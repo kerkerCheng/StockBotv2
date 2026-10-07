@@ -113,7 +113,9 @@ def load_schedule(path: Path = DEFAULT_CONFIG) -> dict[str, Any]:
 LLM_EXECUTORS = ("none", "claude")
 #: T2 輪詢（daily ⑩e）的每次呼叫 timeout 與每次幾條等待；config 沒寫時用這兩個值。
 #: 每次 1 條是刻意的（R2 條件 1）：⑩g 只認負責這條的那一次呼叫搜過的東西，一次多條就驗不出同一次呼叫裡的照抄。
-POLL_LLM_DEFAULTS: dict[str, Any] = {"poll_timeout_minutes": 3, "poll_chunk_size": 1}
+POLL_LLM_DEFAULTS: dict[str, Any] = {"poll_timeout_minutes": 3, "poll_chunk_size": 1,
+                                     # 每日摘要（2026-10-07）：一輪一次、零工具；沒寫就用 5 分鐘
+                                     "digest_timeout_minutes": 5}
 
 
 def load_llm(path: Path = DEFAULT_CONFIG, *, repo_root: Path = ROOT) -> dict[str, Any]:
@@ -139,7 +141,7 @@ def load_llm(path: Path = DEFAULT_CONFIG, *, repo_root: Path = ROOT) -> dict[str
     # 寫了就照下面同一套驗——打錯的數字比沒有更危險。
     for key, default in POLL_LLM_DEFAULTS.items():
         llm.setdefault(key, default)
-    for key in ("triage_timeout_minutes", "prescreen_timeout_minutes", "poll_timeout_minutes"):
+    for key in ("triage_timeout_minutes", "prescreen_timeout_minutes", "poll_timeout_minutes", "digest_timeout_minutes"):
         _positive_number(llm, key, "llm")
     for key in ("triage_chunk_size", "prescreen_chunk_size", "poll_chunk_size"):
         chunk = llm.get(key)
@@ -181,7 +183,8 @@ def load_radar(path: Path = DEFAULT_CONFIG) -> dict[str, Any]:
     payload = json.loads(path.read_text(encoding="utf-8"))
     radar = payload.get("radar")
     if radar is None:
-        return {"enabled": False, "max_items": 5, "timeout_minutes": 10.0, "configured": False}
+        return {"enabled": False, "max_items": 5, "timeout_minutes": 10.0, "configured": False,
+                "market_topics": [], "max_market_items": 0}
     if not isinstance(radar, dict):
         raise ValueError("radar 區塊必須是 object")
     if not isinstance(radar.get("enabled"), bool):
@@ -190,7 +193,18 @@ def load_radar(path: Path = DEFAULT_CONFIG) -> dict[str, Any]:
     if isinstance(max_items, bool) or not isinstance(max_items, int) or not 1 <= max_items <= 20:
         raise ValueError(f"radar.max_items 必須是 1..20 的整數：{max_items!r}")
     timeout = _positive_number(radar, "timeout_minutes", "radar")
-    return {"enabled": radar["enabled"], "max_items": max_items, "timeout_minutes": float(timeout), "configured": True}
+    # 市場大事（2026-10-07 使用者：「我們還是必須知道 AI CAPEX 整個市場的大事，不能見樹不見林」）：
+    # 不限在盯公司的市場層廣搜。沒寫＝不搜（舊行為）；寫了就要合法——打錯的數字比沒有更危險。
+    topics = radar.get("market_topics", [])
+    if not isinstance(topics, list) or not all(isinstance(t, str) and t.strip() for t in topics) or len(topics) > 8:
+        raise ValueError("radar.market_topics 必須是最多 8 個非空字串的清單")
+    max_market = radar.get("max_market_items", 0)
+    if isinstance(max_market, bool) or not isinstance(max_market, int) or not 0 <= max_market <= 10:
+        raise ValueError(f"radar.max_market_items 必須是 0..10 的整數：{max_market!r}")
+    if topics and not max_market:
+        raise ValueError("radar.market_topics 有寫、max_market_items 卻是 0——市場大事會一則都收不到")
+    return {"enabled": radar["enabled"], "max_items": max_items, "timeout_minutes": float(timeout), "configured": True,
+            "market_topics": [t.strip() for t in topics], "max_market_items": max_market}
 
 
 #: 分類層每日上限的預設值——**config 沒寫 `triage` 整段時用它**。

@@ -19,6 +19,8 @@ description: >
 > **無人值守的每日訊息是 Windows daily**（`StockBotv2-Daily` → `crons/daily_task.py`）：它每天抓資料、跑機械段、
 > 外部雷達（2026-10-05 起：`claude -p` 只開 WebSearch 提議、程式驗證後寫 secondary lead）、
 > triage（`claude -p` 零工具提議、程式驗證後寫入）、materialize、組零 LLM 的心跳並發 Discord——**每天一則**。
+> 2026-10-07 起 Discord 那一則是**短版** `brief_<日期>.md`（lead 抓了什麼、市場大事、待你決定、狀態與健康度、下一次研究；
+> 前兩塊是 ⑪c `claude -p` 零工具寫的 TL;DR，每句指得回當天的 lead）；完整五段照樣在 `heartbeat_<日期>.md`。
 > Codex 不在任何無人值守步驟裡；舊的 Codex daily prompt 逐字封存於
 > `docs/archive/2026-09-24-codex-daily-brief-prompt-v1.8.md`（不得再執行）。
 >

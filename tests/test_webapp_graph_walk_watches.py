@@ -251,7 +251,7 @@ def test_both_kinds_are_registered_and_validate() -> None:
     # 2026-09-26 Step 2.6：coverage → graph_walk（kind 數不變）。
     assert STATE_KINDS == ("structure_table", "beta", "graph_walk", "watches", "positions",
                            "structure_readings", "account_scorecard", "candidates",
-                           "layer_notes")   # 3.6：+candidates → 8；個股頁 S4b：+layer_notes → 9
+                           "layer_notes", "daily")   # 3.6：+candidates → 8；個股頁 S4b：+layer_notes → 9；10-07：+daily → 10
     for kind, payload in (("graph_walk", fake_graph_walk_payload()), ("watches", fake_watches_payload())):
         assert validate_state_artifact(kind, payload) is payload
         with pytest.raises(ArtifactUnavailable, match="content_digest"):

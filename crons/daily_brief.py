@@ -1,0 +1,295 @@
+"""Discord 那一則（2026-10-07 使用者指示）。
+
+使用者原話：「每日心跳，太雜了，而且我想看到你每天 websearch 的結果跟你做了什麼，比較有實感……Lead 抓了哪些 TL;DR、
+Websearch 大事件 TL;DR、幾件事待我決定、健康度等等」。
+
+五塊、固定順序、**每塊一定出現**（沒東西也說沒東西——INV-3）：
+
+① lead 抓了什麼：⑪c LLM 寫的 TL;DR（每句都指得回今天的 lead）；沒產生時退回程式組的來源計數與分流 go 的標題。
+② 市場大事：同上；退回雷達收據收下的那幾則（層別｜標題｜一句事實）。
+③ 待你決定：pq2 球在你手上的每一條（程式組，與心跳段 3 同一個 `_pq2_item_lines`）。
+④ 狀態與健康度：**每天都印**的基本狀態（daily 步數、較昨變動、候選各格檔數與最老滯留、watch 今日醒／到期／標旗／未檢、
+   反證與加碼條件、無到期的等待、今天第一次被點名的新名字——2026-10-07 使用者：「daily 心跳基本重要的 status 還是要印」），
+   再接健康度：沒問題就一行；有問題才逐條（daily 失敗的步驟、LLM 額度、invariants FAIL、健康紅燈）。
+⑤ 下一次研究要做的：常駐計數器（未 triage、未檢、待深挖、該重讀、等你提供的文件）——**0 也印**（L14）。
+
+完整五段心跳照樣每天寫進 `library/private/heartbeat/heartbeat_<日期>.md`（互動 session 讀它查細節）；APP「每日」頁
+顯示的是這一則。這裡的數字全部來自心跳同一份快照、同一批函式與執行紀錄，不另算一份（L16）；LLM 寫的句子標明是提議，
+判定只在互動 session。
+"""
+from __future__ import annotations
+
+from datetime import date, datetime, timezone
+from pathlib import Path
+from typing import Any, Mapping, Sequence
+
+ROOT = Path(__file__).resolve().parent.parent
+HEARTBEAT_DIR = ROOT / "library" / "private" / "heartbeat"
+
+#: lead 來源前綴 → 人話（沒列到的照原字）。只用來分組計數，不判斷任何事。
+SOURCE_LABELS: Mapping[str, str] = {
+    "x": "X 帳號", "edgar": "SEC 申報", "mops": "台股公告", "mfn": "北歐公告", "yahoo": "Yahoo 新聞",
+    "sivers": "Sivers 新聞", "official": "公司官網", "web_radar": "外部雷達", "decompose": "拆層研究題",
+    "directed": "指定研究題", "event_watch": "等待醒來", "theme_scan": "題材掃描", "graph_walk": "走圖",
+    "user_shared": "你給的",
+}
+RADAR_SCOPE_WORDS: Mapping[str, str] = {"market": "市場", "theme": "主題", "watch": "在盯"}
+TITLE_CHARS = 70
+
+
+def _short(text: Any, limit: int = TITLE_CHARS) -> str:
+    flat = " ".join(str(text or "").split())
+    return flat if len(flat) <= limit else flat[:limit] + "…"
+
+
+def _source_family(source: Any) -> str:
+    prefix = str(source or "").split(":", 1)[0]
+    return SOURCE_LABELS.get(prefix, prefix or "（沒有來源）")
+
+
+def _read_json(path: Path) -> Any:
+    import json
+
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None
+
+
+def leads_block(*, digest: Mapping[str, Any] | None, todays: Sequence[Mapping[str, Any]],
+                digest_problem: str | None) -> list[str]:
+    """① lead 抓了什麼。標題行永遠是程式數的（外面新進幾則、哪些來源；我們自己登記的研究題另計、不摘要）；
+    內容是 LLM 的 TL;DR，沒有就退回分流 go 的標題。"""
+    from collections import Counter
+
+    from engine_b.digest import is_external
+
+    external = [lead for lead in todays if is_external(lead)]
+    internal = len(todays) - len(external)
+    families = Counter(_source_family(lead.get("source")) for lead in external)
+    head = f"**① Lead 抓了什麼**（外面新進 {len(external)} 則" + (
+        "：" + "、".join(f"{name} {n}" for name, n in families.most_common()) if external else "") + (
+        f"；另有我們自己登記的研究題 {internal} 則，不摘要" if internal else "") + "）"
+    lines = [head]
+    bullets = list((digest or {}).get("leads") or ())
+    if bullets:
+        lines.extend(f"- {b['text']}" for b in bullets)
+        return lines
+    went = [lead for lead in external if lead.get("status") == "triaged_go"]
+    reason = digest_problem or "LLM 摘要今天沒產生"
+    if not external:
+        lines.append("- 這一輪外面沒有新進的 lead")
+    elif went:
+        lines.append(f"- （{reason}——改列分流判 go 的 {len(went)} 則）")
+        lines.extend(f"- {_short(lead.get('title'))}" for lead in went[:3])
+    else:
+        lines.append(f"- （{reason}；分流判 go 的 0 則）")
+    return lines
+
+
+def events_block(*, digest: Mapping[str, Any] | None, receipt: Mapping[str, Any] | None,
+                 digest_problem: str | None, radar_problem: str | None) -> list[str]:
+    """② 市場大事。標題行是雷達收據的計數；內容是 LLM 的 TL;DR，沒有就退回雷達收下的那幾則（標題＋一句事實）。"""
+    summary = (receipt or {}).get("summary") or {}
+    if receipt is None:
+        head = f"**② 市場大事**（外部雷達今天沒有收據：{radar_problem or '沒跑'}）"
+    else:
+        head = (f"**② 市場大事**（雷達搜 {summary.get('searches', '?')} 次、收 {summary.get('new', 0)} 則"
+                f"——市場 {summary.get('new_market', 0)}、主題 {summary.get('new_theme', 0)}、在盯 {summary.get('new_watch', 0)}）")
+    lines = [head]
+    bullets = list((digest or {}).get("events") or ())
+    if bullets:
+        lines.extend(f"- {b['text']}" for b in bullets)
+        return lines
+    accepted = list((receipt or {}).get("accepted") or ())
+    if accepted:
+        lines.append(f"- （{digest_problem or 'LLM 摘要今天沒產生'}——改列雷達收下的原文標題與一句事實）")
+        for item in accepted[:5]:
+            scope = RADAR_SCOPE_WORDS.get(str(item.get("scope")), "主題")
+            lines.append(f"- [{scope}] {_short(item.get('title') or item.get('url'))}——{_short(item.get('fact'), 90)}")
+    else:
+        lines.append("- 今天沒有收下任何一則")
+    return lines
+
+
+def decisions_block(*, actionable: Sequence[Mapping[str, Any]] | None, problem: str | None,
+                    todo_mod: Any) -> list[str]:
+    """③ 待你決定：與心跳段 3 同一份清單與同一個格式（`_pq2_item_lines`）。"""
+    from crons.heartbeat import _pq2_item_lines
+
+    if actionable is None:
+        return [f"**③ 待你決定**（讀不到：{problem}）"]
+    lines = [f"**③ 待你決定**（{len(actionable)}）"]
+    if not actionable:
+        lines.append("- 沒有")
+        return lines
+    lines.extend("- " + line.strip() for line in _pq2_item_lines(actionable, todo_mod=todo_mod))
+    return lines
+
+
+#: LLM 步驟的短名（只給 Discord 那一則用；完整標籤在執行紀錄）。
+LLM_STEP_WORDS: Mapping[str, str] = {"01c_radar_propose": "外部雷達", "07a_triage_propose": "分類",
+                                     "10b_prescreen_propose": "預篩", "10e_poll_propose": "T2 輪詢",
+                                     "11c_digest_propose": "每日摘要"}
+
+
+def _last_line(text: Any) -> str:
+    lines = [line.strip() for line in str(text or "").splitlines() if line.strip()]
+    return lines[-1] if lines else ""
+
+
+def _n(value: Any) -> str:
+    return "未讀到" if value is None else str(value)
+
+
+def disproof_line(snapshot: Mapping[str, Any]) -> str:
+    """反證與加碼條件一行——數字是心跳快照同一份（`collect_snapshot` 用 `disproof_counts` 算的；L16 不另算）。"""
+    s = snapshot
+    return (f"反證：在盯 {_n(s.get('disproof.watching'))}｜**觸及待處置 {_n(s.get('disproof.touched_pending'))}**"
+            f"｜到期待複查 {_n(s.get('disproof.expired_pending'))}｜未盯 {_n(s.get('disproof.unwatched'))}"
+            f"｜加碼條件 在盯 {_n(s.get('confirm.watching'))}／觸及 {_n(s.get('confirm.touched_pending'))}")
+
+
+def status_lines(*, record: Mapping[str, Any] | None, diff_lines: Sequence[str], status: Sequence[str]) -> list[str]:
+    """④ 的上半：**每天都印**的基本狀態（2026-10-07 使用者：「daily 心跳基本重要的 status 還是要印」；AGENTS 要求心跳必印的
+    計數器——候選各格檔數與最老滯留、watch 今日醒／到期／標旗、反證在盯與未盯——Discord 只送短版之後就住這裡）。
+    `status` 是心跳自己的函式組的那幾行（同一個函式，不另寫一份——L16）；這裡只加 daily 的步數與較昨變動。"""
+    lines = []
+    if record is not None:
+        steps = [r for r in record.get("steps") or [] if isinstance(r, Mapping)]
+        ok = sum(1 for r in steps if r.get("status") == "ok")
+        skipped = sum(1 for r in steps if r.get("status") == "skipped")
+        lines.append(f"- daily {ok}/{len(steps)} 步完成｜跳過 {skipped}｜沒完成 {len(steps) - ok - skipped}")
+    lines.extend(f"- {line}" for line in diff_lines[:1])
+    lines.extend(f"- {line}" for line in status if line)
+    return lines
+
+
+def health_block(*, record: Mapping[str, Any] | None, record_problem: str | None,
+                 quota: Sequence[Mapping[str, Any]], snapshot: Mapping[str, Any]) -> list[str]:
+    """④ 的下半（健康度）：沒問題一行；有問題逐條。被額度擋下的 LLM 步驟併成一行（同一個原因不重複四次）；其他失敗印人話標籤
+    與錯誤的最後一行；invariants FAIL、健康紅燈照快照。"""
+    problems: list[str] = []
+    folded = {key for entry in quota for key in entry.get("steps") or ()}
+    for entry in quota:
+        names = "、".join(LLM_STEP_WORDS.get(k, k) for k in entry.get("steps") or ())
+        problems.append(f"LLM 額度{entry.get('status_words')}：Claude{entry.get('window_words')}額度{entry.get('used_text')}，"
+                        f"{entry.get('reset_text')} 重置——這一輪沒跑：{names}")
+    if record is None:
+        # `_load_run_record` 的理由本身就是完整的一句（「今天沒有 daily 執行紀錄（daily 沒跑…）」／「讀不到」／「格式不對」）
+        problems.append(record_problem or "今天沒有 daily 執行紀錄")
+        done = total = None
+    else:
+        steps = [r for r in record.get("steps") or [] if isinstance(r, Mapping)]
+        total = len(steps)
+        done = sum(1 for r in steps if r.get("status") == "ok")
+        for row in steps:
+            if row.get("status") in ("ok", "skipped", "running", None) or row.get("key") in folded:
+                continue
+            why = _last_line(row.get("error") or row.get("reason") or row.get("stderr_tail"))
+            exit_text = f"exit {row.get('exit')}" if row.get("exit") not in (None, "", 0, "0") else ""
+            detail = "；".join(x for x in (exit_text, _short(why, 90)) if x)
+            problems.append(f"{row.get('label') or row.get('key')}：{row.get('status')}" + (f"（{detail}）" if detail else ""))
+    for key, label in (("invariants.fail", "invariants FAIL"), ("health.red", "健康紅燈")):
+        if snapshot.get(key):
+            problems.append(f"{label} {snapshot[key]}")
+    if not problems:
+        return [f"- 健康度：正常（daily {done}/{total} 步 ok；invariants、健康審查無紅）"]
+    return [f"- 健康度：{len(problems)} 個問題", *(f"  - ⚠ {p}" for p in problems)]
+
+
+#: ⑤ 的常駐計數器（快照鍵 → 人話）。**0 也印**（L14：會自己出現的計數器）。
+TODO_COUNTERS: tuple[tuple[str, str], ...] = (
+    ("lead.pending", "未 triage"), ("semantic.pending_check", "未檢"), ("t2.hits_pending", "T2 命中待檢"),
+    ("lead.triaged_go", "待深挖 lead"), ("reading.needs_reread", "讀圖該重讀"), ("layer_note.reread", "層說明該重讀"),
+    ("disproof.touched_pending", "反證觸及待處置"), ("confirm.touched_pending", "加碼條件觸及待處置"),
+    ("pq2.source_trace_review", "等你提供的文件"),
+)
+
+
+def todo_block(snapshot: Mapping[str, Any]) -> list[str]:
+    cells = [f"{label} {'未讀到' if snapshot.get(key) is None else snapshot.get(key)}" for key, label in TODO_COUNTERS]
+    return ["**⑤ 下一次研究要做的**", "- " + "｜".join(cells)]
+
+
+def compose_brief(*, now: datetime, summary: str, snapshot: Mapping[str, Any], run_record_path: Path | None,
+                  leads_path: Path | None = None, heartbeat_dir: Path = HEARTBEAT_DIR,
+                  diff_lines: Sequence[str] = (), state_dir: Path | None = None) -> str:
+    """組 Discord 那一則（markdown）。每一塊各自降級：組不出來就印一行理由，不讓整則消失（L13）；
+    ④ 的每一行也各自降級（候選板 artifact 讀不到不帶走 watch 那一行）。"""
+    from crons import heartbeat as hb
+    from engine_b import digest as digest_mod
+
+    today: date = now.astimezone().date()
+    blocks: list[list[str]] = [[summary]]
+    digest = digest_mod.load_digest(today, out_dir=heartbeat_dir)
+    record, record_problem = hb._load_run_record(run_record_path, now=now)
+    rows = {str(r.get("key")): r for r in (record or {}).get("steps") or [] if isinstance(r, Mapping)}
+    digest_step = rows.get("11e_digest_apply") or rows.get("11c_digest_propose") or {}
+    digest_problem = None if digest else (
+        f"LLM 摘要今天沒產生（{digest_step.get('key') or '摘要步驟'} {digest_step.get('status') or '沒跑'}"
+        + (f"：{_short(digest_step.get('error') or digest_step.get('reason'), 60)}" if
+           (digest_step.get('error') or digest_step.get('reason')) else "") + "）")
+    receipt = _read_json(heartbeat_dir / f"radar_{today.isoformat()}.json")
+    radar_step = next((rows[k] for k in ("01e_radar_apply", "01c_radar_propose") if k in rows
+                       and rows[k].get("status") != "ok"), None)
+    radar_problem = None if radar_step is None else (
+        f"{radar_step.get('key')} {radar_step.get('status')}：{_short(radar_step.get('error') or radar_step.get('reason'), 60)}")
+
+    def guarded(title: str, build: Any) -> list[str]:
+        try:
+            return build()
+        except Exception as exc:  # noqa: BLE001 — 一塊組不出來不帶走整則
+            return [f"**{title}**（這一塊組不出來：{type(exc).__name__}: {_short(exc, 80)}）"]
+
+    def leads_part() -> list[str]:
+        from engine_b import leads as leads_mod
+
+        store = leads_mod.load(leads_path) if leads_path else leads_mod.load()
+        return leads_block(digest=digest, todays=digest_mod.select_leads(store, now=now), digest_problem=digest_problem)
+
+    def decisions_part() -> list[str]:
+        from engine_b import todo as todo_mod
+
+        try:
+            actionable = todo_mod.actionable_items(todo_mod.load())
+        except Exception as exc:  # noqa: BLE001
+            return decisions_block(actionable=None, problem=f"{type(exc).__name__}", todo_mod=todo_mod)
+        return decisions_block(actionable=actionable, problem=None, todo_mod=todo_mod)
+
+    def line(build: Any, label: str) -> str:
+        try:
+            return build()
+        except Exception as exc:  # noqa: BLE001 — 一行讀不到就說讀不到（INV-3），不帶走其他行
+            return f"{label}：讀不到（{type(exc).__name__}）"
+
+    def waits_line() -> str:
+        from engine_b import leads as leads_mod
+
+        store = leads_mod.load(leads_path) if leads_path else leads_mod.load()
+        holes = leads_mod.parked_without_expiry(store)
+        return (f"**無到期的等待 {len(holes)}**（INV-2：每個等待都要有到期）" if holes else "無到期的等待 0")
+
+    def status_part() -> list[str]:
+        status = [line(lambda: hb._candidate_lines(state_dir)[0], "候選"),
+                  line(lambda: hb._watch_today_line(now=now, hint=False), "watch"),
+                  line(lambda: disproof_line(snapshot), "反證"),
+                  line(waits_line, "無到期的等待"),
+                  line(lambda: hb._new_names_line(now=now, leads_path=leads_path, hint=False), "新點名")]
+        health = health_block(record=record, record_problem=record_problem,
+                              quota=hb.quota_entries(rows, now=now), snapshot=snapshot)
+        return ["**④ 狀態與健康度**", *status_lines(record=record, diff_lines=diff_lines, status=status), *health]
+
+    blocks.append(guarded("① Lead 抓了什麼", leads_part))
+    blocks.append(guarded("② 市場大事", lambda: events_block(digest=digest, receipt=receipt,
+                                                          digest_problem=digest_problem, radar_problem=radar_problem)))
+    blocks.append(guarded("③ 待你決定", decisions_part))
+    blocks.append(guarded("④ 狀態與健康度", status_part))
+    blocks.append(guarded("⑤ 下一次研究要做的", lambda: todo_block(snapshot)))
+    if digest:
+        blocks.append(["_TL;DR 是 LLM 寫的提議、每句指得回當天的 lead；判定只在互動 session。_"])
+    return "\n\n".join("\n".join(block) for block in blocks).rstrip() + "\n"
+
+
+__all__ = ["RADAR_SCOPE_WORDS", "SOURCE_LABELS", "TODO_COUNTERS", "compose_brief", "decisions_block",
+           "disproof_line", "events_block", "health_block", "leads_block", "status_lines", "todo_block"]

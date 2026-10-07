@@ -55,7 +55,7 @@ def _stores(args: argparse.Namespace) -> tuple[ArtifactStore, StateArtifactStore
 #: 新增一個 state materializer 時**必須加進來**，否則它會被當成「沒指定」而重跑全部單檔。
 _STATE_FLAGS: tuple[str, ...] = (
     "structure_table", "beta", "graph_walk", "watches", "positions",
-    "structure_readings", "account_scorecard", "candidates", "layer_notes",
+    "structure_readings", "account_scorecard", "candidates", "layer_notes", "daily",
 )
 
 
@@ -63,7 +63,7 @@ def cmd_materialize(args: argparse.Namespace) -> int:
     """跑完整條鏈並寫下 artifact。**這是唯一會跑模型、連 DB、讀 private ledger 的入口。**"""
     from .materialize import (
         candidate_context, materialize_account_scorecard, materialize_beta, materialize_candidates,
-        materialize_graph_walk, materialize_layer_notes,
+        materialize_daily, materialize_graph_walk, materialize_layer_notes,
         materialize_many, materialize_positions,
         materialize_structure_readings,
         materialize_structure_table, materialize_watches, write_vocabularies,
@@ -203,6 +203,22 @@ def cmd_materialize(args: argparse.Namespace) -> int:
             print(f"✗ layer_notes：{type(exc).__name__}: {str(exc)[:200]}", file=sys.stderr)
         else:
             print(f"✓ layer_notes → {path.name}（{path.stat().st_size:,} bytes；{_layer_notes_summary(payload)}）")
+    # 「每日」頁（2026-10-07）：照抄 daily ⑱ 寫的短版；as-of 視角明確拒絕（只有當天那一個檔）。
+    if getattr(args, "daily", False):
+        total += 1
+        if as_of is not None:
+            failed += 1
+            print("✗ daily：as-of 視角明確拒絕——只有當天 daily 寫的那一個檔（INV-6）", file=sys.stderr)
+        else:
+            try:
+                path, payload = materialize_daily(store=state_store)
+            except Exception as exc:  # noqa: BLE001 — 理由原樣回報，不吞
+                failed += 1
+                print(f"✗ daily：{type(exc).__name__}: {str(exc)[:200]}", file=sys.stderr)
+            else:
+                brief = payload.get("brief") or {}
+                state = "有短版" if brief.get("markdown") else f"沒有短版：{(brief.get('absence') or {}).get('reason')}"
+                print(f"✓ daily → {path.name}（{path.stat().st_size:,} bytes；{state}）")
     # 帳號計分表（Phase 3）：唯一會抓價格的 materializer，所以 fail-soft 且與其他各自獨立。
     if getattr(args, "account_scorecard", False):
         total += 1
@@ -685,6 +701,8 @@ def build_parser() -> argparse.ArgumentParser:
     mat.add_argument("--structure-readings", action="store_true",
                      help="另外（或只）materialize 結構讀圖：每一份讀圖跟現在的圖還一不一致（唯讀 ledger ＋ 確定性比對）")
     # dest 與 state kind 同名（`layer_notes`），`_STATE_FLAGS` 才比對得起來。
+    mat.add_argument("--daily", action="store_true",
+                     help="另外（或只）materialize「每日」頁：daily ⑱ 寫的短版照抄（2026-10-07）")
     mat.add_argument("--layer-notes", dest="layer_notes", action="store_true",
                      help="另外（或只）materialize 層說明閱讀頁：ledger 全文、出處的文件自宣告、主張的 watch 狀態、哪幾頁連過來（唯讀）")
     mat.add_argument("--as-of", help="YYYY-MM-DD：point-in-time 視角（單檔與結構表都適用）")

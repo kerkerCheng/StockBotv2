@@ -285,6 +285,10 @@
         "value_type": "string",
         "description": "雷達 LLM 說為什麼值得看的一句話（LLM 的話）"
       },
+      "radar_scope": {
+        "value_type": "string",
+        "description": "雷達這一則落在哪一層（engine_b.radar.SCOPES：market＝AI capex 市場大事、theme＝我們在追的主題、watch＝碰到在盯的條件；2026-10-07）"
+      },
       "radar_publisher": {
         "value_type": "string",
         "description": "雷達 LLM 報的發布者（LLM 的話，未驗）"

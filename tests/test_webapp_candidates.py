@@ -135,11 +135,15 @@ def test_the_no_narrative_list_travels_with_the_board_and_counts_as_cognition() 
 
 
 def test_frontend_lists_no_narrative_tickers_and_says_how_to_get_on_the_board() -> None:
+    """2026-10-07：清單住首頁「沒有敘事」那一組（`alpha.candidates.LIST_GROUPS`）；候選板只留一句與連結（重複的摺疊拿掉）。"""
     from pathlib import Path
 
+    from alpha.candidates import LIST_GROUPS
+
     source = (Path(__file__).resolve().parents[1] / "webapp" / "static" / "app.js").read_text(encoding="utf-8")
-    assert "payload.no_narrative" in source and "沒有敘事、不上板" in source
-    assert "要讓一檔上板，路是研究它、寫敘事" in source
+    assert "沒有敘事、不上板" in source and "要讓一檔上板，路是研究它、寫敘事" in source
+    assert "首頁「沒有敘事」那一組" in source
+    assert "no_narrative" in LIST_GROUPS                                   # 首頁真的有那一組（不是連到空的地方）
 
 
 def test_board_rides_get_node_names_from_the_graph_and_fall_back_to_ids(monkeypatch) -> None:

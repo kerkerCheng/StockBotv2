@@ -194,6 +194,7 @@ fetchers/{edgar,mops,mfn,rns}.py ↑      engine_c/etl_yfinance.py → SQLite
 | **分類／語意預篩** | Windows daily 的兩步：`claude -p` 零工具提議、程式驗證後寫入（Step 1.3／1.4 接上） | 每日硬上限（由 CLI 截斷，不靠 prompt） | 失敗不阻斷；印「未 triage N」與分類層本輪結果 |
 | **外部雷達**（2026-10-04 Phase 7 Step 7.0f） | Windows daily 的 ①b–①e（harvest 之後、triage 批次之前）：①c `claude -p` **只開 WebSearch**（`crons/llm_step.py::radar_argv`；放行只用 `--settings` 的 `permissions.allow`），①e `engine_b/radar.py` 驗證後寫 | 每日上限 `radar.max_items`（程式截，不靠 prompt）；`radar.enabled`／`llm.executor=none` 都能關 | 網址必須出自**同一次執行**的搜尋結果（程式從 stream 收 `tool_use_result` 的連結，不信 LLM 自報）；正規化後與 lead registry 去重（已登記的不碰）；寫成 `web_radar:<主題>`、`source_class=secondary`；**不喚醒語意 watch**（T0 只認一手）；triage 批次裡排在所有非雷達 lead 之後；心跳段 3 每天一行、收據 `radar_<日期>.json`。**它不是 last30days**：ROADMAP 硬約束 8 擋的是「輸出沒有 provenance 契約」的東西進無人值守管線——雷達的契約是每一則都指得回這一次搜尋結果裡的網址，指不回就拒收。八週試驗與停止條件見 ROADMAP Phase 7 |
 | **T2 輪詢**（2026-10-06 使用者指示） | Windows daily 的 ⑩d–⑩g（⑩ sync 與預篩之後）：⑩d `engine_b/watch_poll.py` 挑到期該查的等待（與互動 `event_watch sweep` 同一份挑法），⑩e `claude -p` **與雷達同一組 argv**（只開 WebSearch），**每條等待一次呼叫**、每次一個收集器（逐次紀錄 `search_calls`），⑩g 驗證後寫 | 每日上限 `config/event_watch.json` 的 `sweep_budget_per_run`（20）；`poll_hits_per_watch`（每條每輪 3 則）；調 0 或 `llm.executor=none` 都能關 | 歸屬只認負責那條的那一次呼叫：回答出自那次 session、回報的查詢詞至少一個是那次真的送出的（否則那條不算查過）、網址是那次拿到的；**只記 `poll.last_checked`、只把命中掛在 `poll.hits`——不改 watch 狀態、不叫醒、不寫 lead**；判定只在互動（`watch_poll queue` → `judge`；觸及＝叫醒那條等待，之後照喚醒目標走既有的路）。心跳段 3 每天一行（本輪做了什麼＋命中待檢）、收據 `watch_poll_<日期>.json`；命中兩週沒判，QueueLiveness 亮紅 |
+| **每日摘要**（2026-10-07 使用者指示：「心跳太雜」「心跳沒有不能跑 LLM，必要就跑」） | Windows daily 的 ⑪b–⑪e：⑪b `engine_b/digest.py prepare` 只送近 26 小時**外部來源**的 lead（我們自己登記的研究題只計數）與雷達收據，⑪c `claude -p` **零工具**（與分類同一組 argv）寫兩段 TL;DR，⑪e 驗證後只寫 `library/private/heartbeat/digest_<日期>.json` | `max_llm_calls.digest` 1；調 0 或 `llm.executor=none` 都能關 | 每一句的 `lead_ids` 只能是這一批裡的 id（指不回去整句丟、照數，L18）；每句 ≤160 字、每段上限 leads 4／events 3；**只摘要不判定、不寫任何 authority**。外部雷達同日多一個**市場層**（`radar.market_topics` 四題、各一次搜尋；收據每列 `scope`＝market／theme／watch）回答「AI capex 整個市場這週發生什麼」（使用者：「不能見樹不見林」）。⑱ 心跳以同一份快照組 **Discord 短版**（`crons/daily_brief.py`：lead 抓了什麼／市場大事／待你決定／狀態與健康度——每天印候選各格、watch 今日、反證、無到期的等待、新點名／下一次研究），⑱b 照抄進 APP「每日」頁（kind `daily`），⑲ 只送短版；完整五段照樣落檔給互動 session |
 | **研究** | 互動 session 手動 research-drain | 有 | daily 的 `drain_limit_per_run` 歸零 |
 
 > **2026-09-24（Phase 1 Step 1.8）心跳改版**：五段不增不減。段 2 第一行是**較昨變動**——⑱ 帶 `--write-snapshot` 寫
@@ -620,7 +621,11 @@ filesystem 結構，不該經由 HTTP 出去。遮成 `«private-authority»`，
 **state artifact（2026-09-08，呈現責任重切 B1）：** per-ticker 的 Analyst View 之外，多了**跨標的的 state**
 （`library/private/app/state/<kind>.json`；`webapp/contracts.py::STATE_SCHEMA_VERSIONS` 是封閉的 kind 字彙，
 2026-09-26 起是 `structure_table`／`beta`／`graph_walk`／`watches`／`positions`／`structure_readings`／`account_scorecard`（`coverage` → `graph_walk`，Phase 2 Step 2.6；`structure_readings` 的頁 `#/structure-readings` 於 Step 2.7 上線，每一列帶引用原文與反證登記的 watch id）；
-`ranking`／`basket`／`multi_year` 已於 Phase 0 退役；2026-09-29 Phase 3 Step 3.6 加 `candidates`；2026-10-07 個股頁 plan S4b 加 `layer_notes`（層說明閱讀頁，§6.15），共 9 個，查證 `python -m webapp status`）。
+`ranking`／`basket`／`multi_year` 已於 Phase 0 退役；2026-09-29 Phase 3 Step 3.6 加 `candidates`；2026-10-07 個股頁 plan S4b 加 `layer_notes`（層說明閱讀頁，§6.15）；同日加 `daily`（Discord 短版照抄，§4.1），共 10 個，查證 `python -m webapp status`）。
+**呈現取捨（2026-10-07 使用者：「App 是要給人看的…不需要給我看的…不是收起來 是拿掉」）：** 畫面只放使用者會看的；
+agent 查核用的欄位（authority、freshness identity、content digest、`this_is_not`、逐條排除理由、凍結的舊店與 history 線、
+走圖的 prod 副產品與 registry note 對、每一天的收盤表）**留在 artifact 與 `/api/v1/*`、不印**。頁尾統一一行「這份畫面產生於…」
+（過期才加規則）；追蹤表只印 live／paper 兩條線，power-law 三量跟著線走；結構表的需求鏈改跟著篩選出現。個股頁的稽核區與「完整細節」留到個股頁改版。
 **`candidates` kind（候選狀態板）：** 字彙與純函式（三個字、滯留、已持有索引、整板組裝、rollup）住零 I/O 的 `alpha/candidates.py`——
 心跳與 APP 的 fake payload 只 import 它，不經 `alpha.providers`（那會把 Neo4j／Engine C／yfinance 載進來）；推導住 `alpha/providers/candidates.py`（候選板、心跳、個股頁、成交收據共用一個函式），
 持股身分解析住 `portfolio/holdings.py`（`engine_b/cli.py::_held` 也呼叫它，但保留自己的語意：全部持股、含 beta、Sheet 讀不到 fail closed）；
@@ -643,7 +648,7 @@ alpha／beta 界線用 `risk/hard_caps.py` 匯出的 `beta_instrument_for`／`is
 sleeve／差距狀態／行情狀態／降級原因的中文標籤全部從 `portfolio.allocation` 的對照函式取（L16）。逐檔折線的序列只搬
 Engine C `technical_observations` 的 `session_date`＋`close_adjusted`——那張表還留著 08-29 前的動能欄位，**永遠不進 artifact**
 （`tests/test_webapp_beta.py` 掃整份 JSON 鍵名）。畫面依 dataviz skill：水平堆疊條（現在的配置，色跟 sleeve 走）、分歧條
-（距目標多遠，灰帶＝容忍區間）、儀表（風控上限、52 週位置）、單系列折線（自身收盤，含十字線 tooltip 與表格版）；
+（距目標多遠，灰帶＝容忍區間）、儀表（風控上限、52 週位置）、單系列折線（自身收盤，含十字線 tooltip；表格版 2026-10-07 拿掉）；
 調色盤用 dataviz 參考實例的已驗證值（深淺兩套）。`freshness_identity` 只含各 sleeve 狀態／各檔行情狀態／風險警告，
 價格心跳變了不算認知變了。
 

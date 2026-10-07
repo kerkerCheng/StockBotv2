@@ -204,7 +204,7 @@ def test_state_kinds_are_a_closed_vocabulary() -> None:
     # 都會在這裡變紅——不必另外寫一條「不得出現」的斷言。
     assert STATE_KINDS == ("structure_table", "beta", "graph_walk", "watches", "positions",
                            "structure_readings", "account_scorecard", "candidates",
-                           "layer_notes")   # 3.6：+candidates → 8；個股頁 S4b：+layer_notes → 9
+                           "layer_notes", "daily")   # 3.6：+candidates → 8；個股頁 S4b：+layer_notes → 9；10-07：+daily → 10
     assert STATE_SCHEMA_VERSIONS["structure_table"] == "stockbot-app/structure_table/1"
 
 
@@ -271,7 +271,7 @@ def test_state_store_round_trip(tmp_path) -> None:
     assert got == payload and fresh.state == "fresh"
     assert store.kinds() == ["structure_table"]
     assert store.missing_kinds() == ["beta", "graph_walk", "watches", "positions",
-                                     "structure_readings", "account_scorecard", "candidates", "layer_notes"]
+                                     "structure_readings", "account_scorecard", "candidates", "layer_notes", "daily"]
     with pytest.raises(ArtifactUnavailable, match="未登記"):
         store.read("cashflow")
     with pytest.raises(ArtifactUnavailable, match="尚未 materialize"):
@@ -284,7 +284,7 @@ def test_state_store_reports_missing_and_broken_separately(tmp_path) -> None:
     store = StateArtifactStore(tmp_path)
     assert store.kinds() == []
     assert store.missing_kinds() == ["structure_table", "beta", "graph_walk", "watches", "positions",
-                                     "structure_readings", "account_scorecard", "candidates", "layer_notes"]
+                                     "structure_readings", "account_scorecard", "candidates", "layer_notes", "daily"]
     with pytest.raises(ArtifactUnavailable, match="尚未 materialize"):
         store.read("structure_table")
     (tmp_path / "structure_table.json").write_text('{"kind": "structure_table", "rows": [', encoding="utf-8")
@@ -366,7 +366,7 @@ def test_status_and_verify_commands_include_state(tmp_path, capsys) -> None:
     doc = json.loads(capsys.readouterr().out)
     assert [s["kind"] for s in doc["state"]] == ["structure_table"]
     assert doc["state_missing"] == ["beta", "graph_walk", "watches", "positions",
-                                   "structure_readings", "account_scorecard", "candidates", "layer_notes"]
+                                   "structure_readings", "account_scorecard", "candidates", "layer_notes", "daily"]
 
 
 # ---------------------------------------------------------------------------

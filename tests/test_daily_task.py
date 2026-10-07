@@ -80,6 +80,13 @@ EXPECTED_STEPS = (
                         "--run-id", "{run_id}"), 3, True, False, "apply", False, None, "10e_poll_propose", None),
     ("11_standing_go", ("-m", "engine_b.todo", "standing-go", "--run"), 5, True, False, "command", False, None,
      None, None),
+    # ⑪b–⑪e 每日摘要（2026-10-07 使用者指示）：LLM 只寫兩段 TL;DR、每句指得回今天的 lead；套用只寫 library/private/heartbeat
+    ("11b_digest_prepare", ("-m", "engine_b.digest", "prepare", "--run-id", "{run_id}", "--out", "{digest_batch}"),
+     2, False, False, "command", False, None, None, None),
+    ("11c_digest_propose", (), 5, False, True, "llm", False, None, "11b_digest_prepare", "digest"),
+    ("11d_integrity_after_digest", (), 1, False, False, "integrity", True, None, None, None),
+    ("11e_digest_apply", ("-m", "engine_b.digest", "apply", "--file", "{digest_result}", "--batch", "{digest_batch}",
+                          "--run-id", "{run_id}"), 2, False, False, "apply", False, None, "11c_digest_propose", None),
     ("12_fiscal_year_backfill", ("scripts/backfill_fiscal_year_results.py", "--write"), 10, True, True,
      "command", False, None, None, None),
     ("13_materialize", ("-m", "webapp", "materialize", "--tracked", "--registry-listed", "--structure-table",
@@ -96,9 +103,12 @@ EXPECTED_STEPS = (
      None, None, None),
     ("17_finalize", ("scripts/finalize_daily_state.py",), 2, True, False, "command", True, None, None, None),
     ("18_heartbeat", ("-m", "crons.heartbeat", "--out", "{brief}", "--summary-out", "{summary_file}",
-                      "--write-snapshot"), 3, False, False, "heartbeat", True, None,
+                      "--write-snapshot", "--brief-out", "{short_brief}"), 3, False, False, "heartbeat", True, None,
      None, None),
-    ("19_publish", ("scripts/publish_daily_brief.py", "--brief-file", "{brief}", "--summary", "{summary}"),
+    # ⑱b「每日」頁（2026-10-07）：短版照抄進 APP，排在 ⑲ 之前
+    ("18b_materialize_daily", ("-m", "webapp", "materialize", "--daily"), 2, False, False, "command", True, None,
+     None, None),
+    ("19_publish", ("scripts/publish_daily_brief.py", "--brief-file", "{short_brief}", "--summary", "{summary}"),
      3, False, True, "publish", True, None, None, None),
 )
 
@@ -123,10 +133,10 @@ def test_no_forbidden_command_in_the_list(forbidden: str) -> None:
 
 
 def test_llm_steps_have_no_argv_in_the_list() -> None:
-    """LLM 呼叫的 argv 不住清單（由 1.3 的呼叫端與測試另守）；清單裡的 LLM 步驟只有這四個。"""
+    """LLM 呼叫的 argv 不住清單（由 1.3 的呼叫端與測試另守）；清單裡的 LLM 步驟只有這五個（2026-10-07 加每日摘要）。"""
     llm = [s for s in DAILY_STEPS if s.kind == "llm"]
     assert [s.key for s in llm] == ["01c_radar_propose", "07a_triage_propose", "10b_prescreen_propose",
-                                    "10e_poll_propose"]
+                                    "10e_poll_propose", "11c_digest_propose"]
     assert all(s.argv == () for s in llm)
     # 雷達三步跟著 `radar.enabled`（Phase 7 Step 7.0f）；其他步驟沒有開關
     assert {s.key for s in DAILY_STEPS if s.switch} == {"01b_radar_prepare", "01c_radar_propose", "01e_radar_apply"}
@@ -268,7 +278,8 @@ def test_happy_path_runs_every_step_and_records_them(tmp_path: Path) -> None:
     # 測試用的 config 沒有 radar 區塊＝雷達關閉（Phase 7 Step 7.0f），三步與 executor=none 的 LLM 步驟一起記 skipped
     llm_keys = ("07a_triage_propose", "07b_triage_apply", "10b_prescreen_propose", "10c_prescreen_apply",
                 "01b_radar_prepare", "01c_radar_propose", "01e_radar_apply",
-                "10e_poll_propose", "10g_poll_apply")        # T2 輪詢（2026-10-06）：提議與套用跟著 executor=none
+                "10e_poll_propose", "10g_poll_apply",        # T2 輪詢（2026-10-06）：提議與套用跟著 executor=none
+                "11c_digest_propose", "11e_digest_apply")    # 每日摘要（2026-10-07）：同上
     assert all(status[k] == "skipped" for k in llm_keys), status
     assert all(v == "ok" for k, v in status.items() if k not in llm_keys), status
     assert run.record["status"] == "completed"

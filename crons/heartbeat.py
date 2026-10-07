@@ -951,7 +951,8 @@ def _woke_on(watch: dict, day: date) -> bool:
     return any(_local_day(s) == day for s in stamps)
 
 
-def _watch_today_line(*, now: datetime) -> str:
+def _watch_today_line(*, now: datetime, hint: bool = True) -> str:
+    """`hint=False`：Discord 短版用（命令提示是給互動 session 的，不給手機上的人）。數字同一份。"""
     from engine_b import event_watch as ew
 
     data = ew.load_watches()
@@ -961,12 +962,13 @@ def _watch_today_line(*, now: datetime) -> str:
     expired = sum(1 for w in watches if _local_day(w.get("expired_at")) == today)
     c = ew.counters(data)
     return (f"watch：今日醒 {woken}｜今日到期 {expired}｜已觸發未消化 {c['fired_unconsumed']}"
-            f"｜語意標旗 {c['semantic_flagged']}｜**未檢 {c['semantic_pending_check']}**（判定只在互動："
-            "`python -m engine_b.event_watch semantic-queue`）")
+            f"｜語意標旗 {c['semantic_flagged']}｜**未檢 {c['semantic_pending_check']}**"
+            + ("（判定只在互動：`python -m engine_b.event_watch semantic-queue`）" if hint else ""))
 
 
-def _new_names_line(*, now: datetime, leads_path: Path | None) -> str:
-    """今天第一次被點名、registry 沒有的名字（registry 是「圖裡沒有」的代理：圖裡的公司都在 registry）。"""
+def _new_names_line(*, now: datetime, leads_path: Path | None, hint: bool = True) -> str:
+    """今天第一次被點名、registry 沒有的名字（registry 是「圖裡沒有」的代理：圖裡的公司都在 registry）。
+    `hint=False`：Discord 短版用（命令提示給互動 session，不給手機上的人）。數字同一份。"""
     from engine_b import leads as leads_mod
 
     store = leads_mod.load(leads_path) if leads_path is not None else leads_mod.load()
@@ -974,7 +976,7 @@ def _new_names_line(*, now: datetime, leads_path: Path | None) -> str:
     today = now.astimezone().date()
     fresh = sorted((r for r in rows if _local_day(r.get("first_seen")) == today),
                    key=lambda r: str(r.get("first_seen")))
-    tail = f"｜累計被點名但未登記 {len(rows)}（`python -m engine_b.cli onboard-candidates`）"
+    tail = f"｜累計被點名但未登記 {len(rows)}" + ("（`python -m engine_b.cli onboard-candidates`）" if hint else "")
     if not fresh:
         return "今天第一次被點名、registry 沒有的名字 0" + tail
     names = "、".join(f"{r.get('ticker')}（{' '.join(str(r.get('sample_title') or '').split())[:30]}）"
@@ -1344,29 +1346,64 @@ def _prescreen_and_quota_lines(*, now: datetime, record_path: Path | None) -> li
     else:
         step = apply or propose
         lines.append(f"預篩：本輪沒完成（{(step or {}).get('status')}：{(step or {}).get('reason') or (step or {}).get('error') or '—'}）")
-    # 額度：同一個狀態＋同一個窗只印一行（兩個 LLM 步驟看到的是同一個帳號額度），寫成人話：用了幾成、幾點重置、
-    # 用完會怎樣（2026-10-01 使用者問「LLM 額度是什麼問題」——原本只印 allowed_warning、seven_day、重置 ?）。
+    return lines + _quota_lines_from(rows, now=now)
+
+
+def quota_lines(*, now: datetime, record_path: Path | None) -> list[str]:
+    """LLM 額度的人話行（心跳段 3 與 Discord 那一則的健康度共用——一個 owner，L16）。讀不到執行紀錄＝沒有行。"""
+    record, _problem = _load_run_record(record_path, now=now)
+    if record is None:
+        return []
+    return _quota_lines_from({str(r.get("key")): r for r in record.get("steps") or [] if isinstance(r, Mapping)},
+                             now=now)
+
+
+#: daily 裡的 LLM 步驟（看額度用）。2026-10-07：T2 輪詢與每日摘要也是 LLM 步驟——額度用完時它們一樣被擋（L17 對稱面）。
+LLM_PROPOSE_KEYS: tuple[str, ...] = ("01c_radar_propose", "07a_triage_propose", "10b_prescreen_propose",
+                                     "10e_poll_propose", "11c_digest_propose")
+
+
+def quota_entries(rows: Mapping[str, Any], *, now: datetime) -> list[dict[str, Any]]:
+    """LLM 額度的結構化狀態：同一個狀態＋同一個窗合成一筆（幾個 LLM 步驟看到的是同一個帳號額度）。
+    心跳段 3 那一行與 Discord 那一則的健康度都由它組字（一個 owner，L16）。"""
     seen: dict[tuple[Any, Any], dict[str, Any]] = {}
-    for key in ("01c_radar_propose", "07a_triage_propose", "10b_prescreen_propose"):
+    for key in LLM_PROPOSE_KEYS:
         for call in (rows.get(key) or {}).get("calls") or []:
             limit = (call or {}).get("rate_limit") or {}
             if limit and limit.get("status") not in (None, "allowed"):
                 entry = seen.setdefault((limit.get("status"), limit.get("rateLimitType")), {"steps": [], **limit})
                 if key not in entry["steps"]:
                     entry["steps"].append(key)
+    out = []
+    # 重置時間印**排程時區**（台北）——2026-10-07 前用 `now.tzinfo`，而 daily 傳進來的 now 是 UTC：心跳印「10-06 23:40 重置」，
+    # CLI 自己說的是「resets 7:40am (Asia/Taipei)」（同一個時刻、兩個鐘；時區只有 config 那一份，L16）
+    try:
+        from engine_b.event_watch import _local_timezone
+
+        zone = _local_timezone()
+    except Exception:  # noqa: BLE001 — 排程設定讀不到就退回 now 自己的時區，照印
+        zone = now.tzinfo
     for (status, kind), entry in seen.items():
         used = entry.get("utilization")
-        used_text = f"已用 {used:.0%}" if isinstance(used, (int, float)) else "用量沒回報"
-        reset = entry.get("resetsAt")
         try:
-            reset_text = datetime.fromtimestamp(float(reset), timezone.utc).astimezone(now.tzinfo).strftime("%m-%d %H:%M")
+            reset_text = datetime.fromtimestamp(float(entry.get("resetsAt")), timezone.utc).astimezone(
+                zone).strftime("%m-%d %H:%M")
         except (TypeError, ValueError, OverflowError, OSError):
             reset_text = "?"
-        lines.append(f"⚠ **LLM 額度{QUOTA_STATUS_WORDS.get(str(status), '')}**（{status}）：Claude 訂閱"
-                     f"{QUOTA_WINDOW_WORDS.get(str(kind), f' {kind or '?'} ')}額度{used_text}，{reset_text} 重置"
-                     f"（{'、'.join(entry['steps'])}）——整個帳號的用量，含互動 session；用完時 daily 的分類、預篩與外部雷達"
-                     "會暫停（記成 rate_limited），心跳照發")
-    return lines
+        out.append({"status": status, "kind": kind, "steps": list(entry["steps"]),
+                    "status_words": QUOTA_STATUS_WORDS.get(str(status), ""),
+                    "window_words": QUOTA_WINDOW_WORDS.get(str(kind), f" {kind or '?'} "),
+                    "used_text": f"已用 {used:.0%}" if isinstance(used, (int, float)) else "用量沒回報",
+                    "reset_text": reset_text})
+    return out
+
+
+def _quota_lines_from(rows: Mapping[str, Any], *, now: datetime) -> list[str]:
+    # 額度：寫成人話——用了幾成、幾點重置、用完會怎樣（2026-10-01 使用者問「LLM 額度是什麼問題」）。
+    return [f"⚠ **LLM 額度{e['status_words']}**（{e['status']}）：Claude 訂閱{e['window_words']}額度{e['used_text']}，"
+            f"{e['reset_text']} 重置（{'、'.join(e['steps'])}）——整個帳號的用量，含互動 session；用完時 daily 的分類、"
+            "預篩與外部雷達會暫停（記成 rate_limited），心跳照發"
+            for e in quota_entries(rows, now=now)]
 
 
 def radar_rejected(summary: Mapping[str, Any]) -> int:
@@ -2182,6 +2219,8 @@ class Heartbeat:
     snapshot: dict[str, int | None]
     banner: list[str]
     summary: str
+    #: 較昨變動那幾行（段 2 第一行的來源；Discord 短版也印它——2026-10-07 使用者：「心跳基本重要的 status 還是要印」）
+    diff: list[str] = field(default_factory=list)
 
 
 def compose_heartbeat(
@@ -2235,7 +2274,7 @@ def compose_heartbeat(
                                theme_nudge=nudge, theme_line=theme_line)
     except Exception as exc:  # noqa: BLE001
         summary = f"Daily {today.isoformat()}｜⚠ 摘要行組不出來（{type(exc).__name__}）"
-    return Heartbeat(sections=sections, snapshot=snapshot, banner=banner, summary=summary)
+    return Heartbeat(sections=sections, snapshot=snapshot, banner=banner, summary=summary, diff=list(diff))
 
 
 def build_heartbeat(**kwargs: Any) -> list[Section]:
@@ -2333,6 +2372,9 @@ def main(argv: Sequence[str] | None = None) -> int:
                         help="把 Discord 摘要行寫到這個檔（daily ⑲ 帶進 publish --summary）")
     parser.add_argument("--write-snapshot", action="store_true",
                         help="寫今天的快照（daily ⑱ 才帶；互動手跑不帶，免得蓋掉 daily 的那一份）")
+    parser.add_argument("--brief-out", type=Path, default=None,
+                        help="把 Discord 那一則（五塊：lead／市場大事／待你決定／健康度／下一次研究；crons/daily_brief.py）"
+                             "寫到這個檔（2026-10-07 使用者指示：心跳太雜）")
     args = parser.parse_args(argv)
 
     now = datetime.now(timezone.utc)
@@ -2359,6 +2401,18 @@ def main(argv: Sequence[str] | None = None) -> int:
         print(f"心跳已寫入 {args.out}（{len(text.encode('utf-8'))} bytes）", file=sys.stderr)
     else:
         sys.stdout.write(text)
+    if args.brief_out is not None:
+        # Discord 那一則：與心跳同一份快照與摘要行（不另算，L16）；組不出來就退回一行理由＋摘要行，不讓發送沒東西可發
+        try:
+            from crons.daily_brief import compose_brief
+
+            brief = compose_brief(now=now, summary=beat.summary, snapshot=beat.snapshot,
+                                  run_record_path=run_record_path_for(now), diff_lines=beat.diff)
+        except Exception as exc:  # noqa: BLE001
+            brief = (f"{beat.summary}\n\n（Discord 短版組不出來：{type(exc).__name__}——完整心跳照樣寫在 heartbeat 目錄，"
+                     "互動 session 說「daily brief」就讀得到）\n")
+        args.brief_out.write_text(brief, encoding="utf-8")
+        print(f"短版已寫入 {args.brief_out}（{len(brief.encode('utf-8'))} bytes）", file=sys.stderr)
     # **永遠 0**：心跳的失敗模式是「印出降級行」，不是「不發」。
     return 0
 

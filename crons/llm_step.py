@@ -512,3 +512,22 @@ def compose_poll_prompt(items: Sequence[Mapping[str, Any]]) -> str:
         POLL_PROMPT.read_text(encoding="utf-8").strip(),
         f"## 本輪資料（{len(items)} 條等待）\n\n{DATA_START}\n{data}\n{DATA_END}",
     ]) + "\n"
+
+
+# ---------------------------------------------------------------------------
+# 每日摘要（⑪c；2026-10-07 使用者指示）：零工具（與 triage／預篩同一組 argv 與能力期望）——只寫兩段 TL;DR，
+# 每一句都要列出它根據的 lead id，⑪e 由程式驗證那些 id 都在這一輪的資料裡。
+# ---------------------------------------------------------------------------
+
+DIGEST_PROMPT = ROOT / "crons" / "digest_prompt.md"
+DIGEST_SCHEMA = ROOT / "crons" / "digest_schema.json"
+
+
+def compose_digest_prompt(requests: Sequence[Mapping[str, Any]]) -> str:
+    """每日摘要的 prompt：固定指示（`crons/digest_prompt.md`）＋程式組的資料（今天的 lead 與雷達收下的新聞）。
+    **資料只來自 `engine_b.digest.prepare` 的批次**——不讀 Sheet、持股、NAV、私人路徑（測試以哨兵證明）。"""
+    data = json.dumps(list(requests), ensure_ascii=False, indent=1)
+    return "\n\n".join([
+        DIGEST_PROMPT.read_text(encoding="utf-8").strip(),
+        f"## 本輪資料\n\n{DATA_START}\n{data}\n{DATA_END}",
+    ]) + "\n"
