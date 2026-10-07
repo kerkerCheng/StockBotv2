@@ -65,3 +65,24 @@ def test_real_readme_status_cells_start_with_a_known_word():
     bad = [r for r in rows if not known.match(r["status"].strip())]
     assert not bad, bad
     assert sum(1 for r in rows if hint._is_active(r["status"])) <= 1
+
+
+def test_next_step_prints_resume_pointer_and_executor_model(tmp_path, monkeypatch, capsys):
+    """2026-10-07：hook 只印定義欄——7.1 定義寫的「InP 磊晶層說明（排第一件）」已做完，新 session 會照著重做；
+    建議模型也一律寫「便宜」，可是 7.1 的執行者欄是強模型，便宜模型跑到研究 Step 就停下交回。"""
+    plan = tmp_path / "plan.md"
+    plan.write_text(
+        "| Step | 內容 | 狀態 | 執行者 | commit |\n|---|---|---|---|---|\n"
+        "| 7.0 | 開場 | ✅ | 執行模型 | x |\n"
+        "| 7.1 | 研究：**舊的第一件**、積壓 | ○（已做：舊的第一件。**續工指標**：①新的第一件 ②第二件〔研究：強模型〕） | 強模型 | |\n"
+        "| 7.2 | 回放 | ○ | 執行模型 | |\n", encoding="utf-8")
+    msg = _run(tmp_path, monkeypatch, capsys, f"| 7 研究 | [p]({plan.as_posix()}) | active（2026-10-04） |\n")
+    assert "續工：①新的第一件 ②第二件" in msg
+    assert "舊的第一件" not in msg
+    assert "建議模型：強模型" in msg
+    # 沒有續工指標、執行者是執行模型時照舊：印定義、建議便宜
+    plan.write_text(
+        "| Step | 內容 | 狀態 | 執行者 | commit |\n|---|---|---|---|---|\n"
+        "| 7.2 | 回放 | ○ | 執行模型 | |\n", encoding="utf-8")
+    msg = _run(tmp_path, monkeypatch, capsys, f"| 7 研究 | [p]({plan.as_posix()}) | active |\n")
+    assert "7.2（回放）" in msg and "建議模型：便宜" in msg

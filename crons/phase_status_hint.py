@@ -16,7 +16,11 @@ PLANS_README = ROOT / "docs" / "plans" / "README.md"
 
 _ROW = re.compile(r"^\|\s*(?P<phase>[^|]+?)\s*\|\s*(?P<plan>[^|]+?)\s*\|\s*(?P<status>[^|]+?)\s*\|\s*$")
 _LINK = re.compile(r"\]\(([^)]+)\)")
-_STEP = re.compile(r"^\|\s*(?P<step>[^|]+?)\s*\|\s*(?P<what>[^|]+?)\s*\|\s*(?P<state>[^|]+?)\s*\|")
+_STEP = re.compile(r"^\|\s*(?P<step>[^|]+?)\s*\|\s*(?P<what>[^|]+?)\s*\|\s*(?P<state>[^|]+?)\s*\|(?:\s*(?P<who>[^|]*?)\s*\|)?")
+#: 狀態格裡「續工指標」之後那一段就是下一個 session 該做的事（2026-10-07：hook 原本只印定義欄，
+#: 7.1 定義寫的「InP 磊晶層說明（排第一件）」已做完，新 session 會照著做一件做過的事）。
+_RESUME = "續工指標"
+_RESUME_MAX = 400
 #: 狀態欄以封閉字彙開頭、後面常接括號註記（「active（2026-10-01；…）」）。
 #: ⚠ 2026-10-01 事發：原本比對 `== "active"`，Phase 4 那一列帶了註記就被當成「沒有 active plan」，
 #: hook 叫人去寫 Phase 5 的 plan——執行者照做就會停在一份其實在跑的 plan 前面。
@@ -49,7 +53,16 @@ def _phase_rows(text: str) -> list[dict[str, str]]:
     return rows
 
 
-def _next_step(plan_path: Path) -> str | None:
+def _resume_pointer(state: str) -> str | None:
+    i = state.find(_RESUME)
+    if i < 0:
+        return None
+    text = state[i + len(_RESUME):].lstrip("*：: ")
+    text = text.split("〔")[0].strip()
+    return (text[:_RESUME_MAX] + "…") if len(text) > _RESUME_MAX else (text or None)
+
+
+def _next_step(plan_path: Path) -> dict[str, str] | None:
     try:
         text = plan_path.read_text(encoding="utf-8")
     except OSError:
@@ -66,8 +79,23 @@ def _next_step(plan_path: Path) -> str | None:
             if not m or set(m.group("step")) <= {"-"}:
                 continue
             if "✅" not in m.group("state"):
-                return f"{m.group('step')}（{m.group('what')}）"
+                return {"step": m.group("step"), "what": m.group("what"), "state": m.group("state"),
+                        "who": m.group("who") or ""}
     return None
+
+
+def _step_text(step: dict[str, str] | None) -> str:
+    if not step:
+        return "（進度表讀不到，看 git log）"
+    pointer = _resume_pointer(step["state"])
+    return f"{step['step']}（續工：{pointer}）" if pointer else f"{step['step']}（{step['what']}）"
+
+
+def _model_text(step: dict[str, str] | None, note: str) -> str:
+    # 進度表的「執行者」欄優先：研究 Step 是強模型，便宜模型跑 /phase-run 做到這裡會停下交回——建議便宜等於白跑一趟。
+    if step and "強模型" in step.get("who", ""):
+        return "強模型（這個 Step 的執行者欄；便宜模型做到這裡會停下交回）"
+    return f"便宜（對照表註記優先{'：' + note if note else ''}）"
 
 
 def main() -> int:
@@ -84,8 +112,8 @@ def main() -> int:
         # 狀態欄的註記照抄（例：Phase 4「執行者全程強模型」）——「建議模型：便宜」是對照表的預設分工，註記優先。
         note = plan["status"].strip()[len("active"):].strip()
         msg = (
-            f"🧭 Phase {plan['phase']} 執行中｜下一個 Step：{step or '（進度表讀不到，看 git log）'}"
-            f"｜建議模型：便宜（對照表註記優先{'：' + note if note else ''}）｜貼 /phase-run"
+            f"🧭 Phase {plan['phase']} 執行中｜下一個 Step：{_step_text(step)}"
+            f"｜建議模型：{_model_text(step, note)}｜貼 /phase-run"
         )
     elif len(active) > 1:
         msg = "🧭 對照表有兩份以上 active plan——先修 docs/plans/README.md 再開工"
