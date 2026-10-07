@@ -112,6 +112,25 @@ def _wipeout_overview(panel: Mapping[str, Any]) -> dict[str, Any]:
             "tally": (panel.get("context") or {}).get("tally"), "lanes": lanes}
 
 
+def _candidate_overview(panel: Mapping[str, Any]) -> dict[str, Any]:
+    """首頁分組（2026-10-07 使用者指示）：這檔落在候選板的哪一格——**照抄**候選面板那一格（與候選板同一個
+    `derive_row`），鍵與中文都由產生端給，這裡不判、不造字。沒有那一格時，「沒寫敘事」與「這次沒讀到」分兩組
+    （L12）：看面板自己宣告的缺席種類。"""
+    from alpha.candidates import LIST_GROUPS
+
+    datum = _line_map(panel).get("candidate:state") or {}
+    row = datum.get("value")
+    if isinstance(row, Mapping):
+        if row.get("derived") in LIST_GROUPS:
+            return {"list_group": str(row["derived"]), "label": row.get("derived_label"), "absence_kind": None}
+        # 有候選列、值卻不在首頁分組字彙裡＝字彙漏了一格（不是「沒讀到」）：照實寫出那個值
+        return {"list_group": "unavailable", "label": None, "absence_kind": "upstream_unavailable",
+                "reason": f"候選狀態的值 {row.get('derived')!r} 不在首頁分組字彙裡（alpha.candidates.LIST_GROUPS）"}
+    kind = datum.get("absence_kind") or panel.get("absence_kind")
+    return {"list_group": "no_narrative" if kind == "not_yet_recorded" else "unavailable", "label": None,
+            "absence_kind": kind or "upstream_unavailable", "reason": datum.get("reason") or panel.get("reason")}
+
+
 def build_overview(view: Mapping[str, Any], *, price_context: Mapping[str, Any] | None = None) -> dict[str, Any]:
     """清單卡片的投影。**純選取**——這裡沒有任何算術。"""
     headline = view["headline"]
@@ -144,6 +163,8 @@ def build_overview(view: Mapping[str, Any], *, price_context: Mapping[str, Any] 
         "gap_closure": _cell(fundamental_lines.get("gap_closure")),
         # D2（2026-09-18）歸零旗標：四盞燈（顏色＋一句話）與紅黃綠灰計數。照抄 panel。
         "wipeout": _wipeout_overview(view.get("wipeout") or {}),
+        # 2026-10-07（使用者指示）：首頁照候選狀態分組。照抄候選面板（與候選板同一個推導）。
+        "candidate": _candidate_overview(view.get("candidate") or {}),
         # V1：熟成度計數（照抄 research panel 的 catalyst_quantitative_link）
         "ripeness": _cell(_line_map(view.get("research") or {}).get("catalyst_quantitative_link")),
         # 催化劑那一格的形狀（七缺陷之 1）：`ripeness` 在沒有 linked 催化劑時整格無值，
@@ -1179,7 +1200,7 @@ def build_positions_artifact(results: Sequence[Mapping[str, Any]],
     payload: dict[str, Any] = {
         "schema_version": STATE_SCHEMA_VERSIONS["positions"],
         "kind": "positions",
-        "title": "部位與問責：已投的怎麼樣、系統準不準",
+        "title": "追蹤表：判斷寫下之後、真的買了之後怎麼樣（舊店凍結在最下面）",
         "generated_at": stamp.isoformat(),
         "as_of": None,
         "point_in_time": {"mode": "current", "as_of": None, "excluded": None},
@@ -1808,6 +1829,7 @@ def write_vocabularies(store: ArtifactStore | None = None) -> Path:
     而不是在 APP 端再寫一份「absence_kind 是什麼意思」的對照表。
     """
     from alpha.absence import ABSENCE_KINDS, SETTLED_ABSENCE_KINDS
+    from alpha.candidates import LIST_GROUP_LABELS, LIST_GROUPS
     from briefing.analyst_view.contracts import (
         ACCOUNTING_BASIS_DISPLAY, CORE_PANELS, FIRST_SCREEN_QUESTIONS, OPTIONAL_PANELS, PLAIN_ABSENCE_SHORT,
         PLAIN_BET_UNITS, PLAIN_LINE_LABELS, PLAIN_PANEL_TITLES, PLAIN_PRICED_IN, PLAIN_READINESS,
@@ -1840,6 +1862,8 @@ def write_vocabularies(store: ArtifactStore | None = None) -> Path:
         "weak_input_rules": dict(WEAK_INPUT_RULES),
         "core_panels": list(CORE_PANELS),
         "optional_panels": list(OPTIONAL_PANELS),
+        # 首頁分組（2026-10-07 使用者指示）：順序與中文只有 `alpha.candidates` 那一份，API 照這個順序分段（L16）
+        "list_groups": [{"key": key, "label": LIST_GROUP_LABELS[key]} for key in LIST_GROUPS],
         "readiness_states": {
             "ready": "核心各段都有內容，且沒有被標記需要動作",
             "ready_with_flags": "有內容，但至少一段 stale／review_required／not_applicable",

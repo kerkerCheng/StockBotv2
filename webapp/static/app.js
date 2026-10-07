@@ -273,6 +273,10 @@ function renderCard(row) {
 
   const badges = el('div', 'badges');
   badges.appendChild(readinessBadge(row.readiness.state));
+  // 研究完整度（2026-10-07 起不再是首頁分組，留在卡上）：只印兩種不常見、而且下一步不同的終局
+  if (row.closure_terminal === 'settled' || row.closure_terminal === 'awaiting_report') {
+    badges.appendChild(el('span', 'badge badge-fresh', row.closure_label || row.closure_terminal));
+  }
   // ⚠ 2026-09-23（Phase 0 Step 0b.1b）：stance 徽章（這份判讀是不是我們自己的）隨 FY+1 模型退役。
   if (row.freshness && row.freshness.state === 'stale') {
     const b = el('span', 'badge badge-stale', 'stale');
@@ -1680,6 +1684,9 @@ async function renderStructureTable() {
   }
   head.appendChild(badges);
   app.appendChild(head);
+  // 2026-10-07 使用者回饋（「結構表可以留但我不知道怎麼查」）：一句什麼時候用它。
+  app.appendChild(el('p', 'note', '什麼時候用：想知道某一層（例如 CW 雷射、快接頭）有哪幾家在供貨、'
+    + '從需求端走到這一層經過哪幾層——用下面的「只看某一層」挑；想看一家公司坐在哪幾層，用公司名搜。'));
 
   // ① 已知限制：契約說「解讀前必讀」，所以不摺疊。
   const limits = el('section', 'panel');
@@ -2987,6 +2994,12 @@ async function renderPositions() {
   // ⓪ 三條 lane（Phase 5）：我們真的買的、我們寫下判斷的、舊店的歷史——分母分開。
   app.appendChild(renderPositionLanes(payload, detailSet));
 
+  // 2026-10-07（使用者回饋：「我的部位是不是都是舊店的東西」）：上面三條線才是現行的追蹤表（paper＝12-22 檢查點要用的）；
+  // 下面 ①–⑤ 是舊店（入圖日起算的歷史 cohort、舊 Decision Store 計數），收進一個預設摺起來的區塊——不刪，凍結唯讀。
+  const old = document.createElement('details');
+  old.className = 'old-store';
+  old.appendChild(el('summary', null, '舊店（凍結唯讀：入圖日起算的歷史 cohort 與舊 Decision Store）——點開看'));
+
   // ① 舊店的真實成交紀錄（凍結；live lane 讀 trade_log）。
   const sec0 = el('section', 'panel');
   sec0.appendChild(el('h2', null, `舊店的真實成交紀錄（${(live.tickers || []).length} 檔；凍結唯讀，live lane 讀 trade_log）`));
@@ -3009,7 +3022,7 @@ async function renderPositions() {
   boardLink.href = '#/candidates';
   toBoard.appendChild(boardLink);
   sec0.appendChild(toBoard);
-  app.appendChild(sec0);
+  old.appendChild(sec0);
 
   // ② 樣本效度**先於**數字——排版順序本身就是判準的一部分。
   if (health) {
@@ -3040,7 +3053,7 @@ async function renderPositions() {
       + '——這個比例高代表我們常在漲完之後才注意到'));
     sec1.appendChild(rows);
     sec1.appendChild(mdParagraph(notes.sample_validity || ''));
-    app.appendChild(sec1);
+    old.appendChild(sec1);
   }
 
   // ③ 常駐計數器
@@ -3060,7 +3073,7 @@ async function renderPositions() {
     sec2.appendChild(el('p', 'note',
       `不進分母但必須現形：重複 cohort ${c.duplicate_cohort_companies || 0}｜無 identity 殘骸 ${c.orphan_cohorts || 0}`));
   }
-  app.appendChild(sec2);
+  old.appendChild(sec2);
 
   // ④ 等權重聚合
   const sec3 = el('section', 'panel');
@@ -3091,7 +3104,7 @@ async function renderPositions() {
     sec3.appendChild(el('p', 'note', `（時序檔有 ${series.skipped} 行解析失敗，已跳過但沒有靜默丟棄）`));
   }
   sec3.appendChild(mdParagraph(notes.aggregate || ''));
-  app.appendChild(sec3);
+  old.appendChild(sec3);
 
   /* ④b power-law 三量（D15，2026-09-18）。**與等權並列不是取代**：上面那格回答
      「排序整體準不準」，這一格回答「有沒有抓到那一檔」——賭注是小賠多檔一檔補回，
@@ -3135,7 +3148,7 @@ async function renderPositions() {
     (pl.known_biases || []).forEach((b) => sec3b.appendChild(mdParagraph('⚠ ' + b)));
   }
   sec3b.appendChild(mdParagraph(notes.power_law || ''));
-  app.appendChild(sec3b);
+  old.appendChild(sec3b);
 
   /* ④c 賭注收斂（V4，2026-09-19）。**第三個維度**：上面兩格都以股價為錨點，而本圖標的
      同漲同跌；共識修正不受 beta 污染，也不需要賣出就能驗證。
@@ -3185,7 +3198,7 @@ async function renderPositions() {
     (bc.known_biases || []).forEach((b) => sec3c.appendChild(mdParagraph('⚠ ' + b)));
   }
   sec3c.appendChild(mdParagraph(notes.bet_convergence || ''));
-  app.appendChild(sec3c);
+  old.appendChild(sec3c);
 
   // ⑤ 逐檔
   const sec4 = el('section', 'panel');
@@ -3210,8 +3223,9 @@ async function renderPositions() {
       `另有 ${payload.unavailable.length} 個 cohort 的 Shadow 是 unavailable，無錨點可計算（多半是無 ticker 的未上市或殘骸）。`));
   }
   sec4.appendChild(el('p', 'warn', '▲ ' + (notes.monitoring || '')));
-  app.appendChild(sec4);
+  old.appendChild(sec4);
 
+  app.appendChild(old);
   app.appendChild(stateFooter(payload, '這一頁不是什麼'));
   window.scrollTo(0, 0);
 }
@@ -3481,7 +3495,7 @@ function scorecardExcessTable(account, payload) {
     });
   });
   table.appendChild(body);
-  box.appendChild(table);
+  box.appendChild(stackTable(table));
   return box;
 }
 
@@ -3598,31 +3612,62 @@ function plainText(text) {
       box.appendChild(markdownTable(rows));
     } else {
       const row = el('div', line.trim() ? 'pt-line' : 'pt-line pt-blank');
-      row.appendChild(mdInline(line));
+      row.appendChild(inlineWithCites(line));
       box.appendChild(row);
     }
   }
   return box;
 }
 
-/** markdown 表格 → 表格（第二行的 `|---|` 分隔線略過；格子文字一個字不改）。 */
+/** 正文裡的行內出處（〔一手·供應商自述｜`檔名` p.82〕）印成淡色小字——**字一個不改**，只讓正文先被讀到。 */
+function inlineWithCites(text) {
+  const frag = document.createDocumentFragment();
+  String(text || '').split(/(〔[^〕]*〕)/).forEach((part) => {
+    if (!part) return;
+    if (part.startsWith('〔') && part.endsWith('〕')) {
+      const span = el('span', 'cite-inline');
+      span.appendChild(mdInline(part));
+      frag.appendChild(span);
+    } else {
+      frag.appendChild(mdInline(part));
+    }
+  });
+  return frag;
+}
+
+/** markdown 表格 → 表格（第二行的 `|---|` 分隔線略過；格子文字一個字不改）。手機上每列變一張小卡（`stackTable`）。 */
 function markdownTable(rows) {
   const cells = (row) => row.trim().replace(/^\|/, '').replace(/\|$/, '').split('|').map((c) => c.trim());
   const wrap = el('div', 'table-wrap');
   const table = el('table', 'rank pt-table');
+  const head = el('thead');
+  const body = el('tbody');
   rows.forEach((row, index) => {
     const parts = cells(row);
     if (parts.every((c) => /^:?-{3,}:?$/.test(c))) return;
     const tr = el('tr');
     parts.forEach((c) => {
       const cell = el(index === 0 ? 'th' : 'td');
-      cell.appendChild(mdInline(c));
+      cell.appendChild(inlineWithCites(c));
       tr.appendChild(cell);
     });
-    table.appendChild(tr);
+    (index === 0 ? head : body).appendChild(tr);
   });
-  wrap.appendChild(table);
+  table.appendChild(head);
+  table.appendChild(body);
+  wrap.appendChild(stackTable(table));
   return wrap;
+}
+
+/** 窄螢幕（手機）時每一列變成一張小卡、每一格上面印欄名——欄名照抄表頭，不另寫一份。
+    寬螢幕照舊是表格。給 `thead` 第一列的欄名，`tbody` 每一格掛 `data-label`。 */
+function stackTable(table) {
+  const headers = Array.from(table.querySelectorAll('thead tr:first-child th')).map((th) => th.textContent.trim());
+  table.querySelectorAll('tbody tr').forEach((tr) => {
+    Array.from(tr.children).forEach((cell, i) => { if (headers[i]) cell.setAttribute('data-label', headers[i]); });
+  });
+  table.classList.add('stack');
+  return table;
 }
 
 /** 出處旁的「文件自宣告」：文件自己帶的等級（附哪裡寫的）與檔頭的宣告段（逐字）；都沒有就印缺席的那一句。 */
@@ -3786,26 +3831,36 @@ async function renderLayerNote(node) {
     app.appendChild(box);
     return;
   }
+  // 2026-10-07 使用者回饋（「點進去看不懂、排版也歪」）：正文先、關於這份的資料放最後；行內出處淡化、每段出處清單摺起來。
+  // 版面與示意圖（每塊一句讀法、鏈上的位置圖）仍在 S5——這一版只是讓手機讀得下去。
   const units = (payload.labels || {}).units || {};
   const head = el('div', 'detail-head');
   head.appendChild(el('h1', null, row.title));
-  head.appendChild(el('div', 'company', `${row.node}｜${units[row.unit] || row.unit}｜寫於 ${row.created_at}（UTC）`
-    + `｜重讀日 ${row.expires || '—'}｜${row.note_id}${row.versions > 1 ? `（第 ${row.versions} 版）` : ''}`));
+  const pages = ((row.cited_by || {}).pages || []);
+  const sub = el('div', 'company');
+  sub.appendChild(document.createTextNode(`${units[row.unit] || row.unit}｜`));
+  if (pages.length) {
+    sub.appendChild(document.createTextNode('坐在這一層的個股頁：'));
+    pages.forEach((page, i) => {
+      if (i) sub.appendChild(document.createTextNode('、'));
+      const link = el('a', null, page.ticker);
+      link.href = '#/' + encodeURIComponent(page.ticker);
+      sub.appendChild(link);
+    });
+  } else {
+    sub.appendChild(document.createTextNode('還沒有個股頁連過來（原因見最下面）'));
+  }
+  head.appendChild(sub);
   app.appendChild(head);
-
-  const sec0 = el('section', 'panel');
-  sec0.appendChild(el('p', 'note', '重讀日到了要看什麼：' + row.reread_reason));
-  (row.reread || []).forEach((r) => sec0.appendChild(el('p', 'warn', '▲ 該重讀：' + r)));
-  sec0.appendChild(el('p', 'note', '每個出處旁並列兩種等級：「層說明寫」看的是誰說的；「文件自宣告」是文件自己帶的等級與檔頭說明——'
-    + '第三方轉錄、AI 摘要、改寫過的節錄會在這裡現形。'));
-  app.appendChild(sec0);
-  app.appendChild(citedByBlock(payload, row));
+  (row.reread || []).forEach((r) => app.appendChild(el('p', 'warn', '▲ 該重讀：' + r)));
 
   (row.sections || []).forEach((section) => {
-    const sec = el('section', 'panel');
-    sec.appendChild(el('p', 'dim', `段：${section.label}`));
+    const sec = el('section', 'panel layer-section');
+    // 正文自己有段標題（`## ①…`）就不重複印；沒有才補契約的段名（段的順序由契約決定，materialize 已排好）
+    if (!/^\s*#/.test(section.text || '')) sec.appendChild(el('h2', null, section.label));
     sec.appendChild(plainText(section.text));
-    sec.appendChild(group(`出處 ${(section.citations || []).length} 個`, () => citationList(section.citations)));
+    sec.appendChild(drill(`出處 ${(section.citations || []).length} 個（每個出處的等級與文件自己怎麼說）`,
+      () => citationList(section.citations)));
     app.appendChild(sec);
   });
 
@@ -3814,6 +3869,19 @@ async function renderLayerNote(node) {
   if ((row.claims || []).length) secC.appendChild(claimList(payload, row.claims));
   else secC.appendChild(el('p', 'note', '這一份沒有自己的主張——牽涉個股的條件掛在那幾檔敘事的反證上（看個股頁）。'));
   app.appendChild(secC);
+
+  const about = el('section', 'panel');
+  about.appendChild(el('h2', null, '關於這一份'));
+  const rows = el('div', 'rows');
+  rows.appendChild(kv('節點', row.node));
+  rows.appendChild(kv('寫於', `${row.created_at}（UTC）${row.versions > 1 ? `｜第 ${row.versions} 版` : ''}`));
+  rows.appendChild(kv('重讀日', `${row.expires || '—'}：${row.reread_reason}`));
+  rows.appendChild(kv('紀錄 id', row.note_id));
+  about.appendChild(rows);
+  about.appendChild(el('p', 'note', '每個出處旁並列兩種等級：「層說明寫」看的是誰說的；「文件自宣告」是文件自己帶的等級與檔頭說明——'
+    + '第三方轉錄、AI 摘要、改寫過的節錄會在那裡現形。'));
+  app.appendChild(about);
+  app.appendChild(citedByBlock(payload, row));
 
   app.appendChild(stateFooter(payload, '層說明頁不是什麼'));
   window.scrollTo(0, 0);

@@ -25,6 +25,13 @@ GROUP_LABELS: Mapping[str, str] = {"open": "可開", "missing": "缺 X", "priced
 SIDE_GROUPS: tuple[str, ...] = ("not_multiple", "edge_unmeasurable", "legacy", "precondition_failed")
 SIDE_LABELS: Mapping[str, str] = {"not_multiple": "非倍率候選", "edge_unmeasurable": "邊緣無法量",
                                   "legacy": "舊版（缺候選狀態）", "precondition_failed": "前提失效"}
+#: 首頁（單檔判讀清單）的分組（2026-10-07 使用者指示）：候選板同一組字＋兩個出口——沒寫敘事、這次沒讀到（L12：兩件事）。
+#: **順序是閱讀順序，不是名次**：研究時間花最多的在上（已持有、可開、缺 X、等回落——Phase 7 A4「深度」壓在這裡），
+#: 敘事要重寫的其次，判斷過「不要」的在最後；組內一律 ticker 字母序（AGENTS：不得輸出跨檔全序）。
+LIST_GROUPS: tuple[str, ...] = ("held", "open", "missing", "priced_wait", "precondition_failed", "legacy",
+                                "edge_unmeasurable", "no_narrative", "not_multiple", "pass", "unavailable")
+LIST_GROUP_LABELS: Mapping[str, str] = {**GROUP_LABELS, **SIDE_LABELS, "no_narrative": "還沒寫敘事",
+                                        "unavailable": "候選狀態這次沒讀到"}
 #: 敘事宣告的兩題 → 首屏三個字（§8 第 1 點）；v1 或沒有敘事一律「未答」。
 ANSWER_WORDS: Mapping[str, str] = {"yes": "是", "no": "否", "unmeasurable": "無法量"}
 UNANSWERED = "未答"
@@ -245,5 +252,6 @@ def assemble_board(rows: Sequence[Mapping[str, Any] | None], *, universe: Sequen
 
 
 __all__ = ["ANSWER_WORDS", "CANDIDATES_THIS_IS_NOT", "GROUPS", "GROUP_LABELS", "IN_NUMBERS_LINES", "LIGHT_ORDER",
-           "LIGHT_WORDS", "PRICED_IN_LINES", "REWRITE_STATE_WORDS", "SIDE_GROUPS", "SIDE_LABELS", "UNANSWERED",
+           "LIGHT_WORDS", "LIST_GROUPS", "LIST_GROUP_LABELS", "PRICED_IN_LINES", "REWRITE_STATE_WORDS", "SIDE_GROUPS",
+           "SIDE_LABELS", "UNANSWERED",
            "WIPEOUT_LINES", "assemble_board", "cap_label", "held_index", "rollup", "stall_since", "three_words"]

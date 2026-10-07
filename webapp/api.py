@@ -123,9 +123,10 @@ async def meta(request: Request) -> Response:
     return _json(payload)
 
 
-#: 清單分段。**照抄 `alpha.closure` 的 terminal**（materialize 端已寫進 overview）——
-#: APP 不自己定義「什麼叫做完」（L16）。
-_GROUP_LABELS: dict[str, str] = {
+#: 研究完整度（卡片上的小標）。**照抄 `alpha.closure` 的 terminal**（materialize 端已寫進 overview）——
+#: APP 不自己定義「什麼叫做完」（L16）。⚠ 2026-10-07 起它**不再是首頁的分組**（分組改成候選狀態，見 `stocks`），
+#: 只留在每張卡上，資訊不丟。
+_CLOSURE_LABELS: dict[str, str] = {
     "ready": "已有判讀",
     "settled": "刻意不主張",
     # 第三種終局（2026-09-19）。⚠ 它**不是待辦**：目標期間已結束、財報還沒公布，
@@ -134,7 +135,8 @@ _GROUP_LABELS: dict[str, str] = {
     "awaiting_report": "等財報公布（會自己解開）",
     "not_started": "還沒做",
 }
-_GROUP_ORDER: dict[str, int] = {k: i for i, k in enumerate(_GROUP_LABELS)}
+#: overview 沒有候選狀態（2026-10-07 之前 materialize 的舊 artifact）——是 artifact 的版本問題，不是「沒有敘事」。
+_STALE_GROUP = {"key": "stale_artifact", "label": "判讀早於這次分組（重跑 materialize 就會歸位）"}
 
 
 def _group_of(row: Mapping[str, Any]) -> str:
@@ -184,25 +186,34 @@ async def stocks(request: Request) -> Response:
         overview["freshness"] = freshness.to_dict()
         overview["generated_at"] = payload["generated_at"]
         overview["research_context_digest"] = payload.get("research_context_digest")
+        overview["closure_label"] = _CLOSURE_LABELS[_group_of(overview)]
         items.append(overview)
-    # 分組**不是排序**。`AGENTS.md`：不得輸出跨檔全序或首選，且研究完整度不得
-    # 拿來排序——「ready 排最上面」會被讀成「最值得看」，而 ready 與值不值得投相關但非因果。
-    # 分段解決「打開第一屏全是空的」這個真實問題，又不製造第二套投資排序：**組內順序一個字都沒動**（仍是字母序）。
-    items.sort(key=lambda row: (_GROUP_ORDER.get(_group_of(row), 9), str(row.get("ticker") or "")))
+    # 分組＝候選狀態（2026-10-07 使用者指示；候選板同一個推導，materialize 端已照抄進 overview）。
+    # 組序是**閱讀順序，不是名次**：研究時間花最多的在上、判斷「不要」的在最後——順序與中文只有 `.meta.json`
+    # 那一份（`alpha.candidates.LIST_GROUPS`），這裡不另抄（L16）。`AGENTS.md`：不得輸出跨檔全序或首選，
+    # 所以**組內一律 ticker 字母序**。字彙表讀不到就不分組（整份照字母），不在這裡補一份。
+    vocab = (_read_vocabularies(_store(request)).get("vocabularies") or {}).get("list_groups")
+    groups: list[dict[str, Any]] = [dict(g) for g in vocab] if isinstance(vocab, list) else []
+    known = {g["key"] for g in groups}
     for row in items:
-        row["group"] = _group_of(row)
+        group = (row.get("candidate") or {}).get("list_group")
+        row["group"] = group if group in known else (_STALE_GROUP["key"] if groups else None)
+    if groups:
+        groups.append(dict(_STALE_GROUP))
+    order = {g["key"]: i for i, g in enumerate(groups)}
+    items.sort(key=lambda row: (order.get(row["group"], len(order)), str(row.get("ticker") or "")))
     return _json({
         "api_version": API_VERSION,
         "count": len(items),
         "stocks": items,
-        "groups": [{"key": k, "label": v, "count": sum(1 for r in items if r.get("group") == k)}
-                   for k, v in _GROUP_LABELS.items()],
+        "groups": [{**g, "count": sum(1 for r in items if r.get("group") == g["key"])} for g in groups],
         # 常駐計數器（L14：真正的防呆是會自己出現的計數器，不是要人讀的段落）。
         "view_counters": _view_counters(items),
         "unavailable": unavailable,
         "correlation_warning": _CORRELATION_WARNING,
-        "group_note": "分組是研究完整度，**不是投資排序**——組內順序未改動（字母序）；"
-                      "跨檔排序已退役，結構事實住 /api/v1/structure-table。",
+        "group_note": ("分組是候選狀態（與候選板同一個推導），組序是閱讀順序：研究花最多時間的在上、判斷「不要」的在最後——"
+                       "**不是投資排序**，組內一律字母序；跨檔排序已退役。" if groups else
+                       "字彙表讀不到（重跑 materialize）——這次不分組，整份照字母序；**不是投資排序**。"),
     })
 
 
