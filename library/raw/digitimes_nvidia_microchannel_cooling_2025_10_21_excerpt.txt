@@ -1,0 +1,12 @@
+SOURCE: DIGITIMES Asia〈Nvidia sparks Taiwan competition with new microchannel cooling technology〉（Aaron Lee, Taipei）
+URL: https://www.digitimes.com/news/a20251021PD208/ai-server-liquid-cooling-technology-competition-nvidia-taiwan.html
+PUBLISHED: 2025-10-21（頁面「Oct 21, 2025, 09:47」；meta Date 2025-10-21T09:47:10+08:00）
+RETRIEVED: 2026-10-07
+STORAGE: repo_excerpt（付費牆；只收公開可見的標題、署名與 meta description，逐字）
+NOTE: 媒體——「is also said to be introducing」是傳聞語氣；MCL（微通道蓋）、MCCP（微通道冷板）沒有 NVIDIA 一手。
+
+【標題、署名】
+Nvidia sparks Taiwan competition with new microchannel cooling technology Aaron Lee , Taipei Oct 21, 2025, 09:47
+
+【meta description（頁面 <meta name="Description">，逐字；頁面原文 crucfial 的錯字照抄）】
+Nvidia is planning to promote new cooling technologies in response to increasing demand for AI server cooling. In addition to the Microchannel Lid (MCL), the company is also said to be introducing a Microchannel Cold Plate (MCCP), both designed to meet the cooling requirements of the Vera Rubin server rack. Since both technologies rely on liquid cooling, liquid cooling is becoming a crucfial stand

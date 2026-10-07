@@ -1,0 +1,12 @@
+SOURCE: DIGITIMES Asia〈Nvidia standardizes Vera Rubin liquid cooling, names four cold plate suppliers〉（Aaron Lee, Taipei）
+URL: https://www.digitimes.com/news/a20260318PD231/nvidia-rubin-liquid-cooling-ai-server-launch.html
+PUBLISHED: 2026-03-19（頁面「Mar 19, 2026, 13:52」；meta Date 2026-03-19T13:52:41+08:00）
+RETRIEVED: 2026-10-07
+STORAGE: repo_excerpt（付費牆；只收頁面公開可見的標題、圖說與 meta description，逐字）
+NOTE: 媒體——付費全文未讀；「at GTC, named four suppliers」的出處（NVIDIA 的哪一份文件或展示）全文才可能寫到。
+
+【標題、署名、圖說】
+Nvidia standardizes Vera Rubin liquid cooling, names four cold plate suppliers Aaron Lee , Taipei Mar 19, 2026, 13:52 0 Nvidia GTC highlights four Vera Rubin liquid cooling plates and their suppliers. Credit: DIGITIMES
+
+【meta description（頁面 <meta name="Description">，逐字）】
+Nvidia plans to launch its next-generation AI server architecture, Vera Rubin, in the second half of 2026, with liquid cooling set to become standard. The company will centralize procurement of cold plates and, at GTC, named four suppliers: Asia Vital Components (AVC), Cooler Master, Jentech, and Delta Electronics.

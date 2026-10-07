@@ -1,0 +1,20 @@
+SOURCE: 雙鴻科技（3324）法人說明會簡報（2026 BofA Asia Pacific Conference，Island Shangri-La Hong Kong；MOPS 中文檔 332420260818M001.pdf，封面「August 2026」）
+URL: https://mopsov.twse.com.tw/nas/STR/332420260818M001.pdf
+PUBLISHED: 2026-09-23（MOPS 法人說明會一覽：召開日期 115/09/23；簡報檔名日期 2026-08-18、封面「August 2026」）
+RETRIEVED: 2026-10-07
+STORAGE: repo_excerpt（簡報轉錄）
+NOTE: 發行人簡報（自述）。文字頁以 pypdf 抽字照抄；p.7 季度產品組合是圖，由研究 session 照圖逐字轉錄。全份 15 頁沒有液冷營收占比、沒有客戶名、沒有任何平台（GB300、Vera Rubin）的份額。
+
+p.4 公司基本資訊：「成立：1999」「上櫃：2005」「股本：NT$9.31 億元」「全方位散熱解決供應商」；「液冷 (水冷板、分岐管、水冷分配裝置、快接頭…Rack System)」「氣冷 (HP/VC/3DVC…散熱模組)」。
+p.6 全球廠區布局：Taiwan 臺灣、Kunshan 昆山、Chongqing 重慶、Hefei 合肥、Guangzhou 廣州、Thailand 泰國。
+p.7 季度_產品組合（圖；Server／PC／VGA／Others）：
+  1Q25 44%／35%／17%／4%
+  2Q25 45%／31%／21%／3%
+  3Q25 60%／27%／11%／2%
+  4Q25 72%／19%／8%／1%
+  1Q26 76%／17%／6%／1%
+  2Q26 78%／17%／4%／1%
+p.9 液冷解決方案（產品圖的標籤）：Rack Manifold、Rack、AI Manifold、Dimm Cold Plate、In-Row CDU、Sidecar、Building Manifold、Cold Plate、RPU、L-to-L CDU、Internal Manifold、Quick Disconnect、450kW Power Shelf (DC48V/DC400V)、L-to-A CDU。
+p.11 季度_簡易損益表（NT$ 千元；2Q26／1Q26／2Q25）：營業淨額 8,700,121／8,551,657／5,306,304（QoQ 1.7%、YoY 64.0%）；營業毛利 2,472,471／2,536,523／1,386,739；毛利率 28.4%／29.7%／26.1%；營業利益率 16.0%／17.8%／11.9%；每股盈餘（元）10.41／12.61／1.75。
+p.12 半年度_簡易損益表（1H26／1H25）：營業淨額 17,251,778／9,721,388（YoY 77.5%）；毛利率 29.0%／26.7%；每股盈餘（元）23.01／7.41。
+p.13 年度_簡易損益表（2025／2024／2023）：營業淨額 23,276,344／15,778,909／12,712,629；毛利率 27.4%／25.5%／23.6%；每股盈餘（元）28.26／21.23／14.28。

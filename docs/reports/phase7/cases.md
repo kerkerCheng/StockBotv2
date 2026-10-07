@@ -122,6 +122,7 @@
   - 2026-10-07｜外部光源、FAU 兩份層說明遷入 ledger（個股頁 S4a）：`ln_f7996a796a5e53c8`、`ln_863549fd0f4a7468`——兩份的層主張原本就掛在讀圖與敘事的 watch 上，不重登。
   - 2026-10-07｜續工 ①（晚段）：**波若威 3163.TWO 第一份敘事 `ib_a35b0492e80432ee`（缺 X）**——押 FAU 層 `sr_8c9292bfbc2b492a`；X＝①FAU 層的量或換不掉（五家被客戶點名、Coherent 可整套自製）②CPO 光纖套件與配線盒量產出現在營收（2025 年報致股東報告書：115 年下半年開始量產；8 月營收年增 9.7%）③已定價主參照（自家歷史只湊得出約兩年）；等待 `ew_0371`（11-16）、反證 1、加碼條件 1（同日 `ib_987df2c1dad5c4e7` 換版：評價利益的主詞改成「股票與 ETF」）。三項必查都做：致股東報告書、表頭（113／114 兩年度合併）、同義節點（`tech:cpo_fiber_attach` 未併，續工 ⑥）。順帶發現：①本業利潤薄、淨利大半是持股評價（2026 H1 透過損益按公允價值衡量之金融資產利益 2.92 億元 vs 營收 12.48 億元）；②季報股數 2026Q2 mismatch 17.5% 是待分配股票股利（每股 1.75 元）、不是增資；③月營收缺 2024-05——今天的 36 個月回補漏掉那一個月，補回後已定價窗 484 → 726 天（仍不滿三年）
   - 2026-10-07｜使用者 go：**[730] FAU 同義節點合併**（commit `a5024b04`：`config/entity_aliases.json` 一筆＋`loader/migrate_fau_merge_20261007.py`；備份 `20261007T141331Z` 後 apply）——`tech:cpo_fiber_attach` 刪除、Coherent 掛在舊節點的供貨邊併進既有那條、FAU 多一條 is_component_of `tech:scale_out_cpo`（原邊搬家，不是新來源）、cl1 改指 FAU；舊 id 殘留 assertion／claim／關係 0、重投影 11 條邊 0 衝突、audit invariants 14 PASS。FAU 讀圖重讀 **`sr_aa0b79ad032a31c4`**（仍 undecided，「表示法缺陷」修完）；波若威 `ib_45fdc0945f279b22`、上詮 `ib_84f838c2b0cc8801` 換騎（各格內容不變）。`tech:cpo`／`tech:scale_out_cpo` 疑似同義，另案
+  - 2026-10-07｜向你要文件 pq2 **[735]**：波若威（3163）、上詮（3363）的 CPO 光纖組件／FAU 營收占比與客戶平台（台灣券商報告或法說 memo；兩檔都停在「缺」）
 - failure log：（尚無）
   - #27（SOI.PA FY2026 分部占比兩筆都生效，「出現在數字裡」被默默丟——當下修為印衝突；序列仍成不了，合併紀錄留 7.5）
 
@@ -357,6 +358,7 @@
   - 2026-10-07｜續工 ③（晚段）：**冷板 `sr_4d0e1386fed45cec`、分歧管 `sr_62439eac8d9c7edd` 重讀**（取代 `sr_7d2a979f43e3fc92`、`sr_baee167c3dfb3b71`；仍 undecided——上一版沒有登記任何條件、不會自己醒〔INV-2〕；各登兩個條件 watch：買方或廠商一手寫出該零件本身的交期／配額／預付 → 量；某世代平台只有一兩家合格 → 護城河）。對倍率：冷板層圖上 4 家都是非邊緣大廠或私人（台達、奇鋐、健策、CoolIT），邊緣大小的台廠雙鴻（3324）不在圖上、沒有任何 lead → directed lead `lead_d9c78bb0aff0b8a882d925766c309410`（triaged_go，層深讀入口）——「沒讀」不寫成「沒有可投資的公司」；分歧管層的邊緣公司只有高力，它的倍率要靠 CDU 與板式熱交換器的位置。高力敘事改押新分歧管讀圖 `ib_2b74e3b9fd70ec80`（文字與候選狀態不變）
 - 裁決：（尚無）
 - 2×2：尚未到裁決點
+  - 2026-10-07｜續工 ①（/phase-run）：**冷板層說明 v1 `ln_4211fda64a785417`**（個股頁 S4 第六份；主張 K1 Vera Rubin 四家、K2 MCL／MCCP 登 watch）→ 冷板讀圖換版 **`sr_c2cae5b7616559ec`（undecided → neither）**：DigiTimes 導言寫 NVIDIA「will centralize procurement of cold plates and, at GTC, named four suppliers」（奇鋐、Cooler Master、健策、台達；媒體，NVIDIA 自己的新聞稿與技術文沒點名）——客戶自己點名四家、跨世代換人＝不是換不掉；沒有買方說缺＝不是量。directed lead 的答案：雙鴻（3324）是冷板、分歧管、CDU 的量產供應商（年報自述，伺服器營收 2026Q2 占 78%、客戶只寫代號），但分析師 16 家、**系統口徑非倍率**，而且不在 Vera Rubin 的四家 → 入圖包 pq2 **[732]**（三條供貨邊，名冊隨包 staged）；邊緣大小的力致、泰碩、建準年報只寫到開發或佈局。**這一層沒有可投資的邊緣公司**（failure log #43：上一版把雙鴻寫成邊緣大小是目測）
 - failure log：（尚無）
   - #9（同 P1）
   - #10（[690] CoolIT 的兩條供貨邊印 externally_corroborated——文件是收購方 Ecolab 發的）
@@ -380,6 +382,17 @@
   - 2026-10-07｜反方查證抓到的讀法錯（研究地圖內已標，未進任何 ledger）：§5 把半年報裡就有的營收拆分寫成「沒有數字」（L11-5）——百普賽斯重組蛋白 80.37%、技術服務 2.82%，所以它的曝險在抗原試劑（A4）、不在 AI 表達服務；昭衍的 4,384 萬是預付款總額（它自己持猴，不是乾淨的買方訊號）；Twist 增資兩個數字是基本額對含超額配售、不矛盾
   - 2026-10-07｜AI 生醫研究題全部到終局：AIDD 這條沒有 power-law 的邊緣候選；唯一緊的是中國實驗猴，但需求的一手歸因是創新藥授權、不是 AI。日期等待：ew_0316（FDA 單抗指引定稿，2027-03-31）、ew_0317（BIOSECURE 名單，2026-12-31）、ew_0318（AI 新藥需求端，2026-11-30）。
   - 2026-10-07｜延伸題材：使用者「B ok」→ pq2 **[726]**（受理即 resolve）中國創新藥授權 → 臨床前毒理 → 實驗猴 decompose（`library/private/research_notes/decompose/cn_licensing_nhp_2026-10-07.md`，7 層全不在圖）；7 題當天到終局（`…/2026-10-07_pq1_cnbio_q3a_innostar.md`、`…_cnbio_theme_closeout.md`）：益諾思是買猴的人（一手否定「成本法藏猴資產」）、昭衍公允價值入帳且猴資產約占市值 6%、純做猴的天勤生物（深交所審核中）與鼎泰藥研（港股第二次遞表）未上市——**上市公司層沒有候選**；掛 ew_0319（兩家掛牌，2027-03-31，T2 輪詢）。
+
+## G1 IC 載板上游：低膨脹玻纖布（T-glass）
+
+- 登記：registration「更正與追加」2026-10-07 G1（開題 2026-10-07）
+- 研究產出：
+  - 2026-10-07｜入圖包 pq2 **[733]**（`ra_5dc9439157d8eb9d1b13a9f9d16558b5`；directed lead `lead_2d4195f84bee1e416fb7b1be5297bfaf`）：新節點 `mat:ic_substrate_glass_cloth`＋4 條邊——日東紡 supplies_to（2026-08-05 說明資料與主要質疑応答：T ガラス需求「引き続き非常に強い」、增強到 2028、在漲價、承認客戶在評估別家）、玻纖布 is_component_of IC 載板（日東紡用途表：CPU/GPU/ASIC 要低 CTE，高階 T）、景碩 constrained_by 玻纖布（買方年報：2H25 起玻纖布缺料、2026 持續、要找新供應商）、景碩 supplies_to IC 載板；名冊隨包 staged 日東紡、景碩
+  - 2026-10-07｜層說明草稿 v0（`library/private/research_notes/layer_notes/mat_ic_substrate_glass_cloth.md`，入圖後寫進 ledger；主張 T1–T4）；向你要文件 pq2 **[734]**（T-glass 供需缺口、份額、第二來源認證）
+  - 日東紡用系統口徑是邊緣（市值約 6,690 億日圓、分析師 9 家），FY2026 營業利益預估 300 億日圓裡 280 億是電子材料——入圖後寫第一份敘事前，要先定本鏈的主題等權組（走 pq2）
+- 裁決：（尚未到裁決點；日東紡 2026 年度第 2 季決算說明會 2026-11 上旬）
+- failure log：
+  - #43（名冊外的公司判不了邊緣——本 case 的日東紡、台玻、建榮也是目測）、#44（09-29 研究結論寫了「可能的薄層在上游」卻沒變成 lead）
 
 ## X1 已定價回放（R1）
 
@@ -419,6 +432,7 @@
   - 2026-10-07｜續工 ④（晚段）：**Silex SILEX.ST 第一份敘事 `ib_d5144057cac442c4`（缺 X）**——押鏡陣列層 `sr_87952c233a4e591b`；讀 2026 Q2 季報（2026-07-17）：電信終端市場（含光學交換器）R12 4.62 億克朗、約占 15.1 億的三成，OCS 本身不揭露；CEO 段「optical switches in data centers」客戶興趣特別強、買美國廠是為了「get closer to our largest customers」。X＝①客戶端或第三方點名 OCS 的 MEMS 代工 ②OCS 營收占比 ③已定價主參照（瑞典申報人、上市五個月）；等待 `ew_0376`（11-05，Q3 季報 11-04）、連結讀圖反證 `ew_0194`、`ew_0195`、加碼條件 1
   - 2026-10-07｜Silex「缺 X」①的一手補查：Lumentum FY2026 10-K（2026-08-17）——OCS「contributed more than $90.0 million of revenue during fiscal year 2026」、需求「outpacing our current supply」要做供給分配；**全文「MEMS」0 次**，OCS 鏡陣列自製或外包沒有揭露（`library/raw/lite_10_k_20260817_ocs_excerpt.txt`）。EDGAR 全文檢索「MEMS」＋「optical circuit」2025-06 起只有 Tower 的 6-K（它說的是矽光子 OCS，另一條技術路線、可能是鏡陣列層的反向路徑候選）。下一份 OCS 鏡陣列層說明的起點：客戶端點名多半不公開，可能要向使用者要券商的 OCS 供應鏈報告
 - H2（X2 的部分）：**不足**（證實 1 < 4）；與 P3（7.4）合併判
+  - 2026-10-07｜（旁證，不在 R2 固定樣本、不進判讀線）日東紡（T-glass）兩則 park：`lead_ffdc392c`（07-25，X 帳號「Nittobo / glass fiber/cloth」）、`lead_d8fee64e`（09-04，「Nittobo T-Glass」）；09-29 `lead_9a65a3ce` 的研究結論寫「可能的薄層在上游（玻纖布、ABF 膜），目前未驗證」卻沒變成 lead——10-07 是走圖「下一層 0 條」把它撿回來（case G1、pq2 [733]；failure log #44）。價格：收盤 07-24 3,195 → 10-06 3,640 日圓（分割後，約 +14%）；52 週那次 1,412 → 6,580 的大漲大跌在第一次接觸之前
 - failure log：（尚無）
   - #15（park 缺的那一樣出現了、文件也進來了，卻沒有接回那則 park；一份 S-4、四則）
 

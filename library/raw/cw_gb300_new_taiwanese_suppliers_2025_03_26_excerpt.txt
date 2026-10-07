@@ -1,0 +1,9 @@
+SOURCE: CommonWealth Magazine（天下雜誌英文版）〈GB300 Is Here—And So Are New Taiwanese Suppliers〉
+URL: https://english.cw.com.tw/article/article.action?id=4029
+PUBLISHED: 2025-03-26（頁面標題列「2025-03-26」）
+RETRIEVED: 2026-10-07
+STORAGE: repo_excerpt（媒體有限節錄；原始 HTML 轉文字後逐字截取）
+NOTE: 媒體轉述券商（Morgan Stanley）——不是一手；冷板與快接頭顆數是報導的說法，NVIDIA 沒有一手。
+
+【Change #2 段】
+Change #2: More Couplers and Cold Plates Addressing heat dissipation is a key challenge for the GB300. Starting with the GB200, Nvidia fully adopted liquid cooling systems. Critical components include cold plates—filled with coolant and in direct contact with chips—and couplers that link the cold plates to the cooling infrastructure. While the GB200 used a single large cold plate to cover two GPUs and one CPU, the GB300’s removable GPU design has led to a new configuration: each GPU and CPU now has its own cold plate to improve cooling efficiency. As a result, the number of cold plates and couplers used in the GB300 will increase. Each GB200 compute tray used two cold plates and six couplers; GB300 trays will require six cold plates and 14 couplers. Morgan Stanley notes that established thermal management firms Asia Vital Components (AVC) and Cooler Master will remain key suppliers of cold plates for the GB300 platform. Cooler Master, Fositek, FIT, and Lotes are expected to compete for coupler contracts.
