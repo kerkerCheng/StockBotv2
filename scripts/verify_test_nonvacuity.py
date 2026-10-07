@@ -354,8 +354,9 @@ MUTATIONS: tuple[Mutation, ...] = (
     Mutation(
         name="Engine B archive 誤收整個 library 引用",
         path="engine_b/state_files.py",
-        old="            if not ref.startswith(EVIDENCE_PREFIX):",
-        new="            if not ref.startswith(\"library/\"):",
+        # 2026-10-07：判斷搬進 `raw_evidence_ref`（寫入端與備份端共用），縮排跟著變
+        old="    if not ref.startswith(EVIDENCE_PREFIX):",
+        new="    if not ref.startswith(\"library/\"):",
         test="tests/test_backup_entrypoint.py::test_engine_b_archive_never_includes_private_reference",
         guards="Engine B archive 只收 raw provenance，不得把 library/private 內容混入第二份封裝",
     ),

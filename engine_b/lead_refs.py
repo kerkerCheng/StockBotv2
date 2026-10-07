@@ -237,7 +237,20 @@ def get_trace_status_registry() -> TraceStatusRegistry:
 
 
 def validate_ref_updates(updates: Mapping[str, Any]) -> dict[str, Any]:
+    from engine_b.state_files import StateFileError, raw_evidence_ref
+
     cleaned = get_lead_ref_registry().validate_updates(updates)
+    # 以 `library/raw/` 開頭的值會被備份當成 provenance 路徑收進去——寫入當下就要是單一安全路徑，
+    # 不然照收、隔天備份才 fail closed（2026-10-07 事發；與備份同一條判斷，L16）。
+    for key, value in cleaned.items():
+        for item in (value if isinstance(value, list) else [value]):
+            try:
+                raw_evidence_ref(item)
+            except StateFileError as exc:
+                raise LeadRefError(
+                    f"ref {key} 以 library/raw/ 開頭就必須是單一路徑（備份會把它當 provenance 收進去）：{exc}"
+                    "；說明文字請放在路徑後面以外的地方——例如寫成「已查：library/raw/…」，或另放 parked_reason"
+                ) from exc
     if "trace_status" in cleaned:
         # 寫入端不接受同義詞：見 TraceStatusRegistry.resolve 的理由。
         cleaned["trace_status"] = get_trace_status_registry().resolve(

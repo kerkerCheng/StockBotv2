@@ -898,6 +898,38 @@ def test_parked_without_expiry_finds_the_holes_trace_backlog_cannot_see() -> Non
     assert watched not in holes, "有 watch＝會被事件或到期喚醒"
 
 
+def test_parked_without_expiry_counts_an_open_pq2_pointing_back_as_covered(monkeypatch) -> None:
+    """對稱面（2026-10-07 實測 3 筆全是這一型）：「向你要文件」的 `source_trace_review` 是收集器從 lead 推出來的——
+    pq2 那端有 `ref_id`、lead 這端永遠沒有 `pq2_ref`。未結案的項目指回來＝有機制會回來；結案了就不算。
+    待辦池讀不到時當成沒有任何項目指回來——多報不少報。"""
+    from engine_b import todo
+
+    store = leads.empty_store()
+
+    def _park(url: str) -> str:
+        lead_id, _ = leads.register(store, source="directed:x", url=url, title="向你要文件")
+        leads.triage(store, lead_id, go=False, tier=3, reason="要文件")
+        leads.advance(store, lead_id, "parked", ref={"trace_status": "awaiting_named_disclosure",
+                                                     "trace_requires_user": "true"})
+        return lead_id
+
+    asked = _park("https://e/ask")
+    answered = _park("https://e/answered")
+    pool = {"items": [{"n": 716, "type": "source_trace_review", "ref_id": asked, "resolved_at": None},
+                      {"n": 717, "type": "source_trace_review", "ref_id": answered,
+                       "resolved_at": "2026-10-07T00:00:00+00:00"}], "log": [], "next_n": 718}
+    monkeypatch.setattr(todo, "load", lambda *a, **k: pool)
+    holes = {row["lead_id"] for row in leads.parked_without_expiry(store)}
+    assert asked not in holes, "未結案的 pq2 指回來＝球在待辦池"
+    assert answered in holes, "pq2 已結案、又沒有 watch 或終局——那才是黑洞"
+
+    def broken(*_a, **_k):
+        raise ValueError("todo pool 格式非法")
+
+    monkeypatch.setattr(todo, "load", broken)
+    assert asked in {row["lead_id"] for row in leads.parked_without_expiry(store)}, "待辦池讀不到：多報不少報"
+
+
 def test_parked_without_expiry_ignores_free_text_parked_reason() -> None:
     """`parked_reason` 是自由文字，**不得決定去留**（L16-3）。
 
