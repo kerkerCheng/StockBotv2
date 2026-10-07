@@ -414,6 +414,7 @@
   - 2026-10-05｜雷達第一次無人值守運行（daily 05:30）：搜尋 15 次、新增 1 則（Sivers 人事的二手轉寫，標題「Shepherd Glasgow Fab Into Mass Production」不是原文）
     ——追到 Sivers 09-24 一手公告後 park：Photonics CTO（CST Global 共同創辦人）退休、Amkor 出身的工程副總 10-31 到任；留給 10-29 thesis 複查
   - 2026-10-07｜續工 ④（晚段）：**Silex SILEX.ST 第一份敘事 `ib_d5144057cac442c4`（缺 X）**——押鏡陣列層 `sr_87952c233a4e591b`；讀 2026 Q2 季報（2026-07-17）：電信終端市場（含光學交換器）R12 4.62 億克朗、約占 15.1 億的三成，OCS 本身不揭露；CEO 段「optical switches in data centers」客戶興趣特別強、買美國廠是為了「get closer to our largest customers」。X＝①客戶端或第三方點名 OCS 的 MEMS 代工 ②OCS 營收占比 ③已定價主參照（瑞典申報人、上市五個月）；等待 `ew_0376`（11-05，Q3 季報 11-04）、連結讀圖反證 `ew_0194`、`ew_0195`、加碼條件 1
+  - 2026-10-07｜Silex「缺 X」①的一手補查：Lumentum FY2026 10-K（2026-08-17）——OCS「contributed more than $90.0 million of revenue during fiscal year 2026」、需求「outpacing our current supply」要做供給分配；**全文「MEMS」0 次**，OCS 鏡陣列自製或外包沒有揭露（`library/raw/lite_10_k_20260817_ocs_excerpt.txt`）。EDGAR 全文檢索「MEMS」＋「optical circuit」2025-06 起只有 Tower 的 6-K（它說的是矽光子 OCS，另一條技術路線、可能是鏡陣列層的反向路徑候選）。下一份 OCS 鏡陣列層說明的起點：客戶端點名多半不公開，可能要向使用者要券商的 OCS 供應鏈報告
 - H2（X2 的部分）：**不足**（證實 1 < 4）；與 P3（7.4）合併判
 - failure log：（尚無）
   - #15（park 缺的那一樣出現了、文件也進來了，卻沒有接回那則 park；一份 S-4、四則）

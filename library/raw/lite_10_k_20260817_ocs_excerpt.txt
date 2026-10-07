@@ -1,0 +1,19 @@
+SOURCE: Lumentum Holdings Inc. Form 10-K（fiscal year ended June 27, 2026）——OCS 營收、供給分配、供應商段
+URL: https://www.sec.gov/Archives/edgar/data/1633978/000162828026057358/lite-20260627.htm
+PUBLISHED: 2026-08-17（EDGAR filingDate）
+RETRIEVED: 2026-10-07
+STORAGE: repo_excerpt（美國 SEC 法定申報有限節錄；HTML 轉文字、空白攤平後逐字照抄）
+NOTE: 發行人申報（自述）。Phase 7 Step 7.1 續工 ⑤（OCS MEMS 鏡陣列層，Silex 敘事「缺 X」①）用：查 OCS 的 MEMS 鏡子是自製還是外包——**全文「MEMS」0 次**，沒有揭露 OCS 鏡陣列的來源；供應商段只有泛論（有單一或少數來源的元件、對部分供應商預付）。
+
+MD&A（System products）：
+"We also continued the initial phase of optical circuit switch shipments, which contributed more than $90.0 million of revenue during fiscal year 2026. and we remain on track for manufacturing expansion over the coming quarters to support future growth."
+
+Item 1（Business）：
+"Additionally, our transport offerings include optical circuit switches for data center applications, helping to reduce power consumption and improve overall network efficiency."
+"In addition, we are investing in the emerging optical circuit switching market to enable direct data transmission between fiber optic cables in data centers within the optical plane."
+"Although our intention is to establish at least two sources of supply for materials whenever possible, for certain components we have sole or limited source supply arrangements."
+
+Risk Factors：
+"This demand is outpacing our current supply which has required us to make decisions on supply allocation. We are investing in manufacturing capacity, both internally and with contract manufacturers, to meet demand."
+"We purchase raw materials, packages and components from a limited number of suppliers, who are often small and specialized. Additionally, some of our suppliers are our sole sources for certain materials, equipment and components."
+"While we have entered into advanced payments to secure orders from some of these suppliers, we have not entered into long-term agreements with many of these suppliers."
