@@ -1,0 +1,244 @@
+{
+  "claims": [
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：之後的國家實驗室或政府報告、或變壓器製造商一手寫出有載分接開關交期回到一年以內，或美國新增分接開關產能量產。核查頻率：每半年（DOE／國家實驗室供應鏈報告、LPT 製造商法說與年報）。觸發後 48 小時：e1 加註或降 confidence，重讀分接開關層讀圖的「量」。",
+      "id": "nlr_tp_5700_96742_2026_05_06_cl1",
+      "source_ids": [
+        "nlr_tp_5700_96742_2026_05_06_sc",
+        "nlr_tp_5700_96742_2026_05_06_sd"
+      ],
+      "statement": "National Laboratory of the Rockies (May 2026), from interviews with U.S. transformer manufacturers and suppliers: bushings and OLTCs are now the biggest risks in the market; OLTCs take 80–90 weeks to procure and have just 1 or 2 U.S. manufacturers, otherwise they are typically sourced from Europe; U.S. manufacturers also import bushings and OLTCs from Germany and Switzerland; one domestic transformer manufacturer orders extra inventory ahead of time or asks customers to be open to different makes or specifications. Third-party (government lab), interview-based; the same report's literature section cites OLTC lead times of 'often 18 weeks or more'.",
+      "subject_id": "e1"
+    },
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：之後的國家實驗室或政府報告、或變壓器製造商一手寫出高壓套管交期明顯縮短（例如一年以內），或美國新增 345kV 以上套管產能。核查頻率：每半年。觸發後 48 小時：e2 加註或降 confidence，重讀套管層。",
+      "id": "nlr_tp_5700_96742_2026_05_06_cl2",
+      "source_ids": [
+        "nlr_tp_5700_96742_2026_05_06_sc",
+        "nlr_tp_5700_96742_2026_05_06_sd"
+      ],
+      "statement": "National Laboratory of the Rockies (May 2026): bushings for LPTs are currently the item with the longest lead time, up to 130 weeks; before the pandemic a 230-kV bushing took 40 weeks to a year, now 345-kV bushings take more than 130 weeks; only two U.S. manufacturers support the 345-kV market and none cover 765-kV. Third-party, interview-based.",
+      "subject_id": "e2"
+    },
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：一手文件寫出美國有第二家分接開關量產廠（含外資在美新廠），或 Reinhausen 退出美國生產。核查頻率：每半年。觸發後 48 小時：e3 加註，重讀分接開關層的供給側列舉。",
+      "id": "nlr_tp_5700_96742_2026_05_06_cl3",
+      "source_ids": [
+        "nlr_tp_5700_96742_2026_05_06_sa"
+      ],
+      "statement": "National Laboratory of the Rockies (May 2026): Reinhausen is the only U.S. OLTC producer; ABB/Hitachi and Reinhausen also operate factories in Europe that supply compatible units. Third-party naming of suppliers; no market shares given. Reinhausen is privately held.",
+      "subject_id": "e3"
+    },
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：Hitachi Energy 一手寫出美國廠開始量產 345kV 以上套管。核查頻率：每半年。觸發後 48 小時：e5 加註，重讀套管層。",
+      "id": "nlr_tp_5700_96742_2026_05_06_cl4",
+      "source_ids": [
+        "nlr_tp_5700_96742_2026_05_06_sb"
+      ],
+      "statement": "National Laboratory of the Rockies (May 2026): Hitachi Energy manufactures bushings domestically, but production is generally limited to the ≤235 kV class; for higher ratings utilities must rely on imports, which face longer lead times compared to OLTCs. Third-party; Hitachi Energy is a subsidiary of Hitachi (co:hitachi).",
+      "subject_id": "e5"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:transformer_tap_changer",
+      "id": "e1",
+      "relation": "constrained_by",
+      "source_ids": [
+        "nlr_tp_5700_96742_2026_05_06_sc",
+        "nlr_tp_5700_96742_2026_05_06_sd"
+      ],
+      "src_id": "tech:large_power_transformer"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:transformer_bushing",
+      "id": "e2",
+      "relation": "constrained_by",
+      "source_ids": [
+        "nlr_tp_5700_96742_2026_05_06_sc",
+        "nlr_tp_5700_96742_2026_05_06_sd"
+      ],
+      "src_id": "tech:large_power_transformer"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:transformer_tap_changer",
+      "id": "e3",
+      "relation": "supplies_to",
+      "source_ids": [
+        "nlr_tp_5700_96742_2026_05_06_sa"
+      ],
+      "src_id": "co:reinhausen"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "tech:transformer_tap_changer",
+      "id": "e4",
+      "relation": "supplies_to",
+      "source_ids": [
+        "nlr_tp_5700_96742_2026_05_06_sa"
+      ],
+      "src_id": "co:hitachi"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:transformer_bushing",
+      "id": "e5",
+      "relation": "supplies_to",
+      "source_ids": [
+        "nlr_tp_5700_96742_2026_05_06_sb"
+      ],
+      "src_id": "co:hitachi"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "LPT",
+        "LPTs",
+        "large power transformer",
+        "large power transformers",
+        "초고압 변압기",
+        "extra high voltage power transformer",
+        "extra high voltage power transformers"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:large_power_transformer",
+      "name": "Large Power Transformer (LPT)",
+      "role": null,
+      "source_ids": [
+        "nlr_tp_5700_96742_2026_05_06_sc",
+        "nlr_tp_5700_96742_2026_05_06_sd"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "tap changer",
+        "tap changers",
+        "on-load tap changers",
+        "LTC",
+        "LTCs"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:transformer_tap_changer",
+      "name": "Transformer Tap Changer",
+      "role": null,
+      "source_ids": [
+        "nlr_tp_5700_96742_2026_05_06_sa",
+        "nlr_tp_5700_96742_2026_05_06_sc",
+        "nlr_tp_5700_96742_2026_05_06_sd"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "bushings",
+        "OIP bushings",
+        "high-voltage bushings"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:transformer_bushing",
+      "name": "Transformer Bushing (OIP)",
+      "role": null,
+      "source_ids": [
+        "nlr_tp_5700_96742_2026_05_06_sb",
+        "nlr_tp_5700_96742_2026_05_06_sc",
+        "nlr_tp_5700_96742_2026_05_06_sd"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "Reinhausen",
+        "Maschinenfabrik Reinhausen"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "co:reinhausen",
+      "name": "Reinhausen",
+      "role": null,
+      "source_ids": [
+        "nlr_tp_5700_96742_2026_05_06_sa"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "Hitachi Energy",
+        "Hitachi ABB"
+      ],
+      "attributes": {
+        "ticker": "6501.T"
+      },
+      "confidence": 0.85,
+      "id": "co:hitachi",
+      "name": "Hitachi",
+      "role": null,
+      "source_ids": [
+        "nlr_tp_5700_96742_2026_05_06_sa",
+        "nlr_tp_5700_96742_2026_05_06_sb"
+      ],
+      "type": "Company"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "nlr_tp_5700_96742_2026_05_06",
+    "evidence_tier": 1,
+    "origin_entity": "National Laboratory of the Rockies (U.S. Department of Energy)",
+    "permission_basis": "美國能源部國家實驗室公開技術報告（OSTI 免費全文）；只保留研究必要的逐字摘錄（頁碼 locator），全文不入 repo。published_at 取 OSTI 書目頁 Publication Date。",
+    "published_at": "2026-05-06",
+    "publisher": "OSTI.GOV（U.S. Department of Energy）",
+    "retrieved_at": "2026-10-08",
+    "source_type": "industry_report",
+    "storage_permission": "repo_excerpt",
+    "title": "National Laboratory of the Rockies NLR/TP-5700-96742（2026-05）——Large Power Transformer Supply Chain Gap Analysis and Domestic Content Strategies for Hydropower Rehabilitation: Supplemental Report；分接開關、套管有限節錄",
+    "url": "https://www.osti.gov/servlets/purl/3363379"
+  },
+  "sources": [
+    {
+      "id": "nlr_tp_5700_96742_2026_05_06_sa",
+      "locator": "p.6（PDF 第 18 頁）原料與零件的瓶頸——OLTC",
+      "quote": "OLTC: Reinhausen is the only U.S. OLTC producer. ABB/Hitachi and Reinhausen also operate factories in Europe that supply compatible units. Lead times are significant—often 18 weeks or more—creating potential schedule risks for transformer assembly."
+    },
+    {
+      "id": "nlr_tp_5700_96742_2026_05_06_sb",
+      "locator": "p.6（PDF 第 18 頁）原料與零件的瓶頸——Bushings",
+      "quote": "Bushings: High-voltage bushings are another supply chain concern. Hitachi Energy manufactures bushings domestically, but production is generally limited to the ≤235 kV class. For higher ratings, utilities must rely on imports, which face longer lead times compared to OLTCs."
+    },
+    {
+      "id": "nlr_tp_5700_96742_2026_05_06_sc",
+      "locator": "p.10–11（PDF 第 22–23 頁）訪談結果",
+      "quote": "People who were interviewed said that bushings and OLTCs are now the biggest risks in the market. COVID made existing problems worse. Before the pandemic, it took from 40 weeks to a year to get 230-kV bushing. Now, 345-kV bushings take more than 130 weeks, and there are no domestic suppliers for 765-kV bushings. There are only two U.S. manufacturers that support the 345-kV market and none that cover the 765-kV market. Global companies are still limited in capacity, and customer wait times increase if specific types of insulators are ordered (e.g., resin- impregnated synthetic, resin-impregnated paper, and oil-impregnated synthetic) that require additional lead time. As a result, the only option is to rely on available inventory. U.S. manufacturers also import bushings and OLTCs from Germany and Switzerland. The current lead time to manufacture bushings and OLTCs is about 80 to 90 weeks, even though companies are working to increase their capabilities."
+    },
+    {
+      "id": "nlr_tp_5700_96742_2026_05_06_sd",
+      "locator": "p.16（PDF 第 28 頁）Lead times——國內變壓器廠點名的零件",
+      "quote": "Domestic transformer manufacturers highlighted some critical transformer components that have very long lead times and limited domestic supply. Bushings for LPTs are currently the item with the longest lead time, up to 130 weeks. OLTCs take 80–90 weeks to procure and have just 1 or 2 U.S. manufacturers; otherwise, they are typically sourced from Europe. One domestic transformer manufacturer said they order extra inventory ahead of time or ask customers to be open to different makes or specifications for a particular product to address the long lead times for OLTCs and bushings."
+    }
+  ]
+}
