@@ -1,0 +1,111 @@
+{
+  "claims": [
+    {
+      "confidence": 0.65,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "條件：JEDEC 撤回或大改 JESD264，或主要 CPO 買方一手說不採用它（改用自訂可靠度規範）。核查頻率：每半年（JEDEC 標準頁、OCP／OIF 會議）。觸發後 48 小時：e1 加註、重讀 CPO 全堆疊測試層的需求側。",
+      "id": "jedec_jesd264_pr_2026_10_01_cl1",
+      "source_ids": [
+        "jedec_jesd264_pr_2026_10_01_s1",
+        "jedec_jesd264_pr_2026_10_01_s2",
+        "jedec_jesd264_pr_2026_10_01_s3",
+        "jedec_jesd264_pr_2026_10_01_s4",
+        "jedec_jesd264_pr_2026_10_01_s5"
+      ],
+      "statement": "JEDEC (third-party standards body) released JESD264 on 2026-10-01, 'the first industry-wide standard' for silicon photonics qualification and reliability: a unified framework for qualification and reliability testing, clear requirements for assembly processes and laser integration, and reliability responsibilities split among foundries, OSATs and system developers. It formalizes the test/qualification layer CPO has to pass; it names no test supplier and no volume.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "tech:cpo_full_stack_test",
+      "id": "e1",
+      "relation": "enables",
+      "source_ids": [
+        "jedec_jesd264_pr_2026_10_01_s1",
+        "jedec_jesd264_pr_2026_10_01_s2",
+        "jedec_jesd264_pr_2026_10_01_s3",
+        "jedec_jesd264_pr_2026_10_01_s4",
+        "jedec_jesd264_pr_2026_10_01_s5"
+      ],
+      "src_id": "std:jesd264"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "test_yield",
+      "aliases": [
+        "JESD264"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "std:jesd264",
+      "name": "JESD264: Silicon Photonics Qualification and Reliability Requirements",
+      "role": null,
+      "source_ids": [
+        "jedec_jesd264_pr_2026_10_01_s1"
+      ],
+      "type": "Standard"
+    },
+    {
+      "abstraction_level": "test_yield",
+      "aliases": [
+        "full-stack test",
+        "CPO test",
+        "全堆疊測試"
+      ],
+      "attributes": {},
+      "confidence": 0.75,
+      "id": "tech:cpo_full_stack_test",
+      "name": "CPO 全堆疊測試（full-stack test）",
+      "role": null,
+      "source_ids": [
+        "jedec_jesd264_pr_2026_10_01_s3"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "jedec_jesd264_pr_2026_10_01",
+    "evidence_tier": 2,
+    "origin_entity": "JEDEC Solid State Technology Association",
+    "permission_basis": "JEDEC 新聞稿（Business Wire 發布，2026-10-01）；jedec.org 擋腳本（Cloudflare 403），原文取自 FinancialContent 的 Business Wire 轉載頁（頁面載明 View source version on businesswire.com）；只保留研究必要的逐字摘錄，把連結拆行接回句子。",
+    "published_at": "2026-10-01",
+    "publisher": "Business Wire",
+    "retrieved_at": "2026-10-07",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "JEDEC Publishes First Industry-Wide Silicon Photonics Reliability Standard (JESD264) — press release",
+    "url": "https://www.financialcontent.com/article/bizwire-2026-10-1-jedec-publishes-first-industry-wide-silicon-photonics-reliability-standard-for-ai-datacenter-and-telecom-infrastructure"
+  },
+  "sources": [
+    {
+      "id": "jedec_jesd264_pr_2026_10_01_s1",
+      "locator": "新聞稿第 1 段",
+      "quote": "JEDEC Solid State Technology Association today announced the release of JESD264: Silicon Photonics Qualification and Reliability Requirements, the first industry-wide standard designed to bring consistent qualification and reliability practices to silicon photonics devices."
+    },
+    {
+      "id": "jedec_jesd264_pr_2026_10_01_s2",
+      "locator": "新聞稿第 1 段",
+      "quote": "By establishing a common baseline for testing and manufacturing controls, the standard helps reduce deployment risk and supports broader adoption of silicon photonics in high-speed datacenter, telecommunications and AI networks."
+    },
+    {
+      "id": "jedec_jesd264_pr_2026_10_01_s3",
+      "locator": "新聞稿第 3 段",
+      "quote": "JESD264 addresses these challenges by offering a unified framework for qualification and reliability testing across the silicon photonics ecosystem."
+    },
+    {
+      "id": "jedec_jesd264_pr_2026_10_01_s4",
+      "locator": "新聞稿第 3 段",
+      "quote": "It also establishes clearer reliability responsibilities among foundries, OSATs (Outsourced Semiconductor Assembly and Test) and system developers, helping improve consistency throughout the silicon photonics ecosystem."
+    },
+    {
+      "id": "jedec_jesd264_pr_2026_10_01_s5",
+      "locator": "Key Features of JESD264（條列第 3 點）",
+      "quote": "Clear requirements for assembly processes and laser integration."
+    }
+  ]
+}

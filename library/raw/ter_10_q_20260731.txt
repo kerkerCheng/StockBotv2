@@ -1,0 +1,18 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/97210/000119312526327715/ter-20260628.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Teradyne, Inc. Form 10-Q（quarter ended June 28, 2026）— silicon photonics testing, Quantifi Photonics
+
+Source: https://www.sec.gov/Archives/edgar/data/97210/000119312526327715/ter-20260628.htm
+
+【Notes, Note A — The Company】
+Teradyne, Inc. (“Teradyne”) is a leading global provider of automated test equipment and robotics solutions. Teradyne’s automated test systems are used to test semiconductors, wireless products, data storage, silicon photonics, and complex electronics systems in many industries including consumer electronics, automotive, industrial, computing, communications, and defense and aerospace industries.
+
+【Notes — Acquisitions, Quantifi Photonics】
+On May 31, 2025 , Teradyne acquired all of the issued and outstanding shares of Quantifi Photonics (“Quantifi”), a privately held company in New Zealand and a leader in photonic integrated circuit (“PIC”) test solutions for a total purchase price of $ 127.2 million. The acquisition of Quantifi enables Teradyne to deliver scalable PIC test solutions.
+
+【Notes — Acquisitions, Quantifi Photonics（貢獻不重大）】
+Teradyne has not separately disclosed Quantifi’s standalone contribution to total company revenue or income from operations before income taxes or pro forma financial information because the impact of the acquisition on the condensed consolidated financial statements is not material.
+
+【Notes — Segment Information, Product Test】
+The Product Test segment includes operations related to the design, manufacturing and marketing of products and services for defense/aerospace test, circuit-board test, wireless test systems, high-speed test and measurement and silicon photonics testing.

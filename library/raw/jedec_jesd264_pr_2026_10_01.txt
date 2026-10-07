@@ -1,0 +1,21 @@
+Source URL: https://www.financialcontent.com/article/bizwire-2026-10-1-jedec-publishes-first-industry-wide-silicon-photonics-reliability-standard-for-ai-datacenter-and-telecom-infrastructure
+
+Excerpt:
+[EXCERPT — 有限逐字引文] JEDEC Publishes First Industry-Wide Silicon Photonics Reliability Standard (JESD264) — press release
+
+Source: https://www.businesswire.com/news/home/20261001668542/en/
+
+【新聞稿第 1 段】
+JEDEC Solid State Technology Association today announced the release of JESD264: Silicon Photonics Qualification and Reliability Requirements, the first industry-wide standard designed to bring consistent qualification and reliability practices to silicon photonics devices.
+
+【新聞稿第 1 段】
+By establishing a common baseline for testing and manufacturing controls, the standard helps reduce deployment risk and supports broader adoption of silicon photonics in high-speed datacenter, telecommunications and AI networks.
+
+【新聞稿第 3 段】
+JESD264 addresses these challenges by offering a unified framework for qualification and reliability testing across the silicon photonics ecosystem.
+
+【新聞稿第 3 段】
+It also establishes clearer reliability responsibilities among foundries, OSATs (Outsourced Semiconductor Assembly and Test) and system developers, helping improve consistency throughout the silicon photonics ecosystem.
+
+【Key Features of JESD264（條列第 3 點）】
+Clear requirements for assembly processes and laser integration.

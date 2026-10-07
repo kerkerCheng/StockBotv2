@@ -1,0 +1,107 @@
+{
+  "claims": [
+    {
+      "confidence": 0.65,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "條件：Teradyne 申報或法說撤出、出售或減值光子測試（Quantifi）業務，或 CPO 量產的測試供應商名單一手不含 Teradyne。核查頻率：每季（10-Q、法說）。觸發後 48 小時：e1 加註或提撤回、重讀 CPO 全堆疊測試層。",
+      "id": "ter_10_q_20260731_cl1",
+      "source_ids": [
+        "ter_10_q_20260731_s1",
+        "ter_10_q_20260731_s2",
+        "ter_10_q_20260731_s3",
+        "ter_10_q_20260731_s4"
+      ],
+      "statement": "Teradyne's 10-Q says its automated test systems are used to test silicon photonics, its Product Test segment includes silicon photonics testing, and it bought Quantifi Photonics ('a leader in photonic integrated circuit (PIC) test solutions', $127.2M, 2025-05-31) to 'deliver scalable PIC test solutions'. Scope caveat: the filing says silicon photonics / PIC test, not CPO by name, and says Quantifi's contribution is not material — this is a capability and positioning claim, not evidence of CPO test volume.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "tech:cpo_full_stack_test",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "ter_10_q_20260731_s1",
+        "ter_10_q_20260731_s2",
+        "ter_10_q_20260731_s4"
+      ],
+      "src_id": "co:teradyne"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "test_yield",
+      "aliases": [
+        "TER",
+        "Teradyne, Inc."
+      ],
+      "attributes": {
+        "ticker": "TER"
+      },
+      "confidence": 0.9,
+      "id": "co:teradyne",
+      "name": "Teradyne",
+      "role": "test",
+      "source_ids": [
+        "ter_10_q_20260731_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "test_yield",
+      "aliases": [
+        "full-stack test",
+        "CPO test",
+        "全堆疊測試"
+      ],
+      "attributes": {},
+      "confidence": 0.7,
+      "id": "tech:cpo_full_stack_test",
+      "name": "CPO 全堆疊測試（full-stack test）",
+      "role": null,
+      "source_ids": [
+        "ter_10_q_20260731_s2",
+        "ter_10_q_20260731_s4"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "ter_10_q_20260731",
+    "evidence_tier": 1,
+    "origin_entity": "Teradyne, Inc.",
+    "permission_basis": "美國 SEC 法定申報（Form 10-Q）；只保留研究必要的逐字摘錄（HTML 實體已解碼、空白攤平）。published_at 取 EDGAR filed date。",
+    "published_at": "2026-07-31",
+    "publisher": "SEC EDGAR",
+    "retrieved_at": "2026-10-07",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Teradyne, Inc. Form 10-Q（quarter ended June 28, 2026）— silicon photonics testing, Quantifi Photonics",
+    "url": "https://www.sec.gov/Archives/edgar/data/97210/000119312526327715/ter-20260628.htm"
+  },
+  "sources": [
+    {
+      "id": "ter_10_q_20260731_s1",
+      "locator": "Notes, Note A — The Company",
+      "quote": "Teradyne, Inc. (“Teradyne”) is a leading global provider of automated test equipment and robotics solutions. Teradyne’s automated test systems are used to test semiconductors, wireless products, data storage, silicon photonics, and complex electronics systems in many industries including consumer electronics, automotive, industrial, computing, communications, and defense and aerospace industries."
+    },
+    {
+      "id": "ter_10_q_20260731_s2",
+      "locator": "Notes — Acquisitions, Quantifi Photonics",
+      "quote": "On May 31, 2025 , Teradyne acquired all of the issued and outstanding shares of Quantifi Photonics (“Quantifi”), a privately held company in New Zealand and a leader in photonic integrated circuit (“PIC”) test solutions for a total purchase price of $ 127.2 million. The acquisition of Quantifi enables Teradyne to deliver scalable PIC test solutions."
+    },
+    {
+      "id": "ter_10_q_20260731_s3",
+      "locator": "Notes — Acquisitions, Quantifi Photonics（貢獻不重大）",
+      "quote": "Teradyne has not separately disclosed Quantifi’s standalone contribution to total company revenue or income from operations before income taxes or pro forma financial information because the impact of the acquisition on the condensed consolidated financial statements is not material."
+    },
+    {
+      "id": "ter_10_q_20260731_s4",
+      "locator": "Notes — Segment Information, Product Test",
+      "quote": "The Product Test segment includes operations related to the design, manufacturing and marketing of products and services for defense/aerospace test, circuit-board test, wireless test systems, high-speed test and measurement and silicon photonics testing."
+    }
+  ]
+}

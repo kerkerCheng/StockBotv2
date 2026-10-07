@@ -1,0 +1,108 @@
+{
+  "claims": [
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：FormFactor 下一份 10-Q／10-K 不再把 Systems 成長歸因於 Triton，或揭露 Triton 訂單取消、延後、減值。核查頻率：每季（10-Q、法說）。觸發後 48 小時：e1 加註、重讀 CPO 全堆疊測試層、AEHR 敘事重答「為什麼卡在它」。",
+      "id": "form_10_q_20260804_cl1",
+      "source_ids": [
+        "form_10_q_20260804_s1",
+        "form_10_q_20260804_s2",
+        "form_10_q_20260804_s3",
+        "form_10_q_20260804_s4"
+      ],
+      "statement": "FormFactor's own 10-Q (FormFactor = 'we/our', s1) attributes the year-over-year increase in Systems revenue for the quarter ended June 27, 2026 'primarily' to sales of Triton, 'our recently introduced high-volume co-packaged optics (CPO) testing solution', with Taiwan demand for Triton contributing; it also bought Keystone Photonics (optical probing for SiPh and CPO testing, $20.6M, 2025-12-15). Supplier self-report with revenue recognized — a second supplier on the CPO test layer besides Aehr (wafer-level burn-in); customers are not named.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "tech:cpo_full_stack_test",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "form_10_q_20260804_s1",
+        "form_10_q_20260804_s2",
+        "form_10_q_20260804_s3",
+        "form_10_q_20260804_s4"
+      ],
+      "src_id": "co:formfactor"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "test_yield",
+      "aliases": [
+        "FORM",
+        "FormFactor, Inc."
+      ],
+      "attributes": {
+        "ticker": "FORM"
+      },
+      "confidence": 0.9,
+      "id": "co:formfactor",
+      "name": "FormFactor",
+      "role": "test",
+      "source_ids": [
+        "form_10_q_20260804_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "test_yield",
+      "aliases": [
+        "full-stack test",
+        "CPO test",
+        "全堆疊測試"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:cpo_full_stack_test",
+      "name": "CPO 全堆疊測試（full-stack test）",
+      "role": null,
+      "source_ids": [
+        "form_10_q_20260804_s2",
+        "form_10_q_20260804_s4"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "form_10_q_20260804",
+    "evidence_tier": 1,
+    "origin_entity": "FormFactor, Inc.",
+    "permission_basis": "美國 SEC 法定申報（Form 10-Q）；只保留研究必要的逐字摘錄（HTML 實體已解碼、空白攤平）。published_at 取 EDGAR filed date。",
+    "published_at": "2026-08-04",
+    "publisher": "SEC EDGAR",
+    "retrieved_at": "2026-10-07",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "FormFactor, Inc. Form 10-Q（quarter ended June 27, 2026）— Triton CPO testing, Keystone Photonics",
+    "url": "https://www.sec.gov/Archives/edgar/data/1039399/000103939926000033/form-20260627.htm"
+  },
+  "sources": [
+    {
+      "id": "form_10_q_20260804_s1",
+      "locator": "Part I Item 2（MD&A）Overview",
+      "quote": "Unless expressly stated or the context otherwise requires, the terms “we,” “our,” “us” and “FormFactor” refer to FormFactor, Inc. and its subsidiaries. FormFactor, Inc., headquartered in Livermore, California, is a leading provider of essential test and measurement technologies along the full semiconductor product lifecycle — from characterization, modeling, reliability, and design de-bug, to qualification and production test."
+    },
+    {
+      "id": "form_10_q_20260804_s2",
+      "locator": "Part I Item 2（MD&A）Revenues by Market — Systems",
+      "quote": "Systems — The increase in Systems market revenues for the three months ended June 27, 2026, compared to the three months ended June 28, 2025, was primarily driven by sales of Triton, our recently introduced high-volume co-packaged optics (“CPO”) testing solution."
+    },
+    {
+      "id": "form_10_q_20260804_s3",
+      "locator": "Part I Item 2（MD&A）Revenues by Geographic Region — Taiwan",
+      "quote": "Taiwan — Increased demand for our Foundry & Logic probe card products and increased demand for Triton, our recently introduced high-volume CPO testing platform within Systems, contributed to the increase in revenues."
+    },
+    {
+      "id": "form_10_q_20260804_s4",
+      "locator": "Notes to Condensed Consolidated Financial Statements, Note 4 — Acquisition",
+      "quote": "On December 15, 2025, we acquired 100 % of the shares of Keystone Photonics for total consideration of $ 20.6 million, net of cash acquired of $ 1.7 million. Keystone Photonics provides optical probing technology used in the testing of silicon photonics (“SiPh”) and co‑packaged optics (“CPO”) devices. The acquisition expands the Company’s testing capabilities in these areas and supports customers as SiPh and CPO technologies transition from development into high‑volume manufacturing, including applications related to artificial intelligence data-center infrastructure."
+    }
+  ]
+}

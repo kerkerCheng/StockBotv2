@@ -1,0 +1,18 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1039399/000103939926000033/form-20260627.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] FormFactor, Inc. Form 10-Q（quarter ended June 27, 2026）— Triton CPO testing, Keystone Photonics
+
+Source: https://www.sec.gov/Archives/edgar/data/1039399/000103939926000033/form-20260627.htm
+
+【Part I Item 2（MD&A）Overview】
+Unless expressly stated or the context otherwise requires, the terms “we,” “our,” “us” and “FormFactor” refer to FormFactor, Inc. and its subsidiaries. FormFactor, Inc., headquartered in Livermore, California, is a leading provider of essential test and measurement technologies along the full semiconductor product lifecycle — from characterization, modeling, reliability, and design de-bug, to qualification and production test.
+
+【Part I Item 2（MD&A）Revenues by Market — Systems】
+Systems — The increase in Systems market revenues for the three months ended June 27, 2026, compared to the three months ended June 28, 2025, was primarily driven by sales of Triton, our recently introduced high-volume co-packaged optics (“CPO”) testing solution.
+
+【Part I Item 2（MD&A）Revenues by Geographic Region — Taiwan】
+Taiwan — Increased demand for our Foundry & Logic probe card products and increased demand for Triton, our recently introduced high-volume CPO testing platform within Systems, contributed to the increase in revenues.
+
+【Notes to Condensed Consolidated Financial Statements, Note 4 — Acquisition】
+On December 15, 2025, we acquired 100 % of the shares of Keystone Photonics for total consideration of $ 20.6 million, net of cash acquired of $ 1.7 million. Keystone Photonics provides optical probing technology used in the testing of silicon photonics (“SiPh”) and co‑packaged optics (“CPO”) devices. The acquisition expands the Company’s testing capabilities in these areas and supports customers as SiPh and CPO technologies transition from development into high‑volume manufacturing, including applications related to artificial intelligence data-center infrastructure.
