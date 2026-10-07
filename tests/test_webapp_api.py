@@ -412,36 +412,83 @@ def test_full_detail_has_exactly_one_level_of_expansion() -> None:
 # 分段與常駐計數器（2026-09-10）
 # ---------------------------------------------------------------------------
 
-def test_list_is_grouped_but_the_order_inside_a_group_is_untouched(client) -> None:
-    """分組**不是排序**。
+def _with_candidate(view, derived=None, label=None, absence_kind=None):
+    """在 fake view 上掛一個候選面板（形狀照 production：`candidate:state` 那一格的值是 `derive_row` 的列）。"""
+    if derived is not None:
+        datum = {"key": "candidate:state", "value": {"derived": derived, "derived_label": label}, "status": "available"}
+        panel = {"key": "candidate", "status": "available", "absence_kind": None,
+                 "lines": [{"key": "candidate:state", "datum": datum}]}
+    else:
+        datum = {"key": "candidate:state", "value": None, "status": "missing", "absence_kind": absence_kind,
+                 "reason": "沒有敘事、也沒有持有"}
+        panel = {"key": "candidate", "status": "missing", "absence_kind": absence_kind,
+                 "lines": [{"key": "candidate:state", "datum": datum}]}
+    return {**view, "candidate": panel}
 
-    `AGENTS.md`：不得輸出跨檔全序或首選，且研究完整度不得拿來排序。
-    「ready 排最上面」會被讀成「最值得看」，而 ready 與值不值得投相關但非因果——
-    LYC.AX 是 ready，隱含報酬 −35.7%。分段解決「打開第一屏全是空的」這個真實問題，
-    但組內順序必須一個字都沒動，否則它就變成第二套投資排序了。
-    """
+
+@pytest.fixture()
+def grouped(tmp_path):
+    """五檔、五種候選狀態，ticker 刻意與組序反著取——組序若被字母序蓋掉就看得出來。"""
+    store = ArtifactStore(tmp_path)
+    for ticker, derived, label, kind in (("AAA", "pass", "不要", None), ("BBB", "not_multiple", "非倍率候選", None),
+                                         ("CCC", None, None, "not_yet_recorded"), ("DDD", "missing", "缺 X", None),
+                                         ("EEE", "missing", "缺 X", None), ("ZZZ", "held", "已持有", None),
+                                         ("YYY", None, None, "upstream_unavailable")):
+        store.write(materialize_view(_with_candidate(fake_view(ticker), derived, label, kind)))
+    write_vocabularies(store)
+    return TestClient(create_app(tmp_path)), tmp_path
+
+
+def test_list_is_grouped_by_candidate_state_and_the_order_inside_a_group_is_alphabetical(grouped) -> None:
+    """2026-10-07 使用者指示：首頁照候選狀態分組——研究花最多時間的在上、判斷「不要」的在最後。
+
+    分組**不是排序**：`AGENTS.md` 不得輸出跨檔全序或首選，所以組內一律字母序；組序是閱讀順序，順序與中文
+    只有 `alpha.candidates.LIST_GROUPS` 那一份（經 `.meta.json`），API 不另抄。"""
+    from alpha.candidates import LIST_GROUPS
+
+    client, _ = grouped
     body = client.get("/api/v1/stocks").json()
-    # ⚠ `awaiting_report`（2026-09-19 補的第三種終局）排在 `not_started` **之前**：
-    # 它已經是終局（目標期間結束、財報未出，會自己解開），不是待辦。
-    # 先前它被歸進「還沒做」，而兩者的下一步完全相反（L12）。
-    assert [g["key"] for g in body["groups"]] == [
-        "ready", "settled", "awaiting_report", "not_started"]
+    assert [g["key"] for g in body["groups"]] == [*LIST_GROUPS, "stale_artifact"]
+    assert [r["ticker"] for r in body["stocks"]] == ["ZZZ", "DDD", "EEE", "CCC", "BBB", "AAA", "YYY"]
+    # 沒寫敘事與這次沒讀到是兩組（L12）
+    assert {r["ticker"]: r["group"] for r in body["stocks"]}["CCC"] == "no_narrative"
+    assert {r["ticker"]: r["group"] for r in body["stocks"]}["YYY"] == "unavailable"
     for group in body["groups"]:
         tickers = [r["ticker"] for r in body["stocks"] if r["group"] == group["key"]]
         assert tickers == sorted(tickers), f"{group['key']} 組內順序被動過了"
+        assert group["count"] == len(tickers)
     assert "不是投資排序" in body["group_note"]
 
 
-def test_group_is_copied_from_closure_not_re_derived_in_the_app(client) -> None:
-    """分組照抄 `alpha.closure` 的 terminal（materialize 端寫進 overview）。
-
-    APP 自己定義「什麼叫做完」就是 L16 記過的重造品——重造品會立刻開始偏離。
-    """
+def test_group_is_copied_from_the_candidate_panel_not_re_derived_in_the_app(grouped) -> None:
+    """分組照抄候選面板（與候選板同一個推導；materialize 端寫進 overview）——APP 自己判就是 L16 的重造品。
+    研究完整度不再分組，但每張卡照樣帶著（資訊不丟）。"""
+    client, _ = grouped
     body = client.get("/api/v1/stocks").json()
     for row in body["stocks"]:
-        expected = row["closure_terminal"] if row.get("closure_terminal") in ("ready", "settled") \
-            else "not_started"
-        assert row["group"] == expected, row["ticker"]
+        assert row["group"] == row["candidate"]["list_group"], row["ticker"]
+        assert row["closure_label"], row["ticker"]
+
+
+def test_old_artifacts_are_flagged_and_a_missing_vocabulary_means_no_grouping(grouped) -> None:
+    """2026-10-07 之前 materialize 的頁沒有候選狀態——是 artifact 太舊，不得被歸進「沒寫敘事」；
+    字彙表讀不到就不分組（整份字母序），不在 API 補一份字彙（L16）。"""
+    client, directory = grouped
+    path = directory / "AAA.json"
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    del payload["overview"]["candidate"]
+    from webapp.contracts import canonical_digest
+
+    payload["content_digest"] = canonical_digest(payload)
+    path.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
+    body = client.get("/api/v1/stocks").json()
+    assert {r["ticker"]: r["group"] for r in body["stocks"]}["AAA"] == "stale_artifact"
+    assert body["stocks"][-1]["ticker"] == "AAA"
+    (directory / ".meta.json").unlink()
+    body = client.get("/api/v1/stocks").json()
+    assert body["groups"] == [] and all(r["group"] is None for r in body["stocks"])
+    assert [r["ticker"] for r in body["stocks"]] == sorted(r["ticker"] for r in body["stocks"])
+    assert "字彙表讀不到" in body["group_note"]
 
 
 def test_view_counter_is_always_on_the_first_screen(client) -> None:
@@ -457,8 +504,9 @@ def test_view_counter_is_always_on_the_first_screen(client) -> None:
     assert "with_view" in counters and "with_bet" in counters
     assert counters["headline"] and "已有判讀" in counters["headline"]
     assert "by_stance" not in counters and "our_own_view" not in counters
-    # 純計數：已有判讀＝ready 那一組的檔數，一檔都不能被吃掉或憑空多出（INV-3）。
-    assert counters["with_view"] == sum(1 for r in body["stocks"] if r["group"] == "ready")
+    # 純計數：已有判讀＝研究完整度是 ready 的檔數，一檔都不能被吃掉或憑空多出（INV-3）。
+    # （2026-10-07 起首頁改照候選狀態分組；研究完整度留在每張卡的 `closure_terminal`。）
+    assert counters["with_view"] == sum(1 for r in body["stocks"] if r.get("closure_terminal") == "ready")
 
 
 def test_counters_do_not_invent_a_bet_for_stocks_that_have_none(tmp_path) -> None:

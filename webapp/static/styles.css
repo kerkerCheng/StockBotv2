@@ -452,3 +452,29 @@ table.pt-table th, table.pt-table td { vertical-align: top; overflow-wrap: anywh
 .badge-evidence { color: var(--muted); border-color: var(--border); font-weight: 500; }
 .pt-decl { white-space: pre-wrap; }
 .pt-claim { margin: 0 0 4px; }
+
+/* 窄螢幕（手機）：可堆疊的表格每一列變一張小卡、格子上面印欄名（app.js `stackTable`；2026-10-07 使用者回饋——
+   層說明的表格與帳號計分表在手機上擠成一字一行）。寬螢幕照舊是表格。
+   ⚠ class 叫 stack-table 不叫 stack：`.stack` 已經是資產配置的堆疊長條（height 22px、overflow hidden），撞名會把表壓成一條線。 */
+@media (max-width: 640px) {
+  table.stack-table { min-width: 0; width: 100%; }
+  table.stack-table thead { display: none; }
+  table.stack-table, table.stack-table tbody, table.stack-table tr, table.stack-table td { display: block; width: 100%; }
+  table.stack-table tr { padding: 8px 0; border-bottom: 1px solid var(--border); }
+  table.stack-table tbody tr:last-child { border-bottom: none; }
+  table.stack-table td { border-bottom: none; padding: 2px 0; white-space: normal; }
+  table.stack-table td[data-label]::before { content: attr(data-label); display: block; color: var(--dim);
+                                       font-size: 11px; font-weight: 600; margin-top: 4px; }
+}
+
+/* 導覽（2026-10-07 使用者回饋：手機上「候選板」直排成三行）：每個入口不斷字、放不下就換到下一列。 */
+.nav { flex-wrap: wrap; gap: 6px 14px; }
+.nav a { white-space: nowrap; }
+/* 追蹤表最下面的舊店區塊（預設摺起來）。 */
+details.old-store { margin-top: 16px; }
+details.old-store > summary { cursor: pointer; color: var(--muted); font-size: 13px; padding: 8px 0; }
+/* 層說明正文（2026-10-07 第一輪排版）：行內出處淡化、段與段之間留白。 */
+.cite-inline { color: var(--dim); font-size: 11.5px; }
+.cite-inline code { font-size: 11px; }
+.layer-section .plain-text h3 { margin-top: 4px; }
+.layer-section details { margin-top: 10px; }

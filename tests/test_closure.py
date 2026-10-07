@@ -532,7 +532,8 @@ def test_app_knows_every_terminal_kind_the_ssot_knows() -> None:
     ⚠ 這一條是**對照**而不是重述：它從 `terminal` 的實際分支取值，
     所以未來多一種終局而 APP 沒跟上時，紅的是這一條而不是使用者。
     """
-    from webapp.api import _GROUP_LABELS, _group_of
+    # 2026-10-07：首頁改照候選狀態分組，研究完整度的標籤改名 `_CLOSURE_LABELS`（留在每張卡上）
+    from webapp.api import _CLOSURE_LABELS, _group_of
 
     kinds = {closure.BacklogRow(ticker="a", readiness="ready", open_panels=(), settled_panels=(),
                                 absence_kinds={}).terminal,
@@ -543,7 +544,7 @@ def test_app_knows_every_terminal_kind_the_ssot_knows() -> None:
                                 awaiting_report_since="2026-06-30").terminal}
     assert kinds == {"ready", "settled", "awaiting_report"}
     for kind in kinds:
-        assert kind in _GROUP_LABELS, f"APP 不認得終局 {kind}"
+        assert kind in _CLOSURE_LABELS, f"APP 不認得終局 {kind}"
         assert _group_of({"closure_terminal": kind}) == kind
     # 未到終局仍然落在「還沒做」
     assert _group_of({"closure_terminal": None}) == "not_started"
