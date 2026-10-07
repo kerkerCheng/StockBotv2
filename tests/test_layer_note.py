@@ -190,6 +190,26 @@ def test_a_failed_watch_rehearsal_leaves_the_ledger_untouched(tmp_path, monkeypa
     assert ew.load_watches(watches)["watches"] == []
 
 
+def test_a_registration_failure_after_append_names_the_repair_command(tmp_path, monkeypatch) -> None:
+    """R2 複審：append 之後才失敗（例如 registry 存不進去）——紀錄已在 ledger，錯誤要說出冪等補登的命令，
+    而且是 CLI 接得住的 AlphaError，不是 traceback。"""
+    from alpha.errors import AlphaError
+    from alpha.providers.layer_notes import read_note_records, write_note
+
+    ew = _ew(monkeypatch)
+    raw, ledger = _write_env(tmp_path)
+
+    def _disk_full(*_a, **_k):
+        raise OSError("disk full")
+
+    monkeypatch.setattr(ew, "save_watches", _disk_full)
+    record = _rec()
+    with pytest.raises(AlphaError, match="--register-watches") as exc:
+        write_note(record, watches_path=tmp_path / "w.json", directory=ledger, raw_dir=raw, lead_exists=lambda i: True)
+    assert record["note_id"] in str(exc.value) and "已寫入" in str(exc.value)
+    assert [r.note_id for r in read_note_records("mat:inp_epiwafer", directory=ledger)[0]] == [record["note_id"]]
+
+
 # ---- watch：寫下即登記、換版收掉、到期走重讀 ----
 
 def _write(record, tmp_path, watches):

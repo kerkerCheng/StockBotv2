@@ -157,3 +157,17 @@ def test_tw_share_capital_stays_an_interactive_entry() -> None:
     rules = RULES.read_text(encoding="utf-8")
     assert "tw_share_capital" not in rules
     assert "tw_share_capital" not in (ROOT / "crons" / "harvest_leads.py").read_text(encoding="utf-8")
+
+
+def test_layer_note_ledger_is_written_only_interactively() -> None:
+    """層說明 ledger（A3、append-only；個股頁 plan S4a）只由互動 session 寫（`python -m alpha layer-note --add`）：
+    daily 的封閉步驟清單不得出現它；心跳與 `audit invariants`（daily 第 14 步）只讀 ledger 與 registry，
+    不得呼叫寫入端——要讓無人值守寫它必須重做一次 sandbox impact review（OPERATIONS「層說明 ledger」）。"""
+    assert "layer-note" not in RULES.read_text(encoding="utf-8")
+    assert "layer-note" not in (ROOT / "crons" / "daily_task.py").read_text(encoding="utf-8")
+    heartbeat = (ROOT / "crons" / "heartbeat.py").read_text(encoding="utf-8")
+    assert "_layer_note_lines" in heartbeat           # 讀的那一端確實在心跳裡（不是因為沒接線才乾淨）
+    readers = heartbeat + "".join((ROOT / "audit" / name).read_text(encoding="utf-8")
+                                  for name in ("checks.py", "sources.py"))
+    for writer in ("write_note", "append_note_record", "register_note_watches"):
+        assert writer not in readers, writer

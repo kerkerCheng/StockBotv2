@@ -31,7 +31,7 @@ from datetime import date
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
-from alpha.errors import ContractViolation
+from alpha.errors import AlphaError, ContractViolation
 from alpha.layer_note.contracts import LayerNote, parse_layer_note_record, select_current
 
 _ROOT = Path(__file__).resolve().parents[2]
@@ -260,9 +260,13 @@ def write_note(record: Mapping[str, Any], *, watches_path: Path | None = None, d
     except ew.EventWatchError as exc:
         raise ContractViolation(f"層說明拒收（watch 登記預演失敗，ledger 未動）：{exc}") from None
     path = append_note_record(record, directory=directory, raw_dir=raw_dir, lead_exists=lead_exists)
-    records, _errors = read_note_records(parsed.node, directory=directory)
-    summary = _apply_note_watches(parsed, data, records, stamp=stamp)
-    ew.save_watches(data, watches_path)
+    try:
+        records, _errors = read_note_records(parsed.node, directory=directory)
+        summary = _apply_note_watches(parsed, data, records, stamp=stamp)
+        ew.save_watches(data, watches_path)
+    except Exception as exc:  # noqa: BLE001 — 紀錄已 append：登記沒跟上要說清楚怎麼補，不得變成 traceback（INV-3；R2 複審）
+        raise AlphaError(f"層說明 {parsed.note_id} 已寫入 {path.name}，但 watch 登記失敗（{type(exc).__name__}: {exc}）"
+                         f"——修好後跑 `python -m alpha layer-note {parsed.node} --register-watches` 冪等補登") from exc
     return {"path": str(path), "note_id": parsed.note_id, **summary}
 
 
