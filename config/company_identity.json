@@ -1384,6 +1384,48 @@
       "name_aliases": [
         "Teradyne"
       ]
+    },
+    {
+      "company_id": "co:auras_technology",
+      "research_ticker": "3324.TWO",
+      "market_currency": "TWD",
+      "execution_currency": "TWD",
+      "execution_venue": "TPEx",
+      "display_name": "Auras Technology Co., Ltd.",
+      "_display_name_source": "yfinance longName（2026-10-07）；櫃買 3324（雙鴻科技股份有限公司，年報封面）",
+      "name_aliases": [
+        "Auras",
+        "雙鴻",
+        "雙鴻科技"
+      ]
+    },
+    {
+      "company_id": "co:nitto_boseki",
+      "research_ticker": "3110.T",
+      "market_currency": "JPY",
+      "display_name": "Nitto Boseki Co., Ltd.",
+      "_display_name_source": "yfinance longName（2026-10-07）；説明資料各頁版權列「NITTO BOSEKI CO., LTD.」",
+      "_note": "東証 3110（日東紡績株式会社）；2026-07-01 起 1 股分 5 股。台灣子公司建榮工業材料（5340.TWO，持股 47.65%）不併入別名。",
+      "name_aliases": [
+        "Nittobo",
+        "日東紡",
+        "日東紡績",
+        "Nitto Boseki"
+      ]
+    },
+    {
+      "company_id": "co:kinsus",
+      "research_ticker": "3189.TW",
+      "market_currency": "TWD",
+      "execution_currency": "TWD",
+      "execution_venue": "TWSE",
+      "display_name": "Kinsus Interconnect Technology Corp.",
+      "_display_name_source": "yfinance longName（2026-10-07）；上市 3189（景碩科技股份有限公司，年報封面）",
+      "name_aliases": [
+        "Kinsus",
+        "景碩",
+        "景碩科技"
+      ]
     }
   ]
 }
