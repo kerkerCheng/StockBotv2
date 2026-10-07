@@ -73,8 +73,10 @@ MUTATIONS: tuple[Mutation, ...] = (
     Mutation(
         name="AlphaSignal 長出部位欄位",
         path="alpha/contracts.py",
-        old="    direction: Literal[\"long\", \"short\", \"neutral\"]\n    confidence: float\n    expected_horizon: str",
-        new="    direction: Literal[\"long\", \"short\", \"neutral\"]\n    confidence: float\n    target_weight: float = 0.0\n    expected_horizon: str",
+        # 2026-10-07：confidence 與 expected_horizon 之間多了註解，改對到那行註解；新欄位不給預設值（給了會先撞 dataclass
+        # 欄位順序錯誤，紅的理由就不是 shape guard）
+        old="    confidence: float\n    #: **多久會被驗證**",
+        new="    confidence: float\n    target_weight: float\n    #: **多久會被驗證**",
         test="tests/test_alpha_contracts.py",
         guards="AlphaSignal != Position（import 時的 shape guard）",
     ),
@@ -193,9 +195,10 @@ MUTATIONS: tuple[Mutation, ...] = (
     Mutation(
         name="Engine D 反向 import alpha",
         path="decision_lab/bootstrap.py",
-        old="\"\"\"建立本機 private Decision Store。\"\"\"",
-        new="\"\"\"建立本機 private Decision Store。\"\"\"\nimport alpha  # noqa: F401",
-        test="tests/test_layer_separation.py::test_decision_lab_does_not_import_new_layers",
+        # 2026-10-07：docstring 改成多行（插在裡面會變成字串），改插在 future import 後；測試已改名為 domain 版
+        old="from __future__ import annotations\n",
+        new="from __future__ import annotations\nimport alpha  # noqa: F401\n",
+        test="tests/test_layer_separation.py::test_decision_lab_domain_does_not_import_new_layers",
         guards="依賴方向：Engine D 是下游，不呼叫 Alpha Research",
     ),
     Mutation(
@@ -755,8 +758,9 @@ MUTATIONS: tuple[Mutation, ...] = (
     Mutation(
         name="持股讀不到時逐檔輸出 0.0%",
         path="portfolio/alpha_exposure.py",
-        old="    if status not in _AVAILABLE:",
-        new="    if False:",
+        # 2026-10-07：同一句在渲染函式也有一次——帶下一行註解讓它唯一
+        old="    if status not in _AVAILABLE:\n        # **不逐檔輸出 0.0%。**",
+        new="    if False:\n        # **不逐檔輸出 0.0%。**",
         test=(
             "tests/test_portfolio_alpha_exposure.py::"
             "test_unavailable_holdings_do_not_emit_zero_percent_per_candidate"
@@ -1023,22 +1027,8 @@ MUTATIONS: tuple[Mutation, ...] = (
         test="tests/test_analyst_view.py::test_as_of_view_keeps_the_point_in_time_mode_and_does_not_leak_future_values",
         guards="INV-6：答不出「T 時刻我知道什麼」就要說出來，不得讓歷史視角看起來像當前",
     ),
-    Mutation(
-        name="消費端：敏感度由小到大排（最大的那條沉到最後）",
-        path="briefing/analyst_view/compose.py",
-        old="    return tuple(sorted(data, key=_sensitivity_magnitude, reverse=True))",
-        new="    return tuple(sorted(data, key=_sensitivity_magnitude, reverse=False))",
-        test="tests/test_analyst_view.py::test_weak_inputs_declare_the_rule_that_listed_them_and_order_by_existing_sensitivity",
-        guards="排序是 consumer 唯一被允許的數值動作，它必須真的把 |Δ| 最大的放最前面",
-    ),
-    Mutation(
-        name="消費端：未知的軸不列進脆弱清單",
-        path="briefing/analyst_view/compose.py",
-        old="        if not score.is_known:",
-        new="        if False and not score.is_known:",
-        test="tests/test_analyst_view.py::test_unknown_axis_is_listed_as_unknown_not_as_a_passing_grade",
-        guards="未知不是「沒問題」——把未知軸藏起來會讓畫面看起來比實際完整",
-    ),
+    # 2026-10-07：「消費端：敏感度由小到大排」「消費端：未知的軸不列進脆弱清單」兩條移除——被守的程式（`_sensitivity_magnitude`、
+    # 軸的 is_known 分流）與對應測試都已隨 Phase 0 估值鏈與五軸退役（G3／G12）；留著只會讓這支腳本找不到突變點。
     # --- Step 4 full-chain adversarial acceptance（2026-09-07）-------------
     Mutation(
         name="跨會計年度的 forward EPS 照樣當成分析師修正",
@@ -1072,7 +1062,8 @@ MUTATIONS: tuple[Mutation, ...] = (
     Mutation(
         name="頭條用全域措辭講一句局部範圍的「無」",
         path="briefing/analyst_view/compose.py",
-        old='        attention_scope="只列頭條這幾格自己的成果（" + "、".join(HEADLINE_ARTIFACTS) + "）",',
+        # 2026-10-07：頭條只剩現價一格，字改成「只列現價自己的成果」
+        old='        attention_scope="只列現價自己的成果（" + "、".join(HEADLINE_ARTIFACTS) + "）",',
         new="        attention_scope=None,",
         test=("tests/test_analyst_view.py::"
               "test_headline_no_attention_states_its_scope_and_the_count_outside_it"),
@@ -1203,8 +1194,9 @@ MUTATIONS: tuple[Mutation, ...] = (
     Mutation(
         name="artifact 缺欄位也照服務",
         path="webapp/contracts.py",
-        old="    if missing:",
-        new="    if False:",
+        # 2026-10-07：state artifact 也有一句 if missing——帶上一行對到個股 artifact 那一處
+        old="    missing = [f for f in REQUIRED_FIELDS if f not in payload]\n    if missing:",
+        new="    missing = [f for f in REQUIRED_FIELDS if f not in payload]\n    if False:",
         test="tests/test_webapp_materialize.py::test_missing_required_field_is_rejected_not_patched",
         guards="partial write 必須 fail closed——半份 artifact 與「這檔沒有研究結論」不得同形（L12）",
     ),
@@ -1219,8 +1211,9 @@ MUTATIONS: tuple[Mutation, ...] = (
     Mutation(
         name="serve 端 import 了會重跑模型的東西",
         path="webapp/api.py",
-        old="from .contracts import ARTIFACT_SCHEMA_VERSION, ArtifactUnavailable, max_age_hours",
-        new="from briefing.alpha_view.sources import fetch_alpha_investment_view\nfrom .contracts import ARTIFACT_SCHEMA_VERSION, ArtifactUnavailable, max_age_hours",
+        # 2026-10-07：contracts 那行多了 code_snapshot、code_status（APP 自偵舊程式）
+        old="from .contracts import ARTIFACT_SCHEMA_VERSION, ArtifactUnavailable, code_snapshot, code_status, max_age_hours",
+        new="from briefing.alpha_view.sources import fetch_alpha_investment_view\nfrom .contracts import ARTIFACT_SCHEMA_VERSION, ArtifactUnavailable, code_snapshot, code_status, max_age_hours",
         test="tests/test_webapp_request_path.py",
         guards="「點一下不重跑研究」的第一道證明是 import allowlist——它一鬆，其餘三道證明都可能被繞過",
     ),
@@ -1286,8 +1279,9 @@ MUTATIONS: tuple[Mutation, ...] = (
     Mutation(
         name="AgentFlow：GO 判準被刪",
         path="AGENTS.md",
-        old="**hard invariant：`GO` 只關閉本 Step，不開啟下一個 Step。**",
-        new="**建議：`GO` 之後可以視情況接續。**",
+        # 2026-10-07：AGENTS 重寫後那一句改成條列
+        old="- **`GO` 只關閉本 Step，不開啟下一個 Step**；",
+        new="- **建議：`GO` 之後可以視情況接續**；",
         test="tests/test_agent_workflow.py::test_go_does_not_open_the_next_step",
         guards="這條被刪掉不會有東西壞掉，系統只會安靜地開始自己往下一個 Step 跑",
     ),

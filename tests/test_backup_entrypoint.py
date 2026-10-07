@@ -292,3 +292,106 @@ def test_engine_b_archive_never_includes_private_reference(tmp_path):
 
     with zipfile.ZipFile(archive_path) as archive:
         assert set(archive.namelist()) == set(STATE_PATHS)
+
+
+# ---------------------------------------------------------------------------
+# Drive 上傳重試（2026-10-07：daily ⑯ 撞到 Google 端 HTTP 500「Internal Error」，手動補傳一次就過）
+# ---------------------------------------------------------------------------
+
+class _HttpError(Exception):
+    """形狀同 googleapiclient 的 HttpError：`resp.status` 是 HTTP 狀態碼。"""
+
+    def __init__(self, status: int):
+        super().__init__(f"HttpError {status}")
+        self.resp = type("Resp", (), {"status": status})()
+
+
+class _Call:
+    def __init__(self, outcome):
+        self.outcome = outcome
+
+    def execute(self):
+        if isinstance(self.outcome, BaseException):
+            raise self.outcome
+        return self.outcome
+
+
+class _FakeFiles:
+    """create 依序吐出 outcomes（例外或回傳值）；list／update 給輪替用。"""
+
+    def __init__(self, create_outcomes, list_outcomes=None):
+        self.create_outcomes = list(create_outcomes)
+        self.list_outcomes = list(list_outcomes or [{"files": []}])
+        self.creates = 0
+
+    def create(self, **_kw):
+        self.creates += 1
+        return _Call(self.create_outcomes.pop(0))
+
+    def list(self, **_kw):
+        return _Call(self.list_outcomes.pop(0) if len(self.list_outcomes) > 1 else self.list_outcomes[0])
+
+    def update(self, **_kw):
+        return _Call({})
+
+
+class _FakeService:
+    def __init__(self, files):
+        self._files = files
+
+    def files(self):
+        return self._files
+
+
+def _drive_fixture(tmp_path, monkeypatch, files):
+    entrypoint = _load_entrypoint()
+    token = tmp_path / "token.json"
+    token.write_text("{}", encoding="utf-8")
+    zip_path = tmp_path / "stockbotv2_backup_x.zip"
+    zip_path.write_bytes(b"PK\x05\x06" + b"\x00" * 18)
+    monkeypatch.setattr(entrypoint, "TOKEN_PATH", token)
+    monkeypatch.setattr(entrypoint, "_drive_service", lambda: (_FakeService(files), object()))
+    monkeypatch.setattr(entrypoint, "_ensure_drive_folder", lambda service: "folder-1")
+    monkeypatch.setattr(entrypoint, "_write_token", lambda creds: None)
+    return entrypoint, zip_path
+
+
+def test_a_transient_500_is_retried_and_the_upload_succeeds(tmp_path, monkeypatch):
+    files = _FakeFiles([_HttpError(500), _HttpError(503), {"id": "f1", "name": "x.zip", "size": "22"}])
+    entrypoint, zip_path = _drive_fixture(tmp_path, monkeypatch, files)
+    waits: list[float] = []
+    out = entrypoint.upload_backup_to_drive(zip_path, sleep=waits.append)
+    assert out["status"] == "uploaded" and out["retries"] == 2 and files.creates == 3
+    assert waits == list(entrypoint.DRIVE_RETRY_DELAYS_SECONDS)
+
+
+def test_a_non_transient_error_is_not_retried(tmp_path, monkeypatch):
+    """403（權限）與一般 4xx 要人處理——重試只會拖時間。"""
+    files = _FakeFiles([_HttpError(403)])
+    entrypoint, zip_path = _drive_fixture(tmp_path, monkeypatch, files)
+    waits: list[float] = []
+    out = entrypoint.upload_backup_to_drive(zip_path, sleep=waits.append)
+    assert out["status"] == "delivery_failed" and out["transient"] is False and files.creates == 1 and waits == []
+
+
+def test_retries_run_out_and_the_failure_still_shows(tmp_path, monkeypatch):
+    files = _FakeFiles([_HttpError(500)] * 3)
+    entrypoint, zip_path = _drive_fixture(tmp_path, monkeypatch, files)
+    out = entrypoint.upload_backup_to_drive(zip_path, sleep=lambda _s: None)
+    assert out["status"] == "delivery_failed" and out["transient"] is True and files.creates == 3
+
+
+def test_a_rotation_failure_after_a_good_upload_is_not_an_upload_failure(tmp_path, monkeypatch):
+    """備份已經在雲端了：輪替失敗另記 rotation_error，不把整份標成上傳失敗（那會讓「最後一次成功上傳」停在舊的那份）。"""
+    files = _FakeFiles([{"id": "f1", "name": "x.zip", "size": "22"}], list_outcomes=[_HttpError(403)])
+    entrypoint, zip_path = _drive_fixture(tmp_path, monkeypatch, files)
+    out = entrypoint.upload_backup_to_drive(zip_path, sleep=lambda _s: None)
+    assert out["status"] == "uploaded" and "rotation_error" in out and files.creates == 1
+
+
+def test_connection_drops_count_as_transient():
+    entrypoint = _load_entrypoint()
+    assert entrypoint._is_transient(ConnectionResetError("reset"))
+    assert entrypoint._is_transient(TimeoutError("slow"))
+    assert not entrypoint._is_transient(FileNotFoundError("zip gone"))
+    assert not entrypoint._is_transient(_HttpError(404))

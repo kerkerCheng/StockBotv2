@@ -104,7 +104,9 @@ Lesson 的事發經過與實作落點住 [`docs/lessons-incidents.md`](docs/less
 - **使用者主動指示＝已授權。** 鑄號只為稽核（受理時即 resolve），**不得回頭再請求一次 `go`**。`go` 請求流程只適用於系統主動提案。
 - **常規授權類別（2026-09-09）：** 系統主動提案中，若 `go` 只是**注意力 gate**（授權可逆、不寫任何 authority 的 bounded research
   或派回 pq1），使用者已預先授權，不再逐項請求；清單是封閉字彙，SSOT 與 consumer 見 ARCHITECTURE。**永不列入：** `ra_admission`、
-  `engine_c_observation`、thesis mutation／lifecycle、live、任何付費、decompose 選題。判準：**這個 `go` 攔的是注意力還是 authority？**
+  `engine_c_observation`、thesis mutation／lifecycle、live、任何付費、decompose 選題、向你要文件。判準：**這個 `go` 攔的是注意力還是 authority？**
+- **向你要文件另一區（2026-10-07 使用者：「可以繼續鑄號但隔離一區讓我知道 也不要讓我直接 go 提供文件才算 go」）：**
+  它要的是你手上的文件，不是決定——不列在「待你決定」、批次 `go` 不收；**提供文件才算 go**，拿不到就 drop。
 
 ## 開發項不走 pq2，唯一載體是 ROADMAP（2026-08-31）
 

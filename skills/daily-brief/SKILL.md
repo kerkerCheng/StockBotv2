@@ -189,12 +189,14 @@ checkpoint 狀態。Triage PASS 只授權研究、不授權入圖；prepared RA 
 & '.venv\Scripts\python.exe' -m engine_b.cli advance <lead_id> action_prepared --ref research_action_id=<ra_id>   # prepare 完
 ```
 
-`source_trace_review` 的 `go` 只授權 bounded 追源，先留下跨 session receipt。
+`source_trace_review`（＝向你要文件，2026-10-07 起）的 `go` **只在使用者提供了文件時成立**：`todo dispatch <n> --doc <檔案或網址>`
+（沒附文件一律拒收；使用者原話「不要讓我直接 go 提供文件才算 go」）。它不在「待你決定」裡，呈現時另列「等你提供的文件」一區，
+批次 `go` 不收這一區；拿不到就 `drop`。
 `engine_b.todo work` 只 checkpoint 已由使用者 exact `go` 且已有 `dispatch_ref` 的 work order；
 它不授權 `dispatch`／`resolve`，也不放寬 graph admission 或 live gate：
 
 ```powershell
-& '.venv\Scripts\python.exe' -m engine_b.todo dispatch <todo_n>
+& '.venv\Scripts\python.exe' -m engine_b.todo dispatch <todo_n> --doc library/private/inbox/<使用者給的檔>
 & '.venv\Scripts\python.exe' -m engine_b.todo work <todo_n> --to researching --receipt <研究起始ref>
 ```
 
@@ -684,7 +686,7 @@ pq1／apply；沒有完成 receipt 的 `go` 會失敗並留在池中。必須先
 
 | 動詞 | legacy lead | Source trace review | 已 prepared 的 RA | 到期 thesis（含反證等滿一輪沒發生） | 到期 watch（`watch_decision`，只有假設型等沒有自己複查週期的） |
 |------|-------------|---------------------|-------------------|-------------|-------------------------------|
-| `go` | raw lead 不再進 pq2 | `todo dispatch` 回 pq1；不接受 claim、不授權付費 | **apply 入圖**（見下） | 引導複查；authority mutation 仍另核准；go／drop 後它名下到期的反證自動續到下一個核查點、觸及的續盯 | **研究之後**才用：已發生 → `resolve <n> --verb go --receipt "outcome:touched;report:<內文提到該 watch 的報告>" --quote "<原文>"`，watch 回 fired 交給假設對照；沒發生不得 go；批次 bare go 一律拒收 |
+| `go` | raw lead 不再進 pq2 | **提供文件才算 go**：`todo dispatch <n> --doc …` 回 pq1 讀完交報告；不接受 claim、不授權付費 | **apply 入圖**（見下） | 引導複查；authority mutation 仍另核准；go／drop 後它名下到期的反證自動續到下一個核查點、觸及的續盯 | **研究之後**才用：已發生 → `resolve <n> --verb go --receipt "outcome:touched;report:<內文提到該 watch 的報告>" --quote "<原文>"`，watch 回 fired 交給假設對照；沒發生不得 go；批次 bare go 一律拒收 |
 | `drop` | raw lead 不再進 pq2 | 略過本次人工追源 | 略過該 RA | 標記已看、不複查（到期的反證同樣續到下一個核查點） | 放棄這個等待 |
 | `pending` | 維持不動、留到之後 brief | 同左 | 同左 | 同左 | **必須**帶日期＝續等：`resolve <n> --verb pending --until <日期>`（watch 回 active、編號結案）；批次語法帶不了日期，bare pending 拒收 |
 
@@ -692,8 +694,8 @@ pq1／apply；沒有完成 receipt 的 `go` 會失敗並留在池中。必須先
 `ra_admission go` 那一格原本還寫「入圖後自動建 Shadow」——Shadow 是 Engine D 的東西，也一併退役；
 入圖之後沒有任何自動建立的第二個物件。
 
-`source_trace_review go` 也使用 `todo dispatch <n>`：原 pq2 在 queued／researching 期間保持 active 但不重複
-詢問。只有 prepared action receipt，或誠實的 `trace:<trace_status>` parked receipt 才能結案；前者若需入圖，
+`source_trace_review go` 也使用 `todo dispatch <n> --doc …`（2026-10-07 起必附文件；常規授權已不再替使用者按這個 go）：
+原 pq2 在 queued／researching 期間保持 active 但不重複詢問。只有 prepared action receipt，或誠實的 `trace:<trace_status>` parked receipt 才能結案；前者若需入圖，
 仍另建立 `ra_admission` pq2。新報告訂閱／購買需 exact 價格的獨立人工核准。
 
 `ra_admission` 顯示時必須讓 hint 明列唯一 `Decision handoff`。`focus_company_id` 是 pq1 在 RA 凍結前，

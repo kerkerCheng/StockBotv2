@@ -39,7 +39,9 @@ ITEM_TYPES: dict[str, str] = {
     "lead_research": "（legacy）已移回自動 pq1，不再建立新項目",
     "ra_admission": "核准入圖（Research Action apply）",
     "decision_review": "（legacy）機制退役（Phase 0／G12），不再建立新項目",
-    "source_trace_review": "核准人工 authority 後做 bounded 追源；go 只 dispatch 回 pq1",
+    # 2026-10-07 使用者（「隔離一區讓我知道 也不要讓我直接 go 提供文件才算 go」）：10-06 起 trace_requires_user 一律是
+    # 「向你要文件」，所以這個類型＝向你要文件——不在「待你決定」裡、`todo dispatch` 必須附 `--doc` 才排回 pq1。
+    "source_trace_review": "向你要文件：提供文件才算 go（`todo dispatch <n> --doc <檔案或網址>` 排回 pq1 讀完交報告）；拿不到就 drop",
     "thesis_lifecycle": "本機複查 thesis 並手動更新 lifecycle.json",
     "sheet_only_holding": "（legacy）機制退役（Phase 0），不再建立新項目；Sheet 有而敘事沒有的持股改列候選板「已持有、缺敘事」（Phase 3）",
     "engine_c_observation": "核准把人工觀測寫入 Engine C append-only ledger",
@@ -63,7 +65,7 @@ GO_AUTHORIZATION: dict[str, tuple[str, str]] = {
     "lead_research": ("（legacy）不再建立新項目", "任何 authority mutation"),
     "ra_admission": ("exact graph admission（Research Action apply）", "thesis mutation 與 live"),
     "decision_review": ("（legacy）不再建立新項目", "任何 authority mutation"),
-    "source_trace_review": ("bounded 追源（dispatch 回 pq1）", "提高 evidence tier 與入圖"),
+    "source_trace_review": ("提供文件才算 go：你給文件、我讀完交報告", "付費、提高 evidence tier 與入圖"),
     "thesis_lifecycle": ("本機複查該 thesis；go／drop 後它名下列出的反證續盯到下一個核查點、判定觸及的標已處置並續盯（A7）",
                          "自動改 lifecycle 或入圖"),
     "sheet_only_holding": ("（legacy）不再建立新項目", "任何部位動作"),
@@ -146,8 +148,17 @@ def active_items(pool: Mapping[str, Any]) -> list[dict[str, Any]]:
     )
 
 
-def actionable_items(pool: Mapping[str, Any]) -> list[dict[str, Any]]:
-    """尚需使用者決定的項目；已 dispatch 的 pq1 job 仍 active 但不重複詢問。"""
+#: 「向你要文件」的 pq2 類型（2026-10-07 使用者：「隔離一區讓我知道 也不要讓我直接 go 提供文件才算 go」）。
+#: 唯一判斷住這裡（L16）：心跳、每日訊息、快照都用 `document_requests()`／`actionable_items()`，不各自比對 type。
+DOCUMENT_REQUEST_TYPES = frozenset({"source_trace_review"})
+
+
+def is_document_request(item: Mapping[str, Any]) -> bool:
+    return str(item.get("type")) in DOCUMENT_REQUEST_TYPES
+
+
+def _awaiting_user(pool: Mapping[str, Any]) -> list[dict[str, Any]]:
+    """球在使用者手上的全部項目；已 dispatch 的 pq1 job 仍 active 但不重複詢問，等世界（waiting_on）的也不算。"""
 
     return [
         item for item in active_items(pool)
@@ -156,6 +167,21 @@ def actionable_items(pool: Mapping[str, Any]) -> list[dict[str, Any]]:
             "queued", "researching", "awaiting_approval"
         }
     ]
+
+
+def actionable_items(pool: Mapping[str, Any]) -> list[dict[str, Any]]:
+    """尚需使用者**決定**的項目（「球在你」的唯一來源）。
+
+    2026-10-07 起不含「向你要文件」：那一區另列（`document_requests`），因為它要的是你手上的文件，
+    不是一個 go／drop 的決定——使用者原話「隔離一區讓我知道 也不要讓我直接 go 提供文件才算 go」。"""
+
+    return [item for item in _awaiting_user(pool) if not is_document_request(item)]
+
+
+def document_requests(pool: Mapping[str, Any]) -> list[dict[str, Any]]:
+    """向你要文件、而且還沒提供的那幾筆（隔離一區；提供文件才算 go，`todo dispatch <n> --doc …`）。"""
+
+    return [item for item in _awaiting_user(pool) if is_document_request(item)]
 
 
 def _key(item_type: str, ref_id: str) -> tuple[str, str]:
@@ -770,27 +796,34 @@ def dispatch_source_trace_review(
     *,
     leads_path: Path | str,
     at: str | None = None,
+    document: str | None = None,
 ) -> dict[str, Any]:
-    """將需要人工 authority 的 exact trace item 重新排入 pq1，不先 resolve。"""
+    """向你要文件：**提供文件才算 go**（2026-10-07 使用者）——把文件記在 lead 上、排回 pq1 讀完交報告，不先 resolve。
+
+    沒附文件一律拒收（不再有「go＝我自己再追一次」：10-06 起這個類型要的是使用者手上的文件，
+    自己再追只會重查同樣查不到的東西——10-07 常規授權自動 go 掉 [717][718] 就是這樣）。"""
 
     from engine_b import leads
 
     item = get(pool, n)
     if item["type"] != "source_trace_review":
         raise TodoError(f"[{n}] 不是 source_trace_review")
+    doc = validate_user_document(document, n=n)
     store = leads.load(leads_path)
     stamp = at or _now()
     lead = leads.requeue_trace(
         store,
         str(item["ref_id"]),
-        trigger="user_go",
-        reason="使用者核准 exact source_trace_review；排入 bounded pq1，尚未接受 claim 或核准入圖",
+        trigger="user_document",
+        reason=f"使用者提供文件（{doc}）：排回 pq1 讀完交報告；不接受 claim、不提高 tier、不入圖",
         requeued_at=stamp,
     )
+    leads.annotate_refs(store, str(item["ref_id"]), refs={"trace_user_document": doc})
     leads.save(store, leads_path)
     item["dispatch_status"] = "queued"
     item["dispatch_ref"] = f"lead:{lead['lead_id']}"
     item["dispatched_at"] = stamp
+    item["user_document"] = doc
     item.pop("deferred_at", None)
     item.pop("waiting_on", None)
     pool["log"].append({
@@ -799,10 +832,43 @@ def dispatch_source_trace_review(
         "type": item["type"],
         "ref_id": item["ref_id"],
         "verb": "pq1_queued",
-        "reason": "使用者 go 只授權 bounded source trace",
+        "reason": "使用者提供文件才算 go：排回 pq1 讀完交報告",
         "receipt": item["dispatch_ref"],
+        "document": doc,
     })
     return {"item": item, "lead": lead}
+
+
+_URL_RE = re.compile(r"^https?://", re.IGNORECASE)
+
+
+def validate_user_document(document: str | None, *, n: int | None = None, root: Path = _ROOT) -> str:
+    """「提供文件才算 go」的那份文件：網址，或真的存在的檔案。
+
+    放在 repo 裡的檔必須在 `library/private/` 底下（建議 `library/private/inbox/`）：券商報告、法說 memo 多半是付費或
+    私人文件，不得進 Git（AGENTS：push 前 `library/private` 必須沒被追蹤）。repo 外的檔照絕對路徑記。"""
+
+    label = f"[{n}] " if n is not None else ""
+    raw = str(document or "").strip()
+    if not raw:
+        raise TodoError(f"{label}向你要文件：提供文件才算 go——`python -m engine_b.todo dispatch <編號> --doc <檔案路徑或網址>`；"
+                        "拿不到就 drop（2026-10-07 使用者：「不要讓我直接 go 提供文件才算 go」）")
+    if _URL_RE.match(raw):
+        return raw
+    path = Path(raw)
+    if not path.is_absolute():
+        path = root / path
+    if not path.is_file():
+        raise TodoError(f"{label}找不到文件：{raw}——提供文件才算 go，檔案要真的在")
+    resolved = path.resolve()
+    try:
+        rel = resolved.relative_to(Path(root).resolve())
+    except ValueError:
+        return str(resolved)
+    posix = rel.as_posix()
+    if not posix.startswith("library/private/"):
+        raise TodoError(f"{label}{posix} 在 repo 的追蹤區——使用者提供的文件請放 library/private/inbox/（私人文件不得進 Git）")
+    return posix
 
 
 def checkpoint_source_trace_review(
@@ -1736,7 +1802,8 @@ def _collect_source_trace_rows() -> list[dict[str, Any]]:
             ),
             "hint": str(
                 row.get("review_hint")
-                or "go 只排入 bounded pq1；不接受 claim、不入圖。若需付費，另核准 exact 金額／方案。"
+                or "提供文件才算 go：把文件給我（放 library/private/inbox/ 或貼路徑），我讀完交報告；拿不到就 drop。"
+                "不接受 claim、不入圖。若需付費，另核准 exact 金額／方案。"
             ),
             "source": "source_trace",
         }
@@ -2271,6 +2338,8 @@ def main(argv: list[str] | None = None) -> int:
     )
     p_dispatch.add_argument("numbers", nargs="+")
     p_dispatch.add_argument("--leads", default="")
+    p_dispatch.add_argument("--doc", default="",
+                            help="向你要文件：使用者提供的文件（檔案路徑或網址）——提供文件才算 go；一次只能配一個編號")
 
     p_work = sub.add_parser("work", help="更新已 dispatch 的 source_trace_review pq1 job")
     p_work.add_argument("number", type=int)
@@ -2461,6 +2530,9 @@ def main(argv: list[str] | None = None) -> int:
 
         failures = 0
         if args.command == "dispatch":
+            if args.doc and len(args.numbers) != 1:
+                print("✗ --doc 一次只能配一個編號（一份文件對一個要求）", file=sys.stderr)
+                return 2
             for raw in args.numbers:
                 try:
                     item = get(pool, int(raw))
@@ -2469,6 +2541,7 @@ def main(argv: list[str] | None = None) -> int:
                             pool,
                             int(raw),
                             leads_path=args.leads or DEFAULT_LEADS_PATH,
+                            document=args.doc or None,
                         )
                     else:
                         raise TodoError(

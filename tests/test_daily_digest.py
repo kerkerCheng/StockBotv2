@@ -298,3 +298,55 @@ def test_our_own_research_topics_are_counted_but_never_summarised(tmp_path) -> N
     lines = leads_block(digest=None, todays=digest.select_leads(store, now=NOW), digest_problem="沒產生")
     assert "外面新進 3 則" in lines[0] and "另有我們自己登記的研究題 1 則，不摘要" in lines[0]
     assert all("lead_topic" not in line for line in lines)
+
+
+def test_processing_line_counts_what_we_did_in_the_window() -> None:
+    """2026-10-07 使用者：「Lead 抓了什麼 我們做了哪些處理的數字也要印」——分類（go／no-go、LLM／互動）、
+    研究到終局（轉移紀錄在窗內轉到入圖包／已入圖／停放）、還沒分類、待深挖；窗外的不算。"""
+    from crons.daily_brief import processing_line
+
+    recent = (NOW - timedelta(hours=3)).isoformat()
+    old = (NOW - timedelta(days=3)).isoformat()
+
+    def tri(decision, at, who, by=None):
+        return {"decision": decision, "decided_at": at, "decided_by": by, "classification": {"classified_by": who}}
+
+    store = {"leads": {
+        "a": {"status": "triaged_go", "triage": tri("go", recent, "triage_semantic_v1", by="claude-p:s1")},
+        "b": {"status": "triaged_no_go", "triage": tri("no_go", recent, "interactive:directed")},
+        "c": {"status": "triaged_no_go", "triage": tri("no_go", old, "triage_semantic_v1", by="claude-p:s0")},
+        "i": {"status": "triaged_no_go", "triage": tri("no_go", recent, "triage_semantic_v1", by="harvest:auto_no_go_forms")},
+        "d": {"status": "parked", "triage": tri("go", old, "llm:daily"),
+              "transitions": [{"at": recent, "from": "triaged_go", "to": "parked"}]},
+        "e": {"status": "action_prepared", "triage": tri("go", old, "llm:daily"),
+              "transitions": [{"at": old, "from": "triaged_go", "to": "researching"},
+                              {"at": recent, "from": "researching", "to": "action_prepared"}]},
+        "f": {"status": "parked", "transitions": [{"at": old, "from": "triaged_go", "to": "parked"}]},
+        "g": {"status": "pending"}, "h": {"status": "pending"},
+    }}
+    line = processing_line(store, now=NOW)
+    assert line == ("- 處理：分類 3（go 1／no-go 2；LLM 1／互動 1／機械或舊資料 1）｜研究到終局 2（入圖包 1／已入圖 0／停放 1）"
+                    "｜還沒分類 2｜待深挖 1")
+
+
+def test_the_brief_puts_document_requests_in_their_own_block(tmp_path, monkeypatch) -> None:
+    """③ 只列要你決定的；向你要文件在 ③b，寫明提供文件才算 go，不在批次 go 的例子裡。"""
+    from crons import daily_brief
+    from crons import heartbeat as hb
+    from engine_b import todo
+
+    pool = todo.empty_pool()
+    todo.sync(pool, [{"type": "ra_admission", "ref_id": "ra_x", "title": "InP 磊晶片層建層"},
+                     {"type": "source_trace_review", "ref_id": "lead_doc", "title": "向你要文件：全新光電券商報告"}])
+    monkeypatch.setattr(todo, "load", lambda *a, **k: pool)
+    monkeypatch.setattr(hb, "quota_entries", lambda rows, now: [])
+    leads_path = tmp_path / "pending_leads.json"
+    leads_path.write_text(json.dumps({"leads": {}, "harvest_log": []}), encoding="utf-8")
+    text = daily_brief.compose_brief(now=NOW, summary="Daily｜球在你 1｜等你給文件 1", snapshot={},
+                                     run_record_path=tmp_path / "missing.json", leads_path=leads_path,
+                                     heartbeat_dir=tmp_path)
+    decisions = text.split("**③ 待你決定**", 1)[1].split("**③b", 1)[0]
+    documents = text.split("**③b 等你提供的文件**", 1)[1].split("**④", 1)[0]
+    assert "InP 磊晶片層建層" in decisions and "全新光電" not in decisions
+    assert "全新光電券商報告" in documents and "提供文件才算 go" in documents and "drop" in documents
+    assert "- 處理：" in text.split("**② 市場大事**", 1)[0]

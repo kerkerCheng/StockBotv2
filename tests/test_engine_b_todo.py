@@ -396,17 +396,51 @@ def test_source_trace_review_go_dispatches_back_to_pq1(tmp_path) -> None:
 
     with pytest.raises(todo.TodoError, match="不得 bare go"):
         todo.resolve(pool, 1, "go", receipt="action:ra_fake")
+    # 2026-10-07 使用者：「提供文件才算 go」——向你要文件不在「待你決定」裡，沒附文件的 dispatch 一律拒收、狀態不動
+    assert todo.actionable_items(pool) == [] and [it["n"] for it in todo.document_requests(pool)] == [1]
+    with pytest.raises(todo.TodoError, match="提供文件才算 go"):
+        todo.dispatch_source_trace_review(pool, 1, leads_path=leads_path)
+    assert leads.load(leads_path)["leads"][lead_id]["status"] == "parked"
 
     result = todo.dispatch_source_trace_review(
         pool,
         1,
         leads_path=leads_path,
         at="2026-07-29T00:00:00+00:00",
+        document="https://example.com/broker-report.pdf",
     )
 
     assert result["item"]["dispatch_status"] == "queued"
-    assert todo.actionable_items(pool) == []
-    assert leads.load(leads_path)["leads"][lead_id]["status"] == "triaged_go"
+    assert result["item"]["user_document"] == "https://example.com/broker-report.pdf"
+    assert todo.actionable_items(pool) == [] and todo.document_requests(pool) == []
+    lead = leads.load(leads_path)["leads"][lead_id]
+    assert lead["status"] == "triaged_go"
+    assert lead["refs"]["trace_user_document"] == "https://example.com/broker-report.pdf"
+    assert lead["refs"]["trace_requeue_trigger"] == "user_document"
+
+
+def test_a_provided_document_must_exist_and_private_files_stay_out_of_git(tmp_path) -> None:
+    """文件要真的在；放在 repo 追蹤區的拒收（券商報告是私人文件，只收 library/private/ 底下或 repo 外的檔）。"""
+    root = tmp_path / "repo"
+    (root / "library" / "private" / "inbox").mkdir(parents=True)
+    (root / "library" / "raw").mkdir(parents=True)
+    private = root / "library" / "private" / "inbox" / "broker.pdf"
+    private.write_bytes(b"%PDF")
+    tracked = root / "library" / "raw" / "broker.pdf"
+    tracked.write_bytes(b"%PDF")
+    outside = tmp_path / "Downloads" / "memo.pdf"
+    outside.parent.mkdir()
+    outside.write_bytes(b"%PDF")
+
+    assert todo.validate_user_document("library/private/inbox/broker.pdf", root=root) == "library/private/inbox/broker.pdf"
+    assert todo.validate_user_document(str(outside), root=root) == str(outside.resolve())
+    assert todo.validate_user_document("https://example.com/x.pdf", root=root) == "https://example.com/x.pdf"
+    with pytest.raises(todo.TodoError, match="追蹤區"):
+        todo.validate_user_document("library/raw/broker.pdf", root=root)
+    with pytest.raises(todo.TodoError, match="找不到文件"):
+        todo.validate_user_document("library/private/inbox/nope.pdf", root=root)
+    with pytest.raises(todo.TodoError, match="提供文件才算 go"):
+        todo.validate_user_document("  ", root=root)
 
 
 def test_source_trace_review_resolves_only_after_terminal_trace_receipt(tmp_path) -> None:
@@ -426,7 +460,7 @@ def test_source_trace_review_resolves_only_after_terminal_trace_receipt(tmp_path
         "ref_id": lead_id,
         "title": "追原報告",
     })
-    todo.dispatch_source_trace_review(pool, 1, leads_path=leads_path)
+    todo.dispatch_source_trace_review(pool, 1, leads_path=leads_path, document="https://example.com/broker-report.pdf")
 
     resumed = leads.load(leads_path)
     leads.advance(resumed, lead_id, "parked", ref={
@@ -790,7 +824,7 @@ def _trace_lead_applied(tmp_path, doc_id: str, *, stop_at_prepared: bool = False
         "title": "追法說會逐字稿",
     })
     # dispatch 會把 parked lead requeue 回 pq1；之後才走到 applied，與真實流程一致。
-    todo.dispatch_source_trace_review(pool, 1, leads_path=leads_path)
+    todo.dispatch_source_trace_review(pool, 1, leads_path=leads_path, document="https://example.com/broker-report.pdf")
     resumed = leads.load(leads_path)
     if resumed["leads"][lead_id]["status"] != "researching":
         leads.advance(resumed, lead_id, "researching")
@@ -907,8 +941,9 @@ def test_collected_rows_carry_the_go_boundary_so_consumers_need_not_recall_it() 
 
     # ⚠ 2026-09-22 Step 0a.4：原本用 `decision_review`（現為 legacy 標記）。改用追源型，
     # 它的邊界句仍是活的；同時補一條斷言鎖住「legacy 的兩個 kind 不得長回授權語意」。
-    assert rows[0]["go_authorizes"].startswith("bounded 追源")
-    assert "入圖" in rows[0]["go_excludes"]
+    # 2026-10-07：向你要文件——提供文件才算 go；最相鄰的未授權動作寫出來（付費、提高證據等級、入圖）
+    assert rows[0]["go_authorizes"].startswith("提供文件才算 go")
+    assert "入圖" in rows[0]["go_excludes"] and "付費" in rows[0]["go_excludes"]
     for legacy in ("decision_review", "sheet_only_holding", "lead_research"):
         legacy_row = todo._attach_go_authorization([{"type": legacy}])[0]
         assert "legacy" in legacy_row["go_authorizes"], legacy
