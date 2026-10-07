@@ -1277,6 +1277,53 @@
         "中际旭创",
         "中際旭創"
       ]
+    },
+    {
+      "company_id": "co:parker_hannifin",
+      "research_ticker": "PH",
+      "market_currency": "USD",
+      "display_name": "Parker-Hannifin Corporation",
+      "_display_name_source": "SEC 10-K（FY2026，2026-08-21）封面「PARKER-HANNIFIN CORPORATION」；yfinance longName（2026-10-06）",
+      "_note": "快接頭由 Quick Coupling Division 做（OCP UQD v1 規格致謝）；收單詞別名「Parker」是因為 OCP 上架頁只寫「Parker’s」——單詞比對分大小寫、整詞；名冊目前沒有別家用 Parker，日後若有要回頭拆",
+      "name_aliases": [
+        "Parker Hannifin",
+        "Parker-Hannifin",
+        "Parker"
+      ]
+    },
+    {
+      "company_id": "co:staubli",
+      "research_ticker": null,
+      "display_name": "Stäubli",
+      "_display_name_source": "Stäubli 新聞稿（PR Newswire 2025-11-12）「Stäubli Expands U.S. Manufacturing and Reinforces Leadership in Liquid Cooling」",
+      "_note": "私人公司（瑞士，研究 ticker 明確 null，INV-1）",
+      "name_aliases": [
+        "Stäubli",
+        "Staubli"
+      ]
+    },
+    {
+      "company_id": "co:envicool",
+      "research_ticker": "002837.SZ",
+      "market_currency": "CNY",
+      "display_name": "Shenzhen Envicool Technology Co., Ltd.",
+      "_display_name_source": "yfinance longName（2026-10-06）；深交所 002837（深圳市英维克科技股份有限公司）",
+      "name_aliases": [
+        "Envicool",
+        "英维克",
+        "英維克"
+      ]
+    },
+    {
+      "company_id": "co:alfa_laval",
+      "research_ticker": "ALFA.ST",
+      "market_currency": "SEK",
+      "display_name": "Alfa Laval AB (publ)",
+      "_display_name_source": "yfinance longName（2026-10-06）；Nasdaq Stockholm 上市（Alfa Laval 新聞稿「The company is listed on Nasdaq Stockholm」）",
+      "name_aliases": [
+        "Alfa Laval",
+        "Alfa Laval AB"
+      ]
     }
   ]
 }
