@@ -1,0 +1,128 @@
+{
+  "claims": [
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "條件：JFE 的統合報告、說明會或決算資料寫明退出或縮減日本的方向性電磁鋼板（GO）生產（例如倉敷的 GO 產線轉做 NO），或不再對外銷售 GO。核查頻率：每年（統合報告、說明會資料）。觸發後 48 小時：e1 加註或提撤回、重讀電工鋼層（mat:grain_oriented_electrical_steel）。",
+      "id": "jfe_hd_electrical_steel_strategy_briefing_2024_10_24_cl1",
+      "source_ids": [
+        "jfe_hd_electrical_steel_strategy_briefing_2024_10_24_s2",
+        "jfe_hd_electrical_steel_strategy_briefing_2024_10_24_s3",
+        "jfe_hd_electrical_steel_strategy_briefing_2024_10_24_s4",
+        "jfe_hd_electrical_steel_strategy_briefing_2024_10_24_s5",
+        "jfe_hd_electrical_steel_strategy_briefing_2024_10_24_s6",
+        "jfe_hd_electrical_steel_strategy_briefing_2024_10_24_s7"
+      ],
+      "statement": "JFE Holdings' own electrical-steel strategy deck (2024-10-24) presents grain-oriented electrical steel (GO, 方向性電磁鋼板) as one of its two electrical-steel products: main use 'power and distribution transformers', main customers 'heavy-electrical equipment makers', manufactured at the Kurashiki district, plus the JSW joint venture in India — a JFE Steel (Japan) supply edge besides the India JV. Supplier self-report from a non-statutory IR deck; the GO column is read from a two-column page layout. No volume, no customer names, no share; the Japanese capacity expansion in the same deck (p.8) is for non-oriented steel for EV motors, not GO.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "mat:grain_oriented_electrical_steel",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "jfe_hd_electrical_steel_strategy_briefing_2024_10_24_s2",
+        "jfe_hd_electrical_steel_strategy_briefing_2024_10_24_s3",
+        "jfe_hd_electrical_steel_strategy_briefing_2024_10_24_s4",
+        "jfe_hd_electrical_steel_strategy_briefing_2024_10_24_s5",
+        "jfe_hd_electrical_steel_strategy_briefing_2024_10_24_s6"
+      ],
+      "src_id": "co:jfe_holdings"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "JFE Holdings",
+        "JFE Steel",
+        "JFE Steel Corporation"
+      ],
+      "attributes": {
+        "ticker": "5411.T"
+      },
+      "confidence": 0.9,
+      "id": "co:jfe_holdings",
+      "name": "JFE Holdings",
+      "source_ids": [
+        "jfe_hd_electrical_steel_strategy_briefing_2024_10_24_s1",
+        "jfe_hd_electrical_steel_strategy_briefing_2024_10_24_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "GOES",
+        "grain-oriented electrical steel",
+        "Grain-oriented Silicon Electrical Steel",
+        "HI-B",
+        "方向性電磁鋼板"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "mat:grain_oriented_electrical_steel",
+      "name": "Grain-Oriented Electrical Steel (GOES)",
+      "source_ids": [
+        "jfe_hd_electrical_steel_strategy_briefing_2024_10_24_s2",
+        "jfe_hd_electrical_steel_strategy_briefing_2024_10_24_s3"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "jfe_hd_electrical_steel_strategy_briefing_2024_10_24",
+    "evidence_tier": 1,
+    "origin_entity": "JFE Holdings, Inc.",
+    "permission_basis": "發行人官網公開的 IR 說明會資料（PDF）；只保留研究必要的有限逐字節錄（pypdf 抽字，換行攤平成空白）。",
+    "published_at": "2024-10-24",
+    "publisher": "JFE Holdings, Inc.（IR 説明会資料）",
+    "retrieved_at": "2026-10-07",
+    "source_type": "ir_deck",
+    "storage_permission": "repo_excerpt",
+    "title": "JFEホールディングス「電磁鋼板戦略について」説明会資料（2024-10-24）",
+    "url": "https://www.jfe-holdings.co.jp/common/pdf/investor/library/otherbriefings/241024.pdf"
+  },
+  "sources": [
+    {
+      "id": "jfe_hd_electrical_steel_strategy_briefing_2024_10_24_s1",
+      "locator": "p.1 封面",
+      "quote": "2024年10月24日 JFEホールディングス株式会社 電磁鋼板戦略について"
+    },
+    {
+      "id": "jfe_hd_electrical_steel_strategy_briefing_2024_10_24_s2",
+      "locator": "p.3 頁首與標題（左欄 NO、右欄 GO）",
+      "quote": "Copyright © 2024 JFE Holdings, Inc. All Rights Reserved. 無方向性電磁鋼板（NO）方向性電磁鋼板（GO） JFEグループの電磁鋼板市場における高いプレゼンス"
+    },
+    {
+      "id": "jfe_hd_electrical_steel_strategy_briefing_2024_10_24_s3",
+      "locator": "p.3 主な用途（GO 欄）",
+      "quote": "• 電力・配電用等の変圧器"
+    },
+    {
+      "id": "jfe_hd_electrical_steel_strategy_briefing_2024_10_24_s4",
+      "locator": "p.3 当社の強み",
+      "quote": "• GOやNOの生産における世界トップクラスの技術力"
+    },
+    {
+      "id": "jfe_hd_electrical_steel_strategy_briefing_2024_10_24_s5",
+      "locator": "p.3 主な販売先（GO 欄）",
+      "quote": "• 重電メーカー"
+    },
+    {
+      "id": "jfe_hd_electrical_steel_strategy_briefing_2024_10_24_s6",
+      "locator": "p.3 製造拠点（GO 欄）",
+      "quote": "• 倉敷地区 • JSW社とインドでの電磁鋼板合弁会社を設立(2024/2)"
+    },
+    {
+      "id": "jfe_hd_electrical_steel_strategy_briefing_2024_10_24_s7",
+      "locator": "p.8 高級無方向性電磁鋼板の製造能力増強",
+      "quote": "将来の需要増加に対応すべく、倉敷におけるxEV主機モーター用の高級無方向性電磁鋼板の製造能力を従来比3倍に増強予定。"
+    }
+  ]
+}
