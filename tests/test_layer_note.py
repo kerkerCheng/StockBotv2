@@ -59,6 +59,13 @@ def test_a_valid_note_round_trips_with_a_content_addressed_id() -> None:
     assert not {"candidate_state", "rank", "score", "size", "weight"} & set(record)
 
 
+def test_sections_come_back_in_their_fixed_order_after_a_sorted_round_trip() -> None:
+    """ledger 以 sort_keys 落地（physics、selection、variants）；讀回來要照 ①②③，不照存檔順序。"""
+    stored = json.loads(json.dumps(_rec(), sort_keys=True))
+    assert list(stored["sections"]) == sorted(SECTION_KEYS)
+    assert list(parse_layer_note_record(stored).sections) == list(SECTION_KEYS)
+
+
 def test_the_id_detects_tampering() -> None:
     record = _rec()
     record["title"] = "改過的標題"

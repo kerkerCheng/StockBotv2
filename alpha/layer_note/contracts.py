@@ -312,9 +312,11 @@ def parse_layer_note_record(raw: Mapping[str, Any]) -> LayerNote:
     sections_raw = raw.get("sections") or {}
     if not isinstance(sections_raw, Mapping):
         raise ContractViolation("sections 必須是 object")
+    # 依段鍵的固定順序（①②③）——ledger 以 sort_keys 落地，照存檔順序會印成 ①③②
+    order = {key: index for index, key in enumerate(SECTION_KEYS)}
     sections = {str(k): Section(key=str(k), text=str((v or {}).get("text") or ""),
                                 citations=_citations((v or {}).get("citations"), str(k)))
-                for k, v in sections_raw.items()}
+                for k, v in sorted(sections_raw.items(), key=lambda kv: (order.get(str(kv[0]), len(order)), str(kv[0])))}
     expires = raw.get("expires")
     note = LayerNote(
         note_id=str(raw.get("note_id") or ""), node=str(raw.get("node") or ""), unit=str(raw.get("unit") or ""),

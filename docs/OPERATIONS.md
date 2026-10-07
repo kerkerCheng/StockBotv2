@@ -1625,6 +1625,24 @@ Get-Content library\private\heartbeat\daily_run_<YYYY-MM-DD>.json          # 03_
 | **4 permission contract test** | `test_tw_share_capital_stays_an_interactive_entry`（rules 與 harvest 都不得出現）、`test_heartbeat_monthly_revenue_line_reads_no_network`（擴充：`sync_latest`／`fetch_balance_sheet` 不得出現在心跳）。 |
 | **5 端到端 smoke** | 2026-10-05 實跑：`--backfill 14` 寫入 12 檔 × 14 季＝168 筆、失敗 0；交叉核對攔下 4 筆（3081.TWO 2026Q2 股本含待分配股票股利、3017.TW 三季）；月營收 `--backfill 48` 補到 2022-10；12 檔台股已定價① 12/12 由缺席變有值（第 88–100 百分位，窗 1,087–1,092 天、覆蓋率 1.0）。R2 另抽線上 115Q2：上市收 1,053 列、拒 31 列（銀行、金控、保險、證券），上櫃收 884、拒 7（證券期貨）。 |
 
+### 層說明 ledger（個股頁 plan S4a，2026-10-07 完成 sandbox impact review）
+
+層說明（一個薄層或技術轉換一份、同層每頁共用；A3 研究判斷，不 gate 任何東西）由 `library/private/research_notes/layer_notes/`
+的 markdown 搬進 append-only ledger `library/private/alpha/layer_notes/<node>.jsonl`（命令見「讀圖」那一節；全文仍以 `body_ref` 指回 markdown）。
+**寫入只在互動 session**，寫 registry 前先取 writer lock。`--add` 依序：出處核對（`raw:` 指得回 `library/raw` 的檔名、`lead:` 在 lead registry）
+→ 在 registry 副本上預演每條主張的登記 → append → 登記 `layer_note:<id>#<n>` 語意 watch。預演失敗整筆拒收、ledger 不動；
+append 之後才失敗會說出 `--register-watches` 補登命令。主張與整份都有到期（類別 `reread`：到期是換版，不是丟；INV-2）。
+
+**sandbox impact review 五步：**
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | 新目錄 `library/private/alpha/layer_notes/`（ignored private、append-only）；寫入端只有互動的 `python -m alpha layer-note`。無人值守路徑上只多**讀**：心跳段 2「層說明 N 份｜該重讀 M」與快照鍵 `layer_note.current`／`layer_note.reread`；反證計數把層說明主張算進預期（`disproof_counts(layer_notes=…)`）；daily 第 14 步 `python -m audit invariants` 的 Expiry 與語意來源孤兒兩項多讀這個目錄。不連網、不呼叫 LLM、不寫任何 authority；daily 的語意預篩只看 watch 的 kind 與狀態，層主張 watch 與其他語意 watch 走同一條路。 |
+| **2 skill／prompt／本檔** | 不動 daily prompt 與任何 skill；本節＋「讀圖」那一節的三條命令；ARCHITECTURE §6.15。 |
+| **3 最窄 rule** | **沒有新增任何 rule**（rules 仍 0 條、daily 封閉步驟清單不變）。要讓排程寫層說明必須重做一次本 review。 |
+| **4 permission contract test** | `test_layer_note_ledger_is_written_only_interactively`：rules 與 `crons/daily_task.py` 不得出現 `layer-note`；心跳、`audit/checks.py`、`audit/sources.py` 不得出現 `write_note`／`append_note_record`／`register_note_watches`，並斷言心跳確實有讀的那一端（不是沒接線才乾淨）。變異：daily 步驟清單出現 `layer-note`、心跳 import 寫入端——都紅。 |
+| **5 端到端 smoke** | 2026-10-07 實跑（writer lock 下）：五份遷入——`ln_2a0c6b4830dbf1b1`（InP 磊晶）、`ln_1c39f088ea8cec08`（板式熱交換器）、`ln_9adebe4be9952856`（快接頭）、`ln_f7996a796a5e53c8`（外部光源）、`ln_863549fd0f4a7468`（FAU）；6 條層主張登記 `ew_0310`–`ew_0315`。心跳印「層說明 5 份｜該重讀 0」、兩個新快照鍵列在「首日」；同一刻反證計數不帶／帶層說明 101 → 107、未盯 0；`audit invariants` 14 項 PASS（Expiry：232 個等待全部有到期與去處）；主樹全套 3681 passed。 |
+
 ---
 
 ## 遠端操作

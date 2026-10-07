@@ -648,7 +648,8 @@ def cmd_layer_note(args: argparse.Namespace) -> int:
     - `--list`（預設）：列出這個節點的全部紀錄（含已撤回、已被取代者；標出現行那一份）。
     - `--add spec.json`：append 一筆。spec：`unit`（layer／transition）、`title`、`expires`（重讀日）、`reread_reason`、
       `sections`（physics／variants／selection，各 `text`＋`citations`）、`claims[]`（L7 三件套＋`entities`＋`evidence`＋`citations`）、
-      選填 `supersedes_id`（換版）、`body_ref`（全文 markdown）。出處只認 `raw:<SourceDoc id>`／`lead:<id>`，寫入端核對指得回去；
+      選填 `supersedes_id`（換版）、`body_ref`（全文 markdown）。出處只認 `raw:<library/raw 的檔名>`／`lead:<id>`，寫入端核對指得回去
+      （圖上 SourceDoc id 不一定等於檔名——failure log #37）；
       成功後每條主張登記一筆語意 watch（`layer_note:<note_id>#<n>`），換版時舊版的條件收掉。
     - `--retract <note_id>`：append 一筆撤回紀錄（它的 watch 一併收掉）。
     - `--register-watches`：以現行那一份冪等重跑 watch 登記（append 之後登記失敗時用）。

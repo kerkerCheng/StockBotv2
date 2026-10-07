@@ -118,6 +118,7 @@
     **舊讀圖寫「沒有客戶端點名誰是主力」是表示法造成的錯**：NVIDIA 夥伴角色部落格（2025-03-27，已入圖）點名「Browave, Corning, Senko, TFC Communication, and Coherent」做 CPO 光纖組件，但那份抽取建的是同義節點 `tech:cpo_fiber_attach`，FAU 讀圖看不到（failure log #36；合併＋補邊登 pq1 `lead_0c2c98b5b76b7696376923480ca613bf`）。
     NVIDIA 2025-08-26 另一篇：「detachable optical connector that enhances assembly yield and supports fully automated, mass-manufacturing workflows」。上詮不在點名的五家；2025 年營收跳接線 63%、「C 公司」70.16%。
     讀圖換版 `sr_4c83c85cdb490db9` → **`sr_b93ee89a97c130e6`（仍 undecided；F2 交期／配額、F4 Coherent 整合廠量產兩條條件登 watch）**；上詮敘事換版 `ib_9becf6585056d78d`（仍「缺」，X 換成「FAU 用在哪個 CPO 平台、客戶是誰」；反證改寫加入 C 公司占比、加碼條件「任一 CPO 平台具名上詮」）。因層說明改變的候選狀態 0 筆
+  - 2026-10-07｜外部光源、FAU 兩份層說明遷入 ledger（個股頁 S4a）：`ln_f7996a796a5e53c8`、`ln_863549fd0f4a7468`——兩份的層主張原本就掛在讀圖與敘事的 watch 上，不重登。
 - failure log：（尚無）
   - #27（SOI.PA FY2026 分部占比兩筆都生效，「出現在數字裡」被默默丟——當下修為印衝突；序列仍成不了，合併紀錄留 7.5）
 
@@ -139,7 +140,9 @@
   - 讀後報告摘要：答到——變體分三類（一次長完／光柵＋覆蓋成長／BH 再成長）、MBE 與 MOCVD 在雷射與光偵測器兩側優勢相反、MOCVD 機台 2026 排隊（AIXTRON 雷射系統出貨由 Q2 延到 Q3）而 2027 落地、IDM 在加自己的磊晶（Lumentum G10-AsP）；
     沒答到——聯亞客戶是誰（代號）、高功率 CW 客戶選 BH 還是脊形、開放市場的新份額；相反——兩份敘事被自家年報推翻（failure log #32）；**因層說明改變候選狀態：1 筆（4971.TWO）**。
   - H5 初判（7.4 寫結論，判準不改）：(i) **表示法為主、證據為輔**（圖上沒有磊晶層；客戶具名缺）；(ii) **暫判「沒有」**（開放市場做得出量的只有聯亞，已是已定價等回落；IQE 缺量、全新缺變體、英特磊缺印證且兩盞紅燈；設備層 AIXTRON 不在名冊、沒讀）。
-- failure log：#31（層說明沒有 watch 來源鍵）、#32（反證在登記前就已成立、永遠不會醒）、#33（`fetchers.mops --include-english` 蓋掉中文版；當下修）；#17 第 4 次（[715] 圖影響行）
+  - 2026-10-07｜**InP 層說明遷入 ledger `ln_2a0c6b4830dbf1b1`**（個股頁 S4a）；A6–A8 登記 `ew_0310`–`ew_0312`（`layer_note:` 來源鍵、到期 2026-12-31）——#31 解。
+    全新、英特磊英文年報兩條出處在 library/raw 對不到（英文版節錄只在 [715] 的包裡），照實不列、reread_reason 寫「[715] 核准後換版補」（failure log #37）。
+- failure log：#31（層說明沒有 watch 來源鍵；2026-10-07 S4a 解）、#32（反證在登記前就已成立、永遠不會醒）、#33（`fetchers.mops --include-english` 蓋掉中文版；當下修）；#17 第 4 次（[715] 圖影響行）；#37（層說明的出處 id 對不上 raw 檔名）
 
 ## S1 X 帳號 40 則首次點名的 claim 裁決
 
@@ -341,6 +344,8 @@
     **改正：高力敘事 10-05 版寫的「熱能產品 62.3% → 73.7%」是同一年的個體與合併兩欄**（failure log #35）；真正跨年的是主要客戶表：「SMC」1.50 億（3.75%）→ 26.50 億（40.26%）、Bloom Energy 31.27%。美超微 2026-03-20 8-K：三名相關個人因出口管制被起訴、公司不是被告（媒體寫成公司被起訴）。
     高力敘事換版 `ib_e94c9d2cc0c11d46`（仍「缺」，X 換成「板式熱交換器有沒有進資料中心 CDU」＋「美超微以外客戶量產」；反證 `ew_0298`、加碼條件 `ew_0299`、`ew_0300`；舊 `ew_0278` 收掉）——**因層說明改變的候選狀態 0 筆**（改寫不是改判）。
     建層入圖包 pq2 **[721]**（`ra_d1e2d64cda6c73c3d2ed568ddeab803c`：新節點＋Alfa Laval（客戶端點名，designed_in）、Danfoss 供貨邊＋「是 CDU 元件」＋`co:google depends_on` CDU；名冊 co:alfa_laval 隨包 staged）；向你要文件 pq2 **[722]**（高力的客戶與產品拆分）。H1–H3 三條層主張等 [721] 入圖後的層讀圖（failure log #31 第 2 次）
+  - 2026-10-07｜快接頭、板式熱交換器兩份層說明遷入 ledger（個股頁 S4a）：`ln_9adebe4be9952856`、`ln_1c39f088ea8cec08`；
+    板式熱交換器 H1–H3 不等層讀圖、直接以 `layer_note:` 來源鍵登記 `ew_0313`–`ew_0315`（到期 2026-12-31；`co:alfa_laval` 是 staged 名冊、不掛實體，[721] 核准後換版補）——#31 第 2 次那一筆一併解。
 - 裁決：（尚無）
 - 2×2：尚未到裁決點
 - failure log：（尚無）

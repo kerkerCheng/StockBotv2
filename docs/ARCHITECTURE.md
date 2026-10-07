@@ -871,10 +871,12 @@ thesis 要不要改由人決定（thesis mutation 是四個人工 gate 之一）
 python -m alpha layer-note <node> --add spec.json  → library/private/alpha/layer_notes/<node>.jsonl（append-only，ln_*）
         │  型別層：段鍵封閉（physics／variants／selection）、證據等級封閉（一手／學理／產業報告／推一步／共識／媒體／沒有）、
         │          主張帶 L7 三件套與 co:* 實體、整份有重讀日（INV-2）
-        │  寫入端：出處只認 raw:<SourceDoc id>（library/raw 找得到同名檔）或 lead:<id>（registry 找得到）——指不回去就整筆拒收（L18）
+        │  寫入端：出處只認 raw:<library/raw 的檔名>（圖上 SourceDoc id 不一定等於檔名，failure log #37）或 lead:<id>
+        │          （registry 找得到）——指不回去就整筆拒收（L18）；append 前先在 registry 副本上預演登記，失敗整筆拒收、ledger 不動
         ▼
-每條主張 → 語意 watch `layer_note:<note_id>#<n>`（帶 node；到期走「重讀」：不鑄號、列進節點重讀理由）
-        │  換版或撤回：同節點舊那一份還在盯的條件收掉（與讀圖同一條規則）
+每條主張 → 語意 watch `layer_note:<note_id>#<n>`（帶 node；到期走「重讀」：不鑄號、列進逐節點的「層說明該重讀」——
+        │  `layer_note_reread_rows`，不依賴讀圖；心跳段 2 與 audit Expiry 讀同一份）
+        │  換版或撤回：同節點舊那一份還在盯的條件收掉、觸及未處置的標 handled（verb reread）、到期待決的以 source_superseded 收（與讀圖同一條規則）
         ▼
 心跳段 2 的反證計數把現行層說明的主張算進「預期」（`disproof_counts(layer_notes=…)`）；敘事的反證可以 link 到它（不重登）
 ```
