@@ -291,6 +291,11 @@
     「U.S. manufacturers also import bushings and OLTCs from Germany and Switzerland」「345-kV bushings take more than 130 weeks」「Hitachi Energy manufactures bushings domestically, but production is generally limited to the ≤235 kV class」。
     入圖包 pq2 **[740]**（`ra_834d8a606e347ffeb3d1ba3f1f866d14`；5 條邊；名冊隨包 staged `co:reinhausen`，私人、ticker null）；套管 lead `lead_857be4a6`（park 等的「2026 年一手」到了）與分接開關 lead 都接上。
     **讀法改變**：美國這段缺貨的受益者是 Reinhausen（私人）與 Hitachi Energy（日立子公司）；報告沒提到中國貨源——華明（[739]）不在美國這條線上，它的量是中國電網＋美國以外出口（穩定成長、不是爆量）。層說明草稿同步改寫（加 T5）
+  - 2026-10-08｜使用者 go [739][740] → 入圖（intake 9e617677、b32229a7）、名冊（華明、Reinhausen）登記、發布者名冊補登國家實驗室（包裡已寫明第三方）→
+    分接開關層說明 ledger `ln_0a3b60a33ecff0cf`（T1–T5 登 watch）；**第一份讀圖 `sr_8d94aadb859c3e65`（volume）**——需求側第三方 2026 一手、客戶在接受換品牌（不是護城河），
+    可投資的純供應商只有華明且不在美國這條線上；**套管層第一份讀圖 `sr_92e8df93643eedad`（volume）**——沒有可投資的純供應商；LPT 層重讀 `sr_d78aa6617c9eb00f`（判讀不變，下一層補 2026 證據）；
+    **華明第一份 v2 敘事 `ib_5c26d7071cc7ae09`（缺）**：X＝全球缺口流向它的一手、已定價主參照；反證連讀圖 #1、層說明 T1、T4；等待 `ew_0435` 在 10-31（第三季報）叫醒。
+    走圖「沒人供應」12 → 10（分接開關、套管都有了供應商）
 - 結論（H5 的 (i)(ii)，7.4 寫）：（尚無）
 - failure log：（尚無）
   - #9（同 P1）
@@ -414,6 +419,9 @@
   - 2026-10-08｜`python -m alpha edge 3110.T`（A6）＝邊緣（42.3 億美元、9 家；yfinance 補值，逐欄標來源）——#43 的目測換成系統判定
   - 2026-10-08｜本鏈主題等權組 pq2 **[736]**（「AI 封裝載板與上游材料」6 檔：ATS.VI、Ibiden、欣興、景碩、南電、日東紡；Ibiden、欣興、南電三筆名冊隨號 staged）——**鑄在日東紡第一份敘事之前**（failure log #26 的教訓）；日東紡敘事排在 [736] 落地之後
   - 2026-10-08｜旁證：T4 反向路徑（玻璃核心載板）上的 LPKF（LPK.DE，TGV／LIDE 雷射；X 帳號 3 則 lead 07-27 起）在名冊批次 [737] 裡——登記後玻璃核心的新聞才對得上公司
+  - 2026-10-08｜使用者 go [736] → 主題等權組 `tc_5061f2233f77a865` 落地（Ibiden、欣興、南電隨號登記）→ **日東紡第一份 v2 敘事 `ib_c8f278b954e90d5d`（缺）**：
+    押玻纖布層 `sr_49dcdbd60da7b239`（量）；X＝①T-glass 份額與第二來源在高階載板的認證（[734] 向你要文件）②已定價主參照（日本申報人沒有自家歷史）；
+    反證連讀圖兩條與層說明 T4（玻璃核心）；等待 `ew_0436` 在 11-10（第 2 季決算說明會後）叫醒。順序符合 #26 的教訓：對照組先、敘事後
 - 裁決：（尚未到裁決點；日東紡 2026 年度第 2 季決算說明會 2026-11 上旬）
 - failure log：
   - #43（名冊外的公司判不了邊緣——本 case 的日東紡、台玻、建榮也是目測）、#44（09-29 研究結論寫了「可能的薄層在上游」卻沒變成 lead）

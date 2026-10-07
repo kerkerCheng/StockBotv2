@@ -19,6 +19,7 @@
     {"origin": "Federal Communications Commission", "kind": "government_statistics", "corroborates": true, "seen_in": "fcc_da_26_786_advanced_robotic_devices_2026_07_28", "note": "政府監管紀錄（不是統計，但同樣是第三方自產資料）"},
     {"origin": "U.S. Geological Survey", "kind": "government_statistics", "corroborates": true, "seen_in": "usgs_mcs2026_rare_earths", "note": "美國政府礦產統計"},
     {"origin": "U.S. Department of Energy", "kind": "government_statistics", "corroborates": true, "seen_in": "doe_grid_supply_chain_lpt_hvdc_2022_02_24", "note": "美國能源部供應鏈深度評估（政府報告；對被點名的供應商而言是第三方自產資料）；2026-10-04 隨電力鏈入圖包加入"},
+    {"origin": "National Laboratory of the Rockies", "kind": "government_statistics", "corroborates": true, "seen_in": "nlr_tp_5700_96742_2026_05_06", "note": "美國能源部國家實驗室（原 NREL）技術報告——訪談美國變壓器廠與供應商；對被點名的供應商而言是第三方自產資料（同能源部那一筆的理由）。2026-10-08 隨 pq2 [740] 補登：入圖包已寫明它是第三方，當時漏了 staged 這一筆"},
     {"origin": "Harper Adams University 研究團隊", "kind": "academic", "corroborates": true, "seen_in": "arxiv_g1_power_model_2026", "note": "獨立學術論文（非 Unitree、非減速器供應商）"},
     {"origin": "Open CPX MSA", "kind": "standards_body", "corroborates": true, "seen_in": "opencpx_msa_spec_v1_0_2026_09_16", "note": "多源協議（MSA）規格"},
     {"origin": "Borecraft", "kind": "media", "corroborates": false, "seen_in": "borecraft_coupe_forum_2026_05_14", "note": "論壇／個人評論（NewMaxx）"},
