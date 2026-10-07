@@ -1,0 +1,18 @@
+SOURCE: National Laboratory of the Rockies（美國能源部國家實驗室，原 NREL）Technical Report NLR/TP-5700-96742——Large Power Transformer Supply Chain Gap Analysis and Domestic Content Strategies for Hydropower Rehabilitation: Supplemental Report（Ramasamy, Cooperman, Jayswal, Seward）——分接開關、套管有限節錄
+URL: https://www.osti.gov/servlets/purl/3363379（OSTI 全文；書目頁 https://www.osti.gov/biblio/3363379）
+PUBLISHED: 2026-05-06（OSTI 書目頁 Publication Date；報告封面「May 2026」）
+RETRIEVED: 2026-10-08
+STORAGE: repo_excerpt（美國政府公開報告；pypdf 抽字、去頁首頁碼、空白正規化後逐字截取）
+NOTE: **第三方一手（國家實驗室，訪談美國變壓器廠與供應商）**。p.6 的「often 18 weeks or more」是文獻回顧段，p.10–11、p.16 的「80 to 90 weeks」是訪談結果——同一份報告兩個數字，照實並列。
+
+【p.6（PDF 第 18 頁）原料與零件的瓶頸——OLTC】
+OLTC: Reinhausen is the only U.S. OLTC producer. ABB/Hitachi and Reinhausen also operate factories in Europe that supply compatible units. Lead times are significant—often 18 weeks or more—creating potential schedule risks for transformer assembly.
+
+【p.6（PDF 第 18 頁）原料與零件的瓶頸——Bushings】
+Bushings: High-voltage bushings are another supply chain concern. Hitachi Energy manufactures bushings domestically, but production is generally limited to the ≤235 kV class. For higher ratings, utilities must rely on imports, which face longer lead times compared to OLTCs.
+
+【p.10–11（PDF 第 22–23 頁）訪談結果】
+People who were interviewed said that bushings and OLTCs are now the biggest risks in the market. COVID made existing problems worse. Before the pandemic, it took from 40 weeks to a year to get 230-kV bushing. Now, 345-kV bushings take more than 130 weeks, and there are no domestic suppliers for 765-kV bushings. There are only two U.S. manufacturers that support the 345-kV market and none that cover the 765-kV market. Global companies are still limited in capacity, and customer wait times increase if specific types of insulators are ordered (e.g., resin- impregnated synthetic, resin-impregnated paper, and oil-impregnated synthetic) that require additional lead time. As a result, the only option is to rely on available inventory. U.S. manufacturers also import bushings and OLTCs from Germany and Switzerland. The current lead time to manufacture bushings and OLTCs is about 80 to 90 weeks, even though companies are working to increase their capabilities.
+
+【p.16（PDF 第 28 頁）Lead times——國內變壓器廠點名的零件】
+Domestic transformer manufacturers highlighted some critical transformer components that have very long lead times and limited domestic supply. Bushings for LPTs are currently the item with the longest lead time, up to 130 weeks. OLTCs take 80–90 weeks to procure and have just 1 or 2 U.S. manufacturers; otherwise, they are typically sourced from Europe. One domestic transformer manufacturer said they order extra inventory ahead of time or ask customers to be open to different makes or specifications for a particular product to address the long lead times for OLTCs and bushings.

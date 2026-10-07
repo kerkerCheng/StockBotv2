@@ -286,6 +286,11 @@
     華明裝備（002270.SZ；系統口徑邊緣 22.8 億美元、10 家；名冊條目隨包 staged）`supplies_to tech:transformer_tap_changer`（自報：「国内第一、全球第二」「国内尚无成规模竞争对手」；
     分接開關 2025 年營收 21.02 億元、毛利率 59.61%、出口 +47%；2026 上半年 +14.6%、出口 +44.6%、新增訂單增速與去年同期相當；500kV 以上仍以進口為主；在辦 H 股）。
     層說明草稿 v0（`library/private/research_notes/layer_notes/tech_transformer_tap_changer.md`，主張 T1–T4 等入圖後登 watch）。缺：2026 年的客戶端一手（DART 檢索頁擋自動查詢）、德國那家是誰（推一步 MR，非上市）
+  - 2026-10-08（同晚，續）｜**2026 年第三方一手補上**：National Laboratory of the Rockies NLR/TP-5700-96742（2026-05-06，訪談美國變壓器廠與供應商；媒體轉述「套管 130 週」追回原文）——
+    「OLTCs take 80–90 weeks to procure and have just 1 or 2 U.S. manufacturers; otherwise, they are typically sourced from Europe」「Reinhausen is the only U.S. OLTC producer」
+    「U.S. manufacturers also import bushings and OLTCs from Germany and Switzerland」「345-kV bushings take more than 130 weeks」「Hitachi Energy manufactures bushings domestically, but production is generally limited to the ≤235 kV class」。
+    入圖包 pq2 **[740]**（`ra_834d8a606e347ffeb3d1ba3f1f866d14`；5 條邊；名冊隨包 staged `co:reinhausen`，私人、ticker null）；套管 lead `lead_857be4a6`（park 等的「2026 年一手」到了）與分接開關 lead 都接上。
+    **讀法改變**：美國這段缺貨的受益者是 Reinhausen（私人）與 Hitachi Energy（日立子公司）；報告沒提到中國貨源——華明（[739]）不在美國這條線上，它的量是中國電網＋美國以外出口（穩定成長、不是爆量）。層說明草稿同步改寫（加 T5）
 - 結論（H5 的 (i)(ii)，7.4 寫）：（尚無）
 - failure log：（尚無）
   - #9（同 P1）
