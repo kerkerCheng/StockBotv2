@@ -644,6 +644,51 @@ def test_primary_source_signal_only_wakes_on_tier1_documents() -> None:
     )
 
 
+def test_re_park_with_a_narrower_trigger_retargets_the_reused_watch() -> None:
+    """2026-10-07 AAOI：研究完重新停放、改成只等 AAOI 自己的申報；沿用的 watch 若不跟著改，
+    仍是「AAOI／LITE 有任何新動靜」，下一則提到 LITE 的 CPO 新聞又會把它叫醒（L17 對稱面）。
+    沒有明確改觸發條件的重新停放照舊沿用（setdefault 補的不算改）。"""
+    from engine_b import event_watch as ew
+
+    store = leads.empty_store()
+    parked_id, _ = leads.register(store, source="x:old", url="https://x.com/old/status/atm",
+                                  title="$AAOI ATM done at 105.36 avg, $LITE too")
+    leads.triage(store, parked_id, go=True, tier=4, reason="要一手", decided_at="2026-08-01T00:00:00+00:00")
+    base = {"parked_reason": "只有推文", "trace_status": "lead_only_tier_4",
+            "trace_next_trigger": "AAOI 10-Q 的 ATM 段", "trace_requires_user": "false"}
+    leads.advance(store, parked_id, "parked", ref=dict(base))
+
+    def _fire(source: str, url: str, title: str, tier: int, at: str) -> None:
+        lead_id, _ = leads.register(store, source=source, url=url, title=title)
+        leads.triage(store, lead_id, go=True, tier=tier, reason="r", decided_at=at)
+
+    def _watch() -> dict:
+        return next(w for w in ew.load_watches()["watches"] if w.get("wake_lead") == parked_id)
+
+    assert _watch()["kind"] == "related_entity_signal" and "LITE" in _watch()["entities"]
+    _fire("x:someone", "https://x.com/a/1", "$LITE CPO 新聞", 4, "2026-08-02T00:00:00+00:00")
+    assert store["leads"][parked_id]["status"] == "triaged_go"     # 寬條件：提到 LITE 就醒
+
+    # 沒有明確改觸發條件 → 沿用，不改
+    leads.advance(store, parked_id, "parked", ref=dict(base))
+    assert _watch()["kind"] == "related_entity_signal" and not _watch().get("retargets")
+
+    _fire("x:someone", "https://x.com/a/2", "$AAOI 新聞", 4, "2026-08-03T00:00:00+00:00")
+    assert store["leads"][parked_id]["status"] == "triaged_go"
+    leads.advance(store, parked_id, "parked", ref=base | {
+        "trace_trigger_kind": "entity_filing_signal", "trace_trigger_entities": ["AAOI"]})
+    watch = _watch()
+    assert (watch["kind"], watch["entities"]) == ("entity_filing_signal", ["AAOI"])
+    assert watch["retargets"][-1]["from_kind"] == "related_entity_signal"
+    assert "LITE" in watch["retargets"][-1]["from_entities"]
+
+    _fire("x:someone", "https://x.com/a/3", "$LITE 又一則", 4, "2026-08-04T00:00:00+00:00")
+    _fire("x:someone", "https://x.com/a/4", "$AAOI 又一則推文", 4, "2026-08-05T00:00:00+00:00")
+    assert store["leads"][parked_id]["status"] == "parked", "改窄之後，推文不得再叫醒它"
+    _fire("edgar:AAOI", "https://sec.gov/aaoi/10q", "AAOI 10-Q", 1, "2026-08-06T00:00:00+00:00")
+    assert store["leads"][parked_id]["status"] == "triaged_go", "AAOI 自己的一手申報必須叫醒它"
+
+
 def test_trace_backlog_flags_entries_no_trigger_can_ever_reach() -> None:
     """2026-08-13：既不需人工 authority、又沒有具名標的的 parked lead 已經死了。
 

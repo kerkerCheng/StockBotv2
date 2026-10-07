@@ -222,26 +222,44 @@ def ensure_trace_watch(
     consumed_entities: Iterable[str] = (),
     created_at: str | None = None,
     today: date | None = None,
+    retarget: bool = False,
 ) -> dict[str, Any] | None:
     """替一筆剛 park 的追源線索建立等待條件（沒有就建，有就沿用）。
 
     這是 [321] 的**入口端**：遷移只處理了既有 backlog，新 park 的若不建 watch，
     就會立刻變回沒有到期日、沒人管的等待——L13「管子只接了一頭」。
+
+    `retarget`＝這一次停放**明確**改了觸發條件：沿用的 watch 跟著改，舊值留在 `retargets`。
+    沒有這步，沿用會把上一輪的寬條件帶下去——2026-10-07 AAOI 那條研究完改成只等 AAOI 自己的申報，
+    沿用的 watch 仍是「AAOI／LITE 有任何新動靜」，下一則提到 LITE 的 CPO 新聞又會把它叫醒（L17 對稱面）。
     """
     entities = sorted({str(e).strip() for e in entities if str(e).strip()})
     if not entities:
         return None  # 沒有具名標的就沒有觸發條件，不假裝在等（由 wake_state=unwatched 現形）
+    kind = "entity_filing_signal" if kind == "primary_source_signal" else kind
     data = load_watches()
     for watch in data.get("watches", []):
         # 只沿用還在等的（active／fired）。到期的那一筆代表**上一輪**等待——lead 研究完再 park 是新的一輪，
         # 沿用它會變成沒有到期的等待且不被任何計數器數到（R2-b NB-1）。
         if watch.get("wake_lead") == lead_id and watch.get("status") in ("active", "fired"):
+            if retarget and (watch.get("kind"), sorted(watch.get("entities") or ())) != (kind, entities):
+                if kind not in ("entity_filing_signal", "related_entity_signal"):
+                    raise EventWatchError(f"追源 watch 只能改成具名實體的等待，不能改成 {kind}")
+                watch.setdefault("retargets", []).append({
+                    "at": _now(), "from_kind": watch.get("kind"), "from_entities": list(watch.get("entities") or ()),
+                    "from_created_at": watch.get("created_at"), "to_kind": kind, "to_entities": entities})
+                watch["kind"], watch["entities"] = kind, entities
+                # 新條件從這條線索最後一次進 pq1 起算：那之前的事研究時已經看過，不該立刻再叫醒它。
+                watch["created_at"] = created_at or watch.get("created_at")
+                if query_hint:
+                    watch.setdefault("poll", {})["query_hint"] = query_hint[:200]
+                save_watches(data)
             return watch
     today = today or _today()
     ttl = load_config()["trace_ttl_days"]
     watch = add_watch(
         data,
-        kind="entity_filing_signal" if kind == "primary_source_signal" else kind,
+        kind=kind,
         wake_lead=lead_id,
         expires=(today + timedelta(days=ttl)).isoformat(),
         entities=entities,
