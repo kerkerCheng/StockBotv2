@@ -2488,6 +2488,9 @@ function readingsCard(view) {
   if (hint) node.appendChild(mdParagraph(hint));
   if (!(panel.lines || []).length) {
     node.appendChild(el('p', 'note', panel.reason || '還沒有讀圖'));
+    // 多數坐的層還沒有讀圖，但可能已經有層說明——沒讀圖這條路也要連得過去（個股頁 plan S4b）
+    const links = layerNoteLinks(panel.context || {});
+    if (links) node.appendChild(links);
     return node;
   }
   node.appendChild(renderRows(panel.lines));
@@ -2495,8 +2498,32 @@ function readingsCard(view) {
   if (glossary) node.appendChild(glossary);
   const seats = (panel.context || {}).seats || [];
   if (seats.length) node.appendChild(el('p', 'note', '圖上它供貨或開發的節點：' + seats.join('、')));
+  const links = layerNoteLinks(panel.context || {});
+  if (links) node.appendChild(links);
   node.appendChild(el('p', 'note', '完整的引文與反證在「讀圖」頁（#/structure-readings）。'));
   return node;
+}
+
+/* 坐的層有層說明的，連到閱讀頁（個股頁 plan S4b）。清單照 materialize 給的（與「坐的層」同一份、同一個順序）；
+   讀不到 ledger 就說讀不到，不印成「沒有層說明」。 */
+function layerNoteLinks(context) {
+  const notes = context.layer_notes || [];
+  const absence = context.layer_notes_absence;
+  if (!notes.length && !absence) return null;
+  const box = el('div', 'layer-note-links');
+  if (absence) box.appendChild(el('p', 'warn', `▲ 層說明這次沒讀到：${absence.reason}（${absence.kind}）`));
+  if (notes.length) {
+    const p = el('p', 'note');
+    p.appendChild(document.createTextNode('它坐的層有層說明（客戶為什麼選這家的變體、什麼會讓它被換掉）：'));
+    notes.forEach((n, i) => {
+      if (i) p.appendChild(document.createTextNode('、'));
+      const link = el('a', null, n.title || n.node);
+      link.href = '#/layer/' + encodeURIComponent(n.node);
+      p.appendChild(link);
+    });
+    box.appendChild(p);
+  }
+  return box;
 }
 
 function readingRow(row) {
@@ -3548,6 +3575,250 @@ async function renderScorecard() {
   app.appendChild(secB);
 }
 
+/* ---------- 層說明（layer_notes state；個股頁 plan S4b）：純文字閱讀頁 ----------
+   照印 ledger 全文（三段依 ①②③ 的固定順序）、每個出處的兩種等級（層說明寫的「誰說的」與文件自宣告，並列不合併）、
+   每條主張的 watch 狀態、哪幾頁連過來。**不做版面、不畫圖**（版面與示意圖在 S5）；列序是節點 id 的字母序，不是名次。 */
+
+/** 研究 session 寫的 markdown，照原文一行一行印：`##` 變標題、`|` 開頭的連續行變表格、其餘保留縮排與換行。
+    不改一個字——強調與程式碼記號交給 `mdInline`。 */
+function plainText(text) {
+  const box = el('div', 'plain-text');
+  const lines = String(text || '').split('\n');
+  for (let i = 0; i < lines.length; i += 1) {
+    const line = lines[i];
+    const heading = line.match(/^(#{1,4})\s+(.*)$/);
+    if (heading) {
+      const h = el(heading[1].length <= 2 ? 'h3' : 'h4');
+      h.appendChild(mdInline(heading[2]));
+      box.appendChild(h);
+    } else if (line.trim().startsWith('|')) {
+      const rows = [];
+      while (i < lines.length && lines[i].trim().startsWith('|')) { rows.push(lines[i]); i += 1; }
+      i -= 1;
+      box.appendChild(markdownTable(rows));
+    } else {
+      const row = el('div', line.trim() ? 'pt-line' : 'pt-line pt-blank');
+      row.appendChild(mdInline(line));
+      box.appendChild(row);
+    }
+  }
+  return box;
+}
+
+/** markdown 表格 → 表格（第二行的 `|---|` 分隔線略過；格子文字一個字不改）。 */
+function markdownTable(rows) {
+  const cells = (row) => row.trim().replace(/^\|/, '').replace(/\|$/, '').split('|').map((c) => c.trim());
+  const wrap = el('div', 'table-wrap');
+  const table = el('table', 'rank pt-table');
+  rows.forEach((row, index) => {
+    const parts = cells(row);
+    if (parts.every((c) => /^:?-{3,}:?$/.test(c))) return;
+    const tr = el('tr');
+    parts.forEach((c) => {
+      const cell = el(index === 0 ? 'th' : 'td');
+      cell.appendChild(mdInline(c));
+      tr.appendChild(cell);
+    });
+    table.appendChild(tr);
+  });
+  wrap.appendChild(table);
+  return wrap;
+}
+
+/** 出處旁的「文件自宣告」：文件自己帶的等級（附哪裡寫的）與檔頭的宣告段（逐字）；都沒有就印缺席的那一句。 */
+function declaredBlock(declared) {
+  const box = el('div', 'declared');
+  if (declared.absence) {
+    box.appendChild(el('span', 'rule', '文件自宣告：' + declared.absence.label));
+    return box;
+  }
+  const tiers = (declared.tiers || []).map((t) => `tier ${t.tier}（${t.from}）`);
+  if (tiers.length) box.appendChild(el('span', 'rule', '文件自宣告的等級：' + tiers.join('；')));
+  (declared.lines || []).forEach((text) => {
+    const quote = el('div', 'verbatim pt-decl', text);
+    quote.appendChild(el('div', 'src', '文件檔頭的宣告（逐字）'));
+    box.appendChild(quote);
+  });
+  return box;
+}
+
+function citationList(citations) {
+  const list = el('ul', 'weak');
+  (citations || []).forEach((c) => {
+    const li = el('li');
+    const head = el('div');
+    head.appendChild(el('span', 'badge badge-evidence', '層說明寫：' + c.evidence_label));
+    head.appendChild(document.createTextNode(' '));
+    head.appendChild(el('code', null, c.ref || '（沒有出處：' + c.evidence_label + '）'));
+    li.appendChild(head);
+    if (c.quote) li.appendChild(el('div', 'verbatim', c.quote));
+    if (c.declared) li.appendChild(declaredBlock(c.declared));
+    list.appendChild(li);
+  });
+  return list;
+}
+
+function companyName(payload, id) {
+  const label = (payload.company_labels || {})[id];
+  return label ? `${label}（${id}）` : id;
+}
+
+function citedByBlock(payload, row) {
+  const sec = el('section', 'panel');
+  sec.appendChild(el('h2', null, '哪幾頁連過來（由圖推：公司對這個節點有供貨或開發邊）'));
+  const cited = row.cited_by || {};
+  if (cited.absence) {
+    sec.appendChild(el('p', 'warn', `▲ ${cited.absence.reason}（${cited.absence.kind}）`));
+    return sec;
+  }
+  const pages = cited.pages || [];
+  const p = el('p', null, pages.length ? `${pages.length} 頁：` : '0 頁');
+  pages.forEach((page, i) => {
+    if (i) p.appendChild(document.createTextNode('、'));
+    const link = el('a', null, page.ticker);
+    link.href = '#/' + encodeURIComponent(page.ticker);
+    p.appendChild(link);
+    if (page.label) p.appendChild(el('span', 'dim', `（${page.label}）`));
+  });
+  sec.appendChild(p);
+  (cited.without_page || []).forEach((w) => {
+    sec.appendChild(el('p', 'note', `也坐在這一層、但沒有個股頁：${companyName(payload, w.company_id)}——${w.reason}`));
+  });
+  return sec;
+}
+
+function claimList(payload, claims) {
+  const list = el('ul', 'weak');
+  claims.forEach((c) => {
+    const li = el('li');
+    li.appendChild(mdParagraph(`${c.n}. ${c.claim}`, 'pt-claim'));
+    li.appendChild(el('span', 'rule', `狀態：${c.state_label}`
+      + (c.watch_id ? `｜watch ${c.watch_id}（${c.watch_status}）` : '') + (c.watch_expires ? `｜到期 ${c.watch_expires}` : '')));
+    li.appendChild(el('span', 'rule', '什麼會讓它變假／什麼事件要叫醒：' + c.condition));
+    li.appendChild(el('span', 'rule', `核查頻率：${c.check_frequency}｜觸發後 48 小時：${c.action_48h}`));
+    li.appendChild(el('span', 'rule', `證據等級：${c.evidence_label}｜盯的公司：`
+      + (c.entities || []).map((id) => companyName(payload, id)).join('、')));
+    li.appendChild(citationList(c.citations));
+    list.appendChild(li);
+  });
+  return list;
+}
+
+async function loadLayerNotes() {
+  try {
+    return await getJSON(`${API}/layer-notes`);
+  } catch (err) {
+    renderStateError(err, '讀不到層說明');
+    return null;
+  }
+}
+
+async function renderLayerNotes() {
+  markNav('layer-notes');
+  const payload = await loadLayerNotes();
+  if (!payload) return;
+  app.textContent = '';
+  footerWarning.textContent = payload.correlation_warning || '';
+  const head = el('div', 'detail-head');
+  head.appendChild(el('h1', null, payload.title));
+  app.appendChild(head);
+
+  const c = payload.counts || {};
+  const states = c.claim_states || {};
+  const graphAbsence = (payload.graph || {}).absence;
+  const sec0 = el('section', 'panel');
+  sec0.appendChild(kpiRow([
+    { label: '現行', value: String(c.notes || 0), sub: '一層一份、同層每頁共用' },
+    { label: '主張', value: String(c.claims || 0), sub: `沒有 watch 在盯 ${states.unwatched || 0}｜被判觸及 ${states.touched || 0}` },
+    { label: '連過來的個股頁', value: graphAbsence ? '未算' : String(c.pages_linked || 0), sub: graphAbsence ? graphAbsence.reason : '由圖推' },
+    { label: '該重讀', value: String(c.needs_reread || 0), sub: '整份到期、主張觸及或到期、沒人盯', cls: 'hero' },
+  ]));
+  sec0.appendChild(el('p', 'note', `出處 ${c.citations_with_ref || 0} 個裡，文件有自宣告的 ${c.citations_declared || 0} 個——`
+    + '其餘印「文件沒宣告」或為什麼問不到；推一步、沒有出處的不算在內。'));
+  app.appendChild(sec0);
+
+  const sec1 = el('section', 'panel');
+  sec1.appendChild(el('h2', null, '每一份層說明（依節點 id 的字母序，不是名次）'));
+  const list = el('ul', 'weak');
+  (payload.rows || []).forEach((row) => {
+    const li = el('li');
+    const link = el('a', null, row.title);
+    link.href = '#/layer/' + encodeURIComponent(row.node);
+    const top = el('div');
+    top.appendChild(link);
+    li.appendChild(top);
+    const cited = row.cited_by || {};
+    li.appendChild(el('span', 'rule', `${row.node}｜${((payload.labels || {}).units || {})[row.unit] || row.unit}`
+      + `｜重讀日 ${row.expires || '—'}｜主張 ${(row.claims || []).length} 條｜`
+      + (cited.absence ? '連過來的頁：未連（見下一行）' : `連過來的頁 ${(cited.pages || []).length}：`
+        + ((cited.pages || []).map((p) => p.ticker).join('、') || '—'))));
+    if (cited.absence) li.appendChild(el('span', 'rule', `沒有頁連過來：${cited.absence.reason}`));
+    (row.reread || []).forEach((r) => li.appendChild(el('span', 'rule', '該重讀：' + r)));
+    list.appendChild(li);
+  });
+  if (!(payload.rows || []).length) list.appendChild(el('li', null, '一份層說明都還沒寫（`python -m alpha layer-note <node> --add`）'));
+  sec1.appendChild(list);
+  if ((payload.withdrawn || []).length) sec1.appendChild(el('p', 'note', '有紀錄但現行已撤回：' + payload.withdrawn.join('、')));
+  (payload.parse_errors || []).forEach((e) => sec1.appendChild(el('p', 'warn', '▲ ledger 讀不懂：' + e)));
+  (payload.declaration_problems || []).forEach((e) => sec1.appendChild(el('p', 'warn', '▲ 文件自宣告讀不到：' + e)));
+  app.appendChild(sec1);
+
+  app.appendChild(stateFooter(payload, '層說明頁不是什麼'));
+  window.scrollTo(0, 0);
+}
+
+async function renderLayerNote(node) {
+  markNav('layer-notes');
+  const payload = await loadLayerNotes();
+  if (!payload) return;
+  app.textContent = '';
+  footerWarning.textContent = payload.correlation_warning || '';
+  const back = el('a', 'back', '← 全部層說明');
+  back.href = '#/layer-notes';
+  app.appendChild(back);
+  const row = (payload.rows || []).find((r) => r.node === node);
+  if (!row) {
+    const box = el('div', 'error');
+    box.appendChild(el('h2', null, `${node} 沒有現行的層說明`));
+    box.appendChild(el('p', 'note', (payload.withdrawn || []).includes(node)
+      ? '它有紀錄，但最新一筆是撤回——撤回後沒有現行的那一份（舊版不復活）。'
+      : '這個節點還沒寫層說明，或節點 id 打錯了。'));
+    app.appendChild(box);
+    return;
+  }
+  const units = (payload.labels || {}).units || {};
+  const head = el('div', 'detail-head');
+  head.appendChild(el('h1', null, row.title));
+  head.appendChild(el('div', 'company', `${row.node}｜${units[row.unit] || row.unit}｜寫於 ${row.created_at}（UTC）`
+    + `｜重讀日 ${row.expires || '—'}｜${row.note_id}${row.versions > 1 ? `（第 ${row.versions} 版）` : ''}`));
+  app.appendChild(head);
+
+  const sec0 = el('section', 'panel');
+  sec0.appendChild(el('p', 'note', '重讀日到了要看什麼：' + row.reread_reason));
+  (row.reread || []).forEach((r) => sec0.appendChild(el('p', 'warn', '▲ 該重讀：' + r)));
+  sec0.appendChild(el('p', 'note', '每個出處旁並列兩種等級：「層說明寫」看的是誰說的；「文件自宣告」是文件自己帶的等級與檔頭說明——'
+    + '第三方轉錄、AI 摘要、改寫過的節錄會在這裡現形。'));
+  app.appendChild(sec0);
+  app.appendChild(citedByBlock(payload, row));
+
+  (row.sections || []).forEach((section) => {
+    const sec = el('section', 'panel');
+    sec.appendChild(el('p', 'dim', `段：${section.label}`));
+    sec.appendChild(plainText(section.text));
+    sec.appendChild(group(`出處 ${(section.citations || []).length} 個`, () => citationList(section.citations)));
+    app.appendChild(sec);
+  });
+
+  const secC = el('section', 'panel');
+  secC.appendChild(el('h2', null, '④ 主張：每條寫下即登記 watch'));
+  if ((row.claims || []).length) secC.appendChild(claimList(payload, row.claims));
+  else secC.appendChild(el('p', 'note', '這一份沒有自己的主張——牽涉個股的條件掛在那幾檔敘事的反證上（看個股頁）。'));
+  app.appendChild(secC);
+
+  app.appendChild(stateFooter(payload, '層說明頁不是什麼'));
+  window.scrollTo(0, 0);
+}
+
 async function route() {
   const hash = window.location.hash || '#/';
   const target = decodeURIComponent(hash.replace(/^#\/?/, ''));
@@ -3571,6 +3842,9 @@ async function route() {
     else if (target === 'candidates') await renderCandidates();
     // 2026-10-02（Phase 5 Step 5.5）：帳號計分表頁——心跳段 5 一直寫「完整表在 APP」，這一頁之前其實不存在。
     else if (target === 'account-scorecard') await renderScorecard();
+    // 2026-10-07（個股頁 plan S4b）：層說明。`layer/` 帶斜線與小寫，不會撞到 ticker（ticker 一律大寫、不含斜線）。
+    else if (target === 'layer-notes') await renderLayerNotes();
+    else if (target.startsWith('layer/')) await renderLayerNote(target.slice('layer/'.length));
     else if (target) await renderDetail(target);
     else await renderList();
   } catch (err) {

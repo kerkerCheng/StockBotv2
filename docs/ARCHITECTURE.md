@@ -620,7 +620,7 @@ filesystem 結構，不該經由 HTTP 出去。遮成 `«private-authority»`，
 **state artifact（2026-09-08，呈現責任重切 B1）：** per-ticker 的 Analyst View 之外，多了**跨標的的 state**
 （`library/private/app/state/<kind>.json`；`webapp/contracts.py::STATE_SCHEMA_VERSIONS` 是封閉的 kind 字彙，
 2026-09-26 起是 `structure_table`／`beta`／`graph_walk`／`watches`／`positions`／`structure_readings`／`account_scorecard`（`coverage` → `graph_walk`，Phase 2 Step 2.6；`structure_readings` 的頁 `#/structure-readings` 於 Step 2.7 上線，每一列帶引用原文與反證登記的 watch id）；
-`ranking`／`basket`／`multi_year` 已於 Phase 0 退役；2026-09-29 Phase 3 Step 3.6 加 `candidates`，共 8 個，查證 `python -m webapp status`）。
+`ranking`／`basket`／`multi_year` 已於 Phase 0 退役；2026-09-29 Phase 3 Step 3.6 加 `candidates`；2026-10-07 個股頁 plan S4b 加 `layer_notes`（層說明閱讀頁，§6.15），共 9 個，查證 `python -m webapp status`）。
 **`candidates` kind（候選狀態板）：** 字彙與純函式（三個字、滯留、已持有索引、整板組裝、rollup）住零 I/O 的 `alpha/candidates.py`——
 心跳與 APP 的 fake payload 只 import 它，不經 `alpha.providers`（那會把 Neo4j／Engine C／yfinance 載進來）；推導住 `alpha/providers/candidates.py`（候選板、心跳、個股頁、成交收據共用一個函式），
 持股身分解析住 `portfolio/holdings.py`（`engine_b/cli.py::_held` 也呼叫它，但保留自己的語意：全部持股、含 beta、Sheet 讀不到 fail closed）；
@@ -885,6 +885,15 @@ python -m alpha layer-note <node> --add spec.json  → library/private/alpha/lay
 ②各家變體與階段（`variants`）＝轉換時需求怎麼變、瓶頸在哪一步形成；③客戶為什麼選、什麼會換掉（`selection`）＝在系統裡多重要；
 ④主張（`claims[]`）＝B4 沒有、L7 三件套。之後加段是**加字**（`SECTION_KEYS`），不是搬資料（L2）。
 全文（長的 markdown）住 `library/private/research_notes/layer_notes/`，ledger 以 `body_ref` 指過去；閱讀頁照印 ledger（個股頁 plan S4b）。
+
+**閱讀頁（2026-10-07 個股頁 plan S4b）：** state kind `layer_notes`（`webapp/layer_notes.py` 純函式組 artifact、`webapp/materialize.py::materialize_layer_notes`
+一次載入；APP `#/layer-notes`、`#/layer/<節點>`，GET `/api/v1/layer-notes` 整份給、沒有路徑參數）。三件事各只有一個 owner：
+①主張落哪一格＝`alpha.providers.layer_notes.claim_state`（「該重讀」的三種主張理由也問它）；②**文件自宣告**＝`source_declarations`——
+文件自己帶的 `.meta.json` 等級、`doc_id` 完全等於檔名的抽取檔等級、raw 檔頭鍵名含 NOTE／TIER 的宣告段（逐字），三種都沒有才是
+「文件沒宣告」；與層說明自己的證據等級（看誰說的）**並列不合併**——第三方轉錄、AI 摘要、改寫過的節錄的保真度住文件自己那一格（L16）；
+③「哪幾頁連過來」＝圖的 `seats_from_edges`，與個股頁讀圖面板「坐的層」同一支（面板列出坐的層裡有層說明的、連到閱讀頁，**不改面板狀態與
+readiness**）。缺席由產生端宣告：轉換不是層／圖上沒有任何邊碰到這個節點／沒有公司坐／這次沒讀到圖（`webapp.layer_notes.CITED_BY_ABSENCES`）。
+版面與示意圖仍在 S5。
 
 ## 7. Engine D（Decision Lab）——frozen 2026-09-22（G12）
 

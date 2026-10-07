@@ -55,7 +55,7 @@ def _stores(args: argparse.Namespace) -> tuple[ArtifactStore, StateArtifactStore
 #: 新增一個 state materializer 時**必須加進來**，否則它會被當成「沒指定」而重跑全部單檔。
 _STATE_FLAGS: tuple[str, ...] = (
     "structure_table", "beta", "graph_walk", "watches", "positions",
-    "structure_readings", "account_scorecard", "candidates",
+    "structure_readings", "account_scorecard", "candidates", "layer_notes",
 )
 
 
@@ -63,7 +63,7 @@ def cmd_materialize(args: argparse.Namespace) -> int:
     """跑完整條鏈並寫下 artifact。**這是唯一會跑模型、連 DB、讀 private ledger 的入口。**"""
     from .materialize import (
         candidate_context, materialize_account_scorecard, materialize_beta, materialize_candidates,
-        materialize_graph_walk,
+        materialize_graph_walk, materialize_layer_notes,
         materialize_many, materialize_positions,
         materialize_structure_readings,
         materialize_structure_table, materialize_watches, write_vocabularies,
@@ -187,6 +187,22 @@ def cmd_materialize(args: argparse.Namespace) -> int:
             print(f"✓ candidates → {path.name}（{path.stat().st_size:,} bytes；"
                   f"可開 {c.get('open')}／缺 X {c.get('missing')}／等回落 {c.get('priced_wait')}／不要 {c.get('pass')}"
                   f"／已持有 {'未驗' if c.get('held') is None else c.get('held')}／無敘事 {c.get('no_narrative')}）")
+    # 層說明閱讀頁（個股頁 plan S4b）：同樣放在單檔之後——「哪幾頁連過來」只列這個 store 真的有的個股頁。各自 fail-soft。
+    if getattr(args, "layer_notes", False) and as_of is not None:
+        # INV-6：答不出「T 時刻我知道什麼」就明確拒絕——ledger 的現行那一份、watch 狀態、圖都只有現在
+        total += 1
+        failed += 1
+        print("✗ layer_notes：as-of 視角明確拒絕——層說明的現行那一份、主張的 watch 狀態與圖都只有現在的（INV-6）；"
+              "拿掉 --as-of 再跑", file=sys.stderr)
+    elif getattr(args, "layer_notes", False):
+        total += 1
+        try:
+            path, payload = materialize_layer_notes(store=state_store, pages=store.tickers())
+        except Exception as exc:  # noqa: BLE001 — 理由原樣回報，不吞
+            failed += 1
+            print(f"✗ layer_notes：{type(exc).__name__}: {str(exc)[:200]}", file=sys.stderr)
+        else:
+            print(f"✓ layer_notes → {path.name}（{path.stat().st_size:,} bytes；{_layer_notes_summary(payload)}）")
     # 帳號計分表（Phase 3）：唯一會抓價格的 materializer，所以 fail-soft 且與其他各自獨立。
     if getattr(args, "account_scorecard", False):
         total += 1
@@ -215,6 +231,17 @@ def cmd_materialize(args: argparse.Namespace) -> int:
                   f"；該重讀 {payload['needs_reread']['n']}）")
     print(f"完成 {total - failed}/{total}；下一步：python -m webapp serve")
     return 1 if failed else 0
+
+
+def _layer_notes_summary(payload: dict) -> str:
+    """materialize 與 status 共用的一行（照抄 artifact 的計數，不另算）。"""
+    c = payload.get("counts") or {}
+    states = c.get("claim_states") or {}
+    graph = ((payload.get("graph") or {}).get("absence") or {}).get("kind")
+    return (f"現行 {c.get('notes', 0)} 份／主張 {c.get('claims', 0)} 條（沒人盯 {states.get('unwatched', 0)}）"
+            f"／出處 {c.get('citations_with_ref', 0)} 個裡文件有自宣告 {c.get('citations_declared', 0)}"
+            f"／連過來的個股頁 {'未算（圖讀不到）' if graph else c.get('pages_linked', 0)}"
+            f"／該重讀 {c.get('needs_reread', 0)} 份")
 
 
 def cmd_serve(args: argparse.Namespace) -> int:
@@ -311,6 +338,8 @@ def cmd_status(args: argparse.Namespace) -> int:
         elif kind == "positions":
             extra = (f"｜逐檔 {len(payload['rows'])}"
                      f"／真實成交 {len(payload['live']['tickers'])} 檔")
+        elif kind == "layer_notes":
+            extra = f"｜{_layer_notes_summary(payload)}"
         print(f"- {kind}｜{freshness.state}（{freshness.age_hours:.1f}h）"
               f"｜{payload['point_in_time']['mode']}{extra}")
     for kind in missing:
@@ -655,6 +684,9 @@ def build_parser() -> argparse.ArgumentParser:
                      help="另外（或只）materialize 候選狀態板：敘事宣告 × Sheet 持有 × 前提每天重驗（唯讀；會讀 Sheet readonly）")
     mat.add_argument("--structure-readings", action="store_true",
                      help="另外（或只）materialize 結構讀圖：每一份讀圖跟現在的圖還一不一致（唯讀 ledger ＋ 確定性比對）")
+    # dest 與 state kind 同名（`layer_notes`），`_STATE_FLAGS` 才比對得起來。
+    mat.add_argument("--layer-notes", dest="layer_notes", action="store_true",
+                     help="另外（或只）materialize 層說明閱讀頁：ledger 全文、出處的文件自宣告、主張的 watch 狀態、哪幾頁連過來（唯讀）")
     mat.add_argument("--as-of", help="YYYY-MM-DD：point-in-time 視角（單檔與結構表都適用）")
     _dirs(mat)
     mat.set_defaults(func=cmd_materialize)

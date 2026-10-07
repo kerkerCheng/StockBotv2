@@ -109,6 +109,7 @@ async def meta(request: Request) -> Response:
             # 清單與路由表的一致性改由 tests/test_webapp_request_path.py 守（不再靠人記得）。
             f"GET /api/{API_VERSION}/candidates",
             f"GET /api/{API_VERSION}/account-scorecard",
+            f"GET /api/{API_VERSION}/layer-notes",
         ],
         "not_offered": [
             "沒有任何寫入端點：不下單、不記錄選擇、不改 thesis、不入圖、不核准 pq2。",
@@ -316,6 +317,18 @@ async def account_scorecard(request: Request) -> Response:
     return await _serve_state(request, "account_scorecard")
 
 
+# 2026-10-07（個股頁 plan S4b）：層說明的純文字閱讀頁。整份 artifact 一次給（沒有路徑參數——不多開一個讀檔面）；
+# 哪一個節點由前端的 `#/layer/<node>` 挑，照抄、不重算。
+_STATE_NOTES["layer_notes"] = (
+    "python -m webapp materialize --layer-notes",
+    "「artifact 讀不到」與「一份層說明都還沒寫」是兩件事——後者會以 200 ＋ rows=[] 回。")
+
+
+async def layer_notes(request: Request) -> Response:
+    """層說明：ledger 全文、出處與文件自宣告、每條主張的 watch 狀態、哪幾頁連過來（照抄，不排序、不 gate）。"""
+    return await _serve_state(request, "layer_notes")
+
+
 async def index(request: Request) -> Response:
     return _static_file("index.html")
 
@@ -405,6 +418,7 @@ def create_app(directory: Path | None = None, state_directory: Path | None = Non
         Route(f"/api/{API_VERSION}/structure-readings", structure_readings, methods=["GET"]),
         Route(f"/api/{API_VERSION}/candidates", candidates, methods=["GET"]),
         Route(f"/api/{API_VERSION}/account-scorecard", account_scorecard, methods=["GET"]),
+        Route(f"/api/{API_VERSION}/layer-notes", layer_notes, methods=["GET"]),
         Route(f"/api/{API_VERSION}/stocks", stocks, methods=["GET"]),
         Route(f"/api/{API_VERSION}/stocks/{{ticker}}", stock_detail, methods=["GET"]),
     ]

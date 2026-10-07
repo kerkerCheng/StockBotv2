@@ -840,7 +840,8 @@ materialize 用**，不動 `discover_tracked_tickers`——那會連帶擴大 ED
 & '.venv\Scripts\python.exe' -m query.graph_walk                            # 走圖：九型問句各自「命中／母體」（零 LLM、不排序、不加總）；第 9 型逐對印兩端逐字與 registry note
 #   （重複節點與覆蓋缺口原本各有一支 CLI，2026-09-29 Phase 3 Step 3.1c 退役——跑它們會 exit 2 並指回走圖）
 & '.venv\Scripts\python.exe' -m webapp materialize --candidates              # 候選狀態板（2026-09-29 Phase 3 Step 3.6；不寫 authority：敘事 ledger、讀圖對圖、watch、Engine C、Sheet readonly、FX）
-& '.venv\Scripts\python.exe' -m webapp materialize --tracked --registry-listed --structure-table --beta --graph-walk --watches --positions --structure-readings --scorecard --candidates   # Daily ⑬ 的完整一輪（crons/daily_task.py 是唯一權威）
+& '.venv\Scripts\python.exe' -m webapp materialize --layer-notes             # 層說明閱讀頁（2026-10-07 個股頁 plan S4b；唯讀：ledger、watch、raw 檔頭與抽取檔、圖的邊）
+& '.venv\Scripts\python.exe' -m webapp materialize --tracked --registry-listed --structure-table --beta --graph-walk --watches --positions --structure-readings --scorecard --candidates --layer-notes   # Daily ⑬ 的完整一輪（crons/daily_task.py 是唯一權威）
 
 # 2) serve：純讀。**不重建任何東西**
 & '.venv\Scripts\python.exe' -m webapp serve                  # http://127.0.0.1:8790/
@@ -900,6 +901,9 @@ materialize 用**，不動 `discover_tracked_tickers`——那會連帶擴大 ED
 & '.venv\Scripts\python.exe' -m alpha layer-note mat:inp_epiwafer                    # 列出（標出現行那一份）
 & '.venv\Scripts\python.exe' -m alpha layer-note mat:inp_epiwafer --add spec.json    # 出處核對＋每條主張登記語意 watch（layer_note:<id>#<n>）
 & '.venv\Scripts\python.exe' -m alpha layer-note mat:inp_epiwafer --register-watches # append 之後登記失敗時冪等補登
+# 閱讀頁（2026-10-07 個股頁 plan S4b；APP #/layer-notes、#/layer/<節點>；daily ⑬ 每天重建）——寫完層說明想馬上在 APP 讀到：
+& '.venv\Scripts\python.exe' -m webapp materialize --layer-notes                         # 只重建閱讀頁（全文、出處的文件自宣告、主張狀態、哪幾頁連過來）
+& '.venv\Scripts\python.exe' -m webapp materialize COHR LITE --layer-notes               # 連個股頁「坐的層」的連結一起更新（只重跑點名的那幾檔）
 ```
 
 ```jsonc
@@ -1642,6 +1646,27 @@ append 之後才失敗會說出 `--register-watches` 補登命令。主張與整
 | **3 最窄 rule** | **沒有新增任何 rule**（rules 仍 0 條、daily 封閉步驟清單不變）。要讓排程寫層說明必須重做一次本 review。 |
 | **4 permission contract test** | `test_layer_note_ledger_is_written_only_interactively`：rules 與 `crons/daily_task.py` 不得出現 `layer-note`；心跳、`audit/checks.py`、`audit/sources.py` 不得出現 `write_note`／`append_note_record`／`register_note_watches`，並斷言心跳確實有讀的那一端（不是沒接線才乾淨）。變異：daily 步驟清單出現 `layer-note`、心跳 import 寫入端——都紅。 |
 | **5 端到端 smoke** | 2026-10-07 實跑（writer lock 下）：五份遷入——`ln_2a0c6b4830dbf1b1`（InP 磊晶）、`ln_1c39f088ea8cec08`（板式熱交換器）、`ln_9adebe4be9952856`（快接頭）、`ln_f7996a796a5e53c8`（外部光源）、`ln_863549fd0f4a7468`（FAU）；6 條層主張登記 `ew_0310`–`ew_0315`。心跳印「層說明 5 份｜該重讀 0」、兩個新快照鍵列在「首日」；同一刻反證計數不帶／帶層說明 101 → 107、未盯 0；`audit invariants` 14 項 PASS（Expiry：232 個等待全部有到期與去處）；主樹全套 3681 passed。 |
+
+### 層說明閱讀頁（個股頁 plan S4b，2026-10-07 完成 sandbox impact review）
+
+APP 新 kind `layer_notes`（`#/layer-notes` 清單、`#/layer/<節點>` 單份）：**照印 ledger 全文**（三段依 ①②③ 的固定順序）、每條主張盯它的
+watch 與狀態（判定只有 `alpha.providers.layer_notes.claim_state` 一個，與「該重讀」同一套）、**哪幾頁連過來**（由圖推：公司對這個節點有
+`supplies_to`／`develops` 邊——與個股頁「坐的層」同一個 `seats_from_edges`；節點還沒入圖就沒有頁連過來，照實印理由）。
+每個出處旁並列兩種等級、不合併：層說明寫的（看「誰說的」）與**文件自宣告**——文件自己帶的三種東西照抄：`library/raw/<檔名>.meta.json` 的
+`evidence_tier`、`extractions/*.json` 裡 `doc_id` **完全等於**檔名的 `evidence_tier`、raw 文字檔開頭（前 20 行、遇 `---` 停）鍵名含
+NOTE 或 TIER 的宣告段（逐字）；三種都沒有才印「文件沒宣告」，lead 出處與對不到檔的各有自己的一句。個股頁讀圖面板（有讀圖、沒讀圖兩條路）
+列出坐的層裡有層說明的、連到閱讀頁——**不改面板狀態與 readiness**。不做版面與示意圖（S5）。只有現在的視角：`--layer-notes` 帶 `--as-of`
+明確拒絕（exit 1、不寫 artifact；INV-6）。
+
+**sandbox impact review 五步：**
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | daily ⑬ 的 `python -m webapp materialize` 多一個旗標 `--layer-notes`：**讀取變多、寫入只多一份 derived cache**——多讀層說明 ledger（`library/private/alpha/layer_notes/`）、watch registry、`library/raw/` 的檔頭與 `.meta.json`、`extractions/*.json` 的 `source_doc`、同一組本機 Neo4j bolt 的唯讀邊（`query.structure._load_edges`，與個股頁讀圖面板同一支）與名冊；只寫 `library/private/app/state/layer_notes.json`（atomic）。個股頁 materialize 的讀圖輸入多讀一次層說明 ledger（唯讀）。**不寫任何 authority**、無新網路主機或憑證、不呼叫 LLM、不碰 `.git`。圖讀不到只讓「哪幾頁連過來」說讀不到，全文照印；ledger 壞行、一行都讀不出 node 的檔、讀不懂的抽取檔都逐條印在頁上（INV-3）。APP 多一個 GET `/api/v1/layer-notes`（整份 artifact、沒有路徑參數——不多開讀檔面），沒有寫入端點 |
+| **2 skill／prompt／本檔** | 不動 daily prompt 與任何 skill；本節＋「讀圖」那一節與「Web App／API」的命令；ARCHITECTURE §6.15 與 state kind 清單 |
+| **3 最窄 rule** | **沒有新增任何 rule**（rules 仍 0 條）；daily 封閉步驟清單不加步，只在 ⑬ 的 argv 加一個唯讀旗標（`tests/test_daily_task.py` 逐項相等）。寫層說明仍只在互動 session |
+| **4 permission contract test** | `test_layer_note_ledger_is_written_only_interactively` 改成比對寫入子命令的 argv 記號（`"layer-note"`；原本比子字串，會把唯讀旗標 `--layer-notes` 也算進去），另斷言 daily 確實帶 `--layer-notes`（不是沒接線才乾淨），並把閱讀頁那一端（`webapp/materialize.py`、`webapp/layer_notes.py`）列進「不得出現寫入函式」；`tests/test_webapp_request_path.py` 的 `STATE_ROUTES` 加 `/api/v1/layer-notes`（四種證明：import 白名單、模組哨兵、檔案快照、斷網，與 405）。變異：daily 拿掉 `--layer-notes`、daily 多一步 `-m alpha layer-note`、閱讀頁 import `write_note`——都紅 |
+| **5 端到端 smoke** | 2026-10-07 真資料（暫存目錄）：現行 5 份、主張 6 條全部在盯、出處 125 個裡文件有自宣告 122（沒宣告的是同一份 `lumentum_ofc2026_investor_briefing` 的 3 次引用）；連過來的個股頁 5 頁——外部光源 3（COHR、LITE、POET；O-Net 名冊沒有研究代號另列）、FAU 2（3363.TWO、COHR）、快接頭 1（6805.TW；Danfoss 另列）、InP 磊晶與板式熱交換器 0（圖上還沒有這兩個節點，等 pq2 [715]／[721]）。今早 daily 產的 6 個個股頁與新程式重產的逐頁比對：readiness、讀圖面板狀態、缺席分型、`freshness_identity` 6/6 相同，context 只多連結。「該重讀」重構前後在真資料上逐字相同（3 個日期＋4 種假 registry）。headless Edge 實點 `#/layer-notes`、`#/layer/tech%3Aexternal_laser_source`、`#/layer/mat%3Ainp_epiwafer`、`#/COHR`（讀圖面板兩個連結） |
 
 ---
 

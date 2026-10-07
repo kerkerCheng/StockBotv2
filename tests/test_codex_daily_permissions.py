@@ -162,12 +162,24 @@ def test_tw_share_capital_stays_an_interactive_entry() -> None:
 def test_layer_note_ledger_is_written_only_interactively() -> None:
     """層說明 ledger（A3、append-only；個股頁 plan S4a）只由互動 session 寫（`python -m alpha layer-note --add`）：
     daily 的封閉步驟清單不得出現它；心跳與 `audit invariants`（daily 第 14 步）只讀 ledger 與 registry，
-    不得呼叫寫入端——要讓無人值守寫它必須重做一次 sandbox impact review（OPERATIONS「層說明 ledger」）。"""
+    不得呼叫寫入端——要讓無人值守寫它必須重做一次 sandbox impact review（OPERATIONS「層說明 ledger」）。
+
+    2026-10-07（S4b）：daily ⑬ 多了 `webapp materialize --layer-notes`（閱讀頁，**只讀**）。原本比對的是子字串
+    `layer-note`，會把唯讀旗標也算進去——改成比對寫入子命令的 argv 記號 `"layer-note"`（`--layer-notes` 是另一個記號），
+    並把閱讀頁那一端（`webapp/materialize.py`、`webapp/layer_notes.py`）也列進「只讀、不得碰寫入函式」。"""
+    from crons.daily_task import DAILY_STEPS
+
     assert "layer-note" not in RULES.read_text(encoding="utf-8")
-    assert "layer-note" not in (ROOT / "crons" / "daily_task.py").read_text(encoding="utf-8")
+    tokens = [token for step in DAILY_STEPS for token in step.argv]
+    assert "layer-note" not in tokens                  # 寫入子命令不在任何一步的 argv
+    assert '"layer-note"' not in (ROOT / "crons" / "daily_task.py").read_text(encoding="utf-8")
+    assert "--layer-notes" in tokens                   # 讀的那一端確實在 daily（閱讀頁每天重建，不是沒接線才乾淨）
     heartbeat = (ROOT / "crons" / "heartbeat.py").read_text(encoding="utf-8")
     assert "_layer_note_lines" in heartbeat           # 讀的那一端確實在心跳裡（不是因為沒接線才乾淨）
     readers = heartbeat + "".join((ROOT / "audit" / name).read_text(encoding="utf-8")
                                   for name in ("checks.py", "sources.py"))
+    readers += "".join((ROOT / "webapp" / name).read_text(encoding="utf-8")
+                       for name in ("materialize.py", "layer_notes.py"))
+    assert "materialize_layer_notes" in readers        # 閱讀頁的 materializer 確實在被掃的檔案裡
     for writer in ("write_note", "append_note_record", "register_note_watches"):
         assert writer not in readers, writer

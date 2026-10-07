@@ -82,6 +82,9 @@ STATE_SCHEMA_VERSIONS: dict[str, str] = {
     # /3（2026-10-06 多主題等權組 S1）：`theme_cohort` 改成 `{mode, cohorts: [...], absence}`；每則點名只跟自己所屬的組比。
     "account_scorecard": "stockbot-app/account_scorecard/3",
     "candidates": "stockbot-app/candidates/1",
+    # 2026-10-07（個股頁 plan S4b）：層說明的純文字閱讀頁——ledger 全文、出處與文件自宣告、每條主張的 watch 狀態、
+    # 哪幾頁連過來 → 9。不做版面與示意圖（S5）。
+    "layer_notes": "stockbot-app/layer_notes/1",
 }
 STATE_KINDS: tuple[str, ...] = tuple(STATE_SCHEMA_VERSIONS)
 
