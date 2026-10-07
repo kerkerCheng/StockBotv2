@@ -148,9 +148,12 @@ def test_the_brief_prints_the_llm_sentences_when_there_are_some(tmp_path) -> Non
     lines = leads_block(digest=saved, todays=todays, digest_problem=None)
     assert lines[0] == "**① Lead 抓了什麼**（外面新進 2 則：X 帳號 1、外部雷達 1）"
     assert lines[1] == "- 富世達：快接頭認證中"
-    receipt = {"summary": {"searches": 11, "new": 1, "new_market": 1, "new_theme": 0, "new_watch": 0}}
+    # ② 有收據就列收據收下的每一則（2026-10-08 起），不用 LLM 的「市場大事」那幾句
+    receipt = {"summary": {"searches": 11, "new": 1, "new_market": 1, "new_theme": 0, "new_watch": 0},
+               "accepted": [{"scope": "market", "title": "LG lands deal", "fact": "LG 與 AIR 簽冷水機長約", "lead_id": "lead_r"}]}
     lines = events_block(digest=saved, receipt=receipt, digest_problem=None, radar_problem=None)
-    assert "雷達搜 11 次、收 1 則——市場 1" in lines[0] and lines[1] == "- LG 拿到冷水機長約"
+    assert "雷達搜 11 次、收 1 則——市場 1" in lines[0] and lines[1] == "- [市場] LG 與 AIR 簽冷水機長約"
+    assert "LG 拿到冷水機長約" not in "\n".join(lines)
 
 
 def test_without_a_digest_the_brief_says_why_and_falls_back_to_program_content() -> None:
@@ -162,9 +165,41 @@ def test_without_a_digest_the_brief_says_why_and_falls_back_to_program_content()
     receipt = {"summary": {"searches": 9, "new": 1, "new_market": 1},
                "accepted": [{"scope": "market", "title": "LG lands deal", "fact": "LG 簽冷水機長約"}]}
     lines = events_block(digest=None, receipt=receipt, digest_problem="沒產生", radar_problem=None)
-    assert lines[-1] == "- [市場] LG lands deal——LG 簽冷水機長約"
+    assert lines[-1] == "- [市場] LG 簽冷水機長約"
     lines = events_block(digest=None, receipt=None, digest_problem="沒產生", radar_problem="01c rate_limited")
     assert "沒有收據：01c rate_limited" in lines[0] and lines[-1] == "- 今天沒有收下任何一則"
+
+
+def test_market_events_list_every_item_the_radar_took_say_what_it_left_and_flag_a_likely_repeat() -> None:
+    """2026-10-08 使用者：「tldr 只有三則，但你說收四則……如果沒收但想讓我知道的就再註明」。真實那天：收 4 則（LLM 摘要只寫 3 句，
+    其中一句是前一天收的台積電）、沒收 1 則（Sivers 股東會通知，lead 已有同一網址）、LG 冷水機合約前一天換個網址收過。"""
+    from crons.daily_brief import events_block
+
+    receipt = {"summary": {"searches": 34, "new": 4, "new_market": 2, "new_theme": 2, "new_watch": 0},
+               "accepted": [
+                   {"scope": "market", "title": "Google signs 3.6GW deal with Constellation", "fact": "Google 與 Constellation 簽 3.6GW"},
+                   {"scope": "market", "title": "LG Electronics Secures Supply Agreement to Advance AI Data Center Cooling Business",
+                    "fact": "LG 與 AIR 簽冷水機多年期供應協議"},
+                   {"scope": "theme", "title": "奇鋐9月營收首破200億大關 連3月創新高", "fact": "奇鋐 9 月營收 210.18 億元"},
+                   {"scope": "theme", "title": "Agility Robotics & Fort Robotics Expand Partnership", "fact": "Agility 與 FORT 擴大合作"}],
+               "rejected": [{"url": "https://www.sivers-semiconductors.com/press/notice-egm", "reason": "duplicate"}]}
+    recent = [{"title": "AIR AND LG SUPPLY AGREEMENT AIMS TO ADVANCE AI DATA CENTER COOLING BUSINESS IN NORTH AMERICA",
+               "_date": "2026-10-07"},
+              {"title": "TSMC hits another record but Nvidia and Apple demand may become its next problem", "_date": "2026-10-07"}]
+    digest_saved = {"events": [{"text": "台積電 2 奈米訂單上調", "lead_ids": ["lead_tsmc_yesterday"]}]}
+    lines = events_block(digest=digest_saved, receipt=receipt, digest_problem=None, radar_problem=None, recent_accepted=recent)
+    assert "收 4 則" in lines[0] and "沒收 1 則" in lines[0] and "收下的都進 lead" in lines[0]
+    body = lines[1:]
+    assert len([x for x in body if x.startswith("- [")]) == 4                       # 收下的每一則都列
+    assert not any("台積電" in x for x in body)                                       # 前一天收的不會被夾進來
+    lg = next(x for x in body if "LG" in x)
+    assert "可能跟 10-07 收過的是同一件事" in lg
+    assert not any("可能跟" in x for x in body if "Google" in x or "奇鋐" in x)        # 不像的不標
+    assert body[-1].startswith("- 沒收：") and "lead 裡已經有這個網址" in body[-1]
+    receipt["rejected"][0]["lead_id"] = "lead_sivers"
+    titled = events_block(digest=None, receipt=receipt, digest_problem=None, radar_problem=None,
+                          lead_titles={"lead_sivers": "Sivers 臨時股東會通知"})
+    assert titled[-1] == "- 沒收：Sivers 臨時股東會通知——lead 裡已經有這個網址"
 
 
 def test_health_folds_the_quota_into_one_line_and_names_other_failures() -> None:
@@ -186,6 +221,26 @@ def test_health_folds_the_quota_into_one_line_and_names_other_failures() -> None
     ok = health_block(record={"steps": [{"key": "a", "status": "ok"}, {"key": "b", "status": "skipped"}]},
                       record_problem=None, quota=[], snapshot={})
     assert ok == ["- 健康度：正常（daily 1/2 步 ok；invariants、健康審查無紅）"]
+
+
+def test_a_quota_warning_does_not_hide_a_real_failure_and_does_not_claim_the_steps_were_skipped() -> None:
+    """2026-10-08 真實那天：額度 68%（allowed_warning，照跑），T2 輪詢 5 次呼叫 1 次逾時——舊版把逾時併進額度那行、還寫「這一輪沒跑」，
+    使用者問「看起來還有額度，但為啥你說 error」。"""
+    from crons.daily_brief import health_block
+
+    record = {"steps": [
+        {"key": "01c_radar_propose", "status": "ok", "label": "外部雷達提議"},
+        {"key": "10e_poll_propose", "status": "timeout", "label": "T2 輪詢提議", "error": "超過 3 分鐘",
+         "calls": [{"status": "ok"}, {"status": "ok"}, {"status": "ok"}, {"status": "ok"}, {"status": "timeout"}]},
+        {"key": "10g_poll_apply", "status": "skipped", "label": "T2 輪詢套用", "reason": "llm_not_ok：10e_poll_propose 沒有成功"},
+    ]}
+    quota = [{"status": "allowed_warning", "status_words": "接近上限", "window_words": " 7 天", "used_text": "已用 68%",
+              "reset_text": "10-12 23:00", "steps": ["01c_radar_propose", "10e_poll_propose"]}]
+    lines = health_block(record=record, record_problem=None, quota=quota, snapshot={})
+    assert lines[0] == "- 健康度：2 個問題"
+    assert "這一輪照跑" in lines[1] and "這一輪沒跑" not in lines[1]
+    assert lines[2].startswith("  - ⚠ T2 輪詢提議：timeout（超過 3 分鐘；5 次呼叫：ok 4、timeout 1；任一次沒過整步不寫結果）")
+    assert lines[2].endswith("——連帶跳過：T2 輪詢套用")
 
 
 def test_the_research_counters_print_zero_and_say_when_they_could_not_be_read() -> None:
@@ -253,6 +308,26 @@ def test_decisions_reuse_the_heartbeat_list_and_say_none_when_empty() -> None:
     assert lines[0] == "**③ 待你決定**（1）" and lines[1].startswith("- [715] InP 磊晶片層建層｜go＝")
     assert "批次回覆" in lines[-1]
     assert "讀不到" in decisions_block(actionable=None, problem="OSError", todo_mod=todo)[0]
+
+
+def test_the_decisions_end_with_one_copyable_line_built_from_the_recommendations_on_the_items() -> None:
+    """2026-10-08 使用者：「待我決定的批次回覆 一樣就要給我單行可複製建議的操作」。建議是鑄號的 session 寫在編號上的，
+    daily 只照抄；沒寫建議的另列、不進那一行；watch_decision 的 go／pending 進不了批次。"""
+    from crons.daily_brief import decisions_block
+    from engine_b import todo
+
+    items = [
+        {"n": 736, "type": "manual", "title": "載板鏈對照組", "recommendation": {"verb": "go", "reason": "日東紡敘事要先有對照組"}},
+        {"n": 739, "type": "ra_admission", "title": "分接開關層補華明", "recommendation": {"verb": "go", "reason": "供給側 0→1"}},
+        {"n": 741, "type": "manual", "title": "舊題目", "recommendation": {"verb": "drop", "reason": "pool 現值已無對應（todo list 查過）"}},
+        {"n": 742, "type": "manual", "title": "沒寫建議的"},
+        {"n": 743, "type": "watch_decision", "title": "到期", "recommendation": {"verb": "pending", "reason": "等 Q3"}},
+    ]
+    lines = decisions_block(actionable=items, problem=None, todo_mod=todo)
+    assert "｜建議 go：日東紡敘事要先有對照組" in lines[1]
+    assert lines[-1] == "- 建議（鑄號時寫的；可直接複製）：`736 739 go 741 drop`"
+    assert any(x.startswith("- 沒寫建議：[742]、[743]") for x in lines)
+    assert not any("批次回覆" in x for x in lines)
 
 
 def test_the_quota_reset_time_is_printed_in_the_schedule_timezone(monkeypatch) -> None:

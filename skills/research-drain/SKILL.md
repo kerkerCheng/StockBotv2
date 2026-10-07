@@ -523,7 +523,9 @@ Samsung／SKH 側」）。這種問題 park 成 pq2 並繼續下一條，收尾�
   `python -m engine_b.cli decompose-propose --system "<一台實體>" --anchor <tech:x> --why "<為什麼是新錨>" --lead <id>`
   鑄一個 `manual` 型編號，讓使用者在批次行裡一起決定；**同時 open ≤2、drop 過沒新 lead 不重生**。
   核准仍逐題、系統不自行開題，decompose gate 不因此放寬。沒有合格候選就寫「本輪無新錨」。
-- **最後一行單獨給可複製的批次指令**（如 `341 342 343 go 344 drop`）
+- **最後一行單獨給可複製的批次指令**（如 `341 342 343 go 344 drop`）；**鑄的每個編號同時寫建議**
+  （`python -m engine_b.todo recommend <n> --verb go|drop|pending --reason "<go 會讓哪個數字變>"`）——
+  daily 短版的 ③ 照抄它組出同一行（2026-10-08 使用者指示；沒寫的編號會列在「沒寫建議」）
 - **本輪的否定結果**：哪些研究做完後結論是「不是瓶頸」——這一段不得省略，
   它是這個 skill 最容易被誤讀成「沒產出」的部分
 - **本輪寫下的 ROADMAP 列，逐列標檔次**（段 5.5 ④ 的三問結果）：`當下修`（已做完，附驗收數字）／

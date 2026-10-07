@@ -234,6 +234,31 @@ def get(pool: Mapping[str, Any], n: int) -> dict[str, Any]:
     raise TodoError(f"編號 {n} 不存在或已處理")
 
 
+#: 寫在編號上的建議（2026-10-08 使用者：「待我決定的批次回覆 一樣就要給我單行可複製建議的操作」）。
+RECOMMENDATION_KEY = "recommendation"
+
+
+def recommend(pool: Mapping[str, Any], n: int, verb: str, *, reason: str, at: str | None = None) -> dict[str, Any]:
+    """鑄號的 session 把它對這個編號的建議寫上去（動詞＋一句理由）；心跳與 daily 短版照抄，組出可直接複製的批次那一行。
+
+    **建議不是授權**：不 resolve、不改任何狀態，使用者回 go／drop 才算數。理由要答得出「go 會讓哪個數字變」，drop 要附
+    查過 pool 現值的查證命令（AGENTS「建議只由 ground truth 導出」）。向你要文件那一區不收建議——提供文件才算 go。
+    同一個編號再寫一次＝覆蓋（建議跟著最新的研究走），舊的那筆留在 `history`。"""
+    if verb not in VERBS:
+        raise TodoError(f"建議的動詞只收 {VERBS}（收到 {verb!r}）")
+    text = " ".join(str(reason or "").split())
+    if not text:
+        raise TodoError("建議要附一句理由（go 會讓哪個數字變；drop 附查證命令）")
+    item = get(pool, n)
+    if item.get("type") == "source_trace_review":
+        raise TodoError(f"[{n}] 是向你要文件：提供文件才算 go，不寫建議")
+    old = item.get(RECOMMENDATION_KEY)
+    if old:
+        item.setdefault("history", []).append({"at": at or _now(), "event": "recommendation_replaced", "old": old})
+    item[RECOMMENDATION_KEY] = {"verb": verb, "reason": text, "at": at or _now()}
+    return item
+
+
 def _receipt_fields(receipt: str) -> dict[str, str]:
     """解析 `key:value;key:value` receipt；拒絕空值與重複欄位。"""
 
@@ -2307,6 +2332,11 @@ def main(argv: list[str] | None = None) -> int:
     p_standing.add_argument("--leads", default="")
     p_standing.add_argument("--json", action="store_true")
 
+    p_rec = sub.add_parser("recommend", help="鑄號的 session 寫建議（動詞＋一句理由）；心跳與 daily 短版組出可複製的批次那一行")
+    p_rec.add_argument("numbers", nargs="+")
+    p_rec.add_argument("--verb", required=True, choices=VERBS)
+    p_rec.add_argument("--reason", required=True, help="一句理由：go 會讓哪個數字變；drop 附查過 pool 現值的查證命令")
+
     p_res = sub.add_parser("resolve", help="處理編號：go／drop／pending")
     p_res.add_argument("numbers", nargs="+")
     p_res.add_argument("--verb", required=True, choices=VERBS)
@@ -2474,6 +2504,18 @@ def main(argv: list[str] | None = None) -> int:
                 print(f"  ✗ [{row['n']}] {row['reason']}", file=sys.stderr)
         return 1 if outcome["failed"] else 0
 
+
+    if args.command == "recommend":
+        failures = 0
+        for raw in args.numbers:
+            try:
+                recommend(pool, int(raw), args.verb, reason=args.reason)
+                print(f"✓ [{raw}] 建議 {args.verb}")
+            except (TodoError, ValueError) as exc:
+                failures += 1
+                print(f"✗ [{raw}]：{exc}", file=sys.stderr)
+        save(pool, args.pool)
+        return 1 if failures else 0
 
     if args.command == "resolve":
         failures = 0

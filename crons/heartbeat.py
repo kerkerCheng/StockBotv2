@@ -1262,24 +1262,60 @@ def _pq2_item_lines(actionable: Sequence[Mapping[str, Any]], *, todo_mod: Any) -
         return []
     lines = []
     items = sorted(actionable, key=lambda i: int(i["n"]))
-    for item in items[:PQ2_LIST_LIMIT]:
+    shown = items[:PQ2_LIST_LIMIT]
+    for item in shown:
         auth = todo_mod.go_authorization(str(item.get("type")))
         title = " ".join(str(item.get("title") or "").split())
+        rec = item.get("recommendation") or {}
+        rec_text = (f"｜建議 {rec.get('verb')}：{_short_text(rec.get('reason'), 60)}"
+                    if rec.get("verb") in ("go", "drop", "pending") else "")
         lines.append(f"  [{item['n']}] {title[:70]}{'…' if len(title) > 70 else ''}"
-                     f"｜go＝{auth['go_authorizes']}｜不含：{auth['go_excludes']}")
+                     f"｜go＝{auth['go_authorizes']}｜不含：{auth['go_excludes']}{rec_text}")
     if len(items) > PQ2_LIST_LIMIT:
         lines.append(f"  其餘 {len(items) - PQ2_LIST_LIMIT} 筆（`python -m engine_b.todo list`）")
     decisions = [int(i["n"]) for i in items if i.get("type") == "watch_decision"]
     others = [int(i["n"]) for i in items if i.get("type") != "watch_decision"]
-    batch = "批次回覆：`<編號…> go <編號…> drop <編號…> pending`"
-    if others:
-        batch += f"（例：`{others[0]} go`）"
+    decision_note = ""
     if decisions:
         # 批次語法帶不了日期，watch_decision 的 bare go／bare pending 一定被拒（Step 1.7，第 2 輪 N-h）
-        batch += (f"｜watch_decision {', '.join(map(str, decisions))} 在批次裡只能 drop；"
-                  "續等：`python -m engine_b.todo resolve <n> --verb pending --until <日期>`；要研究就在互動 session 說")
-    lines.append("  " + batch)
+        decision_note = (f"watch_decision {', '.join(map(str, decisions))} 在批次裡只能 drop；"
+                         "續等：`python -m engine_b.todo resolve <n> --verb pending --until <日期>`；要研究就在互動 session 說")
+    suggested, missing = recommended_batch(shown)
+    if suggested is None:
+        # 一條建議都沒寫：照舊給範本（使用者自己填）
+        batch = "批次回覆：`<編號…> go <編號…> drop <編號…> pending`"
+        if others:
+            batch += f"（例：`{others[0]} go`）"
+        lines.append("  " + batch + (f"｜{decision_note}" if decision_note else ""))
+        return lines
+    # 2026-10-08 使用者：「待我決定的批次回覆 一樣就要給我單行可複製建議的操作」——最後一行只放那一行指令（AGENTS 收尾摘要）
+    if missing:
+        lines.append(f"  沒寫建議：{'、'.join(f'[{n}]' for n in missing)}——要你自己判斷（不在下面那一行裡）")
+    if decision_note:
+        lines.append("  " + decision_note)
+    lines.append(f"  建議（鑄號時寫的；可直接複製）：`{suggested}`")
     return lines
+
+
+def _short_text(text: Any, limit: int) -> str:
+    one = " ".join(str(text or "").split())
+    return one if len(one) <= limit else one[:limit - 1] + "…"
+
+
+def recommended_batch(items: Sequence[Mapping[str, Any]]) -> tuple[str | None, list[int]]:
+    """編號上寫的建議 → 一行批次指令（`736 737 go 741 drop`）；沒寫建議的編號另列（它們不在那一行裡）。
+
+    watch_decision 只有 drop 進得了批次（go 要引文、pending 要日期）——建議是 go／pending 的歸「沒寫建議」那一列，要人處理。"""
+    groups: dict[str, list[int]] = {"go": [], "drop": [], "pending": []}
+    missing: list[int] = []
+    for item in items:
+        verb = (item.get("recommendation") or {}).get("verb")
+        if verb not in groups or (item.get("type") == "watch_decision" and verb != "drop"):
+            missing.append(int(item["n"]))
+            continue
+        groups[verb].append(int(item["n"]))
+    parts = [f"{' '.join(map(str, ns))} {verb}" for verb, ns in groups.items() if ns]
+    return (" ".join(parts) if parts else None), missing
 
 
 #: 到期處置 kind → 心跳的短標籤。**鍵必須等於 `event_watch.EXPIRY_RESOLUTION_KINDS`**（測試守；L16）。

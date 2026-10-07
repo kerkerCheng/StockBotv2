@@ -1269,3 +1269,27 @@ def test_the_cli_offers_watch_and_the_docs_show_no_trigger_without_until() -> No
         for line in text.splitlines():
             if re.search(r"--verb pending\b.*--trigger", line):
                 assert "--until" in line or "--watch" in line, (rel, line)
+
+
+def test_a_recommendation_is_advice_written_on_the_item_and_never_resolves_it() -> None:
+    """2026-10-08 使用者：「待我決定的批次回覆 一樣就要給我單行可複製建議的操作」——建議由鑄號的 session 寫在編號上（動詞＋理由），
+    心跳與 daily 短版照抄；它不是授權：不 resolve、不改狀態。向你要文件不收建議；再寫一次＝覆蓋，舊的留在 history。"""
+    pool = _pool_with({"type": "manual", "ref_id": "m1", "title": "A"},
+                      {"type": "source_trace_review", "ref_id": "lead_x", "title": "向你要文件：X"})
+    n_manual, n_docs = sorted(i["n"] for i in todo.active_items(pool))
+    todo.recommend(pool, n_manual, "go", reason="  供給側 0 → 1  ")
+    item = todo.get(pool, n_manual)
+    assert item["recommendation"]["verb"] == "go" and item["recommendation"]["reason"] == "供給側 0 → 1"
+    assert not item.get("resolved_at") and not item.get("resolution")
+    todo.recommend(pool, n_manual, "drop", reason="pool 現值已無對應（python -m engine_b.todo list）")
+    assert todo.get(pool, n_manual)["recommendation"]["verb"] == "drop"
+    assert todo.get(pool, n_manual)["history"][-1]["old"]["verb"] == "go"
+    with pytest.raises(todo.TodoError):
+        todo.recommend(pool, n_manual, "maybe", reason="x")
+    with pytest.raises(todo.TodoError):
+        todo.recommend(pool, n_manual, "go", reason="   ")
+    with pytest.raises(todo.TodoError):
+        todo.recommend(pool, n_docs, "go", reason="提供文件才算 go")
+    todo.resolve(pool, n_manual, "drop", reason="x", receipt="authority:user_directive;ref:test")
+    with pytest.raises(todo.TodoError):
+        todo.recommend(pool, n_manual, "go", reason="已結案的不收")

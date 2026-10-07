@@ -23,7 +23,10 @@ Websearch 大事件 TL;DR、幾件事待我決定、健康度等等」。
 """
 from __future__ import annotations
 
-from datetime import date, datetime, timezone
+import json
+import re
+from collections import Counter
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
@@ -145,28 +148,87 @@ def leads_block(*, digest: Mapping[str, Any] | None, todays: Sequence[Mapping[st
     return lines
 
 
+#: 雷達沒收的理由（`engine_b.radar` 收據的 reason 代碼 → 人話；認不得的照印原字）。
+RADAR_REJECT_WORDS: Mapping[str, str] = {
+    "duplicate": "lead 裡已經有這個網址", "over_cap": "超過每日上限", "url_not_in_search": "網址不在這一輪的搜尋結果裡",
+    "invalid": "欄位不合法", "published_unparsed": "發布日讀不出來", "theme_unknown": "題材對不上",
+    "relates_to_unknown": "在盯的條件對不上", "scope_unknown": "層別讀不懂",
+}
+#: 「可能是同一件事」：今天收下的標題與前幾天收下的標題，詞（英文）／兩字組（中日韓）重疊到這個比例就標出來——
+#: 只標「可能」，不判定、不擋（同一件事換了網址會再被收一次：2026-10-08 LG 冷水機合約 10-07 收 PR Newswire、10-08 收 LG 官網）。
+REPEAT_LOOKBACK_DAYS = 3
+REPEAT_TITLE_OVERLAP = 0.5
+_TITLE_STOPWORDS = frozenset({"a", "an", "and", "the", "to", "of", "in", "for", "on", "with", "by", "at", "as", "its", "is"})
+
+
+def _title_tokens(title: Any) -> set[str]:
+    text = str(title or "").lower()
+    words = {w for w in re.findall(r"[a-z0-9]+", text) if w not in _TITLE_STOPWORDS}
+    cjk = re.sub(r"[^぀-ヿ一-鿿]", "", text)
+    return words | {cjk[i:i + 2] for i in range(len(cjk) - 1)}
+
+
+def _possible_repeat(item: Mapping[str, Any], recent: Sequence[Mapping[str, Any]]) -> Mapping[str, Any] | None:
+    mine = _title_tokens(item.get("title"))
+    best, best_ratio = None, 0.0
+    for old in recent:
+        theirs = _title_tokens(old.get("title"))
+        if not mine or not theirs:
+            continue
+        ratio = len(mine & theirs) / len(mine | theirs)
+        if ratio >= REPEAT_TITLE_OVERLAP and ratio > best_ratio:
+            best, best_ratio = old, ratio
+    return best
+
+
+def recent_radar_accepted(heartbeat_dir: Path, today: date, *, days: int = REPEAT_LOOKBACK_DAYS) -> list[dict[str, Any]]:
+    """前幾天雷達收據收下的那幾則（帶收據日期）；讀不到的那天就跳過（只拿來標「可能是同一件事」）。"""
+    out: list[dict[str, Any]] = []
+    for back in range(1, days + 1):
+        day = today - timedelta(days=back)
+        receipt = _read_json(heartbeat_dir / f"radar_{day.isoformat()}.json") or {}
+        out.extend({**item, "_date": day.isoformat()} for item in receipt.get("accepted") or () if isinstance(item, Mapping))
+    return out
+
+
 def events_block(*, digest: Mapping[str, Any] | None, receipt: Mapping[str, Any] | None,
-                 digest_problem: str | None, radar_problem: str | None) -> list[str]:
-    """② 市場大事。標題行是雷達收據的計數；內容是 LLM 的 TL;DR，沒有就退回雷達收下的那幾則（標題＋一句事實）。"""
+                 digest_problem: str | None, radar_problem: str | None,
+                 recent_accepted: Sequence[Mapping[str, Any]] = (),
+                 lead_titles: Mapping[str, str] | None = None) -> list[str]:
+    """② 市場大事：**今天雷達收下的每一則都列**（層別＋雷達寫的一句事實），沒收的附理由，跟前幾天收過的標題很像的標「可能是同一件事」。
+
+    2026-10-08 使用者：「tldr 只有三則，但你說收四則……還是 tldr 就把收的都包含上去？如果沒收但想讓我知道的就再註明」。
+    原本這裡印 LLM 摘要的「市場大事」——最多 3 句、取材是過去 26 小時的所有 lead，所以會漏掉今天收的、又夾進昨天收的。
+    收據不在（雷達沒跑）才退回 LLM 摘要。"""
     summary = (receipt or {}).get("summary") or {}
+    rejected = [r for r in (receipt or {}).get("rejected") or () if isinstance(r, Mapping)]
     if receipt is None:
-        head = f"**② 市場大事**（外部雷達今天沒有收據：{radar_problem or '沒跑'}）"
-    else:
-        head = (f"**② 市場大事**（雷達搜 {summary.get('searches', '?')} 次、收 {summary.get('new', 0)} 則"
-                f"——市場 {summary.get('new_market', 0)}、主題 {summary.get('new_theme', 0)}、在盯 {summary.get('new_watch', 0)}）")
-    lines = [head]
-    bullets = list((digest or {}).get("events") or ())
-    if bullets:
-        lines.extend(f"- {b['text']}" for b in bullets)
+        lines = [f"**② 市場大事**（外部雷達今天沒有收據：{radar_problem or '沒跑'}）"]
+        bullets = list((digest or {}).get("events") or ())
+        if bullets:
+            lines.append("- （改列 LLM 摘要的市場大事——取材是過去 26 小時的 lead，可能含前一天收的）")
+            lines.extend(f"- {b['text']}" for b in bullets)
+        else:
+            lines.append("- 今天沒有收下任何一則")
         return lines
-    accepted = list((receipt or {}).get("accepted") or ())
-    if accepted:
-        lines.append(f"- （{digest_problem or 'LLM 摘要今天沒產生'}——改列雷達收下的原文標題與一句事實）")
-        for item in accepted[:5]:
-            scope = RADAR_SCOPE_WORDS.get(str(item.get("scope")), "主題")
-            lines.append(f"- [{scope}] {_short(item.get('title') or item.get('url'))}——{_short(item.get('fact'), 90)}")
-    else:
+    lines = [f"**② 市場大事**（雷達搜 {summary.get('searches', '?')} 次、收 {summary.get('new', 0)} 則"
+             f"——市場 {summary.get('new_market', 0)}、主題 {summary.get('new_theme', 0)}、在盯 {summary.get('new_watch', 0)}"
+             + (f"；沒收 {len(rejected)} 則" if rejected else "") + "；收下的都進 lead、照常分類）"]
+    accepted = [a for a in (receipt or {}).get("accepted") or () if isinstance(a, Mapping)]
+    for item in accepted:
+        scope = RADAR_SCOPE_WORDS.get(str(item.get("scope")), "主題")
+        line = f"- [{scope}] {_short(item.get('fact') or item.get('title') or item.get('url'), 110)}"
+        repeat = _possible_repeat(item, recent_accepted)
+        if repeat is not None:
+            line += f"（⚠ 可能跟 {str(repeat.get('_date', ''))[5:]} 收過的是同一件事：{_short(repeat.get('title'), 50)}）"
+        lines.append(line)
+    if not accepted:
         lines.append("- 今天沒有收下任何一則")
+    for item in rejected[:5]:
+        why = RADAR_REJECT_WORDS.get(str(item.get("reason")), str(item.get("reason") or "?"))
+        # 「已經有這個網址」那種：印那則既有 lead 的標題（收據只帶網址與 lead id）；讀不到就退回網址
+        known = (lead_titles or {}).get(str(item.get("lead_id") or "")) or ""
+        lines.append(f"- 沒收：{_short(known or item.get('title') or item.get('url'), 80)}——{why}")
     return lines
 
 
@@ -243,11 +305,15 @@ def health_block(*, record: Mapping[str, Any] | None, record_problem: str | None
     """④ 的下半（健康度）：沒問題一行；有問題逐條。被額度擋下的 LLM 步驟併成一行（同一個原因不重複四次）；其他失敗印人話標籤
     與錯誤的最後一行；invariants FAIL、健康紅燈照快照。"""
     problems: list[str] = []
-    folded = {key for entry in quota for key in entry.get("steps") or ()}
+    # 只有真的被擋（rejected）的步驟併進額度那一行。接近上限（allowed_warning）時步驟照跑，它們自己的失敗要照列——
+    # 2026-10-08：T2 輪詢一次呼叫逾時，被併進「額度接近上限……這一輪沒跑」那行，使用者以為是額度出錯，而那些步驟其實都跑了。
+    folded = {key for entry in quota if entry.get("status") == "rejected" for key in entry.get("steps") or ()}
     for entry in quota:
         names = "、".join(LLM_STEP_WORDS.get(k, k) for k in entry.get("steps") or ())
-        problems.append(f"LLM 額度{entry.get('status_words')}：Claude{entry.get('window_words')}額度{entry.get('used_text')}，"
-                        f"{entry.get('reset_text')} 重置——這一輪沒跑：{names}")
+        head = (f"LLM 額度{entry.get('status_words')}：Claude{entry.get('window_words')}額度{entry.get('used_text')}，"
+                f"{entry.get('reset_text')} 重置")
+        problems.append(head + (f"——這一輪沒跑：{names}" if entry.get("status") == "rejected"
+                                else f"——這一輪照跑（{names}）；用完時這些步驟會暫停"))
     if record is None:
         # `_load_run_record` 的理由本身就是完整的一句（「今天沒有 daily 執行紀錄（daily 沒跑…）」／「讀不到」／「格式不對」）
         problems.append(record_problem or "今天沒有 daily 執行紀錄")
@@ -261,8 +327,18 @@ def health_block(*, record: Mapping[str, Any] | None, record_problem: str | None
                 continue
             why = _last_line(row.get("error") or row.get("reason") or row.get("stderr_tail"))
             exit_text = f"exit {row.get('exit')}" if row.get("exit") not in (None, "", 0, "0") else ""
-            detail = "；".join(x for x in (exit_text, _short(why, 90)) if x)
-            problems.append(f"{row.get('label') or row.get('key')}：{row.get('status')}" + (f"（{detail}）" if detail else ""))
+            # 多次呼叫的 LLM 步驟：寫出幾次、各幾次怎樣——任一次失敗整步不寫結果，成功的那幾次也沒套用（daily_task 的跑法）
+            calls = [c for c in row.get("calls") or () if isinstance(c, Mapping)]
+            calls_text = ""
+            if len(calls) > 1:
+                tally = Counter(str(c.get("status")) for c in calls)
+                calls_text = (f"{len(calls)} 次呼叫：" + "、".join(f"{k} {v}" for k, v in tally.items())
+                              + "；任一次沒過整步不寫結果")
+            detail = "；".join(x for x in (exit_text, _short(why, 90), calls_text) if x)
+            skipped = [r.get("label") or r.get("key") for r in steps
+                       if r.get("status") == "skipped" and str(row.get("key")) in str(r.get("reason") or "")]
+            problems.append(f"{row.get('label') or row.get('key')}：{row.get('status')}" + (f"（{detail}）" if detail else "")
+                            + (f"——連帶跳過：{'、'.join(map(str, skipped))}" if skipped else ""))
     for key, label in (("invariants.fail", "invariants FAIL"), ("health.red", "健康紅燈")):
         if snapshot.get(key):
             problems.append(f"{label} {snapshot[key]}")
@@ -363,8 +439,19 @@ def compose_brief(*, now: datetime, summary: str, snapshot: Mapping[str, Any], r
         return ["**④ 狀態與健康度**", *status_lines(record=record, diff_lines=diff_lines, status=status), *health]
 
     blocks.append(guarded("① Lead 抓了什麼", leads_part))
-    blocks.append(guarded("② 市場大事", lambda: events_block(digest=digest, receipt=receipt,
-                                                          digest_problem=digest_problem, radar_problem=radar_problem)))
+    def rejected_titles() -> dict[str, str]:
+        try:
+            from engine_b import leads as leads_mod
+
+            store = leads_mod.load(leads_path) if leads_path else leads_mod.load()
+            ids = {str(r.get("lead_id")) for r in (receipt or {}).get("rejected") or () if isinstance(r, Mapping)}
+            return {lid: str(((store.get("leads") or {}).get(lid) or {}).get("title") or "") for lid in ids}
+        except Exception:  # noqa: BLE001 — 標題讀不到就印網址，不帶走整塊
+            return {}
+
+    blocks.append(guarded("② 市場大事", lambda: events_block(
+        digest=digest, receipt=receipt, digest_problem=digest_problem, radar_problem=radar_problem,
+        recent_accepted=recent_radar_accepted(heartbeat_dir, today), lead_titles=rejected_titles())))
     blocks.append(guarded("③ 待你決定", decisions_part))
     blocks.append(guarded("④ 狀態與健康度", status_part))
     blocks.append(guarded("⑤ 下一次研究要做的", lambda: todo_block(snapshot)))
