@@ -1,0 +1,110 @@
+{
+  "claims": [
+    {
+      "confidence": 0.65,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：Dover／CPC 出售或退出資料中心液冷接頭業務，或 Dover 申報寫明液冷連接器停產。核查頻率：每季（Dover 10-Q 與法說）。觸發後 48 小時：e1 降 confidence 或提撤回，重讀快接頭層供給側。",
+      "id": "dover_cpc_everis_dc_qd_pr_2026_07_22_cl1",
+      "source_ids": [
+        "dover_cpc_everis_dc_qd_pr_2026_07_22_s1",
+        "dover_cpc_everis_dc_qd_pr_2026_07_22_s2",
+        "dover_cpc_everis_dc_qd_pr_2026_07_22_s3",
+        "dover_cpc_everis_dc_qd_pr_2026_07_22_s4"
+      ],
+      "statement": "Dover's own release (2026-07-22): CPC (Colder Products Company), a Dover company, calls itself 'a leading provider of quick disconnect couplings, fittings and connectors for thermal management (liquid cooling of electronics)' with an established 'UQD and LQ connector families' portfolio, and adds full-flow (non-valved) Everis DC fittings that 'can be integrated directly into cold plates or manifolds'. Supplier self-report (L8 weak); no customer named. Context in Dover's SEC filings: 2025 filings name 'thermal connectors used in liquid cooling of data centers' as a growth driver; the 2026 Q1/Q2 10-Qs no longer do.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:liquid_cooling_quick_disconnect",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "dover_cpc_everis_dc_qd_pr_2026_07_22_s1",
+        "dover_cpc_everis_dc_qd_pr_2026_07_22_s2",
+        "dover_cpc_everis_dc_qd_pr_2026_07_22_s3",
+        "dover_cpc_everis_dc_qd_pr_2026_07_22_s4"
+      ],
+      "src_id": "co:dover"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "Dover Corporation",
+        "Colder Products Company"
+      ],
+      "attributes": {
+        "ticker": "DOV"
+      },
+      "confidence": 0.9,
+      "id": "co:dover",
+      "name": "Dover",
+      "source_ids": [
+        "dover_cpc_everis_dc_qd_pr_2026_07_22_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "quick disconnect",
+        "quick disconnects",
+        "UQD",
+        "UQDB",
+        "liquid cooling quick disconnect"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:liquid_cooling_quick_disconnect",
+      "name": "Liquid-cooling quick disconnect (UQD/UQDB)",
+      "source_ids": [
+        "dover_cpc_everis_dc_qd_pr_2026_07_22_s1",
+        "dover_cpc_everis_dc_qd_pr_2026_07_22_s2",
+        "dover_cpc_everis_dc_qd_pr_2026_07_22_s3",
+        "dover_cpc_everis_dc_qd_pr_2026_07_22_s4"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "dover_cpc_everis_dc_qd_pr_2026_07_22",
+    "evidence_tier": 2,
+    "origin_entity": "Dover Corporation",
+    "permission_basis": "發行人公開新聞稿；只保留研究必要的逐字摘錄。published_at 取 PR Newswire datePublished 2026-07-22T16:15:00-04:00。",
+    "published_at": "2026-07-22",
+    "publisher": "PR Newswire（Dover 發布）",
+    "retrieved_at": "2026-10-06",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "CPC Launches Everis DC Full-Flow Connectors for High-Performance AI Cooling（Dover／CPC 新聞稿）",
+    "url": "https://www.prnewswire.com/news-releases/cpc-launches-everis-dc-full-flow-connectors-for-high-performance-ai-cooling-302832498.html"
+  },
+  "sources": [
+    {
+      "id": "dover_cpc_everis_dc_qd_pr_2026_07_22_s1",
+      "locator": "首段",
+      "quote": "CPC (Colder Products Company), part of PSG, a Dover company (NYSE: DOV), and a leading manufacturer of connection technologies used in liquid cooling of electronics, today announced the launch of the Everis® DC Series, a family of full-flow connectors designed to support the increasing thermal demands of artificial intelligence (AI) and high-performance computing infrastructure."
+    },
+    {
+      "id": "dover_cpc_everis_dc_qd_pr_2026_07_22_s2",
+      "locator": "產品組合段",
+      "quote": "Everis DC connectors expand CPC's established portfolio of liquid cooling solutions, including the UQD and LQ connector families."
+    },
+    {
+      "id": "dover_cpc_everis_dc_qd_pr_2026_07_22_s3",
+      "locator": "About CPC",
+      "quote": "CPC (Colder Products Company) is a leading provider of quick disconnect couplings, fittings and connectors for thermal management (liquid cooling of electronics), life sciences, biopharma, industrial and chemical handling markets."
+    },
+    {
+      "id": "dover_cpc_everis_dc_qd_pr_2026_07_22_s4",
+      "locator": "產品段（無閥全流量）",
+      "quote": "Unlike traditional valved connectors, Everis DC Series fittings can be integrated directly into cold plates or manifolds for enhanced space utilization."
+    }
+  ]
+}

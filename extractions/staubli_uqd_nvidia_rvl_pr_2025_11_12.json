@@ -1,0 +1,102 @@
+{
+  "claims": [
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：NVIDIA 或整機廠的一手合格名單公開且不含 Stäubli，或 Stäubli 後續新聞稿不再宣稱 RVL。核查頻率：每季（NVIDIA 技術文與發表會、整機廠產品指南、Stäubli 新聞稿）。觸發後 48 小時：e1 的 qualification_status 改回 null、重讀快接頭層。",
+      "id": "staubli_uqd_nvidia_rvl_pr_2025_11_12_cl1",
+      "source_ids": [
+        "staubli_uqd_nvidia_rvl_pr_2025_11_12_s1",
+        "staubli_uqd_nvidia_rvl_pr_2025_11_12_s2",
+        "staubli_uqd_nvidia_rvl_pr_2025_11_12_s3"
+      ],
+      "statement": "Stäubli's own release (2025-11-12): its 'UQD and UQDB connectors remain approved by NVIDIA and are included in NVIDIA's Recommended Vendor List (RVL)', with a new cleanroom facility in Duncan, South Carolina producing 'multiple connector families, including the UQD'. NVIDIA's RVL is not public, so qualification_status=qualified is the supplier's word (L8 weak); no system builder or end customer named.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {
+        "qualification_status": "qualified"
+      },
+      "confidence": 0.7,
+      "dst_id": "tech:liquid_cooling_quick_disconnect",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "staubli_uqd_nvidia_rvl_pr_2025_11_12_s1",
+        "staubli_uqd_nvidia_rvl_pr_2025_11_12_s2",
+        "staubli_uqd_nvidia_rvl_pr_2025_11_12_s3"
+      ],
+      "src_id": "co:staubli"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "Stäubli",
+        "Staubli"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:staubli",
+      "name": "Stäubli",
+      "source_ids": [
+        "staubli_uqd_nvidia_rvl_pr_2025_11_12_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "quick disconnect",
+        "quick disconnects",
+        "UQD",
+        "UQDB",
+        "liquid cooling quick disconnect"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:liquid_cooling_quick_disconnect",
+      "name": "Liquid-cooling quick disconnect (UQD/UQDB)",
+      "source_ids": [
+        "staubli_uqd_nvidia_rvl_pr_2025_11_12_s1",
+        "staubli_uqd_nvidia_rvl_pr_2025_11_12_s2",
+        "staubli_uqd_nvidia_rvl_pr_2025_11_12_s3"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "staubli_uqd_nvidia_rvl_pr_2025_11_12",
+    "evidence_tier": 2,
+    "origin_entity": "Stäubli",
+    "permission_basis": "供應商公開新聞稿；只保留研究必要的逐字摘錄。published_at 取 PR Newswire datePublished 2025-11-12T09:01:00-05:00。staubli.com 原頁被 Cloudflare 擋，未取得。",
+    "published_at": "2025-11-12",
+    "publisher": "PR Newswire（Stäubli 發布）",
+    "retrieved_at": "2026-10-06",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "Stäubli Expands U.S. Manufacturing and Reinforces Leadership in Liquid Cooling（Stäubli 新聞稿）",
+    "url": "https://www.prnewswire.com/news-releases/staubli-expands-us-manufacturing-and-reinforces-leadership-in-liquid-cooling-302612065.html"
+  },
+  "sources": [
+    {
+      "id": "staubli_uqd_nvidia_rvl_pr_2025_11_12_s1",
+      "locator": "副標",
+      "quote": "First to assemble quick-disconnects in cleanroom environments, Stäubli addresses global demand with localized UQD production and sustained NVIDIA certification."
+    },
+    {
+      "id": "staubli_uqd_nvidia_rvl_pr_2025_11_12_s2",
+      "locator": "Certified performance for the AI ecosystem",
+      "quote": "Stäubli's UQD and UQDB connectors remain approved by NVIDIA and are included in NVIDIA's Recommended Vendor List (RVL), recognizing their compliance with NVIDIA's stringent performance, pressure, and leak-free requirements."
+    },
+    {
+      "id": "staubli_uqd_nvidia_rvl_pr_2025_11_12_s3",
+      "locator": "Meeting demands with localized production",
+      "quote": "Today, the company's new cleanroom facility in Duncan, South Carolina supports North American production for multiple connector families, including the UQD."
+    }
+  ]
+}

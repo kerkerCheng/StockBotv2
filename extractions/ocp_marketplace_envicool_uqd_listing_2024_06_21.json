@@ -1,0 +1,87 @@
+{
+  "claims": [
+    {
+      "confidence": 0.55,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：英維克從 OCP 目錄下架 UQD 產品，或其年報、公告寫明不再做資料中心快接頭。核查頻率：每半年（OCP 目錄重數）＋每年（年報）。觸發後 48 小時：e1 降 confidence 或提撤回。",
+      "id": "ocp_marketplace_envicool_uqd_listing_2024_06_21_cl1",
+      "source_ids": [
+        "ocp_marketplace_envicool_uqd_listing_2024_06_21_s1"
+      ],
+      "statement": "Envicool's OCP Marketplace listing (vendor-submitted, dated 2024-06-21): 'Envicool® UQD series is developed based on OCP UQD specification'; the same vendor also lists a UQDB (blind-mate) product. Vendor-attested conformance only; no customer named, no NVIDIA qualification stated (L8 weak).",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "tech:liquid_cooling_quick_disconnect",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "ocp_marketplace_envicool_uqd_listing_2024_06_21_s1"
+      ],
+      "src_id": "co:envicool"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "Envicool",
+        "英维克",
+        "英維克"
+      ],
+      "attributes": {
+        "ticker": "002837.SZ"
+      },
+      "confidence": 0.9,
+      "id": "co:envicool",
+      "name": "Envicool",
+      "source_ids": [
+        "ocp_marketplace_envicool_uqd_listing_2024_06_21_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "quick disconnect",
+        "quick disconnects",
+        "UQD",
+        "UQDB",
+        "liquid cooling quick disconnect"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:liquid_cooling_quick_disconnect",
+      "name": "Liquid-cooling quick disconnect (UQD/UQDB)",
+      "source_ids": [
+        "ocp_marketplace_envicool_uqd_listing_2024_06_21_s1"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "ocp_marketplace_envicool_uqd_listing_2024_06_21",
+    "evidence_tier": 2,
+    "origin_entity": "Shenzhen Envicool Technology Co., Ltd.",
+    "permission_basis": "OCP 官方目錄上由廠商提交的產品頁；只保留研究必要的逐字摘錄。published_at 取 OCP WordPress REST（/wp-json/wp/v2/marketplace，id 1517）的 date 2024-06-21——上架發布日，不是擷取日。",
+    "published_at": "2024-06-21",
+    "publisher": "Open Compute Project Marketplace",
+    "retrieved_at": "2026-10-06",
+    "source_type": "datasheet",
+    "storage_permission": "repo_excerpt",
+    "title": "Envicool® Universal Quick Disconnect（OCP Marketplace 上架頁）",
+    "url": "https://www.opencompute.org/marketplace/facilities-physical-infrastructure/envicool-universal-quick-disconnect/"
+  },
+  "sources": [
+    {
+      "id": "ocp_marketplace_envicool_uqd_listing_2024_06_21_s1",
+      "locator": "上架頁產品說明",
+      "quote": "Envicool® UQD series is developed based on OCP UQD specification."
+    }
+  ]
+}

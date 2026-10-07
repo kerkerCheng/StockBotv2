@@ -1,0 +1,87 @@
+{
+  "claims": [
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：Parker 從 OCP 目錄下架資料中心 UQD 產品，或 Parker 申報寫明退出資料中心液冷接頭。核查頻率：每半年（OCP 目錄重數）＋每年（Parker 10-K）。觸發後 48 小時：e1 降 confidence 或提撤回，重讀快接頭層供給側。",
+      "id": "ocp_marketplace_parker_uqd_listing_2024_05_15_cl1",
+      "source_ids": [
+        "ocp_marketplace_parker_uqd_listing_2024_05_15_s1"
+      ],
+      "statement": "Parker's OCP Marketplace listing (vendor-submitted, dated 2024-05-15): 'Parker’s Universal Quick Disconnect (UQD) is an OCP Inspired™ product based on the approved OCP UQD specification v1.0', quick disconnect couplers 'for liquid cooling and thermal management applications for servers and supercomputers'. OCP Inspired is vendor-attested conformance, not OCP certification and not NVIDIA qualification; no customer named (L8 weak).",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:liquid_cooling_quick_disconnect",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "ocp_marketplace_parker_uqd_listing_2024_05_15_s1"
+      ],
+      "src_id": "co:parker_hannifin"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "Parker Hannifin",
+        "Parker-Hannifin",
+        "Parker"
+      ],
+      "attributes": {
+        "ticker": "PH"
+      },
+      "confidence": 0.9,
+      "id": "co:parker_hannifin",
+      "name": "Parker Hannifin",
+      "source_ids": [
+        "ocp_marketplace_parker_uqd_listing_2024_05_15_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "quick disconnect",
+        "quick disconnects",
+        "UQD",
+        "UQDB",
+        "liquid cooling quick disconnect"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:liquid_cooling_quick_disconnect",
+      "name": "Liquid-cooling quick disconnect (UQD/UQDB)",
+      "source_ids": [
+        "ocp_marketplace_parker_uqd_listing_2024_05_15_s1"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "ocp_marketplace_parker_uqd_listing_2024_05_15",
+    "evidence_tier": 2,
+    "origin_entity": "Parker-Hannifin Corporation",
+    "permission_basis": "OCP 官方目錄上由廠商提交的產品頁；只保留研究必要的逐字摘錄。published_at 取 OCP WordPress REST（/wp-json/wp/v2/marketplace，id 1514）的 date 2024-05-15——上架發布日，不是擷取日。",
+    "published_at": "2024-05-15",
+    "publisher": "Open Compute Project Marketplace",
+    "retrieved_at": "2026-10-06",
+    "source_type": "datasheet",
+    "storage_permission": "repo_excerpt",
+    "title": "Parker UQD Series – Universal Quick Disconnect Couplings（OCP Marketplace 上架頁）",
+    "url": "https://www.opencompute.org/marketplace/facilities-physical-infrastructure/parker-uqd-series-universal-quick-disconnect-couplings/"
+  },
+  "sources": [
+    {
+      "id": "ocp_marketplace_parker_uqd_listing_2024_05_15_s1",
+      "locator": "上架頁產品說明",
+      "quote": "Quick disconnect, flat face couplers for liquid cooling and thermal management applications for servers and supercomputers. Parker’s Universal Quick Disconnect (UQD) is an OCP Inspired™ product based on the approved OCP UQD specification v1.0."
+    }
+  ]
+}

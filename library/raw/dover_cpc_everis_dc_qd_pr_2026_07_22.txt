@@ -1,0 +1,11 @@
+Source URL: https://www.prnewswire.com/news-releases/cpc-launches-everis-dc-full-flow-connectors-for-high-performance-ai-cooling-302832498.html
+
+Excerpt:
+[EXCERPT — 公開文件之有限逐字引文] CPC Launches Everis DC Full-Flow Connectors for High-Performance AI Cooling（Dover／CPC 新聞稿）
+Source: https://www.prnewswire.com/news-releases/cpc-launches-everis-dc-full-flow-connectors-for-high-performance-ai-cooling-302832498.html
+Published: 2026-07-22 | Origin: Dover Corporation | Retrieved: 2026-10-06
+
+首段："CPC (Colder Products Company), part of PSG, a Dover company (NYSE: DOV), and a leading manufacturer of connection technologies used in liquid cooling of electronics, today announced the launch of the Everis® DC Series, a family of full-flow connectors designed to support the increasing thermal demands of artificial intelligence (AI) and high-performance computing infrastructure."
+產品組合段："Everis DC connectors expand CPC's established portfolio of liquid cooling solutions, including the UQD and LQ connector families."
+About CPC："CPC (Colder Products Company) is a leading provider of quick disconnect couplings, fittings and connectors for thermal management (liquid cooling of electronics), life sciences, biopharma, industrial and chemical handling markets."
+產品段（無閥全流量）："Unlike traditional valved connectors, Everis DC Series fittings can be integrated directly into cold plates or manifolds for enhanced space utilization."
