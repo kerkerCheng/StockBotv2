@@ -81,6 +81,9 @@ def world(monkeypatch: pytest.MonkeyPatch, tmp_path):
     monkeypatch.setattr(sources, "hypotheses", lambda: state["hypotheses"])
     monkeypatch.setattr(sources, "thesis_lifecycle", lifecycle)
     monkeypatch.setattr(sources, "reading_ledgers", ledgers)
+    # 2026-10-07（S4a R2 F9）：層說明 ledger 一樣注入——主樹一有真實層說明，沒注入就會讀到私有資料
+    state.update(layer_note_ledgers={})
+    monkeypatch.setattr(sources, "layer_note_ledgers", lambda: state["layer_note_ledgers"])
     # Phase 3 Step 3.6：敘事（現行 v2 與 ledger）與候選板 artifact 一律注入——不得讀到真實私有資料。
     state.update(briefs=[], brief_ledgers={}, board=None)
     monkeypatch.setattr(sources, "current_briefs", lambda: state["briefs"])
@@ -194,6 +197,33 @@ def test_reading_condition_expired_must_show_up_in_the_node_reread_reasons(world
 
     world["watches"] = [_expired(_reading_watch("ew_r", node=""))]
     assert "沒寫 node" in _findings(checks.check_expiry())
+
+
+def test_layer_claim_expiry_goes_to_the_layer_note_rows_not_the_readings(world) -> None:
+    """2026-10-07 S4a（R2 C2）：層說明主張到期的去處是層說明自己的逐節點「該重讀」清單——不依賴結構讀圖
+    （轉換型節點永遠沒有讀圖；用讀圖判會一直紅、而且指向錯的補法）。"""
+    from alpha.layer_note import layer_note_record, parse_layer_note_record
+
+    node = "transition:pluggable_to_cpo"
+    text = "可插拔轉 CPO 時，外部雷射的需求由每個收發器一顆變成每個交換器共用一組。" * 2
+    note = parse_layer_note_record(layer_note_record({
+        "node": node, "unit": "transition", "title": "可插拔 → CPO", "expires": FUTURE, "reread_reason": "季報後重讀",
+        "sections": {k: {"text": text, "citations": [{"evidence": "inference"}]}
+                     for k in ("physics", "variants", "selection")},
+        "claims": [{"claim": "CPO 讓雷射數量變少而功率變高，磊晶要的是少而強", "condition": READING_COND,
+                    "entities": ["co:coherent"], "check_frequency": "每季", "action_48h": "換版這一份層說明",
+                    "evidence": "inference", "citations": []}]}, created_at=_ago(days=40)))
+    ref = f"layer_note:{note.note_id}#1"
+    world["watches"] = [_expired(_watch("ew_l", kind="semantic_condition", condition=READING_COND, source_ref=ref,
+                                        disproof_ref=ref, node=node))]
+    world["ledgers"] = {}                                    # 沒有任何讀圖——不得因此 FAIL
+    world["layer_note_ledgers"] = {node: {"records": [note], "errors": [], "current": note}}
+    assert checks.check_expiry().status.name == "PASS"
+
+    world["layer_note_ledgers"] = {}                         # 它的層說明不是現行了——到期就沒有去處
+    result = checks.check_expiry()
+    assert result.status.name == "FAIL"
+    assert "層說明主張" in _findings(result) and "換版" in _findings(result) and "讀圖" not in _findings(result)
 
 
 def test_hypothesis_expiry_needs_an_open_watch_decision_or_a_resolution(world) -> None:

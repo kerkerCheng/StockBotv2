@@ -466,6 +466,8 @@ def check_expiry() -> AuditResult:
             readings_note = None
         except SourceUnavailable as exc:
             readings, readings_note = {}, str(exc)
+        layer_note_rows: dict[str, dict] | None = None     # 第一次遇到層說明主張才讀（S4a R2 C2）
+        layer_note_note: str | None = None
         for watch in watches:
             if watch.get("status") != "expired":
                 continue
@@ -495,6 +497,27 @@ def check_expiry() -> AuditResult:
                     findings.append(
                         f"watch {wid}（thesis 反證「{_label(watch)}」）到期超過一天，沒有列進任何未結案 thesis "
                         "複查的 disproof_watch_ids——到期被丟了（A7：重問＝併進那份 thesis 的複查）")
+            elif cls == "reread" and str(watch.get("source_ref") or "").startswith("layer_note:"):
+                # 層說明的主張（2026-10-07 S4a R2 C2）：去處是層說明自己的逐節點「該重讀」清單——不依賴結構讀圖
+                # （轉換型節點永遠沒有讀圖；用讀圖判會一直紅、而且指向錯的補法）。重問＝換版那一份層說明。
+                from alpha.providers.layer_notes import layer_note_reread_rows
+
+                if layer_note_rows is None:
+                    try:
+                        notes = {n: led["current"] for n, led in sources.layer_note_ledgers().items() if led.get("current")}
+                        layer_note_rows = {r["node"]: r for r in layer_note_reread_rows(notes, watches, today=today)}
+                    except SourceUnavailable as exc:
+                        layer_note_rows, layer_note_note = {}, str(exc)
+                if layer_note_note:
+                    unchecked.append(wid)
+                    continue
+                node = str(watch.get("node") or "")
+                row = layer_note_rows.get(node) or {}
+                if not any(ew.condition_label(watch.get("condition")) in reason for reason in row.get("reasons") or ()):
+                    findings.append(
+                        f"watch {wid}（層說明主張「{_label(watch)}」）到期超過一天，節點 {node or '（沒寫 node）'} 的"
+                        "層說明該重讀清單裡沒有它——心跳不會叫你換版（補法：`python -m alpha layer-note <node> --add`，"
+                        "spec 帶 supersedes_id；那一份若已不是現行，舊條件應該在換版時就收掉）")
             elif cls == "reread":
                 if readings_note:
                     unchecked.append(wid)
@@ -731,6 +754,11 @@ def _semantic_source_orphans(watches: list[dict]) -> tuple[list[str], list[str],
     except SourceUnavailable as exc:
         briefs = None
         soft.append(f"⚠ 敘事來源的反證與 wake_brief 未檢查：{exc}")
+    try:
+        layer_notes = sources.layer_note_ledgers()
+    except SourceUnavailable as exc:
+        layer_notes = None
+        soft.append(f"⚠ 層說明來源的主張 watch 未檢查：{exc}")
     brief_by_id = {r.brief_id: (t, r) for t, led in (briefs or {}).items() for r in led["records"]}
     current_brief_ids: set[str] = set()
     for _t, led in (briefs or {}).items():
@@ -858,6 +886,26 @@ def _semantic_source_orphans(watches: list[dict]) -> tuple[list[str], list[str],
             if waiting and getattr(current, "reading_id", None) != reading_id:
                 findings.append(f"watch {wid}（「{label}」）還在等，來源讀圖 {reading_id} 卻不是 {node} 的現行讀圖"
                                 "——重讀後舊條件沒收")
+        elif base.startswith("layer_note:"):
+            # 層說明的主張（2026-10-07 S4a）：與讀圖同一套三問——指得回那一份、第 k 條就是它的條件、還在等的是現行那一份
+            if layer_notes is None:
+                continue
+            examined += 1
+            note_id = base[len("layer_note:"):]
+            node = str(watch.get("node") or "")
+            record = next((r for r in (layer_notes.get(node) or {}).get("records", [])
+                           if r.note_id == note_id), None)
+            if record is None:
+                findings.append(f"watch {wid}（「{label}」）的 disproof_ref 指向層說明 {note_id}，"
+                                f"節點 {node or '（沒寫 node）'} 的 ledger 裡沒有這一份")
+                continue
+            claims = tuple(record.claims or ())
+            if not 1 <= index <= len(claims) or disproof.normalize(claims[index - 1].condition) != text:
+                findings.append(f"watch {wid}（「{label}」）的 disproof_ref={ref} 在層說明的 claims[] 對不到它的條件")
+            current = (layer_notes.get(node) or {}).get("current")
+            if waiting and getattr(current, "note_id", None) != note_id:
+                findings.append(f"watch {wid}（「{label}」）還在等，來源層說明 {note_id} 卻不是 {node} 的現行層說明"
+                                "——換版後舊條件沒收")
     return findings, soft, examined
 
 

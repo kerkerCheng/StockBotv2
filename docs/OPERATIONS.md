@@ -896,6 +896,10 @@ materialize 用**，不動 `discover_tracked_tickers`——那會連帶擴大 ED
 & '.venv\Scripts\python.exe' -m alpha structure-reading tech:cw_dfb_laser --check   # 跟現在的圖比一次並分級（唯讀）
 & '.venv\Scripts\python.exe' -m alpha structure-reading tech:cw_dfb_laser --add spec.json
 & '.venv\Scripts\python.exe' -m webapp materialize --structure-readings   # 算 staleness，心跳第 2 段才看得到
+# 層說明（2026-10-07 個股頁 plan S4a；一個薄層一份、同層每頁共用；寫 registry 前先取 writer lock）
+& '.venv\Scripts\python.exe' -m alpha layer-note mat:inp_epiwafer                    # 列出（標出現行那一份）
+& '.venv\Scripts\python.exe' -m alpha layer-note mat:inp_epiwafer --add spec.json    # 出處核對＋每條主張登記語意 watch（layer_note:<id>#<n>）
+& '.venv\Scripts\python.exe' -m alpha layer-note mat:inp_epiwafer --register-watches # append 之後登記失敗時冪等補登
 ```
 
 ```jsonc

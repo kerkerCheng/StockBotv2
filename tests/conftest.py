@@ -67,6 +67,20 @@ def _isolate_event_watch_registry(tmp_path_factory, monkeypatch):
     return target
 
 
+@pytest.fixture(autouse=True)
+def _isolate_layer_note_ledger(tmp_path_factory, monkeypatch):
+    """把層說明 ledger（2026-10-07 個股頁 S4a）導向空的暫存目錄。
+
+    心跳、audit、反證計數預設都會讀現行層說明；主樹一有真實層說明，沒隔離的測試就會讀到私有資料、
+    計數跟著真資料變（S4a R2 F9）。與上面同一個理由用 autouse：忘記隔離不會有錯誤訊息。
+    """
+    from alpha.providers import layer_notes
+
+    target = tmp_path_factory.mktemp("layer_notes")
+    monkeypatch.setattr(layer_notes, "LAYER_NOTE_DIR", target)
+    return target
+
+
 @pytest.fixture
 def tmp_git_repo(tmp_path: Path) -> Path:
     """Create an isolated Git repository with a deterministic identity."""

@@ -338,6 +338,8 @@ def reread_reasons(node: str, watches: Sequence[Mapping[str, Any]]) -> list[str]
             reasons.append(f"客戶 {','.join(woken.get('shared_entities') or watch.get('entities') or [])}"
                            f" 出了新文件 {woken.get('lead_id')}")
         judgment = watch.get("judgment") or {}
+        # ⚠ 只收讀圖來源：層說明的主張有自己的逐節點清單（`alpha.providers.layer_notes.layer_note_reread_rows`）——
+        # 混進來會撐大「結構讀圖該重讀」、而且重讀讀圖清不掉（2026-10-07 S4a R2 F7）。
         if watch.get("node") != node or not str(watch.get("source_ref") or "").startswith("reading:"):
             continue
         if judgment.get("touches") == "yes" and not judgment.get("handled"):

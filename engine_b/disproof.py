@@ -311,10 +311,12 @@ def after_thesis_review(data: dict[str, Any], watch_ids: Sequence[str], *, n: in
 
 
 def source_is_current(watch: Mapping[str, Any], *, lifecycle: Mapping[str, Any] | None = None,
-                      readings: Mapping[str, Any] | None = None) -> bool:
+                      readings: Mapping[str, Any] | None = None,
+                      layer_notes: Mapping[str, Any] | None = None) -> bool:
     """語意 watch 的來源還是不是現行（NB-4、NB2-1）。讀不到 lifecycle → False（fail closed：不能確認就不放行）。
 
-    thesis 來源：memo 是某個非 retired thesis 的現行 memo。讀圖來源：reading_id 是該節點現行讀圖。其餘（假設型）→ True。"""
+    thesis 來源：memo 是某個非 retired thesis 的現行 memo。讀圖來源：reading_id 是該節點現行讀圖。
+    層說明來源（2026-10-07 S4a）：note_id 是該節點現行層說明。其餘（假設型）→ True。"""
     ref = str(watch.get("source_ref") or "")
     memo = memo_ref(ref)
     if memo is not None:
@@ -327,6 +329,13 @@ def source_is_current(watch: Mapping[str, Any], *, lifecycle: Mapping[str, Any] 
         reading_id = ref[len("reading:"):].split("#", 1)[0]
         readings = current_readings() if readings is None else readings
         return any(getattr(r, "reading_id", None) == reading_id for r in readings.values())
+    if ref.startswith("layer_note:"):
+        note_id = ref[len("layer_note:"):].split("#", 1)[0]
+        if layer_notes is None:
+            from alpha.providers.layer_notes import current_notes
+
+            layer_notes = current_notes()
+        return any(getattr(n, "note_id", None) == note_id for n in layer_notes.values())
     return True
 
 
@@ -432,7 +441,8 @@ def condition_key(watch: Mapping[str, Any]) -> tuple[str, str]:
 def disproof_counts(watches: Sequence[Mapping[str, Any]], *, lifecycle: Mapping[str, Any] | None = None,
                     readings: Mapping[str, Any] | None = None, coverage: frozenset[str] | None = None,
                     frozen_history: int | None = None, root: Path = ROOT,
-                    briefs: Sequence[Any] | None = None) -> dict[str, Any]:
+                    briefs: Sequence[Any] | None = None,
+                    layer_notes: Mapping[str, Any] | None = None) -> dict[str, Any]:
     """心跳段 2 與 audit 共用。以條件為單位（見模組 docstring）；`coverage` 沒給 → 叫不醒記 None。
 
     `briefs`（Phase 3 Step 3.4）：各檔**現行的 v2 敘事**。它們自己新登的反證（`brief:<id>#n`）算進預期；
@@ -482,6 +492,11 @@ def disproof_counts(watches: Sequence[Mapping[str, Any]], *, lifecycle: Mapping[
                 expected[(f"reading:{reading.reading_id}", normalize(getattr(entry, "condition", "")))] = where
         else:
             v1_prose += 1
+    # 層說明的主張（2026-10-07 S4a）：與讀圖同一個慣例——呼叫端明確傳入現行的（`current_layer_notes()`）；
+    # 沒傳就是沒算（測試不會因為日後真 ledger 有紀錄而變動）。不放進預期，它的 watch 會在這裡被當成「不在預期」而整類跳過（INV-3）。
+    for node, note in (layer_notes or {}).items():
+        for claim in tuple(getattr(note, "claims", ()) or ()):
+            expected[(f"layer_note:{note.note_id}", normalize(getattr(claim, "condition", "")))] = f"{node} 層說明重讀"
     state: dict[tuple[str, str], tuple[str, Mapping[str, Any]]] = {}
     orphan_touched = 0
     for watch in watches:
@@ -707,6 +722,13 @@ def current_readings() -> dict[tuple[str, str], Any]:
     return out
 
 
+def current_layer_notes() -> dict[str, Any]:
+    """各節點現行的層說明（讀 ledger；經 alpha.providers；2026-10-07 S4a）。"""
+    from alpha.providers.layer_notes import current_notes
+
+    return current_notes()
+
+
 def frozen_history_count() -> int | None:
     """舊店（凍結唯讀）每家最新一份 coverage assessment 裡寫了反證的家數——**不盯**，只印數。"""
     try:
@@ -724,7 +746,7 @@ def frozen_history_count() -> int | None:
 
 
 __all__ = ["CONFIRM", "CONFIRM_STATES", "DOWNSIDE_SOURCES", "DOWNSIDE_STATES", "after_thesis_review", "condition_key",
-           "confirm_counts", "confirm_line", "confirm_rows", "confirm_state", "current_readings",
+           "confirm_counts", "confirm_line", "confirm_rows", "confirm_state", "current_layer_notes", "current_readings",
            "disproof_counts", "downside_rows", "frozen_history_count", "load_lifecycle",
            "memo_ref", "normalize", "reconcile_thesis_disproof", "review_horizon", "source_is_current",
            "watch_category"]

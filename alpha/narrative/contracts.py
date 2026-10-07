@@ -306,6 +306,8 @@ ACK_DISPOSITIONS: tuple[str, ...] = ("still_holds", "thesis_changed", "retired",
 RIDE_UNITS: tuple[str, ...] = ("layer", "socket")
 #: 反證的 `source`：自己寫的（self）、thesis 的 claim／memo 條目、或讀圖 id——**指得回原文**（L18）。
 DISPROOF_SOURCE_PREFIXES: tuple[str, ...] = ("self", "thesis:", "claim:", "sr_")
+#: 反證可以連結（`link_source_ref`）的既有 watch 來源鍵：thesis 條目、讀圖反證、層說明主張（2026-10-07 S4a 加）。
+LINKABLE_SOURCE_PREFIXES: tuple[str, ...] = ("thesis:", "reading:", "layer_note:")
 
 
 def _iso_day(value: Any, label: str) -> date:
@@ -356,9 +358,11 @@ class NarrativeDisproof:
             raise ContractViolation("disproof[].expires 必須是日期")
         if not str(self.source).startswith(DISPROOF_SOURCE_PREFIXES):
             raise ContractViolation(f"disproof[].source 必須是 {DISPROOF_SOURCE_PREFIXES} 之一開頭（指得回原文，L18）")
-        if self.link_source_ref is not None and not str(self.link_source_ref).startswith(("thesis:", "reading:")) \
+        # 2026-10-07（S4a）：層說明的主張也能被連結——敘事的反證與層的主張同一條件時，連結既有 watch、不重登
+        if self.link_source_ref is not None and not str(self.link_source_ref).startswith(LINKABLE_SOURCE_PREFIXES) \
                 or (self.link_source_ref is not None and "#" not in str(self.link_source_ref)):
-            raise ContractViolation("disproof[].link_source_ref 必須是既有 watch 的來源鍵（thesis:…#n 或 reading:…#n）")
+            raise ContractViolation(
+                "disproof[].link_source_ref 必須是既有 watch 的來源鍵（thesis:…#n、reading:…#n 或 layer_note:…#n）")
 
     def as_dict(self) -> dict[str, Any]:
         return {"condition": self.condition, "check_frequency": self.check_frequency, "action_48h": self.action_48h,
