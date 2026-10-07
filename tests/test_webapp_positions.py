@@ -260,16 +260,29 @@ def test_meta_declares_positions(client) -> None:
     assert "GET /api/v1/positions" in client.get("/api/v1/meta").json()["endpoints"]
 
 
+def _js_function(source: str, name: str) -> str:
+    block = source.split(f"function {name}(", 1)[1]
+    return re.split(r"\n(?:async )?function ", block, maxsplit=1)[0]
+
+
 def test_frontend_puts_sample_validity_before_the_numbers() -> None:
-    """排版順序本身是判準：真實部位 → 樣本效度 → 計數器 → 聚合 → 逐檔。"""
+    """排版順序本身是判準：每條線先印樣本數與量測起始日，再印報酬；power-law 三量跟著每條線走（AGENTS 追蹤表必印）。
+
+    2026-10-07 使用者（「舊店…連你都不會看就也沒必要給我看了…不是收起來 是拿掉」）：舊店 ①–⑤ 與 history 線不再印。"""
     source = (ROOT / "webapp" / "static" / "app.js").read_text(encoding="utf-8")
     assert "function renderPositions" in source
-    block = source.split("async function renderPositions", 1)[1]
-    block = re.split(r"\\n(?:async )?function ", block, maxsplit=1)[0]
-    validity = block.index("這批數字能證明什麼")
-    aggregate = block.index("推薦籃子整體")
-    assert validity < aggregate, "樣本效度必須排在聚合數字之前"
+    # 只看程式碼、不看註解（拿掉的理由寫在註解裡，提到舊名字是紀錄不是畫面）
+    page = "\n".join(line for line in _js_function(source, "renderPositions").splitlines()
+                     if not line.strip().startswith("//"))
+    for retired in ("這批數字能證明什麼", "推薦籃子整體", "賭注收斂", "old-store", "舊店的真實成交紀錄"):
+        assert retired not in page, retired
+    assert "const LANE_ORDER = ['live', 'paper'];" in source            # history 線不印
+    summary = _js_function(source, "laneSummaryText")
+    assert summary.index("算得出報酬") < summary.index("等權"), "樣本數必須排在報酬之前"
+    power = _js_function(source, "lanePowerLawText")
+    for field in ("basket_total_return", "top_contributor", "rest_contribution", "maturity", "分母還沒出現"):
+        assert field in power, field
     for token in ("該買", "建議買", "績效", ".sort("):
-        assert token not in block, token
+        assert token not in page and token not in power, token
     html = (ROOT / "webapp" / "static" / "index.html").read_text(encoding="utf-8")
     assert 'href="#/positions"' in html

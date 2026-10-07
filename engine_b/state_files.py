@@ -72,6 +72,20 @@ def validate_state_files(root: Path | str) -> list[dict[str, Any]]:
     return result
 
 
+def raw_evidence_ref(value: str) -> str | None:
+    """一個字串若是 `library/raw/` 引用，回傳正規化後的路徑；不是就回 None；**不是單一安全路徑**就 raise。
+
+    備份端（`raw_evidence_refs`）與寫入端（`engine_b.lead_refs.validate_ref_updates`）共用這一條（L16、L17-3）。
+    事發 2026-10-07：一筆 lead 的 `trace_attempts_ref` 寫成「`library/raw/…txt`（說明）、…」——寫入時照收，
+    當天 daily 的備份才 fail closed（備份本身是對的：它分不出這是說明還是路徑注入）。"""
+    ref = value.strip().replace("\\", "/")
+    if not ref.startswith(EVIDENCE_PREFIX):
+        return None
+    if len(ref.split()) != 1 or ".." in ref or ref.endswith("/"):
+        raise StateFileError(f"不安全的 raw evidence 引用：{ref}")
+    return ref
+
+
 def raw_evidence_refs(payload: dict[str, Any]) -> tuple[str, ...]:
     """從 pending leads payload 推導合法的 raw provenance 路徑集合。"""
     found: set[str] = set()
@@ -84,12 +98,9 @@ def raw_evidence_refs(payload: dict[str, Any]) -> tuple[str, ...]:
             for value in node:
                 walk(value)
         elif isinstance(node, str):
-            ref = node.strip().replace("\\", "/")
-            if not ref.startswith(EVIDENCE_PREFIX):
-                return
-            if len(ref.split()) != 1 or ".." in ref or ref.endswith("/"):
-                raise StateFileError(f"不安全的 raw evidence 引用：{ref}")
-            found.add(ref)
+            ref = raw_evidence_ref(node)
+            if ref is not None:
+                found.add(ref)
 
     walk(payload.get("leads") or {})
     return tuple(sorted(found))

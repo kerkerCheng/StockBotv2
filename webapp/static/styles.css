@@ -439,7 +439,8 @@ table.rank.compare td:first-child { color: var(--muted); }
 .table-filter select { flex: 0 1 260px; }
 .table-filter-count { flex-basis: 100%; }
 .node-name { font-weight: 600; }
-ul.no-narrative { columns: 3 12rem; }
+/* 共用頁尾一行（2026-10-07：authority／digest／「不是什麼」不再印）。 */
+.state-footer { margin: 18px 0 8px; }
 
 /* ---------- 層說明閱讀頁（個股頁 plan S4b）：純文字、照原文一行一行印——版面與示意圖在 S5 ---------- */
 .plain-text { font-size: 14px; line-height: 1.6; }
@@ -470,9 +471,6 @@ table.pt-table th, table.pt-table td { vertical-align: top; overflow-wrap: anywh
 /* 導覽（2026-10-07 使用者回饋：手機上「候選板」直排成三行）：每個入口不斷字、放不下就換到下一列。 */
 .nav { flex-wrap: wrap; gap: 6px 14px; }
 .nav a { white-space: nowrap; }
-/* 追蹤表最下面的舊店區塊（預設摺起來）。 */
-details.old-store { margin-top: 16px; }
-details.old-store > summary { cursor: pointer; color: var(--muted); font-size: 13px; padding: 8px 0; }
 /* 層說明正文（2026-10-07 第一輪排版）：行內出處淡化、段與段之間留白。 */
 .cite-inline { color: var(--dim); font-size: 11.5px; }
 .cite-inline code { font-size: 11px; }

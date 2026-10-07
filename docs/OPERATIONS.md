@@ -56,6 +56,8 @@ Get-Content library\private\heartbeat\daily_run_<YYYY-MM-DD>.json    # 每步 st
 | ⑯ Drive 上傳失敗（`auth_expired`／`delivery_failed`） | 段 1「失敗 1：16_backup」＋備份行 ⚠「Drive <狀態>（最後成功上傳：N 天前）」；本機那份照留、⑯b 照驗。修好後 `python scripts\backup_private.py upload` 補傳（token 過期先 `auth`） |
 | T2 輪詢（⑩d–⑩g）沒跑完或一直「沒真的查」 | 段 3「T2 輪詢：本輪沒跑完（<步驟> <狀態>：<理由>）」或拒收裡「沒真的查 N」；有該查的、卻超過 `min_recheck_days` 沒有任何一次輪詢時整行 ⚠＋摘要行「T2 輪詢 N 天沒跑」。回滾：`config/event_watch.json` 的 `sweep_budget_per_run` 調 0（或 `llm.executor=none` 連同其他 LLM 步驟一起停） |
 | T2 命中掛著沒人判定 | 段 3「**命中待檢 N**（最老 D 天）」；超過兩週 `audit invariants` 的 QueueLiveness 亮紅。判定：`python -m engine_b.watch_poll queue` → `judge` |
+| ⑪c 每日摘要沒產生（額度、timeout、全部句子被拒） | 短版 ①②「（LLM 摘要今天沒產生（<步驟> <狀態>）——改列…）」：① 退回分流判 go 的標題、② 退回雷達收據的原文標題與一句事實；④ 健康度把被額度擋下的 LLM 步驟併成一行並印重置時間。只停摘要：`config/daily_routine.json` 的 `max_llm_calls.digest` 調 0 |
+| ⑯ 備份 fail closed「不安全的 raw evidence 引用」 | 某筆 lead 的 ref 以 `library/raw/` 開頭卻不是單一路徑（2026-10-07 事發：`trace_attempts_ref` 寫成「路徑＋說明」）。持鎖用 `python -m engine_b.cli annotate <lead> --ref "<key>=已查：library/raw/…"` 改正後 `python scripts\backup_private.py run`；寫入端 10-07 起當場拒收同型 |
 | 開跑時工作區不乾淨 | 段 1 ⚠ 列出路徑（照跑） |
 | 保險檢查觸發（LLM 步驟前後指紋變了） | **沒有心跳也沒有 Discord**（心跳會 import 被改的檔）；開 session 時 `crons/routine_hint.py` 第一句說出來 |
 | daily 根本沒跑 | 開 session 時 `crons/routine_hint.py`：「今天沒有 daily 執行紀錄」 |
@@ -81,7 +83,14 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 & '.venv\Scripts\python.exe' crons\heartbeat.py                    # Markdown 到 stdout
 & '.venv\Scripts\python.exe' crons\heartbeat.py --format json      # 機器可讀
 & '.venv\Scripts\python.exe' crons\heartbeat.py --out .\hb.md       # 寫 UTF-8 檔，交給既有 publisher
+& '.venv\Scripts\python.exe' crons\heartbeat.py --out .\hb.md --brief-out .\brief.md   # 另寫 Discord 短版
 ```
+
+**Discord 送的是短版**（2026-10-07 使用者：「心跳太雜」；`crons/daily_brief.py`）：① lead 抓了什麼 ② 市場大事
+（這兩塊是 ⑪c 的 TL;DR，沒產生就退回程式組的來源計數與雷達收據原文）③ 待你決定 ④ 狀態與健康度（**每天都印**：daily 步數、
+較昨變動、候選各格與最老滯留、watch 今日、反證與加碼條件、無到期的等待、新點名；同日使用者：「基本重要的 status 還是要印」）
+⑤ 下一次研究（未 triage／未檢／待深挖…，0 也印）。數字與心跳同一份快照、同一批函式；每一塊、④ 的每一行各自降級。
+完整五段照樣寫 `heartbeat_<日期>.md`（互動 session 說「daily brief」讀它），APP「每日」頁照抄短版。
 
 它**只讀**本機 authority（`pending_leads.json`／`todo_pool.json`／`event_watches.json`／
 `thesis/lifecycle.json`）、`webapp` 已 materialize 的 state artifact 與 daily 的執行紀錄，**不寫任何 authority、不連外、
@@ -104,6 +113,16 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 ~~無人值守進入點 `crons/heartbeat_task.py`＋工作 `StockBotv2-Heartbeat`（07:00）~~——2026-09-24 Phase 1 Step 1.2a 起由
 `StockBotv2-Daily` 的 ⑱⑲ 取代（1.2a 停用、2026-09-25 1.2b 刪除）；它們的理由（LLM 失敗心跳照發、永遠 exit 0、Python 不用 `.cmd`、
 發送走 subprocess）搬進 `crons/daily_task.py` 的 docstring，守它們的測試改主詞搬進 `tests/test_daily_task.py`「無人值守入口」節。
+
+### Sandbox impact review 結論（2026-10-07：Discord 改送短版；daily ⑪b–⑪e 每日摘要；①c 雷達加市場層；⑱b APP「每日」頁；lead ref 寫入端擋 raw 引用）
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | 使用者 10-07 指示（「心跳太雜」「Websearch 大事件 TL;DR……不能見樹不見林」「心跳沒有不能跑 LLM，必要就跑」）。①c 雷達：同一支 `claude -p`、同一組 `radar_argv`（只多開 WebSearch），prompt 多一個市場層工作（`config/daily_routine.json` 的 `radar.market_topics` 四個題目、各一次搜尋、7 天內最重要的一則；`max_market_items` 3），收據每列多 `scope`（market／theme／watch，schema 必填），lead refs 多 `radar_scope`（`config/lead_ref_keys.json` 登記）；prompt 寫搜尋上限 12 次（軟上限，10-07 試跑實際 14 次）、timeout 12 分。⑪b `python -m engine_b.digest prepare`：只讀 lead registry（近 26 小時、**外部來源**的 lead：標題、摘錄、來源；我們自己登記的研究題只計數不送）與當天雷達收據，只寫 `library/private/heartbeat/digest_batch_<日期>.json`；沒東西就給空批次、⑪c 不呼叫模型。⑪c `claude -p`：**零工具**（`llm_argv`，與分類、預篩同一組），一次呼叫，寫 `digest_proposals_<日期>.json`。⑪d 保險檢查。⑪e `python -m engine_b.digest apply`：逐句驗證（`lead_ids` 只能是批次裡的 id、每句 ≤160 字、每段上限 leads 4／events 3；指不回去的整句丟、照數；簡體疑似另計），只寫 `digest_<日期>.json`——**不寫任何 authority**。⑱ 心跳多 `--brief-out`：組短版（`crons/daily_brief.py`；同一份快照、同一批函式，零 LLM、零網路），寫 `brief_<日期>.md`。⑱b `python -m webapp materialize --daily`：只寫 `library/private/app/state/daily.json`（derived cache，不取鎖）。⑲ 改帶 `--brief-file brief_<日期>.md`（同一支 publisher、同一個 webhook）。APP 新 kind `daily`（唯讀 GET `/api/v1/daily`），request path 四條證明照守。另兩件互動側：`engine_b.lead_refs.validate_ref_updates` 當場拒收「以 `library/raw/` 開頭卻不是單一路徑」的 ref（與備份同一條判斷 `state_files.raw_evidence_ref`）；`engine_b.leads.parked_without_expiry` 多讀 todo pool（唯讀；pq2 以 `ref_id` 指回來＝有機制會回來）。總時限 354 ≤ 360。 |
+| **2 canonical skill／prompt／本檔** | `crons/digest_prompt.md`、`crons/digest_schema.json`（新）；`crons/radar_prompt.md`、`crons/radar_schema.json`；`config/daily_routine.json`（`radar.market_topics`／`max_market_items`／`_doc_market`、`llm.digest_timeout_minutes`）；AGENTS「等待與心跳」三條與「APP」一條（使用者原話）；本節、「Daily」失敗長相表、「心跳」節；`docs/ARCHITECTURE.md` §4.1；`skills/daily-brief/SKILL.md` 檔頭。 |
+| **3 最窄 rule** | `.codex/rules` 仍是 0 條。新的 LLM 步驟用零工具那一組 argv（沒有 WebSearch、沒有檔案工具）；雷達的放行沒變。回滾：`llm.executor=none`（LLM 步驟一起停；短版照發，①② 退回程式組的內容）；只停摘要：`max_llm_calls.digest` 調 0；只停市場層：`radar.market_topics` 清空。 |
+| **4 contract test** | `tests/test_daily_task.py`（逐項相等：⑪b–⑪e、⑱／⑲ argv、⑱b；LLM 步驟五個、加總 ≤ 時限）；`tests/test_daily_digest.py`（只送外部來源、隱私哨兵、指不回去整句丟、超長／超量照數、空批次不呼叫、短版五塊各自降級、④ 每天印且每行各自降級、未 triage／未檢 0 也印、額度重置印排程時區）；`tests/test_radar.py`（scope、市場層上限、未知 scope 照數）；`tests/test_webapp_request_path.py`（daily 路由）；`tests/test_lead_ref_registry.py`（raw 引用寫入端；變異：拿掉檢查 → 2 紅）；`tests/test_engine_b_leads.py`（pq2 指回來算有機制、待辦池讀不到多報不少報）。 |
+| **5 端到端 smoke** | 2026-10-07 `scripts/trial_daily_brief.py` 三輪（真資料、真 `claude -p`；只寫 `--out` 暫存目錄與 registry 副本）：第一輪摘要把我們自己的研究題也摘進去、加了原文沒有的評價 → 只送外部來源、prompt 禁加評價；第二輪出現簡體 → prompt 第 0 條＋簡體計數；第三輪 7 句全收（簡體疑似 0、拒收 0），市場層 1 則（台積電產能）、主題 4 則（測試瓶頸、台灣 AI 需求…）。心跳以真資料產短版：④ 每一格都印出來（候選各格、watch 今日醒 2、反證在盯 107、無到期的等待、新點名）。同日修掉兩個實跑暴露的問題：備份 fail closed（一筆 lead 的 `trace_attempts_ref` 寫成路徑＋散文；改正後補跑 `backup_private.py run`＋`verify-restore` 通過）、「無到期的等待 3」其實是 pq2 [716][720][722] 在等你給文件（計數器補對稱面後 0）。⚠ 端到端驗收是 10-08 05:30 真正的排程觸發（L13-1）。 |
 
 ### Sandbox impact review 結論（2026-10-06：daily ⑩d–⑩g T2 輪詢；總時限 240 → 360；LLM 步驟每次呼叫重算 deadline、加總照實算）
 

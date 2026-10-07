@@ -213,6 +213,18 @@ DAILY_STEPS: tuple[DailyStep, ...] = (
               3, True, False, kind="apply", requires="10e_poll_propose"),
     DailyStep("11_standing_go", "常規授權（封閉清單）",
               ("-m", "engine_b.todo", "standing-go", "--run"), 5, True, False),
+    # ⑪b–⑪e 每日摘要（2026-10-07 使用者指示：「Lead 抓了哪些 TL;DR、Websearch 大事件 TL;DR」）：LLM 只寫兩段 TL;DR，
+    # 每句都要指得回今天的 lead；⑪e 由程式驗證後寫 digest_<日期>.json（只寫 library/private/heartbeat，不取鎖）。
+    # 待你決定、健康度、todo 不經 LLM，⑱ 心跳用程式組。LLM 失敗時沒有摘要檔，心跳照發並說「今天沒產生」。
+    DailyStep("11b_digest_prepare", "每日摘要：組今天的 lead 與雷達收下的新聞（不讀持股）",
+              ("-m", "engine_b.digest", "prepare", "--run-id", "{run_id}", "--out", "{digest_batch}"), 2, False, False),
+    DailyStep("11c_digest_propose", "每日摘要提議（claude -p 零工具、只回 JSON）",
+              (), 5, False, True, kind="llm", requires="11b_digest_prepare", llm_task="digest"),
+    DailyStep("11d_integrity_after_digest", "保險檢查（LLM 步驟前後指紋）",
+              (), 1, False, False, kind="integrity", essential=True),
+    DailyStep("11e_digest_apply", "每日摘要套用（程式驗每句引用的 lead id 都在今天的資料裡）",
+              ("-m", "engine_b.digest", "apply", "--file", "{digest_result}", "--batch", "{digest_batch}",
+               "--run-id", "{run_id}"), 2, False, False, kind="apply", requires="11c_digest_propose"),
     DailyStep("12_fiscal_year_backfill", "XBRL 基期補值（mechanical 欄位）",
               ("scripts/backfill_fiscal_year_results.py", "--write"), 10, True, True),
     # `--layer-notes`（2026-10-07 個股頁 plan S4b）：層說明閱讀頁，**只讀** ledger——寫層說明只在互動 session
@@ -238,11 +250,17 @@ DAILY_STEPS: tuple[DailyStep, ...] = (
     DailyStep("17_finalize", "收尾（驗 state、釋放鎖、收工標記）",
               ("scripts/finalize_daily_state.py",), 2, True, False, essential=True),
     # ⑱ 同時寫 Discord 摘要行與今天的快照（Phase 1 Step 1.8）：兩者都在 library/private/heartbeat/，derived、不是 authority。
-    DailyStep("18_heartbeat", "組心跳（零 LLM、零網路）",
-              ("-m", "crons.heartbeat", "--out", "{brief}", "--summary-out", "{summary_file}", "--write-snapshot"),
+    DailyStep("18_heartbeat", "組心跳（計數器零 LLM、零網路）＋ Discord 短版",
+              ("-m", "crons.heartbeat", "--out", "{brief}", "--summary-out", "{summary_file}", "--write-snapshot",
+               "--brief-out", "{short_brief}"),
               3, False, False, kind="heartbeat", essential=True),
-    DailyStep("19_publish", "發送 Discord",
-              ("scripts/publish_daily_brief.py", "--brief-file", "{brief}", "--summary", "{summary}"),
+    # ⑱b「每日」頁（2026-10-07）：短版照抄進 APP，排在 ⑲ 之前（手機上 Discord 切段時，APP 那一頁是同一則的完整版）。
+    # 完整心跳五段不進 APP（同日使用者：「不需要給我看的…拿掉」）——它留在 heartbeat 目錄給互動 session 查細節。
+    # 只寫 library/private/app/state 的 derived cache（不取鎖）；失敗不擋 ⑲（APP 那一頁會顯示舊的、標 stale）。
+    DailyStep("18b_materialize_daily", "APP「每日」頁（照抄短版）",
+              ("-m", "webapp", "materialize", "--daily"), 2, False, False, essential=True),
+    DailyStep("19_publish", "發送 Discord（短版：lead／市場大事／待你決定／狀態與健康度／下一次研究）",
+              ("scripts/publish_daily_brief.py", "--brief-file", "{short_brief}", "--summary", "{summary}"),
               3, False, True, kind="publish", essential=True),
 )
 
@@ -269,7 +287,7 @@ def max_llm_calls(step: DailyStep, llm: Mapping[str, Any] | None) -> int:
     """LLM 步驟最多會分成幾次呼叫＝ceil(每日上限 ÷ 每次幾筆)。上限各住自己的 SSOT（triage：`triage.daily_limit`；
     預篩：`semantic_screen_daily_limit`；T2：`sweep_budget_per_run`——後兩者在 config/event_watch.json）；雷達一輪一次。
     ⚠ 2026-10-06 R2 條件 2：原本加總只算一次呼叫，帳面 245／300 的餘裕在真的分多批的日子並不存在。"""
-    if step.kind != "llm" or llm is None or step.llm_task in (None, "radar"):
+    if step.kind != "llm" or llm is None or step.llm_task in (None, "radar", "digest"):
         return 1
     if step.llm_task == "triage":
         from engine_b.routine_config import triage_daily_limit
@@ -400,6 +418,8 @@ class DailyRun:
             "date": self.date,
             "run_id": self.run_id,
             "brief": str(self.brief_path),
+            # Discord 那一則（2026-10-07 使用者指示：心跳太雜）：⑱ 寫、⑱b 照抄進 APP「每日」頁、⑲ 發
+            "short_brief": str(self.out_dir / f"brief_{self.date}.md"),
             # ⑲ 的 --summary：⑱ 寫出的摘要行（`Daily <日期>｜球在你 N`＋紅旗）；⑱ 沒寫出來就退回固定字串
             "summary": self._summary_text(),
             "summary_file": str(self.out_dir / f"heartbeat_{self.date}.summary.txt"),
@@ -411,6 +431,8 @@ class DailyRun:
             "radar_result": str(self.out_dir / f"radar_proposals_{self.date}.json"),
             "poll_batch": str(self.out_dir / f"watch_poll_batch_{self.date}.json"),
             "poll_result": str(self.out_dir / f"watch_poll_proposals_{self.date}.json"),
+            "digest_batch": str(self.out_dir / f"digest_batch_{self.date}.json"),
+            "digest_result": str(self.out_dir / f"digest_proposals_{self.date}.json"),
         }
 
     def _expand(self, argv: Sequence[str]) -> list[str]:
@@ -731,6 +753,12 @@ class DailyRun:
                     "batch_key": "items", "out_key": "flags", "schema": llm_step.PRESCREEN_SCHEMA,
                     "compose": llm_step.compose_prescreen_prompt,
                     "chunk": int(self.llm["prescreen_chunk_size"]),
+                    "stamp": lambda item, session: {**item, "session_id": session}}
+        if task == "digest":
+            # 每日摘要（2026-10-07 使用者指示）：零工具、一輪一次——與 triage／預篩同一組 argv 與能力檢查
+            return {"batch": Path(paths["digest_batch"]), "result": Path(paths["digest_result"]),
+                    "batch_key": "requests", "out_key": "bullets", "schema": llm_step.DIGEST_SCHEMA,
+                    "compose": llm_step.compose_digest_prompt, "chunk": 1,
                     "stamp": lambda item, session: {**item, "session_id": session}}
         raise ValueError(f"未知 LLM 任務：{task}")
 

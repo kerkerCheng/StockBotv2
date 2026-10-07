@@ -85,3 +85,27 @@ def test_registry_rejects_duplicate_or_unknown_value_type() -> None:
                 },
             }
         )
+
+
+def test_a_raw_evidence_ref_must_be_a_single_path_at_write_time() -> None:
+    """2026-10-07 事發：`trace_attempts_ref` 寫成「library/raw/…txt（說明）、…」——寫入時照收，當天 daily 的備份才
+    fail closed（備份分不出說明與路徑注入）。寫入端與備份端同一條判斷（`state_files.raw_evidence_ref`）：
+    以 library/raw/ 開頭就必須是單一安全路徑；說明寫在前面（「已查：…」）或另放就照收。"""
+    with pytest.raises(LeadRefError, match="單一路徑"):
+        validate_ref_updates({"trace_attempts_ref": "library/raw/aaoi_8_k_20260821.txt（ATM 6 億美元）、aaoi_8_k_20260910.txt"})
+    with pytest.raises(LeadRefError, match="單一路徑"):
+        validate_ref_updates({"trace_trigger_entities": ["AAOI", "library/raw/../secrets.txt"]})
+    assert validate_ref_updates({"trace_attempts_ref": "library/raw/aaoi_8_k_20260821.txt"}) == {
+        "trace_attempts_ref": "library/raw/aaoi_8_k_20260821.txt"}
+    prose = "已查：library/raw/aaoi_8_k_20260821.txt（ATM 6 億美元）、aaoi_8_k_20260910.txt（購地）"
+    assert validate_ref_updates({"trace_attempts_ref": prose}) == {"trace_attempts_ref": prose}
+
+
+def test_advance_with_an_unsafe_raw_ref_leaves_the_lead_untouched() -> None:
+    store = leads.empty_store()
+    lead_id, _ = leads.register(store, source="test", url="https://example.com/lead")
+    leads.triage(store, lead_id, go=True, tier=3, reason="test")
+    with pytest.raises(LeadRefError):
+        leads.advance(store, lead_id, "parked", ref={"trace_attempts_ref": "library/raw/a.txt 另見 b.txt"})
+    assert store["leads"][lead_id]["status"] == "triaged_go"
+    assert store["leads"][lead_id]["refs"] == {}

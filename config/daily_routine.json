@@ -46,7 +46,8 @@
     "prescreen_timeout_minutes": 15,
     "prescreen_chunk_size": 3,
     "poll_timeout_minutes": 3,
-    "poll_chunk_size": 1
+    "poll_chunk_size": 1,
+    "digest_timeout_minutes": 5
   },
   "pq1": {
     "_drain_doc": [
@@ -89,7 +90,19 @@
     ],
     "enabled": true,
     "max_items": 5,
-    "timeout_minutes": 10
+    "timeout_minutes": 12,
+    "_doc_market": [
+      "市場大事（2026-10-07 使用者：「我們還是必須知道 AI CAPEX 整個市場的大事，不能見樹不見林」）：",
+      "market_topics 每題建議搜一次、不限在盯的公司；收進來的寫成 lead（scope=market，與主題／在盯條件那一層分開計上限）。",
+      "max_market_items：市場大事每日最多幾則（0..10）；max_items 仍只管主題與在盯條件那一層。沒寫 market_topics＝不搜。"
+    ],
+    "market_topics": [
+      "AI 資料中心資本支出：雲端與 AI 大廠（Microsoft、Alphabet、Amazon、Meta、Oracle、OpenAI、xAI）的 capex 指引、新建案、電力合約",
+      "AI 晶片與系統：NVIDIA、AMD、Broadcom、TSMC 的新產品時程、產能、出貨或延後",
+      "大型供應合約與產能預訂（多年期、預付款）：電力設備、散熱、光通訊、記憶體、先進封裝",
+      "政策與管制：出口管制、關稅、補貼、電網與資料中心核准"
+    ],
+    "max_market_items": 3
   },
   "theme_scan": {
     "_doc": [

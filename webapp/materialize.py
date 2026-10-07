@@ -1200,7 +1200,7 @@ def build_positions_artifact(results: Sequence[Mapping[str, Any]],
     payload: dict[str, Any] = {
         "schema_version": STATE_SCHEMA_VERSIONS["positions"],
         "kind": "positions",
-        "title": "追蹤表：判斷寫下之後、真的買了之後怎麼樣（舊店凍結在最下面）",
+        "title": "追蹤表：判斷寫下之後、真的買了之後怎麼樣",
         "generated_at": stamp.isoformat(),
         "as_of": None,
         "point_in_time": {"mode": "current", "as_of": None, "excluded": None},
@@ -1276,9 +1276,10 @@ def build_positions_artifact(results: Sequence[Mapping[str, Any]],
                                "是讓錨點帶有進場判斷（`record-choice --user-sized` 的 `decided_at`）。",
             "monitoring": "alpha live 部位目前**不在** `event_search_requests` 的自動監控範圍"
                           "（那條只走 beta instruments）——有 live 部位時沒有人在自動看跌幅。",
-            "lanes": "三條 lane 各算各的分母（Phase 5）：**live**＝trade_log 的 alpha 成交（錨＝成交價，量買得準不準）；"
+            # APP 只印 live／paper（2026-10-07 使用者：舊店拿掉）；history 仍在 `lanes` 裡給心跳與 outcome 腳本讀。
+            "lanes": "兩條線各算各的分母（Phase 5）：**live**＝trade_log 的 alpha 成交（錨＝成交價，量買得準不準）；"
                      "**paper**＝每檔第一份 v2 敘事寫下那天（錨＝那天收盤，量判斷準不準；列上帶當時與現行的候選狀態、"
-                     "首次點名它的 lead）；**history**＝舊店入圖日（凍結只印）。對主題等權組的超額每列排除本檔，"
+                     "首次點名它的 lead）。對主題等權組的超額每列排除本檔，"
                      "缺價的成員列出、不進平均——只印不比、不排序、不設門檻。",
             "legacy_live": "上面 `live` 那一段是**舊店**的 live fill（凍結唯讀）；`lanes.live` 讀的是 trade_log——"
                            "部位真相是 Google Sheet、收據跟著成交事件走（2026-09-16／09-22 定案）。",
@@ -1744,6 +1745,39 @@ def materialize_layer_notes(*, pages: Sequence[str], store: StateArtifactStore |
     return target.write(payload), payload
 
 
+def materialize_daily(*, store: StateArtifactStore | None = None, day: date | None = None,
+                      heartbeat_dir: Path | None = None,
+                      generated_at: datetime | None = None) -> tuple[Path, dict[str, Any]]:
+    """「每日」頁（2026-10-07 使用者指示）：照抄 daily ⑱ 寫下的短版、當天的每日摘要與雷達收據的計數。**唯讀**。
+    完整心跳五段不進這一頁（同日使用者：「不需要給我看的…拿掉」；細節照樣在 heartbeat 目錄給互動 session 查）。"""
+    from engine_b.digest import load_digest
+
+    from .daily import build_daily_artifact
+
+    folder = heartbeat_dir or (Path(__file__).resolve().parents[1] / "library" / "private" / "heartbeat")
+    day = day or datetime.now().astimezone().date()
+
+    def text(name: str) -> str | None:
+        path = folder / name
+        try:
+            return path.read_text(encoding="utf-8") if path.is_file() else None
+        except OSError:
+            return None
+
+    receipt_text = text(f"radar_{day.isoformat()}.json")
+    try:
+        radar_summary = (json.loads(receipt_text) or {}).get("summary") if receipt_text else None
+    except ValueError:
+        radar_summary = None
+    # private 路徑在組 artifact **之前**遮（digest 算的是遮過的內容；遮在後面會讓讀取端的 digest 對不上）
+    brief_md = text(f"brief_{day.isoformat()}.md")
+    payload = build_daily_artifact(day=day, brief_md=redact_private_paths(brief_md) if brief_md else None,
+                                   digest=load_digest(day, out_dir=folder), radar_summary=radar_summary,
+                                   generated_at=generated_at)
+    target = store or StateArtifactStore()
+    return target.write(payload), payload
+
+
 def _prediction_table(*, today: date, as_of: date | None, watches: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
     """圖預測對錯表（Phase 5 Step 5.4）：讀圖 ledger 全部紀錄＋語意 watch＋兩張日期對照表 → `prediction_rows`。
 
@@ -1889,4 +1923,4 @@ __all__ = ["BETA_MATERIALIZER_VERSION", "BETA_THIS_IS_NOT", "GRAPH_WALK_MATERIAL
            "CANDIDATE_SERIES_NAME", "DEFAULT_MEASUREMENT_DIR", "append_candidate_series", "candidate_series_path",
            "candidate_series_row",
            "redact_private_paths", "write_vocabularies",
-           "materialize_account_scorecard", "materialize_layer_notes"]
+           "materialize_account_scorecard", "materialize_daily", "materialize_layer_notes"]

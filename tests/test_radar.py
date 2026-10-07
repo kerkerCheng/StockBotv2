@@ -160,7 +160,8 @@ def test_prepare_sends_themes_and_watched_conditions_and_never_touches_holdings(
     monkeypatch.setattr(holdings, "resolve_holdings", boom)
     out = tmp_path / "radar_batch.json"
     summary = radar.prepare(RUN, out, max_items=5, today=TODAY, themes=THEMES, watches=WATCHES, registry=REG)
-    assert summary == {"themes": 2, "watched_conditions": 2, "max_items": 5}
+    assert summary == {"themes": 2, "watched_conditions": 2, "max_items": 5, "market_topics": 0,
+                       "max_market_items": 0}
     batch = json.loads(out.read_text(encoding="utf-8"))
     request = batch["requests"][0]
     assert batch["run_id"] == RUN and [c["watch_id"] for c in request["watched_conditions"]] == ["ew_c1", "ew_d1"]
@@ -191,10 +192,11 @@ def _item(url, **over) -> dict:
     return base
 
 
-def _files(tmp_path, items, *, urls, max_items=5, no_change=False, run=RUN):
+def _files(tmp_path, items, *, urls, max_items=5, no_change=False, run=RUN, max_market=0):
     batch = tmp_path / "radar_batch.json"
     batch.write_text(json.dumps({"schema": radar.BATCH_SCHEMA, "run_id": run, "requests": [
-        {"max_items": max_items, "watched_conditions": [{"watch_id": "ew_d1"}, {"watch_id": "ew_c1"}]}]}),
+        {"max_items": max_items, "max_market_items": max_market,
+         "watched_conditions": [{"watch_id": "ew_d1"}, {"watch_id": "ew_c1"}]}]}),
         encoding="utf-8")
     result = tmp_path / "radar_proposals.json"
     result.write_text(json.dumps({"schema": "llm-result-v1", "run_id": run, "sessions": ["sess-r"], "items": items,
@@ -463,3 +465,45 @@ def test_the_snapshot_has_the_four_radar_keys() -> None:
     from crons.heartbeat import SNAPSHOT_KEYS
 
     assert {"radar.new", "radar.duplicate", "radar.rejected", "radar.related"} <= set(SNAPSHOT_KEYS)
+
+
+# ---------------------------------------------------------------------------
+# 市場大事（2026-10-07 使用者：「我們還是必須知道 AI CAPEX 整個市場的大事，不能見樹不見林」）
+# ---------------------------------------------------------------------------
+
+def test_prepare_carries_the_market_topics_from_config(tmp_path) -> None:
+    out = tmp_path / "radar_batch.json"
+    summary = radar.prepare(RUN, out, max_items=5, today=TODAY, themes=THEMES, watches=WATCHES, registry=REG,
+                            market_topics=["AI 資料中心資本支出", "政策與管制"], max_market_items=3)
+    assert summary["market_topics"] == 2 and summary["max_market_items"] == 3
+    request = json.loads(out.read_text(encoding="utf-8"))["requests"][0]
+    assert request["market_topics"] == ["AI 資料中心資本支出", "政策與管制"] and request["max_market_items"] == 3
+    assert "market_topics" in llm_step.compose_radar_prompt([request])
+
+
+def test_market_events_and_followed_topics_have_separate_caps(tmp_path) -> None:
+    """市場大事不擠掉在追的題目，反過來也一樣：兩層各算各的上限。"""
+    items = [_item(URL_A, scope="market"), _item(URL_B, scope="market"), _item(URL_C, scope="theme")]
+    out, store = _apply(tmp_path, items, urls=[URL_A, URL_B, URL_C], max_items=1, max_market=1)
+    s = out["summary"]
+    assert (s["new"], s["new_market"], s["new_theme"], s["over_cap"]) == (2, 1, 1, 1)
+    assert leads.lead_id_for(URL_B) not in store["leads"]
+    assert store["leads"][leads.lead_id_for(URL_A)]["refs"]["radar_scope"] == "market"
+    (tmp_path / "zero").mkdir()
+    zero, _ = _apply(tmp_path / "zero", [_item(URL_A, scope="market")], urls=[URL_A], max_market=0)
+    assert zero["summary"]["new"] == 0 and zero["summary"]["over_cap"] == 1   # 沒開市場層就一則都不收
+
+
+def test_an_unknown_scope_is_counted_and_kept_off_the_market_quota(tmp_path) -> None:
+    out, store = _apply(tmp_path, [_item(URL_A, scope="headline"), _item(URL_B)], urls=[URL_A, URL_B], max_market=0)
+    s = out["summary"]
+    assert s["scope_unknown"] == 2 and s["new_theme"] == 2 and s["new_market"] == 0
+    assert store["leads"][leads.lead_id_for(URL_A)]["refs"]["radar_scope"] == "theme"
+
+
+def test_the_receipt_keeps_the_search_title_and_the_llm_fact_for_the_daily_brief(tmp_path) -> None:
+    out, _store = _apply(tmp_path, [_item(URL_A, scope="watch")], urls=[URL_A])
+    receipt = json.loads((tmp_path / "receipts" / f"radar_{TODAY.isoformat()}.json").read_text(encoding="utf-8"))
+    row = receipt["accepted"][0]
+    assert row["scope"] == "watch" and row["fact"] == "Coherent 宣布 CW 雷射產能擴充" and row["why"] == "碰到供給側的條件"
+    assert row["publisher"] == "Example News"

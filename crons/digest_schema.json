@@ -1,0 +1,22 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["bullets", "no_material_change"],
+  "properties": {
+    "bullets": {
+      "type": "array",
+      "maxItems": 12,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["section", "text", "lead_ids"],
+        "properties": {
+          "section": {"type": "string", "enum": ["leads", "events"]},
+          "text": {"type": "string"},
+          "lead_ids": {"type": "array", "items": {"type": "string"}}
+        }
+      }
+    },
+    "no_material_change": {"type": "boolean"}
+  }
+}

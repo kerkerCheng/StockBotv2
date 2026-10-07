@@ -85,6 +85,9 @@ STATE_SCHEMA_VERSIONS: dict[str, str] = {
     # 2026-10-07（個股頁 plan S4b）：層說明的純文字閱讀頁——ledger 全文、出處與文件自宣告、每條主張的 watch 狀態、
     # 哪幾頁連過來 → 9。不做版面與示意圖（S5）。
     "layer_notes": "stockbot-app/layer_notes/1",
+    # 2026-10-07（使用者指示：心跳太雜）：「每日」頁——Discord 那一則（短版）照抄 daily ⑱ 寫的檔 → 10。
+    # 完整心跳五段不進 APP（同日使用者：「不需要給我看的…拿掉」），留在 heartbeat 目錄給互動 session。
+    "daily": "stockbot-app/daily/1",
 }
 STATE_KINDS: tuple[str, ...] = tuple(STATE_SCHEMA_VERSIONS)
 

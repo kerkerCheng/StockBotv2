@@ -110,6 +110,7 @@ async def meta(request: Request) -> Response:
             f"GET /api/{API_VERSION}/candidates",
             f"GET /api/{API_VERSION}/account-scorecard",
             f"GET /api/{API_VERSION}/layer-notes",
+            f"GET /api/{API_VERSION}/daily",
         ],
         "not_offered": [
             "沒有任何寫入端點：不下單、不記錄選擇、不改 thesis、不入圖、不核准 pq2。",
@@ -335,6 +336,16 @@ _STATE_NOTES["layer_notes"] = (
     "「artifact 讀不到」與「一份層說明都還沒寫」是兩件事——後者會以 200 ＋ rows=[] 回。")
 
 
+_STATE_NOTES["daily"] = (
+    "python -m webapp materialize --daily",
+    "「artifact 讀不到」與「今天心跳沒寫出來」是兩件事——後者會以 200 ＋ heartbeat.absence 回。")
+
+
+async def daily(request: Request) -> Response:
+    """「每日」頁：Discord 那一則（短版），照抄 daily ⑱ 寫的檔（2026-10-07 使用者指示：心跳太雜）。"""
+    return await _serve_state(request, "daily")
+
+
 async def layer_notes(request: Request) -> Response:
     """層說明：ledger 全文、出處與文件自宣告、每條主張的 watch 狀態、哪幾頁連過來（照抄，不排序、不 gate）。"""
     return await _serve_state(request, "layer_notes")
@@ -430,6 +441,7 @@ def create_app(directory: Path | None = None, state_directory: Path | None = Non
         Route(f"/api/{API_VERSION}/candidates", candidates, methods=["GET"]),
         Route(f"/api/{API_VERSION}/account-scorecard", account_scorecard, methods=["GET"]),
         Route(f"/api/{API_VERSION}/layer-notes", layer_notes, methods=["GET"]),
+        Route(f"/api/{API_VERSION}/daily", daily, methods=["GET"]),
         Route(f"/api/{API_VERSION}/stocks", stocks, methods=["GET"]),
         Route(f"/api/{API_VERSION}/stocks/{{ticker}}", stock_detail, methods=["GET"]),
     ]

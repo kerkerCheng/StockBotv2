@@ -829,8 +829,13 @@ def parked_without_expiry(store: dict[str, Any]) -> list[dict[str, Any]]:
 
     - 有非 consumed 的 Event Watch → 會被事件或到期喚醒；
     - `refs.pq2_ref` 有值 → 球在待辦池那邊，pq2 編號自己有生命週期；
+    - 待辦池有**未結案**的項目以 `ref_id` 指回這筆 lead → 同上（對稱面，2026-10-07 補：「向你要文件」型的
+      `source_trace_review` 是收集器從 lead 推出來的，pq2 那端有 `ref_id`、lead 這端永遠不會回寫 `pq2_ref`——
+      只看 lead 這端的話，每一筆開了口的都被算成黑洞，那天實測 3 筆全是這一型；L17-3）；
     - terminal `trace_status` → 不需要回來（追源已有終局）；
     - 以上皆無 → **黑洞**。
+
+    待辦池讀不到時當成「沒有任何項目指回來」——寧可多報黑洞，不可少報（INV-2／INV-3 的安全方向）。
 
     ⚠ `parked_reason` 刻意不採信：它是自由文字。一筆寫著「只是治理公告、無 thesis 內容」
     的 lead 讀起來像終局，但機器讀不到——要讓機器知道它是終局，正確做法是給它一個
@@ -849,13 +854,19 @@ def parked_without_expiry(store: dict[str, Any]) -> list[dict[str, Any]]:
             watch.get("status") in ("active", "fired")
             or (watch.get("status") == "expired" and not watch.get("expiry_resolution")))
     }
+    try:
+        from engine_b import todo as todo_mod
+
+        asked = {str(item.get("ref_id")) for item in todo_mod.active_items(todo_mod.load()) if item.get("ref_id")}
+    except Exception:  # noqa: BLE001 — 讀不到就當沒有（多報不少報）
+        asked = set()
     registry = get_trace_status_registry()
     holes: list[dict[str, Any]] = []
     for lead in store["leads"].values():
         if lead.get("status") != "parked":
             continue
         lead_id = str(lead.get("lead_id") or "")
-        if lead_id in watched:
+        if lead_id in watched or lead_id in asked:
             continue
         refs = lead.get("refs") or {}
         if str(refs.get("pq2_ref") or "").strip():
