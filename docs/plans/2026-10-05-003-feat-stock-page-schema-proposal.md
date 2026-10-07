@@ -8,6 +8,7 @@
 > （下一批層說明、同階段同業宣告、三條邊走 pq1 → pq2）。
 > **S4 第一份層說明：InP 磊晶片 v1（2026-10-06，`library/private/research_notes/layer_notes/mat_inp_epiwafer.md`；層節點入圖 pq2 [715]；因它改變候選狀態 1 筆、主張變成 watch 7 條＋3 條待層讀圖）。** **S4 第二份：快接頭 v1（2026-10-06，`…/layer_notes/tech_liquid_cooling_quick_disconnect.md`；層讀圖 undecided → neither、富世達「缺 → 不要」1 筆、主張 watch 7 條；補供給側入圖包 pq2 [719]、要文件 [720]）。** **S4 第三份：板式熱交換器 v1（2026-10-06，`…/layer_notes/tech_brazed_plate_heat_exchanger.md`；提議節點、建層包 pq2 [721]、要文件 [722]；改正高力敘事一處錯讀，候選狀態 0 筆改判）——「≥3 份層說明已存在」這個 S5 前置達成（S5 仍要 S2–S4 完成且使用者點名）。** **S4 第四份：外部光源 v1（2026-10-06，`…/layer_notes/tech_external_laser_source.md`；讀圖換版仍 undecided、主張 5 條登成條件；候選狀態 0 筆改判）。** **S4 第五份：FAU v1（2026-10-06，`…/layer_notes/tech_fiber_attach_unit.md`；發現客戶端名單被同義節點藏起來，合併登 pq1；候選狀態 0 筆改判）——Amendment 第一批（InP 磊晶、散熱鏈、外部光源、FAU）收齊。** 下一批照走圖「下一層 0 條」的層優先（brainstorm F48）。 原狀態 AWAITING_HUMAN（2026-10-05）。設計與盤點：[`docs/brainstorms/2026-10-05-stock-page-schema.md`](../brainstorms/2026-10-05-stock-page-schema.md)。
 > 樣稿：<https://claude.ai/artifact/Q5TL6rQyYp87uYgXgG3vfH>（第九輪九張板，Version 16）。
+> **2026-10-07 收尾狀態：** S1 第九輪已改 §14.1 ②③④，v1.0 **只差 ①負錨點兩檔驗收**（候選合晶 6182、矽創 8016，時光機頁未做）；[715]／[721] 入圖後 InP 磊晶、板式熱交換器的層說明頁有個股頁連過來。**APP 個股頁仍是舊版面是預期**——畫布＝S5，前置 S2–S4；S2、S3、S5 每步待使用者點名。負錨點何時做見待決 D7。
 
 ```
 INTAKE
@@ -116,6 +117,8 @@ Phase 7 是研究期（比例 2026-10-07 已拿掉，Phase 7 plan A5：擋住研
   起因：使用者問「App 你有更新了嗎？我看還是舊的」——APP 個股頁仍是舊版面是預期，S1 只出畫布樣稿（brainstorm 回饋 #39）。
   討論過的內容都在計畫內：十三塊與規則（brainstorm §5）、「量 → 錢 → 價」與參考尺（§13、§13.1）、凍結前審查與第九輪修正（§14：自家毛利週期、
   換算句出處等級、AI 刻度標臨時、負錨點）；由本檔 S2–S5 做進 APP。
+
+- **D7**（2026-10-07 提出，待使用者）：S1 ①負錨點兩檔驗收什麼時候做——**A** 第一波（Phase 7 7.1）走完再做、之後點名 S2；**B** 併入第一波（它本身是研究：兩張起漲前的時光機頁，驗證十三塊分不分得出「會漲」與「先崩」，對上 brainstorm F51「覆蓋晚於倍率」），做完凍結 v1.0、再點名 S2 與第一波交錯。建議 B。起因：使用者問「App 個股頁面開發現在怎麼排？跟當初畫的 html layout 還有差？都還沒實作？」
 
 ## 如果這個方向是錯的，最先壞掉的是哪一筆（L11-6）
 
