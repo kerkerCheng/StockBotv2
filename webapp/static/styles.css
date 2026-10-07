@@ -440,3 +440,15 @@ table.rank.compare td:first-child { color: var(--muted); }
 .table-filter-count { flex-basis: 100%; }
 .node-name { font-weight: 600; }
 ul.no-narrative { columns: 3 12rem; }
+
+/* ---------- 層說明閱讀頁（個股頁 plan S4b）：純文字、照原文一行一行印——版面與示意圖在 S5 ---------- */
+.plain-text { font-size: 14px; line-height: 1.6; }
+.plain-text h3 { font-size: 16px; margin: 14px 0 6px; }
+.plain-text h4 { font-size: 14px; margin: 10px 0 4px; }
+.pt-line { white-space: pre-wrap; overflow-wrap: anywhere; }
+.pt-blank { height: .6em; }
+table.pt-table { min-width: 560px; }
+table.pt-table th, table.pt-table td { vertical-align: top; overflow-wrap: anywhere; }
+.badge-evidence { color: var(--muted); border-color: var(--border); font-weight: 500; }
+.pt-decl { white-space: pre-wrap; }
+.pt-claim { margin: 0 0 4px; }

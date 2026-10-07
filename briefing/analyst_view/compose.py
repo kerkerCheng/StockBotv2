@@ -361,6 +361,11 @@ def _readings_panel(readings: Mapping[str, Any] | None) -> AnalystPanel:
     absence = readings.get("absence")
     seats = list(readings.get("seats") or ())
     rows = list(readings.get("readings") or ())
+    # 坐的層有層說明的（個股頁 plan S4b）：連到閱讀頁。照抄產生端（`seat_readings_for`）——**不影響本面板的狀態與 readiness**：
+    # 層說明是研究判斷（A3），不 gate 任何東西。有讀圖、沒讀圖兩條路都帶（多數坐的層還沒有讀圖）。
+    links: dict[str, Any] = {"layer_notes": [dict(n) for n in readings.get("layer_notes") or ()]}
+    if readings.get("layer_notes_absence"):
+        links["layer_notes_absence"] = dict(readings["layer_notes_absence"])
     if absence or not rows:
         # 缺席分型照抄產生端（`seat_readings_for` 的 `absence`／`empty`）；舊輸入沒有 `empty` 時退回「還沒讀」。
         declared = absence or readings.get("empty") or {}
@@ -371,7 +376,7 @@ def _readings_panel(readings: Mapping[str, Any] | None) -> AnalystPanel:
         return AnalystPanel(**base, status="missing", source_statuses={"structure_readings": "missing"},
                             source_absence_kinds={"structure_readings": kind},
                             source_settled_by={"structure_readings": declared.get("settled_by")}, notes=notes,
-                            context={"available": False, "seats": seats}, reason=reason)
+                            context={"available": False, "seats": seats, **links}, reason=reason)
     lines = []
     for row in rows:
         status = _READING_DATUM_STATUS.get(row.get("status"), "review_required")
@@ -388,7 +393,7 @@ def _readings_panel(readings: Mapping[str, Any] | None) -> AnalystPanel:
     status = worst_status([line.datum.status for line in lines])
     return AnalystPanel(**base, status=status, source_statuses={"structure_readings": status},
                         source_absence_kinds={"structure_readings": None}, lines=tuple(lines), notes=notes,
-                        context={"available": True, "seats": seats,
+                        context={"available": True, "seats": seats, **links,
                                  "core_rule": "核心面板（3.7 起）：讀圖 stale／過期會讓 readiness 變成「讀得成但要留意」；"
                                               "狀態只由讀圖對圖決定，不看 refresh 燈"},
                         reason=None)

@@ -1665,6 +1665,64 @@ def materialize_structure_readings(*, store: StateArtifactStore | None = None,
     return target.write(payload), payload
 
 
+def materialize_layer_notes(*, pages: Sequence[str], store: StateArtifactStore | None = None,
+                            generated_at: datetime | None = None) -> tuple[Path, dict[str, Any]]:
+    """層說明的純文字閱讀頁（個股頁 plan S4b）。**唯讀**：讀 ledger、watch registry、raw 檔頭與抽取檔、圖的邊。
+
+    `pages`：已 materialize 的個股頁（「哪幾頁連過來」只列真的有頁的）。**必填、沒有預設**——給空集合會把每一家都印成
+    「還沒有個股頁」，那是一句假話（R1）。圖讀不到只讓「哪幾頁連過來」說讀不到；全文、出處、主張照印——那一半不靠圖。"""
+    from alpha.layer_note import EVIDENCE_LABELS, SECTION_LABELS
+    from alpha.providers.layer_notes import (
+        CLAIM_STATES, DECLARATION_ABSENCES, layer_note_reread_rows, ledger_snapshot, note_citation_refs, note_page_row,
+        source_declarations,
+    )
+    from engine_b import event_watch as ew
+    from identity import get_registry
+
+    from .layer_notes import build_layer_notes_artifact, cited_by
+
+    snapshot = ledger_snapshot()
+    notes = snapshot["notes"]
+    watches = list(ew.load_watches().get("watches") or ())
+    reread = {row["node"]: row["reasons"] for row in layer_note_reread_rows(notes, watches, today=ew._today())}
+    declarations = source_declarations(ref for note in notes.values() for ref in note_citation_refs(note))
+    try:
+        from alpha.providers.structure_readings import seats_from_edges
+        from query.structure import _load_edges
+
+        edges = _load_edges() if notes else []
+        seats: dict[str, list[str]] | None = seats_from_edges(edges)
+        graph_nodes: frozenset[str] | None = frozenset({e.src for e in edges} | {e.dst for e in edges})
+        graph_absence = None
+    except Exception as exc:  # noqa: BLE001 — 圖讀不到只讓「哪幾頁連過來」說讀不到
+        seats, graph_nodes = None, None
+        graph_absence = {"kind": "upstream_unavailable",
+                         "reason": f"這次沒讀到圖（{type(exc).__name__}）——「哪幾頁連過來」整欄未算，不是 0"}
+    registry = get_registry()
+    wanted = {co for co, nodes in (seats or {}).items() if set(nodes) & set(notes)}
+    wanted |= {e for note in notes.values() for claim in note.claims for e in claim.entities}
+    companies = {co: {"known": registry.company(co) is not None, "ticker": registry.research_ticker(co),
+                      "label": _company_label(registry, co)} for co in sorted(wanted)}
+    page_set = frozenset(str(t).upper() for t in pages)
+    rows = []
+    for node in sorted(notes):
+        row = note_page_row(notes[node], watches=watches, declarations=declarations["by_ref"],
+                            reread=reread.get(node, ()), versions=snapshot["versions"].get(node, 1))
+        row["cited_by"] = cited_by(node, row["unit"], seats=seats, graph_nodes=graph_nodes, companies=companies,
+                                   pages=page_set)
+        rows.append(row)
+    payload = build_layer_notes_artifact(
+        rows=redact_private_paths(rows), parse_errors=redact_private_paths(snapshot["errors"]),
+        withdrawn=snapshot["withdrawn"], declaration_problems=redact_private_paths(declarations["unreadable"]),
+        graph_absence=graph_absence,
+        company_labels={co: info["label"] for co, info in companies.items() if info["label"]},
+        labels={"sections": SECTION_LABELS, "evidence": EVIDENCE_LABELS, "claim_states": CLAIM_STATES,
+                "declaration_absences": DECLARATION_ABSENCES},
+        generated_at=generated_at)
+    target = store or StateArtifactStore()
+    return target.write(payload), payload
+
+
 def _prediction_table(*, today: date, as_of: date | None, watches: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
     """圖預測對錯表（Phase 5 Step 5.4）：讀圖 ledger 全部紀錄＋語意 watch＋兩張日期對照表 → `prediction_rows`。
 
@@ -1807,4 +1865,4 @@ __all__ = ["BETA_MATERIALIZER_VERSION", "BETA_THIS_IS_NOT", "GRAPH_WALK_MATERIAL
            "CANDIDATE_SERIES_NAME", "DEFAULT_MEASUREMENT_DIR", "append_candidate_series", "candidate_series_path",
            "candidate_series_row",
            "redact_private_paths", "write_vocabularies",
-           "materialize_account_scorecard"]
+           "materialize_account_scorecard", "materialize_layer_notes"]

@@ -36,6 +36,7 @@ from test_webapp_positions import fake_positions_payload
 from test_webapp_candidates import fake_candidates_payload
 from test_webapp_structure_table import fake_table_payload
 from test_account_scorecard import fake_scorecard_payload
+from test_webapp_layer_notes import fake_layer_notes_payload
 from webapp.structure_readings import build_structure_readings_artifact
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -52,6 +53,7 @@ STATE_ROUTES: dict[str, str] = {
     "/api/v1/structure-readings": "structure_readings",
     "/api/v1/candidates": "candidates",
     "/api/v1/account-scorecard": "account_scorecard",
+    "/api/v1/layer-notes": "layer_notes",
 }
 
 #: serve 端的三個模組。`materialize.py` 與 `__main__.py` **不在此列**——它們本來就會跑模型。
@@ -111,6 +113,7 @@ def app_dir(tmp_path):
     StateArtifactStore(tmp_path / "state").write(fake_candidates_payload())
     StateArtifactStore(tmp_path / "state").write(build_structure_readings_artifact(rows=[]))
     StateArtifactStore(tmp_path / "state").write(fake_scorecard_payload(tmp_path / "scorecard_inputs"))
+    StateArtifactStore(tmp_path / "state").write(fake_layer_notes_payload())
     return tmp_path
 
 

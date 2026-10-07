@@ -215,10 +215,12 @@ DAILY_STEPS: tuple[DailyStep, ...] = (
               ("-m", "engine_b.todo", "standing-go", "--run"), 5, True, False),
     DailyStep("12_fiscal_year_backfill", "XBRL 基期補值（mechanical 欄位）",
               ("scripts/backfill_fiscal_year_results.py", "--write"), 10, True, True),
+    # `--layer-notes`（2026-10-07 個股頁 plan S4b）：層說明閱讀頁，**只讀** ledger——寫層說明只在互動 session
+    # （`tests/test_codex_daily_permissions.py::test_layer_note_ledger_is_written_only_interactively`）。
     DailyStep("13_materialize", "APP materialize",
               ("-m", "webapp", "materialize", "--tracked", "--registry-listed", "--structure-table",
                "--beta", "--graph-walk", "--watches", "--positions", "--structure-readings", "--scorecard",
-               "--candidates"),
+               "--candidates", "--layer-notes"),
               25, True, True),
     DailyStep("14_health_audit", "健康審查",
               ("query/health_audit.py", "--local", "--json"),

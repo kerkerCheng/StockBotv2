@@ -448,6 +448,8 @@ def seat_readings_context(*, today: Any = None, as_of: Any = None) -> dict[str, 
     - `seats`：`co:*` → 它 `supplies_to`／`develops` 到的非公司節點（讀圖只寫在層與插槽上）。
     - `by_node`：節點 → 現行讀圖（每個單位一份）＋ 由讀圖字彙附上的中文標籤——消費端（compose、builder）
       不碰讀圖字彙，標籤在這裡附上，那一端只照抄（L16：字彙只有一份）。每列帶 `demand_customers`（Step 3.7）。
+    - `layer_notes`：節點 → 現行層說明的 `{node, note_id, title}`（個股頁 plan S4b：坐的層連到閱讀頁）；ledger 讀不到時另帶
+      `layer_notes_absence`，讀圖照走。
     讀不到就整份回 `upstream_unavailable`，不回空集合——空集合會讓每一檔都印「還沒讀」（INV-3）。
     ⚠ Step 3.7 由 `webapp/materialize.py::readings_context` 原樣搬來（briefing 的 CLI 也要用，briefing 不得 import webapp）。
     ⚠ **as-of 視角明確拒絕**（INV-6；3.7 R1）：坐在哪些節點讀的是現在的圖（`_load_edges` 沒有時點投影），讀圖對圖的
@@ -487,7 +489,21 @@ def seat_readings_context(*, today: Any = None, as_of: Any = None) -> dict[str, 
             "reading": row.get("reading"), "needs_reread": row.get("needs_reread"),
             "demand_customers": list(row.get("demand_customers") or ()),
         })
-    return {"seats": seats_from_edges(edges), "by_node": by_node}
+    return {"seats": seats_from_edges(edges), "by_node": by_node, **_layer_note_index()}
+
+
+def _layer_note_index() -> dict[str, Any]:
+    """坐的層有沒有層說明（個股頁 plan S4b）：節點 → 現行那一份的 `{node, note_id, title}`，個股頁據此連到閱讀頁。
+    ledger 讀不到只讓這一半說讀不到（`layer_notes_absence`），不帶走讀圖面板——不是「坐的層都沒有層說明」（INV-3）。"""
+    try:
+        from .layer_notes import current_notes
+
+        notes = current_notes()
+    except Exception as exc:  # noqa: BLE001
+        return {"layer_notes": {}, "layer_notes_absence": {
+            "kind": "upstream_unavailable", "reason": f"這次沒讀到層說明 ledger（{type(exc).__name__}）——不是「沒有層說明」"}}
+    return {"layer_notes": {node: {"node": node, "note_id": note.note_id, "title": note.title}
+                            for node, note in notes.items()}}
 
 
 def seats_from_edges(edges: Iterable[Any]) -> dict[str, list[str]]:
@@ -538,6 +554,11 @@ def seat_readings_for(context: Mapping[str, Any], company_id: str | None, *,
     seats = list((context.get("seats") or {}).get(company_id) or ())
     by_node = context.get("by_node") or {}
     readings = [r for node in seats for r in by_node.get(node, ())]
+    # 坐的層有層說明的（S4b）：與 seats 同一份、同一個順序——「坐在哪一層」只有 `seats_from_edges` 一個 owner（L16）
+    notes = context.get("layer_notes") or {}
+    linked = {"layer_notes": [dict(notes[node]) for node in seats if node in notes]}
+    if context.get("layer_notes_absence"):
+        linked["layer_notes_absence"] = dict(context["layer_notes_absence"])
     # 沒有讀圖時是哪一種沒有——由這裡宣告，面板照抄（L12：「還沒讀」與「圖上沒有可讀的層」下一步不同）。
     empty = ({"kind": "not_yet_recorded",
               "reason": "這家公司坐的層與插槽都還沒有讀圖（圖上它供貨或開發的節點：" + "、".join(seats) + "）"}
@@ -552,7 +573,7 @@ def seat_readings_for(context: Mapping[str, Any], company_id: str | None, *,
         else:
             empty = {**empty, "reason": empty["reason"] + "｜⚠ 有一筆需求側宣告（" + demand_side.abstention_id
                      + "）但圖上有它坐的層，和圖矛盾，不採用"}
-    return {"seats": seats, "readings": readings, "empty": empty}
+    return {"seats": seats, "readings": readings, "empty": empty, **linked}
 
 
 def known_nodes(*, directory: Path | None = None) -> list[str]:
