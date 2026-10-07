@@ -23,6 +23,61 @@
       ],
       "statement": "TSMC's COUPE process (EIC+PIC integration via 3D chip-on-wafer stacking) is the named silicon photonics engine process for NVIDIA's CPO switches. Substitutability judged 4/5 for this relation: customer-side naming by NVIDIA plus no other foundry named in the ecosystem; not 5 because merchant silicon photonics foundries exist (unnamed here) and NVIDIA could dual-source future generations.",
       "subject_id": "e1"
+    },
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：NVIDIA 下一代 CPO 交換器（或其夥伴頁）的光纖組件名單拿掉 Browave，或 NVIDIA 一手文件寫出另一種架構讓這一層不再需要（例：光纖改由封裝廠一體成型、不再外購光纖組件）。核查頻率：每次 NVIDIA GTC 與 Computex（每年兩次）＋每季財報。觸發後 48 小時：該供貨邊加註或提撤回，重讀 FAU 層讀圖、改寫有騎在這一層的敘事。",
+      "id": "nvidia_sipho_blog_partner_roles_cl3",
+      "source_ids": [
+        "nvidia_sipho_blog_partner_roles_s7"
+      ],
+      "statement": "NVIDIA's own technical blog on its silicon-photonics (CPO) switches lists, under the partner entry 'Browave, Corning, Senko, TFC Communication, and Coherent', the role 'Industry experts with optical connectors and fiber assemblies for linking the ELS lasers with polarization, maintaining fibers into the silicon photonics engine, and data output to the front panel.' Customer-side naming: Browave supplies the fiber attach / fiber assembly layer of NVIDIA's CPO switch. The blog names five partners for the role, so this is not sole source; it states a partner role, not volume or share.",
+      "subject_id": "e8"
+    },
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：NVIDIA 下一代 CPO 交換器（或其夥伴頁）的光纖組件名單拿掉 Corning，或 NVIDIA 一手文件寫出另一種架構讓這一層不再需要（例：光纖改由封裝廠一體成型、不再外購光纖組件）。核查頻率：每次 NVIDIA GTC 與 Computex（每年兩次）＋每季財報。觸發後 48 小時：該供貨邊加註或提撤回，重讀 FAU 層讀圖、改寫有騎在這一層的敘事。",
+      "id": "nvidia_sipho_blog_partner_roles_cl4",
+      "source_ids": [
+        "nvidia_sipho_blog_partner_roles_s7"
+      ],
+      "statement": "NVIDIA's own technical blog on its silicon-photonics (CPO) switches lists, under the partner entry 'Browave, Corning, Senko, TFC Communication, and Coherent', the role 'Industry experts with optical connectors and fiber assemblies for linking the ELS lasers with polarization, maintaining fibers into the silicon photonics engine, and data output to the front panel.' Customer-side naming: Corning supplies the fiber attach / fiber assembly layer of NVIDIA's CPO switch. The blog names five partners for the role, so this is not sole source; it states a partner role, not volume or share.",
+      "subject_id": "e9"
+    },
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：NVIDIA 下一代 CPO 交換器（或其夥伴頁）的光纖組件名單拿掉 Senko，或 NVIDIA 一手文件寫出另一種架構讓這一層不再需要（例：光纖改由封裝廠一體成型、不再外購光纖組件）。核查頻率：每次 NVIDIA GTC 與 Computex（每年兩次）＋每季財報。觸發後 48 小時：該供貨邊加註或提撤回，重讀 FAU 層讀圖、改寫有騎在這一層的敘事。",
+      "id": "nvidia_sipho_blog_partner_roles_cl5",
+      "source_ids": [
+        "nvidia_sipho_blog_partner_roles_s7"
+      ],
+      "statement": "NVIDIA's own technical blog on its silicon-photonics (CPO) switches lists, under the partner entry 'Browave, Corning, Senko, TFC Communication, and Coherent', the role 'Industry experts with optical connectors and fiber assemblies for linking the ELS lasers with polarization, maintaining fibers into the silicon photonics engine, and data output to the front panel.' Customer-side naming: Senko supplies the fiber attach / fiber assembly layer of NVIDIA's CPO switch. The blog names five partners for the role, so this is not sole source; it states a partner role, not volume or share.",
+      "subject_id": "e10"
+    },
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：NVIDIA 下一代 CPO 交換器（或其夥伴頁）的光纖組件名單拿掉 TFC Communication，或 NVIDIA 一手文件寫出另一種架構讓這一層不再需要（例：光纖改由封裝廠一體成型、不再外購光纖組件）。核查頻率：每次 NVIDIA GTC 與 Computex（每年兩次）＋每季財報。觸發後 48 小時：該供貨邊加註或提撤回，重讀 FAU 層讀圖、改寫有騎在這一層的敘事。",
+      "id": "nvidia_sipho_blog_partner_roles_cl6",
+      "source_ids": [
+        "nvidia_sipho_blog_partner_roles_s7"
+      ],
+      "statement": "NVIDIA's own technical blog on its silicon-photonics (CPO) switches lists, under the partner entry 'Browave, Corning, Senko, TFC Communication, and Coherent', the role 'Industry experts with optical connectors and fiber assemblies for linking the ELS lasers with polarization, maintaining fibers into the silicon photonics engine, and data output to the front panel.' Customer-side naming: TFC Communication supplies the fiber attach / fiber assembly layer of NVIDIA's CPO switch. The blog names five partners for the role, so this is not sole source; it states a partner role, not volume or share.",
+      "subject_id": "e11"
+    },
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：NVIDIA 下一代 CPO 交換器（或其夥伴頁）的光纖組件名單拿掉 Coherent，或 NVIDIA 一手文件寫出另一種架構讓這一層不再需要（例：光纖改由封裝廠一體成型、不再外購光纖組件）。核查頻率：每次 NVIDIA GTC 與 Computex（每年兩次）＋每季財報。觸發後 48 小時：該供貨邊加註或提撤回，重讀 FAU 層讀圖、改寫有騎在這一層的敘事。",
+      "id": "nvidia_sipho_blog_partner_roles_cl7",
+      "source_ids": [
+        "nvidia_sipho_blog_partner_roles_s7"
+      ],
+      "statement": "NVIDIA's own technical blog on its silicon-photonics (CPO) switches lists, under the partner entry 'Browave, Corning, Senko, TFC Communication, and Coherent', the role 'Industry experts with optical connectors and fiber assemblies for linking the ELS lasers with polarization, maintaining fibers into the silicon photonics engine, and data output to the front panel.' Customer-side naming: Coherent supplies the fiber attach / fiber assembly layer of NVIDIA's CPO switch. The blog names five partners for the role, so this is not sole source; it states a partner role, not volume or share. Coherent's own filings already supply this node (self-reported); this sentence is the customer-side naming of the same role.",
+      "subject_id": "e12"
     }
   ],
   "edges": [
@@ -108,6 +163,61 @@
         "nvidia_sipho_blog_partner_roles_s9"
       ],
       "src_id": "co:sumitomo_electric"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:fiber_attach_unit",
+      "id": "e8",
+      "relation": "supplies_to",
+      "source_ids": [
+        "nvidia_sipho_blog_partner_roles_s7"
+      ],
+      "src_id": "co:browave"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:fiber_attach_unit",
+      "id": "e9",
+      "relation": "supplies_to",
+      "source_ids": [
+        "nvidia_sipho_blog_partner_roles_s7"
+      ],
+      "src_id": "co:corning"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:fiber_attach_unit",
+      "id": "e10",
+      "relation": "supplies_to",
+      "source_ids": [
+        "nvidia_sipho_blog_partner_roles_s7"
+      ],
+      "src_id": "co:senko"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:fiber_attach_unit",
+      "id": "e11",
+      "relation": "supplies_to",
+      "source_ids": [
+        "nvidia_sipho_blog_partner_roles_s7"
+      ],
+      "src_id": "co:tfc_optical"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:fiber_attach_unit",
+      "id": "e12",
+      "relation": "supplies_to",
+      "source_ids": [
+        "nvidia_sipho_blog_partner_roles_s7"
+      ],
+      "src_id": "co:coherent"
     }
   ],
   "nodes": [
@@ -267,6 +377,93 @@
         "nvidia_sipho_blog_partner_roles_s5"
       ],
       "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "GLW"
+      ],
+      "attributes": {
+        "ticker": "GLW"
+      },
+      "confidence": 0.75,
+      "id": "co:corning",
+      "name": "Corning",
+      "role": "material_base",
+      "source_ids": [
+        "nvidia_sipho_blog_partner_roles_s7"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "FAU",
+        "fiber attach unit"
+      ],
+      "attributes": {},
+      "confidence": 0.8,
+      "id": "tech:fiber_attach_unit",
+      "name": "Fiber Attach Unit",
+      "role": null,
+      "source_ids": [
+        "nvidia_sipho_blog_partner_roles_s7"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "Browave Corporation",
+        "波若威",
+        "3163.TWO"
+      ],
+      "attributes": {
+        "ticker": "3163.TWO"
+      },
+      "confidence": 0.75,
+      "id": "co:browave",
+      "name": "Browave",
+      "role": null,
+      "source_ids": [
+        "nvidia_sipho_blog_partner_roles_s7"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "TFC Communication",
+        "Suzhou TFC Optical Communication Co., Ltd.",
+        "天孚通信",
+        "300394.SZ"
+      ],
+      "attributes": {
+        "ticker": "300394.SZ"
+      },
+      "confidence": 0.75,
+      "id": "co:tfc_optical",
+      "name": "TFC Optical Communication",
+      "role": null,
+      "source_ids": [
+        "nvidia_sipho_blog_partner_roles_s7"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "SENKO"
+      ],
+      "attributes": {},
+      "confidence": 0.75,
+      "id": "co:senko",
+      "name": "Senko",
+      "role": null,
+      "source_ids": [
+        "nvidia_sipho_blog_partner_roles_s7"
+      ],
+      "type": "Company"
     }
   ],
   "schema_version": "0.1",
@@ -280,7 +477,7 @@
     "retrieved_at": "2026-09-01",
     "source_type": "news",
     "storage_permission": "repo_excerpt",
-    "supersedes_extraction_sha256": "f273d6a67ff19d52164a83babaeebc69544cabb12a57648ddbf888a1d178639e",
+    "supersedes_extraction_sha256": "1a0de8e24e5752977288043fc09dbd95c6704786589696f8584345de5193080d",
     "title": "A New Era in Data Center Networking with NVIDIA Silicon Photonics-based Network Switching (partner roles)",
     "url": "https://developer.nvidia.com/blog/a-new-era-in-data-center-networking-with-nvidia-silicon-photonics-based-network-switching/"
   },
