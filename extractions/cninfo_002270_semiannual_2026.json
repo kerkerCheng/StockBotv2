@@ -1,0 +1,104 @@
+{
+  "claims": [
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：華明季報或年報寫出出口（直接＋間接）或分接開關新增訂單轉為衰退。核查頻率：每季（華明季報）。觸發後 48 小時：重讀分接開關層的「量」那一半，華明敘事改寫押注。",
+      "id": "cninfo_002270_semiannual_2026_cl1",
+      "source_ids": [
+        "cninfo_002270_semiannual_2026_s1",
+        "cninfo_002270_semiannual_2026_s2"
+      ],
+      "statement": "Huaming's own 1H2026 report: revenue CNY 1.281bn (+14.25%); core power-equipment revenue CNY 1.099bn (+14.64%); direct and indirect power-equipment exports CNY 449m (+44.59%), over 40% of power-equipment revenue, with export sales and order amounts at record highs; as of the report date, new-order growth is similar to the prior-year period. It cites China customs data: transformer exports CNY 35.68bn in 1H2026 (+26.7%). Supplier self-report (L8: weak); indirect exports are the company's incomplete internal estimate.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:transformer_tap_changer",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "cninfo_002270_semiannual_2026_s3",
+        "cninfo_002270_semiannual_2026_s1"
+      ],
+      "src_id": "co:huaming"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "Huaming",
+        "华明装备",
+        "華明裝備",
+        "华明电力装备"
+      ],
+      "attributes": {
+        "ticker": "002270.SZ"
+      },
+      "confidence": 0.9,
+      "id": "co:huaming",
+      "name": "Huaming Power Equipment",
+      "role": null,
+      "source_ids": [
+        "cninfo_002270_semiannual_2026_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "tap changer",
+        "tap changers",
+        "on-load tap changers",
+        "LTC",
+        "LTCs",
+        "分接开关",
+        "有载分接开关"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:transformer_tap_changer",
+      "name": "Transformer Tap Changer",
+      "role": null,
+      "source_ids": [
+        "cninfo_002270_semiannual_2026_s1"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "cninfo_002270_semiannual_2026",
+    "evidence_tier": 1,
+    "origin_entity": "Huaming Power Equipment Co., Ltd.",
+    "permission_basis": "深交所上市公司法定半年度報告（公開）；只保留研究必要的有限逐字節錄。published_at 取巨潮資訊網公告日期。",
+    "published_at": "2026-08-29",
+    "publisher": "巨潮资讯网（深交所指定信息披露网站）",
+    "retrieved_at": "2026-10-08",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "华明电力装备股份有限公司（002270）2026 年半年度报告——经营概述、出口有限节录",
+    "url": "http://static.cninfo.com.cn/finalpage/2026-08-29/1225528484.PDF"
+  },
+  "sources": [
+    {
+      "id": "cninfo_002270_semiannual_2026_s3",
+      "locator": "第二节 一、公司简介",
+      "quote": "股票简称 华明装备 股票代码 002270"
+    },
+    {
+      "id": "cninfo_002270_semiannual_2026_s1",
+      "locator": "三、主营业务分析 概述",
+      "quote": "2026 年上半年，公司实现营业收入 12.81 亿元，同比增长 14.25%，其中核心业务电力设备实现营业收入 10.99 亿，同比增长 14.64%，受海外加大电力等基础设施投入的影响，电力设备直接出口、间接出口销售额、订单金额创历史新高，实现营收 4.49 亿，同比增长 44.59% ，占电力设备营业收入比例超过 40%，截至本报告披露日，新增订单增速水平与去年同期相当。"
+    },
+    {
+      "id": "cninfo_002270_semiannual_2026_s2",
+      "locator": "一、主要业务 3）变压器出口持续增长",
+      "quote": "海关总署数据显示，2026 年上半年我国变压器累计出口金额达 356.8 亿元，同比增长 26.7%。"
+    }
+  ]
+}
