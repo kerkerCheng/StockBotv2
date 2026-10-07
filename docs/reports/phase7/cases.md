@@ -280,11 +280,18 @@
     綜合鋼廠、GOES 占比答不出來（研究判斷已存，敘事等電力組）
   - 2026-10-07｜續工 ③④（晚段）：**電工鋼層重讀 `sr_4815aae51426ad76`**（取代 `sr_467982cb902b776c`；仍 undecided，新增「**這一層沒有可投資的公司**」——坐在這一層的上市公司都是綜合鋼廠：Cliffs 的「Stainless and electrical steel」合計 5.25 億美元、占 2026 Q2 營收 52.26 億的一成〔10-Q 產品線營收表，raw 節錄〕、JFE 的電磁鋼板不拆營收〔有報 grep〕；DOE 2022 的 13 家 GOES 廠與日韓德規格級廠也是綜合鋼廠；登記兩個條件 watch：買方一手的交期／配額／預付 → 量、GOES 占營收過半的上市公司或電工鋼分拆 → 重答可投資）。CLF 廣度短敘事 `ib_d4e4af073bed51db`（**不要：曝險太薄**；同日 `ib_7854f58bf92e65a2` 換讀圖 id）。5411.T 短檢查＝**①補供貨邊**：JFE 自己的「電磁鋼板戦略」說明會資料（2024-10-24）p.3——GO 在倉敷生產、用於電力與配電變壓器、主要賣給重電廠 → `ra_c9dc8e5f9266b905f385ecf602b7dc37` → pq2 **[729]**（directed lead `lead_47e5000ff705cdb71b11d64867555128`）；同一份 p.8：日本國內擴產的是車用 NO、GO 只在印度擴。敘事 `ib_458fb43e6f11c7f8`（不要：曝險太薄；同日 `ib_ad8a0cfcc5383313` 換讀圖 id）。⚠ [729] 的搜尋摘要寫「統合報告與有報都沒拆 GO」——寫的當下只讀了有報，統合報告（2025 版第 5、7 節）事後 grep 才核對到同樣沒拆（L11-5：結論碰巧對，順序錯）
   - 2026-10-07｜使用者 go：[729] 入圖（intake commit `0b1c05e0`；`complete-ra` 結案）→ 讀圖檢查把電工鋼層標成該重讀（供給側新增 co:jfe_holdings 一條）→ **重讀 `sr_761bd010a662901a`**（取代 `sr_4815aae51426ad76`；仍 undecided、仍「這一層沒有可投資的公司」）：新的邊只多確認一家日本規格級廠，沒有量、價或換不掉的證據；JFE 把國內擴產給了車用 NO 而不是 GO，是供應商自述、不當反證；兩個條件 watch 改掛新版（舊的兩筆收掉）
+  - 2026-10-08｜**更正 10-05 那筆的「撤回」**（上面那句保留不刪）：DOE 有寫——報告 p.21（PDF 第 36 頁）：「When the end-users request that porcelain for bushings to be sourced outside of China, there are limited sources available including U.S., Japan, and Poland.」
+    10-05 的「全文找不到」是 pypdf 文字層把字拆開（porcela in、a va ila ble）造成的 grep 失誤（L11-5，failure log #47）；原標題的「只剩」仍過度——原文是 including（列舉）。套管 lead 的 parked_reason 已附加同一則更正
+  - 2026-10-08｜走圖第 7 型「沒人供應」→ **分接開關層**：入圖包 pq2 **[739]**（`ra_fc186b9d57144e080858681047aa468b`；lead `lead_b97b021796c41c7ba053937e98a48f14`，`graph_walk:no_supplier`）——
+    華明裝備（002270.SZ；系統口徑邊緣 22.8 億美元、10 家；名冊條目隨包 staged）`supplies_to tech:transformer_tap_changer`（自報：「国内第一、全球第二」「国内尚无成规模竞争对手」；
+    分接開關 2025 年營收 21.02 億元、毛利率 59.61%、出口 +47%；2026 上半年 +14.6%、出口 +44.6%、新增訂單增速與去年同期相當；500kV 以上仍以進口為主；在辦 H 股）。
+    層說明草稿 v0（`library/private/research_notes/layer_notes/tech_transformer_tap_changer.md`，主張 T1–T4 等入圖後登 watch）。缺：2026 年的客戶端一手（DART 檢索頁擋自動查詢）、德國那家是誰（推一步 MR，非上市）
 - 結論（H5 的 (i)(ii)，7.4 寫）：（尚無）
 - failure log：（尚無）
   - #9（同 P1）
   - #10（[691] 合資股東的新聞稿被分類成外部印證；與 C1 [690] 同形）
   - #17（[699] 的圖影響行把整份更正文件當成增量）
+  - #47（10-05 用 grep 判定 DOE「沒寫」套管瓷件那句，實際是 PDF 文字層拆字——撤回了一個對的說法）
 
 ## P3 800VDC 擱置五則回看
 

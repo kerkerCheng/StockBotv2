@@ -1,0 +1,15 @@
+SOURCE: U.S. Department of Energy — Electric Grid Supply Chain Review: Large Power Transformers and High Voltage Direct Current Systems——分接開關、套管、Hitachi Energy Alamo 廠有限節錄
+URL: https://www.energy.gov/sites/default/files/2022-02/Electric%20Grid%20Supply%20Chain%20Report%20-%20Final.pdf
+PUBLISHED: 2022-02-24
+RETRIEVED: 2026-10-04（PDF）；本摘錄 2026-10-08 以 pdfminer 重抽（pypdf 文字層把字拆開：「porcela in」「a va ila ble」，grep 會漏——failure log #47）
+STORAGE: repo_excerpt（美國政府公開報告；空白正規化後逐字截取；斷行連字號「end- users」接回）
+NOTE: **第三方一手（政府報告，2022 年、美國）**。分接開關那句是 stakeholder 的說法；德國那家與美國三家都沒具名。
+
+【報告 p.11（PDF 第 26 頁）2.1.2.5 Tap Changers】
+A transformer tap changer is a component designed to change the output voltage of a transformer by changing the turns ratio between the primary and secondary winding. Two types of tap changers are commonly utilized in transformers today, on-load tap changers (LTC) and de-energized tap changers (DETC) (Waukesha, 2021). LTCs are designed to operate when the transformer is still under electrical load, while DETCs are designed for operation when the transformer does not have an electrical load. Generally, LTCs are preferred by industry due to continuous loading requirements of the transformers (Pitt, 2018).
+
+【報告 p.13–14（PDF 第 28–29 頁）2.1.4.1 U.S. LPT manufacturers——Hitachi Energy】
+Hitachi Energy, formerly known as Hitachi ABB, has one LPT facility in the United States in South Boston, Virginia with a maximum range of 230 kV and 150 MVA as indicated through stakeholder engagement. In addition, this company has a facility in Varennes, Quebec which can supply transformers for traditional and specialty applications (including HVDC) up to 765 kV and 1400 MVA. They also 13 ELECTRIC GRID SUPPLY CHAIN DEEP DIVE ASSESSMENT operate a facility in Alamo, Tennessee that supplies transformer components such as bushings, LTCs, etc.
+
+【報告 p.21（PDF 第 36 頁）2.1.6——套管瓷件、分接開關】
+It has been observed that high-voltage bushings often have a long lead time of up to five months (U.S. Department of Energy, 2014). When the end-users request that porcelain for bushings to be sourced outside of China, there are limited sources available including U.S., Japan, and Poland. Stakeholders indicated that tap changers could also be a bottle neck. There are three domestic suppliers and one reliable supplier from Germany. However, German tap changers are much more costly and have a longer lead time.
