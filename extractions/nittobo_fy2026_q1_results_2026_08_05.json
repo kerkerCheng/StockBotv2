@@ -1,0 +1,175 @@
+{
+  "claims": [
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：日東紡的決算說明資料或主要質疑応答寫出 T ガラス需給緩和、價格下修或出貨量下修，或寫出客戶改用他社低熱膨張ガラス造成份額流失；或 IC 載板廠一手寫出低熱膨張玻纖布不再短缺。核查頻率：每季（日東紡決算說明會、景碩等載板廠季報與法說）。觸發後 48 小時：e1 加註或降 confidence，重讀 IC 載板玻纖布層讀圖與層說明。",
+      "id": "nittobo_fy2026_q1_results_2026_08_05_cl1",
+      "source_ids": [
+        "nittobo_fy2026_q1_results_2026_08_05_s1",
+        "nittobo_fy2026_q1_results_2026_08_05_s2",
+        "nittobo_fy2026_q1_results_2026_08_05_s3",
+        "nittobo_fy2026_q1_results_2026_08_05_s4",
+        "nittobo_fy2026_q1_results_2026_08_05_s6",
+        "nittobo_fy2026_q1_results_2026_08_05_s7",
+        "nittobo_fy2026_q1_results_2026_08_05_s8"
+      ],
+      "statement": "Nittobo's own Q1 FY2026 results materials and Q&A (2026-08-05): demand for its low-thermal-expansion glass (T-glass) for semiconductor package substrates is 'still very strong' and expected to expand greatly for both thick and thin grades; it is executing a capacity-expansion plan through 2028 (a new T-glass melting furnace in Taiwan in FY2026) and says price revisions centered on special glass contributed to profit growth; electronic-materials operating profit is guided at ¥28.0bn of a ¥30.0bn company total for FY2026 (FY2025: ¥19.4bn of ¥20.8bn). It acknowledges customers are evaluating other companies' low-CTE glass because its added capacity has not yet fully come online, while asserting T-glass's quality advantage for package substrates. Supplier self-report (L8: weak); no customer named; the company states no market share (third-party share figures are media).",
+      "subject_id": "e1"
+    },
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：載板廠或晶片廠一手寫出高階 CPU／GPU／ASIC 載板改用不需要低熱膨張玻纖布的結構（例：玻璃核心基板量產取代有機核心），或一般 E 玻纖布在高階載板量產合格。核查頻率：每半年（載板廠年報與法說、日東紡說明會）。觸發後 48 小時：e2 加註，重讀這一層的反向路徑。",
+      "id": "nittobo_fy2026_q1_results_2026_08_05_cl2",
+      "source_ids": [
+        "nittobo_fy2026_q1_results_2026_08_05_s5",
+        "nittobo_fy2026_q1_results_2026_08_05_s4"
+      ],
+      "statement": "Nittobo's special-glass application table (Aug 2026): for semiconductor package substrates of CPU/GPU/ASIC the material requirement is low CTE, with T glass at the high end and E glass at the middle end (thin T glass for NAND, DDR5 and LPDDR5 memory substrates). Supplier's own application map (L8: self-report).",
+      "subject_id": "e2"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "mat:ic_substrate_glass_cloth",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "nittobo_fy2026_q1_results_2026_08_05_s1",
+        "nittobo_fy2026_q1_results_2026_08_05_s2",
+        "nittobo_fy2026_q1_results_2026_08_05_s3",
+        "nittobo_fy2026_q1_results_2026_08_05_s4"
+      ],
+      "src_id": "co:nitto_boseki"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "mat:ic_package_substrate",
+      "id": "e2",
+      "relation": "is_component_of",
+      "source_ids": [
+        "nittobo_fy2026_q1_results_2026_08_05_s5",
+        "nittobo_fy2026_q1_results_2026_08_05_s4"
+      ],
+      "src_id": "mat:ic_substrate_glass_cloth"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "Nittobo",
+        "日東紡",
+        "日東紡績",
+        "Nitto Boseki"
+      ],
+      "attributes": {
+        "ticker": "3110.T"
+      },
+      "confidence": 0.9,
+      "id": "co:nitto_boseki",
+      "name": "Nitto Boseki",
+      "role": null,
+      "source_ids": [
+        "nittobo_fy2026_q1_results_2026_08_05_s1",
+        "nittobo_fy2026_q1_results_2026_08_05_s4"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "Tガラス",
+        "T-glass",
+        "低熱膨張ガラス",
+        "Low CTE 玻纖布",
+        "low-CTE glass cloth"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "mat:ic_substrate_glass_cloth",
+      "name": "IC-substrate glass fiber cloth (low-CTE T-glass class)",
+      "role": null,
+      "source_ids": [
+        "nittobo_fy2026_q1_results_2026_08_05_s4",
+        "nittobo_fy2026_q1_results_2026_08_05_s5"
+      ],
+      "type": "Material"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "IC substrates"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "mat:ic_package_substrate",
+      "name": "IC Package Substrate",
+      "role": null,
+      "source_ids": [
+        "nittobo_fy2026_q1_results_2026_08_05_s5"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "nittobo_fy2026_q1_results_2026_08_05",
+    "evidence_tier": 1,
+    "origin_entity": "Nitto Boseki Co., Ltd.",
+    "permission_basis": "上場会社の IR 説明会資料（公開）＋同日の主要質疑応答（https://ssl4.eir-parts.net/doc/3110/ir_material_for_fiscal_ym1/209977/00.pdf，公司自行摘要、非逐字稿）；只保留研究必要的有限摘錄，圖表頁 p.15、p.16、p.20 由研究 session 照頁面影像轉錄。",
+    "published_at": "2026-08-05",
+    "publisher": "日東紡績株式会社（IR 説明会資料，E-IR 託管）",
+    "retrieved_at": "2026-10-07",
+    "source_type": "ir_deck",
+    "storage_permission": "repo_excerpt",
+    "title": "日東紡績 2027年3月期 第1四半期 決算説明資料＋主要質疑応答（2026-08-05）",
+    "url": "https://ssl4.eir-parts.net/doc/3110/ir_material_for_fiscal_ym1/209585/00.pdf"
+  },
+  "sources": [
+    {
+      "id": "nittobo_fy2026_q1_results_2026_08_05_s1",
+      "locator": "主要質疑応答 Q3（2026-08-05）",
+      "quote": "半導体パッケージメーカーが日東紡以外の低熱膨張ガラスを採用し始めていること、競合他社が生産能力を増やしていることについて、どのように捉えているか。"
+    },
+    {
+      "id": "nittobo_fy2026_q1_results_2026_08_05_s2",
+      "locator": "主要質疑応答 A3（2026-08-05）",
+      "quote": "まだ当社の増産効果が本格的に発現できていないこともあり、お客様が他社の低熱膨張ガラスを使う検討を進めていることは認識している。ただし、パッケージ基板に求められる品質の高さにおいて T ガラスの競争優位性に変わりはなく、今は供給能力をしっかり上げてマーケットシェアを維持していきたいと考えている。"
+    },
+    {
+      "id": "nittobo_fy2026_q1_results_2026_08_05_s3",
+      "locator": "主要質疑応答 A2（2026-08-05）",
+      "quote": "T ガラスの需要は引き続き非常に強い。現在、2028 年までの能力増強計画を着実に実行しており、今後も需要が続く限り、T ガラスには優先度高くリソースを振り向ける。"
+    },
+    {
+      "id": "nittobo_fy2026_q1_results_2026_08_05_s4",
+      "locator": "説明資料 p.12 FY2026 事業見通し——電子材料",
+      "quote": "サーバー向け、エッジ機器向け半導体パッケージ基板用低熱膨張ガラス（Tガラス）は厚物・薄物ともに需要は大幅拡大の見込み。能力増強を積極的に進める"
+    },
+    {
+      "id": "nittobo_fy2026_q1_results_2026_08_05_s5",
+      "locator": "説明資料 p.20 スペシャルガラスの半導体・PCB用途（影像轉錄）",
+      "quote": "半導体パッケージ基板：CPU/GPU/ASIC——素材への要求「低CTE」——グラスファイバー種類 ハイエンド「T」、ミドルエンド「E」"
+    },
+    {
+      "id": "nittobo_fy2026_q1_results_2026_08_05_s6",
+      "locator": "説明資料 p.5 営業利益 増減分析",
+      "quote": "スペシャルガラスを中心に価格改定を進めたことが増益に寄与"
+    },
+    {
+      "id": "nittobo_fy2026_q1_results_2026_08_05_s7",
+      "locator": "説明資料 p.16 スペシャルガラスの能力増強（影像轉錄）",
+      "quote": "ヤーン・台湾（NITTOBO ASIA Glass Fiber Co., Ltd.〔嘉義〕）：E（汎用・極細）；NE「FY2024 溶融炉増設」；T「FY2026 溶融炉新設」"
+    },
+    {
+      "id": "nittobo_fy2026_q1_results_2026_08_05_s8",
+      "locator": "説明資料 p.14 セグメント別見通し：営業利益（表格數值轉錄）",
+      "quote": "電子材料 280（FY2025 實績 194）；全社調整 ▲25；計 300（FY2025 實績 208）"
+    }
+  ]
+}

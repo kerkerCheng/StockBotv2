@@ -1,0 +1,127 @@
+{
+  "claims": [
+    {
+      "confidence": 0.65,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：景碩後續季報、年報或法說寫出玻纖布供應恢復、不再影響營收或毛利，或寫明它的缺料與低熱膨張玻纖布無關。核查頻率：每季（景碩季報、法說）。觸發後 48 小時：e1 降 confidence 或提撤回，重讀 IC 載板玻纖布層。",
+      "id": "mops_3189_annual_report_2025_cl1",
+      "source_ids": [
+        "mops_3189_annual_report_2025_s1"
+      ],
+      "statement": "Kinsus's own FY2025 annual report (letter to shareholders, risk): raw-material shortages emerged from 2H2025, including glass fiber cloth and copper foil, together with rising copper and gold prices; these will continue to affect revenue growth and compress gross margin in 2026; countermeasures are seeking new raw-material suppliers and raising selling prices. The filing does not specify the glass-cloth grade (low-CTE T-glass vs. E-glass). Buyer-side first-hand (IC substrate maker).",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "mat:ic_substrate_glass_cloth",
+      "id": "e1",
+      "relation": "constrained_by",
+      "source_ids": [
+        "mops_3189_annual_report_2025_s1"
+      ],
+      "src_id": "co:kinsus"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "mat:ic_package_substrate",
+      "id": "e2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "mops_3189_annual_report_2025_s2",
+        "mops_3189_annual_report_2025_s3"
+      ],
+      "src_id": "co:kinsus"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "Kinsus",
+        "景碩",
+        "景碩科技"
+      ],
+      "attributes": {
+        "ticker": "3189.TW"
+      },
+      "confidence": 0.9,
+      "id": "co:kinsus",
+      "name": "Kinsus Interconnect Technology",
+      "role": null,
+      "source_ids": [
+        "mops_3189_annual_report_2025_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "Tガラス",
+        "T-glass",
+        "低熱膨張ガラス",
+        "Low CTE 玻纖布",
+        "low-CTE glass cloth"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "mat:ic_substrate_glass_cloth",
+      "name": "IC-substrate glass fiber cloth (low-CTE T-glass class)",
+      "role": null,
+      "source_ids": [
+        "mops_3189_annual_report_2025_s1"
+      ],
+      "type": "Material"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "IC substrates"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "mat:ic_package_substrate",
+      "name": "IC Package Substrate",
+      "role": null,
+      "source_ids": [
+        "mops_3189_annual_report_2025_s2",
+        "mops_3189_annual_report_2025_s3"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "mops_3189_annual_report_2025",
+    "evidence_tier": 1,
+    "origin_entity": "Kinsus Interconnect Technology Corp.",
+    "permission_basis": "台灣上市公司法定申報（中文版股東會年報）；只保留研究必要的逐字摘錄。published_at 取 MOPS 列表上傳時間 115/05/08 14:46:47。",
+    "published_at": "2026-05-08",
+    "publisher": "公開資訊觀測站（MOPS 電子書）",
+    "retrieved_at": "2026-10-07",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "景碩科技（3189）2025 年度股東會年報——缺料風險、營業比重、產銷政策有限節錄",
+    "url": "https://doc.twse.com.tw/server-java/t57sb01?step=9&kind=F&co_id=3189&filename=2025_3189_20260527F04.pdf"
+  },
+  "sources": [
+    {
+      "id": "mops_3189_annual_report_2025_s1",
+      "locator": "致股東報告書（p.2–3）——風險方面",
+      "quote": "風險方面， 114年下半年開始浮現缺料問題，原物料如玻纖布、銅箔的短缺，原物料如銅價、金價的持續上漲，在115年仍然會持續影響營收的成長及壓縮毛利率，相關對策為尋求新的原物料供應商及調漲售價。"
+    },
+    {
+      "id": "mops_3189_annual_report_2025_s2",
+      "locator": "營運概況——主要產品之營業比重",
+      "quote": "載板部門   32,311,845   82.11%"
+    },
+    {
+      "id": "mops_3189_annual_report_2025_s3",
+      "locator": "致股東報告書——重要之產銷政策 (2)",
+      "quote": "(2) 擴充 ABF FC-BGA 載板產能，以搭配高層數板及高頻/高速的中長期的發展需求。"
+    }
+  ]
+}
