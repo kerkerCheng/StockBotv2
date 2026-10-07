@@ -1,0 +1,143 @@
+{
+  "claims": [
+    {
+      "confidence": 0.65,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：Alfa Laval 下架這一型或改寫「specified for use in the Google Deschutes 5 CDU project」，或 Google 規格改列別家。核查頻率：每半年（OCP 目錄）。觸發後 48 小時：e1 的 qualification_status 改寫、重讀板式熱交換器層。",
+      "id": "ocp_marketplace_alfa_laval_cb210_bphe_listing_2025_10_12_cl1",
+      "source_ids": [
+        "ocp_marketplace_alfa_laval_cb210_bphe_listing_2025_10_12_s1",
+        "ocp_marketplace_alfa_laval_cb210_bphe_listing_2025_10_12_s2"
+      ],
+      "statement": "Alfa Laval's own OCP listing (2025-10-12): its CB210 copper brazed plate heat exchanger, and 'The CB210-276AH-F heat exchanger has been specified for use in the Google Deschutes 5 CDU project' — supplier self-report that matches the buyer's spec (see Google's Deschutes document).",
+      "subject_id": "e1"
+    },
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：主流 CDU 設計改為不用液對液板式熱交換器（例：液對氣、殼管式、或廠務水直入）。核查頻率：每年（OCP 高峰會、CDU 廠產品指南）。觸發後 48 小時：e2 加註、重讀 CDU 層下一層。",
+      "id": "ocp_marketplace_alfa_laval_cb210_bphe_listing_2025_10_12_cl2",
+      "source_ids": [
+        "ocp_marketplace_alfa_laval_cb210_bphe_listing_2025_10_12_s3"
+      ],
+      "statement": "Alfa Laval describes the plate heat exchanger as an option for in-row and centralised CDUs that 'functions as a circuit breaker between the medias in the system' — the liquid-to-liquid boundary between facility water and the IT coolant loop inside a CDU.",
+      "subject_id": "e2"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {
+        "qualification_status": "designed_in"
+      },
+      "confidence": 0.75,
+      "dst_id": "tech:brazed_plate_heat_exchanger",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "ocp_marketplace_alfa_laval_cb210_bphe_listing_2025_10_12_s1",
+        "ocp_marketplace_alfa_laval_cb210_bphe_listing_2025_10_12_s2"
+      ],
+      "src_id": "co:alfa_laval"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:coolant_distribution_unit",
+      "id": "e2",
+      "relation": "is_component_of",
+      "source_ids": [
+        "ocp_marketplace_alfa_laval_cb210_bphe_listing_2025_10_12_s3"
+      ],
+      "src_id": "tech:brazed_plate_heat_exchanger"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "Alfa Laval",
+        "Alfa Laval AB"
+      ],
+      "attributes": {
+        "ticker": "ALFA.ST"
+      },
+      "confidence": 0.9,
+      "id": "co:alfa_laval",
+      "name": "Alfa Laval",
+      "source_ids": [
+        "ocp_marketplace_alfa_laval_cb210_bphe_listing_2025_10_12_s1",
+        "ocp_marketplace_alfa_laval_cb210_bphe_listing_2025_10_12_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "brazed plate heat exchanger",
+        "brazed plate heat exchangers",
+        "BPHE",
+        "BPHEs",
+        "BHE",
+        "copper brazed plate heat exchanger",
+        "硬銲型板式熱交換器"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:brazed_plate_heat_exchanger",
+      "name": "Brazed plate heat exchanger (BPHE)",
+      "source_ids": [
+        "ocp_marketplace_alfa_laval_cb210_bphe_listing_2025_10_12_s1",
+        "ocp_marketplace_alfa_laval_cb210_bphe_listing_2025_10_12_s3"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "CDU",
+        "CDUs",
+        "coolant distribution unit",
+        "coolant distribution units"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:coolant_distribution_unit",
+      "name": "Coolant Distribution Unit (CDU)",
+      "source_ids": [
+        "ocp_marketplace_alfa_laval_cb210_bphe_listing_2025_10_12_s3"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "ocp_marketplace_alfa_laval_cb210_bphe_listing_2025_10_12",
+    "evidence_tier": 2,
+    "origin_entity": "Alfa Laval AB (publ)",
+    "permission_basis": "OCP 官方目錄上由廠商提交的產品頁；只保留研究必要的逐字摘錄。published_at 取 OCP WordPress REST 的上架發布日 2025-10-12。",
+    "published_at": "2025-10-12",
+    "publisher": "Open Compute Project Marketplace",
+    "retrieved_at": "2026-10-06",
+    "source_type": "datasheet",
+    "storage_permission": "repo_excerpt",
+    "title": "Alfa Laval Brazed Plate Heat Exchanger – Model CB210 / CB210AQ（OCP Marketplace 上架頁）",
+    "url": "https://www.opencompute.org/marketplace/facilities-physical-infrastructure/alfa-laval-brazed-plate-heat-exchanger-bphe-cb210-model/"
+  },
+  "sources": [
+    {
+      "id": "ocp_marketplace_alfa_laval_cb210_bphe_listing_2025_10_12_s1",
+      "locator": "INTRODUCTION",
+      "quote": "The Alfa Laval CB210 copper brazed plate heat exchanger (BHE) is engineered to provide efficient heat transfer with a compact footprint."
+    },
+    {
+      "id": "ocp_marketplace_alfa_laval_cb210_bphe_listing_2025_10_12_s2",
+      "locator": "Google Deschutes 5 CDU project",
+      "quote": "The CB210-276AH-F heat exchanger has been specified for use in the Google Deschutes 5 CDU project."
+    },
+    {
+      "id": "ocp_marketplace_alfa_laval_cb210_bphe_listing_2025_10_12_s3",
+      "locator": "POSITIONS IN DATA CENTER",
+      "quote": "The plate heat exchanger may be an option for an In-Row & Centralised Cooling Distribution Unit (CCDU, large skid based CDUs) and functions as a circuit breaker between the medias in the system, minimizing the volume of the coolant required."
+    }
+  ]
+}

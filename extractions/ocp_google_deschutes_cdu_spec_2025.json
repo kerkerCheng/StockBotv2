@@ -1,0 +1,168 @@
+{
+  "claims": [
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：Google 的下一版 Deschutes 規格或 Google 一手文件改為不用液對液 CDU（例：改液對氣或廠務水直入機櫃）。核查頻率：每次 OCP 高峰會（每年兩次）。觸發後 48 小時：e1 加註或提撤回，重讀 CDU 層需求側。",
+      "id": "ocp_google_deschutes_cdu_spec_2025_cl1",
+      "source_ids": [
+        "ocp_google_deschutes_cdu_spec_2025_s1",
+        "ocp_google_deschutes_cdu_spec_2025_s4"
+      ],
+      "statement": "Google's own CDU specification (Project Deschutes, contributed to OCP, final 2025-09-05) is written by Google as the 'customer' for its CDU 'vendors', drawing on 'more than 7 years of scale liquid cooling experience at Google', and opens the design to 'any CDU supplier in the industry'. Buyer-side document: Google depends on liquid-to-liquid CDUs and deliberately multi-sources the CDU itself.",
+      "subject_id": "e1"
+    },
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：Deschutes 下一版改列別家為第一來源，或 CDU 廠文件寫出不用 Alfa Laval 的 Deschutes 熱交換器而成為主流。核查頻率：每次 OCP 高峰會＋每季（CDU 廠上架頁）。觸發後 48 小時：e2 的 qualification_status 改寫、重讀板式熱交換器層。",
+      "id": "ocp_google_deschutes_cdu_spec_2025_cl2",
+      "source_ids": [
+        "ocp_google_deschutes_cdu_spec_2025_s2",
+        "ocp_google_deschutes_cdu_spec_2025_s3",
+        "ocp_google_deschutes_cdu_spec_2025_s4"
+      ],
+      "statement": "In Google's Deschutes CDU specification the heat exchanger is specified as 'First source vendor: Alfa Laval ● Model: CB210-276AH', three in parallel per 2 MW CDU — the buyer names the supplier (designed_in at the spec level). The same spec says components are 'sourced from multiple vendors that are widely known in the industry', so 'first source' is not sole source; no second source is named.",
+      "subject_id": "e2"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:coolant_distribution_unit",
+      "id": "e1",
+      "relation": "depends_on",
+      "source_ids": [
+        "ocp_google_deschutes_cdu_spec_2025_s1",
+        "ocp_google_deschutes_cdu_spec_2025_s4"
+      ],
+      "src_id": "co:google"
+    },
+    {
+      "attributes": {
+        "qualification_status": "designed_in"
+      },
+      "confidence": 0.8,
+      "dst_id": "tech:brazed_plate_heat_exchanger",
+      "id": "e2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "ocp_google_deschutes_cdu_spec_2025_s3",
+        "ocp_google_deschutes_cdu_spec_2025_s4"
+      ],
+      "src_id": "co:alfa_laval"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "end_demand",
+      "aliases": [
+        "Google Cloud"
+      ],
+      "attributes": {
+        "ticker": "GOOGL"
+      },
+      "confidence": 0.9,
+      "id": "co:google",
+      "name": "Google",
+      "role": "adjacent_silicon",
+      "source_ids": [
+        "ocp_google_deschutes_cdu_spec_2025_s1",
+        "ocp_google_deschutes_cdu_spec_2025_s4"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "CDU",
+        "CDUs",
+        "coolant distribution unit",
+        "coolant distribution units"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:coolant_distribution_unit",
+      "name": "Coolant Distribution Unit (CDU)",
+      "source_ids": [
+        "ocp_google_deschutes_cdu_spec_2025_s1",
+        "ocp_google_deschutes_cdu_spec_2025_s2"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "Alfa Laval",
+        "Alfa Laval AB"
+      ],
+      "attributes": {
+        "ticker": "ALFA.ST"
+      },
+      "confidence": 0.9,
+      "id": "co:alfa_laval",
+      "name": "Alfa Laval",
+      "source_ids": [
+        "ocp_google_deschutes_cdu_spec_2025_s3"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "brazed plate heat exchanger",
+        "brazed plate heat exchangers",
+        "BPHE",
+        "BPHEs",
+        "BHE",
+        "copper brazed plate heat exchanger",
+        "硬銲型板式熱交換器"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:brazed_plate_heat_exchanger",
+      "name": "Brazed plate heat exchanger (BPHE)",
+      "source_ids": [
+        "ocp_google_deschutes_cdu_spec_2025_s3"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "ocp_google_deschutes_cdu_spec_2025",
+    "evidence_tier": 1,
+    "origin_entity": "Google",
+    "permission_basis": "開放規格（OCP 文件）；只保留研究必要的逐字摘錄。published_at 取 OCP 文件名的定稿日 2025-09-05（公開可得日；規格頁尾寫 Date: July 01, 2025 是內文版本日）。PDF 文字層斷行多，引文已把空白攤平。",
+    "published_at": "2025-09-05",
+    "publisher": "Open Compute Project",
+    "retrieved_at": "2026-10-06",
+    "source_type": "datasheet",
+    "storage_permission": "repo_excerpt",
+    "title": "Project Deschutes: Data Center Facilities 0.80.0 Specification（Google 提交 OCP 的第五代 CDU 規格）",
+    "url": "https://www.opencompute.org/documents/ocp-specification-deschutes-final-2025-09-05-pdf"
+  },
+  "sources": [
+    {
+      "id": "ocp_google_deschutes_cdu_spec_2025_s1",
+      "locator": "§2.3 Impact",
+      "quote": "The specification will enable any CDU supplier in the industry to develop, manufacture and improve upon the “Project Deschutes” design which is informed by more than 7 years of scale liquid cooling experience at Google."
+    },
+    {
+      "id": "ocp_google_deschutes_cdu_spec_2025_s2",
+      "locator": "§2.4 Scale",
+      "quote": "The “Project Deschutes” CDU is assembled from components that are sourced from multiple vendors that are widely known in the industry."
+    },
+    {
+      "id": "ocp_google_deschutes_cdu_spec_2025_s3",
+      "locator": "§6.2 Heat Exchanger",
+      "quote": "6.2 Heat Exchanger ● First source vendor: Alfa Laval ● Model: CB210-276AH ● Two pass heat exchanger ● 3 heat exchangers in parallel for lower pressure drop and thermal performance"
+    },
+    {
+      "id": "ocp_google_deschutes_cdu_spec_2025_s4",
+      "locator": "§19.3 Nomenclature",
+      "quote": "The term “customer” used in this document refers to Google ● The term “vendor” used in this document refers to the CDU provider."
+    }
+  ]
+}

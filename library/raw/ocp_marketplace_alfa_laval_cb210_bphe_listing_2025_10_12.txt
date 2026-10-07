@@ -1,0 +1,10 @@
+Source URL: https://www.opencompute.org/marketplace/facilities-physical-infrastructure/alfa-laval-brazed-plate-heat-exchanger-bphe-cb210-model/
+
+Excerpt:
+[EXCERPT — 公開文件之有限逐字引文] Alfa Laval Brazed Plate Heat Exchanger – Model CB210 / CB210AQ（OCP Marketplace 上架頁）
+Source: https://www.opencompute.org/marketplace/facilities-physical-infrastructure/alfa-laval-brazed-plate-heat-exchanger-bphe-cb210-model/
+Published: 2025-10-12 | Origin: Alfa Laval AB (publ) | Retrieved: 2026-10-06
+
+INTRODUCTION："The Alfa Laval CB210 copper brazed plate heat exchanger (BHE) is engineered to provide efficient heat transfer with a compact footprint."
+Google Deschutes 5 CDU project："The CB210-276AH-F heat exchanger has been specified for use in the Google Deschutes 5 CDU project."
+POSITIONS IN DATA CENTER："The plate heat exchanger may be an option for an In-Row & Centralised Cooling Distribution Unit (CCDU, large skid based CDUs) and functions as a circuit breaker between the medias in the system, minimizing the volume of the coolant required."

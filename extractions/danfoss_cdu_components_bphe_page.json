@@ -1,0 +1,134 @@
+{
+  "claims": [
+    {
+      "confidence": 0.55,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：Danfoss 頁面或公告不再把板式熱交換器列為資料中心 CDU 元件，或退出這個應用。核查頻率：每年。觸發後 48 小時：e1 降 confidence 或提撤回。",
+      "id": "danfoss_cdu_components_bphe_page_cl1",
+      "source_ids": [
+        "danfoss_cdu_components_bphe_page_s1",
+        "danfoss_cdu_components_bphe_page_s2"
+      ],
+      "statement": "Danfoss's own product page offers heat exchangers among 'almost every component to build an efficient, reliable CDU' and states that brazed plate heat exchangers are 'widely favored in CDUs'. Supplier self-report; no CDU maker or end customer named; undated page.",
+      "subject_id": "e1"
+    },
+    {
+      "confidence": 0.65,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：同 e2（Alfa Laval 文件）——主流 CDU 改用別種熱交換或不再需要液對液熱交換。核查頻率：每年。觸發後 48 小時：e2 加註。",
+      "id": "danfoss_cdu_components_bphe_page_cl2",
+      "source_ids": [
+        "danfoss_cdu_components_bphe_page_s2"
+      ],
+      "statement": "Danfoss: 'Brazed plate heat exchangers (BPHEs) are widely favored in CDUs due to their exceptional efficiency, compact design, and ability to handle high pressures and temperatures.' Corroborates that the BPHE is the default liquid-to-liquid heat exchanger inside CDUs (a second, independent supplier besides Alfa Laval).",
+      "subject_id": "e2"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "tech:brazed_plate_heat_exchanger",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "danfoss_cdu_components_bphe_page_s1",
+        "danfoss_cdu_components_bphe_page_s2"
+      ],
+      "src_id": "co:danfoss"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:coolant_distribution_unit",
+      "id": "e2",
+      "relation": "is_component_of",
+      "source_ids": [
+        "danfoss_cdu_components_bphe_page_s2"
+      ],
+      "src_id": "tech:brazed_plate_heat_exchanger"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "Danfoss"
+      ],
+      "attributes": {
+        "ticker": null
+      },
+      "confidence": 0.9,
+      "id": "co:danfoss",
+      "name": "Danfoss",
+      "source_ids": [
+        "danfoss_cdu_components_bphe_page_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "brazed plate heat exchanger",
+        "brazed plate heat exchangers",
+        "BPHE",
+        "BPHEs",
+        "BHE",
+        "copper brazed plate heat exchanger",
+        "硬銲型板式熱交換器"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:brazed_plate_heat_exchanger",
+      "name": "Brazed plate heat exchanger (BPHE)",
+      "source_ids": [
+        "danfoss_cdu_components_bphe_page_s2"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "CDU",
+        "CDUs",
+        "coolant distribution unit",
+        "coolant distribution units"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:coolant_distribution_unit",
+      "name": "Coolant Distribution Unit (CDU)",
+      "source_ids": [
+        "danfoss_cdu_components_bphe_page_s1",
+        "danfoss_cdu_components_bphe_page_s2"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "danfoss_cdu_components_bphe_page",
+    "evidence_tier": 2,
+    "origin_entity": "Danfoss",
+    "permission_basis": "供應商官網產品頁；只保留研究必要的逐字摘錄。頁面沒有發布日——published_at 留 null，不用擷取日冒充（L11-5）。",
+    "published_at": null,
+    "publisher": "Danfoss 官網",
+    "retrieved_at": "2026-10-06",
+    "source_type": "datasheet",
+    "storage_permission": "repo_excerpt",
+    "title": "Coolant distribution units for data centers（Danfoss 官網 CDU 元件頁）",
+    "url": "https://www.danfoss.com/en/industries/buildings-commercial/dps/data-center-liquid-cooling/coolant-distribution-units-for-data-centers/"
+  },
+  "sources": [
+    {
+      "id": "danfoss_cdu_components_bphe_page_s1",
+      "locator": "CDU components",
+      "quote": "From heat exchangers over to valves, drives, and sensors to controllers – with Danfoss, you get almost every component to build an efficient, reliable CDU."
+    },
+    {
+      "id": "danfoss_cdu_components_bphe_page_s2",
+      "locator": "FAQ",
+      "quote": "Brazed plate heat exchangers (BPHEs) are widely favored in CDUs due to their exceptional efficiency, compact design, and ability to handle high pressures and temperatures."
+    }
+  ]
+}

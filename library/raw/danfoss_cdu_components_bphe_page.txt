@@ -1,0 +1,9 @@
+Source URL: https://www.danfoss.com/en/industries/buildings-commercial/dps/data-center-liquid-cooling/coolant-distribution-units-for-data-centers/
+
+Excerpt:
+[EXCERPT — 公開文件之有限逐字引文] Coolant distribution units for data centers（Danfoss 官網 CDU 元件頁）
+Source: https://www.danfoss.com/en/industries/buildings-commercial/dps/data-center-liquid-cooling/coolant-distribution-units-for-data-centers/
+Published: （無日期） | Origin: Danfoss | Retrieved: 2026-10-06
+
+CDU components："From heat exchangers over to valves, drives, and sensors to controllers – with Danfoss, you get almost every component to build an efficient, reliable CDU."
+FAQ："Brazed plate heat exchangers (BPHEs) are widely favored in CDUs due to their exceptional efficiency, compact design, and ability to handle high pressures and temperatures."

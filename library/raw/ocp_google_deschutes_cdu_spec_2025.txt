@@ -1,0 +1,11 @@
+Source URL: https://www.opencompute.org/documents/ocp-specification-deschutes-final-2025-09-05-pdf
+
+Excerpt:
+[EXCERPT — 公開文件之有限逐字引文] Project Deschutes: Data Center Facilities 0.80.0 Specification（Google 提交 OCP 的第五代 CDU 規格）
+Source: https://www.opencompute.org/documents/ocp-specification-deschutes-final-2025-09-05-pdf
+Published: 2025-09-05 | Origin: Google | Retrieved: 2026-10-06
+
+§2.3 Impact："The specification will enable any CDU supplier in the industry to develop, manufacture and improve upon the “Project Deschutes” design which is informed by more than 7 years of scale liquid cooling experience at Google."
+§2.4 Scale："The “Project Deschutes” CDU is assembled from components that are sourced from multiple vendors that are widely known in the industry."
+§6.2 Heat Exchanger："6.2 Heat Exchanger ● First source vendor: Alfa Laval ● Model: CB210-276AH ● Two pass heat exchanger ● 3 heat exchangers in parallel for lower pressure drop and thermal performance"
+§19.3 Nomenclature："The term “customer” used in this document refers to Google ● The term “vendor” used in this document refers to the CDU provider."
