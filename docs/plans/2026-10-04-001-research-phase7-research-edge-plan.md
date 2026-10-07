@@ -125,6 +125,16 @@ derived_from: docs/brainstorms/2026-10-04-phase7-research-edge-proposal.md（能
 | why | 使用者 2026-10-07：「開發預算上限 10% 這個看要不要拿掉，太死了，真的該開發的東西還是要擺在研究前，不必為了這個條件繞遠路」 |
 | impact | ROADMAP Phase 7 列一句；本檔 §11 第 3 項；個股頁 plan「和 Phase 7 的關係」一句；AGENTS 不改（比例本來就不在 AGENTS；「指得出真實案例」那句是邊界、不是比例，照留） |
 
+**A6｜名冊外的公司也能判邊緣：研究時的機械入口（failure log #43；2026-10-07 使用者「可以 做掉」，10-08 交付）**
+
+| 欄 | 內容 |
+|---|---|
+| 原 plan | 邊緣判定（市值 ≤ 100 億美元**且**分析師 ≤ 12 家，`config/alpha_screen.json`）只在 materialize 時對名冊內的檔算（`alpha.providers.edge.edge_states` → `screen_inputs`：名冊＋Engine C）；名冊外的代號回 `unmeasurable`。research-drain 段 5 只寫「邊緣判定或座位讀不到的，一律留在母體」，研究走到名冊外的公司沒有入口 |
+| 新觀察 | failure log #43，2 次：C1 冷板讀圖與 directed lead 寫「邊緣大小的台廠雙鴻」——目測市值；套系統口徑雙鴻分析師 16 家、不是邊緣。O5 FAU 讀圖寫「邊緣大小的是 Browave」——同樣目測。同晚 G1 的日東紡、台玻、建榮也只能目測。研究要找的正是名冊外的新邊緣候選，目測只看得到市值、看不到覆蓋厚薄 |
+| proposed change | 唯讀入口 `python -m alpha edge <代號…>`（`alpha.providers.edge.adhoc_edge_states`）：同一個純函式 `alpha/edge.py::edge_state`、同一份門檻；名冊＋Engine C 有值的欄位照用（候選板同一條路），缺的欄位才用 yfinance 補——市值＝價格×股數、報價單位照 `identity/currency.py` 換成結算幣別再換美元（不用 yfinance 的 marketCap 欄：小單位報價時單位不保證），家數＝`numberOfAnalystOpinions`；**每個欄位標來源**；取數失敗（含限流）照實落「量不到」並寫理由，家數缺值不當 0。research-drain 段 5 加一行：名冊外的公司用這個命令判、不目測，讀圖／敘事／層說明寫「邊緣」時附判定與來源 |
+| why | 使用者 2026-10-07「可以 做掉」；A5 的判準：它擋研究——研究走到名冊外的公司時只能目測，目測已經錯了一次（雙鴻） |
+| impact | `alpha/providers/edge.py`（新函式，materialize 走的 `edge_states` 不動）、`alpha/cli.py`（`edge` 子命令）、`tests/test_alpha_edge_adhoc.py`（5 條：三個原始案例、GBp 小單位、未登記報價單位 fail closed、名冊值優先只補缺欄、取數失敗照實寫）、`skills/research-drain/SKILL.md` 一行；不動 contract、不進 request path、不寫任何 authority。驗收：真資料回放 3324.TWO → 非邊緣（16 家）、3110.T → 邊緣（42.3 億美元、9 家）、3163.TWO → 量不到（家數取不到）＝3／3；變異 3 個全紅（拿掉小單位換算、yfinance 覆蓋名冊值、家數缺值當 0）；全套 3754 passed／1 skipped。之後的量：讀圖、敘事、層說明裡「邊緣」字樣附得出判定的比例（10-07 是 0／3） |
+
 ## 0.5 核准狀態、續工方式、進度表
 
 **本 plan 是使用者已核准的 PLAN_PROPOSAL**（§0.1）。`AGENTS.md`「常規推進授權」照用：Verdict 為 `GO` 且沒有待使用者決定的問題就**直接做下一個 Step**；

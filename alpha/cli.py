@@ -777,6 +777,12 @@ def build_parser() -> argparse.ArgumentParser:
     note.add_argument("--format", choices=("markdown", "json"), default="markdown")
     note.set_defaults(func=cmd_layer_note)
 
+    edge = sub.add_parser(
+        "edge", help="研究時判邊緣（唯讀）：名冊外的代號也能判——同一個判定函式與門檻，缺的輸入用 yfinance 補、逐欄標來源")
+    edge.add_argument("tickers", nargs="+", help="代號，例如 3324.TWO 3110.T（照交易所後綴寫）")
+    edge.add_argument("--format", choices=("markdown", "json"), default="markdown")
+    edge.set_defaults(func=cmd_edge)
+
     cohort = sub.add_parser(
         "theme-cohort", help="主題等權組（唯讀）：列出現行的組／查一檔屬於哪幾組；寫入只經 pq2 complete-theme-cohort")
     cohort.add_argument("ticker", nargs="?", help="只看這一檔屬於哪幾組")
@@ -853,6 +859,31 @@ def cmd_audit_moved(_args: argparse.Namespace) -> int:
           file=sys.stderr)
     print("請改用：python -m audit invariants", file=sys.stderr)
     return 2
+
+
+def cmd_edge(args: argparse.Namespace) -> int:
+    """研究時判邊緣（failure log #43）：名冊外的代號也能判，判定與門檻同候選板；唯讀。"""
+    from .providers.edge import adhoc_edge_states
+
+    tickers = [t.strip() for t in args.tickers if t.strip()]
+    rows = adhoc_edge_states(tickers)
+    if args.format == "json":
+        print(json.dumps(rows, ensure_ascii=False, indent=2, default=str))
+        return 0
+    print("| 代號 | 判定 | 市值（USD） | 分析師 | 理由 | 市值來源 | 家數來源 |")
+    print("|---|---|---|---|---|---|---|")
+    for t in tickers:
+        r = rows[t]
+        cap = r.get("market_cap_usd")
+        cap_s = f"{cap / 1e9:.2f}B" if cap is not None else f"—（{r.get('market_cap_absence') or '缺'}）"
+        cnt = r.get("analyst_count")
+        src = r.get("sources") or {}
+        print(f"| {t} | {r['label']} | {cap_s} | {cnt if cnt is not None else '—'} | {'、'.join(r['reasons'])} | "
+              f"{src.get('market_cap') or '—'} | {src.get('analyst_count') or '—'} |")
+    lim = next(iter(rows.values()))["thresholds"] if rows else {}
+    print(f"\n門檻（config/alpha_screen.json，兩條 AND）：市值 ≤ {lim.get('market_cap_max_usd', 0) / 1e9:.0f}B 美元、分析師 ≤ {lim.get('analyst_count_max')} 家。"
+          "這只回答「算不算倍率候選」，不排序、不給尺寸。")
+    return 0
 
 
 def main(argv: list[str] | None = None) -> int:
