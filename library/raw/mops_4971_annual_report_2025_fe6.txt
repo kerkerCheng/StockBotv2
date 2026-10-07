@@ -1,0 +1,15 @@
+Source URL: https://doc.twse.com.tw/server-java/t57sb01?step=9&kind=F&co_id=4971&filename=2025_4971_20260623FE6.pdf
+
+Excerpt:
+[EXCERPT — 法定申報／一手文件之有限逐字引文] IntelliEPI Inc. (Cayman)（4971）2025 Annual Report（英文版股東會年報，股東會後修訂本）
+Source: https://doc.twse.com.tw/server-java/t57sb01?step=9&kind=F&co_id=4971&filename=2025_4971_20260623FE6.pdf
+Published: 2026-08-27 | Origin: IntelliEPI Inc. (Cayman) | Retrieved: 2026-10-06
+
+[mops_4971_annual_report_2025_fe6_s1] Ch.5 Operational Highlights——fiber-optic communication 產業結構表（Segment／Domestic Suppliers／International Suppliers）的 Epitaxy 列
+Segment Product/Technology Domestic Suppliers International Suppliers Epitaxy LD/MOCVD LD/MBE PD/ MOCVD PD/ MBE VPEC, Epistar, LandMark, HJ, Etc. IntelliEPI, IQE, II-VI, etc.
+
+[mops_4971_annual_report_2025_fe6_s2] 同節，產業結構表前一段
+IET focuses on the R&D and production of epitaxial wafers for GaAs/AlGaAs-based and InP/InGaAs-based optical active component (VCSEL) and optical passive component (PIN, APD).
+
+[mops_4971_annual_report_2025_fe6_s3] Ch.5 市場占有率段（2）（資料來源：IET internal data）
+IET is the world top one InP PIN suppliers, which account for almost 100% 100G-200G InP PIN commercial orders worldwide. InP PIN is an advanced and high-profit device which performs better when grown by MBE technique. IET supplies products to three of the world’s top four optoelctronic companies, and will keep the leadership in future.

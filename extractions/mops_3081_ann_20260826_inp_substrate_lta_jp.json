@@ -1,0 +1,96 @@
+{
+  "claims": [
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：聯亞的重大訊息或財報寫出這份基板長約縮減、終止，或基板不足造成出貨下滑。核查頻率：每季（聯亞重大訊息與財報）。觸發後 48 小時：本 claim 加註，InP 基板層與 InP 磊晶片層讀圖重讀。",
+      "id": "mops_3081_ann_20260826_inp_substrate_lta_jp_cl1",
+      "source_ids": [
+        "mops_3081_ann_20260826_inp_substrate_lta_jp_s1",
+        "mops_3081_ann_20260826_inp_substrate_lta_jp_s2"
+      ],
+      "statement": "LandMark (an InP epiwafer maker) is signing a 4-year long-term purchase agreement (2026–2029) with an unnamed Japanese InP substrate supplier and its Taiwan subsidiary 'to ensure stable supply of the key raw material, InP substrates'. Counterparty is undisclosed and must not be inferred (INV-1).",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "mat:inp_substrate",
+      "id": "e1",
+      "relation": "depends_on",
+      "source_ids": [
+        "mops_3081_ann_20260826_inp_substrate_lta_jp_s1"
+      ],
+      "src_id": "mat:inp_epiwafer"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "equipment_epitaxy",
+      "aliases": [
+        "InP epiwafer",
+        "InP epi-wafer",
+        "InP epitaxial wafer",
+        "indium phosphide epitaxial wafer",
+        "磷化銦磊晶片"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "mat:inp_epiwafer",
+      "name": "Indium Phosphide (InP) epitaxial wafer (laser and photodetector epi)",
+      "source_ids": [
+        "mops_3081_ann_20260826_inp_substrate_lta_jp_s1"
+      ],
+      "type": "Material"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "InP",
+        "indium phosphide",
+        "InP wafer",
+        "InP substrate",
+        "6-inch indium phosphide wafer substrate"
+      ],
+      "attributes": {
+        "concentration_score": 4,
+        "ramp_difficulty_intrinsic": 5
+      },
+      "confidence": 0.9,
+      "id": "mat:inp_substrate",
+      "name": "Indium Phosphide (InP) substrate",
+      "source_ids": [
+        "mops_3081_ann_20260826_inp_substrate_lta_jp_s1"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "mops_3081_ann_20260826_inp_substrate_lta_jp",
+    "evidence_tier": 1,
+    "origin_entity": "LandMark Optoelectronics Corporation",
+    "permission_basis": "台灣上櫃公司重大訊息（MOPS 歷史重大訊息查詢 t05st01）；全文短、只保留研究必要的逐字。published_at 取 MOPS 發言日期 115/08/26。",
+    "published_at": "2026-08-26",
+    "publisher": "公開資訊觀測站（MOPS 重大訊息）",
+    "retrieved_at": "2026-10-06",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "聯亞光電 重大訊息（2026-08-26）：公告本公司董事會決議簽訂磷化銦基板長期採購合約",
+    "url": "https://mopsov.twse.com.tw/mops/web/t05st01?co_id=3081&spoke_date=20260826&seq_no=2"
+  },
+  "sources": [
+    {
+      "id": "mops_3081_ann_20260826_inp_substrate_lta_jp_s1",
+      "locator": "重大訊息說明第 5 點（主要內容）",
+      "quote": "5.主要內容（解除者不適用）:為確保關鍵原料磷化銦基板之穩定供應，本公司擬與某日本供應商及其台灣子公司簽訂為期4年之長期採購合約。"
+    },
+    {
+      "id": "mops_3081_ann_20260826_inp_substrate_lta_jp_s2",
+      "locator": "重大訊息說明第 2、4 點",
+      "quote": "2.契約或承諾相對人:某日本供應商及其台灣子公司 3.與公司關係:無 4.契約或承諾起迄日期（或解除日期）:預計115年至118年"
+    }
+  ]
+}

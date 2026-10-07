@@ -1,0 +1,15 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/928876/000117891326003180/zk2635540.htm
+
+Excerpt:
+[EXCERPT — 法定申報／一手文件之有限逐字引文] Tower Semiconductor Ltd. Form 6-K（2026-06-15）——IQE and Tower Semiconductor Announce Multi-year InP epiwafer Supply Agreement
+Source: https://www.sec.gov/Archives/edgar/data/928876/000117891326003180/zk2635540.htm
+Published: 2026-06-15 | Origin: Tower Semiconductor Ltd. | Retrieved: 2026-10-06
+
+[tsem_6_k_20260615_iqe_inp_s1] Exhibit（新聞稿）第 2 段
+IQE’s InP epiwafers will be used in several of Tower’s advanced silicon photonics platforms for next-generation optical technologies, providing a high-quality supply base for Tower’s product roadmap.
+
+[tsem_6_k_20260615_iqe_inp_s2] Exhibit（新聞稿）Tower 總裁 Dr. Marco Racanelli 引言
+We are pleased to partner with IQE as a key supplier for our next-generation photonic technologies that add InP high-performance components to our high-volume, mature, silicon photonics platform.
+
+[tsem_6_k_20260615_iqe_inp_s3] Exhibit（新聞稿）第 2 段末
+The agreement provides for a minimum purchase commitment by Tower in the first year, a reciprocal supply commitment from IQE, and minimum volume commitments thereafter.

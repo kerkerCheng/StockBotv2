@@ -1,0 +1,18 @@
+Source URL: https://doc.twse.com.tw/server-java/t57sb01?step=9&kind=F&co_id=2455&filename=2025_2455_20260529FE4.pdf
+
+Excerpt:
+[EXCERPT — 法定申報／一手文件之有限逐字引文] Visual Photonics Epitaxy（2455）2025 Annual Report（英文版股東會年報）
+Source: https://doc.twse.com.tw/server-java/t57sb01?step=9&kind=F&co_id=2455&filename=2025_2455_20260529FE4.pdf
+Published: 2026-05-08 | Origin: Visual Photonics Epitaxy Co., Ltd. | Retrieved: 2026-10-06
+
+[mops_2455_annual_report_2025_fe4_s1] Ch.5 Competition status——Optoelectronics
+Optoelectronics The Company’s optoelectronic products adopt MOCVD to produce epitaxial layers. The foreign competitors include the UK -based company, IQE, primarily. The domestic competitor is LandMark Optoelectronics Corporation.
+
+[mops_2455_annual_report_2025_fe4_s2] Ch.5 Industrial structure 表（compound semiconductor，資料來源 Yole）的 Epitaxy 列
+Overview of investments by domestic/foreign manufacturers in the field of compound semiconductor By industry Domestic manufacturer Foreign manufacturer Epitaxy VPEC, IQE TAIWAN CORPORATION (IQE), and LandMark Optoelectronics Corporation, etc. IQE, InteliEpi, Picogiga (Soitec) and Sumika, etc.
+
+[mops_2455_annual_report_2025_fe4_s3] Ch.5 主要客戶增減變動原因（英文版寫「In 2026」，中文版同段是 114 年度＝2025）
+In 2026, due to the explosive increase in demand for high -speed optical communication components by AI servers data centers, shipment revenue of optoelectronic indium phosphide epitaxial wafers rose sharply, resulting in revenue growth.
+
+[mops_2455_annual_report_2025_fe4_s4] Letter to Shareholders——2026 outlook
+Shipments of 800G receiver components are set to double, while 1.6T products have completed validation and begu n mass production. The increase in transmission speeds is expected to drive up average selling prices and profit margins. The demand for CW laser transmitters is also expected to double compared to last year, with the potential to acquire new customers and further expand market share.

@@ -1,0 +1,220 @@
+{
+  "claims": [
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：聯亞的年報或法說不再列「製程後磷化銦磊晶片」（再成長）產品，或其他商用磊晶廠在一手文件寫出高功率埋入式或光柵 DFB 的 CW 雷射磊晶片量產並具名客戶。核查頻率：每季（聯亞與各家財報、法說）＋每年（年報）。觸發後 48 小時：本 claim 加註，InP 磊晶片層讀圖重讀供給側。",
+      "id": "mops_3081_annual_report_2025_fe4_inp_epi_cl1",
+      "source_ids": [
+        "mops_3081_annual_report_2025_fe4_inp_epi_s4",
+        "mops_3081_annual_report_2025_fe4_inp_epi_s5"
+      ],
+      "statement": "LandMark lists 'Regrown InP Epi-wafer' as its own product group (RWG-DFB, BH-FP/DFB, photodetector) and says it does DFB grating fabrication and multiple epitaxial growth itself. Variant-level capability claim by the supplier (L8: self-report); which customers use which variant is not disclosed.",
+      "subject_id": "e1"
+    },
+    {
+      "confidence": 0.45,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "條件：聯亞年報的競爭段不再寫 IDM 把部分磊晶製程外包，或它的主要客戶表中 2025 年因資料中心長出來的客戶占比腰斬。核查頻率：每年（聯亞年報）。觸發後 48 小時：本 claim 加註，聯亞敘事「我們賭什麼」重寫。",
+      "id": "mops_3081_annual_report_2025_fe4_inp_epi_cl2",
+      "source_ids": [
+        "mops_3081_annual_report_2025_fe4_inp_epi_s6"
+      ],
+      "statement": "LandMark says IDMs frequently face internal capacity constraints and gradually outsource certain epitaxial processes to it. Supplier description of its customers' motive (L8: weak); customers are disclosed only by code.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "mat:inp_epiwafer",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "mops_3081_annual_report_2025_fe4_inp_epi_s1",
+        "mops_3081_annual_report_2025_fe4_inp_epi_s4"
+      ],
+      "src_id": "co:landmark_optoelectronics"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:cw_dfb_laser",
+      "id": "e2",
+      "relation": "is_component_of",
+      "source_ids": [
+        "mops_3081_annual_report_2025_fe4_inp_epi_s2"
+      ],
+      "src_id": "mat:inp_epiwafer"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:eml",
+      "id": "e3",
+      "relation": "is_component_of",
+      "source_ids": [
+        "mops_3081_annual_report_2025_fe4_inp_epi_s3"
+      ],
+      "src_id": "mat:inp_epiwafer"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:photodiode",
+      "id": "e4",
+      "relation": "is_component_of",
+      "source_ids": [
+        "mops_3081_annual_report_2025_fe4_inp_epi_s3"
+      ],
+      "src_id": "mat:inp_epiwafer"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "equipment_epitaxy",
+      "aliases": [
+        "InP epiwafer",
+        "InP epi-wafer",
+        "InP epitaxial wafer",
+        "indium phosphide epitaxial wafer",
+        "磷化銦磊晶片"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "mat:inp_epiwafer",
+      "name": "Indium Phosphide (InP) epitaxial wafer (laser and photodetector epi)",
+      "source_ids": [
+        "mops_3081_annual_report_2025_fe4_inp_epi_s1",
+        "mops_3081_annual_report_2025_fe4_inp_epi_s4"
+      ],
+      "type": "Material"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "聯亞光電",
+        "LandMark Optoelectronics",
+        "3081.TWO",
+        "聯亞光電工業股份有限公司",
+        "LandMark"
+      ],
+      "attributes": {
+        "ticker": "3081.TWO"
+      },
+      "confidence": 0.95,
+      "id": "co:landmark_optoelectronics",
+      "name": "LandMark Optoelectronics Corporation",
+      "role": "foundry",
+      "source_ids": [
+        "mops_3081_annual_report_2025_fe4_inp_epi_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "CW laser",
+        "internal laser diode",
+        "high-power CW laser",
+        "CW DFB",
+        "CW DFB laser",
+        "DFB laser",
+        "high-power DFB laser"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 4
+      },
+      "confidence": 0.9,
+      "id": "tech:cw_dfb_laser",
+      "name": "High-power CW DFB laser",
+      "source_ids": [
+        "mops_3081_annual_report_2025_fe4_inp_epi_s2"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "EML",
+        "EML laser",
+        "InP EML",
+        "200-gig EML",
+        "differential EML",
+        "Electro-absorption Modulated Laser"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 4
+      },
+      "confidence": 0.9,
+      "id": "tech:eml",
+      "name": "Electro-absorption Modulated Laser",
+      "source_ids": [
+        "mops_3081_annual_report_2025_fe4_inp_epi_s3"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "photodiodes",
+        "detectors"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:photodiode",
+      "name": "Photodiode (InP-based)",
+      "source_ids": [
+        "mops_3081_annual_report_2025_fe4_inp_epi_s3"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "mops_3081_annual_report_2025_fe4_inp_epi",
+    "evidence_tier": 1,
+    "origin_entity": "LandMark Optoelectronics Corporation",
+    "permission_basis": "台灣上櫃公司法定申報（英文版股東會年報 FE4）；只保留研究必要的逐字摘錄。published_at 取 MOPS 列表上傳時間 115/05/12 17:59:06。",
+    "published_at": "2026-05-12",
+    "publisher": "公開資訊觀測站（MOPS 電子書）",
+    "retrieved_at": "2026-10-06",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "LandMark Optoelectronics Corporation（3081）2025 Annual Report（英文版股東會年報）",
+    "url": "https://doc.twse.com.tw/server-java/t57sb01?step=9&kind=F&co_id=3081&filename=2025_3081_20260527FE4.pdf"
+  },
+  "sources": [
+    {
+      "id": "mops_3081_annual_report_2025_fe4_inp_epi_s1",
+      "locator": "IV. Operational Highlights——A.1.a Principal Business Activities (2)",
+      "quote": "(2) Manufacturing, processing, and trading of Indium Phosphide (InP) epitaxial wafers and chips."
+    },
+    {
+      "id": "mops_3081_annual_report_2025_fe4_inp_epi_s2",
+      "locator": "A.1 Cloud Computing and AI Data Center Applications——core products b.",
+      "quote": "b. Key Light Sources for Advanced Architectures: High-power, high- stability Continuous Wave (CW) DFB laser epi-wafers for Silicon Photonics and CPO architectures."
+    },
+    {
+      "id": "mops_3081_annual_report_2025_fe4_inp_epi_s3",
+      "locator": "A.3.a Technical Level and R&D——core R&D initiatives（第 1、2 項）",
+      "quote": "High-speed, high-power FP, DFB, and EML laser epi-wafers (InP-based)  High-speed photodetector (PD) epi-wafers (GaAs- and InP-based)"
+    },
+    {
+      "id": "mops_3081_annual_report_2025_fe4_inp_epi_s4",
+      "locator": "B.2.a Important Applications of Primary Products——產品表最後一組（Regrown InP Epi-wafer）",
+      "quote": "Regrown InP Epi-wafer RWG-DFB Laser (Ridge Waveguide) 1250 nm ~1650nm BH-FP/DFB Laser (Buried Heterostructure) 1250 nm ~1650nm Photodetector 1100nm ~1650nm"
+    },
+    {
+      "id": "mops_3081_annual_report_2025_fe4_inp_epi_s5",
+      "locator": "A.1 Telecommunication Infrastructure Applications 段末",
+      "quote": "Furthermore, the Company possesses industry -critical DFB LD grating fabrication technology and multiple epitaxial growth (multi-growth) capabilities."
+    },
+    {
+      "id": "mops_3081_annual_report_2025_fe4_inp_epi_s6",
+      "locator": "A.2(4) Competition of the products——第一類（IDM）",
+      "quote": "However, propelled by the rapid growth in global demand for optical communication and data centers, IDMs frequently face internal capacity constraints, prompting them to gradually outsource certain epitaxial processes."
+    }
+  ]
+}

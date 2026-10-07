@@ -1,0 +1,101 @@
+{
+  "claims": [
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：Tower 或 IQE 的一手文件寫出這份 InP 磊晶片協議縮減、終止或最低承諾未履行。核查頻率：每半年（Tower 20-F／6-K、IQE 期中與年度結果）。觸發後 48 小時：本 claim 加註，IQE 敘事與 InP 磊晶片層讀圖重讀。",
+      "id": "tsem_6_k_20260615_iqe_inp_cl1",
+      "source_ids": [
+        "tsem_6_k_20260615_iqe_inp_s1",
+        "tsem_6_k_20260615_iqe_inp_s3"
+      ],
+      "statement": "Customer-side filing (Tower 6-K): IQE's InP epiwafers will be used in several of Tower's silicon photonics platforms; the multi-year agreement has a first-year minimum purchase commitment by Tower, a reciprocal supply commitment from IQE and minimum volume commitments thereafter. Amounts and volumes are not disclosed.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "mat:inp_epiwafer",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "tsem_6_k_20260615_iqe_inp_s1",
+        "tsem_6_k_20260615_iqe_inp_s2"
+      ],
+      "src_id": "co:iqe"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "equipment_epitaxy",
+      "aliases": [
+        "InP epiwafer",
+        "InP epi-wafer",
+        "InP epitaxial wafer",
+        "indium phosphide epitaxial wafer",
+        "磷化銦磊晶片"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "mat:inp_epiwafer",
+      "name": "Indium Phosphide (InP) epitaxial wafer (laser and photodetector epi)",
+      "source_ids": [
+        "tsem_6_k_20260615_iqe_inp_s1"
+      ],
+      "type": "Material"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "IQE",
+        "IQE.L",
+        "台灣高平磊晶"
+      ],
+      "attributes": {
+        "ticker": "IQE.L"
+      },
+      "confidence": 0.9,
+      "id": "co:iqe",
+      "name": "IQE plc",
+      "role": "material_base",
+      "source_ids": [
+        "tsem_6_k_20260615_iqe_inp_s1",
+        "tsem_6_k_20260615_iqe_inp_s2"
+      ],
+      "type": "Company"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "tsem_6_k_20260615_iqe_inp",
+    "evidence_tier": 1,
+    "origin_entity": "Tower Semiconductor Ltd.",
+    "permission_basis": "美國 SEC 法定申報（Form 6-K 附件新聞稿）；只保留研究必要的逐字摘錄（HTML 實體已解碼）。published_at 取 EDGAR filed date。",
+    "published_at": "2026-06-15",
+    "publisher": "SEC EDGAR",
+    "retrieved_at": "2026-10-06",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Tower Semiconductor Ltd. Form 6-K（2026-06-15）——IQE and Tower Semiconductor Announce Multi-year InP epiwafer Supply Agreement",
+    "url": "https://www.sec.gov/Archives/edgar/data/928876/000117891326003180/zk2635540.htm"
+  },
+  "sources": [
+    {
+      "id": "tsem_6_k_20260615_iqe_inp_s1",
+      "locator": "Exhibit（新聞稿）第 2 段",
+      "quote": "IQE’s InP epiwafers will be used in several of Tower’s advanced silicon photonics platforms for next-generation optical technologies, providing a high-quality supply base for Tower’s product roadmap."
+    },
+    {
+      "id": "tsem_6_k_20260615_iqe_inp_s2",
+      "locator": "Exhibit（新聞稿）Tower 總裁 Dr. Marco Racanelli 引言",
+      "quote": "We are pleased to partner with IQE as a key supplier for our next-generation photonic technologies that add InP high-performance components to our high-volume, mature, silicon photonics platform."
+    },
+    {
+      "id": "tsem_6_k_20260615_iqe_inp_s3",
+      "locator": "Exhibit（新聞稿）第 2 段末",
+      "quote": "The agreement provides for a minimum purchase commitment by Tower in the first year, a reciprocal supply commitment from IQE, and minimum volume commitments thereafter."
+    }
+  ]
+}

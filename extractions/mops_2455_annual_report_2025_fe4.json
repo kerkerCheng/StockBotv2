@@ -1,0 +1,168 @@
+{
+  "claims": [
+    {
+      "confidence": 0.55,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：全新的年報、法說或財報說明寫出 CW 雷射或光偵測器磊晶需求衰退、沒有新增客戶，或磷化銦磊晶片出貨營收下滑。核查頻率：每季（全新財報、法說）＋每年（年報）。觸發後 48 小時：本 claim 加註，全新敘事與 InP 磊晶片層讀圖重讀。",
+      "id": "mops_2455_annual_report_2025_fe4_cl1",
+      "source_ids": [
+        "mops_2455_annual_report_2025_fe4_s3",
+        "mops_2455_annual_report_2025_fe4_s4"
+      ],
+      "statement": "VPEC says AI data-centre demand made shipment revenue of its optoelectronic InP epitaxial wafers rise sharply (English text says 'In 2026'; the Chinese edition dates the same passage to FY2025), that 800G receiver shipments are set to double and 1.6T products have begun mass production, and that CW laser transmitter demand is expected to double with potential new customers. Supplier self-report; volumes and the CW variant (FP vs DFB, high-power) are not disclosed.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "mat:inp_epiwafer",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "mops_2455_annual_report_2025_fe4_s2",
+        "mops_2455_annual_report_2025_fe4_s3"
+      ],
+      "src_id": "co:vpec"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.6,
+      "dst_id": "mat:inp_epiwafer",
+      "id": "e2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "mops_2455_annual_report_2025_fe4_s1"
+      ],
+      "src_id": "co:landmark_optoelectronics"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.6,
+      "dst_id": "mat:inp_epiwafer",
+      "id": "e3",
+      "relation": "supplies_to",
+      "source_ids": [
+        "mops_2455_annual_report_2025_fe4_s1"
+      ],
+      "src_id": "co:iqe"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "equipment_epitaxy",
+      "aliases": [
+        "InP epiwafer",
+        "InP epi-wafer",
+        "InP epitaxial wafer",
+        "indium phosphide epitaxial wafer",
+        "磷化銦磊晶片"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "mat:inp_epiwafer",
+      "name": "Indium Phosphide (InP) epitaxial wafer (laser and photodetector epi)",
+      "source_ids": [
+        "mops_2455_annual_report_2025_fe4_s3"
+      ],
+      "type": "Material"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "Visual Photonics Epitaxy",
+        "全新光電",
+        "2455.TW"
+      ],
+      "attributes": {
+        "ticker": "2455.TW"
+      },
+      "confidence": 0.95,
+      "id": "co:vpec",
+      "name": "VPEC",
+      "role": "foundry",
+      "source_ids": [
+        "mops_2455_annual_report_2025_fe4_s2",
+        "mops_2455_annual_report_2025_fe4_s3"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "聯亞光電",
+        "LandMark Optoelectronics",
+        "3081.TWO",
+        "聯亞光電工業股份有限公司",
+        "LandMark"
+      ],
+      "attributes": {
+        "ticker": "3081.TWO"
+      },
+      "confidence": 0.95,
+      "id": "co:landmark_optoelectronics",
+      "name": "LandMark Optoelectronics Corporation",
+      "role": "foundry",
+      "source_ids": [
+        "mops_2455_annual_report_2025_fe4_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "IQE",
+        "IQE.L",
+        "台灣高平磊晶"
+      ],
+      "attributes": {
+        "ticker": "IQE.L"
+      },
+      "confidence": 0.9,
+      "id": "co:iqe",
+      "name": "IQE plc",
+      "role": "material_base",
+      "source_ids": [
+        "mops_2455_annual_report_2025_fe4_s1"
+      ],
+      "type": "Company"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "mops_2455_annual_report_2025_fe4",
+    "evidence_tier": 1,
+    "origin_entity": "Visual Photonics Epitaxy Co., Ltd.",
+    "permission_basis": "台灣上市公司法定申報（英文版股東會年報 FE4，與中文版 F04 同日上傳）；只保留研究必要的逐字摘錄。published_at 取 MOPS 列表上傳時間 115/05/08 14:48:22。",
+    "published_at": "2026-05-08",
+    "publisher": "公開資訊觀測站（MOPS 電子書）",
+    "retrieved_at": "2026-10-06",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Visual Photonics Epitaxy（2455）2025 Annual Report（英文版股東會年報）",
+    "url": "https://doc.twse.com.tw/server-java/t57sb01?step=9&kind=F&co_id=2455&filename=2025_2455_20260529FE4.pdf"
+  },
+  "sources": [
+    {
+      "id": "mops_2455_annual_report_2025_fe4_s1",
+      "locator": "Ch.5 Competition status——Optoelectronics",
+      "quote": "Optoelectronics The Company’s optoelectronic products adopt MOCVD to produce epitaxial layers. The foreign competitors include the UK -based company, IQE, primarily. The domestic competitor is LandMark Optoelectronics Corporation."
+    },
+    {
+      "id": "mops_2455_annual_report_2025_fe4_s2",
+      "locator": "Ch.5 Industrial structure 表（compound semiconductor，資料來源 Yole）的 Epitaxy 列",
+      "quote": "Overview of investments by domestic/foreign manufacturers in the field of compound semiconductor By industry Domestic manufacturer Foreign manufacturer Epitaxy VPEC, IQE TAIWAN CORPORATION (IQE), and LandMark Optoelectronics Corporation, etc. IQE, InteliEpi, Picogiga (Soitec) and Sumika, etc."
+    },
+    {
+      "id": "mops_2455_annual_report_2025_fe4_s3",
+      "locator": "Ch.5 主要客戶增減變動原因（英文版寫「In 2026」，中文版同段是 114 年度＝2025）",
+      "quote": "In 2026, due to the explosive increase in demand for high -speed optical communication components by AI servers data centers, shipment revenue of optoelectronic indium phosphide epitaxial wafers rose sharply, resulting in revenue growth."
+    },
+    {
+      "id": "mops_2455_annual_report_2025_fe4_s4",
+      "locator": "Letter to Shareholders——2026 outlook",
+      "quote": "Shipments of 800G receiver components are set to double, while 1.6T products have completed validation and begu n mass production. The increase in transmission speeds is expected to drive up average selling prices and profit margins. The demand for CW laser transmitters is also expected to double compared to last year, with the potential to acquire new customers and further expand market share."
+    }
+  ]
+}

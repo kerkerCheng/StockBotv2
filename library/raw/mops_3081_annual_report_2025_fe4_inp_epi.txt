@@ -1,0 +1,24 @@
+Source URL: https://doc.twse.com.tw/server-java/t57sb01?step=9&kind=F&co_id=3081&filename=2025_3081_20260527FE4.pdf
+
+Excerpt:
+[EXCERPT — 法定申報／一手文件之有限逐字引文] LandMark Optoelectronics Corporation（3081）2025 Annual Report（英文版股東會年報）
+Source: https://doc.twse.com.tw/server-java/t57sb01?step=9&kind=F&co_id=3081&filename=2025_3081_20260527FE4.pdf
+Published: 2026-05-12 | Origin: LandMark Optoelectronics Corporation | Retrieved: 2026-10-06
+
+[mops_3081_annual_report_2025_fe4_inp_epi_s1] IV. Operational Highlights——A.1.a Principal Business Activities (2)
+(2) Manufacturing, processing, and trading of Indium Phosphide (InP) epitaxial wafers and chips.
+
+[mops_3081_annual_report_2025_fe4_inp_epi_s2] A.1 Cloud Computing and AI Data Center Applications——core products b.
+b. Key Light Sources for Advanced Architectures: High-power, high- stability Continuous Wave (CW) DFB laser epi-wafers for Silicon Photonics and CPO architectures.
+
+[mops_3081_annual_report_2025_fe4_inp_epi_s3] A.3.a Technical Level and R&D——core R&D initiatives（第 1、2 項）
+High-speed, high-power FP, DFB, and EML laser epi-wafers (InP-based)  High-speed photodetector (PD) epi-wafers (GaAs- and InP-based)
+
+[mops_3081_annual_report_2025_fe4_inp_epi_s4] B.2.a Important Applications of Primary Products——產品表最後一組（Regrown InP Epi-wafer）
+Regrown InP Epi-wafer RWG-DFB Laser (Ridge Waveguide) 1250 nm ~1650nm BH-FP/DFB Laser (Buried Heterostructure) 1250 nm ~1650nm Photodetector 1100nm ~1650nm
+
+[mops_3081_annual_report_2025_fe4_inp_epi_s5] A.1 Telecommunication Infrastructure Applications 段末
+Furthermore, the Company possesses industry -critical DFB LD grating fabrication technology and multiple epitaxial growth (multi-growth) capabilities.
+
+[mops_3081_annual_report_2025_fe4_inp_epi_s6] A.2(4) Competition of the products——第一類（IDM）
+However, propelled by the rapid growth in global demand for optical communication and data centers, IDMs frequently face internal capacity constraints, prompting them to gradually outsource certain epitaxial processes.
