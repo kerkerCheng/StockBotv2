@@ -3666,7 +3666,7 @@ function stackTable(table) {
   table.querySelectorAll('tbody tr').forEach((tr) => {
     Array.from(tr.children).forEach((cell, i) => { if (headers[i]) cell.setAttribute('data-label', headers[i]); });
   });
-  table.classList.add('stack');
+  table.classList.add('stack-table');
   return table;
 }
 
