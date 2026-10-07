@@ -1426,6 +1426,201 @@
         "景碩",
         "景碩科技"
       ]
+    },
+    {
+      "company_id": "co:ibiden",
+      "research_ticker": "4062.T",
+      "market_currency": "JPY",
+      "display_name": "Ibiden Co.,Ltd.",
+      "_display_name_source": "yfinance longName（2026-10-08）；東証 4062（イビデン株式会社）",
+      "_note": "隨「AI 封裝載板與上游材料」主題等權組 pq2 staged（2026-10-08）：IC 載板是主業；系統口徑非邊緣（約 436 億美元、17 家，`python -m alpha edge` 2026-10-07）——入組是 G9 量測基準，不是候選",
+      "name_aliases": [
+        "Ibiden",
+        "IBIDEN",
+        "イビデン"
+      ]
+    },
+    {
+      "company_id": "co:unimicron",
+      "research_ticker": "3037.TW",
+      "market_currency": "TWD",
+      "execution_currency": "TWD",
+      "execution_venue": "TWSE",
+      "display_name": "Unimicron Technology Corp.",
+      "_display_name_source": "yfinance longName（2026-10-08）；上市 3037（欣興電子股份有限公司）",
+      "_note": "隨「AI 封裝載板與上游材料」主題等權組 pq2 staged（2026-10-08）：ABF／BT 載板與 PCB；系統口徑非邊緣（約 672 億美元、19 家）——入組是 G9 量測基準，不是候選",
+      "name_aliases": [
+        "Unimicron",
+        "欣興",
+        "欣興電子"
+      ]
+    },
+    {
+      "company_id": "co:nan_ya_pcb",
+      "research_ticker": "8046.TW",
+      "market_currency": "TWD",
+      "execution_currency": "TWD",
+      "execution_venue": "TWSE",
+      "display_name": "Nan Ya Printed Circuit Board Corporation",
+      "_display_name_source": "yfinance longName（2026-10-08）；上市 8046（南亞電路板股份有限公司）",
+      "_note": "隨「AI 封裝載板與上游材料」主題等權組 pq2 staged（2026-10-08）：ABF／BT 載板；系統口徑非邊緣（約 300 億美元、14 家）。不放單詞「Nan Ya」（台塑集團多家共用）；「南電」是中文整串比對，留意「台南電…」這類誤中（2026-10-08 原文庫 0 次）",
+      "name_aliases": [
+        "Nan Ya PCB",
+        "南電",
+        "南亞電路板"
+      ]
+    },
+    {
+      "company_id": "co:modine",
+      "research_ticker": "MOD",
+      "market_currency": "USD",
+      "display_name": "Modine Manufacturing Company",
+      "_display_name_source": "yfinance longName（2026-10-08）",
+      "_note": "名冊批次（2026-10-08）：散熱鏈（資料中心冰水機）；系統口徑邊緣（約 97.6 億美元、8 家，`python -m alpha edge`）；lead_1f5a72a9（X，「$MOD - Chillers / Cooling」）",
+      "name_aliases": [
+        "Modine"
+      ]
+    },
+    {
+      "company_id": "co:aaon",
+      "research_ticker": "AAON",
+      "market_currency": "USD",
+      "display_name": "AAON, Inc.",
+      "_display_name_source": "yfinance longName（2026-10-08）",
+      "_note": "名冊批次（2026-10-08）：散熱鏈（冰水機／液冷）；系統口徑邊緣（約 70.8 億美元、4 家）；lead_1f5a72a9（X，「$AAON - Chillers / liquid cooling」）、lead_85718e11",
+      "name_aliases": [
+        "AAON"
+      ]
+    },
+    {
+      "company_id": "co:munters",
+      "research_ticker": "MTRS.ST",
+      "market_currency": "SEK",
+      "aliases": [
+        "MTRS"
+      ],
+      "display_name": "Munters Group AB (publ)",
+      "_display_name_source": "yfinance longName（2026-10-08）；Nasdaq Stockholm MTRS",
+      "_note": "名冊批次（2026-10-08）：散熱鏈（資料中心冰水機）；系統口徑邊緣（約 23.6 億美元、8 家）；lead_1f5a72a9（X，「$MTRS - chillers」）。代號別名 MTRS＝lead 的 cashtag 寫法（yfinance 上 MTRS 不是任何上市代號，2026-10-08 查）",
+      "name_aliases": [
+        "Munters"
+      ]
+    },
+    {
+      "company_id": "co:navitas",
+      "research_ticker": "NVTS",
+      "market_currency": "USD",
+      "display_name": "Navitas Semiconductor Corporation",
+      "_display_name_source": "yfinance longName（2026-10-08）",
+      "_note": "名冊批次（2026-10-08）：電力鏈 800VDC（GaN／SiC 功率元件）；系統口徑邊緣（約 29.6 億美元、8 家）；lead_f82cfe46（official:navitas，NVIDIA MGX 800VDC 生態系）、lead_a4c2e143（decompose-800vdc）、lead_3a7c4e5d。單詞「Navitas」也是一家私人電池公司（Navitas Systems）的名字，入圖引文要看上下文",
+      "name_aliases": [
+        "Navitas",
+        "Navitas Semiconductor"
+      ]
+    },
+    {
+      "company_id": "co:power_integrations",
+      "research_ticker": "POWI",
+      "market_currency": "USD",
+      "display_name": "Power Integrations, Inc.",
+      "_display_name_source": "yfinance longName（2026-10-08）",
+      "_note": "名冊批次（2026-10-08）：電力鏈 800VDC（GaN 功率元件）；系統口徑邊緣（約 28.7 億美元、4 家）；lead_3a7c4e5d（X，XFAB 的曝險客戶）",
+      "name_aliases": [
+        "Power Integrations"
+      ]
+    },
+    {
+      "company_id": "co:enersys",
+      "research_ticker": "ENS",
+      "market_currency": "USD",
+      "display_name": "EnerSys",
+      "_display_name_source": "yfinance longName（2026-10-08）",
+      "_note": "名冊批次（2026-10-08）：電力鏈（BBU 備援電池）；系統口徑邊緣（約 65 億美元、4 家）；lead_798000da（X，高功率圓柱電芯／BBU 缺貨的延伸）",
+      "name_aliases": [
+        "EnerSys"
+      ]
+    },
+    {
+      "company_id": "co:hammond_power_solutions",
+      "research_ticker": "HPS-A.TO",
+      "market_currency": "CAD",
+      "aliases": [
+        "HPS.A"
+      ],
+      "display_name": "Hammond Power Solutions Inc.",
+      "_display_name_source": "yfinance longName（2026-10-08）；TSX HPS.A",
+      "_note": "名冊批次（2026-10-08）：電力鏈（乾式變壓器；7.1 開過的變壓器題目）；系統口徑邊緣（約 18.3 億美元、8 家）；lead_1f5a72a9（X，「$HPS.A - Transformers」）。代號別名 HPS.A＝lead 的 cashtag 寫法（yfinance 上 HPS.A 不是任何上市代號，2026-10-08 查）。不放單詞「Hammond」（Hammond Manufacturing 是另一家）",
+      "name_aliases": [
+        "Hammond Power Solutions",
+        "Hammond Power"
+      ]
+    },
+    {
+      "company_id": "co:vishay",
+      "research_ticker": "VSH",
+      "market_currency": "USD",
+      "display_name": "Vishay Intertechnology, Inc.",
+      "_display_name_source": "yfinance longName（2026-10-08）",
+      "_note": "名冊批次（2026-10-08）：被動元件（鉭質電容、晶片電阻）——lead_ffdc392c（X，07-25「瓶頸時程」清單點名）、lead_b0daa999；系統口徑邊緣（約 51.4 億美元、6 家）。Vishay Precision Group（VPG）是分拆出去的另一家，不在名冊",
+      "name_aliases": [
+        "Vishay"
+      ]
+    },
+    {
+      "company_id": "co:kulicke_and_soffa",
+      "research_ticker": "KLIC",
+      "market_currency": "USD",
+      "display_name": "Kulicke and Soffa Industries, Inc.",
+      "_display_name_source": "yfinance longName（2026-10-08）",
+      "_note": "名冊批次（2026-10-08）：封裝設備（打線機；lead_7f7cc2f4 說 AI 伺服器帶動成熟製程封裝、打線機成為主要瓶頸）；系統口徑邊緣（約 49.4 億美元、3 家）。不放「K&S」（太短、別處也用）",
+      "name_aliases": [
+        "Kulicke and Soffa",
+        "Kulicke & Soffa"
+      ]
+    },
+    {
+      "company_id": "co:lpkf",
+      "research_ticker": "LPK.DE",
+      "market_currency": "EUR",
+      "aliases": [
+        "LPK"
+      ],
+      "display_name": "LPKF Laser & Electronics SE",
+      "_display_name_source": "yfinance longName（2026-10-08）；XETRA LPK",
+      "_note": "名冊批次（2026-10-08）：玻璃基板（TGV／LIDE 雷射）——IC 載板鏈的下一代；系統口徑邊緣（約 4.1 億美元、2 家）；lead_3e383a34、lead_9b2aad22、lead_b8f9702c（X，玻璃核心載板量產時程）。代號別名 LPK＝lead 的 cashtag 寫法（yfinance 上 LPK 只有一個沒有價格的 ECN 報價，不是上市公司，2026-10-08 查）",
+      "name_aliases": [
+        "LPKF",
+        "LPKF Laser"
+      ]
+    },
+    {
+      "company_id": "co:huaming",
+      "research_ticker": "002270.SZ",
+      "market_currency": "CNY",
+      "execution_currency": "CNY",
+      "execution_venue": "SZSE",
+      "display_name": "Huaming Power Equipment Co.,Ltd",
+      "_display_name_source": "yfinance longName（2026-10-08）；深交所 002270（华明电力装备股份有限公司，年報封面）",
+      "_note": "隨分接開關入圖包 staged（2026-10-08）：主業變壓器分接開關（2025 年電力設備占營收 86.63%）；系統口徑邊緣（22.8 億美元、10 家，`python -m alpha edge`）。不收單詞「华明」（兩字整串比對會撞「中华明…」這類字串）",
+      "name_aliases": [
+        "Huaming",
+        "Huaming Power Equipment",
+        "华明装备",
+        "華明裝備",
+        "华明电力装备",
+        "華明電力裝備"
+      ]
+    },
+    {
+      "company_id": "co:reinhausen",
+      "research_ticker": null,
+      "display_name": "Reinhausen GmbH",
+      "_display_name_source": "reinhausen.com 版權頁（Imprint）逐字「Reinhausen GmbH」「Falkensteinstraße 8 93059 Regensburg Germany」（2026-10-08）；舊稱 Maschinenfabrik Reinhausen",
+      "_note": "私人公司（研究 ticker 明確 null，INV-1）；國家實驗室 2026-05 報告：美國唯一的有載分接開關生產者。不收「MR」（太短）",
+      "name_aliases": [
+        "Reinhausen",
+        "Maschinenfabrik Reinhausen"
+      ]
     }
   ]
 }
