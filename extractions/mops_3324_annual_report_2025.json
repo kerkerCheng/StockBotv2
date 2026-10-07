@@ -1,0 +1,193 @@
+{
+  "claims": [
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：雙鴻後續年報、季報或法說寫出冷板量產停止或主要伺服器客戶流失；或客戶端一手文件列出某一世代 AI 平台的冷板合格名單、其中沒有雙鴻（媒體已報導 Vera Rubin 的四家不含雙鴻，需一手）。核查頻率：每季（雙鴻月營收、季報、法說）。觸發後 48 小時：e1 降 confidence 或提撤回，重讀冷板層讀圖與冷板層說明 ②。",
+      "id": "mops_3324_annual_report_2025_cl1",
+      "source_ids": [
+        "mops_3324_annual_report_2025_s1",
+        "mops_3324_annual_report_2025_s2",
+        "mops_3324_annual_report_2025_s3",
+        "mops_3324_annual_report_2025_s4",
+        "mops_3324_annual_report_2025_s5"
+      ],
+      "statement": "Auras's own FY2025 annual report: it describes itself as a liquid-cooling system solution provider whose liquid-cooling products include water cold plates (GPU/CPU/DIMM), pumps, coolant distribution units and manifolds with customized design and production; server revenue share rose from 39% (2024) to 57% (2025); customers above 10% of sales are disclosed only by code (2025: Q 15.37%, U 14.80%, T 14.35%), and U's increase is attributed to server new-model water- and air-cooling sales. Self-report in a statutory filing (L8: weak); no customer or platform is named in these passages.",
+      "subject_id": "e1"
+    },
+    {
+      "confidence": 0.5,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "條件：雙鴻後續文件寫出 CDU 停止開發或出貨，或客戶端一手顯示其 CDU 未通過認證。核查頻率：每半年（雙鴻年報、法說）。觸發後 48 小時：e3 降 confidence 或提撤回，重讀 CDU 層讀圖。",
+      "id": "mops_3324_annual_report_2025_cl2",
+      "source_ids": [
+        "mops_3324_annual_report_2025_s1",
+        "mops_3324_annual_report_2025_s2",
+        "mops_3324_annual_report_2025_s6"
+      ],
+      "statement": "Auras's annual report lists coolant distribution units among its liquid-cooling products (customized design and production; liquid-to-liquid and liquid-to-air, in-rack and in-row) and says it is developing in-row liquid-to-liquid CDUs above 2 MW. Self-report; no CDU volume, customer or qualification is stated in these passages.",
+      "subject_id": "e3"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "tech:liquid_cooling_cold_plate",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "mops_3324_annual_report_2025_s1",
+        "mops_3324_annual_report_2025_s2",
+        "mops_3324_annual_report_2025_s3"
+      ],
+      "src_id": "co:auras_technology"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "tech:liquid_cooling_manifold",
+      "id": "e2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "mops_3324_annual_report_2025_s1",
+        "mops_3324_annual_report_2025_s2",
+        "mops_3324_annual_report_2025_s3"
+      ],
+      "src_id": "co:auras_technology"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.6,
+      "dst_id": "tech:coolant_distribution_unit",
+      "id": "e3",
+      "relation": "supplies_to",
+      "source_ids": [
+        "mops_3324_annual_report_2025_s1",
+        "mops_3324_annual_report_2025_s2",
+        "mops_3324_annual_report_2025_s6"
+      ],
+      "src_id": "co:auras_technology"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "Auras",
+        "雙鴻",
+        "雙鴻科技"
+      ],
+      "attributes": {
+        "ticker": "3324.TWO"
+      },
+      "confidence": 0.9,
+      "id": "co:auras_technology",
+      "name": "Auras Technology",
+      "role": null,
+      "source_ids": [
+        "mops_3324_annual_report_2025_s1",
+        "mops_3324_annual_report_2025_s7"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "水冷板"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:liquid_cooling_cold_plate",
+      "name": "Liquid-cooling cold plate (direct-to-chip)",
+      "role": null,
+      "source_ids": [
+        "mops_3324_annual_report_2025_s2"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "分歧管",
+        "分岐管"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:liquid_cooling_manifold",
+      "name": "Liquid-cooling distribution manifold",
+      "role": null,
+      "source_ids": [
+        "mops_3324_annual_report_2025_s2"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "冷水分配裝置",
+        "液冷分配裝置"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:coolant_distribution_unit",
+      "name": "Coolant Distribution Unit (CDU)",
+      "role": null,
+      "source_ids": [
+        "mops_3324_annual_report_2025_s2"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "mops_3324_annual_report_2025",
+    "evidence_tier": 1,
+    "origin_entity": "Auras Technology Co., Ltd.",
+    "permission_basis": "台灣上櫃公司法定申報（中文版股東會年報）；只保留研究必要的逐字摘錄（fetchers.mops 抽字後照行號截取、只去換行）。published_at 取 MOPS 列表上傳時間 115/04/30 14:08:35（民國年轉西元）。",
+    "published_at": "2026-04-30",
+    "publisher": "公開資訊觀測站（MOPS 電子書）",
+    "retrieved_at": "2026-10-07",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "雙鴻科技（3324）2025 年度股東會年報——液冷段落有限節錄",
+    "url": "https://doc.twse.com.tw/server-java/t57sb01?step=9&kind=F&co_id=3324&filename=2025_3324_20260521F04.pdf"
+  },
+  "sources": [
+    {
+      "id": "mops_3324_annual_report_2025_s1",
+      "locator": "p.67 營運概況——產業概況 2.(2) 下游產品應用領域",
+      "quote": "雙鴻從氣冷模組零組件生產製造商，躍進成為液冷技術整機櫃系統供應商，持續投入智能化生產之研發與製造，提供客戶完整的液冷應用包含水冷板、泵浦、液冷分配裝置、分岐管等客製化設計與生產。"
+    },
+    {
+      "id": "mops_3324_annual_report_2025_s2",
+      "locator": "p.66 營運概況——產業概況 2. 上中下游產業之關聯性（液冷系統的關鍵零部件）",
+      "quote": "在液冷系統解決方案中，公司可提供液冷系統的關鍵零部件，包含分歧管、水對水/水對氣及一對一/一對多的冷水分配裝置、GPU/CPU/DIMM水冷板等液冷散熱方案。"
+    },
+    {
+      "id": "mops_3324_annual_report_2025_s3",
+      "locator": "p.64 營運概況——業務內容 3. 公司目前之產品及服務項目（液冷）",
+      "quote": "液冷技術則提供涵蓋含水冷板、泵浦、冷水分配裝置、分岐管、快接頭等客製化設計與生產"
+    },
+    {
+      "id": "mops_3324_annual_report_2025_s4",
+      "locator": "p.2 致股東報告書——二、一一四年營業計畫（回顧一一四年營運結果）",
+      "quote": "伺服器、PC、VGA、Others 營收占比分別為 57%、27%、14%、2%，相較 2024 年營收占比 39%、39%、17%、5%，伺服器營收占比大幅提升。"
+    },
+    {
+      "id": "mops_3324_annual_report_2025_s5",
+      "locator": "p.77 營運概況——主要進銷貨客戶名單 2.（增減變動原因）",
+      "quote": "增減變動原因：主係因 Server 新機種水冷及氣冷銷售增加，致使 U 公司 114 年度銷售金額占比增加。"
+    },
+    {
+      "id": "mops_3324_annual_report_2025_s6",
+      "locator": "p.3 致股東報告書——展望一一五年營運成長動能 3.（液冷分配裝置）",
+      "quote": "液冷分配裝置 (CDU)：AI運算推進，整機櫃功耗從千瓦級(KW)躍升至兆瓦級(MW)，為資料中心的效率及效能最大化做準備，公司不斷技術升級，液冷分配裝置往 2MW以上一對多(In-Row) L2L (Liquid to Liquid) CDU (Cooling Distribution Unit) 開發。"
+    },
+    {
+      "id": "mops_3324_annual_report_2025_s7",
+      "locator": "p.68–69 營運概況——技術及研發概況 2. 研究發展概況",
+      "quote": "早在2012年，透過IBM技轉液冷散熱技術，雙鴻不斷精進優化液冷技術。"
+    }
+  ]
+}
