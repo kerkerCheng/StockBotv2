@@ -466,6 +466,8 @@ def advance(
     if to_status not in ALL_STATUSES:
         raise LeadStateError(f"未知狀態：{to_status}")
     cleaned_ref = validate_ref_updates(ref) if ref else {}
+    # 這一次停放有沒有**明確**改觸發條件（下面 setdefault 補的不算）：有才把沿用的 watch 改過去。
+    retarget = bool({"trace_trigger_kind", "trace_trigger_entities"} & set(cleaned_ref))
     lead = _require(store, lead_id)
     if (
         to_status == "parked"
@@ -524,6 +526,7 @@ def advance(
                 # 最後一次進 pq1 的時間，不是原始 triage 時間：2.9b 起排回不改寫 triage，若拿 decided_at，
                 # 剛觸發排回的那則 lead 比 watch 還新、會立刻再叫醒它（排回迴圈）。
                 created_at=last_entered_pq1_at(lead) or None,
+                retarget=retarget,
             )
     return lead
 
