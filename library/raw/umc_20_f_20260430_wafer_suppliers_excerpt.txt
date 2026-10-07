@@ -1,0 +1,12 @@
+SOURCE: United Microelectronics Corporation Annual Report on Form 20-F for FY2025（SEC accession 0001193125-26-193757）——矽晶圓供應商有限節錄
+URL: https://www.sec.gov/Archives/edgar/data/1033767/000119312526193757/d91630d20f.htm
+PUBLISHED: 2026-04-30（EDGAR filing date）
+RETRIEVED: 2026-10-08
+STORAGE: repo_excerpt（SEC 公開文件；HTML 去標籤、空白正規化後逐字截取）
+NOTE: **客戶端一手（晶圓代工廠）**，講矽晶圓整體、不分 SOI 或光子。
+
+【Item 3.D Risk Factors（原料）】
+For example, we purchased a majority of our silicon wafers from Shin-Etsu Handotai Corporation, or Shin-Etsu, GlobalWafers, Sumco Group (including Sumco Corporation and Formosa Sumco Technology Corporation) and Soitec. Although we source raw materials from multiple suppliers, a small number of these suppliers hold an important position in our raw material supply due to the consistency of their product quality, and this concentration of supply may subject us to additional risks, particularly if we are not able to maintain relationships with these suppliers.
+
+【Item 4.B Raw Materials】
+Although we have not experienced any shortage of raw materials that had a material effect on our operations, and supplies of raw materials we use currently are adequate, shortages could occur in various critical materials due to interruption of supply or an increase in industry demand. The most important raw material used in our production processes is silicon wafer, which is the basic raw material from which integrated circuits are made. The principal makers for our wafers are Shin-Etsu, GlobalWafers, Sumco Group and Soitec. We have in the past obtained and believe that we will continue to be able to obtain a sufficient supply of silicon wafers.

@@ -1,0 +1,24 @@
+SOURCE: GLOBALFOUNDRIES Inc. Annual Report on Form 20-F for FY2025（SEC accession 0001709048-26-000022）——SOI 晶圓供應與矽光子有限節錄
+URL: https://www.sec.gov/Archives/edgar/data/1709048/000170904826000022/gfs-20251231.htm
+PUBLISHED: 2026-02-27（EDGAR filing date）
+RETRIEVED: 2026-10-08
+STORAGE: repo_excerpt（SEC 公開文件；HTML 去標籤、空白正規化後逐字截取）
+NOTE: **客戶端一手（矽光子代工廠）**。講的是 300mm SOI 晶圓整體（RF-SOI、FD-SOI、矽光子都在 300mm SOI 上），**沒有把光子用的 SOI 拆出來**；71% 是 SOI 晶圓支出占比，不是數量占比。同一份 20-F 已入圖（`gfs_20_f_20260227`，引文只有 Raw Materials 那一句）。
+
+【Item 3.D Risk Factors（原料供應）】
+If we are unable to obtain 300mm SOI wafers from Soitec S.A. (“Soitec”), our primary supplier, for any reason, we expect that it would take us an extended period to find a replacement supplier on commercially acceptable terms. In 2025, Soitec accounted for approximately 71% of our SOI wafer spend. While we are in the process of developing relationships with alternate suppliers, we do not expect to be able to acquire a significant amount of SOI wafers from those suppliers in the near term, and there is no assurance that we will ever be able to do so.
+
+【Item 3.D Risk Factors（Soitec 的上游）】
+For example, Soitec is reliant on third-party providers to obtain raw silicon wafers—difficulties in obtaining raw silicon wafers may result in Soitec’s inability to produce SOI wafers.
+
+【Item 4.B Business Overview — Raw Materials】
+One of the most important raw materials used in our production processes is silicon wafers, which is the basic raw material from which ICs are made. In order to secure a reliable and flexible supply of high-quality wafers, we have entered into multiple long-term agreements with the majority of our principal suppliers, the largest of which is Soitec.
+
+【Item 10.C Material Contracts】
+2024 Soitec MSA Addendum – In October 2024, the Company executed an addendum to the 2017 MSA with Soitec S.A. for 300mm RFSOI and FD Products. The addendum establishes the required supply volumes, pricing and other terms for materials essential to our processes until 2026 and, subject to certain conditions, until 2030.
+
+【Item 5 Operating Results（終端市場）】
+Communications, Infrastructure & Data Center grew 29.1% year-over-year, supported by growth in silicon photonics optical networking and satellite communications.
+
+【Note 5 Business Combinations（AMF）】
+AMF is a pioneering silicon photonics foundry based in Singapore. The acquisition is expected to enhance the Company’s scale, differentiation and customer base in silicon photonics.

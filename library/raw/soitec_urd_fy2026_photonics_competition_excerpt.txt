@@ -1,0 +1,45 @@
+SOURCE: Soitec 2025-2026 Universal Registration Document（法定年度註冊文件，AMF 申報；英文版）——光子 SOI、競爭、產能、展望有限節錄
+URL: https://www.soitec.com/docs/default-source/agm-documents/2026/en/soitec---2025-2026-urd---va.pdf（本庫 library/raw/soitec_urd_fy2026_en.pdf）
+PUBLISHED: 2026-06-10（封面：法文版 URD「was filed on June 10, 2026 with the French financial markets authority (AMF)」；英文版是譯本）
+RETRIEVED: 2026-09-02（PDF）；本摘錄 2026-10-08 程式截取
+STORAGE: repo_excerpt（法定文件有限節錄；pypdf 抽字、空白正規化後逐字截取；合字 ﬁ／ﬂ 還原成 fi／fl；PDF 斷行留下的「Photonics- SOI」「Power- SOI」空格還原）
+NOTE: **供應商一手（自述）**。競爭者（SEH、GlobalWafers）是 Soitec 自己點名；「industry standard」是自我評價。
+
+【1.9 Competitive landscape｜PDF p.34（印刷頁 32）】
+In the artificial intelligence sector, FD-SOI and Photonics-SOI products compete with players such as Shin-Etsu Handotai (SEH) and GlobalWafers, among others. Soitec offers a diverse product portfolio in the Mobile Communications sector, including FD-SOI, POI and RF-SOI, and competes with groups such as GlobalWafers, SEH and NGK, among others.
+
+【1.9 Competitive landscape（SEH）｜PDF p.34（印刷頁 32）】
+Soitec has licensed its SOI patents to SEH. SEH is a major player in the Group’s ecosystem: it is both a strategic supplier for 200 mm and 300 mm bulk wafers and a competitor, as well as a minority shareholder.
+
+【1.9 Competitive landscape（SEH 授權）｜PDF p.34（印刷頁 32）】
+SEH obtained a patent license for the SOI technology in 1997, which was renewed in March 2023 for a 10-year period. The license requires no operating interaction beyond declaring their sales for the calculation of royalties;
+
+【1.x Photonics and optical sensing｜PDF p.27（印刷頁 25）】
+Photonics-SOI substrates are a central feature of this transition. They are used for data center interconnections of 100/400 GbE (Gigabit Ethernet), 800 GbE and beyond. The integration of silicon photonics into very high speed components (co-packaged optics, CPO) is garnering growing interest. SOI technology offers a unique structure enabling the integration of optical devices monolithically on standard CMOS platforms. Soitec’s photonics-SOI plays a major role in devices’ final optical performance, so Soitec is continually innovating and improving their features to support the technological developments of latest-generation data centers. Soitec supplies several international foundries with both 200 mm and 300 mm wafers.
+
+【1.6.1 Production sites in France｜PDF p.32（印刷頁 30）】
+The Bernin 1 (200 mm wafer production) and Bernin 2 (300 mm wafer production) plants have an annual production capacity of 750,000 and 800,000 wafers respectively.
+
+【1.6.2 Production site in Singapore｜PDF p.32（印刷頁 30）】
+The fab is currently undergoing qualification for the production of Photonics-SOI and Power-SOI substrates.
+
+【2.1.5.1.2 Competitive market（風險）｜PDF p.42（印刷頁 40）】
+There is a risk of substrate producers developing integrated models enabling them to make SOI, POI, Photonics, etc., or offer alternatives to Soitec products.
+
+【5 Comments on the fiscal year（合併營收）｜PDF p.231（印刷頁 229）】
+Consolidated revenue came in at €592 million, down 30% at constant scope and exchange rates from €891 million in fiscal year 2024-2025.
+
+【5 Comments on the fiscal year（Edge & Cloud AI）｜PDF p.232（印刷頁 230）】
+In this context, Photonics-SOI technology has gradually become an industry standard, both for optical transceivers and for co-packaged optics (CPO) architectures.
+
+【5 Comments on the fiscal year（Edge & Cloud AI 營收）｜PDF p.232（印刷頁 230）】
+Edge & Cloud AI revenue totaled €214 million, up 8% at constant scope and exchange rates.
+
+【5.1.4.2 Main future capital expenditure｜PDF p.239（印刷頁 237）】
+Over fiscal year 2026-2027, the Group aims to keep CAPEX under control, while continuing to selectively accelerate strategic investments, notably in Photonics-SOI and POI, mainly at the Bernin site.
+
+【5.3 Trends and objectives｜PDF p.239（印刷頁 237）】
+Photonics-SOI momentum is accelerating and the Group is mobilizing its industrial footprint to address growing customer demand and volume ramp-up.
+
+【5.3 Trends and objectives（獲利）｜PDF p.239（印刷頁 237）】
+Fiscal year 2026-2027 profitability is expected to be impacted by low fab loading, unfavorable exchange effects and a decrease in certain funding.

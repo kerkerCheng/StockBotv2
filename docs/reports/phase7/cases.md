@@ -123,8 +123,16 @@
   - 2026-10-07｜續工 ①（晚段）：**波若威 3163.TWO 第一份敘事 `ib_a35b0492e80432ee`（缺 X）**——押 FAU 層 `sr_8c9292bfbc2b492a`；X＝①FAU 層的量或換不掉（五家被客戶點名、Coherent 可整套自製）②CPO 光纖套件與配線盒量產出現在營收（2025 年報致股東報告書：115 年下半年開始量產；8 月營收年增 9.7%）③已定價主參照（自家歷史只湊得出約兩年）；等待 `ew_0371`（11-16）、反證 1、加碼條件 1（同日 `ib_987df2c1dad5c4e7` 換版：評價利益的主詞改成「股票與 ETF」）。三項必查都做：致股東報告書、表頭（113／114 兩年度合併）、同義節點（`tech:cpo_fiber_attach` 未併，續工 ⑥）。順帶發現：①本業利潤薄、淨利大半是持股評價（2026 H1 透過損益按公允價值衡量之金融資產利益 2.92 億元 vs 營收 12.48 億元）；②季報股數 2026Q2 mismatch 17.5% 是待分配股票股利（每股 1.75 元）、不是增資；③月營收缺 2024-05——今天的 36 個月回補漏掉那一個月，補回後已定價窗 484 → 726 天（仍不滿三年）
   - 2026-10-07｜使用者 go：**[730] FAU 同義節點合併**（commit `a5024b04`：`config/entity_aliases.json` 一筆＋`loader/migrate_fau_merge_20261007.py`；備份 `20261007T141331Z` 後 apply）——`tech:cpo_fiber_attach` 刪除、Coherent 掛在舊節點的供貨邊併進既有那條、FAU 多一條 is_component_of `tech:scale_out_cpo`（原邊搬家，不是新來源）、cl1 改指 FAU；舊 id 殘留 assertion／claim／關係 0、重投影 11 條邊 0 衝突、audit invariants 14 PASS。FAU 讀圖重讀 **`sr_aa0b79ad032a31c4`**（仍 undecided，「表示法缺陷」修完）；波若威 `ib_45fdc0945f279b22`、上詮 `ib_84f838c2b0cc8801` 換騎（各格內容不變）。`tech:cpo`／`tech:scale_out_cpo` 疑似同義，另案
   - 2026-10-07｜向你要文件 pq2 **[735]**：波若威（3163）、上詮（3363）的 CPO 光纖組件／FAU 營收占比與客戶平台（台灣券商報告或法說 memo；兩檔都停在「缺」）
+  - 2026-10-08｜**Photonics-SOI 層說明 v1**（層深讀入口「下一層 0 條」——矽光子 PIC 層判量、上游沒接；SOI.PA「缺 X」指向這一層；`library/private/research_notes/layer_notes/mat_photonics_soi_wafer.md`，ledger `ln_b3a788384542e760`）：
+    **客戶說換不掉、供應商說不缺**——GF 2025 年度 20-F：300mm SOI「our primary supplier」是 Soitec、占 SOI 晶圓支出約 71%、換一家「would take us an extended period」、替代來源近期拿不到量（客戶端一手，**不分光子**；GF 與 Soitec 2024 年協議增補名稱只寫 RFSOI 與 FD）；
+    Soitec 自己的 URD：FY2026-27 獲利受「low fab loading」影響、AI 領域 Photonics-SOI 的競爭者是 SEH（持 Smart Cut 授權到 2033）與 GlobalWafers；聯電 20-F 泛指矽晶圓「supplies……are adequate」。
+    讀圖換版 `sr_f0f03b1e543dc73a` → **`sr_6707b77bd1a5958c`（仍 undecided：A 有客戶端一手但不是這一層的〔L6〕、B 指向不缺）**；層主張 S1–S4 登 watch（`ew_0422`–`ew_0425`）；
+    SOI.PA 敘事換版 `ib_01af87313ad148a5`（仍「缺」，X 縮成「光子用 SOI 的客戶端一手」＋已定價主參照；反證加一條連 S1）。因層說明改變的候選狀態 0 筆。
+    新摘錄三份（程式截取、逐字）：`soitec_urd_fy2026_photonics_competition_excerpt`、`gfs_20_f_20260227_soi_supplier_risk_excerpt`、`umc_20_f_20260430_wafer_suppliers_excerpt`。
+    旁證（L11-4）：GF 這份 20-F 早已入圖（`gfs_20_f_20260227`），但策展摘錄只收了 Raw Materials 那一句、沒收風險段的 71%——failure log #46
 - failure log：（尚無）
   - #27（SOI.PA FY2026 分部占比兩筆都生效，「出現在數字裡」被默默丟——當下修為印衝突；序列仍成不了，合併紀錄留 7.5）
+  - #46（入圖時的策展摘錄只收當時要的那句，同一份申報裡更強的客戶端證據留在庫外——10-08 要重抓 EDGAR 才看得到）
 
 ## O6 光通訊磊晶與 MOCVD 產能（二階）
 
