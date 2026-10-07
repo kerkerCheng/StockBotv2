@@ -1,0 +1,25 @@
+SOURCE: 個股頁 schema S1 時光機頁（2025-06-30）贏家對照——聯亞 3081、高力 8996 的 113 年度股東會年報致股東報告書（AXT 的對照取自 2025-05-01 Q1 2025 新聞稿，brainstorm §10.2 已列）
+URL: ① 聯亞 MOPS t57sb01 2024 年度股東會年報（mops_3081_annual_report_2024）② 高力 MOPS t57sb01 2024 年度股東會年報（mops_8996_annual_report_2024）
+PUBLISHED: ① 2025-05-09（MOPS 上傳 114/05/09）② 2025-04-30（MOPS 上傳 114/04/30）——都早於 2025-06-30
+RETRIEVED: 2026-10-07
+STORAGE: repo_excerpt（發行人年報有限節錄；pypdf 抽字、逐字照抄）
+NOTE: 發行人自述（一手）。用途：與負錨點（library/raw/negative_anchor_timemachine_sources_2021_excerpt.txt）比「需求寫成什麼」與「供給緊的四件事」在時點當下有沒有。
+
+① 聯亞 113 年度年報 致股東報告書：
+「113 年度，隨著人工智能（AI）需求的持續擴大，數據中心相關產品持續為公司帶來營收的增長。」
+「本年度營業收入為新台幣 12.08 億元，較前一年增長了 14.4%；稅後淨損為 0.54 億元，相較 2023 年度虧損幅度減少 74%；每股稅後虧損縮小至 0.59 元。」
+「展望 114 年，AI 技術將持續在全球各行業中快速發展，隨著數據傳輸需求規格的升級，以及美國、大陸地區的數據中心持續增建，800G/1.6T 以上高速光收發模組的應用需求持續快速增加。而矽光技術也將躍為往後的主流解決方案，預期能為公司帶來強勁的營收成長動能。」
+（全文沒有擴產倍數、客戶預付或長約、漲價的字樣。）
+
+② 高力 113 年度年報 致股東報告書：
+「亞馬遜、谷歌、Meta、微軟等超大型雲端服務企業，以及在自動駕駛發展相當時日的特斯拉、於人工智慧模型領域佔有一席之地的 xAI 等等國際領導公司，皆雄心勃勃地宣示未來數年將在 AI 技術或資料中心加大投資，此趨勢亦帶動產業上下游方興未艾的發展，包含資料中心伺服器所需水冷等散熱系統暨零組件產品」
+「本公司 113 年度在水冷散熱領域的業績也有跳躍式的成長。」
+「同時為了建置台灣與中國以外的生產基地，於 113 年第四季度在泰國設立子公司，並已選好生產基地。這兩項重大決策，都是為了迎接 AI 產業未來的市場需求。」
+「(二) ㄧ一三年度合併財務報告……營業收入 4,325,671 4,003,440 -322,231 -7.45%」（112 年度／113 年度，單位新台幣仟元）
+（全文沒有客戶預付、長約或漲價的字樣。）
+
+③ AXT, Inc.——"AXT Inc. Announces First Quarter 2025 Financial Results"（新聞稿，2025-05-01；https://investors.axt.com/Investors/news/news-details/2025/AXT-Inc--Announces-First-Quarter-2025-Financial-Results/default.aspx；HTML 轉文字、逐字照抄；RETRIEVED 2026-10-07）：
+"Revenue for the first quarter of 2025 was $19.4 million, compared with $25.1 million for the fourth quarter of 2024 and $22.7 million for the first quarter of 2024."
+"GAAP gross margin was (6.4) percent of revenue for the first quarter of 2025, compared with 17.6 percent of revenue for the fourth quarter of 2024 and 26.9 percent for the first quarter of 2024."
+"The company’s decline in GAAP and non-GAAP gross margin from the prior quarter was primarily the result of three factors: a 58 percent reduction in indium phosphide sales quarter-over-quarter due to trade restrictions in China, a significant yield reduction on semi-insulating gallium arsenide wafers, and under-absorbed factory overhead due to lower substrate sales."
+"Tongmei, our China subsidiary, is uniquely positioned to optimize growth opportunities in China, such as high-speed data center connectivity and LIDAR for autonomous driving, and are pursuing these and other opportunities with success across key markets for indium phosphide, gallium arsenide, and germanium substrates."
