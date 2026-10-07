@@ -1324,6 +1324,66 @@
         "Alfa Laval",
         "Alfa Laval AB"
       ]
+    },
+    {
+      "company_id": "co:browave",
+      "research_ticker": "3163.TWO",
+      "market_currency": "TWD",
+      "execution_currency": "TWD",
+      "execution_venue": "TPEx",
+      "display_name": "Browave Corporation",
+      "_display_name_source": "yfinance longName（2026-10-07）；櫃買 3163（波若威科技股份有限公司）",
+      "name_aliases": [
+        "Browave",
+        "波若威"
+      ]
+    },
+    {
+      "company_id": "co:tfc_optical",
+      "research_ticker": "300394.SZ",
+      "market_currency": "CNY",
+      "execution_currency": "CNY",
+      "execution_venue": "SZSE",
+      "display_name": "Suzhou TFC Optical Communication Co., Ltd.",
+      "_display_name_source": "yfinance longName（2026-10-07）；深交所 300394（苏州天孚光通信股份有限公司）",
+      "_note": "別名「TFC Communication」是 NVIDIA 技術部落格夥伴名單的逐字寫法（庫內 library/raw/nvidia_sipho_blog_partner_roles.txt）；刻意不收單詞「TFC」（太短、整詞比對易撞）",
+      "name_aliases": [
+        "TFC Communication",
+        "TFC Optical Communication",
+        "天孚通信",
+        "天孚光通信"
+      ]
+    },
+    {
+      "company_id": "co:senko",
+      "research_ticker": null,
+      "display_name": "Senko",
+      "_display_name_source": "NVIDIA 技術部落格夥伴名單逐字「Browave, Corning, Senko, TFC Communication, and Coherent」（庫內 library/raw/nvidia_sipho_blog_partner_roles.txt）",
+      "_note": "私人公司（研究 ticker 明確 null，INV-1）；原文只寫「Senko」，法定全名本輪未取得一手",
+      "name_aliases": [
+        "Senko",
+        "SENKO"
+      ]
+    },
+    {
+      "company_id": "co:formfactor",
+      "research_ticker": "FORM",
+      "market_currency": "USD",
+      "display_name": "FormFactor, Inc.",
+      "_display_name_source": "SEC 10-Q 2026-08-04 申報公司名「FORMFACTOR INC」；yfinance longName「FormFactor, Inc.」（2026-10-07）",
+      "name_aliases": [
+        "FormFactor"
+      ]
+    },
+    {
+      "company_id": "co:teradyne",
+      "research_ticker": "TER",
+      "market_currency": "USD",
+      "display_name": "Teradyne, Inc.",
+      "_display_name_source": "SEC 10-Q 2026-07-31 申報公司名「TERADYNE, INC」；10-Q 本文「Teradyne, Inc. (“Teradyne”)」",
+      "name_aliases": [
+        "Teradyne"
+      ]
     }
   ]
 }
