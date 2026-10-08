@@ -63,7 +63,7 @@ def test_fill_rows_are_value_or_a_named_absence_and_copy_the_producers_kind() ->
     assert rows["B0.candidate_state"]["state"] == "value"
     assert rows["B1.position"] == {**rows["B1.position"], "state": "absent", "absence_kind": "not_yet_recorded"}
     assert rows["B9.debt"]["absence_kind"] == "capability_absent"          # default_absence_kind("not_modeled")
-    assert rows["B2.capture_ratio"]["absence_kind"] == "capability_absent" and "S3" in rows["B2.capture_ratio"]["looked"]
+    assert rows["B2.path_layers"]["absence_kind"] == "capability_absent" and "S3" in rows["B2.path_layers"]["looked"]
     assert rows["B4.layer_note"]["state"] == "value"
     assert all(r["state"] == "value" or (r["state"] == "absent" and r["absence_kind"]) for r in rows.values())
 
@@ -84,6 +84,17 @@ def test_the_demand_anchor_cell_reads_the_page_input_three_ways() -> None:
     assert unread["absence_kind"] == "upstream_unavailable"
     assert empty["absence_kind"] == "not_yet_recorded" and "demand_anchor_series" in empty["looked"]
     assert valued["B2.anchor_change"]["state"] == "value"
+
+
+def test_the_capture_cell_reads_the_page_input_three_ways() -> None:
+    """個股頁 S3b（2026-10-08）：B2「吃到多少」讀 `@capture_ratio`——沒讀到＝`upstream_unavailable`；讀到但沒有加總型的錨、
+    沒有季營收或三者湊不齊＝`not_yet_recorded`；有值＝有值。"""
+    unread = {r["element"]: r for r in ps.fill_table(_view())}["B2.capture_ratio"]
+    empty = {r["element"]: r for r in ps.fill_table(_view(), extra={"capture_ratio": []})}["B2.capture_ratio"]
+    valued = {r["element"]: r for r in ps.fill_table(_view(), extra={"capture_ratio": ["hyperscaler_cash_capex"]})}
+    assert unread["absence_kind"] == "upstream_unavailable"
+    assert empty["absence_kind"] == "not_yet_recorded" and "季均價" in empty["looked"]
+    assert valued["B2.capture_ratio"]["state"] == "value"
 
 
 def test_materialize_writes_the_fill_and_the_meta_carries_the_contract(tmp_path) -> None:

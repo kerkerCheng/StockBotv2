@@ -111,8 +111,10 @@ ELEMENTS: tuple[PageElement, ...] = (
                 "——走不到錨、或題材沒宣告序列，就是沒有"),
     PageElement("B2.path_layers", "B2", "路徑上各層：從錨到公司坐的層，每層一條年增", "path", "mechanical", (),
                 "capability_absent", f"{_S3_ANCHOR}；結構表的鏈有，層的同業序列沒有"),
-    PageElement("B2.capture_ratio", "B2", "吃到多少：公司當季營收 ÷ 當季錨", "company", "mechanical", (),
-                "capability_absent", f"{_S3}：吃到多少（換美元）"),
+    PageElement("B2.capture_ratio", "B2", "吃到多少：公司當季營收 ÷ 當季錨", "company", "mechanical",
+                ("@capture_ratio",), "not_yet_recorded",
+                "吃到多少（個股頁 S3b）：公司同一曆季的營收（換美元，季均價）÷ 雲端四大現金資本支出——沒有加總型的錨、"
+                "公司沒有季營收（海外）、會計季對不上曆季，就沒有"),
     PageElement("B2.share_now", "B2", "份額（現在）：同階段同業的營收堆疊、覆蓋率必印", "layer", "research", (),
                 "capability_absent", f"{_S3}；同階段同業的宣告在層說明（S4）"),
     PageElement("B2.peer_changes", "B2", "同層各家變化：最近一季年增，依名稱排、標階段", "layer", "mechanical", (),

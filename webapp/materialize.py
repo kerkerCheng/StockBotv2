@@ -225,7 +225,8 @@ def materialize_view(analyst_view_dict: Mapping[str, Any], *,
                      page_extra: Mapping[str, Any] | None = None,
                      diagrams: Sequence[Mapping[str, Any]] | None = None,
                      node_names: Mapping[str, str] | None = None,
-                     demand_anchor: Mapping[str, Any] | None = None) -> dict[str, Any]:
+                     demand_anchor: Mapping[str, Any] | None = None,
+                     capture: Mapping[str, Any] | None = None) -> dict[str, Any]:
     """`AnalystView.to_dict()` → artifact payload（含遮蔽、overview、兩個 digest）。純函式。
 
     `price_series` 是**脈絡不是判讀**：一條這檔自己的已收盤收盤價序列，讓使用者看得懂
@@ -268,6 +269,8 @@ def materialize_view(analyst_view_dict: Mapping[str, Any], *,
         # 需求錨序列（個股頁 S3a，2026-10-08）：這家公司走到的錨對到的 A2 序列（季值、年增、可知日、缺哪一家），
         # 或缺席與原因。照抄 `alpha.demand_anchor`；APP 畫 B2「錨的變化」。
         "demand_anchor": dict(demand_anchor) if demand_anchor is not None else None,
+        # 吃到多少（個股頁 S3b）：公司同一曆季營收（換美元）÷ 錨；照抄 `alpha.capture`（季、匯率、可知日、缺哪個）。
+        "capture": dict(capture) if capture is not None else None,
         "materializer": {
             "version": MATERIALIZER_VERSION,
             "python": f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}",
@@ -294,7 +297,8 @@ def _page_fill(view: Mapping[str, Any], extra: Mapping[str, Any] | None, fill_ta
 
 def page_extra_for(ticker: str, layer_notes: Mapping[str, Any] | None,
                   diagrams: Sequence[Mapping[str, Any]] | None = None,
-                  demand_anchor: Mapping[str, Any] | None = None) -> dict[str, Any] | None:
+                  demand_anchor: Mapping[str, Any] | None = None,
+                  capture: Mapping[str, Any] | None = None) -> dict[str, Any] | None:
     """個股頁填得滿表的頁外輸入：引用這一頁的層說明節點（`layer_notes` state artifact 的 `cited_by.pages`）、
     涵蓋這一頁坐的層的示意圖 id（`diagrams`；None＝這一輪沒讀到示意圖目錄）、需求錨序列（`demand_anchor`：有值的序列 key；
     讀不到或回看的那天不推＝不給這個鍵）。artifact 讀不到 → 那一個鍵不給（那一格印這一輪沒讀到，不是「沒有」）。"""
@@ -304,6 +308,9 @@ def page_extra_for(ticker: str, layer_notes: Mapping[str, Any] | None,
     absence_kind = ((demand_anchor or {}).get("absence") or {}).get("kind")
     if demand_anchor is not None and absence_kind not in ("upstream_unavailable", "point_in_time_unavailable"):
         extra["demand_anchor"] = [str(s.get("key")) for s in demand_anchor.get("series") or () if s.get("points")]
+    capture_kind = ((capture or {}).get("absence") or {}).get("kind")
+    if capture is not None and capture_kind not in ("upstream_unavailable", "point_in_time_unavailable"):
+        extra["capture_ratio"] = [str(capture.get("anchor_key"))] if capture.get("points") else []
     if layer_notes is None:
         return extra or None
     want = str(ticker).upper()
@@ -462,12 +469,13 @@ def materialize(ticker: str, *, as_of: date | None = None, scenario: str | None 
     names = node_names if node_names is not None else _seat_node_names({"seats": {"_": list(seats)}})
     anchor_ctx = anchors if anchors is not None else _anchor_context(as_of)
     demand = _page_demand_anchor(anchor_ctx, candidate_ctx, view.identity.company_id)
+    capture = _page_capture(str(view.identity.ticker or ticker), demand, as_of)
     payload = materialize_view(analyst.to_dict(), generated_at=generated_at,
                                price_series=_close_series(ticker),
-                               page_extra=page_extra_for(ticker, notes_state, page_diagrams, demand),
+                               page_extra=page_extra_for(ticker, notes_state, page_diagrams, demand, capture),
                                diagrams=page_diagrams,
                                node_names={str(n): names[str(n)] for n in seats if str(n) in names},
-                               demand_anchor=demand)
+                               demand_anchor=demand, capture=capture)
     target = store or ArtifactStore()
     return target.write(payload), payload
 
@@ -502,6 +510,26 @@ def _page_demand_anchor(anchor_ctx: Mapping[str, Any] | None, candidate_ctx: Map
         return {"anchors": [], "series": [], "absence": {
             "kind": kind, "reason": f"結構表的需求錨這一輪讀不到（{source.get('reason') or '候選輸入沒有需求錨'}）"}}
     return page_anchor(anchor_ctx, (bets.get("anchors") or {}).get(str(company_id)), bets.get("names"))
+
+
+def _page_capture(ticker: str, demand: Mapping[str, Any] | None, as_of: date | None) -> dict[str, Any]:
+    """一頁的「吃到多少」（個股頁 S3b；`alpha.providers.capture`）：公司同一曆季的營收（換美元）÷ 錨。
+    讀不到 Engine C → 這一格印這一輪沒讀到（不是「吃到 0」）。"""
+    from alpha.providers.capture import page_capture
+    from engine_c.db import get_conn
+
+    try:
+        conn = get_conn()
+    except Exception as exc:  # noqa: BLE001 — 吃到多少是 B2 的一格，讀不到不擋整份判讀
+        return {"points": [], "gaps": [], "absence": {"kind": "upstream_unavailable",
+                                                      "reason": f"Engine C 讀不到（{type(exc).__name__}）"}}
+    try:
+        return page_capture(conn, ticker, demand, as_of=as_of or date.today())
+    except Exception as exc:  # noqa: BLE001
+        return {"points": [], "gaps": [], "absence": {"kind": "upstream_unavailable",
+                                                      "reason": f"吃到多少算不出來（{type(exc).__name__}: {str(exc)[:120]}）"}}
+    finally:
+        conn.close()
 
 
 def _seat_node_names(context: Mapping[str, Any] | None) -> dict[str, str]:

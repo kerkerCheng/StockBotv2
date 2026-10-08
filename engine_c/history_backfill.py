@@ -98,6 +98,16 @@ CAPEX_TAGS: tuple[str, ...] = ("PaymentsToAcquirePropertyPlantAndEquipment", "Pa
 #: 直接有 3 個月 fact 的那一季（例：MSFT、AMZN 每季都給）照用直接的，不衍生。營收、營業利益有 3 個月 fact，不在這裡。
 YTD_CONCEPTS: frozenset[str] = frozenset({"capex"})
 
+#: 歷史匯率（個股頁 S3b，2026-10-08；`fx_history` 表）：幣別 → (FRED 的 H.10 日序列, 報價方向)。`per_usd`＝一美元換幾單位
+#: 該幣、`usd_per`＝一單位該幣換幾美元（歐元、英鎊是這個方向）。抓哪幾個幣別**從資料導出**（`fx_currencies_needed`：營收序列
+#: 實際出現的非美元幣別），不手寫清單；這張表只是「有哪條序列可抓」。
+FX_SERIES: Mapping[str, tuple[str, str]] = {
+    "TWD": ("DEXTAUS", "per_usd"), "JPY": ("DEXJPUS", "per_usd"), "KRW": ("DEXKOUS", "per_usd"),
+    "CNY": ("DEXCHUS", "per_usd"), "SEK": ("DEXSDUS", "per_usd"), "CAD": ("DEXCAUS", "per_usd"),
+    "HKD": ("DEXHKUS", "per_usd"), "CHF": ("DEXSZUS", "per_usd"),
+    "EUR": ("DEXUSEU", "usd_per"), "GBP": ("DEXUSUK", "usd_per"),
+}
+
 #: 年度 fact 只認會計年度：年報（10-K／20-F／40-F）裡的年度期間。季報裡一年長的期間若不是某份年報的會計年度，
 #: 是**近 12 個月（TTM）**欄（2026-10-08 實測：AMZN 的季報現金流量有 TTM 欄）——當成年度會讓 FY−9M 衍生出錯，不存、計數進報告。
 ANNUAL_FORMS: tuple[str, ...] = ("10-K", "20-F", "40-F")
@@ -178,6 +188,16 @@ CREATE TABLE IF NOT EXISTS fundamental_history (
 );
 CREATE INDEX IF NOT EXISTS idx_fundamental_history_asof
     ON fundamental_history (ticker, metric, period_end, filed);
+CREATE TABLE IF NOT EXISTS fx_history (
+    series_id TEXT NOT NULL,
+    currency TEXT NOT NULL,
+    quote TEXT NOT NULL CHECK (quote IN ('per_usd', 'usd_per')),
+    obs_date TEXT NOT NULL,
+    rate REAL NOT NULL CHECK (rate > 0),
+    source TEXT NOT NULL,
+    fetched_at TEXT NOT NULL,
+    PRIMARY KEY (series_id, obs_date)
+);
 """.format(metrics=", ".join(f"'{m}'" for m in METRICS))
 
 
@@ -769,8 +789,50 @@ def _store_offerings(conn: Any, ticker: str, cik: str, cache: dict[str, list[dic
     return {"outcome": "written", "rows": written, "recent_count": len(filings), "coverage_from": coverage_from(filings)}
 
 
+def fx_currencies_needed(conn: Any) -> list[str]:
+    """要抓哪幾個幣別的歷史匯率：營收序列（台股月營收、EDGAR 季營收）實際出現的非美元幣別 ∩ `FX_SERIES`（L16：從資料導出）。"""
+    found: set[str] = set()
+    for sql in ("SELECT DISTINCT currency FROM monthly_revenue_observations",
+                "SELECT DISTINCT currency FROM fundamental_history WHERE metric = 'revenue_quarter'"):
+        try:
+            found |= {str(r[0]) for r in conn.execute(sql).fetchall() if r[0]}
+        except sqlite3.Error:
+            continue
+    return sorted(c for c in found if c != "USD" and c in FX_SERIES)
+
+
+def backfill_fx(conn: Any, *, today: date, incremental: bool, fetched_at: str,
+                fetch: Callable[..., tuple[list[tuple[date, float]], int]] | None = None) -> dict[str, Any]:
+    """歷史匯率（FRED H.10 日序列）寫進 `fx_history`。可重建投影（L10）：同一天重抓就覆寫。增量從最後一筆往回 14 天重抓。
+    一個幣別抓不到只讓那一個幣別記缺席（`unavailable`），不擋其他幣別、不擋整步。"""
+    if fetch is None:
+        from fetchers.fred import fetch_series as fetch
+    out: dict[str, Any] = {}
+    for currency in fx_currencies_needed(conn):
+        series, quote = FX_SERIES[currency]
+        series_id = f"fred:{series}"
+        last = conn.execute("SELECT MAX(obs_date) FROM fx_history WHERE series_id = ?", (series_id,)).fetchone()[0]
+        start = (date.fromisoformat(str(last)[:10]) - timedelta(days=14)) if (incremental and last) \
+            else today - timedelta(days=365 * FUNDAMENTAL_LOOKBACK_YEARS)
+        try:
+            rows, blanks = fetch(series, start=start)
+        except Exception as exc:  # noqa: BLE001
+            out[currency] = {"outcome": "unavailable", "series": series_id, "absence": f"{type(exc).__name__}: {exc}"[:300]}
+            continue
+        conn.executemany(
+            "INSERT OR REPLACE INTO fx_history (series_id, currency, quote, obs_date, rate, source, fetched_at) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?)",
+            [(series_id, currency, quote, day.isoformat(), float(rate), "FRED H.10（聯準會紐約中午買入匯率）", fetched_at)
+             for day, rate in rows if rate > 0])
+        conn.commit()
+        out[currency] = {"outcome": "written", "series": series_id, "quote": quote, "rows": len(rows),
+                         "no_quote_days": blanks, "since": start.isoformat(),
+                         "latest": rows[-1][0].isoformat() if rows else None}
+    return out
+
+
 def run(conn: Any, *, tickers: Sequence[str] | None = None, incremental: bool = False, today: date | None = None,
-        sleep: float = 0.15, prices: bool = True, edgar: bool = True) -> dict[str, Any]:
+        sleep: float = 0.15, prices: bool = True, edgar: bool = True, fx: bool = True) -> dict[str, Any]:
     """回填（或增量）一批標的，回報告。任何一檔失敗都不讓整批停（記進報告）。"""
     today = today or date.today()
     fetched_at = datetime.now(timezone.utc).isoformat()
@@ -833,6 +895,13 @@ def run(conn: Any, *, tickers: Sequence[str] | None = None, incremental: bool = 
                                                           incremental=incremental, fetched_at=fetched_at)
                     time.sleep(sleep)
         report["tickers"][ticker] = entry
+    if fx:
+        # 歷史匯率（個股頁 S3b）：營收序列的非美元幣別各一次 FRED 請求；抓不到只記缺席、不擋整步
+        try:
+            report["fx"] = backfill_fx(conn, today=today, incremental=incremental, fetched_at=fetched_at)
+        except Exception as exc:  # noqa: BLE001
+            conn.rollback()
+            report["fx"] = {"_error": {"outcome": "error", "absence": f"{type(exc).__name__}: {exc}"[:300]}}
     report["summary"] = summarize(report)
     return report
 
@@ -855,6 +924,9 @@ def summarize(report: Mapping[str, Any]) -> dict[str, Any]:
         # CHECK 未遷移時略過的新指標列數（Step 4.6）：daily 印出的 summary 就看得到，不只藏在逐檔報告裡（INV-3）
         "late_metrics_skipped": sum(((e.get("edgar") or {}).get("late_metrics_skipped") or {}).get("rows", 0)
                                     for e in tickers.values()),
+        # 歷史匯率（個股頁 S3b）：每個幣別寫了幾筆、或抓不到——daily 印的 summary 看得到（INV-3）
+        "fx": {currency: (body.get("rows") if body.get("outcome") == "written" else body.get("outcome"))
+               for currency, body in (report.get("fx") or {}).items()},
     }
 
 
@@ -880,6 +952,7 @@ def main(argv: list[str] | None = None) -> int:
                         help="daily：價格整段重抓、EDGAR 只在 submissions 有新申報時重抓")
     parser.add_argument("--no-prices", action="store_true")
     parser.add_argument("--no-edgar", action="store_true")
+    parser.add_argument("--no-fx", action="store_true", help="不抓歷史匯率（FRED H.10）")
     parser.add_argument("--report", help="完整報告寫到這個 JSON 檔")
     args = parser.parse_args(argv)
     try:
@@ -891,7 +964,7 @@ def main(argv: list[str] | None = None) -> int:
     conn = _open(args.db)
     try:
         report = run(conn, tickers=args.tickers, incremental=args.incremental,
-                     prices=not args.no_prices, edgar=not args.no_edgar)
+                     prices=not args.no_prices, edgar=not args.no_edgar, fx=not args.no_fx)
     finally:
         conn.close()
     if args.report:

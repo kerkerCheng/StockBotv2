@@ -114,6 +114,16 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 `StockBotv2-Daily` 的 ⑱⑲ 取代（1.2a 停用、2026-09-25 1.2b 刪除）；它們的理由（LLM 失敗心跳照發、永遠 exit 0、Python 不用 `.cmd`、
 發送走 subprocess）搬進 `crons/daily_task.py` 的 docstring，守它們的測試改主詞搬進 `tests/test_daily_task.py`「無人值守入口」節。
 
+### Sandbox impact review 結論（2026-10-08：個股頁 S3b 吃到多少——歷史匯率 FRED H.10）
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | daily ②b（`02b_history_incremental`，argv 不變）**多連一個外部來源**：`fred.stlouisfed.org` 的公開 CSV（不用金鑰；`fetchers/fred.py`），每個需要的幣別一次請求（現在只有台幣——從營收序列導出），寫 Engine C 新表 `fx_history`（可重建投影：同一天重抓覆寫；建表即可，不用遷移）。抓不到只讓那一個幣別記 `unavailable`、不擋整步；summary 多 `fx` 一格（daily 印得出來）。daily ⑬ materialize（argv 不變）每頁多讀 Engine C 的月營收／季營收／匯率（唯讀），payload 多 `capture`、B2「吃到多少」讀 `@capture_ratio`。不跑 LLM、不碰任何人工 gate |
+| **2 canonical skill／prompt／本檔** | 本節；`docs/ARCHITECTURE.md` 首屏「吃到多少」；個股頁 plan「S3 拆段」 |
+| **3 最窄 rule** | daily argv 不變；不新增 step、allowlist、APP 路由；CLI 多 `--no-fx`（互動用）；APP 仍無寫入端點 |
+| **4 contract test** | `tests/test_capture.py`（FRED 表頭與假日、幣別從資料導出、一個幣別失敗不擋、重抓覆寫、匯率 7 天公布上界、季均價整季頭尾與報價方向與同天兩值、台股三個月成季與可知日、會計季錯位不估、三者最晚可知與 as-of 回放、營收路從資料判、三種缺席）；`tests/test_page_schema.py`（B2 吃到多少三種讀法）；`tests/test_stock_page_s5b_charts.py`（前端只照抄）；變異 9／9 抓到 |
+| **5 端到端 smoke** | 真資料：台幣 1245 筆日匯率（5 年）；聯亞 2026Q2 每 10 億美元錨對應 23 萬美元營收（換回台幣約 740 萬元，與 brainstorm 第二輪畫布的 7.4 百萬元一致）、AXT 29 萬美元（畫布同數）；MRVL 會計季 8 月初結束照實缺席 |
+
 ### Sandbox impact review 結論（2026-10-08：個股頁 S3a 需求錨序列——Engine C 現金資本支出、名冊補 Amazon）
 
 | 步 | 結論 |

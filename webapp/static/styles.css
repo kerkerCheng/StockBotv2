@@ -500,6 +500,7 @@ table.pt-table th, table.pt-table td { vertical-align: top; overflow-wrap: anywh
 .ruler-today { fill: var(--accent); }
 .ruler-cohort { fill: var(--settled); }
 .ruler-cohort-line { stroke: var(--border); stroke-width: 1; stroke-dasharray: 3 4; }
+.bar-capture { fill: var(--settled); }
 .detail-sub { color: var(--muted); font-size: 13px; margin-top: 4px; }
 .block-detail { margin-top: 6px; }
 .block-detail .arg-section { margin-top: 6px; }

@@ -48,6 +48,17 @@ def test_the_demand_anchor_lives_in_b2_and_only_copies_the_materialized_series()
         assert arithmetic not in bars, f"錨圖不得自己算：{arithmetic}"
 
 
+def test_the_capture_chart_lives_in_b2_and_only_copies_the_materialized_ratio() -> None:
+    """個股頁 S3b（2026-10-08）：B2「吃到多少」照抄 materialize 的 `capture`（比值、季均價、可知日都在 `alpha.capture` 算好）；
+    前端不換匯、不相除——只有柱高的座標換算；沒有就照印原因。"""
+    assert "captureFigure(payload)" in _body("blockVisuals")
+    figure = _body("captureFigure")
+    for copied in ("payload.capture", "p.per_billion", "last.per_usd", "last.known_on", "cap.revenue_source", "cap.absence.reason"):
+        assert copied in figure, f"吃到多少少照抄了 {copied}"
+    for arithmetic in ("revenue_usd /", "/ p.anchor", "* 1e9", "/ last.per_usd", "Math.pow"):
+        assert arithmetic not in figure, f"吃到多少不得自己算：{arithmetic}"
+
+
 def test_diagrams_show_as_images_in_b4_and_on_the_layer_page_labelled_as_illustration() -> None:
     """示意圖由 materialize 檢查過、編成 data URI；前端只用 <img> 顯示，不把 SVG 原碼塞進頁面（SVG 在 img 裡不執行任何東西）。"""
     assert "key === 'B4'" in _body("blockVisuals") and "payload.diagrams" in _body("blockVisuals")

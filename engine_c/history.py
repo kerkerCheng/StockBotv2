@@ -55,6 +55,23 @@ def first_filed_by_period(conn: Any, ticker: str, metric: str, *, as_of: date | 
     return {str(r[0])[:10]: str(r[1])[:10] for r in rows}
 
 
+#: H.10（FRED 的匯率日序列來源）每週一公布前一週的日資料：某一天的匯率**最晚七天內**可知——讀取端用這個上界（INV-6）。
+FX_PUBLICATION_LAG_DAYS = 7
+
+
+def fx_daily(conn: Any, currency: str, *, as_of: date | str) -> list[dict[str, Any]]:
+    """as-of T 的日匯率（`fx_history`，個股頁 S3b）：只收 `obs_date + 7 天 ≤ T`——用公布上界，寧可晚幾天也不提早看到。
+    回 `[{obs_date, rate, quote, series_id}]`（日期升序）；同一天兩條序列（不該發生）照實兩列都回，交給呼叫端拒收。"""
+    from datetime import timedelta
+
+    cutoff = date.fromisoformat(_iso(as_of)) - timedelta(days=FX_PUBLICATION_LAG_DAYS)
+    rows = conn.execute(
+        """SELECT obs_date, rate, quote, series_id FROM fx_history
+           WHERE currency = ? AND obs_date <= ? ORDER BY obs_date, series_id""",
+        (currency, cutoff.isoformat())).fetchall()
+    return [{"obs_date": str(r[0])[:10], "rate": float(r[1]), "quote": str(r[2]), "series_id": str(r[3])} for r in rows]
+
+
 def monthly_revenue_as_of(conn: Any, ticker: str, *, as_of: date | str) -> dict[str, Any]:
     """as-of T 的台股月營收：`{"months": [...], "conflicts": [...]}`（`data_month` 升序）。
 

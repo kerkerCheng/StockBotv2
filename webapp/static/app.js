@@ -1498,7 +1498,11 @@ function fmtMultiple(v) {
 
 function blockVisuals(payload, view, key) {
   const out = [];
-  if (key === 'B2') anchorFigures(payload).forEach((n) => out.push(n));
+  if (key === 'B2') {
+    anchorFigures(payload).forEach((n) => out.push(n));
+    const capture = captureFigure(payload);
+    if (capture) out.push(capture);
+  }
   if (key === 'B4') (payload.diagrams || []).forEach((d) => out.push(diagramFigure(d)));
   if (key === 'B6') { const n = rulerChart(view); if (n) out.push(n); out.push(priceFigure(payload)); }
   if (key === 'B7') { const n = revenueBars(view); if (n) out.push(n); }
@@ -1713,6 +1717,43 @@ function anchorBars(s) {
     + ((last.derived || []).length && s.aggregation !== 'single' ? `（${last.derived.join('、')} 由年初累計差分推算）` : '')
     + '。'));
   if (s.proxy) wrap.appendChild(el('div', 'chart-legend', s.proxy));
+  return wrap;
+}
+
+/** 吃到多少（B2，個股頁 S3b）：每 10 億美元的錨對應它多少美元營收——往上＝吃到的比例變大。全部照抄 materialize 的 `capture`
+ *  （季營收、換匯的季均價、比值都在 `alpha.capture` 算好）；沒有就照寫原因（沒有加總型的錨／沒有季營收／會計季對不上曆季）。 */
+function captureFigure(payload) {
+  const cap = payload.capture;
+  if (!cap) return null;
+  if (cap.absence || !(cap.points || []).length) {
+    return el('div', 'row-reason ss-pending', `吃到多少：${(cap.absence && cap.absence.reason) || '沒有值'}`);
+  }
+  const pts = cap.points.slice(-12);
+  const max = Math.max(...pts.map((p) => p.per_billion));
+  if (!(max > 0)) return null;
+  const top = 18, bottom = 92, L = 6, R = 314;
+  const step = (R - L) / pts.length;
+  const barW = Math.max(4, step - 9);
+  // 座標換算（同資產配置那段的 pct()／meter()）：比值 → 柱高 px，不是任何財務算術。
+  const barHeight = (amount) => Math.max(1, (amount / max) * (bottom - top));
+  const svg = svgEl('svg', { viewBox: '0 0 320 112', class: 'chart chart-bars', role: 'img', 'aria-label': '吃到多少' });
+  svg.appendChild(svgEl('line', { x1: L, y1: bottom, x2: R, y2: bottom, class: 'chart-axis' }));
+  pts.forEach((p, i) => {
+    const h = barHeight(p.per_billion);
+    const cx = L + step * (i + 0.5);
+    svg.appendChild(svgEl('rect', { x: cx - barW / 2, y: bottom - h, width: barW, height: h, rx: 1.5, class: 'bar bar-capture' }));
+  });
+  svg.appendChild(svgEl('text', { x: L, y: bottom + 15, 'text-anchor': 'start', class: 'chart-label' }, pts[0].period));
+  svg.appendChild(svgEl('text', { x: R, y: bottom + 15, 'text-anchor': 'end', class: 'chart-label' }, pts[pts.length - 1].period));
+  const wrap = el('div', 'chart-wrap');
+  wrap.appendChild(svg);
+  const last = pts[pts.length - 1];
+  const big = fmtBig(last.per_billion) || '—';
+  wrap.appendChild(el('div', 'chart-legend', `吃到多少：${last.period} 每 10 億美元的${cap.anchor_label || '錨'}，對應它 `
+    + `${big}${/[億萬]$/.test(big) ? '' : ' '}美元營收；往上＝吃到的比例變大。`));
+  wrap.appendChild(el('div', 'chart-legend', `營收：${cap.revenue_source || '—'}`
+    + (last.per_usd ? `；換美元用季均價（FRED H.10，${last.period} 一美元 ${fmtNumber(last.per_usd, 2)} ${CURRENCY_WORD[last.currency] || last.currency}）` : '')
+    + `；${last.known_on} 起三者都齊。`));
   return wrap;
 }
 
