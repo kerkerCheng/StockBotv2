@@ -55,12 +55,14 @@ def first_filed_by_period(conn: Any, ticker: str, metric: str, *, as_of: date | 
     return {str(r[0])[:10]: str(r[1])[:10] for r in rows}
 
 
-#: H.10（FRED 的匯率日序列來源）每週一公布前一週的日資料：某一天的匯率**最晚七天內**可知——讀取端用這個上界（INV-6）。
-FX_PUBLICATION_LAG_DAYS = 7
+#: H.10（FRED 的匯率日序列來源）每週一公布前一週的日資料：週一的匯率下週一才公布（+7 天）；那個週一是聯邦假日就延到
+#: 週二（+8 天，例：2026-01-12 的匯率 2026-01-20 才公布——01-19 是 MLK 日）。再留兩天給臨時延後，讀取端用 **10 天**當上界
+#: （INV-6；2026-10-08 S3 R2 C1：原本的 7 天不是上界）。往晚估只讓「可知」晚幾天，往早估才是偷看未來。
+FX_PUBLICATION_LAG_DAYS = 10
 
 
 def fx_daily(conn: Any, currency: str, *, as_of: date | str) -> list[dict[str, Any]]:
-    """as-of T 的日匯率（`fx_history`，個股頁 S3b）：只收 `obs_date + 7 天 ≤ T`——用公布上界，寧可晚幾天也不提早看到。
+    """as-of T 的日匯率（`fx_history`，個股頁 S3b）：只收 `obs_date + 10 天 ≤ T`——用公布上界，寧可晚幾天也不提早看到。
     回 `[{obs_date, rate, quote, series_id}]`（日期升序）；同一天兩條序列（不該發生）照實兩列都回，交給呼叫端拒收。"""
     from datetime import timedelta
 

@@ -59,6 +59,25 @@ def calendar_quarter(period_end: date) -> tuple[int, int] | None:
     return None
 
 
+#: 會計期與曆季的長度最多差幾天（2026-10-08 S3 R2 C2）：13 週的季（91 天）對曆季差 ≤2 天；14 週的季（98 天）差 6–8 天——
+#: 多一週會把那一季灌大約 7%，期末卻仍落在曆季末 ±10 天內，只看期末抓不到。錨的加總與「吃到多少」的公司季共用這一條（L16）。
+PERIOD_LENGTH_SLACK_DAYS = 5
+
+
+def period_length_problem(row: Mapping[str, Any], quarter: tuple[int, int]) -> str | None:
+    """這一期能不能當成 `quarter` 那個曆季：沒有起始日＝量不出長度；長度與曆季差超過 `PERIOD_LENGTH_SLACK_DAYS` 天＝不能。
+    回原因（給人讀的半句）或 None。"""
+    if not row.get("period_start"):
+        return "沒有起始日（量不出這一期有幾天）"
+    end = date.fromisoformat(str(row["period_end"])[:10])
+    length = (end - date.fromisoformat(str(row["period_start"])[:10])).days + 1
+    year, q = quarter
+    cal_length = (date(year + (q == 4), (3 * q) % 12 + 1, 1) - date(year, 3 * q - 2, 1)).days
+    if abs(length - cal_length) > PERIOD_LENGTH_SLACK_DAYS:
+        return f"有 {length} 天、曆季 {cal_length} 天（多出或少了一週）"
+    return None
+
+
 def assemble_series(key: str, spec: Mapping[str, Any], rows_by_ticker: Mapping[str, Sequence[Mapping[str, Any]]],
                     first_by_ticker: Mapping[str, Mapping[str, str]], *, as_of: date) -> dict[str, Any]:
     """一條錨序列：`{key, label, proxy, aggregation, metric, currency, as_of, components, points, gaps, absence}`。
@@ -106,6 +125,8 @@ def _single(rows: Sequence[Mapping[str, Any]], first: Mapping[str, str], currenc
 def _sum_by_calendar_quarter(per_company: Mapping[str, Sequence[Mapping[str, Any]]], first: Mapping[str, Mapping[str, str]],
                              currency: str) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     by_quarter: dict[tuple[int, int], dict[str, Mapping[str, Any]]] = {}
+    # 期間長度對不上曆季、或同一家兩個會計期對到同一季：那一家那一季不加總、寫原因（不挑一個、不讓後一筆蓋掉前一筆；S3 R2 C2／N6）
+    refused: dict[tuple[int, int], dict[str, str]] = {}
     off_calendar: dict[str, list[str]] = {}
     for ticker, rows in per_company.items():
         for row in rows:
@@ -114,20 +135,30 @@ def _sum_by_calendar_quarter(per_company: Mapping[str, Sequence[Mapping[str, Any
             if quarter is None:
                 off_calendar.setdefault(ticker, []).append(end.isoformat())
                 continue
+            problem = period_length_problem(row, quarter)
+            if problem is None and ticker in by_quarter.get(quarter, {}):
+                problem = "兩個會計期對到同一個曆季（不挑一個）"
+                by_quarter[quarter].pop(ticker)
+            if problem or ticker in refused.get(quarter, {}):
+                refused.setdefault(quarter, {}).setdefault(ticker, problem)
+                continue
             by_quarter.setdefault(quarter, {})[ticker] = row
     points, gaps = [], []
-    for (year, q), parts in sorted(by_quarter.items()):
+    for year, q in sorted(set(by_quarter) | set(refused)):
+        parts, bad = by_quarter.get((year, q), {}), refused.get((year, q), {})
         label = f"{year}Q{q}"
-        missing = [t for t in per_company if t not in parts]
+        missing = [t for t in per_company if t not in parts and t not in bad]
         wrong = [t for t, r in parts.items() if str(r.get("currency")) != currency]
-        if missing or wrong:
+        if missing or wrong or bad:
             reasons = []
             if missing:
                 reasons.append(f"缺 {'、'.join(missing)}（as-of 那天還沒申報或沒有這一期）")
+            if bad:
+                reasons.append("；".join(f"{t} 這一期{why}" for t, why in sorted(bad.items())) + "——不加總")
             if wrong:
                 found = "、".join(f"{t} 是 {parts[t].get('currency')}" for t in wrong)
                 reasons.append(f"幣別不是 {currency}：{found}（不換算）")
-            gaps.append({"period": label, "missing": missing + wrong, "reason": "；".join(reasons)})
+            gaps.append({"period": label, "missing": missing + sorted(bad) + wrong, "reason": "；".join(reasons)})
             continue
         quarter_end = {1: (3, 31), 2: (6, 30), 3: (9, 30), 4: (12, 31)}[q]
         points.append({
@@ -172,5 +203,5 @@ def page_anchor(context: Mapping[str, Any] | None, anchors: Mapping[str, str] | 
     return {"anchors": listed, "series": [context["series"][k] for k in keys], "absence": None}
 
 
-__all__ = ["AGGREGATIONS", "CALENDAR_SLACK_DAYS", "DemandAnchorError", "assemble_series", "calendar_quarter",
-           "page_anchor", "series_keys_for", "validate_config"]
+__all__ = ["AGGREGATIONS", "CALENDAR_SLACK_DAYS", "DemandAnchorError", "PERIOD_LENGTH_SLACK_DAYS", "assemble_series",
+           "calendar_quarter", "page_anchor", "period_length_problem", "series_keys_for", "validate_config"]

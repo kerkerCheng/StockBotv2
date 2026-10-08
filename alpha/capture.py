@@ -3,10 +3,10 @@
 公司同一曆季的營收（換美元）÷ 當季題材錨（雲端四大現金資本支出）：往上＝吃到的比例變大。取數住 `alpha/providers/capture.py`。
 
 - **公司的季**：台股＝月營收**三個月都公告**才算一季，可知日＝第三個月的法定公告期限（上界，`monthly_revenue_as_of` 的
-  `available_on`）；美股＝EDGAR 季營收，期末落在曆季末 ±10 天內才算那一曆季——會計季對不上曆季的照實缺席，
-  **不拿重疊天數去估**（例：MRVL 的季 8 月初結束）。
+  `available_on`）；美股＝EDGAR 季營收，期末落在曆季末 ±10 天內、**而且期間長度與曆季差不到 5 天**才算那一曆季——
+  會計季對不上曆季的照實缺席，**不拿重疊天數去估**（例：MRVL 的季 8 月初結束；14 週的季多一週營收）。
 - **換匯**：季均價＝那一季每個有報價日子的平均（FRED H.10），報價方向統一成「一美元換幾單位」。那一季頭尾都要有報價
-  （首筆不晚於季初 +7 天、末筆不早於季末 −7 天）才算完整；可知日＝末筆 + 7 天（H.10 公布上界）。
+  （首筆不晚於季初 +7 天、末筆不早於季末 −7 天）才算完整；可知日＝末筆 + 10 天（H.10 公布上界，含週一假日延後）。
   用季均價不用期末價：營收是一整季累積的流量，用季末那一天的匯率會把季內的匯率變動算錯。
 - **吃到多少**＝營收（美元）÷ 錨（美元），呈現成「每 10 億美元的錨對應它多少美元營收」。可知日＝營收、錨、匯率三者最晚的
   那天；as-of T 時還不可知的那一季不算（INV-6）。
@@ -18,12 +18,13 @@ from __future__ import annotations
 from datetime import date, timedelta
 from typing import Any, Mapping, Sequence
 
-from alpha.demand_anchor import calendar_quarter
+from alpha.demand_anchor import calendar_quarter, period_length_problem
 
 #: 季均價要算完整的一季：首筆不晚於季初 +7 天、末筆不早於季末 −7 天（涵蓋假日與週末，不涵蓋整段缺資料）。
 FX_EDGE_DAYS = 7
-#: H.10 的公布上界（與 `engine_c.history.FX_PUBLICATION_LAG_DAYS` 同一個數；這裡不 import engine_c——alpha 核心不碰外部）。
-FX_KNOWN_LAG_DAYS = 7
+#: H.10 的公布上界（與 `engine_c.history.FX_PUBLICATION_LAG_DAYS` 同一個數，理由寫在那裡；這裡不 import engine_c——alpha 核心
+#: 不碰外部；兩個數相等由 `tests/test_capture.py` 守）。
+FX_KNOWN_LAG_DAYS = 10
 PER = 1_000_000_000          # 「每 10 億美元的錨」
 
 
@@ -98,14 +99,27 @@ def tw_quarters(months: Sequence[Mapping[str, Any]]) -> tuple[dict[str, dict[str
 
 def fiscal_quarters(rows: Sequence[Mapping[str, Any]], first: Mapping[str, str]
                     ) -> tuple[dict[str, dict[str, Any]], list[dict[str, Any]]]:
-    """EDGAR 季營收（`fundamental_series` 每期最新版本）→ 曆季：期末落在曆季末 ±10 天內才算；可知日用最早的申報日。"""
+    """EDGAR 季營收（`fundamental_series` 每期最新版本）→ 曆季：期末落在曆季末 ±10 天內、期間長度與曆季差不超過
+    `alpha.demand_anchor.PERIOD_LENGTH_SLACK_DAYS` 才算（沒有起始日＝量不出長度，也不算；與錨的加總同一條）；
+    兩個會計期對到同一個曆季＝不挑一個；可知日用最早的申報日。"""
     quarters: dict[str, dict[str, Any]] = {}
     gaps: list[dict[str, Any]] = []
+    collided: set[str] = set()
     for row in rows:
         end = date.fromisoformat(str(row["period_end"])[:10])
         quarter = calendar_quarter(end)
         if quarter is None:
             gaps.append({"period": end.isoformat(), "reason": f"會計季期末 {end.isoformat()} 不在曆季末 ±10 天內——與曆季的錨對不起來，不估"})
+            continue
+        problem = period_length_problem(row, quarter)
+        if problem:
+            gaps.append({"period": _label(*quarter), "reason": f"會計季{problem}——與曆季的錨對不起來，不估"})
+            continue
+        if _label(*quarter) in quarters or _label(*quarter) in collided:
+            # 兩個會計期對到同一個曆季（例：改會計年度）——不挑一個、不讓後一筆蓋掉前一筆（INV-3；S3 R2 N6）
+            quarters.pop(_label(*quarter), None)
+            collided.add(_label(*quarter))
+            gaps.append({"period": _label(*quarter), "reason": "兩個會計期對到同一個曆季——不挑一個，不估"})
             continue
         quarters[_label(*quarter)] = {"value": float(row["value"]), "currency": str(row.get("currency")),
                                       "known_on": first.get(end.isoformat(), str(row["filed"])[:10]),

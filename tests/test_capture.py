@@ -4,10 +4,11 @@
 守六件事：
 1. FRED CSV：表頭不對就拒收；`.`（美國假日沒有報價）不是觀測、照實計數；抓不到 raise，不回空清單。
 2. 抓哪些幣別從資料導出（營收序列實際出現的非美元幣別）；一個幣別抓不到只記那一個；同一天重抓覆寫（可重建投影）。
-3. 時點（INV-6）：日匯率只收「觀測日 + 7 天 ≤ T」（H.10 每週一公布前一週）；吃到多少的可知日＝營收、錨、匯率三者最晚，
-   as-of T 時還不可知的那一季不算。
+3. 時點（INV-6）：日匯率只收「觀測日 + 10 天 ≤ T」（H.10 每週一公布前一週、週一假日延到週二，再留兩天；S3 R2 C1）；
+   吃到多少的可知日＝營收、錨、匯率三者最晚，as-of T 時還不可知的那一季不算。
 4. 季均價：整季頭尾都要有報價；歐元、英鎊的報價方向（一歐元換幾美元）先換成「一美元換幾單位」；同一天兩個數不挑一個。
-5. 公司的季：台股三個月都公告才算一季（可知日＝第三個月的法定期限）；EDGAR 會計季期末不在曆季末 ±10 天內就缺席、不估。
+5. 公司的季：台股三個月都公告才算一季（可知日＝第三個月的法定期限）；EDGAR 會計季期末不在曆季末 ±10 天內、或期間長度與
+   曆季差超過 5 天（14 週的季；S3 R2 C2）、或沒有起始日，就缺席、不估。
 6. 營收路從資料判（有月營收走台股路）；缺席分開：沒有加總型的錨／沒有季營收／三者湊不齊。
 """
 from __future__ import annotations
@@ -87,11 +88,21 @@ def test_one_currency_failing_is_recorded_without_stopping_the_step() -> None:
     assert hb.fx_currencies_needed(_db()) == []                                          # 沒有非美元營收＝不抓
 
 
-def test_a_rate_is_only_known_seven_days_after_its_date() -> None:
+def test_a_rate_is_only_known_ten_days_after_its_date_even_when_the_monday_release_is_a_holiday() -> None:
+    """H.10 每週一公布前一週：週一的匯率下週一才公布；那個週一是聯邦假日就延到週二——2026-01-12 的匯率 01-20 才公布
+    （01-19 是 MLK 日）。原本的 7 天會在 01-19 就看到（S3 R2 C1）；上界取 10 天，寧可晚兩天也不偷看。"""
     conn = _db()
     conn.executemany("INSERT INTO fx_history VALUES (?,?,?,?,?,?,?)",
-                     [("fred:DEXTAUS", "TWD", "per_usd", d, 31.0, "s", "t") for d in ("2026-09-29", "2026-09-30", "2026-10-02")])
-    assert [r["obs_date"] for r in eh.fx_daily(conn, "TWD", as_of=date(2026, 10, 8))] == ["2026-09-29", "2026-09-30"]
+                     [("fred:DEXTAUS", "TWD", "per_usd", d, 31.0, "s", "t")
+                      for d in ("2026-01-12", "2026-09-29", "2026-09-30", "2026-10-02")])
+
+    def visible(as_of: date) -> list[str]:
+        return [r["obs_date"] for r in eh.fx_daily(conn, "TWD", as_of=as_of)]
+
+    assert "2026-01-12" not in visible(date(2026, 1, 19)) and "2026-01-12" in visible(date(2026, 1, 22))
+    assert visible(date(2026, 10, 10))[-2:] == ["2026-09-29", "2026-09-30"]
+    # 季均價的可知日用同一個上界（alpha 核心不 import engine_c，所以各寫一份——這裡守兩個數相等）
+    assert cap.FX_KNOWN_LAG_DAYS == eh.FX_PUBLICATION_LAG_DAYS
 
 
 # ---------------------------------------------------------------------------
@@ -111,7 +122,7 @@ def _days(start: str, end: str, rate: float, quote: str = "per_usd"):
 def test_the_quarterly_average_needs_the_whole_quarter_and_normalises_the_quote() -> None:
     q, gaps = cap.quarter_fx(_days("2026-04-01", "2026-06-30", 31.6) + _days("2026-07-01", "2026-07-20", 32.0))
     assert set(q) == {"2026Q2"} and q["2026Q2"]["per_usd"] == pytest.approx(31.6)
-    assert q["2026Q2"]["known_on"] == "2026-07-07" and any(g["period"] == "2026Q3" for g in gaps)
+    assert q["2026Q2"]["known_on"] == "2026-07-10" and any(g["period"] == "2026Q3" for g in gaps)   # 末筆 06-30 + 10 天
     eur, _ = cap.quarter_fx(_days("2026-04-01", "2026-06-30", 1.25, "usd_per"))
     assert eur["2026Q2"]["per_usd"] == pytest.approx(0.8)                              # 一歐元 1.25 美元 → 一美元 0.8 歐元
     clash = _days("2026-04-01", "2026-06-30", 31.6) + [{"obs_date": "2026-05-04", "rate": 30.0, "quote": "per_usd"}]
@@ -132,11 +143,37 @@ def test_a_taiwan_quarter_needs_all_three_months_and_is_known_at_the_third_deadl
 
 
 def test_a_fiscal_quarter_that_does_not_end_near_a_calendar_quarter_is_not_estimated() -> None:
-    rows = [{"period_end": "2026-06-30", "value": 10.0, "currency": "USD", "filed": "2026-08-14", "derived": None},
-            {"period_end": "2026-08-01", "value": 20.0, "currency": "USD", "filed": "2026-08-28", "derived": None}]
+    rows = [{"period_start": "2026-04-01", "period_end": "2026-06-30", "value": 10.0, "currency": "USD", "filed": "2026-08-14",
+             "derived": None},
+            {"period_start": "2026-05-03", "period_end": "2026-08-01", "value": 20.0, "currency": "USD", "filed": "2026-08-28",
+             "derived": None}]
     q, gaps = cap.fiscal_quarters(rows, {"2026-06-30": "2025-08-15"})
     assert set(q) == {"2026Q2"} and q["2026Q2"]["known_on"] == "2025-08-15"
     assert "2026-08-01" in gaps[0]["reason"] and "不估" in gaps[0]["reason"]
+
+
+def test_a_fourteen_week_quarter_or_one_without_a_start_is_not_matched_to_the_calendar_quarter() -> None:
+    """S3 R2 C2：期末落在曆季末 ±10 天內不夠——14 週的會計季（98 天）多一週營收，會把那一季的「吃到多少」灌大約 7%
+    （真資料：KLIC 2025Q3、LRCX 2024Q1、MTSI 2024Q4、FN 2022Q3、FORM 2022Q4）。13 週（91 天）照算；沒有起始日量不出長度也不算。"""
+    rows = [{"period_start": "2025-12-28", "period_end": "2026-03-28", "value": 10.0, "currency": "USD", "filed": "2026-05-01"},
+            {"period_start": "2026-06-28", "period_end": "2026-10-03", "value": 30.0, "currency": "USD", "filed": "2026-11-01"},
+            {"period_end": "2026-12-31", "value": 40.0, "currency": "USD", "filed": "2027-02-01"}]
+    q, gaps = cap.fiscal_quarters(rows, {})
+    assert set(q) == {"2026Q1"}                                                   # 91 天 vs 曆季 90 天
+    why = {g["period"]: g["reason"] for g in gaps}
+    assert "98 天" in why["2026Q3"] and "92 天" in why["2026Q3"] and "不估" in why["2026Q3"]
+    assert "起始日" in why["2026Q4"]
+
+
+def test_two_fiscal_periods_in_one_calendar_quarter_are_not_resolved_by_whichever_came_last() -> None:
+    """S3 R2 N6：兩個會計期對到同一個曆季（例：改會計年度）——不挑一個、不讓後一筆蓋掉前一筆（INV-3）；第三筆也不收。"""
+    rows = [{"period_start": "2026-04-01", "period_end": "2026-06-30", "value": 10.0, "currency": "USD", "filed": "2026-08-01"},
+            {"period_start": "2026-03-29", "period_end": "2026-06-27", "value": 11.0, "currency": "USD", "filed": "2026-08-02"},
+            {"period_start": "2026-04-03", "period_end": "2026-07-02", "value": 12.0, "currency": "USD", "filed": "2026-08-03"},
+            {"period_start": "2026-07-01", "period_end": "2026-09-30", "value": 20.0, "currency": "USD", "filed": "2026-11-01"}]
+    q, gaps = cap.fiscal_quarters(rows, {})
+    assert set(q) == {"2026Q3"} and q["2026Q3"]["value"] == 20.0
+    assert any(g["period"] == "2026Q2" and "兩個會計期" in g["reason"] for g in gaps)
 
 
 def test_capture_is_revenue_in_dollars_over_the_anchor_and_waits_for_all_three() -> None:

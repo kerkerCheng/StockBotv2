@@ -60,7 +60,10 @@ def _conn(rows):
 
 
 def _q(ticker, end, value, filed, accn, **kw):
-    return {"ticker": ticker, "end": end, "value": value, "filed": filed, "accn": accn, **kw}
+    # 起始日預設＝期末所在曆季的第一天（一般的曆季）；要測「沒有起始日」「14 週的季」的列自己帶 start
+    d = date.fromisoformat(end)
+    start = date(d.year, 3 * ((d.month - 1) // 3) + 1, 1).isoformat()
+    return {"ticker": ticker, "end": end, "value": value, "filed": filed, "accn": accn, "start": start, **kw}
 
 
 BASE = [
@@ -104,6 +107,26 @@ def test_off_calendar_periods_are_not_bucketed_and_wrong_currency_is_not_convert
     assert "2025Q3" not in {p["period"] for p in s["points"]}
     reasons = " ".join(g["reason"] for g in s["gaps"])
     assert "EUR" in reasons and "不換算" in reasons and "2025-11-15" in reasons
+
+
+def test_a_fourteen_week_period_or_two_periods_in_one_quarter_are_not_summed() -> None:
+    """S3 R2 C2 的對稱面（錨是「吃到多少」的分母）：期末落在曆季末 ±10 天內不夠——14 週的期多一週會把那一季灌大；
+    沒有起始日量不出長度；同一家兩個會計期對到同一季不挑一個、不讓後一筆蓋掉前一筆（N6）。那一季缺席、寫是誰、為什麼。
+    （真資料 2026-10-08：雲端四大 76 期全是整曆季，這三條今天一筆都不會擋到。）"""
+    rows = BASE + [_q("AAA", "2025-10-04", 12.0, "2025-10-29", "A-Q3", start="2025-06-29"),       # 98 天
+                   _q("BBB", "2025-09-30", 22.0, "2025-10-31", "B-Q3"),
+                   _q("AAA", "2025-12-31", 13.0, "2026-01-29", "A-Q4", start=None),
+                   _q("BBB", "2025-12-31", 23.0, "2026-01-31", "B-Q4"),
+                   _q("AAA", "2026-03-31", 14.0, "2026-04-29", "A-Q1"), _q("AAA", "2026-03-28", 9.0, "2026-04-30", "A-Q1b",
+                                                                            start="2025-12-28"),
+                   _q("BBB", "2026-03-31", 24.0, "2026-04-30", "B-Q1")]
+    s = build_series(_conn(rows), "capex4", CONFIG, as_of=date(2026, 10, 8), registry=REGISTRY)
+    periods = {p["period"] for p in s["points"]}
+    assert {"2025Q2", "2026Q2"} <= periods and not periods & {"2025Q3", "2025Q4", "2026Q1"}
+    why = {g["period"]: g for g in s["gaps"]}
+    assert why["2025Q3"]["missing"] == ["AAA"] and "98 天" in why["2025Q3"]["reason"] and "92 天" in why["2025Q3"]["reason"]
+    assert "起始日" in why["2025Q4"]["reason"]
+    assert "兩個會計期" in why["2026Q1"]["reason"] and why["2026Q1"]["missing"] == ["AAA"]
 
 
 def test_a_single_fiscal_quarter_series_keeps_its_own_period_and_year_over_year() -> None:
