@@ -280,6 +280,26 @@ def compute_layer_stats(*, edges: Sequence[Any], rows: Iterable[Mapping[str, Any
         if not held:
             violations.append(f"{edge.src} {edge.relation} {edge.dst}")
 
+    # 附屬（2026-10-08，Phase 7 failure log #14）：供貨 assertion 的主詞不在它自己的引文裡、文件也不是主詞發的——
+    # 新包在 prepare 就擋（`intake.actions.check_supply_subjects`，同一套判法），這裡數圖上的存量。MP 磁材邊掛 Noveon／
+    # USA Rare Earth 自己的新聞稿那型：「有競爭者在量產」被做成被評公司的供貨 assertion。名冊無名可比的不算（那是身分前置）。
+    from query.bottleneck import usable_name_forms
+    from intake.actions import SUBJECT_NAMED_RELATIONS
+
+    subject_unnamed: list[str] = []
+    for row in rows:
+        subject = str(row.get("src") or "")
+        if row.get("relation") not in SUBJECT_NAMED_RELATIONS or not subject.startswith("co:"):
+            continue
+        resolution = resolve(row.get("origin"))
+        if resolution.kind == "company" and resolution.id == subject:
+            continue
+        company = registry.company(subject) if registry.has_company(subject) else None
+        if company is None or not usable_name_forms(company, shared):
+            continue
+        if not names(quotes_by_assertion.get(str(row.get("assertion_id") or "")) or (), subject):
+            subject_unnamed.append(f"{subject} {row.get('relation')} {row.get('dst')} ← {row.get('source_doc_id')}")
+
     return {
         "baseline": baseline_key,
         "language": lang.label,
@@ -322,6 +342,7 @@ def compute_layer_stats(*, edges: Sequence[Any], rows: Iterable[Mapping[str, Any
         "corroboration_withheld": {reason: sorted(items, key=lambda i: (i["edge"], i["origin"]))
                                    for reason, items in withheld.items()},
         "ec_without_naming_quote": sorted(violations),
+        "supply_subject_unnamed": sorted(subject_unnamed),
         "evidence_baseline": evidence_baseline_key if evidence_baseline is not None else None,
         "evidence_vs_baseline": (None if evidence_baseline is None
                                  else evidence_vs_baseline(edges, evidence_baseline)),
@@ -343,8 +364,14 @@ def summary_line(stats: Mapping[str, Any] | None) -> str:
             f"{enum['unresolved_origin_sources']}）｜③a sub 引文不含可替代性語言 {len(sub['stock_unsupported'])}／"
             f"{sub['stock_n']}（存量）｜{_sub_b_fragment(sub)}｜外部印證違反 {len(stats['ec_without_naming_quote'])}"
             f"｜沒升外部印證：未具名 {len(withheld['unnamed'])}／名冊無名 {len(withheld['no_name_forms'])}／轉述 "
-            f"{len(withheld['relay'])}（轉述字表 {stats['relay_language']}）｜{_evidence_fragment(stats)}"
+            f"{len(withheld['relay'])}（轉述字表 {stats['relay_language']}）"
+            f"｜供貨主詞不在引文 {_count(stats.get('supply_subject_unnamed'))}｜{_evidence_fragment(stats)}"
             f"｜字表 {stats['language']}")
+
+
+def _count(items: Any) -> str:
+    """有清單印數量；沒有這個鍵（舊的落檔）印「未量」——不是 0（INV-3）。"""
+    return "未量" if items is None else str(len(items))
 
 
 def _evidence_fragment(stats: Mapping[str, Any]) -> str:

@@ -200,6 +200,10 @@ def test_the_evidence_labels_and_counters_travel_from_quotes_to_the_heartbeat(tm
     withheld = before["stats"]["corroboration_withheld"]
     assert {k: len(v) for k, v in withheld.items()} == {"unnamed": 2, "no_name_forms": 1, "relay": 2}
     assert before["stats"]["ec_without_naming_quote"] == []
+    # 供貨主詞不在引文（2026-10-08，failure log #14）：「We source the S laser from SPX」那型——客戶的引文沒寫 SPX 的名冊寫法
+    unnamed_supply = before["stats"]["supply_subject_unnamed"]
+    assert len(unnamed_supply) == 2 and all(" supplies_to " in row for row in unnamed_supply)
+    assert "供貨主詞不在引文 2" in before["layer_line"], before["layer_line"]
 
     # 走圖第 2 型
     sole = before["walk"]["sole_supplier_self_reported"]

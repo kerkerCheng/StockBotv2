@@ -85,6 +85,10 @@ def test_supersede_marks_only_untouched_ready_records(tmp_path: Path) -> None:
     research_actions.save_action(record, root=tmp_path)
     with pytest.raises(ValueError, match="核准戳記"):
         research_actions.mark_superseded(third["action_id"], by=newer["action_id"], root=tmp_path)
+    # 取代者自己必須還能被核准（R2 非阻擋 #1）：拿已被取代的那一筆當新版 → 拒收，不留死胡同提示
+    fourth = research_actions.create_action(_payload(marker="v4"), root=tmp_path)
+    with pytest.raises(ValueError, match="不是還能核准的 ready"):
+        research_actions.mark_superseded(fourth["action_id"], by=old["action_id"], root=tmp_path)
 
 
 def test_apply_refuses_a_superseded_record_even_when_its_number_gets_go(tmp_path: Path, monkeypatch) -> None:

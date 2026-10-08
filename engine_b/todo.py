@@ -1890,7 +1890,11 @@ def _ra_graph_impact(action: Mapping[str, Any]) -> str:
         check = action.get("merge_side_effect_check") or {}
         line = increment_line(check.get("increment"))
         if line is None or line.startswith("增量無法核對"):
-            line = _legacy_increment_line(check) or (
+            legacy = _legacy_increment_line(check)
+            if legacy and line is not None:
+                # 新收據但這次增量沒算出來、節點與證據預告有算到：照舊收據的精度印，並說出來（R2 2026-10-08 非阻擋 #5）
+                legacy = f"{legacy}——這一筆的精確增量沒算出來"
+            line = legacy or (
                 f"文件宣告 {n_nodes} 節點、{n_edges} 邊、{n_claims} claims（不是增量：prepare 時沒對圖算）"
                 if line is None else f"{line}：{n_nodes} 節點、{n_edges} 邊、{n_claims} claims")
         parts = [line]

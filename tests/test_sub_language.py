@@ -207,8 +207,9 @@ def _sub_extraction(doc_id: str, quotes: dict[str, str]) -> dict:
          "attributes": {"substitutability": 4}, "source_ids": [f"{doc_id}_s1"]},
         {"id": "e2", "src_id": "co:sumitomo_electric", "dst_id": "mat:test_layer", "relation": "supplies_to",
          "confidence": 0.8, "attributes": {"substitutability": 3}, "source_ids": [f"{doc_id}_s2"]},
+        # e3 掛 s1：供貨邊的主詞要在引文裡（2026-10-08，failure log #14；掛 s2 的「Sumitomo shipped…」會在 prepare 被擋）
         {"id": "e3", "src_id": "co:axt", "dst_id": "mat:test_layer", "relation": "supplies_to", "confidence": 0.8,
-         "source_ids": [f"{doc_id}_s2"]},
+         "source_ids": [f"{doc_id}_s1"]},
     ]
     return {"schema_version": "0.1",
             "source_doc": {"doc_id": doc_id, "title": "Sub doc", "source_type": "industry_report", "evidence_tier": 3,
@@ -232,7 +233,7 @@ def test_packet_warns_but_does_not_reject_a_sub_whose_quote_does_not_discuss_rep
     assert "## sub 引文核對（只警告、不拒收）" in packet and "co:sumitomo_electric" in packet
     assert "## sub 引文核對" in research_actions._full_report(record)                    # 報告與 packet 同一節
     # 沒有帶 sub 的邊 → 不加這一欄（舊形狀的 packet 不變）
-    plain = _sub_extraction("plain_doc", {"s1": "x", "s2": "y"})
+    plain = _sub_extraction("plain_doc", {"s1": "AXT x", "s2": "Sumitomo y"})
     for edge in plain["edges"]:
         edge.pop("attributes", None)
     assert "sub_language_check" not in research_actions.create_action(_payload(plain, None), root=tmp_path)

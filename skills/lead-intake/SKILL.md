@@ -88,6 +88,10 @@ description: >
 4. **L6 幻覺逐字檢查:** 具體型號/公司名/數字**必須在來源 quote 裡逐字出現**才可建節點。若 quote 只給類別詞
    (如 "data center interconnect"),不可推出具體型號節點(如 ZR/ZR+)。形容詞("reference laser"、
    "god-mode"、"mog every player")不是事實,不可當 node attribute。
+   **`supplies_to` 邊的主詞同樣要在它的 quote 裡逐字出現**(文件是主詞自己發的除外;2026-10-08 起 prepare 機械擋,
+   `intake.actions.check_supply_subjects`)。競爭者在量產、有人能取代它——寫成**競爭者自己的**供貨邊,被評公司的
+   substitutability 留給讀圖判;不要把它做成被評公司那條邊上的一條 assertion(Phase 7 failure log #14:MP 掛了
+   Noveon、USA Rare Earth 自己的新聞稿)。
 5. **provenance 鐵律:** 每個 node/edge 必掛 `source_ids`,且用全域唯一格式 `<doc_id>_s<N>`(L6 Gap2),
    不可用文件局部 ID。
 6. **L4 屬性歸位:** 物理現實 → node;會隨關係另一端變的(substitutability/sole_source/lead_time/供應商 ramp)

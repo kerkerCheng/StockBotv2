@@ -243,6 +243,58 @@ def _validate_layer_enumerations(value: object, *, check_vocab: bool = True) -> 
     return normalized
 
 
+#: 主詞要逐字出現在引文裡的關係（failure log #14；L6「具體型號／公司名必須在 quote 裡逐字出現」）。
+#: 只收資料撞到的那一格（L17-4）：兩次都是 `supplies_to`。
+SUBJECT_NAMED_RELATIONS = frozenset({"supplies_to"})
+
+
+def check_supply_subjects(payload: dict, *, registry=None, publishers=None) -> dict:
+    """供貨邊的主詞有沒有在引文裡（2026-10-08，Phase 7 failure log #14）——**不查 Neo4j**，只看這一包。
+
+    事發兩次：MP 的磁材供貨邊上掛了 Noveon、USA Rare Earth **自己的**新聞稿（引文沒有 MP），用來把 MP 的 substitutability
+    由 4 下修到 3；Harmonic Drive 的諧波減速機供貨邊掛了一段講綠的諧波的引文（sub=2）。「有競爭者在量產」這個反證被做成
+    **被評公司的供貨 assertion**——主詞不在引文裡（L6 被繞過），一條 assertion 同時承載「MP 供貨」與「有人能取代 MP」兩義
+    （L12），競爭者本身也沒有成為那一層供給側的一列。
+
+    每條 `supplies_to`、主詞是 `co:*` 的邊：**文件就是主詞自己發的**（origin 解析成主詞——自述「we supply」不必再寫名字），
+    或 `source_ids` 指到的任一段引文以 `quote_names_company`（名字比對唯一 owner）具名主詞 → 過。否則拒收，並指路：
+    競爭者的存在寫成競爭者自己的供貨邊。主詞在名冊沒有比得到的寫法 → 前置（名冊／身分要先補），不拒收——同
+    `check_layer_enumerations` 的分法（INV-3，不壓成一個布林）。只拒收新包；圖上既有的由 `query.layer_stats` 的「未具名」計數現形。
+    """
+
+    from identity.registry import get_registry
+    from query.bottleneck import quote_names_company, shared_name_forms, usable_name_forms
+    from query.origin_resolution import resolve_origin
+
+    reg = registry if registry is not None else get_registry()
+    shared = shared_name_forms(reg)
+    rejections: list[str] = []
+    prerequisites: list[str] = []
+    for document in payload.get("documents") or []:
+        extraction = document["extraction"]
+        source_doc = extraction.get("source_doc") or {}
+        origin = resolve_origin(source_doc.get("origin_entity"), reg, publishers=publishers)
+        quotes = {str(s.get("id")): str(s.get("quote") or "") for s in extraction.get("sources") or []}
+        for edge in extraction.get("edges") or []:
+            subject = str(edge.get("src_id") or "")
+            if edge.get("relation") not in SUBJECT_NAMED_RELATIONS or not subject.startswith("co:"):
+                continue
+            if origin.kind == "company" and origin.id == subject:
+                continue
+            label = f"`{document.get('doc_id')}` 的邊 `{subject} {edge.get('relation')} {edge.get('dst_id')}`"
+            company = reg.company(subject) if reg.has_company(subject) else None
+            if company is None or not usable_name_forms(company, shared):
+                prerequisites.append(f"{label}：主詞在名冊沒有比得到的寫法——先補名冊（名字或身分）才核對得了")
+                continue
+            if any(quote_names_company(quotes.get(str(sid)), company, shared=shared)
+                   for sid in edge.get("source_ids") or []):
+                continue
+            rejections.append(
+                f"{label}：引文沒有逐字寫出主詞，文件也不是它發的（origin＝{source_doc.get('origin_entity')!r}）——"
+                "如果這份文件講的是競爭者在量產或能取代它，寫成競爭者自己的供貨邊；被評公司的可替代性留給讀圖判")
+    return {"status": "rejected" if rejections else "ok", "rejections": rejections, "prerequisites": prerequisites}
+
+
 def check_layer_enumerations(payload: dict, *, registry=None) -> dict:
     """prepare 當下的「在本包」核對（2026-10-01 Phase 4 Step 4.2a）——**不查 Neo4j**，只看這一包的抽取內容。
 
@@ -976,8 +1028,13 @@ def _valid_increment_receipt(increment: object) -> bool:
         return False
     if increment["status"] != "checked":
         return True
-    return all(isinstance(increment.get(key), dict) and isinstance(increment[key].get("new"), list)
-               and isinstance(increment[key].get("declared"), int) for key in ("nodes", "edges", "claims"))
+    if not all(isinstance(increment.get(key), dict) and isinstance(increment[key].get("new"), list)
+               and isinstance(increment[key].get("declared"), int) for key in ("nodes", "edges", "claims")):
+        return False
+    # 元素形狀（R2 2026-10-08 非阻擋 #2）：節點與 claims 是 id 字串，邊是 [src, relation, dst]
+    return (all(isinstance(n, str) for key in ("nodes", "claims") for n in increment[key]["new"])
+            and all(isinstance(e, list) and len(e) == 3 and all(isinstance(x, str) for x in e)
+                    for e in increment["edges"]["new"]))
 
 
 def _render_merge_side_effects(record: dict) -> list[str]:
@@ -1131,6 +1188,9 @@ def create_action(
         layer_check = check_layer_enumerations(normalized)
         if layer_check["status"] != "ok":
             raise ValueError("layer_enumerations 核對失敗：" + "；".join(layer_check["rejections"]))
+    subject_check = check_supply_subjects(normalized)   # failure log #14；prepare 入口已先回逐條原因，這裡是縱深防護
+    if subject_check["status"] != "ok":
+        raise ValueError("供貨邊的引文沒具名主詞：" + "；".join(subject_check["rejections"]))
     payload_bytes = len(_canonical_bytes(normalized))
     digest = canonical_action_digest(normalized)
     parent = _action_root(root)
@@ -1225,7 +1285,9 @@ def mark_superseded(old_action_id: str, *, by: str, root: Path = ROOT, now: date
     if old_action_id == by:
         raise ValueError("不能用自己取代自己")
     current = now or _now()
-    read_action(by, root=root)                       # 新的那一筆必須存在
+    newer = read_action(by, root=root)               # 新的那一筆必須存在、而且自己還能被核准（R2 2026-10-08 非阻擋 #1）
+    if newer["state"] != "ready" or newer.get("superseded_by") or current >= _parse_time(newer["expires_at"]):
+        raise ValueError(f"{by} 不是還能核准的 ready（{newer['state']}）——不能拿它取代別筆，否則舊號的提示指向死胡同")
     with action_lock(old_action_id, root=root):
         record = read_action(old_action_id, root=root)
         if record["state"] != "ready" or (record.get("execution") or {}).get("approval"):

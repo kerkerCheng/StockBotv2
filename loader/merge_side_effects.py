@@ -334,4 +334,5 @@ def render_lines(result: Mapping[str, Any], *, doc_id: str | None = None) -> lis
 
 __all__ = ["NODE_OVERWRITE_FIELDS", "SOURCE_DOC_COALESCE_FIELDS", "SOURCE_DOC_OVERWRITE_FIELDS", "as_loaded",
            "compute_side_effects", "evidence_after_load", "evidence_lines", "fetch_evidence_state", "fetch_graph_state",
-           "has_side_effects", "quotes_by_assertion", "render_lines", "rows_after_load", "side_effects"]
+           "graph_increment", "has_side_effects", "increment_line", "quotes_by_assertion", "render_lines",
+           "rows_after_load", "side_effects"]

@@ -569,6 +569,15 @@ def _prepare_research_action_impl(
                 "problems": [_safe_error_message(item) for item in check["rejections"][:50]],
                 "prerequisites": [_safe_error_message(item) for item in check["prerequisites"][:50]],
             }
+    # 供貨邊的主詞要在引文裡（failure log #14）：逐條原因回給呼叫端（create_action 會再擋一次——縱深防護）
+    subjects = research_actions.check_supply_subjects(payload)
+    if subjects["status"] != "ok":
+        return {
+            "status": "rejected",
+            "error": "供貨邊的引文沒具名主詞（L6）",
+            "problems": [_safe_error_message(item) for item in subjects["rejections"][:50]],
+            "prerequisites": [_safe_error_message(item) for item in subjects["prerequisites"][:50]],
+        }
     try:
         record = research_actions.create_action(
             payload, root=root, merge_side_effects=_merge_side_effect_receipt(normalized_documents))
