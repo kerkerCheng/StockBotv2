@@ -1639,6 +1639,17 @@
       "market_currency": "USD",
       "name_aliases": [],
       "research_ticker": "OUST"
+    },
+    {
+      "company_id": "co:freiberger_compound_materials",
+      "research_ticker": null,
+      "display_name": "Freiberger Compound Materials GmbH",
+      "_display_name_source": "freiberger.com 產品資訊 PI 01.06.09.04（Version 2.0，2023-05-31 review）逐字「Name of company: Freiberger Compound Materials GmbH (FCM)」；InP 規格頁標題「InP substrate wafer specification - Freiberger Compound Materials」（2026-10-08）",
+      "_note": "私人公司（德國 Freiberg；研究 ticker 明確 null，INV-1）：GaAs／InP／GaN 基板。AXT 自己的 FY2025 10-K 把它列為化合物基板的主要競爭者之一；InP 晶圓規格頁見入圖包 [751]。不收「FCM」（太短、別處也用）",
+      "name_aliases": [
+        "Freiberger Compound Materials",
+        "Freiberger"
+      ]
     }
   ]
 }
