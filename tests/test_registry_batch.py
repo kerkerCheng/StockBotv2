@@ -153,3 +153,14 @@ def test_stale_lead_entities_counts_leads_computed_with_an_older_registry() -> N
     assert rb.stale_lead_entities(store) == 0
     store["leads"][lead_id]["entities"] = {"tickers": ["AXTI"], "company_ids": []}   # 舊名冊算的
     assert rb.stale_lead_entities(store) == 1
+
+
+def test_bare_go_on_a_registry_batch_points_to_its_own_complete_command(tmp_path) -> None:
+    """R2（2026-10-08）非阻擋 #1：bare go 的拒收訊息原本寫死 complete-theme-cohort，名冊批次會被導錯指令。"""
+    entry = {"company_id": "co:test_newco2", "research_ticker": "TNCT", "market_currency": "USD",
+             "display_name": "Test Newco Two Inc.", "_display_name_source": "test", "_note": "n", "name_aliases": []}
+    pool = todo.empty_pool()
+    item = todo.propose_registry_batch(pool, {"reason": "測試", "entries": [entry]},
+                                       registry_path=_registry_copy(tmp_path))
+    with pytest.raises(todo.TodoError, match="complete-registry-batch"):
+        todo.resolve(pool, item["n"], "go", reason="bare go", receipt="authority:registry_batch;ref:x")

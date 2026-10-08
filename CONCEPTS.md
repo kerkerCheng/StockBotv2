@@ -134,6 +134,22 @@ The set of claims whose sources all share a single `origin_entity`, derived on d
 The set of `parked` leads whose source tracing did not reach a verbatim primary document, each carrying `trace_status`, `trace_next_trigger`, `trace_attempts_ref` and `trace_requires_user` in its `refs`. Listed by `engine_b.cli trace-backlog`. Leads whose trace succeeded (`original_obtained`) are filtered out — "traced but not graph-worthy" and "could not trace" are different dispositions and only the latter belongs here. `trace_requires_user=false` means a scheduled or event-triggered recheck suffices and it consumes no pq2 number. Distinct from Corroboration Backlog (single-origin claims already in the graph) and from a company's order backlog.
 *Avoid:* park list, unresolved leads
 
+### 停放的等待（觸發標的）
+一則停放的 lead 在等什麼（2026-10-08 起）：`trace_next_trigger` 給人讀；機器等的是觸發條件**點名**的已登記公司（追源還沒結束的另加發文公司），
+預設**只等一手**（持股申報、回補的舊文件不算事件）；沒點名任何已登記公司就等日子（叫醒＝重跑一次路線）；寫「無」＝明確不等。
+終局（拿到原文等）寫了觸發條件也算在等；這一輪到期結案後落成不等。對齊存量與名冊變動後：`engine_b.cli trace-watch-sync`。
+*Avoid:* 「提到就醒」、把 lead 的全部 cashtag 當等待標的
+
+### 名冊批次（registry batch）
+被點名但未登記的公司，由系統分層（系統口徑邊緣）、研究 session 標「它在供給側」、系統起草條目，凍結成一個 pq2 編號；
+使用者 go 之後 `todo complete-registry-batch` 才寫進 `config/company_identity.json`，同一個動作重算 lead 身分與停放等待。
+*Avoid:* 自動登記、隨手改名冊
+
+### 填得滿表（個股頁 page fill）
+個股頁 schema v1.0 的十三塊 × 元素，每一格「有值」或「具名缺席」（缺席的 kind 照抄產生那一格的程式宣告的；沒有任何來源承載才用合約的預設，
+附「在哪裡找過」）。materialize 每次算、印在稽核區；**不放閘、不排序**。合約住 `briefing/analyst_view/page_schema.py`。
+*Avoid:* 完成度分數、覆蓋率排名
+
 ### PQ1（研究佇列 / pq1）
 Daily Approval Loop 的**昂貴研究階段**：priority 排序的 `triaged_go` lead，跑 source-trace + extraction（bounded job）。（2026-09-23 前另有使用者對 `decision_review` 明確 `go` 後 dispatch 的 Engine D gap research；已隨研究側退役。）
 *Avoid:* research stage（過泛）、auto-ingest

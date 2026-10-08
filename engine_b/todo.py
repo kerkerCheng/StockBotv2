@@ -324,9 +324,11 @@ def _validate_go_receipt(item: Mapping[str, Any], receipt: str) -> None:
         # Phase 3 Step 3.3：帶凍結 spec 的 manual 項（主題等權組成分）——go 之後唯一的寫入入口是 complete-*，
         # 它讀**凍結的那一份**、比對 digest 才寫。bare go（或手打一個 authority:…;ref:… receipt）證明不了
         # 使用者 go 的就是寫進去的那一份（比照 engine_c_observation／ra_admission）。
+        # 指令跟著 kind 走（2026-10-08 R2 非阻擋 #1：名冊批次加入之後，原本寫死的 complete-theme-cohort 會把人導錯）
+        command = _FROZEN_SPEC_COMMANDS.get(str(frozen.get("kind")), "complete-<kind>")
         raise TodoError(
             f"[{item.get('n')}] 帶凍結 spec（{frozen.get('kind')}）：不得 bare go；請用 "
-            "`todo complete-theme-cohort <編號>` 讀凍結 spec、比對 digest 後寫入並結案")
+            f"`todo {command} <編號>` 讀凍結 spec、比對 digest 後寫入並結案")
 
     if not receipt.strip():
         raise TodoError(f"{item_type} go 必須附 underlying authority receipt")
@@ -1196,6 +1198,11 @@ def complete_engine_c_observation(
 
 #: 帶凍結 spec 的 manual 項目把 spec 放在這個鍵（Phase 3 Step 3.3：主題等權組成分）。
 FROZEN_SPEC_KEY = "frozen_spec"
+#: 凍結 spec 的 kind → go 之後唯一的寫入指令（bare go 拒收時印給人看；2026-10-08 加名冊批次）。
+_FROZEN_SPEC_COMMANDS: dict[str, str] = {
+    "theme_cohort": "complete-theme-cohort",
+    "registry_batch": "complete-registry-batch",
+}
 
 
 def propose_theme_cohort(pool: dict[str, Any], spec: Mapping[str, Any], *, at: str | None = None) -> dict[str, Any]:
