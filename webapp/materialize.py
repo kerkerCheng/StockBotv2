@@ -220,12 +220,17 @@ def _price_context(series: Sequence[Mapping[str, Any]]) -> dict[str, Any] | None
 
 def materialize_view(analyst_view_dict: Mapping[str, Any], *,
                      generated_at: datetime | None = None,
-                     price_series: Sequence[Mapping[str, Any]] | None = None) -> dict[str, Any]:
+                     price_series: Sequence[Mapping[str, Any]] | None = None,
+                     page_extra: Mapping[str, Any] | None = None) -> dict[str, Any]:
     """`AnalystView.to_dict()` → artifact payload（含遮蔽、overview、兩個 digest）。純函式。
 
     `price_series` 是**脈絡不是判讀**：一條這檔自己的已收盤收盤價序列，讓使用者看得懂
     「現在這個價位在哪」。它不參與任何計算——`freshness_identity` 不含它（價格動了不算認知變了）。
+    `page_extra`：個股頁 schema 填得滿表的頁外輸入（`layer_notes`＝引用這一頁的層說明節點）；沒給＝這一輪沒讀到，
+    那一格印 `upstream_unavailable`（不是「沒有」）。
     """
+    from briefing.analyst_view.page_schema import PAGE_SCHEMA_VERSION, fill_summary, fill_table
+
     view = redact_private_paths(dict(analyst_view_dict))
     stamp = (generated_at or datetime.now(timezone.utc)).astimezone(timezone.utc)
     payload: dict[str, Any] = {
@@ -247,6 +252,9 @@ def materialize_view(analyst_view_dict: Mapping[str, Any], *,
         # 尺的脈絡（2026-09-15）：最近 N 個已收盤交易日的高低點與日期。**脈絡不是訊號**：不排序、不決定尺寸；
         # 只是讓「現價在哪」有個參照。純選取（min／max 是挑點，不是模型）。
         "price_context": _price_context(price_series or ()),
+        # 個股頁 schema 的填得滿表（2026-10-08，個股頁 S2）：每個元素有值或具名缺席，每次 materialize 重算、印在稽核區。
+        # 合約（塊、元素、缺席宣告、證據等級對照）在 `.meta.json` 的 `page_schema`，這裡只放這一檔的逐格結果。
+        "page_fill": _page_fill(view, page_extra, fill_table, fill_summary, PAGE_SCHEMA_VERSION),
         "materializer": {
             "version": MATERIALIZER_VERSION,
             "python": f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}",
@@ -263,6 +271,32 @@ def materialize_view(analyst_view_dict: Mapping[str, Any], *,
     )
     payload["content_digest"] = canonical_digest(payload)
     return payload
+
+
+def _page_fill(view: Mapping[str, Any], extra: Mapping[str, Any] | None, fill_table: Any, fill_summary: Any,
+               version: str) -> dict[str, Any]:
+    rows = fill_table(view, extra=extra)
+    return {"schema": version, "rows": rows, "summary": fill_summary(rows)}
+
+
+def page_extra_for(ticker: str, layer_notes: Mapping[str, Any] | None) -> dict[str, Any] | None:
+    """個股頁填得滿表的頁外輸入：引用這一頁的層說明節點（`layer_notes` state artifact 的 `cited_by.pages`）。
+    artifact 讀不到 → None（那一格印這一輪沒讀到，不是「沒有」）。"""
+    if layer_notes is None:
+        return None
+    want = str(ticker).upper()
+    nodes = [str(row.get("node")) for row in layer_notes.get("rows") or ()
+             if any(str(page.get("ticker") or "").upper() == want
+                    for page in ((row.get("cited_by") or {}).get("pages") or ()))]
+    return {"layer_notes": nodes}
+
+
+def _layer_notes_state(state_store: Any = None) -> dict[str, Any] | None:
+    try:
+        payload, _fresh = (state_store or StateArtifactStore()).read("layer_notes")
+        return payload
+    except Exception:  # noqa: BLE001 — 讀不到只讓 B4 那一格說沒讀到
+        return None
 
 
 def readings_context(*, today: date | None = None, as_of: date | None = None) -> dict[str, Any]:
@@ -368,7 +402,8 @@ def materialize(ticker: str, *, as_of: date | None = None, scenario: str | None 
                 store: ArtifactStore | None = None,
                 generated_at: datetime | None = None,
                 readings: Mapping[str, Any] | None = None,
-                candidates: Mapping[str, Any] | None = None) -> tuple[Path, dict[str, Any]]:
+                candidates: Mapping[str, Any] | None = None,
+                layer_notes: Mapping[str, Any] | None = None) -> tuple[Path, dict[str, Any]]:
     """跑一次完整鏈並寫下 artifact。**只有這裡會連 Neo4j／Engine C／private ledger。**
 
     `readings`：`readings_context()` 的結果（多檔時由 `materialize_many` 載入一次傳進來）；沒給就自己載一次。
@@ -385,8 +420,10 @@ def materialize(ticker: str, *, as_of: date | None = None, scenario: str | None 
     analyst = build_analyst_view(view, readings=readings_input_for(context, view.identity.company_id,
                                                                         str(view.identity.ticker)),
                                  candidate=candidate_input_for(candidate_ctx, view))
+    notes_state = layer_notes if layer_notes is not None else _layer_notes_state()
     payload = materialize_view(analyst.to_dict(), generated_at=generated_at,
-                               price_series=_close_series(ticker))
+                               price_series=_close_series(ticker),
+                               page_extra=page_extra_for(ticker, notes_state))
     target = store or ArtifactStore()
     return target.write(payload), payload
 
@@ -417,9 +454,11 @@ def materialize_many(tickers: Sequence[str], *, as_of: date | None = None,
     readings = readings_context(as_of=as_of) if tickers else None
     if candidates is None and tickers:
         candidates = candidate_context(tickers, as_of=as_of, state_store=state_store)
+    notes_state = _layer_notes_state(state_store) if tickers else None
     for ticker in tickers:
         try:
-            path, _ = materialize(ticker, as_of=as_of, store=target, readings=readings, candidates=candidates)
+            path, _ = materialize(ticker, as_of=as_of, store=target, readings=readings, candidates=candidates,
+                                  layer_notes=notes_state)
         except Exception as exc:  # noqa: BLE001 — 逐檔隔離；理由原樣回報
             results.append((ticker, None, f"{type(exc).__name__}: {str(exc)[:200]}"))
         else:
@@ -1870,6 +1909,7 @@ def write_vocabularies(store: ArtifactStore | None = None) -> Path:
         PRICE_SERIES_NOTE, QUESTIONS,
         WEAK_INPUT_RULES,
     )
+    from briefing.analyst_view.page_schema import schema_payload as page_schema_payload
 
     target = store or ArtifactStore()
     target.directory.mkdir(parents=True, exist_ok=True)
@@ -1903,6 +1943,9 @@ def write_vocabularies(store: ArtifactStore | None = None) -> Path:
             "ready_with_flags": "有內容，但至少一段 stale／review_required／not_applicable",
             "blocked": "至少一段核心缺內容——看 blocker_details 的 absence_kind 才知道該不該去補",
         },
+        # 個股頁 schema v1.0 的合約（2026-10-08，個股頁 S2）：十三塊、元素、缺席宣告、證據等級對照——只有
+        # `briefing.analyst_view.page_schema` 那一份，稽核區的填得滿表照這裡的塊與元素排（L16）
+        "page_schema": page_schema_payload(),
     }
     path = target.directory / ".meta.json"
     tmp = path.with_suffix(".json.tmp")

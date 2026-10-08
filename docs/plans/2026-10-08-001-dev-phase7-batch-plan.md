@@ -23,7 +23,7 @@
 | D5 | EDGAR 文字化不拆字、還原 entity（#5） | Z2／R1 | ✅ |
 | D6 | 閉環佇列認得「主題組未落地」（#26） | Z1／R1 | ✅ |
 | D7 | 名冊候選分層與批次登記 A | Z2／R2 | ✅（R2 已送） |
-| D8 | 個股頁 S2 合約落地 | Z2／R1 | ▶ |
+| D8 | 個股頁 S2 合約落地 | Z2／R1 | ✅ |
 
 ## D1 停放的等待跟著觸發條件走（#1、#15、#2）
 
@@ -160,6 +160,19 @@ Case: #13 第 2 次、#45 第 2 次（Phase 7 名冊條目全手寫、隨包 sta
 **結果：** 測試 17 條；變異 8 項全紅；真資料見 ROADMAP 那一列。**R2：** 送窄範圍審查者（identity 寫入路徑）。
 
 ## D8 個股頁 S2 合約落地
+
+```
+INTAKE
+Zoom: Z2（新封閉字彙；per-ticker artifact 多一個選填鍵 `page_fill`；`.meta.json` 多 `page_schema`）
+Review: R1（呈現層合約；不碰 gate、不寫 authority；artifact 版本不升——舊 artifact 沒有 `page_fill`，稽核區照實印「還沒算」）
+Case: 使用者指示「開 S2」（個股頁 plan S2 列）
+```
+
+**四問：** ①根除「頁上某格沒有值、也說不出為什麼」（每個元素必有缺席宣告，合約自檢擋）。②程式（`check_schema` 在測試裡跑）。
+③加一份合約——它取代的是只寫在 brainstorm §5 的表（要人讀），不是新增第二份：APP 讀 `.meta.json`，不留第二份。
+④最先壞的：缺席 kind 的來源——照抄 line 自己宣告的 kind（L16），合約只在「沒有 line 承載」時給預設；看過：七檔裡 `method_not_applicable`、
+`upstream_unavailable`、`provider_missing` 都是 line 自己帶來的，不是合約猜的。
+**結果：** 測試 13 條（含驗收的變異：拿掉一個缺席宣告 → 自檢紅）；七檔見個股頁 plan 的 S2 列。下一步 S3（機械資料）仍待使用者點名。
 
 - **D2（#3、#17）**：prepare 遇到同 digest 且仍 ready 的 RA 回傳既有那個（冪等）；prepare 可指名被取代的舊 action id → 舊 RA 標 superseded、sync 把舊號標「已被取代、請 drop」；
   prepare 與 sync 對 `focus_company_id` 用同一個判定。圖影響改印「新增 a 節點、b 邊、c claims（另 x 筆已在圖上或逐字保留）」，數字取 prepare 時對圖算的增量、凍結進紀錄。

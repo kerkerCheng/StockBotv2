@@ -796,6 +796,46 @@ function priceCard(payload) {
   return node;
 }
 
+/* 個股頁 schema 的填得滿表（2026-10-08，個股頁 S2；稽核區）：十三塊 × 元素，每格有值或具名缺席。
+   塊與元素的名字只來自 `/api/v1/meta` 的 `page_schema`（前端不留第二份）；這一檔的逐格結果是 artifact 的 `page_fill`。
+   artifact 是 S2 之前 materialize 的就沒有這一格——照實說「還沒算」，不畫成空表（L13：沒算與沒有不得同形）。 */
+function pageFillCard(payload) {
+  const schema = VOCAB && VOCAB.page_schema;
+  const fill = payload.page_fill;
+  const node = el('section', 'panel');
+  node.appendChild(el('h2', null, '這一頁填得滿嗎（個股頁 schema v1.0）'));
+  if (!schema) {
+    node.appendChild(el('div', 'panel-questions', '合約讀不到（/api/v1/meta 沒有 page_schema）——不是「全滿」也不是「全空」'));
+    return node;
+  }
+  if (!fill || !Array.isArray(fill.rows)) {
+    node.appendChild(el('div', 'panel-questions', '這份 artifact 是填得滿表上線之前算的——重跑 materialize 才有'));
+    return node;
+  }
+  const s = fill.summary || {};
+  node.appendChild(el('div', 'panel-questions',
+    `${s.elements} 格：有值 ${s.value}、缺席 ${s.absent}（每一格缺席都說得出是哪一種、在哪裡找過；不放閘、不排序）`));
+  const byKey = {};
+  fill.rows.forEach((row) => { byKey[row.element] = row; });
+  (schema.blocks || []).forEach((block) => {
+    const box = el('div', 'attention');
+    box.appendChild(el('div', 'attention-head', `${block.key}　${block.title}——${block.question}`));
+    (schema.elements || []).filter((e) => e.block === block.key).forEach((element) => {
+      const row = byKey[element.key] || {};
+      const line = el('div', 'attention-body');
+      line.appendChild(document.createTextNode(`${row.state === 'value' ? '●' : '○'} ${element.label}　`));
+      if (row.state !== 'value') {
+        const badge = absenceBadge(row.absence_kind);
+        if (badge) line.appendChild(badge);
+        if (row.looked) line.appendChild(document.createTextNode(`　找過：${row.looked}`));
+      }
+      box.appendChild(line);
+    });
+    node.appendChild(box);
+  });
+  return node;
+}
+
 function blockerCard(payload) {
   const readiness = payload.readiness;
   const plain = plainReadiness(readiness.state);
@@ -1453,7 +1493,7 @@ async function renderDetail(ticker) {
     // ——它列的是估值假設的敏感度，那個模型不在了。
     // ⚠ 2026-09-30（Step 3.7）：`disproofCard` 搬出稽核區、換成論證層的 downsideCard（每條反證連 watch）；
     // 稽核區補上財務三題的數字（值、來源、as of、口徑、規則，或缺席分型）。
-    [blockerCard(payload), threeQuestionsCard(view), versusMarketCard(view)]
+    [blockerCard(payload), threeQuestionsCard(view), versusMarketCard(view), pageFillCard(payload)]
       .forEach((card) => { if (card) box.appendChild(card); });
     return box;
   });
