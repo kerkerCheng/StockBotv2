@@ -789,7 +789,7 @@ AnalystView.brief（optional）→ APP 首屏 briefCard；六張卡收進「為�
   「出現在數字裡了嗎」的數字與出處跟著搬）。**柱狀圖共用一個畫法**（`barChart`：B2 錨、吃到多少、B3 營收）：左上是軸名與單位、左邊刻度，
   圖下不放說明字（使用者：「直接用 Y 軸…然後標量就好了，下面那一坨小字不用」）——可知日、推算的是哪幾家、代理說明在那一塊的展開；
   所有圖照內容欄的寬 1:1 出圖（`chartWidth()`，電腦上不縮在左邊；schema 規則 8、9）。座標、刻度與顯示單位的換算住圖表 helper
-  （`barChart`／`niceTicks`／`scaleFor`，只換座標與單位、不產生新的數），前端守門測試照舊禁止 brief 區做算術。
+  （`barChart`／`barTicks`／`scaleFor`，只換座標與單位、不產生新的數），前端守門測試照舊禁止 brief 區做算術。
   B9 會不會死：燈列上方一段白話（`briefing/analyst_view/contracts.py::PLAIN_WIPEOUT` → `.meta.json`：四盞各問什麼、稀釋與 going concern
   是什麼、四種顏色）；每盞的理由句是 `alpha/wipeout.py` 的白話句（判色規則與輸入不變）。
   B4 示意圖見 §6 層說明之後的「示意圖」。

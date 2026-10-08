@@ -156,6 +156,20 @@ def test_app_js_has_no_dead_function() -> None:
     )
 
 
+def test_no_top_level_function_is_declared_twice() -> None:
+    """同名的頂層函式，JS 讓後宣告的那一份蓋掉前面的、不報任何錯。
+
+    事發 2026-10-08：個股頁新柱狀圖的 `niceTicks(maxShown)` 撞到資產配置圖原有的 `niceTicks(lo, hi, count)`，
+    個股頁整頁「無法載入」——而 pytest、API、`webapp status` 全綠（L13：成功與失敗同形）。死函式守衛抓不到它：
+    兩份都「有人呼叫」。同一次掃出 `signedPct` 早就有兩份（剛好行為相同才沒出事）。
+    """
+    source = APP_JS.read_text(encoding="utf-8")
+    names = re.findall(r"^(?:async )?function (\w+)\(", source, flags=re.M)
+    assert len(names) > 40, "抓不到函式定義，這條守衛等於沒作用"
+    dupes = sorted({name for name in names if names.count(name) > 1})
+    assert not dupes, f"這些頂層函式宣告了兩次（後面那一份會蓋掉前面的）：{dupes}"
+
+
 @pytest.mark.parametrize("broken", ["function f() { return 1;", "const a = [1, 2;"])
 def test_the_bracket_checker_actually_catches_things(broken: str) -> None:
     """守衛自己也要被驗（INV-5：未量測的機制不得享有默認信任）。"""

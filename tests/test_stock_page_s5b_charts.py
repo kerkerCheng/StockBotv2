@@ -50,7 +50,7 @@ def test_bar_charts_have_a_y_axis_named_for_the_series_and_no_legend_underneath(
     """2026-10-08 使用者：「柱狀圖直接用 Y 軸（雲端四大現金資本支出…）然後標量就好了，下面那一坨小字不用」。
     四張柱狀圖（錨、NVIDIA、吃到多少、營收）都走 `barChart`：左上是軸名與單位、左邊是刻度，圖下不放說明字。"""
     chart = _body("barChart")
-    assert "'chart-axis-title'" in chart and "'chart-tick'" in chart and "niceTicks(" in chart
+    assert "'chart-axis-title'" in chart and "'chart-tick'" in chart and "barTicks(" in chart
     assert "chart-legend" not in chart
     for fn in ("anchorBars", "captureFigure", "revenueBars"):
         body = _body(fn)

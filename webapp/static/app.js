@@ -1585,7 +1585,7 @@ function scaleFor(maxAmount) {
 }
 
 /** 好讀的刻度：0 到最大值之間 3 到 4 格，每格是 1、2、2.5、5 乘 10 的次方。 */
-function niceTicks(maxShown) {
+function barTicks(maxShown) {
   const raw = maxShown / 3;
   const exponent = Math.floor(Math.log10(raw));
   const base = 10 ** exponent;
@@ -1604,14 +1604,13 @@ function barChart({ items, title, unit, latest, klass }) {
   if (!(maxAmount > 0)) return null;
   const scale = scaleFor(maxAmount);
   const shown = (amount) => amount / scale.divisor;
-  const { ticks, step } = niceTicks(shown(maxAmount));
+  const { ticks, step } = barTicks(shown(maxAmount));
   const topTick = ticks[ticks.length - 1];
-  const left = 52, right = W - 8, top = 40, bottom = 150;
+  const left = 52, right = W - 8, top = 26, bottom = 136;
   const y = (v) => bottom - (v / topTick) * (bottom - top);
   const slot = (right - left) / items.length;
   const gap = Math.max(3, Math.round(slot / 4));
   const svg = svgEl('svg', { viewBox: `0 0 ${W} ${bottom + 24}`, class: 'chart chart-bars', role: 'img', 'aria-label': title });
-  svg.appendChild(svgEl('text', { x: 4, y: 14, class: 'chart-axis-title' }, `${title}（${scale.word}${unit}）`));
   ticks.forEach((t) => {
     svg.appendChild(svgEl('line', { x1: left, y1: y(t), x2: right, y2: y(t), class: t === 0 ? 'chart-axis' : 'chart-grid' }));
     svg.appendChild(svgEl('text', { x: left - 6, y: y(t) + 4, 'text-anchor': 'end', class: 'chart-tick' },
@@ -1627,11 +1626,16 @@ function barChart({ items, title, unit, latest, klass }) {
   if (latest) {
     const w = labelWidth(latest, 12);
     const x0 = Math.max(left, Math.min(right - w, lastX - w / 2));
-    svg.appendChild(svgEl('text', { x: x0, y: Math.max(32, y(shown(last.amount)) - 6), class: 'chart-label chart-label-strong' }, latest));
+    // 標籤靠右收進圖裡時會蓋到前一根柱：放在它橫跨的每一根柱的上方（手機寬度量到「1,239.3」壓在較高的前一根上）
+    const spanned = items.filter((it, i) => left + slot * (i + 1) - gap / 2 >= x0 && left + slot * i + gap / 2 <= x0 + w);
+    const peak = spanned.length ? Math.min(...spanned.map((it) => y(shown(it.amount)))) : y(shown(last.amount));
+    svg.appendChild(svgEl('text', { x: x0, y: Math.max(16, peak - 6), class: 'chart-label chart-label-strong' }, latest));
   }
   svg.appendChild(svgEl('text', { x: left, y: bottom + 17, 'text-anchor': 'start', class: 'chart-label' }, items[0].period));
   svg.appendChild(svgEl('text', { x: right, y: bottom + 17, 'text-anchor': 'end', class: 'chart-label' }, last.period));
   const wrap = el('div', 'chart-wrap');
+  // Y 軸的名字是圖上方的一般文字：手機上長名字（雲端四大現金資本支出：MSFT、GOOGL、AMZN、META）會自己換行
+  wrap.appendChild(el('div', 'chart-axis-title', `${title}（${scale.word}${unit}）`));
   wrap.appendChild(svg);
   return wrap;
 }
@@ -2065,7 +2069,9 @@ function lineChart(series, opts) {
   return wrap;
 }
 
-function signedPct(value, digits) {
+/** 帶正負號的百分比（預設一位小數）。只有這一份——2026-10-08 前追蹤表那邊另有一個同名函式，JS 後宣告的會蓋掉前面的，
+ *  兩份剛好都印一位小數才沒出事（同一天新圖表的 `niceTicks` 撞名就讓整頁「無法載入」）。 */
+function signedPct(value, digits = 1) {
   const text = fmtRatioPct(value, digits);
   return text === null ? '—' : (value > 0 ? '+' + text : text);
 }
@@ -2741,11 +2747,6 @@ const LANE_TITLES = {
   live: 'live：我們真的買的（trade_log 的成交；起算＝成交價）',
   paper: 'paper：我們寫下判斷的（每檔第一份 v2 敘事那天；起算＝那天收盤）',
 };
-
-function signedPct(value) {
-  const text = fmtRatioPct(value, 1);
-  return text === null ? '—' : (value > 0 ? '+' : '') + text;
-}
 
 /* 多主題等權組 S1（2026-10-06）：每一列只跟自己所屬的組比；沒有值的列印「為什麼沒有」，不印 0、不印空白。
    種類與短標籤都由產生缺席的程式宣告、跟著資料走（`alpha.theme_cohort.cohort_absence`）——前端不維護第二份對照表（L16）；
@@ -3615,11 +3616,17 @@ async function route() {
     app.textContent = '';
     const box = el('div', 'error');
     box.appendChild(el('h2', null, '無法載入'));
-    box.appendChild(el('p', null, 'APP 讀不到已 materialize 的判讀。'));
-    const p = el('p', 'note');
-    p.appendChild(document.createTextNode('請在本機跑：'));
-    p.appendChild(el('code', null, 'python -m webapp materialize <TICKER>'));
-    box.appendChild(p);
+    // 讀不到判讀與頁面程式自己出錯是兩件事（L12）：伺服器回了錯（getJSON 帶 status）才是「讀不到」；其他照實印錯誤，
+    // 不說成沒 materialize（2026-10-08：新圖表的程式錯被這一句蓋成「讀不到判讀」）
+    const fromServer = Boolean(err && err.status);
+    box.appendChild(el('p', null, fromServer ? 'APP 讀不到已 materialize 的判讀。' : '頁面程式出錯了（判讀本身讀得到）。'));
+    if (fromServer) {
+      const p = el('p', 'note');
+      p.appendChild(document.createTextNode('請在本機跑：'));
+      p.appendChild(el('code', null, 'python -m webapp materialize <TICKER>'));
+      box.appendChild(p);
+    }
+    box.appendChild(el('p', 'note', `錯誤：${String((err && (err.stack || err.message)) || err).slice(0, 600)}`));
     app.appendChild(box);
   }
 }

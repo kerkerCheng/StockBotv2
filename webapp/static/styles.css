@@ -500,7 +500,8 @@ table.pt-table th, table.pt-table td { vertical-align: top; overflow-wrap: anywh
 .chart-axis { stroke: var(--muted); stroke-width: 1; }
 .chart-grid { stroke: var(--border); stroke-width: 1; }
 .chart-tick { fill: var(--muted); font-size: 11px; }
-.chart-axis-title { fill: var(--text); font-size: 12px; font-weight: 600; }
+/* Y 軸的名字放在圖上方的一般文字（手機上長名字會自己換行；SVG 裡的字不會換行、會超出畫面——390px 量測抓到） */
+.chart-axis-title { color: var(--text); font-size: 12px; font-weight: 600; margin: 0 0 2px 4px; }
 .ruler-axis { stroke: var(--border); stroke-width: 2; }
 .ruler-range { stroke: var(--dim); stroke-width: 7; stroke-linecap: butt; opacity: .45; }
 .ruler-end { stroke: var(--muted); stroke-width: 2; }
