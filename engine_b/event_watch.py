@@ -212,6 +212,18 @@ def condition_dates(text: str) -> list[date]:
     return out
 
 
+#: 追源等待可以掛的 kind：等具名公司的文件（一手或任何提及），或——觸發條件沒有具名到任何已登記公司時——等一個日子。
+TRACE_WATCH_KINDS = frozenset({"entity_filing_signal", "related_entity_signal", "date"})
+#: 日期型追源等待：`until` 之後還有多久才算到期（T1 每天跑；這段只防「那幾天 daily 沒跑」）。
+TRACE_DATE_GRACE_DAYS = 30
+
+
+def trace_date_until(query_hint: str, *, today: date, ttl: int) -> date:
+    """日期型追源等待哪天叫醒：觸發條件寫出的最早一個**未來**日期；沒寫就是等滿一輪（TTL）。"""
+    future = sorted(d for d in condition_dates(query_hint) if d > today)
+    return future[0] if future else today + timedelta(days=ttl)
+
+
 def ensure_trace_watch(
     lead_id: str,
     *,
@@ -223,45 +235,62 @@ def ensure_trace_watch(
     created_at: str | None = None,
     today: date | None = None,
     retarget: bool = False,
+    data: dict[str, Any] | None = None,
 ) -> dict[str, Any] | None:
     """替一筆剛 park 的追源線索建立等待條件（沒有就建，有就沿用）。
 
     這是 [321] 的**入口端**：遷移只處理了既有 backlog，新 park 的若不建 watch，
     就會立刻變回沒有到期日、沒人管的等待——L13「管子只接了一頭」。
 
-    `retarget`＝這一次停放**明確**改了觸發條件：沿用的 watch 跟著改，舊值留在 `retargets`。
+    `retarget`＝沿用的 watch 跟著新的觸發條件改，舊值留在 `retargets`（相同就不動）。
     沒有這步，沿用會把上一輪的寬條件帶下去——2026-10-07 AAOI 那條研究完改成只等 AAOI 自己的申報，
     沿用的 watch 仍是「AAOI／LITE 有任何新動靜」，下一則提到 LITE 的 CPO 新聞又會把它叫醒（L17 對稱面）。
+
+    `kind="date"`（2026-10-08，failure log #15 ④）：觸發條件沒有具名到任何已登記公司時，等觸發條件寫的日子
+    （沒寫就是 TTL）——叫醒＝重跑一次路線。之前這種停放回 None（`wake_state=unwatched`），套管那則要人手補日期 watch。
+    `data`：呼叫端已載入的 registry（批次重算用，由呼叫端存檔）；沒給就自己讀寫。
     """
-    entities = sorted({str(e).strip() for e in entities if str(e).strip()})
-    if not entities:
-        return None  # 沒有具名標的就沒有觸發條件，不假裝在等（由 wake_state=unwatched 現形）
     kind = "entity_filing_signal" if kind == "primary_source_signal" else kind
-    data = load_watches()
+    entities = [] if kind == "date" else sorted({str(e).strip() for e in entities if str(e).strip()})
+    if kind != "date" and not entities:
+        return None  # 實體型等待沒有具名標的就沒有觸發條件，不假裝在等（由 wake_state=unwatched 現形）
+    own = data is None
+    data = load_watches() if own else data
+    today = today or _today()
+    ttl = load_config()["trace_ttl_days"]
+    until = trace_date_until(query_hint, today=today, ttl=ttl) if kind == "date" else None
     for watch in data.get("watches", []):
         # 只沿用還在等的（active／fired）。到期的那一筆代表**上一輪**等待——lead 研究完再 park 是新的一輪，
         # 沿用它會變成沒有到期的等待且不被任何計數器數到（R2-b NB-1）。
         if watch.get("wake_lead") == lead_id and watch.get("status") in ("active", "fired"):
-            if retarget and (watch.get("kind"), sorted(watch.get("entities") or ())) != (kind, entities):
-                if kind not in ("entity_filing_signal", "related_entity_signal"):
-                    raise EventWatchError(f"追源 watch 只能改成具名實體的等待，不能改成 {kind}")
+            # 只改追源型：假說查核（fact_verification）掛在 lead 上的那兩條（ew_0068、ew_0069）等的是一個具體事實，
+            # 不是觸發條件——停放重算不得把它改成等申報（R1，2026-10-08）
+            if retarget and watch.get("kind") in TRACE_WATCH_KINDS and (
+                    watch.get("kind"), sorted(watch.get("entities") or ())) != (kind, entities):
+                if kind not in TRACE_WATCH_KINDS:
+                    raise EventWatchError(f"追源 watch 只能改成 {sorted(TRACE_WATCH_KINDS)}，不能改成 {kind}")
                 watch.setdefault("retargets", []).append({
                     "at": _now(), "from_kind": watch.get("kind"), "from_entities": list(watch.get("entities") or ()),
-                    "from_created_at": watch.get("created_at"), "to_kind": kind, "to_entities": entities})
+                    "from_until": watch.get("until"), "from_created_at": watch.get("created_at"),
+                    "to_kind": kind, "to_entities": entities})
                 watch["kind"], watch["entities"] = kind, entities
+                watch["until"] = until.isoformat() if until else None
+                if until and str(watch.get("expires") or "") < (until + timedelta(days=TRACE_DATE_GRACE_DAYS)).isoformat():
+                    watch["expires"] = (until + timedelta(days=TRACE_DATE_GRACE_DAYS)).isoformat()
                 # 新條件從這條線索最後一次進 pq1 起算：那之前的事研究時已經看過，不該立刻再叫醒它。
                 watch["created_at"] = created_at or watch.get("created_at")
                 if query_hint:
                     watch.setdefault("poll", {})["query_hint"] = query_hint[:200]
-                save_watches(data)
+                if own:
+                    save_watches(data)
             return watch
-    today = today or _today()
-    ttl = load_config()["trace_ttl_days"]
+    expires = until + timedelta(days=TRACE_DATE_GRACE_DAYS) if until else today + timedelta(days=ttl)
     watch = add_watch(
         data,
         kind=kind,
         wake_lead=lead_id,
-        expires=(today + timedelta(days=ttl)).isoformat(),
+        expires=expires.isoformat(),
+        until=until.isoformat() if until else None,
         entities=entities,
         consumed_entities=consumed_entities,
         poll_query_hint=query_hint[:200],
@@ -271,7 +300,8 @@ def ensure_trace_watch(
         # 用寫入時間會讓 park 當下已在佇列中的新 lead 被誤判成舊事件。
         created_at=created_at,
     )
-    save_watches(data)
+    if own:
+        save_watches(data)
     return watch
 
 
@@ -483,6 +513,7 @@ def check_watches(
     today = today or _today()
     fired: list[dict[str, Any]] = []
     mark_expired(data, today=today)
+    ownership_excluded = {str(f).strip().upper() for f in load_config()["ownership_forms_excluded"]}
     for watch in data["watches"]:
         if watch.get("status") != "active":
             continue
@@ -509,6 +540,10 @@ def check_watches(
         elif kind in ENTITY_MATCH_KINDS and leads:
             targets = set(watch.get("entities") or ())
             created = str(watch.get("created_at") or "")
+            try:
+                created_day = date.fromisoformat(created[:10])
+            except ValueError:
+                created_day = None
             consumed = set(watch.get("consumed_entities") or ())
             consumed_leads = set(watch.get("consumed_leads") or ())
             from engine_b.entities import lead_entities
@@ -537,7 +572,19 @@ def check_watches(
                 # 其餘 kind 等的是正式文件，不該被任何一則提及觸發。
                 if kind in PRIMARY_ONLY_KINDS and not is_primary_source(lead):
                     continue
+                # 持股申報（Form 4 等）不是「某實體的正式文件」在等的那種文件：EDGAR 一手 lead 六成是它（2026-10-08 實測
+                # 255 則裡 159 則），大公司的等待會被它一直叫醒——語意 watch 早就排除（2026-09-09），這裡補上對稱面（failure log #1）。
+                if kind in PRIMARY_ONLY_KINDS and str(lead.get("form_type") or "").strip().upper() in ownership_excluded:
+                    continue
                 if _lead_stamp(lead) <= created:
+                    continue
+                # 回補的舊文件不是新事件：EDGAR lookback 與新 feed 首跑會把舊文件以今天的 first_seen 登記
+                # （同語意 watch 的 ④；failure log #1）。published_at 讀不懂就只看 first_seen，並計數。
+                raw_published = lead.get("published_at")
+                published = parse_published(raw_published)
+                if raw_published and published is None and stats is not None:
+                    stats["published_at_unparsed"] = stats.get("published_at_unparsed", 0) + 1
+                if published is not None and created_day is not None and published < created_day:
                     continue
                 shared = sorted(targets & lead_entities(lead))
                 if not shared:

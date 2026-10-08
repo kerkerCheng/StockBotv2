@@ -193,9 +193,10 @@ def test_related_triaged_lead_requeues_machine_linked_trace_backlog() -> None:
         "trace_next_trigger": "下一份 AXT filing 或一手文件",
         "trace_requires_user": "false",
     })
-    assert store["leads"][parked_id]["refs"]["trace_trigger_kind"] == (
-        "related_entity_signal"
-    )
+    # 2026-10-08（failure log #1）：沒有明示時，標的＝觸發條件點名的公司、只等一手（之前是 lead 全部實體、任何提及）
+    refs = store["leads"][parked_id]["refs"]
+    assert refs["trace_trigger_kind"] == "entity_filing_signal"
+    assert "co:axt" in refs["trace_trigger_entities"]
 
     event_id, _ = leads.register(
         store,
@@ -531,6 +532,8 @@ def test_requeue_consumed_marker_stops_same_entity_waking_lead_repeatedly() -> N
 
     park 的理由（缺某份特定文件、內容不屬圖譜材料）不會因為「又一則提到同一檔的
     貼文」而改變，因此第二次以後的同標的觸發必須被擋下；新標的仍應正常喚醒。
+
+    2026-10-08 起「任何提及」不再是預設（failure log #1），這條測的是**明示** `related_entity_signal` 時的消化標記。
     """
     store = leads.empty_store()
     parked_id, _ = leads.register(
@@ -545,11 +548,13 @@ def test_requeue_consumed_marker_stops_same_entity_waking_lead_repeatedly() -> N
         store, parked_id, go=True, tier=4, reason="需要追原文",
         decided_at="2026-08-01T00:00:00+00:00",
     )
+    wide = {"trace_trigger_kind": "related_entity_signal", "trace_trigger_entities": ["AXTI", "LITE"]}
     leads.advance(store, parked_id, "parked", ref={
         "parked_reason": "只有 tier 3 轉述",
         "trace_status": "isolated_tier_3",
         "trace_next_trigger": "取得券商報告原文",
         "trace_requires_user": "false",
+        **wide,
     })
 
     def _fire(source: str, url: str, title: str, at: str) -> None:
@@ -574,6 +579,7 @@ def test_requeue_consumed_marker_stops_same_entity_waking_lead_repeatedly() -> N
         "trace_status": "isolated_tier_3",
         "trace_next_trigger": "取得券商報告原文",
         "trace_requires_user": "false",
+        **wide,
     })
     _fire("edgar:AXTI", "https://sec.gov/axt/2", "AXTI 8-K 第二份", "2026-08-03T00:00:00+00:00")
     assert store["leads"][parked_id]["status"] == "parked", (
@@ -647,7 +653,7 @@ def test_primary_source_signal_only_wakes_on_tier1_documents() -> None:
 def test_re_park_with_a_narrower_trigger_retargets_the_reused_watch() -> None:
     """2026-10-07 AAOI：研究完重新停放、改成只等 AAOI 自己的申報；沿用的 watch 若不跟著改，
     仍是「AAOI／LITE 有任何新動靜」，下一則提到 LITE 的 CPO 新聞又會把它叫醒（L17 對稱面）。
-    沒有明確改觸發條件的重新停放照舊沿用（setdefault 補的不算改）。"""
+    2026-10-08 起每次停放都重算觸發條件（明示的照用）：明示同一個寬條件 → 不動；不明示 → 由觸發文字推（只等點名的 AAOI）。"""
     from engine_b import event_watch as ew
 
     store = leads.empty_store()
@@ -656,7 +662,8 @@ def test_re_park_with_a_narrower_trigger_retargets_the_reused_watch() -> None:
     leads.triage(store, parked_id, go=True, tier=4, reason="要一手", decided_at="2026-08-01T00:00:00+00:00")
     base = {"parked_reason": "只有推文", "trace_status": "lead_only_tier_4",
             "trace_next_trigger": "AAOI 10-Q 的 ATM 段", "trace_requires_user": "false"}
-    leads.advance(store, parked_id, "parked", ref=dict(base))
+    wide = {"trace_trigger_kind": "related_entity_signal", "trace_trigger_entities": ["AAOI", "LITE"]}
+    leads.advance(store, parked_id, "parked", ref=base | wide)
 
     def _fire(source: str, url: str, title: str, tier: int, at: str) -> None:
         lead_id, _ = leads.register(store, source=source, url=url, title=title)
@@ -669,8 +676,8 @@ def test_re_park_with_a_narrower_trigger_retargets_the_reused_watch() -> None:
     _fire("x:someone", "https://x.com/a/1", "$LITE CPO 新聞", 4, "2026-08-02T00:00:00+00:00")
     assert store["leads"][parked_id]["status"] == "triaged_go"     # 寬條件：提到 LITE 就醒
 
-    # 沒有明確改觸發條件 → 沿用，不改
-    leads.advance(store, parked_id, "parked", ref=dict(base))
+    # 明示同一個寬條件 → 沿用，不改
+    leads.advance(store, parked_id, "parked", ref=base | wide)
     assert _watch()["kind"] == "related_entity_signal" and not _watch().get("retargets")
 
     _fire("x:someone", "https://x.com/a/2", "$AAOI 新聞", 4, "2026-08-03T00:00:00+00:00")
@@ -687,6 +694,12 @@ def test_re_park_with_a_narrower_trigger_retargets_the_reused_watch() -> None:
     assert store["leads"][parked_id]["status"] == "parked", "改窄之後，推文不得再叫醒它"
     _fire("edgar:AAOI", "https://sec.gov/aaoi/10q", "AAOI 10-Q", 1, "2026-08-06T00:00:00+00:00")
     assert store["leads"][parked_id]["status"] == "triaged_go", "AAOI 自己的一手申報必須叫醒它"
+
+    # 不明示 → 由觸發文字推：「AAOI 10-Q 的 ATM 段」點名的是 AAOI（不帶 $ 的已登記代號），只等一手
+    leads.advance(store, parked_id, "parked", ref=dict(base))
+    watch = _watch()
+    assert (watch["kind"], watch["entities"]) == ("entity_filing_signal", ["co:applied_optoelectronics"])
+    assert watch["retargets"][-1]["from_entities"] == ["AAOI"]
 
 
 def test_trace_backlog_flags_entries_no_trigger_can_ever_reach() -> None:
@@ -713,10 +726,14 @@ def test_trace_backlog_flags_entries_no_trigger_can_ever_reach() -> None:
         "https://x.com/a/1", "$AXTI 相關轉述",
         base | {"trace_next_trigger": "AXT 一手揭露"},
     )
-    # 無標的、也不需人工 authority → 永遠不會命中
-    unreachable = _park(
+    # 有觸發條件、但沒點名任何已登記公司 → 2026-10-08 起等日子（到 TTL 重跑一次路線；failure log #15 ④）
+    dated = _park(
         "https://x.com/a/2", "某份政府報告的轉述（無具名公司）",
         base | {"trace_next_trigger": "canonical_dhs_committee_report"},
+    )
+    # 連觸發條件都沒寫、也沒有明示標的 → 永遠不會命中
+    unreachable = _park(
+        "https://x.com/a/4", "某份轉述（無具名公司、沒寫觸發條件）", dict(base),
     )
     # 無標的但需人工 authority → 走 pq2，本來就不靠自動觸發
     manual = _park(
@@ -732,7 +749,13 @@ def test_trace_backlog_flags_entries_no_trigger_can_ever_reach() -> None:
     assert rows[reachable]["unreachable_reason"] is None
     assert rows[reachable]["expires"], "watch 必須帶到期日，無限期等待會腐爛成事實"
 
-    # 無具名標的 → 建不出觸發條件，是唯一真正的黑洞，必須現形。
+    assert rows[dated]["wake_state"] == "watching"
+    from engine_b import event_watch as ew
+
+    dated_watch = next(w for w in ew.load_watches()["watches"] if w.get("wake_lead") == dated)
+    assert dated_watch["kind"] == "date" and dated_watch["until"] and dated_watch["expires"] > dated_watch["until"]
+
+    # 無具名標的、也沒寫觸發條件 → 建不出觸發條件，是唯一真正的黑洞，必須現形。
     assert rows[unreachable]["wake_state"] == "unwatched"
     assert rows[unreachable]["auto_trigger_reachable"] is False
     assert "沒有對應的 Event Watch" in rows[unreachable]["unreachable_reason"]

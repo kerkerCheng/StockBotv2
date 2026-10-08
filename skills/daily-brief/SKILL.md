@@ -276,7 +276,8 @@ WebSearch／Browser（研究只在互動 session，這些都是互動入口）�
 watch 的 `entities`。`trace_trigger_kind` 仍是 lead 上的寫入端字彙（擋拼字錯誤），但**行為由
 `event_watch.WATCH_KINDS` 決定**——`primary_source_signal` 建 watch 時映射到
 `entity_filing_signal`（判準相同：tier-1 ＋ 具名標的交集）。消化標記住在 watch 的
-`consumed_entities`，不再於 lead refs 留第二份。
+`consumed_entities`，不再於 lead refs 留第二份。**沒有明示觸發標的時，停放當下由觸發條件文字推**（2026-10-08）：
+標的＝觸發條件點名的公司、預設只等一手；沒點名就等日子；寫「無」＝不等；終局寫了觸發條件也有 watch（細節 `docs/OPERATIONS.md` 追源段）。
 
 **`wake_state` 必須逐筆列出，`stalled`／`expired`／`unwatched` 三種必須當場處置。** 它們代表
 被動層救不了——等下去不會有事發生：

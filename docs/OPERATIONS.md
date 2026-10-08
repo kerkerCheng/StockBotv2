@@ -2010,9 +2010,15 @@ pq1 每次因 `isolated_tier_3`／截圖／paywall 未果而 park 時，必須�
 
 **Lead 之間的關聯鍵：** URL hash 只認同一篇文章。跨文章關聯靠 `engine_b/entities.py`
 的具名標的做確定性比對（cashtag、`edgar:<TICKER>`、registry 反查的 `co:*`）。
-`trace_next_trigger` 保留給人讀；機器改用 `trace_trigger_kind=related_entity_signal`
-＋`trace_trigger_entities`。同標的的新 lead 通過 triage 後，會把不需人工 access／付費的
-parked trace 排回 bounded pq1，留下 triggering lead receipt。
+`trace_next_trigger` 給人讀；機器用 `trace_trigger_kind`＋`trace_trigger_entities`。**沒有明示時，停放當下由觸發條件
+文字推一次**（2026-10-08，Phase 7 failure log #1、#15；`leads.default_trace_trigger`）：標的＝觸發條件**點名**的已登記公司
+（名冊名字、cashtag、不帶 `$` 的已登記代號）；追源還沒結束的另加這份文件的發文公司。預設**只等一手**（`entity_filing_signal`；
+持股申報與回補的舊文件不算事件）；沒點名任何已登記公司就**等日子**（`date`：觸發條件寫的日子，沒寫就是 TTL；叫醒＝重跑一次路線）；
+寫「無」＝`none`（明確不等）。**終局 trace status 寫了觸發條件也有 watch**；這一輪到期結案後落成 `none`（A3：不無聲續等，再停放才是新的一輪）。
+「任何提及就醒」（`related_entity_signal`）要明示才用。被排回過的 lead 重新停放時要把前次 `trace_status` 換成不同的值，
+得加 `--replace-trace-status`（前次結論一律進 lead 的 `trace_history`；drain 清單會印上一輪的結論）。
+存量對齊、名冊變動後重算：`& '.venv\Scripts\python.exe' -m engine_b.cli trace-watch-sync [--dry-run]`（零 token、只動 pq1 狀態）。
+同標的的新 lead 通過 triage 後，會把不需人工 access／付費的 parked trace 排回 bounded pq1，留下 triggering lead receipt。
 
 一般 scheduled／event-triggered 重查仍屬 pq1，不占 pq2；只有需要使用者提供合法 access、
 核准付費或明確改變研究優先權時，`todo sync` 才建立 `source_trace_review`。

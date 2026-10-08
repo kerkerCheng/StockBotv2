@@ -278,6 +278,35 @@ def _cmd_consume_fired(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_trace_watch_sync(args: argparse.Namespace) -> int:
+    """每則停放的等待對齊現行規則（`leads.sync_trace_watches`；failure log #1、#15）。名冊變動後也跑這一個。
+
+    機械、零 token、只動 pq1 狀態（lead refs、watch registry）。`--dry-run` 只印收據不寫檔。
+    """
+    from engine_b import event_watch as ew
+
+    store = leads.load(args.leads)
+    watch_data = ew.load_watches()
+    result = leads.sync_trace_watches(store, watch_data)
+    if not args.dry_run:
+        leads.save(store, args.leads)
+        ew.save_watches(watch_data)
+    if args.json:
+        print(json.dumps({**result, "dry_run": bool(args.dry_run)}, ensure_ascii=False, indent=2))
+        return 0
+    labels = {
+        "created_entity": "新建：等具名公司的一手文件", "created_date": "新建：等日子（觸發條件沒點名已登記公司）",
+        "retargeted": "改標的（舊的等待跟著觸發條件改）", "unchanged": "不變",
+        "no_wait_none": "明確不等（觸發條件寫「無」）", "no_wait_ownership": "不等：本身是持股申報",
+        "no_wait_other": "不等：其他", "requires_user": "向你要文件（不建 watch）",
+        "round_over": "這一輪已到期結案（不復活；再停放才是新的一輪）",
+    }
+    print(f"停放等待對齊{'（試跑，未寫檔）' if args.dry_run else ''}：")
+    for key, label in labels.items():
+        print(f"  {label}：{result['counts'][key]}")
+    return 0
+
+
 def _cmd_drain(args: argparse.Namespace) -> int:
     """列出 pq1 接下來的 bounded jobs，供 agent 逐個研究與 checkpoint。
 
@@ -371,8 +400,27 @@ def _cmd_drain(args: argparse.Namespace) -> int:
     for rank, l in lead_batch:
         print(f"  [{rank.label}] {l['lead_id']}  {l['status']:12}  {l['source']}")
         print(f"           {l.get('title') or '(無標題)'}  {l.get('url')}")
+        previous = _previous_conclusion(l)
+        if previous:
+            print(f"           ↩ {previous}")
     _print_classification_gaps(classification_gaps)
     return 0
+
+
+def _previous_conclusion(lead: dict) -> str | None:
+    """被排回的 lead 上一輪的結論（failure log #2）：前次 trace_status、停放理由、這次為什麼被叫醒。
+
+    2026-10-04 drain 三條的前次結論被同名 ref 覆寫，原因之一是清單只印標題——看不到上一輪判了什麼，
+    重研究的人只能從頭再判一次。沒被排回過的回 None。
+    """
+    refs = lead.get("refs") or {}
+    if not refs.get("trace_requeued_at"):
+        return None
+    status = refs.get("trace_status") or "（沒有 trace_status）"
+    reason = " ".join(str(refs.get("parked_reason") or "").split())
+    woken = refs.get("trace_trigger_event_ref") or refs.get("trace_requeue_trigger") or "—"
+    return (f"上一輪：{status}｜{reason[:90]}{'…' if len(reason) > 90 else ''}｜這次叫醒：{woken}"
+            "（要改 trace_status 得加 --replace-trace-status）")
 
 
 def _classification_from_args(args: argparse.Namespace, *, required: bool) -> dict | None:
@@ -675,7 +723,8 @@ def _cmd_advance(args: argparse.Namespace) -> int:
     if ref is None:
         return 1
     try:
-        leads.advance(store, args.lead_id, args.to_status, ref=ref or None)
+        leads.advance(store, args.lead_id, args.to_status, ref=ref or None,
+                      replace_trace_status=bool(getattr(args, "replace_trace_status", False)))
     except (leads.LeadStateError, ValueError) as exc:
         print(f"advance 失敗：{exc}", file=sys.stderr)
         return 1
@@ -897,6 +946,14 @@ def build_parser() -> argparse.ArgumentParser:
     p_consume.add_argument("--dry-run", action="store_true", help="只印處置，不寫檔")
     p_consume.set_defaults(func=_cmd_consume_fired)
 
+    p_sync = sub.add_parser(
+        "trace-watch-sync",
+        help="每則停放的等待對齊現行規則：標的＝觸發條件點名的公司＋發文公司、只等一手；名冊變動後也跑（零 token）",
+    )
+    p_sync.add_argument("--dry-run", action="store_true", help="只印收據，不寫檔")
+    p_sync.add_argument("--json", action="store_true")
+    p_sync.set_defaults(func=_cmd_trace_watch_sync)
+
     p_drain = sub.add_parser("drain", help="列出 pq1 接下來該處理的 leads（依 priority）")
     p_drain.add_argument("--limit", type=int, default=None,
                          help="本輪上限；省略時讀 config/daily_routine.json")
@@ -974,6 +1031,8 @@ def build_parser() -> argparse.ArgumentParser:
     p_adv.add_argument("lead_id")
     p_adv.add_argument("to_status")
     p_adv.add_argument("--ref", action="append", help="key=value，記錄關聯（如 research_action_id=ra_x）")
+    p_adv.add_argument("--replace-trace-status", action="store_true",
+                       help="被排回過的 lead 停放時要把前次 trace_status 換成不同的值（舊值留在 trace_history）")
     p_adv.set_defaults(func=_cmd_advance)
 
     p_ann = sub.add_parser("annotate", help="補充 metadata，不變更 lead status")

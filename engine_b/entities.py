@@ -182,6 +182,72 @@ def extract_entities(
     }
 
 
+#: 不帶 `$` 的代號：三個字元以上、大寫開頭的英數字（可帶 `.TW` 類後綴）；底線算分隔（舊停放常寫成 `no_retry_unless_POET_…`）。
+_PLAIN_TICKER_RE = re.compile(r"(?<![A-Za-z0-9])([A-Z][A-Z0-9]{2,5}(?:\.[A-Z]{1,3})?)(?![A-Za-z0-9])")
+
+
+def lead_subject(lead: dict) -> tuple[str, ...]:
+    """這則 lead 是**誰的**事：來源宣告的發文公司（`company_id`，harvest 登記當下寫的）；沒有宣告時，
+    實體裡**恰好一家**已登記公司就取那一家（單一 cashtag 的推文）；兩家以上不猜（INV-1）。
+
+    用途：停放的觸發條件常不寫主詞（「後續 10-Q 或 8-K 揭露實際出售股數」「同標的後續出現具名客戶」）——
+    主詞就是這份文件的發文公司。
+    """
+
+    declared = lead.get("company_id")
+    if isinstance(declared, str) and declared.startswith("co:"):
+        return (declared,)
+    companies = sorted(e for e in lead_entities(lead) if str(e).startswith("co:"))
+    return (companies[0],) if len(companies) == 1 else ()
+
+
+def trigger_entities(text: str | None, registry=None) -> tuple[str, ...]:
+    """追源等待的觸發條件（`trace_next_trigger`）**具名**到的公司——停放時 watch 等的標的（failure log #1）。
+
+    回傳 `co:*`（名冊名字寫法逐字出現、cashtag 解析得到、或不帶 `$` 的已登記代號**嚴格**相符）＋ 逐字 cashtag
+    （未登記的也留，仍可對 lead）。名字比對只走 `query.bottleneck.quote_names_company`（唯一 owner；名冊宣告的寫法、
+    整詞、兩家共用的寫法不算）——不是模糊比對、不呼叫 LLM。不帶 `$` 的代號只認 `company_id_for_ticker` 嚴格相符、
+    三個字元以上的大寫字串（「AAOI 第三季 10-Q」）；去後綴的猜法不用在這裡——「SOI 晶圓」不是 Soitec。
+
+    為什麼不用 lead 自己的實體：lead 是一則推文時，它的實體是推文裡**所有** cashtag（2026-10-04 一則停放等 27 家），
+    而觸發條件寫的是「AXT 下一份 8-K」——等的是 AXT。2026-10-04～07 被排回的 11 次裡 9 次觸發跟原研究無關，
+    多半就是這一格（另一半是預設等「任何提及」，見 `leads.advance`）。
+    """
+
+    raw = str(text or "")
+    if not raw.strip():
+        return ()
+    try:
+        from identity.registry import get_registry
+
+        registry = registry if registry is not None else get_registry()
+    except Exception:
+        registry = None
+    cashtags = extract_cashtags(raw)
+    found: dict[str, None] = {token: None for token in cashtags}
+    if registry is None:
+        return tuple(sorted(found))
+    from query.bottleneck import quote_names_company, shared_name_forms
+
+    try:
+        bases = base_ticker_candidates(registry)
+    except Exception:
+        bases = {}
+    for token in cashtags:
+        company_id = resolve_lead_ticker(token, registry, base_candidates=bases).company_id
+        if company_id:
+            found.setdefault(company_id, None)
+    for token in _PLAIN_TICKER_RE.findall(raw):
+        company_id = registry.company_id_for_ticker(token)
+        if company_id:
+            found.setdefault(company_id, None)
+    shared = shared_name_forms(registry)
+    for company in registry.companies:
+        if quote_names_company(raw, company, shared=shared):
+            found.setdefault(company.company_id, None)
+    return tuple(sorted(found))
+
+
 def lead_entities(lead: dict) -> set[str]:
     """取一筆 lead 已存的實體集合；未擷取過的即時由文字推導。
 

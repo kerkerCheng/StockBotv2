@@ -455,48 +455,250 @@ def _lead_ticker_hint(lead: Mapping[str, Any]) -> str | None:
     return None
 
 
+#: 「沒有要等的」的結構化寫法（2026-10-08，failure log #15）：`trace_trigger_kind=none`。
+#: 終局 trace status 原本同時承載「追源結束、沒有要等的」與「追源結束、研究在等未來事件」兩義（L12）——
+#: 拆開之後，寫了觸發條件就有 watch（不論終局與否），明確不等的寫這一格。
+TRACE_NO_WAIT = "none"
+
+#: 觸發條件文字的「不等」慣例（研究 session 一向寫「無；官方 Form 4 已取得…」；九月的舊停放寫成代碼
+#: `no_retry_opinion_only`、`none_dated_observation`、`terminal_original_does_not_support_aaoi`——但 `no_retry_unless_…`
+#: 是有條件的等）：只在**寫入當下**解析一次，落成上面那一格；之後的判斷一律讀那一格（L15 先解析這是什麼；
+#: L16-3 自由字串不決定去留）。
+_NO_WAIT_TRIGGER_RE = re.compile(
+    r"^\s*(?:無\s*(?:$|[；;，,。.:：（(、])|(?:none|n/?a)\s*(?:$|[;,.:(])|[—–-]+\s*$"
+    r"|no_retry(?!_unless)\w*$|none_\w+$|terminal_\w+$)",
+    re.IGNORECASE)
+
+#: 會蓋掉前次結論的 ref：trace_status 換值要明示（`replace_trace_status=True`），三格舊值一律進 `trace_history`
+#: （failure log #2：2026-10-04 drain 三條的前次結論被同名 ref 覆寫，靠備份 zip 復原）。
+_TRACE_CONCLUSION_KEYS = ("trace_status", "parked_reason", "trace_next_trigger")
+
+
+def trace_wait_plan(lead: Mapping[str, Any]) -> tuple[str, list[str]] | None:
+    """這則停放在等什麼：`(kind, entities)`；不等回 None。只讀結構化欄位（停放時已由 `advance` 落好）。
+
+    - 向你要文件（`trace_requires_user`）→ 不建 watch（使用者就是觸發，pq2 那端有生命週期）
+    - `trace_trigger_kind=none` → 明確不等
+    - lead 本身是持股申報（Form 4 等）→ 不等：它等的是下一份持股申報，而持股申報刻意不叫醒任何 watch
+      （`event_watch` 的 `ownership_forms_excluded`），建了也醒不了——內部人交易由彙總觀測處理
+    - 沒寫觸發條件 → 不等（終局）；非終局照舊用明示的標的（沒有就 None，由 `wake_state=unwatched` 現形）
+    - 其餘 → 有標的等標的（預設只等一手），沒有標的等日子（`date`，觸發條件寫的日子或 TTL）
+    """
+
+    refs = lead.get("refs") or {}
+    if str(refs.get("trace_requires_user") or "").lower() in {"1", "true", "yes"}:
+        return None
+    kind = str(refs.get("trace_trigger_kind") or "").strip()
+    if kind == TRACE_NO_WAIT or str(refs.get("trace_status") or "").strip() == "watch_expired":
+        return None   # 明示不等，或這一輪已到期結案（A3：不無聲續等；再停放才是新的一輪）
+    from engine_b import event_watch as ew
+
+    form = str(lead.get("form_type") or "").strip().upper()
+    if form and form in {str(f).strip().upper() for f in ew.load_config()["ownership_forms_excluded"]}:
+        return None
+    entities = sorted({str(e).strip() for e in refs.get("trace_trigger_entities") or () if str(e).strip()})
+    if not str(refs.get("trace_next_trigger") or "").strip():
+        trace_status = str(refs.get("trace_status") or "").strip()
+        if trace_status and get_trace_status_registry().is_terminal(trace_status):
+            return None
+        return (kind or "entity_filing_signal", entities) if entities else None
+    kind = "entity_filing_signal" if kind in ("", "primary_source_signal") else kind
+    if kind == "date" or not entities:
+        return ("date", [])
+    return (kind, entities)
+
+
+def default_trace_trigger(lead: Mapping[str, Any], trigger: str, *, trace_status: str = "",
+                          registry: Any = None) -> dict[str, Any]:
+    """停放時沒有明示觸發標的，由觸發條件文字推一次（failure log #1、#15）。
+
+    - 寫「無」（或舊代碼 `no_retry_…`）＝明確不等（`none`）。
+    - 標的＝觸發條件**點名**的公司（`entities.trigger_entities`）；追源還沒結束的（非終局）另加這份文件的發文公司
+      （`entities.lead_subject`）——「後續 10-Q 揭露實際出售股數」不寫主詞，主詞就是發文公司。
+      **終局只認點名**：終局的觸發條件多是「同標的後續出現具名客戶……」這類重新打開的條件，加上發文公司會讓它的每一份
+      申報都叫醒一次（2026-10-08 試跑：存量一次叫醒 97 則，多半是臨時股東會通知、法說邀請）。
+    - 有標的預設**只等一手**（`entity_filing_signal`），沒有標的等日子（`date`：觸發條件寫的日子，沒寫就是 TTL）。
+
+    之前的預設是「lead 的全部實體、任何提及就醒」：一則推文的 27 個 cashtag 全成了等待標的，
+    2026-10-04～07 被排回的 11 次裡 9 次觸發跟原研究無關。
+    """
+
+    if _NO_WAIT_TRIGGER_RE.match(trigger):
+        return {"trace_trigger_kind": TRACE_NO_WAIT, "trace_trigger_entities": []}
+    from engine_b.entities import lead_subject, trigger_entities
+
+    entities = set(trigger_entities(trigger, registry))
+    status = str(trace_status or "").strip()
+    if not (status and get_trace_status_registry().is_terminal(status)):
+        entities |= set(lead_subject(dict(lead)))
+    return {"trace_trigger_kind": "entity_filing_signal" if entities else "date",
+            "trace_trigger_entities": sorted(entities)}
+
+
+def sync_trace_watches(
+    store: dict[str, Any],
+    watch_data: dict[str, Any],
+    *,
+    registry: Any = None,
+) -> dict[str, Any]:
+    """每則停放的等待對齊現行規則（2026-10-08 failure log #1、#15；名冊變動後重跑——名冊多一個名字，觸發條件就多點名一家）。
+
+    對每則 parked、寫了觸發條件、不是向你要文件的 lead：觸發標的由觸發文字重算（`default_trace_trigger`；
+    舊值進 `trace_history`），然後依 `trace_wait_plan`：有在等的 watch 就跟著改（`retarget`，相同不動），沒有就建。
+    **只改 pq1 狀態**（lead refs、watch registry），不寫任何 authority。呼叫端負責存檔。
+
+    ⚠ 新條件**從現在起算**（`created_at`＝這一次對齊的時間），不回補：2026-10-08 試跑，從停放那天起算會一次叫醒 57 則
+    （改標的的舊 watch 把當初被「已消化標的」擋掉的舊申報當成新事件，新建的把八月以來的每份申報都算進來），
+    看得到的命中只有 CCXI S-4/A 那一則是它在等的。之前漏接的由研究 session 對著試跑清單處理，不灌進 pq1。
+    到期仍從停放那天算（一輪等待的長度不因對齊而延長）。
+    """
+
+    from datetime import date as _date
+
+    from engine_b import event_watch as ew
+
+    if registry is None:
+        from identity.registry import get_registry
+
+        registry = get_registry()
+    stamp = _now()
+    today = ew._today()
+    live = {str(w.get("wake_lead")): w for w in watch_data.get("watches", [])
+            if w.get("wake_lead") and w.get("status") in ("active", "fired")}
+    # 這一輪已到期結案的（A3：等滿一輪還沒出現就結案，不無聲續等）——不復活；再停放才是新的一輪
+    rounds_over = {str(w.get("wake_lead")) for w in watch_data.get("watches", [])
+                   if w.get("wake_lead") and w.get("status") == "expired"
+                   and (w.get("expiry_resolution") or {}).get("kind") in ("trace_closed", "lead_already_terminal")}
+    rounds_over -= set(live)
+    receipt: dict[str, list[str]] = {key: [] for key in (
+        "created_entity", "created_date", "retargeted", "unchanged", "no_wait_none", "no_wait_ownership",
+        "no_wait_other", "requires_user", "round_over")}
+    for lead_id, lead in sorted(store.get("leads", {}).items()):
+        if lead.get("status") != "parked":
+            continue
+        refs = lead.setdefault("refs", {})
+        trigger = str(refs.get("trace_next_trigger") or "").strip()
+        if not trigger:
+            continue
+        if str(refs.get("trace_requires_user") or "").lower() in {"1", "true", "yes"}:
+            receipt["requires_user"].append(lead_id)
+            continue
+        if (lead_id in rounds_over or str(refs.get("trace_status") or "") == "watch_expired"
+                or refs.get("trace_trigger_kind") == TRACE_NO_WAIT):
+            # 已結案的一輪與明示不等都不重算（重算會把「無」以外的不等——到期結案——蓋回在等）
+            if refs.get("trace_trigger_kind") != TRACE_NO_WAIT:
+                lead.setdefault("trace_history", []).append({
+                    "at": stamp, "note": "trace_watch_sync：這一輪已到期結案，落成不等",
+                    "trace_trigger_kind": refs.get("trace_trigger_kind")})
+                refs["trace_trigger_kind"] = TRACE_NO_WAIT
+            receipt["round_over" if lead_id in rounds_over or refs.get("trace_status") == "watch_expired"
+                    else "no_wait_none"].append(lead_id)
+            continue
+        fresh = default_trace_trigger(lead, trigger, trace_status=str(refs.get("trace_status") or ""),
+                                      registry=registry)
+        old = {key: refs.get(key) for key in fresh if refs.get(key) not in (None, "", [])}
+        if old and any(old.get(key) != value for key, value in fresh.items()):
+            lead.setdefault("trace_history", []).append({"at": stamp, "note": "trace_watch_sync 重算觸發標的", **old})
+        refs.update(fresh)
+        plan = trace_wait_plan(lead)
+        if plan is None:
+            form = str(lead.get("form_type") or "").strip()
+            key = ("no_wait_none" if refs.get("trace_trigger_kind") == TRACE_NO_WAIT
+                   else "no_wait_ownership" if form else "no_wait_other")
+            receipt[key].append(lead_id)
+            continue
+        existing = live.get(lead_id)
+        before = (existing.get("kind"), sorted(existing.get("entities") or ())) if existing else None
+        entered = last_entered_pq1_at(lead)
+        try:
+            # 一輪等待從停放那天起算（不是從今天）：存量各自停放在不同日子，到期與日期型的叫醒日自然錯開，
+            # 不會在 TTL 後的同一天一次排回幾十則（2026-10-08 試跑：從今天起算，日期型 50 則同一天叫醒）。
+            base = min(_date.fromisoformat(entered[:10]), today) if entered else today
+        except ValueError:
+            base = today
+        watch = ew.ensure_trace_watch(
+            lead_id,
+            kind=plan[0],
+            entities=plan[1],
+            query_hint=trigger,
+            note=f"trace_watch_sync 建立；trace_status={refs.get('trace_status') or 'unstructured'}",
+            consumed_entities=refs.get("trace_requeue_consumed_entities") or (),
+            created_at=stamp,
+            today=base,
+            retarget=True,
+            data=watch_data,
+        )
+        if watch is None:
+            receipt["no_wait_other"].append(lead_id)
+        elif existing is None:
+            receipt["created_date" if plan[0] == "date" else "created_entity"].append(lead_id)
+            live[lead_id] = watch
+        elif before != (watch.get("kind"), sorted(watch.get("entities") or ())):
+            receipt["retargeted"].append(lead_id)
+        else:
+            receipt["unchanged"].append(lead_id)
+    return {"at": stamp, "counts": {key: len(ids) for key, ids in receipt.items()}, **receipt}
+
+
+def _record_trace_history(lead: dict[str, Any], updates: Mapping[str, Any], *, at: str) -> None:
+    """會被蓋掉的前次結論（trace_status／parked_reason／trace_next_trigger）先存進 `trace_history`——覆蓋改聯集（L17-2）。"""
+    refs = lead.get("refs") or {}
+    before = {key: refs.get(key) for key in _TRACE_CONCLUSION_KEYS
+              if key in updates and refs.get(key) not in (None, "") and refs.get(key) != updates.get(key)}
+    if before:
+        lead.setdefault("trace_history", []).append({"at": at, **before})
+
+
 def advance(
     store: dict[str, Any],
     lead_id: str,
     to_status: str,
     *,
     ref: dict[str, Any] | None = None,
+    replace_trace_status: bool = False,
 ) -> dict[str, Any]:
-    """一般性 guarded 轉移；非法轉移 raise LeadStateError。"""
+    """一般性 guarded 轉移；非法轉移 raise LeadStateError。
+
+    停放時（2026-10-08，failure log #1、#2、#15）：①沒有明示觸發標的就由觸發條件文字推（`default_trace_trigger`）；
+    ②寫了觸發條件就建 watch，**終局 trace status 也一樣**（`trace_wait_plan`）；③被排回過的 lead 要把前次 trace_status
+    換成不同的值，必須 `replace_trace_status=True`，否則拒收——前次結論一律先進 `trace_history`。
+    """
     if to_status not in ALL_STATUSES:
         raise LeadStateError(f"未知狀態：{to_status}")
     cleaned_ref = validate_ref_updates(ref) if ref else {}
-    # 這一次停放有沒有**明確**改觸發條件（下面 setdefault 補的不算）：有才把沿用的 watch 改過去。
-    retarget = bool({"trace_trigger_kind", "trace_trigger_entities"} & set(cleaned_ref))
+    kind = cleaned_ref.get("trace_trigger_kind")
+    if kind is not None and kind not in TRACE_TRIGGER_KINDS:
+        raise LeadStateError(f"trace_trigger_kind 未登記：{kind!r}（{sorted(TRACE_TRIGGER_KINDS)}）")
     lead = _require(store, lead_id)
-    if (
-        to_status == "parked"
-        and cleaned_ref.get("trace_next_trigger")
-        and str(cleaned_ref.get("trace_requires_user") or "").lower()
-        not in {"1", "true", "yes"}
-    ):
-        # trace_next_trigger 保留給人讀；真正的 routine linkage 使用封閉 kind
-        # 與確定性 entities。新 related signal 只把它排回 bounded pq1，不提高
-        # evidence tier，也不放寬 graph admission。
-        from engine_b.entities import lead_entities
-
-        entities = sorted(lead_entities(lead))
-        if entities:
-            cleaned_ref.setdefault("trace_trigger_kind", "related_entity_signal")
-            cleaned_ref.setdefault("trace_trigger_entities", entities)
+    refs_before = lead.get("refs") or {}
+    previous = str(refs_before.get("trace_status") or "").strip()
+    incoming = str(cleaned_ref.get("trace_status") or "").strip()
+    if (to_status == "parked" and previous and incoming and incoming != previous
+            and refs_before.get("trace_requeued_at") and not replace_trace_status):
+        raise LeadStateError(
+            f"{lead_id} 被排回前的結論是 trace_status={previous}（停放理由：{str(refs_before.get('parked_reason') or '')[:80]}）；"
+            f"這次要改成 {incoming}——確定前次結論不再成立就加 --replace-trace-status（舊值會留在 trace_history）")
     if to_status == "parked":
+        merged = {**refs_before, **cleaned_ref}
+        trigger = str(merged.get("trace_next_trigger") or "").strip()
+        explicit = {"trace_trigger_kind", "trace_trigger_entities"} & set(cleaned_ref)
+        requires_user = str(merged.get("trace_requires_user") or "").lower() in {"1", "true", "yes"}
+        if trigger and not explicit and not requires_user:
+            cleaned_ref.update(default_trace_trigger(lead, trigger, trace_status=str(merged.get("trace_status") or "")))
         _stamp_source_routes_receipt(lead, cleaned_ref)
     current = lead["status"]
     if to_status not in ALLOWED_TRANSITIONS[current]:
         raise LeadStateError(f"非法轉移：{current} → {to_status}")
+    stamp = _now()
     lead["status"] = to_status
     # 轉移紀錄（2026-10-07 使用者：「Lead 抓了什麼 我們做了哪些處理的數字也要印」）：每日訊息①數「今天研究到終局幾條」
     # 讀的就是這裡。之前的轉移沒有時間戳，不補（不編時間，INV-6）——這個數從 10-07 起才有。
-    lead.setdefault("transitions", []).append({"at": _now(), "from": current, "to": to_status})
+    lead.setdefault("transitions", []).append({"at": stamp, "from": current, "to": to_status})
     if to_status == "pending":
         # un-park：清掉舊 triage，回到待判斷
         lead["triage"] = None
     if cleaned_ref:
+        _record_trace_history(lead, cleaned_ref, at=stamp)
         lead["refs"].update(cleaned_ref)
 
     # [321] 入口端：park 成追源等待的當下就建 Event Watch，讓它有到期日。
@@ -505,28 +707,24 @@ def advance(
         refs = lead.get("refs") or {}
         trace_status = str(refs.get("trace_status") or "").strip()
         parked_reason = str(refs.get("parked_reason") or "").strip()
-        has_trace = bool(trace_status) or "trace" in parked_reason.lower()
-        requires_user = str(refs.get("trace_requires_user") or "").lower() in {
-            "1", "true", "yes",
-        }
-        if (
-            has_trace
-            and not requires_user
-            and not get_trace_status_registry().is_terminal(trace_status)
-        ):
+        has_trace = (bool(trace_status) or "trace" in parked_reason.lower()
+                     or bool(str(refs.get("trace_next_trigger") or "").strip()))
+        plan = trace_wait_plan(lead) if has_trace else None
+        if plan is not None:
             from engine_b import event_watch as ew
 
             ew.ensure_trace_watch(
                 lead_id,
-                kind=str(refs.get("trace_trigger_kind") or "related_entity_signal"),
-                entities=refs.get("trace_trigger_entities") or (),
+                kind=plan[0],
+                entities=plan[1],
                 query_hint=str(refs.get("trace_next_trigger") or ""),
                 note=f"park 時自動建立；trace_status={trace_status or 'unstructured'}",
                 consumed_entities=refs.get("trace_requeue_consumed_entities") or (),
                 # 最後一次進 pq1 的時間，不是原始 triage 時間：2.9b 起排回不改寫 triage，若拿 decided_at，
                 # 剛觸發排回的那則 lead 比 watch 還新、會立刻再叫醒它（排回迴圈）。
                 created_at=last_entered_pq1_at(lead) or None,
-                retarget=retarget,
+                # 觸發條件每次停放都重算（明示的照用）：沿用的 watch 跟著改，相同就不動。
+                retarget=True,
             )
     return lead
 
@@ -542,7 +740,9 @@ def annotate_refs(
         raise ValueError("refs 不可為空")
     cleaned = validate_ref_updates(refs)
     lead = _require(store, lead_id)
-    lead.setdefault("refs", {}).update(cleaned)
+    lead.setdefault("refs", {})
+    _record_trace_history(lead, cleaned, at=_now())  # 前次結論不被同名 ref 蓋掉（failure log #2）
+    lead["refs"].update(cleaned)
     return lead
 
 
@@ -838,7 +1038,8 @@ def parked_without_expiry(store: dict[str, Any]) -> list[dict[str, Any]]:
     - 待辦池有**未結案**的項目以 `ref_id` 指回這筆 lead → 同上（對稱面，2026-10-07 補：「向你要文件」型的
       `source_trace_review` 是收集器從 lead 推出來的，pq2 那端有 `ref_id`、lead 這端永遠不會回寫 `pq2_ref`——
       只看 lead 這端的話，每一筆開了口的都被算成黑洞，那天實測 3 筆全是這一型；L17-3）；
-    - terminal `trace_status` → 不需要回來（追源已有終局）；
+    - terminal `trace_status` **而且** `trace_wait_plan` 說不等 → 不需要回來（追源已有終局、也沒有在等的事）；
+      2026-10-08 起終局但寫了觸發條件的算「在等」（failure log #15：終局值同時承載兩義，L12）——沒有 watch 就是黑洞；
     - 以上皆無 → **黑洞**。
 
     待辦池讀不到時當成「沒有任何項目指回來」——寧可多報黑洞，不可少報（INV-2／INV-3 的安全方向）。
@@ -878,7 +1079,7 @@ def parked_without_expiry(store: dict[str, Any]) -> list[dict[str, Any]]:
         if str(refs.get("pq2_ref") or "").strip():
             continue
         trace_status = str(refs.get("trace_status") or "").strip()
-        if trace_status and registry.is_terminal(trace_status):
+        if trace_status and registry.is_terminal(trace_status) and trace_wait_plan(lead) is None:
             continue
         title = " ".join(str(lead.get("title") or "").split())
         holes.append({
@@ -1096,11 +1297,13 @@ def triage(
     return lead
 
 
-# 寫入端仍接受的 trace 觸發類型（`trace_trigger_kind` ref 的合法值）。
+# 寫入端接受的 trace 觸發類型（`trace_trigger_kind` ref 的合法值；`advance` 擋拼字錯誤）。
 # ⚠ 判斷不在這裡：[321] 起等待條件由 Event Watch 判定，`primary_source_signal`
-# 在建 watch 時映射到 `entity_filing_signal`（判準本就相同）。這個集合只用來擋
-# 寫入端的拼字錯誤，不再有喚醒行為——kind 的行為 SSOT 是 `event_watch.WATCH_KINDS`。
-TRACE_TRIGGER_KINDS = frozenset({"related_entity_signal", "primary_source_signal"})
+# 在建 watch 時映射到 `entity_filing_signal`（判準本就相同）——kind 的行為 SSOT 是 `event_watch.WATCH_KINDS`。
+# 2026-10-08（failure log #1、#15）：補上停放預設會寫的 `entity_filing_signal`、`date`，與明確不等的 `none`
+# （之前這份只有兩個值、而且沒人檢查——10-07 AAOI 那次明示寫入的 `entity_filing_signal` 就不在裡面）。
+TRACE_TRIGGER_KINDS = frozenset({"related_entity_signal", "primary_source_signal", "entity_filing_signal",
+                                 "date", TRACE_NO_WAIT})
 
 # tier 判準的 SSOT 在 lead_refs（event_watch 也用同一份）。[321] 之前這裡與
 # event_watch.py 各有一份字面值，L16 的教科書案例。
@@ -1238,9 +1441,11 @@ def close_expired_trace_watches(store: dict[str, Any], watch_data: dict[str, Any
         elif lead.get("status") == "parked" and trace_status and registry.is_terminal(trace_status):
             # 已是終局（original_obtained／contradicts／not_pursued…）→ 不覆寫：`watch_expired` 的定義是
             # 「等待結束不是主張為假」，蓋掉 `contradicts` 等於丟失「原主張被推翻」（R2-b NB-2；L17 覆蓋還是聯集）
+            # 這一輪等待結束＝不再等（2026-10-08 起終局寫了觸發條件也算在等，不落這一格會被當成黑洞、被對齊命令重建）
+            annotate_refs(store, lead_id, refs={"trace_trigger_kind": TRACE_NO_WAIT})
             kind = "lead_already_terminal"
         elif lead.get("status") == "parked":
-            annotate_refs(store, lead_id, refs={"trace_status": "watch_expired"})
+            annotate_refs(store, lead_id, refs={"trace_status": "watch_expired", "trace_trigger_kind": TRACE_NO_WAIT})
             kind = "trace_closed"
         elif lead.get("status") in ("applied", "triaged_no_go"):
             kind = "lead_closed"
@@ -1325,9 +1530,14 @@ def consume_fired_lead_watches(
                 ),
                 "trace_trigger_watch_ref": watch_id,
             })
-            ew.reactivate(watch_data, watch_id)
+            # 日期型等的是那一天，叫醒過就完成了（回 active 會每輪再醒）；再停放時建下一輪。
+            (ew.consume_fired if watch.get("kind") == "date" else ew.reactivate)(watch_data, watch_id)
             requeued.append(lead_id)
         elif status in {"pending", "triaged_go", "researching", "action_prepared"}:
+            if watch.get("kind") == "date":
+                ew.consume_fired(watch_data, watch_id)
+                consumed.append({"watch_id": watch_id, "lead_id": lead_id, "reason": f"日期到、lead 已在路上：{status}"})
+                continue
             ew.reactivate(watch_data, watch_id)
             reactivated.append(lead_id)
         else:
