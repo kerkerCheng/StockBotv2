@@ -263,7 +263,8 @@ def test_frontend_contains_no_arithmetic_on_research_numbers() -> None:
 def test_frontend_reads_its_vocabulary_from_the_api() -> None:
     source = (ROOT / "webapp" / "static" / "app.js").read_text(encoding="utf-8")
     assert "VOCAB.absence_kinds" in source
-    assert "VOCAB.accounting_basis_display" in source
+    # ⚠ 2026-10-08：`VOCAB.accounting_basis_display`（共識的口徑名）隨「完整細節」與「市場預測什麼」拿掉——個股頁不再印
+    # 共識的原始數字（使用者：「給機器看的不用顯示出來」）；字彙留在 API 給 artifact 的消費者，前端不留第二份。
     # 前端只允許一份**縮寫標籤**對照（畫面寬度所需），完整說明一律來自 API。
     assert source.count("ABSENCE_SHORT") <= 3
 
@@ -319,24 +320,30 @@ def test_plain_labels_never_claim_more_than_the_vocabulary_does() -> None:
     assert joined.count("可以買") == joined.count("不是「可以買」")
 
 
-def test_single_stock_page_leads_with_the_answer_then_the_price(client) -> None:
-    """單檔頁的順序本身是回饋的修正：先結論、再價格，細節收成一個 details。"""
+def test_single_stock_page_is_the_header_and_the_thirteen_blocks_only(client) -> None:
+    """2026-10-08 使用者：「舊有的資訊非必要的就拿掉，除非是給我看的；給機器看的不用顯示出來」。單檔頁＝頁首（現價、
+    哪天產生）＋十三塊；頁尾四張卡（基本數字／憑什麼這樣想／讀圖／錯了怎麼知道）與「稽核」「完整細節」兩個大展開拿掉——
+    不是收起來，是拿掉；人讀的內容搬進對應的塊，給查核用的留在 artifact 與 API。"""
     source = (ROOT / "webapp" / "static" / "app.js").read_text(encoding="utf-8")
     block = source.split("async function renderDetail", 1)[1]
     block = re.split(r"\n(?:async )?function ", block, maxsplit=1)[0]
-    # 2026-09-15：首屏只剩短評；結論／價格／卡在哪收進「為什麼這樣算」，再下一層才是完整細節
-    # 2026-09-15 三層：短評 → 論證 → 走勢 → 稽核（結論卡、卡在哪…）→ 完整細節
-    order = [block.index(name) for name in
-             ("briefCard(", "argumentCard(", "稽核", "conclusionCard(", "blockerCard(", "完整細節")]
-    assert order == sorted(order), "順序必須是：短評（含走勢）→ 論證 → 稽核（結論 → 卡在哪）→ 完整細節"
-    # 走勢圖住在第一個 block（短評卡）裡，不再是獨立的一段
+    assert "briefCard(payload, view)" in block and "headerLine(payload, view)" in block
+    assert "drill(" not in block, "頁面層不再有大展開（稽核／完整細節）"
+    for gone in ("numbersStrip", "argumentCard", "readingsCard", "downsideCard", "conclusionCard", "blockerCard",
+                 "threeQuestionsCard", "versusMarketCard", "pageFillCard", "blockCells", "renderHeadline", "renderBet",
+                 "renderFundamental", "renderResearch", "renderReadiness", "renderFreshness", "priceCard"):
+        assert f"function {gone}(" not in source, f"{gone} 應已拿掉"
+    # 人讀的內容搬進對應的塊（論證、坐的層、反證、時間表、三題的數字與出處）
+    detail = source.split("function blockDetail", 1)[1].split("\nfunction ", 1)[0]
+    for owner in ("chainDetail(view)", "seatsDetail(payload, view)", "'priced_in'", "'in_numbers'", "downsideDetail(view)",
+                  "'will_it_die'", "timelineDetail(view)"):
+        assert owner in detail, f"塊的展開少了 {owner}"
+    # 走勢圖住在「怎麼被定價」那一塊（脈絡不是訊號）；首屏卡片不再自己掛走勢
+    visuals = source.split("function blockVisuals", 1)[1].split("\nfunction ", 1)[0]
+    assert "priceFigure(payload)" in visuals
+    # 沒有短評的頁也照十三塊排（不再有第二套舊版面）
     brief_fn = source.split("function briefCard", 1)[1].split("\nfunction ", 1)[0]
-    assert "priceCard(payload)" in brief_fn and "priceCard(" not in block
-    # 細節一格都沒少：六個面板的 render 全都還在 details 裡
-    # ⚠ 2026-09-23（Phase 0 Step 0b.1）：`renderWhy`／`renderEntry` 隨兩個 panel 退役。
-    for renderer in ("renderFundamental(view)", "renderResearch(view)",
-                     "renderFreshness(payload)"):
-        assert renderer in block, f"完整細節少了 {renderer}"
+    assert "schemaFirstScreen(payload, view, available ? panel : null)" in brief_fn
 
 
 def test_price_series_is_context_not_a_signal(client) -> None:
@@ -346,7 +353,7 @@ def test_price_series_is_context_not_a_signal(client) -> None:
     assert "脈絡不是訊號" in PRICE_SERIES_NOTE
     assert "不用它排序" in PRICE_SERIES_NOTE and "不用它決定買多少" in PRICE_SERIES_NOTE
     source = (ROOT / "webapp" / "static" / "app.js").read_text(encoding="utf-8")
-    block = source.split("function priceCard", 1)[1]
+    block = source.split("function priceFigure", 1)[1]
     block = re.split(r"\n(?:async )?function ", block, maxsplit=1)[0]
     for banned in ("sma", "SMA", "rsi", "RSI", "macd", "MACD", "均線", "突破"):
         assert banned not in block, f"走勢圖不得帶動能指標：{banned}"
@@ -357,55 +364,53 @@ def test_no_row_ever_defers_to_an_expansion_that_does_not_exist() -> None:
 
     2026-09-08 使用者原話：「感覺很多地方你就只是收乾淨而寫『見展開』」。事發位置是
     `renderRow`——值是結構化物件時它印「見下方展開」，而底下並沒有那個展開。
-    現在每一種形狀都有一句人話（`structuredText`），認不得的退回逐格 `鍵：值`
-    （`keyValueList`），所以**沒有任何一條路徑會產生「請看別處」**。
+
+    ⚠ 2026-10-08：`renderRow`／`structuredText`（完整細節的逐格列）隨那個大展開拿掉；結構化的值現在只出現在三題的
+    「數字與出處」——`tqNumbers` 用 `detailList` 印成人話：認得的鍵給中文名，**認不得的鍵照原名印**（不濾掉，INV-3），
+    巢狀明細印筆數。所以仍然**沒有任何一條路徑會產生「請看別處」**。
 
     ⚠ 禁的是它**當成畫面文字**（單引號字串），不是提到這四個字——註解裡刻意留著
     這段歷史，那正是防止它被寫回來的剎車。
     """
     source = (ROOT / "webapp" / "static" / "app.js").read_text(encoding="utf-8")
     assert "'見下方展開'" not in source, "又出現「見下方展開」——那是把問題推給一個不存在的展開"
-    block = source.split("function renderRow(label, datum)", 1)[1]
-    block = re.split(r"\n(?:async )?function ", block, maxsplit=1)[0]
-    assert "structuredText(datum)" in block, "結構化的值必須被翻成人話"
-    assert "keyValueList(datum.value)" in block, "認不得的形狀也要看得到內容，不能留白"
-    # 逐格標籤也走白話別名（先前這裡直接印 read model 的 display_label）
-    rows = source.split("function renderRows(lines, filterRoles)", 1)[1]
-    rows = re.split(r"\n(?:async )?function ", rows, maxsplit=1)[0]
-    assert "plainLine(line.key, line.display_label)" in rows
+    tq = source.split("function tqNumbers(view, question)", 1)[1]
+    tq = re.split(r"\n(?:async )?function ", tq, maxsplit=1)[0]
+    assert "detailList(d.value)" in tq and "detailList(deps.detail)" in tq, "結構化的值必須被翻成人話"
+    detail = source.split("function detailList(detail)", 1)[1]
+    detail = re.split(r"\n(?:async )?function ", detail, maxsplit=1)[0]
+    assert "TQ_DETAIL_LABELS[key] || key" in detail, "認不得的鍵要照原名印，不能留白或濾掉"
 
 
-def test_versus_market_card_prints_only_what_the_market_says() -> None:
-    """⚠ 2026-09-23（Phase 0 Step 0b.1b，C／H 組）：原名 `test_versus_market_is_a_real_comparison_table`，
-    守「我們估／市場共識／我們比市場」四欄表——內部預測與相減隨 FY+1 因果橋退役，表跟著退役。
-    現在這張卡只印市場說了什麼：會計年度別共識（role `consensus_fiscal`，每格由 `structuredText`
-    翻成人話，不留「見下方展開」）＋賣方目標價與倍數。**不得再長出「我們估」「我們比市場」那兩欄。**
+def test_market_numbers_on_the_page_are_only_what_the_market_says() -> None:
+    """⚠ 2026-09-23（Phase 0 Step 0b.1b，C／H 組）：「我們估／市場共識／我們比市場」四欄表——內部預測與相減隨 FY+1
+    因果橋退役，表跟著退役。⚠ 2026-10-08：「市場預測什麼」卡（`versusMarketCard`）隨稽核區拿掉；人要看的兩個本益比住
+    「怎麼被定價」的數字與出處（`marketMultiples`）——只印市場說了什麼、標明是別人的數字。**不得再長出「我們估」「我們比市場」。**
     """
     source = (ROOT / "webapp" / "static" / "app.js").read_text(encoding="utf-8")
-    block = source.split("function versusMarketCard(view)", 1)[1]
+    block = source.split("function marketMultiples(view)", 1)[1]
     block = re.split(r"\n(?:async )?function ", block, maxsplit=1)[0]
-    for token in ("'consensus_fiscal'", "target_mean", "forward_pe", "不是我們的目標價"):
-        assert token in block, f"市場卡少了 {token}"
+    for token in ("trailing_pe", "forward_pe", "別人的"):
+        assert token in block, f"市場的數字少了 {token}"
     for retired in ("COMPARE_ROWS", "'我們估'", "'我們比市場'", "reverseBridgeBlock", "opinion_stance"):
         assert retired not in block, f"退役的比較表不得復活：{retired}"
     assert "const COMPARE_ROWS" not in source and "function reverseBridgeBlock" not in source
 
 
-def test_full_detail_has_exactly_one_level_of_expansion() -> None:
-    """「完整細節」點一次就是全部——展開裡不得再套展開。
-
-    2026-09-08 使用者原話：「太多展開」。先前是七個 details，每個裡面還有第二層
-    details，摘要一律寫著「展開：某某（N 項）」。現在六個面板的內部一律用 `group()`
-    （有標題、直接看得到內容），只有最外層那一個 `drill()`。
-    """
+def test_each_block_has_at_most_one_expansion_and_none_is_nested() -> None:
+    """2026-09-08 使用者原話：「太多展開」——展開裡不得再套展開。2026-10-08 起頁面層沒有大展開（稽核、完整細節拿掉），
+    展開只住在塊底下：每個塊的展開函式各一個 `drill()`，展開裡用的 helper 一個都不開展開（有標題就用 `group-title`）。"""
     source = (ROOT / "webapp" / "static" / "app.js").read_text(encoding="utf-8")
-    panels = source.split("function renderHeadline(view)", 1)[1].split("/* ---------- 白話別名", 1)[0]
-    assert "drill(" not in panels, "完整細節裡的面板不得再有第二層展開"
-    assert panels.count("group(") >= 6, "面板內容應改用 group()——有標題但直接看得到"
-    block = source.split("async function renderDetail", 1)[1]
-    block = re.split(r"\n(?:async )?function ", block, maxsplit=1)[0]
-    # 2026-09-15 起兩個展開（「稽核」與「完整細節」），都在最外層——沒有巢狀；論證層不折疊
-    assert block.count("drill(") == 2, "單檔頁只准有兩個最外層展開（稽核／完整細節）"
+
+    def body(name: str) -> str:
+        part = source.split(f"function {name}(", 1)[1]
+        return re.split(r"\n(?:async )?function ", part, maxsplit=1)[0]
+
+    for fn in ("chainDetail", "seatsDetail", "numbersDrill", "downsideDetail", "timelineDetail"):
+        assert body(fn).count("drill(") == 1, f"{fn} 只准有一個展開"
+    for helper in ("argumentSection", "tqNumbers", "detailList", "tqPoint", "layerNoteLinks", "marketMultiples"):
+        assert "drill(" not in body(helper), f"{helper} 在展開裡，不得再開展開"
+    assert "drill(" not in body("renderDetail")
 
 
 # ---------------------------------------------------------------------------
@@ -533,24 +538,28 @@ def test_layer_and_socket_are_explained_from_one_vocabulary(client) -> None:
     assert "VOCAB.plain_bet_units" in source and "騎" not in source
 
 
-def test_priced_in_is_explained_from_one_string_on_both_places(client) -> None:
-    """Phase 7 Step 7.0c（使用者 2026-10-04：「已定價」讀不懂）：白話只有一份（contracts → `.meta.json` → API），
-    首屏三個字底下與稽核區那一題的標題旁各印一次；APP 不留第二份字串。"""
+def test_priced_in_is_explained_from_one_string_in_one_place(client) -> None:
+    """Phase 7 Step 7.0c（使用者 2026-10-04：「已定價」讀不懂）：白話只有一份（contracts → `.meta.json` → API），APP 不留
+    第二份字串。2026-10-08（使用者：「非必要的就拿掉」）起首屏只留「已定價嗎 是」那個字，白話放進「怎麼被定價」那一塊的
+    「數字與出處」——印一次，不在首屏每一頁重複一大段；字串裡也不帶內部編號。"""
     from briefing.analyst_view.contracts import PLAIN_PRICED_IN
 
     text = client.get("/api/v1/meta").json()["vocabularies"]["plain_priced_in"]
     assert text == PLAIN_PRICED_IN
     assert "不是「太貴」" in text and "目標價" in text and "自己過去三年" in text and "EV/S" in text and "P/S" in text
+    assert "Phase" not in text and "R1" not in text and "稽核區" not in text, "給人看的白話不帶內部編號與已拿掉的區塊名"
     source = (ROOT / "webapp" / "static" / "app.js").read_text(encoding="utf-8")
     assert "VOCAB.plain_priced_in" in source and "太貴" not in source
-    assert source.count("= pricedInPlain();") == 2        # 首屏一次、稽核區一次（不數函式定義那一行）
+    assert source.count("pricedInPlain()") == 2           # 函式定義一次、「怎麼被定價」的數字與出處一次
+    detail = source.split("function blockDetail", 1)[1].split("\nfunction ", 1)[0]
+    assert "numbersDrill(view, 'priced_in', () => [pricedInPlain()" in detail
 
 
-def test_stock_page_three_words_jump_to_the_audit_rows_on_the_same_page() -> None:
-    """2026-09-30 使用者回饋（「這三個字是要我去候選板看詳細嗎？」）：細節在同一頁的稽核區——三個字可以點，
-    稽核區與每一題都有錨點；連到候選板的那一句不再暗示細節在那裡。"""
+def test_stock_page_three_words_jump_to_their_numbers_on_the_same_page() -> None:
+    """2026-09-30 使用者回饋（「這三個字是要我去候選板看詳細嗎？」）：細節在同一頁——三個字可以點；
+    2026-10-08 起每一題的數字住在那一題那一塊的「數字與出處」（錨點 `tq-<題>`），點了打開它。連到候選板的那一句不再暗示細節在那裡。"""
     source = (ROOT / "webapp" / "static" / "app.js").read_text(encoding="utf-8")
-    assert "jumpToAudit(question)" in source and "auditDrill.id = 'audit-drill'" in source
-    assert "title.id = 'tq-' + question" in source
+    assert "jumpToNumbers(question)" in source and "node.id = 'tq-' + question" in source
+    assert "audit-drill" not in source
     assert "看候選板 →" not in source and "和其他檔一起看（候選板）→" in source
     assert "candidateWatchLine(row.watch)" in source and "'理由：' + row.reason" in source

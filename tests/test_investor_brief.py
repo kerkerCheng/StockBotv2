@@ -158,11 +158,12 @@ def test_packet_carries_the_brief_frame_for_the_session() -> None:
     assert "alpha brief" in frame["_how_to_use"]
 
 
-def test_first_screen_is_the_brief_and_everything_else_is_behind_one_click() -> None:
+def test_the_page_is_the_brief_and_each_block_keeps_its_own_detail() -> None:
+    """2026-10-08（使用者：「舊有的資訊非必要的就拿掉」）：單檔頁只剩頁首與短評卡（十三塊）；細節住各自那一塊的展開。"""
     source = (ROOT / "webapp" / "static" / "app.js").read_text(encoding="utf-8")
     block = source.split("async function renderDetail", 1)[1]
     block = re.split(r"\n(?:async )?function ", block, maxsplit=1)[0]
-    assert block.index("briefCard(") < block.index("argumentCard(") < block.index("drill(")
+    assert "briefCard(" in block and "argumentCard(" not in block and "drill(" not in block
     # 首屏卡片不得自己算報酬；尺的三個數與兩個報酬都來自 materialize 端
     card = source.split("function briefCard", 1)[1].split("\nasync function renderDetail", 1)[0]
     for token in ("fair_value /", "/ price", "value - ", "value / ", "Math.pow"):

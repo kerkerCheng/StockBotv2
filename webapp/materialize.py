@@ -223,14 +223,16 @@ def materialize_view(analyst_view_dict: Mapping[str, Any], *,
                      generated_at: datetime | None = None,
                      price_series: Sequence[Mapping[str, Any]] | None = None,
                      page_extra: Mapping[str, Any] | None = None,
-                     diagrams: Sequence[Mapping[str, Any]] | None = None) -> dict[str, Any]:
+                     diagrams: Sequence[Mapping[str, Any]] | None = None,
+                     node_names: Mapping[str, str] | None = None) -> dict[str, Any]:
     """`AnalystView.to_dict()` → artifact payload（含遮蔽、overview、兩個 digest）。純函式。
 
     `price_series` 是**脈絡不是判讀**：一條這檔自己的已收盤收盤價序列，讓使用者看得懂
     「現在這個價位在哪」。它不參與任何計算——`freshness_identity` 不含它（價格動了不算認知變了）。
     `page_extra`：個股頁 schema 填得滿表的頁外輸入（`layer_notes`＝引用這一頁的層說明節點）；沒給＝這一輪沒讀到，
     那一格印 `upstream_unavailable`（不是「沒有」）。
-    `diagrams`：涵蓋這一頁坐的層的技術示意圖（`webapp.diagrams`；已檢查過、編成 data URI）——呈現用，不進任何 digest。
+    `diagrams`：涵蓋這一頁坐的層的技術示意圖（`webapp.diagrams`；已檢查過、編成 data URI）——呈現用，不進新鮮度身分。
+    `node_names`：坐的層的節點名——同上，呈現用（`content_digest` 照常涵蓋整份 artifact）。
     """
     from briefing.analyst_view.page_schema import PAGE_SCHEMA_VERSION, fill_summary, fill_table
 
@@ -260,6 +262,8 @@ def materialize_view(analyst_view_dict: Mapping[str, Any], *,
         "page_fill": _page_fill(view, page_extra, fill_table, fill_summary, PAGE_SCHEMA_VERSION),
         # 技術示意圖（2026-10-08，個股頁 S5b）：標「示意」、附出處；研究 session 畫，APP 用 <img> 顯示。
         "diagrams": [dict(d) for d in (diagrams or ())],
+        # 坐的層的節點名（2026-10-08）：「技術鏈」的展開印名字、不印 `tech:…` ID——呈現用，不進新鮮度身分。
+        "node_names": dict(node_names or {}),
         "materializer": {
             "version": MATERIALIZER_VERSION,
             "python": f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}",
@@ -422,12 +426,14 @@ def materialize(ticker: str, *, as_of: date | None = None, scenario: str | None 
                 readings: Mapping[str, Any] | None = None,
                 candidates: Mapping[str, Any] | None = None,
                 layer_notes: Mapping[str, Any] | None = None,
-                diagrams: Mapping[str, Any] | None = None) -> tuple[Path, dict[str, Any]]:
+                diagrams: Mapping[str, Any] | None = None,
+                node_names: Mapping[str, str] | None = None) -> tuple[Path, dict[str, Any]]:
     """跑一次完整鏈並寫下 artifact。**只有這裡會連 Neo4j／Engine C／private ledger。**
 
     `readings`：`readings_context()` 的結果（多檔時由 `materialize_many` 載入一次傳進來）；沒給就自己載一次。
     3.7 起它同時餵讀圖面板與 argument 鏈段的需求端（同一份，不各載一次）。
     `candidates`：`candidate_context()` 的結果（同上，多檔載一次）；沒給就為這一檔載一次。
+    `node_names`：坐的層的節點名（`_seat_node_names`；多檔時載一次）；沒給就只查這一檔坐的那幾個。
     """
     from briefing.alpha_view.sources import fetch_alpha_investment_view
     from briefing.analyst_view import build_analyst_view
@@ -443,12 +449,24 @@ def materialize(ticker: str, *, as_of: date | None = None, scenario: str | None 
     loaded = diagrams if diagrams is not None else _diagrams_loaded()
     seats = ((context or {}).get("seats") or {}).get(view.identity.company_id) or ()
     page_diagrams = None if loaded is None else diagrams_for_nodes(loaded, seats)
+    names = node_names if node_names is not None else _seat_node_names({"seats": {"_": list(seats)}})
     payload = materialize_view(analyst.to_dict(), generated_at=generated_at,
                                price_series=_close_series(ticker),
                                page_extra=page_extra_for(ticker, notes_state, page_diagrams),
-                               diagrams=page_diagrams)
+                               diagrams=page_diagrams,
+                               node_names={str(n): names[str(n)] for n in seats if str(n) in names})
     target = store or ArtifactStore()
     return target.write(payload), payload
+
+
+def _seat_node_names(context: Mapping[str, Any] | None) -> dict[str, str]:
+    """讀圖 context 裡每一個坐的節點在圖上的名字（個股頁「技術鏈」的展開印名字、不印 `tech:…` ID；2026-10-08）。
+    **fail-soft**：圖讀不到就回空——畫面照印 ID；名字只是顯示，不是認知狀態（與 `_attach_ride_node_names` 同一個理由）。"""
+    nodes = sorted({str(n) for seats in ((context or {}).get("seats") or {}).values() for n in seats or ()})
+    try:
+        return _graph_node_names(nodes)
+    except Exception:  # noqa: BLE001 — 名字補不上不擋 materialize
+        return {}
 
 
 def _close_series(ticker: str, *, sessions: int = 180) -> list[dict[str, Any]]:
@@ -479,10 +497,11 @@ def materialize_many(tickers: Sequence[str], *, as_of: date | None = None,
         candidates = candidate_context(tickers, as_of=as_of, state_store=state_store)
     notes_state = _layer_notes_state(state_store) if tickers else None
     loaded = _diagrams_loaded() if tickers else None
+    names = _seat_node_names(readings) if tickers else None
     for ticker in tickers:
         try:
             path, _ = materialize(ticker, as_of=as_of, store=target, readings=readings, candidates=candidates,
-                                  layer_notes=notes_state, diagrams=loaded)
+                                  layer_notes=notes_state, diagrams=loaded, node_names=names)
         except Exception as exc:  # noqa: BLE001 — 逐檔隔離；理由原樣回報
             results.append((ticker, None, f"{type(exc).__name__}: {str(exc)[:200]}"))
         else:

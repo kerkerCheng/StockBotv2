@@ -125,65 +125,6 @@ function fmtBig(n, unit) {
   return unit ? `${text} ${unit}` : text;
 }
 
-/* ---------- 結構化的值也要看得懂 ----------
-   2026-09-08 使用者回饋：「感覺很多地方你就只是收乾淨而寫『見展開』」。
-   說的就是這裡——值是物件時，先前那一列印的是「見下方展開」，而底下**沒有**那個展開。
-   一句「見下方展開」等於什麼都沒說，而且它假裝有下文。
-
-   現在每一種形狀都在這裡有一句人話；認不得的形狀退回逐格 `鍵：值`，**永遠看得到內容**。
-   ⚠ 這一層**不算任何新數字**：`relative_gap`／`growth`／`delta_fair_value` 都是 authority
-   已經算好的欄位，這裡只挑欄位、排版、翻標籤。 */
-function structuredText(datum) {
-  const v = datum && datum.value;
-  if (!v || typeof v !== 'object' || Array.isArray(v)) return null;
-  const bits = [];
-
-  // ① 市場共識：平均值＋幾位分析師＋高低區間
-  if ('avg' in v && 'analyst_count' in v) {
-    if (typeof v.analyst_count === 'number') bits.push(`${v.analyst_count} 位分析師`);
-    if (typeof v.low === 'number' && typeof v.high === 'number') {
-      bits.push(`區間 ${fmtBig(v.low)}–${fmtBig(v.high)}`);
-    }
-    if (typeof v.growth === 'number') bits.push(`比去年 ${fmtPercent(v.growth)}`);
-    if (v.accounting_basis) bits.push(`口徑 ${basisDisplay(v.accounting_basis).label}`);
-    return { text: fmtBig(v.avg, v.currency), sub: bits.join('｜') };
-  }
-  // ⚠ 2026-09-23（Phase 0 Step 0b.1b）：「我們 vs 市場」「兩個指標的差距摘要」「敏感度」「目標價與現價的差」
-  // 「持有區間」五種形狀隨估值鏈退役——它們的值不會再出現在任何 datum 裡。
-  // ④ 五軸分數：宣告了什麼、實際採用什麼、為什麼被降級
-  if ('declared' in v && 'effective' in v) {
-    if (v.session_level_label) bits.push(v.session_level_label);
-    if (v.downgrade_reason) bits.push(`降級原因：${v.downgrade_reason}`);
-    return {
-      text: v.declared === v.effective ? String(v.effective) : `${v.effective}（宣告 ${v.declared}）`,
-      sub: bits.join('｜'),
-    };
-  }
-  // ⑤ 到期／催化劑監看
-  if ('days_to_expiry' in v || ('state' in v && 'label' in v)) {
-    if (typeof v.days_to_expiry === 'number') bits.push(`還有 ${v.days_to_expiry} 天到期`);
-    if (v.next_catalyst) bits.push(`下一個事件 ${v.next_catalyst}`);
-    if (v.next_catalyst_confidence) bits.push(`把握度 ${v.next_catalyst_confidence}`);
-    return { text: [v.label, v.state].filter(Boolean).join('｜'), sub: bits.join('｜') };
-  }
-  // ⑥ thesis 狀態
-  if ('status' in v && 'next_check' in v) {
-    bits.push(`下次核查 ${v.next_check || '未排定'}`);
-    if (v.next_check_source) bits.push(`依據 ${v.next_check_source}`);
-    return { text: String(v.status), sub: bits.join('｜') };
-  }
-  // ⑦ 自動失效能力：它會做什麼、不會做什麼
-  if ('overall' in v && 'capability' in v) {
-    if (v.capability) bits.push(v.capability);
-    if (v.does_not) bits.push(`不做：${v.does_not}`);
-    return { text: String(v.overall), sub: bits.join('｜') };
-  }
-  // ⑪ authority 自己組好的一句話——照抄，不改寫
-  if (v.one_sentence) return { text: null, sub: v.one_sentence };
-  if (v.note) return { text: null, sub: v.note };
-  return null;
-}
-
 /* 認不得的形狀：逐格 `鍵：值` 攤出來。醜，但**看得到**——這比一句「見下方展開」誠實。 */
 function keyValueList(obj) {
   const box = el('div', 'row-reason');
@@ -242,13 +183,6 @@ function readinessBadge(state) {
   const badge = el('span', 'badge badge-' + state, text);
   badge.title = readinessLabel(state);
   return badge;
-}
-
-function basisDisplay(raw) {
-  const table = (VOCAB && VOCAB.accounting_basis_display) || {};
-  const entry = table[raw];
-  if (!entry) return { label: raw || '未宣告', note: 'authority 沒有登記這個口徑值。', raw: raw };
-  return { label: entry.label, note: entry.note, raw: raw };
 }
 
 /* ---------- 清單 ---------- */
@@ -412,67 +346,6 @@ function valueText(datum) {
   return null;   // 結構化的值交給各自的 renderer，不在這裡壓成一行 JSON
 }
 
-function renderRow(label, datum) {
-  const row = el('div', 'row');
-  row.appendChild(el('div', 'row-label', label));
-  const text = valueText(datum);
-  const struct = text === null ? structuredText(datum) : null;
-  if (text !== null) {
-    const cell = el('div', 'row-value', text);
-    if (datum.unit === 'ratio' && typeof datum.value === 'number') cell.classList.add(signClass(datum.value));
-    row.appendChild(cell);
-  } else if (struct && struct.text) {
-    row.appendChild(el('div', 'row-value', struct.text));
-  } else if (datum.value && typeof datum.value === 'object') {
-    row.appendChild(el('div', 'row-value', ''));   // 內容在下一行，不寫「見下方展開」
-  } else {
-    row.classList.add('row-absent');
-    const cell = el('div', 'row-value');
-    const badge = absenceBadge(datum.absence_kind);
-    if (badge) cell.appendChild(badge); else cell.appendChild(document.createTextNode('—'));
-    row.appendChild(cell);
-  }
-  if (struct && struct.sub) row.appendChild(el('div', 'row-reason', struct.sub));
-  else if (!struct && datum.value && typeof datum.value === 'object') {
-    row.appendChild(keyValueList(datum.value));
-  }
-  if (datum.reason) row.appendChild(el('div', 'row-reason', datum.reason));
-  return row;
-}
-
-function renderRows(lines, filterRoles) {
-  const box = el('div', 'rows');
-  const seen = {};
-  let duplicates = 0;
-  lines.filter((line) => !filterRoles || filterRoles.indexOf(line.role) >= 0)
-    .forEach((line) => {
-      // 上游偶爾送來完全相同的兩列（同 key 同值，例如 COHR 的 FY2027 共識各出現兩次）。
-      // 這裡只印一次，**但把丟掉幾列講出來**——靜默去重會讓「沒有」與「被吃掉」同形（INV-3）。
-      const fingerprint = line.key + '|' + JSON.stringify(line.datum.value);
-      if (seen[fingerprint]) { duplicates += 1; return; }
-      seen[fingerprint] = true;
-      box.appendChild(renderRow(plainLine(line.key, line.display_label), line.datum));
-    });
-  if (duplicates) {
-    box.appendChild(el('div', 'row-reason',
-      `（上游送來 ${duplicates} 列與上面完全相同的重複資料，這裡只印一次。）`));
-  }
-  return box;
-}
-
-function panelShell(panel, title) {
-  const node = el('section', 'panel');
-  const heading = el('h2');
-  heading.appendChild(document.createTextNode(title || panel.title));
-  const badge = absenceBadge(panel.absence_kind);
-  if (badge) { heading.appendChild(document.createTextNode(' ')); heading.appendChild(badge); }
-  node.appendChild(heading);
-  const questions = (panel.questions || [])
-    .map((q) => (VOCAB && VOCAB.questions && VOCAB.questions[q]) || q).join('　');
-  if (questions) node.appendChild(el('div', 'panel-questions', questions));
-  return node;
-}
-
 /* 展開裡不再套展開：`group` 是「有標題、但直接看得到內容」的區塊。
    判準一句話——**使用者已經點開「完整細節」了，他要的就是內容**。 */
 function group(title, buildBody) {
@@ -486,28 +359,6 @@ function drill(title, buildBody) {
   const node = document.createElement('details');
   node.appendChild(el('summary', null, title));
   node.appendChild(buildBody());
-  return node;
-}
-
-function renderHeadline(view) {
-  const panel = view.headline;
-  const node = panelShell(panel, '現在多少錢：現價的每一格');
-  const lines = lineMap(panel);
-
-  const numbers = el('div', 'headline-numbers');
-  const price = lines.current_price && lines.current_price.datum;
-  const quoteUnit = price && price.dependencies ? price.dependencies.quote_unit : null;
-  if (price) {
-    numbers.appendChild(numberBlock('現價', fmtQuantity(price.value, quoteUnit) || '—',
-      price.as_of ? `bar ${price.as_of}` : ''));
-  }
-  if (numbers.childNodes.length) node.appendChild(numbers);
-  // ⚠ 2026-09-23（Phase 0 Step 0b.1b）：目標價、隱含報酬、兩桿拆解、epistemics 一句話、口徑列
-  // 全部隨估值鏈退役；現價沒有值時由下面的每一格印它自己的缺席理由。
-  node.appendChild(group('頭條的每一格（含缺席理由）', () => renderRows(panel.lines)));
-  if (panel.notes && panel.notes.length) {
-    node.appendChild(group('這一段不是什麼', () => listOf(panel.notes)));
-  }
   return node;
 }
 
@@ -525,121 +376,9 @@ function listOf(items) {
   return list;
 }
 
-function renderFundamental(view) {
-  const panel = view.fundamental;
-  const node = panelShell(panel, '市場預測什麼（原始數字）');
-  // ⚠ 2026-09-23（Phase 0 Step 0b.1b）：internal／consensus_same_period／comparison／market_proxy 四組
-  // 隨 FY+1 因果橋與估值鏈退役；剩下的是 Engine C 的原始數字。
-  const groups = [
-    ['consensus_fiscal', '會計年度別共識（身分是 fiscal_period_end；只呈現，不相減）'],
-    ['market_context', '市場脈絡與共識時序'],
-  ];
-  groups.forEach(([role, title]) => {
-    const rows = (panel.lines || []).filter((line) => line.role === role);
-    if (!rows.length) return;
-    // 全部直接印出來。使用者已經點開「完整細節」了，再藏一層只是多一次摩擦。
-    node.appendChild(el('div', 'group-title', `${title}（${rows.length} 項）`));
-    node.appendChild(renderRows(rows));
-  });
-  node.appendChild(el('p', 'note', (panel.context || {}).rule || ''));
-  if (panel.notes && panel.notes.length) {
-    node.appendChild(group('這一段的警告與涵蓋率說明', () => listOf(panel.notes)));
-  }
-  return node;
-}
-
-function renderResearch(view) {
-  const panel = view.research;
-  const node = panelShell(panel, '研究現況與五軸判斷');
-  const rows = (panel.lines || []).filter((line) => line.role === 'thesis' || line.role === 'lifecycle');
-  if (rows.length) node.appendChild(renderRows(rows));
-
-  // 舊 session 判讀的反證（`panel.disproofs`）2026-10-01 Phase 4 Step 4.7a 退役：恆「未盯」。反證住 downside 面板。
-  if (panel.catalysts && panel.catalysts.length) {
-    node.appendChild(group(`催化劑（${panel.catalysts.length}）`, () => listOf(
-      panel.catalysts.map((c) => [c.description || c.label, c.expected_at || c.due, c.date_confidence, c.state]
-        .filter(Boolean).join('｜')))));
-  }
-  if (panel.checkpoints && panel.checkpoints.length) {
-    node.appendChild(group(`檢核點（${panel.checkpoints.length}）`, () => listOf(
-      panel.checkpoints.map((c) => [c.date || c.due, c.what || c.label, c.decides ? '決定：' + c.decides : null,
-        c.date_confidence].filter(Boolean).join('｜')))));
-  }
-  if (panel.risks && panel.risks.length) {
-    node.appendChild(group(`風險（${panel.risks.length}）`, () => listOf(panel.risks)));
-  }
-  const scores = (panel.lines || []).filter((line) => line.role === 'score');
-  if (scores.length) node.appendChild(group(`五軸判斷（${scores.length}）`, () => renderRows(scores)));
-  if (panel.attention && panel.attention.length) {
-    node.appendChild(group(`需要重看的研究成果（${panel.attention.length}）`, () => listOf(
-      panel.attention.map((a) => `${a.artifact_type}：${a.state}｜${(a.reasons || []).join('；')}`))));
-  }
-  return node;
-}
-
-function renderFreshness(payload) {
-  const f = payload.freshness;
-  const node = el('section', 'panel');
-  node.appendChild(el('h2', null, '這份判讀有多新'));
-  const rows = el('div', 'rows');
-  rows.appendChild(kv('materialize 於', `${f.generated_at}（${f.age_hours.toFixed(1)} 小時前，${f.state}）`));
-  rows.appendChild(kv('視角', `${payload.point_in_time_mode}${payload.as_of ? '（as-of ' + payload.as_of + '）' : ''}`));
-  rows.appendChild(kv('refresh 整體狀態', payload.refresh.overall));
-  rows.appendChild(kv('研究 context digest', payload.research_context_digest || '—'));
-  rows.appendChild(kv('artifact content digest', payload.content_digest));
-  rows.appendChild(kv('新鮮度身分', payload.freshness_identity));
-  node.appendChild(rows);
-  node.appendChild(el('p', 'note', f.rule));
-  if (payload.refresh.notes && payload.refresh.notes.length) {
-    node.appendChild(group('refresh 註記', () => listOf(payload.refresh.notes)));
-  }
-  return node;
-}
-
-function renderReadiness(payload) {
-  const readiness = payload.readiness;
-  const node = el('section', 'panel');
-  const head = el('h2');
-  head.appendChild(document.createTextNode('判讀狀態　'));
-  head.appendChild(readinessBadge(readiness.state));
-  node.appendChild(head);
-  node.appendChild(el('div', 'panel-questions', readinessLabel(readiness.state)));
-
-  (readiness.blocker_details || []).forEach((item) => {
-    const box = el('div', 'attention ' + (item.settled ? 'settled' : 'blocked'));
-    const head2 = el('div', 'attention-head');
-    head2.appendChild(document.createTextNode(
-      `卡在「${plainPanel(item.panel, PANEL_TITLE[item.panel] || item.panel).title}」這一層（${item.status}）　`));
-    const badge = absenceBadge(item.absence_kind);
-    if (badge) head2.appendChild(badge);
-    box.appendChild(head2);
-    box.appendChild(el('div', 'attention-body', absenceLabel(item.absence_kind) || ''));
-    if (item.reason) box.appendChild(el('div', 'attention-body', item.reason));
-    node.appendChild(box);
-  });
-  (readiness.flag_details || []).forEach((item) => {
-    const box = el('div', 'attention flags');
-    const head2 = el('div', 'attention-head',
-      `旗標：${plainPanel(item.panel, PANEL_TITLE[item.panel] || item.panel).title}（${item.status}）`);
-    box.appendChild(head2);
-    if (item.reason) box.appendChild(el('div', 'attention-body', item.reason));
-    node.appendChild(box);
-  });
-  if (readiness.optional_unavailable && readiness.optional_unavailable.length) {
-    // 面板名走 /meta 白話、缺席走產生端宣告的分型（3.7 覆核：原本印內部 key，並把「不上板」說成能力未提供）。
-    const view = payload.view || {};
-    const items = readiness.optional_unavailable.map((text) => {
-      const key = String(text).split('：')[0];
-      const panel = view[key] || {};
-      const short = (VOCAB && VOCAB.plain_absence_short && VOCAB.plain_absence_short[panel.absence_kind]) || panel.status;
-      return `${plainPanel(key, PANEL_TITLE[key] || key).title}（${short || '沒有內容'}）`;
-    });
-    node.appendChild(el('p', 'note',
-      '選配面板沒有內容：' + items.join('、') + '——**不影響** readiness，不代表這檔研究不完整'));
-  }
-  node.appendChild(group('readiness 的判準原文', () => el('p', 'note', readiness.rule)));
-  return node;
-}
+/* ⚠ 2026-10-08：「完整細節」的五個面板（`renderHeadline`／`renderBet`／`renderFundamental`／`renderResearch`／
+   `renderReadiness`／`renderFreshness`）隨那個大展開拿掉（使用者：「給機器看的不用顯示出來」）——現價在頁首、賭注是首屏「押什麼」、
+   催化劑在「接下來看什麼」；共識原始數字、五軸分數、readiness 判準原文、digest 與新鮮度身分留在 artifact 與 API。 */
 
 /* ---------- 白話別名：全部來自 /api/v1/meta，前端不維護第二份（L16） ---------- */
 
@@ -653,279 +392,41 @@ function plainLine(key, fallback) {
   return table[key] || fallback || key;
 }
 
-function plainReadiness(state) {
-  const table = (VOCAB && VOCAB.plain_readiness) || {};
-  return table[state] || { label: state, note: readinessLabel(state) };
-}
+/* ---------- 單檔判讀 ----------
+   2026-09-08 使用者回饋：「太多展開、太多字、全部是內部術語，基本上看不懂」；2026-10-08：「舊有的資訊非必要的就拿掉，
+   除非是給我看的；給機器看的不用顯示出來」。現在一頁＝頁首＋十三塊（`briefCard`），塊底下一個展開放論證與數字。
+   ⚠ 刪的是版面不是內容：給查核用的每一格都還在 artifact 與 `/api/v1/stocks/<T>`。
+   ⚠ 2026-10-08 拿掉的：「稽核」（結論卡、卡在哪、市場預測原始數字、填得滿表）與「完整細節」（現價每一格、賭注、
+   市場預測、研究現況與五軸、判讀狀態、新鮮度、不是什麼）兩個大展開，以及頁尾「基本數字／憑什麼這樣想／讀圖／錯了怎麼知道」
+   四張卡——人讀的部分搬進對應的塊（現價→頁首、這條鏈怎麼走→需求傳導、讀圖→技術鏈、反證與風險→錯了怎麼知道、
+   時間表與催化劑→接下來看什麼、三題的數字→各自那一塊的「數字與出處」）。 */
 
-/* ---------- 單檔判讀：先給答案，細節收起來 ----------
-   2026-09-08 使用者回饋：「太多展開、太多字、全部是內部術語，基本上看不懂」。
-   改法有三條，順序就是這一頁的結構：
-   ① **先給結論與價格**——現在多少錢、我們認為值多少、差多少，再配一張這檔自己的走勢；
-   ② **只留會改變你行動的四塊**（卡在哪／最脆弱／什麼會推翻它／我們 vs 市場）；
-   ③ 其餘**全部收進一個** `<details>`——原本六個面板的完整欄位一格沒刪，只是不再預設攤開。
-   ⚠ 刪的是版面不是內容：任何一格都還在，`/api/v1/stocks/<T>` 也一個欄位沒少。 */
-
-function conclusionCard(payload, view) {
-  const panel = view.headline;
-  const lines = lineMap(panel);
-  const meta = plainPanel('headline', panel.title);
-  const node = el('section', 'panel callout');
-  node.appendChild(el('h2', null, meta.title));
-  node.appendChild(el('div', 'panel-questions', meta.hint));
-
-  const numbers = el('div', 'headline-numbers');
-  const price = lines.current_price && lines.current_price.datum;
-  const quoteUnit = price && price.dependencies ? price.dependencies.quote_unit : null;
-  if (price) {
-    numbers.appendChild(numberBlock(plainLine('current_price'), fmtQuantity(price.value, quoteUnit) || '—',
-      price.as_of ? `收盤 ${price.as_of}` : ''));
-  }
-  if (numbers.childNodes.length) node.appendChild(numbers);
-  // 沒有現價時，把「為什麼沒有」放在跟數字一樣顯眼的位置——不留白、不寫 0。
-  if (price && (price.value === null || price.value === undefined)) {
-    const box = el('div', 'attention ' + (isSettled(price.absence_kind) ? 'settled' : 'blocked'));
-    const head = el('div', 'attention-head');
-    head.appendChild(document.createTextNode(plainLine('current_price') + '：'));
-    const badge = absenceBadge(price.absence_kind);
-    if (badge) head.appendChild(badge);
-    box.appendChild(head);
-    if (price.reason) box.appendChild(el('div', 'attention-body', price.reason));
-    node.appendChild(box);
-  }
-  // ⚠ 2026-09-23（Phase 0 Step 0b.1b）：目標價、隱含報酬、兩桿拆解、stance 橫幅、epistemics 一句話
-  // 隨估值鏈退役（C／H 組）；賭注／下檔的四價區塊已隨 E 組退役。反證那一端在「錯了怎麼知道」面板（downside）。
-  // D2（2026-09-18）：歸零旗標。它問「這家公司會不會直接歸零」。
-  node.appendChild(wipeoutBlock(view));
-  return node;
-}
-
-/* 歸零旗標（D2，2026-09-18）：四盞燈。**只畫顏色與一句話**——算出顏色的數字住稽核區
-   （每盞燈的 dependencies.inputs），因為 D2 定案是「紅黃綠不給數字」。
-
+/* 歸零旗標（D2，2026-09-18）：四盞燈只畫顏色與一句話——算出顏色的數字在「會不會死」那一塊的「數字與出處」。
    ⚠ 顏色**照抄** `alpha.wipeout` 的判定；本畫面不從 inputs 重判一次色，也不把四盞合成一個分數。
    ⚠ 灰燈與綠燈在畫面上必須一眼分得出來：灰＝這一項沒量到，不是「查過都沒事」。 */
 const WIPEOUT_COLOURS = { red: { mark: '🔴', word: '紅' }, amber: { mark: '🟡', word: '黃' },
                           green: { mark: '🟢', word: '綠' } };
 
-function wipeoutBlock(view) {
-  const panel = view.wipeout;
-  const meta = plainPanel('wipeout', panel ? panel.title : '會不會歸零');
-  const node = el('div', 'bet');
-  node.appendChild(el('div', 'group-title', meta.title));
-  if (!panel) return node;
-  node.appendChild(el('div', 'panel-questions', meta.hint));
-  const tally = (panel.context && panel.context.tally) || {};
-  node.appendChild(el('div', 'rule',
-    `紅 ${tally.red || 0}｜黃 ${tally.amber || 0}｜綠 ${tally.green || 0}｜灰（沒量到）${tally.unlit || 0}`));
-  const list = el('ul', 'weak');
-  (panel.lines || []).filter((line) => line.role === 'wipeout').forEach((line) => {
-    const d = line.datum;
-    const value = (d && d.value) || {};
-    const colour = WIPEOUT_COLOURS[value.colour];
-    const li = el('li');
-    li.appendChild(document.createTextNode(
-      // ⚠ 2026-09-30（Step 3.7 渲染實測）：原本是 `plainLine(line.key) || display_label`——plainLine 查不到會回 key 本身，
-      // 於是 `||` 右邊永遠用不到，畫面印出 `wipeout_going_concern` 這種內部名。fallback 要傳進去。
-      `${colour ? colour.mark + ' ' + colour.word : '⬜ 灰'}　${plainLine(line.key, line.display_label)}`));
-    const why = value.reason || d.reason;
-    if (why) li.appendChild(el('span', 'rule', why));
-    if (!colour) {
-      const badge = absenceBadge(d.absence_kind);
-      if (badge) li.appendChild(badge);
-    }
-    list.appendChild(li);
-  });
-  node.appendChild(list);
-  if (panel.context && panel.context.unlit_rule) {
-    node.appendChild(el('div', 'rule', panel.context.unlit_rule));
-  }
-  return node;
-}
-
-/* 賭注（V0，2026-09-15）與下檔（D2，2026-09-18）：「如果對了／如果反證成真，值多少」。
-   數字全部照抄對應 panel 的輸出；本畫面不相減、不算年化、**不補 bull case 也不補 bear case**。
-   沒寫時印一行「還沒寫」——缺席要現形，而且兩者都是 optional，不影響判讀完不完整。
-
-   ⚠ 兩邊共用這一個函式，是為了讓兩組數字**逐格對得起來**——使用者要並排讀它們，
-   而兩份各自手寫的區塊會在某次改動後悄悄長出不同的格。 */
-/* ⚠ 2026-09-23（Phase 0 Step 0b.1b）：`OVERLAY_BLOCKS` 與 `betBlock`（四價區塊）隨 E 組退役。 */
-/* ⚠ 2026-09-23（Step 0b.1b）：`renderDownside` 隨 downside panel 退役。 */
-
-function renderBet(view) {
-  const panel = view.bet;
-  const node = panelShell(panel, '賭注：我們賭什麼、押在哪一層、什麼必須為真（optional，不影響這份判讀完不完整）');
-  node.appendChild(el('p', 'note', (panel.context || {}).optional_rule || ''));
-  // Step 3.7：「押在哪一層（或哪個插槽）」是敘事宣告的 rides[]——印成「節點（層／插槽）」一句；其餘兩格照 renderRow。
-  const box = el('div', 'rows');
-  (panel.lines || []).forEach((line) => {
-    const d = line.datum;
-    if (line.key === 'rides' && Array.isArray(d.value)) {
-      const row = el('div', 'row');
-      row.appendChild(el('div', 'row-label', line.display_label));
-      row.appendChild(el('div', 'row-value',
-        d.value.map((r) => `「${r.node_name || r.node}」（${r.unit_label || r.unit}）`).join('、')));
-      box.appendChild(row);
-    } else {
-      box.appendChild(renderRow(plainLine(line.key, line.display_label), d));
-    }
-  });
-  node.appendChild(box);
-  const glossary = unitGlossary();
-  if (glossary) node.appendChild(glossary);
-  if (panel.notes && panel.notes.length) {
-    node.appendChild(group('賭注不是什麼', () => listOf(panel.notes)));
-  }
-  return node;
-}
-
-function priceCard(payload) {
+/** 股價走勢（脈絡不是訊號——AGENTS「量測、訊號、脈絡三分」；2026-10-08 起放在「怎麼被定價」那一塊、參考尺之後）。 */
+function priceFigure(payload) {
   const series = payload.price_series || [];
-  const node = el('section', 'panel');
-  node.appendChild(el('h2', null, '股價走勢（這檔自己的收盤價）'));
   const price = (payload.overview && payload.overview.price) || {};
-  node.appendChild(lineChart(series, {
+  const wrap = el('div', 'chart-wrap');
+  wrap.appendChild(lineChart(series, {
     ariaLabel: `${payload.ticker} 收盤價`,
     emptyNote: '沒有取到這檔的收盤序列——沒有折線不是價格為 0。',
   }));
   const note = (VOCAB && VOCAB.price_series_note) || '';
-  node.appendChild(el('p', 'note',
-    (series.length ? `${series[0].session_date} 起，共 ${series.length} 個已收盤交易日` +
-      (price.quote_unit ? `（單位 ${price.quote_unit}）。` : '。') : '') + note));
+  // 字彙裡的 `**…**` 是粗體標記——照 markdown 印（2026-10-08 實測：當成純文字會把兩個星號原樣露出來）
+  wrap.appendChild(mdParagraph((series.length ? `收盤價：${series[0].session_date} 起 ${series.length} 個交易日` +
+    (price.quote_unit ? `（${price.quote_unit}）。` : '。') : '') + note, 'chart-legend'));
   // 2026-10-07：「表格版：每一個交易日的收盤」拿掉（使用者：「不需要給我看的…拿掉」）——十字線 tooltip 讀得到每一天的值。
-  return node;
+  return wrap;
 }
 
-/* 個股頁 schema 的填得滿表（2026-10-08，個股頁 S2；稽核區）：十三塊 × 元素，每格有值或具名缺席。
-   塊與元素的名字只來自 `/api/v1/meta` 的 `page_schema`（前端不留第二份）；這一檔的逐格結果是 artifact 的 `page_fill`。
-   artifact 是 S2 之前 materialize 的就沒有這一格——照實說「還沒算」，不畫成空表（L13：沒算與沒有不得同形）。 */
-function pageFillCard(payload) {
-  const schema = VOCAB && VOCAB.page_schema;
-  const fill = payload.page_fill;
-  const node = el('section', 'panel');
-  node.appendChild(el('h2', null, '這一頁填得滿嗎（個股頁 schema v1.0）'));
-  if (!schema) {
-    node.appendChild(el('div', 'panel-questions', '合約讀不到（/api/v1/meta 沒有 page_schema）——不是「全滿」也不是「全空」'));
-    return node;
-  }
-  if (!fill || !Array.isArray(fill.rows)) {
-    node.appendChild(el('div', 'panel-questions', '這份 artifact 是填得滿表上線之前算的——重跑 materialize 才有'));
-    return node;
-  }
-  const s = fill.summary || {};
-  node.appendChild(el('div', 'panel-questions',
-    `${s.elements} 格：有值 ${s.value}、缺席 ${s.absent}（每一格缺席都說得出是哪一種、在哪裡找過；不放閘、不排序）`));
-  const byKey = {};
-  fill.rows.forEach((row) => { byKey[row.element] = row; });
-  (schema.blocks || []).forEach((block) => {
-    const box = el('div', 'attention');
-    box.appendChild(el('div', 'attention-head', `${block.key}　${block.title}——${block.question}`));
-    (schema.elements || []).filter((e) => e.block === block.key).forEach((element) => {
-      const row = byKey[element.key] || {};
-      const line = el('div', 'attention-body');
-      line.appendChild(document.createTextNode(`${row.state === 'value' ? '●' : '○'} ${element.label}　`));
-      if (row.state !== 'value') {
-        const badge = absenceBadge(row.absence_kind);
-        if (badge) line.appendChild(badge);
-        if (row.looked) line.appendChild(document.createTextNode(`　找過：${row.looked}`));
-      }
-      box.appendChild(line);
-    });
-    node.appendChild(box);
-  });
-  return node;
-}
-
-function blockerCard(payload) {
-  const readiness = payload.readiness;
-  const plain = plainReadiness(readiness.state);
-  const blockers = readiness.blocker_details || [];
-  const flags = readiness.flag_details || [];
-  if (!blockers.length && !flags.length) return null;
-  const node = el('section', 'panel');
-  const head = el('h2');
-  head.appendChild(document.createTextNode('卡在哪　'));
-  head.appendChild(el('span', 'badge badge-' + readiness.state, plain.label));
-  node.appendChild(head);
-  node.appendChild(el('div', 'panel-questions', plain.note));
-  blockers.forEach((item) => {
-    const box = el('div', 'attention ' + (item.settled ? 'settled' : 'blocked'));
-    const head2 = el('div', 'attention-head');
-    head2.appendChild(document.createTextNode(
-      `${plainPanel(item.panel, PANEL_TITLE[item.panel] || item.panel).title}　`));
-    const badge = absenceBadge(item.absence_kind);
-    if (badge) head2.appendChild(badge);
-    box.appendChild(head2);
-    box.appendChild(el('div', 'attention-body', absenceLabel(item.absence_kind) || ''));
-    if (item.reason) box.appendChild(el('div', 'attention-body', truncate(item.reason, 160)));
-    node.appendChild(box);
-  });
-  flags.forEach((item) => {
-    const box = el('div', 'attention flags');
-    box.appendChild(el('div', 'attention-head',
-      `要留意：${plainPanel(item.panel, PANEL_TITLE[item.panel] || item.panel).title}`));
-    if (item.reason) box.appendChild(el('div', 'attention-body', truncate(item.reason, 220)));
-    node.appendChild(box);
-  });
-  return node;
-}
-
-/* 錯了怎麼知道（Phase 3 Step 3.7，論證層）：每一條反證連到盯它的 watch；沒有 watch 的印「未盯」。
-   **全部照抄** downside 面板（歸屬＝`attributed_watches`、落格＝`watch_category`，與心跳段 2 同一套）；
-   本畫面不判、不算，連計數都是 materialize 端給的。舊判讀（session assessor）的反證 2026-10-01 退役、不在這裡印。 */
-function downsideCard(view) {
-  const panel = view.downside;
-  if (!panel) return null;
-  const meta = plainPanel('downside', panel.title);
-  const node = el('section', 'panel');
-  node.appendChild(el('h2', null, meta.title));
-  if (meta.hint) node.appendChild(el('div', 'panel-questions', meta.hint));
-  const lines = (panel.lines || []).filter((line) => line.role === 'downside');
-  if (!lines.length) {
-    const box = el('div', 'attention flags');
-    // 「名下還沒有反證」與「這次沒讀到反證的來源」下一步不同（3.7 R1）：標題跟著產生端宣告的分型走（首屏③同一個函式）。
-    const head = el('div', 'attention-head', downsideAbsenceHead(panel) + '　');
-    const badge = absenceBadge(panel.absence_kind);
-    if (badge) head.appendChild(badge);
-    box.appendChild(head);
-    if (panel.reason) box.appendChild(el('div', 'attention-body', panel.reason));
-    node.appendChild(box);
-  } else {
-    const counts = (panel.context || {}).counts || {};
-    node.appendChild(el('div', 'rule', `在盯 ${counts.active || 0}｜醒來待判 ${counts.fired || 0}｜`
-      + `觸及待處置 ${counts.touched || 0}｜到期待複查 ${counts.expired || 0}｜未盯 ${counts.unwatched || 0}`));
-    const list = el('ul', 'weak');
-    lines.forEach((line) => {
-      const r = line.datum.value || {};
-      const li = el('li', null, r.condition || '');
-      const bits = [r.source_label || line.display_label,
-        r.watch_id ? `watch ${r.watch_id}：${r.state_label}` + (r.until ? `（到期 ${r.until}）` : '') : r.state_label];
-      if (r.check_frequency) bits.push('多久看一次：' + r.check_frequency);
-      if (r.action_48h) bits.push('觸發後要做什麼：' + r.action_48h);
-      li.appendChild(el('span', 'rule', bits.join('｜')));
-      // 同一筆 watch 只印一列；敘事也以來源鍵連到它時，把另一個來源寫在這裡（不另起一列、不多算一次）。
-      if ((r.also || []).length) {
-        li.appendChild(el('span', 'rule', '也連到這一條：' + r.also.map((a) => a.source_label).join('、')));
-      }
-      list.appendChild(li);
-    });
-    node.appendChild(list);
-  }
-  (panel.notes || []).forEach((text) => node.appendChild(el('p', 'note', text)));
-  const catalysts = (view.research && view.research.catalysts) || [];
-  if (catalysts.length) {
-    node.appendChild(el('div', 'group-title', '什麼時候會知道'));
-    // 催化劑的欄位是 description／expected_at（3.7 覆核：原本照抄 label／due，畫面只剩內部狀態字 unlinked）。
-    node.appendChild(listOf(catalysts.map((c) => [c.expected_at || '日期未定', c.description || c.label,
-      c.date_confidence].filter(Boolean).join('｜'))));
-  }
-  return node;
-}
-
-/* 財務三題的數字（Phase 3 Step 3.7，稽核區）：每一行＝值＋來源＋as of＋口徑＋規則，或缺席分型的中文。
+/* 財務三題的數字（Phase 3 Step 3.7）：每一行＝值＋來源＋日期＋口徑＋規則，或缺席分型的中文。
    **照抄** three_questions 面板（read model 的同一格）；這裡只挑顯示格式（百分位、倍數、百分比、燈色），不算、不比、
    **沒有門檻**——幾分算已定價由寫敘事的人判斷。 */
-const TQ_QUESTIONS = { will_it_die: '會死嗎', priced_in: '已定價嗎', in_numbers: '出現在數字裡了嗎' };
 const TQ_VALUE_FORMAT = {
   own_history_pctile: (v) => `第 ${fmtNumber(v, 1)} 百分位（自己跟自己比）`,
   cohort_median: (v) => `${fmtNumber(v, 2)} 倍`,
@@ -986,114 +487,97 @@ function tqPoint(point) {
   return li;
 }
 
-function threeQuestionsCard(view) {
+/* 算出一格的輸入（`dependencies.detail`）印成人話（2026-10-08 使用者：「給機器看的不用顯示」）：
+   認得的鍵給中文名、數字照格式印；**認不得的鍵照原名印**（不濾掉，INV-3）；巢狀的明細（逐筆申報、募資文件清單）只印筆數——
+   原文在 `/api/v1/stocks/<T>` 與 artifact；已經印在這一行「來源／日期」的鍵（source、as_of、status）不重複印。 */
+const TQ_DETAIL_LABELS = {
+  multiple_today: '今天的倍數', median: '三年中位', min: '三年最低', max: '三年最高', samples: '樣本數',
+  window_start: '起', window_end: '迄', trading_days_in_window: '窗內交易日', coverage: '覆蓋率',
+  theme: '組', n_members: '組內檔數', n_same_basis: '同口徑檔數', currency: '幣別',
+  cash_and_equivalents: '現金', free_cash_flow_ttm: '自由現金流（近四季）', runway_months: '現金撐幾個月',
+  total_debt: '總債', market_cap_usd: '市值（美元）', base_outstanding: '期初股數', base_date: '期初日',
+  last_outstanding: '最新股數', last_date: '最新日', change: '股數變化', issued_total: '期間發行金額',
+  days_since_last: '距上次發行（天）', offering_summary: '募資文件', context_summary: '其他文件',
+};
+const TQ_DETAIL_PERCENT = { change: true, coverage: true };
+const TQ_DETAIL_SKIP = { source: true, as_of: true, status: true };
+
+function detailList(detail) {
+  const bits = [];
+  Object.keys(detail).forEach((key) => {
+    const item = detail[key];
+    if (TQ_DETAIL_SKIP[key] || item === null || item === undefined || item === '') return;
+    const label = TQ_DETAIL_LABELS[key] || key;
+    if (typeof item === 'number') bits.push(`${label}：${TQ_DETAIL_PERCENT[key] ? fmtPercent(item) : fmtBig(item)}`);
+    else if (Array.isArray(item)) bits.push(`${label}：${item.length} 筆明細`);
+    else if (typeof item === 'object') bits.push(`${label}：${Object.keys(item).length} 項明細`);
+    else bits.push(`${label}：${item}`);
+  });
+  return bits.length ? el('div', 'row-reason', bits.join('　')) : null;
+}
+
+/** 財務三題某一題的每一行（原稽核區「財務三題的數字」那一題；2026-10-08 起住在那一塊的「數字與出處」裡）：
+ *  值＋來源＋日期＋口徑＋規則，或缺席分型的中文。**照抄** three_questions 面板，這裡只挑顯示格式，不算、不比、沒有門檻。
+ *  整個面板沒有任何一行＝這次沒有三題的數字（說為什麼，不印成空）。 */
+function tqNumbers(view, question) {
   const panel = view.three_questions;
   if (!panel) return null;
-  const meta = plainPanel('three_questions', panel.title);
-  const node = el('section', 'panel');
-  node.appendChild(el('h2', null, meta.title));
-  if (meta.hint) node.appendChild(el('div', 'panel-questions', meta.hint));
-  const lines = (panel.lines || []).filter((line) => line.role === 'three_question');
-  if (!lines.length) {
+  const all = (panel.lines || []).filter((line) => line.role === 'three_question');
+  if (!all.length) {
     const box = el('div', 'attention flags');
     const head = el('div', 'attention-head', '這次沒有三題的數字　');
     const badge = absenceBadge(panel.absence_kind);
     if (badge) head.appendChild(badge);
     box.appendChild(head);
     if (panel.reason) box.appendChild(el('div', 'attention-body', panel.reason));
-    node.appendChild(box);
-    return node;
+    return box;
   }
-  Object.keys(TQ_QUESTIONS).forEach((question) => {
-    const rows = lines.filter((line) => (line.datum.dependencies || {}).question === question);
-    if (!rows.length) return;
-    const title = el('div', 'group-title', TQ_QUESTIONS[question]);
-    title.id = 'tq-' + question;
-    node.appendChild(title);
-    if (question === 'priced_in') {
-      const plain = pricedInPlain();
-      if (plain) node.appendChild(plain);
+  const lines = all.filter((line) => (line.datum.dependencies || {}).question === question);
+  if (!lines.length) return null;
+  const box = el('div', 'rows');
+  lines.forEach((line) => {
+    const d = line.datum;
+    const deps = d.dependencies || {};
+    const row = el('div', 'row');
+    row.appendChild(el('div', 'row-label', line.display_label));
+    const text = tqValueText(d);
+    if (text === null) {
+      row.classList.add('row-absent');
+      const cell = el('div', 'row-value');
+      const badge = absenceBadge(d.absence_kind);
+      if (badge) cell.appendChild(badge); else cell.appendChild(document.createTextNode('—'));
+      row.appendChild(cell);
+      row.appendChild(el('div', 'row-reason', absenceLabel(d.absence_kind) || ''));
+      if (d.reason) row.appendChild(el('div', 'row-reason', d.reason));
+    } else {
+      row.appendChild(el('div', 'row-value', text));
+      const where = [deps.source ? '來源 ' + deps.source : null, d.as_of ? String(d.as_of).slice(0, 10) : null,
+        deps.basis ? '口徑 ' + deps.basis : null].filter(Boolean).join('｜');
+      if (where) row.appendChild(el('div', 'row-reason', where));
+      if (Array.isArray(d.value)) {
+        const list = el('ul', 'weak');
+        d.value.forEach((point) => list.appendChild(tqPoint(point)));
+        row.appendChild(list);
+      } else if (typeof d.value === 'object') {
+        const inner = detailList(d.value);
+        if (inner) row.appendChild(inner);
+      }
     }
-    const box = el('div', 'rows');
-    rows.forEach((line) => {
-      const d = line.datum;
-      const deps = d.dependencies || {};
-      const row = el('div', 'row');
-      row.appendChild(el('div', 'row-label', line.display_label));
-      const text = tqValueText(d);
-      if (text === null) {
-        row.classList.add('row-absent');
-        const cell = el('div', 'row-value');
-        const badge = absenceBadge(d.absence_kind);
-        if (badge) cell.appendChild(badge); else cell.appendChild(document.createTextNode('—'));
-        row.appendChild(cell);
-        row.appendChild(el('div', 'row-reason', absenceLabel(d.absence_kind) || ''));
-        if (d.reason) row.appendChild(el('div', 'row-reason', d.reason));
-      } else {
-        row.appendChild(el('div', 'row-value', text));
-        const where = [deps.source ? '來源 ' + deps.source : null, d.as_of ? 'as of ' + d.as_of : null,
-          deps.basis ? '口徑 ' + deps.basis : null].filter(Boolean).join('｜');
-        if (where) row.appendChild(el('div', 'row-reason', where));
-        if (Array.isArray(d.value)) {
-          const list = el('ul', 'weak');
-          d.value.forEach((point) => list.appendChild(tqPoint(point)));
-          row.appendChild(list);
-        } else if (typeof d.value === 'object') {
-          row.appendChild(keyValueList(d.value));
-        }
-      }
-      // 算出這一格的輸入（倍數、中位數、窗、口徑理由）——敘事引用的數字要在這裡核對得到（AGENTS：敘事那一句引用稽核區）。
-      if (deps.detail && typeof deps.detail === 'object' && Object.keys(deps.detail).length) {
-        row.appendChild(keyValueList(deps.detail));
-      }
-      if (d.method) row.appendChild(el('div', 'rule', '規則：' + d.method));
-      box.appendChild(row);
-    });
-    node.appendChild(box);
+    // 算出這一格的輸入（倍數、中位數、窗、口徑理由）——敘事引用的數字要在這裡核對得到（AGENTS：敘事那一句引用這裡的數字）。
+    if (deps.detail && typeof deps.detail === 'object' && Object.keys(deps.detail).length) {
+      const inner = detailList(deps.detail);
+      if (inner) row.appendChild(inner);
+    }
+    if (d.method) row.appendChild(el('div', 'rule', '規則：' + d.method));
+    box.appendChild(row);
   });
-  (panel.notes || []).forEach((text) => node.appendChild(el('p', 'note', text)));
-  return node;
+  (panel.notes || []).forEach((text) => box.appendChild(el('p', 'note', text)));
+  return box;
 }
 
-/* 市場預測什麼（稽核區）：會計年度別共識與市場觀測的**原始數字**。
-   ⚠ 2026-09-23（Phase 0 Step 0b.1b）：原本這裡是「我們估／市場共識／我們比市場」四欄表＋反推表
-   （COMPARE_ROWS／reverseBridgeBlock）——內部預測與相減全部讀 FY+1 因果橋與估值鏈，整組退役。
-   現在只印市場說了什麼；每一格都是 materialize 端的同一個 datum，本畫面不算任何數。 */
-function versusMarketCard(view) {
-  const panel = view.fundamental;
-  const lines = lineMap(panel);
-  const ctx = panel.context || {};
-  const meta = plainPanel('fundamental', panel.title);
-  const node = el('section', 'panel');
-  node.appendChild(el('h2', null, meta.title));
-  node.appendChild(el('div', 'panel-questions', meta.hint));
-
-  const fiscal = (panel.lines || []).filter((line) => line.role === 'consensus_fiscal');
-  if (fiscal.length) {
-    node.appendChild(el('div', 'group-title', `會計年度別共識（${fiscal.length} 項；身分是 fiscal_period_end）`));
-    node.appendChild(renderRows(fiscal));
-  } else {
-    node.appendChild(el('p', 'note', '還沒有會計年度別共識（consensus_estimates 沒有這檔的列）。'));
-  }
-
-  // 市場還說了什麼：賣方目標價與倍數。**這是別人的數字**，不是本系統的預期報酬。
-  const context = el('div', 'headline-numbers');
-  const target = lines.target_mean && lines.target_mean.datum;
-  const count = lines.analyst_count && lines.analyst_count.datum;
-  if (target && typeof target.value === 'number') {
-    context.appendChild(numberBlock('賣方目標價（均值）', fmtBig(target.value),
-      count && typeof count.value === 'number'
-        ? `${count.value} 家；不是我們的目標價` : '不是我們的目標價'));
-  }
-  const forwardPe = lines.forward_pe && lines.forward_pe.datum;
-  if (forwardPe && typeof forwardPe.value === 'number') {
-    context.appendChild(numberBlock('市場給的預估本益比', fmtNumber(forwardPe.value, 1) + 'x',
-      '以市場共識 EPS 計'));
-  }
-  if (context.childNodes.length) node.appendChild(context);
-  node.appendChild(el('p', 'note', ctx.rule || ''));
-  return node;
-}
+/* ⚠ 2026-10-08：「市場預測什麼」卡（`versusMarketCard`：會計年度別共識、賣方目標價的原始數字）隨稽核區拿掉——
+   人要看的兩個本益比住「怎麼被定價」的數字與出處（`marketMultiples`）；共識原始數字留在 artifact 與 API。
+   2026-09-23 退役的「我們估／市場共識／我們比市場」四欄表與反推表（COMPARE_ROWS／reverseBridgeBlock）不得復活。 */
 
 /* 投資人短評（2026-09-15）：首屏只有這一張——七句前因後果、一把尺、一顆燈。
    文字是研究 session 寫進 ledger 的判斷，數字由 materialize 端從既有 Datum 填入；本畫面只排版。 */
@@ -1110,38 +594,34 @@ function briefCard(payload, view) {
   }
   // ⚠ 2026-09-23（Phase 0 Step 0b.1）：「目標價到了」那個徽章退役（`target_reached` 隨目標價退役）。
   // AGENTS D3 的判準沒有退役——`realized` 只提醒、不觸發出場；它現在的家是心跳段 2 的候選狀態板。
-  // Phase 7 Step 7.0e：v2 短評照五題排（對照表只住 contracts，經 `.meta.json` 帶來）；其餘照舊一格一行。
   const available = Boolean(panel && panel.context && panel.context.available);
-  // 個股頁 S5（2026-10-08）：首屏照 page_schema 的段與塊排（取代 Phase 7 Step 7.0e 的五題）；v1 短評照舊一格一行。
-  const screen = available ? schemaFirstScreen(payload, view, panel) : null;
-  if (screen) {
-    node.appendChild(screen);
-  } else if (available) {
-    const story = el('div', 'story');
-    (panel.lines || []).filter((line) => line.key.indexOf('brief:') === 0)
-      .forEach((line) => story.appendChild(storyRow(line)));
-    node.appendChild(story);
-  }
-  if (available) {
-    const rides = view.bet && lineMap(view.bet).rides;
-    if (rides && Array.isArray(rides.datum.value) && rides.datum.value.length) {
-      const glossary = unitGlossary();
-      if (glossary) node.appendChild(glossary);
-    }
-  } else {
+  // 個股頁 S5（2026-10-08）：首屏照 page_schema 的段與塊排。**每一頁都用這個版面**（2026-10-08 使用者「舊的非必要就拿掉」：
+  // 沒有敘事的頁也照十三塊排——研究要寫的塊印「還沒寫」，機械的塊照樣有燈、有圖），不再有第二套舊版面。
+  const screen = schemaFirstScreen(payload, view, available ? panel : null);
+  // 頁首那一行狀態（schema B0：候選狀態、理由、在等什麼）放在十三塊之前。
+  const line = candidateLine(view, Boolean(screen));
+  if (line) node.appendChild(line);
+  if (!available) {
     const box = el('div', 'attention flags');
     box.appendChild(el('div', 'attention-head', '還沒寫短評'));
     box.appendChild(el('div', 'attention-body', (panel && panel.reason) || meta.hint));
     node.appendChild(box);
   }
-  // ⚠ **2026-09-23（Phase 0 Step 0b.1）：首屏那把尺與「要翻倍需要什麼為真」計算框整塊退役。**
-  // ROADMAP「個股頁」對照表把它們列進「拿掉」：尺上是現價／沒賭對／賭對／判斷錯了，
-  // 計算框問的是「這個結構允不允許翻倍」——兩者都建在估值鏈與多年反向橋上。
-  // 接手的是末行候選狀態與財務三題三個字（Phase 3 Step 3.7，下面這一行）。
-  const line = candidateLine(view, Boolean(screen));
-  if (line) node.appendChild(line);
-  // 走勢圖留下來：它是**脈絡**不是訊號（AGENTS「量測、訊號、脈絡三分」）。
-  node.appendChild(priceCard(payload));
+  if (screen) {
+    node.appendChild(screen);
+  } else if (available) {     // `.meta.json` 讀不到十三塊的合約（舊 server）：短評每一格照印，不猜它屬於哪一塊
+    const story = el('div', 'story');
+    (panel.lines || []).filter((row) => row.key.indexOf('brief:') === 0)
+      .forEach((row) => story.appendChild(storyRow(row)));
+    node.appendChild(story);
+  }
+  const rides = view.bet && lineMap(view.bet).rides;
+  if (available && rides && Array.isArray(rides.datum.value) && rides.datum.value.length) {
+    const glossary = unitGlossary();
+    if (glossary) node.appendChild(drill('名詞：層、插槽、押在哪一格', () => glossary));
+  }
+  // ⚠ **2026-09-23（Phase 0 Step 0b.1）：首屏那把尺與「要翻倍需要什麼為真」計算框整塊退役。**（估值鏈與多年反向橋）
+  // 走勢圖 2026-10-08 搬進「怎麼被定價」那一塊（它是脈絡不是訊號——AGENTS「量測、訊號、脈絡三分」）。
   return node;
 }
 
@@ -1157,20 +637,25 @@ function storyRow(line) {
 
 /** 首屏（個股頁 S5，2026-10-08；取代 Phase 7 Step 7.0e 的五題）：段的順序與每塊的讀法來源**只有 page_schema 那一份**
  * （`.meta.json` 的 `page_schema.first_screen`；app.js 不留第二份，L16）。每塊＝塊名（滑過看它問什麼）＋一句讀法
- * （v2 敘事的格、既有元件；都沒有就照印合約宣告的「還沒寫／還沒做」）＋一個展開（這一塊的格，照抄填得滿表）。
- * 這一頁的短評沒帶齊合約放的每一格（v1 短評）或 `.meta.json` 是舊的——回 null，照舊版面，不猜、不補。 */
+ * （v2 敘事的格、既有元件；都沒有就照印合約宣告的「還沒寫／還沒做」）＋這一塊的圖＋一個展開（給人讀的論證與數字）。
+ * `panel` 是 null＝這一檔沒有短評：敘事的格印「還沒寫」，元件與圖照常。短評有、但沒帶齊合約放的每一格（舊格式）：
+ * 每一格先照印在最前面，不猜它屬於哪一塊、也不丟（INV-3）。`.meta.json` 是舊的（沒有合約）——回 null。 */
 function schemaFirstScreen(payload, view, panel) {
   const schema = VOCAB && VOCAB.page_schema;
   const screen = schema && schema.first_screen;
   if (!screen || !Array.isArray(screen.sections) || !screen.sections.length) return null;
-  const lines = lineMap(panel);
+  const lines = panel ? lineMap(panel) : {};
   const readings = screen.readings || {};
   const slots = [];
   Object.keys(readings).forEach((key) => (readings[key].slots || []).forEach((slot) => slots.push(slot)));
-  if (!slots.every((slot) => lines['brief:' + slot])) return null;
   const blocks = {};
   (schema.blocks || []).forEach((block) => { blocks[block.key] = block; });
   const box = el('div', 'schema-screen');
+  if (panel && !slots.every((slot) => lines['brief:' + slot])) {
+    const story = el('div', 'story');
+    (panel.lines || []).filter((row) => row.key.indexOf('brief:') === 0).forEach((row) => story.appendChild(storyRow(row)));
+    box.appendChild(story);
+  }
   screen.sections.forEach((section) => {
     const sec = el('div', 'ss-section ss-' + section.key);
     sec.appendChild(el('div', 'ss-section-title', section.title));
@@ -1183,9 +668,11 @@ function schemaFirstScreen(payload, view, panel) {
   return box;
 }
 
-/** 一塊：讀法（短評的格依序、再放既有元件）；兩者都沒有就印合約的 pending。不改任何一格、不加字。 */
+/** 一塊：讀法（短評的格依序、再放既有元件）；都沒有就印合約的 pending、或「還沒寫」（沒有敘事的頁）。
+ *  接著是這一塊的圖，最後一個展開（`blockDetail`）。不改任何一格、不加字。 */
 function schemaBlock(payload, view, lines, block, reading) {
   const node = el('div', 'fq ss-block');
+  node.id = 'blk-' + block.key;
   const head = el('h3', 'fq-title', block.title);
   if (block.question) head.title = block.question;
   node.appendChild(head);
@@ -1195,60 +682,165 @@ function schemaBlock(payload, view, lines, block, reading) {
   (reading.parts || []).forEach((part) => questionPart(view, part).forEach((n) => node.appendChild(n)));
   if (!(reading.slots || []).length && !(reading.parts || []).length) {
     node.appendChild(el('div', 'row-reason ss-pending', reading.pending || '還沒寫'));
+  } else if (!story.childNodes.length && !(reading.parts || []).length) {
+    node.appendChild(el('div', 'row-reason ss-pending', '還沒寫（這一檔還沒有研究寫的敘事）'));
   }
   blockVisuals(payload, view, block.key).forEach((n) => node.appendChild(n));
-  const cells = blockCells(payload, view, block);
-  if (cells) node.appendChild(cells);
+  const detail = blockDetail(payload, view, block.key);
+  if (detail) node.appendChild(detail);
   return node;
 }
 
-/** 一塊的格（展開層）：照抄填得滿表——有值印承載它的 line 的值（結構化的值不在這裡攤開，同一份在稽核區），
- * 缺席印分型與「在哪裡找過」。不判、不算、不排序。 */
-function blockCells(payload, view, block) {
-  const schema = VOCAB && VOCAB.page_schema;
-  const fill = payload.page_fill;
-  if (!schema || !fill || !Array.isArray(fill.rows)) return null;
-  const elements = (schema.elements || []).filter((e) => e.block === block.key);
-  if (!elements.length) return null;
-  const byKey = {};
-  fill.rows.forEach((row) => { byKey[row.element] = row; });
-  const valued = elements.filter((e) => (byKey[e.key] || {}).state === 'value').length;
-  return drill(`這一塊的格：${elements.length} 格，有值 ${valued}、缺席 ${elements.length - valued}`, () => {
-    const list = el('div', 'ss-cells');
-    elements.forEach((element) => {
-      const row = byKey[element.key] || {};
-      const line = el('div', 'attention-body');
-      line.appendChild(document.createTextNode(`${row.state === 'value' ? '●' : '○'} ${element.label}　`));
-      if (row.state === 'value') {
-        line.appendChild(el('span', 'dim', cellValueText(view, row.lines || [])));
-      } else {
-        const badge = absenceBadge(row.absence_kind);
-        if (badge) line.appendChild(badge);
-        if (row.looked) line.appendChild(document.createTextNode(`　找過：${row.looked}`));
-      }
-      list.appendChild(line);
+/** 塊底下的展開（2026-10-08 使用者：「給我看的留，給機器看的拿掉」）：這一塊給人讀的論證與要核對的數字。
+ *  原本散在頁尾四張卡與稽核區的內容搬進對應的塊；每塊最多一個展開、展開裡不再套展開（2026-09-08「太多展開」）。
+ *  沒有內容就不放。「數字與出處」掛 id `tq-<題>`——首屏「會死嗎／已定價嗎／出現在數字裡了嗎」點了打開它。 */
+function blockDetail(payload, view, key) {
+  if (key === 'B2') return chainDetail(view);
+  if (key === 'B4') return seatsDetail(payload, view);
+  if (key === 'B6') return numbersDrill(view, 'priced_in', () => [pricedInPlain(), marketMultiples(view)]);
+  if (key === 'B7') return numbersDrill(view, 'in_numbers', () => []);
+  if (key === 'B8') return downsideDetail(view);
+  if (key === 'B9') return numbersDrill(view, 'will_it_die', () => [wipeoutUnlitRule(view)]);
+  if (key === 'B11') return timelineDetail(view);
+  return null;
+}
+
+/** 財務三題某一題的「數字與出處」（原稽核區那一題；敘事那一句引用的數字在這裡核對得到——AGENTS）。 */
+function numbersDrill(view, question, extras) {
+  const rows = tqNumbers(view, question);
+  if (!rows) return null;
+  const node = drill('數字與出處', () => {
+    const box = el('div', 'block-detail');
+    extras().filter(Boolean).forEach((n) => box.appendChild(n));
+    box.appendChild(rows);
+    return box;
+  });
+  node.id = 'tq-' + question;
+  return node;
+}
+
+/** 「怎麼被定價」的兩個本益比與分析師家數（schema B6「本益比兩個年度」）：照抄 fundamental 面板的市場觀測，不算。 */
+function marketMultiples(view) {
+  const lines = view.fundamental ? lineMap(view.fundamental) : {};
+  const bits = [];
+  const trailing = lines.trailing_pe && lines.trailing_pe.datum;
+  const forward = lines.forward_pe && lines.forward_pe.datum;
+  const count = lines.analyst_count && lines.analyst_count.datum;
+  if (trailing && typeof trailing.value === 'number') bits.push(`近四季本益比 ${fmtNumber(trailing.value, 1)} 倍`);
+  if (forward && typeof forward.value === 'number') bits.push(`用明年度共識 EPS 算 ${fmtNumber(forward.value, 1)} 倍`);
+  if (count && typeof count.value === 'number') bits.push(`追蹤的分析師 ${count.value} 位`);
+  return bits.length ? el('div', 'row-reason', `市場的數字（別人的，只當脈絡）：${bits.join('｜')}`) : null;
+}
+
+/** 灰燈的規則一句（wipeout 面板給的；灰＝這一項沒量到，不是綠）。 */
+function wipeoutUnlitRule(view) {
+  const rule = view.wipeout && view.wipeout.context && view.wipeout.context.unlit_rule;
+  return rule ? el('div', 'row-reason', rule) : null;
+}
+
+/** 「需求傳導」的展開：這條鏈怎麼走（圖的敘述＋圖裡 claim 的引文，照抄原論證卡的第一段）。 */
+function chainDetail(view) {
+  const line = view.argument ? lineMap(view.argument)['argument:chain'] : null;
+  if (!line) return null;
+  return drill('這條鏈怎麼走：圖上的連結與證據強度', () => argumentSection(line));
+}
+
+/** 「技術鏈」的展開：它坐的每一層現在讀成什麼（讀圖面板照抄）。節點印名字——層說明的標題、圖上的名字，都沒有才印 ID
+ *  （ID 放 title）；哪幾層有層說明連到閱讀頁。完整引文與反證在讀圖頁。 */
+function seatsDetail(payload, view) {
+  const panel = view.readings;
+  if (!panel) return null;
+  const ctx = panel.context || {};
+  const titles = {};
+  (ctx.layer_notes || []).forEach((n) => { titles[n.node] = n.title; });
+  const names = payload.node_names || {};
+  const rows = (panel.lines || []).filter((line) => line.role === 'reading');
+  const links = layerNoteLinks(ctx);
+  if (!rows.length && !links) return null;
+  return drill(`它坐的層：現在讀成什麼（${rows.length} 層有讀圖）`, () => {
+    const box = el('div', 'block-detail');
+    if (!rows.length) box.appendChild(el('p', 'note', panel.reason || '還沒有讀圖'));
+    const list = el('ul', 'weak');
+    rows.forEach((line) => {
+      const m = /^reading:(.+):(layer|socket)$/.exec(line.key) || [];
+      const node = m[1] || line.key;
+      const li = el('li', null, `${titles[node] || names[node] || node}（${m[2] === 'socket' ? '插槽' : '層'}）`);
+      li.title = node;
+      const d = line.datum || {};
+      li.appendChild(el('span', 'rule', typeof d.value === 'string' && d.value ? d.value
+        : (absenceLabel(d.absence_kind) || d.reason || '—')));
+      list.appendChild(li);
     });
-    return list;
+    if (rows.length) box.appendChild(list);
+    const unread = (ctx.seats || []).length - rows.length;
+    if (unread > 0) box.appendChild(el('p', 'note', `它坐的另外 ${unread} 個節點還沒有讀圖。`));
+    if (links) box.appendChild(links);
+    const more = el('a', null, '完整的引文與反證在「讀圖」頁 →');
+    more.href = '#/structure-readings';
+    box.appendChild(more);
+    return box;
   });
 }
 
-/** 有值那一格的字：承載它的 line 的值（字串或數字照印、最多三條）；結構化的值指去稽核區，不在這裡另組字。 */
-function cellValueText(view, keys) {
-  const index = {};
-  Object.keys(view || {}).forEach((name) => {
-    const panel = view[name];
-    if (panel && Array.isArray(panel.lines)) panel.lines.forEach((line) => { index[line.key] = line; });
-  });
-  const parts = [];
-  keys.slice(0, 3).forEach((key) => {
-    const line = index[key];
-    const d = line && line.datum;
-    if (d && (typeof d.value === 'string' || typeof d.value === 'number')) {
-      const text = truncate(String(valueText(d) || d.value), 80);
-      if (parts.indexOf(text) < 0) parts.push(text);   // 兩條 line 承載同一句（例：敘事的 our_bet 與賭注面板）只印一次
+/** 「錯了怎麼知道」的展開：每條反證——誰在盯、多久看一次、觸發後 48 小時做什麼（照抄 downside 面板，與心跳段 2 同一套；
+ *  watch 編號放 title，查得到但不擋在句子裡）。研究時寫的風險原文附在後面。 */
+function downsideDetail(view) {
+  const panel = view.downside;
+  const rows = panel ? (panel.lines || []).filter((line) => line.role === 'downside') : [];
+  const risks = view.argument ? lineMap(view.argument)['argument:risks'] : null;
+  const riskText = risks && risks.datum && typeof risks.datum.value === 'string' && risks.datum.value;
+  if (!panel && !riskText) return null;
+  return drill('每條反證：多久看一次、觸發後做什麼', () => {
+    const box = el('div', 'block-detail');
+    if (panel && !rows.length) {
+      // 「名下還沒有反證」與「這次沒讀到反證的來源」下一步不同（3.7 R1）：標題跟著產生端宣告的分型走（首屏同一個函式）。
+      const head = el('div', 'attention-head', downsideAbsenceHead(panel) + '　');
+      const badge = absenceBadge(panel.absence_kind);
+      if (badge) head.appendChild(badge);
+      box.appendChild(head);
+      if (panel.reason) box.appendChild(el('div', 'attention-body', panel.reason));
+    } else if (rows.length) {
+      const counts = (panel.context || {}).counts || {};
+      box.appendChild(el('div', 'rule', `在盯 ${counts.active || 0}｜醒來待判 ${counts.fired || 0}｜`
+        + `觸及待處置 ${counts.touched || 0}｜到期待複查 ${counts.expired || 0}｜未盯 ${counts.unwatched || 0}`));
+      const list = el('ul', 'weak');
+      rows.forEach((line) => {
+        const r = line.datum.value || {};
+        const li = el('li', null, r.condition || '');
+        if (r.watch_id) li.title = 'watch ' + r.watch_id;
+        const bits = [r.source_label || line.display_label, (r.state_label || '—') + (r.until ? `（到期 ${r.until}）` : '')];
+        if (r.check_frequency) bits.push('多久看一次：' + r.check_frequency);
+        if (r.action_48h) bits.push('觸發後要做什麼：' + r.action_48h);
+        li.appendChild(el('span', 'rule', bits.join('｜')));
+        // 同一筆 watch 只印一列；敘事也以來源鍵連到它時，把另一個來源寫在這裡（不另起一列、不多算一次）。
+        if ((r.also || []).length) li.appendChild(el('span', 'rule', '也連到這一條：' + r.also.map((a) => a.source_label).join('、')));
+        list.appendChild(li);
+      });
+      box.appendChild(list);
     }
+    ((panel && panel.notes) || []).forEach((text) => box.appendChild(el('p', 'note', text)));
+    if (riskText) box.appendChild(argumentSection(risks));
+    return box;
   });
-  return parts.length ? parts.join('｜') : '有值（細節在稽核區）';
+}
+
+/** 「接下來看什麼」的展開：研究時寫的時間表（原論證卡第三段）＋催化劑的日期（description／expected_at——3.7 覆核：
+ *  原本照抄 label／due，畫面只剩內部狀態字 unlinked）。 */
+function timelineDetail(view) {
+  const line = view.argument ? lineMap(view.argument)['argument:timeline'] : null;
+  const hasText = Boolean(line && line.datum && typeof line.datum.value === 'string' && line.datum.value);
+  const catalysts = (view.research && view.research.catalysts) || [];
+  if (!hasText && !catalysts.length) return null;
+  return drill('時間表', () => {
+    const box = el('div', 'block-detail');
+    if (hasText) box.appendChild(argumentSection(line));
+    if (catalysts.length) {
+      box.appendChild(el('div', 'group-title', '什麼時候會知道'));
+      box.appendChild(listOf(catalysts.map((c) => [c.expected_at || '日期未定', c.description || c.label,
+        c.date_confidence].filter(Boolean).join('｜'))));
+    }
+    return box;
+  });
 }
 
 /** 首屏塊裡的既有元件（字全由 materialize 端給）。認不得的元件名照印出來，不靜默略過（INV-3）。 */
@@ -1264,20 +856,19 @@ function questionPart(view, part) {
   return [el('div', 'row-reason', `（這一題的元件 ${part} 這版畫面還不認得）`)];
 }
 
-/* 首屏末行（Phase 3 Step 3.7）：候選狀態＋財務三題三個字。**全部照抄** candidate 面板——字由 materialize 端給
+/* 候選狀態＋財務三題三個字（Phase 3 Step 3.7）。**全部照抄** candidate 面板——字由 materialize 端給
    （與候選板同一個推導），本畫面不判、不算。沒有敘事也沒有持有＝不上板，三個字照印（會死嗎看燈，兩題「未答」）。
-   2026-09-30 使用者回饋（「這三個字是要我去候選板看詳細嗎？」）：細節其實在同一頁的稽核區——三個字改成可以點，
-   點了打開稽核區、跳到那一題的數字；候選狀態直接寫理由、在等什麼、哪天醒；會死嗎把不是綠的燈逐盞寫出來。 */
+   2026-09-30 使用者回饋（「這三個字是要我去候選板看詳細嗎？」）：三個字可以點，點了打開同一頁那一題的數字；
+   2026-10-08 起數字住在那一題的那一塊（會不會死／怎麼被定價／押對了夠大嗎）的「數字與出處」裡。 */
 const CANDIDATE_WORDS = [['candidate:will_it_die', '會死嗎', 'will_it_die'], ['candidate:priced_in', '已定價嗎', 'priced_in'],
   ['candidate:in_numbers', '出現在數字裡了嗎', 'in_numbers']];
 
-/** 打開同頁的稽核區、捲到那一題（`threeQuestionsCard` 給每一題的標題掛了 id）。稽核區不在就不動。 */
-function jumpToAudit(question) {
-  const box = document.getElementById('audit-drill');
+/** 打開同一頁那一題的「數字與出處」、捲過去（`numbersDrill` 掛了 id `tq-<題>`）。不在就不動。 */
+function jumpToNumbers(question) {
+  const box = document.getElementById('tq-' + question);
   if (!box) return;
   box.open = true;
-  const target = document.getElementById('tq-' + question) || box;
-  target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  box.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 /** 候選狀態在等的那一筆 watch：哪天醒、最晚哪天到期重問。watch id 放 title（查得到，但不擋在句子裡）。 */
@@ -1322,8 +913,8 @@ function lampsBlock(view, withGreen) {
   return box;
 }
 
-/** 財務三題的三個字（可點：打開稽核區、跳到那一題）。`questions`＝印哪幾題（舊版面三個一起；五題版面分到②④）。
- * 「已定價嗎」在的時候，白話緊跟在後——首屏只有這一處印白話。 */
+/** 財務三題的三個字（可點：打開同一頁那一題的「數字與出處」）。`questions`＝印哪幾題（十三塊版面分到各自那一塊；
+ * 讀不到合約的舊 server 三個一起）。「已定價嗎」的白話 2026-10-08 起只放在那一題的「數字與出處」裡（首屏只留字）。 */
 function wordsBlock(view, questions) {
   const panel = view.candidate;
   if (!panel || !(panel.lines || []).length) return [];
@@ -1333,16 +924,11 @@ function wordsBlock(view, questions) {
     const d = lines[key] && lines[key].datum;
     const word = el('button', 'word word-link', `${label}　${d && d.value ? d.value : '—'} ↓`);
     word.type = 'button';
-    word.title = '打開下面的稽核區，跳到這一題的數字';
-    word.addEventListener('click', () => jumpToAudit(question));
+    word.title = '打開這一題的數字與出處';
+    word.addEventListener('click', () => jumpToNumbers(question));
     words.appendChild(word);
   });
-  const out = [words];
-  if (questions.indexOf('priced_in') >= 0) {
-    const plain = pricedInPlain();
-    if (plain) out.push(plain);
-  }
-  return out;
+  return [words];
 }
 
 /** ③ 每條反證與盯它的 watch 狀態——照抄 downside 面板（論證層那張卡同一份；這裡只印條件與狀態，細節在那張卡）。 */
@@ -1438,72 +1024,45 @@ function unitGlossary() {
    ROADMAP「個股頁」對照表把整把尺列進「拿掉」。走勢圖（`priceCard`）留著——它是脈絡不是訊號。
    接手首屏的是句子、燈、候選狀態與財務三題（Phase 3）。 */
 
-function argumentCard(view) {
-  const panel = view.argument;
-  const meta = plainPanel('argument', panel ? panel.title : '為什麼這樣想');
-  const node = el('section', 'panel argument-card');
-  node.appendChild(el('h2', null, meta.title));
-  node.appendChild(el('div', 'panel-questions', meta.hint));
-  if (!panel) return node;
-  (panel.lines || []).filter((line) => line.role === 'paragraph').forEach((line) => {
-    const d = line.datum;
-    const sec = el('div', 'arg-section');
-    sec.appendChild(el('h3', null, line.display_label));
-    if (typeof d.value === 'string' && d.value) {
-      sec.appendChild(el('p', 'arg-text', d.value));
-    } else {
-      sec.appendChild(el('p', 'arg-text muted', '（' + (d.reason || '缺料') + '）'));
-    }
-    const deps = d.dependencies || {};
-    (deps.long_form || []).forEach((item) => {
-      const box = el('div', 'arg-long');
-      box.appendChild(el('div', 'arg-long-title', item.title || ''));
-      box.appendChild(el('div', 'arg-long-text', item.text || ''));
-      sec.appendChild(box);
-    });
-    if ((deps.citations || []).length) {
-      const list = el('ul', 'arg-cites');
-      deps.citations.forEach((c) => {
-        const li = el('li');
-        const who = el('span', 'cite-who', `${c.who || '？'}　${c.date || ''}`);
-        li.appendChild(who);
-        li.appendChild(document.createTextNode('　' + (c.statement || '')));
-        if (c.url) {
-          const a = el('a', 'cite-link', '原文 ↗');
-          a.href = c.url; a.target = '_blank'; a.rel = 'noopener noreferrer';
-          if (c.title) a.title = c.title;
-          li.appendChild(document.createTextNode(' '));
-          li.appendChild(a);
-        } else if (c.title) {
-          li.title = c.title;
-        }
-        list.appendChild(li);
-      });
-      sec.appendChild(el('div', 'arg-long-title', '引文（圖裡的 claim，照抄）'));
-      sec.appendChild(list);
-    }
-    node.appendChild(sec);
-  });
-  return node;
-}
-
-/* 基本數字列（2026-09-15 使用者回饋：基本數字不用全部藏進稽核）。
-   只放六格、每格白話標籤；全部照抄 headline／bet panel 既有的 Datum，不算、不造句。 */
-function numbersStrip(view) {
-  const head = lineMap(view.headline);
-  const node = el('section', 'panel numbers-strip');
-  node.appendChild(el('div', 'group-title', '基本數字'));
-  const numbers = el('div', 'headline-numbers');
-  const price = head.current_price && head.current_price.datum;
-  const quoteUnit = price && price.dependencies ? price.dependencies.quote_unit : null;
-  if (price && typeof price.value === 'number') {
-    numbers.appendChild(numberBlock(plainLine('current_price'), fmtQuantity(price.value, quoteUnit) || '—',
-      price.as_of ? `收盤 ${price.as_of}` : ''));
+/** 論證的一段（argument 面板的 paragraph：這條鏈怎麼走／風險與認錯條件／時間表）：文字、研究長文、圖裡 claim 的引文，照抄。
+ *  2026-10-08 起三段分別住「需求傳導」「錯了怎麼知道」「接下來看什麼」三塊的展開裡（原本是頁尾一張「憑什麼這樣想」卡）。 */
+function argumentSection(line) {
+  const d = line.datum || {};
+  const sec = el('div', 'arg-section');
+  if (typeof d.value === 'string' && d.value) {
+    sec.appendChild(el('p', 'arg-text', d.value));
+  } else {
+    sec.appendChild(el('p', 'arg-text muted', '（' + (d.reason || '缺料') + '）'));
   }
-  /* ⚠ 2026-09-23（Phase 0 Step 0b.1b）：「沒賭對的目標價／要漲跌多少／市場付的倍數 vs 我們給的」隨
-     估值鏈退役（C／H 組）；賭注與下檔的四格已隨 E 組退役。基本數字只剩現價——「已定價嗎」由財務三題回答（Phase 3）。 */
-  if (numbers.childNodes.length) node.appendChild(numbers);
-  return node;
+  const deps = d.dependencies || {};
+  (deps.long_form || []).forEach((item) => {
+    const box = el('div', 'arg-long');
+    box.appendChild(el('div', 'arg-long-title', item.title || ''));
+    box.appendChild(el('div', 'arg-long-text', item.text || ''));
+    sec.appendChild(box);
+  });
+  if ((deps.citations || []).length) {
+    const list = el('ul', 'arg-cites');
+    deps.citations.forEach((c) => {
+      const li = el('li');
+      const who = el('span', 'cite-who', `${c.who || '？'}　${c.date || ''}`);
+      li.appendChild(who);
+      li.appendChild(document.createTextNode('　' + (c.statement || '')));
+      if (c.url) {
+        const a = el('a', 'cite-link', '原文 ↗');
+        a.href = c.url; a.target = '_blank'; a.rel = 'noopener noreferrer';
+        if (c.title) a.title = c.title;
+        li.appendChild(document.createTextNode(' '));
+        li.appendChild(a);
+      } else if (c.title) {
+        li.title = c.title;
+      }
+      list.appendChild(li);
+    });
+    sec.appendChild(el('div', 'arg-long-title', '引文（圖裡的 claim，照抄）'));
+    sec.appendChild(list);
+  }
+  return sec;
 }
 
 async function renderDetail(ticker) {
@@ -1542,65 +1101,33 @@ async function renderDetail(ticker) {
   const head = el('div', 'detail-head');
   head.appendChild(el('h1', null, payload.ticker));
   head.appendChild(el('div', 'company', payload.company_label || ''));
+  const sub = headerLine(payload, view);
+  if (sub) head.appendChild(sub);
   app.appendChild(head);
 
-  // 首屏只有短評（2026-09-15 使用者回饋：「一堆數字跟內部名詞堆起來的東西根本看不懂」）。
-  // 原本的六張卡整組收進第一個展開，一個字不刪；再下一層才是第二個展開。
-  // 三層（2026-09-15）：①短評 ②論證（可長文，直接攤開）＋走勢 ③查核區（一個展開；格只住這裡）
+  // 2026-10-08 使用者：「舊有的資訊非必要的就拿掉，除非是給我看的；給機器看的不用顯示出來」。
+  // 一頁只剩頁首＋十三塊（個股頁 schema v1.0）：①每塊一句讀法 ②塊底下一個展開放這一塊給人讀的論證（這條鏈怎麼走、
+  // 坐的層讀成什麼、每條反證、時間表）③要核對的數字與出處也在那一塊的展開裡（財務三題）。原本的「基本數字／憑什麼這樣想／
+  // 讀圖／錯了怎麼知道」四張卡的內容搬進對應的塊；「稽核」與「完整細節」兩個大展開、每塊的「這一塊的格」（填得滿表）拿掉——
+  // 給查核用的欄位（authority、digest、readiness、填得滿表、原始 JSON）留在 artifact 與 `/api/v1/stocks/<T>`，不必有畫面。
   app.appendChild(briefCard(payload, view));
-  app.appendChild(numbersStrip(view));
-  app.appendChild(argumentCard(view));
-  // Phase 2 Step 2.7：讀圖面板（選配）緊接在論證之後——論證講這條鏈怎麼走，讀圖講鏈上那一層現在還是不是當初讀的樣子。
-  const readings = readingsCard(view);
-  if (readings) app.appendChild(readings);
-  // Phase 3 Step 3.7：downside（錯了怎麼知道）緊接讀圖——每條反證連到盯它的 watch，沒有的印「未盯」。
-  const downside = downsideCard(view);
-  if (downside) app.appendChild(downside);
-  const audit = el('section', 'panel');
-  const auditDrill = drill('稽核：每一格的來源、狀態、算式與警告（給查核用；首屏三個字點下去會跳到這裡）', () => {
-    const box = el('div', 'why-box');
-    box.appendChild(conclusionCard(payload, view));
-    // ⚠ 2026-09-23（Phase 0 Step 0b.1）：`fragileCard`（最脆弱的假設）隨 `why` panel 退役
-    // ——它列的是估值假設的敏感度，那個模型不在了。
-    // ⚠ 2026-09-30（Step 3.7）：`disproofCard` 搬出稽核區、換成論證層的 downsideCard（每條反證連 watch）；
-    // 稽核區補上財務三題的數字（值、來源、as of、口徑、規則，或缺席分型）。
-    [blockerCard(payload), threeQuestionsCard(view), versusMarketCard(view), pageFillCard(payload)]
-      .forEach((card) => { if (card) box.appendChild(card); });
-    return box;
-  });
-  auditDrill.id = 'audit-drill';
-  audit.appendChild(auditDrill);
-  app.appendChild(audit);
-
-  // 完整細節：**一個展開，展開後就是全部**。先前這裡是七個 details，每個裡面還有第二層
-  // details，摘要一律寫著「展開：某某（N 項）」——那是把東西收乾淨，然後叫人再點一次。
-  const details = el('section', 'panel');
-  details.appendChild(el('h2', null, '完整細節'));
-  details.appendChild(el('p', 'note',
-    '稽核用：同一份判讀的每一格。點一次就全部攤開，裡面沒有第二層展開，' +
-    '也沒有任何一列會叫你「見下方展開」。'));
-  details.appendChild(drill('展開完整細節（現價／賭注／下檔／我們與市場／研究現況／判讀狀態／新鮮度）',
-    () => {
-      const box = el('div', 'full-detail');
-      box.appendChild(renderHeadline(view));
-      box.appendChild(renderBet(view));
-      box.appendChild(renderFundamental(view));
-      // ⚠ 2026-09-23（Phase 0 Step 0b.1）：`renderWhy` 與 `renderEntry` 隨兩個 panel 退役。
-      box.appendChild(renderResearch(view));
-      box.appendChild(renderReadiness(payload));
-      box.appendChild(renderFreshness(payload));
-      const limits = el('section', 'panel');
-      limits.appendChild(el('h2', null, '這份判讀不是什麼'));
-      limits.appendChild(listOf(view.limits || []));
-      if (view.warnings && view.warnings.length) {
-        limits.appendChild(el('div', 'group-title', `組裝時的警告（${view.warnings.length}）`));
-        limits.appendChild(listOf(view.warnings));
-      }
-      box.appendChild(limits);
-      return box;
-    }));
-  app.appendChild(details);
   window.scrollTo(0, 0);
+}
+
+/** 頁首一行：現價與收盤日、這份判讀哪天產生（原「基本數字」那一格搬上來；判讀不在點擊時重算）。 */
+function headerLine(payload, view) {
+  const head = view.headline ? lineMap(view.headline) : {};
+  const price = head.current_price && head.current_price.datum;
+  const quoteUnit = price && price.dependencies ? price.dependencies.quote_unit : null;
+  const bits = [];
+  if (price && typeof price.value === 'number') {
+    bits.push(`現在股價 ${fmtQuantity(price.value, quoteUnit) || '—'}${price.as_of ? `（${price.as_of} 收盤）` : ''}`);
+  } else if (price) {
+    bits.push(`現在股價：沒有（${absenceLabel(price.absence_kind) || price.reason || '沒說為什麼'}）`);
+  }
+  const generated = payload.freshness && payload.freshness.generated_at;
+  if (generated) bits.push(`這份判讀產生於 ${String(generated).slice(0, 10)}`);
+  return bits.length ? el('div', 'detail-sub', bits.join('｜')) : null;
 }
 
 /* ---------- 結構表（structure_table state；照抄 structure_table() 的輸出，不重排、不加權、沒有名次） ----------
@@ -1972,7 +1499,7 @@ function fmtMultiple(v) {
 function blockVisuals(payload, view, key) {
   const out = [];
   if (key === 'B4') (payload.diagrams || []).forEach((d) => out.push(diagramFigure(d)));
-  if (key === 'B6') { const n = rulerChart(view); if (n) out.push(n); }
+  if (key === 'B6') { const n = rulerChart(view); if (n) out.push(n); out.push(priceFigure(payload)); }
   if (key === 'B7') { const n = revenueBars(view); if (n) out.push(n); }
   return out;
 }
@@ -2001,8 +1528,12 @@ function diagramFigure(d) {
   return box;
 }
 
-/** 參考尺：自家三年倍數的最低、中位、最高與今天；同組中位只在同口徑時畫。對數刻度——倍數常跨兩個數量級
- *  （AXTI 三年 P/S 0.53 → 96），線性尺會把中位擠到邊上。圖上只標兩端與今天，中位與組中位寫在圖下（避免字疊字）。 */
+/** 參考尺（B6）：今天的倍數落在自家近三年的哪裡。第一列＝自家三年最低到最高的範圍、中位、今天；同組中位只在同口徑時
+ *  畫在第二列（同一把對數刻度——倍數常跨兩個數量級，例：AXTI 三年 P/S 0.53 → 96，線性尺會把中位擠到邊上）。
+ *  2026-10-08 使用者看不懂舊版（「最高」貼在圖的右緣、剛好落在同組中位的菱形底下，看起來像最高在菱形那裡；中位那條線沒字）：
+ *  每個記號旁邊直接寫它是什麼、標籤貼著自己的位置；會撞在一起就換一列放（字不准重疊——規則 9，selfcheck 量）。 */
+const RULER_BASIS = { 'P/S': '股價營收比（P/S）', 'EV/S': '企業價值營收比（EV/S）' };
+
 function rulerChart(view) {
   const own = tqLine(view, ':own_history_pctile');
   const d = own && own.datum;
@@ -2015,38 +1546,61 @@ function rulerChart(view) {
   const cohort = cd && cd.status === 'available' && typeof cd.value === 'number' && cd.value > 0
     && (cd.dependencies || {}).basis === dep.basis ? cd : null;
   const values = [det.min, det.max, det.median, det.multiple_today].concat(cohort ? [cohort.value] : []);
-  const lo = Math.min(...values) / 1.2;
-  const hi = Math.max(...values) * 1.2;
-  const L = 8, R = 312, Y = 30;
+  const lo = Math.min(...values) / 1.15;
+  const hi = Math.max(...values) * 1.15;
+  const L = 10, R = 310, Y = 30;
   const x = (v) => L + (Math.log(v) - Math.log(lo)) / (Math.log(hi) - Math.log(lo)) * (R - L);
-  const svg = svgEl('svg', { viewBox: '0 0 320 58', class: 'chart chart-ruler', role: 'img',
-    'aria-label': `自家三年 ${basis} 的位置` });
+  // 標籤排版：估字寬（中文 11px、其他 6.5px），三列（範圍上方、下方、再下方）依序找第一個放得下、不撞的位置。
+  const rows = { above: Y - 12, below: Y + 21, below2: Y + 36 };
+  const placed = { above: [], below: [], below2: [] };
+  const textWidth = (s) => Array.from(s).reduce((w, ch) => w + (ch.charCodeAt(0) >= 0x2000 ? 11 : 6.5), 0);
+  const labels = [];
+  const place = (text, at, align, prefer, strong) => {
+    const w = textWidth(text);
+    let x0 = align === 'start' ? at : align === 'end' ? at - w : at - w / 2;
+    x0 = Math.max(L - 6, Math.min(R + 6 - w, x0));
+    const row = prefer.find((name) => placed[name].every(([a, b]) => x0 + w + 6 <= a || b + 6 <= x0)) || prefer[prefer.length - 1];
+    placed[row].push([x0, x0 + w]);
+    labels.push({ text, x: x0, y: rows[row], strong });
+  };
+  const tx = x(det.multiple_today);
+  place(`今天 ${fmtMultiple(det.multiple_today)}`, tx, 'middle', ['above', 'below2'], true);
+  place(`最低 ${fmtMultiple(det.min)}`, x(det.min) - 4, 'start', ['below', 'below2']);
+  place(`最高 ${fmtMultiple(det.max)}`, x(det.max) + 4, 'end', ['below', 'below2']);
+  place(`中位 ${fmtMultiple(det.median)}`, x(det.median), 'middle', ['below', 'above', 'below2']);
+  const used = placed.below2.length ? rows.below2 : rows.below;
+  const Y2 = used + 22;
+  const height = cohort ? Y2 + 18 : used + 8;
+  const svg = svgEl('svg', { viewBox: `0 0 320 ${height}`, class: 'chart chart-ruler', role: 'img',
+    'aria-label': `今天的 ${basis} 在自家三年的位置` });
   svg.appendChild(svgEl('line', { x1: x(det.min), y1: Y, x2: x(det.max), y2: Y, class: 'ruler-range' }));
   svg.appendChild(svgEl('line', { x1: x(det.median), y1: Y - 8, x2: x(det.median), y2: Y + 8, class: 'ruler-median' }));
+  svg.appendChild(svgEl('circle', { cx: tx, cy: Y, r: 5.5, class: 'ruler-today' }));
+  labels.forEach((lab) => svg.appendChild(svgEl('text', { x: lab.x, y: lab.y, 'text-anchor': 'start',
+    class: lab.strong ? 'chart-label chart-label-strong' : 'chart-label' }, lab.text)));
   if (cohort) {
     const cx = x(cohort.value);
-    svg.appendChild(svgEl('path', { d: `M${cx} ${Y - 7}L${cx + 6} ${Y}L${cx} ${Y + 7}L${cx - 6} ${Y}Z`, class: 'ruler-cohort' }));
+    svg.appendChild(svgEl('line', { x1: L, y1: Y2, x2: R, y2: Y2, class: 'ruler-cohort-line' }));
+    svg.appendChild(svgEl('path', { d: `M${cx} ${Y2 - 7}L${cx + 6} ${Y2}L${cx} ${Y2 + 7}L${cx - 6} ${Y2}Z`, class: 'ruler-cohort' }));
+    const text = `同組中位 ${fmtMultiple(cohort.value)}`;
+    const right = cx + 12 + textWidth(text) <= R + 6;
+    svg.appendChild(svgEl('text', { x: right ? cx + 12 : cx - 12, y: Y2 + 4, 'text-anchor': right ? 'start' : 'end',
+      class: 'chart-label' }, text));
   }
-  const tx = x(det.multiple_today);
-  svg.appendChild(svgEl('circle', { cx: tx, cy: Y, r: 5.5, class: 'ruler-today' }));
-  const todayText = `今天 ${fmtMultiple(det.multiple_today)}`;
-  const anchor = tx < 60 ? 'start' : tx > 260 ? 'end' : 'middle';
-  svg.appendChild(svgEl('text', { x: anchor === 'start' ? Math.max(L, tx - 6) : anchor === 'end' ? Math.min(R, tx + 6) : tx,
-    y: Y - 13, 'text-anchor': anchor, class: 'chart-label chart-label-strong' }, todayText));
-  svg.appendChild(svgEl('text', { x: L, y: Y + 22, 'text-anchor': 'start', class: 'chart-label' }, `最低 ${fmtMultiple(det.min)}`));
-  svg.appendChild(svgEl('text', { x: R, y: Y + 22, 'text-anchor': 'end', class: 'chart-label' }, `最高 ${fmtMultiple(det.max)}`));
   const wrap = el('div', 'chart-wrap');
   wrap.appendChild(svg);
-  const legend = [`● 今天＝自家三年第 ${fmtNumber(d.value, 1)} 百分位`, `│ 中位 ${fmtMultiple(det.median)}`];
+  const legend = [`今天 ${fmtMultiple(det.multiple_today)} 倍＝自家近三年第 ${fmtNumber(d.value, 0)} 百分位：`
+    + `三年裡約 ${fmtNumber(d.value, 0)}% 的交易日倍數比今天低。`];
   if (cohort) {
     const cdet = (cohort.dependencies || {}).detail || {};
-    legend.push(`◆ 同組中位 ${fmtMultiple(cohort.value)}（${cdet.theme || '主題等權組'}，${cdet.n_same_basis || '?'}／${cdet.n_members || '?'} 檔同口徑）`);
+    legend.push(`同組＝${cdet.theme || '主題等權組'}（同口徑 ${cdet.n_same_basis || '?'} 檔，共 ${cdet.n_members || '?'} 檔），只當脈絡。`);
   } else {
-    legend.push('◆ 同組中位：沒有同口徑的主題等權組');
+    legend.push('同組中位：沒有同口徑的主題等權組。');
   }
-  const window_ = det.window_start && det.window_end ? `${String(det.window_start).slice(0, 10)} → ${String(det.window_end).slice(0, 10)}` : '三年';
-  legend.push(`${basis}、對數刻度、${window_}${det.samples ? `、${det.samples} 個樣本` : ''}`);
-  wrap.appendChild(el('div', 'chart-legend', legend.join('　')));
+  const window_ = det.window_start && det.window_end
+    ? `，${String(det.window_start).slice(0, 7)} → ${String(det.window_end).slice(0, 7)}` : '';
+  legend.push(`倍數＝${RULER_BASIS[basis] || basis}；刻度是對數（等距＝等倍數）${window_}。`);
+  legend.forEach((text) => wrap.appendChild(el('div', 'chart-legend', text)));
   return wrap;
 }
 
@@ -2090,7 +1644,9 @@ function revenueBars(view) {
   const det = (d.dependencies && d.dependencies.detail) || {};   // 幣別由序列自己帶（三題③），這裡只翻成中文
   const ccy = det.currency ? (CURRENCY_WORD[det.currency] || det.currency)
     : (Array.isArray(det.currencies) && det.currencies.length ? `（幣別混合：${det.currencies.join('／')}）` : '（幣別未標）');
-  const amount = `${fmtBig(last.value) || '—'}${ccy.startsWith('元') || ccy.startsWith('（') ? '' : ' '}${ccy}`;
+  const big = fmtBig(last.value) || '—';
+  // 「20.5 億」後面直接接「美元」，不留空格；數字結尾（例 9,800）才隔一格
+  const amount = `${big}${/[億萬]$/.test(big) || ccy.startsWith('元') || ccy.startsWith('（') ? '' : ' '}${ccy}`;
   const legend = [`柱高＝營收（最新一期 ${amount}）`, `顏色＝年增正負（最近三期：${recent}）`];
   if (d.dependencies && d.dependencies.basis) legend.push(`來源：${d.dependencies.basis}`);
   wrap.appendChild(el('div', 'chart-legend', legend.join('　')));
@@ -2661,29 +2217,8 @@ const READING_STATUS_TEXT = {
   current: '現行', stale: '跟圖不一致（該重讀）', stale_low: '只有證據等級變了（不必重讀）', expired: '過期（該重讀）',
 };
 
-function readingsCard(view) {
-  const panel = view.readings;
-  if (!panel) return null;
-  const node = panelShell(panel, '讀圖：它坐的那一層結構變了沒');
-  const hint = plainPanel('readings', panel.title).hint;
-  if (hint) node.appendChild(mdParagraph(hint));
-  if (!(panel.lines || []).length) {
-    node.appendChild(el('p', 'note', panel.reason || '還沒有讀圖'));
-    // 多數坐的層還沒有讀圖，但可能已經有層說明——沒讀圖這條路也要連得過去（個股頁 plan S4b）
-    const links = layerNoteLinks(panel.context || {});
-    if (links) node.appendChild(links);
-    return node;
-  }
-  node.appendChild(renderRows(panel.lines));
-  const glossary = unitGlossary();
-  if (glossary) node.appendChild(glossary);
-  const seats = (panel.context || {}).seats || [];
-  if (seats.length) node.appendChild(el('p', 'note', '圖上它供貨或開發的節點：' + seats.join('、')));
-  const links = layerNoteLinks(panel.context || {});
-  if (links) node.appendChild(links);
-  node.appendChild(el('p', 'note', '完整的引文與反證在「讀圖」頁（#/structure-readings）。'));
-  return node;
-}
+/* ⚠ 2026-10-08：個股頁的「讀圖」卡（`readingsCard`）拿掉——坐的層讀成什麼搬進「技術鏈」那一塊的展開（`seatsDetail`，
+   節點印名字不印 ID）；「圖上它供貨或開發的節點：tech:…」那一長串 ID 是給機器的，不再印。 */
 
 /* 坐的層有層說明的，連到閱讀頁（個股頁 plan S4b）。清單照 materialize 給的（與「坐的層」同一份、同一個順序）；
    讀不到 ledger 就說讀不到，不印成「沒有層說明」。 */
@@ -3913,6 +3448,8 @@ function selfCheck() {
   // 640px 以下的手機斷點在 390 與 496 都成立，限寬量到的就是手機版面。
   const vw = selfCheckWidth() || window.innerWidth;
   const doc = document.documentElement;
+  // `&open=1`：先把每個展開打開再量（塊底下的論證與數字也要在 390px 不溢出、不疊字）。
+  if (/[?&]open=1\b/.test(window.location.search)) app.querySelectorAll('details').forEach((d) => { d.open = true; });
   const offenders = [];
   const scrollsX = (node) => {
     for (let p = node.parentElement; p && p !== document.body; p = p.parentElement) {

@@ -137,11 +137,19 @@ def test_provider_narrative_context_is_optional_and_failures_only_warn() -> None
     assert [c["claim_id"] for c in out] == ["b", "a"], "關於公司本身的 claim 先排"
 
 
-def test_app_has_three_tiers_in_order() -> None:
+def test_argument_paragraphs_live_in_their_blocks_without_arithmetic() -> None:
+    """論證三段（這條鏈怎麼走／風險與認錯條件／時間表）2026-10-08 起住在十三塊裡各自那一塊的展開
+    （需求傳導／錯了怎麼知道／接下來看什麼；原本是頁尾一張「憑什麼這樣想」卡）。照印、不算。"""
     source = (ROOT / "webapp" / "static" / "app.js").read_text(encoding="utf-8")
-    block = source.split("async function renderDetail", 1)[1]
-    block = re.split(r"\n(?:async )?function ", block, maxsplit=1)[0]
-    assert block.index("briefCard(") < block.index("argumentCard(") < block.index("drill(")
-    card = source.split("function argumentCard", 1)[1].split("\nasync function renderDetail", 1)[0]
+
+    def body(name: str) -> str:
+        part = source.split(f"function {name}(", 1)[1]
+        return re.split(r"\n(?:async )?function ", part, maxsplit=1)[0]
+
+    for fn, key in (("chainDetail", "'argument:chain'"), ("downsideDetail", "'argument:risks'"),
+                    ("timelineDetail", "'argument:timeline'")):
+        assert key in body(fn) and "argumentSection(" in body(fn), f"{fn} 沒接到 {key}"
+    card = body("argumentSection")
+    assert "deps.citations" in card and "引文（圖裡的 claim，照抄）" in card
     for token in ("fair_value /", "/ price", "value - ", "value / ", "Math.pow"):
         assert token not in card, token

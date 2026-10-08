@@ -746,11 +746,12 @@ def test_markdown_prints_the_own_history_coverage_on_the_audit_line() -> None:
 
 def test_frontend_series_points_cover_all_three_shapes_and_the_lamp_label_fallback() -> None:
     source = (Path(__file__).resolve().parents[1] / "webapp" / "static" / "app.js").read_text(encoding="utf-8")
-    point = source.split("const TQ_POINT_KEYS", 1)[1].split("function threeQuestionsCard", 1)[0]
+    point = source.split("const TQ_POINT_KEYS", 1)[1].split("function tqNumbers", 1)[0]
     for key in ("period_end", "data_month", "revenue_twd_thousand", "available_on", "revenue_mix", "derived"):
         assert key in point, f"三題序列少認了 {key}（alpha/three_questions.py 會產這個鍵）"
     assert "keyValueList(rest)" in point, "認不得的鍵要照印，不得濾掉（INV-3）"
-    wipe = source.split("function wipeoutBlock", 1)[1].split("\nfunction ", 1)[0]
+    # 2026-10-08：四盞燈只剩首屏「會不會死」那一份（`lampsBlock`；原稽核區的 `wipeoutBlock` 隨稽核區拿掉）
+    wipe = source.split("function lampsBlock", 1)[1].split("\nfunction ", 1)[0]
     assert "plainLine(line.key, line.display_label)" in wipe, "燈名的 fallback 要傳進 plainLine（否則印內部 key）"
 
 
@@ -865,15 +866,18 @@ def test_frontend_guards_for_the_second_review_round() -> None:
     source = (Path(__file__).resolve().parents[1] / "webapp" / "static" / "app.js").read_text(encoding="utf-8")
     point = source.split("const TQ_POINT_KEYS", 1)[1].split("function tqPoint", 1)[0]
     assert "x >= 0 && x <= 1" in point, "占比只對 0–1 的數字 ×100（金額不得印成百分比）"
-    card = source.split("function downsideCard", 1)[1].split("\nfunction ", 1)[0]
-    assert "c.description" in card and "c.expected_at" in card and "c.label, c.due, c.state" not in card
-    # 沒有反證列時的標題（含回看那天不推）在 Phase 7 Step 7.0e 抽成一個函式，卡片與首屏③共用（L16）
+    # 2026-10-08：反證卡（`downsideCard`）搬進「錯了怎麼知道」那一塊的展開（`downsideDetail`）；催化劑搬到「接下來看什麼」
+    # （`timelineDetail`）——欄位仍是 description／expected_at，不是內部狀態字。
+    card = source.split("function downsideDetail", 1)[1].split("\nfunction ", 1)[0]
+    timeline = source.split("function timelineDetail", 1)[1].split("\nfunction ", 1)[0]
+    assert "c.description" in timeline and "c.expected_at" in timeline and "c.label, c.due, c.state" not in timeline
+    # 沒有反證列時的標題（含回看那天不推）在 Phase 7 Step 7.0e 抽成一個函式，展開與首屏共用（L16）
     head = source.split("function downsideAbsenceHead", 1)[1].split("\nfunction ", 1)[0]
     assert "downsideAbsenceHead(panel)" in card and "point_in_time_unavailable" in head
-    readiness = source.split("function renderReadiness", 1)[1].split("\nfunction ", 1)[0]
-    assert "plainPanel(key" in readiness and "沒有 entry 判準" not in readiness
-    tq = source.split("function threeQuestionsCard", 1)[1].split("\nfunction ", 1)[0]
-    assert "keyValueList(deps.detail)" in tq, "敘事引用的倍數與中位數要在稽核區核對得到"
+    # readiness 那張卡（`renderReadiness`）隨「完整細節」拿掉——判準原文留在 API（給查核的，不必有畫面）
+    assert "function renderReadiness(" not in source
+    tq = source.split("function tqNumbers", 1)[1].split("\nfunction ", 1)[0]
+    assert "detailList(deps.detail)" in tq, "敘事引用的倍數與中位數要在「數字與出處」核對得到"
 
 
 
