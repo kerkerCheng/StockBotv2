@@ -1621,6 +1621,24 @@
         "Reinhausen",
         "Maschinenfabrik Reinhausen"
       ]
+    },
+    {
+      "_display_name_source": "yfinance longName（2026-10-08）；交易所 NMS",
+      "_note": "名冊批次草稿（2026-10-08）：被點名未登記裡系統口徑邊緣、lead 把它放在供給側的兩家（MaxLinear：光模組 DSP／TIA；Ouster：光達）——登記後點名它們的 lead 才對得上、讀圖與敘事引用得到；系統口徑 edge（約 97.4 億美元、分析師 11 家）；lead：lead_20eb32acaf78ffb751ee07966e185534",
+      "company_id": "co:maxlinear",
+      "display_name": "MaxLinear, Inc.",
+      "market_currency": "USD",
+      "name_aliases": [],
+      "research_ticker": "MXL"
+    },
+    {
+      "_display_name_source": "yfinance longName（2026-10-08）；交易所 NMS",
+      "_note": "名冊批次草稿（2026-10-08）：被點名未登記裡系統口徑邊緣、lead 把它放在供給側的兩家（MaxLinear：光模組 DSP／TIA；Ouster：光達）——登記後點名它們的 lead 才對得上、讀圖與敘事引用得到；系統口徑 edge（約 30.0 億美元、分析師 5 家）；lead：lead_44d33f5c904cb1fb75c452098d739e55",
+      "company_id": "co:ouster",
+      "display_name": "Ouster, Inc.",
+      "market_currency": "USD",
+      "name_aliases": [],
+      "research_ticker": "OUST"
     }
   ]
 }
