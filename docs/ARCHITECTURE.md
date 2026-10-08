@@ -759,11 +759,14 @@ AnalystView.brief（optional）→ APP 首屏 briefCard；六張卡收進「為�
   （`confirm_rows`；每條要印的那一句由 `confirm_line` 在 materialize 端組好、前端照印——`app.js` 的全檔部位用語禁字檢查不放寬，
   這類字只住封閉字彙旁邊）。為什麼不另開 `confirm_ref` 欄位：用 `disproof_ref` 的地方有八處，另開欄位漏改任何一處，加碼條件就會叫不醒、
   沒人消費（INV-4）；標錯字的代價比等待消失小。
-- **首屏五題（2026-10-04 Phase 7 Step 7.0e，使用者 A1）**：v2 短評的首屏照五題排——①這一檔押的是什麼 ②押對了夠大嗎
-  ③錯了怎麼知道、哪天知道 ④會不會死 ⑤是不是新賭注。**標題與「哪一格放哪一題」只有一份**
-  （`briefing/analyst_view/contracts.py::FIRST_SCREEN_QUESTIONS`，七格各放一次；`FIRST_SCREEN_PARTS` 是題下既有元件的封閉字彙：
-  三個字、歸零燈、反證列、加碼條件、是不是新賭注），經 `.meta.json` 給 APP，app.js 不留第二份；只**重排**既有句子與燈，不改任何
-  Datum、不改 ledger。帶不齊對照表每一格的頁（v1 短評、舊 `.meta.json`）照舊版面。
+- **首屏（2026-10-08 個股頁 S5a，使用者選 B；取代 2026-10-04 Phase 7 Step 7.0e 的首屏五題）**：v2 短評的首屏照個股頁 schema
+  的十三塊排成四段——論點（B1 押什麼）／營收從哪來 → 事件 → 怎麼被定價（B3、B5、B6）／深入（B2 需求傳導、B4 技術鏈、B12 量 → 錢 → 價）／
+  清單（B7 夠大嗎、B8 錯了怎麼知道、B9 會不會死、B10 是不是新賭注、B11 接下來看什麼）；B0 頁首是候選狀態那一行。
+  **段與「哪一格放哪一塊」只有一份**（`briefing/analyst_view/page_schema.py::FIRST_SCREEN_SECTIONS`／`BLOCK_READINGS`：v2 七格與
+  `FIRST_SCREEN_PARTS` 的元件各放一次；沒有句子來源的塊宣告 `pending`——研究的塊印「還沒寫」、要 S3 機械資料的塊印「還沒做」），
+  經 `.meta.json` 的 `page_schema.first_screen` 給 APP，app.js 不留第二份；每塊底下一個展開列這一塊的格（照抄填得滿表：有值或具名缺席）。
+  只**重排**既有句子與燈，不改任何 Datum、不改 ledger。帶不齊合約每一格的頁（v1 短評、舊 `.meta.json`）照舊版面。
+  五題的 `FIRST_SCREEN_QUESTIONS` 已刪（兩份並存＝兩個 owner，L16）。
 - **是不是新賭注（同上，使用者 A3）**：候選推導多一格 `shared_bet`——這一檔和每一檔**持有的 alpha 檔**（`held_index`）共用的需求錨與
   層／插槽，依 ticker 字母列，**不打分、不排序、不加權、不進候選狀態前提**。需求錨只取結構表逐列的 `demand_anchor`／`anchor_basis`
   （唯一來源；materialize 讀**同一輪** `--structure-table` 寫下的 artifact——`webapp/materialize.py::bet_structure`，不另開連線重算），

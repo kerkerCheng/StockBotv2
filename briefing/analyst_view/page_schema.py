@@ -181,6 +181,46 @@ ELEMENTS: tuple[PageElement, ...] = (
 )
 
 
+@dataclass(frozen=True)
+class BlockReading:
+    """一塊的「一句讀法」從哪來（個股頁 S5，2026-10-08；規則 7：研究寫、沒寫印「還沒寫」）。
+
+    `slots`＝v2 敘事的格（依序）、`parts`＝`FIRST_SCREEN_PARTS` 的既有元件；兩者都空時印 `pending`（產生端宣告的缺席句，
+    研究的塊寫「還沒寫」、要 S3 機械資料的塊寫「還沒做」）。只是**呈現位置**：不排序、不打分、不進候選狀態的前提。
+    """
+    block: str
+    slots: tuple[str, ...] = ()
+    parts: tuple[str, ...] = ()
+    pending: str | None = None
+
+
+#: 首屏（個股頁 S5，2026-10-08；使用者選 B：S5 先做、S3 那幾格先印「還沒做」）。形式照 brainstorm §5 回饋 #11：
+#: 論點一句＋短文（營收從哪來 → 事件 → 怎麼被定價）＋深入入口＋清單（夠大嗎、錯了怎麼知道、會不會死、是不是新賭注、接下來看什麼）。
+#: B0 是頁首（候選狀態那一行），不在段裡。**「哪一格放哪一塊」只有這一份**——取代 Phase 7 Step 7.0e 的首屏五題
+#: （①→論點、②③④⑤→清單；②裡的 demand 與 priced_in 移到深入的需求傳導與短文的怎麼被定價）。
+FIRST_SCREEN_SECTIONS: tuple[Mapping[str, Any], ...] = (
+    {"key": "thesis", "title": "論點", "blocks": ("B1",)},
+    {"key": "essay", "title": "營收從哪來 → 事件 → 怎麼被定價", "blocks": ("B3", "B5", "B6")},
+    {"key": "deep", "title": "深入", "blocks": ("B2", "B4", "B12")},
+    {"key": "checklist", "title": "清單", "blocks": ("B7", "B8", "B9", "B10", "B11")},
+)
+
+BLOCK_READINGS: tuple[BlockReading, ...] = (
+    BlockReading("B1", slots=("our_bet", "bottleneck", "position")),
+    BlockReading("B2", slots=("demand",)),
+    BlockReading("B3", pending="還沒寫：營收結構的一句讀法要研究寫，產品、地區、客戶比例的機械資料在個股頁 S3（還沒做）"),
+    BlockReading("B4", pending="還沒寫：技術鏈的一句讀法要研究寫；坐的層有層說明時，展開裡連得過去"),
+    BlockReading("B5", pending="還沒寫：事件與影響多大的一句讀法要研究寫；相對同組的反應在個股頁 S3（還沒做）"),
+    BlockReading("B6", slots=("priced_in",), parts=("priced_in",)),
+    BlockReading("B7", slots=("what_must_be_true",), parts=("in_numbers",)),
+    BlockReading("B8", parts=("disproof", "confirm")),
+    BlockReading("B9", parts=("will_it_die", "wipeout")),
+    BlockReading("B10", parts=("shared_bet",)),
+    BlockReading("B11", slots=("when",)),
+    BlockReading("B12", pending="還沒做：量 → 錢 → 價要個股頁 S3 的機械資料（營收階梯）"),
+)
+
+
 #: 證據等級對照表（§5.2 S2）：圖外字彙 ↔ `evidence_class`。值是「圖上對得上的 evidence_class」；空 tuple＝圖上沒有這一類
 #: （共識是時變數字，不入圖——L4；學理、推一步、沒有不是文件來源）。
 EVIDENCE_LEVEL_MAP: Mapping[str, Mapping[str, Any]] = {
@@ -202,6 +242,35 @@ EVIDENCE_LEVEL_MAP: Mapping[str, Mapping[str, Any]] = {
 # ---------------------------------------------------------------------------
 # 合約自檢（封閉性；測試與 materialize 都跑）
 # ---------------------------------------------------------------------------
+
+def _first_screen_problems(block_keys: Sequence[str]) -> list[str]:
+    """首屏的不變式（S5）：B1–B12 各在一段、各有一份讀法來源；v2 敘事七格與首屏元件各放一次，不漏不重；
+    沒有任何句子來源的塊必須宣告 `pending`（沒寫印「還沒寫」，規則 7），有來源的塊不得再宣告。"""
+    from alpha.narrative.contracts import SLOT_KEYS_V2
+    from briefing.analyst_view.contracts import FIRST_SCREEN_PARTS
+
+    problems: list[str] = []
+    placed = [key for section in FIRST_SCREEN_SECTIONS for key in section["blocks"]]
+    expected = [key for key in block_keys if key != "B0"]
+    if sorted(placed) != sorted(expected) or len(placed) != len(set(placed)):
+        problems.append(f"首屏的段沒有把 B1–B12 各放一次：{placed}")
+    readings = {r.block: r for r in BLOCK_READINGS}
+    if len(readings) != len(BLOCK_READINGS) or sorted(readings) != sorted(expected):
+        problems.append(f"首屏讀法要 B1–B12 各一份：{sorted(readings)}")
+    slots = [s for r in BLOCK_READINGS for s in r.slots]
+    if sorted(slots) != sorted(SLOT_KEYS_V2) or len(slots) != len(set(slots)):
+        problems.append(f"v2 敘事七格要各放一次：{slots}")
+    parts = [p for r in BLOCK_READINGS for p in r.parts]
+    if sorted(parts) != sorted(FIRST_SCREEN_PARTS) or len(parts) != len(set(parts)):
+        problems.append(f"首屏元件要各放一次：{parts}")
+    for r in BLOCK_READINGS:
+        has_source = bool(r.slots or r.parts)
+        if has_source and r.pending:
+            problems.append(f"{r.block} 有句子來源又宣告了 pending")
+        if not has_source and not (r.pending or "").strip():
+            problems.append(f"{r.block} 沒有句子來源、也沒宣告沒有時印什麼（規則 7）")
+    return problems
+
 
 def check_schema() -> list[str]:
     """合約自己的不變式。空 list＝通過。拿掉任何一個元素的缺席宣告、單位或資料源都會在這裡現形。"""
@@ -238,6 +307,7 @@ def check_schema() -> list[str]:
         for spec in element.lines:
             if not (spec.startswith("@") or "/" in spec):
                 problems.append(f"{label} 的 line 宣告 {spec!r} 要寫成 <panel>/<key glob> 或 @<extra>")
+    problems.extend(_first_screen_problems(block_keys))
     if set(EVIDENCE_LEVEL_MAP) != set(EVIDENCE_LEVELS):
         problems.append(f"證據等級對照表的圖外字彙與 EVIDENCE_LEVELS 不一致：{sorted(set(EVIDENCE_LEVEL_MAP) ^ set(EVIDENCE_LEVELS))}")
     covered = {cls for row in EVIDENCE_LEVEL_MAP.values() for cls in row["graph"]}
@@ -315,9 +385,17 @@ def schema_payload() -> dict[str, Any]:
                       "absence": e.absence, "looked": e.looked} for e in ELEMENTS],
         "evidence_level_map": {k: {"label": v["label"], "graph": list(v["graph"]), "note": v["note"]}
                                for k, v in EVIDENCE_LEVEL_MAP.items()},
+        # 首屏（S5）：段的順序與每塊的讀法來源——app.js 照這裡排，不留第二份（L16）
+        "first_screen": {
+            "sections": [{"key": s["key"], "title": s["title"], "blocks": list(s["blocks"])}
+                         for s in FIRST_SCREEN_SECTIONS],
+            "readings": {r.block: {"slots": list(r.slots), "parts": list(r.parts), "pending": r.pending}
+                         for r in BLOCK_READINGS},
+        },
     }
 
 
-__all__ = ["BLOCKS", "DECLARABLE_ABSENCES", "ELEMENTS", "EVIDENCE_LEVEL_MAP", "PAGE_SCHEMA_VERSION", "PageBlock",
+__all__ = ["BLOCKS", "BLOCK_READINGS", "BlockReading", "DECLARABLE_ABSENCES", "ELEMENTS", "EVIDENCE_LEVEL_MAP",
+           "FIRST_SCREEN_SECTIONS", "PAGE_SCHEMA_VERSION", "PageBlock",
            "PageElement", "SOURCES", "UNITS", "VALUE_STATUSES", "check_schema", "fill_summary", "fill_table",
            "schema_payload"]

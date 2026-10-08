@@ -554,7 +554,7 @@ function renderResearch(view) {
   const rows = (panel.lines || []).filter((line) => line.role === 'thesis' || line.role === 'lifecycle');
   if (rows.length) node.appendChild(renderRows(rows));
 
-  // 舊 session 判讀的反證（`panel.disproofs`）2026-10-01 Phase 4 Step 4.7a 退役：恆「未盯」。反證住「錯了怎麼知道」面板。
+  // 舊 session 判讀的反證（`panel.disproofs`）2026-10-01 Phase 4 Step 4.7a 退役：恆「未盯」。反證住 downside 面板。
   if (panel.catalysts && panel.catalysts.length) {
     node.appendChild(group(`催化劑（${panel.catalysts.length}）`, () => listOf(
       panel.catalysts.map((c) => [c.description || c.label, c.expected_at || c.due, c.date_confidence, c.state]
@@ -1112,9 +1112,10 @@ function briefCard(payload, view) {
   // AGENTS D3 的判準沒有退役——`realized` 只提醒、不觸發出場；它現在的家是心跳段 2 的候選狀態板。
   // Phase 7 Step 7.0e：v2 短評照五題排（對照表只住 contracts，經 `.meta.json` 帶來）；其餘照舊一格一行。
   const available = Boolean(panel && panel.context && panel.context.available);
-  const questions = available ? firstScreenQuestions(panel) : null;
-  if (questions) {
-    node.appendChild(fiveQuestions(view, panel, questions));
+  // 個股頁 S5（2026-10-08）：首屏照 page_schema 的段與塊排（取代 Phase 7 Step 7.0e 的五題）；v1 短評照舊一格一行。
+  const screen = available ? schemaFirstScreen(payload, view, panel) : null;
+  if (screen) {
+    node.appendChild(screen);
   } else if (available) {
     const story = el('div', 'story');
     (panel.lines || []).filter((line) => line.key.indexOf('brief:') === 0)
@@ -1137,7 +1138,7 @@ function briefCard(payload, view) {
   // ROADMAP「個股頁」對照表把它們列進「拿掉」：尺上是現價／沒賭對／賭對／判斷錯了，
   // 計算框問的是「這個結構允不允許翻倍」——兩者都建在估值鏈與多年反向橋上。
   // 接手的是末行候選狀態與財務三題三個字（Phase 3 Step 3.7，下面這一行）。
-  const line = candidateLine(view, Boolean(questions));
+  const line = candidateLine(view, Boolean(screen));
   if (line) node.appendChild(line);
   // 走勢圖留下來：它是**脈絡**不是訊號（AGENTS「量測、訊號、脈絡三分」）。
   node.appendChild(priceCard(payload));
@@ -1154,33 +1155,102 @@ function storyRow(line) {
   return row;
 }
 
-/** 首屏五題（Phase 7 Step 7.0e；使用者 2026-10-04 A1）：標題與「哪一格放哪一題」**只有 contracts 那一份**
- * （`.meta.json` 的 `first_screen_questions`；app.js 不留第二份，L16）。這一頁的短評帶齊對照表放的每一格才用五題版面——
- * v1 短評（格不同）與還沒有對照表的舊 `.meta.json` 照舊版面，不猜、不補。 */
-function firstScreenQuestions(panel) {
-  const table = (VOCAB && VOCAB.first_screen_questions) || null;
-  if (!Array.isArray(table) || !table.length) return null;
-  const keys = new Set((panel.lines || []).map((line) => line.key));
-  return table.every((q) => (q.slots || []).every((slot) => keys.has('brief:' + slot))) ? table : null;
-}
-
-/** 五題依序：每題底下先放短評的那幾格（對照表的順序），再放既有的元件（`parts`，封閉字彙）。不改任何一格、不加字。 */
-function fiveQuestions(view, panel, table) {
+/** 首屏（個股頁 S5，2026-10-08；取代 Phase 7 Step 7.0e 的五題）：段的順序與每塊的讀法來源**只有 page_schema 那一份**
+ * （`.meta.json` 的 `page_schema.first_screen`；app.js 不留第二份，L16）。每塊＝塊名（滑過看它問什麼）＋一句讀法
+ * （v2 敘事的格、既有元件；都沒有就照印合約宣告的「還沒寫／還沒做」）＋一個展開（這一塊的格，照抄填得滿表）。
+ * 這一頁的短評沒帶齊合約放的每一格（v1 短評）或 `.meta.json` 是舊的——回 null，照舊版面，不猜、不補。 */
+function schemaFirstScreen(payload, view, panel) {
+  const schema = VOCAB && VOCAB.page_schema;
+  const screen = schema && schema.first_screen;
+  if (!screen || !Array.isArray(screen.sections) || !screen.sections.length) return null;
   const lines = lineMap(panel);
-  const box = el('div', 'five-questions');
-  table.forEach((q) => {
-    const section = el('div', 'fq');
-    section.appendChild(el('h3', 'fq-title', q.title));
-    const story = el('div', 'story');
-    (q.slots || []).forEach((slot) => { if (lines['brief:' + slot]) story.appendChild(storyRow(lines['brief:' + slot])); });
-    if (story.childNodes.length) section.appendChild(story);
-    (q.parts || []).forEach((part) => questionPart(view, part).forEach((n) => section.appendChild(n)));
-    box.appendChild(section);
+  const readings = screen.readings || {};
+  const slots = [];
+  Object.keys(readings).forEach((key) => (readings[key].slots || []).forEach((slot) => slots.push(slot)));
+  if (!slots.every((slot) => lines['brief:' + slot])) return null;
+  const blocks = {};
+  (schema.blocks || []).forEach((block) => { blocks[block.key] = block; });
+  const box = el('div', 'schema-screen');
+  screen.sections.forEach((section) => {
+    const sec = el('div', 'ss-section ss-' + section.key);
+    sec.appendChild(el('div', 'ss-section-title', section.title));
+    (section.blocks || []).forEach((key) => {
+      const block = blocks[key] || { key, title: key, question: '' };
+      sec.appendChild(schemaBlock(payload, view, lines, block, readings[key] || {}));
+    });
+    box.appendChild(sec);
   });
   return box;
 }
 
-/** 五題裡的既有元件（字全由 materialize 端給）。認不得的元件名照印出來，不靜默略過（INV-3）。 */
+/** 一塊：讀法（短評的格依序、再放既有元件）；兩者都沒有就印合約的 pending。不改任何一格、不加字。 */
+function schemaBlock(payload, view, lines, block, reading) {
+  const node = el('div', 'fq ss-block');
+  const head = el('h3', 'fq-title', block.title);
+  if (block.question) head.title = block.question;
+  node.appendChild(head);
+  const story = el('div', 'story');
+  (reading.slots || []).forEach((slot) => { if (lines['brief:' + slot]) story.appendChild(storyRow(lines['brief:' + slot])); });
+  if (story.childNodes.length) node.appendChild(story);
+  (reading.parts || []).forEach((part) => questionPart(view, part).forEach((n) => node.appendChild(n)));
+  if (!(reading.slots || []).length && !(reading.parts || []).length) {
+    node.appendChild(el('div', 'row-reason ss-pending', reading.pending || '還沒寫'));
+  }
+  const cells = blockCells(payload, view, block);
+  if (cells) node.appendChild(cells);
+  return node;
+}
+
+/** 一塊的格（展開層）：照抄填得滿表——有值印承載它的 line 的值（結構化的值不在這裡攤開，同一份在稽核區），
+ * 缺席印分型與「在哪裡找過」。不判、不算、不排序。 */
+function blockCells(payload, view, block) {
+  const schema = VOCAB && VOCAB.page_schema;
+  const fill = payload.page_fill;
+  if (!schema || !fill || !Array.isArray(fill.rows)) return null;
+  const elements = (schema.elements || []).filter((e) => e.block === block.key);
+  if (!elements.length) return null;
+  const byKey = {};
+  fill.rows.forEach((row) => { byKey[row.element] = row; });
+  const valued = elements.filter((e) => (byKey[e.key] || {}).state === 'value').length;
+  return drill(`這一塊的格：${elements.length} 格，有值 ${valued}、缺席 ${elements.length - valued}`, () => {
+    const list = el('div', 'ss-cells');
+    elements.forEach((element) => {
+      const row = byKey[element.key] || {};
+      const line = el('div', 'attention-body');
+      line.appendChild(document.createTextNode(`${row.state === 'value' ? '●' : '○'} ${element.label}　`));
+      if (row.state === 'value') {
+        line.appendChild(el('span', 'dim', cellValueText(view, row.lines || [])));
+      } else {
+        const badge = absenceBadge(row.absence_kind);
+        if (badge) line.appendChild(badge);
+        if (row.looked) line.appendChild(document.createTextNode(`　找過：${row.looked}`));
+      }
+      list.appendChild(line);
+    });
+    return list;
+  });
+}
+
+/** 有值那一格的字：承載它的 line 的值（字串或數字照印、最多三條）；結構化的值指去稽核區，不在這裡另組字。 */
+function cellValueText(view, keys) {
+  const index = {};
+  Object.keys(view || {}).forEach((name) => {
+    const panel = view[name];
+    if (panel && Array.isArray(panel.lines)) panel.lines.forEach((line) => { index[line.key] = line; });
+  });
+  const parts = [];
+  keys.slice(0, 3).forEach((key) => {
+    const line = index[key];
+    const d = line && line.datum;
+    if (d && (typeof d.value === 'string' || typeof d.value === 'number')) {
+      const text = truncate(String(valueText(d) || d.value), 80);
+      if (parts.indexOf(text) < 0) parts.push(text);   // 兩條 line 承載同一句（例：敘事的 our_bet 與賭注面板）只印一次
+    }
+  });
+  return parts.length ? parts.join('｜') : '有值（細節在稽核區）';
+}
+
+/** 首屏塊裡的既有元件（字全由 materialize 端給）。認不得的元件名照印出來，不靜默略過（INV-3）。 */
 function questionPart(view, part) {
   const lines = view.candidate ? lineMap(view.candidate) : {};
   const state = lines['candidate:state'] && lines['candidate:state'].datum;

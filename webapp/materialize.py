@@ -1904,7 +1904,7 @@ def write_vocabularies(store: ArtifactStore | None = None) -> Path:
     from alpha.absence import ABSENCE_KINDS, SETTLED_ABSENCE_KINDS
     from alpha.candidates import LIST_GROUP_LABELS, LIST_GROUPS
     from briefing.analyst_view.contracts import (
-        ACCOUNTING_BASIS_DISPLAY, CORE_PANELS, FIRST_SCREEN_QUESTIONS, OPTIONAL_PANELS, PLAIN_ABSENCE_SHORT,
+        ACCOUNTING_BASIS_DISPLAY, CORE_PANELS, OPTIONAL_PANELS, PLAIN_ABSENCE_SHORT,
         PLAIN_BET_UNITS, PLAIN_LINE_LABELS, PLAIN_PANEL_TITLES, PLAIN_PRICED_IN, PLAIN_READINESS,
         PRICE_SERIES_NOTE, QUESTIONS,
         WEAK_INPUT_RULES,
@@ -1925,9 +1925,7 @@ def write_vocabularies(store: ArtifactStore | None = None) -> Path:
         "plain_bet_units": dict(PLAIN_BET_UNITS),
         # 「已定價嗎」的白話（Phase 7 Step 7.0c）：首屏三個字底下與稽核區那一題的標題旁各印一次，APP 不留第二份
         "plain_priced_in": PLAIN_PRICED_IN,
-        # 個股頁首屏五題（Phase 7 Step 7.0e）：標題與「哪一格放哪一題」只有 contracts 那一份，APP 照這個順序排
-        "first_screen_questions": [{**q, "slots": list(q["slots"]), "parts": list(q["parts"])}
-                                   for q in FIRST_SCREEN_QUESTIONS],
+        # ⚠ 2026-10-08（個股頁 S5）：首屏五題退役——首屏的段與每塊讀法來源住 `page_schema.first_screen`（下面），只有一份
         "plain_readiness": {k: dict(v) for k, v in PLAIN_READINESS.items()},
         # ⚠ 2026-09-23（Phase 0 Step 0b.1b）：plain_stance／plain_driver_labels／plain_multiple_derivation
         # 三份白話層隨估值鏈退役。

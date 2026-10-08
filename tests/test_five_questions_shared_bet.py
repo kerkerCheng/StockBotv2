@@ -15,7 +15,8 @@ import pytest
 from alpha.narrative.contracts import SLOT_KEYS_V2
 from alpha.providers.candidates import bet_index, shared_bet
 from alpha.providers.structure_readings import seats_from_edges
-from briefing.analyst_view.contracts import FIRST_SCREEN_PARTS, FIRST_SCREEN_QUESTIONS
+from briefing.analyst_view.contracts import FIRST_SCREEN_PARTS
+from briefing.analyst_view.page_schema import BLOCK_READINGS, BLOCKS, FIRST_SCREEN_SECTIONS
 
 ROOT = Path(__file__).resolve().parents[1]
 APP_JS = ROOT / "webapp" / "static" / "app.js"
@@ -44,24 +45,27 @@ SEATS = {A: [LAYER], B: [LAYER, OTHER], C: [SOCKET], D: [OTHER]}
 
 
 # ---------------------------------------------------------------------------
-# 五題：對照只有一份
+# 首屏：對照只有一份（2026-10-08 個股頁 S5 起住 page_schema；五題退役，①→論點、②③④⑤→清單）
 # ---------------------------------------------------------------------------
 
-def test_five_questions_place_every_v2_slot_exactly_once_in_the_plan_order() -> None:
-    assert [q["key"] for q in FIRST_SCREEN_QUESTIONS] == ["what_bet", "big_enough", "how_wrong", "will_it_die",
-                                                          "new_bet"]
-    slots = [s for q in FIRST_SCREEN_QUESTIONS for s in q["slots"]]
+def test_the_first_screen_places_every_v2_slot_and_part_exactly_once() -> None:
+    assert [s["key"] for s in FIRST_SCREEN_SECTIONS] == ["thesis", "essay", "deep", "checklist"]
+    slots = [s for r in BLOCK_READINGS for s in r.slots]
     assert sorted(slots) == sorted(SLOT_KEYS_V2) and len(slots) == len(set(slots))     # 七格各放一次，不漏不重
-    parts = [p for q in FIRST_SCREEN_QUESTIONS for p in q["parts"]]
+    parts = [p for r in BLOCK_READINGS for p in r.parts]
     assert sorted(parts) == sorted(FIRST_SCREEN_PARTS) and len(parts) == len(set(parts))
-    by_key = {q["key"]: q for q in FIRST_SCREEN_QUESTIONS}
-    # plan §5 第 2 項的對照（①押什麼：our_bet，bottleneck／position 收在題下；②翻倍條件、demand、已定價；③when）
-    assert by_key["what_bet"]["slots"] == ("our_bet", "bottleneck", "position")
-    assert by_key["big_enough"]["slots"] == ("what_must_be_true", "demand", "priced_in")
-    assert by_key["big_enough"]["parts"] == ("priced_in", "in_numbers")
-    assert by_key["how_wrong"]["slots"] == ("when",) and by_key["how_wrong"]["parts"] == ("disproof", "confirm")
-    assert by_key["will_it_die"]["parts"] == ("will_it_die", "wipeout")
-    assert by_key["new_bet"]["parts"] == ("shared_bet",)
+    by_block = {r.block: r for r in BLOCK_READINGS}
+    # 原五題的對照照搬到塊（brainstorm §5 回饋 #11 的首屏形式）：①押什麼→論點 B1；②夠大嗎→B7（demand 進深入的 B2、priced_in 進短文的 B6）；
+    # ③錯了怎麼知道→B8（when 進接下來看什麼 B11）；④會不會死→B9；⑤是不是新賭注→B10
+    assert by_block["B1"].slots == ("our_bet", "bottleneck", "position")
+    assert by_block["B7"].slots == ("what_must_be_true",) and by_block["B7"].parts == ("in_numbers",)
+    assert by_block["B2"].slots == ("demand",) and by_block["B6"].slots == ("priced_in",)
+    assert by_block["B6"].parts == ("priced_in",)
+    assert by_block["B8"].parts == ("disproof", "confirm") and by_block["B11"].slots == ("when",)
+    assert by_block["B9"].parts == ("will_it_die", "wipeout") and by_block["B10"].parts == ("shared_bet",)
+    # 沒有句子來源的塊照合約印 pending（規則 7）；S3 的塊寫「還沒做」
+    assert all(r.pending for r in BLOCK_READINGS if not (r.slots or r.parts))
+    assert "還沒做" in by_block["B12"].pending
 
 
 def test_the_meta_carries_the_one_copy_and_app_js_keeps_none(tmp_path: Path) -> None:
@@ -69,18 +73,26 @@ def test_the_meta_carries_the_one_copy_and_app_js_keeps_none(tmp_path: Path) -> 
     from webapp.store import ArtifactStore
 
     meta = json.loads(write_vocabularies(ArtifactStore(tmp_path)).read_text(encoding="utf-8"))
-    assert meta["first_screen_questions"] == [{**q, "slots": list(q["slots"]), "parts": list(q["parts"])}
-                                              for q in FIRST_SCREEN_QUESTIONS]
+    assert "first_screen_questions" not in meta                                 # 退役的那一份不再出貨
+    screen = meta["page_schema"]["first_screen"]
+    assert [s["key"] for s in screen["sections"]] == [s["key"] for s in FIRST_SCREEN_SECTIONS]
+    assert screen["readings"]["B1"]["slots"] == ["our_bet", "bottleneck", "position"]
+    import re
+
     source = APP_JS.read_text(encoding="utf-8")
-    assert "VOCAB.first_screen_questions" in source
-    for q in FIRST_SCREEN_QUESTIONS:
-        assert q["title"].split(" ", 1)[1] not in source, q["title"]          # 標題不在前端（不留第二份，L16）
+    assert "schema.first_screen" in source and "first_screen_questions" not in source
+    code = re.sub(r"(?m)//.*$", "", re.sub(r"/\*.*?\*/", "", source, flags=re.S))   # 註解裡提到塊名不算第二份
+    for block in BLOCKS:
+        assert block.title not in code, block.title                            # 塊名不在前端（不留第二份，L16）
+    for section in FIRST_SCREEN_SECTIONS:
+        if len(section["title"]) > 4:
+            assert section["title"] not in code, section["title"]
     body = source.split("function questionPart(", 1)[1].split("\n}\n", 1)[0]
     for part in FIRST_SCREEN_PARTS:
         assert f"'{part}'" in body, part                                       # 每個元件前端都認得
     assert "還不認得" in body                                                   # 認不得的照印，不靜默略過（INV-3）
-    # v1 短評（格不同）照舊版面：帶齊對照表的每一格才用五題
-    gate = source.split("function firstScreenQuestions(", 1)[1].split("\n}\n", 1)[0]
+    # v1 短評（格不同）照舊版面：帶齊合約放的每一格才用新首屏
+    gate = source.split("function schemaFirstScreen(", 1)[1].split("\n}\n", 1)[0]
     assert ".every(" in gate and "'brief:' + slot" in gate
 
 

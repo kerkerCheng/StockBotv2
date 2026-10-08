@@ -368,6 +368,17 @@ table.rank.compare td:first-child { color: var(--muted); }
 .brief-card .fq-title { font-size: 15px; margin: 0 0 .15rem; }
 .brief-card .fq .story { margin-top: .15rem; }
 .brief-card .fq .candidate-words { margin: .25rem 0; }
+/* 個股頁 S5（2026-10-08）：首屏照 page_schema 的段排（論點／短文／深入／清單）；段名小字在上、塊沿用五題的樣式。
+   沒有分數、名次或顏色排序——段與塊的順序只是閱讀順序。 */
+.brief-card .schema-screen { margin-top: .4rem; }
+.brief-card .ss-section { margin-top: .7rem; }
+.brief-card .ss-section:first-child { margin-top: .2rem; }
+.brief-card .ss-section-title { font-size: 12px; letter-spacing: .08em; opacity: .65; padding-bottom: .15rem;
+  border-bottom: 1px solid var(--border); }
+.brief-card .ss-section .fq:first-of-type { border-top: 0; }
+.brief-card .ss-pending { font-style: italic; opacity: .75; }
+.brief-card .ss-block details { margin-top: .25rem; }
+.brief-card .ss-cells .attention-body { overflow-wrap: anywhere; }
 .numbers-strip .headline-numbers .num-value { font-size: 19px; }
 .brief-card .badge-light { margin-left: .5rem; }
 .card-brief { margin: .4rem 0 .2rem; font-size: .92rem; line-height: 1.45; opacity: .9; }

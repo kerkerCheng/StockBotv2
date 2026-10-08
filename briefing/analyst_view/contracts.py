@@ -295,17 +295,9 @@ FIRST_SCREEN_PARTS: tuple[str, ...] = (
     "priced_in", "in_numbers", "will_it_die", "wipeout", "disproof", "confirm", "shared_bet",
 )
 
-#: 個股頁首屏五題（Phase 7 Step 7.0e；使用者 2026-10-04 A1）。**標題與「哪一格放哪一題」只有這一份**——
-#: materialize 寫進 `.meta.json`，APP 照這個順序排，app.js 不留第二份（L16）。`slots`＝v2 短評的格（依序；七格各放一次），
-#: `parts`＝`FIRST_SCREEN_PARTS` 的元件。只是呈現順序：不排序、不打分、不進候選狀態的前提（plan §0 第 3 條）。
-FIRST_SCREEN_QUESTIONS: tuple[Mapping[str, Any], ...] = (
-    {"key": "what_bet", "title": "① 這一檔押的是什麼", "slots": ("our_bet", "bottleneck", "position"), "parts": ()},
-    {"key": "big_enough", "title": "② 押對了夠大嗎", "slots": ("what_must_be_true", "demand", "priced_in"),
-     "parts": ("priced_in", "in_numbers")},
-    {"key": "how_wrong", "title": "③ 錯了怎麼知道、哪天知道", "slots": ("when",), "parts": ("disproof", "confirm")},
-    {"key": "will_it_die", "title": "④ 會不會死", "slots": (), "parts": ("will_it_die", "wipeout")},
-    {"key": "new_bet", "title": "⑤ 是不是新賭注", "slots": (), "parts": ("shared_bet",)},
-)
+#: ⚠ 2026-10-08（個股頁 S5）：首屏五題（Phase 7 Step 7.0e 的 `FIRST_SCREEN_QUESTIONS`）退役——「哪一格放哪一塊」改由
+#: `briefing.analyst_view.page_schema` 的 `FIRST_SCREEN_SECTIONS`／`BLOCK_READINGS` 一份承載（十三塊；①→論點、②③④⑤→清單）。
+#: 兩份並存就是兩個 owner（L16），所以這一份刪掉、不留別名。`FIRST_SCREEN_PARTS` 照舊是元件的封閉字彙。
 
 PRICE_SERIES_NOTE = (
     "這是這檔自己的收盤價（provider 報價單位原值，未換算幣別）。"
@@ -645,7 +637,7 @@ def readiness_class(status: str) -> str:
 
 
 __all__ = [
-    "FIRST_SCREEN_PARTS", "FIRST_SCREEN_QUESTIONS",
+    "FIRST_SCREEN_PARTS",
     "PLAIN_ABSENCE_SHORT",
     "PLAIN_BET_UNITS",
     "PLAIN_LINE_LABELS",
