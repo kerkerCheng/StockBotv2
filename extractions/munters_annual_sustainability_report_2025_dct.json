@@ -1,0 +1,126 @@
+{
+  "claims": [
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：Munters 後續季報或年報寫明 LCX（CDU）停售、退出，或 12 月那筆約 21 億瑞典克朗、含 CDU 的訂單取消或交期延後超過一季；或客戶端一手文件顯示該案的 CDU 不由 Munters 供應。核查頻率：每季（季報）。觸發後 48 小時：e1 降 confidence 或提撤回、重讀 CDU 層（tech:coolant_distribution_unit）。",
+      "id": "munters_annual_sustainability_report_2025_dct_cl1",
+      "source_ids": [
+        "munters_annual_sustainability_report_2025_dct_s1",
+        "munters_annual_sustainability_report_2025_dct_s2",
+        "munters_annual_sustainability_report_2025_dct_s3",
+        "munters_annual_sustainability_report_2025_dct_s4",
+        "munters_annual_sustainability_report_2025_dct_s5",
+        "munters_annual_sustainability_report_2025_dct_s6",
+        "munters_annual_sustainability_report_2025_dct_s7"
+      ],
+      "statement": "Munters' own 2025 annual report: its Data Center Technologies business area (40% of group net sales in 2025) implemented its LCX platform (a coolant distribution unit) with key customers; 2025 organic order intake rose 247%, driven by CDUs, CRAHs and chillers; a December record order of about SEK 2.1 billion from a US colocation data center customer comprises CRAHs, CDUs and Geoclima chillers, with deliveries from Q4 2026 through Q1 2028. Supplier self-report: no CDU-specific revenue or unit volume is disclosed, customers are unnamed, and the large order bundles CDUs with air handlers and chillers.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "tech:coolant_distribution_unit",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "munters_annual_sustainability_report_2025_dct_s1",
+        "munters_annual_sustainability_report_2025_dct_s3",
+        "munters_annual_sustainability_report_2025_dct_s5",
+        "munters_annual_sustainability_report_2025_dct_s6"
+      ],
+      "src_id": "co:munters"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "Munters Group AB",
+        "Munters Group AB (publ)"
+      ],
+      "attributes": {
+        "ticker": "MTRS.ST"
+      },
+      "confidence": 0.9,
+      "id": "co:munters",
+      "name": "Munters",
+      "role": null,
+      "source_ids": [
+        "munters_annual_sustainability_report_2025_dct_s1",
+        "munters_annual_sustainability_report_2025_dct_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "CDU",
+        "CDUs"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:coolant_distribution_unit",
+      "name": "Coolant Distribution Unit (CDU)",
+      "role": null,
+      "source_ids": [
+        "munters_annual_sustainability_report_2025_dct_s3",
+        "munters_annual_sustainability_report_2025_dct_s4"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "munters_annual_sustainability_report_2025_dct",
+    "evidence_tier": 1,
+    "origin_entity": "Munters Group AB (publ)",
+    "permission_basis": "發行人官網公開的年報（PDF）；只保留研究必要的有限逐字節錄（pypdf 抽字，換行攤平成空白；排版斷字如「com- missioning」照抄）。",
+    "published_at": "2026-03-10",
+    "publisher": "Munters Group AB (publ)（官網年報 PDF）",
+    "retrieved_at": "2026-10-08",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Munters Annual & Sustainability Report 2025（2026-03-10 公布）Data Center Technologies 節錄",
+    "url": "https://www.munters.com/globalassets/story-page-import-images/munters-annual-and-sustainability-report-20252.pdf"
+  },
+  "sources": [
+    {
+      "id": "munters_annual_sustainability_report_2025_dct_s1",
+      "locator": "p.8 The year in brief（Record year for DCT）",
+      "quote": "In 2025, Munters business area DCT delivered a record year, driven by strong demand and focused work in close partnership with customers."
+    },
+    {
+      "id": "munters_annual_sustainability_report_2025_dct_s2",
+      "locator": "p.37 Data Center Technologies（事業定位）",
+      "quote": "Data Center Tecnologies (DCT) is a technology-leading provider of advanced cooling systems for data centers."
+    },
+    {
+      "id": "munters_annual_sustainability_report_2025_dct_s3",
+      "locator": "p.37 DCT Key events during 2025",
+      "quote": "Implemented the LCX platform (CDU) with key customers to enable scalable liquid cooling"
+    },
+    {
+      "id": "munters_annual_sustainability_report_2025_dct_s4",
+      "locator": "p.39 Two loops that together enable efficient data center cooling",
+      "quote": "Coolant distribution units (CDU) and liquid cooling evaporators (LCE) serve as the interface between the two loops."
+    },
+    {
+      "id": "munters_annual_sustainability_report_2025_dct_s5",
+      "locator": "p.41 DCT Market development and financial performance 2025 — Order intake",
+      "quote": "Organic order intake increased by +247%, driven by strong demand for CDUs, CRAHs, and chillers. Growth was particularly strong in the Americas, with orders from both colocators and hyperscalers, reflecting a strengthened market position and an expanded offering during the year, supported by continued strong underlying demand."
+    },
+    {
+      "id": "munters_annual_sustainability_report_2025_dct_s6",
+      "locator": "p.66 Board of Directors' report — significant events（12 月紀錄訂單）",
+      "quote": "In December, DCT received new record orders with a total value of approx. BSEK 2.1 from a US-based colocation data center customer. The orders comprise chilled water Computer Room Air Handlers (CRAHs), Coolant Distribution Units (CDUs), Geoclima Circlemiser chillers, and related start-up and com- missioning services for large-scale data center cool- ing infrastructure. Deliveries are scheduled to begin in Q4 2026 and continue through Q1 2028."
+    },
+    {
+      "id": "munters_annual_sustainability_report_2025_dct_s7",
+      "locator": "p.37 Data Center Technologies（占集團營收）",
+      "quote": "Share of Group net sales 40% (2024: 32)"
+    }
+  ]
+}

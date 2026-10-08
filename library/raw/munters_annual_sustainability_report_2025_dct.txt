@@ -1,0 +1,27 @@
+Source URL: https://www.munters.com/globalassets/story-page-import-images/munters-annual-and-sustainability-report-20252.pdf
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Munters Annual & Sustainability Report 2025（2026-03-10 公布）Data Center Technologies 節錄
+
+Source: https://www.munters.com/globalassets/story-page-import-images/munters-annual-and-sustainability-report-20252.pdf
+
+【p.8 The year in brief（Record year for DCT）】
+In 2025, Munters business area DCT delivered a record year, driven by strong demand and focused work in close partnership with customers.
+
+【p.37 Data Center Technologies（事業定位）】
+Data Center Tecnologies (DCT) is a technology-leading provider of advanced cooling systems for data centers.
+
+【p.37 DCT Key events during 2025】
+Implemented the LCX platform (CDU) with key customers to enable scalable liquid cooling
+
+【p.39 Two loops that together enable efficient data center cooling】
+Coolant distribution units (CDU) and liquid cooling evaporators (LCE) serve as the interface between the two loops.
+
+【p.41 DCT Market development and financial performance 2025 — Order intake】
+Organic order intake increased by +247%, driven by strong demand for CDUs, CRAHs, and chillers. Growth was particularly strong in the Americas, with orders from both colocators and hyperscalers, reflecting a strengthened market position and an expanded offering during the year, supported by continued strong underlying demand.
+
+【p.66 Board of Directors' report — significant events（12 月紀錄訂單）】
+In December, DCT received new record orders with a total value of approx. BSEK 2.1 from a US-based colocation data center customer. The orders comprise chilled water Computer Room Air Handlers (CRAHs), Coolant Distribution Units (CDUs), Geoclima Circlemiser chillers, and related start-up and com- missioning services for large-scale data center cool- ing infrastructure. Deliveries are scheduled to begin in Q4 2026 and continue through Q1 2028.
+
+【p.37 Data Center Technologies（占集團營收）】
+Share of Group net sales 40% (2024: 32)
