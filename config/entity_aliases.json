@@ -125,6 +125,15 @@
       "basis": "semantic_reviewed",
       "approval_receipt": "todo:730",
       "note": "使用者 2026-10-07 核准（[730]）。兩端逐字：tech:cpo_fiber_attach「CPO 光纖耦合／連接器層（fiber attach）」，唯一來源是 NVIDIA 矽光子部落格夥伴條目的角色句（nvidia_sipho_blog_partner_roles_s3）「Industry experts with optical connectors and fiber assemblies for linking the ELS lasers with polarization, maintaining fibers into the silicon photonics engine, and data output to the front panel.」；tech:fiber_attach_unit「Fiber Attach Unit」——Coherent 法說「the actual fiber attach unit, so this is the -- what connects the switch chip or the XPU to the faceplate or to the external laser source module」、上詮年報的 FAU 產線、同一份 NVIDIA 部落格 s7 點名的五家（[727]）。兩者講的是同一層：把光纖接進矽光子引擎、接到面板與外部雷射光源的光纖組件。⚠ canonical **不照** _readme 的「同組取最短 id」（那會選 tech:cpo_fiber_attach）：改選 tech:fiber_attach_unit——6 條供貨邊、FAU 讀圖、層說明 ledger（ln_863549fd0f4a7468）與兩份敘事的押注都掛在這個 id，選短的會讓它們全部搬家；例外只在本筆，規則本身不改。事發：Phase 7 failure log #36（客戶端五家名單曾整份掛在同義節點，FAU 讀圖因此寫錯「沒有客戶端點名」）。不含 tech:cpo／tech:scale_out_cpo 那一對（疑似同義，另案）。"
+    },
+    "tech:near_package_optics": {
+      "name": "Near-Packaged Optics (NPO)",
+      "aliases": [
+        "tech:npo"
+      ],
+      "basis": "semantic_reviewed",
+      "approval_receipt": "todo:752",
+      "note": "使用者 2026-10-08 核准（[752]）。兩端逐字：tech:npo「Near-Packaged Optics」——Lumentum Q4 FY2026 法說「The rest of our customer base is currently prioritizing near-packaged architectures as an intermediate step to the eventual adoption of CPO.」（lite_transcript_q4fy2026，三筆 assertion 全部出自這一句）；tech:near_package_optics「Near-Packaged Optics (NPO)」——Coherent「CPO and NPO opportunities」、Aeva「a Near-Packaged Optics (NPO) solution for a hyperscaler」、NewPhotonics「near-packaged optics … NPO optical engine」、Credo「NPO: Optical engines are mounted on the board near the compute device」。兩者講的是同一個架構：光引擎裝在板上、靠近交換器或運算晶片（不是和 ASIC 共同封裝）。⚠ canonical **不照** _readme 的「同組取最短 id」（那會選 tech:npo）：比照 [730] 改選 tech:near_package_optics——NPO 層讀圖（sr_f004cdb4639c6441）、Aeva 敘事的押注與四份來源都掛在這個 id，選短的會讓它們全部搬家；例外只在本筆，規則本身不改。事發：Phase 7 failure log #59（#36 的第二例；第 9 型比 id token 子集與名稱逐字，兩條都不中）。⚠ 照搬的疑點：prod:uhp_laser is_component_of 那條的引文沒寫 UHP 雷射（L6 Gap 4），本筆不改它；tech:cpo 節點別名裡的「NPO」「near-packaged optics」是別名污染，另案。不含 tech:cpo 與 scale_up／scale_out 那一群。"
     }
   }
 }
