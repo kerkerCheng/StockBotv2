@@ -1,0 +1,37 @@
+SOURCE: Navitas Semiconductor Corporation — Form 10-K（fiscal year 2025；SEC EDGAR accession 0001821769-26-000007）與 Form 10-Q（quarter ended 2026-06-30；accession 0001628280-26-049808）
+URL: https://www.sec.gov/Archives/edgar/data/1821769/000182176926000007/nvts-20251231.htm ；https://www.sec.gov/Archives/edgar/data/1821769/000162828026049808/nvts-20260630.htm
+PUBLISHED: 2026-02-27（10-K）；2026-07-27（10-Q）
+RETRIEVED: 2026-10-08
+STORAGE: repo_excerpt（美國法定公開申報有限節錄；HTML 轉文字、空白攤平後逐字照抄）
+NOTE: 發行人自己的年報與季報（自述）。Phase 7 Step 7.1 段 5「坐哪一層」短檢查（NVTS）用。兩份都沒有任何資料中心客戶或 GPU 廠的名字（只寫和 hyperscaler、GPU vendor 的「strategic partnerships」）；營收經經銷商、單一經銷商占 2026Q2 營收 71%。
+
+=== Form 10-K（FY2025，filed 2026-02-27） ===
+
+【Item 1 Business — Business Strategy（Navitas 2.0）】
+"In late 2025, we announced a strategic pivot that we called “Navitas 2.0,” which entailed an enhanced focus on high-power markets, including AI data centers, energy and grid infrastructure, performance computing and industrial electrification, and a de-emphasis on mobile and consumer products."
+
+【Item 1 Business — Sales and Marketing】
+"We leverage deep design expertise and strategic partnerships with leading hyperscalers, GPU vendors, Tier-1 OEMs and ODMs, and platform providers to develop differentiated solutions for next-generation architectures, including 800 VDC systems."
+
+【Item 1A Risk Factors（新市場的預測）】
+"For example, our predictions for the use of GaN- and SiC-based products in 800V AI data center power applications depend on assumptions regarding the acceptance and growth of 800V systems themselves."
+
+【Item 1A Risk Factors（競爭）】
+"or traditional competitors with established R&D and manufacturing resources, and long-standing customer relationships, may choose to offer competitive GaN or high-voltage SiC solutions."
+
+【Note 12 — Significant Customers（營收占比 2025／2024）】
+"A majority of the Company’s revenues are attributable to sales of the Company’s products to distributors of electronic components. These distributors sell the Company’s products to a range of end users, including OEMs and merchant power supply manufacturers. The following customers represented 10% or more of the Company’s net revenues (in thousands) for the twelve months ended December 31, 2025 and 2024: Year Ended December 31, Customer 2025 2024 Distributor A * 56 % Distributor B 46 % * Distributor C 11 % *"
+
+=== Form 10-Q（quarter ended 2026-06-30，filed 2026-07-27） ===
+
+【Item 2 MD&A — Results of operations（千美元；本季／去年同季／變動）】
+"Net revenues $ 10,529 $ 14,490 $ (3,961) (27) %"
+
+【Note 4 — Customer Concentration（營收占比；本季／去年同季／上半年／去年上半年）】
+"Distributor A 71 % * 69 % * Distributor B * 54 % * 53 %"
+
+【Note — Earnout（股價觸發、以股票結清）】
+"The change in fair value of the earnout liability was recorded as a loss of approximately $203.1 million and $211.0 million for the three and six months ended June 30, 2026, respectively. The earnout obligations were settled primarily through the issuance of an aggregate of 9.8 million shares of Class A common stock across Triggering Event I, Triggering Event II, and Triggering Event III."
+
+【Item 2 MD&A — Liquidity（Financing Activities）】
+"primarily driven by $373.2 million of net proceeds from our at-the-market offerings (compared to $96.8 million of net proceeds in 2025)"

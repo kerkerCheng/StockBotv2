@@ -1,0 +1,28 @@
+SOURCE: Power Integrations, Inc. — Form 10-K（fiscal year 2025；SEC EDGAR accession 0000833640-26-000037）與 Form 10-Q（quarter ended 2026-06-30；accession 0000833640-26-000145）
+URL: https://www.sec.gov/Archives/edgar/data/833640/000083364026000037/powi-20251231x10k.htm ；https://www.sec.gov/Archives/edgar/data/833640/000083364026000145/powi-20260630.htm
+PUBLISHED: 2026-02-06（10-K）；2026-08-06（10-Q）
+RETRIEVED: 2026-10-08
+STORAGE: repo_excerpt（美國法定公開申報有限節錄；HTML 轉文字、空白攤平後逐字照抄）
+NOTE: 發行人自己的年報與季報（自述）。Phase 7 Step 7.1 段 5「坐哪一層」短檢查（POWI）用。10-K 寫資料中心 AI 電源是更高功率 GaN「開發中」的目標應用、「需要幾年」；兩份都沒有資料中心客戶、也沒有 800V 字樣；10-Q 的終端市場表沒有資料中心這一格。
+
+=== Form 10-K（FY2025，filed 2026-02-06） ===
+
+【Item 1 Business — Strategy（更高功率 GaN）】
+"We expect such applications to include power supplies used in data centers delivering artificial intelligence (“AI”) services, in communications network infrastructure equipment and in onboard-charging circuitry for EVs, among others. Additionally, we are developing GaN technologies capable of supporting higher power output than today’s GaN devices, with an aim of developing products to address power-switching modules in EV drivetrains, which currently incorporate SiC and IGBT modules. In July 2024 we acquired the assets of Odyssey Semiconductor, a developer of vertical GaN technology, in an effort to accelerate our development of higher-power GaN devices. We believe the development of such technologies will take several years to complete."
+
+【Item 1 Business — Products（GaN 版本）】
+"In 2023 we announced new versions of our InnoSwitch products incorporating GaN transistors with higher voltage ratings of 900 volts and 1250 volts; earlier GaN products feature transistors rated at 750 volts. In 2019 we introduced InnoMux™ ICs, which provide up to three DC outputs, eliminating the need for additional power-management circuitry in certain end products requiring multiple voltages while significantly increasing efficiency. In 2024 we introduced InnoMux-2 products, featuring GaN transistors rated at 1700 volts."
+
+【Item 1 Business — Products（功率範圍）】
+"This portfolio of power-conversion products generally addresses power supplies up to about 500 watts of output."
+
+【Item 1 Business — Customers（前十大）】
+"Our top ten customers, including distributors that resell to OEMs and merchant power supply manufacturers, accounted for approximately 81%, 79% and 80% of net revenue in 2025, 2024 and 2023, respectively. In 2025, two customers, both distributors, each accounted for more than 10% of revenue, in 2024, two customers, both distributors, each accounted for more than 10% of revenue, and in 2023, three customers, all distributors, each accounted for more than 10% of revenue."
+
+=== Form 10-Q（quarter ended 2026-06-30，filed 2026-08-06） ===
+
+【Item 2 MD&A — Revenue mix by end market（本季／去年同季／上半年／去年上半年）】
+"End Market 2026 2025 2026 2025 Communications 10 % 11 % 10 % 10 % Computer 11 % 12 % 11 % 12 % Consumer 36 % 37 % 37 % 41 % Industrial 43 % 40 % 42 % 37 %"
+
+【Item 2 MD&A — Net revenues（成長歸因）】
+"The increases in net revenue for the three- and six-month periods were due to higher sales in the industrial end-market."

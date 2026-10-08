@@ -1,0 +1,31 @@
+SOURCE: Vishay Intertechnology, Inc. — Form 10-K（fiscal year 2025；SEC EDGAR accession 0000103730-26-000019）與 Form 10-Q（quarter ended 2026-07-04；accession 0000103730-26-000065）
+URL: https://www.sec.gov/Archives/edgar/data/103730/000010373026000019/form10k.htm ；https://www.sec.gov/Archives/edgar/data/103730/000010373026000065/form10q.htm
+PUBLISHED: 2026-02-13（10-K）；2026-08-05（10-Q）
+RETRIEVED: 2026-10-08
+STORAGE: repo_excerpt（美國法定公開申報有限節錄；HTML 轉文字、空白攤平後逐字照抄）
+NOTE: 發行人自己的年報與季報（自述）。Phase 7 Step 7.1 段 5「坐哪一層」短檢查（VSH）用。10-K 把 A.I. 列為六個趨勢之一；10-Q 整份沒有 A.I.、data center、server 字樣，終端市場表沒有資料中心這一格（computing 併在 Other）。
+
+=== Form 10-K（FY2025，filed 2026-02-13） ===
+
+【Item 1 Business — Overview】
+"we are supporting next level automation in multiple areas, including factories, the electrification of the automobile, 5G network technology, artificial intelligence ("A.I."), smart-grid infrastructure projects, and the rapid expansion of connectivity across everything (IoT)."
+
+【Item 1 Business — Our Competitive Strengths】
+"We are currently a worldwide technology and market leader in wire wound power shunts, leaded and thin film SMD resistors, power inductors, wet and polymer tantalum capacitors in conformal-coated packages, power rectifiers, low-voltage power MOSFETs, and infrared components."
+
+【Item 1 Business — Sales and Marketing（客戶集中）】
+"Net revenues from our top 30 customers represent approximately 74% of our total net revenues. No single customer comprised more than 10% of our total net revenues for 2025."
+
+=== Form 10-Q（quarter ended 2026-07-04，filed 2026-08-05） ===
+
+【Note 10 — Sales by end market（千美元；本季／去年同季／上半年／去年上半年）】
+"Industrial $ 347,290 $ 267,028 $ 646,193 $ 511,954 Automotive 294,424 267,423 578,715 524,535 Military and Aerospace 92,882 80,488 182,055 156,805 Healthcare 43,452 37,899 84,044 74,431 Other* 140,535 109,412 266,818 209,761 Tariff refunds passed through to customers (30,008 ) - (30,008 ) - Total Revenue $ 888,575 $ 762,250 $ 1,727,817 $ 1,477,486 *Power supplies, telecommunications, consumer products, and computing."
+
+【Item 2 MD&A — Financial Metrics（五季：2025Q2→2026Q2）】
+"End-of-period backlog $ 1,174,900 $ 1,152,700 $ 1,314,100 $ 1,592,300 $ 1,877,300 Book-to-bill ratio 1.02 0.97 1.20 1.34 1.32"
+
+【Item 2 MD&A — Financial Metrics（說明）】
+"Order levels remain high and backlog increased versus the prior fiscal quarter and prior year quarter. We continue to increase capacity for critical product lines."
+
+【Item 2 MD&A — Recent Developments（增資）】
+"On July 1, 2026, we completed an underwritten public offering of 17.25 million shares of our common stock at a price to the public of $50.00 per share for proceeds of $830.25 million, net of underwriting discounts and issuance costs."

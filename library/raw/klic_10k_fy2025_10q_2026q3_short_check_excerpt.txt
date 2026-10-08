@@ -1,0 +1,42 @@
+SOURCE: Kulicke and Soffa Industries, Inc. — Form 10-K（fiscal year ended 2025-10-04；SEC EDGAR accession 0000056978-25-000081）、Form 10-Q（quarter ended 2026-07-04；accession 0000056978-26-000032）、Form 8-K Exhibit 99.1（2026-08-05 第三季財報新聞稿；accession 0000056978-26-000030）
+URL: https://www.sec.gov/Archives/edgar/data/56978/000005697825000081/klic-20251004.htm ；https://www.sec.gov/Archives/edgar/data/56978/000005697826000032/klic-20260704.htm ；https://www.sec.gov/Archives/edgar/data/56978/000005697826000030/ex991liveq32026.htm
+PUBLISHED: 2025-11-20（10-K）；2026-08-06（10-Q）；2026-08-05（8-K）
+RETRIEVED: 2026-10-08
+STORAGE: repo_excerpt（美國法定公開申報有限節錄；HTML 轉文字、空白攤平後逐字照抄）
+NOTE: 發行人自己的年報、季報與財報新聞稿（自述）。Phase 7 Step 7.1 段 5「坐哪一層」短檢查（KLIC）用。三份都沒有 AI、資料中心、HBM 字樣；打線機這一波成長它自己歸因於 general semiconductor／memory 的「customer technology transitions and improved demand conditions」，前三大客戶都是中國封測廠。
+
+=== Form 10-K（FY2025，filed 2025-11-20） ===
+
+【Item 1 Business — Advanced Packaging】
+"With the launch of our APAMATM, APAMA PlusTM and APTURATM, we are also developing and manufacturing advanced packaging solutions for the emerging 2.5-dimensional integrated circuit (“2.5D IC”) and 3-dimensional integrated circuit (“3D IC”) markets."
+
+【Item 1 Business — Advanced Packaging（APTURA）】
+"The APTURATM is a highly capable thermo-compression bonding system which supports an ultra-fine-pitch fluxless direct-copper thermo-compression bonding process. With this system, we are well positioned to enable growth of chiplet-based advanced packages."
+
+【Item 1A Risk Factors（營收結構）】
+"Given that a majority of our revenue comes from wire bonding, a reduced demand for our wire bonding equipment could materially and adversely affect our financial results."
+
+=== Form 10-Q（quarter ended 2026-07-04，filed 2026-08-06） ===
+
+【Note — Segment information（Advanced Solutions 定義）】
+"Advanced Solutions: Reflects the results of the Company from the design, development, manufacture and sale of die-attach and thermocompression systems and solutions."
+
+【Item 2 MD&A — Net revenue by segment（千美元；本季／占比／去年同季／占比／變動）】
+"Ball Bonding Equipment $ 226,068 68.4 % $ 75,990 51.2 % $ 150,078 197.5 % Wedge Bonding Equipment 25,777 7.8 % 22,126 14.9 % 3,651 16.5 % Advanced Solutions 29,415 8.9 % 10,811 7.3 % 18,604 172.1 % APS 35,772 10.8 % 31,392 21.2 % 4,380 14.0 % All Others 13,377 4.1 % 8,094 5.4 % 5,283 65.3 %"
+
+【Item 2 MD&A — Ball Bonding Equipment 成長歸因】
+"This increase was primarily due to an increase in sales volume of approximately $126.6 million in general semiconductor, $19.4 million in memory and $4.1 million in automotive and industrial end markets driven by customer technology transitions and improved demand conditions."
+
+【Note — Customer concentration（九個月營收占比；本期／去年同期）】
+"Tianshui Huatian Technology Co., Ltd 13.8 % 10.1 % Haoseng Industrial Co., Ltd 14.8 % * Changjin Technology (Shanghai) Co., Ltd 10.4 %"
+
+=== Form 8-K Exhibit 99.1（2026-08-05 第三季財報新聞稿） ===
+
+【CEO 引言】
+"We see strong sequential growth in the third quarter and demand conditions continue to improve across all end markets. We remain closely engaged to support the evolving technology requirements of our industry, and remain committed to address the immediate and long-term production needs of our customers."
+
+【Fourth Quarter Fiscal 2026 Outlook】
+"K&S currently expects net revenue in the fourth quarter of fiscal 2026 ending October 3, 2026 to be approximately $375 million +/- $20 million"
+
+【導言（Advanced Solutions 產能）】
+"Kulicke & Soffa anticipates its expanded Advanced Solutions production facility will be completed, as scheduled, within the second half of fiscal 2027."

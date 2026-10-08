@@ -1,0 +1,26 @@
+SOURCE: LPKF Laser & Electronics SE — Annual Report 2025（2026-03-26 公布；官網 PDF 172 頁，pypdf 抽字）
+URL: https://www.lpkf.com/fileadmin/mediafiles/user_upload/company/investor-relations/financial-reports/2025/LPKF_Annual_Report_2025.pdf
+PUBLISHED: 2026-03-26（同日 Corporate News「LPKF reports slight improvement in earnings in 2025 and initiates Group realignment」）
+RETRIEVED: 2026-10-08
+STORAGE: repo_excerpt（發行人年報有限節錄；pypdf 抽字、空白攤平後逐字照抄——PDF 抽字留下的斷字空白如「defect -free」「par ticularly」照抄）
+NOTE: 發行人自己的年報（自述）。Phase 7 Step 7.1 段 5「坐哪一層」短檢查（LPK.DE）用。LIDE（玻璃雷射深蝕刻，TGV）在主要半導體廠「開發與認證」階段、量產是「下一個里程碑」；整份沒有任何量產客戶的名字。2026 年上半年報沒讀（短檢查只讀年報）。
+
+=== Annual Report 2025 ===
+
+【p.5 致股東（LIDE）】
+"With LIDE, LPKF has developed a key process that enables defect -free, high -precision processing of glass substrates. The majority of the relevant players in the semiconductor market are already using this technology in development and qualification; the breakthrough to mass production is the next milestone."
+
+【p.9 致股東（訂單）】
+"At EUR 91.6 million, incoming orders in the reporting period were 19.9% below the previous year’s level. At EUR 27.0 million, the order backlog at the end of the year was EUR 23.9 million below the previous year’s figure. The overall order situation is par ticularly affected by the lack of major orders in the Solar segment."
+
+【p.40 Combined Management Report — Segments（Electronics 含 LIDE）】
+"e Electronics segment also includes LIDE technology (Laser Induced Deep Etching) developed by LPKF."
+
+【p.40 Combined Management Report — Segments（Electronics 含 LIDE）】
+"The LIDE business encompasses both the development and sale of laser systems for high-precision structuring of glass and the production of glass components using the company’s own LIDE systems."
+
+【p.54 Report on Economic Position（先進封裝）】
+"had a positive effect on LPKF's positioning in this new market segment, in which the company is already strongly positioned today, even though the actual ramp-up phase of the business is still ahead."
+
+【p.55 Development of revenue（分部營收）】
+"In the 2025 financial year, the LPKF Group generated revenue of EUR 115.3 million, down 6.2% on the previous year (EUR 122.9 million). In 2025, the Solar segment delivered the remaining laser systems for the structuring of solar modules as part of a major order. Supplemented by spare parts deliveries and services, revenue of EUR 28.3 million was achieved, EUR 12.9 million less than in the previous year. The main f actors here were the loss of a planned major project in China and significant investment reluctance on the part of customers due to the impending technological shift toward perovskites. Revenue generated in the Electronics segment amounted to EUR 35.9 million, representing a decrease of EUR 1.0 million compared to the previous year (EUR 36.9 million)."
