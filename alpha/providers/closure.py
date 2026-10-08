@@ -17,6 +17,7 @@ from alpha.closure import (
     _base_observation_tickers,
     _sector_and_structure_edge,
     deferred_tickers,
+    pending_admission_focus,
     pending_cohort_members,
     population_for,
     row_from_artifact,
@@ -104,9 +105,19 @@ def collect_backlog(*, artifact_dir: Path | None = None, state_dir: Path | None 
         deferred = deferred_tickers(pool, _resolve)
         # 等主題組（failure log #26）：還沒落地的組提案裡的成員（沒寫過敘事的才算，見下面）
         pending_cohort = pending_cohort_members(pool)
+        # 等入圖（failure log #51）：短檢查結論①的 ra_admission 還在 pq2——focus 讀 RA 紀錄，讀不到那一號就不算
+        from intake.actions import read_action
+
+        def _focus_ticker(ref_id: str) -> str | None:
+            try:
+                return _resolve(str(read_action(ref_id)["payload"].get("focus_company_id") or ""))
+            except Exception:  # noqa: BLE001
+                return None
+
+        pending_admission = pending_admission_focus(pool, _focus_ticker)
     except Exception as exc:  # noqa: BLE001
-        pending_cohort = {}
-        notes.append(f"pq2 待辦池讀不到，本輪不套「使用者已 defer」「等主題組」：{type(exc).__name__}")
+        pending_cohort, pending_admission = {}, {}
+        notes.append(f"pq2 待辦池讀不到，本輪不套「使用者已 defer」「等主題組」「等入圖」：{type(exc).__name__}")
 
     enriched: list[BacklogRow] = []
     for r in rows:
@@ -136,6 +147,7 @@ def collect_backlog(*, artifact_dir: Path | None = None, state_dir: Path | None 
             generated_at=r.generated_at,
             population=population, population_reason=reason, short_check_due=due,
             awaiting_cohort=cohort_n,
+            awaiting_admission=(pending_admission.get(r.ticker.upper()) if population == "edge_no_seat" else None),
         ))
     return enriched, notes
 

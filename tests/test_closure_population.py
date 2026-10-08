@@ -88,8 +88,9 @@ def test_gate_and_summary_list_the_outside_by_name() -> None:
 def test_outside_lines_print_even_at_zero() -> None:
     """0 也印——「沒有人退出」與「沒算」不得同形（L13）。"""
     lines = closure.render_outside(closure.summarize([_row("A")]))
-    assert len(lines) == 3 and "非倍率 0 檔" in lines[0] and "已做過短檢查 0 檔" in lines[1]
-    assert "等主題組 0 檔" in lines[2]                    # 2026-10-08（failure log #26）
+    assert len(lines) == 4 and "非倍率 0 檔" in lines[0] and "已做過短檢查 0 檔" in lines[1]
+    assert "等入圖 0 檔" in lines[2]                      # 2026-10-08（failure log #51）
+    assert "等主題組 0 檔" in lines[3]                    # 2026-10-08（failure log #26）
 
 
 # ---- 等主題組（2026-10-08，failure log #26）：組要在這條鏈第一份敘事之前定義 ----
@@ -114,7 +115,34 @@ def test_awaiting_cohort_rows_are_not_queued_and_are_listed_with_their_number() 
     assert [r.ticker for r in closure.rank_backlog(rows)] == ["AXTI"]
     summary = closure.summarize(rows)
     assert summary["awaiting_cohort"] == [["3017.TW", 701]] and summary["open_count"] == 1
-    assert "3017.TW（[701]）" in closure.render_outside(summary)[2]
+    assert "3017.TW（[701]）" in closure.render_outside(summary)[3]
+
+
+# ---- 等入圖（2026-10-08，failure log #51）：短檢查結論①補供貨邊、入圖包還在 pq2 ----
+
+def test_pending_admission_focus_reads_open_ra_admissions_through_their_focus() -> None:
+    focus = {"ra_a": "AAON", "ra_b": "MTRS.ST", "ra_old": "KLIC", "ra_unreadable": None, "ra_c": "XFAB.PA"}
+    pool = _pool({"n": 748, "type": "ra_admission", "ref_id": "ra_a"},
+                 {"n": 747, "type": "ra_admission", "ref_id": "ra_b"},
+                 {"n": 760, "type": "ra_admission", "ref_id": "ra_a"},                    # 同一檔第二包：取小的
+                 {"n": 700, "type": "ra_admission", "ref_id": "ra_old", "resolved_at": "2026-10-01"},   # 已結案
+                 {"n": 749, "type": "ra_admission", "ref_id": "ra_unreadable"},          # 讀不到 focus：不猜
+                 {"n": 750, "type": "manual", "ref_id": "ra_c"})                         # 不是入圖包
+    assert closure.pending_admission_focus(pool, focus.get) == {"AAON": 748, "MTRS.ST": 747}
+
+
+def test_edge_without_seat_waiting_on_its_admission_is_not_queued_and_is_listed() -> None:
+    """①掛了 pq2 之後原本仍顯示「短檢查到期」→ 下一個 session 會重做同一個短檢查（5 檔同時撞到）。"""
+    rows = [_row("AAON", population="edge_no_seat", short_check_due=True, awaiting_admission=748),
+            _row("ENS", population="edge_no_seat", short_check_due=True)]
+    assert [r.ticker for r in closure.rank_backlog(rows)] == ["ENS"]
+    assert set(closure.closure_gate(rows).actionable) == {"ENS"}
+    summary = closure.summarize(rows)
+    assert summary["outside"]["edge_no_seat_awaiting_admission"] == [["AAON", 748]]
+    assert "AAON（[748]）" in closure.render_outside(summary)[2]
+    assert "等入圖 1" in closure.render_summary(summary)
+    # 只認邊緣沒座位：母體內的列帶了編號也照舊排（它的出口是自己的終局，不是這一號）
+    assert _row("SILEX.ST", awaiting_admission=748).queued
 
 
 def test_the_narrative_writer_refuses_a_first_narrative_whose_cohort_has_not_landed(monkeypatch) -> None:

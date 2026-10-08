@@ -95,13 +95,18 @@ class BacklogRow:
     #: （pq2 凍結的 spec）裡 → 那個 pq2 編號。plan 7.1 ④：那條鏈的組要在第一份敘事之前定義（已定價的相對比較才有事先登記的
     #: 參照）；10-05 散熱四檔照閉環佇列寫了敘事、組晚落地，驗收⑤不成立。provider 讀待辦池算好帶進來（本檔不讀檔）。
     awaiting_cohort: int | None = None
+    #: 等入圖（2026-10-08，Phase 7 failure log #51）：邊緣沒座位、短檢查結論①補供貨邊——focus 是這一檔的 `ra_admission`
+    #: 還在 pq2 → 那個 pq2 編號。原本只認得②③的出口（90 天內有 v2 敘事），①掛了 pq2 之後仍顯示「短檢查到期」、被當成
+    #: 可自主推進——下一個 session 會重做同一個短檢查。provider 讀待辦池＋RA 紀錄算好帶進來（本檔不讀檔）。
+    awaiting_admission: int | None = None
 
     @property
     def queued(self) -> bool:
         """在不在段 5 的佇列裡（`rank_backlog`／`closure_gate`／`open_profile` 都讀這一格）。
 
         母體內：照舊「未到終局」。非倍率：永遠不排（它的文件進層說明當證據，不寫敘事）。
-        邊緣沒座位：短檢查到期才排（沒查過、或上次查超過 90 天）——每個等待都有到期（INV-2）。
+        邊緣沒座位：短檢查到期才排（沒查過、或上次查超過 90 天）——每個等待都有到期（INV-2）；
+        短檢查結論①的入圖包還在 pq2 時不排（出口是那個編號：go＋apply 之後它有座位、自己進母體；drop 了又到期）。
         等主題組：組落地前不排（它的出口是那個 pq2 編號：go＋complete 之後自動回到佇列；drop 了也回來）。
         """
         if self.awaiting_cohort is not None:
@@ -109,7 +114,7 @@ class BacklogRow:
         if self.population == "non_multiple":
             return False
         if self.population == "edge_no_seat":
-            return bool(self.short_check_due)
+            return bool(self.short_check_due) and self.awaiting_admission is None
         return self.terminal is None
 
     @property
@@ -214,6 +219,20 @@ def pending_cohort_members(pool: Mapping[str, Any]) -> dict[str, int]:
             ticker = str(member.get("ticker") or "").upper()
             if ticker:
                 out.setdefault(ticker, int(item["n"]))
+    return out
+
+
+def pending_admission_focus(pool: Mapping[str, Any], focus_ticker: Any) -> dict[str, int]:
+    """還沒結案的 `ra_admission` → 它 focus 的那一檔（research ticker）→ pq2 編號（failure log #51）。純函式：
+    `focus_ticker(ref_id)` 由 provider 給（讀 RA 紀錄的 `payload.focus_company_id` 再查名冊），讀不到回 None——那一號就不算，
+    那一檔維持「短檢查到期」（不猜）。同一檔有兩包取編號小的（先鑄的那個）。"""
+    out: dict[str, int] = {}
+    for item in sorted((i for i in (pool.get("items") or ()) if not i.get("resolved_at")), key=lambda i: i["n"]):
+        if item.get("type") != "ra_admission" or not item.get("ref_id"):
+            continue
+        ticker = focus_ticker(str(item["ref_id"]))
+        if ticker:
+            out.setdefault(str(ticker).upper(), int(item["n"]))
     return out
 
 
@@ -324,6 +343,11 @@ def summarize(rows: Sequence[BacklogRow]) -> dict[str, Any]:
                              if r.population == "non_multiple"],
             "edge_no_seat_checked": [[r.ticker, r.population_reason] for r in sorted(rows, key=lambda x: x.ticker)
                                      if r.population == "edge_no_seat" and not r.short_check_due],
+            # failure log #51：短檢查結論①補供貨邊、入圖包還在 pq2——不排，出口在那個編號上
+            "edge_no_seat_awaiting_admission": [[r.ticker, r.awaiting_admission]
+                                                for r in sorted(rows, key=lambda x: x.ticker)
+                                                if r.population == "edge_no_seat" and r.short_check_due
+                                                and r.awaiting_admission is not None],
         },
         # 等主題組（failure log #26）：不排、也不算可推進數；逐檔列名附 pq2 編號（出口在那個編號上）
         "awaiting_cohort": [[r.ticker, r.awaiting_cohort] for r in sorted(rows, key=lambda x: x.ticker)
@@ -392,12 +416,16 @@ def render_outside(summary: Mapping[str, Any]) -> list[str]:
     outside = summary.get("outside") or {}
     non = list(outside.get("non_multiple") or ())
     checked = list(outside.get("edge_no_seat_checked") or ())
+    admission = list(outside.get("edge_no_seat_awaiting_admission") or ())
     cohort = list(summary.get("awaiting_cohort") or ())
     return [
         (f"母體外·非倍率 {len(non)} 檔（不寫敘事；它的文件進層說明當在位者或客戶證據；每次 materialize 重算，翻回邊緣就回母體）"
          + ("：" + "、".join(f"{t}（{why}）" for t, why in non) if non else "")),
         (f"母體外·邊緣沒座位、{SHORT_CHECK_DAYS} 天內已做過短檢查 {len(checked)} 檔"
          + ("：" + "、".join(f"{t}（{why}）" for t, why in checked) if checked else "")),
+        # failure log #51：①補供貨邊的入圖包還在 pq2——go＋apply 之後有座位、自己進母體；drop 了短檢查又到期
+        (f"母體外·邊緣沒座位、短檢查結論①補供貨邊、等入圖 {len(admission)} 檔"
+         + ("：" + "、".join(f"{t}（[{n}]）" for t, n in admission) if admission else "")),
         # failure log #26：組落地前不寫第一份敘事；出口在那個 pq2 編號上
         (f"等主題組 {len(cohort)} 檔（還沒寫過敘事、主題組提案還在 pq2——組落地前不排，go＋complete 之後自動回佇列）"
          + ("：" + "、".join(f"{t}（[{n}]）" for t, n in cohort) if cohort else "")),
@@ -435,10 +463,11 @@ def render_summary(summary: Mapping[str, Any], *, notes: Sequence[str] = ()) -> 
         parts += f"／等財報 {len(awaiting)}"
     outside = summary.get("outside") or {}
     n_non, n_checked = len(outside.get("non_multiple") or ()), len(outside.get("edge_no_seat_checked") or ())
+    n_adm = len(outside.get("edge_no_seat_awaiting_admission") or ())
     line = (
         f"段5 每檔閉環：到終局 {summary['terminal_count']}（{parts}）"
         f"／未到終局 {summary['open_count']}"
-        f"／母體外 {n_non + n_checked}（非倍率 {n_non}、邊緣沒座位已查 {n_checked}）"
+        f"／母體外 {n_non + n_checked + n_adm}（非倍率 {n_non}、邊緣沒座位已查 {n_checked}、等入圖 {n_adm}）"
         f"｜有 ready 檔的產業 {len(summary['sectors_with_ready'])}／{len(summary['sectors_seen'])}"
     )
     if nxt:
