@@ -527,3 +527,10 @@ table.pt-table th, table.pt-table td { vertical-align: top; overflow-wrap: anywh
   pointer-events: none; }
 .diagram-mark-tag { position: absolute; right: 6px; top: -11px; background: var(--accent); color: #ffffff;
   font-size: 11px; font-weight: 600; padding: 1px 6px; border-radius: 8px; white-space: nowrap; }
+/* 坐、但不是頁首「做什麼」講的那幾格（押的格之外）：細虛線、不加標籤 */
+.diagram-mark-also { border-width: 2px; border-style: dashed; opacity: .75; }
+
+/* 頁首「做什麼」（schema B0；2026-10-08）：公司名下面第一行就看得到它做什麼、在示意圖哪一格 */
+.detail-what { margin-top: 6px; }
+.detail-what-line { color: var(--text); font-size: 15px; font-weight: 600; }
+.detail-what-where { color: var(--muted); font-size: 13px; margin-top: 2px; }

@@ -143,6 +143,7 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 | **3 最窄 rule** | daily argv 不變；不新增 step、allowlist、APP 路由；APP 仍無寫入端點；CSP 不變（原本就是 `img-src 'self' data:`）；`?selfcheck=1` 只在帶參數時在瀏覽器裡量、不連網 |
 | **4 contract test** | `tests/test_webapp_diagrams.py`（會執行或載入外部的 SVG 不嵌、出處與節點必填、**沒量過／圖改過沒重量／字疊字／壓框線／舊版量測／量到 0 段字都不嵌且說為什麼**、量測紀錄不被當成一張圖）；`tests/test_draw_diagram.py`（斷行不拆英文字、避頭避尾、箭頭換行保留空白、最後一行不只剩兩個字、框中框下一行不壓框線）；`tests/test_stock_page_s5b_charts.py`（圖只照抄稽核區的值、selfcheck 只在帶參數時跑且不連網）；變異 5／5 抓到 |
 | **5 端到端 smoke** | 真資料：三張圖 `check_diagrams` 字疊字／出框／壓框線 0（截圖抓到量測當時沒量的壓框線後補量測、重畫）；反向對照四種問題各抓到、量測閘四種情況各擋到；materialize 後個股頁 B4 與閱讀頁拿到圖、`?selfcheck=1&w=390` 溢出 0（見個股頁 plan S5 列） |
+| **續（同日，個股頁 plan Amendment F：頁首「做什麼」與示意圖位置表）** | daily ⑬ argv、讀的路徑、寫的檔都不變：示意圖說明檔多一個 `geometry`（位置表，只由互動的 `scripts/draw_diagram.py` 寫，同一個私有檔）；載入閘多一項檢查（位置表綁 SVG、落在圖內、一節點一格、聯集＝`nodes_shown`，不過不嵌）；個股頁 payload 多 `what_it_does`、每張圖多 `width`／`height`／`boxes`。不連網、不跑 LLM、不碰任何 authority。contract test：`tests/test_stock_page_what_it_does.py`、`tests/test_webapp_diagrams.py`（位置表六種情況）、`tests/test_draw_diagram.py`（位置表與 rect 同步、一節點兩格擋、`nodes_shown` 對不上不畫）；變異 11／11 抓到 |
 
 ### Sandbox impact review 結論（2026-10-07 下午：向你要文件另一區、提供文件才算 go；①處理數字；分類上限 90／總時限 400；備份上傳重試；雷達搜尋上限照實寫）
 
@@ -980,9 +981,10 @@ materialize 用**，不動 `discover_tracked_tickers`——那會連帶擴大 ED
 & '.venv\Scripts\python.exe' -m webapp materialize --layer-notes                         # 只重建閱讀頁（全文、出處的文件自宣告、主張狀態、哪幾頁連過來）
 & '.venv\Scripts\python.exe' -m webapp materialize COHR LITE --layer-notes               # 連個股頁「坐的層」的連結一起更新（只重跑點名的那幾檔）
 # 技術示意圖（2026-10-08 個股頁 plan S5b 第二段；私有、住 library/private/research_notes/diagrams/；APP 個股頁 B4 與閱讀頁）
-#   寫 <id>.json（title／caption／nodes_shown／sources 必填，layout.steps 是由上往下的方框與箭頭；「圖上：…」先跑走圖或 query.structure 查供貨邊）
-& '.venv\Scripts\python.exe' scripts\draw_diagram.py optics_ai_link_inp    # 照 layout 畫 SVG、接著量測並寫 <id>.check.json；不合格 exit 1
-& '.venv\Scripts\python.exe' scripts\check_diagrams.py                     # 手寫或改過 SVG 後重量（不給 id 量全部）；字疊字、出框、壓框線三項 0 才嵌
+#   寫 <id>.json（title／caption／nodes_shown／sources 必填，layout.steps 是由上往下的方框與箭頭；「圖上：…」先跑走圖或 query.structure 查供貨邊；
+#   每一格寫 nodes＝畫的是圖上哪幾個節點——一個節點只畫在一格、全部格的聯集＝nodes_shown，個股頁據此標「這檔在這裡」）
+& '.venv\Scripts\python.exe' scripts\draw_diagram.py optics_ai_link_inp    # 照 layout 畫 SVG、把位置表寫回 <id>.json（綁 SVG）、接著量測並寫 <id>.check.json；不合格 exit 1
+& '.venv\Scripts\python.exe' scripts\check_diagrams.py                     # 手寫 SVG 後量（不給 id 量全部）；字疊字、出框、壓框線三項 0 才嵌（畫圖器畫的圖別手改——位置表綁 SVG，改了就重跑 draw_diagram）
 & '.venv\Scripts\python.exe' -m webapp materialize --layer-notes           # 嵌進閱讀頁；個股頁 B4 跟著下一次 materialize（或點名那幾檔）
 #   沒量過、圖改過沒重量、量測沒過 → 不嵌，理由印在 layer_notes artifact 的 diagram_rejections（需要本機 Edge；量不到就是量不到，不是 0）
 ```

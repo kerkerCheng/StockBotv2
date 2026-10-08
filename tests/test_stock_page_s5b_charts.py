@@ -91,14 +91,31 @@ def test_the_capture_chart_lives_in_b2_and_only_copies_the_materialized_ratio() 
 
 def test_diagrams_show_as_images_in_b4_and_on_the_layer_page_labelled_as_illustration() -> None:
     """示意圖由 materialize 檢查過、編成 data URI；前端只用 <img> 顯示，不把 SVG 原碼塞進頁面（SVG 在 img 裡不執行任何東西）。
-    2026-10-08 使用者：「我想知道它出現在示意圖的哪一個地方」——坐的那幾格疊一個「在這裡」框（位置換算，不改圖），上方一句列出是哪幾格。"""
-    assert "key === 'B4'" in _body("blockVisuals") and "payload.diagrams" in _body("blockVisuals")
+    2026-10-08 使用者：「我想知道它出現在示意圖的哪一個地方」——坐的那幾格疊一個框（位置換算，不改圖），上方一句列出是哪幾格；
+    頁首「做什麼」講的那幾格（押的格）粗框加「押在這裡」，其餘坐的格細虛線。手畫的圖沒有位置表：照實說標不出，不是不印。"""
+    visuals = _body("blockVisuals")
+    assert "key === 'B4'" in visuals and "payload.diagrams" in visuals
+    assert "payload.what_it_does" in visuals and "what.focus" in visuals          # 粗框跟頁首講的是同一份（L16）
     figure = _body("diagramFigure")
     assert "document.createElement('img')" in figure and "img.src = d.src" in figure
     assert "innerHTML" not in figure and "示意｜" in figure and "出處" in figure
-    assert "d.boxes" in figure and "'diagram-mark'" in figure and "在這裡" in figure and "在這張圖的" in figure
+    assert "d.boxes" in figure and "'diagram-mark'" in figure and "diagram-mark-also" in figure
+    assert "這裡`" in figure and "在這張圖的" in figure and "圖上也在" in figure
+    assert "Array.isArray(d.boxes)" in figure and "標不出在哪一格" in figure
     layer = _body("renderLayerNote")
     assert "row.diagrams" in layer and "diagramFigure(d, [row.node]" in layer
+
+
+def test_the_header_says_what_it_makes_and_where_it_sits_in_the_diagram() -> None:
+    """2026-10-08 使用者：「這個公司在做甚麼東西是我們關注的，甚至可以寫在最前面…像 COHR 就寫個 CW DFB 雷射」——
+    公司名下面第一行照印 materialize 組好的「做什麼」（`webapp.materialize.what_it_does`）；前端不挑節點、不組句子。"""
+    detail = _body("renderDetail")
+    assert detail.index("whatLine(payload)") < detail.index("headerLine(payload, view)")
+    what = _body("whatLine")
+    for copied in ("payload.what_it_does", "what.line", "what.where_line", "what.absence"):
+        assert copied in what, f"做什麼少照抄了 {copied}"
+    for composed in ("node_name", ".rides", "seats", "join("):
+        assert composed not in what, f"做什麼的句子要在 materialize 組，不在前端：{composed}"
 
 
 def test_selfcheck_runs_only_on_request_and_never_touches_the_network() -> None:

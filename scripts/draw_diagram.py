@@ -3,12 +3,16 @@
 `library/private/research_notes/diagrams/<id>.json` 的 `layout.steps` 是一條由上往下的鏈，每一步是一個方框或一個箭頭：
 
     {"box": "light", "title": "雷射晶片", "desc": "…", "suppliers": ["Coherent、聯亞（CW DFB）"],
-     "dashed": false, "inner": [{"title": "…", "desc": "…", "suppliers": [...]}]}
+     "nodes": ["tech:cw_dfb_laser", "tech:eml"],
+     "dashed": false, "inner": [{"title": "…", "desc": "…", "suppliers": [...], "nodes": [...]}]}
     {"arrow": "從磊晶片切出"}
 
 `box` 是配色（elec／light／mat／heat／power／note／gray）；`suppliers` 照圖上真的有的供貨邊寫（附「列舉不完整」），
-空的就印「這一層還沒有供應商」。畫好寫 `<id>.svg`，接著跑 `scripts/check_diagrams.py` 的量測並寫量測紀錄——
-不合格 exit 1（規則 9：字不重疊、不出框、不壓框線，0 才發佈）。只寫這兩個私有檔，不寫任何 authority。
+空的就印「這一層還沒有供應商」。`nodes`＝這一格畫的是圖上哪幾個節點（一個節點只畫在一格；全部格的聯集＝`nodes_shown`），
+個股頁據此標「這檔在這裡」（2026-10-08 使用者：「我想知道它出現在示意圖的哪一個地方」）。
+畫好寫 `<id>.svg`、把每一格的位置表（`geometry`：格名、節點、上緣、高、左緣、寬，綁這張 SVG 的 sha256）寫回說明檔，
+接著跑 `scripts/check_diagrams.py` 的量測並寫量測紀錄——不合格 exit 1（規則 9：字不重疊、不出框、不壓框線，0 才發佈）。
+只寫這三個私有檔，不寫任何 authority。
 
 直式、寬 360（手機）；字寬用估計值斷行（中文 1em、英文 0.56–0.68em），英文字與數字不拆開、收尾標點不放行首、
 開頭括號不放行尾。估計不準的地方由量測抓——這裡只負責「大多數時候一次就過」。
@@ -27,7 +31,7 @@ from xml.sax.saxutils import escape
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from webapp.diagrams import DIAGRAM_DIR  # noqa: E402
+from webapp.diagrams import DIAGRAM_DIR, NODE_PREFIXES, svg_digest  # noqa: E402
 
 W = 360
 X0, X1 = 12, 348          # 方框左右
@@ -128,13 +132,15 @@ class Canvas:
     def __init__(self) -> None:
         self.parts: list[str] = []
         self.y = 30.0
+        #: 每一格（含框中框）的位置與節點——個股頁標「在這裡」用（座標是 viewBox 單位）
+        self.boxes: list[dict[str, Any]] = []
 
     def _text(self, x: float, y: float, s: str, size: float, weight: str, fill: str, anchor: str = "start") -> None:
         self.parts.append(f'<text x="{x:.1f}" y="{y:.1f}" font-size="{size}" font-weight="{weight}" fill="{fill}" '
                           f'text-anchor="{anchor}">{escape(s)}</text>')
 
     def box(self, kind: str, title: str, desc: str, suppliers: list[str], *, dashed: bool = False,
-            inner: list[dict[str, Any]] | None = None) -> None:
+            inner: list[dict[str, Any]] | None = None, nodes: list[str] | None = None) -> None:
         """一層：粗體名字、描述、（可選）框中框、最後灰字「圖上：…」。"""
         text_w = X1 - X0 - 2 * PAD
         top = self.y
@@ -149,7 +155,7 @@ class Canvas:
                 + [(ln, 11, "400", MUTED) for ln in wrap(supplier_line(list(spec.get("suppliers") or [])), 11, iw)]
             iplaced, icursor = _place(ilines, X0 + PAD + INNER_PAD, itop, INNER_PAD - 2)
             ibottom = icursor + INNER_PAD
-            inner_rects.append((itop, ibottom - itop))
+            inner_rects.append((itop, ibottom - itop, str(spec["title"]), list(spec.get("nodes") or ())))
             placed += iplaced
             cursor = ibottom
         sup = [(ln, 11, "400", MUTED) for ln in wrap(supplier_line(suppliers), 11, text_w)]
@@ -159,9 +165,14 @@ class Canvas:
         dash = ' stroke-dasharray="5 4"' if dashed else ""
         self.parts.append(f'<rect x="{X0}" y="{top:.1f}" width="{X1 - X0}" height="{h:.1f}" rx="10" '
                           f'fill="{FILL[kind]}" stroke="{STROKE[kind]}" stroke-width="1.4"{dash}/>')
-        for itop, ih in inner_rects:
+        # 位置表的數字照抄上面 rect 的屬性（同一個格式化），標記才會疊在畫出來的框上
+        self.boxes.append({"title": title, "nodes": list(nodes or ()), "top": float(f"{top:.1f}"),
+                           "height": float(f"{h:.1f}"), "left": X0, "span": X1 - X0})
+        for itop, ih, ititle, inodes in inner_rects:
             self.parts.append(f'<rect x="{X0 + PAD}" y="{itop:.1f}" width="{text_w}" height="{ih:.1f}" rx="8" '
                               f'fill="#ffffff" stroke="{STROKE[kind]}" stroke-width="1"/>')
+            self.boxes.append({"title": ititle, "nodes": inodes, "top": float(f"{itop:.1f}"),
+                               "height": float(f"{ih:.1f}"), "left": X0 + PAD, "span": text_w, "inside": title})
         for x, base, s, size, weight, fill in placed:
             self._text(x, base, s, size, weight, fill)
         self.y = top + h
@@ -189,6 +200,22 @@ def layout_problems(layout: Any) -> list[str]:
     if not isinstance(steps, list) or not steps:
         return ["說明檔沒有 layout.steps（要畫的鏈）"]
     problems = []
+    seen: dict[str, str] = {}
+
+    def check_nodes(where: str, nodes: Any) -> None:
+        if nodes is None:
+            return
+        if not isinstance(nodes, list):
+            problems.append(f"{where}的 nodes 要是清單")
+            return
+        for node in nodes:
+            if not str(node).startswith(NODE_PREFIXES):
+                problems.append(f"{where}的節點 {node!r} 不是 tech:／mat:／prod:")
+            elif str(node) in seen:
+                problems.append(f"節點 {node} 同時畫在「{seen[str(node)]}」和{where}（一個節點只畫在一格，標記才不會兩處都亮）")
+            else:
+                seen[str(node)] = where
+
     for i, step in enumerate(steps, 1):
         if not isinstance(step, dict) or ("box" in step) == ("arrow" in step):
             problems.append(f"第 {i} 步要嘛是 box、要嘛是 arrow")
@@ -197,21 +224,38 @@ def layout_problems(layout: Any) -> list[str]:
                 problems.append(f"第 {i} 步的配色 {step['box']!r} 不認得（{sorted(FILL)}）")
             if not str(step.get("title") or "").strip():
                 problems.append(f"第 {i} 步的方框沒有名字")
+            check_nodes(f"第 {i} 步", step.get("nodes"))
             for j, spec in enumerate(step.get("inner") or (), 1):
                 if not str((spec or {}).get("title") or "").strip():
                     problems.append(f"第 {i} 步的第 {j} 個框中框沒有名字")
+                check_nodes(f"第 {i} 步的第 {j} 個框中框", (spec or {}).get("nodes"))
     return problems
 
 
-def render(layout: dict[str, Any]) -> str:
+def layout_nodes(layout: dict[str, Any]) -> list[str]:
+    """layout 每一格畫的節點（依出現順序）——說明檔的 `nodes_shown` 要和它一樣（同一份，L16）。"""
+    out: list[str] = []
+    for step in layout.get("steps") or ():
+        if "box" in step:
+            out += [str(n) for n in step.get("nodes") or ()]
+            out += [str(n) for spec in step.get("inner") or () for n in (spec or {}).get("nodes") or ()]
+    return out
+
+
+def draw(layout: dict[str, Any]) -> Canvas:
     canvas = Canvas()
     for step in layout["steps"]:
         if "arrow" in step:
             canvas.arrow(str(step["arrow"] or ""))
         else:
             canvas.box(step["box"], str(step["title"]), str(step.get("desc") or ""), list(step.get("suppliers") or []),
-                       dashed=bool(step.get("dashed")), inner=list(step.get("inner") or []))
-    return canvas.svg()
+                       dashed=bool(step.get("dashed")), inner=list(step.get("inner") or []),
+                       nodes=[str(n) for n in step.get("nodes") or ()])
+    return canvas
+
+
+def render(layout: dict[str, Any]) -> str:
+    return draw(layout).svg()
 
 
 def main(argv: list[str]) -> int:
@@ -227,13 +271,23 @@ def main(argv: list[str]) -> int:
             print(f"✗ {diagram_id}：找不到 {meta_path.name}")
             ok = False
             continue
-        layout = json.loads(meta_path.read_text(encoding="utf-8")).get("layout")
+        meta = json.loads(meta_path.read_text(encoding="utf-8"))
+        layout = meta.get("layout")
         problems = layout_problems(layout)
+        if not problems and sorted(set(layout_nodes(layout))) != sorted(set(meta.get("nodes_shown") or ())):
+            problems.append("nodes_shown 和每一格畫的節點對不上——"
+                            f"格裡有、nodes_shown 沒有：{sorted(set(layout_nodes(layout)) - set(meta.get('nodes_shown') or ()))}；"
+                            f"nodes_shown 有、沒有一格畫它：{sorted(set(meta.get('nodes_shown') or ()) - set(layout_nodes(layout)))}")
         if problems:
             print(f"✗ {diagram_id}：" + "；".join(problems))
             ok = False
             continue
-        (DIAGRAM_DIR / f"{diagram_id}.svg").write_text(render(layout), encoding="utf-8")
+        canvas = draw(layout)
+        svg = canvas.svg()
+        (DIAGRAM_DIR / f"{diagram_id}.svg").write_text(svg, encoding="utf-8")
+        # 位置表綁這張 SVG：圖重畫或手改過，位置表就對不上、不嵌（webapp.diagrams.geometry_problems）
+        meta["geometry"] = {"svg_sha256": svg_digest(svg), "boxes": canvas.boxes}
+        meta_path.write_text(json.dumps(meta, ensure_ascii=False, indent=1), encoding="utf-8")
         if not Path(EDGE).is_file():
             print(f"△ {diagram_id}：已畫，但找不到 Edge 量不到——沒有量測紀錄，materialize 不會嵌")
             ok = False

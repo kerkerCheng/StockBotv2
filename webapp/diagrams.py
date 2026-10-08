@@ -3,7 +3,9 @@
 每張圖三個檔，住 `library/private/research_notes/diagrams/`（研究 session 寫；私有、不進 repo）：
 
 - `<id>.json`——`{"title", "caption", "nodes_shown": [tech:/mat:/prod: 節點], "sources": [{"ref", "what"}], "drawn_at", "author"}`；
-  可另帶 `layout`（`scripts/draw_diagram.py` 照它畫 SVG；這裡不讀）。
+  可另帶 `layout`（`scripts/draw_diagram.py` 照它畫 SVG；這裡不讀）與 `geometry`（畫圖器寫的位置表：每一格的名字、節點、
+  上緣、高、左緣、寬，綁 SVG 的 sha256）——個股頁據此標「這檔在這裡」（2026-10-08 使用者）。手畫的圖沒有位置表＝標不出
+  在哪一格（照實說，不是錯）；有位置表就要對得上現在這張 SVG、節點的聯集要等於 `nodes_shown`，否則不嵌。
 - `<id>.svg`——圖本身（`scripts/draw_diagram.py` 畫或手寫，手機寬度可讀）。
 - `<id>.check.json`——`scripts/check_diagrams.py` 的量測紀錄（規則 9：字不重疊、不出框、不壓框線；**量過、0 才發佈**）。
   紀錄綁 SVG 的 sha256：圖改過就要重量，沒量、量測沒過、量測版本舊了都不嵌。
@@ -126,6 +128,60 @@ def receipt_problems(svg_text: str, path: Path) -> list[str]:
     return []
 
 
+def viewbox_size(svg_text: str) -> tuple[float, float] | None:
+    """SVG viewBox 的寬高（個股頁把位置表換成百分比疊在圖上）；讀不到回 None。"""
+    try:
+        parts = str(ElementTree.fromstring(svg_text).get("viewBox") or "").replace(",", " ").split()
+        width, height = float(parts[2]), float(parts[3])
+    except (ElementTree.ParseError, IndexError, ValueError):
+        return None
+    return (width, height) if width > 0 and height > 0 else None
+
+
+def _number(value: Any) -> bool:
+    return isinstance(value, (int, float)) and not isinstance(value, bool) and value >= 0
+
+
+def geometry_problems(meta: Mapping[str, Any], svg_text: str) -> list[str]:
+    """位置表（`geometry`）的檢查：綁得上現在這張 SVG、每一格有名字且落在圖裡、一個節點只在一格、
+    節點的聯集＝`nodes_shown`（選圖與標記同一份，L16）。沒有位置表回空（手畫的圖；個股頁照實說標不出）。"""
+    geometry = meta.get("geometry")
+    if geometry is None:
+        return []
+    if not isinstance(geometry, Mapping) or not isinstance(geometry.get("boxes"), list):
+        return ["位置表（geometry）格式不對（重跑 scripts/draw_diagram.py）"]
+    if geometry.get("svg_sha256") != svg_digest(svg_text):
+        return ["圖改過、位置表沒跟著重畫（位置表對不上現在的 SVG；重跑 scripts/draw_diagram.py）"]
+    size = viewbox_size(svg_text)
+    if size is None:
+        return ["位置表需要 SVG 的 viewBox 寬高"]
+    width, height = size
+    problems: list[str] = []
+    placed: dict[str, str] = {}
+    for i, box in enumerate(geometry["boxes"], 1):
+        if not isinstance(box, Mapping) or not str(box.get("title") or "").strip():
+            problems.append(f"位置表第 {i} 格沒有名字")
+            continue
+        title = str(box["title"])
+        if not all(_number(box.get(k)) for k in ("top", "height", "left", "span")):
+            problems.append(f"位置表「{title}」的上緣／高／左緣／寬要是非負數")
+        elif box["top"] + box["height"] > height + 0.5 or box["left"] + box["span"] > width + 0.5:
+            problems.append(f"位置表「{title}」落在圖外")
+        nodes = box.get("nodes")
+        if not isinstance(nodes, list):
+            problems.append(f"位置表「{title}」的 nodes 要是清單")
+            continue
+        for node in nodes:
+            if str(node) in placed:
+                problems.append(f"節點 {node} 同時在「{placed[str(node)]}」和「{title}」兩格")
+            placed[str(node)] = title
+    shown = {str(n) for n in meta.get("nodes_shown") or ()}
+    if not problems and set(placed) != shown:
+        problems.append(f"位置表的節點和 nodes_shown 對不上（格裡有、nodes_shown 沒有：{sorted(set(placed) - shown)}；"
+                        f"nodes_shown 有、沒有一格畫它：{sorted(shown - set(placed))}）")
+    return problems
+
+
 def load_diagrams(directory: Path | None = None, *, raw_dir: Path = RAW_DIR) -> dict[str, Any]:
     """全部示意圖：`{"diagrams": [可嵌的], "rejected": [{id, problems}]}`。目錄不存在＝0 張（不是錯）。"""
     root = directory or DIAGRAM_DIR
@@ -147,11 +203,14 @@ def load_diagrams(directory: Path | None = None, *, raw_dir: Path = RAW_DIR) -> 
         if not svg_text:
             problems.append(f"找不到 {svg_path.name}")
         else:
-            problems += svg_problems(svg_text) or receipt_problems(svg_text, receipt_path(root, diagram_id))
+            problems += (svg_problems(svg_text) or receipt_problems(svg_text, receipt_path(root, diagram_id))
+                         or geometry_problems(meta, svg_text))
         problems += meta_problems(meta, raw_dir=raw_dir)
         if problems:
             out["rejected"].append({"id": diagram_id, "problems": problems})
             continue
+        width, height = viewbox_size(svg_text) or (None, None)
+        geometry = meta.get("geometry")
         out["diagrams"].append({
             "id": diagram_id,
             "title": str(meta["title"]),
@@ -161,6 +220,11 @@ def load_diagrams(directory: Path | None = None, *, raw_dir: Path = RAW_DIR) -> 
             "drawn_at": meta.get("drawn_at"),
             "author": meta.get("author") or "session",
             "src": "data:image/svg+xml;base64," + base64.b64encode(svg_text.encode("utf-8")).decode("ascii"),
+            # 每一格的位置（viewBox 單位）與它畫的節點；None＝這張圖沒有位置表（手畫的），個股頁標不出在哪一格
+            "width": width, "height": height,
+            "boxes": None if geometry is None else [
+                {"title": str(b["title"]), "nodes": [str(n) for n in b["nodes"]], "top": b["top"], "height": b["height"],
+                 "left": b["left"], "span": b["span"], "inside": b.get("inside")} for b in geometry["boxes"]],
         })
     return out
 
@@ -173,5 +237,6 @@ def diagrams_for_nodes(loaded: Mapping[str, Any] | None, nodes: Any) -> list[dic
     return [d for d in loaded.get("diagrams") or () if want & set(d.get("nodes_shown") or ())]
 
 
-__all__ = ["CHECK_PROBLEMS", "CHECK_VERSION", "DIAGRAM_DIR", "FORBIDDEN_TAGS", "RECEIPT_SUFFIX", "diagrams_for_nodes",
-           "load_diagrams", "meta_problems", "receipt_path", "receipt_problems", "svg_digest", "svg_problems"]
+__all__ = ["CHECK_PROBLEMS", "CHECK_VERSION", "DIAGRAM_DIR", "FORBIDDEN_TAGS", "NODE_PREFIXES", "RECEIPT_SUFFIX",
+           "diagrams_for_nodes", "geometry_problems", "load_diagrams", "meta_problems", "receipt_path", "receipt_problems",
+           "svg_digest", "svg_problems", "viewbox_size"]

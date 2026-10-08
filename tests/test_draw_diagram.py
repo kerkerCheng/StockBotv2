@@ -3,11 +3,15 @@
 這裡用估計字寬檢查幾何；實際字框由 scripts/check_diagrams.py 用瀏覽器量。"""
 from __future__ import annotations
 
+import json
 import re
+from pathlib import Path
 from xml.etree import ElementTree
 
-from scripts.draw_diagram import ASC, DSC, X1, layout_problems, render, text_width, wrap
-from webapp.diagrams import svg_problems
+import scripts.check_diagrams as check_diagrams
+import scripts.draw_diagram as draw_diagram
+from scripts.draw_diagram import ASC, DSC, X1, draw, layout_nodes, layout_problems, render, text_width, wrap
+from webapp.diagrams import geometry_problems, svg_digest, svg_problems
 
 LPT = "圖上：HD 現代電氣、曉星重工、日立、Prolec GE、Delta Star、Virginia Transformer、Niagara、PTT（列舉不完整）"
 MODULE = "發：DSP 把電訊號整理乾淨 → 驅動 → 雷射＋調變器把資料寫進光 → 光纖。收：光偵測器 → TIA 放大 → DSP。"
@@ -89,3 +93,59 @@ def test_a_layout_that_cannot_be_drawn_says_what_is_wrong() -> None:
     text = " ".join(problems)
     assert "neon" in text and "沒有名字" in text and "要嘛是 box" in text and "框中框" in text
     assert layout_problems({"steps": [{"box": "heat", "title": "冷板"}, {"arrow": ""}]}) == []
+
+
+PLACED = {"steps": [
+    {"box": "heat", "title": "冷板", "desc": "貼在晶片上的金屬板，冷卻液流過裡面的流道把熱帶走。",
+     "nodes": ["tech:liquid_cooling_cold_plate"]},
+    {"arrow": "熱"},
+    {"box": "heat", "title": "CDU", "desc": "泵推動機櫃這一側的迴路。", "nodes": ["tech:coolant_distribution_unit"],
+     "inner": [{"title": "板式熱交換器", "desc": "兩種液體隔著一疊薄金屬板交換熱量。", "suppliers": ["Alfa Laval、Danfoss"],
+                "nodes": ["tech:brazed_plate_heat_exchanger"]}]},
+    {"box": "gray", "title": "設施水", "desc": "熱最後由設施端排到室外。"},
+]}
+
+
+def test_every_box_records_exactly_where_it_was_drawn_and_which_nodes_it_shows() -> None:
+    """2026-10-08 使用者：「我想知道它出現在示意圖的哪一個地方」——畫圖器記下每一格（含框中框）的位置與節點，
+    數字和畫出來的 rect 一模一樣（個股頁的「在這裡」框才疊得準）。"""
+    canvas = draw(PLACED)
+    root = ElementTree.fromstring(canvas.svg())
+    ns = "{http://www.w3.org/2000/svg}"
+    rects = {tuple(float(r.get(k)) for k in ("x", "y", "width", "height")) for r in root.iter(f"{ns}rect")}
+    assert [b["title"] for b in canvas.boxes] == ["冷板", "CDU", "板式熱交換器", "設施水"]
+    for b in canvas.boxes:
+        assert (b["left"], b["top"], b["span"], b["height"]) in rects, b
+    assert canvas.boxes[2]["inside"] == "CDU" and canvas.boxes[2]["nodes"] == ["tech:brazed_plate_heat_exchanger"]
+    assert canvas.boxes[3]["nodes"] == []
+    assert layout_nodes(PLACED) == ["tech:liquid_cooling_cold_plate", "tech:coolant_distribution_unit",
+                                    "tech:brazed_plate_heat_exchanger"]
+
+
+def test_a_node_in_two_boxes_or_something_that_is_not_a_node_is_refused() -> None:
+    twice = {"steps": [{"box": "heat", "title": "甲", "nodes": ["tech:x"]},
+                       {"box": "heat", "title": "乙", "inner": [{"title": "丙", "nodes": ["tech:x"]}]}]}
+    assert any("同時畫在" in p for p in layout_problems(twice))
+    assert any("co:acme" in p for p in layout_problems({"steps": [{"box": "heat", "title": "甲", "nodes": ["co:acme"]}]}))
+    assert any("清單" in p for p in layout_problems({"steps": [{"box": "heat", "title": "甲", "nodes": "tech:x"}]}))
+
+
+def _meta(nodes_shown: list[str]) -> dict:
+    return {"title": "液冷", "caption": "示意", "nodes_shown": nodes_shown, "sources": [{"ref": "raw:x.txt"}], "layout": PLACED}
+
+
+def test_drawing_writes_the_position_table_bound_to_the_svg_and_refuses_a_mismatched_nodes_shown(tmp_path: Path,
+                                                                                                  monkeypatch) -> None:
+    """畫圖器把位置表寫回說明檔、綁這張 SVG 的 sha256（載入端照同一個檢查放行）；`nodes_shown` 和每一格的節點對不上就不畫
+    （選圖與標記同一份，L16）。量測要 Edge——這裡把 Edge 指到不存在的路徑，畫完就停（exit 1、沒有量測紀錄）。"""
+    monkeypatch.setattr(draw_diagram, "DIAGRAM_DIR", tmp_path)
+    monkeypatch.setattr(check_diagrams, "EDGE", str(tmp_path / "no-edge.exe"))
+    (tmp_path / "good.json").write_text(json.dumps(_meta(layout_nodes(PLACED)), ensure_ascii=False), encoding="utf-8")
+    (tmp_path / "off.json").write_text(json.dumps(_meta(["tech:liquid_cooling_cold_plate", "tech:eml"]),
+                                                  ensure_ascii=False), encoding="utf-8")
+    assert draw_diagram.main(["good", "off"]) == 1
+    svg = (tmp_path / "good.svg").read_text(encoding="utf-8")
+    meta = json.loads((tmp_path / "good.json").read_text(encoding="utf-8"))
+    assert meta["geometry"]["svg_sha256"] == svg_digest(svg) and len(meta["geometry"]["boxes"]) == 4
+    assert geometry_problems(meta, svg) == []
+    assert not (tmp_path / "off.svg").exists() and "geometry" not in json.loads((tmp_path / "off.json").read_text(encoding="utf-8"))

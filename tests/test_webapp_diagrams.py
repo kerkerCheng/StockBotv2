@@ -99,3 +99,38 @@ def test_only_a_passing_measurement_of_this_exact_svg_lets_a_diagram_in(tmp_path
     assert "舊版" in why["old_checker"] and "0 段字" in why["blank_page"]
     # 量測紀錄本身不被當成一張圖（不會多出 id 為 xxx.check 的拒收）
     assert not any(r["id"].endswith(".check") for r in loaded["rejected"])
+
+
+BOX = {"title": "雷射", "nodes": ["tech:cw_dfb_laser"], "top": 10, "height": 40, "left": 10, "span": 120}
+
+
+def _geometry(svg: str, boxes: list) -> dict:
+    return {"svg_sha256": svg_digest(svg), "boxes": boxes}
+
+
+def test_the_position_table_must_belong_to_this_svg_and_cover_exactly_the_nodes_shown(tmp_path: Path) -> None:
+    """2026-10-08 使用者：「我想知道它出現在示意圖的哪一個地方」——畫圖器寫的位置表讓個股頁標「在這裡」。位置表綁 SVG：
+    圖改過沒重畫、格子落在圖外、一個節點兩格、節點和 nodes_shown 對不上——標記會標錯地方，整張不嵌。沒有位置表（手畫）照嵌、
+    `boxes` 是 None（個股頁照實說標不出），不是空清單。"""
+    raw = tmp_path / "raw"
+    raw.mkdir()
+    (raw / "doc_a.txt").write_text("x", encoding="utf-8")
+    d = tmp_path / "diagrams"
+    d.mkdir()
+    _write(d, "placed", CLEAN, {**META, "geometry": _geometry(CLEAN, [BOX, {**BOX, "title": "框外的說明", "nodes": []}])})
+    _write(d, "hand_drawn", CLEAN, META)
+    _write(d, "stale", CLEAN, {**META, "geometry": _geometry(CLEAN.replace("交換器", "改過"), [BOX])})
+    _write(d, "extra_node", CLEAN, {**META, "geometry": _geometry(CLEAN, [{**BOX, "nodes": ["tech:cw_dfb_laser", "tech:eml"]}])})
+    _write(d, "outside", CLEAN, {**META, "geometry": _geometry(CLEAN, [{**BOX, "top": 190}])})
+    _write(d, "twice", CLEAN, {**META, "geometry": _geometry(CLEAN, [BOX, {**BOX, "title": "又一格"}])})
+    _write(d, "untitled", CLEAN, {**META, "geometry": _geometry(CLEAN, [{**BOX, "title": " "}])})
+    loaded = load_diagrams(d, raw_dir=raw)
+    by_id = {x["id"]: x for x in loaded["diagrams"]}
+    assert set(by_id) == {"placed", "hand_drawn"}
+    placed = by_id["placed"]
+    assert (placed["width"], placed["height"]) == (360.0, 200.0)              # 寬高照 SVG 的 viewBox，不另存一份
+    assert [b["title"] for b in placed["boxes"]] == ["雷射", "框外的說明"] and placed["boxes"][0]["nodes"] == ["tech:cw_dfb_laser"]
+    assert by_id["hand_drawn"]["boxes"] is None
+    why = {r["id"]: " ".join(r["problems"]) for r in loaded["rejected"]}
+    assert "位置表沒跟著重畫" in why["stale"] and "對不上" in why["extra_node"] and "圖外" in why["outside"]
+    assert "兩格" in why["twice"] and "沒有名字" in why["untitled"]

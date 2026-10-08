@@ -226,7 +226,8 @@ def materialize_view(analyst_view_dict: Mapping[str, Any], *,
                      diagrams: Sequence[Mapping[str, Any]] | None = None,
                      node_names: Mapping[str, str] | None = None,
                      demand_anchor: Mapping[str, Any] | None = None,
-                     capture: Mapping[str, Any] | None = None) -> dict[str, Any]:
+                     capture: Mapping[str, Any] | None = None,
+                     what_it_does: Mapping[str, Any] | None = None) -> dict[str, Any]:
     """`AnalystView.to_dict()` → artifact payload（含遮蔽、overview、兩個 digest）。純函式。
 
     `price_series` 是**脈絡不是判讀**：一條這檔自己的已收盤收盤價序列，讓使用者看得懂
@@ -271,6 +272,8 @@ def materialize_view(analyst_view_dict: Mapping[str, Any], *,
         "demand_anchor": dict(demand_anchor) if demand_anchor is not None else None,
         # 吃到多少（個股頁 S3b）：公司同一曆季營收（換美元）÷ 錨；照抄 `alpha.capture`（季、匯率、可知日、缺哪個）。
         "capture": dict(capture) if capture is not None else None,
+        # 頁首「做什麼」（2026-10-08）：押的層或插槽（敘事）或圖上它供貨開發的節點（圖），與在示意圖的哪一格——`what_it_does` 組好照印。
+        "what_it_does": dict(what_it_does) if what_it_does is not None else None,
         "materializer": {
             "version": MATERIALIZER_VERSION,
             "python": f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}",
@@ -295,14 +298,64 @@ def _page_fill(view: Mapping[str, Any], extra: Mapping[str, Any] | None, fill_ta
     return {"schema": version, "rows": rows, "summary": fill_summary(rows)}
 
 
+#: 「做什麼」沒有押的格、改列圖上的節點時最多列幾個（其餘寫「等共 N 個」）。列序是節點 id 的字母序（`seats_from_edges`），不是名次。
+WHAT_IT_DOES_SHOWN = 3
+
+
+def what_it_does(view: Mapping[str, Any], seats: Sequence[str] | None, names: Mapping[str, str],
+                 diagrams: Sequence[Mapping[str, Any]] | None) -> dict[str, Any]:
+    """頁首「做什麼」（個股頁 B0；2026-10-08 使用者：「這個公司在做甚麼東西是我們關注的…像 COHR 就寫個 CW DFB 雷射，
+    一目了然」）。純函式。
+
+    兩個來源分開寫（L12）：敘事宣告的 `rides`（押的層或插槽——研究判斷）優先，寫「押在：…」；沒宣告時才列圖上它供貨或
+    開發的節點（`seats_from_edges`——圖的事實），寫「圖上它供貨或開發：…」並說敘事還沒宣告押哪一格；兩個都沒有＝具名缺席。
+    `seats` 是 None＝圖這一輪讀不到（不是「圖上沒有」，INV-3）。
+    `where_line`：這幾個節點在示意圖的哪一格（畫圖器的位置表）；沒有一格畫到就不印（技術鏈那一塊照樣有圖與說明）。
+    只照抄、不排序、不打分。"""
+    rides_line = next((line for line in ((view.get("bet") or {}).get("lines") or ())
+                       if str(line.get("key") or "") == "rides"), None)
+    rides = [r for r in ((rides_line or {}).get("datum") or {}).get("value") or () if isinstance(r, Mapping)]
+    seat_list = [str(n) for n in seats or ()]
+    if not rides and seats is None:
+        return {"source": None, "line": None, "focus": [], "where": [], "where_line": None,
+                "absence": {"kind": "upstream_unavailable",
+                            "reason": "圖這一輪讀不到，說不出它供貨或開發哪些節點（敘事也還沒宣告押哪一格）"}}
+    if rides:
+        source, focus = "rides", [str(r.get("node")) for r in rides]
+        line = "押在：" + "、".join(f"{r.get('node_name') or r.get('node')}（{r.get('unit_label') or r.get('unit')}）"
+                                  for r in rides)
+    elif seat_list:
+        source, focus = "seats", seat_list
+        shown = "、".join(names.get(n) or n for n in seat_list[:WHAT_IT_DOES_SHOWN])
+        more = f" 等共 {len(seat_list)} 個" if len(seat_list) > WHAT_IT_DOES_SHOWN else ""
+        line = f"圖上它供貨或開發：{shown}{more}（敘事還沒宣告押哪一格）"
+    else:
+        return {"source": None, "line": None, "focus": [], "where": [], "where_line": None,
+                "absence": {"kind": "not_yet_recorded",
+                            "reason": "敘事還沒宣告押哪一格，圖上也還沒有它供貨或開發的節點"}}
+    want = set(focus)
+    where = []
+    for d in diagrams or ():
+        hit = [str(b.get("title")) for b in d.get("boxes") or () if want & {str(n) for n in b.get("nodes") or ()}]
+        if hit:
+            where.append({"diagram": str(d.get("id")), "title": str(d.get("title") or ""), "boxes": hit})
+    boxes = [title for w in where for title in w["boxes"]]
+    where_line = ("示意圖上在" + "、".join(f"「{t}」" for t in boxes) + "（往下「技術鏈」有圖）") if boxes else None
+    return {"source": source, "line": line, "focus": focus, "where": where, "where_line": where_line, "absence": None}
+
+
 def page_extra_for(ticker: str, layer_notes: Mapping[str, Any] | None,
                   diagrams: Sequence[Mapping[str, Any]] | None = None,
                   demand_anchor: Mapping[str, Any] | None = None,
-                  capture: Mapping[str, Any] | None = None) -> dict[str, Any] | None:
+                  capture: Mapping[str, Any] | None = None,
+                  what: Mapping[str, Any] | None = None) -> dict[str, Any] | None:
     """個股頁填得滿表的頁外輸入：引用這一頁的層說明節點（`layer_notes` state artifact 的 `cited_by.pages`）、
     涵蓋這一頁坐的層的示意圖 id（`diagrams`；None＝這一輪沒讀到示意圖目錄）、需求錨序列（`demand_anchor`：有值的序列 key；
-    讀不到或回看的那天不推＝不給這個鍵）。artifact 讀不到 → 那一個鍵不給（那一格印這一輪沒讀到，不是「沒有」）。"""
+    讀不到或回看的那天不推＝不給這個鍵）、「做什麼」講的節點（`what`）。artifact 讀不到 → 那一個鍵不給
+    （那一格印這一輪沒讀到，不是「沒有」）。"""
     extra: dict[str, Any] = {}
+    if what is not None and ((what.get("absence") or {}).get("kind")) != "upstream_unavailable":
+        extra["what_it_does"] = list(what.get("focus") or ())
     if diagrams is not None:
         extra["diagrams"] = [str(d.get("id")) for d in diagrams]
     absence_kind = ((demand_anchor or {}).get("absence") or {}).get("kind")
@@ -470,12 +523,15 @@ def materialize(ticker: str, *, as_of: date | None = None, scenario: str | None 
     anchor_ctx = anchors if anchors is not None else _anchor_context(as_of)
     demand = _page_demand_anchor(anchor_ctx, candidate_ctx, view.identity.company_id)
     capture = _page_capture(str(view.identity.ticker or ticker), demand, as_of)
-    payload = materialize_view(analyst.to_dict(), generated_at=generated_at,
+    analyst_dict = analyst.to_dict()
+    graph_read = isinstance((context or {}).get("seats"), Mapping)        # 讀圖 context 讀不到＝說不出坐哪幾格（不是「沒有」）
+    what = what_it_does(analyst_dict, seats if graph_read else None, names, page_diagrams)
+    payload = materialize_view(analyst_dict, generated_at=generated_at,
                                price_series=_close_series(ticker),
-                               page_extra=page_extra_for(ticker, notes_state, page_diagrams, demand, capture),
+                               page_extra=page_extra_for(ticker, notes_state, page_diagrams, demand, capture, what),
                                diagrams=page_diagrams,
                                node_names={str(n): names[str(n)] for n in seats if str(n) in names},
-                               demand_anchor=demand, capture=capture)
+                               demand_anchor=demand, capture=capture, what_it_does=what)
     target = store or ArtifactStore()
     return target.write(payload), payload
 

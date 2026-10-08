@@ -85,8 +85,11 @@ _S3_ANCHOR = f"{_S3}：需求錨序列（SEC 四家現金資本支出＋NVIDIA �
 
 ELEMENTS: tuple[PageElement, ...] = (
     # B0 頁首與一行狀態
-    PageElement("B0.what_it_does", "B0", "它是做什麼的一句", "company", "mechanical", (),
-                "capability_absent", f"{_S3}；現在只有研究寫的「在系統哪一格」（B1）"),
+    # 2026-10-08 使用者：「這個公司在做甚麼東西是我們關注的…像 COHR 就寫個 CW DFB 雷射」——押的層或插槽（敘事宣告）優先，
+    # 沒宣告時是圖上它供貨或開發的節點；兩個來源在句子裡分開寫（webapp.materialize.what_it_does，L12）
+    PageElement("B0.what_it_does", "B0", "做什麼：押的層或插槽；沒宣告時是圖上它供貨或開發的節點，與在示意圖的哪一格",
+                "company", "graph", ("bet/rides", "@what_it_does"), "not_yet_recorded",
+                "v2 敘事的 rides；圖上的供貨與開發邊（seats_from_edges）；示意圖的位置表"),
     PageElement("B0.candidate_state", "B0", "候選狀態", "company", "research", ("candidate/candidate:state",),
                 "not_yet_recorded", "候選板（敘事的候選狀態）"),
     PageElement("B0.revenue_yoy", "B0", "最近營收年增", "company", "mechanical",
@@ -339,9 +342,9 @@ def _matching_lines(view: Mapping[str, Any], spec: str) -> list[Mapping[str, Any
 def fill_table(view: Mapping[str, Any], *, extra: Mapping[str, Any] | None = None) -> list[dict[str, Any]]:
     """一檔的填得滿表：每個元素一列，`state` 只有 `value`／`absent` 兩種。
 
-    缺席的 kind：承載它的 line 有、但沒值 → 照抄那條 line 的 `datum.absence_kind`（沒宣告就用 `default_absence_kind(status)`
-    查表）；沒有任何 line 承載 → 合約宣告的預設。`extra`：頁外的輸入（`@layer_notes`＝引用這一頁的層說明節點；
-    沒給＝這一輪沒讀到 → `upstream_unavailable`，不是「沒有」）。"""
+    缺席的 kind：頁外的輸入這一輪沒讀到 → `upstream_unavailable`（優先：沒讀到的那一半可能有值）；承載它的 line 有、但沒值 →
+    照抄那條 line 的 `datum.absence_kind`（沒宣告就用 `default_absence_kind(status)` 查表）；沒有任何 line 承載 → 合約宣告的預設。
+    `extra`：頁外的輸入（`@layer_notes`＝引用這一頁的層說明節點；沒給＝這一輪沒讀到 → `upstream_unavailable`，不是「沒有」）。"""
     rows: list[dict[str, Any]] = []
     for element in ELEMENTS:
         row: dict[str, Any] = {"element": element.key, "block": element.block}
@@ -352,16 +355,17 @@ def fill_table(view: Mapping[str, Any], *, extra: Mapping[str, Any] | None = Non
         valued = [line for line in carried if str((line.get("datum") or {}).get("status")) in VALUE_STATUSES]
         if valued or extra_hit:
             row.update(state="value", lines=[str(line.get("key")) for line in valued][:8])
+        elif unread:
+            # 頁外的輸入這一輪沒讀到：不是「沒有」（INV-3）——就算承載它的 line 宣告了別的缺席，沒讀到的那一半可能有值，
+            # 所以沒讀到優先（B0「做什麼」：敘事沒宣告押哪一格、圖又沒讀到，不能說成「還沒寫」）
+            row.update(state="absent", absence_kind="upstream_unavailable",
+                       looked=f"{element.looked}——這一輪沒讀到（{'、'.join(unread)}）")
         elif carried:
             datum = carried[0].get("datum") or {}
             kind = datum.get("absence_kind") or default_absence_kind(str(datum.get("status") or "missing")) \
                 or element.absence
             row.update(state="absent", absence_kind=kind, looked=element.looked,
                        lines=[str(line.get("key")) for line in carried][:8])
-        elif unread:
-            # 頁外的輸入這一輪沒讀到：不是「沒有」（INV-3）
-            row.update(state="absent", absence_kind="upstream_unavailable",
-                       looked=f"{element.looked}——這一輪沒讀到（{'、'.join(unread)}）")
         else:
             row.update(state="absent", absence_kind=element.absence, looked=element.looked)
         rows.append(row)

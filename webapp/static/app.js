@@ -1151,6 +1151,8 @@ async function renderDetail(ticker) {
   const head = el('div', 'detail-head');
   head.appendChild(el('h1', null, payload.ticker));
   head.appendChild(el('div', 'company', payload.company_label || ''));
+  const what = whatLine(payload);
+  if (what) head.appendChild(what);
   const sub = headerLine(payload, view);
   if (sub) head.appendChild(sub);
   app.appendChild(head);
@@ -1162,6 +1164,21 @@ async function renderDetail(ticker) {
   // 給查核用的欄位（authority、digest、readiness、填得滿表、原始 JSON）留在 artifact 與 `/api/v1/stocks/<T>`，不必有畫面。
   app.appendChild(briefCard(payload, view));
   window.scrollTo(0, 0);
+}
+
+/** 頁首「做什麼」（schema B0；2026-10-08 使用者：「像 COHR 就寫個 CW DFB 雷射，一目了然」）：materialize 組好的句子照印
+ *  （`what_it_does`：押的層或插槽，敘事沒宣告時是圖上它供貨或開發的節點；在示意圖的哪一格）。前端不挑、不組。 */
+function whatLine(payload) {
+  const what = payload.what_it_does;
+  if (!what) return null;
+  const box = el('div', 'detail-what');
+  if (what.line) {
+    box.appendChild(el('div', 'detail-what-line', what.line));
+    if (what.where_line) box.appendChild(el('div', 'detail-what-where', what.where_line));
+  } else {
+    box.appendChild(el('div', 'detail-what-where', `做什麼：還不知道——${(what.absence || {}).reason || '沒說為什麼'}`));
+  }
+  return box;
 }
 
 /** 頁首一行：現價與收盤日、這份判讀哪天產生（原「基本數字」那一格搬上來；判讀不在點擊時重算）。 */
@@ -1628,9 +1645,11 @@ function blockVisuals(payload, view, key) {
   }
   if (key === 'B3') { const n = revenueBars(view); if (n) out.push(n); }
   if (key === 'B4') {
-    // 標出它坐的層：讀圖面板的「坐的節點」（與讀圖、是不是新賭注同一份 seats）
+    // 標出它坐的層：讀圖面板的「坐的節點」（與讀圖、是不是新賭注同一份 seats）；頁首「做什麼」講的那幾格（押的格）粗框加標籤
     const seats = ((view.readings || {}).context || {}).seats || Object.keys(payload.node_names || {});
-    (payload.diagrams || []).forEach((d) => out.push(diagramFigure(d, seats, payload.ticker)));
+    const what = payload.what_it_does || {};
+    const word = what.source === 'rides' ? '押在' : '在';
+    (payload.diagrams || []).forEach((d) => out.push(diagramFigure(d, seats, payload.ticker, what.focus, word)));
   }
   if (key === 'B6') { const n = rulerChart(view); if (n) out.push(n); out.push(priceFigure(payload)); }
   return out;
@@ -1772,12 +1791,25 @@ function captureFigure(payload) {
  *  `mine`＝這一頁要標出來的節點（個股頁：它坐的層；閱讀頁：那一層）。2026-10-08 使用者：「我想知道它出現在示意圖的哪一個地方」
  *  ——圖的每一格帶它畫的是哪幾個節點與位置（`d.boxes`，畫圖工具量的），坐的那幾格疊一個框、寫「在這裡」；圖上方一句話列出是哪幾格。
  *  框只是疊在圖片上的位置換算（同 pct() 的寫法），不改圖本身。 */
-function diagramFigure(d, mine, who) {
+/** 一張示意圖＋「在這裡」的框（2026-10-08 使用者：「我想知道它出現在示意圖的哪一個地方」）。位置表（`d.boxes`，畫圖器記的
+ *  每一格位置與節點）換成百分比疊在圖上——只是座標換算，不改圖。`mine`＝它坐的節點（框線）；`focus`＝頁首「做什麼」講的那幾個
+ *  （押的格；粗框＋標籤）。`focusWord`：押的格寫「押在」。手畫的圖沒有位置表＝照實說標不出。 */
+function diagramFigure(d, mine, who, focus, focusWord) {
   const box = el('div', 'diagram');
   box.appendChild(el('div', 'diagram-title', d.title || '示意圖'));
   const want = new Set(mine || []);
-  const hits = (d.boxes || []).filter((b) => (b.nodes || []).some((n) => want.has(n)));
-  if (hits.length && who) box.appendChild(el('div', 'diagram-where', `${who} 在這張圖的：${hits.map((b) => b.title).join('、')}`));
+  const strong = new Set(focus || mine || []);
+  const hits = (Array.isArray(d.boxes) ? d.boxes : []).filter((b) => (b.nodes || []).some((n) => want.has(n)));
+  const isFocus = (b) => (b.nodes || []).some((n) => strong.has(n));
+  const titles = (list) => list.map((b) => `「${b.title}」`).join('、');
+  if (who && !Array.isArray(d.boxes)) {
+    box.appendChild(el('div', 'diagram-where', '這張圖沒有記下每一格的位置（不是用畫圖工具畫的），標不出在哪一格'));
+  } else if (who && hits.length) {
+    const main = hits.filter(isFocus);
+    const also = hits.filter((b) => !isFocus(b));
+    const head = main.length ? `${who} ${focusWord || '在'}：${titles(main)}` : `${who} 在這張圖的：${titles(also)}`;
+    box.appendChild(el('div', 'diagram-where', main.length && also.length ? `${head}｜圖上也在：${titles(also)}` : head));
+  }
   const frame = el('div', 'diagram-frame');
   const img = document.createElement('img');
   img.className = 'diagram-img';
@@ -1787,12 +1819,12 @@ function diagramFigure(d, mine, who) {
   frame.appendChild(img);
   if (d.height > 0 && d.width > 0) {
     hits.forEach((b) => {
-      const mark = el('div', 'diagram-mark');
+      const mark = el('div', isFocus(b) ? 'diagram-mark' : 'diagram-mark diagram-mark-also');
       mark.style.top = `${(b.top / d.height) * 100}%`;
       mark.style.height = `${(b.height / d.height) * 100}%`;
       mark.style.left = `${(b.left / d.width) * 100}%`;
       mark.style.width = `${(b.span / d.width) * 100}%`;
-      if (who) mark.appendChild(el('span', 'diagram-mark-tag', `${who} 在這裡`));
+      if (who && isFocus(b)) mark.appendChild(el('span', 'diagram-mark-tag', `${who} ${focusWord || '在'}這裡`));
       frame.appendChild(mark);
     });
   }
