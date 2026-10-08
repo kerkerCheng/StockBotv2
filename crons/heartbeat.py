@@ -966,6 +966,30 @@ def _watch_today_line(*, now: datetime, hint: bool = True) -> str:
             + ("（判定只在互動：`python -m engine_b.event_watch semantic-queue`）" if hint else ""))
 
 
+def _registry_tail(store: Mapping[str, Any], rows: list[Mapping[str, Any]]) -> str:
+    """「被點名未登記」的分格與名冊重算計數（2026-10-08，ROADMAP「名冊候選分層與批次登記」A④）。
+
+    分格讀互動 session 存的分層表（系統口徑邊緣＋研究 session 標的供給側；零網路）；沒分層過的照實算「未分層」，不猜。
+    「名冊變動後未重算的 lead」：存著的 lead 實體跟用當下名冊重算的不一樣的則數——應恆為 0，不是 0 就跑
+    `python -m engine_b.cli registry-rescan`（名冊從入圖包隨包 staged 或手改時不會自己重算）。讀不到印缺席，不印 0。"""
+    try:
+        from engine_b import registry_batch as rb
+
+        split = rb.tier_summary(rows, rb.load_tiers())
+        tiers = (f"（邊緣供給側 {split['edge_supply']}／邊緣未標 {split['edge_other']}／非邊緣 {split['not_edge']}"
+                 f"／量不到 {split['unmeasurable']}／未分層 {split['untiered']}）")
+    except Exception as exc:  # noqa: BLE001 — 分層表壞了只讓這一格缺席
+        tiers = f"（分層讀不到：{type(exc).__name__}）"
+    try:
+        from engine_b import registry_batch as rb
+
+        stale = rb.stale_lead_entities(store)
+        rescan = f"｜名冊變動後未重算的 lead {stale}" + ("（**跑 registry-rescan**）" if stale else "")
+    except Exception as exc:  # noqa: BLE001
+        rescan = f"｜名冊變動後未重算的 lead：讀不到（{type(exc).__name__}）——不是 0"
+    return tiers + rescan
+
+
 def _new_names_line(*, now: datetime, leads_path: Path | None, hint: bool = True) -> str:
     """今天第一次被點名、registry 沒有的名字（registry 是「圖裡沒有」的代理：圖裡的公司都在 registry）。
     `hint=False`：Discord 短版用（命令提示給互動 session，不給手機上的人）。數字同一份。"""
@@ -976,7 +1000,8 @@ def _new_names_line(*, now: datetime, leads_path: Path | None, hint: bool = True
     today = now.astimezone().date()
     fresh = sorted((r for r in rows if _local_day(r.get("first_seen")) == today),
                    key=lambda r: str(r.get("first_seen")))
-    tail = f"｜累計被點名但未登記 {len(rows)}" + ("（`python -m engine_b.cli onboard-candidates`）" if hint else "")
+    tail = f"｜累計被點名但未登記 {len(rows)}" + _registry_tail(store, rows) + (
+        "（`python -m engine_b.cli onboard-candidates`）" if hint else "")
     if not fresh:
         return "今天第一次被點名、registry 沒有的名字 0" + tail
     names = "、".join(f"{r.get('ticker')}（{' '.join(str(r.get('sample_title') or '').split())[:30]}）"

@@ -810,8 +810,13 @@ _VETTED_STATUSES: frozenset[str] = frozenset(
 )
 
 
-def onboard_candidates(store: dict[str, Any]) -> list[dict[str, Any]]:
+def onboard_candidates(store: dict[str, Any], *, include_resolved: bool = False) -> list[dict[str, Any]]:
     """已通過 triage 的 lead 裡逐字點名、但 registry 沒有的標的。
+
+    2026-10-08（ROADMAP「名冊候選分層與批次登記」A①；failure log #45）：人打的字串先用 `entities.resolve_manual_name`
+    比名冊（寫出的代號剝交易所前綴、去後綴唯一對應、名冊名字）——對得到的**其實已登記**，不再算未登記
+    （`include_resolved=True` 時以 `resolved_to` 列出，給 CLI 印「寫法對不上」那一段）。每列附 `suggested_tickers`：
+    cashtag 就是它自己；人打字串是字串裡寫出的代號，寫不出就是空（呈現成「代號寫法待人工」）。
 
     **這裡補的是一個結構性黑洞。** pq2 的六個 collector 沒有一個負責
     「這家公司該不該註冊」：（2026-09-23 前）已有 cohort 但缺可交易 ticker 的走 Engine D 的
@@ -832,7 +837,7 @@ def onboard_candidates(store: dict[str, Any]) -> list[dict[str, Any]]:
     （authority），仍走 `skills/company-onboard`。
     """
 
-    from engine_b.entities import extract_entities
+    from engine_b.entities import extract_entities, resolve_manual_name
 
     try:
         from identity.registry import get_registry
@@ -853,6 +858,7 @@ def onboard_candidates(store: dict[str, Any]) -> list[dict[str, Any]]:
         return []
 
     seen: dict[str, dict[str, Any]] = {}
+    manual_cache: dict[str, tuple[str | None, tuple[str, ...]]] = {}
     for lead in store["leads"].values():
         if lead.get("status") not in _VETTED_STATUSES:
             continue
@@ -864,6 +870,11 @@ def onboard_candidates(store: dict[str, Any]) -> list[dict[str, Any]]:
             name = str(raw_name).strip()
             if not name:
                 continue
+            if name not in manual_cache:
+                manual_cache[name] = resolve_manual_name(name, registry)
+            resolved_to, written = manual_cache[name]
+            if resolved_to and not include_resolved:
+                continue
             row = seen.setdefault(
                 name,
                 {
@@ -872,6 +883,8 @@ def onboard_candidates(store: dict[str, Any]) -> list[dict[str, Any]]:
                     "lead_count": 0,
                     "lead_ids": [],
                     "sample_title": "",
+                    "suggested_tickers": list(written),
+                    **({"resolved_to": resolved_to} if resolved_to else {}),
                 },
             )
             row["lead_count"] += 1
@@ -907,6 +920,7 @@ def onboard_candidates(store: dict[str, Any]) -> list[dict[str, Any]]:
                     "lead_count": 0,
                     "lead_ids": [],
                     "sample_title": "",
+                    "suggested_tickers": [upper],
                 },
             )
             row["lead_count"] += 1

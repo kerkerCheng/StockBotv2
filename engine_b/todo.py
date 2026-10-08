@@ -1265,6 +1265,80 @@ def complete_theme_cohort(pool: dict[str, Any], n: int, *, at: str | None = None
             "members": [m["ticker"] for m in record["members"]]}
 
 
+def propose_registry_batch(pool: dict[str, Any], spec: Mapping[str, Any], *, at: str | None = None,
+                           registry_path: Any = None) -> dict[str, Any]:
+    """名冊批次登記（2026-10-08，ROADMAP「名冊候選分層與批次登記」A）：驗證條目、**凍結進一個 manual pq2 編號**（spec＋digest）。
+
+    spec＝`{"reason": "<這一批為什麼現在登記>", "entries": [<registry_batch.draft_entry 的草稿，人可改>]}`。
+    同一份 spec 重提得到同一個編號；改了任何一個字就是另一個編號——核准綁的是內容（比照主題等權組）。"""
+    from engine_b import registry_batch as rb
+
+    reason = " ".join(str(spec.get("reason") or "").split())
+    entries = list(spec.get("entries") or [])
+    if not reason:
+        raise TodoError("名冊批次要附一句 reason（這一批為什麼現在登記、它們在哪幾則 lead 的供給側）")
+    problems = rb.validate_batch(entries, registry_path=registry_path)
+    if problems:
+        raise TodoError("名冊批次驗不過（一筆都不鑄）：" + "；".join(problems))
+    clean = {"reason": reason, "entries": entries}
+    digest = rb.spec_digest(clean)
+    names = "、".join(f"{e.get('display_name')}（{e.get('research_ticker') or '私人'}）" for e in entries)
+    item = upsert(
+        pool, item_type="manual", ref_id=f"registry_batch:{digest[:16]}",
+        title=f"名冊批次登記 {len(entries)} 家：{names}",
+        hint=("go 後跑 `python -m engine_b.todo complete-registry-batch <編號>`——讀凍結 spec、比對 digest、整批重新驗證、"
+              "寫 config/company_identity.json，並重算 lead 身分與停放等待；bare go 拒收。go 只登記身分（INV-1），"
+              "不含入圖、不含任何候選狀態或買賣；代號別名會進資本歸屬的代號解析"),
+        source="registry_batch", at=at)
+    item[FROZEN_SPEC_KEY] = {"kind": "registry_batch", "spec": clean, "digest": digest}
+    return item
+
+
+def complete_registry_batch(pool: dict[str, Any], n: int, *, at: str | None = None, registry_path: Any = None,
+                            leads_path: Any = None, watch_path: Any = None) -> dict[str, Any]:
+    """使用者對 exact 編號 go 之後：讀凍結 spec → 比對 digest → **對當下的名冊**整批重新驗證 → 寫名冊 →
+    同一個動作重算 lead 身分與停放等待 → 以 `authority:registry_batch;ref:<digest16>` 結案。任何一步不符就拒收、名冊一行都不寫。"""
+    from engine_b import event_watch as ew
+    from engine_b import leads as leads_mod
+    from engine_b import registry_batch as rb
+    from identity.registry import get_registry
+
+    item = get(pool, n)
+    if item["type"] != "manual":
+        raise TodoError(f"[{n}] 不是 manual 型（名冊批次是帶凍結 spec 的 manual 項）")
+    frozen = item.get(FROZEN_SPEC_KEY) or {}
+    if frozen.get("kind") != "registry_batch":
+        raise TodoError(f"[{n}] 沒有凍結的名冊批次 spec——不是由 add-registry-batch 鑄的號")
+    if item.get("resolved_at") or item.get("resolution"):
+        raise TodoError(f"[{n}] 已結案（{item.get('resolution')}），不得寫入")
+    spec = frozen.get("spec") or {}
+    digest = rb.spec_digest(spec)
+    if digest != frozen.get("digest") or not str(item.get("ref_id", "")).endswith(digest[:16]):
+        raise TodoError(f"[{n}] 凍結 spec 的 digest 不符——spec 在鑄號之後被改過，拒收")
+    entries = list(spec.get("entries") or [])
+    problems = rb.validate_batch(entries, registry_path=registry_path)
+    if problems:
+        raise TodoError(f"[{n}] 名冊在鑄號之後變了、這一批現在驗不過（一筆都不寫）：" + "；".join(problems))
+    rb.write_entries(entries, registry_path=registry_path)
+    get_registry.cache_clear()
+    store = leads_mod.load(leads_path) if leads_path is not None else leads_mod.load()
+    watch_data = ew.load_watches(watch_path) if watch_path is not None else ew.load_watches()
+    rescan = rb.after_registry_change(store, watch_data)
+    if leads_path is not None:
+        leads_mod.save(store, leads_path)
+    else:
+        leads_mod.save(store)
+    if watch_path is not None:
+        ew.save_watches(watch_data, watch_path)
+    else:
+        ew.save_watches(watch_data)
+    receipt = f"authority:registry_batch;ref:{digest[:16]}"
+    resolve(pool, n, "go", reason="使用者核准後寫入名冊（凍結 spec、digest 相符、整批重新驗證）",
+            receipt=receipt, at=at, _skip_receipt_validation=True)
+    return {"receipt": receipt, "registered": [e["company_id"] for e in entries], **rescan,
+            "next": "commit config/company_identity.json（名冊是版本控制內的 authority）"}
+
+
 def complete_thesis_mutation(
     pool: dict[str, Any],
     n: int,
@@ -2434,6 +2508,18 @@ def main(argv: list[str] | None = None) -> int:
     )
     p_complete_tc.add_argument("number", type=int)
 
+    p_add_rb = sub.add_parser(
+        "add-registry-batch",
+        help="把名冊批次登記的條目凍結進一個 manual pq2 編號（研究步驟用；互動專用；起草見 engine_b.cli onboard-candidates --draft）",
+    )
+    p_add_rb.add_argument("--spec", required=True, help="spec JSON 檔（reason／entries）")
+
+    p_complete_rb = sub.add_parser(
+        "complete-registry-batch",
+        help="核准後讀凍結 spec、比對 digest、整批重新驗證、寫名冊，並重算 lead 身分與停放等待（bare go 拒收）",
+    )
+    p_complete_rb.add_argument("number", type=int)
+
     p_complete_tm = sub.add_parser(
         "complete-thesis-mutation",
         help="核准後把 thesis lifecycle 變更寫入 lifecycle.json 並結案",
@@ -2671,6 +2757,27 @@ def main(argv: list[str] | None = None) -> int:
             print(json.dumps(result, ensure_ascii=False, indent=2))
             return 0
         except TodoError as exc:
+            print(f"✗ [{args.number}]：{exc}", file=sys.stderr)
+            return 2
+
+    if args.command == "add-registry-batch":
+        try:
+            spec = json.loads(Path(args.spec).read_text(encoding="utf-8"))
+            item = propose_registry_batch(pool, spec)
+            save(pool, args.pool)
+            print(f"✓ [{item['n']}] {item['title']}｜digest {item[FROZEN_SPEC_KEY]['digest'][:16]}")
+            return 0
+        except (TodoError, OSError, ValueError) as exc:
+            print(f"✗ add-registry-batch：{exc}", file=sys.stderr)
+            return 2
+
+    if args.command == "complete-registry-batch":
+        try:
+            result = complete_registry_batch(pool, args.number)
+            save(pool, args.pool)
+            print(json.dumps(result, ensure_ascii=False, indent=2))
+            return 0
+        except (TodoError, OSError, ValueError) as exc:
             print(f"✗ [{args.number}]：{exc}", file=sys.stderr)
             return 2
 

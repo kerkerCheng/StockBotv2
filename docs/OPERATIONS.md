@@ -775,6 +775,21 @@ cashtag 由 `entities.py` 確定性抽取；公司名寫成純文字時 regex �
 **它只回答「誰一直出現卻不在圖裡」，不回答該不該 onboard**——後者仍走
 `skills/company-onboard` 並由使用者決定。
 
+**名冊候選分層與批次登記（2026-10-08，使用者選 A 半自動；ROADMAP 同名列）：** 人打字串先剝交易所前綴、去後綴唯一對應、
+比名冊名字——對得到的其實已登記，不再算未登記（`--show-resolved` 連它們一起列）；每列附代號建議。登記一批：
+
+```powershell
+& '.venv\Scripts\python.exe' -m engine_b.cli onboard-candidates --tier [代號…]          # 系統口徑判邊緣（連 yfinance；不給＝全部候選）
+& '.venv\Scripts\python.exe' -m engine_b.cli onboard-candidates --mark-supply 代號… --note "<哪則 lead、供什麼給誰>"
+& '.venv\Scripts\python.exe' -m engine_b.cli onboard-candidates --draft 代號… --why "<這一批為什麼>" --out batch.json
+& '.venv\Scripts\python.exe' -m engine_b.todo add-registry-batch --spec batch.json        # 人補名字別名後鑄號（凍結 spec＋digest）
+& '.venv\Scripts\python.exe' -m engine_b.todo complete-registry-batch <n>                 # 使用者 go 之後：整批重新驗證、寫名冊、重算
+& '.venv\Scripts\python.exe' -m engine_b.cli registry-rescan                               # 名冊從別的路徑變了（入圖包隨包 staged、手改）之後
+```
+
+分層表是私有 state（`library/private/registry/onboard_tiers.json`），只決定起草誰；**寫名冊只有 `complete-registry-batch` 一條路**，
+代號別名會進資本歸屬的代號解析（`company_id_for_ticker`）。心跳那一行印分格與「名冊變動後未重算的 lead」（應恆為 0）。
+
 ### Engine D（舊 Decision Store，frozen 2026-09-22）
 ```powershell
 & '.venv\Scripts\python.exe' -m decision_lab status              # 表筆數、schema 版本、檔案 sha256（唯讀，mode=ro）

@@ -248,6 +248,59 @@ def trigger_entities(text: str | None, registry=None) -> tuple[str, ...]:
     return tuple(sorted(found))
 
 
+#: 人打字串裡的交易所前綴 → 研究代號後綴（2026-10-08，ROADMAP「名冊候選分層與批次登記」A①；failure log #45）。
+#: 字彙只收資料撞到的寫法（10-08 的 32 個人打字串）；美股交易所沒有後綴。
+_EXCHANGE_SUFFIX: dict[str, str] = {
+    "NYSE": "", "NASDAQ": "", "NYSE AMERICAN": "", "AMEX": "",
+    "TWSE": ".TW", "TPEX": ".TWO", "TSE": ".T", "TYO": ".T",
+    "SZSE": ".SZ", "SSE": ".SS", "HKEX": ".HK", "KRX": ".KS", "KOSDAQ": ".KQ",
+}
+_PREFIXED_TICKER_RE = re.compile(
+    r"\b(NYSE AMERICAN|NYSE|NASDAQ|AMEX|TWSE|TPEX|TSE|TYO|SZSE|SSE|HKEX|KRX|KOSDAQ)\s*:?\s*([A-Z]{1,5}|\d{4,6})\b",
+    re.IGNORECASE)
+_SUFFIXED_TICKER_RE = re.compile(
+    r"(?<![A-Za-z0-9])((?:\d{4,6}|[A-Z]{1,6})\.(?:TWO|TW|T|KS|KQ|SZ|SS|HK|DE|PA|L|ST|AX|V|TO|SW|AS))(?![A-Za-z0-9])")
+_PAREN_US_TICKER_RE = re.compile(r"\(([A-Z]{1,5})\)")
+
+
+def manual_name_tickers(raw: str | None) -> tuple[str, ...]:
+    """人打的公司字串裡**寫出來的**代號（依出現順序、去重）：`(TWSE: 3711)`→`3711.TW`、`(TPEx: 4979)`→`4979.TWO`、
+    `(NYSE: FN)`→`FN`、`(3363.TW)`、`AIXA.DE`、`(AMZN)`。只轉寫法、不猜市場——字串沒寫交易所也沒寫後綴的數字代號不收。"""
+    text = str(raw or "")
+    found: dict[str, None] = {}
+    for exchange, code in _PREFIXED_TICKER_RE.findall(text):
+        suffix = _EXCHANGE_SUFFIX[" ".join(exchange.upper().split())]
+        found.setdefault(f"{code.upper()}{suffix}", None)
+    for ticker in _SUFFIXED_TICKER_RE.findall(text):
+        found.setdefault(ticker.upper(), None)
+    for ticker in _PAREN_US_TICKER_RE.findall(text):
+        found.setdefault(ticker, None)
+    return tuple(found)
+
+
+def resolve_manual_name(raw: str | None, registry) -> tuple[str | None, tuple[str, ...]]:
+    """人打的「未登記」字串 → (名冊裡的 co:*，字串寫出的代號)。三條路都是既有的確定性比對（不新造、不模糊）：
+    寫出的代號先嚴格、再去後綴唯一對應（`3363.TW` 寫錯後綴也對得到名冊的 `3363.TWO`）；再用名冊名字（`trigger_entities`）。
+    對到兩家以上回 None（不猜，INV-1）。事發：10-08 的 32 個人打字串裡 11 個其實已登記，只是寫法對不上（failure log #45）。"""
+    tickers = manual_name_tickers(raw)
+    try:
+        bases = base_ticker_candidates(registry)
+    except Exception:
+        bases = {}
+    by_ticker: set[str] = set()
+    for ticker in tickers:
+        hit = registry.company_id_for_ticker(ticker)
+        if not hit:
+            base = ticker.split(".", 1)[0]
+            candidates = bases.get(base, ())
+            hit = candidates[0] if len(candidates) == 1 else None
+        if hit:
+            by_ticker.add(hit)
+    # 寫出的代號比名字具體：「Samsung Electro-Mechanics (009150.KS)」的名字也對得到三星電子，代號只對得到三星電機
+    ids = by_ticker or {e for e in trigger_entities(raw, registry) if e.startswith("co:")}
+    return (next(iter(ids)) if len(ids) == 1 else None), tickers
+
+
 def lead_entities(lead: dict) -> set[str]:
     """取一筆 lead 已存的實體集合；未擷取過的即時由文字推導。
 

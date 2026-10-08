@@ -41,6 +41,11 @@ Step 5 — pq2 ra_admission → 使用者核准 → apply 入口 → 驗收
 私人公司 ticker 明確為 null，不猜）。新公司先在那裡登記，`display_name` 只填 mechanical 來源
 （年報封面／交易所公告名／EDGAR 註冊名），並寫 `_display_name_source`。圖上的 ticker 由名冊派生，
 不要改任何 loader 程式碼。
+**不隨入圖包的名冊登記走批次**（2026-10-08，ROADMAP「名冊候選分層與批次登記」A）：
+`python -m engine_b.cli onboard-candidates --tier <代號…>`（系統口徑邊緣）→ 讀過 lead 後 `--mark-supply <代號…> --note "<哪則 lead、供什麼給誰>"`
+→ `--draft <代號…> --why "<這一批為什麼>" --out <檔>`（起草；**名字別名留空，人補**）→ `python -m engine_b.todo add-registry-batch --spec <檔>`
+鑄號並寫建議 → 使用者 go → `complete-registry-batch <n>`（整批重新驗證、寫名冊、同一個動作重算 lead 身分與停放等待）→ commit 名冊。
+隨入圖包 staged 的條目照舊；名冊從那條路變了之後跑 `python -m engine_b.cli registry-rescan`（心跳「名冊變動後未重算的 lead」非 0 時）。
 
 ---
 

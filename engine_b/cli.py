@@ -783,13 +783,92 @@ def _cmd_harvest_health(args: argparse.Namespace) -> int:
 
 
 def _cmd_onboard_candidates(args: argparse.Namespace) -> int:
-    """列出反覆出現在已 triage lead 裡、但 registry 沒有的標的。"""
+    """列出反覆出現在已 triage lead 裡、但 registry 沒有的標的。
+
+    2026-10-08（ROADMAP「名冊候選分層與批次登記」A）多四個動作，全是互動用：
+    `--show-resolved` 連「人打字串其實已登記」一起列；`--tier [代號…]` 系統口徑判邊緣（連 yfinance；不給代號＝全部候選）；
+    `--mark-supply 代號… --note` 研究 session 讀過 lead 後標「它在供給側」；`--draft 代號… --out` 起草名冊條目
+    （之後人補名字別名，再 `python -m engine_b.todo add-registry-batch --spec <檔>` 鑄號）。
+    """
+    from engine_b import registry_batch as rb
 
     store = leads.load(args.leads)
-    rows = leads.onboard_candidates(store)
+    rows = leads.onboard_candidates(store, include_resolved=bool(args.show_resolved))
+    if args.mark_supply:
+        data = rb.load_tiers()
+        try:
+            marked = rb.mark_supply(data, args.mark_supply, note=args.note or "", supply_side=not args.not_supply)
+        except rb.RegistryBatchError as exc:
+            print(f"✗ {exc}", file=sys.stderr)
+            return 2
+        rb.save_tiers(data)
+        print(f"✓ 標記 {'非' if args.not_supply else ''}供給側：{'、'.join(marked)}")
+        return 0
+    if args.tier is not None:
+        import time
+
+        wanted = args.tier or [r["suggested_tickers"][0] for r in rows if r.get("suggested_tickers")]
+
+        def _fetch(ticker: str):
+            import yfinance as yf
+
+            time.sleep(0.35)   # 批次抓 yfinance 會被靜默限流（memory：限流是缺值不是例外）
+            return yf.Ticker(ticker).info or {}
+
+        data = rb.tier(wanted, fetch_info=_fetch)
+        rb.save_tiers(data)
+        for ticker in wanted:
+            row = data["rows"].get(ticker.upper()) or {}
+            print(f"  {ticker:<11} {row.get('edge_state')!s:<13} {str(row.get('name'))[:40]:<40} "
+                  f"cap={row.get('market_cap_usd')} an={row.get('analyst_count')} missing={row.get('missing') or ''}")
+        print(f"✓ 分層 {len(wanted)} 檔 → {rb.TIERS_PATH}")
+        return 0
+    if args.draft:
+        data = rb.load_tiers()
+        by_suggestion = {t: r for r in rows for t in r.get("suggested_tickers") or ()}
+        entries, problems = [], []
+        for raw in args.draft:
+            ticker = raw.strip().upper()
+            tier_row = (data.get("rows") or {}).get(ticker)
+            if tier_row is None:
+                problems.append(f"{ticker} 還沒分層（先 --tier {ticker}）")
+                continue
+            cand = by_suggestion.get(ticker) or {}
+            try:
+                entries.append(rb.draft_entry(
+                    ticker, tier_row, cashtag=cand.get("ticker") if cand.get("detected_by") == "cashtag" else None,
+                    why=args.why or "", lead_ids=cand.get("lead_ids") or ()))
+            except rb.RegistryBatchError as exc:
+                problems.append(str(exc))
+        spec = {"reason": args.why or "", "entries": entries}
+        Path(args.out).write_text(json.dumps(spec, ensure_ascii=False, indent=2), encoding="utf-8")
+        checked = rb.validate_batch(entries) if entries else []
+        print(f"✓ 起草 {len(entries)} 筆 → {args.out}（名字別名留空等人補；reason 要寫）")
+        for line in problems + checked:
+            print(f"  ⚠ {line}")
+        return 0
     if args.min_leads > 1:
         rows = [row for row in rows if row["lead_count"] >= args.min_leads]
     print(json.dumps(rows, ensure_ascii=False, indent=2))
+    return 0
+
+
+def _cmd_registry_rescan(args: argparse.Namespace) -> int:
+    """名冊變動之後同一個動作重算：lead 身分（`backfill_entities --rescan`）＋停放等待（`trace-watch-sync`）。
+
+    `complete-registry-batch` 寫完名冊會自己跑；名冊從別的路徑改（入圖包隨包 staged、手改）之後跑這一個——
+    心跳的「名冊變動後未重算的 lead」不是 0 就該跑。零 token、只動 pq1 狀態。
+    """
+    from engine_b import event_watch as ew
+    from engine_b import registry_batch as rb
+
+    store = leads.load(args.leads)
+    watch_data = ew.load_watches()
+    before = rb.stale_lead_entities(store)
+    result = rb.after_registry_change(store, watch_data)
+    leads.save(store, args.leads)
+    ew.save_watches(watch_data)
+    print(json.dumps({"stale_before": before, **result}, ensure_ascii=False, indent=2))
     return 0
 
 
@@ -1091,7 +1170,25 @@ def build_parser() -> argparse.ArgumentParser:
         "--min-leads", type=int, default=1,
         help="至少被幾筆不同 lead 點名才列出（預設 1）",
     )
+    p_onboard.add_argument("--show-resolved", action="store_true",
+                           help="連「人打字串其實已登記（寫法對不上）」一起列，附 resolved_to")
+    p_onboard.add_argument("--tier", nargs="*", default=None, metavar="TICKER",
+                           help="系統口徑判邊緣、存進分層表（連 yfinance；不給代號＝全部候選的建議代號）")
+    p_onboard.add_argument("--mark-supply", nargs="+", default=None, metavar="TICKER",
+                           help="研究 session 讀過 lead 後標「它在供給側」（要 --note；配 --not-supply 標不是）")
+    p_onboard.add_argument("--not-supply", action="store_true", help="與 --mark-supply 一起用：標成不在供給側")
+    p_onboard.add_argument("--note", default="", help="--mark-supply 的理由（哪則 lead、它供什麼給誰）")
+    p_onboard.add_argument("--draft", nargs="+", default=None, metavar="TICKER",
+                           help="起草名冊條目（要先 --tier）；寫到 --out，之後人補名字別名、再 todo add-registry-batch")
+    p_onboard.add_argument("--why", default="", help="--draft 的批次理由（寫進每筆 _note 與 spec 的 reason）")
+    p_onboard.add_argument("--out", default="registry_batch_draft.json", help="--draft 的輸出檔")
     p_onboard.set_defaults(func=_cmd_onboard_candidates)
+
+    p_rescan = sub.add_parser(
+        "registry-rescan",
+        help="名冊變動之後一個動作重算 lead 身分與停放等待（心跳「名冊變動後未重算的 lead」非 0 就跑；零 token）",
+    )
+    p_rescan.set_defaults(func=_cmd_registry_rescan)
 
     p_related = sub.add_parser(
         "related",
