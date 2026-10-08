@@ -88,7 +88,58 @@ def test_gate_and_summary_list_the_outside_by_name() -> None:
 def test_outside_lines_print_even_at_zero() -> None:
     """0 也印——「沒有人退出」與「沒算」不得同形（L13）。"""
     lines = closure.render_outside(closure.summarize([_row("A")]))
-    assert len(lines) == 2 and "非倍率 0 檔" in lines[0] and "已做過短檢查 0 檔" in lines[1]
+    assert len(lines) == 3 and "非倍率 0 檔" in lines[0] and "已做過短檢查 0 檔" in lines[1]
+    assert "等主題組 0 檔" in lines[2]                    # 2026-10-08（failure log #26）
+
+
+# ---- 等主題組（2026-10-08，failure log #26）：組要在這條鏈第一份敘事之前定義 ----
+
+def _pool(*items: dict) -> dict:
+    return {"items": list(items)}
+
+
+def test_pending_cohort_members_read_only_open_frozen_theme_cohort_specs() -> None:
+    spec = {"kind": "theme_cohort", "spec": {"members": [{"ticker": "3017.tw"}, {"ticker": "3653.TW"}]}}
+    pool = _pool({"n": 701, "frozen_spec": spec},
+                 {"n": 650, "frozen_spec": {"kind": "theme_cohort", "spec": {"members": [{"ticker": "AXTI"}]}},
+                  "resolved_at": "2026-09-30"},                                   # 已落地／已結案：不算
+                 {"n": 702, "frozen_spec": {"kind": "other", "spec": {"members": [{"ticker": "X"}]}}})
+    assert closure.pending_cohort_members(pool) == {"3017.TW": 701, "3653.TW": 701}
+
+
+def test_awaiting_cohort_rows_are_not_queued_and_are_listed_with_their_number() -> None:
+    from dataclasses import replace
+
+    rows = [replace(_row("3017.TW"), awaiting_cohort=701), _row("AXTI")]
+    assert [r.ticker for r in closure.rank_backlog(rows)] == ["AXTI"]
+    summary = closure.summarize(rows)
+    assert summary["awaiting_cohort"] == [["3017.TW", 701]] and summary["open_count"] == 1
+    assert "3017.TW（[701]）" in closure.render_outside(summary)[2]
+
+
+def test_the_narrative_writer_refuses_a_first_narrative_whose_cohort_has_not_landed(monkeypatch) -> None:
+    from alpha.providers import closure as provider
+
+    monkeypatch.setattr(provider, "_last_brief_day", lambda _t: None)
+    monkeypatch.setattr("engine_b.todo.load", lambda *a, **k: _pool(
+        {"n": 701, "frozen_spec": {"kind": "theme_cohort", "spec": {"members": [{"ticker": "3017.TW"}]}}}))
+    assert provider.first_narrative_awaiting_cohort("3017.tw") == 701
+    assert provider.first_narrative_awaiting_cohort("AXTI") is None
+    # 已經寫過敘事的檔：之後的重寫不是「第一份」，不擋
+    from datetime import date
+
+    monkeypatch.setattr(provider, "_last_brief_day", lambda _t: date(2026, 10, 5))
+    assert provider.first_narrative_awaiting_cohort("3017.TW") is None
+
+
+def test_alpha_brief_add_stops_before_reading_the_spec(monkeypatch, tmp_path, capsys) -> None:
+    """寫入端：`python -m alpha brief <T> --add` 對「第一份、組提案還在 pq2」的檔整筆拒收，什麼都不寫。"""
+    from alpha import cli
+
+    monkeypatch.setattr(provider, "first_narrative_awaiting_cohort", lambda _t: 701)
+    missing_spec = tmp_path / "never_read.json"            # 不存在：拒收發生在讀 spec 之前
+    assert cli.main(["brief", "AXTI", "--add", str(missing_spec)]) == 2
+    assert "[701]" in capsys.readouterr().err
 
 
 # ---- provider：照抄 artifact、不重算 ----

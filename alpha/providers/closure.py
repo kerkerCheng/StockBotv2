@@ -17,6 +17,7 @@ from alpha.closure import (
     _base_observation_tickers,
     _sector_and_structure_edge,
     deferred_tickers,
+    pending_cohort_members,
     population_for,
     row_from_artifact,
 )
@@ -99,9 +100,13 @@ def collect_backlog(*, artifact_dir: Path | None = None, state_dir: Path | None 
             except Exception:  # noqa: BLE001
                 return None
 
-        deferred = deferred_tickers(load_pool(), _resolve)
+        pool = load_pool()
+        deferred = deferred_tickers(pool, _resolve)
+        # 等主題組（failure log #26）：還沒落地的組提案裡的成員（沒寫過敘事的才算，見下面）
+        pending_cohort = pending_cohort_members(pool)
     except Exception as exc:  # noqa: BLE001
-        notes.append(f"pq2 待辦池讀不到，本輪不套「使用者已 defer」：{type(exc).__name__}")
+        pending_cohort = {}
+        notes.append(f"pq2 待辦池讀不到，本輪不套「使用者已 defer」「等主題組」：{type(exc).__name__}")
 
     enriched: list[BacklogRow] = []
     for r in rows:
@@ -117,6 +122,10 @@ def collect_backlog(*, artifact_dir: Path | None = None, state_dir: Path | None 
         reason, due = population_detail(population, code, info, board_day=board_day,
                                         last_brief=_last_brief_day(r.ticker) if population == "edge_no_seat" else None,
                                         today=today)
+        # 組要在第一份敘事之前定義（plan 7.1 ④）：已經寫過 v2 敘事的檔不受影響（之後的重寫不是「第一份」）
+        cohort_n = pending_cohort.get(r.ticker.upper())
+        if cohort_n is not None and _last_brief_day(r.ticker) is not None:
+            cohort_n = None
         enriched.append(BacklogRow(
             ticker=r.ticker, readiness=r.readiness, open_panels=r.open_panels, settled_panels=r.settled_panels,
             absence_kinds=r.absence_kinds,
@@ -126,8 +135,25 @@ def collect_backlog(*, artifact_dir: Path | None = None, state_dir: Path | None 
             awaiting_report_since=awaiting,
             generated_at=r.generated_at,
             population=population, population_reason=reason, short_check_due=due,
+            awaiting_cohort=cohort_n,
         ))
     return enriched, notes
+
+
+def first_narrative_awaiting_cohort(ticker: str) -> int | None:
+    """這一檔還沒有任何 v2 敘事、而且在一個還沒落地的主題組提案裡 → 那個 pq2 編號；否則 None（failure log #26）。
+
+    敘事寫入端（`python -m alpha brief <T> --add`）與閉環佇列讀同一份資料（`alpha.closure.pending_cohort_members`）。
+    待辦池讀不到 → None（不擋；佇列那一端同樣照舊——讀不到不是「組已落地」，但擋寫入要有收據）。
+    """
+    if _last_brief_day(ticker) is not None:
+        return None
+    try:
+        from engine_b.todo import load as load_pool
+
+        return pending_cohort_members(load_pool()).get(str(ticker).upper())
+    except Exception:  # noqa: BLE001
+        return None
 
 
 def supply_seats(structure_payload: Any, registry: Any) -> frozenset[str]:

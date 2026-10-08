@@ -91,6 +91,10 @@ class BacklogRow:
     population_reason: str | None = None
     #: 邊緣沒座位：「坐哪一層」短檢查到期了嗎（90 天內有 v2 敘事＝查過）。用到今天，所以 provider 算（本檔無時鐘）。
     short_check_due: bool | None = None
+    #: 等主題組（2026-10-08，Phase 7 failure log #26）：這一檔**還沒有任何 v2 敘事**、而且在一個還沒落地的主題等權組提案
+    #: （pq2 凍結的 spec）裡 → 那個 pq2 編號。plan 7.1 ④：那條鏈的組要在第一份敘事之前定義（已定價的相對比較才有事先登記的
+    #: 參照）；10-05 散熱四檔照閉環佇列寫了敘事、組晚落地，驗收⑤不成立。provider 讀待辦池算好帶進來（本檔不讀檔）。
+    awaiting_cohort: int | None = None
 
     @property
     def queued(self) -> bool:
@@ -98,7 +102,10 @@ class BacklogRow:
 
         母體內：照舊「未到終局」。非倍率：永遠不排（它的文件進層說明當證據，不寫敘事）。
         邊緣沒座位：短檢查到期才排（沒查過、或上次查超過 90 天）——每個等待都有到期（INV-2）。
+        等主題組：組落地前不排（它的出口是那個 pq2 編號：go＋complete 之後自動回到佇列；drop 了也回來）。
         """
+        if self.awaiting_cohort is not None:
+            return False
         if self.population == "non_multiple":
             return False
         if self.population == "edge_no_seat":
@@ -192,6 +199,22 @@ def row_from_artifact(ticker: str, payload: Mapping[str, Any], *,
         awaiting_report_since=awaiting,
         generated_at=str(payload.get("generated_at") or "") or None,
     )
+
+
+def pending_cohort_members(pool: Mapping[str, Any]) -> dict[str, int]:
+    """還沒落地的主題等權組提案裡的成員 → 那個 pq2 編號（failure log #26）。純函式，只讀待辦池的結構化欄位：
+    未結案、`frozen_spec.kind == "theme_cohort"` 的項目（`engine_b.todo.propose_theme_cohort` 凍結的 spec）。
+    同一檔出現在兩個未落地的提案裡取編號小的（先提的那個）。"""
+    out: dict[str, int] = {}
+    for item in sorted((i for i in (pool.get("items") or ()) if not i.get("resolved_at")), key=lambda i: i["n"]):
+        frozen = item.get("frozen_spec") or {}
+        if frozen.get("kind") != "theme_cohort":
+            continue
+        for member in (frozen.get("spec") or {}).get("members") or ():
+            ticker = str(member.get("ticker") or "").upper()
+            if ticker:
+                out.setdefault(ticker, int(item["n"]))
+    return out
 
 
 def sectors_with_ready(rows: Iterable[BacklogRow]) -> frozenset[str]:
@@ -302,6 +325,9 @@ def summarize(rows: Sequence[BacklogRow]) -> dict[str, Any]:
             "edge_no_seat_checked": [[r.ticker, r.population_reason] for r in sorted(rows, key=lambda x: x.ticker)
                                      if r.population == "edge_no_seat" and not r.short_check_due],
         },
+        # 等主題組（failure log #26）：不排、也不算可推進數；逐檔列名附 pq2 編號（出口在那個編號上）
+        "awaiting_cohort": [[r.ticker, r.awaiting_cohort] for r in sorted(rows, key=lambda x: x.ticker)
+                            if r.awaiting_cohort is not None],
         "sectors_with_ready": sorted(ready_sectors),
         "sectors_seen": sorted(all_sectors),
         "next": None if nxt is None else {
@@ -366,11 +392,15 @@ def render_outside(summary: Mapping[str, Any]) -> list[str]:
     outside = summary.get("outside") or {}
     non = list(outside.get("non_multiple") or ())
     checked = list(outside.get("edge_no_seat_checked") or ())
+    cohort = list(summary.get("awaiting_cohort") or ())
     return [
         (f"母體外·非倍率 {len(non)} 檔（不寫敘事；它的文件進層說明當在位者或客戶證據；每次 materialize 重算，翻回邊緣就回母體）"
          + ("：" + "、".join(f"{t}（{why}）" for t, why in non) if non else "")),
         (f"母體外·邊緣沒座位、{SHORT_CHECK_DAYS} 天內已做過短檢查 {len(checked)} 檔"
          + ("：" + "、".join(f"{t}（{why}）" for t, why in checked) if checked else "")),
+        # failure log #26：組落地前不寫第一份敘事；出口在那個 pq2 編號上
+        (f"等主題組 {len(cohort)} 檔（還沒寫過敘事、主題組提案還在 pq2——組落地前不排，go＋complete 之後自動回佇列）"
+         + ("：" + "、".join(f"{t}（[{n}]）" for t, n in cohort) if cohort else "")),
     ]
 
 

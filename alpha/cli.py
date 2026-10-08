@@ -288,6 +288,16 @@ def cmd_brief(args: argparse.Namespace) -> int:
     ticker = str(resolved_ticker)
     if args.add or args.retract:
         if args.add:
+            # 組要在這條鏈第一份敘事之前定義（plan 7.1 ④；failure log #26：10-05 散熱四檔照佇列寫了敘事、組晚落地，
+            # 已定價的相對比較沒有事先登記的參照）。只擋「第一份、而且它的組提案還在 pq2」——寫過的重寫不擋。
+            from .providers.closure import first_narrative_awaiting_cohort
+
+            waiting = first_narrative_awaiting_cohort(ticker)
+            if waiting is not None:
+                print(f"✗ {ticker} 還沒有任何敘事，而它所屬的主題等權組提案 [{waiting}] 還沒落地——"
+                      f"先請使用者 go [{waiting}]、跑 `python -m engine_b.todo complete-theme-cohort {waiting}`，"
+                      "再寫第一份敘事（組要在第一份敘事之前定義）", file=sys.stderr)
+                return 2
             spec = json.loads(Path(args.add).read_text(encoding="utf-8"))
             try:
                 record = brief_record(
