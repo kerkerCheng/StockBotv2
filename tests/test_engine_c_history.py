@@ -49,14 +49,17 @@ def test_sqlite_schema_creates_the_three_tables_and_is_idempotent() -> None:
 
 def test_metric_vocabulary_is_the_same_in_sqlite_postgres_and_schema_sql() -> None:
     """三處字彙一致。Postgres 的遷移檔是版本化的（已套用的檔不改）：建表那份＋之後每一份 CHECK 遷移的聯集
-    （2026-10-01 Phase 4 Step 4.6 加 `20261001_add_equity_issued_value_metric.sql`）。"""
-    migration = (ROOT / "engine_c" / "migrations" / "20260929_add_history_tables.sql").read_text(encoding="utf-8")
-    later = (ROOT / "engine_c" / "migrations" / "20261001_add_equity_issued_value_metric.sql").read_text(encoding="utf-8")
+    （2026-10-01 Phase 4 Step 4.6 加 `20261001_add_equity_issued_value_metric.sql`；2026-10-08 個股頁 S3a 加
+    `20261008_add_capex_metric.sql`）。**最新那一份 CHECK 遷移要列出完整字彙**（它是先刪再建）。"""
+    migrations = ROOT / "engine_c" / "migrations"
+    migration = (migrations / "20260929_add_history_tables.sql").read_text(encoding="utf-8")
+    later = [(migrations / name).read_text(encoding="utf-8")
+             for name in ("20261001_add_equity_issued_value_metric.sql", "20261008_add_capex_metric.sql")]
     schema = (ROOT / "engine_c" / "schema.sql").read_text(encoding="utf-8")
     for metric in hb.METRICS:
         assert f"'{metric}'" in schema and f"'{metric}'" in hb._SQLITE_DDL, metric
-        assert f"'{metric}'" in (later if metric in hb.LATE_METRICS else migration), metric
-        assert f"'{metric}'" in later, f"CHECK 遷移要列出完整字彙（含舊的）：{metric}"
+        assert f"'{metric}'" in (" ".join(later) if metric in hb.LATE_METRICS else migration), metric
+        assert f"'{metric}'" in later[-1], f"最新的 CHECK 遷移要列出完整字彙（含舊的）：{metric}"
     for table in ("price_history", "corporate_actions", "fundamental_history"):
         assert f"CREATE TABLE IF NOT EXISTS {table}" in migration
         assert f"CREATE TABLE IF NOT EXISTS {table}" in schema

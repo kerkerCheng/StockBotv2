@@ -63,7 +63,7 @@ def test_fill_rows_are_value_or_a_named_absence_and_copy_the_producers_kind() ->
     assert rows["B0.candidate_state"]["state"] == "value"
     assert rows["B1.position"] == {**rows["B1.position"], "state": "absent", "absence_kind": "not_yet_recorded"}
     assert rows["B9.debt"]["absence_kind"] == "capability_absent"          # default_absence_kind("not_modeled")
-    assert rows["B2.anchor_change"]["absence_kind"] == "capability_absent" and "S3" in rows["B2.anchor_change"]["looked"]
+    assert rows["B2.capture_ratio"]["absence_kind"] == "capability_absent" and "S3" in rows["B2.capture_ratio"]["looked"]
     assert rows["B4.layer_note"]["state"] == "value"
     assert all(r["state"] == "value" or (r["state"] == "absent" and r["absence_kind"]) for r in rows.values())
 
@@ -73,6 +73,17 @@ def test_an_unread_page_input_is_not_reported_as_nothing() -> None:
     assert rows["B4.layer_note"]["absence_kind"] == "upstream_unavailable" and "沒讀到" in rows["B4.layer_note"]["looked"]
     rows = {r["element"]: r for r in ps.fill_table(_view(), extra={"layer_notes": []})}
     assert rows["B4.layer_note"]["absence_kind"] == "not_yet_recorded"
+
+
+def test_the_demand_anchor_cell_reads_the_page_input_three_ways() -> None:
+    """個股頁 S3a（2026-10-08）：B2「錨的變化」讀頁外輸入 `@demand_anchor`——這一輪沒讀到（結構表或 Engine C 讀不到、
+    回看的那天不推）＝`upstream_unavailable`；讀到但這家公司走不到錨或題材沒宣告序列＝`not_yet_recorded`；有序列＝有值。"""
+    unread = {r["element"]: r for r in ps.fill_table(_view())}["B2.anchor_change"]
+    empty = {r["element"]: r for r in ps.fill_table(_view(), extra={"demand_anchor": []})}["B2.anchor_change"]
+    valued = {r["element"]: r for r in ps.fill_table(_view(), extra={"demand_anchor": ["hyperscaler_cash_capex"]})}
+    assert unread["absence_kind"] == "upstream_unavailable"
+    assert empty["absence_kind"] == "not_yet_recorded" and "demand_anchor_series" in empty["looked"]
+    assert valued["B2.anchor_change"]["state"] == "value"
 
 
 def test_materialize_writes_the_fill_and_the_meta_carries_the_contract(tmp_path) -> None:

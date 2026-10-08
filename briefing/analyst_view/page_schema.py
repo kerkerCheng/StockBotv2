@@ -105,8 +105,10 @@ ELEMENTS: tuple[PageElement, ...] = (
     PageElement("B1.why_stuck", "B1", "為什麼卡在它：量還是換不掉（附證據等級）", "layer", "research",
                 ("brief/brief:bottleneck",), "not_yet_recorded", "v2 敘事的「為什麼卡在它」"),
     # B2 需求傳導（§5.4）
-    PageElement("B2.anchor_change", "B2", "錨的變化：題材錨序列的季度值與年增", "theme_anchor", "mechanical", (),
-                "capability_absent", _S3_ANCHOR),
+    PageElement("B2.anchor_change", "B2", "錨的變化：題材錨序列的季度值與年增", "theme_anchor", "mechanical",
+                ("@demand_anchor",), "not_yet_recorded",
+                "需求錨序列（config/demand_anchor_series.json；個股頁 S3a）：這家公司在結構表走到的錨對到的序列"
+                "——走不到錨、或題材沒宣告序列，就是沒有"),
     PageElement("B2.path_layers", "B2", "路徑上各層：從錨到公司坐的層，每層一條年增", "path", "mechanical", (),
                 "capability_absent", f"{_S3_ANCHOR}；結構表的鏈有，層的同業序列沒有"),
     PageElement("B2.capture_ratio", "B2", "吃到多少：公司當季營收 ÷ 當季錨", "company", "mechanical", (),

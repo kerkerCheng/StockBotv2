@@ -114,6 +114,16 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 `StockBotv2-Daily` 的 ⑱⑲ 取代（1.2a 停用、2026-09-25 1.2b 刪除）；它們的理由（LLM 失敗心跳照發、永遠 exit 0、Python 不用 `.cmd`、
 發送走 subprocess）搬進 `crons/daily_task.py` 的 docstring，守它們的測試改主詞搬進 `tests/test_daily_task.py`「無人值守入口」節。
 
+### Sandbox impact review 結論（2026-10-08：個股頁 S3a 需求錨序列——Engine C 現金資本支出、名冊補 Amazon）
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | daily ②b（`02b_history_incremental`：`engine_c.history_backfill --incremental`，argv 不變）多寫兩種 metric（`capex_quarter`／`capex_annual`）——同一張表、同一個 SEC companyfacts 請求（不多打一次）；名冊多了 `co:amazon`（[753]），daily 的宇宙多一檔（價格、快照、EDGAR 各一次）。daily ⑬ materialize（argv 不變）多讀 `config/demand_anchor_series.json` 與 Engine C `fundamental_history`（唯讀，一輪一次）；個股頁 payload 多 `demand_anchor`、填得滿表的 B2「錨的變化」改讀 `@demand_anchor`。DB CHECK 遷移是互動一次性的（`python -m engine_c.migrate_fundamental_metrics --apply`，2026-10-08 已跑：備份＋對帳 8625 列）——**不進 daily**；未遷移的庫新 metric 只略過並計數（`LATE_METRICS`）。不連新的外部服務、不跑 LLM、不碰任何人工 gate |
+| **2 canonical skill／prompt／本檔** | 本節；`docs/ARCHITECTURE.md` 首屏「需求錨序列」；個股頁 plan「S3 拆段」。不動任何 skill、prompt |
+| **3 最窄 rule** | daily argv 不變；不新增 step、allowlist、APP 路由；APP 仍無寫入端點 |
+| **4 contract test** | `tests/test_engine_c_capex.py`（年初累計差分、直接單季不衍生、隔年才有直接數字時中間那一年仍有衍生值、減數取當時已知版本、季報近 12 個月欄不當年度、APO 型重列年度照存、兩個 tag 不同數拒寫、營收不受影響）；`tests/test_demand_anchor.py`（四家都申報才加總、as-of 回放、可知日／版本日、曆季 ±10 天、幣別不換算、會計季單一型、名冊缺代號整條缺席、三種缺席、設定檔 fail closed）；`tests/test_page_schema.py`（B2 三種讀法）；`tests/test_engine_c_history.py`（三處字彙＋最新 CHECK 遷移列全）；變異 8／8 抓到 |
+| **5 端到端 smoke** | 真資料：雲端四大各 19 季（MSFT FY26 Q4＝FY−9M 358 億、GOOGL 2026Q2＝H1−Q1 449 億、AMZN 直接 542 億）；錨序列 2026Q2 1,651 億美元、年增 +87%（與 brainstorm 第二輪畫布手算一致）；as-of 2026-07-27 回放 2026Q2 缺席並寫出缺 MSFT、AMZN、META；AMZN 的近 12 個月欄 25 筆不存；個股頁 COHR、AXTI、聯亞、奇鋐、KLIC 的「錨的變化」有值、MSFT、AMZN 照實寫走不到錨；390px 溢出 0、字疊字 0 |
+
 ### Sandbox impact review 結論（2026-10-08：個股頁 S5b 圖表元件與示意圖、S5c 手機量測）
 
 | 步 | 結論 |

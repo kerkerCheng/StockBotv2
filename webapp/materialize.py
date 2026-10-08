@@ -224,7 +224,8 @@ def materialize_view(analyst_view_dict: Mapping[str, Any], *,
                      price_series: Sequence[Mapping[str, Any]] | None = None,
                      page_extra: Mapping[str, Any] | None = None,
                      diagrams: Sequence[Mapping[str, Any]] | None = None,
-                     node_names: Mapping[str, str] | None = None) -> dict[str, Any]:
+                     node_names: Mapping[str, str] | None = None,
+                     demand_anchor: Mapping[str, Any] | None = None) -> dict[str, Any]:
     """`AnalystView.to_dict()` → artifact payload（含遮蔽、overview、兩個 digest）。純函式。
 
     `price_series` 是**脈絡不是判讀**：一條這檔自己的已收盤收盤價序列，讓使用者看得懂
@@ -264,6 +265,9 @@ def materialize_view(analyst_view_dict: Mapping[str, Any], *,
         "diagrams": [dict(d) for d in (diagrams or ())],
         # 坐的層的節點名（2026-10-08）：「技術鏈」的展開印名字、不印 `tech:…` ID——呈現用，不進新鮮度身分。
         "node_names": dict(node_names or {}),
+        # 需求錨序列（個股頁 S3a，2026-10-08）：這家公司走到的錨對到的 A2 序列（季值、年增、可知日、缺哪一家），
+        # 或缺席與原因。照抄 `alpha.demand_anchor`；APP 畫 B2「錨的變化」。
+        "demand_anchor": dict(demand_anchor) if demand_anchor is not None else None,
         "materializer": {
             "version": MATERIALIZER_VERSION,
             "python": f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}",
@@ -289,13 +293,17 @@ def _page_fill(view: Mapping[str, Any], extra: Mapping[str, Any] | None, fill_ta
 
 
 def page_extra_for(ticker: str, layer_notes: Mapping[str, Any] | None,
-                  diagrams: Sequence[Mapping[str, Any]] | None = None) -> dict[str, Any] | None:
+                  diagrams: Sequence[Mapping[str, Any]] | None = None,
+                  demand_anchor: Mapping[str, Any] | None = None) -> dict[str, Any] | None:
     """個股頁填得滿表的頁外輸入：引用這一頁的層說明節點（`layer_notes` state artifact 的 `cited_by.pages`）、
-    涵蓋這一頁坐的層的示意圖 id（`diagrams`；None＝這一輪沒讀到示意圖目錄）。
-    artifact 讀不到 → 那一個鍵不給（那一格印這一輪沒讀到，不是「沒有」）。"""
+    涵蓋這一頁坐的層的示意圖 id（`diagrams`；None＝這一輪沒讀到示意圖目錄）、需求錨序列（`demand_anchor`：有值的序列 key；
+    讀不到或回看的那天不推＝不給這個鍵）。artifact 讀不到 → 那一個鍵不給（那一格印這一輪沒讀到，不是「沒有」）。"""
     extra: dict[str, Any] = {}
     if diagrams is not None:
         extra["diagrams"] = [str(d.get("id")) for d in diagrams]
+    absence_kind = ((demand_anchor or {}).get("absence") or {}).get("kind")
+    if demand_anchor is not None and absence_kind not in ("upstream_unavailable", "point_in_time_unavailable"):
+        extra["demand_anchor"] = [str(s.get("key")) for s in demand_anchor.get("series") or () if s.get("points")]
     if layer_notes is None:
         return extra or None
     want = str(ticker).upper()
@@ -427,13 +435,15 @@ def materialize(ticker: str, *, as_of: date | None = None, scenario: str | None 
                 candidates: Mapping[str, Any] | None = None,
                 layer_notes: Mapping[str, Any] | None = None,
                 diagrams: Mapping[str, Any] | None = None,
-                node_names: Mapping[str, str] | None = None) -> tuple[Path, dict[str, Any]]:
+                node_names: Mapping[str, str] | None = None,
+                anchors: Mapping[str, Any] | None = None) -> tuple[Path, dict[str, Any]]:
     """跑一次完整鏈並寫下 artifact。**只有這裡會連 Neo4j／Engine C／private ledger。**
 
     `readings`：`readings_context()` 的結果（多檔時由 `materialize_many` 載入一次傳進來）；沒給就自己載一次。
     3.7 起它同時餵讀圖面板與 argument 鏈段的需求端（同一份，不各載一次）。
     `candidates`：`candidate_context()` 的結果（同上，多檔載一次）；沒給就為這一檔載一次。
     `node_names`：坐的層的節點名（`_seat_node_names`；多檔時載一次）；沒給就只查這一檔坐的那幾個。
+    `anchors`：需求錨序列（`_anchor_context`；多檔時載一次）；沒給就為這一檔載一次。
     """
     from briefing.alpha_view.sources import fetch_alpha_investment_view
     from briefing.analyst_view import build_analyst_view
@@ -450,13 +460,48 @@ def materialize(ticker: str, *, as_of: date | None = None, scenario: str | None 
     seats = ((context or {}).get("seats") or {}).get(view.identity.company_id) or ()
     page_diagrams = None if loaded is None else diagrams_for_nodes(loaded, seats)
     names = node_names if node_names is not None else _seat_node_names({"seats": {"_": list(seats)}})
+    anchor_ctx = anchors if anchors is not None else _anchor_context(as_of)
+    demand = _page_demand_anchor(anchor_ctx, candidate_ctx, view.identity.company_id)
     payload = materialize_view(analyst.to_dict(), generated_at=generated_at,
                                price_series=_close_series(ticker),
-                               page_extra=page_extra_for(ticker, notes_state, page_diagrams),
+                               page_extra=page_extra_for(ticker, notes_state, page_diagrams, demand),
                                diagrams=page_diagrams,
-                               node_names={str(n): names[str(n)] for n in seats if str(n) in names})
+                               node_names={str(n): names[str(n)] for n in seats if str(n) in names},
+                               demand_anchor=demand)
     target = store or ArtifactStore()
     return target.write(payload), payload
+
+
+def _anchor_context(as_of: date | None) -> dict[str, Any]:
+    """需求錨序列（個股頁 S3a；取數 `alpha.providers.demand_anchor`、組法 `alpha.demand_anchor`）：一輪載入一次
+    （as-of T 只用 `filed ≤ T` 的申報）。讀不到 Engine C 或設定 → `{"absence": …}`——B2「錨的變化」印這一輪沒讀到，不是「沒有成長」。"""
+    from alpha.providers.demand_anchor import anchor_context
+    from engine_c.db import get_conn
+
+    try:
+        conn = get_conn()
+    except Exception as exc:  # noqa: BLE001 — 錨是 B2 的一格，讀不到不擋整份判讀
+        return {"absence": {"kind": "upstream_unavailable", "reason": f"Engine C 讀不到（{type(exc).__name__}: {str(exc)[:120]}）"}}
+    try:
+        return anchor_context(conn, as_of=as_of or date.today())
+    finally:
+        conn.close()
+
+
+def _page_demand_anchor(anchor_ctx: Mapping[str, Any] | None, candidate_ctx: Mapping[str, Any] | None,
+                        company_id: str | None) -> dict[str, Any]:
+    """一頁的「錨的變化」：這家公司在結構表走到的需求錨（候選輸入 `bets.anchors`，與「是不是新賭注」同一份）→ 對到的序列。
+    結構表的錨讀不到（或回看的那天不推）＝讀不到，不是「走不到錨」（L12）。"""
+    from alpha.demand_anchor import page_anchor
+
+    ctx = candidate_ctx if isinstance(candidate_ctx, Mapping) else {}
+    bets = ctx.get("bets") if isinstance(ctx.get("bets"), Mapping) else None
+    if ctx.get("absence") or bets is None or bets.get("anchors_absence"):
+        source = ctx.get("absence") or (bets or {}).get("anchors_absence") or {}
+        kind = source.get("kind") if source.get("kind") == "point_in_time_unavailable" else "upstream_unavailable"
+        return {"anchors": [], "series": [], "absence": {
+            "kind": kind, "reason": f"結構表的需求錨這一輪讀不到（{source.get('reason') or '候選輸入沒有需求錨'}）"}}
+    return page_anchor(anchor_ctx, (bets.get("anchors") or {}).get(str(company_id)), bets.get("names"))
 
 
 def _seat_node_names(context: Mapping[str, Any] | None) -> dict[str, str]:
@@ -498,10 +543,11 @@ def materialize_many(tickers: Sequence[str], *, as_of: date | None = None,
     notes_state = _layer_notes_state(state_store) if tickers else None
     loaded = _diagrams_loaded() if tickers else None
     names = _seat_node_names(readings) if tickers else None
+    anchors = _anchor_context(as_of) if tickers else None
     for ticker in tickers:
         try:
             path, _ = materialize(ticker, as_of=as_of, store=target, readings=readings, candidates=candidates,
-                                  layer_notes=notes_state, diagrams=loaded, node_names=names)
+                                  layer_notes=notes_state, diagrams=loaded, node_names=names, anchors=anchors)
         except Exception as exc:  # noqa: BLE001 — 逐檔隔離；理由原樣回報
             results.append((ticker, None, f"{type(exc).__name__}: {str(exc)[:200]}"))
         else:

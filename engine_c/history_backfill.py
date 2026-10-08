@@ -75,15 +75,32 @@ METRICS: tuple[str, ...] = (
     # Phase 4 Step 4.6：新股發行金額（稀釋燈的輸入）。照營收的慣例拆季度／年度兩個名字，第四季同樣由
     # 「年度 − 前三季累計」衍生。建表之後才加——舊庫的 CHECK 要先遷移（`engine_c.migrate_fundamental_metrics`）。
     "equity_issued_value_quarter", "equity_issued_value_annual",
+    # 個股頁 S3a（2026-10-08）：現金資本支出（需求錨序列的原料：雲端四大）。現金流量表在季報裡是**年初累計**，
+    # 單季由累計差分衍生（`YTD_CONCEPTS`）；建表之後才加——舊庫的 CHECK 先遷移（`engine_c.migrate_fundamental_metrics`）。
+    "capex_quarter", "capex_annual",
 )
 #: 建表之後才加進 `METRICS` 的指標。舊庫的 CHECK 還不認得它們時，`backfill_ticker_edgar` 只略過這幾個並計數，
 #: 營收／現金／封面股數照寫——一個新指標不得讓整批既有指標寫不進去（Step 4.6 的 L11-6 ④：CHECK 未遷移時
 #: 35 檔的 EDGAR 段會整批 error）。
-LATE_METRICS: frozenset[str] = frozenset({"equity_issued_value_quarter", "equity_issued_value_annual"})
+LATE_METRICS: frozenset[str] = frozenset({"equity_issued_value_quarter", "equity_issued_value_annual",
+                                          "capex_quarter", "capex_annual"})
 
 #: 新股發行金額的 tag（Phase 4 Step 4.6）：只收 us-gaap 這一個——稀釋燈只對國內申報人判色；
 #: `StockIssuedDuringPeriodSharesNewIssues`（股數版）是 plan 原指定、已被 4.0 量到只 10／35 檔有，不用。
 EQUITY_ISSUED_TAGS: tuple[str, ...] = ("StockIssuedDuringPeriodValueNewIssues",)
+
+#: 現金資本支出的 tag（個股頁 S3a，2026-10-08）：現金流量表「購置不動產、廠房與設備」那一行。各家用其中一個——
+#: 2026-10-08 實測雲端四大：MSFT／GOOGL／META 用前者、AMZN 用後者，同一期間同一份申報兩個都給的 0 組；
+#: 兩個都給而數字不同時照營收的守則拒寫（不挑一個）。**是代理**：含非 AI 支出、不含融資租賃。
+CAPEX_TAGS: tuple[str, ...] = ("PaymentsToAcquirePropertyPlantAndEquipment", "PaymentsToAcquireProductiveAssets")
+
+#: 季報裡只給**年初累計**的指標（現金流量表）：單季＝累計差分——Q2＝6M−Q1、Q3＝9M−6M、Q4＝FY−9M（後者與營收共用）。
+#: 直接有 3 個月 fact 的那一季（例：MSFT、AMZN 每季都給）照用直接的，不衍生。營收、營業利益有 3 個月 fact，不在這裡。
+YTD_CONCEPTS: frozenset[str] = frozenset({"capex"})
+
+#: 年度 fact 只認會計年度：年報（10-K／20-F／40-F）裡的年度期間。季報裡一年長的期間若不是某份年報的會計年度，
+#: 是**近 12 個月（TTM）**欄（2026-10-08 實測：AMZN 的季報現金流量有 TTM 欄）——當成年度會讓 FY−9M 衍生出錯，不存、計數進報告。
+ANNUAL_FORMS: tuple[str, ...] = ("10-K", "20-F", "40-F")
 
 #: 國內季度申報人的判定窗：最近 18 個月內有 10-Q。
 QUARTERLY_WINDOW_DAYS = 548
@@ -298,6 +315,8 @@ def _flow_tags(concept: str) -> tuple[tuple[str, tuple[str, ...]], ...]:
         return (("us-gaap", REVENUE_TAGS), ("ifrs-full", IFRS_REVENUE_TAGS))
     if concept == "equity_issued_value":
         return (("us-gaap", EQUITY_ISSUED_TAGS),)
+    if concept == "capex":
+        return (("us-gaap", CAPEX_TAGS),)
     return (("us-gaap", OPERATING_INCOME_TAGS), ("ifrs-full", IFRS_OPERATING_INCOME_TAGS))
 
 
@@ -332,6 +351,42 @@ def _resolve_groups(candidates: Iterable[_Fact], key: Callable[[_Fact], tuple],
     return out
 
 
+def _derive_ytd_quarters(concept: str, quarter: Mapping[tuple, _Fact], nine: Mapping[tuple, _Fact],
+                         six_candidates: Iterable[_Fact], *, key: Callable[[_Fact], tuple], reason: str,
+                         rejected: list[dict[str, Any]], horizon: date, emit: Callable[..., None]) -> None:
+    """年初累計的指標（`YTD_CONCEPTS`，現金流量表）在季報裡沒有單季：Q2＝6M−Q1、Q3＝9M−6M（Q4＝FY−9M 與營收共用）。
+
+    每一份累計（每一個版本）各衍生一列，`filed` 取兩份較晚的、減數取**那份累計申報時已知的最新版本**（`filed ≤` 被減數的
+    `filed`）——讀取端 as-of T 取 `filed ≤ T` 的最新一列，所以 T 落在兩份申報之間時拿得到的是當時能算出的那個數（INV-6）。
+    那一份累計申報時**已經有**直接的 3 個月 fact（`filed ≤` 累計的 `filed`）就不衍生——直接的若要到隔年比較欄才出現，
+    中間那一年仍要有衍生值（否則 as-of 在那一年裡那一季是空的）；同一個會計年度起點湊不到減數也不衍生（缺季不補 0）。"""
+    six = _resolve_groups(six_candidates, key, label=f"{concept}_six_month", rejected=rejected,
+                          multi_value_reason=reason, horizon=horizon)
+
+    def direct_known(fact: _Fact) -> bool:
+        return any(q.end == fact.end and q.filed <= fact.filed for q in quarter.values())
+
+    def known_at(pool: Iterable[_Fact], fact: _Fact) -> _Fact | None:
+        same_year = [p for p in pool if p.start == fact.start and p.end < fact.end and p.filed <= fact.filed
+                     and p.unit == fact.unit]
+        return max(same_year, key=lambda p: (p.filed, p.accession, p.end)) if same_year else None
+
+    for h1 in six.values():
+        q1 = known_at([q for q in quarter.values() if q.start == h1.start], h1)
+        if direct_known(h1) or q1 is None:
+            continue
+        emit(f"{concept}_quarter", h1, start=q1.end + timedelta(days=1),
+             derived=f"6M−Q1：{h1.accession}（{h1.tag}）−{q1.accession}（{q1.tag}）",
+             filed=max(h1.filed, q1.filed), value=h1.value - q1.value, tag=f"{h1.namespace}:{h1.tag}")
+    for nm in nine.values():
+        h1 = known_at(six.values(), nm)
+        if direct_known(nm) or h1 is None:
+            continue
+        emit(f"{concept}_quarter", nm, start=h1.end + timedelta(days=1),
+             derived=f"9M−6M：{nm.accession}（{nm.tag}）−{h1.accession}（{h1.tag}）",
+             filed=max(nm.filed, h1.filed), value=nm.value - h1.value, tag=f"{nm.namespace}:{nm.tag}")
+
+
 def build_fundamental_rows(facts: Mapping[str, Any], *, ticker: str, filer: str, today: date,
                            fetched_at: str) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     """companyfacts → `(fundamental_history 的列, 拒寫清單)`。**純函式**：不連網、不寫檔。
@@ -362,7 +417,7 @@ def build_fundamental_rows(facts: Mapping[str, Any], *, ticker: str, filer: str,
             "source": SOURCE_EDGAR, "fetched_at": fetched_at,
         })
 
-    for concept in ("revenue", "operating_income", "equity_issued_value"):
+    for concept in ("revenue", "operating_income", "equity_issued_value", "capex"):
         candidates = [f for namespace, tags in _flow_tags(concept) for tag in tags
                       for f in _facts(facts, namespace, tag, forms=forms)]
         by_span: dict[str, list[_Fact]] = {}
@@ -371,9 +426,21 @@ def build_fundamental_rows(facts: Mapping[str, Any], *, ticker: str, filer: str,
             span = _span_class(fact)
             if span in ("quarter", "nine_month", "annual"):
                 by_span.setdefault(span, []).append(fact)
-            elif span is None and fact.end >= horizon \
-                    and not _SIX_MONTH_DAYS[0] <= (fact.end - fact.start).days <= _SIX_MONTH_DAYS[1]:
+            elif span is None and _SIX_MONTH_DAYS[0] <= (fact.end - fact.start).days <= _SIX_MONTH_DAYS[1]:
+                if concept in YTD_CONCEPTS:          # 現金流量表的半年累計是 Q2 的原料；營收那類有單季，照舊不存
+                    by_span.setdefault("six_month", []).append(fact)
+            elif span is None and fact.end >= horizon:
                 irregular.add((fact.start, fact.end, fact.accession, fact.value))
+        # 年度只認會計年度（`ANNUAL_FORMS` 裡出現過的年度期間）；季報裡一年長、又不是任何一份年報的會計年度的，
+        # 是近 12 個月（TTM）欄——不存、計數進報告（INV-3；2026-10-08 AMZN 的季報現金流量有 TTM 欄）。
+        fiscal_years = {(f.start, f.end) for f in by_span.get("annual", ()) if f.form.startswith(ANNUAL_FORMS)}
+        trailing = [f for f in by_span.get("annual", ()) if (f.start, f.end) not in fiscal_years]
+        if trailing:
+            by_span["annual"] = [f for f in by_span["annual"] if (f.start, f.end) in fiscal_years]
+            for start, end, accession in sorted({(f.start, f.end, f.accession) for f in trailing if f.end >= horizon}):
+                rejected.append({"metric": concept, "kind": "not_fiscal_year",
+                                 "key": [start.isoformat(), end.isoformat(), accession],
+                                 "reason": "一年長的期間不是任何一份年報的會計年度（季報裡的近 12 個月欄）——不當年度、不存"})
         # 期間長度不是季／半年／9 個月／年的 fact（成立未滿一季、會計年度變更）：不存，但**計數進報告**——
         # 不得靜默丟（R2-c 覆核 #2、INV-3：CCXI 的兩筆發行金額 fact 原本無聲消失，讀取端還說「沒有任何 fact」）
         for start, end, accession, value in sorted(irregular):
@@ -417,6 +484,9 @@ def build_fundamental_rows(facts: Mapping[str, Any], *, ticker: str, filer: str,
                  derived=f"FY−9M：{fy.accession}（{fy.tag}）−{nm.accession}（{nm.tag}）",
                  filed=max(fy.filed, nm.filed), value=fy.value - nm.value,
                  tag=f"{fy.namespace}:{fy.tag}")
+        if concept in YTD_CONCEPTS:
+            _derive_ytd_quarters(concept, quarter, nine, by_span.get("six_month", ()), key=key, reason=reason,
+                                 rejected=rejected, horizon=horizon, emit=emit)
 
     for metric, spec in INSTANT_TAGS.items():
         if metric == "shares_outstanding_cover" and filer != "domestic_quarterly":

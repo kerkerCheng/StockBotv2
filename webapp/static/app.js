@@ -1498,6 +1498,7 @@ function fmtMultiple(v) {
 
 function blockVisuals(payload, view, key) {
   const out = [];
+  if (key === 'B2') anchorFigures(payload).forEach((n) => out.push(n));
   if (key === 'B4') (payload.diagrams || []).forEach((d) => out.push(diagramFigure(d)));
   if (key === 'B6') { const n = rulerChart(view); if (n) out.push(n); out.push(priceFigure(payload)); }
   if (key === 'B7') { const n = revenueBars(view); if (n) out.push(n); }
@@ -1650,6 +1651,68 @@ function revenueBars(view) {
   const legend = [`柱高＝營收（最新一期 ${amount}）`, `顏色＝年增正負（最近三期：${recent}）`];
   if (d.dependencies && d.dependencies.basis) legend.push(`來源：${d.dependencies.basis}`);
   wrap.appendChild(el('div', 'chart-legend', legend.join('　')));
+  return wrap;
+}
+
+/** 需求錨（B2「錨的變化」，個股頁 S3a）：這家公司在結構表走到的錨對到的 A2 序列——每條一張柱狀圖（最近 12 期、
+ *  最新一期標年增），圖下寫最新一期、可知日、哪幾家是推算、它是代理。全部照抄 materialize 的 `demand_anchor`（不加總、不換算）；
+ *  沒有就照寫原因（走不到錨／題材沒宣告序列／這一輪沒讀到——三種不同）。 */
+function anchorFigures(payload) {
+  const demand = payload.demand_anchor;
+  if (!demand) return [];
+  const out = [];
+  const anchors = demand.anchors || [];
+  if (anchors.length) {
+    out.push(el('div', 'row-reason', '它走到的需求錨：' + anchors.map((a) => `${a.name || a.node}`
+      + (a.basis === 'company' ? '（退回公司層才走到）' : '')).join('、')));
+  }
+  if (demand.absence) {
+    out.push(el('div', 'row-reason ss-pending', `錨的變化：${demand.absence.reason || absenceLabel(demand.absence.kind) || '沒有'}`));
+    return out;
+  }
+  (demand.series || []).forEach((s) => { const fig = anchorBars(s); if (fig) out.push(fig); });
+  return out;
+}
+
+function anchorBars(s) {
+  if (s.absence || !(s.points || []).length) {
+    return el('div', 'row-reason ss-pending', `${s.label || s.key}：${(s.absence && s.absence.reason) || '沒有值'}`);
+  }
+  const pts = s.points.slice(-12);
+  const max = Math.max(...pts.map((p) => p.value));
+  if (!(max > 0)) return null;
+  const top = 18, bottom = 92, L = 6, R = 314;
+  const step = (R - L) / pts.length;
+  const barW = Math.max(4, step - 9);
+  // 座標換算（同資產配置那段的 pct()／meter()）：錨的值 → 柱高 px，不是任何財務算術。
+  const barHeight = (amount) => Math.max(1, (amount / max) * (bottom - top));
+  const svg = svgEl('svg', { viewBox: '0 0 320 112', class: 'chart chart-bars', role: 'img', 'aria-label': s.label || '需求錨' });
+  svg.appendChild(svgEl('line', { x1: L, y1: bottom, x2: R, y2: bottom, class: 'chart-axis' }));
+  pts.forEach((p, i) => {
+    const h = barHeight(p.value);
+    const cx = L + step * (i + 0.5);
+    const klass = p.yoy == null ? 'bar' : p.yoy >= 0 ? 'bar bar-pos' : 'bar bar-neg';
+    svg.appendChild(svgEl('rect', { x: cx - barW / 2, y: bottom - h, width: barW, height: h, rx: 1.5, class: klass }));
+    if (i === pts.length - 1 && p.yoy != null) {
+      svg.appendChild(svgEl('text', { x: Math.min(R, cx + barW / 2), y: Math.max(11, bottom - h - 5), 'text-anchor': 'end',
+        class: 'chart-label chart-label-strong' }, `年增 ${fmtPercent(p.yoy)}`));
+    }
+  });
+  svg.appendChild(svgEl('text', { x: L, y: bottom + 15, 'text-anchor': 'start', class: 'chart-label' }, pts[0].period));
+  svg.appendChild(svgEl('text', { x: R, y: bottom + 15, 'text-anchor': 'end', class: 'chart-label' }, pts[pts.length - 1].period));
+  const wrap = el('div', 'chart-wrap');
+  wrap.appendChild(svg);
+  const last = pts[pts.length - 1];
+  const big = fmtBig(last.value) || '—';
+  const ccy = CURRENCY_WORD[s.currency] || s.currency || '';
+  const who = (s.components || []).map((c) => c.ticker).join('、');
+  wrap.appendChild(el('div', 'chart-legend', `${s.label}${who && s.aggregation !== 'single' ? `（${who}）` : ''}：`
+    + `最新一期 ${last.period} ${big}${/[億萬]$/.test(big) ? '' : ' '}${ccy}`
+    + (last.yoy != null ? `，年增 ${fmtPercent(last.yoy)}` : '')
+    + `；${last.known_on} 起${s.aggregation === 'single' ? '申報' : '每一家都申報了'}`
+    + ((last.derived || []).length && s.aggregation !== 'single' ? `（${last.derived.join('、')} 由年初累計差分推算）` : '')
+    + '。'));
+  if (s.proxy) wrap.appendChild(el('div', 'chart-legend', s.proxy));
   return wrap;
 }
 

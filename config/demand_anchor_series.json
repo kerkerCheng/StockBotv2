@@ -1,0 +1,32 @@
+{
+  "_doc": [
+    "需求錨序列（個股頁 S3a，2026-10-08；brainstorm 2026-10-05-stock-page-schema §5.4 B2「錨的變化」）：圖上的需求錨節點 → 這個題材的錨序列。",
+    "這是字彙——日後加一列就能補（L2）；不在 anchors 上的錨＝「題材沒宣告錨」，個股頁 B2 照實印缺席，不臨時湊一條頂替。",
+    "序列是 A2：Engine C fundamental_history 的 SEC 申報值（alpha/demand_anchor.py 組）。可知日＝申報日；多家加總時取最晚的那一家（INV-6）。",
+    "DRAM、成熟製程、機器人、稀土的錨還沒有序列（2026-10-08）：它們的需求不只 AI 資本支出，硬掛會讓錨講錯故事。"
+  ],
+  "series": {
+    "hyperscaler_cash_capex": {
+      "label": "雲端四大現金資本支出",
+      "metric": "capex_quarter",
+      "components": ["co:microsoft", "co:google", "co:amazon", "co:meta"],
+      "aggregation": "sum_calendar_quarter",
+      "currency": "USD",
+      "proxy": "代理：現金流量表的「購置不動產、廠房與設備」——含非 AI 支出、不含融資租賃"
+    },
+    "nvidia_revenue": {
+      "label": "NVIDIA 營收",
+      "metric": "revenue_quarter",
+      "components": ["co:nvidia"],
+      "aggregation": "single",
+      "currency": "USD",
+      "proxy": "NVIDIA 自己的會計季（1 月底結算），不與曆季相加"
+    }
+  },
+  "anchors": {
+    "tech:ai_switch": ["hyperscaler_cash_capex", "nvidia_revenue"],
+    "tech:optical_scale_up": ["hyperscaler_cash_capex", "nvidia_revenue"],
+    "tech:scale_across": ["hyperscaler_cash_capex", "nvidia_revenue"],
+    "tech:hbm": ["hyperscaler_cash_capex", "nvidia_revenue"]
+  }
+}

@@ -243,7 +243,8 @@ CREATE TABLE IF NOT EXISTS fundamental_history (
     metric VARCHAR(40) NOT NULL CHECK (metric IN (
         'revenue_quarter', 'revenue_annual', 'operating_income_quarter', 'operating_income_annual',
         'cash', 'total_debt', 'shares_outstanding_cover',
-        'equity_issued_value_quarter', 'equity_issued_value_annual')),
+        'equity_issued_value_quarter', 'equity_issued_value_annual',
+        'capex_quarter', 'capex_annual')),
     period_start DATE,
     period_end DATE NOT NULL,
     filed DATE NOT NULL,

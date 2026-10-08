@@ -782,7 +782,16 @@ AnalystView.brief（optional）→ APP 首屏 briefCard；六張卡收進「為�
   標籤會撞就換一列——2026-10-08 使用者看不懂舊版「最高貼在右緣、落在同組中位底下」後重畫）＋股價走勢、B7 營收柱（`in_numbers_series` 最後 12 期，
   幣別跟著序列走——`alpha/three_questions.py::_series_currency`，混幣別就不寫單一幣別）。圖上不放標題、只標兩端與今天，其餘寫在圖下
   （schema 規則 8、9）；座標換算只住 beta 圖那一區的寫法（`pct()`／`meter()`／`barHeight()`），前端守門測試照舊禁止 brief 區做算術。
-  B4 示意圖見 §6 層說明之後的「示意圖」。**手機量測（S5c）**：`?selfcheck=1&w=390`（加 `&open=1` 先打開每個展開再量）讓 app.js 量整頁溢出與 SVG 字疊字，結果寫進隱藏的
+  B4 示意圖見 §6 層說明之後的「示意圖」。
+  **需求錨序列（2026-10-08 個股頁 S3a；B2「錨的變化」）**：A2 投影，`alpha/providers/demand_anchor.py` 取數（設定檔、名冊、
+  Engine C）、`alpha/demand_anchor.py` 組（純函式——alpha 核心不碰外部世界），照 `config/demand_anchor_series.json`
+  （需求錨節點 → 序列的字彙；日後加一列就能補）。原料是 Engine C `fundamental_history`：`capex_quarter`／`capex_annual`
+  （現金資本支出，`CAPEX_TAGS`；季報的現金流量是**年初累計**，單季＝累計差分 Q2＝6M−Q1、Q3＝9M−6M、Q4＝FY−9M，標 `derived`、
+  `filed` 取兩份較晚的；年度只認年報裡的會計年度——季報的近 12 個月欄不存）與 NVIDIA 的 `revenue_quarter`。加總型（雲端四大）
+  **每一家同一曆季都申報了**才有那一季、缺誰照寫；可知日＝每家最早申報日取最晚、版本日另記（INV-6）；會計季（NVIDIA）走單一型、
+  不與曆季相加；幣別不換算。一頁走到哪幾個錨照候選輸入 `bets.anchors`（結構表逐列錨，與「是不是新賭注」同一份）；
+  缺席分三種：這一輪沒讀到／走不到錨／題材沒宣告序列。materialize 一輪載入一次，payload 帶 `demand_anchor`，頁外輸入
+  `@demand_anchor` 餵填得滿表。**手機量測（S5c）**：`?selfcheck=1&w=390`（加 `&open=1` 先打開每個展開再量）讓 app.js 量整頁溢出與 SVG 字疊字，結果寫進隱藏的
   `#selfcheck` 由 headless Edge 讀（Edge 最小視窗約 496px，390 用根寬度模擬）；只在帶參數時跑、不連網。
 - **是不是新賭注（同上，使用者 A3）**：候選推導多一格 `shared_bet`——這一檔和每一檔**持有的 alpha 檔**（`held_index`）共用的需求錨與
   層／插槽，依 ticker 字母列，**不打分、不排序、不加權、不進候選狀態前提**。需求錨只取結構表逐列的 `demand_anchor`／`anchor_basis`

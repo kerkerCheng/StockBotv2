@@ -42,6 +42,19 @@ def fundamental_series(conn: Any, ticker: str, metric: str, *, as_of: date | str
     return [dict(known[k]) for k in sorted(known)]
 
 
+def first_filed_by_period(conn: Any, ticker: str, metric: str, *, as_of: date | str) -> dict[str, str]:
+    """as-of T 每一期**最早**的申報日（`filed ≤ T` 的版本裡最早那一個）：`{period_end: filed}`。
+
+    `fundamental_series` 給的是每期最新的版本（隔年比較欄重列時，版本日是隔年）；「這一期最早何時知道」要看最早的版本——
+    需求錨序列的可知日用它（個股頁 S3a）。"""
+    rows = conn.execute(
+        """SELECT period_end, MIN(filed) FROM fundamental_history
+           WHERE ticker = ? AND metric = ? AND filed <= ?
+           GROUP BY period_end""",
+        (ticker, metric, _iso(as_of))).fetchall()
+    return {str(r[0])[:10]: str(r[1])[:10] for r in rows}
+
+
 def monthly_revenue_as_of(conn: Any, ticker: str, *, as_of: date | str) -> dict[str, Any]:
     """as-of T 的台股月營收：`{"months": [...], "conflicts": [...]}`（`data_month` 升序）。
 

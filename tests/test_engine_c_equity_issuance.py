@@ -150,7 +150,8 @@ def test_migration_backs_up_rebuilds_reconciles_and_is_idempotent(tmp_path) -> N
     db = _old_db(tmp_path / "prod.db", rows=[_row(), _row(accn="A2", filed="2026-08-10"), _row("cash", accn="C1")])
     conn = sqlite3.connect(str(db), isolation_level=None)
     before = mig.table_fingerprint(conn)
-    assert mig.missing_metrics(conn) == ["equity_issued_value_quarter", "equity_issued_value_annual"]
+    assert mig.missing_metrics(conn) == ["equity_issued_value_quarter", "equity_issued_value_annual", "capex_quarter",
+                                         "capex_annual"]
     conn.close()
     backup = mig.backup_database(db, tmp_path / "backups" / "prod.pre.db")
     assert backup["rows"] == 3 and Path(backup["path"]).is_file()
@@ -182,7 +183,8 @@ def test_a_reconciliation_mismatch_rolls_back_and_leaves_the_table_untouched(tmp
         mig.migrate(conn)
     monkeypatch.setattr(mig, "table_fingerprint", real)
     assert mig.table_fingerprint(conn) == before
-    assert mig.missing_metrics(conn) == ["equity_issued_value_quarter", "equity_issued_value_annual"]
+    assert mig.missing_metrics(conn) == ["equity_issued_value_quarter", "equity_issued_value_annual", "capex_quarter",
+                                         "capex_annual"]
     assert "fundamental_history__new" not in {r[0] for r in conn.execute("SELECT name FROM sqlite_master")}
 
 

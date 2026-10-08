@@ -35,6 +35,19 @@ def test_the_charts_only_copy_audit_values() -> None:
     assert "det.currency" in bars       # 幣別由序列自己帶（alpha.three_questions._series_currency），這裡只翻成中文
 
 
+def test_the_demand_anchor_lives_in_b2_and_only_copies_the_materialized_series() -> None:
+    """個股頁 S3a（2026-10-08）：B2「錨的變化」照抄 materialize 的 `demand_anchor`（季值、年增、可知日、推算的是哪幾家、代理說明）
+    ——前端不加總、不換算、不算年增；沒有就照印那一種缺席的原因（走不到錨／題材沒宣告序列／這一輪沒讀到）。"""
+    assert "key === 'B2'" in _body("blockVisuals") and "anchorFigures(payload)" in _body("blockVisuals")
+    figures = _body("anchorFigures")
+    assert "payload.demand_anchor" in figures and "demand.absence.reason" in figures
+    bars = _body("anchorBars")
+    for copied in ("p.value", "p.yoy", "last.known_on", "last.derived", "s.proxy", "s.components"):
+        assert copied in bars, f"錨圖少照抄了 {copied}"
+    for arithmetic in ("value / ", "value - ", " / prior", "reduce((", "Math.pow"):
+        assert arithmetic not in bars, f"錨圖不得自己算：{arithmetic}"
+
+
 def test_diagrams_show_as_images_in_b4_and_on_the_layer_page_labelled_as_illustration() -> None:
     """示意圖由 materialize 檢查過、編成 data URI；前端只用 <img> 顯示，不把 SVG 原碼塞進頁面（SVG 在 img 裡不執行任何東西）。"""
     assert "key === 'B4'" in _body("blockVisuals") and "payload.diagrams" in _body("blockVisuals")
