@@ -1650,6 +1650,17 @@
         "Freiberger Compound Materials",
         "Freiberger"
       ]
+    },
+    {
+      "_display_name_source": "SEC companyfacts entityName「AMAZON COM INC」（CIK 1018724，2026-10-08 讀）；只做排版正規化（公司自身寫法 Amazon.com, Inc.）",
+      "_note": "需求錨序列的成分（個股頁 S3a，2026-10-08）：現金資本支出 us-gaap:PaymentsToAcquireProductiveAssets；不是研究候選、不上候選板的判讀",
+      "company_id": "co:amazon",
+      "display_name": "Amazon.com, Inc.",
+      "execution_currency": "USD",
+      "execution_venue": "NASDAQ",
+      "market_currency": "USD",
+      "name_aliases": [],
+      "research_ticker": "AMZN"
     }
   ]
 }
