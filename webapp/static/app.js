@@ -1196,6 +1196,7 @@ function schemaBlock(payload, view, lines, block, reading) {
   if (!(reading.slots || []).length && !(reading.parts || []).length) {
     node.appendChild(el('div', 'row-reason ss-pending', reading.pending || '還沒寫'));
   }
+  blockVisuals(view, block.key).forEach((n) => node.appendChild(n));
   const cells = blockCells(payload, view, block);
   if (cells) node.appendChild(cells);
   return node;
@@ -1946,6 +1947,129 @@ function svgEl(tag, attrs, text) {
   Object.keys(attrs || {}).forEach((k) => node.setAttribute(k, String(attrs[k])));
   if (text !== undefined && text !== null) node.textContent = String(text);
   return node;
+}
+
+/* （個股頁 S5b 的圖住這一段：與資產配置的圖一樣只做座標換算——首屏卡片那段有「不得自己算報酬」的檢查，畫圖不放在那裡。） */
+/* ---------- 個股頁 S5b：圖（2026-10-08；schema v1.0 規則 6、8、9） ----------
+   量化圖只畫系統裡的數字（三題稽核區的值照抄，不另算）；圖上不加標題，看點寫在上方那一句讀法、口徑寫在圖下那一行；
+   圖上的字不准互相重疊——由 `?selfcheck=1` 機械量測（selfCheck），0 才算過（S5c）。
+   放哪一塊照 page_schema：B6 怎麼被定價＝參考尺、B7 押對了夠大嗎（「出現在數字裡」）＝營收柱狀。
+   SVG 元素用資產配置那一段既有的 `svgEl`／`SVG_NS`（同一份，不另寫）。 */
+
+function tqLine(view, suffix) {
+  const panel = view && view.three_questions;
+  if (!panel || !Array.isArray(panel.lines)) return null;
+  return panel.lines.find((line) => String(line.key || '').endsWith(suffix)) || null;
+}
+
+const CURRENCY_WORD = { TWD: '元台幣', USD: '美元', JPY: '日圓', EUR: '歐元', GBP: '英鎊', CNY: '元人民幣',
+  KRW: '韓元', SEK: '瑞典克朗', CAD: '加幣', AUD: '澳幣', HKD: '港幣', CHF: '瑞士法郎' };
+
+function fmtMultiple(v) {
+  return fmtNumber(v, v >= 100 ? 0 : v >= 10 ? 1 : 2);
+}
+
+function blockVisuals(view, key) {
+  const out = [];
+  if (key === 'B6') { const n = rulerChart(view); if (n) out.push(n); }
+  if (key === 'B7') { const n = revenueBars(view); if (n) out.push(n); }
+  return out;
+}
+
+/** 參考尺：自家三年倍數的最低、中位、最高與今天；同組中位只在同口徑時畫。對數刻度——倍數常跨兩個數量級
+ *  （AXTI 三年 P/S 0.53 → 96），線性尺會把中位擠到邊上。圖上只標兩端與今天，中位與組中位寫在圖下（避免字疊字）。 */
+function rulerChart(view) {
+  const own = tqLine(view, ':own_history_pctile');
+  const d = own && own.datum;
+  const dep = (d && d.dependencies) || {};
+  const det = dep.detail || {};
+  if (!d || d.status !== 'available' || !(det.min > 0 && det.max > 0 && det.median > 0 && det.multiple_today > 0)) return null;
+  const basis = dep.basis || '倍數';
+  const cohortLine = tqLine(view, ':cohort_median');
+  const cd = cohortLine && cohortLine.datum;
+  const cohort = cd && cd.status === 'available' && typeof cd.value === 'number' && cd.value > 0
+    && (cd.dependencies || {}).basis === dep.basis ? cd : null;
+  const values = [det.min, det.max, det.median, det.multiple_today].concat(cohort ? [cohort.value] : []);
+  const lo = Math.min(...values) / 1.2;
+  const hi = Math.max(...values) * 1.2;
+  const L = 8, R = 312, Y = 30;
+  const x = (v) => L + (Math.log(v) - Math.log(lo)) / (Math.log(hi) - Math.log(lo)) * (R - L);
+  const svg = svgEl('svg', { viewBox: '0 0 320 58', class: 'chart chart-ruler', role: 'img',
+    'aria-label': `自家三年 ${basis} 的位置` });
+  svg.appendChild(svgEl('line', { x1: x(det.min), y1: Y, x2: x(det.max), y2: Y, class: 'ruler-range' }));
+  svg.appendChild(svgEl('line', { x1: x(det.median), y1: Y - 8, x2: x(det.median), y2: Y + 8, class: 'ruler-median' }));
+  if (cohort) {
+    const cx = x(cohort.value);
+    svg.appendChild(svgEl('path', { d: `M${cx} ${Y - 7}L${cx + 6} ${Y}L${cx} ${Y + 7}L${cx - 6} ${Y}Z`, class: 'ruler-cohort' }));
+  }
+  const tx = x(det.multiple_today);
+  svg.appendChild(svgEl('circle', { cx: tx, cy: Y, r: 5.5, class: 'ruler-today' }));
+  const todayText = `今天 ${fmtMultiple(det.multiple_today)}`;
+  const anchor = tx < 60 ? 'start' : tx > 260 ? 'end' : 'middle';
+  svg.appendChild(svgEl('text', { x: anchor === 'start' ? Math.max(L, tx - 6) : anchor === 'end' ? Math.min(R, tx + 6) : tx,
+    y: Y - 13, 'text-anchor': anchor, class: 'chart-label chart-label-strong' }, todayText));
+  svg.appendChild(svgEl('text', { x: L, y: Y + 22, 'text-anchor': 'start', class: 'chart-label' }, `最低 ${fmtMultiple(det.min)}`));
+  svg.appendChild(svgEl('text', { x: R, y: Y + 22, 'text-anchor': 'end', class: 'chart-label' }, `最高 ${fmtMultiple(det.max)}`));
+  const wrap = el('div', 'chart-wrap');
+  wrap.appendChild(svg);
+  const legend = [`● 今天＝自家三年第 ${fmtNumber(d.value, 1)} 百分位`, `│ 中位 ${fmtMultiple(det.median)}`];
+  if (cohort) {
+    const cdet = (cohort.dependencies || {}).detail || {};
+    legend.push(`◆ 同組中位 ${fmtMultiple(cohort.value)}（${cdet.theme || '主題等權組'}，${cdet.n_same_basis || '?'}／${cdet.n_members || '?'} 檔同口徑）`);
+  } else {
+    legend.push('◆ 同組中位：沒有同口徑的主題等權組');
+  }
+  const window_ = det.window_start && det.window_end ? `${String(det.window_start).slice(0, 10)} → ${String(det.window_end).slice(0, 10)}` : '三年';
+  legend.push(`${basis}、對數刻度、${window_}${det.samples ? `、${det.samples} 個樣本` : ''}`);
+  wrap.appendChild(el('div', 'chart-legend', legend.join('　')));
+  return wrap;
+}
+
+/** 營收柱狀：最近 12 期（台股月營收、EDGAR 季營收照抄三題③的序列）；柱高＝營收、顏色＝年增正負。
+ *  圖上只標最新一期的年增與首尾兩期的期別，其餘寫在圖下（避免字疊字）。 */
+function revenueBars(view) {
+  const line = tqLine(view, ':in_numbers_series');
+  const d = line && line.datum;
+  if (!d || d.status !== 'available' || !Array.isArray(d.value) || d.value.length < 2) return null;
+  const pts = d.value.slice(-12).map((p) => ({
+    label: p.data_month || String(p.period_end || '').slice(0, 7),
+    value: typeof p.revenue_twd_thousand === 'number' ? p.revenue_twd_thousand * 1000 : p.value,
+    yoy: typeof p.yoy === 'number' ? p.yoy : null,
+  }));
+  if (pts.some((p) => typeof p.value !== 'number' || !isFinite(p.value))) return null;
+  const max = Math.max(...pts.map((p) => p.value));
+  if (!(max > 0)) return null;
+  const top = 18, bottom = 92, L = 6, R = 314;
+  const step = (R - L) / pts.length;
+  const barW = Math.max(4, step - 9);   // 柱寬＝每格寬減固定間距（8 季約 30px、12 個月約 17px）
+  // 座標換算（同資產配置那段的 pct()／meter()）：營收 → 柱高 px，不是任何財務算術。
+  const barHeight = (amount) => Math.max(1, (amount / max) * (bottom - top));
+  const svg = svgEl('svg', { viewBox: '0 0 320 112', class: 'chart chart-bars', role: 'img', 'aria-label': '營收與年增' });
+  svg.appendChild(svgEl('line', { x1: L, y1: bottom, x2: R, y2: bottom, class: 'chart-axis' }));
+  pts.forEach((p, i) => {
+    const h = barHeight(p.value);
+    const cx = L + step * (i + 0.5);
+    const klass = p.yoy == null ? 'bar' : p.yoy >= 0 ? 'bar bar-pos' : 'bar bar-neg';
+    svg.appendChild(svgEl('rect', { x: cx - barW / 2, y: bottom - h, width: barW, height: h, rx: 1.5, class: klass }));
+    if (i === pts.length - 1 && p.yoy != null) {
+      svg.appendChild(svgEl('text', { x: Math.min(R, cx + barW / 2), y: Math.max(11, bottom - h - 5), 'text-anchor': 'end',
+        class: 'chart-label chart-label-strong' }, `年增 ${fmtPercent(p.yoy)}`));
+    }
+  });
+  svg.appendChild(svgEl('text', { x: L, y: bottom + 15, 'text-anchor': 'start', class: 'chart-label' }, pts[0].label));
+  svg.appendChild(svgEl('text', { x: R, y: bottom + 15, 'text-anchor': 'end', class: 'chart-label' }, pts[pts.length - 1].label));
+  const wrap = el('div', 'chart-wrap');
+  wrap.appendChild(svg);
+  const recent = pts.slice(-3).map((p) => `${p.label} ${p.yoy == null ? '—' : fmtPercent(p.yoy)}`).join('、');
+  const last = pts[pts.length - 1];
+  const det = (d.dependencies && d.dependencies.detail) || {};   // 幣別由序列自己帶（三題③），這裡只翻成中文
+  const ccy = det.currency ? (CURRENCY_WORD[det.currency] || det.currency)
+    : (Array.isArray(det.currencies) && det.currencies.length ? `（幣別混合：${det.currencies.join('／')}）` : '（幣別未標）');
+  const amount = `${fmtBig(last.value) || '—'}${ccy.startsWith('元') || ccy.startsWith('（') ? '' : ' '}${ccy}`;
+  const legend = [`柱高＝營收（最新一期 ${amount}）`, `顏色＝年增正負（最近三期：${recent}）`];
+  if (d.dependencies && d.dependencies.basis) legend.push(`來源：${d.dependencies.basis}`);
+  wrap.appendChild(el('div', 'chart-legend', legend.join('　')));
+  return wrap;
 }
 
 function fmtMoney(value, currency) {
@@ -3701,6 +3825,8 @@ async function renderDaily() {
 }
 
 async function route() {
+  const checkWidth = selfCheckWidth();
+  if (checkWidth) document.documentElement.style.width = `${checkWidth}px`;   // 只在 ?selfcheck=1&w= 量測時
   const hash = window.location.hash || '#/';
   const target = decodeURIComponent(hash.replace(/^#\/?/, ''));
   app.textContent = '';
@@ -3729,6 +3855,7 @@ async function route() {
     else if (target.startsWith('layer/')) await renderLayerNote(target.slice('layer/'.length));
     else if (target) await renderDetail(target);
     else await renderList();
+    if (/[?&]selfcheck=1\b/.test(window.location.search)) setTimeout(selfCheck, 0);
   } catch (err) {
     app.textContent = '';
     const box = el('div', 'error');
@@ -3740,6 +3867,65 @@ async function route() {
     box.appendChild(p);
     app.appendChild(box);
   }
+}
+
+/** 個股頁 S5c 的機械量測（只在網址帶 `?selfcheck=1` 時跑；唯讀、不連網、不寫任何東西）：
+ *  ①頁面橫向溢出（文件寬度超過視窗幾 px；逐一列出右緣超出視窗、又不在自己可捲動的容器裡的元素）
+ *  ②圖上的字互相重疊的對數（schema v1.0 規則 9：0 才算過）。結果寫進 `#selfcheck`，headless 瀏覽器的 DOM 傾印讀得到。 */
+function selfCheckWidth() {
+  const m = /[?&]selfcheck=1\b.*?[?&]w=(\d{3,4})\b/.exec(window.location.search);
+  return m ? Number(m[1]) : null;
+}
+
+function selfCheck() {
+  // headless 瀏覽器的視窗最小約 496px：要量 390px 就用 `&w=390` 把根元素限寬（route 開頭套用），右緣跟 w 比。
+  // 640px 以下的手機斷點在 390 與 496 都成立，限寬量到的就是手機版面。
+  const vw = selfCheckWidth() || window.innerWidth;
+  const doc = document.documentElement;
+  const offenders = [];
+  const scrollsX = (node) => {
+    for (let p = node.parentElement; p && p !== document.body; p = p.parentElement) {
+      const ox = getComputedStyle(p).overflowX;
+      if (ox === 'auto' || ox === 'scroll' || ox === 'hidden') return true;
+    }
+    return false;
+  };
+  app.querySelectorAll('*').forEach((node) => {
+    const r = node.getBoundingClientRect();
+    if (r.width > 0 && r.right > vw + 0.5 && !scrollsX(node)) {
+      offenders.push({ el: node.tagName.toLowerCase() + (node.className && typeof node.className === 'string' ? '.' + node.className.split(' ').join('.') : ''),
+        right: Math.round(r.right), text: (node.textContent || '').trim().slice(0, 40) });
+    }
+  });
+  let overlaps = 0;
+  const details = [];
+  app.querySelectorAll('svg').forEach((svg) => {
+    const boxes = Array.from(svg.querySelectorAll('text')).map((t) => ({ t: t.textContent, r: t.getBoundingClientRect() }));
+    for (let i = 0; i < boxes.length; i += 1) {
+      for (let j = i + 1; j < boxes.length; j += 1) {
+        const a = boxes[i].r, b = boxes[j].r;
+        if (a.left < b.right - 0.5 && b.left < a.right - 0.5 && a.top < b.bottom - 0.5 && b.top < a.bottom - 0.5) {
+          overlaps += 1;
+          details.push(`${boxes[i].t} ↔ ${boxes[j].t}`);
+        }
+      }
+    }
+  });
+  let maxRight = 0;
+  app.querySelectorAll('*').forEach((node) => {
+    const r = node.getBoundingClientRect();
+    if (r.width > 0 && !scrollsX(node)) maxRight = Math.max(maxRight, r.right);
+  });
+  const result = { viewport: vw, doc_width: Math.round(Math.max(maxRight, doc.clientWidth > vw ? 0 : doc.scrollWidth)),
+    page_overflow_px: Math.max(0, Math.round(maxRight - vw)),
+    offenders: offenders.slice(0, 20), offenders_total: offenders.length,
+    charts: app.querySelectorAll('svg').length, text_overlaps: overlaps, overlap_pairs: details.slice(0, 20) };
+  let out = document.getElementById('selfcheck');
+  if (!out) { out = document.createElement('pre'); out.id = 'selfcheck'; out.hidden = true; document.body.appendChild(out); }
+  out.textContent = JSON.stringify(result);
+  const focus = /[?&]focus=(\d)\b/.exec(window.location.search);   // 截圖看圖用：把第 n 張圖捲到頂端
+  const wraps = app.querySelectorAll('.chart-wrap');
+  if (focus && wraps[Number(focus[1])]) wraps[Number(focus[1])].scrollIntoView({ block: 'start' });
 }
 
 window.addEventListener('hashchange', route);

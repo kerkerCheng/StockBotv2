@@ -250,6 +250,21 @@ def test_a_single_segment_point_is_context_and_edgar_quarters_become_the_series(
     assert len(rows[0]["value"]) == 8 and rows[1]["key"] == "in_numbers_structure"
 
 
+def test_the_revenue_series_carries_its_own_report_currency_and_never_picks_one_of_a_mix() -> None:
+    """個股頁 S5b（2026-10-08）：營收柱狀的「最新一期 4,758.9 萬」沒有幣別——幣別要由序列自己帶（資料列上實際寫的），
+    畫面照抄；混了多種幣別就照實列出、不挑一個（L12）。"""
+    edgar = tq.in_numbers(_domestic(), today=TODAY)[0]
+    assert edgar["detail"]["currency"] == "USD"
+    mixed = _domestic(revenue_quarters=_quarters(date(2022, 3, 31), 18)[:-1]
+                      + _quarters(date(2026, 6, 30), 1, currency="EUR"))   # 最新一季要在 200 天內，否則整行缺席
+    row = tq.in_numbers(mixed, today=TODAY)[0]
+    assert row["detail"]["currency"] is None and row["detail"]["currencies"] == ["EUR", "USD"]
+    months = [{"data_month": f"2026-0{m}", "revenue": 100 + m, "revenue_year_ago": 100, "unit_scale": 1000,
+               "available_on": f"2026-0{m + 1}-10"} for m in range(1, 9)]
+    monthly = tq.in_numbers({"revenue_kind": "monthly", "monthly_revenue": months}, today=TODAY)[0]
+    assert monthly["detail"]["currency"] == "TWD"
+
+
 def test_two_segment_points_take_priority_and_nothing_is_upstream_unavailable() -> None:
     segs = [{"as_of": "2025-06-30", "value": {"a": 0.4}, "field": "segment_revenue_share"},
             {"as_of": "2025-12-31", "value": {"a": 0.5}, "field": "segment_revenue_share"}]

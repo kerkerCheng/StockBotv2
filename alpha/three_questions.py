@@ -399,15 +399,17 @@ def in_numbers(inp: Mapping[str, Any], *, today: date) -> list[dict[str, Any]]:
                    "available_on": m.get("available_on")} for m in last]
         out.append(line(key, label, value=series, source="monthly_revenue_observations（MOPS）",
                         as_of=last[-1].get("available_on"), basis="台股月營收 YoY（可用日＝法定期限，非實際公告日）",
-                        rule=_RULE_NUMBERS))
+                        rule=_RULE_NUMBERS, detail={"currency": "TWD"}))
     elif inp.get("revenue_kind") != "monthly" and len(_as_of_map(inp.get("revenue_quarters") or (), today)) >= 2:
         series = _yoy_quarters(inp["revenue_quarters"], today, n=8)
         out.append(line(key, label, value=series, source="fundamental_history（SEC companyfacts 季營收）",
-                        as_of=series[-1]["filed"], basis="EDGAR 季營收（YoY 對同一季）", rule=_RULE_NUMBERS))
+                        as_of=series[-1]["filed"], basis="EDGAR 季營收（YoY 對同一季）", rule=_RULE_NUMBERS,
+                        detail=_series_currency(inp["revenue_quarters"])))
     elif len(_as_of_map(inp.get("revenue_annual") or (), today)) >= 2:
         series = _yoy_quarters(inp["revenue_annual"], today, n=4)
         out.append(line(key, label, value=series, source="fundamental_history（SEC companyfacts 年度營收）",
-                        as_of=series[-1]["filed"], basis="20-F 年度營收（YoY）", rule=_RULE_NUMBERS))
+                        as_of=series[-1]["filed"], basis="20-F 年度營收（YoY）", rule=_RULE_NUMBERS,
+                        detail=_series_currency(inp["revenue_annual"])))
     else:
         points = (len(months) or len(_as_of_map(inp.get("revenue_quarters") or (), today))
                   or len(_as_of_map(inp.get("revenue_annual") or (), today)))
@@ -424,6 +426,12 @@ def in_numbers(inp: Mapping[str, Any], *, today: date) -> list[dict[str, Any]]:
 #: 的量級）、月營收 75（法定期限次月 10 日＋一個月緩衝）。超過就不是「現在的數字」——缺席並印 days_since_last。
 _SERIES_MAX_AGE = {"EDGAR 季營收（YoY 對同一季）": 200, "20-F 年度營收（YoY）": 550}
 _MONTHLY_MAX_AGE = 75
+
+
+def _series_currency(rows: Any) -> dict[str, Any]:
+    """序列的報表幣別（個股頁 S5b 的營收柱狀照抄，2026-10-08）：資料列上實際寫的幣別；混了多種就照實列出、不挑一個（L12）。"""
+    found = sorted({str(r.get("currency")) for r in rows or () if r.get("currency")})
+    return {"currency": found[0]} if len(found) == 1 else {"currency": None, "currencies": found}
 
 
 def _stale_series_check(row: dict[str, Any], *, today: date) -> dict[str, Any]:

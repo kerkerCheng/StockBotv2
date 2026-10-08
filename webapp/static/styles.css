@@ -487,3 +487,18 @@ table.pt-table th, table.pt-table td { vertical-align: top; overflow-wrap: anywh
 .cite-inline code { font-size: 11px; }
 .layer-section .plain-text h3 { margin-top: 4px; }
 .layer-section details { margin-top: 10px; }
+
+/* 個股頁 S5b 的圖（2026-10-08）：寬度跟著容器走、高度照比例；字的顏色與大小只在這裡定（CSP 不准行內 style）。 */
+.chart-wrap { margin: 8px 0 4px; max-width: 520px; }
+.chart { display: block; width: 100%; height: auto; overflow: visible; }
+.chart-legend { color: var(--muted); font-size: 12px; line-height: 1.5; margin-top: 2px; overflow-wrap: anywhere; }
+.chart-label { fill: var(--muted); font-size: 11px; }
+.chart-label-strong { fill: var(--text); font-weight: 600; }
+.chart-axis { stroke: var(--border); stroke-width: 1; }
+.ruler-range { stroke: var(--border); stroke-width: 7; stroke-linecap: round; }
+.ruler-median { stroke: var(--muted); stroke-width: 2; }
+.ruler-today { fill: var(--accent); }
+.ruler-cohort { fill: var(--settled); }
+.bar { fill: var(--dim); }
+.bar-pos { fill: var(--accent); }
+.bar-neg { fill: var(--neg); }
