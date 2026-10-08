@@ -58,7 +58,9 @@ def test_the_first_screen_places_every_v2_slot_and_part_exactly_once() -> None:
     # 原五題的對照照搬到塊（brainstorm §5 回饋 #11 的首屏形式）：①押什麼→論點 B1；②夠大嗎→B7（demand 進深入的 B2、priced_in 進短文的 B6）；
     # ③錯了怎麼知道→B8（when 進接下來看什麼 B11）；④會不會死→B9；⑤是不是新賭注→B10
     assert by_block["B1"].slots == ("our_bet", "bottleneck", "position")
-    assert by_block["B7"].slots == ("what_must_be_true",) and by_block["B7"].parts == ("in_numbers",)
+    # 2026-10-08 使用者：「對我來說都是營收，一起看最好」——「出現在數字裡了嗎」從 B7 搬到 B3 營收從哪來
+    assert by_block["B7"].slots == ("what_must_be_true",) and by_block["B7"].parts == ()
+    assert by_block["B3"].parts == ("in_numbers",) and by_block["B3"].pending
     assert by_block["B2"].slots == ("demand",) and by_block["B6"].slots == ("priced_in",)
     assert by_block["B6"].parts == ("priced_in",)
     assert by_block["B8"].parts == ("disproof", "confirm") and by_block["B11"].slots == ("when",)

@@ -246,7 +246,7 @@ def dilution_flag(shares_series: Sequence[tuple[date, float]] | None,
                          "（涵蓋到哪裡在數字與出處）",
                          rule=_DILUTION_RULE, inputs=inputs, absence_kind="upstream_unavailable")
         inputs["issued_without_offering"] = True
-        return _flag(None, "只有發行金額、沒有募資文件——員工認股與增資授權不算募資（有哪些申報在數字與出處）",
+        return _flag(None, "只有發行金額、沒有募資文件——員工計畫登記（股票獎酬、員工認股）與增資授權不算募資（有哪些申報在數字與出處）",
                      rule=_DILUTION_RULE, inputs=inputs, absence_kind="insufficient_evidence")
     if unattributed or inconsistent:
         why = "；".join(x for x in ("年報有新股發行、季報加起來不到——歸不到季" if unattributed else "",
@@ -260,7 +260,7 @@ def dilution_flag(shares_series: Sequence[tuple[date, float]] | None,
                      rule=_DILUTION_RULE, inputs=inputs, absence_kind="insufficient_evidence")
     if isinstance(change, (int, float)) and change > 0:
         inputs["outstanding_note"] = f"股數 {change:+.1%}（無新股發行紀錄）"
-        return _flag(None, "股數增加了，但沒有發新股的紀錄——分不出是員工認股還是沒標出來的增資",
+        return _flag(None, "股數增加了，但沒有發新股的紀錄——分不出是發給員工的股票酬勞還是沒標出來的增資",
                      rule=_DILUTION_RULE, inputs=inputs, absence_kind="insufficient_evidence")
     return _flag("green", "過去一年沒有發新股，股數也沒有增加", rule=_DILUTION_RULE,
                  inputs=inputs)
