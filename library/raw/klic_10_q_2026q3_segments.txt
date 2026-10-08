@@ -1,0 +1,18 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/56978/000005697826000032/klic-20260704.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Kulicke and Soffa Industries, Inc. Form 10-Q（quarter ended 2026-07-04）分部定義、分部營收與客戶集中節錄
+
+Source: https://www.sec.gov/Archives/edgar/data/56978/000005697826000032/klic-20260704.htm
+
+【Note — Segment information（Ball Bonding 定義）】
+Ball Bonding Equipment: Reflects the results of the Company from the design, development, manufacture and sale of ball bonding equipment and wafer level bonding equipment.
+
+【Item 2 MD&A — Net revenue by segment（千美元；本季／占比／去年同季／占比／變動）】
+Ball Bonding Equipment $ 226,068 68.4 % $ 75,990 51.2 % $ 150,078 197.5 % Wedge Bonding Equipment 25,777 7.8 % 22,126 14.9 % 3,651 16.5 % Advanced Solutions 29,415 8.9 % 10,811 7.3 % 18,604 172.1 % APS 35,772 10.8 % 31,392 21.2 % 4,380 14.0 % All Others 13,377 4.1 % 8,094 5.4 % 5,283 65.3 %
+
+【Item 2 MD&A — Ball Bonding Equipment 成長歸因】
+This increase was primarily due to an increase in sales volume of approximately $126.6 million in general semiconductor, $19.4 million in memory and $4.1 million in automotive and industrial end markets driven by customer technology transitions and improved demand conditions.
+
+【Note — Customer concentration（九個月營收占比；本期／去年同期）】
+Tianshui Huatian Technology Co., Ltd 13.8 % 10.1 % Haoseng Industrial Co., Ltd 14.8 % * Changjin Technology (Shanghai) Co., Ltd 10.4 %

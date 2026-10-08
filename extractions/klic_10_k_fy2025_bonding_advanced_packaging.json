@@ -1,0 +1,153 @@
+{
+  "claims": [
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：K&S 後續 10-K／10-Q 寫明打線機不再是營收主體（例如出售或縮減打線事業）。核查頻率：每季（10-Q）。觸發後 48 小時：e1 加註或提撤回、重讀打線設備層（tech:wire_bonding）。",
+      "id": "klic_10_k_fy2025_bonding_advanced_packaging_cl1",
+      "source_ids": [
+        "klic_10_k_fy2025_bonding_advanced_packaging_s1",
+        "klic_10_k_fy2025_bonding_advanced_packaging_s2",
+        "klic_10_k_fy2025_bonding_advanced_packaging_s5"
+      ],
+      "statement": "K&S's own FY2025 10-K: it is a semiconductor assembly equipment maker and a majority of its revenue comes from wire bonding; its ball and wedge bonders are manufactured in Singapore. Supplier self-report; no share, customer or end use is given in these passages.",
+      "subject_id": "e1"
+    },
+    {
+      "confidence": 0.45,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "條件：K&S 後續文件寫明停止或出售熱壓接合／先進封裝設備產品線，或客戶端一手文件顯示主要先進封裝產線的熱壓接合採用其他供應商、未採用 K&S。核查頻率：每半年（10-K、10-Q）。觸發後 48 小時：e2 降 confidence 或提撤回、重讀先進封裝層的供給側。",
+      "id": "klic_10_k_fy2025_bonding_advanced_packaging_cl2",
+      "source_ids": [
+        "klic_10_k_fy2025_bonding_advanced_packaging_s3",
+        "klic_10_k_fy2025_bonding_advanced_packaging_s4",
+        "klic_10_k_fy2025_bonding_advanced_packaging_s5"
+      ],
+      "statement": "K&S's FY2025 10-K says that with APAMA, APAMA Plus and APTURA it is developing and manufacturing advanced packaging solutions for 2.5D and 3D IC markets, and that its fluxless direct-copper thermo-compression bonder positions it for chiplet-based advanced packages; these tools are built in Singapore. Supplier self-report: no advanced-packaging customer, qualification or volume is named, and the segment that sells these tools (Advanced Solutions) is loss-making in the 2026 10-Q.",
+      "subject_id": "e2"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "tech:wire_bonding",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "klic_10_k_fy2025_bonding_advanced_packaging_s1",
+        "klic_10_k_fy2025_bonding_advanced_packaging_s2",
+        "klic_10_k_fy2025_bonding_advanced_packaging_s5"
+      ],
+      "src_id": "co:kulicke_and_soffa"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.55,
+      "dst_id": "tech:advanced_packaging",
+      "id": "e2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "klic_10_k_fy2025_bonding_advanced_packaging_s1",
+        "klic_10_k_fy2025_bonding_advanced_packaging_s3",
+        "klic_10_k_fy2025_bonding_advanced_packaging_s4",
+        "klic_10_k_fy2025_bonding_advanced_packaging_s5"
+      ],
+      "src_id": "co:kulicke_and_soffa"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "equipment_epitaxy",
+      "aliases": [
+        "Kulicke and Soffa Industries, Inc."
+      ],
+      "attributes": {
+        "ticker": "KLIC"
+      },
+      "confidence": 0.9,
+      "id": "co:kulicke_and_soffa",
+      "name": "Kulicke & Soffa",
+      "role": null,
+      "source_ids": [
+        "klic_10_k_fy2025_bonding_advanced_packaging_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "equipment_epitaxy",
+      "aliases": [
+        "wire bonding",
+        "ball bonder",
+        "wedge bonder"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:wire_bonding",
+      "name": "Wire bonding equipment (ball and wedge bonders)",
+      "role": null,
+      "source_ids": [
+        "klic_10_k_fy2025_bonding_advanced_packaging_s2",
+        "klic_10_k_fy2025_bonding_advanced_packaging_s5"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "foundry_packaging",
+      "aliases": [
+        "advanced packaging"
+      ],
+      "attributes": {},
+      "confidence": 0.8,
+      "id": "tech:advanced_packaging",
+      "name": "Advanced packaging chip integration",
+      "role": null,
+      "source_ids": [
+        "klic_10_k_fy2025_bonding_advanced_packaging_s3",
+        "klic_10_k_fy2025_bonding_advanced_packaging_s4"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "klic_10_k_fy2025_bonding_advanced_packaging",
+    "evidence_tier": 1,
+    "origin_entity": "Kulicke and Soffa Industries, Inc.",
+    "permission_basis": "SEC EDGAR 公開申報（美國法定公開文件）；只保留研究必要的有限逐字節錄（HTML 轉文字，空白攤平）。",
+    "published_at": "2025-11-20",
+    "publisher": "Kulicke and Soffa Industries, Inc.（SEC EDGAR 10-K，accession 0000056978-25-000081）",
+    "retrieved_at": "2026-10-08",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Kulicke and Soffa Industries, Inc. Form 10-K（fiscal year ended 2025-10-04）Item 1 Business 與 Item 1A 節錄：打線與先進封裝設備",
+    "url": "https://www.sec.gov/Archives/edgar/data/56978/000005697825000081/klic-20251004.htm"
+  },
+  "sources": [
+    {
+      "id": "klic_10_k_fy2025_bonding_advanced_packaging_s1",
+      "locator": "Item 1 Business（總述）",
+      "quote": "Kulicke and Soffa Industries, Inc. (“K&S,” “we,” “us,” “our,” or the “Company”) is a global leader in semiconductor assembly technology, advancing device performance across automotive, compute, industrial, memory and communications markets."
+    },
+    {
+      "id": "klic_10_k_fy2025_bonding_advanced_packaging_s2",
+      "locator": "Item 1A Risk Factors（營收結構）",
+      "quote": "Given that a majority of our revenue comes from wire bonding, a reduced demand for our wire bonding equipment could materially and adversely affect our financial results."
+    },
+    {
+      "id": "klic_10_k_fy2025_bonding_advanced_packaging_s3",
+      "locator": "Item 1 Business — Advanced Packaging",
+      "quote": "With the launch of our APAMATM, APAMA PlusTM and APTURATM, we are also developing and manufacturing advanced packaging solutions for the emerging 2.5-dimensional integrated circuit (“2.5D IC”) and 3-dimensional integrated circuit (“3D IC”) markets."
+    },
+    {
+      "id": "klic_10_k_fy2025_bonding_advanced_packaging_s4",
+      "locator": "Item 1 Business — Advanced Packaging（APTURA）",
+      "quote": "The APTURATM is a highly capable thermo-compression bonding system which supports an ultra-fine-pitch fluxless direct-copper thermo-compression bonding process. With this system, we are well positioned to enable growth of chiplet-based advanced packages."
+    },
+    {
+      "id": "klic_10_k_fy2025_bonding_advanced_packaging_s5",
+      "locator": "Item 1 Business — Manufacturing",
+      "quote": "Our ball bonder, wedge bonder, AT Premier series, APAMATM, APAMA PlusTM, APTURATM and KatalystTM bonder manufacturing and assembly is done at our facility in Singapore."
+    }
+  ]
+}

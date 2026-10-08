@@ -1,0 +1,21 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/56978/000005697825000081/klic-20251004.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Kulicke and Soffa Industries, Inc. Form 10-K（fiscal year ended 2025-10-04）Item 1 Business 與 Item 1A 節錄：打線與先進封裝設備
+
+Source: https://www.sec.gov/Archives/edgar/data/56978/000005697825000081/klic-20251004.htm
+
+【Item 1 Business（總述）】
+Kulicke and Soffa Industries, Inc. (“K&S,” “we,” “us,” “our,” or the “Company”) is a global leader in semiconductor assembly technology, advancing device performance across automotive, compute, industrial, memory and communications markets.
+
+【Item 1A Risk Factors（營收結構）】
+Given that a majority of our revenue comes from wire bonding, a reduced demand for our wire bonding equipment could materially and adversely affect our financial results.
+
+【Item 1 Business — Advanced Packaging】
+With the launch of our APAMATM, APAMA PlusTM and APTURATM, we are also developing and manufacturing advanced packaging solutions for the emerging 2.5-dimensional integrated circuit (“2.5D IC”) and 3-dimensional integrated circuit (“3D IC”) markets.
+
+【Item 1 Business — Advanced Packaging（APTURA）】
+The APTURATM is a highly capable thermo-compression bonding system which supports an ultra-fine-pitch fluxless direct-copper thermo-compression bonding process. With this system, we are well positioned to enable growth of chiplet-based advanced packages.
+
+【Item 1 Business — Manufacturing】
+Our ball bonder, wedge bonder, AT Premier series, APAMATM, APAMA PlusTM, APTURATM and KatalystTM bonder manufacturing and assembly is done at our facility in Singapore.

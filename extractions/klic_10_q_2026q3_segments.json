@@ -1,0 +1,103 @@
+{
+  "claims": [
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：K&S 後續季報的打線機營收連兩季年減，或它把這一波需求寫成一次性的中國擴產或國產替代並說明不會延續。核查頻率：每季（10-Q）。觸發後 48 小時：e1 加註、重讀打線設備層（tech:wire_bonding），K&S 敘事重寫（缺 X 轉不要）。",
+      "id": "klic_10_q_2026q3_segments_cl1",
+      "source_ids": [
+        "klic_10_q_2026q3_segments_s1",
+        "klic_10_q_2026q3_segments_s2",
+        "klic_10_q_2026q3_segments_s3",
+        "klic_10_q_2026q3_segments_s4"
+      ],
+      "statement": "K&S's 10-Q for the quarter ended 2026-07-04: ball bonding equipment revenue was $226.1 million (68.4% of revenue, up 197.5% year on year), which it attributes to higher sales volume in general semiconductor (about $126.6 million), memory (about $19.4 million) and automotive and industrial (about $4.1 million) end markets, driven by customer technology transitions and improved demand conditions; three Chinese assembly houses each exceeded 10% of nine-month revenue. Supplier self-report; it does not attribute the demand to AI or name what its customers build with the bonders.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "tech:wire_bonding",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "klic_10_q_2026q3_segments_s1",
+        "klic_10_q_2026q3_segments_s2",
+        "klic_10_q_2026q3_segments_s3"
+      ],
+      "src_id": "co:kulicke_and_soffa"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "equipment_epitaxy",
+      "aliases": [
+        "Kulicke and Soffa Industries, Inc."
+      ],
+      "attributes": {
+        "ticker": "KLIC"
+      },
+      "confidence": 0.9,
+      "id": "co:kulicke_and_soffa",
+      "name": "Kulicke & Soffa",
+      "role": null,
+      "source_ids": [
+        "klic_10_q_2026q3_segments_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "equipment_epitaxy",
+      "aliases": [
+        "ball bonding equipment"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:wire_bonding",
+      "name": "Wire bonding equipment (ball and wedge bonders)",
+      "role": null,
+      "source_ids": [
+        "klic_10_q_2026q3_segments_s1"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "klic_10_q_2026q3_segments",
+    "evidence_tier": 1,
+    "origin_entity": "Kulicke and Soffa Industries, Inc.",
+    "permission_basis": "SEC EDGAR 公開申報（美國法定公開文件）；只保留研究必要的有限逐字節錄（HTML 轉文字，空白攤平）。",
+    "published_at": "2026-08-06",
+    "publisher": "Kulicke and Soffa Industries, Inc.（SEC EDGAR 10-Q，accession 0000056978-26-000032）",
+    "retrieved_at": "2026-10-08",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Kulicke and Soffa Industries, Inc. Form 10-Q（quarter ended 2026-07-04）分部定義、分部營收與客戶集中節錄",
+    "url": "https://www.sec.gov/Archives/edgar/data/56978/000005697826000032/klic-20260704.htm"
+  },
+  "sources": [
+    {
+      "id": "klic_10_q_2026q3_segments_s1",
+      "locator": "Note — Segment information（Ball Bonding 定義）",
+      "quote": "Ball Bonding Equipment: Reflects the results of the Company from the design, development, manufacture and sale of ball bonding equipment and wafer level bonding equipment."
+    },
+    {
+      "id": "klic_10_q_2026q3_segments_s2",
+      "locator": "Item 2 MD&A — Net revenue by segment（千美元；本季／占比／去年同季／占比／變動）",
+      "quote": "Ball Bonding Equipment $ 226,068 68.4 % $ 75,990 51.2 % $ 150,078 197.5 % Wedge Bonding Equipment 25,777 7.8 % 22,126 14.9 % 3,651 16.5 % Advanced Solutions 29,415 8.9 % 10,811 7.3 % 18,604 172.1 % APS 35,772 10.8 % 31,392 21.2 % 4,380 14.0 % All Others 13,377 4.1 % 8,094 5.4 % 5,283 65.3 %"
+    },
+    {
+      "id": "klic_10_q_2026q3_segments_s3",
+      "locator": "Item 2 MD&A — Ball Bonding Equipment 成長歸因",
+      "quote": "This increase was primarily due to an increase in sales volume of approximately $126.6 million in general semiconductor, $19.4 million in memory and $4.1 million in automotive and industrial end markets driven by customer technology transitions and improved demand conditions."
+    },
+    {
+      "id": "klic_10_q_2026q3_segments_s4",
+      "locator": "Note — Customer concentration（九個月營收占比；本期／去年同期）",
+      "quote": "Tianshui Huatian Technology Co., Ltd 13.8 % 10.1 % Haoseng Industrial Co., Ltd 14.8 % * Changjin Technology (Shanghai) Co., Ltd 10.4 %"
+    }
+  ]
+}
