@@ -1,0 +1,24 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1816581/000162828026013313/oust-20251231.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Ouster, Inc. Form 10-K（fiscal year 2025）Item 1 Business 與 Item 7 MD&A 節錄：數位光達感測器、客戶與競爭者
+
+Source: https://www.sec.gov/Archives/edgar/data/1816581/000162828026013313/oust-20251231.htm
+
+【Item 1 Business（總述）】
+As a pioneer in Physical AI, Ouster offers a unified sensing and perception platform that combines high-performance digital lidar, cameras, AI compute, sensor fusion and perception software, and cutting-edge AI models to our customers.
+
+【Item 1 Business（製造）】
+Our main manufacturing partners are Benchmark Electronics, Inc. (“Benchmark”) and Fabrinet. Benchmark and Fabrinet manufacture the majority of our products, which we expect will reduce our product costs and allow us to rapidly scale production to meet our anticipated product demand.
+
+【Item 1 Business — Our Customers】
+We target four markets globally: automotive, industrial, robotics, and smart infrastructure. For the year ended December 31, 2025, two customers accounted for more than 10% of our revenue.
+
+【Item 7 MD&A — Revenue by geographic location（千美元；2025／2024／變動）】
+Americas $ 92,103 $ 58,430 $ 33,673 58 % Asia and Pacific 54,187 20,158 34,029 169 Europe, Middle East and Africa 23,094 32,513 (9,419) (29) Total $ 169,384 $ 111,101 $ 58,283 52 %
+
+【Item 1 Business — Competition】
+Our competitors may include and are not limited to: AEye, Aeva Inc., Cepton, Hesai Technology, Innoviz Technologies, Koito Manufacturing Co. Ltd., Luminar Technologies, MicroVision, Pepperl+Fuchs, Quanergy, RoboSense, Seyond, and SICK.
+
+【Item 1 Business — Growth Strategy】
+Ouster is positioned to secure a greater share of the sensing and perception market, including new high-growth use cases such as humanoid robotics, industrial automation, and visual inspection.

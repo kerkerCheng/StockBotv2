@@ -1,0 +1,118 @@
+{
+  "claims": [
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：Ouster 後續 10-K／10-Q 寫明停止銷售數位光達感測器、或光達不再是主要營收來源（例如營收主體轉成軟體或相機），或公司被併購下市。核查頻率：每季（10-Q）。觸發後 48 小時：e1 加註或提撤回、重讀光達層（tech:lidar）的供給側。",
+      "id": "oust_10_k_fy2025_digital_lidar_cl1",
+      "source_ids": [
+        "oust_10_k_fy2025_digital_lidar_s1",
+        "oust_10_k_fy2025_digital_lidar_s2",
+        "oust_10_k_fy2025_digital_lidar_s3",
+        "oust_10_k_fy2025_digital_lidar_s4",
+        "oust_10_k_fy2025_digital_lidar_s5",
+        "oust_10_k_fy2025_digital_lidar_s6"
+      ],
+      "statement": "Ouster's own FY2025 10-K: it sells digital lidar sensors (with cameras, AI compute and perception software) to automotive, industrial, robotics and smart infrastructure customers; contract manufacturers Benchmark and Fabrinet build the majority of its products; 2025 revenue was $169.4 million (up 52%), with two unnamed customers each above 10% of revenue. It lists 13 lidar competitors including Hesai and RoboSense, and names humanoid robotics as a new use case. Supplier self-report; no customer is named and no market share is claimed.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:lidar",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "oust_10_k_fy2025_digital_lidar_s1",
+        "oust_10_k_fy2025_digital_lidar_s2",
+        "oust_10_k_fy2025_digital_lidar_s3",
+        "oust_10_k_fy2025_digital_lidar_s4"
+      ],
+      "src_id": "co:ouster"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "Ouster, Inc."
+      ],
+      "attributes": {
+        "ticker": "OUST"
+      },
+      "confidence": 0.9,
+      "id": "co:ouster",
+      "name": "Ouster",
+      "role": null,
+      "source_ids": [
+        "oust_10_k_fy2025_digital_lidar_s1",
+        "oust_10_k_fy2025_digital_lidar_s6"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "end_demand",
+      "aliases": [
+        "digital lidar"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:lidar",
+      "name": "LIDAR sensing system",
+      "role": null,
+      "source_ids": [
+        "oust_10_k_fy2025_digital_lidar_s1",
+        "oust_10_k_fy2025_digital_lidar_s5"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "oust_10_k_fy2025_digital_lidar",
+    "evidence_tier": 1,
+    "origin_entity": "Ouster, Inc.",
+    "permission_basis": "SEC EDGAR 公開申報（美國法定公開文件）；只保留研究必要的有限逐字節錄（HTML 轉文字，空白攤平）。",
+    "published_at": "2026-03-02",
+    "publisher": "Ouster, Inc.（SEC EDGAR 10-K，accession 0001628280-26-013313）",
+    "retrieved_at": "2026-10-08",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Ouster, Inc. Form 10-K（fiscal year 2025）Item 1 Business 與 Item 7 MD&A 節錄：數位光達感測器、客戶與競爭者",
+    "url": "https://www.sec.gov/Archives/edgar/data/1816581/000162828026013313/oust-20251231.htm"
+  },
+  "sources": [
+    {
+      "id": "oust_10_k_fy2025_digital_lidar_s1",
+      "locator": "Item 1 Business（總述）",
+      "quote": "As a pioneer in Physical AI, Ouster offers a unified sensing and perception platform that combines high-performance digital lidar, cameras, AI compute, sensor fusion and perception software, and cutting-edge AI models to our customers."
+    },
+    {
+      "id": "oust_10_k_fy2025_digital_lidar_s2",
+      "locator": "Item 1 Business（製造）",
+      "quote": "Our main manufacturing partners are Benchmark Electronics, Inc. (“Benchmark”) and Fabrinet. Benchmark and Fabrinet manufacture the majority of our products, which we expect will reduce our product costs and allow us to rapidly scale production to meet our anticipated product demand."
+    },
+    {
+      "id": "oust_10_k_fy2025_digital_lidar_s3",
+      "locator": "Item 1 Business — Our Customers",
+      "quote": "We target four markets globally: automotive, industrial, robotics, and smart infrastructure. For the year ended December 31, 2025, two customers accounted for more than 10% of our revenue."
+    },
+    {
+      "id": "oust_10_k_fy2025_digital_lidar_s4",
+      "locator": "Item 7 MD&A — Revenue by geographic location（千美元；2025／2024／變動）",
+      "quote": "Americas $ 92,103 $ 58,430 $ 33,673 58 % Asia and Pacific 54,187 20,158 34,029 169 Europe, Middle East and Africa 23,094 32,513 (9,419) (29) Total $ 169,384 $ 111,101 $ 58,283 52 %"
+    },
+    {
+      "id": "oust_10_k_fy2025_digital_lidar_s5",
+      "locator": "Item 1 Business — Competition",
+      "quote": "Our competitors may include and are not limited to: AEye, Aeva Inc., Cepton, Hesai Technology, Innoviz Technologies, Koito Manufacturing Co. Ltd., Luminar Technologies, MicroVision, Pepperl+Fuchs, Quanergy, RoboSense, Seyond, and SICK."
+    },
+    {
+      "id": "oust_10_k_fy2025_digital_lidar_s6",
+      "locator": "Item 1 Business — Growth Strategy",
+      "quote": "Ouster is positioned to secure a greater share of the sensing and perception market, including new high-growth use cases such as humanoid robotics, industrial automation, and visual inspection."
+    }
+  ]
+}
