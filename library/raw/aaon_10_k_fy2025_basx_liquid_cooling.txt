@@ -1,0 +1,27 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/824142/000082414226000005/aaon-20251231.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] AAON, Inc. Form 10-K（fiscal year 2025）Item 1 Business 與 Item 7 MD&A 節錄：BASX 資料中心液冷與 CDU
+
+Source: https://www.sec.gov/Archives/edgar/data/824142/000082414226000005/aaon-20251231.htm
+
+【Item 1 Business（總述）】
+AAON is a leader in heating, ventilation, air conditioning, and liquid cooling solutions for commercial and industrial indoor environments.
+
+【Item 1 Business — Business Segments（BASX）】
+BASX: BASX engineers, manufactures, and sells a wide range of custom, high-performance cooling solutions for the rapidly growing hyperscale data center market; ventilation solutions for cleanroom environments in the biopharmaceutical, semiconductor, medical, and agricultural sectors; and highly customized air handlers and modular solutions for a variety of markets.
+
+【Item 1 Business — Products - BASX Brand（CDU）】
+In 2025, BASX expanded its liquid cooling portfolio with the introduction of its proprietary Coolant Distribution Unit (“CDU”). The BASX CDU serves as the critical interface between facility water systems and technology cooling loops, providing precise flow, temperature, and pressure control to server cold plates.
+
+【Item 1 Business — Products - BASX Brand（CDU 規格）】
+The CDU platform supports rack densities exceeding 100 kilowatts and incorporates N+1 redundant, hot-swappable pumps and power supplies, multi-zone active leak detection, and automated isolation capabilities. These features are designed to enhance system reliability, protect IT assets, and enable continuous operation in high-density AI and HPC deployments.
+
+【Item 7 MD&A — Backlog】
+Backlog was up from a year ago for both AAON-branded products and BASX-branded products with BASX-branded products increasing 141.3%, or $762.4 million, when compared to December 31, 2024. Most of these orders were associated with the BASX-branded data center liquid cooling solutions.
+
+【Item 1 Business — Key Customers（客戶集中）】
+For the years ended December 31, 2025, 2024, and 2023, the Company had three, two and three customers, respectively, that were 10 percent or greater concentrations of revenue. We have earned the trust and business of these significant customers over many years of performing to their needs, which they have supported with long-standing multi-year programs.
+
+【Item 1 Business — Key Customers（市場例子，不是客戶名單）】
+Examples of companies in this space include Microsoft, Amazon Web Services, Google Cloud, QTS and Applied Digital.

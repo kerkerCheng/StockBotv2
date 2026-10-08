@@ -1,0 +1,123 @@
+{
+  "claims": [
+    {
+      "confidence": 0.5,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "條件：AAON 後續 10-K／10-Q 或說明會寫明 BASX 的 CDU 停售、退出或未進入量產，或客戶端一手文件顯示資料中心液冷訂單不含 BASX 的 CDU。核查頻率：每季（10-Q）。觸發後 48 小時：e1 降 confidence 或提撤回、重讀 CDU 層（tech:coolant_distribution_unit）。",
+      "id": "aaon_10_k_fy2025_basx_liquid_cooling_cl1",
+      "source_ids": [
+        "aaon_10_k_fy2025_basx_liquid_cooling_s1",
+        "aaon_10_k_fy2025_basx_liquid_cooling_s2",
+        "aaon_10_k_fy2025_basx_liquid_cooling_s3",
+        "aaon_10_k_fy2025_basx_liquid_cooling_s4",
+        "aaon_10_k_fy2025_basx_liquid_cooling_s5",
+        "aaon_10_k_fy2025_basx_liquid_cooling_s6",
+        "aaon_10_k_fy2025_basx_liquid_cooling_s7"
+      ],
+      "statement": "AAON's own FY2025 10-K: its BASX segment sells cooling solutions to the hyperscale data center market and in 2025 introduced a proprietary Coolant Distribution Unit (CDU) as part of its liquid cooling portfolio — the interface between facility water and the technology cooling loop, controlling flow to server cold plates, supporting racks above 100 kW. BASX-branded backlog rose 141.3% in 2025 and 'most' of those orders were associated with its data center liquid cooling solutions. Supplier self-report: the 10-K gives no CDU-specific revenue, unit volume, named customer or qualification; how much of the liquid cooling backlog is CDUs versus facility heat rejection or air handling is not split. Three customers above 10% of revenue are unnamed; the five companies listed are market examples, not a customer list.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.6,
+      "dst_id": "tech:coolant_distribution_unit",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "aaon_10_k_fy2025_basx_liquid_cooling_s1",
+        "aaon_10_k_fy2025_basx_liquid_cooling_s3",
+        "aaon_10_k_fy2025_basx_liquid_cooling_s4"
+      ],
+      "src_id": "co:aaon"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "AAON, Inc.",
+        "BASX"
+      ],
+      "attributes": {
+        "ticker": "AAON"
+      },
+      "confidence": 0.9,
+      "id": "co:aaon",
+      "name": "AAON",
+      "role": null,
+      "source_ids": [
+        "aaon_10_k_fy2025_basx_liquid_cooling_s1",
+        "aaon_10_k_fy2025_basx_liquid_cooling_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "CDU"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:coolant_distribution_unit",
+      "name": "Coolant Distribution Unit (CDU)",
+      "role": null,
+      "source_ids": [
+        "aaon_10_k_fy2025_basx_liquid_cooling_s3"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "aaon_10_k_fy2025_basx_liquid_cooling",
+    "evidence_tier": 1,
+    "origin_entity": "AAON, Inc.",
+    "permission_basis": "SEC EDGAR 公開申報（美國法定公開文件）；只保留研究必要的有限逐字節錄（HTML 轉文字，空白攤平）。",
+    "published_at": "2026-03-02",
+    "publisher": "AAON, Inc.（SEC EDGAR 10-K，accession 0000824142-26-000005）",
+    "retrieved_at": "2026-10-08",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "AAON, Inc. Form 10-K（fiscal year 2025）Item 1 Business 與 Item 7 MD&A 節錄：BASX 資料中心液冷與 CDU",
+    "url": "https://www.sec.gov/Archives/edgar/data/824142/000082414226000005/aaon-20251231.htm"
+  },
+  "sources": [
+    {
+      "id": "aaon_10_k_fy2025_basx_liquid_cooling_s1",
+      "locator": "Item 1 Business（總述）",
+      "quote": "AAON is a leader in heating, ventilation, air conditioning, and liquid cooling solutions for commercial and industrial indoor environments."
+    },
+    {
+      "id": "aaon_10_k_fy2025_basx_liquid_cooling_s2",
+      "locator": "Item 1 Business — Business Segments（BASX）",
+      "quote": "BASX: BASX engineers, manufactures, and sells a wide range of custom, high-performance cooling solutions for the rapidly growing hyperscale data center market; ventilation solutions for cleanroom environments in the biopharmaceutical, semiconductor, medical, and agricultural sectors; and highly customized air handlers and modular solutions for a variety of markets."
+    },
+    {
+      "id": "aaon_10_k_fy2025_basx_liquid_cooling_s3",
+      "locator": "Item 1 Business — Products - BASX Brand（CDU）",
+      "quote": "In 2025, BASX expanded its liquid cooling portfolio with the introduction of its proprietary Coolant Distribution Unit (“CDU”). The BASX CDU serves as the critical interface between facility water systems and technology cooling loops, providing precise flow, temperature, and pressure control to server cold plates."
+    },
+    {
+      "id": "aaon_10_k_fy2025_basx_liquid_cooling_s4",
+      "locator": "Item 1 Business — Products - BASX Brand（CDU 規格）",
+      "quote": "The CDU platform supports rack densities exceeding 100 kilowatts and incorporates N+1 redundant, hot-swappable pumps and power supplies, multi-zone active leak detection, and automated isolation capabilities. These features are designed to enhance system reliability, protect IT assets, and enable continuous operation in high-density AI and HPC deployments."
+    },
+    {
+      "id": "aaon_10_k_fy2025_basx_liquid_cooling_s5",
+      "locator": "Item 7 MD&A — Backlog",
+      "quote": "Backlog was up from a year ago for both AAON-branded products and BASX-branded products with BASX-branded products increasing 141.3%, or $762.4 million, when compared to December 31, 2024. Most of these orders were associated with the BASX-branded data center liquid cooling solutions."
+    },
+    {
+      "id": "aaon_10_k_fy2025_basx_liquid_cooling_s6",
+      "locator": "Item 1 Business — Key Customers（客戶集中）",
+      "quote": "For the years ended December 31, 2025, 2024, and 2023, the Company had three, two and three customers, respectively, that were 10 percent or greater concentrations of revenue. We have earned the trust and business of these significant customers over many years of performing to their needs, which they have supported with long-standing multi-year programs."
+    },
+    {
+      "id": "aaon_10_k_fy2025_basx_liquid_cooling_s7",
+      "locator": "Item 1 Business — Key Customers（市場例子，不是客戶名單）",
+      "quote": "Examples of companies in this space include Microsoft, Amazon Web Services, Google Cloud, QTS and Applied Digital."
+    }
+  ]
+}
