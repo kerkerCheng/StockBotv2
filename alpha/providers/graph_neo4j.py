@@ -318,9 +318,14 @@ class Neo4jGraphResearchProvider:
     ) -> StructuralContext:
         rows = [r for r in self._bottleneck_rows(as_of)
                 if str(r.get("company_id")) == str(company_id)]
+        # 證據索引收這家公司在結構表上的**全部**列（不論 substitutability 填了沒、多高），`edges` 與 Q1 照舊只用達門檻的子集
+        # （2026-10-08，Phase 7 failure log #25）。事發：寫 ATS.VI 的研究判斷時索引只有財務快照——AT&S 的供貨邊（Kulim 擴產由
+        # 客戶全額出資）在圖上卻引用不了，因為「算不算瓶頸」與「能不能被引用」共用一個子集（L12）；判斷最重要的證據只能寫在
+        # 理由文字裡，指不回原文（L18）。as-of 照舊：`_table(as_of)` 是投影後的表。
         evidence: list[EvidenceRef] = []
-        for row in rows:
-            evidence.extend(self._row_evidence(row))
+        for row in self._table(as_of).get("rows") or []:
+            if str(row.get("company_id")) == str(company_id):
+                evidence.extend(self._row_evidence(row))
         return StructuralContext(
             company_id=company_id,
             edges=tuple({
