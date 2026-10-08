@@ -388,6 +388,9 @@ def test_xbrl_header_is_stripped_from_the_cover_page_on() -> None:
     text = "mrvl-20260801 false 2027 Q2 http://fasb.org/us-gaap/2026#X UNITED STATES SECURITIES AND EXCHANGE COMMISSION Form 10-Q"
     assert sp.strip_xbrl_header(text).startswith("UNITED STATES SECURITIES AND EXCHANGE COMMISSION")
     assert sp.strip_xbrl_header("no cover here") == "no cover here"
+    # 2026-10-08 起 EDGAR 走共用文字化：封面兩個段落各自一行（failure log #5）——字間空白不拘
+    split = "ix:header taxonomy junk\nUNITED STATES\nSECURITIES AND EXCHANGE COMMISSION\nWashington, D.C."
+    assert sp.strip_xbrl_header(split).startswith("UNITED STATES\nSECURITIES AND EXCHANGE COMMISSION")
 
 
 def test_mfn_text_only_talks_to_mfn_and_never_fetches_attachments(monkeypatch) -> None:

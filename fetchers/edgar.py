@@ -37,7 +37,7 @@ except ImportError:
     print("需要 requests 套件: pip install requests", file=sys.stderr)
     sys.exit(1)
 
-from fetchers.utils import make_doc_id, rate_sleep, write_raw
+from fetchers.utils import html_to_text, make_doc_id, rate_sleep, write_raw
 
 EDGAR_BASE = "https://data.sec.gov"
 EDGAR_SEARCH = "https://efts.sec.gov/LATEST/search-index"
@@ -53,9 +53,6 @@ FORM_TIER: dict[str, int] = {
     "DEF 14A": 2,
 }
 
-_REMOVE_TAGS = re.compile(r"<[^>]+>")
-_COLLAPSE_WS = re.compile(r"[ \t]{2,}")
-_COLLAPSE_NL = re.compile(r"\n{3,}")
 
 
 def _build_headers() -> dict[str, str]:
@@ -68,10 +65,14 @@ def _build_headers() -> dict[str, str]:
 
 
 def _strip_html(html: str) -> str:
-    text = _REMOVE_TAGS.sub(" ", html)
-    text = _COLLAPSE_WS.sub(" ", text)
-    text = _COLLAPSE_NL.sub("\n\n", text)
-    return text.strip()
+    """filing 主文件的 HTML → 純文字：走共用的 `fetchers.utils.html_to_text`（2026-10-08，Phase 7 failure log #5）。
+
+    事發：原本這裡自己用 regex 把**每個**標籤換成空格、也不還原 entity——MRVL 10-Q 的「u nder the capacity reservation
+    agreements」「$ 870.0 &#160;million」、CCXI S-4/A 的「full -scale」都是它造的；從 library/raw 複製的引文因此不是原文件
+    的字（L6／L18），兩次都要回原始 HTML 重建。共用那一份早就做對了（行內相連、區塊換行、entity 還原），這裡只多傳表格
+    儲存格的分隔（財務表一格一個數字）。
+    """
+    return html_to_text(html, cell_sep=" ").strip()
 
 
 def ticker_cik_map() -> dict[str, str]:
@@ -279,6 +280,14 @@ def fetch_ticker(
                 f"{int(f['cik'])}/{f['accession']}/{f['primary_doc']}"
             ),
         }
+        existing = out_dir / f"{doc_id}.txt"
+        if existing.exists() and existing.read_text(encoding="utf-8") != text:
+            # 既有 raw 可能是已入圖引文的出處（provenance 以它的位元組比對）——不默默覆寫（2026-10-08，failure log #5：
+            # 文字化規則改過，同一份 filing 重抓的文字會跟舊版不同）。要新版請 --out 到別的目錄再對照。
+            print(f"[edgar] ⚠ {existing} 已存在且內容不同——保留既有版本（它可能是已入圖引文的出處）；"
+                  "要新版文字請用 --out 寫到別的目錄", file=sys.stderr)
+            results.append({**meta, "kept_existing_raw": True})
+            continue
         txt_path, meta_path = write_raw(doc_id, text, meta, out_dir)
         print(f"[edgar] saved {txt_path.name} ({len(text):,} chars)")
         results.append(meta)

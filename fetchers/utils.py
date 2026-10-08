@@ -49,12 +49,16 @@ _BLOCK_TAGS = (
 )
 
 
-def html_to_text(fragment: str) -> str:
-    """HTML 片段 → 純文字（給 MFN／RNS 這類把全文放在頁面裡的來源）。
+def html_to_text(fragment: str, *, cell_sep: str = "") -> str:
+    """HTML 片段 → 純文字（MFN／RNS 這類把全文放在頁面裡的來源；2026-10-08 起 EDGAR 也用這一份）。
 
     ⚠ 刻意**不**用 `get_text("\n")`：MFN 的正文把每個字組包在獨立的 `<span>` 裡，
     以換行當分隔會把一句話拆成十行。做法是 inline 元素直接相連（原文的空白已在
     `<span> </span>` 裡）、只有區塊元素前後補換行，最後把連續空白壓成一個、空行最多留一個。
+    HTML entity（`&#160;`、`&amp;`）由 parser 還原。
+
+    `cell_sep`：表格儲存格（td／th）之後補的分隔。EDGAR 的財務表一格一個數字，直接相連會把「2025」「2024」黏成
+    「20252024」——EDGAR 傳 `" "`；預設空字串（MFN／RNS 的輸出一字不變，既有 raw 的出處不受影響）。
     """
     from bs4 import BeautifulSoup
 
@@ -63,6 +67,9 @@ def html_to_text(fragment: str) -> str:
         tag.decompose()
     for br in soup.find_all("br"):
         br.replace_with("\n")
+    if cell_sep:
+        for cell in soup.find_all(["td", "th"]):
+            cell.insert_after(cell_sep)
     for tag in soup.find_all(_BLOCK_TAGS):
         tag.insert_before("\n")
         tag.insert_after("\n")

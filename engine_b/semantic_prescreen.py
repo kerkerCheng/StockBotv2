@@ -59,15 +59,18 @@ def parse_edgar_url(url: str) -> tuple[str, str, str] | None:
 #: inline XBRL filing 轉文字後，前段是隱藏的 `ix:header`（taxonomy URL、context id）——2026-09-24 實測
 #: 三份 10-Q 的封面分別在第 8.6k／23.9k／33.9k 字才開始，而預篩只取前 `prescreen_text_max_chars` 字。
 _COVER_START = "UNITED STATES SECURITIES AND EXCHANGE COMMISSION"
+#: 同一串字、字之間容許任何空白：2026-10-08 起 EDGAR 走共用文字化（區塊元素各自一行，failure log #5），封面常是
+#: 「UNITED STATES」「SECURITIES AND EXCHANGE COMMISSION」兩個段落——不放寬就會找不到、整段表頭留在預篩的字數裡。
+_COVER_START_RE = re.compile(r"\s+".join(map(re.escape, _COVER_START.split())))
 
 
 def strip_xbrl_header(text: str | None) -> str | None:
-    """從封面（`UNITED STATES SECURITIES AND EXCHANGE COMMISSION`）起算；找不到就原樣回傳（不猜）。
+    """從封面（`UNITED STATES SECURITIES AND EXCHANGE COMMISSION`，字間空白不拘）起算；找不到就原樣回傳（不猜）。
     只切掉前面的機器表頭，不動正文——引文比對仍對存檔的這一份做。"""
     if not text:
         return text
-    start = text.find(_COVER_START)
-    return text[start:] if start > 0 else text
+    match = _COVER_START_RE.search(text)
+    return text[match.start():] if match and match.start() > 0 else text
 
 
 def fetch_mfn_text(url: str, *, session: Any = None) -> str:
