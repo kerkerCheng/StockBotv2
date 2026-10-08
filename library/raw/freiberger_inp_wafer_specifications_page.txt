@@ -1,0 +1,18 @@
+Source URL: https://freiberger.com/en/products/inp-wafer
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Freiberger Compound Materials — InP Wafer Specifications（官網產品規格頁）
+
+Source: https://freiberger.com/en/products/inp-wafer
+
+【頁面標題】
+InP substrate wafer specification - Freiberger Compound Materials
+
+【InP Wafer Specifications（直徑篩選）】
+InP Wafer Specifications Accessible view of the specifications Filter by diameter - All InP Wafers - 100 mm Diameter - 3" Diameter
+
+【規格表：100 mm、S 摻雜 n 型、EPD ≤50】
+Diameter (mm) Conduction range 100 SC (n-type) Dopand S Etch Pit Density ≤50 Growth method VGF Thickness Flat/Notch Polish Application 625 Flat Polish single double Application LASER Detector
+
+【規格表：3 吋、S 摻雜 n 型、EPD ≤500】
+Diameter (mm) Conduction range 3" SC (n-type) Dopand S Etch Pit Density ≤500 Growth method VGF Thickness Flat/Notch Polish Application 625 Flat Polish single double Application LASER Detector

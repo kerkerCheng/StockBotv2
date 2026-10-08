@@ -1,0 +1,104 @@
+{
+  "claims": [
+    {
+      "confidence": 0.55,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "條件：Freiberger 官網撤下 InP 晶圓產品、或公司公告退出 InP 基板業務。核查頻率：每半年（官網產品頁）。觸發後 48 小時：e1 提撤回、重讀 InP 基板層（mat:inp_substrate）的供給側列舉。",
+      "id": "freiberger_inp_wafer_specifications_page_cl1",
+      "source_ids": [
+        "freiberger_inp_wafer_specifications_page_s1",
+        "freiberger_inp_wafer_specifications_page_s2",
+        "freiberger_inp_wafer_specifications_page_s3",
+        "freiberger_inp_wafer_specifications_page_s4"
+      ],
+      "statement": "Freiberger Compound Materials' own InP wafer specification page lists indium phosphide substrate wafers in 100 mm and 3-inch diameters, grown by VGF, with sulfur-doped n-type grades whose stated applications are LASER and Detector. Supplier self-report from an undated product page: it shows a commercial InP substrate product line, not its volume, share, capacity plans or data-center customers.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "mat:inp_substrate",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "freiberger_inp_wafer_specifications_page_s1",
+        "freiberger_inp_wafer_specifications_page_s2",
+        "freiberger_inp_wafer_specifications_page_s3",
+        "freiberger_inp_wafer_specifications_page_s4"
+      ],
+      "src_id": "co:freiberger_compound_materials"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "Freiberger Compound Materials GmbH",
+        "Freiberger"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:freiberger_compound_materials",
+      "name": "Freiberger Compound Materials",
+      "role": null,
+      "source_ids": [
+        "freiberger_inp_wafer_specifications_page_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "InP wafer"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "mat:inp_substrate",
+      "name": "Indium Phosphide (InP) substrate",
+      "role": null,
+      "source_ids": [
+        "freiberger_inp_wafer_specifications_page_s2",
+        "freiberger_inp_wafer_specifications_page_s3"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "freiberger_inp_wafer_specifications_page",
+    "evidence_tier": 1,
+    "origin_entity": "Freiberger Compound Materials GmbH",
+    "permission_basis": "發行人官網公開的產品規格頁；只保留研究必要的有限逐字節錄（HTML 轉文字，空白攤平）。頁面沒有日期，published_at 留空（INV-6：不用讀取日冒充）。",
+    "published_at": null,
+    "publisher": "Freiberger Compound Materials GmbH（官網）",
+    "retrieved_at": "2026-10-08",
+    "source_type": "datasheet",
+    "storage_permission": "repo_excerpt",
+    "title": "Freiberger Compound Materials — InP Wafer Specifications（官網產品規格頁）",
+    "url": "https://freiberger.com/en/products/inp-wafer"
+  },
+  "sources": [
+    {
+      "id": "freiberger_inp_wafer_specifications_page_s1",
+      "locator": "頁面標題",
+      "quote": "InP substrate wafer specification - Freiberger Compound Materials"
+    },
+    {
+      "id": "freiberger_inp_wafer_specifications_page_s2",
+      "locator": "InP Wafer Specifications（直徑篩選）",
+      "quote": "InP Wafer Specifications Accessible view of the specifications Filter by diameter - All InP Wafers - 100 mm Diameter - 3\" Diameter"
+    },
+    {
+      "id": "freiberger_inp_wafer_specifications_page_s3",
+      "locator": "規格表：100 mm、S 摻雜 n 型、EPD ≤50",
+      "quote": "Diameter (mm) Conduction range 100 SC (n-type) Dopand S Etch Pit Density ≤50 Growth method VGF Thickness Flat/Notch Polish Application 625 Flat Polish single double Application LASER Detector"
+    },
+    {
+      "id": "freiberger_inp_wafer_specifications_page_s4",
+      "locator": "規格表：3 吋、S 摻雜 n 型、EPD ≤500",
+      "quote": "Diameter (mm) Conduction range 3\" SC (n-type) Dopand S Etch Pit Density ≤500 Growth method VGF Thickness Flat/Notch Polish Application 625 Flat Polish single double Application LASER Detector"
+    }
+  ]
+}
