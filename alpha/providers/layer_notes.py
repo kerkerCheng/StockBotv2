@@ -182,6 +182,13 @@ def append_note_record(record: Mapping[str, Any], *, directory: Path | None = No
         raise ContractViolation(f"layer note {parsed.note_id} 已在 ledger 中——同內容不得重複 append")
     if parsed.supersedes_id and not any(r.note_id == parsed.supersedes_id for r in existing):
         raise ContractViolation(f"supersedes_id {parsed.supersedes_id} 不在 {parsed.node} 的 ledger 中")
+    if parsed.supersedes_id and not parsed.retracted and existing:
+        # 2026-10-08（Phase 7 failure log #56，讀圖那一側的對稱面）：換版只取代最新那一筆（select_current 的規則），
+        # 取代更舊的一版會讓取代鏈分岔。
+        head = max(existing, key=lambda r: (r.created_at, r.note_id))
+        if head.note_id != parsed.supersedes_id:
+            raise ContractViolation(f"supersedes_id {parsed.supersedes_id} 不是 {parsed.node} 最新的一筆"
+                                    f"（最新是 {head.note_id}）——換版只取代現行那一份，否則取代鏈會分岔")
     if not parsed.retracted:
         problems = verify_citation_refs(record, raw_dir=raw_dir, lead_exists=lead_exists) + _duplicate_conditions(parsed)
         if problems:

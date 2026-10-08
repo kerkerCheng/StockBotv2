@@ -122,6 +122,22 @@ def test_append_only_rules(tmp_path: Path) -> None:
         append_reading_record(_record(kind="moat", supersedes_id="sr_nonexistent"), directory=tmp_path, quotes=QUOTES)
 
 
+def test_a_reread_supersedes_the_current_reading_not_an_older_one(tmp_path: Path) -> None:
+    """2026-10-08 failure log #56：CDU 層重讀把 supersedes_id 寫成前前一版（sr_015…），寫入端只查「在不在 ledger」就放行，
+    取代鏈分岔、頁面的「取代誰」差一版。換版只准取代同單位最新的那一筆，拒收訊息要說出現行是哪一筆。"""
+    first = _record()
+    append_reading_record(first, directory=tmp_path, quotes=QUOTES)
+    second = _record(created_at=NOW + timedelta(hours=1), supersedes_id=first["reading_id"])
+    append_reading_record(second, directory=tmp_path, quotes=QUOTES)
+    stale = _record(created_at=NOW + timedelta(hours=2), supersedes_id=first["reading_id"])
+    with pytest.raises(ContractViolation, match=second["reading_id"]):
+        append_reading_record(stale, directory=tmp_path, quotes=QUOTES)
+    append_reading_record(_record(created_at=NOW + timedelta(hours=2), supersedes_id=second["reading_id"]),
+                          directory=tmp_path, quotes=QUOTES)
+    records, _errors = read_reading_records(NODE, directory=tmp_path)
+    assert len(records) == 3, "被拒收的那一筆沒有寫進 ledger"
+
+
 def test_retraction_removes_the_current_reading(tmp_path: Path) -> None:
     first = _record()
     append_reading_record(first, directory=tmp_path, quotes=QUOTES)

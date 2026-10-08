@@ -53,6 +53,13 @@ def append_brief_record(record: Mapping[str, Any], *, directory: Path | None = N
         raise ContractViolation(f"brief {parsed.brief_id} 已在 ledger 中——同內容不得重複 append")
     if parsed.supersedes_id and not any(r.brief_id == parsed.supersedes_id for r in existing):
         raise ContractViolation(f"supersedes_id {parsed.supersedes_id} 不在 ledger 中")
+    if parsed.supersedes_id and not parsed.retracted and existing:
+        # 2026-10-08（Phase 7 failure log #56，讀圖那一側的對稱面）：換版只取代最新那一筆（select_brief 的規則），
+        # 取代更舊的一版會讓取代鏈分岔。
+        head = max(existing, key=lambda r: (r.created_at, r.brief_id))
+        if head.brief_id != parsed.supersedes_id:
+            raise ContractViolation(f"supersedes_id {parsed.supersedes_id} 不是 {parsed.ticker} 最新的一筆"
+                                    f"（最新是 {head.brief_id}）——換版只取代現行那一份，否則取代鏈會分岔")
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("a", encoding="utf-8") as handle:
         handle.write(json.dumps(dict(record), ensure_ascii=False, sort_keys=True) + "\n")

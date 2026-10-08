@@ -183,6 +183,24 @@ def test_two_different_disproofs_in_one_version_are_accepted(tmp_path: Path) -> 
     assert len(out["registered"]) == 2
 
 
+def test_a_rewrite_supersedes_the_latest_brief_not_an_older_one(tmp_path: Path) -> None:
+    """2026-10-08 failure log #56（讀圖那一側的對稱面）：換版只取代最新那一筆；取代更舊的一版拒收、說出最新是哪一筆。"""
+    from alpha.providers.briefs import append_brief_record
+
+    t0 = datetime(2026, 10, 8, tzinfo=timezone.utc)
+    first = _record(state="pass", reason="不要：測試第一版", stamp=t0)
+    append_brief_record(first, directory=tmp_path)
+    second = _record(state="pass", reason="不要：測試第二版", supersedes=first["brief_id"], stamp=t0 + timedelta(hours=1))
+    append_brief_record(second, directory=tmp_path)
+    stale = _record(state="pass", reason="不要：測試第三版", supersedes=first["brief_id"], stamp=t0 + timedelta(hours=2))
+    with pytest.raises(ContractViolation, match=second["brief_id"]):
+        append_brief_record(stale, directory=tmp_path)
+    append_brief_record(_record(state="pass", reason="不要：測試第三版", supersedes=second["brief_id"],
+                                stamp=t0 + timedelta(hours=2)), directory=tmp_path)
+    records, _ = read_brief_records(T, directory=tmp_path)
+    assert len(records) == 3, "被拒收的那一筆沒有寫進 ledger"
+
+
 def test_retracting_a_v2_closes_its_active_watches(tmp_path: Path) -> None:
     ctx = _ctx()
     first = _write(tmp_path, _record(), ctx)

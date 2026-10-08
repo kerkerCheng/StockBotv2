@@ -197,6 +197,24 @@ def test_a_failed_watch_rehearsal_leaves_the_ledger_untouched(tmp_path, monkeypa
     assert ew.load_watches(watches)["watches"] == []
 
 
+def test_a_new_version_supersedes_the_latest_note_not_an_older_one(tmp_path) -> None:
+    """2026-10-08 failure log #56（讀圖那一側的對稱面）：換版只取代最新那一筆；取代更舊的一版拒收、說出最新是哪一筆。"""
+    from alpha.providers.layer_notes import append_note_record, read_note_records
+
+    raw, ledger = _write_env(tmp_path)
+    v1 = _rec()
+    append_note_record(v1, directory=ledger, raw_dir=raw, lead_exists=lambda i: True)
+    v2 = _rec(_spec(title="InP 磊晶片 v2", supersedes_id=v1["note_id"]), at="2026-10-09T00:00:00+00:00")
+    append_note_record(v2, directory=ledger, raw_dir=raw, lead_exists=lambda i: True)
+    stale = _rec(_spec(title="InP 磊晶片 v3", supersedes_id=v1["note_id"]), at="2026-10-10T00:00:00+00:00")
+    with pytest.raises(ContractViolation, match=v2["note_id"]):
+        append_note_record(stale, directory=ledger, raw_dir=raw, lead_exists=lambda i: True)
+    append_note_record(_rec(_spec(title="InP 磊晶片 v3", supersedes_id=v2["note_id"]), at="2026-10-10T00:00:00+00:00"),
+                       directory=ledger, raw_dir=raw, lead_exists=lambda i: True)
+    records, _errors = read_note_records("mat:inp_epiwafer", directory=ledger)
+    assert len(records) == 3, "被拒收的那一筆沒有寫進 ledger"
+
+
 def test_a_registration_failure_after_append_names_the_repair_command(tmp_path, monkeypatch) -> None:
     """R2 複審：append 之後才失敗（例如 registry 存不進去）——紀錄已在 ledger，錯誤要說出冪等補登的命令，
     而且是 CLI 接得住的 AlphaError，不是 traceback。"""

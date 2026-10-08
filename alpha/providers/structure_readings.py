@@ -191,6 +191,16 @@ def append_reading_record(record: Mapping[str, Any], *, directory: Path | None =
         raise ContractViolation(f"reading {parsed.reading_id} 已在 ledger 中——同內容不得重複 append")
     if parsed.supersedes_id and not any(r.reading_id == parsed.supersedes_id for r in existing):
         raise ContractViolation(f"supersedes_id {parsed.supersedes_id} 不在 ledger 中")
+    if parsed.supersedes_id and not parsed.retracted:
+        # 2026-10-08（Phase 7 failure log #56）：只查「在不在 ledger」放行了取代一份已被取代的舊版——取代鏈分岔，
+        # 頁面上的「取代誰」差一版（watch 那一側由 register_reading_watches 收同單位每一份，不受影響）。
+        # 現行＝同單位最新一筆（與 select_reading 同一條規則）；換版只准取代它。
+        same_unit = [r for r in existing if r.unit == parsed.unit]
+        head = max(same_unit, key=lambda r: (r.created_at, r.reading_id)) if same_unit else None
+        if head is None or head.reading_id != parsed.supersedes_id:
+            raise ContractViolation(
+                f"supersedes_id {parsed.supersedes_id} 不是這個節點（{parsed.unit}）最新的一筆"
+                f"（最新是 {head.reading_id if head else '沒有'}）——換版只取代現行那一份，否則取代鏈會分岔")
     if not parsed.retracted:
         problems = verify_disproof_sources(record, existing)
         if parsed.citations:
