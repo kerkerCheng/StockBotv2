@@ -1,0 +1,21 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1288469/000128846926000011/mxl-20251231.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] MaxLinear, Inc. Form 10-K（fiscal year 2025）Item 1 Business、Item 7 MD&A 與財報附註節錄：光模組 DSP 與資料中心光互連
+
+Source: https://www.sec.gov/Archives/edgar/data/1288469/000128846926000011/mxl-20251231.htm
+
+【Notes to Consolidated Financial Statements — Note 1 Organization】
+MaxLinear is a fabless integrated circuit design company whose products integrate all or substantial portions of a high-speed communication system, including radio frequency, or RF, high-performance analog, mixed-signal, digital signal processing, security engines, data compression and networking layers, and power management.
+
+【Item 1 Business — Challenges（Optical Fiber Channel Impairments）】
+Therefore, communications SoCs present inside optical modules (often referred to as digital signal 8 Table of Contents processors, or DSPs) are required to correct both electrical and optical signal impairments at both ends of the fiber termination.
+
+【Item 7 MD&A — Overview（2025 營收來源）】
+In the year ended December 31, 2025, net revenue was $467.6 million, which was derived in part from sales of RF receivers and RF receiver SoC and connectivity solutions into broadband operator voice and data modems and gateways and connectivity adapters, global analog and digital RF receiver products, radio and modem solutions into wireless carrier access and backhaul infrastructure platforms, high-speed optical interconnect solutions sold into optical modules for data-center, metro and long-haul networks, and high-performance interface and power management solutions into a broad range of communications, industrial, automotive and multi-market applications.
+
+【Item 7 MD&A — Net Revenue by market（千美元；2025／2024／變動）】
+Broadband $ 204,423 $ 116,819 $ 87,604 75 % % of net revenue 44 % 32 % Connectivity 77,990 55,769 22,221 40 % % of net revenue 17 % 15 % Infrastructure 148,164 113,907 34,257 30 % % of net revenue 32 % 32 % Industrial and multi-market 37,064 74,033 (36,969) (50) % % of net revenue 8 % 21 % Total net revenue $ 467,641 $ 360,528 $ 107,113 30 %
+
+【Item 1A Risk Factors — 客戶集中】
+In the year ended December 31, 2025, two customers accounted for 28% of our net revenue, and our ten largest customers collectively accounted for 65% of our net revenue, of which distributor customers accounted for less than 10% of our net revenue.

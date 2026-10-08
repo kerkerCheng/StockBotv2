@@ -1,0 +1,102 @@
+{
+  "claims": [
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：MaxLinear 後續 10-Q 的 infrastructure 成長歸因不再含 optical 出貨，或寫明資料中心產品需求下滑、預付晶圓轉列減損。核查頻率：每季（10-Q）。觸發後 48 小時：e1 加註、重讀光模組 DSP 層（tech:optical_module_dsp）。",
+      "id": "mxl_10_q_2026q2_optical_shipments_cl1",
+      "source_ids": [
+        "mxl_10_q_2026q2_optical_shipments_s1",
+        "mxl_10_q_2026q2_optical_shipments_s2",
+        "mxl_10_q_2026q2_optical_shipments_s3",
+        "mxl_10_q_2026q2_optical_shipments_s4"
+      ],
+      "statement": "MaxLinear's 10-Q for the quarter ended 2026-06-30: first-half revenue ($306.0 million) was derived in part from high-speed optical interconnect solutions sold into optical modules for data-center, metro and long-haul networks; Q2 infrastructure revenue was $85.0 million, up 145% year on year and 50% of revenue, driven by higher shipment volumes of optical, high-performance analog and wireless backhaul products; working capital absorbed a wafer prepayment for rising demand for certain data center products. Supplier self-report; the optical portion is not split out and no customer or product is named.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "tech:optical_module_dsp",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "mxl_10_q_2026q2_optical_shipments_s1",
+        "mxl_10_q_2026q2_optical_shipments_s3"
+      ],
+      "src_id": "co:maxlinear"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "MaxLinear, Inc."
+      ],
+      "attributes": {
+        "ticker": "MXL"
+      },
+      "confidence": 0.9,
+      "id": "co:maxlinear",
+      "name": "MaxLinear",
+      "role": null,
+      "source_ids": [
+        "mxl_10_q_2026q2_optical_shipments_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "optical module DSP"
+      ],
+      "attributes": {},
+      "confidence": 0.8,
+      "id": "tech:optical_module_dsp",
+      "name": "Optical module DSP (data-center optical interconnect)",
+      "role": null,
+      "source_ids": [
+        "mxl_10_q_2026q2_optical_shipments_s1"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "mxl_10_q_2026q2_optical_shipments",
+    "evidence_tier": 1,
+    "origin_entity": "MaxLinear, Inc.",
+    "permission_basis": "SEC EDGAR 公開申報（美國法定公開文件）；只保留研究必要的有限逐字節錄（HTML 轉文字，空白攤平）。",
+    "published_at": "2026-07-23",
+    "publisher": "MaxLinear, Inc.（SEC EDGAR 10-Q，accession 0001288469-26-000051）",
+    "retrieved_at": "2026-10-08",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "MaxLinear, Inc. Form 10-Q（quarter ended 2026-06-30）Item 2 MD&A 節錄：infrastructure 營收與光通訊出貨",
+    "url": "https://www.sec.gov/Archives/edgar/data/1288469/000128846926000051/mxl-20260630.htm"
+  },
+  "sources": [
+    {
+      "id": "mxl_10_q_2026q2_optical_shipments_s1",
+      "locator": "Item 2 MD&A — Overview（上半年營收來源）",
+      "quote": "In the six months ended June 30, 2026, net revenue was $306.0 million, which was derived in part from sales of high-speed optical interconnect solutions sold into optical modules for data-center, metro and long-haul networks"
+    },
+    {
+      "id": "mxl_10_q_2026q2_optical_shipments_s2",
+      "locator": "Item 2 MD&A — Net Revenue by market（千美元；2026Q2／2025Q2／變動；上半年同）",
+      "quote": "Infrastructure $ 85,016 $ 34,709 $ 50,307 145 % $ 147,830 $ 61,270 $ 86,560 141 % % of net revenue 50 % 32 % 48 % 30 %"
+    },
+    {
+      "id": "mxl_10_q_2026q2_optical_shipments_s3",
+      "locator": "Item 2 MD&A — Net Revenue（第二季 infrastructure 成長歸因）",
+      "quote": "The increase in infrastructure net revenue of $50.3 million was driven by increases in the volume of shipments of optical, high-performance analog, and wireless backhaul products."
+    },
+    {
+      "id": "mxl_10_q_2026q2_optical_shipments_s4",
+      "locator": "Item 2 MD&A — Cash Flows from Operating Activities",
+      "quote": "The change in working capital was driven by a prepayment for wafers supporting rising demand for certain data center products."
+    }
+  ]
+}

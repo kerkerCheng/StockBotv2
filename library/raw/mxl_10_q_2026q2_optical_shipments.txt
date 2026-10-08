@@ -1,0 +1,18 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1288469/000128846926000051/mxl-20260630.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] MaxLinear, Inc. Form 10-Q（quarter ended 2026-06-30）Item 2 MD&A 節錄：infrastructure 營收與光通訊出貨
+
+Source: https://www.sec.gov/Archives/edgar/data/1288469/000128846926000051/mxl-20260630.htm
+
+【Item 2 MD&A — Overview（上半年營收來源）】
+In the six months ended June 30, 2026, net revenue was $306.0 million, which was derived in part from sales of high-speed optical interconnect solutions sold into optical modules for data-center, metro and long-haul networks
+
+【Item 2 MD&A — Net Revenue by market（千美元；2026Q2／2025Q2／變動；上半年同）】
+Infrastructure $ 85,016 $ 34,709 $ 50,307 145 % $ 147,830 $ 61,270 $ 86,560 141 % % of net revenue 50 % 32 % 48 % 30 %
+
+【Item 2 MD&A — Net Revenue（第二季 infrastructure 成長歸因）】
+The increase in infrastructure net revenue of $50.3 million was driven by increases in the volume of shipments of optical, high-performance analog, and wireless backhaul products.
+
+【Item 2 MD&A — Cash Flows from Operating Activities】
+The change in working capital was driven by a prepayment for wafers supporting rising demand for certain data center products.
