@@ -439,6 +439,8 @@ table.rank.compare td:first-child { color: var(--muted); }
 }
 .brief-card .candidate-words .word-link:hover { background: var(--surface-2); }
 .brief-card .lamp-notes { margin: .1rem 0 .3rem; }
+.lamp-plain { margin-bottom: 6px; }
+.lamp-row { font-size: 14px; line-height: 1.6; margin: 2px 0; }
 .glossary { margin-top: .6rem; padding: .45rem .7rem; border-left: 3px solid var(--border); }
 .glossary .rule { margin: .15rem 0; }
 .table-filter { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 8px 0 4px; }
@@ -488,18 +490,23 @@ table.pt-table th, table.pt-table td { vertical-align: top; overflow-wrap: anywh
 .layer-section .plain-text h3 { margin-top: 4px; }
 .layer-section details { margin-top: 10px; }
 
-/* 個股頁 S5b 的圖（2026-10-08）：寬度跟著容器走、高度照比例；字的顏色與大小只在這裡定（CSP 不准行內 style）。 */
-.chart-wrap { margin: 8px 0 4px; max-width: 520px; }
+/* 個股頁 S5b 的圖（2026-10-08）：圖照內容欄的寬 1:1 出圖（app.js `chartWidth`），所以這裡不再限寬——電腦上不會縮在左邊
+   （2026-10-08 使用者：電腦上看歪的）。字的顏色與大小只在這裡定（CSP 不准行內 style）。 */
+.chart-wrap { margin: 10px 0 6px; }
 .chart { display: block; width: 100%; height: auto; overflow: visible; }
 .chart-legend { color: var(--muted); font-size: 12px; line-height: 1.5; margin-top: 2px; overflow-wrap: anywhere; }
 .chart-label { fill: var(--muted); font-size: 11px; }
-.chart-label-strong { fill: var(--text); font-weight: 600; }
-.chart-axis { stroke: var(--border); stroke-width: 1; }
-.ruler-range { stroke: var(--border); stroke-width: 7; stroke-linecap: round; }
-.ruler-median { stroke: var(--muted); stroke-width: 2; }
+.chart-label-strong { fill: var(--text); font-weight: 600; font-size: 12px; }
+.chart-axis { stroke: var(--muted); stroke-width: 1; }
+.chart-grid { stroke: var(--border); stroke-width: 1; }
+.chart-tick { fill: var(--muted); font-size: 11px; }
+.chart-axis-title { fill: var(--text); font-size: 12px; font-weight: 600; }
+.ruler-axis { stroke: var(--border); stroke-width: 2; }
+.ruler-range { stroke: var(--dim); stroke-width: 7; stroke-linecap: butt; opacity: .45; }
+.ruler-end { stroke: var(--muted); stroke-width: 2; }
+.ruler-median { stroke: var(--text); stroke-width: 2; }
 .ruler-today { fill: var(--accent); }
 .ruler-cohort { fill: var(--settled); }
-.ruler-cohort-line { stroke: var(--border); stroke-width: 1; stroke-dasharray: 3 4; }
 .bar-capture { fill: var(--settled); }
 .detail-sub { color: var(--muted); font-size: 13px; margin-top: 4px; }
 .block-detail { margin-top: 6px; }
@@ -508,8 +515,15 @@ table.pt-table th, table.pt-table td { vertical-align: top; overflow-wrap: anywh
 .bar-pos { fill: var(--accent); }
 .bar-neg { fill: var(--neg); }
 
-/* 技術示意圖（個股頁 S5b）：SVG 以 <img> 顯示，白底卡片讓深色模式下也讀得清楚（圖本身的配色固定）。 */
+/* 技術示意圖（個股頁 S5b）：SVG 以 <img> 顯示，白底卡片讓深色模式下也讀得清楚（圖本身的配色固定）。
+   「在這裡」框疊在圖片上（位置由畫圖工具量的格子換算成百分比），只標它坐的那幾格。 */
 .diagram { margin: 10px 0 6px; }
 .diagram-title { font-weight: 600; margin-bottom: 6px; }
-.diagram-img { display: block; width: 100%; max-width: 520px; height: auto; background: #ffffff;
+.diagram-where { color: var(--text); font-size: 13px; margin-bottom: 6px; }
+.diagram-frame { position: relative; max-width: 520px; }
+.diagram-img { display: block; width: 100%; height: auto; background: #ffffff;
   border: 1px solid var(--border); border-radius: 10px; }
+.diagram-mark { position: absolute; border: 3px solid var(--accent); border-radius: 12px; box-sizing: border-box;
+  pointer-events: none; }
+.diagram-mark-tag { position: absolute; right: 6px; top: -11px; background: var(--accent); color: #ffffff;
+  font-size: 11px; font-weight: 600; padding: 1px 6px; border-radius: 8px; white-space: nowrap; }

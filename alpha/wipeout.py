@@ -77,16 +77,16 @@ def cash_runway_flag(runway: Mapping[str, Any] | None) -> dict[str, Any]:
                                          "as_of", "source", "status", "runway_months")}
     status = runway.get("status")
     if status == "self_funding":
-        return _flag("green", "自由現金流為正——不靠外部資金也能維持營運", rule=_CASH_RULE, inputs=inputs)
+        return _flag("green", "本業賺得出現金（自由現金流為正）——不用靠借錢或增資過日子", rule=_CASH_RULE, inputs=inputs)
     if status == "calculated":
         months = runway.get("runway_months")
         if not isinstance(months, (int, float)):
             return _flag(None, "跑道狀態宣稱已算出，卻沒有月數", rule=_CASH_RULE, inputs=inputs,
                          absence_kind="upstream_unavailable")
         if months < GOING_CONCERN_HORIZON_MONTHS:
-            return _flag("red", "手上現金撐不到一個 going-concern 評估期", rule=_CASH_RULE, inputs=inputs)
-        return _flag("amber", "在燒錢，但現金撐得過一個 going-concern 評估期", rule=_CASH_RULE, inputs=inputs)
-    return _flag(None, "現金／總債／自由現金流三個輸入缺一即不推導（部分推導只會給出看起來精確的錯值）",
+            return _flag("red", "在燒錢，照現在的速度手上的現金撐不到一年", rule=_CASH_RULE, inputs=inputs)
+        return _flag("amber", "在燒錢，但手上的現金撐得過一年", rule=_CASH_RULE, inputs=inputs)
+    return _flag(None, "現金、債務、自由現金流缺一個就不判（只用部分數字會算出看起來精確的錯值）",
                  rule=_CASH_RULE, inputs=inputs, absence_kind="upstream_unavailable")
 
 
@@ -103,16 +103,16 @@ def debt_flag(runway: Mapping[str, Any] | None) -> dict[str, Any]:
     inputs = {"cash_and_equivalents": cash, "total_debt": debt, "free_cash_flow_ttm": fcf,
               "as_of": runway.get("as_of"), "source": runway.get("source")}
     if not isinstance(cash, (int, float)) or not isinstance(debt, (int, float)):
-        return _flag(None, "缺現金或總債，不推導", rule=_DEBT_RULE, inputs=inputs,
+        return _flag(None, "缺現金或債務的數字，不判", rule=_DEBT_RULE, inputs=inputs,
                      absence_kind="upstream_unavailable")
     if cash >= debt:
-        return _flag("green", "淨現金——手上的錢多於要還的錢", rule=_DEBT_RULE, inputs=inputs)
+        return _flag("green", "手上的現金比欠的債多——不怕還債", rule=_DEBT_RULE, inputs=inputs)
     if not isinstance(fcf, (int, float)):
-        return _flag(None, "是淨負債，但缺自由現金流，判不出還得出來還不出來", rule=_DEBT_RULE,
+        return _flag(None, "欠的比手上的現金多，但缺自由現金流——判不出還不還得出來", rule=_DEBT_RULE,
                      inputs=inputs, absence_kind="upstream_unavailable")
     if fcf >= 0:
-        return _flag("amber", "淨負債，但自由現金流為正——還本靠自己生得出來", rule=_DEBT_RULE, inputs=inputs)
-    return _flag("red", "淨負債而且在燒錢——還本得靠再融資", rule=_DEBT_RULE, inputs=inputs)
+        return _flag("amber", "欠的比手上的現金多，但本業每年賺得出現金——靠自己還得出來", rule=_DEBT_RULE, inputs=inputs)
+    return _flag("red", "欠的比手上的現金多、本業又在燒錢——債到期得靠再借錢或增資", rule=_DEBT_RULE, inputs=inputs)
 
 
 _DILUTION_RULE = (
@@ -201,15 +201,15 @@ def dilution_flag(shares_series: Sequence[tuple[date, float]] | None,
     if isinstance(change, (int, float)):
         inputs["outstanding_note"] = f"同期封面股數 {change:+.1%}"
     if status == "method_not_applicable":
-        return _flag(None, "不是按季申報的美國國內申報人——新股發行金額這個方法不適用（股數變化照印在稽核層）",
+        return _flag(None, "不是按季申報的美國公司——「有沒有發新股」這個查法不適用（股數變化在數字與出處）",
                      rule=_DILUTION_RULE, inputs=inputs, absence_kind="method_not_applicable")
     if status == "provider_missing":
         inputs["issuance_reason"] = issuance.get("reason")
-        return _flag(None, "回填窗內沒有新股發行金額的申報紀錄——說不出有沒有增發（股數變化照印在稽核層）",
+        return _flag(None, "查得到的申報裡沒有發新股金額的紀錄——說不出有沒有增資（股數變化在數字與出處）",
                      rule=_DILUTION_RULE, inputs=inputs, absence_kind="provider_missing")
     if status != "ok":
         inputs["issuance_reason"] = issuance.get("reason")
-        return _flag(None, "沒有讀到新股發行金額（上游缺席）", rule=_DILUTION_RULE, inputs=inputs,
+        return _flag(None, "這次沒讀到發新股的資料", rule=_DILUTION_RULE, inputs=inputs,
                      absence_kind="upstream_unavailable")
     total = float(issuance.get("trailing_total") or 0.0)
     # 判色看窗內正值的加總（R2-c 覆核 #1：淨加總會被負值——更正或 tag 前後不一的負第四季——抵掉真實發行）
@@ -235,18 +235,18 @@ def dilution_flag(shares_series: Sequence[tuple[date, float]] | None,
         inputs.update(offering_summary=_document_text(documents) if documents else None,
                       context_summary=_document_text(context) if context else None)
         if documents:
-            return _flag("amber", "一個完整會計年度內有新股發行紀錄，窗內也有募資文件（增資說明書或私募公告，逐份在稽核層）",
+            return _flag("amber", "過去一年發過新股（股數變多、每股分到的變少），也有增資說明書或私募公告",
                          rule=_DILUTION_RULE, inputs=inputs)
         if offerings.get("status") != "ok":
             inputs["offering_reason"] = offerings.get("reason")
-            return _flag(None, "有新股發行金額，但募資文件清單讀不到——不判黃也不判綠",
+            return _flag(None, "有發新股的金額，但募資文件清單讀不到——不判黃也不判綠",
                          rule=_DILUTION_RULE, inputs=inputs, absence_kind="upstream_unavailable")
         if not offerings.get("complete"):
-            return _flag(None, "有新股發行金額、窗內沒找到募資文件，但申報清單涵蓋不到整個窗——不判黃也不判綠"
-                         "（涵蓋到哪裡在稽核層）",
+            return _flag(None, "有發新股的金額、沒找到募資文件，但申報清單涵蓋不到整年——不判黃也不判綠"
+                         "（涵蓋到哪裡在數字與出處）",
                          rule=_DILUTION_RULE, inputs=inputs, absence_kind="upstream_unavailable")
         inputs["issued_without_offering"] = True
-        return _flag(None, "只有發行金額、窗內沒有募資文件——員工計畫登記與增資授權不算募資（窗內有哪些申報在稽核層）",
+        return _flag(None, "只有發行金額、沒有募資文件——員工認股與增資授權不算募資（有哪些申報在數字與出處）",
                      rule=_DILUTION_RULE, inputs=inputs, absence_kind="insufficient_evidence")
     if unattributed or inconsistent:
         why = "；".join(x for x in ("年報有新股發行、季報加起來不到——歸不到季" if unattributed else "",
@@ -256,13 +256,13 @@ def dilution_flag(shares_series: Sequence[tuple[date, float]] | None,
                      rule=_DILUTION_RULE, inputs=inputs, absence_kind="insufficient_evidence")
     if not shares.get("eligible"):
         inputs["colour_available_on"] = shares.get("colour_available_on")
-        return _flag(None, "窗內沒有新股發行紀錄，但同口徑股數的觀測窗還不滿一個完整會計年度——說不出沒有增發",
+        return _flag(None, "沒有發新股的紀錄，但股數的觀測還不滿一整年——說不出沒有增資",
                      rule=_DILUTION_RULE, inputs=inputs, absence_kind="insufficient_evidence")
     if isinstance(change, (int, float)) and change > 0:
         inputs["outstanding_note"] = f"股數 {change:+.1%}（無新股發行紀錄）"
-        return _flag(None, "同口徑股數增加了，但窗內沒有新股發行紀錄——分不出員工股酬與沒標 tag 的增發",
+        return _flag(None, "股數增加了，但沒有發新股的紀錄——分不出是員工認股還是沒標出來的增資",
                      rule=_DILUTION_RULE, inputs=inputs, absence_kind="insufficient_evidence")
-    return _flag("green", "一個完整會計年度內沒有新股發行紀錄，同口徑股數也沒有增加", rule=_DILUTION_RULE,
+    return _flag("green", "過去一年沒有發新股，股數也沒有增加", rule=_DILUTION_RULE,
                  inputs=inputs)
 
 
@@ -291,16 +291,16 @@ def going_concern_flag(observation: Mapping[str, Any] | None) -> dict[str, Any]:
               "as_of": (observation or {}).get("as_of"), "source": (observation or {}).get("source"),
               "conflict": (observation or {}).get("conflict")}
     if (observation or {}).get("conflict"):
-        return _flag(None, "同一日期有多筆生效的 going-concern 判讀，不挑一個", rule=_GOING_CONCERN_RULE,
+        return _flag(None, "同一天有好幾筆會計師意見的判讀，不挑一個", rule=_GOING_CONCERN_RULE,
                      inputs=inputs, absence_kind="insufficient_evidence")
     if opinion == "substantial_doubt":
-        return _flag("red", "查核意見對繼續經營表示重大疑慮", rule=_GOING_CONCERN_RULE, inputs=inputs)
+        return _flag("red", "會計師在查核報告裡警告：公司能不能繼續經營下去有重大疑慮", rule=_GOING_CONCERN_RULE, inputs=inputs)
     if opinion == "no_substantial_doubt":
-        return _flag("green", "查核意見沒有繼續經營的重大疑慮", rule=_GOING_CONCERN_RULE, inputs=inputs)
+        return _flag("green", "會計師的查核報告沒有警告公司經營不下去", rule=_GOING_CONCERN_RULE, inputs=inputs)
     if opinion == "not_reviewed":
-        return _flag(None, "已登記「還沒讀查核意見」", rule=_GOING_CONCERN_RULE, inputs=inputs,
+        return _flag(None, "已登記「還沒讀會計師的查核報告」", rule=_GOING_CONCERN_RULE, inputs=inputs,
                      absence_kind="not_yet_recorded")
-    return _flag(None, "還沒有任何結構化的 going-concern 判讀", rule=_GOING_CONCERN_RULE, inputs=inputs,
+    return _flag(None, "還沒有人讀過會計師的查核報告（沒量到，不是沒事）", rule=_GOING_CONCERN_RULE, inputs=inputs,
                  absence_kind="not_yet_recorded")
 
 

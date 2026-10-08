@@ -189,8 +189,9 @@ ELEMENTS: tuple[PageElement, ...] = (
 class BlockReading:
     """一塊的「一句讀法」從哪來（個股頁 S5，2026-10-08；規則 7：研究寫、沒寫印「還沒寫」）。
 
-    `slots`＝v2 敘事的格（依序）、`parts`＝`FIRST_SCREEN_PARTS` 的既有元件；兩者都空時印 `pending`（產生端宣告的缺席句，
-    研究的塊寫「還沒寫」、要 S3 機械資料的塊寫「還沒做」）。只是**呈現位置**：不排序、不打分、不進候選狀態的前提。
+    `slots`＝v2 敘事的格（依序）、`parts`＝`FIRST_SCREEN_PARTS` 的既有元件；**沒有敘事的那一句時**印 `pending`（產生端宣告的缺席句，
+    研究的塊寫「還沒寫」、要 S3 機械資料的塊寫「還沒做」）——2026-10-08 起有元件也照印（B3 有營收的元件、讀法句還沒寫）。
+    只是**呈現位置**：不排序、不打分、不進候選狀態的前提。
     """
     block: str
     slots: tuple[str, ...] = ()
@@ -212,11 +213,13 @@ FIRST_SCREEN_SECTIONS: tuple[Mapping[str, Any], ...] = (
 BLOCK_READINGS: tuple[BlockReading, ...] = (
     BlockReading("B1", slots=("our_bet", "bottleneck", "position")),
     BlockReading("B2", slots=("demand",)),
-    BlockReading("B3", pending="還沒寫：營收結構的一句讀法要研究寫，產品、地區、客戶比例的機械資料在個股頁 S3（還沒做）"),
+    # 2026-10-08 使用者：「對我來說都是營收，一起看最好」——「出現在數字裡了嗎」與營收柱從 B7 搬來營收從哪來（同一段、首屏上半）
+    BlockReading("B3", parts=("in_numbers",),
+                 pending="還沒寫：營收結構的一句讀法要研究寫；產品、地區、客戶比例的機械資料在個股頁 S3d（還沒做）"),
     BlockReading("B4", pending="還沒寫：技術鏈的一句讀法要研究寫；坐的層有層說明時，展開裡連得過去"),
     BlockReading("B5", pending="還沒寫：事件與影響多大的一句讀法要研究寫；相對同組的反應在個股頁 S3（還沒做）"),
     BlockReading("B6", slots=("priced_in",), parts=("priced_in",)),
-    BlockReading("B7", slots=("what_must_be_true",), parts=("in_numbers",)),
+    BlockReading("B7", slots=("what_must_be_true",)),
     BlockReading("B8", parts=("disproof", "confirm")),
     BlockReading("B9", parts=("will_it_die", "wipeout")),
     BlockReading("B10", parts=("shared_bet",)),
@@ -268,10 +271,10 @@ def _first_screen_problems(block_keys: Sequence[str]) -> list[str]:
     if sorted(parts) != sorted(FIRST_SCREEN_PARTS) or len(parts) != len(set(parts)):
         problems.append(f"首屏元件要各放一次：{parts}")
     for r in BLOCK_READINGS:
-        has_source = bool(r.slots or r.parts)
-        if has_source and r.pending:
-            problems.append(f"{r.block} 有句子來源又宣告了 pending")
-        if not has_source and not (r.pending or "").strip():
+        # 敘事的格與 pending 不並存（兩個都在講「那一句讀法」）；元件＋pending 可以（2026-10-08：B3 有營收的元件、讀法句還沒寫）
+        if r.slots and r.pending:
+            problems.append(f"{r.block} 有敘事的格又宣告了 pending")
+        if not (r.slots or r.parts) and not (r.pending or "").strip():
             problems.append(f"{r.block} 沒有句子來源、也沒宣告沒有時印什麼（規則 7）")
     return problems
 
@@ -386,7 +389,7 @@ def schema_payload() -> dict[str, Any]:
         "blocks": [{"key": b.key, "title": b.title, "question": b.question, "unit": b.unit, "writer": b.writer}
                    for b in BLOCKS],
         "elements": [{"key": e.key, "block": e.block, "label": e.label, "unit": e.unit, "source": e.source,
-                      "absence": e.absence, "looked": e.looked} for e in ELEMENTS],
+                      "lines": list(e.lines), "absence": e.absence, "looked": e.looked} for e in ELEMENTS],
         "evidence_level_map": {k: {"label": v["label"], "graph": list(v["graph"]), "note": v["note"]}
                                for k, v in EVIDENCE_LEVEL_MAP.items()},
         # 首屏（S5）：段的順序與每塊的讀法來源——app.js 照這裡排，不留第二份（L16）

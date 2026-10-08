@@ -678,13 +678,17 @@ function schemaBlock(payload, view, lines, block, reading) {
   node.appendChild(head);
   const story = el('div', 'story');
   (reading.slots || []).forEach((slot) => { if (lines['brief:' + slot]) story.appendChild(storyRow(lines['brief:' + slot])); });
-  if (story.childNodes.length) node.appendChild(story);
-  (reading.parts || []).forEach((part) => questionPart(view, part).forEach((n) => node.appendChild(n)));
-  if (!(reading.slots || []).length && !(reading.parts || []).length) {
-    node.appendChild(el('div', 'row-reason ss-pending', reading.pending || '還沒寫'));
-  } else if (!story.childNodes.length && !(reading.parts || []).length) {
+  if (story.childNodes.length) {
+    node.appendChild(story);
+  } else if (reading.pending) {
+    // 讀法句還沒有：照印合約的缺席句（有元件也印——B3 有營收、讀法句還沒寫）
+    node.appendChild(el('div', 'row-reason ss-pending', reading.pending));
+  } else if ((reading.slots || []).length && !(reading.parts || []).length) {
     node.appendChild(el('div', 'row-reason ss-pending', '還沒寫（這一檔還沒有研究寫的敘事）'));
+  } else if (!(reading.parts || []).length) {
+    node.appendChild(el('div', 'row-reason ss-pending', '還沒寫'));
   }
+  (reading.parts || []).forEach((part) => questionPart(view, part).forEach((n) => node.appendChild(n)));
   blockVisuals(payload, view, block.key).forEach((n) => node.appendChild(n));
   const detail = blockDetail(payload, view, block.key);
   if (detail) node.appendChild(detail);
@@ -695,10 +699,10 @@ function schemaBlock(payload, view, lines, block, reading) {
  *  原本散在頁尾四張卡與稽核區的內容搬進對應的塊；每塊最多一個展開、展開裡不再套展開（2026-09-08「太多展開」）。
  *  沒有內容就不放。「數字與出處」掛 id `tq-<題>`——首屏「會死嗎／已定價嗎／出現在數字裡了嗎」點了打開它。 */
 function blockDetail(payload, view, key) {
-  if (key === 'B2') return chainDetail(view);
+  if (key === 'B2') return chainDetail(payload, view);
   if (key === 'B4') return seatsDetail(payload, view);
   if (key === 'B6') return numbersDrill(view, 'priced_in', () => [pricedInPlain(), marketMultiples(view)]);
-  if (key === 'B7') return numbersDrill(view, 'in_numbers', () => []);
+  if (key === 'B3') return numbersDrill(view, 'in_numbers', () => []);
   if (key === 'B8') return downsideDetail(view);
   if (key === 'B9') return numbersDrill(view, 'will_it_die', () => [wipeoutUnlitRule(view)]);
   if (key === 'B11') return timelineDetail(view);
@@ -738,11 +742,41 @@ function wipeoutUnlitRule(view) {
   return rule ? el('div', 'row-reason', rule) : null;
 }
 
-/** 「需求傳導」的展開：這條鏈怎麼走（圖的敘述＋圖裡 claim 的引文，照抄原論證卡的第一段）。 */
-function chainDetail(view) {
+/** 「需求傳導」的展開：這條鏈怎麼走（圖的敘述＋圖裡 claim 的引文，照抄原論證卡的第一段），以及錨與吃到多少的出處——
+ *  走到哪個錨、哪天起每一家都申報了、哪幾家由年初累計差分推算、它是代理、換匯用哪一季的季均價。2026-10-08 使用者：
+ *  圖下那一坨小字不用——圖只留 Y 軸與量，這些照抄 materialize 的 `demand_anchor`／`capture`，放這裡給要查的時候看。 */
+function chainDetail(payload, view) {
   const line = view.argument ? lineMap(view.argument)['argument:chain'] : null;
-  if (!line) return null;
-  return drill('這條鏈怎麼走：圖上的連結與證據強度', () => argumentSection(line));
+  const demand = payload.demand_anchor || {};
+  const cap = payload.capture || {};
+  const notes = [];
+  const anchors = demand.anchors || [];
+  if (anchors.length) {
+    notes.push('它走到的需求錨：' + anchors.map((a) => `${a.name || a.node}`
+      + (a.basis === 'company' ? '（退回公司層才走到）' : '')).join('、'));
+  }
+  (demand.series || []).forEach((s) => {
+    const pts = s.points || [];
+    if (!pts.length) return;
+    const last = pts[pts.length - 1];
+    notes.push(`${s.label}：最新一期 ${last.period}，${last.known_on} 起${s.aggregation === 'single' ? '申報' : '每一家都申報了'}`
+      + ((last.derived || []).length && s.aggregation !== 'single' ? `（${last.derived.join('、')} 由年初累計差分推算）` : '')
+      + `。${s.proxy || ''}`);
+  });
+  const cpts = cap.points || [];
+  if (cpts.length) {
+    const last = cpts[cpts.length - 1];
+    notes.push(`吃到多少：營收用${cap.revenue_source || '—'}`
+      + (last.per_usd ? `；換美元用季均價（FRED H.10，${last.period} 一美元 ${fmtNumber(last.per_usd, 2)} ${CURRENCY_WORD[last.currency] || last.currency}）` : '')
+      + `；${last.known_on} 起營收、錨、匯率都齊。往上＝吃到的比例變大。`);
+  }
+  if (!line && !notes.length) return null;
+  return drill('細節：這條鏈怎麼走、錨與吃到多少的出處', () => {
+    const box = el('div', 'block-detail');
+    if (line) box.appendChild(argumentSection(line));
+    notes.forEach((text) => box.appendChild(el('div', 'row-reason', text)));
+    return box;
+  });
 }
 
 /** 「技術鏈」的展開：它坐的每一層現在讀成什麼（讀圖面板照抄）。節點印名字——層說明的標題、圖上的名字，都沒有才印 ID
@@ -892,25 +926,41 @@ function confirmLines(row, tag) {
   });
 }
 
-/** 歸零燈：燈名＋顏色＋理由，照抄 wipeout 面板（與稽核區同一份）。`withGreen`＝綠燈也列（五題的④逐盞列；
- * 舊版面只列不是綠的那幾盞，全綠就不印）。灰＝沒量到，不是綠。 */
+/** 歸零燈（B9 會不會死）：燈名＋顏色＋一句白話理由，照抄 wipeout 面板。2026-10-08 使用者：「這四個燈號到底代表什麼，
+ * 稀釋是啥、going concern 是什麼」——燈名改用 page_schema 的 B9 白話問句（錢夠不夠／怕不怕還債／會不會一直增資／
+ * 會計師有沒有警告；名字只住合約那一份，L16），綠燈也寫理由（「沒事」是怎麼沒事），四盞燈上面印一句白話（`plain_wipeout`）。
+ * `withGreen`＝綠燈也列（十三塊版面逐盞列；讀不到合約的舊 server 只列不是綠的）。灰＝沒量到，不是沒事。 */
 function lampsBlock(view, withGreen) {
   const panel = view.wipeout;
   if (!panel) return null;
+  const names = lampNames();
   const items = [];
   (panel.lines || []).filter((line) => line.role === 'wipeout').forEach((line) => {
     const d = line.datum || {};
     const value = d.value || {};
     if (value.colour === 'green' && !withGreen) return;
     const colour = WIPEOUT_COLOURS[value.colour];
-    const name = plainLine(line.key, line.display_label).replace(/^歸零旗標：/, '');
-    const why = value.colour === 'green' ? '' : (value.reason || d.reason || absenceLabel(d.absence_kind) || '');
-    items.push(`${colour ? colour.mark + ' ' + colour.word + '　' + name : '⬜ 灰　' + name + '（沒量到，不是綠）'}${why ? '：' + why : ''}`);
+    const name = names[line.key] || plainLine(line.key, line.display_label).replace(/^歸零旗標：/, '');
+    const why = value.reason || d.reason || absenceLabel(d.absence_kind) || '';
+    items.push(`${colour ? colour.mark : '⬜'} ${name}${colour ? '' : '（沒量到，不是沒事）'}${why ? '：' + why : ''}`);
   });
   if (!items.length) return null;
   const box = el('div', 'lamp-notes');
-  items.forEach((text) => box.appendChild(el('div', 'row-reason', text)));
+  const plain = (VOCAB && VOCAB.plain_wipeout) || '';
+  if (plain && withGreen) box.appendChild(el('div', 'row-reason lamp-plain', plain));
+  items.forEach((text) => box.appendChild(el('div', 'lamp-row', text)));
   return box;
+}
+
+/** 燈名：page_schema 的 B9 元素名（`wipeout/<key>` 那一條 line 對到的元素；合約只有一份，前端不另寫）。 */
+function lampNames() {
+  const out = {};
+  ((VOCAB && VOCAB.page_schema && VOCAB.page_schema.elements) || []).forEach((element) => {
+    (element.lines || []).forEach((spec) => {
+      if (String(spec).indexOf('wipeout/') === 0) out[String(spec).slice('wipeout/'.length)] = element.label;
+    });
+  });
+  return out;
 }
 
 /** 財務三題的三個字（可點：打開同一頁那一題的「數字與出處」）。`questions`＝印哪幾題（十三塊版面分到各自那一塊；
@@ -1478,10 +1528,12 @@ function svgEl(tag, attrs, text) {
 
 /* （個股頁 S5b 的圖住這一段：與資產配置的圖一樣只做座標換算——首屏卡片那段有「不得自己算報酬」的檢查，畫圖不放在那裡。） */
 /* ---------- 個股頁 S5b：圖（2026-10-08；schema v1.0 規則 6、8、9） ----------
-   量化圖只畫系統裡的數字（三題稽核區的值照抄，不另算）；圖上不加標題，看點寫在上方那一句讀法、口徑寫在圖下那一行；
+   量化圖只畫系統裡的數字（三題、需求錨、吃到多少的值照抄，不另算）；意思交給 Y 軸與那一句讀法（規則 8），圖下不放一坨說明；
    圖上的字不准互相重疊——由 `?selfcheck=1` 機械量測（selfCheck），0 才算過（S5c）。
-   放哪一塊照 page_schema：B6 怎麼被定價＝參考尺、B7 押對了夠大嗎（「出現在數字裡」）＝營收柱狀。
-   SVG 元素用資產配置那一段既有的 `svgEl`／`SVG_NS`（同一份，不另寫）。 */
+   2026-10-08 使用者回饋（電腦上看）：圖縮在左邊、看起來歪；柱狀圖要有 Y 軸（軸上寫這是什麼、標量），下面那一坨小字不用。
+   所以圖照**這一頁內容欄的寬度 1:1 出圖**（`chartWidth`；手機約 340、電腦最多 880），柱狀圖一律用 `barChart`（Y 軸＋刻度＋最新一期）。
+   放哪一塊照 page_schema：B2 需求傳導＝錨與吃到多少、B3 營收從哪來＝營收、B6 怎麼被定價＝參考尺與走勢。
+   SVG 元素用資產配置那一段既有的 `svgEl`／`SVG_NS`（同一份，不另寫）。座標換算只住這一段（同 `pct()`／`meter()` 的寫法）。 */
 
 function tqLine(view, suffix) {
   const panel = view && view.three_questions;
@@ -1496,6 +1548,77 @@ function fmtMultiple(v) {
   return fmtNumber(v, v >= 100 ? 0 : v >= 10 ? 1 : 2);
 }
 
+/** 圖的寬（px）＝這一頁內容欄的寬，1:1 出圖：手機約 340、電腦最多 880（再寬字就太散）。 */
+function chartWidth() {
+  const w = (app && app.clientWidth) || 360;
+  return Math.max(300, Math.min(880, w - 56));
+}
+
+/** 估字寬（11px：中文一個字寬、其他約 0.6 個）——只拿來決定標籤放哪一列，真的有沒有疊字由 selfcheck 量。 */
+function labelWidth(s, size) {
+  const px = size || 11;
+  return Array.from(String(s)).reduce((w, ch) => w + (ch.charCodeAt(0) >= 0x2000 ? px : px * 3 / 5), 0);
+}
+
+/** 柱狀圖的量級：最大值 ≥ 1 億就用「億」，≥ 1 萬用「萬」，否則原單位（台幣、美元、日圓都適用）。 */
+function scaleFor(maxAmount) {
+  if (maxAmount >= 1e8) return { divisor: 1e8, word: '億' };
+  if (maxAmount >= 1e4) return { divisor: 1e4, word: '萬' };
+  return { divisor: 1, word: '' };
+}
+
+/** 好讀的刻度：0 到最大值之間 3 到 4 格，每格是 1、2、2.5、5 乘 10 的次方。 */
+function niceTicks(maxShown) {
+  const raw = maxShown / 3;
+  const exponent = Math.floor(Math.log10(raw));
+  const base = 10 ** exponent;
+  const f = raw / base;
+  const step = (f <= 1 ? 1 : f <= 2 ? 2 : f <= 2.5 ? 2.5 : f <= 5 ? 5 : 10) * base;
+  const ticks = [0];
+  while (ticks[ticks.length - 1] < maxShown) ticks.push(ticks[ticks.length - 1] + step);
+  return { ticks, step };
+}
+
+/** 正規柱狀圖：左上是 Y 軸的名字（這條序列是什麼、單位），左邊刻度，下面首尾期別，最新一期頭上寫數字（與年增）。
+ *  `items`：[{period, amount（原單位）}]；`unit`：幣別字（美元、元台幣）；`latest`：最新一期頭上的字。只做座標換算，值照抄。 */
+function barChart({ items, title, unit, latest, klass }) {
+  const W = chartWidth();
+  const maxAmount = Math.max(...items.map((it) => it.amount));
+  if (!(maxAmount > 0)) return null;
+  const scale = scaleFor(maxAmount);
+  const shown = (amount) => amount / scale.divisor;
+  const { ticks, step } = niceTicks(shown(maxAmount));
+  const topTick = ticks[ticks.length - 1];
+  const left = 52, right = W - 8, top = 40, bottom = 150;
+  const y = (v) => bottom - (v / topTick) * (bottom - top);
+  const slot = (right - left) / items.length;
+  const gap = Math.max(3, Math.round(slot / 4));
+  const svg = svgEl('svg', { viewBox: `0 0 ${W} ${bottom + 24}`, class: 'chart chart-bars', role: 'img', 'aria-label': title });
+  svg.appendChild(svgEl('text', { x: 4, y: 14, class: 'chart-axis-title' }, `${title}（${scale.word}${unit}）`));
+  ticks.forEach((t) => {
+    svg.appendChild(svgEl('line', { x1: left, y1: y(t), x2: right, y2: y(t), class: t === 0 ? 'chart-axis' : 'chart-grid' }));
+    svg.appendChild(svgEl('text', { x: left - 6, y: y(t) + 4, 'text-anchor': 'end', class: 'chart-tick' },
+      fmtNumber(t, step < 1 ? 1 : 0)));
+  });
+  items.forEach((it, i) => {
+    const top_ = y(shown(it.amount));
+    svg.appendChild(svgEl('rect', { x: left + slot * i + gap / 2, y: top_, width: Math.max(2, slot - gap),
+      height: Math.max(1, bottom - top_), rx: 1.5, class: klass || 'bar bar-pos' }));
+  });
+  const last = items[items.length - 1];
+  const lastX = left + slot * (items.length - 0.5);
+  if (latest) {
+    const w = labelWidth(latest, 12);
+    const x0 = Math.max(left, Math.min(right - w, lastX - w / 2));
+    svg.appendChild(svgEl('text', { x: x0, y: Math.max(32, y(shown(last.amount)) - 6), class: 'chart-label chart-label-strong' }, latest));
+  }
+  svg.appendChild(svgEl('text', { x: left, y: bottom + 17, 'text-anchor': 'start', class: 'chart-label' }, items[0].period));
+  svg.appendChild(svgEl('text', { x: right, y: bottom + 17, 'text-anchor': 'end', class: 'chart-label' }, last.period));
+  const wrap = el('div', 'chart-wrap');
+  wrap.appendChild(svg);
+  return wrap;
+}
+
 function blockVisuals(payload, view, key) {
   const out = [];
   if (key === 'B2') {
@@ -1503,40 +1626,20 @@ function blockVisuals(payload, view, key) {
     const capture = captureFigure(payload);
     if (capture) out.push(capture);
   }
-  if (key === 'B4') (payload.diagrams || []).forEach((d) => out.push(diagramFigure(d)));
+  if (key === 'B3') { const n = revenueBars(view); if (n) out.push(n); }
+  if (key === 'B4') {
+    // 標出它坐的層：讀圖面板的「坐的節點」（與讀圖、是不是新賭注同一份 seats）
+    const seats = ((view.readings || {}).context || {}).seats || Object.keys(payload.node_names || {});
+    (payload.diagrams || []).forEach((d) => out.push(diagramFigure(d, seats, payload.ticker)));
+  }
   if (key === 'B6') { const n = rulerChart(view); if (n) out.push(n); out.push(priceFigure(payload)); }
-  if (key === 'B7') { const n = revenueBars(view); if (n) out.push(n); }
   return out;
 }
 
-/** 技術示意圖（B4 與層說明頁共用）：研究 session 畫的 SVG，materialize 檢查過才嵌、編成 data URI；
- *  用 <img> 顯示（SVG 在 img 裡不執行任何東西）。規則 6：標「示意」、附出處——出處摺起來，第一眼只看圖。 */
-function diagramFigure(d) {
-  const box = el('div', 'diagram');
-  box.appendChild(el('div', 'diagram-title', d.title || '示意圖'));
-  const img = document.createElement('img');
-  img.className = 'diagram-img';
-  img.src = d.src;
-  img.alt = `示意圖：${d.title || ''}`;
-  img.loading = 'lazy';
-  box.appendChild(img);
-  // 「圖上：…」是畫圖那天圖上的供應商——日期跟著印，之後新入圖的不會自己出現在圖裡
-  box.appendChild(el('div', 'chart-legend', `示意｜${d.caption || ''}${d.drawn_at ? `｜${d.drawn_at} 畫` : ''}`));
-  const sources = d.sources || [];
-  if (sources.length) {
-    box.appendChild(drill(`出處 ${sources.length} 份`, () => {
-      const list = el('div', 'ss-cells');
-      sources.forEach((s) => list.appendChild(el('div', 'attention-body', `${s.what || ''}　${s.ref || ''}`)));
-      return list;
-    }));
-  }
-  return box;
-}
-
-/** 參考尺（B6）：今天的倍數落在自家近三年的哪裡。第一列＝自家三年最低到最高的範圍、中位、今天；同組中位只在同口徑時
- *  畫在第二列（同一把對數刻度——倍數常跨兩個數量級，例：AXTI 三年 P/S 0.53 → 96，線性尺會把中位擠到邊上）。
- *  2026-10-08 使用者看不懂舊版（「最高」貼在圖的右緣、剛好落在同組中位的菱形底下，看起來像最高在菱形那裡；中位那條線沒字）：
- *  每個記號旁邊直接寫它是什麼、標籤貼著自己的位置；會撞在一起就換一列放（字不准重疊——規則 9，selfcheck 量）。 */
+/** 參考尺（B6）：今天的倍數落在自家近三年的哪裡。**全部在同一條對數刻度的線上**（2026-10-08 使用者：同組中位要在線上、
+ *  最高最低也要有線）：細線是整把尺、粗的一段是自家三年的範圍（兩端有刻度線）、中位一條刻度線、今天一個點、同組中位一個菱形
+ *  （只在同口徑時畫）。每個記號旁邊直接寫它是什麼；標籤會撞在一起就換一列放（字不准重疊——規則 9）。
+ *  對數刻度——倍數常跨兩個數量級（例：AXTI 三年 P/S 0.53 → 96），線性尺會把中位擠到邊上。 */
 const RULER_BASIS = { 'P/S': '股價營收比（P/S）', 'EV/S': '企業價值營收比（EV/S）' };
 
 function rulerChart(view) {
@@ -1550,130 +1653,84 @@ function rulerChart(view) {
   const cd = cohortLine && cohortLine.datum;
   const cohort = cd && cd.status === 'available' && typeof cd.value === 'number' && cd.value > 0
     && (cd.dependencies || {}).basis === dep.basis ? cd : null;
-  const values = [det.min, det.max, det.median, det.multiple_today].concat(cohort ? [cohort.value] : []);
-  const lo = Math.min(...values) / 1.15;
-  const hi = Math.max(...values) * 1.15;
-  const L = 10, R = 310, Y = 30;
+  const marks = [det.min, det.max, det.median, det.multiple_today].concat(cohort ? [cohort.value] : []);
+  const lo = Math.min(...marks) / 1.15;
+  const hi = Math.max(...marks) * 1.15;
+  const W = chartWidth();
+  const L = 16, R = W - 16, Y = 40;
   const x = (v) => L + (Math.log(v) - Math.log(lo)) / (Math.log(hi) - Math.log(lo)) * (R - L);
-  // 標籤排版：估字寬（中文 11px、其他 6.5px），三列（範圍上方、下方、再下方）依序找第一個放得下、不撞的位置。
-  const rows = { above: Y - 12, below: Y + 21, below2: Y + 36 };
+  const rows = { above: Y - 16, below: Y + 26, below2: Y + 43 };
   const placed = { above: [], below: [], below2: [] };
-  const textWidth = (s) => Array.from(s).reduce((w, ch) => w + (ch.charCodeAt(0) >= 0x2000 ? 11 : 6.5), 0);
   const labels = [];
-  const place = (text, at, align, prefer, strong) => {
-    const w = textWidth(text);
-    let x0 = align === 'start' ? at : align === 'end' ? at - w : at - w / 2;
-    x0 = Math.max(L - 6, Math.min(R + 6 - w, x0));
-    const row = prefer.find((name) => placed[name].every(([a, b]) => x0 + w + 6 <= a || b + 6 <= x0)) || prefer[prefer.length - 1];
+  const place = (text, at, prefer, strong) => {
+    const w = labelWidth(text, strong ? 12 : 11);
+    const x0 = Math.max(2, Math.min(W - 2 - w, at - w / 2));
+    const row = prefer.find((name) => placed[name].every(([a, b]) => x0 + w + 8 <= a || b + 8 <= x0)) || prefer[prefer.length - 1];
     placed[row].push([x0, x0 + w]);
     labels.push({ text, x: x0, y: rows[row], strong });
   };
   const tx = x(det.multiple_today);
-  place(`今天 ${fmtMultiple(det.multiple_today)}`, tx, 'middle', ['above', 'below2'], true);
-  place(`最低 ${fmtMultiple(det.min)}`, x(det.min) - 4, 'start', ['below', 'below2']);
-  place(`最高 ${fmtMultiple(det.max)}`, x(det.max) + 4, 'end', ['below', 'below2']);
-  place(`中位 ${fmtMultiple(det.median)}`, x(det.median), 'middle', ['below', 'above', 'below2']);
-  const used = placed.below2.length ? rows.below2 : rows.below;
-  const Y2 = used + 22;
-  const height = cohort ? Y2 + 18 : used + 8;
-  const svg = svgEl('svg', { viewBox: `0 0 320 ${height}`, class: 'chart chart-ruler', role: 'img',
+  place(`今天 ${fmtMultiple(det.multiple_today)}`, tx, ['above', 'below2'], true);
+  place(`最低 ${fmtMultiple(det.min)}`, x(det.min), ['below', 'below2']);
+  place(`最高 ${fmtMultiple(det.max)}`, x(det.max), ['below', 'below2']);
+  place(`中位 ${fmtMultiple(det.median)}`, x(det.median), ['below', 'above', 'below2']);
+  if (cohort) place(`同組中位 ${fmtMultiple(cohort.value)}`, x(cohort.value), ['above', 'below', 'below2']);
+  const height = placed.below2.length ? rows.below2 + 8 : rows.below + 8;
+  const svg = svgEl('svg', { viewBox: `0 0 ${W} ${height}`, class: 'chart chart-ruler', role: 'img',
     'aria-label': `今天的 ${basis} 在自家三年的位置` });
+  svg.appendChild(svgEl('line', { x1: L, y1: Y, x2: R, y2: Y, class: 'ruler-axis' }));
   svg.appendChild(svgEl('line', { x1: x(det.min), y1: Y, x2: x(det.max), y2: Y, class: 'ruler-range' }));
-  svg.appendChild(svgEl('line', { x1: x(det.median), y1: Y - 8, x2: x(det.median), y2: Y + 8, class: 'ruler-median' }));
-  svg.appendChild(svgEl('circle', { cx: tx, cy: Y, r: 5.5, class: 'ruler-today' }));
-  labels.forEach((lab) => svg.appendChild(svgEl('text', { x: lab.x, y: lab.y, 'text-anchor': 'start',
-    class: lab.strong ? 'chart-label chart-label-strong' : 'chart-label' }, lab.text)));
+  [det.min, det.max].forEach((v) => svg.appendChild(svgEl('line', { x1: x(v), y1: Y - 10, x2: x(v), y2: Y + 10, class: 'ruler-end' })));
+  svg.appendChild(svgEl('line', { x1: x(det.median), y1: Y - 10, x2: x(det.median), y2: Y + 10, class: 'ruler-median' }));
   if (cohort) {
     const cx = x(cohort.value);
-    svg.appendChild(svgEl('line', { x1: L, y1: Y2, x2: R, y2: Y2, class: 'ruler-cohort-line' }));
-    svg.appendChild(svgEl('path', { d: `M${cx} ${Y2 - 7}L${cx + 6} ${Y2}L${cx} ${Y2 + 7}L${cx - 6} ${Y2}Z`, class: 'ruler-cohort' }));
-    const text = `同組中位 ${fmtMultiple(cohort.value)}`;
-    const right = cx + 12 + textWidth(text) <= R + 6;
-    svg.appendChild(svgEl('text', { x: right ? cx + 12 : cx - 12, y: Y2 + 4, 'text-anchor': right ? 'start' : 'end',
-      class: 'chart-label' }, text));
+    svg.appendChild(svgEl('path', { d: `M${cx} ${Y - 8}L${cx + 7} ${Y}L${cx} ${Y + 8}L${cx - 7} ${Y}Z`, class: 'ruler-cohort' }));
   }
+  svg.appendChild(svgEl('circle', { cx: tx, cy: Y, r: 6, class: 'ruler-today' }));
+  labels.forEach((lab) => svg.appendChild(svgEl('text', { x: lab.x, y: lab.y,
+    class: lab.strong ? 'chart-label chart-label-strong' : 'chart-label' }, lab.text)));
   const wrap = el('div', 'chart-wrap');
   wrap.appendChild(svg);
-  const legend = [`今天 ${fmtMultiple(det.multiple_today)} 倍＝自家近三年第 ${fmtNumber(d.value, 0)} 百分位：`
-    + `三年裡約 ${fmtNumber(d.value, 0)}% 的交易日倍數比今天低。`];
-  if (cohort) {
-    const cdet = (cohort.dependencies || {}).detail || {};
-    legend.push(`同組＝${cdet.theme || '主題等權組'}（同口徑 ${cdet.n_same_basis || '?'} 檔，共 ${cdet.n_members || '?'} 檔），只當脈絡。`);
-  } else {
-    legend.push('同組中位：沒有同口徑的主題等權組。');
-  }
-  const window_ = det.window_start && det.window_end
-    ? `，${String(det.window_start).slice(0, 7)} → ${String(det.window_end).slice(0, 7)}` : '';
-  legend.push(`倍數＝${RULER_BASIS[basis] || basis}；刻度是對數（等距＝等倍數）${window_}。`);
-  legend.forEach((text) => wrap.appendChild(el('div', 'chart-legend', text)));
+  const cdet = cohort ? ((cohort.dependencies || {}).detail || {}) : {};
+  wrap.appendChild(el('div', 'chart-legend', `今天 ${fmtMultiple(det.multiple_today)} 倍＝自家近三年第 ${fmtNumber(d.value, 0)} 百分位`
+    + `（三年裡約 ${fmtNumber(d.value, 0)}% 的交易日倍數比今天低）。倍數＝${RULER_BASIS[basis] || basis}，對數刻度`
+    + (cohort ? `；同組＝${cdet.theme || '主題等權組'}（同口徑 ${cdet.n_same_basis || '?'} 檔），只當脈絡。` : '；沒有同口徑的主題等權組。')));
   return wrap;
 }
 
-/** 營收柱狀：最近 12 期（台股月營收、EDGAR 季營收照抄三題③的序列）；柱高＝營收、顏色＝年增正負。
- *  圖上只標最新一期的年增與首尾兩期的期別，其餘寫在圖下（避免字疊字）。 */
+/** 營收（B3 營收從哪來，2026-10-08 使用者：營收放在一起看）：最近 12 期（台股月營收、EDGAR 季營收照抄三題③的序列），
+ *  最新一期頭上寫年增。幣別由序列自己帶（`alpha.three_questions._series_currency`），混幣別就不畫（不換算）。 */
 function revenueBars(view) {
   const line = tqLine(view, ':in_numbers_series');
   const d = line && line.datum;
   if (!d || d.status !== 'available' || !Array.isArray(d.value) || d.value.length < 2) return null;
-  const pts = d.value.slice(-12).map((p) => ({
-    label: p.data_month || String(p.period_end || '').slice(0, 7),
-    value: typeof p.revenue_twd_thousand === 'number' ? p.revenue_twd_thousand * 1000 : p.value,
+  const det = (d.dependencies && d.dependencies.detail) || {};
+  if (!det.currency) {
+    return el('div', 'row-reason', Array.isArray(det.currencies) && det.currencies.length
+      ? `營收序列的幣別混在一起（${det.currencies.join('／')}）——不畫成一張圖` : '營收序列沒標幣別——不畫');
+  }
+  const items = d.value.slice(-12).map((p) => ({
+    period: p.data_month || String(p.period_end || '').slice(0, 7),
+    amount: typeof p.revenue_twd_thousand === 'number' ? p.revenue_twd_thousand * 1000 : p.value,
     yoy: typeof p.yoy === 'number' ? p.yoy : null,
   }));
-  if (pts.some((p) => typeof p.value !== 'number' || !isFinite(p.value))) return null;
-  const max = Math.max(...pts.map((p) => p.value));
-  if (!(max > 0)) return null;
-  const top = 18, bottom = 92, L = 6, R = 314;
-  const step = (R - L) / pts.length;
-  const barW = Math.max(4, step - 9);   // 柱寬＝每格寬減固定間距（8 季約 30px、12 個月約 17px）
-  // 座標換算（同資產配置那段的 pct()／meter()）：營收 → 柱高 px，不是任何財務算術。
-  const barHeight = (amount) => Math.max(1, (amount / max) * (bottom - top));
-  const svg = svgEl('svg', { viewBox: '0 0 320 112', class: 'chart chart-bars', role: 'img', 'aria-label': '營收與年增' });
-  svg.appendChild(svgEl('line', { x1: L, y1: bottom, x2: R, y2: bottom, class: 'chart-axis' }));
-  pts.forEach((p, i) => {
-    const h = barHeight(p.value);
-    const cx = L + step * (i + 0.5);
-    const klass = p.yoy == null ? 'bar' : p.yoy >= 0 ? 'bar bar-pos' : 'bar bar-neg';
-    svg.appendChild(svgEl('rect', { x: cx - barW / 2, y: bottom - h, width: barW, height: h, rx: 1.5, class: klass }));
-    if (i === pts.length - 1 && p.yoy != null) {
-      svg.appendChild(svgEl('text', { x: Math.min(R, cx + barW / 2), y: Math.max(11, bottom - h - 5), 'text-anchor': 'end',
-        class: 'chart-label chart-label-strong' }, `年增 ${fmtPercent(p.yoy)}`));
-    }
-  });
-  svg.appendChild(svgEl('text', { x: L, y: bottom + 15, 'text-anchor': 'start', class: 'chart-label' }, pts[0].label));
-  svg.appendChild(svgEl('text', { x: R, y: bottom + 15, 'text-anchor': 'end', class: 'chart-label' }, pts[pts.length - 1].label));
-  const wrap = el('div', 'chart-wrap');
-  wrap.appendChild(svg);
-  const recent = pts.slice(-3).map((p) => `${p.label} ${p.yoy == null ? '—' : fmtPercent(p.yoy)}`).join('、');
-  const last = pts[pts.length - 1];
-  const det = (d.dependencies && d.dependencies.detail) || {};   // 幣別由序列自己帶（三題③），這裡只翻成中文
-  const ccy = det.currency ? (CURRENCY_WORD[det.currency] || det.currency)
-    : (Array.isArray(det.currencies) && det.currencies.length ? `（幣別混合：${det.currencies.join('／')}）` : '（幣別未標）');
-  const big = fmtBig(last.value) || '—';
-  // 「20.5 億」後面直接接「美元」，不留空格；數字結尾（例 9,800）才隔一格
-  const amount = `${big}${/[億萬]$/.test(big) || ccy.startsWith('元') || ccy.startsWith('（') ? '' : ' '}${ccy}`;
-  const legend = [`柱高＝營收（最新一期 ${amount}）`, `顏色＝年增正負（最近三期：${recent}）`];
-  if (d.dependencies && d.dependencies.basis) legend.push(`來源：${d.dependencies.basis}`);
-  wrap.appendChild(el('div', 'chart-legend', legend.join('　')));
-  return wrap;
+  if (items.some((it) => typeof it.amount !== 'number' || !isFinite(it.amount))) return null;
+  const last = items[items.length - 1];
+  const monthly = typeof d.value[0].data_month === 'string';      // 台股月營收的點帶 data_month；EDGAR 的帶 period_end
+  return barChart({ items, title: monthly ? '每月營收' : '每季營收', unit: CURRENCY_WORD[det.currency] || det.currency,
+    latest: last.yoy == null ? null : `年增 ${fmtPercent(last.yoy)}` });
 }
 
-/** 需求錨（B2「錨的變化」，個股頁 S3a）：這家公司在結構表走到的錨對到的 A2 序列——每條一張柱狀圖（最近 12 期、
- *  最新一期標年增），圖下寫最新一期、可知日、哪幾家是推算、它是代理。全部照抄 materialize 的 `demand_anchor`（不加總、不換算）；
- *  沒有就照寫原因（走不到錨／題材沒宣告序列／這一輪沒讀到——三種不同）。 */
+/** 需求錨（B2「錨的變化」，個股頁 S3a）：這家公司在結構表走到的錨對到的 A2 序列——每條一張柱狀圖（Y 軸寫它是什麼、
+ *  最新一期頭上寫量與年增）。可知日、哪幾家推算、代理說明、走到哪個錨，放進這一塊的「細節」（`chainDetail`），圖下不放字。
+ *  全部照抄 materialize 的 `demand_anchor`（不加總、不換算）；沒有就照寫原因（走不到錨／題材沒宣告序列／這一輪沒讀到）。 */
 function anchorFigures(payload) {
   const demand = payload.demand_anchor;
   if (!demand) return [];
-  const out = [];
-  const anchors = demand.anchors || [];
-  if (anchors.length) {
-    out.push(el('div', 'row-reason', '它走到的需求錨：' + anchors.map((a) => `${a.name || a.node}`
-      + (a.basis === 'company' ? '（退回公司層才走到）' : '')).join('、')));
-  }
   if (demand.absence) {
-    out.push(el('div', 'row-reason ss-pending', `錨的變化：${demand.absence.reason || absenceLabel(demand.absence.kind) || '沒有'}`));
-    return out;
+    return [el('div', 'row-reason ss-pending', `錨的變化：${demand.absence.reason || absenceLabel(demand.absence.kind) || '沒有'}`)];
   }
+  const out = [];
   (demand.series || []).forEach((s) => { const fig = anchorBars(s); if (fig) out.push(fig); });
   return out;
 }
@@ -1683,45 +1740,19 @@ function anchorBars(s) {
     return el('div', 'row-reason ss-pending', `${s.label || s.key}：${(s.absence && s.absence.reason) || '沒有值'}`);
   }
   const pts = s.points.slice(-12);
-  const max = Math.max(...pts.map((p) => p.value));
-  if (!(max > 0)) return null;
-  const top = 18, bottom = 92, L = 6, R = 314;
-  const step = (R - L) / pts.length;
-  const barW = Math.max(4, step - 9);
-  // 座標換算（同資產配置那段的 pct()／meter()）：錨的值 → 柱高 px，不是任何財務算術。
-  const barHeight = (amount) => Math.max(1, (amount / max) * (bottom - top));
-  const svg = svgEl('svg', { viewBox: '0 0 320 112', class: 'chart chart-bars', role: 'img', 'aria-label': s.label || '需求錨' });
-  svg.appendChild(svgEl('line', { x1: L, y1: bottom, x2: R, y2: bottom, class: 'chart-axis' }));
-  pts.forEach((p, i) => {
-    const h = barHeight(p.value);
-    const cx = L + step * (i + 0.5);
-    const klass = p.yoy == null ? 'bar' : p.yoy >= 0 ? 'bar bar-pos' : 'bar bar-neg';
-    svg.appendChild(svgEl('rect', { x: cx - barW / 2, y: bottom - h, width: barW, height: h, rx: 1.5, class: klass }));
-    if (i === pts.length - 1 && p.yoy != null) {
-      svg.appendChild(svgEl('text', { x: Math.min(R, cx + barW / 2), y: Math.max(11, bottom - h - 5), 'text-anchor': 'end',
-        class: 'chart-label chart-label-strong' }, `年增 ${fmtPercent(p.yoy)}`));
-    }
-  });
-  svg.appendChild(svgEl('text', { x: L, y: bottom + 15, 'text-anchor': 'start', class: 'chart-label' }, pts[0].period));
-  svg.appendChild(svgEl('text', { x: R, y: bottom + 15, 'text-anchor': 'end', class: 'chart-label' }, pts[pts.length - 1].period));
-  const wrap = el('div', 'chart-wrap');
-  wrap.appendChild(svg);
-  const last = pts[pts.length - 1];
-  const big = fmtBig(last.value) || '—';
-  const ccy = CURRENCY_WORD[s.currency] || s.currency || '';
   const who = (s.components || []).map((c) => c.ticker).join('、');
-  wrap.appendChild(el('div', 'chart-legend', `${s.label}${who && s.aggregation !== 'single' ? `（${who}）` : ''}：`
-    + `最新一期 ${last.period} ${big}${/[億萬]$/.test(big) ? '' : ' '}${ccy}`
-    + (last.yoy != null ? `，年增 ${fmtPercent(last.yoy)}` : '')
-    + `；${last.known_on} 起${s.aggregation === 'single' ? '申報' : '每一家都申報了'}`
-    + ((last.derived || []).length && s.aggregation !== 'single' ? `（${last.derived.join('、')} 由年初累計差分推算）` : '')
-    + '。'));
-  if (s.proxy) wrap.appendChild(el('div', 'chart-legend', s.proxy));
-  return wrap;
+  const items = pts.map((p) => ({ period: p.period, amount: p.value }));
+  const lastAmount = items[items.length - 1].amount;
+  const lastYoy = pts[pts.length - 1].yoy;
+  const scale = scaleFor(Math.max(...items.map((it) => it.amount)));
+  const latest = `${fmtNumber(lastAmount / scale.divisor, 0)}${lastYoy != null ? `（年增 ${fmtPercent(lastYoy)}）` : ''}`;
+  return barChart({ items,
+    title: s.aggregation === 'single' ? `${s.label}（會計季）` : `${s.label}${who ? `：${who}` : ''}`,
+    unit: CURRENCY_WORD[s.currency] || s.currency || '', latest });
 }
 
 /** 吃到多少（B2，個股頁 S3b）：每 10 億美元的錨對應它多少美元營收——往上＝吃到的比例變大。全部照抄 materialize 的 `capture`
- *  （季營收、換匯的季均價、比值都在 `alpha.capture` 算好）；沒有就照寫原因（沒有加總型的錨／沒有季營收／會計季對不上曆季）。 */
+ *  （季營收、換匯的季均價、比值都在 `alpha.capture` 算好）；換匯與可知日放進這一塊的「細節」。沒有就照寫原因。 */
 function captureFigure(payload) {
   const cap = payload.capture;
   if (!cap) return null;
@@ -1729,32 +1760,54 @@ function captureFigure(payload) {
     return el('div', 'row-reason ss-pending', `吃到多少：${(cap.absence && cap.absence.reason) || '沒有值'}`);
   }
   const pts = cap.points.slice(-12);
-  const max = Math.max(...pts.map((p) => p.per_billion));
-  if (!(max > 0)) return null;
-  const top = 18, bottom = 92, L = 6, R = 314;
-  const step = (R - L) / pts.length;
-  const barW = Math.max(4, step - 9);
-  // 座標換算（同資產配置那段的 pct()／meter()）：比值 → 柱高 px，不是任何財務算術。
-  const barHeight = (amount) => Math.max(1, (amount / max) * (bottom - top));
-  const svg = svgEl('svg', { viewBox: '0 0 320 112', class: 'chart chart-bars', role: 'img', 'aria-label': '吃到多少' });
-  svg.appendChild(svgEl('line', { x1: L, y1: bottom, x2: R, y2: bottom, class: 'chart-axis' }));
-  pts.forEach((p, i) => {
-    const h = barHeight(p.per_billion);
-    const cx = L + step * (i + 0.5);
-    svg.appendChild(svgEl('rect', { x: cx - barW / 2, y: bottom - h, width: barW, height: h, rx: 1.5, class: 'bar bar-capture' }));
-  });
-  svg.appendChild(svgEl('text', { x: L, y: bottom + 15, 'text-anchor': 'start', class: 'chart-label' }, pts[0].period));
-  svg.appendChild(svgEl('text', { x: R, y: bottom + 15, 'text-anchor': 'end', class: 'chart-label' }, pts[pts.length - 1].period));
-  const wrap = el('div', 'chart-wrap');
-  wrap.appendChild(svg);
   const last = pts[pts.length - 1];
-  const big = fmtBig(last.per_billion) || '—';
-  wrap.appendChild(el('div', 'chart-legend', `吃到多少：${last.period} 每 10 億美元的${cap.anchor_label || '錨'}，對應它 `
-    + `${big}${/[億萬]$/.test(big) ? '' : ' '}美元營收；往上＝吃到的比例變大。`));
-  wrap.appendChild(el('div', 'chart-legend', `營收：${cap.revenue_source || '—'}`
-    + (last.per_usd ? `；換美元用季均價（FRED H.10，${last.period} 一美元 ${fmtNumber(last.per_usd, 2)} ${CURRENCY_WORD[last.currency] || last.currency}）` : '')
-    + `；${last.known_on} 起三者都齊。`));
-  return wrap;
+  const scale = scaleFor(Math.max(...pts.map((p) => p.per_billion)));
+  return barChart({ items: pts.map((p) => ({ period: p.period, amount: p.per_billion })),
+    title: '吃到多少：每 10 億美元雲端資本支出對應它的營收', unit: '美元',
+    latest: fmtNumber(last.per_billion / scale.divisor, 1), klass: 'bar bar-capture' });
+}
+
+/** 技術示意圖（B4 與層說明頁共用）：研究 session 畫的 SVG，materialize 檢查過才嵌、編成 data URI；用 <img> 顯示
+ *  （SVG 在 img 裡不執行任何東西）。規則 6：標「示意」、附出處——出處摺起來，第一眼只看圖。
+ *  `mine`＝這一頁要標出來的節點（個股頁：它坐的層；閱讀頁：那一層）。2026-10-08 使用者：「我想知道它出現在示意圖的哪一個地方」
+ *  ——圖的每一格帶它畫的是哪幾個節點與位置（`d.boxes`，畫圖工具量的），坐的那幾格疊一個框、寫「在這裡」；圖上方一句話列出是哪幾格。
+ *  框只是疊在圖片上的位置換算（同 pct() 的寫法），不改圖本身。 */
+function diagramFigure(d, mine, who) {
+  const box = el('div', 'diagram');
+  box.appendChild(el('div', 'diagram-title', d.title || '示意圖'));
+  const want = new Set(mine || []);
+  const hits = (d.boxes || []).filter((b) => (b.nodes || []).some((n) => want.has(n)));
+  if (hits.length && who) box.appendChild(el('div', 'diagram-where', `${who} 在這張圖的：${hits.map((b) => b.title).join('、')}`));
+  const frame = el('div', 'diagram-frame');
+  const img = document.createElement('img');
+  img.className = 'diagram-img';
+  img.src = d.src;
+  img.alt = `示意圖：${d.title || ''}`;
+  img.loading = 'lazy';
+  frame.appendChild(img);
+  if (d.height > 0 && d.width > 0) {
+    hits.forEach((b) => {
+      const mark = el('div', 'diagram-mark');
+      mark.style.top = `${(b.top / d.height) * 100}%`;
+      mark.style.height = `${(b.height / d.height) * 100}%`;
+      mark.style.left = `${(b.left / d.width) * 100}%`;
+      mark.style.width = `${(b.span / d.width) * 100}%`;
+      if (who) mark.appendChild(el('span', 'diagram-mark-tag', `${who} 在這裡`));
+      frame.appendChild(mark);
+    });
+  }
+  box.appendChild(frame);
+  // 「圖上：…」是畫圖那天圖上的供應商——日期跟著印，之後新入圖的不會自己出現在圖裡
+  box.appendChild(el('div', 'chart-legend', `示意｜${d.caption || ''}${d.drawn_at ? `｜${d.drawn_at} 畫` : ''}`));
+  const sources = d.sources || [];
+  if (sources.length) {
+    box.appendChild(drill(`出處 ${sources.length} 份`, () => {
+      const list = el('div', 'ss-cells');
+      sources.forEach((s) => list.appendChild(el('div', 'attention-body', `${s.what || ''}　${s.ref || ''}`)));
+      return list;
+    }));
+  }
+  return box;
 }
 
 function fmtMoney(value, currency) {
@@ -3423,7 +3476,7 @@ async function renderLayerNote(node) {
   // 技術示意圖（2026-10-08，個股頁 S5b）：這一層在整條鏈的哪裡、光／電／熱怎麼走——放正文之前。
   (row.diagrams || []).forEach((d) => {
     const sec = el('section', 'panel layer-section');
-    sec.appendChild(diagramFigure(d));
+    sec.appendChild(diagramFigure(d, [row.node], '這一層'));
     app.appendChild(sec);
   });
 

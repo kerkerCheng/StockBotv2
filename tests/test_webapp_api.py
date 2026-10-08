@@ -335,7 +335,7 @@ def test_single_stock_page_is_the_header_and_the_thirteen_blocks_only(client) ->
         assert f"function {gone}(" not in source, f"{gone} 應已拿掉"
     # 人讀的內容搬進對應的塊（論證、坐的層、反證、時間表、三題的數字與出處）
     detail = source.split("function blockDetail", 1)[1].split("\nfunction ", 1)[0]
-    for owner in ("chainDetail(view)", "seatsDetail(payload, view)", "'priced_in'", "'in_numbers'", "downsideDetail(view)",
+    for owner in ("chainDetail(payload, view)", "seatsDetail(payload, view)", "'priced_in'", "'in_numbers'", "downsideDetail(view)",
                   "'will_it_die'", "timelineDetail(view)"):
         assert owner in detail, f"塊的展開少了 {owner}"
     # 走勢圖住在「怎麼被定價」那一塊（脈絡不是訊號）；首屏卡片不再自己掛走勢

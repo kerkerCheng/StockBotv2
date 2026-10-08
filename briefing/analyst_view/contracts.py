@@ -290,6 +290,15 @@ PLAIN_PRICED_IN = (
     "這一格分不分得出贏家還在量。"
 )
 
+#: 「會不會死」四盞燈的白話（2026-10-08 使用者：「這四個燈號到底代表什麼，稀釋是啥、going concern 是什麼」）。
+#: **只有這一份**——materialize 寫進 `.meta.json`，APP 照抄在四盞燈上面（L16）。燈名用 page_schema 的 B9 白話問句。
+PLAIN_WIPEOUT = (
+    "會不會死＝四種會讓公司直接歸零的情況，各一盞燈：錢夠不夠用（在燒錢的話，現金撐不撐得過一年）、"
+    "怕不怕還債（欠的比手上的現金多、本業又在燒錢）、會不會一直增資（發新股——股數變多、每股分到的變少，也就是「稀釋」）、"
+    "會計師有沒有警告（查核報告寫「公司能不能繼續經營有重大疑慮」，英文叫 going concern）。"
+    "🔴 已經是這樣　🟡 要留意　🟢 沒事　⬜ 沒量到（不是沒事）。四盞燈不合成一個分數；算出顏色的數字在「數字與出處」。"
+)
+
 #: 個股頁首屏的既有元件（封閉字彙；Phase 7 Step 7.0e）。五題只**重排**它們，不新增判斷、不改任何 Datum：
 #: 三個字（候選面板）、歸零燈（wipeout 面板）、反證列（downside 面板）、加碼條件與「是不是新賭注」（候選狀態那一份）。
 FIRST_SCREEN_PARTS: tuple[str, ...] = (
@@ -644,6 +653,7 @@ __all__ = [
     "PLAIN_LINE_LABELS",
     "PLAIN_PANEL_TITLES",
     "PLAIN_PRICED_IN",
+    "PLAIN_WIPEOUT",
     "PLAIN_READINESS",
     "PRICE_SERIES_NOTE",
     "ACCOUNTING_BASIS_DISPLAY", "AnalystBlocker", "accounting_basis_display",
