@@ -114,6 +114,16 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 `StockBotv2-Daily` 的 ⑱⑲ 取代（1.2a 停用、2026-09-25 1.2b 刪除）；它們的理由（LLM 失敗心跳照發、永遠 exit 0、Python 不用 `.cmd`、
 發送走 subprocess）搬進 `crons/daily_task.py` 的 docstring，守它們的測試改主詞搬進 `tests/test_daily_task.py`「無人值守入口」節。
 
+### Sandbox impact review 結論（2026-10-08：個股頁 S5b 圖表元件與示意圖、S5c 手機量測）
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | daily ⑬ materialize（argv 不變）多讀 `library/private/research_notes/diagrams/` 的 `*.json`、`*.svg`、`*.check.json`（唯讀；目錄不存在＝0 張）與 `library/raw` 的檔案存在檢查；個股頁 payload 多 `diagrams`（data URI）、閱讀頁每層多 `diagrams`、artifact 多 `diagram_rejections`；三題營收序列 line 的 `detail` 多 `currency`。**不寫任何新檔**：量測紀錄只由互動的 `scripts/check_diagrams.py`／`scripts/draw_diagram.py` 寫（要本機 Edge，不進 daily）。不連網、不跑 LLM、不碰任何 authority |
+| **2 canonical skill／prompt／本檔** | 本節；本檔「技術示意圖」三行；`docs/ARCHITECTURE.md` 首屏「圖表元件」與 §6「示意圖」。不動任何 skill、prompt |
+| **3 最窄 rule** | daily argv 不變；不新增 step、allowlist、APP 路由；APP 仍無寫入端點；CSP 不變（原本就是 `img-src 'self' data:`）；`?selfcheck=1` 只在帶參數時在瀏覽器裡量、不連網 |
+| **4 contract test** | `tests/test_webapp_diagrams.py`（會執行或載入外部的 SVG 不嵌、出處與節點必填、**沒量過／圖改過沒重量／字疊字／壓框線／舊版量測／量到 0 段字都不嵌且說為什麼**、量測紀錄不被當成一張圖）；`tests/test_draw_diagram.py`（斷行不拆英文字、避頭避尾、箭頭換行保留空白、最後一行不只剩兩個字、框中框下一行不壓框線）；`tests/test_stock_page_s5b_charts.py`（圖只照抄稽核區的值、selfcheck 只在帶參數時跑且不連網）；變異 5／5 抓到 |
+| **5 端到端 smoke** | 真資料：三張圖 `check_diagrams` 字疊字／出框／壓框線 0（截圖抓到量測當時沒量的壓框線後補量測、重畫）；反向對照四種問題各抓到、量測閘四種情況各擋到；materialize 後個股頁 B4 與閱讀頁拿到圖、`?selfcheck=1&w=390` 溢出 0（見個股頁 plan S5 列） |
+
 ### Sandbox impact review 結論（2026-10-07 下午：向你要文件另一區、提供文件才算 go；①處理數字；分類上限 90／總時限 400；備份上傳重試；雷達搜尋上限照實寫）
 
 | 步 | 結論 |
@@ -949,6 +959,12 @@ materialize 用**，不動 `discover_tracked_tickers`——那會連帶擴大 ED
 # 閱讀頁（2026-10-07 個股頁 plan S4b；APP #/layer-notes、#/layer/<節點>；daily ⑬ 每天重建）——寫完層說明想馬上在 APP 讀到：
 & '.venv\Scripts\python.exe' -m webapp materialize --layer-notes                         # 只重建閱讀頁（全文、出處的文件自宣告、主張狀態、哪幾頁連過來）
 & '.venv\Scripts\python.exe' -m webapp materialize COHR LITE --layer-notes               # 連個股頁「坐的層」的連結一起更新（只重跑點名的那幾檔）
+# 技術示意圖（2026-10-08 個股頁 plan S5b 第二段；私有、住 library/private/research_notes/diagrams/；APP 個股頁 B4 與閱讀頁）
+#   寫 <id>.json（title／caption／nodes_shown／sources 必填，layout.steps 是由上往下的方框與箭頭；「圖上：…」先跑走圖或 query.structure 查供貨邊）
+& '.venv\Scripts\python.exe' scripts\draw_diagram.py optics_ai_link_inp    # 照 layout 畫 SVG、接著量測並寫 <id>.check.json；不合格 exit 1
+& '.venv\Scripts\python.exe' scripts\check_diagrams.py                     # 手寫或改過 SVG 後重量（不給 id 量全部）；字疊字、出框、壓框線三項 0 才嵌
+& '.venv\Scripts\python.exe' -m webapp materialize --layer-notes           # 嵌進閱讀頁；個股頁 B4 跟著下一次 materialize（或點名那幾檔）
+#   沒量過、圖改過沒重量、量測沒過 → 不嵌，理由印在 layer_notes artifact 的 diagram_rejections（需要本機 Edge；量不到就是量不到，不是 0）
 ```
 
 ```jsonc

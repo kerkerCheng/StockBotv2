@@ -26,6 +26,7 @@ from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
+from .diagrams import diagrams_for_nodes, load_diagrams
 from .structure_readings import build_structure_readings_artifact
 from .contracts import (
     ARTIFACT_SCHEMA_VERSION, STATE_SCHEMA_VERSIONS, ArtifactUnavailable, canonical_digest, freshness_identity,
@@ -221,13 +222,15 @@ def _price_context(series: Sequence[Mapping[str, Any]]) -> dict[str, Any] | None
 def materialize_view(analyst_view_dict: Mapping[str, Any], *,
                      generated_at: datetime | None = None,
                      price_series: Sequence[Mapping[str, Any]] | None = None,
-                     page_extra: Mapping[str, Any] | None = None) -> dict[str, Any]:
+                     page_extra: Mapping[str, Any] | None = None,
+                     diagrams: Sequence[Mapping[str, Any]] | None = None) -> dict[str, Any]:
     """`AnalystView.to_dict()` → artifact payload（含遮蔽、overview、兩個 digest）。純函式。
 
     `price_series` 是**脈絡不是判讀**：一條這檔自己的已收盤收盤價序列，讓使用者看得懂
     「現在這個價位在哪」。它不參與任何計算——`freshness_identity` 不含它（價格動了不算認知變了）。
     `page_extra`：個股頁 schema 填得滿表的頁外輸入（`layer_notes`＝引用這一頁的層說明節點）；沒給＝這一輪沒讀到，
     那一格印 `upstream_unavailable`（不是「沒有」）。
+    `diagrams`：涵蓋這一頁坐的層的技術示意圖（`webapp.diagrams`；已檢查過、編成 data URI）——呈現用，不進任何 digest。
     """
     from briefing.analyst_view.page_schema import PAGE_SCHEMA_VERSION, fill_summary, fill_table
 
@@ -255,6 +258,8 @@ def materialize_view(analyst_view_dict: Mapping[str, Any], *,
         # 個股頁 schema 的填得滿表（2026-10-08，個股頁 S2）：每個元素有值或具名缺席，每次 materialize 重算、印在稽核區。
         # 合約（塊、元素、缺席宣告、證據等級對照）在 `.meta.json` 的 `page_schema`，這裡只放這一檔的逐格結果。
         "page_fill": _page_fill(view, page_extra, fill_table, fill_summary, PAGE_SCHEMA_VERSION),
+        # 技術示意圖（2026-10-08，個股頁 S5b）：標「示意」、附出處；研究 session 畫，APP 用 <img> 顯示。
+        "diagrams": [dict(d) for d in (diagrams or ())],
         "materializer": {
             "version": MATERIALIZER_VERSION,
             "python": f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}",
@@ -279,16 +284,29 @@ def _page_fill(view: Mapping[str, Any], extra: Mapping[str, Any] | None, fill_ta
     return {"schema": version, "rows": rows, "summary": fill_summary(rows)}
 
 
-def page_extra_for(ticker: str, layer_notes: Mapping[str, Any] | None) -> dict[str, Any] | None:
-    """個股頁填得滿表的頁外輸入：引用這一頁的層說明節點（`layer_notes` state artifact 的 `cited_by.pages`）。
-    artifact 讀不到 → None（那一格印這一輪沒讀到，不是「沒有」）。"""
+def page_extra_for(ticker: str, layer_notes: Mapping[str, Any] | None,
+                  diagrams: Sequence[Mapping[str, Any]] | None = None) -> dict[str, Any] | None:
+    """個股頁填得滿表的頁外輸入：引用這一頁的層說明節點（`layer_notes` state artifact 的 `cited_by.pages`）、
+    涵蓋這一頁坐的層的示意圖 id（`diagrams`；None＝這一輪沒讀到示意圖目錄）。
+    artifact 讀不到 → 那一個鍵不給（那一格印這一輪沒讀到，不是「沒有」）。"""
+    extra: dict[str, Any] = {}
+    if diagrams is not None:
+        extra["diagrams"] = [str(d.get("id")) for d in diagrams]
     if layer_notes is None:
-        return None
+        return extra or None
     want = str(ticker).upper()
     nodes = [str(row.get("node")) for row in layer_notes.get("rows") or ()
              if any(str(page.get("ticker") or "").upper() == want
                     for page in ((row.get("cited_by") or {}).get("pages") or ()))]
-    return {"layer_notes": nodes}
+    return {**extra, "layer_notes": nodes}
+
+
+def _diagrams_loaded() -> dict[str, Any] | None:
+    """技術示意圖目錄（載入＋檢查一次）；讀不到目錄以外的錯 → None（B4 那一格印這一輪沒讀到）。"""
+    try:
+        return load_diagrams()
+    except Exception:  # noqa: BLE001 — 示意圖是呈現，讀不到不該讓判讀讀不到
+        return None
 
 
 def _layer_notes_state(state_store: Any = None) -> dict[str, Any] | None:
@@ -403,7 +421,8 @@ def materialize(ticker: str, *, as_of: date | None = None, scenario: str | None 
                 generated_at: datetime | None = None,
                 readings: Mapping[str, Any] | None = None,
                 candidates: Mapping[str, Any] | None = None,
-                layer_notes: Mapping[str, Any] | None = None) -> tuple[Path, dict[str, Any]]:
+                layer_notes: Mapping[str, Any] | None = None,
+                diagrams: Mapping[str, Any] | None = None) -> tuple[Path, dict[str, Any]]:
     """跑一次完整鏈並寫下 artifact。**只有這裡會連 Neo4j／Engine C／private ledger。**
 
     `readings`：`readings_context()` 的結果（多檔時由 `materialize_many` 載入一次傳進來）；沒給就自己載一次。
@@ -421,9 +440,13 @@ def materialize(ticker: str, *, as_of: date | None = None, scenario: str | None 
                                                                         str(view.identity.ticker)),
                                  candidate=candidate_input_for(candidate_ctx, view))
     notes_state = layer_notes if layer_notes is not None else _layer_notes_state()
+    loaded = diagrams if diagrams is not None else _diagrams_loaded()
+    seats = ((context or {}).get("seats") or {}).get(view.identity.company_id) or ()
+    page_diagrams = None if loaded is None else diagrams_for_nodes(loaded, seats)
     payload = materialize_view(analyst.to_dict(), generated_at=generated_at,
                                price_series=_close_series(ticker),
-                               page_extra=page_extra_for(ticker, notes_state))
+                               page_extra=page_extra_for(ticker, notes_state, page_diagrams),
+                               diagrams=page_diagrams)
     target = store or ArtifactStore()
     return target.write(payload), payload
 
@@ -455,10 +478,11 @@ def materialize_many(tickers: Sequence[str], *, as_of: date | None = None,
     if candidates is None and tickers:
         candidates = candidate_context(tickers, as_of=as_of, state_store=state_store)
     notes_state = _layer_notes_state(state_store) if tickers else None
+    loaded = _diagrams_loaded() if tickers else None
     for ticker in tickers:
         try:
             path, _ = materialize(ticker, as_of=as_of, store=target, readings=readings, candidates=candidates,
-                                  layer_notes=notes_state)
+                                  layer_notes=notes_state, diagrams=loaded)
         except Exception as exc:  # noqa: BLE001 — 逐檔隔離；理由原樣回報
             results.append((ticker, None, f"{type(exc).__name__}: {str(exc)[:200]}"))
         else:
@@ -1766,17 +1790,20 @@ def materialize_layer_notes(*, pages: Sequence[str], store: StateArtifactStore |
                       "label": _company_label(registry, co)} for co in sorted(wanted)}
     page_set = frozenset(str(t).upper() for t in pages)
     rows = []
+    loaded_diagrams = _diagrams_loaded()   # 技術示意圖（個股頁 S5b）：同層的閱讀頁也看得到
     for node in sorted(notes):
         row = note_page_row(notes[node], watches=watches, declarations=declarations["by_ref"],
                             reread=reread.get(node, ()), versions=snapshot["versions"].get(node, 1))
         row["cited_by"] = cited_by(node, row["unit"], seats=seats, graph_nodes=graph_nodes, companies=companies,
                                    pages=page_set)
+        row["diagrams"] = diagrams_for_nodes(loaded_diagrams, [node])
         rows.append(row)
     payload = build_layer_notes_artifact(
         rows=redact_private_paths(rows), parse_errors=redact_private_paths(snapshot["errors"]),
         withdrawn=snapshot["withdrawn"], declaration_problems=redact_private_paths(declarations["unreadable"]),
         graph_absence=graph_absence,
         company_labels={co: info["label"] for co, info in companies.items() if info["label"]},
+        diagram_rejections=(loaded_diagrams or {}).get("rejected") or (),
         labels={"sections": SECTION_LABELS, "evidence": EVIDENCE_LABELS, "claim_states": CLAIM_STATES,
                 "declaration_absences": DECLARATION_ABSENCES},
         generated_at=generated_at)

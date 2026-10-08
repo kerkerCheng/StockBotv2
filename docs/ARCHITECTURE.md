@@ -767,6 +767,12 @@ AnalystView.brief（optional）→ APP 首屏 briefCard；六張卡收進「為�
   經 `.meta.json` 的 `page_schema.first_screen` 給 APP，app.js 不留第二份；每塊底下一個展開列這一塊的格（照抄填得滿表：有值或具名缺席）。
   只**重排**既有句子與燈，不改任何 Datum、不改 ledger。帶不齊合約每一格的頁（v1 短評、舊 `.meta.json`）照舊版面。
   五題的 `FIRST_SCREEN_QUESTIONS` 已刪（兩份並存＝兩個 owner，L16）。
+- **圖表元件（2026-10-08 個股頁 S5b、S5c）**：塊底下的定量圖只畫系統自己的數字——app.js 照抄同一頁 `three_questions` line 的原值：
+  B6 參考尺（自家三年倍數的最低／中位／最高／今天，對數刻度；同組中位只在同口徑時畫）、B7 營收柱（`in_numbers_series` 最後 12 期，
+  幣別跟著序列走——`alpha/three_questions.py::_series_currency`，混幣別就不寫單一幣別）。圖上不放標題、只標兩端與今天，其餘寫在圖下
+  （schema 規則 8、9）；座標換算只住 beta 圖那一區的寫法（`pct()`／`meter()`／`barHeight()`），前端守門測試照舊禁止 brief 區做算術。
+  B4 示意圖見 §6 層說明之後的「示意圖」。**手機量測（S5c）**：`?selfcheck=1&w=390` 讓 app.js 量整頁溢出與 SVG 字疊字，結果寫進隱藏的
+  `#selfcheck` 由 headless Edge 讀（Edge 最小視窗約 496px，390 用根寬度模擬）；只在帶參數時跑、不連網。
 - **是不是新賭注（同上，使用者 A3）**：候選推導多一格 `shared_bet`——這一檔和每一檔**持有的 alpha 檔**（`held_index`）共用的需求錨與
   層／插槽，依 ticker 字母列，**不打分、不排序、不加權、不進候選狀態前提**。需求錨只取結構表逐列的 `demand_anchor`／`anchor_basis`
   （唯一來源；materialize 讀**同一輪** `--structure-table` 寫下的 artifact——`webapp/materialize.py::bet_structure`，不另開連線重算），
@@ -901,7 +907,15 @@ python -m alpha layer-note <node> --add spec.json  → library/private/alpha/lay
 「文件沒宣告」；與層說明自己的證據等級（看誰說的）**並列不合併**——第三方轉錄、AI 摘要、改寫過的節錄的保真度住文件自己那一格（L16）；
 ③「哪幾頁連過來」＝圖的 `seats_from_edges`，與個股頁讀圖面板「坐的層」同一支（面板列出坐的層裡有層說明的、連到閱讀頁，**不改面板狀態與
 readiness**）。缺席由產生端宣告：轉換不是層／圖上沒有任何邊碰到這個節點／沒有公司坐／這次沒讀到圖（`webapp.layer_notes.CITED_BY_ABSENCES`）。
-版面與示意圖仍在 S5。
+
+**示意圖（2026-10-08 個股頁 S5b 第二段；schema 規則 5、6、9）：** 研究 session 畫的技術示意圖住 `library/private/research_notes/diagrams/`
+（私有）：`<id>.json` 說明檔（標題、說明、`nodes_shown`、出處必填；可帶 `layout`）、`<id>.svg`、`<id>.check.json` 量測紀錄。
+`webapp/diagrams.py` 是唯一的載入閘：SVG 不准有會執行或載入外部的東西、`raw:` 出處要指得回檔、**量測紀錄要綁同一張 SVG 的 sha256，
+且字疊字／出框／壓框線都是 0**（`scripts/check_diagrams.py` 用 headless Edge 量真的字框；量測規則變了就升 `CHECK_VERSION`，舊紀錄一律當沒量過）。
+不過就不嵌，理由照實進 `layer_notes` artifact 的 `diagram_rejections`（INV-3）。嵌法：data URI 進 payload、APP 用 `<img>` 顯示
+（img 裡的 SVG 不執行任何東西；CSP 原本就是 `img-src 'self' data:`，不用放寬）。哪一頁拿到哪張圖＝圖的 `nodes_shown` 與該頁坐的層（`seats_from_edges`）
+或閱讀頁的節點有交集；圖裡「圖上：…」是畫圖那天的供貨邊（標「列舉不完整」，圖下印畫的日期）。`scripts/draw_diagram.py` 照 `layout`
+畫直式鏈圖（寬 360、斷行不拆英文字、避頭避尾），畫完即量。**這裡不判圖畫得對不對**——那是研究，出處讓人回頭核。
 
 ## 7. Engine D（Decision Lab）——frozen 2026-09-22（G12）
 

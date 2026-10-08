@@ -502,3 +502,9 @@ table.pt-table th, table.pt-table td { vertical-align: top; overflow-wrap: anywh
 .bar { fill: var(--dim); }
 .bar-pos { fill: var(--accent); }
 .bar-neg { fill: var(--neg); }
+
+/* 技術示意圖（個股頁 S5b）：SVG 以 <img> 顯示，白底卡片讓深色模式下也讀得清楚（圖本身的配色固定）。 */
+.diagram { margin: 10px 0 6px; }
+.diagram-title { font-weight: 600; margin-bottom: 6px; }
+.diagram-img { display: block; width: 100%; max-width: 520px; height: auto; background: #ffffff;
+  border: 1px solid var(--border); border-radius: 10px; }

@@ -102,7 +102,7 @@ def build_layer_notes_artifact(
     *, rows: Sequence[Mapping[str, Any]], labels: Mapping[str, Mapping[str, str]],
     parse_errors: Sequence[str] = (), withdrawn: Sequence[str] = (), declaration_problems: Sequence[str] = (),
     graph_absence: Mapping[str, Any] | None = None, company_labels: Mapping[str, str] | None = None,
-    generated_at: datetime | None = None,
+    generated_at: datetime | None = None, diagram_rejections: Sequence[Mapping[str, Any]] = (),
 ) -> dict[str, Any]:
     """逐節點的閱讀頁列 → state artifact。**純函式**：不讀 ledger、不查圖。
 
@@ -138,6 +138,8 @@ def build_layer_notes_artifact(
         "withdrawn": list(withdrawn),
         "parse_errors": list(parse_errors),
         "declaration_problems": list(declaration_problems),
+        # 技術示意圖檢查沒過的（2026-10-08，個股頁 S5b）：沒嵌進任何一頁，理由逐條列在這裡（INV-3）
+        "diagram_rejections": [dict(r) for r in diagram_rejections],
         "graph": {"absence": dict(graph_absence)} if graph_absence else {"absence": None},
         "company_labels": dict(company_labels or {}),
         "labels": {**{k: dict(v) for k, v in labels.items()}, "cited_by_absences": dict(CITED_BY_ABSENCES),

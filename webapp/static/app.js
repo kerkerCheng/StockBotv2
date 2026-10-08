@@ -1196,7 +1196,7 @@ function schemaBlock(payload, view, lines, block, reading) {
   if (!(reading.slots || []).length && !(reading.parts || []).length) {
     node.appendChild(el('div', 'row-reason ss-pending', reading.pending || '還沒寫'));
   }
-  blockVisuals(view, block.key).forEach((n) => node.appendChild(n));
+  blockVisuals(payload, view, block.key).forEach((n) => node.appendChild(n));
   const cells = blockCells(payload, view, block);
   if (cells) node.appendChild(cells);
   return node;
@@ -1969,11 +1969,36 @@ function fmtMultiple(v) {
   return fmtNumber(v, v >= 100 ? 0 : v >= 10 ? 1 : 2);
 }
 
-function blockVisuals(view, key) {
+function blockVisuals(payload, view, key) {
   const out = [];
+  if (key === 'B4') (payload.diagrams || []).forEach((d) => out.push(diagramFigure(d)));
   if (key === 'B6') { const n = rulerChart(view); if (n) out.push(n); }
   if (key === 'B7') { const n = revenueBars(view); if (n) out.push(n); }
   return out;
+}
+
+/** 技術示意圖（B4 與層說明頁共用）：研究 session 畫的 SVG，materialize 檢查過才嵌、編成 data URI；
+ *  用 <img> 顯示（SVG 在 img 裡不執行任何東西）。規則 6：標「示意」、附出處——出處摺起來，第一眼只看圖。 */
+function diagramFigure(d) {
+  const box = el('div', 'diagram');
+  box.appendChild(el('div', 'diagram-title', d.title || '示意圖'));
+  const img = document.createElement('img');
+  img.className = 'diagram-img';
+  img.src = d.src;
+  img.alt = `示意圖：${d.title || ''}`;
+  img.loading = 'lazy';
+  box.appendChild(img);
+  // 「圖上：…」是畫圖那天圖上的供應商——日期跟著印，之後新入圖的不會自己出現在圖裡
+  box.appendChild(el('div', 'chart-legend', `示意｜${d.caption || ''}${d.drawn_at ? `｜${d.drawn_at} 畫` : ''}`));
+  const sources = d.sources || [];
+  if (sources.length) {
+    box.appendChild(drill(`出處 ${sources.length} 份`, () => {
+      const list = el('div', 'ss-cells');
+      sources.forEach((s) => list.appendChild(el('div', 'attention-body', `${s.what || ''}　${s.ref || ''}`)));
+      return list;
+    }));
+  }
+  return box;
 }
 
 /** 參考尺：自家三年倍數的最低、中位、最高與今天；同組中位只在同口徑時畫。對數刻度——倍數常跨兩個數量級
@@ -3756,6 +3781,12 @@ async function renderLayerNote(node) {
     + `${row.versions > 1 ? `（第 ${row.versions} 版）` : ''}｜重讀日 ${row.expires || '—'}：${row.reread_reason || '—'}`));
   app.appendChild(head);
   (row.reread || []).forEach((r) => app.appendChild(el('p', 'warn', '▲ 該重讀：' + r)));
+  // 技術示意圖（2026-10-08，個股頁 S5b）：這一層在整條鏈的哪裡、光／電／熱怎麼走——放正文之前。
+  (row.diagrams || []).forEach((d) => {
+    const sec = el('section', 'panel layer-section');
+    sec.appendChild(diagramFigure(d));
+    app.appendChild(sec);
+  });
 
   (row.sections || []).forEach((section) => {
     const sec = el('section', 'panel layer-section');

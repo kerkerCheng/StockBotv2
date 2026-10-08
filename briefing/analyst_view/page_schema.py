@@ -127,8 +127,8 @@ ELEMENTS: tuple[PageElement, ...] = (
     # B4 技術鏈（§5.5）
     PageElement("B4.layer_note", "B4", "坐的層的層說明（物理與變體、各家階段、客戶為什麼選、主張的 watch）", "layer",
                 "research", ("@layer_notes",), "not_yet_recorded", "層說明 ledger（S4a）：引用這一頁的層說明"),
-    PageElement("B4.diagram", "B4", "示意圖（從終端系統到這一層）", "layer", "research", (),
-                "capability_absent", "個股頁 S5（版面與示意圖）尚未做"),
+    PageElement("B4.diagram", "B4", "示意圖（從終端系統到這一層）", "layer", "research", ("@diagrams",),
+                "not_yet_recorded", "研究筆記的技術示意圖：涵蓋這一頁坐的層的圖"),
     # B5 事件
     PageElement("B5.catalyst", "B5", "事件：碰到哪一塊營收、多大、何時進營收", "event", "research",
                 ("research/catalyst_shape", "research/catalyst_quantitative_link"), "not_yet_recorded",
