@@ -1,0 +1,103 @@
+{
+  "claims": [
+    {
+      "confidence": 0.65,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：Hammond 後續季報寫明資料中心出貨或訂單轉為下滑成為主要拖累，或退出乾式變壓器（例如出售該產品線）。核查頻率：每季（財報新聞稿／MD&A）。觸發後 48 小時：e1 加註或提撤回、重讀乾式變壓器層（tech:dry_type_transformer）。",
+      "id": "hps_q2_2026_results_pr_2026_07_30_cl1",
+      "source_ids": [
+        "hps_q2_2026_results_pr_2026_07_30_s1",
+        "hps_q2_2026_results_pr_2026_07_30_s2",
+        "hps_q2_2026_results_pr_2026_07_30_s3",
+        "hps_q2_2026_results_pr_2026_07_30_s4"
+      ],
+      "statement": "Hammond Power Solutions' own Q2 2026 results release: it makes dry-type transformers, power quality products, related magnetics and power conversion systems; U.S. sales grew significantly year on year, driven by increases in data centre shipments; Q2 2026 backlog was 96.9% higher than a year earlier, primarily due to large project orders driven by data centre activity, though it fell 3.1% from Q4 2025 and 6.9% from Q1 2026 as shipments exceeded new bookings. Supplier self-report: customers are unnamed, the data-centre share of revenue is not disclosed, and the release says 'data centre', not AI.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:dry_type_transformer",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "hps_q2_2026_results_pr_2026_07_30_s1",
+        "hps_q2_2026_results_pr_2026_07_30_s3"
+      ],
+      "src_id": "co:hammond_power_solutions"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "Hammond Power Solutions Inc.",
+        "HPS"
+      ],
+      "attributes": {
+        "ticker": "HPS-A.TO"
+      },
+      "confidence": 0.9,
+      "id": "co:hammond_power_solutions",
+      "name": "Hammond Power Solutions",
+      "role": null,
+      "source_ids": [
+        "hps_q2_2026_results_pr_2026_07_30_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "dry-type transformers"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:dry_type_transformer",
+      "name": "Dry-type transformer",
+      "role": null,
+      "source_ids": [
+        "hps_q2_2026_results_pr_2026_07_30_s1"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "hps_q2_2026_results_pr_2026_07_30",
+    "evidence_tier": 1,
+    "origin_entity": "Hammond Power Solutions Inc.",
+    "permission_basis": "發行人官網公開的財報新聞稿（PDF）；只保留研究必要的有限逐字節錄（pypdf 抽字，換行攤平成空白）。",
+    "published_at": "2026-07-30",
+    "publisher": "Hammond Power Solutions Inc.（官網 IR 新聞稿 PDF）",
+    "retrieved_at": "2026-10-08",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "Hammond Power Solutions Reports Second Quarter 2026 Financial Results（2026-07-30 發行人新聞稿）",
+    "url": "https://emea.hammondpowersolutions.com/-/media/Project/HPS/shared/Investor-Relations/2026-YEAR-ITEMS/Q2-2026/Q2-2026-Financial-Results-Press-Release---073026.pdf"
+  },
+  "sources": [
+    {
+      "id": "hps_q2_2026_results_pr_2026_07_30_s1",
+      "locator": "p.3 About Hammond Power Solutions Inc.",
+      "quote": "Hammond Power Solutions Inc. (“HPS” or the “Company”) enables electrification through its broad range of dry-type transformers, power quality products, related magnetics and power conversion systems."
+    },
+    {
+      "id": "hps_q2_2026_results_pr_2026_07_30_s2",
+      "locator": "p.1 導言（CEO Adrian Thomas）",
+      "quote": "Demand in the U.S. market continues to be driven by data centre investment, electrification and power infrastructure spending, and our expanded manufacturing footprint is allowing us to support that growth more effectively."
+    },
+    {
+      "id": "hps_q2_2026_results_pr_2026_07_30_s3",
+      "locator": "p.1 Geography 段",
+      "quote": "Sales in the U.S. market in the second quarter grew significantly year-over-year, driven by increases in data centre shipments, along with modest improvements in industrial markets versus the first quarter of 2026 and 2025."
+    },
+    {
+      "id": "hps_q2_2026_results_pr_2026_07_30_s4",
+      "locator": "p.1 Backlog 段",
+      "quote": "The Company’s Quarter 2, 2026 backlog increased by 96.9% as compared to Quarter 2, 2025, primarily due to large project orders driven by data centre activity. Backlog decreased 3.1% from Quarter 4, 2025 and 6.9% from Quarter 1, 2026, as shipments exceeded new order bookings during the period."
+    }
+  ]
+}
