@@ -697,6 +697,13 @@ def _validate_record(record: object) -> dict:
         validate_normalized_payload(record["payload"], stored=True)
         if canonical_action_digest(record["payload"]) != record["action_digest"]:
             raise ValueError("Research Action payload digest mismatch")
+    superseded = record.get("superseded_by")
+    if superseded is not None:
+        # 同一個 session 指名的新版（`mark_superseded`；failure log #3）。不進 payload、不進 digest。
+        if not isinstance(superseded, dict) or set(superseded) != {"action_id", "at"}:
+            raise ValueError("Research Action superseded_by must be {action_id, at}")
+        validate_action_id(superseded["action_id"])
+        _parse_time(superseded["at"])
     review = record.get("review")
     if review is not None:
         if not isinstance(review, dict):
@@ -723,7 +730,8 @@ def _validate_record(record: object) -> dict:
             not isinstance(side_check, dict) or not isinstance(side_check.get("documents"), list)
             or not all(isinstance(d, dict) and isinstance(d.get("doc_id"), str)
                        and d.get("status") in MERGE_SIDE_EFFECT_STATUSES for d in side_check["documents"])
-            or not _valid_evidence_receipt(side_check.get("evidence"))):
+            or not _valid_evidence_receipt(side_check.get("evidence"))
+            or not _valid_increment_receipt(side_check.get("increment"))):
         raise ValueError("Research Action merge side effect receipt is invalid")
 
     manifest = record.get("document_manifest")
@@ -960,6 +968,18 @@ def _valid_evidence_receipt(evidence: object) -> bool:
         and isinstance(c.get("after_withheld"), list) for c in changes)
 
 
+def _valid_increment_receipt(increment: object) -> bool:
+    """`merge_side_effect_check.increment`（2026-10-08，failure log #17）：缺＝舊紀錄（合法）；有就要形狀對。"""
+    if increment is None:
+        return True
+    if not isinstance(increment, dict) or increment.get("status") not in MERGE_SIDE_EFFECT_STATUSES:
+        return False
+    if increment["status"] != "checked":
+        return True
+    return all(isinstance(increment.get(key), dict) and isinstance(increment[key].get("new"), list)
+               and isinstance(increment[key].get("declared"), int) for key in ("nodes", "edges", "claims"))
+
+
 def _render_merge_side_effects(record: dict) -> list[str]:
     """packet 的「入圖副作用」一節（Phase 6 Step 6.2d）：入圖時會改到圖上哪些**既有**值。沒有收據就整節不印（舊紀錄 render 不變）。
     Phase 6 Step 6.4 起多印「入圖後證據等級會變的邊」（收據沒有 `evidence` 的舊紀錄不印這一段）。"""
@@ -967,9 +987,12 @@ def _render_merge_side_effects(record: dict) -> list[str]:
     check = record.get("merge_side_effect_check")
     if not check:
         return []
-    from loader.merge_side_effects import evidence_lines, render_lines
+    from loader.merge_side_effects import evidence_lines, increment_line, render_lines
 
     lines = ["", "## 入圖副作用（prepare 當下對圖核對；只印、不放閘）", ""]
+    increment = increment_line(check.get("increment"))
+    if increment:
+        lines.append(f"- 圖的增量：{increment}")
     for document in check.get("documents") or []:
         lines.extend(render_lines(document, doc_id=document.get("doc_id")))
     lines.extend(evidence_lines(check.get("evidence")))
@@ -1109,9 +1132,16 @@ def create_action(
         if layer_check["status"] != "ok":
             raise ValueError("layer_enumerations 核對失敗：" + "；".join(layer_check["rejections"]))
     payload_bytes = len(_canonical_bytes(normalized))
+    digest = canonical_action_digest(normalized)
     parent = _action_root(root)
     with _exclusive_lock(parent / "locks" / ".store.lock", now=current):
         _compact_expired_actions(root, current)
+        # 冪等（2026-10-08，failure log #3）：同一份內容（digest 相同）已有一筆還能核准的 → 回那一筆，不另建。
+        # 事發：為了看完整 packet 重跑 prepare（同一份 draft），store 不以 digest 去重，sync 對兩筆各鑄一號（[697]／[698]），
+        # 多出來的那一號只能請使用者 drop。
+        existing = _ready_with_digest(digest, root=root, now=current)
+        if existing is not None:
+            return {**existing, "deduplicated": True}
         active_count, staged_bytes = _quota_usage(root)
         if active_count >= MAX_NONTERMINAL_ACTIONS:
             raise ValueError(
@@ -1135,7 +1165,7 @@ def create_action(
         record = {
             "schema_version": ACTION_RECORD_SCHEMA,
             "action_id": action_id,
-            "action_digest": canonical_action_digest(normalized),
+            "action_digest": digest,
             "state": "ready",
             "created_at": created_at,
             "updated_at": created_at,
@@ -1171,6 +1201,42 @@ def create_action(
         _validate_record(record)
         _write_new_json(_action_path(action_id, root), record)
     return copy.deepcopy(record)
+
+
+def _ready_with_digest(digest: str, *, root: Path, now: datetime) -> dict | None:
+    """同一個 digest、還能被核准的那一筆（ready、沒過期、沒被取代）；沒有回 None。呼叫端持有 store 鎖。"""
+    for record in iter_actions(root=root):
+        if (record.get("action_digest") == digest and record.get("state") == "ready"
+                and not record.get("superseded_by") and now < _parse_time(record["expires_at"])):
+            return record
+    return None
+
+
+def mark_superseded(old_action_id: str, *, by: str, root: Path = ROOT, now: datetime | None = None) -> dict:
+    """同一個 session 明確宣告：`old_action_id` 已被 `by` 取代（`prepare --supersedes`；2026-10-08，failure log #3）。
+
+    事發：更正 L8 備註後重新 prepare，舊的 [679] 與新的 [680] 並存——sync 不收「來源消失」的編號（推論不是收據，設計正確），
+    但「我剛 prepare 的上一版被我自己取代」是同一個 session 的明確事實。風險：go 到舊號，apply 會套用 L8 備註不實的那一版。
+    標記之後：apply 拒收舊的那一筆（`scripts/apply_ra_admission.py`、`_apply_research_action_impl`）；sync 把舊號標「已被取代、
+    建議 drop」。只收**還沒動過**的舊紀錄（ready、沒有核准戳記）——已經在 apply 的不能被取代。不改 state、不進 digest。
+    """
+    validate_action_id(old_action_id)
+    validate_action_id(by)
+    if old_action_id == by:
+        raise ValueError("不能用自己取代自己")
+    current = now or _now()
+    read_action(by, root=root)                       # 新的那一筆必須存在
+    with action_lock(old_action_id, root=root):
+        record = read_action(old_action_id, root=root)
+        if record["state"] != "ready" or (record.get("execution") or {}).get("approval"):
+            raise ValueError(f"{old_action_id} 的狀態是 {record['state']}"
+                             f"{'（已蓋核准戳記）' if (record.get('execution') or {}).get('approval') else ''}——只有還沒動過的 ready 能被取代")
+        if record.get("superseded_by"):
+            if record["superseded_by"]["action_id"] == by:
+                return record
+            raise ValueError(f"{old_action_id} 已被 {record['superseded_by']['action_id']} 取代")
+        record["superseded_by"] = {"action_id": by, "at": _iso(current)}
+        return save_action(record, root=root, now=current)
 
 
 def compact_applied_payload(record: dict) -> dict:

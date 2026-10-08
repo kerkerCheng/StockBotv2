@@ -275,6 +275,7 @@ def test_prepare_returns_each_rejection_reason(tmp_path: Path) -> None:
     extraction = _extraction(quotes={"co:axt": "AXT ships.", "co:sumitomo_electric": "we lead"})
     request = {"schema_version": research_actions.ACTION_PAYLOAD_SCHEMA, "action_slug": "layer-action",
                "report": _payload(extraction, None)["report"], "layer_enumerations": [_enum()],
+               "focus_company_id": "co:axt",   # 2026-10-08 起 prepare 要求宣告 focus（failure log #3）
                "documents": [{"extraction_json": json.dumps(extraction), "storage_permission": "repo_full",
                               "permission_basis": BASIS}]}
     original = application._prepare_extraction_impl

@@ -449,7 +449,7 @@ def _merge_side_effect_receipt(documents: list[dict], *, driver_factory=None) ->
     assertion 與逐字、用分類的唯一 owner 前後各算一次）；讀不到同樣記 `upstream_unavailable`，不是「不會變」。
     """
     from identity.registry import get_registry
-    from loader.merge_side_effects import evidence_after_load, fetch_evidence_state, side_effects
+    from loader.merge_side_effects import evidence_after_load, fetch_evidence_state, graph_increment, side_effects
 
     results: list[dict] = []
     try:
@@ -460,8 +460,11 @@ def _merge_side_effect_receipt(documents: list[dict], *, driver_factory=None) ->
         reason = f"連不上圖（{type(exc).__name__}）——副作用無法核對"
         return {"documents": [{"doc_id": d["doc_id"], "status": "upstream_unavailable", "reason": reason}
                               for d in documents],
-                "evidence": {"status": "upstream_unavailable", "reason": reason}}
+                "evidence": {"status": "upstream_unavailable", "reason": reason},
+                "increment": {"status": "upstream_unavailable", "reason": reason}}
     evidence: dict = {"status": "upstream_unavailable", "reason": "沒有算到（讀圖在副作用那一步就失敗了）"}
+    # 圖上真的多出來的節點／邊／claims（failure log #17）：決策區塊的「圖影響」行讀這一格，不再數文件宣告數
+    increment: dict = {"status": "upstream_unavailable", "reason": "沒有算到（讀圖在副作用那一步就失敗了）"}
     try:
         with driver.session(default_access_mode=neo4j.READ_ACCESS) as session:
             for document in documents:
@@ -473,8 +476,17 @@ def _merge_side_effect_receipt(documents: list[dict], *, driver_factory=None) ->
             except AssertionError:
                 raise
             except Exception as exc:  # noqa: BLE001
+                state = None
                 evidence = {"status": "upstream_unavailable",
                             "reason": f"證據等級預告算不出來（{type(exc).__name__}: {str(exc)[:160]}）"}
+            if state is not None:
+                try:
+                    increment = graph_increment(state, [d["extraction"] for d in documents], session)
+                except AssertionError:
+                    raise
+                except Exception as exc:  # noqa: BLE001
+                    increment = {"status": "upstream_unavailable",
+                                 "reason": f"增量算不出來（{type(exc).__name__}: {str(exc)[:160]}）"}
     except AssertionError:
         raise
     except Exception as exc:  # noqa: BLE001
@@ -484,7 +496,7 @@ def _merge_side_effect_receipt(documents: list[dict], *, driver_factory=None) ->
                     for d in documents if d["doc_id"] not in done]
     finally:
         driver.close()
-    return {"documents": results, "evidence": evidence}
+    return {"documents": results, "evidence": evidence, "increment": increment}
 
 
 def _prepare_research_action_impl(
@@ -494,6 +506,14 @@ def _prepare_research_action_impl(
         request = research_actions.parse_action_request(action_json)
     except (ValueError, TypeError) as exc:
         return {"status": "rejected", "error": _safe_error_message(exc)}
+    # focus company 用 sync 的同一個判定（failure log #3）：prepare 時還沒有綁定的 lead，所以等於要求 RA 自己宣告——
+    # 之前這裡放行、sync 才擋，鑄出帶 BLOCKER 的編號只能請使用者 drop（[687]）。
+    from intake.focus import resolve_focus
+
+    _focus, blocker = resolve_focus(request.get("focus_company_id"))
+    if blocker:
+        return {"status": "rejected",
+                "error": "focus_company_id 必填（draft 頂層 `focus_company_id`，名冊登記過的 co:*）——" + blocker}
 
     normalized_documents = []
     for index, document in enumerate(request["documents"]):
@@ -554,7 +574,7 @@ def _prepare_research_action_impl(
             payload, root=root, merge_side_effects=_merge_side_effect_receipt(normalized_documents))
     except (OSError, RuntimeError, ValueError) as exc:
         return {"status": "rejected", "error": _safe_error_message(exc)}
-    return {
+    result = {
         "status": "ready",
         "action_id": record["action_id"],
         "action_digest": record["action_digest"],
@@ -567,6 +587,11 @@ def _prepare_research_action_impl(
             "until the user explicitly approves this action ID."
         ),
     }
+    if record.get("deduplicated"):
+        # 同一份內容已有一筆還能核准的（failure log #3）：回那一筆，sync 不會再多鑄一號
+        result["deduplicated"] = True
+        result["note"] = "同一份內容（digest 相同）已有一筆 ready 的 Research Action——沿用它，沒有另建"
+    return result
 
 def _get_research_action_status_impl(
     action_id: str = "", *, root: Path = INTAKE_ROOT
@@ -728,6 +753,14 @@ def _apply_research_action_impl(
                     "status": "expired",
                     "action_id": action_id,
                     "error": "prepare a fresh Research Action before approval",
+                }
+            if record["state"] == "ready" and record.get("superseded_by"):
+                # 同一個 session 宣告過被新版取代（failure log #3）：舊版的內容（例如 L8 備註不實的那一版）不得入圖
+                return {
+                    "status": "rejected",
+                    "action_id": action_id,
+                    "error": (f"這一筆已被 {record['superseded_by']['action_id']} 取代——drop 這個編號、"
+                              "go 新的那一筆；no graph mutation occurred"),
                 }
             if record["state"] == "ready" and _parse_action_time(
                 record["expires_at"]

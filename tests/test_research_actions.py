@@ -83,6 +83,8 @@ def _request_json() -> str:
             "schema_version": research_actions.ACTION_PAYLOAD_SCHEMA,
             "action_slug": "test-action",
             "report": _report(),
+            # prepare 與 sync 對 focus 用同一個判定（2026-10-08，failure log #3）：沒宣告的 draft 在 prepare 就被擋
+            "focus_company_id": "co:axt",
             "documents": [
                 {
                     "extraction_json": json.dumps(document["extraction"]),
@@ -112,6 +114,7 @@ def _request_for_docs(*doc_ids: str) -> str:
             "schema_version": research_actions.ACTION_PAYLOAD_SCHEMA,
             "action_slug": "multi-doc-action",
             "report": _report(),
+            "focus_company_id": "co:axt",
             "documents": documents,
         }
     )

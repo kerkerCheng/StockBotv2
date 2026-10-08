@@ -55,14 +55,35 @@ def prepare_from_file(
     return prepare(action_json, root=root)
 
 
+def supersede(old_ids: list[str], *, new_id: str, root: Path = ROOT) -> list[dict]:
+    """`--supersedes`：新版 ready 之後把指名的舊版標成被取代（`intake.actions.mark_superseded`；failure log #3）。
+    逐筆回收據；某一筆標不上（已在 apply、已被別筆取代、不存在）照實寫進收據，不擋新版。"""
+    from intake import actions as research_actions
+
+    out = []
+    for old in old_ids:
+        try:
+            research_actions.mark_superseded(old, by=new_id, root=root)
+            out.append({"action_id": old, "status": "superseded", "by": new_id})
+        except (OSError, ValueError, FileNotFoundError) as exc:
+            out.append({"action_id": old, "status": "not_superseded", "error": str(exc)})
+    return out
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--action-file", required=True, type=Path)
+    parser.add_argument(
+        "--supersedes", action="append", default=[], metavar="RA_ID",
+        help="這一版取代哪一筆還沒核准的舊版（同一個 session 的明確宣告）：舊版 apply 拒收、sync 把舊號標「已被取代、建議 drop」",
+    )
     args = parser.parse_args(argv)
     try:
         result = prepare_from_file(args.action_file)
     except (OSError, ValueError, json.JSONDecodeError) as exc:
         result = {"status": "rejected", "error": str(exc)}
+    if result.get("status") == "ready" and args.supersedes:
+        result["superseded"] = supersede(args.supersedes, new_id=str(result["action_id"]))
     print(json.dumps(result, ensure_ascii=False, default=str, indent=2))
     return 0 if result.get("status") == "ready" else 2
 

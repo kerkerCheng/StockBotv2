@@ -163,9 +163,13 @@ pq1。使用者對 action ID 明確回覆 `go` 後，另一個執行步驟才可
 - 跑 `loader/validate.py`(vocab + schema 形狀檢查;新 relation/type 先補 `schema/vocab.json`)
 - node/edge 帶齊 `source_ids`(全域格式)、`confidence`、L4 歸位好的屬性
 - 呼叫 `prepare_research_action` 讓程式重跑驗證並凍結 immutable payload；把原樣 review packet 放進 pq2
-- 在凍結前，分開列出 graph delta 內所有公司與唯一 `focus_company_id`；把 focus 寫入綁定 lead，並在
+- 在凍結前，分開列出 graph delta 內所有公司與唯一 `focus_company_id`；**draft 頂層必填 `focus_company_id`**
+  （2026-10-08 起 prepare 與 sync 用同一個判定 `intake.focus.resolve_focus`，沒宣告在 prepare 就被擋）；把 focus 寫入綁定 lead，並在
   `ra_admission` pq2 明列 `Decision handoff: co:x`。其他公司只作 evidence／relationship context，不因入圖
   自動建立 cohort；若沒有唯一 focus，先留 pq1，若要追多個投資標的則分開提出 handoff。
+- 同一份 draft 重跑 prepare（例如想再看一次 packet）會回**同一筆**（digest 相同、還能核准的就沿用，`deduplicated: true`），
+  不會多鑄一號。**改了內容要換掉還沒核准的上一版**：`prepare_research_action.py --action-file <新版> --supersedes <舊 ra_id>`——
+  舊版 apply 拒收、sync 把舊號標「已被取代」並寫上 drop 建議（Phase 7 failure log #3）。
 - **不要**在 pq1 或同一輪呼叫 loader 或 RA apply。只有使用者明確核准 action ID 後，才由
   apply 流程寫入、驗圖並接續窄 pathset commit/push
 

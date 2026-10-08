@@ -237,6 +237,50 @@ def evidence_after_load(state: Mapping[str, Any], documents: list[Mapping[str, A
     return changes
 
 
+def graph_increment(state: Mapping[str, Any], documents: list[Mapping[str, Any]], session: Any) -> dict[str, Any]:
+    """本包入圖後圖上**真的多出來**的節點、canonical 邊、claims——與文件宣告數分開（2026-10-08，Phase 7 failure log #17）。
+
+    事發：決策區塊的「圖影響」數的是凍結 payload 裡每份抽取**宣告**的節點／邊／claims。抽取檔會重新宣告它引用到的既有節點，
+    更正走廊的新版更是整份重宣告——[699] 印 +19 節點、20 邊、12 claims，實際新增 3 節點、4 邊、4 claims（L12：一個數字兩種語意）。
+    `state`＝`fetch_evidence_state` 的現值（呼叫端已在同一個唯讀 session 取過）；邊照 `rows_after_load`（loader 的 MERGE 語意）前後
+    各收斂一次（`collapse_assertions` 的 canonical key）；節點與 claims 查 `:Entity` 的 id 在不在圖上（Claim 也是 `:Entity`）。
+    """
+    from query.bottleneck import collapse_assertions
+
+    loaded = [as_loaded(doc) for doc in documents]
+    node_ids = sorted({str(n["id"]) for d in loaded for n in d.get("nodes") or () if n.get("id")})
+    claim_ids = sorted({str(c["id"]) for d in loaded for c in d.get("claims") or () if c.get("id")})
+    on_graph = {str(r["id"]) for r in session.run("MATCH (n:Entity) WHERE n.id IN $ids RETURN n.id AS id",
+                                                  ids=node_ids + claim_ids)}
+    before = set(collapse_assertions(state["rows"]))
+    after_rows, _quotes = rows_after_load(list(state["rows"]), state["links"], state["source_quotes"], loaded)
+    declared_edges = set(collapse_assertions(
+        [{"src": e.get("src_id"), "relation": e.get("relation"), "dst": e.get("dst_id")}
+         for d in loaded for e in d.get("edges") or ()]))
+    new_edges = sorted(set(collapse_assertions(after_rows)) - before)
+    return {
+        "status": "checked",
+        "nodes": {"new": [n for n in node_ids if n not in on_graph], "declared": len(node_ids)},
+        "edges": {"new": [list(key) for key in new_edges], "declared": len(declared_edges)},
+        "claims": {"new": [c for c in claim_ids if c not in on_graph], "declared": len(claim_ids)},
+    }
+
+
+def increment_line(check: Mapping[str, Any] | None) -> str | None:
+    """「圖影響」那一行的數字（決策區塊與 RA packet 共用；failure log #17）。沒有收據＝None（呼叫端退回宣告數並標明）。"""
+    if not check:
+        return None
+    if check.get("status") != "checked":
+        return f"增量無法核對（{check.get('reason') or 'upstream_unavailable'}）——下列是文件宣告數，不是增量"
+    parts, kept = [], 0
+    for key, label in (("nodes", "節點"), ("edges", "邊"), ("claims", "claims")):
+        block = check.get(key) or {}
+        new = len(block.get("new") or ())
+        parts.append(f"{new} {label}")
+        kept += max(0, int(block.get("declared") or 0) - new)
+    return f"新增 {'、'.join(parts)}" + (f"（另 {kept} 筆已在圖上或逐字保留）" if kept else "")
+
+
 def evidence_lines(check: Mapping[str, Any] | None) -> list[str]:
     """「入圖後證據等級會變的邊」那幾行（RA packet；遷移工具有自己的全圖比對）。沒有收據＝不印（舊紀錄 render 不變）。"""
     if not check:

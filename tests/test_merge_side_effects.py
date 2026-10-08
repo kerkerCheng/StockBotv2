@@ -195,3 +195,36 @@ def test_evidence_lines_say_unknown_out_loud_and_print_each_change() -> None:
         {"edge": ["co:a", "supplies_to", "tech:z"], "before": None, "after": "self_reported", "after_withheld": []}]})
     assert lines[0] == "- 入圖後證據等級會變的邊 2 條："
     assert "外部印證 → 待判定（沒升外部印證：引文沒具名主詞）" in lines[1] and "新邊 → 供應商自報" in lines[2]
+
+
+class _IdSession:
+    """`graph_increment` 只查「這些 id 在不在圖上」。"""
+
+    def __init__(self, on_graph):
+        self.on_graph = set(on_graph)
+
+    def run(self, _cypher, ids=()):
+        return [{"id": i} for i in ids if i in self.on_graph]
+
+
+def test_graph_increment_counts_what_the_graph_gains_not_what_the_documents_declare() -> None:
+    """更正走廊的形狀（[699]）：新版整份重宣告既有節點與邊——增量只算圖上沒有的（2026-10-08，failure log #17）。"""
+    from loader.merge_side_effects import graph_increment, increment_line
+
+    doc = _packet_doc()
+    doc["nodes"] = [{"id": "co:lumentum", "type": "Company", "name": "Lumentum"},
+                    {"id": "tech:x", "type": "Technology", "name": "X"},
+                    {"id": "tech:z", "type": "Technology", "name": "Z"}]
+    doc["claims"] = [{"id": "d_c1", "text": "舊 claim"}, {"id": "d_c2", "text": "新 claim"}]
+    state = {"rows": _graph_rows(), "links": {"d_e1": ["d_s1"], "d_e2": ["d_s2"], "o_e1": ["o_s1"]},
+             "source_quotes": {"d_s1": "old wording", "d_s2": "NVIDIA buys lasers", "o_s1": "NVIDIA needs lasers"}}
+    increment = graph_increment(state, [doc], _IdSession({"co:lumentum", "tech:x", "d_c1"}))
+    assert increment == {
+        "status": "checked",
+        "nodes": {"new": ["tech:z"], "declared": 3},
+        "edges": {"new": [["co:lumentum", "supplies_to", "tech:z"]], "declared": 2},   # e1 已在圖上
+        "claims": {"new": ["d_c2"], "declared": 2},
+    }
+    assert increment_line(increment) == "新增 1 節點、1 邊、1 claims（另 4 筆已在圖上或逐字保留）"
+    assert increment_line(None) is None
+    assert increment_line({"status": "upstream_unavailable", "reason": "連不上圖"}).startswith("增量無法核對（連不上圖）")

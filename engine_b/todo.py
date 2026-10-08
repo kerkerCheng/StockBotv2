@@ -1463,6 +1463,11 @@ def sync(
         # 圖影響一句話跟著項目走（L16）；collector 沒算出來就維持缺席。
         if row.get("graph_impact"):
             item["graph_impact"] = str(row["graph_impact"])
+        # 被同一個 session 宣告取代的入圖包（failure log #3）：建議 drop——收據是 prepare --supersedes 寫在紀錄上的，不是推論
+        if row.get("superseded_by") and (item.get(RECOMMENDATION_KEY) or {}).get("verb") != "drop":
+            recommend(pool, int(item["n"]), "drop",
+                      reason=f"已被 {row['superseded_by']} 取代（prepare --supersedes 的收據）；apply 會拒收這一筆",
+                      at=stamp)
         # 同理：標的歸屬。既有 item 在下一次 sync 一併補上（upsert 是同一條路）。
         if row.get("company_id"):
             item["company_id"] = str(row["company_id"])
@@ -1843,11 +1848,16 @@ def collect_from_research_actions() -> list[dict[str, Any]]:
     return _fail_soft(_collect_research_action_rows)
 
 
-def _ra_graph_impact(payload: Mapping[str, Any]) -> str:
+def _ra_graph_impact(action: Mapping[str, Any]) -> str:
     """一句話回答「核准這個 RA 對圖的影響是什麼」（2026-08-31 使用者要求）。
 
-    從凍結 payload 數 nodes／edges／claims 並列 origin＋tier。
-    解析失敗回空字串（fail-soft：影響行缺席，密度契約其餘不變）。
+    **數的是圖的增量，不是文件大小**（2026-10-08，Phase 7 failure log #17）：讀 prepare 當下對圖算好、凍結在紀錄裡的
+    `merge_side_effect_check.increment`（唯一 owner `loader.merge_side_effects.graph_increment`）——「新增 a 節點、b 邊、c claims
+    （另 x 筆已在圖上或逐字保留）」。之前數凍結 payload 裡每份抽取**宣告**的節點／邊／claims：抽取檔會重新宣告引用到的既有節點、
+    更正走廊整份重宣告，於是 [699] 印 +19 節點、20 邊、12 claims，實際新增 3、4、4（L12）。
+    2026-10-08 之前的紀錄沒有 `increment`：節點用各文件的 `new_nodes` 聯集、邊用證據等級預告裡的新邊（`before=None`）——
+    兩樣當時就對圖算過；claims 當時沒算，照實寫「claims 增量未記錄」。連這兩樣都沒有才退回宣告數，並寫明那是宣告數。
+    並列 origin＋tier。解析失敗回空字串（fail-soft：影響行缺席，密度契約其餘不變）。
 
     ⚠ 兩個 key 都要認：draft（`library/leads/action_drafts/*.json`）用字串
     `extraction_json`，但 prepare 凍結後正規化成 dict `extraction`。本函式原本只讀前者，
@@ -1857,6 +1867,9 @@ def _ra_graph_impact(payload: Mapping[str, Any]) -> str:
     """
 
     try:
+        from loader.merge_side_effects import increment_line
+
+        payload = action.get("payload") or {}
         n_nodes = n_edges = n_claims = 0
         origins: list[str] = []
         for doc in payload.get("documents") or []:
@@ -1874,12 +1887,30 @@ def _ra_graph_impact(payload: Mapping[str, Any]) -> str:
                 origins.append(f"{origin}（tier {tier}）" if tier else origin)
         if not (n_nodes or n_edges or n_claims):
             return ""
-        parts = [f"+{n_nodes} 節點、{n_edges} 邊、{n_claims} claims"]
+        check = action.get("merge_side_effect_check") or {}
+        line = increment_line(check.get("increment"))
+        if line is None or line.startswith("增量無法核對"):
+            line = _legacy_increment_line(check) or (
+                f"文件宣告 {n_nodes} 節點、{n_edges} 邊、{n_claims} claims（不是增量：prepare 時沒對圖算）"
+                if line is None else f"{line}：{n_nodes} 節點、{n_edges} 邊、{n_claims} claims")
+        parts = [line]
         if origins:
             parts.append("來源：" + "、".join(dict.fromkeys(origins)))
         return "｜".join(parts)
     except Exception:
         return ""
+
+
+def _legacy_increment_line(check: Mapping[str, Any]) -> str | None:
+    """2026-10-08 之前的 prepare 收據：節點增量當時就對圖算過（`new_nodes`）；邊只記到**證據等級會變**的新邊
+    （`before=None`）——沒有證據等級的新邊不在裡面（[692] 回放：收據 7 條、實際 9 條），所以寫「至少」；claims 沒算。"""
+    documents = check.get("documents") or []
+    evidence = check.get("evidence") or {}
+    if not documents or any(d.get("status") != "checked" for d in documents) or evidence.get("status") != "checked":
+        return None
+    nodes = {n for d in documents for n in d.get("new_nodes") or ()}
+    edges = [c for c in evidence.get("changes") or () if c.get("before") is None]
+    return f"新增 {len(nodes)} 節點、至少 {len(edges)} 邊（舊收據：邊只記到有證據等級的、claims 增量未記錄）"
 
 
 def _collect_research_action_rows() -> list[dict[str, Any]]:
@@ -1909,30 +1940,19 @@ def _collect_research_action_rows() -> list[dict[str, Any]]:
                 } - {""})
             except Exception:
                 focuses = []
-            conflict = bool(declared) and bool(focuses) and set(focuses) != {declared}
-            if declared and not conflict:
-                focuses = [declared]
-            if conflict:
-                # 兩個來源都說話但說得不一樣：不猜，交還人工。
-                handoff_hint = (
-                    f"BLOCKER：RA 自報 focus_company_id={declared}，綁定 lead 卻是 "
-                    f"{'、'.join(focuses)}；先回 pq1 對齊，不得先 apply。"
-                )
-            elif len(focuses) == 1:
-                handoff_hint = (
-                    f"核准 exact graph delta；focus company：{focuses[0]}。"
-                    "RA 內其他公司只作 evidence／relationship context，不自動建 cohort。"
-                )
-            elif focuses:
-                handoff_hint = (
-                    "BLOCKER：Research Action 有多個 focus_company_id："
-                    f"{', '.join(focuses)}；先回 pq1 拆成明確 focus company。"
-                )
-            else:
-                handoff_hint = (
-                    "BLOCKER：Research Action 尚未聲明唯一 focus_company_id；"
-                    "先回 pq1 補 focus company，不得先 apply。"
-                )
+            # 判定只住 `intake.focus.resolve_focus`（prepare 用同一個；failure log #3）：兩個來源說得不一樣就不猜、交還人工。
+            from intake.focus import resolve_focus
+
+            focus, blocker = resolve_focus(declared, focuses)
+            handoff_hint = blocker or (
+                f"核准 exact graph delta；focus company：{focus}。"
+                "RA 內其他公司只作 evidence／relationship context，不自動建 cohort。"
+            )
+            superseded_by = (action.get("superseded_by") or {}).get("action_id")
+            if superseded_by:
+                # 同一個 session 宣告過被新版取代：apply 會拒收這一筆（failure log #3）
+                handoff_hint = (f"已被 `{superseded_by}` 取代（同一個 session 換了新版）——drop 這一筆、不要 go；"
+                                "apply 會拒收它")
             title = (
                 action.get("slug")
                 or action.get("title")
@@ -1947,9 +1967,11 @@ def _collect_research_action_rows() -> list[dict[str, Any]]:
                 "hint": handoff_hint,
                 "source": "research_action",
             }
-            impact = _ra_graph_impact(action.get("payload") or {})
+            impact = _ra_graph_impact(action)
             if impact:
                 row["graph_impact"] = impact
+            if superseded_by:
+                row["superseded_by"] = str(superseded_by)
             rows.append(row)
     return [r for r in rows if r["ref_id"]]
 

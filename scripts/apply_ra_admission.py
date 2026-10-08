@@ -120,6 +120,10 @@ def check_and_stamp(n: int, digest: str, *, pool_path: Path, root: Path, now: da
     expired = record["state"] == "ready" and current >= research_actions._parse_time(record["expires_at"])
     if record["state"] == "expired" or expired:
         raise ApplyRefused(f"{action_id} 已過期——重提請重跑 prepare（新 digest、新編號）")
+    if record.get("superseded_by"):
+        # failure log #3：同一個 session 宣告過被新版取代——go 到舊號也不得套用舊版內容
+        raise ApplyRefused(f"[{n}] 指的 {action_id} 已被 {record['superseded_by']['action_id']} 取代——"
+                           "請 drop 這個編號、go 新的那一筆；沒有任何寫入")
     retry = record["state"] in _RETRY_STATES and bool(approval)
     if record["state"] in _RETRY_STATES and not approval:
         # 舊紀錄（入口上線前中斷的 apply）沒有任何戳記——沒有哪個編號能「沿用原核准重試」（R2-a N5）。
@@ -134,7 +138,7 @@ def check_and_stamp(n: int, digest: str, *, pool_path: Path, root: Path, now: da
     if not approval:
         with research_actions.action_lock(action_id, root=root):
             record = research_actions.read_action(action_id, root=root)    # 鎖內重讀，避免蓋到別人剛改的版本
-            if record["action_digest"] != digest or record["state"] != "ready":
+            if record["action_digest"] != digest or record["state"] != "ready" or record.get("superseded_by"):
                 raise ApplyRefused(f"{action_id} 在檢查與蓋章之間被改動了——沒有任何寫入，請重跑")
             # 鎖內也要重查戳記（R2-a N2）：兩個未結的編號指向同一筆紀錄、同時執行時，後到的不得覆蓋先到的戳記。
             stamped_by = (record.get("execution") or {}).get("approval")

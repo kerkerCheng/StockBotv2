@@ -969,13 +969,48 @@ def test_graph_impact_reads_the_frozen_payload_not_only_the_draft() -> None:
         "claims": [{"id": "cl1"}],
     }
 
-    frozen = {"documents": [{"doc_id": "d", "extraction": extraction}]}
-    draft = {"documents": [{"doc_id": "d", "extraction_json": json.dumps(extraction)}]}
+    frozen = {"payload": {"documents": [{"doc_id": "d", "extraction": extraction}]}}
+    draft = {"payload": {"documents": [{"doc_id": "d", "extraction_json": json.dumps(extraction)}]}}
 
-    expected = "+2 節點、1 邊、1 claims｜來源：Example Co（tier 3）"
+    # 沒有 prepare 當下的增量收據 → 退回宣告數，並寫明那不是增量（2026-10-08，failure log #17）
+    expected = "文件宣告 2 節點、1 邊、1 claims（不是增量：prepare 時沒對圖算）｜來源：Example Co（tier 3）"
     assert todo._ra_graph_impact(frozen) == expected
     assert todo._ra_graph_impact(draft) == expected
-    assert todo._ra_graph_impact({"documents": [{"doc_id": "d"}]}) == ""
+    assert todo._ra_graph_impact({"payload": {"documents": [{"doc_id": "d"}]}}) == ""
+
+
+def test_graph_impact_prints_the_graph_increment_not_the_document_size() -> None:
+    """[699] 的形狀：更正走廊整份重宣告——印 +19 節點、20 邊、12 claims，實際新增 3、4、4（failure log #17）。"""
+    extraction = {
+        "source_doc": {"origin_entity": "U.S. DOE", "evidence_tier": 1},
+        "nodes": [{"id": f"co:n{i}"} for i in range(19)],
+        "edges": [{"id": f"e{i}"} for i in range(20)],
+        "claims": [{"id": f"cl{i}"} for i in range(12)],
+    }
+    payload = {"documents": [{"doc_id": "doe", "extraction": extraction}]}
+    increment = {"status": "checked",
+                 "nodes": {"new": ["co:n0", "co:n1", "co:n2"], "declared": 19},
+                 "edges": {"new": [["co:n0", "supplies_to", "tech:x"]] * 4, "declared": 20},
+                 "claims": {"new": ["cl0", "cl1", "cl2", "cl3"], "declared": 12}}
+    action = {"payload": payload, "merge_side_effect_check": {"documents": [], "increment": increment}}
+    assert todo._ra_graph_impact(action) == (
+        "新增 3 節點、4 邊、4 claims（另 40 筆已在圖上或逐字保留）｜來源：U.S. DOE（tier 1）")
+
+    # 2026-10-08 之前的收據：節點與邊當時就對圖算過，claims 沒算
+    legacy = {"payload": payload, "merge_side_effect_check": {
+        "documents": [{"doc_id": "doe", "status": "checked", "new_nodes": ["co:n0", "co:n1", "co:n2"]}],
+        "evidence": {"status": "checked", "changes": [
+            {"edge": ["co:n0", "supplies_to", "tech:x"], "before": None, "after": "self_reported", "after_withheld": []},
+            {"edge": ["co:n5", "supplies_to", "tech:x"], "before": "self_reported", "after": "externally_corroborated",
+             "after_withheld": []}]}}}
+    assert todo._ra_graph_impact(legacy) == (
+        "新增 3 節點、至少 1 邊（舊收據：邊只記到有證據等級的、claims 增量未記錄）｜來源：U.S. DOE（tier 1）")
+
+    # 讀不到圖 → 不得印成增量
+    unavailable = {"payload": payload, "merge_side_effect_check": {
+        "documents": [{"doc_id": "doe", "status": "upstream_unavailable"}],
+        "increment": {"status": "upstream_unavailable", "reason": "連不上圖"}}}
+    assert todo._ra_graph_impact(unavailable).startswith("增量無法核對（連不上圖）——下列是文件宣告數，不是增量：19 節點")
 
 
 # ---------------------------------------------------------------------------
