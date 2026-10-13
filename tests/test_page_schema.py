@@ -63,7 +63,7 @@ def test_fill_rows_are_value_or_a_named_absence_and_copy_the_producers_kind() ->
     assert rows["B0.candidate_state"]["state"] == "value"
     assert rows["B1.position"] == {**rows["B1.position"], "state": "absent", "absence_kind": "not_yet_recorded"}
     assert rows["B9.debt"]["absence_kind"] == "capability_absent"          # default_absence_kind("not_modeled")
-    assert rows["B2.path_layers"]["absence_kind"] == "capability_absent" and "S3" in rows["B2.path_layers"]["looked"]
+    assert rows["B2.share_now"]["absence_kind"] == "capability_absent" and "S3" in rows["B2.share_now"]["looked"]
     assert rows["B4.layer_note"]["state"] == "value"
     assert all(r["state"] == "value" or (r["state"] == "absent" and r["absence_kind"]) for r in rows.values())
 

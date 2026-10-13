@@ -843,6 +843,7 @@ def build_changes(*, now: datetime, state_dir: Path | None, thesis_path: Path,
                     + "、".join(str(n) for n in (triggers.get("nodes") or [])[:5])
                     + "——thesis 要不要改由人決定，系統只標記")
     section.lines.extend(_layer_note_lines(now=now))
+    section.lines.append(_layer_rep_line(now=now))
 
     # ⚠ 2026-09-23（Phase 0 Step 0b.1b，C／H 組）：原本這裡印「目標倍數背離 N 檔」（估值假設 ledger 的
     # target_pe 對今天的市場倍數）。目標倍數隨估值鏈退役；2026-09-29（Step 3.6）起由三題的有值／缺席計數取代。
@@ -859,6 +860,24 @@ def build_changes(*, now: datetime, state_dir: Path | None, thesis_path: Path,
             line += "：" + "、".join(str(w) for w in warnings)
         section.lines.append(line)
     return section
+
+
+def _layer_rep_line(*, now: datetime) -> str:
+    """層代表公司宣告（個股頁 S3c，2026-10-09）：現行幾份、過重看日幾份——0 也印（常駐計數器，L14）；讀不到照說（INV-3）。
+    過重看日的宣告照用、頁上標「已過重看日」；重問＝換版（`python -m alpha layer-reps <node> --add`）。"""
+    try:
+        from alpha.providers.layer_reps import ledger_snapshot
+        from engine_b import event_watch as ew
+
+        snap = ledger_snapshot(today=ew._today(now))
+    except Exception as exc:  # noqa: BLE001 — 這一行讀不到不帶走整段
+        return f"層代表公司宣告：讀不到（{type(exc).__name__}）——過重看日未算"
+    line = f"層代表公司宣告 {snap['current']} 份｜**過重看日 {len(snap['overdue'])}**"
+    if snap["overdue"]:
+        line += "：" + "、".join(snap["overdue"][:5]) + ("…" if len(snap["overdue"]) > 5 else "")
+    if snap["parse_errors"]:
+        line += f"｜壞行 {snap['parse_errors']}"
+    return line
 
 
 def _layer_note_lines(*, now: datetime) -> list[str]:

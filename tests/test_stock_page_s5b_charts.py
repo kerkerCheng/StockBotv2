@@ -124,3 +124,17 @@ def test_selfcheck_runs_only_on_request_and_never_touches_the_network() -> None:
     for forbidden in ("fetch(", "getJSON(", "XMLHttpRequest", "localStorage", "sendBeacon"):
         assert forbidden not in check, forbidden
     assert "text_overlaps" in check and "page_overflow_px" in check
+
+
+def test_the_path_ladder_lives_in_b2_and_only_copies_the_materialized_lines() -> None:
+    """個股頁 S3c（2026-10-09）：B2「路徑上各層」照抄 materialize 的 `path_layers`——年增、代表公司幾家、缺席原因都在
+    `alpha.path_layers` 算好；前端不算年增、不排序；押的格那幾條先列、其餘收在一個展開；代表公司的理由在 B2 的細節。"""
+    assert "pathFigure(payload)" in _body("blockVisuals")
+    fig = _body("pathFigure")
+    for copied in ("payload.path_layers", "h.latest.yoy", "h.latest.coverage", "h.absence", "pl.absence.reason",
+                   "p.focus", "h.proxy", "includes_page_company"):
+        assert copied in fig, f"路徑上各層少照抄了 {copied}"
+    for forbidden in (".sort(", "value / ", "/ prior", "reduce(("):
+        assert forbidden not in fig, f"路徑上各層不得自己算或排：{forbidden}"
+    detail = _body("chainDetail")
+    assert "payload.path_layers" in detail and "r.why" in detail and "latest.missing" in detail

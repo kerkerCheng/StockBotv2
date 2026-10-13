@@ -749,6 +749,69 @@ def cmd_layer_note(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_layer_reps(args: argparse.Namespace) -> int:
+    """層代表公司宣告 ledger 的讀寫入口（個股頁 S3c；使用者 2026-10-09 ②A）——研究替一層宣告用誰的營收代表這一層的成長。
+
+    - `--list`（預設）：列出這個節點的全部紀錄（標出現行那一份）。
+    - `--add spec.json`：append 一筆。spec：`expires`（重看日）、`reread_reason`、`representatives[]`
+      （每家 `company_id`〔co:*〕、`scope`〔whole_company／segment〕、scope=segment 時 `segment`〔分部名稱，要逐字出現在引文裡〕、
+      `why`〔≥20 字：為什麼代表、不能代表什麼〕、`citations`〔同層說明：evidence＋ref＋quote〕）、換版時 `supersedes_id`。
+    - `--retract <rep_id>`：append 一筆撤回紀錄（這一層回到「還沒宣告代表公司」）。
+
+    ⚠ 不入圖、不 gate 任何東西；同一家同口徑只能代表一層（寫入端擋）。公司節點（co:*）不用宣告——直接用它自己的營收。
+    """
+    from datetime import datetime, timezone
+
+    from .layer_rep import SCOPE_LABELS, layer_reps_record, select_current
+    from .providers.layer_reps import ledger_path, read_records, write_declaration
+
+    node = str(args.node)
+    records, errors = read_records(node)
+    if args.add or args.retract:
+        stamp = datetime.now(timezone.utc)
+        try:
+            if args.add:
+                spec = json.loads(Path(args.add).read_text(encoding="utf-8"))
+                if spec.get("node") and str(spec["node"]) != node:
+                    print(f"✗ spec 的 node（{spec['node']}）與命令列（{node}）不一致——節點只寫在命令列", file=sys.stderr)
+                    return 2
+                record = layer_reps_record({**spec, "node": node}, created_at=stamp, author=str(spec.get("author") or "session"))
+            else:
+                target = next((r for r in records if r.rep_id == args.retract), None)
+                if target is None:
+                    print(f"✗ ledger 裡沒有 {args.retract}", file=sys.stderr)
+                    return 2
+                record = layer_reps_record({"node": node, "retracted": True, "supersedes_id": target.rep_id,
+                                            "representatives": []}, created_at=stamp, author=target.author)
+            path = write_declaration(record)
+        except (KeyError, ValueError, TypeError, AlphaError) as exc:
+            print(f"✗ {exc}", file=sys.stderr)
+            return 2
+        print(f"✓ {record['rep_id']} → {path}")
+        for rep in record["representatives"]:
+            scope = SCOPE_LABELS.get(rep["scope"], rep["scope"]) + (f"（{rep['segment']}）" if rep.get("segment") else "")
+            print(f"  - {rep['company_id']}｜{scope}" + ("｜分部還沒有季序列：頁上會照寫缺席" if rep["scope"] == "segment" else ""))
+        return 0
+
+    current = select_current(records)
+    if args.format == "json":
+        path = ledger_path(node)
+        lines = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()] \
+            if path.is_file() else []
+        print(json.dumps({"node": node, "current": current.rep_id if current else None, "records": lines,
+                          "parse_errors": errors}, ensure_ascii=False, indent=2))
+        return 0
+    print(f"# 層代表公司：{node}（{len(records)} 筆；現行 {current.rep_id if current else '—'}）")
+    for r in records:
+        mark = "▶ 現行" if current is not None and r.rep_id == current.rep_id else ("撤回" if r.retracted else "已被取代")
+        reps = "、".join(f"{x.company_id}（{SCOPE_LABELS.get(x.scope, x.scope)}{'：' + x.segment if x.segment else ''}）"
+                        for x in r.representatives) or "—"
+        print(f"- {r.rep_id}｜{r.created_at.date().isoformat()}｜{mark}｜{reps}｜重看日 {r.expires}")
+    if errors:
+        print(f"⚠ 解析失敗 {len(errors)} 行：" + "；".join(errors[:3]))
+    return 0
+
+
 # ⚠ **2026-09-23（Phase 0 Step 0b.1b）：`cmd_entry_criterion` 與 `entry-criterion` 子命令退役（F 組）。**
 # EntryCriterion ledger 的讀寫入口。ledger 檔案本身留在 `library/private/alpha/entry_criteria/`
 # （private append-only，L10：拿不回來的只能 append），但**沒有任何消費端**——進場靠判斷。
@@ -786,6 +849,16 @@ def build_parser() -> argparse.ArgumentParser:
     note.add_argument("--register-watches", action="store_true", help="以現行那一份冪等重跑主張 watch 登記")
     note.add_argument("--format", choices=("markdown", "json"), default="markdown")
     note.set_defaults(func=cmd_layer_note)
+
+    reps = sub.add_parser(
+        "layer-reps",
+        help="層代表公司宣告 ledger：--list／--add spec.json／--retract <id>（個股頁 S3c；用誰的營收代表這一層的成長）")
+    reps.add_argument("node", help="層節點 id，例如 mat:inp_epiwafer（不收 co:*：公司節點直接用自己的營收）")
+    reps.add_argument("--list", action="store_true", help="（預設）列出 ledger")
+    reps.add_argument("--add", help="append 一筆（JSON spec；名冊、出處、同一家同口徑只代表一層由本命令核對）")
+    reps.add_argument("--retract", help="append 一筆撤回紀錄（指定 rep_id）")
+    reps.add_argument("--format", choices=("markdown", "json"), default="markdown")
+    reps.set_defaults(func=cmd_layer_reps)
 
     edge = sub.add_parser(
         "edge", help="研究時判邊緣（唯讀）：名冊外的代號也能判——同一個判定函式與門檻，缺的輸入用 yfinance 補、逐欄標來源")

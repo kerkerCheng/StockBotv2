@@ -227,7 +227,8 @@ def materialize_view(analyst_view_dict: Mapping[str, Any], *,
                      node_names: Mapping[str, str] | None = None,
                      demand_anchor: Mapping[str, Any] | None = None,
                      capture: Mapping[str, Any] | None = None,
-                     what_it_does: Mapping[str, Any] | None = None) -> dict[str, Any]:
+                     what_it_does: Mapping[str, Any] | None = None,
+                     path_layers: Mapping[str, Any] | None = None) -> dict[str, Any]:
     """`AnalystView.to_dict()` → artifact payload（含遮蔽、overview、兩個 digest）。純函式。
 
     `price_series` 是**脈絡不是判讀**：一條這檔自己的已收盤收盤價序列，讓使用者看得懂
@@ -274,6 +275,9 @@ def materialize_view(analyst_view_dict: Mapping[str, Any], *,
         "capture": dict(capture) if capture is not None else None,
         # 頁首「做什麼」（2026-10-08）：押的層或插槽（敘事）或圖上它供貨開發的節點（圖），與在示意圖的哪一格——`what_it_does` 組好照印。
         "what_it_does": dict(what_it_does) if what_it_does is not None else None,
+        # 路徑上各層（個股頁 S3c，2026-10-09）：從需求錨走到它坐的層，每一節一條年增（層＝研究宣告的代表公司、公司節點＝它自己）
+        # 或具名缺席。照抄 `alpha.path_layers`；APP 畫 B2「路徑上各層」。
+        "path_layers": dict(path_layers) if path_layers is not None else None,
         "materializer": {
             "version": MATERIALIZER_VERSION,
             "python": f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}",
@@ -348,7 +352,8 @@ def page_extra_for(ticker: str, layer_notes: Mapping[str, Any] | None,
                   diagrams: Sequence[Mapping[str, Any]] | None = None,
                   demand_anchor: Mapping[str, Any] | None = None,
                   capture: Mapping[str, Any] | None = None,
-                  what: Mapping[str, Any] | None = None) -> dict[str, Any] | None:
+                  what: Mapping[str, Any] | None = None,
+                  path_layers: Mapping[str, Any] | None = None) -> dict[str, Any] | None:
     """個股頁填得滿表的頁外輸入：引用這一頁的層說明節點（`layer_notes` state artifact 的 `cited_by.pages`）、
     涵蓋這一頁坐的層的示意圖 id（`diagrams`；None＝這一輪沒讀到示意圖目錄）、需求錨序列（`demand_anchor`：有值的序列 key；
     讀不到或回看的那天不推＝不給這個鍵）、「做什麼」講的節點（`what`）。artifact 讀不到 → 那一個鍵不給
@@ -356,6 +361,10 @@ def page_extra_for(ticker: str, layer_notes: Mapping[str, Any] | None,
     extra: dict[str, Any] = {}
     if what is not None and ((what.get("absence") or {}).get("kind")) != "upstream_unavailable":
         extra["what_it_does"] = list(what.get("focus") or ())
+    # 路徑上各層：只算錨以外、有年增的節點——只有錨那一節有值不算（否則這一格會恆亮，L14-4）
+    path_kind = ((path_layers or {}).get("absence") or {}).get("kind")
+    if path_layers is not None and path_kind not in ("upstream_unavailable", "point_in_time_unavailable"):
+        extra["path_layers"] = list(path_layers.get("valued_nodes") or ())
     if diagrams is not None:
         extra["diagrams"] = [str(d.get("id")) for d in diagrams]
     absence_kind = ((demand_anchor or {}).get("absence") or {}).get("kind")
@@ -496,7 +505,8 @@ def materialize(ticker: str, *, as_of: date | None = None, scenario: str | None 
                 layer_notes: Mapping[str, Any] | None = None,
                 diagrams: Mapping[str, Any] | None = None,
                 node_names: Mapping[str, str] | None = None,
-                anchors: Mapping[str, Any] | None = None) -> tuple[Path, dict[str, Any]]:
+                anchors: Mapping[str, Any] | None = None,
+                paths: Mapping[str, Any] | None = None) -> tuple[Path, dict[str, Any]]:
     """跑一次完整鏈並寫下 artifact。**只有這裡會連 Neo4j／Engine C／private ledger。**
 
     `readings`：`readings_context()` 的結果（多檔時由 `materialize_many` 載入一次傳進來）；沒給就自己載一次。
@@ -504,6 +514,7 @@ def materialize(ticker: str, *, as_of: date | None = None, scenario: str | None 
     `candidates`：`candidate_context()` 的結果（同上，多檔載一次）；沒給就為這一檔載一次。
     `node_names`：坐的層的節點名（`_seat_node_names`；多檔時載一次）；沒給就只查這一檔坐的那幾個。
     `anchors`：需求錨序列（`_anchor_context`；多檔時載一次）；沒給就為這一檔載一次。
+    `paths`：路徑上各層（`_path_context`；多檔時載一次——每一層一輪只算一次）；沒給就為這一檔載一次。
     """
     from briefing.alpha_view.sources import fetch_alpha_investment_view
     from briefing.analyst_view import build_analyst_view
@@ -526,14 +537,71 @@ def materialize(ticker: str, *, as_of: date | None = None, scenario: str | None 
     analyst_dict = analyst.to_dict()
     graph_read = isinstance((context or {}).get("seats"), Mapping)        # 讀圖 context 讀不到＝說不出坐哪幾格（不是「沒有」）
     what = what_it_does(analyst_dict, seats if graph_read else None, names, page_diagrams)
+    path_ctx = paths if paths is not None else _path_context(as_of, context, anchor_ctx, None)
+    path_layers = _page_path_layers(path_ctx, view.identity.company_id, what)
     payload = materialize_view(analyst_dict, generated_at=generated_at,
                                price_series=_close_series(ticker),
-                               page_extra=page_extra_for(ticker, notes_state, page_diagrams, demand, capture, what),
+                               page_extra=page_extra_for(ticker, notes_state, page_diagrams, demand, capture, what,
+                                                         path_layers),
                                diagrams=page_diagrams,
                                node_names={str(n): names[str(n)] for n in seats if str(n) in names},
-                               demand_anchor=demand, capture=capture, what_it_does=what)
+                               demand_anchor=demand, capture=capture, what_it_does=what, path_layers=path_layers)
     target = store or ArtifactStore()
     return target.write(payload), payload
+
+
+def _path_context(as_of: date | None, readings: Mapping[str, Any] | None, anchor_ctx: Mapping[str, Any] | None,
+                  state_store: Any = None) -> dict[str, Any]:
+    """路徑上各層（個股頁 S3c）的一輪輸入：結構表的鏈（同一輪 `--structure-table` 寫下的 artifact）、層代表公司宣告、名冊、
+    Engine C 的營收與匯率——每一層一輪只算一次。回看（as_of）整格 point_in_time_unavailable：結構表、坐的層、代表公司宣告都只有
+    現在的版本（INV-6，與錨、吃到多少一致）。任何一個上游讀不到＝整格這一輪沒讀到，不是「沒有」。"""
+    from alpha.path_layers import PAGE_ABSENCES, absent
+
+    if as_of is not None:
+        return {"absence": absent("point_in_time", PAGE_ABSENCES)}
+    try:
+        structure, _fresh = (state_store or StateArtifactStore()).read("structure_table")
+    except Exception as exc:  # noqa: BLE001 — 讀不到只讓這一格說讀不到
+        return {"absence": absent("structure_unread", PAGE_ABSENCES, f"這一輪沒讀到結構表（{type(exc).__name__}）")}
+    if structure.get("absence") or not isinstance(structure.get("rows"), list):
+        return {"absence": absent("structure_unread", PAGE_ABSENCES)}
+    from alpha.providers.layer_reps import current_declarations
+    from alpha.providers.path_layers import path_context
+    from engine_c.db import get_conn
+    from identity.registry import get_registry
+
+    try:
+        declarations, _book = current_declarations()
+    except Exception:  # noqa: BLE001 — 宣告 ledger 讀不到：每一層照寫讀不到（不是「沒宣告」）
+        declarations = None
+    seats = (readings or {}).get("seats") if isinstance((readings or {}).get("seats"), Mapping) else {}
+    try:
+        conn = get_conn()
+    except Exception as exc:  # noqa: BLE001
+        return {"absence": absent("structure_unread", PAGE_ABSENCES, f"Engine C 讀不到（{type(exc).__name__}）")}
+    try:
+        ctx = path_context(conn, structure_rows=structure["rows"], seats=seats, declarations=declarations,
+                           registry=get_registry(), anchor_ctx=anchor_ctx, as_of=date.today())
+    except Exception as exc:  # noqa: BLE001 — 路徑是 B2 的一格，算不出來不擋整份判讀
+        return {"absence": absent("structure_unread", PAGE_ABSENCES,
+                                  f"路徑上各層算不出來（{type(exc).__name__}: {str(exc)[:120]}）")}
+    finally:
+        conn.close()
+    return {**ctx, "structure_as_of": structure.get("generated_at"), "absence": None}
+
+
+def _page_path_layers(ctx: Mapping[str, Any] | None, company_id: str | None,
+                      what: Mapping[str, Any] | None) -> dict[str, Any]:
+    """一頁的「路徑上各層」（`alpha.path_layers.page_path`）；一輪的輸入讀不到就照抄那個缺席。"""
+    from alpha.path_layers import page_path
+
+    ctx = ctx or {}
+    if ctx.get("absence"):
+        return {"paths": [], "hops": {}, "counts": {}, "absence": dict(ctx["absence"])}
+    paths, dropped = (ctx.get("paths_by_company") or {}).get(str(company_id), ([], {"no_chain": 0, "input_side": 0}))
+    page = page_path(paths, dropped, ctx.get("hops") or {}, page_company=str(company_id),
+                     focus=(what or {}).get("focus") or (), in_structure=str(company_id) in (ctx.get("companies") or ()))
+    return {**page, "as_of": ctx.get("as_of"), "structure_as_of": ctx.get("structure_as_of")}
 
 
 def _anchor_context(as_of: date | None) -> dict[str, Any]:
@@ -628,10 +696,12 @@ def materialize_many(tickers: Sequence[str], *, as_of: date | None = None,
     loaded = _diagrams_loaded() if tickers else None
     names = _seat_node_names(readings) if tickers else None
     anchors = _anchor_context(as_of) if tickers else None
+    paths = _path_context(as_of, readings, anchors, state_store) if tickers else None
     for ticker in tickers:
         try:
             path, _ = materialize(ticker, as_of=as_of, store=target, readings=readings, candidates=candidates,
-                                  layer_notes=notes_state, diagrams=loaded, node_names=names, anchors=anchors)
+                                  layer_notes=notes_state, diagrams=loaded, node_names=names, anchors=anchors,
+                                  paths=paths)
         except Exception as exc:  # noqa: BLE001 — 逐檔隔離；理由原樣回報
             results.append((ticker, None, f"{type(exc).__name__}: {str(exc)[:200]}"))
         else:

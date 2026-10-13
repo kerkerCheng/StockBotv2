@@ -114,6 +114,16 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 `StockBotv2-Daily` 的 ⑱⑲ 取代（1.2a 停用、2026-09-25 1.2b 刪除）；它們的理由（LLM 失敗心跳照發、永遠 exit 0、Python 不用 `.cmd`、
 發送走 subprocess）搬進 `crons/daily_task.py` 的 docstring，守它們的測試改主詞搬進 `tests/test_daily_task.py`「無人值守入口」節。
 
+### Sandbox impact review 結論（2026-10-09：個股頁 S3c 路徑上各層——層代表公司宣告 ledger）
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | 新目錄 `library/private/alpha/layer_representatives/`（ignored private、append-only）；寫入端只有互動的 `python -m alpha layer-reps`。無人值守路徑上只多**讀**：daily ⑬ materialize（argv 不變）每輪讀一次這個目錄、同一輪 `structure_table` state artifact 的 `chain`、名冊與 Engine C 的營收與匯率（與「吃到多少」同一組讀取），個股頁 payload 多 `path_layers`、填得滿表 B2「路徑上各層」讀 `@path_layers`；心跳段 2 多一行「層代表公司宣告 N 份｜過重看日 M」。不連網、不跑 LLM、不寫任何 authority、不碰圖 |
+| **2 canonical skill／prompt／本檔** | 本節；本檔「層代表公司宣告」命令；`docs/ARCHITECTURE.md` 首屏「路徑上各層」；個股頁 plan Amendment G 與 S3 表。不動任何 skill、prompt |
+| **3 最窄 rule** | daily argv 不變；不新增 step、allowlist、APP 路由；APP 仍無寫入端點；寫入只在互動 CLI |
+| **4 contract test** | `tests/test_layer_reps.py`（形狀封閉 15 列、分部名稱逐字、id 綁內容、as-of 與撤回、寫入端名冊／出處／取代鏈、同一家同口徑只代表一層、不碰層說明 ledger、心跳 0 也印）；`tests/test_path_layers.py`（截在本公司之前、上游不收、固定成分年增、14 週不比、只有錨有值不算、缺席字彙封閉、頁面合約拿掉同層各家）；`tests/test_stock_page_s5b_charts.py`（前端只照抄、不排序）；變異 12／12 |
+| **5 端到端 smoke** | 真資料：101 個路徑節點、108 家公司一輪 5 秒；8 份宣告（聯亞→InP 磊晶、Lam＋應材→半導體設備、景碩→IC 載板、日東紡電子材料→玻纖布、Soitec Edge & Cloud AI→Photonics-SOI、Lumentum Components→EML、AAOI Data Center→可插拔模組、華明→分接開關）有值 2 層、其餘 6 層照寫缺什麼（分部沒有季序列、海外季營收沒接） |
+
 ### Sandbox impact review 結論（2026-10-08：個股頁 S3b 吃到多少——歷史匯率 FRED H.10）
 
 | 步 | 結論 |
@@ -978,6 +988,10 @@ materialize 用**，不動 `discover_tracked_tickers`——那會連帶擴大 ED
 & '.venv\Scripts\python.exe' -m alpha layer-note mat:inp_epiwafer                    # 列出（標出現行那一份）
 & '.venv\Scripts\python.exe' -m alpha layer-note mat:inp_epiwafer --add spec.json    # 出處核對＋每條主張登記語意 watch（layer_note:<id>#<n>）
 & '.venv\Scripts\python.exe' -m alpha layer-note mat:inp_epiwafer --register-watches # append 之後登記失敗時冪等補登
+# 層代表公司宣告（2026-10-09 個股頁 S3c；用誰的營收代表這一層的成長；不入圖、同一家同口徑只能代表一層）
+& '.venv\Scripts\python.exe' -m alpha layer-reps mat:inp_epiwafer                    # 列出（標出現行那一份）
+& '.venv\Scripts\python.exe' -m alpha layer-reps mat:inp_epiwafer --add spec.json    # spec：expires、reread_reason、representatives[]（company_id、scope、segment、why、citations）；換版帶 supersedes_id
+#   寫完要在個股頁 B2「路徑上各層」看到：python -m webapp materialize（全部頁；各層一輪只算一次）
 # 閱讀頁（2026-10-07 個股頁 plan S4b；APP #/layer-notes、#/layer/<節點>；daily ⑬ 每天重建）——寫完層說明想馬上在 APP 讀到：
 & '.venv\Scripts\python.exe' -m webapp materialize --layer-notes                         # 只重建閱讀頁（全文、出處的文件自宣告、主張狀態、哪幾頁連過來）
 & '.venv\Scripts\python.exe' -m webapp materialize COHR LITE --layer-notes               # 連個股頁「坐的層」的連結一起更新（只重跑點名的那幾檔）

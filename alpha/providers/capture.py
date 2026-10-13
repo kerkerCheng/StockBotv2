@@ -13,11 +13,43 @@ from typing import Any, Mapping
 
 from alpha.capture import capture_series, fiscal_quarters, quarter_fx, tw_quarters
 
+NO_QUARTERLY_REVENUE = "公司沒有季營收序列（不是台股月營收、也沒有 EDGAR 季營收——海外公司的財報來源還沒接）"
+
+
+def company_quarters(conn: Any, ticker: str, *, as_of: date) -> dict[str, Any]:
+    """一家公司 as-of T 的曆季營收：有台股月營收就三個月成一季，否則 EDGAR 季營收對曆季（期末 ±10 天、長度差 ≤5 天、
+    兩期同季不挑）。回 `{quarters, gaps, source}`；`source` 是 None＝兩條路都沒有資料。「吃到多少」與路徑上各層共用（L16）。"""
+    from engine_c.history import first_filed_by_period, fundamental_series, monthly_revenue_as_of
+
+    monthly = monthly_revenue_as_of(conn, ticker, as_of=as_of)
+    if monthly["months"]:
+        quarters, gaps = tw_quarters(monthly["months"])
+        gaps += [{"period": c["data_month"], "reason": f"同一個月兩個不同的數 {c['values']}——那個月不用"}
+                 for c in monthly.get("conflicts") or ()]
+        return {"quarters": quarters, "gaps": gaps, "source": "台股月營收（三個月相加）"}
+    rows = fundamental_series(conn, ticker, "revenue_quarter", as_of=as_of)
+    if not rows:
+        return {"quarters": {}, "gaps": [], "source": None}
+    quarters, gaps = fiscal_quarters(rows, first_filed_by_period(conn, ticker, "revenue_quarter", as_of=as_of))
+    return {"quarters": quarters, "gaps": gaps, "source": "EDGAR 季營收"}
+
+
+def fx_tables(conn: Any, currencies: Any, *, as_of: date) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+    """幣別 → 季均價表（美元以外）；讀不到某幣別的日匯率就不給那個鍵（換算端照寫「沒有歷史匯率」）。"""
+    from engine_c.history import fx_daily
+
+    fx: dict[str, Any] = {}
+    gaps: list[dict[str, Any]] = []
+    for currency in sorted({str(c) for c in currencies} - {"USD"}):
+        rates = fx_daily(conn, currency, as_of=as_of)
+        if rates:
+            fx[currency], fx_gaps = quarter_fx(rates)
+            gaps += [{**g, "reason": f"{currency}：{g['reason']}"} for g in fx_gaps]
+    return fx, gaps
+
 
 def page_capture(conn: Any, ticker: str, demand_anchor: Mapping[str, Any] | None, *, as_of: date) -> dict[str, Any]:
     """一頁的「吃到多少」：`{anchor_key, anchor_label, revenue_source, points, gaps, absence}`。"""
-    from engine_c.history import first_filed_by_period, fundamental_series, fx_daily, monthly_revenue_as_of
-
     demand = demand_anchor or {}
     if (demand.get("absence") or {}).get("kind") in ("upstream_unavailable", "point_in_time_unavailable"):
         return {"points": [], "gaps": [], "absence": dict(demand["absence"])}
@@ -26,26 +58,13 @@ def page_capture(conn: Any, ticker: str, demand_anchor: Mapping[str, Any] | None
     if anchor is None:
         reason = (demand.get("absence") or {}).get("reason") or "這一頁的需求錨沒有加總型（曆季）的序列"
         return {"points": [], "gaps": [], "absence": {"kind": "not_yet_recorded", "reason": f"沒有可以比的錨：{reason}"}}
-    monthly = monthly_revenue_as_of(conn, ticker, as_of=as_of)
-    if monthly["months"]:
-        company, gaps = tw_quarters(monthly["months"])
-        source = "台股月營收（三個月相加）"
-        gaps += [{"period": c["data_month"], "reason": f"同一個月兩個不同的數 {c['values']}——那個月不用"}
-                 for c in monthly.get("conflicts") or ()]
-    else:
-        rows = fundamental_series(conn, ticker, "revenue_quarter", as_of=as_of)
-        if not rows:
-            return {"anchor_key": anchor["key"], "anchor_label": anchor.get("label"), "points": [], "gaps": [],
-                    "absence": {"kind": "not_yet_recorded",
-                                "reason": "公司沒有季營收序列（不是台股月營收、也沒有 EDGAR 季營收——海外公司的財報來源還沒接）"}}
-        company, gaps = fiscal_quarters(rows, first_filed_by_period(conn, ticker, "revenue_quarter", as_of=as_of))
-        source = "EDGAR 季營收"
-    fx: dict[str, Any] = {}
-    for currency in sorted({str(q.get("currency")) for q in company.values()} - {"USD"}):
-        rates = fx_daily(conn, currency, as_of=as_of)
-        if rates:
-            fx[currency], fx_gaps = quarter_fx(rates)
-            gaps += [{**g, "reason": f"{currency}：{g['reason']}"} for g in fx_gaps]
+    got = company_quarters(conn, ticker, as_of=as_of)
+    if got["source"] is None:
+        return {"anchor_key": anchor["key"], "anchor_label": anchor.get("label"), "points": [], "gaps": [],
+                "absence": {"kind": "not_yet_recorded", "reason": NO_QUARTERLY_REVENUE}}
+    company, gaps, source = got["quarters"], list(got["gaps"]), got["source"]
+    fx, fx_gaps = fx_tables(conn, {str(q.get("currency")) for q in company.values()}, as_of=as_of)
+    gaps += fx_gaps
     result = capture_series(company, fx, anchor["points"], as_of=as_of)
     out = {"anchor_key": anchor["key"], "anchor_label": anchor.get("label"), "revenue_source": source,
            "points": result["points"], "gaps": gaps + result["gaps"], "absence": None}
@@ -55,4 +74,4 @@ def page_capture(conn: Any, ticker: str, demand_anchor: Mapping[str, Any] | None
     return out
 
 
-__all__ = ["page_capture"]
+__all__ = ["NO_QUARTERLY_REVENUE", "company_quarters", "fx_tables", "page_capture"]

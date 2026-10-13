@@ -770,13 +770,75 @@ function chainDetail(payload, view) {
       + (last.per_usd ? `；換美元用季均價（FRED H.10，${last.period} 一美元 ${fmtNumber(last.per_usd, 2)} ${CURRENCY_WORD[last.currency] || last.currency}）` : '')
       + `；${last.known_on} 起營收、錨、匯率都齊。往上＝吃到的比例變大。`);
   }
+  // 路徑上各層（S3c）：有宣告代表公司的層，逐家印用哪一種營收、為什麼代表、最新一季誰沒進來（照抄 materialize）
+  const hops = (payload.path_layers || {}).hops || {};
+  Object.keys(hops).forEach((node) => {
+    const h = hops[node];
+    (h.representatives || []).forEach((r) => {
+      notes.push(`${h.name}｜代表公司 ${r.name}（${r.scope_label}${r.segment ? '：' + r.segment : ''}）：${r.why}`);
+    });
+    const latest = h.latest || {};
+    (latest.missing || []).forEach((m) => notes.push(`${h.name}｜${latest.period} 沒算進來：${m.name || m.company} ${m.reason}`));
+    if (h.declaration) {
+      notes.push(`${h.name}｜代表公司宣告於 ${h.declaration.declared_on}，重看日 ${h.declaration.expires}`
+        + (h.declaration.overdue ? '（已過重看日）' : ''));
+    }
+  });
   if (!line && !notes.length) return null;
-  return drill('細節：這條鏈怎麼走、錨與吃到多少的出處', () => {
+  return drill('細節：這條鏈怎麼走、錨、吃到多少與各層代表公司的出處', () => {
     const box = el('div', 'block-detail');
     if (line) box.appendChild(argumentSection(line));
     notes.forEach((text) => box.appendChild(el('div', 'row-reason', text)));
     return box;
   });
+}
+
+/** 路徑上各層（B2，個股頁 S3c）：錢從需求錨往下走到它坐的層，每一節一行——年增（層＝研究宣告的代表公司加總、公司＝它自己）
+ *  或產生端宣告的缺席原因。押的格那幾條路徑先列、其餘收在一個展開；順序照 materialize（索引不是名次）。只照抄、不算。 */
+function pathFigure(payload) {
+  const pl = payload.path_layers;
+  if (!pl) return null;
+  const box = el('div', 'path-layers');
+  box.appendChild(el('div', 'chart-axis-title', '路徑上各層：錢從需求錨往下，經過的每一層有沒有在長'));
+  if (pl.absence) {
+    box.appendChild(el('div', 'row-reason ss-pending', pl.absence.reason || absenceLabel(pl.absence.kind) || '沒有'));
+    return box;
+  }
+  const hops = pl.hops || {};
+  const hopRow = (node) => {
+    const h = hops[node] || { name: node, kind_label: '' };
+    const row = el('div', 'path-hop');
+    row.appendChild(el('span', 'path-kind', h.kind_label || ''));
+    row.appendChild(el('span', 'path-name', h.name || node));
+    let text = '';
+    if (h.kind === 'anchor') {
+      text = (h.series || []).filter((s) => typeof s.yoy === 'number')
+        .map((s) => `${s.label} ${fmtPercent(s.yoy)}（${s.period}）`).join('；') || ((h.absence || {}).reason || '');
+    } else if (h.latest) {
+      text = `年增 ${fmtPercent(h.latest.yoy)}（${h.latest.period}${h.latest.coverage ? `，代表公司 ${h.latest.coverage} 家` : ''}）`
+        + (h.kind === 'company' ? `｜${h.proxy || ''}` : '') + (h.includes_page_company ? '｜含本公司' : '');
+    } else {
+      text = (h.absence || {}).reason || '沒有';
+    }
+    row.appendChild(el('span', h.latest || h.kind === 'anchor' ? 'path-value' : 'path-value path-absent', text));
+    return row;
+  };
+  const pathBox = (p) => {
+    const one = el('div', 'path-one');
+    p.nodes.forEach((node) => one.appendChild(hopRow(node)));
+    return one;
+  };
+  const paths = pl.paths || [];
+  const shown = paths.filter((p) => p.focus);
+  const head = shown.length ? shown : paths.slice(0, 1);
+  head.forEach((p) => box.appendChild(pathBox(p)));
+  const rest = paths.filter((p) => head.indexOf(p) < 0);
+  if (rest.length) box.appendChild(drill(`其他 ${rest.length} 條路徑`, () => {
+    const more = el('div', 'block-detail');
+    rest.forEach((p) => more.appendChild(pathBox(p)));
+    return more;
+  }));
+  return box;
 }
 
 /** 「技術鏈」的展開：它坐的每一層現在讀成什麼（讀圖面板照抄）。節點印名字——層說明的標題、圖上的名字，都沒有才印 ID
@@ -1644,6 +1706,8 @@ function blockVisuals(payload, view, key) {
   const out = [];
   if (key === 'B2') {
     anchorFigures(payload).forEach((n) => out.push(n));
+    const path = pathFigure(payload);
+    if (path) out.push(path);
     const capture = captureFigure(payload);
     if (capture) out.push(capture);
   }

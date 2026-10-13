@@ -24,7 +24,7 @@ from typing import Any, Mapping, Sequence
 
 from alpha.absence import ABSENCE_KINDS, default_absence_kind
 
-PAGE_SCHEMA_VERSION = "stock-page-schema/1.0"
+PAGE_SCHEMA_VERSION = "stock-page-schema/1.1"   # 1.1（2026-10-09 S3c）：拿掉 B2 同層各家變化、路徑上各層接上
 
 #: 單位（§5.1）：每塊、每個元素都要宣告掛在哪個單位。
 UNITS: Mapping[str, str] = {
@@ -81,7 +81,6 @@ BLOCKS: tuple[PageBlock, ...] = (
 )
 
 _S3 = "個股頁 S3（機械資料）尚未做"
-_S3_ANCHOR = f"{_S3}：需求錨序列（SEC 四家現金資本支出＋NVIDIA 營收）、同業營收季化"
 
 ELEMENTS: tuple[PageElement, ...] = (
     # B0 頁首與一行狀態
@@ -112,16 +111,19 @@ ELEMENTS: tuple[PageElement, ...] = (
                 ("@demand_anchor",), "not_yet_recorded",
                 "需求錨序列（config/demand_anchor_series.json；個股頁 S3a）：這家公司在結構表走到的錨對到的序列"
                 "——走不到錨、或題材沒宣告序列，就是沒有"),
-    PageElement("B2.path_layers", "B2", "路徑上各層：從錨到公司坐的層，每層一條年增", "path", "mechanical", (),
-                "capability_absent", f"{_S3_ANCHOR}；結構表的鏈有，層的同業序列沒有"),
+    PageElement("B2.path_layers", "B2", "路徑上各層：從錨到公司坐的層，每層一條年增", "path", "mechanical",
+                ("@path_layers",), "not_yet_recorded",
+                "路徑上各層（個股頁 S3c）：結構表裡這家公司從需求錨走到它坐的層的鏈；層＝研究宣告的代表公司營收"
+                "（曆季、換美元、同一組公司兩年都有才算年增）、公司節點＝它自己的營收——不在結構表、走不到錨、"
+                "層還沒宣告代表公司、代表公司沒有季營收，就沒有（只有錨那一節有值不算）"),
     PageElement("B2.capture_ratio", "B2", "吃到多少：公司當季營收 ÷ 當季錨", "company", "mechanical",
                 ("@capture_ratio",), "not_yet_recorded",
                 "吃到多少（個股頁 S3b）：公司同一曆季的營收（換美元，季均價）÷ 雲端四大現金資本支出——沒有加總型的錨、"
                 "公司沒有季營收（海外）、會計季對不上曆季，就沒有"),
     PageElement("B2.share_now", "B2", "份額（現在）：同階段同業的營收堆疊、覆蓋率必印", "layer", "research", (),
                 "capability_absent", f"{_S3}；同階段同業的宣告在層說明（S4）"),
-    PageElement("B2.peer_changes", "B2", "同層各家變化：最近一季年增，依名稱排、標階段", "layer", "mechanical", (),
-                "capability_absent", f"{_S3}：同業營收季化"),
+    # ⚠ 2026-10-09 使用者 ①A：「同層各家變化」（最近一季年增、依名稱排、標階段）拿掉——10-05 回饋 #18：「同層各家只是一堆年增數字，
+    # 沒有內涵……拿掉，同業改和評價一起看」。同業和評價一起看另排（要同業的共識數字）。
     PageElement("B2.demand_reading", "B2", "一句讀法：什麼在放量、誰在花錢", "path", "research",
                 ("brief/brief:demand",), "not_yet_recorded", "v2 敘事的「什麼在放量、誰在花錢」"),
     # B3 營收從哪來

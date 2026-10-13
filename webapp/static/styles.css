@@ -441,6 +441,16 @@ table.rank.compare td:first-child { color: var(--muted); }
 .brief-card .lamp-notes { margin: .1rem 0 .3rem; }
 .lamp-plain { margin-bottom: 6px; }
 .lamp-row { font-size: 14px; line-height: 1.6; margin: 2px 0; }
+
+/* 路徑上各層（B2，個股頁 S3c）：一條路徑一組、一節一行（種類｜名字｜年增或缺席原因）；手機上自然換行 */
+.path-layers { margin: 10px 0 6px; }
+.path-one { border-left: 2px solid var(--border); margin: 6px 0 8px 4px; padding-left: 8px; }
+.path-hop { font-size: 13px; line-height: 1.5; margin: 3px 0; overflow-wrap: anywhere; }
+.path-kind { color: var(--muted); font-size: 11px; border: 1px solid var(--border); border-radius: 6px; padding: 0 4px;
+  margin-right: 6px; }
+.path-name { font-weight: 600; margin-right: 6px; }
+.path-value { color: var(--text); }
+.path-absent { color: var(--muted); }
 .glossary { margin-top: .6rem; padding: .45rem .7rem; border-left: 3px solid var(--border); }
 .glossary .rule { margin: .15rem 0; }
 .table-filter { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 8px 0 4px; }

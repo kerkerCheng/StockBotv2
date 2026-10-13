@@ -813,6 +813,20 @@ AnalystView.brief（optional）→ APP 首屏 briefCard；六張卡收進「為�
   週一是聯邦假日延到週二＝+8 天，再留兩天；S3 R2 C1——原本的 7 天不是上界）；
   季均價要整季頭尾都有報價。可知日＝營收、錨、匯率三者最晚，as-of T 時還不可知的那一季不算（INV-6）。**手機量測（S5c）**：`?selfcheck=1&w=390`（加 `&open=1` 先打開每個展開再量）讓 app.js 量整頁溢出與 SVG 字疊字，結果寫進隱藏的
   `#selfcheck` 由 headless Edge 讀（Edge 最小視窗約 496px，390 用根寬度模擬）；只在帶參數時跑、不連網。
+  **路徑上各層（2026-10-09 個股頁 S3c；B2；使用者 ①A ②A）**：錢從需求錨往下走到它坐的層，每一節一行年增或具名缺席——
+  `alpha/path_layers.py`（純函式）＋`alpha/providers/path_layers.py`（取數，一輪 materialize 每一層、每一家公司各算一次）。
+  路徑＝結構表 `chain`：鏈經過本公司就截在它之前、供貨邊收整條、不經過本公司的依賴／受限邊不收（那是它的上游，照計數）。
+  每一節：錨＝照抄 B2「錨的變化」的最新年增；層與產品＝**研究宣告的代表公司**同一曆季營收換美元加總的年增，**只算那一季與去年同季都有值、
+  已可知的那幾家**（固定成分，印「代表公司 n/N 家」，其餘逐家寫缺什麼）；公司節點（co:）＝它自己的整家營收、自己的季（比去年同一季、
+  14 週的季不比），必印「整家公司營收（含不走這條路的業務）」。取數與換匯沿用「吃到多少」（`company_quarters`、`fx_tables`、
+  `usd_quarter`——同一個 owner）。只有錨那一節有值不算「有值」（否則恆亮，L14-4）；回看整格 point_in_time_unavailable。
+  **層代表公司宣告**（`alpha/layer_rep` 契約＋`alpha/providers/layer_reps.py`，ledger `library/private/alpha/layer_representatives/`，
+  CLI `python -m alpha layer-reps`）：A3 研究判斷、append-only、不入圖；一筆＝一層完整的代表公司清單（`company_id`、口徑
+  whole_company／segment——分部名稱要逐字出現在帶出處的引文裡、`why`、出處沿用層說明的 Citation 與同一支核對 `verify_refs`）；
+  寫入端擋名冊沒有的公司、指不回去的出處、分岔的取代鏈，以及**同一家同口徑代表兩層**（同一份營收算進兩層）。as-of 只看那天以前寫的。
+  另一本 ledger 而不放進層說明紀錄：路徑上最常經過的層還沒有層說明、而層說明換版會收掉該層所有主張 watch（個股頁 plan Amendment G）。
+  代表公司不是「份額（現在）」的同階段同業（L12）。心跳段 2 多一行「層代表公司宣告 N 份｜過重看日 M」。
+  「同層各家變化」（每家最近一季年增）依使用者 ①A 從頁面合約拿掉（`stock-page-schema/1.1`）。
 - **是不是新賭注（同上，使用者 A3）**：候選推導多一格 `shared_bet`——這一檔和每一檔**持有的 alpha 檔**（`held_index`）共用的需求錨與
   層／插槽，依 ticker 字母列，**不打分、不排序、不加權、不進候選狀態前提**。需求錨只取結構表逐列的 `demand_anchor`／`anchor_basis`
   （唯一來源；materialize 讀**同一輪** `--structure-table` 寫下的 artifact——`webapp/materialize.py::bet_structure`，不另開連線重算），

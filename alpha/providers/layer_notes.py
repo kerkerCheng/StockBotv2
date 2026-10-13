@@ -133,6 +133,11 @@ def _refs(record: Mapping[str, Any]) -> list[tuple[str, str]]:
 def verify_citation_refs(record: Mapping[str, Any], *, raw_dir: Path | None = None,
                          lead_exists: Any = None) -> list[str]:
     """每個出處指不指得回去：`raw:<檔名>` 在 library/raw 有同名檔、`lead:<id>` 在 lead registry 裡。回問題清單（空＝全過）。"""
+    return verify_refs(_refs(record), raw_dir=raw_dir, lead_exists=lead_exists)
+
+
+def verify_refs(pairs: Iterable[tuple[str, str]], *, raw_dir: Path | None = None, lead_exists: Any = None) -> list[str]:
+    """(在哪裡, ref) 清單的出處核對——層說明與層代表公司宣告共用這一支（L16：核對規則只有一份）。"""
     raw_dir = raw_dir or RAW_DIR
     if lead_exists is None:
         def lead_exists(lead_id: str) -> bool:
@@ -140,7 +145,7 @@ def verify_citation_refs(record: Mapping[str, Any], *, raw_dir: Path | None = No
 
             return lead_id in (leads.load().get("leads") or {})
     problems: list[str] = []
-    for where, ref in _refs(record):
+    for where, ref in pairs:
         kind, _, ident = ref.partition(":")
         if kind == "raw":
             if not any(p.stem == ident for p in raw_dir.glob(f"{ident}.*")):

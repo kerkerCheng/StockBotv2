@@ -5,8 +5,8 @@
 > 單檔頁 2026-10-08 E 瘦身（頁首＋十三塊；給機器看的拿掉）；S4 是研究，照常。**
 > **2026-10-09：S3a、S3b ✅ 關閉**（R2 CONDITIONAL_GO → C1 匯率公布上界、C2 會計期長度修好 → 窄範圍覆核 GO；見「S3 拆段」表下）；
 > **Amendment F（使用者電腦上看的五點）✅**：參考尺一條線、柱狀圖 Y 軸、營收搬到 B3、四盞燈白話、頁首「做什麼」＋示意圖標「押在這裡」。
-> **S3c 開工前待使用者決定兩件**：①「同層各家變化」——使用者 10-05 回饋 #18 說拿掉同層年增表、同業改和評價一起看，但 v1.0 合約仍留著這一格；
-> ②「路徑上各層」每層一條年增要用誰的營收代表那一層（多數公司坐好幾層，整家公司營收會失真）。
+> **S3c ✅（2026-10-13；使用者 2026-10-09 決定 ①A 拿掉同層各家年增表、②A 研究宣告每一層的代表公司）**：B2「路徑上各層」上線；
+> 代表公司宣告另開一本 ledger（Amendment G，可一句話撤回改放進層說明）；第一批 8 層宣告、2 層有值、其餘照寫缺什麼；R2 見 S3 表下。
 
 > 狀態：**S1 ✅ v1.0 凍結（2026-10-07，brainstorm §15）**：負錨點兩檔（合晶 6182 事件月 2021-10、矽創 8016 事件月 2021-06）的時光機頁與三檔贏家對照——
 > 最乾淨分開的是 B12「價」（自家三年百分位：負錨點 99、100；贏家 27、83、31），其次「錢」的自家毛利位置（93、100 對 0、29、83）；B3 供給緊四件事方向相反
@@ -147,6 +147,16 @@ B6 參考尺（自家三年倍數最低／中位／最高／今天，對數刻�
 | proposed change | ①參考尺整把在一條對數刻度的線上：自家範圍兩端與中位各一條刻度線、同組中位的菱形畫在同一條線上；圖照內容欄寬 1:1 出圖 ②柱狀圖（錨、吃到多少、營收）共用一個畫法：左上軸名與單位、左邊刻度，圖下不放字；可知日、推算的是哪幾家、代理說明搬進該塊的展開 ③頁首公司名下第一行「做什麼」（B0）：敘事宣告的押的層或插槽優先，沒宣告時列圖上它供貨或開發的節點並說敘事還沒宣告，再一句在示意圖的哪一格；畫圖器記下每一格的位置與節點（位置表綁 SVG），B4 示意圖把坐的格疊框——押的格粗框加「押在這裡」 ④營收柱與「出現在數字裡了嗎」的數字搬到 B3 營收從哪來；B3 的讀法句仍印「還沒寫」 ⑤四盞燈的理由句改白話（判色規則與輸入一字不改），燈列上方一段說明四盞各問什麼、稀釋與 going concern 是什麼 |
 | why | 使用者主動指示＝已授權；AGENTS「首屏的單位是句不是格」「APP 是給人看的」；③④⑤都是「看得到但看不懂／要找」——頁首一行與白話句不加任何判斷，只把已有的事實放到人先看的地方 |
 | impact | `webapp/static/app.js`、`styles.css`；`webapp/materialize.py`（`what_it_does`）；`webapp/diagrams.py`（位置表檢查）、`scripts/draw_diagram.py`（記位置）；`briefing/analyst_view/page_schema.py`（B0 元素、B3／B7 讀法、`fill_table` 頁外輸入沒讀到優先）；`briefing/analyst_view/contracts.py`（`PLAIN_WIPEOUT`）；`alpha/wipeout.py`（理由句）；示意圖說明檔每一格補 `nodes`（私有）；ARCHITECTURE 首屏三條與 §6 示意圖、OPERATIONS 示意圖命令與 sandbox 結論 |
+
+## Amendment（2026-10-09 G；S3c：拿掉同層各家年增表、代表公司宣告另開一本 ledger）
+
+| 欄 | 內容 |
+|---|---|
+| 原 plan | S3c「B2 路徑各層與同層各家（依名稱排，標階段）」，驗收「路徑上各層」「同層各家變化」有值的頁數；頁面合約 v1.0 有 `B2.peer_changes` |
+| 新觀察 | 使用者 2026-10-09 選 ①A（拿掉同層各家年增表：10-05 回饋 #18「同層各家只是一堆年增數字，沒有內涵……同業改和評價一起看」）、②A（研究替每一層宣告代表公司；原提案寫「寫在層說明裡、不入圖」）。設計比較時查到：路徑上頁數最多的層（CPO 29 頁、CW DFB 10、CDU 8）沒有層說明；層說明換版會收掉該層所有主張 watch（今天 19 筆）、讓 4 條敘事反證連到的層主張變成非現行 |
+| proposed change | ①頁面合約拿掉 `B2.peer_changes`（`stock-page-schema/1.1`）；同業和評價一起看另排。②代表公司宣告**另開一本 append-only ledger**（`library/private/alpha/layer_representatives/`、`python -m alpha layer-reps`）：研究宣告、不入圖、同層每頁共用（②A 的三個要素都保留），只是不寫進層說明那一筆紀錄；閱讀時照樣印在那一層。**可一句話撤回**改回寫在層說明裡——代價是 CPO、CW DFB、CDU 要先寫完整層說明才能宣告。S3c 驗收改成「路徑上各層有值的頁數，依節點種類分開報（研究宣告的層／公司節點）」 |
+| why | 使用者主動指示＝已授權；不放進層說明紀錄的理由是三筆會壞的現有資料（L11-6：上面「新觀察」）；被否決的替代：B 只用「只坐這一層」的公司（今天 CW DFB 7 家只 1 家、CDU 7 家只 1 家、InP 基板 4 家 0 家）、C 全部加總（被大公司整家營收主導） |
+| impact | 新 `alpha/layer_rep/`、`alpha/providers/layer_reps.py`、`alpha/path_layers.py`、`alpha/providers/path_layers.py`；`alpha/capture.py`、`alpha/providers/capture.py`（抽出共用的換美元與取數）；`alpha/providers/layer_notes.py`（出處核對共用一支）；`alpha/cli.py`（`layer-reps`）；`webapp/materialize.py`、`app.js`、`styles.css`；`crons/heartbeat.py`（一行計數）；`page_schema`；ARCHITECTURE、OPERATIONS（sandbox 結論）；R2 命中 trigger 1（新 authority ledger）與 2（跨公司期間、換匯、時點）——照 Phase 7 plan Q7 常規 opt-in |
 
 ## S3 拆段（2026-10-08；實作分段，不改 S3 的範圍與驗收）
 

@@ -150,6 +150,12 @@ The set of `parked` leads whose source tracing did not reach a verbatim primary 
 附「在哪裡找過」）。materialize 每次算、印在稽核區；**不放閘、不排序**。合約住 `briefing/analyst_view/page_schema.py`。
 *Avoid:* 完成度分數、覆蓋率排名
 
+### 層代表公司（layer representatives）
+研究替一層宣告「用誰的營收代表這一層的成長」（全公司或某個分部的營收），個股頁 B2「路徑上各層」據此算年增。研究判斷、append-only、
+不入圖；同一家同口徑只能代表一層。**它不是「同階段同業」**——同階段同業是「份額（現在）」的分母（賣同一種東西的全部公司），代表公司是
+刻意挑過、營收以這一層為主的子集，兩者不得共用。ledger `library/private/alpha/layer_representatives/`、CLI `python -m alpha layer-reps`。
+*Avoid:* 同業、龍頭、指標股
+
 ### PQ1（研究佇列 / pq1）
 Daily Approval Loop 的**昂貴研究階段**：priority 排序的 `triaged_go` lead，跑 source-trace + extraction（bounded job）。（2026-09-23 前另有使用者對 `decision_review` 明確 `go` 後 dispatch 的 Engine D gap research；已隨研究側退役。）
 *Avoid:* research stage（過泛）、auto-ingest

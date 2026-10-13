@@ -139,30 +139,37 @@ def capture_series(company: Mapping[str, Mapping[str, Any]], fx: Mapping[str, Ma
         if anchor is None or not anchor.get("value"):
             gaps.append({"period": label, "reason": "錨沒有這一季（四家還沒都申報，或超出錨的期間）"})
             continue
-        currency = str(q.get("currency"))
-        rate = None
-        known = [str(q["known_on"]), str(anchor["known_on"])]
-        if currency != "USD":
-            table = fx.get(currency)
-            if table is None:
-                gaps.append({"period": label, "reason": f"沒有 {currency} 的歷史匯率——不換算"})
-                continue
-            quarter_rate = table.get(label)
-            if quarter_rate is None:
-                gaps.append({"period": label, "reason": f"{currency} 那一季沒有完整的季均價"})
-                continue
-            rate = float(quarter_rate["per_usd"])
-            known.append(str(quarter_rate["known_on"]))
-        known_on = max(known)
+        usd = usd_quarter(q, label, fx)
+        if usd.get("reason"):
+            gaps.append({"period": label, "reason": usd["reason"]})
+            continue
+        known_on = max(usd["known_on"], str(anchor["known_on"]))
         if known_on > as_of.isoformat():
             gaps.append({"period": label, "reason": f"as-of {as_of.isoformat()} 時還不可知（{known_on} 才齊）"})
             continue
-        revenue_usd = float(q["value"]) / rate if rate else float(q["value"])
-        ratio = revenue_usd / float(anchor["value"])
-        points.append({"period": label, "revenue": float(q["value"]), "currency": currency, "per_usd": rate,
-                       "revenue_usd": revenue_usd, "anchor": float(anchor["value"]), "ratio": ratio,
+        ratio = usd["usd"] / float(anchor["value"])
+        points.append({"period": label, "revenue": float(q["value"]), "currency": usd["currency"], "per_usd": usd["per_usd"],
+                       "revenue_usd": usd["usd"], "anchor": float(anchor["value"]), "ratio": ratio,
                        "per_billion": ratio * PER, "known_on": known_on, "source": q.get("source")})
     return {"points": points, "gaps": gaps}
 
 
-__all__ = ["FX_EDGE_DAYS", "FX_KNOWN_LAG_DAYS", "PER", "capture_series", "fiscal_quarters", "quarter_fx", "tw_quarters"]
+def usd_quarter(q: Mapping[str, Any], label: str, fx: Mapping[str, Mapping[str, Mapping[str, Any]]]) -> dict[str, Any]:
+    """一家公司一個曆季的營收換美元：那一季自己的季均價（`quarter_fx`）；可知日＝營收與匯率較晚的那天。
+    回 `{usd, currency, per_usd, known_on}`，換不了回 `{reason}`。「吃到多少」與路徑上各層共用這一支（L16）。"""
+    currency = str(q.get("currency"))
+    if currency == "USD":
+        return {"usd": float(q["value"]), "currency": currency, "per_usd": None, "known_on": str(q["known_on"])}
+    table = fx.get(currency)
+    if table is None:
+        return {"reason": f"沒有 {currency} 的歷史匯率——不換算"}
+    quarter_rate = table.get(label)
+    if quarter_rate is None:
+        return {"reason": f"{currency} 那一季沒有完整的季均價"}
+    rate = float(quarter_rate["per_usd"])
+    return {"usd": float(q["value"]) / rate, "currency": currency, "per_usd": rate,
+            "known_on": max(str(q["known_on"]), str(quarter_rate["known_on"]))}
+
+
+__all__ = ["FX_EDGE_DAYS", "FX_KNOWN_LAG_DAYS", "PER", "capture_series", "fiscal_quarters", "quarter_fx", "tw_quarters",
+           "usd_quarter"]
