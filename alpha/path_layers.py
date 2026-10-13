@@ -134,8 +134,9 @@ def fiscal_yoy(rows: Sequence[Mapping[str, Any]], first: Mapping[str, str], *, a
     points: list[dict[str, Any]] = []
     gaps: list[dict[str, Any]] = []
     for end, row in sorted(by_end.items()):
-        prior = next((r for e, r in by_end.items()
-                      if abs((e - (end - timedelta(days=365))).days) <= CALENDAR_SLACK_DAYS), None)
+        target = end - timedelta(days=365)
+        near = [e for e in by_end if abs((e - target).days) <= CALENDAR_SLACK_DAYS]
+        prior = by_end[min(near, key=lambda e: (abs((e - target).days), e))] if near else None   # 取最近的那一期（R2 非阻擋）
         if prior is None:
             continue
         if str(row.get("currency")) != str(prior.get("currency")):
