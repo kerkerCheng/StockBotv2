@@ -445,6 +445,28 @@ def is_judgment_field(field_name: str) -> bool:
     return spec is None or bool(spec.requires_user_approval)
 
 
+def _approval_problem(approval_ref: str, *, observation_id: str, targets: Any, relation: str) -> str | None:
+    """判斷欄位的核准收據（`proposal:pr_…;pq2:[N]`）指得回一份**還在等寫入**、內容對得上的關係提案嗎——對得上回 None。"""
+    from engine_c import pending_observations
+
+    fields = dict(part.split(":", 1) for part in approval_ref.split(";") if ":" in part)
+    proposal_id = fields.get("proposal", "").strip()
+    try:
+        record = pending_observations.read(proposal_id) if proposal_id else None
+    except pending_observations.ProposalError:
+        record = None
+    if record is None:
+        return f"核准收據指的提案 {proposal_id or '（沒寫）'} 不存在"
+    payload = record.get("payload") or {}
+    if (payload.get("kind") != "relation" or payload.get("observation_id") != observation_id
+            or sorted(payload.get("target_ids") or ()) != sorted(str(t) for t in targets)
+            or payload.get("relation") != relation):
+        return f"核准收據指的提案 {proposal_id} 內容與這筆關係對不上"
+    if record.get("state") != "pending":
+        return f"提案 {proposal_id} 已是 {record.get('state')}"
+    return None
+
+
 def check_relation(
     conn: Any,
     *,
@@ -487,10 +509,15 @@ def check_relation(
     off = [i for i in targets if (str(found[i][1]), str(found[i][2])) != (ticker, field_name)]
     if off:
         raise RelationError(f"目標 {off} 不是 {ticker}／{field_name}——取代與並存只在同一家公司同一個欄位之內")
-    if require_approval and is_judgment_field(field_name) and not str(approval_ref or "").strip():
-        raise RelationError(f"{field_name} 是判斷欄位（或未登記）：取代關係要走 pq2——"
-                            "`python -m engine_c.observation_relations add …` 只建提案，使用者 go 之後由 "
-                            "`python -m engine_b.todo complete-observation <編號>` 寫入")
+    if require_approval and is_judgment_field(field_name):
+        if not str(approval_ref or "").strip():
+            raise RelationError(f"{field_name} 是判斷欄位（或未登記）：取代關係要走 pq2——"
+                                "`python -m engine_c.observation_relations add …` 只建提案，使用者 go 之後由 "
+                                "`python -m engine_b.todo complete-observation <編號>` 寫入")
+        # 收據要指得回一份還在等寫入、內容一字對得上的提案（R2 非阻擋 #4：以前任何字串都過——直接呼叫寫入端就繞得過 gate）
+        problem = _approval_problem(str(approval_ref), observation_id=str(observation_id), targets=targets, relation=relation)
+        if problem:
+            raise RelationError(f"{field_name} 是判斷欄位：{problem}——只有 `todo complete-observation` 寫得進去")
     live = {str(r["observation_id"]) for r in live_rows(conn, ticker=ticker, field_names=[field_name])}
     dead = [i for i in ids if i not in live]
     if dead:

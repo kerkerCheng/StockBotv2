@@ -108,13 +108,9 @@ def _share_count_check(conn, ticker: str, snapshot_shares) -> None:
     而 3105 的 5.25 倍離新界線仍有兩倍以上的餘裕，鑑別力沒有損失。
     """
     import json as _json
-    rows = conn.execute(
-        "SELECT observation_id, value, supersedes_id FROM manual_observations"
-        " WHERE ticker = ? AND field_name = 'fiscal_year_results' ORDER BY recorded_at", (ticker,)).fetchall()
-    if not rows or not snapshot_shares:
+    if not snapshot_shares:
         return
-    superseded = {r["supersedes_id"] for r in rows if r["supersedes_id"]}
-    live = [r for r in rows if r["observation_id"] not in superseded]
+    live = _live_fiscal_rows(conn, ticker)
     if not live:
         return
     try:
@@ -134,16 +130,18 @@ def _share_count_check(conn, ticker: str, snapshot_shares) -> None:
           "所以快照錯的話**市值那一格也同樣錯**。")
 
 
+def _live_fiscal_rows(conn, ticker: str) -> list[dict]:
+    """該檔目前生效的 fiscal_year_results 列（記錄時間升序）——「哪幾筆生效」只住 `engine_c.manual_observations.live_rows`
+    （supersedes_id＋取代關係表；2026-10-14 取代鏈 A，R2 非阻擋 #1：這裡原本自己用 supersedes_id 算，較早記錄的那筆被留下時會給錯）。"""
+    from engine_c.manual_observations import live_rows
+
+    return sorted(live_rows(conn, ticker=ticker, field_names=["fiscal_year_results"]), key=lambda r: str(r["recorded_at"]))
+
+
 def _live_base(conn, ticker: str):
-    """該檔目前生效的 fiscal_year_results 觀測（已 supersede 的排掉）。"""
+    """該檔目前生效的 fiscal_year_results 觀測（已被取代的排掉）。"""
     import json as _json
-    rows = conn.execute(
-        "SELECT observation_id, value, supersedes_id FROM manual_observations"
-        " WHERE ticker = ? AND field_name = 'fiscal_year_results' ORDER BY recorded_at", (ticker,)).fetchall()
-    if not rows:
-        return None
-    superseded = {r["supersedes_id"] for r in rows if r["supersedes_id"]}
-    live = [r for r in rows if r["observation_id"] not in superseded]
+    live = _live_fiscal_rows(conn, ticker)
     if not live:
         return None
     try:
@@ -294,11 +292,14 @@ def probe(ticker: str) -> None:
 
     _share_count_check(conn, ticker, (snap.get("shares_outstanding") if row is not None else None))
 
-    print("\n## Engine C 人工觀測")
+    print("\n## Engine C 人工觀測（生效＝`live_rows`：supersedes_id 與取代關係都沒指到）")
+    from engine_c.manual_observations import live_rows
+
+    live_ids = {str(r["observation_id"]) for r in live_rows(conn, ticker=ticker)}
     for row in conn.execute(
             "SELECT observation_id, field_name, as_of, author, supersedes_id, length(value) AS n"
             " FROM manual_observations WHERE ticker = ? ORDER BY recorded_at", (ticker,)):
-        print("  ", dict(row))
+        print("  ", {**dict(row), "生效": str(row["observation_id"]) in live_ids})
 
     print("\n## 既有假設 ledger")
     for kind, folder in (("operating", "assumptions"), ("valuation", "valuation"), ("horizon", "horizon")):

@@ -98,16 +98,30 @@ def test_relations_stay_inside_one_company_and_field_and_only_between_live_rows(
                            author="t")
 
 
-def test_judgment_fields_need_the_pq2_receipt_but_mechanical_fields_do_not() -> None:
+def test_judgment_fields_need_a_receipt_that_points_back_to_the_matching_pending_proposal(tmp_path, monkeypatch) -> None:
+    """R2 非阻擋 #4：收據以前是自由字串——直接呼叫寫入端、隨便寫一個就繞得過 gate。現在要指得回一份還在等寫入、
+    內容一字對得上的提案（那份提案的編號只有使用者 go 之後 `todo complete-observation` 會帶進來）。"""
+    monkeypatch.setattr(pending_observations, "PENDING_DIR", tmp_path / "pending")
     conn = _open()
     _legacy(conn, A, "原本那一句", field="backlog", author="claude-code")
     _legacy(conn, B, "錯字更正後的那一句", field="backlog", recorded="2026-09-11 09:00:00", author="claude-code")
+    _legacy(conn, C, "第三種說法", field="backlog", recorded="2026-09-12 09:00:00", author="claude-code")
+    reason = "錯字更正：前一筆把金額寫錯（測試）"
     with pytest.raises(mo.RelationError, match="判斷欄位"):
-        mo.append_relation(conn, observation_id=B, target_ids=[A], relation="supersedes", reason="錯字更正：前一筆把金額寫錯（測試）",
-                           author="test")
-    mo.append_relation(conn, observation_id=B, target_ids=[A], relation="supersedes", reason="錯字更正：前一筆把金額寫錯（測試）",
-                       author="test", approval_ref="proposal:pr_x;pq2:[1]")
-    assert mo.live_observation_ids(conn, "AXTI", "backlog", "2025-12-31") == [B]
+        mo.append_relation(conn, observation_id=B, target_ids=[A], relation="supersedes", reason=reason, author="test")
+    with pytest.raises(mo.RelationError, match="不存在"):
+        mo.append_relation(conn, observation_id=B, target_ids=[A], relation="supersedes", reason=reason, author="test",
+                           approval_ref="proposal:pr_madeup0123456789abcdef0123456789ab;pq2:[1]")
+    other = pending_observations.propose_relation(conn, observation_id=B, target_ids=[C], relation="supersedes",
+                                                  reason=reason, author="test")
+    with pytest.raises(mo.RelationError, match="對不上"):                   # 別份提案的收據：內容不同
+        mo.append_relation(conn, observation_id=B, target_ids=[A], relation="supersedes", reason=reason, author="test",
+                           approval_ref=f"proposal:{other['proposal_id']};pq2:[1]")
+    record = pending_observations.propose_relation(conn, observation_id=B, target_ids=[A], relation="supersedes",
+                                                   reason=reason, author="test")
+    mo.append_relation(conn, observation_id=B, target_ids=[A], relation="supersedes", reason=reason, author="test",
+                       approval_ref=f"proposal:{record['proposal_id']};pq2:[1]")
+    assert mo.live_observation_ids(conn, "AXTI", "backlog", "2025-12-31") == [B, C]
 
 
 def test_the_projection_winner_comes_from_live_rows_only() -> None:
@@ -182,6 +196,24 @@ def test_a_declared_parallel_with_two_currencies_says_so_instead_of_asking_for_a
                        reason="台幣報表與 20-F 美元換算：同一年度兩種表達", author="test")
     actuals, reason = EngineCFundamentalsProvider(conn=conn).fiscal_year_results(Ticker("TSM"))
     assert actuals is None and "登記過的刻意並存" in reason and "correction" not in reason
+
+
+def test_segment_points_for_the_three_questions_respect_as_of() -> None:
+    """R2 非阻擋 #6：三題③的占比點以前回看那天也看得到之後才寫的更正（同函式的價格與營收早就有 as-of）。"""
+    from engine_c.three_question_inputs import _segment_points
+
+    conn = _open()
+    share = {"Mobile Communications": 0.522, "Edge & Cloud AI": 0.3615}
+    _legacy(conn, A, {**share, "Automotive & Industrial": 0.1165}, field="segment_revenue_share", ticker="SOI.PA",
+            as_of="2026-03-31T00:00:00+00:00", recorded="2026-09-04 08:27:00")
+    _legacy(conn, B, {**share, "Automotive & Industrial": 0.1166}, field="segment_revenue_share", ticker="SOI.PA",
+            as_of="2026-03-31T00:00:00+00:00", recorded="2026-09-04 08:27:00")
+    mo.append_relation(conn, observation_id=B, target_ids=[A], relation="supersedes",
+                       reason="更正：前一筆為了湊整把 0.1166 寫成 0.1165", author="test")
+    now = _segment_points(conn, "SOI.PA", today=date(2026, 12, 31))
+    assert [p.get("conflict") for p in now] == [None] and now[0]["value"]["Automotive & Industrial"] == 0.1166
+    before = _segment_points(conn, "SOI.PA", today=date(2026, 10, 1))      # 關係是 10-14 寫的
+    assert before[0]["conflict"] == sorted([A, B])
 
 
 def test_the_revenue_mix_reader_uses_the_same_rule() -> None:

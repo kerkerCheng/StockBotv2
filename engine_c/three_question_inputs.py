@@ -41,20 +41,23 @@ def _rows(conn: Any, ticker: str, metric: str) -> list[dict[str, Any]]:
              "value": r[5], "currency": r[6], "derived": r[7], "tag": r[8]} for r in cur.fetchall()]
 
 
-def _segment_points(conn: Any, ticker: str) -> list[dict[str, Any]]:
-    """分部／產品線占比：每個 (欄位, as_of) 取生效那一筆（supersedes 沒被指到的）；解析不了的不收。
+def _segment_points(conn: Any, ticker: str, *, today: date | None = None) -> list[dict[str, Any]]:
+    """分部／產品線占比：每個 (欄位, as_of) 取生效那一筆（`live_observation_ids`：supersedes 與取代關係都沒指到的）；
+    解析不了的不收。`today`＝as-of：只看那天以前**記錄**的列與關係（2026-10-14 取代鏈 A R2 非阻擋 #6——同一函式的價格與營收
+    早就有 as-of，占比沒有，回看那天會看到之後才寫的更正）。
 
     同一 (欄位, as_of) 有多筆生效 → `{"conflict": [...]}`，不挑一個、也不默默丟（INV-3；同 going-concern 的前例）。
     """
     from engine_c.manual_observations import live_observation_ids
 
+    cutoff = today.isoformat() if today is not None else None
     out = []
     for field in _SEGMENT_FIELDS:
         dates = [r[0] for r in conn.execute(
             "SELECT DISTINCT as_of FROM manual_observations WHERE ticker = ? AND field_name = ? ORDER BY as_of",
             (ticker, field)).fetchall()]
         for as_of in dates:
-            live = live_observation_ids(conn, ticker, field, as_of)
+            live = live_observation_ids(conn, ticker, field, as_of, recorded_by=cutoff)
             if len(live) > 1:
                 out.append({"as_of": str(as_of)[:10], "field": field, "conflict": sorted(live)})
                 continue
@@ -105,7 +108,7 @@ def get_three_question_inputs(ticker: str, *, conn: Any, today: date, company_id
         "splits": [(date.fromisoformat(str(d)[:10]), float(r)) for d, r in conn.execute(
             "SELECT action_date, ratio FROM corporate_actions WHERE ticker = ? AND kind = 'split' ORDER BY action_date",
             (ticker,)).fetchall()],
-        "segment_shares": _segment_points(conn, ticker),
+        "segment_shares": _segment_points(conn, ticker, today=today),
         "source": "engine_c：price_history＋fundamental_history（SEC companyfacts）",
     }
     for metric, key in _METRIC_KEYS.items():
