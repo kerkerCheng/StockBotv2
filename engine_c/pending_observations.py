@@ -26,6 +26,10 @@ from engine_c.observation_fields import validate_field_name
 ROOT = Path(__file__).resolve().parent.parent
 PENDING_DIR = ROOT / "library" / "private" / "engine_c_observations"
 PROPOSAL_SCHEMA = "engine-c-observation-proposal/v1"
+#: 判斷欄位的取代／並存關係提案（2026-10-14 取代鏈 A）：與觀測提案同一個目錄、同一個 pq2 type、同一個 complete 入口——
+#: Engine C 判讀寫入 gate 只有一道門。id 前綴 `pr_`（觀測是 `po_`）。
+RELATION_PROPOSAL_SCHEMA = "engine-c-relation-proposal/v1"
+_PREFIXES = ("po_", "pr_")
 
 _PAYLOAD_FIELDS = ("ticker", "field_name", "value", "source_ref", "as_of", "author")
 
@@ -45,7 +49,7 @@ def _canonical(payload: Mapping[str, Any]) -> str:
 
 
 def _path(proposal_id: str) -> Path:
-    if not proposal_id.startswith("po_") or not proposal_id[3:].isalnum():
+    if not proposal_id.startswith(_PREFIXES) or not proposal_id[3:].isalnum():
         raise ProposalError(f"非法 proposal_id：{proposal_id}")
     path = PENDING_DIR / f"{proposal_id}.json"
     if path.parent.resolve() != PENDING_DIR.resolve():
@@ -145,6 +149,38 @@ def propose(
     return record
 
 
+def propose_relation(
+    conn: Any,
+    *,
+    observation_id: str,
+    target_ids: Any,
+    relation: str,
+    reason: str,
+    author: str,
+) -> dict[str, Any]:
+    """判斷欄位的取代／並存關係提案（同內容重複提案不會產生第二個編號）。發編號之前就用寫入端同一套檢查驗過
+    （`engine_c.manual_observations.check_relation`，只差核准收據）——錯誤不得遲到使用者 go 之後才出現。"""
+    from engine_c.manual_observations import RelationError, check_relation
+
+    try:
+        ticker, field_name, targets = check_relation(
+            conn, observation_id=observation_id, target_ids=target_ids, relation=relation, reason=reason,
+            author=author, approval_ref=None, require_approval=False)
+    except RelationError as exc:
+        raise ProposalError(str(exc)) from exc
+    payload = {"kind": "relation", "ticker": ticker, "field_name": field_name, "observation_id": str(observation_id),
+               "target_ids": targets, "relation": relation, "reason": str(reason).strip(), "author": str(author).strip()}
+    digest = hashlib.sha256(_canonical(payload).encode("utf-8")).hexdigest()
+    proposal_id = "pr_" + digest[:32]
+    path = _path(proposal_id)
+    if path.exists():
+        return json.loads(path.read_text(encoding="utf-8"))
+    record = {"schema_version": RELATION_PROPOSAL_SCHEMA, "proposal_id": proposal_id, "payload_digest": digest,
+              "state": "pending", "created_at": _now(), "payload": payload, "relation_ids": None, "resolved_at": None}
+    _write(record)
+    return record
+
+
 def read(proposal_id: str) -> dict[str, Any] | None:
     path = _path(proposal_id)
     if not path.exists():
@@ -157,7 +193,7 @@ def iter_pending() -> Iterator[dict[str, Any]]:
 
     if not PENDING_DIR.exists():
         return
-    for path in sorted(PENDING_DIR.glob("po_*.json")):
+    for path in sorted(p for prefix in _PREFIXES for p in PENDING_DIR.glob(f"{prefix}*.json")):
         try:
             record = json.loads(path.read_text(encoding="utf-8"))
         except (OSError, ValueError):
@@ -166,14 +202,18 @@ def iter_pending() -> Iterator[dict[str, Any]]:
             yield record
 
 
-def mark_applied(proposal_id: str, *, observation_id: str) -> dict[str, Any]:
+def mark_applied(proposal_id: str, *, observation_id: str | None = None,
+                 relation_ids: Any = None) -> dict[str, Any]:
     record = read(proposal_id)
     if record is None:
         raise ProposalError(f"找不到提案 {proposal_id}")
     if record.get("state") != "pending":
         raise ProposalError(f"提案 {proposal_id} 已是 {record.get('state')}，不可重複套用")
     record["state"] = "applied"
-    record["observation_id"] = observation_id
+    if relation_ids is not None:
+        record["relation_ids"] = list(relation_ids)
+    else:
+        record["observation_id"] = observation_id
     record["resolved_at"] = _now()
     _write(record)
     return record

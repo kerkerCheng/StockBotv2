@@ -28,28 +28,26 @@ def _decode(value: Any) -> Any:
 
 def live_observations(conn: Any, ticker: str, *, as_of: date | None = None
                       ) -> tuple[dict[str, list[dict[str, Any]]], list[dict[str, Any]]]:
-    """欄位 → 生效的觀測（觀測期升序），與衝突清單。"""
-    marks = ",".join("?" for _ in FIELDS)
-    rows = conn.execute(
-        f"SELECT observation_id, field_name, value, source_ref, as_of, recorded_at, supersedes_id "
-        f"FROM manual_observations WHERE ticker = ? AND field_name IN ({marks})", (ticker, *FIELDS)).fetchall()
-    if as_of is not None:
-        rows = [r for r in rows if str(r[5])[:10] <= as_of.isoformat()]
-    superseded = {str(r[6]) for r in rows if r[6]}
-    by_key: dict[tuple[str, str], list[Any]] = {}
-    for r in rows:
-        if str(r[0]) not in superseded:
-            by_key.setdefault((str(r[1]), str(r[4])[:10]), []).append(r)
+    """欄位 → 生效的觀測（觀測期升序），與衝突清單。「哪幾筆生效」只住 `engine_c.manual_observations.live_rows`
+    （supersedes_id＋取代關係；as-of 只看那天以前記錄的列與關係，L16）；同期多筆生效＝衝突，登記過的刻意並存另外標出。"""
+    from engine_c.manual_observations import declared_parallel, live_rows
+
+    cutoff = as_of.isoformat() if as_of is not None else None
+    by_key: dict[tuple[str, str], list[dict[str, Any]]] = {}
+    for r in live_rows(conn, ticker=ticker, field_names=FIELDS, recorded_by=cutoff):
+        by_key.setdefault((str(r["field_name"]), str(r["as_of"])[:10]), []).append(r)
     out: dict[str, list[dict[str, Any]]] = {}
     conflicts: list[dict[str, Any]] = []
     for (field, period), live in sorted(by_key.items()):
         if len(live) > 1:
-            conflicts.append({"field": field, "label": FIELD_LABELS[field], "as_of": period,
-                              "ids": sorted(str(r[0]) for r in live)})
+            ids = sorted(str(r["observation_id"]) for r in live)
+            conflicts.append({"field": field, "label": FIELD_LABELS[field], "as_of": period, "ids": ids,
+                              "declared_parallel": declared_parallel(conn, ids, recorded_by=cutoff)})
             continue
         r = live[0]
-        out.setdefault(field, []).append({"as_of": period, "value": _decode(r[2]), "source_ref": str(r[3] or ""),
-                                          "observation_id": str(r[0])})
+        out.setdefault(field, []).append({"as_of": period, "value": _decode(r["value"]),
+                                          "source_ref": str(r["source_ref"] or ""),
+                                          "observation_id": str(r["observation_id"])})
     return out, conflicts
 
 

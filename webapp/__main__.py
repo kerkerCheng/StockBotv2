@@ -449,16 +449,16 @@ def _base_payloads(tickers) -> dict[str, dict]:
     if not pointer.exists():
         return {}
     db = private / _json.loads(pointer.read_text(encoding="utf-8"))["engine_c"]
+    from engine_c.manual_observations import live_rows
+
     conn = _sqlite3.connect(f"file:{db.as_posix()}?mode=ro", uri=True)
-    conn.row_factory = _sqlite3.Row
     wanted = {str(t) for t in tickers}
-    got = [dict(r) for r in conn.execute(
-        "SELECT ticker, observation_id, value, supersedes_id FROM manual_observations "
-        "WHERE field_name = 'fiscal_year_results' ORDER BY ticker, recorded_at")]
-    superseded = {r["supersedes_id"] for r in got if r["supersedes_id"]}
+    # 「哪幾筆生效」只住 `engine_c.manual_observations.live_rows`（supersedes_id＋取代關係，L16）；同一檔最後記錄的那筆
+    got = sorted(live_rows(conn, field_names=["fiscal_year_results"]),
+                 key=lambda r: (str(r["ticker"]), str(r["recorded_at"])))
     out: dict[str, dict] = {}
     for row in got:
-        if row["observation_id"] in superseded or row["ticker"] not in wanted:
+        if row["ticker"] not in wanted:
             continue
         try:
             out[row["ticker"]] = _json.loads(row["value"])
@@ -467,31 +467,26 @@ def _base_payloads(tickers) -> dict[str, dict]:
     return out
 
 
-def _live_observation_groups() -> dict[tuple[str, str, str], list[str]]:
-    """`{(ticker, field_name, as_of): [生效 observation_id]}`——**全庫**，不只段5 工單那幾檔。
+def _live_observation_groups() -> tuple[dict[tuple[str, str, str], list[str]], int]:
+    """（`{(ticker, field_name, as_of): [生效 observation_id]}` 裡**不是登記過的刻意並存**的多筆組，刻意並存的組數）——**全庫**，
+    不只段5 工單那幾檔。規則只住 `engine_c.manual_observations`（`duplicate_live_groups`；supersedes_id＋取代關係，L16）。
 
     ⚠ `as_of` 一定要在鍵裡：同一欄位的不同期間本來就該同時生效（實測漏掉它會把 14 組誤報成 21 組）。
     """
     import json as _json
     import sqlite3 as _sqlite3
-    from collections import defaultdict
+
+    from engine_c.manual_observations import duplicate_live_groups, live_groups
 
     private = Path(__file__).resolve().parents[1] / "library" / "private"
     pointer = private / "runtime_pointer.json"
     if not pointer.exists():
-        return {}
+        return {}, 0
     db = private / _json.loads(pointer.read_text(encoding="utf-8"))["engine_c"]
     conn = _sqlite3.connect(f"file:{db.as_posix()}?mode=ro", uri=True)
-    rows = conn.execute(
-        "SELECT ticker, field_name, substr(as_of, 1, 10), observation_id, supersedes_id "
-        "FROM manual_observations").fetchall()
-    superseded = {str(r[4]) for r in rows if r[4]}
-    groups: dict[tuple[str, str, str], list[str]] = defaultdict(list)
-    for ticker, field, as_of, oid, _sup in rows:
-        if str(oid) in superseded:
-            continue
-        groups[(str(ticker), str(field), str(as_of))].append(str(oid))
-    return dict(groups)
+    duplicates = duplicate_live_groups(conn)
+    parallel = sum(1 for ids in live_groups(conn).values() if len(ids) > 1) - len(duplicates)
+    return duplicates, parallel
 
 
 def _consensus_series() -> dict[str, list[dict]]:
@@ -560,7 +555,8 @@ def cmd_closure_gate(args: argparse.Namespace) -> int:
         StateArtifactStore(resolve_state_dir(Path(args.dir) if args.dir else None,
                                              Path(args.state_dir) if args.state_dir else None)))
     eps_rows = closure.base_eps_reconciliation_gaps(_base_payloads(page_tickers))
-    dup_rows = closure.duplicate_live_observations(_live_observation_groups())
+    dup_groups, parallel_groups = _live_observation_groups()
+    dup_rows = closure.duplicate_live_observations(dup_groups)
     series = _consensus_series()
     all_bases = _base_payloads(list(series))
     rule_a = closure.consensus_self_contradictions(series)
@@ -603,6 +599,7 @@ def cmd_closure_gate(args: argparse.Namespace) -> int:
                         "duplicate_live_observations": [
                             {"ticker": tk, "field": fn, "as_of": ao, "observation_ids": list(ids)}
                             for tk, fn, ao, ids in dup_rows],
+                        "declared_parallel_groups": parallel_groups,
                         "base_eps_reconciliation": [
                             {"ticker": tk, "basis": b, "reported": rep, "implied": imp,
                              "relative_gap": rel} for tk, b, rep, imp, rel in eps_rows]},
@@ -637,7 +634,7 @@ def cmd_closure_gate(args: argparse.Namespace) -> int:
             print(f"- {line}")
         for line in closure.render_base_eps_reconciliation(eps_rows):
             print(f"- {line}")
-        for line in closure.render_duplicate_live_observations(dup_rows):
+        for line in closure.render_duplicate_live_observations(dup_rows, parallel=parallel_groups):
             print(f"- {line}")
         for line in closure.render_consensus_contradictions(rule_a, rule_b):
             print(f"- {line}")

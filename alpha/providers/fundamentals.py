@@ -441,8 +441,25 @@ class EngineCFundamentalsProvider:
                 if str(r.get("as_of") or "")[:10] <= cutoff
                 and str(r.get("recorded_at") or "")[:10] <= cutoff]
 
+    def _closes(self, as_of: date | None) -> dict[str, list[str]]:
+        """取代關係表：`{新的那筆: [它關掉的那幾筆]}`（as-of 只看那天以前記錄的；2026-10-14 取代鏈 A——一筆可以關掉多筆）。"""
+        from engine_c.manual_observations import relation_map
+
+        try:
+            return relation_map(self._conn(), recorded_by=as_of.isoformat() if as_of else None)
+        except Exception:  # noqa: BLE001 — 舊庫沒有關係表＝沒有關係
+            return {}
+
+    @staticmethod
+    def _dead_ids(rows: Sequence[Mapping[str, Any]], closes: Mapping[str, Sequence[str]]) -> set[str]:
+        """不再生效的 id：`supersedes_id` 指到的＋取代關係關掉的。規則與 `engine_c.manual_observations.live_rows`
+        同一條（L16）——這裡只因為列已經在手上，不再查一次。"""
+        return ({str(r["supersedes_id"]) for r in rows if r.get("supersedes_id")}
+                | {str(t) for targets in closes.values() for t in targets})
+
     def _superseded_refs(
-        self, rows: Sequence[Mapping[str, Any]], live: Mapping[str, Any]
+        self, rows: Sequence[Mapping[str, Any]], live: Mapping[str, Any],
+        closes: Mapping[str, Sequence[str]] | None = None,
     ) -> tuple[EvidenceRef, ...]:
         """這一筆 live 觀測的**整條 supersession 祖先鏈**，每一筆都標明被誰取代。
 
@@ -461,30 +478,35 @@ class EngineCFundamentalsProvider:
         ——正好是 append-only 設計要防的事。
         """
         by_id = {str(r["observation_id"]): r for r in rows}
+        closes = closes or {}
         out: list[EvidenceRef] = []
         seen = {str(live["observation_id"])}
-        current, successor = live, str(live["observation_id"])
-        while True:
-            parent_id = current.get("supersedes_id")
-            if not parent_id or str(parent_id) in seen:
-                break
-            parent = by_id.get(str(parent_id))
-            seen.add(str(parent_id))
-            if parent is None:
-                # 祖先不在本次查詢的視窗裡（as-of 過濾掉了）——照樣給一個可解析的 ref，
-                # 因為「解析不到」與「那一版在當時不存在」是兩件事（INV-3）。
+        # 2026-10-14 起祖先不只一條：`supersedes_id` 的單值鏈＋取代關係關掉的每一筆（一筆可以關掉多筆）——逐層往回走
+        frontier: list[tuple[Mapping[str, Any], str]] = [(live, str(live["observation_id"]))]
+        while frontier:
+            current, successor = frontier.pop(0)
+            parents = ([str(current["supersedes_id"])] if current.get("supersedes_id") else []) + \
+                list(closes.get(str(current.get("observation_id")), ()))
+            for parent_id in parents:
+                if parent_id in seen:
+                    continue
+                seen.add(parent_id)
+                parent = by_id.get(parent_id)
+                if parent is None:
+                    # 祖先不在本次查詢的視窗裡（as-of 過濾掉了）——照樣給一個可解析的 ref，
+                    # 因為「解析不到」與「那一版在當時不存在」是兩件事（INV-3）。
+                    out.append(EvidenceRef(
+                        ref=f"engine_c://manual_observation/{parent_id}",
+                        kind="engine_c_observation", origin_entity="issuer_filing",
+                        quote=f"⚠ 已被 {successor} 取代（superseded）；該版本不在本次 as-of 視窗內"))
+                    continue
+                ref = self._ledger_ref(parent, published_at=None)
                 out.append(EvidenceRef(
-                    ref=f"engine_c://manual_observation/{parent_id}",
-                    kind="engine_c_observation", origin_entity="issuer_filing",
-                    quote=f"⚠ 已被 {successor} 取代（superseded）；該版本不在本次 as-of 視窗內"))
-                break
-            ref = self._ledger_ref(parent, published_at=None)
-            out.append(EvidenceRef(
-                ref=ref.ref, kind=ref.kind, origin_entity=ref.origin_entity,
-                quote=f"⚠ 已被 {successor} 取代（superseded）：{(ref.quote or '')[:200]}",
-                published_at=ref.published_at, retrieved_at=ref.retrieved_at,
-                recorded_at=ref.recorded_at))
-            current, successor = parent, str(parent_id)
+                    ref=ref.ref, kind=ref.kind, origin_entity=ref.origin_entity,
+                    quote=f"⚠ 已被 {successor} 取代（superseded）：{(ref.quote or '')[:200]}",
+                    published_at=ref.published_at, retrieved_at=ref.retrieved_at,
+                    recorded_at=ref.recorded_at))
+                frontier.append((parent, parent_id))
         return tuple(out)
 
     def _ledger_ref(self, row: Mapping[str, Any], *, published_at: date | None) -> EvidenceRef:
@@ -506,7 +528,8 @@ class EngineCFundamentalsProvider:
         if not rows:
             return None, (f"Engine C 截至 {as_of.isoformat()} 無 {ticker} 的 fiscal_year_results 觀測" if as_of
                           else f"Engine C 無 {ticker} 的 fiscal_year_results 觀測（scripts/record_mechanical_observation.py）")
-        superseded = {r.get("supersedes_id") for r in rows if r.get("supersedes_id")}
+        closes = self._closes(as_of)
+        superseded = self._dead_ids(rows, closes)
         # ⚠ **同一年度有兩筆以上生效時不得靜默選第一筆**（2026-09-20）。
         # 實測（8 檔）分兩種形狀，而它們的正確處理相反——壓成一條規則兩邊都會錯（L12）：
         #   ①**同幣別的骨架 vs 補完**（6 檔）：08:26 批次先寫只有 revenue 的骨架，10:xx 補上
@@ -527,6 +550,20 @@ class EngineCFundamentalsProvider:
                     by_currency["?"] = by_currency.get("?", 0) + 1
             if len(by_currency) > 1:
                 ids = "、".join(r["observation_id"][:20] for r in live_rows)
+                from engine_c.manual_observations import declared_parallel
+
+                try:
+                    parallel = declared_parallel(self._conn(), [r["observation_id"] for r in live_rows],
+                                                 recorded_by=as_of.isoformat() if as_of else None)
+                except Exception:  # noqa: BLE001 — 舊庫沒有關係表＝沒有登記
+                    parallel = False
+                if parallel:
+                    # 2026-10-14：登記過的刻意並存（例：TSM 的台幣報表與 20-F 美元換算）——不是沒連上的重複，
+                    # 所以不叫人 append correction；要單一數字的這一格照樣不挑一個（選錯是量級錯誤）
+                    return None, (
+                        f"{ticker} 同一年度有 {len(live_rows)} 筆**登記過的刻意並存**觀測，幣別不同"
+                        f"（{'／'.join(f'{k}×{v}' for k, v in sorted(by_currency.items()))}）：{ids}。"
+                        "兩種表達都算數，但這一格要單一幣別的數字——不挑一個（選錯是量級錯誤，報價單位 ≠ 結算幣別）")
                 return None, (
                     f"{ticker} 同一年度有 {len(live_rows)} 筆生效的 fiscal_year_results，"
                     f"而且**幣別不一致**（{'／'.join(f'{k}×{v}' for k, v in sorted(by_currency.items()))}）"
@@ -570,7 +607,7 @@ class EngineCFundamentalsProvider:
                     gaap=_numeric_block(payload.get("gaap")),
                     non_gaap=(_numeric_block(payload.get("non_gaap")) if payload.get("non_gaap") else None),
                     exit_quarter=(dict(payload["exit_quarter"]) if isinstance(payload.get("exit_quarter"), dict) else None),
-                    evidence=(ref, *self._superseded_refs(rows, row)), source_filed_at=filed,
+                    evidence=(ref, *self._superseded_refs(rows, row, closes)), source_filed_at=filed,
                     recorded_at=_as_datetime(row.get("recorded_at")),
                     observation_id=str(row["observation_id"]),
                     coverage_note=("；".join(x for x in (
@@ -599,7 +636,8 @@ class EngineCFundamentalsProvider:
         rows = self._ledger_rows(ticker, INTERIM_RESULTS_FIELD, as_of)
         if not rows:
             return (), None                # 沒有不是錯——多數標的的目標年度還沒報導
-        superseded = {r.get("supersedes_id") for r in rows if r.get("supersedes_id")}
+        closes = self._closes(as_of)
+        superseded = self._dead_ids(rows, closes)
         out: list[Any] = []
         errors: list[str] = []
         for row in rows:
@@ -621,7 +659,7 @@ class EngineCFundamentalsProvider:
                     gaap=_numeric_block(payload.get("gaap")),
                     non_gaap=(_numeric_block(payload.get("non_gaap")) if payload.get("non_gaap") else None),
                     evidence=(self._ledger_ref(row, published_at=filed or end),
-                              *self._superseded_refs(rows, row)),
+                              *self._superseded_refs(rows, row, closes)),
                     source_filed_at=filed,
                     observation_id=str(row["observation_id"]),
                 ))
@@ -644,7 +682,7 @@ class EngineCFundamentalsProvider:
         rows = self._ledger_rows(ticker, FX_RATE_FIELD, as_of)
         if not rows:
             return (), None
-        superseded = {r.get("supersedes_id") for r in rows if r.get("supersedes_id")}
+        superseded = self._dead_ids(rows, self._closes(as_of))
         out: list[Any] = []
         errors: list[str] = []
         for row in rows:
@@ -722,6 +760,7 @@ class EngineCFundamentalsProvider:
         if ticker is None:
             return []
         out: list[dict[str, Any]] = []
+        closes = self._closes(as_of)
         for row in self._ledger_rows(ticker, field_name, as_of):
             try:
                 payload = json.loads(row["value"])
@@ -730,6 +769,8 @@ class EngineCFundamentalsProvider:
             out.append({"observation_id": str(row["observation_id"]), "as_of": _as_date(row.get("as_of")),
                         "recorded_at": _as_datetime(row.get("recorded_at")),
                         "supersedes_id": row.get("supersedes_id"),
+                        # 取代關係關掉的那幾筆（2026-10-14；一筆可以關掉多筆）——變更偵測的「前一版」連得到它們
+                        "closes": list(closes.get(str(row["observation_id"]), ())),
                         "payload": payload if isinstance(payload, dict) else None})
         return out
 

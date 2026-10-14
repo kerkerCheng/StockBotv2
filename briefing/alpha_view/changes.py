@@ -259,7 +259,8 @@ def ledger_changes(
             changed_ref=f"engine_c://manual_observation/{row['observation_id']}",
             observed_at=recorded, effective_at=period, published_at=published,
             new_version=str(row["observation_id"]), material_fields=tuple(fields), detail=detail,
-            related_refs=((f"engine_c://manual_observation/{row['supersedes_id']}",) if row.get("supersedes_id") else ())))
+            related_refs=tuple(f"engine_c://manual_observation/{prev}" for prev in
+                               ([row["supersedes_id"]] if row.get("supersedes_id") else []) + list(row.get("closes") or ()))))
     return out
 
 

@@ -69,6 +69,24 @@ CREATE TABLE IF NOT EXISTS manual_observations (
 CREATE INDEX IF NOT EXISTS idx_manual_observation_field_time
     ON manual_observations (ticker, field_name, as_of, observation_id);
 
+-- 人工觀測的取代／並存關係（2026-10-14 取代鏈 A）：append-only；一筆可以關掉多筆（supersedes_id 是單值、帶 FK，
+-- 兩條互不相干的鏈合併不了），也記刻意並存。既有 manual_observations 一個欄位都不改。
+-- SQLite 對應的建表住 engine_c/manual_observations.py::ensure_manual_observation_schema（遷移 20261014_add_manual_observation_relations.sql）。
+CREATE TABLE IF NOT EXISTS manual_observation_relations (
+    relation_id VARCHAR(64) PRIMARY KEY,
+    observation_id VARCHAR(64) NOT NULL REFERENCES manual_observations(observation_id),
+    target_id VARCHAR(64) NOT NULL REFERENCES manual_observations(observation_id),
+    relation VARCHAR(16) NOT NULL CHECK (relation IN ('supersedes', 'parallel')),
+    reason TEXT NOT NULL,
+    author VARCHAR(255) NOT NULL,
+    approval_ref TEXT,
+    recorded_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    payload_digest VARCHAR(64) NOT NULL UNIQUE,
+    CHECK (observation_id <> target_id)
+);
+CREATE INDEX IF NOT EXISTS idx_manual_observation_relations_target
+    ON manual_observation_relations (target_id);
+
 CREATE INDEX IF NOT EXISTS idx_manual_ticker
     ON manual_fields (ticker);
 

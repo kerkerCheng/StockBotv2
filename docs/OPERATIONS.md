@@ -114,6 +114,16 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 `StockBotv2-Daily` 的 ⑱⑲ 取代（1.2a 停用、2026-09-25 1.2b 刪除）；它們的理由（LLM 失敗心跳照發、永遠 exit 0、Python 不用 `.cmd`、
 發送走 subprocess）搬進 `crons/daily_task.py` 的 docstring，守它們的測試改主詞搬進 `tests/test_daily_task.py`「無人值守入口」節。
 
+### Sandbox impact review 結論（2026-10-14：人工觀測的取代鏈收多值——取代鏈 A）
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | Engine C SQLite 多一張 append-only 表 `manual_observation_relations`（`get_conn` 的建表一併建；ignored private runtime）。寫入端兩個：互動的 `python -m engine_c.observation_relations add`（mechanical 欄位直接寫；判斷欄位只在 `library/private/engine_c_observations/` 寫 `pr_*` 提案）與既有的 `python -m engine_b.todo complete-observation`（判斷欄位的關係在使用者 go 之後才寫）。無人值守路徑上只多**讀**：daily ⑬ materialize（argv 不變）的三題、會不會死、營收結構、基期讀取改由同一條「哪幾筆生效」規則取（多讀一張小表）；`todo sync`（daily 已在跑）多收 `pr_*` 提案。`manual_fields` 投影的勝出者改成只從生效列挑——2026-10-14 遷移時只有 AXTI runway 一格的勝出者換了（閘門測試列 → 原觀測）。不連網、不跑 LLM、不碰圖 |
+| **2 canonical skill／prompt／本檔** | 本節；本檔「Engine C」命令；`docs/ARCHITECTURE.md` §8.1「取代與並存關係」；ROADMAP「人工觀測的取代鏈收多值」。不動任何 skill、prompt |
+| **3 最窄 rule** | daily argv 不變；不新增 step、allowlist、rule；寫入只在互動 CLI 與既有的 complete 入口 |
+| **4 contract test** | `tests/test_observation_relations.py`（一筆關掉兩條鏈、as-of 看得到關係之前、拒收八種不合法、判斷欄位要收據、投影只從生效列挑、冪等、刻意並存不算重複、`allow_parallel` 留紀錄、基期的祖先引用走關係、刻意並存的雙幣別不叫人寫更正、營收結構同一條規則、計數器分開寫並存、判斷欄位走同一道 gate、drop 收提案不換號重生、提案前先檢查）；變異 16／16 |
+| **5 端到端 smoke** | 遷移前本機備份＋還原驗證（20261014T072251Z）；`scripts/migrate_manual_relations_20261014.py` 先驗證後寫：ledger 401 列一列未改、取代關係 11 筆（mechanical 10 組）、判斷欄位 4 份提案鑄 [754]–[757]；closure-gate「同一期間有多筆生效觀測」14 → 4；manifest 與對帳在 `library/private/migrations/20261014_manual_relations/` |
+
 ### Sandbox impact review 結論（2026-10-14：個股頁 S3d 第二段——台股年報地區別、押的那一塊、三題③拆兩行）
 
 | 步 | 結論 |
@@ -1062,6 +1072,11 @@ materialize 用**，不動 `discover_tracked_tickers`——那會連帶擴大 ED
 & '.venv\Scripts\python.exe' -m engine_c.set_manual_field --fields <T>   # 列出已登記觀測欄位（階層式）
 # ⚠ set_manual_field 只建立待核准提案，不直接寫 ledger；核准後走 todo complete-observation
 & '.venv\Scripts\python.exe' -m engine_c.set_manual_field --list <T>     # 列出該標的已填欄位
+# 人工觀測的取代／並存關係（2026-10-14 取代鏈 A）：一筆可以關掉多筆、也記刻意並存；既有列一字不改（append-only 關係表）
+& '.venv\Scripts\python.exe' -m engine_c.observation_relations list                                   # 同一期間多筆生效的組＋已寫的關係
+& '.venv\Scripts\python.exe' -m engine_c.observation_relations add mo_新 --supersedes mo_舊1 mo_舊2 --reason "…"
+& '.venv\Scripts\python.exe' -m engine_c.observation_relations add mo_甲 --parallel mo_乙 --reason "…"   # 兩筆都算數
+# ⚠ mechanical 欄位直接寫；判斷欄位同一個命令只建提案（pr_*）→ todo sync 鑄號 → 使用者 go → todo complete-observation
 # 機械歷史表（Phase 3 Step 3.2）：價格 raw／adjusted＋分割、EDGAR 基本面（每份申報各一列，as-of 看 filed）
 & '.venv\Scripts\python.exe' -m engine_c.history_backfill --report <file.json>   # 全體回填（寫正式庫：先取 writer lock、不得與 daily 同時）
 & '.venv\Scripts\python.exe' -m engine_c.history_backfill --incremental          # daily ②b 跑的那一行

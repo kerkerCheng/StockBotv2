@@ -44,7 +44,7 @@ def test_manual_observation_is_append_only_and_projection_is_rebuildable() -> No
     assert first != second
     assert conn.execute("SELECT COUNT(*) FROM manual_observations").fetchone()[0] == 2
     conn.execute("DELETE FROM manual_fields")
-    assert rebuild_manual_projection(conn) == 2
+    assert rebuild_manual_projection(conn) == 1      # 2026-10-14 起只重播生效列：被取代的 first 不再重播（ledger 裡兩筆都在）
     projected = conn.execute(
         "SELECT value, source_note, updated_at FROM manual_fields"
     ).fetchone()
@@ -152,9 +152,9 @@ def test_manual_observation_rejects_secret_in_ordinary_source_field() -> None:
 def test_second_unlinked_observation_for_the_same_period_is_rejected() -> None:
     """同一個 (ticker, field, as_of) 已經有生效紀錄時，新的一筆必須說出關係（2026-09-13）。
 
-    ⚠ 為什麼不給預設：`supersedes_id` 是**單值**欄位（而且帶 FK），所以一旦長出兩條互不相干的
-    鏈就**在資料模型上無法合併**，讀取端只能靠 `ORDER BY as_of DESC, recorded_at DESC` 猜哪一筆
-    算數——猜不是宣告（L17-3②）。2026-09-13 實測全庫已經有 **14 組**這樣的紀錄。
+    ⚠ 為什麼不給預設：`supersedes_id` 是**單值**欄位（而且帶 FK），一旦長出兩條互不相干的鏈就要
+    另外寫取代關係才合併得了（2026-10-14 取代鏈 A；之前根本合併不了），讀取端不猜哪一筆算數——
+    猜不是宣告（L17-3②）。2026-09-13 實測全庫已經有 **14 組**這樣的紀錄。
     """
     conn = _conn()
     first = append_manual_observation(

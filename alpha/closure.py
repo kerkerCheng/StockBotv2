@@ -878,19 +878,14 @@ def render_base_eps_reconciliation(rows: Sequence[tuple[str, str, float, float, 
 def duplicate_live_observations(
     groups: Mapping[tuple[str, str, str], Sequence[str]]
 ) -> tuple[tuple[str, str, str, tuple[str, ...]], ...]:
-    """同一個 `(ticker, field_name, as_of)` 有多於一筆「生效」觀測的那幾組。
+    """同一個 `(ticker, field_name, as_of)` 有多於一筆「生效」、**而且不是登記過的刻意並存**的那幾組。
 
-    ⚠ **這不是可以清掉的待辦，是一個資料模型的限制**：`manual_observations.supersedes_id` 是
-    **單值**欄位（而且帶 FK 指回自己），所以一筆新紀錄只能關掉一條 supersession 鏈。
-    典型長法是「`xbrl_backfill` 先寫一筆最小組合，之後有人寫完整版但沒有指向它」——
-    兩條互不相干的鏈**在現有 schema 下無法合併**。
-    2026-09-13 起寫入端會擋下新的（`engine_c/manual_observations.py::_reject_unlinked_duplicate`），
-    但既有的只能等 schema 決定（ROADMAP 旁支開發項「人工觀測的取代鏈收多值」——2026-09-22 改寫時漏搬、2026-10-14 補回）。
-
-    ⚠ 今天不會取到錯的值：`alpha/providers/fundamentals.py` 用
-    `ORDER BY as_of DESC, recorded_at DESC` 取回、取第一筆可解析且未被 supersede 的——
-    等於「最新者勝出」，而最新的通常就是最完整的那一筆。
-    **但那是排序的副作用，不是宣告**，所以這個計數器要常駐。
+    典型長法是「`xbrl_backfill` 先寫一筆最小組合，之後有人寫完整版但沒有指向它」——`supersedes_id` 是單值欄位
+    （而且帶 FK），一筆新紀錄只能關掉一條鏈。2026-09-13 起寫入端會擋下新的
+    （`engine_c/manual_observations.py::_reject_unlinked_duplicate`）；**2026-10-14 起合併得了**（ROADMAP「人工觀測的
+    取代鏈收多值」，使用者選 A）：取代關係表一筆可以關掉多筆、也記刻意並存——機械欄位用
+    `python -m engine_c.observation_relations add`，判斷欄位同一個命令只建提案、走 pq2。
+    這個計數器照樣常駐：它歸零之後，下一組重複一長出來就會自己出現（L14）。
     """
     out: list[tuple[str, str, str, tuple[str, ...]]] = []
     for key in sorted(groups):
@@ -901,17 +896,18 @@ def duplicate_live_observations(
 
 
 def render_duplicate_live_observations(
-    rows: Sequence[tuple[str, str, str, tuple[str, ...]]]
+    rows: Sequence[tuple[str, str, str, tuple[str, ...]]], *, parallel: int = 0
 ) -> list[str]:
-    """常駐一行。沒命中也印（否則「沒有問題」與「沒有跑」同形）。"""
+    """常駐一行。沒命中也印（否則「沒有問題」與「沒有跑」同形）；登記過的刻意並存另外寫幾組、不算重複。"""
+    tail = f"（另有 {parallel} 組是登記過的刻意並存，不算）" if parallel else ""
     if not rows:
-        return ["同一期間有多筆生效觀測：0 組"]
+        return [f"同一期間有多筆生效觀測：0 組{tail}"]
     fields = sorted({r[1] for r in rows})
-    return [f"⚠ 同一期間有多筆生效觀測：{len(rows)} 組（{len(fields)} 個欄位：{'、'.join(fields)}）——"
+    return [f"⚠ 同一期間有多筆生效觀測：{len(rows)} 組（{len(fields)} 個欄位：{'、'.join(fields)}）{tail}——"
             + "、".join(f"{tk}/{fn}@{ao}({len(ids)})" for tk, fn, ao, ids in rows)
-            + "。`supersedes_id` 是單值欄位且帶 FK，**兩條互不相干的鏈在現有 schema 下無法合併**；"
-            "2026-09-13 起寫入端會擋下新的，既有的要等 schema 決定（ROADMAP「人工觀測的取代鏈收多值」，要使用者選 A／B）。"
-            "⚠ 今天取到的仍是「最新者勝出」那一筆——**那是排序的副作用，不是宣告**。"]
+            + "。合併：機械欄位 `python -m engine_c.observation_relations add <新> --supersedes <舊…>`；"
+            "判斷欄位同一個命令只建提案、`python -m engine_b.todo sync` 鑄號、使用者 go 後 `todo complete-observation`。"
+            "讀取端照寫衝突、不挑一個。"]
 
 
 #: 兩條共識矛盾規則各自的容忍帶。

@@ -448,6 +448,17 @@ def resolve(
         item["receipt"] = receipt or None
         if item["type"] == "thesis_lifecycle" and verb in ("go", "drop"):
             _mark_disproof_handled(item, verb, stamp)
+        if item["type"] == "engine_c_observation" and verb == "drop":
+            # 提案是 content-addressed 的凍結物件：drop 就是對這一份的決定——提案跟著結案，下次 sync 才不會換號重生
+            # （2026-10-14 取代鏈 A 補的對稱面；觀測提案原本也會換號重生）
+            from engine_c import pending_observations
+
+            try:
+                record = pending_observations.read(str(item["ref_id"]))
+                if record is not None and record.get("state") == "pending":
+                    pending_observations.mark_dropped(str(item["ref_id"]), reason=reason or "使用者 drop")
+            except pending_observations.ProposalError:
+                pass                                   # ref_id 不是提案形狀（舊資料）：drop 本身照樣成立
     pool["log"].append({
         "at": stamp, "n": item["n"], "type": item["type"],
         "ref_id": item["ref_id"], "verb": verb, "reason": reason or None,
@@ -1161,7 +1172,7 @@ def complete_engine_c_observation(
 
     from engine_c import pending_observations
     from engine_c.db import get_conn
-    from engine_c.manual_observations import append_manual_observation
+    from engine_c.manual_observations import append_manual_observation, append_relation
 
     item = get(pool, n)
     if item["type"] != "engine_c_observation":
@@ -1174,6 +1185,21 @@ def complete_engine_c_observation(
         raise TodoError(f"提案 {proposal_id} 已是 {record.get('state')}，不可重複寫入")
 
     payload = dict(record["payload"])
+    if payload.get("kind") == "relation":
+        # 判斷欄位的取代／並存關係（2026-10-14 取代鏈 A）：使用者 go 的就是凍結的這一份；核准收據跟著關係走
+        conn = get_conn()
+        try:
+            relation_ids = append_relation(
+                conn, observation_id=payload["observation_id"], target_ids=payload["target_ids"],
+                relation=payload["relation"], reason=payload["reason"], author=payload["author"],
+                approval_ref=f"proposal:{proposal_id};pq2:[{n}]")
+        finally:
+            conn.close()
+        pending_observations.mark_applied(proposal_id, relation_ids=relation_ids)
+        receipt = f"relations:{','.join(relation_ids)};proposal:{proposal_id}"
+        resolve(pool, n, "go", reason="使用者核准後寫入 Engine C 取代關係", receipt=receipt, at=at,
+                _skip_receipt_validation=True)
+        return {"relation_ids": relation_ids, "receipt": receipt}
     conn = get_conn()
     try:
         observation_id = append_manual_observation(
@@ -2068,6 +2094,21 @@ def _collect_engine_c_observation_rows() -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
     for record in iter_pending():
         payload = record.get("payload") or {}
+        if payload.get("kind") == "relation":
+            # 判斷欄位的取代／並存關係（2026-10-14 取代鏈 A）——同一道 Engine C 判讀寫入 gate
+            verb = "取代" if payload.get("relation") == "supersedes" else "與它們並存"
+            rows.append({
+                "type": "engine_c_observation",
+                "ref_id": str(record["proposal_id"]),
+                "title": f"Engine C 取代關係：{payload.get('ticker')} / {payload.get('field_name')}（同一期間兩筆生效，定哪一筆算數）",
+                "hint": (
+                    "核准後以 `todo complete-observation <編號>` 寫入取代關係（既有兩筆一字不改，只記哪一筆不再生效）；"
+                    f"{payload.get('observation_id')} {verb} {'、'.join(payload.get('target_ids') or ())}；"
+                    f"理由：{str(payload.get('reason'))[:120]}"
+                ),
+                "source": "engine_c",
+            })
+            continue
         rows.append({
             "type": "engine_c_observation",
             "ref_id": str(record["proposal_id"]),

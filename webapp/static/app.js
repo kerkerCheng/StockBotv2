@@ -880,7 +880,8 @@ function mixFigures(payload) {
     else if (mix.absences && mix.absences[key]) out.push(el('div', 'row-reason ss-pending', `${label}：${mix.absences[key].reason}`));
   });
   (mix.conflicts || []).forEach((c) => out.push(el('div', 'row-reason',
-    `${c.label || c.field}（${c.as_of}）有 ${(c.ids || []).length} 筆同時生效的紀錄——不挑一個，這一筆不印`)));
+    `${c.label || c.field}（${c.as_of}）有 ${(c.ids || []).length} 筆同時生效的紀錄`
+    + (c.declared_parallel ? '（登記過的刻意並存）' : '') + '——不挑一個，這一筆不印')));
   return out;
 }
 

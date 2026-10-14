@@ -1086,6 +1086,18 @@ JSON 數值（散文一律拒絕）——`mechanical` 的定義就是「可被�
 TDnet 五種寫法，用 regex 驗會攔掉合法的法國 URD 引用（L15 記過的坑）。provenance 仍必填。
 查證：`python -c "from engine_c.observation_fields import get_observation_field_registry as g;print(g().mechanical_field_names)"`
 
+**取代與並存關係（2026-10-14 取代鏈 A；ROADMAP「人工觀測的取代鏈收多值」，使用者選 A）：** `supersedes_id` 是單值、帶 FK，
+一筆新紀錄只能關掉一條鏈——同一期間長出兩條互不相干的鏈之後就合併不了（2026-09-13 實測 14 組）。另一本 append-only 的
+`manual_observation_relations`（`supersedes`／`parallel`，每個目標一列）：一筆可以關掉多筆、也記刻意並存（`allow_parallel`
+的寫入從此留紀錄）。**「哪幾筆生效」只有一條規則**：`engine_c.manual_observations.live_rows`（沒被 `supersedes_id`、也沒被
+`supersedes` 關係指到；as-of 只看那天以前記錄的列與關係）——三題、會不會死、營收結構、基期（含「已被 X 取代」的祖先引用，
+一筆可以有多個祖先）、APP 計數器、`manual_fields` 投影的勝出者都從這裡取。寫入端 `append_relation`／`check_relation`：
+兩端同一家公司同一欄位、現在都生效（取代失效的列會分岔、讓失效的列去取代別人是復活）、判斷欄位要核准收據；
+判斷欄位的關係只建提案（`pr_*`，與觀測提案同一個目錄、同一個 pq2 type、同一個 `todo complete-observation`——Engine C 判讀寫入
+gate 只有一道門），drop 會把提案收掉、不換號重生。入口：`python -m engine_c.observation_relations list｜add`。
+2026-10-14 遷移（備份 20261014T072251Z、ledger 401 列一列未改）：mechanical 10 組直接合併，判斷欄位 4 組鑄 [754]–[757]；
+閉環計數器「同一期間有多筆生效觀測」14 → 4。
+
 **圖 metadata 回填（`loader/source_dating.py`）四道補償控制：**
 ① 屬性白名單（只有 `published_at`／`retrieved_at`）；② `--basis` 必填並落地成節點屬性；
 ③ 寫入值另存 `published_at_backfilled`，**basis 與現值脫鉤是可偵測的**；
