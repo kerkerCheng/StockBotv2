@@ -151,13 +151,15 @@ BET_SHARE_FIELD = "segment_revenue_share"
 
 
 def bet_share(rides: Sequence[str], declarations: Mapping[str, Any] | None, company_id: str,
-              shares: Sequence[Mapping[str, Any]], *, node_names: Mapping[str, str] | None = None) -> dict[str, Any]:
+              shares: Sequence[Mapping[str, Any]], *, node_names: Mapping[str, str] | None = None,
+              conflicts: Sequence[Mapping[str, Any]] = ()) -> dict[str, Any]:
     """押的那一塊占營收多少（B3；2026-10-14）：敘事押的層裡，研究宣告這家當代表公司的那幾層（層代表公司宣告，S3c）——
     宣告用分部營收 → 那個分部在**最新一次**分部占比裡的占比（名稱逐字對得上才算；最新一次沒有同名的就照說，不拿舊的一次湊）；
     宣告用全公司營收 → 整家公司。押的層沒宣告它、宣告的分部沒有占比觀測 → 具名缺席。不推算、不跨公司。
 
     `rides`：敘事押的節點（`what_it_does` 的 focus，只在來源是 rides 時）；`declarations`：節點 → 現行宣告（None＝這一輪沒讀到）；
-    `shares`：`revenue_mix` 的 `shares`（已是生效、as-of 過的）。"""
+    `shares`：`revenue_mix` 的 `shares`（已是生效、as-of 過的）；`conflicts`：`revenue_mix` 的同期多筆生效——比用到的那一次還新的，
+    照寫在那一格（R2 非阻擋 #2：SOI.PA 印 FY2025 的 24.2%，較新的 FY2026 有兩筆同時生效、沒印——不寫出來會被當成最新的）。"""
     names = node_names or {}
     if not rides:
         return {"items": [], "absence": {"kind": "not_yet_recorded", "reason": "敘事還沒宣告押哪一層，說不出押的那一塊"}}
@@ -165,6 +167,9 @@ def bet_share(rides: Sequence[str], declarations: Mapping[str, Any] | None, comp
         return {"items": [], "absence": {"kind": "upstream_unavailable", "reason": "層代表公司宣告這一輪沒讀到"}}
     points = next((list(s.get("points") or ()) for s in shares if s.get("field") == BET_SHARE_FIELD), [])
     latest = points[-1] if points else None
+    used = str((latest or {}).get("as_of") or "")
+    newer_conflicts = sorted(str(c.get("as_of")) for c in conflicts
+                             if c.get("field") == BET_SHARE_FIELD and str(c.get("as_of") or "") > used)
     items: list[dict[str, Any]] = []
     for node in rides:
         label = names.get(node) or node
@@ -187,11 +192,14 @@ def bet_share(rides: Sequence[str], declarations: Mapping[str, Any] | None, comp
             when = (latest or {}).get("period") or (latest or {}).get("as_of")
             reason = (f"宣告的分部「{rep.segment}」在最新一次分部占比（{when}）裡沒有同名的一塊（有的是：{'、'.join(have)}）"
                       if latest else f"宣告的分部「{rep.segment}」還沒有分部占比觀測")
+            if newer_conflicts:
+                reason += f"（{newer_conflicts[-1]} 那一次有多筆同時生效的紀錄，不挑一個）"
             items.append({**base, "value": None, "reason": reason})
             continue
         items.append({**base, "value": "share", "share": part.get("share"), "prev_share": part.get("prev_share"),
                       "period": latest.get("period") or latest.get("as_of"), "as_of": latest.get("as_of"),
-                      "source_ref": latest.get("source_ref"), "reason": None})
+                      "source_ref": latest.get("source_ref"), "reason": None,
+                      "newer_conflict": newer_conflicts[-1] if newer_conflicts else None})
     valued = [item for item in items if item.get("value")]
     absence = None if valued else {"kind": "not_yet_recorded",
                                    "reason": "；".join(str(item["reason"]) for item in items if item.get("reason"))}

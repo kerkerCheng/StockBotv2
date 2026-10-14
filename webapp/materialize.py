@@ -593,7 +593,7 @@ def _page_bet_share(what: Mapping[str, Any] | None, reps: Mapping[str, Any] | No
         return {"items": [], "absence": {"kind": "upstream_unavailable", "reason": "營收結構這一輪沒讀到"}}
     rides = list((what or {}).get("focus") or ()) if (what or {}).get("source") == "rides" else []
     return bet_share(rides, (reps or {}).get("declarations"), str(company_id or ""), (mix or {}).get("shares") or (),
-                     node_names=names)
+                     node_names=names, conflicts=(mix or {}).get("conflicts") or ())
 
 
 def _page_revenue_mix(ticker: str, as_of: date | None) -> dict[str, Any]:

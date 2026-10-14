@@ -134,6 +134,22 @@ def test_bet_share_never_borrows_an_older_point_or_a_product_line_and_names_what
     assert bet_share(["tech:x"], None, "co:a", [])["absence"]["kind"] == "upstream_unavailable"
 
 
+def test_a_newer_conflicted_observation_is_said_next_to_the_older_share() -> None:
+    """R2 非阻擋 #2（SOI.PA）：用的是前一次（FY2025 24.2%），較新的一次兩筆同時生效、沒印——那一格要自己說，不然會被當成最新。"""
+    from alpha.revenue_mix import bet_share
+
+    decls = {"tech:x": _decl([("co:a", "segment", "Edge & Cloud AI")])}
+    shares = _segment_shares(("2025-03-31", [("Edge & Cloud AI", 0.2424)]))
+    conflicts = [{"field": "segment_revenue_share", "as_of": "2026-03-31", "ids": ["mo_a", "mo_b"]},
+                 {"field": "product_line_revenue_share", "as_of": "2026-09-30", "ids": ["mo_c", "mo_d"]}]
+    item = bet_share(["tech:x"], decls, "co:a", shares, conflicts=conflicts)["items"][0]
+    assert item["share"] == 0.2424 and item["newer_conflict"] == "2026-03-31"     # 產品線的衝突不算（口徑不同）
+    older_only = bet_share(["tech:x"], decls, "co:a", shares,
+                           conflicts=[{"field": "segment_revenue_share", "as_of": "2024-03-31", "ids": ["x", "y"]}])
+    assert older_only["items"][0]["newer_conflict"] is None
+    assert "item.newer_conflict" in _body("betShareLines")
+
+
 def test_the_page_contract_reads_bet_share_and_unread_is_not_absence() -> None:
     from webapp.materialize import _page_bet_share
 

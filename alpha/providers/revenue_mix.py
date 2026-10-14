@@ -54,6 +54,10 @@ def live_observations(conn: Any, ticker: str, *, as_of: date | None = None
 
 
 TW_SUFFIXES = (".TW", ".TWO")
+#: 年報地區別沒收的原因（`engine_c.tw_region_revenue.CHECK_STATUSES`）→ 缺席 kind。上游缺（MOPS 還沒有年報、月營收不滿十二個月）
+#: 要補的是上游、不是答案（R2 非阻擋 #1：`capability_absent` 是「已定」的那一類）；版面認不出來才是我們的抽取做不到。
+REGION_ABSENCE_KINDS: Mapping[str, str] = {"not_yet_available": "not_yet_recorded", "document_missing": "upstream_unavailable",
+                                           "no_monthly_revenue": "upstream_unavailable"}
 
 
 def _regions(conn: Any, ticker: str, as_of: date | None) -> tuple[dict[str, Any] | None, dict[str, Any] | None]:
@@ -67,7 +71,7 @@ def _regions(conn: Any, ticker: str, as_of: date | None) -> tuple[dict[str, Any]
         return None, {"kind": "not_yet_recorded", "reason": "還沒從年度財報抽地區別營收"}
     if found["status"] == "ok":
         return region_mix(found), None
-    kind = "not_yet_recorded" if found["status"] == "not_yet_available" else "capability_absent"
+    kind = REGION_ABSENCE_KINDS.get(str(found["status"]), "capability_absent")
     return None, {"kind": kind, "reason": str(found.get("reason") or found["status"])}
 
 

@@ -253,6 +253,11 @@ def test_the_reader_only_adds_regions_for_taiwan_and_segment_absence_stays() -> 
                   "basis_quotes": []}, fetched="2026-10-14T05:00:00+00:00", ticker="7777.TW")
     failed = revenue_mix(conn, "7777.TW", as_of=date(2026, 10, 14))
     assert failed["absences"]["regions"] == {"kind": "capability_absent", "reason": "加起來不等於合計"}
+    # R2 非阻擋 #1：上游缺（MOPS 還沒有年報、月營收不齊）是待補，不是「已定」的 capability_absent
+    for ticker, status in (("6666.TW", "document_missing"), ("5555.TW", "no_monthly_revenue")):
+        _write(conn, {"status": status, "reason": "上游缺", "years": {}, "basis": "unstated", "basis_quotes": []},
+               fetched="2026-10-14T05:00:00+00:00", ticker=ticker)
+        assert revenue_mix(conn, ticker, as_of=date(2026, 10, 14))["absences"]["regions"]["kind"] == "upstream_unavailable"
 
 
 def test_the_page_contract_counts_regions_as_a_value() -> None:

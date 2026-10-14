@@ -893,8 +893,9 @@ function betShareLines(payload) {
   return (bet.items || []).map((item) => {
     if (item.value === 'share') {
       const prev = typeof item.prev_share === 'number' ? `；前一次 ${fmtRatioPct(item.prev_share, 1)}` : '';
+      const newer = item.newer_conflict ? `——較新的 ${item.newer_conflict} 那一次有多筆同時生效的紀錄、不挑一個，這裡是前一次` : '';
       return el('div', 'row-reason', `押的那一塊：「${item.node_name}」由研究宣告用「${item.segment}」分部代表——`
-        + `占營收 ${fmtRatioPct(item.share, 1)}（${item.period}${prev}）`);
+        + `占營收 ${fmtRatioPct(item.share, 1)}（${item.period}${prev}）${newer}`);
     }
     if (item.value === 'whole_company') {
       return el('div', 'row-reason', `押的那一塊：「${item.node_name}」由研究宣告用全公司營收代表——整家公司就是押的那一塊`);
