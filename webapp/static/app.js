@@ -905,6 +905,52 @@ function betShareLines(payload) {
   });
 }
 
+/** 事件之後跟組比（B5，個股頁 S3e）：研究說過會改變信心的事（這一檔名下醒過的等待、已過的確定檢核點），每件一列——日期、
+ *  哪一種、說什麼、事件前最後一個收盤，與每一組 1／5／20 個交易日的相對漲跌（本檔 − 組員平均）；還沒滿 n 日寫「還沒滿」。
+ *  全部照抄 materialize 的 `event_reaction`（報酬是那邊算好的，這裡只換成百分比字樣；不排序、不上色）。 */
+function eventReactionLines(payload) {
+  const er = payload.event_reaction;
+  if (!er) return [];
+  const out = [];
+  const counts = er.counts || {};
+  // 不算的那幾種照數寫（判定之前 AI 標旗不算事件；估計日期的檢核點差一兩天就會算到別的事上）
+  const skipped = [
+    counts.flagged_unjudged ? `${counts.flagged_unjudged} 件 AI 標旗、還沒判定是否觸及` : null,
+    counts.judged_not_touched ? `${counts.judged_not_touched} 件判定沒觸及` : null,
+    counts.other_wakes ? `${counts.other_wakes} 件其他醒法` : null,
+    counts.estimated_checkpoints ? `${counts.estimated_checkpoints} 個已過的檢核點只有估計日期` : null,
+  ].filter(Boolean);
+  const estimated = skipped.length
+    ? el('div', 'row-reason ss-pending', `不算事件的：${skipped.join('、')}（判定觸及、日期確定才算）`)
+    : null;
+  if (er.absence) {
+    out.push(el('div', 'row-reason ss-pending', `事件之後跟組比：${er.absence.reason}`));
+    if (estimated) out.push(estimated);
+    return out;
+  }
+  (er.events || []).forEach((e) => {
+    const price = e.price_before
+      ? `｜事件前收盤 ${fmtNumber(e.price_before.close, 2)}${e.price_before.unit ? ' ' + e.price_before.unit : ''}（${e.price_before.date}）`
+      : '';
+    const late = e.date_basis === 'woken_at' ? '（這是系統發現它醒的日子，事件可能更早）'
+      : (e.date_basis === 'watch_date' ? '（研究定的日子，事件本身可能早幾天）' : '');
+    const parts = (e.reactions || []).map((r) => {
+      if (r.absence) return `相對「${r.theme}」組：${r.absence}`;
+      const windows = (r.windows || []).map((w) => (w.pending ? `${w.n} 日 還沒滿`
+        : (w.absence ? `${w.n} 日 ${w.absence}` : `${w.n} 日 ${signedPct(w.relative)}`)));
+      return `相對「${r.theme}」組：${windows.join('、')}`;
+    });
+    if (e.reaction_absence) parts.push(`相對同組：${e.reaction_absence.reason}`);
+    out.push(el('div', 'row-reason', `${e.date} ${e.kind_label}${late}：${e.label || '—'}${price}`
+      + (parts.length ? `｜${parts.join('；')}` : '')));
+  });
+  if ((er.total || 0) > (er.events || []).length) {
+    out.push(el('div', 'row-reason', `（另有 ${er.total - er.events.length} 件較早的事，沒列）`));
+  }
+  if (estimated) out.push(estimated);
+  return out;
+}
+
 /** B3「數字與出處」裡的營收結構細節：客戶集中度與 backlog 的全文、每一次占比觀測的出處與沒畫的欄位、押的那一塊的宣告理由（照抄）。 */
 function mixDetail(payload) {
   const mix = payload.revenue_mix || {};
@@ -1796,6 +1842,7 @@ function blockVisuals(payload, view, key) {
     betShareLines(payload).forEach((m) => out.push(m));
     mixFigures(payload).forEach((m) => out.push(m));
   }
+  if (key === 'B5') eventReactionLines(payload).forEach((m) => out.push(m));
   if (key === 'B4') {
     // 標出它坐的層：讀圖面板的「坐的節點」（與讀圖、是不是新賭注同一份 seats）；頁首「做什麼」講的那幾格（押的格）粗框加標籤
     const seats = ((view.readings || {}).context || {}).seats || Object.keys(payload.node_names || {});

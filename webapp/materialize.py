@@ -230,7 +230,8 @@ def materialize_view(analyst_view_dict: Mapping[str, Any], *,
                      what_it_does: Mapping[str, Any] | None = None,
                      path_layers: Mapping[str, Any] | None = None,
                      revenue_mix: Mapping[str, Any] | None = None,
-                     bet_share: Mapping[str, Any] | None = None) -> dict[str, Any]:
+                     bet_share: Mapping[str, Any] | None = None,
+                     event_reaction: Mapping[str, Any] | None = None) -> dict[str, Any]:
     """`AnalystView.to_dict()` → artifact payload（含遮蔽、overview、兩個 digest）。純函式。
 
     `price_series` 是**脈絡不是判讀**：一條這檔自己的已收盤收盤價序列，讓使用者看得懂
@@ -284,6 +285,9 @@ def materialize_view(analyst_view_dict: Mapping[str, Any], *,
         "revenue_mix": dict(revenue_mix) if revenue_mix is not None else None,
         # 押的那一塊（2026-10-14）：敘事押的層 × 層代表公司宣告 × 分部占比——照抄 `alpha.revenue_mix.bet_share`。
         "bet_share": dict(bet_share) if bet_share is not None else None,
+        # 事件之後跟組比（個股頁 S3e，2026-10-14）：這一檔名下醒過的等待與已過的確定檢核點，每件 1／5／20 日相對主題等權組——
+        # 照抄 `alpha.event_reaction`。
+        "event_reaction": dict(event_reaction) if event_reaction is not None else None,
         "materializer": {
             "version": MATERIALIZER_VERSION,
             "python": f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}",
@@ -361,7 +365,8 @@ def page_extra_for(ticker: str, layer_notes: Mapping[str, Any] | None,
                   what: Mapping[str, Any] | None = None,
                   path_layers: Mapping[str, Any] | None = None,
                   revenue_mix: Mapping[str, Any] | None = None,
-                  bet: Mapping[str, Any] | None = None) -> dict[str, Any] | None:
+                  bet: Mapping[str, Any] | None = None,
+                  reaction: Mapping[str, Any] | None = None) -> dict[str, Any] | None:
     """個股頁填得滿表的頁外輸入：引用這一頁的層說明節點（`layer_notes` state artifact 的 `cited_by.pages`）、
     涵蓋這一頁坐的層的示意圖 id（`diagrams`；None＝這一輪沒讀到示意圖目錄）、需求錨序列（`demand_anchor`：有值的序列 key；
     讀不到或回看的那天不推＝不給這個鍵）、「做什麼」講的節點（`what`）。artifact 讀不到 → 那一個鍵不給
@@ -382,6 +387,10 @@ def page_extra_for(ticker: str, layer_notes: Mapping[str, Any] | None,
     # 押的那一塊：有值的節點（占比或整家公司）；宣告或營收結構這一輪沒讀到＝不給鍵
     if bet is not None and ((bet.get("absence") or {}).get("kind")) != "upstream_unavailable":
         extra["bet_share"] = [str(item.get("node")) for item in bet.get("items") or () if item.get("value")]
+    # 事件之後跟組比：至少有一個窗算得出相對報酬的事件（只有「還沒滿」或沒有組的不算有值）；讀不到＝不給鍵
+    if reaction is not None and ((reaction.get("absence") or {}).get("kind")) != "upstream_unavailable":
+        extra["event_reaction"] = [str(e.get("key")) for e in reaction.get("events") or ()
+                                   if any("relative" in w for r in e.get("reactions") or () for w in r.get("windows") or ())]
     if diagrams is not None:
         extra["diagrams"] = [str(d.get("id")) for d in diagrams]
     absence_kind = ((demand_anchor or {}).get("absence") or {}).get("kind")
@@ -524,7 +533,8 @@ def materialize(ticker: str, *, as_of: date | None = None, scenario: str | None 
                 node_names: Mapping[str, str] | None = None,
                 anchors: Mapping[str, Any] | None = None,
                 paths: Mapping[str, Any] | None = None,
-                layer_reps: Mapping[str, Any] | None = None) -> tuple[Path, dict[str, Any]]:
+                layer_reps: Mapping[str, Any] | None = None,
+                events: Mapping[str, Any] | None = None) -> tuple[Path, dict[str, Any]]:
     """跑一次完整鏈並寫下 artifact。**只有這裡會連 Neo4j／Engine C／private ledger。**
 
     `readings`：`readings_context()` 的結果（多檔時由 `materialize_many` 載入一次傳進來）；沒給就自己載一次。
@@ -534,6 +544,7 @@ def materialize(ticker: str, *, as_of: date | None = None, scenario: str | None 
     `anchors`：需求錨序列（`_anchor_context`；多檔時載一次）；沒給就為這一檔載一次。
     `paths`：路徑上各層（`_path_context`；多檔時載一次——每一層一輪只算一次）；沒給就為這一檔載一次。
     `layer_reps`：層代表公司宣告（`_layer_reps_loaded`；多檔時載一次）——押的那一塊用；沒給就為這一檔載一次。
+    `events`：事件之後跟組比的一輪輸入（`_event_context`；多檔時載一次）；沒給就為這一檔載一次。
     """
     from briefing.alpha_view.sources import fetch_alpha_investment_view
     from briefing.analyst_view import build_analyst_view
@@ -561,16 +572,52 @@ def materialize(ticker: str, *, as_of: date | None = None, scenario: str | None 
     mix = _page_revenue_mix(str(view.identity.ticker or ticker), as_of)
     reps = layer_reps if layer_reps is not None else _layer_reps_loaded(as_of)
     bet = _page_bet_share(what, reps, view.identity.company_id, mix, names)
+    event_ctx = events if events is not None else _event_context()
+    reaction = _page_event_reaction(str(view.identity.ticker or ticker), view.identity.company_id, analyst_dict,
+                                    event_ctx, as_of)
     payload = materialize_view(analyst_dict, generated_at=generated_at,
                                price_series=_close_series(ticker),
                                page_extra=page_extra_for(ticker, notes_state, page_diagrams, demand, capture, what,
-                                                         path_layers, mix, bet),
+                                                         path_layers, mix, bet, reaction),
                                diagrams=page_diagrams,
                                node_names={str(n): names[str(n)] for n in seats if str(n) in names},
                                demand_anchor=demand, capture=capture, what_it_does=what, path_layers=path_layers,
-                               revenue_mix=mix, bet_share=bet)
+                               revenue_mix=mix, bet_share=bet, event_reaction=reaction)
     target = store or ArtifactStore()
     return target.write(payload), payload
+
+
+def _event_context() -> dict[str, Any] | None:
+    """事件之後跟組比的一輪輸入（多檔載一次）：Event Watch registry、leads、thesis lifecycle。任一讀不到 → None（＝這一輪沒讀到）。
+    回看（as-of）時用同一份現在的 registry——`woken_by.at` 與事件日由 `alpha.providers.event_reaction` 按 as-of 濾。"""
+    try:
+        from engine_b import event_watch as ew
+        from engine_b import leads as leads_mod
+        from engine_b.disproof import load_lifecycle
+
+        return {"watches": list(ew.load_watches().get("watches") or ()), "leads": dict(leads_mod.load().get("leads") or {}),
+                "lifecycle": load_lifecycle()}
+    except Exception:  # noqa: BLE001 — 讀不到只讓 B5 那一格說讀不到
+        return None
+
+
+def _page_event_reaction(ticker: str, company_id: str | None, analyst_dict: Mapping[str, Any],
+                         context: Mapping[str, Any] | None, as_of: date | None) -> dict[str, Any]:
+    """一頁的「事件之後跟組比」（`alpha.providers.event_reaction`）；檢核點取頁上 research 面板照抄的那幾個。"""
+    if context is None:
+        return {"events": [], "total": 0, "absence": {"kind": "upstream_unavailable",
+                                                      "reason": "等待 registry 或 leads 這一輪沒讀到"}}
+    try:
+        from alpha.providers.briefs import read_brief_records
+        from alpha.providers.event_reaction import page_event_reaction
+
+        records, _problems = read_brief_records(ticker)
+        checkpoints = ((analyst_dict.get("research") or {}).get("checkpoints")) or ()
+        return page_event_reaction(ticker, company_id, as_of=as_of or date.today(), context=context,
+                                   brief_records=records, checkpoints=checkpoints)
+    except Exception as exc:  # noqa: BLE001 — 事件反應是 B5 的一格，算不出來不擋整份判讀
+        return {"events": [], "total": 0, "absence": {
+            "kind": "upstream_unavailable", "reason": f"事件反應算不出來（{type(exc).__name__}: {str(exc)[:120]}）"}}
 
 
 def _layer_reps_loaded(as_of: date | None) -> dict[str, Any]:
@@ -764,11 +811,12 @@ def materialize_many(tickers: Sequence[str], *, as_of: date | None = None,
     anchors = _anchor_context(as_of) if tickers else None
     paths = _path_context(as_of, readings, anchors, state_store) if tickers else None
     reps = _layer_reps_loaded(as_of) if tickers else None
+    events = _event_context() if tickers else None
     for ticker in tickers:
         try:
             path, _ = materialize(ticker, as_of=as_of, store=target, readings=readings, candidates=candidates,
                                   layer_notes=notes_state, diagrams=loaded, node_names=names, anchors=anchors,
-                                  paths=paths, layer_reps=reps)
+                                  paths=paths, layer_reps=reps, events=events)
         except Exception as exc:  # noqa: BLE001 — 逐檔隔離；理由原樣回報
             results.append((ticker, None, f"{type(exc).__name__}: {str(exc)[:200]}"))
         else:

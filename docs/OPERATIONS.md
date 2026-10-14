@@ -114,6 +114,16 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 `StockBotv2-Daily` 的 ⑱⑲ 取代（1.2a 停用、2026-09-25 1.2b 刪除）；它們的理由（LLM 失敗心跳照發、永遠 exit 0、Python 不用 `.cmd`、
 發送走 subprocess）搬進 `crons/daily_task.py` 的 docstring，守它們的測試改主詞搬進 `tests/test_daily_task.py`「無人值守入口」節。
 
+### Sandbox impact review 結論（2026-10-14：個股頁 S3e——事件之後跟組比）
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | 無人值守路徑上只多**讀**：daily ⑬ materialize（argv 不變）每輪多讀一次 Event Watch registry、leads store、thesis lifecycle（本機檔，與候選板同一組讀取），每頁多讀 Engine C 日線（唯讀連線，與三題同一支）；個股頁 payload 多 `event_reaction`、填得滿表 B5「相對同組的反應」讀 `@event_reaction`。不寫任何檔、不連網、不跑 LLM、不碰任何 authority；**不改 watch 狀態**（只讀 `woken_by`／`judgments`） |
+| **2 canonical skill／prompt／本檔** | 本節；`docs/ARCHITECTURE.md` 首屏「事件之後跟組比」；個股頁 plan S3 表 S3e。不動任何 skill、prompt |
+| **3 最窄 rule** | daily argv 不變；不新增 step、allowlist、APP 路由、rule；APP 仍無寫入端點 |
+| **4 contract test** | `tests/test_event_reaction.py`（基準與第 n 日、還沒滿與組員不足、跨交易日曆、同一則新聞一件、只收三種醒法與確定檢核點、as-of、頁面合約只算有相對報酬的、前端只照抄）；變異 9／9 |
+| **5 端到端 smoke** | 真資料：聯亞、高力、全新的「研究等的日子」（10-12，9 月月營收後重寫）各一件，1 日相對同組 +8.05%／+1.73%／+6.84%，5 日與 20 日寫「還沒滿」；AEHR 有事件但不在任何組（具名缺席）；COHR 只有 AI 標旗與判定沒觸及（照數寫、不算）；AVGO 只有估計日期的檢核點（照數寫、不算） |
+
 ### Sandbox impact review 結論（2026-10-14：人工觀測的取代鏈收多值——取代鏈 A）
 
 | 步 | 結論 |

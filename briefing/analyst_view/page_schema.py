@@ -24,8 +24,8 @@ from typing import Any, Mapping, Sequence
 
 from alpha.absence import ABSENCE_KINDS, default_absence_kind
 
-PAGE_SCHEMA_VERSION = "stock-page-schema/1.3"   # 1.1（S3c）拿掉 B2 同層各家、路徑上各層接上；1.2（S3d）B3 營收結構與 backlog 接上；
-#                                                  1.3（S3d 第二段）台股年報地區別、押的那一塊接上
+PAGE_SCHEMA_VERSION = "stock-page-schema/1.4"   # 1.1（S3c）拿掉 B2 同層各家、路徑上各層接上；1.2（S3d）B3 營收結構與 backlog 接上；
+#                                                  1.3（S3d 第二段）台股年報地區別、押的那一塊接上；1.4（S3e）事件之後跟組比接上
 
 #: 單位（§5.1）：每塊、每個元素都要宣告掛在哪個單位。
 UNITS: Mapping[str, str] = {
@@ -149,8 +149,11 @@ ELEMENTS: tuple[PageElement, ...] = (
     PageElement("B5.catalyst", "B5", "事件：碰到哪一塊營收、多大、何時進營收", "event", "research",
                 ("research/catalyst_shape", "research/catalyst_quantitative_link"), "not_yet_recorded",
                 "thesis 的催化劑（lifecycle）"),
-    PageElement("B5.relative_reaction", "B5", "相對同組的 1／5／20 日反應", "event", "market", (),
-                "capability_absent", f"{_S3}：事件相對反應（依主題等權組）"),
+    PageElement("B5.relative_reaction", "B5", "相對同組的 1／5／20 日反應", "event", "market", ("@event_reaction",),
+                "not_yet_recorded",
+                "事件之後跟組比（個股頁 S3e，2026-10-14；使用者選事件來源 A）：這一檔名下醒過的等待（新聞叫醒的用發布日）與已過的"
+                "確定檢核點，每件從事件前最後一個收盤算 1／5／20 個交易日、減主題等權組員平均——沒有醒過的等待、不在任何組、"
+                "或事件之後都還沒滿一個交易日，就沒有"),
     # B6 怎麼被定價
     PageElement("B6.own_history", "B6", "自家三年百分位", "company", "market",
                 ("three_questions/tq:priced_in:*:own_history_pctile",), "upstream_unavailable", "三題②①"),
@@ -229,7 +232,7 @@ BLOCK_READINGS: tuple[BlockReading, ...] = (
     BlockReading("B3", parts=("in_numbers",),
                  pending="還沒寫：營收結構的一句讀法要研究寫；產品、地區、客戶比例的機械資料在個股頁 S3d（還沒做）"),
     BlockReading("B4", pending="還沒寫：技術鏈的一句讀法要研究寫；坐的層有層說明時，展開裡連得過去"),
-    BlockReading("B5", pending="還沒寫：事件與影響多大的一句讀法要研究寫；相對同組的反應在個股頁 S3（還沒做）"),
+    BlockReading("B5", pending="還沒寫：事件與影響多大的一句讀法要研究寫；相對同組的反應在下面（機械算的，只照實印）"),
     BlockReading("B6", slots=("priced_in",), parts=("priced_in",)),
     BlockReading("B7", slots=("what_must_be_true",)),
     BlockReading("B8", parts=("disproof", "confirm")),
