@@ -451,6 +451,15 @@ table.rank.compare td:first-child { color: var(--muted); }
 .path-name { font-weight: 600; margin-right: 6px; }
 .path-value { color: var(--text); }
 .path-absent { color: var(--muted); }
+
+/* 營收從哪來（B3，個股頁 S3d）：一塊一列——名字｜條（長度＝占比）｜百分比；手機上名字太長就換行 */
+.mix-box { margin: 10px 0 6px; }
+.mix-row { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(60px, 1fr) auto; gap: 8px; align-items: center;
+  font-size: 13px; margin: 3px 0; }
+.mix-name { overflow-wrap: anywhere; }
+.mix-track { background: var(--border); border-radius: 3px; height: 8px; overflow: hidden; }
+.mix-bar { display: block; height: 100%; background: var(--accent); }
+.mix-pct { color: var(--text); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .glossary { margin-top: .6rem; padding: .45rem .7rem; border-left: 3px solid var(--border); }
 .glossary .rule { margin: .15rem 0; }
 .table-filter { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 8px 0 4px; }

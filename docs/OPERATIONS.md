@@ -114,6 +114,16 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 `StockBotv2-Daily` 的 ⑱⑲ 取代（1.2a 停用、2026-09-25 1.2b 刪除）；它們的理由（LLM 失敗心跳照發、永遠 exit 0、Python 不用 `.cmd`、
 發送走 subprocess）搬進 `crons/daily_task.py` 的 docstring，守它們的測試改主詞搬進 `tests/test_daily_task.py`「無人值守入口」節。
 
+### Sandbox impact review 結論（2026-10-14：個股頁 S3d 第一段——營收結構接上 B3）
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | daily ⑬ materialize（argv 不變）每頁多讀一次 Engine C `manual_observations` 的四個欄位（分部／產品線占比、客戶集中度、backlog；本機、唯讀、同一個 `get_conn`）；個股頁 payload 多 `revenue_mix`、填得滿表 B3 兩格讀 `@revenue_mix`／`@backlog`。不寫任何檔、不連網、不跑 LLM、不碰任何 authority |
+| **2 canonical skill／prompt／本檔** | 本節；`docs/ARCHITECTURE.md` 首屏「營收從哪來」；個股頁 plan S3 表。不動任何 skill、prompt |
+| **3 最窄 rule** | daily argv 不變；不新增 step、allowlist、APP 路由；APP 仍無寫入端點 |
+| **4 contract test** | `tests/test_revenue_mix.py`（只畫頂層占比、前一次逐字對名稱、生效那一筆、同期兩筆不挑、as-of 只看已記錄的、文字照抄先印第一句、讀不到≠沒有紀錄、前端只照抄）；變異 6／6 |
+| **5 端到端 smoke** | 真資料：聯亞（產品線 99.2%、前四大客戶 70.5%、年報無在手訂單揭露）、AT&S（Microelectronics 62.6%，前一次 45.4%）、COHR、AAOI、SK hynix 逐頁可讀；119 頁裡 35 頁有占比、29 頁有客戶集中度、31 頁有 backlog（B3「產品、地區、客戶比例」有值 41 頁，原本 0）；Engine C 有 5 組同期兩筆生效的觀測（LYC.AX 兩欄、META、MP、SOI.PA），頁上照寫不挑一個 |
+
 ### Sandbox impact review 結論（2026-10-09：個股頁 S3c 路徑上各層——層代表公司宣告 ledger）
 
 | 步 | 結論 |

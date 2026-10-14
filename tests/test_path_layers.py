@@ -77,7 +77,7 @@ def test_the_page_contract_drops_same_layer_peers_and_reads_the_path_input_three
     """使用者 2026-10-09 ①A：拿掉「同層各家變化」（10-05 回饋 #18：只是一堆年增數字，沒有內涵）。"""
     keys = {e.key for e in ps.ELEMENTS}
     assert "B2.peer_changes" not in keys and "B2.path_layers" in keys
-    assert ps.PAGE_SCHEMA_VERSION == "stock-page-schema/1.1" and ps.check_schema() == []
+    assert ps.PAGE_SCHEMA_VERSION.startswith("stock-page-schema/1.") and ps.check_schema() == []
     cell = lambda extra: {r["element"]: r for r in ps.fill_table({}, extra=extra)}["B2.path_layers"]  # noqa: E731
     assert cell({})["absence_kind"] == "upstream_unavailable"
     assert cell({"path_layers": []})["absence_kind"] == "not_yet_recorded" and "代表公司" in cell({"path_layers": []})["looked"]

@@ -228,7 +228,8 @@ def materialize_view(analyst_view_dict: Mapping[str, Any], *,
                      demand_anchor: Mapping[str, Any] | None = None,
                      capture: Mapping[str, Any] | None = None,
                      what_it_does: Mapping[str, Any] | None = None,
-                     path_layers: Mapping[str, Any] | None = None) -> dict[str, Any]:
+                     path_layers: Mapping[str, Any] | None = None,
+                     revenue_mix: Mapping[str, Any] | None = None) -> dict[str, Any]:
     """`AnalystView.to_dict()` → artifact payload（含遮蔽、overview、兩個 digest）。純函式。
 
     `price_series` 是**脈絡不是判讀**：一條這檔自己的已收盤收盤價序列，讓使用者看得懂
@@ -278,6 +279,8 @@ def materialize_view(analyst_view_dict: Mapping[str, Any], *,
         # 路徑上各層（個股頁 S3c，2026-10-09）：從需求錨走到它坐的層，每一節一條年增（層＝研究宣告的代表公司、公司節點＝它自己）
         # 或具名缺席。照抄 `alpha.path_layers`；APP 畫 B2「路徑上各層」。
         "path_layers": dict(path_layers) if path_layers is not None else None,
+        # 營收從哪來（個股頁 S3d，2026-10-14）：Engine C 人工觀測的分部／產品線占比、客戶集中度、backlog——照抄 `alpha.revenue_mix`。
+        "revenue_mix": dict(revenue_mix) if revenue_mix is not None else None,
         "materializer": {
             "version": MATERIALIZER_VERSION,
             "python": f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}",
@@ -353,7 +356,8 @@ def page_extra_for(ticker: str, layer_notes: Mapping[str, Any] | None,
                   demand_anchor: Mapping[str, Any] | None = None,
                   capture: Mapping[str, Any] | None = None,
                   what: Mapping[str, Any] | None = None,
-                  path_layers: Mapping[str, Any] | None = None) -> dict[str, Any] | None:
+                  path_layers: Mapping[str, Any] | None = None,
+                  revenue_mix: Mapping[str, Any] | None = None) -> dict[str, Any] | None:
     """個股頁填得滿表的頁外輸入：引用這一頁的層說明節點（`layer_notes` state artifact 的 `cited_by.pages`）、
     涵蓋這一頁坐的層的示意圖 id（`diagrams`；None＝這一輪沒讀到示意圖目錄）、需求錨序列（`demand_anchor`：有值的序列 key；
     讀不到或回看的那天不推＝不給這個鍵）、「做什麼」講的節點（`what`）。artifact 讀不到 → 那一個鍵不給
@@ -365,6 +369,11 @@ def page_extra_for(ticker: str, layer_notes: Mapping[str, Any] | None,
     path_kind = ((path_layers or {}).get("absence") or {}).get("kind")
     if path_layers is not None and path_kind not in ("upstream_unavailable", "point_in_time_unavailable"):
         extra["path_layers"] = list(path_layers.get("valued_nodes") or ())
+    # 營收從哪來：有哪幾種觀測（分部／產品線占比、客戶集中度）、有沒有 backlog；讀不到 Engine C＝不給鍵（這一輪沒讀到）
+    if revenue_mix is not None and not revenue_mix.get("unread"):
+        extra["revenue_mix"] = [s["field"] for s in revenue_mix.get("shares") or ()] + \
+            (["customer_concentration"] if revenue_mix.get("customers") else [])
+        extra["backlog"] = ["backlog"] if revenue_mix.get("backlog") else []
     if diagrams is not None:
         extra["diagrams"] = [str(d.get("id")) for d in diagrams]
     absence_kind = ((demand_anchor or {}).get("absence") or {}).get("kind")
@@ -539,15 +548,37 @@ def materialize(ticker: str, *, as_of: date | None = None, scenario: str | None 
     what = what_it_does(analyst_dict, seats if graph_read else None, names, page_diagrams)
     path_ctx = paths if paths is not None else _path_context(as_of, context, anchor_ctx, None)
     path_layers = _page_path_layers(path_ctx, view.identity.company_id, what)
+    mix = _page_revenue_mix(str(view.identity.ticker or ticker), as_of)
     payload = materialize_view(analyst_dict, generated_at=generated_at,
                                price_series=_close_series(ticker),
                                page_extra=page_extra_for(ticker, notes_state, page_diagrams, demand, capture, what,
-                                                         path_layers),
+                                                         path_layers, mix),
                                diagrams=page_diagrams,
                                node_names={str(n): names[str(n)] for n in seats if str(n) in names},
-                               demand_anchor=demand, capture=capture, what_it_does=what, path_layers=path_layers)
+                               demand_anchor=demand, capture=capture, what_it_does=what, path_layers=path_layers,
+                               revenue_mix=mix)
     target = store or ArtifactStore()
     return target.write(payload), payload
+
+
+def _page_revenue_mix(ticker: str, as_of: date | None) -> dict[str, Any]:
+    """一頁的「營收從哪來」（個股頁 S3d；`alpha.providers.revenue_mix`）。讀不到 Engine C → `unread`（那幾格印這一輪沒讀到，
+    不是「沒有紀錄」）。"""
+    from alpha.providers.revenue_mix import revenue_mix
+    from engine_c.db import get_conn
+
+    try:
+        conn = get_conn()
+    except Exception as exc:  # noqa: BLE001 — 營收結構是 B3 的一格，讀不到不擋整份判讀
+        return {"shares": [], "customers": None, "backlog": None, "conflicts": [], "absences": {},
+                "unread": {"kind": "upstream_unavailable", "reason": f"Engine C 讀不到（{type(exc).__name__}）"}}
+    try:
+        return revenue_mix(conn, ticker, as_of=as_of)
+    except Exception as exc:  # noqa: BLE001
+        return {"shares": [], "customers": None, "backlog": None, "conflicts": [], "absences": {},
+                "unread": {"kind": "upstream_unavailable", "reason": f"營收結構讀不到（{type(exc).__name__}: {str(exc)[:120]}）"}}
+    finally:
+        conn.close()
 
 
 def _path_context(as_of: date | None, readings: Mapping[str, Any] | None, anchor_ctx: Mapping[str, Any] | None,

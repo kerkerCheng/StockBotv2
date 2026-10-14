@@ -702,7 +702,7 @@ function blockDetail(payload, view, key) {
   if (key === 'B2') return chainDetail(payload, view);
   if (key === 'B4') return seatsDetail(payload, view);
   if (key === 'B6') return numbersDrill(view, 'priced_in', () => [pricedInPlain(), marketMultiples(view)]);
-  if (key === 'B3') return numbersDrill(view, 'in_numbers', () => []);
+  if (key === 'B3') return numbersDrill(view, 'in_numbers', () => mixDetail(payload));
   if (key === 'B8') return downsideDetail(view);
   if (key === 'B9') return numbersDrill(view, 'will_it_die', () => [wipeoutUnlitRule(view)]);
   if (key === 'B11') return timelineDetail(view);
@@ -839,6 +839,60 @@ function pathFigure(payload) {
     return more;
   }));
   return box;
+}
+
+/** 營收從哪來（B3，個股頁 S3d）：分部／產品線占比——一塊一列（名字｜長度＝占比的條｜百分比，前一次的占比括號裡），
+ *  客戶集中度與 backlog 先印第一句（全文與出處在這一塊的「數字與出處」）。全部照抄 materialize 的 `revenue_mix`：
+ *  分部依占比由大到小是 materialize 排好的呈現順序，前端不排、不算（條的長度只是座標換算）。 */
+function mixFigures(payload) {
+  const mix = payload.revenue_mix;
+  if (!mix) return [];
+  if (mix.unread) return [el('div', 'row-reason ss-pending', `營收結構：${mix.unread.reason}`)];
+  const out = [];
+  (mix.shares || []).forEach((s) => {
+    const latest = (s.points || [])[(s.points || []).length - 1];
+    if (!latest) return;
+    const box = el('div', 'mix-box');
+    const prev = (s.points || []).length > 1 ? s.points[s.points.length - 2] : null;
+    box.appendChild(el('div', 'chart-axis-title',
+      `${s.label}營收占比（${latest.period || latest.as_of}${prev ? `；括號是前一次 ${prev.period || prev.as_of}` : ''}）`));
+    (latest.parts || []).forEach((p) => {
+      const row = el('div', 'mix-row');
+      row.appendChild(el('span', 'mix-name', p.name));
+      const track = el('span', 'mix-track');
+      const bar = el('span', 'mix-bar');
+      bar.style.width = `${Math.max(0, Math.min(100, p.share * 100))}%`;
+      track.appendChild(bar);
+      row.appendChild(track);
+      row.appendChild(el('span', 'mix-pct', fmtRatioPct(p.share, 1)
+        + (typeof p.prev_share === 'number' ? `（${fmtRatioPct(p.prev_share, 1)}）` : '')));
+      box.appendChild(row);
+    });
+    out.push(box);
+  });
+  if (mix.absences && mix.absences.shares) out.push(el('div', 'row-reason ss-pending', `營收占比：${mix.absences.shares.reason}`));
+  [['customers', '客戶集中度'], ['backlog', 'backlog 與長約']].forEach(([key, label]) => {
+    const item = mix[key];
+    if (item) out.push(el('div', 'row-reason', `${label}（${item.as_of}）：${item.headline}`));
+    else if (mix.absences && mix.absences[key]) out.push(el('div', 'row-reason ss-pending', `${label}：${mix.absences[key].reason}`));
+  });
+  (mix.conflicts || []).forEach((c) => out.push(el('div', 'row-reason',
+    `${c.label || c.field}（${c.as_of}）有 ${(c.ids || []).length} 筆同時生效的紀錄——不挑一個，這一筆不印`)));
+  return out;
+}
+
+/** B3「數字與出處」裡的營收結構細節：客戶集中度與 backlog 的全文、每一次占比觀測的出處與沒畫的欄位（照抄）。 */
+function mixDetail(payload) {
+  const mix = payload.revenue_mix || {};
+  const out = [];
+  [['customers', '客戶集中度'], ['backlog', 'backlog 與長約']].forEach(([key, label]) => {
+    const item = mix[key];
+    if (item) out.push(el('div', 'row-reason', `${label}（${item.as_of}）全文：${item.text}｜出處：${item.source_ref || '—'}`));
+  });
+  (mix.shares || []).forEach((s) => (s.points || []).forEach((p) => out.push(el('div', 'row-reason',
+    `${s.label}占比 ${p.period || p.as_of}：出處 ${p.source_ref || '—'}`
+    + ((p.ignored || []).length ? `｜不是占比、沒畫的欄位：${p.ignored.join('、')}` : '')))));
+  return out;
 }
 
 /** 「技術鏈」的展開：它坐的每一層現在讀成什麼（讀圖面板照抄）。節點印名字——層說明的標題、圖上的名字，都沒有才印 ID
@@ -1711,7 +1765,10 @@ function blockVisuals(payload, view, key) {
     const capture = captureFigure(payload);
     if (capture) out.push(capture);
   }
-  if (key === 'B3') { const n = revenueBars(view); if (n) out.push(n); }
+  if (key === 'B3') {
+    const n = revenueBars(view); if (n) out.push(n);
+    mixFigures(payload).forEach((m) => out.push(m));
+  }
   if (key === 'B4') {
     // 標出它坐的層：讀圖面板的「坐的節點」（與讀圖、是不是新賭注同一份 seats）；頁首「做什麼」講的那幾格（押的格）粗框加標籤
     const seats = ((view.readings || {}).context || {}).seats || Object.keys(payload.node_names || {});

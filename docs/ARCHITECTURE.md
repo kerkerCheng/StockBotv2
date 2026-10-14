@@ -827,6 +827,11 @@ AnalystView.brief（optional）→ APP 首屏 briefCard；六張卡收進「為�
   另一本 ledger 而不放進層說明紀錄：路徑上最常經過的層還沒有層說明、而層說明換版會收掉該層所有主張 watch（個股頁 plan Amendment G）。
   代表公司不是「份額（現在）」的同階段同業（L12）。心跳段 2 多一行「層代表公司宣告 N 份｜過重看日 M」。
   「同層各家變化」（每家最近一季年增）依使用者 ①A 從頁面合約拿掉（`stock-page-schema/1.1`）。
+  **營收從哪來（2026-10-14 個股頁 S3d 第一段；B3）**：Engine C `manual_observations` 已有的研究觀測接上頁——分部／產品線營收占比
+  （一塊一列：名字、長度＝占比的條、百分比，括號是前一次；只畫頂層 0..1 的數值鍵，`total*` 與 `_` 開頭的鍵照列「沒畫」）、客戶集中度與
+  backlog（多數是研究寫的文字：先印第一句，全文與出處在 B3「數字與出處」）。`alpha/revenue_mix.py`（純函式）＋`alpha/providers/revenue_mix.py`
+  （只取生效那一筆、同一觀測期兩筆生效不挑一個；as-of 只看那天以前記錄的）。頁面合約 1.2：B3「產品、地區、客戶比例」「backlog 與長約」讀
+  `@revenue_mix`／`@backlog`；「押的那一塊占營收多少」仍待把押的層對到分部。地區別（台股季報附註抽取）是 S3d 第二段，還沒做。
 - **是不是新賭注（同上，使用者 A3）**：候選推導多一格 `shared_bet`——這一檔和每一檔**持有的 alpha 檔**（`held_index`）共用的需求錨與
   層／插槽，依 ticker 字母列，**不打分、不排序、不加權、不進候選狀態前提**。需求錨只取結構表逐列的 `demand_anchor`／`anchor_basis`
   （唯一來源；materialize 讀**同一輪** `--structure-table` 寫下的 artifact——`webapp/materialize.py::bet_structure`，不另開連線重算），

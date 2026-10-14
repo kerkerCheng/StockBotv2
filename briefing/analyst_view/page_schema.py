@@ -24,7 +24,7 @@ from typing import Any, Mapping, Sequence
 
 from alpha.absence import ABSENCE_KINDS, default_absence_kind
 
-PAGE_SCHEMA_VERSION = "stock-page-schema/1.1"   # 1.1（2026-10-09 S3c）：拿掉 B2 同層各家變化、路徑上各層接上
+PAGE_SCHEMA_VERSION = "stock-page-schema/1.2"   # 1.1（S3c）拿掉 B2 同層各家、路徑上各層接上；1.2（S3d）B3 營收結構與 backlog 接上
 
 #: 單位（§5.1）：每塊、每個元素都要宣告掛在哪個單位。
 UNITS: Mapping[str, str] = {
@@ -127,12 +127,15 @@ ELEMENTS: tuple[PageElement, ...] = (
     PageElement("B2.demand_reading", "B2", "一句讀法：什麼在放量、誰在花錢", "path", "research",
                 ("brief/brief:demand",), "not_yet_recorded", "v2 敘事的「什麼在放量、誰在花錢」"),
     # B3 營收從哪來
-    PageElement("B3.revenue_mix", "B3", "產品、地區、客戶比例與變化", "company", "mechanical", (),
-                "capability_absent", f"{_S3}：台股季報附註地區別抽取；Engine C 既有觀測接進 B3（資料有、頁沒位置）"),
-    PageElement("B3.backlog", "B3", "backlog 與長約（金額、期間、預付）", "company", "mechanical", (),
-                "capability_absent", f"{_S3}；長約在圖上（供貨邊），頁上還沒位置"),
+    PageElement("B3.revenue_mix", "B3", "產品、地區、客戶比例與變化", "company", "mechanical", ("@revenue_mix",),
+                "not_yet_recorded",
+                "Engine C 人工觀測（個股頁 S3d）：分部／產品線營收占比、客戶集中度——研究從年報或申報表記下，沒記就沒有；"
+                "地區別（台股季報附註抽取）還沒做"),
+    PageElement("B3.backlog", "B3", "backlog 與長約（金額、期間、預付）", "company", "mechanical", ("@backlog",),
+                "not_yet_recorded",
+                "Engine C 人工觀測 backlog（個股頁 S3d）：研究從年報或申報表記下；很多地區的準則不要求揭露在手訂單，照實寫"),
     PageElement("B3.bet_share", "B3", "押的那一塊占營收多少", "company", "mechanical", (),
-                "capability_absent", f"{_S3}；多數公司不拆分部（照實印量不到）"),
+                "capability_absent", f"{_S3}：要把押的層對到某個分部（多數公司不拆分部，照實印量不到）"),
     # B4 技術鏈（§5.5）
     PageElement("B4.layer_note", "B4", "坐的層的層說明（物理與變體、各家階段、客戶為什麼選、主張的 watch）", "layer",
                 "research", ("@layer_notes",), "not_yet_recorded", "層說明 ledger（S4a）：引用這一頁的層說明"),
