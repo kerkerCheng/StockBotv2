@@ -229,7 +229,8 @@ def materialize_view(analyst_view_dict: Mapping[str, Any], *,
                      capture: Mapping[str, Any] | None = None,
                      what_it_does: Mapping[str, Any] | None = None,
                      path_layers: Mapping[str, Any] | None = None,
-                     revenue_mix: Mapping[str, Any] | None = None) -> dict[str, Any]:
+                     revenue_mix: Mapping[str, Any] | None = None,
+                     bet_share: Mapping[str, Any] | None = None) -> dict[str, Any]:
     """`AnalystView.to_dict()` → artifact payload（含遮蔽、overview、兩個 digest）。純函式。
 
     `price_series` 是**脈絡不是判讀**：一條這檔自己的已收盤收盤價序列，讓使用者看得懂
@@ -281,6 +282,8 @@ def materialize_view(analyst_view_dict: Mapping[str, Any], *,
         "path_layers": dict(path_layers) if path_layers is not None else None,
         # 營收從哪來（個股頁 S3d，2026-10-14）：Engine C 人工觀測的分部／產品線占比、客戶集中度、backlog——照抄 `alpha.revenue_mix`。
         "revenue_mix": dict(revenue_mix) if revenue_mix is not None else None,
+        # 押的那一塊（2026-10-14）：敘事押的層 × 層代表公司宣告 × 分部占比——照抄 `alpha.revenue_mix.bet_share`。
+        "bet_share": dict(bet_share) if bet_share is not None else None,
         "materializer": {
             "version": MATERIALIZER_VERSION,
             "python": f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}",
@@ -357,7 +360,8 @@ def page_extra_for(ticker: str, layer_notes: Mapping[str, Any] | None,
                   capture: Mapping[str, Any] | None = None,
                   what: Mapping[str, Any] | None = None,
                   path_layers: Mapping[str, Any] | None = None,
-                  revenue_mix: Mapping[str, Any] | None = None) -> dict[str, Any] | None:
+                  revenue_mix: Mapping[str, Any] | None = None,
+                  bet: Mapping[str, Any] | None = None) -> dict[str, Any] | None:
     """個股頁填得滿表的頁外輸入：引用這一頁的層說明節點（`layer_notes` state artifact 的 `cited_by.pages`）、
     涵蓋這一頁坐的層的示意圖 id（`diagrams`；None＝這一輪沒讀到示意圖目錄）、需求錨序列（`demand_anchor`：有值的序列 key；
     讀不到或回看的那天不推＝不給這個鍵）、「做什麼」講的節點（`what`）。artifact 讀不到 → 那一個鍵不給
@@ -369,11 +373,15 @@ def page_extra_for(ticker: str, layer_notes: Mapping[str, Any] | None,
     path_kind = ((path_layers or {}).get("absence") or {}).get("kind")
     if path_layers is not None and path_kind not in ("upstream_unavailable", "point_in_time_unavailable"):
         extra["path_layers"] = list(path_layers.get("valued_nodes") or ())
-    # 營收從哪來：有哪幾種觀測（分部／產品線占比、客戶集中度）、有沒有 backlog；讀不到 Engine C＝不給鍵（這一輪沒讀到）
+    # 營收從哪來：有哪幾種觀測（分部／產品線占比、台股年報地區別、客戶集中度）、有沒有 backlog；讀不到 Engine C＝不給鍵（這一輪沒讀到）
     if revenue_mix is not None and not revenue_mix.get("unread"):
         extra["revenue_mix"] = [s["field"] for s in revenue_mix.get("shares") or ()] + \
+            ([revenue_mix["regions"]["field"]] if revenue_mix.get("regions") else []) + \
             (["customer_concentration"] if revenue_mix.get("customers") else [])
         extra["backlog"] = ["backlog"] if revenue_mix.get("backlog") else []
+    # 押的那一塊：有值的節點（占比或整家公司）；宣告或營收結構這一輪沒讀到＝不給鍵
+    if bet is not None and ((bet.get("absence") or {}).get("kind")) != "upstream_unavailable":
+        extra["bet_share"] = [str(item.get("node")) for item in bet.get("items") or () if item.get("value")]
     if diagrams is not None:
         extra["diagrams"] = [str(d.get("id")) for d in diagrams]
     absence_kind = ((demand_anchor or {}).get("absence") or {}).get("kind")
@@ -515,7 +523,8 @@ def materialize(ticker: str, *, as_of: date | None = None, scenario: str | None 
                 diagrams: Mapping[str, Any] | None = None,
                 node_names: Mapping[str, str] | None = None,
                 anchors: Mapping[str, Any] | None = None,
-                paths: Mapping[str, Any] | None = None) -> tuple[Path, dict[str, Any]]:
+                paths: Mapping[str, Any] | None = None,
+                layer_reps: Mapping[str, Any] | None = None) -> tuple[Path, dict[str, Any]]:
     """跑一次完整鏈並寫下 artifact。**只有這裡會連 Neo4j／Engine C／private ledger。**
 
     `readings`：`readings_context()` 的結果（多檔時由 `materialize_many` 載入一次傳進來）；沒給就自己載一次。
@@ -524,6 +533,7 @@ def materialize(ticker: str, *, as_of: date | None = None, scenario: str | None 
     `node_names`：坐的層的節點名（`_seat_node_names`；多檔時載一次）；沒給就只查這一檔坐的那幾個。
     `anchors`：需求錨序列（`_anchor_context`；多檔時載一次）；沒給就為這一檔載一次。
     `paths`：路徑上各層（`_path_context`；多檔時載一次——每一層一輪只算一次）；沒給就為這一檔載一次。
+    `layer_reps`：層代表公司宣告（`_layer_reps_loaded`；多檔時載一次）——押的那一塊用；沒給就為這一檔載一次。
     """
     from briefing.alpha_view.sources import fetch_alpha_investment_view
     from briefing.analyst_view import build_analyst_view
@@ -549,16 +559,41 @@ def materialize(ticker: str, *, as_of: date | None = None, scenario: str | None 
     path_ctx = paths if paths is not None else _path_context(as_of, context, anchor_ctx, None)
     path_layers = _page_path_layers(path_ctx, view.identity.company_id, what)
     mix = _page_revenue_mix(str(view.identity.ticker or ticker), as_of)
+    reps = layer_reps if layer_reps is not None else _layer_reps_loaded(as_of)
+    bet = _page_bet_share(what, reps, view.identity.company_id, mix, names)
     payload = materialize_view(analyst_dict, generated_at=generated_at,
                                price_series=_close_series(ticker),
                                page_extra=page_extra_for(ticker, notes_state, page_diagrams, demand, capture, what,
-                                                         path_layers, mix),
+                                                         path_layers, mix, bet),
                                diagrams=page_diagrams,
                                node_names={str(n): names[str(n)] for n in seats if str(n) in names},
                                demand_anchor=demand, capture=capture, what_it_does=what, path_layers=path_layers,
-                               revenue_mix=mix)
+                               revenue_mix=mix, bet_share=bet)
     target = store or ArtifactStore()
     return target.write(payload), payload
+
+
+def _layer_reps_loaded(as_of: date | None) -> dict[str, Any]:
+    """層代表公司宣告：as-of 那天的現行（`select_current`，INV-6）。讀不到 → `{"declarations": None}`（＝這一輪沒讀到）。"""
+    from alpha.providers.layer_reps import current_declarations
+
+    try:
+        declarations, _book = current_declarations(as_of=as_of)
+    except Exception:  # noqa: BLE001 — 宣告讀不到只讓押的那一塊說讀不到
+        return {"declarations": None}
+    return {"declarations": declarations}
+
+
+def _page_bet_share(what: Mapping[str, Any] | None, reps: Mapping[str, Any] | None, company_id: str | None,
+                    mix: Mapping[str, Any] | None, names: Mapping[str, str] | None) -> dict[str, Any]:
+    """一頁的「押的那一塊占營收多少」（`alpha.revenue_mix.bet_share`）：只看敘事押的層（rides）——圖上坐的節點不是押注。"""
+    from alpha.revenue_mix import bet_share
+
+    if (mix or {}).get("unread"):
+        return {"items": [], "absence": {"kind": "upstream_unavailable", "reason": "營收結構這一輪沒讀到"}}
+    rides = list((what or {}).get("focus") or ()) if (what or {}).get("source") == "rides" else []
+    return bet_share(rides, (reps or {}).get("declarations"), str(company_id or ""), (mix or {}).get("shares") or (),
+                     node_names=names)
 
 
 def _page_revenue_mix(ticker: str, as_of: date | None) -> dict[str, Any]:
@@ -570,12 +605,12 @@ def _page_revenue_mix(ticker: str, as_of: date | None) -> dict[str, Any]:
     try:
         conn = get_conn()
     except Exception as exc:  # noqa: BLE001 — 營收結構是 B3 的一格，讀不到不擋整份判讀
-        return {"shares": [], "customers": None, "backlog": None, "conflicts": [], "absences": {},
+        return {"shares": [], "regions": None, "customers": None, "backlog": None, "conflicts": [], "absences": {},
                 "unread": {"kind": "upstream_unavailable", "reason": f"Engine C 讀不到（{type(exc).__name__}）"}}
     try:
         return revenue_mix(conn, ticker, as_of=as_of)
     except Exception as exc:  # noqa: BLE001
-        return {"shares": [], "customers": None, "backlog": None, "conflicts": [], "absences": {},
+        return {"shares": [], "regions": None, "customers": None, "backlog": None, "conflicts": [], "absences": {},
                 "unread": {"kind": "upstream_unavailable", "reason": f"營收結構讀不到（{type(exc).__name__}: {str(exc)[:120]}）"}}
     finally:
         conn.close()
@@ -728,11 +763,12 @@ def materialize_many(tickers: Sequence[str], *, as_of: date | None = None,
     names = _seat_node_names(readings) if tickers else None
     anchors = _anchor_context(as_of) if tickers else None
     paths = _path_context(as_of, readings, anchors, state_store) if tickers else None
+    reps = _layer_reps_loaded(as_of) if tickers else None
     for ticker in tickers:
         try:
             path, _ = materialize(ticker, as_of=as_of, store=target, readings=readings, candidates=candidates,
                                   layer_notes=notes_state, diagrams=loaded, node_names=names, anchors=anchors,
-                                  paths=paths)
+                                  paths=paths, layer_reps=reps)
         except Exception as exc:  # noqa: BLE001 — 逐檔隔離；理由原樣回報
             results.append((ticker, None, f"{type(exc).__name__}: {str(exc)[:200]}"))
         else:

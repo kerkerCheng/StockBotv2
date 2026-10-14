@@ -41,7 +41,8 @@ LIGHT_WORDS: Mapping[str, str] = {"red": "紅", "amber": "黃", "green": "綠"}
 #: 「該重寫」的三種狀態（`engine_b.queue_segments.narrative_rewrite_state` 的值）→ 人讀。
 REWRITE_STATE_WORDS: Mapping[str, str] = {"fired": "醒來", "touched": "觸及", "expired": "到期未判"}
 PRICED_IN_LINES: tuple[str, ...] = ("own_history_pctile", "cohort_median", "rel_return_30d", "rel_return_90d")
-IN_NUMBERS_LINES: tuple[str, ...] = ("in_numbers_series",)
+#: 營收序列與占比序列（2026-10-14 拆成兩行，L12）：任一行有值，「出現在數字裡了嗎」就量得到。
+IN_NUMBERS_LINES: tuple[str, ...] = ("in_numbers_series", "in_numbers_mix_series")
 WIPEOUT_LINES: tuple[str, ...] = ("wipeout_cash_runway", "wipeout_debt", "wipeout_dilution", "wipeout_going_concern")
 
 #: 這份板**不是什麼**——隨 artifact 出門，畫面永遠印得出來。
@@ -159,6 +160,19 @@ def stall_since(records: Sequence[InvestorBrief], brief: InvestorBrief) -> datet
 # 整板與 rollup
 # ---------------------------------------------------------------------------
 
+def _any_line_counts(read: Sequence[Mapping[str, Any]], question: str, keys: Sequence[str]) -> dict[str, int]:
+    """一題有幾行可以回答它（例：營收序列或占比序列）：任一行有值算有值；都缺席時記第一行（主行）的缺席 kind。"""
+    bucket: dict[str, int] = {}
+    for tq in read:
+        rows = [r for r in tq.get(question) or () if r.get("key") in keys]
+        if any(r.get("absence_kind") is None for r in rows):
+            kind = "value"
+        else:
+            kind = next((str(r.get("absence_kind")) for r in rows if r.get("key") == keys[0]), "no_line")
+        bucket[kind] = bucket.get(kind, 0) + 1
+    return bucket
+
+
 def _absence_counts(bucket: Mapping[str, int] | None, not_read: int) -> dict[str, Any]:
     bucket = dict(bucket or {})
     valued = int(bucket.pop("value", 0))
@@ -209,7 +223,7 @@ def rollup(three_questions_by_ticker: Mapping[str, Mapping[str, Any] | None],
         "universe": len(tqs),
         "lines": {k: dict(v) for k, v in sorted(lines.items())},
         "priced_in_own": _absence_counts(lines.get("own_history_pctile"), len(not_read)),
-        "in_numbers": _absence_counts(lines.get("in_numbers_series"), len(not_read)),
+        "in_numbers": _absence_counts(_any_line_counts(read, "in_numbers", IN_NUMBERS_LINES), len(not_read)),
         "wipeout": {"companies": len(read), "lamps": lamps, "unlit_by_kind": dict(sorted(unlit_by_kind.items())),
                     "red_tickers": sorted(red_tickers), "all_four_non_grey": all_four},
         "not_read": {"n": len(not_read), "tickers": sorted(not_read),

@@ -93,6 +93,75 @@ def test_the_b3_figures_only_copy_the_materialized_mix() -> None:
         assert forbidden not in fig and forbidden not in _body("mixDetail"), forbidden
 
 
+def _decl(node_reps, rep_id="lr_x"):
+    from types import SimpleNamespace
+
+    return SimpleNamespace(rep_id=rep_id, representatives=tuple(
+        SimpleNamespace(company_id=c, scope=s, segment=seg, why=f"{c} 的這一塊營收代表這一層的成長；不代表其他產品") for c, s, seg in node_reps))
+
+
+def _segment_shares(*points):
+    return [{"field": "segment_revenue_share", "label": "分部", "points": [
+        {"as_of": a, "period": a, "source_ref": f"src-{a}", "parts": [{"name": n, "share": v, "prev_share": None} for n, v in parts],
+         "ignored": []} for a, parts in points]}]
+
+
+def test_bet_share_joins_the_ride_the_declaration_and_the_latest_segment_share() -> None:
+    from alpha.revenue_mix import bet_share
+
+    decls = {"tech:x": _decl([("co:a", "segment", "Data Center")]), "tech:y": _decl([("co:a", "whole_company", None)]),
+             "tech:z": _decl([("co:other", "whole_company", None)])}
+    shares = _segment_shares(("2024-12-31", [("Data Center", 0.30)]), ("2025-12-31", [("Data Center", 0.43), ("CATV", 0.57)]))
+    out = bet_share(["tech:x", "tech:y", "tech:z", "tech:w"], decls, "co:a", shares, node_names={"tech:x": "可插拔光模組"})
+    x, y, z, w = out["items"]
+    assert out["absence"] is None and x["value"] == "share" and x["share"] == 0.43 and x["period"] == "2025-12-31"
+    assert x["node_name"] == "可插拔光模組" and x["source_ref"] == "src-2025-12-31"
+    assert y["value"] == "whole_company"
+    assert z["value"] is None and "不含這一家" in z["reason"] and w["value"] is None and "還沒宣告代表公司" in w["reason"]
+
+
+def test_bet_share_never_borrows_an_older_point_or_a_product_line_and_names_what_is_missing() -> None:
+    from alpha.revenue_mix import bet_share
+
+    decls = {"tech:x": _decl([("co:a", "segment", "Data Center")])}
+    renamed = _segment_shares(("2024-12-31", [("Data Center", 0.30)]), ("2025-12-31", [("Datacom", 0.43)]))
+    out = bet_share(["tech:x"], decls, "co:a", renamed)
+    assert out["absence"]["kind"] == "not_yet_recorded" and "2025-12-31" in out["absence"]["reason"]
+    assert "Datacom" in out["absence"]["reason"]                     # 最新一次沒有同名的：照說，不拿 2024 那一次湊
+    product = [{"field": "product_line_revenue_share", "points": _segment_shares(("2025-12-31", [("Data Center", 0.4)]))[0]["points"]}]
+    assert "還沒有分部占比觀測" in bet_share(["tech:x"], decls, "co:a", product)["absence"]["reason"]
+    assert bet_share([], decls, "co:a", [])["absence"]["kind"] == "not_yet_recorded"
+    assert bet_share(["tech:x"], None, "co:a", [])["absence"]["kind"] == "upstream_unavailable"
+
+
+def test_the_page_contract_reads_bet_share_and_unread_is_not_absence() -> None:
+    from webapp.materialize import _page_bet_share
+
+    valued = {"items": [{"node": "tech:x", "value": "share"}, {"node": "tech:y", "value": None}], "absence": None}
+    extra = page_extra_for("X", None, bet=valued)
+    assert extra["bet_share"] == ["tech:x"]
+    rows = {r["element"]: r for r in ps.fill_table({}, extra=extra)}
+    assert rows["B3.bet_share"]["state"] == "value"
+    unread = page_extra_for("X", None, bet={"items": [], "absence": {"kind": "upstream_unavailable"}}) or {}
+    rows = {r["element"]: r for r in ps.fill_table({}, extra=unread)}
+    assert rows["B3.bet_share"]["absence_kind"] == "upstream_unavailable"
+    seats_only = _page_bet_share({"source": "seats", "focus": ["tech:x"]}, {"declarations": {}}, "co:a", {"shares": []}, {})
+    assert "敘事還沒宣告押哪一層" in seats_only["absence"]["reason"]   # 圖上坐的節點不是押注
+    unread_mix = {"unread": {"kind": "upstream_unavailable", "reason": "Engine C 讀不到（OperationalError）"}}
+    assert _page_bet_share({"source": "rides", "focus": ["tech:x"]}, {"declarations": {}}, "co:a", unread_mix,
+                           {})["absence"]["kind"] == "upstream_unavailable"
+
+
+def test_the_b3_bet_share_line_only_copies_the_materialized_items() -> None:
+    assert "betShareLines(payload)" in _body("blockVisuals")
+    lines = _body("betShareLines")
+    for copied in ("payload.bet_share", "item.share", "item.segment", "item.period", "item.reason", "bet.absence"):
+        assert copied in lines, copied
+    for forbidden in (".sort(", "value / ", "reduce(("):
+        assert forbidden not in lines, forbidden
+    assert "item.why" in _body("mixDetail")
+
+
 def test_a_long_first_sentence_is_cut_at_the_last_separator_that_fits() -> None:
     long = "主要銷貨客戶：" + "；".join(f"C{i:02d} 567,378 千元 25.76%" for i in range(1, 12)) + "。"
     out = headline(long)

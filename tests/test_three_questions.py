@@ -265,10 +265,17 @@ def test_the_revenue_series_carries_its_own_report_currency_and_never_picks_one_
     assert monthly["detail"]["currency"] == "TWD"
 
 
-def test_two_segment_points_take_priority_and_nothing_is_upstream_unavailable() -> None:
+def test_two_segment_points_get_their_own_line_and_never_take_the_revenue_slot() -> None:
+    """2026-10-14 以前占比序列佔掉 `in_numbers_series`：頁首「最近營收年增」與 B3 營收柱讀到占比，有營收序列的公司會被擠掉營收。"""
     segs = [{"as_of": "2025-06-30", "value": {"a": 0.4}, "field": "segment_revenue_share"},
             {"as_of": "2025-12-31", "value": {"a": 0.5}, "field": "segment_revenue_share"}]
-    assert "分部" in tq.in_numbers(_domestic(segment_shares=segs), today=TODAY)[0]["basis"]
+    rows = tq.in_numbers(_domestic(segment_shares=segs), today=TODAY)
+    assert rows[0]["key"] == "in_numbers_series" and "EDGAR 季營收" in rows[0]["basis"]     # 營收序列照樣在
+    assert rows[1]["key"] == "in_numbers_mix_series" and "分部" in rows[1]["basis"]
+    assert [p["as_of"] for p in rows[1]["value"]] == ["2025-06-30", "2025-12-31"] and len(rows) == 2   # 成序列的欄位不再當脈絡
+    alone = tq.in_numbers({"revenue_kind": "annual", "segment_shares": segs}, today=TODAY)
+    assert alone[0]["key"] == "in_numbers_series" and alone[0]["absence_kind"] == "upstream_unavailable"
+    assert alone[1]["key"] == "in_numbers_mix_series"
     empty = tq.in_numbers({"revenue_kind": "quarterly"}, today=TODAY)
     assert empty[0]["absence_kind"] == "upstream_unavailable"
 
@@ -295,7 +302,8 @@ def test_a_conflicted_observation_day_is_printed_and_never_becomes_a_series_poin
     assert rows[2]["absence_kind"] == "insufficient_evidence" and rows[2]["detail"]["conflict"] == ["mo_a", "mo_b"]
     two = [one, {"as_of": "2025-09-30", "value": {"a": 0.3}, "field": "segment_revenue_share"}, conflict]
     rows = tq.in_numbers({"revenue_kind": "annual", "segment_shares": two}, today=TODAY)
-    assert [p["as_of"] for p in rows[0]["value"]] == ["2025-03-31", "2025-09-30"]
+    mix = next(r for r in rows if r["key"] == "in_numbers_mix_series")
+    assert [p["as_of"] for p in mix["value"]] == ["2025-03-31", "2025-09-30"]
     assert rows[-1]["key"] == "in_numbers_conflict"
 
 

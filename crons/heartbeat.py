@@ -263,6 +263,12 @@ def build_freshness(*, now: datetime, state_dir: Path | None, leads_path: Path,
     except Exception as exc:  # noqa: BLE001
         absence = Absence("upstream_unavailable", f"季報股數盤點失敗：{type(exc).__name__}")
         section.lines.append(f"台股季報股數：{absence.reason}（{absence.kind}）")
+    # (c1b) 台股年報地區別（2026-10-14，個股頁 S3d 第二段）：同上——一年一次、永久可查，不排程，心跳印落後幾年。
+    try:
+        section.lines.append(_tw_region_revenue_line(now=now))
+    except Exception as exc:  # noqa: BLE001
+        absence = Absence("upstream_unavailable", f"年報地區別盤點失敗：{type(exc).__name__}")
+        section.lines.append(f"台股年報地區別：{absence.reason}（{absence.kind}）")
 
     # (c2) FX 觀測新鮮度（2026-09-19）。**它是一個已知會過期、而且沒有人在補的東西**：
     # 四筆 fx_rate 觀測的 `_note` 逐字寫著「現價 bar_date 換了就要補新的一筆」，
@@ -658,6 +664,44 @@ def _tw_share_capital_line(*, now: datetime) -> str:
         line += f"｜不用的季共 {rejected} 筆"
     line += (f"｜⚠ 落後 {lag} 季（跑 `python -m engine_c.tw_share_capital --sync`）" if lag > 0
              else "｜已跟上法定期限")
+    return line
+
+
+def _tw_region_revenue_line(*, now: datetime) -> str:
+    """台股年報地區別的新鮮度（個股頁 B3 的地區那一塊靠它）。零網路——只讀本機 Engine C。
+
+    落後相對**法定期限**算（年報次年 3/31）：每一檔看最新一份年報的年度；最新一份沒收（合計對不上月營收等）另列，
+    那是解析或資料的事，重抓不一定修得了。讀法與個股頁同一支（`engine_c.tw_region_revenue.region_revenue`，L16）。"""
+
+    from engine_c.db import get_conn
+    from engine_c.monthly_revenue import registry_taiwan_tickers
+    from engine_c.tw_region_revenue import latest_due_year, region_revenue
+
+    tickers = registry_taiwan_tickers()
+    if not tickers:
+        return "台股年報地區別：registry 裡沒有台股（capability_absent）"
+    today = now.astimezone().date()
+    due = latest_due_year(today)
+    conn = get_conn()
+    try:
+        found = {t: region_revenue(conn, t, as_of=today) for t in tickers}
+    finally:
+        conn.close()
+    have = {t: r for t, r in found.items() if r is not None and r.get("report_year") is not None}
+    if not have:
+        return (f"台股年報地區別 {len(tickers)} 檔｜**一筆都沒有**"
+                f"（跑 `python -m engine_c.tw_region_revenue --backfill --year {due}`）")
+    ok = [t for t, r in have.items() if r.get("status") == "ok"]
+    failed = sorted(f"{t}（{r.get('status')}）" for t, r in have.items() if r.get("status") != "ok")
+    behind = sorted(t for t, r in have.items() if int(r["report_year"]) < due)
+    empty = sorted(set(tickers) - set(have))
+    line = f"台股年報地區別 {len(ok)}/{len(tickers)} 檔有值｜最新 {max(int(r['report_year']) for r in have.values())} 年度"
+    if failed:
+        line += "｜最新一份沒收：" + "、".join(failed)
+    if empty:
+        line += f"｜**{len(empty)} 檔一筆都沒有**：" + "、".join(empty)
+    line += (f"｜⚠ {len(behind)} 檔落後（{due} 年度年報已過期限；跑 `python -m engine_c.tw_region_revenue --backfill`）"
+             if behind or empty else "｜已跟上法定期限")
     return line
 
 

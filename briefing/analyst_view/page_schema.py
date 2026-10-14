@@ -24,7 +24,8 @@ from typing import Any, Mapping, Sequence
 
 from alpha.absence import ABSENCE_KINDS, default_absence_kind
 
-PAGE_SCHEMA_VERSION = "stock-page-schema/1.2"   # 1.1（S3c）拿掉 B2 同層各家、路徑上各層接上；1.2（S3d）B3 營收結構與 backlog 接上
+PAGE_SCHEMA_VERSION = "stock-page-schema/1.3"   # 1.1（S3c）拿掉 B2 同層各家、路徑上各層接上；1.2（S3d）B3 營收結構與 backlog 接上；
+#                                                  1.3（S3d 第二段）台股年報地區別、押的那一塊接上
 
 #: 單位（§5.1）：每塊、每個元素都要宣告掛在哪個單位。
 UNITS: Mapping[str, str] = {
@@ -130,12 +131,15 @@ ELEMENTS: tuple[PageElement, ...] = (
     PageElement("B3.revenue_mix", "B3", "產品、地區、客戶比例與變化", "company", "mechanical", ("@revenue_mix",),
                 "not_yet_recorded",
                 "Engine C 人工觀測（個股頁 S3d）：分部／產品線營收占比、客戶集中度——研究從年報或申報表記下，沒記就沒有；"
-                "地區別（台股季報附註抽取）還沒做"),
+                "台股另有年度財報附註的地區別（機械抽取，合計要對得上月營收十二個月加總；依什麼分地區照年報原文標）"),
     PageElement("B3.backlog", "B3", "backlog 與長約（金額、期間、預付）", "company", "mechanical", ("@backlog",),
                 "not_yet_recorded",
                 "Engine C 人工觀測 backlog（個股頁 S3d）：研究從年報或申報表記下；很多地區的準則不要求揭露在手訂單，照實寫"),
-    PageElement("B3.bet_share", "B3", "押的那一塊占營收多少", "company", "mechanical", (),
-                "capability_absent", f"{_S3}：要把押的層對到某個分部（多數公司不拆分部，照實印量不到）"),
+    PageElement("B3.bet_share", "B3", "押的那一塊占營收多少", "company", "mechanical", ("@bet_share",),
+                "not_yet_recorded",
+                "敘事押的層 × 層代表公司宣告 × 分部占比（2026-10-14）：押的層宣告這家用某個分部代表，就印那個分部在最新一次"
+                "分部占比的占比（名稱逐字對得上才算）；宣告用全公司營收就是整家公司——敘事沒宣告押哪一層、押的層沒宣告它當代表、"
+                "宣告的分部沒有占比觀測，就沒有（多數公司不拆分部，照實印）"),
     # B4 技術鏈（§5.5）
     PageElement("B4.layer_note", "B4", "坐的層的層說明（物理與變體、各家階段、客戶為什麼選、主張的 watch）", "layer",
                 "research", ("@layer_notes",), "not_yet_recorded", "層說明 ledger（S4a）：引用這一頁的層說明"),

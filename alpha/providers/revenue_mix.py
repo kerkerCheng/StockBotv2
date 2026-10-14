@@ -1,5 +1,5 @@
 """營收從哪來的取數（個股頁 S3d，2026-10-14）：讀 Engine C `manual_observations` 的分部／產品線占比、客戶集中度、backlog，
-交給 `alpha.revenue_mix` 整理。
+與台股年報地區別（`tw_region_revenue_observations`，S3d 第二段），交給 `alpha.revenue_mix` 整理。
 
 - **生效那一筆**：同一 (欄位, 觀測期) 只取沒被 `supersedes_id` 指到的；兩筆以上同時生效＝衝突，照列、不挑一個
   （INV-3；與 `engine_c.three_question_inputs._segment_points` 同一條規則）。
@@ -12,7 +12,7 @@ import json
 from datetime import date
 from typing import Any, Mapping
 
-from alpha.revenue_mix import SHARE_LABELS, backlog_text, customers_text, headline, share_series
+from alpha.revenue_mix import SHARE_LABELS, backlog_text, customers_text, headline, region_mix, share_series
 
 FIELDS = ("segment_revenue_share", "product_line_revenue_share", "customer_concentration", "backlog")
 FIELD_LABELS = {"segment_revenue_share": "分部營收占比", "product_line_revenue_share": "產品線營收占比",
@@ -53,15 +53,35 @@ def live_observations(conn: Any, ticker: str, *, as_of: date | None = None
     return out, conflicts
 
 
+TW_SUFFIXES = (".TW", ".TWO")
+
+
+def _regions(conn: Any, ticker: str, as_of: date | None) -> tuple[dict[str, Any] | None, dict[str, Any] | None]:
+    """台股年報地區別 → (一塊占比, 缺席)。不是台股＝兩個都 None（這一種本來就不適用，不印缺席）。"""
+    from engine_c.tw_region_revenue import region_revenue
+
+    if not ticker.upper().endswith(TW_SUFFIXES):
+        return None, None
+    found = region_revenue(conn, ticker, as_of=as_of)
+    if found is None:
+        return None, {"kind": "not_yet_recorded", "reason": "還沒從年度財報抽地區別營收"}
+    if found["status"] == "ok":
+        return region_mix(found), None
+    kind = "not_yet_recorded" if found["status"] == "not_yet_available" else "capability_absent"
+    return None, {"kind": kind, "reason": str(found.get("reason") or found["status"])}
+
+
 def revenue_mix(conn: Any, ticker: str, *, as_of: date | None = None) -> dict[str, Any]:
-    """一頁的「營收從哪來」：`{shares: [...], customers, backlog, conflicts, absences}`——沒有觀測的那一種具名缺席。"""
+    """一頁的「營收從哪來」：`{shares: [...], regions, customers, backlog, conflicts, absences}`——沒有觀測的那一種具名缺席。"""
     live, conflicts = live_observations(conn, ticker, as_of=as_of)
     shares = []
     for field, label in SHARE_LABELS.items():
         points = [p for p in live.get(field) or () if isinstance(p["value"], Mapping)]
         if points:
             shares.append({"field": field, "label": label, "points": share_series(points)})
-    out: dict[str, Any] = {"shares": shares, "customers": None, "backlog": None, "conflicts": conflicts, "absences": {}}
+    regions, region_absence = _regions(conn, ticker, as_of)
+    out: dict[str, Any] = {"shares": shares, "regions": regions, "customers": None, "backlog": None, "conflicts": conflicts,
+                           "absences": {"regions": region_absence} if region_absence else {}}
     for field, key, render in (("customer_concentration", "customers", customers_text), ("backlog", "backlog", backlog_text)):
         latest = (live.get(field) or [None])[-1]
         if latest is None:

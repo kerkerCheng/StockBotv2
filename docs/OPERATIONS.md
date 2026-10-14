@@ -114,6 +114,16 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 `StockBotv2-Daily` 的 ⑱⑲ 取代（1.2a 停用、2026-09-25 1.2b 刪除）；它們的理由（LLM 失敗心跳照發、永遠 exit 0、Python 不用 `.cmd`、
 發送走 subprocess）搬進 `crons/daily_task.py` 的 docstring，守它們的測試改主詞搬進 `tests/test_daily_task.py`「無人值守入口」節。
 
+### Sandbox impact review 結論（2026-10-14：個股頁 S3d 第二段——台股年報地區別、押的那一塊、三題③拆兩行）
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | 新的**互動式**入口 `python -m engine_c.tw_region_revenue --backfill`：下載 MOPS 財報區（`mtype=A`，主機與股東會年報、月營收同一台）的年度財報 PDF、本機抽字，寫 Engine C SQLite 的 `tw_region_revenue_observations`（ignored private runtime、可重建，L10）。**不在無人值守路徑上**。無人值守路徑上只多**讀**：daily ⑬ materialize（argv 不變）每頁多讀那張表與層代表公司宣告（同一輪載一次），payload 多 `revenue_mix.regions` 與 `bet_share`；心跳段 1 多一行「台股年報地區別」（只讀本機）。不跑 LLM、不碰圖。三題③拆兩行、placeholder 拆兩組只改計算與寫入端檢查 |
+| **2 canonical skill／prompt／本檔** | 本節；本檔「台股年報地區別」；`docs/ARCHITECTURE.md` 首屏「營收從哪來」；個股頁 plan S3 表；敘事契約（`alpha/narrative/contracts.py` 的 placeholder 字彙與 `brief_frame` position 題目）。不動任何 skill、prompt |
+| **3 最窄 rule** | daily argv 不變；不新增 step、allowlist、APP 路由、rule；APP 仍無寫入端點；要改成排程必須重做本 review |
+| **4 contract test** | `tests/test_tw_region_revenue.py`（營收欄靠合計認、兩欄四欄年份倒過來都認得、同一欄對上兩年不收、加不起來整塊不收、不是地名不收、「其他」不算地名、每個標題都看、依什麼分照原文、同一結果只更新抓取時間 A→B→A 讀到 A、可知日前看不到、只給台股、分部缺席不被地區吃掉、心跳計數）；`test_tw_region_revenue_stays_an_interactive_entry_and_the_heartbeat_only_reads`；`tests/test_revenue_mix.py`（押的那一塊）；`tests/test_three_questions.py`、`tests/test_narrative_v2.py`、`tests/test_candidates.py`（三題③兩行、兩組 placeholder、寫入端引用要有值、任一行有值算量得到）；地區別變異 28／28 |
+| **5 端到端 smoke** | 真資料：17 檔名冊台股回補 2025 年度年報，17/17 有值（欣興第一輪沒收、修成每個標題都看之後收下）；歸屬基準 9 檔客戶所在地、1 檔營運地點（高力）、7 檔那一節沒寫；ATS.VI、IQE.L 兩份敘事換版只改 placeholder 名稱（寫入端檢查照過，IQE.L 兩條反證換新 watch 號、條件與到期不變） |
+
 ### Sandbox impact review 結論（2026-10-14：個股頁 S3d 第一段——營收結構接上 B3）
 
 | 步 | 結論 |
@@ -1736,6 +1746,25 @@ Get-Content library\private\heartbeat\daily_run_<YYYY-MM-DD>.json          # 03_
 | **3 最窄 rule** | **沒有新增任何 rule**。要改成排程必須重做一次本 review。 |
 | **4 permission contract test** | `test_tw_share_capital_stays_an_interactive_entry`（rules 與 harvest 都不得出現）、`test_heartbeat_monthly_revenue_line_reads_no_network`（擴充：`sync_latest`／`fetch_balance_sheet` 不得出現在心跳）。 |
 | **5 端到端 smoke** | 2026-10-05 實跑：`--backfill 14` 寫入 12 檔 × 14 季＝168 筆、失敗 0；交叉核對攔下 4 筆（3081.TWO 2026Q2 股本含待分配股票股利、3017.TW 三季）；月營收 `--backfill 48` 補到 2022-10；12 檔台股已定價① 12/12 由缺席變有值（第 88–100 百分位，窗 1,087–1,092 天、覆蓋率 1.0）。R2 另抽線上 115Q2：上市收 1,053 列、拒 31 列（銀行、金控、保險、證券），上櫃收 884、拒 7（證券期貨）。 |
+
+### 台股年報地區別（個股頁 S3d 第二段，2026-10-14 完成 sandbox impact review——見本檔開頭 S3d 第二段那一節）
+
+個股頁 B3「營收從哪來」的地區那一塊。來源是 MOPS 財報區的**年度**財報附註「地區別資訊」（IFRS 8 全公司層級揭露只在年報有），
+與月營收、季報股數同性質（永久可查，L10）→ **互動式入口**，不進無人值守；心跳第 1 段印有值幾檔、最新年度、最新一份沒收的、落後法定期限的。
+
+```powershell
+# 每年 3/31（年報法定期限）過後跑一次；重跑冪等（同一結果只更新 fetched_at）
+& '.venv\Scripts\python.exe' -m engine_c.tw_region_revenue --backfill                       # 最近一個已過期限的年度、名冊全部台股
+& '.venv\Scripts\python.exe' -m engine_c.tw_region_revenue --backfill --year 2025 --ticker 3037.TW
+& '.venv\Scripts\python.exe' -m engine_c.tw_region_revenue --ticker 3037.TW                 # 印讀到的（個股頁同一支讀取端）
+```
+
+- **先有月營收**：營收那一欄靠「合計＝那一年月營收十二個月加總（≤0.3%）」認出來；缺月營收的先跑
+  `python -m engine_c.monthly_revenue --backfill 36`（不滿十二個月的年度不比，回補報表寫 `no_monthly_revenue`）。
+- **沒收的原因是封閉字彙**（`check_status`）：`ambiguous_years`（兩年營收差不到 0.6%）、`total_mismatch`（加不起來）、`not_geographic`
+  （合計對得上但標籤不是地名）、`no_region_table`、`section_not_found`、`document_missing`——回補報表與心跳逐檔列出，頁上寫原因。
+- **依什麼分地區**（`revenue_basis`）照年報那一節的原文：客戶所在地、營運地點（高力）、兩者都寫、沒寫；頁上照印，不一律當客戶所在地。
+- **可知日**＝MOPS 列表的上傳日（`filing_metadata`）；解析不到才用法定期限（`statutory_deadline_only`）。比較年那一欄用同一份年報的可知日。
 
 ### 層說明 ledger（個股頁 plan S4a，2026-10-07 完成 sandbox impact review）
 

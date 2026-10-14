@@ -364,8 +364,11 @@ def _yoy_quarters(rows: Sequence[Mapping[str, Any]], today: date, *, n: int) -> 
 
 
 def in_numbers(inp: Mapping[str, Any], *, today: date) -> list[dict[str, Any]]:
-    """出現在數字裡了嗎：一行序列（第一個有 ≥2 點的來源）＋（可選）一行結構脈絡。"""
-    key, label = "in_numbers_series", "出現在數字裡了嗎：序列"
+    """出現在數字裡了嗎：一行營收序列（月營收、EDGAR 季、20-F 年度，第一個有 ≥2 點的來源）＋（有的話）一行占比序列＋結構脈絡。
+
+    **營收與占比是兩種量，各住一個 key（L12）。** 2026-10-14 以前，同一個占比欄位有 ≥2 點時占比序列會佔掉 `in_numbers_series`
+    ——頁首「最近營收年增」與 B3 營收柱讀到的其實是占比（ATS.VI、IQE.L、SOI.PA），而有營收序列的公司會被擠掉營收。"""
+    key, label = "in_numbers_series", "出現在數字裡了嗎：營收序列"
     out: list[dict[str, Any]] = []
     # 分部占比與產品線占比是兩種切法（口徑不同）：**同一個欄位**有 ≥2 個觀測日才成序列，不跨欄位湊點（L12）。
     by_field: dict[str, list[Mapping[str, Any]]] = {}
@@ -380,15 +383,16 @@ def in_numbers(inp: Mapping[str, Any], *, today: date) -> list[dict[str, Any]]:
             continue
         by_field.setdefault(str(seg.get("field")), []).append(seg)
     series_field = next((f for f, pts in sorted(by_field.items()) if len(pts) >= 2), None)
+    mix: list[dict[str, Any]] = []
     if series_field is not None:
         pts = sorted(by_field[series_field], key=lambda s: str(s.get("as_of")))
-        out.append(line(key, label, value=[{"as_of": p.get("as_of"), "revenue_mix": p["value"]} for p in pts[-4:]],
+        mix.append(line("in_numbers_mix_series", "出現在數字裡了嗎：營收占比序列",
+                        value=[{"as_of": p.get("as_of"), "revenue_mix": p["value"]} for p in pts[-4:]],
                         source=series_field, as_of=pts[-1].get("as_of"), basis="分部／產品線營收占比（同一欄位）",
                         rule=_RULE_NUMBERS))
-        return out + conflicts
-    contexts = [line("in_numbers_structure", "出現在數字裡了嗎：結構脈絡（只有一點）", value=pts[0]["value"],
-                     source=f, as_of=pts[0].get("as_of"), rule="這個欄位只有一個觀測日——當結構脈絡印，不佔序列位置")
-                for f, pts in sorted(by_field.items())] + conflicts
+    contexts = mix + [line("in_numbers_structure", "出現在數字裡了嗎：結構脈絡（只有一點）", value=pts[0]["value"],
+                           source=f, as_of=pts[0].get("as_of"), rule="這個欄位只有一個觀測日——當結構脈絡印，不佔序列位置")
+                      for f, pts in sorted(by_field.items()) if f != series_field] + conflicts
     months = [m for m in (inp.get("monthly_revenue") or ())
               if (_iso(m.get("available_on")) or date.max) <= today and m.get("revenue") is not None]
     if len(months) >= 2:

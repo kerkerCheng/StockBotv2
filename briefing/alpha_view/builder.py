@@ -310,22 +310,32 @@ def _three_question_values(three_questions: Mapping[str, Any] | None) -> dict[st
     rows = {r["key"]: r for q in ("priced_in", "in_numbers") for r in (three_questions or {}).get(q) or ()
             if r.get("absence_kind") is None}
     own = rows.get("own_history_pctile")
-    series = rows.get("in_numbers_series")
-    latest = (series["value"][-1] if series and isinstance(series.get("value"), list) and series["value"] else None)
-    yoy = latest.get("yoy") if isinstance(latest, Mapping) else None
-    # 分部／產品線占比序列沒有年增率（2026-10-05 ATS.VI 是第一檔）：印各分部占比，只取 -1..1 的數值鍵（說明欄位與總額不是占比）
-    mix = latest.get("revenue_mix") if isinstance(latest, Mapping) else None
+
+    def _latest(key: str) -> Mapping[str, Any] | None:
+        series = rows.get(key)
+        point = series["value"][-1] if series and isinstance(series.get("value"), list) and series["value"] else None
+        return point if isinstance(point, Mapping) else None
+
+    def _date(point: Mapping[str, Any] | None) -> str | None:
+        when = (point.get("period_end") or point.get("data_month") or point.get("as_of")) if point else None
+        return str(when)[:10] if when else None
+
+    # 營收序列與占比序列各給一組 placeholder（2026-10-14 拆開，L12）：年增率只來自營收序列；占比只取 -1..1 的數值鍵
+    # （說明欄位與總額不是占比）
+    latest, latest_mix = _latest("in_numbers_series"), _latest("in_numbers_mix_series")
+    yoy = latest.get("yoy") if latest else None
+    mix = latest_mix.get("revenue_mix") if latest_mix else None
     shares = sorted(((str(k), float(v)) for k, v in (mix or {}).items() if not str(k).startswith("_")
                      and isinstance(v, (int, float)) and not isinstance(v, bool) and -1.0 <= v <= 1.0),
                     key=lambda kv: -kv[1]) if isinstance(mix, Mapping) else []
-    as_of = (latest.get("period_end") or latest.get("data_month") or latest.get("as_of")) if isinstance(latest, Mapping) else None
     return {
         "own_history_pctile": (f"{float(own['value']):.0f}" if own else None),
         "own_history_basis": (own.get("basis") if own else None),
         "cohort_median": format_value("multiple", rows["cohort_median"]["value"]) if "cohort_median" in rows else None,
-        "in_numbers_latest": (format_value("ratio", yoy) if yoy is not None else
-                              "、".join(f"{k} {format_value('share', v)}" for k, v in shares) or None),
-        "in_numbers_as_of": (str(as_of)[:10] if as_of else None),
+        "in_numbers_latest": (format_value("ratio", yoy) if yoy is not None else None),
+        "in_numbers_as_of": _date(latest),
+        "in_numbers_mix_latest": "、".join(f"{k} {format_value('share', v)}" for k, v in shares) or None,
+        "in_numbers_mix_as_of": _date(latest_mix),
     }
 
 

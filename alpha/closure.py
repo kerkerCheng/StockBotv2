@@ -885,7 +885,7 @@ def duplicate_live_observations(
     典型長法是「`xbrl_backfill` 先寫一筆最小組合，之後有人寫完整版但沒有指向它」——
     兩條互不相干的鏈**在現有 schema 下無法合併**。
     2026-09-13 起寫入端會擋下新的（`engine_c/manual_observations.py::_reject_unlinked_duplicate`），
-    但既有的只能等 schema 決定（見 ROADMAP）。
+    但既有的只能等 schema 決定（ROADMAP 旁支開發項「人工觀測的取代鏈收多值」——2026-09-22 改寫時漏搬、2026-10-14 補回）。
 
     ⚠ 今天不會取到錯的值：`alpha/providers/fundamentals.py` 用
     `ORDER BY as_of DESC, recorded_at DESC` 取回、取第一筆可解析且未被 supersede 的——
@@ -910,7 +910,7 @@ def render_duplicate_live_observations(
     return [f"⚠ 同一期間有多筆生效觀測：{len(rows)} 組（{len(fields)} 個欄位：{'、'.join(fields)}）——"
             + "、".join(f"{tk}/{fn}@{ao}({len(ids)})" for tk, fn, ao, ids in rows)
             + "。`supersedes_id` 是單值欄位且帶 FK，**兩條互不相干的鏈在現有 schema 下無法合併**；"
-            "2026-09-13 起寫入端會擋下新的，既有的要等 schema 決定（ROADMAP）。"
+            "2026-09-13 起寫入端會擋下新的，既有的要等 schema 決定（ROADMAP「人工觀測的取代鏈收多值」，要使用者選 A／B）。"
             "⚠ 今天取到的仍是「最新者勝出」那一筆——**那是排序的副作用，不是宣告**。"]
 
 

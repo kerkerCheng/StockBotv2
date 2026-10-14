@@ -849,13 +849,15 @@ function mixFigures(payload) {
   if (!mix) return [];
   if (mix.unread) return [el('div', 'row-reason ss-pending', `營收結構：${mix.unread.reason}`)];
   const out = [];
-  (mix.shares || []).forEach((s) => {
+  // 人工記的分部／產品線占比，加上台股年報機械抽的地區別（同一個形狀，各自一塊；note＝年報說依什麼分地區）
+  (mix.shares || []).concat(mix.regions ? [mix.regions] : []).forEach((s) => {
     const latest = (s.points || [])[(s.points || []).length - 1];
     if (!latest) return;
     const box = el('div', 'mix-box');
     const prev = (s.points || []).length > 1 ? s.points[s.points.length - 2] : null;
     box.appendChild(el('div', 'chart-axis-title',
       `${s.label}營收占比（${latest.period || latest.as_of}${prev ? `；括號是前一次 ${prev.period || prev.as_of}` : ''}）`));
+    if (s.note) box.appendChild(el('div', 'row-reason', s.note));
     (latest.parts || []).forEach((p) => {
       const row = el('div', 'mix-row');
       row.appendChild(el('span', 'mix-name', p.name));
@@ -871,6 +873,7 @@ function mixFigures(payload) {
     out.push(box);
   });
   if (mix.absences && mix.absences.shares) out.push(el('div', 'row-reason ss-pending', `營收占比：${mix.absences.shares.reason}`));
+  if (mix.absences && mix.absences.regions) out.push(el('div', 'row-reason ss-pending', `地區營收：${mix.absences.regions.reason}`));
   [['customers', '客戶集中度'], ['backlog', 'backlog 與長約']].forEach(([key, label]) => {
     const item = mix[key];
     if (item) out.push(el('div', 'row-reason', `${label}（${item.as_of}）：${item.headline}`));
@@ -881,15 +884,36 @@ function mixFigures(payload) {
   return out;
 }
 
-/** B3「數字與出處」裡的營收結構細節：客戶集中度與 backlog 的全文、每一次占比觀測的出處與沒畫的欄位（照抄）。 */
+/** 押的那一塊占營收多少（B3，2026-10-14）：敘事押的層 × 層代表公司宣告 × 分部占比——一層一句；對不上照印哪一段沒有。
+ *  全部照抄 materialize 的 `bet_share`（占比是 Engine C 觀測、不是這裡算的）。 */
+function betShareLines(payload) {
+  const bet = payload.bet_share;
+  if (!bet) return [];
+  if (bet.absence) return [el('div', 'row-reason ss-pending', `押的那一塊：${bet.absence.reason}`)];
+  return (bet.items || []).map((item) => {
+    if (item.value === 'share') {
+      const prev = typeof item.prev_share === 'number' ? `；前一次 ${fmtRatioPct(item.prev_share, 1)}` : '';
+      return el('div', 'row-reason', `押的那一塊：「${item.node_name}」由研究宣告用「${item.segment}」分部代表——`
+        + `占營收 ${fmtRatioPct(item.share, 1)}（${item.period}${prev}）`);
+    }
+    if (item.value === 'whole_company') {
+      return el('div', 'row-reason', `押的那一塊：「${item.node_name}」由研究宣告用全公司營收代表——整家公司就是押的那一塊`);
+    }
+    return el('div', 'row-reason ss-pending', `押的那一塊：${item.reason}`);
+  });
+}
+
+/** B3「數字與出處」裡的營收結構細節：客戶集中度與 backlog 的全文、每一次占比觀測的出處與沒畫的欄位、押的那一塊的宣告理由（照抄）。 */
 function mixDetail(payload) {
   const mix = payload.revenue_mix || {};
   const out = [];
+  ((payload.bet_share || {}).items || []).filter((item) => item.value).forEach((item) => out.push(el('div', 'row-reason',
+    `押的那一塊「${item.node_name}」的代表公司宣告：${item.why}${item.source_ref ? `｜占比出處：${item.source_ref}` : ''}`)));
   [['customers', '客戶集中度'], ['backlog', 'backlog 與長約']].forEach(([key, label]) => {
     const item = mix[key];
     if (item) out.push(el('div', 'row-reason', `${label}（${item.as_of}）全文：${item.text}｜出處：${item.source_ref || '—'}`));
   });
-  (mix.shares || []).forEach((s) => (s.points || []).forEach((p) => out.push(el('div', 'row-reason',
+  (mix.shares || []).concat(mix.regions ? [mix.regions] : []).forEach((s) => (s.points || []).forEach((p) => out.push(el('div', 'row-reason',
     `${s.label}占比 ${p.period || p.as_of}：出處 ${p.source_ref || '—'}`
     + ((p.ignored || []).length ? `｜不是占比、沒畫的欄位：${p.ignored.join('、')}` : '')))));
   return out;
@@ -1767,6 +1791,7 @@ function blockVisuals(payload, view, key) {
   }
   if (key === 'B3') {
     const n = revenueBars(view); if (n) out.push(n);
+    betShareLines(payload).forEach((m) => out.push(m));
     mixFigures(payload).forEach((m) => out.push(m));
   }
   if (key === 'B4') {

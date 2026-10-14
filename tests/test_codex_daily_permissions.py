@@ -151,6 +151,19 @@ def test_heartbeat_monthly_revenue_line_reads_no_network() -> None:
         assert network_entry not in heartbeat, network_entry
 
 
+def test_tw_region_revenue_stays_an_interactive_entry_and_the_heartbeat_only_reads() -> None:
+    """台股年報地區別（2026-10-14，個股頁 S3d 第二段）與季報股數同性質（MOPS 年報永久可查，L10）：留互動式、不進任何
+    無人值守 rule；心跳那一行只讀本機 Engine C——下載 PDF、抽字的入口不得出現在心跳。要改成排程必須重做 sandbox impact
+    review（OPERATIONS「台股年報地區別」）。"""
+    rules = RULES.read_text(encoding="utf-8")
+    assert "tw_region_revenue" not in rules
+    assert "tw_region_revenue" not in (ROOT / "crons" / "harvest_leads.py").read_text(encoding="utf-8")
+    heartbeat = (ROOT / "crons" / "heartbeat.py").read_text(encoding="utf-8")
+    assert "_tw_region_revenue_line" in heartbeat
+    for network_entry in ("fetch_document", "list_documents", "pdf_to_text", "backfill("):
+        assert network_entry not in heartbeat, network_entry
+
+
 def test_tw_share_capital_stays_an_interactive_entry() -> None:
     """季報股數與月營收同性質（MOPS 按季永久可查，漏抓補得回來，L10）：刻意留互動式——不進任何無人值守 rule，
     要改成排程必須重做一次 sandbox impact review（OPERATIONS「台股季報股數」）。"""

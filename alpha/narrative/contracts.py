@@ -134,9 +134,11 @@ BRIEF_FRAME_V2: Mapping[str, Mapping[str, str]] = {
         "do_not": "⚠ 不得寫『AI 需求強勁』這種沒有主詞的句子——要有誰、花多少、買什麼。⚠ 金額要指得回引用。",
     },
     "position": {
-        "question": "它坐在哪幾層／哪幾格？各占多少營收？（出現在數字裡了嗎——引用「年增 {in_numbers_latest}（{in_numbers_as_of}）」；它填的是年增率，不是營收）",
-        "look_at": "rides[] 的讀圖供給側、分部／產品線占比、三題稽核區「出現在數字裡了嗎」那一行",
-        "do_not": "⚠ 不得用內部節點名——用人話。⚠ 答了 `answers.in_numbers`＝yes／no 這一格就必須含 {in_numbers_latest}。",
+        "question": "它坐在哪幾層／哪幾格？各占多少營收？（出現在數字裡了嗎——引用「年增 {in_numbers_latest}（{in_numbers_as_of}）」，"
+                    "它填的是年增率不是營收；只有占比序列時引用「{in_numbers_mix_latest}（{in_numbers_mix_as_of}）」）",
+        "look_at": "rides[] 的讀圖供給側、分部／產品線占比、三題稽核區「出現在數字裡了嗎」的營收序列與占比序列",
+        "do_not": "⚠ 不得用內部節點名——用人話。⚠ 答了 `answers.in_numbers`＝yes／no 這一格就必須含 {in_numbers_latest} 或 "
+                  "{in_numbers_mix_latest}，而且引用的那個要有值。",
     },
     "bottleneck": {
         "question": "為什麼卡在它？（引用你押的那份讀圖結論；誰想殺它＝反向路徑上的替代者）",
@@ -203,8 +205,12 @@ PLACEHOLDERS_V2: Mapping[str, str] = {
     "cohort_median": "已定價②：主題等權組同口徑中位數",
     # 已定價③（相對組 30／90 個交易日漲幅）**不在首屏字彙**（2026-09-30 使用者定案：首屏不放價格報酬）——
     # 只在個股頁稽核區印（`three_questions` 各行）；首屏要談就用文字描述，不引用數字。
-    "in_numbers_latest": "出現在數字裡了嗎：序列最新一點的**年增率**（YoY；不是營收本身——寫「年增 {in_numbers_latest}」；最新一點沒有年增〔例：分部占比序列〕時印（尚無））",
-    "in_numbers_as_of": "出現在數字裡了嗎：最新一點的日期",
+    "in_numbers_latest": "出現在數字裡了嗎：營收序列最新一點的**年增率**（YoY；不是營收本身——寫「年增 {in_numbers_latest}」；沒有營收序列時印（尚無））",
+    "in_numbers_as_of": "出現在數字裡了嗎：營收序列最新一點的日期",
+    # 2026-10-14：占比序列另給一組（以前占比會填進 {in_numbers_latest}——同一個 placeholder 有時是年增率、有時是占比，
+    # 這家公司日後有了營收序列，「占營收升到 {in_numbers_latest}」就會安靜地印成「+25%」，L12）。
+    "in_numbers_mix_latest": "出現在數字裡了嗎：分部／產品線占比序列最新一次的各塊占比（例「Microelectronics 52%、…」；沒有占比序列時印（尚無））",
+    "in_numbers_mix_as_of": "出現在數字裡了嗎：占比序列最新一次的日期",
     # Phase 7 Step 7.0c：「要翻倍需要什麼」的起點。只給起點、不給目標——條件由寫敘事的人用營業數字寫在文字裡。
     "market_cap": "翻倍的起點：市值（Engine C 快照的現價 × 流通股數，報價單位換成結算幣別、不做匯率換算；含幣別與日期）",
     "revenue_ttm": "近四季營收（Engine C 快照的 TTM，財報幣別；日期是快照的取數日，不是財報期末）",
@@ -527,8 +533,9 @@ class InvestorBrief:
             raise ContractViolation("priced_in 那一格必須含 {own_history_pctile}——已定價嗎的主參照是自己的歷史")
         position = slots.get("position")
         if self.answers.in_numbers in ("yes", "no") and position is not None \
-                and "{in_numbers_latest}" not in position.text:
-            raise ContractViolation("answers.in_numbers 答了 yes／no，position 那一格就必須含 {in_numbers_latest}（型別層強制引用）")
+                and "{in_numbers_latest}" not in position.text and "{in_numbers_mix_latest}" not in position.text:
+            raise ContractViolation("answers.in_numbers 答了 yes／no，position 那一格就必須含 {in_numbers_latest} 或 "
+                                    "{in_numbers_mix_latest}（型別層強制引用）")
         wmbt = slots.get("what_must_be_true")
         if wmbt is not None:
             bad = sorted(t for t in wmbt.placeholders if t[1:-1] in WHAT_MUST_BE_TRUE_FORBIDDEN)

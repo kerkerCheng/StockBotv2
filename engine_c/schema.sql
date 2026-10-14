@@ -211,6 +211,32 @@ CREATE TABLE IF NOT EXISTS tw_share_capital_observations (
 CREATE INDEX IF NOT EXISTS idx_tw_share_capital_ticker_period
     ON tw_share_capital_observations (ticker, period_end DESC, fetched_at DESC);
 
+-- 台股年度財報地區別營收（個股頁 S3d 第二段，2026-10-14）：可重建 ETL 觀測；一列＝一份年報的抽取結果（兩年在 years_json）；
+-- 營收欄由「合計最接近月營收十二個月加總」機械認出；revenue_basis＝年報自己說依什麼分地區。
+-- SQLite 對應的建表住 engine_c/tw_region_revenue.py（遷移 20261014_add_tw_region_revenue.sql）。
+CREATE TABLE IF NOT EXISTS tw_region_revenue_observations (
+    observation_id VARCHAR(64) PRIMARY KEY,
+    ticker VARCHAR(32) NOT NULL,
+    company_code VARCHAR(16) NOT NULL,
+    report_year INTEGER NOT NULL,
+    years_json TEXT NOT NULL,
+    check_status VARCHAR(32) NOT NULL,
+    check_reason TEXT,
+    revenue_basis VARCHAR(32) NOT NULL,
+    basis_quotes_json TEXT NOT NULL,
+    currency VARCHAR(8) NOT NULL,
+    unit_scale INTEGER NOT NULL CHECK (unit_scale > 0),
+    source_filename TEXT,
+    available_on DATE NOT NULL,
+    available_on_basis VARCHAR(32) NOT NULL,
+    source TEXT NOT NULL,
+    fetched_at TIMESTAMPTZ NOT NULL,
+    payload_digest VARCHAR(64) NOT NULL UNIQUE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_tw_region_revenue_ticker
+    ON tw_region_revenue_observations (ticker, report_year DESC, fetched_at DESC);
+
 -- 機械歷史表（Phase 3 Step 3.2）：價格 raw／adjusted＋分割事件、EDGAR 基本面（每份申報各一列）。
 -- 可重建的 ETL 觀測，不是 append-only judgment ledger（L10：今天重取一次拿得回來）。
 -- 財報數字的可用日是 filed（EDGAR 申報日），不是會計期末、更不是 fetched_at（INV-6）；

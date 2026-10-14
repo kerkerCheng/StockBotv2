@@ -369,6 +369,17 @@ def test_rollup_counts_lamps_greys_by_kind_and_unread_with_reasons() -> None:
     assert r["edge"] == {"edge": 1, "not_edge": 1, "unmeasurable": 1}
 
 
+def test_in_numbers_counts_a_ticker_measurable_when_either_series_has_a_value() -> None:
+    """2026-10-14 營收序列與占比序列拆成兩行：只有占比序列的公司（ATS.VI 等）照樣算「出現在數字裡」量得到；
+    兩行都缺席時記營收那一行的缺席 kind。"""
+    mix_only = _tq(absent_numbers=True)
+    mix_only["in_numbers"].append({"key": "in_numbers_mix_series", "value": [1], "absence_kind": None})
+    r = rollup({"A": _tq(), "B": mix_only, "C": _tq(absent_numbers=True)}, {})
+    assert r["in_numbers"] == {"valued": 2, "absent": {"upstream_unavailable": 1}, "absent_total": 1}
+    row = _derive([_brief()], tq=mix_only)                            # 可開的前提：占比序列有值就沒失效
+    assert not any("出現在數字裡" in p for p in row.get("preconditions") or ())
+
+
 # ---------------------------------------------------------------------------
 # 整板載入（load_board）：宇宙合併、只在 Sheet 的持有、Sheet 讀不到、三題讀不到、ledger 不在
 # ---------------------------------------------------------------------------

@@ -76,7 +76,10 @@ OPEN_READING_KINDS: frozenset[str] = frozenset({"moat", "volume"})
 CURRENT_READING_STATUSES: frozenset[str] = frozenset({"current", "stale_low"})
 #: 已定價那一格引用的稽核行。相對組漲幅（③）2026-09-30 起只在稽核區、不上首屏，所以不在這裡——它有值不強迫答 yes／no。
 _PRICED_IN_LINES = ("own_history_pctile", "cohort_median")
-_IN_NUMBERS_LINES = ("in_numbers_series",)
+_IN_NUMBERS_LINES = ("in_numbers_series", "in_numbers_mix_series")
+#: 「出現在數字裡了嗎」的兩個 placeholder → 各自填值的稽核行（2026-10-14 拆開：年增率與占比是兩種量，L12）。
+IN_NUMBERS_PLACEHOLDER_LINES: Mapping[str, str] = {"in_numbers_latest": "in_numbers_series",
+                                                   "in_numbers_mix_latest": "in_numbers_mix_series"}
 
 
 class WriteContext:
@@ -251,6 +254,17 @@ def v2_write_problems(parsed: InvestorBrief, *, ctx: WriteContext, existing: Seq
         if (rows.get("cohort_median") or {}).get("absence_kind") is None and "cohort_median" in rows \
                 and "{cohort_median}" not in text:
             problems.append("priced_in：主題等權組中位數有值，這一格必須一併引用 {cohort_median}")
+    # 出現在數字裡了嗎答 yes／no：引用的 placeholder 至少一個要有值（2026-10-14 兩個 placeholder 拆開後的補償控制——
+    # 以前占比序列會填進 {in_numbers_latest}，現在不會；答 yes 卻印「（尚無）」是自相矛盾，L15）
+    if tq is not None and parsed.answers and parsed.answers.in_numbers in ("yes", "no"):
+        text = slots.get("position", "")
+        cited = [p for p in IN_NUMBERS_PLACEHOLDER_LINES if "{" + p + "}" in text]
+        valued_lines = {p: k for p, k in IN_NUMBERS_PLACEHOLDER_LINES.items()
+                        if k in rows and (rows.get(k) or {}).get("absence_kind") is None}
+        if cited and not any(p in valued_lines for p in cited):
+            hint = "、".join("{" + p + "}" for p in valued_lines) or "沒有（那就答 unmeasurable）"
+            problems.append(f"answers.in_numbers={parsed.answers.in_numbers}：position 引用的 "
+                            f"{'、'.join('{' + p + '}' for p in cited)} 在稽核區沒有值，印出來是（尚無）——有值的是 {hint}")
 
     # ④ candidate_state：缺 X／等回落 → 本公司 wake_brief、active、kind 合法
     cs = parsed.candidate_state

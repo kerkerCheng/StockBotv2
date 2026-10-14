@@ -218,6 +218,10 @@ def _ensure_sqlite_schema(conn: sqlite3.Connection) -> None:
     from engine_c.offerings import ensure_offering_schema
 
     ensure_offering_schema(conn)
+    # 個股頁 S3d 第二段（2026-10-14）：台股年度財報地區別營收（可重建 ETL 表，只 CREATE IF NOT EXISTS）。
+    from engine_c.tw_region_revenue import ensure_region_revenue_schema
+
+    ensure_region_revenue_schema(conn)
     conn.commit()
 
 

@@ -228,6 +228,22 @@ def test_unmeasurable_only_when_the_audit_lines_are_all_absent(tmp_path: Path) -
     _write(tmp_path, rec, _ctx(tq=all_absent))
 
 
+def test_in_numbers_yes_must_cite_a_placeholder_that_has_a_value(tmp_path: Path) -> None:
+    """2026-10-14：{in_numbers_latest}（營收年增）與 {in_numbers_mix_latest}（占比）拆開後的補償控制（L15）——只有占比序列的
+    公司答 yes 卻引用年增，印出來是（尚無）；型別層兩個都收（舊紀錄照讀），寫入端要引用到有值的那個。"""
+    mix_only = _tq(cohort_median="not_yet_recorded", rel_return_30d="not_yet_recorded", rel_return_90d="not_yet_recorded")
+    mix_only["in_numbers"] = [
+        {"key": "in_numbers_series", "value": None, "absence_kind": "upstream_unavailable"},
+        {"key": "in_numbers_mix_series", "value": [{"as_of": "2026-06-30", "revenue_mix": {"a": 0.6}}], "absence_kind": None}]
+    with pytest.raises(ContractViolation, match="在稽核區沒有值.*in_numbers_mix_latest"):
+        _write(tmp_path, _record(), _ctx(tq=mix_only))                # 預設那格引用 {in_numbers_latest}
+    mix_slot = _slots(position="Microelectronics 占營收 {in_numbers_mix_latest}（{in_numbers_mix_as_of}）。")
+    _write(tmp_path / "b", _record(slots=mix_slot), _ctx(tq=mix_only))
+    rec = _record(slots=mix_slot)                                     # 型別層：只引用占比也算有引用
+    with pytest.raises(ContractViolation, match="有值的是 \\{in_numbers_latest\\}"):
+        _write(tmp_path / "c", rec, _ctx())                           # 反過來：只有營收序列卻引用占比，一樣拒收
+
+
 def test_relative_group_return_stays_off_the_first_screen(tmp_path: Path) -> None:
     """2026-09-30 使用者定案（plan §14 #43／#44）：相對組漲幅只在稽核區，不上首屏。
 
