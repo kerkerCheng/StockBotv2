@@ -1,0 +1,21 @@
+SOURCE: ASMPT Limited（HKEX 0522）Announcement Of 2026 Unaudited Interim Results For The Six Months Ended 30 June 2026——SEMI 主流業務、打線與黏晶機需求有限節錄
+URL: https://www.asmpt.com/site/assets/files/85468/q2_2026_en_announcement.pdf
+PUBLISHED: 2026-07-28（公告末署日期）
+RETRIEVED: 2026-10-16
+STORAGE: repo_excerpt（法定公告有限節錄；pdftotext 抽字，空白攤平，逐字截取）
+NOTE: **供應商一手（自述）**。打線與黏晶機合併描述，沒有打線機單獨數字。
+
+【RESULTS SUMMARY（公司與集團定義）】
+ASMPT Limited and its subsidiaries (the “Group” or “ASMPT”) delivered revenue from Continuing operations of HK$8.90 billion (US$1.14 billion) for the six months ended 30 June 2026
+
+【MANAGEMENT DISCUSSION AND ANALYSIS — SEMI Mainstream】
+SEMI mainstream business experienced significant growth, supported by high utilisation at leading IDMs due to improving demand for power management requirements for AI data centres, and industrial applications. Notably, China’s revenue and bookings were especially strong, with wire bonding (“WB”) and die bonding (“DB”) tool demand supported by ongoing AI infrastructure expansion and high OSAT utilisation.
+
+【MANAGEMENT DISCUSSION AND ANALYSIS — SEMI Q2 revenue】
+QoQ and YoY growth were driven by Photonics due to AI-related applications, and wire and die bonders due to both AI and consumer related applications.
+
+【MANAGEMENT DISCUSSION AND ANALYSIS — SEMI Q2 bookings】
+SEMI Q2 bookings of HK$3.36 billion (US$428.1 million) were up 39.0% QoQ due to wire and die bonders and Photonics, and up 125.9% YoY due to wire and die bonders, Photonics and TCB.
+
+【MANAGEMENT DISCUSSION AND ANALYSIS — 地區】
+By geography, share of revenue from China increased to from 38.1% in 1H 2025 to 42.2% YoY in 1H 2026 mainly driven by wire and die bonders

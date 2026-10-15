@@ -1,0 +1,9 @@
+SOURCE: Kulicke and Soffa Industries, Inc. Form 10-K（fiscal year ended October 4, 2025）Item 1 Business — Competition 有限節錄
+URL: https://www.sec.gov/Archives/edgar/data/56978/000005697825000081/klic-20251004.htm
+PUBLISHED: 2025-11-20（EDGAR 申報日）
+RETRIEVED: 2026-10-16
+STORAGE: repo_excerpt（法定申報有限節錄；HTML 轉文字、空白攤平，逐字截取）
+NOTE: **供應商一手（自述）**。這是它整條設備線的競爭者清單，不是只有打線機。
+
+【Item 1 Business — Competition（設備）】
+The market for semiconductor equipment and packaging materials products is intensely competitive. Significant competitive factors in the semiconductor equipment market include price, speed/throughput, production yield, process control, delivery time, innovation, quality and customer support, each of which contribute to lower the overall cost per package being manufactured. Our major equipment competitors are ASM Pacific Technology, Hesse GmbH, Han's Laser Technology Co., Ltd., BE Semiconductor Industries N.V., Hanwha Precision Machinery Co., Ltd., Panasonic Holdings Corporation, Yamaha Robotics Holdings Co. Ltd., and Nordson Corporation.
