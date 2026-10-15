@@ -1,0 +1,12 @@
+Source URL: https://emea.hammondpowersolutions.com/-/media/Project/HPS/shared/Investor-Relations/2026-YEAR-ITEMS/Q2-2026/Q2-2026-Financial-Results-Press-Release---073026.pdf
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Hammond Power Solutions Reports Second Quarter 2026 Financial Results（2026-07-30 發行人新聞稿）——在手訂單、產能與交期
+RETRIEVED: 2026-10-16（本機抓官網 PDF，pdftotext 抽字、空白攤平，逐字截取）
+NOTE: 發行人一手（自述）。同一份新聞稿的另一份節錄是圖上的引用來源 library/raw/hps_q2_2026_results_pr_2026_07_30.txt，本檔不取代它。
+
+【p.1 Backlog 段（含交期）】
+Backlog decreased 3.1% from Quarter 4, 2025 and 6.9% from Quarter 1, 2026, as shipments exceeded new order bookings during the period. Despite these sequential declines, backlog remains at a significant level, supporting utilization of the Company’s expanded manufacturing capacity while enabling continued improvements in competitive lead times and responsiveness to customer demand.
+
+【執行長引言（美國市場）】
+Demand in the U.S. market continues to be driven by data centre investment, electrification and power infrastructure spending, and our expanded manufacturing footprint is allowing us to support that growth more effectively.

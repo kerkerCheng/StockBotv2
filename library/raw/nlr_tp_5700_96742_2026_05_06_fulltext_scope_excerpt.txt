@@ -1,0 +1,15 @@
+Source URL: https://docs.nlr.gov/docs/fy26osti/96742.pdf
+
+Excerpt:
+[EXCERPT — 有限逐字引文] National Laboratory of the Rockies NLR/TP-5700-96742（2026-05）Large Power Transformer Supply Chain Gap Analysis and Domestic Content Strategies for Hydropower Rehabilitation: Supplemental Report——全文範圍核對
+RETRIEVED: 2026-10-16（docs.nlr.gov 全文 PDF；OSTI 的 purl 從本機連不上）
+NOTE: 第三方（DOE 國家實驗室）。全文只談大型電力變壓器（LPT）與它的零件；**沒有乾式或配電級變壓器的交期或缺貨句**——唯一碰到配電級的是引用的生產者物價指數（power and distribution transformers）。另一份節錄（分接開關、套管）是 library/raw/nlr_tp_5700_96742_2026_05_06.txt。
+
+【Executive Summary（擴產仍不足；資料中心是需求來源之一）】
+Domestic manufacturing capacity has expanded in recent years, with facility upgrades announced by Delta Star, Hitachi Energy, and Pennsylvania Transformer and new capacity planned by Siemens Energy. Yet these expansions remain insufficient to meet rising demand from hydropower, data centers, and renewable integration.
+
+【LPT costs（生產者物價指數）】
+Transformer costs have increased sharply since 2021, with prices in 2025 approximately 80% higher than the relatively constant value between 2014 and 2021 (Figure 8).
+
+【Figure 8 標題】
+Figure 8. Producer price index for power and distribution transformers.
