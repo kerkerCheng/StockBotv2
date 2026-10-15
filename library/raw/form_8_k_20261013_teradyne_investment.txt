@@ -1,0 +1,19 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1039399/000103939926000037/form-20261006.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] FormFactor, Inc. Form 8-K（event date October 6, 2026; signed October 13, 2026）Item 3.02 private placement to Teradyne; Exhibit 99.1 press release dated October 12, 2026
+RETRIEVED: 2026-10-15（本機抓取 EDGAR 原文，去 HTML 後逐字截取）
+NOTE: 發行人一手（Item 3.02 是法定申報）；新聞稿兩家共同發布，合作內容是自述。
+
+Source: https://www.sec.gov/Archives/edgar/data/1039399/000103939926000037/form-20261006.htm
+
+【Item 3.02. Unregistered Sales of Equity Securities】
+On October 6, 2026, FormFactor, Inc. (the "Company") entered into a Securities Purchase Agreement (the "Purchase Agreement"), by and between the Company and Teradyne, Inc., a Massachusetts corporation (the "Purchaser"), pursuant to which the Company agreed to issue and sell to the Purchaser, in a private placement transaction, an aggregate of 2,234,887 shares of the Company's common stock, $0.001 par value per share (the "Purchased Shares"), for aggregate cash consideration of approximately $300.0 million. The transaction is expected to close in the fourth quarter of fiscal 2026, subject to the satisfaction of customary closing conditions.
+
+Source: https://www.sec.gov/Archives/edgar/data/1039399/000103939926000037/ex-991.htm
+
+【Exhibit 99.1 — Press Release dated October 12, 2026】
+FormFactor and Teradyne Announce Strategic Collaboration to Accelerate Next-Generation Semiconductor Testing
+The collaboration brings together FormFactor's industry-leading expertise in probe technologies, interface solutions, test engineering, and device characterization with Teradyne's advanced automated test platforms to help customers address growing semiconductor complexity. Together, the companies will partner to advance semiconductor test architectures, optimize test infrastructure, and enhance production readiness for existing and emerging applications, including high-performance compute (HPC), advanced packaging, high-bandwidth memory (HBM), and silicon photonics.
+"The most demanding test challenges in advanced packaging, silicon photonics, and memory can't be solved by a single company," said Gregory Smith, President and Chief Executive Officer of Teradyne. "By investing in FormFactor and combining our leading-edge test platforms with FormFactor's probe and interface expertise, we're building a more complete, validated path to production for our shared customers, and reinforcing our commitment to an open, interoperable ecosystem."
+Under the terms of the agreement, Teradyne has agreed to make a $300 million strategic equity investment. The transaction is subject to customary closing conditions and regulatory approvals.

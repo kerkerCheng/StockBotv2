@@ -1,0 +1,40 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1039399/000103939926000033/form-20260627.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] FormFactor, Inc. Form 10-Q（quarter ended June 27, 2026）— revenues by market, segment gross margin, customer concentration, Systems / Triton, Farmers Branch, shares outstanding
+RETRIEVED: 2026-10-15（本機抓取 EDGAR 原文，去 HTML 後逐字截取；表格由去 HTML 的連續文字還原，數字逐一對過合計）
+NOTE: 供應商一手（自述）。另一份同一 10-Q 的摘錄（Triton、Keystone）是圖上的引用來源 library/raw/form_10_q_20260804.txt，本檔不取代它。
+
+Source: https://www.sec.gov/Archives/edgar/data/1039399/000103939926000033/form-20260627.htm
+
+【Cover】
+As of July 29, 2026, 78,120,725 shares of the registrant's common stock, par value $0.001 per share, were outstanding.
+
+【Note 2 — Concentration of Credit and Other Risks（欄位：Three Months Ended June 27, 2026 ／ June 28, 2025 ； Six Months Ended June 27, 2026 ／ June 28, 2025）】
+Each of the following customers accounted for 10% or more of our revenues for the periods indicated:
+SK hynix Inc. 24.3 % ／ 25.0 % ； 26.8 % ／ 24.2 %
+Intel Corporation * ／ 12.4 % ； * ／ 12.2 %
+Taiwan Semiconductor Manufacturing Company Ltd. 11.0 % ／ 10.4 % ； 10.3 % ／ *
+35.3 % ／ 47.8 % ； 37.1 % ／ 36.4 %
+* Less than 10% of revenues.
+
+【MD&A — Revenues by Segment and Market（Three Months Ended June 27, 2026 ／ % of Revenues ／ June 28, 2025 ／ % of Revenues ／ $ Change ／ % Change；dollars in thousands）】
+Foundry & Logic $ 121,839 ／ 47.2 % ／ $ 99,513 ／ 50.9 % ／ $ 22,326 ／ 22.4 %
+DRAM 84,999 ／ 32.9 ／ 57,057 ／ 29.1 ／ 27,942 ／ 49.0
+Flash 2,857 ／ 1.1 ／ 5,538 ／ 2.8 ／ (2,681) ／ (48.4)
+Systems 48,547 ／ 18.8 ／ 33,690 ／ 17.2 ／ 14,857 ／ 44.1
+Total revenues $ 258,242 ／ 100.0 % ／ $ 195,798 ／ 100.0 % ／ $ 62,444 ／ 31.9 %
+
+【MD&A — DRAM】
+DRAM — The increase in DRAM product revenues for the three and six months ended June 27, 2026, compared to the three and six months ended June 28, 2025, was primarily driven by increased demand for high-bandwidth memory ("HBM") designs utilized in generative artificial intelligence applications, with additional contributions from higher demand for other non-HBM DRAM designs. Revenue growth from HBM products accounted for approximately 75% and 69% of the year-over-year increase in DRAM product revenues for the three- and six-month periods, respectively.
+
+【MD&A — Systems（six months）】
+The increase in Systems market revenues for the six months ended June 27, 2026, compared to the six months ended June 28, 2025, was also primarily driven by sales of Triton, partially offset by lower revenue from legacy product offerings as manufacturing capacity and customer demand increasingly shifted toward the Triton platform.
+
+【Note — Segment information（Three Months Ended June 27, 2026 ／ June 28, 2025；Probe Cards ／ Systems ／ Corporate and Other ／ Total）】
+Revenues $ 209,695 ／ $ 48,547 ／ $ — ／ $ 258,242 ； $ 162,108 ／ $ 33,690 ／ $ — ／ $ 195,798
+Gross margin 54.4 % ／ 48.5 % ／ — ／ 50.7 % ； 38.3 % ／ 39.4 % ／ — ／ 37.3 %
+Geographical region — Taiwan $ 78,408 ／ $ 16,013 ／ $ 94,421 ； $ 46,814 ／ $ 6,065 ／ $ 52,879
+
+【MD&A — Factory Expansion】
+Factory Expansion — In June 2025, we purchased a manufacturing site in Farmers Branch, Texas. We expect to begin production at this site late in the fourth quarter of fiscal 2026, with a ramp to initial target production levels over the course of fiscal 2027.
