@@ -132,7 +132,7 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 | **2 canonical skill／prompt／本檔** | 本節；本檔「Engine C」命令；`docs/ARCHITECTURE.md` §8.1「取代與並存關係」；ROADMAP「人工觀測的取代鏈收多值」。不動任何 skill、prompt |
 | **3 最窄 rule** | daily argv 不變；不新增 step、allowlist、rule；寫入只在互動 CLI 與既有的 complete 入口 |
 | **4 contract test** | `tests/test_observation_relations.py`（一筆關掉兩條鏈、as-of 看得到關係之前、拒收八種不合法、判斷欄位要收據、投影只從生效列挑、冪等、刻意並存不算重複、`allow_parallel` 留紀錄、基期的祖先引用走關係、刻意並存的雙幣別不叫人寫更正、營收結構同一條規則、計數器分開寫並存、判斷欄位走同一道 gate、drop 收提案不換號重生、提案前先檢查）；變異 16／16 |
-| **5 端到端 smoke** | 遷移前本機備份＋還原驗證（20261014T072251Z）；`scripts/migrate_manual_relations_20261014.py` 先驗證後寫：ledger 401 列一列未改、取代關係 11 筆（mechanical 10 組）、判斷欄位 4 份提案鑄 [754]–[757]；closure-gate「同一期間有多筆生效觀測」14 → 4；manifest 與對帳在 `library/private/migrations/20261014_manual_relations/` |
+| **5 端到端 smoke** | 遷移前本機備份＋還原驗證（20261014T072251Z）；`scripts/migrate_manual_relations_20261014.py` 先驗證後寫：ledger 401 列一列未改、取代關係 11 筆（mechanical 10 組）、判斷欄位 4 份提案鑄 [754]–[757]；closure-gate「同一期間有多筆生效觀測」14 → 4（2026-10-15 使用者 go 四號 → 0）；manifest 與對帳在 `library/private/migrations/20261014_manual_relations/` |
 
 ### Sandbox impact review 結論（2026-10-14：個股頁 S3d 第二段——台股年報地區別、押的那一塊、三題③拆兩行）
 

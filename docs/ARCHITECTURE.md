@@ -851,6 +851,8 @@ AnalystView.brief（optional）→ APP 首屏 briefCard；六張卡收進「為�
   同一個條件，判定沒觸及）。反應：基準＝事件日之前最後一個收盤、第 n 日＝事件日當天起本檔第 n 個交易日（調整後收盤）、相對＝本檔
   − 組員平均（組員各取事件日前最後一個收盤與第 n 日那天以前最後一個收盤；過半才算）；還沒滿 n 日寫「還沒滿」。as-of 只看那天以前
   已經醒的。頁面合約 1.4：B5 讀 `@event_reaction`（至少一個窗算得出相對報酬的事件才算有值）。不排序、不上色。
+  已知限制（照記、不排程——指不出真實案例）：事件日只到「日」——盤後才公布的事，事件日當天的收盤其實還在事件前，1 日窗會低估
+  （5／20 日窗幾乎不受影響）；跨時區的新聞發布日同理。
   **三題③拆成兩行（同日）**：`in_numbers_series` 只放營收序列（月營收／EDGAR 季／20-F 年度），占比序列住 `in_numbers_mix_series`——以前占比
   序列有兩點就佔掉營收那一格，頁首「最近營收年增」與 B3 營收柱讀到的其實是占比（ATS.VI、IQE.L、SOI.PA）。敘事 placeholder 同步拆開：
   `{in_numbers_latest}` 只填營收年增，占比填 `{in_numbers_mix_latest}`／`{in_numbers_mix_as_of}`；寫入端補一條「答 yes／no 時引用的那個要有值」
@@ -1104,6 +1106,9 @@ TDnet 五種寫法，用 regex 驗會攔掉合法的法國 URD 引用（L15 記�
 gate 只有一道門），drop 會把提案收掉、不換號重生。入口：`python -m engine_c.observation_relations list｜add`。
 2026-10-14 遷移（備份 20261014T072251Z、ledger 401 列一列未改）：mechanical 10 組直接合併，判斷欄位 4 組鑄 [754]–[757]；
 閉環計數器「同一期間有多筆生效觀測」14 → 4；2026-10-15 使用者 go 四號、寫入 4 筆取代關係 → 0。
+已知限制（照記、不排程——指不出真實案例，撞到再修）：①關係沒有撤回入口——選錯了，要再寫一筆內容同被關掉那筆的新觀測去取代勝出者
+（判斷欄位照樣走 pq2），或從遷移前備份還原；②`allow_parallel` 目前只有測試在用——正式的刻意並存走 `observation_relations add --relation parallel`
+（mechanical）或關係提案（判斷欄位）。
 
 **圖 metadata 回填（`loader/source_dating.py`）四道補償控制：**
 ① 屬性白名單（只有 `published_at`／`retrieved_at`）；② `--basis` 必填並落地成節點屬性；
