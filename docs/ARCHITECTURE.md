@@ -1103,7 +1103,7 @@ TDnet 五種寫法，用 regex 驗會攔掉合法的法國 URD 引用（L15 記�
 判斷欄位的關係只建提案（`pr_*`，與觀測提案同一個目錄、同一個 pq2 type、同一個 `todo complete-observation`——Engine C 判讀寫入
 gate 只有一道門），drop 會把提案收掉、不換號重生。入口：`python -m engine_c.observation_relations list｜add`。
 2026-10-14 遷移（備份 20261014T072251Z、ledger 401 列一列未改）：mechanical 10 組直接合併，判斷欄位 4 組鑄 [754]–[757]；
-閉環計數器「同一期間有多筆生效觀測」14 → 4。
+閉環計數器「同一期間有多筆生效觀測」14 → 4；2026-10-15 使用者 go 四號、寫入 4 筆取代關係 → 0。
 
 **圖 metadata 回填（`loader/source_dating.py`）四道補償控制：**
 ① 屬性白名單（只有 `published_at`／`retrieved_at`）；② `--basis` 必填並落地成節點屬性；
