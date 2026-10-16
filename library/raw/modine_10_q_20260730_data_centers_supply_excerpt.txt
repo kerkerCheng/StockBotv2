@@ -1,0 +1,22 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/67347/000110465926088569/mod-20260630x10q.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Modine Manufacturing Company Form 10-Q（quarter ended June 30, 2026；FY2027 Q1），Item 2 MD&A
+Filed: 2026-07-30（accession 0001104659-26-088569）
+RETRIEVED: 2026-10-17（EDGAR 全文本機抓取、逐字核對）
+NOTE: 合併口徑；CDU 營收沒有單獨拆出（資料中心部門含冰水機、機房空調、CDU 等）。
+
+【MD&A — First quarter highlights】
+Net sales in the first quarter of fiscal 2027 increased $191.3 million, or 28 percent, from the first quarter of fiscal 2026, primarily due to higher sales in our Data Centers segment.
+
+【MD&A — First quarter highlights】
+Gross margin declined 340 basis points to 20.8 percent, primarily due to lower gross margin in the Data Centers segment, largely driven by higher material costs and operating inefficiencies associated with our rapid expansion of manufacturing capacity for data center cooling solutions and supplier capacity constraints.
+
+【MD&A — Data Centers segment】
+primarily due to higher sales volume in North America, driven by sales growth to hyperscale customers.
+
+【MD&A — Data Centers segment cost of sales】
+We also incurred higher expenses related to the rapid expansion of manufacturing capacity in the U.S. and our production schedules were temporarily disrupted during the first quarter of fiscal 2027 due to supplier capacity constraints for certain key components, which resulted in unfavorable absorption of manufacturing overhead, facility, and labor costs.
+
+【MD&A — Data Centers segment cost of sales】
+We have been and will continue to take actions to secure supply, including working with current partners and qualifying additional suppliers. These actions began yielding positive results over the course of the first quarter.
