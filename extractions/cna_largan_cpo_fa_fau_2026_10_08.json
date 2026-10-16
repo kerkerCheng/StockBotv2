@@ -1,0 +1,119 @@
+{
+  "claims": [
+    {
+      "confidence": 0.5,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：大立光法說或重大訊息寫出 FA／FAU 的客戶認證取消、FAU 量產延到 2028 年以後，或那座新廠改作他用。核查頻率：每季（法說）。觸發後 48 小時：e1 降信心或提撤回，重讀 FAU 層說明的供給側列舉，並回頭看上詮、波若威兩份敘事的競爭段。",
+      "id": "cna_largan_cpo_fa_fau_2026_10_08_cl1",
+      "source_ids": [
+        "cna_largan_cpo_fa_fau_2026_10_08_s1",
+        "cna_largan_cpo_fa_fau_2026_10_08_s2",
+        "cna_largan_cpo_fa_fau_2026_10_08_s3",
+        "cna_largan_cpo_fa_fau_2026_10_08_s4",
+        "cna_largan_cpo_fa_fau_2026_10_08_s5"
+      ],
+      "statement": "Largan Precision's chairman said at the 2026-10-08 earnings call (as reported by CNA) that its fiber array (FA) for co-packaged optics has passed qualification at one customer, with capacity to be built by the end of Q2 2027; the customer also wants Largan to build the whole fiber attach unit (FAU), a production line has been demonstrated to the customer, a newly completed site (its second largest) is dedicated to FAU, and FAU volume production is targeted for the second half of 2027. He said FA and FAU are what the market lacks most. Supplier statements relayed by a news agency: pre-production, single customer, customer unnamed; yield and margin are open.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "tech:fiber_attach_unit",
+      "id": "e1",
+      "relation": "develops",
+      "source_ids": [
+        "cna_largan_cpo_fa_fau_2026_10_08_s1",
+        "cna_largan_cpo_fa_fau_2026_10_08_s2",
+        "cna_largan_cpo_fa_fau_2026_10_08_s3",
+        "cna_largan_cpo_fa_fau_2026_10_08_s4"
+      ],
+      "src_id": "co:largan_precision"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "大立光",
+        "大立光電",
+        "大立光電股份有限公司",
+        "Largan Precision Co., Ltd.",
+        "Largan"
+      ],
+      "attributes": {
+        "ticker": "3008.TW"
+      },
+      "confidence": 0.9,
+      "id": "co:largan_precision",
+      "name": "Largan Precision",
+      "role": null,
+      "source_ids": [
+        "cna_largan_cpo_fa_fau_2026_10_08_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "FAU",
+        "fiber attach unit",
+        "fiber attach",
+        "CPO optical connectors",
+        "fiber assemblies"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:fiber_attach_unit",
+      "name": "Fiber Attach Unit",
+      "role": null,
+      "source_ids": [
+        "cna_largan_cpo_fa_fau_2026_10_08_s1",
+        "cna_largan_cpo_fa_fau_2026_10_08_s2"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "cna_largan_cpo_fa_fau_2026_10_08",
+    "evidence_tier": 2,
+    "origin_entity": "大立光電股份有限公司（董事長林恩平，2026-10-08 法人說明會）",
+    "permission_basis": "通訊社新聞稿；只保留研究必要的有限逐字節錄（董事長在法說的發言轉述，記者趙敏雅）。大立光法說沒有公開簡報或逐字稿，這是取得到最接近一手的版本（tier 2）。",
+    "published_at": "2026-10-08",
+    "publisher": "中央通訊社（CNA）",
+    "retrieved_at": "2026-10-15",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "中央社：大立光衝刺CPO 林恩平：FA通過認證FAU拚明年量產（2026-10-08 法說報導）",
+    "url": "https://www.cna.com.tw/news/afe/202610080326.aspx"
+  },
+  "sources": [
+    {
+      "id": "cna_largan_cpo_fa_fau_2026_10_08_s1",
+      "locator": "導言（大立光董事長林恩平，10/8 法說）",
+      "quote": "大立光董事長林恩平今天表示，光纖陣列（FA）已通過客戶認證，預計2027年第2季底建置產能，客戶也希望大立光直接做光纖陣列單元（FAU），「已跟客戶Demo產線」，有望於2027年下半年量產。"
+    },
+    {
+      "id": "cna_largan_cpo_fa_fau_2026_10_08_s2",
+      "locator": "第 4 段（FA 與 FAU 的做法與出貨目標）",
+      "quote": "林恩平透露，現在市場上最缺FA與FAU，公司目前規劃做FA，採購PMLA、稜鏡，透過耦合組裝成FAU，也爭取將FAU安裝至Carrier（載板）的製程，目標2027年中出貨產品涵蓋FAU加Carrier方案。"
+    },
+    {
+      "id": "cna_largan_cpo_fa_fau_2026_10_08_s3",
+      "locator": "第 5 段（FA 客戶認證）",
+      "quote": "林恩平表示，FA要量產，已通過1家客戶認證，預計明年第2季底建置產能；"
+    },
+    {
+      "id": "cna_largan_cpo_fa_fau_2026_10_08_s4",
+      "locator": "第 6 段（新廠區）",
+      "quote": "一座新落成廠區將全部用於FAU，「這相當於我們現有的廠區第二大」，這個月大立光會帶客戶去看，討論產能。"
+    },
+    {
+      "id": "cna_largan_cpo_fa_fau_2026_10_08_s5",
+      "locator": "第 7 段（良率與毛利）",
+      "quote": "林恩平不諱言，目前FA、FAU都有挑戰性，毛利率將取決於良率。"
+    }
+  ]
+}
