@@ -1661,6 +1661,52 @@
       "market_currency": "USD",
       "name_aliases": [],
       "research_ticker": "AMZN"
+    },
+    {
+      "company_id": "co:yunnan_germanium",
+      "research_ticker": "002428.SZ",
+      "market_currency": "CNY",
+      "display_name": "Yunnan Lincang Xinyuan Germanium Industry Co.,LTD",
+      "_display_name_source": "yfinance longName（2026-10-15）；深交所 002428（云南临沧鑫圆锗业股份有限公司，简称云南锗业）",
+      "_note": "InP 晶片（襯底）由控股子公司雲南鑫耀半導體材料有限公司生產；入圖包見 inp_substrate_yunnan_germanium_2026_10_15_action.json",
+      "name_aliases": [
+        "Yunnan Germanium",
+        "云南锗业",
+        "雲南鍺業",
+        "云南临沧鑫圆锗业",
+        "云南临沧鑫圆锗业股份有限公司",
+        "Yunnan Lincang Xinyuan Germanium"
+      ]
+    },
+    {
+      "company_id": "co:largan_precision",
+      "research_ticker": "3008.TW",
+      "market_currency": "TWD",
+      "display_name": "Largan Precision Co., Ltd.",
+      "_display_name_source": "yfinance longName（2026-10-15）；臺灣證券交易所 3008（大立光電股份有限公司）",
+      "_note": "非邊緣（市值 266.8 億美元、分析師 19 位，2026-10-15 alpha edge）；入圖包見 fau_largan_develops_2026_10_15_action.json",
+      "name_aliases": [
+        "Largan Precision",
+        "Largan",
+        "大立光",
+        "大立光電",
+        "大立光電股份有限公司"
+      ]
+    },
+    {
+      "company_id": "co:asmpt",
+      "research_ticker": "0522.HK",
+      "market_currency": "HKD",
+      "execution_currency": "HKD",
+      "execution_venue": "HKEX",
+      "display_name": "ASMPT Limited",
+      "_display_name_source": "自家 HKEX 2026 中期業績公告封面（ASMPT LIMITED，Stock Code: 0522）",
+      "_note": "打線層（tech:wire_bonding）第二家供應商的入圖包隨包 staged（2026-10-16）；系統口徑非邊緣（約 72.7 億美元、18 位分析師，`python -m alpha edge 0522.HK`）；K&S FY2025 10-K 把「ASM Pacific Technology」列為第一個主要設備競爭者。不放單詞「ASM」（ASM International 共用）",
+      "name_aliases": [
+        "ASMPT",
+        "ASM Pacific Technology",
+        "ASM Pacific"
+      ]
     }
   ]
 }

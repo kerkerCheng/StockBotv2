@@ -42,19 +42,20 @@ def test_registered_companies_written_differently_resolve_to_the_registry() -> N
     assert resolve_manual_name("LuxNet 華星光通 (TPEx: 4979)", registry)[0] == "co:luxnet"
     # 寫出的代號比名字具體：名字「Samsung」也對得到三星電子，代號只對得到三星電機
     assert resolve_manual_name("Samsung Electro-Mechanics (009150.KS)", registry)[0] == "co:samsung_electro_mechanics"
-    assert resolve_manual_name("ASMPT", registry) == (None, ())
+    # 名冊裡沒有、也沒寫代號 → 不猜（原本用 ASMPT，2026-10-17 [763] 隨包把它登記進名冊後換成 BESI）
+    assert resolve_manual_name("BESI", registry) == (None, ())
 
 
 def test_onboard_candidates_no_longer_counts_registered_manual_strings() -> None:
     store = leads.empty_store()
     lead_id, _ = leads.register(store, source="x:a", url="https://x.com/a/1", title="FAU suppliers")
     leads.triage(store, lead_id, go=True, tier=3, reason="r")
-    leads.annotate_refs(store, lead_id, refs={"onboard_candidate_names": ["FOCI 上詮 (3363.TW)", "ASMPT"]})
+    leads.annotate_refs(store, lead_id, refs={"onboard_candidate_names": ["FOCI 上詮 (3363.TW)", "BESI"]})
     names = [r["ticker"] for r in leads.onboard_candidates(store)]
-    assert names == ["ASMPT"]
+    assert names == ["BESI"]
     full = {r["ticker"]: r for r in leads.onboard_candidates(store, include_resolved=True)}
     assert full["FOCI 上詮 (3363.TW)"]["resolved_to"] == "co:foci"
-    assert full["ASMPT"]["suggested_tickers"] == []                  # 代號寫法待人工
+    assert full["BESI"]["suggested_tickers"] == []                  # 代號寫法待人工
 
 
 # --- 分層、標記、起草 -------------------------------------------------------------
