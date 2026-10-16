@@ -1,0 +1,43 @@
+Source URL: https://www.trendforce.com/presscenter/news/20261013-13267.html
+
+Excerpt:
+[EXCERPT — 有限逐字引文] TrendForce press release 2026-10-13「Integrated Optical-Electrical Testing Platforms Become Key to CPO Mass Production, Reshaping the Test Equipment Supply Chain」；另附 TrendForce 2026-07-20 繁中 insight「搶攻 CPO 量產：檢測技術最後關鍵一哩路」
+RETRIEVED: 2026-10-16（本機抓取全文、逐字核對）
+NOTE: 第三方（研究機構）的能力描述與分段列舉，不是客戶文件；三份都沒有客戶具名，晶圓級燒機除了 Aehr 沒有第二個名字。
+
+Source: https://www.trendforce.com/presscenter/news/20261013-13267.html
+
+【七段】
+TrendForce identifies seven major segments in the CPO testing supply chain: ATE, probing and test interfaces, optical and high-speed measurement instruments, test integration and automation, core optical coupling and alignment modules, third-party testing and analysis, and packaging and production testing.
+
+【ATE（Teradyne）】
+Teradyne acquired Quantifi Photonics in 2025 to strengthen its optical measurement capabilities.
+
+【ATE（Advantest）】
+Advantest is integrating optical instruments through its existing test platforms and software. In September 2026, the company announced a collaboration with VIAVI and SENKO to combine automated testing, optical measurement, and detachable optical interfaces.
+
+【對準與探測】
+GMT Global provides multi-axis optical coupling and alignment modules, while MPI offers probing equipment and optical alignment solutions.
+
+【介面與燒機】
+WinWay specializes in test interfaces, and Chroma has capabilities in automated testing and burn-in testing.
+
+【第三方實驗室】
+Third-party testing providers, including MSS, MA-tek, and iST, are helping customers accelerate product development through optical-electrical measurements, materials analysis, failure analysis, and reliability verification.
+
+【ficonTEC】
+RoboTechnik completed its full acquisition of Germany-based ficonTEC in 2025, gaining a foothold in the global optoelectronic packaging and test equipment supply chain.
+
+【瓶頸是測試速度】
+a complete test of a single photonic integrated circuit (PIC) can still take over 100 seconds. Consequently, the bottleneck in mass production is now shifting from alignment accuracy to testing speed.
+
+【時程】
+TrendForce expects 2027 to be a pivotal year for the convergence of CPO testing architectures and equipment investment strategies, while 2028 will serve as a critical period for validating readiness for large-scale mass production.
+
+Source: https://www.trendforce.com.tw/insights/cpo-testing-market-opportunities（2026-07-20）
+
+【Advantest×FormFactor】
+2025 年 4 月，Advantest 進一步與 FormFactor 合作推出 V93000-Triton 光子測試設備
+
+【致茂燒機是元件級】
+致茂為全球 SLT 設備龍頭，其光電二極體燒機及可靠度測試系統 Model 58604/58604-C/58606 系列針對 3D Sensing、LD、PD、modulator 等 PIC 元件的可靠度測試。
