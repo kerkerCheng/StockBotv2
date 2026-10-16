@@ -1,0 +1,113 @@
+{
+  "claims": [
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：雲南鍺業公告這份供貨合同終止、大幅縮減或客戶延遲提貨，或季報、年報顯示磷化銦晶片沒有按批交付。核查頻率：每季（季報與重大事項公告）。觸發後 48 小時：e1 的 claim 降信心或提撤回，重讀 InP 基板層（mat:inp_substrate）的供給側列舉與雲南鍺業敘事。",
+      "id": "yng_002428_ann_2026_044_inp_supply_contract_cl1",
+      "source_ids": [
+        "yng_002428_ann_2026_044_inp_supply_contract_s1",
+        "yng_002428_ann_2026_044_inp_supply_contract_s2",
+        "yng_002428_ann_2026_044_inp_supply_contract_s3"
+      ],
+      "statement": "Yunnan Germanium's exchange filing (SZSE announcement 2026-044, dated 2026-07-24) states that its controlled subsidiary Yunnan Xinyao Semiconductor Materials signed a supply agreement to sell indium phosphide wafers (substrates) to a customer whose identity is withheld under a confidentiality exemption, with an expected total of CNY 570.08-855.12 million including tax, delivered in batches from 2026-08-01 to 2027-12-31 (53.48%-80.23% of 2025 audited revenue). Supplier self-report: it shows a contracted commercial InP substrate business, not its share, capacity, 6-inch status or the customer's identity.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "mat:inp_substrate",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "yng_002428_ann_2026_044_inp_supply_contract_s1",
+        "yng_002428_ann_2026_044_inp_supply_contract_s2",
+        "yng_002428_ann_2026_044_inp_supply_contract_s4"
+      ],
+      "src_id": "co:yunnan_germanium"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "云南锗业",
+        "雲南鍺業",
+        "Yunnan Lincang Xinyuan Germanium Industry",
+        "云南临沧鑫圆锗业股份有限公司"
+      ],
+      "attributes": {
+        "ticker": "002428.SZ"
+      },
+      "confidence": 0.9,
+      "id": "co:yunnan_germanium",
+      "name": "Yunnan Germanium",
+      "role": null,
+      "source_ids": [
+        "yng_002428_ann_2026_044_inp_supply_contract_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "InP",
+        "indium phosphide",
+        "InP wafer",
+        "InP substrate",
+        "6-inch indium phosphide wafer substrate"
+      ],
+      "attributes": {
+        "concentration_score": 4,
+        "ramp_difficulty_intrinsic": 5
+      },
+      "confidence": 0.9,
+      "id": "mat:inp_substrate",
+      "name": "Indium Phosphide (InP) substrate",
+      "role": null,
+      "source_ids": [
+        "yng_002428_ann_2026_044_inp_supply_contract_s1",
+        "yng_002428_ann_2026_044_inp_supply_contract_s4"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "yng_002428_ann_2026_044_inp_supply_contract",
+    "evidence_tier": 1,
+    "origin_entity": "云南临沧鑫圆锗业股份有限公司",
+    "permission_basis": "上市公司依法公開的交易所公告；只保留研究必要的有限逐字節錄。published_at 取公告末署日期 2026-07-24（媒體報導為 7/23 深夜公布）。",
+    "published_at": "2026-07-24",
+    "publisher": "深圳证券交易所（巨潮资讯网）",
+    "retrieved_at": "2026-10-15",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "云南临沧鑫圆锗业股份有限公司 关于签订日常经营重大合同的公告（公告编号 2026-044）",
+    "url": "http://static.cninfo.com.cn/finalpage/2026-07-24/1225438868.PDF"
+  },
+  "sources": [
+    {
+      "id": "yng_002428_ann_2026_044_inp_supply_contract_s1",
+      "locator": "特别提示 1、合同类型及金额",
+      "quote": "云南临沧鑫圆锗业股份有限公司（下称“公司”）控股子公司云南鑫耀半导体材料有限公司（下称“云南鑫耀”）与客户签订了供货协议，约定向客户销售磷化铟晶片（衬底），合同预计总金额区间为57,008万元至85,512万元（含税）。"
+    },
+    {
+      "id": "yng_002428_ann_2026_044_inp_supply_contract_s2",
+      "locator": "一、合同签署概况",
+      "quote": "占公司2025年度经审计营业收入的比例为53.48%至80.23%。合同履行期限为2026年8月1日至2027年12月31日。"
+    },
+    {
+      "id": "yng_002428_ann_2026_044_inp_supply_contract_s3",
+      "locator": "二、交易对手方介绍",
+      "quote": "根据交易双方签署的保密协议，本次交易对方名称及部分合同条款信息属于商业秘密。"
+    },
+    {
+      "id": "yng_002428_ann_2026_044_inp_supply_contract_s4",
+      "locator": "三、合同主要内容 1",
+      "quote": "合同标的：磷化铟晶片（衬底）；"
+    }
+  ]
+}
