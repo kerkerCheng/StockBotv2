@@ -145,7 +145,7 @@ def test_the_brief_prints_the_llm_sentences_when_there_are_some(tmp_path) -> Non
     saved = {"leads": [{"text": "富世達：快接頭認證中", "lead_ids": ["lead_a"]}],
              "events": [{"text": "LG 拿到冷水機長約", "lead_ids": ["lead_r"]}]}
     todays = [_lead("lead_a", seen=NOW), _lead("lead_r", seen=NOW, source="web_radar:cooling")]
-    lines = leads_block(digest=saved, todays=todays, digest_problem=None)
+    lines = leads_block(digest=saved, todays=todays, since=NOW - timedelta(hours=digest.WINDOW_HOURS), digest_problem=None)
     assert lines[0] == "**① Lead 抓了什麼**（外面新進 2 則：X 帳號 1、外部雷達 1）"
     assert lines[1] == "- 富世達：快接頭認證中"
     # ② 有收據就列收據收下的每一則（2026-10-08 起），不用 LLM 的「市場大事」那幾句
@@ -160,7 +160,8 @@ def test_without_a_digest_the_brief_says_why_and_falls_back_to_program_content()
     from crons.daily_brief import events_block, leads_block
 
     todays = [_lead("lead_a", seen=NOW, status="triaged_go", title="穩懋 CW 雷射代工量產")]
-    lines = leads_block(digest=None, todays=todays, digest_problem="LLM 摘要今天沒產生（11c rate_limited）")
+    lines = leads_block(digest=None, todays=todays, since=NOW - timedelta(hours=digest.WINDOW_HOURS),
+                        digest_problem="LLM 摘要今天沒產生（11c rate_limited）")
     assert "11c rate_limited" in lines[1] and lines[2] == "- 穩懋 CW 雷射代工量產"
     receipt = {"summary": {"searches": 9, "new": 1, "new_market": 1},
                "accepted": [{"scope": "market", "title": "LG lands deal", "fact": "LG 簽冷水機長約"}]}
@@ -370,9 +371,23 @@ def test_our_own_research_topics_are_counted_but_never_summarised(tmp_path) -> N
     assert summary["internal_total"] == 1 and summary["leads_total"] == 3
     request = json.loads(out.read_text(encoding="utf-8"))["requests"][0]
     assert "lead_topic" not in {r["lead_id"] for r in request["leads"]}
-    lines = leads_block(digest=None, todays=digest.select_leads(store, now=NOW), digest_problem="沒產生")
-    assert "外面新進 3 則" in lines[0] and "另有我們自己登記的研究題 1 則，不摘要" in lines[0]
+    lines = leads_block(digest=None, todays=digest.select_leads(store, now=NOW), digest_problem="沒產生",
+                        since=NOW - timedelta(hours=digest.WINDOW_HOURS))
+    assert "外面新進 2 則" in lines[0] and "另有我們自己登記的研究題 1 則，不摘要" in lines[0]
     assert all("lead_topic" not in line for line in lines)
+
+
+def test_headline_splits_new_arrivals_from_backlog_triaged_this_round() -> None:
+    """2026-10-16：10-13 標題寫「外面新進 125 則」，其中 82 則是 10-10～10-12 積下來、那天才分類的（L12：一個數字裝兩種意思）。
+    窗內首見的才叫新進、來源家族只數它們；首見在窗前、這輪才分類的另印一個數；沒有首見時間的也算前者之外。"""
+    from crons.daily_brief import leads_block
+
+    store = _store()
+    store["leads"]["lead_no_seen"] = {**_lead("lead_no_seen", seen=NOW, status="triaged_go",
+                                              triage_at=NOW - timedelta(hours=1)), "first_seen": None}
+    lines = leads_block(digest=None, todays=digest.select_leads(store, now=NOW), digest_problem="沒產生",
+                        since=NOW - timedelta(hours=digest.WINDOW_HOURS))
+    assert lines[0] == "**① Lead 抓了什麼**（外面新進 2 則：外部雷達 1、X 帳號 1；另有前幾天進來、這輪才分類的 2 則）"
 
 
 def test_processing_line_counts_what_we_did_in_the_window() -> None:

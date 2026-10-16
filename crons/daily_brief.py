@@ -115,19 +115,25 @@ def processing_line(store: Mapping[str, Any], *, now: datetime, hours: int | Non
             f"／停放 {finished['parked']}）｜還沒分類 {pending}｜待深挖 {queued}")
 
 
-def leads_block(*, digest: Mapping[str, Any] | None, todays: Sequence[Mapping[str, Any]],
+def leads_block(*, digest: Mapping[str, Any] | None, todays: Sequence[Mapping[str, Any]], since: datetime,
                 digest_problem: str | None, processing: str | None = None) -> list[str]:
-    """① lead 抓了什麼。標題行永遠是程式數的（外面新進幾則、哪些來源；我們自己登記的研究題另計、不摘要）；
-    內容是 LLM 的 TL;DR，沒有就退回分流 go 的標題。"""
+    """① lead 抓了什麼。標題行永遠是程式數的（外面新進幾則、哪些來源；前幾天進來、這輪才分類的另計；
+    我們自己登記的研究題另計、不摘要）；內容是 LLM 的 TL;DR，沒有就退回分流 go 的標題。
+
+    `todays` 是 `select_leads` 的窗（窗內首見 ∪ 窗內剛分類）；`since` 是窗的起點。2026-10-16：10-13 標題寫「新進 125」，
+    其中 82 則是 10-10～10-12 積下來、那天才分類的——一個數字裝兩種意思（L12），所以首見在窗前的拆出來印。"""
     from collections import Counter
 
     from engine_b.digest import is_external
 
     external = [lead for lead in todays if is_external(lead)]
     internal = len(todays) - len(external)
-    families = Counter(_source_family(lead.get("source")) for lead in external)
-    head = f"**① Lead 抓了什麼**（外面新進 {len(external)} 則" + (
-        "：" + "、".join(f"{name} {n}" for name, n in families.most_common()) if external else "") + (
+    fresh = [lead for lead in external if (seen := _stamp(lead.get("first_seen"))) is not None and seen >= since]
+    backlog = len(external) - len(fresh)
+    families = Counter(_source_family(lead.get("source")) for lead in fresh)
+    head = f"**① Lead 抓了什麼**（外面新進 {len(fresh)} 則" + (
+        "：" + "、".join(f"{name} {n}" for name, n in families.most_common()) if fresh else "") + (
+        f"；另有前幾天進來、這輪才分類的 {backlog} 則" if backlog else "") + (
         f"；另有我們自己登記的研究題 {internal} 則，不摘要" if internal else "") + "）"
     lines = [head]
     if processing:
@@ -400,7 +406,7 @@ def compose_brief(*, now: datetime, summary: str, snapshot: Mapping[str, Any], r
         except Exception as exc:  # noqa: BLE001 — 這一行算不出來就說，不帶走整塊
             processing = f"- 處理：算不出來（{type(exc).__name__}）"
         return leads_block(digest=digest, todays=digest_mod.select_leads(store, now=now), digest_problem=digest_problem,
-                           processing=processing)
+                           since=now - timedelta(hours=digest_mod.WINDOW_HOURS), processing=processing)
 
     def decisions_part() -> list[str]:
         from engine_b import todo as todo_mod
