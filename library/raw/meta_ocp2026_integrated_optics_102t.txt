@@ -1,0 +1,33 @@
+Source URL: https://www.dropbox.com/scl/fi/z1n92er8ebbleihbqve1p/Integrated-Optics-at-Scale-for-AI-Infrastructure-From-51.2T-CPO-Validation-to-Meta-s-102.4T-Integrated-Optics-Switch.pdf?rlkey=jnci9jk0ifttl5ieetymsrajz&dl=0
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Meta, Integrated Optics at Scale: From 51.2T Validation to Future 102.4T Product（OCP Global Summit 2026, Special Focus: Photonics；Granthana Rangaswamy, Siamak Amiralizadeh, Xu Wang）
+
+Source: https://www.dropbox.com/scl/fi/z1n92er8ebbleihbqve1p/Integrated-Optics-at-Scale-for-AI-Infrastructure-From-51.2T-CPO-Validation-to-Meta-s-102.4T-Integrated-Optics-Switch.pdf?rlkey=jnci9jk0ifttl5ieetymsrajz&dl=0
+
+【Learnings — 51.2T validation】
+The 51.2T validation proved viability of integrated optics technology for high volume manufacturing
+
+【Next target】
+Next target: 102.4T CPO/NPO product
+
+【CPO vs NPO trade-offs（共同）】
+CPO and NPO both improve density and shorten the ASIC-to-optics channel, cutting power & cost vs. retimed pluggables
+
+【CPO vs NPO trade-offs（CPO 欄）】
+Higher optics supply chain risk
+
+【CPO vs NPO trade-offs（NPO 欄）】
+Modular interposer approach can foster a broader multi-vendor ecosystem
+
+【102.4T — laser modules】
+Field replaceable laser modules help manage the serviceability risk as the technology matures
+
+【102.4T — laser modules】
+OIF ELSFP compliance to enable open ecosystem and multi-sourcing
+
+【Learnings and Insights I】
+ELS module, root-caused to a laser drive SMT component, drove most CPO failures. A fix was implemented and verified by design change.
+
+【Common considerations】
+Reliability is implementation- and vendor-specific

@@ -1,0 +1,158 @@
+{
+  "claims": [
+    {
+      "confidence": 0.65,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "條件：Meta 後續發表寫出 LPO 退出量產或下一代改回 retimed pluggable。核查頻率：每次 OCP 高峰會與 OFC（每年兩次）。觸發後 48 小時：e1 降 confidence 或提撤回、重讀 LPO 節點（tech:lpo）的需求側。",
+      "id": "meta_ocp2026_lpo_hyperscale_cl1",
+      "source_ids": [
+        "meta_ocp2026_lpo_hyperscale_s1",
+        "meta_ocp2026_lpo_hyperscale_s2"
+      ],
+      "statement": "Meta (buyer) at OCP 2026: its evidence comes from 100G/lane LPO in large-scale production, and the lessons carry forward to next-gen linear (200G/lane LRO/LPO, NPO); in live production, linear runs about 2x fewer interruptions and about 2.6x fewer service-affecting failures than retimed. No LPO module vendor is named.",
+      "subject_id": "e1"
+    },
+    {
+      "confidence": 0.65,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：Meta 或另一家雲端業者的一手寫出 LPO 撤回、或擴到更多 hop（後者是加強）；或 200G/lane 以上的 linear 需要回到 retimer。核查頻率：每季（OCP、OFC、雲端業者技術部落格）。觸發後 48 小時：重讀光模組 DSP 層的反向路徑。",
+      "id": "meta_ocp2026_lpo_hyperscale_cl2",
+      "source_ids": [
+        "meta_ocp2026_lpo_hyperscale_s3",
+        "meta_ocp2026_lpo_hyperscale_s4",
+        "meta_ocp2026_lpo_hyperscale_s5",
+        "meta_ocp2026_lpo_hyperscale_s6"
+      ],
+      "statement": "Meta (buyer) at OCP 2026: 'the per-module retimer DSP is a repeated tax in power, heat, and cost across millions of links'; with LPO 'no DSP means one fewer class of failure' (the host must own equalization instead). Scope is narrow: 'LPO runs the DTSW-EDSW hop, All the rest are retimed.' — LPO displaces module DSPs on one hop of Meta's fabric in production; every other hop still uses retimed (DSP) optics.",
+      "subject_id": "e2"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:lpo",
+      "id": "e1",
+      "relation": "depends_on",
+      "source_ids": [
+        "meta_ocp2026_lpo_hyperscale_s1",
+        "meta_ocp2026_lpo_hyperscale_s2"
+      ],
+      "src_id": "co:meta"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "tech:optical_module_dsp",
+      "id": "e2",
+      "relation": "competes_with",
+      "source_ids": [
+        "meta_ocp2026_lpo_hyperscale_s3",
+        "meta_ocp2026_lpo_hyperscale_s4",
+        "meta_ocp2026_lpo_hyperscale_s5",
+        "meta_ocp2026_lpo_hyperscale_s6"
+      ],
+      "src_id": "tech:lpo"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "end_demand",
+      "aliases": [
+        "Meta"
+      ],
+      "attributes": {
+        "ticker": "META"
+      },
+      "confidence": 0.9,
+      "id": "co:meta",
+      "name": "Meta",
+      "role": "adjacent_silicon",
+      "source_ids": [
+        "meta_ocp2026_lpo_hyperscale_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "LPO",
+        "linear pluggable optics"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:lpo",
+      "name": "Linear Pluggable Optics (LPO)",
+      "role": null,
+      "source_ids": [
+        "meta_ocp2026_lpo_hyperscale_s1",
+        "meta_ocp2026_lpo_hyperscale_s3",
+        "meta_ocp2026_lpo_hyperscale_s6"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "optical module DSP",
+        "DSPs inside optical modules"
+      ],
+      "attributes": {},
+      "confidence": 0.8,
+      "id": "tech:optical_module_dsp",
+      "name": "Optical module DSP (data-center optical interconnect)",
+      "role": null,
+      "source_ids": [
+        "meta_ocp2026_lpo_hyperscale_s3",
+        "meta_ocp2026_lpo_hyperscale_s5"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "meta_ocp2026_lpo_hyperscale",
+    "evidence_tier": 1,
+    "origin_entity": "Meta Platforms, Inc.",
+    "permission_basis": "OCP Global Summit 2026 公開場次投影片（OCP 官方錄影頁連結的檔案）；只保留研究必要的有限逐字節錄。投影片無日期，published_at 留空（會期 2026-10-12～10-15）。",
+    "published_at": null,
+    "publisher": "Open Compute Project（OCP Global Summit 2026 recorded content；投影片由 OCP 錄影頁連結）",
+    "retrieved_at": "2026-10-16",
+    "source_type": "paper",
+    "storage_permission": "repo_excerpt",
+    "title": "Meta, Operating Linear Pluggable Optics at Hyperscale: From Link Management to Production Reliability（OCP Global Summit 2026；Amin Yekani, Qing Wang）",
+    "url": "https://www.dropbox.com/scl/fi/17o37klf66hft3uo1tzk2/Operating-Linear-Pluggable-Optics-at-Hyperscale-From-Link-Management-to-Production-Reliability.pdf?rlkey=xytan60aj10116rhl0zsv5ou3&dl=0"
+  },
+  "sources": [
+    {
+      "id": "meta_ocp2026_lpo_hyperscale_s1",
+      "locator": "Production evidence",
+      "quote": "This evidence is from 100G/lane LPO in large-scale production, but the lessons carry forward to next-gen linear: 200G/lane LRO/LPO, NPO, and beyond."
+    },
+    {
+      "id": "meta_ocp2026_lpo_hyperscale_s2",
+      "locator": "Failure Rate vs. Interruption Rate (Live Production)",
+      "quote": "Same link mode, live production: linear runs ~2× fewer interruptions and ~2.6× fewer service-affecting failures than"
+    },
+    {
+      "id": "meta_ocp2026_lpo_hyperscale_s3",
+      "locator": "LPO Benefits and Challenges",
+      "quote": "At AI scale, the per-module retimer DSP is a repeated tax in power, heat, and cost across millions of links."
+    },
+    {
+      "id": "meta_ocp2026_lpo_hyperscale_s4",
+      "locator": "LPO Benefits and Challenges",
+      "quote": "No DSP safety net in the module. The host must own equalization, lost triage capabilities."
+    },
+    {
+      "id": "meta_ocp2026_lpo_hyperscale_s5",
+      "locator": "Production reliability",
+      "quote": "At the module level the two optics are on par, so the gain is architectural: no DSP means one fewer class of failure."
+    },
+    {
+      "id": "meta_ocp2026_lpo_hyperscale_s6",
+      "locator": "Deployment scope",
+      "quote": "LPO runs the DTSW-EDSW hop, All the rest are retimed."
+    }
+  ]
+}

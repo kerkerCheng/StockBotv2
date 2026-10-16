@@ -1,0 +1,16 @@
+Source URL: https://www.dropbox.com/scl/fi/17o37klf66hft3uo1tzk2/Operating-Linear-Pluggable-Optics-at-Hyperscale-From-Link-Management-to-Production-Reliability.pdf?rlkey=xytan60aj10116rhl0zsv5ou3&dl=0
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Meta, Operating Linear Pluggable Optics at Hyperscale: From Link Management to Production Reliability（OCP Global Summit 2026；Amin Yekani, Qing Wang）
+
+Source: https://www.dropbox.com/scl/fi/17o37klf66hft3uo1tzk2/Operating-Linear-Pluggable-Optics-at-Hyperscale-From-Link-Management-to-Production-Reliability.pdf?rlkey=xytan60aj10116rhl0zsv5ou3&dl=0
+
+【Production evidence】
+This evidence is from 100G/lane LPO in large-scale production, but the lessons carry forward to next-gen linear: 200G/lane LRO/LPO, NPO, and beyond.
+
+【Failure Rate vs. Interruption Rate (Live Production)】
+Same link mode, live production: linear runs ~2× fewer interruptions and ~2.6× fewer service-affecting failures than
+At AI scale, the per-module retimer DSP is a repeated tax in power, heat, and cost across millions of links.
+No DSP safety net in the module. The host must own equalization, lost triage capabilities.
+At the module level the two optics are on par, so the gain is architectural: no DSP means one fewer class of failure.
+LPO runs the DTSW-EDSW hop, All the rest are retimed.

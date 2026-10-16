@@ -1,0 +1,224 @@
+{
+  "claims": [
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "條件：Meta 後續的 OCP 規格貢獻、論文或發表寫明 102.4T 世代只走 CPO 或只走 NPO（另一方被放棄），或 Meta 放棄整合光學、回到 retimed pluggable。核查頻率：每次 OCP 高峰會與 OFC（每年兩次）。觸發後 48 小時：e1／e2 降 confidence 或提撤回、重讀 NPO 與 CPO 兩層讀圖（tech:near_package_optics、tech:cpo）。",
+      "id": "meta_ocp2026_integrated_optics_102t_cl1",
+      "source_ids": [
+        "meta_ocp2026_integrated_optics_102t_s1",
+        "meta_ocp2026_integrated_optics_102t_s2",
+        "meta_ocp2026_integrated_optics_102t_s3",
+        "meta_ocp2026_integrated_optics_102t_s4",
+        "meta_ocp2026_integrated_optics_102t_s5"
+      ],
+      "statement": "Meta (buyer) at OCP 2026: its 51.2T CPO evaluation proved integrated optics viable for high-volume manufacturing, and its next target is a 102.4T CPO/NPO product. It weighs CPO against NPO: both improve density and cut power and cost versus retimed pluggables; CPO carries higher optics supply chain risk, while NPO's modular interposer can foster a broader multi-vendor ecosystem. A design target and evaluation, not a purchase commitment; no vendor is named.",
+      "subject_id": "e1"
+    },
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "條件：Meta 後續的規格貢獻或發表寫出 102.4T 改用內建光源（不用 ELSFP），或只認證單一 ELSFP 供應商。核查頻率：每次 OCP 高峰會與 OFC（每年兩次）。觸發後 48 小時：e3 降 confidence 或提撤回、重讀外部光源層（tech:external_laser_source）。",
+      "id": "meta_ocp2026_integrated_optics_102t_cl2",
+      "source_ids": [
+        "meta_ocp2026_integrated_optics_102t_s6",
+        "meta_ocp2026_integrated_optics_102t_s7",
+        "meta_ocp2026_integrated_optics_102t_s8",
+        "meta_ocp2026_integrated_optics_102t_s9"
+      ],
+      "statement": "Meta (buyer): in its 51.2T CPO evaluation the ELS module drove most CPO failures (root-caused to a laser-drive SMT component, fixed by design change); its next 102.4T design keeps field-replaceable ELSFP laser modules and requires OIF ELSFP compliance to enable an open ecosystem and multi-sourcing. Reliability is implementation- and vendor-specific. No ELS vendor is named.",
+      "subject_id": "e3"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "tech:near_package_optics",
+      "id": "e1",
+      "relation": "depends_on",
+      "source_ids": [
+        "meta_ocp2026_integrated_optics_102t_s2",
+        "meta_ocp2026_integrated_optics_102t_s3",
+        "meta_ocp2026_integrated_optics_102t_s5"
+      ],
+      "src_id": "co:meta"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "tech:cpo",
+      "id": "e2",
+      "relation": "depends_on",
+      "source_ids": [
+        "meta_ocp2026_integrated_optics_102t_s1",
+        "meta_ocp2026_integrated_optics_102t_s2",
+        "meta_ocp2026_integrated_optics_102t_s3"
+      ],
+      "src_id": "co:meta"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "tech:external_laser_source",
+      "id": "e3",
+      "relation": "depends_on",
+      "source_ids": [
+        "meta_ocp2026_integrated_optics_102t_s6",
+        "meta_ocp2026_integrated_optics_102t_s7",
+        "meta_ocp2026_integrated_optics_102t_s8"
+      ],
+      "src_id": "co:meta"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:cpo",
+      "id": "e4",
+      "relation": "competes_with",
+      "source_ids": [
+        "meta_ocp2026_integrated_optics_102t_s2",
+        "meta_ocp2026_integrated_optics_102t_s3",
+        "meta_ocp2026_integrated_optics_102t_s4",
+        "meta_ocp2026_integrated_optics_102t_s5"
+      ],
+      "src_id": "tech:near_package_optics"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "end_demand",
+      "aliases": [
+        "Meta"
+      ],
+      "attributes": {
+        "ticker": "META"
+      },
+      "confidence": 0.9,
+      "id": "co:meta",
+      "name": "Meta",
+      "role": "adjacent_silicon",
+      "source_ids": [
+        "meta_ocp2026_integrated_optics_102t_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "NPO",
+        "near-packaged optics"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 3
+      },
+      "confidence": 0.9,
+      "id": "tech:near_package_optics",
+      "name": "Near-Packaged Optics (NPO)",
+      "role": null,
+      "source_ids": [
+        "meta_ocp2026_integrated_optics_102t_s2",
+        "meta_ocp2026_integrated_optics_102t_s5"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "CPO",
+        "co-packaged optics"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 5
+      },
+      "confidence": 0.9,
+      "id": "tech:cpo",
+      "name": "Co-Packaged Optics",
+      "role": null,
+      "source_ids": [
+        "meta_ocp2026_integrated_optics_102t_s1",
+        "meta_ocp2026_integrated_optics_102t_s2"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "ELS"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 5
+      },
+      "confidence": 0.9,
+      "id": "tech:external_laser_source",
+      "name": "External Laser Source",
+      "role": null,
+      "source_ids": [
+        "meta_ocp2026_integrated_optics_102t_s6",
+        "meta_ocp2026_integrated_optics_102t_s7"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "meta_ocp2026_integrated_optics_102t",
+    "evidence_tier": 1,
+    "origin_entity": "Meta Platforms, Inc.",
+    "permission_basis": "OCP Global Summit 2026 公開場次投影片（OCP 官方錄影頁 https://www.opencompute.org/events/ocp-summit/2026-ocp-global-summit/recorded-content/ 連結的檔案）；只保留研究必要的有限逐字節錄。投影片無日期、錄影頁不列逐場日期，published_at 留空（會期 2026-10-12～10-15）。",
+    "published_at": null,
+    "publisher": "Open Compute Project（OCP Global Summit 2026 recorded content；投影片由 OCP 錄影頁連結）",
+    "retrieved_at": "2026-10-16",
+    "source_type": "paper",
+    "storage_permission": "repo_excerpt",
+    "title": "Meta, Integrated Optics at Scale: From 51.2T Validation to Future 102.4T Product（OCP Global Summit 2026, Special Focus: Photonics；Granthana Rangaswamy, Siamak Amiralizadeh, Xu Wang）",
+    "url": "https://www.dropbox.com/scl/fi/z1n92er8ebbleihbqve1p/Integrated-Optics-at-Scale-for-AI-Infrastructure-From-51.2T-CPO-Validation-to-Meta-s-102.4T-Integrated-Optics-Switch.pdf?rlkey=jnci9jk0ifttl5ieetymsrajz&dl=0"
+  },
+  "sources": [
+    {
+      "id": "meta_ocp2026_integrated_optics_102t_s1",
+      "locator": "Learnings — 51.2T validation",
+      "quote": "The 51.2T validation proved viability of integrated optics technology for high volume manufacturing"
+    },
+    {
+      "id": "meta_ocp2026_integrated_optics_102t_s2",
+      "locator": "Next target",
+      "quote": "Next target: 102.4T CPO/NPO product"
+    },
+    {
+      "id": "meta_ocp2026_integrated_optics_102t_s3",
+      "locator": "CPO vs NPO trade-offs（共同）",
+      "quote": "CPO and NPO both improve density and shorten the ASIC-to-optics channel, cutting power & cost vs. retimed pluggables"
+    },
+    {
+      "id": "meta_ocp2026_integrated_optics_102t_s4",
+      "locator": "CPO vs NPO trade-offs（CPO 欄）",
+      "quote": "Higher optics supply chain risk"
+    },
+    {
+      "id": "meta_ocp2026_integrated_optics_102t_s5",
+      "locator": "CPO vs NPO trade-offs（NPO 欄）",
+      "quote": "Modular interposer approach can foster a broader multi-vendor ecosystem"
+    },
+    {
+      "id": "meta_ocp2026_integrated_optics_102t_s6",
+      "locator": "102.4T — laser modules",
+      "quote": "Field replaceable laser modules help manage the serviceability risk as the technology matures"
+    },
+    {
+      "id": "meta_ocp2026_integrated_optics_102t_s7",
+      "locator": "102.4T — laser modules",
+      "quote": "OIF ELSFP compliance to enable open ecosystem and multi-sourcing"
+    },
+    {
+      "id": "meta_ocp2026_integrated_optics_102t_s8",
+      "locator": "Learnings and Insights I",
+      "quote": "ELS module, root-caused to a laser drive SMT component, drove most CPO failures. A fix was implemented and verified by design change."
+    },
+    {
+      "id": "meta_ocp2026_integrated_optics_102t_s9",
+      "locator": "Common considerations",
+      "quote": "Reliability is implementation- and vendor-specific"
+    }
+  ]
+}
