@@ -1,0 +1,99 @@
+{
+  "claims": [
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：Coherent（或另一家模組廠）的申報或法說寫出模組 DSP 是唯一或有限來源、或 DSP 缺貨限制出貨。核查頻率：每年 10-K、每季 10-Q。觸發後 48 小時：重讀光模組 DSP 層，改這條 claim 或提撤回。",
+      "id": "cohr_10_k_20260814_sources_of_supply_cl1",
+      "source_ids": [
+        "cohr_10_k_20260814_sources_of_supply_s1",
+        "cohr_10_k_20260814_sources_of_supply_s2",
+        "cohr_10_k_20260814_sources_of_supply_s3"
+      ],
+      "statement": "Coherent (optical-module maker, buyer of DSPs) FY2026 10-K: DSPs are among the third-party raw materials it buys, and such raw materials 'are generally available from several sources'; the sole-source or limited-source exception it names is the Industrial segment's exotic materials, crystals and optics — not DSPs.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:optical_module_dsp",
+      "id": "e1",
+      "relation": "depends_on",
+      "source_ids": [
+        "cohr_10_k_20260814_sources_of_supply_s1",
+        "cohr_10_k_20260814_sources_of_supply_s2"
+      ],
+      "src_id": "co:coherent"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "COHR",
+        "Coherent Corp"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": null,
+        "ticker": "COHR"
+      },
+      "confidence": 0.9,
+      "id": "co:coherent",
+      "name": "Coherent",
+      "role": "bottleneck_supplier",
+      "source_ids": [
+        "cohr_10_k_20260814_sources_of_supply_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "optical module DSP",
+        "DSPs inside optical modules"
+      ],
+      "attributes": {},
+      "confidence": 0.8,
+      "id": "tech:optical_module_dsp",
+      "name": "Optical module DSP (data-center optical interconnect)",
+      "role": null,
+      "source_ids": [
+        "cohr_10_k_20260814_sources_of_supply_s1"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "cohr_10_k_20260814_sources_of_supply",
+    "evidence_tier": 1,
+    "origin_entity": "Coherent",
+    "permission_basis": "Public SEC EDGAR filing（accession 0000820318-26-000020）；只保留研究必要的有限逐字節錄。",
+    "published_at": "2026-08-14",
+    "publisher": "SEC EDGAR",
+    "retrieved_at": "2026-10-16",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Coherent Corp. FY2026 Form 10-K — Item 1 Business, Sources of Supply（有限節錄）",
+    "url": "https://www.sec.gov/Archives/edgar/data/820318/000082031826000020/iivi-20260630.htm"
+  },
+  "sources": [
+    {
+      "id": "cohr_10_k_20260814_sources_of_supply_s1",
+      "locator": "Item 1 Business — Sources of Supply",
+      "quote": "In our production processes, we use certain substrates, along with numerous optical, electrical, and mechanical parts that are sourced from third-party suppliers. These include InP substrates, ICs, DSPs, mechanical housings, and optical components, and we commonly refer to them as raw materials."
+    },
+    {
+      "id": "cohr_10_k_20260814_sources_of_supply_s2",
+      "locator": "Item 1 Business — Sources of Supply",
+      "quote": "Raw materials or subcomponents required in the manufacturing process are generally available from several sources."
+    },
+    {
+      "id": "cohr_10_k_20260814_sources_of_supply_s3",
+      "locator": "Item 1 Business — Sources of Supply",
+      "quote": "However, in the Industrial segment, we currently purchase several key components and materials used in the manufacture of our products, including exotic materials, crystals, and optics, from sole-source or limited-source suppliers."
+    }
+  ]
+}

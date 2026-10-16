@@ -22,6 +22,17 @@
       ],
       "statement": "⚠ 本輪原目標是補 tech:dsp_1p6t（1.6T DSP）的供給側，**經逐字核對後判定 Marvell FY2026 10-K 不足以支持該邊**，故未建立。理由：全文 DSP 出現 9 次，明確者為 PAM DSPs、coherent／coherent-lite optical DSPs 與 AEC DSPs；`1.6T` 全文僅出現一次，且該句為「Our Ethernet physical-layer transceiver portfolio addresses all the critical speeds ranging from 10Mbps to 1.6Tbps」——講的是 Ethernet PHY 支援速率上限，不是 1.6T DSP 產品。依 L6 Gap 4（具體型號必須在 quote 內逐字出現），不得由「有 optical DSP」＋「有 1.6Tbps PHY」推論出「供應 1.6T DSP」。tech:dsp_1p6t 仍為 0 供應商，需另尋具名 1.6T DSP 的一手來源。",
       "subject_id": "e2"
+    },
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "條件：Marvell 的申報不再列 PAM DSP，或宣布出售／退出光互連 DSP。核查頻率：每年 10-K。觸發後 48 小時：重讀光模組 DSP 層。",
+      "id": "mrvl_10_k_fy2026_20260311_cl3",
+      "source_ids": [
+        "mrvl_10_k_fy2026_20260311_s1"
+      ],
+      "statement": "Marvell's FY2026 10-K lists 'PAM (pulse amplitude modulation), coherent and coherent-lite DSPs' among its interconnect products (supplier self-report in a filing; added 2026-10-16 after tech:optical_module_dsp was admitted on 2026-10-08). No customer, share or volume is given; it makes the optical-module DSP layer's supply side at least two named companies (with MaxLinear).",
+      "subject_id": "e4"
     }
   ],
   "edges": [
@@ -60,6 +71,17 @@
         "mrvl_10_k_fy2026_20260311_s2"
       ],
       "src_id": "co:marvell_technology"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:optical_module_dsp",
+      "id": "e4",
+      "relation": "supplies_to",
+      "source_ids": [
+        "mrvl_10_k_fy2026_20260311_s1"
+      ],
+      "src_id": "co:marvell_technology"
     }
   ],
   "nodes": [
@@ -73,7 +95,7 @@
       "confidence": 0.9,
       "id": "co:marvell_technology",
       "name": "Marvell Technology, Inc.",
-      "role": "adjacent_silicon",
+      "role": null,
       "source_ids": [
         "mrvl_10_k_fy2026_20260311_s1"
       ],
@@ -89,7 +111,7 @@
       "confidence": 0.9,
       "id": "tech:lpo",
       "name": "Linear Pluggable Optics (LPO)",
-      "role": "adjacent_silicon",
+      "role": null,
       "source_ids": [
         "mrvl_10_k_fy2026_20260311_s1",
         "mrvl_10_k_fy2026_20260311_s2"
@@ -105,7 +127,7 @@
       "confidence": 0.9,
       "id": "tech:cpo",
       "name": "Co-Packaged Optics (CPO)",
-      "role": "adjacent_silicon",
+      "role": null,
       "source_ids": [
         "mrvl_10_k_fy2026_20260311_s1"
       ],
@@ -128,6 +150,22 @@
         "mrvl_10_k_fy2026_20260311_s2"
       ],
       "type": "TechNode"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "optical module DSP",
+        "DSPs inside optical modules"
+      ],
+      "attributes": {},
+      "confidence": 0.8,
+      "id": "tech:optical_module_dsp",
+      "name": "Optical module DSP (data-center optical interconnect)",
+      "role": null,
+      "source_ids": [
+        "mrvl_10_k_fy2026_20260311_s1"
+      ],
+      "type": "TechNode"
     }
   ],
   "schema_version": "0.1",
@@ -141,6 +179,7 @@
     "retrieved_at": "2026-08-21",
     "source_type": "filing",
     "storage_permission": "repo_full",
+    "supersedes_extraction_sha256": "6d58f0bc26aba5e000a4b804c2347726bfb72e0010f6fc89157c1f2b778d8292",
     "title": "Marvell Technology FY2026 Form 10-K — Item 1 Business, Interconnects product portfolio",
     "url": "https://www.sec.gov/Archives/edgar/data/1835632/000183563226000011/mrvl-20260131.htm"
   },
