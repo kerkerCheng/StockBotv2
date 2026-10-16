@@ -1,0 +1,110 @@
+{
+  "claims": [
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "條件：ASMPT 後續業績公告或年報寫出打線機需求轉弱、主流業務回落，或把打線機的成長改寫成與 AI 無關（只有消費性、國產替代）；或客戶端一手（封測廠、IDM）寫出 AI 電源或 AI 基建的封裝不用打線。核查頻率：每季（ASMPT 季度業績與中期／年度報告）。觸發後 48 小時：e1 的 claim 降 confidence、重讀打線層（tech:wire_bonding）與 K&S 敘事「需求」那一格。",
+      "id": "asmpt_2026_interim_results_wire_bonding_cl1",
+      "source_ids": [
+        "asmpt_2026_interim_results_wire_bonding_s1",
+        "asmpt_2026_interim_results_wire_bonding_s2",
+        "asmpt_2026_interim_results_wire_bonding_s3",
+        "asmpt_2026_interim_results_wire_bonding_s4",
+        "asmpt_2026_interim_results_wire_bonding_s5"
+      ],
+      "statement": "ASMPT's own 2026 interim results announcement (HKEX, six months to 30 June 2026): its SEMI mainstream business sells wire bonding (WB) and die bonding (DB) tools; China revenue and bookings were especially strong, with WB/DB tool demand 'supported by ongoing AI infrastructure expansion and high OSAT utilisation', while IDM utilisation rose on power-management demand for AI data centres. Q2 SEMI growth in wire and die bonders was attributed to 'both AI and consumer related applications'; Q2 SEMI bookings rose 125.9% YoY on wire and die bonders, Photonics and TCB; China's revenue share rose from 38.1% to 42.2% mainly on wire and die bonders. Supplier self-report: no wire-bonder-only revenue, unit volume, lead time, allocation or named customer; the AI attribution is the supplier's own characterisation of its market.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:wire_bonding",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "asmpt_2026_interim_results_wire_bonding_s1",
+        "asmpt_2026_interim_results_wire_bonding_s2",
+        "asmpt_2026_interim_results_wire_bonding_s3"
+      ],
+      "src_id": "co:asmpt"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "equipment_epitaxy",
+      "aliases": [
+        "ASMPT Limited",
+        "ASM Pacific Technology"
+      ],
+      "attributes": {
+        "ticker": "0522.HK"
+      },
+      "confidence": 0.9,
+      "id": "co:asmpt",
+      "name": "ASMPT",
+      "role": null,
+      "source_ids": [
+        "asmpt_2026_interim_results_wire_bonding_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "equipment_epitaxy",
+      "aliases": [
+        "wire bonding"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:wire_bonding",
+      "name": "Wire bonding equipment (ball and wedge bonders)",
+      "role": null,
+      "source_ids": [
+        "asmpt_2026_interim_results_wire_bonding_s2"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "asmpt_2026_interim_results_wire_bonding",
+    "evidence_tier": 1,
+    "origin_entity": "ASMPT Limited",
+    "permission_basis": "上市公司依法公開的交易所公告（HKEX，Stock Code 0522）；只保留研究必要的有限逐字節錄（pdftotext 抽字、空白攤平）。published_at 取公告末署日期 2026-07-28（Hong Kong, 28 July 2026）。",
+    "published_at": "2026-07-28",
+    "publisher": "ASMPT Limited（HKEX 公告，Stock Code 0522）",
+    "retrieved_at": "2026-10-16",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "ASMPT Limited Announcement Of 2026 Unaudited Interim Results（六個月至 2026-06-30）節錄：SEMI 主流業務、打線與黏晶機需求",
+    "url": "https://www.asmpt.com/site/assets/files/85468/q2_2026_en_announcement.pdf"
+  },
+  "sources": [
+    {
+      "id": "asmpt_2026_interim_results_wire_bonding_s1",
+      "locator": "RESULTS SUMMARY（公司與集團定義）",
+      "quote": "ASMPT Limited and its subsidiaries (the “Group” or “ASMPT”) delivered revenue from Continuing operations of HK$8.90 billion (US$1.14 billion) for the six months ended 30 June 2026"
+    },
+    {
+      "id": "asmpt_2026_interim_results_wire_bonding_s2",
+      "locator": "MANAGEMENT DISCUSSION AND ANALYSIS — SEMI Mainstream",
+      "quote": "SEMI mainstream business experienced significant growth, supported by high utilisation at leading IDMs due to improving demand for power management requirements for AI data centres, and industrial applications. Notably, China’s revenue and bookings were especially strong, with wire bonding (“WB”) and die bonding (“DB”) tool demand supported by ongoing AI infrastructure expansion and high OSAT utilisation."
+    },
+    {
+      "id": "asmpt_2026_interim_results_wire_bonding_s3",
+      "locator": "MANAGEMENT DISCUSSION AND ANALYSIS — SEMI Q2 revenue",
+      "quote": "QoQ and YoY growth were driven by Photonics due to AI-related applications, and wire and die bonders due to both AI and consumer related applications."
+    },
+    {
+      "id": "asmpt_2026_interim_results_wire_bonding_s4",
+      "locator": "MANAGEMENT DISCUSSION AND ANALYSIS — SEMI Q2 bookings",
+      "quote": "SEMI Q2 bookings of HK$3.36 billion (US$428.1 million) were up 39.0% QoQ due to wire and die bonders and Photonics, and up 125.9% YoY due to wire and die bonders, Photonics and TCB."
+    },
+    {
+      "id": "asmpt_2026_interim_results_wire_bonding_s5",
+      "locator": "MANAGEMENT DISCUSSION AND ANALYSIS — 地區",
+      "quote": "By geography, share of revenue from China increased to from 38.1% in 1H 2025 to 42.2% YoY in 1H 2026 mainly driven by wire and die bonders"
+    }
+  ]
+}
