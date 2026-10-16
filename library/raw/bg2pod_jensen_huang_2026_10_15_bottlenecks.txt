@@ -1,0 +1,20 @@
+Source URL: https://www.youtube.com/watch?v=eS7qQ3WJSrw
+
+Excerpt:
+[EXCERPT — 有限逐字引文] BG2 Pod「Jensen Huang | Does AI Revenue Justify Capex, '27 AI Bottlenecks, Singularity, Open vs Closed & more」
+（Brad Gerstner、Clark Tang 訪問 NVIDIA 執行長黃仁勳；發布 2026-10-15 03:00 PT；章節「(47:07) 2027 AI Bottlenecks」之後的「(1:13:26) AI Supply and Demand Dynamics」段）
+Audio: https://d3ctxlq1ktw2nl.cloudfront.net/staging/2026-9-15/434203331-44100-2-dec3db8a7fb56.mp3（podcast RSS enclosure；本機剪 01:15:30–01:18:00 轉寫）
+Video: https://www.youtube.com/watch?v=eS7qQ3WJSrw
+TRANSCRIPTION: 機器轉寫，非官方逐字稿。主文是本機 faster-whisper（small.en）對官方 MP3 的轉寫；已逐句對照 YouTube 自動字幕（另一套獨立辨識），只取兩邊用字一致的句子，語助詞與重複字已由兩套辨識各自略去或保留。
+差異（照實列出）：①「really hard to make it the precision」（whisper）／「really hard to make at the precision」（YouTube）——引文避開這三個字；②「supply constraint」（whisper）／「supply constrained」（YouTube，矽光子那一句）——引文照 whisper 原字。
+
+[01:16:23] But nonetheless, as we continue to increase supply upstream and downstream, one of the critical areas is substrate.
+[01:16:34] Substrates are getting larger and they're more chips. And so it's working against them in two ways. Every single chip that's being shipped uses more of the material.
+[01:16:46] And so these organic materials are really hard to make it the precision that we need because as the packages get larger, the thermal coefficients and the way we stack things make it really hard to handle things like warpage and various manufacturing defects.
+[01:17:05] And so at the scale that we do, we have to be very precise and we need really great partners.
+[01:17:12] And so that's supply constraint. And those are just some examples.
+[01:17:15] Silicon photonics is supply constraint. So everything is supply constraint. And so we're going to keep working on it.
+[01:17:24] Every single week that goes by, we increase. But nonetheless, we keep increasing more supply and the order books keeps going up.
+[01:17:32] And so it's going to be hard to close that gap for a few years.
+
+YouTube 自動字幕同段（對照用，含語助詞）：「one of the critical areas is substrate. Substrates are getting larger and there more chips … so these these um organic materials are are are really hard to make at the precision that we need because the as the packages get larger. um uh the the the coefficient the thermal coefficients um and the way we stack things make it really hard to handle things like warpage and you know and various various manufacturing defects and and so at the scale that we do we have to be very precise and we need really great partners and … and so that's that's supply constraint and just that those are just some examples uh silicon photonics is is supply constrained and so so everything is supply constrained」

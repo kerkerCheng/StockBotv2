@@ -1,0 +1,180 @@
+{
+  "claims": [
+    {
+      "confidence": 0.65,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：NVIDIA 的申報、法說或執行長公開談話寫出 IC 載板（ABF／有機載板）供應已不再限制出貨，或改口受限的是別的環節；或主要載板廠（揖斐電、欣興、景碩、AT&S、三星電機）法說寫出大尺寸 AI 載板供過於求、稼動下滑。核查頻率：每季（NVIDIA 10-Q／法說、載板廠季報）。觸發後 48 小時：降這條邊的 confidence 或提撤回，重讀 IC 載板層與玻纖布層。",
+      "id": "bg2pod_jensen_huang_2026_10_15_bottlenecks_cl1",
+      "source_ids": [
+        "bg2pod_jensen_huang_2026_10_15_bottlenecks_s1",
+        "bg2pod_jensen_huang_2026_10_15_bottlenecks_s2",
+        "bg2pod_jensen_huang_2026_10_15_bottlenecks_s3",
+        "bg2pod_jensen_huang_2026_10_15_bottlenecks_s4",
+        "bg2pod_jensen_huang_2026_10_15_bottlenecks_s5"
+      ],
+      "statement": "NVIDIA's CEO (buyer side, BG2 Pod 2026-10-15): as NVIDIA increases supply, 'one of the critical areas is substrate'; the organic materials are 'really hard to make' at the precision NVIDIA needs because larger packages and stacking make warpage and manufacturing defects hard to handle, it needs 'really great partners', 'And so that's supply constraint.' No substrate supplier is named.",
+      "subject_id": "e1"
+    },
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：NVIDIA 的申報、法說或執行長公開談話寫出矽光子已不再限制供給，或主要矽光子代工（台積電、GlobalFoundries、Tower）寫出產能過剩。核查頻率：每季。觸發後 48 小時：降這條邊的 confidence 或提撤回，重讀矽光子與 CPO 層。",
+      "id": "bg2pod_jensen_huang_2026_10_15_bottlenecks_cl2",
+      "source_ids": [
+        "bg2pod_jensen_huang_2026_10_15_bottlenecks_s6",
+        "bg2pod_jensen_huang_2026_10_15_bottlenecks_s7",
+        "bg2pod_jensen_huang_2026_10_15_bottlenecks_s8"
+      ],
+      "statement": "NVIDIA's CEO (buyer side, BG2 Pod 2026-10-15): 'Silicon photonics is supply constraint' (YouTube captions: 'supply constrained'); NVIDIA keeps adding supply while 'the order books keeps going up', and 'it's going to be hard to close that gap for a few years.' No silicon-photonics supplier is named.",
+      "subject_id": "e2"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "mat:ic_package_substrate",
+      "id": "e1",
+      "relation": "constrained_by",
+      "source_ids": [
+        "bg2pod_jensen_huang_2026_10_15_bottlenecks_s1",
+        "bg2pod_jensen_huang_2026_10_15_bottlenecks_s2",
+        "bg2pod_jensen_huang_2026_10_15_bottlenecks_s3",
+        "bg2pod_jensen_huang_2026_10_15_bottlenecks_s4",
+        "bg2pod_jensen_huang_2026_10_15_bottlenecks_s5"
+      ],
+      "src_id": "co:nvidia"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "tech:silicon_photonics",
+      "id": "e2",
+      "relation": "constrained_by",
+      "source_ids": [
+        "bg2pod_jensen_huang_2026_10_15_bottlenecks_s6",
+        "bg2pod_jensen_huang_2026_10_15_bottlenecks_s7",
+        "bg2pod_jensen_huang_2026_10_15_bottlenecks_s8"
+      ],
+      "src_id": "co:nvidia"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "NVDA",
+        "NVIDIA Corporation",
+        "Nvidia"
+      ],
+      "attributes": {
+        "ticker": "NVDA"
+      },
+      "confidence": 0.95,
+      "id": "co:nvidia",
+      "name": "NVIDIA",
+      "role": "leader",
+      "source_ids": [
+        "bg2pod_jensen_huang_2026_10_15_bottlenecks_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "large body substrates",
+        "IC substrates",
+        "advanced IC substrates",
+        "high-end IC substrates",
+        "FCBGA",
+        "Flip Chip-Ball Grid Array"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "mat:ic_package_substrate",
+      "name": "IC Package Substrate",
+      "role": null,
+      "source_ids": [
+        "bg2pod_jensen_huang_2026_10_15_bottlenecks_s1",
+        "bg2pod_jensen_huang_2026_10_15_bottlenecks_s2",
+        "bg2pod_jensen_huang_2026_10_15_bottlenecks_s3"
+      ],
+      "type": "Material"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "SiPh"
+      ],
+      "attributes": {
+        "concentration_score": null,
+        "intrinsic_cycle_time_weeks": null,
+        "ramp_difficulty_intrinsic": 4
+      },
+      "confidence": 0.9,
+      "id": "tech:silicon_photonics",
+      "name": "Silicon Photonics",
+      "role": null,
+      "source_ids": [
+        "bg2pod_jensen_huang_2026_10_15_bottlenecks_s6"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "bg2pod_jensen_huang_2026_10_15_bottlenecks",
+    "evidence_tier": 1,
+    "origin_entity": "NVIDIA",
+    "permission_basis": "公開 podcast／YouTube 節目（發布 2026-10-15 03:00 PT，YouTube publishDate 與 RSS pubDate 一致）；只保留研究必要的有限逐字節錄。逐字為機器轉寫，兩套獨立辨識逐句對照，差異列在節錄開頭。",
+    "published_at": "2026-10-15",
+    "publisher": "BG2 Pod（Altimeter；YouTube 與 podcast RSS 同步發布）",
+    "retrieved_at": "2026-10-16",
+    "source_type": "transcript",
+    "storage_permission": "repo_excerpt",
+    "title": "BG2 Pod, Jensen Huang | Does AI Revenue Justify Capex, '27 AI Bottlenecks, Singularity, Open vs Closed & more（Brad Gerstner、Clark Tang 訪問 NVIDIA 執行長黃仁勳）",
+    "url": "https://www.youtube.com/watch?v=eS7qQ3WJSrw"
+  },
+  "sources": [
+    {
+      "id": "bg2pod_jensen_huang_2026_10_15_bottlenecks_s1",
+      "locator": "01:16:26",
+      "quote": "as we continue to increase supply upstream and downstream, one of the critical areas is substrate."
+    },
+    {
+      "id": "bg2pod_jensen_huang_2026_10_15_bottlenecks_s2",
+      "locator": "01:16:46",
+      "quote": "these organic materials are really hard to make"
+    },
+    {
+      "id": "bg2pod_jensen_huang_2026_10_15_bottlenecks_s3",
+      "locator": "01:16:50",
+      "quote": "the precision that we need because as the packages get larger, the thermal coefficients and the way we stack things make it really hard to handle things like warpage and various manufacturing defects."
+    },
+    {
+      "id": "bg2pod_jensen_huang_2026_10_15_bottlenecks_s4",
+      "locator": "01:17:05",
+      "quote": "at the scale that we do, we have to be very precise and we need really great partners."
+    },
+    {
+      "id": "bg2pod_jensen_huang_2026_10_15_bottlenecks_s5",
+      "locator": "01:17:12",
+      "quote": "And so that's supply constraint."
+    },
+    {
+      "id": "bg2pod_jensen_huang_2026_10_15_bottlenecks_s6",
+      "locator": "01:17:15",
+      "quote": "Silicon photonics is supply constraint."
+    },
+    {
+      "id": "bg2pod_jensen_huang_2026_10_15_bottlenecks_s7",
+      "locator": "01:17:24",
+      "quote": "we keep increasing more supply and the order books keeps going up."
+    },
+    {
+      "id": "bg2pod_jensen_huang_2026_10_15_bottlenecks_s8",
+      "locator": "01:17:32",
+      "quote": "it's going to be hard to close that gap for a few years."
+    }
+  ]
+}
