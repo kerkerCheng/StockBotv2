@@ -1,0 +1,128 @@
+{
+  "claims": [
+    {
+      "confidence": 0.5,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "條件：Modine 後續 10-K／10-Q 或說明會寫明 CDU 停售、退出或未進入量產，或客戶端一手文件顯示它的資料中心訂單不含 CDU（只有冰水機、乾式冷卻器、空調箱等設施端設備）。核查頻率：每季（10-Q 與財報說明會）。觸發後 48 小時：e1 降 confidence 或提撤回、重讀 CDU 層（tech:coolant_distribution_unit）。",
+      "id": "modine_10_k_fy2026_data_centers_cdu_cl1",
+      "source_ids": [
+        "modine_10_k_fy2026_data_centers_cdu_s1",
+        "modine_10_k_fy2026_data_centers_cdu_s2",
+        "modine_10_k_fy2026_data_centers_cdu_s3",
+        "modine_10_k_fy2026_data_centers_cdu_s4",
+        "modine_10_k_fy2026_data_centers_cdu_s5",
+        "modine_10_k_fy2026_data_centers_cdu_s6",
+        "modine_10_k_fy2026_data_centers_cdu_s7",
+        "modine_10_k_fy2026_data_centers_cdu_s8"
+      ],
+      "statement": "Modine's own FY2026 10-K (fiscal year ended March 31, 2026): its Data Centers business serves hyperscale, colocation, NeoCloud and edge data center customers, and its data center products include coolant distribution units (CDU) alongside chillers, dry coolers, precision air handling units, CRAC/CRAH units, fan walls, rear-door heat exchangers and immersion solutions. Data Centers was 35% of FY2026 net sales (25% in FY2025); FY2026 net sales grew 23% to $3.2 billion, driven by hyperscale and colocation data center customers; one unnamed global technology customer was about 11% of sales. Supplier self-report: the 10-K gives no CDU-specific revenue, unit volume, named customer or qualification, and does not split CDUs from facility-side heat rejection and air handling.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.6,
+      "dst_id": "tech:coolant_distribution_unit",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "modine_10_k_fy2026_data_centers_cdu_s1",
+        "modine_10_k_fy2026_data_centers_cdu_s3",
+        "modine_10_k_fy2026_data_centers_cdu_s4"
+      ],
+      "src_id": "co:modine"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "Modine Manufacturing Company"
+      ],
+      "attributes": {
+        "ticker": "MOD"
+      },
+      "confidence": 0.9,
+      "id": "co:modine",
+      "name": "Modine",
+      "role": null,
+      "source_ids": [
+        "modine_10_k_fy2026_data_centers_cdu_s1",
+        "modine_10_k_fy2026_data_centers_cdu_s3"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "CDU"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:coolant_distribution_unit",
+      "name": "Coolant Distribution Unit (CDU)",
+      "role": null,
+      "source_ids": [
+        "modine_10_k_fy2026_data_centers_cdu_s4"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "modine_10_k_fy2026_data_centers_cdu",
+    "evidence_tier": 1,
+    "origin_entity": "Modine Manufacturing Company",
+    "permission_basis": "SEC EDGAR 公開申報（美國法定公開文件）；只保留研究必要的有限逐字節錄（HTML 轉文字，空白攤平）。",
+    "published_at": "2026-05-27",
+    "publisher": "Modine Manufacturing Company（SEC EDGAR 10-K，accession 0001104659-26-066795）",
+    "retrieved_at": "2026-10-16",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Modine Manufacturing Company Form 10-K（fiscal year ended March 31, 2026）Item 1 Business 與 Item 7 MD&A 節錄：資料中心散熱與 CDU",
+    "url": "https://www.sec.gov/Archives/edgar/data/67347/000110465926066795/mod-20260331x10k.htm"
+  },
+  "sources": [
+    {
+      "id": "modine_10_k_fy2026_data_centers_cdu_s1",
+      "locator": "Item 1 Business — Terms and Year References（「we」＝Modine）",
+      "quote": "When we use the terms “Modine,” “we,” “us,” the “Company,” or “our” in this report, unless the context otherwise requires, we are referring to Modine Manufacturing Company."
+    },
+    {
+      "id": "modine_10_k_fy2026_data_centers_cdu_s2",
+      "locator": "Item 1 Business — Climate Solutions Segment",
+      "quote": "The Climate Solutions segment provides cooling solutions for data centers that help save water and energy through intelligent controls."
+    },
+    {
+      "id": "modine_10_k_fy2026_data_centers_cdu_s3",
+      "locator": "Item 1 Business — Data Centers（客戶型態）",
+      "quote": "The Data Centers business provides innovative thermal management solutions for data center customers in North America, Europe, the Middle East and Africa (“EMEA”), and Asia Pacific. This business serves data center management customers, including Hyperscale, Colocation, NeoCloud and Edge customers."
+    },
+    {
+      "id": "modine_10_k_fy2026_data_centers_cdu_s4",
+      "locator": "Item 1 Business — Data Centers（產品，含 CDU）",
+      "quote": "Data center products include chillers, dry coolers, precision air handling units, computer room air conditioning (“CRAC”), computer room air handler (“CRAH”) units, fan walls, rear-door heat exchangers, coolant distribution units (“CDU”) and immersion solutions."
+    },
+    {
+      "id": "modine_10_k_fy2026_data_centers_cdu_s5",
+      "locator": "Item 1 Business — Products and Product Groups（占營收）",
+      "quote": "The following is a summary of our primary product groups, categorized as a percentage of our net sales: Fiscal 2026 Fiscal 2025 Data Centers 35 % 25 %"
+    },
+    {
+      "id": "modine_10_k_fy2026_data_centers_cdu_s6",
+      "locator": "Item 1 Business — Customer Dependence（客戶集中）",
+      "quote": "Our ten largest customers, some of which are conglomerates or otherwise affiliated with one another, accounted for 49 percent of our consolidated net sales in fiscal 2026. In fiscal 2026, one global technology customer in our Climate Solutions segment accounted for approximately 11 percent of our sales."
+    },
+    {
+      "id": "modine_10_k_fy2026_data_centers_cdu_s7",
+      "locator": "Item 7 MD&A — Overview（營收成長來源）",
+      "quote": "During fiscal 2026, our consolidated net sales were $3.2 billion, a 23 percent increase from $2.6 billion in fiscal 2025, primarily driven by higher sales in our Climate Solutions segment. The higher Climate Solutions segment sales included significant sales growth to hyperscale and colocation data center customers and $119 million of incremental sales from businesses we acquired during fiscal 2026."
+    },
+    {
+      "id": "modine_10_k_fy2026_data_centers_cdu_s8",
+      "locator": "Item 1 Business — Business Strategy and Results（擴產）",
+      "quote": "Following our 80/20 discipline during fiscal 2026, we significantly expanded our Data Centers business and production capacity and are continuing to grow this business to meet increasing customer demand."
+    }
+  ]
+}

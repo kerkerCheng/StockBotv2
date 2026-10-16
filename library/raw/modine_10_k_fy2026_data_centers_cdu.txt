@@ -1,0 +1,30 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/67347/000110465926066795/mod-20260331x10k.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Modine Manufacturing Company Form 10-K（fiscal year ended March 31, 2026）Item 1 Business 與 Item 7 MD&A 節錄：資料中心散熱與 CDU
+
+Source: https://www.sec.gov/Archives/edgar/data/67347/000110465926066795/mod-20260331x10k.htm
+
+【Item 1 Business — Terms and Year References（「we」＝Modine）】
+When we use the terms “Modine,” “we,” “us,” the “Company,” or “our” in this report, unless the context otherwise requires, we are referring to Modine Manufacturing Company.
+
+【Item 1 Business — Climate Solutions Segment】
+The Climate Solutions segment provides cooling solutions for data centers that help save water and energy through intelligent controls.
+
+【Item 1 Business — Data Centers（客戶型態）】
+The Data Centers business provides innovative thermal management solutions for data center customers in North America, Europe, the Middle East and Africa (“EMEA”), and Asia Pacific. This business serves data center management customers, including Hyperscale, Colocation, NeoCloud and Edge customers.
+
+【Item 1 Business — Data Centers（產品，含 CDU）】
+Data center products include chillers, dry coolers, precision air handling units, computer room air conditioning (“CRAC”), computer room air handler (“CRAH”) units, fan walls, rear-door heat exchangers, coolant distribution units (“CDU”) and immersion solutions.
+
+【Item 1 Business — Products and Product Groups（占營收）】
+The following is a summary of our primary product groups, categorized as a percentage of our net sales: Fiscal 2026 Fiscal 2025 Data Centers 35 % 25 %
+
+【Item 1 Business — Customer Dependence（客戶集中）】
+Our ten largest customers, some of which are conglomerates or otherwise affiliated with one another, accounted for 49 percent of our consolidated net sales in fiscal 2026. In fiscal 2026, one global technology customer in our Climate Solutions segment accounted for approximately 11 percent of our sales.
+
+【Item 7 MD&A — Overview（營收成長來源）】
+During fiscal 2026, our consolidated net sales were $3.2 billion, a 23 percent increase from $2.6 billion in fiscal 2025, primarily driven by higher sales in our Climate Solutions segment. The higher Climate Solutions segment sales included significant sales growth to hyperscale and colocation data center customers and $119 million of incremental sales from businesses we acquired during fiscal 2026.
+
+【Item 1 Business — Business Strategy and Results（擴產）】
+Following our 80/20 discipline during fiscal 2026, we significantly expanded our Data Centers business and production capacity and are continuing to grow this business to meet increasing customer demand.
