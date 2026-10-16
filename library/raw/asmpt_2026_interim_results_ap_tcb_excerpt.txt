@@ -1,0 +1,21 @@
+SOURCE: ASMPT Limited（HKEX 0522）Announcement Of 2026 Unaudited Interim Results For The Six Months Ended 30 June 2026——集團摘要與先進封裝（TCB、光子）有限節錄
+URL: https://www.asmpt.com/site/assets/files/85468/q2_2026_en_announcement.pdf
+PUBLISHED: 2026-07-28（公告末署日期）
+RETRIEVED: 2026-10-17
+STORAGE: repo_excerpt（法定公告有限節錄；pypdf 抽字，空白攤平，逐字截取）
+NOTE: **供應商一手（自述）**；集團合併、持續經營業務口徑。同一份公告的打線段見 asmpt_2026_interim_results_wire_bonding_excerpt.txt。
+
+【Key Highlights】
+AI continued to fuel strong revenue and bookings
+
+【Group Results Summary（1H 2026，持續經營業務，集團合併）】
+Revenue 4,935.8 (US$630.0 million) +24.4% +52.1% 8,902.6 (US$1,138.0 million) +18.9% +42.5%
+
+【MD&A — Advanced Packaging】
+The AP business achieved record half-year revenue of US$339.0 million in 1H 2026, representing a 17% YoY increase and contributing to 30% of Group revenue. TCB, SMT high precision and Photonics solutions were the largest contributors within the AP portfolio.
+
+【MD&A — TCB】
+In July 2026, the Group received new bulk orders for more than 50 of its C2S TCB tools from OSAT customers.
+
+【MD&A — AP portfolio】
+AP solutions include Thermo Compression Bonding (“TCB”) and Hybrid Bonding for system-level integration, Photonics for high-speed data movement, high- precision Flip Chip and Mass Reflow for cost-efficient scaling, and advanced SMT placement tools for AI server boards.
