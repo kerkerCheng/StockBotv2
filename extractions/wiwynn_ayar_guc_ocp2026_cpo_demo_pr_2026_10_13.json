@@ -1,0 +1,191 @@
+{
+  "claims": [
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "speculative",
+      "disproof_condition": "條件：Ayar Labs 或其客戶的一手文件寫出 TeraPHY 不是用在 scale-up（只做 scale-out 或別的介面），或 SuperNova 改用非 ELSFP 的封裝形式。核查頻率：依 SuperNova 插槽讀圖到期（2026-12-31）重讀；Ayar 新聞稿由語意 watch 標旗。觸發後 48 小時：改這條分類邊或提撤回，重讀 SuperNova 插槽。",
+      "id": "wiwynn_ayar_guc_ocp2026_cpo_demo_pr_2026_10_13_cl1",
+      "source_ids": [
+        "wiwynn_ayar_guc_ocp2026_cpo_demo_pr_2026_10_13_s2",
+        "wiwynn_ayar_guc_ocp2026_cpo_demo_pr_2026_10_13_s3",
+        "wiwynn_ayar_guc_ocp2026_cpo_demo_pr_2026_10_13_s4",
+        "wiwynn_ayar_guc_ocp2026_cpo_demo_pr_2026_10_13_s5",
+        "wiwynn_ayar_guc_ocp2026_cpo_demo_pr_2026_10_13_s6"
+      ],
+      "statement": "Joint release (Wiwynn, Ayar Labs, GUC; 2026-10-13): Wiwynn's compute system integrates GUC's MCPs with Ayar Labs' TeraPHY optical engines 'paired with ELSFP-based high-power SuperNova light sources'; it is a live demonstration ('system-level functional proof'), not a production order — no customer is named, and the companies say they will keep 'driving CPO from validation toward high-volume deployment.'",
+      "subject_id": "e3"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "prod:teraphy_chiplet",
+      "id": "e1",
+      "relation": "develops",
+      "source_ids": [
+        "wiwynn_ayar_guc_ocp2026_cpo_demo_pr_2026_10_13_s2",
+        "wiwynn_ayar_guc_ocp2026_cpo_demo_pr_2026_10_13_s3"
+      ],
+      "src_id": "co:ayar_labs"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "tech:scale_up_cpo",
+      "id": "e2",
+      "relation": "is_variant_of",
+      "source_ids": [
+        "wiwynn_ayar_guc_ocp2026_cpo_demo_pr_2026_10_13_s1",
+        "wiwynn_ayar_guc_ocp2026_cpo_demo_pr_2026_10_13_s3",
+        "wiwynn_ayar_guc_ocp2026_cpo_demo_pr_2026_10_13_s5"
+      ],
+      "src_id": "prod:teraphy_chiplet"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:external_laser_source",
+      "id": "e3",
+      "relation": "is_variant_of",
+      "source_ids": [
+        "wiwynn_ayar_guc_ocp2026_cpo_demo_pr_2026_10_13_s4"
+      ],
+      "src_id": "prod:supernova"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [],
+      "attributes": {
+        "ticker": null
+      },
+      "confidence": 0.9,
+      "id": "co:ayar_labs",
+      "name": "Ayar Labs",
+      "role": "disruptor",
+      "source_ids": [
+        "wiwynn_ayar_guc_ocp2026_cpo_demo_pr_2026_10_13_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "TeraPHY"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "prod:teraphy_chiplet",
+      "name": "TeraPHY optical I/O chiplet",
+      "role": null,
+      "source_ids": [
+        "wiwynn_ayar_guc_ocp2026_cpo_demo_pr_2026_10_13_s2",
+        "wiwynn_ayar_guc_ocp2026_cpo_demo_pr_2026_10_13_s3"
+      ],
+      "type": "Product"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "SuperNova"
+      ],
+      "attributes": {},
+      "confidence": 0.55,
+      "id": "prod:supernova",
+      "name": "Ayar Labs SuperNova light source module",
+      "role": null,
+      "source_ids": [
+        "wiwynn_ayar_guc_ocp2026_cpo_demo_pr_2026_10_13_s2",
+        "wiwynn_ayar_guc_ocp2026_cpo_demo_pr_2026_10_13_s4"
+      ],
+      "type": "Product"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 5
+      },
+      "confidence": 0.9,
+      "id": "tech:scale_up_cpo",
+      "name": "Scale-up CPO",
+      "role": null,
+      "source_ids": [
+        "wiwynn_ayar_guc_ocp2026_cpo_demo_pr_2026_10_13_s1"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "ELS",
+        "pluggable laser source",
+        "external light source engine",
+        "external laser sources",
+        "light engines",
+        "External Laser Small Form Factor Pluggable",
+        "ELSFP",
+        "external laser module"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 5
+      },
+      "confidence": 0.9,
+      "id": "tech:external_laser_source",
+      "name": "External Laser Source",
+      "role": null,
+      "source_ids": [
+        "wiwynn_ayar_guc_ocp2026_cpo_demo_pr_2026_10_13_s4"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "wiwynn_ayar_guc_ocp2026_cpo_demo_pr_2026_10_13",
+    "evidence_tier": 1,
+    "origin_entity": "Wiwynn / Ayar Labs / Global Unichip Corp.（聯合新聞稿）",
+    "permission_basis": "公開新聞稿（PR Newswire）；只保留研究必要的有限逐字節錄。",
+    "published_at": "2026-10-13",
+    "publisher": "PR Newswire",
+    "retrieved_at": "2026-10-16",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "Wiwynn／Ayar Labs／GUC 聯合新聞稿 2026-10-13：OCP Global Summit 2026 實機展示整合光學運算系統（TeraPHY 光引擎＋SuperNova 光源）",
+    "url": "https://www.prnewswire.com/news-releases/wiwynn-ayar-labs-and-guc-advance-co-packaged-optics-with-live-demonstration-of-integrated-optical-compute-system-at-ocp-global-summit-2026-302907032.html"
+  },
+  "sources": [
+    {
+      "id": "wiwynn_ayar_guc_ocp2026_cpo_demo_pr_2026_10_13_s1",
+      "locator": "導言（公司介紹）",
+      "quote": "Ayar Labs, the leader in co-packaged optics (CPO) solutions for AI scale-up"
+    },
+    {
+      "id": "wiwynn_ayar_guc_ocp2026_cpo_demo_pr_2026_10_13_s2",
+      "locator": "導言",
+      "quote": "Ayar Labs' TeraPHY™ optical engine paired with SuperNova™ light source"
+    },
+    {
+      "id": "wiwynn_ayar_guc_ocp2026_cpo_demo_pr_2026_10_13_s3",
+      "locator": "第二段",
+      "quote": "The system integrates GUC's multi-chip packages (MCPs) with TeraPHY™ optical engines (OEs), powered by the Ayar Labs SuperNova™ light source."
+    },
+    {
+      "id": "wiwynn_ayar_guc_ocp2026_cpo_demo_pr_2026_10_13_s4",
+      "locator": "Live Demonstration Highlights：Silicon-to-System Optical Integration",
+      "quote": "Ayar Labs' TeraPHY OEs paired with ELSFP-based high-power SuperNova light sources"
+    },
+    {
+      "id": "wiwynn_ayar_guc_ocp2026_cpo_demo_pr_2026_10_13_s5",
+      "locator": "Looking Ahead",
+      "quote": "This demonstration shows CPO has progressed from architectural validation to system-level functional proof, laying a solid foundation for hyperscale adoption."
+    },
+    {
+      "id": "wiwynn_ayar_guc_ocp2026_cpo_demo_pr_2026_10_13_s6",
+      "locator": "Looking Ahead",
+      "quote": "The three companies will continue deepening their collaboration, driving CPO from validation toward high-volume deployment."
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+Source URL: https://www.prnewswire.com/news-releases/wiwynn-ayar-labs-and-guc-advance-co-packaged-optics-with-live-demonstration-of-integrated-optical-compute-system-at-ocp-global-summit-2026-302907032.html
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Wiwynn, Ayar Labs, and GUC Advance Co-Packaged Optics with Live Demonstration of Integrated Optical Compute System at OCP Global Summit 2026
+（PR Newswire，SAN JOSE, Calif., Oct. 13, 2026；三家聯合新聞稿）
+Source: https://www.prnewswire.com/news-releases/wiwynn-ayar-labs-and-guc-advance-co-packaged-optics-with-live-demonstration-of-integrated-optical-compute-system-at-ocp-global-summit-2026-302907032.html
+RETRIEVED: 2026-10-16（本機抓取全文、逐字核對）
+NOTE: 實機展示，不是量產或採購；全文沒有任何客戶具名。
+
+Wiwynn, an innovative cloud IT infrastructure provider for data centers, Ayar Labs, the leader in co-packaged optics (CPO) solutions for AI scale-up, and Global Unichip Corp. (GUC), the Advanced ASIC Leader, today announced the latest milestone in their strategic collaboration.
+For the first time, they are presenting a live demonstration at OCP Global Summit 2026, showcasing Wiwynn's compute system integrating GUC's ASIC with Ayar Labs' TeraPHY™ optical engine paired with SuperNova™ light source, streaming real-time health telemetry.
+The system integrates GUC's multi-chip packages (MCPs) with TeraPHY™ optical engines (OEs), powered by the Ayar Labs SuperNova™ light source.
+Silicon-to-System Optical Integration: Wiwynn's system architecture integrates GUC's MCP with Ayar Labs' TeraPHY OEs paired with ELSFP-based high-power SuperNova light sources, into an ORV3-ready compute system.
+This demonstration shows CPO has progressed from architectural validation to system-level functional proof, laying a solid foundation for hyperscale adoption. The three companies will continue deepening their collaboration, driving CPO from validation toward high-volume deployment.
