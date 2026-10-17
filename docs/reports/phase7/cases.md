@@ -132,6 +132,12 @@
     SOI.PA 敘事換版 `ib_01af87313ad148a5`（仍「缺」，X 縮成「光子用 SOI 的客戶端一手」＋已定價主參照；反證加一條連 S1）。因層說明改變的候選狀態 0 筆。
     新摘錄三份（程式截取、逐字）：`soitec_urd_fy2026_photonics_competition_excerpt`、`gfs_20_f_20260227_soi_supplier_risk_excerpt`、`umc_20_f_20260430_wafer_suppliers_excerpt`。
     旁證（L11-4）：GF 這份 20-F 早已入圖（`gfs_20_f_20260227`），但策展摘錄只收了 Raw Materials 那一句、沒收風險段的 71%——failure log #46
+  - 2026-10-17｜**E2 成立 → 外部光源層改判 neither**：使用者 go [773]（Broadcom OCP 2026 TH6-Davisson 夥伴投影片）、[779]（NVIDIA 部落格「Lumentum, Sumitomo, and Coherent: These vendors provide ELS assembly, optical alignment, and test with the silicon photonics engine.」）入圖，[778] 把 `prod:els_module`、`tech:els_pluggable_module` 併進 `tech:external_laser_source`。
+    客戶端點名的 ELS 供應商由 1 家（Coherent）變成：NVIDIA 三家＋Broadcom 的 ELSFP 夥伴七家（eoptolink、O-Net、TFC、FIT、Source Photonics、Aperion、Ligent）；買方 Meta 明寫「OIF ELSFP compliance to enable open ecosystem and multi-sourcing」。
+    讀圖換版 `sr_3429846bcf5ae77a` → **`sr_a5736ee4bae76eaf`（neither：模組這一格不卡——買方刻意多源、組裝產能從收發器產線挪得過來；錢流向下一層的高功率雷射晶片）**；E2 處置（入圖完成、不再登記），E1／E3–E5 沿用、新增「量產只集中在一兩家」一條。
+    **O5 的讀法**：「Coherent 是唯一」早已推翻（10-04 的 `already_available`），這次連「第二來源」都不稀有了——這一格的倍率不在模組。
+    邊緣檔 Ligent（9856.HK，海信寬帶）第一份敘事 `ib_6a9066192211ada6`（**不要**：只坐這一格、ELSFP 早期商用、本體是數通光模組 69.4%；自製 400mW CW-DFB 2027Q1 投產，若照時程通過驗證由反證叫醒）。
+    Sivers 換騎 `ib_bd872222b5a0eaa6`，「為什麼卡在它」補 Broadcom 的「standard lasers. You don't need fancy combs」與「you don't even need an external laser source」。Lumentum ELS 邊的合格狀態衝突 pq2 **[781]**（取 qualifying）
 - failure log：（尚無）
   - #27（SOI.PA FY2026 分部占比兩筆都生效，「出現在數字裡」被默默丟——當下修為印衝突；序列仍成不了，合併紀錄留 7.5）
   - #46（入圖時的策展摘錄只收當時要的那句，同一份申報裡更強的客戶端證據留在庫外——10-08 要重抓 EDGAR 才看得到）
@@ -303,6 +309,13 @@
   - 2026-10-17｜**Wave 2 結論**（唯讀研究 workflow wf_59646a4e-958（9 位）＋走圖判定 wf_c1f5a527-bef；寫入由主 session）。新的一手：國家實驗室 NLR/TP-5700-96742 全文（圖上那份只節錄了分接開關與套管）其實寫了 CTC 與壓板——「However, for CTCs, which are a critical component of LPT windings, Sam Dong is the only domestic manufacturer.」「This reliance on a single U.S. supplier creates a supply chain bottleneck, prompting original equipment manufacturers to turn to imported CTC.」（2025 年訪談）、部分區域 CTC 供應商退出、GOES 與 CTC 各占 LPT 成本約 25%、壓板「a single domestic manufacturer」且「not many options outside of China」；**美國海關提單**（ImportKey 彙整頁）：KSH International（KSHINTL.NS，邊緣 0.67B／1 家）2026-10-12 把「CONTINUOUSLY TRANSPOSED CONDUCTORS CTC」運給 Virginia Transformer、10-14 運給同地址的 Georgia Transformer；Precision Wires India（PRECWIRE.NS，邊緣 0.86B／1 家）10-06、10-13 把 CTC 運給 Pennsylvania Transformer——兩家 LPT 廠都在圖上。KSH 自己的簡報：產品線有 Continuously Transposed Conductors、出口約三成含美國、產能 2027-03 擴到約兩倍、FY26 利用率 64.8%——**薄只在美國國內這一段**，印度產能正在倍增，量的窗口可能比 LPT 本身早關。→ 入圖包 pq2 **[774]**（`ra_f5dbda57026d610cd39a4b7127af527a`；NLR 走更正走廊；名冊兩筆 staged；發布者「U.S. Customs and Border Protection」與 ImportKey 能不能當入圖來源，請在核准時一併判斷）。絕緣層：沒有上市、主業是絕緣材料的邊緣公司（Weidmann、Cindus 私人；Nomex 2026-04-01 已由 DuPont 賣給私人的 Arclin；日立能源印度非邊緣）。
   - **(i)＝證據**：開題時表示法是 0，decompose 一天補上；之後擋的是證據——下游 filing 從不具名上游、政府報告具名的都是私人公司或大集團；把上市邊緣公司連上 LPT 廠的是海關提單，這類來源不在管線裡。附帶表示法缺口：走圖第 7 型只認「零條供應邊」、認不得「只有私人或巨頭供應」，CTC、絕緣、套管、電工鋼四層都不亮（failure log #72）。**(ii)＝有**：分接開關的華明（002270.SZ，邊緣 2.28B／10 家；讀圖 `sr_8d94aadb859c3e65`、敘事 `ib_5c26d7071cc7ae09`「缺」——它不在美國這條線上）；CTC 層的 KSH、Precision Wires 待 [774] 入圖後補讀圖與敘事才成列。其餘層：電工鋼、套管、絕緣＝沒有；出廠測試＝供給側照定義是 LPT 廠自己（`lead_188e1fa1` 停放理由）。
   - **H5 帳（三個二階 case，判準 7.0a 凍結、wave 2 不改）**：O6 (ii)＝沒有、O1-U (ii)＝沒有、P2 (ii)＝有 → 三個裡 2 個 (ii)＝沒有＝**達到「削弱」（殺死條件）**；正式裁決照登記在 7.5 寫。proposal §8 的產品化條件（≥2 個 (i)＝表示法擋住，而且上游有第一層看不到的候選）：三個 case 的 (i) 都不是表示法——不成立。讀法：往上游走沒有比第一層更容易找到非共識公司；P2 那一個「有」是靠一類新來源（海關提單）找到的，不是靠往上游走本身。
+  - 2026-10-17｜使用者 go **[774]** → 入圖（名冊 KSH、Precision Wires；發布者名冊補「U.S. Customs and Border Protection」＝監管紀錄）。**CTC 層第一份讀圖 `sr_6f443137842396a1`（volume，範圍限美國國內）**、**絕緣材料層 `sr_37d39efa37d1f2f4`（undecided）**；LPT 層換版 `sr_6dd80c0c8c245f16`（判讀 volume 不變，下一層接上這兩層）。
+    新讀一手三份（節錄進 `library/raw/`）：KSH Q1 FY27 簡報＋法說逐字稿——「CTC will represent anywhere between 50% to 75% of that segment」（特殊線材占營收 75%）、美國「each of them represented between 8% to 11% of total revenue」、與 Hitachi Energy 簽五年框架但「no quantity or, you know, price defined」、新客戶「link it to the market price」、Q1 每噸 EBITDA 93,325 盧比（去年 65,885）；
+    KSH FY26 年報：營業現金流 −6.50 億、購置設備 −16.28 億盧比（IPO 39.75 億補上）；Precision Wires FY26 年報：出口 14.83%、CTC 占比未揭露、「USA imposed substantial tariffs on Indian Products during the year」。
+    **KSH 敘事 `ib_3ce1b35b6eadad69`（缺 X，`ew_0770` 11/20 叫醒）**：X＝①Q1 每噸 EBITDA 的跳升是價還是 CTC 占比暫時偏高（管理層自己說兩三季內回落）②Hitachi 框架寫不寫出量③全球（不只美國）也緊的第三方證據——讀圖只證到美國那段，而美國只占它營收約一成；
+    歸零旗標補 mechanical 基期 `mo_c5a370fb876637f9268caf1e5030b87b`（FY26 現金、總債、自由現金流）→ 現金跑道與負債兩盞紅（擴產＋營運資金燒錢），持續經營意見是 judgment、鑄 pq2 **[782]**。
+    **Precision Wires 敘事 `ib_cdf43407f53be8b9`（不要：CTC 只是五個產品之一、出口共 14.83%，美國這段推不動整家公司）**。
+    P2 (ii) 照舊＝有（KSH 是邊緣、缺 X）；但 KSH 的「有」要靠全球也緊才成倍率——讀圖只證到美國、美國約一成，H5 的「上游有非共識候選」在這一檔是**有候選、尚無倍率路徑**
 - failure log：（尚無）
   - #9（同 P1）
   - #10（[691] 合資股東的新聞稿被分類成外部印證；與 C1 [690] 同形）
