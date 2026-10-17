@@ -1,0 +1,21 @@
+Source URL: https://towersemi.com/2026/10/13/10132026-2/
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Tower Semiconductor／Semtech 聯合新聞稿（MIGDAL HAEMEK, Israel, and Camarillo, California, Oct. 13, 2026）：擴大多年期協議，Semtech 出資鎖定 Tower 的專用 SiGe 產能
+RETRIEVED: 2026-10-18（towersemi.com 原始 HTML 去標籤後逐字核對）
+NOTE: 原文沒有寫金額或產能數字。
+
+【第一段（dateline MIGDAL HAEMEK, Israel, and Camarillo, California, Oct. 13, 2026）】
+"today announced an expanded multi-year agreement that builds on the companies’ 20-year partnership. Under the agreement, Semtech will invest in securing dedicated silicon germanium (SiGe) capacity at Tower in support of its strong design wins and demand for AI Data Center optical interconnect components."
+
+【第三段】
+"Semtech’s signal integrity portfolio, including transimpedance amplifiers (TIAs), modulator and laser drivers and linear equalizers, is built on Tower’s SiGe process technology and serves fully retimed optics (FRO), linear pluggable optics (LPO), linear receive optics (LRO), near-packaged optics (NPO), eXtra-dense pluggable optics (XPO), linear equalizers on PCB and active copper cables (ACC)."
+
+【第五段】
+"The secured capacity spans Tower’s fabs in the United States, Israel and Japan, adding supply resilience and geographic diversification to Semtech’s manufacturing strategy. Building on current production, the agreement gives Semtech additional supply assurance as demand for its SiGe-based products is expected to grow across a broadening base of customer programs and end markets."
+
+【第四段】
+"The award recognizes Semtech’s 224 Gbps per Lane TIA Family for Linear Pluggable Optics built on Tower’s leading-edge SiGe technology."
+
+【Semtech 執行長 Hong Hou 引述】
+"Meeting that demand requires long-term capacity planning and commitment with our manufacturing partners. Tower has been a trusted partner to Semtech for 20 years, and we are very pleased with our partnership agreement that secures dedicated SiGe capacity across three regions to grow across copper and optical interconnects, from 800G and 1.6T today through 3.2T and beyond.”"
