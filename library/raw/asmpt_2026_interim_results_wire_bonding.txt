@@ -19,3 +19,15 @@ SEMI Q2 bookings of HK$3.36 billion (US$428.1 million) were up 39.0% QoQ due to 
 
 【MANAGEMENT DISCUSSION AND ANALYSIS — 地區】
 By geography, share of revenue from China increased to from 38.1% in 1H 2025 to 42.2% YoY in 1H 2026 mainly driven by wire and die bonders
+
+【MANAGEMENT DISCUSSION AND ANALYSIS — Advanced Packaging 產品組合（2026-10-17 追加）】
+AP solutions include Thermo Compression Bonding (“TCB”) and Hybrid Bonding for system-level integration, Photonics for high-speed data movement, high- precision Flip Chip and Mass Reflow for cost-efficient scaling, and advanced SMT placement tools for AI server boards.
+
+【MANAGEMENT DISCUSSION AND ANALYSIS — Advanced Packaging 營收（2026-10-17 追加）】
+The AP business achieved record half-year revenue of US$339.0 million in 1H 2026, representing a 17% YoY increase and contributing to 30% of Group revenue. TCB, SMT high precision and Photonics solutions were the largest contributors within the AP portfolio.
+
+【MANAGEMENT DISCUSSION AND ANALYSIS — TCB（logic, C2S）（2026-10-17 追加）】
+In logic, order momentum for the Group’s chip-to-substrate (“C2S”) solutions remained strong, supported by repeat orders for larger compound die TCB tools from OSAT partners of the leading advanced logic customer. In July 2026, the Group received new bulk orders for more than 50 of its C2S TCB tools from OSAT customers.
+
+【MANAGEMENT DISCUSSION AND ANALYSIS — TCB（memory）（2026-10-17 追加）】
+In memory, even as the Group continued to secure repeat orders from HBM manufacturers, the timing of customers’ new tool purchase decisions remains dependent on HBM4 product rollout schedules.
