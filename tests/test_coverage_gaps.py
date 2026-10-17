@@ -90,4 +90,16 @@ def test_degree_never_counts_verbatim_as_a_structural_edge() -> None:
     """
     from query.coverage_gaps import COVERAGE_CYPHER
 
-    assert "type(any_rel) <> 'QUOTES'" in COVERAGE_CYPHER
+    assert "NOT type(any_rel) IN ['QUOTES', 'ABOUT']" in COVERAGE_CYPHER
+
+
+def test_degree_never_counts_claim_about_edges_as_structural() -> None:
+    """`degree` 也排除 `ABOUT`（claim → 節點）——2026-10-17 QUOTES 修法的對稱面（failure log #74①）。
+
+    `tech:advanced_robotic_devices`（FCC 法規類別）結構邊 0、只有一個 claim ABOUT 它，於是被印成
+    「誰供應…（圖上 0 家）」而不是孤立節點的「先確認它該掛在 stack 哪一層」。只驗 Cypher 文字（同上一條）。
+    """
+    from query.coverage_gaps import COVERAGE_CYPHER
+
+    where = next(line for line in COVERAGE_CYPHER.splitlines() if "any_rel" in line and "WHERE" in line)
+    assert "'ABOUT'" in where and "'QUOTES'" in where

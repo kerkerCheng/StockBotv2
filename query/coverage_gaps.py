@@ -53,7 +53,7 @@ WHERE NOT c.id IN direct_ids
   AND c <> n AND mid <> n AND mid <> c
 WITH n, direct_ids, collect(DISTINCT c.id) AS indirect_ids
 OPTIONAL MATCH (n)-[any_rel]-()
-WHERE type(any_rel) <> 'QUOTES'
+WHERE NOT type(any_rel) IN ['QUOTES', 'ABOUT']
 WITH n, direct_ids, indirect_ids, count(any_rel) AS degree
 RETURN n.id AS node, n.name AS name, direct_ids, indirect_ids,
        degree, n.abstraction_level AS abstraction_level
@@ -67,6 +67,9 @@ ORDER BY size(direct_ids), size(indirect_ids), node
 # 但各有 2 段逐字）。後果不是數字難看：`isolated` 決定「下一步」印哪一句，而
 # 「先確認它該掛在 stack 哪一層」與「誰供應它」是兩個不同的研究動作。
 # 這是 L17 的形狀——不會壞、不會報錯、測試不會紅，因為沒有任何東西被它逼著回來修。
+# ⚠ 2026-10-17 對稱面補上：`ABOUT`（claim → 節點）也是證據邊、不是結構邊。`tech:advanced_robotic_devices`
+# （FCC 法規類別：結構邊 0、一個 claim ABOUT 它）因此被印成「誰供應…（圖上 0 家）」，該印孤立問句
+# （failure log #74①；回放：全圖只有這一個節點的 isolated 判定改變）。
 
 # ---------------------------------------------------------------------------
 # 分桶與走圖共用的常數：**跟著資料走**（L16）。走圖第 7／8 型（`query/graph_walk.py`）從這裡拿，
