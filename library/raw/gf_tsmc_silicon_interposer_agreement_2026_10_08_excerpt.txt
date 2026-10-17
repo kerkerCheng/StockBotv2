@@ -1,0 +1,21 @@
+Source URL: https://gf.com/news-and-events/news/globalfoundries-reaches-agreement-to-establish-us-based-supply-of-silicon-interposers-for-advanced-ai-packaging/
+
+Excerpt:
+[EXCERPT — 有限逐字引文] GlobalFoundries 新聞稿（MALTA, N.Y., Oct. 8, 2026）：與 TSMC 簽製造協議，在美國建立 CoWoS 用矽中介層的供應
+RETRIEVED: 2026-10-18（gf.com 原始 HTML 去標籤後逐字核對；EDGAR 在 2026-09-08 至 10-14 之間沒有對應的 6-K）
+NOTE: 原文沒有寫協議金額（WebFetch 摘要曾冒出「valued at $2 billion」，原始頁面沒有這句——不採）。
+
+【第一段】
+"GlobalFoundries (Nasdaq: GFS) (GF) today announced a manufacturing agreement with TSMC to establish a U.S.-based supply of silicon interposers for TSMC’s CoWoS ® advanced packaging ecosystem."
+
+【第一段】
+"Under the agreement, GF will provide manufacturing service to TSMC, and add fabrication capacity at its Malta, New York facility, supporting growing demand for high-performance computing and AI systems."
+
+【第二段】
+"GF expects to expand capacity at its Malta facility and establish the first U.S.-based source of silicon interposers supporting advanced packaging technologies, including embedded deep trench capacitor components."
+
+【時程與年限】
+"Volume production is expected to begin ramping at GF’s Malta site during the first half of 2028. The agreement has an initial term of five years and provides a framework for future capacity expansion."
+
+【高層引述（Ed Kaste）】
+"Advanced packaging is becoming increasingly critical to delivering the performance, power efficiency and scale required for next-generation AI systems,"
