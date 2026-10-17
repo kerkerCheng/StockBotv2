@@ -167,6 +167,7 @@
   - 2026-10-07｜**InP 層說明遷入 ledger `ln_2a0c6b4830dbf1b1`**（個股頁 S4a）；A6–A8 登記 `ew_0310`–`ew_0312`（`layer_note:` 來源鍵、到期 2026-12-31）——#31 解。
     全新、英特磊英文年報兩條出處在 library/raw 對不到（英文版節錄只在 [715] 的包裡），照實不列、reread_reason 寫「[715] 核准後換版補」（failure log #37）。
   - 2026-10-07｜續工 ⑤（走圖第 1 型）：**6 吋 InP 產線層第一份讀圖 `sr_ad7419b129b4dad5`（undecided）**——這一格是製造能力、不是多家供貨的市場：只有 Coherent 自述在 6 吋量產（「客戶因此選它」也是它轉述的），穩懋在開發（develops 邊，不在供給側快照）；量的訊號在下一層（Coherent 預付 AXT 2,228.85 萬美元鎖 6 吋基板）。兩條條件登 watch（第二家 6 吋 InP 量產／客戶端寫明選供應商的理由是 6 吋）。邊緣公司不在這一格
+  - 2026-10-18｜**盤點 B 組（光通訊電子件與封裝）**：①pq2 **[789]**——GF 2026-10-08 新聞稿：與 TSMC 簽製造協議在美國 Malta 供 CoWoS 用矽中介層（2028 上半年量產爬坡、初始五年；**原文無金額**，WebFetch 摘要的「$2 billion」不存在）——圖上矽中介層第一個供應商，並把 tech:cowos 接到先進封裝總稱節點（先進封裝讀圖缺口①的建模那一半）。②pq2 **[791]**（取代 [790]）——GF＋Marvell 擴大 SiGe 產能協議（2026-09-17，Burlington）＋Marvell 投資人日簡報（2026-10-06）「SiGe Drivers / TIAs」「Multi-foundry」：SiGe 平台供應商 1→2、TIA／驅動器接上 NPO 與 CPO；[790] 把 enables 方向寫反（failure log #78，當下修）。③**LPO 第一份讀圖 `sr_bfd181ebfe7dee2b`（neither，層）**：Meta 一個 hop 量產、模組廠多家（Ligent、中際、新易盛）、Arista 交換器支援，沒有任何缺貨一手；它是光模組 DSP 層的反向路徑，需求錨走不到是建模缺口（is_variant_of 不走訪）。④MRM 兩個節點（`tech:micro_ring_modulator`、`tech:mrm_200g`）是變體不是同義，但共用別名 MRM——第 9 型偵測不到（failure log #79，量測全圖 10 對）。
 - failure log：#31（層說明沒有 watch 來源鍵；2026-10-07 S4a 解）、#32（反證在登記前就已成立、永遠不會醒）、#33（`fetchers.mops --include-english` 蓋掉中文版；當下修）；#17 第 4 次（[715] 圖影響行）；#37（層說明的出處 id 對不上 raw 檔名）
 
 ## S1 X 帳號 40 則首次點名的 claim 裁決
@@ -321,6 +322,10 @@
   - 2026-10-17（夜）｜使用者 go **[785]**（KSH Q1 FY27 簡報＋法說入圖：KSH→Hitachi 五年框架〔自述、量價未定〕、CTC 占特殊線材 50–75%、美國 8–11%）、**[782]** KSH 持續經營意見（無保留）寫入 Engine C、[787] Precision Wires 的同型提案鑄號。
     CTC 讀圖主動換版 `sr_cf14fb582d8b131d`（判讀不變；缺口②的 KSH 半邊補上；digest 沒變——既有邊多自述來源），KSH `ib_63239e9aa6a0fe97`、Precision Wires `ib_168eab8e1e4814c8` 換騎。
     同夜發現 Precision Wires 與 Ligent 被閉包閘門用過期座位表排出母體（failure log #77，當下修）——補 mechanical 基期 `mo_ab3412cdfd022d1e1d04fb000b2c991a`（FY26：自由現金流 −2.07 億盧比；營業現金流含 usance 信用狀買銅 1,01,811 lakhs 的應付帳款）後到終局
+  - 2026-10-18｜**盤點 B 組（workflow 9 位撞 session 額度全滅，主 session 用它們下載的檔接手）**：
+    ①華明（[788] 待核）：H 股 Application Proof（Frost & Sullivan，公司委託）2024 年分接開關全球份額 17.9% 第二、海外營收 19.9%；美國海關提單 2026 年 5–9 月幾乎每月直接出貨 OLTC 給 Prolec GE（Shreveport、Waukesha）——推翻分接開關讀圖「華明不在美國這條線上」那句，[788] 核准後重讀 `sr_8d94aadb859c3e65`、改寫 `ib_5c26d7071cc7ae09` X①、層說明 `ln_0a3b60a33ecff0cf` T5。
+    ②LPT 第二個開口的買方：pq2 **[792]**——Oncor 8-K（2025-11-05）「securing critical long-lead time equipment, including large power transformers」＋供應商交期承諾、首批 2027 Q1；Core Scientific 10-K「lead times of 12 to 18 months or longer」；Fermi 10-K 1.2 億美元高壓設備倉儲融資提前採購變壓器——名冊隨包 staged 三家（Oncor 股權未上市 ticker null）。CoreWeave、Equinix、DLR 等 10-K 沒寫變壓器交期；Constellation 的週數是轉引 NIAC，不收。
+    ③絕緣、套管、電工鋼的對美出貨人（ImportKey 海關頁 175 檔）：壓板（台州新源）、絕緣件（遼寧 XD 興啟、Sabar、Permali Wallace、Transvick、Enpay、常州英中）、CRGO 鐵芯（Amod）、套管（HSP→HSP US、Trench、MGC Moser Glaser、Onload Gears）全是私人公司或大集團子公司；唯一上市、邊緣大小的是**江蘇神馬電力（603530.SS，市值 2.36B、分析師量不到）**——複合空心絕緣子直接出貨 Siemens Energy Grid Technologies、Hitachi Energy USA（Mt Pleasant），年報自述與 Hitachi Energy、Siemens Energy、GE Vernova「形成了扎实的合作基础」、2025 海外新簽訂單 10.12 億元（+36.40%）。四維初判客戶端資本承諾無、瓶頸地位未知 → 不打包，登記 `lead_c461550b4e3297ae7285479bd1772796` 誠實停放（awaiting_named_disclosure，觸發 co:hitachi 文件與神馬 Q3／年報）。
 - failure log：（尚無）
   - #9（同 P1）
   - #10（[691] 合資股東的新聞稿被分類成外部印證；與 C1 [690] 同形）
@@ -539,6 +544,7 @@
     - 致動器層重讀 `sr_14456dc4d147f3f3`（undecided）：現代摩比斯供 Atlas 致動器是集團內採購、Schaeffler 綁的是互惠交易——兩條客戶端具名都不算獨立印證；
       現代摩比斯 `ib_c8e5e572872abec6`（非邊緣的不要：約 252 億美元、28 位）；SHA0.DE `ib_3671da7bf86f5edc` 改押
   - 2026-10-05｜Nidec 入圖後的一手補查（R4 報告原寫「未查」）：窗口內（09-01 入圖 → 10-02）唯一的一手是 2026-09-30 延遲發布的 FY2025 決算摘要——第三方委員會確認多起管理層參與的不當會計、6,321 億日圓減損、營業虧損 5,190 億日圓；東證特別注意銘柄指定在 2025-10-28（早於入圖）。這是治理／會計事件，**沒有觸及入圖時的結構主張**（FLEXWAVE），R4 結論不變（證據不足以判）；只記事實、不做「它為什麼跌」的因果歸因（L14）。觀測 `mo_b35ec2d6cdd9154e1be5d12cb1a67e3b`；敘事 Nidec `ib_96330eed2aea24c9`（非邊緣的不要，治理風險記在 our_bet）、宇樹 688836.SS `ib_68f7e54c0de8e0a2`（非邊緣的不要；只坐自家整機 G1，failure log #22 第二型）
+  - 2026-10-18｜**盤點 B 組（人形量產客戶一手）**：pq2 **[793]**——宇樹招股意向書（2026-07-31）「公司实现机器人核心零部件关节模组的自研自产……降低了对外部供应 链的依赖」，生產環節含電機、減速器及關節模組，原材料「市场供应充足」、前五大供應商 22–26% 多匿名——量最大的人形廠不是外部致動器供應商的客戶；入圖後重讀致動器層 `sr_14456dc4d147f3f3` 的需求側。環動科技（雙環傳動分拆）招股書申報稿：客戶全匿名（主要客戶 1、2）、工業機器人為主、前五大 78.34%——無 graph delta。
 - failure log：（尚無）
   - #14（反證以被評公司的供貨 assertion 形式入圖：MP 磁材邊上的 Noveon、USA Rare Earth 文件，引文沒有 MP）
   - #19（海外財報缺口：6324.T、LYC.AX、6680.HK 的已定價嗎與出現在數字裡都量不到）、#20（A＋H 檔快照市值只算 H 股）
