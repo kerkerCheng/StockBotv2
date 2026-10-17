@@ -1,24 +1,25 @@
 {
   "schema_version": "1",
-  "resolution_id": "resolution_eba48e711b0a98d4fd4514543b41e9cc75b1562e65b1fcda6e7683b741375c05_f83b9809f73f",
+  "resolution_id": "resolution_eba48e711b0a98d4fd4514543b41e9cc75b1562e65b1fcda6e7683b741375c05_b07d087a9af0",
   "conflict_id": "conflict_eba48e711b0a98d4fd4514543b41e9cc75b1562e65b1fcda6e7683b741375c05",
   "edge_key": "edge:dadc511c45ec86ecc0d6ae2cd470565652ab4e346fb01365ccf2e01b3a684c09",
   "attribute": "qualification_status",
-  "candidate_set_hash": "f83b9809f73f11c9fea0f67da5a8a48f40c314bfb01d4f878ca16f42b3faf101",
+  "candidate_set_hash": "b07d087a9af01f62cfe935b68ac9ddb9718694c4618dadc7919a66f7c76616f2",
   "action": "choose_value",
-  "selected_value": "sampling",
+  "selected_value": "qualifying",
   "supporting_assertion_ids": [
-    "lumentum_q3fy26_cpo_e6"
+    "lumentum_q4fy26_els_order_e1"
   ],
   "rejected_assertion_ids": [
-    "lumentum_q2fy26_cpo_e11"
+    "lumentum_q2fy26_cpo_e11",
+    "lumentum_q2fy26_cpo_e12",
+    "lumentum_q3fy26_cpo_e6"
   ],
   "supporting_source_ids": [
-    "lumentum_q3fy26_cpo_s3",
-    "lumentum_q3fy26_cpo_s10"
+    "lumentum_q4fy26_els_order_s1"
   ],
-  "rationale": "scope 澄清型：Q2 的 designed_in quote 把 UHP 雷射晶片的 design-in 與 ELS 模組混在一句（design win 屬晶片，非模組）；Q3 更具體：ELS 模組仍是 development work／接觸新客戶的敲門磚。ELS 模組本身取 sampling；UHP 晶片的 designed_in 已在另一條邊保存，無資訊遺失。",
+  "rationale": "同 scope（Lumentum 的 ELS 模組，不是 UHP 雷射晶片）。2026-07-18 的舊決議取 sampling（Q3 FY26「our development work continues with multiple CPO customers … within a pluggable turnkey ELS module solution」），當時就把 Q2 的 designed_in 判為晶片與模組混在一句（design win 屬晶片）。[778] 合併後候選多了 Q4 FY26 8-K Exhibit 99.1（2026-08-11）「an initial order for ELS modules」——客戶下了第一筆模組訂單（法說另寫交貨在 2027 下半年），狀態由 development／sampling 往前推進，較新文件明確取代舊狀態；但還沒出貨、沒有合格完成的字樣，所以取 qualifying 而不是 qualified 或 designed_in。Q2 e12（s16 是策略描述「moving beyond standalone laser-chip supply into pluggable ELS modules would expand…」，不是狀態）不採。全部是 Lumentum 自述（同一 origin），信心中等。",
   "resolved_confidence": 0.6,
   "approved_by": "Cheng",
-  "approved_at": "2026-07-18T07:14:08+08:00"
+  "approved_at": "2026-10-17T13:38:22+00:00"
 }

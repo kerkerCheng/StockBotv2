@@ -1,0 +1,23 @@
+{
+  "schema_version": "1",
+  "resolution_id": "resolution_487518d8c9fa8ee0296c90a12c452b37b2fffd9a644147784f11651a4e974138_e88467886889",
+  "conflict_id": "conflict_487518d8c9fa8ee0296c90a12c452b37b2fffd9a644147784f11651a4e974138",
+  "edge_key": "edge:6ced2b7a07f1e12e3f28cbf663cb9a76cbd5a63b99fd41a0b02ad2528ac2a861",
+  "attribute": "qualification_status",
+  "candidate_set_hash": "e88467886889f0fba17ad45c188d5bb5b30760121841bfac2b1e22cd147b8c6c",
+  "action": "choose_value",
+  "selected_value": "designed_in",
+  "supporting_assertion_ids": [
+    "lumentum_q2fy26_cpo_e7"
+  ],
+  "rejected_assertion_ids": [
+    "lumentum_q3fy26_cpo_e10"
+  ],
+  "supporting_source_ids": [
+    "lumentum_q2fy26_cpo_s8"
+  ],
+  "rationale": "同 scope（Lumentum 的 1.6T 資料中心收發器）。Q2 FY26（2026-02-03）「now in the 'lead pack' of transceiver suppliers as customers move to 1.6T」＝已被客戶選入（designed_in）。Q3 FY26（2026-05-06）那條被標 qualifying，但它的兩段引文都沒有說還在認證：s6「we are poised to ramp 1.6T-speed transceiver shipments in fiscal Q4」是準備出量（比認證中更前進），s23 講毛利。較新的文件沒有取代 designed_in，只是把它往出貨推——所以取 designed_in；qualifying 是抽取時的誤標。兩條都是 Lumentum 自述（同一 origin），信心中等。",
+  "resolved_confidence": 0.6,
+  "approved_by": "Cheng",
+  "approved_at": "2026-10-17T13:38:22+00:00"
+}
