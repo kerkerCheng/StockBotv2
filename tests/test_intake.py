@@ -653,6 +653,40 @@ def test_load_extraction_publishes_before_graph_and_supports_extraction_only(
     assert not (tmp_path / "library" / "raw" / "remote_doc.txt").exists()
 
 
+def test_load_extraction_receipt_hashes_the_stored_file_even_when_loader_rewrites_ids(
+    tmp_path: Path, monkeypatch
+) -> None:
+    """`load_to_graph` 會就地把別名 id 換成 canonical（`resolve_document`）——收據與回傳的雜湊
+    必須對落檔的那一版算，否則重試時 receipt 永遠對不上（2026-10-17 [779] 實測）。"""
+    from intake.provenance import canonical_extraction_hash, verify_graph_complete
+
+    _install_graph_success(monkeypatch)
+
+    def rewriting_loader(doc, _session):
+        # 真的 loader 改的是 node／edge 端點／claim subject 的 id（別名 → canonical）
+        for node in doc.get("nodes", []):
+            node["id"] = "tech:canonical_node"
+
+    monkeypatch.setattr(application, "load_to_graph", rewriting_loader)
+
+    extraction = _extraction("alias_doc")
+    extraction["sources"] = [{"id": "alias_doc_s1", "locator": "p.1", "quote": "Alias layer supplies the canonical layer."}]
+    extraction["nodes"] = [{"id": "tech:alias_node", "type": "TechNode", "name": "Alias layer", "aliases": [],
+                            "abstraction_level": "device_chip", "role": None, "attributes": {}, "confidence": 0.8,
+                            "source_ids": ["alias_doc_s1"]}]
+    result = application._load_extraction_impl(
+        json.dumps(extraction),
+        "repo_full",
+        "Official public filing retained for private research",
+        root=tmp_path,
+    )
+
+    assert result["status"] == "loaded_or_already_complete"
+    stored = json.loads((tmp_path / "extractions" / "alias_doc.json").read_text(encoding="utf-8"))
+    assert result["extraction_sha256"] == canonical_extraction_hash(stored)
+    verify_graph_complete("alias_doc", stored, root=tmp_path)
+
+
 @pytest.mark.parametrize("payload", ["null", "[]", '"text"', "42", "true"])
 def test_load_extraction_rejects_non_object_json_before_driver(
     payload: str, tmp_path: Path, monkeypatch

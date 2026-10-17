@@ -19,6 +19,7 @@ remote provider session｜action quota／30 天過期／5 MiB 上限｜
 mobile two-call workflow｜遠端 Git 限制。它們是 ops 限制，不是 domain 規則。
 """
 from __future__ import annotations
+import copy
 import json
 import os
 import sys
@@ -325,6 +326,12 @@ def _load_extraction_impl(
             "finalize_eligible": False,
         }
 
+    # 落檔的那一版（publish_provenance 剛寫進 extractions/）。⚠ `load_to_graph` 會**就地**把別名 id 換成
+    # canonical（identity.entities.resolve_document 改 doc 本身）——收據與回傳的 extraction_sha256 若對
+    # 改寫後的 doc 算，就對不上落檔的抽取，重試時 `_verify_action_document_receipt` 永遠報 hash mismatch
+    # （2026-10-17 [779]：nvidia_sipho_blog_partner_roles 帶 [730] 併掉的 tech:cpo_fiber_attach）。
+    # 驗圖與 projection 仍用改寫後的 doc（它們要的是圖上的 canonical id）。
+    stored_doc = copy.deepcopy(doc)
     driver = _driver()
     graph_stage = "not_started"
     try:
@@ -341,7 +348,7 @@ def _load_extraction_impl(
         }
         projection = project_edge_keys(driver, affected_edge_keys)
         graph_stage = "projected"
-        mark_graph_complete(doc_id, doc, root=root)
+        mark_graph_complete(doc_id, stored_doc, root=root)
         graph_stage = "receipt_written"
     except Exception as e:
         mutated = graph_stage != "not_started"
@@ -377,7 +384,7 @@ def _load_extraction_impl(
         "open_conflict_ids": projection["open_conflict_ids"],
         "stale_resolution_ids": projection["stale_resolution_ids"],
         "finalize_eligible": provenance["finalize_eligible"],
-        "extraction_sha256": canonical_extraction_hash(doc),
+        "extraction_sha256": canonical_extraction_hash(stored_doc),
         "counts": {
             "nodes": len(doc.get("nodes", [])),
             "edges": len(doc.get("edges", [])),
