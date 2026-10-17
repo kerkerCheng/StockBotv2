@@ -1707,6 +1707,75 @@
         "ASM Pacific Technology",
         "ASM Pacific"
       ]
+    },
+    {
+      "company_id": "co:eoptolink",
+      "research_ticker": "300502.SZ",
+      "market_currency": "CNY",
+      "execution_currency": "CNY",
+      "execution_venue": "SZSE",
+      "display_name": "Eoptolink Technology Inc., Ltd.",
+      "_display_name_source": "自家官網頁尾「Copyright © 2021 Eoptolink Technology Inc., Ltd.」；AAOI FY2025 10-K 競爭者段逐字同；深交所 300502（成都新易盛通信技术股份有限公司）",
+      "_note": "外部光源層入圖包隨包 staged（2026-10-17）；系統口徑非邊緣（64.0B 美元、6 家，`python -m alpha edge 300502.SZ`）。別名「eoptolink」是 Broadcom OCP 2026 夥伴投影片的 logo 寫法（名字比對單詞分大小寫）",
+      "name_aliases": [
+        "Eoptolink",
+        "eoptolink",
+        "新易盛"
+      ]
+    },
+    {
+      "company_id": "co:source_photonics",
+      "research_ticker": null,
+      "display_name": "Source Photonics",
+      "_display_name_source": "自家官網 sourcephotonics.com 標題「Source Photonics: Leading Global Manufacturer of Optical Transceivers」",
+      "_note": "私人公司（研究 ticker 明確 null，INV-1）；外部光源層入圖包隨包 staged（2026-10-17）",
+      "name_aliases": [
+        "Source Photonics"
+      ]
+    },
+    {
+      "company_id": "co:ligent",
+      "research_ticker": "9856.HK",
+      "market_currency": "HKD",
+      "execution_currency": "HKD",
+      "execution_venue": "HKEX",
+      "display_name": "Ligent Technologies, Inc.",
+      "_display_name_source": "自家官網 About 頁「Ligent Technologies,Inc.(stock code:9856.hk)」；yfinance longName 同（2026-10-17 核對）",
+      "_note": "外部光源層入圖包隨包 staged（2026-10-17）；系統口徑「邊緣無法量」（3.09B 美元、分析師家數量不到）——進段 5 母體。別名「LIGENT」是 Broadcom OCP 2026 夥伴投影片的 logo 寫法",
+      "name_aliases": [
+        "Ligent",
+        "LIGENT",
+        "Ligent Technologies"
+      ]
+    },
+    {
+      "company_id": "co:ksh_international",
+      "research_ticker": "KSHINTL.NS",
+      "market_currency": "INR",
+      "execution_currency": "INR",
+      "execution_venue": "NSE",
+      "display_name": "KSH International Limited",
+      "_display_name_source": "自家 NSE 申報投資人簡報（2026-05-26）封面；yfinance longName 同（2026-10-17 核對）",
+      "_note": "CTC 層入圖包隨包 staged（2026-10-17）；系統口徑邊緣（約 0.67B 美元、分析師 1 家，`python -m alpha edge KSHINTL.NS`）。美國海關提單收貨方寫「KSH INTERNATIONAL LTD」或「KSH INTERNATIONAL LIMITED」。不放單詞「KSH」",
+      "name_aliases": [
+        "KSH International",
+        "KSH International Limited",
+        "KSH INTERNATIONAL LTD"
+      ]
+    },
+    {
+      "company_id": "co:precision_wires_india",
+      "research_ticker": "PRECWIRE.NS",
+      "market_currency": "INR",
+      "execution_currency": "INR",
+      "execution_venue": "NSE",
+      "display_name": "Precision Wires India Limited",
+      "_display_name_source": "美國海關提單託運人名「PRECISION WIRES INDIA LIMITED」；yfinance longName 同（2026-10-17 核對）",
+      "_note": "CTC 層入圖包隨包 staged（2026-10-17）；系統口徑邊緣（約 0.86B 美元、分析師 1 家）。不放縮寫「PWIL」（短縮寫易誤中）",
+      "name_aliases": [
+        "Precision Wires India",
+        "Precision Wires India Limited"
+      ]
     }
   ]
 }
