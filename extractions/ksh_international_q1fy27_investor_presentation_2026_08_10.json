@@ -1,0 +1,135 @@
+{
+  "claims": [
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "條件：KSH 後續簡報不再寫 CTC 需求強、或特殊線材營收轉為年減。核查頻率：每季。觸發後 48 小時：e2 的 claim 降 confidence，重讀 CTC 層。",
+      "id": "ksh_international_q1fy27_investor_presentation_2026_08_10_cl1",
+      "source_ids": [
+        "ksh_international_q1fy27_investor_presentation_2026_08_10_s2",
+        "ksh_international_q1fy27_investor_presentation_2026_08_10_s3",
+        "ksh_international_q1fy27_investor_presentation_2026_08_10_s4"
+      ],
+      "statement": "KSH International Q1 FY27 investor presentation (BSE/NSE filing 2026-08-10): 'Growth in our higher value-addition Specialized Wires, specifically CTC, meaningfully outpaced the healthy growth in Standard Wires'; key trend 'Strong demand for specialized wires, especially CTC, domestically and in exports'; signed a long-term framework agreement with a large global transformer OEM to supply its global production facilities over the next five years; claims to be the only Indian supplier approved for HVDC transformers. Issuer self-report (L8 weak).",
+      "subject_id": "e2"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "co:hitachi",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "ksh_international_q1fy27_investor_presentation_2026_08_10_s1",
+        "ksh_international_q1fy27_investor_presentation_2026_08_10_s2"
+      ],
+      "src_id": "co:ksh_international"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "mat:ctc_copper_conductor",
+      "id": "e2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "ksh_international_q1fy27_investor_presentation_2026_08_10_s2",
+        "ksh_international_q1fy27_investor_presentation_2026_08_10_s3"
+      ],
+      "src_id": "co:ksh_international"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "KSH International Limited",
+        "KSH INTERNATIONAL LTD"
+      ],
+      "attributes": {
+        "ticker": "KSHINTL.NS"
+      },
+      "confidence": 0.85,
+      "id": "co:ksh_international",
+      "name": "KSH International",
+      "role": null,
+      "source_ids": [
+        "ksh_international_q1fy27_investor_presentation_2026_08_10_s1",
+        "ksh_international_q1fy27_investor_presentation_2026_08_10_s2",
+        "ksh_international_q1fy27_investor_presentation_2026_08_10_s4"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "Hitachi Energy",
+        "Hitachi ABB"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:hitachi",
+      "name": "Hitachi",
+      "role": null,
+      "source_ids": [
+        "ksh_international_q1fy27_investor_presentation_2026_08_10_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "CTC",
+        "CTC copper wire",
+        "Continuously Transposed Conductor"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "mat:ctc_copper_conductor",
+      "name": "Continuously Transposed Conductor (CTC) copper wire",
+      "role": null,
+      "source_ids": [
+        "ksh_international_q1fy27_investor_presentation_2026_08_10_s2",
+        "ksh_international_q1fy27_investor_presentation_2026_08_10_s3"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "ksh_international_q1fy27_investor_presentation_2026_08_10",
+    "evidence_tier": 1,
+    "origin_entity": "KSH International Limited",
+    "permission_basis": "印度上市公司依 SEBI LODR 申報交易所的投資人簡報；只保留研究必要的有限逐字節錄（pypdf 本機抽字、空白正規化）。published_at 取申報日 2026-08-10。",
+    "published_at": "2026-08-10",
+    "publisher": "BSE（交易所申報）",
+    "retrieved_at": "2026-10-17",
+    "source_type": "ir_deck",
+    "storage_permission": "repo_excerpt",
+    "title": "KSH International Limited Q1 FY2027 Earnings Presentation（2026-08-10）節錄：CTC 需求、五年框架協議、客戶",
+    "url": "https://www.bseindia.com/xml-data/corpfiling/AttachHis/f1397129-0d33-483b-8633-89b9aed4ff65.pdf"
+  },
+  "sources": [
+    {
+      "id": "ksh_international_q1fy27_investor_presentation_2026_08_10_s1",
+      "locator": "p.3 KSH in a Snapshot——客戶",
+      "quote": "Serves 120+ OEM customers including leading local and global companies such as Hitachi Energy, CG Power, BHEL, GE Vernova, Siemens Energy, Bharat Bijlee, Nidec, Suzlon etc."
+    },
+    {
+      "id": "ksh_international_q1fy27_investor_presentation_2026_08_10_s2",
+      "locator": "p.14 Management Commentary",
+      "quote": "Growth in our higher value-addition Specialized Wires, specifically CTC, meaningfully outpaced the healthy growth in Standard Wires, driving volumes, exports and unit economic profitability in Q1. During the quarter, we also signed a long-term framework agreement with a large Global transformer OEM to supply their global production facilities over the next five years."
+    },
+    {
+      "id": "ksh_international_q1fy27_investor_presentation_2026_08_10_s3",
+      "locator": "p.14 Key Trends",
+      "quote": "Strong demand for specialized wires, especially CTC, domestically and in exports"
+    },
+    {
+      "id": "ksh_international_q1fy27_investor_presentation_2026_08_10_s4",
+      "locator": "p.3 KSH in a Snapshot——HVDC",
+      "quote": "Only Indian supplier approved for HVDC transformers. Recently received first awards for Specialized wires for HVDC transformers."
+    }
+  ]
+}

@@ -1,0 +1,181 @@
+{
+  "claims": [
+    {
+      "confidence": 0.55,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "條件：KSH 後續季報、法說或公告寫出與 Hitachi Energy 的框架協議終止、或兩季以上仍沒有寫出量或價；或 Hitachi 的一手文件否認。核查頻率：每季（KSH 季報與法說）。觸發後 48 小時：e1 降 confidence 或提撤回，KSH 敘事的需求格重寫。",
+      "id": "ksh_international_q1fy27_earnings_call_2026_08_11_cl1",
+      "source_ids": [
+        "ksh_international_q1fy27_earnings_call_2026_08_11_s1",
+        "ksh_international_q1fy27_earnings_call_2026_08_11_s4",
+        "ksh_international_q1fy27_earnings_call_2026_08_11_s5",
+        "ksh_international_q1fy27_earnings_call_2026_08_11_s6"
+      ],
+      "statement": "KSH International's Q1 FY27 earnings call (2026-08-11, transcript filed with BSE/NSE 2026-08-14): it has entered a five-year supply framework agreement with Hitachi Energy Global to supply winding wires to Hitachi's Indian plants and some global plants; management says 'there's no quantity or, you know, price defined as of right now'. Context given by management: transformer makers globally sit on order books of about three to four years and tend to lock in some of the capacity they need. Supplier self-report (L8 weak); Hitachi Energy has not confirmed.",
+      "subject_id": "e1"
+    },
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "條件：KSH 後續季報或法說寫出 CTC 占比明顯下降（管理層已預告兩三季內回落到過去水準，那不算）、出口營收年減，或美國占比掉到 5% 以下。核查頻率：每季。觸發後 48 小時：e2 的 claim 加註，重讀 CTC 層的供給側與 KSH 敘事。",
+      "id": "ksh_international_q1fy27_earnings_call_2026_08_11_cl2",
+      "source_ids": [
+        "ksh_international_q1fy27_earnings_call_2026_08_11_s2",
+        "ksh_international_q1fy27_earnings_call_2026_08_11_s3",
+        "ksh_international_q1fy27_earnings_call_2026_08_11_s7",
+        "ksh_international_q1fy27_earnings_call_2026_08_11_s8",
+        "ksh_international_q1fy27_earnings_call_2026_08_11_s9"
+      ],
+      "statement": "KSH International (Q1 FY27 call): roughly 75% of revenue comes from large power transformers, 'driven by our core continuously transposed conductors or CTC product'; CTC represents 'anywhere between 50% to 75%' of specialized wires (specialized wires were 75% of Q1 revenue per the same-day deck); all exports go to T&D customers; annually the Middle East, Europe and the US are each 8%–11% of total revenue; some new customers were onboarded at higher value addition, linked to the market price. Supplier self-report (L8 weak): no CTC-only revenue, lead time or price figure.",
+      "subject_id": "e2"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "co:hitachi",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "ksh_international_q1fy27_earnings_call_2026_08_11_s1",
+        "ksh_international_q1fy27_earnings_call_2026_08_11_s4",
+        "ksh_international_q1fy27_earnings_call_2026_08_11_s5"
+      ],
+      "src_id": "co:ksh_international"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "mat:ctc_copper_conductor",
+      "id": "e2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "ksh_international_q1fy27_earnings_call_2026_08_11_s1",
+        "ksh_international_q1fy27_earnings_call_2026_08_11_s2",
+        "ksh_international_q1fy27_earnings_call_2026_08_11_s3",
+        "ksh_international_q1fy27_earnings_call_2026_08_11_s7"
+      ],
+      "src_id": "co:ksh_international"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "KSH International Limited",
+        "KSH INTERNATIONAL LTD"
+      ],
+      "attributes": {
+        "ticker": "KSHINTL.NS"
+      },
+      "confidence": 0.85,
+      "id": "co:ksh_international",
+      "name": "KSH International",
+      "role": null,
+      "source_ids": [
+        "ksh_international_q1fy27_earnings_call_2026_08_11_s1",
+        "ksh_international_q1fy27_earnings_call_2026_08_11_s2",
+        "ksh_international_q1fy27_earnings_call_2026_08_11_s4"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "Hitachi Energy",
+        "Hitachi ABB"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:hitachi",
+      "name": "Hitachi",
+      "role": null,
+      "source_ids": [
+        "ksh_international_q1fy27_earnings_call_2026_08_11_s4",
+        "ksh_international_q1fy27_earnings_call_2026_08_11_s5"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "CTC",
+        "CTC copper wire",
+        "Continuously Transposed Conductor"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "mat:ctc_copper_conductor",
+      "name": "Continuously Transposed Conductor (CTC) copper wire",
+      "role": null,
+      "source_ids": [
+        "ksh_international_q1fy27_earnings_call_2026_08_11_s2",
+        "ksh_international_q1fy27_earnings_call_2026_08_11_s3",
+        "ksh_international_q1fy27_earnings_call_2026_08_11_s7"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "ksh_international_q1fy27_earnings_call_2026_08_11",
+    "evidence_tier": 1,
+    "origin_entity": "KSH International Limited",
+    "permission_basis": "印度上市公司依 SEBI LODR 申報交易所（BSE／NSE）的法說會逐字稿；只保留研究必要的有限逐字節錄（pypdf 本機抽字、空白正規化）。published_at 取法說日 2026-08-11（逐字稿 08-14 申報）。",
+    "published_at": "2026-08-11",
+    "publisher": "BSE（交易所申報）",
+    "retrieved_at": "2026-10-17",
+    "source_type": "transcript",
+    "storage_permission": "repo_excerpt",
+    "title": "KSH International Limited Q1 FY27 Earnings Conference Call 逐字稿（2026-08-11）節錄：CTC 占比、美國占營收、Hitachi Energy 五年框架",
+    "url": "https://www.bseindia.com/xml-data/corpfiling/AttachHis/524d4b30-e0c3-4daf-8d75-72f4269a8d4e.pdf"
+  },
+  "sources": [
+    {
+      "id": "ksh_international_q1fy27_earnings_call_2026_08_11_s1",
+      "locator": "p.3 開場（MD Rajesh Hegde）",
+      "quote": "For those new to KSH International, we are a 45-year-old manufacturer of magnet"
+    },
+    {
+      "id": "ksh_international_q1fy27_earnings_call_2026_08_11_s2",
+      "locator": "p.4 開場——營收結構",
+      "quote": "Roughly 75% of our revenue comes from large power transformers used in T&D, renewables, railways, and data centers, driven by our core continuously transposed conductors or CTC product, in which we are the market leaders in India."
+    },
+    {
+      "id": "ksh_international_q1fy27_earnings_call_2026_08_11_s3",
+      "locator": "p.4 開場——出口",
+      "quote": "CTC is a complex engineered wire product and all of our exports are exclusively to T&D customers across five continents."
+    },
+    {
+      "id": "ksh_international_q1fy27_earnings_call_2026_08_11_s4",
+      "locator": "p.4 開場——Hitachi Energy 框架協議",
+      "quote": "We are very pleased to announce that we have entered into a five-year supply framework agreement with Hitachi Energy Global to supply winding wires to their Indian plants as well as their some of their global plants."
+    },
+    {
+      "id": "ksh_international_q1fy27_earnings_call_2026_08_11_s5",
+      "locator": "Q&A——框架協議沒有量與價",
+      "quote": "So with Hitachi, you know, as we mentioned, this is a framework agreement where the broad construct is, you know, decided upon, but still there's no quantity or, you know, price defined as of right now."
+    },
+    {
+      "id": "ksh_international_q1fy27_earnings_call_2026_08_11_s6",
+      "locator": "Q&A——變壓器廠鎖產能",
+      "quote": "since most of the transformer manufacturers globally are sitting on an order book of say about say three to four years, so the general tendency is to, you know, at least lock in some amount of the capacity that would be required"
+    },
+    {
+      "id": "ksh_international_q1fy27_earnings_call_2026_08_11_s7",
+      "locator": "p.16–17 Q&A——CTC 占特殊線材",
+      "quote": "CTC will represent anywhere between 50% to 75% of that segment."
+    },
+    {
+      "id": "ksh_international_q1fy27_earnings_call_2026_08_11_s8",
+      "locator": "p.13–14 Q&A——美國占營收",
+      "quote": "annually Middle East, Europe, and US are key export geographies, and each of them represented between 8% to 11% of total revenue."
+    },
+    {
+      "id": "ksh_international_q1fy27_earnings_call_2026_08_11_s9",
+      "locator": "p.20 Q&A——新客戶連結市場價",
+      "quote": "some of the new customers we had, and which we were executing orders in the Q1 where we've onboarded, they are obviously at a higher value addition than the existing customers because we had an opportunity to link it to the market price as well."
+    }
+  ]
+}
