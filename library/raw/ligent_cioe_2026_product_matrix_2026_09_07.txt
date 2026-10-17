@@ -1,0 +1,15 @@
+Source URL: https://www.ligent.com/about/news/175.html
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Ligent Technologies 官網新聞稿〈CIOE 2026 … Featuring NPO/XPO and High‑Power Lasers〉節錄：ELSFP 用自研 CW 雷射、100 mW ELSFP 初步商用
+Source: https://www.ligent.com/about/news/175.html
+RETRIEVED: 2026-10-17（官網 HTML 本機去標籤、逐字核對）
+
+【CIOE 2026 新聞稿（2026-09-07）NPO 段】
+Paired with the ELSFP external light source solution featuring self‑developed CW lasers, it delivers a complete NPO optical interconnect solution tailored for high‑density and low‑power‑consumption scenarios.
+
+【同上，光源產品線段】
+In terms of light source product lines, the 100 mW ELSFP has achieved initial commercialization, while the brand‑new 400 mW ultra‑high‑power ELSFP will be demonstrated on‑site at the exhibition.
+
+【同上，自研雷射段】
+Ligent Technologies’ self‑developed lasers feature high output power, high efficiency and superior stability. They lay a solid light‑source foundation for ELSFP, NPO/CPO silicon photonics applications, completing the full technical chain spanning CW lasers, ELSFP external light sources down to NPO/CPO deployments.

@@ -1,0 +1,134 @@
+{
+  "claims": [
+    {
+      "confidence": 0.55,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "條件：Ligent 後續公告、業績或客戶端文件寫出 ELSFP 改用外購雷射，或 100 mW ELSFP 商用中止。核查頻率：每半年。觸發後 48 小時：e1 的 claim 降 confidence，重讀外部光源層「誰自製雷射」那一句。",
+      "id": "ligent_cioe_2026_product_matrix_2026_09_07_cl1",
+      "source_ids": [
+        "ligent_cioe_2026_product_matrix_2026_09_07_s1",
+        "ligent_cioe_2026_product_matrix_2026_09_07_s2",
+        "ligent_cioe_2026_product_matrix_2026_09_07_s3"
+      ],
+      "statement": "Ligent Technologies' own CIOE 2026 release (2026-09-07): its ELSFP external light source features 'self‑developed CW lasers'; 'the 100 mW ELSFP has achieved initial commercialization', with a 400 mW ELSFP demonstrated; the company describes a full chain from CW lasers to ELSFP to NPO/CPO. Issuer self-report (L8 weak), same origin as Broadcom's partner listing of LIGENT only in subject — no customer, volume or qualification named here.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "tech:external_laser_source",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "ligent_cioe_2026_product_matrix_2026_09_07_s1",
+        "ligent_cioe_2026_product_matrix_2026_09_07_s2",
+        "ligent_cioe_2026_product_matrix_2026_09_07_s3"
+      ],
+      "src_id": "co:ligent"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "Ligent Technologies, Inc.",
+        "Ligent"
+      ],
+      "attributes": {
+        "ticker": "9856.HK"
+      },
+      "confidence": 0.85,
+      "id": "co:ligent",
+      "name": "Ligent Technologies",
+      "role": null,
+      "source_ids": [
+        "ligent_cioe_2026_product_matrix_2026_09_07_s1",
+        "ligent_cioe_2026_product_matrix_2026_09_07_s2",
+        "ligent_cioe_2026_product_matrix_2026_09_07_s3"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "CW laser",
+        "internal laser diode",
+        "high-power CW laser",
+        "CW DFB",
+        "CW DFB laser",
+        "DFB laser",
+        "high-power DFB laser"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:cw_dfb_laser",
+      "name": "High-power CW DFB laser",
+      "role": null,
+      "source_ids": [
+        "ligent_cioe_2026_product_matrix_2026_09_07_s1",
+        "ligent_cioe_2026_product_matrix_2026_09_07_s3"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "ELS",
+        "pluggable laser source",
+        "external light source engine",
+        "external laser sources",
+        "light engines",
+        "External Laser Small Form Factor Pluggable",
+        "ELSFP",
+        "external laser module",
+        "ELS module",
+        "turnkey ELS module",
+        "turnkey ELS"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:external_laser_source",
+      "name": "External Laser Source",
+      "role": null,
+      "source_ids": [
+        "ligent_cioe_2026_product_matrix_2026_09_07_s1",
+        "ligent_cioe_2026_product_matrix_2026_09_07_s2",
+        "ligent_cioe_2026_product_matrix_2026_09_07_s3"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "ligent_cioe_2026_product_matrix_2026_09_07",
+    "evidence_tier": 2,
+    "origin_entity": "Ligent Technologies, Inc.",
+    "permission_basis": "公司官網公開新聞稿；只保留研究必要的有限逐字節錄（HTML 本機去標籤後逐字核對）。published_at 取頁面標示日期 2026-09-07。",
+    "published_at": "2026-09-07",
+    "publisher": "Ligent Technologies（官網）",
+    "retrieved_at": "2026-10-17",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "Ligent Technologies 官網新聞稿〈CIOE 2026 … Featuring NPO/XPO and High‑Power Lasers〉節錄：ELSFP 用自研 CW 雷射、100 mW ELSFP 初步商用",
+    "url": "https://www.ligent.com/about/news/175.html"
+  },
+  "sources": [
+    {
+      "id": "ligent_cioe_2026_product_matrix_2026_09_07_s1",
+      "locator": "CIOE 2026 新聞稿（2026-09-07）NPO 段",
+      "quote": "Paired with the ELSFP external light source solution featuring self‑developed CW lasers, it delivers a complete NPO optical interconnect solution tailored for high‑density and low‑power‑consumption scenarios."
+    },
+    {
+      "id": "ligent_cioe_2026_product_matrix_2026_09_07_s2",
+      "locator": "同上，光源產品線段",
+      "quote": "In terms of light source product lines, the 100 mW ELSFP has achieved initial commercialization, while the brand‑new 400 mW ultra‑high‑power ELSFP will be demonstrated on‑site at the exhibition."
+    },
+    {
+      "id": "ligent_cioe_2026_product_matrix_2026_09_07_s3",
+      "locator": "同上，自研雷射段",
+      "quote": "Ligent Technologies’ self‑developed lasers feature high output power, high efficiency and superior stability. They lay a solid light‑source foundation for ELSFP, NPO/CPO silicon photonics applications, completing the full technical chain spanning CW lasers, ELSFP external light sources down to NPO/CPO deployments."
+    }
+  ]
+}

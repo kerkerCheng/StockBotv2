@@ -1,0 +1,24 @@
+Source URL: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0914/2026091400007.pdf
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Ligent Technologies, Inc.（9856.HK）Global Offering 招股書節錄：自製高功率 CW-DFB 雷射晶片（75／100mW 已量產、400mW 給 CPO 用 ELSFP 開發中）
+Source: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0914/2026091400007.pdf
+RETRIEVED: 2026-10-17（HKEXnews 招股書 PDF 本機抽字、逐字核對；PDF 行尾斷開的「CW-／DFB」接回成 CW-DFB）
+
+【DEFINITIONS（PDF 第 22 頁）】
+“Company”, “our Company”, “the Company”, “we”, “our” or “us” Ligent Technologies, Inc.
+
+【SUMMARY — Optical Chips（PDF 第 11 頁）】
+We have developed and produced DFB laser chips, including 75mW and 100mW high-power continuous CW-DFB laser chips, and are currently developing 150mW/400mW CW-DFB laser chips.
+
+【BUSINESS — Production Facilities／Utilization（PDF 第 163 頁）】
+These laser chips are either sold to external Chinese and overseas customers or used for our in-house production of optical transceivers.
+
+【SUMMARY — Gross Profit Margin（PDF 第 16 頁）】
+The gross profit margin of optical chips improved significantly to a positive 40.7% in the six months ended June 30, 2026, primarily due to an increase in sales volume of optical chips after we achieved production of 75mW CW-DFB laser chips in the first quarter of 2026.
+
+【BUSINESS — Our Products, CW-DFB laser chips（PDF 第 153 頁）】
+We are also developing 400mW CW-DFB laser chips which will be used in the CPO-based ELSFP modules. We expect to commence production of 150mW CW-DFB laser chips by the fourth quarter of 2026 and complete customer validation of this product with leading optical transceiver manufacturers in the first quarter of 2027. We expect to commence production of 400mW CW-DFB laser chips by the first quarter of 2027 and complete customer validation of this product with leading optical transceiver manufacturers in the third quarter of 2027.
+
+【BUSINESS — Laser chips in-house（PDF 第 146 頁）】
+Since the launch of our high-power CW-DFB laser chips, some of our CW-DFB laser chips used in the optical transceiver production are produced in-house.
