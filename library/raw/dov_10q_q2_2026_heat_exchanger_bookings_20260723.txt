@@ -1,0 +1,12 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/29905/000002990526000027/dov-20260630.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Dover Corporation 10-Q（quarter ended June 30, 2026；EDGAR 2026-07-23）節錄：MD&A — Climate & Sustainability Technologies
+RETRIEVED: 2026-10-18（EDGAR 原文抽字、空白正規化後逐字核對）
+NOTE: 原文沒寫 SWEP 這個品牌名，也沒拆資料中心營收；熱交換器事業在 Climate & Sustainability Technologies 分部。
+
+【MD&A — Climate & Sustainability Technologies（第二季營收）】
+"The organic revenue growth was primarily driven by continued strong demand in CO2 refrigerant systems and growth in refrigerated door case volumes, as well as accelerating demand for heat exchangers used in data center cooling and other applications."
+
+【MD&A — Climate & Sustainability Technologies（第二季訂單）】
+"Bookings in the second quarter of 2026 increased 45.8% from the prior year comparable quarter. The bookings increase was primarily driven by demand strength in retail refrigeration and heat exchangers, including longer lead-time orders. Segment book-to-bill was 1.23."

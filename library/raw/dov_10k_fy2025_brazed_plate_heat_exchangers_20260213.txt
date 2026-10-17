@@ -1,0 +1,12 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/29905/000002990526000009/dov-20251231.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Dover Corporation 10-K（fiscal year ended December 31, 2025；EDGAR 2026-02-13）節錄：Item 1 Business
+RETRIEVED: 2026-10-18（EDGAR 原文抽字、空白正規化後逐字核對）
+NOTE: 原文沒寫 SWEP 這個品牌名，也沒拆資料中心營收；熱交換器事業在 Climate & Sustainability Technologies 分部。
+
+【Item 1 Business — Climate & Sustainability Technologies】
+"Our heat exchanger business manufactures energy-efficient brazed plate heat exchangers used for residential climate control applications, including heat pumps, as well as industrial heating and cooling applications, including an increasing opportunity in data center cooling applications."
+
+【Item 1 Business — 元件的切換成本】
+"For example, our industrial and biopharma pumps, biopharma connectors, engineered bearings and compression components, clean energy components, and heat exchangers are all part of larger systems built or employed by our customers. Such components typically serve demanding applications where value-in-use and costs and risks of switching far exceed the cost of the component itself."
