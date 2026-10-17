@@ -1,0 +1,69 @@
+Source URL: https://www.bseindia.com/xml-data/corpfiling/AttachHis/f1397129-0d33-483b-8633-89b9aed4ff65.pdf
+Source URL: https://www.bseindia.com/xml-data/corpfiling/AttachHis/524d4b30-e0c3-4daf-8d75-72f4269a8d4e.pdf
+
+Excerpt:
+[EXCERPT — 有限逐字引文] KSH International Limited（NSE: KSHINTL；BSE: 544664）Q1 FY2027（季末 2026-06-30）兩份交易所申報節錄：
+①Investor Presentation（BSE／NSE 申報 2026-08-10）；②Earnings Conference Call 逐字稿（法說 2026-08-11，申報 2026-08-14）
+RETRIEVED: 2026-10-17（BSE 申報 PDF 本機抽字、逐字核對；簡報表格因抽字壓成多行，數字照原表）
+
+=== ① Investor Presentation（2026-08-10）===
+
+【p.3 KSH in a Snapshot】
+Transformer capacity in India to triple from ~110 GVA to ~300 GVA by FY28E*. Key drivers include Energy transition, AI data centers as well as global grid upgrades.（*ICICI Securities）
+Only Indian supplier approved for HVDC transformers. Recently received first awards for Specialized wires for HVDC transformers.
+Expanding total capacity from 29,045 MT in FY25 to 59,045 MT by March 2027. At June 30, 2026, Annualized Capacity was 43,445 MTs.
+Serves 120+ OEM customers including leading local and global companies such as Hitachi Energy, CG Power, BHEL, GE Vernova, Siemens Energy, Bharat Bijlee, Nidec, Suzlon etc.
+Largest Indian exporter of winding wires to 24 countries including Middle East, Europe and USA. ~30% revenue contribution from exports.
+
+【Sales Volume (MTPA) & Capacity Utilization】
+FY24 21,495（75.6%）｜FY25 23,324（80.3%）｜FY26 28,168（64.8%）｜Q1-FY27 7,969（73.4%）
+
+【p.14 Management Commentary】
+"Growth in our higher value-addition Specialized Wires, specifically CTC, meaningfully outpaced the healthy growth in Standard Wires, driving volumes, exports and unit economic profitability in Q1. During the quarter, we also signed a long-term framework agreement with a large Global transformer OEM to supply their global production facilities over the next five years. Our next phase of capacity expansion in Phase 2 is on track to come online in Q2, and last week, we commissioned our upcast backward integration facility as well." – Rajesh K. Hegde, Managing Director
+Key Trends: Strong demand for specialized wires, especially CTC, domestically and in exports
+Q1 FY27 vs Q1 FY26: Revenue Ops (Y/Y) +108% vs +29%｜PAT (INR Mn) 422 vs 227｜Volume Growth +30% vs +7%｜EBITDA/Ton (in Rs) 93,325 vs 65,885｜Specialized Wire Mix 75% vs 72%｜Specialized Revenue Growth (Y/Y) 113% vs 29%｜Export Revenue Growth 83% vs 32%
+Avl Capacity (MTs) 43,445｜Utilization 73%｜Total Debt (INR Mn) 4,810 vs 3,794｜Debt/Equity 0.57 vs 1.18
+
+【p.15 Quarterly Financial Performance（INR Mn）】
+Revenue from Operations 11,642（Q1 FY26 5,587；Y-o-Y 108.4%；Q4 FY26 10,183）
+Gross Profit 1,163｜Gross Profit Margin % 9.99%（Q1 FY26 11.63%；Q4 FY26 9.52%）
+EBITDA 744｜EBITDA Margin % 6.39%｜Profit After Tax 422｜Diluted EPS (INR) 6.22
+
+【p.16 Historical Income Statement（INR Mn）】
+Revenue from Operations FY24 13,828｜FY25 19,283｜FY26 31,070
+Gross Profit Margin % FY24 10.92%｜FY25 11.09%｜FY26 10.32%
+
+=== ② Earnings Conference Call Transcript（2026-08-11）===
+
+【p.4 開場（MD Rajesh Hegde）】
+"Thus, LME copper price and exchange rate is a direct pass-through. Roughly 75% of our revenue comes from large power transformers used in T&D, renewables, railways, and data centers, driven by our core continuously transposed conductors or CTC product, in which we are the market leaders in India."
+"CTC is a complex engineered wire product and all of our exports are exclusively to T&D customers across five continents."
+"We are very pleased to announce that we have entered into a five-year supply framework agreement with Hitachi Energy Global to supply winding wires to their Indian plants as well as their some of their global plants."
+
+【p.5】
+"As yet, this is a framework agreement and the details are still being finalized."
+"Looking at our export performance in Q1 of FY27, our export revenue increased 76% year-over-year and 12% higher than Q4 of FY26."
+"In fact, in Q1, CTC's contribution to the total revenue reached record levels in the last several years. Apart from the end-user demand environment, this was also partially driven by the fact that we front-loaded some of our phase one capacity addition towards specialized wires."
+"Over the next two to three quarters, we expect this to normalize to previous levels as we complete phase two of our expansion over the remainder of this year."
+
+【Q&A：Hitachi 框架協議】
+"So with Hitachi, you know, as we mentioned, this is a framework agreement where the broad construct is, you know, decided upon, but still there's no quantity or, you know, price defined as of right now."
+"Now the trend in the industry, what we had mentioned before also is, since most of the transformer manufacturers globally are sitting on an order book of say about say three to four years, so the general tendency is to, you know, at least lock in some amount of the capacity that would be required"
+
+【p.16–17 Q&A：CTC 占比（HSBC 提問）】
+"So for the last 2, 3 quarters or so, that has trended above 25% of overall CTC volume is coming from the large power transformers."（回答 765 kV 與 HVDC 的占比）
+"I think if you look at overall specialized wires, CTC will represent anywhere between 50% to 75% of that segment."（Dhruv Chopra）
+
+【Q&A：產能配置】
+"when we did the 43,000 approximately capacity, we had front-loaded the CTC capacity, but now going forward, we would be having more of the standard wire and some of the special wire which goes into the EV"
+"But the CTC capacity is available with us for the rest of the year already, and that's the focus for utilization and with the customers."
+
+【p.20 Q&A：每噸 EBITDA 93,000 的來源】
+"One of them was obviously the CTC mix was higher, the export percentage was higher also"
+"But one thing that we pointed out also is that some of the new customers we had, and which we were executing orders in the Q1 where we've onboarded, they are obviously at a higher value addition than the existing customers because we had an opportunity to link it to the market price as well."
+"So next year we'll really start with an installed capacity base of around 59,000 metric tons."
+
+【p.13–14 Q&A：出口占比與美國（ICICI Securities 提問「how much was to US and Middle East?」）】
+"So on that basis, I think it was 27%, around 27%. Yes, this quarter it was 27%."（Q1 FY27 出口占營業收入，不含其他營業收入）
+"the target is to increase it back to its historical peak of around 40% of total revenue."
+"So, quarterly we don't provide that information, but annually Middle East, Europe, and US are key export geographies, and each of them represented between 8% to 11% of total revenue."（Dhruv Chopra）

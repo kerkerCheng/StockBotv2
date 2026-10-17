@@ -1,0 +1,26 @@
+Source URL: https://nsearchives.nseindia.com/annual_reports/AR_30261_PRECWIRE_2025_2026_U_2469795_08082026133545.pdf
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Precision Wires India Limited（NSE: PRECWIRE）Annual Report 2025-26（NSE 年報申報 Revised 版，2026-08-08；原版 2026-07-13）節錄：出口、美國關稅、產品線、產能
+RETRIEVED: 2026-10-17（NSE 年報 PDF 本機抽字；⚠ 抽字把詞間空白全部吃掉，下列引文是補回空白後的逐字——核對時去掉空白比對）
+
+【p.21–22 Directors' Report §3 Operations】
+"During most of the year, India faced the uncertainty brought about by the imposition of US Trade tariffs."
+"During FY2025-26, there was a steady demand in key overseas markets despite facing stiff competition and tariff discrimination in international markets. USA imposed substantial tariffs on Indian Products during the year."
+"Despite the complex Geo-Political global environment, we were able to grow exports, contributing to the Company's balanced revenue mix."
+"Copper supply remained tight globally."
+"During the end of the year, our Company commenced its Copper Rod manufacturing operation at Valvada, Gujarat for captive use at our Silvassa, DNH plants."
+
+【p.22 Expansion: Status of Projects（表格，抽字壓成多行）】
+"Our current installed Capacity of Copper Winding Wires as on date of this Board Meeting after considering completion of this project is currently approx. 55,000 MT/PA (rounded off)"
+"Project is in Progress and is expected to be completed by end of Q1 FY2026-27. Our Installed Capacity for manufacturing of Copper Winding Wires after Completion of this project will be approx. 61,700 MT/PA (rounded off)."
+"Project is in Progress and is expected to be completed by end of Q1 FY2027-28. Our Installed Capacity for manufacturing of Copper Winding Wires after Completion of this project will be approx. 65,500 MT/PA (rounded off)."
+
+【p.40 Research and Development】
+"Currently there are five main products are there, which are developed by the Company, based on the widespread requirement of the customer i.e. Continuously Transposed Conductor, Enamelled Round Winding Wires, Enamelled Rectangular Winding Wire, Paper Insulated Copper Conductor and Submersible Winding Wire."
+
+【p.63 BRSR Section A §16】
+"b. What is the contribution of exports as a percentage of the total turnover of the entity?"
+"14.83% of Total Turnover."
+
+（全份年報沒有揭露 CTC 營收占比或美國營收占比；「Transposed」只出現在產品列舉與會計政策的公司描述。）
