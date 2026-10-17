@@ -1,0 +1,11 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/2071778/000207177826000010/frmi-20251231.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Fermi Inc. 10-K（fiscal year ended December 31, 2025；EDGAR 2026-03-30）節錄：High Voltage Equipment Warehouse Financing、Risk Factors
+RETRIEVED: 2026-10-18（EDGAR 原文抽字、空白正規化後逐字核對）
+
+【Item 1 Business — High Voltage Equipment Warehouse Financing】
+"In February 2026, we entered into a $120.0 million high-voltage equipment warehouse financing facility with Keystone National Group, LLC, which may be increased by up to an additional $100.0 million subject to the terms and conditions of the financing agreement. The facility is intended to support the procurement of long-lead electrical infrastructure required for Project Matador, including substations, transformers, breakers, and related high-voltage switchgear and balance-of-plant equipment. This facility is intended to enhance execution certainty by enabling advance procurement and staged delivery of critical non-spinning equipment necessary to support campus energization and phased power delivery."
+
+【Item 1A Risk Factors — Long-Lead Equipment and Key Supplier Concentration】
+"The project requires procurement of long-lead equipment, including turbines, transformers, breakers, substations, and related high-voltage infrastructure. Industry-wide constraints on manufacturing capacity and delivery lead times may delay energization schedules or increase project costs."
