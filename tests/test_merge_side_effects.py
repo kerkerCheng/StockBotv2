@@ -195,6 +195,18 @@ def test_evidence_lines_say_unknown_out_loud_and_print_each_change() -> None:
         {"edge": ["co:a", "supplies_to", "tech:z"], "before": None, "after": "self_reported", "after_withheld": []}]})
     assert lines[0] == "- 入圖後證據等級會變的邊 2 條："
     assert "外部印證 → 待判定（沒升外部印證：引文沒具名主詞）" in lines[1] and "新邊 → 供應商自報" in lines[2]
+    assert "採用帶動" not in lines[1]
+
+
+def test_evidence_lines_spell_out_the_enables_direction() -> None:
+    """2026-10-18 [790]：`tech:sige_platform enables tech:tia_driver` 寫反了（本意是 SiGe 是 TIA 的製程），
+    乾跑只印「新邊」，同文件沒有反向邊所以 validate 也沒說話——方向要印在邊旁邊。"""
+    from loader.merge_side_effects import evidence_lines
+
+    lines = evidence_lines({"status": "checked", "changes": [
+        {"edge": ["tech:tia_driver", "enables", "tech:sige_platform"], "before": None, "after": "self_reported",
+         "after_withheld": []}]})
+    assert "（＝`tech:tia_driver` 的採用帶動 `tech:sige_platform` 的需求）" in lines[1]
 
 
 class _IdSession:

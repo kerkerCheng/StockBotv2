@@ -300,7 +300,10 @@ def evidence_lines(check: Mapping[str, Any] | None) -> list[str]:
         after = EVIDENCE_LABEL.get(str(change.get("after")), str(change.get("after")))
         withheld = [WITHHELD_LABELS.get(str(w), str(w)) for w in change.get("after_withheld") or ()]
         note = f"（沒升外部印證：{'、'.join(withheld)}）" if withheld else ""
-        lines.append(f"  - `{' '.join(change['edge'])}`：{before} → {after}{note}")
+        src, relation, dst = change["edge"]
+        # `enables` 的方向只靠定義記得住，寫反了 validate 抓不到（同文件沒有反向邊時）——把定義印在邊旁邊，寫的人與核准的人都看得到
+        plain = f"（＝`{src}` 的採用帶動 `{dst}` 的需求）" if relation == "enables" else ""
+        lines.append(f"  - `{' '.join(change['edge'])}`{plain}：{before} → {after}{note}")
     return lines
 
 
