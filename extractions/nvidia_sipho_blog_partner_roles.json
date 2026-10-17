@@ -78,6 +78,45 @@
       ],
       "statement": "NVIDIA's own technical blog on its silicon-photonics (CPO) switches lists, under the partner entry 'Browave, Corning, Senko, TFC Communication, and Coherent', the role 'Industry experts with optical connectors and fiber assemblies for linking the ELS lasers with polarization, maintaining fibers into the silicon photonics engine, and data output to the front panel.' Customer-side naming: Coherent supplies the fiber attach / fiber assembly layer of NVIDIA's CPO switch. The blog names five partners for the role, so this is not sole source; it states a partner role, not volume or share. Coherent's own filings already supply this node (self-reported); this sentence is the customer-side naming of the same role.",
       "subject_id": "e12"
+    },
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：NVIDIA 後續的一手文件（技術部落格、夥伴頁、法說）把 Sumitomo Electric 移出 ELS 夥伴名單，或 Sumitomo Electric 的一手寫出不再供 NVIDIA 的 ELS 組裝。核查頻率：每半年（NVIDIA GTC、OCP 與夥伴頁）。觸發後 48 小時：e13 降 confidence 或提撤回，重讀外部光源層的供給側。",
+      "id": "nvidia_sipho_blog_partner_roles_cl_els_sumitomo_electric",
+      "source_ids": [
+        "nvidia_sipho_blog_partner_roles_s9",
+        "nvidia_sipho_blog_partner_roles_s5",
+        "nvidia_sipho_blog_partner_roles_s6"
+      ],
+      "statement": "NVIDIA (customer/platform) technical blog on silicon-photonics switching, partner roles: under 'ELS lasers and subassemblies' it names 'Lumentum, Sumitomo, and Coherent: These vendors provide ELS assembly, optical alignment, and test with the silicon photonics engine.' Lasers reside on front-panel external-laser-source pluggable OSFP modules. Customer-side naming of Sumitomo Electric as an ELS supplier for NVIDIA's CPO switches (added 2026-10-17: the same sentence was previously attached only to the Sumitomo→NVIDIA company edge, invisible to the ELS layer reading — failure log #36 shape). No volume, share or sole-source claim.",
+      "subject_id": "e13"
+    },
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：NVIDIA 後續的一手文件（技術部落格、夥伴頁、法說）把 Lumentum 移出 ELS 夥伴名單，或 Lumentum 的一手寫出不再供 NVIDIA 的 ELS 組裝。核查頻率：每半年（NVIDIA GTC、OCP 與夥伴頁）。觸發後 48 小時：e14 降 confidence 或提撤回，重讀外部光源層的供給側。",
+      "id": "nvidia_sipho_blog_partner_roles_cl_els_lumentum",
+      "source_ids": [
+        "nvidia_sipho_blog_partner_roles_s9",
+        "nvidia_sipho_blog_partner_roles_s5",
+        "nvidia_sipho_blog_partner_roles_s6"
+      ],
+      "statement": "NVIDIA (customer/platform) technical blog on silicon-photonics switching, partner roles: under 'ELS lasers and subassemblies' it names 'Lumentum, Sumitomo, and Coherent: These vendors provide ELS assembly, optical alignment, and test with the silicon photonics engine.' Lasers reside on front-panel external-laser-source pluggable OSFP modules. Customer-side naming of Lumentum as an ELS supplier for NVIDIA's CPO switches (added 2026-10-17: the same sentence was previously attached only to the Sumitomo→NVIDIA company edge, invisible to the ELS layer reading — failure log #36 shape). No volume, share or sole-source claim.",
+      "subject_id": "e14"
+    },
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：NVIDIA 後續的一手文件（技術部落格、夥伴頁、法說）把 Coherent 移出 ELS 夥伴名單，或 Coherent 的一手寫出不再供 NVIDIA 的 ELS 組裝。核查頻率：每半年（NVIDIA GTC、OCP 與夥伴頁）。觸發後 48 小時：e15 降 confidence 或提撤回，重讀外部光源層的供給側。",
+      "id": "nvidia_sipho_blog_partner_roles_cl_els_coherent",
+      "source_ids": [
+        "nvidia_sipho_blog_partner_roles_s9",
+        "nvidia_sipho_blog_partner_roles_s5",
+        "nvidia_sipho_blog_partner_roles_s6"
+      ],
+      "statement": "NVIDIA (customer/platform) technical blog on silicon-photonics switching, partner roles: under 'ELS lasers and subassemblies' it names 'Lumentum, Sumitomo, and Coherent: These vendors provide ELS assembly, optical alignment, and test with the silicon photonics engine.' Lasers reside on front-panel external-laser-source pluggable OSFP modules. Customer-side naming of Coherent as an ELS supplier for NVIDIA's CPO switches (added 2026-10-17: the same sentence was previously attached only to the Sumitomo→NVIDIA company edge, invisible to the ELS layer reading — failure log #36 shape). No volume, share or sole-source claim.",
+      "subject_id": "e15"
     }
   ],
   "edges": [
@@ -218,6 +257,43 @@
         "nvidia_sipho_blog_partner_roles_s7"
       ],
       "src_id": "co:coherent"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:external_laser_source",
+      "id": "e13",
+      "relation": "supplies_to",
+      "source_ids": [
+        "nvidia_sipho_blog_partner_roles_s9",
+        "nvidia_sipho_blog_partner_roles_s5",
+        "nvidia_sipho_blog_partner_roles_s6"
+      ],
+      "src_id": "co:sumitomo_electric"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:external_laser_source",
+      "id": "e14",
+      "relation": "supplies_to",
+      "source_ids": [
+        "nvidia_sipho_blog_partner_roles_s9",
+        "nvidia_sipho_blog_partner_roles_s5"
+      ],
+      "src_id": "co:lumentum"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:external_laser_source",
+      "id": "e15",
+      "relation": "supplies_to",
+      "source_ids": [
+        "nvidia_sipho_blog_partner_roles_s9",
+        "nvidia_sipho_blog_partner_roles_s5"
+      ],
+      "src_id": "co:coherent"
     }
   ],
   "nodes": [
@@ -350,12 +426,13 @@
       "attributes": {
         "ticker": "5802.T"
       },
-      "confidence": 0.85,
+      "confidence": 0.9,
       "id": "co:sumitomo_electric",
       "name": "Sumitomo Electric Industries",
       "role": "material_base",
       "source_ids": [
-        "nvidia_sipho_blog_partner_roles_s5"
+        "nvidia_sipho_blog_partner_roles_s5",
+        "nvidia_sipho_blog_partner_roles_s9"
       ],
       "type": "Company"
     },
@@ -386,7 +463,7 @@
       "attributes": {
         "ticker": "GLW"
       },
-      "confidence": 0.75,
+      "confidence": 0.9,
       "id": "co:corning",
       "name": "Corning",
       "role": "material_base",
@@ -399,10 +476,13 @@
       "abstraction_level": "module_subsystem",
       "aliases": [
         "FAU",
-        "fiber attach unit"
+        "fiber attach unit",
+        "fiber attach",
+        "CPO optical connectors",
+        "fiber assemblies"
       ],
       "attributes": {},
-      "confidence": 0.8,
+      "confidence": 0.9,
       "id": "tech:fiber_attach_unit",
       "name": "Fiber Attach Unit",
       "role": null,
@@ -464,6 +544,45 @@
         "nvidia_sipho_blog_partner_roles_s7"
       ],
       "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "ELS",
+        "pluggable laser source",
+        "external light source engine",
+        "external laser sources",
+        "light engines",
+        "External Laser Small Form Factor Pluggable",
+        "ELSFP",
+        "external laser module"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:external_laser_source",
+      "name": "External Laser Source",
+      "role": null,
+      "source_ids": [
+        "nvidia_sipho_blog_partner_roles_s6",
+        "nvidia_sipho_blog_partner_roles_s9"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "LITE",
+        "Lumentum Holdings"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:lumentum",
+      "name": "Lumentum",
+      "role": "bottleneck_supplier",
+      "source_ids": [
+        "nvidia_sipho_blog_partner_roles_s9"
+      ],
+      "type": "Company"
     }
   ],
   "schema_version": "0.1",
@@ -477,7 +596,7 @@
     "retrieved_at": "2026-09-01",
     "source_type": "news",
     "storage_permission": "repo_excerpt",
-    "supersedes_extraction_sha256": "1a0de8e24e5752977288043fc09dbd95c6704786589696f8584345de5193080d",
+    "supersedes_extraction_sha256": "a95f8c534cc21bbe04835afc713c9a91bc1bdbb33f894d35a9ae80a9147b53bb",
     "title": "A New Era in Data Center Networking with NVIDIA Silicon Photonics-based Network Switching (partner roles)",
     "url": "https://developer.nvidia.com/blog/a-new-era-in-data-center-networking-with-nvidia-silicon-photonics-based-network-switching/"
   },
