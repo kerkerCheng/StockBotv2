@@ -29,7 +29,9 @@
 
 - 登記：registration §2 O1-U（開題 2026-10-04）
 - 研究產出：（尚無）
+  - 2026-10-17｜Wave 2（唯讀研究 workflow wf_59646a4e-958（9 位）＋走圖判定 wf_c1f5a527-bef；寫入由主 session）：一手——商務部、海關總署公告 2025 年第 10 號原文、USGS MCS 2026 Indium、AXT FY2025 10-K（庫內）、住友電工 CS MANTECH 2016 長晶論文、Dowa 有報（2026-06-23）、5N Plus 2025 年報；InP 基板層讀圖換版 `sr_9aa50cb6a36e4822`（判讀不變 volume；反證⑤措辭改準、寫進「上游折進第一層」）；AXTI `ib_9f388500f6291544`、002428.SZ `ib_0c3c7db62b3f2c47` 敘事換騎（內容一字不改）。
 - 結論（H5 的 (i)(ii)，7.4 寫）：（尚無）
+  - 2026-10-17｜**(i)＝都沒擋**：表示法——現有字彙裝得下（DEPENDS_ON／SUPPLIES_TO／CONSTRAINED_BY，原料節點有 mat:rare_earth_metals 前例）；出口管制是時變的監管狀態，照 L4 住讀圖反證⑤的 watch，位置正確。證據——結論需要的一手都拿得到。**(ii)＝沒有**：上游折進了第一層——①管制物項是「3C004.a．磷化铟」本身（所有形態，含多晶）、三甲基铟、三乙基铟與 3E004 生產技術，**銦金屬不在清單**；②銦是冶煉副產品：中國精銦 760 噸占全球 1,100 噸的 70%，中國以外約 340 噸，消費大宗是 ITO，2025 年美國到岸價只漲 11%（USGS）；③AXT 自製 InP 多晶與 pBN 坩堝、自有 VGF，住友自有 VB，看不到獨立的長晶代工層；④邊緣冶煉廠（錫業 000960.SZ、株冶 600961.SS、Dowa 5714.T、5N Plus VNP.TO）銦占營收是零頭或分不出來（Dowa 有報銦與鋅合併成一行、InP 0 處；5N Plus 年報 InP 0 處），Korea Zinc、Umicore 非邊緣，Indium Corporation 私人——最上游真正可投資的就是第一層本身（AXT、雲南鍺業都垂直整合）。指標：讀圖 `sr_9aa50cb6a36e4822`。圖沒有自己報出這個上游：走圖九型沒有一型命中 InP 基板或銦；「下一層 0 條」在 204 個 mat／tech／prod 節點裡 173 個恆亮（L14-4）——本 case 是 7.0a 人工登記開的題。旁支轉給 O6：三甲基铟、三乙基铟是管制品、也是 MOCVD 前驅物（南大光电 300346.SZ 判邊緣 4.35B／1 家，沒查它的 TMIn 營收）。
 - failure log：（尚無）
 
 ## O2 SIVE.ST／CW DFB 與 ELS
@@ -140,6 +142,7 @@
 - 研究產出：（尚無）
   - 2026-10-07｜使用者 go **[715]** 入圖（intake `2b2814f8`）：`mat:inp_epiwafer` 建層；第一份層讀圖 `sr_d16f22339e294216`（volume；層說明 A6–A8 登成讀圖反證）。鄰層換版、判讀不變：CW DFB `sr_d6819880c609bef7`、InP 基板 `sr_3771f0c4c0264542`（需求側多一條買方四年長約）、光二極體 `sr_162c61ce62e6e2fe`；騎這些讀圖的敘事重新連結（聯亞、全新、華星光、SIVE、COHR、LITE、穩懋、AXTI、住友電工、JX、英特磊；COHR／LITE／AXTI 補「已定價」組中位數引用）。要文件 [716][724][725] 改寫成具體去哪找（元大／凱基 App、搜尋字、日期區間；failure log #38）。
 - 結論（H5 的 (i)(ii)，7.4 寫）：（尚無）
+  - 2026-10-17｜**Wave 2 結論**（唯讀研究 workflow wf_59646a4e-958（9 位）＋走圖判定 wf_c1f5a527-bef；寫入由主 session）：**(i)＝證據**——開題時是表示法（圖上沒有磊晶層），[715] 一個 RA 一天就解；層建好之後四檔敘事卡的格全是證據或價格（聯亞已定價等回落、IQE 缺承諾的量與 InP 營收拆分、全新缺 CW 磊晶的量與變體、英特磊份額只有自報），層讀圖缺的三格（聯亞客戶全是代號、BH 還是脊形沒有客戶端文件、份額只有 Yole 2021）也是證據。表示法只剩設備層（圖上沒有 MOCVD 節點，AIXTRON、Veeco 不在名冊）。**(ii)＝沒有**——設備層讀得出是薄的、集中需求也真的灌進去了：買方 MOPS 取得資產公告三筆具名「AIXTRON SE」（聯亞 2026-06-17 約 8.37 億元、08-26 約 9.9 億元；全新 07-30 約 6.53 億元一批、每單位約 9,335 萬元，用途只寫「供生產使用」、不分 InP 或 GaAs）；AIXTRON 新聞稿具名 Lumentum 下多台 G10-AsP；光電占接單 Q1 近七成、Q2 約 75%；Q3 初估接單約 2.75 億歐元、CEO「driven by strong demand for equipment for laser applications in AI data center communications」；現金流主要來自客戶預付款。但可投資的那一半不成立：AIXTRON 非邊緣（41.7 億美元、15 位分析師——比第一層四檔的 8／8／1／3 位都擁擠）；Veeco（邊緣 26.1 億、3 位）的化合物半導體只占 Q2 營收 11%，且在等 Axcelis 全股票併購（SAMR 未批）。這一層押的是量、時鐘短：管理層說 2026 年的限制是爬坡速度不是產能上限、約 15 家雷射廠占相關接單約八成（皆轉述）。指標：讀圖 `sr_d16f22339e294216`；敘事 `ib_37cabf618c6f1978`、`ib_c490d6f9208776d2`、`ib_afd3e889b15a9ed6`、`ib_82e4ee2f96d53261`。另：反證 watch `ew_0643`（AIXTRON 雷射設備大批出貨再延後）的比對實體掛在聯亞，AIXTRON 自己 10-29 的完整季報叫不醒它——10-29 後由互動 session 手動判一次（failure log #71）。開題登記預測的 failure mode「設備產能下游文件很少寫」只對一半：台灣 MOPS 第 20 款寫得出交易相對人，但不寫機型與用途。
   - 2026-10-05｜research-drain 段 5：光二極體層讀圖 `sr_1de9b7868a235363`（undecided：圖上沒有需求側）；英特磊 `ib_fcc9cb3a94644c63`（不要：磷化銦主力在高頻、國防、量子運算，不在 AI 光互連路徑上；會死嗎兩盞紅燈）
   - 2026-10-05｜IQE：補記 Engine C 兩筆（H1 2026 期中結果 `mo_cff71545649a72f530ff7e0ddc704829`、分部占比第二點 `mo_27e86e110a827d67b59fc763d59a46f7`，出處 2026-09-07 半年報：營收年增 43%、Photonics 年增 45%〔一部分是美國國防資金釋出〕、調整後淨現金 3,020 萬英鎊）；量子點雷射磊晶層 `sr_99a7ed3847bc398e`（undecided：一家供應、一個私人買方）；敘事 `ib_da0aabd997e48b44`（缺 X，`ew_0249`：**InP 磊晶在圖上還不是一層**——IQE 的 InP 磊晶邊接在 Tower、MACOM 公司上，LandMark、VPEC、IntelliEPI 是它的競爭者但沒有層節點；這正是本 case 要建的層）
   - 2026-10-06｜**InP 磊晶片層說明 v1**（plan A3 排第一件；個股頁 schema S4 第一份；`library/private/research_notes/layer_notes/mat_inp_epiwafer.md`，四段規格＋讀後報告＋要文件）。
@@ -297,6 +300,9 @@
     **華明第一份 v2 敘事 `ib_5c26d7071cc7ae09`（缺）**：X＝全球缺口流向它的一手、已定價主參照；反證連讀圖 #1、層說明 T1、T4；等待 `ew_0435` 在 10-31（第三季報）叫醒。
     走圖「沒人供應」12 → 10（分接開關、套管都有了供應商）
 - 結論（H5 的 (i)(ii)，7.4 寫）：（尚無）
+  - 2026-10-17｜**Wave 2 結論**（唯讀研究 workflow wf_59646a4e-958（9 位）＋走圖判定 wf_c1f5a527-bef；寫入由主 session）。新的一手：國家實驗室 NLR/TP-5700-96742 全文（圖上那份只節錄了分接開關與套管）其實寫了 CTC 與壓板——「However, for CTCs, which are a critical component of LPT windings, Sam Dong is the only domestic manufacturer.」「This reliance on a single U.S. supplier creates a supply chain bottleneck, prompting original equipment manufacturers to turn to imported CTC.」（2025 年訪談）、部分區域 CTC 供應商退出、GOES 與 CTC 各占 LPT 成本約 25%、壓板「a single domestic manufacturer」且「not many options outside of China」；**美國海關提單**（ImportKey 彙整頁）：KSH International（KSHINTL.NS，邊緣 0.67B／1 家）2026-10-12 把「CONTINUOUSLY TRANSPOSED CONDUCTORS CTC」運給 Virginia Transformer、10-14 運給同地址的 Georgia Transformer；Precision Wires India（PRECWIRE.NS，邊緣 0.86B／1 家）10-06、10-13 把 CTC 運給 Pennsylvania Transformer——兩家 LPT 廠都在圖上。KSH 自己的簡報：產品線有 Continuously Transposed Conductors、出口約三成含美國、產能 2027-03 擴到約兩倍、FY26 利用率 64.8%——**薄只在美國國內這一段**，印度產能正在倍增，量的窗口可能比 LPT 本身早關。→ 入圖包 pq2 **[774]**（`ra_f5dbda57026d610cd39a4b7127af527a`；NLR 走更正走廊；名冊兩筆 staged；發布者「U.S. Customs and Border Protection」與 ImportKey 能不能當入圖來源，請在核准時一併判斷）。絕緣層：沒有上市、主業是絕緣材料的邊緣公司（Weidmann、Cindus 私人；Nomex 2026-04-01 已由 DuPont 賣給私人的 Arclin；日立能源印度非邊緣）。
+  - **(i)＝證據**：開題時表示法是 0，decompose 一天補上；之後擋的是證據——下游 filing 從不具名上游、政府報告具名的都是私人公司或大集團；把上市邊緣公司連上 LPT 廠的是海關提單，這類來源不在管線裡。附帶表示法缺口：走圖第 7 型只認「零條供應邊」、認不得「只有私人或巨頭供應」，CTC、絕緣、套管、電工鋼四層都不亮（failure log #72）。**(ii)＝有**：分接開關的華明（002270.SZ，邊緣 2.28B／10 家；讀圖 `sr_8d94aadb859c3e65`、敘事 `ib_5c26d7071cc7ae09`「缺」——它不在美國這條線上）；CTC 層的 KSH、Precision Wires 待 [774] 入圖後補讀圖與敘事才成列。其餘層：電工鋼、套管、絕緣＝沒有；出廠測試＝供給側照定義是 LPT 廠自己（`lead_188e1fa1` 停放理由）。
+  - **H5 帳（三個二階 case，判準 7.0a 凍結、wave 2 不改）**：O6 (ii)＝沒有、O1-U (ii)＝沒有、P2 (ii)＝有 → 三個裡 2 個 (ii)＝沒有＝**達到「削弱」（殺死條件）**；正式裁決照登記在 7.5 寫。proposal §8 的產品化條件（≥2 個 (i)＝表示法擋住，而且上游有第一層看不到的候選）：三個 case 的 (i) 都不是表示法——不成立。讀法：往上游走沒有比第一層更容易找到非共識公司；P2 那一個「有」是靠一類新來源（海關提單）找到的，不是靠往上游走本身。
 - failure log：（尚無）
   - #9（同 P1）
   - #10（[691] 合資股東的新聞稿被分類成外部印證；與 C1 [690] 同形）
@@ -313,7 +319,16 @@
     供應商自報的產品發表與合作字樣，**不補 lead_fa672a29 的缺口**（supplier relationship not proven）；台達 2025 年報同樣只寫已發展 19 吋 90kW DC/DC 機架式電源
     （800VDC 降 50／48VDC）與列間 1MW 800VDC 電源系統，沒有具名客戶。PR 的散熱段轉給 C1（[697]）
 - 逐則（park 理由今天站不站得住；H2 的「證實」定義）：（尚無）
+  - 2026-10-17｜**Wave 2 回看**（唯讀研究 workflow wf_59646a4e-958（9 位）＋走圖判定 wf_c1f5a527-bef；寫入由主 session）——嚴格照 H2「證實＝之後的一手補上 park 理由缺的那一樣」：
+    ①VRM（lead_18be6b77；「named-supplier role remains unproven」）→ **未證實，理由仍成立**：NVIDIA 800 VDC 技術部落格 dateModified 2026-01-14 名單沒更新；OCP 2026 部落格沒點名任何 VRM 廠；光寶只自述有 VRM 產品線；「MPS 拿約 70%」只是分析師轉述。
+    ②BBU／超級電容（lead_3e0ba028；「wait for named product or supplier disclosure」）→ **理由字面不成立、仍未證實**：具名產品已出現（台達 PR 2026-10-15「a 4RU 80 kW battery backup unit (BBU)」、光寶 PR 2026-10-15「a 108kW Capacitor Backup Unit (CBU)」），都是供應商自報；誰供貨沒有客戶端一手。
+    ③整流與 busway（lead_4c2881be；「ecosystem membership is not a supply contract」）→ **未證實（邊界）**：客戶端 Visionbay 2026-09-16「has begun designing K-1 … alongside … Vertiv 800 VDC power distribution systems」、NVIDIA 2026-10-12 部落格同述——客戶端具名，但是**設計選用**，不是 park 理由缺的**供貨合約**。⚠ **判準在此定一次**：設計選用不算 H2 的證實（之後 X2、P3 照同一條用）。Vertiv 非邊緣、不在名冊。
+    ④GaN／SiC（lead_a4c2e143；「beneficiary ranking would be inference」）→ **未證實，理由仍成立**：Navitas 24kW 800V-to-12V PDB 是與 NVIDIA 的合作（轉載）、Claros 是供應商併購；Navitas 8-K 2026-08-25「short - to mid - term (2027/2028) financial model remain unchanged」；POWI、AOS、Innoscience 09-03 之後沒有訂單或 design win。
+    ⑤DC/DC power shelf（lead_fa672a29；「supplier relationship not proven」）→ **未證實，理由仍成立**：台達 90 kW、光寶 95 kW shelf 都是自報展示；「±400VDC及800VDC系統均陸續出貨…2026年相關產品整體規模有限」只見工商時報轉述。
+    **H2 合併**：P3 嚴格 0/5（含邊界也只有 1/5），X2 1/36，證實數 < 4 → H2 維持「不足」。**世界動了什麼**：從「名單」往「產品與設計選用」動了一格，不是量產訂單；一手與轉述都把 800V 放量放在 2027。**SST（題材掃描 lead_3b9966f3，同日）**：一手只有設計採用——Infineon PR 2026-09-29「will deliver silicon carbide (SiC) power devices to Eaton … MVSST 2.0」（未來式）、Wolfspeed→私人新創 Amperesand（3.3 kV WolfPACK）、Eaton 8-K 收購 Resilient Power Systems；台達「年底 100 台」含送樣、放量年由「最慢 2027」滑到「2028」（皆轉述）；SST 製造商至少 3 家、SiC 至少 2 家，**不是薄層**，邊緣的只有 Wolfspeed（一家私人客戶、「會死嗎」先亮燈）——不開新層，停放等台達 Q3 法說的實際台數。
+    ⚠ **機制缺陷（failure log #69）**：五則 09-03 停成 `original_obtained`，理由句卻是在等具名揭露——沒有觸發、沒有 watch。當下修：un-park 後改停 `awaiting_named_disclosure`、各掛 ew_0744–0748（到期 2027-02-14）。
 - failure log：（尚無）
+  - #69（停放分類把「等待」與「結案」混在 original_obtained）
 
 ## C1 液冷台股供應商
 
@@ -407,6 +422,7 @@
   - 2026-10-07｜反方查證抓到的讀法錯（研究地圖內已標，未進任何 ledger）：§5 把半年報裡就有的營收拆分寫成「沒有數字」（L11-5）——百普賽斯重組蛋白 80.37%、技術服務 2.82%，所以它的曝險在抗原試劑（A4）、不在 AI 表達服務；昭衍的 4,384 萬是預付款總額（它自己持猴，不是乾淨的買方訊號）；Twist 增資兩個數字是基本額對含超額配售、不矛盾
   - 2026-10-07｜AI 生醫研究題全部到終局：AIDD 這條沒有 power-law 的邊緣候選；唯一緊的是中國實驗猴，但需求的一手歸因是創新藥授權、不是 AI。日期等待：ew_0316（FDA 單抗指引定稿，2027-03-31）、ew_0317（BIOSECURE 名單，2026-12-31）、ew_0318（AI 新藥需求端，2026-11-30）。
   - 2026-10-07｜延伸題材：使用者「B ok」→ pq2 **[726]**（受理即 resolve）中國創新藥授權 → 臨床前毒理 → 實驗猴 decompose（`library/private/research_notes/decompose/cn_licensing_nhp_2026-10-07.md`，7 層全不在圖）；7 題當天到終局（`…/2026-10-07_pq1_cnbio_q3a_innostar.md`、`…_cnbio_theme_closeout.md`）：益諾思是買猴的人（一手否定「成本法藏猴資產」）、昭衍公允價值入帳且猴資產約占市值 6%、純做猴的天勤生物（深交所審核中）與鼎泰藥研（港股第二次遞表）未上市——**上市公司層沒有候選**；掛 ew_0319（兩家掛牌，2027-03-31，T2 輪詢）。
+  - 2026-10-17｜**更正**（上面那句保留不刪）：「天勤生物（深交所審核中）」是錯的——深交所、上交所 API 用「天勤」「湖北天勤」「天勤生物」都查無；**中信證券 2026-08-13 公告終止對湖北天勤生物的輔導**（「因公司战略调整原因」）；港交所在審名單（2026-10-17）也沒有。當時依據搜尋摘要、沒開詳情頁（L11-3、L11-5）。鼎泰藥研（TriApex）港交所狀態 A、只有 2026-06-15 的第一次申請版本，約 2026-12-15 失效。**「上市公司層沒有候選」不變，唯一的潛在入口只剩鼎泰。**另兩件同日一手：①商務部、科技部公告 2026 年第 48 號（10-16，徵求意見到 11-15）修訂禁限出口技術目錄——生物醫藥只列 CGT／siRNA 技術工藝平台與病原微生物功能增強，「对外授权许可、利用相关技术工艺提供外包研发和生产服务等……不属于管理范围」，**碰不到抗體／ADC 授權這條鏈頭**（lead_f12babb1）；②昭衍 2026-05-19 業績說明會「目前行业内食蟹猴供应仍然偏紧」但「国内猴子进口政策出现松动迹象」——供給側的反向訊號，政策原文未找到；新浪那則「24 萬」是財經博主一句「据悉」，「三省訂完」是 07-13 記者電訪被雷達併成同一條 10 月事實（lead_268ffc9e，failure log #70）。
 
 ## G1 IC 載板上游：低膨脹玻纖布（T-glass）
 
