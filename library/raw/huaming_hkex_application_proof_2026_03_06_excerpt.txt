@@ -1,0 +1,27 @@
+Source URL: https://www1.hkexnews.hk/app/sehk/2026/108266/documents/sehk26030600646.pdf
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Huaming Power Equipment Co., Ltd.（002270.SZ）H 股 Application Proof（1st submission，英文全文版，HKEX 2026-03-06）節錄：全球分接開關份額（Frost & Sullivan，公司委託）、海外營收、多源趨勢
+RETRIEVED: 2026-10-18（HKEX 申請版本 PDF 本機抽字、空白正規化後逐字核對）
+NOTE: Application Proof 是遞表草稿（封面寫明交易所與證監會不對內容負責）；份額出自公司委託的 Frost & Sullivan 報告——發行人文件引用的第三方研究，不是客戶一手。Company A／B 原文沒具名。
+
+【Summary（PDF p.4）】
+"Our overseas operation was a key growth driver, with revenue from overseas sales contributing approximately 19.9% of our total revenue in 2025, compared to 14.1% in 2023. Our revenue from overseas sales reached RMB478.8 million in 2025 from RMB274.3 million in 2023, with a CAGR of 32.1%."
+
+【Industry Overview — Competitive Landscape Analysis（PDF p.97）】
+"According to Frost & Sullivan, in terms of revenue from the tap-changer business in 2024, we ranked second globally in terms of revenue, with a market share of 17.9%. The three largest global players collectively accounted for approximately 82.5% of the market, reflecting a high degree of industry concentration. In addition, the Company is the only China-based participant among the top three globally."
+
+【Industry Overview — 排名表註（PDF p.97）】
+"Note: Company A: Established in 1891 and headquartered in Regensburg, Germany, a private company engaged in the R&D and manufacture of transformer tap-changers and related monitoring solutions. Company B: Incorporated in 2020 and headquartered in Zurich, Switzerland, a private company and a subsidiary of a Japanese diversified industrial group; its transformer components and tap-changer business traces back over a century, with key operations based in Sweden."
+
+【Industry Overview — 多源趨勢（PDF p.97）】
+"In parallel, utility customers and transformer OEMs are moving from single sourcing toward dual or multi sourcing to enhance supply chain security and reduce execution risk."
+
+【Business — Overview（PDF p.1xx）】
+"Globally, we ranked second in terms of revenue in 2024, with a market share of approximately 17.9%. In voltage segments below 500kV , we held a global market share of approximately 57.3% by sales volume in 2024, according to Frost & Sullivan, demonstrating our strong position across mainstream product categories."
+
+【Business — Sales and Marketing】
+"In addition to our direct export sales, domestic transformer manufacturers also use our tap-changers on transformers exported for overseas projects, enabling us to serve overseas end users indirectly."
+
+【Industry Overview — Tap-changer Business Market Share（PDF p.97）】
+（表格，數字照原表）Ranking｜Company｜Headquarter｜Revenue of Tap-changer Business (RMB in millions)｜Market Share：1 Company A, Germany, 5,052.4, 50.2%；2 The Company, China, 1,798.9, 17.9%；3 Company B, Switzerland, 1,448.2, 14.4%；Top 3 combined 82.5%。Source: Listed companies’ public filings, companies’ websites, Frost & Sullivan analysis
