@@ -1,0 +1,107 @@
+{
+  "claims": [
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：OCI MSA 後續版本（v1.1 以後）允許模組或引擎內建雷射取代 ELS，或主要成員宣布 OCI 產品不用 ELSFP。核查頻率：每半年（oci-msa.org 規格頁、OFC／OCP）。觸發後 48 小時：e1 加註或提撤回，重讀外部光源層的需求側與反向路徑（ew_0722 那一條）。",
+      "id": "oci_msa_200g_oci_phy_spec_v1_0_2026_03_11_cl1",
+      "source_ids": [
+        "oci_msa_200g_oci_phy_spec_v1_0_2026_03_11_s1",
+        "oci_msa_200g_oci_phy_spec_v1_0_2026_03_11_s2",
+        "oci_msa_200g_oci_phy_spec_v1_0_2026_03_11_s3",
+        "oci_msa_200g_oci_phy_spec_v1_0_2026_03_11_s4"
+      ],
+      "statement": "OCI MSA v1.0 (2026-03-11; editors AMD, Broadcom & Meta), the open optical scale-up interconnect spec for 'the AI scale-up domain': §2.5 'The OCI implementation shall use an ELS in compliance with the OIF ELSFP implementation'; the ELS provides the light to both transmitter groups. A written standard mandating external laser sources for OCI scale-up links — it contradicts the OCP 2026 oral remark that OCI does not need an external laser source; the written spec governs.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:external_laser_source",
+      "id": "e1",
+      "relation": "depends_on",
+      "source_ids": [
+        "oci_msa_200g_oci_phy_spec_v1_0_2026_03_11_s2",
+        "oci_msa_200g_oci_phy_spec_v1_0_2026_03_11_s3",
+        "oci_msa_200g_oci_phy_spec_v1_0_2026_03_11_s4"
+      ],
+      "src_id": "tech:optical_scale_up"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:optical_scale_up",
+      "name": "Optical scale-up interconnect",
+      "role": null,
+      "source_ids": [
+        "oci_msa_200g_oci_phy_spec_v1_0_2026_03_11_s2"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "ELS",
+        "pluggable laser source",
+        "external light source engine",
+        "external laser sources",
+        "light engines",
+        "External Laser Small Form Factor Pluggable",
+        "ELSFP",
+        "external laser module"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:external_laser_source",
+      "name": "External Laser Source",
+      "role": null,
+      "source_ids": [
+        "oci_msa_200g_oci_phy_spec_v1_0_2026_03_11_s3",
+        "oci_msa_200g_oci_phy_spec_v1_0_2026_03_11_s4"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "oci_msa_200g_oci_phy_spec_v1_0_2026_03_11",
+    "evidence_tier": 1,
+    "origin_entity": "OCI MSA",
+    "permission_basis": "OCI MSA 官網公開發布的規格 PDF（v1.0，2026-03-11）；只保留研究必要的有限逐字節錄（pypdf 抽字）。published_at 取 Revision History 的 v1.0 日期。",
+    "published_at": "2026-03-11",
+    "publisher": "OCI MSA（oci-msa.org）",
+    "retrieved_at": "2026-10-17",
+    "source_type": "industry_report",
+    "storage_permission": "repo_excerpt",
+    "title": "OCI MSA, 200G Optical Compute Interconnect Line Interface Specification v1.0（2026-03-11；編者 AMD、Broadcom、Meta）節錄：scale-up 用途與 §2.5 外部光源",
+    "url": "https://www.oci-msa.org/assets/files/200G-OCI-Optical-Phy-Specification-v1.0.pdf"
+  },
+  "sources": [
+    {
+      "id": "oci_msa_200g_oci_phy_spec_v1_0_2026_03_11_s1",
+      "locator": "Revision History",
+      "quote": "v1.0 03/11/2026 AMD, Broadcom & Meta 1. Release version"
+    },
+    {
+      "id": "oci_msa_200g_oci_phy_spec_v1_0_2026_03_11_s2",
+      "locator": "Introduction",
+      "quote": "To reduce the fiber connectivity and density challenges of the AI scale-up domain, each fiber supports a bidirectional link with both transmit and receive signals counter-propagating on the same fiber."
+    },
+    {
+      "id": "oci_msa_200g_oci_phy_spec_v1_0_2026_03_11_s3",
+      "locator": "§2.5 External Laser Source",
+      "quote": "The OCI implementation shall use an ELS in compliance with the OIF ELSFP implementation and with the specifications provided in Table 2-6."
+    },
+    {
+      "id": "oci_msa_200g_oci_phy_spec_v1_0_2026_03_11_s4",
+      "locator": "Introduction（Type A／B 收發器）",
+      "quote": "The external laser source (ELS) provides the light to the group A and group B transmitters for modulation."
+    }
+  ]
+}

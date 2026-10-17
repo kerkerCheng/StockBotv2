@@ -1,0 +1,21 @@
+Source URL: https://www.youtube.com/watch?v=WFSptM2O3jA
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Open Compute Project 官方 YouTube 頻道〈CPO, OCI〉（OCP Global Summit 2026，Special Focus: Photonics；講者 Rajiv Pancholy, Director of Hyperscale Strategy and Products - Broadcom；2026-10-14 場、2026-10-15 上傳）
+Source: https://www.youtube.com/watch?v=WFSptM2O3jA
+RETRIEVED: 2026-10-17（YouTube 自動字幕〔en asr〕本機抓取；口述照 ASR 原樣、時間碼為區段起訖。投影片 logo 文字由 lead_324f6de0 附的 OCP 直播截圖逐字轉寫——截圖下方字幕條與官方 ASR 8:08–8:13 一致；自取影格被 googlevideo 擋〔403〕）
+
+【投影片〈TH6-Davisson CPO Partner Ecosystem〉（影片約 7:54–8:20；logo 文字逐字轉寫，框名照投影片）】
+TH6-Davisson CPO Partner Ecosystem ｜ FAU：CORNING · TwinstarTech（TWINSTAR TECHNOLOGIES CO., LTD.） ｜ ELSFP：eoptolink · O-Net Technologies · TFC · FIT · SOURCE PHOTONICS · APERION · LIGENT ｜ （中框）tsmc · SPIL · TH6-Davisson ｜ CPO Rack Unit：Celestica · nexthop ai · Micas Networks · HPE · SUPERMICRO · JABIL · DELTA · QCT
+
+【口述 8:05–8:17（YouTube 自動字幕，照 ASR 原樣）】
+with with the breath of this going on the show floor, you'll see uh mechanical samples of the box. It's it's ready to go. We have ELSFP partners, we have FAU partners. Again, really trying to show that we're ready to to scale this.
+
+【口述 3:42–3:51（YouTube 自動字幕）】
+really going through that, we redesigned the connector. We redesigned We have, you know, a redesign on the ELSFP. You know, we found some issues with the SMT. We had to change that out. Really,
+
+【口述 9:39–9:47（YouTube 自動字幕）】
+By the way, these are standard lasers. You don't need fancy combs. It's a DWDM spacing that standard lasers can do on a CWDM 4 grid. Okay, so again, all of
+
+【口述 10:00–10:05（YouTube 自動字幕）】
+kind of telling people A, you have to do this. Like, you don't even need an external laser source. You can have the laser source embedded in the engine.

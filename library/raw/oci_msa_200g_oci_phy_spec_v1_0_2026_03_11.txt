@@ -1,0 +1,18 @@
+Source URL: https://www.oci-msa.org/assets/files/200G-OCI-Optical-Phy-Specification-v1.0.pdf
+
+Excerpt:
+[EXCERPT — 有限逐字引文] OCI MSA, 200G Optical Compute Interconnect Line Interface Specification v1.0（2026-03-11；編者 AMD、Broadcom、Meta）節錄：scale-up 用途與 §2.5 外部光源
+Source: https://www.oci-msa.org/assets/files/200G-OCI-Optical-Phy-Specification-v1.0.pdf
+RETRIEVED: 2026-10-17（官網 PDF 本機抽字、逐字核對）
+
+【Revision History】
+v1.0 03/11/2026 AMD, Broadcom & Meta 1. Release version
+
+【Introduction】
+To reduce the fiber connectivity and density challenges of the AI scale-up domain, each fiber supports a bidirectional link with both transmit and receive signals counter-propagating on the same fiber.
+
+【§2.5 External Laser Source】
+The OCI implementation shall use an ELS in compliance with the OIF ELSFP implementation and with the specifications provided in Table 2-6.
+
+【Introduction（Type A／B 收發器）】
+The external laser source (ELS) provides the light to the group A and group B transmitters for modulation.

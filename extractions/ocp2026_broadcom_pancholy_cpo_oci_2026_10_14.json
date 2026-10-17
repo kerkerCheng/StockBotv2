@@ -1,0 +1,316 @@
+{
+  "claims": [
+    {
+      "confidence": 0.55,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "條件：Broadcom 或 Eoptolink（新易盛） 的一手文件把它移出 TH6-Davisson（或後繼平台）的 ELSFP 夥伴名單，或寫明它的 ELSFP 沒有進入量產或認證。核查頻率：每半年（OCP／OFC、Broadcom 與該公司公告）。觸發後 48 小時：e1 降 confidence 或提撤回，重讀外部光源層的供給側。",
+      "id": "ocp2026_broadcom_pancholy_cpo_oci_2026_10_14_cl_e1",
+      "source_ids": [
+        "ocp2026_broadcom_pancholy_cpo_oci_2026_10_14_s1",
+        "ocp2026_broadcom_pancholy_cpo_oci_2026_10_14_s2"
+      ],
+      "statement": "Platform-side (Broadcom) naming at OCP Global Summit 2026 (official OCP video WFSptM2O3jA, talk 2026-10-14): the 'TH6-Davisson CPO Partner Ecosystem' slide lists seven ELSFP partners — eoptolink, O-Net Technologies, TFC, FIT, SOURCE PHOTONICS, APERION, LIGENT — and two FAU partners (CORNING, TwinstarTech); the speaker says 'We have ELSFP partners, we have FAU partners.' A partner listing is not a qualification or volume statement. Edges are built only for names the registry can resolve (TFC's single-word form is deliberately not registered; FIT, APERION and TwinstarTech identities are unverified; Corning's FAU edge already exists from NVIDIA's list and the uppercase logo does not match its registered forms). Coherent and Lumentum are not on this slide (absence from a partner slide is not evidence they do not supply). Eoptolink (300502.SZ) is a large optical-module maker (not edge).",
+      "subject_id": "e1"
+    },
+    {
+      "confidence": 0.55,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "條件：Broadcom 或 O-Net 的一手文件把它移出 TH6-Davisson（或後繼平台）的 ELSFP 夥伴名單，或寫明它的 ELSFP 沒有進入量產或認證。核查頻率：每半年（OCP／OFC、Broadcom 與該公司公告）。觸發後 48 小時：e2 降 confidence 或提撤回，重讀外部光源層的供給側。",
+      "id": "ocp2026_broadcom_pancholy_cpo_oci_2026_10_14_cl_e2",
+      "source_ids": [
+        "ocp2026_broadcom_pancholy_cpo_oci_2026_10_14_s1",
+        "ocp2026_broadcom_pancholy_cpo_oci_2026_10_14_s2"
+      ],
+      "statement": "Platform-side (Broadcom) naming at OCP Global Summit 2026 (official OCP video WFSptM2O3jA, talk 2026-10-14): the 'TH6-Davisson CPO Partner Ecosystem' slide lists seven ELSFP partners — eoptolink, O-Net Technologies, TFC, FIT, SOURCE PHOTONICS, APERION, LIGENT — and two FAU partners (CORNING, TwinstarTech); the speaker says 'We have ELSFP partners, we have FAU partners.' A partner listing is not a qualification or volume statement. Edges are built only for names the registry can resolve (TFC's single-word form is deliberately not registered; FIT, APERION and TwinstarTech identities are unverified; Corning's FAU edge already exists from NVIDIA's list and the uppercase logo does not match its registered forms). Coherent and Lumentum are not on this slide (absence from a partner slide is not evidence they do not supply). O-Net Technologies is privately held; on the graph its only prior ELS origin was Sivers' annual report (a partner's self-report) — this is the first platform-side naming.",
+      "subject_id": "e2"
+    },
+    {
+      "confidence": 0.55,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "條件：Broadcom 或 Source Photonics 的一手文件把它移出 TH6-Davisson（或後繼平台）的 ELSFP 夥伴名單，或寫明它的 ELSFP 沒有進入量產或認證。核查頻率：每半年（OCP／OFC、Broadcom 與該公司公告）。觸發後 48 小時：e3 降 confidence 或提撤回，重讀外部光源層的供給側。",
+      "id": "ocp2026_broadcom_pancholy_cpo_oci_2026_10_14_cl_e3",
+      "source_ids": [
+        "ocp2026_broadcom_pancholy_cpo_oci_2026_10_14_s1",
+        "ocp2026_broadcom_pancholy_cpo_oci_2026_10_14_s2"
+      ],
+      "statement": "Platform-side (Broadcom) naming at OCP Global Summit 2026 (official OCP video WFSptM2O3jA, talk 2026-10-14): the 'TH6-Davisson CPO Partner Ecosystem' slide lists seven ELSFP partners — eoptolink, O-Net Technologies, TFC, FIT, SOURCE PHOTONICS, APERION, LIGENT — and two FAU partners (CORNING, TwinstarTech); the speaker says 'We have ELSFP partners, we have FAU partners.' A partner listing is not a qualification or volume statement. Edges are built only for names the registry can resolve (TFC's single-word form is deliberately not registered; FIT, APERION and TwinstarTech identities are unverified; Corning's FAU edge already exists from NVIDIA's list and the uppercase logo does not match its registered forms). Coherent and Lumentum are not on this slide (absence from a partner slide is not evidence they do not supply). Source Photonics is privately held.",
+      "subject_id": "e3"
+    },
+    {
+      "confidence": 0.55,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "條件：Broadcom 或 Ligent 的一手文件把它移出 TH6-Davisson（或後繼平台）的 ELSFP 夥伴名單，或寫明它的 ELSFP 沒有進入量產或認證。核查頻率：每半年（OCP／OFC、Broadcom 與該公司公告）。觸發後 48 小時：e4 降 confidence 或提撤回，重讀外部光源層的供給側。",
+      "id": "ocp2026_broadcom_pancholy_cpo_oci_2026_10_14_cl_e4",
+      "source_ids": [
+        "ocp2026_broadcom_pancholy_cpo_oci_2026_10_14_s1",
+        "ocp2026_broadcom_pancholy_cpo_oci_2026_10_14_s2"
+      ],
+      "statement": "Platform-side (Broadcom) naming at OCP Global Summit 2026 (official OCP video WFSptM2O3jA, talk 2026-10-14): the 'TH6-Davisson CPO Partner Ecosystem' slide lists seven ELSFP partners — eoptolink, O-Net Technologies, TFC, FIT, SOURCE PHOTONICS, APERION, LIGENT — and two FAU partners (CORNING, TwinstarTech); the speaker says 'We have ELSFP partners, we have FAU partners.' A partner listing is not a qualification or volume statement. Edges are built only for names the registry can resolve (TFC's single-word form is deliberately not registered; FIT, APERION and TwinstarTech identities are unverified; Corning's FAU edge already exists from NVIDIA's list and the uppercase logo does not match its registered forms). Coherent and Lumentum are not on this slide (absence from a partner slide is not evidence they do not supply). Ligent Technologies (9856.HK) self-reports (2026-09-07) that its 100 mW ELSFP 'has achieved initial commercialization' and that its ELSFP uses self-developed CW lasers (not in this package).",
+      "subject_id": "e4"
+    },
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：Broadcom 的一手文件寫出 TH6-Davisson 或後繼 CPO 改用模組內建雷射（不用 ELSFP），或 ELSFP 可靠度問題導致量產延後。核查頻率：每半年（OCP、OFC、Broadcom 法說）。觸發後 48 小時：重讀外部光源層的反向路徑與需求側。",
+      "id": "ocp2026_broadcom_pancholy_cpo_oci_2026_10_14_cl_e5",
+      "source_ids": [
+        "ocp2026_broadcom_pancholy_cpo_oci_2026_10_14_s1",
+        "ocp2026_broadcom_pancholy_cpo_oci_2026_10_14_s2",
+        "ocp2026_broadcom_pancholy_cpo_oci_2026_10_14_s3",
+        "ocp2026_broadcom_pancholy_cpo_oci_2026_10_14_s4",
+        "ocp2026_broadcom_pancholy_cpo_oci_2026_10_14_s5"
+      ],
+      "statement": "Broadcom (platform owner) at OCP 2026: TH6-Davisson CPO uses pluggable external laser sources (ELSFP) from a listed partner ecosystem ('We have ELSFP partners, we have FAU partners'); it redesigned the ELSFP after finding SMT issues ('a redesign on the ELSFP. You know, we found some issues with the SMT') — reliability, not capacity, is the stated pain point. On OCI scale-up the speaker adds 'these are standard lasers. You don't need fancy combs' and 'you don't even need an external laser source. You can have the laser source embedded in the engine' — the latter conflicts with the written OCI v1.0 spec §2.5 ('shall use an ELS'), which governs (separate document in this package). Auto-captions (ASR), not an official transcript.",
+      "subject_id": "e5"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "tech:external_laser_source",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "ocp2026_broadcom_pancholy_cpo_oci_2026_10_14_s1",
+        "ocp2026_broadcom_pancholy_cpo_oci_2026_10_14_s2"
+      ],
+      "src_id": "co:eoptolink"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "tech:external_laser_source",
+      "id": "e2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "ocp2026_broadcom_pancholy_cpo_oci_2026_10_14_s1",
+        "ocp2026_broadcom_pancholy_cpo_oci_2026_10_14_s2"
+      ],
+      "src_id": "co:o_net_technologies"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "tech:external_laser_source",
+      "id": "e3",
+      "relation": "supplies_to",
+      "source_ids": [
+        "ocp2026_broadcom_pancholy_cpo_oci_2026_10_14_s1",
+        "ocp2026_broadcom_pancholy_cpo_oci_2026_10_14_s2"
+      ],
+      "src_id": "co:source_photonics"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "tech:external_laser_source",
+      "id": "e4",
+      "relation": "supplies_to",
+      "source_ids": [
+        "ocp2026_broadcom_pancholy_cpo_oci_2026_10_14_s1",
+        "ocp2026_broadcom_pancholy_cpo_oci_2026_10_14_s2"
+      ],
+      "src_id": "co:ligent"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:external_laser_source",
+      "id": "e5",
+      "relation": "depends_on",
+      "source_ids": [
+        "ocp2026_broadcom_pancholy_cpo_oci_2026_10_14_s1",
+        "ocp2026_broadcom_pancholy_cpo_oci_2026_10_14_s2",
+        "ocp2026_broadcom_pancholy_cpo_oci_2026_10_14_s3"
+      ],
+      "src_id": "prod:th6_davisson"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:fiber_attach_unit",
+      "id": "e6",
+      "relation": "depends_on",
+      "source_ids": [
+        "ocp2026_broadcom_pancholy_cpo_oci_2026_10_14_s1",
+        "ocp2026_broadcom_pancholy_cpo_oci_2026_10_14_s2"
+      ],
+      "src_id": "prod:th6_davisson"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "ELS",
+        "pluggable laser source",
+        "external light source engine",
+        "external laser sources",
+        "light engines",
+        "External Laser Small Form Factor Pluggable",
+        "ELSFP",
+        "external laser module"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:external_laser_source",
+      "name": "External Laser Source",
+      "role": null,
+      "source_ids": [
+        "ocp2026_broadcom_pancholy_cpo_oci_2026_10_14_s1",
+        "ocp2026_broadcom_pancholy_cpo_oci_2026_10_14_s2",
+        "ocp2026_broadcom_pancholy_cpo_oci_2026_10_14_s3"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "FAU",
+        "fiber attach unit",
+        "fiber attach",
+        "CPO optical connectors",
+        "fiber assemblies"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:fiber_attach_unit",
+      "name": "Fiber Attach Unit",
+      "role": null,
+      "source_ids": [
+        "ocp2026_broadcom_pancholy_cpo_oci_2026_10_14_s1",
+        "ocp2026_broadcom_pancholy_cpo_oci_2026_10_14_s2"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "TH6-Davisson",
+        "BCM78919"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "prod:th6_davisson",
+      "name": "Tomahawk 6 – Davisson (BCM78919)",
+      "role": null,
+      "source_ids": [
+        "ocp2026_broadcom_pancholy_cpo_oci_2026_10_14_s1",
+        "ocp2026_broadcom_pancholy_cpo_oci_2026_10_14_s2"
+      ],
+      "type": "Product"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "O-Net"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:o_net_technologies",
+      "name": "O-Net Technologies",
+      "role": "leader",
+      "source_ids": [
+        "ocp2026_broadcom_pancholy_cpo_oci_2026_10_14_s1",
+        "ocp2026_broadcom_pancholy_cpo_oci_2026_10_14_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "Eoptolink Technology Inc., Ltd.",
+        "新易盛"
+      ],
+      "attributes": {
+        "ticker": "300502.SZ"
+      },
+      "confidence": 0.85,
+      "id": "co:eoptolink",
+      "name": "Eoptolink",
+      "role": null,
+      "source_ids": [
+        "ocp2026_broadcom_pancholy_cpo_oci_2026_10_14_s1",
+        "ocp2026_broadcom_pancholy_cpo_oci_2026_10_14_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "Source Photonics"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "co:source_photonics",
+      "name": "Source Photonics",
+      "role": null,
+      "source_ids": [
+        "ocp2026_broadcom_pancholy_cpo_oci_2026_10_14_s1",
+        "ocp2026_broadcom_pancholy_cpo_oci_2026_10_14_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "Ligent Technologies, Inc.",
+        "Ligent"
+      ],
+      "attributes": {
+        "ticker": "9856.HK"
+      },
+      "confidence": 0.85,
+      "id": "co:ligent",
+      "name": "Ligent Technologies",
+      "role": null,
+      "source_ids": [
+        "ocp2026_broadcom_pancholy_cpo_oci_2026_10_14_s1",
+        "ocp2026_broadcom_pancholy_cpo_oci_2026_10_14_s2"
+      ],
+      "type": "Company"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "ocp2026_broadcom_pancholy_cpo_oci_2026_10_14",
+    "evidence_tier": 2,
+    "origin_entity": "Broadcom Inc.",
+    "permission_basis": "OCP Global Summit 2026 公開場次的官方錄影（YouTube）；只保留研究必要的有限逐字（自動字幕與投影片文字轉寫）。published_at 取場次日期 2026-10-14（現場公開發表；影片 10-15 上傳）。",
+    "published_at": "2026-10-14",
+    "publisher": "Open Compute Project（YouTube 官方頻道）",
+    "retrieved_at": "2026-10-17",
+    "source_type": "transcript",
+    "storage_permission": "repo_excerpt",
+    "title": "Broadcom（Rajiv Pancholy）〈CPO, OCI〉OCP Global Summit 2026——TH6-Davisson 夥伴投影片（ELSFP 七家、FAU 兩家）與口述節錄",
+    "url": "https://www.youtube.com/watch?v=WFSptM2O3jA"
+  },
+  "sources": [
+    {
+      "id": "ocp2026_broadcom_pancholy_cpo_oci_2026_10_14_s1",
+      "locator": "投影片〈TH6-Davisson CPO Partner Ecosystem〉（影片約 7:54–8:20；logo 文字逐字轉寫，框名照投影片）",
+      "quote": "TH6-Davisson CPO Partner Ecosystem ｜ FAU：CORNING · TwinstarTech（TWINSTAR TECHNOLOGIES CO., LTD.） ｜ ELSFP：eoptolink · O-Net Technologies · TFC · FIT · SOURCE PHOTONICS · APERION · LIGENT ｜ （中框）tsmc · SPIL · TH6-Davisson ｜ CPO Rack Unit：Celestica · nexthop ai · Micas Networks · HPE · SUPERMICRO · JABIL · DELTA · QCT"
+    },
+    {
+      "id": "ocp2026_broadcom_pancholy_cpo_oci_2026_10_14_s2",
+      "locator": "口述 8:05–8:17（YouTube 自動字幕，照 ASR 原樣）",
+      "quote": "with with the breath of this going on the show floor, you'll see uh mechanical samples of the box. It's it's ready to go. We have ELSFP partners, we have FAU partners. Again, really trying to show that we're ready to to scale this."
+    },
+    {
+      "id": "ocp2026_broadcom_pancholy_cpo_oci_2026_10_14_s3",
+      "locator": "口述 3:42–3:51（YouTube 自動字幕）",
+      "quote": "really going through that, we redesigned the connector. We redesigned We have, you know, a redesign on the ELSFP. You know, we found some issues with the SMT. We had to change that out. Really,"
+    },
+    {
+      "id": "ocp2026_broadcom_pancholy_cpo_oci_2026_10_14_s4",
+      "locator": "口述 9:39–9:47（YouTube 自動字幕）",
+      "quote": "By the way, these are standard lasers. You don't need fancy combs. It's a DWDM spacing that standard lasers can do on a CWDM 4 grid. Okay, so again, all of"
+    },
+    {
+      "id": "ocp2026_broadcom_pancholy_cpo_oci_2026_10_14_s5",
+      "locator": "口述 10:00–10:05（YouTube 自動字幕）",
+      "quote": "kind of telling people A, you have to do this. Like, you don't even need an external laser source. You can have the laser source embedded in the engine."
+    }
+  ]
+}
