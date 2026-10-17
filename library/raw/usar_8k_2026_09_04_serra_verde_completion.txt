@@ -1,0 +1,10 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1970622/000121390026097399/ea030400101ex99-1.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] USA Rare Earth 8-K Exhibit 99.1（2026-09-04 新聞稿）：完成與 Serra Verde 的合併
+RETRIEVED: 2026-10-17（EDGAR 原文經 fetchers.edgar 抽字、空白正規化後逐字核對）
+
+"today announced the completion of its combination with Serra Verde Group (“Serra Verde”) on September 3, 2026"
+"Serra Verde is the only scaled producer of all four magnetic and other critical heavy rare earth elements outside Asia."
+"The first stage of this program is expected to reach a run-rate of approximately 4,000 tons per annum (tpa) of total rare earth oxide (TREO) production by the end of 2026."
+"Construction is underway on the second stage of the expansion, targeting average production of 6,400 tpa of TREO, with commissioning expected to begin within 12 months."

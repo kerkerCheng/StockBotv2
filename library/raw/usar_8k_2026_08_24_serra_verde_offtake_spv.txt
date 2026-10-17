@@ -1,0 +1,11 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1970622/000121390026092810/ea030292401ex99-1.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] USA Rare Earth 8-K Exhibit 99.1（2026-08-24 新聞稿）：Serra Verde 包銷 SPV 完成資本化
+RETRIEVED: 2026-10-17（EDGAR 原文經 fetchers.edgar 抽字、空白正規化後逐字核對）
+
+"U.S. Department of War (DoW) provides a $750 million investment in the SPV"
+"the special purpose vehicle (the “SPV”) that will purchase 100% of the Phase 1 production of rare earth materials (“the Offtake Agreement”) produced by Serra Verde Group (“Serra Verde”) has completed its capitalization arrangements."
+"The agreement, which has both a take-or-pay arrangement and floor prices, is vital to support the development of an integrated rare earth value chain."
+"The U.S. government has entered into a forward purchase contract with the SPV for the purchase of not less than $300 million of rare earth payable products over five years."
+"Serra Verde announced it entered into a 15-year offtake agreement to supply the SPV capitalized by various U.S. Government agencies, as well as private capital sources for 100% of its Phase I production with guaranteed price floors for its magnetic rare earths, including the industry’s first and only price floors for heavy rare earths dysprosium and terbium."
