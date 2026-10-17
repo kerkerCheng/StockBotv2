@@ -7,7 +7,7 @@
 """
 from __future__ import annotations
 
-from datetime import date
+from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -67,6 +67,11 @@ def collect_backlog(*, artifact_dir: Path | None = None, state_dir: Path | None 
 
         sector_edge = _sector_and_structure_edge(payload, get_registry(), _anchor_to_sector())
         seats = supply_seats(payload, get_registry())
+        newer = seats_older_than_graph(payload.get("generated_at"))
+        if newer is not None:
+            seats = None
+            notes.append(f"座位表（structure_table {payload.get('generated_at')}）比最近一次寫圖（{newer.isoformat(timespec='minutes')}）舊——"
+                         "座位當讀不到、全部留在母體；先跑 python -m webapp materialize --structure-table")
     except Exception as exc:  # noqa: BLE001
         notes.append(f"structure_table state 讀不到：{type(exc).__name__}")
 
@@ -166,6 +171,33 @@ def first_narrative_awaiting_cohort(ticker: str) -> int | None:
         return pending_cohort_members(load_pool()).get(str(ticker).upper())
     except Exception:  # noqa: BLE001
         return None
+
+
+#: 寫圖的落點：入圖收據（graph-complete 時寫）與圖遷移紀錄。檔案 mtime＝寫圖完成的時間。
+_GRAPH_WRITE_DIRS: tuple[Path, ...] = (
+    Path(__file__).resolve().parents[2] / "library" / "private" / "intake_state",
+    Path(__file__).resolve().parents[2] / "library" / "private" / "graph_migrations",
+)
+
+
+def seats_older_than_graph(generated_at: Any, dirs: tuple[Path, ...] = _GRAPH_WRITE_DIRS) -> datetime | None:
+    """座位表（structure_table）產生之後又寫過圖 → 回最近一次寫圖時間；否則 None。
+
+    事發 2026-10-17（failure log #77）：daily 05:46 算的座位表撐到晚上，[773][774] 入圖讓 PWIL、Ligent 有了座位，
+    閘門卻照舊表把它們判「邊緣沒座位」、印 closed——state 的新鮮度只看產生多久，不看之後有沒有寫圖。
+    產生時間讀不出來也算過期（往留在母體那邊倒，INV-3）。
+    """
+    stamps = [p.stat().st_mtime for d in dirs if d.is_dir() for p in d.glob("*.json")]
+    if not stamps:
+        return None
+    latest = datetime.fromtimestamp(max(stamps), tz=timezone.utc)
+    try:
+        generated = datetime.fromisoformat(str(generated_at))
+    except ValueError:
+        return latest
+    if generated.tzinfo is None:
+        generated = generated.replace(tzinfo=timezone.utc)
+    return latest if latest > generated else None
 
 
 def supply_seats(structure_payload: Any, registry: Any) -> frozenset[str]:

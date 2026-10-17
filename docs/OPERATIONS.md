@@ -277,6 +277,16 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 | **4 contract test** | `tests/test_narrative_doubling.py`（新題目與字彙、`{price}`／已定價數字在這一格照拒、sources 從名冊字彙查換算係數、GBp 換成 GBP 而且不打匯率、報價單位未登記 fail closed、起點印金額＋幣別＋日期或不給值、填值與舊紀錄不變、被取代的讀圖拒收並列出該換的 id、現行讀圖與別的單位放行）；`tests/test_webapp_api.py::test_priced_in_is_explained_from_one_string_on_both_places`。變異：拿掉第 ⑦ 項 → 1 紅；市值不換單位 → 1 紅 |
 | **5 端到端 smoke** | 真資料：重新 materialize AXTI／COHR／LITE／SIVE.ST——敘事四檔各 8 格逐字相同、artifact 除 `generated_at` 逐位相同、`.meta.json` 只多 `plain_priced_in`；headless Edge 開 `#/AXTI`：頁面渲染、白話出現兩次（首屏、稽核區）；`python -m alpha research AXTI` 的 packet 印新題目；市值換算：IQE.L 729.5 億 GBp → **7.3 億 GBP**、AXTI 56.3 億 USD、SIVE.ST 106.1 億 SEK、300308.SZ 9,016.0 億 CNY；20 行敘事 ledger 解析 0 失敗 |
 
+### Sandbox impact review 結論（2026-10-17，Phase 7 failure log #77 當下修：閉包的座位表比最近一次寫圖舊就當讀不到）
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | `alpha/providers/closure.py::collect_backlog`（`webapp closure-gate`、`engine_b.cli drain` 首行段 5 計數——daily-brief 會跑 `drain`）讀完 `structure_table` 之後，多 `stat` 兩個本機目錄的 `*.json` mtime：`library/private/intake_state/`（入圖收據，graph-complete 時寫）與 `library/private/graph_migrations/`（圖遷移紀錄）。最近一次 mtime 晚於座位表的 `generated_at`（或讀不出 `generated_at`）→ 座位當讀不到（`seats=None`，INV-3：全部留在母體）並印一行「先跑 `python -m webapp materialize --structure-table`」。只讀檔案 metadata、不讀內容、不寫任何檔、不連網、不跑 LLM、不碰圖 |
+| **2 canonical skill／prompt／本檔** | 本節；research-drain 不改——它本來就規定段 5 的停止條件由 `closure-gate` 回答，閘門自己會印出要重算座位表 |
+| **3 最窄 rule** | daily argv 不變、不新增 step／allowlist；兩個目錄本來就在 daily 可讀的 `library/private/` 底下 |
+| **4 contract test** | `tests/test_closure_population.py::test_seats_built_before_the_last_graph_write_count_as_unreadable`（寫圖晚於座位表 → 回寫圖時間；早於 → None；讀不出產生時間 → 當過期；目錄不存在 → None）。變異：比較方向反過來 → 紅；讀不出產生時間當新鮮 → 紅（2／2） |
+| **5 端到端 smoke** | 真資料：正式 state（座位表 2026-10-17T13:41Z、最近寫圖更早）→ 沒有提示、邊緣沒座位 10、閘門未到終局 0；把寫圖落點換成一個 mtime 晚一小時的暫存收據 → 印出提示、邊緣沒座位 0（全部留回母體）、閘門未到終局 8。事發那一輪（座位表 05:46、[773][774] 晚上入圖）閘門印 closed、PWIL 與 Ligent 被判「邊緣沒座位」，重算座位表後兩檔回母體、未到終局 2 |
+
 ### Sandbox impact review 結論（2026-10-04，Phase 7 Step 7.0b：巢狀 writer lock、thesis 逾期提醒只看 lifecycle）
 
 | 步 | 結論 |

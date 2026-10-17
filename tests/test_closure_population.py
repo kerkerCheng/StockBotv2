@@ -191,6 +191,24 @@ def test_board_inputs_copy_the_candidates_artifact() -> None:
     assert got["OLDART"]["edge_state"] is None        # 舊 artifact 沒有 edge → None → 留在母體
 
 
+def test_seats_built_before_the_last_graph_write_count_as_unreadable(tmp_path) -> None:
+    """failure log #77：座位表之後又入圖 → 回寫圖時間（呼叫端把座位當讀不到、全部留在母體）。"""
+    import os
+
+    intake = tmp_path / "intake_state"
+    intake.mkdir()
+    receipt = intake / "doc.json"
+    receipt.write_text("{}", encoding="utf-8")
+    graph_written = 1_792_000_000          # 2026-10-14T17:46Z
+    os.utime(receipt, (graph_written, graph_written))
+    dirs = (intake, tmp_path / "graph_migrations")          # 第二個目錄不存在也照判
+    newer = provider.seats_older_than_graph("2026-10-01T00:00:00+00:00", dirs)
+    assert newer is not None and newer.timestamp() == graph_written
+    assert provider.seats_older_than_graph("2026-12-31T00:00:00+00:00", dirs) is None
+    assert provider.seats_older_than_graph(None, dirs) is not None        # 讀不出產生時間 → 當過期（INV-3）
+    assert provider.seats_older_than_graph("2026-10-01T00:00:00", (tmp_path / "nope",)) is None
+
+
 def test_supply_seat_counts_only_supplies_to() -> None:
     class _Reg:
         def research_ticker(self, cid):
