@@ -45,6 +45,43 @@
       ],
       "statement": "National Laboratory of the Rockies (May 2026): Hitachi Energy manufactures bushings domestically, but production is generally limited to the ≤235 kV class; for higher ratings utilities must rely on imports, which face longer lead times compared to OLTCs. Third-party; Hitachi Energy is a subsidiary of Hitachi (co:hitachi).",
       "subject_id": "e5"
+    },
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：之後的國家實驗室或政府報告、或 LPT 製造商（HD 現代、曉星、Hitachi Energy、Virginia Transformer、Pennsylvania Transformer）一手寫出 CTC 不再短缺，或美國新增一家量產 CTC 的國內廠。核查頻率：每半年。觸發後 48 小時：e6 加註或降 confidence，重讀 CTC 層讀圖的「量」與窗口。",
+      "id": "nlr_tp_5700_96742_2026_05_06_cl5",
+      "source_ids": [
+        "nlr_tp_5700_96742_2026_05_06_se1",
+        "nlr_tp_5700_96742_2026_05_06_se2",
+        "nlr_tp_5700_96742_2026_05_06_sf",
+        "nlr_tp_5700_96742_2026_05_06_sg"
+      ],
+      "statement": "National Laboratory of the Rockies (May 2026), from 2025 industry interviews: for CTCs, a critical component of LPT windings, Sam Dong is the only domestic (U.S.) manufacturer; this reliance on a single U.S. supplier creates a supply chain bottleneck and pushes OEMs to imported CTC; some regional CTC suppliers have exited, forcing the remaining ones to take extra orders. Citing a 2020 Commerce/BIS survey, GOES and CTC each contribute about 25% of an LPT's production cost. Third-party, interview-based; the bottleneck is U.S.-domestic — imports substitute, so this is not a global single source. No lead time or price figure is given for CTC.",
+      "subject_id": "e6"
+    },
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：一手文件寫出美國有第二家 CTC 量產廠（含 Essex Furukawa 等宣布在美生產 CTC），或 Sam Dong 退出美國生產。核查頻率：每半年。觸發後 48 小時：e7 加註，重讀 CTC 層的供給側列舉。",
+      "id": "nlr_tp_5700_96742_2026_05_06_cl6",
+      "source_ids": [
+        "nlr_tp_5700_96742_2026_05_06_se1"
+      ],
+      "statement": "National Laboratory of the Rockies (May 2026): Sam Dong is the only domestic (U.S.) CTC manufacturer. Third-party naming; scope is U.S. domestic production only — the same passage says OEMs turn to imported CTC, so this is not a global sole source. Sam Dong is privately held (research ticker null).",
+      "subject_id": "e7"
+    },
+    {
+      "confidence": 0.65,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：之後的國家實驗室或政府報告、或 LPT 製造商一手寫出壓板不再難找，或美國新增壓板產能。核查頻率：每半年。觸發後 48 小時：e8 加註或降 confidence，重讀絕緣層讀圖。",
+      "id": "nlr_tp_5700_96742_2026_05_06_cl7",
+      "source_ids": [
+        "nlr_tp_5700_96742_2026_05_06_sh",
+        "nlr_tp_5700_96742_2026_05_06_sf"
+      ],
+      "statement": "National Laboratory of the Rockies (May 2026): pressboard is another critical LPT item with a single domestic manufacturer and is often imported; sourcing pressboard is a global challenge, except perhaps from China; the U.S. has a few producers of pressboard and insulating materials but there are not many options outside of China. Third-party, interview-based; the single domestic pressboard manufacturer is not named; no lead time, price or volume figure.",
+      "subject_id": "e8"
     }
   ],
   "edges": [
@@ -104,6 +141,42 @@
         "nlr_tp_5700_96742_2026_05_06_sb"
       ],
       "src_id": "co:hitachi"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "mat:ctc_copper_conductor",
+      "id": "e6",
+      "relation": "constrained_by",
+      "source_ids": [
+        "nlr_tp_5700_96742_2026_05_06_se1",
+        "nlr_tp_5700_96742_2026_05_06_se2",
+        "nlr_tp_5700_96742_2026_05_06_sf"
+      ],
+      "src_id": "tech:large_power_transformer"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "mat:ctc_copper_conductor",
+      "id": "e7",
+      "relation": "supplies_to",
+      "source_ids": [
+        "nlr_tp_5700_96742_2026_05_06_se1"
+      ],
+      "src_id": "co:sam_dong"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "mat:transformer_insulation",
+      "id": "e8",
+      "relation": "constrained_by",
+      "source_ids": [
+        "nlr_tp_5700_96742_2026_05_06_sh",
+        "nlr_tp_5700_96742_2026_05_06_sf"
+      ],
+      "src_id": "tech:large_power_transformer"
     }
   ],
   "nodes": [
@@ -119,13 +192,16 @@
         "extra high voltage power transformers"
       ],
       "attributes": {},
-      "confidence": 0.85,
+      "confidence": 0.9,
       "id": "tech:large_power_transformer",
       "name": "Large Power Transformer (LPT)",
       "role": null,
       "source_ids": [
         "nlr_tp_5700_96742_2026_05_06_sc",
-        "nlr_tp_5700_96742_2026_05_06_sd"
+        "nlr_tp_5700_96742_2026_05_06_sd",
+        "nlr_tp_5700_96742_2026_05_06_se2",
+        "nlr_tp_5700_96742_2026_05_06_sg",
+        "nlr_tp_5700_96742_2026_05_06_sh"
       ],
       "type": "TechNode"
     },
@@ -136,10 +212,12 @@
         "tap changers",
         "on-load tap changers",
         "LTC",
-        "LTCs"
+        "LTCs",
+        "分接开关",
+        "有载分接开关"
       ],
       "attributes": {},
-      "confidence": 0.85,
+      "confidence": 0.9,
       "id": "tech:transformer_tap_changer",
       "name": "Transformer Tap Changer",
       "role": null,
@@ -158,7 +236,7 @@
         "high-voltage bushings"
       ],
       "attributes": {},
-      "confidence": 0.85,
+      "confidence": 0.9,
       "id": "tech:transformer_bushing",
       "name": "Transformer Bushing (OIP)",
       "role": null,
@@ -194,13 +272,67 @@
       "attributes": {
         "ticker": "6501.T"
       },
-      "confidence": 0.85,
+      "confidence": 0.9,
       "id": "co:hitachi",
       "name": "Hitachi",
       "role": null,
       "source_ids": [
         "nlr_tp_5700_96742_2026_05_06_sa",
         "nlr_tp_5700_96742_2026_05_06_sb"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "CTC",
+        "CTC copper wire",
+        "Continuously Transposed Conductor"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "mat:ctc_copper_conductor",
+      "name": "Continuously Transposed Conductor (CTC) copper wire",
+      "role": null,
+      "source_ids": [
+        "nlr_tp_5700_96742_2026_05_06_se1",
+        "nlr_tp_5700_96742_2026_05_06_se2",
+        "nlr_tp_5700_96742_2026_05_06_sf",
+        "nlr_tp_5700_96742_2026_05_06_sg"
+      ],
+      "type": "Material"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "pressboard",
+        "transformer board",
+        "insulating material"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "mat:transformer_insulation",
+      "name": "Transformer Insulating Material (pressboard)",
+      "role": null,
+      "source_ids": [
+        "nlr_tp_5700_96742_2026_05_06_sf",
+        "nlr_tp_5700_96742_2026_05_06_sh"
+      ],
+      "type": "Material"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "Sam Dong",
+        "Samdong"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "co:sam_dong",
+      "name": "Sam Dong",
+      "role": null,
+      "source_ids": [
+        "nlr_tp_5700_96742_2026_05_06_se1"
       ],
       "type": "Company"
     }
@@ -216,7 +348,8 @@
     "retrieved_at": "2026-10-08",
     "source_type": "industry_report",
     "storage_permission": "repo_excerpt",
-    "title": "National Laboratory of the Rockies NLR/TP-5700-96742（2026-05）——Large Power Transformer Supply Chain Gap Analysis and Domestic Content Strategies for Hydropower Rehabilitation: Supplemental Report；分接開關、套管有限節錄",
+    "supersedes_extraction_sha256": "4cf577ba1e821ed6da3b1b4302ea2fd8772bd8c725c64729192a7c283f7727bf",
+    "title": "National Laboratory of the Rockies NLR/TP-5700-96742（2026-05）——Large Power Transformer Supply Chain Gap Analysis and Domestic Content Strategies for Hydropower Rehabilitation: Supplemental Report；分接開關、套管、CTC、壓板有限節錄",
     "url": "https://www.osti.gov/servlets/purl/3363379"
   },
   "sources": [
@@ -239,6 +372,31 @@
       "id": "nlr_tp_5700_96742_2026_05_06_sd",
       "locator": "p.16（PDF 第 28 頁）Lead times——國內變壓器廠點名的零件",
       "quote": "Domestic transformer manufacturers highlighted some critical transformer components that have very long lead times and limited domestic supply. Bushings for LPTs are currently the item with the longest lead time, up to 130 weeks. OLTCs take 80–90 weeks to procure and have just 1 or 2 U.S. manufacturers; otherwise, they are typically sourced from Europe. One domestic transformer manufacturer said they order extra inventory ahead of time or ask customers to be open to different makes or specifications for a particular product to address the long lead times for OLTCs and bushings."
+    },
+    {
+      "id": "nlr_tp_5700_96742_2026_05_06_se1",
+      "locator": "p.6（PDF 第 18 頁）原料與零件的瓶頸——CTC",
+      "quote": "However, for CTCs, which are a critical component of LPT windings, Sam Dong is the only domestic manufacturer."
+    },
+    {
+      "id": "nlr_tp_5700_96742_2026_05_06_se2",
+      "locator": "p.6（PDF 第 18 頁）原料與零件的瓶頸——CTC（緊接上句；上句句末有腳註 3：Information from industry interviews conducted in 2025.）",
+      "quote": "This reliance on a single U.S. supplier creates a supply chain bottleneck, prompting original equipment manufacturers to turn to imported CTC."
+    },
+    {
+      "id": "nlr_tp_5700_96742_2026_05_06_sf",
+      "locator": "p.11（PDF 第 23 頁）訪談結果——CTC 與壓板",
+      "quote": "Some regional suppliers of CTC have exited the market, which has forced remaining companies to take additional orders. The United States has a few producers of pressboard and insulating materials, but there are not many options outside of China."
+    },
+    {
+      "id": "nlr_tp_5700_96742_2026_05_06_sg",
+      "locator": "p.11（PDF 第 23 頁）LPT 成本——CTC 占比",
+      "quote": "A 2020 industry survey by the U.S. Department of Commerce found that GOES and CTC, two major components, each contribute about 25% of the total production cost of an LPT (Bureau of Industry and Security 2021)."
+    },
+    {
+      "id": "nlr_tp_5700_96742_2026_05_06_sh",
+      "locator": "p.16（PDF 第 28 頁）Lead times——壓板",
+      "quote": "Pressboard is another critical item with a single domestic manufacturer and is often imported as well. Sourcing pressboard is a global challenge, except perhaps from China."
     }
   ]
 }

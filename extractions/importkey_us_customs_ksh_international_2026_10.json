@@ -1,0 +1,137 @@
+{
+  "claims": [
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：之後一季以上的公開提單紀錄不再出現 KSH 對 Virginia／Georgia Transformer 的 CTC 出貨，或這兩家改由其他來源進口 CTC。核查頻率：每季。觸發後 48 小時：e2 加註或降 confidence，重讀 CTC 層的供給側。",
+      "id": "importkey_us_customs_ksh_international_2026_10_cl1",
+      "source_ids": [
+        "importkey_us_customs_ksh_international_2026_10_s1",
+        "importkey_us_customs_ksh_international_2026_10_s2",
+        "importkey_us_customs_ksh_international_2026_10_s3",
+        "importkey_us_customs_ksh_international_2026_10_s4"
+      ],
+      "statement": "U.S. customs bill-of-lading records (aggregated by ImportKey): KSH International Ltd shipped 'CONTINUOUSLY TRANSPOSED CONDUCTORS CTC' to 'VIRGINIA TRANSFORMER CORP' (arrival 2026-10-12, Los Angeles) and 'CONTINUOUSLY TRANSPOSED CONDUCTORS AND PAPER COVERED COPPER CONDUCTORS STRIPS' to 'GEORGIA TRANSFORMER CORP' (arrival 2026-10-14, Savannah). The buyer table gives both consignees the same address, 220 Glade View Drive NE, Roanoke, Virginia 24012 (Virginia Transformer's; Georgia Transformer is not in the registry and gets no edge here). Third-party regulatory record of actual shipments; product description is shipper-declared; free page shows a sample only (no volumes or values).",
+      "subject_id": "e2"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "mat:ctc_copper_conductor",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "importkey_us_customs_ksh_international_2026_10_s1",
+        "importkey_us_customs_ksh_international_2026_10_s2"
+      ],
+      "src_id": "co:ksh_international"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "co:virginia_transformer",
+      "id": "e2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "importkey_us_customs_ksh_international_2026_10_s1",
+        "importkey_us_customs_ksh_international_2026_10_s3"
+      ],
+      "src_id": "co:ksh_international"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "KSH International Limited",
+        "KSH INTERNATIONAL LTD"
+      ],
+      "attributes": {
+        "ticker": "KSHINTL.NS"
+      },
+      "confidence": 0.85,
+      "id": "co:ksh_international",
+      "name": "KSH International",
+      "role": null,
+      "source_ids": [
+        "importkey_us_customs_ksh_international_2026_10_s1",
+        "importkey_us_customs_ksh_international_2026_10_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "CTC",
+        "CTC copper wire",
+        "Continuously Transposed Conductor"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "mat:ctc_copper_conductor",
+      "name": "Continuously Transposed Conductor (CTC) copper wire",
+      "role": null,
+      "source_ids": [
+        "importkey_us_customs_ksh_international_2026_10_s1",
+        "importkey_us_customs_ksh_international_2026_10_s2"
+      ],
+      "type": "Material"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "Virginia Transformer",
+        "Virginia Transformers",
+        "Virginia Transformer Technology"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:virginia_transformer",
+      "name": "Virginia Transformer",
+      "role": null,
+      "source_ids": [
+        "importkey_us_customs_ksh_international_2026_10_s1",
+        "importkey_us_customs_ksh_international_2026_10_s3"
+      ],
+      "type": "Company"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "importkey_us_customs_ksh_international_2026_10",
+    "evidence_tier": 2,
+    "origin_entity": "U.S. Customs and Border Protection",
+    "permission_basis": "美國海關（CBP）進口提單紀錄的第三方彙整頁（ImportKey 免費頁，僅顯示部分樣本紀錄）；只保留研究必要的有限逐字節錄（表格各欄以「 | 」相連）。頁面沒有發布日：published_at 留空，紀錄本身的到港日寫在引文裡（INV-6：不以擷取日冒充發布日）。",
+    "published_at": null,
+    "publisher": "ImportKey（美國海關進口提單彙整，免費頁）",
+    "retrieved_at": "2026-10-17",
+    "source_type": "industry_report",
+    "storage_permission": "repo_excerpt",
+    "title": "美國海關進口提單（ImportKey 彙整頁）：KSH INTERNATIONAL LTD 對 VIRGINIA TRANSFORMER CORP、GEORGIA TRANSFORMER CORP 出 CTC（2026-10 到港）",
+    "url": "https://importkey.com/i/ksh-international-ltd"
+  },
+  "sources": [
+    {
+      "id": "importkey_us_customs_ksh_international_2026_10_s1",
+      "locator": "Customs US Trade Data Records——提單列（到港 2026-10-12）",
+      "quote": "2026-10-12 | KSH INTERNATIONAL LTD | VIRGINIA TRANSFORMER CORP | CONTINUOUSLY TRANSPOSED CONDUCTORS CTC | 53313 Jawaharlal Nehrul, India | 2704 Los Angeles, California | Unavailable | ONEYMUMG93022600"
+    },
+    {
+      "id": "importkey_us_customs_ksh_international_2026_10_s2",
+      "locator": "Customs US Trade Data Records——提單列（到港 2026-10-14）",
+      "quote": "2026-10-14 | KSH INTERNATIONAL LTD | GEORGIA TRANSFORMER CORP | CONTINUOUSLY TRANSPOSED CONDUCTORS AND PAPER COVERED COPPER CONDUCTORS STRIPS | 53313 Jawaharlal Nehrul, India | 1703 Savannah, Georgia | Unavailable | MAEU275451414"
+    },
+    {
+      "id": "importkey_us_customs_ksh_international_2026_10_s3",
+      "locator": "Buyers available for KSH INTERNATIONAL LTD——買方表",
+      "quote": "44 | VIRGINIA TRANSFORMER CORP | AMOD STAMPINGS P LTD, LEGNANO TEKNOELECTRIC COMPANY S P A, LIAONINGXD XINGQI ELECTRIC, LIAONINGXD XINGQI ELECTRIC MATERIAL, AMOD STAMPINGS PVT LTD, | 220 GLADE VIEW DRIVE N E ROANOKE VIRGINIA 24012"
+    },
+    {
+      "id": "importkey_us_customs_ksh_international_2026_10_s4",
+      "locator": "Buyers available for KSH INTERNATIONAL LTD——買方表",
+      "quote": "53 | GEORGIA TRANSFORMER CORP | MPP TECHNOLOGIES PVT LTD, SABAR INDUSTRIES, RATIONAL ENGINEERS LIMITED, LIAONINGXD XINGQI ELECTRIC MATERIAL, NEW BHARAT ENGINEERING WORKS, | 220 GLADE VIEW DRIVE N E ROANOKE VIRGINIA 24012"
+    }
+  ]
+}

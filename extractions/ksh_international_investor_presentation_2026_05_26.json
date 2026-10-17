@@ -1,0 +1,112 @@
+{
+  "claims": [
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "條件：KSH 的季報或年報寫出出口營收轉為年減，或擴產完成後特殊線材利用率連兩季低於 60%。核查頻率：每季（NSE 季報與投資人簡報）。觸發後 48 小時：e1 加註，重讀 CTC 層的量與窗口。",
+      "id": "ksh_international_investor_presentation_2026_05_26_cl1",
+      "source_ids": [
+        "ksh_international_investor_presentation_2026_05_26_s1",
+        "ksh_international_investor_presentation_2026_05_26_s2",
+        "ksh_international_investor_presentation_2026_05_26_s3",
+        "ksh_international_investor_presentation_2026_05_26_s4",
+        "ksh_international_investor_presentation_2026_05_26_s5"
+      ],
+      "statement": "KSH International's own investor presentation (NSE, 2026-05-26): its products include Continuously Transposed Conductors; specialised magnet winding wires are 75.3% of revenue; it is the 'largest Indian exporter of winding wires to 24 countries including Middle East, Europe and USA' with ~30% of revenue from exports; it serves 120+ OEMs including Hitachi Energy, GE Vernova and Siemens Energy; capacity is being expanded from 29,045 MT (FY25) to 59,045 MT by March 2027 (43,445 MT annualized at 2026-03-31), while FY26 capacity utilisation was 64.8% (down from 80.3% in FY25). Supplier self-report: no CTC-only revenue, no U.S. share, no named U.S. customer — the U.S. LPT customers come from the customs records, not from this deck.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "mat:ctc_copper_conductor",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "ksh_international_investor_presentation_2026_05_26_s3",
+        "ksh_international_investor_presentation_2026_05_26_s1"
+      ],
+      "src_id": "co:ksh_international"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "KSH International Limited",
+        "KSH INTERNATIONAL LTD"
+      ],
+      "attributes": {
+        "ticker": "KSHINTL.NS"
+      },
+      "confidence": 0.85,
+      "id": "co:ksh_international",
+      "name": "KSH International",
+      "role": null,
+      "source_ids": [
+        "ksh_international_investor_presentation_2026_05_26_s1",
+        "ksh_international_investor_presentation_2026_05_26_s3"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "CTC",
+        "CTC copper wire",
+        "Continuously Transposed Conductor"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "mat:ctc_copper_conductor",
+      "name": "Continuously Transposed Conductor (CTC) copper wire",
+      "role": null,
+      "source_ids": [
+        "ksh_international_investor_presentation_2026_05_26_s3"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "ksh_international_investor_presentation_2026_05_26",
+    "evidence_tier": 1,
+    "origin_entity": "KSH International Limited",
+    "permission_basis": "印度上市公司向 NSE 申報的投資人簡報（公開）；只保留研究必要的有限逐字節錄（pypdf 抽字、空白攤平）。published_at 取 NSE 申報檔名日期 2026-05-26。",
+    "published_at": "2026-05-26",
+    "publisher": "NSE（National Stock Exchange of India）申報",
+    "retrieved_at": "2026-10-17",
+    "source_type": "ir_deck",
+    "storage_permission": "repo_excerpt",
+    "title": "KSH International Limited Investor Presentation（Q4 FY26，NSE 申報 2026-05-26）節錄：出口、產能、產品線、客戶",
+    "url": "https://nsearchives.nseindia.com/corporate/INTERNATIONAL_26052026004449_KSHInvestorPresentation26052026signed.pdf"
+  },
+  "sources": [
+    {
+      "id": "ksh_international_investor_presentation_2026_05_26_s1",
+      "locator": "p.2 Investment Highlights——Export Leader",
+      "quote": "Largest Indian exporter of winding wires to 24 countries including Middle East, Europe and USA. ~30% revenue contribution from exports."
+    },
+    {
+      "id": "ksh_international_investor_presentation_2026_05_26_s2",
+      "locator": "p.2 Investment Highlights——Capacity Expansion",
+      "quote": "Expanding total capacity from 29,045 MT in FY25 to 59,045 MT by March 2027. At March31, 2026, Annualized Capacity had reached 43,445 MTs."
+    },
+    {
+      "id": "ksh_international_investor_presentation_2026_05_26_s3",
+      "locator": "Our Products（產品線）",
+      "quote": "Specialised Magnet Winding Wires (75.3% Revenue Share1) Our Products Paper Insulated Rectangular Copper & Aluminium Magnet Winding Wires Continuously Transposed Conductors"
+    },
+    {
+      "id": "ksh_international_investor_presentation_2026_05_26_s4",
+      "locator": "Sales Volume & Capacity Utilization",
+      "quote": "Sales Volume (MTPA) & Capacity Utilization 17,645 21,495 23,324 28,168 69.8% 75.6% 80.3% 64.8% FY23 FY24 FY25 FY26"
+    },
+    {
+      "id": "ksh_international_investor_presentation_2026_05_26_s5",
+      "locator": "p.2 Investment Highlights——Blue Chip OEM Customers",
+      "quote": "Serves 120+ OEM customers including leading local and global companies such as Hitachi Energy, CG Power, BHEL, GE Vernova, Siemens Energy, Bharat Bijlee, Nidec, Suzlon etc."
+    }
+  ]
+}

@@ -1,0 +1,137 @@
+{
+  "claims": [
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：之後一季以上的公開提單紀錄不再出現 Precision Wires India 對 Pennsylvania Transformer 的 CTC 出貨，或 Pennsylvania Transformer 改由其他來源進口 CTC。核查頻率：每季。觸發後 48 小時：e2 加註或降 confidence，重讀 CTC 層的供給側。",
+      "id": "importkey_us_customs_precision_wires_india_2026_10_cl1",
+      "source_ids": [
+        "importkey_us_customs_precision_wires_india_2026_10_s1",
+        "importkey_us_customs_precision_wires_india_2026_10_s2",
+        "importkey_us_customs_precision_wires_india_2026_10_s3",
+        "importkey_us_customs_precision_wires_india_2026_10_s4"
+      ],
+      "statement": "U.S. customs bill-of-lading records (aggregated by ImportKey): Precision Wires India Limited shipped 'COPPER CONDUCTORS (CONTINUOUSLY TRANSPOSED CONTAINING 5 TO 72 ENAMELLED STRIPS)' to 'PENNSYLVANIA TRANSFORMER PAT' (arrivals 2026-10-06 and 2026-10-13, Newark NJ). The buyer table lists 'PENNSYLVANIA TRANSFORMER PAT' and 'PENNSYLVANIA TRANSFORMER TECHNOLOGY' at 30 Curry Ave/Avenue, Canonsburg PA 15317 — the same consignee address, identified as co:pennsylvania_transformer_technology (an LPT maker on the graph). Third-party regulatory record of actual shipments; product description is shipper-declared; free page shows a sample only (no volumes or values).",
+      "subject_id": "e2"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "mat:ctc_copper_conductor",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "importkey_us_customs_precision_wires_india_2026_10_s1",
+        "importkey_us_customs_precision_wires_india_2026_10_s2"
+      ],
+      "src_id": "co:precision_wires_india"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "co:pennsylvania_transformer_technology",
+      "id": "e2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "importkey_us_customs_precision_wires_india_2026_10_s1",
+        "importkey_us_customs_precision_wires_india_2026_10_s2",
+        "importkey_us_customs_precision_wires_india_2026_10_s3",
+        "importkey_us_customs_precision_wires_india_2026_10_s4"
+      ],
+      "src_id": "co:precision_wires_india"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "Precision Wires India Limited",
+        "PRECISION WIRES INDIA LIMITED"
+      ],
+      "attributes": {
+        "ticker": "PRECWIRE.NS"
+      },
+      "confidence": 0.85,
+      "id": "co:precision_wires_india",
+      "name": "Precision Wires India",
+      "role": null,
+      "source_ids": [
+        "importkey_us_customs_precision_wires_india_2026_10_s1",
+        "importkey_us_customs_precision_wires_india_2026_10_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "CTC",
+        "CTC copper wire",
+        "Continuously Transposed Conductor"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "mat:ctc_copper_conductor",
+      "name": "Continuously Transposed Conductor (CTC) copper wire",
+      "role": null,
+      "source_ids": [
+        "importkey_us_customs_precision_wires_india_2026_10_s1",
+        "importkey_us_customs_precision_wires_india_2026_10_s2"
+      ],
+      "type": "Material"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "Pennsylvania Transformer Technology"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:pennsylvania_transformer_technology",
+      "name": "Pennsylvania Transformer Technology",
+      "role": null,
+      "source_ids": [
+        "importkey_us_customs_precision_wires_india_2026_10_s3",
+        "importkey_us_customs_precision_wires_india_2026_10_s4"
+      ],
+      "type": "Company"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "importkey_us_customs_precision_wires_india_2026_10",
+    "evidence_tier": 2,
+    "origin_entity": "U.S. Customs and Border Protection",
+    "permission_basis": "美國海關（CBP）進口提單紀錄的第三方彙整頁（ImportKey 免費頁，僅顯示部分樣本紀錄）；只保留研究必要的有限逐字節錄（表格各欄以「 | 」相連）。頁面沒有發布日：published_at 留空，紀錄本身的到港日寫在引文裡（INV-6：不以擷取日冒充發布日）。",
+    "published_at": null,
+    "publisher": "ImportKey（美國海關進口提單彙整，免費頁）",
+    "retrieved_at": "2026-10-17",
+    "source_type": "industry_report",
+    "storage_permission": "repo_excerpt",
+    "title": "美國海關進口提單（ImportKey 彙整頁）：PRECISION WIRES INDIA LIMITED 對 PENNSYLVANIA TRANSFORMER 出 CTC（2026-10 到港）",
+    "url": "https://importkey.com/i/precision-wires-india-limited"
+  },
+  "sources": [
+    {
+      "id": "importkey_us_customs_precision_wires_india_2026_10_s1",
+      "locator": "Customs US Trade Data Records——提單列（到港 2026-10-13）",
+      "quote": "2026-10-13 | PRECISION WIRES INDIA LIMITED | PENNSYLVANIA TRANSFORMER PAT | COPPER CONDUCTORS (CONTINUOUSLY TRANSPOSED CONTAINING 5 TO 72 ENAMELLED STRIPS) | 53313 Jawaharlal Nehrul, India | 4601 New York/Newark Area, Newark, New Jersey | Unavailable | MAEU276115112"
+    },
+    {
+      "id": "importkey_us_customs_precision_wires_india_2026_10_s2",
+      "locator": "Customs US Trade Data Records——提單列（到港 2026-10-06）",
+      "quote": "2026-10-06 | PRECISION WIRES INDIA LIMITED | PENNSYLVANIA TRANSFORMER PAT | COPPER CONDUCTORS (CONTINUOUSLY TRANSPOSED CONTAINING 5 TO 72 ENAMELLED STRIPS) | 52330 Mina Raysut, Oman | 4601 New York/Newark Area, Newark, New Jersey | Unavailable | MAEU275245082"
+    },
+    {
+      "id": "importkey_us_customs_precision_wires_india_2026_10_s3",
+      "locator": "Buyers available for PRECISION WIRES INDIA LIMITED——買方表",
+      "quote": "28 | PENNSYLVANIA TRANSFORMER PAT | TTP TECHNOLOGIES PVT LTD, ARC WELD ENGINEERS, KAIZEN SWITCHGEAR PRODUCTS PVT LTD, SABAR INDUSTRIES, GENKINGER GMBH MATERIAL HANDLING, | 30 CURRY AVE CANONSBURG PA 15317"
+    },
+    {
+      "id": "importkey_us_customs_precision_wires_india_2026_10_s4",
+      "locator": "Buyers available for PRECISION WIRES INDIA LIMITED——買方表",
+      "quote": "18 | PENNSYLVANIA TRANSFORMER TECHNOLOGY | ARC WELD ENGINEERS, KRYFS POWER COMPONENTS LTD, HEINRICH GEORG GMBH, NARAYAN POWERTECH PVT LTD, INTECH ENGINEERING, | 30 CURRY AVENUE CANONSBURG PA 15317"
+    }
+  ]
+}

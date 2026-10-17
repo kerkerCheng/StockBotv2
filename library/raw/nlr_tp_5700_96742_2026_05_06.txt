@@ -16,3 +16,15 @@ People who were interviewed said that bushings and OLTCs are now the biggest ris
 
 【p.16（PDF 第 28 頁）Lead times——國內變壓器廠點名的零件】
 Domestic transformer manufacturers highlighted some critical transformer components that have very long lead times and limited domestic supply. Bushings for LPTs are currently the item with the longest lead time, up to 130 weeks. OLTCs take 80–90 weeks to procure and have just 1 or 2 U.S. manufacturers; otherwise, they are typically sourced from Europe. One domestic transformer manufacturer said they order extra inventory ahead of time or ask customers to be open to different makes or specifications for a particular product to address the long lead times for OLTCs and bushings.
+
+【p.6（PDF 第 18 頁）原料與零件的瓶頸——CTC（2026-10-17 追加；句末「3」是腳註標號，腳註 3：Information from industry interviews conducted in 2025.）】
+However, for CTCs, which are a critical component of LPT windings, Sam Dong is the only domestic manufacturer.3 This reliance on a single U.S. supplier creates a supply chain bottleneck, prompting original equipment manufacturers to turn to imported CTC.
+
+【p.11（PDF 第 23 頁）訪談結果——CTC 與壓板（2026-10-17 追加）】
+Some regional suppliers of CTC have exited the market, which has forced remaining companies to take additional orders. The United States has a few producers of pressboard and insulating materials, but there are not many options outside of China.
+
+【p.11（PDF 第 23 頁）LPT 成本（2026-10-17 追加）】
+A 2020 industry survey by the U.S. Department of Commerce found that GOES and CTC, two major components, each contribute about 25% of the total production cost of an LPT (Bureau of Industry and Security 2021).
+
+【p.16（PDF 第 28 頁）Lead times——壓板（2026-10-17 追加）】
+Pressboard is another critical item with a single domestic manufacturer and is often imported as well. Sourcing pressboard is a global challenge, except perhaps from China.
