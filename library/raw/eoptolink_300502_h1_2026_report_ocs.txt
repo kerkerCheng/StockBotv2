@@ -1,0 +1,15 @@
+Source URL: http://static.cninfo.com.cn/finalpage/2026-08-25/1225499406.PDF
+
+Excerpt:
+[EXCERPT — 有限逐字引文] 成都新易盛通信技术股份有限公司 2026年半年度报告節錄：自研 MEMS 芯片的光路交换机（OCS）、NX200/300 系列
+Source: http://static.cninfo.com.cn/finalpage/2026-08-25/1225499406.PDF
+RETRIEVED: 2026-10-17（巨潮資訊 PDF 本機抽字、逐字核對）
+
+【第一节 释义（PDF 第 2–3 頁）】
+公司、本公司、新易盛 指 成都新易盛通信技术股份有限公司
+
+【第三节 一、报告期内公司从事的主要业务（PDF 第 9 頁）】
+公司已构建起覆盖传统可插拔光模块、LPO/LRO、XPO、NPO 及 CPO 等多种互联形态的解决方案与技术体系，并 推出了搭载自研 MEMS 芯片的光路交换机（OCS）产品
+
+【第三节 二、核心竞争力分析——研发（PDF 第 13 頁）】
+先后推出基于 400G PAM4 的新一代 1.6T DR4 OSFP 光模块、基于硅光技术的 6.4T NPO 模块和行业首款 12.8T XPO 光模块,并发布基于自研 3D MEMS 技术的 NX200/300 系列 OCS 产品。

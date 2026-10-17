@@ -1,0 +1,133 @@
+{
+  "claims": [
+    {
+      "confidence": 0.55,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "條件：新易盛的年報、季報或公告寫出 OCS 產品線停止、MEMS 晶片改外購，或之後的定期報告不再提 OCS。核查頻率：每半年（年報、半年報）。觸發後 48 小時：e1、e2 降 confidence 或提撤回，重讀 MEMS 鏡陣列層的供給側。",
+      "id": "eoptolink_300502_h1_2026_report_ocs_cl1",
+      "source_ids": [
+        "eoptolink_300502_h1_2026_report_ocs_s1",
+        "eoptolink_300502_h1_2026_report_ocs_s2",
+        "eoptolink_300502_h1_2026_report_ocs_s3"
+      ],
+      "statement": "Eoptolink (新易盛, 300502.SZ) 2026 interim report (cninfo, 2026-08-25): the company has launched an optical circuit switch (OCS) product carrying its self-developed MEMS chip, and released the NX200/300 series OCS based on self-developed 3D MEMS technology. Issuer self-report (L8 weak): no customer, shipment, revenue or fab named — a develops edge, not supply. Relevance: on the graph the 3D MEMS mirror array (the OCS optical core) had a single supplier edge (Silex Microsystems); this shows the mirror-array design is not confined to one house.",
+      "subject_id": "e2"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:ocs",
+      "id": "e1",
+      "relation": "develops",
+      "source_ids": [
+        "eoptolink_300502_h1_2026_report_ocs_s1",
+        "eoptolink_300502_h1_2026_report_ocs_s2",
+        "eoptolink_300502_h1_2026_report_ocs_s3"
+      ],
+      "src_id": "co:eoptolink"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "tech:mems_mirror_array",
+      "id": "e2",
+      "relation": "develops",
+      "source_ids": [
+        "eoptolink_300502_h1_2026_report_ocs_s1",
+        "eoptolink_300502_h1_2026_report_ocs_s2",
+        "eoptolink_300502_h1_2026_report_ocs_s3"
+      ],
+      "src_id": "co:eoptolink"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "Eoptolink Technology Inc., Ltd.",
+        "新易盛"
+      ],
+      "attributes": {
+        "ticker": "300502.SZ"
+      },
+      "confidence": 0.85,
+      "id": "co:eoptolink",
+      "name": "Eoptolink",
+      "role": null,
+      "source_ids": [
+        "eoptolink_300502_h1_2026_report_ocs_s1",
+        "eoptolink_300502_h1_2026_report_ocs_s2",
+        "eoptolink_300502_h1_2026_report_ocs_s3"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "OCS",
+        "optical switches",
+        "optical circuit switch"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:ocs",
+      "name": "Optical Circuit Switch",
+      "role": null,
+      "source_ids": [
+        "eoptolink_300502_h1_2026_report_ocs_s2",
+        "eoptolink_300502_h1_2026_report_ocs_s3"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "MEMS OCS core",
+        "MEMS mirror array"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:mems_mirror_array",
+      "name": "3D MEMS mirror array (OCS optical core)",
+      "role": null,
+      "source_ids": [
+        "eoptolink_300502_h1_2026_report_ocs_s2",
+        "eoptolink_300502_h1_2026_report_ocs_s3"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "eoptolink_300502_h1_2026_report_ocs",
+    "evidence_tier": 1,
+    "origin_entity": "Eoptolink Technology Inc., Ltd.",
+    "permission_basis": "深交所上市公司公開披露的半年度報告（巨潮資訊）；只保留研究必要的有限逐字節錄（pypdf 本機抽字、空白正規化——中文詞間偶有抽字多出的空格，照抽字原樣）。published_at 取披露日 2026-08-25。",
+    "published_at": "2026-08-25",
+    "publisher": "巨潮資訊（深交所指定披露網站）",
+    "retrieved_at": "2026-10-17",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "成都新易盛通信技术股份有限公司 2026年半年度报告節錄：自研 MEMS 芯片的光路交换机（OCS）、NX200/300 系列",
+    "url": "http://static.cninfo.com.cn/finalpage/2026-08-25/1225499406.PDF"
+  },
+  "sources": [
+    {
+      "id": "eoptolink_300502_h1_2026_report_ocs_s1",
+      "locator": "第一节 释义（PDF 第 2–3 頁）",
+      "quote": "公司、本公司、新易盛 指 成都新易盛通信技术股份有限公司"
+    },
+    {
+      "id": "eoptolink_300502_h1_2026_report_ocs_s2",
+      "locator": "第三节 一、报告期内公司从事的主要业务（PDF 第 9 頁）",
+      "quote": "公司已构建起覆盖传统可插拔光模块、LPO/LRO、XPO、NPO 及 CPO 等多种互联形态的解决方案与技术体系，并 推出了搭载自研 MEMS 芯片的光路交换机（OCS）产品"
+    },
+    {
+      "id": "eoptolink_300502_h1_2026_report_ocs_s3",
+      "locator": "第三节 二、核心竞争力分析——研发（PDF 第 13 頁）",
+      "quote": "先后推出基于 400G PAM4 的新一代 1.6T DR4 OSFP 光模块、基于硅光技术的 6.4T NPO 模块和行业首款 12.8T XPO 光模块,并发布基于自研 3D MEMS 技术的 NX200/300 系列 OCS 产品。"
+    }
+  ]
+}
