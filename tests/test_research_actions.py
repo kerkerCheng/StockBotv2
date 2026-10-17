@@ -566,6 +566,52 @@ def test_prepare_prints_which_existing_values_the_load_would_overwrite(
     assert f"節點 `{node['id']}` 的 `abstraction_level` 會被覆寫：'a_different_level'" in packet
 
 
+def test_dry_run_prints_the_same_side_effects_but_writes_nothing_and_mints_nothing(
+    tmp_path: Path, monkeypatch
+) -> None:
+    """failure log #3 修後殘留（2026-10-16 [768][769][770]）：副作用要在 prepare 之前就看得到。乾跑跑同一串檢查、印和 packet
+    同一個函式組的「入圖副作用」，但不寫 staging、不配 action id——sync 掃不到它，所以不會為它鑄號。"""
+    request = json.loads(_request_for_docs("first_doc"))
+    extraction = json.loads(request["documents"][0]["extraction_json"])
+    sid = f"{extraction['source_doc']['doc_id']}_s1"
+    extraction["sources"] = [{"id": sid, "locator": "p1", "quote": "Test layer is a material."}]
+    node = {"id": "mat:test_layer", "type": "Material", "name": "Test layer", "abstraction_level": "materials_substrate",
+            "confidence": 0.9, "source_ids": [sid]}
+    extraction["nodes"] = [node]
+    request["documents"][0]["extraction_json"] = json.dumps(extraction)
+    graph = _ReadOnlyGraph(nodes={node["id"]: {
+        "type": node["type"], "name": node["name"], "abstraction_level": "a_different_level",
+        "role": node.get("role"), "aliases": [], "attrs": "{}", "confidence": 0.9}})
+    monkeypatch.setattr(application, "_driver", lambda: graph)
+
+    dry = application._prepare_research_action_impl(json.dumps(request), root=tmp_path, dry_run=True)
+    assert dry["status"] == "dry_run"
+    assert "action_id" not in dry and dry["would_deduplicate_to"] is None
+    overwrite = f"節點 `{node['id']}` 的 `abstraction_level` 會被覆寫：'a_different_level'"
+    assert overwrite in dry["side_effects"]
+    assert list(research_actions.iter_actions(root=tmp_path)) == [], "乾跑寫了 staging"
+    assert not (tmp_path / "extractions").exists() and not (tmp_path / "library" / "raw").exists()
+
+    # 正式 prepare 的 packet 印的是同一段字（同一個 owner），digest 也相同
+    real = application._prepare_research_action_impl(json.dumps(request), root=tmp_path)
+    assert real["status"] == "ready" and real["action_digest"] == dry["action_digest"]
+    assert dry["side_effects"] in real["review_packet"]
+    # 之後再乾跑同一份：指得出會被去重到哪一筆（不會多鑄一號）
+    again = application._prepare_research_action_impl(json.dumps(request), root=tmp_path, dry_run=True)
+    assert again["would_deduplicate_to"] == real["action_id"]
+    assert len(list(research_actions.iter_actions(root=tmp_path))) == 1
+
+
+def test_dry_run_still_rejects_what_prepare_would_reject(tmp_path: Path, monkeypatch) -> None:
+    """乾跑不是放寬：正式 prepare 會擋的（這裡是第二份文件不合法），乾跑一樣擋、一樣不寫。"""
+    monkeypatch.setattr(application, "_driver", lambda: _ReadOnlyGraph())
+    request = json.loads(_request_for_docs("first_doc", "second_doc"))
+    request["documents"][1]["extraction_json"] = "{not json"
+    dry = application._prepare_research_action_impl(json.dumps(request), root=tmp_path, dry_run=True)
+    assert dry["status"] == "rejected"
+    assert list(research_actions.iter_actions(root=tmp_path)) == []
+
+
 def test_prepare_rejects_whole_action_when_later_document_is_invalid(
     tmp_path: Path,
 ) -> None:

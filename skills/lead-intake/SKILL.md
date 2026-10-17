@@ -166,7 +166,10 @@ pq1。使用者對 action ID 明確回覆 `go` 後，另一個執行步驟才可
 - 整理成 DB 無關中介格式(`schema/intermediate_format.schema.json`),如同 `extract.py` 的輸出
 - 跑 `loader/validate.py`(vocab + schema 形狀檢查;新 relation/type 先補 `schema/vocab.json`)
 - node/edge 帶齊 `source_ids`(全域格式)、`confidence`、L4 歸位好的屬性
-- 呼叫 `prepare_research_action` 讓程式重跑驗證並凍結 immutable payload；把原樣 review packet 放進 pq2
+- 呼叫 `prepare_research_action` 讓程式重跑驗證並凍結 immutable payload；把原樣 review packet 放進 pq2。
+  **先 `--dry-run`**：同一串檢查照跑、印「入圖副作用」（會被覆寫的節點欄位、證據等級預告），但不寫 staging、不配 action id、
+  sync 不會鑄號——prepare 之後才發現覆寫，就只能換號、讓使用者 drop 舊號（Phase 7 failure log #3：10-16 一輪三個）。
+  宣告既有節點時照圖上現值帶回 role／confidence 等欄位；走更正走廊時也一樣（舊的邊與引文逐字保留，節點宣告照圖上現值——#67）
 - 在凍結前，分開列出 graph delta 內所有公司與唯一 `focus_company_id`；**draft 頂層必填 `focus_company_id`**
   （2026-10-08 起 prepare 與 sync 用同一個判定 `intake.focus.resolve_focus`，沒宣告在 prepare 就被擋）；把 focus 寫入綁定 lead，並在
   `ra_admission` pq2 明列 `Decision handoff: co:x`。其他公司只作 evidence／relationship context，不因入圖

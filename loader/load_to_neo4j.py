@@ -359,7 +359,7 @@ def check_duplicate_url(source_doc: dict, session, allow_dup_url: bool = False) 
             f"這很可能是同一份文件被以不同 doc_id 重複 onboard。"
             f"若為同一文件的不同段落，請為各段填不同的 source_doc.section 再載入（既有那份也要有 section）；"
             f"若是同一份文件要補新段落、而既有那份沒有 section，沿用既有 doc_id 走更正走廊"
-            f"（source_doc.supersedes_extraction_sha256＝現存抽取檔的 hash，舊內容逐字保留；intake/provenance.py）；"
+            f"（source_doc.supersedes_extraction_sha256＝現存抽取檔的 hash；舊的邊與引文逐字保留，節點宣告照圖上現值——照字面重放舊抽取的節點宣告會把之後別份文件改過的屬性改回去〔failure log #67〕；intake/provenance.py）；prepare 前先 --dry-run 看入圖副作用；"
             f"若確為不同文件，重跑並加 --allow-dup-url。"
         )
     print(

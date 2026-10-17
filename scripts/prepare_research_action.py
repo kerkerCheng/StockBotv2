@@ -42,6 +42,7 @@ def prepare_from_file(
     *,
     root: Path = ROOT,
     prepare: Callable[..., dict] | None = None,
+    dry_run: bool = False,
 ) -> dict:
     path = _resolve_draft(action_file, root=root)
     action_json = path.read_text(encoding="utf-8")
@@ -52,6 +53,8 @@ def prepare_from_file(
         from intake.application import _prepare_research_action_impl
 
         prepare = _prepare_research_action_impl
+    if dry_run:
+        return prepare(action_json, root=root, dry_run=True)
     return prepare(action_json, root=root)
 
 
@@ -77,15 +80,21 @@ def main(argv: list[str] | None = None) -> int:
         "--supersedes", action="append", default=[], metavar="RA_ID",
         help="這一版取代哪一筆還沒核准的舊版（同一個 session 的明確宣告）：舊版 apply 拒收、sync 把舊號標「已被取代、建議 drop」",
     )
+    parser.add_argument(
+        "--dry-run", action="store_true",
+        help="每一道檢查照跑、印入圖副作用，但不寫 staging、不配 action id（sync 不會鑄號）——prepare 只能跑一次，先乾跑（failure log #3）",
+    )
     args = parser.parse_args(argv)
+    if args.dry_run and args.supersedes:
+        parser.error("--dry-run 不寫任何紀錄，不能同時宣告 --supersedes")
     try:
-        result = prepare_from_file(args.action_file)
+        result = prepare_from_file(args.action_file, dry_run=args.dry_run)
     except (OSError, ValueError, json.JSONDecodeError) as exc:
         result = {"status": "rejected", "error": str(exc)}
     if result.get("status") == "ready" and args.supersedes:
         result["superseded"] = supersede(args.supersedes, new_id=str(result["action_id"]))
     print(json.dumps(result, ensure_ascii=False, default=str, indent=2))
-    return 0 if result.get("status") == "ready" else 2
+    return 0 if result.get("status") in {"ready", "dry_run"} else 2
 
 
 if __name__ == "__main__":

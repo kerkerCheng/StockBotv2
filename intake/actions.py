@@ -1179,18 +1179,7 @@ def create_action(
     """
 
     current = now or _now()
-    normalized = validate_normalized_payload(payload)
-    # sub 引文核對（Phase 4 Step 4.4b）：只警告、不拒收；依賴當下字表，所以同樣在這一刻跑一次、存成收據。
-    sub_check = check_sub_language(normalized)
-    layer_check = None
-    if normalized.get("layer_enumerations"):
-        # 「在本包」核對在建立紀錄的這一刻跑一次、存成收據（依賴當下名冊，不得放進 `_validate_record`）。
-        layer_check = check_layer_enumerations(normalized)
-        if layer_check["status"] != "ok":
-            raise ValueError("layer_enumerations 核對失敗：" + "；".join(layer_check["rejections"]))
-    subject_check = check_supply_subjects(normalized)   # failure log #14；prepare 入口已先回逐條原因，這裡是縱深防護
-    if subject_check["status"] != "ok":
-        raise ValueError("供貨邊的引文沒具名主詞：" + "；".join(subject_check["rejections"]))
+    normalized, sub_check, layer_check = _checked_for_create(payload)
     payload_bytes = len(_canonical_bytes(normalized))
     digest = canonical_action_digest(normalized)
     parent = _action_root(root)
@@ -1261,6 +1250,50 @@ def create_action(
         _validate_record(record)
         _write_new_json(_action_path(action_id, root), record)
     return copy.deepcopy(record)
+
+
+def _checked_for_create(payload: dict) -> tuple[dict, dict | None, dict | None]:
+    """建立紀錄前的那串檢查（`create_action` 與 `preview_action` 共用；兩邊各寫一份會漂開——L16）。
+    回 `(normalized, sub_check, layer_check)`；任何一道不過就 raise ValueError。"""
+    normalized = validate_normalized_payload(payload)
+    # sub 引文核對（Phase 4 Step 4.4b）：只警告、不拒收；依賴當下字表，所以同樣在這一刻跑一次、存成收據。
+    sub_check = check_sub_language(normalized)
+    layer_check = None
+    if normalized.get("layer_enumerations"):
+        # 「在本包」核對在建立紀錄的這一刻跑一次、存成收據（依賴當下名冊，不得放進 `_validate_record`）。
+        layer_check = check_layer_enumerations(normalized)
+        if layer_check["status"] != "ok":
+            raise ValueError("layer_enumerations 核對失敗：" + "；".join(layer_check["rejections"]))
+    subject_check = check_supply_subjects(normalized)   # failure log #14；prepare 入口已先回逐條原因，這裡是縱深防護
+    if subject_check["status"] != "ok":
+        raise ValueError("供貨邊的引文沒具名主詞：" + "；".join(subject_check["rejections"]))
+    return normalized, sub_check, layer_check
+
+
+def preview_action(
+    payload: dict, *, root: Path = ROOT, now: datetime | None = None,
+    merge_side_effects: dict | None = None,
+) -> dict:
+    """乾跑（`prepare_research_action.py --dry-run`；failure log #3 修後殘留）：跑 `create_action` 同一串檢查、算 digest、
+    印 packet 同一個函式組的「入圖副作用」——**不取 store 鎖、不寫 staging、不配 action id**，所以 sync 不會為它鑄號。
+
+    事發（2026-10-16）：副作用只在 prepare 之後的 packet 裡看得到，一輪三次發現節點會被覆寫時都已經 prepare 了，
+    修正只能 `--supersedes` 換號、舊號留給使用者 drop（[768][769][770]）。"""
+    current = now or _now()
+    normalized, sub_check, layer_check = _checked_for_create(payload)
+    digest = canonical_action_digest(normalized)
+    existing = _ready_with_digest(digest, root=root, now=current)
+    preview = {"merge_side_effect_check": merge_side_effects} if merge_side_effects is not None else {}
+    return {
+        "status": "dry_run",
+        "action_digest": digest,
+        "would_deduplicate_to": existing["action_id"] if existing else None,
+        "document_count": len(normalized["documents"]),
+        "sub_language_check": sub_check,
+        "layer_enumeration_check": layer_check,
+        "side_effects": "\n".join(_render_merge_side_effects(preview)).strip(),
+        "next_action": "乾跑沒有寫任何東西。副作用乾淨就拿掉 --dry-run 正式 prepare（只跑一次）；不乾淨就改草稿再乾跑。",
+    }
 
 
 def _ready_with_digest(digest: str, *, root: Path, now: datetime) -> dict | None:

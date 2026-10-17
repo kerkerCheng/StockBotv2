@@ -273,7 +273,7 @@ ref 解析，不是一支前置查詢命令。
 
 | 終局 | 條件 | 動作 |
 |---|---|---|
-| **產出入圖包** | 有可核准的 graph delta | `prepare_research_action.py` → `advance action_prepared` → 取得 pq2 編號 |
+| **產出入圖包** | 有可核准的 graph delta | `prepare_research_action.py --dry-run`（看入圖副作用；不寫、不鑄號）→ 乾淨再正式 `prepare_research_action.py`（只跑一次）→ `advance action_prepared` → 取得 pq2 編號 |
 | **產出 onboard 包** | 標的不在 registry，但四維初判（瓶頸地位／需求錨／客戶端資本承諾／純度）值得入圖 | 打包 registry 條目＋首批 extraction＋L8 來源清單成 ra_admission packet 取號（`AGENTS.md`「Onboard 也走 pq2」）——**不要 park 成開放式 scope 問題** |
 | **誠實 park** | 追源未果／被一手否定／只屬 Engine C 時變觀測／沒有唯一 focus／四維初判不過 | `advance parked` ＋ 完整 trace refs |
 

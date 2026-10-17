@@ -500,8 +500,10 @@ def _merge_side_effect_receipt(documents: list[dict], *, driver_factory=None) ->
 
 
 def _prepare_research_action_impl(
-    action_json: str, *, root: Path = INTAKE_ROOT
+    action_json: str, *, root: Path = INTAKE_ROOT, dry_run: bool = False
 ) -> dict:
+    """`dry_run=True`：每一道檢查照跑（含同 URL 多段、主詞具名、入圖副作用），最後改呼叫 `preview_action`——不寫 staging、
+    不配 action id（failure log #3 修後殘留：副作用要在 prepare 之前就看得到，否則修正只能換號）。"""
     try:
         request = research_actions.parse_action_request(action_json)
     except (ValueError, TypeError) as exc:
@@ -578,6 +580,12 @@ def _prepare_research_action_impl(
             "problems": [_safe_error_message(item) for item in subjects["rejections"][:50]],
             "prerequisites": [_safe_error_message(item) for item in subjects["prerequisites"][:50]],
         }
+    if dry_run:
+        try:
+            return research_actions.preview_action(
+                payload, root=root, merge_side_effects=_merge_side_effect_receipt(normalized_documents))
+        except (OSError, RuntimeError, ValueError) as exc:
+            return {"status": "rejected", "error": _safe_error_message(exc)}
     try:
         record = research_actions.create_action(
             payload, root=root, merge_side_effects=_merge_side_effect_receipt(normalized_documents))
