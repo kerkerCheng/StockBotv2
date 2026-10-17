@@ -1,0 +1,11 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1801368/000180136826000048/mp-20260630.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] MP Materials Corp. 10-Q（quarter ended June 30, 2026；EDGAR 2026-08-07）節錄：重稀土（Tb、Dy）精煉時程
+RETRIEVED: 2026-10-18（EDGAR 原文抽字、空白正規化後逐字核對）
+
+【Item 2 MD&A — Overview】
+"Until such time that we achieve our designed throughputs of separated products, including heavy rare earth elements (“HREE”), we may experience unstable operations and elevated costs of our initial production of such products. In the second half of 2026, we expect to begin refining HREE with initial production of terbium and dysprosium. As part of our partnership with the United States Department of War (the “DoW”), we have committed to further extend our HREE 31 Table of Contents refining capabilities to include the separation of samarium oxide and to recommission the chlor-alkali facilities at Mountain Pass."
+
+【Note 15 — Government Grants】
+"In February 2022, the Company was awarded a $35.0 million contract by the DoW Office of Industrial Base Analysis and Sustainment program to design and build a facility to process HREE at Mountain Pass (the “HREE Facility”) (the “HREE Production Project Agreement”)."
