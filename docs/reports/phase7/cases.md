@@ -60,6 +60,8 @@
   - 2026-10-06｜積壓：雷達 lead_c07d7676（AK&M「Sivers 出售 Sivers Photonics 給 Nordic Acquisition」，頁面時間 2026-10-06）→ park `contradicts`——內文是 2024-08-06 與 byNordic 簽不具約束力意向書的舊聞再刊；
     Sivers 的 MFN 2026 年沒有出售或分拆公告（最新 09-29 臨時股東會通知：換會計師、員工選擇權、C 股）。不觸及 Sivers thesis 的反證（雷達本來就不叫醒語意 watch）；雷達八週試驗記一則偽陽性
   - 2026-10-07｜續工 ⑤（走圖第 1 型「薄層沒人讀」）：**UHP 雷射層第一份讀圖 `sr_26e0a9fe152d5a71`（volume）**——CW DFB 層的 400 mW 高功率子集合；客戶端 NVIDIA 新聞稿：「nonexclusive」協議、數十億美元採購承諾＋產能取得權（被引用那一句沒有逐字寫出 Lumentum，不標外部印證）；Coherent 也供（Cignal 轉述）；下一層 InP 晶圓產能 fully allocated（Lumentum 自述）。坐這一格的只有 Lumentum、Coherent（非邊緣）；三條反證登 watch（訂單取消或供給寬鬆／第三家被客戶點名量產／改用不需外部高功率雷射的架構）
+  - 2026-10-17｜使用者 go **[783]**（Ligent 招股書＋官網新聞稿入圖）→ **CW DFB 層反證①「第八家」觸發**：海信寬帶（Ligent，9856.HK）2026 年第一季量產 75mW 高功率 CW-DFB，「These laser chips are either sold to external Chinese and overseas customers or used for our in-house production of optical transceivers.」——同時是新商用供應商與買家自製（反證⑥那一型，發生在中國收發器廠）。
+    讀圖換版 `sr_640eff4b41cefb8a`（**維持 volume、窗口再短**：規模小——光晶片占它營收 1.6%；①改成「第九家」）；押這一層的七份敘事換騎，華星光 `ib_909214fd8f0f382e`、Sivers `ib_7ff0b3092b27e675`、聯亞 `ib_9ad8fd1d85f44300`、全新 `ib_824c2cead1f98942` 在「為什麼卡在它」補 Ligent 一句（候選狀態都不變）
 - 2×2：尚未到裁決點
 - failure log：（尚無）
   - #1（lead_f1694626 被排回）、#3（[679]／[680] 重複號）
@@ -316,6 +318,9 @@
     歸零旗標補 mechanical 基期 `mo_c5a370fb876637f9268caf1e5030b87b`（FY26 現金、總債、自由現金流）→ 現金跑道與負債兩盞紅（擴產＋營運資金燒錢），持續經營意見是 judgment、鑄 pq2 **[782]**。
     **Precision Wires 敘事 `ib_cdf43407f53be8b9`（不要：CTC 只是五個產品之一、出口共 14.83%，美國這段推不動整家公司）**。
     P2 (ii) 照舊＝有（KSH 是邊緣、缺 X）；但 KSH 的「有」要靠全球也緊才成倍率——讀圖只證到美國、美國約一成，H5 的「上游有非共識候選」在這一檔是**有候選、尚無倍率路徑**
+  - 2026-10-17（夜）｜使用者 go **[785]**（KSH Q1 FY27 簡報＋法說入圖：KSH→Hitachi 五年框架〔自述、量價未定〕、CTC 占特殊線材 50–75%、美國 8–11%）、**[782]** KSH 持續經營意見（無保留）寫入 Engine C、[787] Precision Wires 的同型提案鑄號。
+    CTC 讀圖主動換版 `sr_cf14fb582d8b131d`（判讀不變；缺口②的 KSH 半邊補上；digest 沒變——既有邊多自述來源），KSH `ib_63239e9aa6a0fe97`、Precision Wires `ib_168eab8e1e4814c8` 換騎。
+    同夜發現 Precision Wires 與 Ligent 被閉包閘門用過期座位表排出母體（failure log #77，當下修）——補 mechanical 基期 `mo_ab3412cdfd022d1e1d04fb000b2c991a`（FY26：自由現金流 −2.07 億盧比；營業現金流含 usance 信用狀買銅 1,01,811 lakhs 的應付帳款）後到終局
 - failure log：（尚無）
   - #9（同 P1）
   - #10（[691] 合資股東的新聞稿被分類成外部印證；與 C1 [690] 同形）
