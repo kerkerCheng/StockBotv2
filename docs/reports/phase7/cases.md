@@ -168,6 +168,7 @@
     全新、英特磊英文年報兩條出處在 library/raw 對不到（英文版節錄只在 [715] 的包裡），照實不列、reread_reason 寫「[715] 核准後換版補」（failure log #37）。
   - 2026-10-07｜續工 ⑤（走圖第 1 型）：**6 吋 InP 產線層第一份讀圖 `sr_ad7419b129b4dad5`（undecided）**——這一格是製造能力、不是多家供貨的市場：只有 Coherent 自述在 6 吋量產（「客戶因此選它」也是它轉述的），穩懋在開發（develops 邊，不在供給側快照）；量的訊號在下一層（Coherent 預付 AXT 2,228.85 萬美元鎖 6 吋基板）。兩條條件登 watch（第二家 6 吋 InP 量產／客戶端寫明選供應商的理由是 6 吋）。邊緣公司不在這一格
   - 2026-10-18｜**盤點 B 組（光通訊電子件與封裝）**：①pq2 **[789]**——GF 2026-10-08 新聞稿：與 TSMC 簽製造協議在美國 Malta 供 CoWoS 用矽中介層（2028 上半年量產爬坡、初始五年；**原文無金額**，WebFetch 摘要的「$2 billion」不存在）——圖上矽中介層第一個供應商，並把 tech:cowos 接到先進封裝總稱節點（先進封裝讀圖缺口①的建模那一半）。②pq2 **[791]**（取代 [790]）——GF＋Marvell 擴大 SiGe 產能協議（2026-09-17，Burlington）＋Marvell 投資人日簡報（2026-10-06）「SiGe Drivers / TIAs」「Multi-foundry」：SiGe 平台供應商 1→2、TIA／驅動器接上 NPO 與 CPO；[790] 把 enables 方向寫反（failure log #78，當下修）。③**LPO 第一份讀圖 `sr_bfd181ebfe7dee2b`（neither，層）**：Meta 一個 hop 量產、模組廠多家（Ligent、中際、新易盛）、Arista 交換器支援，沒有任何缺貨一手；它是光模組 DSP 層的反向路徑，需求錨走不到是建模缺口（is_variant_of 不走訪）。④MRM 兩個節點（`tech:micro_ring_modulator`、`tech:mrm_200g`）是變體不是同義，但共用別名 MRM——第 9 型偵測不到（failure log #79，量測全圖 10 對）。
+  - 2026-10-18（第二段）｜三個小缺口到終局：①CPO 測試讀圖缺口③台積電徐國晉「四大瓶頸」——只有 SEMI 矽光子峰會（8/31）的媒體轉述，官方逐字稿或簡報找不到（「我找不到」≠「不存在」），讀圖原本就寫「未取得官方逐字稿」，不換版；②FAU：Broadcom 點名的 TwinstarTech 是上海松江的被動光元件廠（官網：光纖陣列、MPO、「Co-package optics」，13,000 m²、700+ 人），沒看到掛牌資訊；大立光的邊在下一層微透鏡陣列，FAU 讀圖不寫是對的；③InP 上游旁支（三甲基銦）：南大光電 300346.SZ 2025 年報「前驱体材料（含 MO 源）」占營收 27.61%、不拆三甲基銦，MO 源以 LED 外延為主（全球 MO 源市場約 1.8 億美元，年報引述）、內銷 92%、沒有 InP 磊晶客戶具名——無 graph delta，旁支結案。
 - failure log：#31（層說明沒有 watch 來源鍵；2026-10-07 S4a 解）、#32（反證在登記前就已成立、永遠不會醒）、#33（`fetchers.mops --include-english` 蓋掉中文版；當下修）；#17 第 4 次（[715] 圖影響行）；#37（層說明的出處 id 對不上 raw 檔名）
 
 ## S1 X 帳號 40 則首次點名的 claim 裁決
@@ -326,6 +327,7 @@
     ①華明（[788] 待核）：H 股 Application Proof（Frost & Sullivan，公司委託）2024 年分接開關全球份額 17.9% 第二、海外營收 19.9%；美國海關提單 2026 年 5–9 月幾乎每月直接出貨 OLTC 給 Prolec GE（Shreveport、Waukesha）——推翻分接開關讀圖「華明不在美國這條線上」那句，[788] 核准後重讀 `sr_8d94aadb859c3e65`、改寫 `ib_5c26d7071cc7ae09` X①、層說明 `ln_0a3b60a33ecff0cf` T5。
     ②LPT 第二個開口的買方：pq2 **[792]**——Oncor 8-K（2025-11-05）「securing critical long-lead time equipment, including large power transformers」＋供應商交期承諾、首批 2027 Q1；Core Scientific 10-K「lead times of 12 to 18 months or longer」；Fermi 10-K 1.2 億美元高壓設備倉儲融資提前採購變壓器——名冊隨包 staged 三家（Oncor 股權未上市 ticker null）。CoreWeave、Equinix、DLR 等 10-K 沒寫變壓器交期；Constellation 的週數是轉引 NIAC，不收。
     ③絕緣、套管、電工鋼的對美出貨人（ImportKey 海關頁 175 檔）：壓板（台州新源）、絕緣件（遼寧 XD 興啟、Sabar、Permali Wallace、Transvick、Enpay、常州英中）、CRGO 鐵芯（Amod）、套管（HSP→HSP US、Trench、MGC Moser Glaser、Onload Gears）全是私人公司或大集團子公司；唯一上市、邊緣大小的是**江蘇神馬電力（603530.SS，市值 2.36B、分析師量不到）**——複合空心絕緣子直接出貨 Siemens Energy Grid Technologies、Hitachi Energy USA（Mt Pleasant），年報自述與 Hitachi Energy、Siemens Energy、GE Vernova「形成了扎实的合作基础」、2025 海外新簽訂單 10.12 億元（+36.40%）。四維初判客戶端資本承諾無、瓶頸地位未知 → 不打包，登記 `lead_c461550b4e3297ae7285479bd1772796` 誠實停放（awaiting_named_disclosure，觸發 co:hitachi 文件與神馬 Q3／年報）。
+  - 2026-10-18（第二段）｜乾式變壓器讀圖換版 `sr_cfed15e6eb35a726`（判讀 undecided 不變）：補 Hammond 2026-09-22 新聞稿——Fort Worth 新廠 2027 Q4 起分段投產、初期約 CAD 2.5 億年產能（產能計畫是時變數字，只寫在讀圖）；Hammond 敘事換騎。
 - failure log：（尚無）
   - #9（同 P1）
   - #10（[691] 合資股東的新聞稿被分類成外部印證；與 C1 [690] 同形）
@@ -422,6 +424,7 @@
 - 裁決：（尚無）
 - 2×2：尚未到裁決點
   - 2026-10-07｜續工 ①（/phase-run）：**冷板層說明 v1 `ln_4211fda64a785417`**（個股頁 S4 第六份；主張 K1 Vera Rubin 四家、K2 MCL／MCCP 登 watch）→ 冷板讀圖換版 **`sr_c2cae5b7616559ec`（undecided → neither）**：DigiTimes 導言寫 NVIDIA「will centralize procurement of cold plates and, at GTC, named four suppliers」（奇鋐、Cooler Master、健策、台達；媒體，NVIDIA 自己的新聞稿與技術文沒點名）——客戶自己點名四家、跨世代換人＝不是換不掉；沒有買方說缺＝不是量。directed lead 的答案：雙鴻（3324）是冷板、分歧管、CDU 的量產供應商（年報自述，伺服器營收 2026Q2 占 78%、客戶只寫代號），但分析師 16 家、**系統口徑非倍率**，而且不在 Vera Rubin 的四家 → 入圖包 pq2 **[732]**（三條供貨邊，名冊隨包 staged）；邊緣大小的力致、泰碩、建準年報只寫到開發或佈局。**這一層沒有可投資的邊緣公司**（failure log #43：上一版把雙鴻寫成邊緣大小是目測）
+  - 2026-10-18｜盤點清單：板式熱交換器層第三家供應商 → pq2 **[794]**（Dover FY2025 10-K「brazed plate heat exchangers … including an increasing opportunity in data center cooling applications」；Q2 10-Q 資料中心冷卻熱交換器需求加速、分部訂單年增 45.8%「including longer lead-time orders」、book-to-bill 1.23）——讀圖原本只引 Dover 法說轉錄的「交期拉長」，換成它自己的申報書面版本。
 - failure log：（尚無）
   - #9（同 P1）
   - #10（[690] CoolIT 的兩條供貨邊印 externally_corroborated——文件是收購方 Ecolab 發的）
