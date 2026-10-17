@@ -134,6 +134,34 @@
       "basis": "semantic_reviewed",
       "approval_receipt": "todo:752",
       "note": "使用者 2026-10-08 核准（[752]）。兩端逐字：tech:npo「Near-Packaged Optics」——Lumentum Q4 FY2026 法說「The rest of our customer base is currently prioritizing near-packaged architectures as an intermediate step to the eventual adoption of CPO.」（lite_transcript_q4fy2026，三筆 assertion 全部出自這一句）；tech:near_package_optics「Near-Packaged Optics (NPO)」——Coherent「CPO and NPO opportunities」、Aeva「a Near-Packaged Optics (NPO) solution for a hyperscaler」、NewPhotonics「near-packaged optics … NPO optical engine」、Credo「NPO: Optical engines are mounted on the board near the compute device」。兩者講的是同一個架構：光引擎裝在板上、靠近交換器或運算晶片（不是和 ASIC 共同封裝）。⚠ canonical **不照** _readme 的「同組取最短 id」（那會選 tech:npo）：比照 [730] 改選 tech:near_package_optics——NPO 層讀圖（sr_f004cdb4639c6441）、Aeva 敘事的押注與四份來源都掛在這個 id，選短的會讓它們全部搬家；例外只在本筆，規則本身不改。事發：Phase 7 failure log #59（#36 的第二例；第 9 型比 id token 子集與名稱逐字，兩條都不中）。⚠ 照搬的疑點：prod:uhp_laser is_component_of 那條的引文沒寫 UHP 雷射（L6 Gap 4），本筆不改它；tech:cpo 節點別名裡的「NPO」「near-packaged optics」是別名污染，另案。不含 tech:cpo 與 scale_up／scale_out 那一群。"
+    },
+    "tech:transceiver_1_6t": {
+      "name": "1.6T-speed transceiver",
+      "aliases": [
+        "tech:cloud_transceiver_1_6t"
+      ],
+      "basis": "semantic_reviewed",
+      "approval_receipt": "todo:776",
+      "note": "使用者 2026-10-17 核准（[776]）。兩端逐字：tech:transceiver_1_6t「we are poised to ramp 1.6T-speed transceiver shipments in fiscal Q4 with a portion of this volume leveraging our own CW lasers.」（Lumentum Q3 FY26）、AAOI「800G and 1.6T optical transceivers」、中際旭創「2027年整體行業的1.6T需求依然保持強勁」；tech:cloud_transceiver_1_6t「Transceiver revenue grew ~$50M sequentially … now in the 'lead pack' of transceiver suppliers as customers move to 1.6T」（Lumentum Q2 FY26，五筆 assertion 全出自這一份）。兩端都是 1.6T 這一代的資料中心光收發器、別名都是「1.6T transceiver」；[615] packet B 組當時的疑慮「cloud 特指資料中心」不成立——transceiver_1_6t 的每段逐字也都是 AI 資料中心。canonical 照 _readme 取最短 id。不含：1.6T 世代與可插拔收發器層 tech:pluggable_transceiver 的關係（另案）"
+    },
+    "tech:six_inch_inp_production": {
+      "name": "Six-inch InP wafer production line",
+      "aliases": [
+        "tech:inp_6inch_fab"
+      ],
+      "basis": "semantic_reviewed",
+      "approval_receipt": "todo:777",
+      "note": "使用者 2026-10-17 核准（[777]）。兩端逐字：tech:inp_6inch_fab「we shipped our first transceivers containing components produced on our 6-inch lines… The initial 6-inch production contribution came from our Sherman, Texas facility」（Coherent），另有 NVIDIA 部落格「Coherent’s expansion at its Sherman, Texas, campus scales what it calls the world’s first volume production 6-inch indium phosphide fab」；tech:six_inch_inp_production「our high-power CW laser is produced on our six-inch indium phosphide line in our Sherman, Texas facility」。同一條 Coherent Sherman 的 6 吋 InP 產線。拆開的後果：NVIDIA 客戶端那句掛在舊 id，6 吋讀圖看不到（failure log #36 第三例）；id token 不互為子集、名稱不同，走圖第 9 型兩條都不中。⚠ canonical **不照** _readme 的「同組取最短 id」（那會選 tech:inp_6inch_fab）：比照 [730][752] 留讀圖 sr_ad7419b129b4dad5 掛著的 id；例外只在本筆"
+    },
+    "tech:external_laser_source": {
+      "name": "External Laser Source",
+      "aliases": [
+        "prod:els_module",
+        "tech:els_pluggable_module"
+      ],
+      "basis": "semantic_reviewed",
+      "approval_receipt": "todo:778",
+      "note": "使用者 2026-10-17 核准（[778]）。三端逐字：prod:els_module「We were recently given our first external light source, or ELS, module purchase for delivery by the second half of calendar 2027.」（Lumentum Q4 FY26 法說）；tech:els_pluggable_module「an initial order for ELS modules」（同季 8-K Exhibit 99.1）、「…within a pluggable turnkey ELS module solution」、Cignal「largest purchase order ever for the ELSFPs」；tech:external_laser_source 自己的邊上就掛著同兩句——同一句話生出三個節點（[505]、[615] 同型；failure log #59 別名交集回放列為真重複）。⚠ canonical **不照** _readme 的「同組取最短 id」（那會選 prod:els_module）：留層讀圖 sr_3429846bcf5ae77a、層說明與反證 watch 都掛著的 id；例外只在本筆。不併 prod:els_8ch_module（Sivers／O-Net／Enablence 的 8 通道產品，這一層的一個變體，有自己的插槽讀圖 sr_35ca0ce58617d5f6）。⚠ Cignal（2026-04）「largest purchase order ever」與 Lumentum 8 月「first … ELS module purchase」對不上——照原證據等級搬，不合成一件事"
     }
   }
 }
