@@ -134,10 +134,10 @@
     旁證（L11-4）：GF 這份 20-F 早已入圖（`gfs_20_f_20260227`），但策展摘錄只收了 Raw Materials 那一句、沒收風險段的 71%——failure log #46
   - 2026-10-17｜**E2 成立 → 外部光源層改判 neither**：使用者 go [773]（Broadcom OCP 2026 TH6-Davisson 夥伴投影片）、[779]（NVIDIA 部落格「Lumentum, Sumitomo, and Coherent: These vendors provide ELS assembly, optical alignment, and test with the silicon photonics engine.」）入圖，[778] 把 `prod:els_module`、`tech:els_pluggable_module` 併進 `tech:external_laser_source`。
     客戶端點名的 ELS 供應商由 1 家（Coherent）變成：NVIDIA 三家＋Broadcom 的 ELSFP 夥伴七家（eoptolink、O-Net、TFC、FIT、Source Photonics、Aperion、Ligent）；買方 Meta 明寫「OIF ELSFP compliance to enable open ecosystem and multi-sourcing」。
-    讀圖換版 `sr_3429846bcf5ae77a` → **`sr_a5736ee4bae76eaf`（neither：模組這一格不卡——買方刻意多源、組裝產能從收發器產線挪得過來；錢流向下一層的高功率雷射晶片）**；E2 處置（入圖完成、不再登記），E1／E3–E5 沿用、新增「量產只集中在一兩家」一條。
+    讀圖換版 `sr_3429846bcf5ae77a` → `sr_a5736ee4bae76eaf` → 同日更正 **`sr_62e2a48a354f407c`（neither：模組這一格不卡——買方刻意多源、組裝產能從收發器產線挪得過來；錢流向下一層的高功率雷射晶片）**——更正的是「高功率雷射要嘛向外買、要嘛還在開發」一句：Ligent 官網 2026-09-07 自述 ELSFP「featuring self‑developed CW lasers」、100 mW 版已初步商用，[773] 的 claim 早已寫明，寫讀圖前沒 grep 自家庫（L11-4，failure log #76）；E2 處置（入圖完成、不再登記），E1／E3–E5 沿用、新增「量產只集中在一兩家」一條。
     **O5 的讀法**：「Coherent 是唯一」早已推翻（10-04 的 `already_available`），這次連「第二來源」都不稀有了——這一格的倍率不在模組。
-    邊緣檔 Ligent（9856.HK，海信寬帶）第一份敘事 `ib_6a9066192211ada6`（**不要**：只坐這一格、ELSFP 早期商用、本體是數通光模組 69.4%；自製 400mW CW-DFB 2027Q1 投產，若照時程通過驗證由反證叫醒）。
-    Sivers 換騎 `ib_bd872222b5a0eaa6`，「為什麼卡在它」補 Broadcom 的「standard lasers. You don't need fancy combs」與「you don't even need an external laser source」。Lumentum ELS 邊的合格狀態衝突 pq2 **[781]**（取 qualifying）
+    邊緣檔 Ligent（9856.HK，海信寬帶）第一份敘事 `ib_6a9066192211ada6` → 同日更正 **`ib_c2ed62e6e0972a48`（不要**：只坐這一格、本體是數通光模組 69.4%；它自述 ELSFP 用自研 CW 雷射，但自製雷射的模組廠不只它、光晶片只占營收 1.6%——光晶片長到一成以上或 400mW 照時程通過驗證由反證叫醒）。
+    Sivers 換騎 `ib_bd872222b5a0eaa6`（→ `ib_fbbe08ac5b795369` 換引用到更正版讀圖），「為什麼卡在它」補 Broadcom 的「standard lasers. You don't need fancy combs」與「you don't even need an external laser source」。Lumentum ELS 邊的合格狀態衝突 pq2 **[781]**（取 qualifying）
 - failure log：（尚無）
   - #27（SOI.PA FY2026 分部占比兩筆都生效，「出現在數字裡」被默默丟——當下修為印衝突；序列仍成不了，合併紀錄留 7.5）
   - #46（入圖時的策展摘錄只收當時要的那句，同一份申報裡更強的客戶端證據留在庫外——10-08 要重抓 EDGAR 才看得到）

@@ -37,3 +37,10 @@ Total：2023 4,238,989｜2024 5,086,600｜2025 8,354,680｜H1 2025 4,215,825｜H
 "Since the launch of our high-power CW-DFB laser chips, some of our CW-DFB laser chips used in the optical transceiver production are produced in-house."
 
 （招股書沒有單列 ELSFP 的營收；ELSFP 的營收含在光收發器裡。）
+
+=== 補：公司官網新聞稿（2026-09-07，CIOE 2026；https://www.ligent.com/about/news/175.html；RETRIEVED 2026-10-17，HTML 本機去標籤後逐字核對）===
+"Paired with the ELSFP external light source solution featuring self‑developed CW lasers, it delivers a complete NPO optical interconnect solution tailored for high‑density and low‑power‑consumption scenarios."
+"In terms of light source product lines, the 100 mW ELSFP has achieved initial commercialization, while the brand‑new 400 mW ultra‑high‑power ELSFP will be demonstrated on‑site at the exhibition."
+"Ligent Technologies’ self‑developed lasers feature high output power, high efficiency and superior stability."
+"They lay a solid light‑source foundation for ELSFP, NPO/CPO silicon photonics applications, completing the full technical chain spanning CW lasers, ELSFP external light sources down to NPO/CPO deployments."
+（招股書的「400mW CW-DFB laser chips which will be used in the CPO-based ELSFP modules」是更高功率的下一代；100 mW 那一代的 ELSFP 已經用它自研的雷射——兩份文件不矛盾。）
