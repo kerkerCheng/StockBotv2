@@ -1,0 +1,21 @@
+Source URL: https://gf.com/news-and-events/news/globalfoundries-and-marvell-expand-collaboration-fornext-generation-optical-connectivity/
+
+Excerpt:
+[EXCERPT — 有限逐字引文] GlobalFoundries／Marvell 聯合新聞稿（MALTA, N.Y., September 17, 2026；GlobeNewswire 同文）：擴大多年期協議，增加 GF 佛蒙特州 Burlington 廠的 SiGe 產能
+RETRIEVED: 2026-10-18（gf.com 原始 HTML 去標籤後逐字核對）
+NOTE: 原文沒有寫協議金額或產能數字。由 GF 發布、Marvell 主管具名引述（客戶聲音在供應商發布的稿子裡，不是 Marvell 自己的申報）。
+
+【第一段（dateline MALTA, N.Y., September 17, 2026）】
+"GlobalFoundries (Nasdaq: GFS) (GF) and Marvell Technology, Inc. (Nasdaq: MRVL), a leader in data infrastructure semiconductor solutions, today announced an expanded multi-year agreement to increase capacity for GF’s silicon germanium (SiGe) technology at its Burlington, Vermont, facility to support growing demand for next-generation optical connectivity."
+
+【第二段】
+"The expanded collaboration between GF and Marvell will increase capacity for high-performance SiGe technology used in next-generation pluggable optical transceivers, Near-Packaged Optics (NPO) and Co-packaged Optics (CPO)."
+
+【第三段】
+"The expanded agreement builds on existing production and is expected to add significant capacity to support Marvell’s growing requirements."
+
+【第四段】
+"GF’s SiGe technology portfolio provides the high-frequency performance, signal integrity and power efficiency required for advanced optical networking applications. Its current technology supports 200G-per-lane optical connectivity, with a roadmap designed to address higher-speed generations as AI and cloud data center bandwidth requirements continue to grow. GF has manufactured advanced SiGe technology for over a decade and continues to co-integrate SiGe, silicon photonics and advanced packaging for new optical connectivity architectures including NPO and CPO."
+
+【Marvell 引述（Robb Johnson, VP Foundry Technology）】
+"“As the industry moves toward higher-bandwidth optical architectures, including NPO and CPO, Marvell is investing aggressively to lead this transition. Our expanded collaboration with GF will help ensure we have the SiGe technology and manufacturing capacity to support the significant growth we see ahead.”"

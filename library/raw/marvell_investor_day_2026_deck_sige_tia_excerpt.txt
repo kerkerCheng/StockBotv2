@@ -1,0 +1,18 @@
+Source URL: https://d1io3yog0oux5.cloudfront.net/_150b852dda059845723bdeeb90b063b6/marvell/files/654831/marvell-investor-day-2026-presentaion-deck.pdf
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Marvell Investor Day 2026 簡報（161 頁）節錄：TIA／驅動器、SiGe、多晶圓廠
+RETRIEVED: 2026-10-18（Marvell IR 的 cloudfront PDF 本機抽字、空白正規化後逐字核對；投影片是圖表，抽字照原樣）
+NOTE: 簡報沒有印日期。活動日 2026-10-06 取自 Quartr 的逐字稿列表（Investor Day 2026, Oct 6, 2026），PDF CreationDate 2026-10-07T04:04Z（美西 10-06 晚）相符。逐字稿是 Quartr 版權，不入庫、不當證據。
+
+【p.77】
+"TIAs and Drivers required for every optical interconnect Performance rules Lowest noise, high gain, high linearity Dozens of specialized products every year Pairs with wide variety of optics Expanding into new form factors Pluggables transceivers → NPO, CPO"
+
+【p.78】
+"Marvell high-speed analog foundation ▪ Multi-foundry process leadership ▪ Broadband GaAs, SiGe, and InP ▪ 30-40 tape-outs per year"
+
+【p.111（表格列，抽字原樣）】
+"400G Light Engine NPO / CPO 200G NPO SiGe Drivers / TIAs"
+
+【p.69】
+"New world: Heterogeneous integration CMOS + SiPho + SiGe + TFLN in Light Engine"
