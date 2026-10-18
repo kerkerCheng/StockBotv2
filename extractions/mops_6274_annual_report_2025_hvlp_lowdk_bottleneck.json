@@ -1,0 +1,225 @@
+{
+  "claims": [
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：台燿、聯茂、生益等 CCL 廠或 PCB 廠的一手寫出 HVLP4 銅箔與 Low Dk2／Q 布不再短缺、價格回落，或高速 CCL 的訂單轉弱。核查頻率：每季（CCL 廠法說、年報）。觸發後 48 小時：降 constrained_by 兩條邊的 confidence，重讀 HVLP 與 Low-Dk 布兩層的「量」。",
+      "id": "mops_6274_annual_report_2025_hvlp_lowdk_bottleneck_cl1",
+      "source_ids": [
+        "mops_6274_annual_report_2025_hvlp_lowdk_bottleneck_s1",
+        "mops_6274_annual_report_2025_hvlp_lowdk_bottleneck_s2",
+        "mops_6274_annual_report_2025_hvlp_lowdk_bottleneck_s3",
+        "mops_6274_annual_report_2025_hvlp_lowdk_bottleneck_s4",
+        "mops_6274_annual_report_2025_hvlp_lowdk_bottleneck_s5",
+        "mops_6274_annual_report_2025_hvlp_lowdk_bottleneck_s6"
+      ],
+      "statement": "Taiwan Union Technology (a high-speed CCL maker and buyer of copper foil and glass cloth), 2025 annual report: the supply increments and adjustments of Low Dk1, Low Dk2 and Q-glass cloth and HVLP3/HVLP4 copper foil needed for CCL upgrades 'clearly affect the supply bottleneck of CCL & PCB'; Low Dk1 cloth tightness is easing as weavers expand, while Low Dk2 cloth is still clearly constrained by suppliers' expansion pace; copper foil is ~35%, glass cloth ~25% of CCL cost. Counter-statement in the same report: its main raw materials each have two or more suppliers and there has been no supply shortage or interruption in the past.",
+      "subject_id": "e2"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "mat:high_speed_ccl",
+      "id": "e1",
+      "relation": "is_component_of",
+      "source_ids": [
+        "mops_6274_annual_report_2025_hvlp_lowdk_bottleneck_s1",
+        "mops_6274_annual_report_2025_hvlp_lowdk_bottleneck_s4"
+      ],
+      "src_id": "mat:hvlp_copper_foil"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "mat:high_speed_ccl",
+      "id": "e2",
+      "relation": "is_component_of",
+      "source_ids": [
+        "mops_6274_annual_report_2025_hvlp_lowdk_bottleneck_s1",
+        "mops_6274_annual_report_2025_hvlp_lowdk_bottleneck_s4"
+      ],
+      "src_id": "mat:pcb_low_dk_glass_cloth"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "mat:hvlp_copper_foil",
+      "id": "e3",
+      "relation": "constrained_by",
+      "source_ids": [
+        "mops_6274_annual_report_2025_hvlp_lowdk_bottleneck_s1",
+        "mops_6274_annual_report_2025_hvlp_lowdk_bottleneck_s5"
+      ],
+      "src_id": "mat:high_speed_ccl"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "mat:pcb_low_dk_glass_cloth",
+      "id": "e4",
+      "relation": "constrained_by",
+      "source_ids": [
+        "mops_6274_annual_report_2025_hvlp_lowdk_bottleneck_s1",
+        "mops_6274_annual_report_2025_hvlp_lowdk_bottleneck_s2",
+        "mops_6274_annual_report_2025_hvlp_lowdk_bottleneck_s5"
+      ],
+      "src_id": "mat:high_speed_ccl"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "mat:high_speed_ccl",
+      "id": "e5",
+      "relation": "supplies_to",
+      "source_ids": [
+        "mops_6274_annual_report_2025_hvlp_lowdk_bottleneck_s6",
+        "mops_6274_annual_report_2025_hvlp_lowdk_bottleneck_s5"
+      ],
+      "src_id": "co:taiwan_union_technology"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "HVLP",
+        "HVLP copper foil",
+        "HVLP4",
+        "HVLP 銅箔",
+        "超低轮廓铜箔"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "mat:hvlp_copper_foil",
+      "name": "HVLP copper foil (hyper-very-low-profile electrodeposited copper foil)",
+      "role": null,
+      "source_ids": [
+        "mops_6274_annual_report_2025_hvlp_lowdk_bottleneck_s1",
+        "mops_6274_annual_report_2025_hvlp_lowdk_bottleneck_s2",
+        "mops_6274_annual_report_2025_hvlp_lowdk_bottleneck_s3",
+        "mops_6274_annual_report_2025_hvlp_lowdk_bottleneck_s4",
+        "mops_6274_annual_report_2025_hvlp_lowdk_bottleneck_s5",
+        "mops_6274_annual_report_2025_hvlp_lowdk_bottleneck_s6"
+      ],
+      "type": "Material"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "high-speed CCL",
+        "low-loss CCL",
+        "高速 CCL",
+        "高階 CCL",
+        "高速覆銅板"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "mat:high_speed_ccl",
+      "name": "High-speed copper clad laminate (low-loss CCL, M6–M9 class)",
+      "role": null,
+      "source_ids": [
+        "mops_6274_annual_report_2025_hvlp_lowdk_bottleneck_s1",
+        "mops_6274_annual_report_2025_hvlp_lowdk_bottleneck_s2",
+        "mops_6274_annual_report_2025_hvlp_lowdk_bottleneck_s3",
+        "mops_6274_annual_report_2025_hvlp_lowdk_bottleneck_s4",
+        "mops_6274_annual_report_2025_hvlp_lowdk_bottleneck_s5",
+        "mops_6274_annual_report_2025_hvlp_lowdk_bottleneck_s6"
+      ],
+      "type": "Material"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "Low Dk glass cloth",
+        "Low-Dk 玻纖布",
+        "LowDK 布",
+        "NE glass",
+        "NER glass",
+        "低介電玻纖布"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "mat:pcb_low_dk_glass_cloth",
+      "name": "Low-Dk glass fiber cloth for high-speed PCB/CCL (Low Dk1/Dk2, NE/NER class)",
+      "role": null,
+      "source_ids": [
+        "mops_6274_annual_report_2025_hvlp_lowdk_bottleneck_s1",
+        "mops_6274_annual_report_2025_hvlp_lowdk_bottleneck_s2",
+        "mops_6274_annual_report_2025_hvlp_lowdk_bottleneck_s3",
+        "mops_6274_annual_report_2025_hvlp_lowdk_bottleneck_s4",
+        "mops_6274_annual_report_2025_hvlp_lowdk_bottleneck_s5",
+        "mops_6274_annual_report_2025_hvlp_lowdk_bottleneck_s6"
+      ],
+      "type": "Material"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "台燿",
+        "Taiwan Union Technology"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:taiwan_union_technology",
+      "name": "台燿科技股份有限公司",
+      "role": null,
+      "source_ids": [
+        "mops_6274_annual_report_2025_hvlp_lowdk_bottleneck_s1",
+        "mops_6274_annual_report_2025_hvlp_lowdk_bottleneck_s2",
+        "mops_6274_annual_report_2025_hvlp_lowdk_bottleneck_s3",
+        "mops_6274_annual_report_2025_hvlp_lowdk_bottleneck_s4",
+        "mops_6274_annual_report_2025_hvlp_lowdk_bottleneck_s5",
+        "mops_6274_annual_report_2025_hvlp_lowdk_bottleneck_s6"
+      ],
+      "type": "Company"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "mops_6274_annual_report_2025_hvlp_lowdk_bottleneck",
+    "evidence_tier": 1,
+    "origin_entity": "台燿科技股份有限公司",
+    "permission_basis": "公開法定申報或公司 IR 公開文件；只保留研究必要的有限逐字節錄。",
+    "published_at": "2026-05-28",
+    "publisher": "公開資訊觀測站",
+    "retrieved_at": "2026-10-18",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "台燿科技（6274）2025 年報：CCL 升級所需的 Low Dk1／Dk2／Q glass 玻璃布與 HVLP3／HVLP4 銅箔「明顯影響 CCL & PCB 的供貨瓶頸」；Low Dk2 布受布廠擴產進度限制；送樣 1.6T M9 材料",
+    "url": "https://doc.twse.com.tw/server-java/t57sb01?step=9&kind=F&co_id=6274&filename=2025_6274_20260617F04.pdf"
+  },
+  "sources": [
+    {
+      "id": "mops_6274_annual_report_2025_hvlp_lowdk_bottleneck_s1",
+      "locator": "營運概況——產業概況（原物料供給）",
+      "quote": "伴隨著銅箔基板材料持續升級對應所需的low Dk1, Low Dk 2及 Q glass玻璃布及 HVLP3, HVLP4等級的高階銅箔市場供給增量與 調整，明顯影響 CCL & PCB 的供貨瓶頸，價格與穩定性外，也顯著排擠了傳 統 E glass 玻璃布及一般 HTE & RTF銅箔的供給市場平衡狀況，尤其是在台 灣地區市場。"
+    },
+    {
+      "id": "mops_6274_annual_report_2025_hvlp_lowdk_bottleneck_s2",
+      "locator": "營運概況——產業概況（玻璃布）",
+      "quote": "目前主要 low Dk1玻璃 布供應隨著玻璃布廠商持續擴廠與調 整產能後緊繃狀況有緩解趨勢，Low Dk2玻璃布部分仍明顯受到玻璃布供應商擴產進度影響。"
+    },
+    {
+      "id": "mops_6274_annual_report_2025_hvlp_lowdk_bottleneck_s3",
+      "locator": "營運概況——主要原料供應狀況",
+      "quote": "主要原料採購均維持二家 以上之供應商，且過去並無供貨短缺或中斷情形發生。"
+    },
+    {
+      "id": "mops_6274_annual_report_2025_hvlp_lowdk_bottleneck_s4",
+      "locator": "營運概況——成本結構",
+      "quote": "電鍍銅箔約占 CCL 成本~35%，玻纖布約 ~25%，樹脂約~25%"
+    },
+    {
+      "id": "mops_6274_annual_report_2025_hvlp_lowdk_bottleneck_s5",
+      "locator": "營運概況——競爭",
+      "quote": "由於高階市場競爭者相對有限，且受上游高階原物料產出限制，使高階市場 產業相對健康良好"
+    },
+    {
+      "id": "mops_6274_annual_report_2025_hvlp_lowdk_bottleneck_s6",
+      "locator": "研發——2026 計畫",
+      "quote": "積極送樣 1.6T M9 等級材料 SI 認證"
+    }
+  ]
+}

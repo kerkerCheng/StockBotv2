@@ -1,0 +1,113 @@
+{
+  "claims": [
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：三井決算說明寫出 VSP 減產、價格下修或高階 HVLP 競爭者合格量產。核查頻率：每季。觸發後 48 小時：重讀 HVLP 銅箔層。",
+      "id": "mitsui_kinzoku_q1fy27_briefing_minutes_vsp_cl1",
+      "source_ids": [
+        "mitsui_kinzoku_q1fy27_briefing_minutes_vsp_s1",
+        "mitsui_kinzoku_q1fy27_briefing_minutes_vsp_s2",
+        "mitsui_kinzoku_q1fy27_briefing_minutes_vsp_s3",
+        "mitsui_kinzoku_q1fy27_briefing_minutes_vsp_s4"
+      ],
+      "statement": "Mitsui Kinzoku Q1 FY2027 results briefing minutes (Q&A; publication date not printed): HVLP4-and-above super-high-grade products are about 45% of VSP sales volume in 1H and about 60% in 2H; in the high HVLP categories the number of competitors able to produce with stable quality remains limited; customer qualification at the new Malaysia plant is later than expected; a further price increase applied from July 2026 after one from October 2025. Supplier self-statements.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "mat:hvlp_copper_foil",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "mitsui_kinzoku_q1fy27_briefing_minutes_vsp_s2",
+        "mitsui_kinzoku_q1fy27_briefing_minutes_vsp_s3"
+      ],
+      "src_id": "co:mitsui_kinzoku"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "三井金属",
+        "三井金屬",
+        "Mitsui Kinzoku",
+        "Mitsui Mining & Smelting"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:mitsui_kinzoku",
+      "name": "Mitsui Kinzoku Co., Ltd.",
+      "role": null,
+      "source_ids": [
+        "mitsui_kinzoku_q1fy27_briefing_minutes_vsp_s1",
+        "mitsui_kinzoku_q1fy27_briefing_minutes_vsp_s2",
+        "mitsui_kinzoku_q1fy27_briefing_minutes_vsp_s3",
+        "mitsui_kinzoku_q1fy27_briefing_minutes_vsp_s4"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "HVLP",
+        "HVLP copper foil",
+        "HVLP4",
+        "HVLP 銅箔",
+        "超低轮廓铜箔"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "mat:hvlp_copper_foil",
+      "name": "HVLP copper foil (hyper-very-low-profile electrodeposited copper foil)",
+      "role": null,
+      "source_ids": [
+        "mitsui_kinzoku_q1fy27_briefing_minutes_vsp_s1",
+        "mitsui_kinzoku_q1fy27_briefing_minutes_vsp_s2",
+        "mitsui_kinzoku_q1fy27_briefing_minutes_vsp_s3",
+        "mitsui_kinzoku_q1fy27_briefing_minutes_vsp_s4"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "mitsui_kinzoku_q1fy27_briefing_minutes_vsp",
+    "evidence_tier": 2,
+    "origin_entity": "Mitsui Kinzoku Co., Ltd.",
+    "permission_basis": "公開法定申報或公司 IR 公開文件；只保留研究必要的有限逐字節錄。published_at 留空：議事錄沒有印發布日（INV-6，不以說明會日期冒充）。",
+    "published_at": null,
+    "publisher": "公司 IR 網站",
+    "retrieved_at": "2026-10-18",
+    "source_type": "transcript",
+    "storage_permission": "repo_excerpt",
+    "title": "三井金屬 2027 年 3 月期第 1 四半期決算說明會議事錄：VSP（HVLP）中 HVLP4 以上占比上期約 45%、下期約 60%；高階類別能穩定量產的競爭者有限；馬來西亞廠客戶認定延遲；2026-07 起追加漲價",
+    "url": "https://www.mitsui-kinzoku.com/LinkClick.aspx?fileticket=Ch79AESSq6A%3D&tabid=100&mid=1060&TabModule819=0"
+  },
+  "sources": [
+    {
+      "id": "mitsui_kinzoku_q1fy27_briefing_minutes_vsp_s1",
+      "locator": "質疑応答——VSP 販売数量",
+      "quote": "増産投資し拡販を進めているマレーシア銅箔で製品の顧客認定が想定より も遅れている影響を織り込んでいる。"
+    },
+    {
+      "id": "mitsui_kinzoku_q1fy27_briefing_minutes_vsp_s2",
+      "locator": "質疑応答——HVLP4 以上の比率",
+      "quote": "HVLP4 以上のスーパーハイグレード品の VSP 販売数量に占 める割合は、上期は約 45%と見込んでおり、前回予想の約 40%より少し上がっている。下期は約 60% で前回予想と変わっていない。"
+    },
+    {
+      "id": "mitsui_kinzoku_q1fy27_briefing_minutes_vsp_s3",
+      "locator": "質疑応答——競合",
+      "quote": "HVLP の高いカテゴリーにおいては、技術的な難度が高い製品であることから競合となる安定した品質で製造 できる会社は引き続き限られると考えており"
+    },
+    {
+      "id": "mitsui_kinzoku_q1fy27_briefing_minutes_vsp_s4",
+      "locator": "質疑応答——価格",
+      "quote": "2025 年度 10 月以降適用で値上げを実施していたが、2026 年 7 月以降適用の追加の値上げを実施 した。"
+    }
+  ]
+}

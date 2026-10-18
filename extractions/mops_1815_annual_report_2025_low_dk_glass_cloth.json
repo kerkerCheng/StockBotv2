@@ -1,0 +1,115 @@
+{
+  "claims": [
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：富喬寫出 LowDk 產品銷量或價格低於預算、泰國布廠延後，或主要客戶轉單。核查頻率：每季。觸發後 48 小時：重讀 Low-Dk 玻纖布層。",
+      "id": "mops_1815_annual_report_2025_low_dk_glass_cloth_cl1",
+      "source_ids": [
+        "mops_1815_annual_report_2025_low_dk_glass_cloth_s1",
+        "mops_1815_annual_report_2025_low_dk_glass_cloth_s2",
+        "mops_1815_annual_report_2025_low_dk_glass_cloth_s3",
+        "mops_1815_annual_report_2025_low_dk_glass_cloth_s4"
+      ],
+      "statement": "Fulltech Fiber Glass, 2025 annual report: Low-Dk glass fiber cloth became the core PCB market product in 2025 and its sales volume and prices exceeded budget; vertically integrated yarn-to-cloth LowDk capacity expanded since 2025 comes on line in 2026 and a new Thailand cloth plant starts production in 2H 2027; FLD1/FLD2/FLD3 grades target customers' M9-class products. Supplier self-statements.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "mat:pcb_low_dk_glass_cloth",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "mops_1815_annual_report_2025_low_dk_glass_cloth_s1",
+        "mops_1815_annual_report_2025_low_dk_glass_cloth_s2",
+        "mops_1815_annual_report_2025_low_dk_glass_cloth_s3",
+        "mops_1815_annual_report_2025_low_dk_glass_cloth_s4"
+      ],
+      "src_id": "co:fulltech_fiber_glass"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "富喬",
+        "富喬工業",
+        "Fulltech"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:fulltech_fiber_glass",
+      "name": "富喬工業股份有限公司",
+      "role": null,
+      "source_ids": [
+        "mops_1815_annual_report_2025_low_dk_glass_cloth_s1",
+        "mops_1815_annual_report_2025_low_dk_glass_cloth_s2",
+        "mops_1815_annual_report_2025_low_dk_glass_cloth_s3",
+        "mops_1815_annual_report_2025_low_dk_glass_cloth_s4"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "Low Dk glass cloth",
+        "Low-Dk 玻纖布",
+        "LowDK 布",
+        "NE glass",
+        "NER glass",
+        "低介電玻纖布"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "mat:pcb_low_dk_glass_cloth",
+      "name": "Low-Dk glass fiber cloth for high-speed PCB/CCL (Low Dk1/Dk2, NE/NER class)",
+      "role": null,
+      "source_ids": [
+        "mops_1815_annual_report_2025_low_dk_glass_cloth_s1",
+        "mops_1815_annual_report_2025_low_dk_glass_cloth_s2",
+        "mops_1815_annual_report_2025_low_dk_glass_cloth_s3",
+        "mops_1815_annual_report_2025_low_dk_glass_cloth_s4"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "mops_1815_annual_report_2025_low_dk_glass_cloth",
+    "evidence_tier": 1,
+    "origin_entity": "富喬工業股份有限公司",
+    "permission_basis": "公開法定申報或公司 IR 公開文件；只保留研究必要的有限逐字節錄。",
+    "published_at": "2026-06-04",
+    "publisher": "公開資訊觀測站",
+    "retrieved_at": "2026-10-18",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "富喬工業（1815）2025 年報：Low DK 玻纖布 2025 年躍升為 PCB 市場核心產品、銷量與價格超預算；LowDk 紗布一體產能 2026 年開出、泰國布廠 2027 下半年投產；FLD1／2／3 對應客戶 M9",
+    "url": "https://doc.twse.com.tw/server-java/t57sb01?step=9&kind=F&co_id=1815&filename=2025_1815_20260623F04.pdf"
+  },
+  "sources": [
+    {
+      "id": "mops_1815_annual_report_2025_low_dk_glass_cloth_s1",
+      "locator": "營運概況——市場",
+      "quote": "2024 年被視為主力產品的高頻、高速、低損耗材料如 Low DK(低介電常數) 玻纖布，在 2025 年已正式躍升為 PCB 應用的市場核心產品"
+    },
+    {
+      "id": "mops_1815_annual_report_2025_low_dk_glass_cloth_s2",
+      "locator": "致股東報告書——2025 成果",
+      "quote": "受惠 Low DK 產品需求大幅成長影響下，本公司銷售 數量及價格都超越預算，致使 2025 年度獲利狀況高於原訂之預算目標。"
+    },
+    {
+      "id": "mops_1815_annual_report_2025_low_dk_glass_cloth_s3",
+      "locator": "致股東報告書——2026 計畫",
+      "quote": "在生產方 面 ， 我們將正式開出 2025 年起擴充的 Low Dk 產品垂直整合產能 ， 新建泰國布廠預 定 2027 下半年投入生產，維持「紗布一體」的競爭優勢。"
+    },
+    {
+      "id": "mops_1815_annual_report_2025_low_dk_glass_cloth_s4",
+      "locator": "研發計畫",
+      "quote": "未來強化高頻 高速(112G/224G)傳輸應用對應性 ， 持續開發FLD1/FLD2/FLD3 不同等級 產品，符合客戶 M9 等級產品應用。"
+    }
+  ]
+}

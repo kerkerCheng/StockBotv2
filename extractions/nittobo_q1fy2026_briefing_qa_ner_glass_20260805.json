@@ -1,0 +1,89 @@
+{
+  "claims": [
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：日東紡說明會寫出 NE／NER 需給緩和、出貨下修或價格下修。核查頻率：每季。觸發後 48 小時：重讀 Low-Dk 玻纖布層。",
+      "id": "nittobo_q1fy2026_briefing_qa_ner_glass_20260805_cl1",
+      "source_ids": [
+        "nittobo_q1fy2026_briefing_qa_ner_glass_20260805_s1"
+      ],
+      "statement": "Nitto Boseki Q1 FY2026 briefing Q&A: demand for NER (low-dielectric) glass for AI servers is growing very strongly and this year's sales volume will rise substantially; NER capacity is being increased step by step with the switch to the second generation; no price revision is planned this fiscal year. Supplier self-statement.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "mat:pcb_low_dk_glass_cloth",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "nittobo_q1fy2026_briefing_qa_ner_glass_20260805_s1"
+      ],
+      "src_id": "co:nitto_boseki"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "Nittobo",
+        "日東紡",
+        "日東紡績",
+        "Nitto Boseki"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:nitto_boseki",
+      "name": "Nitto Boseki",
+      "role": null,
+      "source_ids": [
+        "nittobo_q1fy2026_briefing_qa_ner_glass_20260805_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "Low Dk glass cloth",
+        "Low-Dk 玻纖布",
+        "LowDK 布",
+        "NE glass",
+        "NER glass",
+        "低介電玻纖布"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "mat:pcb_low_dk_glass_cloth",
+      "name": "Low-Dk glass fiber cloth for high-speed PCB/CCL (Low Dk1/Dk2, NE/NER class)",
+      "role": null,
+      "source_ids": [
+        "nittobo_q1fy2026_briefing_qa_ner_glass_20260805_s1"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "nittobo_q1fy2026_briefing_qa_ner_glass_20260805",
+    "evidence_tier": 2,
+    "origin_entity": "Nitto Boseki Co., Ltd.",
+    "permission_basis": "公開法定申報或公司 IR 公開文件；只保留研究必要的有限逐字節錄。",
+    "published_at": "2026-08-05",
+    "publisher": "公司 IR 網站",
+    "retrieved_at": "2026-10-18",
+    "source_type": "transcript",
+    "storage_permission": "repo_excerpt",
+    "title": "日東紡 2026 年度第 1 四半期決算說明會主要質疑應答：NER 玻璃（低介電）AI 伺服器需求非常強、本期銷量大增、隨第 2 世代切換階段性增產、本期無漲價計畫",
+    "url": "https://ssl4.eir-parts.net/doc/3110/ir_material_for_fiscal_ym1/209977/00.pdf"
+  },
+  "sources": [
+    {
+      "id": "nittobo_q1fy2026_briefing_qa_ner_glass_20260805_s1",
+      "locator": "主要質疑応答（NER ガラス）",
+      "quote": "NER ガラスの需要は AI サーバー向けで非常に伸びており、今期の販売数量は前期比でかなり大きく 増加させる予定。NER ガラスの生産能力については、第２世代への切り替えを想定できていたため計 画通り段階的に増やしていく。価格改定については、今期中に実施する予定は現時点ではない。"
+    }
+  ]
+}

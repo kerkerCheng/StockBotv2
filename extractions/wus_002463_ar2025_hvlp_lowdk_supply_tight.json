@@ -1,0 +1,119 @@
+{
+  "claims": [
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：滬電、勝宏、金像等 PCB 廠的一手寫出高端原材料（HVLP、特種玻纖布）供應不再偏緊。核查頻率：每半年（年報、半年報）。觸發後 48 小時：降兩條 depends_on 背後的約束讀法，重讀兩層。",
+      "id": "wus_002463_ar2025_hvlp_lowdk_supply_tight_cl1",
+      "source_ids": [
+        "wus_002463_ar2025_hvlp_lowdk_supply_tight_s1"
+      ],
+      "statement": "WUS Printed Circuit (a high-end PCB maker, i.e., a buyer of these materials), 2025 annual report: as high-end PCB moves to ultra-low-loss resin, HVLP copper foil and special high-performance glass fiber cloth, some high-end raw materials face phased capacity limits and tight supply; it joins customers' development very early to shorten material qualification and secure priority allocation when supply is tight. Customer-side statement; no supplier named.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "mat:hvlp_copper_foil",
+      "id": "e1",
+      "relation": "depends_on",
+      "source_ids": [
+        "wus_002463_ar2025_hvlp_lowdk_supply_tight_s1"
+      ],
+      "src_id": "co:wus_printed_circuit"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "mat:pcb_low_dk_glass_cloth",
+      "id": "e2",
+      "relation": "depends_on",
+      "source_ids": [
+        "wus_002463_ar2025_hvlp_lowdk_supply_tight_s1"
+      ],
+      "src_id": "co:wus_printed_circuit"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "沪电股份",
+        "滬電",
+        "沪士电子",
+        "WUS"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:wus_printed_circuit",
+      "name": "沪士电子股份有限公司",
+      "role": null,
+      "source_ids": [
+        "wus_002463_ar2025_hvlp_lowdk_supply_tight_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "HVLP",
+        "HVLP copper foil",
+        "HVLP4",
+        "HVLP 銅箔",
+        "超低轮廓铜箔"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "mat:hvlp_copper_foil",
+      "name": "HVLP copper foil (hyper-very-low-profile electrodeposited copper foil)",
+      "role": null,
+      "source_ids": [
+        "wus_002463_ar2025_hvlp_lowdk_supply_tight_s1"
+      ],
+      "type": "Material"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "Low Dk glass cloth",
+        "Low-Dk 玻纖布",
+        "LowDK 布",
+        "NE glass",
+        "NER glass",
+        "低介電玻纖布"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "mat:pcb_low_dk_glass_cloth",
+      "name": "Low-Dk glass fiber cloth for high-speed PCB/CCL (Low Dk1/Dk2, NE/NER class)",
+      "role": null,
+      "source_ids": [
+        "wus_002463_ar2025_hvlp_lowdk_supply_tight_s1"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "wus_002463_ar2025_hvlp_lowdk_supply_tight",
+    "evidence_tier": 1,
+    "origin_entity": "沪士电子股份有限公司",
+    "permission_basis": "公開法定申報或公司 IR 公開文件；只保留研究必要的有限逐字節錄。",
+    "published_at": "2026-03-25",
+    "publisher": "巨潮資訊",
+    "retrieved_at": "2026-10-18",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "滬士電子（002463）2025 年報：高階 PCB 往超極低損耗樹脂、HVLP 銅箔、特種高性能玻纖布演進，部分高端原材階段性產能受限、供應偏緊；提早參與材料認證以在供應緊張時獲優先配額",
+    "url": "http://static.cninfo.com.cn/finalpage/2026-03-25/1225027832.PDF"
+  },
+  "sources": [
+    {
+      "id": "wus_002463_ar2025_hvlp_lowdk_supply_tight_s1",
+      "locator": "经营情况讨论与分析——供应链",
+      "quote": "伴随高阶 PCB 向超极低损耗 树脂、超低轮廓铜箔（ HVLP）及特种高性能玻纤布加速演进，严苛的工艺壁垒与良率瓶颈致使部分高端原材 面临阶段性的产能受限，供应偏紧状态。公司在终端客户产品开发的极早期便全面介入，提前参与新一代高端 材料的电性能验证与可靠性测试等，缩短材料认证周期，确保在供应紧张时获得优先配额保障"
+    }
+  ]
+}

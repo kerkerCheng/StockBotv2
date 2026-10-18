@@ -1,0 +1,129 @@
+{
+  "claims": [
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：金居或三井季報、法說寫出 HVLP4 供需缺口收斂（三井馬來西亞廠客戶認定完成、金居三廠量產、其他廠合格）。核查頻率：每季。觸發後 48 小時：重讀 HVLP 銅箔層的時鐘。",
+      "id": "mops_8358_annual_report_2025_hvlp_copper_foil_cl1",
+      "source_ids": [
+        "mops_8358_annual_report_2025_hvlp_copper_foil_s1",
+        "mops_8358_annual_report_2025_hvlp_copper_foil_s2",
+        "mops_8358_annual_report_2025_hvlp_copper_foil_s3",
+        "mops_8358_annual_report_2025_hvlp_copper_foil_s4",
+        "mops_8358_annual_report_2025_hvlp_copper_foil_s5",
+        "mops_8358_annual_report_2025_hvlp_copper_foil_s6"
+      ],
+      "statement": "Co-Tech Development (HVLP copper foil maker), 2025 annual report: the HVLP copper foil market is highly concentrated (citing ITRI Dec-2025: Mitsui 37%, Furukawa 16%, Co-Tech 10%, others 37%); it expects a 2026 HVLP4 supply-demand gap of about 15–25% because HVLP4 is harder to make, customer qualification is long and yield ramps slowly; its third plant starts trial production of high-grade HVLP in 1Q 2027. Supplier self-assessment; the share figures are a third-party estimate quoted by the company.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "mat:hvlp_copper_foil",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "mops_8358_annual_report_2025_hvlp_copper_foil_s2",
+        "mops_8358_annual_report_2025_hvlp_copper_foil_s5",
+        "mops_8358_annual_report_2025_hvlp_copper_foil_s6"
+      ],
+      "src_id": "co:co_tech"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "金居",
+        "金居開發",
+        "Co-Tech"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:co_tech",
+      "name": "CO-TECH DEVELOPMENT CORP.",
+      "role": null,
+      "source_ids": [
+        "mops_8358_annual_report_2025_hvlp_copper_foil_s1",
+        "mops_8358_annual_report_2025_hvlp_copper_foil_s2",
+        "mops_8358_annual_report_2025_hvlp_copper_foil_s3",
+        "mops_8358_annual_report_2025_hvlp_copper_foil_s4",
+        "mops_8358_annual_report_2025_hvlp_copper_foil_s5",
+        "mops_8358_annual_report_2025_hvlp_copper_foil_s6"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "HVLP",
+        "HVLP copper foil",
+        "HVLP4",
+        "HVLP 銅箔",
+        "超低轮廓铜箔"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "mat:hvlp_copper_foil",
+      "name": "HVLP copper foil (hyper-very-low-profile electrodeposited copper foil)",
+      "role": null,
+      "source_ids": [
+        "mops_8358_annual_report_2025_hvlp_copper_foil_s1",
+        "mops_8358_annual_report_2025_hvlp_copper_foil_s2",
+        "mops_8358_annual_report_2025_hvlp_copper_foil_s3",
+        "mops_8358_annual_report_2025_hvlp_copper_foil_s4",
+        "mops_8358_annual_report_2025_hvlp_copper_foil_s5",
+        "mops_8358_annual_report_2025_hvlp_copper_foil_s6"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "mops_8358_annual_report_2025_hvlp_copper_foil",
+    "evidence_tier": 1,
+    "origin_entity": "CO-TECH DEVELOPMENT CORP.",
+    "permission_basis": "公開法定申報或公司 IR 公開文件；只保留研究必要的有限逐字節錄。",
+    "published_at": "2026-08-13",
+    "publisher": "公開資訊觀測站",
+    "retrieved_at": "2026-10-18",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "金居開發（8358）2025 年報：HVLP 銅箔市場高度集中（引 ITRI：三井 37%、古河 16%、金居 10%）、2026 年 HVLP4 供需缺口約 15–25%、三廠 2027Q1 試產",
+    "url": "https://doc.twse.com.tw/server-java/t57sb01?step=9&kind=F&co_id=8358&filename=2025_8358_20260608F11.pdf"
+  },
+  "sources": [
+    {
+      "id": "mops_8358_annual_report_2025_hvlp_copper_foil_s1",
+      "locator": "營運概況——HVLP 市場（引 ITRI 2025-12）",
+      "quote": "全球 HVLP 銅箔市場供應商占比約為： 供應商 市占率 三井 37% 古河 16% 金居 10% 其他 37%"
+    },
+    {
+      "id": "mops_8358_annual_report_2025_hvlp_copper_foil_s2",
+      "locator": "營運概況——HVLP 市場結構",
+      "quote": "目前 HVLP 銅箔市場呈現高度集中結構，主要供應商以金居與日系少數廠商 為主，包括金居、三井、古河等，其中三井市占率居於領先地位。"
+    },
+    {
+      "id": "mops_8358_annual_report_2025_hvlp_copper_foil_s3",
+      "locator": "營運概況——供需",
+      "quote": "2026 年預估 HVLP4 銅箔供需缺口約 15-25%，形成市場結構性供給瓶 頸。"
+    },
+    {
+      "id": "mops_8358_annual_report_2025_hvlp_copper_foil_s4",
+      "locator": "營運概況——供需原因",
+      "quote": "HVLP4 不僅製程難度更高，且客戶端認證時間長、良率爬坡慢，使有效供給成長 落後需求，形成中期的結構性供需缺口。"
+    },
+    {
+      "id": "mops_8358_annual_report_2025_hvlp_copper_foil_s5",
+      "locator": "營運概況——升級路徑",
+      "quote": "CCL 由 M6 迅速推進至 M7、M8，並逐步邁向 M9 等 級 ， 對應更高頻高速傳輸需求 ； 同時銅箔由HVLP2、HVLP3 升級至 HVLP4， 成為 AI 伺服器與高速運算平台之關鍵材料。"
+    },
+    {
+      "id": "mops_8358_annual_report_2025_hvlp_copper_foil_s6",
+      "locator": "營運概況——產能",
+      "quote": "金居三廠規劃於 2027 年第一季啟動試產，預計生產 HVLP 高階產品。"
+    }
+  ]
+}

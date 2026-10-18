@@ -1,0 +1,130 @@
+{
+  "claims": [
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：台光電季報、法說寫出 AI 伺服器／交換器用高速 CCL 出貨或訂單下修，或 2027 年 930 萬張月產能開出後高速 CCL 毛利明顯回落。核查頻率：每季。觸發後 48 小時：重讀高速 CCL 層。",
+      "id": "mops_2383_annual_report_2025_high_speed_ccl_cl1",
+      "source_ids": [
+        "mops_2383_annual_report_2025_high_speed_ccl_s1",
+        "mops_2383_annual_report_2025_high_speed_ccl_s2"
+      ],
+      "statement": "Elite Material, 2025 annual report: it has become a core supplier of high-speed CCL to the world's major AI server and 800G switch brands (self-statement, no customer named). Counter-statement in the same report: the supply status of its main raw materials (copper foil, glass fiber cloth, epoxy resin) is listed as 'normal'.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "mat:high_speed_ccl",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "mops_2383_annual_report_2025_high_speed_ccl_s1"
+      ],
+      "src_id": "co:elite_material"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:ai_switch",
+      "id": "e2",
+      "relation": "is_component_of",
+      "source_ids": [
+        "mops_2383_annual_report_2025_high_speed_ccl_s1"
+      ],
+      "src_id": "mat:high_speed_ccl"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "台光電",
+        "台光電子",
+        "Elite Material"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:elite_material",
+      "name": "台光電子材料股份有限公司",
+      "role": null,
+      "source_ids": [
+        "mops_2383_annual_report_2025_high_speed_ccl_s1",
+        "mops_2383_annual_report_2025_high_speed_ccl_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "high-speed CCL",
+        "low-loss CCL",
+        "高速 CCL",
+        "高階 CCL",
+        "高速覆銅板"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "mat:high_speed_ccl",
+      "name": "High-speed copper clad laminate (low-loss CCL, M6–M9 class)",
+      "role": null,
+      "source_ids": [
+        "mops_2383_annual_report_2025_high_speed_ccl_s1",
+        "mops_2383_annual_report_2025_high_speed_ccl_s2"
+      ],
+      "type": "Material"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "scale-up network",
+        "scale-out network",
+        "scale-up networking",
+        "scale-out networking",
+        "AI datacenter network",
+        "AI networking",
+        "fabric solutions",
+        "switch ASIC",
+        "Ethernet networking for AI"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:ai_switch",
+      "name": "Data-center switch / scale-up network",
+      "role": null,
+      "source_ids": [
+        "mops_2383_annual_report_2025_high_speed_ccl_s1",
+        "mops_2383_annual_report_2025_high_speed_ccl_s2"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "mops_2383_annual_report_2025_high_speed_ccl",
+    "evidence_tier": 1,
+    "origin_entity": "台光電子材料股份有限公司",
+    "permission_basis": "公開法定申報或公司 IR 公開文件；只保留研究必要的有限逐字節錄。",
+    "published_at": "2026-07-24",
+    "publisher": "公開資訊觀測站",
+    "retrieved_at": "2026-10-18",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "台光電子（2383）2025 年報：已成為全球主要 AI 伺服器與 800G 交換器品牌的高速 CCL 核心供應商；主要原料（銅箔、玻纖布、樹脂）供應狀況「正常」",
+    "url": "https://doc.twse.com.tw/server-java/t57sb01?step=9&kind=F&co_id=2383&filename=2025_2383_20260527F11.pdf"
+  },
+  "sources": [
+    {
+      "id": "mops_2383_annual_report_2025_high_speed_ccl_s1",
+      "locator": "致股東報告書——營運",
+      "quote": "深耕高速 CCL 領域，技術領先、產品組合完整，已成為全球主要 AI 伺服器與 800G 交換器品牌的核心供應商。"
+    },
+    {
+      "id": "mops_2383_annual_report_2025_high_speed_ccl_s2",
+      "locator": "營運概況——主要原料供應狀況（表格抽字）",
+      "quote": "主要原料 供應地區 供應狀況 銅箔 玻璃纖維布 環氧樹脂 國內 日本、國內 日本、國內 正 常 正 常 正 常"
+    }
+  ]
+}

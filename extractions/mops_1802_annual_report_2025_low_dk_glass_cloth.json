@@ -1,0 +1,106 @@
+{
+  "claims": [
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：台玻年報、季報寫出 Low Dk 布出貨或價格下修、或客戶認證流失。核查頻率：每季。觸發後 48 小時：重讀 Low-Dk 玻纖布層。",
+      "id": "mops_1802_annual_report_2025_low_dk_glass_cloth_cl1",
+      "source_ids": [
+        "mops_1802_annual_report_2025_low_dk_glass_cloth_s1",
+        "mops_1802_annual_report_2025_low_dk_glass_cloth_s2",
+        "mops_1802_annual_report_2025_low_dk_glass_cloth_s3"
+      ],
+      "statement": "Taiwan Glass, 2025 annual report: its Low-Dk and Low-CTE glass fiber cloths have broadly obtained certification and adoption by major global customers, with Taoyuan and Lukang plants rebuilt to expand capacity; first- and second-generation low-Dk (LDK) cloth is in mass production; gross profit rose because high-grade glass fiber cloth entered the AI supply chain. Supplier self-statements, customers unnamed.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "mat:pcb_low_dk_glass_cloth",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "mops_1802_annual_report_2025_low_dk_glass_cloth_s1",
+        "mops_1802_annual_report_2025_low_dk_glass_cloth_s2",
+        "mops_1802_annual_report_2025_low_dk_glass_cloth_s3"
+      ],
+      "src_id": "co:taiwan_glass"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "台玻",
+        "台灣玻璃",
+        "Taiwan Glass"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:taiwan_glass",
+      "name": "台灣玻璃工業股份有限公司",
+      "role": null,
+      "source_ids": [
+        "mops_1802_annual_report_2025_low_dk_glass_cloth_s1",
+        "mops_1802_annual_report_2025_low_dk_glass_cloth_s2",
+        "mops_1802_annual_report_2025_low_dk_glass_cloth_s3"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "Low Dk glass cloth",
+        "Low-Dk 玻纖布",
+        "LowDK 布",
+        "NE glass",
+        "NER glass",
+        "低介電玻纖布"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "mat:pcb_low_dk_glass_cloth",
+      "name": "Low-Dk glass fiber cloth for high-speed PCB/CCL (Low Dk1/Dk2, NE/NER class)",
+      "role": null,
+      "source_ids": [
+        "mops_1802_annual_report_2025_low_dk_glass_cloth_s1",
+        "mops_1802_annual_report_2025_low_dk_glass_cloth_s2",
+        "mops_1802_annual_report_2025_low_dk_glass_cloth_s3"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "mops_1802_annual_report_2025_low_dk_glass_cloth",
+    "evidence_tier": 1,
+    "origin_entity": "台灣玻璃工業股份有限公司",
+    "permission_basis": "公開法定申報或公司 IR 公開文件；只保留研究必要的有限逐字節錄。",
+    "published_at": "2026-08-10",
+    "publisher": "公開資訊觀測站",
+    "retrieved_at": "2026-10-18",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "台灣玻璃（1802）2025 年報：低介電（LDK）一代、二代玻布量產、普遍獲全球主要客戶認證；高階玻纖布打入 AI 供應鏈、毛利大增；改建桃園、鹿港廠擴產",
+    "url": "https://doc.twse.com.tw/server-java/t57sb01?step=9&kind=F&co_id=1802&filename=2025_1802_20260612F11.pdf"
+  },
+  "sources": [
+    {
+      "id": "mops_1802_annual_report_2025_low_dk_glass_cloth_s1",
+      "locator": "營運概況——產品",
+      "quote": "台玻 低介電 ( Low D k )玻纖布與 低 熱 膨脹 係數( Low C T E )玻纖布， 已 普遍 獲 得 全球主 要客戶 認 證 與 採 用 。 並 因應市 場需求 改建 桃園廠與鹿港廠 擴 充產能"
+    },
+    {
+      "id": "mops_1802_annual_report_2025_low_dk_glass_cloth_s2",
+      "locator": "研發成果",
+      "quote": "已成 功 開發低 介 電(L DK )一 代 、二 代 玻布量產，以 及低熱 膨 脹係數 (Low CTE)玻布量產，供應 市場5G高 頻 高 速 材料 的需 求。"
+    },
+    {
+      "id": "mops_1802_annual_report_2025_low_dk_glass_cloth_s3",
+      "locator": "財務分析——毛利",
+      "quote": "營業毛利增加，係因高階玻纖布成功打入AI供應鏈，生產AI關鍵零組件，獲利能力大幅增加所致 。"
+    }
+  ]
+}
