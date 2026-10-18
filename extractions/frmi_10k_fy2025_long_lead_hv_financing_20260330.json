@@ -1,0 +1,97 @@
+{
+  "claims": [
+    {
+      "confidence": 0.65,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：Fermi Inc. 後續申報寫出變壓器交期縮短到 12 個月以內、取消或延後長交期設備採購，或改說電力設備不再是時程瓶頸。核查頻率：每季（Fermi Inc. 10-Q／8-K）。觸發後 48 小時：降這條邊的 confidence，重讀 LPT 層需求側。",
+      "id": "frmi_10k_fy2025_long_lead_hv_financing_20260330_cl1",
+      "source_ids": [
+        "frmi_10k_fy2025_long_lead_hv_financing_20260330_s1",
+        "frmi_10k_fy2025_long_lead_hv_financing_20260330_s2"
+      ],
+      "statement": "Fermi (FY2025 10-K): in February 2026 entered a $120.0 million high-voltage equipment warehouse financing facility (upsizable by $100.0 million) to support procurement of long-lead electrical infrastructure for Project Matador, including substations, transformers and breakers, enabling advance procurement and staged delivery; risk factors say industry-wide constraints on manufacturing capacity and delivery lead times may delay energization. Transformer type and suppliers are not named.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "tech:large_power_transformer",
+      "id": "e1",
+      "relation": "depends_on",
+      "source_ids": [
+        "frmi_10k_fy2025_long_lead_hv_financing_20260330_s1",
+        "frmi_10k_fy2025_long_lead_hv_financing_20260330_s2"
+      ],
+      "src_id": "co:fermi"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "end_demand",
+      "aliases": [
+        "Fermi Inc.",
+        "Fermi America"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:fermi",
+      "name": "Fermi Inc.",
+      "role": null,
+      "source_ids": [
+        "frmi_10k_fy2025_long_lead_hv_financing_20260330_s1",
+        "frmi_10k_fy2025_long_lead_hv_financing_20260330_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "LPT",
+        "LPTs",
+        "large power transformer",
+        "large power transformers",
+        "초고압 변압기",
+        "extra high voltage power transformer",
+        "extra high voltage power transformers"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:large_power_transformer",
+      "name": "Large Power Transformer (LPT)",
+      "role": null,
+      "source_ids": [
+        "frmi_10k_fy2025_long_lead_hv_financing_20260330_s1",
+        "frmi_10k_fy2025_long_lead_hv_financing_20260330_s2"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "frmi_10k_fy2025_long_lead_hv_financing_20260330",
+    "evidence_tier": 1,
+    "origin_entity": "Fermi Inc.",
+    "permission_basis": "SEC EDGAR 公開申報；只保留研究必要的有限逐字節錄。published_at 取 EDGAR 申報日。",
+    "published_at": "2026-03-30",
+    "publisher": "SEC EDGAR（10-K）",
+    "retrieved_at": "2026-10-18",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Fermi FY2025 10-K：2026 年 2 月簽 1.2 億美元高壓設備倉儲融資，用來提前採購 Project Matador 的變電站、變壓器、斷路器等長交期設備；風險段寫製造產能與交期全產業受限",
+    "url": "https://www.sec.gov/Archives/edgar/data/2071778/000207177826000010/frmi-20251231.htm"
+  },
+  "sources": [
+    {
+      "id": "frmi_10k_fy2025_long_lead_hv_financing_20260330_s1",
+      "locator": "Item 1 Business — High Voltage Equipment Warehouse Financing",
+      "quote": "In February 2026, we entered into a $120.0 million high-voltage equipment warehouse financing facility with Keystone National Group, LLC, which may be increased by up to an additional $100.0 million subject to the terms and conditions of the financing agreement. The facility is intended to support the procurement of long-lead electrical infrastructure required for Project Matador, including substations, transformers, breakers, and related high-voltage switchgear and balance-of-plant equipment. This facility is intended to enhance execution certainty by enabling advance procurement and staged delivery of critical non-spinning equipment necessary to support campus energization and phased power delivery."
+    },
+    {
+      "id": "frmi_10k_fy2025_long_lead_hv_financing_20260330_s2",
+      "locator": "Item 1A Risk Factors — Long-Lead Equipment and Key Supplier Concentration",
+      "quote": "The project requires procurement of long-lead equipment, including turbines, transformers, breakers, substations, and related high-voltage infrastructure. Industry-wide constraints on manufacturing capacity and delivery lead times may delay energization schedules or increase project costs."
+    }
+  ]
+}

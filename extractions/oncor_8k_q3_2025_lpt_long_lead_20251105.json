@@ -1,0 +1,87 @@
+{
+  "claims": [
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：Oncor Electric Delivery Company LLC 後續申報寫出變壓器交期縮短到 12 個月以內、取消或延後長交期設備採購，或改說電力設備不再是時程瓶頸。核查頻率：每季（Oncor Electric Delivery Company LLC 10-Q／8-K）。觸發後 48 小時：降這條邊的 confidence，重讀 LPT 層需求側。",
+      "id": "oncor_8k_q3_2025_lpt_long_lead_20251105_cl1",
+      "source_ids": [
+        "oncor_8k_q3_2025_lpt_long_lead_20251105_s1"
+      ],
+      "statement": "Oncor (Q3 2025 8-K exhibit): executing its portion of the PUCT-approved Permian Basin Reliability Plan by securing critical long-lead time equipment, including large power transformers, high-voltage circuit breakers and electrical reactors; it has obtained commitments from suppliers on delivery timelines, with initial equipment expected to arrive in the first quarter of 2027. Suppliers are not named.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:large_power_transformer",
+      "id": "e1",
+      "relation": "depends_on",
+      "source_ids": [
+        "oncor_8k_q3_2025_lpt_long_lead_20251105_s1"
+      ],
+      "src_id": "co:oncor_electric_delivery"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "end_demand",
+      "aliases": [
+        "Oncor"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:oncor_electric_delivery",
+      "name": "Oncor Electric Delivery Company LLC",
+      "role": null,
+      "source_ids": [
+        "oncor_8k_q3_2025_lpt_long_lead_20251105_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "LPT",
+        "LPTs",
+        "large power transformer",
+        "large power transformers",
+        "초고압 변압기",
+        "extra high voltage power transformer",
+        "extra high voltage power transformers"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:large_power_transformer",
+      "name": "Large Power Transformer (LPT)",
+      "role": null,
+      "source_ids": [
+        "oncor_8k_q3_2025_lpt_long_lead_20251105_s1"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "oncor_8k_q3_2025_lpt_long_lead_20251105",
+    "evidence_tier": 1,
+    "origin_entity": "Oncor Electric Delivery Company LLC",
+    "permission_basis": "SEC EDGAR 公開申報；只保留研究必要的有限逐字節錄。published_at 取 EDGAR 申報日。",
+    "published_at": "2025-11-05",
+    "publisher": "SEC EDGAR（8-K EX-99.1，Oncor 第三季財報新聞稿）",
+    "retrieved_at": "2026-10-18",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Oncor 2025 第三季財報新聞稿（8-K EX-99.1）：為 Permian Basin 可靠度計畫鎖定大型電力變壓器等長交期設備，供應商交期承諾、首批 2027 Q1 到貨",
+    "url": "https://www.sec.gov/Archives/edgar/data/1193311/000119312525265880/d82988dex991.htm"
+  },
+  "sources": [
+    {
+      "id": "oncor_8k_q3_2025_lpt_long_lead_20251105_s1",
+      "locator": "Operational Highlights",
+      "quote": "Oncor is executing on its portion of the Permian Basin Reliability Plan (PBRP) recently approved by the Public Utility Commission of Texas (PUCT) by securing critical long-lead time equipment, including large power transformers, high-voltage circuit breakers, and electrical reactors. Leveraging its supplier relationships, Oncor has obtained commitments from suppliers on delivery timelines, with initial equipment expected to arrive in the first quarter of 2027 to help meet expedited project timelines."
+    }
+  ]
+}

@@ -1,0 +1,88 @@
+{
+  "claims": [
+    {
+      "confidence": 0.65,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：Core Scientific 後續申報寫出變壓器交期縮短到 12 個月以內、取消或延後長交期設備採購，或改說電力設備不再是時程瓶頸。核查頻率：每季（Core Scientific 10-Q／8-K）。觸發後 48 小時：降這條邊的 confidence，重讀 LPT 層需求側。",
+      "id": "corz_10k_fy2025_lpt_lead_times_20260302_cl1",
+      "source_ids": [
+        "corz_10k_fy2025_lpt_lead_times_20260302_s1"
+      ],
+      "statement": "Core Scientific (FY2025 10-K, Item 1): procurement of long-lead-time electrical and mechanical equipment is among the most significant factors affecting delivery timelines for large-scale AI infrastructure; high-voltage transformers, switchgear, generators and advanced cooling can require lead times of 12 to 18 months or longer. The filing says 'high-voltage transformers', not 'large power transformer' (same mapping as the IREN edge).",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "tech:large_power_transformer",
+      "id": "e1",
+      "relation": "depends_on",
+      "source_ids": [
+        "corz_10k_fy2025_lpt_lead_times_20260302_s1"
+      ],
+      "src_id": "co:core_scientific"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "end_demand",
+      "aliases": [
+        "Core Scientific",
+        "Core Scientific, Inc."
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:core_scientific",
+      "name": "Core Scientific",
+      "role": null,
+      "source_ids": [
+        "corz_10k_fy2025_lpt_lead_times_20260302_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "LPT",
+        "LPTs",
+        "large power transformer",
+        "large power transformers",
+        "초고압 변압기",
+        "extra high voltage power transformer",
+        "extra high voltage power transformers"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:large_power_transformer",
+      "name": "Large Power Transformer (LPT)",
+      "role": null,
+      "source_ids": [
+        "corz_10k_fy2025_lpt_lead_times_20260302_s1"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "corz_10k_fy2025_lpt_lead_times_20260302",
+    "evidence_tier": 1,
+    "origin_entity": "Core Scientific, Inc.",
+    "permission_basis": "SEC EDGAR 公開申報；只保留研究必要的有限逐字節錄。published_at 取 EDGAR 申報日。",
+    "published_at": "2026-03-02",
+    "publisher": "SEC EDGAR（10-K）",
+    "retrieved_at": "2026-10-18",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Core Scientific FY2025 10-K（Item 1）：高壓變壓器、開關設備、發電機、先進冷卻的交期 12 到 18 個月以上，是 AI 資料中心交付時程最重要的因素之一",
+    "url": "https://www.sec.gov/Archives/edgar/data/1839341/000162828026013305/core-20251231.htm"
+  },
+  "sources": [
+    {
+      "id": "corz_10k_fy2025_lpt_lead_times_20260302_s1",
+      "locator": "Item 1 Business（長交期設備）",
+      "quote": "We believe the procurement of long-lead-time electrical and mechanical equipment has become among the most significant factors affecting delivery timelines for large-scale AI infrastructure deployments. Certain components, including high-voltage transformers, switchgear, generators and advanced cooling systems, can require lead times of 12 to 18 months or longer, which can materially affect data center construction schedules."
+    }
+  ]
+}
