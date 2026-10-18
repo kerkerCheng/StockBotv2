@@ -1,0 +1,215 @@
+{
+  "claims": [
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：Semtech 或 Tower 的申報、法說寫出 SiGe 專用產能協議縮減、延後或終止，或 Semtech 的資料中心光互連（TIA／驅動器）營收轉為下滑。核查頻率：每季（Tower 6-K／法說、Semtech 10-Q／法說）。觸發後 48 小時：e1、e2 降 confidence，重讀 SiGe／TIA 層。",
+      "id": "tower_semtech_sige_capacity_agreement_2026_10_13_cl1",
+      "source_ids": [
+        "tower_semtech_sige_capacity_agreement_2026_10_13_s1",
+        "tower_semtech_sige_capacity_agreement_2026_10_13_s2",
+        "tower_semtech_sige_capacity_agreement_2026_10_13_s3",
+        "tower_semtech_sige_capacity_agreement_2026_10_13_s4",
+        "tower_semtech_sige_capacity_agreement_2026_10_13_s5"
+      ],
+      "statement": "Tower Semiconductor and Semtech (joint release, 2026-10-13): expanded multi-year agreement under which 'Semtech will invest in securing dedicated silicon germanium (SiGe) capacity at Tower in support of its strong design wins and demand for AI Data Center optical interconnect components'; the secured capacity spans Tower's fabs in the US, Israel and Japan and builds on current production. Semtech's TIAs, modulator and laser drivers and linear equalizers are built on Tower's SiGe process and serve FRO, LPO, LRO, NPO, XPO, linear equalizers on PCB and ACC. No contract value or capacity figure is disclosed.",
+      "subject_id": "e2"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "co:semtech",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "tower_semtech_sige_capacity_agreement_2026_10_13_s1",
+        "tower_semtech_sige_capacity_agreement_2026_10_13_s3",
+        "tower_semtech_sige_capacity_agreement_2026_10_13_s5"
+      ],
+      "src_id": "co:tower_semiconductor"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "tech:sige_platform",
+      "id": "e2",
+      "relation": "depends_on",
+      "source_ids": [
+        "tower_semtech_sige_capacity_agreement_2026_10_13_s1",
+        "tower_semtech_sige_capacity_agreement_2026_10_13_s2",
+        "tower_semtech_sige_capacity_agreement_2026_10_13_s5"
+      ],
+      "src_id": "co:semtech"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "tech:tia_driver",
+      "id": "e3",
+      "relation": "supplies_to",
+      "source_ids": [
+        "tower_semtech_sige_capacity_agreement_2026_10_13_s2",
+        "tower_semtech_sige_capacity_agreement_2026_10_13_s4"
+      ],
+      "src_id": "co:semtech"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:lpo",
+      "id": "e4",
+      "relation": "supplies_to",
+      "source_ids": [
+        "tower_semtech_sige_capacity_agreement_2026_10_13_s2",
+        "tower_semtech_sige_capacity_agreement_2026_10_13_s4"
+      ],
+      "src_id": "co:semtech"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:sige_platform",
+      "id": "e5",
+      "relation": "enables",
+      "source_ids": [
+        "tower_semtech_sige_capacity_agreement_2026_10_13_s2"
+      ],
+      "src_id": "tech:tia_driver"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "foundry_packaging",
+      "aliases": [
+        "TSEM",
+        "TowerJazz",
+        "Tower",
+        "Tower Semiconductor Ltd."
+      ],
+      "attributes": {},
+      "confidence": 0.95,
+      "id": "co:tower_semiconductor",
+      "name": "Tower Semiconductor",
+      "role": null,
+      "source_ids": [
+        "tower_semtech_sige_capacity_agreement_2026_10_13_s1",
+        "tower_semtech_sige_capacity_agreement_2026_10_13_s3"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "Semtech",
+        "Semtech Corporation"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:semtech",
+      "name": "Semtech",
+      "role": null,
+      "source_ids": [
+        "tower_semtech_sige_capacity_agreement_2026_10_13_s1",
+        "tower_semtech_sige_capacity_agreement_2026_10_13_s2",
+        "tower_semtech_sige_capacity_agreement_2026_10_13_s3",
+        "tower_semtech_sige_capacity_agreement_2026_10_13_s4",
+        "tower_semtech_sige_capacity_agreement_2026_10_13_s5"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "foundry_packaging",
+      "aliases": [
+        "SiGe"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:sige_platform",
+      "name": "Silicon Germanium (SiGe) platform",
+      "role": null,
+      "source_ids": [
+        "tower_semtech_sige_capacity_agreement_2026_10_13_s1",
+        "tower_semtech_sige_capacity_agreement_2026_10_13_s2"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "TIA",
+        "trans-impedance amplifier",
+        "laser driver"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:tia_driver",
+      "name": "TIA and driver (optical transceiver)",
+      "role": "adjacent_silicon",
+      "source_ids": [
+        "tower_semtech_sige_capacity_agreement_2026_10_13_s2",
+        "tower_semtech_sige_capacity_agreement_2026_10_13_s4"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "LPO",
+        "linear pluggable optics"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:lpo",
+      "name": "Linear Pluggable Optics (LPO)",
+      "role": null,
+      "source_ids": [
+        "tower_semtech_sige_capacity_agreement_2026_10_13_s2",
+        "tower_semtech_sige_capacity_agreement_2026_10_13_s4"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "tower_semtech_sige_capacity_agreement_2026_10_13",
+    "evidence_tier": 2,
+    "origin_entity": "Tower Semiconductor Ltd. / Semtech Corporation",
+    "permission_basis": "Tower Semiconductor 官網公開新聞稿（與 Semtech 聯合發布）；只保留研究必要的有限逐字節錄。published_at 取 dateline 2026-10-13。",
+    "published_at": "2026-10-13",
+    "publisher": "Tower Semiconductor（官網新聞稿）",
+    "retrieved_at": "2026-10-18",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "Tower／Semtech 聯合新聞稿：擴大多年期協議，Semtech 出資鎖定 Tower 在美、以、日三地的專用 SiGe 產能（TIA、驅動器、線性等化器；服務 LPO、LRO、NPO、XPO）",
+    "url": "https://towersemi.com/2026/10/13/10132026-2/"
+  },
+  "sources": [
+    {
+      "id": "tower_semtech_sige_capacity_agreement_2026_10_13_s1",
+      "locator": "第一段（dateline MIGDAL HAEMEK, Israel, and Camarillo, California, Oct. 13, 2026）",
+      "quote": "today announced an expanded multi-year agreement that builds on the companies’ 20-year partnership. Under the agreement, Semtech will invest in securing dedicated silicon germanium (SiGe) capacity at Tower in support of its strong design wins and demand for AI Data Center optical interconnect components."
+    },
+    {
+      "id": "tower_semtech_sige_capacity_agreement_2026_10_13_s2",
+      "locator": "第三段",
+      "quote": "Semtech’s signal integrity portfolio, including transimpedance amplifiers (TIAs), modulator and laser drivers and linear equalizers, is built on Tower’s SiGe process technology and serves fully retimed optics (FRO), linear pluggable optics (LPO), linear receive optics (LRO), near-packaged optics (NPO), eXtra-dense pluggable optics (XPO), linear equalizers on PCB and active copper cables (ACC)."
+    },
+    {
+      "id": "tower_semtech_sige_capacity_agreement_2026_10_13_s3",
+      "locator": "第五段",
+      "quote": "The secured capacity spans Tower’s fabs in the United States, Israel and Japan, adding supply resilience and geographic diversification to Semtech’s manufacturing strategy. Building on current production, the agreement gives Semtech additional supply assurance as demand for its SiGe-based products is expected to grow across a broadening base of customer programs and end markets."
+    },
+    {
+      "id": "tower_semtech_sige_capacity_agreement_2026_10_13_s4",
+      "locator": "第四段",
+      "quote": "The award recognizes Semtech’s 224 Gbps per Lane TIA Family for Linear Pluggable Optics built on Tower’s leading-edge SiGe technology."
+    },
+    {
+      "id": "tower_semtech_sige_capacity_agreement_2026_10_13_s5",
+      "locator": "Semtech 執行長 Hong Hou 引述",
+      "quote": "Meeting that demand requires long-term capacity planning and commitment with our manufacturing partners. Tower has been a trusted partner to Semtech for 20 years, and we are very pleased with our partnership agreement that secures dedicated SiGe capacity across three regions to grow across copper and optical interconnects, from 800G and 1.6T today through 3.2T and beyond.”"
+    }
+  ]
+}
