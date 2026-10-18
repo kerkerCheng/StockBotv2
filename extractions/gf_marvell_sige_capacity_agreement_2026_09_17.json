@@ -1,0 +1,154 @@
+{
+  "claims": [
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：Marvell 的申報或法說寫出 SiGe 光模組電子件（TIA／驅動器）轉到其他晶圓廠為主，或 GF 季報寫出 Burlington SiGe 擴產延後、縮減。核查頻率：每季（GF 6-K／法說、Marvell 10-Q／法說）。觸發後 48 小時：e2、e3 降 confidence，重讀 TIA／驅動器層。",
+      "id": "gf_marvell_sige_capacity_agreement_2026_09_17_cl1",
+      "source_ids": [
+        "gf_marvell_sige_capacity_agreement_2026_09_17_s1",
+        "gf_marvell_sige_capacity_agreement_2026_09_17_s2",
+        "gf_marvell_sige_capacity_agreement_2026_09_17_s3",
+        "gf_marvell_sige_capacity_agreement_2026_09_17_s4",
+        "gf_marvell_sige_capacity_agreement_2026_09_17_s5"
+      ],
+      "statement": "GlobalFoundries and Marvell (joint release issued by GF, 2026-09-17): expanded multi-year agreement to increase capacity for GF's SiGe technology at Burlington, Vermont; builds on existing production and 'is expected to add significant capacity to support Marvell's growing requirements'; SiGe used in next-generation pluggable optical transceivers, NPO and CPO; current technology supports 200G-per-lane. Marvell's VP Foundry Technology is quoted: the collaboration 'will help ensure we have the SiGe technology and manufacturing capacity to support the significant growth we see ahead.' No contract value or capacity figure is disclosed.",
+      "subject_id": "e2"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:sige_platform",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "gf_marvell_sige_capacity_agreement_2026_09_17_s1",
+        "gf_marvell_sige_capacity_agreement_2026_09_17_s4"
+      ],
+      "src_id": "co:globalfoundries"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "co:marvell_technology",
+      "id": "e2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "gf_marvell_sige_capacity_agreement_2026_09_17_s1",
+        "gf_marvell_sige_capacity_agreement_2026_09_17_s3",
+        "gf_marvell_sige_capacity_agreement_2026_09_17_s5"
+      ],
+      "src_id": "co:globalfoundries"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "tech:sige_platform",
+      "id": "e3",
+      "relation": "depends_on",
+      "source_ids": [
+        "gf_marvell_sige_capacity_agreement_2026_09_17_s3",
+        "gf_marvell_sige_capacity_agreement_2026_09_17_s5"
+      ],
+      "src_id": "co:marvell_technology"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "foundry_packaging",
+      "aliases": [
+        "GFS",
+        "GF",
+        "GLOBALFOUNDRIES Inc."
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:globalfoundries",
+      "name": "GlobalFoundries",
+      "role": "foundry",
+      "source_ids": [
+        "gf_marvell_sige_capacity_agreement_2026_09_17_s1",
+        "gf_marvell_sige_capacity_agreement_2026_09_17_s4"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "MRVL",
+        "Marvell"
+      ],
+      "attributes": {},
+      "confidence": 0.95,
+      "id": "co:marvell_technology",
+      "name": "Marvell Technology",
+      "role": null,
+      "source_ids": [
+        "gf_marvell_sige_capacity_agreement_2026_09_17_s1",
+        "gf_marvell_sige_capacity_agreement_2026_09_17_s3",
+        "gf_marvell_sige_capacity_agreement_2026_09_17_s5"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "foundry_packaging",
+      "aliases": [
+        "SiGe"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:sige_platform",
+      "name": "Silicon Germanium (SiGe) platform",
+      "role": null,
+      "source_ids": [
+        "gf_marvell_sige_capacity_agreement_2026_09_17_s1",
+        "gf_marvell_sige_capacity_agreement_2026_09_17_s2",
+        "gf_marvell_sige_capacity_agreement_2026_09_17_s4"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "gf_marvell_sige_capacity_agreement_2026_09_17",
+    "evidence_tier": 2,
+    "origin_entity": "GlobalFoundries Inc.",
+    "permission_basis": "GlobalFoundries 官網公開新聞稿；只保留研究必要的有限逐字節錄。published_at 取 dateline 2026-09-17。",
+    "published_at": "2026-09-17",
+    "publisher": "GlobalFoundries（官網新聞稿；GlobeNewswire 同文）",
+    "retrieved_at": "2026-10-18",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "GlobalFoundries／Marvell 聯合新聞稿：擴大多年期協議，增加 GF Burlington 廠 SiGe 產能，用於可插拔光模組、NPO 與 CPO",
+    "url": "https://gf.com/news-and-events/news/globalfoundries-and-marvell-expand-collaboration-fornext-generation-optical-connectivity/"
+  },
+  "sources": [
+    {
+      "id": "gf_marvell_sige_capacity_agreement_2026_09_17_s1",
+      "locator": "第一段（dateline MALTA, N.Y., September 17, 2026）",
+      "quote": "GlobalFoundries (Nasdaq: GFS) (GF) and Marvell Technology, Inc. (Nasdaq: MRVL), a leader in data infrastructure semiconductor solutions, today announced an expanded multi-year agreement to increase capacity for GF’s silicon germanium (SiGe) technology at its Burlington, Vermont, facility to support growing demand for next-generation optical connectivity."
+    },
+    {
+      "id": "gf_marvell_sige_capacity_agreement_2026_09_17_s2",
+      "locator": "第二段",
+      "quote": "The expanded collaboration between GF and Marvell will increase capacity for high-performance SiGe technology used in next-generation pluggable optical transceivers, Near-Packaged Optics (NPO) and Co-packaged Optics (CPO)."
+    },
+    {
+      "id": "gf_marvell_sige_capacity_agreement_2026_09_17_s3",
+      "locator": "第三段",
+      "quote": "The expanded agreement builds on existing production and is expected to add significant capacity to support Marvell’s growing requirements."
+    },
+    {
+      "id": "gf_marvell_sige_capacity_agreement_2026_09_17_s4",
+      "locator": "第四段",
+      "quote": "GF’s SiGe technology portfolio provides the high-frequency performance, signal integrity and power efficiency required for advanced optical networking applications. Its current technology supports 200G-per-lane optical connectivity, with a roadmap designed to address higher-speed generations as AI and cloud data center bandwidth requirements continue to grow. GF has manufactured advanced SiGe technology for over a decade and continues to co-integrate SiGe, silicon photonics and advanced packaging for new optical connectivity architectures including NPO and CPO."
+    },
+    {
+      "id": "gf_marvell_sige_capacity_agreement_2026_09_17_s5",
+      "locator": "Marvell 引述（Robb Johnson, VP Foundry Technology）",
+      "quote": "“As the industry moves toward higher-bandwidth optical architectures, including NPO and CPO, Marvell is investing aggressively to lead this transition. Our expanded collaboration with GF will help ensure we have the SiGe technology and manufacturing capacity to support the significant growth we see ahead.”"
+    }
+  ]
+}

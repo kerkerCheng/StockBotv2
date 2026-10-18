@@ -1,0 +1,180 @@
+{
+  "claims": [
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：Marvell 或其他 TIA／驅動器廠的申報寫出 NPO／CPO 的 TIA／驅動器改由 CMOS 或與 DSP／EIC 單晶整合、不再用 SiGe。核查頻率：每半年（Marvell 法說、投資人日；Semtech、MACOM 10-K）。觸發後 48 小時：e1 降 confidence，重讀 TIA／驅動器層與 SiGe 這一層的必要性。",
+      "id": "marvell_investor_day_2026_deck_sige_tia_cl1",
+      "source_ids": [
+        "marvell_investor_day_2026_deck_sige_tia_m1",
+        "marvell_investor_day_2026_deck_sige_tia_m2",
+        "marvell_investor_day_2026_deck_sige_tia_m3",
+        "marvell_investor_day_2026_deck_sige_tia_m4"
+      ],
+      "statement": "Marvell Investor Day 2026 deck: 'TIAs and Drivers required for every optical interconnect' and 'Expanding into new form factors Pluggables transceivers → NPO, CPO' (p.77); its high-speed analog foundation is 'Multi-foundry process leadership' across 'Broadband GaAs, SiGe, and InP' (p.78); the scale-up optics table lists '200G NPO' with 'SiGe Drivers / TIAs' (p.111). Origin is Marvell itself, a TIA/driver vendor; the deck does not name its SiGe foundries.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:sige_platform",
+      "id": "e1",
+      "relation": "enables",
+      "source_ids": [
+        "marvell_investor_day_2026_deck_sige_tia_m2",
+        "marvell_investor_day_2026_deck_sige_tia_m3"
+      ],
+      "src_id": "tech:tia_driver"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "tech:tia_driver",
+      "id": "e2",
+      "relation": "depends_on",
+      "source_ids": [
+        "marvell_investor_day_2026_deck_sige_tia_m1",
+        "marvell_investor_day_2026_deck_sige_tia_m3"
+      ],
+      "src_id": "tech:near_package_optics"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.65,
+      "dst_id": "tech:tia_driver",
+      "id": "e3",
+      "relation": "depends_on",
+      "source_ids": [
+        "marvell_investor_day_2026_deck_sige_tia_m1"
+      ],
+      "src_id": "tech:cpo"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "MRVL",
+        "Marvell"
+      ],
+      "attributes": {},
+      "confidence": 0.95,
+      "id": "co:marvell_technology",
+      "name": "Marvell Technology",
+      "role": null,
+      "source_ids": [
+        "marvell_investor_day_2026_deck_sige_tia_m2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "foundry_packaging",
+      "aliases": [
+        "SiGe"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:sige_platform",
+      "name": "Silicon Germanium (SiGe) platform",
+      "role": null,
+      "source_ids": [
+        "marvell_investor_day_2026_deck_sige_tia_m2",
+        "marvell_investor_day_2026_deck_sige_tia_m3",
+        "marvell_investor_day_2026_deck_sige_tia_m4"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "TIA",
+        "trans-impedance amplifier",
+        "laser driver"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:tia_driver",
+      "name": "TIA and driver (optical transceiver)",
+      "role": "adjacent_silicon",
+      "source_ids": [
+        "marvell_investor_day_2026_deck_sige_tia_m1",
+        "marvell_investor_day_2026_deck_sige_tia_m3"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "NPO",
+        "near package optics",
+        "near-packaged optics"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:near_package_optics",
+      "name": "Near-Packaged Optics (NPO)",
+      "role": null,
+      "source_ids": [
+        "marvell_investor_day_2026_deck_sige_tia_m1",
+        "marvell_investor_day_2026_deck_sige_tia_m3"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "CPO",
+        "co-packaged optics",
+        "NPO",
+        "near packaged optics"
+      ],
+      "attributes": {},
+      "confidence": 0.95,
+      "id": "tech:cpo",
+      "name": "Co-Packaged Optics",
+      "role": null,
+      "source_ids": [
+        "marvell_investor_day_2026_deck_sige_tia_m1"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "marvell_investor_day_2026_deck_sige_tia",
+    "evidence_tier": 2,
+    "origin_entity": "Marvell Technology, Inc.",
+    "permission_basis": "Marvell 投資人關係網站公開簡報；只保留研究必要的有限逐字節錄。簡報無印日期，活動日 2026-10-06 依 Quartr 列表與 PDF CreationDate 相符。",
+    "published_at": "2026-10-06",
+    "publisher": "Marvell Technology（投資人日簡報）",
+    "retrieved_at": "2026-10-18",
+    "source_type": "ir_deck",
+    "storage_permission": "repo_excerpt",
+    "title": "Marvell Investor Day 2026 簡報：TIA／驅動器是每條光互連都要的件、SiGe 驅動器／TIA 用在 200G NPO、多晶圓廠製程",
+    "url": "https://d1io3yog0oux5.cloudfront.net/_150b852dda059845723bdeeb90b063b6/marvell/files/654831/marvell-investor-day-2026-presentaion-deck.pdf"
+  },
+  "sources": [
+    {
+      "id": "marvell_investor_day_2026_deck_sige_tia_m1",
+      "locator": "p.77",
+      "quote": "TIAs and Drivers required for every optical interconnect Performance rules Lowest noise, high gain, high linearity Dozens of specialized products every year Pairs with wide variety of optics Expanding into new form factors Pluggables transceivers → NPO, CPO"
+    },
+    {
+      "id": "marvell_investor_day_2026_deck_sige_tia_m2",
+      "locator": "p.78",
+      "quote": "Marvell high-speed analog foundation ▪ Multi-foundry process leadership ▪ Broadband GaAs, SiGe, and InP ▪ 30-40 tape-outs per year"
+    },
+    {
+      "id": "marvell_investor_day_2026_deck_sige_tia_m3",
+      "locator": "p.111（表格列，抽字原樣）",
+      "quote": "400G Light Engine NPO / CPO 200G NPO SiGe Drivers / TIAs"
+    },
+    {
+      "id": "marvell_investor_day_2026_deck_sige_tia_m4",
+      "locator": "p.69",
+      "quote": "New world: Heterogeneous integration CMOS + SiPho + SiGe + TFLN in Light Engine"
+    }
+  ]
+}
