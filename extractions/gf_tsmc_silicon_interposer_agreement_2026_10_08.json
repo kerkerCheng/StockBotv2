@@ -1,0 +1,197 @@
+{
+  "claims": [
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：GF 或 TSMC 的後續申報、法說寫出矽中介層協議延後、縮減或終止，或 Malta 的量產時程延到 2028 年下半年以後。核查頻率：每季（GF 6-K／法說、TSMC 法說）。觸發後 48 小時：e1、e4 降 confidence，重讀先進封裝層與 CoWoS 的供給側時鐘。",
+      "id": "gf_tsmc_silicon_interposer_agreement_2026_10_08_cl1",
+      "source_ids": [
+        "gf_tsmc_silicon_interposer_agreement_2026_10_08_s1",
+        "gf_tsmc_silicon_interposer_agreement_2026_10_08_s2",
+        "gf_tsmc_silicon_interposer_agreement_2026_10_08_s3",
+        "gf_tsmc_silicon_interposer_agreement_2026_10_08_s4",
+        "gf_tsmc_silicon_interposer_agreement_2026_10_08_s5"
+      ],
+      "statement": "GlobalFoundries (2026-10-08 press release): manufacturing agreement with TSMC to establish a U.S.-based supply of silicon interposers for TSMC's CoWoS advanced packaging ecosystem; GF will provide manufacturing service to TSMC and add fabrication capacity at Malta, New York, including embedded deep trench capacitor components; volume production expected to begin ramping in the first half of 2028; initial term five years with a framework for future expansion. No contract value is disclosed. Supplier-issued release naming the customer (TSMC); TSMC has not published its own statement in this package.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "mat:silicon_interposer",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "gf_tsmc_silicon_interposer_agreement_2026_10_08_s1",
+        "gf_tsmc_silicon_interposer_agreement_2026_10_08_s3",
+        "gf_tsmc_silicon_interposer_agreement_2026_10_08_s4"
+      ],
+      "src_id": "co:globalfoundries"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "tech:cowos",
+      "id": "e2",
+      "relation": "is_component_of",
+      "source_ids": [
+        "gf_tsmc_silicon_interposer_agreement_2026_10_08_s1"
+      ],
+      "src_id": "mat:silicon_interposer"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "tech:advanced_packaging",
+      "id": "e3",
+      "relation": "is_variant_of",
+      "source_ids": [
+        "gf_tsmc_silicon_interposer_agreement_2026_10_08_s1"
+      ],
+      "src_id": "tech:cowos"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "co:tsmc",
+      "id": "e4",
+      "relation": "supplies_to",
+      "source_ids": [
+        "gf_tsmc_silicon_interposer_agreement_2026_10_08_s1",
+        "gf_tsmc_silicon_interposer_agreement_2026_10_08_s2"
+      ],
+      "src_id": "co:globalfoundries"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "foundry_packaging",
+      "aliases": [
+        "GFS",
+        "GF",
+        "GLOBALFOUNDRIES Inc."
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:globalfoundries",
+      "name": "GlobalFoundries",
+      "role": "foundry",
+      "source_ids": [
+        "gf_tsmc_silicon_interposer_agreement_2026_10_08_s1",
+        "gf_tsmc_silicon_interposer_agreement_2026_10_08_s2",
+        "gf_tsmc_silicon_interposer_agreement_2026_10_08_s3"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "foundry_packaging",
+      "aliases": [
+        "2330.TW",
+        "TSM",
+        "Taiwan Semiconductor Manufacturing Company",
+        "台積電"
+      ],
+      "attributes": {},
+      "confidence": 0.95,
+      "id": "co:tsmc",
+      "name": "TSMC",
+      "role": null,
+      "source_ids": [
+        "gf_tsmc_silicon_interposer_agreement_2026_10_08_s1",
+        "gf_tsmc_silicon_interposer_agreement_2026_10_08_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "mat:silicon_interposer",
+      "name": "Silicon Interposer",
+      "role": null,
+      "source_ids": [
+        "gf_tsmc_silicon_interposer_agreement_2026_10_08_s1",
+        "gf_tsmc_silicon_interposer_agreement_2026_10_08_s3"
+      ],
+      "type": "Material"
+    },
+    {
+      "abstraction_level": "foundry_packaging",
+      "aliases": [
+        "CoWoS",
+        "CoWoS-S"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:cowos",
+      "name": "Chip-on-Wafer-on-Substrate (CoWoS)",
+      "role": null,
+      "source_ids": [
+        "gf_tsmc_silicon_interposer_agreement_2026_10_08_s1"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "foundry_packaging",
+      "aliases": [
+        "advanced packaging",
+        "heterogeneous integration",
+        "3D chiplet integration"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:advanced_packaging",
+      "name": "Advanced packaging chip integration",
+      "role": null,
+      "source_ids": [
+        "gf_tsmc_silicon_interposer_agreement_2026_10_08_s1",
+        "gf_tsmc_silicon_interposer_agreement_2026_10_08_s5"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "gf_tsmc_silicon_interposer_agreement_2026_10_08",
+    "evidence_tier": 2,
+    "origin_entity": "GlobalFoundries Inc.",
+    "permission_basis": "GlobalFoundries 官網公開新聞稿；只保留研究必要的有限逐字節錄（原始 HTML 去標籤後逐字核對）。published_at 取 dateline 2026-10-08。",
+    "published_at": "2026-10-08",
+    "publisher": "GlobalFoundries（官網新聞稿）",
+    "retrieved_at": "2026-10-18",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "GlobalFoundries 新聞稿：與 TSMC 簽製造協議，在美國 Malta 建立 CoWoS 用矽中介層供應（2028 上半年量產爬坡、初始五年）",
+    "url": "https://gf.com/news-and-events/news/globalfoundries-reaches-agreement-to-establish-us-based-supply-of-silicon-interposers-for-advanced-ai-packaging/"
+  },
+  "sources": [
+    {
+      "id": "gf_tsmc_silicon_interposer_agreement_2026_10_08_s1",
+      "locator": "第一段",
+      "quote": "GlobalFoundries (Nasdaq: GFS) (GF) today announced a manufacturing agreement with TSMC to establish a U.S.-based supply of silicon interposers for TSMC’s CoWoS ® advanced packaging ecosystem."
+    },
+    {
+      "id": "gf_tsmc_silicon_interposer_agreement_2026_10_08_s2",
+      "locator": "第一段",
+      "quote": "Under the agreement, GF will provide manufacturing service to TSMC, and add fabrication capacity at its Malta, New York facility, supporting growing demand for high-performance computing and AI systems."
+    },
+    {
+      "id": "gf_tsmc_silicon_interposer_agreement_2026_10_08_s3",
+      "locator": "第二段",
+      "quote": "GF expects to expand capacity at its Malta facility and establish the first U.S.-based source of silicon interposers supporting advanced packaging technologies, including embedded deep trench capacitor components."
+    },
+    {
+      "id": "gf_tsmc_silicon_interposer_agreement_2026_10_08_s4",
+      "locator": "時程與年限",
+      "quote": "Volume production is expected to begin ramping at GF’s Malta site during the first half of 2028. The agreement has an initial term of five years and provides a framework for future capacity expansion."
+    },
+    {
+      "id": "gf_tsmc_silicon_interposer_agreement_2026_10_08_s5",
+      "locator": "高層引述（Ed Kaste）",
+      "quote": "Advanced packaging is becoming increasingly critical to delivering the performance, power efficiency and scale required for next-generation AI systems,"
+    }
+  ]
+}
