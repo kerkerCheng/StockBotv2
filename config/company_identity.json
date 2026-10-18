@@ -1604,10 +1604,12 @@
       "execution_venue": "SZSE",
       "display_name": "Huaming Power Equipment Co.,Ltd",
       "_display_name_source": "yfinance longName（2026-10-08）；深交所 002270（华明电力装备股份有限公司，年報封面）",
-      "_note": "隨分接開關入圖包 staged（2026-10-08）：主業變壓器分接開關（2025 年電力設備占營收 86.63%）；系統口徑邊緣（22.8 億美元、10 家，`python -m alpha edge`）。不收單詞「华明」（兩字整串比對會撞「中华明…」這類字串）",
+      "_note": "隨分接開關入圖包 staged（2026-10-08）：主業變壓器分接開關（2025 年電力設備占營收 86.63%）；系統口徑邊緣（22.8 億美元、10 家，`python -m alpha edge`）。不收單詞「华明」（兩字整串比對會撞「中华明…」這類字串）。[810]（2026-10-19）加全資子公司英文名：H 股 Application Proof（HKEX 2026-03-06）釋義「“Huaming Power” Shanghai Huaming Power Equipment Co., Ltd.」；美國海關提單出貨人寫成 SHANGHAI HUAMING POWER（INV-1：子公司出貨解析到上市母公司）",
       "name_aliases": [
         "Huaming",
         "Huaming Power Equipment",
+        "Shanghai Huaming Power",
+        "Shanghai Huaming Power Equipment",
         "华明装备",
         "華明裝備",
         "华明电力装备",
