@@ -1,0 +1,95 @@
+{
+  "claims": [
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：Ibiden 或其他 IC 載板廠的一手寫出玻纖布再度短缺、或第三、四家供應商量產延後；或寫出玻纖布已完全不構成採購風險。核查頻率：每季（Ibiden 決算 Q&A、景碩、欣興、南電法說）。觸發後 48 小時：重讀 T-glass 布層的「量」與時鐘。",
+      "id": "ibiden_q1fy2026_qa_glass_cloth_suppliers_20260805_cl1",
+      "source_ids": [
+        "ibiden_q1fy2026_qa_glass_cloth_suppliers_20260805_s1",
+        "ibiden_q1fy2026_qa_glass_cloth_suppliers_20260805_s2"
+      ],
+      "statement": "Ibiden (IC package substrate maker, a buyer of glass cloth), Q1 FY2026 Q&A: the glass cloth supply outlook improved mainly because of more suppliers—previously only two in Japan and Taiwan, now prospects of a third and fourth supplier for mass production—and a Japanese supplier is increasing capacity until next fiscal year, so material procurement risk is expected to decrease; substrate demand itself will continue to significantly exceed industry supply. Customer-side statement; suppliers unnamed.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "mat:ic_substrate_glass_cloth",
+      "id": "e1",
+      "relation": "depends_on",
+      "source_ids": [
+        "ibiden_q1fy2026_qa_glass_cloth_suppliers_20260805_s1"
+      ],
+      "src_id": "co:ibiden"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "Ibiden",
+        "IBIDEN",
+        "イビデン"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "co:ibiden",
+      "name": "Ibiden",
+      "role": null,
+      "source_ids": [
+        "ibiden_q1fy2026_qa_glass_cloth_suppliers_20260805_s1",
+        "ibiden_q1fy2026_qa_glass_cloth_suppliers_20260805_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "Tガラス",
+        "T-glass",
+        "低熱膨張ガラス",
+        "Low CTE 玻纖布",
+        "low-CTE glass cloth"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "mat:ic_substrate_glass_cloth",
+      "name": "IC-substrate glass fiber cloth (low-CTE T-glass class)",
+      "role": null,
+      "source_ids": [
+        "ibiden_q1fy2026_qa_glass_cloth_suppliers_20260805_s1",
+        "ibiden_q1fy2026_qa_glass_cloth_suppliers_20260805_s2"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "ibiden_q1fy2026_qa_glass_cloth_suppliers_20260805",
+    "evidence_tier": 2,
+    "origin_entity": "IBIDEN Co., Ltd.",
+    "permission_basis": "公司官網公開 IR 文件或新聞稿；只保留研究必要的有限逐字節錄。published_at 取文件日期。",
+    "published_at": "2026-08-05",
+    "publisher": "IBIDEN Co., Ltd.（官網）",
+    "retrieved_at": "2026-10-18",
+    "source_type": "transcript",
+    "storage_permission": "repo_excerpt",
+    "title": "Ibiden（IC 載板廠）FY2026 第 1 季決算 Key Q&A：玻纖布供應展望改善——以前日台只有兩家，現在可望有第三、四家可量產，日本供應商擴產到下年度；載板需求仍將大幅超過業界供給",
+    "url": "https://www.ibiden.com/ir/items/en_QA_FY2026Q1.pdf"
+  },
+  "sources": [
+    {
+      "id": "ibiden_q1fy2026_qa_glass_cloth_suppliers_20260805_s1",
+      "locator": "Questioner 2",
+      "quote": "[Q] Compared to the beginning of the fiscal year, the forecast for glass cloth supply seems to have improved. What are the main reasons for this improvement? [A] The biggest factor is the increase in the number of suppliers. Previously, there were only two suppliers in Japan and Taiwan, but we now have prospects for using a third and fourth supplier for mass production. Furthermore, a Japanese supplier plans to increase production capacity until the next fiscal year, so we expect material procurement risks to decrease."
+    },
+    {
+      "id": "ibiden_q1fy2026_qa_glass_cloth_suppliers_20260805_s2",
+      "locator": "Questioner 1",
+      "quote": "Currently, we are receiving inquiries for large, high-multilayer IC package substrates from all customers. We believe that demand will continue to significantly exceed the industry's supply capacity."
+    }
+  ]
+}

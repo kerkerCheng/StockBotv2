@@ -1,0 +1,86 @@
+{
+  "claims": [
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：三星電機寫出玻璃基板量產時程延後或停止開發，或宣布量產出貨。核查頻率：每半年。觸發後 48 小時：重讀 T-glass 布層的反向路徑。",
+      "id": "semco_kpca2026_glass_substrate_core_20260910_cl1",
+      "source_ids": [
+        "semco_kpca2026_glass_substrate_core_20260910_s1"
+      ],
+      "statement": "Samsung Electro-Mechanics KPCA 2026 release: glass substrate technology applies glass as the core material to reduce warpage and secure signal and power characteristics while lowering layer count. Development-stage self-statement; the company's own November 2025 release put mass production with its joint venture after 2027 (not in this package).",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "mat:glass_core",
+      "id": "e1",
+      "relation": "develops",
+      "source_ids": [
+        "semco_kpca2026_glass_substrate_core_20260910_s1"
+      ],
+      "src_id": "co:samsung_electro_mechanics"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "Samsung Electro-Mechanics",
+        "Samsung Electro-Mechanics Co., Ltd."
+      ],
+      "attributes": {},
+      "confidence": 0.95,
+      "id": "co:samsung_electro_mechanics",
+      "name": "Samsung Electro-Mechanics",
+      "role": null,
+      "source_ids": [
+        "semco_kpca2026_glass_substrate_core_20260910_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "glass core substrate",
+        "Glass Core",
+        "玻璃芯載板",
+        "玻璃核心載板",
+        "유리기판"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "mat:glass_core",
+      "name": "Glass core for IC package substrates (glass core substrate)",
+      "role": null,
+      "source_ids": [
+        "semco_kpca2026_glass_substrate_core_20260910_s1"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "semco_kpca2026_glass_substrate_core_20260910",
+    "evidence_tier": 2,
+    "origin_entity": "Samsung Electro-Mechanics",
+    "permission_basis": "公司官網公開 IR 文件或新聞稿；只保留研究必要的有限逐字節錄。published_at 取文件日期。",
+    "published_at": "2026-09-10",
+    "publisher": "Samsung Electro-Mechanics（官網）",
+    "retrieved_at": "2026-10-18",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "三星電機 KPCA 2026 新聞稿（2026-09-10）：玻璃基板技術把玻璃當核心材料，減少翹曲、降低層數",
+    "url": "https://www.samsungsem.com/global/newsroom/news/view.do?id=10522"
+  },
+  "sources": [
+    {
+      "id": "semco_kpca2026_glass_substrate_core_20260910_s1",
+      "locator": "本文",
+      "quote": "Glass substrate technology applies glass as the core material to reduce warpage of the substrate and to secure signal characteristics and power efficiency while lowering the number of layers."
+    }
+  ]
+}

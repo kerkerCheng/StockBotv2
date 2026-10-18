@@ -1,0 +1,120 @@
+{
+  "claims": [
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：LG Innotek、三星電機、SKC 或任何 GPU／ASIC 客戶的一手寫出玻璃芯載板量產出貨（不是試產或認證樣品），或 2028 量產目標延後。核查頻率：每半年。觸發後 48 小時：重讀 T-glass 布層的反向路徑。",
+      "id": "lg_innotek_glass_substrate_press_20260909_cl1",
+      "source_ids": [
+        "lg_innotek_glass_substrate_press_20260909_s1"
+      ],
+      "statement": "LG Innotek press release (2026-09-09): a glass substrate replaces the core layer inside the substrate with glass to minimize warpage and circuit distortion; LG Innotek targets glass substrate mass production in 2028. Self-statement by a would-be substitute; no customer named.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.55,
+      "dst_id": "mat:ic_substrate_glass_cloth",
+      "id": "e1",
+      "relation": "competes_with",
+      "source_ids": [
+        "lg_innotek_glass_substrate_press_20260909_s1"
+      ],
+      "src_id": "mat:glass_core"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "mat:ic_package_substrate",
+      "id": "e2",
+      "relation": "is_component_of",
+      "source_ids": [
+        "lg_innotek_glass_substrate_press_20260909_s1"
+      ],
+      "src_id": "mat:glass_core"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "glass core substrate",
+        "Glass Core",
+        "玻璃芯載板",
+        "玻璃核心載板",
+        "유리기판"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "mat:glass_core",
+      "name": "Glass core for IC package substrates (glass core substrate)",
+      "role": null,
+      "source_ids": [
+        "lg_innotek_glass_substrate_press_20260909_s1"
+      ],
+      "type": "Material"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "Tガラス",
+        "T-glass",
+        "低熱膨張ガラス",
+        "Low CTE 玻纖布",
+        "low-CTE glass cloth"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "mat:ic_substrate_glass_cloth",
+      "name": "IC-substrate glass fiber cloth (low-CTE T-glass class)",
+      "role": null,
+      "source_ids": [
+        "lg_innotek_glass_substrate_press_20260909_s1"
+      ],
+      "type": "Material"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "large body substrates",
+        "IC substrates",
+        "advanced IC substrates",
+        "high-end IC substrates",
+        "FCBGA",
+        "Flip Chip-Ball Grid Array"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "mat:ic_package_substrate",
+      "name": "IC Package Substrate",
+      "role": null,
+      "source_ids": [
+        "lg_innotek_glass_substrate_press_20260909_s1"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "lg_innotek_glass_substrate_press_20260909",
+    "evidence_tier": 2,
+    "origin_entity": "LG Innotek",
+    "permission_basis": "公司官網公開 IR 文件或新聞稿；只保留研究必要的有限逐字節錄。published_at 取文件日期。",
+    "published_at": "2026-09-09",
+    "publisher": "LG Innotek（官網）",
+    "retrieved_at": "2026-10-18",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "LG Innotek 官方新聞稿（2026-09-09）：玻璃基板是把基板內部核心層換成玻璃，目標 2028 年量產",
+    "url": "https://www.lginnotek.com/news/pressView.do?locale=ko&idx=6600"
+  },
+  "sources": [
+    {
+      "id": "lg_innotek_glass_substrate_press_20260909_s1",
+      "locator": "本文",
+      "quote": "유리기판은 기판 내부 코어(Core)층을 유리로 대체해, 기판의 휨 현상과 회로 왜곡을 최소화할 수 있다는 장점이 있다. LG이노텍은 2028년 유리기판 양산을 목표로 기술 개발에 속도를 내고 있다."
+    }
+  ]
+}
