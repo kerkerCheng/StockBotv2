@@ -1,0 +1,10 @@
+Source URL: https://www.kaori.com.tw/en/modules/immersion/about
+
+Excerpt:
+[EXCERPT — 有限逐字引文] 高力官網「About Energy Management BU」——供應商自述
+DATE: 
+RETRIEVED: 2026-10-18（原文 HTML／PDF 本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 第三方海關彙整站（ImportYeti、ImportGenius）是美國 CBP 艙單的第三方轉載，不是公司一手；發行人文件是自述；媒體只當線索。
+
+【高力官網「About Energy Management BU」——供應商自述：自家設計製造 CDU，並寫「Brazed Plate Heat Exchanger is a crucial part in CDU」、「KAORI is designer & manufacturer of Brazed Plate Heat Exchanger (BPHE) since 1994」；沒有明寫自家 CDU 用自家板式熱交換器（推一步才是），沒有客戶名。⚠ 頁面沒有日期，published_at 留空。只撐讀圖正文圖外段，敘事未引用。】
+"Design & Manufacture | Customized design for Coolant Distribution Unit (CDU) , Immersion Tank, Piping Networks and Centralized Temperature Control System. Key Component | Brazed Plate Heat Exchanger is a crucial part in CDU.KAORI is designer & manufacturer of Brazed Plate Heat Exchanger (BPHE) since 1994. Technical Support | Installation, deployment, maintenance and warranty. Experience in Working with Hyperscale Data Center"

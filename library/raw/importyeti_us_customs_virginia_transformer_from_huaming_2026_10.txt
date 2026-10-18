@@ -1,0 +1,10 @@
+Source URL: https://www.importyeti.com/company/virginia-transformer
+
+Excerpt:
+[EXCERPT — 有限逐字引文] ImportYeti（美國 CBP 海運艙單的第三方彙整）Virginia Transformer 公司頁的供應商表
+DATE: 頁面標 ImportYeti synced 10/07/2026；擷取 2026-10-18（頁面沒有發布日）
+RETRIEVED: 2026-10-18（原文 HTML／PDF 本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 第三方海關彙整站（ImportYeti、ImportGenius）是美國 CBP 艙單的第三方轉載，不是公司一手；發行人文件是自述；媒體只當線索。
+
+【ImportYeti（美國 CBP 海運艙單的第三方彙整）Virginia Transformer 公司頁的供應商表：Shanghai Huaming Power Equipment 一列（近 12 個月 1 筆、累計 4 筆 11,603 kg、品名 Tap Changer、按季序列 2024-04、2024-07、2024-10、2026-04 各 1 筆）。頁內 __next_f 資料解碼後逐字】
+"{"shipments_12m":1,"vendor_name":"Shanghai Huaming Power Equipment","vendor_address":"No 977 Tongpu Rd Putuo District Shanghai China - Putuo","vendor_address_location":"Putuo Qu","vendor_address_location_url":"/location/supplier/china/district/1798438-putuo-qu","vendor_address_country":"China","vendor_address_country_url":"/location/supplier/china/country","vendor_address_country_code":"CN","country":"China","country_code":"CN","url":"/supplier/shanghai-huaming-power-equipment","top_companies":[{"company_name":"Prolec Ge Usa","shipments_12m":15,"total_shipments":143},{"company_name":"Virginia Transformer","shipments_12m":1,"total_shipments":4},{"company_name":"Ge Grid Solutions","shipments_12m":0,"total_shipments":70},{"company_name":"Gede Shreveport Transformers","shipments_12m":0,"total_shipments":60},{"company_name":"Ge Energy Transformers","shipments_12m":0,"total_shipments":10}],"total_shipments_company":4,"total_weight":11603,"total_teus":5,"hs_codes":["8479.89"],"product_descriptions":"Tap Changer","vendor_time_series":{"01/04/2024":{"shipments":1,"weight":3262,"teu":0},"01/07/2024":{"shipments":1,"weight":2144,"teu":2},"01/10/2024":{"shipments":1,"weight":2166,"teu":0},"01/04/2026":{"shipments":1,"weight":4031,"teu":2}}"

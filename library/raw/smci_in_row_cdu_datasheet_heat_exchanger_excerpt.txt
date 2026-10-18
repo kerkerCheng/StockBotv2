@@ -1,0 +1,10 @@
+Source URL: https://www.supermicro.com/datasheet/datasheet_In_Row_CDU.pdf
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Supermicro In-Row Coolant Distribution Unit (CDU) datasheet——客戶端（伺服器廠）產品文件
+DATE: 
+RETRIEVED: 2026-10-18（原文 HTML／PDF 本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 第三方海關彙整站（ImportYeti、ImportGenius）是美國 CBP 艙單的第三方轉載，不是公司一手；發行人文件是自述；媒體只當線索。
+
+【Supermicro In-Row Coolant Distribution Unit (CDU) datasheet——客戶端（伺服器廠）產品文件：只寫「adopts a liquid-to-liquid heat exchanger」，全文沒有任何熱交換器品牌（也沒有 Kaori）。用途：說明 CDU／伺服器廠的產品文件本來就不寫零件品牌，「沒點名高力」不是反證（L11-5）。⚠ 規格書沒有日期，published_at 留空。】
+"Supermicro’s In-Row CDU adopts a liquid-to-liquid heat exchanger design to deliver exceptional cooling performance for high- power, high-density server clusters. With outstanding thermal transfer efficiency and a total cooling capacity of up to 2.2 MW, it can support multiple racks or entire clusters within a facility. When integrated with Supermicro’s Water Cooling Tower, it maximizes overall efficiency and ensures long-term operational reliability for large-scale deployments."

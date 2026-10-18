@@ -1,0 +1,10 @@
+Source URL: https://www.importgenius.com/suppliers/shanghai-huaming-power
+
+Excerpt:
+[EXCERPT — 有限逐字引文] ImportGenius（美國 CBP 海運艙單的第三方彙整）Shanghai Huaming Power（舊名稱）供應商頁的免費樣本第 1 列
+DATE: 到港 2024-06-06；頁面 Updated: 2024-06-06；擷取 2026-10-18
+RETRIEVED: 2026-10-18（原文 HTML／PDF 本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 第三方海關彙整站（ImportYeti、ImportGenius）是美國 CBP 艙單的第三方轉載，不是公司一手；發行人文件是自述；媒體只當線索。
+
+【ImportGenius（美國 CBP 海運艙單的第三方彙整）Shanghai Huaming Power（舊名稱）供應商頁的免費樣本第 1 列：提單 UULNSH24041007、品名 ON LOAD TAP CHANGER（提單原字）、收貨人 GEORGIA TRANSFORMER CORPORATION、2024-06-06 到港、3262 Kgs、11 PKG。原頁每欄各占一行】
+"Supplier Shipments # Bill of Lading Product Importer Supplier Arrival Date Country of Origin Gross Weight KGS Quantity 1 UULNSH24041007 ON LOAD TAP CHANGER GEORGIA TRANSFORMER CORPORATION SHANGHAI HUAMING POWER 2024-06-06 China 3262 Kgs 11 PKG"

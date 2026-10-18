@@ -1,0 +1,10 @@
+Source URL: https://www.lumentum.com/en/blog/mems-mirrors-and-evolution-optical-switching-ai-data-centers
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Lumentum 部落格〈MEMS Mirrors and the Evolution of Optical Switching in AI Data Centers〉（Sheldon McLaughlin；OCS 系統廠自述，沒寫鏡片晶圓
+DATE: 2026-05-28
+RETRIEVED: 2026-10-18（原文 HTML／PDF 本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 第三方海關彙整站（ImportYeti、ImportGenius）是美國 CBP 艙單的第三方轉載，不是公司一手；發行人文件是自述；媒體只當線索。
+
+【Lumentum 部落格〈MEMS Mirrors and the Evolution of Optical Switching in AI Data Centers〉（Sheldon McLaughlin；OCS 系統廠自述，沒寫鏡片晶圓在哪裡做）】
+"Lumentum began developing MEMS-based optical switches in the late 1990s, and Lumentum MEMS-based 1xN Wavelength Selective Switches (WSS) have been widely deployed in telecom ROADM networks since the mid-2000s. To date, Lumentum has shipped more than 150,000 MEMS-based WSS modules into telecom and hyperscale metro and long-haul optical networks, accumulating over one trillion (10¹²) mirror-hours of field operation. After more than two decades of WSS market leadership, Lumentum has applied this extensive experience in high-reliability MEMS mirror design and scalable optical subassembly manufacturing to MEMS-based Optical Circuit Switches for AI data centers."

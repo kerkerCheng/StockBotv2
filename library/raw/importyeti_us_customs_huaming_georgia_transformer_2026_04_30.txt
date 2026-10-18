@@ -1,0 +1,10 @@
+Source URL: https://www.importyeti.com/supplier/shanghai-huaming-power-equipment
+
+Excerpt:
+[EXCERPT — 有限逐字引文] ImportYeti（美國 CBP 海運艙單的第三方彙整）Shanghai Huaming Power Equipment 供應商頁的一筆提單
+DATE: 到港 2026-04-30；頁面標 ImportYeti synced 10/07/2026；擷取 2026-10-18
+RETRIEVED: 2026-10-18（原文 HTML／PDF 本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 第三方海關彙整站（ImportYeti、ImportGenius）是美國 CBP 艙單的第三方轉載，不是公司一手；發行人文件是自述；媒體只當線索。
+
+【ImportYeti（美國 CBP 海運艙單的第三方彙整）Shanghai Huaming Power Equipment 供應商頁的一筆提單：2026-04-30 到港、收貨人 Georgia Transformer Corp（地址 220 Glade View Dr Ne, Roanoke；ImportYeti 連到 /company/virginia-transformer）、品名 Tap Changer（ImportYeti 整理過的品名，不是提單原字）。頁內 __next_f 資料解碼後逐字】
+"{"date":"2026-04-30T00:00:00.000Z","bol":"SGLSSHA35119271","billCode":"H","masterBol":"HLCUSHA2504FXDI0","houseBol":"SGLSSHA35119271","organization":{"title":"Georgia Transformer Corp","address":"220 Glade View Dr Ne, Roanoke, Va 24012, Us","addressLoc":"Randolph","addressLocUrl":"/location/company/united-states-of-america/district/4780984-randolph","addressCountry":"United States of America","addressCountryUrl":"/location/company/united-states-of-america/country","country":"United States of America","countryCode":"US","url":"/company/virginia-transformer"},"weight":4031,"description":"Tap Changer","shippingRoute":"Asia,Transatlantic","shippingCost":null,"alibaba_data":null,"containersCount":1,"quantity":"14","quantityUnit":"PKG","hasMinimalData":true}"

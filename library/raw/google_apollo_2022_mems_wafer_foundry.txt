@@ -1,0 +1,10 @@
+Source URL: https://arxiv.org/pdf/2208.10041
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Google〈Mission Apollo: Landing Optical Circuit Switching at Datacenter Scale〉arXiv 2208.10041 p.8（客戶端自著論文；代工未具名）
+DATE: 2022-08
+RETRIEVED: 2026-10-18（原文 HTML／PDF 本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 第三方海關彙整站（ImportYeti、ImportGenius）是美國 CBP 艙單的第三方轉載，不是公司一手；發行人文件是自述；媒體只當線索。
+
+【Google〈Mission Apollo: Landing Optical Circuit Switching at Datacenter Scale〉arXiv 2208.10041 p.8（客戶端自著論文；代工未具名）】
+"Manufacturing a custom OCS at scale requires that the product be designed from the start for yield, throughput, and manufacturability. To enable high throughput and yield, most of the product’s opto-mechanical tolerances are pushed to the MEMS mirrors. This also enables rapid assembly and easy alignment of the optical core. To produce the Palomar OCS, we developed custom testers, alignment, and assembly stations for the MEMS mirrors, fiber collimators, optical core and its constituent components, and the full OCS product. Each MEMS mirror is fully tested at the wafer foundry using a prober-based solution that can address each of the 176 mirrors on the die during a single touch-down event."

@@ -1,0 +1,10 @@
+Source URL: https://cse.hkust.edu.hk/~kaichen/courses/spring24/comp7215/papers/lightwave-sigcomm23.pdf
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Google〈Lightwave Fabrics〉ACM SIGCOMM '23 p.12（下一代 300×300 由內部開發）
+DATE: 2023-09
+RETRIEVED: 2026-10-18（原文 HTML／PDF 本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 第三方海關彙整站（ImportYeti、ImportGenius）是美國 CBP 艙單的第三方轉載，不是公司一手；發行人文件是自述；媒體只當線索。
+
+【Google〈Lightwave Fabrics〉ACM SIGCOMM '23 p.12（下一代 300×300 由內部開發）】
+"Looking forward to future lightwave fabrics, free-space MEMS OCS technology can be improved along all major performance axes (scale, switching time, loss), as evidenced by existing litera- ture and our current internal development efforts to manufacture a larger 300×300 MEMS-based OCS with improved reliability and enhanced features for link-quality monitoring."

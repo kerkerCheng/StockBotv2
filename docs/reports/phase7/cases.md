@@ -332,6 +332,7 @@
     ③絕緣、套管、電工鋼的對美出貨人（ImportKey 海關頁 175 檔）：壓板（台州新源）、絕緣件（遼寧 XD 興啟、Sabar、Permali Wallace、Transvick、Enpay、常州英中）、CRGO 鐵芯（Amod）、套管（HSP→HSP US、Trench、MGC Moser Glaser、Onload Gears）全是私人公司或大集團子公司；唯一上市、邊緣大小的是**江蘇神馬電力（603530.SS，市值 2.36B、分析師量不到）**——複合空心絕緣子直接出貨 Siemens Energy Grid Technologies、Hitachi Energy USA（Mt Pleasant），年報自述與 Hitachi Energy、Siemens Energy、GE Vernova「形成了扎实的合作基础」、2025 海外新簽訂單 10.12 億元（+36.40%）。四維初判客戶端資本承諾無、瓶頸地位未知 → 不打包，登記 `lead_c461550b4e3297ae7285479bd1772796` 誠實停放（awaiting_named_disclosure，觸發 co:hitachi 文件與神馬 Q3／年報）。
   - 2026-10-18（第二段）｜乾式變壓器讀圖換版 `sr_cfed15e6eb35a726`（判讀 undecided 不變）：補 Hammond 2026-09-22 新聞稿——Fort Worth 新廠 2027 Q4 起分段投產、初期約 CAD 2.5 億年產能（產能計畫是時變數字，只寫在讀圖）；Hammond 敘事換騎。
   - 2026-10-18（第三段）｜[788] go＋入圖後：分接開關讀圖 `sr_e785dae2f2565756`（volume 不變），**更正上一版「華明不在美國這條線上」**——美國海關提單顯示華明直接出貨 OLTC 給 Prolec GE 的兩個美國據點（樣本 2026-05～09，總筆數 255、2006 年起）；錯在把國家實驗室訪談沒提到中國讀成美國沒有中國貨源（L11-5）。層說明 v2 `ln_1614e38d9e1bc5c0`（T5 換成「美國這條線斷了」才觸發的新主張、份額補 F&S：華明 17.9% 第二、前三家 82.5%）；華明敘事 `ib_91bdb2db3f24de2a`（「缺」不變，缺的①改成「量在加速的一手」）。
+  - 2026-10-18（第四段）｜公開文件追源：美國海關紀錄彙整（ImportYeti）華明給 Prolec GE 近四季 2／4／2／8 筆、第二個美國收貨人 Georgia Transformer（Virginia Transformer，品名 Tap Changer，零星）；DART：HD 現代電氣 2025 年報第一次把 MR 列為電裝品主要買進對象（沒寫品項）、曉星只揭露鋼板與銅——分接開關讀圖 `sr_c12929ba0fe07ae5`（volume 不變）、華明敘事換版（缺不變，筆數序列寫清楚能說明與不能說明的）。
 - failure log：（尚無）
   - #9（同 P1）
   - #10（[691] 合資股東的新聞稿被分類成外部印證；與 C1 [690] 同形）
@@ -431,6 +432,7 @@
   - 2026-10-18｜盤點清單：板式熱交換器層第三家供應商 → pq2 **[794]**（Dover FY2025 10-K「brazed plate heat exchangers … including an increasing opportunity in data center cooling applications」；Q2 10-Q 資料中心冷卻熱交換器需求加速、分部訂單年增 45.8%「including longer lead-time orders」、book-to-bill 1.23）——讀圖原本只引 Dover 法說轉錄的「交期拉長」，換成它自己的申報書面版本。
   - 2026-10-18｜wfC：「NVIDIA 在 GTC 點名 Vera Rubin 冷板四家」查無 NVIDIA 一手（DigiTimes 圖說像現場展示）；冷板讀圖 `sr_10c0ba5b1caa04bf` 的「換得掉」改靠供給側五家量產、分歧管讀圖 `sr_47059f62582b16c2` 缺口②結案（NVIDIA 只確認 VR 機櫃有 tray 分歧管、由 MGX 生態製造、不具名）。
   - 2026-10-18（第二段）｜[794] go＋入圖後：板式熱交換器讀圖 `sr_ed36a21f43f0ab2e`（volume 不變）——Dover 的邊入圖讓供給側 2→3，但它本來就算在圖外、可補產能沒增加；10-Q 的「longer lead-time orders」把量的訊號從法說推進到法定申報（仍是供應商自述、分部合計）；反證新增④（Dover 連兩季不再提熱交換器訂單且訂單出貨比跌破 1）。
+  - 2026-10-18（第三段）｜公開文件追源：沒有任何 CDU 廠點名高力（規格書本來就不寫熱交換器品牌）；高力 2025 年報 SMC（AI 伺服器）占比三處數字對不上（之前寫的 40.26% 是錯讀）——板式熱交換器讀圖 `sr_1f99a7bd1f5fbf52`、高力敘事換版（缺不變）；層說明的同一處錯讀待改。
 - failure log：（尚無）
   - #9（同 P1）
   - #10（[690] CoolIT 的兩條供貨邊印 externally_corroborated——文件是收購方 Ecolab 發的）
@@ -474,6 +476,7 @@
   - 2026-10-18｜wfC：Ibiden（載板廠，客戶端）Q&A 說玻纖布供應商由日台兩家擴到可望第三、四家、採購風險在降（反證②部分觸及）；玻璃芯是真反向路徑但時鐘在 2027 下半以後、三星電機同時把最大投資押在有機 FCBGA 到 2028——T-glass 讀圖換版 `sr_0d8d2afdea2d7172`（volume 不變、窗口再短），日東紡敘事更正，入圖包 pq2 [800]。
   - 2026-10-18（第二段）｜[800] go＋入圖後：T 布讀圖 `sr_6784a1f8ca5a9aee`、IC 載板讀圖 `sr_bdf526a7db003e99` 換版（都 volume 不變）；載板層補三星電機世宗 2028-09 才量產、越南 2030-06 前營運（同一份新聞稿的圖外原句），反證③到期延到 2028-12-31。
   - 2026-10-18｜[799] go＋入圖後（同族的另一鏈：高速 PCB 材料）：高速 CCL `sr_d15a83b63718e79f`（neither：這一層厚、排隊的是裡面的料；daily lead「CCL 交期 6 個月以上」查無一手；TTM 年報寫 CCL「generally readily available」）、HVLP 銅箔 `sr_007e68bb6d9ca403`（volume，薄的是 HVLP4 以上：台燿寫瓶頸、滬電寫優先配額、三井一年兩次漲價）、PCB 用 Low-Dk 布 `sr_ff00dd2a40d7715a`（volume，只押 Low Dk2）——Low-Dk 布層跟本層是同一批公司與熔爐（日東紡、台玻、富喬、建榮），兩層一起緊也可能一起鬆。新鏈主題組 pq2 [801]（8 檔等權）——金居、三井金屬、富喬的第一份敘事等它 go；台玻排除在組外（營收六成平板玻璃）。名冊批次 [796] 的 TTMI 短檢查③：在高速 CCL 需求側（PCB 廠）。台玻第一份敘事 `ib_5a22d69af8f2d5d7`（缺 X：台光電、台燿、台玻三份 2025 年報的進銷貨段都讀過、都沒有點名台玻——向你要文件 [804]；第二代布占營收無法量）。[801] go 後：金居 `ib_c50158c6c28beca4`（缺 X：HVLP4 以上三井自估份額六到八成、低等級已有新競爭者——金居的成長可能大半不在薄的那一級；[805]）、富喬 `ib_11c5d910826ae3c8`（缺 X：它自己寫第二代紗「逐漸難以滿足新世代應用需求」、年報預估 2026 各產品線銷量低於 2025、自家三年第 98.5 百分位——補齊也多半落在等回落或不要；[806]）、三井金屬 `ib_291b5c2e3b96f04f`（不要：曝險太薄；MicroThin 那一層圖上沒有，已登記走圖洞線索）。
+  - 2026-10-18（第三段）｜公開文件追源：TPCA×工研院 2026-05-06（2025 全球 HVLP 產能 2.34 萬噸、日系逾六成、金居 10.3%；37／16／10 只見於金居年報）、古河 QA（HVLP4 日本為主但韓台在追）、三井 2026-08-17（2031 年後 VSP 合計 2,600 噸／月）——HVLP 讀圖 `sr_3034eea415df3712`（volume 不變）、金居與三井敘事換版；台玻擴產一手（紗場 22.5 億、窯爐改建 47 億、增建冷修 22.42 億；2026 高階布供貨 +40–50%）與 2026Q2 玻纖部門營收已超過平板玻璃——Low-Dk 布讀圖 `sr_70e62330234aaf30`、台玻敘事換版、富喬換騎。
 - failure log：
   - #43（名冊外的公司判不了邊緣——本 case 的日東紡、台玻、建榮也是目測）、#44（09-29 研究結論寫了「可能的薄層在上游」卻沒變成 lead）
 
@@ -516,6 +519,7 @@
   - 2026-10-07｜Silex「缺 X」①的一手補查：Lumentum FY2026 10-K（2026-08-17）——OCS「contributed more than $90.0 million of revenue during fiscal year 2026」、需求「outpacing our current supply」要做供給分配；**全文「MEMS」0 次**，OCS 鏡陣列自製或外包沒有揭露（`library/raw/lite_10_k_20260817_ocs_excerpt.txt`）。EDGAR 全文檢索「MEMS」＋「optical circuit」2025-06 起只有 Tower 的 6-K（它說的是矽光子 OCS，另一條技術路線、可能是鏡陣列層的反向路徑候選）。下一份 OCS 鏡陣列層說明的起點：客戶端點名多半不公開，可能要向使用者要券商的 OCS 供應鏈報告
 - H2（X2 的部分）：**不足**（證實 1 < 4）；與 P3（7.4）合併判
   - 2026-10-07｜（旁證，不在 R2 固定樣本、不進判讀線）日東紡（T-glass）兩則 park：`lead_ffdc392c`（07-25，X 帳號「Nittobo / glass fiber/cloth」）、`lead_d8fee64e`（09-04，「Nittobo T-Glass」）；09-29 `lead_9a65a3ce` 的研究結論寫「可能的薄層在上游（玻纖布、ABF 膜），目前未驗證」卻沒變成 lead——10-07 是走圖「下一層 0 條」把它撿回來（case G1、pq2 [733]；failure log #44）。價格：收盤 07-24 3,195 → 10-06 3,640 日圓（分割後，約 +14%）；52 週那次 1,412 → 6,580 的大漲大跌在第一次接觸之前
+  - 2026-10-18｜公開文件追源：一手能證實已量產的 MEMS-OCS 代工只有 Silex（賽微 2023-12 公告、Silex IPO 說明書「proven at Google, others pilot」——客戶沒點名）；賽微北京到 2026-08 仍未量產；Lumentum R300 的晶圓在哪做沒有一手——MEMS 鏡陣列讀圖 `sr_a04f3136bf4d1bb1`（判不出不變，主缺口改成 Lumentum）、Silex 敘事換版；[765] 的公開那一半大半答了，券商報告仍要。
 - failure log：（尚無）
   - #15（park 缺的那一樣出現了、文件也進來了，卻沒有接回那則 park；一份 S-4、四則）
 

@@ -1,0 +1,10 @@
+Source URL: https://cloud.google.com/blog/products/compute/inside-the-ironwood-tpu-codesigned-ai-stack
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Google Cloud Blog〈Inside the Ironwood TPU codesigned AI stack〉（客戶端；全文沒提 MEMS 與供應商）
+DATE: 2025-11-07
+RETRIEVED: 2026-10-18（原文 HTML／PDF 本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 第三方海關彙整站（ImportYeti、ImportGenius）是美國 CBP 艙單的第三方轉載，不是公司一手；發行人文件是自述；媒體只當線索。
+
+【Google Cloud Blog〈Inside the Ironwood TPU codesigned AI stack〉（客戶端；全文沒提 MEMS 與供應商）】
+"Scaling with OCS: Pods and Superpods To scale beyond a single cube, multiple cubes are connected using an Optical Circuit Switch (OCS) network. This is a dynamic, reconfigurable optical network that connects entire cubes, allowing the system to scale from a small "pod" (e.g., a 256-chip Ironwood pod with four cubes) to a massive "superpod" (e.g., a 9,216-chip system with 144 cubes). This OCS-based topology is key to fault tolerance. If a cube or link fails, the OCS fabric manager instructs the OCS to optically bypass the unhealthy unit and establish new, complete optical circuits connecting only the healthy cubes, swapping in a designated spare."

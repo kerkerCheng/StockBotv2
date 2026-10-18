@@ -1,0 +1,10 @@
+Source URL: https://www.importyeti.com/company/virginia-transformer
+
+Excerpt:
+[EXCERPT — 有限逐字引文] ImportYeti（美國 CBP 海運艙單的第三方彙整）Virginia Transformer 公司頁的供應商表
+DATE: 頁面標 ImportYeti synced 10/07/2026；擷取 2026-10-18（頁面沒有發布日）
+RETRIEVED: 2026-10-18（原文 HTML／PDF 本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 第三方海關彙整站（ImportYeti、ImportGenius）是美國 CBP 艙單的第三方轉載，不是公司一手；發行人文件是自述；媒體只當線索。
+
+【ImportYeti（美國 CBP 海運艙單的第三方彙整）Virginia Transformer 公司頁的供應商表：Maschinenfabrik Reinhausen 一列（近 12 個月 8 筆、累計 131 筆；top_companies＝MR 在美國的前五大收貨人：Hyundai Power Transformers Usa、Reinhausen Manufacturing、Virginia Transformer、Hyosung Hico、Siemens Energy）。頁內 __next_f 資料解碼後逐字】
+"{"shipments_12m":8,"vendor_name":"Maschinenfabrik Reinhausen","vendor_address":"8 Falkensteinstrasse Regensburg By 93059 De","vendor_address_location":"Regensburg","vendor_address_location_url":"/location/supplier/germany/town/6556611-regensburg","vendor_address_country":"Germany","vendor_address_country_url":"/location/supplier/germany/country","vendor_address_country_code":"DE","country":"Germany","country_code":"DE","url":"/supplier/maschinenfabrik-reinhausen","top_companies":[{"company_name":"Hyundai Power Transformers Usa","shipments_12m":19,"total_shipments":142},{"company_name":"Reinhausen Manufacturing","shipments_12m":8,"total_shipments":140},{"company_name":"Virginia Transformer","shipments_12m":8,"total_shipments":131},{"company_name":"Hyosung Hico","shipments_12m":6,"total_shipments":13},{"company_name":"Siemens Energy","shipments_12m":2,"total_shipments":7}],"total_shipments_company":131,"total_weight":161141,"total_teus":207,"hs_codes":["8535.90","8479.89","9403.50","8708.99"],"product_descriptions":"Tap Changer Accessories Banq, Motor Drive, Tap Changer, Spare Tap Changer, Tap Changer Tariff""

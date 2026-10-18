@@ -1,0 +1,10 @@
+Source URL: https://nyemissioner.se/wp-content/uploads/silex-ipo-prospekt.pdf
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Silex Microsystems AB (publ) IPO 公開說明書 p.79（Business overview
+DATE: 2026-04-27
+RETRIEVED: 2026-10-18（原文 HTML／PDF 本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 第三方海關彙整站（ImportYeti、ImportGenius）是美國 CBP 艙單的第三方轉載，不是公司一手；發行人文件是自述；媒體只當線索。
+
+【Silex Microsystems AB (publ) IPO 公開說明書 p.79（Business overview：客戶關係舉例；供應商自述，客戶未具名）】
+"To support these rela- tionships and deliver consistent value, Silex leverages manufacturing and production technologies that can be transferred and reused across multiple customer engagements. However, product-specific functionali- ties, designs and performance-defining features are never transferred and always remain exclusively with the respective customer. As examples of Silex’s strong and long-term customer relationships, as of 2025, a leading technology company continues to utilise a solution that Silex has been developing and manufacturing for 20 years. The solution comprises MEMS-based optical circuit switches used in data centres to significantly reduce capital expenditure and power consumption by allevi- ating network congestion. The OCS-based architecture can improve data centre efficiency, resulting in approxi- mately 30 percent lower network capital expenditure and up to 40 percent lower power consumption."

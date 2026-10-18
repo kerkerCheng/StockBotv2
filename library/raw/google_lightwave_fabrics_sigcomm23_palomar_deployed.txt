@@ -1,0 +1,10 @@
+Source URL: https://cse.hkust.edu.hk/~kaichen/courses/spring24/comp7215/papers/lightwave-sigcomm23.pdf
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Google〈Lightwave Fabrics: At-Scale Optical Circuit Switching for Datacenter and Machine Learning Systems〉ACM SIGCOMM '23
+DATE: 2023-09
+RETRIEVED: 2026-10-18（原文 HTML／PDF 本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 第三方海關彙整站（ImportYeti、ImportGenius）是美國 CBP 艙單的第三方轉載，不是公司一手；發行人文件是自述；媒體只當線索。
+
+【Google〈Lightwave Fabrics: At-Scale Optical Circuit Switching for Datacenter and Machine Learning Systems〉ACM SIGCOMM '23 p.7 §4.1.1（客戶端自著論文；檔案為 HKUST 課程網站副本）】
+"Applying the design principles described in Section 3.2, tens of thousands of Palomar OCS with 136×136 duplex ports (each with eight spare ports) have been manufactured and deployed in our infrastructure."

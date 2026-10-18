@@ -1,0 +1,10 @@
+Source URL: https://www.kaori.com.tw/tw/uploads/filelist/1000/2/1786590496_dc80eed735201dfe.pdf
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Kaori 2025 Annual Report（英文版，高力官網 PDF）p.118–119
+DATE: 2026-08-06
+RETRIEVED: 2026-10-18（原文 HTML／PDF 本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 第三方海關彙整站（ImportYeti、ImportGenius）是美國 CBP 艙單的第三方轉載，不是公司一手；發行人文件是自述；媒體只當線索。
+
+【Kaori 2025 Annual Report（英文版，高力官網 PDF）p.118–119：合併主要銷貨客戶表與增減原因。⚠ 2025 一欄印 SMC 2,209,840／33.58%、BLOOM ENERGY 2,649,595／40.26%、Others 1,873,521，三列加總 6,732,956 不等於銷貨淨額 6,580,623——與中文版不同、自身也不平。中間夾 p.118 生產流程圖的抽字與頁碼標記（抽字順序）。日期：PDF CreationDate／ModDate 2026-08-06。】
+"Unit: NT$ thousand (Source: Consolidated Financial Reports) 2024 2025 Items Name Amount Percentage to All-year Net Sales (%) Relation with Issuer Name Amount Percentage to All-year Net Sales (%) Relation with Issuer 1 BLOOM ENERGY 1,637,557 40.91 None SMC 2,209,840 33.58 None Waste Welding assembly Leak Test Warehousing Assembling power distribution Perfor mance test Leak Test Welding assembly Filling and cleaning === p.119 === - 119 - 2 SMC 150,244 3.75 None BLOOM ENERGY 2,649,595 40.26 None Others 2,215,639 55.34 Others 1,873,521 28.47 Net sales 4,003,440 100.00 Net sales 6,580,623 100.00 Reason for Increase / Decrease: a. Bloom Energy revenue for 2025 rose from 2024, fueled mainly by robust growth in AI computational demand and data center power usage, lifting U.S. electricity needs and driving higher customer orders. b. Revenue from SMC in 2025 rose sharply from 2024, driven by strong growth in AI server and data center markets, lifting shipments of related equipment and cooling products."
