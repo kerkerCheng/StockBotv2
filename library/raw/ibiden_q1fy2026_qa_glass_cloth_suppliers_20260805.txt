@@ -1,0 +1,11 @@
+Source URL: https://www.ibiden.com/ir/items/en_QA_FY2026Q1.pdf
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Ibiden（IC 載板廠）FY2026 第 1 季決算 Key Q&A：玻纖布供應展望改善——以前日台只有兩家，現在可望有第三、四家可量產，日本供應商擴產到下年度；載板需求仍將大幅超過業界供給
+RETRIEVED: 2026-10-18（本機抽字、空白正規化後逐字核對；wfC 研究員下載）
+
+【Questioner 2】
+"[Q] Compared to the beginning of the fiscal year, the forecast for glass cloth supply seems to have improved. What are the main reasons for this improvement? [A] The biggest factor is the increase in the number of suppliers. Previously, there were only two suppliers in Japan and Taiwan, but we now have prospects for using a third and fourth supplier for mass production. Furthermore, a Japanese supplier plans to increase production capacity until the next fiscal year, so we expect material procurement risks to decrease."
+
+【Questioner 1】
+"Currently, we are receiving inquiries for large, high-multilayer IC package substrates from all customers. We believe that demand will continue to significantly exceed the industry's supply capacity."

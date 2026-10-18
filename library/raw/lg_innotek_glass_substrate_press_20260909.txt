@@ -1,0 +1,8 @@
+Source URL: https://www.lginnotek.com/news/pressView.do?locale=ko&idx=6600
+
+Excerpt:
+[EXCERPT — 有限逐字引文] LG Innotek 官方新聞稿（2026-09-09）：玻璃基板是把基板內部核心層換成玻璃，目標 2028 年量產
+RETRIEVED: 2026-10-18（本機抽字、空白正規化後逐字核對；wfC 研究員下載）
+
+【本文】
+"유리기판은 기판 내부 코어(Core)층을 유리로 대체해, 기판의 휨 현상과 회로 왜곡을 최소화할 수 있다는 장점이 있다. LG이노텍은 2028년 유리기판 양산을 목표로 기술 개발에 속도를 내고 있다."

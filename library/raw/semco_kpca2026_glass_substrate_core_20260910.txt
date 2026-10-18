@@ -1,0 +1,8 @@
+Source URL: https://www.samsungsem.com/global/newsroom/news/view.do?id=10522
+
+Excerpt:
+[EXCERPT — 有限逐字引文] 三星電機 KPCA 2026 新聞稿（2026-09-10）：玻璃基板技術把玻璃當核心材料，減少翹曲、降低層數
+RETRIEVED: 2026-10-18（本機抽字、空白正規化後逐字核對；wfC 研究員下載）
+
+【本文】
+"Glass substrate technology applies glass as the core material to reduce warpage of the substrate and to secure signal characteristics and power efficiency while lowering the number of layers."
