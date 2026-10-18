@@ -1,0 +1,161 @@
+{
+  "claims": [
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：之後一季以上的公開提單紀錄不再出現華明對 Prolec GE 的出貨，或 Prolec GE 改由其他來源進口分接開關。核查頻率：每季（ImportGenius／ImportKey 公開頁，互動 session 人工查）。觸發後 48 小時：e1 加註或降 confidence，重讀分接開關層「美國這段的缺貨流向誰」。",
+      "id": "importgenius_us_customs_shanghai_huaming_2026_09_cl1",
+      "source_ids": [
+        "importgenius_us_customs_shanghai_huaming_2026_09_s1",
+        "importgenius_us_customs_shanghai_huaming_2026_09_s2",
+        "importgenius_us_customs_shanghai_huaming_2026_09_s3",
+        "importgenius_us_customs_shanghai_huaming_2026_09_s4",
+        "importgenius_us_customs_shanghai_huaming_2026_09_s5"
+      ],
+      "statement": "U.S. customs bill-of-lading records (aggregated by ImportGenius, page updated 2026-09-27): SHANGHAI HUAMING POWER EQUIPMENT CO shipped to PROLEC GE USA LLC (Shreveport) and PROLEC-GE WAUKESHA INC roughly monthly from May to September 2026, including lines described as 'OLTC - HV 668A' and 'OLTC NON-HV 300A' (on-load tap changers) plus switch and socket assemblies. The free page shows only sample rows (10 of 255 since 2006); no values. Regulatory record: the shipper and consignee are as declared, independent of Huaming's own statements.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "co:prolec_ge",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "importgenius_us_customs_shanghai_huaming_2026_09_s1",
+        "importgenius_us_customs_shanghai_huaming_2026_09_s2",
+        "importgenius_us_customs_shanghai_huaming_2026_09_s3",
+        "importgenius_us_customs_shanghai_huaming_2026_09_s4",
+        "importgenius_us_customs_shanghai_huaming_2026_09_s5"
+      ],
+      "src_id": "co:huaming"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:transformer_tap_changer",
+      "id": "e2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "importgenius_us_customs_shanghai_huaming_2026_09_s1",
+        "importgenius_us_customs_shanghai_huaming_2026_09_s2",
+        "importgenius_us_customs_shanghai_huaming_2026_09_s3"
+      ],
+      "src_id": "co:huaming"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "Huaming",
+        "华明装备",
+        "華明裝備",
+        "华明电力装备"
+      ],
+      "attributes": {
+        "ticker": "002270.SZ"
+      },
+      "confidence": 0.9,
+      "id": "co:huaming",
+      "name": "Huaming Power Equipment",
+      "role": null,
+      "source_ids": [
+        "importgenius_us_customs_shanghai_huaming_2026_09_s1",
+        "importgenius_us_customs_shanghai_huaming_2026_09_s2",
+        "importgenius_us_customs_shanghai_huaming_2026_09_s3",
+        "importgenius_us_customs_shanghai_huaming_2026_09_s4",
+        "importgenius_us_customs_shanghai_huaming_2026_09_s5"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "GE Prolec",
+        "Prolec GE",
+        "SPX Transformer Solutions",
+        "SPX Transformers"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:prolec_ge",
+      "name": "Prolec GE",
+      "role": null,
+      "source_ids": [
+        "importgenius_us_customs_shanghai_huaming_2026_09_s1",
+        "importgenius_us_customs_shanghai_huaming_2026_09_s2",
+        "importgenius_us_customs_shanghai_huaming_2026_09_s3",
+        "importgenius_us_customs_shanghai_huaming_2026_09_s4",
+        "importgenius_us_customs_shanghai_huaming_2026_09_s5"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "tap changer",
+        "tap changers",
+        "on-load tap changers",
+        "LTC",
+        "LTCs",
+        "分接开关",
+        "有载分接开关"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:transformer_tap_changer",
+      "name": "Transformer Tap Changer",
+      "role": null,
+      "source_ids": [
+        "importgenius_us_customs_shanghai_huaming_2026_09_s1",
+        "importgenius_us_customs_shanghai_huaming_2026_09_s2",
+        "importgenius_us_customs_shanghai_huaming_2026_09_s3"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "importgenius_us_customs_shanghai_huaming_2026_09",
+    "evidence_tier": 2,
+    "origin_entity": "U.S. Customs and Border Protection",
+    "permission_basis": "美國海關（CBP）進口提單紀錄的第三方彙整頁（ImportGenius 免費頁，僅顯示部分樣本紀錄）；只保留研究必要的有限逐字節錄（欄位以「 | 」相連）。頁面沒有發布日：published_at 留空，紀錄本身的到港日寫在引文裡（INV-6）。",
+    "published_at": null,
+    "publisher": "ImportGenius（美國海關進口提單彙整，免費頁）",
+    "retrieved_at": "2026-10-17",
+    "source_type": "industry_report",
+    "storage_permission": "repo_excerpt",
+    "title": "美國海關進口提單（ImportGenius 彙整頁）：SHANGHAI HUAMING POWER EQUIPMENT CO 對 PROLEC GE USA LLC／PROLEC-GE WAUKESHA INC 出貨 OLTC（2026-05～09 到港）",
+    "url": "https://www.importgenius.com/suppliers/shanghai-huaming-power-equipment"
+  },
+  "sources": [
+    {
+      "id": "importgenius_us_customs_shanghai_huaming_2026_09_s1",
+      "locator": "提單列（2026-09-04）",
+      "quote": "2026-09-04 | SHANGHAI HUAMING POWER EQUIPMENT CO | PROLEC GE USA LLC | PI 45 INDICATOR ANY SUPPLIEROLTC NON-HV 300A | 2190 Kgs | 16 PKG | DFDSRAF0449102"
+    },
+    {
+      "id": "importgenius_us_customs_shanghai_huaming_2026_09_s2",
+      "locator": "提單列（2026-08-27）",
+      "quote": "2026-08-27 | SHANGHAI HUAMING POWER EQUIPMENT CO | PROLEC-GE WAUKESHA INC | SOCKETASM-STOCK LEVELONE A68S,OLTCNON-HV668A ANYSUPPLIER A22Z | 5745 Kgs | 38 PKG | DFDSRAF0417183"
+    },
+    {
+      "id": "importgenius_us_customs_shanghai_huaming_2026_09_s3",
+      "locator": "提單列（2026-07-14）",
+      "quote": "2026-07-14 | SHANGHAI HUAMING POWER EQUIPMENT CO | PROLEC GE USA LLC | OLTC - HV 668A | 1956 Kgs | 12 PKG | DFDSRAF0327645"
+    },
+    {
+      "id": "importgenius_us_customs_shanghai_huaming_2026_09_s4",
+      "locator": "提單列（2026-09-27）",
+      "quote": "2026-09-27 | SHANGHAI HUAMING POWER EQUIPMENT CO | PROLEC GE USA LLC | SWITCH ASSEMBLY | 8524 Kgs | 59 PKG | DFDSRAF0484936"
+    },
+    {
+      "id": "importgenius_us_customs_shanghai_huaming_2026_09_s5",
+      "locator": "提單列（2026-09-19）",
+      "quote": "2026-09-19 | SHANGHAI HUAMING POWER EQUIPMENT CO | PROLEC GE USA LLC | PI 45 INDICATOR ANY SUPPLIER2 POS NET SWITCH 8504B205P02 HUAM | 2235 Kgs | 14 PKG | DFDSRAF0471822"
+    }
+  ]
+}

@@ -1,0 +1,131 @@
+{
+  "claims": [
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "條件：華明的定期報告或 H 股上市文件更新版寫出海外營收占比下降、全球份額排名下滑，或撤回 H 股申請。核查頻率：每半年（年報、半年報、HKEX 申請狀態）。觸發後 48 小時：e1 的 claim 降 confidence，重讀分接開關層的供給側。",
+      "id": "huaming_hkex_application_proof_2026_03_06_cl1",
+      "source_ids": [
+        "huaming_hkex_application_proof_2026_03_06_s1",
+        "huaming_hkex_application_proof_2026_03_06_s2",
+        "huaming_hkex_application_proof_2026_03_06_s3",
+        "huaming_hkex_application_proof_2026_03_06_s4",
+        "huaming_hkex_application_proof_2026_03_06_s5",
+        "huaming_hkex_application_proof_2026_03_06_s6"
+      ],
+      "statement": "Huaming Power Equipment's HKEX H-share Application Proof (1st submission, 2026-03-06), citing Frost & Sullivan (commissioned by the issuer): in 2024 Huaming ranked second globally in tap-changer revenue with a 17.9% share; the top three held about 82.5% (Company A, a private German company founded 1891 in Regensburg, 50.2%; Company B, a private Swiss subsidiary of a Japanese diversified industrial group, 14.4%); about 57.3% global share by volume below 500kV. Overseas sales were 19.9% of 2025 revenue (RMB 478.8m, 32.1% CAGR from 2023), plus indirect exports via domestic transformer makers. It states utilities and transformer OEMs are moving from single sourcing toward dual or multi sourcing. Issuer document citing commissioned research (not customer-side); Company A/B are not named in the text.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:transformer_tap_changer",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "huaming_hkex_application_proof_2026_03_06_s2",
+        "huaming_hkex_application_proof_2026_03_06_s5",
+        "huaming_hkex_application_proof_2026_03_06_s6"
+      ],
+      "src_id": "co:huaming"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "Huaming",
+        "华明装备",
+        "華明裝備",
+        "华明电力装备"
+      ],
+      "attributes": {
+        "ticker": "002270.SZ"
+      },
+      "confidence": 0.9,
+      "id": "co:huaming",
+      "name": "Huaming Power Equipment",
+      "role": null,
+      "source_ids": [
+        "huaming_hkex_application_proof_2026_03_06_s1",
+        "huaming_hkex_application_proof_2026_03_06_s2",
+        "huaming_hkex_application_proof_2026_03_06_s3",
+        "huaming_hkex_application_proof_2026_03_06_s4",
+        "huaming_hkex_application_proof_2026_03_06_s5",
+        "huaming_hkex_application_proof_2026_03_06_s6"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "tap changer",
+        "tap changers",
+        "on-load tap changers",
+        "LTC",
+        "LTCs",
+        "分接开关",
+        "有载分接开关"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:transformer_tap_changer",
+      "name": "Transformer Tap Changer",
+      "role": null,
+      "source_ids": [
+        "huaming_hkex_application_proof_2026_03_06_s2",
+        "huaming_hkex_application_proof_2026_03_06_s4",
+        "huaming_hkex_application_proof_2026_03_06_s5"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "huaming_hkex_application_proof_2026_03_06",
+    "evidence_tier": 1,
+    "origin_entity": "Huaming Power Equipment Co., Ltd.",
+    "permission_basis": "HKEX 公開刊登的 H 股申請版本（Application Proof，英文全文版）；只保留研究必要的有限逐字節錄。published_at 取刊登日 2026-03-06。",
+    "published_at": "2026-03-06",
+    "publisher": "HKEXnews（申請版本）",
+    "retrieved_at": "2026-10-18",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Huaming Power Equipment Co., Ltd. H 股 Application Proof（1st submission，HKEX 2026-03-06）節錄：全球分接開關份額（Frost & Sullivan）、海外營收、多源趨勢",
+    "url": "https://www1.hkexnews.hk/app/sehk/2026/108266/documents/sehk26030600646.pdf"
+  },
+  "sources": [
+    {
+      "id": "huaming_hkex_application_proof_2026_03_06_s1",
+      "locator": "Summary（PDF p.4）",
+      "quote": "Our overseas operation was a key growth driver, with revenue from overseas sales contributing approximately 19.9% of our total revenue in 2025, compared to 14.1% in 2023. Our revenue from overseas sales reached RMB478.8 million in 2025 from RMB274.3 million in 2023, with a CAGR of 32.1%."
+    },
+    {
+      "id": "huaming_hkex_application_proof_2026_03_06_s2",
+      "locator": "Industry Overview — Competitive Landscape Analysis（PDF p.97）",
+      "quote": "According to Frost & Sullivan, in terms of revenue from the tap-changer business in 2024, we ranked second globally in terms of revenue, with a market share of 17.9%. The three largest global players collectively accounted for approximately 82.5% of the market, reflecting a high degree of industry concentration. In addition, the Company is the only China-based participant among the top three globally."
+    },
+    {
+      "id": "huaming_hkex_application_proof_2026_03_06_s3",
+      "locator": "Industry Overview — 排名表註（PDF p.97）",
+      "quote": "Note: Company A: Established in 1891 and headquartered in Regensburg, Germany, a private company engaged in the R&D and manufacture of transformer tap-changers and related monitoring solutions. Company B: Incorporated in 2020 and headquartered in Zurich, Switzerland, a private company and a subsidiary of a Japanese diversified industrial group; its transformer components and tap-changer business traces back over a century, with key operations based in Sweden."
+    },
+    {
+      "id": "huaming_hkex_application_proof_2026_03_06_s4",
+      "locator": "Industry Overview — 多源趨勢（PDF p.97）",
+      "quote": "In parallel, utility customers and transformer OEMs are moving from single sourcing toward dual or multi sourcing to enhance supply chain security and reduce execution risk."
+    },
+    {
+      "id": "huaming_hkex_application_proof_2026_03_06_s5",
+      "locator": "Business — Overview（PDF p.1xx）",
+      "quote": "Globally, we ranked second in terms of revenue in 2024, with a market share of approximately 17.9%. In voltage segments below 500kV , we held a global market share of approximately 57.3% by sales volume in 2024, according to Frost & Sullivan, demonstrating our strong position across mainstream product categories."
+    },
+    {
+      "id": "huaming_hkex_application_proof_2026_03_06_s6",
+      "locator": "Business — Sales and Marketing",
+      "quote": "In addition to our direct export sales, domestic transformer manufacturers also use our tap-changers on transformers exported for overseas projects, enabling us to serve overseas end users indirectly."
+    }
+  ]
+}
