@@ -1201,11 +1201,14 @@
       "research_ticker": null,
       "display_name": "Virginia Transformer",
       "_display_name_source": "DOE 2022 p.13–14 逐字（Virginia Transformers／Virginia Transformer Technology）",
-      "_note": "私人公司（研究 ticker 明確 null，INV-1）；DOE 寫前身 EFACEC",
+      "_note": "私人公司（研究 ticker 明確 null，INV-1）；DOE 寫前身 EFACEC；2026-10-19 [809] 加 Georgia Transformer 別名——VTC 2026-04-22 新聞稿「its Georgia Transformer (GTC) manufacturing facility in Rincon, Georgia」",
       "name_aliases": [
         "Virginia Transformer",
         "Virginia Transformers",
-        "Virginia Transformer Technology"
+        "Virginia Transformer Technology",
+        "Georgia Transformer",
+        "Georgia Transformer Corp",
+        "Georgia Transformer Corporation"
       ]
     },
     {
