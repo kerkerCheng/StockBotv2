@@ -63,6 +63,7 @@
   - 2026-10-17｜使用者 go **[783]**（Ligent 招股書＋官網新聞稿入圖）→ **CW DFB 層反證①「第八家」觸發**：海信寬帶（Ligent，9856.HK）2026 年第一季量產 75mW 高功率 CW-DFB，「These laser chips are either sold to external Chinese and overseas customers or used for our in-house production of optical transceivers.」——同時是新商用供應商與買家自製（反證⑥那一型，發生在中國收發器廠）。
     讀圖換版 `sr_640eff4b41cefb8a`（**維持 volume、窗口再短**：規模小——光晶片占它營收 1.6%；①改成「第九家」）；押這一層的七份敘事換騎，華星光 `ib_909214fd8f0f382e`、Sivers `ib_7ff0b3092b27e675`、聯亞 `ib_9ad8fd1d85f44300`、全新 `ib_824c2cead1f98942` 在「為什麼卡在它」補 Ligent 一句（候選狀態都不變）
 - 2×2：尚未到裁決點
+  - 2026-10-18｜[798] go＋入圖後：CW DFB 讀圖 `sr_877bf0d2e984aecb`（volume 不變、窗口再縮）——兩週內第七、八、九家（穩懋、Ligent、光環）都是既有三五族產線轉進；反證①改成第十家並把「進入門檻低」寫成本層定性，另加⑧價格與稼動率（家數條件兩週觸發三次、判讀都沒變——#68 同型）；押這層的 7 份敘事換騎。
 - failure log：（尚無）
   - #1（lead_f1694626 被排回）、#3（[679]／[680] 重複號）
 
@@ -169,6 +170,7 @@
   - 2026-10-07｜續工 ⑤（走圖第 1 型）：**6 吋 InP 產線層第一份讀圖 `sr_ad7419b129b4dad5`（undecided）**——這一格是製造能力、不是多家供貨的市場：只有 Coherent 自述在 6 吋量產（「客戶因此選它」也是它轉述的），穩懋在開發（develops 邊，不在供給側快照）；量的訊號在下一層（Coherent 預付 AXT 2,228.85 萬美元鎖 6 吋基板）。兩條條件登 watch（第二家 6 吋 InP 量產／客戶端寫明選供應商的理由是 6 吋）。邊緣公司不在這一格
   - 2026-10-18｜**盤點 B 組（光通訊電子件與封裝）**：①pq2 **[789]**——GF 2026-10-08 新聞稿：與 TSMC 簽製造協議在美國 Malta 供 CoWoS 用矽中介層（2028 上半年量產爬坡、初始五年；**原文無金額**，WebFetch 摘要的「$2 billion」不存在）——圖上矽中介層第一個供應商，並把 tech:cowos 接到先進封裝總稱節點（先進封裝讀圖缺口①的建模那一半）。②pq2 **[791]**（取代 [790]）——GF＋Marvell 擴大 SiGe 產能協議（2026-09-17，Burlington）＋Marvell 投資人日簡報（2026-10-06）「SiGe Drivers / TIAs」「Multi-foundry」：SiGe 平台供應商 1→2、TIA／驅動器接上 NPO 與 CPO；[790] 把 enables 方向寫反（failure log #78，當下修）。③**LPO 第一份讀圖 `sr_bfd181ebfe7dee2b`（neither，層）**：Meta 一個 hop 量產、模組廠多家（Ligent、中際、新易盛）、Arista 交換器支援，沒有任何缺貨一手；它是光模組 DSP 層的反向路徑，需求錨走不到是建模缺口（is_variant_of 不走訪）。④MRM 兩個節點（`tech:micro_ring_modulator`、`tech:mrm_200g`）是變體不是同義，但共用別名 MRM——第 9 型偵測不到（failure log #79，量測全圖 10 對）。
   - 2026-10-18（第二段）｜三個小缺口到終局：①CPO 測試讀圖缺口③台積電徐國晉「四大瓶頸」——只有 SEMI 矽光子峰會（8/31）的媒體轉述，官方逐字稿或簡報找不到（「我找不到」≠「不存在」），讀圖原本就寫「未取得官方逐字稿」，不換版；②FAU：Broadcom 點名的 TwinstarTech 是上海松江的被動光元件廠（官網：光纖陣列、MPO、「Co-package optics」，13,000 m²、700+ 人），沒看到掛牌資訊；大立光的邊在下一層微透鏡陣列，FAU 讀圖不寫是對的；③InP 上游旁支（三甲基銦）：南大光電 300346.SZ 2025 年報「前驱体材料（含 MO 源）」占營收 27.61%、不拆三甲基銦，MO 源以 LED 外延為主（全球 MO 源市場約 1.8 億美元，年報引述）、內銷 92%、沒有 InP 磊晶客戶具名——無 graph delta，旁支結案。
+  - 2026-10-18（第三段）｜[791][795][797] go＋入圖後：TIA／驅動器 `sr_39d9cc30a0930d3f`、SiGe 平台 `sr_34ab9730422a03c2` 第一份讀圖（都 undecided：一個月內兩家 TIA 廠各自向晶圓廠鎖 SiGe 產能是量的形式，但沒有任何一方寫缺貨或交期、兩家晶圓廠都在擴產）；LPO `sr_5f0f6049746b4e05`（neither 不變，Semtech 進供給側是印證方向）；光二極體 `sr_d98d104c46bdb6f9`（undecided 不變：環宇自述「極高的市佔率」撐不起改判、第一大客戶 66%）；CPO `sr_13fb65acb28af9b2`、NPO `sr_9a05655ba2466b7a` 補下一層 TIA。名冊批次 [796] 短檢查③：VIAV（測試儀器、年報無 CPO、自列七家競爭者）、COHU（測試分類機與測試座、無 CPO／矽光子字樣）——都寫「不要」附一條重開反證。環宇、光環第一份敘事定稿（缺 X），等光互連主題組 v2 pq2 [802]（補登組定義後才登記的五家）go 後寫入；光環的 CW 雷射功率等級與客戶向你要文件 [803]；光環快照股數多算 2024 年私募一次（failure log #82）。
 - failure log：#31（層說明沒有 watch 來源鍵；2026-10-07 S4a 解）、#32（反證在登記前就已成立、永遠不會醒）、#33（`fetchers.mops --include-english` 蓋掉中文版；當下修）；#17 第 4 次（[715] 圖影響行）；#37（層說明的出處 id 對不上 raw 檔名）
 
 ## S1 X 帳號 40 則首次點名的 claim 裁決
@@ -262,6 +264,7 @@
     ⚠ 兩檔都是韓股，Engine C 沒有機械營收序列 →「已定價①」算不出，②（組中位數）因此是 upstream_unavailable；③（相對組漲幅）有值。
 - 裁決：（尚無）
 - 2×2：尚未到裁決點
+  - 2026-10-18｜[792] go＋入圖後：LPT 讀圖 `sr_f55b7769209acef2`（volume 不變）——需求側由 IREN 一家擴到四家買方（Oncor、Core Scientific、Fermi），其中兩家付代價鎖貨（Oncor 靠供應商關係換到交期承諾、2027Q1 才到第一批；Fermi 借 1.2 億美元預購高壓設備）；Oncor 的需求來自電網、不經 AI；反證①盯的公司補齊四家（#65 同型）。
 - failure log：（尚無）
   - #9（11 條 decompose 題目缺分類被 drain withheld；回填腳本吃不下 `triage: None`——當下修）
   - #11（[689] IREN 的 depends_on 印 self_reported_costly——買方自述被當成供應商自報；與 C1 [694] 同形）
@@ -328,6 +331,7 @@
     ②LPT 第二個開口的買方：pq2 **[792]**——Oncor 8-K（2025-11-05）「securing critical long-lead time equipment, including large power transformers」＋供應商交期承諾、首批 2027 Q1；Core Scientific 10-K「lead times of 12 to 18 months or longer」；Fermi 10-K 1.2 億美元高壓設備倉儲融資提前採購變壓器——名冊隨包 staged 三家（Oncor 股權未上市 ticker null）。CoreWeave、Equinix、DLR 等 10-K 沒寫變壓器交期；Constellation 的週數是轉引 NIAC，不收。
     ③絕緣、套管、電工鋼的對美出貨人（ImportKey 海關頁 175 檔）：壓板（台州新源）、絕緣件（遼寧 XD 興啟、Sabar、Permali Wallace、Transvick、Enpay、常州英中）、CRGO 鐵芯（Amod）、套管（HSP→HSP US、Trench、MGC Moser Glaser、Onload Gears）全是私人公司或大集團子公司；唯一上市、邊緣大小的是**江蘇神馬電力（603530.SS，市值 2.36B、分析師量不到）**——複合空心絕緣子直接出貨 Siemens Energy Grid Technologies、Hitachi Energy USA（Mt Pleasant），年報自述與 Hitachi Energy、Siemens Energy、GE Vernova「形成了扎实的合作基础」、2025 海外新簽訂單 10.12 億元（+36.40%）。四維初判客戶端資本承諾無、瓶頸地位未知 → 不打包，登記 `lead_c461550b4e3297ae7285479bd1772796` 誠實停放（awaiting_named_disclosure，觸發 co:hitachi 文件與神馬 Q3／年報）。
   - 2026-10-18（第二段）｜乾式變壓器讀圖換版 `sr_cfed15e6eb35a726`（判讀 undecided 不變）：補 Hammond 2026-09-22 新聞稿——Fort Worth 新廠 2027 Q4 起分段投產、初期約 CAD 2.5 億年產能（產能計畫是時變數字，只寫在讀圖）；Hammond 敘事換騎。
+  - 2026-10-18（第三段）｜[788] go＋入圖後：分接開關讀圖 `sr_e785dae2f2565756`（volume 不變），**更正上一版「華明不在美國這條線上」**——美國海關提單顯示華明直接出貨 OLTC 給 Prolec GE 的兩個美國據點（樣本 2026-05～09，總筆數 255、2006 年起）；錯在把國家實驗室訪談沒提到中國讀成美國沒有中國貨源（L11-5）。層說明 v2 `ln_1614e38d9e1bc5c0`（T5 換成「美國這條線斷了」才觸發的新主張、份額補 F&S：華明 17.9% 第二、前三家 82.5%）；華明敘事 `ib_91bdb2db3f24de2a`（「缺」不變，缺的①改成「量在加速的一手」）。
 - failure log：（尚無）
   - #9（同 P1）
   - #10（[691] 合資股東的新聞稿被分類成外部印證；與 C1 [690] 同形）
@@ -426,6 +430,7 @@
   - 2026-10-07｜續工 ①（/phase-run）：**冷板層說明 v1 `ln_4211fda64a785417`**（個股頁 S4 第六份；主張 K1 Vera Rubin 四家、K2 MCL／MCCP 登 watch）→ 冷板讀圖換版 **`sr_c2cae5b7616559ec`（undecided → neither）**：DigiTimes 導言寫 NVIDIA「will centralize procurement of cold plates and, at GTC, named four suppliers」（奇鋐、Cooler Master、健策、台達；媒體，NVIDIA 自己的新聞稿與技術文沒點名）——客戶自己點名四家、跨世代換人＝不是換不掉；沒有買方說缺＝不是量。directed lead 的答案：雙鴻（3324）是冷板、分歧管、CDU 的量產供應商（年報自述，伺服器營收 2026Q2 占 78%、客戶只寫代號），但分析師 16 家、**系統口徑非倍率**，而且不在 Vera Rubin 的四家 → 入圖包 pq2 **[732]**（三條供貨邊，名冊隨包 staged）；邊緣大小的力致、泰碩、建準年報只寫到開發或佈局。**這一層沒有可投資的邊緣公司**（failure log #43：上一版把雙鴻寫成邊緣大小是目測）
   - 2026-10-18｜盤點清單：板式熱交換器層第三家供應商 → pq2 **[794]**（Dover FY2025 10-K「brazed plate heat exchangers … including an increasing opportunity in data center cooling applications」；Q2 10-Q 資料中心冷卻熱交換器需求加速、分部訂單年增 45.8%「including longer lead-time orders」、book-to-bill 1.23）——讀圖原本只引 Dover 法說轉錄的「交期拉長」，換成它自己的申報書面版本。
   - 2026-10-18｜wfC：「NVIDIA 在 GTC 點名 Vera Rubin 冷板四家」查無 NVIDIA 一手（DigiTimes 圖說像現場展示）；冷板讀圖 `sr_10c0ba5b1caa04bf` 的「換得掉」改靠供給側五家量產、分歧管讀圖 `sr_47059f62582b16c2` 缺口②結案（NVIDIA 只確認 VR 機櫃有 tray 分歧管、由 MGX 生態製造、不具名）。
+  - 2026-10-18（第二段）｜[794] go＋入圖後：板式熱交換器讀圖 `sr_ed36a21f43f0ab2e`（volume 不變）——Dover 的邊入圖讓供給側 2→3，但它本來就算在圖外、可補產能沒增加；10-Q 的「longer lead-time orders」把量的訊號從法說推進到法定申報（仍是供應商自述、分部合計）；反證新增④（Dover 連兩季不再提熱交換器訂單且訂單出貨比跌破 1）。
 - failure log：（尚無）
   - #9（同 P1）
   - #10（[690] CoolIT 的兩條供貨邊印 externally_corroborated——文件是收購方 Ecolab 發的）
@@ -467,6 +472,8 @@
     反證連讀圖兩條與層說明 T4（玻璃核心）；等待 `ew_0436` 在 11-10（第 2 季決算說明會後）叫醒。順序符合 #26 的教訓：對照組先、敘事後
 - 裁決：（尚未到裁決點；日東紡 2026 年度第 2 季決算說明會 2026-11 上旬）
   - 2026-10-18｜wfC：Ibiden（載板廠，客戶端）Q&A 說玻纖布供應商由日台兩家擴到可望第三、四家、採購風險在降（反證②部分觸及）；玻璃芯是真反向路徑但時鐘在 2027 下半以後、三星電機同時把最大投資押在有機 FCBGA 到 2028——T-glass 讀圖換版 `sr_0d8d2afdea2d7172`（volume 不變、窗口再短），日東紡敘事更正，入圖包 pq2 [800]。
+  - 2026-10-18（第二段）｜[800] go＋入圖後：T 布讀圖 `sr_6784a1f8ca5a9aee`、IC 載板讀圖 `sr_bdf526a7db003e99` 換版（都 volume 不變）；載板層補三星電機世宗 2028-09 才量產、越南 2030-06 前營運（同一份新聞稿的圖外原句），反證③到期延到 2028-12-31。
+  - 2026-10-18｜[799] go＋入圖後（同族的另一鏈：高速 PCB 材料）：高速 CCL `sr_d15a83b63718e79f`（neither：這一層厚、排隊的是裡面的料；daily lead「CCL 交期 6 個月以上」查無一手；TTM 年報寫 CCL「generally readily available」）、HVLP 銅箔 `sr_007e68bb6d9ca403`（volume，薄的是 HVLP4 以上：台燿寫瓶頸、滬電寫優先配額、三井一年兩次漲價）、PCB 用 Low-Dk 布 `sr_ff00dd2a40d7715a`（volume，只押 Low Dk2）——Low-Dk 布層跟本層是同一批公司與熔爐（日東紡、台玻、富喬、建榮），兩層一起緊也可能一起鬆。新鏈主題組 pq2 [801]（8 檔等權）——金居、三井金屬、富喬的第一份敘事等它 go；台玻排除在組外（營收六成平板玻璃）。名冊批次 [796] 的 TTMI 短檢查③：在高速 CCL 需求側（PCB 廠）。台玻第一份敘事 `ib_5a22d69af8f2d5d7`（缺 X：台光電、台燿、台玻三份 2025 年報的進銷貨段都讀過、都沒有點名台玻——向你要文件 [804]；第二代布占營收無法量）。
 - failure log：
   - #43（名冊外的公司判不了邊緣——本 case 的日東紡、台玻、建榮也是目測）、#44（09-29 研究結論寫了「可能的薄層在上游」卻沒變成 lead）
 
@@ -550,6 +557,7 @@
       現代摩比斯 `ib_c8e5e572872abec6`（非邊緣的不要：約 252 億美元、28 位）；SHA0.DE `ib_3671da7bf86f5edc` 改押
   - 2026-10-05｜Nidec 入圖後的一手補查（R4 報告原寫「未查」）：窗口內（09-01 入圖 → 10-02）唯一的一手是 2026-09-30 延遲發布的 FY2025 決算摘要——第三方委員會確認多起管理層參與的不當會計、6,321 億日圓減損、營業虧損 5,190 億日圓；東證特別注意銘柄指定在 2025-10-28（早於入圖）。這是治理／會計事件，**沒有觸及入圖時的結構主張**（FLEXWAVE），R4 結論不變（證據不足以判）；只記事實、不做「它為什麼跌」的因果歸因（L14）。觀測 `mo_b35ec2d6cdd9154e1be5d12cb1a67e3b`；敘事 Nidec `ib_96330eed2aea24c9`（非邊緣的不要，治理風險記在 our_bet）、宇樹 688836.SS `ib_68f7e54c0de8e0a2`（非邊緣的不要；只坐自家整機 G1，failure log #22 第二型）
   - 2026-10-18｜**盤點 B 組（人形量產客戶一手）**：pq2 **[793]**——宇樹招股意向書（2026-07-31）「公司实现机器人核心零部件关节模组的自研自产……降低了对外部供应 链的依赖」，生產環節含電機、減速器及關節模組，原材料「市场供应充足」、前五大供應商 22–26% 多匿名——量最大的人形廠不是外部致動器供應商的客戶；入圖後重讀致動器層 `sr_14456dc4d147f3f3` 的需求側。環動科技（雙環傳動分拆）招股書申報稿：客戶全匿名（主要客戶 1、2）、工業機器人為主、前五大 78.34%——無 graph delta。
+  - 2026-10-18（第二段）｜[793] go＋入圖後：致動器層讀圖 `sr_90eff8f4a5dea998` 由 undecided 改判 neither——理由在需求側：量產中的宇樹自製關節模組、說原料供應充足，其餘三個買方各是互惠、集團內、未點名；產能那一半是結構推論（量還沒到），反證①盯的公司補上宇樹、Humanoid、Boston Dynamics；現代摩比斯、Schaeffler 敘事各改兩句（state 不變）。
 - failure log：（尚無）
   - #14（反證以被評公司的供貨 assertion 形式入圖：MP 磁材邊上的 Noveon、USA Rare Earth 文件，引文沒有 MP）
   - #19（海外財報缺口：6324.T、LYC.AX、6680.HK 的已定價嗎與出現在數字裡都量不到）、#20（A＋H 檔快照市值只算 H 股）

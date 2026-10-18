@@ -1,0 +1,28 @@
+SOURCE: Cohu, Inc. — Form 10-K（fiscal year ended 2025-12-27）；SEC EDGAR accession 0001437749-26-004339、Form 10-Q（quarter ended 2026-06-27）；SEC EDGAR accession 0001437749-26-025144
+URL: https://www.sec.gov/Archives/edgar/data/21535/000143774926004339/cohu20251227_10k.htm ；https://www.sec.gov/Archives/edgar/data/21535/000143774926025144/cohu20260627_10q.htm
+PUBLISHED: 2026-02-17；2026-07-31
+RETRIEVED: 2026-10-18
+STORAGE: repo_excerpt（美國法定公開申報有限節錄；HTML 轉文字、空白攤平後逐字照抄）
+NOTE: 發行人自己的年報與季報（自述）。兩份都沒有 co-packaged／silicon photonics 字樣；HBM 在年報裡是「檢測」的成長計畫，季報 MD&A 沒有 HBM。Phase 7 Step 7.1 段 5「坐哪一層」短檢查（COHU）用。
+
+=== Form 10-K（fiscal year ended 2025-12-27），filed 2026-02-17 ===
+
+【Item 1 Business — Overview】
+"Cohu is capitalizing on high-growth opportunities in high-bandwidth memory (“HBM”) inspection, high performance processor test in AI applications (CPUs, embedded-NPUs, discrete and integrated GPUs, ASICs and xPUs), mixed signal devices, silicon carbide (“SiC”) and gallium nitride (“GaN”) wide bandgap test, and AI-driven software analytics."
+
+【Item 1 Business — Key Competitors】
+"Cohu’s primary competitors include established global players in semiconductor test and inspection, such as Advantest, Teradyne, Hon Precision, KLA, and other Asia-based manufacturers."
+
+【Item 1A Risk Factors】
+"In 2025, our ten largest customers represented 60% of total revenue."
+
+【Item 1A Risk Factors】
+"intense competition in the test contactor, test handler, automated test equipment industry, our limited backlog"
+
+=== Form 10-Q（quarter ended 2026-06-27），filed 2026-07-31 ===
+
+【Item 2 MD&A — Overview】
+"By contrast, demand related to artificial intelligence (“AI”), high performance computing, and data center applications has remained comparatively strong and continues to support investment in advanced semiconductor testing and inspection solutions."
+
+【Item 2 MD&A — Net Sales】
+"Our consolidated net sales increased 38.4% to $149.0 million in 2026, compared to $107.7 million in 2025."

@@ -1,0 +1,12 @@
+Source URL: https://mopsov.twse.com.tw/nas/STR/499120260805M001.pdf
+
+Excerpt:
+[EXCERPT — 有限逐字引文] 環宇-KY（4991）Q2 2026 Quarterly Online Investor Conference（MOPS 法人說明會，2026-08-05）節錄：季度損益表
+RETRIEVED: 2026-10-18（MOPS PDF 本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 合併口徑（新臺幣仟元）。簡報 p.7「Revenue Mix % vs Gross Margin」是圖、抽不出字；毛利率季減的原因簡報沒寫。
+
+【p.5 Statements of Comprehensive Income - QoQ（2Q26、1Q26、2Q25）】
+"Net Operating Revenue 770,103 714,680 489,983 7.8% 57.2%Gross Profit 333,195 389,747 239,133 -14.5% 39.3%Gross Margin 43.3% 54.5% 48.8%Operating Expenses (235,149) (207,608) (122,060) 13.3% 92.7%Operating Expenses to Revenue % 30.5% 29.0% 24.9%Operating Income 98,046 182,139 117,073 -46.2% -16.3%Operating Margin 12.7% 25.5% 23.9%"
+
+【p.8 Statements of Comprehensive Income - YoY（1H2026、1H2025）】
+"Net Operating Revenue 1,484,783 100.0% 963,153 100.0% 54.2%Operating Cost (761,841) -51.3% (552,333) -57.3% 37.9%Gross Profit 722,942 48.7% 410,820 42.7% 76.0%Operating Expenses (442,757) -29.8% (256,740) -26.7% 72.5%Operating Profit 280,185 18.9% 154,080 16.0% 81.8%"

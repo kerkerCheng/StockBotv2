@@ -1,0 +1,26 @@
+SOURCE: Viavi Solutions Inc. — Form 10-K（fiscal year ended 2026-06-27）；SEC EDGAR accession 0001628280-26-056765
+URL: https://www.sec.gov/Archives/edgar/data/912093/000162828026056765/viav-20260627.htm
+PUBLISHED: 2026-08-13
+RETRIEVED: 2026-10-18
+STORAGE: repo_excerpt（美國法定公開申報有限節錄；HTML 轉文字、空白攤平後逐字照抄）
+NOTE: 發行人自己的年報（自述）。全文沒有 co-packaged／CPO 字樣。Phase 7 Step 7.1 段 5「坐哪一層」短檢查（VIAV）用。
+
+=== Form 10-K（fiscal year ended 2026-06-27），filed 2026-08-13 ===
+
+【Item 1 Business — Network and Service Enablement】
+"Our high-speed optical and Ethernet solutions address lab, production and manufacturing environments to ensure that network equipment is designed and built at peak performance to support artificial intelligence (AI) and high-performance computing (HPC) workloads."
+
+【Item 1 Business — Network and Service Enablement】
+"Our Lab and Production products also enable testing of high-performance integrated circuits and modules."
+
+【Item 1 Business — Competition】
+"NSE competitors include Anritsu Corporation, EXFO Inc., Keysight Technologies Inc., NetScout Systems, Inc., Riverbed Technology, Inc., Rohde & Schwarz and VeEX Inc. While we face multiple competitors for each of our product families, we continue to have one of the broadest portfolios of products and monitoring solutions available in the network and service enablement industry."
+
+【Item 1 Business — Backlog】
+"our sales often reflect orders shipped in the same quarter in which they are received"
+
+【Item 7 MD&A — Net revenue】
+"Net revenue increased $434.0 million, or 40.0%, during fiscal 2026 when compared to fiscal 2025. This increase was primarily from strong demand for lab and production and field products, driven by the data center ecosystem, our acquisition of Spirent’s HSE and CE business as well as demand for our aerospace and defense products, which was partially offset by a decline in spend for wireless products."
+
+【Notes — Segment information】
+"One customer of the Company in the OSP segment generated $174.7 million, $166.7 million and $154.1 million of net revenue, which represented more than 10% of total net revenue, during fiscal 2026, 2025 and 2024, respectively."

@@ -1,0 +1,37 @@
+SOURCE: TTM Technologies, Inc. — Form 10-K（fiscal year ended 2025-12-29）；SEC EDGAR accession 0001193125-26-051976、Form 10-Q（quarter ended 2026-06-29）；SEC EDGAR accession 0001193125-26-335107
+URL: https://www.sec.gov/Archives/edgar/data/1116942/000119312526051976/ttmi-20251229.htm ；https://www.sec.gov/Archives/edgar/data/1116942/000119312526335107/ttmi-20260629.htm
+PUBLISHED: 2026-02-17；2026-08-05
+RETRIEVED: 2026-10-18
+STORAGE: repo_excerpt（美國法定公開申報有限節錄；HTML 轉文字、空白攤平後逐字照抄）
+NOTE: 發行人自己的年報與季報（自述）。原料段是 2026-02 年報的說法（CCL「generally readily available」），季報沒有更新原料供應的說法。Phase 7 Step 7.1 段 5「坐哪一層」短檢查（TTMI）用。
+
+=== Form 10-K（fiscal year ended 2025-12-29），filed 2026-02-17 ===
+
+【Item 1 Business — Suppliers】
+"For advanced interconnect products, primary raw materials include copper clad laminates and chemical solutions such as copper and gold for plating operations, photographic film, carbide drill bits, and plastic for testing fixtures. Most of the raw materials are generally readily available from numerous suppliers in the open market."
+
+【Item 1 Business — Suppliers】
+"Supply for PCB materials can vary over time depending on supply/demand dynamics for key raw materials such as copper clad laminates."
+
+【Item 1 Business — Competition】
+"For PCBs, our competitors are mostly based in China and Taiwan."
+
+【Item 1 Business — Competition】
+"The PCB industry remains highly fragmented and characterized by intense competition."
+
+【Item 1 Business — Competition】
+"Our principal competitors for our Commercial segment include AT&S (Austria Technologie & Systemtechnik Aktiengesellschaft), Founder Technology Group Co., Ltd., Gold Circuit Electronics Ltd., Isu Petasys Co., Ltd., Kinwong Electronic Co. Ltd., Unimicron Technology Corp., Victory Giant Technology Co., Ltd., and WUS Printed Circuit Co., Ltd."
+
+【Item 1A Risk Factors】
+"Our five largest OEM customers collectively accounted for approximately 44%, 42%, and 41% of our net sales for the years ended December 29, 2025, December 30, 2024, and January 1, 2024, respectively, and two customers collectively represented 23% of our net sales for the year ended December 29, 2025."
+
+=== Form 10-Q（quarter ended 2026-06-29），filed 2026-08-05 ===
+
+【Item 2 MD&A — End markets（% of net sales；quarter 2026／2025，two quarters 2026／2025）】
+"Data Center and Networking 40 29 38 28"
+
+【Item 2 MD&A — Net Sales】
+"Total net sales increased $273.4 million, or 37.4%, to $1,004.1 million for the quarter ended June 29, 2026, from $730.6 million for the quarter ended June 30, 2025. The primary driver of this increase was due to continued strong demand in our data center and networking end market driven by the continued build out of AI data centers and related applications, as well as strong growth in our aerospace and defense and medical, industrial, and instrumentation end markets."
+
+【Item 2 MD&A — Liquidity】
+"Our total 2026 capital expenditures are expected to be in the range of $345.0 million to $365.0 million, primarily for capacity expansion to meet market demand."
