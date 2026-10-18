@@ -1,0 +1,97 @@
+{
+  "claims": [
+    {
+      "confidence": 0.65,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：Dover 季報或年報寫出熱交換器（含資料中心冷卻）需求放緩、訂單下滑或 book-to-bill 回到 1 以下，或交期縮短。核查頻率：每季（Dover 10-Q／10-K）。觸發後 48 小時：e1 降 confidence，重讀板式熱交換器層（volume 判讀的供給側與交期）。",
+      "id": "dov_10k_fy2025_brazed_plate_heat_exchangers_20260213_cl1",
+      "source_ids": [
+        "dov_10k_fy2025_brazed_plate_heat_exchangers_20260213_s1",
+        "dov_10k_fy2025_brazed_plate_heat_exchangers_20260213_s2"
+      ],
+      "statement": "Dover FY2025 10-K: its heat exchanger business manufactures energy-efficient brazed plate heat exchangers for residential climate control (including heat pumps) and industrial heating and cooling, 'including an increasing opportunity in data center cooling applications'; Dover also says heat exchangers are components of larger customer systems where switching costs and risks far exceed the component's cost. Supplier self-description; no data center revenue split.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:brazed_plate_heat_exchanger",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "dov_10k_fy2025_brazed_plate_heat_exchangers_20260213_s1",
+        "dov_10k_fy2025_brazed_plate_heat_exchangers_20260213_s2"
+      ],
+      "src_id": "co:dover"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "Dover Corporation",
+        "Colder Products Company"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:dover",
+      "name": "Dover",
+      "role": null,
+      "source_ids": [
+        "dov_10k_fy2025_brazed_plate_heat_exchangers_20260213_s1",
+        "dov_10k_fy2025_brazed_plate_heat_exchangers_20260213_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "brazed plate heat exchanger",
+        "brazed plate heat exchangers",
+        "BPHE",
+        "BPHEs",
+        "BHE",
+        "copper brazed plate heat exchanger",
+        "硬銲型板式熱交換器"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:brazed_plate_heat_exchanger",
+      "name": "Brazed plate heat exchanger (BPHE)",
+      "role": null,
+      "source_ids": [
+        "dov_10k_fy2025_brazed_plate_heat_exchangers_20260213_s1",
+        "dov_10k_fy2025_brazed_plate_heat_exchangers_20260213_s2"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "dov_10k_fy2025_brazed_plate_heat_exchangers_20260213",
+    "evidence_tier": 1,
+    "origin_entity": "Dover Corporation",
+    "permission_basis": "SEC EDGAR 公開申報；只保留研究必要的有限逐字節錄。published_at 取 EDGAR 申報日。",
+    "published_at": "2026-02-13",
+    "publisher": "SEC EDGAR",
+    "retrieved_at": "2026-10-18",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Dover FY2025 10-K（Item 1，Climate & Sustainability Technologies）：熱交換器事業生產硬焊板式熱交換器，資料中心冷卻是日益增加的機會",
+    "url": "https://www.sec.gov/Archives/edgar/data/29905/000002990526000009/dov-20251231.htm"
+  },
+  "sources": [
+    {
+      "id": "dov_10k_fy2025_brazed_plate_heat_exchangers_20260213_s1",
+      "locator": "Item 1 Business — Climate & Sustainability Technologies",
+      "quote": "Our heat exchanger business manufactures energy-efficient brazed plate heat exchangers used for residential climate control applications, including heat pumps, as well as industrial heating and cooling applications, including an increasing opportunity in data center cooling applications."
+    },
+    {
+      "id": "dov_10k_fy2025_brazed_plate_heat_exchangers_20260213_s2",
+      "locator": "Item 1 Business — 元件的切換成本",
+      "quote": "For example, our industrial and biopharma pumps, biopharma connectors, engineered bearings and compression components, clean energy components, and heat exchangers are all part of larger systems built or employed by our customers. Such components typically serve demanding applications where value-in-use and costs and risks of switching far exceed the cost of the component itself."
+    }
+  ]
+}

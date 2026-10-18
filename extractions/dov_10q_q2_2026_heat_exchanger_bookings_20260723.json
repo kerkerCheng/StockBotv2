@@ -1,0 +1,97 @@
+{
+  "claims": [
+    {
+      "confidence": 0.65,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：Dover 季報或年報寫出熱交換器（含資料中心冷卻）需求放緩、訂單下滑或 book-to-bill 回到 1 以下，或交期縮短。核查頻率：每季（Dover 10-Q／10-K）。觸發後 48 小時：e1 降 confidence，重讀板式熱交換器層（volume 判讀的供給側與交期）。",
+      "id": "dov_10q_q2_2026_heat_exchanger_bookings_20260723_cl1",
+      "source_ids": [
+        "dov_10q_q2_2026_heat_exchanger_bookings_20260723_s1",
+        "dov_10q_q2_2026_heat_exchanger_bookings_20260723_s2"
+      ],
+      "statement": "Dover Q2 2026 10-Q: Climate & Sustainability Technologies organic growth included 'accelerating demand for heat exchangers used in data center cooling and other applications'; segment bookings rose 45.8% year on year, driven by retail refrigeration and heat exchangers 'including longer lead-time orders', book-to-bill 1.23. Segment-level, not split by product or end market.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:brazed_plate_heat_exchanger",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "dov_10q_q2_2026_heat_exchanger_bookings_20260723_s1",
+        "dov_10q_q2_2026_heat_exchanger_bookings_20260723_s2"
+      ],
+      "src_id": "co:dover"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "Dover Corporation",
+        "Colder Products Company"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:dover",
+      "name": "Dover",
+      "role": null,
+      "source_ids": [
+        "dov_10q_q2_2026_heat_exchanger_bookings_20260723_s1",
+        "dov_10q_q2_2026_heat_exchanger_bookings_20260723_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "brazed plate heat exchanger",
+        "brazed plate heat exchangers",
+        "BPHE",
+        "BPHEs",
+        "BHE",
+        "copper brazed plate heat exchanger",
+        "硬銲型板式熱交換器"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:brazed_plate_heat_exchanger",
+      "name": "Brazed plate heat exchanger (BPHE)",
+      "role": null,
+      "source_ids": [
+        "dov_10q_q2_2026_heat_exchanger_bookings_20260723_s1",
+        "dov_10q_q2_2026_heat_exchanger_bookings_20260723_s2"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "dov_10q_q2_2026_heat_exchanger_bookings_20260723",
+    "evidence_tier": 1,
+    "origin_entity": "Dover Corporation",
+    "permission_basis": "SEC EDGAR 公開申報；只保留研究必要的有限逐字節錄。published_at 取 EDGAR 申報日。",
+    "published_at": "2026-07-23",
+    "publisher": "SEC EDGAR",
+    "retrieved_at": "2026-10-18",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Dover 2026 Q2 10-Q（MD&A，Climate & Sustainability Technologies）：資料中心冷卻用熱交換器需求加速；分部訂單年增 45.8%，含交期較長的訂單、book-to-bill 1.23",
+    "url": "https://www.sec.gov/Archives/edgar/data/29905/000002990526000027/dov-20260630.htm"
+  },
+  "sources": [
+    {
+      "id": "dov_10q_q2_2026_heat_exchanger_bookings_20260723_s1",
+      "locator": "MD&A — Climate & Sustainability Technologies（第二季營收）",
+      "quote": "The organic revenue growth was primarily driven by continued strong demand in CO2 refrigerant systems and growth in refrigerated door case volumes, as well as accelerating demand for heat exchangers used in data center cooling and other applications."
+    },
+    {
+      "id": "dov_10q_q2_2026_heat_exchanger_bookings_20260723_s2",
+      "locator": "MD&A — Climate & Sustainability Technologies（第二季訂單）",
+      "quote": "Bookings in the second quarter of 2026 increased 45.8% from the prior year comparable quarter. The bookings increase was primarily driven by demand strength in retail refrigeration and heat exchangers, including longer lead-time orders. Segment book-to-bill was 1.23."
+    }
+  ]
+}
