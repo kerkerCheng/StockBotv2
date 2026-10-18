@@ -1989,6 +1989,21 @@
       "market_currency": "USD",
       "name_aliases": [],
       "research_ticker": "TTMI"
+    },
+    {
+      "_display_name_source": "yfinance longName（2026-10-19）；交易所 JPX",
+      "_note": "名冊批次草稿（2026-10-19）：HVLP 銅箔層（mat:hvlp_copper_foil，volume）的第二大供應商：金居 2025 年報轉引工研院份額三井 37%、古河 16%、金居 10%；古河自己 2026-06-04 QA 寫高周波箔供給受限、HVLP4『日本メーカーが中心だが、韓国・台湾勢も技術水準を上げてきている』（library/raw/furukawa_20260604_digicomp_qa_copper_foil_excerpt.txt）。登記後 HVLP 讀圖反證④（新進廠過認證）與層的供給側才盯得到它。2026-10-19 使用者同意鑄號；系統口徑 not_edge（約 150.1 億美元、分析師 10 家）；lead：lead_c349675fdb415bc16ec36afe3d5d91f2",
+      "company_id": "co:furukawa_electric",
+      "display_name": "Furukawa Electric Co., Ltd.",
+      "market_currency": "JPY",
+      "name_aliases": [
+        "古河電工",
+        "古河電気工業",
+        "古河電氣工業",
+        "Furukawa Electric",
+        "Furukawa Electric Co."
+      ],
+      "research_ticker": "5801.T"
     }
   ]
 }
