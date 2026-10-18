@@ -425,6 +425,7 @@
 - 2×2：尚未到裁決點
   - 2026-10-07｜續工 ①（/phase-run）：**冷板層說明 v1 `ln_4211fda64a785417`**（個股頁 S4 第六份；主張 K1 Vera Rubin 四家、K2 MCL／MCCP 登 watch）→ 冷板讀圖換版 **`sr_c2cae5b7616559ec`（undecided → neither）**：DigiTimes 導言寫 NVIDIA「will centralize procurement of cold plates and, at GTC, named four suppliers」（奇鋐、Cooler Master、健策、台達；媒體，NVIDIA 自己的新聞稿與技術文沒點名）——客戶自己點名四家、跨世代換人＝不是換不掉；沒有買方說缺＝不是量。directed lead 的答案：雙鴻（3324）是冷板、分歧管、CDU 的量產供應商（年報自述，伺服器營收 2026Q2 占 78%、客戶只寫代號），但分析師 16 家、**系統口徑非倍率**，而且不在 Vera Rubin 的四家 → 入圖包 pq2 **[732]**（三條供貨邊，名冊隨包 staged）；邊緣大小的力致、泰碩、建準年報只寫到開發或佈局。**這一層沒有可投資的邊緣公司**（failure log #43：上一版把雙鴻寫成邊緣大小是目測）
   - 2026-10-18｜盤點清單：板式熱交換器層第三家供應商 → pq2 **[794]**（Dover FY2025 10-K「brazed plate heat exchangers … including an increasing opportunity in data center cooling applications」；Q2 10-Q 資料中心冷卻熱交換器需求加速、分部訂單年增 45.8%「including longer lead-time orders」、book-to-bill 1.23）——讀圖原本只引 Dover 法說轉錄的「交期拉長」，換成它自己的申報書面版本。
+  - 2026-10-18｜wfC：「NVIDIA 在 GTC 點名 Vera Rubin 冷板四家」查無 NVIDIA 一手（DigiTimes 圖說像現場展示）；冷板讀圖 `sr_10c0ba5b1caa04bf` 的「換得掉」改靠供給側五家量產、分歧管讀圖 `sr_47059f62582b16c2` 缺口②結案（NVIDIA 只確認 VR 機櫃有 tray 分歧管、由 MGX 生態製造、不具名）。
 - failure log：（尚無）
   - #9（同 P1）
   - #10（[690] CoolIT 的兩條供貨邊印 externally_corroborated——文件是收購方 Ecolab 發的）
@@ -465,6 +466,7 @@
     押玻纖布層 `sr_49dcdbd60da7b239`（量）；X＝①T-glass 份額與第二來源在高階載板的認證（[734] 向你要文件）②已定價主參照（日本申報人沒有自家歷史）；
     反證連讀圖兩條與層說明 T4（玻璃核心）；等待 `ew_0436` 在 11-10（第 2 季決算說明會後）叫醒。順序符合 #26 的教訓：對照組先、敘事後
 - 裁決：（尚未到裁決點；日東紡 2026 年度第 2 季決算說明會 2026-11 上旬）
+  - 2026-10-18｜wfC：Ibiden（載板廠，客戶端）Q&A 說玻纖布供應商由日台兩家擴到可望第三、四家、採購風險在降（反證②部分觸及）；玻璃芯是真反向路徑但時鐘在 2027 下半以後、三星電機同時把最大投資押在有機 FCBGA 到 2028——T-glass 讀圖換版 `sr_0d8d2afdea2d7172`（volume 不變、窗口再短），日東紡敘事更正，入圖包 pq2 [800]。
 - failure log：
   - #43（名冊外的公司判不了邊緣——本 case 的日東紡、台玻、建榮也是目測）、#44（09-29 研究結論寫了「可能的薄層在上游」卻沒變成 lead）
 
