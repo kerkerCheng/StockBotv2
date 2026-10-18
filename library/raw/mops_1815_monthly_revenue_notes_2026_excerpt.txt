@@ -1,0 +1,21 @@
+Source URL: https://mopsov.twse.com.tw/nas/t21/otc/t21sc03_115_2_0.html ；https://mopsov.twse.com.tw/nas/t21/otc/t21sc03_115_4_0.html ；https://mopsov.twse.com.tw/nas/t21/otc/t21sc03_115_7_0.html ；https://mopsov.twse.com.tw/nas/t21/otc/t21sc03_115_8_0.html ；https://mopsov.twse.com.tw/nas/t21/otc/t21sc03_115_9_0.html
+
+Excerpt:
+[EXCERPT — 有限逐字引文] 1815.TWO 月營收彙總表的備註欄（MOPS 每月營業收入彙總表，發行人自填說明）
+RETRIEVED: Engine C monthly_revenue_observations（MOPS 月營收彙總頁的機械擷取；2026-10-18 匯出）
+NOTE: 只列有填備註的月份；備註是發行人自述。
+
+【2026-02 月營收（新台幣仟元 629,431）——備註；來源 https://mopsov.twse.com.tw/nas/t21/otc/t21sc03_115_2_0.html】
+"主要受高階薄布需求大幅增加。"
+
+【2026-04 月營收（新台幣仟元 733,783）——備註；來源 https://mopsov.twse.com.tw/nas/t21/otc/t21sc03_115_4_0.html】
+"主要受高階薄布需求大幅增加。"
+
+【2026-07 月營收（新台幣仟元 854,379）——備註；來源 https://mopsov.twse.com.tw/nas/t21/otc/t21sc03_115_7_0.html】
+"主要受惠於AI伺服器與高速傳輸需求帶動高階產品出貨比重提高，電子級玻纖布產品市場價格走高。"
+
+【2026-08 月營收（新台幣仟元 912,400）——備註；來源 https://mopsov.twse.com.tw/nas/t21/otc/t21sc03_115_8_0.html】
+"主要受惠於AI伺服器與高速傳輸需求帶動高階產品出貨比重提高，電子級玻纖布產品市場價格走高。"
+
+【2026-09 月營收（新台幣仟元 938,542）——備註；來源 https://mopsov.twse.com.tw/nas/t21/otc/t21sc03_115_9_0.html】
+"主要受惠於AI伺服器與高速傳輸需求帶動高階產品出貨比重提高，電子級玻纖布產品市場價格走高。"

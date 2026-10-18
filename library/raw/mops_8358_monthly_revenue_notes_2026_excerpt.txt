@@ -1,0 +1,18 @@
+Source URL: https://mopsov.twse.com.tw/nas/t21/otc/t21sc03_115_2_0.html ；https://mopsov.twse.com.tw/nas/t21/otc/t21sc03_115_7_0.html ；https://mopsov.twse.com.tw/nas/t21/otc/t21sc03_115_8_0.html ；https://mopsov.twse.com.tw/nas/t21/otc/t21sc03_115_9_0.html
+
+Excerpt:
+[EXCERPT — 有限逐字引文] 8358.TWO 月營收彙總表的備註欄（MOPS 每月營業收入彙總表，發行人自填說明）
+RETRIEVED: Engine C monthly_revenue_observations（MOPS 月營收彙總頁的機械擷取；2026-10-18 匯出）
+NOTE: 只列有填備註的月份；備註是發行人自述。
+
+【2026-02 月營收（新台幣仟元 850,914）——備註；來源 https://mopsov.twse.com.tw/nas/t21/otc/t21sc03_115_2_0.html】
+"本月營收較去年同期增加,係需求增加及優化產品組合所致"
+
+【2026-07 月營收（新台幣仟元 1,008,644）——備註；來源 https://mopsov.twse.com.tw/nas/t21/otc/t21sc03_115_7_0.html】
+"本月營收較去年同期增加,係需求增加及優化產品組合所致"
+
+【2026-08 月營收（新台幣仟元 1,056,242）——備註；來源 https://mopsov.twse.com.tw/nas/t21/otc/t21sc03_115_8_0.html】
+"本月營收較去年同期增加,係需求增加及優化產品組合所致"
+
+【2026-09 月營收（新台幣仟元 1,104,081）——備註；來源 https://mopsov.twse.com.tw/nas/t21/otc/t21sc03_115_9_0.html】
+"本月營收較去年同期增加,係需求增加及優化產品組合所致"
