@@ -1,0 +1,109 @@
+{
+  "claims": [
+    {
+      "confidence": 0.55,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：環宇季報／年報寫出 PD 產品營收或訂單下滑、市占說法消失，或模組廠／第三方一手寫出 200G PD 由其他廠（Coherent、Lumentum、中國 PD 廠）主供。核查頻率：每季（環宇月營收說明、季報、年報）。觸發後 48 小時：e1 降 confidence，重讀光二極體層供給側。",
+      "id": "mops_4991_annual_report_2025_photodiode_cl1",
+      "source_ids": [
+        "mops_4991_annual_report_2025_photodiode_s1",
+        "mops_4991_annual_report_2025_photodiode_s2",
+        "mops_4991_annual_report_2025_photodiode_s3",
+        "mops_4991_annual_report_2025_photodiode_s4"
+      ],
+      "statement": "GCS Holdings 2025 annual report: develops 200G PD and related transmitter parts for data center customers' 100G–1.6T optical transceivers and states its photodetector (PD) products 'already had a very high market share in 2025' (self-claim, no market definition, share figure or third-party source); in 2025 it developed a 200G/lane InGaAs PIN PD; own-brand optoelectronic component revenue rose about 44%, attributed to AI and data center high-speed transmission demand. Its largest customer was 66.19% of net sales in 2025 (57.88% in 2024), unnamed.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:photodiode",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "mops_4991_annual_report_2025_photodiode_s1",
+        "mops_4991_annual_report_2025_photodiode_s2",
+        "mops_4991_annual_report_2025_photodiode_s3"
+      ],
+      "src_id": "co:gcs_holdings"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "環宇-KY",
+        "環宇通訊半導體",
+        "GCS Holdings",
+        "Global Communication Semiconductors"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:gcs_holdings",
+      "name": "GCS Holdings（環宇-KY）",
+      "role": null,
+      "source_ids": [
+        "mops_4991_annual_report_2025_photodiode_s1",
+        "mops_4991_annual_report_2025_photodiode_s2",
+        "mops_4991_annual_report_2025_photodiode_s3",
+        "mops_4991_annual_report_2025_photodiode_s4"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "photodiodes",
+        "detectors"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:photodiode",
+      "name": "Photodiode (InP-based)",
+      "role": null,
+      "source_ids": [
+        "mops_4991_annual_report_2025_photodiode_s1",
+        "mops_4991_annual_report_2025_photodiode_s3"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "mops_4991_annual_report_2025_photodiode",
+    "evidence_tier": 1,
+    "origin_entity": "GCS Holdings, Inc.",
+    "permission_basis": "公開資訊觀測站公開年報；只保留研究必要的有限逐字節錄。published_at 取 MOPS 上傳時間（115/05/19）。",
+    "published_at": "2026-05-19",
+    "publisher": "公開資訊觀測站（股東會年報）",
+    "retrieved_at": "2026-10-18",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "環宇-KY（GCS Holdings）2025 年報：200G PD 供資料中心 100G–1.6T 光收發模組、自述「光探測器PD產品在2025年度已有極高的市佔率表現」；自有品牌光電元件營收年增約 44%；第一大客戶占 66.19%",
+    "url": "https://doc.twse.com.tw/server-java/t57sb01?step=9&kind=F&co_id=4991&filename=2025_4991_20260603F04.pdf"
+  },
+  "sources": [
+    {
+      "id": "mops_4991_annual_report_2025_photodiode_s1",
+      "locator": "致股東報告書——營運計畫",
+      "quote": "自有 品牌光電元件部分，為拓展市場規模及擴展客戶來源，本公司持續開發高毛利及應用於高 速之光通訊產品，包含 200G PD及相關發射端元件等項目，以滿足資料中心客戶對 100G至 1.6T或更高速光收發模組之需求，光探測器PD產品在2025年度已有極高的市佔率表現。"
+    },
+    {
+      "id": "mops_4991_annual_report_2025_photodiode_s2",
+      "locator": "致股東報告書——2025 年營收",
+      "quote": "而自有品牌光電元件(AOC)營收較去年度 增加約44%，係受惠於人工智慧(AI)及數據中心高速傳輸需求持續，帶動應用於數據中心 產品需求增"
+    },
+    {
+      "id": "mops_4991_annual_report_2025_photodiode_s3",
+      "locator": "營運概況——研發成果",
+      "quote": "2025 成功開發200G/Lane砷化銦鎵PIN光探測器(200G/Lane InGaAs PIN PD)"
+    },
+    {
+      "id": "mops_4991_annual_report_2025_photodiode_s4",
+      "locator": "風險管理——銷貨集中",
+      "quote": "本公司主要代工客戶多為全球一流IDM大廠或無晶圓廠設 計公司，而自有品牌光電元件產品之主要客戶則多為具規模之 下游封裝廠或模組廠商。2025及2024年度對第一大客戶之銷貨 淨額佔公司總銷貨淨額之比率分別為66.19%及57.88%。"
+    }
+  ]
+}
