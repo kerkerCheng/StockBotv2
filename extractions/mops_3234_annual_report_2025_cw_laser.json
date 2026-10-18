@@ -1,0 +1,112 @@
+{
+  "claims": [
+    {
+      "confidence": 0.5,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：光環季報／年報寫出矽光代工（CW 雷射）營收遠低於 2026 預估、或停止該代工服務；或 CW 雷射客戶端文件明寫不採用光環。核查頻率：每季（光環月營收說明、季報、年報）。觸發後 48 小時：e1 降 confidence，重讀 CW DFB 雷射層供給側列舉。",
+      "id": "mops_3234_annual_report_2025_cw_laser_cl1",
+      "source_ids": [
+        "mops_3234_annual_report_2025_cw_laser_s1",
+        "mops_3234_annual_report_2025_cw_laser_s2",
+        "mops_3234_annual_report_2025_cw_laser_s3",
+        "mops_3234_annual_report_2025_cw_laser_s4"
+      ],
+      "statement": "TrueLight 2025 annual report: has worked with well-known domestic and international companies to provide CW laser and automotive LiDAR OEM/ODM foundry production services for AI data center optical communication and silicon photonics; its 2026 plan expects 'cloud data center silicon photonics foundry services' to be 40.2% of revenue and expands capacity of photonic components for silicon photonics, offering epitaxy and foundry services for high-power CW lasers and high-speed photodetectors. Customers are coded (unnamed); 2025 net sales NT$683 million. The 2026 mix is the company's own forecast.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.65,
+      "dst_id": "tech:cw_dfb_laser",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "mops_3234_annual_report_2025_cw_laser_s1",
+        "mops_3234_annual_report_2025_cw_laser_s3"
+      ],
+      "src_id": "co:truelight"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "光環科技",
+        "光環",
+        "TrueLight"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:truelight",
+      "name": "TrueLight（光環科技）",
+      "role": null,
+      "source_ids": [
+        "mops_3234_annual_report_2025_cw_laser_s1",
+        "mops_3234_annual_report_2025_cw_laser_s2",
+        "mops_3234_annual_report_2025_cw_laser_s3",
+        "mops_3234_annual_report_2025_cw_laser_s4"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "CW laser",
+        "internal laser diode",
+        "high-power CW laser",
+        "CW DFB",
+        "CW DFB laser",
+        "DFB laser",
+        "high-power DFB laser"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:cw_dfb_laser",
+      "name": "High-power CW DFB laser",
+      "role": null,
+      "source_ids": [
+        "mops_3234_annual_report_2025_cw_laser_s1",
+        "mops_3234_annual_report_2025_cw_laser_s3"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "mops_3234_annual_report_2025_cw_laser",
+    "evidence_tier": 1,
+    "origin_entity": "TrueLight Corporation",
+    "permission_basis": "公開資訊觀測站公開年報；只保留研究必要的有限逐字節錄。published_at 取 MOPS 上傳時間。",
+    "published_at": "2026-05-08",
+    "publisher": "公開資訊觀測站（股東會年報）",
+    "retrieved_at": "2026-10-18",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "光環科技（TrueLight）2025 年報：與國內外知名大廠合作提供 CW 雷射 OEM／ODM 代工；2026 預估「雲端資料中心矽光應用代工服務」占營收 40.2%；擴充矽光子用光電元件產能、提供高功率 CW 雷射磊晶及代工",
+    "url": "https://doc.twse.com.tw/server-java/t57sb01?step=9&kind=F&co_id=3234&filename=2025_3234_20260529F04.pdf"
+  },
+  "sources": [
+    {
+      "id": "mops_3234_annual_report_2025_cw_laser_s1",
+      "locator": "營運概況——產業發展有利因素",
+      "quote": "已成功與國內外知名大廠合作，提供連續光波雷射(CW Laser)與車載光 達(LiDAR) OEM/ODM 代工生產服務，以佈局 AI 資料中心光通訊、矽光子、 機器人及無人駕駛龐及生物感測等龐大商機。"
+    },
+    {
+      "id": "mops_3234_annual_report_2025_cw_laser_s2",
+      "locator": "致股東報告書——2026 年度營業計畫：預期銷售",
+      "quote": "預估光通訊數據傳輸 應用佔總營收之 34.5%，智慧感測應用佔總營收之 18.7%，而雲端資料中心矽光應 用代工服務則佔總營收之 40.2%，高功率元件應用則預估佔總營收之 3.3%，其他 之銷售則預估佔總營收之 3.3%。"
+    },
+    {
+      "id": "mops_3234_annual_report_2025_cw_laser_s3",
+      "locator": "致股東報告書——重要之產銷政策",
+      "quote": "1.發揮垂直整合優勢，跨入矽光與 AI 應用的代工服務：整合上游磊晶、晶圓製造、 晶粒生產、封裝、可靠性驗證及光機電整合之一條龍製造與驗證能力，上游擴充 矽光子用光電元件的產能，提供高功率 CW 雷射及高速檢光元件的磊晶及代工服 務，下游光機電整合技術則與客戶開發模組，積極跨入矽光與AI 等高成長應用市 場。"
+    },
+    {
+      "id": "mops_3234_annual_report_2025_cw_laser_s4",
+      "locator": "營運概況——主要銷貨客戶（代號）",
+      "quote": "2.銷貨總額百分之十以上之客戶名單： 單位：新台幣仟元 項目 114 年度 113 年度 名 稱 金 額 占全年度 銷貨淨額 比率(%) 與發行人 之關係 名 稱 金 額 占全年度 銷貨淨額 比率(%) 與發行人 之關係 1 T0436 82,922 12 無 E0113 102,067 18 無 2 E0113 79,260 12 無 AC012.1 66,371 12 無 3 T0124 70,044 10 無 其他 451,050 66 其他 405,314 70 銷貨淨額 683,276 100 銷貨淨額 573,752 100 增減變動原因：客戶產品需求變動。"
+    }
+  ]
+}
