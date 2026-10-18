@@ -1962,6 +1962,33 @@
         "沪士电子",
         "WUS"
       ]
+    },
+    {
+      "_display_name_source": "yfinance longName（2026-10-18）；交易所 NMS",
+      "_note": "名冊批次草稿（2026-10-18）：系統口徑邊緣、lead 把它放在供給側、而且對得上圖上現有的缺口：VIAV（光學測試量測，CPO 測試層供給側列舉缺）、COHU（半導體測試設備，同上）、TTMI（多層板，高速 PCB／CCL 層在圖上是 0 節點）。同批標成供給側但不收：SIMO、RMBS（記憶體鏈，不是現行主動 onboarding 的層）、TWST（AI 生醫，B1 已結案）。名字別名留空待人補。；系統口徑 edge（約 82.1 億美元、分析師 7 家）；lead：lead_3ecbb88f2a25a59854e1aadecf44f1da",
+      "company_id": "co:viavi_solutions",
+      "display_name": "Viavi Solutions Inc.",
+      "market_currency": "USD",
+      "name_aliases": [],
+      "research_ticker": "VIAV"
+    },
+    {
+      "_display_name_source": "yfinance longName（2026-10-18）；交易所 NMS",
+      "_note": "名冊批次草稿（2026-10-18）：系統口徑邊緣、lead 把它放在供給側、而且對得上圖上現有的缺口：VIAV（光學測試量測，CPO 測試層供給側列舉缺）、COHU（半導體測試設備，同上）、TTMI（多層板，高速 PCB／CCL 層在圖上是 0 節點）。同批標成供給側但不收：SIMO、RMBS（記憶體鏈，不是現行主動 onboarding 的層）、TWST（AI 生醫，B1 已結案）。名字別名留空待人補。；系統口徑 edge（約 24.1 億美元、分析師 8 家）；lead：lead_46c831193c2d6f7563c5a8f59e25bd3c",
+      "company_id": "co:cohu",
+      "display_name": "Cohu, Inc.",
+      "market_currency": "USD",
+      "name_aliases": [],
+      "research_ticker": "COHU"
+    },
+    {
+      "_display_name_source": "yfinance longName（2026-10-18）；交易所 NMS",
+      "_note": "名冊批次草稿（2026-10-18）：系統口徑邊緣、lead 把它放在供給側、而且對得上圖上現有的缺口：VIAV（光學測試量測，CPO 測試層供給側列舉缺）、COHU（半導體測試設備，同上）、TTMI（多層板，高速 PCB／CCL 層在圖上是 0 節點）。同批標成供給側但不收：SIMO、RMBS（記憶體鏈，不是現行主動 onboarding 的層）、TWST（AI 生醫，B1 已結案）。名字別名留空待人補。；系統口徑 edge（約 98.9 億美元、分析師 5 家）；lead：lead_ffdc392c947397e9a649b634ed41f0c8",
+      "company_id": "co:ttm",
+      "display_name": "TTM Technologies, Inc.",
+      "market_currency": "USD",
+      "name_aliases": [],
+      "research_ticker": "TTMI"
     }
   ]
 }
