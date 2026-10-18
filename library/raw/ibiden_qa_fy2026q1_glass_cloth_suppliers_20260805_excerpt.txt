@@ -1,0 +1,10 @@
+Source URL: https://www.ibiden.com/ir/items/en_QA_FY2026Q1.pdf
+
+Excerpt:
+[EXCERPT — 有限逐字引文] IBIDEN Co., Ltd.（4062.T）Key Q&A: Financial Presentation for the 1st quarter Year Ended March 31, 2027（公司 IR 網站，2026-08-05）節錄：載板需求與玻纖布供應
+RETRIEVED: 2026-10-18（PDF 本機抽字、空白正規化後逐字核對）
+NOTE: 第三、四家玻纖布供應商未具名；「Japan and Taiwan」的兩家也未具名。
+
+"[Q] I understand that the decision-making timing for capacity expansion has been brought forward from "between this fiscal year and next fiscal year" to "by the end of this fiscal year at the latest." Is there any priority in this decision-making? [A] There is no priority. Currently, we are receiving inquiries for large, high-multilayer IC package substrates from all customers. We believe that demand will continue to significantly exceed the industry's supply capacity. We are exploring all possible options."
+
+"<Questioner 2> [Q] Compared to the beginning of the fiscal year, the forecast for glass cloth supply seems to have improved. What are the main reasons for this improvement? [A] The biggest factor is the increase in the number of suppliers. Previously, there were only two suppliers in Japan and Taiwan, but we now have prospects for using a third and fourth supplier for mass production. Furthermore, a Japanese supplier plans to increase production capacity until the next fiscal year, so we expect material procurement risks to decrease."
