@@ -1776,6 +1776,192 @@
         "Precision Wires India",
         "Precision Wires India Limited"
       ]
+    },
+    {
+      "company_id": "co:oncor_electric_delivery",
+      "research_ticker": null,
+      "display_name": "Oncor Electric Delivery Company LLC",
+      "_display_name_source": "SEC 8-K 2025-11-05 EX-99.1 新聞稿內文「Oncor Electric Delivery Company LLC (Oncor)」；EDGAR 註冊名 ONCOR ELECTRIC DELIVERY CO LLC（CIK 0001193311）",
+      "_note": "股權未上市（因公開債向 SEC 申報；研究 ticker 明確 null，INV-1）：德州輸配電業者，LPT 買方。入圖包見 lpt_buyers_oncor_corz_fermi_2026_10_18_action.json",
+      "name_aliases": [
+        "Oncor"
+      ]
+    },
+    {
+      "company_id": "co:core_scientific",
+      "research_ticker": "CORZ",
+      "market_currency": "USD",
+      "execution_currency": "USD",
+      "execution_venue": "NASDAQ",
+      "display_name": "Core Scientific, Inc.",
+      "_display_name_source": "SEC 10-K 2026-03-02 封面「Core Scientific, Inc.」（Exact name of registrant as specified in its charter）；Trading Symbol CORZ, The Nasdaq Global Select Market",
+      "_note": "非邊緣（市值 4.33B、分析師 21，2026-10-18 alpha edge）；AI 資料中心託管業者，LPT 買方。入圖包見 lpt_buyers_oncor_corz_fermi_2026_10_18_action.json",
+      "name_aliases": [
+        "Core Scientific"
+      ]
+    },
+    {
+      "company_id": "co:fermi",
+      "research_ticker": "FRMI",
+      "market_currency": "USD",
+      "execution_currency": "USD",
+      "execution_venue": "NASDAQ",
+      "display_name": "Fermi Inc.",
+      "_display_name_source": "SEC 10-K 2026-03-30 封面「Fermi Inc.」（Exact name of registrant）；Trading Symbol FRMI, The Nasdaq Stock Market LLC（另掛 London Stock Exchange）",
+      "_note": "邊緣（市值 2.03B、分析師 8，2026-10-18 alpha edge）——但在圖上是買方（Project Matador 發電＋資料中心園區），不是供給側。不收裸「Fermi」（Enrico Fermi 核電廠、Fermilab 都會撞）。入圖包見 lpt_buyers_oncor_corz_fermi_2026_10_18_action.json",
+      "name_aliases": [
+        "Fermi America"
+      ]
+    },
+    {
+      "company_id": "co:gcs_holdings",
+      "research_ticker": "4991.TWO",
+      "market_currency": "TWD",
+      "execution_currency": "TWD",
+      "execution_venue": "TPEX",
+      "display_name": "GCS Holdings, Inc.",
+      "_display_name_source": "MOPS 2025 年報封面「英屬蓋曼群島商環宇通訊半導體控股股份有限公司 GCS Holdings, Inc.」；股票代號 4991（櫃買）",
+      "_note": "邊緣（市值 1.66B、分析師 5，2026-10-18 alpha edge）：III-V 晶圓代工（RF、光電）＋自有品牌光電元件（InGaAs PIN PD 等）；營運主體 Global Communication Semiconductors, LLC（美國 Torrance 4 吋廠）。入圖包見 photodiode_gcs_2025_annual_report_action.json",
+      "name_aliases": [
+        "環宇-KY",
+        "環宇通訊半導體",
+        "GCS Holdings",
+        "Global Communication Semiconductors"
+      ]
+    },
+    {
+      "company_id": "co:semtech",
+      "research_ticker": "SMTC",
+      "market_currency": "USD",
+      "execution_currency": "USD",
+      "execution_venue": "NASDAQ",
+      "display_name": "Semtech Corporation",
+      "_display_name_source": "SEC 10-K 2026-03-23 封面「SEMTECH CORPORATION」（Exact name of registrant as specified in its charter）；Trading Symbol SMTC, The Nasdaq Global Select Market",
+      "_note": "非邊緣（市值約 127.6 億美元、分析師 15，2026-10-18 名冊候選分層）：光模組 TIA、驅動器、線性等化器（SiGe，Tower 代工）。入圖包見 sige_tower_semtech_2026_10_13_action.json",
+      "name_aliases": [
+        "Semtech"
+      ]
+    },
+    {
+      "company_id": "co:truelight",
+      "research_ticker": "3234.TWO",
+      "market_currency": "TWD",
+      "execution_currency": "TWD",
+      "execution_venue": "TPEX",
+      "display_name": "TrueLight Corporation",
+      "_display_name_source": "MOPS 114 年度年報封面「光環科技股份有限公司 TrueLight Corporation」；股票代碼 3234（櫃買）",
+      "_note": "邊緣無法量（市值約 6.9 億美元、分析師家數量不到，2026-10-18 alpha edge）：GaAs／InP 光電元件垂直整合（VCSEL、PD、CW 雷射 OEM／ODM 代工、矽光代工）。注意：與華星光（LuxNet，4979）不同家。入圖包見 cw_dfb_truelight_2025_annual_report_action.json",
+      "name_aliases": [
+        "光環科技",
+        "光環",
+        "TrueLight"
+      ]
+    },
+    {
+      "company_id": "co:taiwan_union_technology",
+      "research_ticker": "6274.TWO",
+      "market_currency": "TWD",
+      "execution_currency": "TWD",
+      "execution_venue": "TPEX",
+      "display_name": "台燿科技股份有限公司",
+      "_display_name_source": "MOPS 2025 年報內文「台燿科技股份有限公司」；英文 TAIWAN UNION TECHNOLOGY（同份年報）",
+      "_note": "非邊緣（市值約 143.8 億美元、分析師 15，2026-10-18 alpha edge）：高速 CCL。入圖包見 pcb_materials_layer_2026_10_18_action.json",
+      "name_aliases": [
+        "台燿",
+        "Taiwan Union Technology"
+      ]
+    },
+    {
+      "company_id": "co:co_tech",
+      "research_ticker": "8358.TWO",
+      "market_currency": "TWD",
+      "execution_currency": "TWD",
+      "execution_venue": "TPEX",
+      "display_name": "CO-TECH DEVELOPMENT CORP.",
+      "_display_name_source": "MOPS 2025 年報封面「金居開發股份有限公司 CO-TECH DEVELOPMENT CORP.」；股票代號 8358（櫃買）",
+      "_note": "邊緣（市值約 36.8 億美元、分析師 4，2026-10-18 alpha edge）：電解銅箔（HVLP3／HVLP4）。入圖包見 pcb_materials_layer_2026_10_18_action.json",
+      "name_aliases": [
+        "金居",
+        "金居開發",
+        "Co-Tech"
+      ]
+    },
+    {
+      "company_id": "co:mitsui_kinzoku",
+      "research_ticker": "5706.T",
+      "market_currency": "JPY",
+      "execution_currency": "JPY",
+      "execution_venue": "TSE",
+      "display_name": "Mitsui Kinzoku Co., Ltd.",
+      "_display_name_source": "2027 年 3 月期第 1 四半期決算説明資料（2026-08-07）每頁頁尾「Copyright © Mitsui Kinzoku Co., Ltd.」、封面「三井金属株式会社（5706）」",
+      "_note": "邊緣（市值約 84.7 億美元、分析師 10，2026-10-18 alpha edge）：極薄銅箔、VSP（HVLP）銅箔、FaradFlex。入圖包見 pcb_materials_layer_2026_10_18_action.json",
+      "name_aliases": [
+        "三井金属",
+        "三井金屬",
+        "Mitsui Kinzoku",
+        "Mitsui Mining & Smelting"
+      ]
+    },
+    {
+      "company_id": "co:elite_material",
+      "research_ticker": "2383.TW",
+      "market_currency": "TWD",
+      "execution_currency": "TWD",
+      "execution_venue": "TWSE",
+      "display_name": "台光電子材料股份有限公司",
+      "_display_name_source": "MOPS 2025 年報（股東會後修訂本）內文「台光電子材料股份有限公司」",
+      "_note": "非邊緣（市值約 570.7 億美元、分析師 18，2026-10-18 alpha edge）：高速 CCL 龍頭。不收「EMC」（太短、撞 Dell EMC 等）。入圖包見 pcb_materials_layer_2026_10_18_action.json",
+      "name_aliases": [
+        "台光電",
+        "台光電子",
+        "Elite Material"
+      ]
+    },
+    {
+      "company_id": "co:taiwan_glass",
+      "research_ticker": "1802.TW",
+      "market_currency": "TWD",
+      "execution_currency": "TWD",
+      "execution_venue": "TWSE",
+      "display_name": "台灣玻璃工業股份有限公司",
+      "_display_name_source": "MOPS 2025 年度年報封面「台灣玻璃工業股份有限公司編製」；股票代碼 1802",
+      "_note": "邊緣（市值約 60.0 億美元、分析師 1，2026-10-18 alpha edge）：平板玻璃＋電子級玻纖布（Low Dk、Low CTE）。入圖包見 pcb_materials_layer_2026_10_18_action.json",
+      "name_aliases": [
+        "台玻",
+        "台灣玻璃",
+        "Taiwan Glass"
+      ]
+    },
+    {
+      "company_id": "co:fulltech_fiber_glass",
+      "research_ticker": "1815.TWO",
+      "market_currency": "TWD",
+      "execution_currency": "TWD",
+      "execution_venue": "TPEX",
+      "display_name": "富喬工業股份有限公司",
+      "_display_name_source": "MOPS 114 年度年報內文「富喬工業股份有限公司」；股票代碼 1815（櫃買）",
+      "_note": "邊緣無法量（市值約 26.5 億美元、分析師家數量不到，2026-10-18 研究員 alpha edge）：電子級玻纖紗、布垂直整合（LowDk）。入圖包見 pcb_materials_layer_2026_10_18_action.json",
+      "name_aliases": [
+        "富喬",
+        "富喬工業",
+        "Fulltech"
+      ]
+    },
+    {
+      "company_id": "co:wus_printed_circuit",
+      "research_ticker": "002463.SZ",
+      "market_currency": "CNY",
+      "execution_currency": "CNY",
+      "execution_venue": "SZSE",
+      "display_name": "沪士电子股份有限公司",
+      "_display_name_source": "巨潮 2025 年度報告封面「沪士电子股份有限公司」；深交所 002463",
+      "_note": "非邊緣（市值約 326.8 億美元、分析師 7，2026-10-18 alpha edge）：高階多層 PCB（交換機、AI 伺服器）——在本層是材料的買方。入圖包見 pcb_materials_layer_2026_10_18_action.json",
+      "name_aliases": [
+        "沪电股份",
+        "滬電",
+        "沪士电子",
+        "WUS"
+      ]
     }
   ]
 }
