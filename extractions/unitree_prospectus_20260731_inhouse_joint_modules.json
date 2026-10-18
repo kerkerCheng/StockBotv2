@@ -1,0 +1,141 @@
+{
+  "claims": [
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：宇樹的季報／年報或公告寫出關節模組、減速器或電機改為外購、具名外部關節或減速器供應商，或其前五大供應商出現關節／減速器廠。核查頻率：每半年（宇樹半年報、年報）。觸發後 48 小時：e1 降 confidence，重讀人形致動器層的需求側（外部供應商能否拿到宇樹的量）。",
+      "id": "unitree_prospectus_20260731_inhouse_joint_modules_cl1",
+      "source_ids": [
+        "unitree_prospectus_20260731_inhouse_joint_modules_s1",
+        "unitree_prospectus_20260731_inhouse_joint_modules_s2",
+        "unitree_prospectus_20260731_inhouse_joint_modules_s3",
+        "unitree_prospectus_20260731_inhouse_joint_modules_s4",
+        "unitree_prospectus_20260731_inhouse_joint_modules_s5"
+      ],
+      "statement": "Unitree's final STAR Market prospectus (2026-07-31) says it develops and produces its robot joint modules in-house ('关节模组的自研自产'), describing the joint module as the most core component of a humanoid robot and saying in-house motors reduce its dependence on the external supply chain; its production covers motors, reducers and joint modules, and it also sells joint modules as robot components. Raw-material supply is described as ample, and the top five raw-material suppliers were 22.07%/26.44%/22.54% of purchases (2023–2025), mostly anonymized. For third-party actuator, reducer and joint-motor suppliers this means the largest-volume humanoid maker in this filing is not a customer.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "comp:humanoid_precision_actuators",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "unitree_prospectus_20260731_inhouse_joint_modules_s1",
+        "unitree_prospectus_20260731_inhouse_joint_modules_s2",
+        "unitree_prospectus_20260731_inhouse_joint_modules_s3"
+      ],
+      "src_id": "co:unitree"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "tech:humanoid_robot_systems",
+      "id": "e2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "unitree_prospectus_20260731_inhouse_joint_modules_s2"
+      ],
+      "src_id": "co:unitree"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "robot_system",
+      "aliases": [
+        "Unitree",
+        "宇樹"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "co:unitree",
+      "name": "Unitree Robotics（宇樹科技）",
+      "role": null,
+      "source_ids": [
+        "unitree_prospectus_20260731_inhouse_joint_modules_s1",
+        "unitree_prospectus_20260731_inhouse_joint_modules_s2",
+        "unitree_prospectus_20260731_inhouse_joint_modules_s3",
+        "unitree_prospectus_20260731_inhouse_joint_modules_s4",
+        "unitree_prospectus_20260731_inhouse_joint_modules_s5"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "robot_subsystem",
+      "aliases": [
+        "precision actuators",
+        "series elastic actuators",
+        "quasi-direct-drive motors",
+        "precision reducers"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "comp:humanoid_precision_actuators",
+      "name": "Humanoid precision actuators (series elastic / quasi-direct-drive / precision reducers)",
+      "role": null,
+      "source_ids": [
+        "unitree_prospectus_20260731_inhouse_joint_modules_s1",
+        "unitree_prospectus_20260731_inhouse_joint_modules_s2",
+        "unitree_prospectus_20260731_inhouse_joint_modules_s3"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "robot_system",
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.8,
+      "id": "tech:humanoid_robot_systems",
+      "name": "Humanoid robot systems",
+      "role": null,
+      "source_ids": [
+        "unitree_prospectus_20260731_inhouse_joint_modules_s2"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "unitree_prospectus_20260731_inhouse_joint_modules",
+    "evidence_tier": 1,
+    "origin_entity": "宇树科技股份有限公司",
+    "permission_basis": "上交所科创板公開招股文件（巨潮資訊）；只保留研究必要的有限逐字節錄。published_at 取巨潮公告日。",
+    "published_at": "2026-07-31",
+    "publisher": "巨潮资讯（上交所科创板招股意向书）",
+    "retrieved_at": "2026-10-18",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "宇树科技 科创板招股意向书（2026-07-31）：关节模组、电机、减速器自研自产（「降低了对外部供应链的依赖」）；原材料供应充足、前五大供应商占采购约 22–26%",
+    "url": "http://static.cninfo.com.cn/finalpage/2026-07-31/1225449783.PDF"
+  },
+  "sources": [
+    {
+      "id": "unitree_prospectus_20260731_inhouse_joint_modules_s1",
+      "locator": "第五节 业务与技术——核心技术 10「核心零部件自研与高性能执行机构」",
+      "quote": "公司实现机器人核心零部件关节模组的自研自产，确保 关键零部件完全可控。关节模组是人形机器人最核心的 零部件，决定了机器人的性能极限。公司电机在峰值扭 矩、功率密度上均超过同时期行业平均水平。电机自研 能力让公司可以在较大的窗口内进行机器人正向设计， 为整机运动性能提供可靠基础，同时降低了对外部供应 链的依赖。"
+    },
+    {
+      "id": "unitree_prospectus_20260731_inhouse_joint_modules_s2",
+      "locator": "第五节 业务与技术——三、销售情况（一）主要产品的生产情况",
+      "quote": "公司主要生产环节包括电机、 减速器及关节模组、 电池模块、 电路模块、 结 构部件等各部组件与整机产品的生产、 装配及测试， 属于柔性生产模式。"
+    },
+    {
+      "id": "unitree_prospectus_20260731_inhouse_joint_modules_s3",
+      "locator": "第五节 业务与技术——主要产品（机器人组件）",
+      "quote": "除上述组件产品外， 公司其他机器人组件还包括关节模组、 高算力套件"
+    },
+    {
+      "id": "unitree_prospectus_20260731_inhouse_joint_modules_s4",
+      "locator": "第五节 业务与技术——四、采购情况（主要原材料采购价格）",
+      "quote": "报告期内， 公司主要原材料的市场供应充足， 采购均参考市场价格， 价格总 体保持稳定。"
+    },
+    {
+      "id": "unitree_prospectus_20260731_inhouse_joint_modules_s5",
+      "locator": "第五节 业务与技术——四、采购情况（前五名原材料供应商）",
+      "quote": "报告期内， 公司向前五大供应商采购额占当期原材料总采购额的比例分别为 22.07%、26.44%及 22.54%，集中度较低，不存在向单个供应商的采购占比超 过 50.00%的情况。"
+    }
+  ]
+}
