@@ -13,6 +13,17 @@
       ],
       "statement": "GCS Holdings 2025 annual report: develops 200G PD and related transmitter parts for data center customers' 100G–1.6T optical transceivers and states its photodetector (PD) products 'already had a very high market share in 2025' (self-claim, no market definition, share figure or third-party source); in 2025 it developed a 200G/lane InGaAs PIN PD; own-brand optoelectronic component revenue rose about 44%, attributed to AI and data center high-speed transmission demand. Its largest customer was 66.19% of net sales in 2025 (57.88% in 2024), unnamed.",
       "subject_id": "e1"
+    },
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：主流 800G／1.6T 光收發模組改用不需要分立 PD 的接收端（例如矽鍺光偵測器整進矽光晶片）並量產，一手寫出。核查頻率：每年（光模組廠與 PD 供應商年報、OFC）。觸發後 48 小時：e2 加註，重讀 InP 磊晶與光偵測器相關讀圖的需求側。",
+      "id": "mops_4991_annual_report_2025_photodiode_cl2",
+      "source_ids": [
+        "mops_4991_annual_report_2025_photodiode_s1"
+      ],
+      "statement": "GCS Holdings annual report 2025 (shareholder letter): it develops high-speed optical-communication products including 200G PD and related transmitter components to meet data-center customers' demand for 100G to 1.6T and faster optical transceiver modules — photodiodes are a receive-side component of pluggable optical transceivers. Supplier statement of the application; no transceiver maker is named.",
+      "subject_id": "e2"
     }
   ],
   "edges": [
@@ -28,6 +39,17 @@
         "mops_4991_annual_report_2025_photodiode_s3"
       ],
       "src_id": "co:gcs_holdings"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "tech:photodiode",
+      "id": "e2",
+      "relation": "depends_on",
+      "source_ids": [
+        "mops_4991_annual_report_2025_photodiode_s1"
+      ],
+      "src_id": "tech:pluggable_transceiver"
     }
   ],
   "nodes": [
@@ -68,6 +90,29 @@
         "mops_4991_annual_report_2025_photodiode_s3"
       ],
       "type": "TechNode"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "pluggable transceivers",
+        "800G transceiver",
+        "1.6T transceiver",
+        "1.6T transceivers",
+        "OSFP",
+        "Pluggable Transceivers",
+        "pluggables",
+        "pluggable optical interconnects",
+        "optical pluggables"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:pluggable_transceiver",
+      "name": "Pluggable optical transceiver",
+      "role": null,
+      "source_ids": [
+        "mops_4991_annual_report_2025_photodiode_s1"
+      ],
+      "type": "TechNode"
     }
   ],
   "schema_version": "0.1",
@@ -78,9 +123,10 @@
     "permission_basis": "公開資訊觀測站公開年報；只保留研究必要的有限逐字節錄。published_at 取 MOPS 上傳時間（115/05/19）。",
     "published_at": "2026-05-19",
     "publisher": "公開資訊觀測站（股東會年報）",
-    "retrieved_at": "2026-10-18",
+    "retrieved_at": "2026-10-19",
     "source_type": "filing",
     "storage_permission": "repo_excerpt",
+    "supersedes_extraction_sha256": "f6a8510f73cf3ecb2965a8db5aa396bdd38488be1cafa62783327623ac2330f3",
     "title": "環宇-KY（GCS Holdings）2025 年報：200G PD 供資料中心 100G–1.6T 光收發模組、自述「光探測器PD產品在2025年度已有極高的市佔率表現」；自有品牌光電元件營收年增約 44%；第一大客戶占 66.19%",
     "url": "https://doc.twse.com.tw/server-java/t57sb01?step=9&kind=F&co_id=4991&filename=2025_4991_20260603F04.pdf"
   },
