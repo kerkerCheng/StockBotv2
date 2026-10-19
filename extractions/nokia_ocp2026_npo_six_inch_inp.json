@@ -1,0 +1,116 @@
+{
+  "claims": [
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：Nokia 一手（季報 6-K、20-F、法說）寫出 San Jose 6 吋廠延後或取消、Arizona 收購未完成；或寫出 San Jose 已量產（後者是加強——6 吋 InP 層讀圖的反證①會醒）。核查頻率：每季（Nokia 季報 6-K）。觸發後 48 小時：重讀 6 吋 InP 產線層的供給側列舉與時鐘。",
+      "id": "nokia_ocp2026_npo_six_inch_inp_cl1",
+      "source_ids": [
+        "nokia_ocp2026_npo_six_inch_inp_s1",
+        "nokia_ocp2026_npo_six_inch_inp_s2",
+        "nokia_ocp2026_npo_six_inch_inp_s3",
+        "nokia_ocp2026_npo_six_inch_inp_s4"
+      ],
+      "statement": "Nokia (supplier self-statement) at OCP Global Summit 2026: 'Nokia: 6-inch InP platform' — 3-inch Sunnyvale (1st InP fab), new 6-inch San Jose (2nd InP fab) and new 6-inch Arizona (3rd InP fab); 'Nokia is investing in 6-inch manufacturing to significantly scale capacity.' Nokia's Q2 2026 6-K (same origin, not a second source) says the new San Jose fab is on track to begin ramping production later in Q4 2026 and the Arizona site (NXP Chandler) will be converted to InP production after leasing capacity from early 2027. Development, not volume production. The slide's 'Customers are asking for ~10x InP volume by the end of the decade' is the supplier relaying customers' forecast (context only).",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "tech:six_inch_inp_production",
+      "id": "e1",
+      "relation": "develops",
+      "source_ids": [
+        "nokia_ocp2026_npo_six_inch_inp_s1",
+        "nokia_ocp2026_npo_six_inch_inp_s2",
+        "nokia_ocp2026_npo_six_inch_inp_s3"
+      ],
+      "src_id": "co:nokia"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "foundry_packaging",
+      "aliases": [
+        "Nokia",
+        "Nokia Corporation"
+      ],
+      "attributes": {
+        "ticker": "NOK"
+      },
+      "confidence": 0.9,
+      "id": "co:nokia",
+      "name": "Nokia",
+      "role": null,
+      "source_ids": [
+        "nokia_ocp2026_npo_six_inch_inp_s1",
+        "nokia_ocp2026_npo_six_inch_inp_s3"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "foundry_packaging",
+      "aliases": [
+        "six-inch indium phosphide line",
+        "6-inch InP",
+        "6-inch InP lines",
+        "6-inch production",
+        "6-inch indium phosphide fab"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:six_inch_inp_production",
+      "name": "Six-inch InP wafer production line",
+      "role": null,
+      "source_ids": [
+        "nokia_ocp2026_npo_six_inch_inp_s1",
+        "nokia_ocp2026_npo_six_inch_inp_s2",
+        "nokia_ocp2026_npo_six_inch_inp_s3"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "nokia_ocp2026_npo_six_inch_inp",
+    "evidence_tier": 1,
+    "origin_entity": "Nokia Corporation",
+    "permission_basis": "OCP Global Summit 2026 公開場次投影片（Nokia，Armaghan Eshaghi〈Architecting Near-Packaged Optics for AI Datacenters〉；OCP 官方錄影頁連結的 Dropbox 檔案）；只保留研究必要的有限逐字節錄。投影片無日期，published_at 留空（會期 2026-10-12～10-15）。",
+    "published_at": null,
+    "publisher": "Open Compute Project（OCP Global Summit 2026 recorded content；投影片由 OCP 錄影頁連結）",
+    "retrieved_at": "2026-10-19",
+    "source_type": "paper",
+    "storage_permission": "repo_excerpt",
+    "title": "Nokia, Architecting Near-Packaged Optics for AI Datacenters: Key Technology Choices and Trade-offs（OCP Global Summit 2026）p.7：Nokia 6 吋 InP 平台（San Jose、Arizona 兩座新廠）",
+    "url": "https://www.dropbox.com/scl/fi/42j8sgypar1upllsuthb4/Architecting-Near-Packaged-Optics-for-AI-Datacenters-Key-Technology-Choices-and-Trade-offs.pdf?rlkey=r83lai0rwlp4o0dnazu33i0kk&dl=0"
+  },
+  "sources": [
+    {
+      "id": "nokia_ocp2026_npo_six_inch_inp_s1",
+      "locator": "p.7 標題",
+      "quote": "Nokia: 6-inch InP platform"
+    },
+    {
+      "id": "nokia_ocp2026_npo_six_inch_inp_s2",
+      "locator": "p.7 產線",
+      "quote": "3-inch · Sunnyvale 1st InP fab 6-inch · San Jose 2nd InP fab · New 6-inch · Arizona 3rd InP fab · New"
+    },
+    {
+      "id": "nokia_ocp2026_npo_six_inch_inp_s3",
+      "locator": "p.7",
+      "quote": "Nokia is investing in 6-inch manufacturing to significantly scale capacity."
+    },
+    {
+      "id": "nokia_ocp2026_npo_six_inch_inp_s4",
+      "locator": "p.7（客戶推估，L4 只當脈絡）",
+      "quote": "Customers are asking for ~10× InP volume by the end of the decade."
+    },
+    {
+      "id": "nokia_ocp2026_npo_six_inch_inp_s5",
+      "locator": "p.6 量產組裝條件",
+      "quote": "Known-good-die lasers and PICs; wafer -level test."
+    }
+  ]
+}

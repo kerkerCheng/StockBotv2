@@ -1,0 +1,22 @@
+Source URL: https://www.dropbox.com/scl/fi/42j8sgypar1upllsuthb4/Architecting-Near-Packaged-Optics-for-AI-Datacenters-Key-Technology-Choices-and-Trade-offs.pdf?rlkey=r83lai0rwlp4o0dnazu33i0kk&dl=0
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Nokia, Architecting Near-Packaged Optics for AI Datacenters: Key Technology Choices and Trade-offs（OCP Global Summit 2026）p.7：Nokia 6 吋 InP 平台（San Jose、Arizona 兩座新廠）
+
+Source: https://www.dropbox.com/scl/fi/42j8sgypar1upllsuthb4/Architecting-Near-Packaged-Optics-for-AI-Datacenters-Key-Technology-Choices-and-Trade-offs.pdf?rlkey=r83lai0rwlp4o0dnazu33i0kk&dl=0
+NOTE: pypdf 抽字、空白正規化後逐字（「wafer -level」照抽字原樣）。投影片無日期（會期 2026-10-12～15）。供應商自述（L8 弱主張）；「~10× InP volume」是轉述客戶推估，L4 只當脈絡。
+
+【p.7 標題】
+Nokia: 6-inch InP platform
+
+【p.7 產線】
+3-inch · Sunnyvale 1st InP fab 6-inch · San Jose 2nd InP fab · New 6-inch · Arizona 3rd InP fab · New
+
+【p.7】
+Nokia is investing in 6-inch manufacturing to significantly scale capacity.
+
+【p.7（客戶推估，L4 只當脈絡）】
+Customers are asking for ~10× InP volume by the end of the decade.
+
+【p.6 量產組裝條件】
+Known-good-die lasers and PICs; wafer -level test.
