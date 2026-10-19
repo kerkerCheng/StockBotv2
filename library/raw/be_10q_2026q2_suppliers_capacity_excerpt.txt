@@ -1,0 +1,22 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1664703/000162828026050247/be-20260630.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Bloom Energy Form 10-Q 2026 Q2（2026-07-28 申報）營收拆分表
+DATE: 2026-07-28
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 發行人文件是自述（L8 弱主張）；媒體只當線索；第三方海關彙整站是 CBP 艙單的第三方轉載。
+
+【Bloom Energy Form 10-Q 2026 Q2（2026-07-28 申報）營收拆分表：產品營收（千美元；欄位依序為 2026 與 2025 年 Q2 三個月、2026 與 2025 年 1–6 月）】
+"We disaggregate revenue from contracts with customers into four revenue categories: product, installation, service and 13 electricity (in thousands): Three Months Ended Six Months Ended June 30, June 30, 2026 2025 2026 2025 Revenue from contracts with customers: Product revenue $ 935,413 $ 296,611 $ 1,588,761 $ 508,480"
+
+【同上 10-Q MD&A——產品營收】
+"Product revenue increased by $638.8 million and $1.1 billion, or 215.4% and 212.5%, for the three and six months ended June 30, 2026, respectively, compared to the corresponding periods in the prior year. The increase was primarily due to stronger demand for our power solutions to meet the time‑to‑power needs of a growing market, including a significant deployment for a large AI infrastructure customer and multiple projects executed through the joint venture with Brookfield."
+
+【同上 10-Q MD&A——供應鏈：為單一或少數來源零件認證多家供應商】
+"although throughout 2026 there has been a general worldwide shortage of electronic components, we have continued to not experience significant component shortages, electronic or otherwise to date. Approaches we have taken as we continue to scale our manufacturing include supplier diversification and qualifying multiple suppliers for single or limited source components, enhancing our predictive analytics capabilities, and employing flexible sourcing strategies."
+
+【同上 10-Q MD&A——產能投資（Fremont、Delmarva）】
+"We expect to continue to make capital investments to expand production capacity at our manufacturing facilities in Fremont, California and Delmarva, Delaware. These investments, which include the purchase of new equipment and tenant improvements, are part of our strategic plan to continually increase capacity to meet orders and customer deliver requirements."
+
+【同上 10-Q Item 1A——供應商與採購安排視為機密】
+"we may be constrained in the manner in which we can proceed against the relevant short seller by applicable state law or issues of commercial confidentiality, including because we treat information regarding our suppliers and sourcing arrangements as confidential and proprietary."

@@ -1,0 +1,10 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1039399/000103939926000023/form-20260328.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] FormFactor, Inc. Form 10-Q（quarter ended March 28, 2026；EDGAR filed 2026-05-05，accession 0001039399-26-000023）Note 2 — 1
+DATE: 2026-05-05
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 發行人文件是自述（L8 弱主張）；媒體只當線索；第三方海關彙整站是 CBP 艙單的第三方轉載。
+
+【FormFactor, Inc. Form 10-Q（quarter ended March 28, 2026；EDGAR filed 2026-05-05，accession 0001039399-26-000023）Note 2 — 10% 以上客戶（SK hynix、Intel、NVIDIA）】
+"Note 2 — Concentration of Credit and Other Risks Each of the following customers accounted for 10 % or more of our revenues for the periods indicated: Three Months Ended March 28, 2026 March 29, 2025 SK hynix Inc. 29.5 % 23.3 % Intel Corporation * 12.0 % NVIDIA Corporation 10.2 % * 39.7 % 35.3 % * Less than 10% of revenues."

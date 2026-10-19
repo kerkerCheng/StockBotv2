@@ -1,0 +1,10 @@
+Source URL: https://stockanalysis.com/stocks/lite/transcripts/660925-q4-2026/
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Lumentum FY4Q26 法說 Q&A
+DATE: 2026-08-11
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 發行人文件是自述（L8 弱主張）；媒體只當線索；第三方海關彙整站是 CBP 艙單的第三方轉載。
+
+【Lumentum FY4Q26 法說 Q&A：CW 與 EML 的毛利差距靠縮小 CW 晶粒而大幅收窄，EML 仍較好（自述）（Lumentum FY4Q26 法說 2026-08-11；Quartr 轉錄、StockAnalysis 載；與 Motley Fool 轉錄逐句互核，並以本機 faster-whisper 對 Quartr 存的錄音同一段核過；第三方轉錄，evidence tier 2）】
+"As I said to Chris a minute ago, we've closed the margin gap quite considerably since our last call on EMLs versus CW by shrinking the die size of the CW laser. So EMLs are still better, but we've closed the margin gap quite considerably."

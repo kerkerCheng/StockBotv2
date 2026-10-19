@@ -1,0 +1,19 @@
+Source URL: https://stockanalysis.com/stocks/form/transcripts/551998-q1-2026/
+
+Excerpt:
+[EXCERPT — 有限逐字引文] FormFactor 2026 第一季法說（2026-04-29）逐字稿，第三方轉錄（StockAnalysis 轉載 Quartr，tier 2；已用本機聽寫對過 Quartr 錄音 209–236 秒）
+DATE: 2026-04-29
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 發行人文件是自述（L8 弱主張）；媒體只當線索；第三方海關彙整站是 CBP 艙單的第三方轉載。
+
+【FormFactor 2026 第一季法說（2026-04-29）逐字稿，第三方轉錄（StockAnalysis 轉載 Quartr，tier 2；已用本機聽寫對過 Quartr 錄音 209–236 秒）：CEO 準備稿——高效能運算龍頭首次成為 10% 客戶，關係延伸到 CPO 系統】
+"Our growth is fueled both by strength in familiar areas, like probe cards for high-bandwidth memory, and accelerating contributions from newer foundry and logic opportunities, like networking. The first quarter growth in probe cards for networking applications caused a leader in high-performance compute to become a 10% customer for the first time, and we're continuing to build our relationship with this leading customer in not only networking, but also probe cards for GPUs and systems for Co-Packaged Optics."
+
+【FormFactor 2026 第一季法說（2026-04-29）逐字稿，第三方轉錄（Quartr；本段未另行聽寫核對）：問答 Brian Chin（Stifel）——10% 客戶按下單與付款方認定】
+"With all customers, as we report them as when they cross the 10% threshold as we're required to, it's based on who's placed the PO and who's paying the invoice. In this case, you see we have 2 10% customers in this quarter. As I described on the call, you know, the second 10% customer is associated with networking."
+
+【FormFactor 2026 第一季法說（2026-04-29）逐字稿，第三方轉錄（Quartr；本段未另行聽寫核對）：問答 David Duley（Steelhead）——insertion 1 是光學探測那一站】
+"We are focused on insertion one for a couple of reasons. One, it represents the sort of the foundational optical probing technology that's gonna be needed in any of the insertions. If you think about any of the insertions, you have to be able to optically probe the device. It's just insertion one, essentially is the exclusively focused on that. There's a little bit of electrical probing there, but it's really the optical probing step."
+
+【FormFactor 2026 第一季法說（2026-04-29）逐字稿，第三方轉錄（Quartr；本段未另行聽寫核對）：問答 Brian Chin（Stifel）——毛利率改善不靠價格；個別設計的客戶願付加急費（全公司產能吃緊，未指 CPO）】
+"In this case, there are some isolated incidents where customers are willing to pay expedite fees for a certain design because that offers the value in this capacity-constrained environment."

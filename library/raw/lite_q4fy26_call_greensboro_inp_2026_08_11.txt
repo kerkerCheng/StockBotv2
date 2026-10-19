@@ -1,0 +1,10 @@
+Source URL: https://stockanalysis.com/stocks/lite/transcripts/660925-q4-2026/
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Lumentum FY4Q26 法說 Q&A（Rosenblatt 問）
+DATE: 2026-08-11
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 發行人文件是自述（L8 弱主張）；媒體只當線索；第三方海關彙整站是 CBP 艙單的第三方轉載。
+
+【Lumentum FY4Q26 法說 Q&A（Rosenblatt 問）：Greensboro 廠由砷化鎵轉磷化銦「well underway」、反應爐等長交期品已先處理、2028 年初首營收、2028 年底到 2029 年滿載（自述）（Lumentum FY4Q26 法說 2026-08-11；Quartr 轉錄、StockAnalysis 載；與 Motley Fool 轉錄逐句互核，並以本機 faster-whisper 對 Quartr 存的錄音同一段核過；第三方轉錄，evidence tier 2）】
+"Then finally for Greensboro, is there any update on the expectation for half of the capacity of Greensboro being there in calendar 2028, the other half in calendar 2029? Is that still the schedule? I know it is early, but any kind of color you could give us on the progress there would be great. Thank you. Michael Hurlston President and CEO, Lumentum Look, progressing super well. I am actually very pleased that the team that we got in Greensboro is first rate. As you know, we inherited a fully- functioning fab. The switch that we need to throw is to convert it from gallium arsenide to indium phosphide. That is well underway. Some of the long pole items, reactors, and things like that, our team has gotten out in front of. I think we continue to say first revenue out of that in early 2028, and ramping through calendar 2028 into kind of a full pitch by the end of 2028 and into 2029. So really no change in that, Mike."

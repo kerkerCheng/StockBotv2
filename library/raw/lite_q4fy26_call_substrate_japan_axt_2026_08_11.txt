@@ -1,0 +1,10 @@
+Source URL: https://stockanalysis.com/stocks/lite/transcripts/660925-q4-2026/
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Lumentum FY4Q26 法說 Q&A
+DATE: 2026-08-11
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 發行人文件是自述（L8 弱主張）；媒體只當線索；第三方海關彙整站是 CBP 艙單的第三方轉載。
+
+【Lumentum FY4Q26 法說 Q&A：基板靠「a Japanese supplier」加 AXT 新約，需求若續升還要再找（沒點名日本那一家）（Lumentum FY4Q26 法說 2026-08-11；Quartr 轉錄、StockAnalysis 載；與 Motley Fool 轉錄逐句互核，並以本機 faster-whisper 對 Quartr 存的錄音同一段核過；第三方轉錄，evidence tier 2）】
+"If this vector continues, we are probably going to need to look for more help on substrate. We feel we are good at this moment. We are probably pretty comfortable just given our lead and arrangement with a Japanese supplier and now the announced deal with AXT. But given the rate of change in the demand vector that we are seeing, that may not be true a quarter or two from now either."

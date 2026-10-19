@@ -1,0 +1,10 @@
+Source URL: https://mopsov.twse.com.tw/nas/STR/621320260813E002.pdf
+
+Excerpt:
+[EXCERPT — 有限逐字引文] 聯茂 2026 第二季法說簡報（英文，MOPS 621320260813E002）p.10 產品線
+DATE: 2026-08-13
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 發行人文件是自述（L8 弱主張）；媒體只當線索；第三方海關彙整站是 CBP 艙單的第三方轉載。
+
+【聯茂 2026 第二季法說簡報（英文，MOPS 621320260813E002）p.10 產品線：M9 Extreme Low Loss（Df 0.0010~0.0005）對 IT-999GSE2/3（簡報抽字，欄位順序打散；以 pdfminer 座標核過 IT-999GSE2/3 與 M9 同列）】
+"Well-Expanded Product Line • The need for hyperscale data center and AI server upgrade to expedite the growth of high speed / frequency material demand • ITEQ’s market share in high speed / frequency material to uplift robustly 10 Super Ultra Low Loss M8 Df 0.0015~0.0010 Ultra Low Loss M7 Df 0.005~0.0015 Very Low Loss M6 Df 0.006~0.005 Low Loss M4 Df 0.009~0.006 Mid Loss M2 Df 0.015~0.009 Standard Loss M Df>0.015 10 Extreme Low Loss M9 Df 0.0010~0.0005 IT158, IT180A IT170GRA1, IT170GT IT968G IT988G/SE IT988GL/SE IT968GSE IT958G, IT170GRA2, IT170GL, IT150DA IT-998GSE2 IT-998GSE RF Application IT-88GMW IT-8300GA IT-8350G IT-8615G IT- 999GSE2/3"

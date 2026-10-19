@@ -1,0 +1,10 @@
+Source URL: https://newsletter.semianalysis.com/p/aws-trainium3-deep-dive-a-potential
+
+Excerpt:
+[EXCERPT — 有限逐字引文] SemiAnalysis〈AWS Trainium3 Deep Dive〉（2025-12-04，付費文的免費段落）
+DATE: 2025-12-04
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 發行人文件是自述（L8 弱主張）；媒體只當線索；第三方海關彙整站是 CBP 艙單的第三方轉載。
+
+【SemiAnalysis〈AWS Trainium3 Deep Dive〉（2025-12-04，付費文的免費段落）：Trainium3 NL32x2 Switched 的 JBOG 電路板由 M8（low DK2 布＋HVLP2）升到 M8.5（Low DK2 布＋HVLP4）（第三方分析師稱；沒點名銅箔或玻纖布供應商）】
+"The JBOG tray of the Trainium3 NL32x2 Switched will be very similar to that of the Trainium NL32x2 3D Torus. There will be two Trainium3 chips per JBOG. PCIe 6.0 based connectivity is used for the Trainium3 NL32x2 Switched – an upgrade vs the Trainium2 NL16 2D Torus and Trainium2 NL32x2 3D Torus JBOG which used PCIe 5.0 based connectivity. As a result of this, PCB materials will have to be upgraded from M8 grade copper clad laminate (CCL) (specifically, low DK2 glass fiber cloth + HVLP2 copper foil) to M8.5 grade CCL (Low DK2 glass fiber cloth + HVLP4 copper foil)."

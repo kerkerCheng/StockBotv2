@@ -1,0 +1,10 @@
+Source URL: https://magazines007.com/pdf/Design007-Dec2025.pdf
+
+Excerpt:
+[EXCERPT — 有限逐字引文] 台光電（EMC）在 Design007 Magazine 2025 年 12 月號 p.11 的廣告
+DATE: 原文無日期
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 發行人文件是自述（L8 弱主張）；媒體只當線索；第三方海關彙整站是 CBP 艙單的第三方轉載。
+
+【台光電（EMC）在 Design007 Magazine 2025 年 12 月號 p.11 的廣告：EM-896K2、EM-896K3「developed for AI servers and 1.6T switching networks」——沒有寫玻纖布是哪一種】
+"Introducing EM-896K2 and EM-896K3 Halogen-free, supreme low-loss materials developed for AI servers and 1.6T switching networks • Excellent Dk/Df performance for high-speed signal integrity (< 1.0 dB/inch @ 53GHz) • Low X/Y-axis CTE for improved dimensional stability includes CoWoP applications • Proven multi-lamination reliability (≥12x laminations) Ultra-low X/Y-axis CTE Excellent Dk/Df performance Proven multi- lamination reliability www.emctw.com | EMC.INFS@mail.emctw.com North American Master Distributor (949) 587.3326 • insulectro.com"

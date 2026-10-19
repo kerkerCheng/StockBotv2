@@ -1,0 +1,10 @@
+Source URL: https://stockanalysis.com/stocks/lite/transcripts/660925-q4-2026/
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Lumentum FY4Q26 法說開場
+DATE: 2026-08-11
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 發行人文件是自述（L8 弱主張）；媒體只當線索；第三方海關彙整站是 CBP 艙單的第三方轉載。
+
+【Lumentum FY4Q26 法說開場：200G/lane CW 雷射晶片賣給「a multitude of customers」、內部也用；日本兩座 InP 晶圓廠擴產、新機台合格 CW 與 EML 兩種製程（自述）（Lumentum FY4Q26 法說 2026-08-11；Quartr 轉錄、StockAnalysis 載；與 Motley Fool 轉錄逐句互核，並以本機 faster-whisper 對 Quartr 存的錄音同一段核過；第三方轉錄，evidence tier 2）】
+"Simultaneously, we are expanding our laser chip strategy to capture broader market opportunities in ways that align with our financial model. A key example is our CW laser chip for 200G-per-lane applications, which delivers high yield, proven reliability, and industry-leading performance in a compact form factor to a multitude of customers. Internal deployment of these lasers reinforces what our customers regularly confirm. We have a distinctive ability to deliver at scale to a very tight set of specifications, which enables superior yields in transceiver manufacturing. Importantly, these new CW laser products will deliver margins that are accretive to our long-term financial targets. Looking ahead, we expect demand for both EML and CW lasers to grow significantly through the second half of calendar 2026 and into 2027. To capture the coming 200G and 300G lane speed opportunities, we are expanding capacity across our two indium phosphide wafer fabs in Japan, qualifying both CW and EML process flows on our newest tools as they come online."

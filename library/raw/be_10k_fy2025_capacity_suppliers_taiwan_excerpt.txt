@@ -1,0 +1,22 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1664703/000162828026006516/be-20251231.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Bloom Energy Form 10-K FY2025（2026-02-09 申報）Item 1A Risk Factors——產能擴張
+DATE: 2026-02-09
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 發行人文件是自述（L8 弱主張）；媒體只當線索；第三方海關彙整站是 CBP 艙單的第三方轉載。
+
+【Bloom Energy Form 10-K FY2025（2026-02-09 申報）Item 1A Risk Factors——產能擴張】
+"We plan to double our factory capacity from 1 gigawatt to 2 gigawatts by the end of 2026. Our ability to complete this expansion, and any future expansions, is subject to significant risks and uncertainties, including delays, cost overruns, geopolitical instability and labor shortages. We also need to hire, train and retain skilled employees to manage this expansion and operate our facilities effectively. The manufacture of our products is capital-intensive, and equipment, once purchased, may break down or require costly maintenance or may become obsolete due to technological improvements or other factors. We may also experience quality control issues as we implement any production upgrades. Expanding manufacturing capacity internationally may also expose us to new laws and regulations including those pertaining to labor and employment, environmental and export/import and carries risks. There is also a possibility that we may not be able to achieve our production targets for a variety of reasons, including reliance on third parties who do not fulfill their obligations to us."
+
+【同上 10-K Item 7 MD&A——Fremont 產能 1 GW → 2 GW、每再加 1 GW 的時間與資本支出】
+"We are in the process of expanding our annual production capacity run rate at our Fremont facility from 1 gigawatt to 2 gigawatts and expect to complete the expansion by the end of 2026. While our ability to complete the expansion to 2 gigawatts of annual production capacity run rate (as well as any additional future expansions) is subject to risks and uncertainties, including delays, cost overruns, geopolitical instability and labor shortages, we believe the current expansion remains on schedule and within our planned budget. We have sufficient funds to accommodate the planned expansion for 2026. In the event required, the Fremont facility can accommodate additional capacity expansion of up to approximately 5 gigawatts of annual production capacity run rate. We expect each additional incremental 1 gigawatt increase in our capacity up to 5 gigawatts (if necessary) to require approximately six to nine months to install and capital expenditure of approximately $100 million to $150 million."
+
+【同上 10-K Item 1A——少數與單一供應商】
+"We rely on a limited number of suppliers and other third parties, and in some cases sole suppliers, for some of the raw materials and components used to manufacture our products, including certain materials that are in limited supply. If our suppliers provide insufficient inventory to meet customer demand, or such inventory is not at the level of quality required to meet our standards, or if our suppliers are unable or unwilling to provide us with the contracted quantities (as we have limited or in some case no alternatives for supply), our results of operations could be materially and negatively impacted."
+
+【同上 10-K Item 1A——零件主要由台灣供應】
+"Tensions between mainland China and Taiwan have increased significantly in recent years, presenting an elevated risk of hostilities. Our products contain components which are supplied principally from Taiwan. As such, any disruption impacting Taiwan could adversely impact our ability to obtain these components and supply our customers with products."
+
+【同上 10-K Item 1——供應鏈與關稅】
+"While our supply chain does not have significant exposure to China, significant tariffs on imports from other countries where we do source materials could materially impact our costs."

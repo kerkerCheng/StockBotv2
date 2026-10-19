@@ -1,0 +1,10 @@
+Source URL: https://www.iteqcorp.com/product/product-introduction/high-tg-extreme-low-loss/
+
+Excerpt:
+[EXCERPT — 有限逐字引文] 聯茂（ITEQ）官網 High Tg (Extreme Low-Loss) 產品頁（繁中版）
+DATE: 2026-06-22
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 發行人文件是自述（L8 弱主張）；媒體只當線索；第三方海關彙整站是 CBP 艙單的第三方轉載。
+
+【聯茂（ITEQ）官網 High Tg (Extreme Low-Loss) 產品頁（繁中版）：IT-999GSE2「使用Low Dk2玻布」、IT-999GSE3「使用Q玻布」（原文 IT-999GSE3 那段開頭筆誤寫成「IT-998GSE3」）】
+"High Tg (Extreme Low-Loss) IT-999GSE2 IT-999GSE2 IT-999GSE2是一種高階具有低CTE、高Tg（DMA 180°C）、無鹵素、低Dk和極低損耗材料。該材料專為領先高速應用而設計，例如使用 PAM-4 信號每通道 224Gbps數據速率。該材料專為從1.6T Gbps數據速率到多通道TB速率企業應用而設計。使用Low Dk2玻布，有助於解決與skew相關問題。PP結構採用spread玻布設計，壓合板提供多層spread玻布結構，以減少fiber weave效應。IT-999GSE2也表現出高熱可靠性和CAF可靠性。 應用 224Gbps+ per channel applications 伺服器/儲存裝置/連接器 超級電腦 背板& daughter cards 電信&基地台 混壓設計 重要特性 1.6T G Switch solution Advanced High Tg Resin Technology Lower Dk (3.02@ 10GHz) and Ultra low Df (0.0008 @ 10GHz) Compatible with modified FR-4 processes High thermal & CAF reliability Excellent dimensional stability Ability to use very low-profile Copper for reduced insertion loss Highly suitable for Hybrids, Ability to make high layer count boards 性能 Items Methods IT-999GSE2 Tg (℃) DMA 180 T-288 (w/ 1 Oz Cu, min) TMA >60 Td-5%(℃ ) TGA 5% loss 400 CTE (ppm/℃) a1/a2 30/215 CTE (%), 50-260℃ TMA 2.1 Dk @ 10 GHz (RC78%) IPC TM-650 2.5.5.13 3.02 Df @ 10 GHz (RC78%) IPC TM-650 2.5.5.13 0.0008 PDF 下載 T-999GSE2 Data sheet IT-999GSE3 IT-999GSE3 IT-998GSE3是一種高階具有低CTE、高Tg（DMA 180°C）、無鹵素、低Dk和極低損耗材料。該材料專為領先高速應用而設計，例如使用 PAM-4 信號每通道 224Gbps數據速率。該材料專為從1.6T Gbps數據速率到多通道TB速率企業應用而設計。使用Q玻布，有助於解決與skew相關問題。PP結構採用spread玻布設計，壓合板提供多層spread玻布結構，以減少fiber weave效應。IT-999GSE3也表現出高熱可靠性和CAF可靠性。"

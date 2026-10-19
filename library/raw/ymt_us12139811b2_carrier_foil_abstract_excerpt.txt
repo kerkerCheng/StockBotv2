@@ -1,0 +1,10 @@
+Source URL: https://patents.google.com/patent/US12139811B2/en
+
+Excerpt:
+[EXCERPT — 有限逐字引文] US12139811B2（YMT Co Ltd）摘要
+DATE: 2024-11-12
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 發行人文件是自述（L8 弱主張）；媒體只當線索；第三方海關彙整站是 CBP 艙單的第三方轉載。
+
+【US12139811B2（YMT Co Ltd）摘要：carrier foil-attached metal foil（帶載體箔的金屬箔，含剝離層）——專利是技術能力，不是供貨證據】
+"Abstract The present invention relates to a carrier foil-attached metal foil including a release layer having a specific composition and structure, a method of manufacturing the carrier foil-attached metal foil, and a laminate for forming a printed circuit board including the carrier foil-attached metal foil. The laminate for forming a printed circuit board according to the present invention comprises the carrier foil-attached metal foil, so that a defect rate can be minimized."

@@ -1,0 +1,10 @@
+Source URL: https://newsletter.semianalysis.com/p/aws-trainium3-deep-dive-a-potential
+
+Excerpt:
+[EXCERPT — 有限逐字引文] SemiAnalysis〈AWS Trainium3 Deep Dive〉（2025-12-04，免費段落）
+DATE: 2025-12-04
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 發行人文件是自述（L8 弱主張）；媒體只當線索；第三方海關彙整站是 CBP 艙單的第三方轉載。
+
+【SemiAnalysis〈AWS Trainium3 Deep Dive〉（2025-12-04，免費段落）：Trainium3 NL72x2 Switched 運算托盤的電路板材料與 NL32x2 相同（第三方分析師稱）】
+"The higher compute and power density of the Trainium3 NL72x2 Switched starts from the compute tray, with each compute tray containing four Trainium3 chips. Trainium3 NL72x2 Switched connectivity is also mostly based on PCIe 6.0, therefore the PCB materials are the same as used for the Trainium3 NL32x2 Switched mentioned above."

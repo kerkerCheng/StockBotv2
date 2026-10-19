@@ -1,0 +1,10 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1633978/000130817926000422/lite-ars.pdf
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Lumentum 2026 年度股東報告（ARS，EDGAR 2026-10-06 申報）致股東信 p.1
+DATE: 2026-10-06
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 發行人文件是自述（L8 弱主張）；媒體只當線索；第三方海關彙整站是 CBP 艙單的第三方轉載。
+
+【Lumentum 2026 年度股東報告（ARS，EDGAR 2026-10-06 申報）致股東信 p.1：OCS 已越過每季 1 億美元營收水位；InP 晶圓產能擴充、新機台合格 CW 與 EML 製程；組裝測試產能內部加委外（自述）】
+"Throughout fiscal year 2026, we accelerated momentum across both our Systems and Components portfolios. Our Optical Circuit Switch (OCS) platform has seen incredible adoption, rapidly scaling past a $100 million quarterly revenue run rate. Given our significant technological differentiation and first-mover advantage, we expect this product line to generate revenue in the billions in upcoming years. Across the rest of our portfolio, we achieved record shipments of our high-speed transceivers, transport products and laser chips. We started production of our next-generation 1.6T modules, where our signal integrity engineering team has established an early market advantage. Looking ahead, our ultra-high-power laser portfolio is driving key advances to support emerging co-packaged optics (CPO) and near-packaged optics (NPO) architectures. This marks a major architectural shift, eliminating the need for a digital signal processor (DSP) and thereby reducing data center power consumption and cost. In so doing, optics becomes the default choice for far more of the connectivity backbone. Our manufacturing execution is also best in class, marked by expanded wafer capacity across our global indium phosphide fab footprint and the qualification of both CW and EML process flows on our newest production tools. We rapidly scaled assembly and test capacity, both internally and through strategic partnerships with contract manufacturers."

@@ -1,0 +1,10 @@
+Source URL: https://stockanalysis.com/stocks/lite/transcripts/660925-q4-2026/
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Lumentum FY4Q26 法說開場
+DATE: 2026-08-11
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 發行人文件是自述（L8 弱主張）；媒體只當線索；第三方海關彙整站是 CBP 艙單的第三方轉載。
+
+【Lumentum FY4Q26 法說開場：OCS 內部產線擴充、FY1Q27 指引含第一個三位數 OCS 季、開始與 contract manufacturers 加產能（整機，沒提 MEMS）（Lumentum FY4Q26 法說 2026-08-11；Quartr 轉錄、StockAnalysis 載；與 Motley Fool 轉錄逐句互核，並以本機 faster-whisper 對 Quartr 存的錄音同一段核過；第三方轉錄，evidence tier 2）】
+"Turning to OCS, our internal manufacturing expansion is progressing smoothly. After doubling shipments from fiscal Q3 to Q4, our guidance includes our first triple-digit OCS revenue quarter. The demand signal for 2027 continues to be incredibly strong, and we have started the initial work to add capacity with contract manufacturers, as well as continuing to increase output in our internal factories. Since our last call, the roadmap for OCS has also come into better view. We are now planning higher and lower port count products, including specialized in-tray offerings."

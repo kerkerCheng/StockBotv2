@@ -1,0 +1,10 @@
+Source URL: https://www.semtech.com/company/press/semtech-and-broadcom-showcase-200g-lane-optical-transceiver-at-ecoc-2023
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Semtech 新聞稿 2023-10-02〈Semtech and Broadcom Showcase 200G/lane Optical Transceiver at ECOC 2023〉
+DATE: 2023-10-02
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 發行人文件是自述（L8 弱主張）；媒體只當線索；第三方海關彙整站是 CBP 艙單的第三方轉載。
+
+【Semtech 新聞稿 2023-10-02〈Semtech and Broadcom Showcase 200G/lane Optical Transceiver at ECOC 2023〉：200G/lane 光模組展示用 Broadcom 的 5nm 112GBd PAM4 DSP、EML 與 PD 元件（第三方寫 Broadcom 有 200G/lane PD；展示，不是量產或合格）】
+"CAMARILLO, Calif., Oct 2, 2023 – Semtech Corporation (Nasdaq: SMTC), a high-performance semiconductor, IoT systems and cloud connectivity service provider, today announced the demonstration of a 200G/lane optical transceiver featuring Semtech’s latest FiberEdge ® 200G PAM4 PMDs and Broadcom’s latest generation DSP PHY and single mode optics. Semtech will be conducting a live demonstration of the 200G/lane module, based on Semtech’s newest FiberEdge 200G PAM4 Quad EML Driver and Quad TIA and Broadcom’s state-of-the-art 5nm 112GBd PAM4 DSP, EML and PD devices in Semtech’s booth #517 at the European Conference on Optical Communication (ECOC) 2023 exhibition in Glasgow, Scotland from Oct 2 to 4."

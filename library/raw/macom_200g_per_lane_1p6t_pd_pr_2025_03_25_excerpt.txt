@@ -1,0 +1,10 @@
+Source URL: https://www.macom.com/updates/news/2025/macom-launches-new-high-performance-solutions-for-1-6t-applicati
+
+Excerpt:
+[EXCERPT — 有限逐字引文] MACOM 新聞稿 2025-03-25〈MACOM Launches New High Performance Solutions for 1.6T Applications〉
+DATE: 2025-03-25
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 發行人文件是自述（L8 弱主張）；媒體只當線索；第三方海關彙整站是 CBP 艙單的第三方轉載。
+
+【MACOM 新聞稿 2025-03-25〈MACOM Launches New High Performance Solutions for 1.6T Applications〉：宣布四項 200G/lane、供 1.6T 資料中心光連接的產品供貨（availability），其中 MARP-BP112 背照式整合透鏡 PD 可疊在 MACOM 的 TIA 上（供應商自述；沒寫量產數字與客戶）】
+"Lowell, MA, March 25, 2025 -- MACOM Technology Solutions Inc. (“MACOM”) , a leading supplier of semiconductor products, today announced the availability of four new 200G per lane solutions for 1.6T data center optical connectivity. These solutions represent a meaningful addition to the MACOM portfolio, enabling next-generation capabilities and high-speed connectivity that are crucial for the rapidly evolving digital landscape. 100 mW and 75 mW CW Lasers for DR4 and DR8 Optical Modules MACOM’s new 100 mW and 75 mW Continuous Wave (CW) lasers are designed specifically for 1.6T silicon photonics (SiPh) solutions. The CW Lasers are available as single lasers, or 8-channel and 16-channel arrays. Utilizing MACOM’s advanced Etched Facet Technology (EFT) process, MACOM lasers offer exceptional performance and reliability and are well-suited for DR4 and DR8 optical modules. More information on the 100 mW laser and the 75 mW laser is available here . Photodiode (PD) and TIA Chip Stack Solution for Enhanced System Efficiency The MARP-BP112 backside illuminated PD with integrated lens enables chip stacking of photodiodes on MACOM’s transimpedance amplifiers (TIAs), which optimizes total system performance and helps to reduce assembly costs. This PD can also be used with MACOM’s TIA in a flip-chip side-by-side configuration, which helps enhance thermal management. Designed utilizing MACOM’s proprietary optical semiconductor process, the MARP-BP112 PD features high responsivity and high bandwidth, which are critical for achieving the required bit error rate (BER) for link performance."

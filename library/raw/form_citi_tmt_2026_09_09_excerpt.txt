@@ -1,0 +1,16 @@
+Source URL: https://stockanalysis.com/stocks/form/transcripts/748170-citi-s-2026-global-tmt-conference/
+
+Excerpt:
+[EXCERPT — 有限逐字引文] FormFactor 在 Citi 2026 Global TMT Conference（2026-09-09）的逐字稿，第三方轉錄（StockAnalysis 轉載 Quartr，tier 2；已用本機聽寫對過 Quartr 錄音 135
+DATE: 2026-09-09
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 發行人文件是自述（L8 弱主張）；媒體只當線索；第三方海關彙整站是 CBP 艙單的第三方轉載。
+
+【FormFactor 在 Citi 2026 Global TMT Conference（2026-09-09）的逐字稿，第三方轉錄（StockAnalysis 轉載 Quartr，tier 2；已用本機聽寫對過 Quartr 錄音 1356–1403 秒）：CEO——Triton 目前集中在一組晶圓代工＋fabless，下半年擴到多家】
+"We've got hundreds of systems installed worldwide at close to as many customers, so a very broad customer engagement. All the names you'd expect, where we have systems in their labs, in some cases, in pilot production. One of the exciting things that we're now seeing in the second part of the year is broader production adoption of this TRITON high-volume manufacturing platform at multiple foundries with multiple fabless customers, so seeing it broaden out a little bit. As you said, right now, pretty concentrated, with one major foundry fabless partnership, but building backlog and building the breadth of the backlog where this diversifies a little bit beyond that one customer set."
+
+【FormFactor 在 Citi 2026 Global TMT Conference（2026-09-09）的逐字稿，第三方轉錄（Quartr；已用本機聽寫對過錄音 1403–1471 秒）：分析師轉述一家未具名光子公司說測試是最大瓶頸，CEO 回應】
+"Yesterday we had one of the photonics players here on the stage, and when asked about bottlenecks, they were like, "The biggest bottleneck is the testing space." It is probably not new to you, but I am just curious, a year ago versus now, are you seeing this testing getting harder and harder? I know you are more in the insertion one and probably something in two, but from your perspective, are you seeing there is more challenges than you previously expected when you took on this challenge? Mike Slessor CEO, FormFactor Yeah. Well, being a bottleneck is a double-edged sword, right? It is a good place to be because it means you are relevant and you have chosen to solve a problem that the industry needs. However, it then does demand the resources to help resolve that bottleneck, and I think that is exactly where we are with CPO, having installed now tens of systems, ramping those in production"
+
+【FormFactor 在 Citi 2026 Global TMT Conference（2026-09-09）的逐字稿，第三方轉錄（Quartr；本段未另行聽寫核對）：CEO——2030 年目標模型（16 億美元營收）】
+"I'll ground you in, again, what we shared with people at the Investor Day and the target model that produces 55% gross margin, $5 of earnings per share on $1.6 billion of revenue."

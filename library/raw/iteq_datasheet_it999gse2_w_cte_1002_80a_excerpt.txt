@@ -1,0 +1,10 @@
+Source URL: https://www.iteqcorp.com/wp-content/uploads/2026/06/W-CTE-1002-80A_Data-sheet_IT-999GSE2.pdf
+
+Excerpt:
+[EXCERPT — 有限逐字引文] 聯茂 IT-999GSE2 規格書 W-CTE-1002-80A（REV 1.0-26）
+DATE: 原文無日期
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 發行人文件是自述（L8 弱主張）；媒體只當線索；第三方海關彙整站是 CBP 艙單的第三方轉載。
+
+【聯茂 IT-999GSE2 規格書 W-CTE-1002-80A（REV 1.0-26）：1.6T Solution、Dk 3.02／Df 0.0008 @10GHz、剝離強度以 HVLP4（18μm、35μm）銅箔量測、X/Y CTE 11/12 ppm】
+"REV 1.0-26 W-CTE-1002-80A 保存年限：三年 IT-999GSE2 High T g/Halogen Free/Low Dk/Extreme Low Loss Laminate & Prepreg  ANSI Type :No ANSI  AppliceableIPC-4101 / 134；IPC-4103 /230/530  1.6T Solution  Lower Dk (3.02 @ 10GHz) and ultra low Df (0.0008 @ 10GHz)  Very Stable Dk-Df across frequency Laminate properties Items IPC TM-650 Typical Value Unit Peel Strength A. HVLP4 (18μm) B. HVLP4 (35μm) 2.4.8 2.5 3.0 lb/inch V olume Resistivity 2.5.17.1 1010 M-cm Surface Resistivity 2.5.17.1 109 M Moisture Absorption 2.6.2.1 0.07 % Permittivity (Dk) A. 2GHz B. 5GHz C. 10GHz 2.5.5.13 (RC 70%) 3.18 3.14 3.12 (RC 83%) 3.08 3.04 3.02 -- Loss Tangent (Df) A. 2GHz B. 5GHz C. 10GHz 2.5.5.13 (RC 70%) 0.0007 0.0008 0.0009 (RC 83%) 0.0007 0.0007 0.0008 -- Flexural Strength A. Length direction B. Cross direction 2.4.4 475 425 N/mm2 Young's Modulus A. Warp direction B. Fill direction ASTM D3039 17 15 Gpa Thermal Stress 10 s at 288°C A. Unetched B. Etched 2.4.13.1 Pass Visual Pass Visual Rating Flammability UL94 V-0 Rating Comparative Tracking Index (CTI) ASTM D3638 / UL 746 CTI 2 (250-399) Class (Volts) Glass Transition Temperature (DMA) 2.4.24.4 180 ˚C Decomposition Temperature (5% W.L) 2.4.24.6 400 ˚C X/Y Axis CTE (40℃ to 125℃) 2.4.24.5 11/12 ppm/˚C Z-Axis CTE A. Alpha 1 B. Alpha 2 C. 50 ˚C to 260˚C 2.4.24 30 215 2.1 ppm/˚C ppm/˚C % Thermal Resistance A. T260 B. T288 2.4.24.1 > 60 > 60 Minutes Minutes CCLxxxx: IT-999GSE2 Prepreg: IT-999GSE2BS"

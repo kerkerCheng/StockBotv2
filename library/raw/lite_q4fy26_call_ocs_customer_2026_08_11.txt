@@ -1,0 +1,10 @@
+Source URL: https://stockanalysis.com/stocks/lite/transcripts/660925-q4-2026/
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Lumentum FY4Q26 法說 Q&A
+DATE: 2026-08-11
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 發行人文件是自述（L8 弱主張）；媒體只當線索；第三方海關彙整站是 CBP 艙單的第三方轉載。
+
+【Lumentum FY4Q26 法說 Q&A：Citi 問 key OCS customers 的 build vs buy；CEO 答「one customer that apparently has an internal source of supply」「we will absorb the vast majority of that」「early 2027 ... be the number one supplier」——客戶沒點名（Lumentum FY4Q26 法說 2026-08-11；Quartr 轉錄、StockAnalysis 載；與 Motley Fool 轉錄逐句互核，並以本機 faster-whisper 對 Quartr 存的錄音同一段核過；第三方轉錄，evidence tier 2）】
+"Perhaps tied to that, how should we think about your key OCS customers build versus buying from your calculus? Do you expect Lumentum to eventually absorb most of their internal programs? If so, any timeline in mind? Michael Hurlston President and CEO, Lumentum Papa, look, what I would say is, we are definitely tracking to the $400 million. I would not say tracking ahead. We have definitely, as you know, had some problems early on in the ramp with supply chain. We are out of that now. I think we are executing, as I said, to plan. We are plus or minus about where I would have expected to be for the guide. So that takes a dent out of the $400 million, and that leaves us some room to run in the fourth calendar quarter. Relative to one customer that apparently has an internal source of supply, we are, I think, executing extremely well. I think they will continue to use an internal version, but I think as they ship more and more OCSs, we will absorb the vast majority of that. I would expect, sometime in early 2027 that we cross over and be the number one supplier and actually have momentum from there in terms of our OCS shipments."

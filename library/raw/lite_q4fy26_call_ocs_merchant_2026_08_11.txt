@@ -1,0 +1,10 @@
+Source URL: https://stockanalysis.com/stocks/lite/transcripts/660925-q4-2026/
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Lumentum FY4Q26 法說 Q&A
+DATE: 2026-08-11
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 發行人文件是自述（L8 弱主張）；媒體只當線索；第三方海關彙整站是 CBP 艙單的第三方轉載。
+
+【Lumentum FY4Q26 法說 Q&A：「the only ones that have a track record outside of a contract manufacturing relationship with a large OCS user」「the only merchant supplier today of OCS」（自述）（Lumentum FY4Q26 法說 2026-08-11；Quartr 轉錄、StockAnalysis 載；與 Motley Fool 轉錄逐句互核，並以本機 faster-whisper 對 Quartr 存的錄音同一段核過；第三方轉錄，evidence tier 2）】
+"But look, we are the only guy shipping. I know a lot of people are talking about OCS, a lot of startups. For us to be now at $100 million and beyond types of quarters, we are the only ones that have a track record outside of a contract manufacturing relationship with a large OCS user. So we are really the only merchant supplier today of OCS, and by virtue of that, we are going to get every single call and have the first look, I think, at every single opportunity out there."
