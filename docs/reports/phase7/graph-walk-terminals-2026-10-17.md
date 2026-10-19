@@ -80,3 +80,8 @@
 - 玻璃基板讀圖 sr_ceb0251092afcbc2 寫「需求錨走得到（玻璃 CPO → CPO）」，但走訪不經 is_variant_of、anchor_chain 是 null——下次重讀時改。
 - #59 型（名字不同、別名相同）候選，未判：`tech:scale_out_network` 與錨 `tech:ai_switch` 共用「scale-out network」；`tech:chip_to_chip_optical` 的別名（optical I/O chiplet）正是 Ayar TeraPHY 的品類。
 - plan 續工指標 ④ 的更正：Agility 走不到錨不是因為 is_variant_of 不在走訪清單——唯讀模擬只加 is_variant_of 仍然走不到；要連 develops 一起走、且經過那條已知錯標的 Digit→tote transfer 邊才走得到。
+
+## 2026-10-19 補記（research-drain 段 4）
+
+- 走圖 44 筆命中（③3、⑥7、⑦10、⑧6、⑨18）對照本報告：43 筆已在上表有終局（照舊）；**新 1 筆**：第 6 型 `co:gcs_holdings`（[796]–[799] 隨包登記的新名冊檔，10-17 還不在圖上）供貨 `tech:photodiode` 走不到錨——`tech:photodiode` 往上沒有任何邊。終局 needs_edge_ra → pq2 **[818]**（更正走廊在環宇年報那份抽取加 `tech:pluggable_transceiver depends_on tech:photodiode`，引文是已入圖的 s1）。
+- 第 3 型的 `tech:six_inch_inp_production` 另有 [815]（Nokia develops）待核准；`tech:mems_mirror_array` 等 [765] 文件（照舊）。
