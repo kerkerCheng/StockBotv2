@@ -160,6 +160,23 @@
       "_display_name_source": "SEC 10-Q 2026-08-07 封面 dei:EntityRegistrantName「Blackstone Inc.」"
     },
     {
+      "company_id": "co:boe",
+      "research_ticker": "000725.SZ",
+      "market_currency": "CNY",
+      "execution_currency": "CNY",
+      "execution_venue": "SZSE",
+      "display_name": "BOE Technology Group Co., Ltd.",
+      "_display_name_source": "巨潮資訊網 IR 記錄表抬頭「京东方科技集团股份有限公司 投资者关系活动记录表」（2026-09-21 披露，編號 2026-044）；英文名照公司年報英文版慣用寫法",
+      "_note": "隨玻璃芯入圖包 staged（2026-10-19，drop 即回退）：面板／泛半導體廠，玻璃基封裝載板（Glass Core Substrate）開發方；系統口徑非邊緣（`python -m alpha edge 000725.SZ` → cap_over_edge），不是倍率候選，入圖價值在玻璃芯這一層的供給側。另有 B 股 200725.SZ。⚠ 別名「BOE」會在子公司「BOE Varitronix」（京東方精電，0710.HK）裡整詞命中——同 co:samsung／co:samsung_electro_mechanics 的情形",
+      "name_aliases": [
+        "BOE",
+        "BOE Technology Group",
+        "京东方",
+        "京東方",
+        "京东方科技集团"
+      ]
+    },
+    {
       "company_id": "co:boston_dynamics",
       "research_ticker": null,
       "display_name": "Boston Dynamics",
