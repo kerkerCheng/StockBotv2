@@ -8,7 +8,7 @@
       "source_ids": [
         "importgenius_us_customs_huaming_georgia_transformer_2024_06_06_s1"
       ],
-      "statement": "U.S. customs bill-of-lading record (aggregated by ImportGenius; supplier page under the older name Shanghai Huaming Power): bill of lading UULNSH24041007, product 'ON LOAD TAP CHANGER', importer GEORGIA TRANSFORMER CORPORATION, supplier SHANGHAI HUAMING POWER, arrived 2024-06-06, 3,262 kg, 11 packages. Georgia Transformer (GTC) is Virginia Transformer's manufacturing facility in Rincon, Georgia (Virginia Transformer press release, 2026-04-22). Regulatory record, independent of Huaming's own statements. Third-party aggregators list 4 shipments to this consignee (2024-06, 2024-08, 2024-10, 2026-04, the last described as 'Tap Changer' by ImportYeti); Virginia Transformer's main tap-changer source on the same aggregator is Maschinenfabrik Reinhausen, so Huaming is an occasional second source here.",
+      "statement": "U.S. customs bill-of-lading record (aggregated by ImportGenius; supplier page under the older name Shanghai Huaming Power): bill of lading UULNSH24041007, product 'ON LOAD TAP CHANGER', importer GEORGIA TRANSFORMER CORPORATION, supplier SHANGHAI HUAMING POWER, arrived 2024-06-06, 3,262 kg, 11 packages. Georgia Transformer (GTC) is Virginia Transformer's manufacturing facility in Rincon, Georgia (Virginia Transformer press release, 2026-04-22). Regulatory record, independent of Huaming's own statements. ImportYeti's quarterly series lists 4 shipments from Huaming to Virginia Transformer, one in each of the quarters starting 2024-04, 2024-07, 2024-10 and 2026-04 (this 2024-06-06 bill of lading falls in the first; ImportYeti describes the product as 'Tap Changer'); Virginia Transformer's main tap-changer source on the same aggregator is Maschinenfabrik Reinhausen, so Huaming is an occasional second source here.",
       "subject_id": "e1"
     }
   ],
@@ -107,9 +107,10 @@
     "permission_basis": "美國海關（CBP）進口提單紀錄的第三方彙整頁（ImportGenius 免費頁，僅顯示部分樣本紀錄）；只保留研究必要的有限逐字節錄。published_at 取該筆紀錄的到港日與頁面更新日 2024-06-06（頁面標 Updated: 2024-06-06）。",
     "published_at": "2024-06-06",
     "publisher": "ImportGenius（美國海關進口提單彙整，免費頁）",
-    "retrieved_at": "2026-10-18",
+    "retrieved_at": "2026-10-19",
     "source_type": "industry_report",
     "storage_permission": "repo_excerpt",
+    "supersedes_extraction_sha256": "92693e5f19688cbcd02ce5c0b0e879c1cc355de8c941a0fe441c74487929401b",
     "title": "美國海關進口提單（ImportGenius 彙整頁）：SHANGHAI HUAMING POWER 對 GEORGIA TRANSFORMER CORPORATION（Virginia Transformer 的 Rincon 廠）出貨 ON LOAD TAP CHANGER（2024-06-06 到港）",
     "url": "https://www.importgenius.com/suppliers/shanghai-huaming-power"
   },
