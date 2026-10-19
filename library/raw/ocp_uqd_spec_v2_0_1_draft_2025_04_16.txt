@@ -3,7 +3,7 @@ URL: http://www.hansenfluid.com/news/DRAFT_OCP+UQD+Spec+v2.0.1_16Apr25.html
 PUBLISHED: 2025-04-16（文件標題 DRAFT_OCP+UQD+Spec+v2.0.1_16Apr25；內文 Effective XXXX, 2025）
 RETRIEVED: 2026-10-06
 STORAGE: repo_excerpt（規格草案的有限節錄）
-NOTE: ⚠ 草案、且託管在第三方（hansenfluid.com，一家接頭廠的網站）而非 OCP——不是定稿。定稿 v2 於 2025-10 OCP Global Summit 發布（見 staubli_uqd_v2_mini_qd_pr_2025_11_06）。HTML 原檔是 UTF-8 被當 latin-1 解，已還原。節錄：作者、貢獻者、致謝、OCP 原則（開放、規模）、範圍、與 v1 的互換、驗證報告與氦氣測漏、v1→v2 互換考量表。
+NOTE: ⚠ 草案、且託管在第三方（hansenfluid.com，一家接頭廠的網站）而非 OCP——不是定稿。〔2026-10-19 更正：原寫「定稿 v2 於 2025-10 OCP Global Summit 發布」是把宣布當成定稿——Stäubli 原字是「OCP also announced the UQD v2 update」（staubli_uqd_v2_mini_qd_pr_2025_11_06）；定稿是 v2.0.0，封面「Effective September 22, 2026」、版本表只有「June 2026 V2.0.0」一列，作者 Individual／CPC／AMD，見 ocp_uqd_spec_v2_0_0_2026_09_22。〕HTML 原檔是 UTF-8 被當 latin-1 解，已還原。節錄：作者、貢獻者、致謝、OCP 原則（開放、規模）、範圍、與 v1 的互換、驗證報告與氦氣測漏、v1→v2 互換考量表。
 
 Authors: Travis Gaskill - NVIDIA, Elizabeth Langer – CPC
 

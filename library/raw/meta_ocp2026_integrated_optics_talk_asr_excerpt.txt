@@ -1,0 +1,31 @@
+Source URL: https://www.youtube.com/watch?v=t-ELqYbn7F0
+
+Excerpt:
+[EXCERPT — 有限逐字引文] OCP 官方影片自動字幕（YouTube en asr，不是逐字稿；照 ASR 原樣、只拿掉時間碼）〈Integrated Optics at Scale for AI Infrastructure: From 51.2T CPO Vali
+DATE: 2026-10-14
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: OCP 官方影片的 YouTube 自動字幕——不是逐字稿，可能有聽寫錯字；講者沒在字幕標名的，報告裡寫「推一步」。
+
+【OCP 官方影片自動字幕（YouTube en asr，不是逐字稿；照 ASR 原樣、只拿掉時間碼）〈Integrated Optics at Scale for AI Infrastructure: From 51.2T CPO Validation to Meta's 102.4T〉（OCP Global Summit 2026；OCP 錄影清單講者 Granthana Rangaswamy、Siamak Amiralizadeh、Xu Wang〔Meta〕；2026-10-14 上架）。字幕不標講者：0:03 自我介紹的是 Siamak（ASR 拼成 Amiri-Zadeh），17:46 才交棒給 Granthana——17:46 之前的口述推一步是 Siamak；問答段誰答的字幕沒標。本段：0:03–0:08 講者自我介紹】
+"My name is Siamak Amiri-Zadeh from Meta."
+
+【OCP 官方影片自動字幕（YouTube en asr，不是逐字稿；照 ASR 原樣、只拿掉時間碼）〈Integrated Optics at Scale for AI Infrastructure: From 51.2T CPO Validation to Meta's 102.4T〉（OCP Global Summit 2026；OCP 錄影清單講者 Granthana Rangaswamy、Siamak Amiralizadeh、Xu Wang〔Meta〕；2026-10-14 上架）。字幕不標講者：0:03 自我介紹的是 Siamak（ASR 拼成 Amiri-Zadeh），17:46 才交棒給 Granthana——17:46 之前的口述推一步是 Siamak；問答段誰答的字幕沒標。本段：14:13–14:44 可靠度看供應商與實作】
+"reliability is uh vendor and implementation specific. So, the fact that we have shown for one generation and one vendor uh the optics uh the CPO uh works better than pluggables doesn't mean that all the future integrated optics platforms are going to be more reliable. We have to work on on um developing these uh platforms and understand their failure failure modes before before making that conclusion."
+
+【OCP 官方影片自動字幕（YouTube en asr，不是逐字稿；照 ASR 原樣、只拿掉時間碼）〈Integrated Optics at Scale for AI Infrastructure: From 51.2T CPO Validation to Meta's 102.4T〉（OCP Global Summit 2026；OCP 錄影清單講者 Granthana Rangaswamy、Siamak Amiralizadeh、Xu Wang〔Meta〕；2026-10-14 上架）。字幕不標講者：0:03 自我介紹的是 Siamak（ASR 拼成 Amiri-Zadeh），17:46 才交棒給 Granthana——17:46 之前的口述推一步是 Siamak；問答段誰答的字幕沒標。本段：15:07–15:30 CPO 的好處（可擴到 400G、光學與交換器同一家負責）】
+"Um it is the most scalable uh solution from 200 gig to 400 gig plus data rates as there are less connectors and uh less trace loss. Um the The model is uh simpler, uh at least today. Both the optics that's on the switch substrate and the switch itself is owned by the same entity."
+
+【OCP 官方影片自動字幕（YouTube en asr，不是逐字稿；照 ASR 原樣、只拿掉時間碼）〈Integrated Optics at Scale for AI Infrastructure: From 51.2T CPO Validation to Meta's 102.4T〉（OCP Global Summit 2026；OCP 錄影清單講者 Granthana Rangaswamy、Siamak Amiralizadeh、Xu Wang〔Meta〕；2026-10-14 上架）。字幕不標講者：0:03 自我介紹的是 Siamak（ASR 拼成 Amiri-Zadeh），17:46 才交棒給 Granthana——17:46 之前的口述推一步是 Siamak；問答段誰答的字幕沒標。本段：15:43–16:07 CPO 的挑戰（單一供應商）】
+"The challenges there are CPO fundamentally is less modular and also the other key issue for us is the supply chain risk. So as you know we have been deploying pluggable optics not from a single vendor but multiple vendors for for decade. And moving to a single vendor in the CPO cases is a huge risk for us."
+
+【OCP 官方影片自動字幕（YouTube en asr，不是逐字稿；照 ASR 原樣、只拿掉時間碼）〈Integrated Optics at Scale for AI Infrastructure: From 51.2T CPO Validation to Meta's 102.4T〉（OCP Global Summit 2026；OCP 錄影清單講者 Granthana Rangaswamy、Siamak Amiralizadeh、Xu Wang〔Meta〕；2026-10-14 上架）。字幕不標講者：0:03 自我介紹的是 Siamak（ASR 拼成 Amiri-Zadeh），17:46 才交棒給 Granthana——17:46 之前的口述推一步是 Siamak；問答段誰答的字幕沒標。本段：16:40–17:03 NPO 的好處】
+"the flexibility in having different optics vendors in in in the same footprint which and also the optics technologies to to come up with a mixed platform design. For example, if we wanted to have some portion of the bandwidth moved with pluggable optics and the other portion with the integrated optics, NPO allows that to do much easier than CPO system."
+
+【OCP 官方影片自動字幕（YouTube en asr，不是逐字稿；照 ASR 原樣、只拿掉時間碼）〈Integrated Optics at Scale for AI Infrastructure: From 51.2T CPO Validation to Meta's 102.4T〉（OCP Global Summit 2026；OCP 錄影清單講者 Granthana Rangaswamy、Siamak Amiralizadeh、Xu Wang〔Meta〕；2026-10-14 上架）。字幕不標講者：0:03 自我介紹的是 Siamak（ASR 拼成 Amiri-Zadeh），17:46 才交棒給 Granthana——17:46 之前的口述推一步是 Siamak；問答段誰答的字幕沒標。本段：17:12–17:17 NPO 的挑戰】
+"the insertion loss of the channel as we move beyond 200 gig per lane, it becomes harder and harder to do it with NPO."
+
+【OCP 官方影片自動字幕（YouTube en asr，不是逐字稿；照 ASR 原樣、只拿掉時間碼）〈Integrated Optics at Scale for AI Infrastructure: From 51.2T CPO Validation to Meta's 102.4T〉（OCP Global Summit 2026；OCP 錄影清單講者 Granthana Rangaswamy、Siamak Amiralizadeh、Xu Wang〔Meta〕；2026-10-14 上架）。字幕不標講者：0:03 自我介紹的是 Siamak（ASR 拼成 Amiri-Zadeh），17:46 才交棒給 Granthana——17:46 之前的口述推一步是 Siamak；問答段誰答的字幕沒標。本段：26:17–27:17 問答：台上一位（字幕未標，推一步是 Meta 講者之一）答每通道 400G 怎麼走；中間「>>」那句是台下提問者插話】
+"Um so, from our perspective, the um the returns of having an integrated optics which sac- -rifices serviceability. Once you put a retimer there, um it doesn't provide us a lot of benefits. So, those returns of power and cost savings diminishes. So, we prefer not to use a retimer um in integrated optics case. From modulator point of view, um >> And then plus the plus the receiver TIA sensitivity, all those are, you know, there's just not enough margin to close the link. That's the problem. >> Yes, uh but it's still I'm hopeful that our vendors are going to push the boundaries and surprise us with with technologies that they are developing on the modulator side and on the PCB traces. And be able to scale for 400 gig. If NPO is not possible, obviously CPO I think is it is giving us more gain."
+
+【OCP 官方影片自動字幕（YouTube en asr，不是逐字稿；照 ASR 原樣、只拿掉時間碼）〈Integrated Optics at Scale for AI Infrastructure: From 51.2T CPO Validation to Meta's 102.4T〉（OCP Global Summit 2026；OCP 錄影清單講者 Granthana Rangaswamy、Siamak Amiralizadeh、Xu Wang〔Meta〕；2026-10-14 上架）。字幕不標講者：0:03 自我介紹的是 Siamak（ASR 拼成 Amiri-Zadeh），17:46 才交棒給 Granthana——17:46 之前的口述推一步是 Siamak；問答段誰答的字幕沒標。本段：27:46–28:11 問答最後一句（字幕未標講者、身分不明）】
+"Just uh uh I just want to point out that going from 200 gig to 400 gig, you know, we have to bring everything much closer, right? Because electrical channel, you know, there is a there is a limit. So, it's either NPO or CPO, but you know, even if if it's with a retimer, it it has to be either NPO or CPO. It can it's very difficult to achieve like a pluggable OSFP kind of a configuration with 400 gig. So, this is the right direction."

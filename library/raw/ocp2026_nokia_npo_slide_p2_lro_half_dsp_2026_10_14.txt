@@ -1,0 +1,10 @@
+Source URL: https://www.dropbox.com/scl/fi/42j8sgypar1upllsuthb4/Architecting-Near-Packaged-Optics-for-AI-Datacenters-Key-Technology-Choices-and-Trade-offs.pdf?rlkey=r83lai0rwlp4o0dnazu33i0kk&dl=0
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Nokia 投影片〈Architecting Near-Packaged Optics for AI Datacenters〉p.2（Armaghan Eshaghi，Nokia；pypdf 抽字）
+DATE: 投影片無日期；同場 OCP 官方影片 2026-10-14 上架
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 發行人文件是自述（L8 弱主張）；媒體只當線索；第三方海關彙整站是 CBP 艙單的第三方轉載。
+
+【Nokia 投影片〈Architecting Near-Packaged Optics for AI Datacenters〉p.2（Armaghan Eshaghi，Nokia；pypdf 抽字）：重定時可插拔、LRO、LPO／NPO／CPO、整合光學各用幾顆 SerDes／DSP 與每位元功耗——LRO「1 SerDes + ½ DSP」「DSP on the Tx side only」】
+"Re-timed pluggable 1 SerDes + 1 DSP ~15 pJ/bit link power Host SerDes plus a DSP in the module LRO 1 SerDes + ½ DSP ~10 pJ/bit link power DSP on the Tx side only LPO / NPO / CPO 1 SerDes ~6 pJ/bit link power Host SerDes only; shorter channel than LPO Integrated optics with die-to-die interfaces 0 SerDes < 4 pJ/bit link power Optics on the die; years from volume"

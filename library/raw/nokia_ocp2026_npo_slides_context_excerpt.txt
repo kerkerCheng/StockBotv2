@@ -1,0 +1,22 @@
+Source URL: https://www.dropbox.com/scl/fi/42j8sgypar1upllsuthb4/Architecting-Near-Packaged-Optics-for-AI-Datacenters-Key-Technology-Choices-and-Trade-offs.pdf?rlkey=r83lai0rwlp4o0dnazu33i0kk&dl=0
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Nokia 投影片〈Architecting Near-Packaged Optics for AI Datacenters: Key Technology Choices and Trade-offs〉（OCP Global Summit
+DATE: 2026-10-14
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 發行人文件是自述（L8 弱主張）；媒體只當線索；第三方海關彙整站是 CBP 艙單的第三方轉載。
+
+【Nokia 投影片〈Architecting Near-Packaged Optics for AI Datacenters: Key Technology Choices and Trade-offs〉（OCP Global Summit 2026 FTI Workshop；Armaghan Eshaghi, Director, Optical Platform Solutions, Nokia；投影片無日期，日期取同場 OCP 官方影片上架日 2026-10-14；pypdf 抽字，「wafer -level」「burned -in」「hyperscalervolume」照抽字原樣；供應商自述，L8）：p.2 NPO 與 CPO】
+"NPO: Same energy class as CPO. Unlike CPO, the optical engine stays a part you can replace"
+
+【Nokia 投影片〈Architecting Near-Packaged Optics for AI Datacenters: Key Technology Choices and Trade-offs〉（OCP Global Summit 2026 FTI Workshop；Armaghan Eshaghi, Director, Optical Platform Solutions, Nokia；投影片無日期，日期取同場 OCP 官方影片上架日 2026-10-14；pypdf 抽字，「wafer -level」「burned -in」「hyperscalervolume」照抽字原樣；供應商自述，L8）：p.5〈Laser Placement and Trade-offs〉製造列（四欄依序：Monolithic／Integrated on PIC／In-package／ELSFP）】
+"Manufacturing Single InP wafer Two platforms; yield compounds Known-good, burned -in laser die Shared source (4-16 lanes); PM fiber handling"
+
+【Nokia 投影片〈Architecting Near-Packaged Optics for AI Datacenters: Key Technology Choices and Trade-offs〉（OCP Global Summit 2026 FTI Workshop；Armaghan Eshaghi, Director, Optical Platform Solutions, Nokia；投影片無日期，日期取同場 OCP 官方影片上架日 2026-10-14；pypdf 抽字，「wafer -level」「burned -in」「hyperscalervolume」照抽字原樣；供應商自述，L8）：p.6〈Packaging sets the power, thermal and service model〉的 Assembly】
+"Known-good-die lasers and PICs; wafer -level test. Passive alignment and automation for volume."
+
+【Nokia 投影片〈Architecting Near-Packaged Optics for AI Datacenters: Key Technology Choices and Trade-offs〉（OCP Global Summit 2026 FTI Workshop；Armaghan Eshaghi, Director, Optical Platform Solutions, Nokia；投影片無日期，日期取同場 OCP 官方影片上架日 2026-10-14；pypdf 抽字，「wafer -level」「burned -in」「hyperscalervolume」照抽字原樣；供應商自述，L8）：p.7 全頁】
+"Nokia: 6-inch InP platform LASERS Monolithic Internal External MODULATORS InP 3-inch · Sunnyvale 1st InP fab 6-inch · San Jose 2nd InP fab · New 6-inch · Arizona 3rd InP fab · New SiPh TFLN Manufacturing scale and performance will pick the winners A design that can't be built at hyperscalervolume won’t have a chance. → Customers are asking for ~10× InP volume by the end of the decade. → Nokia is investing in 6-inch manufacturing to significantly scale capacity. Nokia DC Switch with NPO Engines"
+
+【Nokia 投影片〈Architecting Near-Packaged Optics for AI Datacenters: Key Technology Choices and Trade-offs〉（OCP Global Summit 2026 FTI Workshop；Armaghan Eshaghi, Director, Optical Platform Solutions, Nokia；投影片無日期，日期取同場 OCP 官方影片上架日 2026-10-14；pypdf 抽字，「wafer -level」「burned -in」「hyperscalervolume」照抽字原樣；供應商自述，L8）：p.8〈Takeaways〉第 1 條】
+"NPO sits in the same energy class as CPO, with the optics outside the ASIC package: the near-term, serviceable path."

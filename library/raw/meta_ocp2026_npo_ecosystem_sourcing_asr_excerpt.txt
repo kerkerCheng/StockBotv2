@@ -1,0 +1,19 @@
+Source URL: https://www.youtube.com/watch?v=V5blMEcg3GQ
+
+Excerpt:
+[EXCERPT — 有限逐字引文] OCP 官方影片自動字幕（YouTube en asr，不是逐字稿；照 ASR 原樣、只拿掉時間碼）〈Beyond Pluggables: Building the NPO Ecosystem for scaling AI〉（OCP Glo
+DATE: 2026-10-13
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: OCP 官方影片的 YouTube 自動字幕——不是逐字稿，可能有聽寫錯字；講者沒在字幕標名的，報告裡寫「推一步」。
+
+【OCP 官方影片自動字幕（YouTube en asr，不是逐字稿；照 ASR 原樣、只拿掉時間碼）〈Beyond Pluggables: Building the NPO Ecosystem for scaling AI〉（OCP Global Summit 2026 IPEC Workshop；OCP 錄影清單講者 Ge Nan, Meta Technical Sourcing Manager，單人場；2026-10-13 上架）。字幕裡的 MPO 是 NPO 的誤聽（場次標題與上下文）：0:04–0:09 開場自我介紹】
+"I'm Nan here so from technical sourcing team at a meta."
+
+【OCP 官方影片自動字幕（YouTube en asr，不是逐字稿；照 ASR 原樣、只拿掉時間碼）〈Beyond Pluggables: Building the NPO Ecosystem for scaling AI〉（OCP Global Summit 2026 IPEC Workshop；OCP 錄影清單講者 Ge Nan, Meta Technical Sourcing Manager，單人場；2026-10-13 上架）。字幕裡的 MPO 是 NPO 的誤聽（場次標題與上下文）：NPO 的使用情境與備案】
+"So, at the meta, uh we have a very strong um use case for scale-out network for using NPO. This is slightly different than our partner hyperscalers. And uh the thinking process behind that is that um for uh scale-out network, we have a better options, like um the alternatives um the CPO and also the pluggable optics. So, in case NPO doesn't work well for time to market, we have some backup position to mitigate the risk."
+
+【OCP 官方影片自動字幕（YouTube en asr，不是逐字稿；照 ASR 原樣、只拿掉時間碼）〈Beyond Pluggables: Building the NPO Ecosystem for scaling AI〉（OCP Global Summit 2026 IPEC Workshop；OCP 錄影清單講者 Ge Nan, Meta Technical Sourcing Manager，單人場；2026-10-13 上架）。字幕裡的 MPO 是 NPO 的誤聽（場次標題與上下文）：沒有二選一；scale-up 還換不掉銅；scale-out 先導】
+"And my typical answer is that there's no kind of either-or choice. So, um each technology here has its specific use case, and we don't really think they are competing with each other. Because let's say for scale-up um application, and uh the MPO and CPO and also OCI uh it's not mature enough for us to completely replace the copper backplane. But, for um the scale-out network, because we have the bank up there, and we can take a little bit forward and take some risk. Um and as long as we have the backup plan available. This is why Meta has made a decision to roll out MPO to scale-up uh scale-out network and as a pilot platform."
+
+【OCP 官方影片自動字幕（YouTube en asr，不是逐字稿；照 ASR 原樣、只拿掉時間碼）〈Beyond Pluggables: Building the NPO Ecosystem for scaling AI〉（OCP Global Summit 2026 IPEC Workshop；OCP 錄影清單講者 Ge Nan, Meta Technical Sourcing Manager，單人場；2026-10-13 上架）。字幕裡的 MPO 是 NPO 的誤聽（場次標題與上下文）：結語】
+"So in a nutshell, we believe MPO is the right solution for the next generation scale out architecture and just as a start"

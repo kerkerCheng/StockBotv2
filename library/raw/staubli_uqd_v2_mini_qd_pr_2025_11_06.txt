@@ -3,7 +3,7 @@ URL: https://www.prnewswire.com/news-releases/staubli-drives-next-generation-liq
 PUBLISHED: 2025-11-06（PR Newswire datePublished 2025-11-06T09:00:00-05:00）
 RETRIEVED: 2026-10-06
 STORAGE: repo_excerpt（新聞稿正文）
-NOTE: 供應商自述；UQD v2 於 2025-10 OCP Global Summit 發布、v1 由 Stäubli、Parker、CPC 等組成的工作小組於 2020 年制定（此句是 Stäubli 的說法，v1 規格書的貢獻者見 ocp_uqd_spec_rev1_0_2020_09_04）。
+NOTE: 供應商自述；UQD v2 於 2025-10 OCP Global Summit 宣布（原字「announced the UQD v2 update」；〔2026-10-19 更正：原寫「發布」——定稿 v2.0.0 是 2026-09-22 生效，見 ocp_uqd_spec_v2_0_0_2026_09_22〕）、v1 由 Stäubli、Parker、CPC 等組成的工作小組於 2020 年制定（此句是 Stäubli 的說法，v1 規格書的貢獻者見 ocp_uqd_spec_rev1_0_2020_09_04）。
 
 New Mini-QD connector enables use of next-generation optical pluggable modules; UQD v2 specification enforces greater precision
 

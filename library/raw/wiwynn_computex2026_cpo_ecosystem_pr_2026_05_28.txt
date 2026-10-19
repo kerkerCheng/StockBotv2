@@ -1,0 +1,40 @@
+Source URL: https://www.wiwynn.com/news/wiwynn-and-ecosystem-partners-to-showcase-co-packaged-optics-innovations-at-computex-2026
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Wiwynn 官網新聞稿〈Wiwynn and Ecosystem Partners to Showcase Co-Packaged Optics Innovations at Computex 2026〉（TAIPEI, 2026-05-
+DATE: 2026-05-28
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 發行人文件是自述（L8 弱主張）；媒體只當線索；第三方海關彙整站是 CBP 艙單的第三方轉載。
+
+【Wiwynn 官網新聞稿〈Wiwynn and Ecosystem Partners to Showcase Co-Packaged Optics Innovations at Computex 2026〉（TAIPEI, 2026-05-28；頁面標「Updated on October 12, 2026」，取得的是 10-12 修改後的版本，5-28 原版是否一字不差無法核對）：頁面標示】
+"4 min read Wiwynn and Ecosystem Partners to Showcase Co-Packaged Optics Innovations at Computex 2026 Wiwynn Updated on October 12, 2026"
+
+【Wiwynn 官網新聞稿〈Wiwynn and Ecosystem Partners to Showcase Co-Packaged Optics Innovations at Computex 2026〉（TAIPEI, 2026-05-28；頁面標「Updated on October 12, 2026」，取得的是 10-12 修改後的版本，5-28 原版是否一字不差無法核對）：開頭段（展示夥伴名單）】
+"TAIPEI, Taiwan — May 28, 2026 — Wiwynn, an innovative cloud IT infrastructure provider for data center, today announced it will unveil its latest Co-Packaged Optics (CPO) interconnect technologies at Computex 2026 (Nangang Exhibition Center Hall 1, Booth #J0106). The demonstration brings together ecosystem partners including Ayar Labs, Global Unichip Corp. (GUC), Browave, Corning Incorporated, FOCI, Molex, SENKO, and TE Connectivity. Together, the companies will present a full-stack path from chip-level CPO innovation to data center-scale deployment, marking a pivotal step forward for AI scale-up architectures."
+
+【Wiwynn 官網新聞稿〈Wiwynn and Ecosystem Partners to Showcase Co-Packaged Optics Innovations at Computex 2026〉（TAIPEI, 2026-05-28；頁面標「Updated on October 12, 2026」，取得的是 10-12 修改後的版本，5-28 原版是否一字不差無法核對）：With Ayar Labs 段】
+"To accelerate adoption, Wiwynn has formed a strategic partnership with CPO leader Ayar Labs. By integrating Ayar Labs' industry-leading TeraPHY™ optical engines and External Laser Small Form Factor Pluggable (ELSFP) SuperNova™ light sources into Wiwynn's rack-level architecture, the two companies are jointly delivering high-bandwidth, power-efficient CPO connectivity. Together, they are addressing key hyperscaler deployment challenges: fiber management, CPO-enabled AI ASIC integration, thermal management, power efficiency, and manufacturability."
+
+【Wiwynn 官網新聞稿〈Wiwynn and Ecosystem Partners to Showcase Co-Packaged Optics Innovations at Computex 2026〉（TAIPEI, 2026-05-28；頁面標「Updated on October 12, 2026」，取得的是 10-12 修改後的版本，5-28 原版是否一字不差無法核對）：ELSFP 液冷段】
+"To meet CPO architecture’s critical demand for stable external light sources, Wiwynn has engineered an in-house liquid-cooling solution specifically for ELSFP to ensure consistent laser output."
+
+【Wiwynn 官網新聞稿〈Wiwynn and Ecosystem Partners to Showcase Co-Packaged Optics Innovations at Computex 2026〉（TAIPEI, 2026-05-28；頁面標「Updated on October 12, 2026」，取得的是 10-12 修改後的版本，5-28 原版是否一字不差無法核對）：光纖生態系段】
+"Wiwynn also collaborates with a robust ecosystem of fiber and connectivity leaders, including Browave, Corning, FOCI, Molex, SENKO, and TE Connectivity, to bridge fiber routing and optical interconnect solutions within the server system to rack-level infrastructure. The exhibition features advanced technologies, highlighting Fiber Array Units (FAUs), high-density optical connectors, blind-mate interconnects, and fiber management systems. This builds a complete optical interconnect solution from in-chassis to rack-level, accelerating the large-scale adoption of CPO technology in data centers."
+
+【Wiwynn 官網新聞稿〈Wiwynn and Ecosystem Partners to Showcase Co-Packaged Optics Innovations at Computex 2026〉（TAIPEI, 2026-05-28；頁面標「Updated on October 12, 2026」，取得的是 10-12 修改後的版本，5-28 原版是否一字不差無法核對）：結語】
+"Moving forward, Wiwynn remains committed to deepening its cross-layer ecosystem partnerships, leading the transition of CPO technology from validation to hyperscale volume deployment."
+
+【Wiwynn 官網新聞稿〈Wiwynn and Ecosystem Partners to Showcase Co-Packaged Optics Innovations at Computex 2026〉（TAIPEI, 2026-05-28；頁面標「Updated on October 12, 2026」，取得的是 10-12 修改後的版本，5-28 原版是否一字不差無法核對）：Browave（波若威）夥伴聲明（供應商自述）】
+"“Our in-depth collaboration with Wiwynn signifies market-leading recognition of Browave’s R&D strength in Silicon Photonics and high-end CPO,” said Victor Hwang, CEO of Browave. ” Leveraging decades of technical heritage in optical communications and our strategic head start in the CPO market, Browave is honored to provide the core components that empower Wiwynn to showcase industry-leading innovations at Computex. Together, we are capturing the opportunities of the AI wave and continuing to drive the AI server market to new heights.”"
+
+【Wiwynn 官網新聞稿〈Wiwynn and Ecosystem Partners to Showcase Co-Packaged Optics Innovations at Computex 2026〉（TAIPEI, 2026-05-28；頁面標「Updated on October 12, 2026」，取得的是 10-12 修改後的版本，5-28 原版是否一字不差無法核對）：Corning 夥伴聲明（供應商自述）】
+"Claude Echahamian, vice president and general manager, emerging businesses and EMEA, Corning Optical Communications: "Co-packaged optics represents a fundamental shift in how optical connectivity is designed and deployed for large-scale AI systems. This is achieved through relationships across the ecosystem of companies that innovate to make this transformation a reality. Corning is pleased to work with Wiwynn in bringing robust and high-density fiber infrastructures within server trays and across racks for the latest generation of large-scale AI systems.""
+
+【Wiwynn 官網新聞稿〈Wiwynn and Ecosystem Partners to Showcase Co-Packaged Optics Innovations at Computex 2026〉（TAIPEI, 2026-05-28；頁面標「Updated on October 12, 2026」，取得的是 10-12 修改後的版本，5-28 原版是否一字不差無法核對）：FOCI（上詮）夥伴聲明（供應商自述）】
+"“We are pleased to establish a strategic CPO partnership with Wiwynn,” said D.D. Hu, General Manager of FOCI. “Leveraging our core optical interconnect technologies, developed through years of collaboration with the semiconductor industry, we will work together to address key challenges in silicon photonics packaging, including reflow compatibility and system pluggability. Together, we aim to reduce packaging complexity, enhance transmission architecture flexibility, and accelerate the deployment of next-generation AI optical communication infrastructure.”"
+
+【Wiwynn 官網新聞稿〈Wiwynn and Ecosystem Partners to Showcase Co-Packaged Optics Innovations at Computex 2026〉（TAIPEI, 2026-05-28；頁面標「Updated on October 12, 2026」，取得的是 10-12 修改後的版本，5-28 原版是否一字不差無法核對）：SENKO 夥伴聲明（供應商自述）】
+""Manufacturable and serviceable interconnect design is essential to scaling co‑packaged optics,” said Kazu Takano, President and CBDO of SENKO Emerging Technologies Group. “As AI infrastructure transitions toward co‑packaged optics, reliable, high‑density optical connectivity becomes mission‑critical. Through our collaboration with Wiwynn, SENKO is supporting system‑level component integration including detachable FAUs with SEAT™ technology, and SN®-MT Very Small Form Factor (VSFF) interface connectivity, as shown in Wiwynn’s COMPUTEX CPO system demonstration.”"
+
+【Wiwynn 官網新聞稿〈Wiwynn and Ecosystem Partners to Showcase Co-Packaged Optics Innovations at Computex 2026〉（TAIPEI, 2026-05-28；頁面標「Updated on October 12, 2026」，取得的是 10-12 修改後的版本，5-28 原版是否一字不差無法核對）：TE Connectivity 夥伴聲明（供應商自述）】
+"“Co-packaged optics is emerging as a foundational technology for next-generation AI infrastructure, and a strong ecosystem will be critical to advancing these solutions at scale,” said Vishwas Rao, Senior Vice President and General Manager at TE Connectivity. “At TE, we bring deep expertise in high-density interconnects (including M x N arrayed high density FAUs), end-to-end signal and power solutions, and global manufacturing. We combine this with our next generation designs and processes to help customers deploy next-generation CPO architectures across AI data centers.”"

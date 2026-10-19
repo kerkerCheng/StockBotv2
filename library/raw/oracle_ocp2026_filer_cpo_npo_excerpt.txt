@@ -1,0 +1,13 @@
+Source URL: https://www.dropbox.com/scl/fi/a4oiia6e5yse6do4c7stf/Lessons-learned-from-GW-scale-AI-deployments.pdf?rlkey=svl7p1hzeqoqgdg8mdeagci3m&dl=0
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Oracle 投影片〈Lessons learned from GW-scale AI deployments〉（OCP Global Summit 2026, Special Focus: Photonics；Mark Filer, Ar
+DATE: 2026-10-14
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 發行人文件是自述（L8 弱主張）；媒體只當線索；第三方海關彙整站是 CBP 艙單的第三方轉載。
+
+【Oracle 投影片〈Lessons learned from GW-scale AI deployments〉（OCP Global Summit 2026, Special Focus: Photonics；Mark Filer, Architect, Oracle Cloud Infrastructure；投影片無日期，日期取同場 OCP 官方影片上架日 2026-10-14；pypdf 抽字）：p.10〈Beyond pluggables – CPO/NPO systems〉（腳註 1 是 Meta 的 OCP 2025 論文；上標數字照抽字黏在句尾）】
+"(Mis)handling of transceivers a primary failure mode – CPO removes humans from the deploy and ops process • System FIT expected lower than equivalent pluggable- based system1 Power efficiency: expected power savings of up to 50% over the equivalent fully-retimed pluggable-based system (200G/lane generation)2 Cost reduction: theoretical 30%+ cost efficiencies possible (assuming volume deployments)3 Beyond pluggables – CPO/NPO systems https://www.opencpxmsa.org NPO Source: Ciena CPO Source: Broadcom NPO offers some attractive features for end users and switch manufacturers, but must be proven to deliver reliability and power efficiency on par with soldered CPO"
+
+【Oracle 投影片〈Lessons learned from GW-scale AI deployments〉（OCP Global Summit 2026, Special Focus: Photonics；Mark Filer, Architect, Oracle Cloud Infrastructure；投影片無日期，日期取同場 OCP 官方影片上架日 2026-10-14；pypdf 抽字）：p.10 腳註 1】
+"1. Evaluation of CPO performance and pluggable optics health for reliable AI infrastructure, S. Amiralizadeh (Meta), OCP 2025"

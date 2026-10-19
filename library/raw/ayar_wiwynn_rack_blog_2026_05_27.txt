@@ -1,0 +1,22 @@
+Source URL: https://ayarlabs.com/blog/building-a-production-ready-optically-connected-rack-for-ai-scale-up/
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Ayar Labs 部落格〈Building a Production-Ready Optically Connected Rack for AI Scale-Up〉（2026-05-27，article:published_time）
+DATE: 2026-05-27
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 發行人文件是自述（L8 弱主張）；媒體只當線索；第三方海關彙整站是 CBP 艙單的第三方轉載。
+
+【Ayar Labs 部落格〈Building a Production-Ready Optically Connected Rack for AI Scale-Up〉（2026-05-27，article:published_time）：OFC 參考設計】
+"Ayar Labs and Wiwynn announced their partnership at the Optical Fiber Communication (OFC) Conference in March 2026. We demoed a complete rack-scale AI infrastructure reference design, from the L10 chassis to the L11 rack."
+
+【Ayar Labs 部落格〈Building a Production-Ready Optically Connected Rack for AI Scale-Up〉（2026-05-27，article:published_time）：液冷 ELSFP 展示與目的】
+"This demonstration is one of the first times liquid-cooled light sources are being used in a rack architecture. Specifically, the demo showcases a liquid-cooled, high-density ELSFP board design in a “belly-to-belly” placement. The cold plate is designed to support OIF-spec high-power ELSFP with full serviceability. With this demonstration, we aim to validate mechanical and thermal performance and provide a deployment-ready design for high-density CPO systems soon."
+
+【Ayar Labs 部落格〈Building a Production-Ready Optically Connected Rack for AI Scale-Up〉（2026-05-27，article:published_time）：光纖數量】
+"As one might imagine, 1,024 accelerators, with 8 optical engines each and 32 fiber cables per engine, add up fast. At this scale, fiber routing and service operations must be designed in from the start and not layered on after the fact."
+
+【Ayar Labs 部落格〈Building a Production-Ready Optically Connected Rack for AI Scale-Up〉（2026-05-27，article:published_time）：可拆連接器（買方自述 vendor-agnostic）】
+"As the ecosystem matures, detachable connector options can further support serviceability and fiber management at rack scale. Ayar Labs is vendor-agnostic and works across the ecosystem to support multiple connector options based on customer requirements and deployment needs."
+
+【Ayar Labs 部落格〈Building a Production-Ready Optically Connected Rack for AI Scale-Up〉（2026-05-27，article:published_time）：雲端客戶要的證明】
+"“Hyperscalers like the promise of CPO, but they want proof that reliability and serviceability considerations to run this technology in data centers are met in the form factors they understand,” Gupta added."

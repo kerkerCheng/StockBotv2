@@ -1,0 +1,31 @@
+Source URL: https://www.youtube.com/watch?v=BVOUFwe2zrc
+
+Excerpt:
+[EXCERPT — 有限逐字引文] OCP 官方影片自動字幕（YouTube en asr，不是逐字稿；照 ASR 原樣、只拿掉時間碼）〈From Package to DCI: OIF Enablers in Oracle Cloud and AI Networks〉（OC
+DATE: 2026-10-13
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: OCP 官方影片的 YouTube 自動字幕——不是逐字稿，可能有聽寫錯字；講者沒在字幕標名的，報告裡寫「推一步」。
+
+【OCP 官方影片自動字幕（YouTube en asr，不是逐字稿；照 ASR 原樣、只拿掉時間碼）〈From Package to DCI: OIF Enablers in Oracle Cloud and AI Networks〉（OCP Global Summit 2026 OIF Workshop；OCP 錄影清單講者 Mark Filer, Oracle Architect，單人場；2026-10-13 上架）：0:14–0:24 講者所屬（Oracle）】
+"what Oracle is doing uh kind of dovetails with what we're doing in the OIF. And I say we because Oracle joined the OIF this year and uh are now contributing members."
+
+【OCP 官方影片自動字幕（YouTube en asr，不是逐字稿；照 ASR 原樣、只拿掉時間碼）〈From Package to DCI: OIF Enablers in Oracle Cloud and AI Networks〉（OCP Global Summit 2026 OIF Workshop；OCP 錄影清單講者 Mark Filer, Oracle Architect，單人場；2026-10-13 上架）：7:52–8:25 1.6T 改用 LRO／RTLR】
+"So, at 1.6T, uh we want to retain as much of the benefit as possible that we got with LPO at 800 gig, you know, after our internal analysis, we felt like LPO couldn't comfortably meet the SI and interrupt performance requirements we needed at the higher baud rate. So, we uh opted to deploy LRO {slash} uh RTLR. That's retime transmit linear received in OIF speak, um because it provides the lowest uh the best low power solution that's currently available today."
+
+【OCP 官方影片自動字幕（YouTube en asr，不是逐字稿；照 ASR 原樣、只拿掉時間碼）〈From Package to DCI: OIF Enablers in Oracle Cloud and AI Networks〉（OCP Global Summit 2026 OIF Workshop；OCP 錄影清單講者 Mark Filer, Oracle Architect，單人場；2026-10-13 上架）：10:33–11:02 1.6T 之後】
+"So, we're also thinking at the same time beyond pluggables. We want to be preparing ourselves for the uh inevitability of uh 448 gig per lane. And what that means to us now is we should be pipe cleaning this ecosystem at 224 gig per lane. Uh and potentially seeing if this technology proves viable, if we can operate it at scale, we can actually, you know, kind of displace some of the planned 1.6T pluggable deployments and replace it with CPO or NPO type solutions."
+
+【OCP 官方影片自動字幕（YouTube en asr，不是逐字稿；照 ASR 原樣、只拿掉時間碼）〈From Package to DCI: OIF Enablers in Oracle Cloud and AI Networks〉（OCP Global Summit 2026 OIF Workshop；OCP 錄影清單講者 Mark Filer, Oracle Architect，單人場；2026-10-13 上架）：11:19–11:39 CPO 拿掉人手、層層測成 known good】
+"we've seen just from experience mishandling of transceivers is a primary failure mode. CPO removes humans from the deploy and ops process. Everything is tested known good, you know, at the die level or subsystem level before it ever lands at the rack integrator, and the rack is tested known good before it ever lands at the data center."
+
+【OCP 官方影片自動字幕（YouTube en asr，不是逐字稿；照 ASR 原樣、只拿掉時間碼）〈From Package to DCI: OIF Enablers in Oracle Cloud and AI Networks〉（OCP Global Summit 2026 OIF Workshop；OCP 錄影清單講者 Mark Filer, Oracle Architect，單人場；2026-10-13 上架）：11:49–12:14 CPO 可靠度的期待引的是 Meta 的數據】
+"Um the system fit is expected to be This is a typo. Lower, meaning better, than the equivalent pluggable base system. Um so, this this uh statement is kind of supported by some great data that Meta has been publishing incrementally uh with their apples-to-apples CPO and pluggable deployments uh they have going. I expect we'll get an update of that um at this OCP."
+
+【OCP 官方影片自動字幕（YouTube en asr，不是逐字稿；照 ASR 原樣、只拿掉時間碼）〈From Package to DCI: OIF Enablers in Oracle Cloud and AI Networks〉（OCP Global Summit 2026 OIF Workshop；OCP 錄影清單講者 Mark Filer, Oracle Architect，單人場；2026-10-13 上架）：12:36–12:51 CPO 的限制】
+"today CPO solutions uh feature proprietary implementations, so it's a little bit difficult to standardize. Supply chain constraints uh related to that and inflexible configurations like all DR optics only."
+
+【OCP 官方影片自動字幕（YouTube en asr，不是逐字稿；照 ASR 原樣、只拿掉時間碼）〈From Package to DCI: OIF Enablers in Oracle Cloud and AI Networks〉（OCP Global Summit 2026 OIF Workshop；OCP 錄影清單講者 Mark Filer, Oracle Architect，單人場；2026-10-13 上架）：13:29–13:45 NPO 的多供應商】
+"Uh one is multi-vendor optical ecosystem. Everybody likes that on the operator side. Um of course, not everyone on the optic side loves that, but I know a lot of the optic suppliers really want to participate in this ecosystem and NPO is a way to do that."
+
+【OCP 官方影片自動字幕（YouTube en asr，不是逐字稿；照 ASR 原樣、只拿掉時間碼）〈From Package to DCI: OIF Enablers in Oracle Cloud and AI Networks〉（OCP Global Summit 2026 OIF Workshop；OCP 錄影清單講者 Mark Filer, Oracle Architect，單人場；2026-10-13 上架）：17:04–17:17 結語：線性驅動】
+"one is that our linear drive interfaces are correlated. We've seen them to be correlated to a more stable and more resilient network. You know, it's our feeling that this bodes well for the emerging CPO and NPO applications which are presumed to also be linear drive."

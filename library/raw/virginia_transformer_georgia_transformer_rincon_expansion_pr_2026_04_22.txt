@@ -1,0 +1,16 @@
+Source URL: https://www.vatransformer.com/virginia-transformer-breaks-ground-on-georgia-transformer-expansion-in-rincon/
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Virginia Transformer 新聞稿（公司官網，2026-04-22）
+DATE: 2026-04-22
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 發行人文件是自述（L8 弱主張）；媒體只當線索；第三方海關彙整站是 CBP 艙單的第三方轉載。
+
+【Virginia Transformer 新聞稿（公司官網，2026-04-22）：Georgia Transformer（GTC）是它在 Rincon, Georgia 的工廠；擴產破土、預計 2027 年 3 月完工】
+"Rincon, Ga. (Wednesday, April 22, 2026) — Virginia Transformer today held an official groundbreaking ceremony on a major expansion at its Georgia Transformer (GTC) manufacturing facility in Rincon, Georgia, marking the latest investment in the company’s growing production capacity for large power transformers and further solidifying its long-held position of having the shortest lead times for customers. The project follows the company’s announcement in November 2025 outlining plans to expand the Rincon facility. Construction teams have moved beyond initial site preparation and into active expansion work, with project completion slated for March 2027."
+
+【Virginia Transformer 新聞稿（公司官網，2026-04-22）：Rincon 廠產能增加 50%】
+"The Rincon expansion will create approximately 400 new jobs and increase the facility’s production capacity 50 percent."
+
+【Virginia Transformer 新聞稿（公司官網，2026-04-22）：GTC 產品範圍 2 MVA 到 500MVA】
+"Georgia Transformer serves all customers across utilities, data centers, renewable energy, industrial, mining, oil and gas, commercial, institutional, specialty, in US and Canada markets. The plant makes a wide range of transformers, from 2 MVA up to 500MVA with an installed capacity of 150,000 MVA."

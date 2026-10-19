@@ -1,0 +1,19 @@
+Source URL: https://ayarlabs.com/news/ayar-labs-expands-2026-funding-to-650-million/
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Ayar Labs 新聞稿〈Ayar Labs Expands 2026 Funding to $650 Million to Scale Manufacturing-Ready CPO for AI Scale-Up Beyond the
+DATE: 2026-09-10
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 發行人文件是自述（L8 弱主張）；媒體只當線索；第三方海關彙整站是 CBP 艙單的第三方轉載。
+
+【Ayar Labs 新聞稿〈Ayar Labs Expands 2026 Funding to $650 Million to Scale Manufacturing-Ready CPO for AI Scale-Up Beyond the Rack〉（2026-09-10）：開頭（Wiwynn 策略投資）】
+"SAN JOSE, Calif. — Sept. 10, 2026 — Ayar Labs, the leader in co-packaged optics (CPO) solutions for AI scale-up, announced it has secured an additional $150 million in funding, bringing its total primary capital raised in 2026 to $650 million. Separately, the company disclosed that Wiwynn made a strategic investment earlier this year. Wiwynn, a cloud IT and infrastructure provider for data centers, joins a growing group of strategic backers that includes Alchip, AMD, Intel, MediaTek, and NVIDIA."
+
+【Ayar Labs 新聞稿〈Ayar Labs Expands 2026 Funding to $650 Million to Scale Manufacturing-Ready CPO for AI Scale-Up Beyond the Rack〉（2026-09-10）：資金用途（自述）】
+"This new capital will support Ayar Labs’ continued transition to high-volume manufacturing, including investments in product development, validation, scaling the manufacturing ecosystem, and opening a new Bengaluru Design Center."
+
+【Ayar Labs 新聞稿〈Ayar Labs Expands 2026 Funding to $650 Million to Scale Manufacturing-Ready CPO for AI Scale-Up Beyond the Rack〉（2026-09-10）：Mark Wade（客戶未具名）】
+"This funding allows us to move faster on manufacturing-ready co-packaged optics at scale. We’re deepening our work across the foundry and packaging ecosystem and growing our engineering capacity to support customer programs worldwide.”"
+
+【Ayar Labs 新聞稿〈Ayar Labs Expands 2026 Funding to $650 Million to Scale Manufacturing-Ready CPO for AI Scale-Up Beyond the Rack〉（2026-09-10）：William Lin（Wiwynn）】
+"“Through our collaboration and investment with Ayar Labs, we see a clear path to new architectures that reduce the power and complexity limits of copper interconnects, powering rack-scale deployment for the next wave of hyperscale AI data centers.”"

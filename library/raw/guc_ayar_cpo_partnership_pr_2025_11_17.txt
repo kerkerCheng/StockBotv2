@@ -1,0 +1,10 @@
+Source URL: https://www.guc-asic.com/en/news/PressRelease/PR_ENG_20251117
+
+Excerpt:
+[EXCERPT — 有限逐字引文] 創意電子（GUC）新聞稿〈GUC and Ayar Labs Partner to Advance Co-Packaged Optics for Hyperscalers〉（2025-11-17）
+DATE: 2025-11-17
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 發行人文件是自述（L8 弱主張）；媒體只當線索；第三方海關彙整站是 CBP 艙單的第三方轉載。
+
+【創意電子（GUC）新聞稿〈GUC and Ayar Labs Partner to Advance Co-Packaged Optics for Hyperscalers〉（2025-11-17）：開頭】
+"HSINCHU, Taiwan and SAN JOSE, Calif. – Nov. 17, 2025 – Global Unichip Corp. (GUC), the Advanced ASIC leader, and Ayar Labs, a leader in co-packaged optics (CPO) for large-scale AI workloads, have announced a strategic partnership to integrate CPO into GUC's advanced ASIC design services. This collaboration paves the way for high-bandwidth, low-latency, power-efficient optical interconnects in next-generation AI, HPC and networking applications where electrical signaling is reaching its limits. By integrating Ayar Labs' TeraPHYTM optical engines into GUC's advanced packaging and ASIC workflow, the companies are exploring critical areas to enable future CPO deployment."

@@ -1,0 +1,22 @@
+Source URL: https://www.youtube.com/watch?v=MIxPMX78t_M
+
+Excerpt:
+[EXCERPT — 有限逐字引文] OCP 官方影片自動字幕（YouTube en asr，不是逐字稿；照 ASR 原樣、只拿掉時間碼）〈How can Near Packaged Optics continue the eco-system success of plugg
+DATE: 2026-10-13
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: OCP 官方影片的 YouTube 自動字幕——不是逐字稿，可能有聽寫錯字；講者沒在字幕標名的，報告裡寫「推一步」。
+
+【OCP 官方影片自動字幕（YouTube en asr，不是逐字稿；照 ASR 原樣、只拿掉時間碼）〈How can Near Packaged Optics continue the eco-system success of pluggable optics〉（OCP Global Summit 2026 IPEC Workshop；OCP 錄影清單講者 Yawei Yin, Microsoft Sr. Principal Network Developer，單人場，ASR 拼成 Yabei Yin；2026-10-13 上架）。字幕裡的 MPO 是 NPO、CPU 多半是 CPO、feeder rate 是 FIT rate 的誤聽（推一步）：0:05–0:09 開場自我介紹】
+"my name is uh Yabei Yin, coming from Microsoft."
+
+【OCP 官方影片自動字幕（YouTube en asr，不是逐字稿；照 ASR 原樣、只拿掉時間碼）〈How can Near Packaged Optics continue the eco-system success of pluggable optics〉（OCP Global Summit 2026 IPEC Workshop；OCP 錄影清單講者 Yawei Yin, Microsoft Sr. Principal Network Developer，單人場，ASR 拼成 Yabei Yin；2026-10-13 上架）。字幕裡的 MPO 是 NPO、CPU 多半是 CPO、feeder rate 是 FIT rate 的誤聽（推一步）：產業的終點（共封裝）】
+"Uh eventually, uh I think the end goal of the industry, many people would agree to have the optical engine co-packaged with the electrical engine. Uh that's kind of a holy grail of thing."
+
+【OCP 官方影片自動字幕（YouTube en asr，不是逐字稿；照 ASR 原樣、只拿掉時間碼）〈How can Near Packaged Optics continue the eco-system success of pluggable optics〉（OCP Global Summit 2026 IPEC Workshop；OCP 錄影清單講者 Yawei Yin, Microsoft Sr. Principal Network Developer，單人場，ASR 拼成 Yabei Yin；2026-10-13 上架）。字幕裡的 MPO 是 NPO、CPU 多半是 CPO、feeder rate 是 FIT rate 的誤聽（推一步）：線性通道與半重定時】
+"most of the MPO solutions that I'm looking at it today, we will assume linear channels. Linear channels should work, right? But there's a still argument about it if we keep continue to drive to 400G play, uh some of the lanes maybe still facing some challenges. So, uh adding some level of re-timing into the MPO modules uh can be considered and that's also being discussed inside the industry. So, even half re-timed can be considered"
+
+【OCP 官方影片自動字幕（YouTube en asr，不是逐字稿；照 ASR 原樣、只拿掉時間碼）〈How can Near Packaged Optics continue the eco-system success of pluggable optics〉（OCP Global Summit 2026 IPEC Workshop；OCP 錄影清單講者 Yawei Yin, Microsoft Sr. Principal Network Developer，單人場，ASR 拼成 Yabei Yin；2026-10-13 上架）。字幕裡的 MPO 是 NPO、CPU 多半是 CPO、feeder rate 是 FIT rate 的誤聽（推一步）：可靠度要求】
+"my mental model goes it have to be at least 10 times bigger a 10 times smaller in fit and a 10 times bigger in MTBF"
+
+【OCP 官方影片自動字幕（YouTube en asr，不是逐字稿；照 ASR 原樣、只拿掉時間碼）〈How can Near Packaged Optics continue the eco-system success of pluggable optics〉（OCP Global Summit 2026 IPEC Workshop；OCP 錄影清單講者 Yawei Yin, Microsoft Sr. Principal Network Developer，單人場，ASR 拼成 Yabei Yin；2026-10-13 上架）。字幕裡的 MPO 是 NPO、CPU 多半是 CPO、feeder rate 是 FIT rate 的誤聽（推一步）：NPO 是橋】
+"Um so, yeah, MPO is a is a is a bridge. It's a bridge to getting to a better future of more power efficiency and a more reliable network for the end users."

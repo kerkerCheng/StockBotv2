@@ -1,0 +1,10 @@
+Source URL: https://www.youtube.com/watch?v=B2kG3hJ1AOY
+
+Excerpt:
+[EXCERPT — 有限逐字引文] OCP 官方影片自動字幕（YouTube en asr，不是逐字稿）
+DATE: 2026-10-14
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: OCP 官方影片的 YouTube 自動字幕——不是逐字稿，可能有聽寫錯字；講者沒在字幕標名的，報告裡寫「推一步」。
+
+【OCP 官方影片自動字幕（YouTube en asr，不是逐字稿）：〈Standards and Future Technologies〉座談 22:13–22:28，回答聽眾問 top concerns（例如「lack of lasers」）的第一個回答。講者字幕沒標；之後主持人點名 Nathan、Roger（ASR 原樣，推一步是 Rajiv），最後是自稱 system supplier 的那位——消去後推一步是 TeraHop 的 Ryan Yu（光模組廠，供應商自述）】
+"I think we are short on everything, practically. I mean, that's that's the statement. Um it the shortage turn up from places you never thought it's going to be short. Uh but I think industry is uh responding to this unprecedented ramp up actually we experienced in the last couple years."

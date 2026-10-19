@@ -1,0 +1,16 @@
+Source URL: https://ayarlabs.com/news/ayar-labs-and-wiwynn-partner-to-bring-co-packaged-optics-to-rack-scale-ai-systems/
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Ayar Labs 新聞稿〈Ayar Labs and Wiwynn Partner to Bring Co-Packaged Optics to Rack-Scale AI Systems〉（2026-03-11）
+DATE: 2026-03-11
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 發行人文件是自述（L8 弱主張）；媒體只當線索；第三方海關彙整站是 CBP 艙單的第三方轉載。
+
+【Ayar Labs 新聞稿〈Ayar Labs and Wiwynn Partner to Bring Co-Packaged Optics to Rack-Scale AI Systems〉（2026-03-11）：開頭】
+"SAN JOSE, Calif., and TAIPEI, Taiwan — March 11, 2026 — Ayar Labs, the leader in co-packaged optics (CPO) solutions for AI scale-up, and Wiwynn, an innovative cloud IT infrastructure provider for data centers, announced a strategic partnership to deliver optically connected, rack-scale AI systems that support next-generation hyperscale AI workloads."
+
+【Ayar Labs 新聞稿〈Ayar Labs and Wiwynn Partner to Bring Co-Packaged Optics to Rack-Scale AI Systems〉（2026-03-11）：方案內容】
+"The joint solution integrates Ayar Labs’ AI scale-up CPO technology, including TeraPHY™ optical engines powered by the SuperNova™ remote light source, into Wiwynn’s rack-level architecture for next-generation data centers. Together, the companies are solving the practical deployment challenges hyperscalers face, including optical fiber management, integration of CPO enabled AI ASICs, thermal management, power efficiency, and manufacturability."
+
+【Ayar Labs 新聞稿〈Ayar Labs and Wiwynn Partner to Bring Co-Packaged Optics to Rack-Scale AI Systems〉（2026-03-11）：OFC 展示與私下簡報】
+"At the Optical Fiber Communication Conference (OFC), March 15-19, 2026, in Los Angeles, Ayar Labs and Wiwynn will showcase their joint AI CPO solution, highlighting an HVDC (High Voltage Direct Current)-enabled, rack-level system architecture for next-generation AI data centers. It features a 100% liquid-cooled AI system reference design with support of ELSFP SuperNova remote light sources and AI ASICs with optical engines. Access to this preview will be available through private, pre-arranged briefings for select customers, press, and analysts"

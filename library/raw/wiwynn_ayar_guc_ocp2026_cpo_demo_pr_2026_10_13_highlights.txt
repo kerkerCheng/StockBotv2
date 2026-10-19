@@ -1,0 +1,10 @@
+Source URL: https://www.prnewswire.com/news-releases/wiwynn-ayar-labs-and-guc-advance-co-packaged-optics-with-live-demonstration-of-integrated-optical-compute-system-at-ocp-global-summit-2026-302907032.html
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Wiwynn／Ayar Labs／GUC 聯合新聞稿（PR Newswire 2026-10-13）〈Live Demonstration Highlights〉段——補既有節錄 wiwynn_ayar_guc_ocp2026_cpo_de
+DATE: 2026-10-13
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 發行人文件是自述（L8 弱主張）；媒體只當線索；第三方海關彙整站是 CBP 艙單的第三方轉載。
+
+【Wiwynn／Ayar Labs／GUC 聯合新聞稿（PR Newswire 2026-10-13）〈Live Demonstration Highlights〉段——補既有節錄 wiwynn_ayar_guc_ocp2026_cpo_demo_pr_2026_10_13.txt 沒收的展示項目】
+"Live Demonstration Highlights: Silicon-to-System Optical Integration: Wiwynn's system architecture integrates GUC's MCP with Ayar Labs' TeraPHY OEs paired with ELSFP-based high-power SuperNova light sources, into an ORV3-ready compute system. OE Telemetry and System Health Monitoring: Real-time optical engine telemetry gives data centers visibility into system status, strengthening reliability at scale. Stability Metrics Under Live Operation: As the tuning subsystem tracks thermal and wavelength drift (TX heater activity), key eye metrics (eye height, OMA, ER) hold steady alongside OE and ELSFP temperatures. Advanced Cooling Solution: Wiwynn's system-level cooling architecture supports stable operation of optical power under real-world conditions. Detachable FAU and In-Chassis Fiber Routing: Demonstration of serviceability and manufacturability at the compute system level."

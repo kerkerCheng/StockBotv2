@@ -1,0 +1,16 @@
+Source URL: https://blogs.nvidia.com/blog/ocp-global-summit-vera-rubin-scale-ai-factories/
+
+Excerpt:
+[EXCERPT — 有限逐字引文] NVIDIA Blog〈OCP Global Summit: Amid Ecosystem Adoption, NVIDIA Opens Vera Rubin Architecture to Help Scale AI Factories 
+DATE: 2026-10-12
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 發行人文件是自述（L8 弱主張）；媒體只當線索；第三方海關彙整站是 CBP 艙單的第三方轉載。
+
+【NVIDIA Blog〈OCP Global Summit: Amid Ecosystem Adoption, NVIDIA Opens Vera Rubin Architecture to Help Scale AI Factories Worldwide〉（2026-10-12，NVIDIA Writers；客戶端一手）：標題與日期】
+"OCP Global Summit: Amid Ecosystem Adoption, NVIDIA Opens Vera Rubin Architecture to Help Scale AI Factories Worldwide Cisco, Google, Meta, Microsoft and Visionbay are joining many making advances with Vera Rubin. October 12, 2026 by NVIDIA Writers"
+
+【NVIDIA Blog〈OCP Global Summit: Amid Ecosystem Adoption, NVIDIA Opens Vera Rubin Architecture to Help Scale AI Factories Worldwide〉（2026-10-12，NVIDIA Writers；客戶端一手）：導言】
+"NVIDIA contributed key NVIDIA Vera Rubin rack and compute tray designs to OCP through the open NVIDIA MGX architecture, giving system builders a common foundation for developing next-generation AI factory infrastructure."
+
+【NVIDIA Blog〈OCP Global Summit: Amid Ecosystem Adoption, NVIDIA Opens Vera Rubin Architecture to Help Scale AI Factories Worldwide〉（2026-10-12，NVIDIA Writers；客戶端一手）：〈Vera Rubin AI Factories Advance With MGX Rack Contributions at OCP〉段】
+"NVIDIA joined industry leaders in contributing to the third-generation MGX AI data center reference design through OCP’s Open DC Initiative. Combined with open liquid-cooling technologies such as MQD and MQDB, the effort helps turn proven AI factory designs into industry standards that others can adopt, manufacture and scale. For NVIDIA Vera Rubin AI factories, the updated MGX 1.2 specification extends the open architecture for AI factories with rack-scale blind-mate liquid cooling, interoperable rack-scale interconnect infrastructure and a liquid-cooled 5,000A busbar designed for higher-power AI systems. It also adds native 19-inch equipment support and higher-density rack designs. MGX 1.2 further expands modularity with configurable I/O bays, fanless liquid-cooled compute trays, standardized power and cooling interfaces, and a common infrastructure that helps ecosystem partners build interoperable accelerated computing platforms. It improves assembly, test and service times to streamline manufacturing and field service to enable faster and more efficient infrastructure buildout. The architecture supports rack deployments up to 250kW while simplifying serviceability, deployment and infrastructure reuse."

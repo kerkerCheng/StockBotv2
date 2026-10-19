@@ -1,0 +1,16 @@
+Source URL: https://www.youtube.com/watch?v=ejHDd5DP2R8
+
+Excerpt:
+[EXCERPT — 有限逐字引文] OCP 官方影片自動字幕（YouTube en asr，不是逐字稿；照 ASR 原樣、只拿掉時間碼）〈Toward NPO Deployments in AI Fabrics〉（OCP Global Summit 2026 IPEC Wor
+DATE: 2026-10-13
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: OCP 官方影片的 YouTube 自動字幕——不是逐字稿，可能有聽寫錯字；講者沒在字幕標名的，報告裡寫「推一步」。
+
+【OCP 官方影片自動字幕（YouTube en asr，不是逐字稿；照 ASR 原樣、只拿掉時間碼）〈Toward NPO Deployments in AI Fabrics〉（OCP Global Summit 2026 IPEC Workshop；OCP 錄影清單講者 Kannan Raj, Oracle AI Infrastructure Architect，單人場；2026-10-13 上架）：1:58–2:42 NPO 生態系與採用預期】
+"So uh NPO adoption uh it's actually a very interesting ecosystem uh evolving. Uh we have a lot of uh suppliers coming into this ecosystem which is actually great uh for the industry. Uh when you compare to uh CPO uh the NPO ecosystem is much broader. uh we actually want to support that also. Uh we have electrical connectors, external or internal lasers, polarization maintaining fibers, fiber attached units and then there's a whole conversation around uh linear drive. Uh so we expect broad adoption of NPOS's in scale up, scale out and scale across."
+
+【OCP 官方影片自動字幕（YouTube en asr，不是逐字稿；照 ASR 原樣、只拿掉時間碼）〈Toward NPO Deployments in AI Fabrics〉（OCP Global Summit 2026 IPEC Workshop；OCP 錄影清單講者 Kannan Raj, Oracle AI Infrastructure Architect，單人場；2026-10-13 上架）：3:19–3:36 NPO 的基本要求】
+"So one of the uh foundational requirement is the NPO must demonstrate reliability and power efficiency uh should be on par with soldered CPO. So uh as long as that is uh met I think we'll be uh great."
+
+【OCP 官方影片自動字幕（YouTube en asr，不是逐字稿；照 ASR 原樣、只拿掉時間碼）〈Toward NPO Deployments in AI Fabrics〉（OCP Global Summit 2026 IPEC Workshop；OCP 錄影清單講者 Kannan Raj, Oracle AI Infrastructure Architect，單人場；2026-10-13 上架）：16:15–16:38 雷射跳模只能在製造端篩（「D level」推一步是 die level）】
+"uh laser mode hopping whether it is uh ILS ELS uh that problem will persist. I think the the only solution for that is it has to be screened out at manufacturing uh all the way from D level uh to chip on carrier uh to the optical engine or uh uh the the ELS uh module itself."

@@ -1,0 +1,13 @@
+Source URL: https://wccftech.com/nvidia-contributes-vera-rubin-platform-rack-tray-designs-to-ocp/
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Wccftech〈NVIDIA Hands Its Vera Rubin Rack Designs To OCP, Stripping Compute Trays Of Every Cable, Hose, And Fan〉（2026-10
+DATE: 2026-10-12
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 發行人文件是自述（L8 弱主張）；媒體只當線索；第三方海關彙整站是 CBP 艙單的第三方轉載。
+
+【Wccftech〈NVIDIA Hands Its Vera Rubin Rack Designs To OCP, Stripping Compute Trays Of Every Cable, Hose, And Fan〉（2026-10-12；媒體。MQD 那段是口語體，像是 NVIDIA 簡報的逐字轉述，但文中沒標講者——推一步，不是 NVIDIA 原文）：標題與導言】
+"NVIDIA Hands Its Vera Rubin Rack Designs To OCP, Stripping Compute Trays Of Every Cable, Hose, And Fan NVIDIA has announced that it is contributing its Vera Rubin platform to OCP, driving the advancement of AI factories."
+
+【Wccftech〈NVIDIA Hands Its Vera Rubin Rack Designs To OCP, Stripping Compute Trays Of Every Cable, Hose, And Fan〉（2026-10-12；媒體。MQD 那段是口語體，像是 NVIDIA 簡報的逐字轉述，但文中沒標講者——推一步，不是 NVIDIA 原文）：托盤與 MQD 段】
+"For starters, the compute tray has no cables, no hoses, no fans. Everything is liquid-cooled and modular, and that turns hours into minutes for the tray assembly, speeding up the serviceability and also the overall rack build times. Additionally, liquid cooling is added to the busbar, enabling 5,000 amps on the liquid-cooled busbar without making the rack bigger. This brings more compute density, more power density in the same space. And another important contribution that NVIDIA has for this year with OCP is the MQD. The acronym is MGX Quick Disconnect. And there's also an MQDB. The B stands for blind mating. Both of these are new, and there are small liquid cooling connectors inside the tray. And it means that you can take a cold plate and swap it out with easier serviceability and without concern for leaks. These are some of the many contributions to the OCP MGX 1.2 specification."

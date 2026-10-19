@@ -1,0 +1,40 @@
+Source URL: https://www.opencompute.org/wp-content/uploads/2026/10/OCP-Design-Spec_UQD_v2.0.0.pdf
+
+Excerpt:
+[EXCERPT — 有限逐字引文] OCP Design Specification〈Universal Quick Disconnect (UQD) v2.0.0〉（Cooling Environments: Cold Plate Sub-Project；封面「Effect
+DATE: 2026-09-22
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 發行人文件是自述（L8 弱主張）；媒體只當線索；第三方海關彙整站是 CBP 艙單的第三方轉載。
+
+【OCP Design Specification〈Universal Quick Disconnect (UQD) v2.0.0〉（Cooling Environments: Cold Plate Sub-Project；封面「Effective September 22, 2026」；opencompute.org 檔案 HTTP Last-Modified 2026-10-02；第三方規格・定稿；pypdf 文字層，=== p.N === 是頁碼標記）：封面】
+"=== p.1 === Cooling Environments: Cold Plate Sub-Project Design Specification Universal Quick Disconnect (UQD) v2.0.0 Effective September 22, 2026"
+
+【OCP Design Specification〈Universal Quick Disconnect (UQD) v2.0.0〉（Cooling Environments: Cold Plate Sub-Project；封面「Effective September 22, 2026」；opencompute.org 檔案 HTTP Last-Modified 2026-10-02；第三方規格・定稿；pypdf 文字層，=== p.N === 是頁碼標記）：§1.1 CLA 貢獻者】
+"1.1. Open Web Foundation (OWF) CLA Contributions to this Specification are made under the terms and conditions set forth in Modified Open Web Foundation Agreement 0.9 (OWFa 0.9). (As of October 16, 2024) (“Contribution License”) by: AMD"
+
+【OCP Design Specification〈Universal Quick Disconnect (UQD) v2.0.0〉（Cooling Environments: Cold Plate Sub-Project；封面「Effective September 22, 2026」；opencompute.org 檔案 HTTP Last-Modified 2026-10-02；第三方規格・定稿；pypdf 文字層，=== p.N === 是頁碼標記）：§1.2 作者與致謝】
+"1.2. Acknowledgments Version 1 Author(s): Mark Sprenger (Intel), Jordan Johnson (Intel), Bret Henkel (Intel) Version 2 Author(s): Travis Gaskill (Individual), Elizabeth Langer (CPC), Paul Artman (AMD) The Authors of this Specification would like to acknowledge the following companies for their significant collaboration: AMD Cejn CoolIT CPC Danfoss Etched Nvidia Staubli Parker The Authors of this Specification would like to acknowledge the following companies for their feedback: Auras Dell Intel Jonhon Lotes Nidec Amphenol"
+
+【OCP Design Specification〈Universal Quick Disconnect (UQD) v2.0.0〉（Cooling Environments: Cold Plate Sub-Project；封面「Effective September 22, 2026」；opencompute.org 檔案 HTTP Last-Modified 2026-10-02；第三方規格・定稿；pypdf 文字層，=== p.N === 是頁碼標記）：§2.1 Openness】
+"2.1. Openness This specification outlines the design and test criteria for any willing supplier to build and validate a supplier interchang eable fluid quick disconnect. The specification has been developed with input from suppliers and end users. The openness of the specification allows users to work with their preferred suppliers , and enables opportunities for liquid adoption in adjacent market segments."
+
+【OCP Design Specification〈Universal Quick Disconnect (UQD) v2.0.0〉（Cooling Environments: Cold Plate Sub-Project；封面「Effective September 22, 2026」；opencompute.org 檔案 HTTP Last-Modified 2026-10-02；第三方規格・定稿；pypdf 文字層，=== p.N === 是頁碼標記）：§2.4 Scale】
+"2.4. Scale Universality of this specification enables a more robust and resilient global supply chain in support of scaling liquid cooling infrastructure for compute."
+
+【OCP Design Specification〈Universal Quick Disconnect (UQD) v2.0.0〉（Cooling Environments: Cold Plate Sub-Project；封面「Effective September 22, 2026」；opencompute.org 檔案 HTTP Last-Modified 2026-10-02；第三方規格・定稿；pypdf 文字層，=== p.N === 是頁碼標記）：§3 版本表（只有一列）】
+"3. Version Table Date Version # Author Description June 2026 V2.0.0 See Authors Version Release"
+
+【OCP Design Specification〈Universal Quick Disconnect (UQD) v2.0.0〉（Cooling Environments: Cold Plate Sub-Project；封面「Effective September 22, 2026」；opencompute.org 檔案 HTTP Last-Modified 2026-10-02；第三方規格・定稿；pypdf 文字層，=== p.N === 是頁碼標記）：§9 驗證報告】
+"Each test shall be conducted and the test data collated in a test report. A “QD Verification Report Template” is provided with this specification as the preferred template for reporting (see 15.3). The supplier verification test report shall be provided to customers upon request, and as part of submission packet for listing on OCP Marketplace."
+
+【OCP Design Specification〈Universal Quick Disconnect (UQD) v2.0.0〉（Cooling Environments: Cold Plate Sub-Project；封面「Effective September 22, 2026」；opencompute.org 檔案 HTTP Last-Modified 2026-10-02；第三方規格・定稿；pypdf 文字層，=== p.N === 是頁碼標記）：§9.2.1 運輸溫度循環（氦氣測漏改為選做）】
+"Optional screening - conduct helium leak tests prior to, and after thermal cycling on all samples."
+
+【OCP Design Specification〈Universal Quick Disconnect (UQD) v2.0.0〉（Cooling Environments: Cold Plate Sub-Project；封面「Effective September 22, 2026」；opencompute.org 檔案 HTTP Last-Modified 2026-10-02；第三方規格・定稿；pypdf 文字層，=== p.N === 是頁碼標記）：§9.2.1 判準】
+"Pressure decay attributed per individual QD must not exceed 1% of pressure at T0"
+
+【OCP Design Specification〈Universal Quick Disconnect (UQD) v2.0.0〉（Cooling Environments: Cold Plate Sub-Project；封面「Effective September 22, 2026」；opencompute.org 檔案 HTTP Last-Modified 2026-10-02；第三方規格・定稿；pypdf 文字層，=== p.N === 是頁碼標記）：§10 供應商交叉驗證】
+"10. Supplier Cross-Verification Testing Suppliers shall cross-validate their parts with a minimum of 3 other suppliers. In accordance with the OCP tenet of Openness, UQD suppliers shall make their UQDs available to other UQD suppliers upon request for cross -verification purposes. Likewise, the requesting supplier shall make available their UQDs at the time of request. UQD Suppliers shall publish the supplier list with which their QDs have successfully passed cross-verification testing. The cross-verification test reports shall be made available to customers upon request. The required cross -verification tests, shown in Figure 15, are a subset of the QD Property Tests. These tests are considered critical to ensuring the interoperation of one supplier’s QDs with those of a different supplier. The tests may be run in parallel or series, and apply to both the plug and socket of each supplier . In accordance with ISO 18869, the required sample size per test is 3, at minimum. In accordance with ISO 18869:2017 Section 6.3, the instruments must meet certain accuracy requirements. Figure 15 - Cross-Verification Tests Cross-verification across previous versions of UQDs is not in scope of this specification . Performance, feature or dimensional variations across versions should be evaluated by the end user when considering mixed version deployments."
+
+【OCP Design Specification〈Universal Quick Disconnect (UQD) v2.0.0〉（Cooling Environments: Cold Plate Sub-Project；封面「Effective September 22, 2026」；opencompute.org 檔案 HTTP Last-Modified 2026-10-02；第三方規格・定稿；pypdf 文字層，=== p.N === 是頁碼標記）：§15.1 v1／v2 互換考量（閥行程那一列）】
+"Define maximum ‘S’ valve stroke to account for tolerances as a driven dimension V1 QD sets may not fully couple due to tolerance stacks of internal valving (issue present in V1)"

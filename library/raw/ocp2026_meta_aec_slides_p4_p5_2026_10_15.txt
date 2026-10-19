@@ -1,0 +1,10 @@
+Source URL: https://www.dropbox.com/scl/fi/zn5mnhpx9k403r4yub7hu/Large-Scale-Deployment-of-800Gb-s-Active-Electrical-Cables-in-Meta-Data-Centers-for-AI-Applications.pdf?rlkey=kujxqjcyd4szu5i8u2utgqah5&dl=0
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Meta 投影片〈Large-Scale Deployment of 800Gb/s Active Electrical Cables (AEC) in Meta Data Centers for AI Applications〉p.4 比
+DATE: 原文無日期
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 發行人文件是自述（L8 弱主張）；媒體只當線索；第三方海關彙整站是 CBP 艙單的第三方轉載。
+
+【Meta 投影片〈Large-Scale Deployment of 800Gb/s Active Electrical Cables (AEC) in Meta Data Centers for AI Applications〉p.4 比較表（pypdf 抽字，表格欄序可能錯位）與 p.5〈800G AEC in Meta fleet〉（Compatibility：1.0 m to 3.2 m，intra-/adjacent-rack，PDF 換行斷在 intra- 之後）（投影片無日期；同場 OCP 官方影片 2026-10-15 上架；會期 2026-10-12～15）】
+"Interconnect Selection: Optics vs DAC vs AEC OPTICS PASSIVE DAC AEC Optical Transceiver + Fiber Passive Copper Cable Active Electrical Cable Reach Up to 10 km+ (Longest reach) Up to ~2–3 m (Short reach only) Up to < 2 m (Short reach) Power (per end) ~12–15 W+ ~1–2 W (Lowest power) < 12 W (Low power) Cost Highest Lowest Low / Medium 112G PAM4 Budget (at required length) Meets easily Cannot meet (Fails budget) Meets with margin (Re-conditions signal) Cable Management More complex (Fiber, patch panels) Simple (Lightweight, flexible) Simple (Similar to DAC) Field Replaceable Yes Yes Yes Fiber Handling Discipline Required (Strict fiber handling) Not required (Copper cable) Not required (Copper cable) === p.5 === 800G AEC in Meta fleet Cable Spec ● 800G OSFP AEC (112 Gb/s PAM4 lanes) ● IHS (switch) to RHS (NIC) connectivity Physical & Power ● 32 AWG twinax, meshed sleeve (~7.5 mm OD) ● Low power design: < 12 W per end Port & Software ● Flex modes: 2x400G, 1x800G, 8x100G ● CMIS 5.1 compliant management Compatibility ● 1.0 m to 3.2 m (intra- /adjacent-rack)"

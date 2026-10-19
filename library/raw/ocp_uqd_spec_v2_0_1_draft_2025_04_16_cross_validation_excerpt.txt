@@ -1,0 +1,16 @@
+Source URL: http://www.hansenfluid.com/news/DRAFT_OCP+UQD+Spec+v2.0.1_16Apr25.html
+
+Excerpt:
+[EXCERPT — 有限逐字引文] OCP UQD Specification v2.0.1 DRAFT（文件標題 DRAFT_OCP+UQD+Spec+v2.0.1_16Apr25；內文「Effective XXXX, 2025」；託管在 hansenfluid.com，非
+DATE: 2025-04-16
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 發行人文件是自述（L8 弱主張）；媒體只當線索；第三方海關彙整站是 CBP 艙單的第三方轉載。
+
+【OCP UQD Specification v2.0.1 DRAFT（文件標題 DRAFT_OCP+UQD+Spec+v2.0.1_16Apr25；內文「Effective XXXX, 2025」；託管在 hansenfluid.com，非 OCP；草案，不是定稿——定稿見 ocp_uqd_spec_v2_0_0_2026_09_22；既有節錄 ocp_uqd_spec_v2_0_1_draft_2025_04_16 沒收的段落）：封面】
+"DRAFT_OCP+UQD+Spec+v2.0.1_16Apr25 Effective XXXX, 2025 Authors: Travis Gaskill - NVIDIA, Elizabeth Langer – CPC"
+
+【OCP UQD Specification v2.0.1 DRAFT（文件標題 DRAFT_OCP+UQD+Spec+v2.0.1_16Apr25；內文「Effective XXXX, 2025」；託管在 hansenfluid.com，非 OCP；草案，不是定稿——定稿見 ocp_uqd_spec_v2_0_0_2026_09_22；既有節錄 ocp_uqd_spec_v2_0_1_draft_2025_04_16 沒收的段落）：版本表】
+"Version Table Date Version # Author Description 06Nov2024 Draft See Authors Initial Version 14Apr2025 V2.0.1 See Authors UQD Workstream – alpha draft"
+
+【OCP UQD Specification v2.0.1 DRAFT（文件標題 DRAFT_OCP+UQD+Spec+v2.0.1_16Apr25；內文「Effective XXXX, 2025」；託管在 hansenfluid.com，非 OCP；草案，不是定稿——定稿見 ocp_uqd_spec_v2_0_0_2026_09_22；既有節錄 ocp_uqd_spec_v2_0_1_draft_2025_04_16 沒收的段落）：Supplier Cross-Validation Testing 段】
+"Supplier Cross-Validation Testing Suppliers shall cross-validate their parts with a minimum of 3 other suppliers. In accordance with the OCP tenet of Openness, UQD suppliers shall make their UQDs available to other UQD suppliers upon request for cross-validation purposes. Likewise, the requesting supplier shall make available their UQDs at the time of request. UQD Suppliers shall publish the supplier list with which their QDs have successfully passed cross-validation testing. The cross-validation test reports shall be made available to customers upon request. The required cross-validation tests, shown in Figure 12 , are a subset of the QD Property Tests. These tests are considered critical to ensuring the interoperation of one supplier’s QDs with those of a different supplier. The tests may be run in parallel or series. In accordance with ISO 18869, the required sample size per test is 5, at minimum . In accordance with ISO 18869:2017 Section 6.3, the instruments must meet certain accuracy requirements. Figure 12 - Cross-Validation Tests"

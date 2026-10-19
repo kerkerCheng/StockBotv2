@@ -1,0 +1,16 @@
+Source URL: https://developer.nvidia.com/blog/nvidia-vera-rubin-pod-seven-chips-five-rack-scale-systems-one-ai-supercomputer/
+
+Excerpt:
+[EXCERPT — 有限逐字引文] NVIDIA Technical Blog〈NVIDIA Vera Rubin POD: Seven Chips, Five Rack-Scale Systems, One AI Supercomputer〉（2026-03-16，Rohi
+DATE: 2026-03-16
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 發行人文件是自述（L8 弱主張）；媒體只當線索；第三方海關彙整站是 CBP 艙單的第三方轉載。
+
+【NVIDIA Technical Blog〈NVIDIA Vera Rubin POD: Seven Chips, Five Rack-Scale Systems, One AI Supercomputer〉（2026-03-16，Rohil Bhargava、Taylor Allison、Harry Petty；客戶端一手；液冷與機櫃零件段）：標題、日期、作者】
+"NVIDIA Vera Rubin POD: Seven Chips, Five Rack-Scale Systems, One AI Supercomputer Built on the third-generation NVIDIA MGX rack architecture and co-designed from grid to chip for the era of agentic AI Mar 16, 2026 By Rohil Bhargava , Taylor Allison and Harry Petty"
+
+【NVIDIA Technical Blog〈NVIDIA Vera Rubin POD: Seven Chips, Five Rack-Scale Systems, One AI Supercomputer〉（2026-03-16，Rohil Bhargava、Taylor Allison、Harry Petty；客戶端一手；液冷與機櫃零件段）：液冷段】
+"MGX racks can be 100% liquid-cooled leveraging the same data center cooling infrastructure as prior generations. The third-generation MGX rack features new internal tray manifolds, rack UQD08 manifolds, and liquid cooled busbars supporting up to 5,000 A."
+
+【NVIDIA Technical Blog〈NVIDIA Vera Rubin POD: Seven Chips, Five Rack-Scale Systems, One AI Supercomputer〉（2026-03-16，Rohil Bhargava、Taylor Allison、Harry Petty；客戶端一手；液冷與機櫃零件段）：MGX NVL 與 MGX ETL 共用的機櫃零件】
+"Both racks will share the same key rack components built by the experienced MGX ecosystem: racks, chassis, trays, cable cartridges, liquid cooling manifolds, quick disconnects, busbars (standard and liquid cooled), support bracketry, side rails, power shelves, leak containment trays, tray handles, and more."

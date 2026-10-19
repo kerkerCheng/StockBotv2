@@ -1,0 +1,10 @@
+Source URL: https://www.youtube.com/watch?v=qAPjjcVsaqY
+
+Excerpt:
+[EXCERPT — 有限逐字引文] OCP 官方影片自動字幕（YouTube en asr，不是逐字稿）
+DATE: 2026-10-14
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: OCP 官方影片的 YouTube 自動字幕——不是逐字稿，可能有聽寫錯字；講者沒在字幕標名的，報告裡寫「推一步」。
+
+【OCP 官方影片自動字幕（YouTube en asr，不是逐字稿）：Oracle〈Lessons learned from GW-scale AI deployments〉10:18–10:29（講者 Mark Filer，Oracle；講投影片 p.6 的資料集）：FRO 用多家光 DSP、LPO 模組多家，表現相近】
+"Diverse optical DSPs are represented here for the FRO. We also have diverse uh LPO modules, so multiple vendors shown here, but the performance was was uh very similar."

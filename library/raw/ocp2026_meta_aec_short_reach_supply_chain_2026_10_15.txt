@@ -1,0 +1,10 @@
+Source URL: https://www.youtube.com/watch?v=VtaBAmRlhrA
+
+Excerpt:
+[EXCERPT — 有限逐字引文] OCP 官方影片自動字幕（YouTube en asr，不是逐字稿）
+DATE: 2026-10-15
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: OCP 官方影片的 YouTube 自動字幕——不是逐字稿，可能有聽寫錯字；講者沒在字幕標名的，報告裡寫「推一步」。
+
+【OCP 官方影片自動字幕（YouTube en asr，不是逐字稿）：Meta AEC 場 1:51–3:54（講者 Abhijit，Meta；4:33 才交給 Kevin）。短距（口述 3–10 m）改用 AEC 的理由：成本、功耗，以及「DSPs and the lasers」供應吃緊、要把雷射與 DSP 留給 500 m 以上。講者自己說供應鏈這段沒寫進投影片（同場投影片抽字無 supply／laser）。「prospective」是 ASR 原樣】
+"we have decided that all the short reach, which is over 3 m but below 10 m, we will use AEC for the connectivity. And there's few reasons. One is absolutely is the cost. The AEC is much cheaper than optics. And the second is the power, okay? It's it's much lower than the optics. So, in in in the current way the compute tray and and our MiniPack 3 switch, all those connectivity in the cross rack application, we are using active electrical cable. So, I I just tried to give a side-by-side comparison like why we are doing this AEC. And And again, all three mediums are important for the connectivity. Like optics, like you see the cost is one of the biggest factor, like it's the highest in the optics. There is like the power as well. And the serviceability. Optics, like you have to handle multiple fiber cleaning connectivity. But on AEC, when you look at that, you just connect them both both modules together. So, So, short reach application, I believe AEC would be the best solution moving forward for the AI racks. And there is another thing I don't think I mentioned it in this slide deck is the supply chain shortages, right? So, if we use those short reach with the optics, as you know, like the DSPs and the lasers, they are going through a very tough time in the supply chain prospective. So, if we can replace some of these short reach connectivity with AEC, that will help us to use those lasers and DSPs for somewhere where it's absolutely needed, like 500 m and over uh uh distance connectivity."

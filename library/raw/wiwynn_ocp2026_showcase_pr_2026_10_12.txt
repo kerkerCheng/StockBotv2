@@ -1,0 +1,16 @@
+Source URL: https://www.wiwynn.com/news/wiwynn-showcases-next-gen-ai-platforms-thermal-engineering-and-optical-interconnect-technologies-at-2026-ocp-global-summit
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Wiwynn 官網新聞稿〈Wiwynn Showcases Next-Gen AI Platforms, Thermal Engineering, and Optical Interconnect Technologies at 2026 
+DATE: 2026-10-12
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 發行人文件是自述（L8 弱主張）；媒體只當線索；第三方海關彙整站是 CBP 艙單的第三方轉載。
+
+【Wiwynn 官網新聞稿〈Wiwynn Showcases Next-Gen AI Platforms, Thermal Engineering, and Optical Interconnect Technologies at 2026 OCP Global Summit〉（San Jose, 2026-10-12；頁面標「Updated on October 13, 2026」）：頁面標示】
+"3 min read Wiwynn Showcases Next-Gen AI Platforms, Thermal Engineering, and Optical Interconnect Technologies at 2026 OCP Global Summit Wiwynn Updated on October 13, 2026"
+
+【Wiwynn 官網新聞稿〈Wiwynn Showcases Next-Gen AI Platforms, Thermal Engineering, and Optical Interconnect Technologies at 2026 OCP Global Summit〉（San Jose, 2026-10-12；頁面標「Updated on October 13, 2026」）：開頭】
+"San Jose, CA — October 12, 2026 — Wiwynn Corporation, a leading cloud IT infrastructure provider, today unveiled its latest AI infrastructure innovations at the 2026 OCP Global Summit (Booth C74, San Jose Convention Center), spanning next-generation AI rack platforms, breakthrough thermal technologies, and co-packaged optics (CPO) solutions."
+
+【Wiwynn 官網新聞稿〈Wiwynn Showcases Next-Gen AI Platforms, Thermal Engineering, and Optical Interconnect Technologies at 2026 OCP Global Summit〉（San Jose, 2026-10-12；頁面標「Updated on October 13, 2026」）：CPO 段（展示夥伴名單）】
+"Overcoming Network Bottlenecks: CPO-Based Optical Interconnect Wiwynn, together with ecosystem partners including Ayar Labs, Corning, GUC, and Senko, will showcase its co-packaged optics (CPO) scale-up rack solution, covering rack-level fiber routing, patch panel integration, and multi-vendor fiber management, alongside a live demonstration of optical engine telemetry. The demo highlights an open ecosystem approach and Wiwynn's ability to integrate optical, mechanical, cooling, and system-level innovations into a scalable rack-scale AI infrastructure platform."

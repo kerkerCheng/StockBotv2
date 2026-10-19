@@ -1,0 +1,13 @@
+Source URL: https://gov.georgia.gov/press-releases/2025-11-20/gov-kemp-virginia-transformer-create-400-jobs-effingham-expansion
+
+Excerpt:
+[EXCERPT — 有限逐字引文] 喬治亞州長辦公室新聞稿（2025-11-20）
+DATE: 2025-11-20
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 發行人文件是自述（L8 弱主張）；媒體只當線索；第三方海關彙整站是 CBP 艙單的第三方轉載。
+
+【喬治亞州長辦公室新聞稿（2025-11-20）：Virginia Transformer 的 Rincon 廠以 Georgia Transformer 名義營運】
+"ATLANTA – Governor Brian P. Kemp today announced that Virginia Transformer Corp. will invest $40 million to expand its existing manufacturing facility near Rincon, creating over 400 new jobs in Effingham County. The Rincon facility operates as Georgia Transformer."
+
+【喬治亞州長辦公室新聞稿（2025-11-20）：Rincon 廠專做大型電力變壓器、30 到 500 MVA】
+"The Georgia Transformer facility in Rincon specializes in manufacturing custom-designed large power transformers for a wide range of industries, including utilities, data centers, and renewable energy sectors, among others. The state-of-the-art, 250,000-square-foot facility produces transformers ranging from 30 MegaVolt-Amperes (MVA) to 500 MVA at up to 525 kilovolt s. This is the latest in a series of expansion investments at this facility since it became part of the company in 2015."

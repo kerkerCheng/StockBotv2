@@ -1,0 +1,10 @@
+Source URL: https://www.dropbox.com/scl/fi/a4oiia6e5yse6do4c7stf/Lessons-learned-from-GW-scale-AI-deployments.pdf?rlkey=svl7p1hzeqoqgdg8mdeagci3m&dl=0
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Oracle 投影片〈Lessons learned from GW-scale AI deployments〉p.9〈1.6T: Linear Receive Optics (LRO)〉（Mark Filer，Oracle；pypdf 抽
+DATE: 投影片無日期；同場 OCP 官方影片 2026-10-14 上架
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 發行人文件是自述（L8 弱主張）；媒體只當線索；第三方海關彙整站是 CBP 艙單的第三方轉載。
+
+【Oracle 投影片〈Lessons learned from GW-scale AI deployments〉p.9〈1.6T: Linear Receive Optics (LRO)〉（Mark Filer，Oracle；pypdf 抽字）：1.6T 改用 LRO、多家 3nm DSP 互通、LRO DSP 2nm】
+"LPO cannot comfortably meet SI and interop performance requirements at 1.6T; LRO provides the best low power solution currently available: • 26dB channels at 16W power consumption (10 pj/bit) • Performs equally well over short, medium, long reach channels • Supports DR4+ (4dB), and FR4 links in the upper tiers • Interop has been demonstrated from different suppliers and multi-vendor 3nm DSPs • More aggressive power reduction expected as LRO DSP technology matures in 2nm."
