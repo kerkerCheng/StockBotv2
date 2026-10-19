@@ -1,0 +1,10 @@
+Source URL: https://kind.krx.co.kr/external/2026/05/14/000890/20260514001959/11013.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] 심텍（Simmtech）2026 1분기보고서 主要原材料表——COPPER FOIL（동박）主要買進對象「Mitsui & Co. Ltd.」（三井物產＝貿易商，不是三井金屬；表上沒寫是哪一種銅箔；客戶端）
+DATE: 2026-05-14
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 發行人文件是自述（L8 弱主張）；媒體只當線索；第三方海關彙整站是 CBP 艙單的第三方轉載。
+
+【심텍（Simmtech）2026 1분기보고서 主要原材料表——COPPER FOIL（동박）主要買進對象「Mitsui & Co. Ltd.」（三井物產＝貿易商，不是三井金屬；表上沒寫是哪一種銅箔；客戶端）】
+"가. 주요 원재료 등의 현황 (단위 : 백만원, %) 사업부문 매입유형 품 목 구체적용도 2026년 당분기(누계) 2025년 2024년 비고(주요 매입처) 매입액 비율 매입액 비율 매입액 비율 인쇄 회로 기판 원재료 COPPER CLAD LAMINATE (동박적층판) PCB 원판 45,091 20.7 145,864 20.2 105,264 19.5 Lg Chem, Ltd., Doosan Electronic (Gimcheon) PREPREG (절연성수지) 25,365 11.7 86,891 12.0 68,774 12.7 Doosan Electronic (Gimcheon) COPPER FOIL (동박) 6,762 3.1 24,900 3.4 19,620 3.6 Mitsui & Co. Ltd."

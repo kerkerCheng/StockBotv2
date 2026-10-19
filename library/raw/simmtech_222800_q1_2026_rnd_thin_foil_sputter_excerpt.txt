@@ -1,0 +1,10 @@
+Source URL: https://kind.krx.co.kr/external/2026/05/14/000890/20260514001959/11013.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] 심텍（Simmtech）2026 1분기보고서 研發實績表——「동박 대체 Thin Seed Sputter 공법 검증」개발완료；「Thin Copper Foil 평가 소재 국산화」개발완료（客戶端；原文對象是一般 동박、沒寫極薄載
+DATE: 2026-05-14
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 發行人文件是自述（L8 弱主張）；媒體只當線索；第三方海關彙整站是 CBP 艙單的第三方轉載。
+
+【심텍（Simmtech）2026 1분기보고서 研發實績表——「동박 대체 Thin Seed Sputter 공법 검증」개발완료；「Thin Copper Foil 평가 소재 국산화」개발완료（客戶端；原文對象是一般 동박、沒寫極薄載體箔）】
+"15 초미세 회로 기판 개발 저조도 적층 구현 및 동박 대체 Thin Seed Sputter 공법 검증 개발완료 16 Cu Post 개발 PKG Process 간소화 & 원가 절감을 위한 Cu Post 공법 개발 개발완료 17 SL Cavity Both Side Cavity 개발 새로운 구조의 Cavity 제품 개발 (Both Side Cavity) 개발완료 18 ED(Embedded Die) 개발 Embedded Die 에 대한 기술력 확보 개발완료 19 ALD공법을 활용한 RF-SiP 기판 개발 고주파 기판용 저조도 금속 산화 박막 개발 개발완료 20 Thermal Bar Via 개발 Thermal Via 개발을 통해 열방출성이 높은 Sub Process 개발 개발완료 21 High Height Cu Post 개발 Cu Post Height Capability 개선 및 표면처리 기술 확보 개발완료 22 Chunk Via Filling 개발 Chunk Via Filling Process 조건 및 내부 기술력 확보 개발완료 23 PID 소재평가 반도체 RDL 소재를 PCB화하여 제품 진행 가능 여부 평가 개발중 24 Thin Copper Foil 평가 소재 국산화 및 Fine Pitch 시장 선점을 위한 개발 개발완료"
