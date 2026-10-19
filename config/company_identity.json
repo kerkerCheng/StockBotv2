@@ -235,6 +235,19 @@
       ]
     },
     {
+      "company_id": "co:circuit_foil_luxembourg",
+      "research_ticker": null,
+      "display_name": "Circuit Foil Luxembourg S.a.r.l.",
+      "_display_name_source": "德福科技 2025-09-16 向特定對象發行 A 股預案 p.8「CFL 指 Circuit Foil Luxembourg S.a.r.l.」（抽字掉了空白）",
+      "_note": "私人公司（研究 ticker 明確 null，INV-1／L9）。隨極薄載體銅箔入圖包 staged（2026-10-19，drop 即回退）：DoubleThin（DTH）載體銅箔。官網頁尾寫屬 Solus Advanced Materials；德福收購案 2026-01 終止、Solus 出售銅箔事業都只見於媒體，現在歸誰未查",
+      "name_aliases": [
+        "Circuit Foil Luxembourg",
+        "Circuit Foil",
+        "卢森堡铜箔",
+        "盧森堡銅箔"
+      ]
+    },
+    {
       "company_id": "co:cleveland_cliffs",
       "research_ticker": "CLF",
       "market_currency": "USD",
@@ -294,6 +307,23 @@
         "Credo Semiconductor"
       ],
       "_name_aliases_source": "2026-10-03 Phase 6 Step 6.3c：官網 credosemi.com 頁尾「©2026 Credo, Inc.」、全頁自稱「Credo」；10-K Exhibit 21.1 子公司「Credo Semiconductor Inc.（California）」（https://www.sec.gov/Archives/edgar/data/0001807794/000162828026043303/a211subsidiariesoftheregis.htm）——庫內 credo_npo_vs_cpo_20260821 的 origin 就是這個寫法；全圖逐字兩個寫法命中 0（baseline §17.3）"
+    },
+    {
+      "company_id": "co:defu_technology",
+      "research_ticker": "301511.SZ",
+      "market_currency": "CNY",
+      "execution_currency": "CNY",
+      "execution_venue": "SZSE",
+      "display_name": "Jiujiang Defu Technology Co.,Limited",
+      "_display_name_source": "德福科技 2025 年年度报告（2026-04-24）「公司的外文名称（如有） Jiujiang Defu Technology Co.,Limited」；中文名九江德福科技股份有限公司",
+      "_note": "隨極薄載體銅箔入圖包 staged（2026-10-19，drop 即回退）：電解銅箔廠，自述載體銅箔 C-IC2 已在 1.6T 光模組專案量產；系統口徑邊緣（`python -m alpha edge 301511.SZ`：71.3 億美元、4 家）",
+      "name_aliases": [
+        "德福科技",
+        "九江德福科技",
+        "九江德福科技股份有限公司",
+        "Defu Technology",
+        "DEFU TECH"
+      ]
     },
     {
       "company_id": "co:danfoss",
@@ -366,6 +396,23 @@
       "research_ticker": null,
       "display_name": "Ewellix AB",
       "_display_name_source": "Schaeffler 全球據點頁（schaeffler.com locations：Ewellix AB, Gothenburg）"
+    },
+    {
+      "company_id": "co:fangbang_electronics",
+      "research_ticker": "688020.SS",
+      "market_currency": "CNY",
+      "execution_currency": "CNY",
+      "execution_venue": "SSE",
+      "display_name": "Guangzhou Fangbang Electronics Co., Ltd",
+      "_display_name_source": "方邦股份 2025 年年度报告（2026-04-20）「公司的外文名称 GuangzhouFangbangElectronicsCo.,Ltd」（抽字掉了空白，照原文補回）；中文名广州方邦电子股份有限公司",
+      "_note": "隨極薄載體銅箔入圖包 staged（2026-10-19，drop 即回退）：電磁屏蔽膜與可剝銅（帶載體可剝離超薄銅箔）；系統口徑邊緣無法量（`python -m alpha edge 688020.SS`：12.6 億美元、分析師家數 yfinance 沒有）",
+      "name_aliases": [
+        "方邦股份",
+        "方邦电子",
+        "方邦電子",
+        "广州方邦电子股份有限公司",
+        "Fangbang Electronics"
+      ]
     },
     {
       "company_id": "co:fabrinet",
@@ -867,6 +914,19 @@
       ]
     },
     {
+      "company_id": "co:nokia",
+      "research_ticker": "NOK",
+      "market_currency": "USD",
+      "execution_currency": "USD",
+      "execution_venue": "NYSE",
+      "display_name": "Nokia Corporation",
+      "_display_name_source": "SEC 6-K 2026-07-23 封面「Nokia Corporation Karakaari 7 FI-02610 Espoo Finland」；代號照 SEC EDGAR submissions（CIK 924613）tickers NOK／exchanges NYSE（主掛牌在赫爾辛基，研究代號用 NYSE ADS）",
+      "_note": "隨 6 吋 InP 入圖包 staged（2026-10-19，drop 即回退）：San Jose 6 吋 InP 新廠 2026Q4 爬坡、Arizona（NXP Chandler）改建 InP；大型股，不是倍率候選，入圖只為補齊 6 吋 InP 產線這一層的開發者列舉",
+      "name_aliases": [
+        "Nokia"
+      ]
+    },
+    {
       "company_id": "co:novanta",
       "research_ticker": "NOVT",
       "market_currency": "USD",
@@ -936,7 +996,12 @@
       "execution_currency": "USD",
       "execution_venue": "NYSE",
       "display_name": "Oracle Corporation",
-      "_display_name_source": "SEC 10-Q 2026-09-11 封面 dei:EntityRegistrantName「Oracle Corporation」"
+      "_display_name_source": "SEC 10-Q 2026-09-11 封面 dei:EntityRegistrantName「Oracle Corporation」",
+      "_note": "2026-10-19 隨 LPO 入圖包 staged（drop 即回退）加 name_aliases：Oracle 自己的 OCP 2026 投影片 p.1 講者頭銜「Architect, Oracle Cloud Infrastructure」、正文寫「OCI has large deployment of LPO」；圖上節點已有這兩個別名。單詞「OCI」分大小寫比對",
+      "name_aliases": [
+        "Oracle Cloud Infrastructure",
+        "OCI"
+      ]
     },
     {
       "company_id": "co:pennsylvania_transformer_technology",

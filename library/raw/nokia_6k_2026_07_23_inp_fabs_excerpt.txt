@@ -1,0 +1,16 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/924613/000110465926086081/tm2621179d1_6k.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Nokia Corporation Form 6-K（2026-07-23；Nokia Corporation Report for Q2 and Half Year 2026）：San Jose 新廠 2026Q4 爬坡、Arizona（NXP Chandler）改建 InP
+DATE: 2026-07-23
+RETRIEVED: 2026-10-19（EDGAR 原始 HTML 去標籤、空白正規化後逐字）
+NOTE: 6-K 沒寫「6-inch」——「6 吋」只出現在 Nokia OCP 2026 投影片（nokia_ocp2026_npo_six_inch_inp）。同一個 origin（Nokia），不算兩個獨立來源。
+
+【San Jose 廠】
+"Nokia remains on track with its new San Jose Fab to begin ramping production later in Q4 2026 and announced during Q2 2026 an investment to increase its advanced test and packaging capacity in Pennsylvania by 10x beginning in Q3 2026."
+
+【Arizona（NXP Chandler）】
+"As part of its long-term capacity planning, Nokia has entered into a definitive agreement to acquire NXP's Chandler Semiconductor Fabrication campus in Arizona."
+
+【Arizona 改建 InP】
+"Subject to the receipt of certain regulatory approvals, Nokia will initially lease manufacturing capacity in a portion of the facility on the site starting in early 2027 and will convert the site to Indium Phosphide semiconductor production for optical components."
