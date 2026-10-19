@@ -3,16 +3,18 @@
     {
       "confidence": 0.6,
       "demand_proof_level": "guided",
-      "disproof_condition": "條件：GF 或 TSMC 的後續申報、法說寫出矽中介層協議延後、縮減或終止，或 Malta 的量產時程延到 2028 年下半年以後。核查頻率：每季（GF 6-K／法說、TSMC 法說）。觸發後 48 小時：e1、e4 降 confidence，重讀先進封裝層與 CoWoS 的供給側時鐘。",
+      "disproof_condition": "條件：GF 或 TSMC 的後續申報、法說寫出矽中介層協議延後、縮減或終止，或 Malta 的量產時程延到 2028 年下半年以後；或 GF、TSMC 後續文件寫出的協議金額或年限與「multi-year $2 billion」「initial term of five years」不一致（觸發時另更正 cl1 statement）。核查頻率：每季（GF 6-K／法說、TSMC 法說）。觸發後 48 小時：e1、e4 降 confidence，重讀先進封裝層與 CoWoS 的供給側時鐘。",
       "id": "gf_tsmc_silicon_interposer_agreement_2026_10_08_cl1",
       "source_ids": [
         "gf_tsmc_silicon_interposer_agreement_2026_10_08_s1",
         "gf_tsmc_silicon_interposer_agreement_2026_10_08_s2",
         "gf_tsmc_silicon_interposer_agreement_2026_10_08_s3",
         "gf_tsmc_silicon_interposer_agreement_2026_10_08_s4",
-        "gf_tsmc_silicon_interposer_agreement_2026_10_08_s5"
+        "gf_tsmc_silicon_interposer_agreement_2026_10_08_s5",
+        "gf_tsmc_silicon_interposer_agreement_2026_10_08_s6",
+        "gf_tsmc_silicon_interposer_agreement_2026_10_08_s7"
       ],
-      "statement": "GlobalFoundries (2026-10-08 press release): manufacturing agreement with TSMC to establish a U.S.-based supply of silicon interposers for TSMC's CoWoS advanced packaging ecosystem; GF will provide manufacturing service to TSMC and add fabrication capacity at Malta, New York, including embedded deep trench capacitor components; volume production expected to begin ramping in the first half of 2028; initial term five years with a framework for future expansion. No contract value is disclosed. Supplier-issued release naming the customer (TSMC); TSMC has not published its own statement in this package.",
+      "statement": "GlobalFoundries (2026-10-08 press release): manufacturing agreement with TSMC to establish a U.S.-based supply of silicon interposers for TSMC's CoWoS advanced packaging ecosystem; GF will provide manufacturing service to TSMC and add fabrication capacity at Malta, New York, including embedded deep trench capacitor components; volume production expected to begin ramping in the first half of 2028; initial term five years with a framework for future expansion. The release's subheadline describes it as a multi-year $2 billion agreement (GF-stated; TSMC has not disclosed the value in its own filings as of 2026-10-19). Supplier-issued release naming the customer (TSMC); TSMC has not published its own statement in this package.",
       "subject_id": "e1"
     }
   ],
@@ -161,9 +163,10 @@
     "permission_basis": "GlobalFoundries 官網公開新聞稿；只保留研究必要的有限逐字節錄（原始 HTML 去標籤後逐字核對）。published_at 取 dateline 2026-10-08。",
     "published_at": "2026-10-08",
     "publisher": "GlobalFoundries（官網新聞稿）",
-    "retrieved_at": "2026-10-18",
+    "retrieved_at": "2026-10-19",
     "source_type": "news",
     "storage_permission": "repo_excerpt",
+    "supersedes_extraction_sha256": "0e531ea96f4fc197762c90c5929b6e5148898d1cbdae89ac7adcf116ce28ee23",
     "title": "GlobalFoundries 新聞稿：與 TSMC 簽製造協議，在美國 Malta 建立 CoWoS 用矽中介層供應（2028 上半年量產爬坡、初始五年）",
     "url": "https://gf.com/news-and-events/news/globalfoundries-reaches-agreement-to-establish-us-based-supply-of-silicon-interposers-for-advanced-ai-packaging/"
   },
@@ -192,6 +195,16 @@
       "id": "gf_tsmc_silicon_interposer_agreement_2026_10_08_s5",
       "locator": "高層引述（Ed Kaste）",
       "quote": "Advanced packaging is becoming increasingly critical to delivering the performance, power efficiency and scale required for next-generation AI systems,"
+    },
+    {
+      "id": "gf_tsmc_silicon_interposer_agreement_2026_10_08_s6",
+      "locator": "副標題（正文第一段 <p><em>）",
+      "quote": "Multi-year $2 billion agreement will expand capacity for advanced packaging ecosystem and support growing demand for AI and high-performance computing technologies"
+    },
+    {
+      "id": "gf_tsmc_silicon_interposer_agreement_2026_10_08_s7",
+      "locator": "第一段末句",
+      "quote": "The agreement provides a foundation to expand capacity over time as customer demand grows."
     }
   ]
 }
