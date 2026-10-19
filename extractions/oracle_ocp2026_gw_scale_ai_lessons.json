@@ -1,0 +1,171 @@
+{
+  "claims": [
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：Oracle 後續一手（OCP、OFC、技術部落格）寫出 800G 世代 LPO 撤回或縮回到少數 hop。核查頻率：每次 OCP 高峰會與 OFC（每年兩次）。觸發後 48 小時：e1 降 confidence，重讀 LPO 層（tech:lpo）的需求側。",
+      "id": "oracle_ocp2026_gw_scale_ai_lessons_cl1",
+      "source_ids": [
+        "oracle_ocp2026_gw_scale_ai_lessons_s2",
+        "oracle_ocp2026_gw_scale_ai_lessons_s3",
+        "oracle_ocp2026_gw_scale_ai_lessons_s4"
+      ],
+      "statement": "Oracle (buyer; Mark Filer, Architect, Oracle Cloud Infrastructure) at OCP Global Summit 2026: 'Addressing TCO at 800G, OCI has large deployment of LPO transceivers in AI scale-out networks'; data set of identical T0<>T1 links, 156k LPO and 202k FRO (359k total); FRO links experienced 1.75x more transitions than LPO. Second hyperscaler running LPO in the AI back-end (after Meta). No LPO module or chipset vendor is named.",
+      "subject_id": "e1"
+    },
+    {
+      "confidence": 0.65,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：Oracle 或另一家雲端業者的一手寫出 1.6T 世代仍大量部署全線性 LPO（不是 LRO）。核查頻率：每次 OCP 高峰會與 OFC。觸發後 48 小時：e2 降 confidence，重讀 LPO 層與光模組 DSP 層的反向路徑。",
+      "id": "oracle_ocp2026_gw_scale_ai_lessons_cl2",
+      "source_ids": [
+        "oracle_ocp2026_gw_scale_ai_lessons_s5",
+        "oracle_ocp2026_gw_scale_ai_lessons_s6",
+        "oracle_ocp2026_gw_scale_ai_lessons_s7",
+        "oracle_ocp2026_gw_scale_ai_lessons_s8"
+      ],
+      "statement": "Oracle at OCP 2026: 'LPO cannot comfortably meet SI and interop performance requirements at 1.6T; LRO provides the best low power solution currently available'; 'Interop has been demonstrated from different suppliers and multi-vendor 3nm DSPs'; takeaway 'LRO is viable at 1.6T'. LRO keeps a transmit-side DSP and a linear receive side, so at 1.6T (200G/lane) the buyer moves from fully linear LPO to half-linear LRO. Buyer's own technology choice, not a purchase order.",
+      "subject_id": "e2"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:lpo",
+      "id": "e1",
+      "relation": "depends_on",
+      "source_ids": [
+        "oracle_ocp2026_gw_scale_ai_lessons_s2",
+        "oracle_ocp2026_gw_scale_ai_lessons_s3",
+        "oracle_ocp2026_gw_scale_ai_lessons_s4"
+      ],
+      "src_id": "co:oracle"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "tech:lpo",
+      "id": "e2",
+      "relation": "competes_with",
+      "source_ids": [
+        "oracle_ocp2026_gw_scale_ai_lessons_s6",
+        "oracle_ocp2026_gw_scale_ai_lessons_s8"
+      ],
+      "src_id": "tech:lro"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "end_demand",
+      "aliases": [
+        "Oracle Cloud Infrastructure",
+        "OCI"
+      ],
+      "attributes": {
+        "ticker": "ORCL"
+      },
+      "confidence": 0.85,
+      "id": "co:oracle",
+      "name": "Oracle",
+      "role": "adjacent_silicon",
+      "source_ids": [
+        "oracle_ocp2026_gw_scale_ai_lessons_s1",
+        "oracle_ocp2026_gw_scale_ai_lessons_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "LPO",
+        "linear pluggable optics"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:lpo",
+      "name": "Linear Pluggable Optics (LPO)",
+      "role": null,
+      "source_ids": [
+        "oracle_ocp2026_gw_scale_ai_lessons_s2",
+        "oracle_ocp2026_gw_scale_ai_lessons_s4",
+        "oracle_ocp2026_gw_scale_ai_lessons_s6"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "LRO",
+        "linear receive optics"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:lro",
+      "name": "Linear Receive Optics (LRO)",
+      "role": null,
+      "source_ids": [
+        "oracle_ocp2026_gw_scale_ai_lessons_s5",
+        "oracle_ocp2026_gw_scale_ai_lessons_s6",
+        "oracle_ocp2026_gw_scale_ai_lessons_s8"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "oracle_ocp2026_gw_scale_ai_lessons",
+    "evidence_tier": 1,
+    "origin_entity": "Oracle Corporation",
+    "permission_basis": "OCP Global Summit 2026 公開場次投影片（Oracle，Mark Filer〈Lessons learned from GW-scale AI deployments〉；OCP 官方錄影頁連結的 Dropbox 檔案）；只保留研究必要的有限逐字節錄。投影片無日期，published_at 留空（會期 2026-10-12～10-15；同場次官方影片 2026-10-14 上架，不冒充文件日期）。",
+    "published_at": null,
+    "publisher": "Open Compute Project（OCP Global Summit 2026 recorded content；投影片由 OCP 錄影頁連結）",
+    "retrieved_at": "2026-10-19",
+    "source_type": "paper",
+    "storage_permission": "repo_excerpt",
+    "title": "Oracle, Lessons learned from GW-scale AI deployments（OCP Global Summit 2026；Mark Filer, Architect, Oracle Cloud Infrastructure）：800G 大量部署 LPO（15.6 萬條鏈路）、1.6T 改用 LRO",
+    "url": "https://www.dropbox.com/scl/fi/a4oiia6e5yse6do4c7stf/Lessons-learned-from-GW-scale-AI-deployments.pdf?rlkey=svl7p1hzeqoqgdg8mdeagci3m&dl=0"
+  },
+  "sources": [
+    {
+      "id": "oracle_ocp2026_gw_scale_ai_lessons_s1",
+      "locator": "p.1 講者",
+      "quote": "Mark Filer Architect, Oracle Cloud Infrastructure"
+    },
+    {
+      "id": "oracle_ocp2026_gw_scale_ai_lessons_s2",
+      "locator": "p.6〈800G: Linear Pluggable Optics (LPO)〉",
+      "quote": "Addressing TCO at 800G, OCI has large deployment of LPO transceivers in AI scale-out networks"
+    },
+    {
+      "id": "oracle_ocp2026_gw_scale_ai_lessons_s3",
+      "locator": "p.6 資料集",
+      "quote": "Plots show 24-hr max pre-FEC BER across identical T0<>T1 links, 156k LPO and 202k FRO in data set(359k total)"
+    },
+    {
+      "id": "oracle_ocp2026_gw_scale_ai_lessons_s4",
+      "locator": "p.7〈800G: Linear Pluggable Optics (LPO) II〉",
+      "quote": "FRO links experienced 1.75x more transitions than LPO"
+    },
+    {
+      "id": "oracle_ocp2026_gw_scale_ai_lessons_s5",
+      "locator": "p.9 標題",
+      "quote": "1.6T: Linear Receive Optics (LRO)"
+    },
+    {
+      "id": "oracle_ocp2026_gw_scale_ai_lessons_s6",
+      "locator": "p.9",
+      "quote": "LPO cannot comfortably meet SI and interop performance requirements at 1.6T; LRO provides the best low power solution currently available"
+    },
+    {
+      "id": "oracle_ocp2026_gw_scale_ai_lessons_s7",
+      "locator": "p.9 互通",
+      "quote": "Interop has been demonstrated from different suppliers and multi-vendor 3nm DSPs"
+    },
+    {
+      "id": "oracle_ocp2026_gw_scale_ai_lessons_s8",
+      "locator": "p.9 結論",
+      "quote": "Takeaway: LRO is viable at 1.6T and markedly improves network TCO for AI scale-out applications"
+    }
+  ]
+}

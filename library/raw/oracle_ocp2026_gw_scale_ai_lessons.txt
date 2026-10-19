@@ -1,0 +1,31 @@
+Source URL: https://www.dropbox.com/scl/fi/a4oiia6e5yse6do4c7stf/Lessons-learned-from-GW-scale-AI-deployments.pdf?rlkey=svl7p1hzeqoqgdg8mdeagci3m&dl=0
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Oracle, Lessons learned from GW-scale AI deployments（OCP Global Summit 2026；Mark Filer, Architect, Oracle Cloud Infrastructure）：800G 大量部署 LPO（15.6 萬條鏈路）、1.6T 改用 LRO
+
+Source: https://www.dropbox.com/scl/fi/a4oiia6e5yse6do4c7stf/Lessons-learned-from-GW-scale-AI-deployments.pdf?rlkey=svl7p1hzeqoqgdg8mdeagci3m&dl=0
+NOTE: pypdf 抽字、空白正規化後逐字。投影片無日期（會期 2026-10-12～15）。買方自己的部署數據與技術選擇；沒有點名任何模組或晶片組供應商。
+
+【p.1 講者】
+Mark Filer Architect, Oracle Cloud Infrastructure
+
+【p.6〈800G: Linear Pluggable Optics (LPO)〉】
+Addressing TCO at 800G, OCI has large deployment of LPO transceivers in AI scale-out networks
+
+【p.6 資料集】
+Plots show 24-hr max pre-FEC BER across identical T0<>T1 links, 156k LPO and 202k FRO in data set(359k total)
+
+【p.7〈800G: Linear Pluggable Optics (LPO) II〉】
+FRO links experienced 1.75x more transitions than LPO
+
+【p.9 標題】
+1.6T: Linear Receive Optics (LRO)
+
+【p.9】
+LPO cannot comfortably meet SI and interop performance requirements at 1.6T; LRO provides the best low power solution currently available
+
+【p.9 互通】
+Interop has been demonstrated from different suppliers and multi-vendor 3nm DSPs
+
+【p.9 結論】
+Takeaway: LRO is viable at 1.6T and markedly improves network TCO for AI scale-out applications
