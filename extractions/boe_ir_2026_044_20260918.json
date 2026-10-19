@@ -1,0 +1,108 @@
+{
+  "claims": [
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：京東方一手（IR 記錄表、公告、半年報／年報）寫出玻璃基封裝載板項目終止或擱置；或 2027 年中前仍未達到量產投資決策條件、改口延後。核查頻率：每季（京東方季報、半年報／年報、巨潮資訊網 IR 記錄表）。觸發後 48 小時：重讀玻璃芯這一層的供給側，以及 IC 載板、T-glass 布兩份讀圖裡玻璃芯的時鐘。",
+      "id": "boe_ir_2026_044_20260918_cl1",
+      "source_ids": [
+        "boe_ir_2026_044_20260918_s1",
+        "boe_ir_2026_044_20260918_s2",
+        "boe_ir_2026_044_20260918_s3"
+      ],
+      "statement": "BOE investor-relations record 2026-044 (survey on 2026-09-18, disclosed 2026-09-21): BOE distinguishes three uses of glass in advanced packaging (temporary Glass Carrier, Glass Core Substrate, Interposer) and states its target product is the Glass Core Substrate, which addresses warpage of substrates for large, high-power chips. A panel-level glass-core pilot line was funded with RMB 993 million in 2024, completed main-equipment installation in 2025 and reached fully automated line connection in 1H 2026; design capacity 1,000 panels per month. Developer self-statement; customers not named.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "mat:glass_core",
+      "id": "e1",
+      "relation": "develops",
+      "source_ids": [
+        "boe_ir_2026_044_20260918_s1",
+        "boe_ir_2026_044_20260918_s2",
+        "boe_ir_2026_044_20260918_s3"
+      ],
+      "src_id": "co:boe"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "BOE",
+        "BOE Technology Group Co., Ltd.",
+        "京东方",
+        "京东方科技集团股份有限公司"
+      ],
+      "attributes": {},
+      "confidence": 0.95,
+      "id": "co:boe",
+      "name": "BOE Technology Group",
+      "role": null,
+      "source_ids": [
+        "boe_ir_2026_044_20260918_s1",
+        "boe_ir_2026_044_20260918_s2",
+        "boe_ir_2026_044_20260918_s3"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "glass core substrate",
+        "Glass Core",
+        "玻璃芯載板",
+        "玻璃核心載板",
+        "유리기판",
+        "玻璃基载板",
+        "玻璃基封装载板"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "mat:glass_core",
+      "name": "Glass core for IC package substrates (glass core substrate)",
+      "role": null,
+      "source_ids": [
+        "boe_ir_2026_044_20260918_s1",
+        "boe_ir_2026_044_20260918_s2",
+        "boe_ir_2026_044_20260918_s3"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "boe_ir_2026_044_20260918",
+    "evidence_tier": 2,
+    "origin_entity": "BOE Technology Group Co., Ltd.",
+    "permission_basis": "巨潮資訊網（深交所指定披露）的法定披露文件；只保留研究必要的有限逐字節錄。published_at 取披露日（IR 記錄表活動日另寫在標題）。",
+    "published_at": "2026-09-21",
+    "publisher": "巨潮資訊網（深交所指定披露）",
+    "retrieved_at": "2026-10-19",
+    "source_type": "transcript",
+    "storage_permission": "repo_excerpt",
+    "title": "京東方投資者關係活動記錄表 編號 2026-044（2026-09-18 特定對象調研）：玻璃在先進封裝的三種用途；公司目標產品為 Glass Core Substrate；試驗線投資、通線與設計產能",
+    "url": "http://static.cninfo.com.cn/finalpage/2026-09-21/1225573688.PDF"
+  },
+  "sources": [
+    {
+      "id": "boe_ir_2026_044_20260918_s1",
+      "locator": "IR 記錄表問答（三種用途）",
+      "quote": "玻璃在先进封装中有3种潜在的应用方向，分别是硅中介层的制造过程中的临时支撑（Glass Carrier）、作为封装结构基础的玻璃基载板（Glass Core Substrate）以及将玻璃作为可能的中介层（Interposer）材料。"
+    },
+    {
+      "id": "boe_ir_2026_044_20260918_s2",
+      "locator": "IR 記錄表問答（目標產品）",
+      "quote": "玻璃基载板（Glass Core Substrate）凭借更好的热稳定性、平整性等特性，解决了大尺寸高功耗芯片封装中，载板易翘曲的问题，从而提升芯片封装性能。公司布局的目标产品即为玻璃基载板（Glass Core Substrate），可匹配不同的先进封装需求。"
+    },
+    {
+      "id": "boe_ir_2026_044_20260918_s3",
+      "locator": "IR 記錄表問答（試驗線）",
+      "quote": "2024年投资9.93亿元建设板级玻璃基封装载板试验线，并于2025年内完成主设备搬入调试，2026年上半年已实现全自动化设备通线。该试验线设计产能1,000片/月。"
+    }
+  ]
+}

@@ -1,0 +1,90 @@
+{
+  "claims": [
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：京東方一手寫出客戶端晶片級電性測試失敗、送樣客戶退出，或 2027 年中前未達到量產投資決策條件。核查頻率：每季（巨潮資訊網 IR 記錄表、季報）。觸發後 48 小時：e1 加註，重讀玻璃芯這一層的供給側時鐘。",
+      "id": "boe_ir_2026_048_20261015_cl1",
+      "source_ids": [
+        "boe_ir_2026_048_20261015_s1"
+      ],
+      "statement": "BOE investor-relations record 2026-048 (visit on 2026-10-15, disclosed 2026-10-16): the pilot line has fully automated equipment connection; 24-layer (11-2-11) glass-core package substrates larger than 100x100 mm have been produced and sampled, and have passed Pre-con, TCB 1000 cycles, UHAST, BHAST, HTSL and LTSL reliability standard tests. Per BOE's 2026-09-22 results briefing these tests were run in BOE's own fab; chip-level electrical tests with customers were not yet complete, and the chairman targets meeting mass-production investment-decision conditions (customer volume and yield) in 1H 2027 (aiming for Q1). Developer self-statement; customers not named.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "mat:glass_core",
+      "id": "e1",
+      "relation": "develops",
+      "source_ids": [
+        "boe_ir_2026_048_20261015_s1"
+      ],
+      "src_id": "co:boe"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "BOE",
+        "BOE Technology Group Co., Ltd.",
+        "京东方",
+        "京东方科技集团股份有限公司"
+      ],
+      "attributes": {},
+      "confidence": 0.95,
+      "id": "co:boe",
+      "name": "BOE Technology Group",
+      "role": null,
+      "source_ids": [
+        "boe_ir_2026_048_20261015_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "glass core substrate",
+        "Glass Core",
+        "玻璃芯載板",
+        "玻璃核心載板",
+        "유리기판",
+        "玻璃基载板",
+        "玻璃基封装载板"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "mat:glass_core",
+      "name": "Glass core for IC package substrates (glass core substrate)",
+      "role": null,
+      "source_ids": [
+        "boe_ir_2026_048_20261015_s1"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "boe_ir_2026_048_20261015",
+    "evidence_tier": 2,
+    "origin_entity": "BOE Technology Group Co., Ltd.",
+    "permission_basis": "巨潮資訊網（深交所指定披露）的法定披露文件；只保留研究必要的有限逐字節錄。published_at 取披露日（IR 記錄表活動日另寫在標題）。",
+    "published_at": "2026-10-16",
+    "publisher": "巨潮資訊網（深交所指定披露）",
+    "retrieved_at": "2026-10-19",
+    "source_type": "transcript",
+    "storage_permission": "repo_excerpt",
+    "title": "京東方投資者關係活動記錄表 編號 2026-048（2026-10-15 現場參觀＋調研）：24 層（11-2-11）、超過 100×100mm 玻璃基封裝載板產出並送樣，信賴性標準測試通過",
+    "url": "http://static.cninfo.com.cn/finalpage/2026-10-16/1225607807.PDF"
+  },
+  "sources": [
+    {
+      "id": "boe_ir_2026_048_20261015_s1",
+      "locator": "IR 記錄表問答（送樣）",
+      "quote": "目前，公司试验线已实现全自动化设备通线，已有超过100×100mm尺寸的24层（11-2-11）玻璃基封装载板产出并送样，且现已通过Pre-con、TCB 1000 cycles、UHAST、BHAST、HTSL、LTSL信赖性标准测试。"
+    }
+  ]
+}
