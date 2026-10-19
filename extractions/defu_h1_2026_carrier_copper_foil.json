@@ -1,0 +1,104 @@
+{
+  "claims": [
+    {
+      "confidence": 0.5,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "條件：德福 2026 年報（約 2027-04）寫載體銅箔仍是小批量或改口送樣。核查頻率：每半年。觸發後 48 小時：e1 降 confidence。",
+      "id": "defu_h1_2026_carrier_copper_foil_cl1",
+      "source_ids": [
+        "defu_h1_2026_carrier_copper_foil_s1",
+        "defu_h1_2026_carrier_copper_foil_s2"
+      ],
+      "statement": "Defu Technology (self, 2026 interim report): repeats that carrier copper foil C-IC2 is in mass production for 1.6T optical-module projects, while another section of the same report says HVLP4 and carrier copper foil passed customer validation and achieved small-batch shipments during the period. Volume is unknown; customers not named.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.6,
+      "dst_id": "mat:ultra_thin_carrier_copper_foil",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "defu_h1_2026_carrier_copper_foil_s1",
+        "defu_h1_2026_carrier_copper_foil_s2"
+      ],
+      "src_id": "co:defu_technology"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "德福科技",
+        "九江德福科技股份有限公司",
+        "Jiujiang Defu Technology Co.,Limited"
+      ],
+      "attributes": {
+        "ticker": "301511.SZ"
+      },
+      "confidence": 0.9,
+      "id": "co:defu_technology",
+      "name": "Defu Technology",
+      "role": null,
+      "source_ids": [
+        "defu_h1_2026_carrier_copper_foil_s1",
+        "defu_h1_2026_carrier_copper_foil_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "ultra-thin carrier copper foil",
+        "carrier copper foil",
+        "MicroThin",
+        "DoubleThin",
+        "C-IC2",
+        "带载体可剥离超薄铜箔",
+        "可剥铜",
+        "载体铜箔",
+        "極薄可剝離附載體銅箔",
+        "キャリア付極薄銅箔",
+        "キャリア付銅箔"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "mat:ultra_thin_carrier_copper_foil",
+      "name": "Ultra-thin copper foil with carrier (peelable carrier-supported foil for mSAP)",
+      "role": null,
+      "source_ids": [
+        "defu_h1_2026_carrier_copper_foil_s1",
+        "defu_h1_2026_carrier_copper_foil_s2"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "defu_h1_2026_carrier_copper_foil",
+    "evidence_tier": 1,
+    "origin_entity": "Jiujiang Defu Technology Co.,Limited",
+    "permission_basis": "公開法定申報或公司 IR 公開文件；只保留研究必要的有限逐字節錄。published_at 取披露日。",
+    "published_at": "2026-08-21",
+    "publisher": "同花順（轉載深交所公告）",
+    "retrieved_at": "2026-10-19",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "德福科技 2026 年半年度报告（2026-08-21）：載體銅箔 C-IC2 已在 1.6T 光模組專案量產；同份另一處寫載體銅箔通過客戶驗證、實現小批量出貨",
+    "url": "http://notice.10jqka.com.cn/api/pdf/da58398c39fe9d4b.pdf"
+  },
+  "sources": [
+    {
+      "id": "defu_h1_2026_carrier_copper_foil_s1",
+      "locator": "p.12 載體銅箔",
+      "quote": "载体铜箔方面，公司自主研发的载体铜箔C-IC2已在1.6T光模块项目实现量产"
+    },
+    {
+      "id": "defu_h1_2026_carrier_copper_foil_s2",
+      "locator": "p.13 出貨",
+      "quote": "其中HVLP4和载体铜箔报告期内通过客户验证并实现小批量出货"
+    }
+  ]
+}

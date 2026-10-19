@@ -1,0 +1,100 @@
+{
+  "claims": [
+    {
+      "confidence": 0.5,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "條件：CFL 或其母公司一手寫出 DoubleThin 停產或退出封裝基板；核查頻率：每年（CFL 官網型錄、母公司年報）。觸發後 48 小時：e1 降 confidence。",
+      "id": "defu_preplan_20250916_cfl_doublethin_cl1",
+      "source_ids": [
+        "defu_preplan_20250916_cfl_doublethin_s1",
+        "defu_preplan_20250916_cfl_doublethin_s2"
+      ],
+      "statement": "Defu Technology's 2025-09 share-issuance plan (then a prospective acquirer of Circuit Foil Luxembourg, so an interested party): DTH (DoubleThin) is Circuit Foil Luxembourg's carrier copper foil brand — a two-layer structure whose ultra-thin layer is supported by a peelable carrier — and 'HVLP3 and DTH products are in mass production for products of top international manufacturers'. Customers not named; the acquisition was reportedly terminated in 2026-01 (media only, not traced).",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.6,
+      "dst_id": "mat:ultra_thin_carrier_copper_foil",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "defu_preplan_20250916_cfl_doublethin_s1",
+        "defu_preplan_20250916_cfl_doublethin_s2"
+      ],
+      "src_id": "co:circuit_foil_luxembourg"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "Circuit Foil Luxembourg S.a.r.l.",
+        "卢森堡铜箔"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:circuit_foil_luxembourg",
+      "name": "Circuit Foil Luxembourg",
+      "role": null,
+      "source_ids": [
+        "defu_preplan_20250916_cfl_doublethin_s1",
+        "defu_preplan_20250916_cfl_doublethin_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "ultra-thin carrier copper foil",
+        "carrier copper foil",
+        "MicroThin",
+        "DoubleThin",
+        "C-IC2",
+        "带载体可剥离超薄铜箔",
+        "可剥铜",
+        "载体铜箔",
+        "極薄可剝離附載體銅箔",
+        "キャリア付極薄銅箔",
+        "キャリア付銅箔"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "mat:ultra_thin_carrier_copper_foil",
+      "name": "Ultra-thin copper foil with carrier (peelable carrier-supported foil for mSAP)",
+      "role": null,
+      "source_ids": [
+        "defu_preplan_20250916_cfl_doublethin_s1"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "defu_preplan_20250916_cfl_doublethin",
+    "evidence_tier": 1,
+    "origin_entity": "Jiujiang Defu Technology Co.,Limited",
+    "permission_basis": "公開法定申報或公司 IR 公開文件；只保留研究必要的有限逐字節錄。published_at 取披露日。",
+    "published_at": "2025-09-16",
+    "publisher": "巨潮資訊網（深交所公告）",
+    "retrieved_at": "2026-10-19",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "德福科技 2025 年度向特定對象發行 A 股股票預案（2025-09-16）：盧森堡銅箔（CFL）的 DoubleThin（DTH）載體銅箔已量產應用於國際頂尖廠商產品",
+    "url": "http://static.cninfo.com.cn/finalpage/2025-09-16/1224663655.PDF"
+  },
+  "sources": [
+    {
+      "id": "defu_preplan_20250916_cfl_doublethin_s1",
+      "locator": "p.9 釋義",
+      "quote": "DTH指DoubleThin，是卢森堡铜箔的载体铜箔产品牌号，载体铜箔是指采用双层结构，极薄铜箔层由载体铜箔层支撑，在使用过程中可剥离的铜箔"
+    },
+    {
+      "id": "defu_preplan_20250916_cfl_doublethin_s2",
+      "locator": "p.21",
+      "quote": "HVLP3和DTH产品已量产应用于国际顶尖厂商产品。"
+    }
+  ]
+}

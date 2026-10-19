@@ -1,0 +1,139 @@
+{
+  "claims": [
+    {
+      "confidence": 0.5,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "條件：德福後續半年報／年報不再寫 C-IC2 量產或改口為送樣；或光模組廠一手點名的載體銅箔供應商不含德福。核查頻率：每半年。觸發後 48 小時：e1、e2 降 confidence，重讀極薄載體銅箔層供給側；德福敘事重答候選狀態。",
+      "id": "defu_ar2025_carrier_copper_foil_cl1",
+      "source_ids": [
+        "defu_ar2025_carrier_copper_foil_s1",
+        "defu_ar2025_carrier_copper_foil_s2"
+      ],
+      "statement": "Defu Technology (self, annual report 2025): its self-developed carrier copper foil C-IC2 'has achieved mass production in 1.6T optical module projects'; it is pushing domestic substitution of ultra-thin peelable carrier copper foil for IC packaging. Supplier self-statement; the optical-module customer is not named; the 2026 interim report describes carrier foil as 'small-batch shipments'.",
+      "subject_id": "e1"
+    },
+    {
+      "confidence": 0.5,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "條件：一手寫出 1.6T 光模組電路板改用 SAP 或不需載體銅箔的工法。核查頻率：每年。觸發後 48 小時：重讀極薄載體銅箔層的需求側。",
+      "id": "defu_ar2025_carrier_copper_foil_cl2",
+      "source_ids": [
+        "defu_ar2025_carrier_copper_foil_s1"
+      ],
+      "statement": "Defu Technology annual report 2025: carrier copper foil C-IC2 in mass production for 1.6T optical-module projects — the foil goes into the mSAP circuit board inside the transceiver (two hops compressed; the graph has no transceiver-PCB node). Mitsui separately expects MicroThin to keep being used at 1.6T (its Q1 FY2027 briefing minutes).",
+      "subject_id": "e2"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.6,
+      "dst_id": "mat:ultra_thin_carrier_copper_foil",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "defu_ar2025_carrier_copper_foil_s1"
+      ],
+      "src_id": "co:defu_technology"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.6,
+      "dst_id": "tech:transceiver_1_6t",
+      "id": "e2",
+      "relation": "is_component_of",
+      "source_ids": [
+        "defu_ar2025_carrier_copper_foil_s1"
+      ],
+      "src_id": "mat:ultra_thin_carrier_copper_foil"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "德福科技",
+        "九江德福科技股份有限公司",
+        "Jiujiang Defu Technology Co.,Limited"
+      ],
+      "attributes": {
+        "ticker": "301511.SZ"
+      },
+      "confidence": 0.9,
+      "id": "co:defu_technology",
+      "name": "Defu Technology",
+      "role": null,
+      "source_ids": [
+        "defu_ar2025_carrier_copper_foil_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "ultra-thin carrier copper foil",
+        "carrier copper foil",
+        "MicroThin",
+        "DoubleThin",
+        "C-IC2",
+        "带载体可剥离超薄铜箔",
+        "可剥铜",
+        "载体铜箔",
+        "極薄可剝離附載體銅箔",
+        "キャリア付極薄銅箔",
+        "キャリア付銅箔"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "mat:ultra_thin_carrier_copper_foil",
+      "name": "Ultra-thin copper foil with carrier (peelable carrier-supported foil for mSAP)",
+      "role": null,
+      "source_ids": [
+        "defu_ar2025_carrier_copper_foil_s1",
+        "defu_ar2025_carrier_copper_foil_s2"
+      ],
+      "type": "Material"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "1.6T transceiver"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:transceiver_1_6t",
+      "name": "1.6T-speed transceiver",
+      "role": null,
+      "source_ids": [
+        "defu_ar2025_carrier_copper_foil_s1"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "defu_ar2025_carrier_copper_foil",
+    "evidence_tier": 1,
+    "origin_entity": "Jiujiang Defu Technology Co.,Limited",
+    "permission_basis": "公開法定申報或公司 IR 公開文件；只保留研究必要的有限逐字節錄。published_at 取披露日。",
+    "published_at": "2026-04-24",
+    "publisher": "東方財富（轉載深交所公告）",
+    "retrieved_at": "2026-10-19",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "德福科技 2025 年年度报告（2026-04-24）：自主研發的載體銅箔 C-IC2 已在 1.6T 光模組專案量產；推進 IC 封裝用極薄可剝離附載體銅箔國產替代",
+    "url": "https://pdf.dfcfw.com/pdf/H2_AN202604241821556579_1.pdf"
+  },
+  "sources": [
+    {
+      "id": "defu_ar2025_carrier_copper_foil_s1",
+      "locator": "p.11 載體銅箔",
+      "quote": "与此同时，公司自主研发的载体铜箔C-IC2已在1.6T光模块项目实现量产；面向SLP类载板的9-12微米超薄铜箔，可适配BT/类BT体系板材"
+    },
+    {
+      "id": "defu_ar2025_carrier_copper_foil_s2",
+      "locator": "經營計畫",
+      "quote": "开拓封装载板和光模块领域的市场，全力推进IC封装用极薄可剥离附载体铜箔国产化替代进程"
+    }
+  ]
+}

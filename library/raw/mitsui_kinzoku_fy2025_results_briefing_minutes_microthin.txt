@@ -1,0 +1,13 @@
+Source URL: https://www.mitsui-kinzoku.com/LinkClick.aspx?fileticket=0OxEEugNsPE%3D&tabid=144&mid=1060
+
+Excerpt:
+[EXCERPT — 有限逐字引文] 三井金屬 2026 年 3 月期決算說明會議事錄 p.10：MicroThin「当社しか供給できない」、7 成稼動為理想；CPU／GPU 不用 MicroThin，CPU 周邊 DRAM 增加帶動增販
+DATE: 議事錄未印發布日
+RETRIEVED: 2026-10-19（原文 PDF 本機抽字；中日文字之間的抽字空白已正規化，引文取自正規化後全文、逐字）
+NOTE: 競爭者法定文件對三井的說法是第三方；各家對自己的說法是自述（L8 弱主張）。
+
+【p.10 供給】
+"MicroThin ™は当社しか供給できないため、定常的に7割操業ぐらいが理想的と考えている。"
+
+【p.10 用途】
+"CPUやGPUにはMicroThin™は使われないためそこでは販売量増につながらないが、CPU周りでDRAMが増えることはMicroThin™の増販に繋がる。"

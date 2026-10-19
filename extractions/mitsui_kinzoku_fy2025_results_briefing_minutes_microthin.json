@@ -1,0 +1,102 @@
+{
+  "claims": [
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：三井自己寫出 MicroThin 份額下降、競合參入或降價；或客戶端一手點名第二供應商。核查頻率：每季（三井決算說明會議事錄）。觸發後 48 小時：重讀極薄載體銅箔層的供給側；三井敘事重答候選狀態。",
+      "id": "mitsui_kinzoku_fy2025_results_briefing_minutes_microthin_cl1",
+      "source_ids": [
+        "mitsui_kinzoku_fy2025_results_briefing_minutes_microthin_s1",
+        "mitsui_kinzoku_fy2025_results_briefing_minutes_microthin_s2"
+      ],
+      "statement": "Mitsui Kinzoku (self, FY2025 results briefing minutes): 'only we can supply MicroThin', so about 70% utilization is the ideal steady state; MicroThin is not used for CPUs or GPUs, but more DRAM around CPUs drives MicroThin sales. Supplier self-statement (weak, L8); the 'only we' part is contradicted by competitors' statutory filings (Fangbang, Defu) that report their own qualified or mass-produced carrier foil — sole_source is not asserted.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "mat:ultra_thin_carrier_copper_foil",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "mitsui_kinzoku_fy2025_results_briefing_minutes_microthin_s1",
+        "mitsui_kinzoku_fy2025_results_briefing_minutes_microthin_s2"
+      ],
+      "src_id": "co:mitsui_kinzoku"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "三井金属",
+        "三井金屬",
+        "Mitsui Kinzoku",
+        "Mitsui Mining & Smelting"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:mitsui_kinzoku",
+      "name": "Mitsui Kinzoku Co., Ltd.",
+      "role": null,
+      "source_ids": [
+        "mitsui_kinzoku_fy2025_results_briefing_minutes_microthin_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "ultra-thin carrier copper foil",
+        "carrier copper foil",
+        "MicroThin",
+        "DoubleThin",
+        "C-IC2",
+        "带载体可剥离超薄铜箔",
+        "可剥铜",
+        "载体铜箔",
+        "極薄可剝離附載體銅箔",
+        "キャリア付極薄銅箔",
+        "キャリア付銅箔"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "mat:ultra_thin_carrier_copper_foil",
+      "name": "Ultra-thin copper foil with carrier (peelable carrier-supported foil for mSAP)",
+      "role": null,
+      "source_ids": [
+        "mitsui_kinzoku_fy2025_results_briefing_minutes_microthin_s1",
+        "mitsui_kinzoku_fy2025_results_briefing_minutes_microthin_s2"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "mitsui_kinzoku_fy2025_results_briefing_minutes_microthin",
+    "evidence_tier": 2,
+    "origin_entity": "Mitsui Kinzoku Co., Ltd.",
+    "permission_basis": "公開法定申報或公司 IR 公開文件；只保留研究必要的有限逐字節錄。published_at 留空：議事錄沒有印發布日（INV-6，不以說明會日期冒充）。",
+    "published_at": null,
+    "publisher": "公司 IR 網站",
+    "retrieved_at": "2026-10-19",
+    "source_type": "transcript",
+    "storage_permission": "repo_excerpt",
+    "title": "三井金屬 2026 年 3 月期決算說明會議事錄 p.10：MicroThin「当社しか供給できない」、7 成稼動為理想；CPU／GPU 不用 MicroThin，CPU 周邊 DRAM 增加帶動增販",
+    "url": "https://www.mitsui-kinzoku.com/LinkClick.aspx?fileticket=0OxEEugNsPE%3D&tabid=144&mid=1060"
+  },
+  "sources": [
+    {
+      "id": "mitsui_kinzoku_fy2025_results_briefing_minutes_microthin_s1",
+      "locator": "p.10 供給",
+      "quote": "MicroThin ™は当社しか供給できないため、定常的に7割操業ぐらいが理想的と考えている。"
+    },
+    {
+      "id": "mitsui_kinzoku_fy2025_results_briefing_minutes_microthin_s2",
+      "locator": "p.10 用途",
+      "quote": "CPUやGPUにはMicroThin™は使われないためそこでは販売量増につながらないが、CPU周りでDRAMが増えることはMicroThin™の増販に繋がる。"
+    }
+  ]
+}
