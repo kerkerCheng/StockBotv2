@@ -18,12 +18,12 @@
     {
       "confidence": 0.5,
       "demand_proof_level": "inferred",
-      "disproof_condition": "條件：主要光模組廠或交換器廠的一手文件寫明主力 800G／1.6T 可插拔產品改用不含 DSP 的線性驅動（LPO／LRO）並成為出貨主流。核查頻率：每半年（光模組廠年報、法說）。觸發後 48 小時：e2 降 confidence、重讀光模組 DSP 層。",
+      "disproof_condition": "條件：主要光模組廠或交換器廠的一手文件寫明主力 800G／1.6T 可插拔產品改用模組內完全不含 DSP 的線性驅動（LPO）並成為出貨主流（LRO 仍保留發送端 DSP，轉向 LRO 只把模組 DSP 減半，不觸發本條）。核查頻率：每半年（光模組廠年報、法說）。觸發後 48 小時：e2 降 confidence、重讀光模組 DSP 層。",
       "id": "mxl_10_k_fy2025_optical_interconnect_cl2",
       "source_ids": [
         "mxl_10_k_fy2025_optical_interconnect_s2"
       ],
-      "statement": "MaxLinear's 10-K states that communications SoCs inside optical modules (DSPs) are required to correct electrical and optical signal impairments at both ends of the fiber. This is a DSP vendor's technical framing; linear-drive optics (LPO/LRO) designs remove the DSP from the module, so the dependency holds for DSP-based pluggables, not for every optical module.",
+      "statement": "MaxLinear's 10-K states that communications SoCs inside optical modules (DSPs) are required to correct electrical and optical signal impairments at both ends of the fiber. This is a DSP vendor's technical framing (the 10-K does not mention LPO or LRO): linear pluggable optics (LPO) remove the DSP from the module entirely, while linear receive optics (LRO) remove only the receive-side DSP and keep a transmit-side DSP (Zhongji Innolight 2026 interim report; Credo Dove 850 release, 2023-11-29), so the dependency holds in full for fully retimed pluggables, for the transmit half of LRO modules, and not for LPO.",
       "subject_id": "e2"
     }
   ],
@@ -90,10 +90,18 @@
     {
       "abstraction_level": "module_subsystem",
       "aliases": [
-        "pluggable transceivers"
+        "pluggable transceivers",
+        "800G transceiver",
+        "1.6T transceiver",
+        "1.6T transceivers",
+        "OSFP",
+        "Pluggable Transceivers",
+        "pluggables",
+        "pluggable optical interconnects",
+        "optical pluggables"
       ],
       "attributes": {},
-      "confidence": 0.8,
+      "confidence": 0.9,
       "id": "tech:pluggable_transceiver",
       "name": "Pluggable optical transceiver",
       "role": null,
@@ -112,9 +120,10 @@
     "permission_basis": "SEC EDGAR 公開申報（美國法定公開文件）；只保留研究必要的有限逐字節錄（HTML 轉文字，空白攤平；分頁殘字如「8 Table of Contents」照抄）。",
     "published_at": "2026-01-29",
     "publisher": "MaxLinear, Inc.（SEC EDGAR 10-K，accession 0001288469-26-000011）",
-    "retrieved_at": "2026-10-08",
+    "retrieved_at": "2026-10-20",
     "source_type": "filing",
     "storage_permission": "repo_excerpt",
+    "supersedes_extraction_sha256": "0e2390bcada93c3c071ccb6f4e774d3170bbe7984c94a085110e90c3d405cc71",
     "title": "MaxLinear, Inc. Form 10-K（fiscal year 2025）Item 1 Business、Item 7 MD&A 與財報附註節錄：光模組 DSP 與資料中心光互連",
     "url": "https://www.sec.gov/Archives/edgar/data/1288469/000128846926000011/mxl-20251231.htm"
   },
