@@ -1,0 +1,10 @@
+Source URL: https://www.ecfr.gov/current/title-22/chapter-I/subchapter-M/part-126/section-126.1
+
+Excerpt:
+[EXCERPT — 有限逐字引文] 22 CFR 126.1(d)(1)（eCFR，2026-10-01 版）
+DATE: 2026-10-01
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 發行人文件是自述（L8 弱主張）；媒體只當線索；第三方海關彙整站是 CBP 艙單的第三方轉載。
+
+【22 CFR 126.1(d)(1)（eCFR，2026-10-01 版）：ITAR 拒絕政策國家表一——含 China（行政命令 14421 的 Covered Foreign Entity 定義引用此節）】
+"(d) Countries subject to certain prohibitions. (1) For exports, reexports, retransfers, and temporary imports of defense articles and defense services, the following countries are subject to a policy of denial: Table 1 to Paragraph ( d )(1) Country Belarus Burma China Cuba Iran North Korea Venezuela"

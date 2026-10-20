@@ -85,3 +85,8 @@
 
 - 走圖 44 筆命中（③3、⑥7、⑦10、⑧6、⑨18）對照本報告：43 筆已在上表有終局（照舊）；**新 1 筆**：第 6 型 `co:gcs_holdings`（[796]–[799] 隨包登記的新名冊檔，10-17 還不在圖上）供貨 `tech:photodiode` 走不到錨——`tech:photodiode` 往上沒有任何邊。終局 needs_edge_ra → pq2 **[818]**（更正走廊在環宇年報那份抽取加 `tech:pluggable_transceiver depends_on tech:photodiode`，引文是已入圖的 s1）。
 - 第 3 型的 `tech:six_inch_inp_production` 另有 [815]（Nokia develops）待核准；`tech:mems_mirror_array` 等 [765] 文件（照舊）。
+
+## 2026-10-20 補記（research-drain 第三輪）
+
+- 走圖 45 筆命中對照本報告：43 筆照舊；**新 2 筆**都在 LRO：第 7 型 `tech:lro`（誰供應，圖上 0 家）→ 入圖包 **[829]**（7 家，全部自報；入圖後這一筆消失）；第 9 型 `tech:lro` ↔ `prod:jabil_sivers_1_6t_lro_module` → distinct_not_merge，**[828]** 以 is_variant_of 寫明模組是 LRO 的一種（比照 `tech:ocs` ↔ `prod:palomar_ocs`，命中會留著——`config/entity_aliases.json` 只登記合併，沒有「刻意不併」的登記處）。
+- 第 3 型 `tech:mems_mirror_array`：[765] 讀完後追 Lumentum 一手 → **[827]**（develops，設計權）；代工換不換得掉仍沒有一手（照舊）。

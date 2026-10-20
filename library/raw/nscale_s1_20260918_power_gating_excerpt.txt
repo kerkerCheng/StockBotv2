@@ -1,0 +1,10 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/2110365/000119312526395475/ck0002110365-20260918.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Nscale Limited S-1（2026-09-18）產業段
+DATE: 2026-09-18
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 發行人文件是自述（L8 弱主張）；媒體只當線索；第三方海關彙整站是 CBP 艙單的第三方轉載。
+
+【Nscale Limited S-1（2026-09-18）產業段：電力取得與成本是 AI 容量擴張的主要閘門；為大規模 AI 部署的電網擴建或現代化拉長了專案時程、推高成本（公司自述的產業描述）】
+"Access to power and its delivery cost have emerged as the primary gating factor for AI capacity expansion. As AI workloads scale, a differentiated power strategy focused on long-term availability, cost predictability, and delivery certainty has become increasingly essential to the intelligence ecosystem. Compute and data center providers are turning to securing alternative, longer-term, lower-cost, and lower-carbon power solutions, both utility-served and behind-the-meter. Grid build-outs or modernization to support large-scale AI deployments has extended project lead times and raised costs. This power-led sourcing approach is shifting data center development from Tier-1 markets, where major new deployments are increasingly power-constrained, toward Tier-2 and Tier-3 markets with more available, lower-cost power, and the ability to support multi-gigawatt deployments over time."

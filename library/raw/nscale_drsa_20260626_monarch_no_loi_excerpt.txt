@@ -1,0 +1,10 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/2110365/000119312526285636/filename1.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Nscale DRS/A（保密草稿，EDGAR 提交日 2026-06-26；公開可知日不明）
+DATE: 原文無日期
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 發行人文件是自述（L8 弱主張）；媒體只當線索；第三方海關彙整站是 CBP 艙單的第三方轉載。
+
+【Nscale DRS/A（保密草稿，EDGAR 提交日 2026-06-26；公開可知日不明）：Monarch 收購段——5 月版的 Microsoft 意向書那一句已不在（同段直接從「planned for 2031.」接「We will also integrate AIPCorp’s leadership」）】
+"On March 31, 2026, we acquired AIPCorp to accelerate our U.S. expansion and further advance our strategy to build a full‑stack AI hyperscaler integrated from energy to compute. The acquisition secures the Monarch Compute Campus in Mason County, West Virginia, an approximately 2,250‑acre site that we believe will be one of the first state‑certified AI micro-grids purpose‑built for AI workloads in the United States, with a power runway scalable to over 8 GWs of gross power capacity; with an initial 2 GWs of gross power capacity (1.35 GWs of I T load power capacity) expected to be online by the first half of 2028, with expansion to approximately 10 Table of Contents 8 GWs of gross capacity planned for 2031. We will also integrate AIPCorp’s leadership and broader organization into Nscale, adding a team with nearly a decade of AI‑infrastructure development experience and continuity that we believe will enhance our ability to execute the Monarch Compute Campus buildout and support our broader development and expansion efforts."

@@ -1,0 +1,10 @@
+Source URL: https://www.prnewswire.com/news-releases/nscale-and-microsoft-announce-collaboration-with-nvidia-and-caterpillar-to-deliver-1-35gw-of-nvidia-vera-rubin-nvl72-gpus-at-flagship-ai-factory-campus-in-west-virginia-302715210.html
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Nscale 新聞稿 2026-03-16（PR Newswire）
+DATE: 2026-03-16
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 發行人文件是自述（L8 弱主張）；媒體只當線索；第三方海關彙整站是 CBP 艙單的第三方轉載。
+
+【Nscale 新聞稿 2026-03-16（PR Newswire）：與 Microsoft 簽意向書 1.35 GW（Monarch，Vera Rubin NVL72），2027 年底起分批；架構是多年期算力服務＋長期資料中心租約（意向書，非確定合約；原稿沒有 GPU 顆數）】
+"Nscale has signed a letter of intent with Microsoft to provide 1.35 gigawatts of AI compute capacity, setting up the West Virginia Monarch AI campus as a global flagship deployment of NVIDIA's next-generation Vera Rubin GPUs as Vera Rubin NVL72 systems engineered with the NVIDIA Vera Rubin DSX AI Factory reference design. Nscale today also announced the acquisition of American Intelligence & Power Corporation ("AIPCorp"), sponsored by Fidelis New Energy and 8090 Industries, which includes the Monarch Compute Campus, a site with up to 2,250 acres in Mason County, West Virginia, and the United States' first state-certified AI microgrid with a power runway scalable to over eight gigawatts. Under the collaboration with Microsoft, Nscale will construct and operate advanced AI data center infrastructure to host this large-scale GPU deployment based on the latest generation NVIDIA Vera Rubin NVL72 GPUs and future technologies. The deployment will be delivered across multiple tranches beginning in late 2027, creating one of the largest dedicated AI compute installations in the world. The planned infrastructure will operate under a long-term framework that includes an initial multi-year compute services term alongside a long-term data centre lease structure, reflecting the scale and strategic importance of the facility."

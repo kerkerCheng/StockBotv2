@@ -1,0 +1,10 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/2110365/000119312526395475/ck0002110365-20260918.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Nscale Limited S-1（2026-09-18）Business—Customers
+DATE: 2026-09-18
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 發行人文件是自述（L8 弱主張）；媒體只當線索；第三方海關彙整站是 CBP 艙單的第三方轉載。
+
+【Nscale Limited S-1（2026-09-18）Business—Customers：與 Microsoft 的 statements of work 合計 up to 約 438 億美元至 2033-12；GPU 服務期每批驗收起 5–6 年；雙方可因違約（60 天通知）或破產事由終止（供應商揭露，具名客戶）】
+"Between September 2025 and April 2026, we entered into statements of work with Microsoft that provide for payments to us of up to approximately $43.8 billion through December 2033, not including the optional extensions, and which are subject to the satisfaction of delivery and availability of service requirements. Pursuant to these statements of work, we will provide Microsoft with GPU infrastructure, colocation space, and cloud services. The statements of work contain customary provisions regarding service terms and do not have any renewal provision, other than the optional six-month extension at Microsoft's election. Each statement of work ends on the last remaining end date of the GPU services provided thereunder, with GPU services terms from five to six years from acceptance of each tranche and an optional six-month extension at Microsoft’s election. Either party may terminate the statement of work for cause (i) upon 60 days’ notice to the other party of a breach or (ii) if the other party suspends or ceases carrying on its business or a substantial part thereof, or becomes subject to an insolvency event such as entering into a composition or arrangement with creditors, an inability to pay debts as they become due, or the appointment of a liquidator, receiver, administrator, or similar officer."

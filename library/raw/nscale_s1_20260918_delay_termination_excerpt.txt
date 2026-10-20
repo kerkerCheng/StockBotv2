@@ -1,0 +1,10 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/2110365/000119312526395475/ck0002110365-20260918.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Nscale Limited S-1（2026-09-18）Risk Factors
+DATE: 2026-09-18
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 發行人文件是自述（L8 弱主張）；媒體只當線索；第三方海關彙整站是 CBP 艙單的第三方轉載。
+
+【Nscale Limited S-1（2026-09-18）Risk Factors：Anthropic 在 Monarch 的四批服務，任一批延誤 Anthropic 可無責終止該批；其他客戶合約也有延誤終止權（公司自述）】
+"Furthermore, pursuant to the Anthropic Services Agreements, we are obligated to provide dedicated GPU infrastructure services to Anthropic at our Monarch Compute Campus. The Anthropic Services Agreements provide only limited relief in the event of supply chain delays, and if we fail to meet agreed delivery timelines for any tranche, Anthropic may be entitled to terminate that tranche without liability. Similarly, certain of our other customer contracts provide the applicable customer with a right to terminate for delays, with varying notice periods, depending on the terms of the applicable contract."

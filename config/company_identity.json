@@ -2091,6 +2091,49 @@
         "Furukawa Electric Co."
       ],
       "research_ticker": "5801.T"
+    },
+    {
+      "company_id": "co:nscale",
+      "research_ticker": null,
+      "display_name": "Nscale Limited",
+      "_display_name_source": "SEC S-1 2026-09-18 封面「Nscale Limited*」（Exact Name of Registrant as Specified in its Charter）；註腳：上市前將重新登記為公眾公司並改名 Nscale plc",
+      "_note": "股權未上市（S-1 寫擬申請 NYSE 代號「NSCL」，尚未定價；研究 ticker 明確 null，INV-1、L9，比照 co:oncor_electric_delivery）。EDGAR CIK 0002110365（EDGAR 舊名 DSNS HOLDINGS Ltd）。英國 AI 雲業者，在圖上是 LPT 買方（需求側），不是候選。非邊緣：媒體轉述 IPO 目標估值最高 350 億美元、投資人建議 160–190 億美元（DCD 轉述 Business Times）；alpha edge 需要代號，掛牌前跑不了。掛牌後補 research_ticker＝NSCL 與交易所。 入圖包見 lpt_buyer_nscale_s1_2026_10_20_action.json",
+      "name_aliases": [
+        "Nscale"
+      ]
+    },
+    {
+      "company_id": "co:iteq",
+      "research_ticker": "6213.TW",
+      "market_currency": "TWD",
+      "execution_currency": "TWD",
+      "execution_venue": "TWSE",
+      "display_name": "聯茂電子股份有限公司",
+      "_display_name_source": "官網頁首「聯茂電子股份有限公司 ITEQ CORPORATION」；2026 第二季法說簡報封面「ITEQ Corporation」；股票代號 6213（上市）",
+      "_note": "隨石英布層附加包 staged（2026-10-20，drop 即回退）：高速 CCL（M9 Extreme Low Loss：IT-999GSE2 用 Low Dk2 布、IT-999GSE3 用 Q 布）；系統口徑邊緣（`python -m alpha edge 6213.TW`：約 85.9 億美元、分析師 10 家，2026-10-20）。入圖包見 quartz_glass_cloth_suppliers_addon_2026_10_20_action.json",
+      "name_aliases": [
+        "聯茂",
+        "聯茂電子",
+        "ITEQ",
+        "ITEQ Corporation"
+      ]
+    },
+    {
+      "company_id": "co:feilihua_quartz_glass",
+      "research_ticker": "300395.SZ",
+      "market_currency": "CNY",
+      "execution_currency": "CNY",
+      "execution_venue": "SZSE",
+      "display_name": "湖北菲利华石英玻璃股份有限公司",
+      "_display_name_source": "2026 年半年度报告「公司的中文名称 湖北菲利华石英玻璃股份有限公司」「公司的外文名称（如有） HubeiFeilihuaQuartzGlassCo.,Ltd」（抽字掉了空白）；股票简称 菲利华、代码 300395（深交所）",
+      "_note": "隨石英布層附加包 staged（2026-10-20，drop 即回退）：石英玻璃材料；石英电子布（高频高速 CCL 補強材料）自述 2026 上半年營收 1.53 億元、超薄布仍在終端認證——營收大頭在半導體與航太石英材料，寫敘事時再量占比；系統口徑邊緣（`python -m alpha edge 300395.SZ`：約 59.4 億美元、分析師 2 家，2026-10-20）。入圖包見 quartz_glass_cloth_suppliers_addon_2026_10_20_action.json",
+      "name_aliases": [
+        "菲利华",
+        "菲利華",
+        "Feilihua",
+        "Hubei Feilihua",
+        "Hubei Feilihua Quartz Glass Co., Ltd"
+      ]
     }
   ]
 }
