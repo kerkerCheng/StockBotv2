@@ -1,0 +1,31 @@
+Source URL: https://s21.q4cdn.com/377324469/files/doc_presentations/2026/2026-Lumentum-at-OFC_final.pdf
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Lumentum Investor Briefing OFC 2026（2026-03-17）節錄：MEMS 光交換時間軸（2000 年組 MEMS 團隊、2024 年 OCS 用大型 2D 陣列）、Lumentum’s MEMS-Based 300x300 OCS
+
+Source: https://s21.q4cdn.com/377324469/files/doc_presentations/2026/2026-Lumentum-at-OFC_final.pdf
+NOTE: pypdf 逐頁抽字、空白正規化後逐字（p.26 為時間軸圖，年份與項目照抽字順序）。發行人 IR 簡報＝自述；沒寫鏡片晶圓在哪裡做、沒點名 OCS 客戶。
+
+【p.1 封面】
+Lumentum Investor Briefing OFC 2026 Los Angeles March 17, 2026
+
+【p.5〈Deep Roots, Wide Moat〉】
+Optical Switching Leadership Decades of WSS MEMS expertise applied to OCS optical engine
+
+【p.26 標題】
+Decades of Innovations in MEMS-Based Optical Switching
+
+【p.26 時間軸】
+2000 MEMS team formed
+
+【p.26 時間軸】
+2004 2D MEMS array
+
+【p.26 時間軸】
+2024 Large 2D array for OCS
+
+【p.27〈Unlocking Data Center Scale: The Case for MEMS-Based OCS〉】
+Unlocking Data Center Scale: The Case for MEMS-Based OCS Lumentum’s MEMS-Based 300x300 OCS
+
+【p.29〈OCS Production Ramp〉】
+25+ years of MEMS engine expertise now deployed in the data center

@@ -1,0 +1,97 @@
+{
+  "claims": [
+    {
+      "confidence": 0.55,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：Lumentum、它的供應商或客戶的一手文件寫出 Lumentum OCS 用的鏡陣列設計來自第三方（授權或整顆外購鏡陣列），或 Lumentum 停止 OCS 產品線。核查頻率：每季（Lumentum 10-Q／10-K 與法說；下一次 FY1Q27 財報 2026-11-05）。觸發後 48 小時：這條 develops 邊降 confidence 或提撤回，重讀 tech:mems_mirror_array 讀圖的設計方那一格與 Silex 敘事。",
+      "id": "lumentum_blog_mems_mirrors_2026_05_28_cl1",
+      "source_ids": [
+        "lumentum_blog_mems_mirrors_2026_05_28_s1",
+        "lumentum_blog_mems_mirrors_2026_05_28_s2"
+      ],
+      "statement": "Lumentum blog 'MEMS Mirrors and the Evolution of Optical Switching in AI Data Centers' (Sheldon McLaughlin, 2026-05-28): Lumentum began developing MEMS-based optical switches in the late 1990s; 'Lumentum has applied this extensive experience in high-reliability MEMS mirror design and scalable optical subassembly manufacturing to MEMS-based Optical Circuit Switches for AI data centers'. Issuer self-report — a develops (design) edge, not supply; where the mirror wafers are fabricated is not stated.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "tech:mems_mirror_array",
+      "id": "e1",
+      "relation": "develops",
+      "source_ids": [
+        "lumentum_blog_mems_mirrors_2026_05_28_s1",
+        "lumentum_blog_mems_mirrors_2026_05_28_s2"
+      ],
+      "src_id": "co:lumentum"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "LITE",
+        "Lumentum Holdings",
+        "Lumentum Holdings Inc."
+      ],
+      "attributes": {
+        "concentration_score": null,
+        "ramp_difficulty_intrinsic": 5,
+        "ticker": "LITE"
+      },
+      "confidence": 0.9,
+      "id": "co:lumentum",
+      "name": "Lumentum",
+      "role": "bottleneck_supplier",
+      "source_ids": [
+        "lumentum_blog_mems_mirrors_2026_05_28_s1",
+        "lumentum_blog_mems_mirrors_2026_05_28_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "MEMS OCS core",
+        "MEMS mirror array"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:mems_mirror_array",
+      "name": "3D MEMS mirror array (OCS optical core)",
+      "role": null,
+      "source_ids": [
+        "lumentum_blog_mems_mirrors_2026_05_28_s1",
+        "lumentum_blog_mems_mirrors_2026_05_28_s2"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "lumentum_blog_mems_mirrors_2026_05_28",
+    "evidence_tier": 2,
+    "origin_entity": "Lumentum Holdings Inc.",
+    "permission_basis": "Lumentum 官網公開部落格（lumentum.com Blog）；只保留研究必要的有限逐字節錄（原頁 HTML 本機抽字、空白正規化）。published_at 取頁面日期「May 28, 2026」（頁面 metadata 2026-05-28）。公司部落格＝自述，比照 NVIDIA 部落格 news／tier 2 前例。",
+    "published_at": "2026-05-28",
+    "publisher": "Lumentum（lumentum.com Blog）",
+    "retrieved_at": "2026-10-18",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "Lumentum 部落格〈MEMS Mirrors and the Evolution of Optical Switching in AI Data Centers〉（Sheldon McLaughlin，2026-05-28）：「high-reliability MEMS mirror design」用到 AI 資料中心 OCS",
+    "url": "https://www.lumentum.com/en/blog/mems-mirrors-and-evolution-optical-switching-ai-data-centers"
+  },
+  "sources": [
+    {
+      "id": "lumentum_blog_mems_mirrors_2026_05_28_s1",
+      "locator": "部落格正文〈Proven in Optical Networks〉第一段",
+      "quote": "Lumentum began developing MEMS-based optical switches in the late 1990s, and Lumentum MEMS-based 1xN Wavelength Selective Switches (WSS) have been widely deployed in telecom ROADM networks since the mid-2000s."
+    },
+    {
+      "id": "lumentum_blog_mems_mirrors_2026_05_28_s2",
+      "locator": "部落格正文〈Proven in Optical Networks〉第二段",
+      "quote": "After more than two decades of WSS market leadership, Lumentum has applied this extensive experience in high-reliability MEMS mirror design and scalable optical subassembly manufacturing to MEMS-based Optical Circuit Switches for AI data centers."
+    }
+  ]
+}

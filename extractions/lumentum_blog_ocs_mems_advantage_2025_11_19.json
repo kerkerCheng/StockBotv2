@@ -1,0 +1,115 @@
+{
+  "claims": [
+    {
+      "confidence": 0.55,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：Lumentum、它的供應商或客戶的一手文件寫出 Lumentum OCS 用的鏡陣列設計來自第三方（授權或整顆外購鏡陣列），或 Lumentum 停止 OCS 產品線。核查頻率：每季（Lumentum 10-Q／10-K 與法說；下一次 FY1Q27 財報 2026-11-05）。觸發後 48 小時：這條 develops 邊降 confidence 或提撤回，重讀 tech:mems_mirror_array 讀圖的設計方那一格與 Silex 敘事。",
+      "id": "lumentum_blog_ocs_mems_advantage_2025_11_19_cl1",
+      "source_ids": [
+        "lumentum_blog_ocs_mems_advantage_2025_11_19_s1",
+        "lumentum_blog_ocs_mems_advantage_2025_11_19_s2",
+        "lumentum_blog_ocs_mems_advantage_2025_11_19_s3",
+        "lumentum_blog_ocs_mems_advantage_2025_11_19_s4"
+      ],
+      "statement": "Lumentum blog 'Optical Circuit Switches in AI Hyperscale Data Centers – The MEMS Advantage' (Sheldon McLaughlin, Distinguished Technical Staff, 2025-11-19): a MEMS OCS features an array of tiny movable mirrors on a silicon substrate; 'our 3D-MEMS architecture incorporates mirrors that tilt continuously along two axes'; 'Our single-crystal silicon MEMS design' is embodied in the R300 (up to 300x300 ports); the R300 control software 'augments our proprietary MEMS design'. Issuer self-report of design ownership — a develops edge, not supply; no fab, foundry or customer is named.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "tech:mems_mirror_array",
+      "id": "e1",
+      "relation": "develops",
+      "source_ids": [
+        "lumentum_blog_ocs_mems_advantage_2025_11_19_s1",
+        "lumentum_blog_ocs_mems_advantage_2025_11_19_s2",
+        "lumentum_blog_ocs_mems_advantage_2025_11_19_s3",
+        "lumentum_blog_ocs_mems_advantage_2025_11_19_s4"
+      ],
+      "src_id": "co:lumentum"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "LITE",
+        "Lumentum Holdings",
+        "Lumentum Holdings Inc."
+      ],
+      "attributes": {
+        "concentration_score": null,
+        "ramp_difficulty_intrinsic": 5,
+        "ticker": "LITE"
+      },
+      "confidence": 0.9,
+      "id": "co:lumentum",
+      "name": "Lumentum",
+      "role": "bottleneck_supplier",
+      "source_ids": [
+        "lumentum_blog_ocs_mems_advantage_2025_11_19_s1",
+        "lumentum_blog_ocs_mems_advantage_2025_11_19_s2",
+        "lumentum_blog_ocs_mems_advantage_2025_11_19_s3",
+        "lumentum_blog_ocs_mems_advantage_2025_11_19_s4"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "MEMS OCS core",
+        "MEMS mirror array"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:mems_mirror_array",
+      "name": "3D MEMS mirror array (OCS optical core)",
+      "role": null,
+      "source_ids": [
+        "lumentum_blog_ocs_mems_advantage_2025_11_19_s1",
+        "lumentum_blog_ocs_mems_advantage_2025_11_19_s2",
+        "lumentum_blog_ocs_mems_advantage_2025_11_19_s3",
+        "lumentum_blog_ocs_mems_advantage_2025_11_19_s4"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "lumentum_blog_ocs_mems_advantage_2025_11_19",
+    "evidence_tier": 2,
+    "origin_entity": "Lumentum Holdings Inc.",
+    "permission_basis": "Lumentum 官網公開部落格（lumentum.com Blog）；只保留研究必要的有限逐字節錄（原頁 HTML 本機抽字、空白正規化）。published_at 取頁面日期「November 19, 2025」。公司部落格＝自述，比照 NVIDIA 部落格 news／tier 2 前例。",
+    "published_at": "2025-11-19",
+    "publisher": "Lumentum（lumentum.com Blog）",
+    "retrieved_at": "2026-10-19",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "Lumentum 部落格〈Optical Circuit Switches in AI Hyperscale Data Centers – The MEMS Advantage〉（Sheldon McLaughlin, Distinguished Technical Staff，2025-11-19）：R300 的 3D-MEMS 鏡陣列、「our proprietary MEMS design」",
+    "url": "https://www.lumentum.com/en/blog/optical-circuit-switches-in-ai-hyperscale-data-centers"
+  },
+  "sources": [
+    {
+      "id": "lumentum_blog_ocs_mems_advantage_2025_11_19_s1",
+      "locator": "部落格正文（MEMS OCS 構造段）",
+      "quote": "A MEMS OCS features an array of tiny movable mirrors embedded on a silicon substrate to direct optical signals between input and output fibers."
+    },
+    {
+      "id": "lumentum_blog_ocs_mems_advantage_2025_11_19_s2",
+      "locator": "部落格正文（3D-MEMS 架構段）",
+      "quote": "Furthermore, our 3D-MEMS architecture incorporates mirrors that tilt continuously along two axes, allowing precise alignment of any input beam to any output fiber across a large free-space switching fabric."
+    },
+    {
+      "id": "lumentum_blog_ocs_mems_advantage_2025_11_19_s3",
+      "locator": "部落格正文（R300 段）",
+      "quote": "Our single-crystal silicon MEMS design also eliminates “hinge fatigue” and enables hundreds of millions of operational cycles with no failures. This capability is embodied in the R300, which currently supports up to 300x300 ports with a typical insertion loss of 1.5 dB or less."
+    },
+    {
+      "id": "lumentum_blog_ocs_mems_advantage_2025_11_19_s4",
+      "locator": "部落格正文（控制軟體段）",
+      "quote": "The control software for the R300 is based on the popular, open-source SONiC OS and augments our proprietary MEMS design, which does not need a “closed loop” control mechanism."
+    }
+  ]
+}

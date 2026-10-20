@@ -1,0 +1,151 @@
+{
+  "claims": [
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：Lumentum、它的供應商或客戶的一手文件寫出 Lumentum OCS 用的鏡陣列設計來自第三方（授權或整顆外購鏡陣列），或 Lumentum 停止 OCS 產品線。核查頻率：每季（Lumentum 10-Q／10-K 與法說；下一次 FY1Q27 財報 2026-11-05）。觸發後 48 小時：這條 develops 邊降 confidence 或提撤回，重讀 tech:mems_mirror_array 讀圖的設計方那一格與 Silex 敘事。",
+      "id": "lumentum_ofc2026_investor_briefing_2026_03_17_cl1",
+      "source_ids": [
+        "lumentum_ofc2026_investor_briefing_2026_03_17_s1",
+        "lumentum_ofc2026_investor_briefing_2026_03_17_s2",
+        "lumentum_ofc2026_investor_briefing_2026_03_17_s3",
+        "lumentum_ofc2026_investor_briefing_2026_03_17_s4",
+        "lumentum_ofc2026_investor_briefing_2026_03_17_s5",
+        "lumentum_ofc2026_investor_briefing_2026_03_17_s6",
+        "lumentum_ofc2026_investor_briefing_2026_03_17_s7",
+        "lumentum_ofc2026_investor_briefing_2026_03_17_s8"
+      ],
+      "statement": "Lumentum OFC 2026 investor briefing (2026-03-17): the p.26 timeline 'Decades of Innovations in MEMS-Based Optical Switching' lists '2000 MEMS team formed', '2004 2D MEMS array' and '2024 Large 2D array for OCS'; p.27 presents 'Lumentum’s MEMS-Based 300x300 OCS'; p.5 'Decades of WSS MEMS expertise applied to OCS optical engine'; p.29 '25+ years of MEMS engine expertise now deployed in the data center'. Issuer self-report: Lumentum develops the MEMS mirror array that forms the optical core of its own OCS — a develops (design) edge, not supply. The deck does not say where the mirror wafers are fabricated and names no OCS customer.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:mems_mirror_array",
+      "id": "e1",
+      "relation": "develops",
+      "source_ids": [
+        "lumentum_ofc2026_investor_briefing_2026_03_17_s1",
+        "lumentum_ofc2026_investor_briefing_2026_03_17_s2",
+        "lumentum_ofc2026_investor_briefing_2026_03_17_s3",
+        "lumentum_ofc2026_investor_briefing_2026_03_17_s4",
+        "lumentum_ofc2026_investor_briefing_2026_03_17_s5",
+        "lumentum_ofc2026_investor_briefing_2026_03_17_s6",
+        "lumentum_ofc2026_investor_briefing_2026_03_17_s7",
+        "lumentum_ofc2026_investor_briefing_2026_03_17_s8"
+      ],
+      "src_id": "co:lumentum"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "LITE",
+        "Lumentum Holdings",
+        "Lumentum Holdings Inc."
+      ],
+      "attributes": {
+        "concentration_score": null,
+        "ramp_difficulty_intrinsic": 5,
+        "ticker": "LITE"
+      },
+      "confidence": 0.9,
+      "id": "co:lumentum",
+      "name": "Lumentum",
+      "role": "bottleneck_supplier",
+      "source_ids": [
+        "lumentum_ofc2026_investor_briefing_2026_03_17_s1",
+        "lumentum_ofc2026_investor_briefing_2026_03_17_s2",
+        "lumentum_ofc2026_investor_briefing_2026_03_17_s3",
+        "lumentum_ofc2026_investor_briefing_2026_03_17_s4",
+        "lumentum_ofc2026_investor_briefing_2026_03_17_s5",
+        "lumentum_ofc2026_investor_briefing_2026_03_17_s6",
+        "lumentum_ofc2026_investor_briefing_2026_03_17_s7",
+        "lumentum_ofc2026_investor_briefing_2026_03_17_s8"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "MEMS OCS core",
+        "MEMS mirror array"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:mems_mirror_array",
+      "name": "3D MEMS mirror array (OCS optical core)",
+      "role": null,
+      "source_ids": [
+        "lumentum_ofc2026_investor_briefing_2026_03_17_s1",
+        "lumentum_ofc2026_investor_briefing_2026_03_17_s2",
+        "lumentum_ofc2026_investor_briefing_2026_03_17_s3",
+        "lumentum_ofc2026_investor_briefing_2026_03_17_s4",
+        "lumentum_ofc2026_investor_briefing_2026_03_17_s5",
+        "lumentum_ofc2026_investor_briefing_2026_03_17_s6",
+        "lumentum_ofc2026_investor_briefing_2026_03_17_s7",
+        "lumentum_ofc2026_investor_briefing_2026_03_17_s8"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "lumentum_ofc2026_investor_briefing_2026_03_17",
+    "evidence_tier": 1,
+    "origin_entity": "Lumentum Holdings Inc.",
+    "permission_basis": "Lumentum 投資人關係網站公開的 OFC 2026 投資人簡報（q4cdn 託管 PDF）；只保留研究必要的有限逐字節錄（pypdf 逐頁抽字、空白正規化），全文不入本份。published_at 取封面日期 2026-03-17。",
+    "published_at": "2026-03-17",
+    "publisher": "Lumentum Investor Relations（investor.lumentum.com；q4cdn 託管 PDF）",
+    "retrieved_at": "2026-09-08",
+    "source_type": "ir_deck",
+    "storage_permission": "repo_excerpt",
+    "title": "Lumentum Investor Briefing OFC 2026（2026-03-17）節錄：MEMS 光交換時間軸（2000 年組 MEMS 團隊、2024 年 OCS 用大型 2D 陣列）、Lumentum’s MEMS-Based 300x300 OCS",
+    "url": "https://s21.q4cdn.com/377324469/files/doc_presentations/2026/2026-Lumentum-at-OFC_final.pdf"
+  },
+  "sources": [
+    {
+      "id": "lumentum_ofc2026_investor_briefing_2026_03_17_s1",
+      "locator": "p.1 封面",
+      "quote": "Lumentum Investor Briefing OFC 2026 Los Angeles March 17, 2026"
+    },
+    {
+      "id": "lumentum_ofc2026_investor_briefing_2026_03_17_s2",
+      "locator": "p.5〈Deep Roots, Wide Moat〉",
+      "quote": "Optical Switching Leadership Decades of WSS MEMS expertise applied to OCS optical engine"
+    },
+    {
+      "id": "lumentum_ofc2026_investor_briefing_2026_03_17_s3",
+      "locator": "p.26 標題",
+      "quote": "Decades of Innovations in MEMS-Based Optical Switching"
+    },
+    {
+      "id": "lumentum_ofc2026_investor_briefing_2026_03_17_s4",
+      "locator": "p.26 時間軸",
+      "quote": "2000 MEMS team formed"
+    },
+    {
+      "id": "lumentum_ofc2026_investor_briefing_2026_03_17_s5",
+      "locator": "p.26 時間軸",
+      "quote": "2004 2D MEMS array"
+    },
+    {
+      "id": "lumentum_ofc2026_investor_briefing_2026_03_17_s6",
+      "locator": "p.26 時間軸",
+      "quote": "2024 Large 2D array for OCS"
+    },
+    {
+      "id": "lumentum_ofc2026_investor_briefing_2026_03_17_s7",
+      "locator": "p.27〈Unlocking Data Center Scale: The Case for MEMS-Based OCS〉",
+      "quote": "Unlocking Data Center Scale: The Case for MEMS-Based OCS Lumentum’s MEMS-Based 300x300 OCS"
+    },
+    {
+      "id": "lumentum_ofc2026_investor_briefing_2026_03_17_s8",
+      "locator": "p.29〈OCS Production Ramp〉",
+      "quote": "25+ years of MEMS engine expertise now deployed in the data center"
+    }
+  ]
+}
