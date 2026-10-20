@@ -55,7 +55,7 @@
 
 ## 6. 什麼會推翻這個 Thesis（Disproof Conditions）
 
-1. **ELS 時間表**：2026 年底前未確認 ELS production readiness，且 2027-H1 前 photonics 無任何付費量產訂單（非 NRE）→ 放量時間表全面後移，48h 內決策降評或退場。
+1. **ELS 時間表**：2026 年底前未確認 ELS production readiness，且 2027-H1 前資料中心光子（外部光源、可插拔 CW 雷射）無任何付費量產訂單（非 NRE；光達、感測等非資料中心訂單不算）→ 放量時間表全面後移，48h 內決策降評或退場。（2026-10-20 使用者核准 [833] 改條文：原文「photonics 無任何付費量產訂單」被 Sivers 10-20 公告的光達量產訂單照字面滿足，這條反證已不會再觸發；本論點押的是 AI 資料中心雷射，限定資料中心才盯得到。）
 2. **Jabil 通道**：1.6T 合作於 2027 未進入 qualification 完成／ramp，或合作終止 → 平台通路論點降評。
 3. **Ayar 節點**：Ayar Labs 公開替換雷射供應商或 Sivers 披露失去該計畫 → 最具可信度的 designed-in 證據消失。
 4. **資金螺旋**：毛利率至 2027 年中仍深度為負且需再次大額增發 → 稀釋侵蝕 per-share thesis，降評。
