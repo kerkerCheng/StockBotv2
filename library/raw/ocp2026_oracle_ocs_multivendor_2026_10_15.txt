@@ -1,0 +1,10 @@
+Source URL: https://www.youtube.com/watch?v=XjJ8sXzr-Oc
+
+Excerpt:
+[EXCERPT — 有限逐字引文] OCP Global Summit 2026 同場次 Oracle 的 Kannan Raj
+DATE: 2026-10-15
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 發行人文件是自述（L8 弱主張）；媒體只當線索；第三方海關彙整站是 CBP 艙單的第三方轉載。
+
+【OCP Global Summit 2026 同場次 Oracle 的 Kannan Raj：要多供應商 OCS 實作、「our uh march towards OCS deployment」——買方要多來源、自稱仍在走向部署；全場沒有一句說 Oracle 買 Lumentum 的 OCS（YouTube 自動字幕）】
+"So we want multi- vendor uh OCS implementations that take advantage of GNMI uh uh GNOI GNSI uh and standardize across the board for all of this. Now uh one of the key challenges that we have encountered uh in our uh march towards OCS deployment"

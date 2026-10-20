@@ -1,0 +1,13 @@
+Source URL: https://media.cadc.uscourts.gov/opinions/docs/2026/08/25-5256-2188737.pdf
+
+Excerpt:
+[EXCERPT — 有限逐字引文] 美國哥倫比亞特區巡迴上訴法院 Hesai Technology Co., Ltd v. DoD, No. 25-5256（2026-08-18 判決，法院官網 PDF）開頭段
+DATE: 2026-08-18
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 發行人文件是自述（L8 弱主張）；媒體只當線索；第三方海關彙整站是 CBP 艙單的第三方轉載。
+
+【美國哥倫比亞特區巡迴上訴法院 Hesai Technology Co., Ltd v. DoD, No. 25-5256（2026-08-18 判決，法院官網 PDF）開頭段：以正當程序理由撤銷地院判決、發回】
+"GARCIA, Circuit Judge : Federal law requires the Secretary of Defense to annually publish a list identifying all “Chinese military companies” operating in the United States. In 2024, the Secretary included Hesai Technology Co., Ltd., and its subsidiary, Hesai, Inc. (collectively, Hesai) on that list. Hesai sued, claiming the Secretary violated the Fifth Amendment’s Due Process Clause and the Administrative Procedure Act. The district court granted summary judgment to the Secretary. We reverse based on Hesai’s due process claim. Because the Secretary’s designation carries reputational and legal consequences, it implicates a protected interest. The Constitution therefore required the Secretary to provide Hesai notice of the unclassified materials on which he intended to rely and a meaningful opportunity to respond before finalizing the designation. The Secretary provided neither, and that error was not harmless. We therefore reverse and remand so that the Secretary may afford Hesai the process it is due."
+
+【同判決 III.C 救濟段與主文：不撤銷 2024 年的認定（禾賽已在國防部 2026 年清單上再次被列）、發回國防部補正當程序】
+"The remaining question is remedy. In NCRI and PMOI, despite finding due process violations, we declined to vacate the designations at issue while the government cured those violations, citing “the realities of the foreign policy and national security concerns asserted by the Secretary in support of those designations.” NCRI, 251 F.3d at 209; see PMOI, 613 F.3d at 230–31. Th e fact that Hesai has been redesignated in the Secretary’s 2026 list arguably undercuts the national security interests at stake here, but that fact also undercuts the significance of vacating the Secretary’s designation. We accordingly see no reason to deviate from the course indicated by NCRI and PMOI, and we remand without vacating the 2024 designation before us. IV The district court’s judgment is reversed, and the case is remanded to the district court with instructions to remand the matter to the Secretary for further proceedings consistent with this opinion. So ordered."

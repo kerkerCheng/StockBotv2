@@ -1,0 +1,10 @@
+Source URL: https://docs.fcc.gov/public/attachments/FCC-26-50A1.pdf
+
+Excerpt:
+[EXCERPT — 有限逐字引文] FCC 26-50 Third FNPRM ¶145（2026-07-23 發布；FR 2026-08-07 提案、意見期 9-08／回覆 9-21）
+DATE: 2026-07-23
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 發行人文件是自述（L8 弱主張）；媒體只當線索；第三方海關彙整站是 CBP 艙單的第三方轉載。
+
+【FCC 26-50 Third FNPRM ¶145（2026-07-23 發布；FR 2026-08-07 提案、意見期 9-08／回覆 9-21）：HBOM／SBOM 揭露是否限於關鍵元件，例舉 optical transceivers——仍是徵詢意見，不是規則】
+"145. We also seek comment on whether we should limit the HBOM/SBOM requirement to certain components? Should we, for example, limit this to specific components, such as logic bearing hardware component? Should we instead just list out several critical components, such as modular transmitters and IoT modules, semiconductors, and optical transceivers? For example, under this proposal applicants would have to provide information on the producer and place of production of any semiconductor in their device, but not mere nails and screws. Would this more targeted approach better serve national security objectives without imposing undue costs? We seek comment on this option."

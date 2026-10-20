@@ -1,0 +1,10 @@
+Source URL: https://investor.tsmc.com/english/encrypt/files/encrypt_file/reports/2026-10/eba4fac72873bf546b669bd2b5d973df5c93215d/TSMC%203Q26%20Transcript.pdf
+
+Excerpt:
+[EXCERPT — 有限逐字引文] 台積電 2026 Q3 法說逐字稿（investor.tsmc.com 代管、LSEG StreetEvents edited transcript，2026-10-15）C.C. Wei 回答 Stifel 對 GF 矽中介層的提問
+DATE: 2026-10-15
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: OCP 官方影片的 YouTube 自動字幕——不是逐字稿，可能有聽寫錯字；講者沒在字幕標名的，報告裡寫「推一步」。
+
+【台積電 2026 Q3 法說逐字稿（investor.tsmc.com 代管、LSEG StreetEvents edited transcript，2026-10-15）C.C. Wei 回答 Stifel 對 GF 矽中介層的提問：理由是後段供給「a little bit shortage on the back end」】
+"Well, let me answer the question. We designed a deal with GlobalFoundries. And this is part of our overall strategy in the back-end supply. Actually, our number one priority is to help our customers to be successful in their market. We want them to be fully supported by all the supply, including the front end and back end. Definitely, we have a little bit shortage on the back end, and we'd like to work with our so-called partner with GlobalFoundries so that both TSMC and GlobalFoundries can support TSMC's customers for their product to be introduced with enough support and the capacity."

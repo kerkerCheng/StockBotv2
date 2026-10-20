@@ -1,0 +1,10 @@
+Source URL: https://www.businesswire.com/news/home/20260316857906/en/
+
+Excerpt:
+[EXCERPT — 有限逐字引文] HyperLight 新聞稿（Business Wire 2026-03-16，AETOSWire 轉載逐字）
+DATE: 2026-03-16
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 發行人文件是自述（L8 弱主張）；媒體只當線索；第三方海關彙整站是 CBP 艙單的第三方轉載。
+
+【HyperLight 新聞稿（Business Wire 2026-03-16，AETOSWire 轉載逐字）：1.6T-DR8 TFLN 參考收發器，由天孚（SZSE: 300394）提供工程與製造支援；單顆 CW 雷射、20W（HyperLight 自述）】
+"HyperLight Corporation (“HyperLight”) today announced a major milestone in low-power optical networking with the demonstration of a 1.6T-DR8 optical transceiver leveraging HyperLight’s TFLN Chiplet™ Platform. The reference module was demonstrated with engineering and manufacturing support from Suzhou TFC Optical Communication Co., Ltd. (SZSE: 300394, or "TFC"). The reference design achieves 20W power consumption in a fully retimed 1.6T-DR8 module, representing approximately 20% lower module-level power compared to alternative technologies. The reduction is achieved through a simple drop-in transmitter implementation based on a single thin-film lithium niobate photonic integrated circuit (TFLN PIC). The TFLN transmitter enables the module to operate using a single continuous-wave (CW) laser, compared to the two to four lasers typically required in conventional implementations. Additional energy savings are achieved through the ability to operate directly from the native low-swing electrical output of the DSP, enabled by the low drive voltage of TFLN modulators. “TFLN is a key technology for future 400Gbps-per-lane optical systems,” said Mian Zhang, CEO of HyperLight. “What we are demonstrating today is that even at the current 200Gbps-per-lane generation, TFLN can already deliver massive power savings. At the scale of modern AI data centers, that translates into megawatts of potential energy reduction. Our work with TFC demonstrates how readily HyperLight’s technology can integrate into existing optical module ecosystems.” HyperLight will demonstrate the module live at OFC 2026, taking place March 16–18 in Los Angeles, California."

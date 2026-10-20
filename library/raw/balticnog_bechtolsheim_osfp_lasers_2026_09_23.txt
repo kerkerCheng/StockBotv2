@@ -1,0 +1,10 @@
+Source URL: https://www.youtube.com/watch?v=u2jQKX1WZUk
+
+Excerpt:
+[EXCERPT — 有限逐字引文] BalticNOG 2026〈Next generation optics for Scale Up, Scale Out and Scale Across〉Andreas Bechtolsheim（Arista）YouTube 自動字幕（
+DATE: 2026-09-23
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: OCP 官方影片的 YouTube 自動字幕——不是逐字稿，可能有聽寫錯字；講者沒在字幕標名的，報告裡寫「推一步」。
+
+【BalticNOG 2026〈Next generation optics for Scale Up, Scale Out and Scale Across〉Andreas Bechtolsheim（Arista）YouTube 自動字幕（asr，不是逐字稿；時間碼已拿掉）20:19–21:04：OSFP 今年出貨與需求、雷射不夠、2028 與市場規模（「Their projection」引用的預測者未具名）】
+"the OSFP in the age of 600 gig is the by far the winner. Their projection is there will be over 120 millions of these OSFPs sold this calendar year and actually uh they can't get enough lasers and so on. So, they they demand is actually more like 150. And by 2028, the projection is that it will go up to uh perhaps 200 million units per year. It's an insanely large market. Uh OSFP all these high speed optics used to be I don't know, 5 billion, 7 billion revenue per year. Now, the projection for next year is 70 billion dollars. So, with the demand of AI going up 10x, you know, all of these things go up a lot."

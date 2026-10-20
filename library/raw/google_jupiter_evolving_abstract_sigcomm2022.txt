@@ -1,0 +1,10 @@
+Source URL: https://research.google/pubs/jupiter-evolving-transforming-googles-datacenter-network-via-optical-circuit-switches-and-software-defined-networking/
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Google〈Jupiter Evolving〉（ACM SIGCOMM 2022）摘要
+DATE: 2022-08-22
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 發行人文件是自述（L8 弱主張）；媒體只當線索；第三方海關彙整站是 CBP 艙單的第三方轉載。
+
+【Google〈Jupiter Evolving〉（ACM SIGCOMM 2022）摘要：Jupiter 十年間「30% reduction in capex, 41% reduction in power」——對照 Silex 公開說明書 p.79 那位未具名客戶的「approximately 30 percent lower network capital expenditure and up to 40 percent lower power consumption」（客戶端一手；數字吻合只是推論的依據，不是具名）】
+"We present a decade of evolution and production experience with Jupiter datacenter network fabrics. In this period Jupiter has delivered 5x higher speed and capacity, 30% reduction in capex, 41% reduction in power, incremental deployment and technology refresh all while serving live production traffic."

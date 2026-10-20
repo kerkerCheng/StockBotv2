@@ -1,0 +1,10 @@
+Source URL: https://www.youtube.com/watch?v=XjJ8sXzr-Oc
+
+Excerpt:
+[EXCERPT — 有限逐字引文] OCP Global Summit 2026 同場次問答
+DATE: 2026-10-15
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 發行人文件是自述（L8 弱主張）；媒體只當線索；第三方海關彙整站是 CBP 艙單的第三方轉載。
+
+【OCP Global Summit 2026 同場次問答：聽眾問 OCS 何時成為每座資料中心的一部分（量的拐點），Oracle 的 Kannan Raj 答「my take is probably about a year away」、追問後說是「production deployment」——答的是產業拐點的個人看法，不是 Oracle 自己的部署時程（YouTube 自動字幕）】
+"So, when do you see the inflection point on the hockey stick as far as OCS's being part of every data center? I mean volume-wise, are we two years away, one year, one month? >> Uh so that's a good question. Uh it depends on use cases. Uh right now we are in the uh midst of uh building large scale data centers right so it's like gigawatt scale campuses and uh uh it it depends on how the workloads get distributed across multiple uh buildings multiple data halls and so on. uh so once uh a a requirement for reconfigurability of workloads is established I think it's there so I my my take is probably about a year away >> for initial testing alpha type projects in the data center >> uh for production deployment"

@@ -1,0 +1,13 @@
+Source URL: https://www.youtube.com/watch?v=KvAZNJKvsqQ
+
+Excerpt:
+[EXCERPT — 有限逐字引文] RAISE Summit 2026（巴黎，2026-07-08）Hurlston 與 BlackRock Tony Kim 爐邊對談；Lumentum 官方 YouTube 頻道 2026-07-28 上傳、上傳者人工字幕（KvAZNJKv
+DATE: 2026-07-08
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 發行人文件是自述（L8 弱主張）；媒體只當線索；第三方海關彙整站是 CBP 艙單的第三方轉載。
+
+【RAISE Summit 2026（巴黎，2026-07-08）Hurlston 與 BlackRock Tony Kim 爐邊對談；Lumentum 官方 YouTube 頻道 2026-07-28 上傳、上傳者人工字幕（KvAZNJKvsqQ，09:59–11:53）：五座 InP 晶圓廠、兩家（Lumentum 與另一家獲 NVIDIA 投資的對手，原文未具名）供不應求、InP 短缺會比記憶體更嚴重（發行人口述）】
+"Yeah, look, one of the key components in these optical systems are lasers. They're basically semiconductor devices that throw off light. That's how the whole thing starts. This is an industry, and we started talking about it at the beginning of the conversation, that's used to telecom customers. AT&T, Verizon— and the numbers of lasers that those kind of customers would deploy are in the, you know, hundreds. Right. Now, we're talking about hundreds of million. So, for us to get our fabrication facilities up the curve to go from thousands of wafers to millions of wafers is no small feat. You know, you've covered us for a long time. We've now put online five different wafer fabs. There's a different material. This is not CMOS. What's the material? It's called indium phosphide, right. A very complicated name, but it's basically something that can emit light. It's a property that, a material that can emit light, and we have five indium phosphide fabs that we're trying to ramp to scale. We see a huge shortage, and that's one of the reasons I think NVIDIA invested in Lumentum and invested in one of our largest competitors, who also has incredible indium phosphide manufacturing capability. Between the two of us, I don't think we can service the demand that NVIDIA and others are now putting on us to solve this resistance problem in the data center. And so the shortage of indium phosphide, I think, will become even more acute than what we see from the memory guys."
+
+【RAISE Summit 2026 Hurlston 爐邊對談（Lumentum 官方 YouTube 人工字幕，12:15–12:56）：scale-up 用的外接可插拔光源每顆 8 個雷射、每櫃約一千顆（發行人口述）】
+"Well, a good example, Tony, is right now for scale-up optics, the idea from most of the companies is to put this light source, an external sort of pluggable light source. In that light source, there are eight distinct lasers. Eight lasers per light source? Eight lasers per light source. And per rack, you probably have a thousand— A thousand? —of these in each different rack. So you're talking about 8,000 lasers per rack and there's so many different racks. I mean, you know the numbers better than I do. The opportunity is immense. This is why we need hundreds of millions of lasers."

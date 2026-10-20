@@ -1,0 +1,10 @@
+Source URL: https://uk.investing.com/news/transcripts/earnings-call-transcript-silex-microsystems-posts-strong-q2-2026-growth-93CH-4775615
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Silex Microsystems Q2 2026 法說（2026-07-17）ABG 分析師問成長來源
+DATE: 2026-07-17
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 發行人文件是自述（L8 弱主張）；媒體只當線索；第三方海關彙整站是 CBP 艙單的第三方轉載。
+
+【Silex Microsystems Q2 2026 法說（2026-07-17）ABG 分析師問成長來源：CEO 說 OCS 成長來自 Q2 進來的數家新客戶，「not only the initial big MAG7 company」（Investing.com 第三方逐字稿，tier 2；發行人自述；客戶未具名）】
+"If we start with the OCS market, absolutely, it’s driven by increased demand from new customers, we see several new customers coming in here in Q2. They have a window now to get into the OCS for the data centers. It builds a lot of new data centers, not only the initial big MAG7 company, but also the others are looking into building their own data centers."

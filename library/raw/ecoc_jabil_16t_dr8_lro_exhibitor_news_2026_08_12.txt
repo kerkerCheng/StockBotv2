@@ -1,0 +1,10 @@
+Source URL: https://www.ecocexhibition.com/exhibitor-news/built-for-ai-scale-jabils-1-6t-dr8-lro-optical-transceiver/
+
+Excerpt:
+[EXCERPT — 有限逐字引文] ECOC 2026 展商新聞（Jabil 自撰，Stand 1334，2026-08-12）
+DATE: 2026-08-12
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 發行人文件是自述（L8 弱主張）；媒體只當線索；第三方海關彙整站是 CBP 艙單的第三方轉載。
+
+【ECOC 2026 展商新聞（Jabil 自撰，Stand 1334，2026-08-12）：1.6T DR8 LRO 用 HyperLight TFLN 調變器＋Credo 半重定時 DSP、<13W；原文沒寫雷射供應商（沒有 Sivers 字樣）】
+"Jabil’s 1.6T DR8 LRO optical transceiver redefines power efficiency for AI and cloud data centre networks. Introduced at OFC 2026, it combines a linear receive optics architecture with Thin-Film Lithium Niobate (TFLN) modulator from HyperLight and a Credo half-retimed DSP, delivering exceptional performance at under 13W. Supporting 200G per lane today and architected for 400G per lane migration, it enables scalable, sustainable network growth without compromising reach or reliability. With ultra-low power operation and seamless integration into next-generation AI fabrics, Jabil’s 1.6T DR8 LRO sets a new benchmark for energy-efficient optical connectivity."

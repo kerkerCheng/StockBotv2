@@ -1,0 +1,10 @@
+Source URL: https://www.youtube.com/watch?v=XjJ8sXzr-Oc
+
+Excerpt:
+[EXCERPT — 有限逐字引文] OCP Global Summit 2026 同場次問答
+DATE: 2026-10-15
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 發行人文件是自述（L8 弱主張）；媒體只當線索；第三方海關彙整站是 CBP 艙單的第三方轉載。
+
+【OCP Global Summit 2026 同場次問答：為什麼現在用 OCS——Oracle 的 Kannan Raj「it's actually the scale of deployment」、GW 級園區多棟建築相隔「tens of kilometers」（YouTube 自動字幕）】
+"it's actually the scale of deployment. Uh five years ago we didn't have uh fabrics that were designed to this scale. So today we are talking about uh uh gigawatt scale campuses. It's like multiple buildings spread over like tens of kilometers."

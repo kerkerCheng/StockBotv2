@@ -1,0 +1,10 @@
+Source URL: https://www.youtube.com/watch?v=u2jQKX1WZUk
+
+Excerpt:
+[EXCERPT — 有限逐字引文] BalticNOG 2026 Bechtolsheim（Arista）YouTube 自動字幕 14:14–15:39
+DATE: 2026-09-23
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: OCP 官方影片的 YouTube 自動字幕——不是逐字稿，可能有聽寫錯字；講者沒在字幕標名的，報告裡寫「推一步」。
+
+【BalticNOG 2026 Bechtolsheim（Arista）YouTube 自動字幕 14:14–15:39：機櫃內全銅且短期不變；叢集內 10–20 m 銅不行；RF-microwave 介質傳輸線若真的成立「no lasers, no photo detectors」（有條件、口述）】
+"in the rack it's all copper cables or copper traces because it's the cheapest, the most reliable, the lowest power, and this is highly unlikely to change anytime soon because, you know, it works. Now, within the the cluster, which is the eight or 16 or 32 of these racks connected together, um, you you have a distance of 10 to 20 m, so copper cables no longer work at at these speeds, and there's an amazing uh, amount of different technologies that being developed. They're not quite on the market yet, but the amount of bandwidth, you know, for the cluster is so high, it's like 10 times higher than the scale scale-out bandwidth that it's, you know, it would be the the highest consumption of whatever optics ever get used for this purpose. Now, interesting enough, the perhaps cheapest technology that was just announced here at ECOC is not even optics, but uh, using um, the RF signal uh, and sending it over a microwave dielectric transmission line, which apparently works pretty well over a 10 m reach. So, if this is really true that this works as well, this is a real winner because it's essentially there's no lasers, no photo detectors, no precision, you know, single mode fiber attached. This is just a better version of a copper cable, but it reaches 10 meters."

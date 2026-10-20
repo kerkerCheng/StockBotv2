@@ -1,0 +1,25 @@
+Source URL: https://www.bloomberg.com/news/videos/2026-10-09/lumentum-ceo-opto-parts-capacity-sold-out-to-2029-video
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Bloomberg TV〈The Asia Trade〉Lumentum 執行長 Hurlston 專訪（Bloomberg 頁面 2026-10-09；Bloomberg 自帶 Veritone 字幕 dfxp，本機 faster-whi
+DATE: 2026-10-09
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 發行人文件是自述（L8 弱主張）；媒體只當線索；第三方海關彙整站是 CBP 艙單的第三方轉載。
+
+【Bloomberg TV〈The Asia Trade〉Lumentum 執行長 Hurlston 專訪（Bloomberg 頁面 2026-10-09；Bloomberg 自帶 Veritone 字幕 dfxp，本機 faster-whisper 對同一支音訊互核一致；發行人口述、L8 弱主張、時變數字不入圖 L4）：部分產品到 2028 年少出貨三成、2029 幾乎賣完、其他產品明年少出貨約七成】
+"we are under shipping demand on some of our products by 30% now into 28. We're almost sold out for 2029. And then for other products, we're actually under shipping demand by about 70% next year, even next year. So we are really trying to catch up, add capacity as fast as we can, but we are very, very far behind where customers want."
+
+【Bloomberg TV Hurlston 專訪（2026-10-09；Veritone 字幕＋本機 ASR 互核）：最大瓶頸是自家雷射晶片，遠落後於需求（發行人口述）】
+"We make, uh, these laser chips. So you were just talking about the semiconductor trade. Semiconductor has many, many different facets. And one is a product that actually emits light. And we make these laser chips that, as you said in the opener, connect things together using light. Those chips are behind, vastly behind relative to the overall demand."
+
+【Bloomberg TV Hurlston 專訪（2026-10-09；Veritone 字幕＋本機 ASR 互核）：繼 Greensboro 後決定在日本第二座廠加 InP 產能（現有 Sagamihara；第二座地名兩份轉寫都不清：Veritone 作 Cao／core，本機 ASR 作 Takao／cow）（發行人口述）】
+"So last time I came and spoke with you, we just added a fab in the US, right in Greensboro, North Carolina. Now we've actually made a decision to add capacity here in Japan. So we operate one fabrication facility in Japan in Sagamihara. We're now adding capacity in a second fab into Cao. So we're really now committing to the Japanese market relative to our indium phosphide, our capacity issues."
+
+【Bloomberg TV Hurlston 專訪（2026-10-09；Veritone 字幕＋本機 ASR 互核；Veritone 首字「Are our」本機 ASR 作「Our」）：原料大部分來自中國、與日本合作、目前與中國政府協調供應鏈未中斷但仍是隱憂；中國收發器廠在美國約七成市占（發行人口述，未點名供應商）】
+"Are our suppliers so raw materials come to a large degree from China. We've actually been very effective in partnering with Japan. So Japan is a great home for the raw material that makes up our indium phosphide lasers. But China is a huge source to your point. We've so far been able to work with the Chinese government to get reasonable treatment and keep our supply chain on line and on disrupted. But it is a concern. And on the converse, on our transceiver business, the thing that you are just talking about, it is very difficult for us to sell into the Chinese hyperscalers. The Chinese transceiver makers essentially have 100% market share there, and they do have about 70% market share in the United States shipping transceivers. This product. You were just talking about into the U.S. market. They have a very, very big market share."
+
+【Bloomberg TV Hurlston 專訪（2026-10-09；Veritone 字幕＋本機 ASR 互核）：雲端業者承諾把它帶到五年後、願意出錢、做了一系列風險分攤安排、把部分費用推給客戶，至少到 2030、2031（發行人口述；雲端業者未具名——L6 不能據以寫具名 capital_commitment 邊）】
+"from our perspective, completely sold out. So there's no end in sight, I think. Um, from a hardware point of view, these things take a long time to respond to our cycles or three, 4 or 5 years for us to build capacity, for us to build products, for us to then ship the products to the customer. And we're getting commitments from these very same hyperscalers that get us out five years. They are willing to put money behind it. We've done a whole series of risk allocation moves with the hyperscalers, and they've been good enough, for the most part, to accept some of that risk and, uh, push some of the expense to them. So that seems to carry us out at least into 2030, 2031."
+
+【Bloomberg TV Hurlston 專訪（2026-10-09；Veritone 字幕＋本機 ASR 互核）：新 InP 產能約三年到客戶手上——一年裝機、一年自家合格、一年客戶合格（發行人口述）】
+"It's about three years. So it takes us a year to kit out with equipment, with machinery to put in a, uh, into a fabrication facility. It takes us a year to go through our engineering processes to qualify the device, and then it's another year for our customers to take it and put it in their products and qualify it again. So it's a really long cycle."

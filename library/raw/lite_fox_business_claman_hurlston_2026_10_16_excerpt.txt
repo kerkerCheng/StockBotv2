@@ -1,0 +1,19 @@
+Source URL: https://video.foxbusiness.com/v/6406988639112
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Fox Business〈Claman's Power Players〉Hurlston 專訪（2026-10-16 上架，Fox 官方 VTT 字幕，本機 ASR 互核）
+DATE: 2026-10-16
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: OCP 官方影片的 YouTube 自動字幕——不是逐字稿，可能有聽寫錯字；講者沒在字幕標名的，報告裡寫「推一步」。
+
+【Fox Business〈Claman's Power Players〉Hurlston 專訪（2026-10-16 上架，Fox 官方 VTT 字幕，本機 ASR 互核）：採購承諾大部分不可取消、自家晶圓廠提前三年投資、把部分風險推給客戶（發行人口述；客戶未具名）】
+"ARE THESE FORECASTS AND ALLOCATIONS THAT CUSTOMERS CAN WALK AWAY FROM? >> WE’ VE MADE IT A LOT MORE DIFFICULT FOR CUSTOMERS TO WALK AWAY. YOU KNOW, HAVING COVERED OUR STORY FOR THE BETTER PART OF THE LAST YEAR, WE HAVE THE INVEST WAY AHEAD OF THE CYCLE. SO ONE OF THE THINGS THAT WE DO IS WE MAKE -- WE HAVE OUR OWN FABS. YOU JUST TALKED ABOUT TSMC A SECOND AGO. WE’ RE SORT OF THE TSMC OF LASER CHIPS. AND WHEN WE INVEST, WE’ RE INFORMING THREE YEARS AHEAD OF -- INVESTING THREE YEARS AHEAD OF WHEN WE MIGHT SEE A DEMAND. IN ORDER TO DO THAT, WE WANT TOAL ROTATE RISK A LITTLE BIT -- TO ALLOCATE RISK A LITTLE BIT. THE PURCHASE COMMITMENTS WE HAVE ARE, TO A LARGE DEGREE, NON-CANCELABLE, SO THEY CAN’ T WALK AWAY QUICKLY. AND THAT GIVES US SOME COMFORT AS WE CONTINUE TO SPEND INTO THIS BIG SURGE IN DEMAND."
+
+【Fox Business Hurlston 專訪（2026-10-16，Fox 官方 VTT＋本機 ASR）：升息以來沒有客戶放慢、延後或要求重議訂單（發行人口述）】
+"HAVE YOU SEEN ANY CUSTOMER SLOW OR DELAY OR ASK TO RENEGOTIATE AN ORDER SINCE RATES STARTED RIDING? -- RISING? >> WE HAVEN’ T, IN FACT. YOU KNOW, IT’ S INTERESTING, I THINK THE CFO OF GOOGLE, OF ALPHABET CAME ON JUST A COUPLE OF DAYS AGO AND WAS TALKING ABOUT THEIR CAPEX GOING UP YEAR-OVER-YEAR. LIZ: YEAH. >> FOR THE MOST PART, WE’ RE GOING TO SEE, I THINK, THE HYPERSCALERS REPORT AN INCREASE IN CAPEX IN THIS CYCLE. AND CERTAINLY, THAT’ S CONSISTENT WITH WHAT WE SEE. WE, TO OF COURSE, PROVIDE A A LOT OF HARDWARE THAT GOES INTO THESE DATA CENTERS. THAT’ S SOMETHING THEY HAVE TO SPEND ON WELL AHEAD OF DEPLOYING DATA CENTERS. AND BASED ON WHAT WE SEE, WE SEE THEIR SPENDING GOING UP."
+
+【Fox Business Hurlston 專訪（2026-10-16，Fox 官方 VTT＋本機 ASR）：收發器七成來自中國、它與一兩家美國廠合計三成（發行人口述；講的是收發器，不是雷射晶片）】
+"70% OF SUPPLY IS COMING FROM CHINA TODAY FOR THOSE TRANSCEIVERS. LIZ: THAT’ S HUGE. >> WE MAKE TRANSCEIVERS, SMALL PLAYER. THERE’ S ONE OR TWO OTHER U. S. NAMES THAT MAKE THEM. WE MAKE UP A TOTAL OF 30%."
+
+【Fox Business Hurlston 專訪（2026-10-16；本段 Fox 官方 VTT 漏字「you just referenced Hock Tan, we are not as dependent」，改用本機 faster-whisper 轉寫，其餘與官方 VTT 一致）：即使資料中心建置大幅放緩影響也很小，2027、2028 的數字由電轉光決定（發行人口述）】
+"Our numbers to date are based largely on AI data center build-out. So everything that you've talked about relative to the AI trade this week would impact us. There's no question about it, but the difference between what we're doing and some others, you just referenced Hawk Tan, we are not as dependent on the AI data center build-out going forward. There's a conversion inside data centers from electrical products, products like Broadcom makes to more optical based products. So we could see a world where data center build-outs do slow out significantly, but relative to Lamentum, there's very little impact because our numbers are gonna be governed on a go-forward basis in 27 and certainly in 2028 by that conversion from electrical to optical."

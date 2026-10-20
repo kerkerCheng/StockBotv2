@@ -1,0 +1,10 @@
+Source URL: https://www.youtube.com/watch?v=XjJ8sXzr-Oc
+
+Excerpt:
+[EXCERPT — 有限逐字引文] OCP Global Summit 2026 場次〈Zero Touch OCS Fabrics for AI Scale Out Infrastructure at Hyperscale〉（OCP 官方 YouTube XjJ8sXzr-
+DATE: 2026-10-15
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 發行人文件是自述（L8 弱主張）；媒體只當線索；第三方海關彙整站是 CBP 艙單的第三方轉載。
+
+【OCP Global Summit 2026 場次〈Zero Touch OCS Fabrics for AI Scale Out Infrastructure at Hyperscale〉（OCP 官方 YouTube XjJ8sXzr-Oc，2026-10-15 上架）Lumentum Michael DeMerchant：夏天造的一千台出廠插損、總變異約 0.2 dB、相容標準光收發器（YouTube 自動字幕、時間戳已去除；Lumentum 自述）】
+"this chart shows a bit of data from the factory. So it's actually insertion loss data for a thousand units that were built over the summer. Um, and you know, we're we're very pleased that you can see that the the total variation across all those units is on the order of 0.2 dB. Um, so that that really lets uh the customers have the consistency that they need and the performance that they need to be able to work um and and to be able to confidently deploy and know that their their links are going to close. Um, you know, it's compatible with standard transceivers that you would use uh for for these kind of scale out and scale across applications."
