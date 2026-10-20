@@ -42,6 +42,7 @@ import re
 from collections import Counter, defaultdict
 from dataclasses import dataclass, field
 from datetime import date
+from functools import lru_cache
 from typing import Any, Iterable, Mapping
 
 # 向下（找瓶頸）的邊型：只有這些的 substitutability 有意義。
@@ -276,8 +277,12 @@ def company_name_forms(company) -> tuple[str, ...]:
 _CJK = re.compile(r"[぀-ヿ㐀-䶿一-鿿豈-﫿가-힯]")
 
 
+@lru_cache(maxsize=None)
 def _form_pattern(form: str) -> re.Pattern[str]:
     """一個寫法的比對式。
+
+    快取（2026-10-20）：名冊寫法 10-18 超過 re 模組 512 格的 LRU 之後每次都重新編譯，
+    daily ⑬ materialize 每檔多約 5.6 秒、連三輪逾時——編譯結果只依 form 而定，整個行程共用一份。
 
     - 含中日韓字元 → 完整字串出現即算（沒有分詞可依）。
     - 其餘 → **ASCII 整詞**（`(?<![A-Za-z0-9_])…(?![A-Za-z0-9_])`；不用 `\\b`——Python 把中文字算 word 字元，

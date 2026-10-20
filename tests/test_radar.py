@@ -192,11 +192,11 @@ def _item(url, **over) -> dict:
     return base
 
 
-def _files(tmp_path, items, *, urls, max_items=5, no_change=False, run=RUN, max_market=0):
+def _files(tmp_path, items, *, urls, max_items=5, no_change=False, run=RUN, max_market=0, watched=None):
     batch = tmp_path / "radar_batch.json"
     batch.write_text(json.dumps({"schema": radar.BATCH_SCHEMA, "run_id": run, "requests": [
         {"max_items": max_items, "max_market_items": max_market,
-         "watched_conditions": [{"watch_id": "ew_d1"}, {"watch_id": "ew_c1"}]}]}),
+         "watched_conditions": watched or [{"watch_id": "ew_d1"}, {"watch_id": "ew_c1"}]}]}),
         encoding="utf-8")
     result = tmp_path / "radar_proposals.json"
     result.write_text(json.dumps({"schema": "llm-result-v1", "run_id": run, "sessions": ["sess-r"], "items": items,
@@ -273,6 +273,16 @@ def test_unknown_theme_becomes_new_and_unknown_watch_ids_are_dropped_and_counted
     lead = store["leads"][leads.lead_id_for(URL_A)]
     assert lead["source"] == "web_radar:new" and lead["refs"]["relates_to"] == ["ew_d1"]
     assert out["summary"]["theme_unknown"] == 1 and out["summary"]["relates_to_unknown"] == 1
+
+
+def test_a_watch_id_with_its_date_suffix_cut_off_resolves_only_when_exactly_one_matches(tmp_path) -> None:
+    """2026-10-20：production 的 id 是 `ew_NNNN_YYYY-MM-DD`，LLM 常只回 `ew_NNNN`——10-05 起 26 條全被當成對不上丟掉。"""
+    watched = [{"watch_id": "ew_0421_2026-10-07"}, {"watch_id": "ew_0007_2026-10-01"}, {"watch_id": "ew_0007_2026-10-02"}]
+    out, store = _apply(tmp_path, [_item(URL_A, relates_to=["ew_0421", "ew_0421_2026-10-07", "ew_0007", "ew_0999"])],
+                        urls=[URL_A], watched=watched)
+    assert store["leads"][leads.lead_id_for(URL_A)]["refs"]["relates_to"] == ["ew_0421_2026-10-07"]
+    s = out["summary"]
+    assert s["relates_to_resolved_prefix"] == 1 and s["relates_to_unknown"] == 2 and s["related"] == 1   # 兩條相符不猜
 
 
 def test_a_malformed_url_in_the_search_results_is_left_out_without_breaking_the_run(tmp_path) -> None:
@@ -419,8 +429,20 @@ def test_the_radar_fits_the_daily_time_limit() -> None:
 
     radar_cfg = load_radar()
     assert radar_cfg["configured"] and radar_cfg["enabled"] and radar_cfg["max_items"] == 5
+    assert radar_cfg["max_market_items"] >= len(radar_cfg["market_topics"])      # prompt 要「每題挑一則」
     total = dt.total_timeout_minutes(dt.DAILY_STEPS, load_llm(), radar_cfg)
     assert total < load_schedule()["execution_time_limit_minutes"]
+
+
+def test_a_market_cap_below_the_number_of_market_topics_is_refused(tmp_path) -> None:
+    """2026-10-20：第 5 題加進來時上限只有 4——寫了做不到的數字。原本只擋「有題目卻是 0」那個特例。"""
+    from engine_b.routine_config import load_radar
+
+    cfg = tmp_path / "routine.json"
+    cfg.write_text(json.dumps({"radar": {"enabled": True, "max_items": 5, "timeout_minutes": 10,
+                                         "market_topics": ["甲", "乙", "丙"], "max_market_items": 2}}), encoding="utf-8")
+    with pytest.raises(ValueError, match="少於 market_topics 題數"):
+        load_radar(cfg)
 
 
 # ---------------------------------------------------------------------------
@@ -446,10 +468,10 @@ def test_the_heartbeat_prints_counts_or_says_why_it_did_not_run(tmp_path) -> Non
     ok = _record(tmp_path, [{"key": "01b_radar_prepare", "status": "ok"},
                             {"key": "01e_radar_apply", "status": "ok", "summary": {
                                 "new": 2, "duplicate": 1, "url_not_in_search": 1, "over_cap": 0, "invalid": 0,
-                                "related": 1, "no_material_change": False, "searches": 4}}])
+                                "related": 1, "relates_to_unknown": 2, "no_material_change": False, "searches": 4}}])
     line = _radar_line(now=now, record_path=ok)
     assert line == ("外部雷達：新 2｜重複 1｜拒收 1（網址不在搜尋結果 1、超過上限 0、欄位不合法 0）｜提到在盯的條件 1"
-                    "｜搜尋 4 次（只寫 secondary lead，不喚醒 watch）")
+                    "（條件 id 對不上 2）｜搜尋 4 次（只寫 secondary lead，不喚醒 watch）")
     off = _record(tmp_path, [{"key": "01b_radar_prepare", "status": "skipped", "reason": "radar.enabled=false"},
                              {"key": "01e_radar_apply", "status": "skipped", "reason": "radar.enabled=false"}])
     assert _radar_line(now=now, record_path=off) == "外部雷達：沒跑（01e_radar_apply skipped：radar.enabled=false）"

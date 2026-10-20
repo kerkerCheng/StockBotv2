@@ -1565,7 +1565,8 @@ def _radar_line(*, now: datetime, record_path: Path | None) -> str:
         tail = "｜沒有重要變化" if s.get("no_material_change") and not s.get("new") else ""
         return (f"外部雷達：新 {s.get('new', '?')}｜重複 {s.get('duplicate', '?')}｜拒收 {radar_rejected(s)}"
                 f"（網址不在搜尋結果 {s.get('url_not_in_search', '?')}、超過上限 {s.get('over_cap', '?')}"
-                f"、欄位不合法 {s.get('invalid', '?')}）｜提到在盯的條件 {s.get('related', '?')}{tail}"
+                f"、欄位不合法 {s.get('invalid', '?')}）｜提到在盯的條件 {s.get('related', '?')}"
+                f"（條件 id 對不上 {s.get('relates_to_unknown', '?')}）{tail}"
                 f"｜搜尋 {s.get('searches', '?')} 次（只寫 secondary lead，不喚醒 watch）")
     step = next((rows[k] for k in ("01e_radar_apply", "01c_radar_propose", "01b_radar_prepare")
                  if k in rows and rows[k].get("status") != "ok"), None) or apply or {}

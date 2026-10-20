@@ -145,6 +145,15 @@ def resolve_entities(names: Iterable[str], registry: Any) -> tuple[list[str], li
     return found, raw
 
 
+def _resolve_watch_id(given: str, known: set[str]) -> str | None:
+    """LLM 回報的 watch id → registry 的真 id。完整相符直接收；LLM 常把日期尾綴截掉（`ew_0421` 對 `ew_0421_2026-10-07`），
+    恰好對到一條才收、對到兩條以上不猜（L15）。2026-10-20 前只認完整 id：10-05 起 26 條全被當成對不上丟掉（L17）。"""
+    if given in known:
+        return given
+    hits = [k for k in known if k.startswith(given + "_")]
+    return hits[0] if len(hits) == 1 else None
+
+
 def apply(result_path: Path, batch_path: Path, run_id: str, *, store_path: Path | None = None,
           receipt_dir: Path = OUT_DIR, today: date | None = None, registry: Any = None,
           now: datetime | None = None) -> dict[str, Any]:
@@ -183,7 +192,8 @@ def apply(result_path: Path, batch_path: Path, run_id: str, *, store_path: Path 
     accepted: list[dict[str, Any]] = []
     rejected: list[dict[str, Any]] = []
     counts = {"proposed": 0, "new": 0, **{k: 0 for k in REJECT_REASONS}, "published_unparsed": 0,
-              "theme_unknown": 0, "relates_to_unknown": 0, "related": 0, "scope_unknown": 0,
+              "theme_unknown": 0, "relates_to_unknown": 0, "relates_to_resolved_prefix": 0, "related": 0,
+              "scope_unknown": 0,
               "new_market": 0, "new_theme": 0, "new_watch": 0}
     seen: set[str] = set()
     for item in result.get("items") or ():
@@ -227,8 +237,10 @@ def apply(result_path: Path, batch_path: Path, run_id: str, *, store_path: Path 
         if theme != NEW_THEME and theme not in known_themes:
             counts["theme_unknown"] += 1
             theme = NEW_THEME
-        relates = [str(w) for w in item.get("relates_to") or () if str(w) in known_watches]
-        counts["relates_to_unknown"] += len([w for w in item.get("relates_to") or () if str(w) not in known_watches])
+        resolved = [(str(w), _resolve_watch_id(str(w), known_watches)) for w in item.get("relates_to") or ()]
+        relates = list(dict.fromkeys(r for _, r in resolved if r))
+        counts["relates_to_unknown"] += sum(1 for _, r in resolved if not r)
+        counts["relates_to_resolved_prefix"] += sum(1 for w, r in resolved if r and r != w)
         company_ids, raw_names = resolve_entities(item.get("entities") or (), registry)
         lead_id, is_new = leads.register(store, source=f"{SOURCE_PREFIX}{theme}", url=allowed[key],
                                          title=titles.get(key) or str(item.get("title") or "").strip(),

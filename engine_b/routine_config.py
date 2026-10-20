@@ -201,8 +201,9 @@ def load_radar(path: Path = DEFAULT_CONFIG) -> dict[str, Any]:
     max_market = radar.get("max_market_items", 0)
     if isinstance(max_market, bool) or not isinstance(max_market, int) or not 0 <= max_market <= 10:
         raise ValueError(f"radar.max_market_items 必須是 0..10 的整數：{max_market!r}")
-    if topics and not max_market:
-        raise ValueError("radar.market_topics 有寫、max_market_items 卻是 0——市場大事會一則都收不到")
+    if max_market < len(topics):
+        # 2026-10-20：prompt 要「每題挑一則」，上限少於題數＝寫了做不到的數字（第 5 題加進來時上限只到 4）
+        raise ValueError(f"radar.max_market_items（{max_market}）少於 market_topics 題數（{len(topics)}）——每題一則收不完")
     return {"enabled": radar["enabled"], "max_items": max_items, "timeout_minutes": float(timeout), "configured": True,
             "market_topics": [t.strip() for t in topics], "max_market_items": max_market}
 
