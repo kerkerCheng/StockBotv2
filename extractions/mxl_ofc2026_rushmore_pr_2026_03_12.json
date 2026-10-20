@@ -1,0 +1,90 @@
+{
+  "claims": [
+    {
+      "confidence": 0.5,
+      "demand_proof_level": "speculative",
+      "disproof_condition": "條件：MaxLinear 後續 10-K／10-Q 或法說的產品描述沒有任何 LRO 用途，或寫明 LRO 不在其出貨裡。核查頻率：每半年（MaxLinear 10-K、10-Q）。觸發後 48 小時：e1 提撤回或改成 develops；重讀 LRO 層讀圖的供給側與 MXL 敘事。",
+      "id": "mxl_ofc2026_rushmore_pr_2026_03_12_cl1",
+      "source_ids": [
+        "mxl_ofc2026_rushmore_pr_2026_03_12_s1",
+        "mxl_ofc2026_rushmore_pr_2026_03_12_s2"
+      ],
+      "statement": "MaxLinear press release (2026-03-12): at OFC 2026 it 'will also showcase customer optical modules featuring its Keystone 400G and 800G DSPs, as well as Rushmore DSPs, for fully retimed optical transceiver, LRO and AEC applications.' The sentence does not say which DSP is used for LRO; it only establishes that some customer modules use a MaxLinear DSP for LRO. A showcase, not a shipment or design-in disclosure; MaxLinear's FY2025 10-K does not mention LRO.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.5,
+      "dst_id": "tech:lro",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "mxl_ofc2026_rushmore_pr_2026_03_12_s1",
+        "mxl_ofc2026_rushmore_pr_2026_03_12_s2"
+      ],
+      "src_id": "co:maxlinear"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "MaxLinear, Inc."
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:maxlinear",
+      "name": "MaxLinear",
+      "role": null,
+      "source_ids": [
+        "mxl_ofc2026_rushmore_pr_2026_03_12_s1",
+        "mxl_ofc2026_rushmore_pr_2026_03_12_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "LRO",
+        "linear receive optics"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:lro",
+      "name": "Linear Receive Optics (LRO)",
+      "role": null,
+      "source_ids": [
+        "mxl_ofc2026_rushmore_pr_2026_03_12_s2"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "mxl_ofc2026_rushmore_pr_2026_03_12",
+    "evidence_tier": 2,
+    "origin_entity": "MaxLinear, Inc.",
+    "permission_basis": "公司投資人關係網站公開新聞稿；只保留研究必要的有限逐字節錄。published_at 取頁面 <time datetime=\"2026-03-12 08:35:00\"> 與正文「Released March 12, 2026」。",
+    "published_at": "2026-03-12",
+    "publisher": "MaxLinear 投資人關係網站",
+    "retrieved_at": "2026-10-20",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "MaxLinear 新聞稿（2026-03-12）〈MaxLinear to Showcase Next‑Generation 1.6T Rushmore DSP Live at OFC 2026〉：OFC 展出採用其 Keystone 400G／800G 與 Rushmore DSP 的客戶光模組，用途含全重定時、LRO 與 AEC",
+    "url": "https://investors.maxlinear.com/press-releases/detail/602/maxlinear-to-showcase-nextgeneration-1-6t-rushmore-dsp"
+  },
+  "sources": [
+    {
+      "id": "mxl_ofc2026_rushmore_pr_2026_03_12_s1",
+      "locator": "第一段（發稿主體；U+2011 不斷行連字號照原文）",
+      "quote": "MaxLinear, Inc. (Nasdaq: MXL), a leading provider of high‑speed interconnect ICs for data center, metro, and wireless transport networks, today announced it will showcase its next‑generation 1.6T PHY chipset at OFC 2026, March 17–19, in South Hall, Booth 1049."
+    },
+    {
+      "id": "mxl_ofc2026_rushmore_pr_2026_03_12_s2",
+      "locator": "Live Demos 段末",
+      "quote": "In addition to Rushmore demos, MaxLinear will also showcase customer optical modules featuring its Keystone 400G and 800G DSPs, as well as Rushmore DSPs, for fully retimed optical transceiver, LRO and AEC applications."
+    }
+  ]
+}

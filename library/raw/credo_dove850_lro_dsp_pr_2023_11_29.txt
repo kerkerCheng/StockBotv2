@@ -1,0 +1,13 @@
+Source URL: https://credosemi.com/news/credo-introduces-worlds-first-800g-dsp-for-linear-receive-optics-targeting-hyperscale-and-ai-data-centers/
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Credo 新聞稿（2023-11-29）〈Credo Introduces World’s First 800G DSP for Linear Receive Optics, Targeting Hyperscale and AI Data Centers〉：Dove 850 為 LRO（亦稱 HALO）設計；LRO 只有發送路徑含 DSP
+DATE: 2023-11-29
+RETRIEVED: 2026-10-20（原檔本機抽字、空白攤平後逐字核對）
+NOTE: DSP 廠自己對 LRO 架構的描述；2023 年稿，只撐「LRO 依賴發送端 DSP」這條下一層邊，不撐任何供貨。
+
+【第一段（Dove 850 定位）】
+"optimized for Linear Receive Optics (LRO), also known within the industry as Half-retimed Linear Optics (HALO)."
+
+【第一段（LRO 的定義）】
+"In an LRO transceiver or Active Optical Cable (AOC), only the transmit path from the electrical input to the optical line side output includes a DSP for signal retiming and equalization."

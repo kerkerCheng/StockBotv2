@@ -15,6 +15,32 @@
       ],
       "statement": "Ligent Technologies, Inc. (9856.HK; formerly Hisense Broadband) in its HKEX global-offering prospectus (2026-09-14): it has developed and produced 75mW and 100mW high-power CW-DFB laser chips (production of 75mW achieved in Q1 2026; optical-chip gross margin turned to +40.7% in 1H 2026 on volume), and is developing 150mW/400mW parts — the 400mW chip is for CPO-based ELSFP modules (production targeted Q1 2027, customer validation Q3 2027). The laser chips 'are either sold to external Chinese and overseas customers or used for our in-house production of optical transceivers.' Optical chips were 1.6% of 1H 2026 revenue (RMB 85.0 million of 5,392.6 million). Issuer self-report (L8 weak): customers unnamed, no capacity or share figure.",
       "subject_id": "e1"
+    },
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：Ligent 上市後首份中期或年度業績、公告寫出 LRO 收發器停產、沒有營收，或量產時程被改寫成尚未量產。核查頻率：每半年（港股中期／年度業績）＋公告。觸發後 48 小時：e2 降 confidence 或提撤回；重讀 LRO 層讀圖的供給側與 Ligent 敘事。",
+      "id": "ligent_hkex_prospectus_2026_09_14_cl2",
+      "source_ids": [
+        "ligent_hkex_prospectus_2026_09_14_s1",
+        "ligent_hkex_prospectus_2026_09_14_s7",
+        "ligent_hkex_prospectus_2026_09_14_s8"
+      ],
+      "statement": "Ligent Technologies HKEX prospectus (2026-09-14): 'We have developed and commenced mass production of our linear-drive pluggable optics (LPO) based optical transceivers and linear receive optics (LRO) based optical transceivers in 2025 and the first quarter of 2026, respectively', and it offers 1.6T transceivers 'in three primary architectural approaches — full DSP, LPO and LRO'. Issuer statement in a statutory prospectus; LRO mass production from Q1 2026; customers and qualification status not stated.",
+      "subject_id": "e2"
+    },
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：Ligent 上市後首份中期或年度業績、公告寫出 LPO 收發器停產或沒有營收。核查頻率：每半年（港股中期／年度業績）＋公告。觸發後 48 小時：e3 降 confidence 或提撤回；重讀 LPO 層讀圖的供給側。",
+      "id": "ligent_hkex_prospectus_2026_09_14_cl3",
+      "source_ids": [
+        "ligent_hkex_prospectus_2026_09_14_s1",
+        "ligent_hkex_prospectus_2026_09_14_s7",
+        "ligent_hkex_prospectus_2026_09_14_s8"
+      ],
+      "statement": "Same prospectus passages: LPO-based transceivers in mass production since 2025, and 1.6T transceivers offered in full DSP, LPO and LRO versions — seller-side evidence (not a buyer) that Ligent sells LPO modules, including at 1.6T. Customers not named.",
+      "subject_id": "e3"
     }
   ],
   "edges": [
@@ -30,6 +56,32 @@
         "ligent_hkex_prospectus_2026_09_14_s3",
         "ligent_hkex_prospectus_2026_09_14_s4",
         "ligent_hkex_prospectus_2026_09_14_s6"
+      ],
+      "src_id": "co:ligent"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.65,
+      "dst_id": "tech:lro",
+      "id": "e2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "ligent_hkex_prospectus_2026_09_14_s1",
+        "ligent_hkex_prospectus_2026_09_14_s7",
+        "ligent_hkex_prospectus_2026_09_14_s8"
+      ],
+      "src_id": "co:ligent"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.65,
+      "dst_id": "tech:lpo",
+      "id": "e3",
+      "relation": "supplies_to",
+      "source_ids": [
+        "ligent_hkex_prospectus_2026_09_14_s1",
+        "ligent_hkex_prospectus_2026_09_14_s7",
+        "ligent_hkex_prospectus_2026_09_14_s8"
       ],
       "src_id": "co:ligent"
     }
@@ -102,6 +154,40 @@
         "ligent_hkex_prospectus_2026_09_14_s5"
       ],
       "type": "TechNode"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "LRO",
+        "linear receive optics"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:lro",
+      "name": "Linear Receive Optics (LRO)",
+      "role": null,
+      "source_ids": [
+        "ligent_hkex_prospectus_2026_09_14_s7",
+        "ligent_hkex_prospectus_2026_09_14_s8"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "LPO",
+        "linear pluggable optics"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:lpo",
+      "name": "Linear Pluggable Optics (LPO)",
+      "role": null,
+      "source_ids": [
+        "ligent_hkex_prospectus_2026_09_14_s7",
+        "ligent_hkex_prospectus_2026_09_14_s8"
+      ],
+      "type": "TechNode"
     }
   ],
   "schema_version": "0.1",
@@ -112,10 +198,11 @@
     "permission_basis": "HKEX 公開的招股書（Global Offering 文件）；只保留研究必要的有限逐字節錄（pypdf 本機抽字、空白正規化）。published_at 取 HKEXnews 刊登日 2026-09-14。",
     "published_at": "2026-09-14",
     "publisher": "HKEXnews",
-    "retrieved_at": "2026-10-17",
+    "retrieved_at": "2026-10-20",
     "source_type": "filing",
     "storage_permission": "repo_excerpt",
-    "title": "Ligent Technologies, Inc.（9856.HK）Global Offering 招股書節錄：自製高功率 CW-DFB 雷射晶片（75／100mW 已量產、400mW 給 CPO 用 ELSFP 開發中）",
+    "supersedes_extraction_sha256": "a77d166a959dfc0123c31a8557ead63bd894b03a6470b3ba4198d563d83152d4",
+    "title": "Ligent Technologies, Inc.（9856.HK）Global Offering 招股書節錄：自製高功率 CW-DFB 雷射晶片（75／100mW 已量產、400mW 給 CPO 用 ELSFP 開發中）；LPO 收發器 2025 年、LRO 收發器 2026Q1 開始量產，1.6T 有全 DSP／LPO／LRO 三種架構",
     "url": "https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0914/2026091400007.pdf"
   },
   "sources": [
@@ -148,6 +235,16 @@
       "id": "ligent_hkex_prospectus_2026_09_14_s6",
       "locator": "BUSINESS — Laser chips in-house（PDF 第 146 頁）",
       "quote": "Since the launch of our high-power CW-DFB laser chips, some of our CW-DFB laser chips used in the optical transceiver production are produced in-house."
+    },
+    {
+      "id": "ligent_hkex_prospectus_2026_09_14_s7",
+      "locator": "SUMMARY（PDF 第 11 頁）",
+      "quote": "We have developed and commenced mass production of our linear-drive pluggable optics (LPO) based optical transceivers and linear receive optics (LRO) based optical transceivers in 2025 and the first quarter of 2026, respectively."
+    },
+    {
+      "id": "ligent_hkex_prospectus_2026_09_14_s8",
+      "locator": "BUSINESS — Our Products, 1.6T Series（PDF 第 148 頁；「full DSP ,」逗號前的空白是抽字原樣）",
+      "quote": "We offer 1.6T optical transceivers in three primary architectural approaches — full DSP , LPO and LRO."
     }
   ]
 }

@@ -1,0 +1,90 @@
+{
+  "claims": [
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：模組廠或 DSP 廠的一手寫出 LRO 的發送端改由主機端 SerDes 直接驅動、模組內不再放 DSP（等於變成 LPO），並成為該世代主流。核查頻率：每半年（OFC、OCP 與模組廠年報）。觸發後 48 小時：e1（tech:lro depends_on tech:optical_module_dsp）加註世代範圍或提撤回；重讀光模組 DSP 層的需求側。",
+      "id": "credo_dove850_lro_dsp_pr_2023_11_29_cl1",
+      "source_ids": [
+        "credo_dove850_lro_dsp_pr_2023_11_29_s1",
+        "credo_dove850_lro_dsp_pr_2023_11_29_s2"
+      ],
+      "statement": "Credo press release (2023-11-29) introducing the Dove 850 800G DSP 'optimized for Linear Receive Optics (LRO), also known within the industry as Half-retimed Linear Optics (HALO)': 'In an LRO transceiver or Active Optical Cable (AOC), only the transmit path from the electrical input to the optical line side output includes a DSP for signal retiming and equalization.' LRO therefore still needs a transmit-side optical module DSP — roughly half of a fully retimed design. A DSP vendor's own architectural description.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:optical_module_dsp",
+      "id": "e1",
+      "relation": "depends_on",
+      "source_ids": [
+        "credo_dove850_lro_dsp_pr_2023_11_29_s2"
+      ],
+      "src_id": "tech:lro"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "LRO",
+        "linear receive optics"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:lro",
+      "name": "Linear Receive Optics (LRO)",
+      "role": null,
+      "source_ids": [
+        "credo_dove850_lro_dsp_pr_2023_11_29_s1",
+        "credo_dove850_lro_dsp_pr_2023_11_29_s2"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "optical module DSP",
+        "DSPs inside optical modules"
+      ],
+      "attributes": {},
+      "confidence": 0.8,
+      "id": "tech:optical_module_dsp",
+      "name": "Optical module DSP (data-center optical interconnect)",
+      "role": null,
+      "source_ids": [
+        "credo_dove850_lro_dsp_pr_2023_11_29_s2"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "credo_dove850_lro_dsp_pr_2023_11_29",
+    "evidence_tier": 2,
+    "origin_entity": "Credo Technology Group Holding Ltd",
+    "permission_basis": "公司官網公開新聞稿；只保留研究必要的有限逐字節錄。published_at 取 dateline「SAN JOSE, Calif.—Nov. 29, 2023」（頁面 JSON-LD datePublished 同日）；IR 站 PDF 版同文。",
+    "published_at": "2023-11-29",
+    "publisher": "Credo 官網新聞稿（credosemi.com）",
+    "retrieved_at": "2026-10-20",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "Credo 新聞稿（2023-11-29）〈Credo Introduces World’s First 800G DSP for Linear Receive Optics, Targeting Hyperscale and AI Data Centers〉：Dove 850 為 LRO（亦稱 HALO）設計；LRO 只有發送路徑含 DSP",
+    "url": "https://credosemi.com/news/credo-introduces-worlds-first-800g-dsp-for-linear-receive-optics-targeting-hyperscale-and-ai-data-centers/"
+  },
+  "sources": [
+    {
+      "id": "credo_dove850_lro_dsp_pr_2023_11_29_s1",
+      "locator": "第一段（Dove 850 定位）",
+      "quote": "optimized for Linear Receive Optics (LRO), also known within the industry as Half-retimed Linear Optics (HALO)."
+    },
+    {
+      "id": "credo_dove850_lro_dsp_pr_2023_11_29_s2",
+      "locator": "第一段（LRO 的定義）",
+      "quote": "In an LRO transceiver or Active Optical Cable (AOC), only the transmit path from the electrical input to the optical line side output includes a DSP for signal retiming and equalization."
+    }
+  ]
+}

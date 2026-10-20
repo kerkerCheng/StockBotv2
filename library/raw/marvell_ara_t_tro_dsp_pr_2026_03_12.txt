@@ -1,0 +1,13 @@
+Source URL: https://investor.marvell.com/news-events/press-releases/detail/1013/marvell-ushers-in-the-1-6t-era-with-expanded-optical-dsp-platform-portfolio-redefining-ai-data-center-end-to-end-connectivity
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Marvell 新聞稿（2026-03-12）〈Marvell Ushers In the 1.6T Era with Expanded Optical DSP Platform Portfolio, Redefining AI Data Center End-to-End Connectivity〉：Ara T 為 8x200G 發送端重定時（TRO）光 DSP，2026 年第一季起送樣
+DATE: 2026-03-12
+RETRIEVED: 2026-10-20（原檔本機抽字、空白攤平後逐字核對）
+NOTE: Marvell 自己發的稿，寫的是 TRO；TRO＝LRO 靠新易盛 2025-03-31 稿與 OIF RTLR 定義推一步（Ara T 產品頁還沒查）。
+
+【新產品清單 Ara T 一點（抽字斷行：「Ara T」在上一行，引文自「the first」起）】
+"the first 8x200G transmit-retimed optics (TRO) DSP, delivers improved power efficiency and reduced total cost of ownership in network deployments."
+
+【Availability 段】
+"Marvell Ara X, Ara T, Petra and Aquila M DSPs are sampling to customers beginning in Q1 2026."

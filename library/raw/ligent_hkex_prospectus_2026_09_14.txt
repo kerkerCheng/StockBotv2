@@ -22,3 +22,11 @@ We are also developing 400mW CW-DFB laser chips which will be used in the CPO-ba
 
 【BUSINESS — Laser chips in-house（PDF 第 146 頁）】
 Since the launch of our high-power CW-DFB laser chips, some of our CW-DFB laser chips used in the optical transceiver production are produced in-house.
+
+[2026-10-20 更正走廊補段（HKEXnews 招股書 PDF 本機抽字、空白攤平後逐字核對）]
+
+【SUMMARY（PDF 第 11 頁）】
+We have developed and commenced mass production of our linear-drive pluggable optics (LPO) based optical transceivers and linear receive optics (LRO) based optical transceivers in 2025 and the first quarter of 2026, respectively.
+
+【BUSINESS — Our Products, 1.6T Series（PDF 第 148 頁；「full DSP ,」逗號前的空白是抽字原樣）】
+We offer 1.6T optical transceivers in three primary architectural approaches — full DSP , LPO and LRO.

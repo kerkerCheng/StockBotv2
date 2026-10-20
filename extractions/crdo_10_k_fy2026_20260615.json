@@ -1,0 +1,154 @@
+{
+  "claims": [
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：Credo 後續 10-K／10-Q／法說寫出 LRO 用 DSP 停產、不再推出下一代，或寫明 LRO 版本沒有量產客戶；或模組廠、雲端業者的一手寫出 LRO 用 DSP 的主要供應者是別家而非 Credo。核查頻率：每季（Credo 10-Q 與法說）。觸發後 48 小時：e1 依新文件降 confidence 或提撤回；重讀 LRO 層讀圖的供給側。",
+      "id": "crdo_10_k_fy2026_20260615_cl1",
+      "source_ids": [
+        "crdo_10_k_fy2026_20260615_s3",
+        "crdo_10_k_fy2026_20260615_s4",
+        "crdo_10_k_fy2026_20260615_s5"
+      ],
+      "statement": "Credo's FY2026 10-K (fiscal year ended 2026-05-02): each of its three 100G/lane optical DSP generations (Dove, Lark, Robin) 'also offers a unidirectional 8×100G variant designed for Linear Receive Optics (LRO), an architecture pioneered by Credo that removes DSP functionality from the module receiver', and its 200G/lane Bluebird DSP is designed for 'full‑retimed and LRO‑based 1.6 Tb/s transceivers'. Issuer self-report in a statutory filing (L8 weak; 'pioneered by Credo' is a self-claim, sole_source not asserted); no LRO shipment volume, revenue share or customer is given.",
+      "subject_id": "e1"
+    },
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：Credo 後續 10-K／10-Q 寫出退出或出售光 DSP 產品線，或光 DSP 不再列為產品；或模組廠一手寫出某一代主流光模組 DSP 的供應商不含 Credo。核查頻率：每季（Credo 10-Q 與法說）。觸發後 48 小時：e2 降 confidence 或提撤回；重讀光模組 DSP 層（tech:optical_module_dsp）的供給側。",
+      "id": "crdo_10_k_fy2026_20260615_cl2",
+      "source_ids": [
+        "crdo_10_k_fy2026_20260615_s1",
+        "crdo_10_k_fy2026_20260615_s2"
+      ],
+      "statement": "Credo's FY2026 10-K: Credo optical DSPs 'are core components within optical transceivers deployed in AI clusters, hyperscale data centers, service‑provider networks, enterprise networks, and 5G wireless infrastructure', now in their seventh generation at 50G/lane, 100G/lane and 200G/lane PAM4. Issuer self-report in a statutory filing; this section names no module-maker customer, unit volume or share.",
+      "subject_id": "e2"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "tech:lro",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "crdo_10_k_fy2026_20260615_s3",
+        "crdo_10_k_fy2026_20260615_s4",
+        "crdo_10_k_fy2026_20260615_s5"
+      ],
+      "src_id": "co:credo"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "tech:optical_module_dsp",
+      "id": "e2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "crdo_10_k_fy2026_20260615_s1",
+        "crdo_10_k_fy2026_20260615_s2"
+      ],
+      "src_id": "co:credo"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "Credo",
+        "Credo Technology Group Holding Ltd",
+        "Credo Semiconductor",
+        "CRDO"
+      ],
+      "attributes": {
+        "ticker": "CRDO"
+      },
+      "confidence": 0.9,
+      "id": "co:credo",
+      "name": "Credo Technology",
+      "role": null,
+      "source_ids": [
+        "crdo_10_k_fy2026_20260615_s1",
+        "crdo_10_k_fy2026_20260615_s4"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "LRO",
+        "linear receive optics"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:lro",
+      "name": "Linear Receive Optics (LRO)",
+      "role": null,
+      "source_ids": [
+        "crdo_10_k_fy2026_20260615_s4",
+        "crdo_10_k_fy2026_20260615_s5"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "optical module DSP",
+        "DSPs inside optical modules"
+      ],
+      "attributes": {},
+      "confidence": 0.8,
+      "id": "tech:optical_module_dsp",
+      "name": "Optical module DSP (data-center optical interconnect)",
+      "role": null,
+      "source_ids": [
+        "crdo_10_k_fy2026_20260615_s1",
+        "crdo_10_k_fy2026_20260615_s2"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "crdo_10_k_fy2026_20260615",
+    "evidence_tier": 1,
+    "origin_entity": "Credo Technology Group Holding Ltd",
+    "permission_basis": "SEC EDGAR 公開法定申報；只保留研究必要的有限逐字節錄（HTML 轉文字、空白攤平；U+2011 不斷行連字號照原文）。published_at 取 EDGAR 申報索引的檔案日 2026-06-15（會計年度止於 2026-05-02），不是抓取日。",
+    "published_at": "2026-06-15",
+    "publisher": "SEC EDGAR（Form 10-K，accession 0001628280-26-043303）",
+    "retrieved_at": "2026-10-20",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Credo Technology Group Holding Ltd Form 10-K（fiscal year ended 2026-05-02）Item 1 Business — Optical DSPs 節錄：光 DSP 已到第七代；100G/lane 三代各有 LRO 專用的單向 8×100G 版本；200G/lane Bluebird 支援全重定時與 LRO 的 1.6T 收發器",
+    "url": "https://www.sec.gov/Archives/edgar/data/1807794/000162828026043303/crdo-20260502.htm"
+  },
+  "sources": [
+    {
+      "id": "crdo_10_k_fy2026_20260615_s1",
+      "locator": "Item 1. Business — Optical DSPs 第一段（10-K 頁碼 11）",
+      "quote": "Credo optical digital signal processors (DSPs) are core components within optical transceivers deployed in AI clusters, hyperscale data centers, service‑provider networks, enterprise networks, and 5G wireless infrastructure."
+    },
+    {
+      "id": "crdo_10_k_fy2026_20260615_s2",
+      "locator": "Item 1. Business — Optical DSPs 第二段",
+      "quote": "Now in their seventh generation, Credo DSPs operating at 50G/lane, 100G/lane and 200G/lane PAM4 signaling combine high performance, low latency, power efficiency, and high reliability."
+    },
+    {
+      "id": "crdo_10_k_fy2026_20260615_s3",
+      "locator": "Item 1. Business — Optical DSPs，Dove／Lark／Robin 段首句",
+      "quote": "The Credo Dove, Lark, and Robin families operate at 100G/lane across three successive technology generations."
+    },
+    {
+      "id": "crdo_10_k_fy2026_20260615_s4",
+      "locator": "Item 1. Business — Optical DSPs，Dove／Lark／Robin 段末句",
+      "quote": "Each generation also offers a unidirectional 8×100G variant designed for Linear Receive Optics (LRO), an architecture pioneered by Credo that removes DSP functionality from the module receiver to improve energy efficiency in large‑scale AI deployments."
+    },
+    {
+      "id": "crdo_10_k_fy2026_20260615_s5",
+      "locator": "Item 1. Business — Optical DSPs，Bluebird 段",
+      "quote": "Bluebird is designed to enable a new generation of full‑retimed and LRO‑based 1.6 Tb/s transceivers, delivering high performance, low power consumption, and high reliability."
+    }
+  ]
+}

@@ -1,0 +1,90 @@
+{
+  "claims": [
+    {
+      "confidence": 0.55,
+      "demand_proof_level": "speculative",
+      "disproof_condition": "條件：Marvell 後續文件寫出 Ara T 取消或量產延到 2027 下半年以後；或 OIF、Marvell 產品頁或模組廠一手寫出 TRO 與 LRO 不是同一種架構（例如 TRO 在接收端仍保留部分 DSP 等化）。核查頻率：每半年（Marvell 法說、OFC）。觸發後 48 小時：e1 降 confidence 或提撤回；若是定義不同，連 tech:lro 的別名與本包其他 supplies_to tech:lro 一起重審。",
+      "id": "marvell_ara_t_tro_dsp_pr_2026_03_12_cl1",
+      "source_ids": [
+        "marvell_ara_t_tro_dsp_pr_2026_03_12_s1",
+        "marvell_ara_t_tro_dsp_pr_2026_03_12_s2"
+      ],
+      "statement": "Marvell press release (2026-03-12): Ara T is 'the first 8x200G transmit-retimed optics (TRO) DSP' (Marvell's self-claim), and 'Marvell Ara X, Ara T, Petra and Aquila M DSPs are sampling to customers beginning in Q1 2026' (qualification stage: sampling). The release says TRO, not LRO; reading TRO as LRO rests on Eoptolink's 2025-03-31 release ('Other names for the same approach are Transmit Retimed Optics (TRO) or Retimed Transmit Linear Receive (RTLR) optics') and OIF's RTLR definition (retimed transmitter, linear receiver) — Marvell itself does not describe the receive side. No customer or production timeline is given.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.55,
+      "dst_id": "tech:lro",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "marvell_ara_t_tro_dsp_pr_2026_03_12_s1",
+        "marvell_ara_t_tro_dsp_pr_2026_03_12_s2"
+      ],
+      "src_id": "co:marvell_technology"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "MRVL",
+        "Marvell"
+      ],
+      "attributes": {},
+      "confidence": 0.95,
+      "id": "co:marvell_technology",
+      "name": "Marvell Technology",
+      "role": null,
+      "source_ids": [
+        "marvell_ara_t_tro_dsp_pr_2026_03_12_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "LRO",
+        "linear receive optics"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:lro",
+      "name": "Linear Receive Optics (LRO)",
+      "role": null,
+      "source_ids": [
+        "marvell_ara_t_tro_dsp_pr_2026_03_12_s1"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "marvell_ara_t_tro_dsp_pr_2026_03_12",
+    "evidence_tier": 2,
+    "origin_entity": "Marvell Technology, Inc.",
+    "permission_basis": "公司投資人關係網站公開新聞稿；只保留研究必要的有限逐字節錄。published_at 取頁面 <time datetime=\"2026-03-12T09:02:00\"> 與正文「Released March 12, 2026」。",
+    "published_at": "2026-03-12",
+    "publisher": "Marvell 投資人關係網站",
+    "retrieved_at": "2026-10-20",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "Marvell 新聞稿（2026-03-12）〈Marvell Ushers In the 1.6T Era with Expanded Optical DSP Platform Portfolio, Redefining AI Data Center End-to-End Connectivity〉：Ara T 為 8x200G 發送端重定時（TRO）光 DSP，2026 年第一季起送樣",
+    "url": "https://investor.marvell.com/news-events/press-releases/detail/1013/marvell-ushers-in-the-1-6t-era-with-expanded-optical-dsp-platform-portfolio-redefining-ai-data-center-end-to-end-connectivity"
+  },
+  "sources": [
+    {
+      "id": "marvell_ara_t_tro_dsp_pr_2026_03_12_s1",
+      "locator": "新產品清單 Ara T 一點（抽字斷行：「Ara T」在上一行，引文自「the first」起）",
+      "quote": "the first 8x200G transmit-retimed optics (TRO) DSP, delivers improved power efficiency and reduced total cost of ownership in network deployments."
+    },
+    {
+      "id": "marvell_ara_t_tro_dsp_pr_2026_03_12_s2",
+      "locator": "Availability 段",
+      "quote": "Marvell Ara X, Ara T, Petra and Aquila M DSPs are sampling to customers beginning in Q1 2026."
+    }
+  ]
+}

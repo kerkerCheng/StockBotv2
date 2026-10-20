@@ -12,6 +12,32 @@
       ],
       "statement": "Eoptolink (新易盛, 300502.SZ) 2026 interim report (cninfo, 2026-08-25): the company has launched an optical circuit switch (OCS) product carrying its self-developed MEMS chip, and released the NX200/300 series OCS based on self-developed 3D MEMS technology. Issuer self-report (L8 weak): no customer, shipment, revenue or fab named — a develops edge, not supply. Relevance: on the graph the 3D MEMS mirror array (the OCS optical core) had a single supplier edge (Silex Microsystems); this shows the mirror-array design is not confined to one house.",
       "subject_id": "e2"
+    },
+    {
+      "confidence": 0.55,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "條件：新易盛 2026 年報或之後的定期報告不再提 LRO 產品，或寫明 LRO 停在送樣、沒有量產。核查頻率：每半年（新易盛年報、半年報）。觸發後 48 小時：e3 降 confidence 或提撤回；重讀 LRO 層讀圖的供給側。",
+      "id": "eoptolink_300502_h1_2026_report_ocs_cl2",
+      "source_ids": [
+        "eoptolink_300502_h1_2026_report_ocs_s1",
+        "eoptolink_300502_h1_2026_report_ocs_s2",
+        "eoptolink_300502_h1_2026_report_ocs_s4"
+      ],
+      "statement": "Eoptolink (新易盛, 300502.SZ) 2026 interim report (core competitiveness — technology): it has launched a full 400G/800G/1.6T module range based on silicon photonics and TFLN 'and built multiple high-density, low-power optical module products around LPO/LRO, XPO, NPO and other technical approaches'; the business section says its solution set covers 'LPO/LRO'. Issuer self-report: LPO and LRO are written together, with no split of which products are LRO and no volume or customer.",
+      "subject_id": "e3"
+    },
+    {
+      "confidence": 0.55,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "條件：新易盛 2026 年報或之後的定期報告不再提 LPO 產品，或寫明 LPO 停產。核查頻率：每半年（新易盛年報、半年報）。觸發後 48 小時：e4 降 confidence 或提撤回；重讀 LPO 層讀圖的供給側。",
+      "id": "eoptolink_300502_h1_2026_report_ocs_cl3",
+      "source_ids": [
+        "eoptolink_300502_h1_2026_report_ocs_s1",
+        "eoptolink_300502_h1_2026_report_ocs_s2",
+        "eoptolink_300502_h1_2026_report_ocs_s4"
+      ],
+      "statement": "Same passages of Eoptolink's 2026 interim report: optical module products built around 'LPO/LRO' and a solution set covering 'LPO/LRO' — seller-side evidence that Eoptolink sells LPO modules. LPO and LRO are not split; no LPO volume or buyer is named.",
+      "subject_id": "e4"
     }
   ],
   "edges": [
@@ -38,6 +64,32 @@
         "eoptolink_300502_h1_2026_report_ocs_s1",
         "eoptolink_300502_h1_2026_report_ocs_s2",
         "eoptolink_300502_h1_2026_report_ocs_s3"
+      ],
+      "src_id": "co:eoptolink"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.6,
+      "dst_id": "tech:lro",
+      "id": "e3",
+      "relation": "supplies_to",
+      "source_ids": [
+        "eoptolink_300502_h1_2026_report_ocs_s1",
+        "eoptolink_300502_h1_2026_report_ocs_s2",
+        "eoptolink_300502_h1_2026_report_ocs_s4"
+      ],
+      "src_id": "co:eoptolink"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.6,
+      "dst_id": "tech:lpo",
+      "id": "e4",
+      "relation": "supplies_to",
+      "source_ids": [
+        "eoptolink_300502_h1_2026_report_ocs_s1",
+        "eoptolink_300502_h1_2026_report_ocs_s2",
+        "eoptolink_300502_h1_2026_report_ocs_s4"
       ],
       "src_id": "co:eoptolink"
     }
@@ -97,6 +149,40 @@
         "eoptolink_300502_h1_2026_report_ocs_s3"
       ],
       "type": "TechNode"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "LRO",
+        "linear receive optics"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:lro",
+      "name": "Linear Receive Optics (LRO)",
+      "role": null,
+      "source_ids": [
+        "eoptolink_300502_h1_2026_report_ocs_s2",
+        "eoptolink_300502_h1_2026_report_ocs_s4"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "LPO",
+        "linear pluggable optics"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:lpo",
+      "name": "Linear Pluggable Optics (LPO)",
+      "role": null,
+      "source_ids": [
+        "eoptolink_300502_h1_2026_report_ocs_s2",
+        "eoptolink_300502_h1_2026_report_ocs_s4"
+      ],
+      "type": "TechNode"
     }
   ],
   "schema_version": "0.1",
@@ -107,10 +193,11 @@
     "permission_basis": "深交所上市公司公開披露的半年度報告（巨潮資訊）；只保留研究必要的有限逐字節錄（pypdf 本機抽字、空白正規化——中文詞間偶有抽字多出的空格，照抽字原樣）。published_at 取披露日 2026-08-25。",
     "published_at": "2026-08-25",
     "publisher": "巨潮資訊（深交所指定披露網站）",
-    "retrieved_at": "2026-10-17",
+    "retrieved_at": "2026-10-20",
     "source_type": "filing",
     "storage_permission": "repo_excerpt",
-    "title": "成都新易盛通信技术股份有限公司 2026年半年度报告節錄：自研 MEMS 芯片的光路交换机（OCS）、NX200/300 系列",
+    "supersedes_extraction_sha256": "605570be1403e30e91f888fe326ef2ee8e0fe42ade9e3a9e1b191447364d27d0",
+    "title": "成都新易盛通信技术股份有限公司 2026年半年度报告節錄：自研 MEMS 芯片的光路交换机（OCS）、NX200/300 系列；圍繞 LPO/LRO、XPO、NPO 的光模組產品（核心竞争力分析）",
     "url": "http://static.cninfo.com.cn/finalpage/2026-08-25/1225499406.PDF"
   },
   "sources": [
@@ -128,6 +215,11 @@
       "id": "eoptolink_300502_h1_2026_report_ocs_s3",
       "locator": "第三节 二、核心竞争力分析——研发（PDF 第 13 頁）",
       "quote": "先后推出基于 400G PAM4 的新一代 1.6T DR4 OSFP 光模块、基于硅光技术的 6.4T NPO 模块和行业首款 12.8T XPO 光模块,并发布基于自研 3D MEMS 技术的 NX200/300 系列 OCS 产品。"
+    },
+    {
+      "id": "eoptolink_300502_h1_2026_report_ocs_s4",
+      "locator": "第三节 二、核心竞争力分析——1、技术优势（PDF 第 13 頁；同段，緊接在 s3 之前）",
+      "quote": "公司已成功推出基于硅光（SiPh）和薄膜铌酸 锂（TFLN）技术的 400G、800G 和 1.6T 全系列光模块产品，并围绕 LPO/LRO、XPO、NPO 等技术方案打造出多款具备 高密度、低功耗优势的光模块产品。"
     }
   ]
 }

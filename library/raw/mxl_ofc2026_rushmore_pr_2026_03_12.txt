@@ -1,0 +1,13 @@
+Source URL: https://investors.maxlinear.com/press-releases/detail/602/maxlinear-to-showcase-nextgeneration-1-6t-rushmore-dsp
+
+Excerpt:
+[EXCERPT — 有限逐字引文] MaxLinear 新聞稿（2026-03-12）〈MaxLinear to Showcase Next‑Generation 1.6T Rushmore DSP Live at OFC 2026〉：OFC 展出採用其 Keystone 400G／800G 與 Rushmore DSP 的客戶光模組，用途含全重定時、LRO 與 AEC
+DATE: 2026-03-12
+RETRIEVED: 2026-10-20（原檔本機抽字、空白攤平後逐字核對）
+NOTE: MaxLinear 自己發的稿；這句把 Keystone、Rushmore 兩族配三種用途，沒說哪一顆用在 LRO。是展示，不是出貨。
+
+【第一段（發稿主體；U+2011 不斷行連字號照原文）】
+"MaxLinear, Inc. (Nasdaq: MXL), a leading provider of high‑speed interconnect ICs for data center, metro, and wireless transport networks, today announced it will showcase its next‑generation 1.6T PHY chipset at OFC 2026, March 17–19, in South Hall, Booth 1049."
+
+【Live Demos 段末】
+"In addition to Rushmore demos, MaxLinear will also showcase customer optical modules featuring its Keystone 400G and 800G DSPs, as well as Rushmore DSPs, for fully retimed optical transceiver, LRO and AEC applications."

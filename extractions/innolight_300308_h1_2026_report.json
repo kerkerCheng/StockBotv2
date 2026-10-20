@@ -1,0 +1,178 @@
+{
+  "claims": [
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：中際旭創 2026 年報或之後的定期報告產品表不再列 LRO，或寫明 LRO 產品停產。核查頻率：每半年（中際旭創年報、半年報）。觸發後 48 小時：e1 降 confidence 或提撤回；重讀 LRO 層讀圖的供給側。",
+      "id": "innolight_300308_h1_2026_report_cl1",
+      "source_ids": [
+        "innolight_300308_h1_2026_report_s1",
+        "innolight_300308_h1_2026_report_s2"
+      ],
+      "statement": "Zhongji Innolight 2026 interim report (statutory; main products table): its 800G OSFP 112 module family (VCSEL, EML and silicon photonics; 100 m to 10 km) 'also offers LRO and LPO products'. Issuer self-report; the 1.6T row does not mention LRO, and no LRO volume or customer is given.",
+      "subject_id": "e1"
+    },
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：中際旭創後續定期報告產品表不再列 LPO，或寫明 LPO 產品停產。核查頻率：每半年（中際旭創年報、半年報）。觸發後 48 小時：e2 降 confidence 或提撤回；重讀 LPO 層讀圖的供給側。",
+      "id": "innolight_300308_h1_2026_report_cl2",
+      "source_ids": [
+        "innolight_300308_h1_2026_report_s1",
+        "innolight_300308_h1_2026_report_s2"
+      ],
+      "statement": "Same 800G OSFP 112 row of Zhongji Innolight's 2026 interim report: the family 'also offers LRO and LPO products' — seller-side evidence that the largest module maker sells LPO at 800G. No LPO volume or buyer is named.",
+      "subject_id": "e2"
+    },
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：中際旭創或其他模組廠、DSP 廠的一手寫出 LRO 發送端不再用 DSP（改由主機端 SerDes 直接驅動），或 LRO 的定義改成接收端也保留 DSP。核查頻率：每半年（中際旭創年報、半年報；OFC）。觸發後 48 小時：e3 加註或提撤回；定義改變時連本包各家 supplies_to tech:lro 一起重審。",
+      "id": "innolight_300308_h1_2026_report_cl3",
+      "source_ids": [
+        "innolight_300308_h1_2026_report_s3"
+      ],
+      "statement": "Zhongji Innolight 2026 interim report (industry technology section, '3、线性光学LPO/LRO'): the main difference between LPO and LRO is that LPO removes the DSP at both the transmit and receive ends, while LRO removes it only at the receive end and keeps a DSP at the transmit end. A module maker (a DSP buyer) stating that LRO still needs a transmit-side DSP; the accompanying diagram is credited to Credo, so the framing may follow Credo's.",
+      "subject_id": "e3"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "tech:lro",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "innolight_300308_h1_2026_report_s1",
+        "innolight_300308_h1_2026_report_s2"
+      ],
+      "src_id": "co:zhongji_innolight"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "tech:lpo",
+      "id": "e2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "innolight_300308_h1_2026_report_s1",
+        "innolight_300308_h1_2026_report_s2"
+      ],
+      "src_id": "co:zhongji_innolight"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:optical_module_dsp",
+      "id": "e3",
+      "relation": "depends_on",
+      "source_ids": [
+        "innolight_300308_h1_2026_report_s3"
+      ],
+      "src_id": "tech:lro"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "Innolight",
+        "中際旭創",
+        "中际旭创",
+        "300308.SZ"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "co:zhongji_innolight",
+      "name": "Zhongji Innolight",
+      "role": "leader",
+      "source_ids": [
+        "innolight_300308_h1_2026_report_s1",
+        "innolight_300308_h1_2026_report_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "LRO",
+        "linear receive optics"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:lro",
+      "name": "Linear Receive Optics (LRO)",
+      "role": null,
+      "source_ids": [
+        "innolight_300308_h1_2026_report_s2",
+        "innolight_300308_h1_2026_report_s3"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "LPO",
+        "linear pluggable optics"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:lpo",
+      "name": "Linear Pluggable Optics (LPO)",
+      "role": null,
+      "source_ids": [
+        "innolight_300308_h1_2026_report_s2",
+        "innolight_300308_h1_2026_report_s3"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "optical module DSP",
+        "DSPs inside optical modules"
+      ],
+      "attributes": {},
+      "confidence": 0.8,
+      "id": "tech:optical_module_dsp",
+      "name": "Optical module DSP (data-center optical interconnect)",
+      "role": null,
+      "source_ids": [
+        "innolight_300308_h1_2026_report_s3"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "innolight_300308_h1_2026_report",
+    "evidence_tier": 1,
+    "origin_entity": "Zhongji Innolight Co., Ltd.",
+    "permission_basis": "深交所上市公司公開披露的半年度報告（巨潮資訊）；只保留研究必要的有限逐字節錄（PDF 本機抽字、空白攤平；中文詞間抽字多出的空格照原樣）。published_at 取巨潮 finalpage 路徑的披露日 2026-08-22。",
+    "published_at": "2026-08-22",
+    "publisher": "巨潮資訊（深交所指定披露網站）",
+    "retrieved_at": "2026-10-20",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "中际旭创股份有限公司 2026 年半年度报告節錄（2026-08-22）：800G OSFP 系列同時提供 LRO 及 LPO 產品；LPO 收發兩端去除 DSP、LRO 只在接收端去除、發送端仍保留 DSP",
+    "url": "http://static.cninfo.com.cn/finalpage/2026-08-22/1225491753.PDF"
+  },
+  "sources": [
+    {
+      "id": "innolight_300308_h1_2026_report_s1",
+      "locator": "第一节 释义（PDF 第 5 頁）",
+      "quote": "本公司、公司、中际旭创 指 中际旭创股份有限公司"
+    },
+    {
+      "id": "innolight_300308_h1_2026_report_s2",
+      "locator": "第三节 一（二）主要产品及应用场景，800G OSFP 列（PDF 第 10 頁；表格抽字斷行空白照留）",
+      "quote": "公司提供全面的800G OSFP 112光模块 产品组合，采用VCSEL、EML及硅光 技术，支持100米、500米、2公里至10 公里的链路距离。该产品系列同时提供 LRO及LPO产品。"
+    },
+    {
+      "id": "innolight_300308_h1_2026_report_s3",
+      "locator": "第三节 行业技术「3、线性光学LPO/LRO」（PDF 第 17 頁）",
+      "quote": "LPO和 LRO的主要区别在于LPO在收发两端都去除了DSP，而LRO仅在接收端去除DSP，发送端仍保留 DSP。"
+    }
+  ]
+}

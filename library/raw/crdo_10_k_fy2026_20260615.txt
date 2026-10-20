@@ -1,0 +1,22 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1807794/000162828026043303/crdo-20260502.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Credo Technology Group Holding Ltd Form 10-K（fiscal year ended 2026-05-02）Item 1 Business — Optical DSPs 節錄：光 DSP 已到第七代；100G/lane 三代各有 LRO 專用的單向 8×100G 版本；200G/lane Bluebird 支援全重定時與 LRO 的 1.6T 收發器
+DATE: 2026-06-15
+RETRIEVED: 2026-10-20（原檔本機抽字、空白攤平後逐字核對）
+NOTE: Credo 自己的法定文件（自述）。「pioneered by Credo」是自稱。本節沒有 LRO 出貨量、營收占比或客戶。
+
+【Item 1. Business — Optical DSPs 第一段（10-K 頁碼 11）】
+"Credo optical digital signal processors (DSPs) are core components within optical transceivers deployed in AI clusters, hyperscale data centers, service‑provider networks, enterprise networks, and 5G wireless infrastructure."
+
+【Item 1. Business — Optical DSPs 第二段】
+"Now in their seventh generation, Credo DSPs operating at 50G/lane, 100G/lane and 200G/lane PAM4 signaling combine high performance, low latency, power efficiency, and high reliability."
+
+【Item 1. Business — Optical DSPs，Dove／Lark／Robin 段首句】
+"The Credo Dove, Lark, and Robin families operate at 100G/lane across three successive technology generations."
+
+【Item 1. Business — Optical DSPs，Dove／Lark／Robin 段末句】
+"Each generation also offers a unidirectional 8×100G variant designed for Linear Receive Optics (LRO), an architecture pioneered by Credo that removes DSP functionality from the module receiver to improve energy efficiency in large‑scale AI deployments."
+
+【Item 1. Business — Optical DSPs，Bluebird 段】
+"Bluebird is designed to enable a new generation of full‑retimed and LRO‑based 1.6 Tb/s transceivers, delivering high performance, low power consumption, and high reliability."

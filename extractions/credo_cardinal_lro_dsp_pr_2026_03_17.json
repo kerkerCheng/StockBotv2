@@ -1,0 +1,103 @@
+{
+  "claims": [
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "speculative",
+      "disproof_condition": "條件：到 2027-06-30，Credo 或 Jabil 都沒有文件寫出 Cardinal 的 LRO DSP 進入量產或出貨；或 Jabil 的 1.6T LRO 模組公開改用別家 DSP。核查頻率：每季（Credo 法說、Jabil 法說與新聞稿）。觸發後 48 小時：這份文件撐的那一筆 assertion 降 confidence 或提撤回；重讀 LRO 層讀圖的供給側。",
+      "id": "credo_cardinal_lro_dsp_pr_2026_03_17_cl1",
+      "source_ids": [
+        "credo_cardinal_lro_dsp_pr_2026_03_17_s1",
+        "credo_cardinal_lro_dsp_pr_2026_03_17_s2",
+        "credo_cardinal_lro_dsp_pr_2026_03_17_s3"
+      ],
+      "statement": "Credo press release (2026-03-17): its second-generation 1.6T optical DSP family Cardinal 'consists of dedicated DSPs for full-retimed and linear receive optics (LRO) applications', and 'Credo is now sampling the Cardinal DSP family to lead customers' (qualification stage: sampling, for this generation only). A Jabil photonics VP is quoted saying Cardinal's LRO solution 'will be a critical enabler' for Jabil's ultra-low-power optics — a forward-looking statement printed in the supplier's own release, not a purchase or design-in disclosure.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.6,
+      "dst_id": "tech:lro",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "credo_cardinal_lro_dsp_pr_2026_03_17_s1",
+        "credo_cardinal_lro_dsp_pr_2026_03_17_s2",
+        "credo_cardinal_lro_dsp_pr_2026_03_17_s3"
+      ],
+      "src_id": "co:credo"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "Credo",
+        "Credo Technology Group Holding Ltd",
+        "Credo Semiconductor",
+        "CRDO"
+      ],
+      "attributes": {
+        "ticker": "CRDO"
+      },
+      "confidence": 0.9,
+      "id": "co:credo",
+      "name": "Credo Technology",
+      "role": null,
+      "source_ids": [
+        "credo_cardinal_lro_dsp_pr_2026_03_17_s1",
+        "credo_cardinal_lro_dsp_pr_2026_03_17_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "LRO",
+        "linear receive optics"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:lro",
+      "name": "Linear Receive Optics (LRO)",
+      "role": null,
+      "source_ids": [
+        "credo_cardinal_lro_dsp_pr_2026_03_17_s1",
+        "credo_cardinal_lro_dsp_pr_2026_03_17_s3"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "credo_cardinal_lro_dsp_pr_2026_03_17",
+    "evidence_tier": 2,
+    "origin_entity": "Credo Technology Group Holding Ltd",
+    "permission_basis": "公司投資人關係網站公開新聞稿；只保留研究必要的有限逐字節錄。published_at 取頁面正文日期「March 17, 2026」。",
+    "published_at": "2026-03-17",
+    "publisher": "Credo 投資人關係網站（Business Wire 稿）",
+    "retrieved_at": "2026-10-20",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "Credo 新聞稿（2026-03-17）〈Credo Introduces Cardinal: A Low‑Power 1.6T Optical DSP Family Engineered for Massive‑Scale AI Fabrics〉：Cardinal 系列有全重定時與 LRO 專用 DSP、正在送樣主要客戶；Jabil 光子事業 VP 前瞻引言",
+    "url": "https://investors.credosemi.com/news-events/news/news-details/2026/Credo-Introduces-Cardinal-A-LowPower-1-6T-Optical-DSP-Family-Engineered-for-MassiveScale-AI-Fabrics/default.aspx"
+  },
+  "sources": [
+    {
+      "id": "credo_cardinal_lro_dsp_pr_2026_03_17_s1",
+      "locator": "News Highlights 第三點",
+      "quote": "The Cardinal family consists of dedicated DSPs for full-retimed and linear receive optics (LRO) applications."
+    },
+    {
+      "id": "credo_cardinal_lro_dsp_pr_2026_03_17_s2",
+      "locator": "Product Availability",
+      "quote": "Credo is now sampling the Cardinal DSP family to lead customers."
+    },
+    {
+      "id": "credo_cardinal_lro_dsp_pr_2026_03_17_s3",
+      "locator": "Jabil 引言段（Jason Wildt, VP/GM, Photonics at Jabil）",
+      "quote": "“Credo’s LRO solution in the Cardinal family will be a critical enabler for our teams to deliver ultra-low power optical solutions designed for rack-scale AI infrastructure,” said Jason Wildt, VP/GM, Photonics at Jabil"
+    }
+  ]
+}

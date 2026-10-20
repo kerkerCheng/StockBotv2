@@ -1,0 +1,16 @@
+Source URL: https://investors.credosemi.com/news-events/news/news-details/2026/Credo-Introduces-Cardinal-A-LowPower-1-6T-Optical-DSP-Family-Engineered-for-MassiveScale-AI-Fabrics/default.aspx
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Credo 新聞稿（2026-03-17）〈Credo Introduces Cardinal: A Low‑Power 1.6T Optical DSP Family Engineered for Massive‑Scale AI Fabrics〉：Cardinal 系列有全重定時與 LRO 專用 DSP、正在送樣主要客戶；Jabil 光子事業 VP 前瞻引言
+DATE: 2026-03-17
+RETRIEVED: 2026-10-20（原檔本機抽字、空白攤平後逐字核對）
+NOTE: Credo 自己發的稿；Jabil 那句是刊在供應商稿裡的前瞻句，不算客戶端一手。是送樣，不是量產。
+
+【News Highlights 第三點】
+"The Cardinal family consists of dedicated DSPs for full-retimed and linear receive optics (LRO) applications."
+
+【Product Availability】
+"Credo is now sampling the Cardinal DSP family to lead customers."
+
+【Jabil 引言段（Jason Wildt, VP/GM, Photonics at Jabil）】
+"“Credo’s LRO solution in the Cardinal family will be a critical enabler for our teams to deliver ultra-low power optical solutions designed for rack-scale AI infrastructure,” said Jason Wildt, VP/GM, Photonics at Jabil"

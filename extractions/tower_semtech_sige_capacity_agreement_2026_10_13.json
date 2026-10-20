@@ -14,6 +14,17 @@
       ],
       "statement": "Tower Semiconductor and Semtech (joint release, 2026-10-13): expanded multi-year agreement under which 'Semtech will invest in securing dedicated silicon germanium (SiGe) capacity at Tower in support of its strong design wins and demand for AI Data Center optical interconnect components'; the secured capacity spans Tower's fabs in the US, Israel and Japan and builds on current production. Semtech's TIAs, modulator and laser drivers and linear equalizers are built on Tower's SiGe process and serve FRO, LPO, LRO, NPO, XPO, linear equalizers on PCB and ACC. No contract value or capacity figure is disclosed.",
       "subject_id": "e2"
+    },
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：Semtech 後續 10-K／10-Q、法說或產品頁不再把 LRO 列為其 TIA／驅動器服務的架構，或寫明 LRO 用的線性 TIA 由別家主供、Semtech 沒有量產。核查頻率：每半年（Semtech 10-K／10-Q）。觸發後 48 小時：e6 降 confidence 或提撤回；重讀 LRO 層讀圖的供給側。",
+      "id": "tower_semtech_sige_capacity_agreement_2026_10_13_cl2",
+      "source_ids": [
+        "tower_semtech_sige_capacity_agreement_2026_10_13_s2"
+      ],
+      "statement": "Tower Semiconductor / Semtech joint release (2026-10-13): Semtech's signal-integrity portfolio (TIAs, modulator and laser drivers, linear equalizers), built on Tower's SiGe process, 'serves fully retimed optics (FRO), linear pluggable optics (LPO), linear receive optics (LRO), …'. The same sentence already supports Semtech supplies_to LPO; this records the LRO half (an LRO module's linear receive side needs a linear TIA). No LRO-specific product, customer or volume is named.",
+      "subject_id": "e6"
     }
   ],
   "edges": [
@@ -77,6 +88,17 @@
         "tower_semtech_sige_capacity_agreement_2026_10_13_s2"
       ],
       "src_id": "tech:tia_driver"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.6,
+      "dst_id": "tech:lro",
+      "id": "e6",
+      "relation": "supplies_to",
+      "source_ids": [
+        "tower_semtech_sige_capacity_agreement_2026_10_13_s2"
+      ],
+      "src_id": "co:semtech"
     }
   ],
   "nodes": [
@@ -169,6 +191,22 @@
         "tower_semtech_sige_capacity_agreement_2026_10_13_s4"
       ],
       "type": "TechNode"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "LRO",
+        "linear receive optics"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:lro",
+      "name": "Linear Receive Optics (LRO)",
+      "role": null,
+      "source_ids": [
+        "tower_semtech_sige_capacity_agreement_2026_10_13_s2"
+      ],
+      "type": "TechNode"
     }
   ],
   "schema_version": "0.1",
@@ -179,9 +217,10 @@
     "permission_basis": "Tower Semiconductor 官網公開新聞稿（與 Semtech 聯合發布）；只保留研究必要的有限逐字節錄。published_at 取 dateline 2026-10-13。",
     "published_at": "2026-10-13",
     "publisher": "Tower Semiconductor（官網新聞稿）",
-    "retrieved_at": "2026-10-18",
+    "retrieved_at": "2026-10-20",
     "source_type": "news",
     "storage_permission": "repo_excerpt",
+    "supersedes_extraction_sha256": "305538c0be72420686cc96100580316d6de694d71fa1c19191ad32d96c14e562",
     "title": "Tower／Semtech 聯合新聞稿：擴大多年期協議，Semtech 出資鎖定 Tower 在美、以、日三地的專用 SiGe 產能（TIA、驅動器、線性等化器；服務 LPO、LRO、NPO、XPO）",
     "url": "https://towersemi.com/2026/10/13/10132026-2/"
   },
