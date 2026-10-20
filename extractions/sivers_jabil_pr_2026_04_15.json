@@ -12,6 +12,18 @@
       ],
       "statement": "Sivers 與 Jabil 於 2026-04-15 官方新聞稿宣布合作開發使用 Sivers DFB 雷射的 1.6T LRO（linear receive optical）pluggable 光收發模組，鎖定次世代 hyperscale AI 資料中心；新聞稿本身未揭露具體出貨時程或量產規模，屬開發階段合作宣布，非已確認營收。",
       "subject_id": "co:sivers_semiconductors"
+    },
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：Jabil 或 Sivers 後續新聞稿、法說或產品頁把這顆 1.6T 模組改寫成 LPO（收發兩端都不用 DSP）或全重定時（接收端放回 DSP），或寫明專案改成另一種架構。核查頻率：每季（Jabil、Sivers 法說與新聞稿）。觸發後 48 小時：e3 改接正確的 tech 節點或提撤回；重讀 LRO 層讀圖的供給側與 Sivers 敘事。",
+      "id": "sivers_jabil_pr_2026_04_15_cl2",
+      "source_ids": [
+        "sivers_jabil_pr_2026_04_15_s1",
+        "sivers_jabil_pr_2026_04_15_s3"
+      ],
+      "statement": "Sivers Semiconductors press release (2026-04-15): 'Jabil plans to develop a 1.6T linear receive optical (LRO) transceiver module using Sivers' high-performance Distributed Feedback (DFB) lasers', and Jabil's photonics VP says the collaboration will let Jabil 'deliver a 1.6T LRO solution'. The Jabil module is therefore one implementation of LRO (transmit-side DSP retiming, linear receive side), not a separate architecture or a separate layer. Development stage: no qualification, shipment, volume or DSP vendor is disclosed.",
+      "subject_id": "e3"
     }
   ],
   "edges": [
@@ -43,6 +55,18 @@
         "sivers_jabil_pr_2026_04_15_s3"
       ],
       "src_id": "co:jabil"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.6,
+      "dst_id": "tech:lro",
+      "id": "e3",
+      "relation": "is_variant_of",
+      "source_ids": [
+        "sivers_jabil_pr_2026_04_15_s1",
+        "sivers_jabil_pr_2026_04_15_s3"
+      ],
+      "src_id": "prod:jabil_sivers_1_6t_lro_module"
     }
   ],
   "nodes": [
@@ -51,10 +75,13 @@
       "aliases": [
         "Sivers",
         "SIVE",
-        "SIVE.ST"
+        "SIVE.ST",
+        "Sivers Semiconductors AB",
+        "Sivers Photonics",
+        "Sivers Photonics Ltd"
       ],
       "attributes": {},
-      "confidence": 0.65,
+      "confidence": 0.95,
       "id": "co:sivers_semiconductors",
       "name": "Sivers Semiconductors",
       "role": "bottleneck_supplier",
@@ -64,16 +91,13 @@
       "type": "Company"
     },
     {
-      "abstraction_level": "module_subsystem",
-      "aliases": [
-        "JBL",
-        "Jabil Inc."
-      ],
+      "abstraction_level": "foundry_packaging",
+      "aliases": [],
       "attributes": {},
-      "confidence": 0.65,
+      "confidence": 0.9,
       "id": "co:jabil",
       "name": "Jabil",
-      "role": "robot_component_supplier",
+      "role": "foundry",
       "source_ids": [
         "sivers_jabil_pr_2026_04_15_s1",
         "sivers_jabil_pr_2026_04_15_s3"
@@ -96,6 +120,23 @@
         "sivers_jabil_pr_2026_04_15_s2"
       ],
       "type": "Product"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "LRO",
+        "linear receive optics"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:lro",
+      "name": "Linear Receive Optics (LRO)",
+      "role": null,
+      "source_ids": [
+        "sivers_jabil_pr_2026_04_15_s1",
+        "sivers_jabil_pr_2026_04_15_s3"
+      ],
+      "type": "TechNode"
     }
   ],
   "schema_version": "0.1",
@@ -106,9 +147,10 @@
     "permission_basis": "Official public press release; store the canonical URL and only the research-relevant excerpt.",
     "published_at": "2026-04-15",
     "publisher": "Sivers Semiconductors newsroom",
-    "retrieved_at": "2026-08-11",
+    "retrieved_at": "2026-10-20",
     "source_type": "news",
     "storage_permission": "repo_excerpt",
+    "supersedes_extraction_sha256": "08b6f70537348e0f7162234852752617a398fa1b96787980232ae39c5463d8d8",
     "title": "Sivers Semiconductors Collaborates With Jabil on Energy Efficient 1.6T Pluggable Optical Transceiver Module",
     "url": "https://www.sivers-semiconductors.com/press/sivers-semiconductors-collaborates-with-jabil-on-energy-efficient-1-6t-pluggable-optical-transceiver-module/"
   },

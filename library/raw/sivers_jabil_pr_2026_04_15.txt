@@ -24,3 +24,15 @@ social lead (unconfirmed, citing an unlinked JPMorgan fireside chat) claimed Jab
 targets qualification completion in the August 2026-March 2027 window; that specific
 timeline claim could not be independently verified against a primary transcript and is
 not included in this extraction.
+
+[2026-10-20 更正走廊補段——逐字引文（原頁 HTML 本機抽字核對；舊節錄上方是條列摘要，沒有 s1 原句）]
+NOTE: s1 原頁的撇號是 U+2019「Sivers’」；圖上 s1 存的是直撇號「Sivers'」，沿用圖上那段、不另開 source，其餘逐字。
+
+【opening paragraph（s1）】
+"Jabil plans to develop a 1.6T linear receive optical (LRO) transceiver module using Sivers' high-performance Distributed Feedback (DFB) lasers."
+
+【product description（s2）】
+"The new pluggable module will provide highly energy efficient optical interconnect speeds to accelerate deployment for next generation hyperscale AI data centers."
+
+【Jabil executive quote（s3）】
+"Working with Sivers will allow us to deliver a 1.6T LRO solution that meets both data center performance and power targets at scale."
