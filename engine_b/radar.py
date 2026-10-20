@@ -21,7 +21,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
-from datetime import date, datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Iterable, Mapping, Sequence
 
@@ -58,9 +58,32 @@ def _company_label(registry: Any, entity: str) -> str:
     return f"{name}（{entity}）" if name else str(entity)
 
 
+#: 「已收過」清單（2026-10-20）：前幾天收下的標題交給 LLM，同一件事換了網址或媒體不要再回——網址去重擋不住
+#: （回放 10-14～10-20 收下的 43 則裡至少 5 則是同一件事，吃掉主題層的名額）。
+RECENT_LOOKBACK_DAYS = 7
+RECENT_CAP = 30
+
+
+def recently_accepted(receipt_dir: Path, *, today: date, days: int = RECENT_LOOKBACK_DAYS,
+                      cap: int = RECENT_CAP) -> list[dict[str, str]]:
+    """前 `days` 天（不含今天）雷達收據收下的標題，新的在前，最多 `cap` 則。讀不到的收據略過（只少一份清單，不擋雷達）。"""
+    rows: list[dict[str, str]] = []
+    for back in range(1, days + 1):
+        day = today - timedelta(days=back)
+        try:
+            receipt = json.loads((receipt_dir / f"radar_{day.isoformat()}.json").read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            continue
+        for item in receipt.get("accepted") or ():
+            title = str(item.get("title") or "").strip()
+            if title:
+                rows.append({"date": day.isoformat(), "title": title})
+    return rows[:cap]
+
+
 def build_request(*, themes: Mapping[str, Any], watches: Sequence[Mapping[str, Any]], registry: Any,
                   max_items: int, today: date, market_topics: Sequence[str] = (),
-                  max_market_items: int = 0) -> dict[str, Any]:
+                  max_market_items: int = 0, recent: Sequence[Mapping[str, str]] = ()) -> dict[str, Any]:
     """LLM 要的那一份資料。主題只帶公開的研究題目（描述、核心公司、關鍵字、反證關鍵字）；條件只帶在盯的語意 watch
     （反證與加碼條件）的原文、實體與角色；市場大事只帶 config 裡寫好的題目（2026-10-07）。
     **沒有任何持股、部位、私人路徑的欄位**。"""
@@ -82,12 +105,14 @@ def build_request(*, themes: Mapping[str, Any], watches: Sequence[Mapping[str, A
     condition_rows.sort(key=lambda r: r["watch_id"])
     return {"today": today.isoformat(), "max_items": int(max_items), "themes": theme_rows,
             "watched_conditions": condition_rows,
-            "market_topics": [str(t) for t in market_topics], "max_market_items": int(max_market_items)}
+            "market_topics": [str(t) for t in market_topics], "max_market_items": int(max_market_items),
+            "recently_accepted": [dict(r) for r in recent]}
 
 
 def prepare(run_id: str, out: Path, *, max_items: int, today: date | None = None,
             themes: Mapping[str, Any] | None = None, watches: Sequence[Mapping[str, Any]] | None = None,
-            registry: Any = None, market_topics: Sequence[str] = (), max_market_items: int = 0) -> dict[str, Any]:
+            registry: Any = None, market_topics: Sequence[str] = (), max_market_items: int = 0,
+            receipt_dir: Path = OUT_DIR) -> dict[str, Any]:
     from engine_b import event_watch as ew
     from engine_b.themes import load_themes
     from identity.registry import get_registry
@@ -96,13 +121,14 @@ def prepare(run_id: str, out: Path, *, max_items: int, today: date | None = None
     request = build_request(themes=themes if themes is not None else load_themes(),
                             watches=watches if watches is not None else (ew.load_watches().get("watches") or []),
                             registry=registry or get_registry(), max_items=max_items, today=today,
-                            market_topics=market_topics, max_market_items=max_market_items)
+                            market_topics=market_topics, max_market_items=max_market_items,
+                            recent=recently_accepted(receipt_dir, today=today))
     envelope = {"schema": BATCH_SCHEMA, "run_id": run_id, "run_date": today.isoformat(), "requests": [request]}
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(envelope, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     return {"themes": len(request["themes"]), "watched_conditions": len(request["watched_conditions"]),
             "max_items": request["max_items"], "market_topics": len(request["market_topics"]),
-            "max_market_items": request["max_market_items"]}
+            "max_market_items": request["max_market_items"], "recently_accepted": len(request["recently_accepted"])}
 
 
 # ---------------------------------------------------------------------------

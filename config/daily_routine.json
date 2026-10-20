@@ -106,16 +106,22 @@
       "AI 晶片與系統：NVIDIA、AMD、Broadcom、TSMC 的新產品時程、產能、出貨或延後",
       "大型供應合約與產能預訂（多年期、預付款）：電力設備、散熱、光通訊、記憶體、先進封裝",
       "政策與管制：出口管制、關稅、補貼、電網與資料中心核准",
-      "需求反轉與延誤（反向的大事，和正向同等重要）：雲端與 AI 大廠、neocloud（CoreWeave、Nebius、Nscale、Crusoe、Lambda）退出、取消或延後資料中心合作、租約與容量承諾；電網接入或許可延誤；融資受阻"
+      "需求反轉與延誤（反向的大事，和正向同等重要）：雲端與 AI 大廠、neocloud（CoreWeave、Nebius、Nscale、Crusoe、Lambda）退出、取消或延後資料中心合作、租約與容量承諾；電網接入或許可延誤；融資受阻",
+      "供應鏈分工與採購轉移（結構性）：客戶指定或統一代工與製程、自製改外包或外包改自製、導入或剔除第二來源、規格統一；韓日台中產業媒體的消息也算（標明是轉述）；搜尋字要帶層名詞"
+    ],
+    "_doc_market_structural": [
+      "2026-10-20 加第 6 題（使用者：「我預期繼續 refine 雷達這一塊」；ROADMAP 雷達精進 B）：NVHBM（NVIDIA 要三家記憶體廠統一用台積電做 HBM base die）雷達沒抓到——",
+      "實測泛用查詢（customer requires suppliers switch to TSMC process）抓不到，帶層名詞的（memory makers outsource logic die to foundry）第一頁就有，所以 prompt 寫明要帶層名詞。"
     ],
     "_doc_market_reverse": [
       "2026-10-19 加第 5 題（使用者點名漏抓：Reuters／FT／Guardian 10-18 報導 Microsoft 退出 Nscale 英國 Loughton 資料中心合作、FT 另稱也退出 West Virginia Monarch 部分容量）。",
       "漏抓原因：前 4 題與 prompt 的事件清單全是正向（capex 指引、新建案、電力合約、供應合約、時程、政策），沒有任何一句叫它找退出、取消、延後；",
       "10-19 那輪 24 次搜尋、219 個結果網址，沒有一個含 Nscale（不是上限擠掉：市場層那天只收 2 則）。出場只認反證——需求錨反轉是反證的上游。",
       "max_market_items 3 → 4：一題一則，反向題不該被正向題擠掉。",
-      "2026-10-20：4 → 5——5 題配 4 則仍是寫了做不到的數字；routine_config 改成上限少於題數就拒載（原本只擋「有題目卻是 0」那個特例）。"
+      "2026-10-20：4 → 5——5 題配 4 則仍是寫了做不到的數字；routine_config 改成上限少於題數就拒載（原本只擋「有題目卻是 0」那個特例）。",
+      "2026-10-20 晚：5 → 6（第 6 題結構性分工轉移）。"
     ],
-    "max_market_items": 5
+    "max_market_items": 6
   },
   "theme_scan": {
     "_doc": [

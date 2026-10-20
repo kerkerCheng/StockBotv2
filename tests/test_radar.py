@@ -159,9 +159,10 @@ def test_prepare_sends_themes_and_watched_conditions_and_never_touches_holdings(
     monkeypatch.setattr(gsheets, "fetch_portfolio", boom)
     monkeypatch.setattr(holdings, "resolve_holdings", boom)
     out = tmp_path / "radar_batch.json"
-    summary = radar.prepare(RUN, out, max_items=5, today=TODAY, themes=THEMES, watches=WATCHES, registry=REG)
+    summary = radar.prepare(RUN, out, max_items=5, today=TODAY, themes=THEMES, watches=WATCHES, registry=REG,
+                            receipt_dir=tmp_path)
     assert summary == {"themes": 2, "watched_conditions": 2, "max_items": 5, "market_topics": 0,
-                       "max_market_items": 0}
+                       "max_market_items": 0, "recently_accepted": 0}
     batch = json.loads(out.read_text(encoding="utf-8"))
     request = batch["requests"][0]
     assert batch["run_id"] == RUN and [c["watch_id"] for c in request["watched_conditions"]] == ["ew_c1", "ew_d1"]
@@ -496,11 +497,36 @@ def test_the_snapshot_has_the_four_radar_keys() -> None:
 def test_prepare_carries_the_market_topics_from_config(tmp_path) -> None:
     out = tmp_path / "radar_batch.json"
     summary = radar.prepare(RUN, out, max_items=5, today=TODAY, themes=THEMES, watches=WATCHES, registry=REG,
-                            market_topics=["AI 資料中心資本支出", "政策與管制"], max_market_items=3)
+                            market_topics=["AI 資料中心資本支出", "政策與管制"], max_market_items=3, receipt_dir=tmp_path)
     assert summary["market_topics"] == 2 and summary["max_market_items"] == 3
     request = json.loads(out.read_text(encoding="utf-8"))["requests"][0]
     assert request["market_topics"] == ["AI 資料中心資本支出", "政策與管制"] and request["max_market_items"] == 3
     assert "market_topics" in llm_step.compose_radar_prompt([request])
+
+
+def test_the_titles_accepted_in_the_last_seven_days_go_to_the_llm_so_the_same_story_is_not_returned_again(tmp_path) -> None:
+    """2026-10-20：網址去重擋不住同一件事換網址（回放 7 天 43 則裡至少 5 則重複）——前 7 天收下的標題交給 LLM。"""
+    from datetime import timedelta
+
+    def receipt(day, titles):
+        (tmp_path / f"radar_{day.isoformat()}.json").write_text(json.dumps(
+            {"accepted": [{"title": t, "url": f"https://x.example/{i}"} for i, t in enumerate(titles)]}), encoding="utf-8")
+
+    receipt(TODAY, ["今天的不算"])
+    receipt(TODAY - timedelta(days=1), ["昨天 A", "昨天 B"])
+    receipt(TODAY - timedelta(days=7), ["七天前"])
+    receipt(TODAY - timedelta(days=8), ["八天前不算"])
+    (tmp_path / f"radar_{(TODAY - timedelta(days=3)).isoformat()}.json").write_text("{壞掉", encoding="utf-8")
+    rows = radar.recently_accepted(tmp_path, today=TODAY)
+    assert [r["title"] for r in rows] == ["昨天 A", "昨天 B", "七天前"]           # 新的在前、讀不到的略過
+    assert len(radar.recently_accepted(tmp_path, today=TODAY, cap=2)) == 2
+    out = tmp_path / "radar_batch.json"
+    summary = radar.prepare(RUN, out, max_items=5, today=TODAY, themes=THEMES, watches=WATCHES, registry=REG,
+                            receipt_dir=tmp_path)
+    request = json.loads(out.read_text(encoding="utf-8"))["requests"][0]
+    assert summary["recently_accepted"] == 3 and request["recently_accepted"][0] == {
+        "date": (TODAY - timedelta(days=1)).isoformat(), "title": "昨天 A"}
+    assert "recently_accepted" in llm_step.RADAR_PROMPT.read_text(encoding="utf-8")
 
 
 def test_market_events_and_followed_topics_have_separate_caps(tmp_path) -> None:
