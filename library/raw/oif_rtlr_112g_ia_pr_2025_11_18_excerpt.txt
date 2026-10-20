@@ -1,0 +1,10 @@
+Source URL: https://www.oiforum.com/oif-publishes-implementation-agreement-for-112-gb-s-retimed-transmitter-linear-receiver-rtlr-electrical-and-optical-interface-advancing-energy-efficiency/
+
+Excerpt:
+[EXCERPT — 有限逐字引文] OIF 新聞稿 2025-11-18〈OIF Publishes Implementation Agreement for 112 Gb/s Retimed Transmitter Linear Receiver (RTLR) Electr
+DATE: 2025-11-18
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 發行人文件是自述（L8 弱主張）；媒體只當線索；第三方海關彙整站是 CBP 艙單的第三方轉載。
+
+【OIF 新聞稿 2025-11-18〈OIF Publishes Implementation Agreement for 112 Gb/s Retimed Transmitter Linear Receiver (RTLR) Electrical and Optical Interface〉：RTLR＝發送端重定時、接收端線性（half retimed optical links），模組內不需要接收端 DSP、跨廠互通（第三方標準組織；LRO 的定義出處，圖外）】
+"Fremont, Calif. – November 18, 2025 – OIF , where the optical networking industry’s interoperability work gets done , today announced the publication of a new Implementation Agreement (IA) — OIF-EEI-112G-RTLR (Retimed Transmitter Linear Receiver) . The new IA defines a high-speed, energy-efficient 112 Gb/s chip-to-module electrical interface that connects retimed optical transmitters with linear optical receivers, sometimes referred to as ‘half retimed optical links.’ It supports Ethernet C2M 100 Gb/s and OIF CEI-112G-VSR-PAM4 16 dB channels, operating in the 36-56 GSym/s range for full Ethernet compatibility. By eliminating the need for a receive DSP in the optical module and leveraging signal processing already available in the host device, the IA helps reduce power, cost and design complexity while maintaining interoperability and performance across vendors — a critical need in AI architectures."

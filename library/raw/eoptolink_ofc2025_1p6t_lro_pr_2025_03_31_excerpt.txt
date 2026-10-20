@@ -1,0 +1,10 @@
+Source URL: https://www.prnewswire.com/news-releases/eoptolink-demonstrates-1-6t-lro-modules-at-ofc-2025--302414874.html
+
+Excerpt:
+[EXCERPT — 有限逐字引文] 新易盛（Eoptolink）新聞稿 2025-03-31〈Eoptolink Demonstrates 1.6T LRO Modules at OFC 2025〉
+DATE: 2025-03-31
+RETRIEVED: 2026-10-19（原文 HTML／PDF／字幕本機抽字、空白正規化後以起訖標記切出，逐字）
+NOTE: 發行人文件是自述（L8 弱主張）；媒體只當線索；第三方海關彙整站是 CBP 艙單的第三方轉載。
+
+【新易盛（Eoptolink）新聞稿 2025-03-31〈Eoptolink Demonstrates 1.6T LRO Modules at OFC 2025〉：展示 212Gb/s per lambda 的 1.6T LRO；LRO 的別名 TRO／RTLR；接收端拿掉 DSP 功耗約降三成；LRO 是 LPO 與全重定時的中間路線、驗證較快、與舊模組互通較好（供應商自述，展示不是供貨；圖外）】
+"/PRNewswire/ -- Eoptolink Technology Inc., Ltd. (SZSE: 300502), a leading innovator and provider of advanced optical transceiver solutions, is demonstrating its 1.6T LRO transceiver operating at 212Gb/s per lambda during OFC 2025. Linear Receive Optics (LRO) are optical transceivers that use retimers at the transmit side and linear receivers on the receive side. Other names for the same approach are Transmit Retimed Optics (TRO) or Retimed Transmit Linear Receive (RTLR) optics. By removing the DSP in the receive path, the power consumption of the optical transceiver is reduced by about 30%. The thermal design of the host system is significantly simplified, and the overall system power requirements are reduced. "LRO is a middle way between Linear Pluggable Optics (LPO) and fully retimed optics", explains Dirk Lutz , Distinguished Engineer, Eoptolink Technology Inc., Ltd. "The TP2 and TP3 compliance on the optical side together with reduced power consumption is very attractive to system vendors and end customers. Additional benefits are faster qualification and testing processes as well as increased interoperability with legacy optics." We will be showing live demonstrations of a 1.6T, 800G, LPO, LRO and MCF optical transceiver solutions"

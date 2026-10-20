@@ -71,6 +71,7 @@
   - 2026-10-20｜FormFactor 一手：券商轉述的 CPO 營收追回 Q2 法說——講的是全公司 CPO 營收，insertion 1 只是加速原因；「The CPO piece does flow through that 10% customer」＋10-Q 附註 2 台積電 11.0% → 入圖包 [825]（co:formfactor supplies_to co:tsmc，供應商自述、標弱）。CPO 全堆疊測試讀圖 `sr_74e45898380212a2`（undecided 不變）、FORM `ib_faf0d9e681f38d6b`（不要不變、理由改由一手撐）、AEHR 換騎。
   - 2026-10-20｜Lumentum 一手核券商四題：OCS 大客戶沒點名、預期 2027 年初才成第一大供應商（券商講過頭）；10-K 沒有 MEMS、沒有 epitaxy；雷射晶片 OFC 簡報列 MAKE → 入圖包 [827]（co:lumentum develops tech:mems_mirror_array，設計權）。MEMS 讀圖 `sr_a7bd059e23aa6e88`（undecided、加反證④）、Silex `ib_26d8129aa16683a2`、光環 `ib_6f2e71838ae8c328`（更正前版「差距收窄只靠晶粒」）、華星光 `ib_268b1bed22dcf35f`、聯亞 `ib_899f7c33036e91af`；候選狀態都不變。
   - 2026-10-20｜走圖第 7 型 `tech:lro`（圖上 0 家）追到底：入圖包 [828]（Jabil 模組 is_variant_of LRO）、[829]（Credo、Marvell〔TRO〕、MaxLinear、Semtech、中際旭創、新易盛、Ligent 供 LRO＋LRO depends_on 光模組 DSP＋對稱邊；全是自報、MaxLinear 最弱）、[830]（MaxLinear 10-K claim 更正：LRO 保留發送端 DSP）；Broadcom／AAOI／Coherent 沒找到量產一手（L11-5）。LRO 第一份讀圖、DSP／LPO 換版、MXL 敘事等 [829] 入圖後在真圖上重跑再寫。
+  - 2026-10-20（核准後）｜[823]–[830] 使用者 go、入圖（intake 32b40920…e62564ea）。LRO 第一份讀圖 `sr_6c64cb3c6d3f8e11`（neither：發送端 DSP 三家、OIF 互通協議、沒有缺貨一手）；光模組 DSP `sr_a5003860dc987d46`、LPO `sr_a25896f0e7912080`（都維持 neither；更正「1.6T 從零顆 DSP 走回半顆」——把全重定時算進來是持平到下降）；MXL `ib_a8bb7f16d2935af3`（不要不變）。CPO 全堆疊測試 `sr_28a7f4dd8f29433f`、MEMS 鏡陣列 `sr_8dd7652e9ca791bf` 只改「待核准／圖外」措辭；AEHR、FORM、Silex 換騎。走圖第 7 型 `tech:lro` 消失。
 - failure log：（尚無）
   - #1（lead_f1694626 被排回）、#3（[679]／[680] 重複號）
 
@@ -276,6 +277,7 @@
 - 2×2：尚未到裁決點
   - 2026-10-18｜[792] go＋入圖後：LPT 讀圖 `sr_f55b7769209acef2`（volume 不變）——需求側由 IREN 一家擴到四家買方（Oncor、Core Scientific、Fermi），其中兩家付代價鎖貨（Oncor 靠供應商關係換到交期承諾、2027Q1 才到第一批；Fermi 借 1.2 億美元預購高壓設備）；Oncor 的需求來自電網、不經 AI；反證①盯的公司補齊四家（#65 同型）。
   - 2026-10-20｜使用者點名 Microsoft 退出 Nscale：一手核到只退 Loughton 一站（50 MW；雙方發言人經 AFP／Reuters 轉述）、Monarch 1.35 GW 意向書夏天已失效由 Anthropic 接手——不是需求反轉、不計入已取消需求；FT 原文 → 向你要文件 [821]。副產：Nscale S-1 p.31 站點的大型電力變壓器有顯著部分來自中國 → 入圖包 [824]（第五家買方，名冊隨包 staged co:nscale）；LPT 讀圖 `sr_e317c089018c5d45`（volume 不變；Nscale 圖外、行政命令 14421、Loughton 卡在併網不是變壓器）。雷達市場層只找正向大事 → failure log #88、當下修 8e6dad9b。
+  - 2026-10-20（核准後）｜LPT 讀圖 `sr_a784972def54595a`：Nscale 由圖外改成引用（[824]），反證①補 Nscale 的鬆動條件與核查節奏。
 - failure log：（尚無）
   - #9（11 條 decompose 題目缺分類被 drain withheld；回填腳本吃不下 `triage: None`——當下修）
   - #11（[689] IREN 的 depends_on 印 self_reported_costly——買方自述被當成供應商自報；與 C1 [694] 同形）
@@ -502,6 +504,7 @@
   - 2026-10-19（券商報告）｜[804][806] 券商轉載的聯茂產品線表（10-20 由聯茂一手對上）——Low-Dk 布讀圖 `sr_ef4ce6b4ac4b7345`、台玻 `ib_28920bc567830056`、富喬換版；[805] 券商對金居 HVLP4 份額與 HVLP3/4 產能的估計（券商內容私有：library/private/research_notes/doc_requests/）——HVLP 讀圖 `sr_dc5f1d9865eda833`、金居 `ib_2af852aa24e6760d`（撤回敘事自己「10% 多半高估」的推一步）、三井換騎。
   - 2026-10-20｜CCL 一手：聯茂官網 IT-999GSE2「uses Low Dk2 glass」、IT-999GSE3「uses Q glass」（券商轉載的產品線表在聯茂對上）；台燿 TU-953Q 規格書沒寫布種、台光電 EM-896K3 只有廣告——券商說兩家都改用 Q 布，對這兩家仍是券商稱；Trainium3 升 HVLP4（SemiAnalysis）但供應商沒人點名 → 入圖包 [823]（新節點石英布＋is_component_of 高速 CCL＋competes_with Low-Dk 布）、[826]（onboard 菲利華、聯茂）。Low-Dk 布讀圖 `sr_4c65b28f5fedb95c`、HVLP `sr_a06e3595d99cb164`（都 volume 不變）、台玻 `ib_fece8543d4c2ef9f`、富喬 `ib_b558cc4eda361a5f`、金居 `ib_368c5f2791000f13`。
   - 2026-10-20｜YMT（韓）四維初判不過、維持 park（含極薄箔那一列最多約占營收 5%、需求錨只到 mSAP）；極薄載體銅箔讀圖第三版 `sr_431d7f58b2bcd6ac`（更正「2023 年之後還往下走」——2026 上半年已超過 2025 全年）、三井 `ib_5f43db606ef74b6f`（瓶頸格措辭）、德福與方邦換騎。
+  - 2026-10-20（核准後）｜石英布第一份讀圖 `sr_037ce5e723690b34`（undecided：聯茂同級兩版並列、台燿年報把 Q glass 列進瓶頸料；供給側只有菲利華自述在認證）；Low-Dk 布 `sr_3ac9c21d8aa96ffd`（volume 不變；反證③「石英布成主流」判沒觸發——並列不是主流）；高速 CCL `sr_de14c044019dea62`（neither 不變、補第 5 條反證盯聯茂）。聯茂 6213.TW 第一份敘事 `ib_1d60d81e43b11639`「不要」（寡占厚層裡的大廠、這一輪營收翻倍第一個原因是漲價）；菲利華 300395.SZ `ib_115d2ed83e352547`「缺 X」（石英布約占營收 11.7%、做布的子公司只持股 48.11%；11-01 叫醒 `ew_1414_2026-10-20`）；台玻、富喬換騎並改措辭；PCB 組 v3 加聯茂 → pq2 [832]。
 - failure log：
   - #43（名冊外的公司判不了邊緣——本 case 的日東紡、台玻、建榮也是目測）、#44（09-29 研究結論寫了「可能的薄層在上游」卻沒變成 lead）
 
