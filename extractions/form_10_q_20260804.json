@@ -13,6 +13,18 @@
       ],
       "statement": "FormFactor's own 10-Q (FormFactor = 'we/our', s1) attributes the year-over-year increase in Systems revenue for the quarter ended June 27, 2026 'primarily' to sales of Triton, 'our recently introduced high-volume co-packaged optics (CPO) testing solution', with Taiwan demand for Triton contributing; it also bought Keystone Photonics (optical probing for SiPh and CPO testing, $20.6M, 2025-12-15). Supplier self-report with revenue recognized — a second supplier on the CPO test layer besides Aehr (wafer-level burn-in); customers are not named.",
       "subject_id": "e1"
+    },
+    {
+      "confidence": 0.85,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：FormFactor 之後的 10-Q／10-K 不再把台積電列為 10% 客戶，而且法說說台積電的訂單轉給別家；只是比例跌破 10% 不算（那是時變觀測）。核查頻率：每季（FormFactor 10-Q 附註 2；下一份是 2026 第三季 10-Q，法說 2026-10-28）。觸發後 48 小時：e2 加註（跌破 10% 只加註、不撤邊）；重讀 FORM 敘事「需求」一格與 CPO 全堆疊測試層讀圖缺口②。",
+      "id": "form_10_q_20260804_cl2",
+      "source_ids": [
+        "form_10_q_20260804_s1",
+        "form_10_q_20260804_s5"
+      ],
+      "statement": "FormFactor's own 10-Q for the quarter ended June 27, 2026 (FormFactor = 'we/our', s1), Note 2 (Concentration of Credit and Other Risks), lists Taiwan Semiconductor Manufacturing Company Ltd. as a customer accounting for 10% or more of revenue: 11.0% for the three months ended June 27, 2026 (10.4% a year earlier; 10.3% for the six months). The other 10% customers that quarter are SK hynix (24.3%); Intel is below 10% for the quarter. The note does not break out which products TSMC buys (probe cards and/or Triton CPO test systems). Supplier's filing (L8: TSMC has no document of its own here); revenue shares are dated observations and are not graph attributes (L4).",
+      "subject_id": "e2"
     }
   ],
   "edges": [
@@ -27,6 +39,18 @@
         "form_10_q_20260804_s2",
         "form_10_q_20260804_s3",
         "form_10_q_20260804_s4"
+      ],
+      "src_id": "co:formfactor"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "co:tsmc",
+      "id": "e2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "form_10_q_20260804_s1",
+        "form_10_q_20260804_s5"
       ],
       "src_id": "co:formfactor"
     }
@@ -67,6 +91,24 @@
         "form_10_q_20260804_s4"
       ],
       "type": "TechNode"
+    },
+    {
+      "abstraction_level": "foundry_packaging",
+      "aliases": [
+        "2330.TW",
+        "TSM",
+        "Taiwan Semiconductor Manufacturing Company",
+        "台積電"
+      ],
+      "attributes": {},
+      "confidence": 0.95,
+      "id": "co:tsmc",
+      "name": "TSMC",
+      "role": null,
+      "source_ids": [
+        "form_10_q_20260804_s5"
+      ],
+      "type": "Company"
     }
   ],
   "schema_version": "0.1",
@@ -77,9 +119,10 @@
     "permission_basis": "美國 SEC 法定申報（Form 10-Q）；只保留研究必要的逐字摘錄（HTML 實體已解碼、空白攤平）。published_at 取 EDGAR filed date。",
     "published_at": "2026-08-04",
     "publisher": "SEC EDGAR",
-    "retrieved_at": "2026-10-07",
+    "retrieved_at": "2026-10-19",
     "source_type": "filing",
     "storage_permission": "repo_excerpt",
+    "supersedes_extraction_sha256": "880548d60c02d4d48cf26cfcd64e8321644fb7ca9c958e1d5fa10a5b044074b1",
     "title": "FormFactor, Inc. Form 10-Q（quarter ended June 27, 2026）— Triton CPO testing, Keystone Photonics",
     "url": "https://www.sec.gov/Archives/edgar/data/1039399/000103939926000033/form-20260627.htm"
   },
@@ -103,6 +146,11 @@
       "id": "form_10_q_20260804_s4",
       "locator": "Notes to Condensed Consolidated Financial Statements, Note 4 — Acquisition",
       "quote": "On December 15, 2025, we acquired 100 % of the shares of Keystone Photonics for total consideration of $ 20.6 million, net of cash acquired of $ 1.7 million. Keystone Photonics provides optical probing technology used in the testing of silicon photonics (“SiPh”) and co‑packaged optics (“CPO”) devices. The acquisition expands the Company’s testing capabilities in these areas and supports customers as SiPh and CPO technologies transition from development into high‑volume manufacturing, including applications related to artificial intelligence data-center infrastructure."
+    },
+    {
+      "id": "form_10_q_20260804_s5",
+      "locator": "Notes to Condensed Consolidated Financial Statements, Note 2 — Concentration of Credit and Other Risks",
+      "quote": "Each of the following customers accounted for 10 % or more of our revenues for the periods indicated: Three Months Ended Six Months Ended June 27, 2026 June 28, 2025 June 27, 2026 June 28, 2025 SK hynix Inc. 24.3 % 25.0 % 26.8 % 24.2 % Intel Corporation * 12.4 % * 12.2 % Taiwan Semiconductor Manufacturing Company Ltd. 11.0 % 10.4 % 10.3 % * 35.3 % 47.8 % 37.1 % 36.4 % * Less than 10% of revenues."
     }
   ]
 }

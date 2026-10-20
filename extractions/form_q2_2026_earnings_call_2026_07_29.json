@@ -1,0 +1,116 @@
+{
+  "claims": [
+    {
+      "confidence": 0.65,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：FormFactor 之後的 10-Q 或法說改口——CPO（Triton）營收改由台積電以外的客戶下單付款、台積電不再是主要一方；或台積電自己的文件或供應商名單點名另一家做它 CPO 的 insertion 1 晶圓級光學測試、取代 FormFactor。核查頻率：每季（FormFactor 10-Q 附註 2 與法說，下一次 2026-10-28 第三季法說；台積電法說與技術論壇）。觸發後 48 小時：e1 加註或提撤回；重讀 CPO 全堆疊測試層讀圖（缺口②客戶具名）；FORM 敘事重答「需求」一格與候選狀態理由。",
+      "id": "form_q2_2026_earnings_call_2026_07_29_cl1",
+      "source_ids": [
+        "form_q2_2026_earnings_call_2026_07_29_s2",
+        "form_q2_2026_earnings_call_2026_07_29_s3",
+        "form_q2_2026_earnings_call_2026_07_29_s4",
+        "form_q2_2026_earnings_call_2026_07_29_s5"
+      ],
+      "statement": "On FormFactor's Q2 2026 earnings call (2026-07-29), the prepared remarks say 'the world's leading foundry was again a 10% customer'. An analyst (Krish Sankar, TD Cowen; his words, not FormFactor's) named that customer TSMC ('TSMC being 11% customer') and asked whether NVIDIA's Rubin and CPO business would be booked under TSMC or under NVIDIA. CEO Mike Slessor answered that the second-quarter results for 'this 10% customer' had no GPU component, and that 'The CPO piece does flow through that 10% customer', adding that in the fabless-foundry ecosystem revenue is recognized in different places depending on market segment and product line. So, per FormFactor, its CPO test revenue (Triton) is billed to TSMC; the fabless designer behind it is not named, and the answer does not say all CPO revenue goes through TSMC. Billing customer is not necessarily the fab operating the tools. Supplier self-report on a third-party transcript (L8: weak); TSMC has not said this in its own documents; no sole-source claim.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "co:tsmc",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "form_q2_2026_earnings_call_2026_07_29_s1",
+        "form_q2_2026_earnings_call_2026_07_29_s2",
+        "form_q2_2026_earnings_call_2026_07_29_s3",
+        "form_q2_2026_earnings_call_2026_07_29_s4",
+        "form_q2_2026_earnings_call_2026_07_29_s5"
+      ],
+      "src_id": "co:formfactor"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "test_yield",
+      "aliases": [
+        "FORM",
+        "FormFactor, Inc."
+      ],
+      "attributes": {
+        "ticker": "FORM"
+      },
+      "confidence": 0.9,
+      "id": "co:formfactor",
+      "name": "FormFactor",
+      "role": "test",
+      "source_ids": [
+        "form_q2_2026_earnings_call_2026_07_29_s1",
+        "form_q2_2026_earnings_call_2026_07_29_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "foundry_packaging",
+      "aliases": [
+        "2330.TW",
+        "TSM",
+        "Taiwan Semiconductor Manufacturing Company",
+        "台積電"
+      ],
+      "attributes": {},
+      "confidence": 0.95,
+      "id": "co:tsmc",
+      "name": "TSMC",
+      "role": null,
+      "source_ids": [
+        "form_q2_2026_earnings_call_2026_07_29_s2",
+        "form_q2_2026_earnings_call_2026_07_29_s3"
+      ],
+      "type": "Company"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "form_q2_2026_earnings_call_2026_07_29",
+    "evidence_tier": 2,
+    "origin_entity": "FormFactor, Inc.",
+    "permission_basis": "公開的第三方法說逐字稿（StockAnalysis 轉載 Quartr 轉錄）；只保留研究必要的有限逐字節錄。tier 2：第三方轉錄；邊用到的 CEO 句子已用本機聽寫（faster-whisper large-v3-turbo）對過 Quartr 公司錄音（270–290 秒、1518–1557 秒），升 tier 1 的路徑是 FormFactor IR 的 webcast 重播（investors.formfactor.com 對腳本回 Access Denied）。published_at 取法說日＝財報 8-K 申報日 2026-07-29（逐字稿頁尾「Last updated: Jul 29, 2026」），不是抓取日（INV-6）。",
+    "published_at": "2026-07-29",
+    "publisher": "StockAnalysis（transcript provided by Quartr；第三方轉錄）",
+    "retrieved_at": "2026-10-19",
+    "source_type": "transcript",
+    "storage_permission": "repo_excerpt",
+    "title": "FormFactor, Inc. Q2 2026 Earnings Call（2026-07-29）— third-party transcript excerpt：the world's leading foundry a 10% customer；CPO revenue flows through that 10% customer",
+    "url": "https://stockanalysis.com/stocks/form/transcripts/657372-q2-2026/"
+  },
+  "sources": [
+    {
+      "id": "form_q2_2026_earnings_call_2026_07_29_s1",
+      "locator": "開場（Operator），錄音約 0:00",
+      "quote": "Welcome everyone to FormFactor's second quarter 2026 earnings conference call. On today's call are Chief Executive Officer, Mike Slessor, and Chief Financial Officer, Aric McKinnis."
+    },
+    {
+      "id": "form_q2_2026_earnings_call_2026_07_29_s2",
+      "locator": "CEO Mike Slessor 準備稿，台灣段，錄音約 4:30–4:50（本句已用本機聽寫對過 Quartr 公司錄音 270–290 秒）",
+      "quote": "FormFactor's important role in this region is evident in our supplemental materials. Second quarter revenue from Taiwan grew sequentially by more than 30%, and the world's leading foundry was again a 10% customer."
+    },
+    {
+      "id": "form_q2_2026_earnings_call_2026_07_29_s3",
+      "locator": "問答，Krish Sankar（TD Cowen）提問，錄音約 25:00——這是分析師的話，不是 FormFactor 的（本機聽寫把 TSMC 聽成 TSM）",
+      "quote": "Mike, it's kind of impressive to see TSMC being 11% customer. I'm just wondering, in last quarter, you had NVIDIA, I think it was mostly networking chips. I'm just wondering, does Rubin and CPO for NVIDIA come under TSMC or it'll be under NVIDIA, and what is the status on the Rubin qual?"
+    },
+    {
+      "id": "form_q2_2026_earnings_call_2026_07_29_s4",
+      "locator": "問答，CEO Mike Slessor 回答（第一句），錄音約 25:18",
+      "quote": "Let me address that one first, Krish. There really is no component of GPU business in the second quarter results for this 10% customer."
+    },
+    {
+      "id": "form_q2_2026_earnings_call_2026_07_29_s5",
+      "locator": "問答，CEO Mike Slessor 回答（CPO 那句），錄音約 25:44（已用本機聽寫對過錄音 1518–1557 秒）",
+      "quote": "The CPO piece does flow through that 10% customer. It is in many cases, with the combination of the fabless foundry ecosystem, you recognize revenue in different places depending on the market segment, even depending on the individual product line they have."
+    }
+  ]
+}

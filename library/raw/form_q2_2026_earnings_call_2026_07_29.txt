@@ -1,0 +1,18 @@
+Source URL: https://stockanalysis.com/stocks/form/transcripts/657372-q2-2026/
+
+Excerpt:
+[EXCERPT — 有限逐字引文] FormFactor, Inc. Q2 2026 Earnings Call（2026-07-29）— third-party transcript excerpt：the world's leading foundry a 10% customer；CPO revenue flows through that 10% customer
+
+Source: https://stockanalysis.com/stocks/form/transcripts/657372-q2-2026/
+DATE: 2026-07-29（法說日；頁尾「Data Source: Quartr Last updated: Jul 29, 2026」）
+RETRIEVED: 2026-10-19（StockAnalysis 頁面本機抽字、空白正規化後逐字）
+NOTE: 第三方轉錄（Quartr），tier 2。發話人是 FormFactor 管理層（origin＝FormFactor，供應商自述，L8 弱主張）。「TSMC」一詞出自分析師提問（Krish Sankar，TD Cowen），不是 FormFactor 的話；FormFactor 自己的措辭是「the world's leading foundry」「this／that 10% customer」。問答一段照連續原文收錄（含講者標籤與 GPU 資格兩句）。
+
+【開場（Operator），錄音約 0:00】
+Welcome everyone to FormFactor's second quarter 2026 earnings conference call. On today's call are Chief Executive Officer, Mike Slessor, and Chief Financial Officer, Aric McKinnis.
+
+【CEO Mike Slessor 準備稿，台灣段，錄音約 4:30–4:50（本句已用本機聽寫對過 Quartr 公司錄音 270–290 秒）】
+FormFactor's important role in this region is evident in our supplemental materials. Second quarter revenue from Taiwan grew sequentially by more than 30%, and the world's leading foundry was again a 10% customer.
+
+【問答，Krish Sankar（TD Cowen）提問與 CEO Mike Slessor 回答，錄音約 25:00–25:58（連續原文；聽寫核對 1499–1557 秒）】
+Mike, it's kind of impressive to see TSMC being 11% customer. I'm just wondering, in last quarter, you had NVIDIA, I think it was mostly networking chips. I'm just wondering, does Rubin and CPO for NVIDIA come under TSMC or it'll be under NVIDIA, and what is the status on the Rubin qual? Michael Slessor CEO, FormFactor Let me address that one first, Krish. There really is no component of GPU business in the second quarter results for this 10% customer. As we said in the past, we expect this to be a second half event for us, and we're on track. We're qualified, as we've shared with you, and are shipping production units for revenue here in the third quarter. The CPO piece does flow through that 10% customer. It is in many cases, with the combination of the fabless foundry ecosystem, you recognize revenue in different places depending on the market segment, even depending on the individual product line they have.
