@@ -1,0 +1,127 @@
+{
+  "claims": [
+    {
+      "confidence": 0.65,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：聯茂後續法說或年報寫出高速材料營收占比下滑、M9 料號（IT-999GSE2/3）未過客戶認證或停產。核查頻率：每季（聯茂法說簡報）。觸發後 48 小時：e1 降 confidence，重讀高速 CCL 層的供給側。",
+      "id": "mops_6213_ir_2q26_en_product_line_m9_20260813_cl1",
+      "source_ids": [
+        "mops_6213_ir_2q26_en_product_line_m9_20260813_s2",
+        "mops_6213_ir_2q26_en_product_line_m9_20260813_s3",
+        "mops_6213_ir_2q26_en_product_line_m9_20260813_s4",
+        "mops_6213_ir_2q26_en_product_line_m9_20260813_s5",
+        "mops_6213_ir_2q26_en_product_line_m9_20260813_s6"
+      ],
+      "statement": "ITEQ (self, 2Q26 investor presentation): 'Worldwide top supplier in high speed / frequency laminate'; its product line places IT-999GSE2/3 in the M9 Extreme Low Loss class (Df 0.0010~0.0005); hyperscale data center and AI server upgrades drive high speed / frequency material demand and its share there is expected 'to uplift robustly'. Company self-statement that it supplies high-speed CCL (a supply edge, not a bottleneck claim); customers and volumes are not named in these quotes.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "mat:high_speed_ccl",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "mops_6213_ir_2q26_en_product_line_m9_20260813_s2",
+        "mops_6213_ir_2q26_en_product_line_m9_20260813_s4",
+        "mops_6213_ir_2q26_en_product_line_m9_20260813_s5",
+        "mops_6213_ir_2q26_en_product_line_m9_20260813_s6"
+      ],
+      "src_id": "co:iteq"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "聯茂",
+        "聯茂電子",
+        "ITEQ",
+        "ITEQ Corporation"
+      ],
+      "attributes": {
+        "ticker": "6213.TW"
+      },
+      "confidence": 0.9,
+      "id": "co:iteq",
+      "name": "聯茂電子股份有限公司",
+      "role": null,
+      "source_ids": [
+        "mops_6213_ir_2q26_en_product_line_m9_20260813_s1",
+        "mops_6213_ir_2q26_en_product_line_m9_20260813_s2",
+        "mops_6213_ir_2q26_en_product_line_m9_20260813_s4"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "high-speed CCL",
+        "low-loss CCL",
+        "高速 CCL",
+        "高階 CCL",
+        "高速覆銅板"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "mat:high_speed_ccl",
+      "name": "High-speed copper clad laminate (low-loss CCL, M6–M9 class)",
+      "role": null,
+      "source_ids": [
+        "mops_6213_ir_2q26_en_product_line_m9_20260813_s2",
+        "mops_6213_ir_2q26_en_product_line_m9_20260813_s3",
+        "mops_6213_ir_2q26_en_product_line_m9_20260813_s5",
+        "mops_6213_ir_2q26_en_product_line_m9_20260813_s6"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "mops_6213_ir_2q26_en_product_line_m9_20260813",
+    "evidence_tier": 1,
+    "origin_entity": "聯茂電子股份有限公司（ITEQ Corporation）",
+    "permission_basis": "公開資訊觀測站法人說明會簡報（公開）；只保留研究必要的有限逐字節錄。published_at 取 MOPS 檔名日期 20260813＋封面「Aug 2026」（同一份檔在 MOPS 又掛給 2026-09-16 的 UBS 論壇，不改日期）。",
+    "published_at": "2026-08-13",
+    "publisher": "公開資訊觀測站（法人說明會簡報）",
+    "retrieved_at": "2026-10-19",
+    "source_type": "ir_deck",
+    "storage_permission": "repo_excerpt",
+    "title": "聯茂（ITEQ）2026 年第二季法說簡報（英文，MOPS 621320260813E002）：Worldwide top supplier in high speed / frequency laminate；p.10 產品線 M9 Extreme Low Loss（Df 0.0010~0.0005）對 IT-999GSE2/3；高速材料市占「to uplift robustly」",
+    "url": "https://mopsov.twse.com.tw/nas/STR/621320260813E002.pdf"
+  },
+  "sources": [
+    {
+      "id": "mops_6213_ir_2q26_en_product_line_m9_20260813_s1",
+      "locator": "p.1 封面",
+      "quote": "ITEQ Corporation 2026 Second Quarter Investor Presentation Aug 2026"
+    },
+    {
+      "id": "mops_6213_ir_2q26_en_product_line_m9_20260813_s2",
+      "locator": "p.9 Market Share Leader in Specialty Laminate",
+      "quote": "Worldwide top supplier in high speed / frequency laminate"
+    },
+    {
+      "id": "mops_6213_ir_2q26_en_product_line_m9_20260813_s3",
+      "locator": "p.10 Well-Expanded Product Line（第一點）",
+      "quote": "The need for hyperscale data center and AI server upgrade to expedite the growth of high speed / frequency material demand"
+    },
+    {
+      "id": "mops_6213_ir_2q26_en_product_line_m9_20260813_s4",
+      "locator": "p.10 Well-Expanded Product Line（第二點）",
+      "quote": "ITEQ’s market share in high speed / frequency material to uplift robustly"
+    },
+    {
+      "id": "mops_6213_ir_2q26_en_product_line_m9_20260813_s5",
+      "locator": "p.10 產品線圖 M9 列標籤",
+      "quote": "Extreme Low Loss M9 Df 0.0010~0.0005"
+    },
+    {
+      "id": "mops_6213_ir_2q26_en_product_line_m9_20260813_s6",
+      "locator": "p.10 產品線圖 M9 列料號（抽字順序打散；以 pdfminer 座標核過與 M9 標籤同列）",
+      "quote": "IT-999GSE2/3"
+    }
+  ]
+}

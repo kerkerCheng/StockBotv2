@@ -1,0 +1,183 @@
+{
+  "claims": [
+    {
+      "confidence": 0.55,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：菲利華後續季報／半年報／年報寫出石英電子布項目終止、認證失敗、營收歸零或計提大額減值；或 CCL 廠一手點名的石英布供應商不含菲利華。核查頻率：每季（菲利華季報、半年報、年報）。觸發後 48 小時：e1 降 confidence，重讀石英布節點的供給側；若已寫菲利華敘事，重答候選狀態。",
+      "id": "cninfo_300395_h1_2026_quartz_electronic_cloth_cl1",
+      "source_ids": [
+        "cninfo_300395_h1_2026_quartz_electronic_cloth_s3",
+        "cninfo_300395_h1_2026_quartz_electronic_cloth_s4",
+        "cninfo_300395_h1_2026_quartz_electronic_cloth_s5",
+        "cninfo_300395_h1_2026_quartz_electronic_cloth_s6",
+        "cninfo_300395_h1_2026_quartz_electronic_cloth_s7"
+      ],
+      "statement": "Feilihua (self, 2026 interim report): vertically integrated from quartz sand, quartz rod and quartz electronic yarn to quartz electronic cloth; quartz electronic cloth revenue was RMB 153 million in the period, driven by fast-growing testing demand from AI infrastructure; it has opened a group of global CCL-maker customers, but its ultra-thin quartz electronic cloth is still in customer testing and end-customer qualification (qualification_status: qualifying, not qualified), and its own risk section says orders are uncertain. Supplier self-statement (weak, L8); no customer is named; sole_source is not asserted.",
+      "subject_id": "e1"
+    },
+    {
+      "confidence": 0.55,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "條件：CCL 廠一手寫出高速 CCL 不再用石英布或改用其他補強材料並量產。核查頻率：每半年（菲利華半年報、年報；三家 CCL 廠法說）。觸發後 48 小時：e2 降 confidence，重讀石英布節點的反向路徑與需求側。",
+      "id": "cninfo_300395_h1_2026_quartz_electronic_cloth_cl2",
+      "source_ids": [
+        "cninfo_300395_h1_2026_quartz_electronic_cloth_s2",
+        "cninfo_300395_h1_2026_quartz_electronic_cloth_s6"
+      ],
+      "statement": "Feilihua (quartz cloth supplier, 2026 interim report): with excellent dielectric loss and an ultra-low expansion coefficient, quartz electronic cloth is a preferred material for high-frequency high-speed copper clad laminate (CCL); its customers include global CCL makers. Supplier-side statement of the application; corroborates the buyer-side statements of ITEQ and Taiwan Union Technology.",
+      "subject_id": "e2"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.65,
+      "dst_id": "mat:pcb_quartz_glass_cloth",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "cninfo_300395_h1_2026_quartz_electronic_cloth_s1",
+        "cninfo_300395_h1_2026_quartz_electronic_cloth_s3",
+        "cninfo_300395_h1_2026_quartz_electronic_cloth_s4",
+        "cninfo_300395_h1_2026_quartz_electronic_cloth_s5",
+        "cninfo_300395_h1_2026_quartz_electronic_cloth_s6",
+        "cninfo_300395_h1_2026_quartz_electronic_cloth_s7"
+      ],
+      "src_id": "co:feilihua_quartz_glass"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "mat:high_speed_ccl",
+      "id": "e2",
+      "relation": "is_component_of",
+      "source_ids": [
+        "cninfo_300395_h1_2026_quartz_electronic_cloth_s2",
+        "cninfo_300395_h1_2026_quartz_electronic_cloth_s6"
+      ],
+      "src_id": "mat:pcb_quartz_glass_cloth"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "菲利华",
+        "菲利華",
+        "Feilihua",
+        "Hubei Feilihua",
+        "Hubei Feilihua Quartz Glass Co., Ltd"
+      ],
+      "attributes": {
+        "ticker": "300395.SZ"
+      },
+      "confidence": 0.9,
+      "id": "co:feilihua_quartz_glass",
+      "name": "湖北菲利华石英玻璃股份有限公司",
+      "role": null,
+      "source_ids": [
+        "cninfo_300395_h1_2026_quartz_electronic_cloth_s1",
+        "cninfo_300395_h1_2026_quartz_electronic_cloth_s3"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "Q glass",
+        "Q-glass",
+        "Q布",
+        "Q玻布",
+        "石英布",
+        "石英玻纖布",
+        "石英纤维布",
+        "石英电子布",
+        "石英電子布",
+        "quartz glass cloth"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "mat:pcb_quartz_glass_cloth",
+      "name": "Quartz glass fiber cloth for high-speed PCB/CCL (Q glass / Q-cloth, high-purity SiO2 electronic cloth)",
+      "role": null,
+      "source_ids": [
+        "cninfo_300395_h1_2026_quartz_electronic_cloth_s2",
+        "cninfo_300395_h1_2026_quartz_electronic_cloth_s3",
+        "cninfo_300395_h1_2026_quartz_electronic_cloth_s4",
+        "cninfo_300395_h1_2026_quartz_electronic_cloth_s5"
+      ],
+      "type": "Material"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "high-speed CCL",
+        "low-loss CCL",
+        "高速 CCL",
+        "高階 CCL",
+        "高速覆銅板"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "mat:high_speed_ccl",
+      "name": "High-speed copper clad laminate (low-loss CCL, M6–M9 class)",
+      "role": null,
+      "source_ids": [
+        "cninfo_300395_h1_2026_quartz_electronic_cloth_s2",
+        "cninfo_300395_h1_2026_quartz_electronic_cloth_s6"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "cninfo_300395_h1_2026_quartz_electronic_cloth",
+    "evidence_tier": 1,
+    "origin_entity": "湖北菲利华石英玻璃股份有限公司",
+    "permission_basis": "公開法定申報（深交所創業板半年度報告，巨潮資訊網）；只保留研究必要的有限逐字節錄。published_at 取巨潮公告日 2026-08-21。",
+    "published_at": "2026-08-21",
+    "publisher": "巨潮資訊網（深交所公告）",
+    "retrieved_at": "2026-10-19",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "湖北菲利华石英玻璃（300395.SZ）2026 年半年度报告：石英电子布是高频高速 CCL 的优选材料；石英砂到石英电子布全产业链垂直一体化；超薄石英电子布仍在客户端测试及终端客户认证；上半年石英电子布销售收入 1.53 亿元",
+    "url": "http://static.cninfo.com.cn/finalpage/2026-08-21/1225484647.PDF"
+  },
+  "sources": [
+    {
+      "id": "cninfo_300395_h1_2026_quartz_electronic_cloth_s1",
+      "locator": "第一节 释义",
+      "quote": "菲利华、公司、本公司、股份公司指湖北菲利华石英玻璃股份有限公司"
+    },
+    {
+      "id": "cninfo_300395_h1_2026_quartz_electronic_cloth_s2",
+      "locator": "p.11 第三节 管理层讨论与分析——主要业务（电子电路领域）",
+      "quote": "在电子电路领域，石英电子布因其优异的介电损耗和超低的膨胀系数，是应用于高频高速覆铜板（CCL）的优选材料。"
+    },
+    {
+      "id": "cninfo_300395_h1_2026_quartz_electronic_cloth_s3",
+      "locator": "p.11 同段",
+      "quote": "公司已具备从石英砂、石英棒、石英电子纱到石英电子布全产业环节垂直一体化的研发和生产能力，产品性能保持国际领先水平。"
+    },
+    {
+      "id": "cninfo_300395_h1_2026_quartz_electronic_cloth_s4",
+      "locator": "p.11 同段",
+      "quote": "公司与多家下游客户建立了深度合作关系，目前公司研发的超薄石英电子布产品仍处于客户端测试及终端客户的认证阶段。"
+    },
+    {
+      "id": "cninfo_300395_h1_2026_quartz_electronic_cloth_s5",
+      "locator": "p.11 当季的驱动因素",
+      "quote": "在电子电路领域，全球AI算力基础设施与数据中心建设提速，人工智能技术持续迭代，带动石英电子布测试需求快速增长。公司研发的超薄石英电子布产品仍处于客户端测试及终端客户的认证阶段，报告期内石英电子布实现销售收入1.53亿元。"
+    },
+    {
+      "id": "cninfo_300395_h1_2026_quartz_electronic_cloth_s6",
+      "locator": "p.12 核心竞争力（电子电路领域）",
+      "quote": "公司已开拓了一批优质的全球覆铜板厂商客户，并与下游国际知名企业建立了稳定合作关系。"
+    },
+    {
+      "id": "cninfo_300395_h1_2026_quartz_electronic_cloth_s7",
+      "locator": "p.3 重要风险提示（四）",
+      "quote": "公司石英电子布项目处于客户端测试及终端客户的认证阶段，受到客户产品迭代及适配测试等不确定因素的影响，业务合作及订单存在不确定性，存在未来业务推进不及预期的风险"
+    }
+  ]
+}

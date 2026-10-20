@@ -1,0 +1,25 @@
+Source URL: https://mopsov.twse.com.tw/nas/STR/621320260813E002.pdf
+
+Excerpt:
+[EXCERPT — 有限逐字引文] 聯茂（ITEQ）2026 年第二季法說簡報（英文，MOPS 621320260813E002）：Worldwide top supplier in high speed / frequency laminate；p.10 產品線 M9 Extreme Low Loss（Df 0.0010~0.0005）對 IT-999GSE2/3；高速材料市占「to uplift robustly」
+DATE: 2026-08-13（MOPS 檔名日期；封面 Aug 2026）
+RETRIEVED: 2026-10-19（本機抽字；空白正規化後逐字核對，中文字之間的抽字空白已去掉）
+NOTE: 公司自述。p.10 產品線圖抽字順序打散：M9 標籤與 IT-999GSE2/3 料號以 pdfminer 座標核過同列（M8 列是 IT-998GSE2／IT-998GSE）。p.9 市占圖的數字是時變觀測（Prismark 2026/06），不收。
+
+【p.1 封面】
+"ITEQ Corporation 2026 Second Quarter Investor Presentation Aug 2026"
+
+【p.9 Market Share Leader in Specialty Laminate】
+"Worldwide top supplier in high speed / frequency laminate"
+
+【p.10 Well-Expanded Product Line（第一點）】
+"The need for hyperscale data center and AI server upgrade to expedite the growth of high speed / frequency material demand"
+
+【p.10 Well-Expanded Product Line（第二點）】
+"ITEQ’s market share in high speed / frequency material to uplift robustly"
+
+【p.10 產品線圖 M9 列標籤】
+"Extreme Low Loss M9 Df 0.0010~0.0005"
+
+【p.10 產品線圖 M9 列料號（抽字順序打散；以 pdfminer 座標核過與 M9 標籤同列）】
+"IT-999GSE2/3"
