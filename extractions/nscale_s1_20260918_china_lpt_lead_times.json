@@ -1,0 +1,103 @@
+{
+  "claims": [
+    {
+      "confidence": 0.65,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：Nscale Limited（或改名後的 Nscale plc）之後的 S-1/A、424(b) 招股書或上市後年報／季報刪掉大型電力變壓器的中國來源句，或寫出電機設備交期縮短到 12 個月以內、不再是長交期設備。核查頻率：每份 S-1/A 與 424(b)；上市後每季（10-Q 或 6-K）與每年（10-K 或 20-F）。觸發後 48 小時：降這條邊的 confidence，重讀大型電力變壓器層需求側（與 IREN、Core Scientific、Fermi、Oncor 四條一併看）。",
+      "id": "nscale_s1_20260918_china_lpt_lead_times_cl1",
+      "source_ids": [
+        "nscale_s1_20260918_china_lpt_lead_times_s1",
+        "nscale_s1_20260918_china_lpt_lead_times_s2",
+        "nscale_s1_20260918_china_lpt_lead_times_s3"
+      ],
+      "statement": "Nscale Limited (Form S-1, 2026-09-18, risk factors p.31): suppliers in China are significant sources of the large power transformers, switchgear, battery cells and rare earth permanent magnets used at its sites; reduced availability, higher cost or regulatory restrictions on equipment of Chinese origin could delay the energization of its sites, and qualified suppliers outside China for certain of this equipment are limited in number and quote longer lead times (the filing does not say which equipment); the electrical and mechanical equipment for its sites is ordered on lead times of 18 to 24 months or longer (not an LPT-specific figure). No supplier is named.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "tech:large_power_transformer",
+      "id": "e1",
+      "relation": "depends_on",
+      "source_ids": [
+        "nscale_s1_20260918_china_lpt_lead_times_s1"
+      ],
+      "src_id": "co:nscale"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "end_demand",
+      "aliases": [
+        "Nscale"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:nscale",
+      "name": "Nscale Limited",
+      "role": null,
+      "source_ids": [
+        "nscale_s1_20260918_china_lpt_lead_times_s1",
+        "nscale_s1_20260918_china_lpt_lead_times_s2",
+        "nscale_s1_20260918_china_lpt_lead_times_s3"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "LPT",
+        "LPTs",
+        "large power transformer",
+        "large power transformers",
+        "초고압 변압기",
+        "extra high voltage power transformer",
+        "extra high voltage power transformers"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:large_power_transformer",
+      "name": "Large Power Transformer (LPT)",
+      "role": null,
+      "source_ids": [
+        "nscale_s1_20260918_china_lpt_lead_times_s1",
+        "nscale_s1_20260918_china_lpt_lead_times_s2",
+        "nscale_s1_20260918_china_lpt_lead_times_s3"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "nscale_s1_20260918_china_lpt_lead_times",
+    "evidence_tier": 1,
+    "origin_entity": "Nscale Limited",
+    "permission_basis": "SEC EDGAR 公開申報（S-1，非保密草稿）；只保留研究必要的有限逐字節錄。published_at 取 EDGAR acceptanceDateTime 2026-09-18。",
+    "published_at": "2026-09-18",
+    "publisher": "SEC EDGAR（Form S-1，File No. 333-299011）",
+    "retrieved_at": "2026-10-20",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Nscale Limited Form S-1（2026-09-18）Risk Factors p.31：站點的大型電力變壓器、開關設備、電池芯、稀土磁鐵有顯著部分來自中國供應商；中國以外合格供應商家數有限、報價交期更長；電機與機械設備訂購交期 18–24 個月以上",
+    "url": "https://www.sec.gov/Archives/edgar/data/2110365/000119312526395475/ck0002110365-20260918.htm"
+  },
+  "sources": [
+    {
+      "id": "nscale_s1_20260918_china_lpt_lead_times_s1",
+      "locator": "Risk Factors —「Adverse global macroeconomic conditions, geopolitical risks, or reduced spending on AI and machine learning or on AI cloud infrastructure could adversely affect…」小節，p.31（中國曝險段）",
+      "quote": "Suppliers in China are significant sources of the large power transformers, switchgear, battery cells and rare earth permanent magnets used in the power, mechanical and cooling systems at our sites, and China has imposed export restrictions on rare earths, gallium, germanium and graphite."
+    },
+    {
+      "id": "nscale_s1_20260918_china_lpt_lead_times_s2",
+      "locator": "同上，p.31（中國曝險段）",
+      "quote": "A reduction in the availability of, or an increase in the cost of or regulatory restrictions applicable to, equipment of Chinese origin could delay the energization of our sites and increase our capital costs, and qualified suppliers outside China for certain of this equipment are limited in number and quote longer lead times."
+    },
+    {
+      "id": "nscale_s1_20260918_china_lpt_lead_times_s3",
+      "locator": "同上，p.31（貿易措施段）",
+      "quote": "because the electrical and mechanical equipment required for our sites is ordered on lead times of 18 to 24 months or longer, our planning assumptions for the landed cost and delivery date of that equipment may be susceptible to drift."
+    }
+  ]
+}
