@@ -1,0 +1,197 @@
+{
+  "claims": [
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "條件：聯茂官網或規格書撤下 IT-999GSE3、或改寫成不用 Q glass；或聯茂、台燿、台光電一手寫出 Q 布版 M9 料號停止開發。核查頻率：每季（聯茂官網產品頁與法說簡報）。觸發後 48 小時：e1 降 confidence，重讀石英布節點與 Low-Dk 玻纖布層的反向路徑。",
+      "id": "iteq_web_high_tg_extreme_low_loss_it999gse2_gse3_en_20260622_cl1",
+      "source_ids": [
+        "iteq_web_high_tg_extreme_low_loss_it999gse2_gse3_en_20260622_s3",
+        "iteq_web_high_tg_extreme_low_loss_it999gse2_gse3_en_20260622_s4"
+      ],
+      "statement": "ITEQ (a high-speed CCL maker, i.e. a buyer of glass cloth), product page of its High Tg (Extreme Low-Loss) laminates: IT-999GSE3 is a low-CTE, extreme-low loss material designed for 224Gbps-per-channel PAM-4 and 1.6T applications, and 'The product uses Q glass which helps with the skew related issues'; its laminates use multi-ply spread glass constructions. Buyer-side first-hand statement of the product's composition. No volume, end customer or Q-glass supplier is named, and qualification status at customers is not stated.",
+      "subject_id": "e1"
+    },
+    {
+      "confidence": 0.55,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "條件：聯茂、台燿或台光電的一手寫出 Q 布與 Low Dk2 布用在不同等級或不同位置（例如 Q 布只用於下一級或特定層別，不與 Low Dk2 布二選一），或寫明同一級量產只用其中一種。核查頻率：每季（三家 CCL 廠法說簡報與官網產品頁）。觸發後 48 小時：e2 降 confidence 或提 retire，重讀 Low-Dk 玻纖布層的反向路徑；台玻、富喬敘事重答反證③。",
+      "id": "iteq_web_high_tg_extreme_low_loss_it999gse2_gse3_en_20260622_cl2",
+      "source_ids": [
+        "iteq_web_high_tg_extreme_low_loss_it999gse2_gse3_en_20260622_s2",
+        "iteq_web_high_tg_extreme_low_loss_it999gse2_gse3_en_20260622_s3",
+        "iteq_web_high_tg_extreme_low_loss_it999gse2_gse3_en_20260622_s4",
+        "iteq_web_high_tg_extreme_low_loss_it999gse2_gse3_en_20260622_s5",
+        "iteq_web_high_tg_extreme_low_loss_it999gse2_gse3_en_20260622_s6"
+      ],
+      "statement": "Modeling judgment from a single origin (ITEQ). On the same product page, IT-999GSE2 'uses Low Dk2 glass' and IT-999GSE3 'uses Q glass'; both carry identical application text (224Gbps per channel PAM-4, 1.6T into multi-channel terabit rates), both list '1.6T Switch solution' as the first key feature, and both say the glass 'helps with the skew related issues' (Dk/Df at 10GHz: 3.02/0.0008 vs 2.93/0.0007). A CCL buyer therefore chooses Low Dk2 cloth or Q glass for the same position. The page does not say either replaces the other and gives no mix or volume; this edge marks a parallel alternative, not a mainstream shift.",
+      "subject_id": "e2"
+    },
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "條件：聯茂官網或規格書撤下 IT-999GSE2、或改寫成不用 Low Dk2 glass。核查頻率：每季（聯茂官網產品頁與法說簡報）。觸發後 48 小時：e3 降 confidence（這條 canonical 邊另有台燿年報等來源，不刪邊），重讀 Low-Dk 玻纖布層的需求側。",
+      "id": "iteq_web_high_tg_extreme_low_loss_it999gse2_gse3_en_20260622_cl3",
+      "source_ids": [
+        "iteq_web_high_tg_extreme_low_loss_it999gse2_gse3_en_20260622_s2",
+        "iteq_web_high_tg_extreme_low_loss_it999gse2_gse3_en_20260622_s4"
+      ],
+      "statement": "ITEQ product page: IT-999GSE2, an extreme-low loss laminate designed for 224Gbps PAM-4 and 1.6T applications, 'uses Low Dk2 glass which helps with the skew related issues'. A second CCL maker's first-hand statement (after Taiwan Union Technology's 2025 annual report) that Low Dk2 cloth goes into high-speed CCL, at the product-number level. The cloth supplier is not named.",
+      "subject_id": "e3"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "mat:high_speed_ccl",
+      "id": "e1",
+      "relation": "is_component_of",
+      "source_ids": [
+        "iteq_web_high_tg_extreme_low_loss_it999gse2_gse3_en_20260622_s3",
+        "iteq_web_high_tg_extreme_low_loss_it999gse2_gse3_en_20260622_s4"
+      ],
+      "src_id": "mat:pcb_quartz_glass_cloth"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.6,
+      "dst_id": "mat:pcb_low_dk_glass_cloth",
+      "id": "e2",
+      "relation": "competes_with",
+      "source_ids": [
+        "iteq_web_high_tg_extreme_low_loss_it999gse2_gse3_en_20260622_s2",
+        "iteq_web_high_tg_extreme_low_loss_it999gse2_gse3_en_20260622_s3",
+        "iteq_web_high_tg_extreme_low_loss_it999gse2_gse3_en_20260622_s4",
+        "iteq_web_high_tg_extreme_low_loss_it999gse2_gse3_en_20260622_s5",
+        "iteq_web_high_tg_extreme_low_loss_it999gse2_gse3_en_20260622_s6"
+      ],
+      "src_id": "mat:pcb_quartz_glass_cloth"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "mat:high_speed_ccl",
+      "id": "e3",
+      "relation": "is_component_of",
+      "source_ids": [
+        "iteq_web_high_tg_extreme_low_loss_it999gse2_gse3_en_20260622_s2",
+        "iteq_web_high_tg_extreme_low_loss_it999gse2_gse3_en_20260622_s4"
+      ],
+      "src_id": "mat:pcb_low_dk_glass_cloth"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "Q glass",
+        "Q-glass",
+        "Q布",
+        "Q玻布",
+        "石英布",
+        "石英玻纖布",
+        "石英纤维布",
+        "石英电子布",
+        "石英電子布",
+        "quartz glass cloth"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "mat:pcb_quartz_glass_cloth",
+      "name": "Quartz glass fiber cloth for high-speed PCB/CCL (Q glass / Q-cloth, high-purity SiO2 electronic cloth)",
+      "role": null,
+      "source_ids": [
+        "iteq_web_high_tg_extreme_low_loss_it999gse2_gse3_en_20260622_s3"
+      ],
+      "type": "Material"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "high-speed CCL",
+        "low-loss CCL",
+        "高速 CCL",
+        "高階 CCL",
+        "高速覆銅板"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "mat:high_speed_ccl",
+      "name": "High-speed copper clad laminate (low-loss CCL, M6–M9 class)",
+      "role": null,
+      "source_ids": [
+        "iteq_web_high_tg_extreme_low_loss_it999gse2_gse3_en_20260622_s2",
+        "iteq_web_high_tg_extreme_low_loss_it999gse2_gse3_en_20260622_s3",
+        "iteq_web_high_tg_extreme_low_loss_it999gse2_gse3_en_20260622_s4"
+      ],
+      "type": "Material"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "Low Dk glass cloth",
+        "Low-Dk 玻纖布",
+        "LowDK 布",
+        "NE glass",
+        "NER glass",
+        "低介電玻纖布"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "mat:pcb_low_dk_glass_cloth",
+      "name": "Low-Dk glass fiber cloth for high-speed PCB/CCL (Low Dk1/Dk2, NE/NER class)",
+      "role": null,
+      "source_ids": [
+        "iteq_web_high_tg_extreme_low_loss_it999gse2_gse3_en_20260622_s2"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "iteq_web_high_tg_extreme_low_loss_it999gse2_gse3_en_20260622",
+    "evidence_tier": 1,
+    "origin_entity": "聯茂電子股份有限公司（ITEQ Corporation）",
+    "permission_basis": "聯茂（ITEQ）官網公開產品頁；只保留研究必要的有限逐字節錄。published_at 取頁面自帶的發布中繼資料 article:published_time／JSON-LD datePublished 2026-06-22T10:19:07+08:00（不是抓取日 2026-10-19）。",
+    "published_at": "2026-06-22",
+    "publisher": "聯茂電子官網（產品介紹）",
+    "retrieved_at": "2026-10-19",
+    "source_type": "datasheet",
+    "storage_permission": "repo_excerpt",
+    "title": "聯茂（ITEQ）官網 High Tg (Extreme Low-Loss) 產品頁（英文版）：IT-999GSE2「uses Low Dk2 glass」、IT-999GSE3「uses Q glass」——兩款同為 224Gbps PAM-4、1.6T Switch solution、都說用來解 skew",
+    "url": "https://www.iteqcorp.com/product/product/high-tg-extreme-low-loss/?lang=en"
+  },
+  "sources": [
+    {
+      "id": "iteq_web_high_tg_extreme_low_loss_it999gse2_gse3_en_20260622_s1",
+      "locator": "頁首",
+      "quote": "聯茂電子股份有限公司ITEQ CORPORATION"
+    },
+    {
+      "id": "iteq_web_high_tg_extreme_low_loss_it999gse2_gse3_en_20260622_s2",
+      "locator": "IT-999GSE2 產品說明",
+      "quote": "The IT-999GSE2 is an advanced low CTE, high Tg ( 180°C by DMA), halogen free, low Dk and extreme-low loss material. This material is especially designed for leading edge high speed applications, like the 224Gbps per channel data rates using PAM-4 signaling. The product is designed for enterprise applications ranging from 1.6T Gbps data rates into multi-channel terabit rates. The product uses Low Dk2 glass which helps with the skew related issues. The prepreg constructions are designed with spread glass and laminates offer multi-ply spread glass constructions to reduce the fiber weave effect."
+    },
+    {
+      "id": "iteq_web_high_tg_extreme_low_loss_it999gse2_gse3_en_20260622_s3",
+      "locator": "IT-999GSE3 產品說明（原文「TheThe」照錄）",
+      "quote": "The IT-999GSE3 is an advanced low CTE, high Tg ( 180° C by DMA), halogen free, low Dk and extreme-low loss material. This material is especially designed for leading edge high speed applications, like the 224Gbps per channel data rates using PAM-4 signaling. TheThe product is designed for enterprise applications ranging from 1.6T Gbps data rates into multi-channel terabit rates. The product uses Q glass which helps with the skew related issues. The prepreg constructions are designed with spread glass and laminates offer multi-ply spread glass constructions to reduce the fiber weave effect."
+    },
+    {
+      "id": "iteq_web_high_tg_extreme_low_loss_it999gse2_gse3_en_20260622_s4",
+      "locator": "兩款 Key Features 第一項（IT-999GSE2、IT-999GSE3 各列一次）",
+      "quote": "1.6T Switch solution"
+    },
+    {
+      "id": "iteq_web_high_tg_extreme_low_loss_it999gse2_gse3_en_20260622_s5",
+      "locator": "IT-999GSE2 Key Features",
+      "quote": "Lower Dk (3.02 @ 10GHz) and Ultra low Df (0.0008 @ 10GHz)"
+    },
+    {
+      "id": "iteq_web_high_tg_extreme_low_loss_it999gse2_gse3_en_20260622_s6",
+      "locator": "IT-999GSE3 Key Features",
+      "quote": "Lower Dk (2.93 @ 10GHz) and Ultra low Df (0.0007 @ 10GHz)"
+    }
+  ]
+}

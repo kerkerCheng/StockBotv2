@@ -15,6 +15,17 @@
       ],
       "statement": "Taiwan Union Technology (a high-speed CCL maker and buyer of copper foil and glass cloth), 2025 annual report: the supply increments and adjustments of Low Dk1, Low Dk2 and Q-glass cloth and HVLP3/HVLP4 copper foil needed for CCL upgrades 'clearly affect the supply bottleneck of CCL & PCB'; Low Dk1 cloth tightness is easing as weavers expand, while Low Dk2 cloth is still clearly constrained by suppliers' expansion pace; copper foil is ~35%, glass cloth ~25% of CCL cost. Counter-statement in the same report: its main raw materials each have two or more suppliers and there has been no supply shortage or interruption in the past.",
       "subject_id": "e2"
+    },
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "條件：台燿後續年報或法說不再把 Q glass 列為 CCL 升級所需的玻璃布，或寫明其高速 CCL 不用 Q 布。核查頻率：每年（台燿年報）＋每季（法說簡報）。觸發後 48 小時：e6 降 confidence，重讀石英布節點的需求側。",
+      "id": "mops_6274_annual_report_2025_hvlp_lowdk_bottleneck_cl2",
+      "source_ids": [
+        "mops_6274_annual_report_2025_hvlp_lowdk_bottleneck_s1"
+      ],
+      "statement": "Taiwan Union Technology (a high-speed CCL maker and buyer of glass cloth), 2025 annual report: Q glass cloth is listed together with Low Dk1 and Low Dk2 cloth as the glass cloth needed for continued CCL material upgrades, and the supply increments of these high-end materials 'clearly affect the supply bottleneck of CCL & PCB'. Names Q glass as a CCL input; does not give its share, nor which TUC products use it (its ThunderClad 5Q / TU-953Q datasheet lists glass styles 1035 and 1078 without the glass type).",
+      "subject_id": "e6"
     }
   ],
   "edges": [
@@ -78,6 +89,17 @@
         "mops_6274_annual_report_2025_hvlp_lowdk_bottleneck_s5"
       ],
       "src_id": "co:taiwan_union_technology"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "mat:high_speed_ccl",
+      "id": "e6",
+      "relation": "is_component_of",
+      "source_ids": [
+        "mops_6274_annual_report_2025_hvlp_lowdk_bottleneck_s1"
+      ],
+      "src_id": "mat:pcb_quartz_glass_cloth"
     }
   ],
   "nodes": [
@@ -174,6 +196,30 @@
         "mops_6274_annual_report_2025_hvlp_lowdk_bottleneck_s6"
       ],
       "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "Q glass",
+        "Q-glass",
+        "Q布",
+        "Q玻布",
+        "石英布",
+        "石英玻纖布",
+        "石英纤维布",
+        "石英电子布",
+        "石英電子布",
+        "quartz glass cloth"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "mat:pcb_quartz_glass_cloth",
+      "name": "Quartz glass fiber cloth for high-speed PCB/CCL (Q glass / Q-cloth, high-purity SiO2 electronic cloth)",
+      "role": null,
+      "source_ids": [
+        "mops_6274_annual_report_2025_hvlp_lowdk_bottleneck_s1"
+      ],
+      "type": "Material"
     }
   ],
   "schema_version": "0.1",
@@ -187,6 +233,7 @@
     "retrieved_at": "2026-10-18",
     "source_type": "filing",
     "storage_permission": "repo_excerpt",
+    "supersedes_extraction_sha256": "0008abb0fb46c994283fdbe52317212d900e9061c52b31a65a3f79a0e347f205",
     "title": "台燿科技（6274）2025 年報：CCL 升級所需的 Low Dk1／Dk2／Q glass 玻璃布與 HVLP3／HVLP4 銅箔「明顯影響 CCL & PCB 的供貨瓶頸」；Low Dk2 布受布廠擴產進度限制；送樣 1.6T M9 材料",
     "url": "https://doc.twse.com.tw/server-java/t57sb01?step=9&kind=F&co_id=6274&filename=2025_6274_20260617F04.pdf"
   },
