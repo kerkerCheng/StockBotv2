@@ -93,3 +93,14 @@
 - **影響哪些量測**：7.5 檢查點的雷達計數（「triaged_go 且追到一手或入圖、沒有別的管道更早登記」）要**按這四個日期切段**報——10-20 之後的市場層、10-22 之後的層輪替多出來的收穫不能算成同一台儀器的表現；
   「提到在盯的條件」計數 10-21 起含截短 id 解析（之前低估）、10-22 起只在今天輪到的層的條件裡比（分母變了）。不回溯。
   另：每日摘要（⑪c）10-22 起多一張「可能怎麼影響」清單（雷達精進 C2）——不改任何來源與母體，只改短版輸出，不影響量測。
+
+## 2026-10-21　題材 7 → 6（移除 `cnbio`）＋`aibio` 改寫成「三問全中」的定義；補記 10-07 加 `cnbio`
+
+- **改了什麼**：
+  1. **補記**：`95509fda`（2026-10-07 14:28 台北）在 `config/themes.txt` 加 `cnbio`（中國創新藥授權鏈；使用者「B ok」，pq2 [726]），題材 6 → 7——**當時本檔沒記**。sha256 `15ea5a47d7ebfab85ff0a7f8d6993b1eaa02fcc8a36c60b55d6cbc1b316bd420`（前一筆 10-06 是 `529daf06…5539`）。雷達查詢 10-08 起才出現 cnbio 題（10-07 的 26 個查詢裡沒有）。
+  2. 移除 `cnbio`（7 → 6）；`aibio` 的描述與關鍵字改寫成「三問全中才算 AI 生醫」：①付錢的是 AI 程式 ②買的是實體輸入、量跟著 AI 走 ③落得到一層或具名供應商。關鍵字 40 → 48：拿掉實驗猴／臨床前類 9 個（IND-enabling、preclinical CRO、non-human primate、cynomolgus、臨床前、临床前、食蟹猴、實驗猴、实验猴）與泛用字 6 個（AI-designed drug、oligo synthesis、protein expression、protein production、antibody discovery、high-throughput screening），加 23 個（HT-SPR、Carterra、Adaptyv、oligo pool、Perturb-seq、virtual cell、Ultima Genomics、Tahoe Therapeutics、data generation agreement、TuneLab、autonomous lab 等）；反證詞拿掉 pharma R&D budget cut、monkey supply easing，加 in-house wet lab。仍不列核心公司。sha256（`git show <commit>:config/themes.txt | sha256sum`）見本筆的 commit。
+- **為什麼**：使用者 10-21「生醫 go」——在意的是 AI；這推翻 10-20「生醫兩題留著」（`docs/plans/2026-10-21-001-feat-radar-impact-mapping-plan.md` 開頭）。`cnbio` 的需求一手歸因是融資與授權、不是 AI（cases.md B1 結案段）；舊 `aibio` 的實驗猴字讓 aibio 也收到 cnbio 的新聞（lead_268ffc9e 同時標 aibio、cnbio）。近 14 天雷達在這兩題收 9 則（aibio 5、cnbio 4）：8 則 triaged_no_go、1 則 parked；套三問只有 1 則（Danaher／Abcam 自主實驗室）會收，它的 triage 也是 no-go。
+- **影響哪些量測**：
+  - 雷達主題層 7 → 6 題，**10-22 daily 起**，不回溯；每天約少 1–2 次搜尋（10-08～10-21 cnbio 類查詢每天 1–2 次）。7.5 檢查點與 56 天報告的雷達計數，在上一筆的四個切點之外**再加這一個切點**；`web_radar:cnbio` 的 4 則舊 lead 照實留在試驗計數裡。
+  - lead 主題標記（`leads._themes_for`）只對新登記或內容被補長的 lead 生效；舊 lead 已存的 `themes` 不回溯（`backfill_themes` 只補沒有標記的）。新規則下 Adaptyv、Carterra、HT-SPR 會標到 aibio，實驗猴、臨床前不再標；triage 提示的命中詞隨之改變。
+  - 不變：cnbio 的三個日期等待（ew_0650 到 2027-02-12、ew_0740 到 2026-11-15、ew_0741 到 2027-02-14；kind=date、`poll.eligible=false`，只靠到期日叫醒——移除主題後到期前不會再有雷達新聞讓人看到，使用者在意 AI，接受）；tracked、materialize 頁數、EDGAR 監看（兩題都沒有核心公司）；主題等權組（兩題都沒有）；H1／H5／H9 的 case 清單。T1 manifest 對 `themes.txt` 的差異歸因到這一筆（含 10-07 補記）。
