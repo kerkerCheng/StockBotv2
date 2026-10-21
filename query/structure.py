@@ -77,8 +77,13 @@ ANGLES: tuple[tuple[str, str], ...] = (
     ("supply_side", "供給側：誰供它、有沒有人獨佔"),
     ("next_layer", "下一層：它自己卡在誰身上"),
     ("counter_path", "反向路徑：有沒有東西在取代它"),
+    # 批次二 E3（failure log #87，2026-10-21）：供給側收 supplies_to 卻不收 develops（L17 第三問：對稱面）——
+    # 穩懋、Nokia develops 6 吋 InP、cowos is_variant_of 先進封裝入圖後讀圖都沒變 stale。
+    ("developers", "開發者與變體：誰在做這一層、哪些是它的變體"),
     ("anchor", "需求錨：走不走得到有人花錢的地方"),
 )
+#: 開發者這一類收哪些 relation（指向本節點）。
+DEVELOPER_RELATIONS = ("develops", "is_variant_of")
 
 #: 哪些 relation 算「需求側」——與 `build_upward_index` 同一組語意，但這裡是**看向這個節點**：
 #: `A depends_on N` ⇒ A 需要 N；`N is_component_of B` ⇒ B 需要 N。
@@ -128,6 +133,8 @@ class EdgeView:
     #: None＝沒有 sub 或沒核對。⚠ **不進 `key()`**：字表升版或補一段引文都會讓它變，進了 digest 每一份讀圖都會在
     #: 部署那天變 stale——量到的是我們的程式，不是圖（plan §0 第 6 條；與 `documents` 同一個理由）。
     sub_language_in_quote: bool | None = None
+    #: 我們最早何時取得引用它的文件（`CanonicalEdge.first_retrieved`）。**不進 `key()`**：同一條邊多讀一份文件不得改變 digest。
+    first_retrieved: str | None = None
 
     def as_dict(self) -> dict[str, Any]:
         return {
@@ -136,6 +143,7 @@ class EdgeView:
             "qualification_status": self.qualification_status,
             "evidence": self.evidence, "documents": self.documents,
             "sub_language_in_quote": self.sub_language_in_quote,
+            "first_retrieved": self.first_retrieved,
         }
 
     def key(self) -> tuple:
@@ -163,6 +171,10 @@ class StructureView:
             name: sorted(str(e.key()) for e in self.angles.get(name, ()))
             for name, _ in ANGLES if name != "anchor"
         }
+        # E3 升版（2026-10-21）：開發者這一類是空的就不進 payload——沒有 develops／is_variant_of 的節點 digest 一位元不變，
+        # 升版只碰得到真的有這類邊的那幾個節點（舊讀圖那一側的比對見 `alpha.structure_reading.staleness`）。
+        if not payload.get("developers"):
+            payload.pop("developers", None)
         payload["anchor"] = list(self.anchor_chain or [])
         blob = json.dumps(payload, ensure_ascii=False, sort_keys=True)
         return hashlib.sha256(blob.encode("utf-8")).hexdigest()
@@ -190,6 +202,7 @@ def _view(edge: CanonicalEdge) -> EdgeView:
         qualification_status=edge.qualification_status,
         evidence=edge.evidence, documents=edge.documents,
         sub_language_in_quote=edge.sub_language_in_quote,
+        first_retrieved=getattr(edge, "first_retrieved", None),
     )
 
 
@@ -225,6 +238,10 @@ def build_structure(node: str, edges: Iterable[CanonicalEdge]) -> StructureView:
     view.angles["counter_path"] = [
         _view(e) for e in edges
         if (e.dst == node or e.src == node) and e.relation in counter
+    ]
+    view.angles["developers"] = [
+        _view(e) for e in edges
+        if e.dst == node and e.relation in DEVELOPER_RELATIONS
     ]
     view.anchor_chain = demand_chain(node, build_upward_index(edges))
     return view

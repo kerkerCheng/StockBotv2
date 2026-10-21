@@ -533,6 +533,10 @@ class CanonicalEdge:
     #: ⚠ 這是 point-in-time 的唯一時間線索：canonical edge 本身沒有時間欄位，
     #: 「這條邊在 T 那天存不存在」只能由「引用它的文件在 T 之前發表過沒有」回答。
     source_docs: dict = field(default_factory=dict)
+    #: 引用它的 SourceDoc 最早的 `retrieved_at`（YYYY-MM-DD；全部沒有＝None）——「**我們**最早何時知道」，不是世界何時知道
+    #: （`published_at`）。批次二 E3：舊讀圖快照沒有開發者這一類，升版時只有晚於讀圖日才取得的邊算新增
+    #: （[815] Nokia 那份 published_at 是空的、retrieved_at 是 10-19——只有這一欄分得出來）。不進 digest。
+    first_retrieved: str | None = None
 
 
 def collapse_assertions(rows: Iterable[Mapping[str, Any]]) -> dict[tuple, CanonicalEdge]:
@@ -579,6 +583,9 @@ def collapse_assertions(rows: Iterable[Mapping[str, Any]]) -> dict[tuple, Canoni
             # 不得覆蓋已知值（`or` 而不是直接指派）。
             edge.source_docs[str(doc_id)] = (
                 row.get("published_at") or edge.source_docs.get(str(doc_id)))
+        retrieved = str(row.get("retrieved_at") or "")[:10]
+        if len(retrieved) == 10 and (edge.first_retrieved is None or retrieved < edge.first_retrieved):
+            edge.first_retrieved = retrieved
         if row.get("origin"):
             edge.origins.add(str(row["origin"]))
             if str(row.get("source_type") or "") == "filing":
@@ -971,7 +978,7 @@ def fetch_assertions(session) -> list[dict[str, Any]]:
                d.origin_entity AS origin, d.source_type AS source_type,
                d.origin_linkage AS origin_linkage,
                e.source_doc_id AS source_doc_id, d.published_at AS published_at,
-               e.id AS assertion_id
+               d.retrieved_at AS retrieved_at, e.id AS assertion_id
         """
     ).data()
 

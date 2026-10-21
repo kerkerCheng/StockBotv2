@@ -71,7 +71,9 @@ READING_KINDS: Mapping[str, str] = {
 
 #: 五個角度的 key，與 `query/structure.py::ANGLES` 同一組封閉字彙。
 #: ⚠ 兩邊不一致時寫入端拒收——分類有 SSOT 就不該在第二個地方重造一份（L16）。
-ANGLE_KEYS: tuple[str, ...] = ("demand_side", "supply_side", "next_layer", "counter_path")
+#: 2026-10-21 批次二 E3 加 `developers`（指向本節點的 develops／is_variant_of）——之前寫的讀圖快照沒有這個 key，
+#: staleness 依「快照有沒有這個 key」分新舊（舊的只算讀圖日之後才取得的邊）。
+ANGLE_KEYS: tuple[str, ...] = ("demand_side", "supply_side", "next_layer", "counter_path", "developers")
 
 _ID_FIELDS = ("node", "result_digest", "kind", "reading", "created_at", "author",
               "expires", "tickers", "supersedes_id", "retracted")

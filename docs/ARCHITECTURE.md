@@ -920,9 +920,12 @@ APP：briefCard → argumentCard → priceCard → drill「稽核」→ drill「
 | **結構讀圖** | `query.structure` 查（零 LLM）＋ 互動 session 讀 | **不可以**——只寫下讀到什麼，不濾、不排、不給尺寸 |
 | 賭注／Abstention | 人（或 LLM 起草、人確認） | 不可以 |
 
-**五個角度是封閉清單**（`ANGLES`）：需求側／供給側／下一層／反向路徑／需求錨可達性。
-清單來自 2026-09-17 那次真的問出答案的四次查詢，不是憑空設計——要加第六個角度前先問
-「它在哪一個實際案例裡改變過結論」，答不出來就不要加（L17-4）。
+**角度是封閉清單**（`ANGLES`）：需求側／供給側／下一層／反向路徑／**開發者與變體**／需求錨可達性。
+前五個來自 2026-09-17 那次真的問出答案的四次查詢，不是憑空設計——要加角度前先問
+「它在哪一個實際案例裡改變過結論」，答不出來就不要加（L17-4）。第六個（`developers`：指向本節點的 develops／
+is_variant_of）2026-10-21 加，答得出來：穩懋、Nokia develops 6 吋 InP、cowos is_variant_of 先進封裝三次入圖都沒讓讀圖 stale
+（failure log #87；供給側收 supplies_to 卻不收 develops，L17-3）。它空的時候不進 digest（沒有這類邊的節點 digest 一位元不變）；
+升版前寫的讀圖快照沒有這一類，staleness 只把取得日（`CanonicalEdge.first_retrieved`）晚於讀圖日的邊算新增。
 
 **維護靠「存輸入，不存結論」**（`alpha/structure_reading/`，append-only ledger，主鍵是 node 不是 ticker）：
 紀錄的主體是**當時那五條查詢回什麼**，判讀只是附帶。存結論沒有用——它不會告訴你什麼時候不再成立。

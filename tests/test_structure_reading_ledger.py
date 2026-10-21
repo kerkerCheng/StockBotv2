@@ -280,6 +280,44 @@ def test_a_merge_that_also_brings_a_real_new_edge_is_still_flagged() -> None:
     assert [c["detail"] for c in status["changes"]] == ["新增 1 條：co:new→tech:cw_dfb_laser"]
 
 
+def _with_developers(after, *rows):
+    after = dict(after)
+    after["angles"] = {**after["angles"], "developers": [
+        dict(_edge(src, relation="develops", sub=None, qual=None, evidence="self_reported"), first_retrieved=seen)
+        for src, seen in rows]}
+    return after
+
+
+def _old_record():
+    """E3 升版前寫的讀圖：快照沒有 developers 這一類。"""
+    record = _record()
+    record["angles"].pop("developers")
+    return record
+
+
+def test_an_old_reading_sees_only_developers_retrieved_after_it_was_written() -> None:
+    """批次二 E3（#87）：升版當天，舊讀圖只有「讀圖日之後才取得」的開發者邊算新增——其餘印 digest 升版、內容未變。"""
+    read_on = TODAY.isoformat()
+    known = _status(_with_developers(_structure(digest="d-up"), ("co:win", read_on)), record=_old_record())
+    assert known["status"] == "current" and known["digest_upgraded"] and not needs_reread(known)
+    assert "digest 升版" in known["reason"]
+    later = (TODAY + timedelta(days=2)).isoformat()
+    new = _status(_with_developers(_structure(digest="d-up"), ("co:win", read_on), ("co:nokia", later)),
+                  record=_old_record())
+    assert new["status"] == "stale" and new["highest_grade"] == "high" and not new["digest_upgraded"]
+    assert [c["kind"] for c in new["changes"]] == ["developer_added"] and "co:nokia" in new["changes"][0]["detail"]
+    undated = _status(_with_developers(_structure(digest="d-up"), ("co:x", None)), record=_old_record())
+    assert undated["status"] == "current" and "取得日不明 1 條" in undated["reason"]
+
+
+def test_a_new_reading_compares_developers_like_any_other_angle() -> None:
+    """升版之後寫的讀圖快照有這一類（空的也有 key）：多一家開發者就是供給側變化，不看取得日。"""
+    record = _record()
+    assert record["angles"]["developers"] == []
+    status = _status(_with_developers(_structure(digest="d-new"), ("co:win", "2020-01-01")), record=record)
+    assert status["status"] == "stale" and [c["kind"] for c in status["changes"]] == ["developer_added"]
+
+
 def test_anchor_reachability_change_is_graded() -> None:
     status = _status(_structure(anchor=(), digest="d4"))
     assert any(c["kind"] == "anchor" for c in status["changes"])

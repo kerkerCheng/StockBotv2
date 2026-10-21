@@ -53,9 +53,43 @@ def _view(rows=None):
     return build_structure("tech:cw_dfb_laser", _edges(rows or CW_ROWS))
 
 
-def test_five_angles_in_fixed_order() -> None:
+def test_six_angles_in_fixed_order() -> None:
     assert [name for name, _ in ANGLES] == [
-        "demand_side", "supply_side", "next_layer", "counter_path", "anchor"]
+        "demand_side", "supply_side", "next_layer", "counter_path", "developers", "anchor"]
+
+
+def test_developers_and_variants_pointing_at_the_node_are_their_own_angle() -> None:
+    """批次二 E3（#87）：穩懋、Nokia develops 6 吋 InP、cowos is_variant_of 先進封裝——供給側收 supplies_to 卻不收這兩種（L17-3）。"""
+    rows = CW_ROWS + [_row("co:nokia", "develops", "tech:cw_dfb_laser"),
+                      _row("tech:cw_dfb_laser_v2", "is_variant_of", "tech:cw_dfb_laser"),
+                      _row("tech:cw_dfb_laser", "develops", "tech:somewhere_else")]          # 出去的不算
+    view = _view(rows)
+    assert sorted((e.src, e.relation) for e in view.angles["developers"]) == [
+        ("co:nokia", "develops"), ("tech:cw_dfb_laser_v2", "is_variant_of")]
+    assert view.result_digest() != _view(CW_ROWS + [_row("tech:cw_dfb_laser", "develops", "tech:somewhere_else")]).result_digest()
+
+
+def test_a_node_without_developers_keeps_its_old_digest() -> None:
+    """升版只碰得到真的有開發者邊的節點：這一類空的時候不進 digest（舊算法的 payload 一字不差）。"""
+    import hashlib
+    import json
+
+    view = _view()
+    payload = {name: sorted(str(e.key()) for e in view.angles.get(name, ()))
+               for name in ("demand_side", "supply_side", "next_layer", "counter_path")}
+    payload["anchor"] = list(view.anchor_chain or [])
+    old = hashlib.sha256(json.dumps(payload, ensure_ascii=False, sort_keys=True).encode("utf-8")).hexdigest()
+    assert view.result_digest() == old
+
+
+def test_first_retrieved_is_the_earliest_retrieval_and_never_enters_the_digest() -> None:
+    rows = [dict(_row("co:nokia", "develops", "tech:cw_dfb_laser"), retrieved_at="2026-10-19"),
+            dict(_row("co:nokia", "develops", "tech:cw_dfb_laser"), source_doc_id="doc_b", retrieved_at="2026-10-04T09:00:00"),
+            dict(_row("co:nokia", "develops", "tech:cw_dfb_laser"), source_doc_id="doc_c", retrieved_at=None)]
+    edge = _edges(rows)[0]
+    assert edge.first_retrieved == "2026-10-04"
+    later = [dict(r, retrieved_at="2026-10-20") for r in rows]
+    assert _view(CW_ROWS + rows).result_digest() == _view(CW_ROWS + later).result_digest()
 
 
 def test_each_angle_picks_up_its_own_edges() -> None:

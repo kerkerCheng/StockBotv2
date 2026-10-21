@@ -81,6 +81,10 @@ CHANGE_KINDS: Mapping[str, tuple[str, str]] = {
     # 客戶或第三方第一次具名（evidence 由自報升成外部印證）本身就是確認或推翻事件；層讀圖的分級一字不動。
     # Phase 6 Step 6.1：只有**跨級**（rank 不同）才是；同級互換走 `evidence`（low）。
     "supply_evidence": ("high", "插槽的供貨邊證據等級跨級變了——客戶或第三方第一次具名，是插槽賭注的確認或推翻事件"),
+    # 批次二 E3（failure log #87）：供給側收 supplies_to 卻不收 develops（L17 第三問：對稱面）——新增一家開發者＝供給側變化。
+    "developer_added": ("high", "多了一家開發者或一個變體（develops／is_variant_of）——供給側變化"),
+    "developer_removed": ("high", "少了一家開發者或一個變體——供給側變化"),
+    "developer_attr": ("normal", "開發者那條邊的屬性變了"),
 }
 
 #: 哪些變化**同時**是既有 disproof 機制的觸發來源（§6b ④）。
@@ -93,7 +97,10 @@ _ANGLE_TO_KINDS: Mapping[str, tuple[str, str]] = {
     "demand_side": ("demand_edges", "demand_substitutability"),
     "next_layer": ("next_layer", "next_layer"),
     "counter_path": ("counter_path", "counter_path"),
+    "developers": ("developer_added", "developer_attr"),
 }
+#: E3 升版前寫的讀圖快照沒有這一類（`ANGLE_KEYS` 加了之後才有）。
+DEVELOPERS_ANGLE = "developers"
 
 #: 邊的 key 在快照裡的欄位順序（與 `structure_reading_record` 寫入時一致）。
 _SRC, _REL, _DST, _SUB, _SOLE, _QUAL, _EVID = range(7)
@@ -154,7 +161,8 @@ def _angle_changes(angle: str, before: Iterable[Sequence[Any]], after: Iterable[
         changes.append(StructureChange(angle, member_kind,
                                        f"新增 {len(added)} 條：" + "、".join(f"{s}→{d}" for s, _r, d in added[:3])))
     if removed:
-        kind = {"supply_side": "supply_removed", "counter_path": "counter_path_removed"}.get(angle, member_kind)
+        kind = {"supply_side": "supply_removed", "counter_path": "counter_path_removed",
+                "developers": "developer_removed"}.get(angle, member_kind)
         changes.append(StructureChange(angle, kind,
                                        f"消失 {len(removed)} 條：" + "、".join(f"{s}→{d}" for s, _r, d in removed[:3])))
 
@@ -225,6 +233,32 @@ def canonical_snapshot(angles: Mapping[str, Sequence[Sequence[Any]]], anchor_cha
     return out, chain, sorted(renamed)
 
 
+def _developers_baseline(reading: Any, after_structure: Mapping[str, Any],
+                         before_angles: dict[str, list[list[Any]]]) -> tuple[bool, int]:
+    """E3 升版前寫的快照沒有開發者這一類：把「讀圖日當天或以前就取得」的開發者邊當成那份讀圖已經看得到的，
+    只有**之後**才取得的算新增。回 `(是不是舊快照且這一類非空, 取得日不明的條數)`。
+
+    取得日用 `first_retrieved`（我們最早何時取得引用它的文件），不用 `published_at`：舊文件、新入圖的那一種
+    （[815] Nokia：published_at 空、retrieved_at 10-19）只有它分得出來。取得日不明的照「已在」算並計數（不靜默）。
+    同一天取得又讀圖算「已在」（入圖後才讀圖是常態）。"""
+    if DEVELOPERS_ANGLE in (reading.angles or {}):
+        return False, 0
+    rows = list((after_structure.get("angles") or {}).get(DEVELOPERS_ANGLE) or ())
+    if not rows:
+        return False, 0
+    read_on = reading.created_on.isoformat()
+    baseline, undated = [], 0
+    for e in rows:
+        seen = str(e.get("first_retrieved") or "")
+        if not seen:
+            undated += 1
+        if not seen or seen <= read_on:
+            baseline.append([str(e.get("src")), str(e.get("relation")), str(e.get("dst")), e.get("substitutability"),
+                             e.get("sole_source"), e.get("qualification_status"), e.get("evidence")])
+    before_angles[DEVELOPERS_ANGLE] = baseline
+    return True, undated
+
+
 def reading_status(reading: Any, after_structure: Mapping[str, Any] | None, *, today: date,
                    evidence_rank: Mapping[str, int], aliases: Mapping[str, str] | None = None) -> dict[str, Any]:
     """一份讀圖紀錄現在是什麼狀態，以及**憑什麼**。
@@ -240,15 +274,18 @@ def reading_status(reading: Any, after_structure: Mapping[str, Any] | None, *, t
         return {"status": None, "reason": "這次沒有讀到圖，無法比對（不是 current）",
                 "changes": [], "expired": reading.is_expired(today)}
     before_angles, before_anchor, renamed = canonical_snapshot(reading.angles, reading.anchor_chain, aliases or {})
+    upgraded, undated = _developers_baseline(reading, after_structure, before_angles)
     changes = grade_changes(before_angles, after_structure, before_anchor=before_anchor,
                             unit=reading.unit, evidence_rank=evidence_rank)
     digest_changed = str(after_structure.get("result_digest") or "") != reading.result_digest
     # digest 是用舊 id 算的：換名之後逐項比對找不出差異、而且確實有 id 換了名，那一半的差異就是換名本身
     alias_only = digest_changed and not changes and bool(renamed)
+    # E3 升版：舊快照沒有開發者這一類、這一類又不是空的 → digest 必然不同；逐項比對（只算讀圖日之後才取得的邊）沒有差異＝升版本身
+    upgrade_only = digest_changed and not changes and upgraded and not alias_only
     grades = {c.grade for c in changes}
     if reading.is_expired(today):
         status = "expired"
-    elif not digest_changed or alias_only:
+    elif not digest_changed or alias_only or upgrade_only:
         status = "current"
     elif grades <= {"low"}:
         status = "stale_low"
@@ -260,11 +297,15 @@ def reading_status(reading: Any, after_structure: Mapping[str, Any] | None, *, t
     if alias_only:
         reason = (f"只有同義節點合併換名（{len(renamed)} 個 id：{'、'.join(renamed[:3])}）——"
                   "換成 canonical 後逐項比對沒有差異，判讀不受影響，不進該重讀")
+    elif upgrade_only:
+        reason = ("digest 升版（2026-10-21 收進開發者／變體這一類）、內容未變——這份讀圖寫的時候還沒有這一類，"
+                  "讀圖日之後才取得的開發者邊 0 條" + (f"；取得日不明 {undated} 條照升版前已在算" if undated else ""))
     elif digest_changed and not changes:
         reason = "result_digest 變了但逐項比對找不出差異——比對欄位與 digest 欄位可能不同步"
     return {
         "alias_only": alias_only,
         "renamed": renamed,
+        "digest_upgraded": upgrade_only,
         "status": status,
         "digest_changed": digest_changed,
         "expired": reading.is_expired(today),
