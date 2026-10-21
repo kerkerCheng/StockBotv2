@@ -110,3 +110,54 @@
 - **改了什麼**：`f0854048`（10-07 13:22 台北，**10-08 daily 起**）：雷達 prompt 由「主題＋在盯條件」改成兩層——加**市場層**（`config/daily_routine.json` 的 `radar.market_topics` 4 題、各一次搜尋、上限 `max_market_items`＝3，與主題層分開計上限），主題層改成「每個主題至少一次廣搜」；收據與 lead refs 帶 `scope`（market／theme／watch）。
 - **為什麼**：使用者 2026-10-07「我們還是必須知道 AI CAPEX 整個市場的大事，不能見樹不見林」。
 - **影響哪些量測**：八週試驗的雷達計數多切一段——10-05～10-07 是沒有市場層的儀器（v0），10-08 起才有（v1）；上一筆補記寫「10-08 之後本檔沒有再記任何變動」，這一次在 10-07，同樣沒記。不回溯。
+
+## 2026-10-21　補記：10-07～10-20 漏記的六筆（題材、名冊、主題等權組、新鏈開題、敘事撤回）
+
+> 10-21 計畫盤點（amendment A11）發現。⚠ 更正同日上一筆（雷達四次改動）的前言：它寫「主題等權組、R3 母體在 10-08 之後 git 上沒有變動」——**主題等權組 ledger 住 `library/private/alpha/theme_cohorts/`、不進 Git**，git log 看不到；10-08 之後實際寫了 4 筆（下面 ③④）。R3 母體確實沒變（registration 自 10-08 之後沒有 commit）。時間為 UTC，括號為台北。
+> 查證：主題組全部版本 `python -c "import json,glob;[print(r['cohort_id'],r['created_at'],r.get('supersedes_id')) for f in glob.glob('library/private/alpha/theme_cohorts/*.jsonl') for l in open(f,encoding='utf-8') if l.strip() for r in [json.loads(l)]]"`；名冊家數 `git show <rev>:config/company_identity.json | python -c "import json,sys;print(len(json.load(sys.stdin)['companies']))"`。
+
+（① 10-07 加 `cnbio`：已在同日「題材 7 → 6」那筆補記，不重複。）
+
+### ② 2026-10-08～10-20　名冊 158 → 195（+37；有研究 ticker 116 → 148）
+
+| commit（台北） | pq2 | 新增 |
+|---|---|---|
+| `083c6b89` 10-08 11:22 | [743] | MXL、OUST（+2） |
+| `22fa801d` 10-08 16:13 | [751] | Freiberger（私人，+1） |
+| `e37bd126` 10-08 21:20 | [753] | Amazon（+1） |
+| `ed6e13ea` 10-17 00:15 | [760][761][763] | 雲南鍺業、大立光、ASMPT（+3） |
+| `b031ec7f` 10-17 17:33 | [773][774] | 新易盛、Source Photonics、Ligent、KSH International、Precision Wires India（+5） |
+| `db9820cb` 10-18 09:44 | [792][795][797][798][799] | Oncor、Core Scientific、Fermi、環宇-KY、Semtech、光環、台燿、金居、三井金屬、台光電、台玻、富喬、滬電（+13） |
+| `6942dce9` 10-18 09:49 | [796] | VIAV、COHU、TTMI（+3） |
+| `8faaf758` 10-19 07:41 | [808] | 古河電工（+1） |
+| `e869d32f`、`4c69c053` 10-19 | [809][810] | 只加別名（+0） |
+| `1a5314c7` 10-19 08:00 | [813] | 京東方（+1） |
+| `ea7fc3e1` 10-19 08:18 | [815][816][817] | Nokia、德福、方邦、CFL（私人）（+4；[817] 只加 Oracle 別名） |
+| `483865cd` 10-20 09:26 | [824][826] | Nscale、聯茂、菲利華（+3） |
+
+- **為什麼**：入圖包隨包 staged（go 才進）與名冊批次；每筆 pq2 都已 go（待辦池核對 2026-10-21）。
+- **影響哪些量測**：tracked、每日 materialize 頁數、Engine C 取價多 32 檔（其餘 5 家沒有研究 ticker）。H1 的第一次接觸：名冊多了才以 company_id 比對，但新登記公司的舊 lead，`entities` 不一定抽得到（例：2026-07-25 那則 X 原文的「Mitsui Kinzoku (5706)」「Nittobo」沒被抽成 company_id；`registry-rescan` 的 stale 計數是 0，表示是抽取規則不認得，不是沒重算）——7.5 照 §0.1 逐列做名字比對、記比對法。R3 的「是否在名冊」欄另印登記日。T1 manifest 的名冊差異歸因到上表各 pq2。
+
+### ③ 2026-10-18　光互連組 v2：`tc_cee164691d22da1e`（[802]，20 檔）取代 `tc_35b0d5cd521656ea`
+
+- **改了什麼**：加光環 3234.TWO、環宇-KY 4991.TWO、新易盛 300502.SZ、波若威 3163.TWO、Ligent 9856.HK；新增兩條排除（Semtech／Marvell、GF）。鑄號 04:19Z、落地 05:14Z（台北 13:14）。
+- **為什麼**：環宇、光環第一份敘事的反方審查指出「不在任何主題等權組」是我們登記晚了（L16）；照原準則補上組定義之後才登記的五家。
+- **影響哪些量測**：**registration §0.1 寫死光通訊的超額基準是 `tc_35b0d5cd521656ea`**——照 §0 第 4 條，O 系列 case 的 2×2 與 R3 的排名（§5.3 第 3 點）照用 v1（15 檔），v2 另欄並列、標版本（Phase 5 closeout #6 換版斷點）。⚠ 追蹤表（`current_cohorts()`）10-18 起算的是 v2，所以追蹤表上的光通訊對組超額與 registration 的基準不同版。R3 母體不因 v2 自動追加（新易盛已是 §5.2 #2；其餘 4 檔併 plan §14 第 20 題）。T1 manifest 的主題組差異歸因到本筆。
+
+### ④ 2026-10-18～10-20　高速 PCB 組 v1 → v2 → v3（[801][807][832]）
+
+- **改了什麼**：主題等權組 ledger 新增「AI 高速 PCB 與上游材料」三版——v1 `tc_c928d2d9fdc6d76a`（[801]，8 檔：2383.TW、6274.TWO、8358.TWO、5706.T、1815.TWO、3110.T、002463.SZ、TTMI；鑄號 2026-10-18T02:26Z、落地 05:14Z＝台北 13:14）；v2 `tc_51042f19a27dee98`（[807]，+1802.TW 台玻，9 檔；2026-10-18T23:40Z 落地＝**台北 10-19 07:40**）；v3 `tc_af5ca457df73ab8b`（[832]，+6213.TW 聯茂，10 檔；鑄號 2026-10-20T06:30Z、落地 11:57Z＝台北 19:57）。
+- **為什麼**：v1＝[799] 入圖，新鏈的組要在第一份敘事之前（plan 7.1 ④、failure log #26）；v2＝台玻 2026 Q2 玻璃纖維部門營收已超過平板玻璃、v1 的排除理由不成立，使用者 10-19 同意重議；v3＝聯茂 [826] 入圖、名冊登記，正是 v1／v2 排除理由寫的時點。
+- **影響哪些量測**：H5、H9 與 2×2 多一組（registration G2，事後登記）。⚠ v2 的 `decided_on` 記成 2026-10-18（ledger 用 UTC 日期），使用者是台北 10-19 早上決定的——failure log #49 同形，點時查詢以 10-19 為準。⚠ 本鏈第一份敘事（台玻 `ib_5a22d69af8f2d5d7`，2026-10-18T04:26:55Z）比 v1 落地早 47 分鐘（同一個台北日；台玻當時在 v1 的排除名單，`alpha brief --add` 只擋待核准組提案的成員，所以沒擋）——驗收⑤對本鏈照實記「組晚 47 分鐘」。⚠ 日東紡同時在載板組 `tc_5061f2233f77a865` 與本組：追蹤表（`cohort_for_row`）對它回 `ambiguous_membership`、兩組都不比——G1 的 2×2 欄要在檢查點指定載板組手算；菲利華、德福、方邦不是任何組的組員（`not_in_any_cohort`）。T1 manifest 的主題組差異歸因到本筆。
+
+### ⑤ 2026-10-20　新鏈開題：Bloom SOFC 現場發電（[831]）
+
+- **改了什麼**：使用者 go [831] → system-decompose：2026-10-20T12:37Z 登記 21 則 pq1 題目（source `decompose:bloom_energy_server_sofc_ai`，triaged_go、tier 4），12:38Z 結案。監看來源、題材、X 帳號、R3 母體、主題等權組都不變；名冊不變（本鏈只有高力在名冊）。registration 2026-10-21 append case E1（預先登記，先於本鏈任何讀圖與敘事）。
+- **為什麼**：高力一手核對走回 Bloom（lead `lead_9d629ed0aa9cd6f2c1115c09d63e3ca3`）：會計師附註定案 Bloom 占 2025 營收 31.27%，但圖上沒有燃料電池／現場發電層。
+- **影響哪些量測**：lead registry +21（T1 manifest 的 lead 差異歸因到本筆）；H1、H10 的 case 多 E1。⚠ power 主題的替代／反證關鍵字有「behind-the-meter generation」——之後的現場發電 lead 會被標成 power 的反證（只影響主題標記，不影響判讀線）。SOFC 層有讀圖之後，雷達「讀過的層」輪替的層數跟著變（10-22 起的機制；同 10-21 那筆的分段）。SOFC 主題等權組未定義——第一份 SOFC 敘事之前要鑄號並落地（registration E1）。
+
+### ⑥ 2026-10-20　撤回 41 份非邊緣「不要」敘事
+
+- **改了什麼**：敘事 ledger append 41 筆撤回紀錄（created_at 都是 2026-10-20T14:56Z＝台北 22:56；note 寫「使用者 2026-10-20 決定撤回（「第2題 撤回」）…撤回不是改判：候選板照舊把它列在非倍率」）。41 檔：009150.KS、012330.KS、2301.TW、2308.TW、300308.SZ、3017.TW、3105.TWO、3653.TW、5016.T、5802.T、6594.T、688836.SS、AAPL、AMAT、AMD、ANET、AVGO、CRWV、FN、GFS、GLW、GOOGL、GXO、HEXA-B.ST、INTC、IREN、JBL、LITE、LRCX、META、MRVL、MSFT、MTSI、NBIS、NVDA、ORCL、TSEM、TSLA、TSM、TTMI、UMC。ledger 不進 Git，沒有對應的 commit。
+- **為什麼**：research-drain 規定不替非倍率（非邊緣）公司寫「不要」敘事；這批隨讀圖換版一直亮「該重寫」、有過時句（failure log #93 的調查）。
+- **影響哪些量測**：**paper lane 的母體不變**——`paper_lane_plan` 取每檔最早一筆**未撤回**的 v2，原本那幾筆沒被改，所以 41 檔仍是 paper 列（錨點狀態都是「不要」），現行狀態變成 retracted；2026-10-21 實算 114 列＝缺 26、不要 44、retracted 41、已定價等回落 3。三量、等權、追高計數仍含這 41 列（36%），它們的錨是 filter 的結果（非邊緣）、不是研究判斷——7.5 照實並列兩欄：全部 114 列、去掉現行狀態 retracted 的列（只印不比、不改判讀線）。主題等權組成員（光互連 v2 的 LITE、FN、300308.SZ；散熱 v2 的 3017.TW、3653.TW；PCB 組的 TTMI）與 R3 母體（2308.TW、009150.KS 等）都不受撤回影響——組是價格籃子，不看敘事。plan 驗收⑤（A8）的 Q3 名單只收現行敘事。case 段引用的敘事若之後被撤回，照 registration §0 第 4 條仍評開題那一版。

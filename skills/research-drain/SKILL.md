@@ -165,6 +165,8 @@ pq2 型跑 `todo sync` 翻回球在你、假設型進段 0b。命中掛超過兩
      `python -m engine_b.todo add-theme-cohort --spec <file>` 鑄號 → 使用者 go → `complete-theme-cohort <n>` → 才寫第一份敘事。
      組提案還在 pq2 時，那幾檔在 closure-gate 列成「等主題組（[n]）」、不排；`alpha brief --add` 對它們的第一份敘事整筆拒收。
      ⚠ 機器只認得「已經鑄號的組提案」：新鏈的候選名單只寫在文件裡、沒鑄號，就擋不到——**新鏈先鑄組提案**，再進段 5。
+     ⚠ 機器還有兩個擋不到的形狀——**新鏈的「第一份敘事」以鏈計，不以檔計**：①組提案**排除在外**的檔（10-18 台玻在 [801] 待核准時寫了高速 PCB 鏈第一份敘事 `ib_5a22d69af8f2d5d7`，比組落地早 47 分鐘）；
+     ②**已經有別鏈敘事**、第一次換騎到新鏈讀圖的檔（例：SOFC 鏈的高力——「寫過的重寫不擋」）。第一份騎新鏈讀圖的 v2 敘事（含換騎、含組外的檔）一律等該鏈的組 go＋`complete-theme-cohort` 落地後才寫（failure log #26 第 2 次）。
    **下一檔選誰不是自由心證**——`closure.NEXT_PICK_RULE` 五條依序比：
    使用者沒有明示 defer → 產業能加一（所屬產業尚無 ready 檔）→ 有帶 substitutability 的結構邊 → 已有基期觀測 → ticker
    （2026-10-07 刪「有同期 EPS 共識」「forward EPS 為正」：理由引用的 bridge.py 在 Phase 0 已刪，而它們讓有共識的大型股排在前面）。
