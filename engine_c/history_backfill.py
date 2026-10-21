@@ -648,6 +648,22 @@ def late_metrics_supported(conn: Any, metrics: Iterable[str] = LATE_METRICS) -> 
     return all(f"'{metric}'" in sql for metric in metrics)
 
 
+def conflicting_rows(conn: Any, rows: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
+    """要寫的列裡，唯一鍵已存在、但值或 derived 不同的（`insert_fundamentals` 的 DO NOTHING 會靜默留舊值）。
+    日韓推算列（下半年、第四季）的值取決於當輪拿到哪些書類——同鍵不同值要點名，不得無聲（R2-S2 F1，2026-10-21）。"""
+    out: list[dict[str, Any]] = []
+    for row in rows:
+        found = conn.execute(
+            "SELECT value, derived FROM fundamental_history WHERE ticker = ? AND metric = ? AND period_end = ? "
+            "AND accession = ?", (row["ticker"], row["metric"], row["period_end"], row["accession"])).fetchone()
+        if found is None:
+            continue
+        if found[0] != row["value"] or (found[1] or None) != (row.get("derived") or None):
+            out.append({"metric": row["metric"], "period_end": row["period_end"], "accession": row["accession"],
+                        "stored": found[0], "now": row["value"]})
+    return out
+
+
 def insert_fundamentals(conn: Any, rows: Sequence[Mapping[str, Any]]) -> int:
     """一份申報的一個數永遠不變：唯一鍵（ticker, metric, period_end, accession）已存在就不動（冪等）。"""
     before = conn.execute("SELECT COUNT(*) FROM fundamental_history").fetchone()[0]

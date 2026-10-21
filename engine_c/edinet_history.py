@@ -62,7 +62,8 @@ from typing import Any, Iterable, Mapping, Sequence
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from engine_c.history_backfill import (  # noqa: E402
-    EDINET_FORM_PREFIX, FUNDAMENTAL_LOOKBACK_YEARS, SOURCE_EDINET, insert_fundamentals, late_metrics_supported)
+    EDINET_FORM_PREFIX, FUNDAMENTAL_LOOKBACK_YEARS, SOURCE_EDINET, conflicting_rows, insert_fundamentals,
+    late_metrics_supported)
 
 ROOT = Path(__file__).resolve().parent.parent
 CACHE_DIR = ROOT / "library" / "private" / "engine_c" / "edinet"
@@ -310,7 +311,11 @@ def _shares(rows: Sequence[Sequence[str]], instant_ctx: str, *, doc_id: str, res
         reject(f"出現普通股以外的股類 {other}——多股類不加總")
         return None
     cross = {_number(v) for e, c, _k, _u, v in rows if e == ISSUED_CROSS_CHECK and c in ORDINARY_SHARE_CONTEXTS}
-    if cross and cross != {Decimal(issued)}:
+    if not cross:
+        # R2-S2 F7：沒有「事業年度末現在発行数」時股類檢查與發行數核對都會靜默跳過——拒寫（快取 167 份只有 1 份缺，在窗外）
+        reject("「事業年度末現在発行数」不在——股類與發行數核對不了，不寫")
+        return None
+    if cross != {Decimal(issued)}:
         reject(f"期末發行 {issued:,} 與「事業年度末現在発行数」{sorted(str(x) for x in cross)} 對不上")
         return None
     value = issued - int(own_number)
@@ -589,15 +594,18 @@ def collect(client: Any, *, tickers: Sequence[str], days: Sequence[date], today:
             continue
         if aborted and _read_doc(cache_dir, doc_id) is None:
             run["docs_unfetched"] += 1
+            report["docs_unfetched"] = report.get("docs_unfetched", 0) + 1
             continue
         try:
             doc = _load_doc(client, doc_id, cache_dir=cache_dir, fetched_at=fetched_at)
         except (EdinetAuthError, EdinetRateLimited) as exc:
             aborted = run["aborted"] = str(exc)
             run["docs_unfetched"] += 1
+            report["docs_unfetched"] = report.get("docs_unfetched", 0) + 1
             continue
         except EdinetUnavailable as exc:
             run["docs_failed"].append({"doc_id": doc_id, "ticker": ticker, "reason": str(exc)})
+            report["docs_failed"] = report.get("docs_failed", 0) + 1
             continue
         run["docs_cached" if doc.pop("_cached", False) else "docs_fetched"] += 1
         if doc.get("error"):
@@ -619,6 +627,14 @@ def collect(client: Any, *, tickers: Sequence[str], days: Sequence[date], today:
         if "outcome" in body["report"]:
             continue
         rows, derivation = finalize_rows(body["rows"], today=today)
+        # R2-S2 F1（2026-10-21）：下半年的值取決於這一輪拿到哪些書類；主鍵是觸發那一份。輸入不完整的一輪寫進去的下半年
+        # 之後重算出正確值會與它同鍵、被 DO NOTHING 吞掉——所以這一輪輸入不完整就**不寫推算列**（直接的申報列照寫），計數。
+        gaps = list(_gap_reasons(run, body["report"], aborted=aborted))
+        if gaps:
+            withheld = [r for r in rows if r["metric"] in HALF_METRICS and r.get("derived")]
+            rows = [r for r in rows if not (r["metric"] in HALF_METRICS and r.get("derived"))]
+            derivation["h2_withheld"] = {"rows": len(withheld), "reason": "；".join(gaps)
+                                         + "——這一輪輸入不完整，下半年推算不寫（補齊後下一輪再寫）"}
         body["rows"] = rows
         body["report"].update(derivation, rows_built=len(rows),
                               metrics=dict(Counter(r["metric"] for r in rows)),
@@ -627,6 +643,20 @@ def collect(client: Any, *, tickers: Sequence[str], days: Sequence[date], today:
     run["calls"] = getattr(client, "calls", None)
     run["aborted"] = aborted
     return {"run": run, "tickers": per}
+
+
+def _gap_reasons(run: Mapping[str, Any], report: Mapping[str, Any], *, aborted: Any) -> Iterable[str]:
+    """這一輪對這一檔的輸入哪裡不完整（全市場書類一覧的失敗算每一檔的）。空＝完整。"""
+    if run.get("dates_failed"):
+        yield f"書類一覧抓失敗 {len(run['dates_failed'])} 天"
+    if run.get("dates_unscanned"):
+        yield f"書類一覧沒掃 {run['dates_unscanned']} 天"
+    if aborted:
+        yield "這一輪中止"
+    if report.get("docs_failed"):
+        yield f"本檔文件抓失敗 {report['docs_failed']} 份"
+    if report.get("docs_unfetched"):
+        yield f"本檔文件沒抓 {report['docs_unfetched']} 份"
 
 
 def write(conn: Any, collected: Mapping[str, Any], *, replace: bool = False) -> dict[str, Any]:
@@ -645,6 +675,11 @@ def write(conn: Any, collected: Mapping[str, Any], *, replace: bool = False) -> 
         elif replace:
             cur = conn.execute("DELETE FROM fundamental_history WHERE ticker = ? AND source = ?", (ticker, SOURCE_EDINET))
             out["rows_replaced"][ticker] = cur.rowcount
+        clashes = conflicting_rows(conn, body["rows"])
+        if clashes:
+            # R2-S2 F1 ②：同主鍵、值不同——DO NOTHING 會靜默留舊值；點名並讓這一輪 exit 1（修法：--replace 重建這一檔）
+            body["report"]["conflicts"] = clashes
+            out.setdefault("conflicts", {})[ticker] = clashes
         new = insert_fundamentals(conn, body["rows"])
         body["report"]["rows_new"] = new
         out["rows_new"][ticker] = new
@@ -718,7 +753,8 @@ def filing_freshness(conn: Any, tickers: Sequence[str], *, today: date) -> dict[
         if not rows:
             out["empty"].append(ticker)
             continue
-        end, form = max((str(r[1]), str(r[2])) for r in rows)
+        end = max(str(r[1]) for r in rows)
+        annual = any(str(r[2]) in ANNUAL_FORMS for r in rows if str(r[1]) == end)   # R2-S2 F3：任一列是年報就算
         latest = date.fromisoformat(end)
         revenue = max((str(r[1]) for r in rows if r[0] == "revenue_half"), default=None)
         if revenue is None:
@@ -728,7 +764,7 @@ def filing_freshness(conn: Any, tickers: Sequence[str], *, today: date) -> dict[
         if revenue < end:
             out["unusable"].append(f"{ticker}（{end} 那一期營收沒收）")
         nxt = _add_months(latest, 6)
-        due = nxt + timedelta(days=45) if form in ANNUAL_FORMS else _add_months(nxt, 3)
+        due = nxt + timedelta(days=45) if annual else _add_months(nxt, 3)
         if today > due:
             out["lagging"].append(f"{ticker}（{nxt} 那一期，期限 {due}）")
         out["latest"] = max(out["latest"] or end, end)
@@ -742,7 +778,16 @@ def last_run_summary(cache_dir: Path = CACHE_DIR) -> dict[str, Any] | None:
     except (OSError, ValueError):
         return None
     return {"generated_at": report.get("generated_at"), "aborted": report.get("aborted"),
-            "rejected": sum(len(t.get("rejected") or ()) for t in (report.get("tickers") or {}).values())}
+            "rejected": sum(len(t.get("rejected") or ()) for t in (report.get("tickers") or {}).values()),
+            "failures": run_failures(report)}
+
+
+def run_failures(report: Mapping[str, Any]) -> int:
+    """這一輪有幾處失敗（R2-S2 F2：「拒寫 0」與「有 5 份抓失敗」不得同形）：書類一覧失敗與沒掃的天數、文件失敗與沒抓的份數、
+    同主鍵不同值的衝突。"""
+    conflicts = sum(len(v) for v in ((report.get("write") or {}).get("conflicts") or {}).values())
+    return (len(report.get("dates_failed") or ()) + int(report.get("dates_unscanned") or 0)
+            + len(report.get("docs_failed") or ()) + int(report.get("docs_unfetched") or 0) + conflicts)
 
 
 def stored_series(conn: Any, ticker: str) -> list[dict[str, Any]]:
@@ -774,7 +819,14 @@ def _summary_lines(report: Mapping[str, Any]) -> list[str]:
                      f"｜拒寫 {len(r['rejected'])}｜最新期末 {r['latest_period_end']}（filed {r['latest_filed']}）")
         for item in r["rejected"][:5]:
             lines.append(f"     ⚠ {item['doc_id']} {item['metric']}：{item['reason']}")
+        if r.get("h2_withheld"):
+            lines.append(f"     ⚠ 下半年推算 {r['h2_withheld']['rows']} 列不寫：{r['h2_withheld']['reason']}")
+        for item in r.get("conflicts") or ():
+            lines.append(f"     ⛔ 同主鍵不同值（DO NOTHING 會留舊值；跑 --replace 重建這一檔）：{item['metric']} "
+                         f"{item['period_end']} {item['accession']} 表上 {item['stored']:,.0f} ≠ 這一輪 {item['now']:,.0f}")
     write_result = report.get("write") or {}
+    if write_result.get("replace_skipped_empty"):
+        lines.append("  ⚠ --replace 跳過（這一輪一列都沒建出來，不刪舊列）：" + "、".join(write_result["replace_skipped_empty"]))
     if write_result.get("outcome") not in (None, "written", "dry_run"):
         lines.append(f"  ⛔ 沒寫：{write_result.get('outcome')}——{write_result.get('reason')}")
     return lines
@@ -827,7 +879,8 @@ def main(argv: list[str] | None = None) -> int:
     print("\n".join(_summary_lines(report)))
     print(f"完整報告：{out}")
     write_outcome = (report.get("write") or {}).get("outcome")
-    return 1 if report.get("aborted") or write_outcome not in ("written", "dry_run") else 0
+    return 1 if (report.get("aborted") or write_outcome not in ("written", "dry_run")
+                 or run_failures(report)) else 0
 
 
 if __name__ == "__main__":

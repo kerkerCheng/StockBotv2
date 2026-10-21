@@ -183,9 +183,16 @@ def get_three_question_inputs(ticker: str, *, conn: Any, today: date, company_id
     elif klass == "jp_semiannual":
         inp.update(revenue_kind="semiannual", source="engine_c：price_history＋fundamental_history（EDINET）",
                    shares_basis="期末發行（議決権の状況）−自己保有株式；相互保有與信託持有不扣")
+        if not inp.get("revenue_halves"):
+            # R2-S2 F8：有 EDINET 申報、一列半年營收都沒有——不得印成「非美國申報人、非台股…」（L11-5）
+            inp["no_series_reason"] = ("EDINET 申報人，但沒有任何一個半年營收列（白名單拒寫或下半年推不出來——"
+                                       "看 library/private/engine_c/edinet/last_report.json 的 rejected／h2_missing_h1）")
     elif klass == "kr_quarterly":
         inp.update(revenue_kind="quarterly", source="engine_c：price_history＋fundamental_history（OpenDART）",
                    shares_basis="只算普通股（OpenDART 股式總數現況 distb_stock_co＝發行−庫藏；優先股不加）")
+        if not inp.get("revenue_quarters"):
+            inp["no_series_reason"] = ("OpenDART 申報人，但沒有任何一季營收列（拒寫或第四季推不出來——"
+                                       "看 library/private/engine_c/dart/last_report.json 的 rejected／q4_missing）")
     else:
         inp["revenue_kind"] = "none"
         has_rows = any(inp[k] for k in _METRIC_KEYS.values())

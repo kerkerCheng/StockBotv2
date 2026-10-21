@@ -763,6 +763,9 @@ def _jp_kr_filings_line(*, now: datetime) -> str:
                 part += f"、最近一輪 {str(last.get('generated_at') or '?')[:10]} 拒寫 {last['rejected']} 筆"
                 if last.get("late_known"):
                     part += f"、只拿得到更正版而晚知道 {last['late_known']} 期"
+                if last.get("failures"):
+                    # R2-S2 F2：有抓失敗、沒抓、同主鍵不同值的一輪，不得與乾淨的一輪同形（L13-2）
+                    part += f"、⚠ 那一輪失敗 {last['failures']} 處（重跑 `{command}`；同主鍵不同值要 `--replace`）"
                 if last.get("aborted"):
                     part += f"、⛔ 那一輪中止：{last['aborted']}"
             parts.append(part)

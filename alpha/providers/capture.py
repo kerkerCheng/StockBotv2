@@ -30,7 +30,9 @@ def company_quarters(conn: Any, ticker: str, *, as_of: date) -> dict[str, Any]:
     rows = fundamental_series(conn, ticker, "revenue_quarter", as_of=as_of)
     if not rows:
         if fundamental_series(conn, ticker, "revenue_half", as_of=as_of):
-            return {"quarters": {}, "gaps": [], "source": None, "absence_reason": SEMIANNUAL_ONLY}
+            # R2-S2 F4：與路徑上各層同一個缺席種類（有營收、只是對不上曆季＝輸入不相容，不是「還沒人記」；L16）
+            return {"quarters": {}, "gaps": [], "source": None, "absence_reason": SEMIANNUAL_ONLY,
+                    "absence_kind": "inputs_incompatible"}
         return {"quarters": {}, "gaps": [], "source": None}
     label = _quarterly_label(conn, ticker)
     quarters, gaps = fiscal_quarters(rows, first_filed_by_period(conn, ticker, "revenue_quarter", as_of=as_of),
@@ -76,7 +78,8 @@ def page_capture(conn: Any, ticker: str, demand_anchor: Mapping[str, Any] | None
     got = company_quarters(conn, ticker, as_of=as_of)
     if got["source"] is None:
         return {"anchor_key": anchor["key"], "anchor_label": anchor.get("label"), "points": [], "gaps": [],
-                "absence": {"kind": "not_yet_recorded", "reason": got.get("absence_reason") or NO_QUARTERLY_REVENUE}}
+                "absence": {"kind": got.get("absence_kind") or "not_yet_recorded",
+                            "reason": got.get("absence_reason") or NO_QUARTERLY_REVENUE}}
     company, gaps, source = got["quarters"], list(got["gaps"]), got["source"]
     fx, fx_gaps = fx_tables(conn, {str(q.get("currency")) for q in company.values()}, as_of=as_of)
     gaps += fx_gaps

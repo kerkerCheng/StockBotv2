@@ -51,7 +51,8 @@ from typing import Any, Mapping, Sequence
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from engine_c.history_backfill import (  # noqa: E402
-    DART_FORM_PREFIX, FUNDAMENTAL_LOOKBACK_YEARS, SOURCE_DART, SOURCE_DART_SHARES, insert_fundamentals)
+    DART_FORM_PREFIX, FUNDAMENTAL_LOOKBACK_YEARS, SOURCE_DART, SOURCE_DART_SHARES, conflicting_rows,
+    insert_fundamentals)
 
 ROOT = Path(__file__).resolve().parent.parent
 CACHE_DIR = ROOT / "library" / "private" / "engine_c" / "dart"
@@ -478,6 +479,10 @@ def write(conn: Any, collected: Mapping[str, Any], *, replace: bool = False) -> 
             cur = conn.execute("DELETE FROM fundamental_history WHERE ticker = ? AND source IN (?, ?)",
                                (ticker, SOURCE_DART, SOURCE_DART_SHARES))
             out["rows_replaced"][ticker] = cur.rowcount
+        clashes = conflicting_rows(conn, body["rows"])
+        if clashes:      # 同主鍵、值不同：DO NOTHING 會靜默留舊值——點名並讓這一輪 exit 1（R2-S2 F1 ② 的對稱面）
+            body["report"]["conflicts"] = clashes
+            out.setdefault("conflicts", {})[ticker] = clashes
         new = insert_fundamentals(conn, body["rows"])
         body["report"]["rows_new"] = new
         out["rows_new"][ticker] = new
@@ -553,7 +558,14 @@ def last_run_summary(cache_dir: Path = CACHE_DIR) -> dict[str, Any] | None:
         return None
     return {"generated_at": report.get("generated_at"), "aborted": report.get("aborted"),
             "rejected": sum(len(t.get("rejected") or ()) for t in (report.get("tickers") or {}).values()),
-            "late_known": sum(len(t.get("late_known") or ()) for t in (report.get("tickers") or {}).values())}
+            "late_known": sum(len(t.get("late_known") or ()) for t in (report.get("tickers") or {}).values()),
+            "failures": run_failures(report)}
+
+
+def run_failures(report: Mapping[str, Any]) -> int:
+    """這一輪有幾處失敗（「拒寫 0」與「有報告抓失敗」不得同形）：抓失敗、沒抓的報告、同主鍵不同值的衝突。"""
+    conflicts = sum(len(v) for v in ((report.get("write") or {}).get("conflicts") or {}).values())
+    return len(report.get("failed") or ()) + int(report.get("reports_unfetched") or 0) + conflicts
 
 
 def stored_series(conn: Any, ticker: str) -> list[dict[str, Any]]:
@@ -584,6 +596,12 @@ def _summary_lines(report: Mapping[str, Any]) -> list[str]:
                      f"（filed {r['latest_filed']}）")
         for item in r["rejected"][:5]:
             lines.append(f"     ⚠ {item['report']} {item['metric']}：{item['reason']}")
+        for item in r.get("conflicts") or ():
+            lines.append(f"     ⛔ 同主鍵不同值（DO NOTHING 會留舊值；跑 --replace 重建這一檔）：{item['metric']} "
+                         f"{item['period_end']} {item['accession']} 表上 {item['stored']:,.0f} ≠ 這一輪 {item['now']:,.0f}")
+    skipped = (report.get("write") or {}).get("replace_skipped_empty")
+    if skipped:
+        lines.append("  ⚠ --replace 跳過（這一輪一列都沒建出來，不刪舊列）：" + "、".join(skipped))
     return lines
 
 
@@ -632,7 +650,8 @@ def main(argv: list[str] | None = None) -> int:
                                                           encoding="utf-8")
     print("\n".join(_summary_lines(report)))
     print(f"完整報告：{out}")
-    return 1 if report.get("aborted") or (report.get("write") or {}).get("outcome") not in ("written", "dry_run") else 0
+    return 1 if (report.get("aborted") or (report.get("write") or {}).get("outcome") not in ("written", "dry_run")
+                 or run_failures(report)) else 0
 
 
 if __name__ == "__main__":

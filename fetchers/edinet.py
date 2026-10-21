@@ -134,11 +134,11 @@ class Client:
                     continue
                 raise EdinetRateLimited(f"HTTP {status}：退避 {len(self._backoff)} 次仍被限流——整輪中止")
             if status in (401, 403):
-                raise EdinetAuthError(f"HTTP {status}：key 被拒（{redact(_body_hint(response), self._key)}）")
+                raise EdinetAuthError(f"HTTP {status}：key 被拒（{_body_hint(response, self._key)}）")
             if status == 404:
-                raise EdinetDocMissing(f"HTTP 404（{redact(_body_hint(response), self._key)}）")
+                raise EdinetDocMissing(f"HTTP 404（{_body_hint(response, self._key)}）")
             if status != 200:
-                raise EdinetUnavailable(f"HTTP {status}（{redact(_body_hint(response), self._key)}）")
+                raise EdinetUnavailable(f"HTTP {status}（{_body_hint(response, self._key)}）")
             return response
 
     def list_documents(self, day: date) -> dict[str, Any]:
@@ -178,9 +178,10 @@ class Client:
         raise EdinetUnavailable(f"{doc_id} 回應不是 zip（status={redact(status, self._key)}）")
 
 
-def _body_hint(response: Any) -> str:
+def _body_hint(response: Any, key: str | None) -> str:
+    """錯誤回應的前 200 字——**先遮罩再截斷**（R2-S2 F5：截在 key 中間時前綴不等於 key、遮不掉）。"""
     try:
-        return str(getattr(response, "text", "") or "")[:200]
+        return redact(str(getattr(response, "text", "") or ""), key)[:200]
     except Exception:  # noqa: BLE001
         return ""
 
@@ -213,6 +214,10 @@ def parse_csv_zip(data: bytes) -> list[CsvRow]:
         table = list(csv.reader(io.StringIO(text), delimiter="\t"))
         if not table or tuple(c.strip() for c in table[0]) != CSV_COLUMNS:
             raise EdinetUnavailable(f"{name.rsplit('/', 1)[-1]}：表頭不是預期的九欄——不猜欄位位置")
+        short = [r for r in table[1:] if len(r) < 9 and any(c.strip() for c in r)]
+        if short:
+            # R2-S2 F6：欄數不足的列原本靜默丟掉（白名單元素那一列會變成「沒有」）——整份拒收、不猜欄位（INV-3；樣本 0 列）
+            raise EdinetUnavailable(f"{name.rsplit('/', 1)[-1]}：{len(short)} 列欄數不足九欄——整份不收")
         rows.extend(CsvRow(*r[:9]) for r in table[1:] if len(r) >= 9)
     return rows
 

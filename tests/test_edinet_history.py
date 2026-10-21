@@ -534,3 +534,138 @@ def test_the_heartbeat_line_never_says_caught_up_when_nothing_is_there(monkeypat
     line = heartbeat._jp_kr_filings_line(now=datetime(2026, 10, 21, tzinfo=timezone.utc))
     assert "已跟上" not in line and "1 檔一筆都沒有" in line and "edinet_history --backfill" in line
     assert "韓國" not in line
+
+
+# ---------------------------------------------------------------------------
+# R2-S2（2026-10-21）：F1 推算列在輸入不完整的一輪不寫、同主鍵不同值點名；F2 失敗看得見；F3 年報判定；F5–F8
+# ---------------------------------------------------------------------------
+
+class FlakyClient(FakeClient):
+    def __init__(self, lists, docs, *, fail=()):
+        super().__init__(lists, docs)
+        self.fail = set(fail)
+
+    def fetch_csv_zip(self, doc_id):
+        if doc_id in self.fail:
+            self.calls += 1
+            raise fe.EdinetUnavailable(f"{doc_id} HTTP 500")
+        return super().fetch_csv_zip(doc_id)
+
+
+def _amended_scenario():
+    """上半年原版 11-10、上半年訂正 2026-02-02（營收改了）、年報 2026-06-26——R2 F1 的反例形狀。"""
+    lists, docs, days = _scenario()
+    amend_day = date(2026, 2, 2)
+    lists[amend_day] = [_entry("S100H1A", "170", "2026-02-02 10:00")]
+    docs["S100H1A"] = make_zip(hy_3110(revenue="50000000000", summary="50000000000"))
+    return lists, docs, sorted([*days, amend_day])
+
+
+def test_a_run_with_a_failed_document_withholds_the_second_half_and_the_next_run_writes_it(tmp_path) -> None:
+    """R2-S2 F1：訂正那份這一輪抓失敗——下半年用原版上半年算出來的錯值不得寫進去（之後重算會同鍵被吞掉）；
+    下一輪抓到訂正，下半年＝年度−訂正後的上半年。"""
+    lists, docs, days = _amended_scenario()
+    conn = _conn()
+    first = eh.collect(FlakyClient(lists, docs, fail={"S100H1A"}), tickers=["3110.T"], days=days,
+                       today=date(2026, 10, 21), cache_dir=tmp_path, codelist=CODELIST, fetched_at=FETCHED)
+    report = first["tickers"]["3110.T"]["report"]
+    assert report["h2_withheld"]["rows"] == 2 and "本檔文件抓失敗 1 份" in report["h2_withheld"]["reason"]
+    assert not any(r["metric"] == "revenue_half" and r.get("derived") for r in first["tickers"]["3110.T"]["rows"])
+    eh.write(conn, first)
+    second = eh.collect(FakeClient(lists, docs), tickers=["3110.T"], days=days, today=date(2026, 10, 21),
+                        cache_dir=tmp_path, codelist=CODELIST, fetched_at=FETCHED)
+    assert "h2_withheld" not in second["tickers"]["3110.T"]["report"]
+    assert eh.write(conn, second).get("conflicts") is None
+    from engine_c.history import fundamental_series
+
+    h2 = [r for r in fundamental_series(conn, "3110.T", "revenue_half", as_of="2026-07-01") if r["period_end"] == "2026-03-31"]
+    assert h2[0]["value"] == 120_000_000_000 - 50_000_000_000
+
+
+def test_a_stored_row_with_the_same_key_and_another_value_is_named_not_swallowed(tmp_path) -> None:
+    """R2-S2 F1 ②：DO NOTHING 會靜默留舊值——同主鍵不同值要點名、算進失敗（exit 1）。"""
+    lists, docs, days = _scenario()
+    collected = eh.collect(FakeClient(lists, docs), tickers=["3110.T"], days=days, today=date(2026, 10, 21),
+                           cache_dir=tmp_path, codelist=CODELIST, fetched_at=FETCHED)
+    conn = _conn()
+    h2 = next(r for r in collected["tickers"]["3110.T"]["rows"] if r["metric"] == "revenue_half" and r.get("derived"))
+    conn.execute("INSERT INTO fundamental_history VALUES (?,?,?,?,?,?,?,?,?,1,?,?,?,?)",
+                 (h2["ticker"], h2["metric"], h2["period_start"], h2["period_end"], h2["filed"], h2["accession"],
+                  h2["form"], 1.0, h2["currency"], h2["derived"], h2["tag"], h2["source"], FETCHED))
+    out = eh.write(conn, collected)
+    assert [c["stored"] for c in out["conflicts"]["3110.T"]] == [1.0]
+    report = {"write": out, "dates_failed": [], "docs_failed": []}
+    assert eh.run_failures(report) == 1
+    lines = eh._summary_lines({"mode": "backfill", "window": ["a", "b"], "dates_total": 1, "dates_cached": 0,
+                               "dates_fetched": 1, "dates_failed": [], "dates_unscanned": 0, "docs_fetched": 1,
+                               "docs_cached": 0, "docs_unfetched": 0, "docs_failed": [], "calls": 1,
+                               "tickers": {"3110.T": collected["tickers"]["3110.T"]["report"]}, "write": out})
+    assert any("同主鍵不同值" in line for line in lines)
+
+
+def test_freshness_treats_a_period_as_annual_when_any_of_its_rows_is_the_annual_report() -> None:
+    """R2-S2 F3：年報之後又交上半年訂正（EDINET-170）——字串 max 會挑到 170、把年報期當成半年，落後晚 46 天才亮。"""
+    rows = [("revenue_half", "2025-09-30", "2025-11-10", "EDINET-160"), ("cash", "2026-03-31", "2026-06-26", "EDINET-120"),
+            ("revenue_half", "2026-03-31", "2026-07-15", "EDINET-170")]
+    got = eh.filing_freshness(_fresh_conn(rows), ["3110.T"], today=date(2026, 11, 15))
+    assert got["lagging"] == ["3110.T（2026-09-30 那一期，期限 2026-11-14）"]
+
+
+def test_the_error_body_is_redacted_before_it_is_truncated() -> None:
+    """R2-S2 F5：截在 key 中間時前綴不等於 key、遮不掉——先遮罩再截。"""
+    body = "x" * 190 + KEY
+
+    def denied(url, params=None, **_kw):
+        resp = _Resp(500, None)
+        resp.text = body
+        return resp
+
+    with pytest.raises(fe.EdinetUnavailable) as exc:
+        _client(denied).list_documents(date(2025, 11, 10))
+    assert KEY[:10] not in str(exc.value)
+
+
+def test_a_csv_with_short_rows_is_refused_not_silently_trimmed() -> None:
+    """R2-S2 F6：欄數不足的列原本被丟掉（白名單元素那一列會變成「沒有」）——整份拒收。"""
+    raw = _csv(hy_3110()).decode("utf-16") + '"jppfs_cor:NetSales"\t"売上高"\n'
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w") as z:
+        z.writestr("XBRL_TO_CSV/jpcrp040300-ssr-001_x.csv", raw.encode("utf-16"))
+    with pytest.raises(fe.EdinetUnavailable, match="欄數不足"):
+        fe.parse_csv_zip(buf.getvalue())
+
+
+def test_shares_are_not_written_without_the_cross_check_element() -> None:
+    """R2-S2 F7：沒有「事業年度末現在発行数」時，股類與發行數核對都會靜默跳過——拒寫。"""
+    rows = [r for r in hy_3110() if r[0] != eh.ISSUED_CROSS_CHECK]
+    _skip, result = build(rows)
+    assert "shares_outstanding_cover" not in by_metric(result)
+    assert any("事業年度末現在発行数」不在" in r["reason"] for r in result.rejected)
+
+
+def test_a_japanese_filer_without_any_half_year_revenue_gets_a_japanese_reason() -> None:
+    """R2-S2 F8：有 EDINET 申報、一列半年營收都沒有——理由不得印成「非美國申報人、非台股…」。"""
+    from engine_c.three_question_inputs import get_three_question_inputs
+
+    from engine_c.db import _ensure_sqlite_schema
+
+    conn = sqlite3.connect(":memory:")
+    _ensure_sqlite_schema(conn)
+    conn.execute("INSERT INTO fundamental_history VALUES ('3110.T','cash',NULL,'2026-03-31','2026-06-26','S1',"
+                 "'EDINET-120',1,'JPY',1,NULL,'t',?,?)", (hb.SOURCE_EDINET, FETCHED))
+    inp = get_three_question_inputs("3110.T", conn=conn, today=date(2026, 10, 21))
+    assert inp["revenue_kind"] == "semiannual" and "EDINET 申報人" in inp["no_series_reason"]
+
+
+def test_capture_declares_the_same_absence_kind_as_the_path_layers_for_semiannual_only() -> None:
+    """R2-S2 F4：只有半年營收＝輸入不相容（有營收、對不上曆季），不是「還沒人記」——兩個畫面同一個 kind（L16）。"""
+    from alpha.providers.capture import page_capture
+    from engine_c.db import _ensure_sqlite_schema
+
+    conn = sqlite3.connect(":memory:")
+    _ensure_sqlite_schema(conn)
+    conn.execute("INSERT INTO fundamental_history VALUES ('3110.T','revenue_half','2025-04-01','2025-09-30',"
+                 "'2025-11-10','S1','EDINET-160',1,'JPY',1,NULL,'t',?,?)", (hb.SOURCE_EDINET, FETCHED))
+    anchor = {"series": [{"key": "capex", "label": "雲端四大", "aggregation": "sum_calendar_quarter", "points": [1]}]}
+    got = page_capture(conn, "3110.T", anchor, as_of=date(2026, 10, 21))
+    assert got["absence"]["kind"] == "inputs_incompatible" and "半年" in got["absence"]["reason"]
