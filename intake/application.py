@@ -567,6 +567,8 @@ def _prepare_research_action_impl(
     }
     if request.get("focus_company_id") is not None:
         payload["focus_company_id"] = request["focus_company_id"]
+    if request.get("private_context") is not None:
+        payload["private_context"] = request["private_context"]      # E6：只住私有區，公開報告只印段數與雜湊
     if request.get("layer_enumerations") is not None:
         payload["layer_enumerations"] = request["layer_enumerations"]
         # 先在這裡核對一次，把逐條原因回給呼叫端（create_action 會再擋一次——縱深防護）。

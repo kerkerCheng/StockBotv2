@@ -17,7 +17,7 @@
 | E3 | #87 | 讀圖 digest 收 develops／is_variant_of | 是 | Z2／R1 | 中 | — | ✅ 10-21（變異 7／7；升版當天該重讀 0、印「digest 升版」14 份） |
 | E4 | #75 | 只因同義節點合併而換 id，不算讀圖變動 | 是 | Z1／R1 | 小 | — | ✅ 10-21（變異 5／5；現行 58 份讀圖狀態 0 份改變） |
 | E5 | #79＋#59 | 共用別名進走圖第 9 型＋入圖乾跑提示 | 是 | Z2／R1 | 中 | — | ✅ 10-21（變異 4／4；全圖只靠別名 11 對、reliant／photoresist 仍不配） |
-| E6 | #90 | 券商內容不進公開 repo 的機制 | 否（公開、不可逆） | Z2／**R2** | 中 | **Q3** | ○ |
+| E6 | #90 | 券商內容不進公開 repo 的機制 | 否（公開、不可逆） | Z2／**R2** | 中 | **Q3** | ✅ 程式 10-21（Q3 A；變異 7／7；R2 見落地段） |
 | E7 | #85② | 更正走廊乾跑列出 claim 改句 | 半（核准資訊） | Z1／R1 | 小（約 20 行） | — | ✅ 10-21（變異 4／4；回放 [812] 2 筆、[814] 1 筆） |
 | E8 | #62 | 輪詢不掛已取得的同一份申報；終局 lead 名下等待收掉 | 半 | Z2／R1 | 中 | — | ✅ 10-21（變異 4／4；回放 ew_0020 3/3 擋下；終局不等名下 active 等待現值 5 → 下次 sync 收） |
 | E9 | #10＋#11 | 證據等級認得關係人自述與買方自述 | 半 | Z2／R1 | 中 | — | ✅ 10-21（變異 13／13；買方自述 36 條同級改標、關係人 5 條降級；①改成只認**控制**——見落地段；[691] JFE 要入圖更正宣告控制才生效） |
@@ -130,6 +130,8 @@ Case: #90 第 2 次（#57 [750]；10-20 [823] 入圖報告引元大兩句、10-1
 **現況：** tests、`intake/`、`scripts/prepare_research_action.py` 對「凱基｜元大｜Yuanta｜KGI」grep 0——沒有守門。`git grep -E "凱基|元大" -- library/intake`：5 份 6 處，含券商內容 2 份（就是 #90 那兩份，使用者 10-20 選 c 保留），其餘 3 份只點名 lead 的來源報告。
 **做什麼（Q3 A）：** RA draft 多一個選填欄 `private_context[]`；prepare 存到 `library/private/`（同 action id），決策區塊與私有 packet 照印，公開入圖報告只印段數；digest 收它的雜湊不收原文（核准的仍是同一份內容）；lead-intake／source-trace SKILL 寫「券商讀到的只寫這一欄」。
 **四問：** ①根除（結構上就不會進公開檔）。②程式＋SKILL 一句。③加一欄——公開報告三段本來就沒有私有出口。④最先壞：apply 的雜湊收據與公開報告的對應——私有欄的雜湊要進收據、原文不進。
+**落地（2026-10-21，Q3 A）：** `intake/actions.py`：頂層選填 `private_context[{source, text}]`（最多 20 段、每欄 2 萬字、exact fields）；進 payload 與 digest（核准的是同一份內容）；決策區塊（`render_review_packet`）照印原文並註明只在這裡；公開入圖報告（`_full_report` → library/intake）只印「有私有脈絡 N 段」與 sha256；apply 後壓縮把它留在私有紀錄頂層（同 layer_enumerations）；`_validate_record` 驗形狀。`intake/application.py` prepare 帶進 payload。`prompts/intake_protocol.md` §4.1、source-trace SKILL 寫「券商讀到的只寫這一欄」。草稿目錄 `library/leads/action_drafts/` 本來就 gitignore、決策區塊不落檔（核對過）。既有兩份含券商內容的公開入圖報告照使用者 10-20 選的 c 不動。
+
 **驗收：** 機制：測試＋變異（`private_context` 不出現在公開報告、出現在決策區塊；拿掉分流 → 紅）；量：之後新增入圖報告裡的券商內容句（`git grep` 後人工判，點名來源不算），基準今天新增 0。
 
 ## E7 更正走廊乾跑列出 claim 改句（#85②）

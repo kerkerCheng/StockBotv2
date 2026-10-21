@@ -53,7 +53,13 @@ REQUEST_FIELDS = {"schema_version", "action_slug", "report", "documents"}
 # work order 來的 RA 沒有 lead 可綁，必須在這裡自己聲明。
 # `layer_enumerations`（2026-10-01 Phase 4 Step 4.2a）：「這一包列舉了哪一層的供應商集合、發文者是誰」。
 # ⚠ **頂層選填，不進 `report`**——`report` 是 exact fields，放進去會讓既有 138 筆紀錄的 `_validate_record` 全部失效。
-REQUEST_OPTIONAL_FIELDS = {"focus_company_id", "layer_enumerations"}
+# `private_context`（2026-10-21 批次二 E6；failure log #90）：券商報告等**不可公開**來源讀到的脈絡。只住私有區（action 紀錄本身在
+# library/private/research_actions）；決策區塊照印給使用者看、核准的仍是同一份內容（進 digest）；公開入圖報告只印段數與雜湊。
+# 用結構把「可公開的研究敘述」與「不可公開的來源內容」分開（L12），不靠字串偵測（L16 末句：會誤報的 linter 不用）。
+REQUEST_OPTIONAL_FIELDS = {"focus_company_id", "layer_enumerations", "private_context"}
+PRIVATE_CONTEXT_FIELDS = {"source", "text"}
+MAX_PRIVATE_CONTEXT = 20
+MAX_PRIVATE_CONTEXT_CHARS = 20_000
 LAYER_ENUMERATION_FIELDS = {"node", "suppliers", "relation", "origin_role"}
 MAX_LAYER_ENUMERATIONS = 20
 DOCUMENT_REQUIRED_FIELDS = {
@@ -461,6 +467,56 @@ def _validate_report(report: object) -> dict[str, str]:
     return normalized
 
 
+def _validate_private_context(items: object) -> list[dict[str, str]]:
+    """`private_context[]`：每段 `{source, text}`——source 寫哪一份（券商、日期、頁），text 寫讀到的內容。"""
+    if not isinstance(items, list) or not items:
+        raise ValueError("private_context must be a non-empty list (omit the field when there is none)")
+    if len(items) > MAX_PRIVATE_CONTEXT:
+        raise ValueError(f"private_context exceeds {MAX_PRIVATE_CONTEXT} entries")
+    out: list[dict[str, str]] = []
+    for index, item in enumerate(items):
+        if not isinstance(item, dict):
+            raise ValueError(f"private_context[{index}] must be an object")
+        _require_exact_fields(item, PRIVATE_CONTEXT_FIELDS, f"private_context[{index}]")
+        normalized = {}
+        for field in sorted(PRIVATE_CONTEXT_FIELDS):
+            value = item[field]
+            if not isinstance(value, str) or not value.strip():
+                raise ValueError(f"private_context[{index}].{field} must be a non-empty string")
+            if len(value) > MAX_PRIVATE_CONTEXT_CHARS:
+                raise ValueError(f"private_context[{index}].{field} exceeds {MAX_PRIVATE_CONTEXT_CHARS:,} characters")
+            normalized[field] = value.strip()
+        out.append(normalized)
+    return out
+
+
+def private_context_digest(items: list[dict[str, str]]) -> str:
+    """私有脈絡的 sha256（公開報告印它、不印原文——核准的是哪一份內容，對得回私有區那一份）。"""
+    return hashlib.sha256(_canonical_bytes(items)).hexdigest()
+
+
+def _private_context(record: dict) -> list[dict[str, str]] | None:
+    payload = record.get("payload")
+    if payload is not None:
+        return payload.get("private_context")
+    return record.get("private_context")
+
+
+def _render_private_context(record: dict, *, public: bool) -> list[str]:
+    """決策區塊（`public=False`）印原文；公開入圖報告（`public=True`）只印段數與雜湊——原文不進公開 repo（E6）。"""
+    items = _private_context(record)
+    if not items:
+        return []
+    lines = ["", "## 私有脈絡（不可公開來源；原文只在 library/private）", ""]
+    if public:
+        lines.append(f"- 有私有脈絡 {len(items)} 段（原文不進公開報告）；sha256 `{private_context_digest(items)}`")
+        return lines
+    lines.append("- ⚠ 這一段**只**在決策區塊與私有區；公開入圖報告只印段數與雜湊。")
+    for index, item in enumerate(items, 1):
+        lines.extend(["", f"### {index}. {item['source']}", "", item["text"]])
+    return lines
+
+
 def parse_action_request(action_json: str) -> dict:
     """Parse the strict external v1 request without performing graph validation."""
 
@@ -489,6 +545,11 @@ def parse_action_request(action_json: str) -> dict:
     layer_enumerations = (
         _validate_layer_enumerations(request["layer_enumerations"])
         if request.get("layer_enumerations") is not None
+        else None
+    )
+    private_context = (
+        _validate_private_context(request["private_context"])
+        if request.get("private_context") is not None
         else None
     )
     documents = request["documents"]
@@ -539,6 +600,8 @@ def parse_action_request(action_json: str) -> dict:
         parsed["focus_company_id"] = focus_company_id
     if layer_enumerations is not None:
         parsed["layer_enumerations"] = layer_enumerations
+    if private_context is not None:
+        parsed["private_context"] = private_context
     return parsed
 
 
@@ -556,6 +619,8 @@ def validate_normalized_payload(payload: object, *, stored: bool = False) -> dic
         raise ValueError("unsupported normalized action schema")
     validate_action_slug(payload["action_slug"])
     _validate_report(payload["report"])
+    if payload.get("private_context") is not None:
+        _validate_private_context(payload["private_context"])
     if payload.get("focus_company_id") is not None:
         _validate_focus_company_id(payload["focus_company_id"], check_registry=not stored)
     if payload.get("layer_enumerations") is not None:
@@ -769,6 +834,8 @@ def _validate_record(record: object) -> dict:
     # 驗收「至少 1 份 applied RA 帶 layer_enumerations 且核對通過」數的就是這兩欄。
     if record.get("layer_enumerations") is not None:
         _validate_layer_enumerations(record["layer_enumerations"], check_vocab=False)
+    if record.get("private_context") is not None:
+        _validate_private_context(record["private_context"])
     check = record.get("layer_enumeration_check")
     if check is not None and (not isinstance(check, dict) or check.get("status") != "ok"):
         raise ValueError("Research Action layer enumeration check receipt is invalid")
@@ -1097,6 +1164,7 @@ def render_review_packet(record: dict, *, now: datetime | None = None) -> str | 
     lines.extend(_render_merge_side_effects(record))
     for field in ("search_summary", "l8_notes", "counterevidence_and_gaps"):
         lines.extend(["", f"## {REPORT_HEADINGS[field]}", "", report[field]])
+    lines.extend(_render_private_context(record, public=False))
     lines.extend(
         [
             "",
@@ -1358,6 +1426,9 @@ def compact_applied_payload(record: dict) -> dict:
     # 同一個理由：層列舉是「這一包列舉了哪一層」的收據，壓縮掉就再也驗不了 Phase 4 的驗收（packet 那一列）。
     if payload.get("layer_enumerations"):
         record["layer_enumerations"] = copy.deepcopy(payload["layer_enumerations"])
+    # 同一個理由（E6）：私有脈絡是使用者核准時看到的內容；紀錄本身在 library/private，壓縮不得丟掉它。
+    if payload.get("private_context"):
+        record["private_context"] = copy.deepcopy(payload["private_context"])
     record["payload"] = None
     record["compacted_at"] = _iso(_now())
     return record
@@ -1539,6 +1610,7 @@ def _full_report(record: dict) -> str:
     lines.extend(_render_merge_side_effects(record))
     for field in ("search_summary", "l8_notes", "counterevidence_and_gaps"):
         lines.extend(["", f"## {REPORT_HEADINGS[field]}", "", report[field]])
+    lines.extend(_render_private_context(record, public=True))
 
     conflict_ids = sorted(
         {

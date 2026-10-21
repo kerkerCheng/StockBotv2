@@ -72,6 +72,11 @@ tier 1–2 誠實 passthrough，才讀本協定並進研究與抽取。
 六個 report 欄位、1–10 份 documents 都必填；未知欄位會 fail closed。每份文件沿用完整
 schema/vocab/L6、permission、URL、size 與 no-clobber gate。
 
+頂層選填 `private_context`（2026-10-21）：**不可公開來源讀到的內容只寫這一欄**——券商報告、付費研究、使用者私下給的
+memo。形狀 `[{"source": "哪一份（券商、日期、頁）", "text": "讀到什麼"}]`，最多 20 段。它只住私有區、決策區塊照印給使用者看、
+進 digest（核准的是同一份內容）；**公開入圖報告只印「有私有脈絡 N 段」與雜湊**。`report` 六段會原樣印進公開入圖報告——
+那裡只寫可公開的研究敘述；點名「這則 lead 從哪份券商報告來」可以，內容不行。
+
 ### 4.2 prepare，然後停下來給使用者看
 
 ```powershell
