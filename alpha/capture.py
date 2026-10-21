@@ -97,7 +97,7 @@ def tw_quarters(months: Sequence[Mapping[str, Any]]) -> tuple[dict[str, dict[str
     return quarters, gaps
 
 
-def fiscal_quarters(rows: Sequence[Mapping[str, Any]], first: Mapping[str, str]
+def fiscal_quarters(rows: Sequence[Mapping[str, Any]], first: Mapping[str, str], *, label: str = "EDGAR 季營收"
                     ) -> tuple[dict[str, dict[str, Any]], list[dict[str, Any]]]:
     """EDGAR 季營收（`fundamental_series` 每期最新版本）→ 曆季：期末落在曆季末 ±10 天內、期間長度與曆季差不超過
     `alpha.demand_anchor.PERIOD_LENGTH_SLACK_DAYS` 才算（沒有起始日＝量不出長度，也不算；與錨的加總同一條）；
@@ -123,7 +123,7 @@ def fiscal_quarters(rows: Sequence[Mapping[str, Any]], first: Mapping[str, str]
             continue
         quarters[_label(*quarter)] = {"value": float(row["value"]), "currency": str(row.get("currency")),
                                       "known_on": first.get(end.isoformat(), str(row["filed"])[:10]),
-                                      "source": "EDGAR 季營收" + ("（年度差分推算）" if row.get("derived") else "")}
+                                      "source": label + ("（年度差分推算）" if row.get("derived") else "")}
     return quarters, gaps
 
 

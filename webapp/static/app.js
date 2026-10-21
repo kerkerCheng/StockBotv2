@@ -1935,7 +1935,10 @@ function revenueBars(view) {
   if (items.some((it) => typeof it.amount !== 'number' || !isFinite(it.amount))) return null;
   const last = items[items.length - 1];
   const monthly = typeof d.value[0].data_month === 'string';      // 台股月營收的點帶 data_month；EDGAR 的帶 period_end
-  return barChart({ items, title: monthly ? '每月營收' : '每季營收', unit: CURRENCY_WORD[det.currency] || det.currency,
+  // 標題照抄口徑字樣（不做算術）：日本 EDINET 是半年、20-F 是年度，其餘季度（2026-10-21 日韓財報來源；順帶修 20-F 被標成每季）
+  const basisText = String((d.dependencies || {}).basis || '');
+  const title = monthly ? '每月營收' : basisText.includes('半年') ? '每半年營收' : basisText.includes('年度') ? '每年營收' : '每季營收';
+  return barChart({ items, title, unit: CURRENCY_WORD[det.currency] || det.currency,
     latest: last.yoy == null ? null : `年增 ${fmtPercent(last.yoy)}` });
 }
 

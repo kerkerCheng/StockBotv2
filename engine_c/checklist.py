@@ -390,7 +390,7 @@ def _equity_issuance(connection, ticker: str, *, today) -> dict:
         return {"status": "upstream_unavailable", "reason": "歷史表不存在（舊庫）"}
     if klass != "domestic_quarterly":
         return {"status": "method_not_applicable", "filer_class": klass, "filer_basis": basis}
-    if not late_metrics_supported(connection):
+    if not late_metrics_supported(connection, (_EQUITY_QUARTER, _EQUITY_ANNUAL)):
         return {"status": "upstream_unavailable", "filer_class": klass, "filer_basis": basis,
                 "reason": "fundamental_history 的 CHECK 尚未遷移，新股發行金額存不進來"
                           "（python -m engine_c.migrate_fundamental_metrics --apply）"}

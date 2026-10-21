@@ -54,7 +54,8 @@ def test_metric_vocabulary_is_the_same_in_sqlite_postgres_and_schema_sql() -> No
     migrations = ROOT / "engine_c" / "migrations"
     migration = (migrations / "20260929_add_history_tables.sql").read_text(encoding="utf-8")
     later = [(migrations / name).read_text(encoding="utf-8")
-             for name in ("20261001_add_equity_issued_value_metric.sql", "20261008_add_capex_metric.sql")]
+             for name in ("20261001_add_equity_issued_value_metric.sql", "20261008_add_capex_metric.sql",
+                          "20261021_add_half_year_metrics.sql")]
     schema = (ROOT / "engine_c" / "schema.sql").read_text(encoding="utf-8")
     for metric in hb.METRICS:
         assert f"'{metric}'" in schema and f"'{metric}'" in hb._SQLITE_DDL, metric

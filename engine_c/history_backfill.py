@@ -78,12 +78,15 @@ METRICS: tuple[str, ...] = (
     # 個股頁 S3a（2026-10-08）：現金資本支出（需求錨序列的原料：雲端四大）。現金流量表在季報裡是**年初累計**，
     # 單季由累計差分衍生（`YTD_CONCEPTS`）；建表之後才加——舊庫的 CHECK 先遷移（`engine_c.migrate_fundamental_metrics`）。
     "capex_quarter", "capex_annual",
+    # 日韓財報來源 S1（2026-10-21；使用者「日韓 AAA」）：日本 2024-04 起沒有 Q1／Q3 法定申報，只有半期報告書＋有價證券報告書
+    # ——半年 TTM（Q1 A）。下半年＝年度−上半年（`engine_c/edinet_history.py`），標 derived。建表之後才加——舊庫先遷移。
+    "revenue_half", "operating_income_half",
 )
 #: 建表之後才加進 `METRICS` 的指標。舊庫的 CHECK 還不認得它們時，`backfill_ticker_edgar` 只略過這幾個並計數，
 #: 營收／現金／封面股數照寫——一個新指標不得讓整批既有指標寫不進去（Step 4.6 的 L11-6 ④：CHECK 未遷移時
 #: 35 檔的 EDGAR 段會整批 error）。
 LATE_METRICS: frozenset[str] = frozenset({"equity_issued_value_quarter", "equity_issued_value_annual",
-                                          "capex_quarter", "capex_annual"})
+                                          "capex_quarter", "capex_annual", "revenue_half", "operating_income_half"})
 
 #: 新股發行金額的 tag（Phase 4 Step 4.6）：只收 us-gaap 這一個——稀釋燈只對國內申報人判色；
 #: `StockIssuedDuringPeriodSharesNewIssues`（股數版）是 plan 原指定、已被 4.0 量到只 10／35 檔有，不用。
@@ -114,7 +117,14 @@ ANNUAL_FORMS: tuple[str, ...] = ("10-K", "20-F", "40-F")
 
 #: 國內季度申報人的判定窗：最近 18 個月內有 10-Q。
 QUARTERLY_WINDOW_DAYS = 548
-FILER_CLASSES: tuple[str, ...] = ("domestic_quarterly", "foreign_annual", "unknown")
+FILER_CLASSES: tuple[str, ...] = ("domestic_quarterly", "foreign_annual", "jp_semiannual", "kr_quarterly", "unknown")
+#: 日韓財報來源（2026-10-21）：`fundamental_history.form` 的前綴與 `source`——申報人類別從 form 前綴判（不從代號猜，L16），
+#: 消費端的來源標籤從 source 取（不寫死 EDGAR，L18）。
+EDINET_FORM_PREFIX = "EDINET-"
+DART_FORM_PREFIX = "DART-"
+SOURCE_EDINET = "edinet://api/v2/documents"
+SOURCE_DART = "opendart://fnlttSinglAcntAll"
+SOURCE_DART_SHARES = "opendart://stockTotqySttus"
 
 DOMESTIC_FORMS: tuple[str, ...] = ("10-K", "10-Q")        # 前綴：含 /A
 FOREIGN_ANNUAL_FORMS: tuple[str, ...] = ("20-F", "40-F")
@@ -225,13 +235,23 @@ def classify_filer(filings: Iterable[tuple[str, date]], *, today: date) -> tuple
     兩者都是同一份 companyfacts 的 `form`／`filed`，所以判出來是同一個類別。
     """
     start = today - timedelta(days=QUARTERLY_WINDOW_DAYS)
+    filings = list(filings)
     recent = [(str(f), d) for f, d in filings if d is not None and start <= d <= today]
     quarterly = sorted(d for f, d in recent if f.startswith("10-Q"))
     if quarterly:
         return "domestic_quarterly", f"最近 18 個月有 10-Q（最新 filed {quarterly[-1].isoformat()}）"
+    # 日韓（2026-10-21）：form 前綴是寫入端寫的（`DART-<reprt_code>`、`EDINET-<docTypeCode>`），只有日韓的列會有
+    dart = sorted(d for f, d in recent if f.startswith(DART_FORM_PREFIX))
+    if dart:
+        return "kr_quarterly", f"最近 18 個月有 OpenDART 定期報告（最新 filed {dart[-1].isoformat()}）"
+    edinet = sorted(d for f, d in recent if f.startswith(EDINET_FORM_PREFIX))
+    if edinet:
+        return "jp_semiannual", f"最近 18 個月有 EDINET 半期／有價證券報告書（最新 filed {edinet[-1].isoformat()}）"
     foreign = sorted(d for f, d in recent if f.startswith(FOREIGN_ANNUAL_FORMS))
     if foreign:
         return "foreign_annual", f"最近 18 個月沒有 10-Q、有 20-F／40-F（最新 filed {foreign[-1].isoformat()}）"
+    if any(str(f).startswith((EDINET_FORM_PREFIX, DART_FORM_PREFIX)) for f, _ in filings):
+        return "unknown", "最近 18 個月沒有 EDINET／OpenDART 定期申報（或回填落後、這一輪沒寫）"
     return "unknown", "最近 18 個月既沒有 10-Q 也沒有 20-F／40-F"
 
 
@@ -416,6 +436,9 @@ def build_fundamental_rows(facts: Mapping[str, Any], *, ticker: str, filer: str,
     """
     if filer not in FILER_CLASSES:
         raise HistoryBackfillError(f"未知的申報人類別：{filer!r}")
+    if filer not in ("domestic_quarterly", "foreign_annual", "unknown"):
+        # 日韓的列由各自的回填模組寫（engine_c/edinet_history.py、dart_history.py）；EDGAR 的 builder 不得產生它們
+        raise HistoryBackfillError(f"EDGAR 的列只認 EDGAR 的申報人類別（收到 {filer!r}）")
     if filer == "unknown":
         return [], []
     forms = DOMESTIC_FORMS if filer == "domestic_quarterly" else FOREIGN_ANNUAL_FORMS
@@ -609,8 +632,10 @@ def upsert_prices(conn: Any, rows: Sequence[Mapping[str, Any]], actions: Sequenc
     return len(rows)
 
 
-def late_metrics_supported(conn: Any) -> bool:
-    """這個庫的 `fundamental_history` CHECK 認不認得 `LATE_METRICS`。讀不到建表語句＝不認得（fail closed）。
+def late_metrics_supported(conn: Any, metrics: Iterable[str] = LATE_METRICS) -> bool:
+    """這個庫的 `fundamental_history` CHECK 認不認得 `metrics`（預設全部 `LATE_METRICS`）。讀不到建表語句＝不認得
+    （fail closed）。**逐個 metric 問**（日韓財報來源 S1，2026-10-21）：全有全無的寫法下，加一個新字彙、遷移還沒跑之前，
+    稀釋燈（新股發行金額）與 capex 會整批被略過——一個新指標不得讓既有指標寫不進去或讀成缺席。
 
     只問 SQLite 的 `sqlite_master`：本模組的寫入路徑只走 SQLite（Postgres 由版本化遷移檔管，見 `engine_c/migrations/`）。
     """
@@ -620,7 +645,7 @@ def late_metrics_supported(conn: Any) -> bool:
     except Exception:  # noqa: BLE001 — 不是 SQLite 或讀不到：當成不認得，寧可少寫不可整批寫壞
         return False
     sql = str(row[0] or "") if row else ""
-    return all(f"'{metric}'" in sql for metric in LATE_METRICS)
+    return all(f"'{metric}'" in sql for metric in metrics)
 
 
 def insert_fundamentals(conn: Any, rows: Sequence[Mapping[str, Any]]) -> int:
@@ -719,14 +744,15 @@ def backfill_ticker_edgar(conn: Any, ticker: str, cik: str | None, *, today: dat
         report.update(outcome="lagging", absence=lag.get("warning"))
         return report
     rows, rejected = build_fundamental_rows(facts, ticker=ticker, filer=filer, today=today, fetched_at=fetched_at)
-    if not late_metrics_supported(conn):
-        # 舊庫的 CHECK 還不認得新指標（Step 4.6）：只略過那幾個、計數進報告，其餘照寫（INV-3：不靜默丟）。
-        skipped = [r for r in rows if r["metric"] in LATE_METRICS]
+    unsupported = {m for m in LATE_METRICS if not late_metrics_supported(conn, (m,))}
+    if unsupported:
+        # 舊庫的 CHECK 還不認得新指標（Step 4.6）：只略過**它不認得的那幾個**、計數進報告，其餘照寫（INV-3：不靜默丟）。
+        skipped = [r for r in rows if r["metric"] in unsupported]
         if skipped:
             report["late_metrics_skipped"] = {
                 "rows": len(skipped), "metrics": sorted({r["metric"] for r in skipped}),
                 "reason": "fundamental_history 的 CHECK 尚未遷移——跑 python -m engine_c.migrate_fundamental_metrics --apply"}
-        rows = [r for r in rows if r["metric"] not in LATE_METRICS]
+        rows = [r for r in rows if r["metric"] not in unsupported]
     written = insert_fundamentals(conn, rows)
     report.update(outcome="written", rows_built=len(rows), rows_new=written, rejected=rejected,
                   lag_unknown=(lag.get("status") == "unknown"))

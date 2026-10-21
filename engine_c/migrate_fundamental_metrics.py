@@ -187,7 +187,7 @@ def main(argv: list[str] | None = None) -> int:
     # ——拆掉的是使用者自己的鎖（R2-c 覆核 #4）。這條判斷自 Phase 7 Step 7.0b 起只住 `writer_lock.hold`。
     try:
         with hold(INTERACTIVE_OWNER, ttl_minutes=15,
-                  purpose="Engine C fundamental_history CHECK 遷移（Phase 4 Step 4.6）"):
+                  purpose="Engine C fundamental_history CHECK 遷移（字彙加新 metric；Phase 4 Step 4.6 起沿用）"):
             stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
             backup = backup_database(db_path, db_path.parent / "backups" / f"{db_path.stem}.pre-metrics-{stamp}.db")
             conn = sqlite3.connect(str(db_path), isolation_level=None)

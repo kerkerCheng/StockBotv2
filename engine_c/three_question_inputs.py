@@ -28,17 +28,52 @@ _METRIC_KEYS = {
     "revenue_quarter": "revenue_quarters", "revenue_annual": "revenue_annual",
     "operating_income_quarter": "operating_income_quarters", "cash": "cash", "total_debt": "total_debt",
     "shares_outstanding_cover": "shares_cover",
+    # 日韓財報來源 S1（2026-10-21）：日本 EDINET 的半年序列
+    "revenue_half": "revenue_halves", "operating_income_half": "operating_income_halves",
 }
 _SEGMENT_FIELDS = ("segment_revenue_share", "product_line_revenue_share")
+#: 除權日落在期末前幾天內，那一期的期末股數可能是分割前的（日本常把基準日訂在期末；6594.T 2024-09-27 ×2 實測：
+#: 期末發行 596,284,468、提出日現在 1,192,568,936）——那一期股數整期不用（照台股 `split_in_window` 的先例）。
+SPLIT_NEAR_PERIOD_END_DAYS = 10
+_JP_KR_SOURCES = ("edinet://", "opendart://")
+_JP_SUFFIXES = (".T",)
+_KR_SUFFIXES = (".KS", ".KQ")
 
 
 def _rows(conn: Any, ticker: str, metric: str) -> list[dict[str, Any]]:
     cur = conn.execute(
-        """SELECT period_start, period_end, filed, accession, form, value, currency, derived, tag
+        """SELECT period_start, period_end, filed, accession, form, value, currency, derived, tag, source
            FROM fundamental_history WHERE ticker = ? AND metric = ? ORDER BY period_end, filed, accession""",
         (ticker, metric))
     return [{"period_start": r[0], "period_end": r[1], "filed": r[2], "accession": r[3], "form": r[4],
-             "value": r[5], "currency": r[6], "derived": r[7], "tag": r[8]} for r in cur.fetchall()]
+             "value": r[5], "currency": r[6], "derived": r[7], "tag": r[8], "source": r[9]} for r in cur.fetchall()]
+
+
+def split_near_period_end(rows: list[dict[str, Any]], splits: list[tuple[date, float]], *,
+                          days: int = SPLIT_NEAR_PERIOD_END_DAYS) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    """日韓的股數列：除權日 s 落在（期末 − days, 期末］的那一期整期不用、計數進 shares_rejected（INV-3）——前一期的股數由
+    `shares_on` 乘上分割比例接續。只套在日韓來源的列（美股封面股數與台股另有自己的規則）。"""
+    from datetime import timedelta
+
+    kept, rejected = [], []
+    for row in rows:
+        if not str(row.get("source") or "").startswith(_JP_KR_SOURCES):
+            kept.append(row)
+            continue
+        try:
+            end = date.fromisoformat(str(row["period_end"])[:10])
+        except (TypeError, ValueError, KeyError):
+            kept.append(row)
+            continue
+        hit = next((s for s, _r in splits if end - timedelta(days=days) < s <= end), None)
+        if hit is None:
+            kept.append(row)
+            continue
+        rejected.append({"period_end": end.isoformat(), "status": "split_near_period_end",
+                         "observation_id": row.get("accession"),
+                         "reason": f"除權日 {hit.isoformat()} 在期末前 {days} 天內——期末股數可能是分割前（6594.T 2024-09-27 實測），"
+                                   "整期不用，由前一期股數乘分割比例接續"})
+    return kept, rejected
 
 
 def _segment_points(conn: Any, ticker: str, *, today: date | None = None) -> list[dict[str, Any]]:
@@ -135,18 +170,40 @@ def get_three_question_inputs(ticker: str, *, conn: Any, today: date, company_id
     inp["filer_class"] = klass
     inp["filer_basis"] = basis
     inp["monthly_revenue"] = []
+    if klass in ("jp_semiannual", "kr_quarterly"):
+        # 日韓（2026-10-21，使用者「日韓 AAA」）：期末附近分割的那一期股數不用（6594.T 實測），計數印在稽核區
+        kept, rejected = split_near_period_end(inp["shares_cover"], inp["splits"])
+        inp["shares_cover"] = kept
+        if rejected:
+            inp["shares_rejected"] = rejected
     if klass == "domestic_quarterly":
         inp["revenue_kind"] = "quarterly"
     elif klass == "foreign_annual":
         inp["revenue_kind"] = "annual"
+    elif klass == "jp_semiannual":
+        inp.update(revenue_kind="semiannual", source="engine_c：price_history＋fundamental_history（EDINET）",
+                   shares_basis="期末發行（議決権の状況）−自己保有株式；相互保有與信託持有不扣")
+    elif klass == "kr_quarterly":
+        inp.update(revenue_kind="quarterly", source="engine_c：price_history＋fundamental_history（OpenDART）",
+                   shares_basis="只算普通股（OpenDART 股式總數現況 distb_stock_co＝發行−庫藏；優先股不加）")
     else:
         inp["revenue_kind"] = "none"
         has_rows = any(inp[k] for k in _METRIC_KEYS.values())
-        inp["gate"] = {"absence_kind": "upstream_unavailable",
-                       "reason": ("companyfacts 這一檔最近 18 個月沒有 10-Q／20-F（或回填時落後、這一輪沒寫）——"
-                                  "沒有可用的財報歷史" if has_rows or "." not in ticker else
-                                  "非美國 SEC 申報人、非台股：沒有機械的財報歷史來源（歷史不可得）")}
+        if ticker.endswith(_JP_SUFFIXES + _KR_SUFFIXES):
+            japan = ticker.endswith(_JP_SUFFIXES)
+            module, registry = ("edinet_history", "EDINET") if japan else ("dart_history", "OpenDART")
+            reason = ("最近 18 個月沒有可用的 EDINET／OpenDART 定期申報（或回填落後、這一輪沒寫）——沒有可用的財報歷史"
+                      if has_rows else
+                      f"{'日本' if japan else '韓國'}申報人：{registry} 回填還沒跑或這一檔沒有可用的定期報告"
+                      f"（python -m engine_c.{module} --backfill --ticker {ticker}）——不是歷史不可得")
+            inp["no_series_reason"] = reason
+        elif has_rows or "." not in ticker:
+            reason = "companyfacts 這一檔最近 18 個月沒有 10-Q／20-F（或回填時落後、這一輪沒寫）——沒有可用的財報歷史"
+        else:
+            reason = "非美國 SEC 申報人、非台股、非日韓：這個市場的機械財報來源還沒接（不是歷史不可得）"
+            inp["no_series_reason"] = reason
+        inp["gate"] = {"absence_kind": "upstream_unavailable", "reason": reason}
     return inp
 
 
-__all__ = ["get_three_question_inputs"]
+__all__ = ["SPLIT_NEAR_PERIOD_END_DAYS", "get_three_question_inputs", "split_near_period_end"]

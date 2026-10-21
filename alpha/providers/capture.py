@@ -29,9 +29,24 @@ def company_quarters(conn: Any, ticker: str, *, as_of: date) -> dict[str, Any]:
         return {"quarters": quarters, "gaps": gaps, "source": "台股月營收（三個月相加）"}
     rows = fundamental_series(conn, ticker, "revenue_quarter", as_of=as_of)
     if not rows:
+        if fundamental_series(conn, ticker, "revenue_half", as_of=as_of):
+            return {"quarters": {}, "gaps": [], "source": None, "absence_reason": SEMIANNUAL_ONLY}
         return {"quarters": {}, "gaps": [], "source": None}
-    quarters, gaps = fiscal_quarters(rows, first_filed_by_period(conn, ticker, "revenue_quarter", as_of=as_of))
-    return {"quarters": quarters, "gaps": gaps, "source": "EDGAR 季營收"}
+    label = _quarterly_label(conn, ticker)
+    quarters, gaps = fiscal_quarters(rows, first_filed_by_period(conn, ticker, "revenue_quarter", as_of=as_of),
+                                     label=label)
+    return {"quarters": quarters, "gaps": gaps, "source": label}
+
+
+#: 日本 EDINET 只有半年營收（2026-10-21 日韓財報來源）——對不上曆季的錨，不估（不把半年拆成兩季）。
+SEMIANNUAL_ONLY = "只有半年營收（日本 2024-04 起沒有 Q1／Q3 法定申報）——對不上曆季的錨，不估"
+
+
+def _quarterly_label(conn: Any, ticker: str) -> str:
+    """季營收的來源標籤從資料列的 source 取（L18：韓國的列不得被標成 EDGAR）；美股照原字串。"""
+    sources = {str(r[0] or "") for r in conn.execute(
+        "SELECT DISTINCT source FROM fundamental_history WHERE ticker = ? AND metric = 'revenue_quarter'", (ticker,))}
+    return "DART 季營收" if sources and all(s.startswith("opendart://") for s in sources) else "EDGAR 季營收"
 
 
 def fx_tables(conn: Any, currencies: Any, *, as_of: date) -> tuple[dict[str, Any], list[dict[str, Any]]]:
@@ -61,7 +76,7 @@ def page_capture(conn: Any, ticker: str, demand_anchor: Mapping[str, Any] | None
     got = company_quarters(conn, ticker, as_of=as_of)
     if got["source"] is None:
         return {"anchor_key": anchor["key"], "anchor_label": anchor.get("label"), "points": [], "gaps": [],
-                "absence": {"kind": "not_yet_recorded", "reason": NO_QUARTERLY_REVENUE}}
+                "absence": {"kind": "not_yet_recorded", "reason": got.get("absence_reason") or NO_QUARTERLY_REVENUE}}
     company, gaps, source = got["quarters"], list(got["gaps"]), got["source"]
     fx, fx_gaps = fx_tables(conn, {str(q.get("currency")) for q in company.values()}, as_of=as_of)
     gaps += fx_gaps
@@ -74,4 +89,4 @@ def page_capture(conn: Any, ticker: str, demand_anchor: Mapping[str, Any] | None
     return out
 
 
-__all__ = ["NO_QUARTERLY_REVENUE", "company_quarters", "fx_tables", "page_capture"]
+__all__ = ["NO_QUARTERLY_REVENUE", "SEMIANNUAL_ONLY", "company_quarters", "fx_tables", "page_capture"]

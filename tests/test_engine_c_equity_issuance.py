@@ -151,7 +151,7 @@ def test_migration_backs_up_rebuilds_reconciles_and_is_idempotent(tmp_path) -> N
     conn = sqlite3.connect(str(db), isolation_level=None)
     before = mig.table_fingerprint(conn)
     assert mig.missing_metrics(conn) == ["equity_issued_value_quarter", "equity_issued_value_annual", "capex_quarter",
-                                         "capex_annual"]
+                                         "capex_annual", "revenue_half", "operating_income_half"]
     conn.close()
     backup = mig.backup_database(db, tmp_path / "backups" / "prod.pre.db")
     assert backup["rows"] == 3 and Path(backup["path"]).is_file()
@@ -184,7 +184,7 @@ def test_a_reconciliation_mismatch_rolls_back_and_leaves_the_table_untouched(tmp
     monkeypatch.setattr(mig, "table_fingerprint", real)
     assert mig.table_fingerprint(conn) == before
     assert mig.missing_metrics(conn) == ["equity_issued_value_quarter", "equity_issued_value_annual", "capex_quarter",
-                                         "capex_annual"]
+                                         "capex_annual", "revenue_half", "operating_income_half"]
     assert "fundamental_history__new" not in {r[0] for r in conn.execute("SELECT name FROM sqlite_master")}
 
 
@@ -279,6 +279,26 @@ def test_reader_separates_not_applicable_never_reported_and_not_yet_ready() -> N
     assert _equity_issuance(foreign, "XYZ", today=TODAY)["status"] == "method_not_applicable"
     not_backfilled = _equity_issuance(_reader_conn(_domestic_rows()), "XYZ", today=TODAY)
     assert not_backfilled["status"] == "upstream_unavailable" and "還沒回填" in not_backfilled["reason"]
+
+
+def test_a_new_late_metric_never_takes_down_equity_or_capex_before_its_migration(tmp_path) -> None:
+    """日韓財報來源 S1（2026-10-21）：字彙加了半年營收、遷移還沒跑的庫（CHECK 認得 equity／capex、不認得 half）——
+    全有全無的檢查會讓稀釋燈讀成缺席、EDGAR 段整批略過 equity。逐個 metric 問：只略過真的不認得的。"""
+    from engine_c.checklist import _equity_issuance
+
+    ddl = hb._SQLITE_DDL.replace(", 'revenue_half', 'operating_income_half'", "")
+    assert "'revenue_half'" not in ddl and "'capex_annual'" in ddl
+    conn = sqlite3.connect(str(tmp_path / "1008.db"))
+    conn.executescript(ddl)
+    assert hb.late_metrics_supported(conn) is False
+    assert hb.late_metrics_supported(conn, ("equity_issued_value_quarter", "equity_issued_value_annual")) is True
+    report = hb.backfill_ticker_edgar(conn, "XYZ", "0000000001", today=TODAY, incremental=False, fetched_at=FETCHED,
+                                      fetch_facts=lambda cik: _issuance_facts(),
+                                      lag_status=lambda *a, **k: {"status": "current"})
+    assert report["outcome"] == "written" and "late_metrics_skipped" not in report
+    assert {r[0] for r in conn.execute("SELECT DISTINCT metric FROM fundamental_history")} >= {
+        "equity_issued_value_quarter"}
+    assert _equity_issuance(conn, "XYZ", today=TODAY)["status"] != "upstream_unavailable"
 
 
 def test_an_unmigrated_table_is_upstream_unavailable_not_never_reported(tmp_path) -> None:
