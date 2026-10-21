@@ -41,6 +41,12 @@ def edge_states(tickers: Sequence[str], *, db_path: Path | None = None,
                                  thresholds=limits, market_cap_absence=row.get("market_cap_absence"))
         out[ticker]["threshold_version"] = {"effective_from": limits.get("effective_from"),
                                             "version": limits.get("version")}
+        # 批次二 E10：覆蓋家數取三者最大——三個數與各自來源跟著判定走到候選板（L16、L18：標籤指得回原始數字）
+        from .market_normalization import COVERAGE_SOURCES
+
+        counts = row.get("coverage_counts") or {}
+        out[ticker]["coverage_counts"] = [{"source": key, "label": label, "count": counts.get(key)}
+                                          for key, label in COVERAGE_SOURCES]
     return out
 
 

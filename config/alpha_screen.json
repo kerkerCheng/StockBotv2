@@ -14,5 +14,7 @@
 
   "_absence_policy": "市值或覆蓋無法取得時**不得靜默放行、也不得靜默 filtered**（INV-3）。缺值一律計入 filter 報表的獨立理由，讓它現形。",
 
+  "_coverage_rule_2026_10_21": "覆蓋家數取 EPS 0y、營收 0y、目標價三者有量測的最大值（批次二 E10、failure log #64、使用者 Q4 A）；門檻 12 照舊（原斷點是用 EPS 0y 量的，B 選項才重量）。家數 0 且估值 0 的列是 provider 空殼列，當缺值。實作：alpha/providers/market_normalization.py::coverage_counts。",
+
   "_not_this": "這兩個數字不參與任何順序、不調整部位尺寸、不改 query/bottleneck.py 結構表的任何一格（跨檔排序已於 2026-09-23 退役）。它們只回答『這一檔算不算倍率候選』。⚠ 籃子因此變空是合法結果——AGENTS.md 明文：籃子空就空，不得為了非空放寬條件。"
 }

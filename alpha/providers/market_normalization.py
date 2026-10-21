@@ -84,16 +84,44 @@ def normalized_market_cap(
     return usd, None
 
 
-def analyst_count(ticker: str, conn: sqlite3.Connection) -> int | None:
-    """賣方覆蓋家數。⚠ 取 **0y**（base 假設校準的那一年），不是 +1y。
+#: 覆蓋家數的三個來源（Phase 7 批次二 E10，failure log #64；使用者 2026-10-21 Q4 A）：取三者最大，門檻 12 照舊。
+#: 事發：10-16 五檔只看 EPS 0y 被判邊緣（002472.SZ 8→19、002837.SZ 2→13、688017.SS 5→14、SOI.PA 6→19、XPEV 3→25），
+#: 10-17 0522.HK 一天內 18→7 翻盤——provider 對 EPS 那一欄常常漏人，營收與目標價那兩欄才是全的。
+COVERAGE_SOURCES: tuple[tuple[str, str], ...] = (
+    ("eps_0y", "consensus_estimates：eps 0y"),
+    ("revenue_0y", "consensus_estimates：revenue 0y"),
+    ("target_price", "financial_snapshots：analyst_target_count"),
+)
 
-    +1y 會在 rollover 當天崩塌——2026-09-19 實測 LITE 的 +1y 由 22 人變 1 人，
-    而它的 base 校準在 0y。拿 +1y 當覆蓋門檻會在每年某一天把整批標的誤判成「無人覆蓋」。
-    """
-    row = conn.execute(
-        "SELECT analyst_count FROM consensus_estimates WHERE ticker=? AND metric='eps' "
-        "AND relative_label='0y' ORDER BY snapshot_date DESC LIMIT 1", (ticker,)).fetchone()
-    return int(row["analyst_count"]) if row and row["analyst_count"] is not None else None
+
+def coverage_counts(ticker: str, conn: sqlite3.Connection) -> dict[str, int | None]:
+    """三個來源各自的家數（None＝沒有可用的量測）。⚠ 一律取 **0y**（base 假設校準的那一年），不是 +1y——
+    2026-09-19 實測 LITE 的 +1y 在 rollover 當天由 22 人變 1 人。
+
+    ⚠ **家數 0 而估值也是 0 的列是 provider 的空殼列**（2026-10-21 實測 3163.TWO、3234.TWO 等 6 檔的營收 0y：avg／low／high
+    全 0.0、家數 0）——那不是「零位分析師」的量測，當缺值；否則它們會由「無法量」變「邊緣」（L11-5：我找不到≠不存在）。"""
+    def estimate(metric: str) -> int | None:
+        row = conn.execute(
+            "SELECT analyst_count, estimate_avg FROM consensus_estimates WHERE ticker=? AND metric=? "
+            "AND relative_label='0y' ORDER BY snapshot_date DESC LIMIT 1", (ticker, metric)).fetchone()
+        if not row or row["analyst_count"] is None:
+            return None
+        if int(row["analyst_count"]) == 0 and not row["estimate_avg"]:
+            return None
+        return int(row["analyst_count"])
+
+    row = conn.execute("SELECT analyst_target_count, analyst_target_mean FROM financial_snapshots WHERE ticker=? "
+                       "ORDER BY snapshot_date DESC LIMIT 1", (ticker,)).fetchone()
+    target = None
+    if row and row["analyst_target_count"] is not None and (row["analyst_target_count"] or row["analyst_target_mean"]):
+        target = int(row["analyst_target_count"])
+    return {"eps_0y": estimate("eps"), "revenue_0y": estimate("revenue"), "target_price": target}
+
+
+def analyst_count(ticker: str, conn: sqlite3.Connection) -> int | None:
+    """賣方覆蓋家數＝三個來源（`COVERAGE_SOURCES`）裡有量測的最大值；三個都沒有 → None（無法量）。"""
+    counts = [n for n in coverage_counts(ticker, conn).values() if n is not None]
+    return max(counts) if counts else None
 
 
 def screen_inputs(tickers: list[str], *, db_path: Path | None = None) -> dict[str, Mapping[str, Any]]:
@@ -105,8 +133,10 @@ def screen_inputs(tickers: list[str], *, db_path: Path | None = None) -> dict[st
         out: dict[str, Mapping[str, Any]] = {}
         for ticker in tickers:
             cap, absence = normalized_market_cap(ticker, conn, cache)
+            counts = coverage_counts(ticker, conn)
+            measured = [n for n in counts.values() if n is not None]
             out[ticker] = {"market_cap_usd": cap, "market_cap_absence": absence,
-                           "analyst_count": analyst_count(ticker, conn)}
+                           "analyst_count": max(measured) if measured else None, "coverage_counts": counts}
         return out
     finally:
         conn.close()
