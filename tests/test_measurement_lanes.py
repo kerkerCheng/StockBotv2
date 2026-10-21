@@ -260,6 +260,18 @@ def test_paper_lane_anchors_on_the_first_v2_not_the_current_one(collected) -> No
     assert aaa["first_named_by"]["source"] == "edgar:AAA" and aaa["first_named_absence"] is None
 
 
+def test_the_paper_lane_is_also_summarised_by_current_state(collected) -> None:
+    """批次二 E15（7.5 前置）：撤回的敘事仍以舊錨點留在 paper 聚合裡——依現行狀態各算一次；各組 n 加總＝paper 列數，既有鍵不變。"""
+    rows = collected["lanes"]["paper"]["rows"]
+    summary = OIST.lane_summary(rows, lane="paper")
+    groups = summary["by_current_state"]
+    assert sum(g["n"] for g in groups.values()) == len(rows) == summary["n"]
+    assert groups["open"]["n"] == 1 and groups["open"]["aggregate"]["absolute"] == pytest.approx(0.20)
+    assert "by_current_state" not in OIST.lane_summary(collected["lanes"]["live"]["rows"], lane="live")
+    lines = OIST.render_lanes(collected)
+    assert any(line.startswith("  - 現行狀態 open：1 列") for line in lines)
+
+
 def test_quote_unit_is_settled_on_both_ends_gbp_pence_is_not_pounds(collected) -> None:
     ggg = _row(collected, "paper", "GGG.L")
     assert ggg["anchor_ccy"] == "GBP" and ggg["anchor_price"] == pytest.approx(0.44)   # 44 便士 → 0.44 英鎊
