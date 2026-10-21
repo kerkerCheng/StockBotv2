@@ -24,7 +24,7 @@
 | E10 | #64 | 覆蓋家數取三者最大 | 半 | Z2／R1 | 小＋重算 | Q4 A | ✅ 10-21（變異 4／4；翻盤 7 檔全部 edge→not_edge） |
 | E11 | #68 | 「供給側多一家」不再是機械反證觸發；讀圖反證寫新增產能 | 半 | Z2／R1 | 小 | — | ✅ 10-21 程式＋skill（回放 InP 基板 8 份舊讀圖：仍該重讀、觸發 0）；③兩條「圖上第 N 家」反證待下次換版改寫 |
 | E12 | #50 | 證據清單列得出敘事的 library/raw 引用 | 否 | Z2／R1 | 小 | — | ✅ 10-21（變異 6／6；九份短檢查敘事引用列得出 32/111 → 93/111，library/raw 60/60；其餘 18 是讀圖與三題成果、印在 evidence_unlisted） |
-| E13 | #60 | ROADMAP 改寫時待決題不得消失＋「刻意不併／留待」結構化 | 否 | Z2／R1 | 中 | — | ○ |
+| E13 | #60 | ROADMAP 改寫時待決題不得消失＋「刻意不併／留待」結構化 | 否 | Z2／R1 | 中 | — | ✅ 10-21（變異 6／6；懸空引用 6 → 0；走圖第 9 型命中 28 → 35、dram 那對回到問句；刻意不併要 receipt——見落地段） |
 | E14 | #40 | 改動後自動重啟 serve | 否 | Z2／R1＋sandbox | 小 | **Q5** | ○（推薦不做） |
 | E15 | —（7.5 前置） | 追蹤表 paper lane 依現行狀態分組印 | 否（7.5 報告要用） | Z1／R1 | 小（約 12 行） | — | ✅ 10-21 程式（變異紅；真資料驗收待下一次 daily 追蹤表：各組 n 加總＝paper 列數） |
 
@@ -237,6 +237,8 @@ Case: #60 3 例（「人工觀測的取代鏈」懸空 22 天；`duplicate_nodes
 
 **現況：** tests 裡的「ROADMAP「…」」只出現在註解，沒有守門。
 **做什麼：** ①測試：程式、skill、測試裡的「ROADMAP「X」」對不到現行列時，`docs/archive/roadmap-backlog-log.md` 那一列要有完成或退役標記，否則紅；②ROADMAP 改寫的檢查命令（手動跑，不進 hook——ROADMAP「不做 ROADMAP 驗收 linter」那一句照守）：對 git 前一版做「等使用者決定且沒有完成標記的列」差集，新版或 Phase plan 待決清單找不到的列出來；③（plan §14 #19）名冊 note 的「刻意不併」與「留待研究判斷」改成條目上的結構化欄位，走圖第 9 型只排除「刻意不併」。
+**落地（2026-10-21）與兩處與計畫不同：** ①`tests/test_roadmap_refs.py`：程式、skill、測試裡的 ROADMAP「X」要在現行 ROADMAP、或封存 backlog 帶完成／退役標記的列（註解折行先接回）。**今天懸空的是 6 處，不是計畫寫的 1 處**（`duplicate_nodes` 檔頭那句沒有用「」引述，不歸這條管）：「首屏的單位是句不是格」×2 其實是 AGENTS 的判準 → 改指 AGENTS；「bet 改純文字」×2、「個股頁／首屏」、「首屏：末行候選狀態；三題三個字」→ 改引 ROADMAP「個股頁」那一節的列與逐字；「private authority 備份沒有可執行入口」→ 指封存檔（08-30 交付）；daily-brief SKILL 的格式範例「NEXT_PICK_RULE 沒有成本維度」→ 改佔位。②`python -m scripts.roadmap_pending_check [--base REV]`：舊版「待使用者／待決／要使用者選」又沒有完成標記的列，新版 ROADMAP 與 docs/plans 都找不到粗體標題（前 20 字）的列出來；手動跑、不進 hook。③名冊條目兩欄：`keep_separate [{id, reason, approval_receipt}]`（刻意不併）與 `pending [{ids, reason}]`（留待）——**刻意不併必須帶 pq2 receipt**：舊 backlog 那一列記著使用者要選的題目「不併算不算研究判斷、要不要 receipt」，這裡取不放寬任何門檻的那一邊（L15：沒有 receipt 的語意判斷只是 agent 的意見；與 semantic_reviewed 同一條規則），要放寬再說。走圖第 9 型只排除 keep_separate；note 提過但沒有結構化決定的照樣是問句、帶逐字與留待理由；留待只貼在它說的那一對（cpo 記在 NPO 那筆的留待不貼到 cpo 其他變體）。名冊資料：note 的話照原文轉成欄位（note 不動）——keep_separate 1 筆（3d_nand，[505]）、pending 6 筆（advanced_packaging_gf 因為沒有 receipt 也記成 pending）。**真資料：** 走圖第 9 型命中 28 → 35（note 提過的 8 對裡 7 對回到問句、1 對結構化排除），`tech:dram`／`tech:dram_technology` 與`tech:dram`／`tech:dram_manufacturing` 回到問句並帶「留待研究判斷」；懸空引用 6 → 0。
+
 **驗收：** 機制：①的測試（今天會紅 1 處：`query/duplicate_nodes.py` 檔頭）；量：懸空引用 1 → 0；走圖第 9 型：`tech:dram`／`tech:dram_technology`（留待）回到問句。
 
 ## E14 改動後自動重啟 serve（#40；Q5，推薦不做）
