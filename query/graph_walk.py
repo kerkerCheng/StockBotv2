@@ -388,13 +388,20 @@ def coverage_questions(coverage_rows: Sequence[Mapping[str, Any]]) -> dict[str, 
 
 def duplicate_questions(duplicate_buckets: Mapping[str, Sequence[Mapping[str, Any]]], *,
                         node_total: int) -> dict[str, Any]:
-    """第 9 型：沿用 `query.duplicate_nodes` 的候選與 registry 分桶；只收 `unmentioned`（registry 從沒提過）。"""
+    """第 9 型：沿用 `query.duplicate_nodes` 的候選與 registry 分桶。
+
+    命中＝`unmentioned`＋`mentioned`：2026-10-21（批次二 E13 ③）起只有條目 `keep_separate`（帶 pq2 receipt）的那一桶排出問句——
+    之前 note 提過的一律不算命中，「留待研究判斷」與「刻意不併」同形，於是 `tech:dram`／`tech:dram_technology` 這種留待題
+    從問句裡消失（#60）。note 提過的照樣帶逐字（`registry_mentions`）與留待紀錄（`pending`）。
+    """
     hits = []
-    for pair in sorted(duplicate_buckets.get("unmentioned") or (), key=lambda p: tuple(p["pair"])):
+    pool = list(duplicate_buckets.get("unmentioned") or ()) + list(duplicate_buckets.get("mentioned") or ())
+    for pair in sorted(pool, key=lambda p: tuple(p["pair"])):
         a, b = pair["pair"]
         hits.append({"subject": f"{a}|{b}", "pair": [a, b], "rules": list(pair.get("rules") or ()),
                      "same_abstraction_level": pair.get("same_abstraction_level"),
                      "left": pair.get("left"), "right": pair.get("right"),
+                     "pending": list(pair.get("pending") or ()),
                      "text": QUESTION_BY_KEY["duplicate_node"].question.format(a=a, b=b)})
     mentioned = sorted("|".join(p["pair"]) for p in duplicate_buckets.get("mentioned") or ())
     # note 逐字跟著走（2026-09-29 Phase 3 Step 3.1c：`python -m query.duplicate_nodes` 退役前，note 只在那支 CLI
@@ -402,8 +409,11 @@ def duplicate_questions(duplicate_buckets: Mapping[str, Sequence[Mapping[str, An
     notes = {"|".join(p["pair"]): [{k: m.get(k) for k in ("canonical", "basis", "approval_receipt", "note")}
                                    for m in p.get("registry_mentions") or ()]
              for p in duplicate_buckets.get("mentioned") or ()}
+    kept = [{"pair": list(p["pair"]), **{k: p["keep_separate"][k] for k in ("canonical", "reason", "approval_receipt")}}
+            for p in sorted(duplicate_buckets.get("kept_separate") or (), key=lambda p: tuple(p["pair"]))]
     return {"hits": hits, "scope_n": int(node_total),
-            "extra": {"registry_mentioned": mentioned, "registry_notes": dict(sorted(notes.items()))}}
+            "extra": {"registry_mentioned": mentioned, "registry_notes": dict(sorted(notes.items())),
+                      "kept_separate": kept}}
 
 
 def walk(*, edges: Sequence[CanonicalEdge], graph_nodes: Iterable[str],
@@ -652,8 +662,12 @@ def render_markdown(result: Mapping[str, Any]) -> str:
             out.append(f"- 抽取副產品（`prod:` 前綴、0 家）{len(extra['product_noise'])} 個，只計數、不是題目")
         if extra.get("withdrawn"):
             out.append(f"- 有紀錄但已全部撤回（不在母體）：{'、'.join(extra['withdrawn'])}")
+        if extra.get("kept_separate"):
+            out.append(f"- 名冊結構化記為刻意不併的 {len(extra['kept_separate'])} 對（不算命中）：" + "；".join(
+                f"`{k['pair'][0]}` ↔ `{k['pair'][1]}`（{k['approval_receipt']}：{k['reason']}）" for k in extra["kept_separate"]))
         if extra.get("registry_mentioned"):
-            out.append(f"- registry 的 note 提過的候選 {len(extra['registry_mentioned'])} 對（不算命中；先讀 note）")
+            out.append(f"- 其中 {len(extra['registry_mentioned'])} 對 registry 的 note 提過、但沒有結構化的不併決定"
+                       "（仍算命中；note 逐字如下）")
             for pair, mentions in (extra.get("registry_notes") or {}).items():
                 for m in mentions:
                     out.append(f"  - `{pair.replace('|', '` ↔ `')}`：📄 `{m.get('canonical')}`"

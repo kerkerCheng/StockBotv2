@@ -5,7 +5,7 @@
 2. **禁字表**：內部名詞出現在任何一格就拒收；七格缺一不可；每格必帶引用。
 3. **append-only 語意**：as-of 選取、最新者勝出、撤回就沒有。
 4. **消費端**：沒寫短評 → section missing＋not_yet_recorded。⚠ 2026-09-23（Phase 0 Step 0b.1）：
-   brief panel 由 optional **升為核心**（ROADMAP「首屏的單位是句不是格」），所以沒寫短評**會**讓
+   brief panel 由 optional **升為核心**（AGENTS「首屏的單位是句不是格」），所以沒寫短評**會**讓
    readiness 變差——那是刻意的：新方向下沒寫短評的檔就是沒有產出。實測 70/73 檔還沒寫。
    APP 首屏只有短評卡，其餘收進「為什麼這樣算」。
 """

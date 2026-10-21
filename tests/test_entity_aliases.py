@@ -154,3 +154,73 @@ def test_shipped_registry_loads_and_only_registers_mechanical_basis() -> None:
         # 語意登記一律附得出核准編號——這是本 registry 與「某人的意見」的分界
         if entry["basis"] in entities._BASIS_REQUIRES_RECEIPT:
             assert entities._RECEIPT_PATTERN.match(entry["approval_receipt"])
+
+
+
+# ---------------------------------------------------------------------------
+# 批次二 E13 ③：刻意不併（keep_separate，要 receipt）與留待（pending）結構化
+# ---------------------------------------------------------------------------
+
+def _registry_with(entry_extra: dict) -> dict:
+    return {"schema_version": "entity-aliases-v1", "canonical": {
+        "tech:nand": {"name": "NAND", "aliases": ["tech:nand_flash"], "basis": "name_identical", **entry_extra}}}
+
+
+def test_keep_separate_needs_a_pq2_receipt_like_a_semantic_merge() -> None:
+    from identity.entities import EntityAliasError, _validate
+
+    ok = {"keep_separate": [{"id": "tech:3d_nand_manufacturing", "reason": "證據不足", "approval_receipt": "todo:505"}]}
+    _validate(_registry_with(ok))
+    for bad in ({"id": "tech:3d_nand_manufacturing", "reason": "證據不足", "approval_receipt": None},
+                {"id": "tech:3d_nand_manufacturing", "reason": "證據不足", "approval_receipt": "口頭同意"},
+                {"id": "tech:nand_flash", "reason": "本組成員", "approval_receipt": "todo:505"},
+                {"id": "tech:3d_nand_manufacturing", "reason": " ", "approval_receipt": "todo:505"},
+                {"id": "tech:3d_nand_manufacturing", "approval_receipt": "todo:505"}):
+        with pytest.raises(EntityAliasError):
+            _validate(_registry_with({"keep_separate": [bad]}))
+
+
+def test_pending_is_a_record_with_ids_and_a_reason() -> None:
+    from identity.entities import EntityAliasError, _validate
+
+    _validate(_registry_with({"pending": [{"ids": ["tech:dram", "tech:dram_technology"], "reason": "留待研究判斷"}]}))
+    for bad in ({"ids": [], "reason": "x"}, {"ids": ["co:x"], "reason": "x"}, {"ids": ["tech:dram"], "reason": ""}):
+        with pytest.raises(EntityAliasError):
+            _validate(_registry_with({"pending": [bad]}))
+
+
+def test_only_keep_separate_leaves_the_question_and_pending_rides_along() -> None:
+    from query.duplicate_nodes import bucketize
+
+    canonical = {
+        "tech:nand": {"aliases": ["tech:nand_flash"], "basis": "name_identical",
+                      "note": "tech:3d_nand_manufacturing 刻意不併",
+                      "keep_separate": [{"id": "tech:3d_nand_manufacturing", "reason": "證據不足",
+                                         "approval_receipt": "todo:505"}]},
+        "tech:dram_manufacturing": {"aliases": ["tech:dram_production"], "basis": "name_identical",
+                                    "note": "tech:dram／tech:dram_technology 名稱不同，留待研究判斷。",
+                                    "pending": [{"ids": ["tech:dram", "tech:dram_technology"], "reason": "留待"}]},
+        "tech:near_package_optics": {"aliases": ["tech:npo"], "basis": "semantic_reviewed",
+                                     "approval_receipt": "todo:752",
+                                     "pending": [{"ids": ["tech:cpo"], "reason": "不含 tech:cpo"}]},
+    }
+    pairs = [{"pair": ["tech:3d_nand_manufacturing", "tech:nand_flash"]},
+             {"pair": ["tech:dram", "tech:dram_technology"]},
+             {"pair": ["tech:cpo", "tech:near_package_optics"]},
+             {"pair": ["tech:cpo", "tech:glass_cpo"]}]
+    buckets = bucketize(pairs, canonical)
+    assert [p["pair"] for p in buckets["kept_separate"]] == [["tech:3d_nand_manufacturing", "tech:nand_flash"]]
+    assert [p["pair"] for p in buckets["mentioned"]] == [["tech:dram", "tech:dram_technology"]]
+    assert buckets["mentioned"][0]["pending"][0]["reason"] == "留待"
+    unmentioned = {tuple(p["pair"]): p for p in buckets["unmentioned"]}
+    assert unmentioned[("tech:cpo", "tech:near_package_optics")]["pending"][0]["reason"] == "不含 tech:cpo"
+    # 留待只貼在它說的那一對：cpo 與它其他變體的那一對不帶 NPO 那筆的留待
+    assert unmentioned[("tech:cpo", "tech:glass_cpo")]["pending"] == []
+
+
+def test_the_real_registry_still_loads_with_the_structured_fields() -> None:
+    from identity import entities
+
+    canonical = entities.load()
+    assert canonical["tech:nand"]["keep_separate"][0]["approval_receipt"] == "todo:505"
+    assert any("tech:dram" in item["ids"] for item in canonical["tech:dram_manufacturing"]["pending"])

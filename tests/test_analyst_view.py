@@ -440,7 +440,7 @@ def test_information_hierarchy_puts_the_sentence_before_the_cells() -> None:
     """
     analyst = build_analyst_view(_full_view(with_criterion=True))
     order = list(analyst.PANEL_ORDER)
-    # Step 3.7：首屏是短評＋末行候選狀態（ROADMAP「首屏：末行候選狀態；三題三個字」），接著才是論證。
+    # Step 3.7：首屏是短評＋末行候選狀態（ROADMAP「末行候選狀態；三題三個字」），接著才是論證。
     assert order[0] == "brief" and order[1] == "candidate" and order[2] == "argument", order
     assert order.index("three_questions") > order.index("argument")          # 三題的數字住稽核區
     # 稽核區的原始數字（fundamental）與現價排在論證之後，不搶在句子前面。

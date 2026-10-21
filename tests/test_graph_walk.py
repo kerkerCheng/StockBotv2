@@ -113,7 +113,14 @@ def run_walk(**overrides):
               coverage_rows=fake_coverage(),
               duplicate_buckets={"unmentioned": [{"pair": ["tech:eml", "tech:inp_eml"], "rules": ["id_token_subset"],
                                                   "same_abstraction_level": True, "left": None, "right": None}],
-                                 "mentioned": [{"pair": ["tech:x", "tech:x_y"]}]},
+                                 "mentioned": [{"pair": ["tech:x", "tech:x_y"],
+                                                "pending": [{"canonical": "tech:x", "ids": ["tech:x_y"],
+                                                             "reason": "留待研究判斷"}]}],
+                                 "kept_separate": [{"pair": ["tech:nand", "tech:3d_nand_manufacturing"],
+                                                    "keep_separate": {"canonical": "tech:nand",
+                                                                      "id": "tech:3d_nand_manufacturing",
+                                                                      "reason": "證據不足節點",
+                                                                      "approval_receipt": "todo:505"}}]},
               duplicate_node_total=20, anchors=[ANCHOR])
     kw.update(overrides)
     return gw.walk(**kw)
@@ -351,10 +358,17 @@ def test_coverage_types_reuse_the_scanner_buckets_and_count_product_noise_separa
     assert modelling["hits"][0]["indirect"] == ["co:lumentum"]
 
 
-def test_duplicate_type_counts_unmentioned_pairs_only() -> None:
+def test_duplicate_type_excludes_only_structured_keep_separate() -> None:
+    """批次二 E13 ③（#60）：note 提過但沒有結構化決定的（留待）仍是問句、帶著留待紀錄；只有 keep_separate（帶 receipt）排除。"""
     q = _q(run_walk(), "duplicate_node")
-    assert [h["pair"] for h in q["hits"]] == [["tech:eml", "tech:inp_eml"]]
+    assert [h["pair"] for h in q["hits"]] == [["tech:eml", "tech:inp_eml"], ["tech:x", "tech:x_y"]]
+    assert q["hits"][1]["pending"][0]["reason"] == "留待研究判斷"
     assert q["scope_n"] == 20 and q["extra"]["registry_mentioned"] == ["tech:x|tech:x_y"]
+    assert q["extra"]["kept_separate"] == [{"pair": ["tech:nand", "tech:3d_nand_manufacturing"],
+                                            "canonical": "tech:nand", "reason": "證據不足節點",
+                                            "approval_receipt": "todo:505"}]
+    text = gw.render_markdown(run_walk())
+    assert "刻意不併的 1 對（不算命中）" in text and "仍算命中" in text
 
 
 def test_always_on_is_flagged_only_when_the_scope_is_large_enough() -> None:

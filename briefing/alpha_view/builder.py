@@ -410,7 +410,7 @@ def _investor_brief_section(
     reporting_currency: str | None = None,
 ) -> InvestorBriefSection:
     # ⚠ **2026-09-23（Phase 0 Step 0b.1b）：那把尺（現價／沒賭對／賭對／判斷錯了）整格退役。**
-    # ROADMAP「個股頁／首屏」那一列明文「拿掉」。它是這個 section 唯一讀 `ir`／`payoff`／`downside`
+    # ROADMAP「個股頁」那一節的「首屏」列明文「拿掉」。它是這個 section 唯一讀 `ir`／`payoff`／`downside`
     # 的地方，所以拿掉它同時讓短評 section 不再依賴估值鏈——首屏從此只有句子與燈。
     light = Datum(key="brief_status_light", label="狀態燈",
                   value={"state": refresh_overall, "label": PLAIN_REFRESH_OVERALL.get(refresh_overall, refresh_overall)},
@@ -556,7 +556,7 @@ def _argument_section(*, company_label: str, company_id: str | None, structural:
 
     # ⚠ **2026-09-23（Phase 0 Step 0b.1b）：論證層的「賭注」段退役（E 組）。**
     # 它由四個價格組句（賭注目標價／payoff／EPS 貢獻／倍數貢獻）。`bet` **面板**已於 0b.1a
-    # 改成純文字（讀短評的 `our_bet`）——那是 ROADMAP「bet 改純文字」指的東西；論證層這一段是
+    # 改成純文字（讀短評的 `our_bet`）——那是 ROADMAP「個股頁」那一節「論證」列「`bet` 的四個價格」拿掉指的東西；論證層這一段是
     # 另一回事（拿四個價格造句），整段拿掉。論證層剩三段：鏈、風險與認錯條件、時間表。
 
     # 5. 風險與認錯（全部是 session 長文，照抄）

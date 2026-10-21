@@ -21,7 +21,9 @@
     "canonical 的選法是機械的：同組取最短 id；等長取字母序在前者。任何人重跑都得到同一個。",
     "",
     "⚠ 本檔只作用於**未來**的抽取（loader 在入圖前解析）。圖裡既有節點的合併是 graph write，",
-    "走 pq2：[505]（NAND，語意）與 [506]（三組 name 逐字相同，存量搬遷）。"
+    "走 pq2：[505]（NAND，語意）與 [506]（三組 name 逐字相同，存量搬遷）。",
+    "",
+    "條目選填兩欄（2026-10-21 批次二 E13 ③）：`keep_separate` [{id, reason, approval_receipt}]＝刻意不併，必須帶 pq2 receipt（不併也是研究判斷），走圖第 9 型只排除它；`pending` [{ids, reason}]＝留待／另案，只是紀錄、不排除——留待的題目要回到問句。"
   ],
   "canonical": {
     "tech:advanced_packaging": {
@@ -30,7 +32,15 @@
         "tech:advanced_packaging_integration"
       ],
       "basis": "name_identical",
-      "note": "兩個 id 的 name 逐字相同。tech:advanced_packaging_gf 是 GF Fab 8 特指，不併。"
+      "note": "兩個 id 的 name 逐字相同。tech:advanced_packaging_gf 是 GF Fab 8 特指，不併。",
+      "pending": [
+        {
+          "ids": [
+            "tech:advanced_packaging_gf"
+          ],
+          "reason": "note 記為「GF Fab 8 特指，不併」，但沒有 pq2 receipt——不併也是研究判斷，核准前仍是問句"
+        }
+      ]
     },
     "tech:dram_manufacturing": {
       "name": "DRAM wafer fabrication",
@@ -38,7 +48,16 @@
         "tech:dram_production"
       ],
       "basis": "name_identical",
-      "note": "兩個 id 的 name 逐字相同。tech:dram／tech:dram_technology 名稱不同，留待研究判斷。"
+      "note": "兩個 id 的 name 逐字相同。tech:dram／tech:dram_technology 名稱不同，留待研究判斷。",
+      "pending": [
+        {
+          "ids": [
+            "tech:dram",
+            "tech:dram_technology"
+          ],
+          "reason": "名稱不同，留待研究判斷（note 原文）"
+        }
+      ]
     },
     "tech:eml": {
       "name": "Electro-absorption Modulated Laser (EML)",
@@ -60,7 +79,14 @@
       ],
       "basis": "semantic_reviewed",
       "approval_receipt": "todo:505",
-      "note": "使用者 2026-09-10 核准（[505] 選項 A）。五個 id 的 name 各不相同，但逐字讀完六份原文後全部指向同一件事——設備商賣給 NAND 製造市場的營收／客戶資本支出：AMAT 10-Q『Revenue for Semiconductor Systems by market… Flash memory (NAND) 4%』（同一段同時生出 tech:nand_technology 與 tech:nand_flash）、Lam 10-K『decreases in non-volatile memory spending… by our customers』。⚠ tech:nand_flash 原被標成 device_chip（其餘是 foundry_packaging），但它的兩份 source 都是 AMAT 的 by-market 營收拆分——那個分層沒有證據支持，故一併併入。⚠ tech:3d_nand_manufacturing **刻意不併**：它的唯一 quote 是『Lam Research Corporation is a global supplier of wafer fabrication equipment and services to the semiconductor industry.』，完全沒提 3D NAND——它不是重複節點，是 L6 Gap 4 型（LLM 從類別詞推斷出具體實體）的證據不足節點，另案處理，不得靠合併洗進 canonical。"
+      "note": "使用者 2026-09-10 核准（[505] 選項 A）。五個 id 的 name 各不相同，但逐字讀完六份原文後全部指向同一件事——設備商賣給 NAND 製造市場的營收／客戶資本支出：AMAT 10-Q『Revenue for Semiconductor Systems by market… Flash memory (NAND) 4%』（同一段同時生出 tech:nand_technology 與 tech:nand_flash）、Lam 10-K『decreases in non-volatile memory spending… by our customers』。⚠ tech:nand_flash 原被標成 device_chip（其餘是 foundry_packaging），但它的兩份 source 都是 AMAT 的 by-market 營收拆分——那個分層沒有證據支持，故一併併入。⚠ tech:3d_nand_manufacturing **刻意不併**：它的唯一 quote 是『Lam Research Corporation is a global supplier of wafer fabrication equipment and services to the semiconductor industry.』，完全沒提 3D NAND——它不是重複節點，是 L6 Gap 4 型（LLM 從類別詞推斷出具體實體）的證據不足節點，另案處理，不得靠合併洗進 canonical。",
+      "keep_separate": [
+        {
+          "id": "tech:3d_nand_manufacturing",
+          "reason": "唯一 quote 沒提 3D NAND——L6 Gap 4 型證據不足節點，不是重複；不得靠合併洗進 canonical（[505] 選項 A 同筆核准）",
+          "approval_receipt": "todo:505"
+        }
+      ]
     },
     "tech:ocs": {
       "name": "Optical Circuit Switch",
@@ -106,7 +132,15 @@
       ],
       "basis": "semantic_reviewed",
       "approval_receipt": "todo:615",
-      "note": "使用者 2026-09-19 核准（[615]）。兩端逐字**都是 AMAT 的 by-market 營收拆分**（「Foundry, logic and other 67% … DRAM 29% … Flash memory (NAND) 4%」與「Foundry and logic customers' spending…」）。⚠ **與 [505] NAND 那次完全同型**：同一段 by-market 營收拆分句生出多個節點，而它們指的是同一個「設備商賣給這個市場」的概念。canonical 依機械選法取最短 id。⚠ **第三個同族節點 `tech:leading_edge_logic_foundry` 本次不併**：它與 `tech:foundry_logic_advanced` 才是真正的重複（都指「先進節點的 foundry/logic」），但**偵測器的兩條規則都抓不到那一對**（token 互不為子集、name 完全不同），它是被這一對順帶帶出來的。已列在 [615] 的 B 組等證據。"
+      "note": "使用者 2026-09-19 核准（[615]）。兩端逐字**都是 AMAT 的 by-market 營收拆分**（「Foundry, logic and other 67% … DRAM 29% … Flash memory (NAND) 4%」與「Foundry and logic customers' spending…」）。⚠ **與 [505] NAND 那次完全同型**：同一段 by-market 營收拆分句生出多個節點，而它們指的是同一個「設備商賣給這個市場」的概念。canonical 依機械選法取最短 id。⚠ **第三個同族節點 `tech:leading_edge_logic_foundry` 本次不併**：它與 `tech:foundry_logic_advanced` 才是真正的重複（都指「先進節點的 foundry/logic」），但**偵測器的兩條規則都抓不到那一對**（token 互不為子集、name 完全不同），它是被這一對順帶帶出來的。已列在 [615] 的 B 組等證據。",
+      "pending": [
+        {
+          "ids": [
+            "tech:leading_edge_logic_foundry"
+          ],
+          "reason": "[615] 本次不併；它與 tech:foundry_logic_advanced 才是真正的重複，列在 [615] B 組等證據"
+        }
+      ]
     },
     "tech:poet_optical_interposer": {
       "name": "POET Optical Interposer",
@@ -124,7 +158,16 @@
       ],
       "basis": "semantic_reviewed",
       "approval_receipt": "todo:730",
-      "note": "使用者 2026-10-07 核准（[730]）。兩端逐字：tech:cpo_fiber_attach「CPO 光纖耦合／連接器層（fiber attach）」，唯一來源是 NVIDIA 矽光子部落格夥伴條目的角色句（nvidia_sipho_blog_partner_roles_s3）「Industry experts with optical connectors and fiber assemblies for linking the ELS lasers with polarization, maintaining fibers into the silicon photonics engine, and data output to the front panel.」；tech:fiber_attach_unit「Fiber Attach Unit」——Coherent 法說「the actual fiber attach unit, so this is the -- what connects the switch chip or the XPU to the faceplate or to the external laser source module」、上詮年報的 FAU 產線、同一份 NVIDIA 部落格 s7 點名的五家（[727]）。兩者講的是同一層：把光纖接進矽光子引擎、接到面板與外部雷射光源的光纖組件。⚠ canonical **不照** _readme 的「同組取最短 id」（那會選 tech:cpo_fiber_attach）：改選 tech:fiber_attach_unit——6 條供貨邊、FAU 讀圖、層說明 ledger（ln_863549fd0f4a7468）與兩份敘事的押注都掛在這個 id，選短的會讓它們全部搬家；例外只在本筆，規則本身不改。事發：Phase 7 failure log #36（客戶端五家名單曾整份掛在同義節點，FAU 讀圖因此寫錯「沒有客戶端點名」）。不含 tech:cpo／tech:scale_out_cpo 那一對（疑似同義，另案）。"
+      "note": "使用者 2026-10-07 核准（[730]）。兩端逐字：tech:cpo_fiber_attach「CPO 光纖耦合／連接器層（fiber attach）」，唯一來源是 NVIDIA 矽光子部落格夥伴條目的角色句（nvidia_sipho_blog_partner_roles_s3）「Industry experts with optical connectors and fiber assemblies for linking the ELS lasers with polarization, maintaining fibers into the silicon photonics engine, and data output to the front panel.」；tech:fiber_attach_unit「Fiber Attach Unit」——Coherent 法說「the actual fiber attach unit, so this is the -- what connects the switch chip or the XPU to the faceplate or to the external laser source module」、上詮年報的 FAU 產線、同一份 NVIDIA 部落格 s7 點名的五家（[727]）。兩者講的是同一層：把光纖接進矽光子引擎、接到面板與外部雷射光源的光纖組件。⚠ canonical **不照** _readme 的「同組取最短 id」（那會選 tech:cpo_fiber_attach）：改選 tech:fiber_attach_unit——6 條供貨邊、FAU 讀圖、層說明 ledger（ln_863549fd0f4a7468）與兩份敘事的押注都掛在這個 id，選短的會讓它們全部搬家；例外只在本筆，規則本身不改。事發：Phase 7 failure log #36（客戶端五家名單曾整份掛在同義節點，FAU 讀圖因此寫錯「沒有客戶端點名」）。不含 tech:cpo／tech:scale_out_cpo 那一對（疑似同義，另案）。",
+      "pending": [
+        {
+          "ids": [
+            "tech:cpo",
+            "tech:scale_out_cpo"
+          ],
+          "reason": "[730] 不含 tech:cpo／tech:scale_out_cpo 那一對（疑似同義，另案）"
+        }
+      ]
     },
     "tech:near_package_optics": {
       "name": "Near-Packaged Optics (NPO)",
@@ -133,7 +176,15 @@
       ],
       "basis": "semantic_reviewed",
       "approval_receipt": "todo:752",
-      "note": "使用者 2026-10-08 核准（[752]）。兩端逐字：tech:npo「Near-Packaged Optics」——Lumentum Q4 FY2026 法說「The rest of our customer base is currently prioritizing near-packaged architectures as an intermediate step to the eventual adoption of CPO.」（lite_transcript_q4fy2026，三筆 assertion 全部出自這一句）；tech:near_package_optics「Near-Packaged Optics (NPO)」——Coherent「CPO and NPO opportunities」、Aeva「a Near-Packaged Optics (NPO) solution for a hyperscaler」、NewPhotonics「near-packaged optics … NPO optical engine」、Credo「NPO: Optical engines are mounted on the board near the compute device」。兩者講的是同一個架構：光引擎裝在板上、靠近交換器或運算晶片（不是和 ASIC 共同封裝）。⚠ canonical **不照** _readme 的「同組取最短 id」（那會選 tech:npo）：比照 [730] 改選 tech:near_package_optics——NPO 層讀圖（sr_f004cdb4639c6441）、Aeva 敘事的押注與四份來源都掛在這個 id，選短的會讓它們全部搬家；例外只在本筆，規則本身不改。事發：Phase 7 failure log #59（#36 的第二例；第 9 型比 id token 子集與名稱逐字，兩條都不中）。⚠ 照搬的疑點：prod:uhp_laser is_component_of 那條的引文沒寫 UHP 雷射（L6 Gap 4），本筆不改它；tech:cpo 節點別名裡的「NPO」「near-packaged optics」是別名污染，另案。不含 tech:cpo 與 scale_up／scale_out 那一群。"
+      "note": "使用者 2026-10-08 核准（[752]）。兩端逐字：tech:npo「Near-Packaged Optics」——Lumentum Q4 FY2026 法說「The rest of our customer base is currently prioritizing near-packaged architectures as an intermediate step to the eventual adoption of CPO.」（lite_transcript_q4fy2026，三筆 assertion 全部出自這一句）；tech:near_package_optics「Near-Packaged Optics (NPO)」——Coherent「CPO and NPO opportunities」、Aeva「a Near-Packaged Optics (NPO) solution for a hyperscaler」、NewPhotonics「near-packaged optics … NPO optical engine」、Credo「NPO: Optical engines are mounted on the board near the compute device」。兩者講的是同一個架構：光引擎裝在板上、靠近交換器或運算晶片（不是和 ASIC 共同封裝）。⚠ canonical **不照** _readme 的「同組取最短 id」（那會選 tech:npo）：比照 [730] 改選 tech:near_package_optics——NPO 層讀圖（sr_f004cdb4639c6441）、Aeva 敘事的押注與四份來源都掛在這個 id，選短的會讓它們全部搬家；例外只在本筆，規則本身不改。事發：Phase 7 failure log #59（#36 的第二例；第 9 型比 id token 子集與名稱逐字，兩條都不中）。⚠ 照搬的疑點：prod:uhp_laser is_component_of 那條的引文沒寫 UHP 雷射（L6 Gap 4），本筆不改它；tech:cpo 節點別名裡的「NPO」「near-packaged optics」是別名污染，另案。不含 tech:cpo 與 scale_up／scale_out 那一群。",
+      "pending": [
+        {
+          "ids": [
+            "tech:cpo"
+          ],
+          "reason": "[752] 不含 tech:cpo 與 scale_up／scale_out 那一群（note 原文）"
+        }
+      ]
     },
     "tech:transceiver_1_6t": {
       "name": "1.6T-speed transceiver",
@@ -142,7 +193,15 @@
       ],
       "basis": "semantic_reviewed",
       "approval_receipt": "todo:776",
-      "note": "使用者 2026-10-17 核准（[776]）。兩端逐字：tech:transceiver_1_6t「we are poised to ramp 1.6T-speed transceiver shipments in fiscal Q4 with a portion of this volume leveraging our own CW lasers.」（Lumentum Q3 FY26）、AAOI「800G and 1.6T optical transceivers」、中際旭創「2027年整體行業的1.6T需求依然保持強勁」；tech:cloud_transceiver_1_6t「Transceiver revenue grew ~$50M sequentially … now in the 'lead pack' of transceiver suppliers as customers move to 1.6T」（Lumentum Q2 FY26，五筆 assertion 全出自這一份）。兩端都是 1.6T 這一代的資料中心光收發器、別名都是「1.6T transceiver」；[615] packet B 組當時的疑慮「cloud 特指資料中心」不成立——transceiver_1_6t 的每段逐字也都是 AI 資料中心。canonical 照 _readme 取最短 id。不含：1.6T 世代與可插拔收發器層 tech:pluggable_transceiver 的關係（另案）"
+      "note": "使用者 2026-10-17 核准（[776]）。兩端逐字：tech:transceiver_1_6t「we are poised to ramp 1.6T-speed transceiver shipments in fiscal Q4 with a portion of this volume leveraging our own CW lasers.」（Lumentum Q3 FY26）、AAOI「800G and 1.6T optical transceivers」、中際旭創「2027年整體行業的1.6T需求依然保持強勁」；tech:cloud_transceiver_1_6t「Transceiver revenue grew ~$50M sequentially … now in the 'lead pack' of transceiver suppliers as customers move to 1.6T」（Lumentum Q2 FY26，五筆 assertion 全出自這一份）。兩端都是 1.6T 這一代的資料中心光收發器、別名都是「1.6T transceiver」；[615] packet B 組當時的疑慮「cloud 特指資料中心」不成立——transceiver_1_6t 的每段逐字也都是 AI 資料中心。canonical 照 _readme 取最短 id。不含：1.6T 世代與可插拔收發器層 tech:pluggable_transceiver 的關係（另案）",
+      "pending": [
+        {
+          "ids": [
+            "tech:pluggable_transceiver"
+          ],
+          "reason": "[776] 不含 1.6T 世代與可插拔收發器層的關係（另案）"
+        }
+      ]
     },
     "tech:six_inch_inp_production": {
       "name": "Six-inch InP wafer production line",
