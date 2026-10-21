@@ -76,6 +76,16 @@ def test_a_reride_is_not_a_new_judgment_but_rewriting_the_reason_is() -> None:
     assert judgment_version([a, b, c, d], d).brief_id == d.brief_id           # 已定價那一格的文字一改就重置
 
 
+def test_a_missing_or_pass_reason_edit_is_not_a_new_priced_judgment_but_a_state_change_is() -> None:
+    """2026-10-21 使用者照推薦：理由與在等的 watch 只在等回落時算改判（缺 X／不要的理由多半是證據，不是價格判斷）。"""
+    a = parse_brief_record(_rec(at=_at(10, 6), state="missing", reason="缺：客戶沒具名"))
+    b = parse_brief_record(_rec(at=_at(10, 19), state="missing", reason="缺：客戶已具名一家，量級未揭露",
+                                supersedes=a.brief_id))
+    assert judgment_version([a, b], b).brief_id == a.brief_id
+    c = parse_brief_record(_rec(at=_at(10, 20), state="pass", reason="不要：層判 neither", supersedes=b.brief_id))
+    assert judgment_version([a, b, c], c).brief_id == c.brief_id               # 狀態本身改了照算改判
+
+
 def _derive(records, *, then=None, now=88.0, bars=None, calls=None, state_tq=True):
     calls = calls if calls is not None else []
 

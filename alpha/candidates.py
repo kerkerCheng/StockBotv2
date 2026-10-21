@@ -174,11 +174,14 @@ def stall_since(records: Sequence[InvestorBrief], brief: InvestorBrief) -> datet
 # ---------------------------------------------------------------------------
 
 def priced_judgment_key(brief: InvestorBrief) -> tuple[Any, ...]:
-    """「已定價判斷」的鍵：priced_in 那一格的文字、答案、整個候選狀態（含理由與在等的 watch——等回落的價格理由寫在
-    reason 裡）、歷史不可比宣告（換一把尺）。換騎、只換引用都不改這個鍵，所以不算改判。"""
+    """「已定價判斷」的鍵：priced_in 那一格的文字、答案、候選狀態、歷史不可比宣告（換一把尺）；**理由與在等的 watch
+    只在等回落時算進來**（等回落的價格理由寫在 reason 裡）。換騎、只換引用都不改這個鍵，所以不算改判。
+    2026-10-21 使用者照推薦：缺 X／不要的理由多半是客戶、量級這類證據，改字就讓判斷日歸零會把「判斷日以來」縮短
+    （R2 回放：9 列受影響，例 3363 判斷日以來 −2.6%，只看已定價那一格是 10-06 起 −22.1%）。"""
     slot = brief.slot("priced_in")
-    return (slot.text if slot else None, brief.answers.priced_in if brief.answers else None,
-            brief.candidate_state.as_dict() if brief.candidate_state else None,
+    cs = brief.candidate_state
+    state = (cs.as_dict() if cs.state == "priced_wait" else {"state": cs.state}) if cs is not None else None
+    return (slot.text if slot else None, brief.answers.priced_in if brief.answers else None, state,
             brief.history_not_comparable.as_dict() if brief.history_not_comparable else None)
 
 

@@ -1,6 +1,7 @@
 # PLAN_PROPOSAL：海外財報來源③日本 EDINET、④韓國 OpenDART——三題對日韓由缺席變有值（Z2）
 
-> 日期 2026-10-21｜狀態：**AWAITING_HUMAN**（Q1–Q3 要使用者選；各附推薦）｜ROADMAP「海外財報來源」③④格
+> 日期 2026-10-21｜狀態：**APPROVED**（使用者 2026-10-21「日韓 AAA」＝Q1 A 半年 TTM、Q2 A 普通股 distb_stock_co、Q3 A 只收整行總額）｜ROADMAP「海外財報來源」③④格
+> **實作前的設計修正（10-21 唯讀子代理 `jpkr_design` 實測 EDINET 39 次、OpenDART 8 次）：** ①書類一覧的 periodStart／End 不能用（160 是整個會計年度、140 是單季、訂正書是 null）——期間與 context 一律由 DEI（`TypeOfCurrentPeriodDEI`、`CurrentPeriodEndDateDEI`）決定，docType 不參與（6594 S100UOHJ：docType 160 但 DEI 是 Q2）；②股數只扣自己保有株式，不扣「自己株式等合計」（相互保有在 7/18 份出現，法律上仍是流通股）；③除權日落在期末前 10 天內的那一期股數整期不用（6594 2024-09 實測會少算一半；4062、5706 的 2026-09-29 分割即將重演）；④S1 先把 `late_metrics_supported` 改成逐個 metric 檢查——全有全無的寫法會讓新字彙遷移前美股稀釋燈與 capex 整批略過；⑤日韓 13＋6 檔都沒有整行總借款 → 依 Q3 A 淨負債一律缺席、已定價①用 P/S。
 > 使用者 2026-10-21：「741 742 我已經把 API 貼上去」——[741][742] 已結案（go；唯讀連線測試通過，收據
 > `library/private/research_notes/doc_requests/2026-10-21_overseas_api_keys.md`，不含 key）。開發項的唯一載體是 ROADMAP 與本檔。
 > 調查底稿：research-drain 10-21 唯讀子代理（EDINET 帶 key 2 次、OpenDART 5 次；照台股提案 `2026-10-05-001` 的形狀）。
