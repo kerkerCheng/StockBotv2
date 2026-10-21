@@ -629,7 +629,7 @@ def collect(client: Any, *, tickers: Sequence[str], days: Sequence[date], today:
         rows, derivation = finalize_rows(body["rows"], today=today)
         # R2-S2 F1（2026-10-21）：下半年的值取決於這一輪拿到哪些書類；主鍵是觸發那一份。輸入不完整的一輪寫進去的下半年
         # 之後重算出正確值會與它同鍵、被 DO NOTHING 吞掉——所以這一輪輸入不完整就**不寫推算列**（直接的申報列照寫），計數。
-        gaps = list(_gap_reasons(run, body["report"], aborted=aborted))
+        gaps = list(_gap_reasons(run, body["report"]))
         if gaps:
             withheld = [r for r in rows if r["metric"] in HALF_METRICS and r.get("derived")]
             rows = [r for r in rows if not (r["metric"] in HALF_METRICS and r.get("derived"))]
@@ -645,14 +645,15 @@ def collect(client: Any, *, tickers: Sequence[str], days: Sequence[date], today:
     return {"run": run, "tickers": per}
 
 
-def _gap_reasons(run: Mapping[str, Any], report: Mapping[str, Any], *, aborted: Any) -> Iterable[str]:
-    """這一輪對這一檔的輸入哪裡不完整（全市場書類一覧的失敗算每一檔的）。空＝完整。"""
+def _gap_reasons(run: Mapping[str, Any], report: Mapping[str, Any]) -> Iterable[str]:
+    """這一輪對這一檔的輸入哪裡不完整（全市場書類一覧的失敗算每一檔的）。空＝完整。
+
+    ⚠ 不看整輪的「中止」旗標（R2 複審 HIGH，2026-10-21）：文件迴圈是全市場照日期排的，某一檔撞限流中止時，其他檔的文件
+    可能早已全部抓完——中止造成的缺漏由逐檔的「沒抓」計數承擔，不連累沒受影響的檔。"""
     if run.get("dates_failed"):
         yield f"書類一覧抓失敗 {len(run['dates_failed'])} 天"
     if run.get("dates_unscanned"):
         yield f"書類一覧沒掃 {run['dates_unscanned']} 天"
-    if aborted:
-        yield "這一輪中止"
     if report.get("docs_failed"):
         yield f"本檔文件抓失敗 {report['docs_failed']} 份"
     if report.get("docs_unfetched"):

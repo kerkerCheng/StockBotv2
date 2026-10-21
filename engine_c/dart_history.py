@@ -423,6 +423,7 @@ def collect(client: Any, *, tickers: Sequence[str], today: date, mode: str = "ba
             refresh = refresh_all or (mode == "sync" and end >= today - timedelta(days=SYNC_REFRESH_DAYS))
             if run["aborted"]:
                 run["reports_unfetched"] += 1
+                report["reports_unfetched"] = report.get("reports_unfetched", 0) + 1
                 continue
             try:
                 fs, fs_cached = _cached_call(_report_path(cache_dir, corp, year, code, "fs"),
@@ -435,8 +436,10 @@ def collect(client: Any, *, tickers: Sequence[str], today: date, mode: str = "ba
                 if exc.aborts_run:
                     run["aborted"] = str(exc)
                     run["reports_unfetched"] += 1
+                    report["reports_unfetched"] = report.get("reports_unfetched", 0) + 1
                 else:
                     run["failed"].append({"ticker": ticker, "report": f"{year} {kind}", "reason": str(exc)})
+                    report["reports_failed"] = report.get("reports_failed", 0) + 1
                 continue
             run["reports_cached" if fs_cached and sh_cached else "reports_fetched"] += 1
             if str(fs.get("status")) == "013" or not fs.get("list"):
@@ -457,6 +460,13 @@ def collect(client: Any, *, tickers: Sequence[str], today: date, mode: str = "ba
                 report["late_known"].append({"report": f"{year} {kind}", "original_rcept_dt": earlier[0],
                                              "used_rcept_dt": used_dt[0]})
         q4, q4_missing = derive_fourth_quarter(internal)
+        # R2 複審 MEDIUM（與日本下半年對稱）：這一檔這一輪有報告抓失敗或沒抓，第四季推算不寫——它的值取決於當輪拿到哪些報告
+        gaps = ([f"報告抓失敗 {report['reports_failed']} 份"] if report.get("reports_failed") else []) + \
+               ([f"報告沒抓 {report['reports_unfetched']} 份"] if report.get("reports_unfetched") else [])
+        if gaps and q4:
+            report["q4_withheld"] = {"rows": len(q4), "reason": "；".join(gaps)
+                                     + "——這一輪輸入不完整，第四季推算不寫（補齊後下一輪再寫）"}
+            q4 = []
         rows = [r for r in (*per[ticker]["rows"], *q4) if date.fromisoformat(r["period_end"]) >= horizon]
         per[ticker]["rows"] = rows
         report.update(q4_derived=len(q4), q4_missing=q4_missing, rows_built=len(rows),
@@ -596,6 +606,8 @@ def _summary_lines(report: Mapping[str, Any]) -> list[str]:
                      f"（filed {r['latest_filed']}）")
         for item in r["rejected"][:5]:
             lines.append(f"     ⚠ {item['report']} {item['metric']}：{item['reason']}")
+        if r.get("q4_withheld"):
+            lines.append(f"     ⚠ 第四季推算 {r['q4_withheld']['rows']} 列不寫：{r['q4_withheld']['reason']}")
         for item in r.get("conflicts") or ():
             lines.append(f"     ⛔ 同主鍵不同值（DO NOTHING 會留舊值；跑 --replace 重建這一檔）：{item['metric']} "
                          f"{item['period_end']} {item['accession']} 表上 {item['stored']:,.0f} ≠ 這一輪 {item['now']:,.0f}")

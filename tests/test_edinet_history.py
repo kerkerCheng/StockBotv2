@@ -669,3 +669,32 @@ def test_capture_declares_the_same_absence_kind_as_the_path_layers_for_semiannua
     anchor = {"series": [{"key": "capex", "label": "雲端四大", "aggregation": "sum_calendar_quarter", "points": [1]}]}
     got = page_capture(conn, "3110.T", anchor, as_of=date(2026, 10, 21))
     assert got["absence"]["kind"] == "inputs_incompatible" and "半年" in got["absence"]["reason"]
+
+
+class LimitedClient(FakeClient):
+    """某一份文件撞限流（整輪中止）。"""
+
+    def __init__(self, lists, docs, *, limited):
+        super().__init__(lists, docs)
+        self.limited = limited
+
+    def fetch_csv_zip(self, doc_id):
+        if doc_id == self.limited:
+            self.calls += 1
+            raise fe.EdinetRateLimited("429")
+        return super().fetch_csv_zip(doc_id)
+
+
+def test_an_abort_on_another_ticker_does_not_withhold_a_ticker_whose_documents_were_all_fetched(tmp_path) -> None:
+    """R2 複審 HIGH：文件迴圈是全市場照日期排的——4062 的文件撞限流中止時，3110 的文件早已全部抓完，3110 的下半年照寫；
+    4062 有文件沒抓，它的推算列才擋。"""
+    lists, docs, days = _scenario()
+    later = date(2026, 7, 1)
+    lists[later] = [_entry("S100B4062", "120", "2026-07-01 09:00", code="E00775")]
+    codelist = CODELIST + [{"ＥＤＩＮＥＴコード": "E00775", "証券コード": "40620"}]
+    out = eh.collect(LimitedClient(lists, docs, limited="S100B4062"), tickers=["3110.T", "4062.T"],
+                     days=sorted([*days, later]), today=date(2026, 10, 21), cache_dir=tmp_path, codelist=codelist,
+                     fetched_at=FETCHED)
+    assert out["run"]["aborted"] and out["tickers"]["4062.T"]["report"]["docs_unfetched"] == 1
+    assert "h2_withheld" not in out["tickers"]["3110.T"]["report"]
+    assert any(r["metric"] == "revenue_half" and r.get("derived") for r in out["tickers"]["3110.T"]["rows"])

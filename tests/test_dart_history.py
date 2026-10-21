@@ -364,3 +364,26 @@ def test_freshness_uses_45_days_for_quarters_and_90_for_the_annual_report() -> N
                  "'2026-11-13','R2','DART-11014',1,'KRW',1,NULL,'t',?,?)", (hb.SOURCE_DART, FETCHED))
     got = dh.filing_freshness(conn, ["005930.KS", "000660.KS"], today=date(2027, 3, 31))
     assert got["lagging"] == [] and got["empty"] == ["000660.KS"] and got["latest"] == "2026-09-30"
+
+
+class FailingClient(FakeClient):
+    def __init__(self, listed, fs, shares, *, fail):
+        super().__init__(listed, fs, shares)
+        self.fail_report = fail
+
+    def share_totals(self, corp, year, code):
+        if (year, code) == self.fail_report:
+            self.calls += 1
+            raise fo.DartUnavailable("HTTP 500", outcome="network")
+        return super().share_totals(corp, year, code)
+
+
+def test_a_failed_report_withholds_the_fourth_quarter_like_the_japanese_second_half(tmp_path) -> None:
+    """R2 複審 MEDIUM：這一檔這一輪有報告抓失敗——第四季的值取決於當輪拿到哪些報告，不寫（與日本下半年對稱）。"""
+    listed, fs, shares = _scenario()
+    out = dh.collect(FailingClient(listed, fs, shares, fail=(2026, "11012")), tickers=["005930.KS"], today=TODAY,
+                     cache_dir=tmp_path, corp_rows=CORP_ROWS, fetched_at=FETCHED)
+    report = out["tickers"]["005930.KS"]["report"]
+    assert report["reports_failed"] == 1 and report["q4_withheld"]["rows"] == 2
+    assert not any(r.get("derived", "") and str(r.get("derived")).startswith("FY−9M")
+                   for r in out["tickers"]["005930.KS"]["rows"])
