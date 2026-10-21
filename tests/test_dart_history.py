@@ -143,6 +143,41 @@ def test_the_fourth_quarter_is_the_year_minus_nine_months_filed_when_both_were_k
                     shares=shares_body("20260401000333", "2025-09-30"), filed_of={"20260401000333": "20260401"})
     late, _ = dh.derive_fourth_quarter(q3_late.internal + fy.internal)
     assert {r["filed"] for r in late} == {"2026-04-01"}
+    assert {r["accession"] for r in late} == {"20260401000333"}       # 主鍵跟著較晚那一份（R2-S3 #1）
+
+
+def test_a_third_quarter_corrected_after_the_annual_report_writes_a_new_fourth_quarter() -> None:
+    """R2-S3 #1：3 分期事後更正（新 rcept_no、9 個月累計改了）、年報沒動——新的第四季不得與舊的同鍵被靜默丟掉；
+    as-of 更正日之前讀舊值、之後讀新值。"""
+    def rows_for(q3_rcept, q3_dt, nine):
+        q3 = build(kind="Q3", year=2025, fs=fs_body(q3_rcept, revenue=("24", nine), oi=("11", "28")),
+                   shares=shares_body(q3_rcept, "2025-09-30"), filed_of={q3_rcept: q3_dt})
+        fy = build(kind="FY", year=2025, fs=fs_body("20260310000111", revenue=("90", ""), oi=("40", "")),
+                   shares=shares_body("20260310000111", "2025-12-31"), filed_of={"20260310000111": "20260310"})
+        q4, _ = dh.derive_fourth_quarter(q3.internal + fy.internal)
+        return [r for r in q4 if r["metric"] == "revenue_quarter"]
+
+    conn = sqlite3.connect(":memory:")
+    conn.executescript(hb._SQLITE_DDL)
+    first = rows_for("20251114001805", "20251114", "64")
+    second = rows_for("20260601000999", "20260601", "70")
+    assert hb.insert_fundamentals(conn, first) == 1 and hb.insert_fundamentals(conn, second) == 1
+    from engine_c.history import fundamental_series
+
+    assert fundamental_series(conn, "005930.KS", "revenue_quarter", as_of="2026-05-31")[-1]["value"] == 26.0
+    assert fundamental_series(conn, "005930.KS", "revenue_quarter", as_of="2026-06-01")[-1]["value"] == 20.0
+
+
+def test_replace_never_wipes_a_ticker_when_this_run_built_no_rows(tmp_path) -> None:
+    """R2-S3 #2：清單意外回空、一列都沒建出來時 --replace 不得先刪光再補 0 筆。"""
+    conn = sqlite3.connect(":memory:")
+    conn.executescript(hb._SQLITE_DDL)
+    conn.execute("INSERT INTO fundamental_history VALUES ('005930.KS','cash',NULL,'2025-12-31','2026-03-10','R',"
+                 "'DART-11011',1,'KRW',1,NULL,'t',?,?)", (hb.SOURCE_DART, FETCHED))
+    empty = {"tickers": {"005930.KS": {"rows": [], "report": {}}}}
+    result = dh.write(conn, empty, replace=True)
+    assert result["replace_skipped_empty"] == ["005930.KS"]
+    assert conn.execute("SELECT COUNT(*) FROM fundamental_history").fetchone()[0] == 1
 
 
 # ---------------------------------------------------------------------------

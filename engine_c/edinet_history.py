@@ -639,7 +639,10 @@ def write(conn: Any, collected: Mapping[str, Any], *, replace: bool = False) -> 
     for ticker, body in collected["tickers"].items():
         if "outcome" in body["report"]:
             continue
-        if replace:
+        if replace and not body["rows"]:
+            # R2-S3 #2 的對稱面：一列都沒建出來就不刪（先刪光再補 0 筆＝把歷史整檔丟掉）
+            out.setdefault("replace_skipped_empty", []).append(ticker)
+        elif replace:
             cur = conn.execute("DELETE FROM fundamental_history WHERE ticker = ? AND source = ?", (ticker, SOURCE_EDINET))
             out["rows_replaced"][ticker] = cur.rowcount
         new = insert_fundamentals(conn, body["rows"])
@@ -657,6 +660,9 @@ def run(*, tickers: Sequence[str] | None, mode: str, dry_run: bool, replace: boo
     end = min(until or today, today)
     if start > end:
         raise EdinetHistoryError(f"掃描區間是空的：{start} → {end}")
+    if replace and (since or until):
+        # 窄窗只建得出窗內的列：配 --replace 會刪光整檔、只補回窗內那幾列
+        raise EdinetHistoryError("--replace 只能配全窗回填（不得同時給 --since／--until）")
     universe = jp_universe()
     chosen = sorted({t.upper() for t in tickers}) if tickers else universe
     unknown = [t for t in chosen if t not in universe]

@@ -273,7 +273,12 @@ def derive_fourth_quarter(internal: Sequence[Mapping[str, Any]]) -> tuple[list[d
                                 "reason": "沒有同一年度的 3 分期 9 個月累計——第四季推不出來（不估）"})
                 continue
             q3_end = date.fromisoformat(nine["period_end"])
-            out.append({**{k: fy[k] for k in ("ticker", "accession", "form", "unit_scale", "source", "fetched_at")},
+            # 主鍵（accession）取兩份裡**較晚**的那一份（R2-S3 #1，2026-10-21）：只抄年報的 accession 時，3 分期事後更正、
+            # 年報沒動，新的第四季與舊的同鍵、被 ON CONFLICT DO NOTHING 靜默丟掉、舊值永遠卡住。觸發者換了主鍵就跟著換，
+            # 讀取端「同期間多列、filed ≤ T 取最新」照常處理（日本下半年同一個做法：accession＝觸發那一份）。
+            trigger = max((fy, nine), key=lambda r: (str(r["filed"]), str(r["accession"])))
+            out.append({**{k: fy[k] for k in ("ticker", "unit_scale", "source", "fetched_at")},
+                        "accession": trigger["accession"], "form": trigger["form"],
                         "metric": f"{concept}_quarter", "period_start": (q3_end + timedelta(days=1)).isoformat(),
                         "period_end": fy["period_end"], "filed": max(fy["filed"], nine["filed"]),
                         "value": fy["value"] - nine["value"], "currency": fy["currency"], "tag": fy["tag"],
@@ -466,7 +471,10 @@ def write(conn: Any, collected: Mapping[str, Any], *, replace: bool = False) -> 
     for ticker, body in collected["tickers"].items():
         if "outcome" in body["report"]:
             continue
-        if replace:
+        if replace and not body["rows"]:
+            # R2-S3 #2：這一輪一列都沒建出來（清單意外回空等）就不刪——先刪光再補 0 筆＝把歷史整檔丟掉
+            out.setdefault("replace_skipped_empty", []).append(ticker)
+        elif replace:
             cur = conn.execute("DELETE FROM fundamental_history WHERE ticker = ? AND source IN (?, ?)",
                                (ticker, SOURCE_DART, SOURCE_DART_SHARES))
             out["rows_replaced"][ticker] = cur.rowcount

@@ -381,6 +381,19 @@ def test_a_run_turns_listed_reports_into_rows_with_every_document_accounted_for(
     assert {r[0] for r in cached["rows"]} <= eh.KEPT_ELEMENTS
 
 
+def test_replace_refuses_a_narrow_window_and_never_wipes_on_an_empty_build(tmp_path) -> None:
+    """R2-S3 #2 的對稱面：窄窗只建得出窗內的列——配 --replace 會刪光整檔；一列都沒建出來也不刪。"""
+    with pytest.raises(eh.EdinetHistoryError, match="全窗"):
+        eh.run(tickers=["3110.T"], mode="backfill", dry_run=False, replace=True, since=date(2025, 11, 1),
+               client=FakeClient({}, {}), today=date(2026, 10, 21), cache_dir=tmp_path)
+    conn = _conn()
+    conn.execute("INSERT INTO fundamental_history VALUES ('3110.T','cash',NULL,'2025-09-30','2025-11-10','S1',"
+                 "'EDINET-160',1,'JPY',1,NULL,'t',?,?)", (hb.SOURCE_EDINET, FETCHED))
+    result = eh.write(conn, {"tickers": {"3110.T": {"rows": [], "report": {}}}}, replace=True)
+    assert result["replace_skipped_empty"] == ["3110.T"]
+    assert conn.execute("SELECT COUNT(*) FROM fundamental_history").fetchone()[0] == 1
+
+
 def test_a_document_relisted_on_a_later_day_is_handled_once_with_its_latest_status(tmp_path) -> None:
     """10-21 實測 6268 S100WHTQ 列在兩天：同一份處理兩次。以 docID 去重、留較晚那天的狀態（之後被取下就算取下）。"""
     lists, docs, days = _scenario()
