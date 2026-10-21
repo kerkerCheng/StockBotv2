@@ -117,6 +117,29 @@ def test_the_dry_run_reads_claims_by_the_loader_prefixed_id() -> None:
     assert [(c["field"], c["graph"], c["after"]) for c in result["claim_overwrites"]] == [("statement", "舊句", "新句")]
 
 
+class _NamesSession:
+    """節點、SourceDoc 查詢回空（本包節點全是新的）；重複節點提示那一條回圖上既有節點的名字與別名。"""
+
+    def run(self, cypher, **kw):
+        if "RETURN n.id AS node, n.name AS name, n.aliases AS aliases" in cypher:
+            return [{"node": "tech:near_package_optics", "name": "Near Package Optics", "aliases": ["NPO"]},
+                    {"node": "tech:cpo", "name": "Co-packaged optics", "aliases": ["CPO"]}]
+        return []
+
+
+def test_a_new_node_that_looks_like_an_existing_one_gets_a_hint_not_a_block() -> None:
+    """批次二 E5 ②（#59）：[752] 之前的 NPO 包的形狀——新節點與圖上 `tech:near_package_optics` 名字不同、別名相同；只提示。
+    （`tech:npo` 今天已登記成別名、`as_loaded` 會先換掉，所以夾具用一個沒登記過的 id。）"""
+    doc = _doc(id="tech:npo_module_x", type="TechNode", name="NPO module", aliases=["near-package optics"])
+    result = side_effects(doc, _NamesSession())
+    assert result["new_nodes"] == ["tech:npo_module_x"] and has_side_effects(result) is False
+    assert result["duplicate_hints"] == [{"node": "tech:npo_module_x",
+                                          "matches": [{"node": "tech:near_package_optics", "rules": ["alias_shared"]}]}]
+    lines = render_lines(result, doc_id="d")
+    assert any("不會改到" in line for line in lines)                       # 提示不算副作用
+    assert any("可能與圖上既有節點是同一個" in line and "tech:near_package_optics" in line for line in lines)
+
+
 class _BrokenSession:
     def run(self, *_a, **_k):
         raise OSError("connection refused")

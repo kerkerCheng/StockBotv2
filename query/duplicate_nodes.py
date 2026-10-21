@@ -24,14 +24,17 @@ L18 的 L2 層（顯形）。與 `query/coverage_gaps.py` 的分工：後者問�
 不解析 canonical id**——解析的唯一 owner 是 `identity/entities.py`（L16：分類有 SSOT 時要走它，
 重造一份會立刻開始偏離）。
 
-## 兩條規則，都是純字串比對
+## 三條規則，都是純字串比對
 
 - `id_token_subset`：id 去前綴後以 `_` 切 token，一組是另一組的**真子集**。
   `tech:eml` ⊂ `tech:inp_eml`、`tech:nand` ⊂ `tech:nand_flash` 都是這一型。
 - `name_identical`：`name` 正規化（小寫、非英數字轉空白）後逐字相同。這與
   `identity/entities.py` 的 `name_identical` basis 是同一個判準。
 
-⚠ **刻意只有這兩條。** 2026-09-18 實測過第三條「同 token 數、只差一個 token」（想抓
+- `alias_shared`（2026-10-21 批次二 E5）：一方的別名（正規化：不分大小寫、去空白連字號底線）等於另一方的名字或別名——
+  名字不同、別名相同那型（MRM、NPO、FAU）。污染的別名（`tech:cpo` 掛「NPO」）也會一起冒出來，所以它只能是提示。
+
+⚠ **被否決的那一條不得回來。** 2026-09-18 實測過「同 token 數、只差一個 token」（想抓
 `dram_manufacturing`／`dram_production` 那型），結果**所有單 token 的 id 互相全配**——
 `prod:reliant` 配上 `mat:photoresist`。那不是門檻沒調好，是規則本身沒有鑑別力。
 因此本模組明說自己抓不到那一型（見 `THIS_IS_NOT`），而不是用一條會誤報的規則假裝抓得到
@@ -61,11 +64,14 @@ from typing import Any, Iterable, Mapping, Sequence
 from identity.entities import ENTITY_PREFIXES
 
 #: 命中規則是封閉字彙：每一對候選都必須指得出「它為什麼被提名」。
-MATCH_RULES: tuple[str, ...] = ("id_token_subset", "name_identical")
+MATCH_RULES: tuple[str, ...] = ("id_token_subset", "name_identical", "alias_shared")
 
 RULE_LABELS: dict[str, str] = {
     "id_token_subset": "id token 真子集",
     "name_identical": "name 逐字相同",
+    # 批次二 E5（failure log #79＋#59，2026-10-21）：名字不同、別名相同——MRM 兩節點、NPO [752]、FAU [730]；
+    # 全圖 13 對共用別名，前兩條規則抓 3、漏 10。正規化＝不分大小寫、去空白與連字號底線。
+    "alias_shared": "一方的別名等於另一方的名字或別名",
 }
 
 #: 每個節點最多端幾段逐字。多於此的提示「還有 N 段」，不靜默截斷（INV-3）。
@@ -74,7 +80,7 @@ QUOTES_PER_NODE = 2
 THIS_IS_NOT = (
     "不是「這兩個是同一個東西」的判定——那是研究判斷，載體是 pq2 的 `ra_admission`；"
     "本頁只說「這兩個名字重疊，而且它們的逐字就在下面」。",
-    "不是完整的重複清單：兩條規則都是純字串比對，**名字完全不同的重複抓不到**"
+    "不是完整的重複清單：三條規則都是純字串比對，**名字完全不同、別名也不相交的重複抓不到**"
     "（`tech:ocs`／`tech:optical_circuit_switch` 那型只能靠人讀逐字發現）。",
     "也抓不到「同 head、不同尾綴」那型（`dram_manufacturing`／`dram_production`）——"
     "試過的規則會讓所有單 token id 互相全配，誤報比漏報更貴。",
@@ -94,10 +100,44 @@ WITH n, count(DISTINCT e) AS degree
 OPTIONAL MATCH (n)-[:QUOTES]->(s:Source)
 WHERE s.quote IS NOT NULL
 WITH n, degree, collect({quote: s.quote, locator: s.locator, doc: s.source_doc_id}) AS quotes
-RETURN n.id AS node, n.name AS name, n.abstraction_level AS abstraction_level,
+RETURN n.id AS node, n.name AS name, n.abstraction_level AS abstraction_level, n.aliases AS aliases,
        degree, quotes
 ORDER BY node
 """
+#: 入圖乾跑的提示只要名字與別名（批次二 E5 ②）——不拉逐字與度數。
+NAMES_CYPHER = """
+MATCH (n:Entity)
+WHERE n.id IS NOT NULL AND NOT n:Company
+  AND any(p IN $prefixes WHERE n.id STARTS WITH p)
+RETURN n.id AS node, n.name AS name, n.aliases AS aliases
+"""
+
+
+def _alias_key(text: Any) -> str:
+    return re.sub(r"[\s\-_]+", "", str(text or "").lower())
+
+
+def _forms(view: Mapping[str, Any]) -> tuple[set[str], set[str]]:
+    """(名字的正規形, 別名的正規形)；空字串不算。"""
+    name = {_alias_key(view.get("name"))} - {""}
+    aliases = {_alias_key(a) for a in view.get("aliases") or ()} - {""}
+    return name, aliases
+
+
+def match_rules(a: Mapping[str, Any], b: Mapping[str, Any]) -> list[str]:
+    """兩個節點（`{node, name, aliases}`）命中哪幾條規則——候選對與入圖乾跑提示共用這一支（L16）。"""
+    rules: list[str] = []
+    ta, tb = _tokens(str(a["node"])), _tokens(str(b["node"]))
+    if ta < tb or tb < ta:
+        rules.append("id_token_subset")
+    na, nb = _normalised_name(a.get("name")), _normalised_name(b.get("name"))
+    if na and na == nb:
+        rules.append("name_identical")
+    name_a, alias_a = _forms(a)
+    name_b, alias_b = _forms(b)
+    if alias_a & (name_b | alias_b) or alias_b & (name_a | alias_a):
+        rules.append("alias_shared")
+    return sorted(rules)
 
 
 def _tokens(node_id: str) -> frozenset[str]:
@@ -121,6 +161,7 @@ def _node_view(row: Mapping[str, Any]) -> dict[str, Any]:
     return {
         "node": row["node"],
         "name": row.get("name"),
+        "aliases": [str(a) for a in row.get("aliases") or ()],
         "abstraction_level": row.get("abstraction_level"),
         "degree": int(row.get("degree") or 0),
         # 逐字是本模組存在的理由，所以總數與樣本分開報——截斷要說話（INV-3）。
@@ -138,20 +179,15 @@ def pair_candidates(rows: Iterable[Mapping[str, Any]]) -> list[dict[str, Any]]:
     views = [_node_view(r) for r in rows]
     out: list[dict[str, Any]] = []
     for a, b in itertools.combinations(views, 2):
-        rules: list[str] = []
-        ta, tb = _tokens(a["node"]), _tokens(b["node"])
-        if ta < tb or tb < ta:
-            rules.append("id_token_subset")
-        na, nb = _normalised_name(a["name"]), _normalised_name(b["name"])
-        if na and na == nb:
-            rules.append("name_identical")
+        rules = match_rules(a, b)
         if not rules:
             continue
+        ta, tb = _tokens(a["node"]), _tokens(b["node"])
         # 排序固定：token 少的（較通用的那一端）在前，等長取 id 字母序。任何人重跑得到同一組。
         left, right = (a, b) if (len(ta), a["node"]) <= (len(tb), b["node"]) else (b, a)
         out.append({
             "pair": (left["node"], right["node"]),
-            "rules": sorted(rules),
+            "rules": rules,
             "same_abstraction_level": left["abstraction_level"] == right["abstraction_level"],
             "left": left,
             "right": right,

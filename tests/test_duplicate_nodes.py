@@ -75,7 +75,18 @@ def test_the_rejected_third_rule_never_comes_back() -> None:
 
     pairs = pair_candidates([_row("prod:reliant", "Reliant"), _row("mat:photoresist", "Photoresist")])
     assert pairs == []
-    assert set(MATCH_RULES) == {"id_token_subset", "name_identical"}
+    # 2026-10-21 批次二 E5 加了第三條 `alias_shared`（別名相交）——被否決的是 off-by-one token 那條，不是別名
+    assert set(MATCH_RULES) == {"id_token_subset", "name_identical", "alias_shared"}
+
+
+def test_different_names_with_a_shared_alias_are_candidates() -> None:
+    """批次二 E5（#79＋#59）：`tech:npo`／`tech:near_package_optics` 名字不同、別名相同——前兩條規則看不見。
+    正規化不分大小寫、去空白與連字號（「Near-Package Optics」＝「near package optics」）。"""
+    npo = dict(_row("tech:npo", "NPO"), aliases=["Near-Package Optics"])
+    full = dict(_row("tech:near_package_optics", "Near Package Optics"), aliases=["near-packaged optics"])
+    pairs = pair_candidates([npo, full])
+    assert [p["rules"] for p in pairs] == [["alias_shared"]]
+    assert pair_candidates([_row("tech:npo", "NPO"), _row("tech:near_package_optics", "Near Package Optics")]) == []
 
 
 def test_different_names_that_share_nothing_are_not_candidates() -> None:

@@ -161,6 +161,26 @@ def as_loaded(doc: Mapping[str, Any]) -> dict[str, Any]:
     return resolved
 
 
+def duplicate_hints(doc: Mapping[str, Any], graph_rows: list[Mapping[str, Any]],
+                    new_nodes: list[str]) -> list[dict[str, Any]]:
+    """本包的**新**非公司節點，跟圖上既有節點跑重複候選的同一支比對（`query.duplicate_nodes.match_rules`；批次二 E5 ②，
+    failure log #59：NPO [752]、FAU [730] 入圖時沒有任何東西提醒「圖上已經有一個叫這名字的」）。只提示，不擋。"""
+    from query.duplicate_nodes import match_rules
+
+    fresh = set(new_nodes)
+    out: list[dict[str, Any]] = []
+    for node in doc.get("nodes") or ():
+        node_id = str(node.get("id") or "")
+        if node_id not in fresh or node.get("type") == "Company" or node_id.startswith("co:"):
+            continue
+        view = {"node": node_id, "name": node.get("name"), "aliases": node.get("aliases") or ()}
+        matches = [{"node": str(row["node"]), "rules": rules} for row in graph_rows
+                   if str(row.get("node")) != node_id for rules in [match_rules(view, row)] if rules]
+        if matches:
+            out.append({"node": node_id, "matches": sorted(matches, key=lambda m: m["node"])})
+    return out
+
+
 def side_effects(doc: Mapping[str, Any], session: Any) -> dict[str, Any]:
     """`as_loaded` → `fetch_graph_state` → `compute_side_effects`；讀不到圖回 `upstream_unavailable`（不是「無副作用」）。"""
     loaded = as_loaded(doc)
@@ -171,7 +191,19 @@ def side_effects(doc: Mapping[str, Any], session: Any) -> dict[str, Any]:
     except Exception as exc:  # noqa: BLE001 — 讀不到就不能宣稱沒有副作用
         return {"status": "upstream_unavailable",
                 "reason": f"讀不到圖上的現值（{type(exc).__name__}: {str(exc)[:160]}）——副作用無法核對"}
-    return compute_side_effects(loaded, graph)
+    result = compute_side_effects(loaded, graph)
+    if result.get("new_nodes"):
+        try:
+            from identity.entities import ENTITY_PREFIXES
+            from query.duplicate_nodes import NAMES_CYPHER
+
+            rows = [dict(r) for r in session.run(NAMES_CYPHER, prefixes=list(ENTITY_PREFIXES))]
+            result["duplicate_hints"] = duplicate_hints(loaded, rows, result["new_nodes"])
+        except AssertionError:
+            raise
+        except Exception as exc:  # noqa: BLE001 — 提示算不出來就說，不當成「沒有疑似重複」
+            result["duplicate_hints_unavailable"] = f"{type(exc).__name__}: {str(exc)[:120]}"
+    return result
 
 
 #: 證據等級預告要的另外兩樣現值：每筆 assertion 連到哪幾段 Source、每段 Source 的逐字（`fetch_all_quotes` 只給逐字，
@@ -360,6 +392,16 @@ def render_lines(result: Mapping[str, Any], *, doc_id: str | None = None) -> lis
     if not lines:
         lines.append(f"- {head}不會改到圖上任何既有節點屬性、SourceDoc 欄位或 claim"
                      + (f"（新節點 {len(result.get('new_nodes') or ())} 個）" if result.get("new_nodes") else ""))
+    from query.duplicate_nodes import RULE_LABELS
+
+    for hint in result.get("duplicate_hints") or ():
+        shown = hint["matches"][:5]
+        more = f"（另有 {len(hint['matches']) - 5} 個）" if len(hint["matches"]) > 5 else ""
+        lines.append(f"- {head}新節點 `{hint['node']}` 可能與圖上既有節點是同一個（只提示、不擋；併不併是研究判斷）："
+                     + "、".join(f"`{m['node']}`（{'＋'.join(RULE_LABELS.get(r, r) for r in m['rules'])}）" for m in shown)
+                     + more)
+    if result.get("duplicate_hints_unavailable"):
+        lines.append(f"- {head}重複節點提示算不出來（{result['duplicate_hints_unavailable']}）——不是「沒有疑似重複」")
     return lines
 
 
