@@ -381,6 +381,19 @@ def test_a_run_turns_listed_reports_into_rows_with_every_document_accounted_for(
     assert {r[0] for r in cached["rows"]} <= eh.KEPT_ELEMENTS
 
 
+def test_a_document_relisted_on_a_later_day_is_handled_once_with_its_latest_status(tmp_path) -> None:
+    """10-21 實測 6268 S100WHTQ 列在兩天：同一份處理兩次。以 docID 去重、留較晚那天的狀態（之後被取下就算取下）。"""
+    lists, docs, days = _scenario()
+    later = date(2026, 7, 1)
+    lists[later] = [_entry("S100WZ3X", "160", "2025-11-10 15:00", withdrawn="2")]
+    out = eh.collect(FakeClient(lists, docs), tickers=["3110.T"], days=[*days, later], today=date(2026, 10, 21),
+                     cache_dir=tmp_path, codelist=CODELIST, fetched_at=FETCHED)
+    report = out["tickers"]["3110.T"]["report"]
+    assert out["run"]["docs_relisted"] == 1 and report["docs_seen_by_type"]["160"] == 3
+    assert report["skipped"]["withdrawn"] == 2
+    assert not any(r["accession"] == "S100WZ3X" for r in out["tickers"]["3110.T"]["rows"])
+
+
 def test_an_unresolved_edinet_code_is_a_named_outcome_and_writes_nothing(tmp_path) -> None:
     lists, docs, days = _scenario()
     out = eh.collect(FakeClient(lists, docs), tickers=["3110.T"], days=days, today=date(2026, 10, 21),

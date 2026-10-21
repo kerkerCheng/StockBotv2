@@ -122,7 +122,7 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 | **2 canonical skill／prompt／本檔** | 本節；本檔「Engine C」命令；計畫 `docs/plans/2026-10-21-002-feat-jp-kr-filings-plan.md`；ROADMAP「海外財報來源」③④。不動任何 skill、prompt |
 | **3 最窄 rule** | daily argv 不變；不新增 step、allowlist、APP 路由、rule；`tests/test_codex_daily_permissions.py::test_edinet_and_dart_history_stay_interactive_entries` 鎖住 rules、harvest、daily 步驟不得出現兩個入口、心跳不得出現抓取函式與 key 名稱；要改成排程必須重做本 review |
 | **4 contract test** | `tests/test_edinet_history.py`（DEI 決定 context、member context 不收、白名單歧異拒寫、只扣自己保有、`－`＝0、缺那一行拒寫、股類／核對、七種具名結局、身分對不上整份不用、下半年的 PIT、缺上半年不估、年度列不寫、key 不外洩、節流、限流退避後中止並計數、コード 0／多筆拒收、整輪端到端與快取、CHECK 沒遷移不寫、路徑上各層的半年缺席、心跳兩條）變異 10／10；`tests/test_dart_history.py`（單季與累計欄、第 1 分期核對、IS／CIS 歧異、可知日對不到拒寫、股數只算普通股與四種寫法、第四季 filed 取較晚、901 中止、key 不外洩、晚知道計數、非 12 月決算、新鮮度）變異 9／9；S1 `tests/test_three_questions_semiannual.py` 變異 7／7 |
-| **5 端到端 smoke** | 韓國：6/6 檔寫入 416 列（清單 21 期全用、拒寫 0、第四季推 10／檔；更正版晚知道 12 期——曉星重工 2024 年報原件 03-12、只拿得到 08-14 更正版）；股數第一輪只認「보통주」漏了삼성전기、HD 현대일렉트릭兩檔（寫法是「…(보통주)」「보통주식」），當下修（L17）；KRW 匯率 1,246 筆；materialize 後韓國 6 頁三題①與營收序列 6/6 有值。日本：（寫入後補） |
+| **5 端到端 smoke** | 韓國：6/6 檔寫入 416 列（清單 21 期全用、拒寫 0、第四季推 10／檔；更正版晚知道 12 期——曉星重工 2024 年報原件 03-12、只拿得到 08-14 更正版）；股數第一輪只認「보통주」漏了삼성전기、HD 현대일렉트릭兩檔（寫法是「…(보통주)」「보통주식」），當下修（L17）；KRW 匯率 1,246 筆；materialize 後韓國 6 頁三題①與營收序列 6/6 有值。日本：書類一覧 1,946 天＋文件 246 份（約 70 分鐘、2,170 次呼叫、失敗 0），13/13 檔寫入 512 列、拒寫 0；3110.T 上半年 FY2025 營收 57,412,000,000／營業利益 9,454,000,000／股數 36,580,712 與原文一致；同一份書類重列兩天（6268 S100WHTQ）當下修成以 docID 去重；materialize 後已定價① 12/13 有值＋5016.T 窗不滿三年、營收序列 13/13；快取與報告掃 key 0 命中 |
 
 ### Sandbox impact review 結論（2026-10-14：個股頁 S3e——事件之後跟組比）
 

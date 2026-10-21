@@ -555,9 +555,19 @@ def collect(client: Any, *, tickers: Sequence[str], days: Sequence[date], today:
     entries, scan = scan_lists(client, days, cache_dir=cache_dir, force=force, fetched_at=fetched_at)
     run.update(scan)
     ticker_of = {code: t for t, code in code_of.items()}
-    docs = sorted((e for day in sorted(entries) for e in entries[day] if e.get("edinetCode") in ticker_of),
-                  key=lambda e: (str(e.get("submitDateTime")), str(e.get("docID"))))
-    run.update(docs_fetched=0, docs_cached=0, docs_unfetched=0, docs_failed=[])
+    # 同一份書類會在之後某天的書類一覧重列（書類資訊修正、取下）——以 docID 去重，留**較晚那天**列表上的那一筆
+    # （取下與修正狀態以最新的為準；submitDateTime 不變）。10-21 實測 6268 S100WHTQ 列在兩天、被處理兩次。
+    latest: dict[str, dict[str, Any]] = {}
+    relisted = 0
+    for day in sorted(entries):
+        for e in entries[day]:
+            if e.get("edinetCode") not in ticker_of:
+                continue
+            doc_id = str(e.get("docID") or "")
+            relisted += int(doc_id in latest)
+            latest[doc_id] = e
+    docs = sorted(latest.values(), key=lambda e: (str(e.get("submitDateTime")), str(e.get("docID"))))
+    run.update(docs_fetched=0, docs_cached=0, docs_unfetched=0, docs_failed=[], docs_relisted=relisted)
     aborted = run.get("aborted")
     for entry in docs:
         ticker = ticker_of[entry["edinetCode"]]
@@ -742,7 +752,8 @@ def _summary_lines(report: Mapping[str, Any]) -> list[str]:
     lines = [f"EDINET {report['mode']}{'（乾跑）' if report.get('dry_run') else ''}｜區間 {report['window'][0]}→{report['window'][1]}"
              f"｜書類一覧 {report['dates_total']} 天：快取 {report['dates_cached']}、新抓 {report['dates_fetched']}、"
              f"失敗 {len(report['dates_failed'])}、沒掃 {report['dates_unscanned']}｜文件 新抓 {report['docs_fetched']}、"
-             f"快取 {report['docs_cached']}、沒抓 {report['docs_unfetched']}、失敗 {len(report['docs_failed'])}｜呼叫 {report['calls']}"]
+             f"快取 {report['docs_cached']}、沒抓 {report['docs_unfetched']}、失敗 {len(report['docs_failed'])}、"
+             f"重列去重 {report.get('docs_relisted', 0)}｜呼叫 {report['calls']}"]
     if report.get("aborted"):
         lines.append(f"  ⛔ 中止：{report['aborted']}")
     for ticker, r in sorted(report["tickers"].items()):
