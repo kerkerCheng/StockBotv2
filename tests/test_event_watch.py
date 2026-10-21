@@ -63,6 +63,9 @@ def test_t0_entity_filing_fires_only_on_new_primary_lead():
     # watch 建立前的舊 lead 不觸發
     leads = {"l2": _lead(decided="2026-08-30T00:00:00+00:00", entities=["co:agility_robotics"])}
     assert ew.check_watches(data, leads=leads, today=date(2026, 9, 2)) == []
+    # 2026-10-21：X 推文引用年報數字被 triage 判 tier 1——登記時宣告 secondary 就不算一手文件
+    leads = {"l2b": {**_lead(entities=["co:agility_robotics"]), "source_class": "secondary"}}
+    assert ew.check_watches(data, leads=leads, today=date(2026, 9, 2)) == []
     # 建立後的 tier-1 具名 lead 觸發
     leads = {"l3": _lead(entities=["co:agility_robotics"])}
     fired = ew.check_watches(data, leads=leads, today=date(2026, 9, 2))

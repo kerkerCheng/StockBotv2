@@ -719,3 +719,8 @@
 ### 2×2
 
 - 名單每份一列（registration §3.3：到量測日沒有裁決寫「尚未到裁決點」、組未定義寫「組未定義」，都不填格）。（尚無）
+
+#### Q3W 處置紀錄（append）
+
+- 2026-10-21（凍結當天）｜凍結時已觸發未檢 21 條全部處置：語意 19 條互動判定 touches=no（三份觸發文件逐份讀原文：Sivers 10-20 光達量產訂單新聞稿 13 條——光達、客戶未具名，不是資料中心 CW 光源，ew_1443 的條文本來就排除光達；POET 6-K 附件 99.1 只公告 11-16 季報 4 條；Aehr 8-K 股東會投票結果 2 條），各條理由寫在 watch 的判定紀錄；讀圖重讀訊號 2 條（ew_0121、ew_1110）是 X 推文誤醒、reactivate 回去等 Lumentum 自己的一手文件（failure log #98 當下修）。查證：`python -m engine_b.event_watch counters` 的 `fired_unconsumed` 0、`semantic_pending_check` 0。
+- 處置後，名單內三檔等回落（3081.TWO、4979.TWO、AXTI）假設改宣告可開，四個機械前提都成立（`open_preconditions` 失效 0 條）——可開與否只剩「已定價嗎」的判斷，照各自裁決點重看（AXTI 10-29 盤後、台股 11-10 月營收與 11-14 第三季財報）。

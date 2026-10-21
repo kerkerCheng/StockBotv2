@@ -570,7 +570,11 @@ def check_watches(
                     continue
                 # `related_entity_signal` 等的是「同一標的有任何新動靜」，不限一手；
                 # 其餘 kind 等的是正式文件，不該被任何一則提及觸發。
-                if kind in PRIMARY_ONLY_KINDS and not is_primary_source(lead):
+                # 2026-10-21：triage 的 tier 是 LLM 的判斷——一則引用 10-K 數字的 X 推文（lead_100060ce）被判 tier 1，就叫醒了
+                # 「等需求側客戶的一手文件」的兩份讀圖；歷來 329 次喚醒或消化裡 63 次是 secondary（全是 X 帳號）。登記時宣告的
+                # source_class 是二手就不算一手（與語意 watch 同一條判準；L16、L17 當下修）。
+                if kind in PRIMARY_ONLY_KINDS and (str(lead.get("source_class") or "") == "secondary"
+                                                   or not is_primary_source(lead)):
                     continue
                 # 持股申報（Form 4 等）不是「某實體的正式文件」在等的那種文件：EDGAR 一手 lead 六成是它（2026-10-08 實測
                 # 255 則裡 159 則），大公司的等待會被它一直叫醒——語意 watch 早就排除（2026-09-09），這裡補上對稱面（failure log #1）。
