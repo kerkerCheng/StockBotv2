@@ -85,7 +85,7 @@ def recently_accepted(receipt_dir: Path, *, today: date, days: int = RECENT_LOOK
     return rows[:cap]
 
 
-#: 讀過的層每日輪替（雷達精進 C3，2026-10-21；使用者 10-20：與 themes.txt **並存**）：每天依日期序號固定輪到 K 個
+#: 讀過的層每日輪替（雷達精進 C3，2026-10-21；使用者 10-20：與 themes.txt **並存**）：每天輪到 K 個（最久沒輪到的先）
 #: 有現行讀圖的節點（58 層約 7 天輪完），只把掛在這幾層的在盯條件交給 LLM——全量 270 條（約 52 KB）一次搜不完，
 #: 實際只挑幾條查（10-20 調查）。每天輪 max(ROTATION_K, ⌈層數÷ROTATION_DAYS⌉) 層——層數長了也是 7 天輪完
 #: （10-21 試跑：58 層、每天 8 層，7 天只輪到 56）。掛不到任何層的條件另外每天輪 1/ROTATION_DAYS。
@@ -94,13 +94,33 @@ ROTATION_DAYS = 7
 SUPPLY_NAMES_PER_LAYER = 6
 
 
-def rotation(nodes: Sequence[str], today: date, k: int = ROTATION_K) -> list[str]:
-    """排好序的節點裡今天輪到的那 k 個：起點＝日期序號 × k（取模），連續取 k 個、繞回開頭。相鄰兩天銜接，⌈n/k⌉ 天輪完。"""
+def last_rotated(receipt_dir: Path, *, today: date, days: int = 3 * ROTATION_DAYS) -> dict[str, date]:
+    """前 `days` 天（不含今天）雷達收據的 `rotation`：每層最後一次被輪到的日期。讀不到的收據略過（那天等於沒輪）。"""
+    out: dict[str, date] = {}
+    for back in range(days, 0, -1):
+        day = today - timedelta(days=back)
+        try:
+            receipt = json.loads((receipt_dir / f"radar_{day.isoformat()}.json").read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            continue
+        for node in receipt.get("rotation") or ():
+            out[str(node)] = day
+    return out
+
+
+def rotation(nodes: Sequence[str], today: date, k: int = ROTATION_K,
+             last: Mapping[str, date] | None = None) -> list[str]:
+    """今天輪到的 k 個：**最久沒輪到的先**（從沒輪到過的最先、同一天照節點名）。池子變大變小、哪天雷達沒跑（收據沒寫
+    rotation），都不會讓某層被跳過——空窗上限＝⌈n/k⌉＋沒跑的天數。10-21 回放：原本用「日期序號 × k 取模」，
+    池大小一變排列就平移，400 次模擬有 215 次出現 10–12 天的空窗（過去 20 天池大小變了 8 天）；沒跑的那天也不補。
+    完全沒有收據（第一次跑、測試）才退回日期序號。"""
     ordered = sorted(set(nodes))
     if not ordered:
         return []
-    start = (today.toordinal() * k) % len(ordered)
-    return [ordered[(start + i) % len(ordered)] for i in range(min(k, len(ordered)))]
+    if not last:
+        start = (today.toordinal() * k) % len(ordered)
+        return [ordered[(start + i) % len(ordered)] for i in range(min(k, len(ordered)))]
+    return sorted(ordered, key=lambda n: (last.get(n, date.min), n))[:k]
 
 
 def _condition_nodes(watch: Mapping[str, Any], ctx: Any, *, reading_node: Mapping[str, str],
@@ -121,7 +141,7 @@ def _condition_nodes(watch: Mapping[str, Any], ctx: Any, *, reading_node: Mappin
 
 
 def layer_plan(ctx: Any, *, today: date, registry: Any, note_node: Mapping[str, str] | None = None,
-               k: int = ROTATION_K) -> dict[str, Any]:
+               k: int = ROTATION_K, last: Mapping[str, date] | None = None) -> dict[str, Any]:
     """今天輪到的層（層名、供給側公司、掛在這幾層的條件）＋掛不到層的條件今天那一份。條件給 LLM 短 id（c01…），
     程式留 `condition_ids` 對回原 watch_id（#92：LLM 會把長 id 截掉）。"""
     from engine_b import event_watch as ew
@@ -129,13 +149,15 @@ def layer_plan(ctx: Any, *, today: date, registry: Any, note_node: Mapping[str, 
     readings = ctx.readings
     reading_node = {str(getattr(r, "reading_id", "")): node for node, r in readings.items()}
     rides = {b.ticker: [r.node for r in b.rides or () if r.node in readings] for b in ctx.briefs}
-    today_nodes = rotation(list(readings), today, max(k, math.ceil(len(readings) / ROTATION_DAYS)))
+    today_nodes = rotation(list(readings), today, max(k, math.ceil(len(readings) / ROTATION_DAYS)), last)
     picked: dict[str, list[str]] = {}
     orphans: list[Mapping[str, Any]] = []
     for w in ctx.watches:
         if w.get("kind") != ew.SEMANTIC_KIND or w.get("status") != "active":
             continue
-        nodes = _condition_nodes(w, ctx, reading_node=reading_node, note_node=note_node or {}, rides=rides)
+        # 只認還在輪替池（有現行讀圖）的層：層說明指到的節點若讀圖已撤回或過期，這條條件落進孤兒照 1/7 輪，
+        # 不得因為「掛著一個永遠輪不到的層」而每天都不出現、也沒計數（INV-3；10-21 回放時 0 條，但讀圖會撤回）
+        nodes = _condition_nodes(w, ctx, reading_node=reading_node, note_node=note_node or {}, rides=rides) & set(readings)
         if not nodes:
             orphans.append(w)
         elif nodes & set(today_nodes):
@@ -221,7 +243,8 @@ def prepare(run_id: str, out: Path, *, max_items: int, today: date | None = None
     plan, plan_error = None, None
     try:
         ctx, note_node = (plan_context or _default_plan_context)()
-        plan = layer_plan(ctx, today=today, registry=registry, note_node=note_node)
+        plan = layer_plan(ctx, today=today, registry=registry, note_node=note_node,
+                          last=last_rotated(receipt_dir, today=today))
     except Exception as exc:  # noqa: BLE001 — 輪替壞了雷達照跑（退回全量條件）
         plan_error = f"{type(exc).__name__}: {str(exc)[:160]}"
     request = build_request(themes=themes if themes is not None else load_themes(),
@@ -492,5 +515,5 @@ if __name__ == "__main__":
 
 
 __all__ = ["BATCH_SCHEMA", "NEW_THEME", "RECEIPT_SCHEMA", "REJECT_REASONS", "ROTATION_DAYS", "ROTATION_K", "SCOPES",
-           "SOURCE_PREFIX", "apply", "build_request", "is_radar_lead", "layer_plan", "main", "prepare", "resolve_entities",
+           "SOURCE_PREFIX", "apply", "build_request", "is_radar_lead", "last_rotated", "layer_plan", "main", "prepare", "resolve_entities",
            "rotation", "rotation_coverage"]

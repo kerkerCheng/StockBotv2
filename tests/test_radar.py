@@ -693,6 +693,64 @@ def test_the_heartbeat_line_prints_the_rotation_or_why_it_fell_back(tmp_path) ->
     assert "輪替層沒算出來（RuntimeError: x；退回全量條件）" in _radar_line(now=now, record_path=broken)
 
 
+def test_least_recently_rotated_first_keeps_gaps_bounded_when_the_pool_changes_or_a_day_is_skipped() -> None:
+    """10-21 回放：日期序號取模在池大小一變時排列平移（400 次模擬 215 次空窗 10–12 天），沒跑的那天也不補。
+    改成最久沒輪到的先：新讀的層隔天就輪到；空窗上限＝⌈n/k⌉＋沒跑的天數。"""
+    import math
+    from datetime import timedelta
+
+    nodes = [f"tech:l{i:02d}" for i in range(58)]
+    last, gaps = {}, []
+    for d in range(40):
+        day = TODAY + timedelta(days=d)
+        if d == 10:
+            nodes.append("tech:new_a")
+        if d == 23:
+            nodes.append("tech:new_b")
+        if d == 20:
+            nodes.remove("tech:l03")
+        if d in (15, 16):                       # 雷達沒跑：沒有收據，last 不更新
+            continue
+        k = max(radar.ROTATION_K, math.ceil(len(nodes) / radar.ROTATION_DAYS))
+        today_nodes = radar.rotation(nodes, day, k, last or None)
+        if d == 10:
+            assert "tech:new_a" in today_nodes
+        if d == 23:
+            assert "tech:new_b" in today_nodes
+        for n in today_nodes:
+            if n in last:
+                gaps.append((day - last[n]).days)
+            last[n] = day
+    assert max(gaps) <= math.ceil(60 / 9) + 2                     # ⌈n/k⌉＋沒跑的 2 天
+
+
+def test_last_rotated_reads_the_receipts_and_prepare_starts_with_what_waited_longest(tmp_path) -> None:
+    from datetime import timedelta
+
+    def receipt(back, nodes):
+        (tmp_path / f"radar_{(TODAY - timedelta(days=back)).isoformat()}.json").write_text(
+            json.dumps({"rotation": nodes}), encoding="utf-8")
+
+    receipt(3, ["tech:n00", "tech:n08"])
+    receipt(1, [f"tech:n{i:02d}" for i in range(8)])
+    (tmp_path / f"radar_{(TODAY - timedelta(days=2)).isoformat()}.json").write_text("{壞掉", encoding="utf-8")
+    last = radar.last_rotated(tmp_path, today=TODAY)
+    assert last["tech:n00"] == TODAY - timedelta(days=1) and last["tech:n08"] == TODAY - timedelta(days=3)
+    out = tmp_path / "radar_batch.json"
+    radar.prepare(RUN, out, max_items=5, today=TODAY, themes=THEMES, watches=WATCHES, registry=REG,
+                  receipt_dir=tmp_path, plan_context=_plan_ctx)
+    nodes = [r["node"] for r in json.loads(out.read_text(encoding="utf-8"))["requests"][0]["rotation_layers"]]
+    assert nodes[:2] == ["tech:n09", "tech:n08"] and "tech:n07" not in nodes   # 從沒輪到的先、昨天輪過的最後
+
+
+def test_a_condition_hung_only_on_a_layer_without_a_current_reading_falls_back_to_the_orphans() -> None:
+    """層說明指到的節點若讀圖已撤回（不在輪替池），那條條件不得每天都不出現又沒計數（INV-3）。"""
+    ctx, _notes = _plan_ctx()
+    plan = radar.layer_plan(ctx, today=_day_starting_at_zero(), registry=REG, note_node={"ln_9": "tech:gone"})
+    assert plan["orphans"] == 2 and "ew_n" not in {plan["condition_ids"][c["id"]] for c in plan["conditions"]
+                                                    if c["layers"]}
+
+
 def test_the_schema_asks_for_the_layer_and_the_prompt_allows_32_searches() -> None:
     schema = json.loads(llm_step.RADAR_SCHEMA.read_text(encoding="utf-8"))
     assert "layer" in schema["properties"]["items"]["items"]["required"]
