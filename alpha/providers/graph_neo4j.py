@@ -53,9 +53,13 @@ _EVIDENCE_CLASS_TIER: Mapping[str, int] = {
     "externally_corroborated": 1,
     "counterparty_joint": 2,
     "self_reported_costly": 2,
+    "buyer_self_reported_costly": 2,   # 批次二 E9：與拆出來的那一格同級（只拆標籤）
+    "related_party_costly": 2,
     "needs_review": 3,
     "media_relay": 3,   # 與 needs_review 同級（Step 4.3）
     "self_reported": 4,
+    "buyer_self_reported": 4,
+    "related_party": 4,
 }
 
 #: 走訪方向的關係標籤。⚠ 圖上的邊有自己的方向，而衝擊是**逆著依賴走**的：

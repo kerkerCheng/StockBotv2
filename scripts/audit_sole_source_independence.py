@@ -37,8 +37,8 @@ from dotenv import load_dotenv  # noqa: E402
 from neo4j import GraphDatabase  # noqa: E402
 
 from identity.registry import get_registry  # noqa: E402
-from query.bottleneck import company_id_for_origin, origin_docs  # noqa: E402
-from query.origin_resolution import corroboration  # noqa: E402
+from query.bottleneck import collapse_assertions, company_id_for_origin, origin_docs  # noqa: E402
+from query.origin_resolution import RELATED_PARTY_CLASSES, corroboration, related_parties  # noqa: E402
 from query.sub_language import fetch_all_quotes  # noqa: E402
 
 WEAK = "weak"
@@ -61,7 +61,7 @@ _company_id_for = company_id_for_origin
 
 
 def _sort_origins(origin_entries: dict[str, list[tuple]], subject: str, registry,
-                  quotes_by_assertion) -> dict[str, list[str]]:
+                  quotes_by_assertion, *, relation: str, related) -> dict[str, list[str]]:
     """逐個 origin 問唯一 owner（`query.origin_resolution.corroboration`，Phase 6 Step 6.4）分組。
 
     ⚠ 本檔問的是「**所有** origin 是不是都是供應商自己」（schema §7 的 L8 規則），不是邊的最高證據等級——
@@ -69,12 +69,16 @@ def _sort_origins(origin_entries: dict[str, list[tuple]], subject: str, registry
     共用的是「這個 origin 對這條邊算不算印證」：撐得住外部印證的才算外部；客戶或第三方的引文沒具名主詞、
     或發布者只是轉述句的，另成一組 `withheld`（附理由）——它不是本人，也還不是印證，補具名引文才算。
     `origin_entries`：origin → `(assertion_id, doc, origin_linkage)` 列（`query.bottleneck.origin_docs` 的輸入）。
+    控制關係人（批次二 E9：母子公司、收購方、合資股東）歸「本人」那一組——它不是第三方。
     """
     groups: dict[str, list[str]] = {"external": [], "relay": [], "unresolved": [], "self": [], "withheld": []}
     for origin, entries in sorted(origin_entries.items()):
-        verdict = corroboration(origin, subject, origin_docs(entries, quotes_by_assertion), registry)
+        verdict = corroboration(origin, subject, origin_docs(entries, quotes_by_assertion), registry,
+                                relation=relation, related=related)
         resolution = verdict.resolution
-        if verdict.level == "externally_corroborated":
+        if verdict.level in RELATED_PARTY_CLASSES:
+            groups["self"].append(origin)
+        elif verdict.level == "externally_corroborated":
             groups["external"].append(str(resolution.id) if resolution.kind == "company" else origin)
         elif verdict.withheld:
             groups["withheld"].append(f"{origin}（{verdict.withheld}）")
@@ -116,6 +120,8 @@ def main() -> int:
         ).data(), fetch_all_quotes(tx)))
 
     rows = [{**a, "attrs": _attrs(a["attrs"])} for a in assertions]
+    related = related_parties(collapse_assertions(
+        {"src": r["src"], "relation": r["rel"], "dst": r["dst"], "attributes": r["attrs"]} for r in rows).values())
     by_edge: dict[str, list[dict]] = defaultdict(list)
     for r in rows:
         by_edge[r["edge_key"]].append(r)
@@ -130,7 +136,8 @@ def main() -> int:
             if g["origin"]:
                 origin_entries.setdefault(g["origin"], []).append((g["aid"], g["doc"], g.get("origin_linkage")))
         origins = set(origin_entries)
-        groups = _sort_origins(origin_entries, subject, registry, quotes)
+        groups = _sort_origins(origin_entries, subject, registry, quotes, relation=group[0]["rel"],
+                               related=related)
         unresolved = groups["unresolved"]
         withheld = groups["withheld"]
         external_companies = sorted(set(groups["external"]))

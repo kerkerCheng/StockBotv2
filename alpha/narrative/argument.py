@@ -24,6 +24,10 @@ EVIDENCE_CLASS_PLAIN: Mapping[str, str] = {
     "externally_corroborated": "有客戶或第三方印證",
     "self_reported_costly": "公司自己說的，但寫在正式申報文件裡",
     "self_reported": "只有公司自己說",
+    "buyer_self_reported_costly": "買方自己說它需要，寫在正式申報文件裡",
+    "buyer_self_reported": "買方自己說它需要",
+    "related_party_costly": "關係企業（母子公司、收購方、合資股東）說的，寫在正式申報文件裡，不算第三方",
+    "related_party": "關係企業（母子公司、收購方、合資股東）說的，不算第三方",
     "needs_review": "還沒判定誰說的",
     "media_relay": "媒體轉述的，不算第三方印證",
 }
@@ -34,7 +38,8 @@ QUALIFICATION_PLAIN: Mapping[str, str] = {
     "designed_in": "已被設計進客戶產品", "qualified": "已通過客戶驗證", "qualifying": "驗證中", "unqualified": "尚未驗證",
 }
 #: 弱證據＝等級不高於「待判定」的那幾級（`query.bottleneck.EVIDENCE_RANK` ≤ needs_review；測試守著）。
-WEAK_CLASSES: frozenset[str] = frozenset({"self_reported", "needs_review", "media_relay"})
+WEAK_CLASSES: frozenset[str] = frozenset({"self_reported", "buyer_self_reported", "related_party", "needs_review",
+                                         "media_relay"})
 
 
 def _name(node_id: str | None, names: Mapping[str, str]) -> str:

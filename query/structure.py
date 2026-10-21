@@ -67,6 +67,7 @@ from query.bottleneck import (  # noqa: E402
     DEMAND_PULL_RELATIONS, DEPENDENCY_RELATIONS, CanonicalEdge, build_upward_index,
     classify_evidence, collapse_assertions, demand_chain, fetch_assertions, shared_name_forms,
 )
+from query.origin_resolution import RELATED_PARTY_CLASSES, related_parties  # noqa: E402
 from query.sub_language import canonical_sub_language, fetch_all_quotes, sub_language_flags  # noqa: E402
 
 #: 五個角度是**封閉清單**，而且不是憑空設計的——前四個直接來自 2026-09-17 那次
@@ -313,6 +314,7 @@ def build_socket_view(node: str, edges: Iterable[CanonicalEdge],
     if not makers:
         view.maker_absence = SOCKET_NO_MAKER
     view.deployers = sorted({e.src for e in edges if e.dst == node and e.relation in _DEPLOYER_RELATIONS})
+    related = related_parties(edges)
     docs: dict[str, dict[str, Any]] = {}
     for edge_key, found in sorted(quotes.items()):
         if node not in (edge_key[0], edge_key[2]):
@@ -323,13 +325,16 @@ def build_socket_view(node: str, edges: Iterable[CanonicalEdge],
             verdict = corroboration(str(origin or ""), edge_key[0],
                                     (OriginDoc(doc_id=doc or None, linkage=q.get("origin_linkage"),
                                                quotes=(str(q.get("quote") or ""),)),),
-                                    registry, publishers=publishers, shared=shared)
+                                    registry, publishers=publishers, shared=shared,
+                                    relation=edge_key[1], related=related)
             resolution = verdict.resolution
             company = resolution.id if resolution.kind == "company" else None
             third_party = verdict.publisher_lifted
+            # 批次二 E9：主詞的控制關係人（母子公司、收購方、合資股東）不是客戶端——它的原文不列進客戶端原文。
+            insider = verdict.level in RELATED_PARTY_CLASSES
             docs.setdefault(doc, {"doc": doc, "tier": q.get("tier"), "origin": origin, "company": company,
                                   "resolved_as": _resolved_as(verdict)})
-            if (company is not None and company not in suppliers) or third_party:
+            if ((company is not None and company not in suppliers) or third_party) and not insider:
                 view.customer_quotes.append({"edge": list(edge_key), "quote": q.get("quote"), "doc": doc,
                                              "tier": q.get("tier"), "origin": origin, "company": company,
                                              "publisher": resolution.id if third_party else None,
@@ -370,7 +375,7 @@ def _resolved_as(verdict: Any) -> str | None:
     「算印證的發布者」＝過了 `publisher_lifts`（`verdict.publisher_lifted`，owner 給的）；撐不撐得住外部印證另看 `withheld`。"""
     resolution = verdict.resolution
     if resolution.kind == "company":
-        return None
+        return "關係人" if verdict.level in RELATED_PARTY_CLASSES else None
     if resolution.kind == "publisher":
         return f"第三方·{resolution.publisher_kind}" if verdict.publisher_lifted else "媒體轉述"
     return "解析不到"
@@ -541,7 +546,8 @@ def _graph_driver():
     )
 
 
-def load_snapshot_with_quotes(node: str) -> tuple[StructureView, dict[tuple[str, str, str], list[dict[str, Any]]]]:
+def load_snapshot_with_quotes(node: str) -> tuple[StructureView, dict[tuple[str, str, str], list[dict[str, Any]]],
+                                                  dict[str, frozenset[str]]]:
     """**同一個唯讀 transaction** 裡取邊與這個節點的逐字（讀圖 v3 的引用核對用，plan A2）。
 
     ⚠ 引用必須對**同一份**快照核對：先建快照、再另查一次逐字，兩次查詢之間圖可能變
@@ -556,7 +562,9 @@ def load_snapshot_with_quotes(node: str) -> tuple[StructureView, dict[tuple[str,
                 lambda tx: (fetch_assertions(tx), fetch_all_quotes(tx), fetch_quotes(tx, node)))
     finally:
         driver.close()
-    return build_structure(node, _classify_edges(rows, all_quotes)), quotes
+    edges = _classify_edges(rows, all_quotes)
+    # 控制關係（批次二 E9）與快照同一份邊——讀圖 independent 核對讀它。
+    return build_structure(node, edges), quotes, related_parties(edges)
 
 
 def _load_edges() -> list[CanonicalEdge]:
@@ -589,10 +597,12 @@ def _classify_edges(rows, quotes_by_assertion: Mapping[str, Iterable[str]]) -> l
     shared = shared_name_forms(registry)
     # sub 旗標跟著值走（Phase 6 Step 6.5）：同一份 rows／逐字算一次，canonical 邊取贏得 sub 值那一筆的旗標。
     flags = sub_language_flags(rows, quotes_by_assertion)
+    related = related_parties(edges)
     for edge in edges:
         edge.evidence = classify_evidence(
             edge.src, edge.origins, registry, filing_origins=edge.filing_origins,
-            quotes_by_assertion=quotes_by_assertion, origin_assertions=edge.origin_assertions, shared=shared,
+            quotes_by_assertion=quotes_by_assertion, origin_assertions=edge.origin_assertions,
+            relation=edge.relation, related=related, shared=shared,
         )
         edge.sub_language_in_quote = canonical_sub_language(edge, flags)
     return edges

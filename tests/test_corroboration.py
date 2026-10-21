@@ -53,7 +53,7 @@ def pubs(tmp_path: Path):
 
 def _verdict(origin, subject, quotes, pubs, *, linkage=None, filing=False, doc="d1"):
     return corroboration(origin, subject, [OriginDoc(doc_id=doc, linkage=linkage, quotes=tuple(quotes))],
-                         _registry(), filing=filing, publishers=pubs)
+                         _registry(), filing=filing, publishers=pubs, relation="supplies_to", related={})
 
 
 # ---------------------------------------------------------------------------
@@ -116,7 +116,7 @@ def test_6b_relay_exemption_is_per_document_not_per_origin(pubs) -> None:
     v = corroboration("Reuters", SUPPLIER, [
         OriginDoc(doc_id="own", linkage=INDEPENDENT, quotes=("Supply is tight, sources said",)),
         OriginDoc(doc_id="relay", linkage=None, quotes=("Lumentum is the only qualified supplier",)),
-    ], _registry(), publishers=pubs)
+    ], _registry(), publishers=pubs, relation="supplies_to", related={})
     assert (v.level, v.withheld, v.docs) == ("media_relay", "unnamed", ("own",))
 
 
@@ -151,7 +151,8 @@ def _row(aid, origin, *, src=SUPPLIER, relation="supplies_to", dst="tech:cw_dfb_
 def _classify(rows, quotes, pubs):
     edge = next(iter(collapse_assertions(rows).values()))
     return classify_evidence(edge.src, edge.origins, _registry(), filing_origins=edge.filing_origins,
-                             quotes_by_assertion=quotes, origin_assertions=edge.origin_assertions, publishers=pubs)
+                             quotes_by_assertion=quotes, origin_assertions=edge.origin_assertions, publishers=pubs,
+                             relation=edge.relation, related={})
 
 
 def test_sivers_old_any_quote_scope_would_pass_but_per_origin_scope_does_not(pubs) -> None:
@@ -171,7 +172,7 @@ def test_collapse_records_which_document_each_origin_cites(pubs) -> None:
     assert edge.origin_assertions == {"Reuters": [("a1", "r_own", INDEPENDENT), ("a2", "r_relay", None)]}
     verdicts = edge_corroborations(edge.src, edge.origins, _registry(), quotes_by_assertion={
         "a1": ["Lumentum is the only qualified supplier, the person said"]},
-        origin_assertions=edge.origin_assertions, publishers=pubs)
+        origin_assertions=edge.origin_assertions, publishers=pubs, relation=edge.relation, related={})
     assert [(v.origin, v.level, v.docs) for v in verdicts] == [("Reuters", "externally_corroborated", ("r_own",))]
 
 
@@ -188,7 +189,11 @@ def test_8_callers_that_do_not_pass_quotes_fail_loudly(pubs) -> None:
         classify_evidence(edge.src, edge.origins, _registry(), origin_assertions=edge.origin_assertions)
     with pytest.raises(TypeError):
         classify_evidence(edge.src, edge.origins, _registry(), quotes_by_assertion=None,
-                          origin_assertions=edge.origin_assertions)
+                          origin_assertions=edge.origin_assertions, relation=edge.relation, related={})
+    # 批次二 E9：控制關係同樣必填——沒給就丟例外，不得靜默讓標籤停在舊判定
+    with pytest.raises(TypeError, match="related"):
+        classify_evidence(edge.src, edge.origins, _registry(), quotes_by_assertion={},
+                          origin_assertions=edge.origin_assertions, relation=edge.relation, related=None)
     with pytest.raises(TypeError):
         structure_table(rows, _registry())
     with pytest.raises(TypeError):

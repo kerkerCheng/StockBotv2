@@ -153,7 +153,7 @@ def compute_layer_stats(*, edges: Sequence[Any], rows: Iterable[Mapping[str, Any
     `evidence_baseline`（`load_evidence_baseline`）是證據等級升降的基準；`None`＝讀不到，那一格印缺席、不印 0。"""
     from query.bottleneck import edge_corroborations, quote_names_company, shared_name_forms
     from query.graph_walk import CORROBORATED_EVIDENCE
-    from query.origin_resolution import WITHHELD_REASONS, get_relay_language, resolve_origin
+    from query.origin_resolution import WITHHELD_REASONS, get_relay_language, related_parties, resolve_origin
     from query.sub_language import get_language, sub_language_flags
 
     lang = language or get_language()
@@ -249,12 +249,14 @@ def compute_layer_stats(*, edges: Sequence[Any], rows: Iterable[Mapping[str, Any
 
     # 附屬（Phase 6 Step 6.4）：沒升外部印證的邊與理由——判定只問 owner（`edge_corroborations`→`corroboration`）。
     withheld: dict[str, list[dict[str, Any]]] = {reason: [] for reason in WITHHELD_REASONS}
+    related = related_parties(edges)
     for edge in edges:
         if edge.evidence == "externally_corroborated":
             continue
         for verdict in edge_corroborations(edge.src, edge.origins, registry, edge.filing_origins,
                                            quotes_by_assertion=quotes_by_assertion,
                                            origin_assertions=edge.origin_assertions,
+                                           relation=edge.relation, related=related,
                                            publishers=publishers, relay=relay_language, shared=shared):
             if verdict.withheld:
                 entry = {"edge": f"{edge.src} {edge.relation} {edge.dst}", "evidence": edge.evidence,

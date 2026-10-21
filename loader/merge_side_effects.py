@@ -273,14 +273,18 @@ def evidence_after_load(state: Mapping[str, Any], documents: list[Mapping[str, A
     """入圖後證據等級會變的邊：`state`（`fetch_evidence_state`）前後各算一次；新邊 `before=None`。
     `after_withheld`：改後那一邊沒升外部印證的理由（`corroboration` 的 `withheld`，去重排序）——RA 補引文看得出補到了沒。"""
     from query.bottleneck import best_evidence, collapse_assertions, edge_corroborations, shared_name_forms
+    from query.origin_resolution import related_parties
 
     shared = shared_name_forms(registry)
 
     def verdicts(rows, quotes):
+        edges = collapse_assertions(rows)
+        related = related_parties(edges.values())
         return {key: edge_corroborations(edge.src, edge.origins, registry, edge.filing_origins,
                                          quotes_by_assertion=quotes, origin_assertions=edge.origin_assertions,
+                                         relation=edge.relation, related=related,
                                          publishers=publishers, relay=relay, shared=shared)
-                for key, edge in collapse_assertions(rows).items()}
+                for key, edge in edges.items()}
 
     loaded = [as_loaded(doc) for doc in documents]
     before = verdicts(state["rows"], quotes_by_assertion(state["links"], state["source_quotes"]))

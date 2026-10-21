@@ -350,6 +350,13 @@
                 ],
                 "minimum": 1,
                 "maximum": 5
+              },
+              "control": {
+                "type": [
+                  "boolean",
+                  "null"
+                ],
+                "description": "只用在 invests_in：這筆投資是不是控制（持股過半、合資共同控制、母子公司；逐字要寫得出比例或母子關係）。true 時雙方互為關係人，對方說的不算第三方印證。少數股權不填。"
               }
             }
           },

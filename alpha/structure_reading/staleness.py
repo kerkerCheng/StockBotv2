@@ -152,7 +152,8 @@ def _evidence_change(angle: str, label: str, before: Any, after: Any, *, unit: s
 
 
 def _angle_changes(angle: str, before: Iterable[Sequence[Any]], after: Iterable[Sequence[Any]],
-                   *, unit: str = "layer", evidence_rank: Mapping[str, int]) -> list[StructureChange]:
+                   *, unit: str = "layer", evidence_rank: Mapping[str, int],
+                   evidence_splits: Mapping[str, str] | None = None) -> list[StructureChange]:
     member_kind, attr_kind = _ANGLE_TO_KINDS[angle]
     old = _rows_by_identity(before)
     new = _rows_by_identity(after)
@@ -178,16 +179,39 @@ def _angle_changes(angle: str, before: Iterable[Sequence[Any]], after: Iterable[
             if before_row[index] != after_row[index]:
                 changes.append(StructureChange(
                     angle, attr_kind, f"{label} 的 {name}：{before_row[index]} → {after_row[index]}"))
-        if before_row[_EVID] != after_row[_EVID]:
+        if _split(before_row[_EVID], evidence_splits) != _split(after_row[_EVID], evidence_splits):
             changes.append(_evidence_change(angle, label, before_row[_EVID], after_row[_EVID], unit=unit,
                                             evidence_rank=evidence_rank))
     return changes
 
 
+def _split(evidence: Any, splits: Mapping[str, str] | None) -> Any:
+    """只拆標籤的格換回它拆出來的那一格（批次二 E9；`query.bottleneck.EVIDENCE_LABEL_SPLITS`，呼叫端注入）。"""
+    return (splits or {}).get(str(evidence), evidence)
+
+
+def _split_relabels(before_angles: Mapping[str, Sequence[Sequence[Any]]], after_structure: Mapping[str, Any],
+                    splits: Mapping[str, str] | None) -> int:
+    """同一條邊、證據字串不同、換回舊格後相同的條數——「只拆標籤」造成的 digest 差異（E9）。"""
+    if not splits:
+        return 0
+    count = 0
+    after_angles = after_structure.get("angles") or {}
+    for angle in _ANGLE_TO_KINDS:
+        old = _rows_by_identity(before_angles.get(angle) or ())
+        for e in after_angles.get(angle, ()):
+            key = (str(e.get("src")), str(e.get("relation")), str(e.get("dst")))
+            if key in old and old[key][_EVID] != e.get("evidence") \
+                    and _split(old[key][_EVID], splits) == _split(e.get("evidence"), splits):
+                count += 1
+    return count
+
+
 def grade_changes(before_angles: Mapping[str, Sequence[Sequence[Any]]],
                   after_structure: Mapping[str, Any],
                   *, before_anchor: Sequence[str] | None = None, unit: str,
-                  evidence_rank: Mapping[str, int]) -> list[StructureChange]:
+                  evidence_rank: Mapping[str, int],
+                  evidence_splits: Mapping[str, str] | None = None) -> list[StructureChange]:
     """快照 vs 現在的圖 → 逐項分級的變化清單。**純函式，不查圖。**
 
     `after_structure` 吃 `query.structure.StructureView.as_dict()`。
@@ -204,7 +228,7 @@ def grade_changes(before_angles: Mapping[str, Sequence[Sequence[Any]]],
             for e in after_angles.get(angle, ())
         ]
         changes += _angle_changes(angle, before_angles.get(angle) or (), after_rows, unit=unit,
-                                  evidence_rank=evidence_rank)
+                                  evidence_rank=evidence_rank, evidence_splits=evidence_splits)
 
     after_anchor = list(after_structure.get("anchor_chain") or [])
     if list(before_anchor or []) != after_anchor:
@@ -263,7 +287,8 @@ def _developers_baseline(reading: Any, after_structure: Mapping[str, Any],
 
 
 def reading_status(reading: Any, after_structure: Mapping[str, Any] | None, *, today: date,
-                   evidence_rank: Mapping[str, int], aliases: Mapping[str, str] | None = None) -> dict[str, Any]:
+                   evidence_rank: Mapping[str, int], aliases: Mapping[str, str] | None = None,
+                   evidence_splits: Mapping[str, str] | None = None) -> dict[str, Any]:
     """一份讀圖紀錄現在是什麼狀態，以及**憑什麼**。
 
     `after_structure=None` ＝ 這次沒讀到圖（例如 Neo4j 沒開）：回 `None` 狀態並說明，
@@ -272,6 +297,8 @@ def reading_status(reading: Any, after_structure: Mapping[str, Any] | None, *, t
     `aliases`（批次二 E4）：同義節點合併後舊快照裡的 id 換成 canonical 再比；換完沒有差異、只是有 id 換了名 →
     `current`＋`alias_only`（判讀不受影響：10-17 三筆合併讓 4 份讀圖換版、10 份敘事換騎，零判讀改變）。合併同時帶進
     真的新邊的照舊標——換名只拿掉「名字不同」這一種差異。
+    `evidence_splits`（批次二 E9）：`query.bottleneck.EVIDENCE_LABEL_SPLITS`（呼叫端注入）——只拆標籤的證據格兩邊換回舊格再比；
+    換完沒有差異、只是有證據標籤拆了格 → `current`＋`evidence_relabeled`。真的跨格變化（例：外部印證 → 關係人）照舊標。
     """
     if after_structure is None:
         return {"status": None, "reason": "這次沒有讀到圖，無法比對（不是 current）",
@@ -279,16 +306,19 @@ def reading_status(reading: Any, after_structure: Mapping[str, Any] | None, *, t
     before_angles, before_anchor, renamed = canonical_snapshot(reading.angles, reading.anchor_chain, aliases or {})
     upgraded, undated = _developers_baseline(reading, after_structure, before_angles)
     changes = grade_changes(before_angles, after_structure, before_anchor=before_anchor,
-                            unit=reading.unit, evidence_rank=evidence_rank)
+                            unit=reading.unit, evidence_rank=evidence_rank, evidence_splits=evidence_splits)
+    relabeled = _split_relabels(before_angles, after_structure, evidence_splits)
     digest_changed = str(after_structure.get("result_digest") or "") != reading.result_digest
     # digest 是用舊 id 算的：換名之後逐項比對找不出差異、而且確實有 id 換了名，那一半的差異就是換名本身
     alias_only = digest_changed and not changes and bool(renamed)
     # E3 升版：舊快照沒有開發者這一類、這一類又不是空的 → digest 必然不同；逐項比對（只算讀圖日之後才取得的邊）沒有差異＝升版本身
     upgrade_only = digest_changed and not changes and upgraded and not alias_only
+    # E9 拆格：逐項比對（拆格換回舊格）沒有差異、確實有證據標籤拆了格 → 那一半的差異就是拆格本身
+    relabel_only = digest_changed and not changes and bool(relabeled) and not alias_only and not upgrade_only
     grades = {c.grade for c in changes}
     if reading.is_expired(today):
         status = "expired"
-    elif not digest_changed or alias_only or upgrade_only:
+    elif not digest_changed or alias_only or upgrade_only or relabel_only:
         status = "current"
     elif grades <= {"low"}:
         status = "stale_low"
@@ -303,12 +333,16 @@ def reading_status(reading: Any, after_structure: Mapping[str, Any] | None, *, t
     elif upgrade_only:
         reason = ("digest 升版（2026-10-21 收進開發者／變體這一類）、內容未變——這份讀圖寫的時候還沒有這一類，"
                   "讀圖日之後才取得的開發者邊 0 條" + (f"；取得日不明 {undated} 條照升版前已在算" if undated else ""))
+    elif relabel_only:
+        reason = (f"只有證據標籤拆格（2026-10-21：主詞是買方時「供應商自報」改印「買方自述」，同級）{relabeled} 條——"
+                  "強度與意義沒變，判讀不受影響，不進該重讀")
     elif digest_changed and not changes:
         reason = "result_digest 變了但逐項比對找不出差異——比對欄位與 digest 欄位可能不同步"
     return {
         "alias_only": alias_only,
         "renamed": renamed,
         "digest_upgraded": upgrade_only,
+        "evidence_relabeled": relabel_only,
         "status": status,
         "digest_changed": digest_changed,
         "expired": reading.is_expired(today),

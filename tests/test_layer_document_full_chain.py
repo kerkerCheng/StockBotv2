@@ -21,6 +21,7 @@ from intake import actions as research_actions
 from intake import application
 from intake import provenance as intake
 from query.bottleneck import classify_evidence, collapse_assertions
+from query.origin_resolution import related_parties
 from query.layer_stats import compute_layer_stats
 from query.origin_resolution import PUBLISHER_KINDS, load_publishers
 from query.sub_language import SubLanguage
@@ -112,9 +113,11 @@ def publishers(tmp_path: Path):
 def _classified(rows: list[dict], quotes: dict, publishers) -> list:
     reg = _Registry()
     edges = list(collapse_assertions(rows).values())
+    related = related_parties(edges)
     for edge in edges:
         edge.evidence = classify_evidence(edge.src, edge.origins, reg, filing_origins=edge.filing_origins,
                                           quotes_by_assertion=quotes, origin_assertions=edge.origin_assertions,
+                                          relation=edge.relation, related=related,
                                           publishers=publishers)
     return edges
 

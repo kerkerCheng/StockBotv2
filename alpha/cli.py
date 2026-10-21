@@ -491,7 +491,7 @@ def cmd_structure_reading(args: argparse.Namespace) -> int:
     from datetime import date, datetime, timezone
 
     from .providers.structure_readings import (
-        append_reading_record, entity_alias_map, evidence_rank, fetch_structure_snapshot,
+        append_reading_record, entity_alias_map, evidence_rank, evidence_splits, fetch_structure_snapshot,
         fetch_structure_snapshot_with_quotes, read_reading_records, register_reading_watches,
     )
     from .structure_reading import (
@@ -504,6 +504,7 @@ def cmd_structure_reading(args: argparse.Namespace) -> int:
 
     if args.add or args.retract:
         quotes = None
+        related = None
         if args.add:
             spec = json.loads(Path(args.add).read_text(encoding="utf-8"))
             if "structure" in spec or "angles" in spec or "result_digest" in spec:
@@ -515,7 +516,7 @@ def cmd_structure_reading(args: argparse.Namespace) -> int:
                 return 2
             # ⚠ 走 providers，不直接 import query：alpha/ 的契約與模型層不得依賴外部世界
             # （`tests/test_layer_separation.py`；2026-09-17 它真的擋下過一次）。
-            structure, quotes = fetch_structure_snapshot_with_quotes(node)
+            structure, quotes, related = fetch_structure_snapshot_with_quotes(node)
             try:
                 record = structure_reading_record(
                     node=node, structure=structure, unit=str(spec["unit"]),
@@ -542,7 +543,7 @@ def cmd_structure_reading(args: argparse.Namespace) -> int:
                 author=target.author, created_at=datetime.now(timezone.utc),
             )
         try:
-            path = append_reading_record(record, quotes=quotes)
+            path = append_reading_record(record, quotes=quotes, related=related)
         except AlphaError as exc:
             print(f"✗ {exc}", file=sys.stderr)
             return 2
@@ -572,7 +573,8 @@ def cmd_structure_reading(args: argparse.Namespace) -> int:
         aliases = entity_alias_map()          # 批次二 E4：與讀圖 artifact 同一個比對（合併換名不算變動）
         snapshot = fetch_structure_snapshot(aliases.get(node, node))
         rank = evidence_rank()
-        statuses = {u: reading_status(r, snapshot, today=today, evidence_rank=rank, aliases=aliases)
+        statuses = {u: reading_status(r, snapshot, today=today, evidence_rank=rank, aliases=aliases,
+                                      evidence_splits=evidence_splits())
                     for u, r in current_by_unit.items()}
 
     shown = [r for r in records if r.unit in units]

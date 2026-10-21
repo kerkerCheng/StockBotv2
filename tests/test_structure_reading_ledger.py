@@ -415,3 +415,33 @@ def test_heartbeat_does_not_take_out_its_neighbours_when_readings_are_missing(tm
                                thesis_path=tmp_path / "missing.json")
     text = "\n".join(section.lines)
     assert "結構讀圖：" in text and "watch：今日醒" in text and "beta" in text   # 1.8：watch 行改讀 registry
+
+
+def _with_demand_evidence(structure, evidence, digest):
+    structure = json.loads(json.dumps(structure))
+    for row in structure["angles"]["demand_side"]:
+        row["evidence"] = evidence
+    structure["result_digest"] = digest
+    return structure
+
+
+def test_a_label_only_split_does_not_make_a_reading_stale() -> None:
+    """批次二 E9：拆格前寫的讀圖印「供應商自報」、現在同一條買方邊印「買方自述」——同級、只拆標籤，不算讀圖變動
+    （不換回舊格，升版當天 21 份現行讀圖會一起掉成 stale_low）。真的跨格變化照舊標。"""
+    from alpha.structure_reading.contracts import parse_structure_reading_record
+    from query.bottleneck import EVIDENCE_LABEL_SPLITS
+
+    reading = parse_structure_reading_record(
+        _record(structure=_with_demand_evidence(_structure(), "self_reported", "d-old")))
+    relabeled = _with_demand_evidence(_structure(), "buyer_self_reported", "d-new")
+    status = reading_status(reading, relabeled, today=TODAY, evidence_rank=EVIDENCE_RANK,
+                            evidence_splits=EVIDENCE_LABEL_SPLITS)
+    assert status["status"] == "current" and status["evidence_relabeled"] and not needs_reread(status)
+    assert "買方自述" in status["reason"] and "1 條" in status["reason"]
+    # 不注入拆格表＝舊行為：證據變了就是 stale_low
+    assert reading_status(reading, relabeled, today=TODAY, evidence_rank=EVIDENCE_RANK)["status"] == "stale_low"
+    # 關係人是從外部印證降下來的真變化，不在拆格表裡
+    downgraded = _with_demand_evidence(_structure(), "related_party", "d-new")
+    status = reading_status(reading, downgraded, today=TODAY, evidence_rank=EVIDENCE_RANK,
+                            evidence_splits=EVIDENCE_LABEL_SPLITS)
+    assert status["status"] == "stale_low" and not status["evidence_relabeled"]

@@ -66,6 +66,8 @@ def _cls(subject, origins, reg, *, quotes=None, linkages=None, **kw):
             aid = f"a{i}_{j}"
             origin_assertions.setdefault(origin, []).append((aid, f"doc{i}_{j}", linkage))
             by_aid[aid] = list(quotes.get(origin, ()))
+    kw.setdefault("relation", "supplies_to")
+    kw.setdefault("related", {})
     return classify_evidence(subject, origins, reg, quotes_by_assertion=by_aid, origin_assertions=origin_assertions,
                              **kw)
 
@@ -395,7 +397,7 @@ def test_sole_source_audit_sorts_origins_with_the_same_owner(monkeypatch, tmp_pa
     quotes = {"a0": ["Sivers is the sole supplier"], "a1": ["Sivers holds most of the share"],
               "a2": ["Sivers is the sole supplier"], "a3": ["x"], "a4": ["Ayar Labs sources lasers from Sivers"],
               "a5": ["Coherent also makes CW lasers"]}
-    groups = _sort_origins(entries, SUPPLIER, _Registry(), quotes)
+    groups = _sort_origins(entries, SUPPLIER, _Registry(), quotes, relation="supplies_to", related={})
     assert groups == {"external": ["co:ayar_labs", "TrendForce"], "relay": ["Reuters"],
                       "unresolved": ["Some Blog"], "self": ["Sivers"], "withheld": ["Coherent（unnamed）"]}
 

@@ -54,6 +54,42 @@ SAME_ORIGIN = "same_origin"
 #: 三態（封閉）。
 RESOLUTION_KINDS = ("company", "publisher", "unresolved")
 
+#: 主詞是**需求方**的關係（2026-10-21 批次二 E9；failure log #11）：origin＝主詞時說話的是買方——「我靠它、繞不過」
+#: 是需求側的一手，不是供應商自誇。只拆標籤、rank 照舊（`query.bottleneck.EVIDENCE_RANK`）。只收資料撐得住的兩個：
+#: #11 的六個 case 全是這兩種；`deploys` 今天 origin＝主詞只有 1 條，撞到再加（L17）。
+BUYER_SUBJECT_RELATIONS: frozenset[str] = frozenset({"depends_on", "constrained_by"})
+#: 持股關係（E9；failure log #10）。**這兩種邊本身不套關係人判定**：被投資方說「某某投資了我」是對手方對持股這件事
+#: 本身的陳述，與客戶說「我向它買」同形；拿持股邊去降它自己是循環。
+HOLDING_RELATIONS: frozenset[str] = frozenset({"acquired", "invests_in"})
+#: 關係人自述的兩格（`query.bottleneck.EVIDENCE_RANK` 的鍵）——插槽視角的客戶端原文、讀圖 independent 核對讀它。
+RELATED_PARTY_CLASSES: frozenset[str] = frozenset({"related_party", "related_party_costly"})
+
+
+def related_parties(edges: Iterable[Any]) -> dict[str, frozenset[str]]:
+    """圖上的**控制**關係 → 每家公司的關係人（批次二 E9；failure log #10）。唯一 owner；`corroboration` 讀它。
+
+    控制＝`CanonicalEdge.control`（`acquired` 一律是；`invests_in` 要有一筆 assertion 宣告 `attributes.control`）。
+    雙方互為關係人；同一個控制方底下的兩家也是（同一母公司）。合資的兩個股東**不**因此互為關係人。
+    ⚠ **少數股權不算**（2026-10-21 實測、L11-6）：圖上 16 條持股邊多半是策略或財務投資——NVIDIA 對 Coherent／Lumentum
+    各 20 億美元、MACOM 對 IQE、誼虹對華星光 10.6%。若一律算關係人，NVIDIA 以**客戶**身分說的 9 條供貨／合作會從
+    外部印證掉下來，而客戶端印證是 L8 最強的那一種。控制要由逐字寫得出比例或母子關係的那份文件宣告，不由關係名推。
+    """
+    related: dict[str, set[str]] = {}
+    children: dict[str, set[str]] = {}
+    for edge in edges:
+        if edge.relation not in HOLDING_RELATIONS or not getattr(edge, "control", False):
+            continue
+        parent, child = str(edge.src), str(edge.dst)
+        if parent == child or not (parent.startswith("co:") and child.startswith("co:")):
+            continue
+        related.setdefault(parent, set()).add(child)
+        related.setdefault(child, set()).add(parent)
+        children.setdefault(parent, set()).add(child)
+    for kids in children.values():
+        for kid in kids:
+            related[kid].update(kids - {kid})
+    return {company: frozenset(others) for company, others in related.items()}
+
 
 class PublisherConfigError(ValueError):
     """`config/publishers.json` 形狀或內容不合規——fail closed，不帶著壞設定繼續分類。"""
@@ -263,6 +299,7 @@ class Corroboration:
 
 
 def corroboration(origin: str, subject: str, docs: Iterable[OriginDoc], registry: Any, *,
+                  relation: str, related: Mapping[str, frozenset[str]],
                   filing: bool = False, publishers: PublisherRegistry | None = None,
                   relay: Any = None, shared: frozenset[str] | None = None) -> Corroboration:
     """「這個 origin 對這條邊算不算外部印證」的唯一 owner（Phase 6 Step 6.4）。
@@ -271,7 +308,11 @@ def corroboration(origin: str, subject: str, docs: Iterable[OriginDoc], registry
     `filing`：這個 origin 有沒有 filing 出身的文件（costly proxy）；`relay`：轉述字表（預設正式字表）；
     `shared`：`shared_name_forms(registry)`（大量呼叫時由呼叫端算一次）。規則：
 
-    - **名冊公司、是主詞** → 自報（filing 出身為自報·filing）。照舊。
+    - **名冊公司、是主詞** → 自報（filing 出身為自報·filing）。照舊；`relation` 在 `BUYER_SUBJECT_RELATIONS`
+      （主詞是買方）時是買方自述（filing 另標），同 rank、只拆標籤（批次二 E9；#11）。
+    - **名冊公司、是主詞的控制關係人**（`related`＝`related_parties` 的輸出；持股邊本身除外）→ 關係人自述
+      （filing 另標）——母子公司、收購方、合資股東說的不是第三方印證（E9；#10、L8）。沒有 withheld：
+      不是具名或轉述規則擋的，是說話的人本來就不獨立。
     - **名冊公司、不是主詞**：主詞是公司（`co:*`）時，這個 origin **自己的**引文至少一段逐字具名主詞
       （`query.bottleneck.quote_names_company`——名字比對的唯一 owner）才給外部印證；主詞在名冊沒有比得到的寫法
       （`usable_name_forms` 空）→ 待判定＋`no_name_forms`；有寫法但沒具名 → 待判定＋`unnamed`。主詞不是公司
@@ -304,7 +345,12 @@ def corroboration(origin: str, subject: str, docs: Iterable[OriginDoc], registry
         mentions = _origin_mentions(_strip_annotation(origin), registry)
         return result("counterparty_joint" if len(mentions) >= 2 and (mentions - {subject}) else "needs_review")
     if resolution.kind == "company" and resolution.id == subject:
+        if relation in BUYER_SUBJECT_RELATIONS:
+            return result("buyer_self_reported_costly" if filing else "buyer_self_reported")
         return result("self_reported_costly" if filing else "self_reported")
+    if (resolution.kind == "company" and relation not in HOLDING_RELATIONS
+            and resolution.id in related.get(str(subject), ())):
+        return result("related_party_costly" if filing else "related_party")
 
     if resolution.kind == "publisher":
         considered = tuple(d for d in (docs or (OriginDoc(None),)) if publisher_lifts(resolution, (d.linkage,)))

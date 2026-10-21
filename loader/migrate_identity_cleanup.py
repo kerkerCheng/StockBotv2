@@ -303,12 +303,17 @@ def evidence_by_edge(rows: Iterable[Mapping[str, Any]], registry: Any,
     Phase 6 Step 6.4）。`quotes_by_assertion` 必填：改前用圖上的逐字、改後用 `rows_after_edit` 回的那一份。"""
     from query.bottleneck import classify_evidence, collapse_assertions, shared_name_forms
 
+    from query.origin_resolution import related_parties
+
     shared = shared_name_forms(registry)
     out: dict[tuple[str, str, str], str] = {}
-    for key, edge in collapse_assertions(rows).items():
+    edges = collapse_assertions(rows)
+    related = related_parties(edges.values())
+    for key, edge in edges.items():
         out[key] = classify_evidence(edge.src, edge.origins, registry, filing_origins=edge.filing_origins,
                                      quotes_by_assertion=quotes_by_assertion,
-                                     origin_assertions=edge.origin_assertions, shared=shared)
+                                     origin_assertions=edge.origin_assertions, relation=edge.relation,
+                                     related=related, shared=shared)
     return out
 
 

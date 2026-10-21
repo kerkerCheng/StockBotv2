@@ -76,6 +76,12 @@
 - `qualification_status`: enum `none|sampling|qualifying|qualified|designed_in` \| null
 - `ramp_execution`: int 1–5 \| null — **這家供應商實際 ramp 能力**(與 node 的內在難度分開)
 
+掛在 `invests_in` 上(2026-10-21 批次二 E9):
+
+- `control`: bool \| null — 這筆投資是不是**控制**(持股過半、合資共同控制、母子公司);逐字必須寫得出比例或母子關係。
+  true 時雙方互為關係人,對方說的不算第三方印證(`query.origin_resolution.related_parties`);`acquired` 一律是控制。
+  少數股權(策略或財務投資)不填或填 false——NVIDIA 以客戶身分說的供貨不因它也是股東而降級。
+
 `lead_time_weeks` 已停用且 validator 會拒收。缺料、利用率、物流或特定日期造成的
 實際交期是時變觀測；專用 Engine C schema 建成前只能存為 dated Claim。
 

@@ -72,6 +72,8 @@ def _cls(subject, origins, reg, *, quotes=None, **kw):
     quotes = quotes or {}
     origin_assertions = {o: [(f"a{i}", f"doc{i}", None)] for i, o in enumerate(origins)}
     by_aid = {f"a{i}": list(quotes.get(o, ())) for i, o in enumerate(origins)}
+    kw.setdefault("relation", "supplies_to")
+    kw.setdefault("related", {})
     return classify_evidence(subject, origins, reg, quotes_by_assertion=by_aid, origin_assertions=origin_assertions,
                              **kw)
 

@@ -13,6 +13,7 @@ from pathlib import Path
 import pytest
 
 from query.bottleneck import classify_evidence, collapse_assertions
+from query.origin_resolution import related_parties
 from query.layer_stats import (BASELINE_KEY, BASELINES_PATH, CONTENT_BASELINE_KEY, EVIDENCE_BASELINE_KEY,
                                assertion_content_digest, compute_layer_stats, content_digests, load_baseline,
                                load_content_baseline, load_evidence_baseline, summary_line)
@@ -101,9 +102,11 @@ def stats(tmp_path: Path) -> dict:
 
 def _classified(rows, quotes, reg, pubs):
     edges = list(collapse_assertions(rows).values())
+    related = related_parties(edges)
     for edge in edges:
         edge.evidence = classify_evidence(edge.src, edge.origins, reg, filing_origins=edge.filing_origins,
                                           quotes_by_assertion=quotes, origin_assertions=edge.origin_assertions,
+                                          relation=edge.relation, related=related,
                                           publishers=pubs)
     return edges
 

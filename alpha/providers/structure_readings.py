@@ -64,7 +64,8 @@ def _norm(text: Any) -> str:
 
 
 def verify_citations(record: Mapping[str, Any], quotes: Mapping[tuple[str, str, str], Sequence[Mapping[str, Any]]],
-                     *, registry: Any = None, publishers: Any = None) -> list[str]:
+                     *, related: Mapping[str, frozenset[str]] | None = None, registry: Any = None,
+                     publishers: Any = None) -> list[str]:
     """v3 引用的寫入端核對（plan A2）：回傳問題清單，空＝全部核對得到。**不查圖**——`quotes` 必須與
     紀錄的快照出自同一次查詢（`fetch_structure_snapshot_with_quotes`）。
 
@@ -74,6 +75,9 @@ def verify_citations(record: Mapping[str, Any], quotes: Mapping[tuple[str, str, 
     **算印證的發布者**（`publisher_lifts`：自產資料的類別、或宣告 `origin_linkage=independent` 的媒體文；宣告
     same_origin 的一律不算）；而且**被引用的那段逐字**要具名主詞（主詞是公司時；公司 origin 與發布者都是）、
     發布者的那段不得是轉述句（宣告 independent 的文件不套轉述）。解析不到的不算。
+    `related`（批次二 E9）：`query.origin_resolution.related_parties` 的輸出，與快照同一次查詢——控制關係人
+    （母子公司、收購方、合資股東）標 independent 不算。正式寫入路徑（`alpha.cli` → `fetch_structure_snapshot_with_quotes`）
+    一定帶；None＝這次沒有控制關係可比（測試夾具），不是「核對過、沒有關係人」。
     ⚠ 既有讀圖不回頭重驗（ledger append-only）：新規則只管新寫的那一筆。
     """
     parsed = parse_structure_reading_record(record)
@@ -112,23 +116,24 @@ def verify_citations(record: Mapping[str, Any], quotes: Mapping[tuple[str, str, 
                             f"（這條邊的逐字來自 {docs or '（沒有任何逐字）'}）")
             continue
         if citation.independent:
-            problems.extend(_independence_problems(label, citation.source_id, edge[0], hits, socket_suppliers,
+            problems.extend(_independence_problems(label, citation.source_id, edge, hits, socket_suppliers,
                                                    registry=registry, publishers=publishers,
-                                                   corroboration=corroboration))
+                                                   corroboration=corroboration, related=related or {}))
     return problems
 
 
-def _independence_problems(label: str, source_id: str, subject: str, hits: Sequence[Mapping[str, Any]],
+def _independence_problems(label: str, source_id: str, edge: tuple[str, ...], hits: Sequence[Mapping[str, Any]],
                            socket_suppliers: set[str], *, registry: Any, publishers: Any,
-                           corroboration: Any) -> list[str]:
+                           corroboration: Any, related: Mapping[str, frozenset[str]]) -> list[str]:
     """一條標 `independent` 的引用，撐不撐得住「不是供應商自己、而且這段逐字自己具名主詞、不是轉述」。
 
     `hits` 都出自同一份文件（`source_id`）、都含被引用的片段，所以通常只有一個 origin；逐個 origin 判、只看這幾段逐字
     （不是那份文件在這條邊上的全部逐字——引用的是哪一段，核的就是哪一段），任何一個撐不住就說出來。
     判定只問 `corroboration`；這裡只把它的結論寫成人話，三種沒升的理由分開寫（L12）。
     """
-    from query.origin_resolution import OriginDoc
+    from query.origin_resolution import RELATED_PARTY_CLASSES, OriginDoc
 
+    subject, relation = edge[0], edge[1]
     problems: list[str] = []
     by_origin: dict[tuple[str, str | None], list[str]] = {}
     for q in hits:
@@ -136,11 +141,14 @@ def _independence_problems(label: str, source_id: str, subject: str, hits: Seque
             str(q.get("quote") or ""))
     for (origin, linkage), cited in sorted(by_origin.items(), key=lambda kv: (kv[0][0], str(kv[0][1] or ""))):
         verdict = corroboration(origin, subject, (OriginDoc(doc_id=source_id, linkage=linkage, quotes=tuple(cited)),),
-                                registry, publishers=publishers)
+                                registry, publishers=publishers, relation=relation, related=related)
         resolution = verdict.resolution
         if resolution.kind == "company" and resolution.id == subject:
             problems.append(f"{label}：標了 independent，但來源 {source_id} 就是 {subject} 自己——"
                             "供應商自稱是弱主張（L8）")
+        elif verdict.level in RELATED_PARTY_CLASSES:
+            problems.append(f"{label}：標了 independent，但來源 {source_id} 的 {resolution.id} 與 {subject} 有控制關係"
+                            "（母子公司、收購方或合資股東）——關係人說的不是第三方印證（L8；批次二 E9）")
         elif resolution.kind == "company" and resolution.id in socket_suppliers:
             problems.append(f"{label}：標了 independent，但來源 {source_id} 是這個插槽的另一家供應商 "
                             f"{resolution.id}——同插槽的聯合公告方不是客戶端（L8；plan 待決 #12）")
@@ -176,6 +184,7 @@ def verify_disproof_sources(record: Mapping[str, Any], existing: Sequence[Struct
 
 def append_reading_record(record: Mapping[str, Any], *, directory: Path | None = None,
                           quotes: Mapping[tuple[str, str, str], Sequence[Mapping[str, Any]]] | None = None,
+                          related: Mapping[str, frozenset[str]] | None = None,
                           registry: Any = None) -> Path:
     """append 一筆（已由 `structure_reading_record()` 驗證過的）紀錄；只 append，永不改寫既有行。
 
@@ -207,7 +216,7 @@ def append_reading_record(record: Mapping[str, Any], *, directory: Path | None =
             if quotes is None:
                 problems.append("這筆有引用，但沒有給同一份快照的逐字（quotes）——核對不了就不寫")
             else:
-                problems += verify_citations(record, quotes, registry=registry)
+                problems += verify_citations(record, quotes, registry=registry, related=related)
         if problems:
             raise ContractViolation("讀圖紀錄拒收：\n  - " + "\n  - ".join(problems))
     path = ledger_path(parsed.node, directory=directory)
@@ -232,12 +241,13 @@ def fetch_structure_snapshot(node: str) -> dict[str, Any]:
     return build_structure(str(node), _load_edges()).as_dict()
 
 
-def fetch_structure_snapshot_with_quotes(node: str) -> tuple[dict[str, Any], dict[tuple[str, str, str], list[dict]]]:
-    """快照＋這個節點每條邊的逐字，**出自同一次查詢**（v3 引用核對用；plan §13：不要另查一次圖）。"""
+def fetch_structure_snapshot_with_quotes(node: str) -> tuple[dict[str, Any], dict[tuple[str, str, str], list[dict]],
+                                                                dict[str, frozenset[str]]]:
+    """快照＋這個節點每條邊的逐字＋控制關係（批次二 E9），**出自同一次查詢**（v3 引用核對用；plan §13：不要另查一次圖）。"""
     from query.structure import load_snapshot_with_quotes
 
-    view, quotes = load_snapshot_with_quotes(str(node))
-    return view.as_dict(), quotes
+    view, quotes, related = load_snapshot_with_quotes(str(node))
+    return view.as_dict(), quotes, related
 
 
 def demand_side_customers(record: Mapping[str, Any]) -> list[str]:
@@ -371,6 +381,14 @@ def entity_alias_map() -> dict[str, str]:
         return {}
 
 
+def evidence_splits() -> Mapping[str, str]:
+    """只拆標籤的證據格 → 舊格（批次二 E9；唯一 owner `query.bottleneck.EVIDENCE_LABEL_SPLITS`）——遞給不能 import `query`
+    的讀圖 staleness（`reading_status` 的 `evidence_splits=`）。"""
+    from query.bottleneck import EVIDENCE_LABEL_SPLITS
+
+    return EVIDENCE_LABEL_SPLITS
+
+
 def evidence_rank() -> Mapping[str, int]:
     """證據等級的 rank——唯一 owner 是 `query.bottleneck.EVIDENCE_RANK`，這裡只是把它遞給不能 import `query` 的
     讀圖 staleness（`alpha.structure_reading.staleness.reading_status` 的 `evidence_rank=`；Phase 6 Step 6.1）。
@@ -424,7 +442,8 @@ def reading_status_rows(edges: Sequence[Any], *, today: Any, as_of: Any = None,
             rows.append({"node": node, "unit": unit, "status": None, "reading_id": None,
                          "reason": f"這個節點的 {unit} 讀圖有紀錄但目前沒有現行的那一筆（已全部撤回）"})
         for unit, reading in current.items():
-            status = reading_status(reading, view.as_dict(), today=today, evidence_rank=rank, aliases=aliases)
+            status = reading_status(reading, view.as_dict(), today=today, evidence_rank=rank, aliases=aliases,
+                                    evidence_splits=evidence_splits())
             by_graph = needs_reread(status)
             # 讀圖頁要印得出「判讀憑哪一段原文」與「每條反證登記成哪一筆 watch」（Step 2.7；L18：標籤指得回原始證據）。
             # watch 以 `reading:<id>#<序>` 指回（`register_reading_watches` 的鍵）；沒登記到就是 None，照實印。
@@ -620,7 +639,7 @@ def known_nodes(*, directory: Path | None = None) -> list[str]:
     return nodes
 
 
-__all__ = ["STRUCTURE_READING_DIR", "append_reading_record", "demand_side_customers", "evidence_rank",
+__all__ = ["STRUCTURE_READING_DIR", "append_reading_record", "demand_side_customers", "evidence_rank", "evidence_splits",
            "fetch_structure_snapshot_with_quotes", "fetch_structure_snapshot", "known_nodes", "ledger_path",
            "read_reading_records",
            "register_reading_watches", "reread_reasons", "seat_readings_context", "seat_readings_for", "seats_from_edges",

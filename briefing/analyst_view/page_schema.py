@@ -247,9 +247,11 @@ BLOCK_READINGS: tuple[BlockReading, ...] = (
 #: （共識是時變數字，不入圖——L4；學理、推一步、沒有不是文件來源）。
 EVIDENCE_LEVEL_MAP: Mapping[str, Mapping[str, Any]] = {
     "primary": {"label": "一手", "graph": ("externally_corroborated", "counterparty_joint", "self_reported_costly",
-                                          "self_reported"),
+                                          "self_reported", "buyer_self_reported_costly", "buyer_self_reported",
+                                          "related_party_costly", "related_party"),
                 "note": "一手在圖上的等級由「誰寫的」決定：客戶或第三方＝外部印證、雙方聯合公告＝雙方聯合、被評公司自己的 filing＝自報·filing、"
-                        "自己的新聞稿或簡報＝供應商自報"},
+                        "自己的新聞稿或簡報＝供應商自報；主詞是買方（依賴／受限於）時本人說的是買方自述、"
+                        "母子公司／收購方／合資股東說的是關係人自述（filing 各另標）"},
     "industry_report": {"label": "產業報告", "graph": ("externally_corroborated", "media_relay"),
                         "note": "登記的發布者：逐份過了 publisher_lifts、引文具名主詞且不是轉述句＝外部印證；否則媒體轉述"},
     "media": {"label": "媒體", "graph": ("media_relay", "needs_review"),

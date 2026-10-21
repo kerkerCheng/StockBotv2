@@ -70,9 +70,13 @@ EVIDENCE_CLASS_TO_LEVEL: dict[str, str] = {
     "externally_corroborated": "corroborated",
     "counterparty_joint": "corroborated",
     "self_reported_costly": "bounded_hypothesis",
+    "buyer_self_reported_costly": "bounded_hypothesis",   # 批次二 E9：與拆出來的那一格同階（只拆標籤）
+    "related_party_costly": "bounded_hypothesis",
     "needs_review": "bounded_hypothesis",
     "media_relay": "bounded_hypothesis",   # 與 needs_review 同級（Step 4.3：只把 None 的兩義拆開，不是升降級）
     "self_reported": "unknown",
+    "buyer_self_reported": "unknown",
+    "related_party": "unknown",
 }
 
 CEILING_REASON = "evidence_quality_ceiling"

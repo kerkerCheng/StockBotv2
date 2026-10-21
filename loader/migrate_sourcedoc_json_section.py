@@ -389,7 +389,7 @@ def correction_evidence_changes(rows: list[Mapping[str, Any]], manifest: Mapping
     origin，逐字前後相同。`publishers_after`：更正之後的 publishers（含 `publishers_add`）；不給＝與現在相同。"""
     from identity.registry import get_registry
     from query.bottleneck import classify_evidence, collapse_assertions, shared_name_forms
-    from query.origin_resolution import get_publishers
+    from query.origin_resolution import get_publishers, related_parties
 
     new_origin = {str(c["doc_id"]): c["after"] for c in manifest["corrections"] if c["field"] == "origin_entity"}
     after_rows = [dict(r, origin=new_origin[str(r.get("source_doc_id"))]) if str(r.get("source_doc_id")) in new_origin
@@ -398,10 +398,13 @@ def correction_evidence_changes(rows: list[Mapping[str, Any]], manifest: Mapping
     shared = shared_name_forms(registry)
 
     def classes(source_rows, pubs):
+        edges = collapse_assertions(source_rows)
+        related = related_parties(edges.values())
         return {k: classify_evidence(e.src, e.origins, registry, filing_origins=e.filing_origins,
                                      quotes_by_assertion=quotes_by_assertion,
-                                     origin_assertions=e.origin_assertions, publishers=pubs, shared=shared)
-                for k, e in collapse_assertions(source_rows).items()}
+                                     origin_assertions=e.origin_assertions, relation=e.relation, related=related,
+                                     publishers=pubs, shared=shared)
+                for k, e in edges.items()}
 
     before = classes(rows, get_publishers())
     after = classes(after_rows, publishers_after if publishers_after is not None else get_publishers())

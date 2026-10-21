@@ -159,26 +159,51 @@ DEMAND_ANCHORS = load_demand_anchors()
 # ⚠ 任何列舉等級的表（`EVIDENCE_LABEL`、`alpha.narrative.argument.EVIDENCE_CLASS_PLAIN`、
 # `alpha.evidence_quality.EVIDENCE_CLASS_TO_LEVEL`、`alpha.providers.graph_neo4j._EVIDENCE_CLASS_TIER`）key 集合必須等於本表
 # （`tests/test_origin_resolution.py` 守著）；`query.graph_walk.CORROBORATED_EVIDENCE` 是子集、不含它。
+# `buyer_self_reported*`、`related_party*`（2026-10-21 批次二 E9；failure log #11、#10）：把「主詞自己說」與「主詞的
+# 關係人說」從兩個舊值裡拆出來（L12）。**rank 與它們拆出來的那一格相同**——只是標籤分開，不放寬也不收緊任何 gate；
+# 要給買方自述不同的 rank 先量測（INV-5）。關係人是從外部印證**降**下來的（控制關係的一方不是第三方，L8）。
 EVIDENCE_RANK = {
     "externally_corroborated": 4,
     "counterparty_joint": 3,
     "self_reported_costly": 2,
+    "buyer_self_reported_costly": 2,
+    "related_party_costly": 2,
     "needs_review": 1,
     "media_relay": 1,
     "self_reported": 0,
+    "buyer_self_reported": 0,
+    "related_party": 0,
 }
 EVIDENCE_LABEL = {
     "externally_corroborated": "外部印證",
     "counterparty_joint": "雙方聯合",
     "self_reported_costly": "自報·filing",
+    "buyer_self_reported_costly": "買方自述·filing",
+    "related_party_costly": "關係人自述·filing",
     "needs_review": "待判定",
     "media_relay": "媒體轉述",
     "self_reported": "供應商自報",
+    "buyer_self_reported": "買方自述",
+    "related_party": "關係人自述",
 }
-#: 同級時誰勝出（只有 needs_review／media_relay 同級）：一條邊同時有「解析不到」與「媒體轉述」的 origin 時印**待判定**——
-#: 還有一個沒認出來的來源，它仍可能是獨立第三方；印媒體轉述會讓人以為已經知道每一份是誰。
-#: 結果不得取決於 origin 字串的迭代順序（新增一份文件不該讓標籤來回翻）。
-_TIE_WINS = frozenset({"needs_review"})
+#: 同級時誰勝出——結果不得取決於 origin 字串的迭代順序（新增一份文件不該讓標籤來回翻）。值大者勝；不在表裡＝0。
+#: - needs_review 勝 media_relay：一條邊同時有「解析不到」與「媒體轉述」的 origin 時印**待判定**——還有一個沒認出來的來源，
+#:   它仍可能是獨立第三方；印媒體轉述會讓人以為已經知道每一份是誰。
+#: - 主詞自己（供應商自報／買方自述）勝關係人：兩者都不是第三方，標籤印說話的主角；關係人只多一個同一方的聲音。
+_TIE_ORDER: Mapping[str, int] = {
+    "needs_review": 1,
+    "self_reported": 1, "buyer_self_reported": 1,
+    "self_reported_costly": 1, "buyer_self_reported_costly": 1,
+}
+#: **只拆標籤**的格 → 它拆出來的那一格（E9）。讀圖 staleness 比對時兩邊都換回舊格再比：拆格前寫的快照印 self_reported、
+#: 現在印 buyer_self_reported，強度與意義都沒變——不換回來，升版當天 21 份現行讀圖會一起掉成 stale_low（實測 10-21）。
+#: 關係人**不在這裡**：它是從外部印證降下來的，是真的變化。
+EVIDENCE_LABEL_SPLITS: Mapping[str, str] = {
+    "buyer_self_reported": "self_reported",
+    "buyer_self_reported_costly": "self_reported_costly",
+}
+#: 主詞自己說、或主詞的關係人說——都不是第三方（rank 0 那三格；`self_reported_share` 讀它，不只讀舊的一個值）。
+SELF_SPEAKER_CLASSES: frozenset[str] = frozenset({"self_reported", "buyer_self_reported", "related_party"})
 QUALIFICATION_RANK = {"qualified": 3, "qualifying": 2, "designed_in": 2, "sampling": 1}
 
 
@@ -435,6 +460,8 @@ def edge_corroborations(
     *,
     quotes_by_assertion: Mapping[str, Iterable[str]],
     origin_assertions: Mapping[str, Iterable[tuple[Any, Any, Any]]],
+    relation: str,
+    related: Mapping[str, frozenset[str]],
     publishers=None,
     relay=None,
     shared: frozenset[str] | None = None,
@@ -445,25 +472,31 @@ def edge_corroborations(
     `quotes_by_assertion`、`origin_assertions` **必填**（Phase 6 Step 6.4；plan §5）：呼叫端沒給逐字就丟例外——
     靜默當成「沒有引文」會把全部邊降級，而那與「規則真的降了它們」同形（L13）。
     `origin_assertions`：`CanonicalEdge.origin_assertions`（origin → 引用這條邊的 `(assertion_id, doc, linkage)`）。
+    `relation`、`related`（批次二 E9）**必填**：邊的關係（主詞是買方時 origin＝主詞是買方自述）與
+    `query.origin_resolution.related_parties` 的輸出（控制關係；沒給就丟例外——同上，L13）。
     """
     from query.origin_resolution import corroboration, get_publishers
 
-    if quotes_by_assertion is None or origin_assertions is None:
-        raise TypeError("classify_evidence／edge_corroborations 需要 quotes_by_assertion 與 origin_assertions"
-                        "（逐來源具名核對讀逐字；沒給就丟例外，不得靜默把全部邊降級——L13）")
+    if quotes_by_assertion is None or origin_assertions is None or related is None:
+        raise TypeError("classify_evidence／edge_corroborations 需要 quotes_by_assertion、origin_assertions 與 related"
+                        "（逐來源具名核對讀逐字、關係人判定讀控制關係；沒給就丟例外，不得靜默讓標籤停在舊判定——L13）")
     pubs = publishers if publishers is not None else get_publishers()
     return [corroboration(origin, subject, origin_docs(origin_assertions.get(origin) or (), quotes_by_assertion),
-                          registry, filing=origin in filing_origins, publishers=pubs, relay=relay, shared=shared)
+                          registry, filing=origin in filing_origins, publishers=pubs, relay=relay, shared=shared,
+                          relation=relation, related=related)
             for origin in sorted({str(o) for o in origins if o})]
 
 
 def best_evidence(levels: Iterable[str]) -> str:
-    """取最高等級（同級時 `_TIE_WINS` 勝出——結果不得取決於迭代順序）；一個都沒有＝供應商自報。"""
-    best = "self_reported"
+    """取最高等級（同級時看 `_TIE_ORDER`——結果不得取決於迭代順序）；一個都沒有＝供應商自報。"""
+    # ⚠ 起點是「還沒有」，不是 self_reported：同級同序的買方自述要能贏過起點（E9）。
+    # 末鍵是字串本身——同級同序的兩格（例：供應商自報與買方自述）同一條邊上不會同時出現，但結果仍不得取決於順序。
+    best: str | None = None
     for level in levels:
-        if (EVIDENCE_RANK[level], level in _TIE_WINS) > (EVIDENCE_RANK[best], best in _TIE_WINS):
+        if best is None or ((EVIDENCE_RANK[level], _TIE_ORDER.get(level, 0), level)
+                            > (EVIDENCE_RANK[best], _TIE_ORDER.get(best, 0), best)):
             best = level
-    return best
+    return best or "self_reported"
 
 
 def classify_evidence(
@@ -474,6 +507,8 @@ def classify_evidence(
     *,
     quotes_by_assertion: Mapping[str, Iterable[str]],
     origin_assertions: Mapping[str, Iterable[tuple[Any, Any, Any]]],
+    relation: str,
+    related: Mapping[str, frozenset[str]],
     publishers=None,
     relay=None,
     shared: frozenset[str] | None = None,
@@ -481,7 +516,8 @@ def classify_evidence(
     """六分（五個等級＋與 needs_review 同級的 media_relay），取各 origin 所能支持的最高等級。
 
     每個 origin 的等級只由 `query.origin_resolution.corroboration`（唯一 owner）判——先經 `resolve_origin` 分成三態：
-    - **名冊公司**：是主詞 → 自報（filing 出身為 costly）；不是主詞 → 主詞是公司時，**這個 origin 自己的引文**要
+    - **名冊公司**：是主詞 → 自報（filing 出身為 costly；`relation` 的主詞是買方時是買方自述，E9）；是主詞的控制關係人
+      （`related`，E9）→ 關係人自述；其餘不是主詞 → 主詞是公司時，**這個 origin 自己的引文**要
       逐字具名主詞才是外部印證（否則待判定，Phase 6 Step 6.4）；主詞不是公司 → 外部印證。
     - **登記的發布者**（`config/publishers.json`）：`publisher_lifts` 逐份說算的那幾份文件裡，主詞是公司時要有一段
       具名主詞、不是轉述句（宣告 `independent` 的文件不套轉述）的引文 → 外部印證；否則 → 媒體轉述。
@@ -500,7 +536,8 @@ def classify_evidence(
     """
     return best_evidence(c.level for c in edge_corroborations(
         subject, origins, registry, filing_origins, quotes_by_assertion=quotes_by_assertion,
-        origin_assertions=origin_assertions, publishers=publishers, relay=relay, shared=shared))
+        origin_assertions=origin_assertions, relation=relation, related=related, publishers=publishers, relay=relay,
+        shared=shared))
 
 
 @dataclass
@@ -537,6 +574,10 @@ class CanonicalEdge:
     #: （`published_at`）。批次二 E3：舊讀圖快照沒有開發者這一類，升版時只有晚於讀圖日才取得的邊算新增
     #: （[815] Nokia 那份 published_at 是空的、retrieved_at 是 10-19——只有這一欄分得出來）。不進 digest。
     first_retrieved: str | None = None
+    #: 持股邊是不是**控制**（批次二 E9）：`acquired` 一律是；`invests_in` 要任一筆 assertion 宣告 `attributes.control`
+    #: 為 true（持股過半、合資共同控制、母子公司——逐字寫得出比例或母子關係）。少數股權不是（見 `related_parties`）。
+    #: 其他關係恆為 False。不進 digest。
+    control: bool = False
 
 
 def collapse_assertions(rows: Iterable[Mapping[str, Any]]) -> dict[tuple, CanonicalEdge]:
@@ -609,6 +650,9 @@ def collapse_assertions(rows: Iterable[Mapping[str, Any]]) -> dict[tuple, Canoni
         _take(key, edge, "qualification_status", attrs.get("qualification_status"), conf)
         if attrs.get("sole_source") is not None:
             _take(key, edge, "sole_source", bool(attrs["sole_source"]), conf)
+        # 控制是聯集（任一份文件寫出控制就是）：它是關係人判定的輸入，不是最可信那份的屬性值（E9）。
+        if rel == "acquired" or (rel == "invests_in" and attrs.get("control") is True):
+            edge.control = True
     return grouped
 
 
@@ -877,6 +921,7 @@ def structure_table(
     給了 `sub_language_flags`，每列另多一格 `sub_language_in_quote`：**贏得這一列 sub 值的那筆**引文撐不撐得住
     （Phase 6 Step 6.5；旗標跟著值走，不挑同一條邊上另一筆好看的）。
     """
+    from query.origin_resolution import related_parties
     from query.sub_language import canonical_sub_language
 
     rows = list(rows)
@@ -890,10 +935,12 @@ def structure_table(
                 without_by_edge[(str(row.get("src")), str(row.get("relation")), str(row.get("dst")))].append(aid)
     edges = list(canonical.values())
     shared = shared_name_forms(registry)
+    related = related_parties(edges)
     for edge in edges:
         edge.evidence = classify_evidence(
             edge.src, edge.origins, registry, filing_origins=edge.filing_origins,
-            quotes_by_assertion=quotes_by_assertion, origin_assertions=edge.origin_assertions, shared=shared,
+            quotes_by_assertion=quotes_by_assertion, origin_assertions=edge.origin_assertions,
+            relation=edge.relation, related=related, shared=shared,
         )
 
     upward = build_upward_index(edges)
@@ -951,7 +998,7 @@ def structure_table(
                 1 for e in edges if e.lead_time_weeks is not None
             ),
             "self_reported_share": (
-                sum(1 for e in with_sub if e.evidence == "self_reported") / len(with_sub)
+                sum(1 for e in with_sub if e.evidence in SELF_SPEAKER_CLASSES) / len(with_sub)
                 if with_sub
                 else 0.0
             ),
