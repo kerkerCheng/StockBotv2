@@ -533,7 +533,7 @@ def test_ra_admission_cannot_resolve_without_verified_completion() -> None:
         )
 
 
-def test_complete_ra_validates_authorities_and_resolves(monkeypatch) -> None:
+def test_complete_ra_validates_authorities_and_resolves(monkeypatch, _isolate_new_listing_history) -> None:
     """⚠ 2026-09-23（Phase 0 Step 0b.4）：Decision handoff 隨 decision_lab 研究側退役——
     receipt 只剩 action／digest／commit，complete-ra **不得**再碰 Decision Store（沒有 cohort 可建）。
     原測試名 `..._hands_off_and_resolves` 守的那個 handoff 呼叫已不存在，改守「沒有 handoff」。"""
@@ -578,6 +578,9 @@ def test_complete_ra_validates_authorities_and_resolves(monkeypatch) -> None:
     assert pool["items"][0]["completion_authority"]["company_id"] == "co:axt"
     assert "cohort_id" not in pool["items"][0]["completion_authority"]
     assert pool["log"][-1]["receipt"] == result["receipt"]
+    # 批次二 E1（#81）：入圖包的名冊條目讀不出是哪幾家——交給回補端從資料判（tickers=None）
+    assert _isolate_new_listing_history.calls == [{"tickers": None, "reason": "ra:ra_abc"}]
+    assert result["engine_c_history"]["outcome"] == "isolated_in_tests"
 
 
 @pytest.mark.parametrize("approval", [None, {"pq2_n": 2, "digest": "a" * 64}, {"pq2_n": 1, "digest": "c" * 64}])

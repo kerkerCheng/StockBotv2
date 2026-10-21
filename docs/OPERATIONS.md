@@ -1749,7 +1749,13 @@ Get-Content library\private\heartbeat\daily_run_<YYYY-MM-DD>.json          # 03_
 # 月營收（互動式；每月 11 日後跑一次 --sync 就跟得上）
 & '.venv\Scripts\python.exe' -m engine_c.monthly_revenue --ticker 3081.TWO
 & '.venv\Scripts\python.exe' -m engine_c.monthly_revenue --sync
-& '.venv\Scripts\python.exe' -m engine_c.monthly_revenue --backfill 24
+& '.venv\Scripts\python.exe' -m engine_c.monthly_revenue --backfill 54     # 三年窗要 54 個月（failure log #81：40 個月只有 857 天）
+
+# 新登記的台股（Phase 7 批次二 E1，2026-10-21）：`todo complete-registry-batch`（本批的台股）與 `todo complete-ra`
+# （名冊上一筆歷史都沒有、沒試過的台股——入圖包的名冊條目隨包手寫，完成時讀不出是哪幾家）完成時**自己**回補月營收
+# 54 個月、季報股數 20 季；失敗不擋名冊，收據在回傳的 `engine_c_history`，每次嘗試 append 進
+# library/private/engine_c/new_listing_backfill.jsonl。試過仍沒有的不重打——心跳的「一筆都沒有」與「三年窗不滿」照樣點名。
+# sandbox：只在兩條互動 complete 路徑多一個 MOPS 讀取（主機與 --backfill 同一台）＋Engine C 寫入；不進 daily、不新增 rule。
 
 # 抓取層（要看原始列或某個歷史月份時才用）
 & '.venv\Scripts\python.exe' -m fetchers.mops_open_data --revenue --market tpex --year 2026 --month 7

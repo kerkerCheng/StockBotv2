@@ -592,10 +592,14 @@ def _monthly_revenue_line(*, now: datetime) -> str:
                 empty.append(ticker)
                 continue
             latest[ticker] = str(rows[0].get("data_month") or "")
+        # 批次二 E1（#81）：「有值、湊不滿三年窗」原本不印——10-18 回補 40 個月後仍只有 857 天（要 54 個月）
+        from engine_c.new_listing_history import window_shortfall
+
+        short = window_shortfall(conn, tickers, today=now.astimezone().date())["monthly"]
     finally:
         conn.close()
     if not latest:
-        return f"台股月營收 {len(tickers)} 檔｜**一筆都沒有**（跑 `python -m engine_c.monthly_revenue --backfill 24`）"
+        return f"台股月營收 {len(tickers)} 檔｜**一筆都沒有**（跑 `python -m engine_c.monthly_revenue --backfill 54`）"
     newest = max(latest.values())
     oldest = min(latest.values())
     today = now.astimezone().date().isoformat()
@@ -613,6 +617,9 @@ def _monthly_revenue_line(*, now: datetime) -> str:
         line += f" ～ {newest}"
     if empty:
         line += f"｜**{len(empty)} 檔一筆都沒有**：" + "、".join(empty)
+    if short:
+        line += (f"｜三年窗不滿 {len(short)} 檔（剛上市的也算——那是事實；回補不夠的跑 "
+                 "`python -m engine_c.monthly_revenue --backfill 54`）：" + "、".join(short))
     line += (f"｜⚠ 落後 {lag} 個月（跑 `python -m engine_c.monthly_revenue --sync`）"
              if lag else "｜已跟上公告期限")
     return line
@@ -653,6 +660,9 @@ def _tw_share_capital_line(*, now: datetime) -> str:
             rejected += len({r["period_end"] for r in known["rejected"]})
             if period not in {str(c["period_end"])[:10] for c in known["cover"]}:
                 latest_unusable.append(f"{ticker} {year}Q{quarter}")
+        from engine_c.new_listing_history import window_shortfall
+
+        short = window_shortfall(conn, tickers, today=today)["shares"]       # 批次二 E1（#81）
     finally:
         conn.close()
     if not latest:
@@ -668,6 +678,9 @@ def _tw_share_capital_line(*, now: datetime) -> str:
         line += "｜最新一季不能用（`--sync` 修不了，接著用前一季）：" + "、".join(latest_unusable)
     if rejected:
         line += f"｜不用的季共 {rejected} 筆"
+    if short:
+        line += (f"｜三年窗不滿 {len(short)} 檔（回補不夠的跑 `python -m engine_c.tw_share_capital --backfill 20`）："
+                 + "、".join(short))
     line += (f"｜⚠ 落後 {lag} 季（跑 `python -m engine_c.tw_share_capital --sync`）" if lag > 0
              else "｜已跟上法定期限")
     return line

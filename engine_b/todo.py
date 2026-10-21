@@ -1368,8 +1368,22 @@ def complete_registry_batch(pool: dict[str, Any], n: int, *, at: str | None = No
     receipt = f"authority:registry_batch;ref:{digest[:16]}"
     resolve(pool, n, "go", reason="使用者核准後寫入名冊（凍結 spec、digest 相符、整批重新驗證）",
             receipt=receipt, at=at, _skip_receipt_validation=True)
+    history = _new_listing_history([e.get("research_ticker") for e in entries], reason=f"registry_batch:{digest[:16]}")
     return {"receipt": receipt, "registered": [e["company_id"] for e in entries], **rescan,
+            "engine_c_history": history,
             "next": "commit config/company_identity.json（名冊是版本控制內的 authority）"}
+
+
+def _new_listing_history(tickers: Any, *, reason: str) -> dict[str, Any]:
+    """名冊寫完之後補新台股的 Engine C 歷史（Phase 7 批次二 E1，failure log #81）。`tickers=None`＝從資料判
+    （名冊上一筆歷史都沒有、沒試過的台股）。**失敗只寫進收據、不擋名冊**——名冊已經寫了（INV-3：照數印出來）。
+    測試由 conftest 的 autouse fixture 換掉這一支（不打 MOPS、不寫正式庫）。"""
+    try:
+        from engine_c.new_listing_history import backfill_new_listings
+
+        return backfill_new_listings(tickers, reason=reason)
+    except Exception as exc:  # noqa: BLE001
+        return {"outcome": "error", "reason": reason, "error": f"{type(exc).__name__}: {exc}"[:300]}
 
 
 def complete_thesis_mutation(
@@ -1478,7 +1492,9 @@ def complete_ra_admission(
         receipt=receipt,
         at=stamp,
     )
-    return {"item": resolved, "action": action_id, "receipt": receipt}
+    # E1（#81）：入圖包的名冊條目隨包手寫、完成時讀不出新增了哪幾家——從資料判（一筆歷史都沒有、沒試過的台股）
+    history = _new_listing_history(None, reason=f"ra:{action_id}")
+    return {"item": resolved, "action": action_id, "receipt": receipt, "engine_c_history": history}
 
 
 def retire_legacy_pq1_items(

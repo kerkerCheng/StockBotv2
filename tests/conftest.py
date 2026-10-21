@@ -68,6 +68,23 @@ def _isolate_event_watch_registry(tmp_path_factory, monkeypatch):
 
 
 @pytest.fixture(autouse=True)
+def _isolate_new_listing_history(monkeypatch):
+    """名冊寫入完成後的新台股歷史回補（批次二 E1）會打 MOPS、寫正式 Engine C——測試一律換成記錄器。
+    與上面同一個理由用 autouse：忘記隔離不會有錯誤訊息，只會靜默打網路、寫真庫。呼叫紀錄放在 `calls`。"""
+    from engine_b import todo
+
+    calls: list[dict] = []
+
+    def record(tickers, *, reason):
+        calls.append({"tickers": None if tickers is None else list(tickers), "reason": reason})
+        return {"outcome": "isolated_in_tests", "reason": reason}
+
+    record.calls = calls
+    monkeypatch.setattr(todo, "_new_listing_history", record)
+    return record
+
+
+@pytest.fixture(autouse=True)
 def _isolate_layer_note_ledger(tmp_path_factory, monkeypatch):
     """把層說明 ledger（2026-10-07 個股頁 S4a）導向空的暫存目錄。
 

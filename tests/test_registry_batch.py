@@ -108,7 +108,8 @@ def _registry_copy(tmp_path: Path) -> Path:
     return target
 
 
-def test_registry_batch_is_written_only_by_complete_after_the_frozen_spec_matches(tmp_path, monkeypatch) -> None:
+def test_registry_batch_is_written_only_by_complete_after_the_frozen_spec_matches(
+        tmp_path, monkeypatch, _isolate_new_listing_history) -> None:
     registry_path = _registry_copy(tmp_path)
     entry = {"company_id": "co:test_newco", "research_ticker": "TNCO", "market_currency": "USD",
              "display_name": "Test Newco Inc.", "_display_name_source": "test", "_note": "n", "name_aliases": []}
@@ -144,6 +145,10 @@ def test_registry_batch_is_written_only_by_complete_after_the_frozen_spec_matche
     assert result["registered"] == ["co:test_newco"] and result["receipt"].startswith("authority:registry_batch;ref:")
     assert "co:test_newco" in json.loads(registry_path.read_text(encoding="utf-8"))["companies"][-1]["company_id"]
     assert "co:test_newco" in leads.load(leads_path)["leads"][lead_id]["entities"]["company_ids"]   # 同一個動作重算
+    # 批次二 E1（#81）：名冊寫完同一個動作補新條目的 Engine C 歷史（本批的代號；只補台股由回補端篩）
+    assert _isolate_new_listing_history.calls == [
+        {"tickers": ["TNCO"], "reason": f"registry_batch:{result['receipt'].rsplit(':', 1)[-1]}"}]
+    assert result["engine_c_history"]["outcome"] == "isolated_in_tests"
     with pytest.raises(todo.TodoError, match="不存在或已處理"):
         todo.complete_registry_batch(pool, item["n"], registry_path=registry_path)
 
