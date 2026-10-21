@@ -105,6 +105,19 @@ def test_the_language_gap_flag_only_fires_when_the_text_is_mainly_cjk_and_no_nod
     assert im.impact(lead, _ctx(BRIEFS))["language_gap"] is gap
 
 
+@pytest.mark.parametrize("text, hit", [
+    ("Samsung to make the NVHBM base die at TSMC", True),          # 10-21 漏抓回放：左邊黏著大寫
+    ("custom HBM4E stacks", True), ("two CPOs per switch", False),   # 右邊接數字算；CPO 不是這個 fixture 的節點
+    ("HBMs are sold out", True), ("hbm demand", False),              # 複數 s 算；全小寫不算（縮寫要大寫）
+    ("XHBMX", False), ("the 3HBM rumor", False),                     # 右邊接字母、左邊接數字照舊不算
+    ("an EHBM thing", False), ("ABCHBM", False),                      # 前綴只准恰好兩個大寫（全庫回放 EPIC、CHANNELS 誤報）
+])
+def test_an_all_caps_abbreviation_matches_inside_a_product_name_but_not_inside_a_word(monkeypatch, text, hit) -> None:
+    monkeypatch.setattr(im, "HUB_SHARE", 1.1)
+    ctx = _ctx(BRIEFS, node_names={"tech:hbm": "High Bandwidth Memory (HBM)"})
+    assert ("tech:hbm" in im.node_mentions(text, ctx)) is hit
+
+
 def test_no_entities_and_untouched_are_declared_not_silent(monkeypatch) -> None:
     monkeypatch.setattr(im, "HUB_SHARE", 1.1)
     ctx = _ctx(BRIEFS)

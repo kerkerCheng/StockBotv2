@@ -127,11 +127,20 @@ def lead_entities(lead: Mapping[str, Any], ctx: Context) -> tuple[list[str], lis
     return given, scanned
 
 
+def _form_pattern(form: str) -> re.Pattern[str]:
+    """全大寫縮寫（HBM、CPO、MLCC）左邊可接**恰好兩個**大寫字母的廠商前綴、右邊可接數字或複數 s——NVHBM、HBM4E、
+    PICs 都是同一層（10-21 漏抓回放：韓媒寫「NVHBM base die」對不到 HBM 讀圖）。前綴放寬到任意大寫會誤報：全庫回放
+    「EPIC」對到 PIC、「CHANNELS」對到 ELS——所以只放到資料支持的那一格（L17）。其餘寫法兩側都要字界。"""
+    if form.isupper() and form.isalnum():
+        return re.compile(r"(?<![A-Za-z0-9_])(?:[A-Z]{2})?" + re.escape(form) + r"s?(?![A-Za-z_])")
+    return re.compile(r"(?<![A-Za-z0-9_])" + re.escape(form) + r"(?![A-Za-z0-9_])", 0 if " " not in form else re.I)
+
+
 def node_mentions(text: str, ctx: Context) -> list[str]:
     hits = []
     for nid, forms in ctx.node_forms.items():
         for form in forms:
-            pattern = re.compile(r"(?<![A-Za-z0-9_])" + re.escape(form) + r"(?![A-Za-z0-9_])", 0 if " " not in form else re.I)
+            pattern = _form_pattern(form)
             if pattern.search(text):
                 hits.append(nid)
                 break
