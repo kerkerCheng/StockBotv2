@@ -199,6 +199,14 @@ def _point(row: Mapping[str, Any] | None) -> str:
     return f"第 {float(row['value']):.1f}"
 
 
+def _then_point(row: Mapping[str, Any] | None, source: str | None) -> str:
+    """當時的值＋它是哪一根收盤、怎麼來的（回算或寫入時記下）——兩個數字並列時才分得出哪個是當時看到的（R2）。"""
+    if not row or row.get("value") is None:
+        return _point(row)
+    how = "回算" if source == "recomputed" else "寫入時記下"
+    return f"{_point(row)}（{str(row.get('as_of') or '')[5:10]} 收盤，{how}）"
+
+
 def priced_since(ticker: str, brief: InvestorBrief, judged: InvestorBrief, *, judgment_day: Any,
                  then: Mapping[str, Any] | None, then_source: str, now: Mapping[str, Any] | None,
                  return_since: float | None, wait: Mapping[str, Any] | None = None) -> dict[str, Any] | None:
@@ -215,17 +223,17 @@ def priced_since(ticker: str, brief: InvestorBrief, judged: InvestorBrief, *, ju
     day = str(judgment_day)[5:10]
     label = ("等回落" if state == "priced_wait" else {"yes": "已定價答是", "no": "已定價答否"}.get(str(answer), "答量不到"))
     then_basis, now_basis = (then or {}).get("basis"), (now or {}).get("basis")
-    then_text = _point(then) + (f"（{str((then or {}).get('as_of') or '')[5:10]} 收盤"
-                                + ("，回算" if then_source == "recomputed" else "，寫入時記下") + "）"
-                                if (then or {}).get("value") is not None else "")
+    then_text = _then_point(then, then_source)
     now_text = _point(now) + (f"（{str((now or {}).get('as_of') or '')[5:10]} 收盤）" if now_valued else "")
-    basis = (f"自家三年 {now_basis or then_basis}" if (then_basis == now_basis or not then_basis or not now_basis)
-             else f"判斷時 {then_basis}、今天 {now_basis}——兩把尺")
+    if then_basis and now_basis and then_basis != now_basis:
+        basis = f"判斷時 {then_basis}、今天 {now_basis}——兩把尺"
+    else:
+        basis = "自家三年" + (f" {now_basis or then_basis}" if (now_basis or then_basis) else "")   # 兩邊都沒口徑不印 None
     line = f"{label} {ticker}｜判斷日 {day}：{basis} {then_text} → 今天 {now_text}"
     if return_since is not None:
         line += f"｜判斷日以來 {_signed_pct(return_since)}（調整後收盤）"
     if wait:
-        line += (f"｜等回落自 {str(wait.get('day'))[5:10]}（同一筆等待）：{_point(wait.get('then'))}"
+        line += (f"｜等回落自 {str(wait.get('day'))[5:10]}（同一筆等待）：{_then_point(wait.get('then'), wait.get('then_source'))}"
                  + (f"、{_signed_pct(wait['return'])}" if wait.get("return") is not None else ""))
     return {"answer": answer, "state": state, "judgment_brief_id": judged.brief_id, "judgment_day": str(judgment_day),
             "then": dict(then or {}), "then_source": then_source, "now": dict(now or {}),

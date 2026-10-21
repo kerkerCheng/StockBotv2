@@ -43,9 +43,10 @@ def own_history_at(ticker: str, day: date, *, history_not_comparable: Mapping[st
                    conn: Any = None) -> dict[str, Any]:
     """點時（as-of `day`）的已定價①——取數全部帶 as-of 欄位（價格 bar ≤ day、申報 filed ≤ day、台股月營收法定截止
     ≤ day、股數 available_on ≤ day），所以這就是「day 那天已公開的資料算出來的百分位」（INV-6）。
-    ⚠ 舊版本的判斷日一律用**判斷日（台北）前一天**當 `day`：daily 05:30 才抓前一天收盤，寫敘事的人那天看到的最新
-    一根 bar 是前一天的（2026-10-21 抽查 16 份手打百分位，前一天截點 15 份差 ≤0.5、含當天截點 6 份差 >1）。
-    回算不等於寫入當時看到的（事後資料或程式變動）——呼叫端要標「回算」。"""
+    ⚠ 舊版本的 `day` 一律用 `alpha.providers.candidates.knowable_bar_day(created_at)`——寫入當下系統手上最後一根收盤
+    的日子：daily（`schedule.daily_local_time`）才抓前一天收盤，那之前寫的只有前前一天（2026-10-21 R2：原本寫死
+    「判斷日前一天」，台北 00:00–05:30 寫的 8 列會往後多看一根）。回算不等於寫入當時看到的（事後資料或程式變動）——
+    呼叫端要標「回算」。"""
     if history_not_comparable is None and conn is None:
         return dict(_member_snapshot(ticker, day.isoformat())[0])
     inp = _inputs(ticker, day, conn or _conn_for("ro"))

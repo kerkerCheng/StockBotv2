@@ -503,19 +503,27 @@ class PricedSnapshot:
 #: 已定價的位置詞（ROADMAP 已定價變動計數器；failure log #94）：priced_in 那一格與候選理由裡，**沒寫日期**的句子出現
 #: 就拒收——數字每天重填、這句不會。只在寫入端（`alpha/providers/briefs.py`），不在 parse（舊紀錄照讀）。
 #: 刻意不收：偏低（NVTS「這個百分位只會偏低」講量測偏差）、高點／低點／最高／最低（多半是有日期的價格事實）、
-#: 高處／低處（「這三年的低處是一家…公司」講歷史）、高端（產品等級）。2026-10-21 回放：priced_in 命中 11 份、
-#: 理由命中 7 份，逐句人工看過沒有誤報；有日期的寫法（1815「寫這句的 2026-10-18 當天…頂部」）放行。
-PRICED_POSITION_WORDS: tuple[str, ...] = ("高檔", "低檔", "頂部", "底部", "上緣", "下緣", "偏貴", "便宜", "中段", "中間",
-                                          "偏上", "偏下")
-PRICED_DATE_MARK = re.compile(r"\d{4}-\d{1,2}-\d{1,2}|\d{1,2}-\d{1,2}\s*收盤|\d{1,2}\s*月\s*\d{1,2}\s*日|寫這|寫入時|寫時|當天")
+#: 高處／低處（「這三年的低處是一家…公司」講歷史）、高端（產品等級）。2026-10-21 回放（R2 補「最貴」後）：priced_in
+#: 命中 12 份、理由命中 8 份、聯集 15 份，逐句人工看過沒有誤報；有日期的寫法（1815「寫這句的 2026-10-18 當天…頂部」）放行。
+#: 「最便宜」由「便宜」涵蓋。
+PRICED_POSITION_WORDS: tuple[str, ...] = ("高檔", "低檔", "頂部", "底部", "上緣", "下緣", "偏貴", "最貴", "便宜", "中段",
+                                          "中間", "偏上", "偏下")
+#: 日期標記：寫出的日子，或「寫這／寫入時／寫時」（候選板印判斷日，寫入時＝那一天）。單獨的「當天」不算——
+#: 「法說會當天之後股價在高檔」不是寫入日（R2 2026-10-21）。
+PRICED_DATE_MARK = re.compile(r"\d{4}-\d{1,2}-\d{1,2}|\d{1,2}-\d{1,2}\s*收盤|\d{1,2}\s*月\s*\d{1,2}\s*日|寫這|寫入時|寫時")
+#: 候選理由不是專講價格的欄位：「指引下緣」「循環底部」「中段製程」是別的事——理由那一欄只在句子同時講到價格時才檢查
+#: （R2 2026-10-21；priced_in 那一格本來就是講價格，照舊每句都檢查）。
+PRICED_PRICE_WORDS: tuple[str, ...] = ("自家", "百分位", "P/S", "EV/S", "價格", "股價", "倍數", "估值")
 _SENTENCE_SPLIT = re.compile(r"[。；\n]")
 
 
-def undated_position_claims(text: str) -> list[tuple[list[str], str]]:
-    """沒寫日期、卻用了位置詞的句子：[(命中的詞, 那一句)]。"""
+def undated_position_claims(text: str, *, require_price_word: bool = False) -> list[tuple[list[str], str]]:
+    """沒寫日期、卻用了位置詞的句子：[(命中的詞, 那一句)]。`require_price_word`：只看同時講到價格的句子（候選理由用）。"""
     out: list[tuple[list[str], str]] = []
     for sentence in _SENTENCE_SPLIT.split(text or ""):
         words = [w for w in PRICED_POSITION_WORDS if w in sentence]
+        if require_price_word and not any(p in sentence for p in PRICED_PRICE_WORDS):
+            continue
         if words and not PRICED_DATE_MARK.search(sentence):
             out.append((words, sentence.strip()))
     return out

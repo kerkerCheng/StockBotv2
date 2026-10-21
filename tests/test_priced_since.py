@@ -188,9 +188,13 @@ def test_a_handwritten_snapshot_is_refused(tmp_path: Path) -> None:
 @pytest.mark.parametrize("field, text, refused", [
     ("priced", "已定價：價格已在自家三年的高檔，第 {own_history_pctile} 百分位。", True),
     ("priced", "已定價：寫這句的 2026-10-20 當天在自家三年高檔，第 {own_history_pctile} 百分位。", False),
-    ("reason", "偏貴那一端，等回落", True),
+    ("reason", "價格在偏貴那一端，等回落", True),
     ("reason", "寫入時第 87 百分位，等回落", False),
     ("bottleneck", "只有高端產品線缺貨。", False),                         # 位置詞規則只看已定價那一格與理由
+    ("priced", "已定價：在自己歷史的最貴那一端，第 {own_history_pctile}。", True),       # R2：MXL 同模板漏擋
+    ("reason", "價格在自家歷史最貴那一端不是改判理由", True),
+    ("reason", "缺：Q2 營益率落在指引下緣以上的證據", False),                  # 理由沒講價格的句子不檢查（R2）
+    ("priced", "已定價：法說會當天之後股價在高檔，第 {own_history_pctile}。", True),       # 單獨的「當天」不是寫入日
 ])
 def test_an_undated_position_word_is_refused_only_where_the_percentile_is_judged(tmp_path, field, text, refused) -> None:
     ctx, wid = _ctx()
@@ -254,5 +258,53 @@ def test_the_heartbeat_prints_zero_and_each_wait_row_and_the_short_line_keeps_da
     assert "記下 0｜回算 1" in lines[-1]
     short = hb._priced_wait_short(full)
     assert "AXTI 86.8→88.0 −13.5%（等回落自 09-29 −22.2%）" in short     # 日期的連字號不被換成負號
+    assert "等回落起點的值有回算的" in short
     for word in ("該", "燈", "買", "賣"):
         assert word not in short
+
+
+# ---- R2（2026-10-21）的條件 ----
+
+def test_a_version_written_before_the_daily_run_only_knew_the_bar_before_yesterday() -> None:
+    """R2 D1：daily 05:30（台北）才抓前一天收盤——00:38 寫的版本手上最後一根是前前一天（美股那天收盤甚至還不存在）。"""
+    from alpha.providers.candidates import knowable_bar_day
+
+    assert knowable_bar_day(datetime(2026, 10, 16, 16, 38, tzinfo=timezone.utc)) == date(2026, 10, 15)   # 台北 10-17 00:38
+    assert knowable_bar_day(datetime(2026, 10, 17, 4, 0, tzinfo=timezone.utc)) == date(2026, 10, 16)     # 台北 10-17 12:00
+    early = _rec(at=datetime(2026, 10, 16, 16, 38, tzinfo=timezone.utc))
+    row, calls = _derive([parse_brief_record(early)])
+    assert row["priced_since"]["judgment_day"] == "2026-10-17" and calls[0] == date(2026, 10, 15)
+
+
+def test_the_wait_start_says_it_was_recomputed_and_from_which_close() -> None:
+    row, _ = _derive(_chain())
+    assert "等回落自 09-29（同一筆等待）：第 86.8（09-28 收盤，回算）" in row["priced_since"]["line"]
+
+
+def test_a_transient_unreadable_snapshot_falls_back_to_recomputing() -> None:
+    snap = {"recorded_on": "2026-10-15", "value": None, "absence_kind": "upstream_unavailable",
+            "reason": "寫入當下讀不到三題稽核區"}
+    a = parse_brief_record(_rec(at=_at(10, 15), priced_at_write=snap))
+    row, calls = _derive([a])
+    assert row["priced_since"]["then_source"] == "recomputed" and calls == [date(2026, 10, 14)]
+
+
+def test_a_handwritten_snapshot_is_refused_even_on_a_retraction(tmp_path: Path) -> None:
+    ctx, wid = _ctx()
+    first = _fresh(wid)
+    write_brief(first, ctx=ctx, directory=tmp_path / "b", watches_path=tmp_path / "w.json")
+    retraction = brief_record(company_id=CO, ticker=T, slots=_slots(), record_version=RECORD_VERSION_V2,
+                              rides=[{"node": "tech:x", "unit": "layer", "reading_id": READ}],
+                              answers={"priced_in": "yes", "in_numbers": "yes"},
+                              candidate_state={"state": "priced_wait", "watch_id": wid, "reason": "寫入時第 88 百分位"},
+                              supersedes_id=first["brief_id"], retracted=True)
+    with pytest.raises(ContractViolation, match="不收手寫"):
+        write_brief({**retraction, "priced_at_write": {"recorded_on": "2026-10-21", "value": 1.0}}, ctx=ctx,
+                    directory=tmp_path / "b", watches_path=tmp_path / "w.json")
+
+
+def test_no_basis_on_either_side_prints_no_none() -> None:
+    brief = parse_brief_record(_rec(at=_at(10, 15)))
+    out = priced_since(T, brief, brief, judgment_day="2026-10-15", then={"absence_kind": "inputs_incompatible"},
+                       then_source="recomputed", now={"absence_kind": "inputs_incompatible"}, return_since=None)
+    assert "None" not in out["line"] and "自家三年 量不到" in out["line"]

@@ -7,6 +7,7 @@ content-addressed id 拒絕重複、secret 拒絕、`supersedes_id` 必須指到
 from __future__ import annotations
 
 import json
+from datetime import date as date_type
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
@@ -319,9 +320,9 @@ def v2_write_problems(parsed: InvestorBrief, *, ctx: WriteContext, existing: Seq
 
     # ⑧ 已定價的位置詞要帶日期（ROADMAP 已定價變動計數器；failure log #94）：「高檔」「偏貴」這種依賴百分位大小的結論，
     #   數字每天重填、這句不會——換騎照抄舊句就會把舊判斷包裝成新日期。只擋寫入；舊紀錄照讀（不放 parse 路徑）。
-    for label, text in (("priced_in", slots.get("priced_in", "")),
-                        ("candidate_state.reason", (cs.reason or "") if cs is not None else "")):
-        for words, sentence in undated_position_claims(text):
+    for label, text, need_price in (("priced_in", slots.get("priced_in", ""), False),
+                                    ("candidate_state.reason", (cs.reason or "") if cs is not None else "", True)):
+        for words, sentence in undated_position_claims(text, require_price_word=need_price):
             problems.append(f"{label}：「{'、'.join(words)}」是依賴百分位大小的位置結論，數字每天重填、這句不會——"
                             f"拿掉，或寫明日期（「寫這句的 YYYY-MM-DD 當天…」）；判斷當時的百分位寫入端已自動記下："
                             f"{sentence[:40]}")
@@ -330,17 +331,24 @@ def v2_write_problems(parsed: InvestorBrief, *, ctx: WriteContext, existing: Seq
 
 def priced_snapshot(three_questions: Mapping[str, Any] | None, *, today: Any) -> dict[str, Any]:
     """寫入當下的已定價①（`priced_at_write`）：照抄三題稽核區自家歷史那一行，讀不到就照實記缺席（不得空著，INV-3）。"""
-    day = today.isoformat() if hasattr(today, "isoformat") else str(today)
+    from alpha.absence import check_absence_kind
+
+    from ..narrative.contracts import PricedSnapshot
+
+    day = today if isinstance(today, date_type) else date_type.fromisoformat(str(today)[:10])
+    row = next((r for r in (three_questions or {}).get("priced_in") or () if r.get("key") == "own_history_pctile"), None)
     if three_questions is None:
-        return {"recorded_on": day, "absence_kind": "upstream_unavailable", "reason": "寫入當下讀不到三題稽核區"}
-    row = next((r for r in three_questions.get("priced_in") or () if r.get("key") == "own_history_pctile"), None)
-    if row is None:
-        return {"recorded_on": day, "absence_kind": "upstream_unavailable", "reason": "三題稽核區沒有自家歷史那一行"}
-    if row.get("absence_kind") is not None:
-        return {"recorded_on": day, "absence_kind": str(row["absence_kind"]),
-                "reason": str(row.get("reason") or "（三題沒有寫理由）"), "basis": row.get("basis")}
-    return {"recorded_on": day, "value": float(row["value"]), "basis": row.get("basis"), "as_of": row.get("as_of"),
-            "multiple": (row.get("detail") or {}).get("multiple_today")}
+        snap = PricedSnapshot(recorded_on=day, absence_kind="upstream_unavailable", reason="寫入當下讀不到三題稽核區")
+    elif row is None:
+        snap = PricedSnapshot(recorded_on=day, absence_kind="upstream_unavailable", reason="三題稽核區沒有自家歷史那一行")
+    elif row.get("absence_kind") is not None:
+        check_absence_kind(str(row["absence_kind"]))
+        snap = PricedSnapshot(recorded_on=day, absence_kind=str(row["absence_kind"]),
+                              reason=str(row.get("reason") or "（三題沒有寫理由）"), basis=row.get("basis"))
+    else:
+        snap = PricedSnapshot(recorded_on=day, value=float(row["value"]), basis=row.get("basis"),
+                              as_of=row.get("as_of"), multiple=(row.get("detail") or {}).get("multiple_today"))
+    return snap.as_dict()                                       # 正規形狀（有值與缺席同一組鍵），R2 2026-10-21
 
 
 def write_brief(record: Mapping[str, Any], *, ctx: WriteContext, directory: Path | None = None,
@@ -362,11 +370,11 @@ def write_brief(record: Mapping[str, Any], *, ctx: WriteContext, directory: Path
     settle_due(ctx.watches, parsed.company_id, brief_ids=brief_ids, today=ctx.today)
     if parsed.history_not_comparable is not None and ctx.three_questions_reload is not None:
         ctx.three_questions = ctx.three_questions_reload(parsed.history_not_comparable.as_dict())
+    # 判斷當時的已定價①由寫入端記下（不進 id；換騎也記——那一刻的值就是那一版寫入時看到的）。手寫的一律拒收（含撤回）：
+    # 寫的人手打的數字不是「T 時刻系統知道什麼」（INV-6）。
+    if record.get("priced_at_write") is not None:
+        raise ContractViolation("priced_at_write 由寫入端從當下的三題記下，不收手寫")
     if parsed.record_version == RECORD_VERSION_V2 and not parsed.retracted:
-        # 判斷當時的已定價①由寫入端記下（不進 id；換騎也記——那一刻的值就是那一版寫入時看到的）。手寫的拒收：
-        # 寫的人手打的數字不是「T 時刻系統知道什麼」（INV-6）。
-        if record.get("priced_at_write") is not None:
-            raise ContractViolation("priced_at_write 由寫入端從當下的三題記下，不收手寫")
         record = {**record, "priced_at_write": priced_snapshot(ctx.three_questions, today=ctx.today)}
         parsed = parse_brief_record(record)
         problems = v2_write_problems(parsed, ctx=ctx, existing=existing)

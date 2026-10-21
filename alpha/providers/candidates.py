@@ -314,17 +314,31 @@ def _return_between(bars: Sequence[tuple[date, float | None]], base_day: date, t
     return now[1] / base[1] - 1
 
 
-def _then_row(ticker: str, version: InvestorBrief, day: date,
-              own_history_at: Callable[..., Mapping[str, Any]]) -> tuple[dict[str, Any], str]:
-    """某一版判斷當時的已定價①：寫入端記下的優先（`recorded`）；舊版本點時回算（`recomputed`，截點＝那天前一天）。
-    回算失敗照實記缺席——**不得拿今天的值頂替**（INV-6）。"""
+def knowable_bar_day(created_at: datetime) -> date:
+    """寫入當下系統手上**最後一根收盤**的日子（INV-6 的截點）：daily 每天 `schedule.daily_local_time`（排程時區）才抓前一天
+    收盤——那之前寫的只有前前一天。R2 2026-10-21：原本寫死「判斷日前一天」，台北 00:00–05:30 寫的版本（美股甚至當天
+    收盤還不存在）會往後多看一根；FORM 10-16 00:01 那版手打「寫入時第 87」，前一天截點回算 84.0、這個截點 87.2。"""
     from datetime import timedelta
 
-    if version.priced_at_write is not None:
-        return version.priced_at_write.as_dict(), "recorded"
+    from engine_b import event_watch as ew
+    from engine_b.routine_config import load_schedule
+
+    hh, mm = (int(x) for x in str(load_schedule()["daily_local_time"]).split(":"))
+    local = created_at.astimezone(ew._local_timezone())
+    return (local - timedelta(hours=hh, minutes=mm)).date() - timedelta(days=1)
+
+
+def _then_row(ticker: str, version: InvestorBrief, cutoff: date,
+              own_history_at: Callable[..., Mapping[str, Any]]) -> tuple[dict[str, Any], str]:
+    """某一版判斷當時的已定價①：寫入端記下的優先（`recorded`）；舊版本點時回算（`recomputed`，截點＝`knowable_bar_day`）。
+    寫入當下偶發讀不到（記下的是 upstream_unavailable）也退回回算——不讓一次讀取失敗永久蓋掉可回算的值（R2）。
+    回算失敗照實記缺席——**不得拿今天的值頂替**（INV-6）。"""
+    snap = version.priced_at_write
+    if snap is not None and snap.absence_kind != "upstream_unavailable":
+        return snap.as_dict(), "recorded"
     hnc = version.history_not_comparable.as_dict() if version.history_not_comparable else None
     try:
-        row = dict(own_history_at(ticker, day - timedelta(days=1), history_not_comparable=hnc))
+        row = dict(own_history_at(ticker, cutoff, history_not_comparable=hnc))
     except Exception as exc:  # noqa: BLE001 — 回算壞了照實記缺席，不帶走整列
         row = {"absence_kind": "upstream_unavailable", "reason": f"判斷日回算失敗：{type(exc).__name__}"}
     return row, "recomputed"
@@ -334,31 +348,36 @@ def _priced_since_row(ticker: str, records: Sequence[InvestorBrief], brief: Inve
                       three_questions: Mapping[str, Any] | None, today: date,
                       own_history_at: Callable[..., Mapping[str, Any]],
                       bars_at: Callable[[str, date], Sequence[tuple[date, float | None]]]) -> dict[str, Any] | None:
-    """判斷日的自家三年百分位 → 今天，與判斷日以來報酬（調整後收盤）；等回落另印起點（同一筆等待連續的最早一版）。"""
-    from datetime import timedelta
-
+    """判斷日的自家三年百分位 → 今天，與判斷日以來報酬（調整後收盤）；等回落另印起點（同一筆等待連續的最早一版）。
+    判斷日印日曆日；回算的截點與報酬基準一律用 `knowable_bar_day`（同一個函式，三處共用）。"""
     from engine_b import event_watch as ew
 
     tz = ew._local_timezone()
-    judged = judgment_version(records, brief)
-    jday = judged.created_at.astimezone(tz).date()
-    then, source = _then_row(ticker, judged, jday, own_history_at)
     now = next((dict(r) for r in (three_questions or {}).get("priced_in") or () if r.get("key") == "own_history_pctile"),
                None)
+    answer = brief.answers.priced_in if brief.answers else None
+    state = brief.candidate_state.state if brief.candidate_state else None
+    if answer not in ("yes", "no") and state != "priced_wait" \
+            and not (answer == "unmeasurable" and (now or {}).get("value") is not None):
+        return None                                    # 不會出列的不必回算（R2：40 份答量不到、147 次多餘取數）
+    judged = judgment_version(records, brief)
+    jday = judged.created_at.astimezone(tz).date()
+    jcut = knowable_bar_day(judged.created_at)
+    then, source = _then_row(ticker, judged, jcut, own_history_at)
     try:
         bars = list(bars_at(ticker, today))
     except Exception:  # noqa: BLE001 — 報酬算不出來就不印報酬，百分位照印
         bars = []
-    base_day = (date.fromisoformat(str(then["as_of"])[:10]) if source == "recorded" and then.get("as_of")
-                else jday - timedelta(days=1))
+    base_day = (date.fromisoformat(str(then["as_of"])[:10]) if source == "recorded" and then.get("as_of") else jcut)
     wait = None
-    if brief.candidate_state is not None and brief.candidate_state.state == "priced_wait":
+    if state == "priced_wait":
         start = stall_version(records, brief)
         wday = start.created_at.astimezone(tz).date()
         if wday != jday:
-            wthen, wsource = _then_row(ticker, start, wday, own_history_at)
+            wcut = knowable_bar_day(start.created_at)
+            wthen, wsource = _then_row(ticker, start, wcut, own_history_at)
             wbase = (date.fromisoformat(str(wthen["as_of"])[:10]) if wsource == "recorded" and wthen.get("as_of")
-                     else wday - timedelta(days=1))
+                     else wcut)
             wait = {"day": wday.isoformat(), "then": wthen, "then_source": wsource,
                     "return": _return_between(bars, wbase, today)}
     return priced_since(ticker, brief, judged, judgment_day=jday.isoformat(), then=then, then_source=source, now=now,
@@ -632,4 +651,5 @@ def load_board(tickers: Sequence[str], *, today: date | None = None,
 
 __all__ = ["ANSWER_WORDS", "CANDIDATES_THIS_IS_NOT", "GROUPS", "GROUP_LABELS", "SIDE_GROUPS", "SIDE_LABELS",
            "UNANSWERED", "assemble_board", "bet_index", "board_rewrite", "candidate_context", "derive_row", "held_index",
-           "load_board", "open_preconditions", "page_input", "rollup", "shared_bet", "stall_since", "three_words"]
+           "knowable_bar_day", "load_board", "open_preconditions", "page_input", "rollup", "shared_bet", "stall_since",
+           "three_words"]

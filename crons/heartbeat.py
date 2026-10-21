@@ -860,9 +860,11 @@ def _priced_wait_short(state_dir: Path | None) -> str:
         if ws.get("return") is not None:
             part += f"（等回落自 {str(ws.get('day'))[5:10]} {_signed(ws['return'])}）"
         parts.append(part)
-    recomputed = any((r.get("priced_since") or {}).get("then_source") == "recomputed" for r in wait)
+    recomputed = any((r.get("priced_since") or {}).get("then_source") == "recomputed"
+                     or ((r.get("priced_since") or {}).get("wait_since") or {}).get("then_source") == "recomputed"
+                     for r in wait)
     return (f"等回落 {len(wait)}（自家三年百分位 判斷日→今天｜判斷日以來）：" + "｜".join(parts)
-            + ("（判斷日值有回算的）" if recomputed else ""))
+            + ("（判斷日或等回落起點的值有回算的）" if recomputed else ""))
 
 
 def build_changes(*, now: datetime, state_dir: Path | None, thesis_path: Path,
