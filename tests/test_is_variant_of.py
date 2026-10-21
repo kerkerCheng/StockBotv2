@@ -26,16 +26,25 @@ def test_it_never_leaks_into_a_traversal_list() -> None:
     """**這一條是本檔的重點。**
 
     變體不是替代路線（counter_path）、不是上游（UPSTREAM_RELATIONS）、
-    不帶 sole_source 語意、也不是五個結構角度之一。把它加進任何一個，
+    不帶 sole_source 語意、也不是需求側／下一層的走訪。把它加進任何一個，
     就等於把剛移走的那 17 條又搬回去——而那不會讓任何既有測試變紅。
+    唯一的位置是第六個角度 `developers`（只用來判讀圖過期，不走訪）。
     """
     assert "is_variant_of" not in VOCAB["counter_path_relation"]
     assert "is_variant_of" not in VOCAB["sole_source_beneficiary_end"]
 
-    structure = (ROOT / "query" / "structure.py").read_text(encoding="utf-8")
+    # 2026-10-21 批次二 E3（failure log #87）：結構讀圖加了第六個角度 `developers`（只給 staleness 用、不參與走訪），
+    # 它答得出 L17-4 那一問——穩懋、Nokia develops 6 吋 InP、cowos is_variant_of 先進封裝三次入圖都沒讓讀圖 stale。
+    # 所以這裡改成逐一守**走訪清單**：is_variant_of 只准出現在 DEVELOPER_RELATIONS。
+    import query.bottleneck as qb
+    import query.structure as qs
+
+    assert qs.DEVELOPER_RELATIONS == ("develops", "is_variant_of")
+    for name, relations in (("需求側（inbound）", qs._DEMAND_INBOUND), ("需求側（outbound）", qs._DEMAND_OUTBOUND),
+                            ("下一層／需求鏈", qb.DEPENDENCY_RELATIONS), ("需求拉動", qb.DEMAND_PULL_RELATIONS),
+                            ("上游", qb.UPSTREAM_RELATIONS), ("反向路徑", qs.counter_path_relations())):
+        assert "is_variant_of" not in relations, f"變體不是{name}——它只在讀圖的開發者角度"
     bottleneck = (ROOT / "query" / "bottleneck.py").read_text(encoding="utf-8")
-    assert "is_variant_of" not in structure, (
-        "結構讀圖的五個角度是封閉清單；加第六個要先答出「它在哪個實際案例裡改變過結論」（L17-4）")
     assert "is_variant_of" not in bottleneck, (
         "變體不是上游，也不該參與需求鏈走訪")
 
