@@ -40,15 +40,30 @@ _SOURCE_DOC_CYPHER = (
     "MATCH (sd:SourceDoc {id: $id}) RETURN "
     + ", ".join(f"sd.{f} AS {f}" for f in SOURCE_DOC_OVERWRITE_FIELDS + SOURCE_DOC_COALESCE_FIELDS)
 )
+#: `MERGE_NODE_CLAIM`／`MERGE_EDGE_CLAIM` 對同一個 claim id 直接 SET 的內容欄位（批次二 E7，failure log #85②：
+#: 10-19 GF 與華明更正包乾跑只印「0 claims」，loader 其實會覆寫 statement）。
+CLAIM_OVERWRITE_FIELDS: tuple[str, ...] = ("statement", "disproof_condition", "confidence")
+_CLAIMS_CYPHER = ("MATCH (cl:Claim) WHERE cl.id IN $ids RETURN cl.id AS id, "
+                  + ", ".join(f"cl.{f} AS {f}" for f in CLAIM_OVERWRITE_FIELDS))
+
+
+def _claim_ids(doc: Mapping[str, Any]) -> dict[str, Mapping[str, Any]]:
+    """{圖上的 claim id: 抽取檔的 claim}——id 與 loader 同一個前綴規則（`evidence_id`）。"""
+    from loader.load_to_neo4j import evidence_id
+
+    doc_id = str((doc.get("source_doc") or {}).get("doc_id") or "")
+    return {evidence_id(doc_id, str(c["id"])): c for c in doc.get("claims") or () if c.get("id") and doc_id}
 
 
 def fetch_graph_state(session: Any, doc: Mapping[str, Any]) -> dict[str, Any]:
-    """這份文件會 MERGE 的節點與 SourceDoc 在圖上的現值（唯讀；session 由呼叫端開、關）。"""
+    """這份文件會 MERGE 的節點、SourceDoc 與 claim 在圖上的現值（唯讀；session 由呼叫端開、關）。"""
     ids = sorted({str(n["id"]) for n in doc.get("nodes") or () if n.get("id")})
     nodes = {str(r["id"]): dict(r) for r in session.run(_NODES_CYPHER, ids=ids)}
     doc_id = str((doc.get("source_doc") or {}).get("doc_id") or "")
     found = list(session.run(_SOURCE_DOC_CYPHER, id=doc_id)) if doc_id else []
-    return {"nodes": nodes, "source_doc": dict(found[0]) if found else None}
+    claim_ids = sorted(_claim_ids(doc))
+    claims = {str(r["id"]): dict(r) for r in session.run(_CLAIMS_CYPHER, ids=claim_ids)} if claim_ids else {}
+    return {"nodes": nodes, "source_doc": dict(found[0]) if found else None, "claims": claims}
 
 
 def _norm(value: Any) -> Any:
@@ -110,8 +125,19 @@ def compute_side_effects(doc: Mapping[str, Any], graph: Mapping[str, Any]) -> di
                 if before is not None and str(after) < str(before):
                     entry["regression"] = True          # 日期倒退（例：retrieved_at 比圖上早）
                 sd_conflicts.append(entry)
+    claims_now: Mapping[str, Mapping[str, Any]] = graph.get("claims") or {}
+    claim_overwrites: list[dict[str, Any]] = []
+    for claim_id, claim in sorted(_claim_ids(doc).items()):
+        existing = claims_now.get(claim_id)
+        if existing is None:
+            continue                                   # 新 claim 不算副作用（`graph_increment` 另數）
+        for field in CLAIM_OVERWRITE_FIELDS:
+            before, after = _norm(existing.get(field)), _norm(claim.get(field))
+            if before != after:
+                claim_overwrites.append({"claim": claim_id, "field": field, "graph": before, "after": after})
     return {
         "status": "checked",
+        "claim_overwrites": claim_overwrites,
         "node_overwrites": overwrites,
         "alias_unions": alias_unions,
         "attribute_additions": attribute_additions,
@@ -311,7 +337,7 @@ def has_side_effects(result: Mapping[str, Any]) -> bool | None:
     """有沒有會改到既有值的副作用（新節點、新 SourceDoc 不算）。讀不到圖＝None（不知道），不是 False。"""
     if result.get("status") != "checked":
         return None
-    return bool(result.get("node_overwrites") or result.get("source_doc_conflicts"))
+    return bool(result.get("node_overwrites") or result.get("source_doc_conflicts") or result.get("claim_overwrites"))
 
 
 def render_lines(result: Mapping[str, Any], *, doc_id: str | None = None) -> list[str]:
@@ -329,13 +355,15 @@ def render_lines(result: Mapping[str, Any], *, doc_id: str | None = None) -> lis
     for item in result.get("source_doc_conflicts") or ():
         flag = "（⚠ 日期倒退）" if item.get("regression") else ""
         lines.append(f"- {head}SourceDoc 的 `{item['field']}` 會被改：{item['graph']!r} → {item['after']!r}{flag}")
+    for item in result.get("claim_overwrites") or ():
+        lines.append(f"- {head}Claim `{item['claim']}` 的 `{item['field']}` 會被改：{item['graph']!r} → {item['after']!r}")
     if not lines:
-        lines.append(f"- {head}不會改到圖上任何既有節點屬性或 SourceDoc 欄位"
+        lines.append(f"- {head}不會改到圖上任何既有節點屬性、SourceDoc 欄位或 claim"
                      + (f"（新節點 {len(result.get('new_nodes') or ())} 個）" if result.get("new_nodes") else ""))
     return lines
 
 
-__all__ = ["NODE_OVERWRITE_FIELDS", "SOURCE_DOC_COALESCE_FIELDS", "SOURCE_DOC_OVERWRITE_FIELDS", "as_loaded",
+__all__ = ["CLAIM_OVERWRITE_FIELDS", "NODE_OVERWRITE_FIELDS", "SOURCE_DOC_COALESCE_FIELDS", "SOURCE_DOC_OVERWRITE_FIELDS", "as_loaded",
            "compute_side_effects", "evidence_after_load", "evidence_lines", "fetch_evidence_state", "fetch_graph_state",
            "graph_increment", "has_side_effects", "increment_line", "quotes_by_assertion", "render_lines",
            "rows_after_load", "side_effects"]

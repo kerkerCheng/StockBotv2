@@ -78,6 +78,45 @@ def test_new_nodes_and_a_new_source_doc_are_not_side_effects() -> None:
     assert has_side_effects(result) is False
 
 
+def test_a_correction_that_rewrites_a_claim_statement_is_listed() -> None:
+    """批次二 E7（#85②）：更正走廊重載同一份文件，loader 對同一個 claim id 直接 SET statement——乾跑原本只印「0 claims」。"""
+    doc = _doc()
+    doc["claims"] = [{"id": "c1", "statement": "GF 與台積電簽了矽中介層合作（更正：是授權，不是代工）",
+                      "disproof_condition": "條件；每季；重讀", "confidence": 0.7},
+                     {"id": "c2", "statement": "全新的 claim", "disproof_condition": "x", "confidence": 0.5}]
+    graph = _graph()
+    graph["claims"] = {"d_c1": {"statement": "GF 與台積電簽了矽中介層代工", "disproof_condition": "條件；每季；重讀",
+                                "confidence": 0.7}}
+    result = compute_side_effects(doc, graph)
+    assert result["claim_overwrites"] == [{"claim": "d_c1", "field": "statement",
+                                           "graph": "GF 與台積電簽了矽中介層代工",
+                                           "after": "GF 與台積電簽了矽中介層合作（更正：是授權，不是代工）"}]
+    assert has_side_effects(result) is True                                       # 新 claim c2 不算
+    assert any("Claim `d_c1` 的 `statement` 會被改" in line for line in render_lines(result, doc_id="d"))
+
+
+class _ClaimSession:
+    """只回答 claim 那一條查詢；節點與 SourceDoc 查詢回空。記下 claim 查的 id（前綴規則與 loader 一致）。"""
+
+    def __init__(self):
+        self.claim_ids = None
+
+    def run(self, cypher, **kw):
+        if "MATCH (cl:Claim)" in cypher:
+            self.claim_ids = kw.get("ids")
+            return [{"id": "d_c1", "statement": "舊句", "disproof_condition": "x", "confidence": 0.7}]
+        return []
+
+
+def test_the_dry_run_reads_claims_by_the_loader_prefixed_id() -> None:
+    doc = _doc()
+    doc["claims"] = [{"id": "c1", "statement": "新句", "disproof_condition": "x", "confidence": 0.7}]
+    session = _ClaimSession()
+    result = side_effects(doc, session)
+    assert session.claim_ids == ["d_c1"]
+    assert [(c["field"], c["graph"], c["after"]) for c in result["claim_overwrites"]] == [("statement", "舊句", "新句")]
+
+
 class _BrokenSession:
     def run(self, *_a, **_k):
         raise OSError("connection refused")

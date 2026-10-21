@@ -18,7 +18,7 @@
 | E4 | #75 | 只因同義節點合併而換 id，不算讀圖變動 | 是 | Z1／R1 | 小 | — | ✅ 10-21（變異 5／5；現行 58 份讀圖狀態 0 份改變） |
 | E5 | #79＋#59 | 共用別名進走圖第 9 型＋入圖乾跑提示 | 是 | Z2／R1 | 中 | — | ○ |
 | E6 | #90 | 券商內容不進公開 repo 的機制 | 否（公開、不可逆） | Z2／**R2** | 中 | **Q3** | ○ |
-| E7 | #85② | 更正走廊乾跑列出 claim 改句 | 半（核准資訊） | Z1／R1 | 小（約 20 行） | — | ○ |
+| E7 | #85② | 更正走廊乾跑列出 claim 改句 | 半（核准資訊） | Z1／R1 | 小（約 20 行） | — | ✅ 10-21（變異 4／4；回放 [812] 2 筆、[814] 1 筆） |
 | E8 | #62 | 輪詢不掛已取得的同一份申報；終局 lead 名下等待收掉 | 半 | Z2／R1 | 中 | — | ○ |
 | E9 | #10＋#11 | 證據等級認得關係人自述與買方自述 | 半 | Z2／R1 | 中 | — | ○ |
 | E10 | #64 | 覆蓋家數取三者最大 | 半 | Z2／R1 | 小＋重算 | **Q4** | ○ |
@@ -142,6 +142,8 @@ Case: #85② 2 次（10-19 GF 更正包 [812]、華明更正包 [814] 乾跑都�
 **現況：** `loader/merge_side_effects.py` 只比節點與 SourceDoc 欄位；10-19 之後沒有 commit。
 **做什麼：** `fetch_graph_state` 多取本包 claim id 的 statement／disproof／confidence；`compute_side_effects` 多 `claim_overwrites`；render 印「Claim X 的 statement 會被改：舊 → 新」（約 20 行，超過 L17 十行）。
 **驗收：** 圖：回放 [812]、[814] 草稿乾跑各印出 ≥1 筆 claim 改句，且等於 apply 後圖上 statement 實際改變的 claim；變異：拿掉比對 → 紅。
+
+**落地（2026-10-21）：** `loader/merge_side_effects.py` 多查本包 claim（id 用 loader 同一個 `evidence_id` 前綴）的 statement／disproof_condition／confidence，`claim_overwrites` 逐欄列「Claim X 的 statement 會被改：舊 → 新」，`has_side_effects` 算它。回放：以 git 前一版抽取檔當圖上現值——[812] 列出 2 筆（statement、disproof_condition）、[814] 1 筆（statement），都等於現在圖上 statement 已是更正版的那一個 claim。
 
 ## E8 輪詢不掛已取得的同一份申報；終局 lead 名下等待收掉（#62）
 
