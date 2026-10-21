@@ -13,7 +13,8 @@ from typing import Any, Mapping, Sequence
 
 from shared.redaction import sensitive_payload_path
 
-from ..narrative.contracts import LINKABLE_SOURCE_PREFIXES, InvestorBrief, parse_brief_record, undated_position_claims
+from ..narrative.contracts import (LINKABLE_SOURCE_PREFIXES, RAW_EXCERPT_PREFIX, InvestorBrief, parse_brief_record,
+                                   undated_position_claims)
 from ..errors import ContractViolation
 
 _ROOT = Path(__file__).resolve().parents[2]
@@ -326,6 +327,25 @@ def v2_write_problems(parsed: InvestorBrief, *, ctx: WriteContext, existing: Seq
             problems.append(f"{label}：「{'、'.join(words)}」是依賴百分位大小的位置結論，數字每天重填、這句不會——"
                             f"拿掉，或寫明日期（「寫這句的 YYYY-MM-DD 當天…」）；判斷當時的百分位寫入端已自動記下："
                             f"{sentence[:40]}")
+
+    # ⑨ 一手節錄要指得回（批次二 E12；failure log #50；L18）：`library/raw/<檔名>` 的檔要真的在、而且不得跳出 library/raw
+    #   ——證據清單照這個路徑列，指不回的引用列出來只會是一個死連結。
+    problems.extend(raw_excerpt_problems(parsed, root=_ROOT))
+    return problems
+
+
+def raw_excerpt_problems(parsed: InvestorBrief, *, root: Path) -> list[str]:
+    """每格 `library/raw/<檔名>` 引用：檔在、在 `library/raw` 底下。回問題清單（⑨，`v2_write_problems` 用）。"""
+    raw_dir = (root / "library" / "raw").resolve()
+    problems: list[str] = []
+    for slot in parsed.slots:
+        for ref in slot.evidence_refs:
+            if not str(ref).startswith(RAW_EXCERPT_PREFIX):
+                continue
+            path = (root / str(ref)).resolve()
+            if raw_dir not in path.parents or not path.is_file():
+                problems.append(f"{slot.key}：evidence_refs 的 {ref} 在 library/raw 找不到（或跳出了 library/raw）——"
+                                "一手節錄要先存成檔再引用（證據清單照這個路徑列）")
     return problems
 
 

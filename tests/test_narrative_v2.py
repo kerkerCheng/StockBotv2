@@ -505,3 +505,11 @@ def test_disproof_counts_counts_new_narrative_conditions_once_and_links_not_at_a
                 "source_ref": f"brief:{brief.brief_id}#1", "condition": brief.disproof[0].condition}]
     counts = disproof_counts(watches, lifecycle={}, readings={}, briefs=[brief])
     assert counts["expected"] == 1 and counts["watching"] == 1 and counts["unwatched"] == 0
+
+
+def test_a_raw_excerpt_ref_must_point_to_a_file(tmp_path: Path) -> None:
+    """批次二 E12（failure log #50）：`library/raw/<檔名>` 引用寫入時要指得回檔（證據清單照這個路徑列）。"""
+    slots = _slots()
+    slots["position"]["evidence_refs"] = ["graph://x", "library/raw/__no_such_short_check_excerpt__.txt"]
+    with pytest.raises(ContractViolation, match="library/raw 找不到"):
+        _write(tmp_path, _record(slots=slots), _ctx())

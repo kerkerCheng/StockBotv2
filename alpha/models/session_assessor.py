@@ -122,7 +122,8 @@ class JudgmentPacket:
             "axis_prompts": self.axis_prompts,
             "judgment_schema": self.schema,
             # 2026-09-15：投資人短評的框架——七格前因後果、placeholder 字彙、禁字表。
-            # session 寫完用 `python -m alpha brief <T> --add spec.json`；引用同樣必須是 evidence_index 的 key。
+            # session 寫完用 `python -m alpha brief <T> --add spec.json`；引用是 evidence_index 的 key 或
+            # library/raw/<檔名>（批次二 E12：與寫入端一致——五軸判斷仍只收 evidence_index 的 key）。
             "brief_frame": _brief_frame(),
             "notes": list(self.notes),
         }, ensure_ascii=False, indent=2, default=str)
@@ -220,7 +221,9 @@ def _brief_frame() -> dict[str, Any]:
         "record_version": "investor-brief/v2",
         "_how_to_use": (
             "七格照順序各寫一到兩句白話；數字一律用 placeholder（{price}／{own_history_pctile}／{in_numbers_latest}…），"
-            "不得打字面值；每格 evidence_refs 必須是 evidence_index 的 key；禁字表裡的內部名詞一出現就拒收。"
+            "不得打字面值；每格 evidence_refs 是 evidence_index 的 key，或一手節錄 library/raw/<檔名>（索引之外的一手——"
+            "例如短檢查讀的公司自己的 10-K——先存成檔再引用；寫入時檢查檔案在，個股頁證據清單照列）；"
+            "禁字表裡的內部名詞一出現就拒收。"
             "結構化欄位：rides[]（只能押本公司在供給側的現行讀圖）、disproof[]（寫入即登記成 watch；已在盯的只填 "
             "link_source_ref）、answers（已定價嗎／出現在數字裡了嗎）、candidate_state（缺 X／等回落要先用 "
             "`python -m engine_b.event_watch add --wake-brief <co:*> …` 建好 watch）、confirm[]（**加碼條件**：「這件事發生＝"

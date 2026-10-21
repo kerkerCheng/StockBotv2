@@ -96,11 +96,52 @@ def _attention(view: AlphaInvestmentView, *, artifact_types: Sequence[str] | Non
 
 
 def _evidence_for(view: AlphaInvestmentView, data: Iterable[Datum]) -> tuple[EvidenceItem, ...]:
-    """這些格引用到的證據（依 evidence index 的原順序）。純查表，不重新評級。"""
-    wanted: set[str] = set()
+    """這些格引用到的證據：evidence index 裡的（依 index 原順序），再接 index 之外、**列得出來**的兩種（依首次出現）。
+    純查表，不重新評級、不讀檔。
+
+    index 之外（批次二 E12；failure log #50）：敘事格引用的 `library/raw/<檔名>` 一手節錄（寫入端已查檔案在）列成
+    `external_document`；這一頁 index 沒收的 `graph://source/<doc>` 列成 `source_doc`——兩個都是既有的 `EvidenceRef.kind`
+    （封閉契約，不為它開新 kind）。讀圖 `sr_*`、三題成果 `alpha://…` 不是原始證據、不列——由 `_unlisted_refs` 報出來，
+    不靜默（INV-3）。
+    """
+    refs: list[str] = []
     for datum in data:
-        wanted.update(datum.evidence_refs)
-    return tuple(item for item in view.evidence.index if item.ref in wanted)
+        refs.extend(r for r in datum.evidence_refs if r not in refs)
+    wanted = set(refs)
+    indexed = tuple(item for item in view.evidence.index if item.ref in wanted)
+    in_index = {item.ref for item in indexed}
+    extra = tuple(_outside_index_item(ref) for ref in refs if ref not in in_index and _outside_index_kind(ref))
+    return indexed + extra
+
+
+#: 必須等於 `alpha.narrative.contracts.RAW_EXCERPT_PREFIX`（測試守著；不 import 以維持呈現層零相依）。
+_RAW_EXCERPT_PREFIX = "library/raw/"
+
+
+def _outside_index_kind(ref: str) -> str | None:
+    if ref.startswith(_RAW_EXCERPT_PREFIX):
+        return "external_document"
+    if ref.startswith("graph://source/"):
+        return "source_doc"
+    return None
+
+
+def _outside_index_item(ref: str) -> EvidenceItem:
+    kind = _outside_index_kind(ref)
+    return EvidenceItem(ref=ref, kind=str(kind),
+                        source_doc_id=ref.removeprefix("graph://source/") if kind == "source_doc" else None,
+                        origin_entity=None, url=None, quote=None, published_at=None, retrieved_at=None,
+                        recorded_at=None, evidence_tier=None, evidence_class=None, confidence=None,
+                        corroborating_origins=())
+
+
+def _unlisted_refs(view: AlphaInvestmentView, data: Iterable[Datum]) -> list[str]:
+    """格有引用、證據清單卻列不出的（讀圖、三題成果、或解析不到的）——印出來，不靜默（INV-3；E12）。"""
+    listed = {item.ref for item in _evidence_for(view, data)}
+    out: list[str] = []
+    for datum in data:
+        out.extend(r for r in datum.evidence_refs if r not in listed and r not in out)
+    return out
 
 
 # ---------------------------------------------------------------------------
@@ -258,6 +299,7 @@ def _brief_panel(view: AlphaInvestmentView) -> AnalystPanel:
         lines=lines, notes=ib.is_not,
         evidence=_evidence_for(view, ib.slots),
         context={"capability": ib.meta.capability, "brief_id": ib.brief_id,
+                 "evidence_unlisted": _unlisted_refs(view, ib.slots),
                  "available": ib.meta.status not in VALUELESS_STATUSES,
                  "optional_rule": "短評是 optional：沒寫只表示「還沒寫短評」，不代表這檔研究不完整；"
                                   "文字是研究 session 的判斷（append-only），數字由既有 Datum 填入，不得手打"},

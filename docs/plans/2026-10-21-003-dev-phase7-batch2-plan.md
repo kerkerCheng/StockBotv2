@@ -23,7 +23,7 @@
 | E9 | #10＋#11 | 證據等級認得關係人自述與買方自述 | 半 | Z2／R1 | 中 | — | ✅ 10-21（變異 13／13；買方自述 36 條同級改標、關係人 5 條降級；①改成只認**控制**——見落地段；[691] JFE 要入圖更正宣告控制才生效） |
 | E10 | #64 | 覆蓋家數取三者最大 | 半 | Z2／R1 | 小＋重算 | Q4 A | ✅ 10-21（變異 4／4；翻盤 7 檔全部 edge→not_edge） |
 | E11 | #68 | 「供給側多一家」不再是機械反證觸發；讀圖反證寫新增產能 | 半 | Z2／R1 | 小 | — | ✅ 10-21 程式＋skill（回放 InP 基板 8 份舊讀圖：仍該重讀、觸發 0）；③兩條「圖上第 N 家」反證待下次換版改寫 |
-| E12 | #50 | 證據清單列得出敘事的 library/raw 引用 | 否 | Z2／R1 | 小 | — | ○ |
+| E12 | #50 | 證據清單列得出敘事的 library/raw 引用 | 否 | Z2／R1 | 小 | — | ✅ 10-21（變異 6／6；九份短檢查敘事引用列得出 32/111 → 93/111，library/raw 60/60；其餘 18 是讀圖與三題成果、印在 evidence_unlisted） |
 | E13 | #60 | ROADMAP 改寫時待決題不得消失＋「刻意不併／留待」結構化 | 否 | Z2／R1 | 中 | — | ○ |
 | E14 | #40 | 改動後自動重啟 serve | 否 | Z2／R1＋sandbox | 小 | **Q5** | ○（推薦不做） |
 | E15 | —（7.5 前置） | 追蹤表 paper lane 依現行狀態分組印 | 否（7.5 報告要用） | Z1／R1 | 小（約 12 行） | — | ✅ 10-21 程式（變異紅；真資料驗收待下一次 daily 追蹤表：各組 n 加總＝paper 列數） |
@@ -219,6 +219,8 @@ Case: #50 2 次（10-08 KLIC 等 6 份短檢查敘事；回看 10-07 XFAB.PA、6
 
 **現況：** `alpha/models/session_assessor.py` 第 181 行 `EVIDENCE_SCOPE.in_scope_prefixes` 只有 graph://edge／source／claim 與 engine_c 快照；`briefing/analyst_view/compose.py::_evidence_for` 只查 evidence index；10-08 之後兩檔都沒有 commit。寫入端其實收 `library/raw/<檔名>` 引用。
 **做什麼：** 證據清單列得出敘事引用的 library/raw 節錄（同層說明 `raw:<檔名>` 的規則：寫入時檢查指得回、呈現時列出）；packet 指示改成與寫入端一致。
+**落地（2026-10-21）：** 寫入端 ⑨ `raw_excerpt_problems`：`library/raw/<檔名>` 要真的是 library/raw 底下的檔（跳出去也擋）；`compose._evidence_for` 在索引之後接兩種索引外的引用——一手節錄列成 `external_document`、這一頁索引沒收的 `graph://source/` 列成 `source_doc`（兩個都是既有的 `EvidenceRef.kind`，封閉契約不開新 kind）；讀圖 `sr_*` 與三題成果 `alpha://…` 不是原始證據、不列，brief 面板 context 多一格 `evidence_unlisted` 逐條報出來（INV-3）。packet 的 brief_frame 指示改成與寫入端一致（五軸判斷仍只收索引的 key）；`alpha.narrative.contracts` 檔頭那句「必須解析到 evidence index」與實際不符（寫入端只查非空），一併更正。前綴常數 `RAW_EXCERPT_PREFIX`，呈現層照抄一份、測試守相等（呈現層零相依）。**真資料：** 九份現行版引用 111 個，列得出 32 → 93（library/raw 0/60 → 60/60、graph source 0/1 → 1/1；Engine C 32/32 照舊）；其餘 18＝三題成果 12、讀圖 6，照設計不列、印在 evidence_unlisted。九份引用的 library/raw 檔全部在。
+
 **驗收：** 敘事：短檢查敘事（ENS、VSH、KLIC、NVTS、POWI、LPK.DE、XFAB.PA、6481.T、XPEV）各格引用在證據清單列得出的比例——上線前先量現值，目標全部。
 
 ## E13 ROADMAP 改寫時待決題不得消失＋「刻意不併／留待」結構化（#60）

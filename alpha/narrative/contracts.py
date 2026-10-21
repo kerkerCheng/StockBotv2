@@ -12,8 +12,10 @@ input_dependency）。投資人要的單位不是「格」，是「句」：什�
    見 `PLACEHOLDERS`）；materialize 時由 read model 的 Datum 填入，所以數字永遠不會過期、也不會是 LLM 打的。
    ⚠ 允許的例外只有**年份**（`2030 年`）與**證據裡的事實數字**（`20 億美元`）——它們指得回引用；
    但 `{price}`／`{bet_target}` 這七種 authority 數字若被打成字面值，寫入端擋下。
-2. **每格必帶引用**，且引用必須解析到 packet 的 evidence index——與五軸判斷同一道驗證（L15：先解析
-   身分，再查權限）。解析不到就整格拒收，不是整筆。
+2. **每格必帶引用**：packet 的 evidence index 的 key，或 `library/raw/<檔名>` 的一手節錄（`RAW_EXCERPT_PREFIX`；
+   2026-10-21 批次二 E12）。⚠ 這一條先前寫「必須解析到 evidence index」，寫入端其實只查非空——短檢查敘事唯一的一手
+   （公司自己的 10-K 節錄）本來就不在索引裡（failure log #50）。現在寫入端查 `library/raw/` 的檔真的在
+   （`alpha.providers.briefs.v2_write_problems` ⑨），個股頁證據清單照列（`briefing.analyst_view.compose`）。
 3. **禁字表**：`FORBIDDEN_TERMS` 裡的內部名詞出現在任何一格就拒收。首屏是投資人的，不是分析師的。
 
 ## 它不是什麼
@@ -318,6 +320,9 @@ RIDE_UNITS: tuple[str, ...] = ("layer", "socket")
 DISPROOF_SOURCE_PREFIXES: tuple[str, ...] = ("self", "thesis:", "claim:", "sr_")
 #: 反證可以連結（`link_source_ref`）的既有 watch 來源鍵：thesis 條目、讀圖反證、層說明主張（2026-10-07 S4a 加）。
 LINKABLE_SOURCE_PREFIXES: tuple[str, ...] = ("thesis:", "reading:", "layer_note:")
+#: 敘事格引用一手節錄的寫法（批次二 E12；failure log #50）：`library/raw/<檔名>`——寫入時檔案要在、證據清單照列。
+#: 同層說明的 `raw:<檔名>`（`webapp.diagrams`）同一條規則：寫入時檢查指得回、呈現時列出。
+RAW_EXCERPT_PREFIX = "library/raw/"
 
 
 def _iso_day(value: Any, label: str) -> date:
@@ -811,6 +816,7 @@ def select_brief(records: Sequence[InvestorBrief], *, as_of: date | None, today:
 
 
 __all__ = [
+    "RAW_EXCERPT_PREFIX",
     "ACK_DISPOSITIONS", "ANSWER_KEYS", "ANSWER_VALUES", "Acknowledgement", "Answers", "BRIEF_FRAME_V2",
     "BRIEF_SLOTS_V2", "CANDIDATE_STATES", "CANDIDATE_STATES_DECLARABLE", "CandidateState", "HistoryNotComparable",
     "NarrativeConfirm", "NarrativeDisproof", "PLACEHOLDERS_V2", "PRICED_DATE_MARK", "PRICED_POSITION_WORDS",
