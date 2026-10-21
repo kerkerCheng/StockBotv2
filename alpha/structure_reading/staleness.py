@@ -89,7 +89,10 @@ CHANGE_KINDS: Mapping[str, tuple[str, str]] = {
 
 #: 哪些變化**同時**是既有 disproof 機制的觸發來源（§6b ④）。
 #: ⚠ 這裡只標記；**不自動寫進任何 thesis**——thesis mutation 是四個人工 gate 之一。
-DISPROOF_KINDS: frozenset[str] = frozenset({"counter_path", "supply_added"})
+#: ⚠ 2026-10-21 批次二 E11（failure log #68）：`supply_added` 拿掉——[751] Freiberger、[760] 雲南鍺業都是列舉補齊，
+#: 卻觸發 InP 基板讀圖反證①；家數會隨我們多讀一份文件單調上升（AGENTS「已知會失焦的指標」）。補償控制（L15）：
+#: 它仍是 high、仍讓讀圖該重讀；讀到真的新進者由人照讀圖反證處置。
+DISPROOF_KINDS: frozenset[str] = frozenset({"counter_path"})
 
 _ANGLE_TO_KINDS: Mapping[str, tuple[str, str]] = {
     # 角度 → (成員增減用哪個 kind, 屬性變動用哪個 kind)

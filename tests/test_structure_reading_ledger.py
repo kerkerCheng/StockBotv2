@@ -183,14 +183,15 @@ def test_nothing_changed_is_current() -> None:
     assert not needs_reread(status)
 
 
-def test_one_more_supplier_is_high_grade_and_a_disproof_trigger() -> None:
-    """供給側分布是 B（量的賭注）的核心判準，而「多一家」正是那個假設被推翻的樣子（§6b ④）。"""
+def test_one_more_supplier_is_high_grade_but_no_longer_a_mechanical_disproof_trigger() -> None:
+    """供給側分布是 B（量的賭注）的核心判準，所以「多一家」照舊 high、照舊該重讀（補償控制，L15）；但 2026-10-21 批次二 E11
+    （failure log #68）起不是機械反證觸發：[751] Freiberger、[760] 雲南鍺業都是列舉補齊——家數隨我們多讀一份文件單調上升。"""
     status = _status(_structure(supply=("co:a", "co:b", "co:new"), digest="d1"))
     assert status["status"] == "stale" and status["highest_grade"] == "high"
     assert needs_reread(status)
     kinds = {c["kind"] for c in status["changes"]}
     assert "supply_added" in kinds
-    assert status["disproof_triggers"], "供給側多一家沒有被標成 disproof 觸發"
+    assert status["disproof_triggers"] == [], "供給側多一家又被當成機械反證觸發"
 
 
 def test_counter_path_added_is_a_disproof_trigger_but_removed_is_not() -> None:

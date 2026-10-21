@@ -240,8 +240,11 @@ pq2 型跑 `todo sync` 翻回球在你、假設型進段 0b。命中掛超過兩
      重讀五個角度 → `alpha structure-reading <node> --add`（帶 `supersedes_id`）。
      ⚠ **只做 `stale`／`expired`**：`stale_low`（只有 evidence 等級變）刻意不進——恆亮＝零鑑別力（L14-4）。
      ⚠ 「客戶出新文件叫醒的重讀」不在這一型，在段 `fired_reading_reread`（同一件事不算兩次）。
-     ⚠ **變化若被標成 `disproof_trigger`**（供給側多一家／反向路徑新增），那是**既有 disproof 的觸發**：
+     ⚠ **變化若被標成 `disproof_trigger`**（反向路徑新增），那是**既有 disproof 的觸發**：
      依 L7 要在 48 小時內處置。但 **thesis 要不要改是四個人工 gate 之一**——鑄成 `thesis_mutation` 型 pq2 編號，**不要自己改 thesis**。
+     「供給側多一家」2026-10-21 起不再是機械觸發（批次二 E11，failure log #68）：家數會隨我們多讀一份文件單調上升——
+     它仍讓讀圖該重讀，讀到真的新進者照讀圖反證處置。**讀圖反證寫新增產能或新進者的一手**（擴產公告、首次量產），
+     不寫「圖上第 N 家」。
    - **⑤lead 點名不在圖**：onboard 評估（`skills/company-onboard`）。「另有 N 個名字 registry 解析不到」是
      **ID 沒解析對**，不是圖中無此公司（INV-1）——先修 registry 解析，不是 onboard。
      ticker 用 lead 關聯的同一條規則解析（`$SIVE`→`SIVE.ST`，2026-09-29 起）；「去掉後綴對到多家」另列候選、
