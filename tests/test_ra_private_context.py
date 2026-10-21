@@ -140,3 +140,37 @@ def test_prepare_carries_private_context_into_the_frozen_action(tmp_path: Path, 
     assert SECRET in result["review_packet"]
     stored = research_actions.read_action(result["action_id"], root=tmp_path)
     assert stored["payload"]["private_context"] == PRIVATE
+
+
+
+@pytest.mark.parametrize("permissions", [("local_only",), ("repo_full", "local_only")])
+def test_local_only_and_mixed_actions_never_publish_the_text(tmp_path: Path, permissions) -> None:
+    """R2（LOW 3）：全 local 寫私有報告、混合另寫公開 stub——兩條路都不得帶原文；公開 stub 連段數都不印。"""
+    payload = _payload(PRIVATE)
+    documents = []
+    for index, permission in enumerate(permissions):
+        extraction = _extraction(doc_id=f"pc_doc_{index}")
+        extraction["source_doc"]["storage_permission"] = permission
+        documents.append({"doc_id": extraction["source_doc"]["doc_id"], "extraction": extraction, "raw_payload": {},
+                          "storage_permission": permission, "permission_basis": BASIS, "validation_warnings": []})
+    payload["documents"] = documents
+    record = research_actions.create_action(payload, root=tmp_path)
+    result = research_actions.publish_action_reports(_applied(record), root=tmp_path)
+    private = (tmp_path / result["private_path"]).read_text(encoding="utf-8")
+    assert SECRET not in private and "有私有脈絡 1 段" in private
+    if "repo_full" in permissions:
+        stub = (tmp_path / result["public_path"]).read_text(encoding="utf-8")
+        assert SECRET not in stub and SOURCE not in stub and "私有脈絡" not in stub
+    else:
+        assert result["public_path"] is None
+
+
+def test_the_entry_and_size_limits_fail_closed() -> None:
+    at_limit = [{"source": SOURCE, "text": "x" * research_actions.MAX_PRIVATE_CONTEXT_CHARS}] \
+        * research_actions.MAX_PRIVATE_CONTEXT
+    research_actions.validate_normalized_payload(_payload(at_limit))
+    with pytest.raises(ValueError, match="private_context"):
+        research_actions.validate_normalized_payload(_payload(at_limit + PRIVATE))
+    with pytest.raises(ValueError, match="private_context"):
+        research_actions.validate_normalized_payload(
+            _payload([{"source": SOURCE, "text": "x" * (research_actions.MAX_PRIVATE_CONTEXT_CHARS + 1)}]))

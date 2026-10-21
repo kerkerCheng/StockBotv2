@@ -92,6 +92,8 @@ prepare 只會在 ignored private store 建立 action；不寫 provenance ledger
 - 程式產生的 review packet
 - 文件與 validation warning 摘要
 
+⚠ 帶 `private_context` 的 packet 是**私有物件**（原文只在這裡）：顯示給使用者、進 pq2（池子在 ignored private store）都可以，**不得貼進 docs 或任何會進 repo 的檔**。
+
 **必須把原樣 packet 顯示給使用者（進 pq2 `ra_admission`），然後停止。** 不得因為研究看起來合理，
 就在同一輪自行 apply。若討論後要改 report、extraction 或文件，重新 prepare 新 action；不可把
 舊 action ID 當成已修改版本。
