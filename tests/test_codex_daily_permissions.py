@@ -172,6 +172,26 @@ def test_tw_share_capital_stays_an_interactive_entry() -> None:
     assert "tw_share_capital" not in (ROOT / "crons" / "harvest_leads.py").read_text(encoding="utf-8")
 
 
+def test_edinet_and_dart_history_stay_interactive_entries() -> None:
+    """日韓財報來源（2026-10-21）：EDINET 保存 10 年、DART 2015 起可查，漏抓補得回來（L10），而且兩個入口都帶 API key——
+    不進任何無人值守路徑（rules、harvest、daily 步驟），心跳也不得連 EDINET／OpenDART。要改成排程必須重做 sandbox impact
+    review（OPERATIONS「日韓財報」）。"""
+    from crons.daily_task import DAILY_STEPS
+
+    rules = RULES.read_text(encoding="utf-8")
+    harvest = (ROOT / "crons" / "harvest_leads.py").read_text(encoding="utf-8")
+    daily_tokens = " ".join(token for step in DAILY_STEPS for token in step.argv)
+    for entry in ("edinet_history", "dart_history"):
+        assert entry not in rules, entry
+        assert entry not in harvest, entry
+        assert entry not in daily_tokens, entry
+    heartbeat = (ROOT / "crons" / "heartbeat.py").read_text(encoding="utf-8")
+    assert "_jp_kr_filings_line" in heartbeat          # 不排程的代價由會自己出現的計數器承擔（L14）
+    for network_entry in ("fetchers.edinet", "fetchers.opendart", "fetch_csv_zip", "single_account_all",
+                          "EDINET_API_KEY", "OPENDART_API_KEY"):
+        assert network_entry not in heartbeat, network_entry
+
+
 def test_layer_note_ledger_is_written_only_interactively() -> None:
     """層說明 ledger（A3、append-only；個股頁 plan S4a）只由互動 session 寫（`python -m alpha layer-note --add`）：
     daily 的封閉步驟清單不得出現它；心跳與 `audit invariants`（daily 第 14 步）只讀 ledger 與 registry，

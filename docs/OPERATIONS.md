@@ -114,6 +114,16 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 `StockBotv2-Daily` 的 ⑱⑲ 取代（1.2a 停用、2026-09-25 1.2b 刪除）；它們的理由（LLM 失敗心跳照發、永遠 exit 0、Python 不用 `.cmd`、
 發送走 subprocess）搬進 `crons/daily_task.py` 的 docstring，守它們的測試改主詞搬進 `tests/test_daily_task.py`「無人值守入口」節。
 
+### Sandbox impact review 結論（2026-10-21：日韓財報來源 S1–S4——EDINET、OpenDART）
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | 兩個新的**互動式**入口 `python -m engine_c.edinet_history`、`python -m engine_c.dart_history`：只連官方主機 `api.edinet-fsa.go.jp`（コードリスト `disclosure2dl.edinet-fsa.go.jp`，不帶 key）與 `opendart.fss.or.kr`；key 只從 `.env` 讀，每一條離開抓取層的字串先遮罩（例外、報告、快取掃描 0 命中）。寫 Engine C SQLite 的 `fundamental_history`（可重建投影，L10；`--replace` 只刪自己來源的列），寫入那一刻持 writer lock；快取只留白名單列（`library/private/engine_c/{edinet,dart}/`，原檔不留、PDL1.0 內容不進 repo）。**不在無人值守路徑上**。無人值守路徑上只多**讀**與一個既有序列：daily ⑬ materialize（argv 不變）的日韓頁三題改讀新列；心跳段 1 多一行「日韓財報」（只讀本機）；daily ②b 的匯率步驟因為表上出現 KRW 季營收，多抓一條 FRED `DEXKOUS`（同一主機、argv 不變）。S1 的 `fundamental_history` CHECK 遷移（加 `revenue_half`、`operating_income_half`）已於 10-21 對正式庫 `--apply`（10,106 列對帳一致） |
+| **2 canonical skill／prompt／本檔** | 本節；本檔「Engine C」命令；計畫 `docs/plans/2026-10-21-002-feat-jp-kr-filings-plan.md`；ROADMAP「海外財報來源」③④。不動任何 skill、prompt |
+| **3 最窄 rule** | daily argv 不變；不新增 step、allowlist、APP 路由、rule；`tests/test_codex_daily_permissions.py::test_edinet_and_dart_history_stay_interactive_entries` 鎖住 rules、harvest、daily 步驟不得出現兩個入口、心跳不得出現抓取函式與 key 名稱；要改成排程必須重做本 review |
+| **4 contract test** | `tests/test_edinet_history.py`（DEI 決定 context、member context 不收、白名單歧異拒寫、只扣自己保有、`－`＝0、缺那一行拒寫、股類／核對、七種具名結局、身分對不上整份不用、下半年的 PIT、缺上半年不估、年度列不寫、key 不外洩、節流、限流退避後中止並計數、コード 0／多筆拒收、整輪端到端與快取、CHECK 沒遷移不寫、路徑上各層的半年缺席、心跳兩條）變異 10／10；`tests/test_dart_history.py`（單季與累計欄、第 1 分期核對、IS／CIS 歧異、可知日對不到拒寫、股數只算普通股與四種寫法、第四季 filed 取較晚、901 中止、key 不外洩、晚知道計數、非 12 月決算、新鮮度）變異 9／9；S1 `tests/test_three_questions_semiannual.py` 變異 7／7 |
+| **5 端到端 smoke** | 韓國：6/6 檔寫入 416 列（清單 21 期全用、拒寫 0、第四季推 10／檔；更正版晚知道 12 期——曉星重工 2024 年報原件 03-12、只拿得到 08-14 更正版）；股數第一輪只認「보통주」漏了삼성전기、HD 현대일렉트릭兩檔（寫法是「…(보통주)」「보통주식」），當下修（L17）；KRW 匯率 1,246 筆；materialize 後韓國 6 頁三題①與營收序列 6/6 有值。日本：（寫入後補） |
+
 ### Sandbox impact review 結論（2026-10-14：個股頁 S3e——事件之後跟組比）
 
 | 步 | 結論 |
@@ -1113,6 +1123,20 @@ materialize 用**，不動 `discover_tracked_tickers`——那會連帶擴大 ED
 & '.venv\Scripts\python.exe' scripts\writer_guard.py acquire --minutes 30 --purpose "EDGAR 非增量回填"
 & '.venv\Scripts\python.exe' -m engine_c.history_backfill --no-prices --report <file.json>
 & '.venv\Scripts\python.exe' scripts\writer_guard.py release
+# 日韓財報（2026-10-21 日韓財報來源；互動式，**不進 daily**——兩個來源永久可查、帶 API key）。key 只放 .env：
+# EDINET_API_KEY、OPENDART_API_KEY。寫入那一刻自己持 writer lock（巢狀於 session 鎖）；快取在 library/private/engine_c/{edinet,dart}/
+& '.venv\Scripts\python.exe' -m engine_c.edinet_history --backfill --dry-run       # 日本：書類一覧逐日掃 5 年（首次約 70 分鐘、可續跑）
+& '.venv\Scripts\python.exe' -m engine_c.edinet_history --backfill                 # 走快取、只重抓還沒定案的日期，然後寫入
+& '.venv\Scripts\python.exe' -m engine_c.edinet_history --sync                     # 半期報告書／有報交件後：重掃最近 30 天
+& '.venv\Scripts\python.exe' -m engine_c.edinet_history --ticker 3110.T            # 印已存序列（不連網）
+& '.venv\Scripts\python.exe' -m engine_c.dart_history --backfill --dry-run         # 韓國：約 260 次呼叫、約 5 分鐘
+& '.venv\Scripts\python.exe' -m engine_c.dart_history --sync                       # 季報交件後：清單重抓、期末 400 天內的報告重抓
+& '.venv\Scripts\python.exe' -m engine_c.dart_history --ticker 000660.KS          # 印已存序列（不連網）
+# 什麼時候跑：心跳段 1「日韓財報」那一行印「落後法定期限 N 檔」時跑 --sync；「營收不能用」--sync 修不了，看
+# library/private/engine_c/{edinet,dart}/last_report.json 的 rejected／h2_missing_h1／q4_missing。
+# 韓國的季營收是 KRW：寫完之後 daily ②b 會多抓 FRED DEXKOUS（同一主機、argv 不變）；急著看「吃到多少」可先跑
+# `python -m engine_c.history_backfill --no-prices --no-edgar --incremental --tickers 000660.KS`（只抓匯率）。
+# OpenDART 個資每 2 年要重新同意（901）——[835] pending 到 2028-09-21，到期重問。
 ```
 
 ⚠ **寫入含 `$` 的金額字串不要經 PowerShell 傳參**——`US$71.3M` 會被當變數前綴展開成 `US.3M`，在 append-only ledger 造成需 supersede 才能更正的損毀。用 Python 或 heredoc。

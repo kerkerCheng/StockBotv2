@@ -118,7 +118,10 @@ def _company_line(node: str, cache: _RevenueCache, registry: Any, *, as_of: date
         return {**line, "absence": absent("company_unlisted")}
     got = cache.company(ticker)
     if got["source"] is None:
-        return {**line, "absence": absent("company_no_revenue")}
+        from alpha.providers.capture import SEMIANNUAL_ONLY
+
+        return {**line, "absence": absent("company_semiannual_only" if got.get("absence_reason") == SEMIANNUAL_ONLY
+                                          else "company_no_revenue")}
     if got["source"].startswith("台股"):
         result = calendar_yoy(got["quarters"], as_of=as_of)
     else:

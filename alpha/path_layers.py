@@ -36,6 +36,8 @@ HOP_ABSENCES: Mapping[str, tuple[str, str]] = {
     "declarations_unread": ("upstream_unavailable", "這一輪沒讀到代表公司宣告"),
     "no_complete_quarter": ("not_yet_recorded", "代表公司沒有一季是今年與去年同季都有營收的"),
     "company_no_revenue": ("provider_missing", "這家公司的季營收還沒接（不是台股月營收、也沒有 EDGAR 季營收）"),
+    # 日韓財報來源 S2（2026-10-21）：日本有營收、只是沒有季——「還沒接」是錯的那句（L11-5）
+    "company_semiannual_only": ("inputs_incompatible", "這家公司只有半年營收（日本 2024-04 起沒有季報）——對不上曆季，不估年增"),
     "company_unlisted": ("provider_missing", "未上市或名冊沒有代號"),
     "company_not_in_registry": ("not_yet_recorded", "名冊沒有這家公司"),
     "company_no_yoy": ("not_yet_recorded", "這家公司沒有一季找得到可比的去年同季"),

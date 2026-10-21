@@ -269,6 +269,12 @@ def build_freshness(*, now: datetime, state_dir: Path | None, leads_path: Path,
     except Exception as exc:  # noqa: BLE001
         absence = Absence("upstream_unavailable", f"年報地區別盤點失敗：{type(exc).__name__}")
         section.lines.append(f"台股年報地區別：{absence.reason}（{absence.kind}）")
+    # (c1c) 日韓財報（2026-10-21 日韓財報來源 S4）：EDINET／OpenDART 永久可查、而且都帶 API key——不排程，心跳印落後幾檔。
+    try:
+        section.lines.append(_jp_kr_filings_line(now=now))
+    except Exception as exc:  # noqa: BLE001
+        absence = Absence("upstream_unavailable", f"日韓財報盤點失敗：{type(exc).__name__}")
+        section.lines.append(f"日韓財報：{absence.reason}（{absence.kind}）")
 
     # (c2) FX 觀測新鮮度（2026-09-19）。**它是一個已知會過期、而且沒有人在補的東西**：
     # 四筆 fx_rate 觀測的 `_note` 逐字寫著「現價 bar_date 換了就要補新的一筆」，
@@ -703,6 +709,53 @@ def _tw_region_revenue_line(*, now: datetime) -> str:
     line += (f"｜⚠ {len(behind)} 檔落後（{due} 年度年報已過期限；跑 `python -m engine_c.tw_region_revenue --backfill`）"
              if behind or empty else "｜已跟上法定期限")
     return line
+
+
+def _jp_kr_filings_line(*, now: datetime) -> str:
+    """日韓財報的新鮮度（已定價①與「出現在數字裡了嗎」靠它）。零網路——只讀本機 Engine C 與最近一輪正式回填的報告。
+
+    同台股季報股數：兩個來源都永久可查（L10）、而且都帶 API key，所以不排程；落後相對**法定期限**算（日本半期 45 日、
+    有報 3 個月；韓國季後 45 日、年報 90 日）。「落後」（`--sync` 修得了）與「營收不能用」（下半年推不出來、白名單拒寫——
+    `--sync` 修不了）分開印（L13-2）。判定住各自的模組（`filing_freshness`，L16），這裡只排版。
+    """
+    from engine_c import dart_history, edinet_history
+    from engine_c.db import get_conn
+
+    today = now.astimezone().date()
+    sources = (("日本", edinet_history, edinet_history.jp_universe(), "python -m engine_c.edinet_history --sync"),
+               ("韓國", dart_history, dart_history.kr_universe(), "python -m engine_c.dart_history --sync"))
+    parts: list[str] = []
+    conn = get_conn()
+    try:
+        for label, module, tickers, command in sources:
+            if not tickers:
+                continue
+            fresh = module.filing_freshness(conn, tickers, today=today)
+            part = f"{label} {len(fresh['have'])}/{len(tickers)} 檔有值"
+            if fresh["latest"]:
+                part += f"、最新期末 {fresh['latest']}"
+            if fresh["empty"]:
+                part += (f"、**{len(fresh['empty'])} 檔一筆都沒有**：" + "、".join(fresh["empty"])
+                         + f"（跑 `{command.replace('--sync', '--backfill')}`）")
+            if fresh["unusable"]:
+                part += "、營收不能用（`--sync` 修不了，看回填報告）：" + "、".join(fresh["unusable"])
+            if fresh["lagging"]:
+                part += f"、⚠ 落後法定期限 {len(fresh['lagging'])} 檔：" + "、".join(fresh["lagging"]) + f"（跑 `{command}`）"
+            elif fresh["have"]:      # 一檔都沒有值時不說「跟上了」（成功與失敗不得同形，L13-2）
+                part += "、已跟上法定期限"
+            last = module.last_run_summary()
+            if last is None:
+                part += "、還沒有正式回填過"
+            else:
+                part += f"、最近一輪 {str(last.get('generated_at') or '?')[:10]} 拒寫 {last['rejected']} 筆"
+                if last.get("late_known"):
+                    part += f"、只拿得到更正版而晚知道 {last['late_known']} 期"
+                if last.get("aborted"):
+                    part += f"、⛔ 那一輪中止：{last['aborted']}"
+            parts.append(part)
+    finally:
+        conn.close()
+    return ("日韓財報｜" + "｜".join(parts)) if parts else "日韓財報：registry 裡沒有日韓（capability_absent）"
 
 
 def _app_freshness_line(*, now: datetime, state_dir: Path | None) -> str:
