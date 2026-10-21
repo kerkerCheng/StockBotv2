@@ -46,6 +46,16 @@ _BASIS_REQUIRES_RECEIPT = frozenset({"semantic_reviewed"})
 _RECEIPT_PATTERN = re.compile(r"^todo:\d+$")
 
 
+#: 條目上的「刻意不併」與「留待」（2026-10-21 批次二 E13 ③；failure log #60、舊 backlog「刻意不併沒有結構化登記處」）。
+#: - `keep_separate`：`[{id, reason, approval_receipt}]`——這個 id **不是**本組的同一個東西。「不併」也是研究判斷，所以與
+#:   `semantic_reviewed` 同門檻：**必須**帶 pq2 receipt（L15：沒有 receipt 的語意判斷只是某個 agent 的意見）。
+#:   走圖第 9 型只排除這一種。
+#: - `pending`：`[{ids, reason}]`——note 裡寫著「留待研究判斷／另案」的 id。只是紀錄，**不排除**任何一對：
+#:   留待的題目要回到問句（#60：待決題不得消失）。
+KEEP_SEPARATE_FIELDS = frozenset({"id", "reason", "approval_receipt"})
+PENDING_FIELDS = frozenset({"ids", "reason"})
+
+
 class EntityAliasError(ValueError):
     """registry 本身不合法（衝突、前綴不對、basis 未登記）。"""
 
@@ -93,7 +103,34 @@ def _validate(raw: Mapping) -> dict[str, dict]:
                     f"alias {alias} 已經指向 {seen[alias]}——一個 id 不能有兩個 canonical"
                 )
             seen[alias] = canonical_id
+        _validate_decisions(canonical_id, entry)
     return dict(canonical)
+
+
+def _validate_decisions(canonical_id: str, entry: Mapping) -> None:
+    """`keep_separate`／`pending` 的形狀（E13 ③）。keep_separate 的 receipt 與 semantic_reviewed 同一條規則。"""
+    group = {canonical_id, *(entry.get("aliases") or ())}
+    for item in entry.get("keep_separate") or ():
+        if not isinstance(item, Mapping) or set(item) != KEEP_SEPARATE_FIELDS:
+            raise EntityAliasError(f"{canonical_id} 的 keep_separate 每筆必須正好是 {sorted(KEEP_SEPARATE_FIELDS)}")
+        node_id = str(item["id"])
+        if not any(node_id.startswith(p) for p in ENTITY_PREFIXES) or node_id in group:
+            raise EntityAliasError(f"{canonical_id} 的 keep_separate id {node_id!r} 前綴不對、或就是本組的成員")
+        if not str(item["reason"] or "").strip():
+            raise EntityAliasError(f"{canonical_id} 的 keep_separate {node_id} 沒寫理由")
+        if not _RECEIPT_PATTERN.match(str(item["approval_receipt"] or "")):
+            raise EntityAliasError(
+                f"{canonical_id} 的 keep_separate {node_id} 必須帶 approval_receipt（格式 todo:<pq2 編號>）——"
+                "「不併」也是研究判斷，沒有核准就不排除，只能記成 pending")
+    for item in entry.get("pending") or ():
+        if not isinstance(item, Mapping) or set(item) != PENDING_FIELDS:
+            raise EntityAliasError(f"{canonical_id} 的 pending 每筆必須正好是 {sorted(PENDING_FIELDS)}")
+        ids = item["ids"]
+        if not isinstance(ids, list) or not ids or not all(
+                isinstance(i, str) and any(i.startswith(p) for p in ENTITY_PREFIXES) for i in ids):
+            raise EntityAliasError(f"{canonical_id} 的 pending ids 必須是非空的實體 id 清單")
+        if not str(item["reason"] or "").strip():
+            raise EntityAliasError(f"{canonical_id} 的 pending {ids} 沒寫理由")
 
 
 @lru_cache(maxsize=1)

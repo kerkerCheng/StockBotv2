@@ -1,4 +1,4 @@
-"""Private authority 備份唯一入口（ROADMAP「private authority 備份沒有可執行入口」）。
+"""Private authority 備份唯一入口（docs/archive/roadmap-pre-alpha-refactor.md「private authority 備份」，2026-08-30 交付）。
 
 備份對象是「今天重新取一次拿不回來」的 private authority（L10 判準）：
 - Decision Store：``library/private/decision_lab/decision_lab.db``（SQLite 一致性快照）

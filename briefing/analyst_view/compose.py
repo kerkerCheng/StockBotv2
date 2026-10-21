@@ -288,7 +288,7 @@ def _brief_panel(view: AlphaInvestmentView) -> AnalystPanel:
     return AnalystPanel(
         key="brief", title="投資人短評：這檔在賭什麼",
         questions=("q0_story",),
-        # ⚠ 2026-09-23（Phase 0 Step 0b.1）：升為**核心**（ROADMAP「首屏的單位是句不是格」）。
+        # ⚠ 2026-09-23（Phase 0 Step 0b.1）：升為**核心**（AGENTS「首屏的單位是句不是格」）。
         # 實測 70/73 檔還沒寫短評，所以升核心會讓 blocked 由 18 變 70——**那是真實 backlog
         # 不是規則錯**：新方向下沒有短評的檔就是沒有產出（AGENTS「產出若無法讓人分辨做了什麼
         # 與沒做，它就不算產出」）。缺席語意是 `not_yet_recorded`（不是 settled），所以它會一直
@@ -333,7 +333,7 @@ def _argument_panel(view: AlphaInvestmentView) -> AnalystPanel:
 
 
 def _bet_panel(view: AlphaInvestmentView) -> AnalystPanel:
-    """賭注（optional）：**純文字**——`our_bet` 那一句＋騎的層或插槽＋什麼必須為真（ROADMAP「bet 改純文字」）。
+    """賭注（optional）：**純文字**——`our_bet` 那一句＋騎的層或插槽＋什麼必須為真（ROADMAP「個股頁」那一節「論證」列）。
 
     2026-09-23（Phase 0 Step 0b.1）由四個價格改成一句話；2026-09-30（Phase 3 Step 3.7）補齊另外兩件：
     「騎層或插槽」照抄敘事的 `rides[]`（read model 的 `investor_brief.rides`），「什麼必須為真」照抄短評那一格

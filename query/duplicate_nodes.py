@@ -42,6 +42,10 @@ L18 的 L2 層（顯形）。與 `query/coverage_gaps.py` 的分工：後者問�
 
 ## 為什麼不自己判「這一對已經決定不併了」
 
+⚠ 2026-10-21（批次二 E13 ③）：下面這段說的「刻意不併沒有結構化登記處」已補上——條目的 `keep_separate`（要 pq2 receipt）
+與 `pending`（`identity.entities` 檔頭）。**只有 keep_separate 會把一對排出問句**（分桶 `kept_separate`）；note 提過但沒有
+結構化決定的（`mentioned`）照樣是問句，逐字跟著走。下面兩段保留當初為什麼不從自由文字推。
+
 `config/entity_aliases.json` 的 note 裡確實有「刻意不併」的決定（`tech:advanced_packaging_gf`
 是 GF Fab 8 特指、`tech:3d_nand_manufacturing` 是證據不足的幻覺節點）。但那些話寫在**自由文字**
 裡，而自由文字只能機械回答「有沒有提到這兩個 id」，不能機械回答「它說了什麼」——同一個 note
@@ -85,7 +89,8 @@ THIS_IS_NOT = (
     "也抓不到「同 head、不同尾綴」那型（`dram_manufacturing`／`dram_production`）——"
     "試過的規則會讓所有單 token id 互相全配，誤報比漏報更貴。",
     "`mentioned` 不等於「已決定不併」：registry 的 note 是自由文字，"
-    "機械只讀得出「有沒有提到這兩個 id」，讀不出它說了什麼。逐字附在旁邊，由讀的人判斷。",
+    "機械只讀得出「有沒有提到這兩個 id」，讀不出它說了什麼。逐字附在旁邊，由讀的人判斷；"
+    "只有條目的 `keep_separate`（帶 pq2 receipt）會把一對排出問句。",
     "不排序、不評分：`邊` 與 `逐字` 是脈絡（哪一端是碎片），不是分數。",
 )
 
@@ -238,15 +243,55 @@ def registry_mentions(pair: Sequence[str], canonical: Mapping[str, Mapping[str, 
     return sorted(hits, key=lambda h: h["canonical"])
 
 
+def keep_separate_decisions(canonical: Mapping[str, Mapping[str, Any]]) -> dict[frozenset, dict[str, Any]]:
+    """條目的 `keep_separate`（E13 ③）→ 每一對（本組任一成員 × 不併的那個 id）的決定。\
+    形狀與 receipt 由 `identity.entities` 載入時驗過；這裡只展開。"""
+    out: dict[frozenset, dict[str, Any]] = {}
+    for canonical_id, entry in canonical.items():
+        group = [canonical_id, *(entry.get("aliases") or ())]
+        for item in entry.get("keep_separate") or ():
+            for member in group:
+                out[frozenset((member, str(item["id"])))] = {
+                    "canonical": canonical_id, "id": str(item["id"]), "reason": str(item["reason"]),
+                    "approval_receipt": str(item["approval_receipt"])}
+    return out
+
+
+def pending_notes(pair: Sequence[str], canonical: Mapping[str, Mapping[str, Any]]) -> list[dict[str, Any]]:
+    """這一對被哪幾筆條目記成「留待」（`pending`；E13 ③）——跟著問句印，不排除。
+
+    兩端都要落在那筆的範圍（本組成員＋留待的 id）裡：`tech:cpo` 記在 NPO 那筆的留待只說「cpo 與 NPO 這一對另案」，
+    不能貼到 cpo 與它其他變體的每一對上。
+    """
+    out: list[dict[str, Any]] = []
+    for canonical_id, entry in canonical.items():
+        group = {canonical_id, *(entry.get("aliases") or ())}
+        for item in entry.get("pending") or ():
+            if set(pair) <= group | set(item.get("ids") or ()):
+                out.append({"canonical": canonical_id, "ids": list(item["ids"]), "reason": str(item["reason"])})
+    return sorted(out, key=lambda p: (p["canonical"], p["ids"]))
+
+
 def bucketize(pairs: Iterable[Mapping[str, Any]],
               canonical: Mapping[str, Mapping[str, Any]]) -> dict[str, list[dict[str, Any]]]:
-    """候選對 → `{"unmentioned": [...], "mentioned": [...]}`，每一對帶上 registry 命中。"""
-    buckets: dict[str, list[dict[str, Any]]] = {"unmentioned": [], "mentioned": []}
+    """候選對 → `{"unmentioned", "mentioned", "kept_separate"}`，每一對帶上 registry 命中與留待紀錄。
+
+    `kept_separate`：條目 `keep_separate` 結構化決定不併（帶 receipt）——唯一排出問句的一桶（E13 ③）。
+    `mentioned`：note 逐字提過、但沒有結構化決定——**仍是問句**（留待的題目不得消失，#60）。
+    """
+    kept = keep_separate_decisions(canonical)
+    buckets: dict[str, list[dict[str, Any]]] = {"unmentioned": [], "mentioned": [], "kept_separate": []}
     for pair in pairs:
         enriched = dict(pair)
         mentions = registry_mentions(pair["pair"], canonical)
         enriched["registry_mentions"] = mentions
-        buckets["mentioned" if mentions else "unmentioned"].append(enriched)
+        enriched["pending"] = pending_notes(pair["pair"], canonical)
+        decision = kept.get(frozenset(pair["pair"]))
+        if decision is not None:
+            enriched["keep_separate"] = decision
+            buckets["kept_separate"].append(enriched)
+        else:
+            buckets["mentioned" if mentions else "unmentioned"].append(enriched)
     return buckets
 
 
