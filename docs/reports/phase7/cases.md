@@ -593,3 +593,129 @@
 - failure log：（尚無）
   - #14（反證以被評公司的供貨 assertion 形式入圖：MP 磁材邊上的 Noveon、USA Rare Earth 文件，引文沒有 MP）
   - #19（海外財報缺口：6324.T、LYC.AX、6680.HK 的已定價嗎與出現在數字裡都量不到）、#20（A＋H 檔快照市值只算 H 股）
+
+## Q3W Q3 財報季窗內名單（Step 7.3 中迴路；amendment A8，2026-10-21 凍結）
+
+- 登記：plan §0.4 A8（使用者 2026-10-21 `A7-A12 go`）；ROADMAP Phase 7 驗收⑤。**名單 commit 後不改**；更正只在本段尾 append（日期、改什麼、為什麼）。
+  凍結的版本只管⑤（財報後新版或不換版理由）；O1、O2 等 7.0a 已登記 case 的 2×2 仍用登記那一版（registration §0 第 4 條）。
+- 窗：2026-10-21～2026-11-30（含兩端）。
+- 凍結時點：ledger 與 registry 讀於 2026-10-21 13:23（+08:00），commit 前同日主 session 重跑 `freeze.py` 名單逐列相同；敘事 ledger 最後一筆寫入 2026-10-20 22:56（+08:00）；候選板 artifact
+  `generated_at` 2026-10-20T22:06:30Z（＝`candidate_state_series.jsonl` 的 2026-10-21 那一行）。兩邊一致：現行 v2 敘事 73；宣告缺 X 26、
+  已定價等回落 3、不要 44；候選板已持有 2（COHR、SIVE.ST）。
+- 規則（看任何 Q3 結果之前寫，機械）：
+  1. 母體＝凍結時點每檔現行 v2 敘事（最新一筆、未撤回）中宣告 `missing`／`priced_wait` 的，加上候選板的已持有
+     （`library/private/app/state/candidates.json` 的 `groups.held`，由 Sheet readonly 推導；本段沒有讀 Sheet）→ 30 份。
+     板上側欄（邊緣無法量、非倍率候選）照宣告狀態算。
+  2. 裁決點＝候選狀態那筆 watch 的 `until`；持股沒有候選 watch 的（COHR，宣告「不要」）＝它在窗內的第一份定期財報。
+  3. 裁決點在窗內 → 名單（28）；不在 → 排除並寫理由（2）。
+  4. 凍結後新寫或改判的敘事不追加；名單內的敘事若在財報前換版，⑤仍要一份**財報後**的新版或不換版理由。
+  5. 非倍率公司（名單內的 COHR、側欄「非倍率候選」的 MP；名單外的 LITE——2026-10-20 撤回、沒有現行敘事）的財報只當層的證據：
+     寫進讀圖換版或本段，不做股價裁決。
+
+### 名單（28；依裁決點排序；敘事 id 後括號是寫入日 UTC）
+
+| # | ticker | 名稱 | 宣告狀態（板上分組） | 凍結的敘事 | 裁決點 | 來源 | 候選 watch（until） | 凍結時已觸發未檢 |
+|---|---|---|---|---|---|---|---|---|
+| 1 | 002428.SZ | 雲南鍺業 | 缺 X | `ib_141707402b3c5904`（10-19） | Q3 季報**已公告**（10-20 晚間；cninfo 披露日 10-21） | [b][c] | `ew_0684`（11-01） | — |
+| 2 | 002270.SZ | 華明裝備 | 缺 X | `ib_5da1949ec73110da`（10-20） | Q3 季報 10-27（預約；法定 10-31） | [b] | `ew_0435`（10-31）；另 `ew_1339`（12-24，窗外） | — |
+| 3 | 300395.SZ | 菲利華 | 缺 X | `ib_115d2ed83e352547`（10-20） | Q3 季報 10-27（預約） | [b] | `ew_1414`（11-01） | — |
+| 4 | AXTI | AXT | 已定價等回落 | `ib_11a30b994d9658d7`（10-20） | Q3 財報與法說 10-29 盤後（13:30 PT＝台北 10-30 04:30）；10-Q 約 11 月中 | [a] | `ew_0148`（11-13）；另 `ew_1433`（10-31） | — |
+| 5 | LYC.AX | Lynas | 缺 X | `ib_205494066a93e359`（10-17） | 9 月季季報 10-29 | [d] | `ew_0204`（11-03） | — |
+| 6 | AEHR | Aehr Test Systems | 缺 X | `ib_56caa0a0838b432a`（10-20） | FY27 Q1 財報 11-02 盤後 | [e] | `ew_0636`（11-03） | `ew_1381`、`ew_1382`（加碼條件） |
+| 7 | COHR | Coherent | 不要（非邊緣；板上已持有） | `ib_4233a575e88d7756`（10-20） | FY27 Q1 財報 11-04 盤後（敘事 when 的 12-01 產能檢核點在窗外） | [f] | —（不要，沒有候選 watch） | CW DFB 層 6 筆 |
+| 8 | KSHINTL.NS | KSH International | 缺 X | `ib_63239e9aa6a0fe97`（10-17） | Q2 FY27 董事會核財報 11-04 | [g] | `ew_0770`（11-20） | — |
+| 9 | SILEX.ST | Silex Microsystems | 缺 X | `ib_c0f560eed6ba7575`（10-20） | Q3 季報 11-04 | [h] | `ew_0376`（11-05） | — |
+| 10 | 3110.T | 日東紡 | 缺 X | `ib_fa7246ba7b1720d4`（10-19） | 第 2 四半期決算發表 11-05 | [i] | `ew_0436`（11-10） | — |
+| 11 | ATS.VI | AT&S | 缺 X | `ib_a1f52f8f289e7baa`（10-19） | 2026/27 半年報 11-05 | [j] | `ew_0242`（11-06） | — |
+| 12 | MP | MP Materials | 缺 X（板上非倍率候選） | `ib_5fe12d2ae072b121`（10-20） | Q3 財報 11-05 盤後 | [k] | `ew_0203`（11-09） | — |
+| 13 | USAR | USA Rare Earth | 缺 X | `ib_1344a7b770ec2cd9`（10-17） | Q3 10-Q 未定日（推論期限 11-09） | [l] | `ew_0257`（11-12） | — |
+| 14 | 1802.TW | 台玻 | 缺 X | `ib_9e01b3c3839caac7`（10-20） | 10 月營收 11-10；Q3 財報 11-14 | [m] | `ew_0978`（11-16） | — |
+| 15 | 1815.TWO | 富喬 | 缺 X | `ib_c6362220eca7e383`（10-20） | 同上 | [m] | `ew_0996`（11-16） | — |
+| 16 | 2455.TW | 全新 | 缺 X | `ib_149da848892f4240`（10-20） | 同上 | [m] | `ew_0617`（11-14） | CW DFB 層 6 筆 |
+| 17 | 3081.TWO | 聯亞 | 已定價等回落 | `ib_899f7c33036e91af`（10-19） | 同上 | [m] | `ew_0620`（11-14） | CW DFB 層 6 筆 |
+| 18 | 3163.TWO | 波若威 | 缺 X（板上邊緣無法量） | `ib_809005cc91d199e7`（10-19） | 同上 | [m] | `ew_0371`（11-16） | — |
+| 19 | 3234.TWO | 光環 | 缺 X（板上邊緣無法量） | `ib_6f2e71838ae8c328`（10-19） | 同上 | [m] | `ew_0985`（11-16） | CW DFB 層 6 筆 |
+| 20 | 3363.TWO | 上詮 | 缺 X | `ib_269a5366ae7ad2b2`（10-19） | 同上 | [m] | `ew_0626`（11-14） | — |
+| 21 | 4971.TWO | 英特磊 | 缺 X | `ib_199a6ef5fec4fde0`（10-19） | 同上 | [m] | `ew_0287`（11-16） | — |
+| 22 | 4979.TWO | 華星光 | 已定價等回落 | `ib_268b1bed22dcf35f`（10-19） | 同上 | [m] | `ew_0629`（11-14） | CW DFB 層 6 筆 |
+| 23 | 4991.TWO | 環宇-KY | 缺 X | `ib_3a006e2f3d922739`（10-19） | 同上 | [m] | `ew_0983`（11-16） | — |
+| 24 | 8358.TWO | 金居 | 缺 X | `ib_d961530614c4690c`（10-20） | 同上 | [m] | `ew_0990`（11-16） | — |
+| 25 | 8996.TW | 高力 | 缺 X | `ib_e062d42bc4716cfa`（10-19） | 同上 | [m] | `ew_0632`（11-14） | — |
+| 26 | SOI.PA | Soitec | 缺 X | `ib_7c82a9ab254240cc`（10-17） | H1'27 業績 11-18 盤後 | [n] | `ew_0270`（11-19） | — |
+| 27 | SIVE.ST | Sivers | 缺 X（板上已持有） | `ib_81fcd7087c1afe4c`（10-20） | Q3 季報 11-26 | [o] | `ew_0149`（11-26） | 15 筆（見下） |
+| 28 | IQE.L | IQE | 缺 X | `ib_2e55ac7988833cdb`（10-17） | 窗內沒有排定的財報；裁決點＝候選 watch 叫醒日 11-30 | [p] | `ew_0249`（11-30） | — |
+
+- CW DFB 層 6 筆＝讀圖 `sr_def7cb705477572e` 的 `ew_1101`、`ew_1102`、`ew_1103`、`ew_1105`、`ew_1107`、`ew_1108`（10-19／10-20 醒）。
+  SIVE.ST 另 9 筆：thesis `sivers_v4` 的 `ew_0108`–`ew_0111`、`ew_1443`；讀圖 `sr_35ca0ce58617d5f6` 的 `ew_0139`、`ew_0141`（ENA.V 共用）；
+  讀圖 `sr_470b3e4a5af4e5c3` 的 `ew_1075`、`ew_1077`。
+- 第 1 列：Q3 季報在凍結之前已公開；被評的敘事寫於 10-19（UTC），早於文件，照規則 1–3 列入。
+- 第 4 列：registration O1 與 `thesis/lifecycle.json#axt_inp.catalyst_checkpoints` 寫的 10-30 是估計（`date_confidence: estimated`）；
+  公司 10-01 新聞稿定 10-29 盤後（PT）。不改登記，評估照實際日期。
+
+### 排除（2；裁決點不在窗內）
+
+| ticker | 名稱 | 宣告狀態 | 敘事 | 理由 |
+|---|---|---|---|---|
+| 301511.SZ | 德福科技 | 缺 X | `ib_2b118f6314f9dc06`（10-20） | 候選 watch `ew_1177` until 2027-04-30；敘事 when：「真正的裁決點是 2026 年報（法定期限 2027 年 4 月 30 日）」——窗內的 Q3 季報（cninfo 預約 10-30、變更為 10-27）只看整體毛利率 |
+| 688020.SS | 方邦股份 | 缺 X（板上邊緣無法量） | `ib_29309d271eca27b1`（10-20） | 候選 watch `ew_1178` until 2027-04-30；敘事 when：「真正會裁決的是 2026 年年報」——窗內的 Q3 季報（cninfo 預約 10-30）「不會拆可剝銅」 |
+
+不在母體：宣告「不要」且不是持股的 43 份；LITE 沒有現行敘事（最後一筆 `ib_ffe45711ead6b37c` 是 2026-10-20 的撤回紀錄）。
+
+### 窗內的層證據財報（非倍率；⑤要寫進讀圖換版或本段）
+
+| 公司 | 日期 | 來源 | 對應的層 |
+|---|---|---|---|
+| COHR（名單第 7 列，持股） | 11-04 盤後 | [f] | CW DFB 層 `sr_def7cb705477572e`；InP 基板層 `sr_e8cab2cad68816c0` 的需求側 |
+| LITE（沒有現行敘事） | 11-05 盤後 | [q] | 同上兩層的需求側；另 `ew_0121`（`mat:inp_substrate`）、`ew_1110`（`tech:cw_dfb_laser`）兩筆讀圖喚醒已因 Lumentum 新文件醒、未檢 |
+
+另：AAOI Q3 11-05 盤後 [r]——由 O4 段照 registration §2 O4 的裁決點處理，不進本名單（宣告「不要」）。
+
+### 凍結時窗內要處置的 watch
+
+- 已觸發未檢 21（`fired`：語意 19＋申報型 2）。名單內綁 17：CW DFB 層 6、SIVE.ST 另 9、AEHR 2。名單外 4：POET `ew_0173`（敘事反證）、
+  9856.HK `ew_0833`（讀圖 `sr_62e2a48a354f407c`）、`ew_0121`、`ew_1110`（讀圖喚醒）。預篩標旗 14（likely_unrelated 10、cannot_tell 4）——標旗不是判定。
+- `expires` 落在窗內 10：追源型 9（`ew_0041`、`ew_0454`、`ew_0471`、`ew_0475`、`ew_0479`、`ew_0487`、`ew_0507`、`ew_0526`、`ew_0541`；到期由 daily
+  轉 lead 終局並計數）；敘事型 1：`ew_0656`（FORM 舊「缺」的等待，11-05 醒、11-20 到期；FORM 10-16 已改判不要——failure log #34 同形）。
+- `until` 落在窗內（date 叫醒）46：名單的候選與附加等待 28（上表；AXTI 兩筆）；HPS-A.TO `ew_0593`（11-05；現行敘事是不要，#34 同形）；
+  追源型 17（`ew_0318`、`ew_0440`、`ew_0443`、`ew_0461`、`ew_0465`、`ew_0470`、`ew_0515`、`ew_0519`、`ew_0531`、`ew_0533`、`ew_0539`、
+  `ew_0544`、`ew_0552`、`ew_0558`、`ew_0566`、`ew_0568`、`ew_0740`）。
+
+### 查證命令
+
+- 名單版本：`python -m alpha brief <TICKER> --list`（每列的 `ib_*` 是凍結時點前最後一筆、未撤回）。
+- 候選板計數：`library/private/measurement/candidate_state_series.jsonl` 的 `"date": "2026-10-21"` 那一行（`held` 2、`missing` 21、`priced_wait` 3；
+  `side`：`edge_unmeasurable` 6、`not_multiple` 1）——側欄 6＋1 裡宣告缺 X 的是 3163.TWO、3234.TWO、688020.SS、MP。
+- 已觸發：`python -m engine_b.event_watch counters`（`fired_unconsumed` 21、`semantic_pending_check` 19、`semantic_flagged` 14）；逐筆 `python -m engine_b.event_watch semantic-queue`。
+- 窗內到期與叫醒（凍結時印 `expires_in_window 10 until_in_window 46 fired 21`）：
+  `python -c "import json;w=json.load(open('library/leads/event_watches.json',encoding='utf-8'))['watches'];L=[x for x in w if x['status'] in ('active','fired')];print('expires_in_window',sum(1 for x in L if '2026-10-21'<=str(x.get('expires'))[:10]<='2026-11-30'),'until_in_window',sum(1 for x in L if '2026-10-21'<=str(x.get('until'))[:10]<='2026-11-30' and not '2026-10-21'<=str(x.get('expires'))[:10]<='2026-11-30'),'fired',sum(1 for x in w if x['status']=='fired'))"`
+- A 股預約披露日：巨潮資訊 `http://www.cninfo.com.cn/new/information/getPrbookInfo`（POST `sectionTime=2026-09-30&market=szsh&stockCode=<代號>`；
+  `f002d_0102` 首次預約、`f003d_0102` 第一次變更、`f006d_0102` 實際披露）。
+
+### 裁決點來源（2026-10-21 查；tier：1＝公司或交易所自己發布，3＝轉述或資料商）
+
+- [a] AXT 新聞稿 2026-10-01（tier 1，經轉載逐字核對；BusinessWire 原址回 403）：「will announce its financial results for the third quarter 2026 in a press release immediately following the close of market on October 29, 2026」——https://www.stocktitan.net/news/AXTI/axt-inc-schedules-third-quarter-2026-earnings-release-for-october-29-1r3y6691ysip.html
+- [b] 巨潮資訊預約披露（tier 1）：002270 首次預約 10-27；002428 預約與實際 10-21；300395 首次預約 10-27；301511 首次 10-30、變更 10-27；688020 首次 10-30。
+- [c] 界面新聞 2026-10-20（tier 3，只佐證公告時間）：https://www.jiemian.com/article/15214009.html
+- [d] kalkine 轉述 ASX 公告（tier 3；ASX 原件沒開）：https://kalkine.com.au/news/announcements/lynas-rare-earths-to-release-september-2026-quarterly-results-on-29-october
+- [e] Aehr 2026-10-08（tier 1）：「Monday, November 2, at 5:00 p.m. Eastern Time」——https://www.aehr.com/2026/10/aehr-test-systems-to-announce-first-quarter-fiscal-2027-financial-results-on-november-2-2026/
+- [f] Coherent 新聞稿 2026-10-14（tier 1，經轉載）：「will release its fiscal 2027 first-quarter financial results on November 4, 2026, after the NYSE closes」——https://www.stocktitan.net/news/COHR/coherent-corp-announces-timing-of-fy2027-first-quarter-earnings-ddaorgdddw11.html
+- [g] trendlyne 轉載 KSH 給 BSE 的 2026-10-12 通知（tier 1 內容、轉載；BSE 原件沒開）：「scheduled on 04/11/2026, inter alia, to consider and approve unaudited financial results for the quarter and six-months period ended on September 30, 2026」——https://trendlyne.com/latest-news/all/3360394/KSHINTL/ksh-international-ltd/
+- [h] Silex Q2 季報財報行事曆（tier 1）：`library/raw/silex_q2_2026_interim_report_2026_07_17_excerpt.txt:35`「Interim report Q3 2026 4 November 2026」
+- [i] 日東紡 IR カレンダー（tier 1）：「2027年3月期 第2四半期決算発表 11月5日」——https://www.nittobo.co.jp/ir/calender.htm
+- [j] MarketScreener 行事曆（tier 3；ats.net 行事曆頁抓不到內容，敘事寫入時也標「第三方日程」）——https://www.marketscreener.com/quote/stock/AT-S-AUSTRIA-TECHNOLOGIE--6814931/calendar/
+- [k] MP 2026-10-08（tier 1）：「after the U.S. markets close on Thursday, November 5, 2026」——https://investors.mpmaterials.com/investor-news/news-details/2026/MP-Materials-Announces-Date-for-Third-Quarter-2026-Financial-Results-and-Webcast/default.aspx
+- [l] USAR 沒有公告 Q3 日期（10-21 搜尋）。推論：Q2 10-Q 在 2026-08-10 申報（季末＋41 天；第 40 天是週日），像 40 天申報人 → Q3 期限 11-09；申報人類別沒查。
+- [m] 證券交易法第 36 條（季報：每季終了後 45 日內＝11-14，當天是週六；月營收：每月 10 日以前）。法說會日期沒查。
+- [n] Soitec Q1'27 新聞稿 p.5（tier 1）：「H1'27 Results are due to be published on November 18th, 2026, after market close.」——https://www.soitec.com/docs/default-source/financial-documents/2026-2027/en/soitec---cp-q1'27---en.pdf
+- [o] Sivers 財報行事曆（tier 1）：「November 26, 2026 Interim report」；2026-07-09 新聞稿「Q3 2026 Interim Report: November 26, 2026」——https://www.sivers-semiconductors.com/investors/financial-calendar/
+- [p] IQE 財報行事曆（tier 1）：只列 2026-09-07 中期業績，之後沒有日程——https://www.iqep.com/investors/events/financial-calendar/
+- [q] Lumentum 2026-10-05（tier 1）：「will release its fiscal first quarter 2027 financial results on Thursday, November 5th, 2026, after the market closes」——https://investor.lumentum.com/financial-news-releases/news-details/2026/Lumentum-Announces-Reporting-Date-for-Fiscal-First-Quarter-2027-Financial-Results/default.aspx
+- [r] AAOI 新聞稿（搜尋摘要，原文沒開）：11-05——https://www.tradingview.com/news/prnewswire:0a001e72f0789:0-applied-optoelectronics-announces-date-of-third-quarter-2026-financial-results-conference-call/
+
+### 裁決（逐檔 append：日期｜ticker｜文件｜新版 `ib_*` 或不換版理由｜「錯」的 kind）
+
+- （尚無）
+
+### 2×2
+
+- 名單每份一列（registration §3.3：到量測日沒有裁決寫「尚未到裁決點」、組未定義寫「組未定義」，都不填格）。（尚無）
