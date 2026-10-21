@@ -308,6 +308,10 @@
       "radar_company_ids": {
         "value_type": "string_list",
         "description": "radar_entities 以名冊寫法完全相符解析到的 co:*（query.bottleneck.company_name_forms；共用寫法不算）"
+      },
+      "radar_layer": {
+        "value_type": "string",
+        "description": "雷達從今天輪替到的哪一個讀過的層找到這則（節點 id；只收批次 rotation_layers 裡有的，雷達精進 C3，2026-10-21）"
       }
     }
   }

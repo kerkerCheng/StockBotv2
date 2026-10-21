@@ -147,6 +147,10 @@ WATCHES = [
 ]
 
 
+def _no_plan():
+    raise RuntimeError("測試不載入輪替")
+
+
 def test_prepare_sends_themes_and_watched_conditions_and_never_touches_holdings(tmp_path, monkeypatch) -> None:
     sentinel = "ZZZ-HOLDING-SENTINEL"
 
@@ -160,11 +164,13 @@ def test_prepare_sends_themes_and_watched_conditions_and_never_touches_holdings(
     monkeypatch.setattr(holdings, "resolve_holdings", boom)
     out = tmp_path / "radar_batch.json"
     summary = radar.prepare(RUN, out, max_items=5, today=TODAY, themes=THEMES, watches=WATCHES, registry=REG,
-                            receipt_dir=tmp_path)
+                            receipt_dir=tmp_path, plan_context=_no_plan)
     assert summary == {"themes": 2, "watched_conditions": 2, "max_items": 5, "market_topics": 0,
-                       "max_market_items": 0, "recently_accepted": 0}
+                       "max_market_items": 0, "recently_accepted": 0, "rotation_layers": 0, "rotation_pool": None,
+                       "orphan_conditions": None, "rotation_error": "RuntimeError: 測試不載入輪替"}
     batch = json.loads(out.read_text(encoding="utf-8"))
     request = batch["requests"][0]
+    # 輪替算不出來 → 退回全量條件、照舊用 watch_id（C3 之前的形狀）
     assert batch["run_id"] == RUN and [c["watch_id"] for c in request["watched_conditions"]] == ["ew_c1", "ew_d1"]
     roles = {c["watch_id"]: c["role"] for c in request["watched_conditions"]}
     assert roles["ew_c1"].startswith("加碼條件") and roles["ew_d1"].startswith("反證")
@@ -193,10 +199,11 @@ def _item(url, **over) -> dict:
     return base
 
 
-def _files(tmp_path, items, *, urls, max_items=5, no_change=False, run=RUN, max_market=0, watched=None):
+def _files(tmp_path, items, *, urls, max_items=5, no_change=False, run=RUN, max_market=0, watched=None,
+           envelope=None, layers=None):
     batch = tmp_path / "radar_batch.json"
-    batch.write_text(json.dumps({"schema": radar.BATCH_SCHEMA, "run_id": run, "requests": [
-        {"max_items": max_items, "max_market_items": max_market,
+    batch.write_text(json.dumps({"schema": radar.BATCH_SCHEMA, "run_id": run, **(envelope or {}), "requests": [
+        {"max_items": max_items, "max_market_items": max_market, "rotation_layers": layers or [],
          "watched_conditions": watched or [{"watch_id": "ew_d1"}, {"watch_id": "ew_c1"}]}]}),
         encoding="utf-8")
     result = tmp_path / "radar_proposals.json"
@@ -497,7 +504,8 @@ def test_the_snapshot_has_the_four_radar_keys() -> None:
 def test_prepare_carries_the_market_topics_from_config(tmp_path) -> None:
     out = tmp_path / "radar_batch.json"
     summary = radar.prepare(RUN, out, max_items=5, today=TODAY, themes=THEMES, watches=WATCHES, registry=REG,
-                            market_topics=["AI 資料中心資本支出", "政策與管制"], max_market_items=3, receipt_dir=tmp_path)
+                            market_topics=["AI 資料中心資本支出", "政策與管制"], max_market_items=3, receipt_dir=tmp_path,
+                            plan_context=_no_plan)
     assert summary["market_topics"] == 2 and summary["max_market_items"] == 3
     request = json.loads(out.read_text(encoding="utf-8"))["requests"][0]
     assert request["market_topics"] == ["AI 資料中心資本支出", "政策與管制"] and request["max_market_items"] == 3
@@ -522,7 +530,7 @@ def test_the_titles_accepted_in_the_last_seven_days_go_to_the_llm_so_the_same_st
     assert len(radar.recently_accepted(tmp_path, today=TODAY, cap=2)) == 2
     out = tmp_path / "radar_batch.json"
     summary = radar.prepare(RUN, out, max_items=5, today=TODAY, themes=THEMES, watches=WATCHES, registry=REG,
-                            receipt_dir=tmp_path)
+                            receipt_dir=tmp_path, plan_context=_no_plan)
     request = json.loads(out.read_text(encoding="utf-8"))["requests"][0]
     assert summary["recently_accepted"] == 3 and request["recently_accepted"][0] == {
         "date": (TODAY - timedelta(days=1)).isoformat(), "title": "昨天 A"}
@@ -555,3 +563,138 @@ def test_the_receipt_keeps_the_search_title_and_the_llm_fact_for_the_daily_brief
     row = receipt["accepted"][0]
     assert row["scope"] == "watch" and row["fact"] == "Coherent 宣布 CW 雷射產能擴充" and row["why"] == "碰到供給側的條件"
     assert row["publisher"] == "Example News"
+
+
+# ---------------------------------------------------------------------------
+# 讀過的層每日輪替（雷達精進 C3，2026-10-21；使用者 10-20：與 themes.txt 並存）
+# ---------------------------------------------------------------------------
+
+def _plan_ctx(n=10):
+    nodes = [f"tech:n{i:02d}" for i in range(n)]
+    sem = {"kind": "semantic_condition", "status": "active", "entities": ["co:coherent"]}
+    watches = [
+        {**sem, "watch_id": "ew_r", "source_ref": "reading:sr_1#1", "condition": "讀圖反證"},
+        {**sem, "watch_id": "ew_n", "source_ref": "layer_note:ln_9#1", "condition": "層說明的條件"},
+        {**sem, "watch_id": "ew_b", "source_ref": "brief:ib_aaa#1", "condition": "騎 n03 的敘事條件", "condition_role": "confirm"},
+        {**sem, "watch_id": "ew_far", "source_ref": "reading:sr_8#1", "condition": "今天沒輪到的層"},
+        {**sem, "watch_id": "ew_o", "source_ref": "brief:ib_zzz#1", "condition": "掛不到任何層"},
+        {**sem, "watch_id": "ew_done", "status": "consumed", "source_ref": "reading:sr_1#2", "condition": "已收"},
+    ]
+    ctx = SimpleNamespace(
+        readings={node: SimpleNamespace(reading_id=f"sr_{i}") for i, node in enumerate(nodes)},
+        briefs=[SimpleNamespace(ticker="AAA", rides=(SimpleNamespace(node="tech:n03"),)), SimpleNamespace(ticker="ZZZ", rides=())],
+        watches=watches, watch_owner={"ew_b": ["AAA"], "ew_o": ["ZZZ"]},
+        reading_entities={"tech:n01": {"co:coherent": {"supply_side"}, "co:buyer": {"demand_side"}}},
+        companies={"co:coherent": SimpleNamespace(display_name="Coherent Corp.")},
+        node_names={"tech:n01": "CW DFB laser (CW DFB)"})
+    return ctx, {"ln_9": "tech:n02"}
+
+
+def _day_starting_at_zero():
+    from datetime import timedelta
+
+    return next(TODAY + timedelta(days=d) for d in range(5) if (TODAY + timedelta(days=d)).toordinal() % 5 == 0)
+
+
+def test_the_rotation_takes_k_consecutive_layers_a_day_and_covers_every_layer_in_ceil_n_over_k_days() -> None:
+    from datetime import timedelta
+
+    nodes = [f"tech:l{i:02d}" for i in range(58)]
+    days = [radar.rotation(nodes, TODAY + timedelta(days=d)) for d in range(8)]
+    assert all(len(d) == radar.ROTATION_K for d in days)
+    assert set().union(*days) == set(nodes)                                 # ⌈58/8⌉＝8 天輪完
+    assert nodes.index(days[1][0]) == (nodes.index(days[0][-1]) + 1) % 58   # 相鄰兩天銜接
+    assert radar.rotation(["b", "a"], TODAY) in (["a", "b"], ["b", "a"]) and radar.rotation([], TODAY) == []
+
+
+def test_the_plan_sends_only_conditions_hung_on_todays_layers_with_short_ids_mapped_back() -> None:
+    """條件掛在哪層：讀圖反證 → 那份讀圖的節點；層說明 → 那份說明的節點；敘事 → 它騎的層（歸屬問 watch_owner）。"""
+    ctx, notes = _plan_ctx()
+    plan = radar.layer_plan(ctx, today=_day_starting_at_zero(), registry=REG, note_node=notes)
+    assert [r["node"] for r in plan["layers"]] == [f"tech:n{i:02d}" for i in range(8)]
+    n01 = plan["layers"][1]
+    assert n01 == {"node": "tech:n01", "name": "CW DFB laser (CW DFB)", "supply_side": ["Coherent Corp."], "more_supply": 0,
+                   "conditions": 1}
+    hung = {plan["condition_ids"][c["id"]]: c for c in plan["conditions"]}
+    assert {"ew_b", "ew_n", "ew_r"} <= set(hung) and "ew_far" not in hung and "ew_done" not in hung
+    assert hung["ew_b"]["layers"] == ["tech:n03"] and hung["ew_b"]["role"].startswith("加碼條件")
+    assert all("watch_id" not in c for c in plan["conditions"]) and plan["conditions"][0]["id"] == "c01"
+    assert plan["pool"] == 10 and plan["orphans"] == 1
+
+
+def test_the_plan_widens_k_so_every_layer_is_searched_within_seven_days_as_the_pool_grows() -> None:
+    """10-21 試跑：58 層、固定每天 8 層，7 天只輪到 56——K 改成 max(8, ⌈層數÷7⌉)。"""
+    from datetime import timedelta
+
+    for n in (10, 58, 100):
+        ctx, notes = _plan_ctx(n)
+        week = [radar.layer_plan(ctx, today=TODAY + timedelta(days=d), registry=REG, note_node=notes)
+                for d in range(radar.ROTATION_DAYS)]
+        assert set().union(*({r["node"] for r in p["layers"]} for p in week)) == set(ctx.readings), n
+
+
+def test_a_condition_hung_on_no_layer_is_still_sent_once_every_seven_days() -> None:
+    from datetime import timedelta
+
+    ctx, notes = _plan_ctx()
+    plans = [radar.layer_plan(ctx, today=TODAY + timedelta(days=d), registry=REG, note_node=notes)
+             for d in range(radar.ROTATION_DAYS)]
+    assert [p["orphans_today"] for p in plans].count(1) == 1
+    assert sum("ew_o" in p["condition_ids"].values() for p in plans) == 1     # 真的交給 LLM，不只是計數
+
+
+def test_prepare_with_the_plan_sends_layers_and_keeps_the_id_map_out_of_the_prompt(tmp_path) -> None:
+    out = tmp_path / "radar_batch.json"
+    summary = radar.prepare(RUN, out, max_items=5, today=_day_starting_at_zero(), themes=THEMES, watches=WATCHES,
+                            registry=REG, receipt_dir=tmp_path, plan_context=_plan_ctx)
+    assert (summary["rotation_layers"], summary["rotation_pool"], summary["rotation_error"]) == (8, 10, None)
+    batch = json.loads(out.read_text(encoding="utf-8"))
+    request = batch["requests"][0]
+    assert batch["rotation_pool"] == 10 and set(batch["condition_ids"].values()) >= {"ew_b", "ew_n", "ew_r"}
+    prompt = llm_step.compose_radar_prompt(batch["requests"])
+    assert "rotation_layers" in prompt and "CW DFB laser" in prompt and "ew_r" not in prompt   # LLM 只看到短 id
+
+
+def test_apply_maps_short_ids_back_checks_the_layer_and_counts_seven_day_coverage(tmp_path) -> None:
+    from datetime import timedelta
+
+    receipts = tmp_path / "receipts"
+    receipts.mkdir()
+    for back, nodes in ((1, ["tech:n05"]), (7, ["tech:too_old"])):
+        (receipts / f"radar_{(TODAY - timedelta(days=back)).isoformat()}.json").write_text(
+            json.dumps({"rotation": nodes}), encoding="utf-8")
+    items = [_item(URL_A, relates_to=["c1"], layer="tech:n01"),            # c1 也認成 c01
+             _item(URL_B, relates_to=["c09", "c02"], layer="tech:zz")]       # c09 不存在；層不是今天的
+    out, store = _apply(tmp_path, items, urls=[URL_A, URL_B], watched=[{"id": "c01"}, {"id": "c02"}],
+                        envelope={"condition_ids": {"c01": "ew_0762_2026-10-17", "c02": "ew_r"}, "rotation_pool": 10},
+                        layers=[{"node": "tech:n01"}, {"node": "tech:n02"}])
+    s = out["summary"]
+    refs_a = store["leads"][leads.lead_id_for(URL_A)]["refs"]
+    refs_b = store["leads"][leads.lead_id_for(URL_B)]["refs"]
+    assert refs_a["relates_to"] == ["ew_0762_2026-10-17"] and refs_a["radar_layer"] == "tech:n01"
+    assert refs_b["relates_to"] == ["ew_r"] and "radar_layer" not in refs_b
+    assert (s["relates_to_unknown"], s["layer_unknown"], s["new_layer"]) == (1, 1, 1)
+    assert (s["rotation_layers"], s["rotation_pool"], s["rotation_covered_7d"]) == (2, 10, 3)   # n01、n02＋昨天的 n05
+    receipt = json.loads((receipts / f"radar_{TODAY.isoformat()}.json").read_text(encoding="utf-8"))
+    assert receipt["rotation"] == ["tech:n01", "tech:n02"] and receipt["accepted"][0]["layer"] == "tech:n01"
+
+
+def test_the_heartbeat_line_prints_the_rotation_or_why_it_fell_back(tmp_path) -> None:
+    from crons.heartbeat import _radar_line
+
+    now = datetime(2026, 10, 5, 0, 30, tzinfo=timezone.utc)
+    base = {"new": 1, "duplicate": 0, "url_not_in_search": 0, "over_cap": 0, "invalid": 0, "related": 0,
+            "relates_to_unknown": 0, "searches": 30}
+    ok = _record(tmp_path, [{"key": "01e_radar_apply", "status": "ok", "summary": {
+        **base, "rotation_layers": 8, "rotation_covered_7d": 50, "rotation_pool": 58, "new_layer": 1, "layer_unknown": 0}}])
+    assert "｜輪替層 8（近 7 天輪到 50／58 層；從層收下 1、層 id 對不上 0）" in _radar_line(now=now, record_path=ok)
+    broken = _record(tmp_path, [{"key": "01e_radar_apply", "status": "ok", "summary": {
+        **base, "rotation_layers": 0, "rotation_error": "RuntimeError: x"}}])
+    assert "輪替層沒算出來（RuntimeError: x；退回全量條件）" in _radar_line(now=now, record_path=broken)
+
+
+def test_the_schema_asks_for_the_layer_and_the_prompt_allows_32_searches() -> None:
+    schema = json.loads(llm_step.RADAR_SCHEMA.read_text(encoding="utf-8"))
+    assert "layer" in schema["properties"]["items"]["items"]["required"]
+    text = llm_step.RADAR_PROMPT.read_text(encoding="utf-8")
+    assert "總共 32 次以內" in text and "rotation_layers" in text

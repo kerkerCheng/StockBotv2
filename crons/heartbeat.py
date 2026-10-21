@@ -1619,10 +1619,18 @@ def _radar_line(*, now: datetime, record_path: Path | None) -> str:
     if apply is not None and apply.get("status") == "ok" and isinstance(apply.get("summary"), Mapping):
         s = apply["summary"]
         tail = "｜沒有重要變化" if s.get("no_material_change") and not s.get("new") else ""
+        # 輪替層（雷達精進 C3）：今天輪到幾層、近 7 天輪到幾層／讀過的層總數（驗收 3）；輪替壞了說錯誤（退回全量條件）
+        if s.get("rotation_error"):
+            rotation = f"｜輪替層沒算出來（{str(s['rotation_error'])[:60]}；退回全量條件）"
+        elif "rotation_layers" in s:
+            rotation = (f"｜輪替層 {s.get('rotation_layers')}（近 7 天輪到 {s.get('rotation_covered_7d', '?')}"
+                        f"／{s.get('rotation_pool', '?')} 層；從層收下 {s.get('new_layer', 0)}、層 id 對不上 {s.get('layer_unknown', 0)}）")
+        else:
+            rotation = ""
         return (f"外部雷達：新 {s.get('new', '?')}｜重複 {s.get('duplicate', '?')}｜拒收 {radar_rejected(s)}"
                 f"（網址不在搜尋結果 {s.get('url_not_in_search', '?')}、超過上限 {s.get('over_cap', '?')}"
                 f"、欄位不合法 {s.get('invalid', '?')}）｜提到在盯的條件 {s.get('related', '?')}"
-                f"（條件 id 對不上 {s.get('relates_to_unknown', '?')}）{tail}"
+                f"（條件 id 對不上 {s.get('relates_to_unknown', '?')}）{rotation}{tail}"
                 f"｜搜尋 {s.get('searches', '?')} 次（只寫 secondary lead，不喚醒 watch）")
     step = next((rows[k] for k in ("01e_radar_apply", "01c_radar_propose", "01b_radar_prepare")
                  if k in rows and rows[k].get("status") != "ok"), None) or apply or {}

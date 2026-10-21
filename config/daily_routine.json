@@ -95,7 +95,8 @@
     ],
     "enabled": true,
     "max_items": 5,
-    "timeout_minutes": 12,
+    "_doc_timeout": "2026-10-21 雷達精進 C3：搜尋上限 24 → 32（每天輪替 8 個讀過的層、每層一次），timeout 12 → 16 分鐘（按次數同比例；daily 各步加總 367 → 371，上限 400）。",
+    "timeout_minutes": 16,
     "_doc_market": [
       "市場大事（2026-10-07 使用者：「我們還是必須知道 AI CAPEX 整個市場的大事，不能見樹不見林」）：",
       "market_topics 每題建議搜一次、不限在盯的公司；收進來的寫成 lead（scope=market，與主題／在盯條件那一層分開計上限）。",

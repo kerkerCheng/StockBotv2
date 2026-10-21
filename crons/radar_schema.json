@@ -22,6 +22,7 @@
           "entities",
           "theme",
           "relates_to",
+          "layer",
           "why"
         ],
         "properties": {
@@ -65,6 +66,9 @@
             "items": {
               "type": "string"
             }
+          },
+          "layer": {
+            "type": "string"
           },
           "why": {
             "type": "string"
