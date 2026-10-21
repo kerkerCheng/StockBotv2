@@ -24,6 +24,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from collections import Counter
 from datetime import date
@@ -45,7 +46,30 @@ REJECT_REASONS: Mapping[str, str] = {
     "url_not_in_search": "網址不在負責這條的那次呼叫的搜尋結果裡",
     "duplicate_hit": "這條等待已經掛過這個網址",
     "over_cap": "超過每條等待每輪的命中上限",
+    # 批次二 E8（failure log #62）：ew_0020 三次掛的是 lead 已取得或已查過的同一份申報（主文、同 accession 的附件、10-Q）
+    "already_obtained": "這份申報（同一個 accession，含附件）是 lead 已取得或已查過的——不掛命中",
 }
+#: SEC accession：`0001045810-26-000075` 或路徑裡的 18 碼 `000104581026000075`。
+_ACCESSION_DASHED = re.compile(r"(?<!\d)(\d{10})-(\d{2})-(\d{6})(?!\d)")
+_ACCESSION_PATH = re.compile(r"/Archives/edgar/data/\d+/(\d{18})(?:/|$)", re.IGNORECASE)
+#: lead 的哪幾格寫著它已取得或已查過的申報。
+_OBTAINED_REFS = ("trace_original_url", "trace_attempts_ref", "primary_url")
+
+
+def accessions_in(text: Any) -> set[str]:
+    """一段文字或網址裡的 SEC accession（正規化成 18 碼）。"""
+    s = str(text or "")
+    found = {"".join(m.groups()) for m in _ACCESSION_DASHED.finditer(s)}
+    found |= {m.group(1) for m in _ACCESSION_PATH.finditer(s)}
+    return found
+
+
+def lead_accessions(lead: Mapping[str, Any] | None) -> set[str]:
+    refs = (lead or {}).get("refs") or {}
+    out: set[str] = set()
+    for key in _OBTAINED_REFS:
+        out |= accessions_in(refs.get(key))
+    return out
 #: 原本在追的那則線索的標題塞進 prompt 的長度上限（脈絡，不是證據）。
 LEAD_TITLE_MAX = 160
 
@@ -142,7 +166,8 @@ def prepare(run_id: str, out: Path, *, today: date | None = None, data: Mapping[
 # ---------------------------------------------------------------------------
 
 def apply(result_path: Path, batch_path: Path, run_id: str, *, watches_path: Path | None = None,
-          receipt_dir: Path = OUT_DIR, today: date | None = None) -> dict[str, Any]:
+          receipt_dir: Path = OUT_DIR, today: date | None = None,
+          leads_store: Mapping[str, Any] | None = None) -> dict[str, Any]:
     """驗證後只寫 `poll.last_checked` 與 `poll.hits`，回傳 `{summary, rejected}`（daily 的套用步驟收最後一行 JSON 的第一行）。"""
     from engine_b import event_watch as ew
     from engine_b import leads
@@ -174,6 +199,11 @@ def apply(result_path: Path, batch_path: Path, run_id: str, *, watches_path: Pat
     path = Path(watches_path) if watches_path else ew.WATCHES_PATH
     data = ew.load_watches(path)
     by_id = {str(w.get("watch_id")): w for w in data["watches"]}
+    if leads_store is None:
+        try:
+            leads_store = leads.load()["leads"]
+        except Exception:  # noqa: BLE001 — 讀不到就不擋（只是少一道「已取得」的過濾），照實計數
+            leads_store = {}
 
     answers = [a for a in result.get("results") or ()]
     times_answered = Counter(str(a.get("watch_id") or "").strip() for a in answers if isinstance(a, Mapping))
@@ -230,6 +260,7 @@ def apply(result_path: Path, batch_path: Path, run_id: str, *, watches_path: Pat
             except ValueError:
                 continue
         new_here = 0
+        obtained = lead_accessions(leads_store.get(str(watch.get("wake_lead")))) if watch.get("wake_lead") else set()
         for item in answer.get("items") or ():
             url = str((item or {}).get("url") or "").strip() if isinstance(item, Mapping) else ""
             summary = str(item.get("summary") or "").strip() if isinstance(item, Mapping) else ""
@@ -246,6 +277,9 @@ def apply(result_path: Path, batch_path: Path, run_id: str, *, watches_path: Pat
                 continue
             if key in seen:
                 reject("duplicate_hit", watch_id, url)
+                continue
+            if obtained & accessions_in(url):
+                reject("already_obtained", watch_id, url)
                 continue
             if new_here >= cap:
                 reject("over_cap", watch_id, url)

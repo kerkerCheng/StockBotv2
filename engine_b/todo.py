@@ -1826,7 +1826,27 @@ def _close_orphaned_waits(data: dict[str, Any], pool: Mapping[str, Any],
                 event_watch.close_orphan(data, watch["watch_id"], kind="lead_closed", lead_id=str(watch["wake_lead"]),
                                          note=f"要排回 pq1 的 lead 已 {lead.get('status')}——醒了也沒有東西會接")
                 closed.append(str(watch["watch_id"]))
+            elif lead is not None and _lead_terminal_without_wait(lead):
+                # 批次二 E8（#62）：停在終局、觸發寫「無」（`trace_trigger_kind=none`）——醒了排回 pq1 也沒有東西要追；
+                # ew_0020 掛在 contradicts＋none 的 lead 名下，T2 輪詢三次掛的都是它已取得的申報。擴 `lead_closed` 的認定，不新增收法。
+                refs = lead.get("refs") or {}
+                event_watch.close_orphan(data, watch["watch_id"], kind="lead_closed", lead_id=str(watch["wake_lead"]),
+                                         note=f"lead 停在終局 {refs.get('trace_status')}、明示不等——醒了也沒有東西會接")
+                closed.append(str(watch["watch_id"]))
     return closed
+
+
+def _lead_terminal_without_wait(lead: Mapping[str, Any]) -> bool:
+    from engine_b.lead_refs import get_trace_status_registry
+    from engine_b.leads import TRACE_NO_WAIT
+
+    refs = lead.get("refs") or {}
+    if lead.get("status") != "parked" or refs.get("trace_trigger_kind") != TRACE_NO_WAIT:
+        return False
+    try:
+        return get_trace_status_registry().is_terminal(str(refs.get("trace_status") or ""))
+    except Exception:  # noqa: BLE001 — 讀不到終局字彙就不收（寧可多盯，不靜默收掉）
+        return False
 
 
 def _mark_source_cleared(

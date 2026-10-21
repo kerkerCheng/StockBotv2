@@ -19,7 +19,7 @@
 | E5 | #79＋#59 | 共用別名進走圖第 9 型＋入圖乾跑提示 | 是 | Z2／R1 | 中 | — | ○ |
 | E6 | #90 | 券商內容不進公開 repo 的機制 | 否（公開、不可逆） | Z2／**R2** | 中 | **Q3** | ○ |
 | E7 | #85② | 更正走廊乾跑列出 claim 改句 | 半（核准資訊） | Z1／R1 | 小（約 20 行） | — | ✅ 10-21（變異 4／4；回放 [812] 2 筆、[814] 1 筆） |
-| E8 | #62 | 輪詢不掛已取得的同一份申報；終局 lead 名下等待收掉 | 半 | Z2／R1 | 中 | — | ○ |
+| E8 | #62 | 輪詢不掛已取得的同一份申報；終局 lead 名下等待收掉 | 半 | Z2／R1 | 中 | — | ✅ 10-21（變異 4／4；回放 ew_0020 3/3 擋下；終局不等名下 active 等待現值 5 → 下次 sync 收） |
 | E9 | #10＋#11 | 證據等級認得關係人自述與買方自述 | 半 | Z2／R1 | 中 | — | ○ |
 | E10 | #64 | 覆蓋家數取三者最大 | 半 | Z2／R1 | 小＋重算 | **Q4** | ○ |
 | E11 | #68 | 「供給側多一家」不再是機械反證觸發；讀圖反證寫新增產能 | 半 | Z2／R1 | 小 | — | ○ |
@@ -157,6 +157,8 @@ Case: #62 3 次（ew_0020：10-15 8-K 主文、10-16 同 accession 的 Ex 99.1�
 **現況：** `engine_b/watch_poll.py`、`engine_b/event_watch.py` 10-15 之後沒有 commit；`ORPHAN_CLOSE_KINDS = ("pq2_item_gone", "lead_closed")`，`lead_closed` 只認 applied／no-go（event_watch.py 第 638 行）。
 **做什麼：** ①輪詢命中的申報與 lead 的 `trace_original_url`、`trace_attempts_ref` 同一個 accession（含同 accession 的附件）→ 不掛命中、記「已取得」；②lead 停在終局 trace_status 且觸發寫「無」時，名下追源型等待以 `lead_closed` 收掉並留理由（擴 `lead_closed` 的認定，不新增 close kind）。
 **驗收：** 等待 registry：回放 ew_0020 三次 → 0 次掛命中；「lead 已終局、名下仍 active 的追源等待」上線前先量現值 → 0。
+
+**落地（2026-10-21）：** ①`watch_poll.apply` 對有 `wake_lead` 的等待，命中網址的 SEC accession（`…-26-000075` 或路徑 18 碼）若在 lead 的 `trace_original_url`／`trace_attempts_ref`／`primary_url` 寫過 → 拒收 `already_obtained`（同 accession 的附件一併）；②`todo._close_orphaned_waits`：lead 停放、trace_status 終局、`trace_trigger_kind=none` → 以 `lead_closed` 收（擴認定、不新增收法）。回放：ew_0020 三筆命中 3/3 會被擋；上線前「lead 已終局且明示不等、名下仍 active 的追源等待」現值 **5**（ew_0020 contradicts、ew_0490／0498／0526／0578 original_obtained），下一次 `todo sync` 收成 0。
 
 ## E9 證據等級認得關係人自述與買方自述（#10＋#11）
 

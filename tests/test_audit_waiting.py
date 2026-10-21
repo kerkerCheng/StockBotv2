@@ -477,6 +477,24 @@ def test_sync_closes_waits_whose_only_consumer_is_gone() -> None:
         ew.close_orphan(data, "ew_open", kind="whatever", note="x")
 
 
+def test_sync_closes_a_trace_wait_whose_lead_is_terminal_and_explicitly_not_waiting() -> None:
+    """批次二 E8（#62）：lead 停在終局、觸發寫「無」（trace_trigger_kind=none）——ew_0020 的形狀。擴 lead_closed 的認定；
+    終局但還寫著要等的、或明示不等但還沒終局的都不動。"""
+    from engine_b import todo
+
+    data = {"watches": [_watch("ew_done", wake_lead="l_done"), _watch("ew_waits", wake_lead="l_waits"),
+                        _watch("ew_open", wake_lead="l_open")]}
+    leads = {
+        "l_done": {"status": "parked", "refs": {"trace_status": "contradicts", "trace_trigger_kind": "none"}},
+        "l_waits": {"status": "parked", "refs": {"trace_status": "contradicts", "trace_trigger_kind": "entity_filing_signal"}},
+        "l_open": {"status": "parked", "refs": {"trace_status": "secondary_only", "trace_trigger_kind": "none"}},
+    }
+    assert todo._close_orphaned_waits(data, {"items": []}, leads) == ["ew_done"]
+    by_id = {w["watch_id"]: w for w in data["watches"]}
+    assert by_id["ew_done"]["closed"]["kind"] == "lead_closed" and "明示不等" in by_id["ew_done"]["closed"]["note"]
+    assert by_id["ew_waits"]["status"] == "active" and by_id["ew_open"]["status"] == "active"
+
+
 # ---------------------------------------------------------------------------
 # Phase 3 Step 3.6：敘事該重寫要被候選板帶著（plan §5 第 6 點）、連結斷了的失聯
 # ---------------------------------------------------------------------------

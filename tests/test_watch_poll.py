@@ -258,6 +258,26 @@ def test_apply_records_checked_and_hangs_hits_without_changing_status(tmp_path: 
     assert {r["reason"] for r in receipt["rejected"]} == {"url_not_in_search", "not_searched"}
 
 
+def test_a_hit_on_a_filing_the_lead_already_obtained_is_not_hung(tmp_path: Path) -> None:
+    """批次二 E8（#62）：ew_0020 三次掛的都是 lead 已取得或已查過的同一份申報——8-K 主文、同 accession 的附件、
+    attempts 裡寫過的 10-Q。同一個 accession（含附件）不掛命中、記 already_obtained；新的 accession 照掛。"""
+    base = "https://www.sec.gov/Archives/edgar/data/1045810"
+    main_doc, exhibit = f"{base}/000104581026000069/nvda-20260817.htm", f"{base}/000104581026000069/ex99-1.htm"
+    ten_q, fresh = f"{base}/000104581026000075/nvda-20260726.htm", f"{base}/000104581026000081/nvda-8k.htm"
+    _write_registry([_watch("ew_a", checked="2026-10-01")])
+    leads_store = {"lead_parked": {"refs": {"trace_original_url": main_doc,
+                                            "trace_attempts_ref": "查過 10-Q 0001045810-26-000075 擔保附註"}}}
+    urls = [main_doc, exhibit, ten_q, fresh]
+    result = _result(tmp_path, [_answer("ew_a", queries=["nvda 8-k"], items=[_item(u) for u in urls])],
+                     calls=[_call("ew_a", queries=["nvda 8-k"], urls=urls)])
+    s = wp.apply(result, _batch(tmp_path, ["ew_a"], hits_per_watch=5), RUN, receipt_dir=tmp_path, today=TODAY,
+                 leads_store=leads_store)["summary"]
+    assert s["already_obtained"] == 3 and s["hits_new"] == 1
+    assert [h["url"] for h in _get("ew_a")["poll"]["hits"]] == [fresh]
+    assert wp.accessions_in("acc 0001045810-26-000056 與 0001193125-26-275783") == {
+        "000104581026000056", "000119312526275783"}
+
+
 def test_apply_dedupes_caps_and_treats_dates_as_claims(tmp_path: Path) -> None:
     seen = "https://www.sec.gov/old"
     _write_registry([_watch("ew_a", checked="2026-10-01",
