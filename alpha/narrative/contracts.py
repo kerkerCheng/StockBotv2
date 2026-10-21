@@ -150,7 +150,10 @@ BRIEF_FRAME_V2: Mapping[str, Mapping[str, str]] = {
         "question": "已定價嗎？（自己跟自己的三年歷史比；主題等權組只當脈絡）",
         "look_at": "三題稽核區：{own_history_pctile}（{own_history_basis}）、{cohort_median}；相對組漲幅只在稽核區看、不上首屏",
         "do_not": "⚠ **必須含 {own_history_pctile}**；組中位數有值時必須一併引用 {cohort_median}。⚠ 不設門檻：幾分算已定價是你的判斷，"
-                  "寫出理由，不寫目標價、不寫同業折價、不寫報酬（相對組漲幅也是報酬，只在稽核區）。",
+                  "寫出理由，不寫目標價、不寫同業折價、不寫報酬（相對組漲幅也是報酬，只在稽核區）。"
+                  "⚠ **不得在 placeholder 旁寫依賴數字大小的位置結論**（高檔、偏貴、便宜、中間、頂部……）：數字每天重填、這句不會——"
+                  "2026-10-20 實測 6 份已定價格的形容詞和今天的百分位打架（FN「中段偏上」今天第 34）。判斷當時的百分位寫入端會自動記下"
+                  "（priced_at_write），你不必手打；要描述位置就寫明日期（「寫這句的 YYYY-MM-DD 當天…」）。",
     },
     "our_bet": {
         "question": "我們賭的是哪一件事？押的是層還是插槽？",
@@ -473,6 +476,52 @@ class Acknowledgement:
 
 
 @dataclass(frozen=True, slots=True)
+class PricedSnapshot:
+    """寫入當下的已定價①（自家三年百分位）——**寫入端從當下的三題記下，不收手寫**（ROADMAP 已定價變動計數器，
+    failure log #94：沒有它，換騎會把舊的已定價判斷包裝成新日期，「判斷日的百分位」也只能事後回算）。
+    有值與缺席二擇一（L12）；缺席要說理由。不進 brief id（它是寫入入口的觀測，不是寫的人的主張）。"""
+
+    recorded_on: date
+    value: float | None = None
+    absence_kind: str | None = None
+    reason: str | None = None
+    basis: str | None = None
+    as_of: str | None = None
+    multiple: float | None = None
+
+    def __post_init__(self) -> None:
+        if (self.value is None) == (self.absence_kind is None):
+            raise ContractViolation("priced_at_write：value 與 absence_kind 必須恰好一個（有值與缺席二擇一）")
+        if self.absence_kind is not None and not str(self.reason or "").strip():
+            raise ContractViolation("priced_at_write：缺席必須說明理由")
+
+    def as_dict(self) -> dict[str, Any]:
+        return {"recorded_on": self.recorded_on.isoformat(), "value": self.value, "absence_kind": self.absence_kind,
+                "reason": self.reason, "basis": self.basis, "as_of": self.as_of, "multiple": self.multiple}
+
+
+#: 已定價的位置詞（ROADMAP 已定價變動計數器；failure log #94）：priced_in 那一格與候選理由裡，**沒寫日期**的句子出現
+#: 就拒收——數字每天重填、這句不會。只在寫入端（`alpha/providers/briefs.py`），不在 parse（舊紀錄照讀）。
+#: 刻意不收：偏低（NVTS「這個百分位只會偏低」講量測偏差）、高點／低點／最高／最低（多半是有日期的價格事實）、
+#: 高處／低處（「這三年的低處是一家…公司」講歷史）、高端（產品等級）。2026-10-21 回放：priced_in 命中 11 份、
+#: 理由命中 7 份，逐句人工看過沒有誤報；有日期的寫法（1815「寫這句的 2026-10-18 當天…頂部」）放行。
+PRICED_POSITION_WORDS: tuple[str, ...] = ("高檔", "低檔", "頂部", "底部", "上緣", "下緣", "偏貴", "便宜", "中段", "中間",
+                                          "偏上", "偏下")
+PRICED_DATE_MARK = re.compile(r"\d{4}-\d{1,2}-\d{1,2}|\d{1,2}-\d{1,2}\s*收盤|\d{1,2}\s*月\s*\d{1,2}\s*日|寫這|寫入時|寫時|當天")
+_SENTENCE_SPLIT = re.compile(r"[。；\n]")
+
+
+def undated_position_claims(text: str) -> list[tuple[list[str], str]]:
+    """沒寫日期、卻用了位置詞的句子：[(命中的詞, 那一句)]。"""
+    out: list[tuple[list[str], str]] = []
+    for sentence in _SENTENCE_SPLIT.split(text or ""):
+        words = [w for w in PRICED_POSITION_WORDS if w in sentence]
+        if words and not PRICED_DATE_MARK.search(sentence):
+            out.append((words, sentence.strip()))
+    return out
+
+
+@dataclass(frozen=True, slots=True)
 class InvestorBrief:
     """一份短評（append-only；改一句＝append 一筆新的 supersede 舊的）。"""
 
@@ -496,6 +545,8 @@ class InvestorBrief:
     acknowledged_touched: tuple[Acknowledgement, ...] = ()
     #: 加碼條件（Phase 7 Step 7.0d）：v2 的**選填**欄，沒寫就是空——它只在非空時進 id 欄位集合，既有紀錄的 id 一位都不變。
     confirm: tuple[NarrativeConfirm, ...] = ()
+    #: 寫入當下的已定價①（只有 `write_brief` 寫；不進 id）。7.0 之前的紀錄都沒有——缺席照讀，不得要求存在（INV-3）。
+    priced_at_write: PricedSnapshot | None = None
 
     def __post_init__(self) -> None:
         if self.record_version not in RECORD_VERSIONS:
@@ -517,7 +568,7 @@ class InvestorBrief:
         if self.record_version == RECORD_VERSION_V2:
             self._check_v2_static()
         elif (self.rides or self.disproof or self.answers or self.candidate_state
-              or self.history_not_comparable or self.acknowledged_touched or self.confirm):
+              or self.history_not_comparable or self.acknowledged_touched or self.confirm or self.priced_at_write):
             raise ContractViolation("v1 紀錄不得帶 v2 的結構化欄位——v1 照讀、不補寫")
 
     def _check_v2_static(self) -> None:
@@ -724,8 +775,20 @@ def _parse_v2_fields(raw: Mapping[str, Any]) -> dict[str, Any]:
         entities=tuple(sorted({str(e).strip() for e in (c.get("entities") or ()) if str(e).strip()})),
         expires=_iso_day(c.get("expires"), "confirm[].expires"), source=str(c.get("source") or ""))
         for c in seq("confirm"))
+    paw = raw.get("priced_at_write")
+    if paw is not None and not isinstance(paw, Mapping):
+        raise ContractViolation("priced_at_write 必須是物件")
+    priced = (PricedSnapshot(recorded_on=_iso_day(paw.get("recorded_on"), "priced_at_write.recorded_on"),
+                             value=(float(paw["value"]) if paw.get("value") is not None else None),
+                             absence_kind=(str(paw["absence_kind"]) if paw.get("absence_kind") else None),
+                             reason=(str(paw["reason"]) if paw.get("reason") else None),
+                             basis=(str(paw["basis"]) if paw.get("basis") else None),
+                             as_of=(str(paw["as_of"]) if paw.get("as_of") else None),
+                             multiple=(float(paw["multiple"]) if paw.get("multiple") is not None else None))
+              if paw else None)
     return {"rides": rides, "disproof": disproof, "answers": answers, "candidate_state": candidate,
-            "history_not_comparable": history, "acknowledged_touched": acks, "confirm": confirm}
+            "history_not_comparable": history, "acknowledged_touched": acks, "confirm": confirm,
+            "priced_at_write": priced}
 
 
 def select_brief(records: Sequence[InvestorBrief], *, as_of: date | None, today: date) -> InvestorBrief | None:
@@ -741,7 +804,8 @@ def select_brief(records: Sequence[InvestorBrief], *, as_of: date | None, today:
 __all__ = [
     "ACK_DISPOSITIONS", "ANSWER_KEYS", "ANSWER_VALUES", "Acknowledgement", "Answers", "BRIEF_FRAME_V2",
     "BRIEF_SLOTS_V2", "CANDIDATE_STATES", "CANDIDATE_STATES_DECLARABLE", "CandidateState", "HistoryNotComparable",
-    "NarrativeConfirm", "NarrativeDisproof", "PLACEHOLDERS_V2", "RECORD_VERSION_V1", "RECORD_VERSION_V2", "RECORD_VERSIONS",
+    "NarrativeConfirm", "NarrativeDisproof", "PLACEHOLDERS_V2", "PRICED_DATE_MARK", "PRICED_POSITION_WORDS",
+    "PricedSnapshot", "RECORD_VERSION_V1", "RECORD_VERSION_V2", "RECORD_VERSIONS", "undated_position_claims",
     "RIDE_UNITS",
     "Ride", "SLOT_KEYS_V2", "SLOT_LABELS_V2", "WHAT_MUST_BE_TRUE_FORBIDDEN", "placeholder_vocab", "slot_keys",
     "slot_labels",

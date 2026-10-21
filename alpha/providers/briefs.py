@@ -12,7 +12,7 @@ from typing import Any, Mapping, Sequence
 
 from shared.redaction import sensitive_payload_path
 
-from ..narrative.contracts import LINKABLE_SOURCE_PREFIXES, InvestorBrief, parse_brief_record
+from ..narrative.contracts import LINKABLE_SOURCE_PREFIXES, InvestorBrief, parse_brief_record, undated_position_claims
 from ..errors import ContractViolation
 
 _ROOT = Path(__file__).resolve().parents[2]
@@ -76,6 +76,9 @@ OPEN_READING_KINDS: frozenset[str] = frozenset({"moat", "volume"})
 CURRENT_READING_STATUSES: frozenset[str] = frozenset({"current", "stale_low"})
 #: 已定價那一格引用的稽核行。相對組漲幅（③）2026-09-30 起只在稽核區、不上首屏，所以不在這裡——它有值不強迫答 yes／no。
 _PRICED_IN_LINES = ("own_history_pctile", "cohort_median")
+#: 公開名（L16：候選板每天重驗對稱面時用**同一份**清單——不能用 `alpha.candidates.PRICED_IN_LINES`，那份含相對組漲幅，
+#: 它有值並不強迫答 yes／no，用錯會讓「量不到」的列大批誤判前提失效）。
+PRICED_IN_WRITE_LINES = _PRICED_IN_LINES
 _IN_NUMBERS_LINES = ("in_numbers_series", "in_numbers_mix_series")
 #: 「出現在數字裡了嗎」的兩個 placeholder → 各自填值的稽核行（2026-10-14 拆開：年增率與占比是兩種量，L12）。
 IN_NUMBERS_PLACEHOLDER_LINES: Mapping[str, str] = {"in_numbers_latest": "in_numbers_series",
@@ -313,7 +316,31 @@ def v2_write_problems(parsed: InvestorBrief, *, ctx: WriteContext, existing: Seq
             if current and ref != current:
                 problems.append(f"{slot.key}：evidence_refs 的 {ref} 是 {node}（{unit}）已被取代的讀圖——"
                                 f"這版押的是 {current}，請換成它（不自動改寫）")
+
+    # ⑧ 已定價的位置詞要帶日期（ROADMAP 已定價變動計數器；failure log #94）：「高檔」「偏貴」這種依賴百分位大小的結論，
+    #   數字每天重填、這句不會——換騎照抄舊句就會把舊判斷包裝成新日期。只擋寫入；舊紀錄照讀（不放 parse 路徑）。
+    for label, text in (("priced_in", slots.get("priced_in", "")),
+                        ("candidate_state.reason", (cs.reason or "") if cs is not None else "")):
+        for words, sentence in undated_position_claims(text):
+            problems.append(f"{label}：「{'、'.join(words)}」是依賴百分位大小的位置結論，數字每天重填、這句不會——"
+                            f"拿掉，或寫明日期（「寫這句的 YYYY-MM-DD 當天…」）；判斷當時的百分位寫入端已自動記下："
+                            f"{sentence[:40]}")
     return problems
+
+
+def priced_snapshot(three_questions: Mapping[str, Any] | None, *, today: Any) -> dict[str, Any]:
+    """寫入當下的已定價①（`priced_at_write`）：照抄三題稽核區自家歷史那一行，讀不到就照實記缺席（不得空著，INV-3）。"""
+    day = today.isoformat() if hasattr(today, "isoformat") else str(today)
+    if three_questions is None:
+        return {"recorded_on": day, "absence_kind": "upstream_unavailable", "reason": "寫入當下讀不到三題稽核區"}
+    row = next((r for r in three_questions.get("priced_in") or () if r.get("key") == "own_history_pctile"), None)
+    if row is None:
+        return {"recorded_on": day, "absence_kind": "upstream_unavailable", "reason": "三題稽核區沒有自家歷史那一行"}
+    if row.get("absence_kind") is not None:
+        return {"recorded_on": day, "absence_kind": str(row["absence_kind"]),
+                "reason": str(row.get("reason") or "（三題沒有寫理由）"), "basis": row.get("basis")}
+    return {"recorded_on": day, "value": float(row["value"]), "basis": row.get("basis"), "as_of": row.get("as_of"),
+            "multiple": (row.get("detail") or {}).get("multiple_today")}
 
 
 def write_brief(record: Mapping[str, Any], *, ctx: WriteContext, directory: Path | None = None,
@@ -336,6 +363,12 @@ def write_brief(record: Mapping[str, Any], *, ctx: WriteContext, directory: Path
     if parsed.history_not_comparable is not None and ctx.three_questions_reload is not None:
         ctx.three_questions = ctx.three_questions_reload(parsed.history_not_comparable.as_dict())
     if parsed.record_version == RECORD_VERSION_V2 and not parsed.retracted:
+        # 判斷當時的已定價①由寫入端記下（不進 id；換騎也記——那一刻的值就是那一版寫入時看到的）。手寫的拒收：
+        # 寫的人手打的數字不是「T 時刻系統知道什麼」（INV-6）。
+        if record.get("priced_at_write") is not None:
+            raise ContractViolation("priced_at_write 由寫入端從當下的三題記下，不收手寫")
+        record = {**record, "priced_at_write": priced_snapshot(ctx.three_questions, today=ctx.today)}
+        parsed = parse_brief_record(record)
         problems = v2_write_problems(parsed, ctx=ctx, existing=existing)
         if problems:
             raise ContractViolation("短評 v2 寫入拒收：\n- " + "\n- ".join(problems))
@@ -351,5 +384,5 @@ def write_brief(record: Mapping[str, Any], *, ctx: WriteContext, directory: Path
     return {"path": str(path), "brief_id": parsed.brief_id, **summary}
 
 
-__all__ = ["BRIEF_DIR", "CURRENT_READING_STATUSES", "OPEN_READING_KINDS", "WriteContext", "append_brief_record",
+__all__ = ["BRIEF_DIR", "CURRENT_READING_STATUSES", "OPEN_READING_KINDS", "PRICED_IN_WRITE_LINES", "WriteContext", "append_brief_record", "priced_snapshot",
            "ledger_path", "read_brief_records", "v2_write_problems", "write_brief"]

@@ -17,12 +17,12 @@ from typing import Any, Callable, Mapping, Sequence
 
 from ..candidates import (
     ANSWER_WORDS, CANDIDATES_THIS_IS_NOT, GROUP_LABELS, GROUPS, IN_NUMBERS_LINES, PRICED_IN_LINES,
-    REWRITE_STATE_WORDS, SIDE_GROUPS, SIDE_LABELS, UNANSWERED, assemble_board, cap_label, held_index, rollup,
-    stall_since, three_words,
+    REWRITE_STATE_WORDS, SIDE_GROUPS, SIDE_LABELS, UNANSWERED, assemble_board, cap_label, held_index,
+    judgment_version, priced_since, rollup, stall_since, stall_version, three_words,
 )
 from ..narrative.contracts import RECORD_VERSION_V2, InvestorBrief, select_brief
 from ..structure_reading.contracts import READING_KINDS, READING_UNITS
-from .briefs import CURRENT_READING_STATUSES, OPEN_READING_KINDS
+from .briefs import CURRENT_READING_STATUSES, OPEN_READING_KINDS, PRICED_IN_WRITE_LINES
 
 
 def _valued(three_questions: Mapping[str, Any] | None, question: str, keys: Sequence[str]) -> bool:
@@ -54,6 +54,12 @@ def open_preconditions(brief: InvestorBrief, *, reading_rows: Mapping[tuple[str,
                 failed.append("已定價的稽核行已全部缺席（宣告時有值）")
             if answers.in_numbers in ("yes", "no") and not _valued(three_questions, "in_numbers", IN_NUMBERS_LINES):
                 failed.append("出現在數字裡的稽核行已缺席（宣告時有值）")
+            # 對稱面（ROADMAP 已定價變動計數器）：答量不到、今天量得到了——宣告時的前提也失效了。稽核行用**寫入端同一份**
+            # （不含相對組漲幅：它有值並不強迫答 yes／no，用 PRICED_IN_LINES 會讓量不到的列大批誤判失效）。
+            if answers.priced_in == "unmeasurable" and _valued(three_questions, "priced_in", PRICED_IN_WRITE_LINES):
+                failed.append("已定價答量不到，今天稽核行有值（宣告時量不到）")
+            if answers.in_numbers == "unmeasurable" and _valued(three_questions, "in_numbers", IN_NUMBERS_LINES):
+                failed.append("出現在數字裡答量不到，今天稽核行有值（宣告時量不到）")
     failed.extend(f"待處置的反證 watch：{b}" for b in blocking)                # ③ 歸屬本檔的 watch 沒有待判
     failed.extend(f"連結 {b['link_source_ref']}：{b.get('label') or '已換版'}" for b in breaks)   # ④ 連結來源仍在盯
     return failed
@@ -172,7 +178,9 @@ def derive_row(ticker: str, company_id: str | None, *, records: Sequence[Investo
                lifecycle: Mapping[str, Any] | None, edge: Mapping[str, Any] | None,
                three_questions: Mapping[str, Any] | None, held: Mapping[str, Any],
                three_questions_note: str | None = None, bets: Mapping[str, Any] | None = None,
-               registry: Any = None) -> dict[str, Any] | None:
+               registry: Any = None, own_history_at: Callable[..., Mapping[str, Any]] | None = None,
+               bars_at: Callable[[str, date], Sequence[tuple[date, float | None]]] | None = None
+               ) -> dict[str, Any] | None:
     """一檔的候選狀態。沒有敘事、也沒有持有 → None（不上板，計數另印「無敘事」）。
 
     `bets`／`registry`：首屏「是不是新賭注」的比對輸入（`bet_index`，Phase 7 Step 7.0e）——只呈現在 `shared_bet`，
@@ -269,6 +277,10 @@ def derive_row(ticker: str, company_id: str | None, *, records: Sequence[Investo
     row["since"] = since.isoformat()
     # 「今天」是排程時區的今天；since 是 UTC 時戳——換到同一個時區再相減，否則台北 00:00–08:00 寫的會多算一天。
     row["stall_days"] = (today - since.astimezone(ew._local_timezone()).date()).days
+    # 已定價變動（只印不判；在 held 提早 return 之前——持有的也印）。loader 沒給（測試、個股頁單檔）就不算。
+    row["priced_since"] = (_priced_since_row(ticker, records, brief, three_questions=three_questions, today=today,
+                                             own_history_at=own_history_at, bars_at=bars_at)
+                           if own_history_at is not None and bars_at is not None else None)
     if row["group"] == "held":
         return row
     state = (edge or {}).get("state")
@@ -288,6 +300,69 @@ def derive_row(ticker: str, company_id: str | None, *, records: Sequence[Investo
             return row
     row.update(group=cs.state, derived=cs.state)
     return row
+
+
+def _close_on_or_before(bars: Sequence[tuple[date, float | None]], day: date) -> tuple[date, float] | None:
+    hits = [(d, float(c)) for d, c in bars if d <= day and c is not None]
+    return hits[-1] if hits else None
+
+
+def _return_between(bars: Sequence[tuple[date, float | None]], base_day: date, today: date) -> float | None:
+    base, now = _close_on_or_before(bars, base_day), _close_on_or_before(bars, today)
+    if base is None or now is None or base[1] == 0:
+        return None
+    return now[1] / base[1] - 1
+
+
+def _then_row(ticker: str, version: InvestorBrief, day: date,
+              own_history_at: Callable[..., Mapping[str, Any]]) -> tuple[dict[str, Any], str]:
+    """某一版判斷當時的已定價①：寫入端記下的優先（`recorded`）；舊版本點時回算（`recomputed`，截點＝那天前一天）。
+    回算失敗照實記缺席——**不得拿今天的值頂替**（INV-6）。"""
+    from datetime import timedelta
+
+    if version.priced_at_write is not None:
+        return version.priced_at_write.as_dict(), "recorded"
+    hnc = version.history_not_comparable.as_dict() if version.history_not_comparable else None
+    try:
+        row = dict(own_history_at(ticker, day - timedelta(days=1), history_not_comparable=hnc))
+    except Exception as exc:  # noqa: BLE001 — 回算壞了照實記缺席，不帶走整列
+        row = {"absence_kind": "upstream_unavailable", "reason": f"判斷日回算失敗：{type(exc).__name__}"}
+    return row, "recomputed"
+
+
+def _priced_since_row(ticker: str, records: Sequence[InvestorBrief], brief: InvestorBrief, *,
+                      three_questions: Mapping[str, Any] | None, today: date,
+                      own_history_at: Callable[..., Mapping[str, Any]],
+                      bars_at: Callable[[str, date], Sequence[tuple[date, float | None]]]) -> dict[str, Any] | None:
+    """判斷日的自家三年百分位 → 今天，與判斷日以來報酬（調整後收盤）；等回落另印起點（同一筆等待連續的最早一版）。"""
+    from datetime import timedelta
+
+    from engine_b import event_watch as ew
+
+    tz = ew._local_timezone()
+    judged = judgment_version(records, brief)
+    jday = judged.created_at.astimezone(tz).date()
+    then, source = _then_row(ticker, judged, jday, own_history_at)
+    now = next((dict(r) for r in (three_questions or {}).get("priced_in") or () if r.get("key") == "own_history_pctile"),
+               None)
+    try:
+        bars = list(bars_at(ticker, today))
+    except Exception:  # noqa: BLE001 — 報酬算不出來就不印報酬，百分位照印
+        bars = []
+    base_day = (date.fromisoformat(str(then["as_of"])[:10]) if source == "recorded" and then.get("as_of")
+                else jday - timedelta(days=1))
+    wait = None
+    if brief.candidate_state is not None and brief.candidate_state.state == "priced_wait":
+        start = stall_version(records, brief)
+        wday = start.created_at.astimezone(tz).date()
+        if wday != jday:
+            wthen, wsource = _then_row(ticker, start, wday, own_history_at)
+            wbase = (date.fromisoformat(str(wthen["as_of"])[:10]) if wsource == "recorded" and wthen.get("as_of")
+                     else wday - timedelta(days=1))
+            wait = {"day": wday.isoformat(), "then": wthen, "then_source": wsource,
+                    "return": _return_between(bars, wbase, today)}
+    return priced_since(ticker, brief, judged, judgment_day=jday.isoformat(), then=then, then_source=source, now=now,
+                        return_since=_return_between(bars, base_day, today), wait=wait)
 
 
 def _until_reached(watch: Mapping[str, Any], today: date) -> bool:
@@ -441,7 +516,8 @@ def page_input(context: Mapping[str, Any], ticker: str, company_id: str | None, 
     if row is not None:
         # 個股頁是分析畫面，不帶任何部位欄位（`tests/test_analyst_view.py` 的部位 token 掃描）：「已持有」只以狀態字出現，
         # Sheet 那一列的來源欄位留在候選板（它才是對帳 Sheet 的畫面）。
-        page_row = {k: v for k, v in row.items() if k not in ("held_source", "holdings_verified")}
+        # 已定價變動（priced_since）也不上個股頁：首屏不放價格報酬（2026-09-30 使用者定案）——它住候選板與心跳。
+        page_row = {k: v for k, v in row.items() if k not in ("held_source", "holdings_verified", "priced_since")}
         page_row["sheet_verified"] = bool(row.get("holdings_verified"))
         derived = row.get("derived")
         # v1 敘事只落附組（derived 是 None）：標籤跟候選板同一個（舊版（缺候選狀態）），不印「—」。
@@ -476,6 +552,7 @@ def load_board(tickers: Sequence[str], *, today: date | None = None,
     from engine_b.narrative_watches import link_breaks
 
     from . import briefs as briefs_provider
+    from .three_questions import adjusted_bars, own_history_at
 
     ctx = context if context is not None else candidate_context(tickers, today=today,
                                                                  holdings_loader=holdings_loader, structure=structure)
@@ -520,7 +597,8 @@ def load_board(tickers: Sequence[str], *, today: date | None = None,
         cid = extra.get(ticker) or registry.company_id_for_ticker(ticker)
         row = derive_row(ticker, cid, records=records, today=today, reading_rows=reading_rows,
                          watches=watches, lifecycle=lifecycle, edge=edges.get(ticker), three_questions=tq,
-                         held=held, three_questions_note=note, bets=bets, registry=registry)
+                         held=held, three_questions_note=note, bets=bets, registry=registry,
+                         own_history_at=own_history_at, bars_at=adjusted_bars)
         rows.append(row)
         if row is None:
             no_narrative.append({"ticker": ticker, "company_id": cid,

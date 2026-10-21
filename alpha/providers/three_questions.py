@@ -39,6 +39,26 @@ def _member_snapshot(ticker: str, today_iso: str) -> tuple[dict[str, Any], tuple
     return tq.own_history(inp, today=today), tuple(inp.get("adjusted_bars") or ())
 
 
+def own_history_at(ticker: str, day: date, *, history_not_comparable: Mapping[str, Any] | None = None,
+                   conn: Any = None) -> dict[str, Any]:
+    """點時（as-of `day`）的已定價①——取數全部帶 as-of 欄位（價格 bar ≤ day、申報 filed ≤ day、台股月營收法定截止
+    ≤ day、股數 available_on ≤ day），所以這就是「day 那天已公開的資料算出來的百分位」（INV-6）。
+    ⚠ 舊版本的判斷日一律用**判斷日（台北）前一天**當 `day`：daily 05:30 才抓前一天收盤，寫敘事的人那天看到的最新
+    一根 bar 是前一天的（2026-10-21 抽查 16 份手打百分位，前一天截點 15 份差 ≤0.5、含當天截點 6 份差 >1）。
+    回算不等於寫入當時看到的（事後資料或程式變動）——呼叫端要標「回算」。"""
+    if history_not_comparable is None and conn is None:
+        return dict(_member_snapshot(ticker, day.isoformat())[0])
+    inp = _inputs(ticker, day, conn or _conn_for("ro"))
+    return tq.own_history(inp, today=day, history_not_comparable=history_not_comparable)
+
+
+def adjusted_bars(ticker: str, today: date, *, conn: Any = None) -> list[tuple[date, float | None]]:
+    """調整後收盤（與已定價③同一個口徑），bar_date ≤ today。"""
+    if conn is None:
+        return list(_member_snapshot(ticker, today.isoformat())[1])
+    return list(_inputs(ticker, today, conn).get("adjusted_bars") or ())
+
+
 def clear_cache() -> None:
     _member_snapshot.cache_clear()
     _conn_for.cache_clear()
@@ -87,4 +107,4 @@ def three_questions_for(ticker: str, *, today: date, wipeout: Mapping[str, Mappi
     return result
 
 
-__all__ = ["clear_cache", "cohort_contexts", "three_questions_for"]
+__all__ = ["adjusted_bars", "clear_cache", "cohort_contexts", "own_history_at", "three_questions_for"]

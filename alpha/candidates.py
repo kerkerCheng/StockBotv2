@@ -133,27 +133,103 @@ def three_words(three_questions: Mapping[str, Any] | None, brief: InvestorBrief 
             "in_numbers": ANSWER_WORDS[answers.in_numbers] if answers else UNANSWERED}
 
 
-def stall_since(records: Sequence[InvestorBrief], brief: InvestorBrief) -> datetime:
-    """沿 `supersedes` 鏈往回，取**連續宣告同一 state** 的最早一筆 `created_at`（缺 X／等回落另要求同一 watch）——
-    同 state 重寫不歸零。**撤回打斷連續**：撤回之後到重寫之前那段「沒有宣告」，不算進滯留。
-
-    撤回用**時間**判，不看鏈上有沒有經過撤回紀錄：新版可以直接 supersede 被撤的那一筆（撤回紀錄本身不在鏈上），
-    所以只要兩筆之間有任何一筆撤回紀錄落在 (prev, cur] 之間，那段時間就沒有生效的宣告（`select_brief` 回 None）。"""
+def _walk_back(records: Sequence[InvestorBrief], brief: InvestorBrief,
+               same: Callable[[InvestorBrief], bool]) -> InvestorBrief:
+    """沿 `supersedes` 鏈往回，回傳 `same` 連續成立的最早那一版（滯留與已定價判斷日共用這一條路，L16）。
+    **撤回打斷連續**：撤回用**時間**判，不看鏈上有沒有經過撤回紀錄——新版可以直接 supersede 被撤的那一筆（撤回紀錄
+    本身不在鏈上），所以只要兩筆之間有任何一筆撤回紀錄落在 (prev, cur] 之間，那段時間就沒有生效的宣告。"""
     by_id = {r.brief_id: r for r in records}
     retractions = [r.created_at for r in records if r.retracted]
-    state = brief.candidate_state.state if brief.candidate_state else None
-    watch = brief.candidate_state.watch_id if brief.candidate_state else None
-    since, cur, seen = brief.created_at, brief, {brief.brief_id}
+    cur, seen = brief, {brief.brief_id}
     while cur.supersedes_id and cur.supersedes_id in by_id and cur.supersedes_id not in seen:
         prev = by_id[cur.supersedes_id]
         seen.add(prev.brief_id)
-        cs = prev.candidate_state
-        if prev.retracted or prev.record_version != RECORD_VERSION_V2 or cs is None or cs.state != state \
-                or (state in ("missing", "priced_wait") and cs.watch_id != watch) \
+        if prev.retracted or prev.record_version != RECORD_VERSION_V2 or not same(prev) \
                 or any(prev.created_at < t <= cur.created_at for t in retractions):
             break
-        since, cur = prev.created_at, prev
-    return since
+        cur = prev
+    return cur
+
+
+def stall_version(records: Sequence[InvestorBrief], brief: InvestorBrief) -> InvestorBrief:
+    """**連續宣告同一 state** 的最早那一版（缺 X／等回落另要求同一 watch）——同 state 重寫不歸零；撤回打斷連續。"""
+    state = brief.candidate_state.state if brief.candidate_state else None
+    watch = brief.candidate_state.watch_id if brief.candidate_state else None
+
+    def same(prev: InvestorBrief) -> bool:
+        cs = prev.candidate_state
+        return cs is not None and cs.state == state and (state not in ("missing", "priced_wait") or cs.watch_id == watch)
+
+    return _walk_back(records, brief, same)
+
+
+def stall_since(records: Sequence[InvestorBrief], brief: InvestorBrief) -> datetime:
+    """沿 `supersedes` 鏈往回，取**連續宣告同一 state** 的最早一筆 `created_at`——撤回之後到重寫之前那段「沒有宣告」，
+    不算進滯留。"""
+    return stall_version(records, brief).created_at
+
+
+# ---------------------------------------------------------------------------
+# 已定價變動（ROADMAP 已定價變動常駐計數器；failure log #94）：只印不判——不設門檻、不亮燈、不改候選狀態
+# ---------------------------------------------------------------------------
+
+def priced_judgment_key(brief: InvestorBrief) -> tuple[Any, ...]:
+    """「已定價判斷」的鍵：priced_in 那一格的文字、答案、整個候選狀態（含理由與在等的 watch——等回落的價格理由寫在
+    reason 裡）、歷史不可比宣告（換一把尺）。換騎、只換引用都不改這個鍵，所以不算改判。"""
+    slot = brief.slot("priced_in")
+    return (slot.text if slot else None, brief.answers.priced_in if brief.answers else None,
+            brief.candidate_state.as_dict() if brief.candidate_state else None,
+            brief.history_not_comparable.as_dict() if brief.history_not_comparable else None)
+
+
+def judgment_version(records: Sequence[InvestorBrief], brief: InvestorBrief) -> InvestorBrief:
+    """最後一次真的改判的那一版（判斷鍵連續相同的最早一版）——換騎包裝成新日期的版本不算判斷日（2026-10-21：
+    現行 73 份裡 23 份的現行版日期 ≠ 判斷日）。"""
+    key = priced_judgment_key(brief)
+    return _walk_back(records, brief, lambda prev: priced_judgment_key(prev) == key)
+
+
+def _signed_pct(value: float) -> str:
+    return f"{value * 100:+.1f}%".replace("-", "−")
+
+
+def _point(row: Mapping[str, Any] | None) -> str:
+    if not row or row.get("value") is None:
+        return f"量不到（{(row or {}).get('absence_kind') or '未讀到'}）"
+    return f"第 {float(row['value']):.1f}"
+
+
+def priced_since(ticker: str, brief: InvestorBrief, judged: InvestorBrief, *, judgment_day: Any,
+                 then: Mapping[str, Any] | None, then_source: str, now: Mapping[str, Any] | None,
+                 return_since: float | None, wait: Mapping[str, Any] | None = None) -> dict[str, Any] | None:
+    """一檔「判斷日 vs 今天」的列與一句話（候選板、心跳、短版共用這句——前端與心跳不組字，L16）。
+
+    `then`／`now`：自家三年百分位那一行（`{value|absence_kind, basis, as_of}`）；`then_source`＝`recorded`（寫入端記下的）
+    或 `recomputed`（舊版本：判斷日前一天收盤點時回算，與寫入當時看到的可能不同）。`wait`：等回落起點與判斷日不同時
+    `{day, then, return}`。只在答 yes／no、宣告等回落、或答量不到而今天有值時回列；其餘回 None。"""
+    answer = brief.answers.priced_in if brief.answers else None
+    state = brief.candidate_state.state if brief.candidate_state else None
+    now_valued = bool(now) and now.get("value") is not None
+    if answer not in ("yes", "no") and state != "priced_wait" and not (answer == "unmeasurable" and now_valued):
+        return None
+    day = str(judgment_day)[5:10]
+    label = ("等回落" if state == "priced_wait" else {"yes": "已定價答是", "no": "已定價答否"}.get(str(answer), "答量不到"))
+    then_basis, now_basis = (then or {}).get("basis"), (now or {}).get("basis")
+    then_text = _point(then) + (f"（{str((then or {}).get('as_of') or '')[5:10]} 收盤"
+                                + ("，回算" if then_source == "recomputed" else "，寫入時記下") + "）"
+                                if (then or {}).get("value") is not None else "")
+    now_text = _point(now) + (f"（{str((now or {}).get('as_of') or '')[5:10]} 收盤）" if now_valued else "")
+    basis = (f"自家三年 {now_basis or then_basis}" if (then_basis == now_basis or not then_basis or not now_basis)
+             else f"判斷時 {then_basis}、今天 {now_basis}——兩把尺")
+    line = f"{label} {ticker}｜判斷日 {day}：{basis} {then_text} → 今天 {now_text}"
+    if return_since is not None:
+        line += f"｜判斷日以來 {_signed_pct(return_since)}（調整後收盤）"
+    if wait:
+        line += (f"｜等回落自 {str(wait.get('day'))[5:10]}（同一筆等待）：{_point(wait.get('then'))}"
+                 + (f"、{_signed_pct(wait['return'])}" if wait.get("return") is not None else ""))
+    return {"answer": answer, "state": state, "judgment_brief_id": judged.brief_id, "judgment_day": str(judgment_day),
+            "then": dict(then or {}), "then_source": then_source, "now": dict(now or {}),
+            "return_since": return_since, "wait_since": dict(wait) if wait else None, "line": line}
 
 
 # ---------------------------------------------------------------------------
@@ -268,4 +344,5 @@ def assemble_board(rows: Sequence[Mapping[str, Any] | None], *, universe: Sequen
 __all__ = ["ANSWER_WORDS", "CANDIDATES_THIS_IS_NOT", "GROUPS", "GROUP_LABELS", "IN_NUMBERS_LINES", "LIGHT_ORDER",
            "LIGHT_WORDS", "LIST_GROUPS", "LIST_GROUP_LABELS", "PRICED_IN_LINES", "REWRITE_STATE_WORDS", "SIDE_GROUPS",
            "SIDE_LABELS", "UNANSWERED",
-           "WIPEOUT_LINES", "assemble_board", "cap_label", "held_index", "rollup", "stall_since", "three_words"]
+           "WIPEOUT_LINES", "assemble_board", "cap_label", "held_index", "judgment_version", "priced_judgment_key",
+           "priced_since", "rollup", "stall_since", "stall_version", "three_words"]

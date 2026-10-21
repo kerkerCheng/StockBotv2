@@ -3131,6 +3131,8 @@ function candidateRow(row, detailSet) {
   if (row.stall_days !== null && row.stall_days !== undefined) bits.push(`滯留 ${row.stall_days} 天`);
   li.appendChild(el('span', 'rule', bits.join('｜')));
   if (row.reason) li.appendChild(el('span', 'rule', '理由：' + row.reason));
+  // 已定價變動（判斷日 → 今天、判斷日以來；只印不判）：句子由 materialize 端組好，前端照抄、不做算術。
+  if (row.priced_since && row.priced_since.line) li.appendChild(el('span', 'rule', row.priced_since.line));
   if (row.note) li.appendChild(el('span', 'rule', row.note));
   if (row.held_source) li.appendChild(el('span', 'rule', `Sheet：${row.held_source.sheet_ticker}（解析：${row.held_source.source}）`));
   confirmLines(row, 'span').forEach((line) => li.appendChild(line));

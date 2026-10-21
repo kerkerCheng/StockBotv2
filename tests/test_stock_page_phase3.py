@@ -189,8 +189,10 @@ def test_page_input_is_the_board_derivation_and_carries_no_position_field_names(
     board = cand.derive_row(T, CO, records=[brief], today=TODAY, reading_rows=ctx["reading_rows"],
                             watches=[], lifecycle={}, edge=ctx["edges"][T], three_questions=_tq(), held=held)
     assert page["row"]["derived"] == board["derived"] == "held" and page["row"]["derived_label"] == "已持有"
+    # priced_since（已定價變動，2026-10-21）刻意不上個股頁：首屏不放價格報酬（2026-09-30 使用者定案）——它住候選板與心跳
+    assert "priced_since" not in page["row"]
     assert {k: v for k, v in page["row"].items() if k not in ("sheet_verified", "derived_label")} == \
-        {k: v for k, v in board.items() if k not in ("held_source", "holdings_verified")}
+        {k: v for k, v in board.items() if k not in ("held_source", "holdings_verified", "priced_since")}
     assert page["three_words"] == board["three_words"] == {"will_it_die": "黃（灰 1）", "priced_in": "否",
                                                           "in_numbers": "是"}
 

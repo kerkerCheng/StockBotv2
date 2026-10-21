@@ -523,6 +523,8 @@ def compose_brief(*, now: datetime, summary: str, snapshot: Mapping[str, Any], r
 
     def status_part() -> list[str]:
         status = [line(lambda: hb._candidate_lines(state_dir)[0], "候選"),
+                  # 2026-10-21 使用者問「價格一直跌，等回落能及時反應嗎」：只印不判，壞了只壞自己這一行
+                  line(lambda: hb._priced_wait_short(state_dir), "等回落"),
                   line(lambda: hb._watch_today_line(now=now, hint=False), "watch"),
                   line(lambda: disproof_line(snapshot), "反證"),
                   line(waits_line, "無到期的等待"),

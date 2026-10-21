@@ -809,6 +809,62 @@ def _candidate_lines(state_dir: Path | None) -> list[str]:
 
 
 
+def _priced_rows(state_dir: Path | None) -> tuple[list[Mapping[str, Any]], list[Mapping[str, Any]], Any]:
+    """(等回落那幾列, 板上所有帶 priced_since 的列, 缺席)。只讀 candidates artifact（零網路）。"""
+    board, absence = _load_state(state_dir, "candidates")
+    if absence is not None:
+        return [], [], absence
+    rows = [r for group in (board.get("groups") or {}).values() for r in group or ()]
+    rows += [r for group in (board.get("side_groups") or {}).values() for r in group or ()]
+    wait = [r for r in (board.get("groups") or {}).get("priced_wait") or ()]
+    return wait, [r for r in rows if isinstance(r, Mapping) and r.get("priced_since")], None
+
+
+def _priced_wait_lines(state_dir: Path | None) -> list[str]:
+    """段 2「等回落 N」＋每檔一句（判斷日的自家三年百分位 → 今天、判斷日以來報酬；句子由候選板組好，這裡照抄）＋
+    來源計數「記下 X｜回算 Y｜量不到 Z」——資料品質計數器，**不印**「幾份降了幾 pp」這種隱性門檻。0 檔也印。"""
+    wait, priced, absence = _priced_rows(state_dir)
+    if absence is not None:
+        return [f"等回落：{absence.reason}（{absence.kind}）"]
+    lines = [f"等回落 {len(wait)}（判斷日的自家三年百分位 → 今天｜只印不判，不設門檻）"]
+    for row in wait:
+        info = row.get("priced_since") or {}
+        lines.append("  " + (info.get("line") or f"{row.get('ticker')}：判斷日 vs 今天沒有算（舊 artifact 或 loader 沒給）"))
+    recorded = sum(1 for r in priced if (r["priced_since"].get("then_source") == "recorded"))
+    absent = sum(1 for r in priced if (r["priced_since"].get("then") or {}).get("value") is None)
+    lines.append(f"  已定價判斷日百分位：記下 {recorded}｜回算 {len(priced) - recorded}｜判斷日量不到 {absent}"
+                 f"（板上答 yes／no、等回落或答量不到而今天有值的共 {len(priced)} 份）")
+    return lines
+
+
+def _signed(value: float) -> str:
+    return f"{value * 100:+.1f}%".replace("-", "−")
+
+
+def _priced_wait_short(state_dir: Path | None) -> str:
+    """短版狀態塊一行（2026-10-21 使用者問「價格一直跌，等回落能及時反應嗎」）：每檔「判斷日→今天 報酬」。"""
+    wait, _priced, absence = _priced_rows(state_dir)
+    if absence is not None:
+        return f"等回落：{absence.reason}"
+    if not wait:
+        return "等回落 0"
+    parts = []
+    for row in wait:
+        info = row.get("priced_since") or {}
+        then, now = (info.get("then") or {}).get("value"), (info.get("now") or {}).get("value")
+        ret = info.get("return_since")
+        part = f"{row.get('ticker')} {then if then is not None else '量不到'}→{now if now is not None else '量不到'}"
+        if ret is not None:
+            part += " " + _signed(ret)
+        ws = info.get("wait_since") or {}
+        if ws.get("return") is not None:
+            part += f"（等回落自 {str(ws.get('day'))[5:10]} {_signed(ws['return'])}）"
+        parts.append(part)
+    recomputed = any((r.get("priced_since") or {}).get("then_source") == "recomputed" for r in wait)
+    return (f"等回落 {len(wait)}（自家三年百分位 判斷日→今天｜判斷日以來）：" + "｜".join(parts)
+            + ("（判斷日值有回算的）" if recomputed else ""))
+
+
 def build_changes(*, now: datetime, state_dir: Path | None, thesis_path: Path,
                   diff_lines: Sequence[str] = (), leads_path: Path | None = None) -> Section:
     """較昨變動、watch 今日、反證、新點名、thesis、候選板缺席、讀圖（含重讀理由）、已定價缺席、beta。"""
@@ -848,6 +904,11 @@ def build_changes(*, now: datetime, state_dir: Path | None, thesis_path: Path,
     candidate_lines = _candidate_lines(state_dir)
     section.lines.append(candidate_lines[0])
     section.lines.extend(line for line in candidate_lines[1:-1])
+    # 已定價變動（ROADMAP 已定價變動常駐計數器，2026-10-21）：等回落各檔「判斷日 → 今天」——只印不判。
+    try:
+        section.lines.extend(_priced_wait_lines(state_dir))
+    except Exception as exc:  # noqa: BLE001
+        section.lines.append(f"等回落：盤點失敗（{type(exc).__name__}；upstream_unavailable）")
 
     # 結構讀圖（Q5，2026-09-17）：讓它**不可能安靜腐壞**。心跳只讀已 materialize 的比對結果，
     # 不查圖、不重新推理——重讀是研究，只在互動 session（D12）。
