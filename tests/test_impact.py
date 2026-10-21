@@ -113,6 +113,44 @@ def test_no_entities_and_untouched_are_declared_not_silent(monkeypatch) -> None:
     assert "沒有點名任何名冊公司或節點" in lines[-1]
 
 
+def _parked(lead_id, at, reason, title="MTAR wins larger SOFC hot box share"):
+    return {"lead_id": lead_id, "status": "parked", "title": title, "refs": {"parked_reason": reason},
+            "transitions": [{"at": "2026-10-01T00:00:00+00:00", "to": "researching"}, {"at": at, "to": "parked"}]}
+
+
+def test_a_lead_parked_since_c4_without_disposing_its_watches_is_counted_until_the_reason_names_them(monkeypatch) -> None:
+    """C4：停放理由要逐條處置對照列出的在盯條件；寫簡寫 ew_1 也算（截掉日期尾綴，#92 同一件事），但 ew_12 不算 ew_1。"""
+    monkeypatch.setattr(im, "HUB_SHARE", 1.1)
+    ctx = _ctx(BRIEFS)
+    store = {
+        "L_new": _parked("L_new", "2026-10-21T03:00:00+00:00", "MTAR 自述、等一手"),
+        "L_ok": _parked("L_ok", "2026-10-22T03:00:00+00:00", "對照：ew_1 不相關（講的是新廠，不是份額）"),
+        "L_near": _parked("L_near", "2026-10-22T03:00:00+00:00", "對照：ew_12 等一手"),
+        "L_old": _parked("L_old", "2026-10-19T03:00:00+00:00", "舊的，不回溯"),
+    }
+    rows = im.undisposed(store, ctx)
+    assert {(r["lead_id"], r["watch_id"]) for r in rows} == {("L_new", "ew_1"), ("L_near", "ew_1")}
+
+
+def test_no_recent_parked_lead_means_the_counter_does_not_even_load_the_context(monkeypatch) -> None:
+    def boom():
+        raise AssertionError("沒有 C4 之後停放的 lead，不該載入對照")
+
+    monkeypatch.setattr(im, "load_context", boom)
+    assert im.undisposed({"L_old": _parked("L_old", "2026-10-19T03:00:00+00:00", "x")}) == []
+
+
+def test_the_heartbeat_line_prints_zero_or_the_pairs_with_a_way_to_fix_them(monkeypatch) -> None:
+    from crons.heartbeat import _undisposed_line
+
+    monkeypatch.setattr(im, "HUB_SHARE", 1.1)
+    ctx = _ctx(BRIEFS)
+    store = {"L_new": _parked("L_new", "2026-10-21T03:00:00+00:00", "MTAR 自述")}
+    line = _undisposed_line(leads=store, ctx=ctx)
+    assert line.startswith("**停放未處置對照 1 筆**") and "L_new×ew_1" in line and "engine_b.impact --lead" in line
+    assert _undisposed_line(leads={}, ctx=ctx).startswith("停放未處置對照 0 筆")
+
+
 def test_render_caps_each_list_and_says_how_many_more(monkeypatch) -> None:
     monkeypatch.setattr(im, "HUB_SHARE", 1.1)
     briefs = [_brief(f"R{i}", f"co:r{i}", rides=(("tech:hot_box", "sr_hot"),)) for i in range(5)]

@@ -207,6 +207,40 @@ def impact(lead: Mapping[str, Any], ctx: Context) -> dict[str, Any]:
     }
 
 
+#: C4（2026-10-21 上線）：這天起停放的 lead，停放理由要逐條處置對照列出的在盯條件——寫出 watch id 與「不相關／等一手／已處理」。
+#: 之前停放的不回溯（那時沒有對照可讀，回溯只會一次湧出幾百筆、恆亮）。
+DISPOSITION_SINCE = "2026-10-21"
+_WATCH_SHORT = re.compile(r"^(ew_\d+)")
+
+
+def _parked_at(lead: Mapping[str, Any]) -> str | None:
+    hits = [str(t.get("at") or "") for t in lead.get("transitions") or () if t.get("to") == "parked"]
+    return hits[-1] if hits else None
+
+
+def undisposed(store: Mapping[str, Mapping[str, Any]], ctx: Context | None = None, *,
+               since: str = DISPOSITION_SINCE) -> list[dict[str, str]]:
+    """`since` 起停放的 lead × 它對照出的在盯條件（樞紐只計數的不算）裡，停放理由沒寫到那個 watch id 的組合。
+    寫 `ew_0762` 或完整 id 都算寫到（LLM 與人都常截掉日期尾綴——#92 同一件事）。常駐計數器：處置完就歸零、不恆亮。
+    沒有 `since` 起停放的 lead 就不載入對照（`ctx` 給 None 時才自己載；心跳每天都跑，空的那天不必付載入成本）。"""
+    out: list[dict[str, str]] = []
+    recent = [(lid, lead) for lid, lead in store.items()
+              if lead.get("status") == "parked" and (_parked_at(lead) or "")[:10] >= since]
+    if not recent:
+        return out
+    ctx = ctx if ctx is not None else load_context()
+    for lead_id, lead in recent:
+        reason = str((lead.get("refs") or {}).get("parked_reason") or "")
+        for watch in impact({**lead, "lead_id": lead_id}, ctx)["watches"]:
+            wid = str(watch["watch_id"])
+            short = _WATCH_SHORT.match(wid)
+            forms = {wid} | ({short.group(1)} if short else set())
+            if any(re.search(re.escape(f) + r"(?!\d)", reason) for f in forms):     # ew_12 不算寫到 ew_1
+                continue
+            out.append({"lead_id": str(lead_id), "watch_id": wid})
+    return out
+
+
 def load_context() -> Context:
     """讀名冊、現行敘事與讀圖、在盯的語意 watch、structure_table artifact 的節點名（讀不到就沒有節點名比對，照常跑）。"""
     from alpha.providers.briefs import read_brief_records
@@ -292,5 +326,5 @@ if __name__ == "__main__":
     raise SystemExit(main())
 
 
-__all__ = ["Context", "HUB_SHARE", "HUB_WATCHES", "STRUCT_ANGLES", "impact", "lead_entities", "lead_text", "load_context",
-           "main", "node_mentions", "render"]
+__all__ = ["Context", "DISPOSITION_SINCE", "HUB_SHARE", "HUB_WATCHES", "STRUCT_ANGLES", "impact", "lead_entities", "lead_text",
+           "load_context", "main", "node_mentions", "render", "undisposed"]

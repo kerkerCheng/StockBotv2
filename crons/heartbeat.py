@@ -1240,6 +1240,11 @@ def build_queue(*, state_dir: Path | None = None, now: datetime | None = None,
         section.lines.append(_radar_line(now=moment, record_path=run_record_path))
     except Exception as exc:  # noqa: BLE001
         section.lines.append(f"外部雷達：盤點失敗（{type(exc).__name__}；upstream_unavailable）")
+    # 停放未處置對照（雷達精進 C4，2026-10-21）：停放理由沒寫到對照列出的在盯條件——NVHBM 那則就是這樣漏掉 HBM 讀圖的反證
+    try:
+        section.lines.append(_undisposed_line(leads=leads))
+    except Exception as exc:  # noqa: BLE001
+        section.lines.append(f"停放未處置對照：盤點失敗（{type(exc).__name__}；upstream_unavailable）")
     # T2 主動輪詢（2026-10-06 使用者指示）：1.2a 把 sweep 移出 daily 時這一格一起不見——09-21 之後兩週沒人跑，也沒有任何地方印。
     try:
         section.lines.append(_t2_line(now=moment, record_path=run_record_path))
@@ -1548,6 +1553,21 @@ def _quota_lines_from(rows: Mapping[str, Any], *, now: datetime) -> list[str]:
 def radar_rejected(summary: Mapping[str, Any]) -> int:
     """外部雷達「拒收」的件數＝欄位不合法＋網址不在搜尋結果＋超過上限（**重複另計**，不算拒收）。段 3 那一行與快照共用。"""
     return sum(int(summary.get(k) or 0) for k in ("invalid", "url_not_in_search", "over_cap"))
+
+
+def _undisposed_line(*, leads: Mapping[str, Any] | None, ctx: Any = None) -> str:
+    """段 3「停放未處置對照 N 筆（lead×在盯條件）」——自 C4 上線日起停放的 lead，停放理由沒寫到對照列出的 watch id。
+    會歸零的計數器（處置完就降），不是「碰到 N」那種每天必然 >0 的恆亮數字。"""
+    from engine_b import impact as im
+
+    if leads is None:
+        return "停放未處置對照：lead registry 未讀到"
+    rows = im.undisposed(leads, ctx)
+    if not rows:
+        return f"停放未處置對照 0 筆（自 {im.DISPOSITION_SINCE} 起停放的 lead，對照列出的在盯條件都寫進了停放理由）"
+    sample = "、".join(f"{r['lead_id'][:13]}×{r['watch_id']}" for r in rows[:3])
+    return (f"**停放未處置對照 {len(rows)} 筆**（lead×在盯條件；停放理由沒寫到對照列出的 watch id）：{sample}"
+            + (f"；另 {len(rows) - 3} 筆" if len(rows) > 3 else "") + "｜處置：`python -m engine_b.impact --lead <id>` 後補停放理由")
 
 
 def _radar_line(*, now: datetime, record_path: Path | None) -> str:
@@ -2075,6 +2095,8 @@ SNAPSHOT_KEYS: dict[str, str] = {
     # 外部雷達（Phase 7 Step 7.0f）：上線那天與八週試驗期間，較昨 diff 看得到它每天收了幾則、拒了幾則
     "radar.new": "外部雷達新 lead", "radar.duplicate": "外部雷達重複", "radar.rejected": "外部雷達拒收",
     "radar.related": "外部雷達提到在盯的條件",
+    # 雷達精進 C4（2026-10-21）：停放理由沒寫到影響對照列出的在盯條件——會歸零的計數器
+    "impact.undisposed": "停放未處置對照",
     "health.red": "健康紅燈", "invariants.fail": "invariants FAIL",
     **{f"tier.{t}": f"帳號 {t}" for t in SCORECARD_TIERS},
     # 候選板（Phase 3 Step 3.6）：每一組一鍵——由候選推導的封閉字彙導出，不抄一份（L16）。
@@ -2253,8 +2275,14 @@ def collect_snapshot(*, now: datetime, state_dir: Path | None, leads_path: Path,
         return {"predictions.held": counts.get("held"), "predictions.wrong": table.get("wrong_total"),
                 "predictions.expired_unread": counts.get("expired_unread")}
 
+    def impact_undisposed() -> dict[str, Any]:
+        from engine_b import impact as im
+
+        store = (_read_json(leads_path) or {}).get("leads")
+        return {} if store is None else {"impact.undisposed": len(im.undisposed(store))}
+
     for fn in (watches, t2, pq2, lead_states, readings, layer_notes, walk, thesis, disproof_counts, confirm_counts,
-               prescreen, radar, captures, tiers, candidates, positions, predictions):
+               prescreen, radar, impact_undisposed, captures, tiers, candidates, positions, predictions):
         guard(fn)
     return values
 

@@ -287,6 +287,10 @@ Samsung 兩例都 park 成 scope 問題丟回給使用者，但契約早就允�
 **`trace_next_trigger` 要寫出等誰的什麼文件**（「AXT 下一份 10-Q」，不是「同標的後續揭露」）：沒有明示 `trace_trigger_entities` 時，
 watch 等的就是這句點名的已登記公司（2026-10-08）；沒點名任何一家就只會在日子到時叫醒一次。沒有要等的寫「無；<理由>」。
 被排回的 lead（drain 清單印「↩ 上一輪：…」）重新停放時要把 `trace_status` 換成不同的值，得加 `--replace-trace-status`。
+**處理或停放一條 lead 之前先跑影響對照**（2026-10-21 雷達精進 C4）：`python -m engine_b.impact --lead <lead_id>`——它列出這則碰到的
+敘事（哪一格）、讀圖、在盯條件。`parked_reason` 要**逐條處置對照列出的在盯條件**：寫出 watch id（`ew_0762` 簡寫可）與
+「不相關（為什麼）／等一手（等誰）／已處理（改了哪份讀圖或敘事）」。沒寫到的會出現在心跳段 3「停放未處置對照 N 筆」，處置完才歸零。
+事發：NVHBM（2026-10-18）停放時寫「圖上沒有讀圖可接」，其實 HBM 讀圖缺的兩格與反證 ew_0762／ew_0763 正是它碰到的。
 
 ⚠ **2026-09-22（Phase 0）：工單（decision gap）原本的第三種終局「研究完成後重新評估、
 以新 decision receipt 結案」已退役**（ROADMAP Phase 0／G12）。終局回到兩種：packet 或誠實 park。
