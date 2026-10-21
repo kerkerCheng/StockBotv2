@@ -115,8 +115,78 @@ def processing_line(store: Mapping[str, Any], *, now: datetime, hours: int | Non
             f"／停放 {finished['parked']}）｜還沒分類 {pending}｜待深挖 {queued}")
 
 
+def impact_total_line(impact: Mapping[str, Any] | None, digest: Mapping[str, Any] | None) -> str:
+    """① 的一行總數（雷達精進 C2）：今天外部 lead 碰到我們幾則（確定性對照）＋ LLM 的「可能怎麼影響」收了幾句、丟幾句。
+    完整表在 `impact_<日期>.json`（心跳落檔也印）。沒有對照檔與對照算壞要說出來，不印 0（INV-3）。"""
+    if impact is None:
+        return "- 對照：今天沒有對照檔（⑪b 沒跑或讀不到）"
+    if impact.get("error"):
+        return f"- 對照：沒算出來（{_short(impact.get('error'), 60)}）——摘要照跑、沒有「可能怎麼影響」"
+    c = impact.get("counts") or {}
+    line = (f"- 對照：外部 {c.get('leads', 0)} 則裡碰到敘事 {c.get('narratives', 0)}、讀圖 {c.get('readings', 0)}、"
+            f"在盯條件 {c.get('watches', 0)} 則；只經樞紐 {c.get('hub_only', 0)}、沒碰到 {c.get('untouched', 0)}")
+    if c.get("language_gap"):
+        line += f"、中文比不到節點名 {c['language_gap']}"
+    s = ((digest or {}).get("summary") or {}).get("impact")
+    if s:
+        dropped = sum(int(s.get(k) or 0) for k in ("invalid", "unknown_pair", "quote_not_verbatim", "too_long"))
+        line += (f"｜LLM 提議 {s.get('kept', 0)} 句（候選 {s.get('candidates', 0)} 對"
+                 + (f"、超過上限截掉 {s['truncated']}" if s.get("truncated") else "")
+                 + (f"、丟 {dropped}" if dropped else "") + "）")
+    elif digest is None:
+        line += "｜LLM 提議：摘要今天沒產生"
+    return line
+
+
+_LINK_WORDS = {"own": "本身"}
+#: 短版每則雷達新聞下最多印幾句 LLM 提議（推播只送短版、短版不能太雜——2026-10-07 使用者）。
+PROPOSALS_PER_ITEM = 2
+
+
+def _narrative_label(ticker: str, links: Sequence[str]) -> str:
+    first = links[0] if links else ""
+    if first in _LINK_WORDS:
+        word = _LINK_WORDS[first]
+    elif first.startswith("slot:"):
+        word = first[len("slot:"):].split("<", 1)[0] + " 格"
+    else:
+        word = "騎讀圖"
+    return f"{ticker}〔{word}〕"
+
+
+def impact_touch_lines(row: Mapping[str, Any] | None, proposals: Sequence[Mapping[str, Any]] = (), *,
+                       limit: int = 3) -> list[str]:
+    """② 每則雷達新聞下面：「↳ 碰到」一行（每類最多 `limit` 個、其餘「另 N」、樞紐只印數字）＋ LLM 那一句（標「提議」）。
+    什麼都沒碰到就不印（那則本身已列在上面；總數在 ①）。"""
+    if not row:
+        return []
+    parts: list[str] = []
+    narr = list((row.get("narratives") or {}).items())
+    if narr:
+        parts.append("敘事 " + "、".join(_narrative_label(t, v) for t, v in narr[:limit])
+                     + (f" 另 {len(narr) - limit} 份" if len(narr) > limit else ""))
+    reads = list(row.get("readings") or {})
+    if reads:
+        parts.append("讀圖 " + "、".join(reads[:limit]) + (f" 另 {len(reads) - limit} 份" if len(reads) > limit else ""))
+    ws = row.get("watches") or []
+    if ws:
+        parts.append(f"在盯 反證 {sum(w.get('role') == '反證' for w in ws)}／加碼 {sum(w.get('role') == '加碼條件' for w in ws)}")
+    hub = row.get("hub_only_counts") or {}
+    if row.get("hub_entities") and any(hub.values()):
+        parts.append(f"另經 {'／'.join(str(h).removeprefix('co:') for h in row['hub_entities'][:2])} 碰到 "
+                     f"敘事 {hub.get('narratives', 0)}、在盯 {hub.get('watches', 0)}（樞紐只計數）")
+    lines = [f"  ↳ 碰到：{'；'.join(parts)}"] if parts else []
+    shown = [p for p in proposals if p.get("verdict") != "unrelated"]
+    for p in shown[:PROPOSALS_PER_ITEM]:
+        tag = "提議" if p.get("verdict") == "may_touch" else "提議・不確定"
+        lines.append(f"  ↳ {tag}（{p.get('target')}）：{_short(p.get('sentence'), 80)}")
+    if len(shown) > PROPOSALS_PER_ITEM:
+        lines.append(f"  ↳ 另 {len(shown) - PROPOSALS_PER_ITEM} 句提議見心跳落檔")
+    return lines
+
+
 def leads_block(*, digest: Mapping[str, Any] | None, todays: Sequence[Mapping[str, Any]], since: datetime,
-                digest_problem: str | None, processing: str | None = None) -> list[str]:
+                digest_problem: str | None, processing: str | None = None, impact_line: str | None = None) -> list[str]:
     """① lead 抓了什麼。標題行永遠是程式數的（外面新進幾則、哪些來源；前幾天進來、這輪才分類的另計；
     我們自己登記的研究題另計、不摘要）；內容是 LLM 的 TL;DR，沒有就退回分流 go 的標題。
 
@@ -138,6 +208,8 @@ def leads_block(*, digest: Mapping[str, Any] | None, todays: Sequence[Mapping[st
     lines = [head]
     if processing:
         lines.append(processing)
+    if impact_line:
+        lines.append(impact_line)
     bullets = list((digest or {}).get("leads") or ())
     if bullets:
         lines.extend(f"- {b['text']}" for b in bullets)
@@ -200,7 +272,8 @@ def recent_radar_accepted(heartbeat_dir: Path, today: date, *, days: int = REPEA
 def events_block(*, digest: Mapping[str, Any] | None, receipt: Mapping[str, Any] | None,
                  digest_problem: str | None, radar_problem: str | None,
                  recent_accepted: Sequence[Mapping[str, Any]] = (),
-                 lead_titles: Mapping[str, str] | None = None) -> list[str]:
+                 lead_titles: Mapping[str, str] | None = None,
+                 impact: Mapping[str, Any] | None = None) -> list[str]:
     """② 市場大事：**今天雷達收下的每一則都列**（層別＋雷達寫的一句事實），沒收的附理由，跟前幾天收過的標題很像的標「可能是同一件事」。
 
     2026-10-08 使用者：「tldr 只有三則，但你說收四則……還是 tldr 就把收的都包含上去？如果沒收但想讓我知道的就再註明」。
@@ -221,6 +294,12 @@ def events_block(*, digest: Mapping[str, Any] | None, receipt: Mapping[str, Any]
              f"——市場 {summary.get('new_market', 0)}、主題 {summary.get('new_theme', 0)}、在盯 {summary.get('new_watch', 0)}"
              + (f"；沒收 {len(rejected)} 則" if rejected else "") + "；收下的都進 lead、照常分類）"]
     accepted = [a for a in (receipt or {}).get("accepted") or () if isinstance(a, Mapping)]
+    # 影響對照（雷達精進 C2）：確定性的「碰到」與 LLM 那一句都用 lead_id 對回這一則
+    rows = {str(r.get("lead_id")): r for r in (impact or {}).get("rows") or () if isinstance(r, Mapping)}
+    proposals: dict[str, list[Mapping[str, Any]]] = {}
+    for p in (digest or {}).get("impacts") or ():
+        if isinstance(p, Mapping):
+            proposals.setdefault(str(p.get("lead_id")), []).append(p)
     for item in accepted:
         scope = RADAR_SCOPE_WORDS.get(str(item.get("scope")), "主題")
         line = f"- [{scope}] {_short(item.get('fact') or item.get('title') or item.get('url'), 110)}"
@@ -228,6 +307,8 @@ def events_block(*, digest: Mapping[str, Any] | None, receipt: Mapping[str, Any]
         if repeat is not None:
             line += f"（⚠ 可能跟 {str(repeat.get('_date', ''))[5:]} 收過的是同一件事：{_short(repeat.get('title'), 50)}）"
         lines.append(line)
+        lead_id = str(item.get("lead_id") or "")
+        lines.extend(impact_touch_lines(rows.get(lead_id), proposals.get(lead_id, ())))
     if not accepted:
         lines.append("- 今天沒有收下任何一則")
     for item in rejected[:5]:
@@ -378,6 +459,7 @@ def compose_brief(*, now: datetime, summary: str, snapshot: Mapping[str, Any], r
     today: date = now.astimezone().date()
     blocks: list[list[str]] = [[summary]]
     digest = digest_mod.load_digest(today, out_dir=heartbeat_dir)
+    impact = digest_mod.load_impact(today, out_dir=heartbeat_dir)
     record, record_problem = hb._load_run_record(run_record_path, now=now)
     rows = {str(r.get("key")): r for r in (record or {}).get("steps") or [] if isinstance(r, Mapping)}
     digest_step = rows.get("11e_digest_apply") or rows.get("11c_digest_propose") or {}
@@ -405,8 +487,13 @@ def compose_brief(*, now: datetime, summary: str, snapshot: Mapping[str, Any], r
             processing = processing_line(store, now=now)
         except Exception as exc:  # noqa: BLE001 — 這一行算不出來就說，不帶走整塊
             processing = f"- 處理：算不出來（{type(exc).__name__}）"
+        try:
+            impact_line = impact_total_line(impact, digest)
+        except Exception as exc:  # noqa: BLE001
+            impact_line = f"- 對照：算不出來（{type(exc).__name__}）"
         return leads_block(digest=digest, todays=digest_mod.select_leads(store, now=now), digest_problem=digest_problem,
-                           since=now - timedelta(hours=digest_mod.WINDOW_HOURS), processing=processing)
+                           since=now - timedelta(hours=digest_mod.WINDOW_HOURS), processing=processing,
+                           impact_line=impact_line)
 
     def decisions_part() -> list[str]:
         from engine_b import todo as todo_mod
@@ -457,15 +544,15 @@ def compose_brief(*, now: datetime, summary: str, snapshot: Mapping[str, Any], r
 
     blocks.append(guarded("② 市場大事", lambda: events_block(
         digest=digest, receipt=receipt, digest_problem=digest_problem, radar_problem=radar_problem,
-        recent_accepted=recent_radar_accepted(heartbeat_dir, today), lead_titles=rejected_titles())))
+        recent_accepted=recent_radar_accepted(heartbeat_dir, today), lead_titles=rejected_titles(), impact=impact)))
     blocks.append(guarded("③ 待你決定", decisions_part))
     blocks.append(guarded("④ 狀態與健康度", status_part))
     blocks.append(guarded("⑤ 下一次研究要做的", lambda: todo_block(snapshot)))
     if digest:
-        blocks.append(["_TL;DR 是 LLM 寫的提議、每句指得回當天的 lead；判定只在互動 session。_"])
+        blocks.append(["_TL;DR 與「↳ 提議」是 LLM 寫的提議、每句指得回當天的 lead；「↳ 碰到」是名字比對；判定只在互動 session。_"])
     return "\n\n".join("\n".join(block) for block in blocks).rstrip() + "\n"
 
 
 __all__ = ["RADAR_SCOPE_WORDS", "RESEARCH_TERMINAL_STATES", "SOURCE_LABELS", "TODO_COUNTERS", "compose_brief",
-           "decisions_block", "disproof_line", "documents_block", "events_block", "health_block", "leads_block",
-           "processing_line", "status_lines", "todo_block"]
+           "decisions_block", "disproof_line", "documents_block", "events_block", "health_block", "impact_total_line",
+           "impact_touch_lines", "leads_block", "processing_line", "status_lines", "todo_block"]

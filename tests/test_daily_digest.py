@@ -59,8 +59,12 @@ def test_prepare_reads_leads_and_the_radar_receipt_and_never_holdings(tmp_path, 
                              "why": "長約化", "publisher": "JoongAng"}]}
     (tmp_path / f"radar_{TODAY.isoformat()}.json").write_text(json.dumps(receipt), encoding="utf-8")
     out = tmp_path / "batch.json"
-    summary = digest.prepare("run-1", out, now=NOW, store=_store(), receipt_dir=tmp_path)
-    assert summary == {"leads_total": 3, "leads_given": 3, "internal_total": 0, "radar_items": 1, "radar_receipt": True}
+    from engine_b import impact as im
+
+    empty = im.Context(briefs=[], readings={}, watches=[], companies={}, shared=frozenset(), node_names={})
+    summary = digest.prepare("run-1", out, now=NOW, store=_store(), receipt_dir=tmp_path, impact_context=lambda: empty)
+    assert summary == {"leads_total": 3, "leads_given": 3, "internal_total": 0, "radar_items": 1, "radar_receipt": True,
+                       "impact_touched": 0, "impact_candidates": 0, "impact_truncated": 0, "impact_error": None}
     request = json.loads(out.read_text(encoding="utf-8"))["requests"][0]
     row = next(r for r in request["leads"] if r["lead_id"] == "lead_old_triaged")
     assert row["triage"] == {"decision": "go", "reason": "碰到散熱 CDU 那一層"}
@@ -74,8 +78,179 @@ def test_prepare_reads_leads_and_the_radar_receipt_and_never_holdings(tmp_path, 
 
 def test_an_empty_round_writes_an_empty_batch_so_the_model_is_not_called(tmp_path) -> None:
     out = tmp_path / "batch.json"
-    digest.prepare("run-1", out, now=NOW, store={"leads": {}}, receipt_dir=tmp_path)
+    digest.prepare("run-1", out, now=NOW, store={"leads": {}}, receipt_dir=tmp_path, impact_context=lambda: _ctx_ns([]))
     assert json.loads(out.read_text(encoding="utf-8"))["requests"] == []
+
+
+# ---- 影響對照（雷達精進 C2，2026-10-21）----
+
+def _ctx_ns(briefs):
+    from types import SimpleNamespace as NS
+
+    return NS(briefs=[NS(ticker=t, slots=tuple(NS(key=k, text=v) for k, v in slots)) for t, slots in briefs])
+
+
+def _row(lead_id, *, narratives=None, watches=(), readings=None, absence=None):
+    return {"lead_id": lead_id, "narratives": narratives or {}, "readings": readings or {}, "absence_kind": absence,
+            "watches": [{"watch_id": w, "role": role, "condition": f"{w} 的條件原文"} for w, role in watches],
+            "hub_entities": [], "hub_only_counts": {}, "language_gap": False}
+
+
+def _fake_impact(monkeypatch, rows):
+    from engine_b import impact as im
+
+    monkeypatch.setattr(im, "impact", lambda lead, ctx: rows[str(lead["lead_id"])])
+
+
+BRIEFS_NS = [("8996.TW", (("demand", "最大客戶是 Bloom Energy"), ("our_bet", "賭熱交換器"))), ("FORM", (("demand", "HBM 探針卡"),))]
+
+
+def test_candidates_follow_a_fixed_order_radar_first_then_disproof_confirm_own_slot_rides_and_are_capped(monkeypatch) -> None:
+    """次序是固定規則、不是分數：雷達收下的先 → 反證 → 加碼條件 → 公司本身 → 某一格具名 → 只靠騎讀圖。"""
+    rows = {"lead_new": _row("lead_new", narratives={"FORM": ["rides:tech:hbm"], "8996.TW": ["slot:demand<co:bloom>"]},
+                             watches=[("ew_2", "加碼條件"), ("ew_1", "反證")]),
+            "lead_radar": _row("lead_radar", narratives={"8996.TW": ["own"]})}
+    _fake_impact(monkeypatch, rows)
+    leads = [_store()["leads"]["lead_new"], _store()["leads"]["lead_radar"]]
+    _rows, cands, cut = digest.impact_bundle(leads, {"lead_radar"}, _ctx_ns(BRIEFS_NS))
+    assert [(c["lead_id"], c["target"]) for c in cands] == [
+        ("lead_radar", "8996.TW#our_bet"),                         # 雷達收下的先；本身 → 附「我們的賭注」那一格
+        ("lead_new", "ew_1"), ("lead_new", "ew_2"),               # 反證先於加碼條件
+        ("lead_new", "8996.TW#demand"), ("lead_new", "FORM#demand")]   # 某一格具名先於只靠騎
+    assert cands[3]["text"] == "最大客戶是 Bloom Energy" and cands[1]["text"] == "ew_1 的條件原文" and cut == 0
+    monkeypatch.setattr(digest, "IMPACT_CAP", 2)
+    _rows, cands, cut = digest.impact_bundle(leads, {"lead_radar"}, _ctx_ns(BRIEFS_NS))
+    assert len(cands) == 2 and cut == 3
+    # 沒交給 LLM 的 lead（超過 MAX_LEADS）照算對照列、不出候選——沒給原文就沒得逐字引用
+    rows_all, cands, _ = digest.impact_bundle(leads, set(), _ctx_ns(BRIEFS_NS), eligible={"lead_radar"})
+    assert len(rows_all) == 2 and {c["lead_id"] for c in cands} == {"lead_radar"}
+
+
+def test_one_lead_touching_many_watches_does_not_eat_the_cap_each_lead_takes_turns(monkeypatch) -> None:
+    """10-21 試跑：一則雷達新聞碰到 8 條反證，照純次序會吃掉 15 對的一半——改成每則輪流取。"""
+    rows = {"lead_new": _row("lead_new", watches=[(f"ew_{i}", "反證") for i in range(5)]),
+            "lead_radar": _row("lead_radar", watches=[("ew_9", "反證"), ("ew_8", "加碼條件")])}
+    _fake_impact(monkeypatch, rows)
+    leads = [_store()["leads"]["lead_new"], _store()["leads"]["lead_radar"]]
+    _rows, cands, _ = digest.impact_bundle(leads, set(), _ctx_ns(BRIEFS_NS))
+    assert [c["target"] for c in cands[:4]] == ["ew_0", "ew_9", "ew_1", "ew_8"]
+
+
+def test_prepare_writes_the_impact_file_and_a_broken_context_does_not_block_the_digest(tmp_path, monkeypatch) -> None:
+    rows = {"lead_new": _row("lead_new", watches=[("ew_1", "反證")]), "lead_old_triaged": _row("lead_old_triaged", absence="untouched"),
+            "lead_radar": _row("lead_radar", absence="hub_only")}
+    _fake_impact(monkeypatch, rows)
+    out = tmp_path / "batch.json"
+    s = digest.prepare("run-1", out, now=NOW, store=_store(), receipt_dir=tmp_path, impact_context=lambda: _ctx_ns(BRIEFS_NS))
+    assert (s["impact_touched"], s["impact_candidates"], s["impact_error"]) == (1, 1, None)
+    doc = digest.load_impact(TODAY, out_dir=tmp_path)
+    assert doc["counts"] == {"leads": 3, "narratives": 0, "readings": 0, "watches": 1, "hub_only": 1, "untouched": 1,
+                             "language_gap": 0}
+    request = json.loads(out.read_text(encoding="utf-8"))["requests"][0]
+    assert request["impact_candidates"][0]["target"] == "ew_1" and request["impact_cap"] == digest.IMPACT_CAP
+
+    def broken():
+        raise RuntimeError("讀圖壞了")
+
+    s = digest.prepare("run-2", out, now=NOW, store=_store(), receipt_dir=tmp_path, impact_context=broken)
+    assert s["impact_error"].startswith("RuntimeError") and s["leads_given"] == 3
+    assert digest.load_impact(TODAY, out_dir=tmp_path)["error"].startswith("RuntimeError")
+    assert json.loads(out.read_text(encoding="utf-8"))["requests"][0]["impact_candidates"] == []
+
+
+def _impact_files(tmp_path, impacts):
+    batch = tmp_path / "batch.json"
+    batch.write_text(json.dumps({"schema": digest.BATCH_SCHEMA, "run_id": "run-1", "requests": [{
+        "leads": [{"lead_id": "lead_a", "title": "Kaori wins  Bloom order", "excerpt": "高力 拿到 Bloom 的熱交換器訂單…"}],
+        "radar": [{"lead_id": "lead_r", "title": "LG lands chiller deal", "fact": "LG 簽冷水機長約"}],
+        "impact_candidates": [{"lead_id": "lead_a", "target": "8996.TW#demand"}, {"lead_id": "lead_r", "target": "ew_1"}],
+        "impact_truncated": 2, "leads_total": 1, "leads_given": 1}]}), encoding="utf-8")
+    result = tmp_path / "result.json"
+    result.write_text(json.dumps({"schema": "llm-result-v1", "run_id": "run-1", "bullets": [], "impacts": impacts}),
+                      encoding="utf-8")
+    return result, batch
+
+
+def test_an_impact_sentence_is_kept_only_for_a_given_pair_with_a_verbatim_quote(tmp_path) -> None:
+    """L15：LLM 不得自己配新的對；L18：quote 必須是交給它的原文逐字片段（空白正規化）；不合的照數。"""
+    ok = {"lead_id": "lead_a", "target": "8996.TW#demand", "verdict": "may_touch", "quote": "Kaori wins Bloom order",
+          "sentence": "最大客戶加單，需求格的集中度更高"}
+    impacts = [
+        ok,
+        {**ok, "sentence": "同一對第二句"},                                                         # 重複
+        {**ok, "target": "8996.TW#position"},                                                        # 不在候選
+        {"lead_id": "lead_r", "target": "ew_1", "verdict": "may_touch", "quote": "LG 簽下冷水機", "sentence": "x"},  # 改過字
+        {**ok, "lead_id": "lead_r", "target": "ew_1", "quote": "LG lands", "verdict": "maybe"},     # 字彙外
+        {**ok, "sentence": "長" * (digest.IMPACT_SENTENCE_CHARS + 1), "target": "ew_1", "lead_id": "lead_r",
+         "quote": "chiller deal"},
+        {"lead_id": "lead_r", "target": "ew_1", "verdict": "unrelated", "quote": "LG 簽冷水機長約", "sentence": "講冷水機"},
+    ]
+    result, batch = _impact_files(tmp_path, impacts)
+    s = digest.apply(result, batch, "run-1", out_dir=tmp_path, today=TODAY)["summary"]["impact"]
+    assert (s["proposed"], s["kept"], s["invalid"], s["unknown_pair"], s["quote_not_verbatim"], s["too_long"]) == (7, 2, 2, 1, 1, 1)
+    assert s["candidates"] == 2 and s["truncated"] == 2
+    saved = digest.load_digest(TODAY, out_dir=tmp_path)
+    assert [(i["lead_id"], i["verdict"]) for i in saved["impacts"]] == [("lead_a", "may_touch"), ("lead_r", "unrelated")]
+
+
+def test_the_heartbeat_file_lists_every_touched_lead_with_the_proposal_and_its_quote(tmp_path) -> None:
+    from crons.heartbeat import _impact_lines
+
+    assert _impact_lines(now=NOW, out_dir=tmp_path) == ["影響對照：今天沒有對照檔（⑪b 沒跑或讀不到）"]
+    doc = {"schema": digest.IMPACT_SCHEMA, "error": None, "counts": {"leads": 2, "watches": 1, "untouched": 1},
+           "rows": [{**_row("lead_r", watches=[("ew_1", "反證")]), "title": "LG chiller"}, _row("lead_q", absence="untouched")]}
+    digest.impact_path(TODAY, out_dir=tmp_path).write_text(json.dumps(doc), encoding="utf-8")
+    (tmp_path / f"digest_{TODAY.isoformat()}.json").write_text(json.dumps({"schema": digest.DIGEST_SCHEMA, "impacts": [
+        {"lead_id": "lead_r", "target": "ew_1", "verdict": "unrelated", "sentence": "講冷水機", "quote": "LG"}],
+        "summary": {"impact": {"kept": 1, "candidates": 1}}}), encoding="utf-8")
+    lines = _impact_lines(now=NOW, out_dir=tmp_path)
+    assert lines[0].startswith("影響對照：外部 2 則裡") and lines[1] == "lead_r｜LG chiller"
+    assert "  ↳ 提議［unrelated］（ew_1）：講冷水機｜原文「LG」" in lines and not any("lead_q" in x for x in lines)
+
+
+def test_the_daily_passes_the_impacts_list_through_and_the_schema_matches_the_vocabulary() -> None:
+    from crons import llm_step
+
+    schema = json.loads(llm_step.DIGEST_SCHEMA.read_text(encoding="utf-8"))
+    item = schema["properties"]["impacts"]["items"]
+    assert set(item["properties"]["verdict"]["enum"]) == set(digest.IMPACT_VERDICTS)
+    assert set(item["required"]) == {"lead_id", "target", "verdict", "quote", "sentence"}
+    import inspect
+
+    from crons import daily_task
+
+    assert '"side_lists": ("impacts",)' in inspect.getsource(daily_task.DailyRun._llm_task)
+
+
+def test_the_brief_prints_what_each_radar_item_touched_and_the_proposal_but_not_unrelated_ones() -> None:
+    from crons.daily_brief import events_block, impact_total_line
+
+    receipt = {"summary": {"new": 2}, "accepted": [{"lead_id": "lead_r", "scope": "market", "fact": "LG 簽冷水機長約"},
+                                                   {"lead_id": "lead_q", "scope": "theme", "fact": "沒碰到的一則"}]}
+    impact = {"counts": {"leads": 5, "narratives": 1, "readings": 0, "watches": 1, "hub_only": 1, "untouched": 3},
+              "rows": [{**_row("lead_r", narratives={"AAON": ["slot:demand<co:lg>"], "X": ["own"], "Y": ["rides:a"], "Z": ["own"]},
+                               watches=[("ew_1", "反證")]),
+                        "hub_entities": ["co:nvidia"], "hub_only_counts": {"narratives": 12, "watches": 3}},
+                       _row("lead_q", absence="untouched")]}
+    saved = {"events": [], "impacts": [
+        {"lead_id": "lead_r", "target": "ew_1", "verdict": "may_touch", "sentence": "冷水機長約化碰到反證第 1 條"},
+        {"lead_id": "lead_r", "target": "AAON#demand", "verdict": "unrelated", "sentence": "不相關"}],
+        "summary": {"impact": {"kept": 2, "candidates": 4, "truncated": 0, "unknown_pair": 1}}}
+    lines = events_block(digest=saved, receipt=receipt, digest_problem=None, radar_problem=None, impact=impact)
+    at = lines.index("- [市場] LG 簽冷水機長約")
+    assert lines[at + 1] == ("  ↳ 碰到：敘事 AAON〔demand 格〕、X〔本身〕、Y〔騎讀圖〕 另 1 份；在盯 反證 1／加碼 0；"
+                             "另經 nvidia 碰到 敘事 12、在盯 3（樞紐只計數）")
+    assert lines[at + 2] == "  ↳ 提議（ew_1）：冷水機長約化碰到反證第 1 條"
+    assert lines[at + 3] == "- [主題] 沒碰到的一則"                    # 沒碰到的不加行；不相關的提議不印
+    assert impact_total_line(impact, saved) == ("- 對照：外部 5 則裡碰到敘事 1、讀圖 0、在盯條件 1 則；只經樞紐 1、沒碰到 3"
+                                                "｜LLM 提議 2 句（候選 4 對、丟 1）")
+    many = [{"lead_id": "lead_r", "target": f"ew_{i}", "verdict": "unclear", "sentence": f"第 {i} 句"} for i in range(4)]
+    capped = events_block(digest={**saved, "impacts": many}, receipt=receipt, digest_problem=None, radar_problem=None,
+                          impact=impact)
+    assert "  ↳ 提議・不確定（ew_1）：第 1 句" in capped and "  ↳ 另 2 句提議見心跳落檔" in capped
+    assert impact_total_line(None, saved).startswith("- 對照：今天沒有對照檔")
+    assert "沒算出來" in impact_total_line({"error": "RuntimeError: x"}, None)
+    assert impact_total_line(impact, None).endswith("｜LLM 提議：摘要今天沒產生")
 
 
 # ---- apply ----

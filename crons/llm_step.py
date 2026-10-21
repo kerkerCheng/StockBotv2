@@ -524,8 +524,9 @@ DIGEST_SCHEMA = ROOT / "crons" / "digest_schema.json"
 
 
 def compose_digest_prompt(requests: Sequence[Mapping[str, Any]]) -> str:
-    """每日摘要的 prompt：固定指示（`crons/digest_prompt.md`）＋程式組的資料（今天的 lead 與雷達收下的新聞）。
-    **資料只來自 `engine_b.digest.prepare` 的批次**——不讀 Sheet、持股、NAV、私人路徑（測試以哨兵證明）。"""
+    """每日摘要的 prompt：固定指示（`crons/digest_prompt.md`）＋程式組的資料（今天的 lead、雷達收下的新聞、
+    影響對照的候選對——附敘事那一格的摘錄或在盯條件原文，使用者 2026-10-20 同意）。
+    **資料只來自 `engine_b.digest.prepare` 的批次**——模型零工具、只讀程式交給它的摘錄；不讀 Sheet、持股、NAV（測試以哨兵證明）。"""
     data = json.dumps(list(requests), ensure_ascii=False, indent=1)
     return "\n\n".join([
         DIGEST_PROMPT.read_text(encoding="utf-8").strip(),

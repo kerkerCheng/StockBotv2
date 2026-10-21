@@ -758,7 +758,7 @@ class DailyRun:
             # 每日摘要（2026-10-07 使用者指示）：零工具、一輪一次——與 triage／預篩同一組 argv 與能力檢查
             return {"batch": Path(paths["digest_batch"]), "result": Path(paths["digest_result"]),
                     "batch_key": "requests", "out_key": "bullets", "schema": llm_step.DIGEST_SCHEMA,
-                    "compose": llm_step.compose_digest_prompt, "chunk": 1,
+                    "compose": llm_step.compose_digest_prompt, "chunk": 1, "side_lists": ("impacts",),
                     "stamp": lambda item, session: {**item, "session_id": session}}
         raise ValueError(f"未知 LLM 任務：{task}")
 
@@ -847,12 +847,15 @@ class DailyRun:
             for item in structured[spec["out_key"]]:
                 if isinstance(item, dict):
                     proposals.append(spec["stamp"](item, outcome.session_id))
+            # 主清單以外、schema 允許的第二張清單（每日摘要的 `impacts`，雷達精進 C2）：照收，套用步驟再驗
+            for key in spec.get("side_lists", ()):
+                extra.setdefault(key, []).extend(i for i in structured.get(key) or () if isinstance(i, dict))
+            if "no_material_change" in structured:
+                extra["no_material_change"] = bool(structured["no_material_change"])
             if collector is not None:
                 item_key = spec.get("item_key")
                 search_calls.append({**collector.as_record(), "session_id": outcome.session_id,
                                      "items": [str(i.get(item_key)) for i in chunk] if item_key else []})
-                if "no_material_change" in structured:
-                    extra["no_material_change"] = bool(structured["no_material_change"])
         if make_collector is not None:
             extra["search"] = llm_step.merge_search_records(search_calls)   # 整輪聯集（雷達讀它；一次呼叫時與以前相同）
             extra["search_calls"] = search_calls                            # 逐次（T2 輪詢按這個歸屬）
@@ -865,7 +868,8 @@ class DailyRun:
 
     def _write_llm_result(self, path: Path, out_key: str, proposals: list[dict[str, Any]],
                           sessions: list[Any] | None = None, extra: Mapping[str, Any] | None = None) -> None:
-        """`extra`：雷達的搜尋證據（`search`：程式從 stream 收的網址與標題）與 `no_material_change`；其他任務沒有。"""
+        """`extra`：雷達的搜尋證據（`search`：程式從 stream 收的網址與標題）、`no_material_change`、
+        每日摘要的第二張清單（`impacts`）；其他任務沒有。"""
         payload = {"schema": "llm-result-v1", "run_id": self.run_id, "run_date": self.date,
                    "sessions": sessions or [], **dict(extra or {}), out_key: proposals}
         path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")

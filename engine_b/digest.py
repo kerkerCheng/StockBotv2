@@ -13,6 +13,12 @@
 
 「待你決定」「健康度」「todo」**不經 LLM**——它們是 registry 與執行紀錄的計數，心跳用程式組（`crons/heartbeat.py`）。
 LLM 失敗（例：額度用完）時沒有摘要檔，心跳印「今天沒產生」並退回程式組的標題清單，其餘照發。
+
+**影響對照（雷達精進 C2，2026-10-21）**：prepare 用 `engine_b.impact` 對今天的外部 lead 算確定性對照（碰到哪份敘事哪一格、
+哪份讀圖、哪條在盯條件），寫 `impact_<日期>.json`（LLM 失敗也有）；並把候選對（lead_id, target）連同那一格的敘事摘錄或條件原文
+交給同一次 LLM 呼叫，請它對每一對寫一句「可能怎麼影響」——**只標旗、不判定**：apply 只收候選集內的對、quote 必須是那則 lead
+原文的逐字片段（L18），每日上限 `IMPACT_CAP` 對、截掉的照數。使用者 2026-10-20 同意摘要 LLM 讀敘事各格摘錄（只限這一步）；
+仍不讀持股、Sheet、NAV。
 """
 from __future__ import annotations
 
@@ -28,6 +34,16 @@ OUT_DIR = ROOT / "library" / "private" / "heartbeat"
 BATCH_SCHEMA = "digest-batch-v1"
 DIGEST_SCHEMA = "daily-digest-v1"
 #: 兩段的封閉字彙與每段最多幾句（多的照數、不收）。
+IMPACT_CAP = 15
+IMPACT_SENTENCE_CHARS = 80
+IMPACT_EXCERPT_CHARS = 200
+IMPACT_VERDICTS = frozenset({"may_touch", "unrelated", "unclear"})
+IMPACT_DROP_REASONS: Mapping[str, str] = {
+    "invalid": "欄位不合法、verdict 不在字彙裡、或同一對重複",
+    "unknown_pair": "這一對不在程式給的候選裡（LLM 不得自己發明連結，L15）",
+    "quote_not_verbatim": "quote 不是那則 lead 原文的逐字片段（L18）",
+    "too_long": "說明超過字數上限",
+}
 SECTIONS: Mapping[str, str] = {"leads": "lead 抓到什麼", "events": "市場大事"}
 SECTION_CAPS: Mapping[str, int] = {"leads": 4, "events": 3}
 MAX_TEXT_CHARS = 160
@@ -109,8 +125,55 @@ def _lead_row(lead: Mapping[str, Any]) -> dict[str, Any]:
     return row
 
 
+def _norm(text: Any) -> str:
+    return " ".join(str(text or "").split())
+
+
+def impact_bundle(leads_rows: Sequence[Mapping[str, Any]], radar_ids: set[str], ctx: Any, *,
+                  eligible: set[str] | None = None) -> tuple[list[dict[str, Any]], list[dict[str, Any]], int]:
+    """(對照列, 給 LLM 的候選對, 截掉的對數)。候選的次序是固定規則、不是分數：雷達收下的先；同一群裡每則輪流取
+    （每則先給它的第一對、再第二對）；每則自己的次序是反證 → 加碼條件 → 公司本身 → 某一格具名 → 只靠騎的讀圖；
+    同級照 lead 原本的次序。target：watch_id，或 `<ticker>#<格>`（附那一格摘錄）。
+    對照列涵蓋全部外部 lead；候選只給 `eligible`（這一輪真的交給 LLM 的 lead——沒給原文就沒得逐字引用）。"""
+    from engine_b import impact as im
+
+    slot_text = {(b.ticker, s.key): _one_line(s.text, IMPACT_EXCERPT_CHARS) for b in ctx.briefs for s in b.slots or ()}
+    first_slot = {b.ticker: (b.slots[0].key if b.slots else None) for b in ctx.briefs}
+    rows: list[dict[str, Any]] = []
+    pairs: list[tuple[tuple[int, int, int, int], dict[str, Any]]] = []
+    for order, lead in enumerate(leads_rows):
+        if not is_external(lead):
+            continue
+        row = im.impact(lead, ctx)
+        rows.append(row)
+        lead_id = str(lead.get("lead_id"))
+        if eligible is not None and lead_id not in eligible:
+            continue
+        own: list[tuple[int, dict[str, Any]]] = []
+        for w in row["watches"]:
+            own.append((0 if w["role"] == "反證" else 1,
+                        {"lead_id": lead_id, "target": w["watch_id"], "kind": f"在盯條件（{w['role']}）",
+                         "text": _one_line(w["condition"], 300)}))
+        for ticker, links in row["narratives"].items():
+            slots = [x.split("<", 1)[0][len("slot:"):] for x in links if x.startswith("slot:")]
+            rank = 2 if "own" in links else 3 if slots else 4
+            key = slots[0] if slots else ("our_bet" if (ticker, "our_bet") in slot_text else first_slot.get(ticker))
+            if key is None:
+                continue
+            own.append((rank, {"lead_id": lead_id, "target": f"{ticker}#{key}", "kind": "敘事的一格",
+                               "text": slot_text.get((ticker, key), "")}))
+        # 每則輪流取：先每則的第一對、再第二對（10-21 試跑：一則雷達新聞碰到 8 條反證，把 15 對吃掉一半）
+        own.sort(key=lambda p: p[0])
+        radar = 0 if lead_id in radar_ids else 1
+        pairs.extend(((radar, turn, rank, order), pair) for turn, (rank, pair) in enumerate(own))
+    pairs.sort(key=lambda p: p[0])
+    candidates = [p[1] for p in pairs[:IMPACT_CAP]]
+    return rows, candidates, max(len(pairs) - IMPACT_CAP, 0)
+
+
 def build_request(leads_rows: Sequence[Mapping[str, Any]], radar_receipt: Mapping[str, Any] | None, *,
-                  today: date) -> dict[str, Any]:
+                  today: date, impact_candidates: Sequence[Mapping[str, Any]] = (),
+                  impact_truncated: int = 0) -> dict[str, Any]:
     """LLM 要的那一份資料。**沒有任何持股、部位、私人路徑的欄位**——只有外部 lead 的公開內容與雷達收下的新聞；
     我們自己登記的研究題只計數、不給 LLM（它們不是今天抓到的）。"""
     external = [lead for lead in leads_rows if is_external(lead)]
@@ -121,11 +184,40 @@ def build_request(leads_rows: Sequence[Mapping[str, Any]], radar_receipt: Mappin
                            "fact": item.get("fact"), "why": item.get("why"), "publisher": item.get("publisher")})
     return {"today": today.isoformat(), "sections": dict(SECTIONS), "section_caps": dict(SECTION_CAPS),
             "max_text_chars": MAX_TEXT_CHARS, "leads": rows, "radar": radar_rows,
-            "leads_total": len(external), "leads_given": len(rows), "internal_total": len(leads_rows) - len(external)}
+            "leads_total": len(external), "leads_given": len(rows), "internal_total": len(leads_rows) - len(external),
+            "impact_candidates": [dict(c) for c in impact_candidates], "impact_cap": IMPACT_CAP,
+            "impact_truncated": int(impact_truncated), "impact_sentence_chars": IMPACT_SENTENCE_CHARS}
+
+
+IMPACT_SCHEMA = "lead-impact-v1"
+
+
+def impact_path(day: date, *, out_dir: Path = OUT_DIR) -> Path:
+    return out_dir / f"impact_{day.isoformat()}.json"
+
+
+def load_impact(day: date, *, out_dir: Path = OUT_DIR) -> dict[str, Any] | None:
+    """短版與心跳讀它；沒有檔或讀不懂回 None（呼叫端要說「今天沒有對照」，不是印空白）。"""
+    path = impact_path(day, out_dir=out_dir)
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None
+    return payload if isinstance(payload, dict) and payload.get("schema") == IMPACT_SCHEMA else None
+
+
+def impact_counts(rows: Sequence[Mapping[str, Any]]) -> dict[str, int]:
+    return {"leads": len(rows), "narratives": sum(bool(r.get("narratives")) for r in rows),
+            "readings": sum(bool(r.get("readings")) for r in rows), "watches": sum(bool(r.get("watches")) for r in rows),
+            "hub_only": sum(r.get("absence_kind") == "hub_only" for r in rows),
+            "untouched": sum(r.get("absence_kind") in ("untouched", "no_entities") for r in rows),
+            "language_gap": sum(bool(r.get("language_gap")) for r in rows)}
 
 
 def prepare(run_id: str, out: Path, *, now: datetime | None = None, store: Mapping[str, Any] | None = None,
-            receipt_dir: Path = OUT_DIR) -> dict[str, Any]:
+            receipt_dir: Path = OUT_DIR, impact_context: Any = None) -> dict[str, Any]:
+    """`impact_context`：載入對照 Context 的函式（預設 `engine_b.impact.load_context`；測試注入）。對照載不起來不阻斷摘要——
+    批次照寫、候選為空，對照檔記下錯誤（失敗要說出來，L13）。"""
     from engine_b import leads
 
     now = now or datetime.now(timezone.utc)
@@ -134,15 +226,81 @@ def prepare(run_id: str, out: Path, *, now: datetime | None = None, store: Mappi
     picked = select_leads(store, now=now)
     receipt_path = receipt_dir / f"radar_{today.isoformat()}.json"
     receipt = json.loads(receipt_path.read_text(encoding="utf-8")) if receipt_path.is_file() else None
-    request = build_request(picked, receipt, today=today)
+    radar_ids = {str(a.get("lead_id")) for a in (receipt or {}).get("accepted") or () if a.get("lead_id")}
+    given = [lead for lead in picked if is_external(lead)][:MAX_LEADS]
+    eligible = {str(lead.get("lead_id")) for lead in given} | radar_ids
+    rows: list[dict[str, Any]] = []
+    candidates: list[dict[str, Any]] = []
+    truncated, impact_error = 0, None
+    try:
+        if impact_context is None:
+            from engine_b.impact import load_context as impact_context
+        ctx = impact_context()
+        rows, candidates, truncated = impact_bundle(picked, radar_ids, ctx, eligible=eligible)
+    except Exception as exc:  # noqa: BLE001 — 對照壞了摘要照跑；錯誤寫進對照檔，心跳與短版會印
+        impact_error = f"{type(exc).__name__}: {_one_line(exc, 160)}"
+    request = build_request(picked, receipt, today=today, impact_candidates=candidates, impact_truncated=truncated)
     # 一則都沒有就給空批次——daily 的 LLM 步驟遇到空批次不呼叫模型，照樣寫空結果（沒事與壞了不同形，L13）
     envelope = {"schema": BATCH_SCHEMA, "run_id": run_id, "run_date": today.isoformat(),
                 "requests": [request] if (request["leads"] or request["radar"]) else []}
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(envelope, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    counts = impact_counts(rows)
+    impact_doc = {"schema": IMPACT_SCHEMA, "run_id": run_id, "date": today.isoformat(), "error": impact_error,
+                  "counts": counts, "candidates": len(candidates), "truncated": truncated, "rows": rows,
+                  "note": "確定性對照（名字對到哪裡），不是判定；判定只在互動 session。"}
+    receipt_dir.mkdir(parents=True, exist_ok=True)
+    impact_path(today, out_dir=receipt_dir).write_text(json.dumps(impact_doc, ensure_ascii=False, indent=1) + "\n",
+                                                       encoding="utf-8")
     return {"leads_total": request["leads_total"], "leads_given": request["leads_given"],
             "internal_total": request["internal_total"], "radar_items": len(request["radar"]),
-            "radar_receipt": receipt is not None}
+            "radar_receipt": receipt is not None, "impact_touched": counts["leads"] - counts["untouched"] - counts["hub_only"],
+            "impact_candidates": len(candidates), "impact_truncated": truncated, "impact_error": impact_error}
+
+
+def _given_text(request: Mapping[str, Any]) -> dict[str, str]:
+    """lead_id → 這一輪交給 LLM 的原文（標題、摘錄、雷達的一句事實），空白正規化——quote 只能從這裡逐字取（L18）。"""
+    out: dict[str, list[str]] = {}
+    for r in request.get("leads") or ():
+        out.setdefault(str(r.get("lead_id")), []).extend(
+            [str(r.get("title") or ""), str(r.get("excerpt") or ""), str((r.get("radar") or {}).get("fact") or "")])
+    for r in request.get("radar") or ():
+        out.setdefault(str(r.get("lead_id")), []).extend([str(r.get("title") or ""), str(r.get("fact") or "")])
+    return {lid: "\n".join(_norm(p) for p in parts if p) for lid, parts in out.items()}
+
+
+def _apply_impacts(items: Sequence[Any], request: Mapping[str, Any]) -> tuple[list[dict[str, Any]], dict[str, int]]:
+    """C2 的那一句：只收程式給的候選對、quote 逐字、說明不超長、verdict 在字彙裡；不合的照數（INV-3）。同一對只收第一句。"""
+    candidates = {(str(c.get("lead_id")), str(c.get("target"))): c for c in request.get("impact_candidates") or ()}
+    texts = _given_text(request)
+    counts = {"candidates": len(candidates), "truncated": int(request.get("impact_truncated") or 0), "proposed": 0,
+              "kept": 0, **{k: 0 for k in IMPACT_DROP_REASONS}}
+    kept: list[dict[str, Any]] = []
+    seen: set[tuple[str, str]] = set()
+    for item in items:
+        counts["proposed"] += 1
+        if not isinstance(item, Mapping):
+            counts["invalid"] += 1
+            continue
+        pair = (str(item.get("lead_id") or ""), str(item.get("target") or ""))
+        verdict, quote, sentence = str(item.get("verdict") or ""), _norm(item.get("quote")), _norm(item.get("sentence"))
+        if verdict not in IMPACT_VERDICTS or not quote or not sentence or pair in seen:
+            counts["invalid"] += 1
+            continue
+        if pair not in candidates:
+            counts["unknown_pair"] += 1
+            continue
+        if quote not in texts.get(pair[0], ""):
+            counts["quote_not_verbatim"] += 1
+            continue
+        if len(sentence) > IMPACT_SENTENCE_CHARS:
+            counts["too_long"] += 1
+            continue
+        seen.add(pair)
+        kept.append({"lead_id": pair[0], "target": pair[1], "kind": candidates[pair].get("kind"), "verdict": verdict,
+                     "quote": quote, "sentence": sentence})
+        counts["kept"] += 1
+    return kept, counts
 
 
 def apply(result_path: Path, batch_path: Path, run_id: str, *, out_dir: Path = OUT_DIR,
@@ -185,13 +343,15 @@ def apply(result_path: Path, batch_path: Path, run_id: str, *, out_dir: Path = O
         counts["kept"] += 1
         # 寫成簡體的照數（不丟——有根據的一句比字形重要；計數讓「又退回簡體」自己出現）
         counts["simplified_suspect"] = counts.get("simplified_suspect", 0) + int(simplified_count(text) >= 2)
+    impacts, impact_counts_ = _apply_impacts(result.get("impacts") or (), request)
     today = today or datetime.now().astimezone().date()
     summary = {**counts, "rejected": len(rejected), "leads_total": request.get("leads_total", 0),
                "leads_given": request.get("leads_given", 0), "radar_items": len(request.get("radar") or ()),
-               "no_material_change": bool(result.get("no_material_change"))}
+               "no_material_change": bool(result.get("no_material_change")), "impact": impact_counts_}
     digest = {"schema": DIGEST_SCHEMA, "run_id": run_id, "date": today.isoformat(), "sections": dict(SECTIONS),
-              **kept, "summary": summary, "rejected": rejected, "sessions": list(result.get("sessions") or ()),
-              "note": "兩段 TL;DR 是 LLM 寫的提議（每句都指得回當天的 lead），不是判定；判定只在互動 session。"}
+              **kept, "impacts": impacts, "summary": summary, "rejected": rejected,
+              "sessions": list(result.get("sessions") or ()),
+              "note": "兩段 TL;DR 與「可能怎麼影響」都是 LLM 寫的提議（每句都指得回當天的 lead），不是判定；判定只在互動 session。"}
     out_dir.mkdir(parents=True, exist_ok=True)
     (out_dir / f"digest_{today.isoformat()}.json").write_text(
         json.dumps(digest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
@@ -233,5 +393,6 @@ if __name__ == "__main__":
     sys.exit(main())
 
 
-__all__ = ["BATCH_SCHEMA", "DIGEST_SCHEMA", "DROP_REASONS", "EXTERNAL_CLASSES", "SECTIONS", "SECTION_CAPS", "apply",
-           "build_request", "is_external", "load_digest", "main", "prepare", "select_leads"]
+__all__ = ["BATCH_SCHEMA", "DIGEST_SCHEMA", "DROP_REASONS", "EXTERNAL_CLASSES", "IMPACT_CAP", "IMPACT_DROP_REASONS", "IMPACT_SCHEMA",
+           "IMPACT_VERDICTS", "SECTIONS", "SECTION_CAPS", "apply", "build_request", "impact_bundle", "impact_counts", "impact_path",
+           "is_external", "load_digest", "load_impact", "main", "prepare", "select_leads"]

@@ -17,6 +17,22 @@
         }
       }
     },
+    "impacts": {
+      "type": "array",
+      "maxItems": 20,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["lead_id", "target", "verdict", "quote", "sentence"],
+        "properties": {
+          "lead_id": {"type": "string"},
+          "target": {"type": "string"},
+          "verdict": {"type": "string", "enum": ["may_touch", "unrelated", "unclear"]},
+          "quote": {"type": "string"},
+          "sentence": {"type": "string"}
+        }
+      }
+    },
     "no_material_change": {"type": "boolean"}
   }
 }

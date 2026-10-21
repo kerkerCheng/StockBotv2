@@ -1245,6 +1245,11 @@ def build_queue(*, state_dir: Path | None = None, now: datetime | None = None,
         section.lines.append(_undisposed_line(leads=leads))
     except Exception as exc:  # noqa: BLE001
         section.lines.append(f"停放未處置對照：盤點失敗（{type(exc).__name__}；upstream_unavailable）")
+    # 今天的影響對照完整表（雷達精進 C2）：短版只印雷達那幾則的「↳ 碰到」與總數，這裡落檔全部碰到的
+    try:
+        section.lines.extend(_impact_lines(now=moment))
+    except Exception as exc:  # noqa: BLE001
+        section.lines.append(f"影響對照：盤點失敗（{type(exc).__name__}；upstream_unavailable）")
     # T2 主動輪詢（2026-10-06 使用者指示）：1.2a 把 sweep 移出 daily 時這一格一起不見——09-21 之後兩週沒人跑，也沒有任何地方印。
     try:
         section.lines.append(_t2_line(now=moment, record_path=run_record_path))
@@ -1568,6 +1573,37 @@ def _undisposed_line(*, leads: Mapping[str, Any] | None, ctx: Any = None) -> str
     sample = "、".join(f"{r['lead_id'][:13]}×{r['watch_id']}" for r in rows[:3])
     return (f"**停放未處置對照 {len(rows)} 筆**（lead×在盯條件；停放理由沒寫到對照列出的 watch id）：{sample}"
             + (f"；另 {len(rows) - 3} 筆" if len(rows) > 3 else "") + "｜處置：`python -m engine_b.impact --lead <id>` 後補停放理由")
+
+
+#: 心跳落檔裡逐則列出的對照上限（其餘照數、完整的在 impact_<日期>.json）。
+IMPACT_ROWS_IN_HEARTBEAT = 40
+
+
+def _impact_lines(*, now: datetime, out_dir: Path | None = None) -> list[str]:
+    """段 3「影響對照」：今天外部 lead 碰到哪些敘事／讀圖／在盯條件（⑪b 算的確定性對照）＋ LLM 收下的「可能怎麼影響」。
+    沒有對照檔要說（⑪b 沒跑），算壞要說錯誤——不印 0（INV-3）。"""
+    from crons.daily_brief import impact_total_line
+    from engine_b import digest as digest_mod
+    from engine_b import impact as im
+
+    day = now.astimezone().date()
+    kwargs = {"out_dir": out_dir} if out_dir is not None else {}
+    doc = digest_mod.load_impact(day, **kwargs)
+    digest = digest_mod.load_digest(day, **kwargs)
+    lines = ["影響對照" + impact_total_line(doc, digest)[len("- 對照"):]]
+    if not doc or doc.get("error"):
+        return lines
+    touched = [r for r in doc.get("rows") or () if r.get("absence_kind") is None]
+    proposals: dict[str, list[Mapping[str, Any]]] = {}
+    for p in (digest or {}).get("impacts") or ():
+        proposals.setdefault(str(p.get("lead_id")), []).append(p)
+    for row in touched[:IMPACT_ROWS_IN_HEARTBEAT]:
+        lines.extend(im.render(row))
+        for p in proposals.get(str(row.get("lead_id")), ()):
+            lines.append(f"  ↳ 提議［{p.get('verdict')}］（{p.get('target')}）：{p.get('sentence')}｜原文「{p.get('quote')}」")
+    if len(touched) > IMPACT_ROWS_IN_HEARTBEAT:
+        lines.append(f"（另 {len(touched) - IMPACT_ROWS_IN_HEARTBEAT} 則碰到的見 impact_{day.isoformat()}.json）")
+    return lines
 
 
 def _radar_line(*, now: datetime, record_path: Path | None) -> str:
