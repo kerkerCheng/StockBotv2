@@ -360,6 +360,17 @@ def reread_reasons(node: str, watches: Sequence[Mapping[str, Any]]) -> list[str]
     return reasons
 
 
+def entity_alias_map() -> dict[str, str]:
+    """{別名 id: canonical id}——`config/entity_aliases.json` 經 `identity.entities` 驗證（語意合併必帶核准收據，
+    name_identical 是機械可驗、照名冊規則直接收）。讀不到就回空表：比對照舊（多叫重讀，不少叫）。批次二 E4。"""
+    try:
+        from identity.entities import load
+
+        return {alias: canonical for canonical, entry in load().items() for alias in entry.get("aliases") or ()}
+    except Exception:  # noqa: BLE001
+        return {}
+
+
 def evidence_rank() -> Mapping[str, int]:
     """證據等級的 rank——唯一 owner 是 `query.bottleneck.EVIDENCE_RANK`，這裡只是把它遞給不能 import `query` 的
     讀圖 staleness（`alpha.structure_reading.staleness.reading_status` 的 `evidence_rank=`；Phase 6 Step 6.1）。
@@ -393,6 +404,7 @@ def reading_status_rows(edges: Sequence[Any], *, today: Any, as_of: Any = None,
     from ..structure_reading import needs_reread, reading_status, select_readings
 
     rank = evidence_rank()
+    aliases = entity_alias_map()
     rows: list[dict[str, Any]] = []
     parse_errors: list[str] = []
     for node in known_nodes(directory=directory):
@@ -405,13 +417,14 @@ def reading_status_rows(edges: Sequence[Any], *, today: Any, as_of: Any = None,
             rows.append({"node": node, "unit": None, "status": None, "reading_id": None,
                          "reason": "ledger 有紀錄但目前沒有現行的那一筆（已全部撤回）"})
             continue
-        view = build_structure(node, edges)
+        # 批次二 E4（#75）：讀圖所在的節點本身被併掉時，查 canonical 那一個的結構（舊 id 在圖上已經沒有了）
+        view = build_structure(aliases.get(node, node), edges)
         watch_reasons = reread_reasons(node, watches)
         for unit in sorted({r.unit for r in records} - set(current)):
             rows.append({"node": node, "unit": unit, "status": None, "reading_id": None,
                          "reason": f"這個節點的 {unit} 讀圖有紀錄但目前沒有現行的那一筆（已全部撤回）"})
         for unit, reading in current.items():
-            status = reading_status(reading, view.as_dict(), today=today, evidence_rank=rank)
+            status = reading_status(reading, view.as_dict(), today=today, evidence_rank=rank, aliases=aliases)
             by_graph = needs_reread(status)
             # 讀圖頁要印得出「判讀憑哪一段原文」與「每條反證登記成哪一筆 watch」（Step 2.7；L18：標籤指得回原始證據）。
             # watch 以 `reading:<id>#<序>` 指回（`register_reading_watches` 的鍵）；沒登記到就是 None，照實印。

@@ -251,6 +251,35 @@ def test_digest_moved_but_nothing_found_says_so() -> None:
     assert status["reason"] and "不同步" in status["reason"]
 
 
+def _merged_status(after, aliases, *, record=None):
+    from alpha.structure_reading.contracts import parse_structure_reading_record
+    return reading_status(parse_structure_reading_record(record or _record()), after, today=TODAY,
+                          evidence_rank=EVIDENCE_RANK, aliases=aliases)
+
+
+MERGED = {"co:b_old": "co:b"}
+
+
+def test_an_id_renamed_only_by_a_merge_is_not_a_change() -> None:
+    """批次二 E4（#75）：10-17 三筆同義節點合併讓 4 份讀圖換版、10 份敘事換騎，零判讀改變——換成 canonical 後沒有差異就不算。"""
+    record = _record(structure=_structure(supply=("co:a", "co:b_old")))
+    after = _structure(supply=("co:a", "co:b"), digest="d-merged")
+    plain = _merged_status(after, {}, record=record)
+    assert plain["status"] == "stale" and needs_reread(plain)            # 不換名：一進一出，看起來像換了供應商
+    merged = _merged_status(after, MERGED, record=record)
+    assert merged["status"] == "current" and merged["alias_only"] and not needs_reread(merged)
+    assert merged["renamed"] == ["co:b_old→co:b"] and "合併換名" in merged["reason"]
+
+
+def test_a_merge_that_also_brings_a_real_new_edge_is_still_flagged() -> None:
+    """合併同時帶進真的新邊（外部光源、6 吋 InP 的形狀）：換名只拿掉名字不同那一種差異，新邊照標。"""
+    record = _record(structure=_structure(supply=("co:a", "co:b_old")))
+    after = _structure(supply=("co:a", "co:b", "co:new"), digest="d2")
+    status = _merged_status(after, MERGED, record=record)
+    assert status["status"] == "stale" and not status["alias_only"]
+    assert [c["detail"] for c in status["changes"]] == ["新增 1 條：co:new→tech:cw_dfb_laser"]
+
+
 def test_anchor_reachability_change_is_graded() -> None:
     status = _status(_structure(anchor=(), digest="d4"))
     assert any(c["kind"] == "anchor" for c in status["changes"])

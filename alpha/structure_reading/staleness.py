@@ -203,24 +203,52 @@ def grade_changes(before_angles: Mapping[str, Sequence[Sequence[Any]]],
     return changes
 
 
+def canonical_snapshot(angles: Mapping[str, Sequence[Sequence[Any]]], anchor_chain: Sequence[str] | None,
+                       aliases: Mapping[str, str]) -> tuple[dict[str, list[list[Any]]], list[str], list[str]]:
+    """把讀圖快照裡的別名 id 換成 canonical（Phase 7 批次二 E4，failure log #75）。回 `(角度, 錨鏈, 換了名的 id)`。
+
+    `aliases`＝{別名 id: canonical id}，由呼叫端從 `identity.entities`（已驗證：語意合併必帶核准收據）組好注入——
+    本模組不讀設定檔（純函式）。"""
+    renamed: set[str] = set()
+
+    def canon(node: Any) -> str:
+        text = str(node)
+        target = aliases.get(text)
+        if target and target != text:
+            renamed.add(f"{text}→{target}")
+            return target
+        return text
+
+    out = {angle: [[canon(r[_SRC]), r[_REL], canon(r[_DST]), *r[_SUB:]] for r in rows]
+           for angle, rows in (angles or {}).items()}
+    chain = [canon(n) for n in anchor_chain or ()]
+    return out, chain, sorted(renamed)
+
+
 def reading_status(reading: Any, after_structure: Mapping[str, Any] | None, *, today: date,
-                   evidence_rank: Mapping[str, int]) -> dict[str, Any]:
+                   evidence_rank: Mapping[str, int], aliases: Mapping[str, str] | None = None) -> dict[str, Any]:
     """一份讀圖紀錄現在是什麼狀態，以及**憑什麼**。
 
     `after_structure=None` ＝ 這次沒讀到圖（例如 Neo4j 沒開）：回 `None` 狀態並說明，
     **不得回 `current`**——「沒查」與「查過沒變」不得同形（L13-2）。
     `evidence_rank`：證據等級的 rank（唯一 owner `query.bottleneck.EVIDENCE_RANK`；呼叫端注入、沒有預設——見檔頭）。
+    `aliases`（批次二 E4）：同義節點合併後舊快照裡的 id 換成 canonical 再比；換完沒有差異、只是有 id 換了名 →
+    `current`＋`alias_only`（判讀不受影響：10-17 三筆合併讓 4 份讀圖換版、10 份敘事換騎，零判讀改變）。合併同時帶進
+    真的新邊的照舊標——換名只拿掉「名字不同」這一種差異。
     """
     if after_structure is None:
         return {"status": None, "reason": "這次沒有讀到圖，無法比對（不是 current）",
                 "changes": [], "expired": reading.is_expired(today)}
-    changes = grade_changes(reading.angles, after_structure, before_anchor=reading.anchor_chain,
+    before_angles, before_anchor, renamed = canonical_snapshot(reading.angles, reading.anchor_chain, aliases or {})
+    changes = grade_changes(before_angles, after_structure, before_anchor=before_anchor,
                             unit=reading.unit, evidence_rank=evidence_rank)
     digest_changed = str(after_structure.get("result_digest") or "") != reading.result_digest
+    # digest 是用舊 id 算的：換名之後逐項比對找不出差異、而且確實有 id 換了名，那一半的差異就是換名本身
+    alias_only = digest_changed and not changes and bool(renamed)
     grades = {c.grade for c in changes}
     if reading.is_expired(today):
         status = "expired"
-    elif not digest_changed:
+    elif not digest_changed or alias_only:
         status = "current"
     elif grades <= {"low"}:
         status = "stale_low"
@@ -229,9 +257,14 @@ def reading_status(reading: Any, after_structure: Mapping[str, Any] | None, *, t
     # ⚠ digest 變了卻找不出任何變化＝比對邏輯與 digest 的欄位不同步。安靜回 current 會讓
     # 整個機制失效，所以明說（INV-3：不得靜默丟棄）。
     reason = None
-    if digest_changed and not changes:
+    if alias_only:
+        reason = (f"只有同義節點合併換名（{len(renamed)} 個 id：{'、'.join(renamed[:3])}）——"
+                  "換成 canonical 後逐項比對沒有差異，判讀不受影響，不進該重讀")
+    elif digest_changed and not changes:
         reason = "result_digest 變了但逐項比對找不出差異——比對欄位與 digest 欄位可能不同步"
     return {
+        "alias_only": alias_only,
+        "renamed": renamed,
         "status": status,
         "digest_changed": digest_changed,
         "expired": reading.is_expired(today),
@@ -251,5 +284,5 @@ def needs_reread(status: Mapping[str, Any]) -> bool:
 
 __all__ = [
     "CHANGE_KINDS", "DISPROOF_KINDS", "READING_STATUSES", "StructureChange",
-    "grade_changes", "needs_reread", "reading_status",
+    "canonical_snapshot", "grade_changes", "needs_reread", "reading_status",
 ]

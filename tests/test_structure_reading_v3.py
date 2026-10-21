@@ -576,6 +576,25 @@ def test_reading_rows_carry_citations_and_each_disproof_points_at_its_watch(tmp_
     assert unregistered[0]["disproof"][0]["watch_id"] is None
 
 
+def test_a_reading_whose_own_node_was_merged_is_compared_against_the_canonical_node(tmp_path, monkeypatch) -> None:
+    """批次二 E4（#75，FAU [730] 的形狀）：讀圖所在的節點被併掉、圖上已經沒有舊 id——查 canonical 那一個，
+    換名後成員沒有增減；不換名時整個節點「消失」、每條邊都像換了一家。"""
+    from alpha.providers import structure_readings as sr
+
+    old = "prod:supernova_old"
+    monkeypatch.setattr(sr, "STRUCTURE_READING_DIR", tmp_path / "ledger")
+    sr.append_reading_record(_v3(old), quotes=_quotes(old))
+    edges = _canonical([_row(SIVERS, "supplies_to", SOCKET), _row("prod:teraphy_chiplet", "depends_on", SOCKET)])
+    membership = {"supply_added", "supply_removed", "demand_edges"}
+    monkeypatch.setattr(sr, "entity_alias_map", lambda: {})
+    plain, _ = sr.reading_status_rows(edges, today=TODAY)
+    assert membership & {c["kind"] for c in plain[0]["changes"]}
+    monkeypatch.setattr(sr, "entity_alias_map", lambda: {old: SOCKET})
+    merged, _ = sr.reading_status_rows(edges, today=TODAY)
+    assert not membership & {c["kind"] for c in merged[0]["changes"]}
+    assert merged[0]["renamed"] == [f"{old}→{SOCKET}"]
+
+
 def test_readings_input_is_sliced_by_the_company_seats_from_the_graph_not_by_ticker() -> None:
     """INV-1：由 `co:*` 在圖上 supplies_to／develops 的節點推，不靠讀圖紀錄裡的 ticker。"""
     from webapp.materialize import readings_input_for

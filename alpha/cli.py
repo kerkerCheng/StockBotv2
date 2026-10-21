@@ -491,8 +491,8 @@ def cmd_structure_reading(args: argparse.Namespace) -> int:
     from datetime import date, datetime, timezone
 
     from .providers.structure_readings import (
-        append_reading_record, evidence_rank, fetch_structure_snapshot, fetch_structure_snapshot_with_quotes,
-        read_reading_records, register_reading_watches,
+        append_reading_record, entity_alias_map, evidence_rank, fetch_structure_snapshot,
+        fetch_structure_snapshot_with_quotes, read_reading_records, register_reading_watches,
     )
     from .structure_reading import (
         READING_KINDS, READING_UNITS, needs_reread, reading_status, select_readings, structure_reading_record,
@@ -569,9 +569,11 @@ def cmd_structure_reading(args: argparse.Namespace) -> int:
         if not current_by_unit:
             print("✗ 沒有現行的讀圖紀錄可以比對", file=sys.stderr)
             return 2
-        snapshot = fetch_structure_snapshot(node)
+        aliases = entity_alias_map()          # 批次二 E4：與讀圖 artifact 同一個比對（合併換名不算變動）
+        snapshot = fetch_structure_snapshot(aliases.get(node, node))
         rank = evidence_rank()
-        statuses = {u: reading_status(r, snapshot, today=today, evidence_rank=rank) for u, r in current_by_unit.items()}
+        statuses = {u: reading_status(r, snapshot, today=today, evidence_rank=rank, aliases=aliases)
+                    for u, r in current_by_unit.items()}
 
     shown = [r for r in records if r.unit in units]
     if args.format == "json":
