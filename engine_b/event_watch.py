@@ -535,6 +535,12 @@ def check_watches(
             watch["status"] = "fired"
             watch["woken_by"] = {"kind": kind, "lead_id": lead_id, "shared_entities": shared,
                                  "at": _now(), "disproof_ref": watch.get("disproof_ref")}
+            # 批次二 E2（#63）：重訊叫醒的附上主旨類別（從重訊自己的主旨機械判；佇列照（公司、類別）分組、一組判一次）
+            from engine_b.announcement_category import lead_category
+
+            announcement = lead_category(leads.get(lead_id) or {}) if isinstance(leads, Mapping) else None
+            if announcement:
+                watch["woken_by"]["announcement"] = announcement
             watch["consumed_leads"] = sorted(set(watch.get("consumed_leads") or ()) | {lid for lid, _ in hit})
             fired.append(dict(watch))
         elif kind in ENTITY_MATCH_KINDS and leads:
@@ -1235,6 +1241,9 @@ def judge(data: dict[str, Any], watch_id: str, *, touches: bool, note: str,
             raise EventWatchError(f"只能判定 fired 的語意 watch：{watch_id}")
         judgment = {"at": _now(), "touches": "yes" if touches else "no", "note": note,
                     "lead_id": (watch.get("woken_by") or {}).get("lead_id")}
+        announcement = (watch.get("woken_by") or {}).get("announcement")
+        if announcement:      # 批次二 E2：量「例行重訊類別占語意判定的比例」用（INV-5：先量測後放閘）
+            judgment["announcement_category"] = announcement.get("category")
         if touches:
             if not str(quote or "").strip():
                 raise EventWatchError("判定觸及必須附 --quote（文件逐字）")
@@ -1247,6 +1256,41 @@ def judge(data: dict[str, Any], watch_id: str, *, touches: bool, note: str,
             reactivate(data, watch_id, note=note)
         return judgment
     raise EventWatchError(f"watch 不存在：{watch_id}")
+
+
+def semantic_queue_groups(pending: Iterable[Mapping[str, Any]],
+                          leads_store: Mapping[str, Any]) -> list[dict[str, Any]]:
+    """語意佇列的判定區塊（批次二 E2，#63）：重訊叫醒的照（公司、主旨類別）分組、一組判一次；其他每條自成一組。
+    類別優先用醒來時附上的（`woken_by.announcement`），舊的醒法沒有就從觸發 lead 的主旨當場判（同一支函式）。
+    組的順序＝組內最早醒來的時間（照醒來時間，不是排序權）。"""
+    from engine_b.announcement_category import lead_category
+
+    groups: dict[tuple, dict[str, Any]] = {}
+    for watch in pending:
+        woken = watch.get("woken_by") or {}
+        announcement = woken.get("announcement") or lead_category(leads_store.get(str(woken.get("lead_id"))) or {})
+        key = (("announcement", announcement["ticker"], announcement["category"]) if announcement
+               else ("single", watch["watch_id"]))
+        group = groups.setdefault(key, {"announcement": announcement, "watches": []})
+        group["watches"].append(watch)
+    return list(groups.values())
+
+
+def routine_judgment_share(data: Mapping[str, Any], *, days: int = 7, today: date | None = None) -> dict[str, Any]:
+    """近 N 天的語意判定裡，例行重訊類別（注意交易、法說會、內線澄清）占幾筆——Q2 B 要不要做的量測（INV-5）。"""
+    from engine_b.announcement_category import ROUTINE
+
+    since = ((today or _today()) - timedelta(days=days)).isoformat()
+    judgments = []
+    for watch in data["watches"]:
+        if watch.get("kind") != SEMANTIC_KIND:
+            continue
+        for entry in [*(watch.get("judgments") or []), *([watch["judgment"]] if watch.get("judgment") else [])]:
+            if str(entry.get("at") or "") >= since:
+                judgments.append(entry)
+    routine = sum(1 for j in judgments if j.get("announcement_category") in ROUTINE)
+    return {"days": days, "judgments": len(judgments), "routine": routine,
+            "with_category": sum(1 for j in judgments if j.get("announcement_category"))}
 
 
 def primary_coverage() -> frozenset[str]:
@@ -1366,8 +1410,9 @@ def main(argv: list[str] | None = None) -> int:
     reg.add_argument("--note", default="")
     sub.add_parser("semantic-queue",
                    help="列醒來待檢的語意 watch（照醒來時間；標旗只是給人讀的提示，不是排序權）")
-    jud = sub.add_parser("judge", help="互動 session 判定：觸及（consume＋judgment）或無關（reactivate）")
-    jud.add_argument("watch_id")
+    jud = sub.add_parser("judge", help="互動 session 判定：觸及（consume＋judgment）或無關（reactivate）；"
+                                       "可一次給一組（同一則重訊叫醒的同一類，佇列已分好組）")
+    jud.add_argument("watch_id", nargs="+")
     jud.add_argument("--touches", required=True, choices=("yes", "no"))
     jud.add_argument("--note", required=True)
     jud.add_argument("--quote", default="", help="文件逐字（--touches yes 時必填）")
@@ -1441,6 +1486,10 @@ def main(argv: list[str] | None = None) -> int:
             print(f"（一手涵蓋面算不出來：{type(exc).__name__}: {exc}——semantic_unreachable 記 null）")
             coverage = None
         print(json.dumps(counters(data, coverage=coverage), ensure_ascii=False))
+        share = routine_judgment_share(data)
+        print(f"近 {share['days']} 天語意判定 {share['judgments']} 筆｜帶重訊類別 {share['with_category']}｜"
+              f"其中例行類別（注意交易、法說會、內線澄清）{share['routine']} 筆"
+              "（批次二 E2：量兩週再談要不要不叫醒這三類，INV-5）")
         return 0
     if args.cmd == "register-disproof":
         # 去重（R2-b 第三輪 NB3-9）：同一來源、同一條件已有還在處理中的 watch 就拒收——否則同一份 lead 叫醒兩次、複查兩筆一起續盯
@@ -1474,34 +1523,49 @@ def main(argv: list[str] | None = None) -> int:
         pending.sort(key=lambda w: str((w.get("woken_by") or {}).get("at") or ""))
         if not pending:
             print("（沒有醒來待檢的語意 watch）")
-        for watch in pending:
-            woken = watch.get("woken_by") or {}
-            lead = leads_store.get(str(woken.get("lead_id"))) or {}
-            current = flag_for_current(watch)
-            print(f"{watch['watch_id']}｜醒於 {woken.get('at')}｜{watch.get('source_ref')}")
-            print(f"  條件：{watch.get('condition')}")
-            print(f"  觸發：{lead.get('title') or woken.get('lead_id')}｜{lead.get('url')}"
-                  f"｜form {lead.get('form_type') or '—'}｜共用 {','.join(woken.get('shared_entities') or [])}")
-            if current:
-                print(f"  預篩（提示，不是判定）：{current.get('verdict')}"
-                      + (f"｜引文：{current.get('quote')}" if current.get("quote") else ""))
-            text_path = Path("library/private/semantic_text") / f"{woken.get('lead_id')}.txt"
-            if text_path.is_file():
-                print(f"  全文：{text_path}")
-            print(f"  判定：python -m engine_b.event_watch judge {watch['watch_id']} --touches yes|no "
-                  f"--note \"…\" [--quote \"文件逐字\"]")
+        for group in semantic_queue_groups(pending, leads_store):
+            if group["announcement"]:
+                a = group["announcement"]
+                from engine_b.announcement_category import CATEGORIES
+
+                print(f"【一組】{a['ticker']}｜{CATEGORIES.get(a['category'], a['category'])}｜{len(group['watches'])} 條"
+                      f"｜主旨：{a['subject']}")
+            for watch in group["watches"]:
+                woken = watch.get("woken_by") or {}
+                lead = leads_store.get(str(woken.get("lead_id"))) or {}
+                current = flag_for_current(watch)
+                print(f"{watch['watch_id']}｜醒於 {woken.get('at')}｜{watch.get('source_ref')}")
+                print(f"  條件：{watch.get('condition')}")
+                print(f"  觸發：{lead.get('title') or woken.get('lead_id')}｜{lead.get('url')}"
+                      f"｜form {lead.get('form_type') or '—'}｜共用 {','.join(woken.get('shared_entities') or [])}")
+                if current:
+                    print(f"  預篩（提示，不是判定）：{current.get('verdict')}"
+                          + (f"｜引文：{current.get('quote')}" if current.get("quote") else ""))
+                text_path = Path("library/private/semantic_text") / f"{woken.get('lead_id')}.txt"
+                if text_path.is_file():
+                    print(f"  全文：{text_path}")
+            ids = " ".join(w["watch_id"] for w in group["watches"])
+            print(f"  {'一組判定' if len(group['watches']) > 1 else '判定'}：python -m engine_b.event_watch judge {ids} "
+                  f"--touches yes|no --note \"…\" [--quote \"文件逐字\"]"
+                  + ("（有一條觸及就拆開單獨判）" if len(group["watches"]) > 1 else ""))
         return 0
     if args.cmd == "judge":
-        judgment = judge(data, args.watch_id, touches=args.touches == "yes", note=args.note,
-                         quote=args.quote or None)
+        # 一組一次判（批次二 E2）：先全部驗過再寫——一筆不合法就整組不寫（不留半套判定）
+        for watch_id in args.watch_id:
+            target = next((w for w in data["watches"] if w["watch_id"] == watch_id), None)
+            if target is None or target.get("kind") != SEMANTIC_KIND or target.get("status") != "fired":
+                print(f"✗ {watch_id} 不是 fired 的語意 watch——整組不寫", file=sys.stderr)
+                return 2
+        for watch_id in args.watch_id:
+            judgment = judge(data, watch_id, touches=args.touches == "yes", note=args.note, quote=args.quote or None)
+            if args.touches == "yes":
+                watch = next(w for w in data["watches"] if w["watch_id"] == watch_id)
+                print(f"✓ {watch_id} 判定觸及（{judgment['at']}）｜下一步：L7 48 小時動作＝{watch.get('action_48h')}")
+            else:
+                print(f"✓ {watch_id} 判定無關，回 active 繼續等（觸發 lead 不會再叫醒）")
         save_watches(data)
         if args.touches == "yes":
-            watch = next(w for w in data["watches"] if w["watch_id"] == args.watch_id)
-            print(f"✓ {args.watch_id} 判定觸及（{judgment['at']}）")
-            print(f"下一步：L7 48 小時動作＝{watch.get('action_48h')}")
             print("（等待不會消失：thesis 來源由 todo sync 出一筆 thesis_lifecycle；讀圖來源列進 needs_reread）")
-        else:
-            print(f"✓ {args.watch_id} 判定無關，回 active 繼續等（觸發 lead 不會再叫醒）")
         return 0
     if args.cmd == "flag":
         flag(data, args.watch_id, lead_id=args.lead, verdict=args.verdict,
