@@ -1,0 +1,19 @@
+Source URL: https://cignal.ai/2026/09/scale-across-building-the-optical-layer-for-distributed-ai/
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Cignal AI webinar 頁〈Scale Across: Building the Optical Layer for Distributed AI〉Presentation Summary
+DATE: null（頁面 datePublished 2026-09-03T15:00Z＝活動頁建立；dateModified 2026-10-04T11:24Z；摘要加入日推不出）
+RETRIEVED: 2026-10-22（本機抽字；空白正規化後逐字核對）
+NOTE: 摘要自述以 AI 協助從逐字稿整理——講者歸屬只到段落標題層級。本份可整份拿掉而不影響文件 1、2。
+
+【Presentation Summary — Market context (Cignal AI data)：Supply is the Layer 0 story】
+"line systems have fewer suppliers than pluggables, component lead times run 12-18 months if supply exists at any price, and the bottleneck traces back to indium phosphide wafers for pump lasers."
+
+【Presentation Summary — Cisco: make deployment match AI's pace：Supply pressure is structural】
+"a pump laser now ships in every DCO to reach 0 dBm launch power, multiplying pump demand by an order of magnitude versus the line-system-only era. Cisco has locked in capacity through long-term agreements."
+
+【What to watch】
+"Pump laser and InP supply – 12-18 month lead times and long-term supply agreements will shape who ships."
+
+【Presentation Summary 標頭】
+"Compiled with AI assistance from the session transcript."

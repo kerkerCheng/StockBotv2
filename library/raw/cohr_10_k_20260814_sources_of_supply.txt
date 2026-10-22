@@ -9,3 +9,17 @@ RETRIEVED: 2026-10-16（EDGAR 全文本機抓取、逐字核對）
 In our production processes, we use certain substrates, along with numerous optical, electrical, and mechanical parts that are sourced from third-party suppliers. These include InP substrates, ICs, DSPs, mechanical housings, and optical components, and we commonly refer to them as raw materials.
 Raw materials or subcomponents required in the manufacturing process are generally available from several sources.
 However, in the Industrial segment, we currently purchase several key components and materials used in the manufacture of our products, including exotic materials, crystals, and optics, from sole-source or limited-source suppliers.
+
+[EXCERPT — 有限逐字引文] Coherent Corp FY2026 10-K（fiscal year ended June 30, 2026；acc 0000820318-26-000020）
+DATE: 2026-08-14（沿用圖上既有同一 accession 抽取檔的申報日）
+RETRIEVED: 2026-10-22（fetchers.edgar.fetch_filing_text 抽字；空白正規化後逐字核對）
+NOTE: 公司自述。FY2025 10-K 的「980 nm and 14xx pump lasers」字句 FY2026 版已不在；FY2026 版改在 R&D 表分 GaAs 與 InP Raman 兩種泵浦。
+
+【Item 1 Business — reportable segments table, Datacenter & Communications row】
+"VCSELs, EELs, pump lasers, and other components, optics and ICs for datacenter and communication applications."
+
+【Item 1 Business — Communications markets：連續兩段（產品組合段末句＋下一段首句）】
+"Our portfolio includes coherent transmission components and transceivers, transport products, optical amplifiers, passive optical components, optical line systems, and our multi-rail platform. As AI infrastructure expands across geographically distributed datacenters, demand for DCI solutions continues to grow."
+
+【Item 1 Business — R&D investments table, Datacenter & Communications, 'Pump lasers' row】
+"Pump lasers Continue to invest in our next-generation GaAs pump laser portfolio and our InP based Raman pumps to address evolving terrestrial and undersea markets."

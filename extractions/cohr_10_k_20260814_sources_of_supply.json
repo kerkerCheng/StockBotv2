@@ -12,6 +12,30 @@
       ],
       "statement": "Coherent (optical-module maker, buyer of DSPs) FY2026 10-K: DSPs are among the third-party raw materials it buys, and such raw materials 'are generally available from several sources'; the sole-source or limited-source exception it names is the Industrial segment's exotic materials, crystals and optics — not DSPs.",
       "subject_id": "e1"
+    },
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：Coherent 後續 10-K／10-Q 從產品清單拿掉 pump lasers，或公告出售、關閉泵浦雷射業務。核查頻率：每年（COHR 10-K），出售類事件隨 8-K。觸發後 48 小時：e1 降 confidence 或 retract，重讀 tech:pump_laser 供給側。",
+      "id": "cohr_10_k_20260814_sources_of_supply_cl2",
+      "source_ids": [
+        "cohr_10_k_20260814_sources_of_supply_s4",
+        "cohr_10_k_20260814_sources_of_supply_s5",
+        "cohr_10_k_20260814_sources_of_supply_s6"
+      ],
+      "statement": "Coherent (self, FY2026 10-K): its Datacenter & Communications segment sells 'VCSELs, EELs, pump lasers, and other components'; its communications portfolio includes optical amplifiers, optical line systems and a multi-rail platform, and it states that DCI demand keeps growing as AI infrastructure expands across geographically distributed datacenters. Company self-statement that it supplies pump lasers (a supply-presence edge, not a bottleneck claim; L8). Makes Coherent the second supplier on tech:pump_laser beside Lumentum; no share, customer or volume is stated here.",
+      "subject_id": "e2"
+    },
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：泵浦雷射廠（Coherent、Lumentum）或第三方一手寫出 Raman 泵浦改在非 InP 平台量產。核查頻率：每年（COHR、LITE 10-K 的產品與 R&D 段）。觸發後 48 小時：e4 降 confidence，重讀 mat:inp_substrate 需求側。",
+      "id": "cohr_10_k_20260814_sources_of_supply_cl3",
+      "source_ids": [
+        "cohr_10_k_20260814_sources_of_supply_s6"
+      ],
+      "statement": "Coherent (self, FY2026 10-K R&D table) splits its pump lasers into a 'GaAs pump laser portfolio' and 'InP based Raman pumps' for terrestrial and undersea markets. Only the Raman variant is InP-based, so only tech:raman_pump_laser (not the generic tech:pump_laser, whose GaAs pumps do not use InP) is linked to mat:inp_substrate. The filing names terrestrial and undersea markets, not scale-across; linking Raman pumps to scale-across rests on Cignal AI (separate document), not on this filing.",
+      "subject_id": "e5"
     }
   ],
   "edges": [
@@ -26,6 +50,51 @@
         "cohr_10_k_20260814_sources_of_supply_s2"
       ],
       "src_id": "co:coherent"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "tech:pump_laser",
+      "id": "e2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "cohr_10_k_20260814_sources_of_supply_s4",
+        "cohr_10_k_20260814_sources_of_supply_s6"
+      ],
+      "src_id": "co:coherent"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "tech:pump_laser",
+      "id": "e3",
+      "relation": "is_variant_of",
+      "source_ids": [
+        "cohr_10_k_20260814_sources_of_supply_s6"
+      ],
+      "src_id": "tech:raman_pump_laser"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:raman_pump_laser",
+      "id": "e4",
+      "relation": "develops",
+      "source_ids": [
+        "cohr_10_k_20260814_sources_of_supply_s6"
+      ],
+      "src_id": "co:coherent"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "mat:inp_substrate",
+      "id": "e5",
+      "relation": "depends_on",
+      "source_ids": [
+        "cohr_10_k_20260814_sources_of_supply_s6"
+      ],
+      "src_id": "tech:raman_pump_laser"
     }
   ],
   "nodes": [
@@ -44,7 +113,9 @@
       "name": "Coherent",
       "role": "bottleneck_supplier",
       "source_ids": [
-        "cohr_10_k_20260814_sources_of_supply_s1"
+        "cohr_10_k_20260814_sources_of_supply_s1",
+        "cohr_10_k_20260814_sources_of_supply_s4",
+        "cohr_10_k_20260814_sources_of_supply_s6"
       ],
       "type": "Company"
     },
@@ -63,6 +134,64 @@
         "cohr_10_k_20260814_sources_of_supply_s1"
       ],
       "type": "TechNode"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "pump lasers"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 4
+      },
+      "confidence": 0.85,
+      "id": "tech:pump_laser",
+      "name": "Pump laser",
+      "role": null,
+      "source_ids": [
+        "cohr_10_k_20260814_sources_of_supply_s4",
+        "cohr_10_k_20260814_sources_of_supply_s6"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "Raman pump",
+        "Raman pumps",
+        "InP based Raman pumps",
+        "Raman pump laser"
+      ],
+      "attributes": {},
+      "confidence": 0.8,
+      "id": "tech:raman_pump_laser",
+      "name": "Raman pump laser (InP-based, for Raman amplification)",
+      "role": null,
+      "source_ids": [
+        "cohr_10_k_20260814_sources_of_supply_s6"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "InP",
+        "indium phosphide",
+        "InP wafer",
+        "InP substrate",
+        "6-inch indium phosphide wafer substrate"
+      ],
+      "attributes": {
+        "concentration_score": 4,
+        "ramp_difficulty_intrinsic": 5
+      },
+      "confidence": 0.9,
+      "id": "mat:inp_substrate",
+      "name": "Indium Phosphide (InP) substrate",
+      "role": null,
+      "source_ids": [
+        "cohr_10_k_20260814_sources_of_supply_s6"
+      ],
+      "type": "Material"
     }
   ],
   "schema_version": "0.1",
@@ -76,7 +205,8 @@
     "retrieved_at": "2026-10-16",
     "source_type": "filing",
     "storage_permission": "repo_excerpt",
-    "title": "Coherent Corp. FY2026 Form 10-K — Item 1 Business, Sources of Supply（有限節錄）",
+    "supersedes_extraction_sha256": "8fc2b35d591a508f4dfdd5649ec2746d3ca1f1b6938fa24a75612bb41c829c4f",
+    "title": "Coherent Corp. FY2026 Form 10-K — Item 1 Business：Sources of Supply、部門產品表與研發（泵浦雷射、InP Raman 泵浦）（有限節錄）",
     "url": "https://www.sec.gov/Archives/edgar/data/820318/000082031826000020/iivi-20260630.htm"
   },
   "sources": [
@@ -94,6 +224,21 @@
       "id": "cohr_10_k_20260814_sources_of_supply_s3",
       "locator": "Item 1 Business — Sources of Supply",
       "quote": "However, in the Industrial segment, we currently purchase several key components and materials used in the manufacture of our products, including exotic materials, crystals, and optics, from sole-source or limited-source suppliers."
+    },
+    {
+      "id": "cohr_10_k_20260814_sources_of_supply_s4",
+      "locator": "Item 1 Business — reportable segments table, Datacenter & Communications row",
+      "quote": "VCSELs, EELs, pump lasers, and other components, optics and ICs for datacenter and communication applications."
+    },
+    {
+      "id": "cohr_10_k_20260814_sources_of_supply_s5",
+      "locator": "Item 1 Business — Communications markets：連續兩段（產品組合段末句＋下一段首句；中間只隔段落換行）",
+      "quote": "Our portfolio includes coherent transmission components and transceivers, transport products, optical amplifiers, passive optical components, optical line systems, and our multi-rail platform. As AI infrastructure expands across geographically distributed datacenters, demand for DCI solutions continues to grow."
+    },
+    {
+      "id": "cohr_10_k_20260814_sources_of_supply_s6",
+      "locator": "Item 1 Business — R&D investments table, Datacenter & Communications, 'Pump lasers' row",
+      "quote": "Pump lasers Continue to invest in our next-generation GaAs pump laser portfolio and our InP based Raman pumps to address evolving terrestrial and undersea markets."
     }
   ]
 }

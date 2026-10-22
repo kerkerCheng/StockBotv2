@@ -1,0 +1,16 @@
+Source URL: https://cignal.ai/2026/10/scale-across-sizing-the-optical-layer-for-distributed-ai/
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Cignal AI〈Scale-Across: Sizing the Optical Layer for Distributed AI〉公開摘要頁
+DATE: 2026-10-21（article:published_time 2026-10-21T11:54:24+00:00）
+RETRIEVED: 2026-10-22（本機抽字；空白正規化後逐字核對）
+NOTE: 第三方產研的公開摘要；全文付費。摘要內的 $9.1B／$24.6B 等預測是時變觀測，不收進邊。
+
+【公開摘要（付費牆『Clients login to access』之前）第一段】
+"Scale-across, the extension of a single AI training fabric across multiple data center sites, is the most-discussed application in optical transport this year, but the least quantified."
+
+【公開摘要重點第 5 點】
+"Raman amplification is a major cost driver in scale-across line systems and the pump lasers behind it are among the tightest parts of the optical supply chain."
+
+【付費報告目錄（公開的章節標題）】
+"Raman on Most Links Strains Pump Supply"

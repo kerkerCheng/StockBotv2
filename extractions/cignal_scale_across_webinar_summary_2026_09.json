@@ -1,0 +1,144 @@
+{
+  "claims": [
+    {
+      "confidence": 0.5,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "條件：Cignal 或泵浦雷射廠／客戶一手寫出泵浦交期回到正常、或瓶頸不在 InP 而在封裝。核查頻率：每季。觸發後 48 小時：cl1 降 confidence，重讀 tech:pump_laser 下一層。",
+      "id": "cignal_scale_across_webinar_summary_2026_09_cl1",
+      "source_ids": [
+        "cignal_scale_across_webinar_summary_2026_09_s1",
+        "cignal_scale_across_webinar_summary_2026_09_s3",
+        "cignal_scale_across_webinar_summary_2026_09_s4"
+      ],
+      "statement": "Cignal AI webinar summary (AI-compiled from the session transcript; Market context section attributed to Cignal AI data): line systems have fewer suppliers than pluggables, component lead times run 12-18 months, and the bottleneck traces back to indium phosphide wafers for pump lasers; 'What to watch' lists pump laser and InP supply with 12-18 month lead times and long-term supply agreements. 'Indium phosphide wafers' is ambiguous between InP substrates and InP laser-fab wafer capacity, so no pump_laser→mat:inp_substrate edge is drawn from this document (the InP dependency edge is drawn only on tech:raman_pump_laser from Coherent's 10-K). Lead times are time-varying and are not put on edge attributes.",
+      "subject_id": "tech:pump_laser"
+    },
+    {
+      "confidence": 0.5,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "條件：Cisco、模組廠或 Cignal 一手寫出新一代 DCO（800ZR／1600ZR）不再內建泵浦。核查頻率：每半年（Cignal 公開摘要、Cisco／Acacia 產品文件）。觸發後 48 小時：e1 降 confidence 或 retract，重讀 tech:pump_laser 需求側。",
+      "id": "cignal_scale_across_webinar_summary_2026_09_cl2",
+      "source_ids": [
+        "cignal_scale_across_webinar_summary_2026_09_s2",
+        "cignal_scale_across_webinar_summary_2026_09_s4"
+      ],
+      "statement": "Cignal AI webinar summary, Cisco section (customer/NEM side, AI-compiled summary, not a verbatim Cisco statement): a pump laser now ships in every DCO to reach 0 dBm launch power, multiplying pump demand by an order of magnitude versus the line-system-only era, and Cisco has locked in capacity through long-term agreements. Customer-side indication that buyers lock pump supply; the pump supplier is not named.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.55,
+      "dst_id": "tech:dci_transceiver",
+      "id": "e1",
+      "relation": "is_component_of",
+      "source_ids": [
+        "cignal_scale_across_webinar_summary_2026_09_s2",
+        "cignal_scale_across_webinar_summary_2026_09_s4"
+      ],
+      "src_id": "tech:pump_laser"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "pump lasers"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 4
+      },
+      "confidence": 0.85,
+      "id": "tech:pump_laser",
+      "name": "Pump laser",
+      "role": null,
+      "source_ids": [
+        "cignal_scale_across_webinar_summary_2026_09_s1",
+        "cignal_scale_across_webinar_summary_2026_09_s2",
+        "cignal_scale_across_webinar_summary_2026_09_s3"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "InP",
+        "indium phosphide",
+        "InP wafer",
+        "InP substrate",
+        "6-inch indium phosphide wafer substrate"
+      ],
+      "attributes": {
+        "concentration_score": 4,
+        "ramp_difficulty_intrinsic": 5
+      },
+      "confidence": 0.9,
+      "id": "mat:inp_substrate",
+      "name": "Indium Phosphide (InP) substrate",
+      "role": null,
+      "source_ids": [
+        "cignal_scale_across_webinar_summary_2026_09_s1",
+        "cignal_scale_across_webinar_summary_2026_09_s3"
+      ],
+      "type": "Material"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "DCI",
+        "DCI transceivers",
+        "Data Center Interconnect Transceiver",
+        "ZR/ZR+",
+        "Data center interconnect transceivers",
+        "ZR",
+        "ZR+"
+      ],
+      "attributes": {},
+      "confidence": 0.8,
+      "id": "tech:dci_transceiver",
+      "name": "Data center interconnect (DCI) transceiver",
+      "role": null,
+      "source_ids": [
+        "cignal_scale_across_webinar_summary_2026_09_s2"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "cignal_scale_across_webinar_summary_2026_09",
+    "evidence_tier": 3,
+    "origin_entity": "Cignal AI",
+    "permission_basis": "Public webinar page summary quotes only. published_at 留 null：頁面 datePublished 2026-09-03T15:00Z 是 webinar 頁建立（=活動日），dateModified 2026-10-04T11:24Z；『Presentation Summary』段何時加入推不出（INV-6）。摘要自述 'Compiled with AI assistance from the session transcript'——講者歸屬是段落標題層級，不是逐字發言。",
+    "published_at": null,
+    "publisher": "Cignal AI",
+    "retrieved_at": "2026-10-22",
+    "source_type": "industry_report",
+    "storage_permission": "repo_excerpt",
+    "title": "Cignal AI webinar〈Scale Across: Building the Optical Layer for Distributed AI〉（2026-09-03，講者 Cisco、Coherent、Cignal AI）公開摘要：泵浦雷射瓶頸追到 InP 晶圓；每顆 DCO 都帶一顆泵浦，Cisco 以長約鎖產能",
+    "url": "https://cignal.ai/2026/09/scale-across-building-the-optical-layer-for-distributed-ai/"
+  },
+  "sources": [
+    {
+      "id": "cignal_scale_across_webinar_summary_2026_09_s1",
+      "locator": "Presentation Summary — Market context (Cignal AI data)：Supply is the Layer 0 story",
+      "quote": "line systems have fewer suppliers than pluggables, component lead times run 12-18 months if supply exists at any price, and the bottleneck traces back to indium phosphide wafers for pump lasers."
+    },
+    {
+      "id": "cignal_scale_across_webinar_summary_2026_09_s2",
+      "locator": "Presentation Summary — Cisco: make deployment match AI's pace：Supply pressure is structural",
+      "quote": "a pump laser now ships in every DCO to reach 0 dBm launch power, multiplying pump demand by an order of magnitude versus the line-system-only era. Cisco has locked in capacity through long-term agreements."
+    },
+    {
+      "id": "cignal_scale_across_webinar_summary_2026_09_s3",
+      "locator": "What to watch",
+      "quote": "Pump laser and InP supply – 12-18 month lead times and long-term supply agreements will shape who ships."
+    },
+    {
+      "id": "cignal_scale_across_webinar_summary_2026_09_s4",
+      "locator": "Presentation Summary 標頭",
+      "quote": "Compiled with AI assistance from the session transcript."
+    }
+  ]
+}

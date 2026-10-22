@@ -1,0 +1,96 @@
+{
+  "claims": [
+    {
+      "confidence": 0.65,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "條件：Cignal AI 後續更新，或客戶端（Cisco、Ciena、Nokia、雲端業者）一手寫出泵浦雷射供給已鬆、交期回到正常，或 Raman 改成只在少數跨距選擇性部署。核查頻率：每季（Cignal 季度公開摘要、LITE／COHR 法說泵浦段）。觸發後 48 小時：cl1 降 confidence，重讀 tech:pump_laser 需求側。",
+      "id": "cignal_scale_across_sizing_2026_10_21_cl1",
+      "source_ids": [
+        "cignal_scale_across_sizing_2026_10_21_s1",
+        "cignal_scale_across_sizing_2026_10_21_s2",
+        "cignal_scale_across_sizing_2026_10_21_s3"
+      ],
+      "statement": "Cignal AI (independent optical market research, public summary of its Oct 2026 scale-across report): Raman amplification is a major cost driver in scale-across line systems and the pump lasers behind it are among the tightest parts of the optical supply chain; a report chapter is titled 'Raman on Most Links Strains Pump Supply'. First non-supplier origin on the pump-laser-in-scale-across edge (L8 corroboration of Lumentum's self-reported supply tightness). The public summary names no pump supplier and gives no share; its revenue forecasts are time-varying and are not put on the graph.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "tech:scale_across",
+      "id": "e1",
+      "relation": "is_component_of",
+      "source_ids": [
+        "cignal_scale_across_sizing_2026_10_21_s2",
+        "cignal_scale_across_sizing_2026_10_21_s3"
+      ],
+      "src_id": "tech:pump_laser"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "pump lasers"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 4
+      },
+      "confidence": 0.85,
+      "id": "tech:pump_laser",
+      "name": "Pump laser",
+      "role": null,
+      "source_ids": [
+        "cignal_scale_across_sizing_2026_10_21_s2",
+        "cignal_scale_across_sizing_2026_10_21_s3"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:scale_across",
+      "name": "Scale-across optical interconnect",
+      "role": null,
+      "source_ids": [
+        "cignal_scale_across_sizing_2026_10_21_s1",
+        "cignal_scale_across_sizing_2026_10_21_s2"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "cignal_scale_across_sizing_2026_10_21",
+    "evidence_tier": 3,
+    "origin_entity": "Cignal AI",
+    "permission_basis": "Public summary page quotes only. published_at 取頁面 article:published_time 2026-10-21T11:54:24+00:00。tier 3 比照既有 cignal_cpo_elsfp_1q26_2026_04_01（公開摘要頁）。",
+    "published_at": "2026-10-21",
+    "publisher": "Cignal AI",
+    "retrieved_at": "2026-10-22",
+    "source_type": "industry_report",
+    "storage_permission": "repo_excerpt",
+    "title": "Cignal AI: Scale-Across: Sizing the Optical Layer for Distributed AI（2026-10-21 公開摘要）：Raman 放大是 scale-across line system 的主要成本，背後的泵浦雷射是光通訊供應鏈最緊的零件之一",
+    "url": "https://cignal.ai/2026/10/scale-across-sizing-the-optical-layer-for-distributed-ai/"
+  },
+  "sources": [
+    {
+      "id": "cignal_scale_across_sizing_2026_10_21_s1",
+      "locator": "公開摘要（付費牆『Clients login to access』之前）第一段",
+      "quote": "Scale-across, the extension of a single AI training fabric across multiple data center sites, is the most-discussed application in optical transport this year, but the least quantified."
+    },
+    {
+      "id": "cignal_scale_across_sizing_2026_10_21_s2",
+      "locator": "公開摘要重點第 5 點",
+      "quote": "Raman amplification is a major cost driver in scale-across line systems and the pump lasers behind it are among the tightest parts of the optical supply chain."
+    },
+    {
+      "id": "cignal_scale_across_sizing_2026_10_21_s3",
+      "locator": "付費報告目錄（公開的章節標題）",
+      "quote": "Raman on Most Links Strains Pump Supply"
+    }
+  ]
+}
