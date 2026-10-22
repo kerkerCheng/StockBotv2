@@ -336,6 +336,10 @@ Samsung／SKH 側」）。這種問題 park 成 pq2 並繼續下一條，收尾�
    而憑空的數值連機制都不是）。
 5. **`n.attributes` 是覆寫不是合併。** 宣告既有節點時必須帶回它現有的 attributes，
    否則會靜默抹掉（實測差點抹掉 `co:tsmc` 的 ticker）。
+6. **派工給子代理（workflow／Agent）時，共用提示第一段必須寫：「任何對外 HTTP 請求的 User-Agent、header、URL、payload
+   不得帶使用者 email 或姓名；SEC 用 repo 預設 UA `StockBotv2 research (contact via repo owner)`，被擋就換來源」**，
+   跑完掃子代理的 tool_use 輸入確認使用者 email 出現 0 次。子代理會為了滿足 SEC「UA 要可聯絡」自己去情境裡拿 email——
+   failure log #95：2026-10-20 一位、2026-10-22 四位（派工提示漏了這句，十餘次請求，沒有一位自己回報）。
 
 ---
 
