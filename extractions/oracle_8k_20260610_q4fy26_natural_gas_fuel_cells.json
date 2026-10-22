@@ -1,0 +1,135 @@
+{
+  "claims": [
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：Oracle 之後的財報 8-K、10-Q 或 10-K 刪掉或改寫「intended to use clean energy from natural gas fuel cells」（例：改成燃氣渦輪、往復式引擎或電網），或 Oracle 一手寫出以燃料電池供電的案場取消、延後超過一年或改用其他電源。核查頻率：每季（Oracle 財報 8-K 與 10-Q）。觸發後 48 小時：降 e1、e2 的 confidence，重讀 tech:sofc_onsite_power 需求側。",
+      "id": "oracle_8k_20260610_q4fy26_natural_gas_fuel_cells_cl1",
+      "source_ids": [
+        "oracle_8k_20260610_q4fy26_natural_gas_fuel_cells_s1",
+        "oracle_8k_20260610_q4fy26_natural_gas_fuel_cells_s2",
+        "oracle_8k_20260610_q4fy26_natural_gas_fuel_cells_s3"
+      ],
+      "statement": "Buyer-side statement (Oracle's own Q4 FY2026 earnings release furnished on 8-K): Oracle is building datacenters that are intended to use clean energy from natural gas fuel cells to generate electricity, in the paragraph that attributes RPO and revenue growth to demand for cloud infrastructure for AI training and inferencing. The release gives no MW, no site and no supplier for the fuel cells; the 2.8 GW figure appears only in Bloom Energy's own press release, not in this Oracle filing. Mapping 'natural gas fuel cells' to solid oxide fuel cells is a modeling judgment supported only by the supplier side (Bloom 10-Q Q2 2026: 'partnership between the Company and Oracle to provide on-site solid state power for AI data centers'). The Bloom warrant Oracle sold in FY2026 is consideration paid by the supplier to its customer's customer (Bloom 10-Q), not a capital commitment by Oracle and not demand evidence.",
+      "subject_id": "e1"
+    },
+    {
+      "confidence": 0.5,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "條件：Oracle 與 Nebius 的一手都不再把燃料電池連到 AI 雲端建置（例：只剩非 AI 站點），或 AI 雲端業者的一手寫出燃料電池退出現場發電選項。核查頻率：每季（Oracle 8-K／10-Q、Nebius 6-K）。觸發後 48 小時：降 e2 confidence，檢查 tech:sofc_onsite_power 是否仍走得到需求錨。",
+      "id": "oracle_8k_20260610_q4fy26_natural_gas_fuel_cells_cl2",
+      "source_ids": [
+        "oracle_8k_20260610_q4fy26_natural_gas_fuel_cells_s1",
+        "oracle_8k_20260610_q4fy26_natural_gas_fuel_cells_s2"
+      ],
+      "statement": "The two consecutive sentences tie Oracle's AI-driven cloud infrastructure demand to datacenters intended to run on natural gas fuel cells; this links the existing demand anchor (AI training/inference cluster buildout) to onsite fuel-cell power. One buyer's intent statement, not a measured share of AI capacity.",
+      "subject_id": "e2"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.6,
+      "dst_id": "tech:sofc_onsite_power",
+      "id": "e1",
+      "relation": "depends_on",
+      "source_ids": [
+        "oracle_8k_20260610_q4fy26_natural_gas_fuel_cells_s2"
+      ],
+      "src_id": "co:oracle"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.55,
+      "dst_id": "tech:sofc_onsite_power",
+      "id": "e2",
+      "relation": "enables",
+      "source_ids": [
+        "oracle_8k_20260610_q4fy26_natural_gas_fuel_cells_s1",
+        "oracle_8k_20260610_q4fy26_natural_gas_fuel_cells_s2"
+      ],
+      "src_id": "tech:ai_compute_buildout"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "end_demand",
+      "aliases": [
+        "Oracle Cloud Infrastructure",
+        "OCI"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "co:oracle",
+      "name": "Oracle",
+      "role": "adjacent_silicon",
+      "source_ids": [
+        "oracle_8k_20260610_q4fy26_natural_gas_fuel_cells_s1",
+        "oracle_8k_20260610_q4fy26_natural_gas_fuel_cells_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "SOFC onsite power",
+        "on-site fuel cell power",
+        "behind-the-meter fuel cells",
+        "natural gas fuel cells"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:sofc_onsite_power",
+      "name": "Onsite solid oxide fuel cell power for data centers",
+      "role": null,
+      "source_ids": [
+        "oracle_8k_20260610_q4fy26_natural_gas_fuel_cells_s2"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "end_demand",
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:ai_compute_buildout",
+      "name": "AI training/inference cluster buildout",
+      "role": null,
+      "source_ids": [
+        "oracle_8k_20260610_q4fy26_natural_gas_fuel_cells_s1"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "oracle_8k_20260610_q4fy26_natural_gas_fuel_cells",
+    "evidence_tier": 1,
+    "origin_entity": "Oracle Corporation",
+    "permission_basis": "SEC EDGAR 公開申報（8-K furnished 新聞稿）；只保留研究必要的有限逐字節錄。published_at 取 EDGAR 索引頁 Filing Date 2026-06-10（accepted 2026-06-10 16:13:46）。",
+    "published_at": "2026-06-10",
+    "publisher": "SEC EDGAR（Form 8-K，accession 0001193125-26-265848）",
+    "retrieved_at": "2026-10-22",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Oracle Corporation Form 8-K（2026-06-10）Exhibit 99.1：Q4 與 FY2026 財報新聞稿「AI Market and Technology Evolution」段——RPO 與營收成長來自 AI 訓練與推論的雲端需求；Oracle 正在蓋預定用天然氣燃料電池發電的資料中心",
+    "url": "https://www.sec.gov/Archives/edgar/data/1341439/000119312526265848/orcl-ex99_1.htm"
+  },
+  "sources": [
+    {
+      "id": "oracle_8k_20260610_q4fy26_natural_gas_fuel_cells_s1",
+      "locator": "Exhibit 99.1「AI Market and Technology Evolution」段第 1 句",
+      "quote": "The large increases in Oracle’s RPO and revenue are driven by the growing demand for cloud infrastructure for AI training and inferencing."
+    },
+    {
+      "id": "oracle_8k_20260610_q4fy26_natural_gas_fuel_cells_s2",
+      "locator": "同段第 2 句",
+      "quote": "Oracle is building datacenters that are intended to use clean energy from natural gas fuel cells to generate electricity with minimal emissions."
+    },
+    {
+      "id": "oracle_8k_20260610_q4fy26_natural_gas_fuel_cells_s3",
+      "locator": "「Guidance for Full FY 2027」段（緊接在 AI Market 段之前）",
+      "quote": "For fiscal year 2027, we confirm our prior revenue guidance of $90 billion total revenue and raise our non-GAAP EPS guidance to $8.05, which is growth of 18% 1 after adjusting for the one-time events of selling our Ampere chip business and Bloom Energy warrants in fiscal year 2026."
+    }
+  ]
+}

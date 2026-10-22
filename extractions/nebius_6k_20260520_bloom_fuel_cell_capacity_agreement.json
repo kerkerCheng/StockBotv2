@@ -1,0 +1,97 @@
+{
+  "claims": [
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：Nebius 之後的 6-K（季度財報附註、股東信）或年度 20-F 寫出 Capacity Agreement 終止、縮減（保證容量低於約 250 MW 或費用上限下修）、條件未滿足而未 commence，或寫出改用燃氣渦輪／往復式引擎或電網取代燃料電池。核查頻率：每季（Nebius 6-K）與每年（20-F）。觸發後 48 小時：降這條邊的 confidence，重讀 tech:sofc_onsite_power 需求側（與 Oracle 那條一併看）。",
+      "id": "nebius_6k_20260520_bloom_fuel_cell_capacity_agreement_cl1",
+      "source_ids": [
+        "nebius_6k_20260520_bloom_fuel_cell_capacity_agreement_s1",
+        "nebius_6k_20260520_bloom_fuel_cell_capacity_agreement_s2",
+        "nebius_6k_20260520_bloom_fuel_cell_capacity_agreement_s3"
+      ],
+      "statement": "Buyer-side filing (Nebius Group N.V. Q1 2026 interim financial statements, note 16 subsequent events): on May 14, 2026 a Nebius subsidiary signed a Master Fuel Cell Capacity Agreement and related system orders with Bloom Energy Corporation; Nebius buys the capacity and electricity, Bloom installs, operates and maintains the systems; three phases of 10-year supply terms, guaranteed capacity of approximately 250 MW (installed approximately 328 MW); monthly service fees of up to $2.6 billion in aggregate, subject to commencement upon satisfaction of certain conditions. This is a capacity/service purchase commitment by the buyer, not a supplier claim. Not evidence of non-substitutability: Nebius's Q2 2026 shareholder letter (6-K 2026-08-12) describes the partnership as adding fuel-cell technology to the range of options available for future deployments.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:sofc_onsite_power",
+      "id": "e1",
+      "relation": "depends_on",
+      "source_ids": [
+        "nebius_6k_20260520_bloom_fuel_cell_capacity_agreement_s1",
+        "nebius_6k_20260520_bloom_fuel_cell_capacity_agreement_s2",
+        "nebius_6k_20260520_bloom_fuel_cell_capacity_agreement_s3"
+      ],
+      "src_id": "co:nebius"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "end_demand",
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:nebius",
+      "name": "Nebius",
+      "role": "adjacent_silicon",
+      "source_ids": [
+        "nebius_6k_20260520_bloom_fuel_cell_capacity_agreement_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "SOFC onsite power",
+        "on-site fuel cell power",
+        "behind-the-meter fuel cells",
+        "natural gas fuel cells"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:sofc_onsite_power",
+      "name": "Onsite solid oxide fuel cell power for data centers",
+      "role": null,
+      "source_ids": [
+        "nebius_6k_20260520_bloom_fuel_cell_capacity_agreement_s1",
+        "nebius_6k_20260520_bloom_fuel_cell_capacity_agreement_s2"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "nebius_6k_20260520_bloom_fuel_cell_capacity_agreement",
+    "evidence_tier": 1,
+    "origin_entity": "Nebius Group N.V.",
+    "permission_basis": "SEC EDGAR 公開申報；只保留研究必要的有限逐字節錄。published_at 取 EDGAR 索引頁 Filing Date 2026-05-20（accepted 2026-05-20 06:28:13）。",
+    "published_at": "2026-05-20",
+    "publisher": "SEC EDGAR（Form 6-K，accession 0001104659-26-064092）",
+    "retrieved_at": "2026-10-22",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Nebius Group N.V. Form 6-K（2026-05-20）Exhibit 99.2：2026 Q1 未經查核簡明合併財報附註 16 Subsequent Events——與 Bloom Energy 簽 Master Fuel Cell Capacity Agreement（保證容量約 250 MW、裝置容量約 328 MW、月服務費合計最高 26 億美元）",
+    "url": "https://www.sec.gov/Archives/edgar/data/1513845/000110465926064092/nbis-20260331xex99d2.htm"
+  },
+  "sources": [
+    {
+      "id": "nebius_6k_20260520_bloom_fuel_cell_capacity_agreement_s1",
+      "locator": "Exhibit 99.2 附註 16 SUBSEQUENT EVENTS——Fuel Cell Capacity Agreement 段第 1 句（p.F-30 前）",
+      "quote": "On May 14, 2026, Nebius Inc., a wholly owned subsidiary of the Company, entered into a Master Fuel Cell Capacity Agreement and related system orders (the “Capacity Agreement”) with Bloom Energy Corporation (the “Bloom”)."
+    },
+    {
+      "id": "nebius_6k_20260520_bloom_fuel_cell_capacity_agreement_s2",
+      "locator": "同段第 3 句",
+      "quote": "The power capacity being provided under the Capacity Agreement is expected to come on in three phases (each with a supply term of 10 years) and is expected to provide (in the aggregate) for guaranteed capacity of approximately 250MW and system installed capacity of approximately 328MW."
+    },
+    {
+      "id": "nebius_6k_20260520_bloom_fuel_cell_capacity_agreement_s3",
+      "locator": "同段第 4 句（段末，p.F-30）",
+      "quote": "The Company will pay monthly services fees of up to $2.6 billion in the aggregate over the term of the Capacity Agreement, subject to commencement of the Capacity Agreement upon satisfaction of certain conditions."
+    }
+  ]
+}

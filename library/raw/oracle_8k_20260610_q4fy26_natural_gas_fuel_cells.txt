@@ -1,0 +1,9 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1341439/000119312526265848/orcl-ex99_1.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Oracle Corporation Form 8-K（SEC EDGAR 2026-06-10，accession 0001193125-26-265848）Exhibit 99.1 節錄：Guidance for Full FY 2027 末句與「AI Market and Technology Evolution」段（連續原文）
+RETRIEVED: 2026-10-22（EDGAR 原文抽字逐字核對）
+
+"For fiscal year 2027, we confirm our prior revenue guidance of $90 billion total revenue and raise our non-GAAP EPS guidance to $8.05, which is growth of 18% 1 after adjusting for the one-time events of selling our Ampere chip business and Bloom Energy warrants in fiscal year 2026.
+AI Market and Technology Evolution
+The large increases in Oracle’s RPO and revenue are driven by the growing demand for cloud infrastructure for AI training and inferencing. Oracle is building datacenters that are intended to use clean energy from natural gas fuel cells to generate electricity with minimal emissions. Other innovations in the areas of high-performance networking, advanced security and autonomous software have made Oracle the world’s fastest growing provider of cloud datacenters."
