@@ -156,6 +156,41 @@ def test_shipped_registry_loads_and_only_registers_mechanical_basis() -> None:
             assert entities._RECEIPT_PATTERN.match(entry["approval_receipt"])
 
 
+#: 刻意保留舊 id 的 config：凍結的歷史基準（point-in-time，不隨合併改寫）。
+_FROZEN_CONFIGS = {"entity_aliases.json", "graph_baselines.json"}
+
+
+def test_live_config_node_ids_are_canonical() -> None:
+    """活的 config 寫死的非公司節點 id 必須是名冊的 canonical，寫成已併走的別名就紅。
+
+    事發（2026-10-22 research-drain）：[506] 把 tech:dram_production 併進 tech:dram_manufacturing 之後，
+    config/sector_anchors.json「記憶體」仍寫舊 id，而 query/bottleneck.load_demand_anchors 讀原字串、不經名冊——
+    那個錨從 [506] 起默默失效（INV-3）。合併改了名冊卻沒改 config，沒有任何東西會叫。
+    """
+    import re
+    from pathlib import Path
+
+    node_id = re.compile(r"^(?:tech|mat|prod|std):[A-Za-z0-9_]+$")
+    entities._load.cache_clear()
+    stale: list[tuple[str, str, str]] = []
+
+    def walk(obj, name: str) -> None:
+        if isinstance(obj, dict):
+            for key, value in obj.items():
+                walk(key, name)
+                walk(value, name)
+        elif isinstance(obj, list):
+            for value in obj:
+                walk(value, name)
+        elif isinstance(obj, str) and node_id.match(obj) and entities.resolve(obj) != obj:
+            stale.append((name, obj, entities.resolve(obj)))
+
+    root = Path(__file__).resolve().parent.parent / "config"
+    for path in sorted(root.glob("*.json")):
+        if path.name not in _FROZEN_CONFIGS:
+            walk(json.loads(path.read_text(encoding="utf-8")), path.name)
+    assert stale == [], f"config 寫了已併走的別名 id（改成 canonical）：{stale}"
+
 
 # ---------------------------------------------------------------------------
 # 批次二 E13 ③：刻意不併（keep_separate，要 receipt）與留待（pending）結構化

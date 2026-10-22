@@ -7,7 +7,7 @@
   ],
   "sectors": {
     "AI 光互連／CPO": ["tech:ai_switch", "tech:optical_scale_up", "tech:scale_across"],
-    "記憶體": ["tech:hbm", "tech:dram_technology", "tech:dram_production"],
+    "記憶體": ["tech:hbm", "tech:dram_technology", "tech:dram_manufacturing"],
     "機器人": ["tech:humanoid_robot_systems", "tech:robotic_actuator", "tech:logistics_tote_transfer"],
     "稀土磁材": ["mat:rare_earth_magnets"],
     "成熟／特殊製程": ["tech:essential_chips_mature_node", "tech:non_leading_edge_fab"]
