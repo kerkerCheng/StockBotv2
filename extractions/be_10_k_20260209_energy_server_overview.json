@@ -1,0 +1,114 @@
+{
+  "claims": [],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.95,
+      "dst_id": "prod:bloom_energy_server",
+      "id": "e1",
+      "relation": "develops",
+      "source_ids": [
+        "be_10_k_20260209_energy_server_overview_s1"
+      ],
+      "src_id": "co:bloom_energy"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "tech:sofc_onsite_power",
+      "id": "e2",
+      "relation": "is_component_of",
+      "source_ids": [
+        "be_10_k_20260209_energy_server_overview_s2",
+        "be_10_k_20260209_energy_server_overview_s3"
+      ],
+      "src_id": "prod:bloom_energy_server"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "Bloom Energy Corporation",
+        "Bloom"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:bloom_energy",
+      "name": "Bloom Energy",
+      "role": null,
+      "source_ids": [
+        "be_10_k_20260209_energy_server_overview_s1",
+        "be_10_k_20260209_energy_server_overview_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "Energy Server",
+        "Bloom Energy Server®"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "prod:bloom_energy_server",
+      "name": "Bloom Energy Server",
+      "role": null,
+      "source_ids": [
+        "be_10_k_20260209_energy_server_overview_s1",
+        "be_10_k_20260209_energy_server_overview_s3"
+      ],
+      "type": "Product"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "SOFC onsite power",
+        "on-site fuel cell power",
+        "behind-the-meter fuel cells",
+        "natural gas fuel cells"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:sofc_onsite_power",
+      "name": "Onsite solid oxide fuel cell power for data centers",
+      "role": null,
+      "source_ids": [
+        "be_10_k_20260209_energy_server_overview_s2",
+        "be_10_k_20260209_energy_server_overview_s3"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "be_10_k_20260209_energy_server_overview",
+    "evidence_tier": 1,
+    "origin_entity": "Bloom Energy Corporation",
+    "permission_basis": "SEC EDGAR 公開申報；只保留研究必要的有限逐字節錄。published_at 取 EDGAR 索引頁 Filing Date 2026-02-09（accepted 2026-02-09 17:16:15）。",
+    "published_at": "2026-02-09",
+    "publisher": "SEC EDGAR（Form 10-K，accession 0001628280-26-006516）",
+    "retrieved_at": "2026-10-22",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Bloom Energy Corporation FY2025 Form 10-K——Item 1 Business 概述：Energy Server 與現場發電（有限節錄）",
+    "url": "https://www.sec.gov/Archives/edgar/data/1664703/000162828026006516/be-20251231.htm"
+  },
+  "sources": [
+    {
+      "id": "be_10_k_20260209_energy_server_overview_s1",
+      "locator": "Item 1 Business——概述第 2 段",
+      "quote": "We design, manufacture, distribute, and operate the Bloom Energy Server to provide resilient, distributed power for critical operations."
+    },
+    {
+      "id": "be_10_k_20260209_energy_server_overview_s2",
+      "locator": "Item 1 Business——概述第 1 段第 1 句",
+      "quote": "Bloom Energy is a global leader in onsite power generation, delivering a foundational platform purpose-built for the digital era and the global energy transition."
+    },
+    {
+      "id": "be_10_k_20260209_energy_server_overview_s3",
+      "locator": "Item 1 Business——概述第 4 段第 1 句",
+      "quote": "Our systems use high-temperature solid oxide fuel cells—a proprietary solid-state technology developed by Bloom—which leverage an electrochemical, non-combustion process and form the foundation of our platform, differentiation and competitive advantages."
+    }
+  ]
+}

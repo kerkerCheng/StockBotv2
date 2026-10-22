@@ -1,0 +1,14 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1664703/000162828026006516/be-20251231.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Bloom Energy Corporation FY2025 Form 10-K（申報 2026-02-09）——Item 1 Business 概述
+DATE: 2026-02-09
+RETRIEVED: 2026-10-22（SEC EDGAR 原文 HTML 本機抽字、空白正規化，逐字）
+NOTE: 發行人自述（L8）；本包只用它的結構句（誰做 Energy Server、Energy Server 是現場發電的系統），不用它的市場主張。
+
+【Item 1 Business——概述】
+"Bloom Energy is a global leader in onsite power generation, delivering a foundational platform purpose-built for the digital era and the global energy transition."
+
+"We design, manufacture, distribute, and operate the Bloom Energy Server to provide resilient, distributed power for critical operations."
+
+"Our systems use high-temperature solid oxide fuel cells—a proprietary solid-state technology developed by Bloom—which leverage an electrochemical, non-combustion process and form the foundation of our platform, differentiation and competitive advantages."

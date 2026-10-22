@@ -1,0 +1,97 @@
+{
+  "claims": [],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "prod:bloom_energy_server",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "mtar_annual_report_fy2024_25_clean_energy_bloom_s1"
+      ],
+      "src_id": "co:mtar_technologies"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "co:bloom_energy",
+      "id": "e2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "mtar_annual_report_fy2024_25_clean_energy_bloom_s1"
+      ],
+      "src_id": "co:mtar_technologies"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "MTAR"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "co:mtar_technologies",
+      "name": "MTAR Technologies",
+      "role": null,
+      "source_ids": [
+        "mtar_annual_report_fy2024_25_clean_energy_bloom_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "Bloom Energy Corporation",
+        "Bloom"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:bloom_energy",
+      "name": "Bloom Energy",
+      "role": null,
+      "source_ids": [
+        "mtar_annual_report_fy2024_25_clean_energy_bloom_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "Energy Server",
+        "Bloom Energy Server®"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "prod:bloom_energy_server",
+      "name": "Bloom Energy Server",
+      "role": null,
+      "source_ids": [
+        "mtar_annual_report_fy2024_25_clean_energy_bloom_s1"
+      ],
+      "type": "Product"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "mtar_annual_report_fy2024_25_clean_energy_bloom",
+    "evidence_tier": 1,
+    "origin_entity": "MTAR Technologies Limited",
+    "permission_basis": "上市公司年報（公司官網公開 PDF）；只保留研究必要的有限逐字節錄。published_at 留空：PDF 檔名與上傳路徑（2025/09）不是發布日的證據（INV-6）。",
+    "published_at": null,
+    "publisher": "MTAR Technologies Limited（公司官網年報 PDF）",
+    "retrieved_at": "2026-10-22",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "MTAR Technologies Limited Annual Report FY2024-25——Clean Energy - Fuel Cells & Other Sectors（p.19，有限節錄）",
+    "url": "https://mtar.in/wp-content/uploads/2025/09/Annual-Report-FY-2025-26-Aug-2025-11-Sept.pdf"
+  },
+  "sources": [
+    {
+      "id": "mtar_annual_report_fy2024_25_clean_energy_bloom_s1",
+      "locator": "p.19 Clean Energy - Fuel Cells & Other Sectors（PDF 斷行接回）",
+      "quote": "MTAR supplies power units, sheet metal assemblies, enclosures and ASP assemblies for Solid Oxide Fuel cells and power units for Solid Oxide Electrolysers of Bloom Energy"
+    }
+  ]
+}

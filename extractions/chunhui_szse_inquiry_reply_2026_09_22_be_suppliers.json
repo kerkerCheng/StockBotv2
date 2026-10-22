@@ -1,0 +1,107 @@
+{
+  "claims": [],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "co:bloom_energy",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "chunhui_szse_inquiry_reply_2026_09_22_be_suppliers_s1",
+        "chunhui_szse_inquiry_reply_2026_09_22_be_suppliers_s2"
+      ],
+      "src_id": "co:kaori"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "co:bloom_energy",
+      "id": "e2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "chunhui_szse_inquiry_reply_2026_09_22_be_suppliers_s1",
+        "chunhui_szse_inquiry_reply_2026_09_22_be_suppliers_s2"
+      ],
+      "src_id": "co:mtar_technologies"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "co:kaori",
+      "name": "Kaori Heat Treatment",
+      "role": null,
+      "source_ids": [
+        "chunhui_szse_inquiry_reply_2026_09_22_be_suppliers_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "MTAR"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "co:mtar_technologies",
+      "name": "MTAR Technologies",
+      "role": null,
+      "source_ids": [
+        "chunhui_szse_inquiry_reply_2026_09_22_be_suppliers_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "Bloom Energy Corporation",
+        "Bloom"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:bloom_energy",
+      "name": "Bloom Energy",
+      "role": null,
+      "source_ids": [
+        "chunhui_szse_inquiry_reply_2026_09_22_be_suppliers_s1",
+        "chunhui_szse_inquiry_reply_2026_09_22_be_suppliers_s3"
+      ],
+      "type": "Company"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "chunhui_szse_inquiry_reply_2026_09_22_be_suppliers",
+    "evidence_tier": 1,
+    "origin_entity": "浙江春晖智能控制股份有限公司",
+    "permission_basis": "上市公司在深交所的公開問詢回覆；只保留研究必要的有限逐字節錄。published_at 取巨潮刊登日（finalpage 2026-09-22）。",
+    "published_at": "2026-09-22",
+    "publisher": "深圳证券交易所（巨潮资讯网）",
+    "retrieved_at": "2026-10-22",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "浙江春晖智能控制股份有限公司 關於深交所審核問詢函的回覆（更新版，2026-09-22）——標的公司春晖仪表對美國 BE 及其供應商印度 MTAR、高力的銷售",
+    "url": "http://static.cninfo.com.cn/finalpage/2026-09-22/1225576840.PDF"
+  },
+  "sources": [
+    {
+      "id": "chunhui_szse_inquiry_reply_2026_09_22_be_suppliers_s1",
+      "locator": "問詢回覆——美國關稅政策對標的公司向美國 BE 公司銷售的影響（PDF 斷行接回）",
+      "quote": "标的公司外销客户中，印度MTAR 及高力热处理工业股份有限公司均为美国BE 的供应商，标的公司销售给印度MTAR 及高力热处理工业股份有限公司的产品最终销售至美国BE。"
+    },
+    {
+      "id": "chunhui_szse_inquiry_reply_2026_09_22_be_suppliers_s2",
+      "locator": "問詢回覆——前五大客戶貢獻變化的原因（PDF 斷行接回）",
+      "quote": "鉴于美国BE 公司在2025 年完成供应链调整，标的公司部分直接销售给美国BE 公司的产品通过向中国台湾和印度地区的厂商销售，并由其在当地加工或组装完成后运往美国或美国BE 公司指定地点"
+    },
+    {
+      "id": "chunhui_szse_inquiry_reply_2026_09_22_be_suppliers_s3",
+      "locator": "問詢回覆——BE 近期訂單整理表（引公開資訊；證明文件裡的 BE 即 Bloom Energy）",
+      "quote": "2026 年4 月 甲骨文 扩大与BloomEnergy 合作，计划采购2.8GWSOFC 燃料电池，首期签约1.2GW"
+    }
+  ]
+}
