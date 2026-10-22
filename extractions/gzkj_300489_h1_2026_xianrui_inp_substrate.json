@@ -1,0 +1,106 @@
+{
+  "claims": [
+    {
+      "confidence": 0.5,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "條件：光智科技 2026 年第三季報或 2026 年報（先锐科技 2026-08-25 交割後首次並表）顯示並表後沒有磷化銦襯底營收，或公告先锐科技的磷化銦襯底業務停產、出售或轉出（例如轉入先导基电 600641）。核查頻率：每季（季報、年報與重大事項公告）。觸發後 48 小時：e1 的 claim 降信心或提撤回，重讀 mat:inp_substrate 供給側列舉與讀圖 sr_e8cab2cad68816c0 反證①。",
+      "id": "gzkj_300489_h1_2026_xianrui_inp_substrate_cl1",
+      "source_ids": [
+        "gzkj_300489_h1_2026_xianrui_inp_substrate_s1",
+        "gzkj_300489_h1_2026_xianrui_inp_substrate_s2",
+        "gzkj_300489_h1_2026_xianrui_inp_substrate_s3"
+      ],
+      "statement": "Optics Technology Holding (300489.SZ) states in its 2026 interim report that its newly controlled subsidiary Guangdong Xianrui Technology runs an indium phosphide substrate business (R&D, production, sales; poly- and single-crystal), has iterated 2-inch to 4-inch to 6-inch crystals, is among the first domestic makers to launch 6-inch InP substrates and has already supplied them; Xianrui was not yet consolidated in H1 2026. Supplier self-report: no customer, volume, share or capacity is disclosed.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "mat:inp_substrate",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "gzkj_300489_h1_2026_xianrui_inp_substrate_s1",
+        "gzkj_300489_h1_2026_xianrui_inp_substrate_s2",
+        "gzkj_300489_h1_2026_xianrui_inp_substrate_s3"
+      ],
+      "src_id": "co:optics_technology_holding"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "光智科技",
+        "光智科技股份有限公司",
+        "Optics Technology Holding Co.,Ltd"
+      ],
+      "attributes": {
+        "ticker": "300489.SZ"
+      },
+      "confidence": 0.9,
+      "id": "co:optics_technology_holding",
+      "name": "Optics Technology Holding",
+      "role": null,
+      "source_ids": [
+        "gzkj_300489_h1_2026_xianrui_inp_substrate_s3"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "InP",
+        "indium phosphide",
+        "InP wafer",
+        "InP substrate",
+        "6-inch indium phosphide wafer substrate"
+      ],
+      "attributes": {
+        "concentration_score": 4,
+        "ramp_difficulty_intrinsic": 5
+      },
+      "confidence": 0.9,
+      "id": "mat:inp_substrate",
+      "name": "Indium Phosphide (InP) substrate",
+      "role": null,
+      "source_ids": [
+        "gzkj_300489_h1_2026_xianrui_inp_substrate_s1"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "gzkj_300489_h1_2026_xianrui_inp_substrate",
+    "evidence_tier": 1,
+    "origin_entity": "光智科技股份有限公司",
+    "permission_basis": "上市公司依法公開的定期報告；只保留研究必要的有限逐字節錄（pypdf 抽字、跨行接合）。published_at 取巨潮刊登路徑日期 2026-08-29（封面只寫「2026 年 8 月」），不是抓取日。",
+    "published_at": "2026-08-29",
+    "publisher": "深圳证券交易所（巨潮资讯网）",
+    "retrieved_at": "2026-10-22",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "光智科技股份有限公司 2026 年半年度报告（公告编号 2026-051）——先锐科技磷化铟衬底业务节录",
+    "url": "http://static.cninfo.com.cn/finalpage/2026-08-29/1225524375.PDF"
+  },
+  "sources": [
+    {
+      "id": "gzkj_300489_h1_2026_xianrui_inp_substrate_s1",
+      "locator": "第三节 管理层讨论与分析（五）未来业务规划 1.磷化铟衬底业务（p.12）",
+      "quote": "先锐科技从事磷化铟衬底业务，覆盖磷化铟衬底材料的研发、生产和销售，具备多晶和单晶双重能力，以及规模化量产能力，其中多晶产品具有稳定可控的化学计量比。"
+    },
+    {
+      "id": "gzkj_300489_h1_2026_xianrui_inp_substrate_s2",
+      "locator": "第三节 管理层讨论与分析（五）未来业务规划 1.磷化铟衬底业务（p.12）",
+      "quote": "目前先锐科技已完成 2英寸→4 英寸→6英寸三代晶体迭代，为国内首批推出 6 英寸 InP 衬底的厂家之一，已经实现供货。先锐科技在本报告期内尚未实现并表，暂未对公司本报告期营业收入及利润形成贡献。"
+    },
+    {
+      "id": "gzkj_300489_h1_2026_xianrui_inp_substrate_s3",
+      "locator": "第三节 管理层讨论与分析 一、（一）公司战略升级（p.9）",
+      "quote": "在链接层面，公司通过对先锐科技的控股收购，将磷化铟等半导体材料纳入公司产品体系。"
+    }
+  ]
+}

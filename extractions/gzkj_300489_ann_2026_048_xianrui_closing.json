@@ -1,0 +1,92 @@
+{
+  "claims": [],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "mat:inp_substrate",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "gzkj_300489_ann_2026_048_xianrui_closing_s1",
+        "gzkj_300489_ann_2026_048_xianrui_closing_s2",
+        "gzkj_300489_ann_2026_048_xianrui_closing_s3"
+      ],
+      "src_id": "co:optics_technology_holding"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "光智科技",
+        "光智科技股份有限公司",
+        "Optics Technology Holding Co.,Ltd"
+      ],
+      "attributes": {
+        "ticker": "300489.SZ"
+      },
+      "confidence": 0.9,
+      "id": "co:optics_technology_holding",
+      "name": "Optics Technology Holding",
+      "role": null,
+      "source_ids": [
+        "gzkj_300489_ann_2026_048_xianrui_closing_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "InP",
+        "indium phosphide",
+        "InP wafer",
+        "InP substrate",
+        "6-inch indium phosphide wafer substrate"
+      ],
+      "attributes": {
+        "concentration_score": 4,
+        "ramp_difficulty_intrinsic": 5
+      },
+      "confidence": 0.9,
+      "id": "mat:inp_substrate",
+      "name": "Indium Phosphide (InP) substrate",
+      "role": null,
+      "source_ids": [
+        "gzkj_300489_ann_2026_048_xianrui_closing_s2"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "gzkj_300489_ann_2026_048_xianrui_closing",
+    "evidence_tier": 1,
+    "origin_entity": "光智科技股份有限公司",
+    "permission_basis": "上市公司依法公開的交易所公告；只保留研究必要的有限逐字節錄。published_at 取公告末署日期 2026-08-25。",
+    "published_at": "2026-08-25",
+    "publisher": "深圳证券交易所（巨潮资讯网）",
+    "retrieved_at": "2026-10-22",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "光智科技股份有限公司 关于通过增资方式收购广东先锐科技有限公司控股权暨关联交易的进展公告（公告编号 2026-048）",
+    "url": "http://static.cninfo.com.cn/finalpage/2026-08-25/1225503163.PDF"
+  },
+  "sources": [
+    {
+      "id": "gzkj_300489_ann_2026_048_xianrui_closing_s1",
+      "locator": "一、交易概述",
+      "quote": "约定公司以增资的形式对先锐科技进行投资，取得标的公司50.0832%的股权，实现对标的公司的控股。"
+    },
+    {
+      "id": "gzkj_300489_ann_2026_048_xianrui_closing_s2",
+      "locator": "一、交易概述",
+      "quote": "先锐科技从事III-V族化合物材料业务，覆盖高纯原材料提纯回收及化合物材料的研发、生产和销售，主要产品包括2英寸、3英寸、4英寸和6英寸磷化铟衬底等。"
+    },
+    {
+      "id": "gzkj_300489_ann_2026_048_xianrui_closing_s3",
+      "locator": "二、交易的进展情况",
+      "quote": "近日，先锐科技已完成本次交易的股权交割，并办理完毕相应的工商变更登记及备案手续"
+    }
+  ]
+}
