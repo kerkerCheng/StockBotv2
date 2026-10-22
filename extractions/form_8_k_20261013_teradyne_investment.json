@@ -1,0 +1,139 @@
+{
+  "claims": [
+    {
+      "confidence": 0.9,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：FormFactor 或 Teradyne 的申報寫出交易終止、未在 FormFactor 2026 會計年度第四季交割，或股數、金額變更。核查頻率：每季（FormFactor 10-Q／10-K、Teradyne 10-Q）。觸發後 48 小時：e1 撤回或改寫本 claim，FORM 敘事 priced_in 與 what_must_be_true 兩格的認購價與持股比例重寫。",
+      "id": "form_8_k_20261013_teradyne_investment_cl1",
+      "source_ids": [
+        "form_8_k_20261013_teradyne_investment_s1",
+        "form_8_k_20261013_teradyne_investment_s2",
+        "form_8_k_20261013_teradyne_investment_s3",
+        "form_8_k_20261013_teradyne_investment_s4"
+      ],
+      "statement": "FormFactor's 8-K (Item 3.02): under a Securities Purchase Agreement dated 2026-10-06, Teradyne agreed to buy 2,234,887 newly issued FormFactor shares in a private placement for about US$300 million (a 'strategic equity investment'), expected to close in FormFactor's fiscal Q4 2026 subject to closing conditions and regulatory approvals. Minority strategic stake (control=false; roughly 2.9% of shares outstanding per the 10-Q cover count — inference, not stated in the 8-K), so Teradyne is not a related party of FormFactor for origin resolution. Agreed, not yet closed as of the filing; the Form D filed 2026-10-20 (totalAmountSold 300,000,056; one investor) records the commitment, not closing.",
+      "subject_id": "e1"
+    },
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：任一方申報或新聞稿寫出合作終止、範圍縮減，或交易未交割。核查頻率：每季（雙方 10-Q）。觸發後 48 小時：e2 撤回，重讀 tech:cpo_full_stack_test 供給側。",
+      "id": "form_8_k_20261013_teradyne_investment_cl2",
+      "source_ids": [
+        "form_8_k_20261013_teradyne_investment_s5"
+      ],
+      "statement": "Joint press release (Exhibit 99.1, 2026-10-12): FormFactor (probes, interfaces, test engineering) and Teradyne (ATE platforms) will partner on test architectures and production readiness for HPC, advanced packaging, HBM and silicon photonics. Both parties' own description of the collaboration; it names no customer, product, volume or exclusivity. Not a customer capital commitment.",
+      "subject_id": "e2"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {
+        "control": false
+      },
+      "confidence": 0.9,
+      "dst_id": "co:formfactor",
+      "id": "e1",
+      "relation": "invests_in",
+      "source_ids": [
+        "form_8_k_20261013_teradyne_investment_s1",
+        "form_8_k_20261013_teradyne_investment_s2",
+        "form_8_k_20261013_teradyne_investment_s3",
+        "form_8_k_20261013_teradyne_investment_s4"
+      ],
+      "src_id": "co:teradyne"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "co:formfactor",
+      "id": "e2",
+      "relation": "partnership_with",
+      "source_ids": [
+        "form_8_k_20261013_teradyne_investment_s5"
+      ],
+      "src_id": "co:teradyne"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "test_yield",
+      "aliases": [
+        "TER",
+        "Teradyne, Inc."
+      ],
+      "attributes": {
+        "ticker": "TER"
+      },
+      "confidence": 0.9,
+      "id": "co:teradyne",
+      "name": "Teradyne",
+      "role": "test",
+      "source_ids": [
+        "form_8_k_20261013_teradyne_investment_s1",
+        "form_8_k_20261013_teradyne_investment_s4"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "test_yield",
+      "aliases": [
+        "FORM",
+        "FormFactor, Inc."
+      ],
+      "attributes": {
+        "ticker": "FORM"
+      },
+      "confidence": 0.9,
+      "id": "co:formfactor",
+      "name": "FormFactor",
+      "role": "test",
+      "source_ids": [
+        "form_8_k_20261013_teradyne_investment_s1",
+        "form_8_k_20261013_teradyne_investment_s4"
+      ],
+      "type": "Company"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "form_8_k_20261013_teradyne_investment",
+    "evidence_tier": 1,
+    "origin_entity": "FormFactor, Inc.",
+    "permission_basis": "Official public SEC filing; retain the canonical URL and only research-relevant excerpts.",
+    "published_at": "2026-10-13",
+    "publisher": "SEC EDGAR",
+    "retrieved_at": "2026-10-15",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "FormFactor 8-K（event date 2026-10-06；filed 2026-10-13）：Item 3.02 向 Teradyne 私募 2,234,887 股、約 3.0 億美元；Exhibit 99.1（2026-10-12）雙方技術合作（含矽光子）",
+    "url": "https://www.sec.gov/Archives/edgar/data/1039399/000103939926000037/form-20261006.htm"
+  },
+  "sources": [
+    {
+      "id": "form_8_k_20261013_teradyne_investment_s1",
+      "locator": "Item 3.02（私募對象與股數）",
+      "quote": "pursuant to which the Company agreed to issue and sell to the Purchaser, in a private placement transaction, an aggregate of 2,234,887 shares"
+    },
+    {
+      "id": "form_8_k_20261013_teradyne_investment_s2",
+      "locator": "Item 3.02（金額）",
+      "quote": "for aggregate cash consideration of approximately $300.0 million"
+    },
+    {
+      "id": "form_8_k_20261013_teradyne_investment_s3",
+      "locator": "Item 3.02（交割）",
+      "quote": "The transaction is expected to close in the fourth quarter of fiscal 2026, subject to the satisfaction of customary closing conditions."
+    },
+    {
+      "id": "form_8_k_20261013_teradyne_investment_s4",
+      "locator": "Exhibit 99.1（投資定性）",
+      "quote": "Under the terms of the agreement, Teradyne has agreed to make a $300 million strategic equity investment."
+    },
+    {
+      "id": "form_8_k_20261013_teradyne_investment_s5",
+      "locator": "Exhibit 99.1（合作範圍）",
+      "quote": "Together, the companies will partner to advance semiconductor test architectures, optimize test infrastructure, and enhance production readiness for existing and emerging applications, including high-performance compute (HPC), advanced packaging, high-bandwidth memory (HBM), and silicon photonics."
+    }
+  ]
+}

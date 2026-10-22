@@ -1,0 +1,10 @@
+Source URL: https://convergedigest.com/nvidia-kuchta-pecc-cpo-npo-optics-serviceability/
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Converge Digest「PECC Summit: NVIDIA Maps AI’s Optical Interconnect Needs」（2026-10-20）
+Source: https://convergedigest.com/nvidia-kuchta-pecc-cpo-npo-optics-serviceability/
+Published: 2026-10-20 | Origin: Converge Digest（轉述 NVIDIA Dan Kuchta 於 Optica+APC PECC Summit 的公開演講；未取得簡報或逐字稿；該站自述可能以 AI 輔助起草、經編輯審定） | Retrieved: 2026-10-22
+
+第 1 段（講者與場合）："according to Dan Kuchta, Principal Hardware System Architect at NVIDIA."
+PECC: NVIDIA's Interconnect Takeaways 第 1 點："CPO production Kuchta identified supply availability, manufacturing throughput and test capacity as priorities."
+第 2 段（製造流程）："Its manufacturing approach screens optical engines before soldered integration and attaches fibers late in assembly. Kuchta emphasized that limited practical rework after integration makes component quality and pre-assembly testing especially important."

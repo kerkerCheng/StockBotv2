@@ -1,0 +1,149 @@
+{
+  "claims": [
+    {
+      "confidence": 0.55,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "條件：台積電、FormFactor 或旺矽的一手（法說、年報、新聞稿、申報）寫出台積電 CPO 相關測試設備（探針台）的認證供應商與此不同（多於兩家或不含其中一家），或 THE ELEC 更正。核查頻率：每季（FormFactor 與旺矽的法說）。觸發後 48 小時：本 claim 加註或撤回，重讀 tech:cpo_full_stack_test 讀圖缺口⑤（insertion 1 還有誰）與 FORM 敘事 bottleneck 格。",
+      "id": "thelec_samsung_formfactor_mpi_probe_stations_2026_09_07_cl1",
+      "source_ids": [
+        "thelec_samsung_formfactor_mpi_probe_stations_2026_09_07_s2",
+        "thelec_samsung_formfactor_mpi_probe_stations_2026_09_07_s3"
+      ],
+      "statement": "Third-party media (THE ELEC, 2026-09-07, citing unnamed industry sources): TSMC uses FormFactor and MPI probe stations to develop and validate its COUPE CPO platform, and the two are so far the only probe-station suppliers to have passed TSMC's qualification for CPO-related test equipment. First non-FormFactor origin on this edge (the two admitted documents are FormFactor's own). Limits: development/validation, not production volume; 'only two' means FormFactor is not sole for this step; the article does not name Triton or a test insertion (station mapping to FormFactor's 'insertion 1' is inference). MPI (旺矽, 6223.TWO) is not in the registry, so the second qualified supplier stays in this claim text, not as an edge.",
+      "subject_id": "e1"
+    },
+    {
+      "confidence": 0.5,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "條件：三星或 FormFactor 的一手寫出三星矽光子 PIC 晶圓測試改用其他探針台供應商、或三星延後／取消矽光子代工計畫，或 THE ELEC 更正。核查頻率：每季（FormFactor 法說、三星法說）。觸發後 48 小時：e2 撤回或加註，FORM 敘事 what_must_be_true 格「台積電以外的晶圓代工」那句重寫。",
+      "id": "thelec_samsung_formfactor_mpi_probe_stations_2026_09_07_cl2",
+      "source_ids": [
+        "thelec_samsung_formfactor_mpi_probe_stations_2026_09_07_s1",
+        "thelec_samsung_formfactor_mpi_probe_stations_2026_09_07_s4"
+      ],
+      "statement": "Third-party media (THE ELEC, 2026-09-07, unnamed industry sources): Samsung is evaluating its own silicon-photonics PIC wafers in-house using FormFactor and MPI probe stations, aiming to finish by year-end; Samsung plans silicon-photonics foundry services in 2027. Evaluation/development stage only — no production line, volume, or Triton named; MPI is used alongside FormFactor.",
+      "subject_id": "e2"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.55,
+      "dst_id": "co:tsmc",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "thelec_samsung_formfactor_mpi_probe_stations_2026_09_07_s2",
+        "thelec_samsung_formfactor_mpi_probe_stations_2026_09_07_s3"
+      ],
+      "src_id": "co:formfactor"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.5,
+      "dst_id": "co:samsung",
+      "id": "e2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "thelec_samsung_formfactor_mpi_probe_stations_2026_09_07_s1",
+        "thelec_samsung_formfactor_mpi_probe_stations_2026_09_07_s4"
+      ],
+      "src_id": "co:formfactor"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "test_yield",
+      "aliases": [
+        "FORM",
+        "FormFactor, Inc."
+      ],
+      "attributes": {
+        "ticker": "FORM"
+      },
+      "confidence": 0.9,
+      "id": "co:formfactor",
+      "name": "FormFactor",
+      "role": "test",
+      "source_ids": [
+        "thelec_samsung_formfactor_mpi_probe_stations_2026_09_07_s1",
+        "thelec_samsung_formfactor_mpi_probe_stations_2026_09_07_s2",
+        "thelec_samsung_formfactor_mpi_probe_stations_2026_09_07_s3"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "foundry_packaging",
+      "aliases": [
+        "2330.TW",
+        "TSM",
+        "Taiwan Semiconductor Manufacturing Company",
+        "台積電"
+      ],
+      "attributes": {
+        "ticker": "TSM"
+      },
+      "confidence": 0.95,
+      "id": "co:tsmc",
+      "name": "TSMC",
+      "role": null,
+      "source_ids": [
+        "thelec_samsung_formfactor_mpi_probe_stations_2026_09_07_s2",
+        "thelec_samsung_formfactor_mpi_probe_stations_2026_09_07_s3"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "foundry_packaging",
+      "aliases": [],
+      "attributes": {
+        "ticker": "005930.KS"
+      },
+      "confidence": 0.9,
+      "id": "co:samsung",
+      "name": "Samsung",
+      "role": "foundry",
+      "source_ids": [
+        "thelec_samsung_formfactor_mpi_probe_stations_2026_09_07_s1",
+        "thelec_samsung_formfactor_mpi_probe_stations_2026_09_07_s4"
+      ],
+      "type": "Company"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "thelec_samsung_formfactor_mpi_probe_stations_2026_09_07",
+    "evidence_tier": 3,
+    "origin_entity": "THE ELEC（韓國電子產業媒體；引述匿名業界人士）",
+    "permission_basis": "第三方新聞媒體版權內容；保留 canonical URL，僅存研究必要短引述。",
+    "published_at": "2026-09-07",
+    "publisher": "THE ELEC",
+    "retrieved_at": "2026-10-22",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "THE ELEC：Samsung Adopts TSMC-Validated Photonics Test Platform（FormFactor、MPI 探針台通過台積電 CPO 相關測試設備認證；三星自測 PIC 晶圓，2026-09-07）",
+    "url": "https://www.thelec.net/news/articleView.html?idxno=13736"
+  },
+  "sources": [
+    {
+      "id": "thelec_samsung_formfactor_mpi_probe_stations_2026_09_07_s1",
+      "locator": "第 2 段（三星 PIC 晶圓自測）",
+      "quote": "According to industry sources on Sept. 7, Samsung is testing silicon photonics PIC wafers using probe stations from US-based FormFactor and Taiwan-based MPI."
+    },
+    {
+      "id": "thelec_samsung_formfactor_mpi_probe_stations_2026_09_07_s2",
+      "locator": "第 5 段（台積電 COUPE）",
+      "quote": "TSMC uses probe stations from FormFactor and MPI to develop and validate COUPE (Co-Packaged Optical Engine), its silicon photonics-based co-packaged optics (CPO) platform."
+    },
+    {
+      "id": "thelec_samsung_formfactor_mpi_probe_stations_2026_09_07_s3",
+      "locator": "第 5 段（台積電認證）",
+      "quote": "So far, the two companies are the only probe station suppliers to have passed TSMC's qualification process for CPO-related test equipment."
+    },
+    {
+      "id": "thelec_samsung_formfactor_mpi_probe_stations_2026_09_07_s4",
+      "locator": "副標",
+      "quote": "Company aims to complete in-house PIC wafer evaluation by year-end"
+    }
+  ]
+}

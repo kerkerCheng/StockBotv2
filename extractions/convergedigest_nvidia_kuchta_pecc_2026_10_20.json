@@ -1,0 +1,103 @@
+{
+  "claims": [
+    {
+      "confidence": 0.5,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "條件：NVIDIA 自己的一手（法說、GTC 簡報、技術部落格）寫出 CPO 測試產能已足夠、不再是量產優先限制，或 Converge Digest 更正這段轉述。核查頻率：每季（NVIDIA 法說與 GTC）。觸發後 48 小時：本 assertion 降 confidence 或撤回，重跑 python -m query.structure tech:cpo_full_stack_test，並在該層讀圖註記需求側少一個 origin。",
+      "id": "convergedigest_nvidia_kuchta_pecc_2026_10_20_cl1",
+      "source_ids": [
+        "convergedigest_nvidia_kuchta_pecc_2026_10_20_s1",
+        "convergedigest_nvidia_kuchta_pecc_2026_10_20_s2",
+        "convergedigest_nvidia_kuchta_pecc_2026_10_20_s3"
+      ],
+      "statement": "NVIDIA's Principal Hardware System Architect Dan Kuchta (Optica+APC PECC Summit, 2026-10-20, as reported by Converge Digest; no slides or transcript obtained) named supply availability, manufacturing throughput and test capacity as the priorities for CPO production, and said NVIDIA screens optical engines before soldered integration because there is little practical rework afterwards. This is the platform owner (customer side) on the CPO test step — a second origin alongside TSMC's 2026-08-31 remark (TechNews relay). Wording limit: the relay says 'priorities', not 'bottleneck' or 'shortage'; no test vendor, test insertion, lead time or allocation is named.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.5,
+      "dst_id": "tech:cpo_full_stack_test",
+      "id": "e1",
+      "relation": "constrained_by",
+      "source_ids": [
+        "convergedigest_nvidia_kuchta_pecc_2026_10_20_s1",
+        "convergedigest_nvidia_kuchta_pecc_2026_10_20_s2",
+        "convergedigest_nvidia_kuchta_pecc_2026_10_20_s3"
+      ],
+      "src_id": "tech:cpo"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "CPO",
+        "co-packaged optics",
+        "NPO",
+        "near packaged optics"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 5
+      },
+      "confidence": 0.95,
+      "id": "tech:cpo",
+      "name": "Co-Packaged Optics",
+      "role": null,
+      "source_ids": [
+        "convergedigest_nvidia_kuchta_pecc_2026_10_20_s2"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "test_yield",
+      "aliases": [
+        "full-stack test",
+        "CPO test",
+        "全堆疊測試"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:cpo_full_stack_test",
+      "name": "CPO 全堆疊測試（full-stack test）",
+      "role": null,
+      "source_ids": [
+        "convergedigest_nvidia_kuchta_pecc_2026_10_20_s2",
+        "convergedigest_nvidia_kuchta_pecc_2026_10_20_s3"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "convergedigest_nvidia_kuchta_pecc_2026_10_20",
+    "evidence_tier": 3,
+    "origin_entity": "Converge Digest（轉述 NVIDIA Principal Hardware System Architect Dan Kuchta 於 Optica+APC PECC Summit 的公開演講；未取得簡報或逐字稿）",
+    "permission_basis": "第三方新聞媒體版權內容；保留 canonical URL，僅存研究必要短引述。",
+    "published_at": "2026-10-20",
+    "publisher": "Converge Digest",
+    "retrieved_at": "2026-10-22",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "Converge Digest：PECC Summit: NVIDIA Maps AI’s Optical Interconnect Needs（NVIDIA Dan Kuchta，2026-10-20 Optica+APC PECC Summit）",
+    "url": "https://convergedigest.com/nvidia-kuchta-pecc-cpo-npo-optics-serviceability/"
+  },
+  "sources": [
+    {
+      "id": "convergedigest_nvidia_kuchta_pecc_2026_10_20_s1",
+      "locator": "第 1 段（講者與場合）",
+      "quote": "according to Dan Kuchta, Principal Hardware System Architect at NVIDIA."
+    },
+    {
+      "id": "convergedigest_nvidia_kuchta_pecc_2026_10_20_s2",
+      "locator": "PECC: NVIDIA's Interconnect Takeaways 第 1 點",
+      "quote": "CPO production Kuchta identified supply availability, manufacturing throughput and test capacity as priorities."
+    },
+    {
+      "id": "convergedigest_nvidia_kuchta_pecc_2026_10_20_s3",
+      "locator": "第 2 段（製造流程）",
+      "quote": "Its manufacturing approach screens optical engines before soldered integration and attaches fibers late in assembly. Kuchta emphasized that limited practical rework after integration makes component quality and pre-assembly testing especially important."
+    }
+  ]
+}

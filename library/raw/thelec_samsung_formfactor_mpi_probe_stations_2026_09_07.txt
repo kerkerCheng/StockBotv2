@@ -1,0 +1,11 @@
+Source URL: https://www.thelec.net/news/articleView.html?idxno=13736
+
+Excerpt:
+[EXCERPT — 有限逐字引文] THE ELEC「Samsung Adopts TSMC-Validated Photonics Test Platform」（Published 2026.09.07 23:24 KST，Selye Moon）
+Source: https://www.thelec.net/news/articleView.html?idxno=13736
+Published: 2026-09-07 | Origin: THE ELEC（引述匿名業界人士） | Retrieved: 2026-10-22
+
+第 2 段（三星 PIC 晶圓自測）："According to industry sources on Sept. 7, Samsung is testing silicon photonics PIC wafers using probe stations from US-based FormFactor and Taiwan-based MPI."
+第 5 段（台積電 COUPE）："TSMC uses probe stations from FormFactor and MPI to develop and validate COUPE (Co-Packaged Optical Engine), its silicon photonics-based co-packaged optics (CPO) platform."
+第 5 段（台積電認證）："So far, the two companies are the only probe station suppliers to have passed TSMC's qualification process for CPO-related test equipment."
+副標："Company aims to complete in-house PIC wafer evaluation by year-end"
