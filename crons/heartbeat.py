@@ -1180,8 +1180,10 @@ def _watch_today_line(*, now: datetime, hint: bool = True) -> str:
     woken = sum(1 for w in watches if _woke_on(w, today))
     expired = sum(1 for w in watches if _local_day(w.get("expired_at")) == today)
     c = ew.counters(data)
+    # 2026-10-22：這一格原本叫「未檢」，數的是所有醒來的語意 watch（含敘事來源）；⑤ 的「未檢」只數讀圖／層說明／thesis 來源
+    # （敘事來源歸「敘事該重寫」）——同一個字兩個數會讓人搞混（L12），所以這裡改叫「語意醒來待判」，⑤ 才是待做清單。
     return (f"watch：今日醒 {woken}｜今日到期 {expired}｜已觸發未消化 {c['fired_unconsumed']}"
-            f"｜語意標旗 {c['semantic_flagged']}｜**未檢 {c['semantic_pending_check']}**"
+            f"｜語意標旗 {c['semantic_flagged']}｜語意醒來待判 {c['semantic_pending_check']}（＝⑤ 未檢＋敘事該重寫的醒來）"
             + ("（判定只在互動：`python -m engine_b.event_watch semantic-queue`）" if hint else ""))
 
 
