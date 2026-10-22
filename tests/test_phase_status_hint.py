@@ -20,6 +20,8 @@ def _run(tmp_path, monkeypatch, capsys, rows: str) -> str:
     readme = tmp_path / "README.md"
     readme.write_text(_HEADER + rows, encoding="utf-8")
     monkeypatch.setattr(hint, "PLANS_README", readme)
+    # 今天 daily 快照存在時「貼什麼」改由待做計數決定（2fbd2427）；本檔只測對照表判讀，不讀真實快照
+    monkeypatch.setattr(hint, "_todo_counts", lambda: None)
     assert hint.main() == 0
     return json.loads(capsys.readouterr().out)["systemMessage"]
 
