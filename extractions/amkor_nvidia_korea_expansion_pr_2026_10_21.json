@@ -1,0 +1,137 @@
+{
+  "claims": [
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：Amkor 的 10-Q／10-K 或法說寫出與 NVIDIA 的預付協議縮減、終止或預付款退回，或南韓擴產延後。核查頻率：每季（Amkor 10-Q 與法說）。觸發後 48 小時：e1 加註或降 confidence，重讀先進封裝層讀圖。",
+      "id": "amkor_nvidia_korea_expansion_pr_2026_10_21_cl1",
+      "source_ids": [
+        "amkor_nvidia_korea_expansion_pr_2026_10_21_s1",
+        "amkor_nvidia_korea_expansion_pr_2026_10_21_s2",
+        "amkor_nvidia_korea_expansion_pr_2026_10_21_s3"
+      ],
+      "statement": "Amkor's own release: a new USD 1.3 billion agreement with NVIDIA supports further capacity expansion in South Korea; Amkor's multi-year agreements with NVIDIA in Arizona and South Korea now total USD 3 billion, and 'the prepayments' align Amkor's capacity with NVIDIA's long-term plans — customer prepayments into OSAT packaging capacity. The release does not name the package type; NVIDIA's same-day release says interposer wafer capacity (+300% by end-2028). The USD figures are dated context in the quotes, not graph attributes (L4).",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "co:nvidia",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "amkor_nvidia_korea_expansion_pr_2026_10_21_s1",
+        "amkor_nvidia_korea_expansion_pr_2026_10_21_s2",
+        "amkor_nvidia_korea_expansion_pr_2026_10_21_s3"
+      ],
+      "src_id": "co:amkor_technology"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "tech:advanced_packaging",
+      "id": "e2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "amkor_nvidia_korea_expansion_pr_2026_10_21_s3",
+        "amkor_nvidia_korea_expansion_pr_2026_10_21_s4"
+      ],
+      "src_id": "co:amkor_technology"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "foundry_packaging",
+      "aliases": [
+        "Amkor",
+        "Amkor Technology",
+        "Amkor Technology, Inc.",
+        "AMKR"
+      ],
+      "attributes": {
+        "ticker": "AMKR"
+      },
+      "confidence": 0.9,
+      "id": "co:amkor_technology",
+      "name": "Amkor Technology",
+      "source_ids": [
+        "amkor_nvidia_korea_expansion_pr_2026_10_21_s2",
+        "amkor_nvidia_korea_expansion_pr_2026_10_21_s4"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "NVDA",
+        "NVIDIA Corporation",
+        "Nvidia"
+      ],
+      "attributes": {
+        "ticker": "NVDA"
+      },
+      "confidence": 0.95,
+      "id": "co:nvidia",
+      "name": "NVIDIA",
+      "role": "leader",
+      "source_ids": [
+        "amkor_nvidia_korea_expansion_pr_2026_10_21_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "foundry_packaging",
+      "aliases": [
+        "advanced packaging",
+        "heterogeneous integration",
+        "3D chiplet integration"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:advanced_packaging",
+      "name": "Advanced packaging chip integration",
+      "source_ids": [
+        "amkor_nvidia_korea_expansion_pr_2026_10_21_s3"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "amkor_nvidia_korea_expansion_pr_2026_10_21",
+    "evidence_tier": 1,
+    "origin_entity": "Amkor Technology",
+    "permission_basis": "發行人公開新聞稿（Business Wire 發布、Yahoo Finance 全文轉載）；只保留研究必要的有限逐字節錄。發行人原頁：https://ir.amkor.com/news-releases/news-release-details/amkor-technology-and-nvidia-advance-strategic-partnership-ai 。published_at 取電頭「TEMPE, Ariz., October 21, 2026」。",
+    "published_at": "2026-10-21",
+    "publisher": "Business Wire（Yahoo Finance 轉載；發行人 IR 頁 ir.amkor.com 對本機 403）",
+    "retrieved_at": "2026-10-22",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "Amkor Technology 新聞稿（Business Wire，2026-10-21）：Amkor Technology and NVIDIA Advance Strategic Partnership for AI Infrastructure——南韓新增 13 億美元協議，與 NVIDIA 的多年協議（亞利桑那＋南韓）合計 30 億美元，含預付款",
+    "url": "https://finance.yahoo.com/technology/ai/articles/amkor-technology-nvidia-advance-strategic-113000353.html"
+  },
+  "sources": [
+    {
+      "id": "amkor_nvidia_korea_expansion_pr_2026_10_21_s1",
+      "locator": "副標題",
+      "quote": "New $1.3 billion agreement supports further expansion in South Korea, building on the companies' recent Arizona collaboration"
+    },
+    {
+      "id": "amkor_nvidia_korea_expansion_pr_2026_10_21_s2",
+      "locator": "導言",
+      "quote": "today announced additional investments in South Korea for capacity expansion initiatives with NVIDIA. With this latest commitment, Amkor's multi-year agreements with NVIDIA in Arizona and South Korea total $3 billion."
+    },
+    {
+      "id": "amkor_nvidia_korea_expansion_pr_2026_10_21_s3",
+      "locator": "本文第 2 段",
+      "quote": "The prepayments align Amkor's manufacturing capacity with NVIDIA's long-term growth plans and support increasing demand for advanced packaging solutions."
+    },
+    {
+      "id": "amkor_nvidia_korea_expansion_pr_2026_10_21_s4",
+      "locator": "導言（公司描述）",
+      "quote": "Amkor Technology, Inc. (Nasdaq: AMKR), a leading provider of outsourced semiconductor packaging and test services"
+    }
+  ]
+}

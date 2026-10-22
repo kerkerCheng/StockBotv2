@@ -1,0 +1,22 @@
+Source URL: https://www.samsungsem.com/global/newsroom/news/view.do?id=10614
+
+Excerpt:
+[EXCERPT — 有限逐字引文] 三星電機新聞稿「Samsung Electro-Mechanics and NVIDIA Announce Strategic Partnership to Supply ABF Substrates」（2026-10-21）
+DATE: 2026-10-21
+RETRIEVED: 2026-10-22（原文 HTML 本機抽字、空白正規化，逐字）
+NOTE: 供應商發布、內含 NVIDIA 營運執行副總裁具名引述；與 NVIDIA 同日新聞稿互為不同 origin_entity。沒有合約金額。
+
+【標題】
+"Samsung Electro-Mechanics and NVIDIA Announce Strategic Partnership to Supply ABF Substrates"
+
+【本文第 2 段】
+"Under the agreement, the two companies will jointly invest in expanding dedicated manufacturing facilities for ABF package substrates used in AI semiconductors. Leveraging the expanded production capacity, Samsung Electro-Mechanics plans to supply NVIDIA ABF package substrates beginning in 2026."
+
+【■ Dedicated Production Facilities 段第 2 段】
+"The supply agreement covers advanced package substrates for NVIDIA's compute chipsets, as well as substrates for high-speed networking switches that enable ultra-fast chip-to-chip connectivity within data centers. Deliveries will start in 2026."
+
+【■ Dedicated Production Facilities 段第 3 段】
+"Over a multi-year period, starting in 2026, the volume of package substrates supplied by Samsung Electro-Mechanics to NVIDIA is expected to increase at a double-digit annual rate. By 2028, production allocated to NVIDIA is projected to account for a significant portion of Samsung Electro-Mechanics' total annual package substrate production capacity."
+
+【NVIDIA 營運執行副總裁 Debora Shoquist 引述】
+"Our work with Samsung Electro-Mechanics broadens our network of substrate partners and adds manufacturing capacity to help us scale production and deliver the accelerated computing platforms our customers need."

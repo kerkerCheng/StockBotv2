@@ -1,0 +1,147 @@
+{
+  "claims": [
+    {
+      "confidence": 0.85,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：三星電機的 DART、財報或法說寫出與 NVIDIA 的 ABF 供貨協議縮減、終止，或世宗／釜山專用線延後；或 NVIDIA 一手不再把三星電機列為載板夥伴。核查頻率：每季（三星電機財報與 DART、NVIDIA 10-Q）。觸發後 48 小時：e1 加註或降 confidence，重讀 IC 載板層供給側。",
+      "id": "semco_nvidia_abf_partnership_pr_2026_10_21_cl1",
+      "source_ids": [
+        "semco_nvidia_abf_partnership_pr_2026_10_21_s2",
+        "semco_nvidia_abf_partnership_pr_2026_10_21_s3",
+        "semco_nvidia_abf_partnership_pr_2026_10_21_s4",
+        "semco_nvidia_abf_partnership_pr_2026_10_21_s5"
+      ],
+      "statement": "Samsung Electro-Mechanics' own release: SEMCO and NVIDIA will jointly invest in dedicated ABF package-substrate lines at Sejong and Busan; supply covers substrates for NVIDIA compute chipsets and for high-speed networking switches, with deliveries from 2026 and volume growing at a double-digit annual rate over multiple years; by 2028 NVIDIA's allocation is projected to be a significant portion of SEMCO's total package-substrate capacity. NVIDIA's EVP of operations is quoted in the release ('broadens our network of substrate partners'). Supplier-issued, corroborated by NVIDIA's own release the same day (different origin_entity). No contract value; this is not the 2026-10-19 DART single supply contract (memory package substrates per SEMCO, unnamed 'global major' counterparty, calendar 2027).",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "co:nvidia",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "semco_nvidia_abf_partnership_pr_2026_10_21_s2",
+        "semco_nvidia_abf_partnership_pr_2026_10_21_s3",
+        "semco_nvidia_abf_partnership_pr_2026_10_21_s4",
+        "semco_nvidia_abf_partnership_pr_2026_10_21_s5"
+      ],
+      "src_id": "co:samsung_electro_mechanics"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "mat:ic_package_substrate",
+      "id": "e2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "semco_nvidia_abf_partnership_pr_2026_10_21_s2",
+        "semco_nvidia_abf_partnership_pr_2026_10_21_s3"
+      ],
+      "src_id": "co:samsung_electro_mechanics"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "Samsung Electro-Mechanics",
+        "Samsung Electro-Mechanics Co., Ltd."
+      ],
+      "attributes": {
+        "ticker": "009150.KS"
+      },
+      "confidence": 0.95,
+      "id": "co:samsung_electro_mechanics",
+      "name": "Samsung Electro-Mechanics",
+      "source_ids": [
+        "semco_nvidia_abf_partnership_pr_2026_10_21_s1",
+        "semco_nvidia_abf_partnership_pr_2026_10_21_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "NVDA",
+        "NVIDIA Corporation",
+        "Nvidia"
+      ],
+      "attributes": {
+        "ticker": "NVDA"
+      },
+      "confidence": 0.95,
+      "id": "co:nvidia",
+      "name": "NVIDIA",
+      "role": "leader",
+      "source_ids": [
+        "semco_nvidia_abf_partnership_pr_2026_10_21_s1",
+        "semco_nvidia_abf_partnership_pr_2026_10_21_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "large body substrates",
+        "IC substrates",
+        "advanced IC substrates",
+        "high-end IC substrates",
+        "FCBGA",
+        "Flip Chip-Ball Grid Array"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "mat:ic_package_substrate",
+      "name": "IC Package Substrate",
+      "source_ids": [
+        "semco_nvidia_abf_partnership_pr_2026_10_21_s2",
+        "semco_nvidia_abf_partnership_pr_2026_10_21_s3"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "semco_nvidia_abf_partnership_pr_2026_10_21",
+    "evidence_tier": 1,
+    "origin_entity": "Samsung Electro-Mechanics",
+    "permission_basis": "發行人公開新聞稿；只保留研究必要的有限逐字節錄。published_at 取新聞稿日期「2026.10.21」與本文「[2026/10/21]」。",
+    "published_at": "2026-10-21",
+    "publisher": "Samsung Electro-Mechanics Newsroom",
+    "retrieved_at": "2026-10-22",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "Samsung Electro-Mechanics Press Release 2026-10-21：Samsung Electro-Mechanics and NVIDIA Announce Strategic Partnership to Supply ABF Substrates（世宗、釜山專用線共同投資；2026 年起交貨；運算晶片與高速網路交換器載板）",
+    "url": "https://www.samsungsem.com/global/newsroom/news/view.do?id=10614"
+  },
+  "sources": [
+    {
+      "id": "semco_nvidia_abf_partnership_pr_2026_10_21_s1",
+      "locator": "標題",
+      "quote": "Samsung Electro-Mechanics and NVIDIA Announce Strategic Partnership to Supply ABF Substrates"
+    },
+    {
+      "id": "semco_nvidia_abf_partnership_pr_2026_10_21_s2",
+      "locator": "本文第 2 段",
+      "quote": "Under the agreement, the two companies will jointly invest in expanding dedicated manufacturing facilities for ABF package substrates used in AI semiconductors. Leveraging the expanded production capacity, Samsung Electro-Mechanics plans to supply NVIDIA ABF package substrates beginning in 2026."
+    },
+    {
+      "id": "semco_nvidia_abf_partnership_pr_2026_10_21_s3",
+      "locator": "■ Dedicated Production Facilities 段第 2 段",
+      "quote": "The supply agreement covers advanced package substrates for NVIDIA's compute chipsets, as well as substrates for high-speed networking switches that enable ultra-fast chip-to-chip connectivity within data centers. Deliveries will start in 2026."
+    },
+    {
+      "id": "semco_nvidia_abf_partnership_pr_2026_10_21_s4",
+      "locator": "■ Dedicated Production Facilities 段第 3 段",
+      "quote": "Over a multi-year period, starting in 2026, the volume of package substrates supplied by Samsung Electro-Mechanics to NVIDIA is expected to increase at a double-digit annual rate. By 2028, production allocated to NVIDIA is projected to account for a significant portion of Samsung Electro-Mechanics' total annual package substrate production capacity."
+    },
+    {
+      "id": "semco_nvidia_abf_partnership_pr_2026_10_21_s5",
+      "locator": "NVIDIA 營運執行副總裁 Debora Shoquist 引述",
+      "quote": "Our work with Samsung Electro-Mechanics broadens our network of substrate partners and adds manufacturing capacity to help us scale production and deliver the accelerated computing platforms our customers need."
+    }
+  ]
+}

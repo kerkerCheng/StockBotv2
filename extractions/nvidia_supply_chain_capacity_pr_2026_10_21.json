@@ -1,0 +1,481 @@
+{
+  "claims": [
+    {
+      "confidence": 0.85,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：NVIDIA 或 IBIDEN 的一手（10-Q／10-K、決算短信、適時開示）寫出這份產能預留協議縮減、終止或預付款退回，或大野工廠新增產能的量產爬坡延到 2028 年第二季以後。核查頻率：每季（NVIDIA 10-Q、IBIDEN 決算）。觸發後 48 小時：e1 加註或降 confidence，重讀 IC 載板層讀圖的時鐘一格。",
+      "id": "nvidia_supply_chain_capacity_pr_2026_10_21_cl1",
+      "source_ids": [
+        "nvidia_supply_chain_capacity_pr_2026_10_21_s5"
+      ],
+      "statement": "Customer capital commitment on the substrate layer (NVIDIA's own press release, 2026-10-21): NVIDIA is providing a 'multibillion-dollar capacity reservation advance' to support IBIDEN's Ono Plant in Japan, under an agreement NVIDIA says was 'signed and announced earlier this year by IBIDEN'; the expansion targets 3x current capacity at the plant, with additional capacity ramping from Q1 2028. IBIDEN's own February 2026 disclosures (Ono Cell8, about JPY 280 billion; total FY2026-28 plan about JPY 500 billion) do not name NVIDIA or an advance — the customer link and the prepayment rest on NVIDIA's document. The dollar amount is not given (only 'multibillion'); dates are dated context (L4).",
+      "subject_id": "e1"
+    },
+    {
+      "confidence": 0.85,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：NVIDIA 或三星電機的一手寫出這份 ABF 供貨協議縮減、終止，或世宗／釜山專用線延後、2026 年未開始交貨。核查頻率：每季（三星電機財報與 DART、NVIDIA 10-Q）。觸發後 48 小時：e2 加註或降 confidence，重讀 IC 載板層供給側。",
+      "id": "nvidia_supply_chain_capacity_pr_2026_10_21_cl2",
+      "source_ids": [
+        "nvidia_supply_chain_capacity_pr_2026_10_21_s6"
+      ],
+      "statement": "NVIDIA (customer side) says Samsung Electro-Mechanics is joining NVIDIA's substrate supply chain, bringing immediate capacity from existing South Korean operations, with facility upgrades and new factories in Sejong and Busan; by 2028 production allocated to NVIDIA is projected to be 'a significant portion' of SEMCO's total annual package substrate capacity. SEMCO's own release the same day (separate document in this packet) calls it joint investment in dedicated ABF lines with deliveries from 2026. This names the customer that SEMCO's 2026-09-29 release left unnamed ('customer funding support') only in the sense of a same-layer funder; neither document says the 09-29 funding and this joint investment are the same money (inference, not first-hand).",
+      "subject_id": "e2"
+    },
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：NVIDIA 或欣興的一手（10-Q、法說、重大訊息）寫出 KF 擴產的產能預留協議縮減、終止，或新增產能延到 2027 年第三季以後才開出。核查頻率：每季（欣興法說與月營收說明、NVIDIA 10-Q）。觸發後 48 小時：e3 加註或降 confidence，重讀 IC 載板層的時鐘一格。",
+      "id": "nvidia_supply_chain_capacity_pr_2026_10_21_cl3",
+      "source_ids": [
+        "nvidia_supply_chain_capacity_pr_2026_10_21_s7"
+      ],
+      "statement": "NVIDIA (customer side) supports Unimicron's KF substrate manufacturing expansion in Taiwan with a 'capacity reservation agreement'; new capacity from Q2 2027, full capacity by mid-2028. Unlike the IBIDEN and KYEC paragraphs, this one does not say 'advance' and gives no amount — a reservation agreement, prepayment not stated.",
+      "subject_id": "e3"
+    },
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：NVIDIA 的申報、法說或新聞稿撤回或下修三年 2.5 倍的載板產能計畫，或寫出載板已不再限制出貨。核查頻率：每季（NVIDIA 10-Q／法說）。觸發後 48 小時：本 claim 加註，重讀 IC 載板層讀圖（需求側與反證④）。",
+      "id": "nvidia_supply_chain_capacity_pr_2026_10_21_cl4",
+      "source_ids": [
+        "nvidia_supply_chain_capacity_pr_2026_10_21_s1",
+        "nvidia_supply_chain_capacity_pr_2026_10_21_s3",
+        "nvidia_supply_chain_capacity_pr_2026_10_21_s4"
+      ],
+      "statement": "NVIDIA plans to increase substrate capacity for its products by 2.5x over the next three years; the three named agreements (IBIDEN, Samsung Electro-Mechanics, Unimicron) 'will contribute' 'with more underway'. The largest buyer names at least three substrate suppliers and calls the program resiliency and redundancy — customer-side evidence that this layer is multi-sourced (sole_source false on each of the three supplier-to-NVIDIA edges), and that the buyer is paying to add capacity. CEO quote: 'Capacity is the constraint' (generic, not substrate-specific).",
+      "subject_id": "mat:ic_package_substrate"
+    },
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：NVIDIA 一手點名第二家 CPO 光學引擎製造方（另一家 OSAT 或晶圓廠），或寫出 SPIL 的擴產目標下修、延後；或日月光投控／SPIL 的一手寫出 CPO 光學引擎營收、客戶數或產能與本稿不符。核查頻率：每半年（NVIDIA GTC、日月光投控法說）。觸發後 48 小時：e8 加註或降 confidence，重讀 CPO 封裝層與 tech:cpo 的供給側。",
+      "id": "nvidia_supply_chain_capacity_pr_2026_10_21_cl5",
+      "source_ids": [
+        "nvidia_supply_chain_capacity_pr_2026_10_21_s11"
+      ],
+      "statement": "NVIDIA (customer side) names SPIL as the Taiwan manufacturer it is expanding with for optical engines used in co-packaged optics: capacity to rise 15x by mid-2027, with aims for another doubling by end-2028. No other optical-engine manufacturer is named in this release, but it does not say SPIL is the only one; no revenue, unit or customer-count figure is given. Mapped to tech:cpo_packaging_assembly, where NVIDIA's earlier technical blog (already in the graph) describes SPIL packaging the NVIDIA CPO multi-chip module.",
+      "subject_id": "e8"
+    },
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：NVIDIA 或 Amkor 的一手（10-Q、法說、新聞稿）寫出南韓中介層擴產或預付協議縮減、延後或終止，或揭露中介層是哪一種（矽或有機／RDL）而與本 claim 的保留不符。核查頻率：每季（Amkor 10-Q 與法說、NVIDIA 10-Q）。觸發後 48 小時：e9／e10 加註，重讀先進封裝層讀圖。",
+      "id": "nvidia_supply_chain_capacity_pr_2026_10_21_cl6",
+      "source_ids": [
+        "nvidia_supply_chain_capacity_pr_2026_10_21_s8"
+      ],
+      "statement": "NVIDIA and Amkor plan a greater than 300% increase in interposer wafer capacity in South Korea by end-2028 (customer side). Amkor's own release the same day (separate document in this packet) says a new USD 1.3 billion agreement brings its multi-year agreements with NVIDIA (Arizona and South Korea) to USD 3 billion and refers to 'the prepayments'. The release does not say whether the interposer is silicon or organic/RDL, so it is not mapped to mat:silicon_interposer (L6).",
+      "subject_id": "e9"
+    },
+    {
+      "confidence": 0.85,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：NVIDIA 或京元電的一手（10-Q、重大訊息、法說）寫出這份 11 億美元預付協議縮減、終止，或美國測試廠量產延到 2027 年第三季以後。核查頻率：每季（京元電法說與重大訊息、NVIDIA 10-Q）。觸發後 48 小時：e11 加註或降 confidence；若測試層另立節點，改掛到該層。",
+      "id": "nvidia_supply_chain_capacity_pr_2026_10_21_cl7",
+      "source_ids": [
+        "nvidia_supply_chain_capacity_pr_2026_10_21_s9",
+        "nvidia_supply_chain_capacity_pr_2026_10_21_s10"
+      ],
+      "statement": "NVIDIA (customer side) provides a USD 1.1 billion capacity reservation advance to KYEC for new U.S. testing facilities and equipment, high-volume production targeted for April 2027; NVIDIA expects its total semiconductor testing capacity to double from calendar 2026 to 2027 (U.S., Taiwan, Singapore). The graph has no layer node for AI-accelerator final test, so this packet adds only the company-to-company edge (modeling gap noted in the report).",
+      "subject_id": "e11"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {
+        "sole_source": false
+      },
+      "confidence": 0.9,
+      "dst_id": "co:nvidia",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "nvidia_supply_chain_capacity_pr_2026_10_21_s1",
+        "nvidia_supply_chain_capacity_pr_2026_10_21_s5"
+      ],
+      "src_id": "co:ibiden"
+    },
+    {
+      "attributes": {
+        "sole_source": false
+      },
+      "confidence": 0.9,
+      "dst_id": "co:nvidia",
+      "id": "e2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "nvidia_supply_chain_capacity_pr_2026_10_21_s1",
+        "nvidia_supply_chain_capacity_pr_2026_10_21_s6"
+      ],
+      "src_id": "co:samsung_electro_mechanics"
+    },
+    {
+      "attributes": {
+        "sole_source": false
+      },
+      "confidence": 0.9,
+      "dst_id": "co:nvidia",
+      "id": "e3",
+      "relation": "supplies_to",
+      "source_ids": [
+        "nvidia_supply_chain_capacity_pr_2026_10_21_s1",
+        "nvidia_supply_chain_capacity_pr_2026_10_21_s7"
+      ],
+      "src_id": "co:unimicron"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "mat:ic_package_substrate",
+      "id": "e4",
+      "relation": "supplies_to",
+      "source_ids": [
+        "nvidia_supply_chain_capacity_pr_2026_10_21_s1",
+        "nvidia_supply_chain_capacity_pr_2026_10_21_s5"
+      ],
+      "src_id": "co:ibiden"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "mat:ic_package_substrate",
+      "id": "e5",
+      "relation": "supplies_to",
+      "source_ids": [
+        "nvidia_supply_chain_capacity_pr_2026_10_21_s1",
+        "nvidia_supply_chain_capacity_pr_2026_10_21_s7"
+      ],
+      "src_id": "co:unimicron"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "mat:ic_package_substrate",
+      "id": "e6",
+      "relation": "supplies_to",
+      "source_ids": [
+        "nvidia_supply_chain_capacity_pr_2026_10_21_s1",
+        "nvidia_supply_chain_capacity_pr_2026_10_21_s6"
+      ],
+      "src_id": "co:samsung_electro_mechanics"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "co:nvidia",
+      "id": "e7",
+      "relation": "supplies_to",
+      "source_ids": [
+        "nvidia_supply_chain_capacity_pr_2026_10_21_s2",
+        "nvidia_supply_chain_capacity_pr_2026_10_21_s11"
+      ],
+      "src_id": "co:spil"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "tech:cpo_packaging_assembly",
+      "id": "e8",
+      "relation": "supplies_to",
+      "source_ids": [
+        "nvidia_supply_chain_capacity_pr_2026_10_21_s11"
+      ],
+      "src_id": "co:spil"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "co:nvidia",
+      "id": "e9",
+      "relation": "supplies_to",
+      "source_ids": [
+        "nvidia_supply_chain_capacity_pr_2026_10_21_s2",
+        "nvidia_supply_chain_capacity_pr_2026_10_21_s8"
+      ],
+      "src_id": "co:amkor_technology"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "tech:advanced_packaging",
+      "id": "e10",
+      "relation": "supplies_to",
+      "source_ids": [
+        "nvidia_supply_chain_capacity_pr_2026_10_21_s8"
+      ],
+      "src_id": "co:amkor_technology"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "co:nvidia",
+      "id": "e11",
+      "relation": "supplies_to",
+      "source_ids": [
+        "nvidia_supply_chain_capacity_pr_2026_10_21_s2",
+        "nvidia_supply_chain_capacity_pr_2026_10_21_s10"
+      ],
+      "src_id": "co:king_yuan_electronics"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "NVDA",
+        "NVIDIA Corporation",
+        "Nvidia"
+      ],
+      "attributes": {
+        "ticker": "NVDA"
+      },
+      "confidence": 0.95,
+      "id": "co:nvidia",
+      "name": "NVIDIA",
+      "role": "leader",
+      "source_ids": [
+        "nvidia_supply_chain_capacity_pr_2026_10_21_s1",
+        "nvidia_supply_chain_capacity_pr_2026_10_21_s2",
+        "nvidia_supply_chain_capacity_pr_2026_10_21_s4"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "Ibiden",
+        "IBIDEN",
+        "イビデン"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "co:ibiden",
+      "name": "Ibiden",
+      "source_ids": [
+        "nvidia_supply_chain_capacity_pr_2026_10_21_s1",
+        "nvidia_supply_chain_capacity_pr_2026_10_21_s5"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "Samsung Electro-Mechanics",
+        "Samsung Electro-Mechanics Co., Ltd."
+      ],
+      "attributes": {
+        "ticker": "009150.KS"
+      },
+      "confidence": 0.95,
+      "id": "co:samsung_electro_mechanics",
+      "name": "Samsung Electro-Mechanics",
+      "source_ids": [
+        "nvidia_supply_chain_capacity_pr_2026_10_21_s1",
+        "nvidia_supply_chain_capacity_pr_2026_10_21_s6"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "Unimicron",
+        "Unimicron Technology Corporation",
+        "Unimicron Technology Corp.",
+        "欣興",
+        "欣興電子"
+      ],
+      "attributes": {
+        "ticker": "3037.TW"
+      },
+      "confidence": 0.9,
+      "id": "co:unimicron",
+      "name": "Unimicron Technology",
+      "source_ids": [
+        "nvidia_supply_chain_capacity_pr_2026_10_21_s1",
+        "nvidia_supply_chain_capacity_pr_2026_10_21_s7"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "large body substrates",
+        "IC substrates",
+        "advanced IC substrates",
+        "high-end IC substrates",
+        "FCBGA",
+        "Flip Chip-Ball Grid Array"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "mat:ic_package_substrate",
+      "name": "IC Package Substrate",
+      "source_ids": [
+        "nvidia_supply_chain_capacity_pr_2026_10_21_s1",
+        "nvidia_supply_chain_capacity_pr_2026_10_21_s4"
+      ],
+      "type": "Material"
+    },
+    {
+      "abstraction_level": "foundry_packaging",
+      "aliases": [
+        "SPIL",
+        "Siliconware Precision Industries",
+        "矽品",
+        "矽品精密"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:spil",
+      "name": "Siliconware Precision Industries (SPIL)",
+      "source_ids": [
+        "nvidia_supply_chain_capacity_pr_2026_10_21_s2",
+        "nvidia_supply_chain_capacity_pr_2026_10_21_s11"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "foundry_packaging",
+      "aliases": [
+        "CPO packaging",
+        "CPO multi-chip module assembly"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:cpo_packaging_assembly",
+      "name": "CPO 封裝與系統組裝（MCM packaging + system assembly）",
+      "source_ids": [
+        "nvidia_supply_chain_capacity_pr_2026_10_21_s11"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "foundry_packaging",
+      "aliases": [
+        "Amkor",
+        "Amkor Technology",
+        "Amkor Technology, Inc.",
+        "AMKR"
+      ],
+      "attributes": {
+        "ticker": "AMKR"
+      },
+      "confidence": 0.9,
+      "id": "co:amkor_technology",
+      "name": "Amkor Technology",
+      "source_ids": [
+        "nvidia_supply_chain_capacity_pr_2026_10_21_s2",
+        "nvidia_supply_chain_capacity_pr_2026_10_21_s8"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "foundry_packaging",
+      "aliases": [
+        "advanced packaging",
+        "heterogeneous integration",
+        "3D chiplet integration"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:advanced_packaging",
+      "name": "Advanced packaging chip integration",
+      "source_ids": [
+        "nvidia_supply_chain_capacity_pr_2026_10_21_s8"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "test_yield",
+      "aliases": [
+        "KYEC",
+        "King Yuan Electronics",
+        "京元電",
+        "京元電子"
+      ],
+      "attributes": {
+        "ticker": "2449.TW"
+      },
+      "confidence": 0.9,
+      "id": "co:king_yuan_electronics",
+      "name": "King Yuan Electronics (KYEC)",
+      "source_ids": [
+        "nvidia_supply_chain_capacity_pr_2026_10_21_s2",
+        "nvidia_supply_chain_capacity_pr_2026_10_21_s10"
+      ],
+      "type": "Company"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "nvidia_supply_chain_capacity_pr_2026_10_21",
+    "evidence_tier": 1,
+    "origin_entity": "NVIDIA",
+    "permission_basis": "發行人公開新聞稿；只保留研究必要的有限逐字節錄（library/raw/nvidia_supply_chain_capacity_pr_2026_10_21.txt）。published_at 取新聞稿日期行「October 21, 2026」。",
+    "published_at": "2026-10-21",
+    "publisher": "NVIDIA Newsroom",
+    "retrieved_at": "2026-10-22",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "NVIDIA 新聞稿（GTC Berlin，2026-10-21）：NVIDIA and Supply Chain Partners Expand Capacity to Accelerate AI Infrastructure Buildout——載板（IBIDEN 多十億美元產能預留預付、三星電機加入、欣興 KF 產能預留協議，三年 2.5 倍）、Amkor 中介層晶圓產能 >300%、KYEC 11 億美元產能預留預付、SPIL CPO 光學引擎 15 倍",
+    "url": "https://nvidianews.nvidia.com/news/nvidia-and-supply-chain-partners-expand-capacity-to-accelerate-ai-infrastructure-buildout"
+  },
+  "sources": [
+    {
+      "id": "nvidia_supply_chain_capacity_pr_2026_10_21_s1",
+      "locator": "News Summary 第 1 點",
+      "quote": "Substrate agreements with IBIDEN, Samsung Electro-Mechanics and Unimicron Technology Corporation will, in aggregate, drive a 2.5x increase in capacity over the next three years."
+    },
+    {
+      "id": "nvidia_supply_chain_capacity_pr_2026_10_21_s2",
+      "locator": "導言第 2 段（六家夥伴名單）",
+      "quote": "Working with Amkor Technology, IBIDEN, King Yuan Electronics (KYEC), Samsung Electro-Mechanics, Siliconware Precision Industries (SPIL) and Unimicron Technology Corporation, NVIDIA is enabling new and existing suppliers to expand critical manufacturing capabilities across substrates, advanced packaging, testing and optical engines, strengthening the resiliency and redundancy of NVIDIA's global supply chain."
+    },
+    {
+      "id": "nvidia_supply_chain_capacity_pr_2026_10_21_s3",
+      "locator": "黃仁勳引述",
+      "quote": "Demand is extraordinary. Capacity is the constraint,"
+    },
+    {
+      "id": "nvidia_supply_chain_capacity_pr_2026_10_21_s4",
+      "locator": "Expanding Substrate Capacity 段首",
+      "quote": "NVIDIA plans to increase substrate capacity for its products by 2.5x over the next three years. The agreements below will contribute to this capacity expansion, with more underway."
+    },
+    {
+      "id": "nvidia_supply_chain_capacity_pr_2026_10_21_s5",
+      "locator": "Expanding Substrate Capacity——IBIDEN 段",
+      "quote": "Under an agreement signed and announced earlier this year by IBIDEN, NVIDIA is providing a multibillion-dollar capacity reservation advance to support IBIDEN's Ono Plant in Japan. The expansion targets capacity reaching 3x current levels at the plant, with additional capacity expected to begin ramping in the first quarter of 2028."
+    },
+    {
+      "id": "nvidia_supply_chain_capacity_pr_2026_10_21_s6",
+      "locator": "Expanding Substrate Capacity——Samsung Electro-Mechanics 段",
+      "quote": "Samsung Electro-Mechanics is joining NVIDIA's substrate supply chain, bringing immediate capacity from its existing operations in South Korea. The collaboration also supports facility upgrades and new factories in Sejong and Busan, South Korea. By 2028, production allocated to NVIDIA is projected to account for a significant portion of Samsung Electro-Mechanics' total annual package substrate production capacity."
+    },
+    {
+      "id": "nvidia_supply_chain_capacity_pr_2026_10_21_s7",
+      "locator": "Expanding Substrate Capacity——Unimicron 段",
+      "quote": "NVIDIA is supporting Unimicron's KF substrate manufacturing expansion in Taiwan with a capacity reservation agreement. The expansion is expected to begin adding capacity in the second quarter of 2027 and reach full capacity by mid-2028."
+    },
+    {
+      "id": "nvidia_supply_chain_capacity_pr_2026_10_21_s8",
+      "locator": "Scaling Advanced Packaging 段",
+      "quote": "NVIDIA and Amkor plan to expand advanced packaging capacity in South Korea, targeting a greater than 300% increase in interposer wafer capacity by the end of 2028."
+    },
+    {
+      "id": "nvidia_supply_chain_capacity_pr_2026_10_21_s9",
+      "locator": "Expanding Semiconductor Testing 段首",
+      "quote": "NVIDIA expects its total semiconductor testing capacity to double from calendar 2026 to 2027, supported by buildouts in the U.S., Taiwan and Singapore."
+    },
+    {
+      "id": "nvidia_supply_chain_capacity_pr_2026_10_21_s10",
+      "locator": "Expanding Semiconductor Testing——KYEC 段",
+      "quote": "NVIDIA's $1.1 billion capacity reservation advance to KYEC will support new U.S. testing facilities and equipment, with high-volume production targeted for April 2027."
+    },
+    {
+      "id": "nvidia_supply_chain_capacity_pr_2026_10_21_s11",
+      "locator": "Creating the Infrastructure for Co-Packaged Optics 段",
+      "quote": "NVIDIA and SPIL plan to expand manufacturing capacity in Taiwan for optical engines used in co-packaged optics, supporting the growing connectivity requirements of large-scale computing infrastructure. The expansion targets an increase of 15x by mid-2027, with aims for another doubling by the end of 2028."
+    }
+  ]
+}
