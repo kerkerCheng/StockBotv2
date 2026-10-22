@@ -33,12 +33,11 @@
       ],
       "basis": "name_identical",
       "note": "兩個 id 的 name 逐字相同。tech:advanced_packaging_gf 是 GF Fab 8 特指，不併。",
-      "pending": [
+      "keep_separate": [
         {
-          "ids": [
-            "tech:advanced_packaging_gf"
-          ],
-          "reason": "note 記為「GF Fab 8 特指，不併」，但沒有 pq2 receipt——不併也是研究判斷，核准前仍是問句"
+          "id": "tech:advanced_packaging_gf",
+          "reason": "GF 20-F s9 四處特指：具名廠區 Fab 8、品類是 essential chips（成熟製程）、時態是 plans to create、範圍含 testing；tech:advanced_packaging 是 AI 異質整合那一層（使用者 2026-10-23 go [844]）",
+          "approval_receipt": "todo:844"
         }
       ]
     },
@@ -95,7 +94,14 @@
       ],
       "basis": "semantic_reviewed",
       "approval_receipt": "todo:508",
-      "note": "使用者 2026-09-10 核准（[508]）。⚠ **不得用 name_identical 登記**：兩者 name 現在相同，是 [506] 重載時 MERGE_NODE 覆蓋造成的（tech:ocs 原本是『Optical Circuit Switching (OCS)』，比對備份快照 20260910T053041Z 可驗）——拿自己遷移改出來的 name 當機械依據是循環論證。語意依據：兩者 abstraction_level 同為 network_systems，供應商重疊（都有 SUPPLIES_TO co:lumentum 與 co:coherent），指的是同一層光路交換。canonical 取最短 id ＝ tech:ocs，它也是證據較厚的一端（11 個 source／9 條邊 vs 3 個 source／4 條邊），且今天核准的 Coherent → OCS qualification_status=qualified 就掛在它身上。"
+      "note": "使用者 2026-09-10 核准（[508]）。⚠ **不得用 name_identical 登記**：兩者 name 現在相同，是 [506] 重載時 MERGE_NODE 覆蓋造成的（tech:ocs 原本是『Optical Circuit Switching (OCS)』，比對備份快照 20260910T053041Z 可驗）——拿自己遷移改出來的 name 當機械依據是循環論證。語意依據：兩者 abstraction_level 同為 network_systems，供應商重疊（都有 SUPPLIES_TO co:lumentum 與 co:coherent），指的是同一層光路交換。canonical 取最短 id ＝ tech:ocs，它也是證據較厚的一端（11 個 source／9 條邊 vs 3 個 source／4 條邊），且今天核准的 Coherent → OCS qualification_status=qualified 就掛在它身上。",
+      "keep_separate": [
+        {
+          "id": "prod:palomar_ocs",
+          "reason": "Google 自研的 MEMS OCS（特指產品），逐字寫它取代了早年採用的廠商 OCS——併掉會抹平 OCS 供應商被內製取代的那一層，10-17 已判不併（使用者 2026-10-23 go [844]）",
+          "approval_receipt": "todo:844"
+        }
+      ]
     },
     "tech:us_export_controls": {
       "name": "U.S. Export Controls on Semiconductor Equipment",
@@ -194,12 +200,16 @@
       "basis": "semantic_reviewed",
       "approval_receipt": "todo:776",
       "note": "使用者 2026-10-17 核准（[776]）。兩端逐字：tech:transceiver_1_6t「we are poised to ramp 1.6T-speed transceiver shipments in fiscal Q4 with a portion of this volume leveraging our own CW lasers.」（Lumentum Q3 FY26）、AAOI「800G and 1.6T optical transceivers」、中際旭創「2027年整體行業的1.6T需求依然保持強勁」；tech:cloud_transceiver_1_6t「Transceiver revenue grew ~$50M sequentially … now in the 'lead pack' of transceiver suppliers as customers move to 1.6T」（Lumentum Q2 FY26，五筆 assertion 全出自這一份）。兩端都是 1.6T 這一代的資料中心光收發器、別名都是「1.6T transceiver」；[615] packet B 組當時的疑慮「cloud 特指資料中心」不成立——transceiver_1_6t 的每段逐字也都是 AI 資料中心。canonical 照 _readme 取最短 id。不含：1.6T 世代與可插拔收發器層 tech:pluggable_transceiver 的關係（另案）",
-      "pending": [
+      "keep_separate": [
         {
-          "ids": [
-            "tech:pluggable_transceiver"
-          ],
-          "reason": "[776] 不含 1.6T 世代與可插拔收發器層的關係（另案）"
+          "id": "tech:pluggable_transceiver",
+          "reason": "品類（封裝形態，橫跨 400G 到 3.2T、相對於 CPO 定義）與速率世代的上下位，同 10-17 判過的 cloud_transceiver↔cloud_transceiver_1_6t；[776] keep_out 另案的答案（使用者 2026-10-23 go [844]）",
+          "approval_receipt": "todo:844"
+        },
+        {
+          "id": "prod:1_6t_dr4_transceiver",
+          "reason": "POET 與 Lessengers 共同開發的具名產品（1.6T 2×DR4，建在 POET 光學中介層上），世代品類 vs 特指產品，10-17 已判不併（使用者 2026-10-23 go [844]）",
+          "approval_receipt": "todo:844"
         }
       ]
     },
