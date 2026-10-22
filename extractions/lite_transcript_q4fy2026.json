@@ -168,17 +168,6 @@
       "src_id": "co:axt"
     },
     {
-      "attributes": {},
-      "confidence": 0.9,
-      "dst_id": "prod:uhp_laser",
-      "id": "e10",
-      "relation": "is_component_of",
-      "source_ids": [
-        "lite_transcript_q4fy2026_s6"
-      ],
-      "src_id": "mat:inp_substrate"
-    },
-    {
       "attributes": {
         "sole_source": false,
         "substitutability": 4
@@ -237,17 +226,6 @@
         "lite_transcript_q4fy2026_s11"
       ],
       "src_id": "co:lumentum"
-    },
-    {
-      "attributes": {},
-      "confidence": 0.75,
-      "dst_id": "tech:npo",
-      "id": "e17",
-      "relation": "is_component_of",
-      "source_ids": [
-        "lite_transcript_q4fy2026_s4"
-      ],
-      "src_id": "prod:uhp_laser"
     }
   ],
   "nodes": [

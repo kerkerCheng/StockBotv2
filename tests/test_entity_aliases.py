@@ -258,4 +258,8 @@ def test_the_real_registry_still_loads_with_the_structured_fields() -> None:
 
     canonical = entities.load()
     assert canonical["tech:nand"]["keep_separate"][0]["approval_receipt"] == "todo:505"
-    assert any("tech:dram" in item["ids"] for item in canonical["tech:dram_manufacturing"]["pending"])
+    # 2026-10-23 [842]：tech:dram 由「留待」變成別名（使用者 go）；留待的只剩 tech:dram_technology（要逐邊更正）
+    assert "tech:dram" in canonical["tech:dram_manufacturing"]["aliases"]
+    assert canonical["tech:dram_manufacturing"]["approval_receipt"] == "todo:842"
+    assert any("tech:dram_technology" in item["ids"] for item in canonical["tech:dram_manufacturing"]["pending"])
+    assert canonical["tech:uhp_laser"]["keep_separate"][0]["approval_receipt"] == "todo:840"

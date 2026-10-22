@@ -44,19 +44,20 @@
     "tech:dram_manufacturing": {
       "name": "DRAM wafer fabrication",
       "aliases": [
-        "tech:dram_production"
+        "tech:dram_production",
+        "tech:dram"
       ],
-      "basis": "name_identical",
-      "note": "兩個 id 的 name 逐字相同。tech:dram／tech:dram_technology 名稱不同，留待研究判斷。",
+      "basis": "semantic_reviewed",
+      "note": "使用者 2026-10-23 核准（[842]）：tech:dram 併入——它每一條有逐字的邊都是 AMAT 的 by-market 營收拆分（「Net revenue for Semiconductor Systems by market … Dynamic random-access memory (DRAM) 26%」），AMAT→tech:dram 與 AMAT→本節點用的是一字不差的同一句，[505] NAND 同型；canonical 留名冊既有 key（[506]），不照最短 id。同包退役 amat_10_k_20251212 的 e10（tech:hbm is_variant_of tech:dram——s15 沒有 DRAM）。（原 note：兩個 id 的 name 逐字相同〔tech:dram_production，name_identical〕。tech:dram／tech:dram_technology 名稱不同，留待研究判斷。）",
       "pending": [
         {
           "ids": [
-            "tech:dram",
             "tech:dram_technology"
           ],
-          "reason": "名稱不同，留待研究判斷（note 原文）"
+          "reason": "混了兩種語意（AMAT「DRAM technology transitions」市場句與 Micron「DRAM products include HBM」裝置句），要逐邊更正、不能整顆併；要不要建 DRAM 裝置節點是使用者的題目（[842] 的「不含」）"
         }
-      ]
+      ],
+      "approval_receipt": "todo:842"
     },
     "tech:eml": {
       "name": "Electro-absorption Modulated Laser (EML)",
@@ -134,11 +135,12 @@
     "tech:foundry_logic": {
       "name": "Foundry / Logic Semiconductor Manufacturing",
       "aliases": [
-        "tech:foundry_logic_advanced"
+        "tech:foundry_logic_advanced",
+        "tech:leading_edge_logic_foundry"
       ],
       "basis": "semantic_reviewed",
       "approval_receipt": "todo:615",
-      "note": "使用者 2026-09-19 核准（[615]）。兩端逐字**都是 AMAT 的 by-market 營收拆分**（「Foundry, logic and other 67% … DRAM 29% … Flash memory (NAND) 4%」與「Foundry and logic customers' spending…」）。⚠ **與 [505] NAND 那次完全同型**：同一段 by-market 營收拆分句生出多個節點，而它們指的是同一個「設備商賣給這個市場」的概念。canonical 依機械選法取最短 id。⚠ **第三個同族節點 `tech:leading_edge_logic_foundry` 本次不併**：它與 `tech:foundry_logic_advanced` 才是真正的重複（都指「先進節點的 foundry/logic」），但**偵測器的兩條規則都抓不到那一對**（token 互不為子集、name 完全不同），它是被這一對順帶帶出來的。已列在 [615] 的 B 組等證據。",
+      "note": "使用者 2026-09-19 核准（[615]）。兩端逐字**都是 AMAT 的 by-market 營收拆分**（「Foundry, logic and other 67% … DRAM 29% … Flash memory (NAND) 4%」與「Foundry and logic customers' spending…」）。⚠ **與 [505] NAND 那次完全同型**：同一段 by-market 營收拆分句生出多個節點，而它們指的是同一個「設備商賣給這個市場」的概念。canonical 依機械選法取最短 id。⚠ **第三個同族節點 `tech:leading_edge_logic_foundry` 本次不併**：它與 `tech:foundry_logic_advanced` 才是真正的重複（都指「先進節點的 foundry/logic」），但**偵測器的兩條規則都抓不到那一對**（token 互不為子集、name 完全不同），它是被這一對順帶帶出來的。已列在 [615] 的 B 組等證據。｜2026-10-23 使用者 go [842]：tech:leading_edge_logic_foundry 併入（[615] B 組「等證據」的答案）——它兩條邊的逐字仍是 AMAT 的 by-market 拆分句（「Foundry and logic customers' spending in fiscal 2025 increased driven primarily by higher customer investments in leading-edge manufacturing technologies.」），同 tech:foundry_logic_advanced 那次；同包拿掉 leading_edge 宣告的「leading-edge」「7nm and smaller」別名與節點層 s2，不讓它們聯集進 canonical（L12）。本條目的 approval_receipt 仍指 [615]，這次加入的別名由 [842] 核准。",
       "pending": [
         {
           "ids": [
@@ -231,6 +233,31 @@
       "basis": "semantic_reviewed",
       "approval_receipt": "todo:778",
       "note": "使用者 2026-10-17 核准（[778]）。三端逐字：prod:els_module「We were recently given our first external light source, or ELS, module purchase for delivery by the second half of calendar 2027.」（Lumentum Q4 FY26 法說）；tech:els_pluggable_module「an initial order for ELS modules」（同季 8-K Exhibit 99.1）、「…within a pluggable turnkey ELS module solution」、Cignal「largest purchase order ever for the ELSFPs」；tech:external_laser_source 自己的邊上就掛著同兩句——同一句話生出三個節點（[505]、[615] 同型；failure log #59 別名交集回放列為真重複）。⚠ canonical **不照** _readme 的「同組取最短 id」（那會選 prod:els_module）：留層讀圖 sr_3429846bcf5ae77a、層說明與反證 watch 都掛著的 id；例外只在本筆。不併 prod:els_8ch_module（Sivers／O-Net／Enablence 的 8 通道產品，這一層的一個變體，有自己的插槽讀圖 sr_35ca0ce58617d5f6）。⚠ Cignal（2026-04）「largest purchase order ever」與 Lumentum 8 月「first … ELS module purchase」對不上——照原證據等級搬，不合成一件事"
+    },
+    "tech:uhp_laser": {
+      "name": "Ultra-high-power laser chip",
+      "aliases": [
+        "prod:uhp_laser"
+      ],
+      "basis": "semantic_reviewed",
+      "approval_receipt": "todo:840",
+      "note": "使用者 2026-10-23 核准（[840]）。兩端逐字是同一個東西——Lumentum 給 CPO 用的超高功率雷射晶片，連三季法說：prod:uhp_laser「We remain confident in a demand ramp for our ultra-high-power laser chips in the second half of calendar 2027 ahead of customer scale-up deployments in calendar 2028.」（lite_transcript_q4fy2026 s1）；tech:uhp_laser「Our ultra-high-power laser chip manufacturing ramp for CPO applications is also proceeding according to plan.」（lumentum_q3fy26_cpo s2）。⚠ canonical **不照**「同組取最短 id」（兩個都 14 字元、字母序會選 prod:）：留層讀圖 sr_26e0a9fe152d5a71、它的反證 watch 與 LITE 敘事掛著的 tech: 端，比照 [730][752][778]。同包退役 lite_transcript_q4fy2026 的 e17（is_component_of NPO，s4 沒提雷射）與 e10（InP is_component_of，s6 沒寫 UHP）——[752] note 記的疑點。",
+      "keep_separate": [
+        {
+          "id": "prod:aaoi_400mw_narrow_linewidth_pump_laser",
+          "reason": "層對這一層裡一家公司的具名產品：AAOI「Samples are now available to select customers, with volume production expected later in 2026」，送樣中；兩端各自都站得住「400mW」這個規格詞，共用規格詞不等於同一個東西（使用者 2026-10-23 go [840]）",
+          "approval_receipt": "todo:840"
+        }
+      ]
+    },
+    "tech:micro_ring_modulator": {
+      "name": "Micro Ring Modulator",
+      "aliases": [
+        "tech:mrm_200g"
+      ],
+      "basis": "semantic_reviewed",
+      "approval_receipt": "todo:841",
+      "note": "使用者 2026-10-23 核准（[841]）。兩端是同一顆元件——NVIDIA 設計、台積電製造、每波長 200G、用在 COUPE 的微環調變器：tech:mrm_200g「200Gbps micro-ring modulator (MRM) based on its COUPE platform is scheduled to enter mass production later in 2026」（TrendForce）；tech:micro_ring_modulator「Engineered for direct 200Gbps PAM4 modulation per wavelength, the Micro Ring Modulator achieves an ultra-low density footprint.」（NVIDIA 部落格）。庫內沒有第二代 MRM 的逐字；日後出現 400G MRM 另開變體節點。⚠ canonical **不照**最短 id：留層讀圖 sr_ef7726c7bf9a0e58 掛著的 id。同包退役 trendforce_tsmc_pic_capacity_2026_07_08 的 e3（NVIDIA depends_on，s5 講 COUPE 平台客戶、沒提 MRM），e2 拿掉 s3（PIC 產能句）。"
     }
   }
 }

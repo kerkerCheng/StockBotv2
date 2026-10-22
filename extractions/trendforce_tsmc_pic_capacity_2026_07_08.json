@@ -45,21 +45,9 @@
       "id": "e2",
       "relation": "supplies_to",
       "source_ids": [
-        "trendforce_tsmc_pic_capacity_2026_07_08_s1",
-        "trendforce_tsmc_pic_capacity_2026_07_08_s3"
+        "trendforce_tsmc_pic_capacity_2026_07_08_s1"
       ],
       "src_id": "co:tsmc"
-    },
-    {
-      "attributes": {},
-      "confidence": 0.5,
-      "dst_id": "tech:mrm_200g",
-      "id": "e3",
-      "relation": "depends_on",
-      "source_ids": [
-        "trendforce_tsmc_pic_capacity_2026_07_08_s5"
-      ],
-      "src_id": "co:nvidia"
     }
   ],
   "nodes": [

@@ -124,8 +124,7 @@
     {
       "abstraction_level": "module_subsystem",
       "aliases": [
-        "CPO",
-        "NPO"
+        "CPO"
       ],
       "attributes": {},
       "confidence": 0.9,

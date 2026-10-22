@@ -78,10 +78,7 @@
     {
       "abstraction_level": "device_chip",
       "aliases": [
-        "400mW laser",
-        "ELS",
-        "ELSFP",
-        "external light source"
+        "400mW laser"
       ],
       "attributes": {},
       "confidence": 0.8,

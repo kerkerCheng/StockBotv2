@@ -139,8 +139,6 @@
       "abstraction_level": "network_systems",
       "role": null,
       "aliases": [
-        "scale-up networking",
-        "scale-out networking",
         "AI datacenter network"
       ],
       "attributes": {},

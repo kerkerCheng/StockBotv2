@@ -79,10 +79,6 @@
     {
       "abstraction_level": "network_systems",
       "aliases": [
-        "scale-up network",
-        "scale-out network",
-        "scale-up networking",
-        "scale-out networking",
         "AI datacenter network",
         "AI networking",
         "fabric solutions",

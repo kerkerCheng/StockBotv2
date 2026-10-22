@@ -165,17 +165,12 @@
       "name": "Leading-edge foundry/logic nodes (7nm and below)",
       "abstraction_level": "foundry_packaging",
       "role": null,
-      "aliases": [
-        "leading-edge",
-        "7nm and smaller"
-      ],
+      "aliases": [],
       "attributes": {
         "ramp_difficulty_intrinsic": 5
       },
       "confidence": 0.9,
-      "source_ids": [
-        "amat_10_k_20251212_s2"
-      ]
+      "source_ids": []
     },
     {
       "id": "tech:dram",
@@ -415,17 +410,6 @@
       "src_id": "tech:ai_compute_buildout",
       "dst_id": "tech:advanced_packaging",
       "relation": "enables",
-      "attributes": {},
-      "confidence": 0.9,
-      "source_ids": [
-        "amat_10_k_20251212_s15"
-      ]
-    },
-    {
-      "id": "amat_10_k_20251212_e10",
-      "src_id": "tech:hbm",
-      "dst_id": "tech:dram",
-      "relation": "is_variant_of",
       "attributes": {},
       "confidence": 0.9,
       "source_ids": [

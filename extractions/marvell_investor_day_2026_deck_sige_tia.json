@@ -126,9 +126,7 @@
       "abstraction_level": "module_subsystem",
       "aliases": [
         "CPO",
-        "co-packaged optics",
-        "NPO",
-        "near packaged optics"
+        "co-packaged optics"
       ],
       "attributes": {},
       "confidence": 0.95,
