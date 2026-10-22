@@ -194,6 +194,19 @@ def settle_due(data: dict[str, Any], company_id: str, *, brief_ids: Iterable[str
 # 寫入後的 hook（由 `alpha/providers/briefs.py` 呼叫：append 之前先在副本上預演一次，append 之後正式跑；冪等）
 # ---------------------------------------------------------------------------
 
+#: 敘事「在等」的兩個候選狀態——只有這兩種的敘事有喚醒 watch（`wake_brief`）。
+WAITING_STATES = frozenset({"missing", "priced_wait"})
+
+
+def _close_wake_brief(data: dict[str, Any], company_id: str, note: str, summary: list[str]) -> None:
+    """這家公司還 active 的喚醒 watch（`wake_brief`）收掉——敘事撤回或不再等的時候（failure log #34 ⑥）。"""
+    for watch in data["watches"]:
+        if watch.get("wake_brief") == company_id and watch.get("status") == "active":
+            watch["status"] = "consumed"
+            watch["closed"] = {"at": _now(), "note": note}
+            summary.append(str(watch["watch_id"]))
+
+
 def _close_active(data: dict[str, Any], prefixes: tuple[str, ...], note: str, summary: list[str]) -> None:
     for watch in data["watches"]:
         if not _src(watch).startswith(prefixes) or watch.get("status") != "active":
@@ -241,9 +254,15 @@ def register_brief_watches(record: Any, *, data: dict[str, Any], company_brief_i
     if record.retracted:
         if record.supersedes_id:
             _close_active(data, (f"brief:{record.supersedes_id}#",), f"retracted by {brief_id}", summary["consumed"])
+        _close_wake_brief(data, str(record.company_id), f"retracted by {brief_id}", summary["consumed"])
         return summary
     if older:
         _close_active(data, tuple(f"brief:{b}#" for b in older), f"superseded by {brief_id}", summary["consumed"])
+    state = getattr(getattr(record, "candidate_state", None), "state", None)
+    if state not in WAITING_STATES:
+        # 2026-10-22（failure log #34 ⑥）：新版不再缺 X／等回落——那家公司還在等的喚醒 watch 一併收掉；
+        # 之前只收 `brief:` 來源，喚醒 watch 沒有 source_ref，KLIC／MXL／HPS-A.TO／FORM 改判「不要」後仍在等。
+        _close_wake_brief(data, str(record.company_id), f"{brief_id} 宣告 {state}，不再等", summary["consumed"])
     for ack in record.acknowledged_touched:
         _apply_ack(data, ack.watch_id, ack.disposition, ack.note, brief_id)
         summary["acknowledged"].append(ack.watch_id)

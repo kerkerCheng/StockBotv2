@@ -197,6 +197,12 @@ fetchers/{edgar,mops,mfn,rns}.py ↑      engine_c/etl_yfinance.py → SQLite
 | **每日摘要**（2026-10-07 使用者指示：「心跳太雜」「心跳沒有不能跑 LLM，必要就跑」） | Windows daily 的 ⑪b–⑪e：⑪b `engine_b/digest.py prepare` 只送近 26 小時**外部來源**的 lead（我們自己登記的研究題只計數）與雷達收據，⑪c `claude -p` **零工具**（與分類同一組 argv）寫兩段 TL;DR，⑪e 驗證後只寫 `library/private/heartbeat/digest_<日期>.json` | `max_llm_calls.digest` 1；調 0 或 `llm.executor=none` 都能關 | 每一句的 `lead_ids` 只能是這一批裡的 id（指不回去整句丟、照數，L18）；每句 ≤160 字、每段上限 leads 4／events 3；**只摘要不判定、不寫任何 authority**。外部雷達同日多一個**市場層**（`radar.market_topics` 四題、各一次搜尋；收據每列 `scope`＝market／theme／watch）回答「AI capex 整個市場這週發生什麼」（使用者：「不能見樹不見林」）。⑱ 心跳以同一份快照組 **Discord 短版**（`crons/daily_brief.py`：lead 抓了什麼／市場大事／待你決定／狀態與健康度——每天印候選各格、watch 今日、反證、無到期的等待、新點名／下一次研究），⑱b 照抄進 APP「每日」頁（kind `daily`），⑲ 只送短版；完整五段照樣落檔給互動 session |
 | **研究** | 互動 session 手動 research-drain | 有 | daily 的 `drain_limit_per_run` 歸零 |
 
+> **2026-10-22（使用者「要確保以後的東西都不會被計數漏掉」）待做清單**：短版 ⑤ 與段 3 開頭共用 `engine_b/todo_ledger.py`
+> 的十八格（心跳算一次、計數進快照 `todo.*`）。計數一律呼叫既有的唯一判定（佇列段、分類缺口、影響對照、到期計數…），新增的
+> 只有「接不上的等待」三種與「騎舊讀圖」。**涵蓋登記表 `COVERAGE`**：lead、佇列段、watch、到期類型、pq2 派工、假說、thesis、
+> 候選組、讀圖狀態的每一個值都登記去處（⑤ 的格，或 ③／等事件／機械段／終局／研究題庫／Phase plan），測試從各字彙 SSOT 列舉
+> 比對——新狀態沒登記就紅。SessionStart 的 Phase 提示與 ⑤ 最後一行「下一步貼」是同一個函式（`next_prompt`）。
+
 > **2026-09-24（Phase 1 Step 1.8）心跳改版**：五段不增不減。段 2 第一行是**較昨變動**——⑱ 帶 `--write-snapshot` 寫
 > `library/private/heartbeat/snapshots/<日期>.json`（鍵是封閉清單 `crons/heartbeat.SNAPSHOT_KEYS`、留 14 天；derived、只給 diff，
 > **不是** current-state authority），只印變了的鍵。段 1 加備份／健康審查（⑭ capture）／invariants（⑮ capture）；段 2 的 watch 行改讀

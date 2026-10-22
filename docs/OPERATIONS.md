@@ -89,7 +89,11 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 **Discord 送的是短版**（2026-10-07 使用者：「心跳太雜」；`crons/daily_brief.py`）：① lead 抓了什麼 ② 市場大事
 （這兩塊是 ⑪c 的 TL;DR，沒產生就退回程式組的來源計數與雷達收據原文）③ 待你決定 ④ 狀態與健康度（**每天都印**：daily 步數、
 較昨變動、候選各格與最老滯留、watch 今日、反證與加碼條件、無到期的等待、新點名；同日使用者：「基本重要的 status 還是要印」）
-⑤ 下一次研究（未 triage／未檢／待深挖…，0 也印）。數字與心跳同一份快照、同一批函式；每一塊、④ 的每一行各自降級。
+⑤ 下一次研究——**歸零＝不漏球的唯一清單**（2026-10-22 起由 `engine_b/todo_ledger.py` 組：十八格、工作量與最老天數、0 的格列名字、
+讀不到另列；最後一行「下一步貼」由計數機械導出，全 0 時寫「今天沒有要貼的」）。每一種狀態落在哪一格（或為什麼不是研究待做）
+登記在同一檔的 `COVERAGE`，`tests/test_todo_ledger.py` 守著：新增狀態沒登記就紅。數字與心跳同一份快照、同一批函式；每一塊、④ 的每一行各自降級。
+① 的「新進」窗從上一次心跳起算（`engine_b.digest.window_start`；讀不到或超過 72 小時才退回 26 小時）。
+② 每則一行「事實 → 處置｜LLM 看過的結果」，逐格對照、LLM 原句、篩掉理由在完整心跳段 3「雷達收下的每一則」。
 完整五段照樣寫 `heartbeat_<日期>.md`（互動 session 說「daily brief」讀它），APP「每日」頁照抄短版。
 
 它**只讀**本機 authority（`pending_leads.json`／`todo_pool.json`／`event_watches.json`／

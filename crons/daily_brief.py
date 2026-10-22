@@ -25,6 +25,7 @@ from __future__ import annotations
 
 import json
 import re
+import sys
 from collections import Counter
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
@@ -32,6 +33,9 @@ from typing import Any, Mapping, Sequence
 
 ROOT = Path(__file__).resolve().parent.parent
 HEARTBEAT_DIR = ROOT / "library" / "private" / "heartbeat"
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+from engine_b.todo_ledger import LEDGER as _TODO_LEDGER  # noqa: E402
 
 #: lead 來源前綴 → 人話（沒列到的照原字）。只用來分組計數，不判斷任何事。
 SOURCE_LABELS: Mapping[str, str] = {
@@ -75,7 +79,8 @@ def _stamp(raw: Any) -> datetime | None:
     return moment if moment.tzinfo else moment.replace(tzinfo=timezone.utc)
 
 
-def processing_line(store: Mapping[str, Any], *, now: datetime, hours: int | None = None) -> str:
+def processing_line(store: Mapping[str, Any], *, now: datetime, hours: int | None = None,
+                    since: datetime | None = None) -> str:
     """① 的處理數字（2026-10-07 使用者：「Lead 抓了什麼 我們做了哪些處理的數字也要印」）。
 
     同一個時間窗（`engine_b.digest.WINDOW_HOURS`）：分類（`triage.decided_at` 在窗內；go／no-go、LLM／互動分開）、
@@ -84,7 +89,7 @@ def processing_line(store: Mapping[str, Any], *, now: datetime, hours: int | Non
 
     from engine_b.digest import WINDOW_HOURS
 
-    cutoff = now - timedelta(hours=hours or WINDOW_HOURS)
+    cutoff = since if since is not None else now - timedelta(hours=hours or WINDOW_HOURS)
     leads = [lead for lead in (store.get("leads") or {}).values() if isinstance(lead, Mapping)]
     go = no_go = by_llm = by_hand = by_rule = 0
     finished = {state: 0 for state in RESEARCH_TERMINAL_STATES}
@@ -269,11 +274,52 @@ def recent_radar_accepted(heartbeat_dir: Path, today: date, *, days: int = REPEA
     return out
 
 
+#: lead 現在的狀態 → ② 每則後面印的處置（固定幾個詞；2026-10-22）。
+LEAD_STATE_WORDS: Mapping[str, str] = {
+    "triaged_go": "go", "triaged_no_go": "篩掉", "pending": "還沒分類", "researching": "研究中", "parked": "停放",
+    "action_prepared": "入圖包等核准", "applied": "已入圖",
+}
+
+
+def _target_ticker(target: Any) -> str:
+    return str(target or "?").split("#", 1)[0]
+
+
+def radar_item_outcome(row: Mapping[str, Any] | None, proposals: Sequence[Mapping[str, Any]],
+                       status: str | None, *, impact_ran: bool = True) -> tuple[str, Counter]:
+    """一則雷達新聞「後來怎麼了」：處置（lead 現在的狀態）＋ LLM 看過的結果（無關也算，不藏——2026-10-22：只印「碰到」
+    看不到後來，就是使用者怕的「撈進來沒事」）。回（那一段字, 判定計數）。"""
+    verdicts: Counter = Counter(str(p.get("verdict")) for p in proposals)
+    head = LEAD_STATE_WORDS.get(str(status), str(status or "lead 不在"))
+    kind = (row or {}).get("absence_kind")
+    if proposals:
+        may = [_target_ticker(p.get("target")) for p in proposals if p.get("verdict") == "may_touch"]
+        bits = []
+        if may:
+            bits.append("可能有關 " + "、".join(dict.fromkeys(may)))
+        if verdicts.get("unclear"):
+            bits.append(f"看不出 {verdicts['unclear']} 格")
+        if verdicts.get("unrelated"):
+            bits.append(f"LLM 看過：無關 {verdicts['unrelated']} 格" if not may else f"無關 {verdicts['unrelated']} 格")
+        tail = "；".join(bits)
+    elif kind == "hub_only":
+        hubs = "／".join(str(h).removeprefix("co:") for h in (row or {}).get("hub_entities") or ())[:40]
+        tail = f"只經 {hubs or '大樞紐'}（大樞紐，沒逐格對）"
+    elif not impact_ran:
+        tail = "影響對照今天沒跑（不是沒碰到）"
+    elif kind == "untouched" or not row:
+        tail = "沒碰到我們"
+    else:
+        tail = "碰到了，但 LLM 今天沒看（超過上限或摘要失敗）"
+    return f"→ {head}｜{tail}", verdicts
+
+
 def events_block(*, digest: Mapping[str, Any] | None, receipt: Mapping[str, Any] | None,
                  digest_problem: str | None, radar_problem: str | None,
                  recent_accepted: Sequence[Mapping[str, Any]] = (),
                  lead_titles: Mapping[str, str] | None = None,
-                 impact: Mapping[str, Any] | None = None) -> list[str]:
+                 impact: Mapping[str, Any] | None = None,
+                 lead_states: Mapping[str, str] | None = None) -> list[str]:
     """② 市場大事：**今天雷達收下的每一則都列**（層別＋雷達寫的一句事實），沒收的附理由，跟前幾天收過的標題很像的標「可能是同一件事」。
 
     2026-10-08 使用者：「tldr 只有三則，但你說收四則……還是 tldr 就把收的都包含上去？如果沒收但想讓我知道的就再註明」。
@@ -290,9 +336,6 @@ def events_block(*, digest: Mapping[str, Any] | None, receipt: Mapping[str, Any]
         else:
             lines.append("- 今天沒有收下任何一則")
         return lines
-    lines = [f"**② 市場大事**（雷達搜 {summary.get('searches', '?')} 次、收 {summary.get('new', 0)} 則"
-             f"——市場 {summary.get('new_market', 0)}、主題 {summary.get('new_theme', 0)}、在盯 {summary.get('new_watch', 0)}"
-             + (f"；沒收 {len(rejected)} 則" if rejected else "") + "；收下的都進 lead、照常分類）"]
     accepted = [a for a in (receipt or {}).get("accepted") or () if isinstance(a, Mapping)]
     # 影響對照（雷達精進 C2）：確定性的「碰到」與 LLM 那一句都用 lead_id 對回這一則
     rows = {str(r.get("lead_id")): r for r in (impact or {}).get("rows") or () if isinstance(r, Mapping)}
@@ -300,16 +343,36 @@ def events_block(*, digest: Mapping[str, Any] | None, receipt: Mapping[str, Any]
     for p in (digest or {}).get("impacts") or ():
         if isinstance(p, Mapping):
             proposals.setdefault(str(p.get("lead_id")), []).append(p)
+    # 2026-10-22 使用者：「可不可以短一點 讓我知道你有在做事就好 我怕的是撈進來然後什麼也沒發生」——每則一行
+    # 「事實首句 → 處置｜LLM 看過的結果」；「碰到」的逐項、LLM 原句、篩掉理由在完整心跳段 3（雷達收下的每一則）。
+    body: list[str] = []
+    states: Counter = Counter()
+    seen: Counter = Counter()
     for item in accepted:
         scope = RADAR_SCOPE_WORDS.get(str(item.get("scope")), "主題")
-        line = f"- [{scope}] {_short(item.get('fact') or item.get('title') or item.get('url'), 110)}"
+        lead_id = str(item.get("lead_id") or "")
+        status = (lead_states or {}).get(lead_id)
+        outcome, verdicts = radar_item_outcome(rows.get(lead_id), proposals.get(lead_id, ()), status,
+                                               impact_ran=impact is not None and not (impact or {}).get("error"))
+        states[LEAD_STATE_WORDS.get(str(status), "lead 不在")] += 1
+        seen.update(verdicts)
+        first = re.split(r"[，。；,;]", str(item.get("fact") or item.get("title") or item.get("url") or ""), maxsplit=1)[0]
+        line = f"- [{scope}] {_short(first, 60)} {outcome}"
         repeat = _possible_repeat(item, recent_accepted)
         if repeat is not None:
-            line += f"（⚠ 可能跟 {str(repeat.get('_date', ''))[5:]} 收過的是同一件事：{_short(repeat.get('title'), 50)}）"
-        lines.append(line)
-        lead_id = str(item.get("lead_id") or "")
-        lines.extend(impact_touch_lines(rows.get(lead_id), proposals.get(lead_id, ())))
-    if not accepted:
+            line += f"（⚠ 可能跟 {str(repeat.get('_date', ''))[5:]} 收過的是同一件事）"
+        body.append(line)
+    after = "、".join(f"{word} {n}" for word, n in states.most_common())
+    judged = sum(seen.values())
+    looked = (f"；碰到我們的 {judged} 對 LLM 看過：可能有關 {seen.get('may_touch', 0)}、看不出 {seen.get('unclear', 0)}、"
+              f"無關 {seen.get('unrelated', 0)}") if judged else ""
+    lines = [f"**② 市場大事**（雷達搜 {summary.get('searches', '?')} 次、收 {summary.get('new', 0)} 則"
+             f"——市場 {summary.get('new_market', 0)}、主題 {summary.get('new_theme', 0)}、在盯 {summary.get('new_watch', 0)}"
+             + (f"；沒收 {len(rejected)} 則" if rejected else "") + (f"｜之後：{after}{looked}" if accepted else "") + "）"]
+    lines.extend(body)
+    if accepted:
+        lines.append("- go 的已算進 ⑤「待深挖」；「可能有關」等研究那則 lead 時判定；原句、逐格對照與篩掉理由在完整心跳段 3")
+    else:
         lines.append("- 今天沒有收下任何一則")
     for item in rejected[:5]:
         why = RADAR_REJECT_WORDS.get(str(item.get("reason")), str(item.get("reason") or "?"))
@@ -435,22 +498,55 @@ def health_block(*, record: Mapping[str, Any] | None, record_problem: str | None
 
 
 #: ⑤ 的常駐計數器（快照鍵 → 人話）。**0 也印**（L14：會自己出現的計數器）。
-TODO_COUNTERS: tuple[tuple[str, str], ...] = (
-    ("lead.pending", "未 triage"), ("semantic.pending_check", "未檢"), ("t2.hits_pending", "T2 命中待檢"),
-    ("lead.triaged_go", "待深挖 lead"), ("reading.needs_reread", "讀圖該重讀"), ("layer_note.reread", "層說明該重讀"),
-    ("disproof.touched_pending", "反證觸及待處置"), ("confirm.touched_pending", "加碼條件觸及待處置"),
-    ("pq2.source_trace_review", "等你提供的文件"),
-)
+#: ⑤ 的格（2026-10-22 起由 `engine_b.todo_ledger.LEDGER` 導出——「歸零就不漏球」的唯一清單；涵蓋登記表與測試在那裡）。
+#: 「等你提供的文件」是使用者的動作，只住 ③b，不再算進「下一次研究要做的」。
+TODO_COUNTERS: tuple[tuple[str, str], ...] = tuple((row.key, row.label) for row in _TODO_LEDGER)
 
 
-def todo_block(snapshot: Mapping[str, Any]) -> list[str]:
-    cells = [f"{label} {'未讀到' if snapshot.get(key) is None else snapshot.get(key)}" for key, label in TODO_COUNTERS]
-    return ["**⑤ 下一次研究要做的**", "- " + "｜".join(cells)]
+def todo_block(snapshot: Mapping[str, Any], ledger: Sequence[Any] | None = None,
+               next_line: str | None = None) -> list[str]:
+    """⑤：有 ledger 印逐格（工作量、最老天數、0 的格）；組不出來退回快照計數。最後一行「下一步貼」。"""
+    from engine_b.todo_ledger import render_cells
+
+    lines = ["**⑤ 下一次研究要做的**（歸零＝不漏球；每一種狀態落在哪一格見 engine_b/todo_ledger.py 的涵蓋登記表）"]
+    if ledger is not None:
+        lines.extend(render_cells(ledger))
+    else:
+        cells = [f"{label} {'未讀到' if snapshot.get(key) is None else snapshot.get(key)}" for key, label in TODO_COUNTERS]
+        lines.append("- " + "｜".join(cells) + "（清單組不出來，只有計數）")
+    if next_line:
+        lines.append(f"- **下一步貼**：{next_line}")
+    return lines
+
+
+def next_step_line(*, snapshot: Mapping[str, Any], ledger: Sequence[Any] | None, now: datetime) -> str:
+    """「下一步貼」：③ 有建議的批次行、研究計數、Phase 下一步、題材到期——全部機械導出（`todo_ledger.next_prompt`）。"""
+    from crons import heartbeat as hb
+    from crons import phase_status_hint
+    from engine_b import todo as todo_mod
+    from engine_b.todo_ledger import next_prompt
+
+    batch = None
+    try:
+        batch, _missing = hb.recommended_batch(todo_mod.actionable_items(todo_mod.load()))
+    except Exception:  # noqa: BLE001
+        batch = None
+    try:
+        phase_step = phase_status_hint.active_step_text()
+    except Exception:  # noqa: BLE001
+        phase_step = None
+    try:
+        _line, theme_due = hb.theme_scan_line(now=now)
+    except Exception:  # noqa: BLE001
+        theme_due = False
+    counts = ledger if ledger is not None else {key: snapshot.get(key) for key, _ in TODO_COUNTERS}
+    return next_prompt(counts, decision_batch=batch, phase_step=phase_step, theme_due=bool(theme_due))
 
 
 def compose_brief(*, now: datetime, summary: str, snapshot: Mapping[str, Any], run_record_path: Path | None,
                   leads_path: Path | None = None, heartbeat_dir: Path = HEARTBEAT_DIR,
-                  diff_lines: Sequence[str] = (), state_dir: Path | None = None) -> str:
+                  diff_lines: Sequence[str] = (), state_dir: Path | None = None,
+                  ledger: Sequence[Any] | None = None) -> str:
     """組 Discord 那一則（markdown）。每一塊各自降級：組不出來就印一行理由，不讓整則消失（L13）；
     ④ 的每一行也各自降級（候選板 artifact 讀不到不帶走 watch 那一行）。"""
     from crons import heartbeat as hb
@@ -483,16 +579,18 @@ def compose_brief(*, now: datetime, summary: str, snapshot: Mapping[str, Any], r
         from engine_b import leads as leads_mod
 
         store = leads_mod.load(leads_path) if leads_path else leads_mod.load()
+        # 窗從上一次心跳起算（2026-10-22：固定 26 小時每天重算前一輪）——①、處理數字、TL;DR 材料同一個起點
+        since = digest_mod.window_start(now, snapshot_dir=heartbeat_dir / "snapshots")
         try:
-            processing = processing_line(store, now=now)
+            processing = processing_line(store, now=now, since=since)
         except Exception as exc:  # noqa: BLE001 — 這一行算不出來就說，不帶走整塊
             processing = f"- 處理：算不出來（{type(exc).__name__}）"
         try:
             impact_line = impact_total_line(impact, digest)
         except Exception as exc:  # noqa: BLE001
             impact_line = f"- 對照：算不出來（{type(exc).__name__}）"
-        return leads_block(digest=digest, todays=digest_mod.select_leads(store, now=now), digest_problem=digest_problem,
-                           since=now - timedelta(hours=digest_mod.WINDOW_HOURS), processing=processing,
+        return leads_block(digest=digest, todays=digest_mod.select_leads(store, now=now, since=since),
+                           digest_problem=digest_problem, since=since, processing=processing,
                            impact_line=impact_line)
 
     def decisions_part() -> list[str]:
@@ -544,14 +642,32 @@ def compose_brief(*, now: datetime, summary: str, snapshot: Mapping[str, Any], r
         except Exception:  # noqa: BLE001 — 標題讀不到就印網址，不帶走整塊
             return {}
 
+    def radar_states() -> dict[str, str]:
+        try:
+            from engine_b import leads as leads_mod
+
+            store = leads_mod.load(leads_path) if leads_path else leads_mod.load()
+            ids = {str(a.get("lead_id")) for a in (receipt or {}).get("accepted") or () if isinstance(a, Mapping)}
+            return {lid: str(((store.get("leads") or {}).get(lid) or {}).get("status") or "") for lid in ids}
+        except Exception:  # noqa: BLE001 — 讀不到就印「lead 不在」，不帶走整塊
+            return {}
+
     blocks.append(guarded("② 市場大事", lambda: events_block(
         digest=digest, receipt=receipt, digest_problem=digest_problem, radar_problem=radar_problem,
-        recent_accepted=recent_radar_accepted(heartbeat_dir, today), lead_titles=rejected_titles(), impact=impact)))
+        recent_accepted=recent_radar_accepted(heartbeat_dir, today), lead_titles=rejected_titles(), impact=impact,
+        lead_states=radar_states())))
     blocks.append(guarded("③ 待你決定", decisions_part))
     blocks.append(guarded("④ 狀態與健康度", status_part))
-    blocks.append(guarded("⑤ 下一次研究要做的", lambda: todo_block(snapshot)))
+    def todo_part() -> list[str]:
+        try:
+            nxt = next_step_line(snapshot=snapshot, ledger=ledger, now=now)
+        except Exception as exc:  # noqa: BLE001 — 下一步組不出來不帶走 ⑤
+            nxt = f"組不出來（{type(exc).__name__}）——看上面哪一格不是 0"
+        return todo_block(snapshot, ledger, nxt)
+
+    blocks.append(guarded("⑤ 下一次研究要做的", todo_part))
     if digest:
-        blocks.append(["_TL;DR 與「↳ 提議」是 LLM 寫的提議、每句指得回當天的 lead；「↳ 碰到」是名字比對；判定只在互動 session。_"])
+        blocks.append(["_TL;DR 與「可能有關／無關」是 LLM 寫的提議、每句指得回當天的 lead；判定只在互動 session。_"])
     return "\n\n".join("\n".join(block) for block in blocks).rstrip() + "\n"
 
 

@@ -321,7 +321,8 @@ def test_retired_panels_declare_an_absence_instead_of_disappearing(tmp_path: Pat
     changes = "\n".join(hb.build_changes(now=now, state_dir=state_dir, thesis_path=tmp_path / "nope.json").lines)
     positions = "\n".join(hb.build_positions(state_dir=state_dir).lines)
     assert "候選：可開 0｜缺 X 0｜等回落 1（最老 0 天）｜不要 0｜已持有 0" in changes, changes
-    assert "無敘事 2" in changes and "持股解析不到 1（使用者決定不研究 0）：7803.T" in changes
+    # 2026-10-22：「無敘事」拆開——沒有邊緣判定的兩列算「量不到卻沒敘事」（待做，⑤ 也有），不是非倍率
+    assert "量不到卻沒敘事 2" in changes and "持股解析不到 1（使用者決定不研究 0）：7803.T" in changes
     assert "三題（3 檔）：已定價① 有值 1／缺席 2" in changes and "不是結論" in changes
     # 盞數與有紅燈的檔分開、灰依 kind 分——灰不是綠（ARCHITECTURE §4.1 段 4）
     assert ("歸零旗標 3 檔 × 4 盞：紅 1｜黃 4｜綠 3｜**灰（沒量到）4**（insufficient_evidence 1、not_yet_recorded 3）"

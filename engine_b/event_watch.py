@@ -682,6 +682,10 @@ def past_expiry(watch: Mapping[str, Any], *, today: date | None = None) -> bool:
         return False
 
 
+#: `expiry_class` 回得出的值（封閉；`engine_b.todo_ledger.COVERAGE` 逐一登記去處，測試比對這裡與函式本體——2026-10-22）。
+EXPIRY_CLASSES: frozenset[str] = frozenset({"pq2", "trace", "reading", "rewrite", "thesis_review", "reread", "decision"})
+
+
 def expiry_class(watch: Mapping[str, Any]) -> str:
     """到期要怎麼處置（Phase 1 Step 1.7；到期成批的設計 B，使用者 2026-09-24）：
 

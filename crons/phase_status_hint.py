@@ -98,6 +98,43 @@ def _model_text(step: dict[str, str] | None, note: str) -> str:
     return f"便宜（對照表註記優先{'：' + note if note else ''}）"
 
 
+def active_step_text() -> str | None:
+    """active plan 的下一個 Step（含建議模型）；沒有唯一 active plan 或讀不到回 None。短版「下一步貼」也用它。"""
+    rows = _phase_rows(PLANS_README.read_text(encoding="utf-8"))
+    active = [r for r in rows if _is_active(r["status"])]
+    if len(active) != 1:
+        return None
+    step = _next_step(ROOT / "docs" / "plans" / active[0]["plan"]) if active[0]["plan"] else None
+    if not step:
+        return None
+    note = active[0]["status"].strip()[len("active"):].strip()
+    return f"{step['step']}（建議模型：{_model_text(step, note).split('（')[0]}）"
+
+
+def _todo_counts() -> dict[str, int | None] | None:
+    """今天 daily 快照裡的待做計數（`todo.*`）；沒有今天的快照回 None（不猜，照舊推 /phase-run）。"""
+    from datetime import date
+
+    path = ROOT / "library" / "private" / "heartbeat" / "snapshots" / f"{date.today().isoformat()}.json"
+    try:
+        values = json.loads(path.read_text(encoding="utf-8")).get("values") or {}
+    except (OSError, ValueError):
+        return None
+    counts = {k: v for k, v in values.items() if str(k).startswith("todo.")}
+    return counts or None
+
+
+def _paste_text(step_text: str | None) -> str:
+    """「貼什麼」：與短版 ⑤ 最後一行同一個判斷（`engine_b.todo_ledger.next_prompt`）；讀不到計數照舊推 /phase-run。"""
+    counts = _todo_counts()
+    if counts is None:
+        return "貼 /phase-run"
+    sys.path.insert(0, str(ROOT))
+    from engine_b.todo_ledger import next_prompt
+
+    return "下一步貼（照今天 daily 的計數）：" + next_prompt(counts, phase_step=step_text)
+
+
 def main() -> int:
     try:
         rows = _phase_rows(PLANS_README.read_text(encoding="utf-8"))
@@ -111,9 +148,13 @@ def main() -> int:
         step = _next_step(ROOT / "docs" / "plans" / plan["plan"]) if plan["plan"] else None
         # 狀態欄的註記照抄（例：Phase 4「執行者全程強模型」）——「建議模型：便宜」是對照表的預設分工，註記優先。
         note = plan["status"].strip()[len("active"):].strip()
+        try:
+            paste = _paste_text(f"{step['step']}" if step else None)
+        except Exception:  # noqa: BLE001 — 判斷不出來照舊
+            paste = "貼 /phase-run"
         msg = (
             f"🧭 Phase {plan['phase']} 執行中｜下一個 Step：{_step_text(step)}"
-            f"｜建議模型：{_model_text(step, note)}｜貼 /phase-run"
+            f"｜建議模型：{_model_text(step, note)}｜{paste}"
         )
     elif len(active) > 1:
         msg = "🧭 對照表有兩份以上 active plan——先修 docs/plans/README.md 再開工"

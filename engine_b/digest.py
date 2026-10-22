@@ -50,8 +50,34 @@ MAX_TEXT_CHARS = 160
 #: 一輪最多給 LLM 幾則 lead、每則摘錄多長（daily 的 harvest 一天一百則上下；超過的照數、列在批次檔裡）。
 MAX_LEADS = 150
 EXCERPT_CHARS = 240
-#: 「今天這一輪」的窗：排程每天一次，往回 26 小時（多 2 小時給跑得晚的那一天）。
+#: 「今天這一輪」的窗：**從上一次心跳起算**（`window_start`）；沒有上一份快照才退回往回 26 小時。
+#: ⚠ 2026-10-22：固定 26 小時每天都把前一天 05:30 那一輪包進來（daily 06:24 組短版，往回 26 小時是前一天 04:24）——
+#: 10-21 重算 48 則、10-22 重算 41 則，TL;DR 有一整條重講昨天的新聞。
 WINDOW_HOURS = 26
+#: 上一份快照比現在早超過這麼多小時（例：daily 停了幾天）就不信它，退回 26 小時——不讓窗無限張開。
+WINDOW_MAX_HOURS = 72
+SNAPSHOT_DIR = OUT_DIR / "snapshots"
+
+
+def window_start(now: datetime, *, snapshot_dir: Path | None = None) -> datetime:
+    """「新進」窗的起點：上一份心跳快照（日期早於今天）的 `generated_at`——上一輪組短版的那一刻。
+    讀不到、或早於 `WINDOW_MAX_HOURS`，退回 `now − WINDOW_HOURS`。"""
+    fallback = now - timedelta(hours=WINDOW_HOURS)
+    directory = snapshot_dir or SNAPSHOT_DIR
+    today = now.astimezone().date().isoformat()
+    try:
+        names = sorted(p.stem for p in directory.glob("*.json") if len(p.stem) == 10 and p.stem < today)
+        if not names:
+            return fallback
+        stamp = json.loads((directory / f"{names[-1]}.json").read_text(encoding="utf-8")).get("generated_at")
+        start = datetime.fromisoformat(str(stamp).replace("Z", "+00:00"))
+    except (OSError, ValueError, TypeError):
+        return fallback
+    if start.tzinfo is None:
+        start = start.replace(tzinfo=timezone.utc)
+    if start >= now or now - start > timedelta(hours=WINDOW_MAX_HOURS):
+        return fallback
+    return start
 DROP_REASONS: Mapping[str, str] = {
     "invalid": "欄位不合法（段別、文字或引用是空的）",
     "unknown_ref": "引用的 lead id 不在這一輪的資料裡",
@@ -94,9 +120,11 @@ def is_external(lead: Mapping[str, Any]) -> bool:
     return str(lead.get("source_class") or "") in EXTERNAL_CLASSES
 
 
-def select_leads(store: Mapping[str, Any], *, now: datetime, hours: int = WINDOW_HOURS) -> list[Mapping[str, Any]]:
-    """這一輪的 lead：窗內**新進**的，加上窗內**剛分流**的（分流結果是今天做了什麼的一部分）。依首見時間新到舊。"""
-    since = now - timedelta(hours=hours)
+def select_leads(store: Mapping[str, Any], *, now: datetime, hours: int = WINDOW_HOURS,
+                 since: datetime | None = None) -> list[Mapping[str, Any]]:
+    """這一輪的 lead：窗內**新進**的，加上窗內**剛分流**的（分流結果是今天做了什麼的一部分）。依首見時間新到舊。
+    `since`：窗的起點（正式路徑給 `window_start(now)`）；沒給才用 `now − hours`。"""
+    since = since if since is not None else now - timedelta(hours=hours)
     picked = []
     for lead in (store.get("leads") or {}).values():
         seen = _stamp(lead.get("first_seen"))
@@ -223,7 +251,7 @@ def prepare(run_id: str, out: Path, *, now: datetime | None = None, store: Mappi
     now = now or datetime.now(timezone.utc)
     today = now.astimezone().date()
     store = store if store is not None else leads.load()
-    picked = select_leads(store, now=now)
+    picked = select_leads(store, now=now, since=window_start(now))
     receipt_path = receipt_dir / f"radar_{today.isoformat()}.json"
     receipt = json.loads(receipt_path.read_text(encoding="utf-8")) if receipt_path.is_file() else None
     radar_ids = {str(a.get("lead_id")) for a in (receipt or {}).get("accepted") or () if a.get("lead_id")}

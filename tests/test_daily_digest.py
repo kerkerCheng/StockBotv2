@@ -222,7 +222,9 @@ def test_the_daily_passes_the_impacts_list_through_and_the_schema_matches_the_vo
     assert '"side_lists": ("impacts",)' in inspect.getsource(daily_task.DailyRun._llm_task)
 
 
-def test_the_brief_prints_what_each_radar_item_touched_and_the_proposal_but_not_unrelated_ones() -> None:
+def test_the_brief_prints_one_line_per_radar_item_with_what_happened_after() -> None:
+    """2026-10-22 使用者：「可不可以短一點 讓我知道你有在做事就好 我怕的是撈進來然後什麼也沒發生」——每則一行
+    「事實首句 → 處置｜LLM 看過的結果」，判「無關」的不再藏起來（藏了就只看得到碰到、看不到後來）。"""
     from crons.daily_brief import events_block, impact_total_line
 
     receipt = {"summary": {"new": 2}, "accepted": [{"lead_id": "lead_r", "scope": "market", "fact": "LG 簽冷水機長約"},
@@ -236,18 +238,21 @@ def test_the_brief_prints_what_each_radar_item_touched_and_the_proposal_but_not_
         {"lead_id": "lead_r", "target": "ew_1", "verdict": "may_touch", "sentence": "冷水機長約化碰到反證第 1 條"},
         {"lead_id": "lead_r", "target": "AAON#demand", "verdict": "unrelated", "sentence": "不相關"}],
         "summary": {"impact": {"kept": 2, "candidates": 4, "truncated": 0, "unknown_pair": 1}}}
-    lines = events_block(digest=saved, receipt=receipt, digest_problem=None, radar_problem=None, impact=impact)
-    at = lines.index("- [市場] LG 簽冷水機長約")
-    assert lines[at + 1] == ("  ↳ 碰到：敘事 AAON〔demand 格〕、X〔本身〕、Y〔騎讀圖〕 另 1 份；在盯 反證 1／加碼 0；"
-                             "另經 nvidia 碰到 敘事 12、在盯 3（樞紐只計數）")
-    assert lines[at + 2] == "  ↳ 提議（ew_1）：冷水機長約化碰到反證第 1 條"
-    assert lines[at + 3] == "- [主題] 沒碰到的一則"                    # 沒碰到的不加行；不相關的提議不印
+    lines = events_block(digest=saved, receipt=receipt, digest_problem=None, radar_problem=None, impact=impact,
+                         lead_states={"lead_r": "triaged_go", "lead_q": "triaged_no_go"})
+    assert "之後：go 1、篩掉 1；碰到我們的 2 對 LLM 看過：可能有關 1、看不出 0、無關 1" in lines[0]
+    assert lines[1] == "- [市場] LG 簽冷水機長約 → go｜可能有關 ew_1；無關 1 格"
+    assert lines[2] == "- [主題] 沒碰到的一則 → 篩掉｜沒碰到我們"
+    assert lines[3].startswith("- go 的已算進 ⑤「待深挖」")
+    assert not any("↳" in x for x in lines)                                 # 細節在完整心跳段 3，不在短版
     assert impact_total_line(impact, saved) == ("- 對照：外部 5 則裡碰到敘事 1、讀圖 0、在盯條件 1 則；只經樞紐 1、沒碰到 3"
                                                 "｜LLM 提議 2 句（候選 4 對、丟 1）")
     many = [{"lead_id": "lead_r", "target": f"ew_{i}", "verdict": "unclear", "sentence": f"第 {i} 句"} for i in range(4)]
     capped = events_block(digest={**saved, "impacts": many}, receipt=receipt, digest_problem=None, radar_problem=None,
                           impact=impact)
-    assert "  ↳ 提議・不確定（ew_1）：第 1 句" in capped and "  ↳ 另 2 句提議見心跳落檔" in capped
+    assert capped[1] == "- [市場] LG 簽冷水機長約 → lead 不在｜看不出 4 格"
+    blind = events_block(digest=saved, receipt=receipt, digest_problem=None, radar_problem=None, impact=None)
+    assert blind[2].endswith("影響對照今天沒跑（不是沒碰到）")                  # 沒跑 ≠ 沒碰到（INV-3）
     assert impact_total_line(None, saved).startswith("- 對照：今天沒有對照檔")
     assert "沒算出來" in impact_total_line({"error": "RuntimeError: x"}, None)
     assert impact_total_line(impact, None).endswith("｜LLM 提議：摘要今天沒產生")
@@ -327,7 +332,7 @@ def test_the_brief_prints_the_llm_sentences_when_there_are_some(tmp_path) -> Non
     receipt = {"summary": {"searches": 11, "new": 1, "new_market": 1, "new_theme": 0, "new_watch": 0},
                "accepted": [{"scope": "market", "title": "LG lands deal", "fact": "LG 與 AIR 簽冷水機長約", "lead_id": "lead_r"}]}
     lines = events_block(digest=saved, receipt=receipt, digest_problem=None, radar_problem=None)
-    assert "雷達搜 11 次、收 1 則——市場 1" in lines[0] and lines[1] == "- [市場] LG 與 AIR 簽冷水機長約"
+    assert "雷達搜 11 次、收 1 則——市場 1" in lines[0] and lines[1].startswith("- [市場] LG 與 AIR 簽冷水機長約 →")
     assert "LG 拿到冷水機長約" not in "\n".join(lines)
 
 
@@ -341,7 +346,7 @@ def test_without_a_digest_the_brief_says_why_and_falls_back_to_program_content()
     receipt = {"summary": {"searches": 9, "new": 1, "new_market": 1},
                "accepted": [{"scope": "market", "title": "LG lands deal", "fact": "LG 簽冷水機長約"}]}
     lines = events_block(digest=None, receipt=receipt, digest_problem="沒產生", radar_problem=None)
-    assert lines[-1] == "- [市場] LG 簽冷水機長約"
+    assert lines[1].startswith("- [市場] LG 簽冷水機長約 →")
     lines = events_block(digest=None, receipt=None, digest_problem="沒產生", radar_problem="01c rate_limited")
     assert "沒有收據：01c rate_limited" in lines[0] and lines[-1] == "- 今天沒有收下任何一則"
 
@@ -364,7 +369,7 @@ def test_market_events_list_every_item_the_radar_took_say_what_it_left_and_flag_
               {"title": "TSMC hits another record but Nvidia and Apple demand may become its next problem", "_date": "2026-10-07"}]
     digest_saved = {"events": [{"text": "台積電 2 奈米訂單上調", "lead_ids": ["lead_tsmc_yesterday"]}]}
     lines = events_block(digest=digest_saved, receipt=receipt, digest_problem=None, radar_problem=None, recent_accepted=recent)
-    assert "收 4 則" in lines[0] and "沒收 1 則" in lines[0] and "收下的都進 lead" in lines[0]
+    assert "收 4 則" in lines[0] and "沒收 1 則" in lines[0] and "之後：" in lines[0]
     body = lines[1:]
     assert len([x for x in body if x.startswith("- [")]) == 4                       # 收下的每一則都列
     assert not any("台積電" in x for x in body)                                       # 前一天收的不會被夾進來
@@ -423,11 +428,19 @@ def test_the_research_counters_print_zero_and_say_when_they_could_not_be_read() 
     """AGENTS：「未 triage N」「未檢 N」必印（L13）——字照 AGENTS 寫，0 也印，讀不到印「未讀到」不印 0。"""
     from crons.daily_brief import TODO_COUNTERS, todo_block
 
+    # 2026-10-22 起 ⑤ 讀 engine_b.todo_ledger（ledger 組不出來時退回快照計數，仍是這一行）
     snapshot = {key: 0 for key, _label in TODO_COUNTERS}
-    snapshot["lead.pending"] = 102
-    snapshot["semantic.pending_check"] = None
+    snapshot["todo.pending_triage"] = 102
+    snapshot["todo.semantic"] = None
     line = todo_block(snapshot)[1]
     assert "未 triage 102" in line and "未檢 未讀到" in line and "讀圖該重讀 0" in line
+    from engine_b.todo_ledger import LedgerCount
+
+    rows = [LedgerCount(key, label, 0) for key, label in TODO_COUNTERS]
+    rows[0].count, rows[3].count = 102, None
+    lines = todo_block(snapshot, rows, next_line="`/research-drain`")
+    assert "未 triage 102" in lines[1] and "讀圖該重讀" in lines[2] and "未讀到（不是 0）：未檢" in lines[3]
+    assert lines[-1] == "- **下一步貼**：`/research-drain`"
 
 
 def test_status_lines_always_print_the_basic_counters_even_on_a_quiet_day() -> None:
@@ -615,3 +628,23 @@ def test_the_brief_puts_document_requests_in_their_own_block(tmp_path, monkeypat
     assert "InP 磊晶片層建層" in decisions and "全新光電" not in decisions
     assert "全新光電券商報告" in documents and "提供文件才算 go" in documents and "drop" in documents
     assert "- 處理：" in text.split("**② 市場大事**", 1)[0]
+
+
+def test_the_window_starts_at_the_previous_heartbeat_not_26_hours_back(tmp_path) -> None:
+    """2026-10-22：固定 26 小時每天把前一天那一輪（05:30）包進來——10-21 重算 48 則、10-22 重算 41 則。"""
+    import json
+    from datetime import datetime, timedelta, timezone
+
+    snaps = tmp_path / "snapshots"
+    snaps.mkdir()
+    now = datetime(2026, 10, 21, 22, 24, tzinfo=timezone.utc)                  # 台北 10-22 06:24
+    assert digest.window_start(now, snapshot_dir=snaps) == now - timedelta(hours=digest.WINDOW_HOURS)
+    (snaps / "2026-10-21.json").write_text(json.dumps({"generated_at": "2026-10-20T22:08:00+00:00"}), encoding="utf-8")
+    (snaps / "2026-10-22.json").write_text(json.dumps({"generated_at": "2026-10-21T22:24:00+00:00"}), encoding="utf-8")
+    start = digest.window_start(now, snapshot_dir=snaps)
+    assert start == datetime(2026, 10, 20, 22, 8, tzinfo=timezone.utc)        # 昨天那一份，不是今天自己
+    store = {"leads": {"old": {"lead_id": "old", "first_seen": "2026-10-20T21:30:00+00:00"},
+                       "new": {"lead_id": "new", "first_seen": "2026-10-21T21:30:00+00:00"}}}
+    assert [l["lead_id"] for l in digest.select_leads(store, now=now, since=start)] == ["new"]
+    later = now + timedelta(days=5)                                           # daily 停了幾天：不讓窗無限張開
+    assert digest.window_start(later, snapshot_dir=snaps) == later - timedelta(hours=digest.WINDOW_HOURS)

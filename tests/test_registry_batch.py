@@ -80,7 +80,12 @@ def test_tier_mark_and_draft_build_an_entry_that_the_registry_loader_accepts(mon
         rb.mark_supply(data, ["XXXX"], note="n")
     rb.mark_supply(data, ["AIXA.DE"], note="lead_x：MOCVD 設備供給 InP 磊晶廠")
     assert rb.tier_summary([{"suggested_tickers": ["AIXA.DE"]}, {"suggested_tickers": []}], data) == {
-        "edge_supply": 1, "edge_other": 0, "not_edge": 0, "unmeasurable": 0, "untiered": 1}
+        "edge_supply": 1, "edge_other": 0, "edge_not_supply": 0, "edge_unmarked": 0, "not_edge": 0,
+        "unmeasurable": 0, "untiered": 1}
+    # 2026-10-22：「標了不是供給側」與「沒標」分兩格（舊版合成一格印「邊緣未標」，7 檔全標過 False 卻像沒人看）
+    rows = {"A": {"edge_state": "edge", "supply_side": {"value": False}}, "B": {"edge_state": "edge"}}
+    split = rb.tier_summary([{"suggested_tickers": ["A"]}, {"suggested_tickers": ["B"]}], {"rows": rows})
+    assert (split["edge_not_supply"], split["edge_unmarked"], split["edge_other"]) == (1, 1, 2)
     # 重判邊緣不洗掉人的標記
     data = rb.tier(["AIXA.DE"], fetch_info=_info, tiers=data)
     assert data["rows"]["AIXA.DE"]["supply_side"]["value"] is True

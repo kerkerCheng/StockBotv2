@@ -126,9 +126,12 @@ def mark_supply(data: dict[str, Any], tickers: Iterable[str], *, note: str, supp
 
 
 def tier_summary(candidates: Iterable[Mapping[str, Any]], data: Mapping[str, Any]) -> dict[str, int]:
-    """心跳那一行的分格：邊緣供給側／邊緣未標或非供給側／非邊緣／量不到／還沒分層（人打字串沒有代號的算還沒分層）。"""
+    """心跳那一行的分格：邊緣供給側／邊緣非供給側（標了 False）／邊緣未標（真的沒標）／非邊緣／量不到／還沒分層
+    （人打字串沒有代號的算還沒分層）。⚠ 2026-10-22：「標了不是供給側」與「沒標」原本同一格印成「邊緣未標」——7 檔全都
+    標過 False，卻讓人以為還有 7 家沒人看（L12）。`edge_other` 留著＝兩者合計（舊讀者不斷）。"""
     rows = data.get("rows") or {}
-    out = {"edge_supply": 0, "edge_other": 0, "not_edge": 0, "unmeasurable": 0, "untiered": 0}
+    out = {"edge_supply": 0, "edge_other": 0, "edge_not_supply": 0, "edge_unmarked": 0, "not_edge": 0,
+           "unmeasurable": 0, "untiered": 0}
     for cand in candidates:
         tickers = cand.get("suggested_tickers") or ()
         row = next((rows[t] for t in tickers if t in rows), None)
@@ -136,7 +139,11 @@ def tier_summary(candidates: Iterable[Mapping[str, Any]], data: Mapping[str, Any
             out["untiered"] += 1
         elif row.get("edge_state") == "edge":
             supply = (row.get("supply_side") or {}).get("value")
-            out["edge_supply" if supply else "edge_other"] += 1
+            if supply:
+                out["edge_supply"] += 1
+            else:
+                out["edge_other"] += 1
+                out["edge_not_supply" if supply is False else "edge_unmarked"] += 1
         elif row.get("edge_state") == "not_edge":
             out["not_edge"] += 1
         else:

@@ -82,6 +82,7 @@ from alpha.candidates import GROUP_LABELS as CANDIDATE_GROUP_LABELS  # noqa: E40
 from alpha.candidates import GROUPS as CANDIDATE_GROUPS  # noqa: E402
 from alpha.candidates import SIDE_GROUPS as CANDIDATE_SIDE_GROUPS  # noqa: E402
 from alpha.candidates import SIDE_LABELS as CANDIDATE_SIDE_LABELS  # noqa: E402
+from engine_b.todo_ledger import LEDGER as TODO_LEDGER  # noqa: E402
 
 #: 段序是封閉字彙：**五段，不多不少**。ARCHITECTURE §4.1 是它的規格來源。
 SECTION_TITLES: tuple[str, ...] = (
@@ -837,10 +838,19 @@ def _candidate_lines(state_dir: Path | None) -> list[str]:
         return f"{n}（最老 {d} 天）" if n and d is not None else f"{n}"
 
     held = "未驗（持股未讀到）" if counts.get("held") is None else str(counts.get("held"))
+    # 2026-10-22 使用者：「無敘事 75 你是說那都是我們決定不開，那為啥不是非倍率候選？」——75 檔全是非邊緣：程式先問
+    # 「有沒有敘事」，沒有就不再判邊緣，同一件事拆進兩格（L12）。改成非倍率合一格、再拆有沒有舊敘事；
+    # 真正的待做「邊緣（或量不到）卻沒敘事」單獨一格（⑤ 也有）。
+    no_narr = [r for r in board.get("no_narrative") or () if isinstance(r, Mapping)]
+    non_edge = sum(1 for r in no_narr if (r.get("edge") or {}).get("state") == "not_edge")
+    unmeasured = sum(1 for r in no_narr if (r.get("edge") or {}).get("state") not in ("not_edge", "edge"))
+    edge_gap = len(no_narr) - non_edge - unmeasured
+    with_old = int(counts.get("not_multiple") or 0)
     lines = [f"候選：可開 {aged('open')}｜缺 X {aged('missing')}｜等回落 {aged('priced_wait')}｜不要 {counts.get('pass', 0)}"
-             f"｜已持有 {held}｜非倍率候選 {counts.get('not_multiple', 0)}｜邊緣無法量 {counts.get('edge_unmeasurable', 0)}"
+             f"｜已持有 {held}｜邊緣無法量 {counts.get('edge_unmeasurable', 0)}"
              f"｜舊版 {counts.get('legacy', 0)}｜前提失效 {counts.get('precondition_failed', 0)}"
-             f"｜無敘事 {counts.get('no_narrative', 0)}"]
+             f"｜非倍率 {with_old + non_edge}（有舊敘事 {with_old}｜不寫敘事 {non_edge}）"
+             f"｜邊緣卻沒敘事 {edge_gap}｜量不到卻沒敘事 {unmeasured}"]
     holdings = board.get("holdings") or {}
     if holdings.get("status") != "ok":
         lines.append(f"  持股未讀到，已持有判定暫停（upstream_unavailable）：{holdings.get('reason')}")
@@ -917,6 +927,17 @@ def _priced_wait_short(state_dir: Path | None) -> str:
         return f"等回落：{absence.reason}"
     if not wait:
         return "等回落 0"
+    # 2026-10-22 使用者兩次問「回落多少才變可開」：答案是沒有門檻（AGENTS「已定價不設門檻」），到那一天由人重判——
+    # 所以每檔印「已等幾天、下次重看哪天」（取這家所有還在等的喚醒 watch 最早的 until；ew_1433 比候選列上的 ew_0148 早醒）。
+    try:
+        from engine_b import event_watch as ew
+
+        wakes: dict[str, list[str]] = {}
+        for w in ew.load_watches().get("watches") or ():
+            if w.get("wake_brief") and w.get("status") == "active" and w.get("until"):
+                wakes.setdefault(str(w["wake_brief"]), []).append(str(w["until"]))
+    except Exception:  # noqa: BLE001 — 讀不到就不印下次重看日，不帶走這一行
+        wakes = {}
     parts = []
     for row in wait:
         info = row.get("priced_since") or {}
@@ -928,11 +949,14 @@ def _priced_wait_short(state_dir: Path | None) -> str:
         ws = info.get("wait_since") or {}
         if ws.get("return") is not None:
             part += f"（等回落自 {str(ws.get('day'))[5:10]} {_signed(ws['return'])}）"
+        nxt = min(wakes.get(str(row.get("company_id")), []) or [""])
+        part += f"，已等 {row.get('stall_days', '?')} 天" + (f"、下次重看 {nxt[5:10]}" if nxt else "、沒有下次重看日（⚠ 接不上的等待）")
         parts.append(part)
     recomputed = any((r.get("priced_since") or {}).get("then_source") == "recomputed"
                      or ((r.get("priced_since") or {}).get("wait_since") or {}).get("then_source") == "recomputed"
                      for r in wait)
-    return (f"等回落 {len(wait)}（自家三年百分位 判斷日→今天｜判斷日以來）：" + "｜".join(parts)
+    return (f"等回落 {len(wait)}（自家三年百分位 判斷日→今天｜判斷日以來；沒有「跌到多少就可開」的門檻，到下次重看日由人重判）："
+            + "｜".join(parts)
             + ("（判斷日或等回落起點的值有回算的）" if recomputed else ""))
 
 
@@ -1171,7 +1195,8 @@ def _registry_tail(store: Mapping[str, Any], rows: list[Mapping[str, Any]]) -> s
         from engine_b import registry_batch as rb
 
         split = rb.tier_summary(rows, rb.load_tiers())
-        tiers = (f"（邊緣供給側 {split['edge_supply']}／邊緣未標 {split['edge_other']}／非邊緣 {split['not_edge']}"
+        tiers = (f"（邊緣供給側 {split['edge_supply']}／邊緣非供給側 {split['edge_not_supply']}"
+                 f"／邊緣未標 {split['edge_unmarked']}／非邊緣 {split['not_edge']}"
                  f"／量不到 {split['unmeasurable']}／未分層 {split['untiered']}）")
     except Exception as exc:  # noqa: BLE001 — 分層表壞了只讓這一格缺席
         tiers = f"（分層讀不到：{type(exc).__name__}）"
@@ -1199,10 +1224,31 @@ def _new_names_line(*, now: datetime, leads_path: Path | None, hint: bool = True
         "（`python -m engine_b.cli onboard-candidates`）" if hint else "")
     if not fresh:
         return "今天第一次被點名、registry 沒有的名字 0" + tail
-    names = "、".join(f"{r.get('ticker')}（{' '.join(str(r.get('sample_title') or '').split())[:30]}）"
-                     for r in fresh[:5])
-    return (f"**今天第一次被點名、registry 沒有的名字 {len(fresh)}**：{names}"
+    names = "、".join(f"{r.get('ticker')}（{_mention_context(r, store)}）" for r in fresh[:5])
+    # 粗體只給可能要動作的：邊緣、量不到、或有代號還沒分層的；全是已知非邊緣就不粗體（16 天 16 個名字只有 1 個是邊緣供給側）
+    try:
+        from engine_b import registry_batch as rb
+
+        tier_rows = rb.load_tiers().get("rows") or {}
+    except Exception:  # noqa: BLE001
+        tier_rows = {}
+    all_known_non_edge = all((tier_rows.get(str(r.get("ticker"))) or {}).get("edge_state") == "not_edge" for r in fresh)
+    head = f"今天第一次被點名、registry 沒有的名字 {len(fresh)}"
+    return ((head if all_known_non_edge else f"**{head}**") + f"：{names}"
             + (f"…另 {len(fresh) - 5} 個" if len(fresh) > 5 else "") + tail)
+
+
+def _mention_context(row: Mapping[str, Any], store: Mapping[str, Any], *, width: int = 40) -> str:
+    """提到這個名字的那一句（取第一則 lead 的原文、名字前後約 `width` 字）；找不到才退回標題前 30 字。"""
+    ticker = str(row.get("ticker") or "").lstrip("$")
+    leads = store.get("leads") or {}
+    for lead_id in row.get("lead_ids") or ():
+        text = " ".join(str((leads.get(lead_id) or {}).get("raw_text") or "").split())
+        at = text.find(ticker) if ticker else -1
+        if at >= 0:
+            start = max(0, at - width)
+            return ("…" if start else "") + text[start:at + len(ticker) + width] + "…"
+    return " ".join(str(row.get("sample_title") or "").split())[:30]
 
 
 def _thesis_line(*, now: datetime, thesis_path: Path) -> str:
@@ -1284,7 +1330,7 @@ def _layer_stats_line(walk: Mapping[str, Any], absence: Absence | None) -> str:
 
 
 def build_queue(*, state_dir: Path | None = None, now: datetime | None = None,
-                run_record_path: Path | None = None) -> Section:
+                run_record_path: Path | None = None, ledger: Sequence[Any] | None = None) -> Section:
     """新 lead N、**待 triage N（必印）**、pq1 可做 N、pq2 卡在你 N、expired N。
 
     ⚠ 計數一律消費 `engine_b.queue_segments.observe()`——段序是那裡的封閉字彙，
@@ -1298,6 +1344,12 @@ def build_queue(*, state_dir: Path | None = None, now: datetime | None = None,
     from engine_b import todo as todo_mod
 
     section = Section(3, SECTION_TITLES[2])
+    if ledger is not None:
+        # 待做清單（＝短版 ⑤；2026-10-22）：歸零就不漏球的那一份；下面各行是同一批的細節
+        from engine_b.todo_ledger import render_cells
+
+        section.lines.append("**待做清單（＝短版 ⑤）**")
+        section.lines.extend(render_cells(ledger))
 
     leads_store = leads_mod.load()
     leads = leads_store.get("leads") or {}
@@ -1380,6 +1432,7 @@ def build_queue(*, state_dir: Path | None = None, now: datetime | None = None,
     # 今天的影響對照完整表（雷達精進 C2）：短版只印雷達那幾則的「↳ 碰到」與總數，這裡落檔全部碰到的
     try:
         section.lines.extend(_impact_lines(now=moment))
+        section.lines.extend(_radar_item_lines(now=moment))
     except Exception as exc:  # noqa: BLE001
         section.lines.append(f"影響對照：盤點失敗（{type(exc).__name__}；upstream_unavailable）")
     # T2 主動輪詢（2026-10-06 使用者指示）：1.2a 把 sweep 移出 daily 時這一格一起不見——09-21 之後兩週沒人跑，也沒有任何地方印。
@@ -1735,6 +1788,42 @@ def _impact_lines(*, now: datetime, out_dir: Path | None = None) -> list[str]:
             lines.append(f"  ↳ 提議［{p.get('verdict')}］（{p.get('target')}）：{p.get('sentence')}｜原文「{p.get('quote')}」")
     if len(touched) > IMPACT_ROWS_IN_HEARTBEAT:
         lines.append(f"（另 {len(touched) - IMPACT_ROWS_IN_HEARTBEAT} 則碰到的見 impact_{day.isoformat()}.json）")
+    return lines
+
+
+def _radar_item_lines(*, now: datetime, out_dir: Path | None = None, leads_path: Path | None = None) -> list[str]:
+    """段 3「雷達收下的每一則」（2026-10-22：短版 ② 改成每則一行後，細節要在落檔裡都在——含只經樞紐與沒碰到的）：
+    事實全文、lead 現在的狀態與分類理由、確定性對照（`impact.render`）、LLM 每一句判定。"""
+    from crons.daily_brief import LEAD_STATE_WORDS
+    from engine_b import digest as digest_mod
+    from engine_b import impact as im
+    from engine_b import leads as leads_mod
+
+    day = now.astimezone().date()
+    directory = out_dir or (ROOT / "library" / "private" / "heartbeat")
+    receipt = _read_json(directory / f"radar_{day.isoformat()}.json")
+    if not receipt:
+        return ["雷達收下的每一則：今天沒有收據"]
+    accepted = [a for a in receipt.get("accepted") or () if isinstance(a, Mapping)]
+    kwargs = {"out_dir": out_dir} if out_dir is not None else {}
+    rows = {str(r.get("lead_id")): r for r in (digest_mod.load_impact(day, **kwargs) or {}).get("rows") or ()}
+    proposals: dict[str, list[Mapping[str, Any]]] = {}
+    for p in (digest_mod.load_digest(day, **kwargs) or {}).get("impacts") or ():
+        proposals.setdefault(str(p.get("lead_id")), []).append(p)
+    store = (leads_mod.load(leads_path) if leads_path else leads_mod.load()).get("leads") or {}
+    lines = [f"雷達收下的每一則（{len(accepted)}）："]
+    for item in accepted:
+        lead_id = str(item.get("lead_id") or "")
+        lead = store.get(lead_id) or {}
+        triage = lead.get("triage") or {}
+        state = LEAD_STATE_WORDS.get(str(lead.get("status")), str(lead.get("status") or "lead 不在"))
+        lines.append(f"- {item.get('fact') or item.get('title')}（{lead_id[:13]}；{state}"
+                     + (f"：{str(triage.get('reason'))[:120]}" if triage.get("reason") else "") + "）")
+        row = rows.get(lead_id)
+        if row is not None:
+            lines.extend("  " + text for text in im.render(row))
+        for p in proposals.get(lead_id, ()):
+            lines.append(f"  ↳ LLM［{p.get('verdict')}］（{p.get('target')}）：{p.get('sentence')}")
     return lines
 
 
@@ -2285,6 +2374,8 @@ SNAPSHOT_KEYS: dict[str, str] = {
     # 圖預測對錯表（Phase 5 Step 5.4）：第一筆對／錯出現的那天，較昨 diff 看得到。
     "predictions.held": "圖預測 對", "predictions.wrong": "圖預測 錯",
     "predictions.expired_unread": "圖預測 到期未重讀",
+    # 待做清單（2026-10-22 使用者：「要確保以後的東西都不會被計數漏掉」）：短版 ⑤ 的每一格——由 LEDGER 導出（L16）
+    **{row.key: f"待做 {row.label}" for row in TODO_LEDGER},
 }
 #: 較昨變動一行最多列幾項（其餘寫「另 N 項」）。
 DIFF_LIMIT = 12
@@ -2566,6 +2657,8 @@ class Heartbeat:
     summary: str
     #: 較昨變動那幾行（段 2 第一行的來源；Discord 短版也印它——2026-10-07 使用者：「心跳基本重要的 status 還是要印」）
     diff: list[str] = field(default_factory=list)
+    #: 待做清單（`engine_b.todo_ledger.collect`；短版 ⑤ 與段 3 共用這一份，不各算一次——L16）。None＝組不出來
+    ledger: list[Any] | None = None
 
 
 def compose_heartbeat(
@@ -2589,6 +2682,9 @@ def compose_heartbeat(
                                     run_record_path=run_record_path, capture_dir=capture_dir)
     except Exception:  # noqa: BLE001
         snapshot = {key: None for key in SNAPSHOT_KEYS}
+    ledger = collect_ledger(now=moment, state_dir=state_dir, leads_path=leads)
+    if ledger is not None:
+        snapshot.update({row.key: row.count for row in ledger})
     try:
         previous, previous_date = load_previous_snapshot(snapshots, today=today)
     except Exception:  # noqa: BLE001
@@ -2602,7 +2698,7 @@ def compose_heartbeat(
                lambda: build_changes(now=moment, state_dir=state_dir, thesis_path=thesis, diff_lines=diff,
                                      leads_path=leads_path)),
         _guard(3, SECTION_TITLES[2], lambda: build_queue(state_dir=state_dir, now=moment,
-                                                         run_record_path=run_record_path)),
+                                                         run_record_path=run_record_path, ledger=ledger)),
         _guard(4, SECTION_TITLES[3], lambda: build_positions(state_dir=state_dir)),
         _guard(5, SECTION_TITLES[4], lambda: build_scorecard(state_dir=state_dir, previous=previous)),
     ]
@@ -2619,7 +2715,63 @@ def compose_heartbeat(
                                theme_nudge=nudge, theme_line=theme_line)
     except Exception as exc:  # noqa: BLE001
         summary = f"Daily {today.isoformat()}｜⚠ 摘要行組不出來（{type(exc).__name__}）"
-    return Heartbeat(sections=sections, snapshot=snapshot, banner=banner, summary=summary, diff=list(diff))
+    return Heartbeat(sections=sections, snapshot=snapshot, banner=banner, summary=summary, diff=list(diff),
+                     ledger=ledger)
+
+
+def collect_ledger(*, now: datetime, state_dir: Path | None, leads_path: Path | None = None) -> list[Any] | None:
+    """⑤ 待做清單（`engine_b.todo_ledger.collect`）：心跳讀 artifact 與 ledger 後注入；每個輸入讀不到就給 None
+    （那一格印「未讀到」，不是 0）。整組組不出來回 None——短版 ⑤ 退回快照計數。"""
+    try:
+        from engine_b import event_watch as ew
+        from engine_b import hypotheses as hyp
+        from engine_b import leads as leads_mod
+        from engine_b import todo as todo_mod
+        from engine_b import todo_ledger
+
+        def attempt(fn: Callable[[], Any]) -> Any:
+            try:
+                return fn()
+            except Exception:  # noqa: BLE001 — 讀不到＝None（INV-3）
+                return None
+
+        def readings_needs() -> int | None:
+            payload, absence = _load_state(state_dir, "structure_readings")
+            return None if absence is not None else (payload.get("needs_reread") or {}).get("n")
+
+        def layer_reread() -> int:
+            from alpha.providers.layer_notes import current_notes, layer_note_reread_rows
+
+            return len(layer_note_reread_rows(current_notes(), ew.load_watches().get("watches") or [],
+                                              today=ew._today(now)))
+
+        def candidates() -> Mapping[str, Any] | None:
+            payload, absence = _load_state(state_dir, "candidates")
+            return None if absence is not None else payload
+
+        def thesis_due() -> list[str]:
+            from crons.thesis_freshness_check import lifecycle_due_detail
+
+            return [row[0] for row in lifecycle_due_detail(today=now.astimezone().date())]
+
+        def briefs() -> list[Any]:
+            from engine_b.disproof import current_briefs
+
+            return current_briefs()
+
+        def readings() -> Mapping[Any, Any]:
+            from engine_b.disproof import current_readings
+
+            return current_readings()
+
+        store = leads_mod.load(leads_path) if leads_path else leads_mod.load()
+        return todo_ledger.collect(
+            today=now.astimezone().date(), leads_store=store, watches=ew.load_watches().get("watches") or [],
+            todo_items=todo_mod.load().get("items") or [], hypotheses=hyp.load_store().get("hypotheses") or [],
+            briefs=attempt(briefs), current_readings=attempt(readings), reading_needs_reread=attempt(readings_needs),
+            layer_note_reread=attempt(layer_reread), candidates=attempt(candidates), thesis_due=attempt(thesis_due))
+    except Exception:  # noqa: BLE001 — 待做清單組不出來不帶走心跳
+        return None
 
 
 def build_heartbeat(**kwargs: Any) -> list[Section]:
@@ -2755,7 +2907,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             from crons.daily_brief import compose_brief
 
             brief = compose_brief(now=now, summary=beat.summary, snapshot=beat.snapshot,
-                                  run_record_path=run_record_path_for(now), diff_lines=beat.diff)
+                                  run_record_path=run_record_path_for(now), diff_lines=beat.diff, ledger=beat.ledger)
         except Exception as exc:  # noqa: BLE001
             brief = (f"{beat.summary}\n\n（Discord 短版組不出來：{type(exc).__name__}——完整心跳照樣寫在 heartbeat 目錄，"
                      "互動 session 說「daily brief」就讀得到）\n")
