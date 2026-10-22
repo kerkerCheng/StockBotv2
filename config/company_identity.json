@@ -2141,7 +2141,7 @@
       "market_currency": "USD",
       "display_name": "Amkor Technology, Inc.",
       "_display_name_source": "Amkor 2026-10-21 新聞稿（Business Wire）署名「Amkor Technology, Inc. (Nasdaq: AMKR)」；NVIDIA 2026-10-21 新聞稿「Amkor Technology」",
-      "_note": "隨 NVIDIA 供應鏈產能入圖包 staged（2026-10-23，drop 即回退）：OSAT，南韓中介層晶圓產能 2028 年底 >300%、NVIDIA 預付。系統口徑卡在邊緣門檻上（`python -m alpha edge AMKR`：2026-10-22 研究員 108.6 億美元／10 家非邊緣、2026-10-23 主 session 98.0 億／10 家 within_edge），每次 materialize 重算",
+      "_note": "使用者 2026-10-23 go [849]（入圖包見 nvidia_supply_chain_capacity_2026_10_21_action.json）：OSAT，南韓中介層晶圓產能 2028 年底 >300%、NVIDIA 預付。系統口徑卡在邊緣門檻上（`python -m alpha edge AMKR`：2026-10-22 研究員 108.6 億美元／10 家非邊緣、2026-10-23 主 session 98.0 億／10 家 within_edge），每次 materialize 重算",
       "name_aliases": [
         "Amkor",
         "Amkor Technology",
@@ -2156,7 +2156,7 @@
       "execution_venue": "TWSE",
       "display_name": "King Yuan Electronics Co., Ltd.",
       "_display_name_source": "NVIDIA 2026-10-21 新聞稿「King Yuan Electronics (KYEC)」；上市 2449（京元電子股份有限公司）",
-      "_note": "隨 NVIDIA 供應鏈產能入圖包 staged（2026-10-23，drop 即回退）：半導體測試廠，NVIDIA 11 億美元產能預留預付支持美國新測試廠（2027-04 量產）。系統口徑非邊緣（`python -m alpha edge 2449.TW`：103.4 億美元、16 家），不是倍率候選；圖上目前沒有「AI 加速器終測」層，本包只加公司對公司的邊",
+      "_note": "使用者 2026-10-23 go [849]（入圖包見 nvidia_supply_chain_capacity_2026_10_21_action.json）：半導體測試廠，NVIDIA 11 億美元產能預留預付支持美國新測試廠（2027-04 量產）。系統口徑非邊緣（`python -m alpha edge 2449.TW`：103.4 億美元、16 家），不是倍率候選；圖上目前沒有「AI 加速器終測」層，本包只加公司對公司的邊",
       "name_aliases": [
         "KYEC",
         "King Yuan Electronics",
@@ -2169,7 +2169,7 @@
       "research_ticker": null,
       "display_name": "Siliconware Precision Industries Co., Ltd.",
       "_display_name_source": "NVIDIA 2026-10-21 新聞稿「Siliconware Precision Industries (SPIL)」；日月光投資控股（3711.TW）全資子公司，2018 年下市",
-      "_note": "隨 NVIDIA 供應鏈產能入圖包 staged（2026-10-23，drop 即回退）：日月光投控全資子公司、本身未上市，research_ticker 明確 null（INV-1／L9）；CPO 光學引擎台灣產能 2027 年中 15 倍。⚠ 不放單詞「ASE」（母公司另案，未登記）",
+      "_note": "使用者 2026-10-23 go [849]（入圖包見 nvidia_supply_chain_capacity_2026_10_21_action.json）：日月光投控全資子公司、本身未上市，research_ticker 明確 null（INV-1／L9）；CPO 光學引擎台灣產能 2027 年中 15 倍。⚠ 不放單詞「ASE」（母公司另案，未登記）",
       "name_aliases": [
         "SPIL",
         "Siliconware Precision Industries",
@@ -2186,7 +2186,7 @@
       "execution_venue": "SZSE",
       "display_name": "Optics Technology Holding Co.,Ltd",
       "_display_name_source": "光智科技 2026 年半年度报告「公司的外文名称（如有） Optics Technology Holding Co.,Ltd」（巨潮 2026-08-29）；深交所創業板 300489（光智科技股份有限公司，简称光智科技）",
-      "_note": "隨 InP 基板光智科技入圖包 staged（2026-10-23，drop 即回退）：InP 襯底由控股子公司广东先锐科技有限公司（50.0832%，2026-08-25 交割，300489 公告 2026-048）生產；⚠ 別名刻意含子公司「先锐科技」：它是 50.08% 持股、已併表、本身未上市的唯一 InP 主體，一手引文（半年報、交割公告）具名的是它；可投資的載體只有母公司，所以顯式登記成母公司別名（INV-1：名冊明寫，不是猜）。雲南鍺業的子公司雲南鑫耀沒放，是因為那包引文具名的是母公司。日後若要分開子公司與母公司，改成 [837] 的合資式建模（子公司節點＋母公司 invests_in control）。系統口徑邊緣無法量（`python -m alpha edge 300489.SZ`：46.8 億美元、分析師家數 yfinance 沒有，2026-10-23），依 INV-3 留在母體。⚠ INV-1：先导基电 600641.SH 公告 临2026-086 明文「当前主营业务不包括磷化铟衬底业务」——別把 Vital Materials 的 ticker 猜成 600641；浙江衢州 InP 襯底備案主體『浙江先导微电子科技有限公司』不在 300489 已揭露的範圍內",
+      "_note": "使用者 2026-10-23 go [850]（入圖包見 inp_substrate_optics_technology_holding_2026_10_22_action.json）：InP 襯底由控股子公司广东先锐科技有限公司（50.0832%，2026-08-25 交割，300489 公告 2026-048）生產；⚠ 別名刻意含子公司「先锐科技」：它是 50.08% 持股、已併表、本身未上市的唯一 InP 主體，一手引文（半年報、交割公告）具名的是它；可投資的載體只有母公司，所以顯式登記成母公司別名（INV-1：名冊明寫，不是猜）。雲南鍺業的子公司雲南鑫耀沒放，是因為那包引文具名的是母公司。日後若要分開子公司與母公司，改成 [837] 的合資式建模（子公司節點＋母公司 invests_in control）。系統口徑邊緣無法量（`python -m alpha edge 300489.SZ`：46.8 億美元、分析師家數 yfinance 沒有，2026-10-23），依 INV-3 留在母體。⚠ INV-1：先导基电 600641.SH 公告 临2026-086 明文「当前主营业务不包括磷化铟衬底业务」——別把 Vital Materials 的 ticker 猜成 600641；浙江衢州 InP 襯底備案主體『浙江先导微电子科技有限公司』不在 300489 已揭露的範圍內",
       "name_aliases": [
         "光智科技",
         "光智科技股份有限公司",
@@ -2203,7 +2203,7 @@
       "market_currency": "USD",
       "display_name": "Bloom Energy Corporation",
       "_display_name_source": "Bloom Energy FY2025 Form 10-K 封面（SEC EDGAR accession 0001628280-26-006516，2026-02-09）",
-      "_note": "隨 SOFC 熱箱入圖包 staged（2026-10-23，drop 即回退）：SOFC 現場發電系統整合者（Energy Server）；系統口徑非邊緣（`python -m alpha edge BE`：627.9 億美元、26 家，2026-10-23），不寫敘事、不是倍率候選——入圖價值在它之下的供應層（case E1，[831]）。中文申報常寫「美国BE」（春暉智控問詢回覆），別名收那個寫法；不放單詞「BE」（兩個字母太容易誤撞）",
+      "_note": "使用者 2026-10-23 go [847]（入圖包見 sofc_hot_box_kaori_mtar_bloom_2026_10_23_action.json）：SOFC 現場發電系統整合者（Energy Server）；系統口徑非邊緣（`python -m alpha edge BE`：627.9 億美元、26 家，2026-10-23），不寫敘事、不是倍率候選——入圖價值在它之下的供應層（case E1，[831]）。中文申報常寫「美国BE」（春暉智控問詢回覆），別名收那個寫法；不放單詞「BE」（兩個字母太容易誤撞）",
       "name_aliases": [
         "Bloom Energy",
         "Bloom Energy Corporation",
@@ -2221,7 +2221,7 @@
       "execution_venue": "NSE",
       "display_name": "MTAR Technologies Limited",
       "_display_name_source": "MTAR Technologies Limited Annual Report FY2024-25 頁首「MTAR Technologies Limited Annual report FY 2024 - 25」",
-      "_note": "隨 SOFC 熱箱入圖包 staged（2026-10-23，drop 即回退）：精密工程廠，自述供應 Bloom Energy SOFC 的 power units、鈑金、機殼與 ASP 組件；FY2025-26 單一客戶占營收 73%（未具名）。系統口徑**邊緣**（`python -m alpha edge MTARTECH.NS`：22.1 億美元、5 家，2026-10-23）——入圖後有 supplies_to 座位、進段 5 母體；第一份敘事要等 SOFC 主題組落地（registration ④）",
+      "_note": "使用者 2026-10-23 go [847]（入圖包見 sofc_hot_box_kaori_mtar_bloom_2026_10_23_action.json）：精密工程廠，自述供應 Bloom Energy SOFC 的 power units、鈑金、機殼與 ASP 組件；FY2025-26 單一客戶占營收 73%（未具名）。系統口徑**邊緣**（`python -m alpha edge MTARTECH.NS`：22.1 億美元、5 家，2026-10-23）——入圖後有 supplies_to 座位、進段 5 母體；第一份敘事要等 SOFC 主題組落地（registration ④）",
       "name_aliases": [
         "MTAR",
         "MTAR Technologies",
@@ -2236,7 +2236,7 @@
       "execution_venue": "SZSE",
       "display_name": "浙江春晖智能控制股份有限公司",
       "_display_name_source": "深交所審核問詢函回覆（更新版，巨潮 2026-09-22，1225576840.PDF）首頁「浙江春晖智能控制股份有限公司（以下简称“公司”“上市公司”或“春晖智控”）」；英文正式名稱未取得一手",
-      "_note": "隨 SOFC 熱箱入圖包 staged（2026-10-23，drop 即回退）：收購春晖仪表 61.31%（審核中）；春晖仪表是 Bloom 熱箱溫度感測的主要供應商、也賣給 MTAR 與高力——它的問詢回覆是高力、MTAR 是 BE 供應商的第三方一手。系統口徑邊緣無法量（`python -m alpha edge 300943.SZ`：8.2 億美元、分析師家數 yfinance 沒有）",
+      "_note": "使用者 2026-10-23 go [847]（入圖包見 sofc_hot_box_kaori_mtar_bloom_2026_10_23_action.json）：收購春晖仪表 61.31%（審核中）；春晖仪表是 Bloom 熱箱溫度感測的主要供應商、也賣給 MTAR 與高力——它的問詢回覆是高力、MTAR 是 BE 供應商的第三方一手。系統口徑邊緣無法量（`python -m alpha edge 300943.SZ`：8.2 億美元、分析師家數 yfinance 沒有）",
       "name_aliases": [
         "春晖智控",
         "春暉智控",
