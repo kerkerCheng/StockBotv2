@@ -1,0 +1,15 @@
+Source URL: https://mfn.se/cis/a/sivers-semiconductors/strategic-lidar-customer-initiates-production-orders-with-sivers-semiconductors-e8c1221d
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Sivers Semiconductors 新聞稿「Strategic LiDAR Customer Initiates Production Orders with Sivers Semiconductors」（MFN／Cision，2026-10-20 07:00 CEST）
+DATE: 2026-10-20
+RETRIEVED: 2026-10-22（MFN 原文 HTML 本機抽字、空白正規化，逐字）
+NOTE: 發行人自述（L8）；客戶未具名、訂單金額未揭露；這是光達（車用與工業感測），不是 AI 資料中心。
+
+"Strategic LiDAR Customer Initiates Production Orders with Sivers Semiconductors
+2026-10-20 07:00:00
+Shipments will begin in Q4 2026 against rolling production orders as the automotive and industrial sensing programs move into production phase in 2027
+Kista, Sweden, October 20, 2026 - Sivers Semiconductors AB (STO: SIVE), a global leader in photonics and wireless technologies, today announced that its strategic LiDAR customer has initiated production orders for its automotive and industrial sensing customers.
+Sivers will supply the continuous-wave distributed feedback (CW DFB) lasers and optical amplifiers powering the customer's LiDAR platforms, positioning the company to support growing demand as production scales.
+"We are pleased to see this strategic program advance from design-win to production, with our customer placing first production orders," said Alex McCann, Managing Director of Sivers Semiconductors' photonics business. "This key milestone reflects confidence in our technology, our production facility and its reliability to meet the customer's requirements for volume production. As the program scales, we expect rolling production orders placed to lead times, in line with our customer's multi-year production forecasts."
+As announced in March 2026, the program represents a significant long-term opportunity, with estimated cumulative revenue potential of USD 53 million to USD 138 million over the customer's product lifecycle."
