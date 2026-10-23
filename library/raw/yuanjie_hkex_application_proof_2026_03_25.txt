@@ -1,0 +1,49 @@
+Source URL: https://www1.hkexnews.hk/app/sehk/2026/108326/documents/sehk26032500810.pdf
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Yuanjie Semiconductor Technology Co., Ltd.（陝西源杰半導體科技股份有限公司，688498.SS）HKEX H 股上市申請版本（Application Proof）節錄
+
+Source: https://www1.hkexnews.hk/app/sehk/2026/108326/documents/sehk26032500810.pdf
+PUBLISHED: 2026-03-25（HKEXnews 刊登；草稿、可改——封面 WARNING：「THIS DOCUMENT IS IN DRAFT FORM, INCOMPLETE AND SUBJECT TO CHANGE」）
+RETRIEVED: 2026-10-23（PDF 本機抽字、逐字核對；跨行斷字接回、空白正規化；頁碼為 PDF 頁序）
+
+【DEFINITIONS（PDF 第 29 頁）】
+“Company” or “our Company” Yuanjie Semiconductor Technology Co., Ltd. (陝西源杰半導體科技股份有限公司), a joint stock company with limited liability established on January 28, 2013, the A Shares of which are listed on the SSE STAR Market (stock code: 688498)
+
+【SUMMARY — Overview（PDF 第 10 頁）】
+We are one of the few companies worldwide capable of delivering CW lasers at a ten-million-unit scale, which underscores our unique position and reliability in the global supply chain.
+
+【BUSINESS — Our Strengths（PDF 第 133 頁）】
+In addition, we offer CW lasers specifically tailored to address the needs of SiPh-based optical interconnects.
+
+【HISTORY — Milestones，2024（PDF 第 123 頁）】
+We achieved mass production of 70mW CW lasers with its sales volume exceeding one million units.
+
+【BUSINESS — Our Products, CW Lasers（PDF 第 143 頁）】
+Our CW laser portfolio spans 50mW to 100mW, and stands out for its high optical power output with superior optoelectronic conversion efficiency and reliability, specifically optimized to meet the demands of the continuously iterated SiPh applications.
+
+【SUMMARY — Sales channel（PDF 第 19 頁）】
+Our revenue generated from distribution decreased by 14.4% from RMB74.8 million in 2024 to RMB64.0 million in 2025, primarily due to the successful market expansion of our CW lasers, which were sold to customers mostly through direct sales.
+
+【SUMMARY — Overview（PDF 第 13 頁）】
+In 2025, driven by surging AI computing demand, revenue from our data center laser chips exceeded that from our telecommunications laser chips, becoming our primary growth driver.
+
+【INDUSTRY OVERVIEW — Ranking of Global Laser Chip Market for SiPh-based High-speed Optical Interconnect Products（PDF 第 108 頁；表註 Source: Expert Interviews, annual reports, CIC）】
+CW lasers are primarily applied in SiPh-based high-speed optical interconnect products of 400G and above. In terms of revenue from external sales in 2025, the Company was the second-largest provider of laser chips applied in SiPh-based high-speed optical interconnect products globally and ranked first among PRC players, with a market share of 23.6%.
+
+【BUSINESS — Customers（PDF 第 166 頁）】
+Our customers primarily consist of optical component and optical transceiver manufacturers as well as our distributors.
+
+【BUSINESS — Customers（PDF 第 166 頁）】
+In 2023, 2024 and 2025, our revenue generated from sales to our largest customer in each year amounted to RMB27.5 million, RMB41.3 million and RMB320.8 million, respectively, representing 19.0%, 16.4% and 53.4% of our total revenue in the corresponding year.
+
+【RISK FACTORS — contract liabilities（PDF 第 63 頁）】
+Our contract liabilities primarily arise from advance payments made by our customers to us before we fulfill our performance obligations. Our contract liabilities were RMB2.1 million, RMB1.5 million, and RMB1.9 million as of December 31, 2023, 2024 and 2025, respectively.
+
+【BUSINESS — Our Strengths（PDF 第 134 頁）】
+In 2025, revenue generated from our data center laser chips accounted for 65.4% of our total revenue, serving as the primary engine of our overall growth.
+
+【BUSINESS — Future Trends and Our Key Development Focuses（PDF 第 144 頁）】
+In parallel, to capture opportunities in SiPh application integration, we specifically designed SiPh-based products based on the emerging optical interconnect packaging approaches such as NPO and CPO, ensuring that we remain at the forefront of the high-performance laser chip market for next-generation data centers. The following graphics illustrate our 300mW high-power CW lasers:
+
+（INDUSTRY OVERVIEW 段的排名表其餘四家匿名為 Company D／B／A／C；匿名公司的身分不在原文，本節錄不推斷）
