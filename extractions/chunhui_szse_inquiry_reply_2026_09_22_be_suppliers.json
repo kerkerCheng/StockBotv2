@@ -1,5 +1,21 @@
 {
-  "claims": [],
+  "claims": [
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "條件：Bloom Energy 的一手文件（10-K 供應商段、供應商名單或公開採購資料）寫明溫度感測器另有主要供應商、改由他廠供應，或春晖智控的重組報告書更新版、定期報告寫出春晖仪表對美國 BE 及相關主體的營收或在手訂單明顯下降、份額低於七成。核查頻率：每季（Bloom 10-Q／10-K；春晖智控定期報告與重組進度公告）。觸發後 48 小時：e4 降 confidence 或提撤回，cl1 改寫成新的份額；重讀 SOFC 溫度感測器那一層（若已有讀圖）並回頭改春晖智控敘事。",
+      "id": "chunhui_szse_inquiry_reply_2026_09_22_be_suppliers_cl1",
+      "source_ids": [
+        "chunhui_szse_inquiry_reply_2026_09_22_be_suppliers_s5",
+        "chunhui_szse_inquiry_reply_2026_09_22_be_suppliers_s7",
+        "chunhui_szse_inquiry_reply_2026_09_22_be_suppliers_s8",
+        "chunhui_szse_inquiry_reply_2026_09_22_be_suppliers_s11",
+        "chunhui_szse_inquiry_reply_2026_09_22_be_suppliers_s12"
+      ],
+      "statement": "Dated observation (as of 2026-09-22, Zhejiang Chunhui Intelligent Control's SZSE inquiry reply): the acquisition target Zhejiang Chunhui Instrument focuses its fuel-cell business on SOFC temperature sensors, has supplied Bloom Energy in volume since 2007, and names Japan's Okazaki Manufacturing as its main competitor at that customer; the reply's table from the intermediaries' interview with Bloom lists Chunhui Instrument at over 70% of Bloom's temperature-sensor purchases with Okazaki as the other supplier. Issuer-side document of a related party (the listed company already holds 38.69% and is acquiring the rest) — L8 weak: no Bloom-side primary names Chunhui Instrument; not a sole-source claim (a second supplier is named).",
+      "subject_id": "e4"
+    }
+  ],
   "edges": [
     {
       "attributes": {},
@@ -24,6 +40,89 @@
         "chunhui_szse_inquiry_reply_2026_09_22_be_suppliers_s2"
       ],
       "src_id": "co:mtar_technologies"
+    },
+    {
+      "attributes": {
+        "qualification_status": "qualified"
+      },
+      "confidence": 0.85,
+      "dst_id": "tech:sofc_temperature_sensor",
+      "id": "e3",
+      "relation": "supplies_to",
+      "source_ids": [
+        "chunhui_szse_inquiry_reply_2026_09_22_be_suppliers_s5",
+        "chunhui_szse_inquiry_reply_2026_09_22_be_suppliers_s6",
+        "chunhui_szse_inquiry_reply_2026_09_22_be_suppliers_s7",
+        "chunhui_szse_inquiry_reply_2026_09_22_be_suppliers_s8"
+      ],
+      "src_id": "co:zhejiang_chunhui_instrument"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "co:bloom_energy",
+      "id": "e4",
+      "relation": "supplies_to",
+      "source_ids": [
+        "chunhui_szse_inquiry_reply_2026_09_22_be_suppliers_s5",
+        "chunhui_szse_inquiry_reply_2026_09_22_be_suppliers_s7",
+        "chunhui_szse_inquiry_reply_2026_09_22_be_suppliers_s8",
+        "chunhui_szse_inquiry_reply_2026_09_22_be_suppliers_s2",
+        "chunhui_szse_inquiry_reply_2026_09_22_be_suppliers_s3"
+      ],
+      "src_id": "co:zhejiang_chunhui_instrument"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "co:mtar_technologies",
+      "id": "e5",
+      "relation": "supplies_to",
+      "source_ids": [
+        "chunhui_szse_inquiry_reply_2026_09_22_be_suppliers_s5",
+        "chunhui_szse_inquiry_reply_2026_09_22_be_suppliers_s1"
+      ],
+      "src_id": "co:zhejiang_chunhui_instrument"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "co:kaori",
+      "id": "e6",
+      "relation": "supplies_to",
+      "source_ids": [
+        "chunhui_szse_inquiry_reply_2026_09_22_be_suppliers_s5",
+        "chunhui_szse_inquiry_reply_2026_09_22_be_suppliers_s1"
+      ],
+      "src_id": "co:zhejiang_chunhui_instrument"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "prod:bloom_energy_server",
+      "id": "e7",
+      "relation": "is_component_of",
+      "source_ids": [
+        "chunhui_szse_inquiry_reply_2026_09_22_be_suppliers_s6",
+        "chunhui_szse_inquiry_reply_2026_09_22_be_suppliers_s9",
+        "chunhui_szse_inquiry_reply_2026_09_22_be_suppliers_s3"
+      ],
+      "src_id": "tech:sofc_temperature_sensor"
+    },
+    {
+      "attributes": {
+        "control": false
+      },
+      "confidence": 0.9,
+      "dst_id": "co:zhejiang_chunhui_instrument",
+      "id": "e8",
+      "relation": "invests_in",
+      "source_ids": [
+        "chunhui_szse_inquiry_reply_2026_09_22_be_suppliers_s4",
+        "chunhui_szse_inquiry_reply_2026_09_22_be_suppliers_s5",
+        "chunhui_szse_inquiry_reply_2026_09_22_be_suppliers_s10"
+      ],
+      "src_id": "co:zhejiang_chunhui_intelligent_control"
     }
   ],
   "nodes": [
@@ -71,6 +170,74 @@
         "chunhui_szse_inquiry_reply_2026_09_22_be_suppliers_s3"
       ],
       "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "春晖仪表",
+        "浙江春晖仪表股份有限公司"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "co:zhejiang_chunhui_instrument",
+      "name": "Zhejiang Chunhui Instrument",
+      "role": null,
+      "source_ids": [
+        "chunhui_szse_inquiry_reply_2026_09_22_be_suppliers_s5"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "春晖智控",
+        "浙江春晖智能控制股份有限公司"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:zhejiang_chunhui_intelligent_control",
+      "name": "Zhejiang Chunhui Intelligent Control",
+      "role": null,
+      "source_ids": [
+        "chunhui_szse_inquiry_reply_2026_09_22_be_suppliers_s4",
+        "chunhui_szse_inquiry_reply_2026_09_22_be_suppliers_s5"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "SOFC 温度传感器",
+        "SOFC 的测温产品",
+        "燃料电池温度传感器"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:sofc_temperature_sensor",
+      "name": "SOFC temperature sensor (fuel cell temperature measurement)",
+      "role": null,
+      "source_ids": [
+        "chunhui_szse_inquiry_reply_2026_09_22_be_suppliers_s6",
+        "chunhui_szse_inquiry_reply_2026_09_22_be_suppliers_s7"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "Energy Server",
+        "Bloom Energy Server®"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "prod:bloom_energy_server",
+      "name": "Bloom Energy Server",
+      "role": null,
+      "source_ids": [
+        "chunhui_szse_inquiry_reply_2026_09_22_be_suppliers_s9",
+        "chunhui_szse_inquiry_reply_2026_09_22_be_suppliers_s3"
+      ],
+      "type": "Product"
     }
   ],
   "schema_version": "0.1",
@@ -81,9 +248,10 @@
     "permission_basis": "上市公司在深交所的公開問詢回覆；只保留研究必要的有限逐字節錄。published_at 取巨潮刊登日（finalpage 2026-09-22）。",
     "published_at": "2026-09-22",
     "publisher": "深圳证券交易所（巨潮资讯网）",
-    "retrieved_at": "2026-10-22",
+    "retrieved_at": "2026-10-23",
     "source_type": "filing",
     "storage_permission": "repo_excerpt",
+    "supersedes_extraction_sha256": "e8e3bce70de070cc20b54ea167cc76b70c91ee8a7286c4e284e590b0ad11ce9f",
     "title": "浙江春晖智能控制股份有限公司 關於深交所審核問詢函的回覆（更新版，2026-09-22）——標的公司春晖仪表對美國 BE 及其供應商印度 MTAR、高力的銷售",
     "url": "http://static.cninfo.com.cn/finalpage/2026-09-22/1225576840.PDF"
   },
@@ -102,6 +270,51 @@
       "id": "chunhui_szse_inquiry_reply_2026_09_22_be_suppliers_s3",
       "locator": "問詢回覆——BE 近期訂單整理表（引公開資訊；證明文件裡的 BE 即 Bloom Energy）",
       "quote": "2026 年4 月 甲骨文 扩大与BloomEnergy 合作，计划采购2.8GWSOFC 燃料电池，首期签约1.2GW"
+    },
+    {
+      "id": "chunhui_szse_inquiry_reply_2026_09_22_be_suppliers_s4",
+      "locator": "問詢回覆首頁（發行人自稱）",
+      "quote": "浙江春晖智能控制股份有限公司（以下简称“公司”“上市公司”或“春晖智控”）"
+    },
+    {
+      "id": "chunhui_szse_inquiry_reply_2026_09_22_be_suppliers_s5",
+      "locator": "問詢回覆 1．关于本次交易目的（申报文件显示）",
+      "quote": "上市公司拟发行股份及支付现金购买浙江春晖仪表股份有限公司（以下简称标的资产）61.3106%的股权。上市公司主营业务为流体控制阀和控制系统的研究、开发、制造；标的资产主营业务为温度传感器、微型铠装电加热材料及元器件的研发、生产及销售"
+    },
+    {
+      "id": "chunhui_szse_inquiry_reply_2026_09_22_be_suppliers_s6",
+      "locator": "問詢回覆——燃料电池市场概述",
+      "quote": "标的公司在燃料电池市场的业务主要为固体氧化物燃料电池（SOFC）温度传感器的研发、生产和销售。"
+    },
+    {
+      "id": "chunhui_szse_inquiry_reply_2026_09_22_be_suppliers_s7",
+      "locator": "問詢回覆——产业竞争格局 1、燃料电池领域",
+      "quote": "标的公司目前在燃料电池领域主要专注于 SOFC 的测温产品，境外客户为美国 BE 公司，在该客户的主要竞争对手为日本冈崎制作所。"
+    },
+    {
+      "id": "chunhui_szse_inquiry_reply_2026_09_22_be_suppliers_s8",
+      "locator": "同上（合作沿革）",
+      "quote": "至 2007 年标的公司实现向 BE 公司批量供货。"
+    },
+    {
+      "id": "chunhui_szse_inquiry_reply_2026_09_22_be_suppliers_s9",
+      "locator": "問詢回覆——标的资产与其他供应商在产品技术先进性及定价上的差异情况",
+      "quote": "标的公司向 BE 公司所销售的温度传感器和测试线对于 BE 公司的燃料电池产品安全性和稳定性具有至关重要的作用"
+    },
+    {
+      "id": "chunhui_szse_inquiry_reply_2026_09_22_be_suppliers_s10",
+      "locator": "問詢回覆——修订后的收购整合风险提示",
+      "quote": "尽管上市公司已经持有标的公司 38.69%股权，并向标的公司委派了董事、监事和高管"
+    },
+    {
+      "id": "chunhui_szse_inquiry_reply_2026_09_22_be_suppliers_s11",
+      "locator": "問詢回覆——美国 BE 同类产品采购情况（中介机构访谈）",
+      "quote": "经中介机构向美国 BE 访谈了解，除了向标的公司采购以外，同类产品向其他供应商采购情况如下："
+    },
+    {
+      "id": "chunhui_szse_inquiry_reply_2026_09_22_be_suppliers_s12",
+      "locator": "同上（表：客户名称／主要采购产品／占客户采购同类产品的比例／其他供应商；PDF 抽字後的列序）",
+      "quote": "BE 公司\n温度传感器\n70%以上\n日本冈崎制作所"
     }
   ]
 }
