@@ -2,3 +2,11 @@ Source URL: https://sumitomoelectric.com/sites/default/files/2025-11/download_do
 
 Excerpt:
 Production capacity for InP substrates also expanded ... InP Substrate production capacity (Standardized by size) ... 2024 ... 2028 ... 2.4x
+
+[PDF p.10/13, Optical Devices Used for Intra-DC] Optical devices used for the optical network of intra-DC are mainly EML and CW-LD, which are our main products.
+
+[PDF p.3/13, Optical device-related products (diagram label)] CW LD (light source for Si-Photonics)
+
+[PDF p.12/13, Addressing next-generation technologies] Addressing next-generation technologies ✓ 200G/wavelength EML ✓ High-output (350mW+class) CW-LD
+
+[PDF p.10/13, Demand ratio for chip quantity (table)] Demand ratio for chip quantity (Sumitomo Electric estimates) ... EML 76% 55% 31% CW-LD 24% 45% 69%

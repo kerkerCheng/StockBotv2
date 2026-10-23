@@ -10,9 +10,38 @@
       ],
       "statement": "Sumitomo Electric's 2025-11-13 official data-center growth strategy presents a plan to expand size-standardized InP substrate production capacity to 2.4 times the fiscal 2024 level by fiscal 2028. This is an announced forward capacity plan, not evidence that the capacity has been built, yielded, or customer-qualified.",
       "subject_id": "co:sumitomo_electric"
+    },
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "條件：住友電工的決算說明、統合報告或住友電工デバイス・イノベーション（SEDI）的產品資料寫出 CW-LD 停產、不再外售，或 2028 年度的資料中心光元件產能擴充計畫縮減或延後。核查頻率：每半年（住友電工 5 月、11 月決算說明會）。觸發後 48 小時：e1 降 confidence 或提撤回，重讀 tech:cw_dfb_laser 讀圖的供給側列舉與反證①。",
+      "id": "sumitomo_growth_strategy_dc_2025_11_13_cl2",
+      "source_ids": [
+        "sumitomo_growth_strategy_dc_2025_11_13_s2",
+        "sumitomo_growth_strategy_dc_2025_11_13_s3",
+        "sumitomo_growth_strategy_dc_2025_11_13_s4",
+        "sumitomo_growth_strategy_dc_2025_11_13_s5"
+      ],
+      "statement": "Sumitomo Electric's 2025-11-13 data-center growth strategy deck states that optical devices for the intra-DC optical network are 'mainly EML and CW-LD, which are our main products', labels its CW LD as the 'light source for Si-Photonics', and lists 'High-output (350mW+class) CW-LD' among next-generation technologies. Its own estimate puts CW-LD at 24% / 45% / 69% of intra-DC laser chip demand quantity in 2024 / 2026 / 2028 (EML the rest). Supplier self-report (L8 weak): no customer, shipment volume, capacity or market share for CW-LD is disclosed in the deck.",
+      "subject_id": "e1"
     }
   ],
-  "edges": [],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:cw_dfb_laser",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "sumitomo_growth_strategy_dc_2025_11_13_s2",
+        "sumitomo_growth_strategy_dc_2025_11_13_s3",
+        "sumitomo_growth_strategy_dc_2025_11_13_s4",
+        "sumitomo_growth_strategy_dc_2025_11_13_s5"
+      ],
+      "src_id": "co:sumitomo_electric"
+    }
+  ],
   "nodes": [
     {
       "abstraction_level": "materials_substrate",
@@ -30,6 +59,28 @@
         "sumitomo_growth_strategy_dc_2025_11_13_s1"
       ],
       "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "CW laser",
+        "internal laser diode",
+        "high-power CW laser",
+        "CW DFB",
+        "CW DFB laser",
+        "DFB laser",
+        "high-power DFB laser"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:cw_dfb_laser",
+      "name": "High-power CW DFB laser",
+      "role": null,
+      "source_ids": [
+        "sumitomo_growth_strategy_dc_2025_11_13_s2",
+        "sumitomo_growth_strategy_dc_2025_11_13_s3"
+      ],
+      "type": "TechNode"
     }
   ],
   "schema_version": "0.1",
@@ -40,9 +91,10 @@
     "permission_basis": "Publicly downloadable issuer IR presentation; retain the canonical URL and only the research-relevant excerpt.",
     "published_at": "2025-11-13",
     "publisher": "Sumitomo Electric Industries",
-    "retrieved_at": "2026-08-04",
+    "retrieved_at": "2026-10-23",
     "source_type": "ir_deck",
     "storage_permission": "repo_excerpt",
+    "supersedes_extraction_sha256": "de22ee4131059e2e487dd04e2c04926fe43b0edd981e0de1a6d8a95add2078de",
     "title": "Sumitomo Electric — Growth strategy for data center-related business",
     "url": "https://sumitomoelectric.com/sites/default/files/2025-11/download_documents/Growth%20strategy%20for%20data%20center-related%20business_2025.pdf"
   },
@@ -51,6 +103,26 @@
       "id": "sumitomo_growth_strategy_dc_2025_11_13_s1",
       "locator": "PDF p.12/13, Production Capacity for Optical Devices and InP Substrates",
       "quote": "Production capacity for InP substrates also expanded ... InP Substrate production capacity (Standardized by size) ... 2024 ... 2028 ... 2.4x"
+    },
+    {
+      "id": "sumitomo_growth_strategy_dc_2025_11_13_s2",
+      "locator": "PDF p.10/13, Optical Devices Used for Intra-DC",
+      "quote": "Optical devices used for the optical network of intra-DC are mainly EML and CW-LD, which are our main products."
+    },
+    {
+      "id": "sumitomo_growth_strategy_dc_2025_11_13_s3",
+      "locator": "PDF p.3/13, Optical device-related products (diagram label)",
+      "quote": "CW LD (light source for Si-Photonics)"
+    },
+    {
+      "id": "sumitomo_growth_strategy_dc_2025_11_13_s4",
+      "locator": "PDF p.12/13, Addressing next-generation technologies",
+      "quote": "Addressing next-generation technologies ✓ 200G/wavelength EML ✓ High-output (350mW+class) CW-LD"
+    },
+    {
+      "id": "sumitomo_growth_strategy_dc_2025_11_13_s5",
+      "locator": "PDF p.10/13, Demand ratio for chip quantity (table)",
+      "quote": "Demand ratio for chip quantity (Sumitomo Electric estimates) ... EML 76% 55% 31% CW-LD 24% 45% 69%"
     }
   ]
 }
