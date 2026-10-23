@@ -1,0 +1,23 @@
+Source URL: https://nvidianews.nvidia.com/news/nvidia-uber-robotaxi
+
+Excerpt:
+[EXCERPT — 有限逐字引文] NVIDIA Makes the World Robotaxi-Ready With Uber Partnership to Support Global Expansion（DRIVE AGX Hyperion 10：14 相機、9 雷達、1 光達、12 超音波、2 顆 DRIVE AGX Thor；Uber 2027 起目標 10 萬台）
+
+Source: https://nvidianews.nvidia.com/news/nvidia-uber-robotaxi
+PUBLISHED: 2025-10-28（NVIDIA Newsroom 新聞稿署日）
+RETRIEVED: 2026-10-23（本機抓 HTML 轉文字、逐字核對）
+
+【Press release body（第 3 段）】
+NVIDIA DRIVE AGX Hyperion 10 is a reference production computer and sensor set architecture that makes any vehicle L4-ready.
+
+【Press release body（第 2 段）】
+By enabling faster growth across the level 4 ecosystem, NVIDIA can support Uber in scaling its global autonomous fleet to 100,000 vehicles over time, starting in 2027.
+
+【Press release body（Hyperion 10 規格段）】
+The NVIDIA DRIVE AGX Hyperion 10 production platform features the NVIDIA DRIVE AGX Thor system-on-a-chip; the safety-certified NVIDIA DriveOS™ operating system; a fully qualified multimodal sensor suite including 14 high-definition cameras; nine radars, one lidar and 12 ultrasonics; and a qualified board design.
+
+【Press release body（Hyperion 10 規格段）】
+At the core of DRIVE AGX Hyperion 10 are two performance-packed DRIVE AGX Thor in-vehicle platforms based on NVIDIA Blackwell architecture.
+
+【Press release body（第 4 段）】
+Uber is bringing together human drivers and autonomous vehicles into a single operating network — a unified ride-hailing service including both human and robot drivers. This network, powered by NVIDIA DRIVE AGX Hyperion-ready vehicles and the surrounding AI ecosystem, enables Uber to seamlessly bridge today’s human-driven mobility with the autonomous fleets of tomorrow.

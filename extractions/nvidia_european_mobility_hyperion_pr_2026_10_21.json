@@ -1,0 +1,72 @@
+{
+  "claims": [
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：Bolt、Lucid 或 NVIDIA 的一手寫出歐洲 Hyperion L4 車隊計畫取消、縮減到 25,000 台以下，或 2027 年馬德里資料收集被延後或不獲監理核准。核查頻率：每半年（NVIDIA GTC、Lucid 財報）。觸發後 48 小時：更新本 claim，重讀 tech:robotaxi_fleet 需求側。",
+      "id": "nvidia_european_mobility_hyperion_pr_2026_10_21_cl1",
+      "source_ids": [
+        "nvidia_european_mobility_hyperion_pr_2026_10_21_s1",
+        "nvidia_european_mobility_hyperion_pr_2026_10_21_s2",
+        "nvidia_european_mobility_hyperion_pr_2026_10_21_s3"
+      ],
+      "statement": "NVIDIA (2026-10-21, GTC Berlin): Bolt selected the NVIDIA Alpamayo Stack for its European robotaxi program, beginning with future Lucid vehicles built on Hyperion, and plans data gathering in Madrid in 2027 (subject to regulatory approval) 'as part of a planned European rollout of at least 25,000 level 4-capable future Lucid vehicles built on NVIDIA Hyperion'. Hyperion 'provides a common computing and sensor architecture'. A platform owner's statement of a customer's plan (Bolt and Lucid did not issue it here); no sensor supplier named.",
+      "subject_id": "tech:robotaxi_fleet"
+    }
+  ],
+  "edges": [],
+  "nodes": [
+    {
+      "abstraction_level": "end_demand",
+      "aliases": [
+        "robotaxi fleet",
+        "level 4 robotaxi",
+        "L4 robotaxi",
+        "autonomous fleet",
+        "robotaxi fleets"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:robotaxi_fleet",
+      "name": "Level 4 robotaxi fleet",
+      "role": null,
+      "source_ids": [
+        "nvidia_european_mobility_hyperion_pr_2026_10_21_s1",
+        "nvidia_european_mobility_hyperion_pr_2026_10_21_s2",
+        "nvidia_european_mobility_hyperion_pr_2026_10_21_s3"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "nvidia_european_mobility_hyperion_pr_2026_10_21",
+    "evidence_tier": 1,
+    "origin_entity": "NVIDIA",
+    "permission_basis": "NVIDIA 公開新聞稿；只保留研究必要的有限逐字節錄。published_at 取新聞稿署日 October 21, 2026（GTC Berlin）。",
+    "published_at": "2026-10-21",
+    "publisher": "NVIDIA Newsroom",
+    "retrieved_at": "2026-10-23",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "European Mobility Leaders Build Safe Vehicles and Robotaxi Fleets on NVIDIA Hyperion（GTC Berlin：Bolt 計畫在歐洲推出至少 25,000 台 Hyperion L4 Lucid）",
+    "url": "https://nvidianews.nvidia.com/news/european-mobility-leaders-build-safe-vehicles-and-robotaxi-fleets-on-nvidia-hyperion"
+  },
+  "sources": [
+    {
+      "id": "nvidia_european_mobility_hyperion_pr_2026_10_21_s1",
+      "locator": "Press release body（Bolt 段）",
+      "quote": "Bolt has selected NVIDIA Alpamayo Stack for its European robotaxi program, beginning with future Lucid vehicles built on Hyperion."
+    },
+    {
+      "id": "nvidia_european_mobility_hyperion_pr_2026_10_21_s2",
+      "locator": "Press release body（Bolt 段）",
+      "quote": "Bolt plans to begin gathering real-world driving data to support the development and validation of the autonomous driving technology — subject to regulatory approval — in Madrid in 2027, with Germany being a priority for future deployment as part of a planned European rollout of at least 25,000 level 4-capable future Lucid vehicles built on NVIDIA Hyperion."
+    },
+    {
+      "id": "nvidia_european_mobility_hyperion_pr_2026_10_21_s3",
+      "locator": "Press release body（Volkswagen 段）",
+      "quote": "Hyperion provides a common computing and sensor architecture designed to simplify integration and validation, helping developers and mobility operators bring robotaxi and commercial transport services to market."
+    }
+  ]
+}

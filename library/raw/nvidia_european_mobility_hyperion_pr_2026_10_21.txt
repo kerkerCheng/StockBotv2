@@ -1,0 +1,17 @@
+Source URL: https://nvidianews.nvidia.com/news/european-mobility-leaders-build-safe-vehicles-and-robotaxi-fleets-on-nvidia-hyperion
+
+Excerpt:
+[EXCERPT — 有限逐字引文] European Mobility Leaders Build Safe Vehicles and Robotaxi Fleets on NVIDIA Hyperion（GTC Berlin：Bolt 計畫在歐洲推出至少 25,000 台 Hyperion L4 Lucid）
+
+Source: https://nvidianews.nvidia.com/news/european-mobility-leaders-build-safe-vehicles-and-robotaxi-fleets-on-nvidia-hyperion
+PUBLISHED: 2026-10-21（NVIDIA Newsroom 新聞稿署日）
+RETRIEVED: 2026-10-23（本機抓 HTML 轉文字、逐字核對）
+
+【Press release body（Bolt 段）】
+Bolt has selected NVIDIA Alpamayo Stack for its European robotaxi program, beginning with future Lucid vehicles built on Hyperion.
+
+【Press release body（Bolt 段）】
+Bolt plans to begin gathering real-world driving data to support the development and validation of the autonomous driving technology — subject to regulatory approval — in Madrid in 2027, with Germany being a priority for future deployment as part of a planned European rollout of at least 25,000 level 4-capable future Lucid vehicles built on NVIDIA Hyperion.
+
+【Press release body（Volkswagen 段）】
+Hyperion provides a common computing and sensor architecture designed to simplify integration and validation, helping developers and mobility operators bring robotaxi and commercial transport services to market.
