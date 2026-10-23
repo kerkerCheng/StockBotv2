@@ -204,6 +204,9 @@ RETURN s.id
 #: 把 `source_ids` 從懸空字串變成真的走得到的邊。
 #: ⚠ **`source_ids` 這個欄位一個字都不動**——它是既有消費端讀的東西（`_fmt_sources` 等）。
 #: 這裡只是**新增**一條可走訪的邊；舊路徑照舊，新路徑才走得到逐字。
+#: ⚠ **只增不減**（routine 憑證沒有刪 `QUOTES` 的權限），而邊斷言與 claim 的 `source_ids` 重載時是覆寫——
+#: 更正版拿掉的引用，連結還在。所以**邊斷言的有效逐字以 `source_ids` 為準，讀端過濾 `s.id IN ea.source_ids`**
+#: （2026-10-23：[841] 拿掉 trendforce e2 的 s3 後讀圖照印 s3；全圖 33 條，見 `tests/test_source_quotes.py`）。
 LINK_QUOTES = """
 MATCH (n {id: $id})
 WITH n

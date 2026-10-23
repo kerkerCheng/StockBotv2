@@ -14,7 +14,8 @@
 assertion 列與逐字（`rows_after_load`），用分類的唯一 owner（`query.bottleneck.classify_evidence`→`corroboration`）在記憶體裡
 前後各算一次。MERGE 語意照抄：assertion 以 `evidence_id` 覆寫（舊版有、新版沒有的 assertion **留著**）、SourceDoc 欄位直接
 SET（同一份文件的舊 assertion 也跟著換 origin／宣告——[666] 就是這樣升級的）、`published_at` coalesce、Source 的逐字 coalesce、
-`QUOTES` 連結只增不減。
+`QUOTES` 連結只增不減，但邊斷言的**有效**逐字以 `source_ids` 為準（讀端過濾，見 loader `LINK_QUOTES` 的註解）——
+所以預告裡新版的 `source_ids` 直接取代舊的（2026-10-23）。
 """
 from __future__ import annotations
 
@@ -208,7 +209,8 @@ def side_effects(doc: Mapping[str, Any], session: Any) -> dict[str, Any]:
 
 #: 證據等級預告要的另外兩樣現值：每筆 assertion 連到哪幾段 Source、每段 Source 的逐字（`fetch_all_quotes` 只給逐字，
 #: 模擬「這份文件改了 s3 的逐字」要知道誰連著 s3）。
-_LINKS_CYPHER = "MATCH (ea:EdgeAssertion)-[:QUOTES]->(s:Source) RETURN ea.id AS id, collect(DISTINCT s.id) AS sources"
+_LINKS_CYPHER = ("MATCH (ea:EdgeAssertion)-[:QUOTES]->(s:Source) WHERE s.id IN ea.source_ids "
+                 "RETURN ea.id AS id, collect(DISTINCT s.id) AS sources")
 _SOURCE_QUOTES_CYPHER = "MATCH (s:Source) WHERE s.quote IS NOT NULL RETURN s.id AS id, s.quote AS quote"
 
 
@@ -264,7 +266,7 @@ def rows_after_load(rows: list[Mapping[str, Any]], links: Mapping[str, Any], sou
                 "published_at": source_doc.get("published_at") or template.get("published_at"),
                 "assertion_id": aid,
             }
-            link_after.setdefault(aid, set()).update(str(s) for s in edge.get("source_ids") or ())
+            link_after[aid] = {str(s) for s in edge.get("source_ids") or ()}
     return list(after.values()), quotes_by_assertion(link_after, quotes_after)
 
 

@@ -138,7 +138,8 @@ def fetch_all_quotes(session) -> dict[str, list[str]]:
     `collapse_assertions` 的 `documents` 計數會被灌大（plan §5 b）。所以另開一條查詢、在 Python 端對 id。
     """
     out: dict[str, list[str]] = {}
-    for record in session.run("MATCH (ea:EdgeAssertion)-[:QUOTES]->(s:Source) "
+    # `QUOTES` 只增不減、`source_ids` 重載時覆寫：有效逐字以 `source_ids` 為準（loader `LINK_QUOTES` 的註解）
+    for record in session.run("MATCH (ea:EdgeAssertion)-[:QUOTES]->(s:Source) WHERE s.id IN ea.source_ids "
                               "RETURN ea.id AS id, collect(DISTINCT s.quote) AS quotes"):
         out[str(record["id"])] = [str(q) for q in record["quotes"] or () if q]
     return out

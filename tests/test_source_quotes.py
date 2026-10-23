@@ -113,6 +113,23 @@ def test_reloading_an_existing_doc_must_not_wipe_a_quote() -> None:
     assert "s.quote = $quote" not in MERGE_SOURCE
 
 
+def test_assertion_quotes_are_read_through_source_ids_because_links_only_grow() -> None:
+    """`QUOTES` 只增不減（routine 憑證不准刪），邊斷言的 `source_ids` 卻是重載覆寫——讀端必須以 `source_ids` 過濾（L12）。
+
+    事發（2026-10-23）：[841] 更正版拿掉 trendforce e2 的 s3，`source_ids` 剩 s1、`[:QUOTES]` 還連著 s3，
+    `query.structure --quotes` 照印、讀圖的引用核對也看得到它——全圖 33 條（含 sivers 重排邊號留下的 32 條）。
+    三個讀邊斷言逐字的地方都要過濾；只修一個就是「只認得當初那個案例」（L17）。
+    """
+    from loader.merge_side_effects import _LINKS_CYPHER
+    from query.structure import _Q_QUOTES
+
+    sub_language = (Path(__file__).resolve().parent.parent / "query" / "sub_language.py").read_text(encoding="utf-8")
+    for name, cypher in (("query.structure._Q_QUOTES", _Q_QUOTES), ("merge_side_effects._LINKS_CYPHER", _LINKS_CYPHER)):
+        assert "s.id IN ea.source_ids" in cypher, name
+    assert "WHERE s.id IN ea.source_ids" in sub_language, "query.sub_language.fetch_all_quotes"
+    assert "DELETE" not in LINK_QUOTES, "連結只增不減：routine 沒有刪 QUOTES 的權限，寫端拆不掉"
+
+
 def test_link_quotes_never_creates_a_source_it_cannot_find() -> None:
     """`LINK_QUOTES` 只 MATCH 不 MERGE Source——接不到就是接不到，不得憑空造一個空證據。"""
     assert "MATCH (s:Source)" in LINK_QUOTES

@@ -208,7 +208,7 @@ def _packet_doc() -> dict:
 
 def test_rows_after_load_follow_the_loader_merge_semantics() -> None:
     """assertion 以 evidence_id 覆寫、舊版有新版沒有的留著、SourceDoc 欄位直接 SET 到同一份文件的每一筆、
-    Source 逐字 coalesce、QUOTES 連結只增不減——與 `loader.load_to_neo4j.load` 同一套（預告不得比真的載入樂觀）。"""
+    Source 逐字 coalesce、邊斷言的 QUOTES 照新版 source_ids 覆寫——與 `loader.load_to_neo4j.load` 同一套（預告不得比真的載入樂觀）。"""
     from loader.merge_side_effects import rows_after_load
 
     links = {"d_e1": ["d_s1"], "d_e2": ["d_s2"], "o_e1": ["o_s1"]}
@@ -223,6 +223,21 @@ def test_rows_after_load_follow_the_loader_merge_semantics() -> None:
     assert by_id["d_e1"]["published_at"] == "2026-06-01"                         # 抽取檔沒帶日期：coalesce 留圖上值
     assert quotes["d_e1"] == ["NVIDIA signed a multiyear supply agreement", "NVIDIA will purchase lasers from Lumentum"]
     assert quotes["d_e2"] == ["NVIDIA buys lasers"] and quotes["d_e3"] == ["NVIDIA will purchase lasers from Lumentum"]
+
+
+def test_rows_after_load_drops_a_quote_the_new_version_no_longer_cites() -> None:
+    """更正版拿掉一段引用：預告也要拿掉（2026-10-23 [841] trendforce e2 拿掉 s3 的形狀）——有效逐字以新版 source_ids 為準。"""
+    from loader.merge_side_effects import rows_after_load
+
+    links = {"d_e1": ["d_s1", "d_s2"]}
+    source_quotes = {"d_s1": "NVIDIA signed a multiyear supply agreement", "d_s2": "PIC capacity sentence"}
+    doc = _packet_doc()
+    doc["edges"][0]["source_ids"] = ["d_s1"]
+    _rows, quotes = rows_after_load(_graph_rows(), links, source_quotes, [doc])
+    assert quotes["d_e1"] == ["NVIDIA signed a multiyear supply agreement"]
+    doc["edges"][0]["source_ids"] = []
+    _rows, quotes = rows_after_load(_graph_rows(), links, source_quotes, [doc])
+    assert "d_e1" not in quotes                                                   # 新版不引用任何一段：讀端就沒有逐字
 
 
 def test_evidence_after_load_lists_every_edge_whose_label_would_change() -> None:

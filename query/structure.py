@@ -475,7 +475,7 @@ def render_markdown(view: StructureView,
 
 _Q_QUOTES = """
 MATCH (ea:EdgeAssertion)-[:QUOTES]->(s:Source)
-WHERE ea.src_id = $node OR ea.dst_id = $node
+WHERE (ea.src_id = $node OR ea.dst_id = $node) AND s.id IN ea.source_ids
 OPTIONAL MATCH (ea)-[:CITES]->(d:SourceDoc)
 RETURN ea.src_id AS src, ea.relation AS relation, ea.dst_id AS dst,
        s.quote AS quote, s.locator AS locator,
