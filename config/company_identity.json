@@ -2274,6 +2274,24 @@
         "Yuanjie Semiconductor",
         "Yuanjie"
       ]
+    },
+    {
+      "_display_name_source": "yfinance longName（2026-10-23）；交易所 NCM",
+      "_note": "名冊批次草稿（2026-10-23）：robotaxi decompose（[852]）拆出的兩家邊緣公司：成像雷達（Arbe）與光達（AEye）；登記後它們的申報才叫得醒 R7／R9 停放的等待；系統口徑 edge（約 0.6 億美元、分析師 2 家）",
+      "company_id": "co:arbe_robotics",
+      "display_name": "Arbe Robotics Ltd.",
+      "market_currency": "USD",
+      "name_aliases": [],
+      "research_ticker": "ARBE"
+    },
+    {
+      "_display_name_source": "yfinance longName（2026-10-23）；交易所 NCM",
+      "_note": "名冊批次草稿（2026-10-23）：robotaxi decompose（[852]）拆出的兩家邊緣公司：成像雷達（Arbe）與光達（AEye）；登記後它們的申報才叫得醒 R7／R9 停放的等待；系統口徑 edge（約 0.4 億美元、分析師 2 家）",
+      "company_id": "co:aeye",
+      "display_name": "AEye, Inc.",
+      "market_currency": "USD",
+      "name_aliases": [],
+      "research_ticker": "LIDR"
     }
   ]
 }
