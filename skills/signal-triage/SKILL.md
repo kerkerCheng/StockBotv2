@@ -132,6 +132,8 @@ FILTER 不寫 classification，仍使用 `--no-go --tier ... --reason ...`。PAS
 `withheld_unclassified_lead`，不讓 `unknown` sentinel 偷走 pq1 slot；已核准的 Decision work order
 與其他分類完整的 leads 仍可繼續。trace requeue 不寫 triage（2026-09-26 起只追加 `requeued`），原始那一筆分類照留；原始沒有分類的排回 lead
 由 `classification-health` 單獨計數（`requeued_unclassified_count`）並指出 consumer，只補分類、不重判 go／no_go。
+停放中、叫得回來、卻沒有分類的 lead 不等排回：`classification-health` 當場以 `dormant_unclassified_count` 紅（2026-10-23，failure log #101），
+回填腳本 `--from-json` 也收 parked（no_go 照拒）——一次補完，不讓它們被 watch 一則一則叫醒時才紅。
 
 **`decision_impact` 是判斷核心，也最容易填錯。** 問法固定：*「如果查證結果是 A，什麼會變？
 是 B 呢？」*

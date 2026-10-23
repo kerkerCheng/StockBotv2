@@ -131,9 +131,13 @@ def main() -> int:
             lead = store["leads"].get(lead_id)
             if lead is None:
                 raise KeyError(f"lead 不存在：{lead_id}")
-            if lead.get("status") not in ACTIVE_STATUSES:
+            # parked 也收（2026-10-23）：停放中叫得回來的舊 lead 不先補，排回那一天 daily 就紅（`leads.dormant_classification_gaps`）。
+            # no_go 照拒（FILTER 不寫 classification）；pending／applied 照拒（前者等 triage，後者叫不回來）。
+            dormant_ok = (lead.get("status") == "parked"
+                          and (lead.get("triage") or {}).get("decision") != "no_go")
+            if lead.get("status") not in ACTIVE_STATUSES and not dormant_ok:
                 raise ValueError(
-                    f"semantic active backfill 拒絕非 active lead：{lead_id} status={lead.get('status')}"
+                    f"semantic backfill 只收 active 或停放中（非 no_go）的 lead：{lead_id} status={lead.get('status')}"
                 )
             _validate(tags)
             existing = priority.classification(lead)
@@ -158,9 +162,10 @@ def main() -> int:
     total = len(store["leads"])
     unclassified = sum(1 for l in store["leads"].values() if not priority.classification(l))
     active_gaps = leads.classification_gaps(store)
+    dormant_gaps = leads.dormant_classification_gaps(store)
     print(
         f"lead 總數 {total}｜本次補分類 {changed}（history 還原 {restored}）｜"
-        f"仍未分類 {unclassified}｜active 缺分類 {len(active_gaps)}"
+        f"仍未分類 {unclassified}｜active 缺分類 {len(active_gaps)}｜停放中叫得回來的缺分類 {len(dormant_gaps)}"
     )
     if active_gaps:
         print(json.dumps({"active_gaps": active_gaps}, ensure_ascii=False, indent=2))

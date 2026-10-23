@@ -93,3 +93,62 @@ def test_semantic_backfill_accepts_lead_advanced_without_triage(tmp_path, monkey
     assert record["decision_impact"] == "candidate_set"
     assert record["classified_by"] == "backfill_semantic_v1"
     assert leads.classification_gaps(reloaded) == []
+
+
+def _parked_legacy(store, url: str, *, go: bool = True) -> str:
+    """分類欄位出現前就停放的舊 lead：triage 沒有 classification、停放時帶追源 receipt（叫得回 pq1）。
+    直接改 store，不走 `advance`——停放會順手建追源 watch，測試不碰真的 watch registry。"""
+    lead_id, _ = leads.register(store, source="x:test", url=url)
+    leads.triage(store, lead_id, go=go, tier=4, reason="legacy")
+    lead = store["leads"][lead_id]
+    lead["status"] = "parked"
+    lead["refs"]["trace_status"] = "original_obtained"
+    return lead_id
+
+
+def test_dormant_gap_is_red_before_requeue_and_backfill_closes_it(tmp_path, monkeypatch, capsys) -> None:
+    """2026-10-23：daily 分類檢查 10-17、10-20、10-22、10-23 都紅，每次是被 watch 叫回的另一則舊 lead。
+    停放的那一池要在排回之前就現形、而且補得進去——否則每叫醒一則就紅一天。"""
+    from engine_b import cli
+
+    leads_path = tmp_path / "pending_leads.json"
+    packet_path = tmp_path / "dormant_backfill.json"
+    store = leads.empty_store()
+    dormant = _parked_legacy(store, "https://x.com/test/status/dormant")
+    filtered = _parked_legacy(store, "https://x.com/test/status/filtered", go=False)
+    leads.save(store, leads_path)
+
+    assert leads.classification_gaps(store) == []                                # active 一則都沒有……
+    assert [g["lead_id"] for g in leads.dormant_classification_gaps(store)] == [dormant]   # ……休眠的照樣紅；no_go 不算
+    assert cli.main(["--leads", str(leads_path), "classification-health"]) == 2
+    health = json.loads(capsys.readouterr().out)
+    assert health["status"] == "error" and health["dormant_unclassified_count"] == 1
+    assert health["dormant_consumer"] and "--from-json" in health["dormant_consumer"]
+
+    packet_path.write_text(json.dumps({dormant: {
+        "content_type": "structural_fact", "decision_impact": "confidence_only", "reason": "停放前已讀原文",
+    }}), encoding="utf-8")
+    monkeypatch.setattr(sys, "argv", [
+        "backfill_lead_classification.py", "--leads", str(leads_path), "--from-json", str(packet_path), "--apply",
+    ])
+    assert backfill.main() == 0
+    assert "停放中叫得回來的缺分類 0" in capsys.readouterr().out
+
+    reloaded = leads.load(leads_path)
+    assert leads.dormant_classification_gaps(reloaded) == []
+    assert cli.main(["--leads", str(leads_path), "classification-health"]) == 0
+    capsys.readouterr()
+    # 叫回 pq1 之後分類跟著走（requeue_trace 不寫 triage），active 也不紅
+    leads.requeue_trace(reloaded, dormant, trigger="related_triaged_lead:lead_x", reason="共用實體")
+    assert leads.classification_gaps(reloaded) == []
+
+    # FILTER 照拒：no_go 不寫 classification
+    packet_path.write_text(json.dumps({filtered: {
+        "content_type": "sentiment", "decision_impact": "confidence_only", "reason": "x",
+    }}), encoding="utf-8")
+    try:
+        backfill.main()
+    except ValueError as exc:
+        assert "非 no_go" in str(exc)
+    else:
+        raise AssertionError("no_go 的停放 lead 不得被補分類")

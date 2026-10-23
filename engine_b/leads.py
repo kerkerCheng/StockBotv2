@@ -1106,6 +1106,12 @@ def parked_without_expiry(store: dict[str, Any]) -> list[dict[str, Any]]:
     return sorted(holes, key=lambda row: (str(row["first_seen"]), row["lead_id"]))
 
 
+def has_trace_receipt(lead: Mapping[str, Any]) -> bool:
+    """停放的 lead 帶追源 receipt＝`requeue_trace` 叫得回來（排回資格與休眠分類缺口共用這一個定義，L16）。"""
+    refs = lead.get("refs") or {}
+    return bool(refs.get("trace_status")) or "trace" in str(refs.get("parked_reason") or "").lower()
+
+
 def requeue_trace(
     store: dict[str, Any],
     lead_id: str,
@@ -1131,10 +1137,7 @@ def requeue_trace(
     lead = _require(store, lead_id)
     if lead["status"] != "parked":
         raise LeadStateError(f"trace requeue 只允許 parked；現況 {lead['status']}")
-    refs = lead.get("refs") or {}
-    if not refs.get("trace_status") and "trace" not in str(
-        refs.get("parked_reason") or ""
-    ).lower():
+    if not has_trace_receipt(lead):
         raise LeadStateError("lead 沒有 trace backlog receipt")
 
     stamp = requeued_at or _now()
@@ -1708,5 +1711,31 @@ def classification_gaps(store: dict[str, Any]) -> list[dict[str, Any]]:
             "requeued": requeued,
             "restorable_from_history": restorable,
             "consumer": consumer,
+        })
+    return sorted(rows, key=lambda row: row["lead_id"])
+
+
+def dormant_classification_gaps(store: dict[str, Any]) -> list[dict[str, Any]]:
+    """停放中、叫得回 pq1（`has_trace_receipt`）、卻沒有分類的 lead——排回那一刻就會變成 `classification_gaps`。
+
+    2026-10-23 事發：10-17、10-20、10-22、10-23 的 daily 分類完整性檢查都紅，每次是不同的一則——全是分類欄位
+    出現前（2026-07～08）就停放的舊 lead，被共用實體的 watch 叫回後才現形。8-27 的回填只補 active，停放的
+    那一池（98＋6 則）每叫醒一則就紅一天；分類只在排回後才補得進去，等於讓 daily 替互動 session 排班。
+    no_go 不算（FILTER 不寫 classification）；`applied` 是終局，叫不回來，也不算。
+    """
+
+    from engine_b import priority
+
+    rows: list[dict[str, Any]] = []
+    for lead_id, lead in store["leads"].items():
+        if lead.get("status") != "parked" or not has_trace_receipt(lead):
+            continue
+        if (lead.get("triage") or {}).get("decision") == "no_go" or priority.classification(lead):
+            continue
+        rows.append({
+            "lead_id": lead_id,
+            "source": lead.get("source"),
+            "title": " ".join(str(lead.get("title") or "").split())[:120],
+            "issue": "missing_dormant",
         })
     return sorted(rows, key=lambda row: row["lead_id"])

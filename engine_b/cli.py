@@ -762,15 +762,22 @@ def _cmd_classification_health(args: argparse.Namespace) -> int:
     store = leads.load(args.leads)
     gaps = leads.classification_gaps(store)
     requeued = [g for g in gaps if g.get("requeued")]
+    # 休眠缺口（2026-10-23）：停放、叫得回來、沒分類——排回那一刻才紅，等於一則一則慢慢漏。現在當場紅，
+    # consumer 同一支（backfill 已收 parked）；drain 與待做帳本照舊只讀 active 的 `classification_gaps`。
+    dormant = leads.dormant_classification_gaps(store)
     print(json.dumps({
-        "status": "ok" if not gaps else "error",
+        "status": "ok" if not gaps and not dormant else "error",
         "active_unclassified_count": len(gaps),
         # 排回的舊 lead 缺分類單獨計數（Phase 1 待決 #14；INV-4：每一筆都帶 consumer）——不排除在審查外。
         "requeued_unclassified_count": len(requeued),
         "requeued_restorable_from_history": sum(1 for g in requeued if g.get("restorable_from_history")),
+        "dormant_unclassified_count": len(dormant),
+        "dormant_consumer": ("互動 session：依 skills/signal-triage 判準產 JSON → python scripts/backfill_lead_classification.py "
+                             "--from-json <file> --apply（parked 也收；只補分類、不重判 go／no_go）") if dormant else None,
         "items": gaps,
+        "dormant_items": dormant,
     }, ensure_ascii=False, indent=2))
-    return 0 if not gaps else 2
+    return 0 if not gaps and not dormant else 2
 
 
 def _cmd_harvest_health(args: argparse.Namespace) -> int:
@@ -1125,7 +1132,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     p_class_health = sub.add_parser(
         "classification-health",
-        help="active pq1 classification 完整性（缺漏回 exit 2）",
+        help="pq1 classification 完整性：active 缺漏＋停放中叫得回來的缺漏（任一有就回 exit 2）",
     )
     p_class_health.set_defaults(func=_cmd_classification_health)
 
