@@ -1,0 +1,171 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "yuanjie_hkex_application_proof_2026_03_25",
+    "title": "Yuanjie Semiconductor Technology Co., Ltd.（688498.SS）HKEX H 股上市申請版本（Application Proof）節錄：CW 雷射（50–100mW、千萬顆級交付、2024 年 70mW 量產逾百萬顆）、數據中心雷射晶片 2025 年成主要營收、CIC 行業段排名",
+    "source_type": "filing",
+    "evidence_tier": 1,
+    "origin_entity": "Yuanjie Semiconductor Technology Co., Ltd.",
+    "publisher": "HKEXnews",
+    "url": "https://www1.hkexnews.hk/app/sehk/2026/108326/documents/sehk26032500810.pdf",
+    "published_at": "2026-03-25",
+    "retrieved_at": "2026-10-23",
+    "storage_permission": "repo_excerpt",
+    "permission_basis": "HKEX 依上市規則公開的 H 股上市申請版本（Application Proof，草稿、可改）；只保留研究必要的有限逐字節錄（pdfminer 本機抽字、跨行接合、空白正規化；頁碼以 pypdf 定位）。published_at 取 HKEXnews 刊登日 2026-03-25（源杰同日向上交所公告遞交，公告 2026-025），不是抓取日。"
+  },
+  "sources": [
+    {
+      "id": "yuanjie_hkex_application_proof_2026_03_25_s1",
+      "locator": "DEFINITIONS（PDF 第 29 頁）",
+      "quote": "“Company” or “our Company” Yuanjie Semiconductor Technology Co., Ltd. (陝西源杰半導體科技股份有限公司), a joint stock company with limited liability established on January 28, 2013, the A Shares of which are listed on the SSE STAR Market (stock code: 688498)"
+    },
+    {
+      "id": "yuanjie_hkex_application_proof_2026_03_25_s2",
+      "locator": "SUMMARY — Overview（PDF 第 10 頁）",
+      "quote": "We are one of the few companies worldwide capable of delivering CW lasers at a ten-million-unit scale, which underscores our unique position and reliability in the global supply chain."
+    },
+    {
+      "id": "yuanjie_hkex_application_proof_2026_03_25_s3",
+      "locator": "BUSINESS — Our Strengths（PDF 第 133 頁）",
+      "quote": "In addition, we offer CW lasers specifically tailored to address the needs of SiPh-based optical interconnects."
+    },
+    {
+      "id": "yuanjie_hkex_application_proof_2026_03_25_s4",
+      "locator": "HISTORY — Milestones，2024（PDF 第 123 頁）",
+      "quote": "We achieved mass production of 70mW CW lasers with its sales volume exceeding one million units."
+    },
+    {
+      "id": "yuanjie_hkex_application_proof_2026_03_25_s5",
+      "locator": "BUSINESS — Our Products, CW Lasers（PDF 第 143 頁）",
+      "quote": "Our CW laser portfolio spans 50mW to 100mW, and stands out for its high optical power output with superior optoelectronic conversion efficiency and reliability, specifically optimized to meet the demands of the continuously iterated SiPh applications."
+    },
+    {
+      "id": "yuanjie_hkex_application_proof_2026_03_25_s6",
+      "locator": "SUMMARY — Sales channel（PDF 第 19 頁）",
+      "quote": "Our revenue generated from distribution decreased by 14.4% from RMB74.8 million in 2024 to RMB64.0 million in 2025, primarily due to the successful market expansion of our CW lasers, which were sold to customers mostly through direct sales."
+    },
+    {
+      "id": "yuanjie_hkex_application_proof_2026_03_25_s7",
+      "locator": "SUMMARY — Overview（PDF 第 13 頁）",
+      "quote": "In 2025, driven by surging AI computing demand, revenue from our data center laser chips exceeded that from our telecommunications laser chips, becoming our primary growth driver."
+    },
+    {
+      "id": "yuanjie_hkex_application_proof_2026_03_25_s8",
+      "locator": "INDUSTRY OVERVIEW — Ranking of Global Laser Chip Market for SiPh-based High-speed Optical Interconnect Products（PDF 第 108 頁；表註 Source: Expert Interviews, annual reports, CIC）",
+      "quote": "CW lasers are primarily applied in SiPh-based high-speed optical interconnect products of 400G and above. In terms of revenue from external sales in 2025, the Company was the second-largest provider of laser chips applied in SiPh-based high-speed optical interconnect products globally and ranked first among PRC players, with a market share of 23.6%."
+    },
+    {
+      "id": "yuanjie_hkex_application_proof_2026_03_25_s9",
+      "locator": "BUSINESS — Customers（PDF 第 166 頁）",
+      "quote": "Our customers primarily consist of optical component and optical transceiver manufacturers as well as our distributors."
+    },
+    {
+      "id": "yuanjie_hkex_application_proof_2026_03_25_s10",
+      "locator": "BUSINESS — Customers（PDF 第 166 頁）",
+      "quote": "In 2023, 2024 and 2025, our revenue generated from sales to our largest customer in each year amounted to RMB27.5 million, RMB41.3 million and RMB320.8 million, respectively, representing 19.0%, 16.4% and 53.4% of our total revenue in the corresponding year."
+    },
+    {
+      "id": "yuanjie_hkex_application_proof_2026_03_25_s11",
+      "locator": "RISK FACTORS — contract liabilities（PDF 第 63 頁）",
+      "quote": "Our contract liabilities primarily arise from advance payments made by our customers to us before we fulfill our performance obligations. Our contract liabilities were RMB2.1 million, RMB1.5 million, and RMB1.9 million as of December 31, 2023, 2024 and 2025, respectively."
+    },
+    {
+      "id": "yuanjie_hkex_application_proof_2026_03_25_s12",
+      "locator": "BUSINESS — Our Strengths（PDF 第 134 頁）",
+      "quote": "In 2025, revenue generated from our data center laser chips accounted for 65.4% of our total revenue, serving as the primary engine of our overall growth."
+    },
+    {
+      "id": "yuanjie_hkex_application_proof_2026_03_25_s13",
+      "locator": "BUSINESS — Future Trends and Our Key Development Focuses（PDF 第 144 頁）",
+      "quote": "In parallel, to capture opportunities in SiPh application integration, we specifically designed SiPh-based products based on the emerging optical interconnect packaging approaches such as NPO and CPO, ensuring that we remain at the forefront of the high-performance laser chip market for next-generation data centers. The following graphics illustrate our 300mW high-power CW lasers:"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "co:yuanjie_semiconductor",
+      "type": "Company",
+      "name": "Yuanjie Semiconductor Technology",
+      "aliases": [
+        "Yuanjie Semiconductor Technology Co., Ltd.",
+        "陝西源杰半導體科技股份有限公司",
+        "Yuanjie"
+      ],
+      "abstraction_level": "device_chip",
+      "role": null,
+      "attributes": {
+        "ticker": "688498.SS"
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "yuanjie_hkex_application_proof_2026_03_25_s1"
+      ]
+    },
+    {
+      "id": "tech:cw_dfb_laser",
+      "type": "TechNode",
+      "name": "High-power CW DFB laser",
+      "aliases": [
+        "CW laser",
+        "internal laser diode",
+        "high-power CW laser",
+        "CW DFB",
+        "CW DFB laser",
+        "DFB laser",
+        "high-power DFB laser"
+      ],
+      "abstraction_level": "device_chip",
+      "role": null,
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "yuanjie_hkex_application_proof_2026_03_25_s2",
+        "yuanjie_hkex_application_proof_2026_03_25_s3",
+        "yuanjie_hkex_application_proof_2026_03_25_s5"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "src_id": "co:yuanjie_semiconductor",
+      "dst_id": "tech:cw_dfb_laser",
+      "relation": "supplies_to",
+      "attributes": {},
+      "confidence": 0.8,
+      "source_ids": [
+        "yuanjie_hkex_application_proof_2026_03_25_s1",
+        "yuanjie_hkex_application_proof_2026_03_25_s2",
+        "yuanjie_hkex_application_proof_2026_03_25_s3",
+        "yuanjie_hkex_application_proof_2026_03_25_s4",
+        "yuanjie_hkex_application_proof_2026_03_25_s5",
+        "yuanjie_hkex_application_proof_2026_03_25_s6",
+        "yuanjie_hkex_application_proof_2026_03_25_s8"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "yuanjie_hkex_application_proof_2026_03_25_cl1",
+      "subject_id": "e1",
+      "demand_proof_level": "inferred",
+      "confidence": 0.65,
+      "source_ids": [
+        "yuanjie_hkex_application_proof_2026_03_25_s1",
+        "yuanjie_hkex_application_proof_2026_03_25_s2",
+        "yuanjie_hkex_application_proof_2026_03_25_s3",
+        "yuanjie_hkex_application_proof_2026_03_25_s4",
+        "yuanjie_hkex_application_proof_2026_03_25_s5",
+        "yuanjie_hkex_application_proof_2026_03_25_s6",
+        "yuanjie_hkex_application_proof_2026_03_25_s7",
+        "yuanjie_hkex_application_proof_2026_03_25_s8",
+        "yuanjie_hkex_application_proof_2026_03_25_s9",
+        "yuanjie_hkex_application_proof_2026_03_25_s10",
+        "yuanjie_hkex_application_proof_2026_03_25_s11",
+        "yuanjie_hkex_application_proof_2026_03_25_s12",
+        "yuanjie_hkex_application_proof_2026_03_25_s13"
+      ],
+      "statement": "Yuanjie Semiconductor Technology Co., Ltd. (688498.SS; Shaanxi Yuanjie) in its HKEX H-share Application Proof (2026-03-25): it offers CW lasers 'specifically tailored to address the needs of SiPh-based optical interconnects' (portfolio 50mW to 100mW; 300mW high-power CW lasers shown under SiPh products designed for NPO and CPO), is 'one of the few companies worldwide capable of delivering CW lasers at a ten-million-unit scale', achieved mass production of 70mW CW lasers with sales volume exceeding one million units in 2024, and in 2025 data center laser chips exceeded telecom and accounted for 65.4% of total revenue. The CIC industry section in the same filing (table source 'Expert Interviews, annual reports, CIC') ranks it second globally by 2025 external sales of laser chips for SiPh-based high-speed optical interconnect products (23.6%; the other ranked providers are anonymised). Customers are 'optical component and optical transceiver manufacturers as well as our distributors'; the largest customer was 53.4% of 2025 revenue (unnamed). Contract liabilities (customer advance payments) were only RMB1.9 million at 2025 year-end. Issuer self-report (L8 weak): customers unnamed, no capacity figure, market share is a time-varying observation kept out of graph attributes.",
+      "disproof_condition": "條件：源杰的 A 股季報／年報、H 股招股書定稿或公告寫出 CW 雷射停產、外售中止或被單一客戶包下而不再外售，或數據中心雷射晶片營收占比跌回 50% 以下。核查頻率：每季（A 股季報、年報）＋ H 股招股書定稿或聆訊後資料集刊登時。觸發後 48 小時：e1 降 confidence 或提撤回，重讀 tech:cw_dfb_laser 讀圖的供給側列舉與反證①。"
+    }
+  ]
+}

@@ -62,7 +62,11 @@
     ".DE",
     ".V",
     ".TO",
-    ".SI"
+    ".SI",
+    ".NS",
+    ".BO",
+    ".VI",
+    ".KQ"
    ]
   },
   {
@@ -88,8 +92,8 @@
    ],
    "tier_cap": 1,
    "verified": false,
-   "how": "（未驗證）SSE 有對應的公告查詢端點，尚未實測；先試與 SZSE 同形的路徑",
-   "why": "688017.SS／688836.SS 需要它。**標成未驗證是為了讓缺口看得見**，不是藉口。"
+   "how": "清單（2026-10-23 實測可用）：GET https://query.sse.com.cn/security/stock/queryCompanyBulletinNew.do（params：isPagination=true、pageHelp.pageSize=100、pageHelp.pageNo=1、START_DATE／END_DATE=YYYY-MM-DD、SECURITY_CODE=<六碼>、TITLE=<關鍵字，可空>；headers 必帶 Referer=https://www.sse.com.cn/）→ JSON 的 URL 欄是 static.sse.com.cn 的 PDF 路徑。**PDF 本體抓不到**：static.sse.com.cn 回 JS challenge（不繞過）。本體改走同一份文件的其他一手鏡像——A＋H 兩地上市的走 HKEX 披露易；或巨潮資訊 static.cninfo.com.cn 的 PDF（300489 半年報實測可用；SSE 掛牌的還沒試）",
+   "why": "688017.SS／688836.SS／688498.SS 需要它。2026-10-23：688498（源杰）清單可列，本體是用 HKEX 的 H 股申請版本取得的。**清單通、本體不通，所以仍標未驗證**——驗證指的是拿得到文件本身，不是列得出標題。"
   },
   {
    "key": "mops",
@@ -170,6 +174,20 @@
    "verified": false,
    "how": "（未驗證）www1.hkexnews.hk 的公司公告檢索",
    "why": "6680.HK 需要它。"
+  },
+  {
+   "key": "bse_india",
+   "label": "印度 BSE 公司公告（NSE 掛牌的同一份 Reg. 30 披露也在這裡）",
+   "rung": 2,
+   "applies_to": "ticker_suffix",
+   "suffixes": [
+    ".NS",
+    ".BO"
+   ],
+   "tier_cap": 1,
+   "verified": true,
+   "how": "① GET https://api.bseindia.com/BseIndiaAPI/api/AnnSubCategoryGetData/w（params：pageno=1、strCat=-1、strPrevDate=YYYYMMDD、strToDate=YYYYMMDD、strScrip=<BSE 六碼>、strSearch=P、strType=C、subcategory=-1；headers 帶 Referer／Origin=https://www.bseindia.com）→ JSON 的 Table[].ATTACHMENTNAME。② 附件 GET https://www.bseindia.com/xml-data/corpfiling/AttachHis/<ATTACHMENTNAME>（**AttachLive 回 404 HTML，用 AttachHis**）。公司官網的投資人頁常有同一份 PDF，但財報可能是掃描檔（無文字）",
+   "why": "MTARTECH.NS（BSE 543270）需要它。2026-10-23 實測通過：FY26 經審計結果、FY27 第一季新聞稿與投資人簡報、2026-05-14 訂單披露都取到全文；mtar.in 上的 FY26 合併財報是掃描檔，經審計結果改用 BSE 那份。"
   },
   {
    "key": "issuer_site",

@@ -1,0 +1,52 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1047127/000104712726000046/amkr-20260630.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Amkor Technology 10-Q（2026-06-30 季度，2026-07-28 申報）——營收、終端市場占比、客戶預付、資本支出、資產負債
+DATE: 2026-07-28
+RETRIEVED: 2026-10-23（SEC EDGAR 原文 HTML 本機抽字、空白正規化；表格儲存格以「|」分隔，逐字）
+NOTE: 發行人自己的申報（L8：客戶端預付與產能協議的金額是發行人揭露）。
+
+【Condensed Consolidated Statements of Income（in thousands；三個月 2026／2025）】
+"Net sales | $ | 1,897,965 | $ | 1,511,392 |"
+
+【同上】
+"Gross profit | 318,590 | 181,897 |"
+
+【同上】
+"Net income attributable to Amkor | $ | 173,753 | $ | 54,417 |"
+
+【Note — net sales by end market（三個月 2026／2025、六個月 2026／2025）】
+"Communications (smartphones, tablets) | 42 | % | 40 | % | 43 | % | 40 | %"
+
+【同上】
+"Computing (data center, infrastructure, PC/laptop, storage) | 22 | % | 22 | % | 21 | % | 22 | %"
+
+【同上】
+"Automotive, industrial and other (ADAS, electrification, infotainment, safety) | 22 | % | 20 | % | 22 | % | 21 | %"
+
+【同上】
+"Consumer (AR & gaming, connected home, home electronics, wearables) | 14 | % | 18 | % | 14 | % | 17 | %"
+
+【Note — net sales by product（in thousands；三個月 2026／2025）】
+"Advanced products (1) | $ | 1,556,676 | $ | 1,228,678 |"
+
+【同上（註）】
+"(1) Advanced products include flip chip, memory and wafer-level processing and related test services."
+
+【Liquidity — customer advances】
+"We enter into customer advance payment agreements from time to time, some of which require standby letters of credit. As of June 30, 2026, we expect to receive approximately $300 million of advance payments over a two-year period, all of which will require standby letters of credit upon receipt. In July 2026, we received $100.0 million of customer advance payments"
+
+【Liquidity — capital expenditures】
+"We expect that our 2026 capital expenditures will be approximately $2.5 billion to $3.0 billion. The increase from 2025 is primarily due to the construction of the Arizona Facility."
+
+【Condensed Consolidated Balance Sheets（in thousands；2026-06-30／2025-12-31）】
+"Cash and cash equivalents | $ | 1,551,890 | $ | 1,378,347 |"
+
+【同上】
+"Short-term borrowings and current portion of long-term debt | $ | 150,781 | $ | 162,430 |"
+
+【同上】
+"Long-term debt | 2,334,950 | 1,282,816 |"
+
+【Note — short-term investments（2026-06-30，fair value）】
+"Total short-term investments | 958,660 | 110 | ( 2,578 ) | 956,192 |"

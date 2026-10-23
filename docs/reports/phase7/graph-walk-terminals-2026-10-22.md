@@ -36,3 +36,8 @@
 ## 順帶修掉的（L17 當下修）
 
 - `config/sector_anchors.json`「記憶體」寫的 `tech:dram_production` 在 [506] 已併進 `tech:dram_manufacturing`，`query/bottleneck.load_demand_anchors` 讀原字串、不經名冊——這個錨從 [506] 起默默失效（INV-3）。改成 canonical，並加 `tests/test_entity_aliases.py::test_live_config_node_ids_are_canonical`（活的 config 寫了已併走的別名就紅；凍結的 `graph_baselines.json` 排除）。改後走圖九型計數不變、讀圖該重讀 0／58。
+
+## 2026-10-23 補記（research-drain 段 4）
+
+- 走圖 46 筆命中（③3、⑥6、⑦10、⑧6、⑨21）逐筆對照：第 3／6／7／8 型 25 筆都已在 [10-17 那份](graph-walk-terminals-2026-10-17.md)有終局（照舊；`co:ewellix` 仍由 `lead_ba1604124f95afe967fe02dc87d1c513` 停放承接）。第 9 型 21 對裡 20 對已判（10-17 的 18 對＋本表「記不了」的 2 對）。[840]–[843] 合併與別名清理之後，35 對降成這 20 對。
+- **新 1 對**：`tech:pump_laser ↔ tech:raman_pump_laser` 判 **keep_separate**（上下位）。依兩端逐字，Coherent 10-K 研發表把泵浦雷射分成「next-generation GaAs pump laser portfolio」與「InP based Raman pumps」兩支；Raman 端是 InP 那一支。這是泵浦雷射層入圖包刻意建的變體：它有 `depends_on mat:inp_substrate`，總稱端沒有，因為 GaAs 泵浦不用 InP。合併會讓 InP 基板的需求錯掛到整個泵浦層。兩端都沒有名冊條目，所以**記不了**（failure log #97）。

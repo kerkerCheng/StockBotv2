@@ -1,0 +1,10 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1047127/000104712726000029/amkr-20260430.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Amkor Technology 8-K（2026-04-30 事件，2026-05-05 申報）——0.00% 可轉換優先票據 2031 年到期
+DATE: 2026-05-05
+RETRIEVED: 2026-10-23（SEC EDGAR 原文 HTML 本機抽字、空白正規化；表格儲存格以「|」分隔，逐字）
+NOTE: 發行人自己的申報（L8：客戶端預付與產能協議的金額是發行人揭露）。
+
+【Item 1.01 Indenture and Notes】
+"On May 5, 2026, Amkor Technology, Inc. (the “Company”) issued $1,150,000,000 aggregate principal amount of its 0.00% Convertible Senior Notes due 2031 (the “Notes”)."

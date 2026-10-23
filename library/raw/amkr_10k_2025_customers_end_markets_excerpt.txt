@@ -1,0 +1,16 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1047127/000104712726000014/amkr-20251231.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Amkor Technology 10-K（2025 年度，2026-02-20 申報）——客戶集中、終端市場占比
+DATE: 2026-02-20
+RETRIEVED: 2026-10-23（SEC EDGAR 原文 HTML 本機抽字、空白正規化；表格儲存格以「|」分隔，逐字）
+NOTE: 發行人自己的申報（L8：客戶端預付與產能協議的金額是發行人揭露）。
+
+【Item 1 Business — Customers】
+"Our ten largest customers accounted for 72% of our net sales in 2025. Direct sales to Apple and Qualcomm accounted for 29.8% and 11.1% of our net sales, respectively, for the year ended December 31, 2025."
+
+【Item 1 — net sales by end market（2025／2024／2023）】
+"Computing (data center, infrastructure, PC/laptop, storage) | 20 | % | 19 | % | 16 | %"
+
+【同上】
+"Communications (smartphones, tablets) | 46 | % | 48 | % | 50 | %"

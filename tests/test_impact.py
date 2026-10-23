@@ -145,6 +145,21 @@ def test_a_lead_parked_since_c4_without_disposing_its_watches_is_counted_until_t
     assert {(r["lead_id"], r["watch_id"]) for r in rows} == {("L_new", "ew_1"), ("L_near", "ew_1")}
 
 
+def test_a_watch_registered_after_the_park_is_not_demanded_of_that_park_reason(monkeypatch) -> None:
+    """2026-10-23 L17：停放之後才登記的條件不算未處置（否則每多寫一份讀圖，舊停放就多幾筆＝量到研究量）；
+    缺時戳的照算；再次停放以最後一次為準，那時已存在就要處置。"""
+    monkeypatch.setattr(im, "HUB_SHARE", 1.1)
+    watches = [{**WATCHES[0], "created_at": "2026-10-23T05:00:00+00:00"},
+               {**WATCHES[0], "watch_id": "ew_3", "created_at": "2026-10-20T05:00:00+00:00"},
+               {**WATCHES[0], "watch_id": "ew_4"}]
+    ctx = _ctx(BRIEFS, watches=watches)
+    store = {"L_before": _parked("L_before", "2026-10-22T03:00:00+00:00", "MTAR 自述、等一手"),
+             "L_after": _parked("L_after", "2026-10-23T06:00:00+00:00", "MTAR 自述、等一手")}
+    rows = {(r["lead_id"], r["watch_id"]) for r in im.undisposed(store, ctx)}
+    assert rows == {("L_before", "ew_3"), ("L_before", "ew_4"),
+                    ("L_after", "ew_1"), ("L_after", "ew_3"), ("L_after", "ew_4")}
+
+
 def test_no_recent_parked_lead_means_the_counter_does_not_even_load_the_context(monkeypatch) -> None:
     def boom():
         raise AssertionError("沒有 C4 之後停放的 lead，不該載入對照")

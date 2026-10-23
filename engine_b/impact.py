@@ -23,6 +23,7 @@ import re
 import sys
 from collections import defaultdict
 from dataclasses import dataclass, field
+from datetime import datetime
 from pathlib import Path
 from typing import Any, Iterable, Mapping, Sequence
 
@@ -227,10 +228,19 @@ def _parked_at(lead: Mapping[str, Any]) -> str | None:
     return hits[-1] if hits else None
 
 
+def _instant(value: Any) -> datetime | None:
+    try:
+        return datetime.fromisoformat(str(value).replace("Z", "+00:00")) if value else None
+    except ValueError:
+        return None
+
+
 def undisposed(store: Mapping[str, Mapping[str, Any]], ctx: Context | None = None, *,
                since: str = DISPOSITION_SINCE) -> list[dict[str, str]]:
     """`since` 起停放的 lead × 它對照出的在盯條件（樞紐只計數的不算）裡，停放理由沒寫到那個 watch id 的組合。
     寫 `ew_0762` 或完整 id 都算寫到（LLM 與人都常截掉日期尾綴——#92 同一件事）。常駐計數器：處置完就歸零、不恆亮。
+    **停放之後才登記的 watch 不算**（2026-10-23 L17 當下修：一份新讀圖登三條條件，就讓每則碰到那家公司的舊停放各多三筆，
+    計數器跟著我們多寫讀圖單調上升——量到的是研究量；停放理由寫不到停放時還不存在的條件）。再次停放以最後一次為準，那時就要處置。
     沒有 `since` 起停放的 lead 就不載入對照（`ctx` 給 None 時才自己載；心跳每天都跑，空的那天不必付載入成本）。"""
     out: list[dict[str, str]] = []
     recent = [(lid, lead) for lid, lead in store.items()
@@ -238,10 +248,15 @@ def undisposed(store: Mapping[str, Mapping[str, Any]], ctx: Context | None = Non
     if not recent:
         return out
     ctx = ctx if ctx is not None else load_context()
+    created = {str(w.get("watch_id")): _instant(w.get("created_at")) for w in ctx.watches}
     for lead_id, lead in recent:
         reason = str((lead.get("refs") or {}).get("parked_reason") or "")
+        parked = _instant(_parked_at(lead))
         for watch in impact({**lead, "lead_id": lead_id}, ctx)["watches"]:
             wid = str(watch["watch_id"])
+            born = created.get(wid)
+            if parked and born and born > parked:                                    # 缺時戳的照算（不靜默放過）
+                continue
             short = _WATCH_SHORT.match(wid)
             forms = {wid} | ({short.group(1)} if short else set())
             if any(re.search(re.escape(f) + r"(?!\d)", reason) for f in forms):     # ew_12 不算寫到 ew_1

@@ -1,0 +1,31 @@
+Source URL: https://www.bseindia.com/xml-data/corpfiling/AttachHis/a1cb7bb8-13fd-41c8-9b7d-5e2cb401512f.pdf
+
+Excerpt:
+[EXCERPT — 有限逐字引文] MTAR Technologies Investor Presentation Q1 FY27（BSE 2026-07-30）——燃料電池業務、訂單、擴產
+DATE: 2026-07-30
+RETRIEVED: 2026-10-23（BSE 公告附件／公司官網 PDF 本機抽字，空白正規化後逐字；表格列為抽字後的列序）
+NOTE: 發行人自己的申報（L8 弱主張）；客戶未具名的訂單不推成 Bloom。
+
+【Sector: Clean Energy - Fuel Cells, Hydel & Others（Revenue in Rs. Cr；FY23／FY24／FY25／FY26／Q1FY27 與占營收比）】
+"77% 61% 62% 70% 61% 615.4 441.7 416.9 351.2 220.8"
+
+【同上 Highlights】
+"In the Fuel Cells vertical, the Company supplies various products for Solid Oxide fuel cells"
+
+【同上 Highlights】
+"The company has robust closing order book of Rs. 3431 Cr in Clean Energy by end of Q1 FY 27"
+
+【Revenue Outlook & Robust Order Book】
+"Diversified Order Book of Rs. 5,143.3 Cr as on 30th Jun 2026"
+
+【同上】
+"Company secured orders worth Rs 2,895.1 Cr across various sectors during Q1 FY27, marking the highest order inflow ever achieved in a single quarter and surpassing the entire FY26 order inflow of Rs 2,453.3 Cr"
+
+【Product Portfolio – Clean Energy】
+"15+ plus years of experience in catering to Solid Oxide Fuel Cells, the company has a long standing relationship with the customer"
+
+【Expansion & Diversification Plans】
+"In Clean Energy – Fuel Cells, the Company is in the process of expanding its capacities in a phased manner, in line with customer requirements to support the growing demand. Phase 3 expansion to augment the capacities in this vertical will be completed at the new facility by March 2027"
+
+【Sector: Clean Energy（data centre）】
+"It has recently bagged a order from SLB to supply sheet metal components and assemblies for data centre infrastructure solutions."

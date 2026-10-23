@@ -2229,6 +2229,18 @@
       ]
     },
     {
+      "company_id": "co:zhejiang_chunhui_instrument",
+      "research_ticker": null,
+      "display_name": "浙江春晖仪表股份有限公司",
+      "_display_name_source": "春晖智控深交所審核問詢函回覆（更新版，巨潮 2026-09-22，1225576840.PDF）「上市公司拟发行股份及支付现金购买浙江春晖仪表股份有限公司（以下简称标的资产）61.3106%的股权」；英文正式名稱未取得一手",
+      "_note": "隨 sofc_temperature_sensor_chunhui_instrument_rev_2026_10_23_action.json staged（drop 即回退）。未上市：2025 年 4–6 月自股轉系統摘牌（同一份回覆）；春晖智控（300943.SZ）已持股 38.69%、正以發行股份及支付現金收購其餘 61.3106%（審核中）——收購完成前是參股（invests_in control=false），⚠ 不得登記成春晖智控的別名（INV-1：不是同一家，也還不是子公司）",
+      "name_aliases": [
+        "春晖仪表",
+        "春暉儀表",
+        "浙江春暉儀表股份有限公司"
+      ]
+    },
+    {
       "company_id": "co:zhejiang_chunhui_intelligent_control",
       "research_ticker": "300943.SZ",
       "market_currency": "CNY",
@@ -2241,6 +2253,26 @@
         "春晖智控",
         "春暉智控",
         "浙江春晖智能控制"
+      ]
+    },
+    {
+      "company_id": "co:yuanjie_semiconductor",
+      "research_ticker": "688498.SS",
+      "market_currency": "CNY",
+      "execution_currency": "CNY",
+      "execution_venue": "SSE",
+      "display_name": "Yuanjie Semiconductor Technology Co., Ltd.",
+      "_display_name_source": "HKEX H 股上市申請版本（2026-03-25）封面「YUANJIE SEMICONDUCTOR TECHNOLOGY CO., LTD.」與釋義「Yuanjie Semiconductor Technology Co., Ltd. (陝西源杰半導體科技股份有限公司)」；上交所科創板 688498（陕西源杰半导体科技股份有限公司，简称源杰科技）",
+      "_note": "隨 CW DFB 雷射層入圖包 staged（2026-10-23，drop 即回退；入圖包見 cw_dfb_yuanjie_hkex_application_proof_2026_10_23_action.json）：雷射晶片 IDM（CW／EML／DFB），2025 年數據中心雷射晶片占營收 65.4%。系統口徑非邊緣（`python -m alpha edge 688498.SS`：158.4 億美元、5 家，2026-10-23），不是倍率候選。H 股仍在申請、沒有 H 股代號，不登。別名「西安源杰」是華星光 2025 年報的寫法（公司在西咸新區），顯式登記（INV-1）",
+      "name_aliases": [
+        "源杰科技",
+        "源杰半导体",
+        "源杰半導體",
+        "陕西源杰半导体科技股份有限公司",
+        "陝西源杰半導體科技股份有限公司",
+        "西安源杰",
+        "Yuanjie Semiconductor",
+        "Yuanjie"
       ]
     }
   ]

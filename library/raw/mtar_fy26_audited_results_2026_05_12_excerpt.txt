@@ -1,0 +1,25 @@
+Source URL: https://www.bseindia.com/xml-data/corpfiling/AttachHis/f6eeb395-f240-4236-9f12-547b4cff5e5a.pdf
+
+Excerpt:
+[EXCERPT — 有限逐字引文] MTAR Technologies FY2025-26 經審計財報（BSE 2026-05-12）——合併資產負債表與現金流量表（Annexure 1／2，INR millions）
+DATE: 2026-05-12
+RETRIEVED: 2026-10-23（BSE 公告附件／公司官網 PDF 本機抽字，空白正規化後逐字；表格列為抽字後的列序）
+NOTE: 發行人自己的申報（L8 弱主張）；客戶未具名的訂單不推成 Bloom。
+
+【Annexure 1 Statement of Assets and Liabilities（Standalone 31-Mar-26／31-Mar-25、Consolidated 31-Mar-26／31-Mar-25）】
+"Cash and cash equivalents 9.10 18.72 9.96 19.34"
+
+【同上（非流動 Borrowings：Standalone 31-Mar-26／31-Mar-25、Consolidated 31-Mar-26／31-Mar-25）】
+"Borrowings 1,476.62 810.33 1,476.62 810.46"
+
+【同上（流動 Borrowings：Standalone 31-Mar-26、Consolidated 31-Mar-26；31-Mar-25 兩欄空白）】
+"Borrowings 2,215.59 2,215.59"
+
+【同上（流動資產）】
+"Investment in mutual funds 2,153.39 - 2,153.39 -"
+
+【Annexure 2 Statement of Cash Flows——列名（版面座標：Consolidated 31-Mar-26 欄的值為 1,969.03 與 (1,336.03)）】
+"Net cash flow (used in) / from operating activities (A)"
+
+【同上】
+"Purchase of property, plant and equipment, including intangible assets,"
