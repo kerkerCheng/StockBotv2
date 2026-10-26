@@ -1,0 +1,9 @@
+SOURCE: Hesai Group 新聞稿（PR Newswire）〈Hesai Selected by NVIDIA as Lidar Partner for NVIDIA DRIVE Hyperion 10 to Enable Level 4 Fleet Deployment〉
+URL: https://www.prnewswire.com/news-releases/hesai-selected-by-nvidia-as-lidar-partner-for-nvidia-drive-hyperion-10-to-enable-level-4-fleet-deployment-302653579.html
+PUBLISHED: 2026-01-06（dateline LAS VEGAS, Jan. 6, 2026）
+RETRIEVED: 2026-10-27
+STORAGE: repo_excerpt（公開新聞稿有限節錄；HTML 轉文字、空白攤平後逐字照抄）
+NOTE: 供應商自述（L8 弱主張）。全文「primary」0 命中。光達層讀圖（2026-10-27 重讀）的圖外引用。
+
+【節錄】
+"LAS VEGAS, Jan. 6, 2026 /PRNewswire/ -- Hesai Technology (NASDAQ: HSAI; HKEX: 2525), the global leader in lidar solutions, announced today that it has been selected by NVIDIA as lidar partner for NVIDIA DRIVE AGX Hyperion 10, a reference compute and sensor architecture that makes any vehicle level 4-ready, enabling automakers and developers to build safe, scalable, AI-defined fleets."

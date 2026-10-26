@@ -1,0 +1,18 @@
+SOURCE: Aeva 新聞稿〈Aeva and NVIDIA to Integrate 4D LiDAR as Reference Sensor within the NVIDIA DRIVE Hyperion Platform Ecosystem〉
+URL: https://www.aeva.com/press/aeva-and-nvidia-to-integrate-4d-lidar-as-reference-sensor-within-the-nvidia-drive-hyperion-platform-ecosystem/
+PUBLISHED: 2026-01-05
+RETRIEVED: 2026-10-27
+STORAGE: repo_excerpt（公開新聞稿有限節錄；HTML 轉文字、空白攤平後逐字照抄）
+NOTE: 供應商自述（L8 弱主張），與禾賽 2026-01-06 新聞稿互相重疊。光達層讀圖（2026-10-27 重讀）的圖外引用。
+
+【節錄】
+"Targeting 2028 Start of Production"
+
+【節錄】
+"It combines a state-of-the-art sensor suite that includes one LiDAR, multiple radars, cameras, ultrasonics and external microphones, together with NVIDIA Drive AGX Thor and NVIDIA DriveOS operating system to enable Level 3 and Level 4 automated driving features."
+
+【節錄】
+"“We’re honored that Aeva’s 4D LiDAR is the LiDAR sensor for the Hyperion vehicle platform."
+
+【節錄】
+"Aeva’s 4D LiDAR adds 3D sensing and a unique per-point instant velocity measurement to Hyperion’s perception stack, enabling higher-confidence detection, more stable tracking, and robust long-range performance in both day and night conditions."

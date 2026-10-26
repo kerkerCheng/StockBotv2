@@ -1,0 +1,12 @@
+SOURCE: NVIDIA Blog〈NVIDIA Expands Global Hyperion Ecosystem to Accelerate the Road to Full Autonomy〉
+URL: https://blogs.nvidia.com/blog/global-drive-hyperion-ecosystem-full-autonomy/
+PUBLISHED: 2026-01-05
+RETRIEVED: 2026-10-27
+STORAGE: repo_excerpt（公開部落格有限節錄；HTML 轉文字、空白攤平後逐字照抄）
+NOTE: 平台方（NVIDIA）列 Hyperion 合格感測器夥伴，沒有逐家寫是哪一種感測器；全文「Ouster」0 命中。光達層讀圖（2026-10-27 重讀）的圖外引用。
+
+【節錄】
+"AUMOVIO, along with Aeva, Arbe, Hesai, Omnivision and Sony, are also among the latest partners to qualify their sensor suites on the open, production‑ready Hyperion architecture."
+
+【節錄（緊接上一句）】
+"This growing sensor ecosystem spans cameras, radar, lidar and ultrasonic technologies that enable automakers and developers to build and validate perception systems optimized for level 4 autonomy."
