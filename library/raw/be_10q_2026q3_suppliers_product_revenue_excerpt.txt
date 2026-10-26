@@ -1,0 +1,12 @@
+SOURCE: Bloom Energy Corporation — Form 10-Q（quarter ended 2026-09-30）
+URL: https://www.sec.gov/Archives/edgar/data/1664703/000162828026066931/be-20260930.htm
+PUBLISHED: 2026-10-22
+RETRIEVED: 2026-10-27
+STORAGE: repo_excerpt（美國法定公開申報有限節錄；HTML 轉文字、空白攤平後逐字照抄）
+NOTE: 發行人自述。全文沒有點名任何供應商、也沒有「gigawatt」字樣（研究員 2026-10-27 核對）。Bloom 插槽重讀（2026-10-27）的圖外引用。
+
+【節錄】
+"Approaches we have taken to manage our supply of electronic components despite current worldwide general shortages include supplier diversification, qualifying multiple suppliers for single or limited source components, enhancing our predictive analytics capabilities, and employing flexible sourcing strategies."
+
+【節錄】
+"Product revenue increased by $0.7 billion, or 179.4%, for the three months ended September 30, 2026, and by $1.8 billion, or 198.2%, for the nine months ended September 30, 2026, in each case compared with the corresponding period in 2025."

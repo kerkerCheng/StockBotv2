@@ -2248,7 +2248,7 @@
       "execution_venue": "SZSE",
       "display_name": "浙江春晖智能控制股份有限公司",
       "_display_name_source": "深交所審核問詢函回覆（更新版，巨潮 2026-09-22，1225576840.PDF）首頁「浙江春晖智能控制股份有限公司（以下简称“公司”“上市公司”或“春晖智控”）」；英文正式名稱未取得一手",
-      "_note": "使用者 2026-10-23 go [847]（入圖包見 sofc_hot_box_kaori_mtar_bloom_2026_10_23_action.json）：收購春晖仪表 61.31%（審核中）；春晖仪表是 Bloom 熱箱溫度感測的主要供應商、也賣給 MTAR 與高力——它的問詢回覆是高力、MTAR 是 BE 供應商的第三方一手。系統口徑邊緣無法量（`python -m alpha edge 300943.SZ`：8.2 億美元、分析師家數 yfinance 沒有）",
+      "_note": "使用者 2026-10-23 go [847]（入圖包見 sofc_hot_box_kaori_mtar_bloom_2026_10_23_action.json）：收購春晖仪表 61.31%（審核中）；春晖仪表是 Bloom SOFC 溫度感測器的主要供應商（關係人自報七成以上；一手沒寫是熱箱裡的零件，[858] 掛在 Energy Server 不掛熱箱——2026-10-27 更正這句備註）、也賣給 MTAR 與高力——它的問詢回覆是高力、MTAR 是 BE 供應商的第三方一手。系統口徑邊緣無法量（`python -m alpha edge 300943.SZ`：8.2 億美元、分析師家數 yfinance 沒有）",
       "name_aliases": [
         "春晖智控",
         "春暉智控",
