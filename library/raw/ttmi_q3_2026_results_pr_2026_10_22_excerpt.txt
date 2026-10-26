@@ -1,0 +1,39 @@
+SOURCE: TTM Technologies, Inc. — Form 8-K（Item 2.02）EX-99.1「TTM Technologies, Inc. Reports Third Quarter 2026 Results」；SEC EDGAR accession 0001193125-26-428263、Form 8-K（Item 8.01）EX-99.1（Ophir Optics 收購）；SEC EDGAR accession 0001193125-26-424707
+URL: https://www.sec.gov/Archives/edgar/data/1116942/000119312526428263/d282109dex991.htm ；https://www.sec.gov/Archives/edgar/data/1116942/000119312526424707/d187690dex991.htm
+PUBLISHED: 2026-10-22；2026-10-19
+RETRIEVED: 2026-10-27
+STORAGE: repo_excerpt（美國法定公開申報有限節錄；HTML 轉文字、表格分隔與空白攤平後逐字照抄）
+NOTE: 發行人自己的新聞稿（自述）。全文 grep「capacity」只在 10-19 那份出現一次（亞洲擴產），「constrain」「lead time」「laminate」「supply」在兩份新聞稿都是 0 命中。Phase 7 段 5「坐哪一層」短檢查（TTMI，2026-10-27 第二份）用。
+
+【Q3 2026 結果新聞稿 — 標題】
+"TTM Technologies, Inc. Reports Third Quarter 2026 Results SANTA ANA, Calif. – October 22, 2026 – TTM Technologies, Inc. (NASDAQ: TTMI) (“TTM”), a leading global manufacturer of technology products, including mission systems, radio frequency (“RF”) components, RF microwave/microelectronic assemblies, and technologically advanced interconnect products, including printed circuit boards (“PCB”s) and substrates, today reported results for the third quarter of 2026, which ended on September 28, 2026."
+
+【Q3 2026 結果新聞稿 — Highlights（書出貨比）】
+"Total book to bill of 2.13"
+
+【Q3 2026 結果新聞稿 — Highlights（終端市場）】
+"A&D end market was 34% of total net sales; and total A&D program backlog was $2.0 billion • Data Center and Networking end market was 41% of total net sales driven by continued AI demand"
+
+【Q3 2026 結果新聞稿 — Highlights（營收）】
+"Net sales were $1.2 billion, up 60% year on year, and an all-time quarterly record"
+
+【Q3 2026 結果新聞稿 — 經營者的話（成長來源）】
+"All key markets contributed to our 60% year on year growth with Data Center & Networking up 115%, Medical, Industrial & Instrumentation up 97%, and Aerospace & Defense up 21%."
+
+【Q3 2026 結果新聞稿 — 經營者的話（槓桿）】
+"our net leverage ratio as of September 30, 2026, was 2.8x of pro-forma adjusted TTM EBITDA. By the expected closing date of the proposed acquisition of the Ophir Optics business, we expect leverage to be within our targeted range of 1.5-2.0x"
+
+【Q3 2026 結果新聞稿 — Business Outlook】
+"For the fourth quarter of 2026, TTM estimates that net sales will be in the range of $1.42 billion to $1.44 billion, and non-GAAP net income will be in the range of $1.77 to $1.83 per diluted share. These fourth quarter estimates result in full year 2026 expected net sales of $4.47 billion to $4.49 billion and expected non-GAAP net income in the range of $4.97 to $5.03 per diluted share."
+
+【Q3 2026 結果新聞稿 — 2027 初步預測】
+"we are initiating our preliminary 2027 full year forecast with expected net sales in the range of $6.5 billion to $6.75 billion and expected non-GAAP net income in the range of $8.10 to $8.90 per diluted share."
+
+【Q3 2026 結果新聞稿 — 法說時間】
+"today, October 22, 2026, at 8:30 a.m. Eastern Time (5:30 a.m. Pacific Time)."
+
+【2026-10-19 8-K EX-99.1 — Ophir Optics 收購與亞洲擴產】
+"The transaction along with the Company’s previously announced $400M capital and capacity expansion in Asia, are expected to be funded through a combination of cash on hand and expected future cash flow and borrowings under TTM’s existing revolving credit facility."
+
+【2026-10-19 8-K EX-99.1 — 交割時程】
+"This transaction is expected to close in the second quarter of 2027."
