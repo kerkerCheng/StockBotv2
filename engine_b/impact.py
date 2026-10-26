@@ -250,7 +250,10 @@ def undisposed(store: Mapping[str, Mapping[str, Any]], ctx: Context | None = Non
     ctx = ctx if ctx is not None else load_context()
     created = {str(w.get("watch_id")): _instant(w.get("created_at")) for w in ctx.watches}
     for lead_id, lead in recent:
-        reason = str((lead.get("refs") or {}).get("parked_reason") or "")
+        # 處置讀聯集（2026-10-27 L17-2）：再次停放會把前次理由移進 trace_history，前次逐條寫過的處置仍然成立——
+        # lead 的內容沒變、watch 的條件也沒變；只讀現行理由會讓每次誤醒重停都把處置過的對照重算成未處置。
+        reason = " ".join([str((lead.get("refs") or {}).get("parked_reason") or "")]
+                          + [str(h.get("parked_reason") or "") for h in lead.get("trace_history") or ()])
         parked = _instant(_parked_at(lead))
         for watch in impact({**lead, "lead_id": lead_id}, ctx)["watches"]:
             wid = str(watch["watch_id"])

@@ -160,6 +160,18 @@ def test_a_watch_registered_after_the_park_is_not_demanded_of_that_park_reason(m
                     ("L_after", "ew_1"), ("L_after", "ew_3"), ("L_after", "ew_4")}
 
 
+def test_a_repark_keeps_the_dispositions_written_in_the_earlier_park_reason(monkeypatch) -> None:
+    """2026-10-27 L17-2：再次停放把前次理由移進 trace_history；那裡逐條寫過的處置仍然算數（覆蓋改聯集）。
+    前次沒寫到的照算。"""
+    monkeypatch.setattr(im, "HUB_SHARE", 1.1)
+    watches = [WATCHES[0], {**WATCHES[0], "watch_id": "ew_3"}]
+    ctx = _ctx(BRIEFS, watches=watches)
+    lead = _parked("L_re", "2026-10-27T03:00:00+00:00", "誤醒（2026-10-27）：照原終局重新停放")
+    lead["trace_history"] = [{"at": "2026-10-27T03:00:00+00:00", "parked_reason": "對照：ew_1 不相關（講的是新廠）"}]
+    rows = {(r["lead_id"], r["watch_id"]) for r in im.undisposed({"L_re": lead}, ctx)}
+    assert rows == {("L_re", "ew_3")}
+
+
 def test_no_recent_parked_lead_means_the_counter_does_not_even_load_the_context(monkeypatch) -> None:
     def boom():
         raise AssertionError("沒有 C4 之後停放的 lead，不該載入對照")
