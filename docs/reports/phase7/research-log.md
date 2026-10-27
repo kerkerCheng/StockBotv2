@@ -103,3 +103,38 @@
 **我自己的誤差（記下不改，理由已 append-only）**：
 - `park_1027_10` 寫「Marvell 2026-02-02 新聞稿目標 FY2028 下半年首營收」，其實是帳號引述，沒有查過一手。
 - `park_1027_09` 對 ew_0940／ew_0943 的指涉略有出入。
+
+## 七、2026-10-27 晚（使用者「860 862 … 876 go 861 drop／掃題材／decompose NAND SLC／HBF／三天的 lead 有漏抓嗎」）
+
+**go 執行**：[860]、[862]–[876] 共 16 包經 `scripts/apply_ra_admission.py` 依編號順序入圖，全部 applied、沒有開出衝突。15 包經 `commit_pending_intake.py` 各一個 commit、整批一次 push；[873] 是 local_only，git_status 為 not_required。16 號都用 `complete-ra` 結案；[861] drop（同包舊版，已被 [862] 取代）。
+- complete-ra 每號會替新進名冊、還沒有歷史的台股回填月營收與股數（#81 E1）。第一次以 120 秒逾時跑整批，[860] 在回填華城（1519.TW，54 個月）時被砍掉，結案也沒存下；改成單號、時限 900 秒後，[860] 花 5 分鐘，其餘各號很快。
+
+**題材掃描**（`docs/reports/theme_scan_2026-10-27.md`）：窗口 10-17～10-27，6 組主題加題材外。這一輪兼補雷達：daily 外部雷達 10-24～10-27 四輪都沒跑——10-24、10-25 撞週額度，10-26、10-27 OAuth 過期；互動 session 實測 `claude -p` 已恢復。
+- 註冊 1 則：`lead_90dce94b` ← `theme_scan:robotics`。內容是 Tesla Q3 法說：Optimus 在 Fremont 高量產線開始早期生產；同一場說 2027 年 Megapack 幾乎賣完，屬 BESS 層的供給側。
+- 其餘主題是 FYI，沒有新需求錨；Stage 0 的 16 個新點名代號沒有邊緣候選。
+
+**漏抓查核**：
+- harvest 四天都 ok：X、EDGAR、MOPS 照常進來。
+- 沒跑的是 LLM 那幾步：雷達、分類、預篩、語意輪詢、摘要。
+  - 分類：今天早上已補。
+  - 語意未檢：現為 0。
+  - 語意輪詢：每條帶 last_checked，下一輪會接著查。
+  - 雷達：恢復後只會往回補 7 天、每個主題最多 1 則，所以由這次題材掃描補主題層級。
+  - 摘要：遺失，補不回來。
+- 順著 Tesla 這例查到一個系統性的漏：分類器只看得到標題時會判 no_go。2026-09-01 起有 25 則（EDGAR 6-K／8-K 8 則、雷達 14 則、MFN 3 則），記為 failure log #105，處置待決。
+
+**decompose NAND SLC／HBF**（[877]，使用者主動選題、受理即結案）：
+- 系統是一顆 Sandisk／SK hynix HBF 堆疊（OCP 規格第一代），加一台 Kioxia GP1 GPU 直連 SLC SSD。
+- 來源：
+  - Tom's Hardware、SemiEngineering 轉述的 HBF 規格（tier 3）。
+  - TechTimes 轉述的 Kioxia GP1：FMS 2026 送評估樣品，1 億 IOPS 那一代因 PCIe 7.0 認證延到 2028（tier 3）。
+  - NVIDIA BlueField-4 STX／CMX 新聞稿（tier 1）。
+  - Lam 10-21 法說：SLC 比重每增加 1 個百分點，約多 2% 晶圓產能（tier 1）。
+- 拆出 13 層：✅ 3｜🟡 1｜🔴 9。
+  - ✅：2.5D 中介層封裝、NAND 前段設備、液冷冷板。
+  - 🟡：`tech:nand` 只有 Lam、AMAT 兩條設備供貨邊，沒有任何 NAND 製造商。
+  - 🔴：HBF 核心晶粒、NAND TSV、晶粒堆疊接合、HBF 基底邏輯晶粒、HBF 堆疊測試、SLC 類低延遲 NAND、高 IOPS SSD 控制器、PCIe 7.0 介面、儲存節點 DPU。
+- pq1 登記 10 題，都已分類 go（`lead_d945ab2f`、`lead_f098d8b8`、`lead_f70bb572`、`lead_484d9e8e`、`lead_119e02f8`、`lead_5d94167c`、`lead_fd14dba6`、`lead_72dbe6f5`、`lead_d8472873`、`lead_f3d7c310`）。
+- 追源旗標：
+  - SemiEngineering 寫「256 GB per die」，但同句的 16 層 512 GB 換算是 256Gb（32 GB）一顆；以規格轉述的 256Gb 為準。
+  - Tom's Hardware 寫基底晶粒的 UCIe「could be … implemented by companies like Broadcom or Marvell」，是推測句，不得當成供應商。
