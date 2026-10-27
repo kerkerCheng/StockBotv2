@@ -1,0 +1,29 @@
+SOURCE: 深圳证券交易所 上市审核信息公开——重大资产重组项目动态（项目 1004081，春晖智控）
+URL: https://listing.szse.cn/api/ras/projectrends/details?id=1004081
+PUBLISHED: 2026-09-23（系統的 updtdt；查詢當下的狀態頁，不是一份公告）
+RETRIEVED: 2026-10-27
+STORAGE: repo_excerpt（交易所公開查詢接口回傳的 JSON，逐欄照抄所列欄位；未列欄位是中介機構與簽字人名單）
+NOTE: 2026-10-27 查詢時的狀態快照——審核狀態會變，這份只答「2026-10-27 那天系統寫什麼」（INV-6）。300943.SZ 第一份敘事（2026-10-27）的圖外引用。
+
+【欄位】
+"prjid": 1004081
+"cmpcode": "300943"
+"cmpsnm": "春晖智控"
+"biztyp": "重大资产重组"
+"prjst": "已问询"
+"prjprog": "已问询"
+"acptdt": "2025-09-12"
+"updtdt": "2026-09-23"
+"boardName": "创业板"
+
+【項目進度 prjprogs】
+{"caption": "已问询", "value": 30, "finished": false, "date": "2025-09-26 16:15"}
+{"caption": "并购重组委会议", "value": 46, "finished": false, "date": null}
+{"caption": "已问询", "value": 30, "finished": true, "date": "2025-09-26 16:15"}
+{"caption": "已回复", "value": 33, "finished": false, "date": null}
+{"caption": "提交注册", "value": 60, "finished": false, "date": null}
+{"caption": "注册结果", "value": 70, "finished": false, "date": null}
+{"caption": "已受理", "value": 20, "finished": true, "date": "2025-09-12 20:00"}
+
+【pjreson（中止與恢復審核的理由）】
+[{"2026-05-13 15:00:00":"2026年5月12日，上市公司及中介机构已更新评估资料。"},{"2026-03-31 20:00:00":"浙江春晖智能控制股份有限公司重大资产重组申请文件中记载的评估资料已过有效期，需要补充提交。"}]

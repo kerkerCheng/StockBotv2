@@ -1,0 +1,86 @@
+[EXCERPT — 有限逐字引文] Arbe Robotics：現金、可轉債託管、增資稀釋、Nasdaq 最低買價（6-K 2025-12-08、2025-12-22、2026-04-17、2026-09-04、2026-09-10、2026-09-25、2026-09-28、2026-10-13；424B5 2026-09-28）
+
+Source: https://www.sec.gov/Archives/edgar/data/1861841/000121390025119222/ea026724601ex99-1_arbe.htm
+PUBLISHED: 2025-12-08（6-K Ex.99.1）
+RETRIEVED: 2026-10-27（本機抓 HTML 轉文字、逐字核對；UA 不帶個人資訊）
+
+【可轉債 — 條件未達成的後果】
+Under the present terms of the bonds, if the conditions are not met by December 31, 2025, the Company will be required to effect an early redemption of those bonds which have not been converted.
+
+【可轉債 — 託管款釋出條件】
+The three conditions under these series A convertible bonds for the release of the funds by the trustee are: ● The Company wins a tender or contract to supply its products as a single supplier of chips of imaging radar (directly or through one of the international Tier 1 manufacturers) to one of ten named major automobile manufacturers. ● The average closing trading price of Arbe’s ordinary shares on Nasdaq is not less than $3.10 per share during 30 consecutive trading days, and the average combined trading volume on Nasdaq and TASE during such 30 trading days is at least 300,000 shares per day. ● The closing price of the Company’s ordinary shares on Nasdaq on the date the Company presents to the trustee the documentation confirming the fulfillment of the abovementioned conditions precedent, is not less than $3.10.
+
+【可轉債 — 歐洲 OEM】
+Arbe does not expect to secure the potential strategic program award with a European OEM in the near future.
+
+
+Source: https://www.sec.gov/Archives/edgar/data/1861841/000121390025124538/ea0270363-6k_arberobo.htm
+PUBLISHED: 2025-12-22（6-K）
+RETRIEVED: 2026-10-27（本機抓 HTML 轉文字、逐字核對；UA 不帶個人資訊）
+
+【債券持有人會議 — 展期】
+announcing information regarding a proposal to extend to December 31, 2026 the deadline for meeting the conditions under its series A convertible bonds for the release of the proceeds raised from the issuance of the convertibles bonds which proceeds are held by the trustee of such bonds
+
+
+Source: https://www.sec.gov/Archives/edgar/data/1861841/000121390026097762/ea030448801ex99-1.htm
+PUBLISHED: 2026-09-04（6-K Ex.99.1，2026-06-30 期中財報，accession 0001213900-26-097762）
+RETRIEVED: 2026-10-27（本機抓 HTML 轉文字、逐字核對；UA 不帶個人資訊）
+
+【資產負債表（千美元；2026-06-30／2025-12-31）】
+Cash and cash equivalents $ 5,037 $ 4,028 Restricted cash 280 280 Short-term bank deposits 36,601 40,690 Trade receivable, net 807 571 Other assets - funds held in escrow 25,051 24,525
+
+【資產負債表 — 可轉債】
+Convertible bonds 24,047 24,757
+
+【附註 1e — 一年內資金】
+The Company has incurred losses from operations since its inception and has had negative cash flow from operating activities. Based on its current operating plans, the Company believes that its existing cash and cash equivalents together with anticipated cash generated from operations will be sufficient to meet the Company’s working capital requirements for at least one year from the date of the issuance of these condensed consolidated financial statements.
+
+【附註 9 — 2026 年 1 月增資】
+On January 26, 2026, the Company raised gross proceeds of $18,500 in an underwritten registered public offering, for sale of 13,225,000 ordinary shares at a purchase price of $1.40 per share.
+
+
+Source: https://www.sec.gov/Archives/edgar/data/1861841/000121390026103791/ea030679601ex99-1.htm
+PUBLISHED: 2026-09-25（新聞稿；6-K 2026-09-28 Ex.99.1，accession 0001213900-26-103791）
+RETRIEVED: 2026-10-27（本機抓 HTML 轉文字、逐字核對；UA 不帶個人資訊）
+
+【2026 年 9 月增資】
+it has priced an underwritten registered direct offering of 833,334 ordinary shares at a purchase price of $0.60 per share and, in lieu of ordinary shares to certain investors, pre-funded warrants to purchase up to 24,166,666 ordinary shares
+
+【2026 年 9 月增資 — 毛額】
+Arbe estimates the gross proceeds from this offering to be approximately $15 million before deducting underwriting discounts and commissions and other offering expenses.
+
+
+Source: https://www.sec.gov/Archives/edgar/data/1861841/000121390026103771/ea0306785-424b5_arbe.htm
+PUBLISHED: 2026-09-28（424B5，accession 0001213900-26-103771）
+RETRIEVED: 2026-10-27（本機抓 HTML 轉文字、逐字核對；UA 不帶個人資訊）
+
+【The Offering — 增資前股數】
+based on 127,305,842 of our ordinary shares outstanding
+
+
+Source: https://www.sec.gov/Archives/edgar/data/1861841/000121390026103239/ea0306649-6k_arbe.htm
+PUBLISHED: 2026-09-25（6-K，accession 0001213900-26-103239）
+RETRIEVED: 2026-10-27（本機抓 HTML 轉文字、逐字核對；UA 不帶個人資訊）
+
+【認股權證改價】
+amend the Existing A Warrants to (i) reduce the exercise price to $1.10 per Ordinary Share and (ii) extend the termination date to November 4, 2030 and (B) amend the Existing B Warrants to (i) reduce the exercise price to $1.00 per Ordinary Share
+
+
+Source: https://www.sec.gov/Archives/edgar/data/1861841/000121390026098845/ea0305108-6k_arbe.htm
+PUBLISHED: 2026-09-10（6-K，accession 0001213900-26-098845）
+RETRIEVED: 2026-10-27（本機抓 HTML 轉文字、逐字核對；UA 不帶個人資訊）
+
+【股東會 — 反分割授權】
+A reverse split of the ordinary shares of the Company, at a ratio to be determined by the board in its sole discretion, so that, immediately upon its effectiveness, the ordinary shares would trade at a price of approximately $3.00 per share
+
+
+Source: https://www.sec.gov/Archives/edgar/data/1861841/000121390026109039/ea0308480-6k_arbe.htm
+PUBLISHED: 2026-10-13（6-K，accession 0001213900-26-109039）
+RETRIEVED: 2026-10-27（本機抓 HTML 轉文字、逐字核對；UA 不帶個人資訊）
+
+【Nasdaq 第二個 180 天】
+has been granted an additional 180 calendar day period, or until April 12, 2027, to regain compliance with the minimum bid price requirement of $1.00 per share set forth in Nasdaq Listing Rule 5550(a)(2).
+
+【掛牌的證券就是普通股】
+This notification has no immediate effect on the listing or trading of the Company’s ordinary shares on The Nasdaq Capital Market under the symbol “ARBE”.
+

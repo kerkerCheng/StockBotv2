@@ -1,0 +1,33 @@
+[EXCERPT — 有限逐字引文] AEye, Inc. Form 10-K（FY2025，2026-03-18）：Tier 1（Continental 退出、LITEON）、NVIDIA、競爭、營收與客戶
+
+Source: https://www.sec.gov/Archives/edgar/data/1818644/000143774926008858/lidr20251231_10k.htm
+PUBLISHED: 2026-03-18（EDGAR 10-K，accession 0001437749-26-008858）
+RETRIEVED: 2026-10-27（本機抓 HTML 轉文字、逐字核對；UA 不帶個人資訊）
+
+【Risk Factors — Tier 1（Continental、LITEON）】
+In 2021, we entered into an agreement with a subsidiary of Continental AG, a well-established Tier 1 automotive supplier, pursuant to which Continental licensed from us the rights to manufacture and integrate our lidar solution into automotive OEM model lines through long-term series production contracts with automotive OEMs. In late 2023, Continental informed us that they intended to discontinue our joint lidar development program due to their internal restructuring. Thereafter, we engaged LITEON as our new Tier 1 automotive partner and are actively working with LITEON to bring our products to market.
+
+【Risk Factors — NVIDIA 中立】
+The NVIDIA DRIVE AGX platform supports a number of lidar sensors that are competitive to our solution and NVIDIA is expected to remain neutral with respect to the automotive OEM’s decision as to choice of lidar sensor for that automotive OEM’s solution.
+
+【Business — NVIDIA 整合】
+We have made substantial progress in our collaboration efforts with NVIDIA, and our lidar systems are now integrated into the NVIDIA DRIVE AGX platform. As part of this integration, our sensors interface directly with NVIDIA’s perception stack, enabling evaluation, benchmarking, and application development within the DRIVE AGX environment. This integration supports alignment with NVIDIA’s Hyperion reference architecture and are intended to facilitate future interoperability with autonomous driving and ADAS compute platforms used by global OEMs.
+
+【MD&A — LITEON 產線】
+We announced an expansion of this relationship and an investment from a leading global institutional investor to fund a dedicated production line for ApolloTM, with capacity to produce up to 60,000 units annually.
+
+【Risk Factors — 競爭（中國）】
+Because automotive lidar technology appears to have been successfully commercialized in China, our competitors in that market have likely gained experience that comes with productization that suppliers outside of China, including us, have yet to gain.
+
+【Risk Factors — 替代技術】
+Existing and future camera and radar technologies may emerge as customers’ preferred alternative to our solutions. In addition, some of our competitors are developing lidar based on frequency-modulated continuous wave, or FMCW, sensors or single photon avalanche diode, or SPAD, sensors, rather than the time-of-flight, or ToF, sensors we utilize.
+
+【MD&A — 營收來源】
+To date, we have primarily generated revenue through sales of our products to Non‑Automotive customers and through development contracts with OEMs and Tier 1 suppliers.
+
+【MD&A — 2025 營收（千美元）】
+Revenues increased by $31 or 15%, to $233 for the year ended December 31, 2025 from $202 for the year ended December 31, 2024.
+
+【Notes — 客戶集中度（2025／2024）】
+Customer A 27 % * Customer B 15 % * Customer C 12 % * Customer D 10 % * Customer E * 50 % Customer F * 32 % *Customer accounted for less than 10% of total revenue in the period.
+

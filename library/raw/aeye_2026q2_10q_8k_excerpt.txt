@@ -1,0 +1,74 @@
+[EXCERPT — 有限逐字引文] AEye, Inc.：2026 Q2 10-Q、8-K（2026-08-06 財報新聞稿、2026-09-01 Lunar Outpost、2026-09-09 股東信、2026-09-15 新 ATM）
+
+Source: https://www.sec.gov/Archives/edgar/data/1818644/000121390026086143/ea030082701ex99-1.htm
+PUBLISHED: 2026-08-06（8-K Ex.99.1，accession 0001213900-26-086143）
+RETRIEVED: 2026-10-27（本機抓 HTML 轉文字、逐字核對；UA 不帶個人資訊）
+
+【標題 — NVIDIA】
+Apollo™ Validated on NVIDIA DRIVE AGX Thor™, Placing AEye as a Sensor Partner in the NVIDIA DRIVE Hyperion Ecosystem
+
+【Business Highlights — 軟體可調（自述）】
+Apollo’s™ software-defined architecture was critical to securing the win; it allows AEye to reconfigure scan patterns, range, and resolution
+
+【About AEye — 偵測距離（自述）】
+AEye’s flagship product, Apollo™, has been widely recognized for its small form factor and its ability to detect objects at up to one kilometer.
+
+【Business Highlights — 運動分析】
+Alive3D selected Apollo™ for next generation sports analytics.
+
+【Business Highlights — 交通路口】
+OPTIS™ continues to move into deployment, with the Company’s live smart intersection in the Bay Area remaining operational, as well as multiple OPTIS™ installations in and around Detroit.
+
+【Business Highlights — 車用】
+AEye is active in multiple OEM Level 3 and Level 4 evaluations.
+
+【Business Highlights — 國防】
+Defense remains AEye’s most active vertical, with engagements doubling quarter-over-quarter. The Company’s lead defense customer placed its third consecutive paid order this quarter
+
+【Financial Highlights】
+Q2 2026 revenue was $202 thousand, up approximately nine times the $22 thousand reported in Q2 2025, and approximately double compared to last quarter. ● GAAP net loss in Q2 2026 was $(10.0) million, or $(0.22) per share. ● Non-GAAP net loss in Q2 2026 was $(7.6) million, or $(0.17) per share. ● Cash consumption in Q2 2026 was $7.5 million. ● Cash, cash equivalents, and marketable securities were $71.5 million as of June 30, 2026.
+
+【2026 Cash Consumption Outlook】
+The Company reaffirms its expectation that cash consumption for the full year 2026 will be in the range of $30 million to $35 million, inclusive of approximately $5 million in working capital. The Company expects its cash balance provides operational runway well into 2028.
+
+
+Source: https://www.sec.gov/Archives/edgar/data/1818644/000143774926026354/lidr20260630_10q.htm
+PUBLISHED: 2026-08-06（10-Q，accession 0001437749-26-026354）
+RETRIEVED: 2026-10-27（本機抓 HTML 轉文字、逐字核對；UA 不帶個人資訊）
+
+【封面 — 股數】
+As of August 4, 2026, the registrant had 46,488,312 shares of common stock, 0.0001 par value per share, outstanding.
+
+【附註 — 流動性】
+Management believes that the Company has sufficient financial resources to fund operations and meet its capital requirements and anticipated obligations as they come due in the next twelve months from the date of issuance of these condensed consolidated financial statements.
+
+【Risk Factors — ATM 稀釋】
+Through June 30, 2026, we had sold 24,070,541 shares under our at-the-market equity offering program with A.G.P. for aggregate gross proceeds of approximately $70.4 million, and approximately $54.6 million of capacity remained available under that program. Our weighted average shares outstanding increased from 19,125,970 for the three months ended June 30, 2025 to 45,915,091 for the three months ended June 30, 2026, representing dilution to stockholders who held shares prior to those sales.
+
+
+Source: https://www.sec.gov/Archives/edgar/data/1818644/000094787126000868/ss6825285_8k.htm
+PUBLISHED: 2026-09-15（8-K Item 1.01／1.02，accession 0000947871-26-000868）
+RETRIEVED: 2026-10-27（本機抓 HTML 轉文字、逐字核對；UA 不帶個人資訊）
+
+【新 ATM】
+On September 15, 2026, AEye, Inc. (the “Company”) entered into an At Market Issuance Sales Agreement (the “Sales Agreement”) with A.G.P./Alliance Global Partners (“A.G.P.”). In accordance with the terms of the Sales Agreement, the Company may offer and sell from time to time through A.G.P., acting as sales agent, the Company’s common stock having an aggregate offering price of up to $50,000,000 (the “Placement Shares”).
+
+
+Source: https://www.sec.gov/Archives/edgar/data/1818644/000121390026095950/ea030415101ex99-1.htm
+PUBLISHED: 2026-09-01（8-K Ex.99.1，accession 0001213900-26-095950）
+RETRIEVED: 2026-10-27（本機抓 HTML 轉文字、逐字核對；UA 不帶個人資訊）
+
+【Lunar Outpost】
+today announced that its Apollo™ long-range lidar has been selected by Lunar Outpost, the leader in space mobility and infrastructure, for integration onto the Pegasus Lunar Terrain Vehicle (LTV), which will transport Artemis astronauts across the lunar surface.
+
+【Lunar Outpost — 金額級距】
+This multi-million-dollar contract award is a testament to our technology
+
+
+Source: https://www.sec.gov/Archives/edgar/data/1818644/000121390026098204/ea030492601ex99-1.htm
+PUBLISHED: 2026-09-09（8-K Ex.99.1 股東信，accession 0001213900-26-098204）
+RETRIEVED: 2026-10-27（本機抓 HTML 轉文字、逐字核對；UA 不帶個人資訊）
+
+【股東信 — 車用與卡車】
+Automotive and Trucking Progress: We remain active in multiple OEM Level 3 and Level 4 evaluations and signed an MOU with MoveAWheeL to combine Apollo’s™ long-range detection with acoustic road-surface friction sensing, improving ADAS and autonomous performance in adverse weather.
+

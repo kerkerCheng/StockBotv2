@@ -1,0 +1,89 @@
+[EXCERPT — 有限逐字引文] Arbe Robotics 6-K 新聞稿（2025-12-29、2026-02-26、2026-05-28、2026-08-06、2026-09-08）：Hirain 的 L4 與 L3 量產專案、NVIDIA、robotaxi、營收與展望
+
+Source: https://www.sec.gov/Archives/edgar/data/1861841/000121390025125839/ea027109401ex99-1_arberobo.htm
+PUBLISHED: 2025-12-29（6-K Ex.99.1，accession 0001213900-25-125839）
+RETRIEVED: 2026-10-27（本機抓 HTML 轉文字、逐字核對；UA 不帶個人資訊）
+
+【新聞稿 — L4 專案】
+a China-based state-owned automaker has chosen Hirain Technologies and Arbe’s Ultra HD Radar for its Level 4 autonomous (L4) vehicle program, with vehicle start of production (SOP) scheduled to begin in December 2026.
+
+【新聞稿 — 量與裝車位置】
+After several years of joint development, Hirain’s LRR610 Radar, powered by Arbe’s chipset, was selected for the automaker’s L4 program, with thousands of vehicles expected to be released to the market during 2027. Arbe’s proprietary chipset has the largest channel array count in the industry with 48 receiving and 48 transmitting RF channels, a dedicated processor chip that provides dense data enabling AI-based post-processing. The radar will be installed as the front-facing radar on each vehicle.
+
+
+Source: https://www.sec.gov/Archives/edgar/data/1861841/000121390026020629/ea027820701ex99-1_arbe.htm
+PUBLISHED: 2026-02-26（6-K Ex.99.1，accession 0001213900-26-020629）
+RETRIEVED: 2026-10-27（本機抓 HTML 轉文字、逐字核對；UA 不帶個人資訊）
+
+【FY2025 財報新聞稿 — NVIDIA】
+NVIDIA ecosystem integration: Arbe is working with NVIDIA to integrate Arbe’s ultra-high-resolution radar into NVIDIA’s DRIVE Hyperion autonomous driving platform, combining dense long-range sensing with powerful AI compute to enable advanced perception and production-ready Level 3 autonomy, while accelerating OEM time-to-market.
+
+【FY2025 財報新聞稿 — robotaxi】
+Robotaxi momentum: Arbe is supporting the development of radar systems for multiple robotaxi projects across several countries, laying the groundwork for future large-scale deployments.
+
+【FY2025 財報新聞稿 — 營收】
+Revenues for 2025 were $1.0 million, compared to $0.8 million in 2024.
+
+
+Source: https://www.sec.gov/Archives/edgar/data/1861841/000121390026061736/ea029225201ex99-1.htm
+PUBLISHED: 2026-05-28（6-K Ex.99.1，accession 0001213900-26-061736）
+RETRIEVED: 2026-10-27（本機抓 HTML 轉文字、逐字核對；UA 不帶個人資訊）
+
+【Q1 2026 新聞稿 — robotaxi 追加訂單】
+Arbe received additional orders from global robotaxi players using Phoenix to support L4 autonomy with 360-degree sensing.
+
+【Q1 2026 新聞稿 — 開始出貨給 Hirain】
+Arbe began shipping chipsets to Hirain for its L4 project which it announced in December: Hirain, Arbe’s Tier 1, is using Arbe’s chipset for a high-resolution 48x48 imaging radar project with a Chinese automaker.
+
+【Q1 2026 新聞稿 — 開始賣整套雷達】
+Arbe begins sales of full radar systems: This complements Arbe’s chipset offerings. Arbe has established a dedicated production line to manufacture its radar systems. Initial units have been shipped to various major players in the perimeter-security, and physical AI fields.
+
+【Q1 2026 新聞稿 — 營收與 backlog】
+Revenues for Q1 2026 were $0.5 million, compared to $0.04 million in Q1 2025. Backlog as of March 31, 2026, amounted to $1 million.
+
+
+Source: https://www.sec.gov/Archives/edgar/data/1861841/000121390026085903/ea030020901ex99-1.htm
+PUBLISHED: 2026-08-06（6-K Ex.99.1，accession 0001213900-26-085903）
+RETRIEVED: 2026-10-27（本機抓 HTML 轉文字、逐字核對；UA 不帶個人資訊）
+
+【Q2 2026 新聞稿 — robotaxi 路測】
+Building on the previously reported robotaxi engagements, Arbe’s radar systems have been integrated into vehicles that have commenced on-road trials. Arbe continues to be engaged in active bid processes with additional robotaxi players.
+
+【Q2 2026 新聞稿 — Hirain 量產時程】
+Arbe’s Tier 1 HiRain, a leading supplier offering a portfolio of radar systems based on Arbe’s chipset, has advised Arbe that it is progressing toward production, currently planned for the beginning of 2027, delivering on the previously announced order from its L4 OEM customer.
+
+【Q2 2026 新聞稿 — 營收、backlog】
+Revenues for Q2 2026 were $0.7 million, compared to $0.3 million in Q2 2025. Backlog as of June 30, 2026, amounted to $1 million.
+
+【Q2 2026 新聞稿 — 現金與燒錢目標】
+Management believes that the current balance sheet, with around $42 million in cash, cash equivalents and short-term bank deposits, combined with ongoing revenue growth and a targeted reduction in cash burn to below $7 million per quarter, extends the Company’s cash runway to execute on its growth plans.
+
+【Q2 2026 新聞稿 — 資產負債】
+As of June 30, 2026, Arbe had $41.9 million in cash, cash equivalents and short-term bank deposits.
+
+【Q2 2026 新聞稿 — 全年展望】
+Revenue in the range of $4 million to $6 million.
+
+【Q2 2026 新聞稿 — 設計勝選時程】
+However, the timing of future wins remains dependent on OEM adoption cycles, which are taking longer than previously anticipated. As a result, the Company is not providing guidance on the timing of additional automotive OEM design wins.
+
+
+Source: https://www.sec.gov/Archives/edgar/data/1861841/000121390026097831/ea030464401ex99-1.htm
+PUBLISHED: 2026-09-08（6-K Ex.99.1，accession 0001213900-26-097831；Hirain 與 Arbe 聯合新聞稿）
+RETRIEVED: 2026-10-27（本機抓 HTML 轉文字、逐字核對；UA 不帶個人資訊）
+
+【聯合新聞稿 — L3 專案】
+one of the world’s largest automotive groups has selected Hirain’s imaging radar, powered by Arbe’s ultra-high-resolution radar chipset, for a Level 3 automated driving passenger vehicle program in China, across multiple brands under the group. Hirain will manufacture, supply, and integrate the radar system, with series-production deliveries scheduled to begin in Q4 2027, ahead of vehicle start of production.
+
+【聯合新聞稿 — 分工】
+For the program, Hirain will deliver the complete automotive radar system and lead system development, manufacturing, integration, validation, and quality, leveraging its established automotive manufacturing infrastructure. Arbe’s ultra-high-resolution radar chipset and core technology will power the system, generating the dense and detailed radar data required by the vehicle’s central automated-driving platform.
+
+【聯合新聞稿 — Hirain CTO（客戶端說法）】
+The customer conducted an exceptionally rigorous evaluation across technology, safety, quality, validation, manufacturing, and commercial readiness. Being chosen for this Level 3 program reflects the trust in our solution and our ability to execute against the standards of a leading global automotive manufacturer. Arbe’s radar technology has been central to reaching this point
+
+【聯合新聞稿 — About Hirain】
+Founded in 2003, Beijing Jingwei Hirain Technologies Co., Inc. (“Hirain”)
+
+【聯合新聞稿 — 風險】
+the risk that the program described in this press release does not advance to start of production on the anticipated schedule or at all, the risk that orders are not placed with the Company
+

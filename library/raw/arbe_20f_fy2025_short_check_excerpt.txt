@@ -1,0 +1,42 @@
+[EXCERPT — 有限逐字引文] Arbe Robotics Ltd. Form 20-F（FY2025，2026-03-27）：成像雷達晶片組、Tier 1、NVIDIA、製造、競爭者、客戶集中度
+
+Source: https://www.sec.gov/Archives/edgar/data/1861841/000121390026035653/ea0283041-20f_arbe.htm
+PUBLISHED: 2026-03-27（EDGAR 20-F，accession 0001213900-26-035653）
+RETRIEVED: 2026-10-27（本機抓 HTML 轉文字、逐字核對；UA 不帶個人資訊）
+
+【Item 4 Business — Tier-2 晶片組定位】
+In the private automobile market, we operate as a Tier-2 semiconductor company, developing advanced radar technology and solutions – multi-channel Radio Frequency Integrated Circuit (RF IC) for transmission and reception and a dedicated radar processing IC that includes specialized Radar Processing Unit (‘RPU’) and additional general-purpose processing/control cores. We do not have our own chipset manufacturing facilities. We rely on GlobalFoundries for manufacturing and testing our chipset.
+
+【Item 4 Business — 通道數（自述）】
+The chipset distinguishes itself through its improved ability to support multi-channel processing - up to 2,304 virtual channels, through a combination of up to two transmitters (24 channels each) and up to four receivers (12 channels each). By comparison, other current-generation radar systems presently utilize 12 virtual channels, while the newest, best in class systems available in the market by our competitors are utilizing 256 virtual channels at best
+
+【Item 4 Business — 專案與延後】
+We have been selected for eight “imaging radar - based perception” projects, two of which are with the top five global OEMs which are progressing towards a selection in 2026 and 2027. These selection dates reflect a delay from the earlier target of 2024.
+
+【Item 4 Business — NVIDIA】
+Our radar solution is part of the NVIDIA automotive ecosystem, where it is being combined with NVIDIA accelerated computing to enable advanced AI-based perception for next-generation vehicles. As highlighted in recent announcements, our automotive-grade, ultra-high-resolution radar is designed for integration with NVIDIA DRIVE AGX platforms, supporting capabilities such as free-space mapping, richer perception stacks, and hands-free and eyes-off driving. Because NVIDIA DRIVE serves a broad range of transportation developers, including automakers, truck makers, Tier 1s, robotaxi operators and autonomous vehicle startups, we believe that this collaboration strengthens our visibility and positioning across key mobility markets.
+
+【Item 4 Business — Strategic Relationships（Magna）】
+On November 5, 2025, Magna Electronics, LLC and Arbe signed a Supply Agreement that will regulate the production phase when Magna will have a contract with OEM for imaging radar.
+
+【Item 4 Business — Strategic Relationships（Hirain）】
+Hirain and Arbe signed a number of agreements regulating the development manufacturing of radar product(s) based on Arbe’s chipset. During the fourth quarter of 2022, Hirain issued a preliminary order for 340,000 radar chipsets in order to secure capacity for its anticipated production ramp-up. Hirain has issued a binding purchase order for thousands of chipsets to be shipped in 2026 to support the initial ramp to production.
+
+【Item 4 Business — Competition（Tier 2）】
+We are a Tier 2 supplier, which has its products manufactured by a third-party manufacturer. As a Tier 2 supplier, we supply imaging radar chipset to Tier 1 manufacturers who are building imaging radar systems and to OEMs. The structure of the L4 robotaxi and robotrucks market is less stringent and tier-2 are acting also as direct suppliers.
+
+【Item 4 Business — Competition（具名競爭者）】
+Texas Instruments and NXP offer a radar transceiver of 4Rx * 4Tx, and recently started sampling 8Rx * 8Tx chips capable of scaling up to 24Rx * 24Tx. NXP also offers dedicated radar processing chip capable of processing up to 4 trancievers.
+
+【Item 4 Business — Competition（Mobileye）】
+After previously announcing the development of a 2,304 virtual channels radar (48x48 Rx*Tx), Mobileye has announced that it updated its channel count to 1,536 virtual channels (32x48), which we believe gives up some image quality resolution in order to decrease the throughput and required processing power. We believe that on the one hand Mobileye’s decision to develop a 4D imaging radar is significant to the automotive market in acknowledging Mobileye’s view of the imaging radar’s key role in the overall perception solution, while on the other hand we believe that our excess channel count indicates that our solution can achieve a higher angular native resolution with lower inherent false alarms and an efficient handling of high throughput and processing. To the best of our knowledge, Mobileye’s production may be lagging ours by around two years.
+
+【Item 4 Business — Competition（Forvia、中國）】
+Forvia developed a 24x24 radar based on NXP chipset. This radar totaling 576 channels which are 25% of the channels supported by the Arbe platform causing it to have high ambiguity due to grating lobes and/or doppler. As far as we know this platform uses the very new 8TX * 8RX chips from NXP which just recently sampled and a new processor. Those chips are relatively new and NXP discussed start of production only in 2028. While these NXP based 24x24 solutions are equivalent from price perspective to the previous 12x16 solution such as the Conti ARS-54x these solution lack the massive channel count to provide a full, reach and reduced false alarm. Overall, we believe the Arbe solution is equivalent from price and power, but provides significantly higher number of channels resulting in better performance. There are also competitors that are more centered around China like Huawei and Caltera.
+
+【Item 4 Business — Competition（Ambarella）】
+During 2021, Ambarella acquired Oculii, which was established in 2013, and offers a software solution which is implemented on top of traditional 4Rx * 3Tx radar chips, with the aim to improve the elevation and azimuth resolution and to expand the field of view. This approach will also lead to a denser point cloud, which in turn would allow more advanced signal processing. However, we believe that this software solution is not applicable to autonomy level beyond level 2.
+
+【Notes — Major Customers】
+During the year ended December 31, 2025, the Company had two customers that accounted for 72.85% and 16.03%, respectively, of revenues. During the year ended December 31, 2024, the Company had four customers that accounted for 19.5%, 18.4%, 16.9% and 14.5%, respectively, of revenues. During the year ended December 31, 2023, the Company had three customers that accounted for 38.9%, 18.1% and 12.7%, respectively, of revenues. No other customer accounted for 10% or more of revenues in 2025, 2024 or 2023. The 10% customers were different customers in each of 2025, 2024 and 2023.
+
