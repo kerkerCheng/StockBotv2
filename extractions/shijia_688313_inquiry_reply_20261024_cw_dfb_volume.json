@@ -1,0 +1,116 @@
+{
+  "claims": [
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：仕佳之後的定期報告、上交所公告或問詢回復寫出 100mW CW DFB 出貨下滑、客戶取消或延後訂單，或 CW 雷射晶片及 COC 募投項目延後、縮減或終止。核查頻率：每季（仕佳定期報告與上交所公告）。觸發後 48 小時：降這條邊 confidence，重讀 CW DFB 雷射層的供給側讀法（新增產能與商用供應商家數）。",
+      "id": "shijia_688313_inquiry_reply_20261024_cw_dfb_volume_cl1",
+      "source_ids": [
+        "shijia_688313_inquiry_reply_20261024_cw_dfb_volume_s1",
+        "shijia_688313_inquiry_reply_20261024_cw_dfb_volume_s2",
+        "shijia_688313_inquiry_reply_20261024_cw_dfb_volume_s3",
+        "shijia_688313_inquiry_reply_20261024_cw_dfb_volume_s4"
+      ],
+      "statement": "Shijia Photons (688313.SS) SSE inquiry reply 2026-10-24: its 100mW CW DFB laser chips (for 400G/800G/1.6T silicon-photonics modules) have shipped in volume to multiple leading international optical-module makers since June 2026, with several customers placing volume orders that lock next year's delivery; as of 2026-10-12 it has ample backlog and framework agreements for 100mW, and small-volume orders for 400mW CW DFB COC (for CPO external light sources). Its equity-raise project for CW laser chips and COC has a 3-year build and RMB 1.456B total investment; no unit capacity is stated. Supplier self-report; customers are not named.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:cw_dfb_laser",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "shijia_688313_inquiry_reply_20261024_cw_dfb_volume_s1",
+        "shijia_688313_inquiry_reply_20261024_cw_dfb_volume_s3",
+        "shijia_688313_inquiry_reply_20261024_cw_dfb_volume_s4"
+      ],
+      "src_id": "co:shijia_photons"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "仕佳光子",
+        "河南仕佳光子科技股份有限公司",
+        "Shijia Photons",
+        "688313.SS"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "co:shijia_photons",
+      "name": "Henan Shijia Photons Technology",
+      "role": null,
+      "source_ids": [
+        "shijia_688313_inquiry_reply_20261024_cw_dfb_volume_s1",
+        "shijia_688313_inquiry_reply_20261024_cw_dfb_volume_s2",
+        "shijia_688313_inquiry_reply_20261024_cw_dfb_volume_s3",
+        "shijia_688313_inquiry_reply_20261024_cw_dfb_volume_s4"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "CW laser",
+        "internal laser diode",
+        "high-power CW laser",
+        "CW DFB",
+        "CW DFB laser",
+        "DFB laser",
+        "high-power DFB laser"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:cw_dfb_laser",
+      "name": "High-power CW DFB laser",
+      "role": null,
+      "source_ids": [
+        "shijia_688313_inquiry_reply_20261024_cw_dfb_volume_s1",
+        "shijia_688313_inquiry_reply_20261024_cw_dfb_volume_s2",
+        "shijia_688313_inquiry_reply_20261024_cw_dfb_volume_s3",
+        "shijia_688313_inquiry_reply_20261024_cw_dfb_volume_s4"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "shijia_688313_inquiry_reply_20261024_cw_dfb_volume",
+    "evidence_tier": 1,
+    "origin_entity": "仕佳光子",
+    "permission_basis": "上交所科創板再融資審核問詢函回復 PDF（巨潮資訊網）；只保留研究必要的有限逐字節錄。回復落款日期欄空白（「年 月 日」），published_at 取巨潮刊登日 2026-10-24（與同日刊登的募集說明書申報稿、更新提示性公告同一天）。",
+    "published_at": "2026-10-24",
+    "publisher": "巨潮資訊網（上交所科創板再融資審核文件）",
+    "retrieved_at": "2026-10-27",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "仕佳光子（688313）與華泰聯合證券關於向特定對象發行股票申請文件的審核問詢函的回復（2026-10-24）：100mW CW DFB 雷射晶片自 2026 年 6 月起在多家國際頭部光模組公司批量出貨、多家客戶已下批量訂單鎖定明年交付；400mW CW DFB COC 小批量出貨；CW 雷射晶片及 COC 產業化募投項目建設期 3 年",
+    "url": "http://static.cninfo.com.cn/finalpage/2026-10-24/1225621122.PDF"
+  },
+  "sources": [
+    {
+      "id": "shijia_688313_inquiry_reply_20261024_cw_dfb_volume_s1",
+      "locator": "問題 1 回復：（2）連續波（CW）激光器芯片及 COC 產業化項目",
+      "quote": "本项目主要生产面向硅光及高速光互连应用的高功率连续波（CW）激光器芯片及 COC产品，主要包括 100mW CW DFB 激光器芯片和 400mW CW DFB COC"
+    },
+    {
+      "id": "shijia_688313_inquiry_reply_20261024_cw_dfb_volume_s2",
+      "locator": "問題 1 回復：（2）連續波（CW）激光器芯片及 COC 產業化項目",
+      "quote": "建设周期为3 年，总投资金额145,611.41 万元"
+    },
+    {
+      "id": "shijia_688313_inquiry_reply_20261024_cw_dfb_volume_s3",
+      "locator": "問題 1 回復：5）下游客戶的產品導入和認證（100mW CW DFB 激光器芯片）",
+      "quote": "2026 年 6 月以来，在多家国际头部光模块公司批量出货，多家客户已下批量订单锁定明年交付"
+    },
+    {
+      "id": "shijia_688313_inquiry_reply_20261024_cw_dfb_volume_s4",
+      "locator": "問題 1 回復：6）在手訂單或意向訂單情況",
+      "quote": "截至 2026 年 10 月 12 日，公司 100mW CW DFB 激光器芯片已有较为充足的在手订单及框架协议支撑；400mW CW DFB COC已从部分客户取得小批量订单。"
+    }
+  ]
+}
