@@ -44,3 +44,62 @@
 **[859] decompose**（`decompose:ai_liberty_power_innovations_ai_1_2gw`；選題理由＝提案本身：Liberty 2026-10-21 8-K 與前沿 AI 實驗室簽 1.2GW、含預付容量費）：四組唯讀拆解（系統、原動機、電氣 BOP、燃料排放熱，一手引文機械核對：系統 110 條、原動機 99 條、燃料排放熱 75 組全中，電氣 BOP 除兩處分行的數字外全中）＋主 session 對圖。**拆出 31 層：✅ 1（GSU 落在 tech:large_power_transformer）｜🟡 1（tech:hv_circuit_breaker 零供應商）｜🔴 29**——圖上現場發電只有 SOFC 一條，燃氣這條鏈整條不在。pq1 登記 16 題 R1–R16（全部 triage go＋分類）。追源旗標：預付「3 億美元」只有一份第三方逐字稿有、另一份同句沒有、申報只寫 significant——不得使用；Bergen 合約的「powerbridge」是飛輪元件、PowerBridge LLC 是另一家園區開發商；10-Q 的「Caterpillar Agreement」是 CAT Financial 翻新設備貸款、不是 8.01 億美元供貨合約；INNIO 450MW 新聞稿沒點名 Liberty、不得連；LPI 網頁的 Rolls-Royce 20V4000 是壓裂機隊用。研究暫存在 `library/private/wf_tmp/wf_research/{liberty_power_spec,onsite_gas_prime_movers,elec_bop,fuel_emissions_heat}/`（暫存，不是 authority）。
 
 **其他**：Marvell 10-23 的 8-K（循環信用修約）叫醒載板、先進封裝、SiGe 三份讀圖的客戶重讀 watch——判無關回 active，lead 停放（#96 同形，客戶重讀 watch 也是只看發文公司）。CW DFB 重讀發現供給側缺 Broadcom（它自己說 CW 雷射是業界標準，證據掛在需求側）→ pq1 `lead_49c26e5fd3f275c564fe51a4ca630f0e`。發現未排程：ARBE 已定價量不到是因為 20-F 申報人一律當成可能掛 ADS，但 Arbe 在 Nasdaq 掛的是普通股（1 例；修法要新增掛牌單位登記且 20-F 只有年度點，不是十行內）；NVIDIA 2026-09 把 DRIVE Hyperion 改名 NVIDIA Hyperion（搜尋字兩個都要收）。
+
+## 六、2026-10-27（使用者「修 然後/research-drain 前三天因為額度沒跑很多東西 我們慢慢追回來吧」「繼續」）
+
+**#96 修法**（`6abfcdb4`，Z2、R1）：entity 型等待的叫醒先過預篩（`event_watch.wake_screen` 唯一判斷）——抓得到全文的叫醒先等 daily 預篩，預篩標無關或還沒標的，擋在「叫醒擋下待確認」，由互動 `wake-queue` → `wake-judge` 一份文件判一次；判無關回 active，停放理由不動。重播 10-20 起排回的 70 則：改前有 33 則會照舊放行，改後 70 則全部先擋下等預篩；五個守門變異全紅；test_full_chain_acceptance 的既有失敗不變（它不引用本次任何模組）。代價：被擋下的叫醒最多晚一天（等 daily 預篩）；日期型、假說查核與敘事 wake_brief 不篩。
+
+**CW DFB 雷射層第二次換版**：`sr_37be377974cb068b` 取代 `sr_a7f3ed189b10aff9`。反證①被源杰 2026-10-16 上交所自願性公告觸及：二期 2026 年底至 2027 年初開始形成產能。判讀仍是 volume，窗口第一次有了在位者新產能的開出時點；買方中际旭创的投資者關係記錄表補進。六份敘事換騎，候選狀態都不變：SIVE.ST `ib_2475353e7318ec45`、3081.TWO `ib_9f9dc7f0e13a4d6a`、4979.TWO `ib_1a325e9e8fc0a2f7`、2455.TW `ib_ccf105cdfa5becff`、3234.TWO `ib_4a5a29a75091f26a`、COHR `ib_90e07a44b9b8a489`。圖外一手節錄兩份：源杰上交所產能公告、中际旭创投資者關係記錄的鎖料段。
+
+**[859] 拆解收完**：R1–R15 全部到終局。R10（CEMS）停放 `lead_3ab1feb0`，因為沒有一手把具名 CEMS 供應商接到資料中心表後燃氣電廠。鑄號如下：
+- [860] R1：需求錨加三家整合商。
+- [862] R2：往復式機組（[861] 是同包舊版，建議 drop）。
+- [863] R3＋R4；[864] R5＋R6；[865] R7；[866] R8；[867] R9。
+- [868] R11：微電網控制＋ERock。
+- [869] R13：華城。
+- [870] R14：Enerflex。
+- [871] R15：Stabilis＋Superior Plus。
+- [872] R12：表後 BESS。
+
+依賴鏈：[862]–[872] 都宣告 [860] 的 `tech:onsite_gas_power`；[863]、[868]、[872] 另依賴 [862] 的往復式機組宣告；[865] 依賴 [864]。
+
+**drain 其他鑄號**：
+- [873] CW 層補 Broadcom（Q3 FY26 法說；Motley Fool 逐字稿 local_only）。
+- [874] Anthropic S-1：固定或最低保證的承諾約 2,656 億美元；`co:anthropic depends_on` 大型變壓器。
+- [875] 天孚 ELS 量產交付＋中际旭创 2028 需求指引。
+- [876] CW 層補仕佳光子：上交所問詢回復寫 100mW CW DFB 自 2026-06 起在多家國際頭部光模組廠批量出貨、客戶已下單鎖定明年交付；CW 募投項目建設期 3 年，沒寫顆數。帳號說的「72M／年」「2029 年全產能」本輪在仕佳的說明書與回復裡沒找到——這是「我找不到」，不是「不存在」（L11-5）。
+
+名冊 staged 7 家：ERock（EROC）、華城（1519.TW）、Enerflex（EFXT）、Stabilis（SLNG）、Superior Plus（SPB.TO）、ProPetro（PUMP）、仕佳光子（688313.SS）。
+
+**停放 63 則，pq1 佇列清空**（drain 段 0–1 全為 0）。
+- 等事件 5 則：
+  - 源杰第三季報（`lead_c767d492`）。
+  - Nokia 第四季報告（`lead_50cd9390`）。
+  - Amkor 第三季 10-Q（`lead_2ef544bb`）。
+  - Marvell 申報寫出 Photonic Fabric 記憶體設備的出貨或客戶（`lead_97d668ff`）。
+  - Anthropic 申報點名晶片設計夥伴（`lead_f5074be3`）。S-1 只寫依賴第三方晶片設計服務商做「certain custom accelerator platforms」。
+- not_pursued 58 則：二手、時變觀測、已在圖上的一手的轉述，或圖上沒有的層。
+- 本輪讀過一手後再停的：
+  - Jabil 10-K：全文沒有 Sivers。
+  - AMAT 8-K：加碼 Besi 到約 20%，是持股、不是供貨。
+  - Sivers 臨時股東會：換會計師；P11 激勵計畫稀釋約 2%。
+  - 聯茂 10-23 重訊：9 月單月 EPS 3.54 元，屬 6213.TW 敘事的數字格。
+  - Nokia 第三季 6-K。
+
+**延後的更正走廊**（都要等前一包入圖）：
+- Bloom 10-K 的 small gas turbines competes_with：等 [860]。
+- Fermi 的 SGT6-5000F 與 Solaris SISU：等 [864]。
+- Fermi 10-K 的 BESS。
+- ERock 424B4 的「省掉 BESS」：等 [868]。
+
+**邊緣候選（系統口徑，10-27）**：
+- 已入包：ERock 4.1 億美元／8 家、華城 62.7 億／8、Enerflex 28.6 億／2、Stabilis 0.8 億／1、Superior Plus 10.5 億／11、仕佳 72.9 億／家數拿不到。
+- 未入包：LFUS 92.5 億／4、NGS 4.0 億／3、CLNE 3.2 億／6。
+
+**發現未排程**：
+- 雲嶺光電 IPO 募投（新增 70/100mW CW 1,875 萬顆／年）只在仕佳回復的同業表裡看到轉述。要入圖得讀雲嶺自己的招股書，而雲嶺不在名冊（1 例）。
+- NAND（SLC／HBF）晶圓密集度是圖上沒有的層，要開屬 decompose 選題（`lead_60f861e3` 停放理由已寫明）。
+
+**我自己的誤差（記下不改，理由已 append-only）**：
+- `park_1027_10` 寫「Marvell 2026-02-02 新聞稿目標 FY2028 下半年首營收」，其實是帳號引述，沒有查過一手。
+- `park_1027_09` 對 ew_0940／ew_0943 的指涉略有出入。

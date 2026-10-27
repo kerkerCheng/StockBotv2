@@ -2292,6 +2292,430 @@
       "market_currency": "USD",
       "name_aliases": [],
       "research_ticker": "LIDR"
+    },
+    {
+      "company_id": "co:liberty_energy",
+      "research_ticker": "LBRT",
+      "market_currency": "USD",
+      "execution_currency": "USD",
+      "execution_venue": "NYSE",
+      "display_name": "Liberty Energy Inc.",
+      "_display_name_source": "SEC Form 8-K（2026-10-21，accession 0001694028-26-000055）封面「Liberty Energy Inc.」",
+      "_note": "隨 [859] R1 現場燃氣發電入圖包 staged（2026-10-27，drop 即回退；入圖包見 onsite_gas_power_anchor_liberty_williams_solaris_2026_10_27_action.json）：壓裂服務商，旗下 Liberty Power Innovations（LPI）做資料中心現場燃氣供電整合，2026-10-21 與一家前沿 AI 實驗室簽 1.2 GW 開發協議、含預付容量費。系統口徑非邊緣（`python -m alpha edge LBRT`：26.2 億美元、14 家，2026-10-27），不是倍率候選。不放單詞「Liberty」與「LPI」（太容易誤撞）",
+      "name_aliases": [
+        "Liberty Energy",
+        "Liberty Energy Inc.",
+        "Liberty Power Innovations"
+      ]
+    },
+    {
+      "company_id": "co:williams",
+      "research_ticker": "WMB",
+      "market_currency": "USD",
+      "execution_currency": "USD",
+      "execution_venue": "NYSE",
+      "display_name": "The Williams Companies, Inc.",
+      "_display_name_source": "SEC Form 10-K（FY2025，2026-02-24，accession 0000107263-26-000006）登記名「WILLIAMS COMPANIES, INC.」；Williams 官網版權列「The Williams Companies, Inc.」",
+      "_note": "隨 [859] R1 現場燃氣發電入圖包 staged（2026-10-27，drop 即回退；入圖包見 onsite_gas_power_anchor_liberty_williams_solaris_2026_10_27_action.json）：天然氣管線商，Power Innovation 為資料中心蓋現場燃氣電廠（Socrates，New Albany）。系統口徑非邊緣（WMB 877.6 億美元、24 家，2026-10-27）。俄亥俄 OPSB 案件的申請人 Will-Power OH, LLC 是 Williams 的專案主體（Williams Socrates 專案頁，無發布日）——未收成別名，要用時另行登記。不放單詞「Williams」（Williams-Sonoma 等會誤撞）",
+      "name_aliases": [
+        "The Williams Companies",
+        "Williams Companies",
+        "The Williams Companies, Inc."
+      ]
+    },
+    {
+      "company_id": "co:solaris_energy_infrastructure",
+      "research_ticker": "SEI",
+      "market_currency": "USD",
+      "execution_currency": "USD",
+      "execution_venue": "NYSE",
+      "display_name": "Solaris Energy Infrastructure, Inc.",
+      "_display_name_source": "SEC Form 8-K（2026-09-22，accession 0001193125-26-397255）封面「Solaris Energy Infrastructure, Inc.」",
+      "_note": "隨 [859] R1 現場燃氣發電入圖包 staged（2026-10-27，drop 即回退；入圖包見 onsite_gas_power_anchor_liberty_williams_solaris_2026_10_27_action.json）：Solaris Power Solutions 以燃氣渦輪機隊為 AI 資料中心供電（Stateline 約 900 MW 離網、Hatchbo 約 660 MW、Customer C 約 640 MW，客戶都未具名）。系統口徑非邊緣（SEI 41.0 億美元、14 家，2026-10-27）。不放單詞「Solaris」（Solaris Resources 等會誤撞）",
+      "name_aliases": [
+        "Solaris Energy Infrastructure",
+        "Solaris Energy Infrastructure, Inc.",
+        "Solaris Power Solutions"
+      ]
+    },
+    {
+      "company_id": "co:innio",
+      "research_ticker": "INIO",
+      "market_currency": "USD",
+      "execution_currency": "USD",
+      "execution_venue": "NASDAQ",
+      "display_name": "INNIO N.V.",
+      "_display_name_source": "SEC 424B4（2026-06，accession 0001193125-26-256992）封面「INNIO N.V.」與「list our common shares on Nasdaq under the symbol “INIO.”」",
+      "_note": "隨 [859] R2 燃氣往復式發電機組供給側入圖包 staged（2026-10-27，drop 即回退；入圖包見 gas_reciprocating_genset_supply_innio_cat_wartsila_cummins_psi_2026_10_27_action.json）：Jenbacher 燃氣引擎發電機組（Liberty 8-K 附上的 100 台 JMC 624 合約）。系統口徑非邊緣（`python -m alpha edge INIO`：124.7 億美元、10 家，2026-10-27）",
+      "name_aliases": [
+        "INNIO",
+        "INNIO N.V.",
+        "INNIO Jenbacher",
+        "Jenbacher"
+      ]
+    },
+    {
+      "company_id": "co:caterpillar",
+      "research_ticker": "CAT",
+      "market_currency": "USD",
+      "execution_currency": "USD",
+      "execution_venue": "NYSE",
+      "display_name": "Caterpillar Inc.",
+      "_display_name_source": "SEC Form 10-Q（2026Q2，accession 0000018230-26-000046）封面「Caterpillar Inc.」",
+      "_note": "隨 [859] R2 燃氣往復式發電機組供給側入圖包 staged（2026-10-27，drop 即回退；入圖包見 gas_reciprocating_genset_supply_innio_cat_wartsila_cummins_psi_2026_10_27_action.json）：G20CM34 燃氣引擎（Liberty 10-Q 附上的 8.01 億美元供貨合約）。系統口徑非邊緣（CAT 3,181.5 億美元、26 家，2026-10-27）",
+      "name_aliases": [
+        "Caterpillar",
+        "Caterpillar Inc."
+      ]
+    },
+    {
+      "company_id": "co:wartsila",
+      "research_ticker": "WRT1V.HE",
+      "market_currency": "EUR",
+      "display_name": "Wärtsilä Oyj Abp",
+      "_display_name_source": "yfinance longName（2026-10-27）「Wärtsilä Oyj Abp」",
+      "_note": "隨 [859] R2 燃氣往復式發電機組供給側入圖包 staged（2026-10-27，drop 即回退；入圖包見 gas_reciprocating_genset_supply_innio_cat_wartsila_cummins_psi_2026_10_27_action.json）：34SG 燃氣引擎發電機組（Liberty 10-Q 附上的 20V34SG 設備合約；Wärtsilä 2026 年多則資料中心訂單新聞稿）。系統口徑非邊緣（WRT1V.HE 174.1 億美元、17 家，2026-10-27）。赫爾辛基掛牌、使用者券商可否下單未確認，故不填 execution 欄位",
+      "name_aliases": [
+        "Wärtsilä",
+        "Wärtsilä Corporation",
+        "Wärtsilä Oyj Abp",
+        "Wartsila",
+        "Wärtsilä North America"
+      ]
+    },
+    {
+      "company_id": "co:cummins",
+      "research_ticker": "CMI",
+      "market_currency": "USD",
+      "execution_currency": "USD",
+      "execution_venue": "NYSE",
+      "display_name": "Cummins Inc.",
+      "_display_name_source": "SEC Form 10-Q（2026Q2，accession 0000026172-26-000029）封面「CUMMINS INC.」；新聞稿自稱「Cummins Inc.」",
+      "_note": "隨 [859] R2 燃氣往復式發電機組供給側入圖包 staged（2026-10-27，drop 即回退；入圖包見 gas_reciprocating_genset_supply_innio_cat_wartsila_cummins_psi_2026_10_27_action.json）：HSK78／QSK60 天然氣發電機組（給 Circe Energy 資料中心作主電源，2026–2030 交）。系統口徑非邊緣（CMI 718.8 億美元、19 家，2026-10-27）",
+      "name_aliases": [
+        "Cummins",
+        "Cummins Inc."
+      ]
+    },
+    {
+      "company_id": "co:power_solutions_international",
+      "research_ticker": "PSIX",
+      "market_currency": "USD",
+      "execution_currency": "USD",
+      "execution_venue": "NASDAQ",
+      "display_name": "Power Solutions International, Inc.",
+      "_display_name_source": "SEC Form 10-K（FY2025，accession 0001628280-26-013207）Item 1「Power Solutions International, Inc.」",
+      "_note": "隨 [859] R2 燃氣往復式發電機組供給側入圖包 staged（2026-10-27，drop 即回退；入圖包見 gas_reciprocating_genset_supply_innio_cat_wartsila_cummins_psi_2026_10_27_action.json）：天然氣火花點火引擎與發電機組，10-Q 寫下半年靠資料中心需求、正擴產能。系統口徑邊緣（`python -m alpha edge PSIX`：10.9 億美元、3 家，2026-10-27）；濰柴持股約 46%。不放縮寫「PSI」（太多同名）",
+      "name_aliases": [
+        "Power Solutions International",
+        "Power Solutions International, Inc."
+      ]
+    },
+    {
+      "company_id": "co:ge_vernova",
+      "research_ticker": "GEV",
+      "market_currency": "USD",
+      "execution_currency": "USD",
+      "execution_venue": "NYSE",
+      "display_name": "GE Vernova Inc.",
+      "_display_name_source": "GE Vernova 與 Crusoe 聯合新聞稿（2025-07-22）「GE Vernova Inc. (NYSE: GEV)」",
+      "_note": "隨 [859] R5＋R6 燃氣渦輪發電機組層入圖包 staged（2026-10-27，drop 即回退；入圖包見 gas_turbine_genset_layer_gev_ftai_jereh_bkr_cat_2026_10_27_action.json）：LM2500XPRESS 航改型燃機機組（Crusoe 29 台）。系統口徑非邊緣（`python -m alpha edge GEV`：2,277.5 億美元、33 家，2026-10-27）",
+      "name_aliases": [
+        "GE Vernova",
+        "GE Vernova Inc."
+      ]
+    },
+    {
+      "company_id": "co:ftai",
+      "research_ticker": "FTAI",
+      "market_currency": "USD",
+      "execution_currency": "USD",
+      "execution_venue": "NASDAQ",
+      "display_name": "FTAI Aviation Ltd.",
+      "_display_name_source": "SEC Form 10-Q（2026Q2，accession 0001628280-26-051412）登記名「FTAI Aviation Ltd.」",
+      "_note": "隨 [859] R5＋R6 燃氣渦輪發電機組層入圖包 staged（2026-10-27，drop 即回退；入圖包見 gas_turbine_genset_layer_gev_ftai_jereh_bkr_cat_2026_10_27_action.json）：FTAI Power 把 CFM56 改成 Mod-1 航改型發電渦輪，與杰瑞合資 J&F 封裝銷售（14.65 億美元雲端客戶訂單）。系統口徑非邊緣（FTAI 161.9 億美元、11 家，2026-10-27）",
+      "name_aliases": [
+        "FTAI",
+        "FTAI Aviation",
+        "FTAI Aviation Ltd.",
+        "FTAI Power"
+      ]
+    },
+    {
+      "company_id": "co:jereh",
+      "research_ticker": "002353.SZ",
+      "market_currency": "CNY",
+      "execution_currency": "CNY",
+      "execution_venue": "SZSE",
+      "display_name": "Yantai Jereh Oilfield Services Group Co., Ltd.",
+      "_display_name_source": "yfinance longName（2026-10-27）；杰瑞股份 2026 年半年度报告（2026-08-14）中文名「烟台杰瑞石油服务集团股份有限公司」、「公司的外文名称缩写（如有） Jereh Group」",
+      "_note": "隨 [859] R5＋R6 燃氣渦輪發電機組層入圖包 staged（2026-10-27，drop 即回退；入圖包見 gas_turbine_genset_layer_gev_ftai_jereh_bkr_cat_2026_10_27_action.json）：子公司 GenSystems Power Solutions（GPS）在美國賣燃機發電機組給資料中心、控股子公司 J&F Power Systems 封裝 FTAI Mod-1。系統口徑非邊緣（`python -m alpha edge 002353.SZ`：137.7 億美元、13 家，2026-10-27）。「Jereh Group」是半年報自寫的外文縮寫，FTAI 新聞稿也這樣稱呼它",
+      "name_aliases": [
+        "Jereh",
+        "Jereh Group",
+        "杰瑞股份",
+        "烟台杰瑞石油服务集团股份有限公司",
+        "Yantai Jereh Oilfield Services Group",
+        "Yantai Jereh Oilfield Services Group Co., Ltd."
+      ]
+    },
+    {
+      "company_id": "co:baker_hughes",
+      "research_ticker": "BKR",
+      "market_currency": "USD",
+      "execution_currency": "USD",
+      "execution_venue": "NASDAQ",
+      "display_name": "Baker Hughes Company",
+      "_display_name_source": "yfinance longName（2026-10-27）；Kodiak 聯合新聞稿（2026-07-08）「Baker Hughes (NASDAQ: BKR)」",
+      "_note": "隨 [859] R5＋R6 燃氣渦輪發電機組層入圖包 staged（2026-10-27，drop 即回退；入圖包見 gas_turbine_genset_layer_gev_ftai_jereh_bkr_cat_2026_10_27_action.json）：NovaLT16、Frame 5 燃機與 BRUSH 發電機（Kodiak 約 1 GW、Solaris 承接 30 台 NovaLT16 交貨權）。系統口徑非邊緣（BKR 556.0 億美元、24 家，2026-10-27）",
+      "name_aliases": [
+        "Baker Hughes",
+        "Baker Hughes Company"
+      ]
+    },
+    {
+      "company_id": "co:kodiak_gas_services",
+      "research_ticker": "KGS",
+      "market_currency": "USD",
+      "execution_currency": "USD",
+      "execution_venue": "NYSE",
+      "display_name": "Kodiak Gas Services, Inc.",
+      "_display_name_source": "Kodiak／Baker Hughes 聯合新聞稿（2026-07-08）「Kodiak Gas Services, Inc. (NYSE: KGS)」",
+      "_note": "隨 [859] R5＋R6 燃氣渦輪發電機組層入圖包 staged（2026-10-27，drop 即回退；入圖包見 gas_turbine_genset_layer_gev_ftai_jereh_bkr_cat_2026_10_27_action.json）：天然氣壓縮服務商，向 Baker Hughes 下約 1 GW 燃機與發電機（2030 前交）做表後供電；在圖上是買方。系統口徑非邊緣（KGS 46.0 億美元、14 家，2026-10-27）。不放單詞「Kodiak」（Kodiak Robotics、Kodiak Sciences 等會誤撞）",
+      "name_aliases": [
+        "Kodiak Gas Services",
+        "Kodiak Gas Services, Inc."
+      ]
+    },
+    {
+      "company_id": "co:siemens_energy",
+      "research_ticker": "ENR.DE",
+      "market_currency": "EUR",
+      "display_name": "Siemens Energy AG",
+      "_display_name_source": "yfinance longName（2026-10-27）「Siemens Energy AG」",
+      "_note": "隨 [859] R5＋R6 燃氣渦輪發電機組層入圖包 staged（2026-10-27，drop 即回退；入圖包見 gas_turbine_genset_layer_gev_ftai_jereh_bkr_cat_2026_10_27_action.json）：杰瑞半年報寫兩家簽 SGT 燃機戰略合作；Fermi 首批六台 SGT-800。系統口徑非邊緣（`python -m alpha edge ENR.DE`：1,187.1 億美元、28 家，2026-10-27）。法蘭克福掛牌、使用者券商可否下單未確認，故不填 execution 欄位。不放單詞「Siemens」（Siemens AG 是另一家公司）",
+      "name_aliases": [
+        "Siemens Energy",
+        "Siemens Energy AG",
+        "西门子能源"
+      ]
+    },
+    {
+      "company_id": "co:babcock_wilcox",
+      "research_ticker": "BW",
+      "market_currency": "USD",
+      "execution_currency": "USD",
+      "execution_venue": "NYSE",
+      "display_name": "Babcock & Wilcox Enterprises, Inc.",
+      "_display_name_source": "SEC Form 8-K（2026-09-08，accession 0001104659-26-105943）封面「BABCOCK & WILCOX ENTERPRISES, INC.」；新聞稿自稱「Babcock & Wilcox Enterprises, Inc.」",
+      "_note": "隨 [859] R7 重型燃機與鍋爐＋汽輪機入圖包 staged（2026-10-27，drop 即回退；入圖包見 steam_cycle_heavy_duty_gt_bw_siemens_gev_doosan_2026_10_27_action.json）：燃氣鍋爐＋汽輪機（Rankine）電廠，Base Electron（Applied Digital 支持的 IPP）四座 300 MW、24 億美元、2030 商轉；另向西門子能源加訂 1 GW 汽輪機。系統口徑邊緣（`python -m alpha edge BW`：6.2 億美元、4 家，2026-10-27）。另有特別股 BW PRA、公司債 BWNB——別名不收代號。不放「B&W」（太多同名）",
+      "name_aliases": [
+        "Babcock & Wilcox",
+        "Babcock & Wilcox Enterprises",
+        "Babcock & Wilcox Enterprises, Inc."
+      ]
+    },
+    {
+      "company_id": "co:applied_digital",
+      "research_ticker": "APLD",
+      "market_currency": "USD",
+      "execution_currency": "USD",
+      "execution_venue": "NASDAQ",
+      "display_name": "Applied Digital Corporation",
+      "_display_name_source": "B&W 10-Q（2026Q2）詞彙表「Applied Digital Applied Digital Corporation」；yfinance longName（2026-10-27）",
+      "_note": "隨 [859] R7 重型燃機與鍋爐＋汽輪機入圖包 staged（2026-10-27，drop 即回退；入圖包見 steam_cycle_heavy_duty_gt_bw_siemens_gev_doosan_2026_10_27_action.json）：AI factory 開發商；Base Electron 是它支持的 IPP（B&W 10-K）。在圖上是需求側。系統口徑非邊緣（`python -m alpha edge APLD`：53.9 億美元、16 家，2026-10-27）",
+      "name_aliases": [
+        "Applied Digital",
+        "Applied Digital Corporation"
+      ]
+    },
+    {
+      "company_id": "co:doosan_enerbility",
+      "research_ticker": "034020.KS",
+      "market_currency": "KRW",
+      "execution_currency": "KRW",
+      "execution_venue": "KRX",
+      "display_name": "Doosan Enerbility Co., Ltd.",
+      "_display_name_source": "yfinance longName（2026-10-27）；斗山集團新聞稿（2026-03-06）「Doosan Enerbility」",
+      "_note": "隨 [859] R7 重型燃機與鍋爐＋汽輪機入圖包 staged（2026-10-27，drop 即回退；入圖包見 steam_cycle_heavy_duty_gt_bw_siemens_gev_doosan_2026_10_27_action.json）：380 MW 燃機，美國資料中心客戶 7 台（2029-05 起每月各交一台燃機與發電機），在美累計 12 台。系統口徑非邊緣（`python -m alpha edge 034020.KS`：283.4 億美元、21 家，2026-10-27）。不放單詞「Doosan」（斗山集團旗下多家上市公司）",
+      "name_aliases": [
+        "Doosan Enerbility",
+        "Doosan Enerbility Co., Ltd.",
+        "두산에너빌리티"
+      ]
+    },
+    {
+      "company_id": "co:accelleron",
+      "research_ticker": "ACLN.SW",
+      "market_currency": "CHF",
+      "display_name": "Accelleron Industries AG",
+      "_display_name_source": "yfinance longName（2026-10-27）「Accelleron Industries AG」；2026 半年報英文版自稱「Accelleron Industries Ltd」",
+      "_note": "隨 [859] R8 增壓器／燃料與控制／燃機熱段鑄件入圖包 staged（2026-10-27，drop 即回退；入圖包見 turbocharger_controls_hot_section_accelleron_woodward_howmet_2026_10_27_action.json）：0.5 MW 以上重型引擎增壓器；2026 上半年資料中心相關營收由約 5% 升到略低於 9%，自述成長靠引擎 OEM 產能、瑞士廠接近滿載。系統口徑邊緣（`python -m alpha edge ACLN.SW`：73.1 億美元、10 家，2026-10-27）。瑞士 SIX 掛牌、使用者券商可否下單未確認，故不填 execution 欄位",
+      "name_aliases": [
+        "Accelleron",
+        "Accelleron Industries",
+        "Accelleron Industries AG",
+        "Accelleron Industries Ltd"
+      ]
+    },
+    {
+      "company_id": "co:woodward",
+      "research_ticker": "WWD",
+      "market_currency": "USD",
+      "execution_currency": "USD",
+      "execution_venue": "NASDAQ",
+      "display_name": "Woodward, Inc.",
+      "_display_name_source": "Woodward 新聞稿（8-K Exhibit 99.1，2026-09-16）「Woodward, Inc. (NASDAQ:WWD)」",
+      "_note": "隨 [859] R8 增壓器／燃料與控制／燃機熱段鑄件入圖包 staged（2026-10-27，drop 即回退；入圖包見 turbocharger_controls_hot_section_accelleron_woodward_howmet_2026_10_27_action.json）：燃機與引擎的燃料、點火、控制系統；10-Q 寫發電業務成長來自資料中心主電源與備援需求。系統口徑非邊緣（`python -m alpha edge WWD`：180.5 億美元、12 家，2026-10-27）",
+      "name_aliases": [
+        "Woodward",
+        "Woodward, Inc."
+      ]
+    },
+    {
+      "company_id": "co:howmet",
+      "research_ticker": "HWM",
+      "market_currency": "USD",
+      "execution_currency": "USD",
+      "execution_venue": "NYSE",
+      "display_name": "Howmet Aerospace Inc.",
+      "_display_name_source": "Howmet 2026 年第二季財報稿（8-K Exhibit 99.1，2026-08-06）「Howmet Aerospace Inc., headquartered in Pittsburgh」",
+      "_note": "隨 [859] R8 增壓器／燃料與控制／燃機熱段鑄件入圖包 staged（2026-10-27，drop 即回退；入圖包見 turbocharger_controls_hot_section_accelleron_woodward_howmet_2026_10_27_action.json）：航空與燃機的精密鑄件（含葉片），燃機市場營收第二季年增 38%；沒有逐字寫資料中心。系統口徑非邊緣（HWM 775.1 億美元、20 家，2026-10-27）",
+      "name_aliases": [
+        "Howmet",
+        "Howmet Aerospace",
+        "Howmet Aerospace Inc."
+      ]
+    },
+    {
+      "company_id": "co:ceco_environmental",
+      "research_ticker": "CECO",
+      "market_currency": "USD",
+      "display_name": "CECO Environmental Corp.",
+      "_display_name_source": "CECO 8-K Exhibit 99.1（2026-10-02）「CECO Environmental Corp. (Nasdaq: CECO)」",
+      "_note": "隨 [859] R9 燃氣發電排放控制（SCR）入圖包 staged（2026-10-27，drop 即回退；入圖包見 gas_power_emissions_scr_ceco_johnson_matthey_2026_10_27_action.json）：燃氣發電的排放與排氣系統（含 SCR）；2025Q4 約 1.35 億美元國內燃氣發電專案、2026-04 燃氣發電史上最大單，第一季財報稿寫需求來自資料中心等。系統口徑邊緣（`python -m alpha edge CECO`：28.0 億美元、7 家，2026-10-27）。2026-10-19 起主掛牌由 Nasdaq 轉德州證交所（TXSE），代號不變——交易所欄位等使用者確認券商可下單後再填。正與 Thermon 合併（10-Q 寫 Merger Agreement 2026-02-23）",
+      "name_aliases": [
+        "CECO Environmental",
+        "CECO Environmental Corp."
+      ]
+    },
+    {
+      "company_id": "co:johnson_matthey",
+      "research_ticker": "JMAT.L",
+      "market_currency": "GBp",
+      "display_name": "Johnson Matthey Plc",
+      "_display_name_source": "Johnson Matthey 新聞稿（2026-07-23）「Johnson Matthey Plc (“JM”)」",
+      "_note": "隨 [859] R9 燃氣發電排放控制（SCR）入圖包 staged（2026-10-27，drop 即回退；入圖包見 gas_power_emissions_scr_ceco_johnson_matthey_2026_10_27_action.json）：2026-07-23 完成收購美國 SCR 觸媒廠 Cormetech（企業價值 3.6 億美元，2026-05-28 新聞稿），併入 Clean Air Solutions。系統口徑邊緣（`python -m alpha edge JMAT.L`：40.9 億美元、9 家，2026-10-27）。倫敦以便士報價（GBp）。不收「Cormetech」為別名——收購前的 Cormetech 文件不是 JM 的（時點）",
+      "name_aliases": [
+        "Johnson Matthey",
+        "Johnson Matthey Plc"
+      ]
+    },
+    {
+      "company_id": "co:erock",
+      "research_ticker": "EROC",
+      "market_currency": "USD",
+      "execution_currency": "USD",
+      "execution_venue": "NYSE",
+      "display_name": "ERock, Inc.",
+      "_display_name_source": "SEC 424B4（2026-06-10，accession 0001193125-26-265898）封面「ERock, Inc.」與「listed … on the NYSE under the symbol “EROC.”」",
+      "_note": "隨 [859] R11 表後微電網控制入圖包 staged（2026-10-27，drop 即回退；入圖包見 btm_microgrid_controls_erock_vertiv_uig_2026_10_27_action.json）：Enchanted Rock，自有天然氣引擎（RockBlock）＋嵌入式控制、自組發電機／變壓器／開關櫃，主要服務資料中心；2026-06-30 在手訂單約 17 億美元、第二季營收年減 41.7%。系統口徑邊緣（`python -m alpha edge EROC`：4.1 億美元、8 家，2026-10-27）。424B4 寫「ERock」「Enchanted Rock」都指本公司",
+      "name_aliases": [
+        "ERock",
+        "ERock, Inc.",
+        "Enchanted Rock",
+        "Enchanted Rock Holdings"
+      ]
+    },
+    {
+      "company_id": "co:fortune_electric",
+      "research_ticker": "1519.TW",
+      "market_currency": "TWD",
+      "display_name": "Fortune Electric Co., Ltd.",
+      "_display_name_source": "yfinance longName（2026-10-27）；華城 2025-12-12 法說簡報（MOPS 151920251212M001）封面「華城電機股份有限公司」、末頁「FORTUNE ELECTRIC」",
+      "_note": "隨 [859] R13 大型電力變壓器層入圖包 staged（2026-10-27，drop 即回退；入圖包見 large_power_transformer_fortune_electric_1519_2026_10_27_action.json）：台灣唯一 500kV 級電力變壓器廠，交付美國亞利桑那 525/13.8 kV、130 MVA GSU，外銷占比過半、AIDC 列為成長來源；台中廠擴建超高壓大容量電力變壓器，簡報寫預計 2027 年第二季投產。系統口徑邊緣（`python -m alpha edge 1519.TW`：62.7 億美元、8 家，2026-10-27）。星際之門訂單只見於二手新聞，未入邊",
+      "name_aliases": [
+        "Fortune Electric",
+        "FORTUNE ELECTRIC",
+        "華城",
+        "華城電機",
+        "華城電機股份有限公司"
+      ]
+    },
+    {
+      "company_id": "co:enerflex",
+      "research_ticker": "EFXT",
+      "market_currency": "USD",
+      "execution_currency": "USD",
+      "execution_venue": "NYSE",
+      "display_name": "Enerflex Ltd.",
+      "_display_name_source": "Enerflex 6-K Exhibit 99.1（2026-10-13）「Enerflex Ltd. (TSX: EFX) (NYSE: EFXT)」",
+      "_note": "隨 [859] R14 現場燃料供應入圖包 staged（2026-10-27，drop 即回退；入圖包見 onsite_fuel_gas_enerflex_btm_backlog_2026_10_27_action.json）：天然氣壓縮與處理設備廠（Engineered Systems），2026-10 兩份 6-K 寫拿到約 450 MW 與超過 1 GW 表後燃氣發電機組設計製造案，表後發電在手超過 1.75 GW、交期到 2028；另把亞太業務賣給 INNIO（2026-02-25 協議）。系統口徑邊緣（`python -m alpha edge EFXT`：28.6 億美元、2 家，2026-10-27）。TSX 另以 EFX 掛牌",
+      "name_aliases": [
+        "Enerflex",
+        "Enerflex Ltd."
+      ]
+    },
+    {
+      "company_id": "co:stabilis_solutions",
+      "research_ticker": "SLNG",
+      "market_currency": "USD",
+      "execution_currency": "USD",
+      "execution_venue": "NASDAQ",
+      "display_name": "Stabilis Solutions, Inc.",
+      "_display_name_source": "SEC EDGAR 申報人名稱「Stabilis Solutions, Inc.」（10-Q 2026-08-12，accession 0001437749-26-027112）",
+      "_note": "隨 [859] R15 移動 LNG／CNG 過渡供氣入圖包 staged（2026-10-27，drop 即回退；入圖包見 onsite_gas_virtual_pipeline_stabilis_superior_plus_2026_10_27_action.json）：小型 LNG 液化與配送商；2026-02 拿到約 2 億美元、多年 take-or-pay 的資料中心表後發電 LNG 供應合約（2027Q1–2029Q1，客戶預付 2,500 萬美元），2026-07-09 再簽一份資料中心臨時發電供氣合約；2026Q2 營收 1,190 萬美元、年減 31.2%。系統口徑邊緣（`python -m alpha edge SLNG`：0.8 億美元、1 家，2026-10-27）",
+      "name_aliases": [
+        "Stabilis",
+        "Stabilis Solutions",
+        "Stabilis Solutions, Inc."
+      ]
+    },
+    {
+      "company_id": "co:superior_plus",
+      "research_ticker": "SPB.TO",
+      "market_currency": "CAD",
+      "display_name": "Superior Plus Corp.",
+      "_display_name_source": "Superior Plus 2026 第二季財報稿（2026-08-06）「Superior Plus Corp. (“ Superior” or “ the company ”) (TSX: SPB)」",
+      "_note": "隨 [859] R15 移動 LNG／CNG 過渡供氣入圖包 staged（2026-10-27，drop 即回退；入圖包見 onsite_gas_virtual_pipeline_stabilis_superior_plus_2026_10_27_action.json）：丙烷配送＋Certarus（全資子公司，公路運輸 CNG）；第二季財報稿寫 Certarus 資料中心業務再拿一份合約、成長量來自資料中心等，資料中心合約 2027 年起貢獻 EBITDA。系統口徑邊緣（`python -m alpha edge SPB.TO`：10.5 億美元、11 家，2026-10-27）。別名收 Certarus——它是 Superior Plus 的全資子公司，Superior 的文件以 Certarus 稱這塊業務",
+      "name_aliases": [
+        "Superior Plus",
+        "Superior Plus Corp.",
+        "Certarus"
+      ]
+    },
+    {
+      "company_id": "co:propetro",
+      "research_ticker": "PUMP",
+      "market_currency": "USD",
+      "execution_currency": "USD",
+      "execution_venue": "NYSE",
+      "display_name": "ProPetro Holding Corp.",
+      "_display_name_source": "ProPetro 8-K Exhibit 99.1（2025-10-27）「ProPetro Holding Corp. (“ProPetro” or the “Company”) (NYSE: PUMP)」",
+      "_note": "隨 [859] R12 表後電廠 BESS 入圖包 staged（2026-10-27，drop 即回退；入圖包見 onsite_power_bess_propetro_tesla_innio_2026_10_27_action.json）：油田壓裂服務商，PROPWR 部門做燃氣發電服務；2025-10-27 簽 60 MW 超大規模業者資料中心長約（BESS＋燃氣往復式機組混合）。系統口徑非邊緣（`python -m alpha edge PUMP`：9.0 億美元、13 家，2026-10-27——分析師家數超過門檻）。別名收 PROPWR（它是 ProPetro 的部門，不是另一個法人）",
+      "name_aliases": [
+        "ProPetro",
+        "ProPetro Holding Corp.",
+        "PROPWR"
+      ]
+    },
+    {
+      "company_id": "co:shijia_photons",
+      "research_ticker": "688313.SS",
+      "market_currency": "CNY",
+      "execution_currency": "CNY",
+      "execution_venue": "SSE",
+      "display_name": "Henan Shijia Photons Technology Co., Ltd.",
+      "_display_name_source": "仕佳光子 2026 年度向特定對象發行股票募集說明書（申報稿，2026-10-24）封面「(Henan Shijia Photons Technology Co.,Ltd.)」與發行人基本情況「英文名称 Henan Shijia Photons Technology Co.,Ltd.」；上交所科創板 688313（河南仕佳光子科技股份有限公司，简称仕佳光子）",
+      "_note": "隨 CW DFB 雷射層補仕佳光子入圖包 staged（2026-10-27，drop 即回退；入圖包見 cw_dfb_laser_shijia_688313_inquiry_reply_2026_10_27_action.json）：光晶片與器件廠（無源 AWG／PLC、MT-FA、FAU，有源 DFB／CW DFB）；問詢回覆寫 100mW CW DFB 自 2026 年 6 月起在多家國際頭部光模組廠批量出貨、400mW CW DFB COC 小批量出貨；定增募投「連續波（CW）激光器芯片及 COC 產業化項目」總投資 14.56 億元、建設期 3 年。系統口徑「邊緣無法量」（`python -m alpha edge 688313.SS`：72.9 億美元、分析師家數拿不到，2026-10-27）",
+      "name_aliases": [
+        "仕佳光子",
+        "河南仕佳光子科技股份有限公司",
+        "河南仕佳光子",
+        "Shijia Photons",
+        "Henan Shijia Photons Technology",
+        "Shijia"
+      ]
     }
   ]
 }
