@@ -1,0 +1,394 @@
+{
+  "claims": [
+    {
+      "confidence": 0.85,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：無——這是定義性陳述；若之後有一手寫出資料中心燃氣機組不用同步發電機（例如改直流或別的架構），重讀本層。核查頻率：每年（INNIO 10-K）。觸發後 48 小時：重讀 tech:gas_reciprocating_genset。",
+      "id": "inio_424b4_20260604_specialized_parts_capacity_cl1",
+      "source_ids": [
+        "inio_424b4_20260604_specialized_parts_capacity_s1",
+        "inio_424b4_20260604_specialized_parts_capacity_s3"
+      ],
+      "statement": "INNIO's prospectus defines a genset as engine and alternator together with controls, and lists generators among its specialized component parts.",
+      "subject_id": "e1"
+    },
+    {
+      "confidence": 0.65,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：INNIO 之後的 10-Q／10-K 或年報寫出這一類專用件已有足夠的合格供應商、交期不再是風險，或刪掉這一段風險描述；或寫出這一類零件的交期實際延誤了機組交貨。核查頻率：每季（INNIO 10-Q）。觸發後 48 小時：前者降這條邊 confidence，後者把 demand_proof_level 升為 confirmed 並重讀本層。",
+      "id": "inio_424b4_20260604_specialized_parts_capacity_cl2",
+      "source_ids": [
+        "inio_424b4_20260604_specialized_parts_capacity_s2",
+        "inio_424b4_20260604_specialized_parts_capacity_s3",
+        "inio_424b4_20260604_specialized_parts_capacity_s4"
+      ],
+      "statement": "INNIO (prospectus, 2026-06-04): generator deliveries were delayed in 2022 and 2023 by copper and magnetic steel shortages; generators are among the specialized parts whose suppliers are heavily engaged with INNIO's competitors, which could reduce supplier availability. The past delay is stated as fact; the forward risk is a risk factor, not a reported current shortage. No generator supplier is named.",
+      "subject_id": "e2"
+    },
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：INNIO 之後的 10-Q／10-K 或年報寫出這一類專用件已有足夠的合格供應商、交期不再是風險，或刪掉這一段風險描述；或寫出這一類零件的交期實際延誤了機組交貨。核查頻率：每季（INNIO 10-Q）。觸發後 48 小時：前者降這條邊 confidence，後者把 demand_proof_level 升為 confirmed 並重讀本層。",
+      "id": "inio_424b4_20260604_specialized_parts_capacity_cl3",
+      "source_ids": [
+        "inio_424b4_20260604_specialized_parts_capacity_s3",
+        "inio_424b4_20260604_specialized_parts_capacity_s4",
+        "inio_424b4_20260604_specialized_parts_capacity_s5"
+      ],
+      "statement": "INNIO names cylinder head castings among specialized parts whose suppliers are heavily engaged with its competitors, and says it relies on a limited number of suppliers (in some instances a single supplier) for certain components. Risk-factor language; no supplier named and no realized delay stated for castings.",
+      "subject_id": "e6"
+    },
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：INNIO 之後的 10-Q／10-K 或年報寫出這一類專用件已有足夠的合格供應商、交期不再是風險，或刪掉這一段風險描述；或寫出這一類零件的交期實際延誤了機組交貨。核查頻率：每季（INNIO 10-Q）。觸發後 48 小時：前者降這條邊 confidence，後者把 demand_proof_level 升為 confirmed 並重讀本層。",
+      "id": "inio_424b4_20260604_specialized_parts_capacity_cl4",
+      "source_ids": [
+        "inio_424b4_20260604_specialized_parts_capacity_s3",
+        "inio_424b4_20260604_specialized_parts_capacity_s4",
+        "inio_424b4_20260604_specialized_parts_capacity_s5"
+      ],
+      "statement": "INNIO names pistons among specialized parts whose suppliers are heavily engaged with its competitors. Risk-factor language; no supplier named and no realized delay stated.",
+      "subject_id": "e7"
+    },
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：INNIO 之後的 10-Q／10-K 或年報寫出這一類專用件已有足夠的合格供應商、交期不再是風險，或刪掉這一段風險描述；或寫出這一類零件的交期實際延誤了機組交貨。核查頻率：每季（INNIO 10-Q）。觸發後 48 小時：前者降這條邊 confidence，後者把 demand_proof_level 升為 confirmed 並重讀本層。",
+      "id": "inio_424b4_20260604_specialized_parts_capacity_cl5",
+      "source_ids": [
+        "inio_424b4_20260604_specialized_parts_capacity_s3",
+        "inio_424b4_20260604_specialized_parts_capacity_s4",
+        "inio_424b4_20260604_specialized_parts_capacity_s5"
+      ],
+      "statement": "INNIO names heat exchangers among specialized parts whose suppliers are heavily engaged with its competitors. Risk-factor language; no supplier named and no realized delay stated.",
+      "subject_id": "e8"
+    },
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：INNIO 之後的 10-Q／10-K 寫出資料中心占設備訂單比例降到三成以下，或寫出歐洲擴產已提前完成、產能不再受限。核查頻率：每季（INNIO 10-Q）。觸發後 48 小時：降這條邊 confidence，重讀 tech:gas_reciprocating_genset 的產能讀法。",
+      "id": "inio_424b4_20260604_specialized_parts_capacity_cl6",
+      "source_ids": [
+        "inio_424b4_20260604_specialized_parts_capacity_s1",
+        "inio_424b4_20260604_specialized_parts_capacity_s6",
+        "inio_424b4_20260604_specialized_parts_capacity_s7",
+        "inio_424b4_20260604_specialized_parts_capacity_s8"
+      ],
+      "statement": "INNIO (prospectus): the majority of its engines run on natural gas; about 62% of Equipment Order Intake came from data centers as of 2026-03-31; supplementing capacity at existing European facilities depends on equipment, tooling and test stands and only after specific upgrades expected no earlier than 2028. Supplier self-report; the capacity constraint it names is at the OEM's own plant (equipment, tooling, test stands), not at a named component supplier.",
+      "subject_id": "e9"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "tech:gas_reciprocating_genset",
+      "id": "e1",
+      "relation": "is_component_of",
+      "source_ids": [
+        "inio_424b4_20260604_specialized_parts_capacity_s1",
+        "inio_424b4_20260604_specialized_parts_capacity_s3"
+      ],
+      "src_id": "tech:genset_alternator"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "tech:genset_alternator",
+      "id": "e2",
+      "relation": "constrained_by",
+      "source_ids": [
+        "inio_424b4_20260604_specialized_parts_capacity_s2",
+        "inio_424b4_20260604_specialized_parts_capacity_s3",
+        "inio_424b4_20260604_specialized_parts_capacity_s4"
+      ],
+      "src_id": "co:innio"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:gas_reciprocating_genset",
+      "id": "e3",
+      "relation": "is_component_of",
+      "source_ids": [
+        "inio_424b4_20260604_specialized_parts_capacity_s3"
+      ],
+      "src_id": "tech:gas_engine_cylinder_head_casting"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:gas_reciprocating_genset",
+      "id": "e4",
+      "relation": "is_component_of",
+      "source_ids": [
+        "inio_424b4_20260604_specialized_parts_capacity_s3"
+      ],
+      "src_id": "tech:gas_engine_piston"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:gas_reciprocating_genset",
+      "id": "e5",
+      "relation": "is_component_of",
+      "source_ids": [
+        "inio_424b4_20260604_specialized_parts_capacity_s3"
+      ],
+      "src_id": "tech:gas_engine_heat_exchanger"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "tech:gas_engine_cylinder_head_casting",
+      "id": "e6",
+      "relation": "depends_on",
+      "source_ids": [
+        "inio_424b4_20260604_specialized_parts_capacity_s3",
+        "inio_424b4_20260604_specialized_parts_capacity_s4",
+        "inio_424b4_20260604_specialized_parts_capacity_s5"
+      ],
+      "src_id": "co:innio"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "tech:gas_engine_piston",
+      "id": "e7",
+      "relation": "depends_on",
+      "source_ids": [
+        "inio_424b4_20260604_specialized_parts_capacity_s3",
+        "inio_424b4_20260604_specialized_parts_capacity_s4",
+        "inio_424b4_20260604_specialized_parts_capacity_s5"
+      ],
+      "src_id": "co:innio"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "tech:gas_engine_heat_exchanger",
+      "id": "e8",
+      "relation": "depends_on",
+      "source_ids": [
+        "inio_424b4_20260604_specialized_parts_capacity_s3",
+        "inio_424b4_20260604_specialized_parts_capacity_s4",
+        "inio_424b4_20260604_specialized_parts_capacity_s5"
+      ],
+      "src_id": "co:innio"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:gas_reciprocating_genset",
+      "id": "e9",
+      "relation": "supplies_to",
+      "source_ids": [
+        "inio_424b4_20260604_specialized_parts_capacity_s1",
+        "inio_424b4_20260604_specialized_parts_capacity_s6",
+        "inio_424b4_20260604_specialized_parts_capacity_s7",
+        "inio_424b4_20260604_specialized_parts_capacity_s8"
+      ],
+      "src_id": "co:innio"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "INNIO N.V.",
+        "INNIO Jenbacher",
+        "Jenbacher"
+      ],
+      "attributes": {
+        "ticker": "INIO"
+      },
+      "confidence": 0.85,
+      "id": "co:innio",
+      "name": "INNIO",
+      "role": null,
+      "source_ids": [
+        "inio_424b4_20260604_specialized_parts_capacity_s1",
+        "inio_424b4_20260604_specialized_parts_capacity_s2",
+        "inio_424b4_20260604_specialized_parts_capacity_s3",
+        "inio_424b4_20260604_specialized_parts_capacity_s4",
+        "inio_424b4_20260604_specialized_parts_capacity_s5",
+        "inio_424b4_20260604_specialized_parts_capacity_s6",
+        "inio_424b4_20260604_specialized_parts_capacity_s7",
+        "inio_424b4_20260604_specialized_parts_capacity_s8"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "gas reciprocating engines",
+        "gas engine generator set",
+        "reciprocating gas engine",
+        "gas genset"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:gas_reciprocating_genset",
+      "name": "Gas reciprocating engine generator set",
+      "role": null,
+      "source_ids": [
+        "inio_424b4_20260604_specialized_parts_capacity_s1",
+        "inio_424b4_20260604_specialized_parts_capacity_s2",
+        "inio_424b4_20260604_specialized_parts_capacity_s3",
+        "inio_424b4_20260604_specialized_parts_capacity_s4",
+        "inio_424b4_20260604_specialized_parts_capacity_s5",
+        "inio_424b4_20260604_specialized_parts_capacity_s6",
+        "inio_424b4_20260604_specialized_parts_capacity_s7",
+        "inio_424b4_20260604_specialized_parts_capacity_s8"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "genset alternator",
+        "A/C generator/alternator",
+        "alternator"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:genset_alternator",
+      "name": "Generator set alternator (A/C generator)",
+      "role": null,
+      "source_ids": [
+        "inio_424b4_20260604_specialized_parts_capacity_s1",
+        "inio_424b4_20260604_specialized_parts_capacity_s2",
+        "inio_424b4_20260604_specialized_parts_capacity_s3",
+        "inio_424b4_20260604_specialized_parts_capacity_s4",
+        "inio_424b4_20260604_specialized_parts_capacity_s5",
+        "inio_424b4_20260604_specialized_parts_capacity_s6",
+        "inio_424b4_20260604_specialized_parts_capacity_s7",
+        "inio_424b4_20260604_specialized_parts_capacity_s8"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "cylinder head castings"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:gas_engine_cylinder_head_casting",
+      "name": "Cylinder head castings for large gas engines",
+      "role": null,
+      "source_ids": [
+        "inio_424b4_20260604_specialized_parts_capacity_s1",
+        "inio_424b4_20260604_specialized_parts_capacity_s2",
+        "inio_424b4_20260604_specialized_parts_capacity_s3",
+        "inio_424b4_20260604_specialized_parts_capacity_s4",
+        "inio_424b4_20260604_specialized_parts_capacity_s5",
+        "inio_424b4_20260604_specialized_parts_capacity_s6",
+        "inio_424b4_20260604_specialized_parts_capacity_s7",
+        "inio_424b4_20260604_specialized_parts_capacity_s8"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "gas engine pistons"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:gas_engine_piston",
+      "name": "Pistons for large gas engines",
+      "role": null,
+      "source_ids": [
+        "inio_424b4_20260604_specialized_parts_capacity_s1",
+        "inio_424b4_20260604_specialized_parts_capacity_s2",
+        "inio_424b4_20260604_specialized_parts_capacity_s3",
+        "inio_424b4_20260604_specialized_parts_capacity_s4",
+        "inio_424b4_20260604_specialized_parts_capacity_s5",
+        "inio_424b4_20260604_specialized_parts_capacity_s6",
+        "inio_424b4_20260604_specialized_parts_capacity_s7",
+        "inio_424b4_20260604_specialized_parts_capacity_s8"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "gas engine heat exchangers"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:gas_engine_heat_exchanger",
+      "name": "Heat exchangers for gas engine gensets",
+      "role": null,
+      "source_ids": [
+        "inio_424b4_20260604_specialized_parts_capacity_s1",
+        "inio_424b4_20260604_specialized_parts_capacity_s2",
+        "inio_424b4_20260604_specialized_parts_capacity_s3",
+        "inio_424b4_20260604_specialized_parts_capacity_s4",
+        "inio_424b4_20260604_specialized_parts_capacity_s5",
+        "inio_424b4_20260604_specialized_parts_capacity_s6",
+        "inio_424b4_20260604_specialized_parts_capacity_s7",
+        "inio_424b4_20260604_specialized_parts_capacity_s8"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "inio_424b4_20260604_specialized_parts_capacity",
+    "evidence_tier": 1,
+    "origin_entity": "INNIO N.V.",
+    "permission_basis": "SEC EDGAR 公開申報（424B4 公開說明書）；只保留研究必要的有限逐字節錄。published_at 取 EDGAR 申報日 2026-06-04。",
+    "published_at": "2026-06-04",
+    "publisher": "SEC EDGAR（Form 424B4，accession 0001193125-26-256992）",
+    "retrieved_at": "2026-10-27",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "INNIO N.V. Form 424B4（IPO 公開說明書，2026-06-04）：62% 設備訂單來自資料中心；發電機、缸頭鑄件、熱交換器、活塞是專用件、供應商同時服務競爭者，2022–2023 年發電機因銅與電磁鋼短缺延遲交貨；歐洲擴產受設備、工裝、測試台限制，最早 2028 年",
+    "url": "https://www.sec.gov/Archives/edgar/data/2109150/000119312526256992/liberty_-_424b4.htm"
+  },
+  "sources": [
+    {
+      "id": "inio_424b4_20260604_specialized_parts_capacity_s1",
+      "locator": "Business—Jenbacher Type 6 段",
+      "quote": "increase power density per genset (which combine engine and alternator together with controls) (“genset”)"
+    },
+    {
+      "id": "inio_424b4_20260604_specialized_parts_capacity_s2",
+      "locator": "Risk Factors—原物料與零件供應",
+      "quote": "For example, in 2022 and 2023, we experienced delays with our generator deliveries due to copper and magnetic steel shortages."
+    },
+    {
+      "id": "inio_424b4_20260604_specialized_parts_capacity_s3",
+      "locator": "Risk Factors—原物料與零件供應",
+      "quote": "Furthermore, due to the specialization of the component parts required by power generation companies, particularly our cylinder head castings, generators, heat exchangers and pistons, our suppliers are heavily engaged with our competitors."
+    },
+    {
+      "id": "inio_424b4_20260604_specialized_parts_capacity_s4",
+      "locator": "Risk Factors—原物料與零件供應",
+      "quote": "This engagement could result in a decrease in our suppliers’ availability"
+    },
+    {
+      "id": "inio_424b4_20260604_specialized_parts_capacity_s5",
+      "locator": "Risk Factors—供應商集中",
+      "quote": "We currently rely on a limited number of suppliers, and in some instances, a single supplier, for certain equipment and components to build our products and replacements."
+    },
+    {
+      "id": "inio_424b4_20260604_specialized_parts_capacity_s6",
+      "locator": "Risk Factors—產能爬坡",
+      "quote": "As of March 31, 2026, approximately 62% of our Equipment Order Intake was generated from data centers"
+    },
+    {
+      "id": "inio_424b4_20260604_specialized_parts_capacity_s7",
+      "locator": "Risk Factors—產能爬坡",
+      "quote": "While we may be able to supplement capacity at existing facilities in Europe subject to the availability of certain equipment, tooling and test stands and only after specific upgrades expected no earlier than 2028, any such measures would likely require extended lead times and higher costs."
+    },
+    {
+      "id": "inio_424b4_20260604_specialized_parts_capacity_s8",
+      "locator": "Business—燃料",
+      "quote": "The majority of our engines currently run with natural gas as the primary input fuel."
+    }
+  ]
+}

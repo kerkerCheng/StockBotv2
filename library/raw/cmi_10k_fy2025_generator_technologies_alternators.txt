@@ -1,0 +1,17 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/26172/000002617226000009/cmi-20251231.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Cummins Inc. Form 10-K（FY2025，2026-02-10）：Generator technologies 產品線——Stamford 與 AVK 品牌的 A/C 發電機（7.5 kVA–11,200 kVA），自用也賣給外部機組組裝商；競爭者 Leroy Somer、Marathon Electric、Meccalte；資料中心產品需求排到六到八季後
+RETRIEVED: 2026-10-27（本機原文抽字逐字核對）
+
+【Item 1 Power Systems 產品線】
+"Generator technologies - We design, manufacture, sell and support A/C generator/alternator products and components for internal consumption and for external generator set assemblers."
+
+【Item 1 Power Systems 產品線】
+"Our alternator products are sold under the Stamford and AVK brands and range in output from 7.5 kilovolt-amperes (kVA) to 11,200 kVA."
+
+【Item 1 競爭】
+"Our alternator business competes globally with Leroy Somer, Marathon Electric and Meccalte, among others."
+
+【MD&A】
+"We also have strong demand for our data center products extending out six to eight quarters."

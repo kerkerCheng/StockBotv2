@@ -1,0 +1,11 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/2109150/000119312526319072/d118344d10q.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] INNIO N.V. Form 10-Q（2026Q2，2026-07-28）：資料中心設備營收 2.324 億美元、年增 97%；擴充機組生產與貨櫃化產能以因應北美資料中心客戶
+RETRIEVED: 2026-10-27（本機原文抽字逐字核對）
+
+【MD&A 分部營收】
+"Data center revenue, within Equipment revenue, increased by 97.0% to $232.4 million for the three months ended June 30, 2026 from $118.0 million for the three months ended June 30, 2025."
+
+【MD&A 產能】
+"Our growth to date has been supported by a well-invested, assembly–focused asset base, and we are expanding capacity, notably genset production and containerization capacity, to meet accelerating demand, particularly from our North American data center customers."

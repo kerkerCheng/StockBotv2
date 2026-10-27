@@ -1,0 +1,110 @@
+{
+  "claims": [
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：Cummins 之後的 10-K／10-Q 寫出出售或分拆 Generator technologies（發電機）業務，或 INNIO／Liberty 的一手寫出 JMC 624 改配別家發電機。核查頻率：每年（Cummins 10-K）＋每季（Liberty 10-Q 附件）。觸發後 48 小時：前者改這條邊的主詞，後者降 confidence，重讀發電機層。",
+      "id": "cmi_10k_fy2025_generator_technologies_alternators_cl1",
+      "source_ids": [
+        "cmi_10k_fy2025_generator_technologies_alternators_s1",
+        "cmi_10k_fy2025_generator_technologies_alternators_s2",
+        "cmi_10k_fy2025_generator_technologies_alternators_s3"
+      ],
+      "statement": "Cummins 10-K FY2025: its Generator technologies line designs and sells A/C generators/alternators under the Stamford and AVK brands (7.5 kVA to 11,200 kVA) for internal use and for external generator set assemblers, competing with Leroy Somer, Marathon Electric and Meccalte among others. Supplier self-report. Link to data center gas gensets is outside this document: Liberty's INNIO Jenbacher contract (Liberty 8-K 2026-09-18 Exhibit 10.1) specifies 'CGT AVK Generators' for 100 JMC 624 units; the acronym CGT is not expanded in either document, and a separate UK firm also trades as AVK (power solutions, avk-seg.com) — so the brand match is a reading, not a stated customer relationship.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:genset_alternator",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "cmi_10k_fy2025_generator_technologies_alternators_s1",
+        "cmi_10k_fy2025_generator_technologies_alternators_s2",
+        "cmi_10k_fy2025_generator_technologies_alternators_s3"
+      ],
+      "src_id": "co:cummins"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "Cummins Inc."
+      ],
+      "attributes": {
+        "ticker": "CMI"
+      },
+      "confidence": 0.85,
+      "id": "co:cummins",
+      "name": "Cummins",
+      "role": null,
+      "source_ids": [
+        "cmi_10k_fy2025_generator_technologies_alternators_s1",
+        "cmi_10k_fy2025_generator_technologies_alternators_s2",
+        "cmi_10k_fy2025_generator_technologies_alternators_s3",
+        "cmi_10k_fy2025_generator_technologies_alternators_s4"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "genset alternator",
+        "A/C generator/alternator",
+        "alternator"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:genset_alternator",
+      "name": "Generator set alternator (A/C generator)",
+      "role": null,
+      "source_ids": [
+        "cmi_10k_fy2025_generator_technologies_alternators_s1",
+        "cmi_10k_fy2025_generator_technologies_alternators_s2",
+        "cmi_10k_fy2025_generator_technologies_alternators_s3",
+        "cmi_10k_fy2025_generator_technologies_alternators_s4"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "cmi_10k_fy2025_generator_technologies_alternators",
+    "evidence_tier": 1,
+    "origin_entity": "Cummins Inc.",
+    "permission_basis": "SEC EDGAR 公開申報（10-K）；只保留研究必要的有限逐字節錄。published_at 取 EDGAR 申報日 2026-02-10。",
+    "published_at": "2026-02-10",
+    "publisher": "SEC EDGAR（Form 10-K，accession 0000026172-26-000009）",
+    "retrieved_at": "2026-10-27",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Cummins Inc. Form 10-K（FY2025，2026-02-10）：Generator technologies 產品線——Stamford 與 AVK 品牌的 A/C 發電機（7.5 kVA–11,200 kVA），自用也賣給外部機組組裝商；競爭者 Leroy Somer、Marathon Electric、Meccalte；資料中心產品需求排到六到八季後",
+    "url": "https://www.sec.gov/Archives/edgar/data/26172/000002617226000009/cmi-20251231.htm"
+  },
+  "sources": [
+    {
+      "id": "cmi_10k_fy2025_generator_technologies_alternators_s1",
+      "locator": "Item 1 Power Systems 產品線",
+      "quote": "Generator technologies - We design, manufacture, sell and support A/C generator/alternator products and components for internal consumption and for external generator set assemblers."
+    },
+    {
+      "id": "cmi_10k_fy2025_generator_technologies_alternators_s2",
+      "locator": "Item 1 Power Systems 產品線",
+      "quote": "Our alternator products are sold under the Stamford and AVK brands and range in output from 7.5 kilovolt-amperes (kVA) to 11,200 kVA."
+    },
+    {
+      "id": "cmi_10k_fy2025_generator_technologies_alternators_s3",
+      "locator": "Item 1 競爭",
+      "quote": "Our alternator business competes globally with Leroy Somer, Marathon Electric and Meccalte, among others."
+    },
+    {
+      "id": "cmi_10k_fy2025_generator_technologies_alternators_s4",
+      "locator": "MD&A",
+      "quote": "We also have strong demand for our data center products extending out six to eight quarters."
+    }
+  ]
+}

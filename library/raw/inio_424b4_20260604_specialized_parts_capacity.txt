@@ -1,0 +1,29 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/2109150/000119312526256992/liberty_-_424b4.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] INNIO N.V. Form 424B4（IPO 公開說明書，2026-06-04）：62% 設備訂單來自資料中心；發電機、缸頭鑄件、熱交換器、活塞是專用件、供應商同時服務競爭者，2022–2023 年發電機因銅與電磁鋼短缺延遲交貨；歐洲擴產受設備、工裝、測試台限制，最早 2028 年
+RETRIEVED: 2026-10-27（本機原文抽字逐字核對）
+
+【Business—Jenbacher Type 6 段】
+"increase power density per genset (which combine engine and alternator together with controls) (“genset”)"
+
+【Risk Factors—原物料與零件供應】
+"For example, in 2022 and 2023, we experienced delays with our generator deliveries due to copper and magnetic steel shortages."
+
+【Risk Factors—原物料與零件供應】
+"Furthermore, due to the specialization of the component parts required by power generation companies, particularly our cylinder head castings, generators, heat exchangers and pistons, our suppliers are heavily engaged with our competitors."
+
+【Risk Factors—原物料與零件供應】
+"This engagement could result in a decrease in our suppliers’ availability"
+
+【Risk Factors—供應商集中】
+"We currently rely on a limited number of suppliers, and in some instances, a single supplier, for certain equipment and components to build our products and replacements."
+
+【Risk Factors—產能爬坡】
+"As of March 31, 2026, approximately 62% of our Equipment Order Intake was generated from data centers"
+
+【Risk Factors—產能爬坡】
+"While we may be able to supplement capacity at existing facilities in Europe subject to the availability of certain equipment, tooling and test stands and only after specific upgrades expected no earlier than 2028, any such measures would likely require extended lead times and higher costs."
+
+【Business—燃料】
+"The majority of our engines currently run with natural gas as the primary input fuel."

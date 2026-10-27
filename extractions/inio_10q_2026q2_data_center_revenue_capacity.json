@@ -1,0 +1,97 @@
+{
+  "claims": [
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：INNIO 之後一季的資料中心設備營收年減，或寫出資料中心訂單取消／延後。核查頻率：每季（INNIO 10-Q）。觸發後 48 小時：降這條邊 confidence，重讀 tech:gas_reciprocating_genset。",
+      "id": "inio_10q_2026q2_data_center_revenue_capacity_cl1",
+      "source_ids": [
+        "inio_10q_2026q2_data_center_revenue_capacity_s1",
+        "inio_10q_2026q2_data_center_revenue_capacity_s2"
+      ],
+      "statement": "INNIO 10-Q (Q2 2026): data center revenue within Equipment revenue rose 97.0% to USD 232.4 million from USD 118.0 million a year earlier; INNIO is expanding genset production and containerization capacity for North American data center customers. Shipped revenue, not guidance.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:gas_reciprocating_genset",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "inio_10q_2026q2_data_center_revenue_capacity_s1",
+        "inio_10q_2026q2_data_center_revenue_capacity_s2"
+      ],
+      "src_id": "co:innio"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "INNIO N.V.",
+        "INNIO Jenbacher",
+        "Jenbacher"
+      ],
+      "attributes": {
+        "ticker": "INIO"
+      },
+      "confidence": 0.85,
+      "id": "co:innio",
+      "name": "INNIO",
+      "role": null,
+      "source_ids": [
+        "inio_10q_2026q2_data_center_revenue_capacity_s1",
+        "inio_10q_2026q2_data_center_revenue_capacity_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "gas reciprocating engines",
+        "gas engine generator set",
+        "reciprocating gas engine",
+        "gas genset"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:gas_reciprocating_genset",
+      "name": "Gas reciprocating engine generator set",
+      "role": null,
+      "source_ids": [
+        "inio_10q_2026q2_data_center_revenue_capacity_s1",
+        "inio_10q_2026q2_data_center_revenue_capacity_s2"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "inio_10q_2026q2_data_center_revenue_capacity",
+    "evidence_tier": 1,
+    "origin_entity": "INNIO N.V.",
+    "permission_basis": "SEC EDGAR 公開申報（10-Q）；只保留研究必要的有限逐字節錄。published_at 取 EDGAR 申報日 2026-07-28。",
+    "published_at": "2026-07-28",
+    "publisher": "SEC EDGAR（Form 10-Q，accession 0001193125-26-319072）",
+    "retrieved_at": "2026-10-27",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "INNIO N.V. Form 10-Q（2026Q2，2026-07-28）：資料中心設備營收 2.324 億美元、年增 97%；擴充機組生產與貨櫃化產能以因應北美資料中心客戶",
+    "url": "https://www.sec.gov/Archives/edgar/data/2109150/000119312526319072/d118344d10q.htm"
+  },
+  "sources": [
+    {
+      "id": "inio_10q_2026q2_data_center_revenue_capacity_s1",
+      "locator": "MD&A 分部營收",
+      "quote": "Data center revenue, within Equipment revenue, increased by 97.0% to $232.4 million for the three months ended June 30, 2026 from $118.0 million for the three months ended June 30, 2025."
+    },
+    {
+      "id": "inio_10q_2026q2_data_center_revenue_capacity_s2",
+      "locator": "MD&A 產能",
+      "quote": "Our growth to date has been supported by a well-invested, assembly–focused asset base, and we are expanding capacity, notably genset production and containerization capacity, to meet accelerating demand, particularly from our North American data center customers."
+    }
+  ]
+}
