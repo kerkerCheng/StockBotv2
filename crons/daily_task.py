@@ -283,6 +283,27 @@ def call_timeout_minutes(step: DailyStep, llm: Mapping[str, Any] | None,
     return step.timeout_minutes
 
 
+def chunk_items(batch: Sequence[Mapping[str, Any]], size: int, *, key: str | None = None) -> list[list[Any]]:
+    """LLM 步驟的分批。`key` 沒給＝每批 `size` 筆（與以前逐字相同）；給了＝每批最多 `size` 個**不同的 key**
+    （預篩照文件分：同一份文件叫醒的幾條同一批、全文只放一次，#96）。同 key 必須相鄰才同批——⑩a 已照文件排好。"""
+    size = max(1, int(size))
+    if not key:
+        return [list(batch[start:start + size]) for start in range(0, len(batch), size)]
+    chunks: list[list[Any]] = []
+    current: list[Any] = []
+    seen: set[str] = set()
+    for item in batch:
+        value = str(item.get(key))
+        if value not in seen and len(seen) >= size:
+            chunks.append(current)
+            current, seen = [], set()
+        current.append(item)
+        seen.add(value)
+    if current:
+        chunks.append(current)
+    return chunks
+
+
 def max_llm_calls(step: DailyStep, llm: Mapping[str, Any] | None) -> int:
     """LLM 步驟最多會分成幾次呼叫＝ceil(每日上限 ÷ 每次幾筆)。上限各住自己的 SSOT（triage：`triage.daily_limit`；
     預篩：`semantic_screen_daily_limit`；T2：`sweep_budget_per_run`——後兩者在 config/event_watch.json）；雷達一輪一次。
@@ -752,7 +773,7 @@ class DailyRun:
             return {"batch": Path(paths["prescreen_batch"]), "result": Path(paths["prescreen_result"]),
                     "batch_key": "items", "out_key": "flags", "schema": llm_step.PRESCREEN_SCHEMA,
                     "compose": llm_step.compose_prescreen_prompt,
-                    "chunk": int(self.llm["prescreen_chunk_size"]),
+                    "chunk": int(self.llm["prescreen_chunk_size"]), "chunk_by": "lead_id",
                     "stamp": lambda item, session: {**item, "session_id": session}}
         if task == "digest":
             # 每日摘要（2026-10-07 使用者指示）：零工具、一輪一次——與 triage／預篩同一組 argv 與能力檢查
@@ -823,8 +844,7 @@ class DailyRun:
             base_kwargs["tools"] = spec["tools"]
         search_calls: list[dict[str, Any]] = []
         extra: dict[str, Any] = {}
-        for start in range(0, len(batch), size):
-            chunk = batch[start:start + size]
+        for chunk in chunk_items(batch, size, key=spec.get("chunk_by")):
             # 每一批各自重算到 deadline 還剩多少（2026-10-06）：原本只在步驟開頭算一次，分多批的步驟（預篩、T2 輪詢）
             # 後面幾批會帶著同一個 timeout 越過 deadline——收尾、心跳、發送的保留時間就被吃掉。
             timeout = per_call

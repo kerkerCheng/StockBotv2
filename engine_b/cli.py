@@ -201,7 +201,7 @@ def _fired_watch_summary() -> dict[str, list[dict]]:
     列研究工作；但 audit 的 QueueSegments 會用同一份資料 fail closed，兩邊不會同時安靜。
     """
     out: dict[str, list[dict]] = {"lead": [], "pq2": [], "hypothesis": [], "disproof": [], "reading": [],
-                                  "narrative": []}
+                                  "narrative": [], "wake_hold": []}
     try:
         from engine_b import event_watch as ew
 
@@ -215,7 +215,7 @@ def _fired_watch_summary() -> dict[str, list[dict]]:
 
     by_segment = {"fired_lead_requeue": "lead", "fired_pq2_wake": "pq2", "semantic_pending_check": "disproof",
                   "fired_reading_reread": "reading", "fired_hypothesis_check": "hypothesis",
-                  "narrative_rewrite": "narrative"}
+                  "narrative_rewrite": "narrative", "wake_screen_hold": "wake_hold"}
     for watch in watches:
         key = by_segment.get(str(classify_watch(watch)))
         if key is not None and (watch.get("status") == "fired" or key == "narrative"):
@@ -232,6 +232,7 @@ def _print_segment_counters(pending_count: int, fired: dict[str, list[dict]]) ->
         f"假設對照 {len(fired['hypothesis'])}（→ 對照後 `engine_b.event_watch consume <id>`）／"
         f"反證待檢 {len(fired.get('disproof') or [])}（→ `engine_b.event_watch semantic-queue` → `judge`）／"
         f"讀圖該重讀 {len(fired.get('reading') or [])}（→ `alpha structure-reading <node> --add`）／"
+        f"叫醒擋下待確認 {len(fired.get('wake_hold') or [])}（→ `engine_b.event_watch wake-queue` → `wake-judge`）／"
         f"敘事該重寫 {len(fired.get('narrative') or [])}（→ research-drain 敘事段；連結斷的另見心跳段 3）"
     )
     for watch in fired["hypothesis"]:

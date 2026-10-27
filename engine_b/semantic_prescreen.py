@@ -3,15 +3,22 @@
 **預篩只標旗、不判定**（G7）：`semantic_flag` 是給互動 session 讀的提示，不改 watch 狀態、不減少「未檢 N」，
 判定只在互動（`event_watch judge`）。LLM（⑩b，`claude -p` 零工具）只看得到程式塞進 prompt 的條件原文與全文。
 
-- ⑩a `prepare`：選 `fired`、語意型、且對「這一次叫醒它的 lead」還沒有標旗的 watch，照醒來時間排。
+2026-10-27（failure log #96）起也預篩**擋下的追源／讀圖叫醒**（`event_watch.wake_screen`）：條件由 `wake_condition`
+組（追源讀停放時寫的觸發條件、讀圖讀節點）。標旗只決定放不放行——標「可能觸及」「看不出」交給原 consumer，
+標「無關」仍擋著等互動 `wake-judge` 確認；狀態照樣不在這裡改。
+
+- ⑩a `prepare`：選 `fired`、語意型、且對「這一次叫醒它的 lead」還沒有標旗的 watch，加上擋下還沒預篩的叫醒；
+  照（醒來時間、觸發文件）排，同一份文件叫醒的排在一起。
   **先排除觸發 lead 的來源沒有 fetcher 的**（計數 `no_fetcher`，**不佔名額**——否則它們每天被重選、永遠抓不到，
-  可能吃光名額；第 4 輪 N4-10）。其餘逐筆抓全文，**抓到的才進批次、才算名額**；名額＝
-  `semantic_screen_daily_limit` 扣掉**當日**已寫的標旗數（手動重跑不得超過 G7 的每日硬上限）。
+  可能吃光名額；第 4 輪 N4-10）。其餘逐份抓全文，**抓到的才進批次、才算名額**；名額＝
+  `semantic_screen_daily_limit` **份文件**扣掉**當日**已看過的份數（手動重跑不得超過 G7 的每日硬上限；
+  #96 前是條數——一份 Sivers 股東會通知叫醒 35 條，花錢的是那一份全文，條數上限會讓它拖四天）。
   抓不到計數 `no_text`、不進批次、**不拿標題充數**；全文存 `library/private/semantic_text/<lead_id>.txt`，
   已存在就重用、不重抓。
-- 全文來源只有兩種主機：EDGAR 主文件（`www.sec.gov`，URL 就是主文件）與 MFN 公告頁（`mfn.se`，
+- 全文來源：EDGAR 主文件（`www.sec.gov`，URL 就是主文件）、MFN 公告頁（`mfn.se`，
   **只取公告頁文字、不抓 `mb.cision.com` 的附件、不寫 `out_dir`**——`fetchers/mfn.py:fetch_release` 會做那些事，
-  所以不用它；第 4 輪 N4-8）。MOPS 重訊本來就有 `raw_text`，直接用。
+  所以不用它；第 4 輪 N4-8）、harvest 登記的一手 feed **同主機**的公司新聞頁（2026-10-27 #96；不新增對外主機、
+  UA 不帶聯絡信箱）。MOPS 重訊與 X 貼文本來就有 `raw_text`，直接用。
 - ⑩c `apply`：批次與結果的 `run_id` 相同且等於參數，否則一則都不寫；壞 JSON、沒有結果檔 → 一則都不寫、exit 非零；
   逐則驗 `(watch_id, lead_id)` 在本批、不重複、verdict 在封閉字彙內、`likely_touches` 必帶 quote 且
   quote 是存檔全文的**逐字子字串**（兩邊用同一個空白正規化；L18：標籤要指得回原文）——不合格的拒收並計數。
@@ -87,8 +94,43 @@ def fetch_mfn_text(url: str, *, session: Any = None) -> str:
     return str(parse_release_page(resp.text)["text"])
 
 
+#: 公司自家新聞頁的 User-Agent——**不帶聯絡信箱**（harvest 的 `_UA` 帶，這條路不沿用）。
+PAGE_UA = "StockBotv2 research (contact via repo owner)"
+HARVEST_CONFIG = Path("crons/harvest_config.json")
+
+
+def primary_feed_hosts(config_path: Path | None = None) -> dict[str, str]:
+    """harvest 登記的一手 feed（MFN、EDGAR、MOPS 以外）→ 那個 feed 的主機。公司新聞頁只准連這些主機——
+    harvest 本來就每天連，預篩不新增對外主機（#96：`sivers:press` 的股東會通知叫醒 20 則停放 lead，當時沒有 fetcher）。"""
+    try:
+        config = json.loads(Path(config_path or HARVEST_CONFIG).read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return {}
+    out: dict[str, str] = {}
+    for feed in config.get("feeds") or ():
+        source = str(feed.get("source") or "")
+        if feed.get("source_class") == "primary" and not source.startswith(("mfn:", "edgar:", "mops:")):
+            out[source] = urlsplit(str(feed.get("url") or "")).netloc
+    return out
+
+
+def fetch_page_text(url: str, *, opener: Callable[..., Any] | None = None) -> str:
+    """公司新聞頁 → 文字（共用 `fetchers.utils.html_to_text`）。不抓附件、不寫 `out_dir`。"""
+    from urllib.request import Request, urlopen
+
+    from fetchers.utils import html_to_text, rate_sleep
+
+    with (opener or urlopen)(Request(url, headers={"User-Agent": PAGE_UA}), timeout=30) as resp:
+        html = resp.read().decode("utf-8", errors="replace")
+    rate_sleep()
+    return html_to_text(html)
+
+
 def fetcher_for(lead: Mapping[str, Any]) -> Callable[[], str | None] | None:
-    """這則 lead 有沒有取全文的方法。None＝沒有 fetcher（計 `no_fetcher`、不佔名額）。"""
+    """這則 lead 有沒有取全文的方法。None＝沒有 fetcher（計 `no_fetcher`、不佔名額）。
+
+    順序：MOPS 重訊自帶全文 → EDGAR 主文件 → MFN 公告頁 → harvest 一手 feed 同主機的公司新聞頁 →
+    其他自帶 `raw_text` 的（X 貼文本身就是全文；只有 `related_entity_signal` 的追源叫醒會用到——語意 watch 只認一手）。"""
     source = str(lead.get("source") or "")
     url = str(lead.get("url") or "")
     if source.startswith("mops:") and str(lead.get("raw_text") or "").strip():
@@ -106,6 +148,11 @@ def fetcher_for(lead: Mapping[str, Any]) -> Callable[[], str | None] | None:
         return edgar
     if urlsplit(url).netloc == "mfn.se":
         return lambda: fetch_mfn_text(url)
+    host = primary_feed_hosts().get(source)
+    if host and urlsplit(url).netloc == host and urlsplit(url).scheme == "https":
+        return lambda: fetch_page_text(url)
+    if str(lead.get("raw_text") or "").strip():
+        return lambda: str(lead.get("raw_text"))
     return None
 
 
@@ -143,47 +190,93 @@ def _local_date(stamp: str | None) -> str:
         return ""
 
 
-def flags_written_today(data: Mapping[str, Any], *, today: str | None = None) -> int:
+def documents_screened_today(data: Mapping[str, Any], *, today: str | None = None) -> int:
+    """當日已標過旗的**文件**份數（觸發 lead 去重）——每日上限的單位（#96：一份文件叫醒 35 條，花錢的是那份全文）。"""
     day = today or datetime.now().astimezone().strftime("%Y-%m-%d")
-    return sum(1 for w in data.get("watches") or []
-               if isinstance(w.get("semantic_flag"), dict) and _local_date(w["semantic_flag"].get("at")) == day)
+    return len({str(w["semantic_flag"].get("lead_id")) for w in data.get("watches") or []
+                if isinstance(w.get("semantic_flag"), dict) and _local_date(w["semantic_flag"].get("at")) == day})
+
+
+def wake_condition(watch: Mapping[str, Any], leads: Mapping[str, Any]) -> str:
+    """擋下的追源／讀圖叫醒在等什麼（#96）——給預篩看的條件。追源線索讀停放時寫的觸發條件（`trace_next_trigger`，
+    沒寫就用 T2 的 query hint）；讀圖叫醒等的是「需求側客戶寫到這一層」。末句點名例行申報不算（誤醒的那幾型）。"""
+    if watch.get("wake_lead"):
+        lead = leads.get(str(watch["wake_lead"])) or {}
+        waits = " ".join(str((lead.get("refs") or {}).get("trace_next_trigger")
+                             or (watch.get("poll") or {}).get("query_hint") or "").split())
+        title = " ".join(str(lead.get("title") or "").split())[:200]
+        return (f"（停放中的追源線索在等的事）{waits or '（停放時沒寫觸發條件，只能看線索原題）'}｜線索原題：{title}｜"
+                "這份新文件有沒有回答它在等的事；只是同一家公司的例行申報（治理、股權、董事、融資合約、會議通知、持股）不算")
+    node = str(watch.get("wake_reading") or "")
+    label = node.split(":", 1)[-1].replace("_", " ")
+    return (f"（結構讀圖在等需求側客戶的新文件）讀圖節點 {node}（{label}）｜這份文件有沒有寫到這一層或這個產品的具體內容"
+            "（用量、採購、供應商、認證、產能、規格、價格、技術路線）；只寫財務、治理、股權、融資合約的不算")
+
+
+def _screen_candidates(data: Mapping[str, Any], leads: Mapping[str, Any]) -> list[tuple[Mapping[str, Any], str]]:
+    """(watch, 條件)：醒來還沒標旗的語意 watch，加上擋下還沒預篩的追源／讀圖叫醒（追源只收 lead 仍停放的——
+    在路上的 consume-fired 已直接回 active）。照（醒來時間、觸發文件）排：同一份文件的排在一起，一次看完。"""
+    out: list[tuple[Mapping[str, Any], str]] = []
+    for watch in data.get("watches") or []:
+        if watch.get("kind") == ew.SEMANTIC_KIND and watch.get("status") == "fired" and ew.flag_for_current(watch) is None:
+            out.append((watch, str(watch.get("condition") or "")))
+        elif ew.wake_screen(watch) == "held_unscreened":
+            if watch.get("wake_lead") and (leads.get(str(watch["wake_lead"])) or {}).get("status") != "parked":
+                continue
+            out.append((watch, wake_condition(watch, leads)))
+    def woken(watch: Mapping[str, Any]) -> tuple[str, str]:
+        w = watch.get("woken_by") or {}
+        return str(w.get("at") or ""), str(w.get("lead_id") or "")
+
+    # 文件的先後＝它叫醒的第一條的時間；同一份文件不論各條幾點醒，都排在一起（分批照文件分，全文只付一次）
+    first: dict[str, str] = {}
+    for watch, _ in out:
+        at, lead_id = woken(watch)
+        first[lead_id] = min(first.get(lead_id, at), at)
+    out.sort(key=lambda pair: (first[woken(pair[0])[1]], woken(pair[0])[1], woken(pair[0])[0]))
+    return out
 
 
 def prepare(data: Mapping[str, Any], leads: Mapping[str, Any], *, run_id: str, text_dir: Path = TEXT_DIR,
             today: str | None = None, fetcher: Callable[[Mapping[str, Any]], Any] = fetcher_for) -> dict[str, Any]:
+    """名額＝`semantic_screen_daily_limit` 份**文件**扣掉當日已看過的份數；同一份文件叫醒的每一條都跟著進批次、不另佔名額。"""
     cfg = ew.load_config()
     limit = int(cfg["semantic_screen_daily_limit"])
     max_chars = int(cfg["prescreen_text_max_chars"])
-    already = flags_written_today(data, today=today)
+    already = documents_screened_today(data, today=today)
     remaining = max(0, limit - already)
-    candidates = [w for w in data.get("watches") or []
-                  if w.get("kind") == ew.SEMANTIC_KIND and w.get("status") == "fired"
-                  and ew.flag_for_current(w) is None]
-    candidates.sort(key=lambda w: str((w.get("woken_by") or {}).get("at") or ""))
+    candidates = _screen_candidates(data, leads)
     counts = {"candidates": len(candidates), "no_fetcher": 0, "no_text": 0, "not_in_batch": 0,
-              "reused_text": 0, "truncated": 0, "limit": limit, "flags_today": already}
+              "reused_text": 0, "truncated": 0, "limit": limit, "flags_today": already,
+              "wakes": sum(1 for w, _ in candidates if w.get("kind") != ew.SEMANTIC_KIND), "documents": 0}
     items: list[dict[str, Any]] = []
-    for watch in candidates:
+    texts: dict[str, str | None] = {}
+    for watch, condition in candidates:
         lead_id = str((watch.get("woken_by") or {}).get("lead_id") or "")
         lead = leads.get(lead_id) or {}
         fetch = fetcher(lead) if lead else None
         if fetch is None:
             counts["no_fetcher"] += 1
             continue
-        if len(items) >= remaining:
-            counts["not_in_batch"] += 1
-            continue
-        text, reused = load_or_fetch_text(lead_id, lead, text_dir=text_dir, fetch=fetch)
+        if lead_id not in texts:
+            # 抓到的才算名額（抓不到的計 no_text、不佔位；N4-10 同一條）
+            if sum(1 for t in texts.values() if t is not None) >= remaining:
+                counts["not_in_batch"] += 1
+                continue
+            text, reused = load_or_fetch_text(lead_id, lead, text_dir=text_dir, fetch=fetch)
+            texts[lead_id] = text
+            if text is not None:
+                counts["reused_text"] += int(reused)
+                counts["truncated"] += int(len(text) > max_chars)
+        text = texts[lead_id]
         if text is None:
             counts["no_text"] += 1
             continue
-        counts["reused_text"] += int(reused)
-        truncated = len(text) > max_chars
-        counts["truncated"] += int(truncated)
-        items.append({"watch_id": watch["watch_id"], "lead_id": lead_id, "condition": watch.get("condition"),
+        items.append({"watch_id": watch["watch_id"], "lead_id": lead_id, "condition": condition,
                       "source_ref": watch.get("source_ref"), "text_path": str(_text_path(lead_id, text_dir)),
                       "text_sha256": hashlib.sha256(text.encode("utf-8")).hexdigest(),
-                      "truncated": truncated})
+                      "truncated": len(text) > max_chars})
+    counts["documents"] = len({i["lead_id"] for i in items})
     return {"schema": "prescreen-batch-v1", "run_id": run_id,
             "run_date": datetime.now().astimezone().strftime("%Y-%m-%d"),
             "max_chars": max_chars, "items": items, "counts": counts}
@@ -199,9 +292,10 @@ def cmd_prepare(*, run_id: str, out: Path) -> int:
     out.write_text(json.dumps(batch, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     c = batch["counts"]
     print(json.dumps({"status": "ok", "selected": len(batch["items"]), **c}, ensure_ascii=False))
-    print(f"預篩批次 {len(batch['items'])}｜無 fetcher {c['no_fetcher']}｜無全文 {c['no_text']}"
-          f"｜截斷 {c['truncated']}｜還有 {c['not_in_batch']} 筆沒進本批（每日上限 {c['limit']}、"
-          f"今天已標 {c['flags_today']}）", file=sys.stderr)
+    print(f"預篩批次 {len(batch['items'])} 條（{c['documents']} 份文件；其中追源／讀圖叫醒 {c['wakes']} 條候選）"
+          f"｜無 fetcher {c['no_fetcher']}｜無全文 {c['no_text']}"
+          f"｜截斷 {c['truncated']} 份｜還有 {c['not_in_batch']} 條沒進本批（每日上限 {c['limit']} 份、"
+          f"今天已看 {c['flags_today']} 份）", file=sys.stderr)
     return 0
 
 
@@ -260,7 +354,7 @@ def apply(data: dict[str, Any], batch: Mapping[str, Any], result: Mapping[str, A
                 continue
         try:
             ew.flag(data, key[0], lead_id=key[1], verdict=str(verdict), quote=quote or None,
-                    session_id=proposal.get("session_id"))
+                    session_id=proposal.get("session_id"), note=proposal.get("note"))
         except ew.EventWatchError as exc:
             rejected.append({"pair": "／".join(key), "reason": str(exc)})
             continue

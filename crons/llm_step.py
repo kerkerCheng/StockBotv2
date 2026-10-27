@@ -395,25 +395,27 @@ TRUNCATION_MARK = "……（以下截斷：全文超過上限，後面沒有給�
 
 
 def compose_prescreen_prompt(items: Sequence[Mapping[str, Any]], *, max_chars: int | None = None) -> str:
-    """每筆：watch_id、lead_id、條件原文、全文（超過上限就截斷並明寫）。全文由 ⑩a 存檔、這裡讀檔塞進來。"""
+    """一份文件一段：全文只放一次（超過上限就截斷並明寫），底下列這份文件叫醒的每一條（watch_id、lead_id、條件原文）——
+    #96：一份公告可以叫醒 35 條，逐條重貼全文是同一份錢付 35 次。全文由 ⑩a 存檔、這裡讀檔塞進來。"""
     if max_chars is None:
         from engine_b.event_watch import load_config
 
         max_chars = int(load_config()["prescreen_text_max_chars"])
-    blocks = []
+    documents: dict[str, list[Mapping[str, Any]]] = {}
     for item in items:
-        text = Path(str(item.get("text_path"))).read_text(encoding="utf-8")
+        documents.setdefault(str(item.get("text_path")), []).append(item)
+    blocks = []
+    for n, (path, members) in enumerate(documents.items(), 1):
+        text = Path(path).read_text(encoding="utf-8")
         body = text[:max_chars] + ("\n" + TRUNCATION_MARK if len(text) > max_chars else "")
-        blocks.append("\n".join([
-            f"### watch_id: {item.get('watch_id')}｜lead_id: {item.get('lead_id')}",
-            f"條件（thesis／讀圖的原文）：{item.get('condition')}",
-            "文件全文：",
-            body,
-        ]))
+        lines = [f"### 文件 {n}｜這份文件要對照 {len(members)} 條條件（每一條各回一個 flag）"]
+        for item in members:
+            lines.append(f"- watch_id: {item.get('watch_id')}｜lead_id: {item.get('lead_id')}｜條件：{item.get('condition')}")
+        blocks.append("\n".join([*lines, "文件全文：", body]))
     data = "\n\n".join(blocks)
     return "\n\n".join([
         PRESCREEN_PROMPT.read_text(encoding="utf-8").strip(),
-        f"## 本輪批次（{len(items)} 筆）\n\n{DATA_START}\n{data}\n{DATA_END}",
+        f"## 本輪批次（{len(documents)} 份文件、{len(items)} 條條件）\n\n{DATA_START}\n{data}\n{DATA_END}",
     ]) + "\n"
 
 

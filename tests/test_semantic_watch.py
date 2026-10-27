@@ -347,7 +347,8 @@ def test_no_fetcher_sources_do_not_eat_the_quota(tmp_path, monkeypatch) -> None:
     _cfg(monkeypatch, limit=2)
     data = _fresh()
     _fired_semantic(data, 12)
-    leads = {f"L{i}": ({"source": "sivers:press", "url": "https://www.sivers-semiconductors.com/press/x"}
+    # 2026-10-27（#96）起 harvest 登記的一手 feed 同主機新聞頁有 fetcher——這裡用沒登記的來源代表「沒有 fetcher」
+    leads = {f"L{i}": ({"source": "acme:press", "url": "https://www.acme.example/press/x"}
                        if i < 10 else {"source": "mops:3105.TWO", "raw_text": "全文"}) for i in range(12)}
     batch = sp.prepare(data, leads, run_id="r", text_dir=tmp_path)
     assert batch["counts"]["no_fetcher"] == 10 and len(batch["items"]) == 2

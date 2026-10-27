@@ -39,6 +39,8 @@ LEDGER: tuple[LedgerRow, ...] = (
               "依 skills/signal-triage 產分類 → `python scripts/backfill_lead_classification.py --from-json … --apply`"),
     LedgerRow("todo.leads", "待深挖 lead", "則", "`/research-drain`（`python -m engine_b.cli drain`）做到入圖包、停放或已入圖"),
     LedgerRow("todo.semantic", "未檢", "條", "`python -m engine_b.event_watch semantic-queue` → `judge`（一組判一次）"),
+    LedgerRow("todo.wake_hold", "叫醒擋下待確認", "條",
+              "`python -m engine_b.event_watch wake-queue` → `wake-judge`（一份文件判一次；daily 預篩標觸及的自己放行）"),
     LedgerRow("todo.narrative", "敘事該重寫", "檔", "research-drain「敘事該重寫」段 → `python -m alpha brief <T> --add spec.json`"),
     LedgerRow("todo.reading", "讀圖該重讀", "份", "`python -m alpha structure-reading <node> --check` → 重讀，或判無關 `event_watch reactivate`"),
     LedgerRow("todo.layer_note", "層說明該重讀", "份", "`python -m alpha layer-note <node> --add`（換版）"),
@@ -85,6 +87,7 @@ COVERAGE: Mapping[str, str] = {
     "segment:fired_lead_requeue": "mechanical",  # daily ⑨ consume-fired
     "segment:fired_pq2_wake": "mechanical",      # daily ⑩ todo sync 翻回 ③
     "segment:semantic_pending_check": "todo.semantic",
+    "segment:wake_screen_hold": "todo.wake_hold",      # #96：追源／讀圖叫醒擋下待確認
     "segment:fired_reading_reread": "todo.reading",
     "segment:narrative_rewrite": "todo.narrative",
     "segment:fired_hypothesis_check": "todo.hypothesis",
@@ -355,6 +358,18 @@ def collect(*, today: date, leads_store: Mapping[str, Any], watches: Sequence[Ma
             oldest_days=_oldest((_woken_at(w) for w in pending_watches), today))
 
     guarded("todo.semantic", semantic)
+
+    def wake_hold() -> None:
+        held = [w for w in watches if qs.classify_watch(w) == "wake_screen_hold"]
+        documents = {str((w.get("woken_by") or {}).get("lead_id")) for w in held}
+        unrelated = sum(1 for w in held if ew.wake_screen(w) == "held_unrelated")
+        bits = [f"{len(documents)} 份文件"] if held else []
+        if held:
+            bits.append(f"預篩標無關 {unrelated}、還沒預篩 {len(held) - unrelated}")
+        put("todo.wake_hold", len(held), work="；".join(bits) or None,
+            oldest_days=_oldest((_woken_at(w) for w in held), today))
+
+    guarded("todo.wake_hold", wake_hold)
 
     def narrative() -> None:
         companies = _narrative_companies(watches, briefs or ())

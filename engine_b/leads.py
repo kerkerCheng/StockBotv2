@@ -1377,6 +1377,10 @@ def _requeue_related_trace_backlog(
                 ew.reactivate(watch_data, watch["watch_id"])
                 touched = True
                 continue
+            # #96：只比發文公司的叫醒先擋著（留 fired）——預篩標了觸及或看不出、或互動判定觸及，consume-fired 才排回；
+            # 擋下的由 `event_watch wake-queue` 現形，不重排、不重停（停放理由與處置一筆都不動）。
+            if not ew.wake_released(watch):
+                continue
             shared = watch.get("woken_by", {}).get("shared_entities") or []
             try:
                 requeue_trace(
@@ -1497,6 +1501,8 @@ def consume_fired_lead_watches(
     - lead 已終局（applied／triaged_no_go）或不存在 → watch 直接 consumed（沒有東西可醒）。
     - `requeue_trace` 拒絕（lead 沒有 trace receipt）→ **留在 fired 現形**並記 skipped 理由，
       不硬塞。
+    - lead 仍 `parked`、但叫醒還沒過預篩（`event_watch.wake_screen` 擋下：還沒標旗，或標了無關）→ **留在 fired**、
+      記進 `held`（failure log #96：只比發文公司的叫醒五次誤叫回 59 則）；由 `wake-queue` → `wake-judge` 互動判定。
 
     不改任何 authority：只動 lead 的 status／triage receipt 與 watch 的 status。
     """
@@ -1507,6 +1513,7 @@ def consume_fired_lead_watches(
     reactivated: list[str] = []
     consumed: list[dict[str, str]] = []
     skipped: list[dict[str, str]] = []
+    held: list[dict[str, str]] = []
     for watch in watch_data.get("watches", []):
         if watch.get("status") != "fired" or not watch.get("wake_lead"):
             continue
@@ -1519,6 +1526,10 @@ def consume_fired_lead_watches(
             consumed.append({"watch_id": watch_id, "lead_id": lead_id, "reason": "lead 不存在"})
             continue
         status = str(lead.get("status") or "")
+        if status == "parked" and not ew.wake_released(watch):
+            held.append({"watch_id": watch_id, "lead_id": lead_id, "trigger_lead": str(woken.get("lead_id") or ""),
+                         "screen": str(ew.wake_screen(watch))})
+            continue
         if status == "parked":
             shared = ", ".join(woken.get("shared_entities") or []) or "（未記錄）"
             trigger_lead = str(woken.get("lead_id") or "")
@@ -1527,8 +1538,16 @@ def consume_fired_lead_watches(
                 reason = (f"Event Watch {watch_id} 由 T2 輪詢命中叫醒（{woken.get('url')}；互動判定觸及："
                           f"{woken.get('note')}）；由 consume-fired 排回 pq1 做 bounded 重查")
             else:
+                current = ew.flag_for_current(watch)
+                if woken.get("screen") == "judged":
+                    screen = "；互動判定觸及"
+                elif current:
+                    screen = f"；預篩 {current.get('verdict')}" + (
+                        f"（引文：{str(current.get('quote'))[:120]}）" if current.get("quote") else "")
+                else:
+                    screen = ""
                 reason = (f"Event Watch {watch_id} 已觸發（{watch.get('kind')}；共用具名標的 {shared}"
-                          f"{'；觸發 lead ' + trigger_lead if trigger_lead else ''}）"
+                          f"{'；觸發 lead ' + trigger_lead if trigger_lead else ''}{screen}）"
                           "；由 consume-fired 排回 pq1 做 bounded 重查")
             try:
                 requeue_trace(
@@ -1566,6 +1585,7 @@ def consume_fired_lead_watches(
         "reactivated": sorted(reactivated),
         "consumed": consumed,
         "skipped": skipped,
+        "held": held,
     }
 
 

@@ -77,6 +77,13 @@ SEGMENTS: tuple[Segment, ...] = (
         "Phase 1 Step 1.4（G7）：醒來＝待檢；daily 的預篩只標旗、不判定，所以這一段不會因預篩而變少。",
     ),
     Segment(
+        "wake_screen_hold", 1, "fired 追源／讀圖叫醒擋下待確認（只比發文公司、還沒預篩或預篩標無關）→ 互動判定放行或續等",
+        "research", "daily ⑩a–⑩c 預篩標旗（標觸及或看不出就放行給原 consumer）；其餘由互動 session："
+                    "python -m engine_b.event_watch wake-queue → wake-judge（一份文件判一次）",
+        "failure log #96（2026-10-27）：entity 型等待只比發文公司，五次把 59 則停放 lead 叫回 pq1、逐則重查全照原終局，"
+        "另叫醒三份讀圖的重讀。擋下≠判定無關（G7）；判無關才回 active，lead 照舊停放、讀圖不列該重讀。",
+    ),
+    Segment(
         "fired_reading_reread", 1, "fired 讀圖 watch（需求側客戶出了新一手文件）→ 該節點要重讀",
         "research", "互動 session：python -m query.structure <node> → alpha structure-reading <node> --add"
                     "（下一次 --add 自動 consume 這些 watch）",
@@ -252,6 +259,11 @@ def classify_watch(watch: Mapping[str, Any]) -> str | None:
     if status == "fired":
         if watch.get("wake_pq2"):
             return "fired_pq2_wake"
+        # #96：放不放行只問 `wake_screen`（L16）；擋下的不是 consumer 的工作，是判定的工作
+        from engine_b.event_watch import WAKE_HELD_STATES, wake_screen
+
+        if wake_screen(watch) in WAKE_HELD_STATES:
+            return "wake_screen_hold"
         if watch.get("wake_lead"):
             return "fired_lead_requeue"
         if watch.get("disproof_ref"):

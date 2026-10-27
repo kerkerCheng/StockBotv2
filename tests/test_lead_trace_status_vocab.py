@@ -92,18 +92,21 @@ def test_terminal_status_leaves_trace_backlog() -> None:
 
 
 def test_onboard_candidate_from_plain_text_name() -> None:
-    """cashtag regex 抓不到「Largan Precision (3008)」——正是促成本機制的案例。"""
+    """cashtag regex 抓不到「Largan Precision (3008)」——正是促成本機制的案例。
+
+    ⚠ 大立光後來登記進名冊（真名冊裡有就不再是候選），這裡改用名冊永遠不會有的虛構名字——測的是「人打的純文字名字
+    會被列出」，不是大立光本身（2026-10-27：原寫法隨名冊長大而紅，與被測的機制無關）。"""
 
     store = _store({
         "lead_fau": _lead(
             "lead_fau",
             title="FAU bottlenecks for CPO",
-            refs={"onboard_candidate_names": ["Largan Precision (3008.TW)"]},
+            refs={"onboard_candidate_names": ["Zyxwv Fictional Optics (9998.TW)"]},
         )
     })
     rows = leads.onboard_candidates(store)
     manual = [row for row in rows if row["detected_by"] == "manual"]
-    assert [row["ticker"] for row in manual] == ["Largan Precision (3008.TW)"]
+    assert [row["ticker"] for row in manual] == ["Zyxwv Fictional Optics (9998.TW)"]
 
 
 def test_untriaged_and_rejected_leads_do_not_drive_onboarding() -> None:

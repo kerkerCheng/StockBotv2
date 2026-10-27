@@ -89,6 +89,18 @@ ENTITY_MATCH_KINDS = frozenset({
     "entity_filing_signal", "fact_verification", "related_entity_signal",
 })
 
+#: 叫醒前要先過預篩的等待（failure log #96）：追源線索（`wake_lead`）與讀圖客戶重讀（`wake_reading`）的 entity 型 watch
+#: 只比「發文的是不是這家公司」、不看文件寫了什麼——2026-10 五次把 13／1／1／19／25 則停放 lead 叫回 pq1（Sivers 股東會通知、
+#: Jabil 10-K…），逐則重查全照原終局；10-27 Marvell 循環信用修約的 8-K 又叫醒三份讀圖的重讀。醒來時 `woken_by.screen` 記
+#: `pending`（觸發 lead 抓得到全文）或 `unfetchable`（抓不到就照舊放行，不比修之前差）；`pending` 的要等預篩標旗：
+#: 標「可能觸及」「看不出」放行，標「無關」或還沒標的**擋下待確認**（`wake-queue` → `wake-judge`，互動判定）。
+#: 只標旗不判定（G7）：擋下≠判定無關——判定在互動，那一刻才回 active；預篩判無關的準確度沒量過（INV-5），不自動放掉。
+#: 日期型與假說查核（`fact_verification`）不篩：前者等的是那一天，後者自己就是一筆對照。
+SCREENED_WAKE_KINDS = frozenset({"entity_filing_signal", "related_entity_signal"})
+#: `wake_screen` 的回傳（封閉）：放行、擋下等預篩、擋下等確認（預篩標無關）。
+WAKE_SCREEN_STATES = ("pass", "held_unscreened", "held_unrelated")
+WAKE_HELD_STATES = frozenset({"held_unscreened", "held_unrelated"})
+
 # tier-1 判斷的 SSOT 在 lead_refs（leads 與 event_watch 共用，放低層才不循環 import）。
 from engine_b.lead_refs import PRIMARY_SOURCE_TIER, is_primary_source  # noqa: F401
 
@@ -631,6 +643,8 @@ def check_watches(
                 watch["consumed_entities"] = sorted(
                     consumed | {s.strip().upper() for _lid, sh in matches for s in sh}
                 )
+            if is_screened_wake(watch):
+                woken["screen"] = "pending" if _fetchable(leads.get(lead_id)) else "unfetchable"
             watch["consumed_leads"] = sorted(consumed_leads | {lid for lid, _sh in matches})
             watch["woken_by"] = woken
             fired.append(dict(watch))
@@ -1101,6 +1115,8 @@ def counters(data: Mapping[str, Any], *, coverage: frozenset[str] | None = None)
         # 醒了、還沒判定＝待檢（有沒有預篩標旗都算；預篩只標旗、不減少未檢）
         "semantic_pending_check": len(pending),
         "semantic_flagged": sum(1 for w in pending if flag_for_current(w) is not None),
+        # #96：追源／讀圖叫醒擋下待確認（還沒預篩＋預篩標無關）——互動 `wake-queue` → `wake-judge`
+        "wake_held": sum(1 for w in data["watches"] if wake_screen(w) in WAKE_HELD_STATES),
         "wake_disproof": sum(1 for w in active if w.get("disproof_ref") and not is_confirm(w)),
         # Phase 7 Step 7.0d：加碼條件分開數——它不是反證
         "wake_confirm": sum(1 for w in active if is_confirm(w)),
@@ -1207,25 +1223,122 @@ def flag_for_current(watch: Mapping[str, Any]) -> dict[str, Any] | None:
 PRESCREEN_VERDICTS = ("likely_touches", "likely_unrelated", "cannot_tell")
 
 
+def _fetchable(lead: Mapping[str, Any] | None) -> bool:
+    """觸發 lead 抓得到全文嗎（預篩用同一個 fetcher 判斷；L16）。lead 不在手上就當抓不到——照舊放行，不擋。"""
+    if not lead:
+        return False
+    from engine_b.semantic_prescreen import fetcher_for
+
+    return fetcher_for(lead) is not None
+
+
+def is_screened_wake(watch: Mapping[str, Any]) -> bool:
+    """這筆是要先過預篩才放行的叫醒嗎（#96；見 `SCREENED_WAKE_KINDS`）。"""
+    return watch.get("kind") in SCREENED_WAKE_KINDS and bool(watch.get("wake_lead") or watch.get("wake_reading"))
+
+
+def wake_screen(watch: Mapping[str, Any]) -> str | None:
+    """fired 的追源／讀圖叫醒現在放不放行——**唯一判斷**，consume-fired、triage 的同步重排、讀圖該重讀、佇列段都問它（L16）。
+
+    None＝不需要篩（不是 fired、不是篩的那幾種，或修之前醒的——沒有 `screen` 欄，照舊放行，不把已在路上的卡住）。
+    `pass`：抓不到全文（`unfetchable`）、互動判定觸及（`judged`）、預篩標「可能觸及」或「看不出」。
+    `held_unscreened`：抓得到全文但還沒標旗。`held_unrelated`：預篩標「無關」——等互動確認，不自動回 active（INV-5）。
+    """
+    if watch.get("status") != "fired" or not is_screened_wake(watch):
+        return None
+    screen = (watch.get("woken_by") or {}).get("screen")
+    if screen is None:
+        return None
+    if screen in ("unfetchable", "judged"):
+        return "pass"
+    current = flag_for_current(watch)
+    if current is None:
+        return "held_unscreened"
+    return "held_unrelated" if current.get("verdict") == "likely_unrelated" else "pass"
+
+
+def wake_released(watch: Mapping[str, Any]) -> bool:
+    """fired 的叫醒可以交給它的 consumer 了嗎（排回 pq1、列進該重讀）。"""
+    return wake_screen(watch) not in WAKE_HELD_STATES
+
+
 def flag(data: dict[str, Any], watch_id: str, *, lead_id: str, verdict: str,
-         quote: str | None = None, session_id: str | None = None) -> dict[str, Any]:
-    """預篩標旗（C7；只由 ⑩c `prescreen-apply` 呼叫）：**只寫 `semantic_flag`，不改狀態**（G7：只標旗不判定）。"""
+         quote: str | None = None, session_id: str | None = None, note: str | None = None) -> dict[str, Any]:
+    """預篩標旗（C7；只由 ⑩c `prescreen-apply` 呼叫）：**只寫 `semantic_flag`，不改狀態**（G7：只標旗不判定）。
+
+    對象：fired 的語意 watch，與 fired 的追源／讀圖叫醒（#96：標旗決定放不放行，擋下的仍由互動判定）。
+    `note`＝模型一句理由，給互動確認時讀（不是判定）。"""
     if verdict not in PRESCREEN_VERDICTS:
         raise EventWatchError(f"verdict 必須是 {PRESCREEN_VERDICTS} 之一：{verdict!r}")
     for watch in data["watches"]:
         if watch["watch_id"] != watch_id:
             continue
-        if watch.get("kind") != SEMANTIC_KIND or watch.get("status") != "fired":
-            raise EventWatchError(f"只能對 fired 的語意 watch 標旗：{watch_id}")
+        if watch.get("status") != "fired" or not (watch.get("kind") == SEMANTIC_KIND or is_screened_wake(watch)):
+            raise EventWatchError(f"只能對 fired 的語意 watch 或追源／讀圖叫醒標旗：{watch_id}")
         if (watch.get("woken_by") or {}).get("lead_id") != lead_id:
             raise EventWatchError(f"{watch_id} 不是被 {lead_id} 叫醒的")
         if verdict == "likely_touches" and not str(quote or "").strip():
             raise EventWatchError("likely_touches 必須附文件逐字引文（L18）")
         entry = {"lead_id": lead_id, "at": _now(), "verdict": verdict, "quote": quote,
                  "session_id": session_id}
+        if str(note or "").strip():
+            entry["note"] = str(note).strip()
         watch["semantic_flag"] = entry
         return entry
     raise EventWatchError(f"watch 不存在：{watch_id}")
+
+
+def judge_wake(data: dict[str, Any], watch_id: str, *, touches: bool, note: str,
+               quote: str | None = None) -> dict[str, Any]:
+    """互動 session 判定擋下的追源／讀圖叫醒（#96；G7：判定只在互動）。
+
+    - `touches=False` → 回 active 續等（`reactivate`，理由進 `reactivations`）：觸發 lead 已在 consumed_leads，不會再叫醒；
+      lead 照舊停放、讀圖不列該重讀——**不重排、不重停**，所以停放理由與處置一筆都不動。
+    - `touches=True` → `woken_by.screen = judged`（放行；`quote`＝文件逐字，必填，L18），由原本的 consumer 接手
+      （consume-fired 排回 pq1／讀圖列進該重讀）。
+    每次判定 append 進 `wake_judgments`，附當時的預篩 verdict——量「預篩判無關」準不準用（INV-5：先量測後放閘）。
+    """
+    if not str(note or "").strip():
+        raise EventWatchError("wake-judge 必須附 note（為什麼判定觸及／無關）")
+    for watch in data["watches"]:
+        if watch["watch_id"] != watch_id:
+            continue
+        if wake_screen(watch) not in WAKE_HELD_STATES:
+            raise EventWatchError(f"只能判定擋下待確認的追源／讀圖叫醒：{watch_id}")
+        woken = watch.get("woken_by") or {}
+        current = flag_for_current(watch)
+        judgment = {"at": _now(), "touches": "yes" if touches else "no", "note": note,
+                    "lead_id": woken.get("lead_id"), "prescreen_verdict": (current or {}).get("verdict")}
+        if touches:
+            if not str(quote or "").strip():
+                raise EventWatchError("判定觸及必須附 --quote（文件逐字）")
+            judgment["quote"] = quote
+            watch["wake_judgments"] = [*(watch.get("wake_judgments") or []), judgment]
+            woken["screen"] = "judged"
+            watch["woken_by"] = woken
+        else:
+            watch["wake_judgments"] = [*(watch.get("wake_judgments") or []), judgment]
+            reactivate(data, watch_id, note=f"叫醒擋下、互動確認無關：{note}")
+        return judgment
+    raise EventWatchError(f"watch 不存在：{watch_id}")
+
+
+def wake_screen_counts(data: Mapping[str, Any], *, days: int = 30, today: date | None = None) -> dict[str, int]:
+    """叫醒擋下的常駐計數（#96）＋預篩判無關的量測：近 N 天互動判定裡，預篩標無關的有幾筆被判無關（一致）、幾筆被判觸及（擋錯）。"""
+    since = ((today or _today()) - timedelta(days=days)).isoformat()
+    fired = [w for w in data["watches"] if w.get("status") == "fired"]
+    states = [wake_screen(w) for w in fired]
+    judgments = [j for w in data["watches"] for j in (w.get("wake_judgments") or []) if str(j.get("at") or "") >= since]
+    flagged_unrelated = [j for j in judgments if j.get("prescreen_verdict") == "likely_unrelated"]
+    return {
+        "held_unscreened": states.count("held_unscreened"),
+        "held_unrelated": states.count("held_unrelated"),
+        "days": days,
+        "judged": len(judgments),
+        "judged_unrelated": sum(1 for j in judgments if j.get("touches") == "no"),
+        "prescreen_unrelated_agreed": sum(1 for j in flagged_unrelated if j.get("touches") == "no"),
+        "prescreen_unrelated_wrong": sum(1 for j in flagged_unrelated if j.get("touches") == "yes"),
+    }
 
 
 def judge(data: dict[str, Any], watch_id: str, *, touches: bool, note: str,
@@ -1420,6 +1533,14 @@ def main(argv: list[str] | None = None) -> int:
     jud.add_argument("--touches", required=True, choices=("yes", "no"))
     jud.add_argument("--note", required=True)
     jud.add_argument("--quote", default="", help="文件逐字（--touches yes 時必填）")
+    sub.add_parser("wake-queue",
+                   help="列擋下待確認的追源／讀圖叫醒（#96），照觸發文件分組（一份文件判一次）")
+    wjud = sub.add_parser("wake-judge", help="互動判定擋下的叫醒：觸及（放行給原 consumer）或無關（回 active 續等）；"
+                                             "可一次給一組（同一份文件叫醒的）")
+    wjud.add_argument("watch_id", nargs="+")
+    wjud.add_argument("--touches", required=True, choices=("yes", "no"))
+    wjud.add_argument("--note", required=True)
+    wjud.add_argument("--quote", default="", help="文件逐字（--touches yes 時必填）")
     flg = sub.add_parser("flag", help="預篩標旗（只寫 semantic_flag、不改狀態；由 prescreen-apply 呼叫）")
     flg.add_argument("watch_id")
     flg.add_argument("--lead", required=True)
@@ -1494,6 +1615,66 @@ def main(argv: list[str] | None = None) -> int:
         print(f"近 {share['days']} 天語意判定 {share['judgments']} 筆｜帶重訊類別 {share['with_category']}｜"
               f"其中例行類別（注意交易、法說會、內線澄清）{share['routine']} 筆"
               "（批次二 E2：量兩週再談要不要不叫醒這三類，INV-5）")
+        wake = wake_screen_counts(data)
+        print(f"叫醒擋下待確認：還沒預篩 {wake['held_unscreened']}、預篩標無關 {wake['held_unrelated']}｜"
+              f"近 {wake['days']} 天互動判定 {wake['judged']} 筆（判無關 {wake['judged_unrelated']}）｜"
+              f"預篩標無關的：判定一致 {wake['prescreen_unrelated_agreed']}、擋錯 {wake['prescreen_unrelated_wrong']}"
+              "（#96：量夠再談要不要讓標無關的直接回去續等，INV-5）")
+        return 0
+    if args.cmd == "wake-queue":
+        from engine_b.leads import load as load_leads
+
+        try:
+            leads_store = load_leads()["leads"]
+        except Exception:  # noqa: BLE001
+            leads_store = {}
+        held = [w for w in data["watches"] if wake_screen(w) in WAKE_HELD_STATES]
+        if not held:
+            print("（沒有擋下待確認的追源／讀圖叫醒）")
+        groups: dict[str, list[Mapping[str, Any]]] = {}
+        for watch in sorted(held, key=lambda w: str((w.get("woken_by") or {}).get("at") or "")):
+            groups.setdefault(str((watch.get("woken_by") or {}).get("lead_id")), []).append(watch)
+        for trigger_id, members in groups.items():
+            lead = leads_store.get(trigger_id) or {}
+            print(f"【一份文件】{lead.get('title') or trigger_id}｜{lead.get('url')}｜form {lead.get('form_type') or '—'}"
+                  f"｜叫醒 {len(members)} 條")
+            text_path = Path("library/private/semantic_text") / f"{trigger_id}.txt"
+            print(f"  全文：{text_path if text_path.is_file() else '（還沒抓；daily ⑩a 會抓，或自己讀網址）'}")
+            for watch in members:
+                current = flag_for_current(watch)
+                if watch.get("wake_lead"):
+                    parked = leads_store.get(str(watch["wake_lead"])) or {}
+                    waits = str((parked.get("refs") or {}).get("trace_next_trigger") or "").strip()
+                    target = f"追源 {watch['wake_lead']}（{str(parked.get('title') or '')[:60]}）在等：{waits[:200] or '（停放時沒寫）'}"
+                else:
+                    target = f"讀圖 {watch.get('wake_reading')} 在等需求側客戶寫到這一層"
+                print(f"  {watch['watch_id']}｜{target}")
+                if current:
+                    print(f"    預篩（提示，不是判定）：{current.get('verdict')}"
+                          + (f"｜{current.get('note')}" if current.get("note") else "")
+                          + (f"｜引文：{current.get('quote')}" if current.get("quote") else ""))
+                else:
+                    print("    預篩：還沒標")
+            ids = " ".join(str(w["watch_id"]) for w in members)
+            print(f"  {'一組判定' if len(members) > 1 else '判定'}：python -m engine_b.event_watch wake-judge {ids} "
+                  f"--touches yes|no --note \"…\" [--quote \"文件逐字\"]"
+                  + ("（有一條觸及就拆開單獨判）" if len(members) > 1 else ""))
+        return 0
+    if args.cmd == "wake-judge":
+        # 一組一次判：先全部驗過再寫——一筆不合法就整組不寫（同 judge）
+        for watch_id in args.watch_id:
+            target = next((w for w in data["watches"] if w["watch_id"] == watch_id), None)
+            if target is None or wake_screen(target) not in WAKE_HELD_STATES:
+                print(f"✗ {watch_id} 不是擋下待確認的叫醒——整組不寫", file=sys.stderr)
+                return 2
+        if args.touches == "yes" and not args.quote.strip():
+            print("✗ 判定觸及必須附 --quote（文件逐字）——整組不寫", file=sys.stderr)
+            return 2
+        for watch_id in args.watch_id:
+            judge_wake(data, watch_id, touches=args.touches == "yes", note=args.note, quote=args.quote or None)
+            print(f"✓ {watch_id} " + ("判定觸及，放行（追源由 consume-fired 排回 pq1；讀圖列進該重讀）"
+                                      if args.touches == "yes" else "判定無關，回 active 續等（lead 照舊停放）"))
+        save_watches(data)
         return 0
     if args.cmd == "register-disproof":
         # 去重（R2-b 第三輪 NB3-9）：同一來源、同一條件已有還在處理中的 watch 就拒收——否則同一份 lead 叫醒兩次、複查兩筆一起續盯

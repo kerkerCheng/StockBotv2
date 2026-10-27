@@ -350,11 +350,16 @@ def register_reading_watches(record: Mapping[str, Any], *, watches_path: Path | 
 
 
 def reread_reasons(node: str, watches: Sequence[Mapping[str, Any]]) -> list[str]:
-    """這個節點為什麼該重讀（watch 那一側的理由）：需求側客戶出了新文件、讀圖的反證被判觸及未處置。"""
+    """這個節點為什麼該重讀（watch 那一側的理由）：需求側客戶出了新文件、讀圖的反證被判觸及未處置。
+
+    客戶的新文件只比發文公司（failure log #96：10-27 一份循環信用修約的 8-K 叫醒三份讀圖）——還沒過預篩或預篩標無關的
+    擋著（`event_watch.wake_released`），由佇列段 `wake_screen_hold` 現形、互動判定後才列進來。"""
+    from engine_b.event_watch import wake_released
+
     reasons: list[str] = []
     for watch in watches:
         woken = watch.get("woken_by") or {}
-        if watch.get("wake_reading") == node and watch.get("status") == "fired":
+        if watch.get("wake_reading") == node and watch.get("status") == "fired" and wake_released(watch):
             reasons.append(f"客戶 {','.join(woken.get('shared_entities') or watch.get('entities') or [])}"
                            f" 出了新文件 {woken.get('lead_id')}")
         judgment = watch.get("judgment") or {}

@@ -111,6 +111,20 @@ fired watch 屬段 0b：拿 `fact` 去對觸發 lead 的一手數字，落 `engi
 意向書重刊成新事件）。判定觸及＝那條等待被叫醒，之後照它的喚醒目標走既有的路：追源線索跑 `consume-fired` 排回 pq1、
 pq2 型跑 `todo sync` 翻回球在你、假設型進段 0b。命中掛超過兩週沒判，`audit invariants` 的 QueueLiveness 會亮紅。
 
+**段 `wake_screen_hold`（叫醒擋下待確認，2026-10-27 起，failure log #96；與段 0b 同級）**：追源線索與讀圖客戶重讀的
+entity 型等待只比「發文的是不是這家公司」——醒來先擋著；daily ⑩a–⑩c 預篩標「可能觸及」「看不出」就自己放行（追源由
+`consume-fired` 排回 pq1、讀圖列進該重讀），標「無關」或還沒預篩的在這裡判：
+
+```powershell
+& '.venv\Scripts\python.exe' -m engine_b.event_watch wake-queue      # 照觸發文件分組：文件、全文存檔、每條在等什麼、預篩 verdict 與理由
+& '.venv\Scripts\python.exe' -m engine_b.event_watch wake-judge <watch_id…> --touches no --note "文件實際在講什麼"
+& '.venv\Scripts\python.exe' -m engine_b.event_watch wake-judge <watch_id> --touches yes --note "…" --quote "文件逐字"
+```
+
+**一份文件判一次**：讀全文（至少讀到說得出它在講什麼）再判；同一份文件叫醒的幾條逐條對照各自在等的事，有一條觸及就拆開
+單獨判。判無關＝回 active 續等，lead 照舊停放、**停放理由與處置一筆都不動**（不重排、不重停）；判觸及＝放行，接著跑
+`consume-fired`。預篩標無關只是提示——判得準不準還沒量過（`event_watch counters` 印一致與擋錯的筆數，INV-5），不得照抄 verdict 了事。
+
 **段 `narrative_rewrite`（敘事該重寫，2026-09-29 Phase 3 Step 3.4 起；與段 0b 同級，排在下面三段固定之前**——
 它和 0b 一樣是**已經醒來的等待**，醒來的反證不排在新線索後面）：敘事自己的反證（`brief:` 語意 watch）
 與「缺 X」「已定價等回落」在等的事（`wake_brief` watch）**醒來、被判觸及或到期未判**都進這一段——不鑄 pq2、
