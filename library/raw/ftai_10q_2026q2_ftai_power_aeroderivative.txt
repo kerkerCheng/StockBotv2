@@ -1,0 +1,11 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1590364/000162828026051412/ftai-20260630.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] FTAI Aviation Ltd. Form 10-Q（2026Q2，2026-07-31）：FTAI Power 把 CFM56 航空引擎改成航改型發電渦輪；FTAI Power 目前只以費用列在 Corporate and Other
+RETRIEVED: 2026-10-27（本機原文抽字逐字核對）
+
+【附註 業務概述】
+"On December 30, 2025, the Company announced the launch of FTAI Power, a platform focused on converting CFM56 aircraft engines to aeroderivative power turbines."
+
+【附註 分部】
+"Additionally, Corporate and Other also includes results from an offshore energy business, which consists of equipment that support offshore oil and gas activities and production, and expenses relating to FTAI Power."

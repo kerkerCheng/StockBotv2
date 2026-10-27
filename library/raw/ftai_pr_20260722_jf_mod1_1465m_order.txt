@@ -1,0 +1,14 @@
+Source URL: https://www.manilatimes.net/2026/07/22/tmt-newswire/globenewswire/ftai-announces-1465-billion-gas-turbine-generator-set-order-through-jf-power-systems/2389388/amp
+
+Excerpt:
+[EXCERPT — 有限逐字引文] FTAI Aviation 新聞稿（GlobeNewswire，2026-07-22；The Manila Times 轉載）：與杰瑞（Jereh Group）合資的 J&F Power Systems 跟一家國際雲端服務商簽 Mod-1 航改型燃機發電機組主供應合約，首張訂單 14.65 億美元、2027 年 11 月前分批交，性能不足最多扣 10%
+RETRIEVED: 2026-10-27（本機原文抽字逐字核對）
+
+【導言】
+"(NASDAQ: FTAI) ("FTAI" or the "Company") today announced that J&F Power Systems LLC ("J&F"), FTAI's joint venture with Jereh Group for packaging and distribution of its Mod-1 aeroderivative gas turbine, has entered into a master gas turbine generator set supply agreement (the "Master Agreement") with a leading international cloud service provider (the "Customer") and signed an initial purchase order under the Master Agreement valued at $1.465 billion (the "Order")."
+
+【訂單條款】
+"Under the terms of the Order, J&F will supply Mod-1 mobile gas turbine generator sets supporting the Customer's power infrastructure buildout, with equipment to be delivered in batches through November 2027."
+
+【結算條款】
+"Final settlement amounts are subject to a performance adjustment mechanism, providing upward adjustments for equipment exceeding performance standards and downward adjustments, capped at 10% of the corresponding equipment's value for lower power output."

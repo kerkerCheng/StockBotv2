@@ -1,0 +1,14 @@
+Source URL: https://investors.bakerhughes.com/news/press-releases/news-details/2026/Kodiak-Gas-Services-Baker-Hughes-Announce-Multi-Year-Gas-Turbine-Order-Agreement-to-Support-U-S--Data-Center-Growth/default.aspx
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Kodiak Gas Services 與 Baker Hughes 聯合新聞稿（2026-07-08，Baker Hughes IR）：多年期燃機訂單框架，首批約 1 GW 燃機與發電機（NovaLT16、Frame 5、BRUSH 發電機）2030 年前交，做表後供電；框架上看 1.8 GW
+RETRIEVED: 2026-10-27（本機原文抽字逐字核對）
+
+【副標】
+"Initial major award includes approximately 1 GW of gas turbines and generators delivered by 2030 to support scalable, behind-the-meter power solutions"
+
+【導言】
+"Kodiak Gas Services, Inc. (NYSE: KGS) (“Kodiak”), a leading provider of critical energy infrastructure, and Baker Hughes (NASDAQ: BKR), an energy technology company, announced Wednesday a multi-year strategic agreement under which Baker Hughes will provide power generation solutions to support Kodiak’s expanding energy infrastructure initiatives."
+
+【訂單內容】
+"The initial major order includes NovaLT™16 gas turbines, Frame 5 gas turbines and BRUSH™ Power Generation generators, providing core technologies to deliver dependable power for growing data center and energy infrastructure demand."

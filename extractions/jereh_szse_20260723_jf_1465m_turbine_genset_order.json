@@ -1,0 +1,114 @@
+{
+  "claims": [
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：杰瑞 之後的申報或新聞稿寫出這批資料中心燃機機組訂單取消、延後超過一年，或交機後性能未達標被扣款／退機；或買方一手寫出改用別家機組。核查頻率：每季（杰瑞 季報）。觸發後 48 小時：降這條邊 confidence，重讀燃氣渦輪發電機組層。",
+      "id": "jereh_szse_20260723_jf_1465m_turbine_genset_order_cl1",
+      "source_ids": [
+        "jereh_szse_20260723_jf_1465m_turbine_genset_order_s1",
+        "jereh_szse_20260723_jf_1465m_turbine_genset_order_s2",
+        "jereh_szse_20260723_jf_1465m_turbine_genset_order_s3",
+        "jereh_szse_20260723_jf_1465m_turbine_genset_order_s4"
+      ],
+      "statement": "Jereh SZSE announcement (2026-07-23): its controlled subsidiary J&F Power Systems signed a gas turbine generator set supply master contract with an unnamed well-known international cloud service provider and accepted a USD 1.465 billion order, delivered in batches before November 2027, for data-center power generation; within the past 12 months Jereh and its subsidiaries signed contracts with this customer totalling USD 1,719.8 million (including this order). This is the same order as FTAI's 2026-07-22 release, seen from the other partner.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:gas_turbine_genset",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "jereh_szse_20260723_jf_1465m_turbine_genset_order_s1",
+        "jereh_szse_20260723_jf_1465m_turbine_genset_order_s2",
+        "jereh_szse_20260723_jf_1465m_turbine_genset_order_s3",
+        "jereh_szse_20260723_jf_1465m_turbine_genset_order_s4"
+      ],
+      "src_id": "co:jereh"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "Yantai Jereh Oilfield Services Group Co., Ltd.",
+        "烟台杰瑞石油服务集团股份有限公司",
+        "Jereh Group"
+      ],
+      "attributes": {
+        "ticker": "002353.SZ"
+      },
+      "confidence": 0.85,
+      "id": "co:jereh",
+      "name": "Jereh",
+      "role": null,
+      "source_ids": [
+        "jereh_szse_20260723_jf_1465m_turbine_genset_order_s1",
+        "jereh_szse_20260723_jf_1465m_turbine_genset_order_s2",
+        "jereh_szse_20260723_jf_1465m_turbine_genset_order_s3",
+        "jereh_szse_20260723_jf_1465m_turbine_genset_order_s4"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "gas turbine generator set",
+        "gas turbine generator units",
+        "燃气轮机发电机组"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:gas_turbine_genset",
+      "name": "Gas turbine generator set for onsite power",
+      "role": null,
+      "source_ids": [
+        "jereh_szse_20260723_jf_1465m_turbine_genset_order_s1",
+        "jereh_szse_20260723_jf_1465m_turbine_genset_order_s2",
+        "jereh_szse_20260723_jf_1465m_turbine_genset_order_s3",
+        "jereh_szse_20260723_jf_1465m_turbine_genset_order_s4"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "jereh_szse_20260723_jf_1465m_turbine_genset_order",
+    "evidence_tier": 1,
+    "origin_entity": "烟台杰瑞石油服务集团股份有限公司",
+    "permission_basis": "深交所上市公司公開公告（巨潮資訊網）；只保留研究必要的有限逐字節錄。published_at 取巨潮資訊網公告日 2026-07-23。",
+    "published_at": "2026-07-23",
+    "publisher": "深圳證券交易所（巨潮資訊網）",
+    "retrieved_at": "2026-10-27",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "杰瑞股份（002353.SZ）深交所公告（2026-07-23）：控股子公司 J&F Power Systems 與某國際知名雲服務提供商簽燃氣輪機發電機組供應主合同，訂單 14.65 億美元、2027 年 11 月前分批交付；近 12 個月與同一客戶累計 17.20 億美元",
+    "url": "http://static.cninfo.com.cn/finalpage/2026-07-23/1225436739.PDF"
+  },
+  "sources": [
+    {
+      "id": "jereh_szse_20260723_jf_1465m_turbine_genset_order_s1",
+      "locator": "一、合同簽署概況",
+      "quote": "近日，烟台杰瑞石油服务集团股份有限公司（以下简称“公司”）控股子公司 J&F Power Systems LLC（以下简称“J&F”）与某国际知名云服务提供商（以下简称“客户”）签署了燃气轮机发电机组供应合同（以下简称“主合同”），且收到并接受客户下达的采购订单（以下简称“本订单”或以上统称“合同”），本订单金额为 146,500.00 万美元"
+    },
+    {
+      "id": "jereh_szse_20260723_jf_1465m_turbine_genset_order_s2",
+      "locator": "二、3、近三年類似交易",
+      "quote": "最近十二个月内，公司及公司子公司与该客户及其子公司多次签署燃气轮机发电机组及配套设备供应合同，累计总金额为 171,982.21 万美元"
+    },
+    {
+      "id": "jereh_szse_20260723_jf_1465m_turbine_genset_order_s3",
+      "locator": "三、4、交付期限",
+      "quote": "本订单交付期限：2027 年 11 月之前分批次交付"
+    },
+    {
+      "id": "jereh_szse_20260723_jf_1465m_turbine_genset_order_s4",
+      "locator": "四、合同對公司的影響",
+      "quote": "本合同的签署，是公司与该客户再次在数据中心发电相关领域开展合作"
+    }
+  ]
+}

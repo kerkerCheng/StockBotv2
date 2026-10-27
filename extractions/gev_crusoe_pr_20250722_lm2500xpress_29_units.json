@@ -1,0 +1,134 @@
+{
+  "claims": [
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：GE Vernova 之後的申報或新聞稿寫出這批資料中心燃機機組訂單取消、延後超過一年，或交機後性能未達標被扣款／退機；或買方一手寫出改用別家機組。核查頻率：每季（GE Vernova 季報）。觸發後 48 小時：降這條邊 confidence，重讀燃氣渦輪發電機組層。",
+      "id": "gev_crusoe_pr_20250722_lm2500xpress_29_units_cl1",
+      "source_ids": [
+        "gev_crusoe_pr_20250722_lm2500xpress_29_units_s1",
+        "gev_crusoe_pr_20250722_lm2500xpress_29_units_s2",
+        "gev_crusoe_pr_20250722_lm2500xpress_29_units_s3"
+      ],
+      "statement": "GE Vernova and Crusoe (joint release, 2025-07-22): 29 LM2500XPRESS aeroderivative gas turbine packages for Crusoe AI data centers — 10 ordered December 2024, 19 booked June 2025, together nearly 1 GW; each package is an LM2500 aeroderivative turbine, gas compressor and emissions control system that can start independent of the grid. Joint supplier–customer announcement.",
+      "subject_id": "e2"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "tech:gas_turbine_genset",
+      "id": "e1",
+      "relation": "is_variant_of",
+      "source_ids": [
+        "gev_crusoe_pr_20250722_lm2500xpress_29_units_s1",
+        "gev_crusoe_pr_20250722_lm2500xpress_29_units_s2"
+      ],
+      "src_id": "tech:aeroderivative_gas_turbine"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "tech:aeroderivative_gas_turbine",
+      "id": "e2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "gev_crusoe_pr_20250722_lm2500xpress_29_units_s1",
+        "gev_crusoe_pr_20250722_lm2500xpress_29_units_s2",
+        "gev_crusoe_pr_20250722_lm2500xpress_29_units_s3"
+      ],
+      "src_id": "co:ge_vernova"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "GE Vernova Inc."
+      ],
+      "attributes": {
+        "ticker": "GEV"
+      },
+      "confidence": 0.85,
+      "id": "co:ge_vernova",
+      "name": "GE Vernova",
+      "role": null,
+      "source_ids": [
+        "gev_crusoe_pr_20250722_lm2500xpress_29_units_s1",
+        "gev_crusoe_pr_20250722_lm2500xpress_29_units_s2",
+        "gev_crusoe_pr_20250722_lm2500xpress_29_units_s3"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "aeroderivative gas turbine",
+        "aeroderivative power turbines",
+        "aeroderivative gas turbine packages"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:aeroderivative_gas_turbine",
+      "name": "Aeroderivative gas turbine generator package",
+      "role": null,
+      "source_ids": [
+        "gev_crusoe_pr_20250722_lm2500xpress_29_units_s1",
+        "gev_crusoe_pr_20250722_lm2500xpress_29_units_s2",
+        "gev_crusoe_pr_20250722_lm2500xpress_29_units_s3"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "gas turbine generator set",
+        "gas turbine generator units",
+        "燃气轮机发电机组"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:gas_turbine_genset",
+      "name": "Gas turbine generator set for onsite power",
+      "role": null,
+      "source_ids": [
+        "gev_crusoe_pr_20250722_lm2500xpress_29_units_s1",
+        "gev_crusoe_pr_20250722_lm2500xpress_29_units_s2",
+        "gev_crusoe_pr_20250722_lm2500xpress_29_units_s3"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "gev_crusoe_pr_20250722_lm2500xpress_29_units",
+    "evidence_tier": 1,
+    "origin_entity": "GE Vernova Inc.",
+    "permission_basis": "GE Vernova 與 Crusoe 公開聯合新聞稿；只保留研究必要的有限逐字節錄。published_at 取稿頭「ATLANTA- (July 22, 2025)」。",
+    "published_at": "2025-07-22",
+    "publisher": "Crusoe newsroom（GE Vernova 與 Crusoe 聯合新聞稿）",
+    "retrieved_at": "2026-10-27",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "GE Vernova 與 Crusoe 聯合新聞稿（2025-07-22，Crusoe newsroom）：29 台 LM2500XPRESS 航改型燃機機組給 Crusoe AI 資料中心（2024-12 先訂 10 台、2025-06 再訂 19 台，合計近 1 GW），可脫離電網啟動",
+    "url": "https://www.crusoe.ai/resources/newsroom/ge-vernova-and-crusoe-announce-major-29-unit-gas-turbine-deal"
+  },
+  "sources": [
+    {
+      "id": "gev_crusoe_pr_20250722_lm2500xpress_29_units_s1",
+      "locator": "導言",
+      "quote": "(NYSE: GEV) and Crusoe, the industry’s first vertically integrated AI infrastructure provider, today announced a significant deal to deliver 29 units of GE Vernova’s breakthrough LM2500XPRESS aeroderivative gas turbine packages to Crusoe AI data centers."
+    },
+    {
+      "id": "gev_crusoe_pr_20250722_lm2500xpress_29_units_s2",
+      "locator": "LM2500XPRESS units 段",
+      "quote": "Each of GE Vernova’s LM2500XPRESS, dual fuel, power packages is comprised of a LM2500* aeroderivative gas turbine, gas compressor, and emissions control system, and is capable of starting independent of the power grid with five-minute fast start capability."
+    },
+    {
+      "id": "gev_crusoe_pr_20250722_lm2500xpress_29_units_s3",
+      "locator": "訂單段",
+      "quote": "The announced order of 19 units, booked in June 2025, builds on the first series of 10 units Crusoe ordered in December 2024, and combined, is expected to provide nearly 1GW of electricity."
+    }
+  ]
+}

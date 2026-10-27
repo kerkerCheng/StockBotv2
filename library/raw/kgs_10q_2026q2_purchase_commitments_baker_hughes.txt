@@ -1,0 +1,14 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1767042/000176704226000055/kgs-20260630.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Kodiak Gas Services, Inc. Form 10-Q（2026Q2，2026-08-07）：採購承諾 25 億美元（新壓縮與發電機組），內含 Baker Hughes 多年期發電方案安排
+RETRIEVED: 2026-10-27（本機原文抽字逐字核對）
+
+【附註 Purchase Commitments】
+"Purchase commitments primarily consist of future commitments to purchase new compression and power generation units that have been ordered but not yet received."
+
+【附註 Purchase Commitments】
+"As of June 30, 2026, these commitments amounted to $ 2.5 billion, of which $ 587.9 million is expected to be settled within the next twelve months."
+
+【附註 Purchase Commitments】
+"Included within these future commitments is a multi-year strategic arrangement whereby Baker Hughes will provide power generation solutions to support Kodiak’s expanding energy infrastructure initiatives."

@@ -1,0 +1,149 @@
+{
+  "claims": [
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：FTAI 或杰瑞 之後的申報或新聞稿寫出這批資料中心燃機機組訂單取消、延後超過一年，或交機後性能未達標被扣款／退機；或買方一手寫出改用別家機組。核查頻率：每季（FTAI 或杰瑞 季報）。觸發後 48 小時：降這條邊 confidence，重讀燃氣渦輪發電機組層。",
+      "id": "ftai_pr_20260722_jf_mod1_1465m_order_cl1",
+      "source_ids": [
+        "ftai_pr_20260722_jf_mod1_1465m_order_s1",
+        "ftai_pr_20260722_jf_mod1_1465m_order_s2",
+        "ftai_pr_20260722_jf_mod1_1465m_order_s3"
+      ],
+      "statement": "FTAI (press release, 2026-07-22): J&F Power Systems, FTAI's joint venture with Jereh Group for packaging and distributing its Mod-1 aeroderivative gas turbine, signed a master supply agreement with an unnamed leading international cloud service provider and an initial USD 1.465 billion order for Mod-1 mobile gas turbine generator sets, delivered in batches through November 2027; settlement adjusts with performance, with downward adjustment capped at 10% of equipment value for lower power output. A new entrant's first large order with a contractual performance haircut — field performance has not been reported yet.",
+      "subject_id": "e1"
+    },
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：杰瑞 之後的申報或新聞稿寫出這批資料中心燃機機組訂單取消、延後超過一年，或交機後性能未達標被扣款／退機；或買方一手寫出改用別家機組。核查頻率：每季（杰瑞 季報）。觸發後 48 小時：降這條邊 confidence，重讀燃氣渦輪發電機組層。",
+      "id": "ftai_pr_20260722_jf_mod1_1465m_order_cl2",
+      "source_ids": [
+        "ftai_pr_20260722_jf_mod1_1465m_order_s1",
+        "ftai_pr_20260722_jf_mod1_1465m_order_s2"
+      ],
+      "statement": "Jereh Group is FTAI's joint-venture partner in J&F Power Systems, which packages and distributes the Mod-1 aeroderivative gas turbine and holds the USD 1.465 billion order (FTAI release; Jereh's own SZSE announcement of 2026-07-23 calls J&F its controlled subsidiary).",
+      "subject_id": "e2"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:aeroderivative_gas_turbine",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "ftai_pr_20260722_jf_mod1_1465m_order_s1",
+        "ftai_pr_20260722_jf_mod1_1465m_order_s2",
+        "ftai_pr_20260722_jf_mod1_1465m_order_s3"
+      ],
+      "src_id": "co:ftai"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:aeroderivative_gas_turbine",
+      "id": "e2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "ftai_pr_20260722_jf_mod1_1465m_order_s1",
+        "ftai_pr_20260722_jf_mod1_1465m_order_s2"
+      ],
+      "src_id": "co:jereh"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "FTAI Aviation Ltd.",
+        "FTAI Power"
+      ],
+      "attributes": {
+        "ticker": "FTAI"
+      },
+      "confidence": 0.85,
+      "id": "co:ftai",
+      "name": "FTAI Aviation",
+      "role": null,
+      "source_ids": [
+        "ftai_pr_20260722_jf_mod1_1465m_order_s1",
+        "ftai_pr_20260722_jf_mod1_1465m_order_s2",
+        "ftai_pr_20260722_jf_mod1_1465m_order_s3"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "Yantai Jereh Oilfield Services Group Co., Ltd.",
+        "烟台杰瑞石油服务集团股份有限公司",
+        "Jereh Group"
+      ],
+      "attributes": {
+        "ticker": "002353.SZ"
+      },
+      "confidence": 0.85,
+      "id": "co:jereh",
+      "name": "Jereh",
+      "role": null,
+      "source_ids": [
+        "ftai_pr_20260722_jf_mod1_1465m_order_s1",
+        "ftai_pr_20260722_jf_mod1_1465m_order_s2",
+        "ftai_pr_20260722_jf_mod1_1465m_order_s3"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "aeroderivative gas turbine",
+        "aeroderivative power turbines",
+        "aeroderivative gas turbine packages"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:aeroderivative_gas_turbine",
+      "name": "Aeroderivative gas turbine generator package",
+      "role": null,
+      "source_ids": [
+        "ftai_pr_20260722_jf_mod1_1465m_order_s1",
+        "ftai_pr_20260722_jf_mod1_1465m_order_s2",
+        "ftai_pr_20260722_jf_mod1_1465m_order_s3"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "ftai_pr_20260722_jf_mod1_1465m_order",
+    "evidence_tier": 1,
+    "origin_entity": "FTAI Aviation Ltd.",
+    "permission_basis": "FTAI 公開新聞稿（GlobeNewswire 發布、The Manila Times 轉載）；只保留研究必要的有限逐字節錄。published_at 取轉載頁的 GlobeNewswire 發布日 Jul 22, 2026。",
+    "published_at": "2026-07-22",
+    "publisher": "GlobeNewswire（The Manila Times 轉載）",
+    "retrieved_at": "2026-10-27",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "FTAI Aviation 新聞稿（GlobeNewswire，2026-07-22；The Manila Times 轉載）：與杰瑞（Jereh Group）合資的 J&F Power Systems 跟一家國際雲端服務商簽 Mod-1 航改型燃機發電機組主供應合約，首張訂單 14.65 億美元、2027 年 11 月前分批交，性能不足最多扣 10%",
+    "url": "https://www.manilatimes.net/2026/07/22/tmt-newswire/globenewswire/ftai-announces-1465-billion-gas-turbine-generator-set-order-through-jf-power-systems/2389388/amp"
+  },
+  "sources": [
+    {
+      "id": "ftai_pr_20260722_jf_mod1_1465m_order_s1",
+      "locator": "導言",
+      "quote": "(NASDAQ: FTAI) (\"FTAI\" or the \"Company\") today announced that J&F Power Systems LLC (\"J&F\"), FTAI's joint venture with Jereh Group for packaging and distribution of its Mod-1 aeroderivative gas turbine, has entered into a master gas turbine generator set supply agreement (the \"Master Agreement\") with a leading international cloud service provider (the \"Customer\") and signed an initial purchase order under the Master Agreement valued at $1.465 billion (the \"Order\")."
+    },
+    {
+      "id": "ftai_pr_20260722_jf_mod1_1465m_order_s2",
+      "locator": "訂單條款",
+      "quote": "Under the terms of the Order, J&F will supply Mod-1 mobile gas turbine generator sets supporting the Customer's power infrastructure buildout, with equipment to be delivered in batches through November 2027."
+    },
+    {
+      "id": "ftai_pr_20260722_jf_mod1_1465m_order_s3",
+      "locator": "結算條款",
+      "quote": "Final settlement amounts are subject to a performance adjustment mechanism, providing upward adjustments for equipment exceeding performance standards and downward adjustments, capped at 10% of the corresponding equipment's value for lower power output."
+    }
+  ]
+}

@@ -1,0 +1,137 @@
+{
+  "claims": [
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：Baker Hughes 或 Solaris 之後的申報或新聞稿寫出這批資料中心燃機機組訂單取消、延後超過一年，或交機後性能未達標被扣款／退機；或買方一手寫出改用別家機組。核查頻率：每季（Baker Hughes 或 Solaris 季報）。觸發後 48 小時：降這條邊 confidence，重讀燃氣渦輪發電機組層。",
+      "id": "sei_10q_2026q2_novalt16_delivery_rights_colusa_cl1",
+      "source_ids": [
+        "sei_10q_2026q2_novalt16_delivery_rights_colusa_s1",
+        "sei_10q_2026q2_novalt16_delivery_rights_colusa_s2"
+      ],
+      "statement": "Buyer-side filing (Solaris 10-Q Q2 2026): Solaris took over, by novation, an existing Baker Hughes turbine supply contract for 30 NovaLT16 gas turbine generator units originally held by Colusa Power Infrastructure Partners.",
+      "subject_id": "e1"
+    },
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：Solaris 之後的申報寫出這批燃機交貨權／採購承諾被轉讓出去、取消，或改用電網／其他電源。核查頻率：每季（Solaris 季報）。觸發後 48 小時：降這條邊 confidence，重讀燃氣渦輪發電機組層的需求側。",
+      "id": "sei_10q_2026q2_novalt16_delivery_rights_colusa_cl2",
+      "source_ids": [
+        "sei_10q_2026q2_novalt16_delivery_rights_colusa_s1",
+        "sei_10q_2026q2_novalt16_delivery_rights_colusa_s2"
+      ],
+      "statement": "Solaris paid Colusa USD 66.9 million for the assignment of its contractual delivery rights to 30 NovaLT16 units (about USD 2.2 million per unit, derived) on top of USD 64.3 million paid to Baker Hughes for overdue milestone invoices and suspension-related costs — a buyer paying a third party for turbine delivery slots. The per-unit figure is our division; the filing gives only the totals.",
+      "subject_id": "e2"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:gas_turbine_genset",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "sei_10q_2026q2_novalt16_delivery_rights_colusa_s1",
+        "sei_10q_2026q2_novalt16_delivery_rights_colusa_s2"
+      ],
+      "src_id": "co:baker_hughes"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:gas_turbine_genset",
+      "id": "e2",
+      "relation": "depends_on",
+      "source_ids": [
+        "sei_10q_2026q2_novalt16_delivery_rights_colusa_s1",
+        "sei_10q_2026q2_novalt16_delivery_rights_colusa_s2"
+      ],
+      "src_id": "co:solaris_energy_infrastructure"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "Baker Hughes Company"
+      ],
+      "attributes": {
+        "ticker": "BKR"
+      },
+      "confidence": 0.85,
+      "id": "co:baker_hughes",
+      "name": "Baker Hughes",
+      "role": null,
+      "source_ids": [
+        "sei_10q_2026q2_novalt16_delivery_rights_colusa_s1",
+        "sei_10q_2026q2_novalt16_delivery_rights_colusa_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "Solaris Energy Infrastructure, Inc.",
+        "Solaris Power Solutions"
+      ],
+      "attributes": {
+        "ticker": "SEI"
+      },
+      "confidence": 0.85,
+      "id": "co:solaris_energy_infrastructure",
+      "name": "Solaris Energy Infrastructure",
+      "role": null,
+      "source_ids": [
+        "sei_10q_2026q2_novalt16_delivery_rights_colusa_s1",
+        "sei_10q_2026q2_novalt16_delivery_rights_colusa_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "gas turbine generator set",
+        "gas turbine generator units",
+        "燃气轮机发电机组"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:gas_turbine_genset",
+      "name": "Gas turbine generator set for onsite power",
+      "role": null,
+      "source_ids": [
+        "sei_10q_2026q2_novalt16_delivery_rights_colusa_s1",
+        "sei_10q_2026q2_novalt16_delivery_rights_colusa_s2"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "sei_10q_2026q2_novalt16_delivery_rights_colusa",
+    "evidence_tier": 1,
+    "origin_entity": "Solaris Energy Infrastructure, Inc.",
+    "permission_basis": "SEC EDGAR 公開申報（10-Q）；只保留研究必要的有限逐字節錄。published_at 取 EDGAR 申報日 2026-08-06。",
+    "published_at": "2026-08-06",
+    "publisher": "SEC EDGAR（Form 10-Q，accession 0001628280-26-054349）",
+    "retrieved_at": "2026-10-27",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Solaris Energy Infrastructure, Inc. Form 10-Q（2026Q2，2026-08-06）：向 Colusa 買下 30 台 Baker Hughes NovaLT16 燃機發電機組的交貨權——付 Colusa 6,690 萬美元換交貨權、另付 Baker Hughes 6,430 萬美元逾期里程碑款",
+    "url": "https://www.sec.gov/Archives/edgar/data/1697500/000162828026054349/sei-20260630.htm"
+  },
+  "sources": [
+    {
+      "id": "sei_10q_2026q2_novalt16_delivery_rights_colusa_s1",
+      "locator": "附註 NovaLT16 Turbine Acquisition",
+      "quote": "On March 13, 2026, the Company executed an Assignment, Assumption, Novation and Amendment Agreement (the “Assignment Agreement”) pursuant to which it acquired from Colusa Power Infrastructure Partners, LLC (“Colusa”) all contractual rights to receive 30 NovaLT16 gas turbine generator units (the “NovaLT16 Turbine Acquisition”) from Baker Hughes Energy Services LLC (“Baker Hughes”) under an existing turbine supply contract (the “Turbine Supply Contract”)."
+    },
+    {
+      "id": "sei_10q_2026q2_novalt16_delivery_rights_colusa_s2",
+      "locator": "附註 NovaLT16 Turbine Acquisition",
+      "quote": "At closing, the Company paid Colusa $ 66.9 million as consideration for the assignment of its contractual delivery rights and paid Baker Hughes $ 64.3 million in satisfaction of overdue milestone"
+    }
+  ]
+}

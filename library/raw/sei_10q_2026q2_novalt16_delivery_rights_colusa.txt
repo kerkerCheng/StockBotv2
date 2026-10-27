@@ -1,0 +1,11 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1697500/000162828026054349/sei-20260630.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Solaris Energy Infrastructure, Inc. Form 10-Q（2026Q2，2026-08-06）：向 Colusa 買下 30 台 Baker Hughes NovaLT16 燃機發電機組的交貨權——付 Colusa 6,690 萬美元換交貨權、另付 Baker Hughes 6,430 萬美元逾期里程碑款
+RETRIEVED: 2026-10-27（本機原文抽字逐字核對）
+
+【附註 NovaLT16 Turbine Acquisition】
+"On March 13, 2026, the Company executed an Assignment, Assumption, Novation and Amendment Agreement (the “Assignment Agreement”) pursuant to which it acquired from Colusa Power Infrastructure Partners, LLC (“Colusa”) all contractual rights to receive 30 NovaLT16 gas turbine generator units (the “NovaLT16 Turbine Acquisition”) from Baker Hughes Energy Services LLC (“Baker Hughes”) under an existing turbine supply contract (the “Turbine Supply Contract”)."
+
+【附註 NovaLT16 Turbine Acquisition】
+"At closing, the Company paid Colusa $ 66.9 million as consideration for the assignment of its contractual delivery rights and paid Baker Hughes $ 64.3 million in satisfaction of overdue milestone"

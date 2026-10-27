@@ -1,0 +1,84 @@
+{
+  "claims": [
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：Fermi 之後的申報寫出這批燃機交貨權／採購承諾被轉讓出去、取消，或改用電網／其他電源。核查頻率：每季（Fermi 季報）。觸發後 48 小時：降這條邊 confidence，重讀燃氣渦輪發電機組層的需求側。",
+      "id": "frmi_10q_2026q2_sgt800_acquired_from_mad_energy_cl1",
+      "source_ids": [
+        "frmi_10q_2026q2_sgt800_acquired_from_mad_energy_s1"
+      ],
+      "statement": "Fermi 10-Q (Q2 2026): its first six Siemens SGT-800 gas turbines were acquired from MAD Energy, with Fermi assuming a net profits interest payable to MAD Energy — the units came via another holder rather than a new-build order. Reading this as a sign of slot scarcity is our inference; the filing does not say why.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:gas_turbine_genset",
+      "id": "e1",
+      "relation": "depends_on",
+      "source_ids": [
+        "frmi_10q_2026q2_sgt800_acquired_from_mad_energy_s1"
+      ],
+      "src_id": "co:fermi"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "end_demand",
+      "aliases": [
+        "Fermi Inc.",
+        "Fermi America"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "co:fermi",
+      "name": "Fermi Inc.",
+      "role": null,
+      "source_ids": [
+        "frmi_10q_2026q2_sgt800_acquired_from_mad_energy_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "gas turbine generator set",
+        "gas turbine generator units",
+        "燃气轮机发电机组"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:gas_turbine_genset",
+      "name": "Gas turbine generator set for onsite power",
+      "role": null,
+      "source_ids": [
+        "frmi_10q_2026q2_sgt800_acquired_from_mad_energy_s1"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "frmi_10q_2026q2_sgt800_acquired_from_mad_energy",
+    "evidence_tier": 1,
+    "origin_entity": "Fermi Inc.",
+    "permission_basis": "SEC EDGAR 公開申報（10-Q）；只保留研究必要的有限逐字節錄。published_at 取 EDGAR 申報日 2026-08-14。",
+    "published_at": "2026-08-14",
+    "publisher": "SEC EDGAR（Form 10-Q，accession 0002071778-26-000051）",
+    "retrieved_at": "2026-10-27",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Fermi Inc. Form 10-Q（2026Q2，2026-08-14）：首批六台 Siemens SGT-800 燃機是向 MAD Energy 收購（Firebird Acquisition），並承擔給 MAD Energy 的淨利分成",
+    "url": "https://www.sec.gov/Archives/edgar/data/2071778/000207177826000051/frmi-20260630.htm"
+  },
+  "sources": [
+    {
+      "id": "frmi_10q_2026q2_sgt800_acquired_from_mad_energy_s1",
+      "locator": "附註 Contingent Consideration",
+      "quote": "In connection with the acquisition of the Company’s first six Siemens SGT-800 gas turbines from MAD Energy (the “Firebird Acquisition”), the Company assumed an obligation to pay MAD Energy a net profits interest (the “NPI”)."
+    }
+  ]
+}

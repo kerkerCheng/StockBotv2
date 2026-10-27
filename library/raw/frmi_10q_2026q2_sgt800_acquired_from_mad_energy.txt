@@ -1,0 +1,8 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/2071778/000207177826000051/frmi-20260630.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Fermi Inc. Form 10-Q（2026Q2，2026-08-14）：首批六台 Siemens SGT-800 燃機是向 MAD Energy 收購（Firebird Acquisition），並承擔給 MAD Energy 的淨利分成
+RETRIEVED: 2026-10-27（本機原文抽字逐字核對）
+
+【附註 Contingent Consideration】
+"In connection with the acquisition of the Company’s first six Siemens SGT-800 gas turbines from MAD Energy (the “Firebird Acquisition”), the Company assumed an obligation to pay MAD Energy a net profits interest (the “NPI”)."

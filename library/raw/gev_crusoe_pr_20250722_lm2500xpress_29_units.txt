@@ -1,0 +1,14 @@
+Source URL: https://www.crusoe.ai/resources/newsroom/ge-vernova-and-crusoe-announce-major-29-unit-gas-turbine-deal
+
+Excerpt:
+[EXCERPT — 有限逐字引文] GE Vernova 與 Crusoe 聯合新聞稿（2025-07-22，Crusoe newsroom）：29 台 LM2500XPRESS 航改型燃機機組給 Crusoe AI 資料中心（2024-12 先訂 10 台、2025-06 再訂 19 台，合計近 1 GW），可脫離電網啟動
+RETRIEVED: 2026-10-27（本機原文抽字逐字核對）
+
+【導言】
+"(NYSE: GEV) and Crusoe, the industry’s first vertically integrated AI infrastructure provider, today announced a significant deal to deliver 29 units of GE Vernova’s breakthrough LM2500XPRESS aeroderivative gas turbine packages to Crusoe AI data centers."
+
+【LM2500XPRESS units 段】
+"Each of GE Vernova’s LM2500XPRESS, dual fuel, power packages is comprised of a LM2500* aeroderivative gas turbine, gas compressor, and emissions control system, and is capable of starting independent of the power grid with five-minute fast start capability."
+
+【訂單段】
+"The announced order of 19 units, booked in June 2025, builds on the first series of 10 units Crusoe ordered in December 2024, and combined, is expected to provide nearly 1GW of electricity."

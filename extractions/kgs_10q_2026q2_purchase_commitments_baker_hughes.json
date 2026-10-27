@@ -1,0 +1,103 @@
+{
+  "claims": [
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：Kodiak 之後的申報寫出這批燃機交貨權／採購承諾被轉讓出去、取消，或改用電網／其他電源。核查頻率：每季（Kodiak 季報）。觸發後 48 小時：降這條邊 confidence，重讀燃氣渦輪發電機組層的需求側。",
+      "id": "kgs_10q_2026q2_purchase_commitments_baker_hughes_cl1",
+      "source_ids": [
+        "kgs_10q_2026q2_purchase_commitments_baker_hughes_s1",
+        "kgs_10q_2026q2_purchase_commitments_baker_hughes_s2",
+        "kgs_10q_2026q2_purchase_commitments_baker_hughes_s3"
+      ],
+      "statement": "Kodiak 10-Q (Q2 2026): purchase commitments for new compression and power generation units ordered but not received were USD 2.5 billion at 2026-06-30 (USD 587.9 million within twelve months), including the multi-year Baker Hughes power generation arrangement. The 10-Q does not split power generation from compression, and does not itself say 'gas turbine' — the turbine identification comes from the 2026-07-08 joint release.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.65,
+      "dst_id": "tech:gas_turbine_genset",
+      "id": "e1",
+      "relation": "depends_on",
+      "source_ids": [
+        "kgs_10q_2026q2_purchase_commitments_baker_hughes_s1",
+        "kgs_10q_2026q2_purchase_commitments_baker_hughes_s2",
+        "kgs_10q_2026q2_purchase_commitments_baker_hughes_s3"
+      ],
+      "src_id": "co:kodiak_gas_services"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "Kodiak Gas Services, Inc."
+      ],
+      "attributes": {
+        "ticker": "KGS"
+      },
+      "confidence": 0.85,
+      "id": "co:kodiak_gas_services",
+      "name": "Kodiak Gas Services",
+      "role": null,
+      "source_ids": [
+        "kgs_10q_2026q2_purchase_commitments_baker_hughes_s1",
+        "kgs_10q_2026q2_purchase_commitments_baker_hughes_s2",
+        "kgs_10q_2026q2_purchase_commitments_baker_hughes_s3"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "gas turbine generator set",
+        "gas turbine generator units",
+        "燃气轮机发电机组"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:gas_turbine_genset",
+      "name": "Gas turbine generator set for onsite power",
+      "role": null,
+      "source_ids": [
+        "kgs_10q_2026q2_purchase_commitments_baker_hughes_s1",
+        "kgs_10q_2026q2_purchase_commitments_baker_hughes_s2",
+        "kgs_10q_2026q2_purchase_commitments_baker_hughes_s3"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "kgs_10q_2026q2_purchase_commitments_baker_hughes",
+    "evidence_tier": 1,
+    "origin_entity": "Kodiak Gas Services, Inc.",
+    "permission_basis": "SEC EDGAR 公開申報（10-Q）；只保留研究必要的有限逐字節錄。published_at 取 EDGAR 申報日 2026-08-07。",
+    "published_at": "2026-08-07",
+    "publisher": "SEC EDGAR（Form 10-Q，accession 0001767042-26-000055）",
+    "retrieved_at": "2026-10-27",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Kodiak Gas Services, Inc. Form 10-Q（2026Q2，2026-08-07）：採購承諾 25 億美元（新壓縮與發電機組），內含 Baker Hughes 多年期發電方案安排",
+    "url": "https://www.sec.gov/Archives/edgar/data/1767042/000176704226000055/kgs-20260630.htm"
+  },
+  "sources": [
+    {
+      "id": "kgs_10q_2026q2_purchase_commitments_baker_hughes_s1",
+      "locator": "附註 Purchase Commitments",
+      "quote": "Purchase commitments primarily consist of future commitments to purchase new compression and power generation units that have been ordered but not yet received."
+    },
+    {
+      "id": "kgs_10q_2026q2_purchase_commitments_baker_hughes_s2",
+      "locator": "附註 Purchase Commitments",
+      "quote": "As of June 30, 2026, these commitments amounted to $ 2.5 billion, of which $ 587.9 million is expected to be settled within the next twelve months."
+    },
+    {
+      "id": "kgs_10q_2026q2_purchase_commitments_baker_hughes_s3",
+      "locator": "附註 Purchase Commitments",
+      "quote": "Included within these future commitments is a multi-year strategic arrangement whereby Baker Hughes will provide power generation solutions to support Kodiak’s expanding energy infrastructure initiatives."
+    }
+  ]
+}

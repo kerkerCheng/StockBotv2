@@ -1,0 +1,95 @@
+{
+  "claims": [
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：FTAI 之後的 10-Q／10-K 寫出 FTAI Power 收掉、暫停改裝，或 Mod-1 首批交機延後到 2028 年以後。核查頻率：每季（FTAI 10-Q）。觸發後 48 小時：降這條邊 confidence，重讀航改型燃機層。",
+      "id": "ftai_10q_2026q2_ftai_power_aeroderivative_cl1",
+      "source_ids": [
+        "ftai_10q_2026q2_ftai_power_aeroderivative_s1",
+        "ftai_10q_2026q2_ftai_power_aeroderivative_s2"
+      ],
+      "statement": "FTAI 10-Q (Q2 2026): FTAI Power, launched 2025-12-30, converts CFM56 aircraft engines to aeroderivative power turbines; it appears only as expenses inside Corporate and Other — not yet a revenue line as of 2026-06-30.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "tech:aeroderivative_gas_turbine",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "ftai_10q_2026q2_ftai_power_aeroderivative_s1",
+        "ftai_10q_2026q2_ftai_power_aeroderivative_s2"
+      ],
+      "src_id": "co:ftai"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "FTAI Aviation Ltd.",
+        "FTAI Power"
+      ],
+      "attributes": {
+        "ticker": "FTAI"
+      },
+      "confidence": 0.85,
+      "id": "co:ftai",
+      "name": "FTAI Aviation",
+      "role": null,
+      "source_ids": [
+        "ftai_10q_2026q2_ftai_power_aeroderivative_s1",
+        "ftai_10q_2026q2_ftai_power_aeroderivative_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "aeroderivative gas turbine",
+        "aeroderivative power turbines",
+        "aeroderivative gas turbine packages"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:aeroderivative_gas_turbine",
+      "name": "Aeroderivative gas turbine generator package",
+      "role": null,
+      "source_ids": [
+        "ftai_10q_2026q2_ftai_power_aeroderivative_s1",
+        "ftai_10q_2026q2_ftai_power_aeroderivative_s2"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "ftai_10q_2026q2_ftai_power_aeroderivative",
+    "evidence_tier": 1,
+    "origin_entity": "FTAI Aviation Ltd.",
+    "permission_basis": "SEC EDGAR 公開申報（10-Q）；只保留研究必要的有限逐字節錄。published_at 取 EDGAR 申報日 2026-07-31。",
+    "published_at": "2026-07-31",
+    "publisher": "SEC EDGAR（Form 10-Q，accession 0001628280-26-051412）",
+    "retrieved_at": "2026-10-27",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "FTAI Aviation Ltd. Form 10-Q（2026Q2，2026-07-31）：FTAI Power 把 CFM56 航空引擎改成航改型發電渦輪；FTAI Power 目前只以費用列在 Corporate and Other",
+    "url": "https://www.sec.gov/Archives/edgar/data/1590364/000162828026051412/ftai-20260630.htm"
+  },
+  "sources": [
+    {
+      "id": "ftai_10q_2026q2_ftai_power_aeroderivative_s1",
+      "locator": "附註 業務概述",
+      "quote": "On December 30, 2025, the Company announced the launch of FTAI Power, a platform focused on converting CFM56 aircraft engines to aeroderivative power turbines."
+    },
+    {
+      "id": "ftai_10q_2026q2_ftai_power_aeroderivative_s2",
+      "locator": "附註 分部",
+      "quote": "Additionally, Corporate and Other also includes results from an offshore energy business, which consists of equipment that support offshore oil and gas activities and production, and expenses relating to FTAI Power."
+    }
+  ]
+}

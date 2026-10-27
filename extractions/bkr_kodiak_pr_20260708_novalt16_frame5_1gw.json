@@ -1,0 +1,148 @@
+{
+  "claims": [
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：Baker Hughes 或 Kodiak 之後的申報或新聞稿寫出這批資料中心燃機機組訂單取消、延後超過一年，或交機後性能未達標被扣款／退機；或買方一手寫出改用別家機組。核查頻率：每季（Baker Hughes 或 Kodiak 季報）。觸發後 48 小時：降這條邊 confidence，重讀燃氣渦輪發電機組層。",
+      "id": "bkr_kodiak_pr_20260708_novalt16_frame5_1gw_cl1",
+      "source_ids": [
+        "bkr_kodiak_pr_20260708_novalt16_frame5_1gw_s1",
+        "bkr_kodiak_pr_20260708_novalt16_frame5_1gw_s2",
+        "bkr_kodiak_pr_20260708_novalt16_frame5_1gw_s3"
+      ],
+      "statement": "Baker Hughes and Kodiak (joint release, 2026-07-08): multi-year agreement; the initial award is about 1 GW of NovaLT16 and Frame 5 gas turbines plus BRUSH generators, delivered by 2030 for behind-the-meter power serving data center and energy infrastructure demand, with a framework up to 1.8 GW. Joint supplier–customer announcement; the data-center share of the 1 GW is not stated.",
+      "subject_id": "e1"
+    },
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：Kodiak 之後的申報寫出這批燃機交貨權／採購承諾被轉讓出去、取消，或改用電網／其他電源。核查頻率：每季（Kodiak 季報）。觸發後 48 小時：降這條邊 confidence，重讀燃氣渦輪發電機組層的需求側。",
+      "id": "bkr_kodiak_pr_20260708_novalt16_frame5_1gw_cl2",
+      "source_ids": [
+        "bkr_kodiak_pr_20260708_novalt16_frame5_1gw_s1",
+        "bkr_kodiak_pr_20260708_novalt16_frame5_1gw_s2",
+        "bkr_kodiak_pr_20260708_novalt16_frame5_1gw_s3"
+      ],
+      "statement": "Kodiak, a gas compression services provider, committed to about 1 GW of Baker Hughes gas turbines and generators for behind-the-meter power by 2030.",
+      "subject_id": "e2"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:gas_turbine_genset",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "bkr_kodiak_pr_20260708_novalt16_frame5_1gw_s1",
+        "bkr_kodiak_pr_20260708_novalt16_frame5_1gw_s2",
+        "bkr_kodiak_pr_20260708_novalt16_frame5_1gw_s3"
+      ],
+      "src_id": "co:baker_hughes"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:gas_turbine_genset",
+      "id": "e2",
+      "relation": "depends_on",
+      "source_ids": [
+        "bkr_kodiak_pr_20260708_novalt16_frame5_1gw_s1",
+        "bkr_kodiak_pr_20260708_novalt16_frame5_1gw_s2",
+        "bkr_kodiak_pr_20260708_novalt16_frame5_1gw_s3"
+      ],
+      "src_id": "co:kodiak_gas_services"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "Baker Hughes Company"
+      ],
+      "attributes": {
+        "ticker": "BKR"
+      },
+      "confidence": 0.85,
+      "id": "co:baker_hughes",
+      "name": "Baker Hughes",
+      "role": null,
+      "source_ids": [
+        "bkr_kodiak_pr_20260708_novalt16_frame5_1gw_s1",
+        "bkr_kodiak_pr_20260708_novalt16_frame5_1gw_s2",
+        "bkr_kodiak_pr_20260708_novalt16_frame5_1gw_s3"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "Kodiak Gas Services, Inc."
+      ],
+      "attributes": {
+        "ticker": "KGS"
+      },
+      "confidence": 0.85,
+      "id": "co:kodiak_gas_services",
+      "name": "Kodiak Gas Services",
+      "role": null,
+      "source_ids": [
+        "bkr_kodiak_pr_20260708_novalt16_frame5_1gw_s1",
+        "bkr_kodiak_pr_20260708_novalt16_frame5_1gw_s2",
+        "bkr_kodiak_pr_20260708_novalt16_frame5_1gw_s3"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "gas turbine generator set",
+        "gas turbine generator units",
+        "燃气轮机发电机组"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:gas_turbine_genset",
+      "name": "Gas turbine generator set for onsite power",
+      "role": null,
+      "source_ids": [
+        "bkr_kodiak_pr_20260708_novalt16_frame5_1gw_s1",
+        "bkr_kodiak_pr_20260708_novalt16_frame5_1gw_s2",
+        "bkr_kodiak_pr_20260708_novalt16_frame5_1gw_s3"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "bkr_kodiak_pr_20260708_novalt16_frame5_1gw",
+    "evidence_tier": 1,
+    "origin_entity": "Baker Hughes Company",
+    "permission_basis": "Baker Hughes 與 Kodiak 公開聯合新聞稿；只保留研究必要的有限逐字節錄。published_at 取稿頭「July 08, 2026」。",
+    "published_at": "2026-07-08",
+    "publisher": "Baker Hughes Investor Relations（GlobeNewswire）",
+    "retrieved_at": "2026-10-27",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "Kodiak Gas Services 與 Baker Hughes 聯合新聞稿（2026-07-08，Baker Hughes IR）：多年期燃機訂單框架，首批約 1 GW 燃機與發電機（NovaLT16、Frame 5、BRUSH 發電機）2030 年前交，做表後供電；框架上看 1.8 GW",
+    "url": "https://investors.bakerhughes.com/news/press-releases/news-details/2026/Kodiak-Gas-Services-Baker-Hughes-Announce-Multi-Year-Gas-Turbine-Order-Agreement-to-Support-U-S--Data-Center-Growth/default.aspx"
+  },
+  "sources": [
+    {
+      "id": "bkr_kodiak_pr_20260708_novalt16_frame5_1gw_s1",
+      "locator": "副標",
+      "quote": "Initial major award includes approximately 1 GW of gas turbines and generators delivered by 2030 to support scalable, behind-the-meter power solutions"
+    },
+    {
+      "id": "bkr_kodiak_pr_20260708_novalt16_frame5_1gw_s2",
+      "locator": "導言",
+      "quote": "Kodiak Gas Services, Inc. (NYSE: KGS) (“Kodiak”), a leading provider of critical energy infrastructure, and Baker Hughes (NASDAQ: BKR), an energy technology company, announced Wednesday a multi-year strategic agreement under which Baker Hughes will provide power generation solutions to support Kodiak’s expanding energy infrastructure initiatives."
+    },
+    {
+      "id": "bkr_kodiak_pr_20260708_novalt16_frame5_1gw_s3",
+      "locator": "訂單內容",
+      "quote": "The initial major order includes NovaLT™16 gas turbines, Frame 5 gas turbines and BRUSH™ Power Generation generators, providing core technologies to deliver dependable power for growing data center and energy infrastructure demand."
+    }
+  ]
+}

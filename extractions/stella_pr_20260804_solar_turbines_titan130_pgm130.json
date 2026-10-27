@@ -1,0 +1,125 @@
+{
+  "claims": [
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：Caterpillar 或 Stella 之後的申報或新聞稿寫出這批資料中心燃機機組訂單取消、延後超過一年，或交機後性能未達標被扣款／退機；或買方一手寫出改用別家機組。核查頻率：每季（Caterpillar 或 Stella 季報）。觸發後 48 小時：降這條邊 confidence，重讀燃氣渦輪發電機組層。",
+      "id": "stella_pr_20260804_solar_turbines_titan130_pgm130_cl1",
+      "source_ids": [
+        "stella_pr_20260804_solar_turbines_titan130_pgm130_s1",
+        "stella_pr_20260804_solar_turbines_titan130_pgm130_s2"
+      ],
+      "statement": "Buyer's press release (Stella Power Company, 2026-08-04): secured a large (unquantified) number of PGM130 power generation packages powered by the Titan 130 gas turbine from Solar Turbines, a Caterpillar company, as the backbone of onsite power projects for large users including data centers. No unit count, MW or value disclosed; data centers are one of several listed end users.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:gas_turbine_genset",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "stella_pr_20260804_solar_turbines_titan130_pgm130_s1",
+        "stella_pr_20260804_solar_turbines_titan130_pgm130_s2"
+      ],
+      "src_id": "co:caterpillar"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:onsite_gas_power",
+      "id": "e2",
+      "relation": "is_component_of",
+      "source_ids": [
+        "stella_pr_20260804_solar_turbines_titan130_pgm130_s1",
+        "stella_pr_20260804_solar_turbines_titan130_pgm130_s2"
+      ],
+      "src_id": "tech:gas_turbine_genset"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "Caterpillar Inc."
+      ],
+      "attributes": {
+        "ticker": "CAT"
+      },
+      "confidence": 0.85,
+      "id": "co:caterpillar",
+      "name": "Caterpillar",
+      "role": null,
+      "source_ids": [
+        "stella_pr_20260804_solar_turbines_titan130_pgm130_s1",
+        "stella_pr_20260804_solar_turbines_titan130_pgm130_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "gas turbine generator set",
+        "gas turbine generator units",
+        "燃气轮机发电机组"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:gas_turbine_genset",
+      "name": "Gas turbine generator set for onsite power",
+      "role": null,
+      "source_ids": [
+        "stella_pr_20260804_solar_turbines_titan130_pgm130_s1",
+        "stella_pr_20260804_solar_turbines_titan130_pgm130_s2"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "onsite natural gas power",
+        "onsite gas power",
+        "behind-the-meter natural gas generation",
+        "onsite natural gas and power generation"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:onsite_gas_power",
+      "name": "Onsite natural gas power generation for data centers",
+      "role": null,
+      "source_ids": [
+        "stella_pr_20260804_solar_turbines_titan130_pgm130_s1",
+        "stella_pr_20260804_solar_turbines_titan130_pgm130_s2"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "stella_pr_20260804_solar_turbines_titan130_pgm130",
+    "evidence_tier": 1,
+    "origin_entity": "Stella Power Company",
+    "permission_basis": "Stella Power Company 公開新聞稿（Business Wire 發布、Morningstar 轉載）；只保留研究必要的有限逐字節錄。published_at 取網址中的 Business Wire 發布日 20260804。",
+    "published_at": "2026-08-04",
+    "publisher": "Business Wire（Morningstar 轉載）",
+    "retrieved_at": "2026-10-27",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "Stella Power Company 新聞稿（Business Wire，2026-08-04；Morningstar 轉載）：向 Caterpillar 旗下 Solar Turbines 買大量 PGM130 發電機組（Titan 130 燃機），做資料中心等大用戶的現場發電",
+    "url": "https://www.morningstar.com/news/business-wire/20260804219412/stella-power-company-secures-major-turbine-order-from-caterpillars-solar-turbines-to-accelerate-power-deployment"
+  },
+  "sources": [
+    {
+      "id": "stella_pr_20260804_solar_turbines_titan130_pgm130_s1",
+      "locator": "導言",
+      "quote": "Stella Power Company, an independent power producer sponsored by Arroyo Investors (“Arroyo”), has secured a large quantity of PGM130 power generation packages, powered by the Titan™ 130 gas turbine, from Solar ® Turbines, a Caterpillar company."
+    },
+    {
+      "id": "stella_pr_20260804_solar_turbines_titan130_pgm130_s2",
+      "locator": "第 2 段",
+      "quote": "The turbine fleet forms the backbone of Stella Power Company’s expanding portfolio of onsite power generation projects designed to deliver firm, utility-scale power to large energy users (e.g., data centers, industrial facilities, oil & gas, critical infrastructure) across North America."
+    }
+  ]
+}

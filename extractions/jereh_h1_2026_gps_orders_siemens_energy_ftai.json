@@ -1,0 +1,184 @@
+{
+  "claims": [
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：杰瑞 之後的申報或新聞稿寫出這批資料中心燃機機組訂單取消、延後超過一年，或交機後性能未達標被扣款／退機；或買方一手寫出改用別家機組。核查頻率：每季（杰瑞 季報）。觸發後 48 小時：降這條邊 confidence，重讀燃氣渦輪發電機組層。",
+      "id": "jereh_h1_2026_gps_orders_siemens_energy_ftai_cl1",
+      "source_ids": [
+        "jereh_h1_2026_gps_orders_siemens_energy_ftai_s3"
+      ],
+      "statement": "Jereh H1 2026 report: since November 2025 its gas turbine generator sets and related equipment have kept winning orders with ample backlog, but most deliveries fall in 2027 or later, so the new business contributed little to H1 revenue and profit. Orders are signed; they are not yet in the numbers.",
+      "subject_id": "e1"
+    },
+    {
+      "confidence": 0.65,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：杰瑞或西門子能源之後的公告寫出合作終止，或寫出 GPS 的燃機核心來自別家。核查頻率：每半年（杰瑞定期報告）。觸發後 48 小時：降這條邊 confidence，重讀燃氣渦輪發電機組層的供給側。",
+      "id": "jereh_h1_2026_gps_orders_siemens_energy_ftai_cl2",
+      "source_ids": [
+        "jereh_h1_2026_gps_orders_siemens_energy_ftai_s1"
+      ],
+      "statement": "Jereh signed an SGT gas turbine strategic cooperation agreement with Siemens Energy during H1 2026, to jointly provide power solutions for data centers, industrial manufacturing and oil & gas. The report does not say which SGT models, volumes, or whether GPS's US orders use Siemens turbines.",
+      "subject_id": "e2"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:gas_turbine_genset",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "jereh_h1_2026_gps_orders_siemens_energy_ftai_s3"
+      ],
+      "src_id": "co:jereh"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "co:siemens_energy",
+      "id": "e2",
+      "relation": "partnership_with",
+      "source_ids": [
+        "jereh_h1_2026_gps_orders_siemens_energy_ftai_s1"
+      ],
+      "src_id": "co:jereh"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "co:ftai",
+      "id": "e3",
+      "relation": "partnership_with",
+      "source_ids": [
+        "jereh_h1_2026_gps_orders_siemens_energy_ftai_s2",
+        "jereh_h1_2026_gps_orders_siemens_energy_ftai_s4"
+      ],
+      "src_id": "co:jereh"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "Yantai Jereh Oilfield Services Group Co., Ltd.",
+        "烟台杰瑞石油服务集团股份有限公司",
+        "Jereh Group"
+      ],
+      "attributes": {
+        "ticker": "002353.SZ"
+      },
+      "confidence": 0.85,
+      "id": "co:jereh",
+      "name": "Jereh",
+      "role": null,
+      "source_ids": [
+        "jereh_h1_2026_gps_orders_siemens_energy_ftai_s1",
+        "jereh_h1_2026_gps_orders_siemens_energy_ftai_s2",
+        "jereh_h1_2026_gps_orders_siemens_energy_ftai_s3",
+        "jereh_h1_2026_gps_orders_siemens_energy_ftai_s4"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "Siemens Energy AG",
+        "西门子能源"
+      ],
+      "attributes": {
+        "ticker": "ENR.DE"
+      },
+      "confidence": 0.85,
+      "id": "co:siemens_energy",
+      "name": "Siemens Energy",
+      "role": null,
+      "source_ids": [
+        "jereh_h1_2026_gps_orders_siemens_energy_ftai_s1",
+        "jereh_h1_2026_gps_orders_siemens_energy_ftai_s2",
+        "jereh_h1_2026_gps_orders_siemens_energy_ftai_s3",
+        "jereh_h1_2026_gps_orders_siemens_energy_ftai_s4"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "FTAI Aviation Ltd.",
+        "FTAI Power"
+      ],
+      "attributes": {
+        "ticker": "FTAI"
+      },
+      "confidence": 0.85,
+      "id": "co:ftai",
+      "name": "FTAI Aviation",
+      "role": null,
+      "source_ids": [
+        "jereh_h1_2026_gps_orders_siemens_energy_ftai_s1",
+        "jereh_h1_2026_gps_orders_siemens_energy_ftai_s2",
+        "jereh_h1_2026_gps_orders_siemens_energy_ftai_s3",
+        "jereh_h1_2026_gps_orders_siemens_energy_ftai_s4"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "gas turbine generator set",
+        "gas turbine generator units",
+        "燃气轮机发电机组"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:gas_turbine_genset",
+      "name": "Gas turbine generator set for onsite power",
+      "role": null,
+      "source_ids": [
+        "jereh_h1_2026_gps_orders_siemens_energy_ftai_s1",
+        "jereh_h1_2026_gps_orders_siemens_energy_ftai_s2",
+        "jereh_h1_2026_gps_orders_siemens_energy_ftai_s3",
+        "jereh_h1_2026_gps_orders_siemens_energy_ftai_s4"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "jereh_h1_2026_gps_orders_siemens_energy_ftai",
+    "evidence_tier": 1,
+    "origin_entity": "烟台杰瑞石油服务集团股份有限公司",
+    "permission_basis": "深交所上市公司公開定期報告（巨潮資訊網）；只保留研究必要的有限逐字節錄。published_at 取巨潮資訊網公告日 2026-08-14。",
+    "published_at": "2026-08-14",
+    "publisher": "深圳證券交易所（巨潮資訊網）",
+    "retrieved_at": "2026-10-27",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "杰瑞股份（002353.SZ）2026 年半年度報告（2026-08-14）：自 2025-11 起燃機發電機組持續接單、大部分 2027 年以後交付、本期貢獻有限；與西門子能源簽 SGT 燃機戰略合作、與 FTAI Power 簽戰略合資協議；外文名稱縮寫 Jereh Group",
+    "url": "http://static.cninfo.com.cn/finalpage/2026-08-14/1225472540.PDF"
+  },
+  "sources": [
+    {
+      "id": "jereh_h1_2026_gps_orders_siemens_energy_ftai_s1",
+      "locator": "第三節 業務概要",
+      "quote": "报告期内，公司与西门子能源签署 SGT 燃气轮机战略合作协议，双方在燃气发电领域的合作进一步深化，将共同为数据中心、工业制造及油气能源等领域提供更为高效、绿色、智能的电力解决方案。"
+    },
+    {
+      "id": "jereh_h1_2026_gps_orders_siemens_energy_ftai_s2",
+      "locator": "第三節 業務概要",
+      "quote": "公司与美国知名航空发动机公司 FTAI Power 签署战略合资协议"
+    },
+    {
+      "id": "jereh_h1_2026_gps_orders_siemens_energy_ftai_s3",
+      "locator": "經營情況 （4）電力及數據中心業務尚未進入集中交付期",
+      "quote": "自 2025 年 11 月以来，公司燃气轮机发电机组及配套设备持续取得订单，订单储备充足。但由于相关订单履约周期相对较长，大部分订单交付时间在 2027 年及以后，报告期内尚未达到集中交付节点，因此新业务订单对报告期收入和利润贡献相对有限。"
+    },
+    {
+      "id": "jereh_h1_2026_gps_orders_siemens_energy_ftai_s4",
+      "locator": "第二節 公司簡介",
+      "quote": "公司的外文名称缩写（如有） Jereh Group"
+    }
+  ]
+}

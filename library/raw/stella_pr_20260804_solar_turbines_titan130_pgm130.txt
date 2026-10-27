@@ -1,0 +1,11 @@
+Source URL: https://www.morningstar.com/news/business-wire/20260804219412/stella-power-company-secures-major-turbine-order-from-caterpillars-solar-turbines-to-accelerate-power-deployment
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Stella Power Company 新聞稿（Business Wire，2026-08-04；Morningstar 轉載）：向 Caterpillar 旗下 Solar Turbines 買大量 PGM130 發電機組（Titan 130 燃機），做資料中心等大用戶的現場發電
+RETRIEVED: 2026-10-27（本機原文抽字逐字核對）
+
+【導言】
+"Stella Power Company, an independent power producer sponsored by Arroyo Investors (“Arroyo”), has secured a large quantity of PGM130 power generation packages, powered by the Titan™ 130 gas turbine, from Solar ® Turbines, a Caterpillar company."
+
+【第 2 段】
+"The turbine fleet forms the backbone of Stella Power Company’s expanding portfolio of onsite power generation projects designed to deliver firm, utility-scale power to large energy users (e.g., data centers, industrial facilities, oil & gas, critical infrastructure) across North America."
