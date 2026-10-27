@@ -1,0 +1,155 @@
+{
+  "claims": [
+    {
+      "confidence": 0.65,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：表後燃氣電廠的許可、整合商申報或客戶文件普遍寫明不配 BESS（只靠機組本身處理負載擺動），或 ProPetro 之後的申報寫出 60 MW 案改成不含電池。核查頻率：每季。觸發後 48 小時：重讀 BESS 是必需層還是選配層，調整這條邊與反向路徑的 confidence。",
+      "id": "pump_8k_20251027_propwr_60mw_bess_recip_hybrid_cl1",
+      "source_ids": [
+        "pump_8k_20251027_propwr_60mw_bess_recip_hybrid_s2",
+        "pump_8k_20251027_propwr_60mw_bess_recip_hybrid_s3"
+      ],
+      "statement": "ProPetro's PROPWR 60 MW long-term contract for a hyperscaler data center in the US Midwest (2025-10-27) uses a hybrid system combining battery energy storage (BESS) with natural gas reciprocating engine generators, designed to manage rapid load swings — BESS appears as a component of this onsite gas power design. The BESS supplier is not named.",
+      "subject_id": "e1"
+    },
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：ProPetro 之後的申報寫出 60 MW 合約終止、延後部署，或 PROPWR 退出資料中心。核查頻率：每季（ProPetro 10-Q）。觸發後 48 小時：降這條邊 confidence。",
+      "id": "pump_8k_20251027_propwr_60mw_bess_recip_hybrid_cl2",
+      "source_ids": [
+        "pump_8k_20251027_propwr_60mw_bess_recip_hybrid_s1",
+        "pump_8k_20251027_propwr_60mw_bess_recip_hybrid_s2",
+        "pump_8k_20251027_propwr_60mw_bess_recip_hybrid_s4"
+      ],
+      "statement": "ProPetro (PROPWR division) committed 60 MW of power under a long-term contract to a leading hyperscaler data center operator in the US Midwest, deployment slated from Q2 2026, using gas reciprocating engines plus BESS. The hyperscaler is not named.",
+      "subject_id": "e2"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "tech:onsite_gas_power",
+      "id": "e1",
+      "relation": "is_component_of",
+      "source_ids": [
+        "pump_8k_20251027_propwr_60mw_bess_recip_hybrid_s2",
+        "pump_8k_20251027_propwr_60mw_bess_recip_hybrid_s3"
+      ],
+      "src_id": "tech:onsite_power_bess"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:onsite_gas_power",
+      "id": "e2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "pump_8k_20251027_propwr_60mw_bess_recip_hybrid_s1",
+        "pump_8k_20251027_propwr_60mw_bess_recip_hybrid_s2",
+        "pump_8k_20251027_propwr_60mw_bess_recip_hybrid_s4"
+      ],
+      "src_id": "co:propetro"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "onsite power BESS",
+        "hybrid battery and gas engine power system"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:onsite_power_bess",
+      "name": "Battery energy storage for load-swing buffering in onsite gas power",
+      "role": null,
+      "source_ids": [
+        "pump_8k_20251027_propwr_60mw_bess_recip_hybrid_s1",
+        "pump_8k_20251027_propwr_60mw_bess_recip_hybrid_s2",
+        "pump_8k_20251027_propwr_60mw_bess_recip_hybrid_s3",
+        "pump_8k_20251027_propwr_60mw_bess_recip_hybrid_s4"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "onsite natural gas power",
+        "onsite gas power",
+        "behind-the-meter natural gas generation",
+        "onsite natural gas and power generation"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:onsite_gas_power",
+      "name": "Onsite natural gas power generation for data centers",
+      "role": null,
+      "source_ids": [
+        "pump_8k_20251027_propwr_60mw_bess_recip_hybrid_s1",
+        "pump_8k_20251027_propwr_60mw_bess_recip_hybrid_s2",
+        "pump_8k_20251027_propwr_60mw_bess_recip_hybrid_s3",
+        "pump_8k_20251027_propwr_60mw_bess_recip_hybrid_s4"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "ProPetro Holding Corp.",
+        "PROPWR"
+      ],
+      "attributes": {
+        "ticker": "PUMP"
+      },
+      "confidence": 0.85,
+      "id": "co:propetro",
+      "name": "ProPetro",
+      "role": null,
+      "source_ids": [
+        "pump_8k_20251027_propwr_60mw_bess_recip_hybrid_s1",
+        "pump_8k_20251027_propwr_60mw_bess_recip_hybrid_s2",
+        "pump_8k_20251027_propwr_60mw_bess_recip_hybrid_s3",
+        "pump_8k_20251027_propwr_60mw_bess_recip_hybrid_s4"
+      ],
+      "type": "Company"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "pump_8k_20251027_propwr_60mw_bess_recip_hybrid",
+    "evidence_tier": 1,
+    "origin_entity": "ProPetro Holding Corp.",
+    "permission_basis": "SEC EDGAR 公開申報（8-K 附件新聞稿）；只保留研究必要的有限逐字節錄。published_at 取 EDGAR 申報日 2025-10-27。",
+    "published_at": "2025-10-27",
+    "publisher": "SEC EDGAR（Form 8-K Exhibit 99.1，accession 0001680247-25-000139）",
+    "retrieved_at": "2026-10-27",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "ProPetro 新聞稿（8-K Exhibit 99.1，2025-10-27）：PROPWR 簽 60 MW 長約供電給中西部超大規模業者資料中心——BESS＋高效燃氣往復式機組混合系統，用來處理快速負載擺動，2026 年第二季開始部署",
+    "url": "https://www.sec.gov/Archives/edgar/data/1680247/000168024725000139/propwrdatacenterannounceme.htm"
+  },
+  "sources": [
+    {
+      "id": "pump_8k_20251027_propwr_60mw_bess_recip_hybrid_s1",
+      "locator": "新聞稿導言",
+      "quote": "its PROPWR ℠ division has secured a long-term power supply contract to commit 60 megawatts of reliable energy to support a leading hyperscaler data center ope rator in the Midwest region of the United States."
+    },
+    {
+      "id": "pump_8k_20251027_propwr_60mw_bess_recip_hybrid_s2",
+      "locator": "新聞稿導言",
+      "quote": "Under the terms of the contract, PROPWR will deploy an innovative hybrid energy system that combines battery energy storage solution (BESS) technology with high-efficiency natural gas reciprocating engine generators."
+    },
+    {
+      "id": "pump_8k_20251027_propwr_60mw_bess_recip_hybrid_s3",
+      "locator": "新聞稿導言",
+      "quote": "This advanced configuration is designed to effectively manage rapid load swings, ensuring continuous, stable power delivery while enhancing grid resiliency and operational flexibility."
+    },
+    {
+      "id": "pump_8k_20251027_propwr_60mw_bess_recip_hybrid_s4",
+      "locator": "新聞稿導言",
+      "quote": "Deployment and operations are slated to begin in Q2 2026"
+    }
+  ]
+}

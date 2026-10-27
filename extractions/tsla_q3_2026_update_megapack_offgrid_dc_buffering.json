@@ -1,0 +1,93 @@
+{
+  "claims": [
+    {
+      "confidence": 0.5,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：Tesla 之後的季度更新不再提資料中心、或儲能在手訂單轉降。核查頻率：每季（Tesla 季度更新）。觸發後 48 小時：降這條邊 confidence。",
+      "id": "tsla_q3_2026_update_megapack_offgrid_dc_buffering_cl1",
+      "source_ids": [
+        "tsla_q3_2026_update_megapack_offgrid_dc_buffering_s1",
+        "tsla_q3_2026_update_megapack_offgrid_dc_buffering_s2"
+      ],
+      "statement": "Tesla Q3 2026 update (2026-10-21): Megapack is used in off-grid and on-grid applications, supplying large data center loads and buffering oscillating demand 'with less local fossil fuel generation'; energy storage order rate and backlog at record highs. It does not name any specific onsite gas plant using Megapack.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.55,
+      "dst_id": "tech:onsite_power_bess",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "tsla_q3_2026_update_megapack_offgrid_dc_buffering_s1",
+        "tsla_q3_2026_update_megapack_offgrid_dc_buffering_s2"
+      ],
+      "src_id": "co:tesla"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "Tesla, Inc."
+      ],
+      "attributes": {
+        "ticker": "TSLA"
+      },
+      "confidence": 0.85,
+      "id": "co:tesla",
+      "name": "Tesla",
+      "role": null,
+      "source_ids": [
+        "tsla_q3_2026_update_megapack_offgrid_dc_buffering_s1",
+        "tsla_q3_2026_update_megapack_offgrid_dc_buffering_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "onsite power BESS",
+        "hybrid battery and gas engine power system"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:onsite_power_bess",
+      "name": "Battery energy storage for load-swing buffering in onsite gas power",
+      "role": null,
+      "source_ids": [
+        "tsla_q3_2026_update_megapack_offgrid_dc_buffering_s1",
+        "tsla_q3_2026_update_megapack_offgrid_dc_buffering_s2"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "tsla_q3_2026_update_megapack_offgrid_dc_buffering",
+    "evidence_tier": 1,
+    "origin_entity": "Tesla, Inc.",
+    "permission_basis": "SEC EDGAR 公開申報（8-K 附件季度更新）；只保留研究必要的有限逐字節錄。published_at 取 EDGAR 申報日 2026-10-21。",
+    "published_at": "2026-10-21",
+    "publisher": "SEC EDGAR（Form 8-K Exhibit 99.1，accession 0001628280-26-066738）",
+    "retrieved_at": "2026-10-27",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Tesla 2026 第三季更新（8-K Exhibit 99.1，2026-10-21）：Megapack 用於離網與併網，供應大型資料中心負載、緩衝擺盪需求；儲能訂單率與在手訂單創新高；德州 Megafactory 投產（規劃 50 GWh）",
+    "url": "https://www.sec.gov/Archives/edgar/data/1318605/000162828026066738/exhibit9914.htm"
+  },
+  "sources": [
+    {
+      "id": "tsla_q3_2026_update_megapack_offgrid_dc_buffering_s1",
+      "locator": "Energy Generation and Storage",
+      "quote": "Megapack excels in off-grid and on-grid applications, supplying large data center loads, buffering oscillating demand, helping interconnection grid-compliance and strengthening the grid – all with less local fossil fuel generation."
+    },
+    {
+      "id": "tsla_q3_2026_update_megapack_offgrid_dc_buffering_s2",
+      "locator": "Highlights",
+      "quote": "Demand for our Energy Storage business remained strong in the quarter, with our highest- ever order rate and backlog. Energy storage is the fastest way to add power to the existing grid and is critical to data center uptime."
+    }
+  ]
+}

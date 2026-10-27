@@ -1,0 +1,17 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1680247/000168024725000139/propwrdatacenterannounceme.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] ProPetro 新聞稿（8-K Exhibit 99.1，2025-10-27）：PROPWR 簽 60 MW 長約供電給中西部超大規模業者資料中心——BESS＋高效燃氣往復式機組混合系統，用來處理快速負載擺動，2026 年第二季開始部署
+RETRIEVED: 2026-10-27（本機原文抽字逐字核對）
+
+【新聞稿導言】
+"its PROPWR ℠ division has secured a long-term power supply contract to commit 60 megawatts of reliable energy to support a leading hyperscaler data center ope rator in the Midwest region of the United States."
+
+【新聞稿導言】
+"Under the terms of the contract, PROPWR will deploy an innovative hybrid energy system that combines battery energy storage solution (BESS) technology with high-efficiency natural gas reciprocating engine generators."
+
+【新聞稿導言】
+"This advanced configuration is designed to effectively manage rapid load swings, ensuring continuous, stable power delivery while enhancing grid resiliency and operational flexibility."
+
+【新聞稿導言】
+"Deployment and operations are slated to begin in Q2 2026"

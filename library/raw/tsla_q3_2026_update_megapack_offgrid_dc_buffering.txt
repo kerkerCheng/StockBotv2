@@ -1,0 +1,11 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1318605/000162828026066738/exhibit9914.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Tesla 2026 第三季更新（8-K Exhibit 99.1，2026-10-21）：Megapack 用於離網與併網，供應大型資料中心負載、緩衝擺盪需求；儲能訂單率與在手訂單創新高；德州 Megafactory 投產（規劃 50 GWh）
+RETRIEVED: 2026-10-27（本機原文抽字逐字核對）
+
+【Energy Generation and Storage】
+"Megapack excels in off-grid and on-grid applications, supplying large data center loads, buffering oscillating demand, helping interconnection grid-compliance and strengthening the grid – all with less local fossil fuel generation."
+
+【Highlights】
+"Demand for our Energy Storage business remained strong in the quarter, with our highest- ever order rate and backlog. Energy storage is the fastest way to add power to the existing grid and is critical to data center uptime."

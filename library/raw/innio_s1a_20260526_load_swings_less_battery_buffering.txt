@@ -1,0 +1,11 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/2109150/000119312526237848/ck0002109150-20260526.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] INNIO S-1/A（2026-05-26）：Jenbacher 引擎可處理 25–40% 動態負載擺動、不需大量電池緩衝；精簡電力架構、減少電池或超級電容等輔助設施
+RETRIEVED: 2026-10-27（本機原文抽字逐字核對）
+
+【Business—Data center】
+"By streamlining the power architecture, our solutions reduce the need for costly auxiliary infrastructure, such as batteries or supercapacitors, thereby driving higher total capex efficiency."
+
+【Business—Data center】
+"These engines achieve start-to-first-load in approximately 15 seconds for backup operation and can manage dynamic load swings of 25-40% without requiring extensive battery buffering, all while maintaining strict power quality tolerances, a key value requirement for AI training and inferencing data center workloads."

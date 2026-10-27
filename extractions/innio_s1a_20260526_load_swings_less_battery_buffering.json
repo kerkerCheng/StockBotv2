@@ -1,0 +1,94 @@
+{
+  "claims": [
+    {
+      "confidence": 0.45,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "條件：表後燃氣電廠的許可、整合商申報或客戶文件普遍寫明不配 BESS（只靠機組本身處理負載擺動），或 ProPetro 之後的申報寫出 60 MW 案改成不含電池。核查頻率：每季。觸發後 48 小時：重讀 BESS 是必需層還是選配層，調整這條邊與反向路徑的 confidence。",
+      "id": "innio_s1a_20260526_load_swings_less_battery_buffering_cl1",
+      "source_ids": [
+        "innio_s1a_20260526_load_swings_less_battery_buffering_s1",
+        "innio_s1a_20260526_load_swings_less_battery_buffering_s2"
+      ],
+      "statement": "INNIO (S-1/A, 2026-05-26) claims its Jenbacher engines manage dynamic load swings of 25–40% without extensive battery buffering and reduce the need for batteries or supercapacitors — a supplier claim that engine design can partly substitute for BESS in onsite data center power. It is the engine maker's own claim; ProPetro's 60 MW design still pairs reciprocating engines with BESS, so substitution is partial and unproven by customer documents.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.45,
+      "dst_id": "tech:onsite_power_bess",
+      "id": "e1",
+      "relation": "competes_with",
+      "source_ids": [
+        "innio_s1a_20260526_load_swings_less_battery_buffering_s1",
+        "innio_s1a_20260526_load_swings_less_battery_buffering_s2"
+      ],
+      "src_id": "tech:gas_reciprocating_genset"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "gas reciprocating engines",
+        "gas engine generator set",
+        "reciprocating gas engine",
+        "gas genset"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:gas_reciprocating_genset",
+      "name": "Gas reciprocating engine generator set",
+      "role": null,
+      "source_ids": [
+        "innio_s1a_20260526_load_swings_less_battery_buffering_s1",
+        "innio_s1a_20260526_load_swings_less_battery_buffering_s2"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "onsite power BESS",
+        "hybrid battery and gas engine power system"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:onsite_power_bess",
+      "name": "Battery energy storage for load-swing buffering in onsite gas power",
+      "role": null,
+      "source_ids": [
+        "innio_s1a_20260526_load_swings_less_battery_buffering_s1",
+        "innio_s1a_20260526_load_swings_less_battery_buffering_s2"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "innio_s1a_20260526_load_swings_less_battery_buffering",
+    "evidence_tier": 1,
+    "origin_entity": "INNIO",
+    "permission_basis": "SEC EDGAR 公開申報（S-1/A 註冊說明書修正版）；只保留研究必要的有限逐字節錄。published_at 取 EDGAR 申報日 2026-05-26（檔名 ck0002109150-20260526）。",
+    "published_at": "2026-05-26",
+    "publisher": "SEC EDGAR（Form S-1/A，CIK 0002109150）",
+    "retrieved_at": "2026-10-27",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "INNIO S-1/A（2026-05-26）：Jenbacher 引擎可處理 25–40% 動態負載擺動、不需大量電池緩衝；精簡電力架構、減少電池或超級電容等輔助設施",
+    "url": "https://www.sec.gov/Archives/edgar/data/2109150/000119312526237848/ck0002109150-20260526.htm"
+  },
+  "sources": [
+    {
+      "id": "innio_s1a_20260526_load_swings_less_battery_buffering_s1",
+      "locator": "Business—Data center",
+      "quote": "By streamlining the power architecture, our solutions reduce the need for costly auxiliary infrastructure, such as batteries or supercapacitors, thereby driving higher total capex efficiency."
+    },
+    {
+      "id": "innio_s1a_20260526_load_swings_less_battery_buffering_s2",
+      "locator": "Business—Data center",
+      "quote": "These engines achieve start-to-first-load in approximately 15 seconds for backup operation and can manage dynamic load swings of 25-40% without requiring extensive battery buffering, all while maintaining strict power quality tolerances, a key value requirement for AI training and inferencing data center workloads."
+    }
+  ]
+}
