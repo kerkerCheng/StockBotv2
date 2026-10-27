@@ -1,0 +1,104 @@
+{
+  "claims": [
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：Enerflex 之後的季報或 6-K 寫出表後發電在手訂單下降、專案取消或交期延到 2028 年以後，或 Engineered Systems 擴產投資縮減。核查頻率：每季（Enerflex 季報）。觸發後 48 小時：降這條邊 confidence，重讀現場燃氣發電層的機組整合商讀法。",
+      "id": "efxt_6k_20261013_btm_gas_power_award_backlog_1_75gw_cl1",
+      "source_ids": [
+        "efxt_6k_20261013_btm_gas_power_award_backlog_1_75gw_s1",
+        "efxt_6k_20261013_btm_gas_power_award_backlog_1_75gw_s2",
+        "efxt_6k_20261013_btm_gas_power_award_backlog_1_75gw_s3"
+      ],
+      "statement": "Enerflex 6-K (2026-10-13): contracted to design, engineer, fabricate and assemble over 1 GW of low-emission behind-the-meter natural-gas-fired power generation units for a large-scale North American data center development; with the ~450 MW award of 2026-10-01, its behind-the-meter gas power backlog exceeds 1.75 GW, deliveries through 2028; about USD 100 million authorized to expand Engineered Systems facilities. Customers are not named, and the release does not say whether the units use reciprocating engines or turbines, or whose.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "tech:onsite_gas_power",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "efxt_6k_20261013_btm_gas_power_award_backlog_1_75gw_s1",
+        "efxt_6k_20261013_btm_gas_power_award_backlog_1_75gw_s2",
+        "efxt_6k_20261013_btm_gas_power_award_backlog_1_75gw_s3"
+      ],
+      "src_id": "co:enerflex"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "Enerflex Ltd."
+      ],
+      "attributes": {
+        "ticker": "EFXT"
+      },
+      "confidence": 0.85,
+      "id": "co:enerflex",
+      "name": "Enerflex",
+      "role": null,
+      "source_ids": [
+        "efxt_6k_20261013_btm_gas_power_award_backlog_1_75gw_s1",
+        "efxt_6k_20261013_btm_gas_power_award_backlog_1_75gw_s2",
+        "efxt_6k_20261013_btm_gas_power_award_backlog_1_75gw_s3"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "onsite natural gas power",
+        "onsite gas power",
+        "behind-the-meter natural gas generation",
+        "onsite natural gas and power generation"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:onsite_gas_power",
+      "name": "Onsite natural gas power generation for data centers",
+      "role": null,
+      "source_ids": [
+        "efxt_6k_20261013_btm_gas_power_award_backlog_1_75gw_s1",
+        "efxt_6k_20261013_btm_gas_power_award_backlog_1_75gw_s2",
+        "efxt_6k_20261013_btm_gas_power_award_backlog_1_75gw_s3"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "efxt_6k_20261013_btm_gas_power_award_backlog_1_75gw",
+    "evidence_tier": 1,
+    "origin_entity": "Enerflex Ltd.",
+    "permission_basis": "SEC EDGAR 公開申報（6-K 附件新聞稿）；只保留研究必要的有限逐字節錄。published_at 取新聞稿日期行「CALGARY, Alberta, October 13, 2026」。",
+    "published_at": "2026-10-13",
+    "publisher": "SEC EDGAR（Form 6-K Exhibit 99.1，accession 0001193125-26-419999）",
+    "retrieved_at": "2026-10-27",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Enerflex 新聞稿（6-K Exhibit 99.1，2026-10-13）：拿到超過 1 GW 低排放表後燃氣發電機組設計製造案（北美大型資料中心開發案），表後燃氣發電在手超過 1.75 GW、交期到 2028；授權約 1 億美元擴充 Engineered Systems 產能",
+    "url": "https://www.sec.gov/Archives/edgar/data/1904856/000119312526419999/efxt-ex99_1.htm"
+  },
+  "sources": [
+    {
+      "id": "efxt_6k_20261013_btm_gas_power_award_backlog_1_75gw_s1",
+      "locator": "新聞稿導言",
+      "quote": "The Company has been contracted to design, engineer, fabricate, and assemble over one gigawatt of low emission behind-the-meter natural gas-fired power generation units for a large-scale North American data center development."
+    },
+    {
+      "id": "efxt_6k_20261013_btm_gas_power_award_backlog_1_75gw_s2",
+      "locator": "新聞稿導言",
+      "quote": "Combined with additional project awards, including approximately 450 megawatts announced on October 1, 2026, Enerflex’s backlog of behind-the-meter natural gas-fired power generation now exceeds 1.75 gigawatts, with deliveries extending through 2028."
+    },
+    {
+      "id": "efxt_6k_20261013_btm_gas_power_award_backlog_1_75gw_s3",
+      "locator": "產能投資",
+      "quote": "As previously announced, Enerflex has authorized approximately $100 million of investments in its ES facilities and capabilities, $15 million of which is included in Enerflex’s capital expenditure guidance for 2026."
+    }
+  ]
+}

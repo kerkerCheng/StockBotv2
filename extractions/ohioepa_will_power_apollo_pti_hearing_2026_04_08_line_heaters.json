@@ -1,0 +1,95 @@
+{
+  "claims": [
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：Ohio EPA 的最終許可或 Will-Power 之後的申請把 line heaters 拿掉，或其他表後燃氣電廠許可普遍沒有燃料加熱／調壓設備。核查頻率：每半年（新的表後電廠許可）。觸發後 48 小時：重讀這一層是不是表後燃氣電廠的必要單元。",
+      "id": "ohioepa_will_power_apollo_pti_hearing_2026_04_08_line_heaters_cl1",
+      "source_ids": [
+        "ohioepa_will_power_apollo_pti_hearing_2026_04_08_line_heaters_s1",
+        "ohioepa_will_power_apollo_pti_hearing_2026_04_08_line_heaters_s2"
+      ],
+      "statement": "Ohio EPA hearing deck (2026-04-08) for Will-Power OH LLC's Apollo behind-the-meter power station in Bowling Green, Ohio (power for a co-located customer): 6 natural-gas RICE generators, 21 natural-gas turbine generators, 2 diesel emergency engines and 22 line heaters — fuel-gas line heating is a listed unit of a behind-the-meter gas plant. The deck names no equipment suppliers and does not name the co-located customer.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:onsite_gas_power",
+      "id": "e1",
+      "relation": "is_component_of",
+      "source_ids": [
+        "ohioepa_will_power_apollo_pti_hearing_2026_04_08_line_heaters_s1",
+        "ohioepa_will_power_apollo_pti_hearing_2026_04_08_line_heaters_s2"
+      ],
+      "src_id": "tech:onsite_fuel_gas_conditioning"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "line heaters",
+        "fuel gas line heater",
+        "fuel gas conditioning skid"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:onsite_fuel_gas_conditioning",
+      "name": "Fuel gas conditioning for onsite gas power (line heaters, regulation, filtration)",
+      "role": null,
+      "source_ids": [
+        "ohioepa_will_power_apollo_pti_hearing_2026_04_08_line_heaters_s1",
+        "ohioepa_will_power_apollo_pti_hearing_2026_04_08_line_heaters_s2"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "onsite natural gas power",
+        "onsite gas power",
+        "behind-the-meter natural gas generation",
+        "onsite natural gas and power generation"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:onsite_gas_power",
+      "name": "Onsite natural gas power generation for data centers",
+      "role": null,
+      "source_ids": [
+        "ohioepa_will_power_apollo_pti_hearing_2026_04_08_line_heaters_s1",
+        "ohioepa_will_power_apollo_pti_hearing_2026_04_08_line_heaters_s2"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "ohioepa_will_power_apollo_pti_hearing_2026_04_08_line_heaters",
+    "evidence_tier": 1,
+    "origin_entity": "Ohio EPA",
+    "permission_basis": "Ohio EPA 公開簡報 PDF；只保留研究必要的有限逐字節錄。published_at 取封面「April 8, 2026」。source_type 標 news：這是主管機關的說明會簡報，不是許可本身。",
+    "published_at": "2026-04-08",
+    "publisher": "Ohio EPA（Division of Air Pollution Control，公開說明會與聽證簡報）",
+    "retrieved_at": "2026-10-27",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "Ohio EPA 公開說明會與聽證簡報（2026-04-08）：Will-Power OH LLC Apollo 表後電廠空污設置許可草案——6 台燃氣往復式機組、21 台燃氣渦輪機組、2 台柴油緊急機組、22 台燃料管線加熱器（line heaters）",
+    "url": "https://dam.assets.ohio.gov/image/upload/epa.ohio.gov/Portals/47/citizen/042026-Will-Power-OH-LLC-Apollo-PTIHearing.pdf"
+  },
+  "sources": [
+    {
+      "id": "ohioepa_will_power_apollo_pti_hearing_2026_04_08_line_heaters_s1",
+      "locator": "p.4 Will-Power – Apollo Overview",
+      "quote": "Will-Power is proposing to install a behind-the-meter power station in Bowling Green, Ohio – House internal combustion engines and turbines to provide power to co-located customer"
+    },
+    {
+      "id": "ohioepa_will_power_apollo_pti_hearing_2026_04_08_line_heaters_s2",
+      "locator": "p.4 Will-Power – Apollo Overview",
+      "quote": "Natural gas fired RICE engine generators (6) • Natural gas fired turbine generators (21) • Diesel fired emergency engines (2) • Line heaters (22)"
+    }
+  ]
+}

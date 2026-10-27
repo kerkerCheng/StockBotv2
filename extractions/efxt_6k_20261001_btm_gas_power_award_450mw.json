@@ -1,0 +1,95 @@
+{
+  "claims": [
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：Enerflex 之後的季報或 6-K 寫出表後發電在手訂單下降、專案取消或交期延到 2028 年以後，或 Engineered Systems 擴產投資縮減。核查頻率：每季（Enerflex 季報）。觸發後 48 小時：降這條邊 confidence，重讀現場燃氣發電層的機組整合商讀法。",
+      "id": "efxt_6k_20261001_btm_gas_power_award_450mw_cl1",
+      "source_ids": [
+        "efxt_6k_20261001_btm_gas_power_award_450mw_s1",
+        "efxt_6k_20261001_btm_gas_power_award_450mw_s2"
+      ],
+      "statement": "Enerflex 6-K (2026-10-01): contracted to design, engineer, fabricate and assemble about 450 MW of behind-the-meter natural-gas-fired power generation units for a North American data center developer, built in its North American plants, deliveries 2027–2028. The developer is not named.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "tech:onsite_gas_power",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "efxt_6k_20261001_btm_gas_power_award_450mw_s1",
+        "efxt_6k_20261001_btm_gas_power_award_450mw_s2"
+      ],
+      "src_id": "co:enerflex"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "Enerflex Ltd."
+      ],
+      "attributes": {
+        "ticker": "EFXT"
+      },
+      "confidence": 0.85,
+      "id": "co:enerflex",
+      "name": "Enerflex",
+      "role": null,
+      "source_ids": [
+        "efxt_6k_20261001_btm_gas_power_award_450mw_s1",
+        "efxt_6k_20261001_btm_gas_power_award_450mw_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "onsite natural gas power",
+        "onsite gas power",
+        "behind-the-meter natural gas generation",
+        "onsite natural gas and power generation"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:onsite_gas_power",
+      "name": "Onsite natural gas power generation for data centers",
+      "role": null,
+      "source_ids": [
+        "efxt_6k_20261001_btm_gas_power_award_450mw_s1",
+        "efxt_6k_20261001_btm_gas_power_award_450mw_s2"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "efxt_6k_20261001_btm_gas_power_award_450mw",
+    "evidence_tier": 1,
+    "origin_entity": "Enerflex Ltd.",
+    "permission_basis": "SEC EDGAR 公開申報（6-K 附件新聞稿）；只保留研究必要的有限逐字節錄。published_at 取新聞稿日期行「CALGARY, Alberta, October 1, 2026」。",
+    "published_at": "2026-10-01",
+    "publisher": "SEC EDGAR（Form 6-K Exhibit 99.1，accession 0001193125-26-410172）",
+    "retrieved_at": "2026-10-27",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Enerflex 新聞稿（6-K Exhibit 99.1，2026-10-01）：拿到約 450 MW 表後燃氣發電機組設計製造案（北美資料中心開發商），2027 年開始交貨、2028 年完成",
+    "url": "https://www.sec.gov/Archives/edgar/data/1904856/000119312526410172/efxt-ex99_1.htm"
+  },
+  "sources": [
+    {
+      "id": "efxt_6k_20261001_btm_gas_power_award_450mw_s1",
+      "locator": "新聞稿導言",
+      "quote": "The Company has been contracted to design, engineer, fabricate, and assemble approximately 450 megawatts of behind-the-meter natural gas-fired power generation units for a North American data center developer."
+    },
+    {
+      "id": "efxt_6k_20261001_btm_gas_power_award_450mw_s2",
+      "locator": "新聞稿導言",
+      "quote": "The project will be executed through Enerflex's North American manufacturing operations with deliveries scheduled to commence in 2027 and be completed in 2028."
+    }
+  ]
+}

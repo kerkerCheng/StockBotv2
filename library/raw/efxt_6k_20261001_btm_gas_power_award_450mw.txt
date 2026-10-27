@@ -1,0 +1,11 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1904856/000119312526410172/efxt-ex99_1.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Enerflex 新聞稿（6-K Exhibit 99.1，2026-10-01）：拿到約 450 MW 表後燃氣發電機組設計製造案（北美資料中心開發商），2027 年開始交貨、2028 年完成
+RETRIEVED: 2026-10-27（本機原文抽字逐字核對）
+
+【新聞稿導言】
+"The Company has been contracted to design, engineer, fabricate, and assemble approximately 450 megawatts of behind-the-meter natural gas-fired power generation units for a North American data center developer."
+
+【新聞稿導言】
+"The project will be executed through Enerflex's North American manufacturing operations with deliveries scheduled to commence in 2027 and be completed in 2028."

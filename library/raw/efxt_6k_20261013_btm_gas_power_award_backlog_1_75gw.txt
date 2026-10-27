@@ -1,0 +1,14 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1904856/000119312526419999/efxt-ex99_1.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Enerflex 新聞稿（6-K Exhibit 99.1，2026-10-13）：拿到超過 1 GW 低排放表後燃氣發電機組設計製造案（北美大型資料中心開發案），表後燃氣發電在手超過 1.75 GW、交期到 2028；授權約 1 億美元擴充 Engineered Systems 產能
+RETRIEVED: 2026-10-27（本機原文抽字逐字核對）
+
+【新聞稿導言】
+"The Company has been contracted to design, engineer, fabricate, and assemble over one gigawatt of low emission behind-the-meter natural gas-fired power generation units for a large-scale North American data center development."
+
+【新聞稿導言】
+"Combined with additional project awards, including approximately 450 megawatts announced on October 1, 2026, Enerflex’s backlog of behind-the-meter natural gas-fired power generation now exceeds 1.75 gigawatts, with deliveries extending through 2028."
+
+【產能投資】
+"As previously announced, Enerflex has authorized approximately $100 million of investments in its ES facilities and capabilities, $15 million of which is included in Enerflex’s capital expenditure guidance for 2026."
