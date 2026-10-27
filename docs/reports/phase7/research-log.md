@@ -175,3 +175,13 @@
 **發現未排程**：
 - trigger 文字的實體推斷不認名冊短名（例：「Micron」解析不到 `co:micron`），停放時要手動給 `trace_trigger_entities`（1 例）。
 - 華城（1519.TW）邊緣、在大型變壓器層，敘事還沒寫——下一輪 research-drain 的「邊緣卻沒敘事」。
+
+**段 5 續（10-28 凌晨）——上面那次 exit 0 是假閉包**：[859]–[876] 同日隨包登記的 29 家還沒有頁面、快照與價格歷史，不在母體裡（failure log #106，第 1 次）。手動補齊（`webapp materialize <29 檔>`、`engine_c/etl_yfinance.py <29 檔>`、`engine_c.history_backfill --incremental --tickers <29 檔>`，都是 daily 本來就會跑的同一支）之後，可推進 11 檔，處置如下：
+- 新鏈主題組先鑄號：**[882]** AI 資料中心表後燃氣發電供應鏈（INNIO、PSI、ERock 三檔等權；排除 Accelleron、B&W、CECO、Johnson Matthey、Enerflex、Stabilis、Superior Plus 與大型股，理由逐條寫在提案裡）。燃氣鏈 9 檔邊緣的第一份敘事——含組外那 6 檔——一律等 [882] 落地（failure log #26：新鏈的第一份敘事以鏈計）；組外 7 檔機器擋不到，本輪以 `--skip` 顯式排除。
+- 華城（1519.TW）第一份敘事 `ib_2ae40aa82fb3b49a`：騎大型電力變壓器層，候選狀態「缺」（`ew_1679`，11-15 叫醒）——缺口流向它的一手（具名美國客戶、在手訂單、交期）沒有，2026 年 1–9 月營收約與去年持平。一手：2025 年報（MOPS 抓取，`library/raw/mops_1519_annual_report_2025.txt`）。已定價①補完價格歷史後有值（P/S 自家三年百分位 34.7）。
+- 仕佳光子（688313.SS）第一份敘事 `ib_372daa54addd62e5`：騎 CW DFB 層，候選狀態「缺」（`ew_1683`，2027-04-30 叫醒）——騎的那一層只占營收零頭（2026 上半年 DFB 相關產品 4,890 萬元，光晶片及器件 12.43 億元），大頭在 AWG 與高密度光纖連接器（不在圖上）。一手：2025 年報、2026-10-24 定增問詢回復與募集說明書（節錄 `library/raw/shijia_688313_placement_docs_20261024_revenue_mix_customers_excerpt.txt`）。已定價與出現在數字裡都量不到（中國申報人沒有機械財報來源）。
+- closure-gate exit 0：`--skip 300943.SZ ARBE ACLN.SW BW CECO EFXT JMAT.L SLNG SPB.TO`（300943.SZ 卡世界、ARBE 卡 [881]、其餘 7 檔卡 [882]）。心跳「邊緣卻沒敘事」會是 9（燃氣鏈，全掛 [882]）。
+
+**發現未排程（續）**：
+- 電力主題組（`tc_1a8d8a8911b327d5`）照準則可補華城（主業就是變壓器）；本輪沒鑄 v2——現有敘事不需要它，組中位數只是脈絡（1 例）。
+- 仕佳的營收大頭（AWG、MPO／MMC 高密度連接器）不在圖上；若要押它，是那兩層的層深讀（1 例）。
