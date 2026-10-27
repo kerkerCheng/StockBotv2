@@ -1,0 +1,117 @@
+{
+  "claims": [
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：華城之後的法說簡報或年報寫出外銷訂單取消／遞延、台中廠擴建延後或停建，或月營收連續三個月年減。核查頻率：每季（法說簡報、季報）＋每月營收。觸發後 48 小時：降這條邊 confidence，重讀大型電力變壓器層的供給側讀法。",
+      "id": "fortune_1519_investor_deck_2025_12_12_500kv_gsu_export_cl1",
+      "source_ids": [
+        "fortune_1519_investor_deck_2025_12_12_500kv_gsu_export_s1",
+        "fortune_1519_investor_deck_2025_12_12_500kv_gsu_export_s2",
+        "fortune_1519_investor_deck_2025_12_12_500kv_gsu_export_s3",
+        "fortune_1519_investor_deck_2025_12_12_500kv_gsu_export_s4"
+      ],
+      "statement": "Fortune Electric (1519.TW) investor deck, 2025-12-12: the only 500 kV-class transformer maker in Taiwan; delivered a 525/13.8 kV, 130 MVA generator step-up (GSU) transformer to Arizona, USA; exports exceed 50% of revenue with AIDC named as a growth driver; Taichung plant expansion for extra-high-voltage large power transformers planned to start construction in early 2026 and production in Q2 2027. The deck does not name the Arizona customer or say whether that unit serves a data center or a behind-the-meter plant.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:large_power_transformer",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "fortune_1519_investor_deck_2025_12_12_500kv_gsu_export_s1",
+        "fortune_1519_investor_deck_2025_12_12_500kv_gsu_export_s2",
+        "fortune_1519_investor_deck_2025_12_12_500kv_gsu_export_s3",
+        "fortune_1519_investor_deck_2025_12_12_500kv_gsu_export_s4"
+      ],
+      "src_id": "co:fortune_electric"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "華城電機",
+        "FORTUNE ELECTRIC"
+      ],
+      "attributes": {
+        "ticker": "1519.TW"
+      },
+      "confidence": 0.85,
+      "id": "co:fortune_electric",
+      "name": "Fortune Electric",
+      "role": null,
+      "source_ids": [
+        "fortune_1519_investor_deck_2025_12_12_500kv_gsu_export_s1",
+        "fortune_1519_investor_deck_2025_12_12_500kv_gsu_export_s2",
+        "fortune_1519_investor_deck_2025_12_12_500kv_gsu_export_s3",
+        "fortune_1519_investor_deck_2025_12_12_500kv_gsu_export_s4"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "LPT",
+        "LPTs",
+        "large power transformer",
+        "large power transformers",
+        "초고압 변압기",
+        "extra high voltage power transformer",
+        "extra high voltage power transformers"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:large_power_transformer",
+      "name": "Large Power Transformer (LPT)",
+      "role": null,
+      "source_ids": [
+        "fortune_1519_investor_deck_2025_12_12_500kv_gsu_export_s1",
+        "fortune_1519_investor_deck_2025_12_12_500kv_gsu_export_s2",
+        "fortune_1519_investor_deck_2025_12_12_500kv_gsu_export_s3",
+        "fortune_1519_investor_deck_2025_12_12_500kv_gsu_export_s4"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "fortune_1519_investor_deck_2025_12_12_500kv_gsu_export",
+    "evidence_tier": 1,
+    "origin_entity": "華城電機股份有限公司",
+    "permission_basis": "公開資訊觀測站法說會簡報 PDF；只保留研究必要的有限逐字節錄。published_at 取簡報封面日期 2025-12-12。",
+    "published_at": "2025-12-12",
+    "publisher": "公開資訊觀測站（法說會簡報 151920251212M001）",
+    "retrieved_at": "2026-10-27",
+    "source_type": "ir_deck",
+    "storage_permission": "repo_excerpt",
+    "title": "華城電機（1519）2025 年法說會簡報（2025-12-12，公開資訊觀測站）：國內唯一 500kV 級變壓器、交付美國亞利桑那 525/13.8 kV、130 MVA GSU；外銷占比突破五成、AIDC；台中廠擴建超高壓大容量電力變壓器、預計 2027 年第二季投產",
+    "url": "https://mopsov.twse.com.tw/nas/STR/151920251212M001.pdf"
+  },
+  "sources": [
+    {
+      "id": "fortune_1519_investor_deck_2025_12_12_500kv_gsu_export_s1",
+      "locator": "p.4 公司概況（台中廠）",
+      "quote": "國內唯一500kV級變壓器及東南亞最大電力變壓器生產基地"
+    },
+    {
+      "id": "fortune_1519_investor_deck_2025_12_12_500kv_gsu_export_s2",
+      "locator": "p.12 創新研發-極端氣候地區用",
+      "quote": "華城成功交付 525/13.8 kV、130 MVA GSU 變壓器至美國亞利桑那州，確保其在 50°C 極端高溫下長期穩定運行。"
+    },
+    {
+      "id": "fortune_1519_investor_deck_2025_12_12_500kv_gsu_export_s3",
+      "locator": "p.9 與時俱進、掌握商機、穩健成長",
+      "quote": "AIDC 外銷/台電營收持續成長、外銷佔比突破50%以上"
+    },
+    {
+      "id": "fortune_1519_investor_deck_2025_12_12_500kv_gsu_export_s4",
+      "locator": "p.5 公司概況（台中廠擴建）",
+      "quote": "目前規劃中，預計2026年初動工興建，預計2027年 第二季開始投產 ◼ 內/外銷超高壓大容量電力變壓器"
+    }
+  ]
+}
