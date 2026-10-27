@@ -1,0 +1,187 @@
+{
+  "claims": [
+    {
+      "confidence": 0.9,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：Anthropic 之後的 S-1 修正版、10-Q 或 10-K 寫出固定或最低保證承諾下降、合約終止或重議延後。核查頻率：每季（S-1 修正版、上市後 10-Q）。觸發後 48 小時：降這條邊 confidence，重讀 AI 算力建置需求錨。",
+      "id": "anthropic_s1_20261026_commitments_power_equipment_cl1",
+      "source_ids": [
+        "anthropic_s1_20261026_commitments_power_equipment_s1",
+        "anthropic_s1_20261026_commitments_power_equipment_s2",
+        "anthropic_s1_20261026_commitments_power_equipment_s3",
+        "anthropic_s1_20261026_commitments_power_equipment_s4"
+      ],
+      "statement": "Anthropic S-1 (2026-10-26): as of 2026-06-30, expected future fixed or minimum guaranteed commitments under its CSP hosting and other third-party infrastructure agreements were about USD 265.6 billion, with terms of one to 20 years (at 2025-12-31 its non-cancelable purchase commitments with remaining terms over one year totalled USD 54.6 billion); further compute agreements without fixed minimums are not included. This is a buyer-side, contractually committed demand signal for AI compute buildout.",
+      "subject_id": "e1"
+    },
+    {
+      "confidence": 0.65,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：Anthropic 之後的申報把這段改寫成交期已正常、不再需要預付，或刪掉高壓變壓器等設備的配額描述；或變壓器廠（HD Hyundai Electric、Hyosung、Prolec GE、華城等）的一手寫出交期明顯縮短。核查頻率：每季。觸發後 48 小時：重讀大型電力變壓器層的需求側讀法。",
+      "id": "anthropic_s1_20261026_commitments_power_equipment_cl2",
+      "source_ids": [
+        "anthropic_s1_20261026_commitments_power_equipment_s5",
+        "anthropic_s1_20261026_commitments_power_equipment_s6",
+        "anthropic_s1_20261026_commitments_power_equipment_s7"
+      ],
+      "statement": "Anthropic S-1 (2026-10-26) risk factors, the buyer's own filing: data center electrical, generation and transmission equipment — some made by only a few manufacturers — must be ordered years in advance with substantial pre-delivery payments; high-voltage transformers, switchgear, turbines, generators, substations and transmission components have faced extended delivery times, price increases and allocation constraints as data center demand grew; Anthropic may buy long-lead generation and electrical equipment above market prices to unlock capacity sooner. Customer-side corroboration that this equipment layer is supply-constrained; no supplier is named.",
+      "subject_id": "e2"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "tech:ai_compute_buildout",
+      "id": "e1",
+      "relation": "enables",
+      "source_ids": [
+        "anthropic_s1_20261026_commitments_power_equipment_s1",
+        "anthropic_s1_20261026_commitments_power_equipment_s2",
+        "anthropic_s1_20261026_commitments_power_equipment_s3",
+        "anthropic_s1_20261026_commitments_power_equipment_s4"
+      ],
+      "src_id": "co:anthropic"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "tech:large_power_transformer",
+      "id": "e2",
+      "relation": "depends_on",
+      "source_ids": [
+        "anthropic_s1_20261026_commitments_power_equipment_s5",
+        "anthropic_s1_20261026_commitments_power_equipment_s6",
+        "anthropic_s1_20261026_commitments_power_equipment_s7"
+      ],
+      "src_id": "co:anthropic"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "end_demand",
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "co:anthropic",
+      "name": "Anthropic",
+      "role": "adjacent_silicon",
+      "source_ids": [
+        "anthropic_s1_20261026_commitments_power_equipment_s1",
+        "anthropic_s1_20261026_commitments_power_equipment_s2",
+        "anthropic_s1_20261026_commitments_power_equipment_s3",
+        "anthropic_s1_20261026_commitments_power_equipment_s4",
+        "anthropic_s1_20261026_commitments_power_equipment_s5",
+        "anthropic_s1_20261026_commitments_power_equipment_s6",
+        "anthropic_s1_20261026_commitments_power_equipment_s7"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "end_demand",
+      "aliases": [
+        "AI data center buildout",
+        "AI system performance drive",
+        "AI frontier lab compute",
+        "AI XPU platform",
+        "HPC AI cluster",
+        "hyperscale AI infrastructure",
+        "AI factory buildout",
+        "agentic AI infrastructure"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:ai_compute_buildout",
+      "name": "AI training/inference cluster buildout",
+      "role": null,
+      "source_ids": [
+        "anthropic_s1_20261026_commitments_power_equipment_s1",
+        "anthropic_s1_20261026_commitments_power_equipment_s2",
+        "anthropic_s1_20261026_commitments_power_equipment_s3",
+        "anthropic_s1_20261026_commitments_power_equipment_s4",
+        "anthropic_s1_20261026_commitments_power_equipment_s5",
+        "anthropic_s1_20261026_commitments_power_equipment_s6",
+        "anthropic_s1_20261026_commitments_power_equipment_s7"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "LPT",
+        "LPTs",
+        "large power transformer",
+        "large power transformers",
+        "초고압 변압기",
+        "extra high voltage power transformer",
+        "extra high voltage power transformers"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:large_power_transformer",
+      "name": "Large Power Transformer (LPT)",
+      "role": null,
+      "source_ids": [
+        "anthropic_s1_20261026_commitments_power_equipment_s1",
+        "anthropic_s1_20261026_commitments_power_equipment_s2",
+        "anthropic_s1_20261026_commitments_power_equipment_s3",
+        "anthropic_s1_20261026_commitments_power_equipment_s4",
+        "anthropic_s1_20261026_commitments_power_equipment_s5",
+        "anthropic_s1_20261026_commitments_power_equipment_s6",
+        "anthropic_s1_20261026_commitments_power_equipment_s7"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "anthropic_s1_20261026_commitments_power_equipment",
+    "evidence_tier": 1,
+    "origin_entity": "Anthropic, PBC",
+    "permission_basis": "SEC EDGAR 公開申報（S-1 註冊說明書）；只保留研究必要的有限逐字節錄。published_at 取封面「As filed with the Securities and Exchange Commission on October 26, 2026」與 EDGAR 索引日。",
+    "published_at": "2026-10-26",
+    "publisher": "SEC EDGAR（Form S-1，accession 0001628280-26-067168）",
+    "retrieved_at": "2026-10-27",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Anthropic, PBC Form S-1（2026-10-26）：截至 2026-06-30 固定或最低保證的算力與基礎設施承諾約 2,656 億美元（一至二十年）；資料中心的電力設備（高壓變壓器、開關櫃、渦輪、發電機、變電站）交期拉長、漲價、配額，要提前數年下單並預付",
+    "url": "https://www.sec.gov/Archives/edgar/data/2130357/000162828026067168/anthropicpbc-sx1.htm"
+  },
+  "sources": [
+    {
+      "id": "anthropic_s1_20261026_commitments_power_equipment_s1",
+      "locator": "財報附註 Commitments",
+      "quote": "These contractual commitments primarily relate to CSP hosting and other third- party infrastructure services agreements."
+    },
+    {
+      "id": "anthropic_s1_20261026_commitments_power_equipment_s2",
+      "locator": "財報附註 Commitments",
+      "quote": "As of June 30, 2026 (unaudited), expected future fixed or minimum guaranteed commitments under these agreements were approximately $265.6 billion with terms ranging from one to 20 years ."
+    },
+    {
+      "id": "anthropic_s1_20261026_commitments_power_equipment_s3",
+      "locator": "財報附註 Commitments",
+      "quote": "Future minimum payments under the Company’s non-cancelable purchase commitments with a remaining term in excess of one year as of December 31, 2025 were as follows (in millions)"
+    },
+    {
+      "id": "anthropic_s1_20261026_commitments_power_equipment_s4",
+      "locator": "財報附註 Commitments 表",
+      "quote": "Total non-cancelable contractual commitments $ 54,559"
+    },
+    {
+      "id": "anthropic_s1_20261026_commitments_power_equipment_s5",
+      "locator": "Risk Factors（資料中心供應鏈）",
+      "quote": "Data centers also require electrical, generation, and transmission equipment, cooling systems, backup generators, and networking hardware, some of which are made by only a few manufacturers, must be ordered years in advance, and require substantial pre-delivery payments that we may not recover if our plans change."
+    },
+    {
+      "id": "anthropic_s1_20261026_commitments_power_equipment_s6",
+      "locator": "Risk Factors（資料中心供應鏈）",
+      "quote": "In addition, certain equipment, such as high-voltage transformers, switchgear, turbines, generators, substations, and transmission components, has been subject to extended delivery timelines, price increases, tariffs and national security requirements, and allocation constraints as demand from data center operators and other large electricity consumers has grown."
+    },
+    {
+      "id": "anthropic_s1_20261026_commitments_power_equipment_s7",
+      "locator": "Risk Factors（資料中心供應鏈）",
+      "quote": "In order to secure near-term access to compute, we may also elect, or be required, to procure long-lead-time generation and electrical equipment at prices above prevailing market rates on the expectation that it can be deployed on an accelerated timeline to unlock capacity in the near term."
+    }
+  ]
+}

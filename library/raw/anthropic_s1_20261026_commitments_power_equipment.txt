@@ -1,0 +1,26 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/2130357/000162828026067168/anthropicpbc-sx1.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Anthropic, PBC Form S-1（2026-10-26）：截至 2026-06-30 固定或最低保證的算力與基礎設施承諾約 2,656 億美元（一至二十年）；資料中心的電力設備（高壓變壓器、開關櫃、渦輪、發電機、變電站）交期拉長、漲價、配額，要提前數年下單並預付
+RETRIEVED: 2026-10-27（本機原文抽字逐字核對）
+
+【財報附註 Commitments】
+"These contractual commitments primarily relate to CSP hosting and other third- party infrastructure services agreements."
+
+【財報附註 Commitments】
+"As of June 30, 2026 (unaudited), expected future fixed or minimum guaranteed commitments under these agreements were approximately $265.6 billion with terms ranging from one to 20 years ."
+
+【財報附註 Commitments】
+"Future minimum payments under the Company’s non-cancelable purchase commitments with a remaining term in excess of one year as of December 31, 2025 were as follows (in millions)"
+
+【財報附註 Commitments 表】
+"Total non-cancelable contractual commitments $ 54,559"
+
+【Risk Factors（資料中心供應鏈）】
+"Data centers also require electrical, generation, and transmission equipment, cooling systems, backup generators, and networking hardware, some of which are made by only a few manufacturers, must be ordered years in advance, and require substantial pre-delivery payments that we may not recover if our plans change."
+
+【Risk Factors（資料中心供應鏈）】
+"In addition, certain equipment, such as high-voltage transformers, switchgear, turbines, generators, substations, and transmission components, has been subject to extended delivery timelines, price increases, tariffs and national security requirements, and allocation constraints as demand from data center operators and other large electricity consumers has grown."
+
+【Risk Factors（資料中心供應鏈）】
+"In order to secure near-term access to compute, we may also elect, or be required, to procure long-lead-time generation and electrical equipment at prices above prevailing market rates on the expectation that it can be deployed on an accelerated timeline to unlock capacity in the near term."
