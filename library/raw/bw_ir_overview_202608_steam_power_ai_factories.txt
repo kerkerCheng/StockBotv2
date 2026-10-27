@@ -1,0 +1,23 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1630805/000163080526000066/bwiroverview-august2026x.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Babcock & Wilcox 投資人簡報（2026-08，隨 8-K 2026-08-10 提交）：Base Electron 24 億美元、1.2 GW、北達科他 Center 附近、2026-08 送 Conditional Use Permit；西門子能源供汽輪發電機組；主打「不依賴燃機交期」、比燃機案快好幾年；另有 140 億美元以上的機會清單
+RETRIEVED: 2026-10-27（本機原文抽字逐字核對）
+
+【p.10 B&W AND BASE ELECTRON】
+"$2.4B, 1.2 GW power project for Base Electron"
+
+【p.10 B&W AND BASE ELECTRON】
+"Project will be located near Center, North Dakota and Conditional Use Permit submitted in August 2026"
+
+【p.10 B&W AND BASE ELECTRON】
+"Siemens Energy supplying steam turbine generator sets"
+
+【p.10 B&W AND BASE ELECTRON】
+"Proven B&W boilers + Siemens Energy turbines enable years-faster deployment over traditional combined- or simple-cycle gas turbine projects"
+
+【p.20 POWERING AI FACTORIES AND DATA CENTERS】
+"No dependence on gas turbine delivery"
+
+【p.20 POWERING AI FACTORIES AND DATA CENTERS】
+"Generate firm MW while gas turbine is still in manufacturing"

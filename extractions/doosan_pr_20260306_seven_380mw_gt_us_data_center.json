@@ -1,0 +1,103 @@
+{
+  "claims": [
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：Doosan Enerbility 之後的公告寫出這份合約取消或延後；或美國資料中心客戶改用別家燃機。核查頻率：每半年（Doosan Enerbility 定期報告）。觸發後 48 小時：降這條邊 confidence。",
+      "id": "doosan_pr_20260306_seven_380mw_gt_us_data_center_cl1",
+      "source_ids": [
+        "doosan_pr_20260306_seven_380mw_gt_us_data_center_s1",
+        "doosan_pr_20260306_seven_380mw_gt_us_data_center_s2",
+        "doosan_pr_20260306_seven_380mw_gt_us_data_center_s3"
+      ],
+      "statement": "Doosan Enerbility (2026-03-06): contract with an unnamed U.S. client for seven 380 MW gas turbines, delivering one gas turbine and one generator per month from May 2029 to a data center the client is building; 12 gas turbines now to deliver in the U.S. Supplier self-report; first delivery is more than three years out.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:gas_turbine_genset",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "doosan_pr_20260306_seven_380mw_gt_us_data_center_s1",
+        "doosan_pr_20260306_seven_380mw_gt_us_data_center_s2",
+        "doosan_pr_20260306_seven_380mw_gt_us_data_center_s3"
+      ],
+      "src_id": "co:doosan_enerbility"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "Doosan Enerbility Co., Ltd."
+      ],
+      "attributes": {
+        "ticker": "034020.KS"
+      },
+      "confidence": 0.85,
+      "id": "co:doosan_enerbility",
+      "name": "Doosan Enerbility",
+      "role": null,
+      "source_ids": [
+        "doosan_pr_20260306_seven_380mw_gt_us_data_center_s1",
+        "doosan_pr_20260306_seven_380mw_gt_us_data_center_s2",
+        "doosan_pr_20260306_seven_380mw_gt_us_data_center_s3"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "gas turbine generator set",
+        "gas turbine generator units",
+        "燃气轮机发电机组"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:gas_turbine_genset",
+      "name": "Gas turbine generator set for onsite power",
+      "role": null,
+      "source_ids": [
+        "doosan_pr_20260306_seven_380mw_gt_us_data_center_s1",
+        "doosan_pr_20260306_seven_380mw_gt_us_data_center_s2",
+        "doosan_pr_20260306_seven_380mw_gt_us_data_center_s3"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "doosan_pr_20260306_seven_380mw_gt_us_data_center",
+    "evidence_tier": 1,
+    "origin_entity": "Doosan Enerbility Co., Ltd.",
+    "permission_basis": "Doosan Enerbility 公開新聞稿（斗山集團官網）；只保留研究必要的有限逐字節錄。published_at 取新聞稿日期 2026-03-06。",
+    "published_at": "2026-03-06",
+    "publisher": "Doosan Corporation 官網新聞稿",
+    "retrieved_at": "2026-10-27",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "Doosan Enerbility 新聞稿（2026-03-06，斗山集團官網）：與美國客戶簽 7 台 380 MW 燃機，2029-05 起每月各交一台燃機與發電機給客戶興建中的資料中心；在美累計 12 台",
+    "url": "https://www.doosan.com/en/media-center/press-release_view?id=20172774"
+  },
+  "sources": [
+    {
+      "id": "doosan_pr_20260306_seven_380mw_gt_us_data_center_s1",
+      "locator": "導言",
+      "quote": "On March 6th, Doosan Enerbility announced that it had signed a contract with a U.S. client to supply the company with seven units of its 380MW gas turbine."
+    },
+    {
+      "id": "doosan_pr_20260306_seven_380mw_gt_us_data_center_s2",
+      "locator": "第 2 段",
+      "quote": "Starting in May 2029, Doosan is to sequentially deliver gas turbines and generators, one of each per month, to the data center being built by the client."
+    },
+    {
+      "id": "doosan_pr_20260306_seven_380mw_gt_us_data_center_s3",
+      "locator": "第 2 段",
+      "quote": "With this recently won contract, Doosan Enerbility now has a total of 12 gas turbines to deliver in the United States."
+    }
+  ]
+}

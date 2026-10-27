@@ -1,0 +1,240 @@
+{
+  "claims": [
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：B&W 之後的 10-Q／8-K 寫出 Base Electron 合約終止、縮減座數、延後商轉超過一年，或北達科他的 Conditional Use Permit 被拒；核查頻率：每季（B&W 10-Q）。觸發後 48 小時：降這條邊 confidence，重讀鍋爐＋汽輪機這條路線。",
+      "id": "bw_10q_2026q2_base_electron_2p4b_four_300mw_cl1",
+      "source_ids": [
+        "bw_10q_2026q2_base_electron_2p4b_four_300mw_s1",
+        "bw_10q_2026q2_base_electron_2p4b_four_300mw_s2",
+        "bw_10q_2026q2_base_electron_2p4b_four_300mw_s3",
+        "bw_10q_2026q2_base_electron_2p4b_four_300mw_s4",
+        "bw_10q_2026q2_base_electron_2p4b_four_300mw_s5",
+        "bw_10q_2026q2_base_electron_2p4b_four_300mw_s6"
+      ],
+      "statement": "B&W 10-Q (Q2 2026): definitive agreement with Base Electron (2026-02-26) to design and install four 300 MW natural gas-fired power plants of boilers and steam turbines for an AI factory; total consideration USD 2.4 billion, of which USD 2.0 billion is variable (reimbursable costs plus mark-up) and the rest a fixed fee; commercial operation targeted 2030; USD 100.7 million recognized in Q2 and 131.7 million year-to-date. Already in reported revenue. Most of the value is cost pass-through, so the contract size overstates B&W's margin pool.",
+      "subject_id": "e1"
+    },
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：Applied Digital 或 B&W 之後的申報寫出 Base Electron 案取消、Applied Digital 退出支持，或改由電網供電。核查頻率：每季（B&W 10-Q）。觸發後 48 小時：降這條邊 confidence。",
+      "id": "bw_10q_2026q2_base_electron_2p4b_four_300mw_cl2",
+      "source_ids": [
+        "bw_10q_2026q2_base_electron_2p4b_four_300mw_s1"
+      ],
+      "statement": "Applied Digital signed the November 2025 limited notice to proceed with B&W for the four 300 MW gas-fired boiler and steam turbine plants to power an AI factory; the definitive agreement was then signed by Base Electron.",
+      "subject_id": "e4"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "tech:gas_fired_boiler",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "bw_10q_2026q2_base_electron_2p4b_four_300mw_s1",
+        "bw_10q_2026q2_base_electron_2p4b_four_300mw_s2",
+        "bw_10q_2026q2_base_electron_2p4b_four_300mw_s3",
+        "bw_10q_2026q2_base_electron_2p4b_four_300mw_s4",
+        "bw_10q_2026q2_base_electron_2p4b_four_300mw_s5",
+        "bw_10q_2026q2_base_electron_2p4b_four_300mw_s6"
+      ],
+      "src_id": "co:babcock_wilcox"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:onsite_gas_power",
+      "id": "e2",
+      "relation": "is_component_of",
+      "source_ids": [
+        "bw_10q_2026q2_base_electron_2p4b_four_300mw_s1"
+      ],
+      "src_id": "tech:gas_fired_boiler"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:onsite_gas_power",
+      "id": "e3",
+      "relation": "is_component_of",
+      "source_ids": [
+        "bw_10q_2026q2_base_electron_2p4b_four_300mw_s1"
+      ],
+      "src_id": "tech:steam_turbine_generator"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:gas_fired_boiler",
+      "id": "e4",
+      "relation": "depends_on",
+      "source_ids": [
+        "bw_10q_2026q2_base_electron_2p4b_four_300mw_s1"
+      ],
+      "src_id": "co:applied_digital"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "Babcock & Wilcox Enterprises, Inc."
+      ],
+      "attributes": {
+        "ticker": "BW"
+      },
+      "confidence": 0.85,
+      "id": "co:babcock_wilcox",
+      "name": "Babcock & Wilcox",
+      "role": null,
+      "source_ids": [
+        "bw_10q_2026q2_base_electron_2p4b_four_300mw_s1",
+        "bw_10q_2026q2_base_electron_2p4b_four_300mw_s2",
+        "bw_10q_2026q2_base_electron_2p4b_four_300mw_s3",
+        "bw_10q_2026q2_base_electron_2p4b_four_300mw_s4",
+        "bw_10q_2026q2_base_electron_2p4b_four_300mw_s5",
+        "bw_10q_2026q2_base_electron_2p4b_four_300mw_s6"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "end_demand",
+      "aliases": [
+        "Applied Digital Corporation"
+      ],
+      "attributes": {
+        "ticker": "APLD"
+      },
+      "confidence": 0.85,
+      "id": "co:applied_digital",
+      "name": "Applied Digital",
+      "role": null,
+      "source_ids": [
+        "bw_10q_2026q2_base_electron_2p4b_four_300mw_s1",
+        "bw_10q_2026q2_base_electron_2p4b_four_300mw_s2",
+        "bw_10q_2026q2_base_electron_2p4b_four_300mw_s3",
+        "bw_10q_2026q2_base_electron_2p4b_four_300mw_s4",
+        "bw_10q_2026q2_base_electron_2p4b_four_300mw_s5",
+        "bw_10q_2026q2_base_electron_2p4b_four_300mw_s6"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "natural gas-fired boilers",
+        "natural-gas boilers"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:gas_fired_boiler",
+      "name": "Natural gas-fired boiler for steam-cycle power",
+      "role": null,
+      "source_ids": [
+        "bw_10q_2026q2_base_electron_2p4b_four_300mw_s1",
+        "bw_10q_2026q2_base_electron_2p4b_four_300mw_s2",
+        "bw_10q_2026q2_base_electron_2p4b_four_300mw_s3",
+        "bw_10q_2026q2_base_electron_2p4b_four_300mw_s4",
+        "bw_10q_2026q2_base_electron_2p4b_four_300mw_s5",
+        "bw_10q_2026q2_base_electron_2p4b_four_300mw_s6"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "steam turbine generator sets",
+        "steam turbines",
+        "steam turbine generator systems"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:steam_turbine_generator",
+      "name": "Steam turbine generator set",
+      "role": null,
+      "source_ids": [
+        "bw_10q_2026q2_base_electron_2p4b_four_300mw_s1",
+        "bw_10q_2026q2_base_electron_2p4b_four_300mw_s2",
+        "bw_10q_2026q2_base_electron_2p4b_four_300mw_s3",
+        "bw_10q_2026q2_base_electron_2p4b_four_300mw_s4",
+        "bw_10q_2026q2_base_electron_2p4b_four_300mw_s5",
+        "bw_10q_2026q2_base_electron_2p4b_four_300mw_s6"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "onsite natural gas power",
+        "onsite gas power",
+        "behind-the-meter natural gas generation",
+        "onsite natural gas and power generation"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:onsite_gas_power",
+      "name": "Onsite natural gas power generation for data centers",
+      "role": null,
+      "source_ids": [
+        "bw_10q_2026q2_base_electron_2p4b_four_300mw_s1",
+        "bw_10q_2026q2_base_electron_2p4b_four_300mw_s2",
+        "bw_10q_2026q2_base_electron_2p4b_four_300mw_s3",
+        "bw_10q_2026q2_base_electron_2p4b_four_300mw_s4",
+        "bw_10q_2026q2_base_electron_2p4b_four_300mw_s5",
+        "bw_10q_2026q2_base_electron_2p4b_four_300mw_s6"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "bw_10q_2026q2_base_electron_2p4b_four_300mw",
+    "evidence_tier": 1,
+    "origin_entity": "Babcock & Wilcox Enterprises, Inc.",
+    "permission_basis": "SEC EDGAR 公開申報（10-Q）；只保留研究必要的有限逐字節錄。published_at 取 EDGAR 申報日 2026-08-10。",
+    "published_at": "2026-08-10",
+    "publisher": "SEC EDGAR（Form 10-Q，accession 0001630805-26-000068）",
+    "retrieved_at": "2026-10-27",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Babcock & Wilcox Enterprises, Inc. Form 10-Q（2026Q2，2026-08-10）：Base Electron 四座 300 MW 燃氣電廠（鍋爐＋汽輪機）24 億美元（20 億變動費＝可報銷成本加成）、2030 商轉；第二季認列 1.007 億美元",
+    "url": "https://www.sec.gov/Archives/edgar/data/1630805/000163080526000068/bw-20260630.htm"
+  },
+  "sources": [
+    {
+      "id": "bw_10q_2026q2_base_electron_2p4b_four_300mw_s1",
+      "locator": "附註 Applied Digital/Base Electron Agreements",
+      "quote": "In November 2025, we entered into a limited notice to proceed (\"LNTP\") with Applied Digital for a project to design and install four 300 -megawatt natural gas-fired power plants consisting of boilers and associated steam turbines to deliver power for an AI factory."
+    },
+    {
+      "id": "bw_10q_2026q2_base_electron_2p4b_four_300mw_s2",
+      "locator": "附註 Revenue Recognition—Base Electron Agreement",
+      "quote": "Effective February 26, 2026, we entered into a written definitive agreement with Base Electron, to complete the design and installation of four 300 -megawatt natural gas-fired power plants."
+    },
+    {
+      "id": "bw_10q_2026q2_base_electron_2p4b_four_300mw_s3",
+      "locator": "附註 Revenue Recognition—Base Electron Agreement",
+      "quote": "The total consideration in exchange for completion of this project is $ 2.4 billion, of which $ 2.0 billion is for variable charges and the remaining is a fixed fee."
+    },
+    {
+      "id": "bw_10q_2026q2_base_electron_2p4b_four_300mw_s4",
+      "locator": "附註 Revenue Recognition—Base Electron Agreement",
+      "quote": "The variable charges are based on reimbursable costs incurred plus mark-up."
+    },
+    {
+      "id": "bw_10q_2026q2_base_electron_2p4b_four_300mw_s5",
+      "locator": "附註 Revenue Recognition—Base Electron Agreement",
+      "quote": "The plant is targeted to begin commercial operation in 2030."
+    },
+    {
+      "id": "bw_10q_2026q2_base_electron_2p4b_four_300mw_s6",
+      "locator": "附註 Revenue Recognition—Base Electron Agreement",
+      "quote": "For the three and six months ended June 30, 2026, we have recognized $ 100.7 million and $ 131.7 million of revenue related to this contract, respectively."
+    }
+  ]
+}

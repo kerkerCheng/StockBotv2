@@ -1,0 +1,23 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1630805/000163080526000068/bw-20260630.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Babcock & Wilcox Enterprises, Inc. Form 10-Q（2026Q2，2026-08-10）：Base Electron 四座 300 MW 燃氣電廠（鍋爐＋汽輪機）24 億美元（20 億變動費＝可報銷成本加成）、2030 商轉；第二季認列 1.007 億美元
+RETRIEVED: 2026-10-27（本機原文抽字逐字核對）
+
+【附註 Applied Digital/Base Electron Agreements】
+"In November 2025, we entered into a limited notice to proceed ("LNTP") with Applied Digital for a project to design and install four 300 -megawatt natural gas-fired power plants consisting of boilers and associated steam turbines to deliver power for an AI factory."
+
+【附註 Revenue Recognition—Base Electron Agreement】
+"Effective February 26, 2026, we entered into a written definitive agreement with Base Electron, to complete the design and installation of four 300 -megawatt natural gas-fired power plants."
+
+【附註 Revenue Recognition—Base Electron Agreement】
+"The total consideration in exchange for completion of this project is $ 2.4 billion, of which $ 2.0 billion is for variable charges and the remaining is a fixed fee."
+
+【附註 Revenue Recognition—Base Electron Agreement】
+"The variable charges are based on reimbursable costs incurred plus mark-up."
+
+【附註 Revenue Recognition—Base Electron Agreement】
+"The plant is targeted to begin commercial operation in 2030."
+
+【附註 Revenue Recognition—Base Electron Agreement】
+"For the three and six months ended June 30, 2026, we have recognized $ 100.7 million and $ 131.7 million of revenue related to this contract, respectively."

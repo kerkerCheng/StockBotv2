@@ -1,0 +1,112 @@
+{
+  "claims": [
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：GE Vernova 之後的季報寫出燃機在手訂單／slot reservation 減少、取消潮，或年產能提前到位到不再排隊。核查頻率：每季（GE Vernova 季報）。觸發後 48 小時：降這條邊 confidence，重讀燃氣渦輪發電機組層的產能讀法。",
+      "id": "gev_8k_20260722_q2_slot_reservations_capacity_cl1",
+      "source_ids": [
+        "gev_8k_20260722_q2_slot_reservations_capacity_s1",
+        "gev_8k_20260722_q2_slot_reservations_capacity_s2",
+        "gev_8k_20260722_q2_slot_reservations_capacity_s3",
+        "gev_8k_20260722_q2_slot_reservations_capacity_s4"
+      ],
+      "statement": "GE Vernova Q2 2026: gas equipment backlog 53 GW plus 63 GW of slot reservation agreements (18 GW of new slot reservations signed in the quarter, 10 GW converted to orders, 3 GW shipped); expects at least 125 GW under contract by year-end 2026, against annual gas turbine output of 20 GW from Q3 2026, 24 GW in 2028 and a targeted 30 GW in 2030. Contracted volume is several years of output; the release does not split data center from other end uses.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "tech:gas_turbine_genset",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "gev_8k_20260722_q2_slot_reservations_capacity_s1",
+        "gev_8k_20260722_q2_slot_reservations_capacity_s2",
+        "gev_8k_20260722_q2_slot_reservations_capacity_s3",
+        "gev_8k_20260722_q2_slot_reservations_capacity_s4"
+      ],
+      "src_id": "co:ge_vernova"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "GE Vernova Inc."
+      ],
+      "attributes": {
+        "ticker": "GEV"
+      },
+      "confidence": 0.85,
+      "id": "co:ge_vernova",
+      "name": "GE Vernova",
+      "role": null,
+      "source_ids": [
+        "gev_8k_20260722_q2_slot_reservations_capacity_s1",
+        "gev_8k_20260722_q2_slot_reservations_capacity_s2",
+        "gev_8k_20260722_q2_slot_reservations_capacity_s3",
+        "gev_8k_20260722_q2_slot_reservations_capacity_s4"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "gas turbine generator set",
+        "gas turbine generator units",
+        "燃气轮机发电机组"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:gas_turbine_genset",
+      "name": "Gas turbine generator set for onsite power",
+      "role": null,
+      "source_ids": [
+        "gev_8k_20260722_q2_slot_reservations_capacity_s1",
+        "gev_8k_20260722_q2_slot_reservations_capacity_s2",
+        "gev_8k_20260722_q2_slot_reservations_capacity_s3",
+        "gev_8k_20260722_q2_slot_reservations_capacity_s4"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "gev_8k_20260722_q2_slot_reservations_capacity",
+    "evidence_tier": 1,
+    "origin_entity": "GE Vernova Inc.",
+    "permission_basis": "SEC EDGAR 公開申報（8-K 附件新聞稿）；只保留研究必要的有限逐字節錄。published_at 取 EDGAR 申報日 2026-07-22。",
+    "published_at": "2026-07-22",
+    "publisher": "SEC EDGAR（Form 8-K Exhibit 99，accession 0001996810-26-000147）",
+    "retrieved_at": "2026-10-27",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "GE Vernova 2026 年第二季財報新聞稿（8-K Exhibit 99，2026-07-22）：新簽 20 GW 燃氣設備合約（18 GW slot reservation、2 GW 訂單）；在手 53 GW＋slot reservation 63 GW；年底預期 ≥125 GW 在約；燃機年產能 2026Q3 20 GW、2028 年 24 GW、2030 年 30 GW",
+    "url": "https://www.sec.gov/Archives/edgar/data/1996810/000199681026000147/gevpressrelease2q26.htm"
+  },
+  "sources": [
+    {
+      "id": "gev_8k_20260722_q2_slot_reservations_capacity_s1",
+      "locator": "Power 段",
+      "quote": "Signed 20 gigawatts (GW) of new gas equipment contracts, including 18 GW of slot reservation agreements and 2 GW of orders."
+    },
+    {
+      "id": "gev_8k_20260722_q2_slot_reservations_capacity_s2",
+      "locator": "Power 段",
+      "quote": "Converted 10 GW of existing slot reservation agreements to orders and shipped 3 GW of equipment; resulting in backlog growth from 44 to 53 GW and an increase in slot reservation agreements from 56 to 63 GW."
+    },
+    {
+      "id": "gev_8k_20260722_q2_slot_reservations_capacity_s3",
+      "locator": "CEO 引言",
+      "quote": "We now expect to have at least 125 GW of gas equipment under contract by year-end 2026."
+    },
+    {
+      "id": "gev_8k_20260722_q2_slot_reservations_capacity_s4",
+      "locator": "CEO 引言",
+      "quote": "To meet this demand, we remain on track to deliver 20 GW of annual gas turbine output in the third quarter of 2026, with 24 GW in 2028, and we are implementing actions to produce 30 GW in 2030."
+    }
+  ]
+}

@@ -1,0 +1,202 @@
+{
+  "claims": [
+    {
+      "confidence": 0.45,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "條件：Base Electron 案實際商轉晚於同期開工的燃機案，或 B&W 的汽輪機交期也拉長到與燃機相當（例如西門子能源汽輪機交期超過 24 個月）。核查頻率：每季（B&W 10-Q 與財報稿）。觸發後 48 小時：降這條 competes_with 的 confidence，重讀燃氣渦輪發電機組層的反向路徑。",
+      "id": "bw_ir_overview_202608_steam_power_ai_factories_cl1",
+      "source_ids": [
+        "bw_ir_overview_202608_steam_power_ai_factories_s4",
+        "bw_ir_overview_202608_steam_power_ai_factories_s5",
+        "bw_ir_overview_202608_steam_power_ai_factories_s6"
+      ],
+      "statement": "B&W pitches its gas-fired boiler plus steam turbine (Rankine) plant as a way around gas turbine scarcity — 'no dependence on gas turbine delivery', generating firm MW while gas turbines are still being manufactured, and 'years-faster deployment' than combined- or simple-cycle gas turbine projects. This is the seller's own marketing; no third party has confirmed the time advantage, and B&W's phase 2 adds a gas turbine later (boiler becomes an HRSG), so the route is a bridge as much as a substitute.",
+      "subject_id": "e2"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:steam_turbine_generator",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "bw_ir_overview_202608_steam_power_ai_factories_s1",
+        "bw_ir_overview_202608_steam_power_ai_factories_s3"
+      ],
+      "src_id": "co:siemens_energy"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.5,
+      "dst_id": "tech:gas_turbine_genset",
+      "id": "e2",
+      "relation": "competes_with",
+      "source_ids": [
+        "bw_ir_overview_202608_steam_power_ai_factories_s4",
+        "bw_ir_overview_202608_steam_power_ai_factories_s5",
+        "bw_ir_overview_202608_steam_power_ai_factories_s6"
+      ],
+      "src_id": "tech:gas_fired_boiler"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "Babcock & Wilcox Enterprises, Inc."
+      ],
+      "attributes": {
+        "ticker": "BW"
+      },
+      "confidence": 0.85,
+      "id": "co:babcock_wilcox",
+      "name": "Babcock & Wilcox",
+      "role": null,
+      "source_ids": [
+        "bw_ir_overview_202608_steam_power_ai_factories_s1",
+        "bw_ir_overview_202608_steam_power_ai_factories_s2",
+        "bw_ir_overview_202608_steam_power_ai_factories_s3",
+        "bw_ir_overview_202608_steam_power_ai_factories_s4",
+        "bw_ir_overview_202608_steam_power_ai_factories_s5",
+        "bw_ir_overview_202608_steam_power_ai_factories_s6"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "Siemens Energy AG",
+        "西门子能源"
+      ],
+      "attributes": {
+        "ticker": "ENR.DE"
+      },
+      "confidence": 0.85,
+      "id": "co:siemens_energy",
+      "name": "Siemens Energy",
+      "role": null,
+      "source_ids": [
+        "bw_ir_overview_202608_steam_power_ai_factories_s1",
+        "bw_ir_overview_202608_steam_power_ai_factories_s2",
+        "bw_ir_overview_202608_steam_power_ai_factories_s3",
+        "bw_ir_overview_202608_steam_power_ai_factories_s4",
+        "bw_ir_overview_202608_steam_power_ai_factories_s5",
+        "bw_ir_overview_202608_steam_power_ai_factories_s6"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "steam turbine generator sets",
+        "steam turbines",
+        "steam turbine generator systems"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:steam_turbine_generator",
+      "name": "Steam turbine generator set",
+      "role": null,
+      "source_ids": [
+        "bw_ir_overview_202608_steam_power_ai_factories_s1",
+        "bw_ir_overview_202608_steam_power_ai_factories_s2",
+        "bw_ir_overview_202608_steam_power_ai_factories_s3",
+        "bw_ir_overview_202608_steam_power_ai_factories_s4",
+        "bw_ir_overview_202608_steam_power_ai_factories_s5",
+        "bw_ir_overview_202608_steam_power_ai_factories_s6"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "natural gas-fired boilers",
+        "natural-gas boilers"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:gas_fired_boiler",
+      "name": "Natural gas-fired boiler for steam-cycle power",
+      "role": null,
+      "source_ids": [
+        "bw_ir_overview_202608_steam_power_ai_factories_s1",
+        "bw_ir_overview_202608_steam_power_ai_factories_s2",
+        "bw_ir_overview_202608_steam_power_ai_factories_s3",
+        "bw_ir_overview_202608_steam_power_ai_factories_s4",
+        "bw_ir_overview_202608_steam_power_ai_factories_s5",
+        "bw_ir_overview_202608_steam_power_ai_factories_s6"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "gas turbine generator set",
+        "gas turbine generator units",
+        "燃气轮机发电机组"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:gas_turbine_genset",
+      "name": "Gas turbine generator set for onsite power",
+      "role": null,
+      "source_ids": [
+        "bw_ir_overview_202608_steam_power_ai_factories_s1",
+        "bw_ir_overview_202608_steam_power_ai_factories_s2",
+        "bw_ir_overview_202608_steam_power_ai_factories_s3",
+        "bw_ir_overview_202608_steam_power_ai_factories_s4",
+        "bw_ir_overview_202608_steam_power_ai_factories_s5",
+        "bw_ir_overview_202608_steam_power_ai_factories_s6"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "bw_ir_overview_202608_steam_power_ai_factories",
+    "evidence_tier": 1,
+    "origin_entity": "Babcock & Wilcox Enterprises, Inc.",
+    "permission_basis": "SEC EDGAR 公開申報附上的投資人簡報；只保留研究必要的有限逐字節錄。published_at 取 EDGAR 申報日 2026-08-10。",
+    "published_at": "2026-08-10",
+    "publisher": "SEC EDGAR（Form 8-K，accession 0001630805-26-000066，投資人簡報）",
+    "retrieved_at": "2026-10-27",
+    "source_type": "ir_deck",
+    "storage_permission": "repo_excerpt",
+    "title": "Babcock & Wilcox 投資人簡報（2026-08，隨 8-K 2026-08-10 提交）：Base Electron 24 億美元、1.2 GW、北達科他 Center 附近、2026-08 送 Conditional Use Permit；西門子能源供汽輪發電機組；主打「不依賴燃機交期」、比燃機案快好幾年；另有 140 億美元以上的機會清單",
+    "url": "https://www.sec.gov/Archives/edgar/data/1630805/000163080526000066/bwiroverview-august2026x.htm"
+  },
+  "sources": [
+    {
+      "id": "bw_ir_overview_202608_steam_power_ai_factories_s1",
+      "locator": "p.10 B&W AND BASE ELECTRON",
+      "quote": "$2.4B, 1.2 GW power project for Base Electron"
+    },
+    {
+      "id": "bw_ir_overview_202608_steam_power_ai_factories_s2",
+      "locator": "p.10 B&W AND BASE ELECTRON",
+      "quote": "Project will be located near Center, North Dakota and Conditional Use Permit submitted in August 2026"
+    },
+    {
+      "id": "bw_ir_overview_202608_steam_power_ai_factories_s3",
+      "locator": "p.10 B&W AND BASE ELECTRON",
+      "quote": "Siemens Energy supplying steam turbine generator sets"
+    },
+    {
+      "id": "bw_ir_overview_202608_steam_power_ai_factories_s4",
+      "locator": "p.10 B&W AND BASE ELECTRON",
+      "quote": "Proven B&W boilers + Siemens Energy turbines enable years-faster deployment over traditional combined- or simple-cycle gas turbine projects"
+    },
+    {
+      "id": "bw_ir_overview_202608_steam_power_ai_factories_s5",
+      "locator": "p.20 POWERING AI FACTORIES AND DATA CENTERS",
+      "quote": "No dependence on gas turbine delivery"
+    },
+    {
+      "id": "bw_ir_overview_202608_steam_power_ai_factories_s6",
+      "locator": "p.20 POWERING AI FACTORIES AND DATA CENTERS",
+      "quote": "Generate firm MW while gas turbine is still in manufacturing"
+    }
+  ]
+}

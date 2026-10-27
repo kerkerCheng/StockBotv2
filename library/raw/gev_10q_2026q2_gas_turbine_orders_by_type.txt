@@ -1,0 +1,8 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1996810/000199681026000148/gev-20260630.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] GE Vernova Inc. Form 10-Q（2026Q2，2026-07-22）：燃機訂單台數依類型——第二季重型燃機 52 台（去年同期 20）、HA 15 台、航改型 61 台，合計 12.1 GW
+RETRIEVED: 2026-10-27（本機原文抽字逐字核對）
+
+【MD&A Power 訂單表】
+"Orders in units 2026 2025 2026 2025 Gas Turbines 113 47 150 85 Heavy-Duty Gas Turbines 52 20 80 49 HA-Turbines 15 7 27 15 Aeroderivatives 61 27 70 36 Gas Turbine Gigawatts 12.1 5.1 20.1 12.2"

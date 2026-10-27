@@ -1,0 +1,17 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1996810/000199681026000147/gevpressrelease2q26.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] GE Vernova 2026 年第二季財報新聞稿（8-K Exhibit 99，2026-07-22）：新簽 20 GW 燃氣設備合約（18 GW slot reservation、2 GW 訂單）；在手 53 GW＋slot reservation 63 GW；年底預期 ≥125 GW 在約；燃機年產能 2026Q3 20 GW、2028 年 24 GW、2030 年 30 GW
+RETRIEVED: 2026-10-27（本機原文抽字逐字核對）
+
+【Power 段】
+"Signed 20 gigawatts (GW) of new gas equipment contracts, including 18 GW of slot reservation agreements and 2 GW of orders."
+
+【Power 段】
+"Converted 10 GW of existing slot reservation agreements to orders and shipped 3 GW of equipment; resulting in backlog growth from 44 to 53 GW and an increase in slot reservation agreements from 56 to 63 GW."
+
+【CEO 引言】
+"We now expect to have at least 125 GW of gas equipment under contract by year-end 2026."
+
+【CEO 引言】
+"To meet this demand, we remain on track to deliver 20 GW of annual gas turbine output in the third quarter of 2026, with 24 GW in 2028, and we are implementing actions to produce 30 GW in 2030."

@@ -1,0 +1,14 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1630805/000163080526000066/e-2026q2earningsrelease.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Babcock & Wilcox 2026 年第二季財報新聞稿（8-K Exhibit 99.1，2026-08-10）：第二季營收 3.197 億美元、年增 130%；向西門子能源加訂 1 GW 汽輪機（12–15 個月內交）；Base Electron 案鍋爐與汽輪機製造進度超前
+RETRIEVED: 2026-10-27（本機原文抽字逐字核對）
+
+【CEO 引言】
+"We continue active discussions on other AI data center opportunities and have placed additional orders with Siemens Energy to secure and deliver an additional 1 gigawatt of steam turbines in the next 12 to 15 months to secure speed to markets."
+
+【CEO 引言】
+"Additionally, our first data center project with Base Electron is progressing ahead of expectations and on budget, and manufacturing of the boilers and steam turbines and other long-lead-time components are progressing quickly."
+
+【CEO 引言】
+"The permitting process is underway as we work to provide our proven natural gas-fired boilers and related technologies, alongside Siemens Energy steam turbine systems."

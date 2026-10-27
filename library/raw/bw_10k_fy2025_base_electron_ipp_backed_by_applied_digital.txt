@@ -1,0 +1,8 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1630805/000163080526000018/bw-20251231.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Babcock & Wilcox Enterprises, Inc. Form 10-K（FY2025，2026-03-16）：Base Electron 是 Applied Digital 支持的 IPP，與 B&W 簽四座 300 MW 燃氣電廠的正式合約
+RETRIEVED: 2026-10-27（本機原文抽字逐字核對）
+
+【MD&A Applied Digital Agreement】
+"Applied Digital Agreement Effective February 26, 2026, we entered into the Definitive Agreement with Base Electron, an IPP backed by Applied Digital, to complete the design and installation of four 300-megawatt natural gas-fired power plants."

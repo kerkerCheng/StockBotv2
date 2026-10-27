@@ -1,0 +1,112 @@
+{
+  "claims": [
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：GE Vernova 之後的季報寫出燃機在手訂單／slot reservation 減少、取消潮，或年產能提前到位到不再排隊。核查頻率：每季（GE Vernova 季報）。觸發後 48 小時：降這條邊 confidence，重讀燃氣渦輪發電機組層的產能讀法。",
+      "id": "gev_10q_2026q2_gas_turbine_orders_by_type_cl1",
+      "source_ids": [
+        "gev_10q_2026q2_gas_turbine_orders_by_type_s1"
+      ],
+      "statement": "GE Vernova 10-Q (Q2 2026): heavy-duty gas turbine orders were 52 units in the quarter versus 20 a year earlier (80 vs 49 year-to-date), alongside 15 HA turbines and 61 aeroderivatives; total gas turbine orders 12.1 GW in the quarter. End use is not split.",
+      "subject_id": "e2"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "tech:gas_turbine_genset",
+      "id": "e1",
+      "relation": "is_variant_of",
+      "source_ids": [
+        "gev_10q_2026q2_gas_turbine_orders_by_type_s1"
+      ],
+      "src_id": "tech:heavy_duty_gas_turbine"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "tech:heavy_duty_gas_turbine",
+      "id": "e2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "gev_10q_2026q2_gas_turbine_orders_by_type_s1"
+      ],
+      "src_id": "co:ge_vernova"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "GE Vernova Inc."
+      ],
+      "attributes": {
+        "ticker": "GEV"
+      },
+      "confidence": 0.85,
+      "id": "co:ge_vernova",
+      "name": "GE Vernova",
+      "role": null,
+      "source_ids": [
+        "gev_10q_2026q2_gas_turbine_orders_by_type_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "heavy-duty gas turbines",
+        "HA-Turbines"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:heavy_duty_gas_turbine",
+      "name": "Heavy-duty gas turbine",
+      "role": null,
+      "source_ids": [
+        "gev_10q_2026q2_gas_turbine_orders_by_type_s1"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "gas turbine generator set",
+        "gas turbine generator units",
+        "燃气轮机发电机组"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:gas_turbine_genset",
+      "name": "Gas turbine generator set for onsite power",
+      "role": null,
+      "source_ids": [
+        "gev_10q_2026q2_gas_turbine_orders_by_type_s1"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "gev_10q_2026q2_gas_turbine_orders_by_type",
+    "evidence_tier": 1,
+    "origin_entity": "GE Vernova Inc.",
+    "permission_basis": "SEC EDGAR 公開申報（10-Q）；只保留研究必要的有限逐字節錄。published_at 取 EDGAR 申報日 2026-07-22。",
+    "published_at": "2026-07-22",
+    "publisher": "SEC EDGAR（Form 10-Q，accession 0001996810-26-000148）",
+    "retrieved_at": "2026-10-27",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "GE Vernova Inc. Form 10-Q（2026Q2，2026-07-22）：燃機訂單台數依類型——第二季重型燃機 52 台（去年同期 20）、HA 15 台、航改型 61 台，合計 12.1 GW",
+    "url": "https://www.sec.gov/Archives/edgar/data/1996810/000199681026000148/gev-20260630.htm"
+  },
+  "sources": [
+    {
+      "id": "gev_10q_2026q2_gas_turbine_orders_by_type_s1",
+      "locator": "MD&A Power 訂單表",
+      "quote": "Orders in units 2026 2025 2026 2025 Gas Turbines 113 47 150 85 Heavy-Duty Gas Turbines 52 20 80 49 HA-Turbines 15 7 27 15 Aeroderivatives 61 27 70 36 Gas Turbine Gigawatts 12.1 5.1 20.1 12.2"
+    }
+  ]
+}

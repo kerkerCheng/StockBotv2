@@ -1,0 +1,177 @@
+{
+  "claims": [
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：B&W 或西門子能源之後的申報寫出這 1 GW 汽輪機訂單取消、交期延到 2028 年以後，或 Base Electron 案改用別家汽輪機。核查頻率：每季（B&W 10-Q）。觸發後 48 小時：降這條邊 confidence，重讀汽輪機層。",
+      "id": "bw_8k_20260810_q2_release_siemens_steam_turbines_1gw_cl1",
+      "source_ids": [
+        "bw_8k_20260810_q2_release_siemens_steam_turbines_1gw_s1",
+        "bw_8k_20260810_q2_release_siemens_steam_turbines_1gw_s2",
+        "bw_8k_20260810_q2_release_siemens_steam_turbines_1gw_s3"
+      ],
+      "statement": "Buyer-side (B&W Q2 2026 release): B&W placed additional orders with Siemens Energy for another 1 GW of steam turbines to be delivered in the next 12 to 15 months, and pairs its natural gas-fired boilers with Siemens Energy steam turbine systems for the Base Electron data center project.",
+      "subject_id": "e1"
+    },
+    {
+      "confidence": 0.65,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：B&W 之後的 10-Q／8-K 寫出 Base Electron 合約終止、縮減座數、延後商轉超過一年，或北達科他的 Conditional Use Permit 被拒；核查頻率：每季（B&W 10-Q）。觸發後 48 小時：降這條邊 confidence，重讀鍋爐＋汽輪機這條路線。",
+      "id": "bw_8k_20260810_q2_release_siemens_steam_turbines_1gw_cl2",
+      "source_ids": [
+        "bw_8k_20260810_q2_release_siemens_steam_turbines_1gw_s1",
+        "bw_8k_20260810_q2_release_siemens_steam_turbines_1gw_s3"
+      ],
+      "statement": "B&W is pre-ordering 1 GW of steam turbines beyond its signed project 'to secure speed to markets' while it is still in discussions on other AI data center opportunities — it commits to turbine slots ahead of customer contracts. The release does not say whether the order is cancellable or what deposit was paid.",
+      "subject_id": "e2"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:steam_turbine_generator",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "bw_8k_20260810_q2_release_siemens_steam_turbines_1gw_s1",
+        "bw_8k_20260810_q2_release_siemens_steam_turbines_1gw_s2",
+        "bw_8k_20260810_q2_release_siemens_steam_turbines_1gw_s3"
+      ],
+      "src_id": "co:siemens_energy"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:steam_turbine_generator",
+      "id": "e2",
+      "relation": "depends_on",
+      "source_ids": [
+        "bw_8k_20260810_q2_release_siemens_steam_turbines_1gw_s1",
+        "bw_8k_20260810_q2_release_siemens_steam_turbines_1gw_s3"
+      ],
+      "src_id": "co:babcock_wilcox"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:gas_fired_boiler",
+      "id": "e3",
+      "relation": "supplies_to",
+      "source_ids": [
+        "bw_8k_20260810_q2_release_siemens_steam_turbines_1gw_s2",
+        "bw_8k_20260810_q2_release_siemens_steam_turbines_1gw_s3"
+      ],
+      "src_id": "co:babcock_wilcox"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "Babcock & Wilcox Enterprises, Inc."
+      ],
+      "attributes": {
+        "ticker": "BW"
+      },
+      "confidence": 0.85,
+      "id": "co:babcock_wilcox",
+      "name": "Babcock & Wilcox",
+      "role": null,
+      "source_ids": [
+        "bw_8k_20260810_q2_release_siemens_steam_turbines_1gw_s1",
+        "bw_8k_20260810_q2_release_siemens_steam_turbines_1gw_s2",
+        "bw_8k_20260810_q2_release_siemens_steam_turbines_1gw_s3"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "Siemens Energy AG",
+        "西门子能源"
+      ],
+      "attributes": {
+        "ticker": "ENR.DE"
+      },
+      "confidence": 0.85,
+      "id": "co:siemens_energy",
+      "name": "Siemens Energy",
+      "role": null,
+      "source_ids": [
+        "bw_8k_20260810_q2_release_siemens_steam_turbines_1gw_s1",
+        "bw_8k_20260810_q2_release_siemens_steam_turbines_1gw_s2",
+        "bw_8k_20260810_q2_release_siemens_steam_turbines_1gw_s3"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "steam turbine generator sets",
+        "steam turbines",
+        "steam turbine generator systems"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:steam_turbine_generator",
+      "name": "Steam turbine generator set",
+      "role": null,
+      "source_ids": [
+        "bw_8k_20260810_q2_release_siemens_steam_turbines_1gw_s1",
+        "bw_8k_20260810_q2_release_siemens_steam_turbines_1gw_s2",
+        "bw_8k_20260810_q2_release_siemens_steam_turbines_1gw_s3"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "natural gas-fired boilers",
+        "natural-gas boilers"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:gas_fired_boiler",
+      "name": "Natural gas-fired boiler for steam-cycle power",
+      "role": null,
+      "source_ids": [
+        "bw_8k_20260810_q2_release_siemens_steam_turbines_1gw_s1",
+        "bw_8k_20260810_q2_release_siemens_steam_turbines_1gw_s2",
+        "bw_8k_20260810_q2_release_siemens_steam_turbines_1gw_s3"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "bw_8k_20260810_q2_release_siemens_steam_turbines_1gw",
+    "evidence_tier": 1,
+    "origin_entity": "Babcock & Wilcox Enterprises, Inc.",
+    "permission_basis": "SEC EDGAR 公開申報（8-K 附件新聞稿）；只保留研究必要的有限逐字節錄。published_at 取 EDGAR 申報日 2026-08-10。",
+    "published_at": "2026-08-10",
+    "publisher": "SEC EDGAR（Form 8-K Exhibit 99.1，accession 0001630805-26-000066）",
+    "retrieved_at": "2026-10-27",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Babcock & Wilcox 2026 年第二季財報新聞稿（8-K Exhibit 99.1，2026-08-10）：第二季營收 3.197 億美元、年增 130%；向西門子能源加訂 1 GW 汽輪機（12–15 個月內交）；Base Electron 案鍋爐與汽輪機製造進度超前",
+    "url": "https://www.sec.gov/Archives/edgar/data/1630805/000163080526000066/e-2026q2earningsrelease.htm"
+  },
+  "sources": [
+    {
+      "id": "bw_8k_20260810_q2_release_siemens_steam_turbines_1gw_s1",
+      "locator": "CEO 引言",
+      "quote": "We continue active discussions on other AI data center opportunities and have placed additional orders with Siemens Energy to secure and deliver an additional 1 gigawatt of steam turbines in the next 12 to 15 months to secure speed to markets."
+    },
+    {
+      "id": "bw_8k_20260810_q2_release_siemens_steam_turbines_1gw_s2",
+      "locator": "CEO 引言",
+      "quote": "Additionally, our first data center project with Base Electron is progressing ahead of expectations and on budget, and manufacturing of the boilers and steam turbines and other long-lead-time components are progressing quickly."
+    },
+    {
+      "id": "bw_8k_20260810_q2_release_siemens_steam_turbines_1gw_s3",
+      "locator": "CEO 引言",
+      "quote": "The permitting process is underway as we work to provide our proven natural gas-fired boilers and related technologies, alongside Siemens Energy steam turbine systems."
+    }
+  ]
+}
