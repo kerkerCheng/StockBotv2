@@ -1,0 +1,114 @@
+{
+  "claims": [
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：Williams 的 10-Q／10-K 寫出 Socrates 或其他 Power Innovation 專案的購電協議終止、客戶縮減容量，或改接電網。核查頻率：每季（Williams 10-Q）。觸發後 48 小時：降 e1 confidence，重讀 tech:onsite_gas_power 供給側。",
+      "id": "wmb_10k_fy2025_power_innovation_socrates_cl1",
+      "source_ids": [
+        "wmb_10k_fy2025_power_innovation_socrates_s1",
+        "wmb_10k_fy2025_power_innovation_socrates_s2",
+        "wmb_10k_fy2025_power_innovation_socrates_s3",
+        "wmb_10k_fy2025_power_innovation_socrates_s4"
+      ],
+      "statement": "Supplier-side filing (Williams FY2025 10-K): Williams invests in construction projects to support power demands from new data center and industrial development, including agreements with a large investment-grade company to provide onsite natural gas and power generation infrastructure; the Socrates project (North and South power generation facilities, New Albany, Ohio) is expected to provide a combined 400 MW of onsite power generation capacity to the customer, backed by a 10-year primarily fixed-price power purchase agreement. The 10-K does not name the customer (the Ohio Power Siting Board bulletin in this packet names the consumer of Socrates North).",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:onsite_gas_power",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "wmb_10k_fy2025_power_innovation_socrates_s1",
+        "wmb_10k_fy2025_power_innovation_socrates_s2",
+        "wmb_10k_fy2025_power_innovation_socrates_s3",
+        "wmb_10k_fy2025_power_innovation_socrates_s4"
+      ],
+      "src_id": "co:williams"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "The Williams Companies, Inc.",
+        "Williams Companies"
+      ],
+      "attributes": {
+        "ticker": "WMB"
+      },
+      "confidence": 0.85,
+      "id": "co:williams",
+      "name": "Williams",
+      "role": null,
+      "source_ids": [
+        "wmb_10k_fy2025_power_innovation_socrates_s1",
+        "wmb_10k_fy2025_power_innovation_socrates_s2",
+        "wmb_10k_fy2025_power_innovation_socrates_s3",
+        "wmb_10k_fy2025_power_innovation_socrates_s4"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "onsite natural gas power",
+        "onsite gas power",
+        "behind-the-meter natural gas generation",
+        "onsite natural gas and power generation"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:onsite_gas_power",
+      "name": "Onsite natural gas power generation for data centers",
+      "role": null,
+      "source_ids": [
+        "wmb_10k_fy2025_power_innovation_socrates_s1",
+        "wmb_10k_fy2025_power_innovation_socrates_s2",
+        "wmb_10k_fy2025_power_innovation_socrates_s3",
+        "wmb_10k_fy2025_power_innovation_socrates_s4"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "wmb_10k_fy2025_power_innovation_socrates",
+    "evidence_tier": 1,
+    "origin_entity": "The Williams Companies, Inc.",
+    "permission_basis": "SEC EDGAR 公開申報（10-K）；只保留研究必要的有限逐字節錄。published_at 取 EDGAR 申報日 2026-02-24。",
+    "published_at": "2026-02-24",
+    "publisher": "SEC EDGAR（Form 10-K，accession 0000107263-26-000006）",
+    "retrieved_at": "2026-10-27",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "The Williams Companies, Inc. Form 10-K（FY2025，2026-02-24）MD&A「Power Innovation」：為資料中心與工業開發蓋現場天然氣與發電設施；Socrates（俄亥俄 New Albany）兩座電廠合計 400 MW、10 年期固定價購電協議",
+    "url": "https://www.sec.gov/Archives/edgar/data/107263/000010726326000006/wmb-20251231.htm"
+  },
+  "sources": [
+    {
+      "id": "wmb_10k_fy2025_power_innovation_socrates_s1",
+      "locator": "Item 1「Power Innovation Assets」",
+      "quote": "Williams is investing in construction projects to support the power demands created by new data center and industrial development in power grid-constrained markets, including agreements with a large, investment-grade company to provide onsite natural gas and power generation infrastructure."
+    },
+    {
+      "id": "wmb_10k_fy2025_power_innovation_socrates_s2",
+      "locator": "MD&A「Power Innovation Socrates」",
+      "quote": "The Socrates project involves the construction of the Socrates North and South power generation facilities in New Albany, Ohio."
+    },
+    {
+      "id": "wmb_10k_fy2025_power_innovation_socrates_s3",
+      "locator": "同段",
+      "quote": "Williams has agreed to provide committed power generation and associated gas pipeline infrastructure for the project, which is expected to provide a combined 400 megawatts of onsite power generation capacity to the customer."
+    },
+    {
+      "id": "wmb_10k_fy2025_power_innovation_socrates_s4",
+      "locator": "同段",
+      "quote": "The project is backed by a 10 year, primarily fixed-price power"
+    }
+  ]
+}

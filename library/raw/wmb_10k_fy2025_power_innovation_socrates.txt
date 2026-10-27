@@ -1,0 +1,17 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/107263/000010726326000006/wmb-20251231.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] The Williams Companies, Inc. Form 10-K（FY2025，2026-02-24）MD&A「Power Innovation」：為資料中心與工業開發蓋現場天然氣與發電設施；Socrates（俄亥俄 New Albany）兩座電廠合計 400 MW、10 年期固定價購電協議
+RETRIEVED: 2026-10-27（本機原文抽字逐字核對）
+
+【Item 1「Power Innovation Assets」】
+"Williams is investing in construction projects to support the power demands created by new data center and industrial development in power grid-constrained markets, including agreements with a large, investment-grade company to provide onsite natural gas and power generation infrastructure."
+
+【MD&A「Power Innovation Socrates」】
+"The Socrates project involves the construction of the Socrates North and South power generation facilities in New Albany, Ohio."
+
+【同段】
+"Williams has agreed to provide committed power generation and associated gas pipeline infrastructure for the project, which is expected to provide a combined 400 megawatts of onsite power generation capacity to the customer."
+
+【同段】
+"The project is backed by a 10 year, primarily fixed-price power"

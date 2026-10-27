@@ -1,5 +1,20 @@
 {
-  "claims": [],
+  "claims": [
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：Bloom 之後的 10-K／10-Q 從競爭段拿掉燃氣往復式引擎，或資料中心買方的一手寫出某案場同時評估過兩者、因技術規格只能用其一（那是換不掉的證據，要改 sub）。核查頻率：每年（Bloom 10-K 競爭段）＋每季（Bloom 10-Q）。觸發後 48 小時：重讀 prod:bloom_energy_server 插槽讀圖的反向路徑。",
+      "id": "be_10_k_20260209_energy_server_overview_cl1",
+      "source_ids": [
+        "be_10_k_20260209_energy_server_overview_s4",
+        "be_10_k_20260209_energy_server_overview_s5",
+        "be_10_k_20260209_energy_server_overview_s6",
+        "be_10_k_20260209_energy_server_overview_s7"
+      ],
+      "statement": "Incumbent's own filing (Bloom Energy FY2025 10-K, Energy Server Systems Competition): Bloom primarily competes against OEMs providing onsite firm resources, first listed being gas reciprocating engines (natural-gas reciprocating internal combustion engines generating electricity directly onsite); Bloom claims higher efficiency, lower emissions, higher reliability and better load-following. The same section says major turbine OEMs are supply constrained and engine/turbine lead times have lengthened. Bloom's comparative claims are self-serving; the substitution itself is stated by Bloom.",
+      "subject_id": "e3"
+    }
+  ],
   "edges": [
     {
       "attributes": {},
@@ -23,6 +38,20 @@
         "be_10_k_20260209_energy_server_overview_s3"
       ],
       "src_id": "prod:bloom_energy_server"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "prod:bloom_energy_server",
+      "id": "e3",
+      "relation": "competes_with",
+      "source_ids": [
+        "be_10_k_20260209_energy_server_overview_s4",
+        "be_10_k_20260209_energy_server_overview_s5",
+        "be_10_k_20260209_energy_server_overview_s6",
+        "be_10_k_20260209_energy_server_overview_s7"
+      ],
+      "src_id": "tech:gas_reciprocating_genset"
     }
   ],
   "nodes": [
@@ -78,6 +107,27 @@
         "be_10_k_20260209_energy_server_overview_s3"
       ],
       "type": "TechNode"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "gas reciprocating engines",
+        "gas engine generator set",
+        "reciprocating gas engine",
+        "gas genset"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:gas_reciprocating_genset",
+      "name": "Gas reciprocating engine generator set",
+      "role": null,
+      "source_ids": [
+        "be_10_k_20260209_energy_server_overview_s4",
+        "be_10_k_20260209_energy_server_overview_s5",
+        "be_10_k_20260209_energy_server_overview_s6",
+        "be_10_k_20260209_energy_server_overview_s7"
+      ],
+      "type": "TechNode"
     }
   ],
   "schema_version": "0.1",
@@ -91,7 +141,8 @@
     "retrieved_at": "2026-10-22",
     "source_type": "filing",
     "storage_permission": "repo_excerpt",
-    "title": "Bloom Energy Corporation FY2025 Form 10-K——Item 1 Business 概述：Energy Server 與現場發電（有限節錄）",
+    "supersedes_extraction_sha256": "f1757f6221482f2edb86694871bc64ad9495190888be210e9c8a1d33c92dfd1b",
+    "title": "Bloom Energy Corporation FY2025 Form 10-K——Item 1 Business 概述：Energy Server 與現場發電（有限節錄）；2026-10-27 補 Item 1「Energy Server Systems Competition」：主要競爭對手是提供現場穩定電力的 OEM——燃氣往復式引擎、小型燃氣渦輪、複循環電廠；大型渦輪 OEM 供給受限",
     "url": "https://www.sec.gov/Archives/edgar/data/1664703/000162828026006516/be-20251231.htm"
   },
   "sources": [
@@ -109,6 +160,26 @@
       "id": "be_10_k_20260209_energy_server_overview_s3",
       "locator": "Item 1 Business——概述第 4 段第 1 句",
       "quote": "Our systems use high-temperature solid oxide fuel cells—a proprietary solid-state technology developed by Bloom—which leverage an electrochemical, non-combustion process and form the foundation of our platform, differentiation and competitive advantages."
+    },
+    {
+      "id": "be_10_k_20260209_energy_server_overview_s4",
+      "locator": "Item 1「Energy Server Systems Competition」第 1 段",
+      "quote": "In addition to power provided by centralized utility grids, and other utility and non-utility owned generation sources, we primarily compete against OEMs providing onsite firm resources which are:"
+    },
+    {
+      "id": "be_10_k_20260209_energy_server_overview_s5",
+      "locator": "同節第 1 點",
+      "quote": "Gas reciprocating engines. Reciprocating internal combustion engines that are powered by natural gas to generate electricity directly onsite, often for backup power, load balancing, or CHP applications. The Bloom Energy Server system has a higher efficiency, lower emissions, higher reliability, and better flexibility to adapt to load fluctuations."
+    },
+    {
+      "id": "be_10_k_20260209_energy_server_overview_s6",
+      "locator": "同節",
+      "quote": "Additionally, major turbine OEMs are currently supply constrained and are typically prioritizing capacity expansion only after fulfilling existing commitments."
+    },
+    {
+      "id": "be_10_k_20260209_energy_server_overview_s7",
+      "locator": "Item 1 市場段「Limitations Among Traditional OEMs are Extending Delivery Timelines」",
+      "quote": "Lead times for turbines, engines and other conventional equipment have lengthened due to global order volumes, supply chain constraints and component availability."
     }
   ]
 }

@@ -1,0 +1,20 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1694028/000169402826000055/q32026-earningsrelease.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Liberty Energy Inc. Form 8-K（2026-10-21）Exhibit 99.1：2026 年第三季財報新聞稿——Liberty Power Innovations 與一家前沿 AI 實驗室簽 1.2 GW 資料中心整合供電開發協議，含 significant prepayment of capacity fees
+RETRIEVED: 2026-10-27（本機原文抽字逐字核對）
+
+【Summary Results and Highlights 第 6 點】
+"Executed a strategic development agreement with a leading frontier AI lab and a dedicated infrastructure platform to deliver 1.2 GW of integrated power services at data center campuses"
+
+【CEO 引言（power 段）】
+"Liberty Power Innovations (“LPI”) entered into a strategic development agreement with a leading frontier AI lab and a dedicated infrastructure platform for 1.2 GW of integrated power services at data center campuses."
+
+【同段下一句】
+"The agreement includes a significant prepayment of capacity fees and targeted execution of the first energy service agreement (“ESA”) contract for approximately 500 megawatts ("MW") by December 2026."
+
+【同段】
+"The agreement also establishes a phased energization schedule from Q4 2027 through Q1 2029 and includes the substantive commercial terms for the additional long-term ESAs."
+
+【同段 CEO 引言】
+"We see significant opportunity to expand this relationship and are already working together to advance additional projects across other sites, including gas supply, interconnection, permitting and construction planning."

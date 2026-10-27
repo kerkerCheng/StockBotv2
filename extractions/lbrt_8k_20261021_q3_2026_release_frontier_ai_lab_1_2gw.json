@@ -1,0 +1,174 @@
+{
+  "claims": [
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：Liberty 之後的 8-K、10-Q 或 10-K 寫出這份開發協議終止、第一份約 500 MW 的 ESA 沒在 2026-12 前簽成而延後超過兩季、或預付容量費退還；或 Liberty 寫出這 1.2 GW 改由電網或非燃氣電源供電。核查頻率：每季（Liberty 財報 8-K 與 10-Q）。觸發後 48 小時：降 e1 confidence，重讀 tech:onsite_gas_power 的需求側與供給側（本層讀圖寫成後）。",
+      "id": "lbrt_8k_20261021_q3_2026_release_frontier_ai_lab_1_2gw_cl1",
+      "source_ids": [
+        "lbrt_8k_20261021_q3_2026_release_frontier_ai_lab_1_2gw_s1",
+        "lbrt_8k_20261021_q3_2026_release_frontier_ai_lab_1_2gw_s2",
+        "lbrt_8k_20261021_q3_2026_release_frontier_ai_lab_1_2gw_s3",
+        "lbrt_8k_20261021_q3_2026_release_frontier_ai_lab_1_2gw_s4",
+        "lbrt_8k_20261021_q3_2026_release_frontier_ai_lab_1_2gw_s5"
+      ],
+      "statement": "Supplier-side filing (Liberty Energy Q3 2026 earnings release furnished on 8-K, 2026-10-21): Liberty Power Innovations (LPI) entered into a strategic development agreement with a leading frontier AI lab and a dedicated infrastructure platform for 1.2 GW of integrated power services at data center campuses; the agreement includes a significant prepayment of capacity fees by the customer side, targets execution of the first ~500 MW energy service agreement by December 2026, and sets phased energization from Q4 2027 through Q1 2029; additional projects at other sites include gas supply, interconnection, permitting and construction planning. The AI lab is not named; the prepayment amount is not disclosed in the filing.",
+      "subject_id": "e1"
+    },
+    {
+      "confidence": 0.55,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "條件：Liberty、Williams、Solaris 的一手都不再把現場燃氣發電連到 AI 資料中心（例：只剩油氣或工業客戶），或 AI 雲端業者的一手寫出改回電網、不再用現場燃氣發電。核查頻率：每季（三家的 10-Q／8-K）。觸發後 48 小時：降 e2 confidence，檢查 tech:onsite_gas_power 是否仍走得到需求錨。",
+      "id": "lbrt_8k_20261021_q3_2026_release_frontier_ai_lab_1_2gw_cl2",
+      "source_ids": [
+        "lbrt_8k_20261021_q3_2026_release_frontier_ai_lab_1_2gw_s1",
+        "lbrt_8k_20261021_q3_2026_release_frontier_ai_lab_1_2gw_s2"
+      ],
+      "statement": "The same release ties LPI's onsite power business to a frontier AI lab's data center campuses (1.2 GW). This links the existing demand anchor (AI training/inference cluster buildout) to onsite natural gas power; one supplier's statement about one unnamed customer, not a measured share of AI capacity.",
+      "subject_id": "e2"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:onsite_gas_power",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "lbrt_8k_20261021_q3_2026_release_frontier_ai_lab_1_2gw_s1",
+        "lbrt_8k_20261021_q3_2026_release_frontier_ai_lab_1_2gw_s2",
+        "lbrt_8k_20261021_q3_2026_release_frontier_ai_lab_1_2gw_s3",
+        "lbrt_8k_20261021_q3_2026_release_frontier_ai_lab_1_2gw_s4",
+        "lbrt_8k_20261021_q3_2026_release_frontier_ai_lab_1_2gw_s5"
+      ],
+      "src_id": "co:liberty_energy"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.6,
+      "dst_id": "tech:onsite_gas_power",
+      "id": "e2",
+      "relation": "enables",
+      "source_ids": [
+        "lbrt_8k_20261021_q3_2026_release_frontier_ai_lab_1_2gw_s1",
+        "lbrt_8k_20261021_q3_2026_release_frontier_ai_lab_1_2gw_s2"
+      ],
+      "src_id": "tech:ai_compute_buildout"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "Liberty Energy Inc.",
+        "Liberty Power Innovations",
+        "LPI"
+      ],
+      "attributes": {
+        "ticker": "LBRT"
+      },
+      "confidence": 0.85,
+      "id": "co:liberty_energy",
+      "name": "Liberty Energy",
+      "role": null,
+      "source_ids": [
+        "lbrt_8k_20261021_q3_2026_release_frontier_ai_lab_1_2gw_s1",
+        "lbrt_8k_20261021_q3_2026_release_frontier_ai_lab_1_2gw_s2",
+        "lbrt_8k_20261021_q3_2026_release_frontier_ai_lab_1_2gw_s3",
+        "lbrt_8k_20261021_q3_2026_release_frontier_ai_lab_1_2gw_s4",
+        "lbrt_8k_20261021_q3_2026_release_frontier_ai_lab_1_2gw_s5"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "onsite natural gas power",
+        "onsite gas power",
+        "behind-the-meter natural gas generation",
+        "onsite natural gas and power generation"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:onsite_gas_power",
+      "name": "Onsite natural gas power generation for data centers",
+      "role": null,
+      "source_ids": [
+        "lbrt_8k_20261021_q3_2026_release_frontier_ai_lab_1_2gw_s1",
+        "lbrt_8k_20261021_q3_2026_release_frontier_ai_lab_1_2gw_s2",
+        "lbrt_8k_20261021_q3_2026_release_frontier_ai_lab_1_2gw_s3",
+        "lbrt_8k_20261021_q3_2026_release_frontier_ai_lab_1_2gw_s4",
+        "lbrt_8k_20261021_q3_2026_release_frontier_ai_lab_1_2gw_s5"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "end_demand",
+      "aliases": [
+        "AI data center buildout",
+        "AI system performance drive",
+        "AI frontier lab compute",
+        "AI XPU platform",
+        "HPC AI cluster",
+        "hyperscale AI infrastructure",
+        "AI factory buildout",
+        "agentic AI infrastructure"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:ai_compute_buildout",
+      "name": "AI training/inference cluster buildout",
+      "role": null,
+      "source_ids": [
+        "lbrt_8k_20261021_q3_2026_release_frontier_ai_lab_1_2gw_s1",
+        "lbrt_8k_20261021_q3_2026_release_frontier_ai_lab_1_2gw_s2",
+        "lbrt_8k_20261021_q3_2026_release_frontier_ai_lab_1_2gw_s3",
+        "lbrt_8k_20261021_q3_2026_release_frontier_ai_lab_1_2gw_s4",
+        "lbrt_8k_20261021_q3_2026_release_frontier_ai_lab_1_2gw_s5"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "lbrt_8k_20261021_q3_2026_release_frontier_ai_lab_1_2gw",
+    "evidence_tier": 1,
+    "origin_entity": "Liberty Energy Inc.",
+    "permission_basis": "SEC EDGAR 公開申報（8-K furnished 新聞稿）；只保留研究必要的有限逐字節錄。published_at 取 EDGAR 申報日 2026-10-21。",
+    "published_at": "2026-10-21",
+    "publisher": "SEC EDGAR（Form 8-K，accession 0001694028-26-000055）",
+    "retrieved_at": "2026-10-27",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Liberty Energy Inc. Form 8-K（2026-10-21）Exhibit 99.1：2026 年第三季財報新聞稿——Liberty Power Innovations 與一家前沿 AI 實驗室簽 1.2 GW 資料中心整合供電開發協議，含 significant prepayment of capacity fees",
+    "url": "https://www.sec.gov/Archives/edgar/data/1694028/000169402826000055/q32026-earningsrelease.htm"
+  },
+  "sources": [
+    {
+      "id": "lbrt_8k_20261021_q3_2026_release_frontier_ai_lab_1_2gw_s1",
+      "locator": "Summary Results and Highlights 第 6 點",
+      "quote": "Executed a strategic development agreement with a leading frontier AI lab and a dedicated infrastructure platform to deliver 1.2 GW of integrated power services at data center campuses"
+    },
+    {
+      "id": "lbrt_8k_20261021_q3_2026_release_frontier_ai_lab_1_2gw_s2",
+      "locator": "CEO 引言（power 段）",
+      "quote": "Liberty Power Innovations (“LPI”) entered into a strategic development agreement with a leading frontier AI lab and a dedicated infrastructure platform for 1.2 GW of integrated power services at data center campuses."
+    },
+    {
+      "id": "lbrt_8k_20261021_q3_2026_release_frontier_ai_lab_1_2gw_s3",
+      "locator": "同段下一句",
+      "quote": "The agreement includes a significant prepayment of capacity fees and targeted execution of the first energy service agreement (“ESA”) contract for approximately 500 megawatts (\"MW\") by December 2026."
+    },
+    {
+      "id": "lbrt_8k_20261021_q3_2026_release_frontier_ai_lab_1_2gw_s4",
+      "locator": "同段",
+      "quote": "The agreement also establishes a phased energization schedule from Q4 2027 through Q1 2029 and includes the substantive commercial terms for the additional long-term ESAs."
+    },
+    {
+      "id": "lbrt_8k_20261021_q3_2026_release_frontier_ai_lab_1_2gw_s5",
+      "locator": "同段 CEO 引言",
+      "quote": "We see significant opportunity to expand this relationship and are already working together to advance additional projects across other sites, including gas supply, interconnection, permitting and construction planning."
+    }
+  ]
+}

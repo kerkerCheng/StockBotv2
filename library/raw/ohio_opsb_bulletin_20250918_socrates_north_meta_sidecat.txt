@@ -1,0 +1,14 @@
+Source URL: https://content.govdelivery.com/accounts/OHPUC/bulletins/3f348f9
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Public Utilities Commission of Ohio／Ohio Power Siting Board 新聞公告（2025-09-18）：OPSB 核准 New Albany 200 MW 天然氣電廠（Socrates North，案號 25-188-EL-BGN），表後供電給相鄰資料中心、不接電網；Will-Power OH, LLC 興建營運、Meta Platforms 的關係企業 Sidecat 用電
+RETRIEVED: 2026-10-27（本機原文抽字逐字核對）
+
+【第 1 段】
+"The Ohio Power Siting Board (OPSB) approved the construction of a 200 megawatt (MW) natural gas fired electric generation facility in the city of New Albany and Licking County."
+
+【第 2 段】
+"The Socrates North Power Generation Facility will operate “behind-the-meter” to serve the electric load of an adjacent data center and will not be physically connected to the electric power grid."
+
+【第 3 段】
+"Will-Power OH, LLC will construct and operate the power plant on 20 acres within the New Albany International Business Park, and Sidecat, an affiliate of Meta Platforms, Inc., will consume the power."

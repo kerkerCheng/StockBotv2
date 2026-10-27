@@ -12,3 +12,17 @@ NOTE: 發行人自述（L8）；本包只用它的結構句（誰做 Energy Serv
 "We design, manufacture, distribute, and operate the Bloom Energy Server to provide resilient, distributed power for critical operations."
 
 "Our systems use high-temperature solid oxide fuel cells—a proprietary solid-state technology developed by Bloom—which leverage an electrochemical, non-combustion process and form the foundation of our platform, differentiation and competitive advantages."
+
+RETRIEVED（追加段）: 2026-10-27（EDGAR 原文本機抽字逐字核對）
+
+【Item 1「Energy Server Systems Competition」第 1 段】
+"In addition to power provided by centralized utility grids, and other utility and non-utility owned generation sources, we primarily compete against OEMs providing onsite firm resources which are:"
+
+【同節第 1 點】
+"Gas reciprocating engines. Reciprocating internal combustion engines that are powered by natural gas to generate electricity directly onsite, often for backup power, load balancing, or CHP applications. The Bloom Energy Server system has a higher efficiency, lower emissions, higher reliability, and better flexibility to adapt to load fluctuations."
+
+【同節】
+"Additionally, major turbine OEMs are currently supply constrained and are typically prioritizing capacity expansion only after fulfilling existing commitments."
+
+【Item 1 市場段「Limitations Among Traditional OEMs are Extending Delivery Timelines」】
+"Lead times for turbines, engines and other conventional equipment have lengthened due to global order volumes, supply chain constraints and component availability."

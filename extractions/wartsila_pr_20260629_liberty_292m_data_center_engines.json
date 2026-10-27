@@ -1,0 +1,170 @@
+{
+  "claims": [
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：Wärtsilä 或其資料中心客戶的一手寫出這類案場改用燃氣渦輪、燃料電池或電網取代引擎機組，或 Wärtsilä 寫出資料中心訂單取消。核查頻率：每季（Wärtsilä 季報與訂單新聞稿）。觸發後 48 小時：降 e1 confidence，重讀 tech:onsite_gas_power 的元件組成。",
+      "id": "wartsila_pr_20260629_liberty_292m_data_center_engines_cl1",
+      "source_ids": [
+        "wartsila_pr_20260629_liberty_292m_data_center_engines_s1",
+        "wartsila_pr_20260629_liberty_292m_data_center_engines_s3",
+        "wartsila_pr_20260629_liberty_292m_data_center_engines_s4"
+      ],
+      "statement": "Engine supplier's press release (Wärtsilä, 2026-06-29): Wärtsilä will supply natural gas engines (34SG) for a power plant serving large-scale data center development in the U.S.; AI-driven data center projects require on-site power capacity. Gas engine generator sets are a component of onsite natural gas power for data centers. The release does not use the word 'reciprocating'; that the 34SG is a reciprocating spark-gas engine is a modeling judgment (Bloom's 10-K separately describes gas reciprocating engines as onsite firm resources).",
+      "subject_id": "e1"
+    },
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：Liberty 的 10-Q／8-K 寫出 Wärtsilä 合約終止或大幅縮減，或 Wärtsilä 的訂單新聞稿撤回。核查頻率：每季（Liberty 10-Q）。觸發後 48 小時：降 e2 confidence。",
+      "id": "wartsila_pr_20260629_liberty_292m_data_center_engines_cl2",
+      "source_ids": [
+        "wartsila_pr_20260629_liberty_292m_data_center_engines_s1",
+        "wartsila_pr_20260629_liberty_292m_data_center_engines_s2",
+        "wartsila_pr_20260629_liberty_292m_data_center_engines_s4",
+        "wartsila_pr_20260629_liberty_292m_data_center_engines_s5"
+      ],
+      "statement": "Liberty Energy placed a EUR 292 million order for Wärtsilä 34SG natural gas engines for a data center power plant, with delivery to site from 2029 through 2030 (supplier's statement naming the buyer; Liberty's own 10-Q separately files the Wärtsilä purchase contract).",
+      "subject_id": "e2"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:onsite_gas_power",
+      "id": "e1",
+      "relation": "is_component_of",
+      "source_ids": [
+        "wartsila_pr_20260629_liberty_292m_data_center_engines_s1",
+        "wartsila_pr_20260629_liberty_292m_data_center_engines_s3",
+        "wartsila_pr_20260629_liberty_292m_data_center_engines_s4"
+      ],
+      "src_id": "tech:gas_reciprocating_genset"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "tech:gas_reciprocating_genset",
+      "id": "e2",
+      "relation": "depends_on",
+      "source_ids": [
+        "wartsila_pr_20260629_liberty_292m_data_center_engines_s1",
+        "wartsila_pr_20260629_liberty_292m_data_center_engines_s2",
+        "wartsila_pr_20260629_liberty_292m_data_center_engines_s4",
+        "wartsila_pr_20260629_liberty_292m_data_center_engines_s5"
+      ],
+      "src_id": "co:liberty_energy"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "gas reciprocating engines",
+        "gas engine generator set",
+        "reciprocating gas engine",
+        "gas genset"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:gas_reciprocating_genset",
+      "name": "Gas reciprocating engine generator set",
+      "role": null,
+      "source_ids": [
+        "wartsila_pr_20260629_liberty_292m_data_center_engines_s1",
+        "wartsila_pr_20260629_liberty_292m_data_center_engines_s2",
+        "wartsila_pr_20260629_liberty_292m_data_center_engines_s3",
+        "wartsila_pr_20260629_liberty_292m_data_center_engines_s4",
+        "wartsila_pr_20260629_liberty_292m_data_center_engines_s5"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "onsite natural gas power",
+        "onsite gas power",
+        "behind-the-meter natural gas generation",
+        "onsite natural gas and power generation"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:onsite_gas_power",
+      "name": "Onsite natural gas power generation for data centers",
+      "role": null,
+      "source_ids": [
+        "wartsila_pr_20260629_liberty_292m_data_center_engines_s1",
+        "wartsila_pr_20260629_liberty_292m_data_center_engines_s2",
+        "wartsila_pr_20260629_liberty_292m_data_center_engines_s3",
+        "wartsila_pr_20260629_liberty_292m_data_center_engines_s4",
+        "wartsila_pr_20260629_liberty_292m_data_center_engines_s5"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "Liberty Energy Inc.",
+        "Liberty Power Innovations",
+        "LPI"
+      ],
+      "attributes": {
+        "ticker": "LBRT"
+      },
+      "confidence": 0.85,
+      "id": "co:liberty_energy",
+      "name": "Liberty Energy",
+      "role": null,
+      "source_ids": [
+        "wartsila_pr_20260629_liberty_292m_data_center_engines_s1",
+        "wartsila_pr_20260629_liberty_292m_data_center_engines_s2",
+        "wartsila_pr_20260629_liberty_292m_data_center_engines_s3",
+        "wartsila_pr_20260629_liberty_292m_data_center_engines_s4",
+        "wartsila_pr_20260629_liberty_292m_data_center_engines_s5"
+      ],
+      "type": "Company"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "wartsila_pr_20260629_liberty_292m_data_center_engines",
+    "evidence_tier": 1,
+    "origin_entity": "Wärtsilä Corporation",
+    "permission_basis": "Wärtsilä 公開新聞稿；只保留研究必要的有限逐字節錄。published_at 取新聞稿署日「Press release 29 June 2026 at 15:00 UTC+2」。",
+    "published_at": "2026-06-29",
+    "publisher": "Wärtsilä Corporation Media",
+    "retrieved_at": "2026-10-27",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "Wärtsilä 新聞稿（2026-06-29）：Wärtsilä secures new order to power next wave of AI-driven data center growth in the U.S.——Liberty Energy 下 2.92 億歐元燃氣引擎訂單（34SG），2029–2030 交到現場",
+    "url": "http://www.wartsila.com/media/news/29-06-2026-wartsila-secures-new-order-to-power-next-wave-of-ai-driven-data-center-growth-in-the-u-s--3767555"
+  },
+  "sources": [
+    {
+      "id": "wartsila_pr_20260629_liberty_292m_data_center_engines_s1",
+      "locator": "導言",
+      "quote": "Technology group Wärtsilä will supply engines for a power plant to ensure reliable supply of energy for large-scale data center development in the U.S."
+    },
+    {
+      "id": "wartsila_pr_20260629_liberty_292m_data_center_engines_s2",
+      "locator": "第 1 段",
+      "quote": "The €292 million order, expected to be booked by Wärtsilä in Q3 2026, was placed by Denver-based Liberty Energy, a leading U.S. energy services company."
+    },
+    {
+      "id": "wartsila_pr_20260629_liberty_292m_data_center_engines_s3",
+      "locator": "第 2 段",
+      "quote": "AI-driven data center projects require reliable, flexible on-site power capacity that can be rapidly deployed to offer predictable performance and availability."
+    },
+    {
+      "id": "wartsila_pr_20260629_liberty_292m_data_center_engines_s4",
+      "locator": "產品段",
+      "quote": "Wärtsilä 34SG engines run on natural gas, a platform proven to perform in demanding, high-temperature environments."
+    },
+    {
+      "id": "wartsila_pr_20260629_liberty_292m_data_center_engines_s5",
+      "locator": "末段",
+      "quote": "The equipment delivery to site is scheduled to begin in 2029 and continue through 2030."
+    }
+  ]
+}

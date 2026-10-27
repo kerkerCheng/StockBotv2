@@ -1,0 +1,20 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1697500/000119312526397255/d182097dex991.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Solaris Energy Infrastructure, Inc. Form 8-K（2026-09-22）Exhibit 99.1（發行備忘錄節錄）：三份 AI 資料中心供電合約（Stateline 約 900 MW 離網、Hatchbo 約 660 MW、Customer C 約 640 MW）與解約條款；長約容量超過 2,300 MW
+RETRIEVED: 2026-10-27（本機原文抽字逐字核對）
+
+【Customer Contracts Summary 第 1 句】
+"As of the date of this offering memorandum, we have entered into three significant agreements to provide power generation capacity for data center customers in the artificial intelligence computing sector."
+
+【同段 Stateline】
+"Stateline Power, LLC (“Stateline”), a variable interest entity in which Solaris holds a 50.1% equity interest, will provide approximately 900 MW of off-grid power generation capacity to a data center customer with deliveries expected through the first quarter of 2027."
+
+【同段 Hatchbo】
+"The Hatchbo Agreement initially provided approximately 530 MW of power generation equipment to Hatchbo, an affiliate of an investment-grade global technology company."
+
+【合約條款表】
+"Cancellation Terms 100% (Years 1–3) / 50% (Year 4+) of remaining undiscounted revenue obligation, including escalations"
+
+【同段末】
+"Including energy and other large commercial and industrial end users, Solaris Power Solutions’ portfolio includes more than 2,300 MW of long-term contracted capacity."

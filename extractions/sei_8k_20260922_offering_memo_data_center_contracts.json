@@ -1,0 +1,123 @@
+{
+  "claims": [
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：Solaris 的 10-Q／8-K 寫出三份資料中心合約任一終止、觸發解約條款、或容量下修；或寫出改由非燃氣電源供電。核查頻率：每季（Solaris 10-Q 與 8-K）。觸發後 48 小時：降 e1 confidence，重讀 tech:onsite_gas_power 供給側。",
+      "id": "sei_8k_20260922_offering_memo_data_center_contracts_cl1",
+      "source_ids": [
+        "sei_8k_20260922_offering_memo_data_center_contracts_s1",
+        "sei_8k_20260922_offering_memo_data_center_contracts_s2",
+        "sei_8k_20260922_offering_memo_data_center_contracts_s3",
+        "sei_8k_20260922_offering_memo_data_center_contracts_s4",
+        "sei_8k_20260922_offering_memo_data_center_contracts_s5"
+      ],
+      "statement": "Supplier-side filing (Solaris 8-K Exhibit 99.1, 2026-09-22): three significant agreements to provide power generation capacity for data center customers in the AI computing sector — Stateline (50.1%-owned VIE) ~900 MW of off-grid generation to a data center customer through Q1 2027; Hatchbo (affiliate of an investment-grade global technology company) initially ~530 MW, later converted to a ~660 MW turnkey plant; Customer C ~640 MW; cancellation terms include 100% of remaining undiscounted revenue obligation in years 1–3 for Stateline. Customers are not named. This exhibit does not say 'natural gas'; Solaris' Q2 2026 10-Q describes its fleet as gas turbine generators (outside this packet's quotes).",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:onsite_gas_power",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "sei_8k_20260922_offering_memo_data_center_contracts_s1",
+        "sei_8k_20260922_offering_memo_data_center_contracts_s2",
+        "sei_8k_20260922_offering_memo_data_center_contracts_s3",
+        "sei_8k_20260922_offering_memo_data_center_contracts_s4",
+        "sei_8k_20260922_offering_memo_data_center_contracts_s5"
+      ],
+      "src_id": "co:solaris_energy_infrastructure"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "Solaris Energy Infrastructure, Inc.",
+        "Solaris Power Solutions"
+      ],
+      "attributes": {
+        "ticker": "SEI"
+      },
+      "confidence": 0.85,
+      "id": "co:solaris_energy_infrastructure",
+      "name": "Solaris Energy Infrastructure",
+      "role": null,
+      "source_ids": [
+        "sei_8k_20260922_offering_memo_data_center_contracts_s1",
+        "sei_8k_20260922_offering_memo_data_center_contracts_s2",
+        "sei_8k_20260922_offering_memo_data_center_contracts_s3",
+        "sei_8k_20260922_offering_memo_data_center_contracts_s4",
+        "sei_8k_20260922_offering_memo_data_center_contracts_s5"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "onsite natural gas power",
+        "onsite gas power",
+        "behind-the-meter natural gas generation",
+        "onsite natural gas and power generation"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:onsite_gas_power",
+      "name": "Onsite natural gas power generation for data centers",
+      "role": null,
+      "source_ids": [
+        "sei_8k_20260922_offering_memo_data_center_contracts_s1",
+        "sei_8k_20260922_offering_memo_data_center_contracts_s2",
+        "sei_8k_20260922_offering_memo_data_center_contracts_s3",
+        "sei_8k_20260922_offering_memo_data_center_contracts_s4",
+        "sei_8k_20260922_offering_memo_data_center_contracts_s5"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "sei_8k_20260922_offering_memo_data_center_contracts",
+    "evidence_tier": 1,
+    "origin_entity": "Solaris Energy Infrastructure, Inc.",
+    "permission_basis": "SEC EDGAR 公開申報（8-K Exhibit 99.1）；只保留研究必要的有限逐字節錄。published_at 取 EDGAR 申報日 2026-09-22。",
+    "published_at": "2026-09-22",
+    "publisher": "SEC EDGAR（Form 8-K，accession 0001193125-26-397255）",
+    "retrieved_at": "2026-10-27",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Solaris Energy Infrastructure, Inc. Form 8-K（2026-09-22）Exhibit 99.1（發行備忘錄節錄）：三份 AI 資料中心供電合約（Stateline 約 900 MW 離網、Hatchbo 約 660 MW、Customer C 約 640 MW）與解約條款；長約容量超過 2,300 MW",
+    "url": "https://www.sec.gov/Archives/edgar/data/1697500/000119312526397255/d182097dex991.htm"
+  },
+  "sources": [
+    {
+      "id": "sei_8k_20260922_offering_memo_data_center_contracts_s1",
+      "locator": "Customer Contracts Summary 第 1 句",
+      "quote": "As of the date of this offering memorandum, we have entered into three significant agreements to provide power generation capacity for data center customers in the artificial intelligence computing sector."
+    },
+    {
+      "id": "sei_8k_20260922_offering_memo_data_center_contracts_s2",
+      "locator": "同段 Stateline",
+      "quote": "Stateline Power, LLC (“Stateline”), a variable interest entity in which Solaris holds a 50.1% equity interest, will provide approximately 900 MW of off-grid power generation capacity to a data center customer with deliveries expected through the first quarter of 2027."
+    },
+    {
+      "id": "sei_8k_20260922_offering_memo_data_center_contracts_s3",
+      "locator": "同段 Hatchbo",
+      "quote": "The Hatchbo Agreement initially provided approximately 530 MW of power generation equipment to Hatchbo, an affiliate of an investment-grade global technology company."
+    },
+    {
+      "id": "sei_8k_20260922_offering_memo_data_center_contracts_s4",
+      "locator": "合約條款表",
+      "quote": "Cancellation Terms 100% (Years 1–3) / 50% (Year 4+) of remaining undiscounted revenue obligation, including escalations"
+    },
+    {
+      "id": "sei_8k_20260922_offering_memo_data_center_contracts_s5",
+      "locator": "同段末",
+      "quote": "Including energy and other large commercial and industrial end users, Solaris Power Solutions’ portfolio includes more than 2,300 MW of long-term contracted capacity."
+    }
+  ]
+}
