@@ -1,0 +1,112 @@
+{
+  "claims": [
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：天孚之後的定期報告或公告寫出 ELS 停產、交付延後、客戶取消，或 CPO 配套產品營收下滑。核查頻率：每季（天孚定期報告與公告）。觸發後 48 小時：降這條邊 confidence，重讀外部光源層的供給側讀法。",
+      "id": "tfc_300394_op_20261023_cpo_fau_els_mass_delivery_cl1",
+      "source_ids": [
+        "tfc_300394_op_20261023_cpo_fau_els_mass_delivery_s1",
+        "tfc_300394_op_20261023_cpo_fau_els_mass_delivery_s2",
+        "tfc_300394_op_20261023_cpo_fau_els_mass_delivery_s3"
+      ],
+      "statement": "TFC Optical (300394.SZ) announcement 2026-10-23: in CPO companion products it has achieved stable mass-production delivery of FAU and ELS (external laser source) products; it has long-term cooperation with leading global optical module makers and AI computing infrastructure companies; order backlog is ample. Supplier self-report; ELS customers are not named.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:external_laser_source",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "tfc_300394_op_20261023_cpo_fau_els_mass_delivery_s1",
+        "tfc_300394_op_20261023_cpo_fau_els_mass_delivery_s2",
+        "tfc_300394_op_20261023_cpo_fau_els_mass_delivery_s3"
+      ],
+      "src_id": "co:tfc_optical"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "TFC Communication",
+        "Suzhou TFC Optical Communication Co., Ltd.",
+        "天孚通信",
+        "300394.SZ"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "co:tfc_optical",
+      "name": "TFC Optical Communication",
+      "role": null,
+      "source_ids": [
+        "tfc_300394_op_20261023_cpo_fau_els_mass_delivery_s1",
+        "tfc_300394_op_20261023_cpo_fau_els_mass_delivery_s2",
+        "tfc_300394_op_20261023_cpo_fau_els_mass_delivery_s3"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "ELS",
+        "pluggable laser source",
+        "external light source engine",
+        "external laser sources",
+        "light engines",
+        "External Laser Small Form Factor Pluggable",
+        "ELSFP",
+        "external laser module",
+        "ELS module",
+        "turnkey ELS module",
+        "turnkey ELS"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:external_laser_source",
+      "name": "External Laser Source",
+      "role": null,
+      "source_ids": [
+        "tfc_300394_op_20261023_cpo_fau_els_mass_delivery_s1",
+        "tfc_300394_op_20261023_cpo_fau_els_mass_delivery_s2",
+        "tfc_300394_op_20261023_cpo_fau_els_mass_delivery_s3"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "tfc_300394_op_20261023_cpo_fau_els_mass_delivery",
+    "evidence_tier": 1,
+    "origin_entity": "天孚通信",
+    "permission_basis": "深交所上市公司公告 PDF（巨潮資訊網）；只保留研究必要的有限逐字節錄。published_at 取公告落款與巨潮刊登日 2026-10-23。",
+    "published_at": "2026-10-23",
+    "publisher": "巨潮資訊網（深交所指定披露，公告編號 2026-057）",
+    "retrieved_at": "2026-10-27",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "天孚通信（300394）關於公司近期生產經營情況的公告（2026-10-23，公告編號 2026-057）：CPO 配套產品已實現 FAU、ELS 等相關產品的穩定量產交付；與全球頭部光模組廠及 AI 算力基礎設施廠長期合作；在手訂單充足",
+    "url": "http://static.cninfo.com.cn/finalpage/2026-10-23/1225617692.pdf"
+  },
+  "sources": [
+    {
+      "id": "tfc_300394_op_20261023_cpo_fau_els_mass_delivery_s1",
+      "locator": "二、公司近期生产经营情况",
+      "quote": "公司与全球头部光模块厂商及 AI 算力基础设施厂商建立了长期深度合作关系"
+    },
+    {
+      "id": "tfc_300394_op_20261023_cpo_fau_els_mass_delivery_s2",
+      "locator": "二、公司近期生产经营情况",
+      "quote": "尤其在CPO配套产品领域，公司已实现 FAU、ELS 等相关产品的稳定量产交付。"
+    },
+    {
+      "id": "tfc_300394_op_20261023_cpo_fau_els_mass_delivery_s3",
+      "locator": "二、公司近期生产经营情况",
+      "quote": "截至本公告披露日，公司生产经营秩序正常，主营业务开展情况正常，在手订单充足"
+    }
+  ]
+}

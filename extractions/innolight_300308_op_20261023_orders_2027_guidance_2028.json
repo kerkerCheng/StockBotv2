@@ -1,0 +1,102 @@
+{
+  "claims": [
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：中際旭創之後的定期報告或公告寫出海外客戶下修、延後或取消訂單，或 1.6T 價格明顯下滑、競爭轉為削價。核查頻率：每季（中際旭創定期報告與公告）。觸發後 48 小時：降這條邊 confidence，重讀 1.6T 收發器層與上游雷射層的需求側讀法。",
+      "id": "innolight_300308_op_20261023_orders_2027_guidance_2028_cl1",
+      "source_ids": [
+        "innolight_300308_op_20261023_orders_2027_guidance_2028_s1",
+        "innolight_300308_op_20261023_orders_2027_guidance_2028_s2",
+        "innolight_300308_op_20261023_orders_2027_guidance_2028_s3"
+      ],
+      "statement": "Zhongji Innolight announcement 2026-10-23: major overseas customers have placed orders into 2027 and some key customers have given explicit 2028 demand guidance, with 1.6T and 800G demand expected to keep growing fast; few makers can deliver at scale and pricing is healthy; it is binding core suppliers strategically and signing long-term supply agreements. Customers and suppliers are not named.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:transceiver_1_6t",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "innolight_300308_op_20261023_orders_2027_guidance_2028_s1",
+        "innolight_300308_op_20261023_orders_2027_guidance_2028_s2",
+        "innolight_300308_op_20261023_orders_2027_guidance_2028_s3"
+      ],
+      "src_id": "co:zhongji_innolight"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "Innolight",
+        "中際旭創",
+        "中际旭创",
+        "300308.SZ"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "co:zhongji_innolight",
+      "name": "Zhongji Innolight",
+      "role": "leader",
+      "source_ids": [
+        "innolight_300308_op_20261023_orders_2027_guidance_2028_s1",
+        "innolight_300308_op_20261023_orders_2027_guidance_2028_s2",
+        "innolight_300308_op_20261023_orders_2027_guidance_2028_s3"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "1.6T transceiver"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:transceiver_1_6t",
+      "name": "1.6T-speed transceiver",
+      "role": null,
+      "source_ids": [
+        "innolight_300308_op_20261023_orders_2027_guidance_2028_s1",
+        "innolight_300308_op_20261023_orders_2027_guidance_2028_s2",
+        "innolight_300308_op_20261023_orders_2027_guidance_2028_s3"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "innolight_300308_op_20261023_orders_2027_guidance_2028",
+    "evidence_tier": 1,
+    "origin_entity": "中际旭创",
+    "permission_basis": "深交所上市公司公告 PDF（巨潮資訊網）；只保留研究必要的有限逐字節錄。published_at 取公告落款與巨潮刊登日 2026-10-23。",
+    "published_at": "2026-10-23",
+    "publisher": "巨潮資訊網（深交所指定披露）",
+    "retrieved_at": "2026-10-27",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "中際旭創（300308）關於公司近期生產經營情況的公告（2026-10-23）：海外主要客戶訂單已下至 2027 年、部分重點客戶已給出 2028 年需求明確指引；具備大規模交付能力的廠商有限、價格體系健康；與核心供應商戰略綁定、簽長期供應協議",
+    "url": "http://static.cninfo.com.cn/finalpage/2026-10-23/1225617691.pdf"
+  },
+  "sources": [
+    {
+      "id": "innolight_300308_op_20261023_orders_2027_guidance_2028_s1",
+      "locator": "三、未来展望 1",
+      "quote": "海外市场方面，主要客户订单已下至 2027 年，部分重点客户已给出 2028 年需求的明确指引，预计 1.6T、800G 等高端光模块需求将保持快速增长"
+    },
+    {
+      "id": "innolight_300308_op_20261023_orders_2027_guidance_2028_s2",
+      "locator": "三、未来展望 2",
+      "quote": "目前下游需求快速增长，具备大规模交付能力的厂商有限，市场价格体系健康，给客户的产品报价相对理性。"
+    },
+    {
+      "id": "innolight_300308_op_20261023_orders_2027_guidance_2028_s3",
+      "locator": "三、未来展望 2",
+      "quote": "公司将通过提供多元化产品方案，与核心供应商战略绑定、签订长期供应协议等措施持续增强供应链保障能力，保持良好的交付能力。"
+    }
+  ]
+}
