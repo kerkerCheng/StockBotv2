@@ -76,7 +76,7 @@ def test_truncation_says_how_many_did_not_make_it() -> None:
     """暴量那天看起來不得跟平常一模一樣。"""
     result = subprocess.run(
         [sys.executable, "-m", "engine_b.cli", "list", "--status", "pending",
-         "--by-priority", "--triage-batch"],
+         "--by-priority", "--triage-batch", "--no-fetch"],   # 測試不連網抓全文（failure log #105）
         cwd=ROOT, capture_output=True, text=True, encoding="utf-8", timeout=300)
     assert result.returncode == 0, result.stderr[-500:]
     first = result.stdout.splitlines()[0]

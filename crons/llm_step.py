@@ -366,9 +366,20 @@ def _prompt_lead(lead: Mapping[str, Any]) -> dict[str, Any]:
         "matched_theme_terms": {k: (v or {}).get("terms") for k, v in (lead.get("themes") or {}).items()},
         "image_count": len(lead.get("media") or []),
     }
-    campaigns = (lead.get("refs") or {}).get("campaign_ids")
+    refs = lead.get("refs") or {}
+    campaigns = refs.get("campaign_ids")
     if campaigns:
         out["campaign_ids"] = campaigns
+    # 分類器看得到什麼（failure log #105）：⑥ 抓的全文、雷達的一句事實——沒帶的話它只看到標題就判 no_go。
+    # `body_status` 跟著走（L12：任何會改變輸出的輸入都要出現在證據欄位裡）；prompt 規則 9 說明三者的差別。
+    body = str(lead.get("body_text") or "")
+    if body:
+        out["body_text"] = body[:RAW_TEXT_MAX_CHARS] + ("…（以下截斷）" if len(body) > RAW_TEXT_MAX_CHARS else "")
+    if lead.get("body_status"):
+        out["body_status"] = lead.get("body_status")
+    if str(refs.get("radar_fact") or "").strip():
+        out["radar_fact"] = refs.get("radar_fact")
+        out["radar_publisher"] = refs.get("radar_publisher")
     return out
 
 

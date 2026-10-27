@@ -1409,8 +1409,18 @@ def build_queue(*, state_dir: Path | None = None, now: datetime | None = None,
         meaning = f"｜⚠ **harvest {age / 24:.0f} 天沒跑——0 不代表沒有新文件**"
     else:
         meaning = "｜新 harvest lead 需要分流"
+    # 其中分類器看不到任何內文、daily 不送分類的（failure log #105）——它們不會被 ⑦ 清掉，要互動 session 讀全文後 triage。
+    # 只看本機（原文欄、雷達事實句、全文存檔在不在），不連網。
+    try:
+        from engine_b.lead_text import held_pending
+
+        held_n = len(held_pending(leads))
+        held = f"（其中**無內文、daily 不送分類 {held_n}**：互動 session 讀全文後 triage）" if held_n else "（其中無內文 0）"
+    except Exception as exc:  # noqa: BLE001 — 讀不到不帶走整行（INV-3：未讀到 ≠ 0）
+        held = f"（無內文：盤點失敗 {type(exc).__name__}）"
     section.lines.append(
         f"**未 triage {pending_triage if pending_triage is not None else '未讀到'}**"
+        + held
         + meaning
         + (f"｜分類層每日上限 {limit}" if isinstance(limit, int) else "｜分類層上限未讀到")
         + ("　←**超過上限，今天清不完**" if over else "")

@@ -126,15 +126,19 @@ def _cmd_list(args: argparse.Namespace) -> int:
     # 不印跳過數的話，暴量那天看起來會跟平常一模一樣。
     skipped = 0
     if getattr(args, "triage_batch", False):
+        from .lead_text import attach, summary_line
         from .radar import is_radar_lead
         from .routine_config import triage_daily_limit
 
         limit = triage_daily_limit()
-        total = len(rows)
         # 外部雷達的 lead（Phase 7 Step 7.0f，二手、tier 4）排在所有非雷達 lead 之後才截上限——它提到持股時 relevance 會
         # 排到前面，不這樣做暴量那天會擠掉 harvest 的 lead（plan §6 L11-6 ④）。兩邊各自的順序照原排序不動。
         radar_rows = [lead for lead in rows if is_radar_lead(lead)]
         rows = [lead for lead in rows if not is_radar_lead(lead)] + radar_rows
+        # 分類器看得到什麼（failure log #105）：截上限**之前**先抓內文；看不到任何內文的不送分類、不佔上限。
+        rows, held, text_counts = attach(rows, fetch=not getattr(args, "no_fetch", False))
+        total = len(rows)
+        radar_rows = [lead for lead in rows if is_radar_lead(lead)]
         rows = rows[:limit]
         skipped = total - len(rows)
         radar_in_batch = sum(1 for lead in rows if is_radar_lead(lead))
@@ -144,6 +148,7 @@ def _cmd_list(args: argparse.Namespace) -> int:
                 + (f"；外部雷達 {len(radar_rows)} 則排在最後（進本批 {radar_in_batch} 則）" if radar_rows else ""))
         # json 模式印到 stderr，不污染 stdout 的 JSON（呼叫端可能直接 pipe 給 jq）
         print(note, file=sys.stderr if args.json else sys.stdout)
+        print(summary_line(text_counts, held), file=sys.stderr if args.json else sys.stdout)
     if args.json:
         print(json.dumps(rows, ensure_ascii=False, indent=2))
         return 0
@@ -239,6 +244,21 @@ def _print_segment_counters(pending_count: int, fired: dict[str, list[dict]]) ->
         fact = str(watch.get("fact") or "")[:70]
         print(f"      ⚠ {watch['watch_id']}：{fact}")
     print(_closure_line())
+
+
+def _print_held_pending(store_leads: dict[str, dict]) -> None:
+    """段 0 裡 daily 不送分類的那幾則（failure log #105：分類器看不到任何內文）——互動 session 讀全文後 `triage`。"""
+    from .lead_text import held_pending
+
+    held = held_pending(store_leads)
+    if not held:
+        return
+    print(f"  段0 其中無內文、daily 不送分類 {len(held)} 則（讀全文後 `engine_b.cli triage <lead> …`）：")
+    for lid in held[:10]:
+        lead = store_leads[lid]
+        print(f"      {lid}  {lead.get('source')}  {str(lead.get('title') or '')[:60]}  {lead.get('url')}")
+    if len(held) > 10:
+        print(f"      …另 {len(held) - 10} 則（`engine_b.cli list --status pending`）")
 
 
 def _closure_line() -> str:
@@ -381,6 +401,7 @@ def _cmd_drain(args: argparse.Namespace) -> int:
         print(json.dumps(rows, ensure_ascii=False, indent=2))
         return 0
     _print_segment_counters(pending_count, fired)
+    _print_held_pending(store["leads"])
     if not lead_batch and not classification_gaps:
         # ⚠⚠ **「上限為 0」與「真的沒有」不得同形**（L12／L13-2，2026-09-20 實測）。
         # Phase 2（D12）把 `drain_limit_per_run` 歸零讓 daily 不做研究，而本行原本一律印
@@ -1019,7 +1040,10 @@ def build_parser() -> argparse.ArgumentParser:
     p_list.add_argument("--status", help="只列某狀態（pending／triaged_go…）")
     p_list.add_argument("--triage-batch", dest="triage_batch", action="store_true",
                         help="套用分類層每日硬上限（config/daily_routine.json 的 triage.daily_limit）"
-                             "並印出還有幾則沒進本批；cap 由本命令執行，不靠 prompt 自律")
+                             "並印出還有幾則沒進本批；cap 由本命令執行，不靠 prompt 自律。"
+                             "截上限前先替沒有原文的 lead 抓全文；看不到任何內文的不送分類（failure log #105）")
+    p_list.add_argument("--no-fetch", dest="no_fetch", action="store_true",
+                        help="搭配 --triage-batch：不連網抓全文（要抓的記「超過本輪抓取上限」、不送分類）")
     p_list.add_argument("--by-priority", dest="by_priority", action="store_true",
                         help="依 priority 排序並顯示分數")
     p_list.add_argument("--tracked", help="逗號分隔的已追蹤 ticker（thesis 影響度）")

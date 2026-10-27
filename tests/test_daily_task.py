@@ -52,7 +52,7 @@ EXPECTED_STEPS = (
      10, True, True, "command", False, None, None, None),
     ("05_outcome", ("scripts/outcome_if_settled_today.py",), 10, True, True, "command", False, None, None, None),
     ("06_triage_batch", ("-m", "engine_b.cli", "list", "--status", "pending", "--by-priority",
-                         "--triage-batch", "--json"), 3, False, True, "capture", False,
+                         "--triage-batch", "--json"), 6, False, True, "capture", False,
      "triage_batch_{date}.json", None, None),
     ("07a_triage_propose", (), 15, False, True, "llm", False, None, "06_triage_batch", "triage"),
     ("08_integrity_after_triage", (), 1, False, False, "integrity", True, None, None, None),

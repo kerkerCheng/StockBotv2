@@ -167,10 +167,13 @@ DAILY_STEPS: tuple[DailyStep, ...] = (
     DailyStep("05_outcome", "追蹤表與問責（outcome）",
               ("scripts/outcome_if_settled_today.py",), 10, True, True),
     # ⑥ 連網：`--by-priority` 以 strict 模式讀 Google Sheet 持股（R2-a NB-5）；Sheet 讀不到時它 exit 2、triage 記 batch_failed。
-    DailyStep("06_triage_batch", "triage 批次（上限由 CLI 截斷）",
+    # 2026-10-27（failure log #105）起截上限前先替沒有原文的 lead 抓全文（EDGAR 主文件＋6-K／8-K 附件、MFN、一手 feed
+    # 同主機——與 ⑩a 同一組 fetcher、同一個存檔，一輪最多 `lead_text.FETCH_LIMIT_PER_RUN` 份），看不到內文的不送分類；
+    # 時限因此由 3 分鐘放到 6 分鐘。argv 不變。
+    DailyStep("06_triage_batch", "triage 批次（先抓內文、上限由 CLI 截斷）",
               ("-m", "engine_b.cli", "list", "--status", "pending", "--by-priority",
                "--triage-batch", "--json"),
-              3, False, True, kind="capture", capture="triage_batch_{date}.json"),
+              6, False, True, kind="capture", capture="triage_batch_{date}.json"),
     DailyStep("07a_triage_propose", "triage 提議（claude -p 零工具、只回 JSON）",
               (), 15, False, True, kind="llm", requires="06_triage_batch", llm_task="triage"),
     DailyStep("08_integrity_after_triage", "保險檢查（LLM 步驟前後指紋）",

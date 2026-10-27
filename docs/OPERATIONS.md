@@ -21,7 +21,7 @@ Daily   Windows 工作 StockBotv2-Daily（時間只住 config/daily_routine.json
              ① harvest → ①b–①e 外部雷達（準備 → claude -p 只開 WebSearch 提議 → 保險檢查 → 程式驗證後寫 secondary lead；
                             radar.enabled 控制；Phase 7 Step 7.0f）
              → ② Engine C ETL → ③ FX 同步 → ④ beta 快照 → ⑤ outcome
-             → ⑥ triage 批次 → ⑦a triage 提議（claude -p 零工具；Step 1.3 接上）→ ⑧ 保險檢查
+             → ⑥ triage 批次（截上限前先替沒原文的 lead 抓全文；看不到內文的不送分類，failure log #105）→ ⑦a triage 提議（claude -p 零工具；Step 1.3 接上）→ ⑧ 保險檢查
              → ⑦b triage 套用（程式驗證後寫入；Step 1.3 接上）→ classification-health
              → ⑨ consume-fired → ⑩ todo sync → ⑪ standing-go → ⑫ XBRL 基期補值 → ⑬ materialize
              → ⑭ 健康審查（--json）→ ⑮ invariants（--json）→ ⑯ 本機備份 → ⑰ 收尾（驗 state、釋放鎖）
@@ -118,6 +118,15 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 `StockBotv2-Daily` 的 ⑱⑲ 取代（1.2a 停用、2026-09-25 1.2b 刪除）；它們的理由（LLM 失敗心跳照發、永遠 exit 0、Python 不用 `.cmd`、
 發送走 subprocess）搬進 `crons/daily_task.py` 的 docstring，守它們的測試改主詞搬進 `tests/test_daily_task.py`「無人值守入口」節。
 
+### Sandbox impact review 結論（2026-10-27：分類前的內文——failure log #105）
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | daily ⑥ `python -m engine_b.cli list --status pending --by-priority --triage-batch --json`（**argv 不變**）截上限前多做一件事：替「來自 feed（有 `source_class`）、沒有 `raw_text`、也沒有雷達事實句」的 pending lead 抓全文（`engine_b/lead_text.py::attach`）。**連線主機不新增**：與 ⑩a 語意預篩同一組 fetcher（`engine_b/semantic_prescreen.py::fetcher_for`）——EDGAR `www.sec.gov`（主文件；6-K／8-K 另讀索引頁 `<accession>-index.htm` 的 Type 欄、抓 EX-99.x 附件最多 3 份，`fetchers/edgar.py::fetch_filing_exhibits`，UA 與主文件同一個 `_build_headers`）、MFN `mfn.se`、harvest 登記的一手 feed 同主機；一輪最多 20 份（`FETCH_LIMIT_PER_RUN`），⑥ 時限 3 → 6 分鐘。只寫 `library/private/semantic_text/<lead_id>.txt＋.json`（⑩a 原本就寫的存檔，不取鎖；meta 多 `exhibits_checked`，舊的只有封面的 6-K／8-K 存檔下一次會重抓）。批次列多 `body_status`（封閉字彙 8 個）與 `body_text`（前 3,000 字）；看不到任何內文的（沒有 fetcher、抓不到、超過本輪上限）**不在批次、不佔分類上限、留在 pending**。⑦a prompt 多帶 `body_text`／`body_status`／`radar_fact`／`radar_publisher`（`crons/llm_step.py::_prompt_lead`），`crons/triage_prompt.md` 多規則 9。心跳段 3「未 triage」那一行與 ⑤「未 triage」格多「其中無內文 N」（`lead_text.held_pending`：只看本機原文欄、雷達事實句、存檔在不在，**不連網**）；drain 段 0 列出那幾則。不寫任何 authority、不改 lead 狀態機、不發通知 |
+| **2 canonical skill／prompt／本檔** | 本節；本檔 daily 流程圖 ⑥；`crons/triage_prompt.md` 規則 9；`docs/reports/phase7/failure-log.md` #105。不動 `skills/signal-triage/SKILL.md` 的判準（可引用性不放寬：分類器只是看得到原文了） |
+| **3 最窄 rule** | daily argv 不變；不新增 step、allowlist、APP 路由、rule；`.codex/rules` 固定條目數不變。測試用的 `--no-fetch` 只關掉抓取（要抓的記「超過本輪抓取上限」、不送分類），不放寬任何東西 |
+| **4 contract test** | `tests/test_lead_text.py`（11 條；變異 6／6 轉紅：無內文的也送、附件不放封面前、舊封面存檔照用、prompt 不帶事實句、附件看檔名、心跳不印）：附件看 Type 欄不看檔名（GFS 的 `gfpressreleasefinal.htm`）、`/ix?doc=` 連結；6-K 附件在封面前、10-Q 不抓附件；索引頁抓不到＝抓不到、不留只有封面的存檔；#105 前只有封面的存檔會重抓、新版逐字含舊文；八個狀態各一則、只有帶內文的送分類、順序不變、截斷標明；`--no-fetch` 不呼叫 fetcher；`held_pending` 只數 pending、不連網；prompt 帶全文與事實句、不帶雷達理由、規則 9 寫明；端到端 `list --triage-batch --json --no-fetch` 的 stdout 不含無內文的、stderr 說出來；心跳那一行與「只能用不連網那一支」。`tests/test_triage_batch.py` 的真庫測試加 `--no-fetch`；`tests/test_daily_task.py` ⑥ 時限 6；`tests/test_radar.py` 的批次測試讓雷達 lead 帶事實句（真實資料的形狀）。相關 15 個測試檔 482 條全過 |
+| **5 端到端 smoke** | 真資料（EDGAR UA 以環境變數覆寫成不含個資的字串）：09-01 起理由寫「原文為空」一類的 no_go 43 則——雷達 21 則全部帶得出事實句；EDGAR 8 則全部抓到（POET、CCXI、TSLA、GFS、TSEM 一份是附件在前，TSM 與 TSEM 兩份沒有 EX-99、主文件就是內容）；MFN／Sivers 官網 7 則抓到；另 7 則是 X 貼文只有一條短網址（有 `raw_text`，不在本修法範圍，見 failure log #105 處置欄）。GFS 6-K 原本的存檔 950 字只有封面，附件其實是「GlobalFoundries 獲選在紐約營運兩座新晶圓廠（美日協議）」 |
 ### Sandbox impact review 結論（2026-10-21：日韓財報來源 S1–S4——EDINET、OpenDART）
 
 | 步 | 結論 |

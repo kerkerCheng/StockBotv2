@@ -34,7 +34,8 @@ class LedgerRow:
 #: ⑤ 的每一格，順序＝短版印的順序。**全部是研究 session 做得掉的**（使用者的動作住 ③／③b，不放這裡）。
 LEDGER: tuple[LedgerRow, ...] = (
     LedgerRow("todo.pending_triage", "未 triage", "則",
-              "daily ⑦ 自動清；超過上限或 LLM 失敗由互動 session `python -m engine_b.cli triage`"),
+              "daily ⑦ 自動清；超過上限、LLM 失敗、或無內文（daily 不送分類，failure log #105）由互動 session "
+              "讀全文後 `python -m engine_b.cli triage`（無內文的列在 `engine_b.cli drain` 段 0）"),
     LedgerRow("todo.unclassified", "缺分類", "則",
               "依 skills/signal-triage 產分類 → `python scripts/backfill_lead_classification.py --from-json … --apply`"),
     LedgerRow("todo.leads", "待深挖 lead", "則", "`/research-drain`（`python -m engine_b.cli drain`）做到入圖包、停放或已入圖"),
@@ -329,8 +330,13 @@ def collect(*, today: date, leads_store: Mapping[str, Any], watches: Sequence[Ma
     guarded("todo.unclassified", unclassified)
 
     def pending() -> None:
+        from engine_b.lead_text import held_pending
+
         stamps = [lead.get("first_seen") for lead in leads.values() if lead.get("status") == "pending"]
-        put("todo.pending_triage", seg.get("pending_triage"), oldest_days=_oldest(stamps, today))
+        # 分類器看不到任何內文的 daily 不送分類（failure log #105）——這幾則不會被 ⑦ 清掉，要點名
+        held = held_pending(leads)
+        put("todo.pending_triage", seg.get("pending_triage"), oldest_days=_oldest(stamps, today),
+            note=f"其中無內文 {len(held)} 則要互動 session 讀全文後 triage" if held else None)
 
     guarded("todo.pending_triage", pending)
 

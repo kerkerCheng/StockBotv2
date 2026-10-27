@@ -15,7 +15,8 @@
   #96 前是條數——一份 Sivers 股東會通知叫醒 35 條，花錢的是那一份全文，條數上限會讓它拖四天）。
   抓不到計數 `no_text`、不進批次、**不拿標題充數**；全文存 `library/private/semantic_text/<lead_id>.txt`，
   已存在就重用、不重抓。
-- 全文來源：EDGAR 主文件（`www.sec.gov`，URL 就是主文件）、MFN 公告頁（`mfn.se`，
+- 全文來源：EDGAR 主文件（`www.sec.gov`，URL 就是主文件；6-K／8-K 另照索引頁 Type 欄抓 EX-99.x 附件、放在前面——
+  2026-10-27 failure log #105：主文件只是封面）、MFN 公告頁（`mfn.se`，
   **只取公告頁文字、不抓 `mb.cision.com` 的附件、不寫 `out_dir`**——`fetchers/mfn.py:fetch_release` 會做那些事，
   所以不用它；第 4 輪 N4-8）、harvest 登記的一手 feed **同主機**的公司新聞頁（2026-10-27 #96；不新增對外主機、
   UA 不帶聯絡信箱）。MOPS 重訊與 X 貼文本來就有 `raw_text`，直接用。
@@ -37,6 +38,8 @@ from urllib.parse import urlsplit
 from engine_b import event_watch as ew
 
 TEXT_DIR = Path("library/private/semantic_text")
+#: 主文件常常只是封面、內容在附件 EX-99.x 的表單（failure log #105）；form_type 不明的也照抓附件。
+EXHIBIT_FORMS = frozenset({"6-K", "8-K"})
 _EDGAR_PATH = re.compile(r"^/Archives/edgar/data/(?P<cik>\d+)/(?P<acc>\d{10,20})/(?P<doc>[^/]+)$")
 
 
@@ -139,11 +142,19 @@ def fetcher_for(lead: Mapping[str, Any]) -> Callable[[], str | None] | None:
         parsed = parse_edgar_url(url)
         if parsed is None:
             return None
+        exhibits = wants_exhibits(lead)
 
         def edgar() -> str | None:
-            from fetchers.edgar import fetch_filing_text
+            from fetchers.edgar import fetch_filing_exhibits, fetch_filing_text
 
-            return strip_xbrl_header(fetch_filing_text(*parsed))
+            main = strip_xbrl_header(fetch_filing_text(*parsed))
+            if not exhibits:
+                return main
+            # 附件放前面：分類只看前幾千字（failure log #105：6-K 主文件只是封面，新聞稿在 EX-99.1）
+            parts = [f"【附件 {kind}｜{doc}】\n{text}" for kind, doc, text in fetch_filing_exhibits(parsed[0], parsed[1])]
+            if main and main.strip():
+                parts.append(f"【主文件｜{parsed[2]}】\n{main}")
+            return "\n\n".join(parts) or None
 
         return edgar
     if urlsplit(url).netloc == "mfn.se":
@@ -157,15 +168,42 @@ def fetcher_for(lead: Mapping[str, Any]) -> Callable[[], str | None] | None:
 
 
 def _text_path(lead_id: str, text_dir: Path) -> Path:
-    return text_dir / f"{lead_id}.txt"
+    return Path(text_dir) / f"{lead_id}.txt"
+
+
+def wants_exhibits(lead: Mapping[str, Any]) -> bool:
+    """這則 lead 的全文要不要含 EX-99.x 附件：EDGAR 主文件、而且是 6-K／8-K 或 form_type 不明。"""
+    if parse_edgar_url(str(lead.get("url") or "")) is None:
+        return False
+    form = str(lead.get("form_type") or "").upper().split("/")[0]
+    return not form or form in EXHIBIT_FORMS
+
+
+def cached_text(lead_id: str, lead: Mapping[str, Any], *, text_dir: Path = TEXT_DIR) -> str | None:
+    """存檔的全文。沒存檔、或是 #105 之前只存了封面的 6-K／8-K（meta 沒有 `exhibits_checked`）回 None＝要重抓。
+
+    2026-10-27 實測：GFS 10-14 6-K 的存檔 950 字，只有封面與「Exhibit 99.1 Press release」一行——預篩與分類讀到的都是它。
+    重抓的新版仍逐字包含主文件（附件在前、主文件在後），已驗過的引文仍是子字串。"""
+    path = _text_path(lead_id, text_dir)
+    if not path.is_file():
+        return None
+    if wants_exhibits(lead):
+        try:
+            meta = json.loads(path.with_suffix(".json").read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            meta = {}
+        if not meta.get("exhibits_checked"):
+            return None
+    return path.read_text(encoding="utf-8")
 
 
 def load_or_fetch_text(lead_id: str, lead: Mapping[str, Any], *, text_dir: Path = TEXT_DIR,
                        fetch: Callable[[], str | None]) -> tuple[str | None, bool]:
-    """(全文, 是否重用存檔)。已存檔就重用、不重抓；抓到空字串或失敗回 None。"""
+    """(全文, 是否重用存檔)。已存檔（且不是只有封面的舊版，見 `cached_text`）就重用、不重抓；抓到空字串或失敗回 None。"""
     path = _text_path(lead_id, text_dir)
-    if path.is_file():
-        return path.read_text(encoding="utf-8"), True
+    cached = cached_text(lead_id, lead, text_dir=text_dir)
+    if cached is not None:
+        return cached, True
     try:
         text = fetch()
     except Exception as exc:  # noqa: BLE001 — 抓不到就是抓不到（計數），不得拿標題充數
@@ -173,11 +211,12 @@ def load_or_fetch_text(lead_id: str, lead: Mapping[str, Any], *, text_dir: Path 
         return None, False
     if not text or not str(text).strip():
         return None, False
-    text_dir.mkdir(parents=True, exist_ok=True)
+    Path(text_dir).mkdir(parents=True, exist_ok=True)
     path.write_text(str(text), encoding="utf-8")
     meta = {"lead_id": lead_id, "source_url": lead.get("url"),
             "sha256": hashlib.sha256(str(text).encode("utf-8")).hexdigest(),
-            "chars": len(str(text)), "fetched_at": datetime.now(timezone.utc).isoformat()}
+            "chars": len(str(text)), "fetched_at": datetime.now(timezone.utc).isoformat(),
+            "exhibits_checked": wants_exhibits(lead)}
     path.with_suffix(".json").write_text(json.dumps(meta, ensure_ascii=False, indent=2) + "\n",
                                          encoding="utf-8")
     return str(text), False

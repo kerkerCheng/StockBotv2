@@ -213,6 +213,53 @@ def fetch_filing_text(cik: str, accession: str, primary_doc: str) -> str | None:
         return None
 
 
+_INDEX_ROW = re.compile(r"<tr[^>]*>(.*?)</tr>", re.S | re.I)
+_INDEX_CELL = re.compile(r"<td[^>]*>(.*?)</td>", re.S | re.I)
+_INDEX_HREF = re.compile(r'href="(?:/ix\?doc=)?(/Archives/edgar/data/[^"]+)"', re.I)
+
+
+def parse_filing_index(html: str) -> list[dict[str, str]]:
+    """filing 索引頁（`<accession>-index.htm`）的文件表 → `[{document, type, description}]`。
+
+    附件要看 **Type 欄**，不能看檔名：GFS 2026-10-14 6-K 的新聞稿附件叫 `gfpressreleasefinal.htm`，檔名裡沒有 99
+    （failure log #105）。表頭列（`<th>`）、沒有連結的列（完整 submission 的空 Type）自然被略過。"""
+    rows: list[dict[str, str]] = []
+    for row in _INDEX_ROW.findall(html or ""):
+        cells = _INDEX_CELL.findall(row)
+        if len(cells) < 4:
+            continue
+        href = _INDEX_HREF.search(cells[2])
+        if not href:
+            continue
+        clean = [html_to_text(c).replace("\xa0", " ").strip() for c in cells]
+        rows.append({"document": href.group(1).rsplit("/", 1)[-1], "type": clean[3], "description": clean[1]})
+    return rows
+
+
+def fetch_filing_exhibits(cik: str, accession: str, *, type_prefix: str = "EX-99",
+                          limit: int = 3) -> list[tuple[str, str, str]]:
+    """Type 以 `type_prefix` 開頭的附件 → `[(type, document, 純文字)]`，照索引頁順序、最多 `limit` 份。
+
+    6-K／8-K 的主文件常常只是封面，新聞稿與財報在附件 99.x（failure log #105：分類器只拿到封面就判 no_go）。
+    索引頁抓不到 raise（呼叫端計「抓不到」，不得把只有封面的主文件當成全文）；個別附件抓不到就略過那一份。"""
+    cik_int = str(int(cik))
+    dashed = f"{accession[:10]}-{accession[10:12]}-{accession[12:]}"
+    url = f"https://www.sec.gov/Archives/edgar/data/{cik_int}/{accession}/{dashed}-index.htm"
+    headers = _build_headers()
+    headers["Host"] = "www.sec.gov"
+    rate_sleep()
+    resp = requests.get(url, headers=headers, timeout=30)
+    resp.raise_for_status()
+    out: list[tuple[str, str, str]] = []
+    for row in parse_filing_index(resp.text):
+        if not row["type"].upper().startswith(type_prefix) or len(out) >= limit:
+            continue
+        text = fetch_filing_text(cik, accession, row["document"])
+        if text and text.strip():
+            out.append((row["type"], row["document"], text))
+    return out
+
+
 # 預設截斷：~50k chars ≈ ~12k tokens，10-K 全文常超過 300k chars
 # extract.py 的 context window 大約 100k tokens，但整份 10-K 品質很差（法律條文噪音多）
 # 建議只抓前 50k chars（Business + MD&A 段落），需要更多時手動 --max-chars

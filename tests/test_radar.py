@@ -326,8 +326,10 @@ def test_the_triage_batch_puts_radar_leads_after_every_other_lead_before_the_cap
     import engine_b.routine_config as rc
 
     store = leads.empty_store()
-    leads.register(store, source="web_radar:cpo", url=URL_A, title="Coherent $COHR laser", seen_at="2026-10-01T00:00:00+00:00",
-                   source_class="secondary")
+    radar_id, _ = leads.register(store, source="web_radar:cpo", url=URL_A, title="Coherent $COHR laser",
+                                 seen_at="2026-10-01T00:00:00+00:00", source_class="secondary")
+    # 真實的雷達 lead 一定帶事實句（apply 拒收空的）；沒有它的話 #105 起會被當成無內文、根本不進批次
+    store["leads"][radar_id]["refs"] = {"radar_fact": "Coherent 擴產 6 吋 InP 雷射"}
     for i in range(3):
         leads.register(store, source="rss:x", url=f"https://feed.example/{i}", title=f"plain {i}",
                        seen_at=f"2026-10-04T0{i}:00:00+00:00")
