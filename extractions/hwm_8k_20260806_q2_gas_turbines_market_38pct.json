@@ -1,0 +1,102 @@
+{
+  "claims": [
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：Howmet 之後的半年報／季報寫出資料中心相關需求轉弱（占比下降或該市場營收年減），或客戶改用別家零件。核查頻率：每季（Howmet 定期報告）。觸發後 48 小時：降這條邊 confidence，重讀本層。",
+      "id": "hwm_8k_20260806_q2_gas_turbines_market_38pct_cl1",
+      "source_ids": [
+        "hwm_8k_20260806_q2_gas_turbines_market_38pct_s1",
+        "hwm_8k_20260806_q2_gas_turbines_market_38pct_s2",
+        "hwm_8k_20260806_q2_gas_turbines_market_38pct_s3"
+      ],
+      "statement": "Howmet Q2 2026: gas turbines market revenue grew 38%; demand is 'extraordinary' with customers revisiting and adding to their outlooks; capex must rise further in 2027 for aerospace and gas turbines. The release does not mention data centers and does not split power generation from other gas turbine uses.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:gas_turbine_hot_section_casting",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "hwm_8k_20260806_q2_gas_turbines_market_38pct_s1",
+        "hwm_8k_20260806_q2_gas_turbines_market_38pct_s2",
+        "hwm_8k_20260806_q2_gas_turbines_market_38pct_s3"
+      ],
+      "src_id": "co:howmet"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "Howmet Aerospace Inc."
+      ],
+      "attributes": {
+        "ticker": "HWM"
+      },
+      "confidence": 0.85,
+      "id": "co:howmet",
+      "name": "Howmet Aerospace",
+      "role": null,
+      "source_ids": [
+        "hwm_8k_20260806_q2_gas_turbines_market_38pct_s1",
+        "hwm_8k_20260806_q2_gas_turbines_market_38pct_s2",
+        "hwm_8k_20260806_q2_gas_turbines_market_38pct_s3"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "investment castings including airfoils",
+        "gas turbine airfoils"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:gas_turbine_hot_section_casting",
+      "name": "Gas turbine hot-section investment castings (airfoils)",
+      "role": null,
+      "source_ids": [
+        "hwm_8k_20260806_q2_gas_turbines_market_38pct_s1",
+        "hwm_8k_20260806_q2_gas_turbines_market_38pct_s2",
+        "hwm_8k_20260806_q2_gas_turbines_market_38pct_s3"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "hwm_8k_20260806_q2_gas_turbines_market_38pct",
+    "evidence_tier": 1,
+    "origin_entity": "Howmet Aerospace Inc.",
+    "permission_basis": "SEC EDGAR 公開申報（8-K 附件新聞稿）；只保留研究必要的有限逐字節錄。published_at 取 EDGAR 申報日 2026-08-06。",
+    "published_at": "2026-08-06",
+    "publisher": "SEC EDGAR（Form 8-K Exhibit 99.1，accession 0001104659-26-091610）",
+    "retrieved_at": "2026-10-27",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Howmet Aerospace 2026 年第二季財報稿（8-K Exhibit 99.1，2026-08-06）：燃機市場營收年增 38%、需求「extraordinary」，2027 年資本支出要再提高以支撐航空與燃機成長",
+    "url": "https://www.sec.gov/Archives/edgar/data/4281/000110465926091610/tm2622325d1_ex99-1.htm"
+  },
+  "sources": [
+    {
+      "id": "hwm_8k_20260806_q2_gas_turbines_market_38pct_s1",
+      "locator": "Q2 摘要",
+      "quote": "Revenue was driven by 28% growth in the commercial aerospace market, 11% growth in the defense aerospace market and 38% growth in the gas turbines market."
+    },
+    {
+      "id": "hwm_8k_20260806_q2_gas_turbines_market_38pct_s2",
+      "locator": "CEO 引言",
+      "quote": "Demand in the gas turbines market is extraordinary with customers already revisiting and adding to their demand outlooks."
+    },
+    {
+      "id": "hwm_8k_20260806_q2_gas_turbines_market_38pct_s3",
+      "locator": "CEO 引言",
+      "quote": "Our capital expenditure requirements continue to increase, and we already see the need to increase this further in 2027 to support future organic growth expectations in both the aerospace and gas turbines markets."
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/4281/000110465926091610/tm2622325d1_ex99-1.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Howmet Aerospace 2026 年第二季財報稿（8-K Exhibit 99.1，2026-08-06）：燃機市場營收年增 38%、需求「extraordinary」，2027 年資本支出要再提高以支撐航空與燃機成長
+RETRIEVED: 2026-10-27（本機原文抽字逐字核對）
+
+【Q2 摘要】
+"Revenue was driven by 28% growth in the commercial aerospace market, 11% growth in the defense aerospace market and 38% growth in the gas turbines market."
+
+【CEO 引言】
+"Demand in the gas turbines market is extraordinary with customers already revisiting and adding to their demand outlooks."
+
+【CEO 引言】
+"Our capital expenditure requirements continue to increase, and we already see the need to increase this further in 2027 to support future organic growth expectations in both the aerospace and gas turbines markets."

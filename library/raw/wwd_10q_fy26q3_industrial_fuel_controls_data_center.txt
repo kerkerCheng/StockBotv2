@@ -1,0 +1,17 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/108312/000119312526325790/wwd-20260630.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Woodward, Inc. Form 10-Q（FY2026 第三季，2026-07-30）：Industrial 部門的燃料、點火、控制產品用在工業燃機（重型、航改、小型）、汽輪機與燃氣往復式引擎；發電銷售成長來自資料中心主電源與備援需求
+RETRIEVED: 2026-10-27（本機原文抽字逐字核對）
+
+【附註 Segment—Industrial】
+"Our Industrial segment designs, produces, and services systems and products for the management of energy in the form of fuel, air, fluids, gases, motion, combustion, and electricity."
+
+【附註 Segment—Industrial】
+"These products include actuators, valves, pumps, fuel injection systems, solenoids, ignition systems, control systems, electronics and software, and sensors."
+
+【附註 Segment—Industrial】
+"Our products are used on industrial gas turbines (including heavy frame, aeroderivative, and small industrial gas turbines), steam turbines, compressors, and reciprocating engines (including low speed, medium speed, and high-speed engines that operate on various fuels, including natural gas, diesel, heavy fuel oil, and new lower carbon alternative fuels in both single and dual-fuel applications)."
+
+【MD&A Industrial】
+"Power generation sales increased in the third quarter and first nine months of fiscal year 2026 as compared to the same periods of fiscal year 2025, primarily due to higher data center demand for both base and backup power."

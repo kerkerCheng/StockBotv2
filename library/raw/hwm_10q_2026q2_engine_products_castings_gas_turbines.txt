@@ -1,0 +1,8 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/4281/000000428126000025/hwm-20260630.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Howmet Aerospace Inc. Form 10-Q（2026Q2，2026-08-06）：Engine Products 做投資鑄件（含葉片）與無縫輾環，主要用於航空引擎與燃機
+RETRIEVED: 2026-10-27（本機原文抽字逐字核對）
+
+【附註 Segment Information】
+"Engine Products produces investment castings, including airfoils, and seamless rolled rings primarily for aircraft engines and gas turbine applications."

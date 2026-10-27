@@ -1,0 +1,184 @@
+{
+  "claims": [
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：Accelleron 之後的半年報／季報寫出資料中心相關需求轉弱（占比下降或該市場營收年減），或客戶改用別家零件。核查頻率：每半年（Accelleron 定期報告）。觸發後 48 小時：降這條邊 confidence，重讀本層。",
+      "id": "acln_hy2026_turbochargers_data_center_prime_power_cl1",
+      "source_ids": [
+        "acln_hy2026_turbochargers_data_center_prime_power_s1",
+        "acln_hy2026_turbochargers_data_center_prime_power_s2",
+        "acln_hy2026_turbochargers_data_center_prime_power_s5",
+        "acln_hy2026_turbochargers_data_center_prime_power_s6",
+        "acln_hy2026_turbochargers_data_center_prime_power_s7"
+      ],
+      "statement": "Accelleron H1 2026: High Speed turbochargers (0.5–5 MW) grew on demand from gas-fired prime power for U.S. data centers, supported by capacity expansions at key engine OEMs; data-center-related revenue rose from about 5% of group revenue in H1 2025 to slightly below 9% in H1 2026, which the company itself calls still limited in absolute terms; Swiss manufacturing is close to capacity limits and being expanded. Supplier self-report; customers (engine OEMs) are not named.",
+      "subject_id": "e2"
+    },
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：Accelleron 之後的報告寫出自己的增壓器交期成為客戶出貨的限制（不再是 OEM 產能）。核查頻率：每半年（Accelleron 定期報告）。觸發後 48 小時：重讀燃氣往復式機組層的卡點讀法。",
+      "id": "acln_hy2026_turbochargers_data_center_prime_power_cl2",
+      "source_ids": [
+        "acln_hy2026_turbochargers_data_center_prime_power_s2",
+        "acln_hy2026_turbochargers_data_center_prime_power_s3",
+        "acln_hy2026_turbochargers_data_center_prime_power_s4"
+      ],
+      "statement": "Accelleron says growth in this segment is gated by engine OEM capacity — 'the manufacturing capacity of engine OEMs will be the key growth driver going forward', and diesel backup growth was 'constrained by OEM capacity allocation' — i.e. the binding constraint it describes sits at the engine OEM, not at the turbocharger.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:gas_reciprocating_genset",
+      "id": "e1",
+      "relation": "is_component_of",
+      "source_ids": [
+        "acln_hy2026_turbochargers_data_center_prime_power_s1",
+        "acln_hy2026_turbochargers_data_center_prime_power_s2"
+      ],
+      "src_id": "tech:gas_engine_turbocharger"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "tech:gas_engine_turbocharger",
+      "id": "e2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "acln_hy2026_turbochargers_data_center_prime_power_s1",
+        "acln_hy2026_turbochargers_data_center_prime_power_s2",
+        "acln_hy2026_turbochargers_data_center_prime_power_s5",
+        "acln_hy2026_turbochargers_data_center_prime_power_s6",
+        "acln_hy2026_turbochargers_data_center_prime_power_s7"
+      ],
+      "src_id": "co:accelleron"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "Accelleron Industries AG",
+        "Accelleron Industries Ltd"
+      ],
+      "attributes": {
+        "ticker": "ACLN.SW"
+      },
+      "confidence": 0.85,
+      "id": "co:accelleron",
+      "name": "Accelleron",
+      "role": null,
+      "source_ids": [
+        "acln_hy2026_turbochargers_data_center_prime_power_s1",
+        "acln_hy2026_turbochargers_data_center_prime_power_s2",
+        "acln_hy2026_turbochargers_data_center_prime_power_s3",
+        "acln_hy2026_turbochargers_data_center_prime_power_s4",
+        "acln_hy2026_turbochargers_data_center_prime_power_s5",
+        "acln_hy2026_turbochargers_data_center_prime_power_s6",
+        "acln_hy2026_turbochargers_data_center_prime_power_s7"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "turbochargers for gas-fired prime power",
+        "high speed turbochargers"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:gas_engine_turbocharger",
+      "name": "Turbocharger for large gas engines (0.5 MW and up)",
+      "role": null,
+      "source_ids": [
+        "acln_hy2026_turbochargers_data_center_prime_power_s1",
+        "acln_hy2026_turbochargers_data_center_prime_power_s2",
+        "acln_hy2026_turbochargers_data_center_prime_power_s3",
+        "acln_hy2026_turbochargers_data_center_prime_power_s4",
+        "acln_hy2026_turbochargers_data_center_prime_power_s5",
+        "acln_hy2026_turbochargers_data_center_prime_power_s6",
+        "acln_hy2026_turbochargers_data_center_prime_power_s7"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "gas reciprocating engines",
+        "gas engine generator set",
+        "reciprocating gas engine",
+        "gas genset"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:gas_reciprocating_genset",
+      "name": "Gas reciprocating engine generator set",
+      "role": null,
+      "source_ids": [
+        "acln_hy2026_turbochargers_data_center_prime_power_s1",
+        "acln_hy2026_turbochargers_data_center_prime_power_s2",
+        "acln_hy2026_turbochargers_data_center_prime_power_s3",
+        "acln_hy2026_turbochargers_data_center_prime_power_s4",
+        "acln_hy2026_turbochargers_data_center_prime_power_s5",
+        "acln_hy2026_turbochargers_data_center_prime_power_s6",
+        "acln_hy2026_turbochargers_data_center_prime_power_s7"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "acln_hy2026_turbochargers_data_center_prime_power",
+    "evidence_tier": 1,
+    "origin_entity": "Accelleron Industries AG",
+    "permission_basis": "Accelleron 公開半年報；只保留研究必要的有限逐字節錄。報告內文寫董事會 2026-08-24 核准發布；published_at 取半年度業績發布與法說會日 2026-08-27（多家財經媒體的法說逐字稿日期），非報告內文自載。",
+    "published_at": "2026-08-27",
+    "publisher": "Accelleron Industries（投資人關係網站，半年報 PDF）",
+    "retrieved_at": "2026-10-27",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Accelleron 2026 半年報：High Speed 增壓器營收年增 40%，由美國資料中心燃氣主電源帶動、靠引擎 OEM 擴產支撐；柴油備援成長受 OEM 產能分配限制；資料中心相關營收占比由約 5% 升到略低於 9%；瑞士廠接近滿載",
+    "url": "https://accelleron.com/content/dam/accelleronind/documents/investors/Accelleron-Half-Year-Report-2026.pdf"
+  },
+  "sources": [
+    {
+      "id": "acln_hy2026_turbochargers_data_center_prime_power_s1",
+      "locator": "Company financial and business review",
+      "quote": "High Speed: produces and services turbochargers with power outputs ranging from 0.5 to 5 MW, for the use of one to four turbos per engine."
+    },
+    {
+      "id": "acln_hy2026_turbochargers_data_center_prime_power_s2",
+      "locator": "Letter to shareholders",
+      "quote": "Growth was driven by continued strong demand for turbochargers used in gas-fired prime power applications for data centers in the U.S., supported by capacity expansions at key engine OEMs."
+    },
+    {
+      "id": "acln_hy2026_turbochargers_data_center_prime_power_s3",
+      "locator": "Letter to shareholders",
+      "quote": "Revenue growth in diesel-fired backup power applications was constrained by OEM capacity allocation."
+    },
+    {
+      "id": "acln_hy2026_turbochargers_data_center_prime_power_s4",
+      "locator": "Letter to shareholders—Outlook",
+      "quote": "The manufacturing capacity of engine OEMs will be the key growth driver going forward."
+    },
+    {
+      "id": "acln_hy2026_turbochargers_data_center_prime_power_s5",
+      "locator": "Letter to shareholders—Outlook",
+      "quote": "While we benefit from the additional growth from data center applications, the absolute volumes are still limited in relation to total revenue."
+    },
+    {
+      "id": "acln_hy2026_turbochargers_data_center_prime_power_s6",
+      "locator": "Letter to shareholders—Outlook",
+      "quote": "In the first half of 2025, around 5% of our revenues were data center-related. In the first half of 2026, this figure increased to slightly below 9%."
+    },
+    {
+      "id": "acln_hy2026_turbochargers_data_center_prime_power_s7",
+      "locator": "Letter to shareholders—Raised guidance",
+      "quote": "Since the stock listing in 2022, Accelleron's business volume has almost doubled, bringing its Swiss manufacturing operations close to capacity limits."
+    }
+  ]
+}

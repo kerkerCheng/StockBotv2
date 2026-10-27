@@ -1,0 +1,26 @@
+Source URL: https://accelleron.com/content/dam/accelleronind/documents/investors/Accelleron-Half-Year-Report-2026.pdf
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Accelleron 2026 半年報：High Speed 增壓器營收年增 40%，由美國資料中心燃氣主電源帶動、靠引擎 OEM 擴產支撐；柴油備援成長受 OEM 產能分配限制；資料中心相關營收占比由約 5% 升到略低於 9%；瑞士廠接近滿載
+RETRIEVED: 2026-10-27（本機原文抽字逐字核對）
+
+【Company financial and business review】
+"High Speed: produces and services turbochargers with power outputs ranging from 0.5 to 5 MW, for the use of one to four turbos per engine."
+
+【Letter to shareholders】
+"Growth was driven by continued strong demand for turbochargers used in gas-fired prime power applications for data centers in the U.S., supported by capacity expansions at key engine OEMs."
+
+【Letter to shareholders】
+"Revenue growth in diesel-fired backup power applications was constrained by OEM capacity allocation."
+
+【Letter to shareholders—Outlook】
+"The manufacturing capacity of engine OEMs will be the key growth driver going forward."
+
+【Letter to shareholders—Outlook】
+"While we benefit from the additional growth from data center applications, the absolute volumes are still limited in relation to total revenue."
+
+【Letter to shareholders—Outlook】
+"In the first half of 2025, around 5% of our revenues were data center-related. In the first half of 2026, this figure increased to slightly below 9%."
+
+【Letter to shareholders—Raised guidance】
+"Since the stock listing in 2022, Accelleron's business volume has almost doubled, bringing its Swiss manufacturing operations close to capacity limits."

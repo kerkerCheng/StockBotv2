@@ -1,0 +1,177 @@
+{
+  "claims": [
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：Woodward 之後的半年報／季報寫出資料中心相關需求轉弱（占比下降或該市場營收年減），或客戶改用別家零件。核查頻率：每季（Woodward 定期報告）。觸發後 48 小時：降這條邊 confidence，重讀本層。",
+      "id": "wwd_10q_fy26q3_industrial_fuel_controls_data_center_cl1",
+      "source_ids": [
+        "wwd_10q_fy26q3_industrial_fuel_controls_data_center_s1",
+        "wwd_10q_fy26q3_industrial_fuel_controls_data_center_s2",
+        "wwd_10q_fy26q3_industrial_fuel_controls_data_center_s3",
+        "wwd_10q_fy26q3_industrial_fuel_controls_data_center_s4"
+      ],
+      "statement": "Woodward 10-Q (fiscal Q3 2026): its Industrial segment's fuel injection, ignition, valves, actuators and control systems are used on industrial gas turbines (heavy frame, aeroderivative, small), steam turbines and natural-gas reciprocating engines; power generation sales rose primarily on data center demand for both base and backup power. Supplier self-report; does not quantify the data center share or name engine/turbine customers.",
+      "subject_id": "e3"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:gas_turbine_genset",
+      "id": "e1",
+      "relation": "is_component_of",
+      "source_ids": [
+        "wwd_10q_fy26q3_industrial_fuel_controls_data_center_s2",
+        "wwd_10q_fy26q3_industrial_fuel_controls_data_center_s3"
+      ],
+      "src_id": "tech:prime_mover_fuel_control_system"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:gas_reciprocating_genset",
+      "id": "e2",
+      "relation": "is_component_of",
+      "source_ids": [
+        "wwd_10q_fy26q3_industrial_fuel_controls_data_center_s2",
+        "wwd_10q_fy26q3_industrial_fuel_controls_data_center_s3"
+      ],
+      "src_id": "tech:prime_mover_fuel_control_system"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:prime_mover_fuel_control_system",
+      "id": "e3",
+      "relation": "supplies_to",
+      "source_ids": [
+        "wwd_10q_fy26q3_industrial_fuel_controls_data_center_s1",
+        "wwd_10q_fy26q3_industrial_fuel_controls_data_center_s2",
+        "wwd_10q_fy26q3_industrial_fuel_controls_data_center_s3",
+        "wwd_10q_fy26q3_industrial_fuel_controls_data_center_s4"
+      ],
+      "src_id": "co:woodward"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "Woodward, Inc."
+      ],
+      "attributes": {
+        "ticker": "WWD"
+      },
+      "confidence": 0.85,
+      "id": "co:woodward",
+      "name": "Woodward",
+      "role": null,
+      "source_ids": [
+        "wwd_10q_fy26q3_industrial_fuel_controls_data_center_s1",
+        "wwd_10q_fy26q3_industrial_fuel_controls_data_center_s2",
+        "wwd_10q_fy26q3_industrial_fuel_controls_data_center_s3",
+        "wwd_10q_fy26q3_industrial_fuel_controls_data_center_s4"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "fuel injection systems",
+        "ignition systems",
+        "turbine and engine control systems"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:prime_mover_fuel_control_system",
+      "name": "Fuel, ignition and control systems for gas turbines and gas engines",
+      "role": null,
+      "source_ids": [
+        "wwd_10q_fy26q3_industrial_fuel_controls_data_center_s1",
+        "wwd_10q_fy26q3_industrial_fuel_controls_data_center_s2",
+        "wwd_10q_fy26q3_industrial_fuel_controls_data_center_s3",
+        "wwd_10q_fy26q3_industrial_fuel_controls_data_center_s4"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "gas turbine generator set",
+        "gas turbine generator units",
+        "燃气轮机发电机组"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:gas_turbine_genset",
+      "name": "Gas turbine generator set for onsite power",
+      "role": null,
+      "source_ids": [
+        "wwd_10q_fy26q3_industrial_fuel_controls_data_center_s1",
+        "wwd_10q_fy26q3_industrial_fuel_controls_data_center_s2",
+        "wwd_10q_fy26q3_industrial_fuel_controls_data_center_s3",
+        "wwd_10q_fy26q3_industrial_fuel_controls_data_center_s4"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "gas reciprocating engines",
+        "gas engine generator set",
+        "reciprocating gas engine",
+        "gas genset"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:gas_reciprocating_genset",
+      "name": "Gas reciprocating engine generator set",
+      "role": null,
+      "source_ids": [
+        "wwd_10q_fy26q3_industrial_fuel_controls_data_center_s1",
+        "wwd_10q_fy26q3_industrial_fuel_controls_data_center_s2",
+        "wwd_10q_fy26q3_industrial_fuel_controls_data_center_s3",
+        "wwd_10q_fy26q3_industrial_fuel_controls_data_center_s4"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "wwd_10q_fy26q3_industrial_fuel_controls_data_center",
+    "evidence_tier": 1,
+    "origin_entity": "Woodward, Inc.",
+    "permission_basis": "SEC EDGAR 公開申報（10-Q）；只保留研究必要的有限逐字節錄。published_at 取 EDGAR 申報日 2026-07-30。",
+    "published_at": "2026-07-30",
+    "publisher": "SEC EDGAR（Form 10-Q，accession 0001193125-26-325790）",
+    "retrieved_at": "2026-10-27",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Woodward, Inc. Form 10-Q（FY2026 第三季，2026-07-30）：Industrial 部門的燃料、點火、控制產品用在工業燃機（重型、航改、小型）、汽輪機與燃氣往復式引擎；發電銷售成長來自資料中心主電源與備援需求",
+    "url": "https://www.sec.gov/Archives/edgar/data/108312/000119312526325790/wwd-20260630.htm"
+  },
+  "sources": [
+    {
+      "id": "wwd_10q_fy26q3_industrial_fuel_controls_data_center_s1",
+      "locator": "附註 Segment—Industrial",
+      "quote": "Our Industrial segment designs, produces, and services systems and products for the management of energy in the form of fuel, air, fluids, gases, motion, combustion, and electricity."
+    },
+    {
+      "id": "wwd_10q_fy26q3_industrial_fuel_controls_data_center_s2",
+      "locator": "附註 Segment—Industrial",
+      "quote": "These products include actuators, valves, pumps, fuel injection systems, solenoids, ignition systems, control systems, electronics and software, and sensors."
+    },
+    {
+      "id": "wwd_10q_fy26q3_industrial_fuel_controls_data_center_s3",
+      "locator": "附註 Segment—Industrial",
+      "quote": "Our products are used on industrial gas turbines (including heavy frame, aeroderivative, and small industrial gas turbines), steam turbines, compressors, and reciprocating engines (including low speed, medium speed, and high-speed engines that operate on various fuels, including natural gas, diesel, heavy fuel oil, and new lower carbon alternative fuels in both single and dual-fuel applications)."
+    },
+    {
+      "id": "wwd_10q_fy26q3_industrial_fuel_controls_data_center_s4",
+      "locator": "MD&A Industrial",
+      "quote": "Power generation sales increased in the third quarter and first nine months of fiscal year 2026 as compared to the same periods of fiscal year 2025, primarily due to higher data center demand for both base and backup power."
+    }
+  ]
+}

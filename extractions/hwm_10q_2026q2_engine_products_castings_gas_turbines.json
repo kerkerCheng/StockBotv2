@@ -1,0 +1,100 @@
+{
+  "claims": [],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:gas_turbine_genset",
+      "id": "e1",
+      "relation": "is_component_of",
+      "source_ids": [
+        "hwm_10q_2026q2_engine_products_castings_gas_turbines_s1"
+      ],
+      "src_id": "tech:gas_turbine_hot_section_casting"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:gas_turbine_hot_section_casting",
+      "id": "e2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "hwm_10q_2026q2_engine_products_castings_gas_turbines_s1"
+      ],
+      "src_id": "co:howmet"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "Howmet Aerospace Inc."
+      ],
+      "attributes": {
+        "ticker": "HWM"
+      },
+      "confidence": 0.85,
+      "id": "co:howmet",
+      "name": "Howmet Aerospace",
+      "role": null,
+      "source_ids": [
+        "hwm_10q_2026q2_engine_products_castings_gas_turbines_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "investment castings including airfoils",
+        "gas turbine airfoils"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:gas_turbine_hot_section_casting",
+      "name": "Gas turbine hot-section investment castings (airfoils)",
+      "role": null,
+      "source_ids": [
+        "hwm_10q_2026q2_engine_products_castings_gas_turbines_s1"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "gas turbine generator set",
+        "gas turbine generator units",
+        "燃气轮机发电机组"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:gas_turbine_genset",
+      "name": "Gas turbine generator set for onsite power",
+      "role": null,
+      "source_ids": [
+        "hwm_10q_2026q2_engine_products_castings_gas_turbines_s1"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "hwm_10q_2026q2_engine_products_castings_gas_turbines",
+    "evidence_tier": 1,
+    "origin_entity": "Howmet Aerospace Inc.",
+    "permission_basis": "SEC EDGAR 公開申報（10-Q）；只保留研究必要的有限逐字節錄。published_at 取 EDGAR 申報日 2026-08-06。",
+    "published_at": "2026-08-06",
+    "publisher": "SEC EDGAR（Form 10-Q，accession 0000004281-26-000025）",
+    "retrieved_at": "2026-10-27",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Howmet Aerospace Inc. Form 10-Q（2026Q2，2026-08-06）：Engine Products 做投資鑄件（含葉片）與無縫輾環，主要用於航空引擎與燃機",
+    "url": "https://www.sec.gov/Archives/edgar/data/4281/000000428126000025/hwm-20260630.htm"
+  },
+  "sources": [
+    {
+      "id": "hwm_10q_2026q2_engine_products_castings_gas_turbines_s1",
+      "locator": "附註 Segment Information",
+      "quote": "Engine Products produces investment castings, including airfoils, and seamless rolled rings primarily for aircraft engines and gas turbine applications."
+    }
+  ]
+}
