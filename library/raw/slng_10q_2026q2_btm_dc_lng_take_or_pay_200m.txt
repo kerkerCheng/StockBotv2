@@ -1,0 +1,20 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1043186/000143774926027112/slng20260630_10q.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Stabilis Solutions Form 10-Q（2026Q2，2026-08-12）：約 2 億美元多年 take-or-pay 合約，供 LNG 給資料中心表後發電（客戶為遠端與臨時發電大廠，2027Q1–2029Q1，預付 2,500 萬美元）；2026-07-09 再簽資料中心臨時發電供氣合約；第二季營收年減 31.2%
+RETRIEVED: 2026-10-27（本機原文抽字逐字核對）
+
+【MD&A Expanding Markets】
+"In February 2026, the Company was awarded a multi-year take-or-pay contract to supply LNG for behind-the-meter power generation for a world-leading provider of remote and temporary power generation at a data center."
+
+【MD&A Expanding Markets】
+"LNG deliveries are expected to commence during the first quarter of 2027 and continue through the first quarter of 2029. Total revenue under the initial multi-year term of the contract is estimated to be approximately $200 million."
+
+【MD&A Expanding Markets】
+"The Company will receive $25.0 million in advance payments from the customer; of which, $20.0 million has been received at June 30, 2026 and an additional $5.0 million advance payment was received in the third quarter of 2026."
+
+【MD&A Expanding Markets】
+"On July 9, 2026, the Company signed a contract commencing in the third quarter of 2026 to fuel temporary power generation at a data center that is anticipated to replace a significant portion of lost volumes from prior periods."
+
+【MD&A Results of Operations 表】
+"Total revenues 11,916 17,309 (5,393 ) (31.2 )"

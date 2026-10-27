@@ -1,0 +1,169 @@
+{
+  "claims": [
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：表後燃氣電廠的許可或整合商申報普遍寫明只接管線氣、不用槽車 LNG／CNG，或 Stabilis／Certarus 的資料中心合約提前終止。核查頻率：每季。觸發後 48 小時：重讀這一層是過渡用還是常設。",
+      "id": "slng_10q_2026q2_btm_dc_lng_take_or_pay_200m_cl1",
+      "source_ids": [
+        "slng_10q_2026q2_btm_dc_lng_take_or_pay_200m_s1",
+        "slng_10q_2026q2_btm_dc_lng_take_or_pay_200m_s2",
+        "slng_10q_2026q2_btm_dc_lng_take_or_pay_200m_s4"
+      ],
+      "statement": "Trucked LNG is used to fuel behind-the-meter and temporary power generation at data centers: Stabilis (10-Q, Q2 2026) holds a multi-year contract to supply LNG for behind-the-meter power generation at a data center (deliveries 2027Q1–2029Q1) and a second contract (signed 2026-07-09) to fuel temporary power generation at a data center. It is a bridge/temporary fuel layer — the filing does not say whether pipeline gas later replaces it.",
+      "subject_id": "e1"
+    },
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：Stabilis 之後的 10-Q／10-K 寫出合約取消、交貨延後、退回預付款，或客戶付款違約。核查頻率：每季（Stabilis 10-Q）。觸發後 48 小時：降這條邊 confidence，重讀過渡供氣層。",
+      "id": "slng_10q_2026q2_btm_dc_lng_take_or_pay_200m_cl2",
+      "source_ids": [
+        "slng_10q_2026q2_btm_dc_lng_take_or_pay_200m_s1",
+        "slng_10q_2026q2_btm_dc_lng_take_or_pay_200m_s2",
+        "slng_10q_2026q2_btm_dc_lng_take_or_pay_200m_s3",
+        "slng_10q_2026q2_btm_dc_lng_take_or_pay_200m_s4",
+        "slng_10q_2026q2_btm_dc_lng_take_or_pay_200m_s5"
+      ],
+      "statement": "Stabilis (10-Q, Q2 2026): in February 2026 won a multi-year take-or-pay contract, about USD 200 million over the initial term (deliveries 2027Q1–2029Q1), to supply LNG for behind-the-meter power generation at a data center to a world-leading provider of remote and temporary power generation (customer not named); USD 25 million advance payments; a second data-center temporary power fuel contract signed 2026-07-09. Against Q2 2026 total revenue of USD 11.9 million (down 31.2%), the contract is large relative to the company.",
+      "subject_id": "e2"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.65,
+      "dst_id": "tech:onsite_gas_power",
+      "id": "e1",
+      "relation": "is_component_of",
+      "source_ids": [
+        "slng_10q_2026q2_btm_dc_lng_take_or_pay_200m_s1",
+        "slng_10q_2026q2_btm_dc_lng_take_or_pay_200m_s4"
+      ],
+      "src_id": "tech:onsite_gas_virtual_pipeline"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "tech:onsite_gas_virtual_pipeline",
+      "id": "e2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "slng_10q_2026q2_btm_dc_lng_take_or_pay_200m_s1",
+        "slng_10q_2026q2_btm_dc_lng_take_or_pay_200m_s2",
+        "slng_10q_2026q2_btm_dc_lng_take_or_pay_200m_s3",
+        "slng_10q_2026q2_btm_dc_lng_take_or_pay_200m_s4",
+        "slng_10q_2026q2_btm_dc_lng_take_or_pay_200m_s5"
+      ],
+      "src_id": "co:stabilis_solutions"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "virtual pipeline",
+        "mobile CNG",
+        "trucked LNG for power generation"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:onsite_gas_virtual_pipeline",
+      "name": "Trucked LNG/CNG fuel supply (virtual pipeline) for onsite gas power",
+      "role": null,
+      "source_ids": [
+        "slng_10q_2026q2_btm_dc_lng_take_or_pay_200m_s1",
+        "slng_10q_2026q2_btm_dc_lng_take_or_pay_200m_s2",
+        "slng_10q_2026q2_btm_dc_lng_take_or_pay_200m_s3",
+        "slng_10q_2026q2_btm_dc_lng_take_or_pay_200m_s4",
+        "slng_10q_2026q2_btm_dc_lng_take_or_pay_200m_s5"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "onsite natural gas power",
+        "onsite gas power",
+        "behind-the-meter natural gas generation",
+        "onsite natural gas and power generation"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:onsite_gas_power",
+      "name": "Onsite natural gas power generation for data centers",
+      "role": null,
+      "source_ids": [
+        "slng_10q_2026q2_btm_dc_lng_take_or_pay_200m_s1",
+        "slng_10q_2026q2_btm_dc_lng_take_or_pay_200m_s2",
+        "slng_10q_2026q2_btm_dc_lng_take_or_pay_200m_s3",
+        "slng_10q_2026q2_btm_dc_lng_take_or_pay_200m_s4",
+        "slng_10q_2026q2_btm_dc_lng_take_or_pay_200m_s5"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "Stabilis",
+        "Stabilis Solutions, Inc."
+      ],
+      "attributes": {
+        "ticker": "SLNG"
+      },
+      "confidence": 0.85,
+      "id": "co:stabilis_solutions",
+      "name": "Stabilis Solutions",
+      "role": null,
+      "source_ids": [
+        "slng_10q_2026q2_btm_dc_lng_take_or_pay_200m_s1",
+        "slng_10q_2026q2_btm_dc_lng_take_or_pay_200m_s2",
+        "slng_10q_2026q2_btm_dc_lng_take_or_pay_200m_s3",
+        "slng_10q_2026q2_btm_dc_lng_take_or_pay_200m_s4",
+        "slng_10q_2026q2_btm_dc_lng_take_or_pay_200m_s5"
+      ],
+      "type": "Company"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "slng_10q_2026q2_btm_dc_lng_take_or_pay_200m",
+    "evidence_tier": 1,
+    "origin_entity": "Stabilis Solutions, Inc.",
+    "permission_basis": "SEC EDGAR 公開申報（10-Q）；只保留研究必要的有限逐字節錄。published_at 取 EDGAR 申報日 2026-08-12。",
+    "published_at": "2026-08-12",
+    "publisher": "SEC EDGAR（Form 10-Q，accession 0001437749-26-027112）",
+    "retrieved_at": "2026-10-27",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Stabilis Solutions Form 10-Q（2026Q2，2026-08-12）：約 2 億美元多年 take-or-pay 合約，供 LNG 給資料中心表後發電（客戶為遠端與臨時發電大廠，2027Q1–2029Q1，預付 2,500 萬美元）；2026-07-09 再簽資料中心臨時發電供氣合約；第二季營收年減 31.2%",
+    "url": "https://www.sec.gov/Archives/edgar/data/1043186/000143774926027112/slng20260630_10q.htm"
+  },
+  "sources": [
+    {
+      "id": "slng_10q_2026q2_btm_dc_lng_take_or_pay_200m_s1",
+      "locator": "MD&A Expanding Markets",
+      "quote": "In February 2026, the Company was awarded a multi-year take-or-pay contract to supply LNG for behind-the-meter power generation for a world-leading provider of remote and temporary power generation at a data center."
+    },
+    {
+      "id": "slng_10q_2026q2_btm_dc_lng_take_or_pay_200m_s2",
+      "locator": "MD&A Expanding Markets",
+      "quote": "LNG deliveries are expected to commence during the first quarter of 2027 and continue through the first quarter of 2029. Total revenue under the initial multi-year term of the contract is estimated to be approximately $200 million."
+    },
+    {
+      "id": "slng_10q_2026q2_btm_dc_lng_take_or_pay_200m_s3",
+      "locator": "MD&A Expanding Markets",
+      "quote": "The Company will receive $25.0 million in advance payments from the customer; of which, $20.0 million has been received at June 30, 2026 and an additional $5.0 million advance payment was received in the third quarter of 2026."
+    },
+    {
+      "id": "slng_10q_2026q2_btm_dc_lng_take_or_pay_200m_s4",
+      "locator": "MD&A Expanding Markets",
+      "quote": "On July 9, 2026, the Company signed a contract commencing in the third quarter of 2026 to fuel temporary power generation at a data center that is anticipated to replace a significant portion of lost volumes from prior periods."
+    },
+    {
+      "id": "slng_10q_2026q2_btm_dc_lng_take_or_pay_200m_s5",
+      "locator": "MD&A Results of Operations 表",
+      "quote": "Total revenues 11,916 17,309 (5,393 ) (31.2 )"
+    }
+  ]
+}

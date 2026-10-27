@@ -1,0 +1,113 @@
+{
+  "claims": [
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：Superior Plus 之後的季報寫出資料中心合約延後／取消，或 CNG 量轉為年減。核查頻率：每季（Superior Plus 季報）。觸發後 48 小時：降這條邊 confidence，重讀過渡供氣層。",
+      "id": "spb_q2_2026_results_certarus_data_center_cng_cl1",
+      "source_ids": [
+        "spb_q2_2026_results_certarus_data_center_cng_s1",
+        "spb_q2_2026_results_certarus_data_center_cng_s2",
+        "spb_q2_2026_results_certarus_data_center_cng_s3",
+        "spb_q2_2026_results_certarus_data_center_cng_s4"
+      ],
+      "statement": "Superior Plus Q2 2026 results (2026-08-06): Certarus (its over-the-road CNG business) won an additional data center contract; record Q2 CNG volume of 8.404 million MMBtu (+17%), growth attributed to data center, industrial and wellsite demand; CNG Adjusted EBITDA +23% to USD 33.6 million; supporting power generation for hyperscalers is named the most compelling investment opportunity. Contract sizes, customers and how long each data center relies on trucked CNG are not stated.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:onsite_gas_virtual_pipeline",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "spb_q2_2026_results_certarus_data_center_cng_s1",
+        "spb_q2_2026_results_certarus_data_center_cng_s2",
+        "spb_q2_2026_results_certarus_data_center_cng_s3",
+        "spb_q2_2026_results_certarus_data_center_cng_s4"
+      ],
+      "src_id": "co:superior_plus"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "Superior Plus Corp.",
+        "Certarus"
+      ],
+      "attributes": {
+        "ticker": "SPB.TO"
+      },
+      "confidence": 0.85,
+      "id": "co:superior_plus",
+      "name": "Superior Plus",
+      "role": null,
+      "source_ids": [
+        "spb_q2_2026_results_certarus_data_center_cng_s1",
+        "spb_q2_2026_results_certarus_data_center_cng_s2",
+        "spb_q2_2026_results_certarus_data_center_cng_s3",
+        "spb_q2_2026_results_certarus_data_center_cng_s4"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "virtual pipeline",
+        "mobile CNG",
+        "trucked LNG for power generation"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:onsite_gas_virtual_pipeline",
+      "name": "Trucked LNG/CNG fuel supply (virtual pipeline) for onsite gas power",
+      "role": null,
+      "source_ids": [
+        "spb_q2_2026_results_certarus_data_center_cng_s1",
+        "spb_q2_2026_results_certarus_data_center_cng_s2",
+        "spb_q2_2026_results_certarus_data_center_cng_s3",
+        "spb_q2_2026_results_certarus_data_center_cng_s4"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "spb_q2_2026_results_certarus_data_center_cng",
+    "evidence_tier": 1,
+    "origin_entity": "Superior Plus Corp.",
+    "permission_basis": "公司公開財報稿 PDF；只保留研究必要的有限逐字節錄。published_at 取財報稿日期行「TORONTO, August 6, 2026」。",
+    "published_at": "2026-08-06",
+    "publisher": "Superior Plus 投資人網站（2026 第二季財報稿完整版 PDF；MD&A 同日載於 SEDAR+）",
+    "retrieved_at": "2026-10-27",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Superior Plus 2026 第二季財報稿（2026-08-06）：Certarus 資料中心業務再拿一份合約、CNG 第二季量 840.4 萬 MMBtu 創新高（年增 17%，資料中心等需求帶動）、CNG EBITDA 年增 23%；支援超大規模業者發電是最主要的投資機會",
+    "url": "https://www.superiorplus.com/wp-content/uploads/2026/08/SPB-Q2-2026-Earnings-Release-Full-Package-vF.pdf"
+  },
+  "sources": [
+    {
+      "id": "spb_q2_2026_results_certarus_data_center_cng_s1",
+      "locator": "財報稿重點",
+      "quote": "Certarus’ data center business continues to grow with the awarding of an additional contract and a robust pipeline of future opportunities"
+    },
+    {
+      "id": "spb_q2_2026_results_certarus_data_center_cng_s2",
+      "locator": "CNG Results",
+      "quote": "Q2 volumes of 8,404,000 MMBtu increased 17% and were also a record . Volume growth reflects ongoing business expansion and increased demand from data center, industrial and wellsite customers"
+    },
+    {
+      "id": "spb_q2_2026_results_certarus_data_center_cng_s3",
+      "locator": "CNG Results",
+      "quote": "Q2 Adjusted EBITDA(1) increased 23% to a record $33.6 million driven by increased sales volumes"
+    },
+    {
+      "id": "spb_q2_2026_results_certarus_data_center_cng_s4",
+      "locator": "Capital Allocation",
+      "quote": "Rapidly developing opportunities in supporting power generation for hyperscalers and growth in the transportation market represent the most compelling current opportunities for investment."
+    }
+  ]
+}
