@@ -1,0 +1,103 @@
+{
+  "claims": [
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：EPA 或州主管機關之後放寬表後燃機的 NOx BACT（例如 islanded 電廠豁免），或核發不需 SCR 的同級燃機許可。核查頻率：每季（EPA 新聞稿與州許可公告）。觸發後 48 小時：降這條邊 confidence，重讀排放控制層是否仍是必要層。",
+      "id": "mdeq_permit_0680_00119_mzx_titan_scr_2ppm_cl1",
+      "source_ids": [
+        "mdeq_permit_0680_00119_mzx_titan_scr_2ppm_s1",
+        "mdeq_permit_0680_00119_mzx_titan_scr_2ppm_s2",
+        "mdeq_permit_0680_00119_mzx_titan_scr_2ppm_s3"
+      ],
+      "statement": "Mississippi DEQ PSD permit 0680-00119 (issued 2026-03-11) for MZX Tech LLC: seventeen Solar Titan PGM-130 simple-cycle natural gas turbines (16.5 MW each), each equipped with SCR and oxidation catalyst, with a NOx BACT limit of 2 ppmv at 15% O2. A regulator's binding requirement — the emissions system is not optional for this class of permit. The permit does not say what the power is for.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "tech:gas_turbine_genset",
+      "id": "e1",
+      "relation": "is_component_of",
+      "source_ids": [
+        "mdeq_permit_0680_00119_mzx_titan_scr_2ppm_s1",
+        "mdeq_permit_0680_00119_mzx_titan_scr_2ppm_s2",
+        "mdeq_permit_0680_00119_mzx_titan_scr_2ppm_s3"
+      ],
+      "src_id": "tech:gas_power_emissions_system"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "selective catalytic reduction systems",
+        "SCR and oxidation catalyst",
+        "emissions and exhaust systems"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:gas_power_emissions_system",
+      "name": "Emissions control and exhaust system for gas turbines and engines (SCR, oxidation catalyst)",
+      "role": null,
+      "source_ids": [
+        "mdeq_permit_0680_00119_mzx_titan_scr_2ppm_s1",
+        "mdeq_permit_0680_00119_mzx_titan_scr_2ppm_s2",
+        "mdeq_permit_0680_00119_mzx_titan_scr_2ppm_s3"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "gas turbine generator set",
+        "gas turbine generator units",
+        "燃气轮机发电机组"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:gas_turbine_genset",
+      "name": "Gas turbine generator set for onsite power",
+      "role": null,
+      "source_ids": [
+        "mdeq_permit_0680_00119_mzx_titan_scr_2ppm_s1",
+        "mdeq_permit_0680_00119_mzx_titan_scr_2ppm_s2",
+        "mdeq_permit_0680_00119_mzx_titan_scr_2ppm_s3"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "mdeq_permit_0680_00119_mzx_titan_scr_2ppm",
+    "evidence_tier": 1,
+    "origin_entity": "Mississippi Department of Environmental Quality",
+    "permission_basis": "州環保局核發的正式許可（公開紀錄）；只保留研究必要的有限逐字節錄。published_at 取許可上的「Issued: March 11, 2026」。",
+    "published_at": "2026-03-11",
+    "publisher": "Mississippi DEQ ENSearch Online（正式許可文件）",
+    "retrieved_at": "2026-10-27",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "密西西比州環境品質局 PSD 空氣污染防制建造許可 No. 0680-00119（MZX Tech LLC，Southaven，2026-03-11 核發）：17 台 Solar Titan PGM-130 單循環燃機各配 SCR 與氧化觸媒，NOx BACT ≤ 2 ppmv（15% O2）",
+    "url": "https://opcgis.deq.state.ms.us/ensearchonline/get_doc.aspx?dt=finalp&id=1834338"
+  },
+  "sources": [
+    {
+      "id": "mdeq_permit_0680_00119_mzx_titan_scr_2ppm_s1",
+      "locator": "封面",
+      "quote": "MZX Tech LLC 2875 Stanton Road Southaven, Desoto, Mississippi has been granted permission to construct air emissions equipment"
+    },
+    {
+      "id": "mdeq_permit_0680_00119_mzx_titan_scr_2ppm_s2",
+      "locator": "Section 2 設備表",
+      "quote": "Seventeen 22,100 Horsepower (HP) (16.5 Megawatt (MW)) (185.15 MMBtu/hr) Solar Titan Model PGM-130 Natural Gas-Fired Simple Cycle Combustion Turbines, each equipped with SCR and oxidation catalyst"
+    },
+    {
+      "id": "mdeq_permit_0680_00119_mzx_titan_scr_2ppm_s3",
+      "locator": "Section 3 3.10(e)",
+      "quote": "NOx BACT: ≤ 2 PPMV at 15% O2 on a dry basis not to exceed 1.45 lb/hr per turbine (excluding startup and shutdown) and ≤ 5.6 tpy per turbine (including startup and shutdown)"
+    }
+  ]
+}

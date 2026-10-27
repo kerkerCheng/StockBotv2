@@ -1,0 +1,85 @@
+{
+  "claims": [
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：CECO 之後的 10-Q／財報稿寫出燃氣發電訂單轉弱（Engineered Systems 訂單年減、燃氣發電大單取消或延後），或資料中心相關燃氣發電專案停擺。核查頻率：每季（CECO 10-Q）。觸發後 48 小時：降這條邊 confidence，重讀排放控制層。",
+      "id": "ceco_10q_2026q2_emissions_exhaust_natural_gas_power_cl1",
+      "source_ids": [
+        "ceco_10q_2026q2_emissions_exhaust_natural_gas_power_s1"
+      ],
+      "statement": "CECO 10-Q (Q2 2026): growth was primarily driven by demand for its emissions and exhaust systems for large-scale natural gas power generation projects. The 10-Q does not split data center projects from utility projects or name the customers.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:gas_power_emissions_system",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "ceco_10q_2026q2_emissions_exhaust_natural_gas_power_s1"
+      ],
+      "src_id": "co:ceco_environmental"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "CECO Environmental Corp."
+      ],
+      "attributes": {
+        "ticker": "CECO"
+      },
+      "confidence": 0.85,
+      "id": "co:ceco_environmental",
+      "name": "CECO Environmental",
+      "role": null,
+      "source_ids": [
+        "ceco_10q_2026q2_emissions_exhaust_natural_gas_power_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "selective catalytic reduction systems",
+        "SCR and oxidation catalyst",
+        "emissions and exhaust systems"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:gas_power_emissions_system",
+      "name": "Emissions control and exhaust system for gas turbines and engines (SCR, oxidation catalyst)",
+      "role": null,
+      "source_ids": [
+        "ceco_10q_2026q2_emissions_exhaust_natural_gas_power_s1"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "ceco_10q_2026q2_emissions_exhaust_natural_gas_power",
+    "evidence_tier": 1,
+    "origin_entity": "CECO Environmental Corp.",
+    "permission_basis": "SEC EDGAR 公開申報（10-Q）；只保留研究必要的有限逐字節錄。published_at 取 EDGAR 申報日 2026-08-10。",
+    "published_at": "2026-08-10",
+    "publisher": "SEC EDGAR（Form 10-Q，accession 0001193125-26-342536）",
+    "retrieved_at": "2026-10-27",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "CECO Environmental Corp. Form 10-Q（2026Q2，2026-08-10）：成長主要來自排放與排氣系統用於大型燃氣發電專案",
+    "url": "https://www.sec.gov/Archives/edgar/data/3197/000119312526342536/ceco-20260630.htm"
+  },
+  "sources": [
+    {
+      "id": "ceco_10q_2026q2_emissions_exhaust_natural_gas_power_s1",
+      "locator": "MD&A",
+      "quote": "The increase is primarily driven by demand for the Company’s emissions and exhaust systems applications supporting large-scale natural gas power generation projects."
+    }
+  ]
+}

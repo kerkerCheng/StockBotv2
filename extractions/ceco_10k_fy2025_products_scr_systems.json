@@ -1,0 +1,73 @@
+{
+  "claims": [],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:gas_power_emissions_system",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "ceco_10k_fy2025_products_scr_systems_s1"
+      ],
+      "src_id": "co:ceco_environmental"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "CECO Environmental Corp."
+      ],
+      "attributes": {
+        "ticker": "CECO"
+      },
+      "confidence": 0.85,
+      "id": "co:ceco_environmental",
+      "name": "CECO Environmental",
+      "role": null,
+      "source_ids": [
+        "ceco_10k_fy2025_products_scr_systems_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "selective catalytic reduction systems",
+        "SCR and oxidation catalyst",
+        "emissions and exhaust systems"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:gas_power_emissions_system",
+      "name": "Emissions control and exhaust system for gas turbines and engines (SCR, oxidation catalyst)",
+      "role": null,
+      "source_ids": [
+        "ceco_10k_fy2025_products_scr_systems_s1"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "ceco_10k_fy2025_products_scr_systems",
+    "evidence_tier": 1,
+    "origin_entity": "CECO Environmental Corp.",
+    "permission_basis": "SEC EDGAR 公開申報（10-K）；只保留研究必要的有限逐字節錄。published_at 取 EDGAR 申報日 2026-03-02。",
+    "published_at": "2026-03-02",
+    "publisher": "SEC EDGAR（Form 10-K，accession 0001193125-26-085815）",
+    "retrieved_at": "2026-10-27",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "CECO Environmental Corp. Form 10-K（FY2025，2026-03-02）：產品含 selective catalytic reduction systems、工業消音器、阻尼器與換向閥等",
+    "url": "https://www.sec.gov/Archives/edgar/data/3197/000119312526085815/ceco-20251231.htm"
+  },
+  "sources": [
+    {
+      "id": "ceco_10k_fy2025_products_scr_systems_s1",
+      "locator": "Item 1 Products and Services",
+      "quote": "We provide a wide range of engineered and configured products and solutions including dampers and diverters, expansion joints, selective catalytic reduction systems, severe-service and industrial cyclones, dust collectors, thermal oxidizers, filtration systems, wet and dry scrubbers, separators and coalescers, water treatment packages, metallic and non-metallic pumps, industrial silencers"
+    }
+  ]
+}

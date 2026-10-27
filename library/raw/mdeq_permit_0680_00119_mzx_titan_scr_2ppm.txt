@@ -1,0 +1,14 @@
+Source URL: https://opcgis.deq.state.ms.us/ensearchonline/get_doc.aspx?dt=finalp&id=1834338
+
+Excerpt:
+[EXCERPT — 有限逐字引文] 密西西比州環境品質局 PSD 空氣污染防制建造許可 No. 0680-00119（MZX Tech LLC，Southaven，2026-03-11 核發）：17 台 Solar Titan PGM-130 單循環燃機各配 SCR 與氧化觸媒，NOx BACT ≤ 2 ppmv（15% O2）
+RETRIEVED: 2026-10-27（本機原文抽字逐字核對）
+
+【封面】
+"MZX Tech LLC 2875 Stanton Road Southaven, Desoto, Mississippi has been granted permission to construct air emissions equipment"
+
+【Section 2 設備表】
+"Seventeen 22,100 Horsepower (HP) (16.5 Megawatt (MW)) (185.15 MMBtu/hr) Solar Titan Model PGM-130 Natural Gas-Fired Simple Cycle Combustion Turbines, each equipped with SCR and oxidation catalyst"
+
+【Section 3 3.10(e)】
+"NOx BACT: ≤ 2 PPMV at 15% O2 on a dry basis not to exceed 1.45 lb/hr per turbine (excluding startup and shutdown) and ≤ 5.6 tpy per turbine (including startup and shutdown)"

@@ -1,0 +1,14 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/3197/000119312526183496/ceco-ex99_1.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] CECO 2026 年第一季財報稿（8-K Exhibit 99.1，2026-04-28）：訂單年增 97%、在手訂單破 10 億美元；2026-04 接到燃氣發電市場史上最大訂單；大型專案支撐資料中心等電力需求下的燃氣發電擴張
+RETRIEVED: 2026-10-27（本機原文抽字逐字核對）
+
+【CEO 引言】
+"We continue to secure strategic, large-scale projects to enable natural gas power generation expansion in support of a tremendous global investment in electrical power demand for data centers, artificial intelligence computing, industrial reshoring and electrification."
+
+【CEO 引言】
+"This strong momentum continued into April 2026 as we have already booked approximately over $450 million in new orders including the largest ever order in the Natural Gas Power market"
+
+【About CECO】
+"CECO solutions improve air and water quality, optimize emissions management, and increase energy efficiency for highly-engineered applications in power generation"

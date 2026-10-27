@@ -1,0 +1,94 @@
+{
+  "claims": [
+    {
+      "confidence": 0.65,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：CECO 之後的 10-Q／財報稿寫出燃氣發電訂單轉弱（Engineered Systems 訂單年減、燃氣發電大單取消或延後），或資料中心相關燃氣發電專案停擺。核查頻率：每季（CECO 10-Q）。觸發後 48 小時：降這條邊 confidence，重讀排放控制層。",
+      "id": "ceco_8k_20260224_q4_135m_gas_fired_power_project_cl1",
+      "source_ids": [
+        "ceco_8k_20260224_q4_135m_gas_fired_power_project_s1",
+        "ceco_8k_20260224_q4_135m_gas_fired_power_project_s2"
+      ],
+      "statement": "CECO Q4 2025 release: performance was driven primarily by a domestic gas-fired power generation project of about USD 135 million, a company record. The release does not name the customer or say whether it serves a data center.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:gas_power_emissions_system",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "ceco_8k_20260224_q4_135m_gas_fired_power_project_s1",
+        "ceco_8k_20260224_q4_135m_gas_fired_power_project_s2"
+      ],
+      "src_id": "co:ceco_environmental"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "CECO Environmental Corp."
+      ],
+      "attributes": {
+        "ticker": "CECO"
+      },
+      "confidence": 0.85,
+      "id": "co:ceco_environmental",
+      "name": "CECO Environmental",
+      "role": null,
+      "source_ids": [
+        "ceco_8k_20260224_q4_135m_gas_fired_power_project_s1",
+        "ceco_8k_20260224_q4_135m_gas_fired_power_project_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "selective catalytic reduction systems",
+        "SCR and oxidation catalyst",
+        "emissions and exhaust systems"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:gas_power_emissions_system",
+      "name": "Emissions control and exhaust system for gas turbines and engines (SCR, oxidation catalyst)",
+      "role": null,
+      "source_ids": [
+        "ceco_8k_20260224_q4_135m_gas_fired_power_project_s1",
+        "ceco_8k_20260224_q4_135m_gas_fired_power_project_s2"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "ceco_8k_20260224_q4_135m_gas_fired_power_project",
+    "evidence_tier": 1,
+    "origin_entity": "CECO Environmental Corp.",
+    "permission_basis": "SEC EDGAR 公開申報（8-K 附件新聞稿）；只保留研究必要的有限逐字節錄。published_at 取 EDGAR 申報日 2026-02-24。",
+    "published_at": "2026-02-24",
+    "publisher": "SEC EDGAR（Form 8-K Exhibit 99.1，accession 0001193125-26-065166）",
+    "retrieved_at": "2026-10-27",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "CECO 2025 年第四季財報稿（8-K Exhibit 99.1，2026-02-24）：全年訂單超過 10 億美元，主因一筆約 1.35 億美元的國內燃氣發電專案（公司史上最大）",
+    "url": "https://www.sec.gov/Archives/edgar/data/3197/000119312526065166/ceco-ex99_1.htm"
+  },
+  "sources": [
+    {
+      "id": "ceco_8k_20260224_q4_135m_gas_fired_power_project_s1",
+      "locator": "Q4 摘要",
+      "quote": "This performance was primarily driven by a large domestic gas-fired power generation project of approximately $135 million, also a company record in project value."
+    },
+    {
+      "id": "ceco_8k_20260224_q4_135m_gas_fired_power_project_s2",
+      "locator": "About CECO",
+      "quote": "CECO solutions improve air and water quality, optimize emissions management, and increase energy efficiency for highly-engineered applications in power generation"
+    }
+  ]
+}

@@ -1,0 +1,143 @@
+{
+  "claims": [
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：Johnson Matthey 之後的報告寫出 Cormetech 的美國發電觸媒需求轉弱、出售 Clean Air Solutions，或燃機客戶改用別家觸媒。核查頻率：每半年（JM 半年報／年報）。觸發後 48 小時：降這條邊 confidence，重讀 SCR 觸媒層。",
+      "id": "jm_pr_20260723_complete_cormetech_scr_catalysts_cl1",
+      "source_ids": [
+        "jm_pr_20260723_complete_cormetech_scr_catalysts_s1",
+        "jm_pr_20260723_complete_cormetech_scr_catalysts_s2",
+        "jm_pr_20260723_complete_cormetech_scr_catalysts_s3",
+        "jm_pr_20260723_complete_cormetech_scr_catalysts_s4"
+      ],
+      "statement": "Johnson Matthey (2026-07-23) completed its acquisition of Cormetech, a US manufacturer of SCR catalysts with over 400 long-standing customers and IP in gas turbine catalysts and module designs; JM says the US power generation market is seeing strong demand from the rapid construction of data centres. Supplier self-report as of the completion date; before 2026-07-23 these catalysts were Cormetech's, not JM's. Enterprise value USD 360 million (JM release of 2026-05-28, outside this document). No customer, share or data-center revenue figure given.",
+      "subject_id": "e2"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:gas_power_emissions_system",
+      "id": "e1",
+      "relation": "is_component_of",
+      "source_ids": [
+        "jm_pr_20260723_complete_cormetech_scr_catalysts_s2",
+        "jm_pr_20260723_complete_cormetech_scr_catalysts_s3"
+      ],
+      "src_id": "tech:scr_catalyst"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:scr_catalyst",
+      "id": "e2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "jm_pr_20260723_complete_cormetech_scr_catalysts_s1",
+        "jm_pr_20260723_complete_cormetech_scr_catalysts_s2",
+        "jm_pr_20260723_complete_cormetech_scr_catalysts_s3",
+        "jm_pr_20260723_complete_cormetech_scr_catalysts_s4"
+      ],
+      "src_id": "co:johnson_matthey"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "Johnson Matthey Plc"
+      ],
+      "attributes": {
+        "ticker": "JMAT.L"
+      },
+      "confidence": 0.85,
+      "id": "co:johnson_matthey",
+      "name": "Johnson Matthey",
+      "role": null,
+      "source_ids": [
+        "jm_pr_20260723_complete_cormetech_scr_catalysts_s1",
+        "jm_pr_20260723_complete_cormetech_scr_catalysts_s2",
+        "jm_pr_20260723_complete_cormetech_scr_catalysts_s3",
+        "jm_pr_20260723_complete_cormetech_scr_catalysts_s4"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "SCR catalysts",
+        "Selective Catalytic Reduction catalysts"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:scr_catalyst",
+      "name": "Selective catalytic reduction (SCR) catalyst",
+      "role": null,
+      "source_ids": [
+        "jm_pr_20260723_complete_cormetech_scr_catalysts_s1",
+        "jm_pr_20260723_complete_cormetech_scr_catalysts_s2",
+        "jm_pr_20260723_complete_cormetech_scr_catalysts_s3",
+        "jm_pr_20260723_complete_cormetech_scr_catalysts_s4"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "selective catalytic reduction systems",
+        "SCR and oxidation catalyst",
+        "emissions and exhaust systems"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:gas_power_emissions_system",
+      "name": "Emissions control and exhaust system for gas turbines and engines (SCR, oxidation catalyst)",
+      "role": null,
+      "source_ids": [
+        "jm_pr_20260723_complete_cormetech_scr_catalysts_s1",
+        "jm_pr_20260723_complete_cormetech_scr_catalysts_s2",
+        "jm_pr_20260723_complete_cormetech_scr_catalysts_s3",
+        "jm_pr_20260723_complete_cormetech_scr_catalysts_s4"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "jm_pr_20260723_complete_cormetech_scr_catalysts",
+    "evidence_tier": 1,
+    "origin_entity": "Johnson Matthey Plc",
+    "permission_basis": "Johnson Matthey 公開新聞稿；只保留研究必要的有限逐字節錄。published_at 取新聞稿日期「23 July 2026」。",
+    "published_at": "2026-07-23",
+    "publisher": "Johnson Matthey 官網新聞稿",
+    "retrieved_at": "2026-10-27",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "Johnson Matthey 新聞稿（2026-07-23）：完成收購美國 SCR 觸媒廠 Cormetech——400 多家長期客戶、燃機觸媒與模組設計 IP；美國發電市場因資料中心快速興建需求強勁",
+    "url": "https://matthey.com/media/2026/johnson-matthey-completes-acquisition-of-cormetech-inc"
+  },
+  "sources": [
+    {
+      "id": "jm_pr_20260723_complete_cormetech_scr_catalysts_s1",
+      "locator": "導言",
+      "quote": "Johnson Matthey Plc (“JM”) has today announced the completion of its acquisition of CORMETECH Inc."
+    },
+    {
+      "id": "jm_pr_20260723_complete_cormetech_scr_catalysts_s2",
+      "locator": "About Cormetech",
+      "quote": "Founded in 1989, Cormetech is a globally leading, high-growth US manufacturer of Selective Catalytic Reduction (“SCR”) catalysts serving over 400 long-standing customers."
+    },
+    {
+      "id": "jm_pr_20260723_complete_cormetech_scr_catalysts_s3",
+      "locator": "策略理由",
+      "quote": "In particular, Cormetech's IP in gas turbines and module designs will enable JM to offer customised best-in-class catalysts and systems for a range of energy platforms."
+    },
+    {
+      "id": "jm_pr_20260723_complete_cormetech_scr_catalysts_s4",
+      "locator": "策略理由",
+      "quote": "It is expected to materially enhance Clean Air Solutions’ scale, helping to establish a combined deep market presence in the US’s power generation market, which is seeing strong demand through the rapid construction of data centres."
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/3197/000119312526342536/ceco-20260630.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] CECO Environmental Corp. Form 10-Q（2026Q2，2026-08-10）：成長主要來自排放與排氣系統用於大型燃氣發電專案
+RETRIEVED: 2026-10-27（本機原文抽字逐字核對）
+
+【MD&A】
+"The increase is primarily driven by demand for the Company’s emissions and exhaust systems applications supporting large-scale natural gas power generation projects."

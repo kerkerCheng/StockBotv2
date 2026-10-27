@@ -1,0 +1,11 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/3197/000119312526065166/ceco-ex99_1.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] CECO 2025 年第四季財報稿（8-K Exhibit 99.1，2026-02-24）：全年訂單超過 10 億美元，主因一筆約 1.35 億美元的國內燃氣發電專案（公司史上最大）
+RETRIEVED: 2026-10-27（本機原文抽字逐字核對）
+
+【Q4 摘要】
+"This performance was primarily driven by a large domestic gas-fired power generation project of approximately $135 million, also a company record in project value."
+
+【About CECO】
+"CECO solutions improve air and water quality, optimize emissions management, and increase energy efficiency for highly-engineered applications in power generation"

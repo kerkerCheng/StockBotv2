@@ -1,0 +1,103 @@
+{
+  "claims": [
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：CECO 之後的 10-Q／財報稿寫出燃氣發電訂單轉弱（Engineered Systems 訂單年減、燃氣發電大單取消或延後），或資料中心相關燃氣發電專案停擺。核查頻率：每季（CECO 10-Q）。觸發後 48 小時：降這條邊 confidence，重讀排放控制層。",
+      "id": "ceco_8k_20260428_q1_largest_natural_gas_power_order_cl1",
+      "source_ids": [
+        "ceco_8k_20260428_q1_largest_natural_gas_power_order_s1",
+        "ceco_8k_20260428_q1_largest_natural_gas_power_order_s2",
+        "ceco_8k_20260428_q1_largest_natural_gas_power_order_s3"
+      ],
+      "statement": "CECO Q1 2026 release: booked over USD 450 million of new orders in April 2026 including its largest-ever Natural Gas Power order, and describes its large-scale projects as enabling natural gas power generation expansion driven by data centers, AI computing, reshoring and electrification. The release does not say what product the April order is, who the customer is, or how much is data-center related.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:gas_power_emissions_system",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "ceco_8k_20260428_q1_largest_natural_gas_power_order_s1",
+        "ceco_8k_20260428_q1_largest_natural_gas_power_order_s2",
+        "ceco_8k_20260428_q1_largest_natural_gas_power_order_s3"
+      ],
+      "src_id": "co:ceco_environmental"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "CECO Environmental Corp."
+      ],
+      "attributes": {
+        "ticker": "CECO"
+      },
+      "confidence": 0.85,
+      "id": "co:ceco_environmental",
+      "name": "CECO Environmental",
+      "role": null,
+      "source_ids": [
+        "ceco_8k_20260428_q1_largest_natural_gas_power_order_s1",
+        "ceco_8k_20260428_q1_largest_natural_gas_power_order_s2",
+        "ceco_8k_20260428_q1_largest_natural_gas_power_order_s3"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "selective catalytic reduction systems",
+        "SCR and oxidation catalyst",
+        "emissions and exhaust systems"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:gas_power_emissions_system",
+      "name": "Emissions control and exhaust system for gas turbines and engines (SCR, oxidation catalyst)",
+      "role": null,
+      "source_ids": [
+        "ceco_8k_20260428_q1_largest_natural_gas_power_order_s1",
+        "ceco_8k_20260428_q1_largest_natural_gas_power_order_s2",
+        "ceco_8k_20260428_q1_largest_natural_gas_power_order_s3"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "ceco_8k_20260428_q1_largest_natural_gas_power_order",
+    "evidence_tier": 1,
+    "origin_entity": "CECO Environmental Corp.",
+    "permission_basis": "SEC EDGAR 公開申報（8-K 附件新聞稿）；只保留研究必要的有限逐字節錄。published_at 取 EDGAR 申報日 2026-04-28。",
+    "published_at": "2026-04-28",
+    "publisher": "SEC EDGAR（Form 8-K Exhibit 99.1，accession 0001193125-26-183496）",
+    "retrieved_at": "2026-10-27",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "CECO 2026 年第一季財報稿（8-K Exhibit 99.1，2026-04-28）：訂單年增 97%、在手訂單破 10 億美元；2026-04 接到燃氣發電市場史上最大訂單；大型專案支撐資料中心等電力需求下的燃氣發電擴張",
+    "url": "https://www.sec.gov/Archives/edgar/data/3197/000119312526183496/ceco-ex99_1.htm"
+  },
+  "sources": [
+    {
+      "id": "ceco_8k_20260428_q1_largest_natural_gas_power_order_s1",
+      "locator": "CEO 引言",
+      "quote": "We continue to secure strategic, large-scale projects to enable natural gas power generation expansion in support of a tremendous global investment in electrical power demand for data centers, artificial intelligence computing, industrial reshoring and electrification."
+    },
+    {
+      "id": "ceco_8k_20260428_q1_largest_natural_gas_power_order_s2",
+      "locator": "CEO 引言",
+      "quote": "This strong momentum continued into April 2026 as we have already booked approximately over $450 million in new orders including the largest ever order in the Natural Gas Power market"
+    },
+    {
+      "id": "ceco_8k_20260428_q1_largest_natural_gas_power_order_s3",
+      "locator": "About CECO",
+      "quote": "CECO solutions improve air and water quality, optimize emissions management, and increase energy efficiency for highly-engineered applications in power generation"
+    }
+  ]
+}

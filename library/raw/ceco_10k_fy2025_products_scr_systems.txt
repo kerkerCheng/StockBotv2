@@ -1,0 +1,8 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/3197/000119312526085815/ceco-20251231.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] CECO Environmental Corp. Form 10-K（FY2025，2026-03-02）：產品含 selective catalytic reduction systems、工業消音器、阻尼器與換向閥等
+RETRIEVED: 2026-10-27（本機原文抽字逐字核對）
+
+【Item 1 Products and Services】
+"We provide a wide range of engineered and configured products and solutions including dampers and diverters, expansion joints, selective catalytic reduction systems, severe-service and industrial cyclones, dust collectors, thermal oxidizers, filtration systems, wet and dry scrubbers, separators and coalescers, water treatment packages, metallic and non-metallic pumps, industrial silencers"
