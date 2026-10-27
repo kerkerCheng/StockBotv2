@@ -69,7 +69,7 @@
 - [875] 天孚 ELS 量產交付＋中际旭创 2028 需求指引。
 - [876] CW 層補仕佳光子：上交所問詢回復寫 100mW CW DFB 自 2026-06 起在多家國際頭部光模組廠批量出貨、客戶已下單鎖定明年交付；CW 募投項目建設期 3 年，沒寫顆數。帳號說的「72M／年」「2029 年全產能」本輪在仕佳的說明書與回復裡沒找到——這是「我找不到」，不是「不存在」（L11-5）。
 
-名冊 staged 7 家：ERock（EROC）、華城（1519.TW）、Enerflex（EFXT）、Stabilis（SLNG）、Superior Plus（SPB.TO）、ProPetro（PUMP）、仕佳光子（688313.SS）。
+名冊隨包 staged 29 家（drop 即回退）：[859] 拆解 R1–R9 各包 22 家（Liberty、Williams、Solaris、INNIO、Caterpillar、Wärtsilä、Cummins、PSI、GE Vernova、FTAI、杰瑞、Baker Hughes、Kodiak、Siemens Energy、Doosan Enerbility、Babcock & Wilcox、Applied Digital、Accelleron、Woodward、Howmet、CECO、Johnson Matthey），加本段 7 家：ERock（EROC）、華城（1519.TW）、Enerflex（EFXT）、Stabilis（SLNG）、Superior Plus（SPB.TO）、ProPetro（PUMP）、仕佳光子（688313.SS）。[863]、[873]–[875] 沒有名冊變動。
 
 **停放 63 則，pq1 佇列清空**（drain 段 0–1 全為 0）。
 - 等事件 5 則：
