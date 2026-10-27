@@ -1,0 +1,113 @@
+{
+  "claims": [
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：Cummins 之後的 10-Q／10-K／新聞稿寫出資料中心燃氣機組訂單取消、延後超過一年，或停止供應這一類機組；或買方的一手寫出改用別家機組取代它。核查頻率：每季（Cummins 季報）。觸發後 48 小時：降這條邊 confidence，重讀 tech:gas_reciprocating_genset 供給側（本層讀圖寫成後）。",
+      "id": "cmi_pr_20260616_circe_energy_natural_gas_gensets_data_center_cl1",
+      "source_ids": [
+        "cmi_pr_20260616_circe_energy_natural_gas_gensets_data_center_s1",
+        "cmi_pr_20260616_circe_energy_natural_gas_gensets_data_center_s2",
+        "cmi_pr_20260616_circe_energy_natural_gas_gensets_data_center_s3",
+        "cmi_pr_20260616_circe_energy_natural_gas_gensets_data_center_s4"
+      ],
+      "statement": "Supplier's press release (Cummins, 2026-06-16): agreement with Circe Energy to provide high-horsepower natural gas generator sets (HSK78 C2000N6CD and QSK60 C1400N6 platforms) as the primary, behind-the-meter power source for Circe's AI HPC data center campuses in Texas, deliveries 2026–2030; Cummins provides the generation equipment, Circe and its engineer-of-record own the system design. Supplier self-report naming the customer; no MW or contract value disclosed.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:gas_reciprocating_genset",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "cmi_pr_20260616_circe_energy_natural_gas_gensets_data_center_s1",
+        "cmi_pr_20260616_circe_energy_natural_gas_gensets_data_center_s2",
+        "cmi_pr_20260616_circe_energy_natural_gas_gensets_data_center_s3",
+        "cmi_pr_20260616_circe_energy_natural_gas_gensets_data_center_s4"
+      ],
+      "src_id": "co:cummins"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "Cummins Inc."
+      ],
+      "attributes": {
+        "ticker": "CMI"
+      },
+      "confidence": 0.85,
+      "id": "co:cummins",
+      "name": "Cummins",
+      "role": null,
+      "source_ids": [
+        "cmi_pr_20260616_circe_energy_natural_gas_gensets_data_center_s1",
+        "cmi_pr_20260616_circe_energy_natural_gas_gensets_data_center_s2",
+        "cmi_pr_20260616_circe_energy_natural_gas_gensets_data_center_s3",
+        "cmi_pr_20260616_circe_energy_natural_gas_gensets_data_center_s4"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "gas reciprocating engines",
+        "gas engine generator set",
+        "reciprocating gas engine",
+        "gas genset"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:gas_reciprocating_genset",
+      "name": "Gas reciprocating engine generator set",
+      "role": null,
+      "source_ids": [
+        "cmi_pr_20260616_circe_energy_natural_gas_gensets_data_center_s1",
+        "cmi_pr_20260616_circe_energy_natural_gas_gensets_data_center_s2",
+        "cmi_pr_20260616_circe_energy_natural_gas_gensets_data_center_s3",
+        "cmi_pr_20260616_circe_energy_natural_gas_gensets_data_center_s4"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "cmi_pr_20260616_circe_energy_natural_gas_gensets_data_center",
+    "evidence_tier": 1,
+    "origin_entity": "Cummins Inc.",
+    "permission_basis": "Cummins 公開新聞稿（Business Wire 發布、Nasdaq.com 轉載）；只保留研究必要的有限逐字節錄。published_at 取網址與新聞稿日期 2026-06-16。",
+    "published_at": "2026-06-16",
+    "publisher": "Business Wire（Nasdaq.com 轉載）",
+    "retrieved_at": "2026-10-27",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "Cummins Inc. 新聞稿（Business Wire，2026-06-16；Nasdaq 轉載）：Cummins Natural Gas Generators to Power Large Scale Data Centers in West Texas——為 Circe Energy 的 AI HPC 資料中心供天然氣發電機組作表後主電源，2026–2030 交貨",
+    "url": "https://www.nasdaq.com/press-release/cummins-natural-gas-generators-power-large-scale-data-centers-west-texas-2026-06-16"
+  },
+  "sources": [
+    {
+      "id": "cmi_pr_20260616_circe_energy_natural_gas_gensets_data_center_s1",
+      "locator": "導言",
+      "quote": "Cummins Inc. announced an agreement with Circe Energy to provide a series of high-powered, high-efficiency natural gas generator sets to support a scalable, behind-the-meter, prime power microgrid solution for their High-Performance Computing (HPC) data center located in Texas"
+    },
+    {
+      "id": "cmi_pr_20260616_circe_energy_natural_gas_gensets_data_center_s2",
+      "locator": "第 2 段",
+      "quote": "Deliveries are scheduled from 2026 through 2030 and will include Cummins’ HSK78 (C2000N6CD) and QSK60 (C1400N6) generator set platforms."
+    },
+    {
+      "id": "cmi_pr_20260616_circe_energy_natural_gas_gensets_data_center_s3",
+      "locator": "第 3 段",
+      "quote": "The power system will support Circe’s behind-the-meter power need for their AI HPC data center campuses, including its West Texas campus development, by utilizing Cummins’ HSK78 (C2000N6CD) and QSK60 (C1400N6) high-horsepower natural gas generator sets as the primary power source - without reliability on the grid."
+    },
+    {
+      "id": "cmi_pr_20260616_circe_energy_natural_gas_gensets_data_center_s4",
+      "locator": "Supporting Circe Energy’s West Texas development 段",
+      "quote": "Cummins is providing the power generation equipment and technical validation support, while Circe and its engineer-of-record retain responsibility for final system design and implementation."
+    }
+  ]
+}

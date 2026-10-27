@@ -1,0 +1,104 @@
+{
+  "claims": [
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：PSI 之後的 10-Q／10-K／新聞稿寫出資料中心燃氣機組訂單取消、延後超過一年，或停止供應這一類機組；或買方的一手寫出改用別家機組取代它。核查頻率：每季（PSI 季報）。觸發後 48 小時：降這條邊 confidence，重讀 tech:gas_reciprocating_genset 供給側（本層讀圖寫成後）。",
+      "id": "psix_10q_2026q2_data_center_capacity_customer_concentration_cl1",
+      "source_ids": [
+        "psix_10q_2026q2_data_center_capacity_customer_concentration_s1",
+        "psix_10q_2026q2_data_center_capacity_customer_concentration_s2",
+        "psix_10q_2026q2_data_center_capacity_customer_concentration_s3"
+      ],
+      "statement": "Supplier's own 10-Q (Q2 2026): expects second-half sales to improve on data center-related demand and is expanding manufacturing capacity to meet increasing demand from data center markets; two unnamed customers were 22% and 19% of Q2 net sales. Guidance, not shipped volume; the customers and their end use are not disclosed.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "tech:gas_reciprocating_genset",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "psix_10q_2026q2_data_center_capacity_customer_concentration_s1",
+        "psix_10q_2026q2_data_center_capacity_customer_concentration_s2",
+        "psix_10q_2026q2_data_center_capacity_customer_concentration_s3"
+      ],
+      "src_id": "co:power_solutions_international"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "Power Solutions International, Inc."
+      ],
+      "attributes": {
+        "ticker": "PSIX"
+      },
+      "confidence": 0.85,
+      "id": "co:power_solutions_international",
+      "name": "Power Solutions International",
+      "role": null,
+      "source_ids": [
+        "psix_10q_2026q2_data_center_capacity_customer_concentration_s1",
+        "psix_10q_2026q2_data_center_capacity_customer_concentration_s2",
+        "psix_10q_2026q2_data_center_capacity_customer_concentration_s3"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "gas reciprocating engines",
+        "gas engine generator set",
+        "reciprocating gas engine",
+        "gas genset"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:gas_reciprocating_genset",
+      "name": "Gas reciprocating engine generator set",
+      "role": null,
+      "source_ids": [
+        "psix_10q_2026q2_data_center_capacity_customer_concentration_s1",
+        "psix_10q_2026q2_data_center_capacity_customer_concentration_s2",
+        "psix_10q_2026q2_data_center_capacity_customer_concentration_s3"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "psix_10q_2026q2_data_center_capacity_customer_concentration",
+    "evidence_tier": 1,
+    "origin_entity": "Power Solutions International, Inc.",
+    "permission_basis": "SEC EDGAR 公開申報（10-Q）；只保留研究必要的有限逐字節錄。published_at 取 EDGAR 申報日 2026-08-06。",
+    "published_at": "2026-08-06",
+    "publisher": "SEC EDGAR（Form 10-Q，accession 0001628280-26-054328）",
+    "retrieved_at": "2026-10-27",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Power Solutions International, Inc. Form 10-Q（2026Q2，2026-08-06）：下半年銷售靠資料中心相關市場；擴充產能以因應資料中心需求；客戶 B 占第二季營收 22%、客戶 C 19%（未具名）",
+    "url": "https://www.sec.gov/Archives/edgar/data/1137091/000162828026054328/psix-20260630.htm"
+  },
+  "sources": [
+    {
+      "id": "psix_10q_2026q2_data_center_capacity_customer_concentration_s1",
+      "locator": "MD&A 展望",
+      "quote": "Looking ahead, we expect sales to improve in the second half of the year, driven by demand in data center-related markets, partially offset by ongoing softness in the oil and gas market."
+    },
+    {
+      "id": "psix_10q_2026q2_data_center_capacity_customer_concentration_s2",
+      "locator": "MD&A 產能段",
+      "quote": "Consistent with those goals, the Company is actively pursuing several initiatives to enhance and expand manufacturing capacity to meet the increasing demand from data center markets."
+    },
+    {
+      "id": "psix_10q_2026q2_data_center_capacity_customer_concentration_s3",
+      "locator": "附註 客戶集中",
+      "quote": "Customer B 22 % 13 % 17 % 22 % Customer C 19 %"
+    }
+  ]
+}

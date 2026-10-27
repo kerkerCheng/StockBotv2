@@ -1,0 +1,115 @@
+{
+  "claims": [
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：Liberty 或 Wärtsilä 之後的 10-Q／10-K／新聞稿寫出資料中心燃氣機組訂單取消、延後超過一年，或停止供應這一類機組；或買方的一手寫出改用別家機組取代它。核查頻率：每季（Liberty 或 Wärtsilä 季報）。觸發後 48 小時：降這條邊 confidence，重讀 tech:gas_reciprocating_genset 供給側（本層讀圖寫成後）。",
+      "id": "lbrt_10q_2026q2_ex103_wartsila_equipment_supply_cl1",
+      "source_ids": [
+        "lbrt_10q_2026q2_ex103_wartsila_equipment_supply_s1",
+        "lbrt_10q_2026q2_ex103_wartsila_equipment_supply_s2",
+        "lbrt_10q_2026q2_ex103_wartsila_equipment_supply_s3",
+        "lbrt_10q_2026q2_ex103_wartsila_equipment_supply_s4"
+      ],
+      "statement": "Buyer-side filing (Liberty 10-Q Q2 2026 Exhibit 10.3): Equipment Supply Contract between Liberty Advanced Equipment Technologies LLC and Wärtsilä North America, Inc. for Wärtsilä 20V34SG engines with an equipment package (generator set, control, emissions, compressor and cooling systems), tested in blocks of five generator sets. The engine count and project location are redacted, and this contract does not name the fuel; Wärtsilä's own 2026-04-16 press release calls the 34SG a '(spark gas)' engine (outside this document).",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:gas_reciprocating_genset",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "lbrt_10q_2026q2_ex103_wartsila_equipment_supply_s1",
+        "lbrt_10q_2026q2_ex103_wartsila_equipment_supply_s2",
+        "lbrt_10q_2026q2_ex103_wartsila_equipment_supply_s3",
+        "lbrt_10q_2026q2_ex103_wartsila_equipment_supply_s4"
+      ],
+      "src_id": "co:wartsila"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "Wärtsilä Corporation",
+        "Wartsila",
+        "Wärtsilä North America"
+      ],
+      "attributes": {
+        "ticker": "WRT1V.HE"
+      },
+      "confidence": 0.85,
+      "id": "co:wartsila",
+      "name": "Wärtsilä",
+      "role": null,
+      "source_ids": [
+        "lbrt_10q_2026q2_ex103_wartsila_equipment_supply_s1",
+        "lbrt_10q_2026q2_ex103_wartsila_equipment_supply_s2",
+        "lbrt_10q_2026q2_ex103_wartsila_equipment_supply_s3",
+        "lbrt_10q_2026q2_ex103_wartsila_equipment_supply_s4"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "gas reciprocating engines",
+        "gas engine generator set",
+        "reciprocating gas engine",
+        "gas genset"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:gas_reciprocating_genset",
+      "name": "Gas reciprocating engine generator set",
+      "role": null,
+      "source_ids": [
+        "lbrt_10q_2026q2_ex103_wartsila_equipment_supply_s1",
+        "lbrt_10q_2026q2_ex103_wartsila_equipment_supply_s2",
+        "lbrt_10q_2026q2_ex103_wartsila_equipment_supply_s3",
+        "lbrt_10q_2026q2_ex103_wartsila_equipment_supply_s4"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "lbrt_10q_2026q2_ex103_wartsila_equipment_supply",
+    "evidence_tier": 1,
+    "origin_entity": "Liberty Energy Inc.",
+    "permission_basis": "SEC EDGAR 公開申報（10-Q Exhibit 10.3，部分內容已遮蔽）；只保留研究必要的有限逐字節錄。published_at 取 EDGAR 申報日 2026-07-23。",
+    "published_at": "2026-07-23",
+    "publisher": "SEC EDGAR（Form 10-Q，accession 0001694028-26-000039）",
+    "retrieved_at": "2026-10-27",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Liberty Energy Inc. Form 10-Q（2026Q2，2026-07-23）Exhibit 10.3：Equipment Supply Contract——Liberty Advanced Equipment Technologies 向 Wärtsilä North America 買 Wärtsilä 20V34SG 引擎與機組設備包（發電機組、控制、排放、壓縮、冷卻）",
+    "url": "https://www.sec.gov/Archives/edgar/data/1694028/000169402826000039/exhibit103-wartsila.htm"
+  },
+  "sources": [
+    {
+      "id": "lbrt_10q_2026q2_ex103_wartsila_equipment_supply_s1",
+      "locator": "封面",
+      "quote": "EQUIPMENT SUPPLY CONTRACT By and Between LIBERTY ADVANCED EQUIPMENT TECHNOLOGIES LLC And WÄRTSILÄ NORTH AMERICA, INC."
+    },
+    {
+      "id": "lbrt_10q_2026q2_ex103_wartsila_equipment_supply_s2",
+      "locator": "Recitals (b)",
+      "quote": "Buyer desires to purchase from Supplier [***] Wärtsilä 20V34SG Engines"
+    },
+    {
+      "id": "lbrt_10q_2026q2_ex103_wartsila_equipment_supply_s3",
+      "locator": "定義條款 Equipment",
+      "quote": "An Equipment package consisting of the following items to be provided by Supplier per Annex A: (i) Generator Set, (ii) Control System, (iii) Emissions System, (iv) Compressor System, and (v) Cooling System."
+    },
+    {
+      "id": "lbrt_10q_2026q2_ex103_wartsila_equipment_supply_s4",
+      "locator": "定義條款 Block",
+      "quote": "Each group of five (5) Generator Sets to be provided by Supplier, which will be on line for a Performance Test."
+    }
+  ]
+}

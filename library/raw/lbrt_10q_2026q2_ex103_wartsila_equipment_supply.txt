@@ -1,0 +1,17 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1694028/000169402826000039/exhibit103-wartsila.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Liberty Energy Inc. Form 10-Q（2026Q2，2026-07-23）Exhibit 10.3：Equipment Supply Contract——Liberty Advanced Equipment Technologies 向 Wärtsilä North America 買 Wärtsilä 20V34SG 引擎與機組設備包（發電機組、控制、排放、壓縮、冷卻）
+RETRIEVED: 2026-10-27（本機原文抽字逐字核對）
+
+【封面】
+"EQUIPMENT SUPPLY CONTRACT By and Between LIBERTY ADVANCED EQUIPMENT TECHNOLOGIES LLC And WÄRTSILÄ NORTH AMERICA, INC."
+
+【Recitals (b)】
+"Buyer desires to purchase from Supplier [***] Wärtsilä 20V34SG Engines"
+
+【定義條款 Equipment】
+"An Equipment package consisting of the following items to be provided by Supplier per Annex A: (i) Generator Set, (ii) Control System, (iii) Emissions System, (iv) Compressor System, and (v) Cooling System."
+
+【定義條款 Block】
+"Each group of five (5) Generator Sets to be provided by Supplier, which will be on line for a Performance Test."

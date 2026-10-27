@@ -1,0 +1,14 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1137091/000162828026054328/psix-20260630.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Power Solutions International, Inc. Form 10-Q（2026Q2，2026-08-06）：下半年銷售靠資料中心相關市場；擴充產能以因應資料中心需求；客戶 B 占第二季營收 22%、客戶 C 19%（未具名）
+RETRIEVED: 2026-10-27（本機原文抽字逐字核對）
+
+【MD&A 展望】
+"Looking ahead, we expect sales to improve in the second half of the year, driven by demand in data center-related markets, partially offset by ongoing softness in the oil and gas market."
+
+【MD&A 產能段】
+"Consistent with those goals, the Company is actively pursuing several initiatives to enhance and expand manufacturing capacity to meet the increasing demand from data center markets."
+
+【附註 客戶集中】
+"Customer B 22 % 13 % 17 % 22 % Customer C 19 %"

@@ -1,0 +1,181 @@
+{
+  "claims": [
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：Liberty 或 INNIO 之後的 10-Q／10-K／新聞稿寫出資料中心燃氣機組訂單取消、延後超過一年，或停止供應這一類機組；或買方的一手寫出改用別家機組取代它。核查頻率：每季（Liberty 或 INNIO 季報）。觸發後 48 小時：降這條邊 confidence，重讀 tech:gas_reciprocating_genset 供給側（本層讀圖寫成後）。",
+      "id": "lbrt_8k_20260918_ex101_innio_jenbacher_contract_cl1",
+      "source_ids": [
+        "lbrt_8k_20260918_ex101_innio_jenbacher_contract_s1",
+        "lbrt_8k_20260918_ex101_innio_jenbacher_contract_s3",
+        "lbrt_8k_20260918_ex101_innio_jenbacher_contract_s5",
+        "lbrt_8k_20260918_ex101_innio_jenbacher_contract_s6"
+      ],
+      "statement": "Buyer-side filing (Liberty Energy 8-K Exhibit 10.1, 2026-09-18): a contract dated 2026-02-13 between Liberty Advanced Equipment Technologies LLC (buyer) and Northeast-Western Energy Systems USA LLC (seller) for new gas engine generator sets manufactured by INNIO Jenbacher GmbH & Co OG — 100 JMC 624 units for 2028 delivery with CGT AVK generators; the OEM limited warranty covers equipment bought from INNIO Jenbacher North America or one of the OEM's authorized distributors. INNIO is the manufacturer, the seller of record is a distributor; the buyer filed the contract naming the manufacturer (customer-side evidence, not supplier self-report).",
+      "subject_id": "e1"
+    },
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：Liberty 的 10-Q／8-K 寫出這份合約終止、縮減台數或延後交期超過一年。核查頻率：每季（Liberty 10-Q）。觸發後 48 小時：降 e2 confidence。",
+      "id": "lbrt_8k_20260918_ex101_innio_jenbacher_contract_cl2",
+      "source_ids": [
+        "lbrt_8k_20260918_ex101_innio_jenbacher_contract_s2",
+        "lbrt_8k_20260918_ex101_innio_jenbacher_contract_s3",
+        "lbrt_8k_20260918_ex101_innio_jenbacher_contract_s4",
+        "lbrt_8k_20260918_ex101_innio_jenbacher_contract_s5"
+      ],
+      "statement": "Liberty Advanced Equipment Technologies LLC agreed to pay USD 493,155,400 for 100 JMC 624 gas engine generator sets for 2028 delivery, tested in 20 MW blocks of 5 gensets — a buyer-side capital commitment to this layer. The payment schedule is headed 'LOS Leasing'; this document does not say what LOS Leasing is.",
+      "subject_id": "e2"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:gas_reciprocating_genset",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "lbrt_8k_20260918_ex101_innio_jenbacher_contract_s1",
+        "lbrt_8k_20260918_ex101_innio_jenbacher_contract_s3",
+        "lbrt_8k_20260918_ex101_innio_jenbacher_contract_s5",
+        "lbrt_8k_20260918_ex101_innio_jenbacher_contract_s6"
+      ],
+      "src_id": "co:innio"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:gas_reciprocating_genset",
+      "id": "e2",
+      "relation": "depends_on",
+      "source_ids": [
+        "lbrt_8k_20260918_ex101_innio_jenbacher_contract_s2",
+        "lbrt_8k_20260918_ex101_innio_jenbacher_contract_s3",
+        "lbrt_8k_20260918_ex101_innio_jenbacher_contract_s4",
+        "lbrt_8k_20260918_ex101_innio_jenbacher_contract_s5"
+      ],
+      "src_id": "co:liberty_energy"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "INNIO N.V.",
+        "INNIO Jenbacher",
+        "Jenbacher"
+      ],
+      "attributes": {
+        "ticker": "INIO"
+      },
+      "confidence": 0.85,
+      "id": "co:innio",
+      "name": "INNIO",
+      "role": null,
+      "source_ids": [
+        "lbrt_8k_20260918_ex101_innio_jenbacher_contract_s1",
+        "lbrt_8k_20260918_ex101_innio_jenbacher_contract_s2",
+        "lbrt_8k_20260918_ex101_innio_jenbacher_contract_s3",
+        "lbrt_8k_20260918_ex101_innio_jenbacher_contract_s4",
+        "lbrt_8k_20260918_ex101_innio_jenbacher_contract_s5",
+        "lbrt_8k_20260918_ex101_innio_jenbacher_contract_s6"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "gas reciprocating engines",
+        "gas engine generator set",
+        "reciprocating gas engine",
+        "gas genset"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:gas_reciprocating_genset",
+      "name": "Gas reciprocating engine generator set",
+      "role": null,
+      "source_ids": [
+        "lbrt_8k_20260918_ex101_innio_jenbacher_contract_s1",
+        "lbrt_8k_20260918_ex101_innio_jenbacher_contract_s2",
+        "lbrt_8k_20260918_ex101_innio_jenbacher_contract_s3",
+        "lbrt_8k_20260918_ex101_innio_jenbacher_contract_s4",
+        "lbrt_8k_20260918_ex101_innio_jenbacher_contract_s5",
+        "lbrt_8k_20260918_ex101_innio_jenbacher_contract_s6"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "Liberty Energy Inc.",
+        "Liberty Power Innovations",
+        "LPI"
+      ],
+      "attributes": {
+        "ticker": "LBRT"
+      },
+      "confidence": 0.85,
+      "id": "co:liberty_energy",
+      "name": "Liberty Energy",
+      "role": null,
+      "source_ids": [
+        "lbrt_8k_20260918_ex101_innio_jenbacher_contract_s1",
+        "lbrt_8k_20260918_ex101_innio_jenbacher_contract_s2",
+        "lbrt_8k_20260918_ex101_innio_jenbacher_contract_s3",
+        "lbrt_8k_20260918_ex101_innio_jenbacher_contract_s4",
+        "lbrt_8k_20260918_ex101_innio_jenbacher_contract_s5",
+        "lbrt_8k_20260918_ex101_innio_jenbacher_contract_s6"
+      ],
+      "type": "Company"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "lbrt_8k_20260918_ex101_innio_jenbacher_contract",
+    "evidence_tier": 1,
+    "origin_entity": "Liberty Energy Inc.",
+    "permission_basis": "SEC EDGAR 公開申報（8-K Exhibit 10.1，部分內容已遮蔽）；只保留研究必要的有限逐字節錄。published_at 取 EDGAR 申報日 2026-09-18。",
+    "published_at": "2026-09-18",
+    "publisher": "SEC EDGAR（Form 8-K，accession 0001694028-26-000050）",
+    "retrieved_at": "2026-10-27",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Liberty Energy Inc. Form 8-K（2026-09-18）Exhibit 10.1：Liberty Advanced Equipment Technologies 向 Jenbacher 經銷商 Northeast-Western Energy Systems USA 買 INNIO Jenbacher 燃氣引擎發電機組的合約（2026-02-13 簽；100 台 JMC 624、2028 年交貨、配 CGT AVK 發電機，合約價 4.93 億美元；每 5 台組成 20 MW 的 Power Block；保固由原廠 INNIO Jenbacher 出）",
+    "url": "https://www.sec.gov/Archives/edgar/data/1694028/000169402826000050/a101-jenbachercontract.htm"
+  },
+  "sources": [
+    {
+      "id": "lbrt_8k_20260918_ex101_innio_jenbacher_contract_s1",
+      "locator": "Appendix H Limited Warranty 標題段",
+      "quote": "Limited Warranty on new gas engine generator set (“Equipment”) manufactured by INNIO Jenbacher GmbH & Co OG"
+    },
+    {
+      "id": "lbrt_8k_20260918_ex101_innio_jenbacher_contract_s2",
+      "locator": "價金條款 a)",
+      "quote": "In consideration for the supply of Equipment and Services, Buyer shall pay to Seller $493,155,400.00 (the “Contract Price”) as established in Appendix A Scope of Supply."
+    },
+    {
+      "id": "lbrt_8k_20260918_ex101_innio_jenbacher_contract_s3",
+      "locator": "付款時程表表頭",
+      "quote": "LOS Leasing 100 JMC 624 2028 Delivery Version L111 with CGT AVK Generators"
+    },
+    {
+      "id": "lbrt_8k_20260918_ex101_innio_jenbacher_contract_s4",
+      "locator": "性能保證段",
+      "quote": "This Electric Power Output for each 20 MW Power Block will be the combined average electrical output for 5 gensets measured at the generator terminals"
+    },
+    {
+      "id": "lbrt_8k_20260918_ex101_innio_jenbacher_contract_s5",
+      "locator": "合約首段",
+      "quote": "This Contract for the Sale of Equipment with Buyer’s Purchase Order (this “Contract”), dated as of February 13, 2026 (the “Contract Date”), is by and between Liberty Advanced Equipment Technologies LLC, a Texas LLC (“Buyer”) and NORTHEAST-WESTERN ENERGY SYSTEMS USA LLC , a Delaware limited liability company (“Seller”)."
+    },
+    {
+      "id": "lbrt_8k_20260918_ex101_innio_jenbacher_contract_s6",
+      "locator": "Appendix H 適用範圍",
+      "quote": "purchased by Buyer either from INNIO Jenbacher North America LLC, with a registered office at Westway Plaza, 11330 Clay Road Houston, Texas 77041, USA (“OEM Affiliate”) or from one of OEM’s authorized distributor."
+    }
+  ]
+}

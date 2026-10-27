@@ -1,0 +1,23 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1694028/000169402826000062/exhibit102-260722liberty_c.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Liberty Energy Inc. Form 10-Q（2026Q3，2026-10-22）Exhibit 10.2：G20CM34 Supply Agreement——Caterpillar 供 Cat® G20CM34 燃氣引擎（管線天然氣），合約總價 8.01 億美元
+RETRIEVED: 2026-10-27（本機原文抽字逐字核對）
+
+【合約首段】
+"This G20CM34 Supply Agreement (this “ Agreement ”) is entered into by and between Caterpillar Inc."
+
+【定義條款】
+"“ Engine ” means Cat® G20CM34 engine."
+
+【性能條款】
+"Measured power is expected to be [***] bkW using pipeline natural gas with a Cat Methane Number of 75 or higher."
+
+【價金條款】
+"The total price for all Goods and services under this Agreement shall be $801,000,000 (the “ Contract Price ”)."
+
+【定義條款 Generator Set】
+"“ Generator Set ” or “ Genset ” shall mean the unit consisting of the assembly of an Engine, alternator, mechanical coupling, and base-frame(s)."
+
+【價金條款 Unit Base Price 排除項】
+"For clarity, Unit Base Price does not include extended storage period preservation packaging, site equipment start-up, and site string tests balance of plant (BOP), equipment integration, generator set package assembly, installation, commissioning, freight"

@@ -1,0 +1,131 @@
+{
+  "claims": [
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：Liberty 或 Caterpillar 之後的 10-Q／10-K／新聞稿寫出資料中心燃氣機組訂單取消、延後超過一年，或停止供應這一類機組；或買方的一手寫出改用別家機組取代它。核查頻率：每季（Liberty 或 Caterpillar 季報）。觸發後 48 小時：降這條邊 confidence，重讀 tech:gas_reciprocating_genset 供給側（本層讀圖寫成後）。",
+      "id": "lbrt_10q_2026q3_ex102_caterpillar_g20cm34_supply_cl1",
+      "source_ids": [
+        "lbrt_10q_2026q3_ex102_caterpillar_g20cm34_supply_s1",
+        "lbrt_10q_2026q3_ex102_caterpillar_g20cm34_supply_s2",
+        "lbrt_10q_2026q3_ex102_caterpillar_g20cm34_supply_s3",
+        "lbrt_10q_2026q3_ex102_caterpillar_g20cm34_supply_s4",
+        "lbrt_10q_2026q3_ex102_caterpillar_g20cm34_supply_s5",
+        "lbrt_10q_2026q3_ex102_caterpillar_g20cm34_supply_s6"
+      ],
+      "statement": "Buyer-side filing (Liberty 10-Q Q3 2026 Exhibit 10.2): G20CM34 Supply Agreement with Caterpillar Inc. for Cat G20CM34 engines rated on pipeline natural gas, total contract price USD 801,000,000. The contract defines a Generator Set as engine, alternator, mechanical coupling and base-frame, and says the Unit Base Price does not include balance of plant, equipment integration or generator set package assembly — so Caterpillar's scope here is centred on the engine; who assembles the genset package is not stated in this document. The edge is drawn at the genset layer as a modelling choice.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:gas_reciprocating_genset",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "lbrt_10q_2026q3_ex102_caterpillar_g20cm34_supply_s1",
+        "lbrt_10q_2026q3_ex102_caterpillar_g20cm34_supply_s2",
+        "lbrt_10q_2026q3_ex102_caterpillar_g20cm34_supply_s3",
+        "lbrt_10q_2026q3_ex102_caterpillar_g20cm34_supply_s4",
+        "lbrt_10q_2026q3_ex102_caterpillar_g20cm34_supply_s5",
+        "lbrt_10q_2026q3_ex102_caterpillar_g20cm34_supply_s6"
+      ],
+      "src_id": "co:caterpillar"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "Caterpillar Inc."
+      ],
+      "attributes": {
+        "ticker": "CAT"
+      },
+      "confidence": 0.85,
+      "id": "co:caterpillar",
+      "name": "Caterpillar",
+      "role": null,
+      "source_ids": [
+        "lbrt_10q_2026q3_ex102_caterpillar_g20cm34_supply_s1",
+        "lbrt_10q_2026q3_ex102_caterpillar_g20cm34_supply_s2",
+        "lbrt_10q_2026q3_ex102_caterpillar_g20cm34_supply_s3",
+        "lbrt_10q_2026q3_ex102_caterpillar_g20cm34_supply_s4",
+        "lbrt_10q_2026q3_ex102_caterpillar_g20cm34_supply_s5",
+        "lbrt_10q_2026q3_ex102_caterpillar_g20cm34_supply_s6"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "gas reciprocating engines",
+        "gas engine generator set",
+        "reciprocating gas engine",
+        "gas genset"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:gas_reciprocating_genset",
+      "name": "Gas reciprocating engine generator set",
+      "role": null,
+      "source_ids": [
+        "lbrt_10q_2026q3_ex102_caterpillar_g20cm34_supply_s1",
+        "lbrt_10q_2026q3_ex102_caterpillar_g20cm34_supply_s2",
+        "lbrt_10q_2026q3_ex102_caterpillar_g20cm34_supply_s3",
+        "lbrt_10q_2026q3_ex102_caterpillar_g20cm34_supply_s4",
+        "lbrt_10q_2026q3_ex102_caterpillar_g20cm34_supply_s5",
+        "lbrt_10q_2026q3_ex102_caterpillar_g20cm34_supply_s6"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "lbrt_10q_2026q3_ex102_caterpillar_g20cm34_supply",
+    "evidence_tier": 1,
+    "origin_entity": "Liberty Energy Inc.",
+    "permission_basis": "SEC EDGAR 公開申報（10-Q Exhibit 10.2，部分內容已遮蔽）；只保留研究必要的有限逐字節錄。published_at 取 EDGAR 申報日 2026-10-22。",
+    "published_at": "2026-10-22",
+    "publisher": "SEC EDGAR（Form 10-Q，accession 0001694028-26-000062）",
+    "retrieved_at": "2026-10-27",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Liberty Energy Inc. Form 10-Q（2026Q3，2026-10-22）Exhibit 10.2：G20CM34 Supply Agreement——Caterpillar 供 Cat® G20CM34 燃氣引擎（管線天然氣），合約總價 8.01 億美元",
+    "url": "https://www.sec.gov/Archives/edgar/data/1694028/000169402826000062/exhibit102-260722liberty_c.htm"
+  },
+  "sources": [
+    {
+      "id": "lbrt_10q_2026q3_ex102_caterpillar_g20cm34_supply_s1",
+      "locator": "合約首段",
+      "quote": "This G20CM34 Supply Agreement (this “ Agreement ”) is entered into by and between Caterpillar Inc."
+    },
+    {
+      "id": "lbrt_10q_2026q3_ex102_caterpillar_g20cm34_supply_s2",
+      "locator": "定義條款",
+      "quote": "“ Engine ” means Cat® G20CM34 engine."
+    },
+    {
+      "id": "lbrt_10q_2026q3_ex102_caterpillar_g20cm34_supply_s3",
+      "locator": "性能條款",
+      "quote": "Measured power is expected to be [***] bkW using pipeline natural gas with a Cat Methane Number of 75 or higher."
+    },
+    {
+      "id": "lbrt_10q_2026q3_ex102_caterpillar_g20cm34_supply_s4",
+      "locator": "價金條款",
+      "quote": "The total price for all Goods and services under this Agreement shall be $801,000,000 (the “ Contract Price ”)."
+    },
+    {
+      "id": "lbrt_10q_2026q3_ex102_caterpillar_g20cm34_supply_s5",
+      "locator": "定義條款 Generator Set",
+      "quote": "“ Generator Set ” or “ Genset ” shall mean the unit consisting of the assembly of an Engine, alternator, mechanical coupling, and base-frame(s)."
+    },
+    {
+      "id": "lbrt_10q_2026q3_ex102_caterpillar_g20cm34_supply_s6",
+      "locator": "價金條款 Unit Base Price 排除項",
+      "quote": "For clarity, Unit Base Price does not include extended storage period preservation packaging, site equipment start-up, and site string tests balance of plant (BOP), equipment integration, generator set package assembly, installation, commissioning, freight"
+    }
+  ]
+}

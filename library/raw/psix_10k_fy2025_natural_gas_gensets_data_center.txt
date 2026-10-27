@@ -1,0 +1,17 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1137091/000162828026013207/psix-20251231.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Power Solutions International, Inc. Form 10-K（FY2025，2026-03-02）Item 1：天然氣等替代燃料的火花點火引擎與發電機組，終端市場含資料中心的主電源與備援；最大客戶占 2025 年營收 20%
+RETRIEVED: 2026-10-27（本機原文抽字逐字核對）
+
+【Item 1 General Business Overview】
+"Power Solutions International, Inc., incorporated under the laws of the state of Delaware in 2011, designs, engineers, manufactures, markets and sells a broad range of advanced, emission-certified engines and power systems that are powered by a wide variety of clean, alternative fuels, including natural gas, propane, and biofuels, as well as gasoline and diesel options, within the power systems, industrial and transportation end markets."
+
+【Item 1 終端市場表】
+"Power Systems Electric Power Generation (“Gensets”) Large Custom Genset Enclosures Mobile and Stationary Gensets for: Emergency Standby Rental Prime Power Demand Response Microgrid Oil & Gas Data Center"
+
+【Item 1 產品段】
+"The Company sells engines and power systems, including both emission-certified compression ignition and spark-ignition internal combustion engines which are enabled by advanced controls to run on a wide variety of clean, alternative fuels, including natural gas, propane, and biofuels, as well as gasoline and diesel options, within the power systems, industrial and transportation end markets."
+
+【Item 1 客戶段】
+"The Company’s largest customer represented 20% of consolidated net sales in 2025."

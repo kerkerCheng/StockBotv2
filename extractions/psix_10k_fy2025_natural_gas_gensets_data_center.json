@@ -1,0 +1,113 @@
+{
+  "claims": [
+    {
+      "confidence": 0.65,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：PSI 之後的 10-Q／10-K／新聞稿寫出資料中心燃氣機組訂單取消、延後超過一年，或停止供應這一類機組；或買方的一手寫出改用別家機組取代它。核查頻率：每季（PSI 季報）。觸發後 48 小時：降這條邊 confidence，重讀 tech:gas_reciprocating_genset 供給側（本層讀圖寫成後）。",
+      "id": "psix_10k_fy2025_natural_gas_gensets_data_center_cl1",
+      "source_ids": [
+        "psix_10k_fy2025_natural_gas_gensets_data_center_s1",
+        "psix_10k_fy2025_natural_gas_gensets_data_center_s2",
+        "psix_10k_fy2025_natural_gas_gensets_data_center_s3",
+        "psix_10k_fy2025_natural_gas_gensets_data_center_s4"
+      ],
+      "statement": "Supplier's own 10-K (Power Solutions International FY2025): designs and sells emission-certified spark-ignition and compression-ignition engines and power systems running on natural gas and other fuels; gensets are sold for prime power, microgrid and data center among other uses; largest customer was 20% of 2025 net sales. Self-report; the 10-K does not split data center revenue or name customers, and it does not say how much of its natural gas genset output goes to data centers.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "tech:gas_reciprocating_genset",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "psix_10k_fy2025_natural_gas_gensets_data_center_s1",
+        "psix_10k_fy2025_natural_gas_gensets_data_center_s2",
+        "psix_10k_fy2025_natural_gas_gensets_data_center_s3",
+        "psix_10k_fy2025_natural_gas_gensets_data_center_s4"
+      ],
+      "src_id": "co:power_solutions_international"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "Power Solutions International, Inc."
+      ],
+      "attributes": {
+        "ticker": "PSIX"
+      },
+      "confidence": 0.85,
+      "id": "co:power_solutions_international",
+      "name": "Power Solutions International",
+      "role": null,
+      "source_ids": [
+        "psix_10k_fy2025_natural_gas_gensets_data_center_s1",
+        "psix_10k_fy2025_natural_gas_gensets_data_center_s2",
+        "psix_10k_fy2025_natural_gas_gensets_data_center_s3",
+        "psix_10k_fy2025_natural_gas_gensets_data_center_s4"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "gas reciprocating engines",
+        "gas engine generator set",
+        "reciprocating gas engine",
+        "gas genset"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:gas_reciprocating_genset",
+      "name": "Gas reciprocating engine generator set",
+      "role": null,
+      "source_ids": [
+        "psix_10k_fy2025_natural_gas_gensets_data_center_s1",
+        "psix_10k_fy2025_natural_gas_gensets_data_center_s2",
+        "psix_10k_fy2025_natural_gas_gensets_data_center_s3",
+        "psix_10k_fy2025_natural_gas_gensets_data_center_s4"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "psix_10k_fy2025_natural_gas_gensets_data_center",
+    "evidence_tier": 1,
+    "origin_entity": "Power Solutions International, Inc.",
+    "permission_basis": "SEC EDGAR 公開申報（10-K）；只保留研究必要的有限逐字節錄。published_at 取 EDGAR 申報日 2026-03-02。",
+    "published_at": "2026-03-02",
+    "publisher": "SEC EDGAR（Form 10-K，accession 0001628280-26-013207）",
+    "retrieved_at": "2026-10-27",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Power Solutions International, Inc. Form 10-K（FY2025，2026-03-02）Item 1：天然氣等替代燃料的火花點火引擎與發電機組，終端市場含資料中心的主電源與備援；最大客戶占 2025 年營收 20%",
+    "url": "https://www.sec.gov/Archives/edgar/data/1137091/000162828026013207/psix-20251231.htm"
+  },
+  "sources": [
+    {
+      "id": "psix_10k_fy2025_natural_gas_gensets_data_center_s1",
+      "locator": "Item 1 General Business Overview",
+      "quote": "Power Solutions International, Inc., incorporated under the laws of the state of Delaware in 2011, designs, engineers, manufactures, markets and sells a broad range of advanced, emission-certified engines and power systems that are powered by a wide variety of clean, alternative fuels, including natural gas, propane, and biofuels, as well as gasoline and diesel options, within the power systems, industrial and transportation end markets."
+    },
+    {
+      "id": "psix_10k_fy2025_natural_gas_gensets_data_center_s2",
+      "locator": "Item 1 終端市場表",
+      "quote": "Power Systems Electric Power Generation (“Gensets”) Large Custom Genset Enclosures Mobile and Stationary Gensets for: Emergency Standby Rental Prime Power Demand Response Microgrid Oil & Gas Data Center"
+    },
+    {
+      "id": "psix_10k_fy2025_natural_gas_gensets_data_center_s3",
+      "locator": "Item 1 產品段",
+      "quote": "The Company sells engines and power systems, including both emission-certified compression ignition and spark-ignition internal combustion engines which are enabled by advanced controls to run on a wide variety of clean, alternative fuels, including natural gas, propane, and biofuels, as well as gasoline and diesel options, within the power systems, industrial and transportation end markets."
+    },
+    {
+      "id": "psix_10k_fy2025_natural_gas_gensets_data_center_s4",
+      "locator": "Item 1 客戶段",
+      "quote": "The Company’s largest customer represented 20% of consolidated net sales in 2025."
+    }
+  ]
+}

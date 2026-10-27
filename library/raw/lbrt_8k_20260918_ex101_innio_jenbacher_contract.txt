@@ -1,0 +1,23 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1694028/000169402826000050/a101-jenbachercontract.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Liberty Energy Inc. Form 8-K（2026-09-18）Exhibit 10.1：Liberty Advanced Equipment Technologies 向 Jenbacher 經銷商 Northeast-Western Energy Systems USA 買 INNIO Jenbacher 燃氣引擎發電機組的合約（2026-02-13 簽；100 台 JMC 624、2028 年交貨、配 CGT AVK 發電機，合約價 4.93 億美元；每 5 台組成 20 MW 的 Power Block；保固由原廠 INNIO Jenbacher 出）
+RETRIEVED: 2026-10-27（本機原文抽字逐字核對）
+
+【Appendix H Limited Warranty 標題段】
+"Limited Warranty on new gas engine generator set (“Equipment”) manufactured by INNIO Jenbacher GmbH & Co OG"
+
+【價金條款 a)】
+"In consideration for the supply of Equipment and Services, Buyer shall pay to Seller $493,155,400.00 (the “Contract Price”) as established in Appendix A Scope of Supply."
+
+【付款時程表表頭】
+"LOS Leasing 100 JMC 624 2028 Delivery Version L111 with CGT AVK Generators"
+
+【性能保證段】
+"This Electric Power Output for each 20 MW Power Block will be the combined average electrical output for 5 gensets measured at the generator terminals"
+
+【合約首段】
+"This Contract for the Sale of Equipment with Buyer’s Purchase Order (this “Contract”), dated as of February 13, 2026 (the “Contract Date”), is by and between Liberty Advanced Equipment Technologies LLC, a Texas LLC (“Buyer”) and NORTHEAST-WESTERN ENERGY SYSTEMS USA LLC , a Delaware limited liability company (“Seller”)."
+
+【Appendix H 適用範圍】
+"purchased by Buyer either from INNIO Jenbacher North America LLC, with a registered office at Westway Plaza, 11330 Clay Road Houston, Texas 77041, USA (“OEM Affiliate”) or from one of OEM’s authorized distributor."

@@ -1,0 +1,17 @@
+Source URL: https://www.nasdaq.com/press-release/cummins-natural-gas-generators-power-large-scale-data-centers-west-texas-2026-06-16
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Cummins Inc. 新聞稿（Business Wire，2026-06-16；Nasdaq 轉載）：Cummins Natural Gas Generators to Power Large Scale Data Centers in West Texas——為 Circe Energy 的 AI HPC 資料中心供天然氣發電機組作表後主電源，2026–2030 交貨
+RETRIEVED: 2026-10-27（本機原文抽字逐字核對）
+
+【導言】
+"Cummins Inc. announced an agreement with Circe Energy to provide a series of high-powered, high-efficiency natural gas generator sets to support a scalable, behind-the-meter, prime power microgrid solution for their High-Performance Computing (HPC) data center located in Texas"
+
+【第 2 段】
+"Deliveries are scheduled from 2026 through 2030 and will include Cummins’ HSK78 (C2000N6CD) and QSK60 (C1400N6) generator set platforms."
+
+【第 3 段】
+"The power system will support Circe’s behind-the-meter power need for their AI HPC data center campuses, including its West Texas campus development, by utilizing Cummins’ HSK78 (C2000N6CD) and QSK60 (C1400N6) high-horsepower natural gas generator sets as the primary power source - without reliability on the grid."
+
+【Supporting Circe Energy’s West Texas development 段】
+"Cummins is providing the power generation equipment and technical validation support, while Circe and its engineer-of-record retain responsibility for final system design and implementation."
