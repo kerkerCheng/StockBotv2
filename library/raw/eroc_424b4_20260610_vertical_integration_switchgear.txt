@@ -1,0 +1,17 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/2110029/000119312526265898/d12401d424b4.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] ERock, Inc. 424B4（IPO 公開說明書，2026-06-10）：垂直整合——自有天然氣發電機與嵌入式軟體、自組發電機／變壓器／開關櫃；自稱目前唯一符合柴油機級暫態標準的天然氣發電
+RETRIEVED: 2026-10-27（本機原文抽字逐字核對）
+
+【Prospectus Summary—Overview】
+"We are a vertically integrated company that designs, deploys, operates and maintains multi-purpose distributed power systems, consisting of our proprietary, low emission, quick-response natural gas generator and embedded software technology, for our customers."
+
+【Business—Custom System Design】
+"Our engineers develop tailored solutions that integrate our proprietary generator technology with other distributed energy resources such as solar, battery storage and turbines, integrated with switchgear, transformers and other equipment to deliver a comprehensive power system."
+
+【Risk Factors—供應鏈】
+"In the ordinary course of our business, we purchase engine components and other products necessary for the assembly of our generators, transformers and switchgears."
+
+【Prospectus Summary—Overview】
+"Our generators meet or exceed rigorous ISO 8528-5 G3 diesel standards, delivering fast, stable responses to sudden load swings, and we believe we are currently the only provider of natural gas generation that meets utility-grade transient performance requirements for diesel units, which reduces the need for additional technology to deliver required power quality."

@@ -1,0 +1,120 @@
+{
+  "claims": [
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：Vertiv 之後的申報寫出 UIG 交易終止，或交割後把微電網控制業務關掉／出售。核查頻率：每季（Vertiv 10-Q）。觸發後 48 小時：重讀表後微電網控制層；交割完成時另包補 co:vertiv supplies_to 這一層（時點從交割日起）。",
+      "id": "vrt_8k_20260902_acquire_uig_microgrid_controls_cl1",
+      "source_ids": [
+        "vrt_8k_20260902_acquire_uig_microgrid_controls_s1",
+        "vrt_8k_20260902_acquire_uig_microgrid_controls_s2",
+        "vrt_8k_20260902_acquire_uig_microgrid_controls_s3",
+        "vrt_8k_20260902_acquire_uig_microgrid_controls_s4",
+        "vrt_8k_20260902_acquire_uig_microgrid_controls_s5"
+      ],
+      "statement": "Vertiv (2026-09-02) agreed to acquire UtilityInnovation Group, whose proprietary controls platform and pre-engineered microgrid switchgear orchestrate multiple onsite power sources in real time for behind-the-meter data center power, for about USD 1.45 billion (about 13x expected UIG 2027 EBITDA), closing expected Q4 2026. Until closing UIG is a separate private company, so no Vertiv supply edge is drawn; the deal is evidence that a large data-center power vendor is buying into this control layer.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:onsite_gas_power",
+      "id": "e1",
+      "relation": "is_component_of",
+      "source_ids": [
+        "vrt_8k_20260902_acquire_uig_microgrid_controls_s1",
+        "vrt_8k_20260902_acquire_uig_microgrid_controls_s2",
+        "vrt_8k_20260902_acquire_uig_microgrid_controls_s3"
+      ],
+      "src_id": "tech:btm_microgrid_controls"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "microgrid controls",
+        "pre-engineered microgrid switchgear",
+        "paralleling switchgear for onsite generation"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:btm_microgrid_controls",
+      "name": "Behind-the-meter microgrid controls and paralleling/microgrid switchgear",
+      "role": null,
+      "source_ids": [
+        "vrt_8k_20260902_acquire_uig_microgrid_controls_s1",
+        "vrt_8k_20260902_acquire_uig_microgrid_controls_s2",
+        "vrt_8k_20260902_acquire_uig_microgrid_controls_s3",
+        "vrt_8k_20260902_acquire_uig_microgrid_controls_s4",
+        "vrt_8k_20260902_acquire_uig_microgrid_controls_s5"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "onsite natural gas power",
+        "onsite gas power",
+        "behind-the-meter natural gas generation",
+        "onsite natural gas and power generation"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:onsite_gas_power",
+      "name": "Onsite natural gas power generation for data centers",
+      "role": null,
+      "source_ids": [
+        "vrt_8k_20260902_acquire_uig_microgrid_controls_s1",
+        "vrt_8k_20260902_acquire_uig_microgrid_controls_s2",
+        "vrt_8k_20260902_acquire_uig_microgrid_controls_s3",
+        "vrt_8k_20260902_acquire_uig_microgrid_controls_s4",
+        "vrt_8k_20260902_acquire_uig_microgrid_controls_s5"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "vrt_8k_20260902_acquire_uig_microgrid_controls",
+    "evidence_tier": 1,
+    "origin_entity": "Vertiv Holdings Co",
+    "permission_basis": "SEC EDGAR 公開申報（8-K 附件新聞稿）；只保留研究必要的有限逐字節錄。published_at 取 EDGAR 申報日 2026-09-02。",
+    "published_at": "2026-09-02",
+    "publisher": "SEC EDGAR（Form 8-K Exhibit 99.1，accession 0001193125-26-379306）",
+    "retrieved_at": "2026-10-27",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Vertiv 新聞稿（8-K Exhibit 99.1，2026-09-02）：約 14.5 億美元收購 UtilityInnovation Group（UIG）——微電網控制平台與預先設計的微電網開關櫃、表後電力架構；約 13 倍 UIG 2027 年 EBITDA，預計 2026 年第四季交割",
+    "url": "https://www.sec.gov/Archives/edgar/data/1674101/000119312526379306/d472406dex991.htm"
+  },
+  "sources": [
+    {
+      "id": "vrt_8k_20260902_acquire_uig_microgrid_controls_s1",
+      "locator": "導言",
+      "quote": "(NYSE: VRT) (“Vertiv”), a global leader in critical digital infrastructure, today announced its wholly-owned subsidiary, Vertiv Corporation, has entered into an agreement and plan of merger to acquire Utility Innovation Holdings, Inc., which operates as UtilityInnovation Group (“UIG”), a leader in microgrid solutions, advanced power controls and behind-the-meter power architecture design for data centers"
+    },
+    {
+      "id": "vrt_8k_20260902_acquire_uig_microgrid_controls_s2",
+      "locator": "UIG 能力",
+      "quote": "Technology : Proprietary controls platform and pre-engineered microgrid switchgear that orchestrate multiple power sources in real time and coordinate them with the critical power train."
+    },
+    {
+      "id": "vrt_8k_20260902_acquire_uig_microgrid_controls_s3",
+      "locator": "策略理由",
+      "quote": "Strategically, the acquisition extends Vertiv upstream to the grid interconnect, adding microgrid controls, onsite generation and energy storage orchestration, and behind-the-meter power architecture."
+    },
+    {
+      "id": "vrt_8k_20260902_acquire_uig_microgrid_controls_s4",
+      "locator": "交易條件",
+      "quote": "At the approximately $1.45 billion purchase price, the acquisition represents approximately 13x expected UIG 2027 EBITDA."
+    },
+    {
+      "id": "vrt_8k_20260902_acquire_uig_microgrid_controls_s5",
+      "locator": "交易條件",
+      "quote": "The transaction is subject to regulatory approvals and customary closing conditions and is expected to close in the fourth quarter of 2026."
+    }
+  ]
+}

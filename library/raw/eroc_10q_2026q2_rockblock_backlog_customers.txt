@@ -1,0 +1,23 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/2110029/000119312526346922/eroc-20260630.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] ERock, Inc. Form 10-Q（2026Q2，2026-08-12）：RockBlock＝自有天然氣引擎、1.5–3.5 MW、自家組裝；在手訂單約 17 億美元（年增 15 億）；第二季營收 3,990 萬美元、年減 41.7%；四個交易對手占 28%／13%／13%／11%；主要服務資料中心
+RETRIEVED: 2026-10-27（本機原文抽字逐字核對）
+
+【MD&A Overview】
+"At the core of our power systems is our RockBlock (“RockBlock”), a modular, distributed generator string that incorporates our proprietary natural gas engine, scales in 0.5 megawatt (“MW”) increments from 1.5 MW to 3.5 MW per RockBlock and is assembled in-house."
+
+【附註 Segments】
+"The Company primarily serves data centers, utilities, and commercial and industrial customers across the United States."
+
+【MD&A Key Metrics】
+"Contracted Power System Sales Backlog as of June 30, 2026 was approximately $1.7 billion, an increase of $1.5 billion, as compared to June 30, 2025."
+
+【MD&A Adjusted Gross Profit 表】
+"Total revenues $ 39,878 $ 68,458 $ (28,580 ) (41.7%)"
+
+【附註 Concentration】
+"For the three months ended June 30, 2026, sales to four counterparties accounted for approximately 28%, 13%, 13% and 11% of the Company’s total revenue."
+
+【MD&A 產業環境】
+"Furthermore, global supply chains for essential components, such as transformers and turbines, face multi-year backlogs and lead times ranging from 15 to 24 months."

@@ -1,0 +1,20 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1674101/000119312526379306/d472406dex991.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Vertiv 新聞稿（8-K Exhibit 99.1，2026-09-02）：約 14.5 億美元收購 UtilityInnovation Group（UIG）——微電網控制平台與預先設計的微電網開關櫃、表後電力架構；約 13 倍 UIG 2027 年 EBITDA，預計 2026 年第四季交割
+RETRIEVED: 2026-10-27（本機原文抽字逐字核對）
+
+【導言】
+"(NYSE: VRT) (“Vertiv”), a global leader in critical digital infrastructure, today announced its wholly-owned subsidiary, Vertiv Corporation, has entered into an agreement and plan of merger to acquire Utility Innovation Holdings, Inc., which operates as UtilityInnovation Group (“UIG”), a leader in microgrid solutions, advanced power controls and behind-the-meter power architecture design for data centers"
+
+【UIG 能力】
+"Technology : Proprietary controls platform and pre-engineered microgrid switchgear that orchestrate multiple power sources in real time and coordinate them with the critical power train."
+
+【策略理由】
+"Strategically, the acquisition extends Vertiv upstream to the grid interconnect, adding microgrid controls, onsite generation and energy storage orchestration, and behind-the-meter power architecture."
+
+【交易條件】
+"At the approximately $1.45 billion purchase price, the acquisition represents approximately 13x expected UIG 2027 EBITDA."
+
+【交易條件】
+"The transaction is subject to regulatory approvals and customary closing conditions and is expected to close in the fourth quarter of 2026."

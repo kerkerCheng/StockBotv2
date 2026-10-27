@@ -1,0 +1,175 @@
+{
+  "claims": [
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：ERock 之後的 10-Q／10-K 寫出在手訂單（Contracted Power System Sales Backlog）下降、資料中心客戶取消或延後專案，或營收連續兩季年減且在手訂單沒有轉成營收。核查頻率：每季（ERock 10-Q）。觸發後 48 小時：降這條邊 confidence，重讀現場燃氣發電層的整合商讀法。",
+      "id": "eroc_10q_2026q2_rockblock_backlog_customers_cl1",
+      "source_ids": [
+        "eroc_10q_2026q2_rockblock_backlog_customers_s1",
+        "eroc_10q_2026q2_rockblock_backlog_customers_s2",
+        "eroc_10q_2026q2_rockblock_backlog_customers_s3",
+        "eroc_10q_2026q2_rockblock_backlog_customers_s4",
+        "eroc_10q_2026q2_rockblock_backlog_customers_s5"
+      ],
+      "statement": "ERock 10-Q (Q2 2026): designs, deploys and operates natural-gas distributed power systems primarily for data centers, utilities and C&I customers; Contracted Power System Sales Backlog about USD 1.7 billion at 2026-06-30, up USD 1.5 billion year on year — but Q2 revenue fell 41.7% to USD 39.9 million, and four counterparties made up 28%, 13%, 13% and 11% of Q2 revenue. Backlog has not yet turned into revenue; the customers are not named in this document.",
+      "subject_id": "e1"
+    },
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：ERock 之後的 10-Q／10-K 寫出在手訂單（Contracted Power System Sales Backlog）下降、資料中心客戶取消或延後專案，或營收連續兩季年減且在手訂單沒有轉成營收。核查頻率：每季（ERock 10-Q）。觸發後 48 小時：降這條邊 confidence，重讀現場燃氣發電層的整合商讀法。",
+      "id": "eroc_10q_2026q2_rockblock_backlog_customers_cl2",
+      "source_ids": [
+        "eroc_10q_2026q2_rockblock_backlog_customers_s1"
+      ],
+      "statement": "ERock's RockBlock generator string uses its proprietary natural gas engine, scales from 1.5 to 3.5 MW in 0.5 MW steps and is assembled in-house — ERock is its own engine-genset supplier rather than a buyer of OEM gensets. The engine's own components are purchased (424B4); whose they are is not stated.",
+      "subject_id": "e2"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "tech:onsite_gas_power",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "eroc_10q_2026q2_rockblock_backlog_customers_s1",
+        "eroc_10q_2026q2_rockblock_backlog_customers_s2",
+        "eroc_10q_2026q2_rockblock_backlog_customers_s3",
+        "eroc_10q_2026q2_rockblock_backlog_customers_s4",
+        "eroc_10q_2026q2_rockblock_backlog_customers_s5"
+      ],
+      "src_id": "co:erock"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:gas_reciprocating_genset",
+      "id": "e2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "eroc_10q_2026q2_rockblock_backlog_customers_s1"
+      ],
+      "src_id": "co:erock"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "ERock, Inc.",
+        "Enchanted Rock"
+      ],
+      "attributes": {
+        "ticker": "EROC"
+      },
+      "confidence": 0.85,
+      "id": "co:erock",
+      "name": "ERock",
+      "role": null,
+      "source_ids": [
+        "eroc_10q_2026q2_rockblock_backlog_customers_s1",
+        "eroc_10q_2026q2_rockblock_backlog_customers_s2",
+        "eroc_10q_2026q2_rockblock_backlog_customers_s3",
+        "eroc_10q_2026q2_rockblock_backlog_customers_s4",
+        "eroc_10q_2026q2_rockblock_backlog_customers_s5",
+        "eroc_10q_2026q2_rockblock_backlog_customers_s6"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "onsite natural gas power",
+        "onsite gas power",
+        "behind-the-meter natural gas generation",
+        "onsite natural gas and power generation"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:onsite_gas_power",
+      "name": "Onsite natural gas power generation for data centers",
+      "role": null,
+      "source_ids": [
+        "eroc_10q_2026q2_rockblock_backlog_customers_s1",
+        "eroc_10q_2026q2_rockblock_backlog_customers_s2",
+        "eroc_10q_2026q2_rockblock_backlog_customers_s3",
+        "eroc_10q_2026q2_rockblock_backlog_customers_s4",
+        "eroc_10q_2026q2_rockblock_backlog_customers_s5",
+        "eroc_10q_2026q2_rockblock_backlog_customers_s6"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "gas reciprocating engines",
+        "gas engine generator set",
+        "reciprocating gas engine",
+        "gas genset"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:gas_reciprocating_genset",
+      "name": "Gas reciprocating engine generator set",
+      "role": null,
+      "source_ids": [
+        "eroc_10q_2026q2_rockblock_backlog_customers_s1",
+        "eroc_10q_2026q2_rockblock_backlog_customers_s2",
+        "eroc_10q_2026q2_rockblock_backlog_customers_s3",
+        "eroc_10q_2026q2_rockblock_backlog_customers_s4",
+        "eroc_10q_2026q2_rockblock_backlog_customers_s5",
+        "eroc_10q_2026q2_rockblock_backlog_customers_s6"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "eroc_10q_2026q2_rockblock_backlog_customers",
+    "evidence_tier": 1,
+    "origin_entity": "ERock, Inc.",
+    "permission_basis": "SEC EDGAR 公開申報（10-Q）；只保留研究必要的有限逐字節錄。published_at 取 EDGAR 申報日 2026-08-12。",
+    "published_at": "2026-08-12",
+    "publisher": "SEC EDGAR（Form 10-Q，accession 0001193125-26-346922）",
+    "retrieved_at": "2026-10-27",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "ERock, Inc. Form 10-Q（2026Q2，2026-08-12）：RockBlock＝自有天然氣引擎、1.5–3.5 MW、自家組裝；在手訂單約 17 億美元（年增 15 億）；第二季營收 3,990 萬美元、年減 41.7%；四個交易對手占 28%／13%／13%／11%；主要服務資料中心",
+    "url": "https://www.sec.gov/Archives/edgar/data/2110029/000119312526346922/eroc-20260630.htm"
+  },
+  "sources": [
+    {
+      "id": "eroc_10q_2026q2_rockblock_backlog_customers_s1",
+      "locator": "MD&A Overview",
+      "quote": "At the core of our power systems is our RockBlock (“RockBlock”), a modular, distributed generator string that incorporates our proprietary natural gas engine, scales in 0.5 megawatt (“MW”) increments from 1.5 MW to 3.5 MW per RockBlock and is assembled in-house."
+    },
+    {
+      "id": "eroc_10q_2026q2_rockblock_backlog_customers_s2",
+      "locator": "附註 Segments",
+      "quote": "The Company primarily serves data centers, utilities, and commercial and industrial customers across the United States."
+    },
+    {
+      "id": "eroc_10q_2026q2_rockblock_backlog_customers_s3",
+      "locator": "MD&A Key Metrics",
+      "quote": "Contracted Power System Sales Backlog as of June 30, 2026 was approximately $1.7 billion, an increase of $1.5 billion, as compared to June 30, 2025."
+    },
+    {
+      "id": "eroc_10q_2026q2_rockblock_backlog_customers_s4",
+      "locator": "MD&A Adjusted Gross Profit 表",
+      "quote": "Total revenues $ 39,878 $ 68,458 $ (28,580 ) (41.7%)"
+    },
+    {
+      "id": "eroc_10q_2026q2_rockblock_backlog_customers_s5",
+      "locator": "附註 Concentration",
+      "quote": "For the three months ended June 30, 2026, sales to four counterparties accounted for approximately 28%, 13%, 13% and 11% of the Company’s total revenue."
+    },
+    {
+      "id": "eroc_10q_2026q2_rockblock_backlog_customers_s6",
+      "locator": "MD&A 產業環境",
+      "quote": "Furthermore, global supply chains for essential components, such as transformers and turbines, face multi-year backlogs and lead times ranging from 15 to 24 months."
+    }
+  ]
+}

@@ -1,0 +1,112 @@
+{
+  "claims": [
+    {
+      "confidence": 0.65,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：ERock 之後的 10-Q／10-K 寫出在手訂單（Contracted Power System Sales Backlog）下降、資料中心客戶取消或延後專案，或營收連續兩季年減且在手訂單沒有轉成營收。核查頻率：每季（ERock 10-Q）。觸發後 48 小時：降這條邊 confidence，重讀現場燃氣發電層的整合商讀法。",
+      "id": "eroc_424b4_20260610_vertical_integration_switchgear_cl1",
+      "source_ids": [
+        "eroc_424b4_20260610_vertical_integration_switchgear_s1",
+        "eroc_424b4_20260610_vertical_integration_switchgear_s2",
+        "eroc_424b4_20260610_vertical_integration_switchgear_s3",
+        "eroc_424b4_20260610_vertical_integration_switchgear_s4"
+      ],
+      "statement": "ERock (424B4) is vertically integrated: its own natural gas generator plus embedded software, and it assembles its own generators, transformers and switchgear, integrating them with storage and turbines into a full power system. It supplies this control/switchgear layer inside its own systems, not as a standalone product to other integrators — evidence that the control layer is not captured by a single vendor. ERock's claim to be the only natural gas generation meeting utility-grade diesel transient standards is its own (supplier self-report, not corroborated).",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "tech:btm_microgrid_controls",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "eroc_424b4_20260610_vertical_integration_switchgear_s1",
+        "eroc_424b4_20260610_vertical_integration_switchgear_s2",
+        "eroc_424b4_20260610_vertical_integration_switchgear_s3"
+      ],
+      "src_id": "co:erock"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "ERock, Inc.",
+        "Enchanted Rock"
+      ],
+      "attributes": {
+        "ticker": "EROC"
+      },
+      "confidence": 0.85,
+      "id": "co:erock",
+      "name": "ERock",
+      "role": null,
+      "source_ids": [
+        "eroc_424b4_20260610_vertical_integration_switchgear_s1",
+        "eroc_424b4_20260610_vertical_integration_switchgear_s2",
+        "eroc_424b4_20260610_vertical_integration_switchgear_s3",
+        "eroc_424b4_20260610_vertical_integration_switchgear_s4"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "microgrid controls",
+        "pre-engineered microgrid switchgear",
+        "paralleling switchgear for onsite generation"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:btm_microgrid_controls",
+      "name": "Behind-the-meter microgrid controls and paralleling/microgrid switchgear",
+      "role": null,
+      "source_ids": [
+        "eroc_424b4_20260610_vertical_integration_switchgear_s1",
+        "eroc_424b4_20260610_vertical_integration_switchgear_s2",
+        "eroc_424b4_20260610_vertical_integration_switchgear_s3",
+        "eroc_424b4_20260610_vertical_integration_switchgear_s4"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "eroc_424b4_20260610_vertical_integration_switchgear",
+    "evidence_tier": 1,
+    "origin_entity": "ERock, Inc.",
+    "permission_basis": "SEC EDGAR 公開申報（424B4 公開說明書）；只保留研究必要的有限逐字節錄。published_at 取 EDGAR 申報日 2026-06-10。",
+    "published_at": "2026-06-10",
+    "publisher": "SEC EDGAR（Form 424B4，accession 0001193125-26-265898）",
+    "retrieved_at": "2026-10-27",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "ERock, Inc. 424B4（IPO 公開說明書，2026-06-10）：垂直整合——自有天然氣發電機與嵌入式軟體、自組發電機／變壓器／開關櫃；自稱目前唯一符合柴油機級暫態標準的天然氣發電",
+    "url": "https://www.sec.gov/Archives/edgar/data/2110029/000119312526265898/d12401d424b4.htm"
+  },
+  "sources": [
+    {
+      "id": "eroc_424b4_20260610_vertical_integration_switchgear_s1",
+      "locator": "Prospectus Summary—Overview",
+      "quote": "We are a vertically integrated company that designs, deploys, operates and maintains multi-purpose distributed power systems, consisting of our proprietary, low emission, quick-response natural gas generator and embedded software technology, for our customers."
+    },
+    {
+      "id": "eroc_424b4_20260610_vertical_integration_switchgear_s2",
+      "locator": "Business—Custom System Design",
+      "quote": "Our engineers develop tailored solutions that integrate our proprietary generator technology with other distributed energy resources such as solar, battery storage and turbines, integrated with switchgear, transformers and other equipment to deliver a comprehensive power system."
+    },
+    {
+      "id": "eroc_424b4_20260610_vertical_integration_switchgear_s3",
+      "locator": "Risk Factors—供應鏈",
+      "quote": "In the ordinary course of our business, we purchase engine components and other products necessary for the assembly of our generators, transformers and switchgears."
+    },
+    {
+      "id": "eroc_424b4_20260610_vertical_integration_switchgear_s4",
+      "locator": "Prospectus Summary—Overview",
+      "quote": "Our generators meet or exceed rigorous ISO 8528-5 G3 diesel standards, delivering fast, stable responses to sudden load swings, and we believe we are currently the only provider of natural gas generation that meets utility-grade transient performance requirements for diesel units, which reduces the need for additional technology to deliver required power quality."
+    }
+  ]
+}
