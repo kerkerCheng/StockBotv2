@@ -138,3 +138,40 @@
 - 追源旗標：
   - SemiEngineering 寫「256 GB per die」，但同句的 16 層 512 GB 換算是 256Gb（32 GB）一顆；以規格轉述的 256Gb 為準。
   - Tom's Hardware 寫基底晶粒的 UCIe「could be … implemented by companies like Broadcom or Marvell」，是推測句，不得當成供應商。
+
+## 八、2026-10-27 深夜（使用者「修 #105」＋`/research-drain`）
+
+**#105 修法**（commit `bed7c8f2`，development-flow Z1／R0）：分類前先用語意預篩同一組 fetcher 抓全文，EDGAR 6-K／8-K 抓附件 99.x；抓不到任何內文的不送分類，心跳常駐「無內文未分類 N」。
+- 既有 25 則「原文為空」的 no_go 讀全文後重新分類，共重分 36 則，「原文為空」no_go 剩 0。
+- 測試 482 過；變異 6/6 被抓到。
+
+**pq1 清空**：本段處置 22 則（入圖包 4、停放 18，含本段新開的走圖 lead 1 則），triaged_go 清到 0。
+- 入圖包 4 個，都建議 go：
+  - [878] AI 推論情境記憶儲存層（BlueField-4 驅動的 KV cache 卸載儲存、Micron PCIe Gen6 SSD），`lead_d8472873`。
+  - [879] NAND 層補 Micron、Sandisk 兩家製造商（兩份 FY2026 10-K），`lead_f3d7c310`。
+  - [880] USFP 開層（NVIDIA 與 Cisco 的每通道 400G 可插拔規格，OCP 2026），`lead_30eb7a1f`。
+  - [881] 成像雷達晶片組開層＋Arbe 座位（robotaxi R7），`lead_34ef9086`。
+- 停放 18 則：
+  - decompose NAND SLC／HBF 的 8 題（HBF 核心晶粒、TSV、堆疊接合、基底邏輯晶粒、堆疊測試、SLC 類低延遲 NAND、高 IOPS 控制器、PCIe 7.0），都是 awaiting_named_disclosure：Sandisk HBF Fact Sheet、Kioxia GP1 新聞稿、Astera Labs Aries 7 都沒有點名供應商或流程。
+  - 一手已讀後停：LG 冷水機供應協議、TSLA 8-K Q3 Update、三星電機（一手已在圖上）、NVIDIA ODC 開放規格部落格、變壓器價格交期報告（三個數字是它自己的、無一手出處）、Wiwynn／Ayar／GUC 聯合新聞稿。
+  - 照實轉述後停（tier 1–2 honest passthrough）：KSH（PGCIL 765kV 導線核准）、Cooler Master 2,500kW CDU、奇鋐 6MW In-Row CDU。
+  - 走圖 lead：燃料調壓／加熱撬 `lead_4fc46ee3`（awaiting_named_disclosure，等 Enerflex、CECO、Wärtsilä 具名專案）。
+
+**段 1**：wake-queue 已清（ew_0060、ew_0764 照舊不動）；語意待檢 0。
+
+**段 5**：closure-gate exit 0，`--skip 300943.SZ`（收購案在深交所待審，等世界）與 `--skip ARBE`（座位包 [881] 待 go，等使用者）。
+
+**段 4 走圖**（終局表 [`graph-walk-terminals-2026-10-27.md`](graph-walk-terminals-2026-10-27.md)）：
+- 新命中 6 筆都有終局：FTAI 航改燃機（is_variant_of 刻意不走訪、非邊緣）、車用相機（R3／R4 已停）、車用雷達（[881]）、超音波（R10 已停）、燃料調壓撬（走圖 lead 已停）、robotaxi 車隊（需求端節點；錨刻意不登記，#104）。
+- 讀圖該重讀 4 → 0，四份當天換版：
+  - Bloom Energy Server 插槽 → `sr_db33dc55748a1ff2`（undecided 不改）。[860] 補的反向路徑是 Bloom 自己 10-K 的競爭者清單，不是買方改用，反證 #2 沒成立；#2 補一句排除在位者自述（否則恆亮）。需求側改寫成「繞得過、Bloom 被選的原文理由是對手交期」，新增 #5（渦輪與引擎 OEM 交期縮短）。MTARTECH.NS 換騎、改兩句。
+  - CW DFB 層 → `sr_14af7e9754503353`（volume 不改）。[873] Broadcom 法說「more than tripling」、[876] 仕佳光子 100mW 自 2026-06 起批量出貨，都觸及反證①的實質部分；照 48 小時動作逐項答，沒有⑧的價格或稼動率訊號、方向相反，不改判。①改寫基準、①②⑧補兩家。六份敘事換騎（SIVE.ST、3081.TWO、4979.TWO、3234.TWO、2455.TW、COHR）。
+  - 外部光源層 → `sr_6d26d3c8f69e0ec7`（neither 不改）。[875] 天孚自述 ELS「稳定量产交付」是多源的方向；改一句「這一格還在量產前」。9856.HK、SIVE.ST 只換 id。
+  - 大型電力變壓器層 → `sr_63c81a98cf0f3e09`（volume 不改）。[869] 華城（台中擴建 2027Q2 投產）、[874] Anthropic S-1（第一家買方逐字寫 allocation constraints）；①補 Anthropic、③補華城。沒有敘事騎這一層；華城是邊緣、敘事還沒寫。
+- 敘事該重寫 0。
+
+**#104 重犯（我自己的誤差）**：照 [857] 草稿 ⑤ 把 `tech:robotaxi_fleet` 登記進 `config/sector_anchors.json`，跑錨鏈預告才發現 16 個節點經 co:nvidia 樞紐改判成 robotaxi 產業——跟 10-23 同一個步驟同一個錯，動 config 前沒先 grep failure log（L11-4）。當下撤回（沒有 materialize、沒有寫讀圖）；`_doc` 補一句警告（新增錨前先跑錨鏈改變的節點數預告），#104 記為第 2 次。
+
+**發現未排程**：
+- trigger 文字的實體推斷不認名冊短名（例：「Micron」解析不到 `co:micron`），停放時要手動給 `trace_trigger_entities`（1 例）。
+- 華城（1519.TW）邊緣、在大型變壓器層，敘事還沒寫——下一輪 research-drain 的「邊緣卻沒敘事」。
