@@ -1,0 +1,294 @@
+{
+  "claims": [
+    {
+      "confidence": 0.65,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：永鼎之後的定期報告寫出光棒或光纖擴產延後、縮減，光通訊板塊營收衰退或價格回落、產能利用率下滑；或寫出光棒改為外購。核查頻率：每半年（年報約 4 月、半年報約 8 月下旬）。觸發後 48 小時：降這條邊 confidence，重讀預製棒與光纖層讀圖的供給側（新增產能何時追上需求）。",
+      "id": "cninfo_600105_h1_2026_preform_fiber_mpo_cl1",
+      "source_ids": [
+        "cninfo_600105_h1_2026_preform_fiber_mpo_s2",
+        "cninfo_600105_h1_2026_preform_fiber_mpo_s3",
+        "cninfo_600105_h1_2026_preform_fiber_mpo_s5",
+        "cninfo_600105_h1_2026_preform_fiber_mpo_s6",
+        "cninfo_600105_h1_2026_preform_fiber_mpo_s7",
+        "cninfo_600105_h1_2026_preform_fiber_mpo_s8",
+        "cninfo_600105_h1_2026_preform_fiber_mpo_s9"
+      ],
+      "statement": "Jiangsu Etern (Yongding, 600105.SS) H1 2026 report: vertically integrated preform → fiber → cable, extending into MPO assemblies; after its expansion projects reach full output it will have 1,050 t/yr of preform and 36 million fiber-km/yr of fiber. The company says preform expansion takes 18–24 months with long equipment lead times, so short-term supply stays tight even as a new capacity cycle has started; H1 2026 saw tight supply with rising volume and price, and AI-compute specialty fiber is its core growth line. Named customers are the Chinese telecom operators; no hyperscaler or overseas datacom customer is named. The company also runs overseas power engineering, auto harness and superconductor businesses. Supplier self-report; the preform is described as a product line, not stated whether it is sold outside or used captively.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:optical_fiber_preform",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "cninfo_600105_h1_2026_preform_fiber_mpo_s2",
+        "cninfo_600105_h1_2026_preform_fiber_mpo_s3",
+        "cninfo_600105_h1_2026_preform_fiber_mpo_s8"
+      ],
+      "src_id": "co:jiangsu_etern"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:optical_fiber",
+      "id": "e2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "cninfo_600105_h1_2026_preform_fiber_mpo_s2",
+        "cninfo_600105_h1_2026_preform_fiber_mpo_s3",
+        "cninfo_600105_h1_2026_preform_fiber_mpo_s7",
+        "cninfo_600105_h1_2026_preform_fiber_mpo_s8"
+      ],
+      "src_id": "co:jiangsu_etern"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:optical_fiber_cable",
+      "id": "e3",
+      "relation": "supplies_to",
+      "source_ids": [
+        "cninfo_600105_h1_2026_preform_fiber_mpo_s3",
+        "cninfo_600105_h1_2026_preform_fiber_mpo_s4"
+      ],
+      "src_id": "co:jiangsu_etern"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.65,
+      "dst_id": "tech:high_density_fiber_connector",
+      "id": "e4",
+      "relation": "supplies_to",
+      "source_ids": [
+        "cninfo_600105_h1_2026_preform_fiber_mpo_s2",
+        "cninfo_600105_h1_2026_preform_fiber_mpo_s4",
+        "cninfo_600105_h1_2026_preform_fiber_mpo_s8"
+      ],
+      "src_id": "co:jiangsu_etern"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "tech:optical_fiber",
+      "id": "e5",
+      "relation": "is_component_of",
+      "source_ids": [
+        "cninfo_600105_h1_2026_preform_fiber_mpo_s2",
+        "cninfo_600105_h1_2026_preform_fiber_mpo_s5"
+      ],
+      "src_id": "tech:optical_fiber_preform"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "永鼎股份",
+        "江苏永鼎",
+        "江蘇永鼎",
+        "Jiangsu Etern",
+        "JIANGSU ETERN COMPANY LIMITED",
+        "600105.SS"
+      ],
+      "attributes": {
+        "ticker": "600105.SS"
+      },
+      "confidence": 0.85,
+      "id": "co:jiangsu_etern",
+      "name": "江苏永鼎股份有限公司",
+      "role": null,
+      "source_ids": [
+        "cninfo_600105_h1_2026_preform_fiber_mpo_s1",
+        "cninfo_600105_h1_2026_preform_fiber_mpo_s2",
+        "cninfo_600105_h1_2026_preform_fiber_mpo_s3",
+        "cninfo_600105_h1_2026_preform_fiber_mpo_s4",
+        "cninfo_600105_h1_2026_preform_fiber_mpo_s5",
+        "cninfo_600105_h1_2026_preform_fiber_mpo_s6",
+        "cninfo_600105_h1_2026_preform_fiber_mpo_s7",
+        "cninfo_600105_h1_2026_preform_fiber_mpo_s8",
+        "cninfo_600105_h1_2026_preform_fiber_mpo_s9"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "glass preform",
+        "glass preforms",
+        "optical fibre preform",
+        "fiber preform",
+        "preform"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:optical_fiber_preform",
+      "name": "Optical fiber preform (glass preform)",
+      "role": null,
+      "source_ids": [
+        "cninfo_600105_h1_2026_preform_fiber_mpo_s1",
+        "cninfo_600105_h1_2026_preform_fiber_mpo_s2",
+        "cninfo_600105_h1_2026_preform_fiber_mpo_s3",
+        "cninfo_600105_h1_2026_preform_fiber_mpo_s4",
+        "cninfo_600105_h1_2026_preform_fiber_mpo_s5",
+        "cninfo_600105_h1_2026_preform_fiber_mpo_s6",
+        "cninfo_600105_h1_2026_preform_fiber_mpo_s7",
+        "cninfo_600105_h1_2026_preform_fiber_mpo_s8",
+        "cninfo_600105_h1_2026_preform_fiber_mpo_s9"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "optical fibre",
+        "optical fiber",
+        "bend-insensitive fiber",
+        "single-mode fiber",
+        "fiber"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:optical_fiber",
+      "name": "Optical fiber (single-mode, incl. bend-insensitive)",
+      "role": null,
+      "source_ids": [
+        "cninfo_600105_h1_2026_preform_fiber_mpo_s1",
+        "cninfo_600105_h1_2026_preform_fiber_mpo_s2",
+        "cninfo_600105_h1_2026_preform_fiber_mpo_s3",
+        "cninfo_600105_h1_2026_preform_fiber_mpo_s4",
+        "cninfo_600105_h1_2026_preform_fiber_mpo_s5",
+        "cninfo_600105_h1_2026_preform_fiber_mpo_s6",
+        "cninfo_600105_h1_2026_preform_fiber_mpo_s7",
+        "cninfo_600105_h1_2026_preform_fiber_mpo_s8",
+        "cninfo_600105_h1_2026_preform_fiber_mpo_s9"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "optical fibre cable",
+        "OFC",
+        "high fiber count cable",
+        "high-density cable",
+        "IBR cable",
+        "ribbon cable",
+        "optical fiber, cable"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:optical_fiber_cable",
+      "name": "Optical fiber cable (incl. high-fiber-count data center cable)",
+      "role": null,
+      "source_ids": [
+        "cninfo_600105_h1_2026_preform_fiber_mpo_s1",
+        "cninfo_600105_h1_2026_preform_fiber_mpo_s2",
+        "cninfo_600105_h1_2026_preform_fiber_mpo_s3",
+        "cninfo_600105_h1_2026_preform_fiber_mpo_s4",
+        "cninfo_600105_h1_2026_preform_fiber_mpo_s5",
+        "cninfo_600105_h1_2026_preform_fiber_mpo_s6",
+        "cninfo_600105_h1_2026_preform_fiber_mpo_s7",
+        "cninfo_600105_h1_2026_preform_fiber_mpo_s8",
+        "cninfo_600105_h1_2026_preform_fiber_mpo_s9"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "MPO connector",
+        "MTP/MPO",
+        "MPO/MTP",
+        "MMC connector",
+        "MDC connector",
+        "高密度光纤连接器",
+        "高密度連接器",
+        "pre-terminated trunk",
+        "multi-fiber connector"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:high_density_fiber_connector",
+      "name": "High-density multi-fiber connector and pre-terminated assembly (MPO/MTP, MMC/MDC)",
+      "role": null,
+      "source_ids": [
+        "cninfo_600105_h1_2026_preform_fiber_mpo_s1",
+        "cninfo_600105_h1_2026_preform_fiber_mpo_s2",
+        "cninfo_600105_h1_2026_preform_fiber_mpo_s3",
+        "cninfo_600105_h1_2026_preform_fiber_mpo_s4",
+        "cninfo_600105_h1_2026_preform_fiber_mpo_s5",
+        "cninfo_600105_h1_2026_preform_fiber_mpo_s6",
+        "cninfo_600105_h1_2026_preform_fiber_mpo_s7",
+        "cninfo_600105_h1_2026_preform_fiber_mpo_s8",
+        "cninfo_600105_h1_2026_preform_fiber_mpo_s9"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "cninfo_600105_h1_2026_preform_fiber_mpo",
+    "evidence_tier": 1,
+    "origin_entity": "江苏永鼎股份有限公司",
+    "permission_basis": "公開法定申報（上交所主板半年度報告，巨潮資訊網）；只保留研究必要的有限逐字節錄。published_at 取巨潮路徑日期 2026-08-20。",
+    "published_at": "2026-08-20",
+    "publisher": "巨潮資訊網（上交所公告）",
+    "retrieved_at": "2026-10-28",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "江苏永鼎（600105.SS）2026 年半年度报告：光棒—光纤—光缆一体化并延伸 MPO；扩产全部达产后年产 1050 吨光棒、3600 万芯公里光纤；预制棒扩产周期 18–24 个月、短期供给紧张将延续；上半年全产业链供需偏紧、量价齐升，算力特种光纤是核心增长主线",
+    "url": "http://static.cninfo.com.cn/finalpage/2026-08-20/1225482526.PDF"
+  },
+  "sources": [
+    {
+      "id": "cninfo_600105_h1_2026_preform_fiber_mpo_s1",
+      "locator": "第二节 公司简介和主要财务指标",
+      "quote": "公司的外文名称 JIANGSU ETERN COMPANY LIMITED"
+    },
+    {
+      "id": "cninfo_600105_h1_2026_preform_fiber_mpo_s2",
+      "locator": "第三节 一、报告期内公司所属行业及主营业务情况说明",
+      "quote": "光通信领域，公司推进全产业链垂直整合，以“光棒—光纤—光缆”为产业基石，向上延伸特种光纤、MPO（多芯推入式连接器及组件）、光器件、光芯片等核心高端产品"
+    },
+    {
+      "id": "cninfo_600105_h1_2026_preform_fiber_mpo_s3",
+      "locator": "同节（一）光通信产业（1）光棒、光纤、光缆",
+      "quote": "公司产品覆盖光纤预制棒、通信光纤、特种光纤、通信光缆、特种光缆、室内光缆、蝶形光缆、光电复合缆、通信电缆、数据电缆等全品类，已形成完整产品谱系。"
+    },
+    {
+      "id": "cninfo_600105_h1_2026_preform_fiber_mpo_s4",
+      "locator": "同段",
+      "quote": "光缆及配套产品包含 MPO 光纤跳线、大芯数高密度光缆等数据中心专用产品"
+    },
+    {
+      "id": "cninfo_600105_h1_2026_preform_fiber_mpo_s5",
+      "locator": "同节 行业情况",
+      "quote": "光纤预制棒作为产业链核心环节，扩产周期长达 18-24 个月，叠加核心设备交付周期长、工艺技术壁垒高，短期产能难以快速释放。"
+    },
+    {
+      "id": "cninfo_600105_h1_2026_preform_fiber_mpo_s6",
+      "locator": "同节 行业情况",
+      "quote": "当前行业已开启新一轮产能扩张，但受光棒等核心环节建设周期制约，短期供给紧张格局仍将延续。"
+    },
+    {
+      "id": "cninfo_600105_h1_2026_preform_fiber_mpo_s7",
+      "locator": "第三节 二、经营情况的讨论与分析——1、光棒、光纤、光缆产业协同发展",
+      "quote": "今年上半年以来，AI 算力推动行业迈入高景气周期，全产业链供需格局偏紧，呈现量价齐升态势。算力特种光纤成为公司核心增长主线"
+    },
+    {
+      "id": "cninfo_600105_h1_2026_preform_fiber_mpo_s8",
+      "locator": "同段",
+      "quote": "报告期内，公司持续扩产光棒、光纤、光缆、MPO（多芯推入式连接器及组件），加速全产业链一体化布局。光棒、光纤产能扩充项目全部达产后，将形成年产 1050 吨光棒、3600 万芯公里光纤的生产能力"
+    },
+    {
+      "id": "cninfo_600105_h1_2026_preform_fiber_mpo_s9",
+      "locator": "第三节 主要客户",
+      "quote": "公司产品主要服务于中国移动、中国电信、中国联通、中国广电等国内主流运营商及各类国家重点工程"
+    }
+  ]
+}
