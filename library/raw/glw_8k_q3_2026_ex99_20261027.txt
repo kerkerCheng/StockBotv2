@@ -1,0 +1,11 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/24741/000002474126000273/glw-20261027xex99xq32026.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Corning 8-K Q3 2026 新聞稿（EX-99，2026-10-27）：第三季簽下四份長期、數十億美元的客戶協議（含 Verizon、AT&T）；擴產由分攤擴產成本與風險的長期客戶協議支撐
+RETRIEVED: 2026-10-28（本機原文抽字逐字核對）
+
+【Q3 重點】
+"In the third quarter, Corning secured four long-term, multibillion-dollar customer agreements, including with Verizon and AT&T."
+
+【CFO Ed Schlesinger 引言】
+"To support that growth, we have steadily added capacity, backed by long-term customer agreements that share the cost and risk of expansions."

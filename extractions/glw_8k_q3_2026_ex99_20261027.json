@@ -1,0 +1,96 @@
+{
+  "claims": [
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：Corning 之後的 10-Q、10-K、8-K 或法說寫出這些長約被取消、縮減、延後，或光通訊事業的 Gen AI 營收衰退、客戶預付回沖；或 Amazon 一手寫出改用其他光纖供應商。核查頻率：每季（Corning 季報）。觸發後 48 小時：降這條邊 confidence，重讀光纖層讀圖的需求側。",
+      "id": "glw_8k_q3_2026_ex99_20261027_cl1",
+      "source_ids": [
+        "glw_8k_q3_2026_ex99_20261027_s1",
+        "glw_8k_q3_2026_ex99_20261027_s2"
+      ],
+      "statement": "Corning 8-K Q3 2026 (EX-99, 2026-10-27): Corning secured four long-term, multibillion-dollar customer agreements in Q3 (including Verizon and AT&T), and its capacity additions are backed by long-term customer agreements that share the cost and risk of expansions — customers bear part of the expansion cost (customer-to-supplier commitment). Amounts and the other two counterparties are not disclosed in this document.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "tech:optical_fiber",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "glw_8k_q3_2026_ex99_20261027_s1",
+        "glw_8k_q3_2026_ex99_20261027_s2"
+      ],
+      "src_id": "co:corning"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "GLW"
+      ],
+      "attributes": {
+        "ticker": "GLW"
+      },
+      "confidence": 0.85,
+      "id": "co:corning",
+      "name": "Corning",
+      "role": "material_base",
+      "source_ids": [
+        "glw_8k_q3_2026_ex99_20261027_s1",
+        "glw_8k_q3_2026_ex99_20261027_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "optical fibre",
+        "optical fiber",
+        "bend-insensitive fiber",
+        "single-mode fiber",
+        "fiber"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:optical_fiber",
+      "name": "Optical fiber (single-mode, incl. bend-insensitive)",
+      "role": null,
+      "source_ids": [
+        "glw_8k_q3_2026_ex99_20261027_s1",
+        "glw_8k_q3_2026_ex99_20261027_s2"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "glw_8k_q3_2026_ex99_20261027",
+    "evidence_tier": 1,
+    "origin_entity": "Corning",
+    "permission_basis": "SEC 8-K 附件 99（公開申報）；只保留研究必要的有限逐字節錄。",
+    "published_at": "2026-10-27",
+    "publisher": "SEC EDGAR",
+    "retrieved_at": "2026-10-28",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Corning 8-K Q3 2026 新聞稿（EX-99，2026-10-27）：第三季簽下四份長期、數十億美元的客戶協議（含 Verizon、AT&T）；擴產由分攤擴產成本與風險的長期客戶協議支撐",
+    "url": "https://www.sec.gov/Archives/edgar/data/24741/000002474126000273/glw-20261027xex99xq32026.htm"
+  },
+  "sources": [
+    {
+      "id": "glw_8k_q3_2026_ex99_20261027_s1",
+      "locator": "Q3 重點",
+      "quote": "In the third quarter, Corning secured four long-term, multibillion-dollar customer agreements, including with Verizon and AT&T."
+    },
+    {
+      "id": "glw_8k_q3_2026_ex99_20261027_s2",
+      "locator": "CFO Ed Schlesinger 引言",
+      "quote": "To support that growth, we have steadily added capacity, backed by long-term customer agreements that share the cost and risk of expansions."
+    }
+  ]
+}

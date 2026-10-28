@@ -1,0 +1,26 @@
+Source URL: https://stl.tech/wp-content/uploads/2026/07/Transcript-July-24-2026.pdf
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Sterlite Technologies（STL）Q1 FY27 法說逐字稿（2026-07-24，公司官網刊登）：自製四氯化矽、化學氣相沉積與燒結做成玻璃預製棒，再拉絲、成纜；與一家全球 hyperscaler 簽多年期 11 億美元供貨（到 FY29）、多筆 1 億美元級高芯數 IBR 光纜訂單；鍺用在玻璃製程、氦用在光纖製造，正在找減少鍺用量的技術；依產能挑單
+RETRIEVED: 2026-10-28（本機原文抽字逐字核對）
+
+【開場（Ankit Agarwal，MD）：價值鏈】
+"It starts with the purest grade of silicon, which we transform through advanced processes like silicon tetrachloride formation, chemical vapor deposition and high precision sintering to create ultrapure glass preforms, which is the backbone of optical fiber."
+
+【開場（Ankit Agarwal，MD）：價值鏈】
+"From there, we draw the highest grade fiber, design high-density cables and develop reliable connectivity products that power data centers and telecom networks worldwide."
+
+【開場：Q1 接單】
+"The momentum is anchored by a landmark multiyear $1.1 billion deal with a global hyperscaler to supply optical connectivity products for next-gen AI data centers through FY29."
+
+【開場：Q1 接單】
+"Furthermore, we secured multiple $100 million hyperscaler orders for our high fiber count IBR cable solutions."
+
+【問答（Achal 問原料）：Ankit Agarwal】
+"One is germanium, which is used in our glass process. We have helium, which is required as part of some of our fiber manufacturing."
+
+【問答（Achal 問原料）：Ankit Agarwal】
+"At the same time, we're also looking at new technologies where our consumption of germanium itself could reduce over time."
+
+【問答（Tej Patel 問接單）：Ajay Jhanjhari（CFO）】
+"Obviously, now we are in a situation wherein we have to pick and choose the orders basis the capacity availability."

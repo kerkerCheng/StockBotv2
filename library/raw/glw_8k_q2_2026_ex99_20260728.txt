@@ -1,0 +1,11 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/24741/000002474126000253/glw-20260728xex99xq22026.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Corning 8-K Q2 2026 新聞稿（EX-99，2026-07-28）：Amazon 宣布多年期、數十億美元協議，由 Corning 供應 Amazon 美國資料中心的光纖、光纜與連接方案；NVIDIA 與 Corning 宣布長期夥伴關係，Corning 美國光連接產能擴 10 倍、美國光纖產能增加五成以上
+RETRIEVED: 2026-10-28（本機原文抽字逐字核對）
+
+【Q2 重點（In Q2）】
+"Amazon announced a multiyear, multibillion-dollar agreement under which Corning will supply the optical fiber, cable, and connectivity solutions that power Amazon's expanding data center infrastructure across the United States."
+
+【Q2 重點（In Q2）】
+"NVIDIA and Corning announced a long-term partnership in which Corning will expand its U.S.-based optical connectivity manufacturing capacity by 10x and expand its U.S. fiber production capacity by more than 50% to meet the accelerating demand driven by AI factory buildouts."

@@ -1,0 +1,240 @@
+{
+  "claims": [
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：Corning 之後的 10-Q、10-K、8-K 或法說寫出這些長約被取消、縮減、延後，或光通訊事業的 Gen AI 營收衰退、客戶預付回沖；或 Amazon 一手寫出改用其他光纖供應商。核查頻率：每季（Corning 季報）。觸發後 48 小時：降這條邊 confidence，重讀光纖層讀圖的需求側。",
+      "id": "glw_8k_q2_2026_ex99_20260728_cl1",
+      "source_ids": [
+        "glw_8k_q2_2026_ex99_20260728_s1"
+      ],
+      "statement": "Corning 8-K Q2 2026 (EX-99, 2026-07-28): Amazon announced a multiyear, multibillion-dollar agreement under which Corning will supply the optical fiber, cable and connectivity solutions for Amazon's expanding U.S. data center infrastructure. Customer named; agreement terms (prepayment, take-or-pay) not disclosed in this document.",
+      "subject_id": "e1"
+    },
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：Corning 之後的申報或法說寫出這兩項美國擴產延後、縮減或取消，或 NVIDIA 一手寫出改用其他光連接供應商。核查頻率：每季（Corning 季報）。觸發後 48 小時：降這條邊 confidence，重讀光纖與光纜層讀圖的供給側（新增產能）。",
+      "id": "glw_8k_q2_2026_ex99_20260728_cl2",
+      "source_ids": [
+        "glw_8k_q2_2026_ex99_20260728_s2"
+      ],
+      "statement": "Corning 8-K Q2 2026: NVIDIA and Corning announced a long-term partnership under which Corning will expand U.S.-based optical connectivity manufacturing capacity by 10x and U.S. fiber production capacity by more than 50% to meet demand driven by AI factory buildouts. Capacity targets are plans, not delivered capacity; the document does not say NVIDIA pays for the expansion.",
+      "subject_id": "e4"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "co:amazon",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "glw_8k_q2_2026_ex99_20260728_s1"
+      ],
+      "src_id": "co:corning"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "tech:optical_fiber",
+      "id": "e2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "glw_8k_q2_2026_ex99_20260728_s1",
+        "glw_8k_q2_2026_ex99_20260728_s2"
+      ],
+      "src_id": "co:corning"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "tech:optical_fiber_cable",
+      "id": "e3",
+      "relation": "supplies_to",
+      "source_ids": [
+        "glw_8k_q2_2026_ex99_20260728_s1"
+      ],
+      "src_id": "co:corning"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "co:nvidia",
+      "id": "e4",
+      "relation": "partnership_with",
+      "source_ids": [
+        "glw_8k_q2_2026_ex99_20260728_s2"
+      ],
+      "src_id": "co:corning"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:optical_fiber_cable",
+      "id": "e5",
+      "relation": "enables",
+      "source_ids": [
+        "glw_8k_q2_2026_ex99_20260728_s2"
+      ],
+      "src_id": "tech:ai_compute_buildout"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "GLW"
+      ],
+      "attributes": {
+        "ticker": "GLW"
+      },
+      "confidence": 0.85,
+      "id": "co:corning",
+      "name": "Corning",
+      "role": "material_base",
+      "source_ids": [
+        "glw_8k_q2_2026_ex99_20260728_s1",
+        "glw_8k_q2_2026_ex99_20260728_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "end_demand",
+      "aliases": [
+        "AMZN",
+        "Amazon.com",
+        "Amazon Web Services",
+        "AWS"
+      ],
+      "attributes": {
+        "ticker": "AMZN"
+      },
+      "confidence": 0.85,
+      "id": "co:amazon",
+      "name": "Amazon",
+      "role": "adjacent_silicon",
+      "source_ids": [
+        "glw_8k_q2_2026_ex99_20260728_s1",
+        "glw_8k_q2_2026_ex99_20260728_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "NVDA",
+        "NVIDIA Corporation",
+        "Nvidia"
+      ],
+      "attributes": {
+        "ticker": "NVDA"
+      },
+      "confidence": 0.85,
+      "id": "co:nvidia",
+      "name": "NVIDIA",
+      "role": "leader",
+      "source_ids": [
+        "glw_8k_q2_2026_ex99_20260728_s1",
+        "glw_8k_q2_2026_ex99_20260728_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "optical fibre",
+        "optical fiber",
+        "bend-insensitive fiber",
+        "single-mode fiber",
+        "fiber"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:optical_fiber",
+      "name": "Optical fiber (single-mode, incl. bend-insensitive)",
+      "role": null,
+      "source_ids": [
+        "glw_8k_q2_2026_ex99_20260728_s1",
+        "glw_8k_q2_2026_ex99_20260728_s2"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "optical fibre cable",
+        "OFC",
+        "high fiber count cable",
+        "high-density cable",
+        "IBR cable",
+        "ribbon cable",
+        "optical fiber, cable"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:optical_fiber_cable",
+      "name": "Optical fiber cable (incl. high-fiber-count data center cable)",
+      "role": null,
+      "source_ids": [
+        "glw_8k_q2_2026_ex99_20260728_s1",
+        "glw_8k_q2_2026_ex99_20260728_s2"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "end_demand",
+      "aliases": [
+        "AI data center buildout",
+        "AI system performance drive",
+        "AI frontier lab compute",
+        "AI XPU platform",
+        "HPC AI cluster",
+        "hyperscale AI infrastructure",
+        "AI factory buildout",
+        "agentic AI infrastructure"
+      ],
+      "attributes": {
+        "concentration_score": null,
+        "intrinsic_cycle_time_weeks": null,
+        "ramp_difficulty_intrinsic": null
+      },
+      "confidence": 0.85,
+      "id": "tech:ai_compute_buildout",
+      "name": "AI training/inference cluster buildout",
+      "role": null,
+      "source_ids": [
+        "glw_8k_q2_2026_ex99_20260728_s1",
+        "glw_8k_q2_2026_ex99_20260728_s2"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "glw_8k_q2_2026_ex99_20260728",
+    "evidence_tier": 1,
+    "origin_entity": "Corning",
+    "permission_basis": "SEC 8-K 附件 99（公開申報）；只保留研究必要的有限逐字節錄。",
+    "published_at": "2026-07-28",
+    "publisher": "SEC EDGAR",
+    "retrieved_at": "2026-10-28",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Corning 8-K Q2 2026 新聞稿（EX-99，2026-07-28）：Amazon 宣布多年期、數十億美元協議，由 Corning 供應 Amazon 美國資料中心的光纖、光纜與連接方案；NVIDIA 與 Corning 宣布長期夥伴關係，Corning 美國光連接產能擴 10 倍、美國光纖產能增加五成以上",
+    "url": "https://www.sec.gov/Archives/edgar/data/24741/000002474126000253/glw-20260728xex99xq22026.htm"
+  },
+  "sources": [
+    {
+      "id": "glw_8k_q2_2026_ex99_20260728_s1",
+      "locator": "Q2 重點（In Q2）",
+      "quote": "Amazon announced a multiyear, multibillion-dollar agreement under which Corning will supply the optical fiber, cable, and connectivity solutions that power Amazon's expanding data center infrastructure across the United States."
+    },
+    {
+      "id": "glw_8k_q2_2026_ex99_20260728_s2",
+      "locator": "Q2 重點（In Q2）",
+      "quote": "NVIDIA and Corning announced a long-term partnership in which Corning will expand its U.S.-based optical connectivity manufacturing capacity by 10x and expand its U.S. fiber production capacity by more than 50% to meet the accelerating demand driven by AI factory buildouts."
+    }
+  ]
+}

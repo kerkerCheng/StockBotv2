@@ -1,0 +1,139 @@
+{
+  "claims": [
+    {
+      "confidence": 0.65,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：STL 之後的季報、法說、NSE／BSE 公告寫出 hyperscaler 供貨（Product Award Letter 或高芯數 IBR 光纜訂單）取消、延後或縮減，或資料中心營收占比回落、產能利用率下滑、開始降價搶單。核查頻率：每季（STL 季報與法說，約 1、4、7、10 月下旬）。觸發後 48 小時：降這條邊 confidence，重讀光纖與光纜層讀圖的供給側（新增產能與降價訊號）。",
+      "id": "stl_q1fy27_investor_presentation_202607_cl1",
+      "source_ids": [
+        "stl_q1fy27_investor_presentation_202607_s1"
+      ],
+      "statement": "STL Q1 FY27 investor presentation: a US$1.11 billion Product Award Letter from a hyperscaler (not named) to supply optical connectivity products from FY27 to FY29 for next-gen AI data centers. Supplier self-report; customer not named; a product award letter is a purchase commitment, not a prepayment.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:optical_fiber_cable",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "stl_q1fy27_investor_presentation_202607_s1"
+      ],
+      "src_id": "co:sterlite_technologies"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "Sterlite Technologies Limited",
+        "Sterlite Tech",
+        "STLTECH",
+        "STLTECH.NS"
+      ],
+      "attributes": {
+        "ticker": "STLTECH.NS"
+      },
+      "confidence": 0.85,
+      "id": "co:sterlite_technologies",
+      "name": "Sterlite Technologies",
+      "role": null,
+      "source_ids": [
+        "stl_q1fy27_investor_presentation_202607_s1",
+        "stl_q1fy27_investor_presentation_202607_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "glass preform",
+        "glass preforms",
+        "optical fibre preform",
+        "fiber preform",
+        "preform"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:optical_fiber_preform",
+      "name": "Optical fiber preform (glass preform)",
+      "role": null,
+      "source_ids": [
+        "stl_q1fy27_investor_presentation_202607_s1",
+        "stl_q1fy27_investor_presentation_202607_s2"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "optical fibre",
+        "optical fiber",
+        "bend-insensitive fiber",
+        "single-mode fiber",
+        "fiber"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:optical_fiber",
+      "name": "Optical fiber (single-mode, incl. bend-insensitive)",
+      "role": null,
+      "source_ids": [
+        "stl_q1fy27_investor_presentation_202607_s1",
+        "stl_q1fy27_investor_presentation_202607_s2"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "optical fibre cable",
+        "OFC",
+        "high fiber count cable",
+        "high-density cable",
+        "IBR cable",
+        "ribbon cable",
+        "optical fiber, cable"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:optical_fiber_cable",
+      "name": "Optical fiber cable (incl. high-fiber-count data center cable)",
+      "role": null,
+      "source_ids": [
+        "stl_q1fy27_investor_presentation_202607_s1",
+        "stl_q1fy27_investor_presentation_202607_s2"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "stl_q1fy27_investor_presentation_202607",
+    "evidence_tier": 1,
+    "origin_entity": "Sterlite Technologies",
+    "permission_basis": "公司官網刊登的投資人簡報 PDF；只保留研究必要的有限逐字節錄。簡報本身沒印日期，published_at 取同季法說日 2026-07-24（檔案上傳路徑 2026/07）。",
+    "published_at": "2026-07-24",
+    "publisher": "Sterlite Technologies（stl.tech 投資人專區）",
+    "retrieved_at": "2026-10-28",
+    "source_type": "ir_deck",
+    "storage_permission": "repo_excerpt",
+    "title": "Sterlite Technologies（STL）Q1 FY27 投資人簡報（2026-07，公司官網）：一家 hyperscaler 的 11.1 億美元 Product Award Letter（FY27 到 FY29 供光連接產品給新一代 AI 資料中心）；引 CRU：需求跑在光纖與預製棒供給前面、稼動率高、交期拉長",
+    "url": "https://stl.tech/wp-content/uploads/2026/07/2.-IR-presentation.pdf"
+  },
+  "sources": [
+    {
+      "id": "stl_q1fy27_investor_presentation_202607_s1",
+      "locator": "第 15 頁〈Key Strategic Wins〉",
+      "quote": "Landmark $1.11 Billion Product Award Letter (PAL) Secured (₹10,000+ Cr) from a hyperscaler to supply optical connectivity products from FY27 to FY29 for next-gen AI data centers"
+    },
+    {
+      "id": "stl_q1fy27_investor_presentation_202607_s2",
+      "locator": "〈Reflections〉（As per CRU）",
+      "quote": "Demand acceleration, particularly in high-value applications, is increasingly outpacing fibre and preform availability, leading to high utilisation rates and longer lead times across key markets."
+    }
+  ]
+}

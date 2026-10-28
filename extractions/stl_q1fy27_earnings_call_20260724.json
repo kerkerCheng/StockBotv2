@@ -1,0 +1,291 @@
+{
+  "claims": [
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：STL 之後的季報或法說寫出改向外部採購預製棒、預製棒產線停產或縮減，或寫出鍺、氦供應中斷影響出貨。核查頻率：每季（STL 季報與法說）。觸發後 48 小時：降這條邊 confidence，重讀預製棒層讀圖的供給側。",
+      "id": "stl_q1fy27_earnings_call_20260724_cl1",
+      "source_ids": [
+        "stl_q1fy27_earnings_call_20260724_s1",
+        "stl_q1fy27_earnings_call_20260724_s2",
+        "stl_q1fy27_earnings_call_20260724_s5",
+        "stl_q1fy27_earnings_call_20260724_s6"
+      ],
+      "statement": "Sterlite Technologies (STLTECH.NS) Q1 FY27 call (2026-07-24): STL is vertically integrated from silicon through silicon tetrachloride formation, chemical vapor deposition and sintering to glass preforms, then draws fiber and makes high-density cables; the preforms are made for its own fiber (captive; the call does not say it sells preforms to others). Germanium is used in its glass process and helium in fiber manufacturing; it is looking at technologies to reduce germanium consumption. Supplier self-report.",
+      "subject_id": "e1"
+    },
+    {
+      "confidence": 0.65,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：STL 之後的季報、法說、NSE／BSE 公告寫出 hyperscaler 供貨（Product Award Letter 或高芯數 IBR 光纜訂單）取消、延後或縮減，或資料中心營收占比回落、產能利用率下滑、開始降價搶單。核查頻率：每季（STL 季報與法說，約 1、4、7、10 月下旬）。觸發後 48 小時：降這條邊 confidence，重讀光纖與光纜層讀圖的供給側（新增產能與降價訊號）。",
+      "id": "stl_q1fy27_earnings_call_20260724_cl2",
+      "source_ids": [
+        "stl_q1fy27_earnings_call_20260724_s3",
+        "stl_q1fy27_earnings_call_20260724_s4",
+        "stl_q1fy27_earnings_call_20260724_s7"
+      ],
+      "statement": "STL Q1 FY27 call: a multiyear US$1.1 billion deal with a global hyperscaler (not named) to supply optical connectivity products for next-gen AI data centers through FY29, plus multiple US$100 million hyperscaler orders for high-fiber-count IBR cable; the CFO says STL now has to pick and choose orders based on capacity availability. Supplier self-report; customer not named.",
+      "subject_id": "e5"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:optical_fiber_preform",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "stl_q1fy27_earnings_call_20260724_s1"
+      ],
+      "src_id": "co:sterlite_technologies"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "tech:optical_fiber",
+      "id": "e2",
+      "relation": "is_component_of",
+      "source_ids": [
+        "stl_q1fy27_earnings_call_20260724_s1"
+      ],
+      "src_id": "tech:optical_fiber_preform"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:optical_fiber",
+      "id": "e3",
+      "relation": "supplies_to",
+      "source_ids": [
+        "stl_q1fy27_earnings_call_20260724_s2"
+      ],
+      "src_id": "co:sterlite_technologies"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "tech:optical_fiber_cable",
+      "id": "e4",
+      "relation": "is_component_of",
+      "source_ids": [
+        "stl_q1fy27_earnings_call_20260724_s2"
+      ],
+      "src_id": "tech:optical_fiber"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:optical_fiber_cable",
+      "id": "e5",
+      "relation": "supplies_to",
+      "source_ids": [
+        "stl_q1fy27_earnings_call_20260724_s2",
+        "stl_q1fy27_earnings_call_20260724_s3",
+        "stl_q1fy27_earnings_call_20260724_s4",
+        "stl_q1fy27_earnings_call_20260724_s7"
+      ],
+      "src_id": "co:sterlite_technologies"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:optical_fiber_cable",
+      "id": "e6",
+      "relation": "enables",
+      "source_ids": [
+        "stl_q1fy27_earnings_call_20260724_s3",
+        "stl_q1fy27_earnings_call_20260724_s4"
+      ],
+      "src_id": "tech:ai_compute_buildout"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "Sterlite Technologies Limited",
+        "Sterlite Tech",
+        "STLTECH",
+        "STLTECH.NS"
+      ],
+      "attributes": {
+        "ticker": "STLTECH.NS"
+      },
+      "confidence": 0.85,
+      "id": "co:sterlite_technologies",
+      "name": "Sterlite Technologies",
+      "role": null,
+      "source_ids": [
+        "stl_q1fy27_earnings_call_20260724_s1",
+        "stl_q1fy27_earnings_call_20260724_s2",
+        "stl_q1fy27_earnings_call_20260724_s3",
+        "stl_q1fy27_earnings_call_20260724_s4",
+        "stl_q1fy27_earnings_call_20260724_s5",
+        "stl_q1fy27_earnings_call_20260724_s6",
+        "stl_q1fy27_earnings_call_20260724_s7"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "glass preform",
+        "glass preforms",
+        "optical fibre preform",
+        "fiber preform",
+        "preform"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:optical_fiber_preform",
+      "name": "Optical fiber preform (glass preform)",
+      "role": null,
+      "source_ids": [
+        "stl_q1fy27_earnings_call_20260724_s1",
+        "stl_q1fy27_earnings_call_20260724_s2",
+        "stl_q1fy27_earnings_call_20260724_s3",
+        "stl_q1fy27_earnings_call_20260724_s4",
+        "stl_q1fy27_earnings_call_20260724_s5",
+        "stl_q1fy27_earnings_call_20260724_s6",
+        "stl_q1fy27_earnings_call_20260724_s7"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "optical fibre",
+        "optical fiber",
+        "bend-insensitive fiber",
+        "single-mode fiber",
+        "fiber"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:optical_fiber",
+      "name": "Optical fiber (single-mode, incl. bend-insensitive)",
+      "role": null,
+      "source_ids": [
+        "stl_q1fy27_earnings_call_20260724_s1",
+        "stl_q1fy27_earnings_call_20260724_s2",
+        "stl_q1fy27_earnings_call_20260724_s3",
+        "stl_q1fy27_earnings_call_20260724_s4",
+        "stl_q1fy27_earnings_call_20260724_s5",
+        "stl_q1fy27_earnings_call_20260724_s6",
+        "stl_q1fy27_earnings_call_20260724_s7"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "optical fibre cable",
+        "OFC",
+        "high fiber count cable",
+        "high-density cable",
+        "IBR cable",
+        "ribbon cable",
+        "optical fiber, cable"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:optical_fiber_cable",
+      "name": "Optical fiber cable (incl. high-fiber-count data center cable)",
+      "role": null,
+      "source_ids": [
+        "stl_q1fy27_earnings_call_20260724_s1",
+        "stl_q1fy27_earnings_call_20260724_s2",
+        "stl_q1fy27_earnings_call_20260724_s3",
+        "stl_q1fy27_earnings_call_20260724_s4",
+        "stl_q1fy27_earnings_call_20260724_s5",
+        "stl_q1fy27_earnings_call_20260724_s6",
+        "stl_q1fy27_earnings_call_20260724_s7"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "end_demand",
+      "aliases": [
+        "AI data center buildout",
+        "AI system performance drive",
+        "AI frontier lab compute",
+        "AI XPU platform",
+        "HPC AI cluster",
+        "hyperscale AI infrastructure",
+        "AI factory buildout",
+        "agentic AI infrastructure"
+      ],
+      "attributes": {
+        "concentration_score": null,
+        "intrinsic_cycle_time_weeks": null,
+        "ramp_difficulty_intrinsic": null
+      },
+      "confidence": 0.85,
+      "id": "tech:ai_compute_buildout",
+      "name": "AI training/inference cluster buildout",
+      "role": null,
+      "source_ids": [
+        "stl_q1fy27_earnings_call_20260724_s1",
+        "stl_q1fy27_earnings_call_20260724_s2",
+        "stl_q1fy27_earnings_call_20260724_s3",
+        "stl_q1fy27_earnings_call_20260724_s4",
+        "stl_q1fy27_earnings_call_20260724_s5",
+        "stl_q1fy27_earnings_call_20260724_s6",
+        "stl_q1fy27_earnings_call_20260724_s7"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "stl_q1fy27_earnings_call_20260724",
+    "evidence_tier": 1,
+    "origin_entity": "Sterlite Technologies",
+    "permission_basis": "公司官網刊登的法說會逐字稿 PDF；只保留研究必要的有限逐字節錄。published_at 取法說會日期 2026-07-24（逐字稿每頁頁首日期）。",
+    "published_at": "2026-07-24",
+    "publisher": "Sterlite Technologies（stl.tech 投資人專區）",
+    "retrieved_at": "2026-10-28",
+    "source_type": "transcript",
+    "storage_permission": "repo_excerpt",
+    "title": "Sterlite Technologies（STL）Q1 FY27 法說逐字稿（2026-07-24，公司官網刊登）：自製四氯化矽、化學氣相沉積與燒結做成玻璃預製棒，再拉絲、成纜；與一家全球 hyperscaler 簽多年期 11 億美元供貨（到 FY29）、多筆 1 億美元級高芯數 IBR 光纜訂單；鍺用在玻璃製程、氦用在光纖製造，正在找減少鍺用量的技術；依產能挑單",
+    "url": "https://stl.tech/wp-content/uploads/2026/07/Transcript-July-24-2026.pdf"
+  },
+  "sources": [
+    {
+      "id": "stl_q1fy27_earnings_call_20260724_s1",
+      "locator": "開場（Ankit Agarwal，MD）：價值鏈",
+      "quote": "It starts with the purest grade of silicon, which we transform through advanced processes like silicon tetrachloride formation, chemical vapor deposition and high precision sintering to create ultrapure glass preforms, which is the backbone of optical fiber."
+    },
+    {
+      "id": "stl_q1fy27_earnings_call_20260724_s2",
+      "locator": "開場（Ankit Agarwal，MD）：價值鏈",
+      "quote": "From there, we draw the highest grade fiber, design high-density cables and develop reliable connectivity products that power data centers and telecom networks worldwide."
+    },
+    {
+      "id": "stl_q1fy27_earnings_call_20260724_s3",
+      "locator": "開場：Q1 接單",
+      "quote": "The momentum is anchored by a landmark multiyear $1.1 billion deal with a global hyperscaler to supply optical connectivity products for next-gen AI data centers through FY29."
+    },
+    {
+      "id": "stl_q1fy27_earnings_call_20260724_s4",
+      "locator": "開場：Q1 接單",
+      "quote": "Furthermore, we secured multiple $100 million hyperscaler orders for our high fiber count IBR cable solutions."
+    },
+    {
+      "id": "stl_q1fy27_earnings_call_20260724_s5",
+      "locator": "問答（Achal 問原料）：Ankit Agarwal",
+      "quote": "One is germanium, which is used in our glass process. We have helium, which is required as part of some of our fiber manufacturing."
+    },
+    {
+      "id": "stl_q1fy27_earnings_call_20260724_s6",
+      "locator": "問答（Achal 問原料）：Ankit Agarwal",
+      "quote": "At the same time, we're also looking at new technologies where our consumption of germanium itself could reduce over time."
+    },
+    {
+      "id": "stl_q1fy27_earnings_call_20260724_s7",
+      "locator": "問答（Tej Patel 問接單）：Ajay Jhanjhari（CFO）",
+      "quote": "Obviously, now we are in a situation wherein we have to pick and choose the orders basis the capacity availability."
+    }
+  ]
+}
