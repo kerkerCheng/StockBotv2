@@ -3451,7 +3451,13 @@ function plainText(text) {
   for (let i = 0; i < lines.length; i += 1) {
     const line = lines[i];
     const heading = line.match(/^(#{1,4})\s+(.*)$/);
-    if (heading) {
+    const sub = line.match(/^-#\s+(.*)$/);
+    if (sub) {
+      // Discord 的小字（`-# …`；2026-10-28 起短版的說明都用它）：淡色小一號，字一個不改
+      const row = el('div', 'pt-line pt-sub');
+      row.appendChild(inlineWithCites(sub[1]));
+      box.appendChild(row);
+    } else if (heading) {
       const h = el(heading[1].length <= 2 ? 'h3' : 'h4');
       h.appendChild(mdInline(heading[2]));
       box.appendChild(h);

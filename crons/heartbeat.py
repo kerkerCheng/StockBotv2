@@ -861,6 +861,33 @@ _UNIT_LABEL: dict[str, str] = {"layer": "層", "socket": "插槽"}
 
 
 
+def candidate_counts(board: Mapping[str, Any]) -> dict[str, Any]:
+    """候選板 artifact → 各格檔數與最老滯留（心跳段 2 與 Discord 短版 ④ 共用的唯一算法——L16）。"""
+    counts = board.get("counts") or {}
+    # 2026-10-22 使用者：「無敘事 75 你是說那都是我們決定不開，那為啥不是非倍率候選？」——75 檔全是非邊緣：程式先問
+    # 「有沒有敘事」，沒有就不再判邊緣，同一件事拆進兩格（L12）。改成非倍率合一格、再拆有沒有舊敘事；
+    # 真正的待做「邊緣（或量不到）卻沒敘事」單獨一格（⑤ 也有）。
+    no_narr = [r for r in board.get("no_narrative") or () if isinstance(r, Mapping)]
+    non_edge = sum(1 for r in no_narr if (r.get("edge") or {}).get("state") == "not_edge")
+    unmeasured = sum(1 for r in no_narr if (r.get("edge") or {}).get("state") not in ("not_edge", "edge"))
+    out: dict[str, Any] = {key: counts.get(key, 0) for key in ("open", "missing", "priced_wait", "pass")}
+    out.update(held=counts.get("held"), edge_unmeasurable=counts.get("edge_unmeasurable", 0),
+               legacy=counts.get("legacy", 0), precondition_failed=counts.get("precondition_failed", 0),
+               with_old=int(counts.get("not_multiple") or 0), non_edge=non_edge, unmeasured=unmeasured,
+               edge_gap=len(no_narr) - non_edge - unmeasured, oldest=dict(board.get("oldest_stall_days") or {}))
+    return out
+
+
+def candidate_states_text(c: Mapping[str, Any]) -> str:
+    """封閉字彙的五個候選狀態（AGENTS：可開／缺 X／已定價等回落／不要／已持有），**0 也印**、有檔才印最老滯留。"""
+    def aged(key: str) -> str:
+        n, d = c.get(key, 0), (c.get("oldest") or {}).get(key)
+        return f"{n}（最老 {d} 天）" if n and d is not None else f"{n}"
+
+    held = "未驗（持股未讀到）" if c.get("held") is None else str(c.get("held"))
+    return f"可開 {aged('open')}｜缺 X {aged('missing')}｜等回落 {aged('priced_wait')}｜不要 {c.get('pass', 0)}｜已持有 {held}"
+
+
 def _candidate_lines(state_dir: Path | None) -> list[str]:
     """段 2：候選各組檔數（**0 也印**、最老滯留逐狀態各印）＋持股讀不到／解析不到＋三題有值與缺席計數。
     只讀 `candidates` artifact（零網路；推導在 materialize）。**只數，不下結論**：三題那一行不得讀成「幾檔已定價」。"""
@@ -868,27 +895,11 @@ def _candidate_lines(state_dir: Path | None) -> list[str]:
     if absence is not None:
         return [f"候選板：{absence.reason}（{absence.kind}）",
                 f"三題：{absence.reason}（{absence.kind}）"]
-    counts = board.get("counts") or {}
-    oldest = board.get("oldest_stall_days") or {}
-
-    def aged(key: str) -> str:
-        n, d = counts.get(key, 0), oldest.get(key)
-        return f"{n}（最老 {d} 天）" if n and d is not None else f"{n}"
-
-    held = "未驗（持股未讀到）" if counts.get("held") is None else str(counts.get("held"))
-    # 2026-10-22 使用者：「無敘事 75 你是說那都是我們決定不開，那為啥不是非倍率候選？」——75 檔全是非邊緣：程式先問
-    # 「有沒有敘事」，沒有就不再判邊緣，同一件事拆進兩格（L12）。改成非倍率合一格、再拆有沒有舊敘事；
-    # 真正的待做「邊緣（或量不到）卻沒敘事」單獨一格（⑤ 也有）。
-    no_narr = [r for r in board.get("no_narrative") or () if isinstance(r, Mapping)]
-    non_edge = sum(1 for r in no_narr if (r.get("edge") or {}).get("state") == "not_edge")
-    unmeasured = sum(1 for r in no_narr if (r.get("edge") or {}).get("state") not in ("not_edge", "edge"))
-    edge_gap = len(no_narr) - non_edge - unmeasured
-    with_old = int(counts.get("not_multiple") or 0)
-    lines = [f"候選：可開 {aged('open')}｜缺 X {aged('missing')}｜等回落 {aged('priced_wait')}｜不要 {counts.get('pass', 0)}"
-             f"｜已持有 {held}｜邊緣無法量 {counts.get('edge_unmeasurable', 0)}"
-             f"｜舊版 {counts.get('legacy', 0)}｜前提失效 {counts.get('precondition_failed', 0)}"
-             f"｜非倍率 {with_old + non_edge}（有舊敘事 {with_old}｜不寫敘事 {non_edge}）"
-             f"｜邊緣卻沒敘事 {edge_gap}｜量不到卻沒敘事 {unmeasured}"]
+    c = candidate_counts(board)
+    lines = [f"候選：{candidate_states_text(c)}｜邊緣無法量 {c['edge_unmeasurable']}"
+             f"｜舊版 {c['legacy']}｜前提失效 {c['precondition_failed']}"
+             f"｜非倍率 {c['with_old'] + c['non_edge']}（有舊敘事 {c['with_old']}｜不寫敘事 {c['non_edge']}）"
+             f"｜邊緣卻沒敘事 {c['edge_gap']}｜量不到卻沒敘事 {c['unmeasured']}"]
     holdings = board.get("holdings") or {}
     if holdings.get("status") != "ok":
         lines.append(f"  持股未讀到，已持有判定暫停（upstream_unavailable）：{holdings.get('reason')}")
@@ -958,15 +969,12 @@ def _signed(value: float) -> str:
     return f"{value * 100:+.1f}%".replace("-", "−")
 
 
-def _priced_wait_short(state_dir: Path | None) -> str:
-    """短版狀態塊一行（2026-10-21 使用者問「價格一直跌，等回落能及時反應嗎」）：每檔「判斷日→今天 報酬」。"""
-    wait, _priced, absence = _priced_rows(state_dir)
-    if absence is not None:
-        return f"等回落：{absence.reason}"
-    if not wait:
-        return "等回落 0"
-    # 2026-10-22 使用者兩次問「回落多少才變可開」：答案是沒有門檻（AGENTS「已定價不設門檻」），到那一天由人重判——
-    # 所以每檔印「已等幾天、下次重看哪天」（取這家所有還在等的喚醒 watch 最早的 until；ew_1433 比候選列上的 ew_0148 早醒）。
+#: 短版「等回落」的重看日在這幾天內就加粗（只是排版提示，不是門檻——到那天由人重判）。
+RECHECK_SOON_DAYS = 3
+
+
+def _wait_wake_days() -> dict[str, list[str]]:
+    """company_id → 還在等的喚醒 watch 的 until（ISO 日期字串）。讀不到回空——只少重看日，不帶走整塊。"""
     try:
         from engine_b import event_watch as ew
 
@@ -974,28 +982,63 @@ def _priced_wait_short(state_dir: Path | None) -> str:
         for w in ew.load_watches().get("watches") or ():
             if w.get("wake_brief") and w.get("status") == "active" and w.get("until"):
                 wakes.setdefault(str(w["wake_brief"]), []).append(str(w["until"]))
-    except Exception:  # noqa: BLE001 — 讀不到就不印下次重看日，不帶走這一行
-        wakes = {}
-    parts = []
+        return wakes
+    except Exception:  # noqa: BLE001
+        return {}
+
+
+def _pctile(value: Any) -> str:
+    return "量不到" if value is None else str(int(float(value) + 0.5))
+
+
+def priced_wait_short_lines(state_dir: Path | None, *, today: date,
+                            label: Callable[[Mapping[str, Any]], str] | None = None) -> list[str]:
+    """Discord 短版 ④ 的「等回落」小塊：一檔一行「名字：等幾天｜百分位 起點→今天｜股價 起點以來｜重看日」＋一行小字圖例。
+
+    2026-10-21 使用者問「價格一直跌，等回落能及時反應嗎」；10-22 兩次問「回落多少才變可開」——答案是沒有門檻（AGENTS
+    「已定價不設門檻」），到重看日由人重判，所以每檔印已等幾天、下次重看哪天（取這家所有還在等的喚醒 watch 最早的 until；
+    ew_1433 比候選列上的 ew_0148 早醒）。10-28 使用者核可的排版：起點用**等回落起點**（同一筆等待、判斷日換版也不重設），
+    百分位取整數、重看日在 `RECHECK_SOON_DAYS` 天內加粗、收盤日寫在圖例。0 檔回空（候選那一行已印「等回落 0」）。"""
+    wait, _priced, absence = _priced_rows(state_dir)
+    if absence is not None:
+        return [f"- 等回落：{absence.reason}"]
+    if not wait:
+        return []
+    wakes = _wait_wake_days()
+    rows = []
     for row in wait:
         info = row.get("priced_since") or {}
-        then, now = (info.get("then") or {}).get("value"), (info.get("now") or {}).get("value")
-        ret = info.get("return_since")
-        part = f"{row.get('ticker')} {then if then is not None else '量不到'}→{now if now is not None else '量不到'}"
-        if ret is not None:
-            part += " " + _signed(ret)
         ws = info.get("wait_since") or {}
-        if ws.get("return") is not None:
-            part += f"（等回落自 {str(ws.get('day'))[5:10]} {_signed(ws['return'])}）"
-        nxt = min(wakes.get(str(row.get("company_id")), []) or [""])
-        part += f"，已等 {row.get('stall_days', '?')} 天" + (f"、下次重看 {nxt[5:10]}" if nxt else "、沒有下次重看日（⚠ 接不上的等待）")
-        parts.append(part)
+        start = ws.get("then") if ws.get("return") is not None else info.get("then")
+        ret = ws.get("return") if ws.get("return") is not None else info.get("return_since")
+        nxt = min(wakes.get(str(row.get("company_id")), []) or [""])[:10]
+        try:
+            due = date.fromisoformat(nxt) if nxt else None
+        except ValueError:
+            due = None
+        if due is None:
+            when = "⚠ 沒有重看日（接不上的等待）"
+        elif due < today:
+            when = f"**⚠ 重看日 {nxt[5:]} 已過**"
+        elif (due - today).days <= RECHECK_SOON_DAYS:
+            when = f"**{nxt[5:]} 重看**"
+        else:
+            when = f"{nxt[5:]} 重看"
+        name = label(row) if label else str(row.get("ticker"))
+        text = (f"- {name}：等 {row.get('stall_days', '?')} 天｜百分位 {_pctile((start or {}).get('value'))}"
+                f"→{_pctile((info.get('now') or {}).get('value'))}"
+                f"｜股價 {_signed(ret) if ret is not None else '量不到'}｜{when}")
+        rows.append((due or date.max, text, (info.get("now") or {}).get("as_of"), name))
+    rows.sort(key=lambda r: r[0])
+    closes = sorted({str(r[2])[5:10] for r in rows if r[2]})
+    close_text = ("收盤日 " + closes[0] if len(closes) == 1 else
+                  "收盤日 " + "、".join(f"{r[3]} {str(r[2])[5:10]}" for r in rows if r[2]) if closes else "")
     recomputed = any((r.get("priced_since") or {}).get("then_source") == "recomputed"
                      or ((r.get("priced_since") or {}).get("wait_since") or {}).get("then_source") == "recomputed"
                      for r in wait)
-    return (f"等回落 {len(wait)}（自家三年百分位 判斷日→今天｜判斷日以來；沒有「跌到多少就可開」的門檻，到下次重看日由人重判）："
-            + "｜".join(parts)
-            + ("（判斷日或等回落起點的值有回算的）" if recomputed else ""))
+    legend = ("-# 百分位＝自家三年估值位置，越低越便宜；股價＝等回落起點以來（調整後收盤）；沒有門檻，到重看日由你重判"
+              + (f"｜{close_text}" if close_text else "") + ("｜起點的值有回算的" if recomputed else ""))
+    return [f"**等回落 {len(wait)} 檔**", *(r[1] for r in rows), legend]
 
 
 def build_changes(*, now: datetime, state_dir: Path | None, thesis_path: Path,
@@ -1210,19 +1253,24 @@ def _woke_on(watch: dict, day: date) -> bool:
 
 def _watch_today_line(*, now: datetime, hint: bool = True) -> str:
     """`hint=False`：Discord 短版用（命令提示是給互動 session 的，不給手機上的人）。數字同一份。"""
+    c = watch_today_counts(now=now)
+    # 2026-10-22：這一格原本叫「未檢」，數的是所有醒來的語意 watch（含敘事來源）；⑤ 的「未檢」只數讀圖／層說明／thesis 來源
+    # （敘事來源歸「敘事該重寫」）——同一個字兩個數會讓人搞混（L12），所以這裡改叫「語意醒來待判」，⑤ 才是待做清單。
+    return (f"watch：今日醒 {c['woken']}｜今日到期 {c['expired']}｜已觸發未消化 {c['fired_unconsumed']}"
+            f"｜語意標旗 {c['semantic_flagged']}｜語意醒來待判 {c['semantic_pending_check']}（＝⑤ 未檢＋敘事該重寫的醒來）"
+            + ("（判定只在互動：`python -m engine_b.event_watch semantic-queue`）" if hint else ""))
+
+
+def watch_today_counts(*, now: datetime) -> dict[str, int]:
+    """watch 今日醒／今日到期＋registry 計數器（心跳段 2 與 Discord 短版 ④ 共用——L16）。"""
     from engine_b import event_watch as ew
 
     data = ew.load_watches()
     watches = data.get("watches") or []
     today = now.astimezone().date()
-    woken = sum(1 for w in watches if _woke_on(w, today))
-    expired = sum(1 for w in watches if _local_day(w.get("expired_at")) == today)
-    c = ew.counters(data)
-    # 2026-10-22：這一格原本叫「未檢」，數的是所有醒來的語意 watch（含敘事來源）；⑤ 的「未檢」只數讀圖／層說明／thesis 來源
-    # （敘事來源歸「敘事該重寫」）——同一個字兩個數會讓人搞混（L12），所以這裡改叫「語意醒來待判」，⑤ 才是待做清單。
-    return (f"watch：今日醒 {woken}｜今日到期 {expired}｜已觸發未消化 {c['fired_unconsumed']}"
-            f"｜語意標旗 {c['semantic_flagged']}｜語意醒來待判 {c['semantic_pending_check']}（＝⑤ 未檢＋敘事該重寫的醒來）"
-            + ("（判定只在互動：`python -m engine_b.event_watch semantic-queue`）" if hint else ""))
+    return {"woken": sum(1 for w in watches if _woke_on(w, today)),
+            "expired": sum(1 for w in watches if _local_day(w.get("expired_at")) == today),
+            **ew.counters(data)}
 
 
 def _registry_tail(store: Mapping[str, Any], rows: list[Mapping[str, Any]]) -> str:

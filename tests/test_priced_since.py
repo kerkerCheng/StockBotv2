@@ -260,17 +260,34 @@ def test_the_heartbeat_prints_zero_and_each_wait_row_and_the_short_line_keeps_da
     monkeypatch.setattr(hb, "_load_state", lambda state_dir, kind: (None, SimpleNamespace(reason="未讀到", kind="x"))
                         if state_dir is None else (__import__("json").loads((state_dir / "candidates.json")
                                                                             .read_text(encoding="utf-8")), None))
+    monkeypatch.setattr(ew, "load_watches", lambda: {"watches": []})
     empty = _artifact(tmp_path / "a", [])
-    assert hb._priced_wait_lines(empty)[0].startswith("等回落 0") and hb._priced_wait_short(empty) == "等回落 0"
+    assert hb._priced_wait_lines(empty)[0].startswith("等回落 0") and hb.priced_wait_short_lines(empty, today=TODAY) == []
     full = _artifact(tmp_path / "b", [row])
     lines = hb._priced_wait_lines(full)
     assert lines[0].startswith("等回落 1") and lines[1].strip() == row["priced_since"]["line"]
     assert "記下 0｜回算 1" in lines[-1]
-    short = hb._priced_wait_short(full)
-    assert "AXTI 86.8→88.0 −13.5%（等回落自 09-29 −22.2%）" in short     # 日期的連字號不被換成負號
-    assert "等回落起點的值有回算的" in short
+    # 短版（2026-10-28 使用者核可的排版）：起點是**等回落起點**（09-29，同一筆等待），不是 10-15 的判斷日；百分位取整數
+    short = hb.priced_wait_short_lines(full, today=TODAY)
+    assert short[0] == "**等回落 1 檔**"
+    assert short[1] == f"- AXTI：等 {row['stall_days']} 天｜百分位 87→88｜股價 −22.2%｜⚠ 沒有重看日（接不上的等待）"
+    assert short[-1].startswith("-# 百分位＝自家三年估值位置") and "收盤日 10-20" in short[-1]
+    assert "起點的值有回算的" in short[-1]
     for word in ("該", "燈", "買", "賣"):
-        assert word not in short
+        assert word not in "\n".join(short)
+    # 判斷日（10-15 改判）那天的百分位跟等回落起點不同時，短版仍從起點算（10-28 真實的華星光：判斷日 79.7、起點 89.4）
+    import copy
+
+    moved = copy.deepcopy(row)
+    moved["priced_since"]["then"] = {**moved["priced_since"]["then"], "value": 79.7}
+    assert "百分位 87→88" in hb.priced_wait_short_lines(_artifact(tmp_path / "c", [moved]), today=TODAY)[1]
+    # 重看日：三天內加粗、過了標 ⚠、更遠照印；名字由呼叫端給（名冊）
+    for until, expected in (("2026-10-23", "**10-23 重看**"), ("2026-10-20", "**⚠ 重看日 10-20 已過**"),
+                            ("2026-11-14", "｜11-14 重看")):
+        monkeypatch.setattr(ew, "load_watches", lambda u=until: {"watches": [
+            {"watch_id": "ew_w", "status": "active", "wake_brief": CO, "until": u}]})
+        got = hb.priced_wait_short_lines(full, today=TODAY, label=lambda r: f"AXT {r['ticker']}")[1]
+        assert got.startswith("- AXT AXTI：") and got.endswith(expected), got
 
 
 # ---- R2（2026-10-21）的條件 ----

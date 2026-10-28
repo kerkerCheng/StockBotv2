@@ -94,6 +94,54 @@ def test_sends_summary_and_full_markdown_then_deduplicates(tmp_path: Path) -> No
     assert (tmp_path / "library" / "private" / "notifications" / "outbox.db").exists()
 
 
+SECTIONED = (
+    "## 10-28 Daily｜球在你 2｜⚠ 1\n-# ⚠ daily 失敗 1 步\n\n"
+    "### ① Lead 抓了什麼\n-# 外面新進 3\n- 分類 3：go 1｜no-go 2\n\n"
+    "### ③ 待你決定（2）\n**[878] 開層**\n- go＝把這一包寫進圖\n\n**③b 等你提供的文件：沒有**\n\n"
+    "### ⑤ 下一次研究\n- 待深挖 1 則\n-# 下一步貼：`/research-drain`\n\n"
+    "`878 879 go`\n"
+)
+
+
+def test_a_sectioned_brief_is_sent_one_section_per_message_and_the_copy_line_alone(tmp_path: Path) -> None:
+    """2026-10-28 使用者核可的 Discord 排版：一段一則（`### `）、開頭（`## ` 標題＋紅旗小字）帶 @ 當第一則、
+    討論串標題取開頭那一行、批次指令單獨最後一則（一點就複製）。摘要行不再另發一則（同一件事不發兩次）。"""
+    transport = FakeTransport()
+    settings = _settings()
+    publisher = NotificationPublisher(repo_root=tmp_path, settings=settings, transport=transport)
+    try:
+        envelope = _envelope(settings, SECTIONED)
+        first = publisher.publish(envelope)
+        again = publisher.publish(envelope)
+    finally:
+        publisher.close()
+    sent = [call[0] for call in transport.calls]
+    assert first.status == "sent" and first.total_parts == 5 and again.total_parts == 5
+    assert transport.calls[0][2] == "10-28 Daily｜球在你 2｜⚠ 1"
+    assert sent[0].startswith("<@356614259477839872>\n## 10-28 Daily｜球在你 2｜⚠ 1\n-# ⚠ daily 失敗 1 步")
+    assert "claude -r claude-session-1" in sent[0] and "今日 Daily Brief：NO ACTION" not in "".join(sent)
+    assert sent[1].startswith("### ① Lead 抓了什麼") and sent[2].startswith("### ③ 待你決定（2）")
+    assert "**③b 等你提供的文件：沒有**" in sent[2]                       # ③b 跟 ③ 同一則
+    assert sent[3].endswith("-# 下一步貼：`/research-drain`")             # 段內的 inline code 不會被拆出去
+    assert sent[4] == "`878 879 go`"
+    assert all(not part.startswith("\n") and not part.endswith("\n") for part in sent)
+
+
+def test_a_sectioned_brief_without_an_opening_still_sends_the_summary_first_and_long_sections_split(tmp_path: Path) -> None:
+    transport = FakeTransport()
+    settings = _settings(tag_user_id=None)
+    long_section = "### ④ 狀態與健康度\n" + "\n".join(f"- 第 {i} 行 " + "字" * 40 for i in range(60))
+    publisher = NotificationPublisher(repo_root=tmp_path, settings=settings, transport=transport)
+    try:
+        assert publisher.publish(_envelope(settings, long_section + "\n")).status == "sent"
+    finally:
+        publisher.close()
+    sent = [call[0] for call in transport.calls]
+    assert sent[0].startswith("今日 Daily Brief：NO ACTION")
+    assert len(sent) >= 3 and all(len(part) <= 2000 for part in sent)
+    assert "".join(sent[1:]).replace("\n", "") == long_section.replace("\n", "")   # 一個字都沒少
+
+
 def test_noncanonical_h1_uses_its_explicit_taipei_brief_date(tmp_path: Path) -> None:
     transport = FakeTransport()
     settings = _settings()

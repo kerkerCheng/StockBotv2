@@ -88,6 +88,31 @@ def go_authorization(item_type: str) -> dict[str, str]:
     return {"go_authorizes": authorizes, "go_excludes": excludes}
 
 
+def go_plain(item_type: str) -> dict[str, str]:
+    """同一條邊界的白話版（`GO_PLAIN`）；不認得的類型退回 manual 那一條（與 `go_authorization` 的預設同一個方向）。"""
+
+    authorizes, excludes = GO_PLAIN.get(item_type, GO_PLAIN["manual"])
+    return {"go": authorizes, "excludes": excludes}
+
+
+# 同一條邊界的白話版——給手機上的短版（2026-10-28 使用者核可的排版：「go＝把這一包寫進圖／不含：改敘事或 thesis、下單」）。
+# 不是另一套授權：範圍與上表逐條相同，只把 authority 術語換成動作（入圖＝寫進圖、live＝下單）；「不含」仍逐項寫出最相鄰的
+# 未授權動作（AGENTS「決策行的不含欄」）。鍵必須與 GO_AUTHORIZATION 一致（測試守）。
+GO_PLAIN: dict[str, tuple[str, str]] = {
+    "lead_research": ("（舊類型，不再建立）", "任何寫入"),
+    "ra_admission": ("把這一包寫進圖", "改敘事或 thesis、下單"),
+    "decision_review": ("（舊類型，不再建立）", "任何寫入"),
+    "source_trace_review": ("你給文件、我讀完交報告", "付費、提高證據等級、寫進圖"),
+    "thesis_lifecycle": ("我複查這份 thesis，名下反證續盯到下一個核查點", "自動改 thesis 狀態、寫進圖"),
+    "sheet_only_holding": ("（舊類型，不再建立）", "任何部位動作"),
+    "engine_c_observation": ("把這筆判讀記進只能追加的帳本", "寫進圖、改 thesis"),
+    "thesis_mutation": ("改這份 thesis 的狀態", "寫進圖、下單"),
+    "watch_decision": ("記下「條件已被觸及」，交給假設對照",
+                       "寫進圖、判讀寫入、改 thesis、下單；研究本身不在 go 裡"),
+    "manual": ("照這一項寫明的動作做", "沒寫明的任何動作"),
+}
+
+
 VERBS = ("go", "drop", "pending")
 
 _SHA256_RE = re.compile(r"^[0-9a-f]{64}$")

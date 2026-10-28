@@ -36,6 +36,7 @@ _PART_BUDGET = 1_850
 _DISCORD_HOSTS = frozenset({"discord.com", "discordapp.com"})
 _USER_ID_RE = re.compile(r"^[0-9]{2,32}$")
 _DAILY_BRIEF_TITLE_RE = re.compile(r"^#\s+(Daily Brief\s+.+?)\s*$", re.MULTILINE)
+_OPENING_TITLE_RE = re.compile(r"##\s+([^\n]+?)\s*(?:\n|$)")
 _BRIEF_HEADING_DATE_RE = re.compile(
     r"^#\s+[^\n]*?\b(?P<date>[0-9]{4}-[0-9]{2}-[0-9]{2})\b[^\n]*$",
     re.MULTILINE,
@@ -329,11 +330,7 @@ def _split_content(text: str) -> list[str]:
     return chunks
 
 
-def _summary_content(envelope: NotificationEnvelope) -> str:
-    lines: list[str] = []
-    if envelope.tag_user_id:
-        lines.append(f"<@{envelope.tag_user_id}>")
-    lines.append(envelope.summary.strip())
+def _session_links(envelope: NotificationEnvelope) -> list[str]:
     links: list[str] = []
     if envelope.claude_share_url:
         links.append(f"Claude App：{envelope.claude_share_url}")
@@ -341,17 +338,59 @@ def _summary_content(envelope: NotificationEnvelope) -> str:
         links.append(f"Claude Code：`claude -r {envelope.claude_session_id}`")
     if envelope.codex_thread_id:
         links.append(f"Codex thread ID：`{envelope.codex_thread_id}`")
-    if links:
-        lines.extend(["", "Session：", *links])
+    return ["", "Session：", *links] if links else []
+
+
+def _summary_content(envelope: NotificationEnvelope, opening: str | None = None) -> str:
+    """第一則：（要 @ 人就先 @）＋開頭＋session 連結。`opening` 是短版自己的開頭段（`## …` 標題＋紅旗小字），
+    沒有就用摘要行——同一件事不發兩次。"""
+    lines: list[str] = []
+    if envelope.tag_user_id:
+        lines.append(f"<@{envelope.tag_user_id}>")
+    lines.append((opening if opening is not None else envelope.summary).strip())
+    lines.extend(_session_links(envelope))
     return "\n".join(lines)
+
+
+#: 分則的界線（2026-10-28 使用者核可的 Discord 排版）：每個 `### ` 段一則；單獨一行的 inline code 是可複製的指令，
+#: 自成一則——手機上一點就複製（同日使用者：「最後給我一次複製的指令可以用回以前的格式 那樣我一次點就可以複製」）。
+_SECTION_LINE_RE = re.compile(r"^### ")
+_COPY_LINE_RE = re.compile(r"^`[^`\n]+`\s*$")
+
+
+def _is_sectioned(text: str) -> bool:
+    return any(_SECTION_LINE_RE.match(line) for line in text.splitlines())
+
+
+def _message_parts(text: str) -> list[str]:
+    """分段短版 → 一則一則：開頭（第一個 `### ` 之前）、每個 `### ` 段、每一行單獨的 inline code 各自一則；
+    段超過 `_PART_BUDGET` 才在行界再切（`_split_content`）。段內的字一個不改，只去掉段與段之間的空行。"""
+    chunks: list[list[str]] = [[]]
+    for line in text.splitlines():
+        if _COPY_LINE_RE.match(line):
+            chunks.extend([[line], []])
+        elif _SECTION_LINE_RE.match(line):
+            chunks.append([line])
+        else:
+            chunks[-1].append(line)
+    parts: list[str] = []
+    for chunk in chunks:
+        body = "\n".join(chunk).strip("\n")
+        if body.strip():
+            parts.extend(_split_content(body))
+    return parts
 
 
 def _forum_thread_name(envelope: NotificationEnvelope) -> str:
     """Return a deterministic, Discord-safe name for this Daily Brief thread."""
 
     match = _DAILY_BRIEF_TITLE_RE.search(envelope.brief_text)
+    opening = _OPENING_TITLE_RE.match(envelope.brief_text.lstrip())
     if match:
         name = match.group(1).strip()
+    elif opening:
+        # 分段短版的開頭標題（`## 10-28 Daily｜球在你 5｜⚠ 2`）：討論串列表上一眼看到今天要不要點進來
+        name = opening.group(1).strip()
     else:
         # Prefer an explicit date from a non-canonical H1 so a presentation
         # variation cannot silently shift the Forum thread by one day.
@@ -520,9 +559,18 @@ class NotificationPublisher:
         return row
 
     def _parts(self, envelope: NotificationEnvelope) -> list[str]:
-        full = _split_content(envelope.brief_text)
-        total = len(full)
-        return [f"Daily Brief 完整內容（第 {i}/{total} 段）\n{part}" for i, part in enumerate(full, 1)]
+        """這一次投遞的全部訊息，順序固定（重送時依 index 接續已送出的）。
+
+        分段短版（有 `### ` 段）：第一則＝@＋短版開頭（沒有開頭就用摘要行）＋session 連結，之後一段一則、可複製的指令
+        自成一則（2026-10-28 起）。舊格式：摘要一則＋全文依字數切。"""
+        brief = envelope.brief_text
+        if _is_sectioned(brief):
+            parts = _message_parts(brief)
+            has_opening = not _SECTION_LINE_RE.match(brief.lstrip())
+            if has_opening and parts:
+                return [_summary_content(envelope, opening=parts[0]), *parts[1:]]
+            return [_summary_content(envelope), *parts]
+        return [*_split_content(_summary_content(envelope)), *_split_content(brief)]
 
     def _sent_parts(self, delivery_key: str) -> set[int]:
         rows = self.conn.execute(
@@ -605,7 +653,7 @@ class NotificationPublisher:
                 delivery_key=envelope.delivery_key,
             )
         if row["status"] == "sent":
-            total = len(self._parts(envelope)) + 1
+            total = len(self._parts(envelope))
             return DeliveryResult(
                 status="deduplicated",
                 brief_digest=envelope.brief_digest,
@@ -625,14 +673,7 @@ class NotificationPublisher:
                 error_code="not_configured",
             )
 
-        summary_parts = _split_content(_summary_content(envelope))
-        parts = [
-            *[
-                f"Daily Brief 摘要（第 {i}/{len(summary_parts)} 段）\n{part}"
-                for i, part in enumerate(summary_parts, 1)
-            ],
-            *self._parts(envelope),
-        ]
+        parts = self._parts(envelope)
         sent = self._sent_parts(envelope.delivery_key)
         attempts = 0
         thread_name = row["thread_name"] or _forum_thread_name(envelope)

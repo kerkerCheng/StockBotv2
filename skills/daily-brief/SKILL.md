@@ -21,6 +21,8 @@ description: >
 > triage（`claude -p` 零工具提議、程式驗證後寫入）、materialize、組零 LLM 的心跳並發 Discord——**每天一則**。
 > 2026-10-07 起 Discord 那一則是**短版** `brief_<日期>.md`（lead 抓了什麼、市場大事、待你決定、狀態與健康度、下一次研究；
 > 前兩塊是 ⑪c `claude -p` 零工具寫的 TL;DR，每句指得回當天的 lead）；完整五段照樣在 `heartbeat_<日期>.md`。
+> 2026-10-28 起短版的 Discord 排版：開頭 `## 10-28 Daily｜球在你 N｜⚠ k`（＝討論串標題）、每段 `### ` 一則、說明用 `-# ` 小字、
+> 批次指令單獨最後一則（版面規則住 `crons/daily_brief.py` 模組說明，分則規則住 `notifications/publisher.py`）。
 > Codex 不在任何無人值守步驟裡；舊的 Codex daily prompt 逐字封存於
 > `docs/archive/2026-09-24-codex-daily-brief-prompt-v1.8.md`（不得再執行）。
 >
@@ -527,8 +529,11 @@ mutation、任何 `go` 都不含 live），否則使用者要靠記憶區分授�
 **daily 短版的 ③ 也要有那一行（2026-10-08 使用者：「待我決定的批次回覆 一樣就要給我單行可複製建議的操作」）**：
 daily 自己不判斷，只照抄**編號上寫的建議**——所以**鑄號的那個 session 在同一個動作寫建議**：
 `python -m engine_b.todo recommend <編號…> --verb go|drop|pending --reason "<一句理由：go 會讓哪個數字變；drop 附查證命令>"`。
-短版每列帶「建議 go：理由」、最後一行是 `建議（鑄號時寫的；可直接複製）：\`736 737 go 741 drop\``；
-沒寫建議的編號另列「沒寫建議」、不進那一行（會自己現形）；向你要文件那一區不收建議（提供文件才算 go）。
+短版 ③ 一條一塊（2026-10-28 使用者核可的排版）：**[編號] 主詞**、細節一行、`go＝`／`不含：`（白話，取自
+`engine_b/todo.py` 的 `GO_PLAIN`——與 `GO_AUTHORIZATION` 同鍵、同範圍，不含欄仍逐項寫最相鄰的未授權動作）、
+`圖會變：`（入圖包的 graph_impact）、`建議 go：理由`；批次指令是**整則短版的最後一則、單獨一行 inline code**
+（`` `736 737 go 741 drop` ``——Discord 手機上一點就複製；同日使用者：「最後給我一次複製的指令可以用回以前的格式」）。
+沒寫建議的編號在 ③ 小字列「沒寫建議」、不進那一行（會自己現形）；向你要文件那一區不收建議（提供文件才算 go）。
 建議不是授權——它不 resolve、不改狀態；研究改了結論就再寫一次（覆蓋，舊的留在 history）。
 
 stable pq2 編號後不得只貼短標題或 `co:*` ID。決策行之下，每一個需要使用者決定的 item 至少包含：

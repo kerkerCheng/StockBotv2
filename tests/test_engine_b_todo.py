@@ -934,6 +934,13 @@ def test_every_item_type_declares_its_go_authorization_boundary() -> None:
     for item_type, (authorizes, excludes) in todo.GO_AUTHORIZATION.items():
         assert authorizes.strip(), item_type
         assert excludes.strip(), item_type
+    # 短版的白話版（2026-10-28）：同一組鍵——新增類型時兩邊都要決定，白話版不得靜默退回 manual 那一條
+    assert set(todo.GO_PLAIN) == set(todo.GO_AUTHORIZATION)
+    for item_type, (authorizes, excludes) in todo.GO_PLAIN.items():
+        assert authorizes.strip() and excludes.strip(), item_type
+    # 白話「不含」也要寫出最相鄰的未授權動作：入圖 go 不含改 thesis 與下單；任何 go 都不含下單
+    assert "thesis" in todo.go_plain("ra_admission")["excludes"] and "下單" in todo.go_plain("ra_admission")["excludes"]
+    assert todo.go_plain("no_such_type") == todo.go_plain("manual")
 
 
 def test_collected_rows_carry_the_go_boundary_so_consumers_need_not_recall_it() -> None:
