@@ -635,3 +635,22 @@ table.pt-table th, table.pt-table td { vertical-align: top; overflow-wrap: anywh
 .layer-reading .rule { display: block; color: var(--dim); font-size: 11px; margin-top: 3px; }
 .hole { margin-top: 8px; }
 .hole-head { font-weight: 600; font-size: 14px; }
+
+/* 成績單（2026-10-28）：點圖一點一檔、只有一個顏色（序列色）——位置就是報酬，不用正負兩色（狀態色保留給狀態）；
+   0 與「2 倍」兩條參考線用虛線，格線最淡。計分表一帳號一列，三個基準在同一格裡上下排。 */
+.claim-group { margin: 14px 0 8px; }
+.claim-group h3 { margin: 0 0 2px; font-size: 14px; }
+.claim-dots { display: block; max-width: 100%; height: auto; }
+.claim-dots .axis { stroke: var(--viz-axis); stroke-width: 1; }
+.claim-dots .grid { stroke: var(--viz-grid); stroke-width: 1; }
+.claim-dots .ref { stroke: var(--viz-muted); stroke-width: 1; stroke-dasharray: 3 3; }
+.claim-dots .tick { fill: var(--viz-muted); font-size: 11px; }
+.claim-dots .mark { fill: var(--viz-seq); stroke: var(--viz-surface); stroke-width: 2; }
+.claim-dots .hit { fill: transparent; cursor: pointer; }
+.claim-dots .dot:hover .mark, .claim-dots .dot:focus .mark { fill: var(--text); }
+.claim-dots .dot:focus { outline: none; }
+.dot-readout { min-height: 1.5em; margin-top: 2px; }
+.claim-rows > summary, .account-more > summary { cursor: pointer; color: var(--accent); font-size: 13px; }
+.account-more { margin-top: 4px; }
+.account-detail { margin: 6px 0 10px; }
+.excess-triple div { white-space: nowrap; font-variant-numeric: tabular-nums; }

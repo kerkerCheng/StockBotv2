@@ -2391,8 +2391,10 @@ def write_vocabularies(store: ArtifactStore | None = None) -> Path:
     而不是在 APP 端再寫一份「absence_kind 是什麼意思」的對照表。
     """
     from alpha.absence import ABSENCE_KINDS, SETTLED_ABSENCE_KINDS
-    from alpha.candidates import LIST_GROUP_LABELS, LIST_GROUPS
+    from alpha.candidates import GROUP_LABELS, LIST_GROUP_LABELS, LIST_GROUPS, PAPER_STATE_EXITS
+    from alpha.narrative.contracts import CANDIDATE_STATES_DECLARABLE
     from alpha.structure_reading.contracts import READING_KIND_SHORT, READING_KINDS, READING_UNITS
+    from alpha.structure_reading.predictions import OUTCOMES, UNJUDGED_OUTCOMES
     from briefing.analyst_view.contracts import (
         ACCOUNTING_BASIS_DISPLAY, CORE_PANELS, OPTIONAL_PANELS, PLAIN_ABSENCE_SHORT,
         PLAIN_BET_UNITS, PLAIN_LINE_LABELS, PLAIN_PANEL_TITLES, PLAIN_PRICED_IN, PLAIN_READINESS, PLAIN_WIPEOUT,
@@ -2428,6 +2430,13 @@ def write_vocabularies(store: ArtifactStore | None = None) -> Path:
         "optional_panels": list(OPTIONAL_PANELS),
         # 首頁分組（2026-10-07 使用者指示）：順序與中文只有 `alpha.candidates` 那一份，API 照這個順序分段（L16）
         "list_groups": [{"key": key, "label": LIST_GROUP_LABELS[key]} for key in LIST_GROUPS],
+        # 成績單（2026-10-28）：paper 線照「寫下判斷那天宣告的候選狀態」分組——組＝敘事能宣告的那幾種（0 也印；
+        # 已持有來自 Sheet，不是我們說的話）；「現在」的兩個出口（撤回、舊版）的中文也跟著字彙走（L16）
+        "claim_groups": [{"key": key, "label": GROUP_LABELS[key]} for key in CANDIDATE_STATES_DECLARABLE],
+        "paper_state_exits": [{"key": key, "label": label} for key, label in PAPER_STATE_EXITS.items()],
+        # 圖預測對錯表的終局：閱讀順序（JSON 寫檔會把 dict 的鍵排序，順序要用 list 帶）與不算對錯的那兩種（改寫、非斷言：
+        # 成績單只印件數）——都只有 `alpha.structure_reading.predictions` 那一份
+        "prediction_outcomes": {"order": list(OUTCOMES), "unjudged": list(UNJUDGED_OUTCOMES)},
         "readiness_states": {
             "ready": "核心各段都有內容，且沒有被標記需要動作",
             "ready_with_flags": "有內容，但至少一段 stale／review_required／not_applicable",

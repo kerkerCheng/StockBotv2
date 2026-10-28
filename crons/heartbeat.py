@@ -2404,7 +2404,8 @@ def build_scorecard(*, state_dir: Path | None = None, previous: Mapping[str, Any
         line += "｜較昨：" + ("、".join(moved) if moved else "沒有變化")
     section.lines.append(line)
     biases = list(card.get("known_biases") or [])
-    section.lines.append("完整表（每個帳號的量測窗、點名數、超額報酬、追源成功率）在 APP 帳號計分表頁"
+    # 2026-10-28：帳號計分表頁併進「成績單」最下面一段（`#/account-scorecard` 直接捲到那裡）
+    section.lines.append("完整表（每個帳號的量測窗、點名數、超額報酬、追源成功率）在 APP 成績單最下面一段"
                          + (f"｜已知偏差 {len(biases)} 條（也在 APP）" if biases else "")
                          + f"｜{_scorecard_cohort_cell(card)}")
     return section

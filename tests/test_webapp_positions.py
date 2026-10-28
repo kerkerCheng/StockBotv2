@@ -270,10 +270,11 @@ def test_frontend_puts_sample_validity_before_the_numbers() -> None:
 
     2026-10-07 使用者（「舊店…連你都不會看就也沒必要給我看了…不是收起來 是拿掉」）：舊店 ①–⑤ 與 history 線不再印。"""
     source = (ROOT / "webapp" / "static" / "app.js").read_text(encoding="utf-8")
-    assert "function renderPositions" in source
+    # 2026-10-28：追蹤表頁併進「成績單」（renderReportCard）；兩條線那一段照舊由 renderPositionLanes 畫
+    assert "function renderReportCard" in source and "function renderPositions(" not in source
     # 只看程式碼、不看註解（拿掉的理由寫在註解裡，提到舊名字是紀錄不是畫面）
-    page = "\n".join(line for line in _js_function(source, "renderPositions").splitlines()
-                     if not line.strip().startswith("//"))
+    page = "\n".join(line for name in ("renderReportCard", "renderPositionLanes")
+                     for line in _js_function(source, name).splitlines() if not line.strip().startswith("//"))
     for retired in ("這批數字能證明什麼", "推薦籃子整體", "賭注收斂", "old-store", "舊店的真實成交紀錄"):
         assert retired not in page, retired
     assert "const LANE_ORDER = ['live', 'paper'];" in source            # history 線不印

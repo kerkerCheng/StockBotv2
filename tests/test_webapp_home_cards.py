@@ -308,7 +308,7 @@ def test_the_two_pages_are_gone_and_every_page_says_its_question() -> None:
     assert 'href="#/candidates"' not in html and 'href="#/watches"' not in html
     assert "target === 'watches' || target === 'candidates'" in source
     links = re.findall(r'<a href="#/[^"]*" data-view="[^"]+"([^>]*)>([^<]+)</a>', html)
-    # 幾頁只在一個地方數（`tests/test_webapp_graph_page.py` 的導覽列標籤）；這裡守的是「每一頁都有問句」。
+    # 幾頁只在一個地方數（`tests/test_webapp_report_card.py` 的導覽列標籤）；這裡守的是「每一頁都有問句」。
     assert links and all(re.search(r'data-question="[^"]+？"', attrs) for attrs, _ in links), links
     assert links[0][1] == "公司"
     assert 'id="page-question"' in html and "link.dataset.question" in source

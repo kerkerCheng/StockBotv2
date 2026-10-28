@@ -118,6 +118,16 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 `StockBotv2-Daily` 的 ⑱⑲ 取代（1.2a 停用、2026-09-25 1.2b 刪除）；它們的理由（LLM 失敗心跳照發、永遠 exit 0、Python 不用 `.cmd`、
 發送走 subprocess）搬進 `crons/daily_task.py` 的 docstring，守它們的測試改主詞搬進 `tests/test_daily_task.py`「無人值守入口」節。
 
+### Sandbox impact review 結論（2026-10-28：追蹤表與帳號計分表併成「成績單」）
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | 無人值守路徑只多**寫字彙與一句說明**：daily ⑬ materialize（argv 不變）的 `write_vocabularies` 在 `.meta.json` 多三個鍵（`claim_groups`＝`alpha.narrative.contracts.CANDIDATE_STATES_DECLARABLE` 配 `alpha.candidates.GROUP_LABELS`、`paper_state_exits`＝新常數 `alpha.candidates.PAPER_STATE_EXITS`、`prediction_outcomes`＝`alpha.structure_reading.predictions` 的終局順序與新常數 `UNJUDGED_OUTCOMES`——都是零 I/O 模組的照抄）；daily ⑤ `scripts/outcome_if_settled_today.py` 的 `price_budget` 多一格 `order`（截的順序，一句字；取價的檔數、順序、主機都不變）；心跳段 5 一句字改指「成績單最下面一段」。request path：新 GET `/api/v1/report-card`——請求時讀已 materialize 的 `positions`／`account_scorecard`／`structure_readings` 再分組（paper 列與預測列的複本加中文標籤，不動讀進來的 payload；api.py import 不變）；不跑 LLM、不寫任何東西、不連網、不碰圖。前端兩頁併一頁（`#/account-scorecard` 捲到那一段並說一句）；`?selfcheck=1&open=1` 改成等點開才畫的內容畫完再量（原本量到的是空的展開） |
+| **2 canonical skill／prompt／本檔** | 本節；`docs/ARCHITECTURE.md` §6.9「「成績單」頁」與 §3 計分表那一段的畫面位置；CONCEPTS「成績單」；ROADMAP ④ 與新旁支「paper 線取價上限照代號截掉過半」（待排序）；brainstorm F8；skill 不動（`daily-brief` 指的 `#/positions` 路由照留） |
+| **3 最窄 rule** | daily argv 不變；不新增 step、allowlist、rule；API 多一條唯讀 GET（沒有路徑參數），APP 仍無寫入端點；`/api/v1/positions`、`/api/v1/account-scorecard` 與兩份 state artifact 照留 |
+| **4 contract test** | 新 `tests/test_webapp_report_card.py`（每一列恰好一組且宣告得出的四種 0 也印、字彙外與沒記下的另列、組內照 artifact 列序且路由沒有平均或名次、「現在」標籤跟著字彙走、outcome 腳本寫的出口都在 `PAPER_STATE_EXITS` 裡、計分表／讀圖讀不到各自缺席而 positions 讀不到＝503、沒有字彙＝照資料分組並說原因、導覽列 5 頁與順序、三個基準並排；圖預測對錯表照終局分組、組序照字彙、不算對錯的由 `UNJUDGED_OUTCOMES` 宣告、層名沒有中文就印代號）；`tests/test_webapp_request_path.py` 的 `COMPOSED_ROUTES` 改成「路由 → 回應必有的鍵」並加 `/api/v1/report-card`；三個既有測試改主詞（`test_webapp_positions.py`、`test_webapp_graph_page.py`、`test_webapp_home_cards.py`）；變異 4／4（組內照報酬排、可開掉出宣告組、計分表那格只印 QQQ、不算對錯的被當成判過——都紅）；全套 4361 passed，失敗 7 條都是 `test_full_chain_acceptance.py` 既有的真資料漂移 |
+| **5 端到端 smoke** | 見 ROADMAP 旁支開發項「APP 照使用者問題重組」④的驗收現值 |
+
 ### Sandbox impact review 結論（2026-10-28：讀圖、走圖、層說明清單、結構表四頁併成「圖」）
 
 | 步 | 結論 |

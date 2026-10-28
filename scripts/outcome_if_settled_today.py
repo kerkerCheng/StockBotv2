@@ -943,7 +943,10 @@ def collect(*, no_benchmark: bool = False, today: date | None = None,
             continue                         # 基準由 `_benchmark_series` 抓（既有路徑），這裡只算進額度
         series[symbol], units[symbol] = loader(symbol, wanted[symbol])
     budget = {"cap": max_symbols, "requested": len(order), "fetched": len(keep), "truncated": truncated,
-              "note": "history lane 的 22 檔沿用原路徑、不在這個上限裡"}
+              "note": "history lane 的 22 檔沿用原路徑、不在這個上限裡",
+              # 截的順序由這裡宣告（2026-10-28 成績單：被截的是這個順序的後段——paper 照代號，所以英文代號〔美、歐掛牌〕先被截，
+              # 算得出報酬的那幾檔不是全體的抽樣；畫面照印這一句，不另猜）
+              "order": "基準 → live → paper（照代號：數字代號在前、英文代號在後）→ 主題等權組成員；超過上限就截掉後段"}
 
     unit_of = quote_unit_for or _market_quote_unit
     for row in live["rows"]:

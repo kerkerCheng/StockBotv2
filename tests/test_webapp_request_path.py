@@ -59,8 +59,9 @@ STATE_ROUTES: dict[str, str] = {
     "/api/v1/daily": "daily",
 }
 #: 在請求時**接**好幾份已 materialize 的 artifact 的路由（不是一份 state kind，所以不在上面那張表）。
-#: 2026-10-28 「圖」頁：讀圖＋結構表＋層說明＋走圖＋個股頁——四種證明照樣每一種都要走到它（L17：新增的路由不得漏證明）。
-COMPOSED_ROUTES: tuple[str, ...] = ("/api/v1/graph",)
+#: 2026-10-28 「圖」頁：讀圖＋結構表＋層說明＋走圖＋個股頁；同日「成績單」：追蹤表＋計分表＋圖預測對錯表——
+#: 四種證明照樣每一種都要走到它們（L17：新增的路由不得漏證明）。值＝回應裡必有的鍵（斷網那條證明用它認得是真的回應）。
+COMPOSED_ROUTES: dict[str, str] = {"/api/v1/graph": "zones", "/api/v1/report-card": "claims"}
 
 #: serve 端的三個模組。`materialize.py` 與 `__main__.py` **不在此列**——它們本來就會跑模型。
 SERVE_MODULES = ("api.py", "store.py", "contracts.py")
@@ -304,8 +305,8 @@ def test_requests_still_work_with_networking_completely_disabled(app_dir, monkey
         assert client.get("/api/v1/stocks").json()["count"] == 3
         for path, kind in STATE_ROUTES.items():
             assert client.get(path).json()["kind"] == kind, path
-        for path in COMPOSED_ROUTES:
-            assert "zones" in client.get(path).json(), path
+        for path, key in COMPOSED_ROUTES.items():
+            assert key in client.get(path).json(), path
         assert client.get("/api/v1/stocks/NEVERBUILT").status_code == 503
 
 

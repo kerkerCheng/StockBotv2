@@ -36,6 +36,9 @@ LIST_GROUPS: tuple[str, ...] = ("held", "open", "missing", "priced_wait", "preco
 LIST_GROUP_LABELS: Mapping[str, str] = {**GROUP_LABELS, **SIDE_LABELS, "no_narrative": "還沒寫敘事（邊緣，該寫）",
                                         "not_edge_no_narrative": "不寫敘事（非邊緣）",
                                         "unavailable": "候選狀態這次沒讀到"}
+#: 成績單 paper 線「現在」的狀態除了 GROUPS，還有兩個出口（`scripts/outcome_if_settled_today.py` 寫這兩個鍵）。
+#: 標籤住這裡、經 `.meta.json` 跟著資料走到畫面（L16）——2026-10-28 之前追蹤表直接印英文鍵（`pass → retracted`）。
+PAPER_STATE_EXITS: Mapping[str, str] = {"retracted": "敘事已撤回", "legacy_v1": "現行是舊版敘事（沒有候選狀態）"}
 #: 敘事宣告的兩題 → 首屏三個字（§8 第 1 點）；v1 或沒有敘事一律「未答」。
 ANSWER_WORDS: Mapping[str, str] = {"yes": "是", "no": "否", "unmeasurable": "無法量"}
 UNANSWERED = "未答"

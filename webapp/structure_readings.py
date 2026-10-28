@@ -114,7 +114,7 @@ def build_structure_readings_artifact(
 
 
 def _predictions_section(predictions: Mapping[str, Any], *, needs_n: int) -> dict[str, Any]:
-    """預測表照抄＋字彙的中文（呈現只有一份：追蹤表頁的圖預測對錯表與心跳都讀這裡；2026-10-28 讀圖頁併進「圖」頁時搬過去）。供給側變了但還沒重讀的**不在這張表**——
+    """預測表照抄＋字彙的中文（呈現只有一份：成績單的圖預測對錯表與心跳都讀這裡；2026-10-28 讀圖頁併進「圖」頁時搬過去）。供給側變了但還沒重讀的**不在這張表**——
     那是 staleness 的事，只印一句指過去（plan §5）。"""
     from alpha.structure_reading.predictions import OUTCOMES, WRONG_KINDS
 

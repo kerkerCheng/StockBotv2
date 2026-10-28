@@ -114,6 +114,8 @@ async def meta(request: Request) -> Response:
             f"GET /api/{API_VERSION}/daily",
             # 2026-10-28：「圖」頁——讀圖、結構表、層說明、走圖、個股頁在請求時接起來（只接、不重算）
             f"GET /api/{API_VERSION}/graph",
+            # 同日：「成績單」頁——追蹤表、帳號計分表、圖預測對錯表在請求時接起來（只接、只分組、不重算）
+            f"GET /api/{API_VERSION}/report-card",
         ],
         "not_offered": [
             "沒有任何寫入端點：不下單、不記錄選擇、不改 thesis、不入圖、不核准 pq2。",
@@ -651,6 +653,90 @@ async def graph(request: Request) -> Response:
     })
 
 
+# ---------------------------------------------------------------------------
+# 成績單（2026-10-28 使用者照推薦：追蹤表與帳號計分表併成一頁；brainstorm 2026-10-28 定案 7）
+# ---------------------------------------------------------------------------
+
+#: 寫下判斷那天的狀態沒記下（第一份 v2 敘事讀不到）——這一組由本路由宣告（L16：缺席的種類由產生它的程式宣告）。
+CLAIM_UNRECORDED = "unrecorded"
+
+
+async def report_card(request: Request) -> Response:
+    """「成績單」頁：我們說過的話、追過的來源，後來對不對。
+
+    只**接**已 materialize 的 positions＋account_scorecard＋structure_readings（的圖預測對錯表），不重算、不加新數字：
+    paper 線照「寫下判斷那天宣告的候選狀態」分組——組照 `.meta.json` 的 `claim_groups`（敘事能宣告的四種，0 也印），
+    字彙外或沒記下的狀態照列在後面（不消失，INV-3）；組內照 artifact 的列序（代號字母序），**不照報酬排**（排了就是
+    跨檔全序，G1），也不算組平均（量測才幾週，平均是雜訊；brainstorm F4）。
+    positions 讀不到＝整頁 503（骨架就是它）；另兩份讀不到，那一段寫讀不到、別段照出。"""
+    positions, missing = _optional_state(request, "positions")
+    if positions is None:
+        remedy, note = _STATE_NOTES["positions"]
+        return _json({"error": {"kind": "artifact_unavailable", "state_kind": "positions",
+                                "reason": (missing or {}).get("reason"), "remedy": remedy, "note": note}}, status=503)
+    scorecard, scorecard_absence = _optional_state(request, "account_scorecard")
+    readings, readings_absence = _optional_state(request, "structure_readings")
+    vocab = _read_vocabularies(_store(request)).get("vocabularies") or {}
+    declared = [str(g["key"]) for g in vocab.get("claim_groups") or () if g.get("key")]
+    labels = {str(g["key"]): str(g.get("label") or g["key"])
+              for key in ("list_groups", "claim_groups", "paper_state_exits") for g in vocab.get(key) or ()}
+    labels.setdefault(CLAIM_UNRECORDED, "寫下那天的狀態沒記下")
+
+    # 每列多兩個中文標籤（複本，不動讀進來的 payload）；其餘照抄
+    rows = [{**row, "anchor_label": labels.get(str(row.get("anchor_state")), row.get("anchor_state")),
+             "current_label": labels.get(str(row.get("current_state")), row.get("current_state"))}
+            for row in ((positions.get("lanes") or {}).get("paper") or {}).get("rows") or ()]
+    keys = list(declared)
+    keys += sorted({str(r.get("anchor_state") or CLAIM_UNRECORDED) for r in rows} - set(keys))
+    claims = []
+    for key in keys:
+        members = [r for r in rows if str(r.get("anchor_state") or CLAIM_UNRECORDED) == key]
+        claims.append({"key": key, "label": labels.get(key, key), "declared": key in declared, "n": len(members),
+                       "measured": sum(1 for r in members if r.get("absolute_return") is not None), "rows": members})
+
+    # 圖預測對錯表：照終局分組（組序照 `.meta.json` 的 `prediction_outcomes.order`，字彙外的照列在後面）；每列多層名與讀法的
+    # 中文（複本）。不算對錯的終局（改寫、非斷言）畫面只印件數——由 `prediction_outcomes.unjudged` 宣告，讀不到就全部當判過的列出。
+    predictions = (readings or {}).get("predictions")
+    prediction_groups = None
+    if isinstance(predictions, Mapping) and not predictions.get("absence"):
+        declared_outcomes = vocab.get("prediction_outcomes") or {}
+        unjudged = {str(k) for k in declared_outcomes.get("unjudged") or ()}
+        names = vocab.get("node_labels_zh") or {}
+        kinds = vocab.get("reading_kinds") or {}
+        outcome_labels = (predictions.get("labels") or {}).get("outcomes") or {}
+        p_rows = list(predictions.get("rows") or ())
+        order = [str(k) for k in declared_outcomes.get("order") or ()]
+        order += sorted((set(outcome_labels) | {str(r.get("outcome")) for r in p_rows}) - set(order))
+        prediction_groups = []
+        for key in order:
+            members = [{**r, "node_label": names.get(str(r.get("node"))) or r.get("node"),
+                        "kind_label": (kinds.get(str(r.get("kind"))) or {}).get("short") or r.get("kind")}
+                       for r in p_rows if str(r.get("outcome")) == key]
+            if members:
+                prediction_groups.append({"key": key, "label": outcome_labels.get(key, key), "n": len(members),
+                                          "judged": key not in unjudged,
+                                          "wrong": any(r.get("wrong_kind") for r in members), "rows": members})
+    return _json({
+        "api_version": API_VERSION,
+        "title": "成績單",
+        "positions": positions,
+        "claims": claims,
+        "claims_absence": (None if declared else {
+            "kind": "vocabulary_unavailable",
+            "reason": "`.meta.json` 沒有 claim_groups（字彙表早於成績單）——這次照 artifact 裡出現的狀態分組、"
+                      "0 檔的組不印；重跑 materialize 就會補上"}),
+        "predictions": predictions,
+        "prediction_groups": prediction_groups,
+        "scorecard": scorecard,
+        "absences": {"account_scorecard": scorecard_absence, "structure_readings": readings_absence},
+        "freshness": positions.get("freshness"),
+        "sources": {"account_scorecard": (scorecard or {}).get("freshness"),
+                    "structure_readings": (readings or {}).get("freshness")},
+        "analyst_view_tickers": _store(request).tickers(),
+        "correlation_warning": _CORRELATION_WARNING,
+    })
+
+
 async def index(request: Request) -> Response:
     return _static_file("index.html")
 
@@ -743,6 +829,7 @@ def create_app(directory: Path | None = None, state_directory: Path | None = Non
         Route(f"/api/{API_VERSION}/layer-notes", layer_notes, methods=["GET"]),
         Route(f"/api/{API_VERSION}/daily", daily, methods=["GET"]),
         Route(f"/api/{API_VERSION}/graph", graph, methods=["GET"]),
+        Route(f"/api/{API_VERSION}/report-card", report_card, methods=["GET"]),
         Route(f"/api/{API_VERSION}/stocks", stocks, methods=["GET"]),
         Route(f"/api/{API_VERSION}/stocks/{{ticker}}", stock_detail, methods=["GET"]),
     ]

@@ -223,7 +223,7 @@ fetchers/{edgar,mops,mfn,rns}.py ↑      engine_c/etl_yfinance.py → SQLite
 2. **變了什麼**：門檻跨越、反證觸發、催化劑到期、現價過目標價（提醒不是動作）、**結構讀圖 staleness**（2026-09-17 Q5：N 份現行／該重讀 M，含哪個節點、哪個角度變了；§6.14）。
 3. **佇列**：新 lead N、待 triage N、pq1 可做 N、pq2 卡在你 N、expired N。
 4. **部位**：alpha 占淨值、全歸零少幾 %、追蹤表三個 power-law 統計量、**歸零旗標帳**（2026-09-18 D2：每檔四盞，**盞數與有紅燈的檔數分開算**——「一檔亮四盞」與「四檔各亮一盞」是兩件事；⚠ **灰＝沒量到，不是綠**，`alpha/wipeout.py` 是判色的唯一權威，心跳與 APP 都只照抄。「alpha 全歸零少幾 %」直接取 `beta` artifact 的 `risk.snapshot.alpha_total_weight`，**不另算一份**，也不得與同段「占已投入非現金」混用——分母不同）、幾檔共用同一需求錨、**兩個宇宙各自的賭注帳**（2026-09-17 Q2／Q1：有賭注／刻意不主張／**欠一個答案**，護城河籃子與量的候選**分開計數**——兩個宇宙問的是不同問題，合起來的數字沒有意義）。
-5. **帳號計分表**（2026-09-24 起每天：tier 分布＋較昨；以下為 weekly 時代的完整表規格，現在住 APP 帳號計分表頁）：量測起始日與樣本數必印，讓「還沒量」看得見（2026-09-17 Phase 3 交付：D5 五欄＋已知偏差；2026-10-02 Phase 5 Step 5.5 加第三個基準「主題等權組（排除本檔）」與第四條偏差「主題等權組是回溯基準」；2026-10-06 起每則點名只跟**自己所屬的組**比，非組員的點名進 filter reasons（`not_in_any_cohort`），追蹤表同一支 `alpha.theme_cohort.cohort_for_row`，APP 計分表頁 `#/account-scorecard` 自同一天起才真的存在；**心跳只讀 `state/account_scorecard.json`，不自己算**——計分表要抓價格，而心跳零網路。更新跑 `python -m webapp materialize --scorecard`；讀不到就誠實說讀不到，不偷偷重建）。
+5. **帳號計分表**（2026-09-24 起每天：tier 分布＋較昨；以下為 weekly 時代的完整表規格，現在住 APP 成績單最下面一段——2026-10-28 前是獨立的帳號計分表頁，§6.9）：量測起始日與樣本數必印，讓「還沒量」看得見（2026-09-17 Phase 3 交付：D5 五欄＋已知偏差；2026-10-02 Phase 5 Step 5.5 加第三個基準「主題等權組（排除本檔）」與第四條偏差「主題等權組是回溯基準」；2026-10-06 起每則點名只跟**自己所屬的組**比，非組員的點名進 filter reasons（`not_in_any_cohort`），追蹤表同一支 `alpha.theme_cohort.cohort_for_row`，APP 計分表頁 `#/account-scorecard` 自同一天起才真的存在；**心跳只讀 `state/account_scorecard.json`，不自己算**——計分表要抓價格，而心跳零網路。更新跑 `python -m webapp materialize --scorecard`；讀不到就誠實說讀不到，不偷偷重建）。
    ⚠ **兩個基準必須都印**：2026-09-17 第一次量測，同一個帳號對 QQQ 是 −2.03%、對 SOXX 是 +3.06%——**相反符號**。只印一個會得到相反的結論，而兩個結論都是錯的。
    ⚠ 第 1 段另加**本月 X 花費／上限**與預算停抓列（`budget_exhausted` 刻意不是 `fetch_failed`：它是保護生效不是故障，塞進失敗會讓健康段恆亮，而恆亮等於零鑑別力）。
 
@@ -650,6 +650,21 @@ L16）。兩份 state artifact 與 `/api/v1/candidates`、`/api/v1/watches` 照�
 逐條（含重複節點兩端逐字）看 `python -m query.graph_walk`；圖預測對錯表搬到追蹤表頁；層計數那一行只住心跳段 3（查核用）。
 讀不到 `structure_readings`＝503；其餘三份讀不到各自印缺席（不是 0）。四份 artifact 與舊 `/api/v1/*` 照留；舊連結落到「圖」頁並說一句，
 `#/graph/<節點>` 打開那一層，`#/layer/<節點>` 單份閱讀頁照舊（返回連到圖上那一層）。
+
+**「成績單」頁（同一輪第四步：追蹤表與帳號計分表併成一頁，路由沿用 `#/positions`；回答「我們說過的話、追過的來源，後來對不對」）：**
+`GET /api/v1/report-card` 在請求時接 `positions`＋`account_scorecard`＋`structure_readings` 的圖預測對錯表（不新增 kind；四種證明照走）。
+兩條線的樣本數、量測起始與 power-law 三量照舊在最上面（樣本效度先於數字）；paper 線改照**寫下判斷那天宣告的候選狀態**分組——
+組＝`.meta.json` 的 `claim_groups`（`CANDIDATE_STATES_DECLARABLE` 四種，0 也印；已持有來自 Sheet，不是我們說的話），字彙外或沒記下的
+狀態另列在後面（不消失）；組內照 artifact 的列序（代號），**不照報酬排、路由不算組平均**（量測才幾週，平均是雜訊；brainstorm F4）。
+每組一張點圖（一點一檔、橫軸是寫下後到現在、同格往上疊，「2 倍」那條線一定畫得到），逐檔表點開才畫；「現在」的狀態印中文——
+兩個出口（撤回、舊版）的標籤住 `alpha.candidates.PAPER_STATE_EXITS`，經 `.meta.json` 的 `paper_state_exits` 走到畫面（L16；之前印 `pass → retracted`）。
+帳號計分表在最下面一段一帳號一列：點名數、tier（佇列加分）、各持有期「每檔只算最早一次」的超額——**三個基準並排**（QQQ／SOXX／組）；
+每則都算的版本、點名前漲幅、追源成功率、假設命中率、no-go 率與濾掉理由點開那個帳號才畫；取價筆數與組成員清單是查核用，拿掉
+（截掉、缺價、組讀不到照樣說）。`#/account-scorecard` 捲到那一段並說一句。圖預測對錯表照終局分組（`.meta.json` 的
+`prediction_outcomes`：順序與不算對錯的那兩種都只有 `alpha.structure_reading.predictions` 一份）——對、錯、現行點開才畫（有錯的預設打開），
+改寫與非斷言只印件數，層名照 `config/node_labels_zh.json`（沒有就印代號）。取價被截時照印 outcome 腳本宣告的截的順序
+（`price_budget.order`）：算得出報酬的那幾檔不是全體的抽樣（brainstorm F8）。positions 讀不到＝503，另兩份讀不到各自印缺席；
+artifact 與 `/api/v1/positions`、`/api/v1/account-scorecard` 照留。
 
 **private path 在 materialize 端遮蔽一次。** read model 的理由句會寫出 authority 檔案路徑
 （例：「找不到 session 判斷檔（library/private/alpha/judgments/…）」）；那對開發者有用，但它是 private

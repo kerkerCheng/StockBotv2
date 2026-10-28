@@ -6,7 +6,7 @@
 2. **`/api/v1/graph` 只接不算**：區內照讀圖 artifact 的列序；坐在這一層＝結構表 `supplies_to`（買方那一側不算，L12）；
    層內公司照首頁組序再代號、沒有個股頁的排後面；「錢在變多嗎」照抄個股頁的層序列；讀圖另外關聯的標的分開印。
 3. **讀不到的分開說**：讀圖讀不到＝503；結構表／層說明／走圖讀不到＝那一格寫讀不到、別格照出；字彙表沒有分區＝整頁一區、一層不少。
-4. **畫面**：導覽列 6 頁、四個舊路徑落到圖頁、`#/graph/<node>` 打開那一層、圖預測對錯表搬到追蹤表。
+4. **畫面**：四個舊路徑落到圖頁、`#/graph/<node>` 打開那一層、圖預測對錯表搬到成績單（原追蹤表）。
 """
 from __future__ import annotations
 
@@ -191,12 +191,12 @@ def test_the_four_pages_are_one_graph_page() -> None:
                  "function renderLayerNotes(", "function walkHitList", "function readingRow"):
         assert gone not in source, gone
     labels = re.findall(r'<a href="#/[^"]*" data-view="[^"]+"[^>]*>([^<]+)</a>', html)
-    assert labels == ["公司", "每日", "圖", "資產配置", "追蹤表", "帳號計分表"]
+    assert "圖" in labels               # 導覽列幾頁、什麼順序只在一個地方數：`tests/test_webapp_report_card.py`
     for old in ("#/structure-table", "#/graph-walk", "#/structure-readings", "#/layer-notes"):
         assert f'href="{old}"' not in html
     assert "['structure-table', 'graph-walk', 'structure-readings', 'layer-notes'].includes(target)" in source
     assert "target.startsWith('graph/')" in source and "layer-focus" in source      # 打開那一層
-    assert "renderPredictions(readings.predictions)" in source                       # 預測表搬到追蹤表
+    assert "renderPredictions(payload.predictions, payload.prediction_groups)" in source   # 預測表搬到成績單
     assert "back.href = '#/graph/' + encodeURIComponent(node)" in source            # 層說明回到圖頁那一層
     graph = source[source.index("async function renderGraph("):source.index("/* 圖預測對錯表")]
     assert ".sort(" not in graph and "payload.zones" in graph                       # 區與順序照抄 API
