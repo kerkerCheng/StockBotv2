@@ -16,8 +16,8 @@
     "timezone": "Asia/Taipei",
     "daily_local_time": "05:30",
     "task_name": "StockBotv2-Daily",
-    "execution_time_limit_minutes": 400,
-    "expected_duration_minutes": 60,
+    "execution_time_limit_minutes": 440,
+    "expected_duration_minutes": 80,
     "guard_margin_minutes": 15,
     "harvest_stale_hours": 30
   },
@@ -38,23 +38,29 @@
       "（R2 條件 2：預篩最多 4 次、T2 最多 20 次），約 340 分鐘；實際一輪約 20–40 分鐘。改完已跑 register_daily_task.py --apply。",
       "2026-10-07：分類每輪上限 30 → 90（見 triage._doc），每次呼叫 timeout 15 → 8（實測 30 則一次 240 秒），3 次共 24 分；",
       "加總 363 超過 360，總時限調到 400（它是殺掉卡住行程的保險，不是預期時間）。改完已跑 register_daily_task.py --apply。",
+      "2026-10-28：LLM 改 opus＋xhigh、雷達加 4 題，加總約 430，總時限 400→440；預期時間 60→80（互動 session 避讓窗跟著變）。",
       "claude_effort（2026-10-28，必填）：五個 LLM 步驟共用。不寫就是 CLI 預設——2.1.281→2.1.311 自動升版時由 high 變 medium，",
       "雷達一輪由 4–9 則掉到 1 則。同一份批次實測：雷達 medium 搜 10 收 1／high 32 收 5／max 34 收 2（448 秒）；",
       "分類 43 則 high 每次約 1 分鐘、max 一次 596–816 秒（超過 triage_timeout 8 分，整步會丟棄）、判定與 high 只差 2 則；",
-      "opus＋xhigh 雷達 33 收 5、分類與 sonnet high 差 4 則（多放行的 3 則是雜訊）。所以 sonnet＋high。"
+      "opus＋xhigh 雷達 33 收 5、分類與 sonnet high 差 4 則（多放行的 3 則是雜訊）。所以 sonnet＋high。",
+      "2026-10-28 晚（使用者「A B go」）：改 opus＋xhigh。理由：時間與額度都放得下——今天整輪 daily（sonnet）只讓 5 小時額度",
+      "0%→約 1%；opus＋xhigh 實測雷達 199 秒（sonnet high 102）、分類 30 則一次 239 秒（sonnet high 89）。時限照實測放寬：",
+      "分類 8→12、T2 輪詢 3→4（任一次逾時整步作廢，要餘裕）、摘要 5→8；總時限 400→440。要盯的是分類會不會變鬆",
+      "（多放行就加重研究佇列）：基準 10-28 分類 253 則 go 125（49%），一週後明顯升高就只把分類改回 sonnet（要先讓各步可分開設模型）。",
+      "每次呼叫的 token 與費用 10-28 起寫進執行紀錄（calls[].usage／cost_usd），額度不再用猜的。"
     ],
     "executor": "claude",
     "claude_path": null,
-    "claude_model": "sonnet",
-    "claude_effort": "high",
+    "claude_model": "opus",
+    "claude_effort": "xhigh",
     "cwd": null,
-    "triage_timeout_minutes": 8,
+    "triage_timeout_minutes": 12,
     "triage_chunk_size": 30,
     "prescreen_timeout_minutes": 15,
     "prescreen_chunk_size": 3,
-    "poll_timeout_minutes": 3,
+    "poll_timeout_minutes": 4,
     "poll_chunk_size": 1,
-    "digest_timeout_minutes": 5
+    "digest_timeout_minutes": 8
   },
   "pq1": {
     "_drain_doc": [
@@ -100,8 +106,8 @@
     ],
     "enabled": true,
     "max_items": 5,
-    "_doc_timeout": "2026-10-21 雷達精進 C3：搜尋上限 24 → 32（每天輪替 8 個讀過的層、每層一次），timeout 12 → 16 分鐘（按次數同比例；daily 各步加總 367 → 371，上限 400）。",
-    "timeout_minutes": 16,
+    "_doc_timeout": "2026-10-21 雷達精進 C3：搜尋上限 24 → 32（每天輪替 8 個讀過的層、每層一次），timeout 12 → 16 分鐘（按次數同比例；daily 各步加總 367 → 371，上限 400）。2026-10-28：市場題 6 → 10，搜尋上限 32 → 36，timeout 16 → 18（opus＋xhigh 實測 33 次 199 秒，餘裕仍大）。",
+    "timeout_minutes": 18,
     "_doc_market": [
       "市場大事（2026-10-07 使用者：「我們還是必須知道 AI CAPEX 整個市場的大事，不能見樹不見林」）：",
       "market_topics 每題建議搜一次、不限在盯的公司；收進來的寫成 lead（scope=market，與主題／在盯條件那一層分開計上限）。",
@@ -113,7 +119,18 @@
       "大型供應合約與產能預訂（多年期、預付款）：電力設備、散熱、光通訊、記憶體、先進封裝",
       "政策與管制：出口管制、關稅、補貼、電網與資料中心核准",
       "需求反轉與延誤（反向的大事，和正向同等重要）：雲端與 AI 大廠、neocloud（CoreWeave、Nebius、Nscale、Crusoe、Lambda）退出、取消或延後資料中心合作、租約與容量承諾；電網接入或許可延誤；融資受阻",
-      "供應鏈分工與採購轉移（結構性）：客戶指定或統一代工與製程、自製改外包或外包改自製、導入或剔除第二來源、規格統一；韓日台中產業媒體的消息也算（標明是轉述）；搜尋字要帶層名詞"
+      "供應鏈分工與採購轉移（結構性）：客戶指定或統一代工與製程、自製改外包或外包改自製、導入或剔除第二來源、規格統一；韓日台中產業媒體的消息也算（標明是轉述）；搜尋字要帶層名詞",
+      "瓶頸供應鏈財報與法說——電力設備（燃氣引擎與渦輪、變壓器、開關設備、燃料電池）：訂單、backlog、交期、產能與擴產、價格、毛利率、客戶預付款",
+      "瓶頸供應鏈財報與法說——光通訊上游（光纖與預製棒、雷射與 InP、光模組元件）：訂單、backlog、交期、產能與擴產、價格、毛利率、客戶預付款與認證",
+      "瓶頸供應鏈財報與法說——先進封裝與測試（CoWoS、HBM、測試設備、探針卡、基板）：訂單、backlog、交期、產能與擴產、價格、毛利率、客戶認證",
+      "瓶頸供應鏈財報與法說——散熱（液冷、CDU、冷板、冰水主機）：訂單、backlog、交期、產能與擴產、價格、毛利率"
+    ],
+    "_doc_market_earnings": [
+      "2026-10-28 加第 7–10 題（使用者「A B go」）：10-27 Corning、Teradyne、Wärtsilä 同一天發財報，雷達沒有任何一題問「供應鏈公司的財報」——",
+      "前 6 題是大廠資本支出、晶片時程、大合約、政策、反向、分工；主題層只輪替圖上讀過的層。Corning、Teradyne 剛好從 X 撈到，",
+      "Wärtsilä（名冊有、燃氣鏈 [882] 直接相關，「引擎交期延長」）完全沒撈到。四個區段照使用者的 ChatGPT 排程 prompt 切（電力設備、光通訊上游、",
+      "先進封裝／測試、散熱），每題一則；max_market_items 6 → 10、market_topics 上限 8 → 10（routine_config）。",
+      "驗收：一週內數名冊公司財報日當天，雷達自己撈到的則數（10-27 是 0／3）。"
     ],
     "_doc_market_structural": [
       "2026-10-20 加第 6 題（使用者：「我預期繼續 refine 雷達這一塊」；ROADMAP 雷達精進 B）：NVHBM（NVIDIA 要三家記憶體廠統一用台積電做 HBM base die）雷達沒抓到——",
@@ -127,7 +144,7 @@
       "2026-10-20：4 → 5——5 題配 4 則仍是寫了做不到的數字；routine_config 改成上限少於題數就拒載（原本只擋「有題目卻是 0」那個特例）。",
       "2026-10-20 晚：5 → 6（第 6 題結構性分工轉移）。"
     ],
-    "max_market_items": 6
+    "max_market_items": 10
   },
   "theme_scan": {
     "_doc": [

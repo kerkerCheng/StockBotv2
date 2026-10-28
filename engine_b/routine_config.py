@@ -202,8 +202,9 @@ def load_radar(path: Path = DEFAULT_CONFIG) -> dict[str, Any]:
     # 市場大事（2026-10-07 使用者：「我們還是必須知道 AI CAPEX 整個市場的大事，不能見樹不見林」）：
     # 不限在盯公司的市場層廣搜。沒寫＝不搜（舊行為）；寫了就要合法——打錯的數字比沒有更危險。
     topics = radar.get("market_topics", [])
-    if not isinstance(topics, list) or not all(isinstance(t, str) and t.strip() for t in topics) or len(topics) > 8:
-        raise ValueError("radar.market_topics 必須是最多 8 個非空字串的清單")
+    # 上限 10（2026-10-28：8 → 10，加四個區段的「瓶頸供應鏈財報」題）——與 max_market_items 的上限同一個數，每題一則收得完
+    if not isinstance(topics, list) or not all(isinstance(t, str) and t.strip() for t in topics) or len(topics) > 10:
+        raise ValueError("radar.market_topics 必須是最多 10 個非空字串的清單")
     max_market = radar.get("max_market_items", 0)
     if isinstance(max_market, bool) or not isinstance(max_market, int) or not 0 <= max_market <= 10:
         raise ValueError(f"radar.max_market_items 必須是 0..10 的整數：{max_market!r}")

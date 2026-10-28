@@ -127,6 +127,7 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 | **3 最窄 rule** | `.codex/rules` 仍 0 條（daily 不經 Codex）；不新增 step、allowlist、APP 路由 |
 | **4 contract test** | `tests/test_daily_task.py`：零工具 argv 逐元素相等（含 `--effort high`）、effort 必填且只收五個值（缺、空字串、`ultra`、`HIGH` 都 raise）、正式 config 的值兩種 argv 都帶；`tests/test_radar.py`：雷達 argv 與零工具那份仍只差兩格、effort 跟著走；`tests/test_heartbeat.py`：上一輪沒呼叫 LLM 就往前找、model 一樣不印 |
 | **5 端到端 smoke** | 真資料（10-28 的雷達批次與分類批次，結果只存私有暫存、不套用）：雷達 sonnet 5.5＋high 搜 32 次收 5 則（daily 當天 medium 搜 11 收 1）；分類 43 則 high 2 次呼叫共 126 秒、與 daily 當天差 1 則 |
+| **同日追加（使用者「A B go」）** | 只換值、不換形狀：`--model opus --effort xhigh`（flag 與順序不變，能力檢查、白名單、cwd 全部不變）；分類／T2／摘要時限 8／3／5 → 12／4／8 分、雷達 16 → 18 分、總時限 400 → 440（已 `register_daily_task.py --apply`，比對無差異）、預期時間 60 → 80。執行紀錄每次呼叫多 `usage`（四個 token 計數）與 `cost_usd`，只讀 result 事件、不改判定。雷達市場題 6 → 10（四個區段的瓶頸供應鏈財報）、prompt 搜尋上限 32 → 36。smoke：同一份批次 opus＋xhigh 雷達 33 次 199 秒收 5、分類 30 則一次 239 秒 |
 
 ### Sandbox impact review 結論（2026-10-27：分類前的內文——failure log #105）
 

@@ -958,6 +958,19 @@ def test_good_stream_is_ok_and_records_rate_limit_and_capabilities() -> None:
     assert record["init_capabilities"]["memory_paths"] == "<absent>"
     assert popen.stdin.data == "prompt".encode("utf-8")
     assert popen.kwargs["env"] == {"PATH": "p"} and popen.kwargs["shell"] is False
+    assert record["usage"] is None and record["cost_usd"] is None        # 沒給就是 None，不補 0（INV-3）
+
+
+def test_each_call_records_its_tokens_and_cost() -> None:
+    """2026-10-28 改 opus＋xhigh 時發現執行紀錄從沒記用量，額度只能從 rate_limit 的 1% 精度猜。"""
+    result = {**RESULT_OK, "total_cost_usd": 0.4213,
+              "usage": {"input_tokens": 12, "output_tokens": 3456, "cache_read_input_tokens": 78900,
+                        "cache_creation_input_tokens": 4500, "server_tool_use": {"web_search_requests": 9}}}
+    outcome, _popen = _run_claude([INIT_OK, RATE_OK, result])
+    record = outcome.as_record()
+    assert record["usage"] == {"input_tokens": 12, "output_tokens": 3456, "cache_read_input_tokens": 78900,
+                               "cache_creation_input_tokens": 4500}
+    assert record["cost_usd"] == 0.4213
 
 
 def test_bad_init_kills_before_the_result_is_read() -> None:

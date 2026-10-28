@@ -456,6 +456,26 @@ def test_a_market_cap_below_the_number_of_market_topics_is_refused(tmp_path) -> 
         load_radar(cfg)
 
 
+def test_market_topics_go_up_to_ten_and_the_real_config_asks_about_supply_chain_earnings(tmp_path) -> None:
+    """2026-10-28：10-27 Corning、Teradyne、Wärtsilä 同一天發財報，雷達沒有一題問供應鏈財報——加四個區段，題數上限 8 → 10
+    （與 max_market_items 的上限同一個數）；第 11 題照樣拒載。"""
+    from engine_b.routine_config import load_radar
+
+    def write(n: int):
+        cfg = tmp_path / f"routine_{n}.json"
+        cfg.write_text(json.dumps({"radar": {"enabled": True, "max_items": 5, "timeout_minutes": 10,
+                                             "market_topics": [f"題{i}" for i in range(n)], "max_market_items": 10}}),
+                       encoding="utf-8")
+        return cfg
+
+    assert len(load_radar(write(10))["market_topics"]) == 10
+    with pytest.raises(ValueError, match="最多 10 個"):
+        load_radar(write(11))
+    topics = load_radar()["market_topics"]
+    earnings = [t for t in topics if t.startswith("瓶頸供應鏈財報與法說")]
+    assert len(earnings) == 4 and all("交期" in t and "毛利率" in t for t in earnings)
+
+
 # ---------------------------------------------------------------------------
 # 心跳段 3 那一行與快照鍵
 # ---------------------------------------------------------------------------
@@ -754,8 +774,8 @@ def test_a_condition_hung_only_on_a_layer_without_a_current_reading_falls_back_t
                                                     if c["layers"]}
 
 
-def test_the_schema_asks_for_the_layer_and_the_prompt_allows_32_searches() -> None:
+def test_the_schema_asks_for_the_layer_and_the_prompt_allows_36_searches() -> None:
     schema = json.loads(llm_step.RADAR_SCHEMA.read_text(encoding="utf-8"))
     assert "layer" in schema["properties"]["items"]["items"]["required"]
     text = llm_step.RADAR_PROMPT.read_text(encoding="utf-8")
-    assert "總共 32 次以內" in text and "rotation_layers" in text
+    assert "總共 36 次以內" in text and "rotation_layers" in text

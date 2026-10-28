@@ -152,6 +152,10 @@ def kill_tree(proc: Any) -> None:
         pass
 
 
+#: 執行紀錄留下的 token 計數（result 事件 `usage` 的這四欄；其餘欄位不留）。
+USAGE_KEYS: tuple[str, ...] = ("input_tokens", "output_tokens", "cache_read_input_tokens", "cache_creation_input_tokens")
+
+
 @dataclass
 class LlmOutcome:
     """一次 `claude -p` 的結果。`status` ∈ ok／capability_violation／failed／timeout／rate_limited。"""
@@ -174,6 +178,10 @@ class LlmOutcome:
     #: 工具權限被拒的次數（stream 的 `permission_denied` 事件與 result 的 `permission_denials` 取大者）。
     #: 被拒時 CLI 照樣回 `is_error: false`——不判失敗，「被擋住沒做」就會和「做了、沒東西」同形（L13）。
     permission_denials: int = 0
+    #: result 事件的 token 用量（只留四個計數）與 `total_cost_usd`——2026-10-28 改 opus＋xhigh 時發現執行紀錄從沒記用量，
+    #: 額度只能從 rate_limit 的百分比（精度 1%）猜。缺就是 None，不補 0（INV-3）。
+    usage: dict[str, Any] | None = None
+    cost_usd: float | None = None
 
     def as_record(self) -> dict[str, Any]:
         init = self.init or {}
@@ -186,6 +194,7 @@ class LlmOutcome:
             "seconds": round(self.seconds, 1), "rate_limit": self.rate_limit, "error": self.error,
             "violations": list(self.violations), "hook_events": self.hook_events,
             "killed_before_result": self.killed_before_result, "permission_denials": self.permission_denials,
+            "usage": self.usage, "cost_usd": self.cost_usd,
             # init 能力欄位的原值逐字記下（R2-a 與結案 gate 8 要看）
             "init_capabilities": capabilities,
         }
@@ -305,6 +314,11 @@ def run_claude(prompt: str, *, argv: Sequence[str], cwd: Path, env: Mapping[str,
         return outcome
     outcome.is_error = result.get("is_error")
     outcome.num_turns = result.get("num_turns")
+    usage = result.get("usage")
+    if isinstance(usage, Mapping):
+        outcome.usage = {k: usage.get(k) for k in USAGE_KEYS if k in usage}
+    cost = result.get("total_cost_usd")
+    outcome.cost_usd = float(cost) if isinstance(cost, (int, float)) and not isinstance(cost, bool) else None
     outcome.session_id = result.get("session_id") or outcome.session_id
     rate_status = (outcome.rate_limit or {}).get("status")
     if outcome.is_error is not False:
