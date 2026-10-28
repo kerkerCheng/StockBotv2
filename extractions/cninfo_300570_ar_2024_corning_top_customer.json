@@ -1,0 +1,224 @@
+{
+  "claims": [
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：太辰光之後的年報或半年報寫出第一大客戶占比明顯下降（低於 50%）或具名改為其他客戶，或 Corning 一手寫出高密度連接組件改為自製或轉給其他代工。核查頻率：每半年（年報約 3 月底、半年報約 8 月中）。觸發後 48 小時：降這條邊 confidence，重讀連接層讀圖的客戶側（Corning 的訂單是否仍經過太辰光）。",
+      "id": "cninfo_300570_ar_2024_corning_top_customer_cl1",
+      "source_ids": [
+        "cninfo_300570_ar_2024_corning_top_customer_s1",
+        "cninfo_300570_ar_2024_corning_top_customer_s2",
+        "cninfo_300570_ar_2024_corning_top_customer_s3"
+      ],
+      "statement": "T&S Communications (300570.SZ) 2024 annual report names Corning Incorporated as its largest customer: RMB 965.8 million, 70.10% of 2024 sales (top five customers 83.03%). Supplier-side statutory disclosure; Corning's own filings do not name T&S. The report does not say which products go to Corning; its main products are MTP/MPO high-density connectors and ferrules.",
+      "subject_id": "e1"
+    },
+    {
+      "confidence": 0.65,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：太辰光之後的定期報告寫出 MPO／MMC 高密度連接產品營收衰退、產能利用率明顯低於產能（產量低於產能八成），或寫出降價搶單、客戶轉單。核查頻率：每半年（年報與半年報）。觸發後 48 小時：降這條邊 confidence，重讀連接層讀圖的供給側。",
+      "id": "cninfo_300570_ar_2024_corning_top_customer_cl2",
+      "source_ids": [
+        "cninfo_300570_ar_2024_corning_top_customer_s3",
+        "cninfo_300570_ar_2024_corning_top_customer_s4",
+        "cninfo_300570_ar_2024_corning_top_customer_s5",
+        "cninfo_300570_ar_2024_corning_top_customer_s6"
+      ],
+      "statement": "T&S 2024 annual report: the company calls itself one of the world's largest makers of dense optical connectivity products, with MTP/MPO high-density fiber connectors holding an important market share (no share figure given), and says AI compute demand is driving data center dense-connectivity demand, including multi-channel optical ports for 400G/800G modules and CPO. Supplier self-report.",
+      "subject_id": "e2"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "co:corning",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "cninfo_300570_ar_2024_corning_top_customer_s1",
+        "cninfo_300570_ar_2024_corning_top_customer_s2"
+      ],
+      "src_id": "co:t_and_s_communications"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:high_density_fiber_connector",
+      "id": "e2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "cninfo_300570_ar_2024_corning_top_customer_s3",
+        "cninfo_300570_ar_2024_corning_top_customer_s5"
+      ],
+      "src_id": "co:t_and_s_communications"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "tech:high_density_fiber_connector",
+      "id": "e3",
+      "relation": "enables",
+      "source_ids": [
+        "cninfo_300570_ar_2024_corning_top_customer_s4",
+        "cninfo_300570_ar_2024_corning_top_customer_s6"
+      ],
+      "src_id": "tech:ai_compute_buildout"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "太辰光",
+        "太辰光通信",
+        "T&S Communications",
+        "T&S Communications Co.,Ltd.",
+        "300570.SZ"
+      ],
+      "attributes": {
+        "ticker": "300570.SZ"
+      },
+      "confidence": 0.85,
+      "id": "co:t_and_s_communications",
+      "name": "深圳太辰光通信股份有限公司",
+      "role": null,
+      "source_ids": [
+        "cninfo_300570_ar_2024_corning_top_customer_s1",
+        "cninfo_300570_ar_2024_corning_top_customer_s2",
+        "cninfo_300570_ar_2024_corning_top_customer_s3",
+        "cninfo_300570_ar_2024_corning_top_customer_s4",
+        "cninfo_300570_ar_2024_corning_top_customer_s5",
+        "cninfo_300570_ar_2024_corning_top_customer_s6"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "GLW"
+      ],
+      "attributes": {
+        "ticker": "GLW"
+      },
+      "confidence": 0.85,
+      "id": "co:corning",
+      "name": "Corning",
+      "role": "material_base",
+      "source_ids": [
+        "cninfo_300570_ar_2024_corning_top_customer_s1",
+        "cninfo_300570_ar_2024_corning_top_customer_s2",
+        "cninfo_300570_ar_2024_corning_top_customer_s3",
+        "cninfo_300570_ar_2024_corning_top_customer_s4",
+        "cninfo_300570_ar_2024_corning_top_customer_s5",
+        "cninfo_300570_ar_2024_corning_top_customer_s6"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "MPO connector",
+        "MTP/MPO",
+        "MPO/MTP",
+        "MMC connector",
+        "MDC connector",
+        "高密度光纤连接器",
+        "高密度連接器",
+        "pre-terminated trunk",
+        "multi-fiber connector"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:high_density_fiber_connector",
+      "name": "High-density multi-fiber connector and pre-terminated assembly (MPO/MTP, MMC/MDC)",
+      "role": null,
+      "source_ids": [
+        "cninfo_300570_ar_2024_corning_top_customer_s1",
+        "cninfo_300570_ar_2024_corning_top_customer_s2",
+        "cninfo_300570_ar_2024_corning_top_customer_s3",
+        "cninfo_300570_ar_2024_corning_top_customer_s4",
+        "cninfo_300570_ar_2024_corning_top_customer_s5",
+        "cninfo_300570_ar_2024_corning_top_customer_s6"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "end_demand",
+      "aliases": [
+        "AI data center buildout",
+        "AI system performance drive",
+        "AI frontier lab compute",
+        "AI XPU platform",
+        "HPC AI cluster",
+        "hyperscale AI infrastructure",
+        "AI factory buildout",
+        "agentic AI infrastructure"
+      ],
+      "attributes": {
+        "concentration_score": null,
+        "intrinsic_cycle_time_weeks": null,
+        "ramp_difficulty_intrinsic": null
+      },
+      "confidence": 0.85,
+      "id": "tech:ai_compute_buildout",
+      "name": "AI training/inference cluster buildout",
+      "role": null,
+      "source_ids": [
+        "cninfo_300570_ar_2024_corning_top_customer_s1",
+        "cninfo_300570_ar_2024_corning_top_customer_s2",
+        "cninfo_300570_ar_2024_corning_top_customer_s3",
+        "cninfo_300570_ar_2024_corning_top_customer_s4",
+        "cninfo_300570_ar_2024_corning_top_customer_s5",
+        "cninfo_300570_ar_2024_corning_top_customer_s6"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "cninfo_300570_ar_2024_corning_top_customer",
+    "evidence_tier": 1,
+    "origin_entity": "深圳太辰光通信股份有限公司",
+    "permission_basis": "公開法定申報（深交所創業板年度報告，新浪財經公告鏡像的原 PDF）；只保留研究必要的有限逐字節錄。published_at 取報告封面日期【2025 年 3 月 29 日】，與鏡像路徑日期一致。",
+    "published_at": "2025-03-29",
+    "publisher": "深交所公告（新浪財經公告鏡像）",
+    "retrieved_at": "2026-10-28",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "深圳太辰光通信（300570.SZ）2024 年年度报告：前五大客户第一名 Corning Incorporated，销售额 9.66 亿元、占年度销售总额 70.10%（前五名合计 83.03%）；公司是全球最大的光密集连接产品制造商之一，MTP/MPO 高密度光纤连接器占重要市场份额；AI 算力需求推动数据中心密集连接产品需求",
+    "url": "http://file.finance.sina.com.cn/211.154.219.97:9494/MRGG/CNSESZ_STOCK/2025/2025-3/2025-03-29/10826920.PDF"
+  },
+  "sources": [
+    {
+      "id": "cninfo_300570_ar_2024_corning_top_customer_s1",
+      "locator": "第三节 管理层讨论与分析——（8）主要销售客户（公司前 5 大客户资料）",
+      "quote": "1 Corning Incorporated 965,808,265.22 70.10%"
+    },
+    {
+      "id": "cninfo_300570_ar_2024_corning_top_customer_s2",
+      "locator": "同表",
+      "quote": "前五名客户合计销售金额占年度销售总额比例 83.03%"
+    },
+    {
+      "id": "cninfo_300570_ar_2024_corning_top_customer_s3",
+      "locator": "第三节（三）公司所处行业地位",
+      "quote": "公司是全球最大的光密集连接产品制造商之一，部分无源光器件产品(如 MTP/MPO 高密度光纤连接器、光柔性板)的技术水平在细分行业中处于领先地位，占据重要市场份额"
+    },
+    {
+      "id": "cninfo_300570_ar_2024_corning_top_customer_s4",
+      "locator": "第三节 四、主营业务分析——1、概述",
+      "quote": "随着 AI 技术的突破与算力需求的爆发，全球数据中心建设进入高速扩张期，推动了密集连接技术的迭代升级与应用推广。"
+    },
+    {
+      "id": "cninfo_300570_ar_2024_corning_top_customer_s5",
+      "locator": "同段",
+      "quote": "以 MTP/MPO 为代表的高密度连接产品，通过集成化设计实现了成本优化、性能提升与运维便捷性。"
+    },
+    {
+      "id": "cninfo_300570_ar_2024_corning_top_customer_s6",
+      "locator": "同段",
+      "quote": "算力网络建设的加速、 400G/800G 光模块的普及促使光口向多通道演进，CPO 技术的逐步商用也推动了高密度连接产品的需求增长。"
+    }
+  ]
+}

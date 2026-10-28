@@ -1,0 +1,209 @@
+{
+  "claims": [
+    {
+      "confidence": 0.65,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：太辰光之後的定期報告寫出 MPO／MMC 高密度連接產品營收衰退、產能利用率明顯低於產能（產量低於產能八成），或寫出降價搶單、客戶轉單。核查頻率：每半年（年報與半年報）。觸發後 48 小時：降這條邊 confidence，重讀連接層讀圖的供給側。",
+      "id": "cninfo_300570_ar_2025_mmc_customer_concentration_cl1",
+      "source_ids": [
+        "cninfo_300570_ar_2025_mmc_customer_concentration_s2",
+        "cninfo_300570_ar_2025_mmc_customer_concentration_s3",
+        "cninfo_300570_ar_2025_mmc_customer_concentration_s4",
+        "cninfo_300570_ar_2025_mmc_customer_concentration_s5",
+        "cninfo_300570_ar_2025_mmc_customer_concentration_s7",
+        "cninfo_300570_ar_2025_mmc_customer_concentration_s8"
+      ],
+      "statement": "T&S 2025 annual report: the largest customer (not named in this report; named as Corning Incorporated in the 2024 report) took RMB 1.059 billion, 68.48% of 2025 sales (top five 84.05%). The company calls itself a core MPO/MTP connector supplier and was pushing MMC/MDC very-small-form-factor connectors through trial production, customer qualification and volume production — MMC is still qualifying, not shown as volume revenue. Its own risk section says the optical communications industry is fully competitive ('竞争充分'). Supplier self-report.",
+      "subject_id": "e1"
+    },
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：太辰光之後的定期報告寫出光纖供應已不構成限制（例如改說原材料供應充足），或寫出自製光纖。核查頻率：每半年。觸發後 48 小時：降這條邊 confidence，重讀光纖層讀圖的需求側（連接組件廠對光纖的拉力）。",
+      "id": "cninfo_300570_ar_2025_mmc_customer_concentration_cl2",
+      "source_ids": [
+        "cninfo_300570_ar_2025_mmc_customer_concentration_s6"
+      ],
+      "statement": "T&S 2025 annual report, 2026 operating plan: securing optical fiber supply is a stated supply-chain priority — the connector assembler buys fiber and treats it as a supply risk. Supplier self-report; no supplier named.",
+      "subject_id": "e3"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:high_density_fiber_connector",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "cninfo_300570_ar_2025_mmc_customer_concentration_s4",
+        "cninfo_300570_ar_2025_mmc_customer_concentration_s5"
+      ],
+      "src_id": "co:t_and_s_communications"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:high_density_fiber_connector",
+      "id": "e2",
+      "relation": "is_component_of",
+      "source_ids": [
+        "cninfo_300570_ar_2025_mmc_customer_concentration_s6"
+      ],
+      "src_id": "tech:optical_fiber"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "tech:optical_fiber",
+      "id": "e3",
+      "relation": "depends_on",
+      "source_ids": [
+        "cninfo_300570_ar_2025_mmc_customer_concentration_s6"
+      ],
+      "src_id": "co:t_and_s_communications"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "太辰光",
+        "太辰光通信",
+        "T&S Communications",
+        "T&S Communications Co.,Ltd.",
+        "300570.SZ"
+      ],
+      "attributes": {
+        "ticker": "300570.SZ"
+      },
+      "confidence": 0.85,
+      "id": "co:t_and_s_communications",
+      "name": "深圳太辰光通信股份有限公司",
+      "role": null,
+      "source_ids": [
+        "cninfo_300570_ar_2025_mmc_customer_concentration_s1",
+        "cninfo_300570_ar_2025_mmc_customer_concentration_s2",
+        "cninfo_300570_ar_2025_mmc_customer_concentration_s3",
+        "cninfo_300570_ar_2025_mmc_customer_concentration_s4",
+        "cninfo_300570_ar_2025_mmc_customer_concentration_s5",
+        "cninfo_300570_ar_2025_mmc_customer_concentration_s6",
+        "cninfo_300570_ar_2025_mmc_customer_concentration_s7",
+        "cninfo_300570_ar_2025_mmc_customer_concentration_s8"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "MPO connector",
+        "MTP/MPO",
+        "MPO/MTP",
+        "MMC connector",
+        "MDC connector",
+        "高密度光纤连接器",
+        "高密度連接器",
+        "pre-terminated trunk",
+        "multi-fiber connector"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:high_density_fiber_connector",
+      "name": "High-density multi-fiber connector and pre-terminated assembly (MPO/MTP, MMC/MDC)",
+      "role": null,
+      "source_ids": [
+        "cninfo_300570_ar_2025_mmc_customer_concentration_s1",
+        "cninfo_300570_ar_2025_mmc_customer_concentration_s2",
+        "cninfo_300570_ar_2025_mmc_customer_concentration_s3",
+        "cninfo_300570_ar_2025_mmc_customer_concentration_s4",
+        "cninfo_300570_ar_2025_mmc_customer_concentration_s5",
+        "cninfo_300570_ar_2025_mmc_customer_concentration_s6",
+        "cninfo_300570_ar_2025_mmc_customer_concentration_s7",
+        "cninfo_300570_ar_2025_mmc_customer_concentration_s8"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "optical fibre",
+        "optical fiber",
+        "bend-insensitive fiber",
+        "single-mode fiber",
+        "fiber"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:optical_fiber",
+      "name": "Optical fiber (single-mode, incl. bend-insensitive)",
+      "role": null,
+      "source_ids": [
+        "cninfo_300570_ar_2025_mmc_customer_concentration_s1",
+        "cninfo_300570_ar_2025_mmc_customer_concentration_s2",
+        "cninfo_300570_ar_2025_mmc_customer_concentration_s3",
+        "cninfo_300570_ar_2025_mmc_customer_concentration_s4",
+        "cninfo_300570_ar_2025_mmc_customer_concentration_s5",
+        "cninfo_300570_ar_2025_mmc_customer_concentration_s6",
+        "cninfo_300570_ar_2025_mmc_customer_concentration_s7",
+        "cninfo_300570_ar_2025_mmc_customer_concentration_s8"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "cninfo_300570_ar_2025_mmc_customer_concentration",
+    "evidence_tier": 1,
+    "origin_entity": "深圳太辰光通信股份有限公司",
+    "permission_basis": "公開法定申報（深交所創業板年度報告，新浪財經公告鏡像的原 PDF）；只保留研究必要的有限逐字節錄。published_at 取報告封面日期【2026 年 3 月 31 日】，與鏡像路徑日期一致。",
+    "published_at": "2026-03-31",
+    "publisher": "深交所公告（新浪財經公告鏡像）",
+    "retrieved_at": "2026-10-28",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "深圳太辰光通信（300570.SZ）2025 年年度报告：前五大客户第一名销售额 10.59 亿元、占 68.48%（未具名；前五名合计 84.05%）；MPO/MTP 连接器核心供应商；推进 MMC/MDC 新型产品试产、客户认证及量产；2026 年重点保障光纤供应；风险提示自述「光通信行业竞争充分」",
+    "url": "http://file.finance.sina.com.cn/211.154.219.97:9494/MRGG/CNSESZ_STOCK/2026/2026-3/2026-03-31/12045847.PDF"
+  },
+  "sources": [
+    {
+      "id": "cninfo_300570_ar_2025_mmc_customer_concentration_s1",
+      "locator": "第二节 公司简介",
+      "quote": "公司的外文名称（如有） T&S Communications Co.,Ltd."
+    },
+    {
+      "id": "cninfo_300570_ar_2025_mmc_customer_concentration_s2",
+      "locator": "第三节 主要销售客户（公司前 5 大客户资料）",
+      "quote": "1 第一名 1,059,257,383.43 68.48%"
+    },
+    {
+      "id": "cninfo_300570_ar_2025_mmc_customer_concentration_s3",
+      "locator": "同表",
+      "quote": "前五名客户合计销售金额占年度销售总额比例 84.05%"
+    },
+    {
+      "id": "cninfo_300570_ar_2025_mmc_customer_concentration_s4",
+      "locator": "第三节 核心竞争力",
+      "quote": "深度参与全球数据中心建设演进，是 MPO/MTP 连接器核心供应商，具备高密度、高速光互联产品的研发与规模化生产能力"
+    },
+    {
+      "id": "cninfo_300570_ar_2025_mmc_customer_concentration_s5",
+      "locator": "第三节 四、主营业务分析——生产交付",
+      "quote": "针对市场需求变化，高效推进 MMC（Miniature Multi-fiber Connector）/MDC（Miniaturized Dual-fiber Connector）新型产品试产、客户认证及量产工作"
+    },
+    {
+      "id": "cninfo_300570_ar_2025_mmc_customer_concentration_s6",
+      "locator": "第三节 十一（三）2026 年度经营规划——生产与交付",
+      "quote": "优化供应链，其中重点包括光纤供应的保障及越南供应本地化的推进。"
+    },
+    {
+      "id": "cninfo_300570_ar_2025_mmc_customer_concentration_s7",
+      "locator": "第三节 十一（四）公司可能面对的风险——市场竞争风险",
+      "quote": "光通信行业竞争充分，技术更新迭代较快，如公司产品竞争力跟不上市场要求将对公司发展带来不利。"
+    },
+    {
+      "id": "cninfo_300570_ar_2025_mmc_customer_concentration_s8",
+      "locator": "同节——客户需求波动风险",
+      "quote": "若 AI 算力相关投资放缓、运营商投资出现波动，或行业技术升级节奏不及预期，可能导致客户订单出现波动。"
+    }
+  ]
+}
