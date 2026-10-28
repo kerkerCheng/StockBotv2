@@ -508,6 +508,38 @@ def candidate_context(tickers: Sequence[str], *, today: date | None = None,
             "bets": bet_index(structure, seats_from_edges(graph_edges))}
 
 
+_OVER_EDGE = {"cap_over_edge": "市值", "coverage_over_edge": "分析師家數"}
+
+
+def no_narrative_reason(edge: Mapping[str, Any] | None, records: Sequence[Any], *, today: date) -> str:
+    """沒有敘事也沒有持有的那一頁，候選狀態格寫「為什麼沒有敘事」（2026-10-28 使用者：「滑 app 滑了很久看不出來
+    這些公司為何沒有敘事」——原本 104 頁都只印同一句「不上候選板」）。非邊緣＝規定不寫敘事（research-drain 段 5
+    的母體外）：那一句照抄閉環同一個 `population_detail`（L16，不另造一份）；撤回過的另寫哪天撤回、理由開頭。"""
+    from .closure import population_detail
+
+    edge = dict(edge or {})
+    if edge.get("state") == "not_edge":
+        line, _due = population_detail("non_multiple", "", {"edge": edge}, board_day=today.isoformat(),
+                                       last_brief=None, today=today)
+        limits = edge.get("thresholds") or {}
+        over = [_OVER_EDGE.get(str(r), str(r)) for r in edge.get("reasons") or ()]
+        bound = ""
+        if limits.get("market_cap_max_usd") and limits.get("analyst_count_max") is not None:
+            bound = (f"（門檻：市值 ≤{limits['market_cap_max_usd'] / 1e9:g}B USD、分析師 ≤{limits['analyst_count_max']} 位"
+                     + (f"；超過的是{'與'.join(over)}）" if over else "）"))
+        reason = f"不寫敘事——{line}{bound}；非邊緣不寫敘事，它的財報與文件當層的證據用"
+    else:
+        reason = "沒有敘事、也沒有持有——不上候選板（寫敘事才有候選狀態）"
+        if edge.get("label"):
+            reason += f"；邊緣判定：{edge['label']}"
+    latest = records[-1] if records else None
+    if latest is not None and getattr(latest, "retracted", False):
+        day = str(getattr(latest, "created_at", "") or "")[:10]
+        note = str(getattr(latest, "note", "") or "").strip()
+        reason += f"。原本的敘事 {day} 撤回" + (f"：{note[:80]}…" if len(note) > 80 else (f"：{note}" if note else ""))
+    return reason
+
+
 def page_input(context: Mapping[str, Any], ticker: str, company_id: str | None, *,
                three_questions: Mapping[str, Any] | None, three_questions_note: str | None = None) -> dict[str, Any]:
     """個股頁首屏的候選狀態＋三個字、downside 的反證對 watch（Step 3.7）。**與候選板同一個 `derive_row`**——
@@ -543,7 +575,9 @@ def page_input(context: Mapping[str, Any], ticker: str, company_id: str | None, 
         page_row["derived_label"] = (GROUP_LABELS.get(str(derived)) or SIDE_LABELS.get(str(derived))
                                      or SIDE_LABELS.get(str(row.get("side"))))
     elif sheet.get("status") == "ok":
-        row_absence = {"kind": "not_yet_recorded", "reason": "沒有敘事、也沒有持有——不上候選板（寫敘事才有候選狀態）"}
+        row_absence = {"kind": "not_yet_recorded",
+                       "reason": no_narrative_reason((context.get("edges") or {}).get(str(ticker).upper()), records,
+                                                     today=today)}
     else:
         # Sheet 讀不到時「也沒有持有」是沒驗過的否定（3.7 R1；L12）——產生端宣告暫停，不是「還沒做」。
         row_absence = {"kind": "upstream_unavailable",

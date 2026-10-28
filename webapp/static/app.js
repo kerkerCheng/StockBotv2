@@ -239,8 +239,11 @@ function renderCard(row) {
   if (brief.our_bet && typeof brief.our_bet.value === 'string') {
     card.appendChild(el('div', 'card-brief', brief.our_bet.value));
   } else {
-    // 缺席要現形：沒寫短評不是空白（INV-3）。70/73 檔今天都在這一支。
-    card.appendChild(el('div', 'card-brief absent', '還沒寫短評'));
+    // 缺席要現形：沒寫短評不是空白（INV-3）。沒有敘事的那一組印「為什麼沒有」——理由由產生端給（候選狀態格的
+    // reason，例：非邊緣的市值與分析師家數；2026-10-28 使用者「看不出來這些公司為何沒有敘事」），這裡照抄不組字。
+    const cand = row.candidate || {};
+    card.appendChild(el('div', 'card-brief absent',
+      cand.list_group === 'no_narrative' && cand.reason ? cand.reason : '還沒寫短評'));
   }
   const attention = row.primary_attention;
   if (attention) {

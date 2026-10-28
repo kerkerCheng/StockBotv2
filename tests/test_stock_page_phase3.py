@@ -587,6 +587,27 @@ def test_sheet_unreadable_means_held_is_suspended_not_not_held(monkeypatch) -> N
     assert ok["row_absence"]["kind"] == "not_yet_recorded"
 
 
+def test_no_narrative_page_says_why_there_is_no_narrative(monkeypatch) -> None:
+    """2026-10-28 使用者：「滑 app 滑了很久看不出來這些公司為何沒有敘事」——非邊緣要寫出市值、家數與門檻；撤回過的寫撤回日。"""
+    import alpha.providers.briefs as briefs_mod
+    from alpha.providers import candidates as cand
+
+    not_edge = {"state": "not_edge", "label": "非邊緣", "reasons": ["coverage_over_edge"], "market_cap_usd": 7.3e9,
+                "analyst_count": 16, "thresholds": {"analyst_count_max": 12, "market_cap_max_usd": 1e10}}
+    monkeypatch.setattr(briefs_mod, "read_brief_records", lambda ticker: ([], []))
+    page = cand.page_input(_context(edges={T: not_edge}), T, CO, three_questions=_tq())
+    reason = page["row_absence"]["reason"]
+    assert page["row_absence"]["kind"] == "not_yet_recorded"
+    assert "非邊緣：7.3B USD、分析師 16 位" in reason and "分析師 ≤12 位" in reason and "超過的是分析師家數" in reason
+    edge_page = cand.page_input(_context(), T, CO, three_questions=_tq())
+    assert "非邊緣" not in edge_page["row_absence"]["reason"] and "邊緣判定：邊緣" in edge_page["row_absence"]["reason"]
+
+    class _Retracted:
+        retracted, created_at, note = True, "2026-10-22T00:46:14+00:00", "非邊緣後撤回"
+
+    assert "原本的敘事 2026-10-22 撤回：非邊緣後撤回" in cand.no_narrative_reason(not_edge, [_Retracted()], today=TODAY)
+
+
 def test_legacy_narrative_gets_the_board_label_not_a_dash(monkeypatch) -> None:
     import alpha.providers.briefs as briefs_mod
     from alpha.providers import candidates as cand
