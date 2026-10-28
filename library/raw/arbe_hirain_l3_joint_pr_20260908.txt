@@ -1,0 +1,5 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1861841/000121390026097831/ea030464401ex99-1.htm
+
+Excerpt:
+one of the world’s largest automotive groups has selected Hirain’s imaging radar, powered by Arbe’s ultra-high-resolution radar chipset, for a Level 3 automated driving passenger vehicle program in China, across multiple brands under the group. Hirain will manufacture, supply, and integrate the radar system, with series-production deliveries scheduled to begin in Q4 2027, ahead of vehicle start of production.
+For the program, Hirain will deliver the complete automotive radar system and lead system development, manufacturing, integration, validation, and quality, leveraging its established automotive manufacturing infrastructure. Arbe’s ultra-high-resolution radar chipset and core technology will power the system, generating the dense and detailed radar data required by the vehicle’s central automated-driving platform.

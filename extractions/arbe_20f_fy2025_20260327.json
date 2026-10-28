@@ -1,0 +1,173 @@
+{
+  "claims": [
+    {
+      "confidence": 0.65,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：Arbe 之後的 20-F、6-K 寫出 Hirain 的具約束力訂單取消、延後到 2027 以後，或 Hirain 改用別家晶片組。核查頻率：每季（Arbe 6-K 財報新聞稿）。觸發後 48 小時：降這條邊與 claim 的 confidence，ARBE 敘事重答「量」那一格。",
+      "id": "arbe_20f_fy2025_20260327_cl1",
+      "source_ids": [
+        "arbe_20f_fy2025_20260327_s1",
+        "arbe_20f_fy2025_20260327_s2",
+        "arbe_20f_fy2025_20260327_s3"
+      ],
+      "statement": "Arbe FY2025 20-F: Arbe is a Tier-2 imaging radar chipset supplier to Tier 1s and OEMs, with chipsets manufactured and tested by GlobalFoundries; Hirain issued a preliminary order for 340,000 radar chipsets in Q4 2022 to secure capacity and has issued a binding purchase order for thousands of chipsets to be shipped in 2026 for the initial production ramp. Supplier self-report; the order sizes are not confirmed by Hirain in this filing.",
+      "subject_id": "e1"
+    },
+    {
+      "confidence": 0.5,
+      "demand_proof_level": "speculative",
+      "disproof_condition": "條件：客戶端或第三方一手文件寫出成像雷達晶片組只有一兩家合格、或某車廠或 robotaxi 平台指定單一來源。核查頻率：每半年（Hirain、NVIDIA、車廠公告）。觸發後 48 小時：重讀成像雷達晶片組層的供給側。",
+      "id": "arbe_20f_fy2025_20260327_cl2",
+      "source_ids": [
+        "arbe_20f_fy2025_20260327_s4"
+      ],
+      "statement": "Arbe FY2025 20-F names competing radar chip suppliers: Texas Instruments and NXP offer 4Rx*4Tx radar transceivers and recently started sampling 8Rx*8Tx chips scalable to 24Rx*24Tx; NXP also offers a dedicated radar processing chip; Mobileye develops a 1,536-virtual-channel imaging radar. This is Arbe's own description of its competitors, not a third-party count of the layer's suppliers.",
+      "subject_id": "tech:imaging_radar_chipset"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:imaging_radar_chipset",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "arbe_20f_fy2025_20260327_s1",
+        "arbe_20f_fy2025_20260327_s2"
+      ],
+      "src_id": "co:arbe_robotics"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:automotive_radar",
+      "id": "e2",
+      "relation": "is_component_of",
+      "source_ids": [
+        "arbe_20f_fy2025_20260327_s2"
+      ],
+      "src_id": "tech:imaging_radar_chipset"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "co:arbe_robotics",
+      "id": "e3",
+      "relation": "supplies_to",
+      "source_ids": [
+        "arbe_20f_fy2025_20260327_s1"
+      ],
+      "src_id": "co:globalfoundries"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "Arbe",
+        "ARBE"
+      ],
+      "attributes": {
+        "ticker": "ARBE"
+      },
+      "confidence": 0.9,
+      "id": "co:arbe_robotics",
+      "name": "Arbe Robotics Ltd.",
+      "role": null,
+      "source_ids": [
+        "arbe_20f_fy2025_20260327_s1",
+        "arbe_20f_fy2025_20260327_s2",
+        "arbe_20f_fy2025_20260327_s3"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "imaging radar chipset",
+        "4D imaging radar chipset",
+        "high-resolution radar chipset"
+      ],
+      "attributes": {},
+      "confidence": 0.8,
+      "id": "tech:imaging_radar_chipset",
+      "name": "Imaging radar chipset (multi-channel RF IC + radar processor)",
+      "role": null,
+      "source_ids": [
+        "arbe_20f_fy2025_20260327_s1",
+        "arbe_20f_fy2025_20260327_s2"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "radars",
+        "automotive radar sensor"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:automotive_radar",
+      "name": "Automotive radar",
+      "role": null,
+      "source_ids": [
+        "arbe_20f_fy2025_20260327_s2"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "foundry_packaging",
+      "aliases": [
+        "GFS",
+        "GF",
+        "GLOBALFOUNDRIES Inc."
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:globalfoundries",
+      "name": "GlobalFoundries",
+      "role": "foundry",
+      "source_ids": [
+        "arbe_20f_fy2025_20260327_s1"
+      ],
+      "type": "Company"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "arbe_20f_fy2025_20260327",
+    "evidence_tier": 1,
+    "origin_entity": "Arbe Robotics",
+    "permission_basis": "SEC EDGAR 公開申報文件；只保留研究必要的有限逐字節錄（library/raw/arbe_20f_fy2025_short_check_excerpt.txt）。",
+    "published_at": "2026-03-27",
+    "publisher": "SEC EDGAR",
+    "retrieved_at": "2026-10-27",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Arbe Robotics Ltd. Form 20-F（FY2025，2026-03-27）：Tier-2 成像雷達晶片組（多通道 RF IC＋雷達處理器），GlobalFoundries 代工與測試；Hirain 2022 年預訂 34 萬顆、2026 年出貨的數千顆具約束力訂單；具名競爭者 TI、NXP、Mobileye",
+    "url": "https://www.sec.gov/Archives/edgar/data/1861841/000121390026035653/ea0283041-20f_arbe.htm"
+  },
+  "sources": [
+    {
+      "id": "arbe_20f_fy2025_20260327_s1",
+      "locator": "Item 4 Business — Tier-2 晶片組定位",
+      "quote": "In the private automobile market, we operate as a Tier-2 semiconductor company, developing advanced radar technology and solutions – multi-channel Radio Frequency Integrated Circuit (RF IC) for transmission and reception and a dedicated radar processing IC that includes specialized Radar Processing Unit (‘RPU’) and additional general-purpose processing/control cores. We do not have our own chipset manufacturing facilities. We rely on GlobalFoundries for manufacturing and testing our chipset."
+    },
+    {
+      "id": "arbe_20f_fy2025_20260327_s2",
+      "locator": "Item 4 Business — Competition（Tier 2）",
+      "quote": "As a Tier 2 supplier, we supply imaging radar chipset to Tier 1 manufacturers who are building imaging radar systems and to OEMs."
+    },
+    {
+      "id": "arbe_20f_fy2025_20260327_s3",
+      "locator": "Item 4 Business — Strategic Relationships（Hirain）",
+      "quote": "Hirain and Arbe signed a number of agreements regulating the development manufacturing of radar product(s) based on Arbe’s chipset. During the fourth quarter of 2022, Hirain issued a preliminary order for 340,000 radar chipsets in order to secure capacity for its anticipated production ramp-up. Hirain has issued a binding purchase order for thousands of chipsets to be shipped in 2026 to support the initial ramp to production."
+    },
+    {
+      "id": "arbe_20f_fy2025_20260327_s4",
+      "locator": "Item 4 Business — Competition（具名競爭者）",
+      "quote": "Texas Instruments and NXP offer a radar transceiver of 4Rx * 4Tx, and recently started sampling 8Rx * 8Tx chips capable of scaling up to 24Rx * 24Tx. NXP also offers dedicated radar processing chip capable of processing up to 4 trancievers."
+    }
+  ]
+}

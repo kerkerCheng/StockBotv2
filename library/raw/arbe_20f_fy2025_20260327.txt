@@ -1,0 +1,7 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1861841/000121390026035653/ea0283041-20f_arbe.htm
+
+Excerpt:
+In the private automobile market, we operate as a Tier-2 semiconductor company, developing advanced radar technology and solutions – multi-channel Radio Frequency Integrated Circuit (RF IC) for transmission and reception and a dedicated radar processing IC that includes specialized Radar Processing Unit (‘RPU’) and additional general-purpose processing/control cores. We do not have our own chipset manufacturing facilities. We rely on GlobalFoundries for manufacturing and testing our chipset.
+As a Tier 2 supplier, we supply imaging radar chipset to Tier 1 manufacturers who are building imaging radar systems and to OEMs.
+Hirain and Arbe signed a number of agreements regulating the development manufacturing of radar product(s) based on Arbe’s chipset. During the fourth quarter of 2022, Hirain issued a preliminary order for 340,000 radar chipsets in order to secure capacity for its anticipated production ramp-up. Hirain has issued a binding purchase order for thousands of chipsets to be shipped in 2026 to support the initial ramp to production.
+Texas Instruments and NXP offer a radar transceiver of 4Rx * 4Tx, and recently started sampling 8Rx * 8Tx chips capable of scaling up to 24Rx * 24Tx. NXP also offers dedicated radar processing chip capable of processing up to 4 trancievers.

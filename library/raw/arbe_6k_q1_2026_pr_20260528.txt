@@ -1,0 +1,6 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1861841/000121390026061736/ea029225201ex99-1.htm
+
+Excerpt:
+Arbe began shipping chipsets to Hirain for its L4 project which it announced in December: Hirain, Arbe’s Tier 1, is using Arbe’s chipset for a high-resolution 48x48 imaging radar project with a Chinese automaker.
+Arbe begins sales of full radar systems: This complements Arbe’s chipset offerings. Arbe has established a dedicated production line to manufacture its radar systems.
+Arbe received additional orders from global robotaxi players using Phoenix to support L4 autonomy with 360-degree sensing.

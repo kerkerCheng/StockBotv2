@@ -1,0 +1,129 @@
+{
+  "claims": [
+    {
+      "confidence": 0.55,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：Arbe 之後的 6-K 寫出 robotaxi 訂單取消、路測結束未轉量產，或整套雷達產線停產。核查頻率：每季（Arbe 6-K）。觸發後 48 小時：拿掉 Arbe→車用雷達這條邊的量含意，ARBE 敘事重答需求格。",
+      "id": "arbe_6k_q1_2026_pr_20260528_cl1",
+      "source_ids": [
+        "arbe_6k_q1_2026_pr_20260528_s1",
+        "arbe_6k_q1_2026_pr_20260528_s2",
+        "arbe_6k_q1_2026_pr_20260528_s3"
+      ],
+      "statement": "Arbe Q1 2026 release: Arbe began shipping chipsets to Hirain for its L4 project with a Chinese automaker, began selling full radar systems from a dedicated production line, and received additional orders from global robotaxi players using its Phoenix radar for L4 360-degree sensing. Supplier self-report; robotaxi customers are not named and order sizes are not stated.",
+      "subject_id": "e2"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:imaging_radar_chipset",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "arbe_6k_q1_2026_pr_20260528_s1"
+      ],
+      "src_id": "co:arbe_robotics"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.65,
+      "dst_id": "tech:automotive_radar",
+      "id": "e2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "arbe_6k_q1_2026_pr_20260528_s2",
+        "arbe_6k_q1_2026_pr_20260528_s3"
+      ],
+      "src_id": "co:arbe_robotics"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "Arbe",
+        "ARBE"
+      ],
+      "attributes": {
+        "ticker": "ARBE"
+      },
+      "confidence": 0.9,
+      "id": "co:arbe_robotics",
+      "name": "Arbe Robotics Ltd.",
+      "role": null,
+      "source_ids": [
+        "arbe_6k_q1_2026_pr_20260528_s1",
+        "arbe_6k_q1_2026_pr_20260528_s2",
+        "arbe_6k_q1_2026_pr_20260528_s3"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "imaging radar chipset",
+        "4D imaging radar chipset",
+        "high-resolution radar chipset"
+      ],
+      "attributes": {},
+      "confidence": 0.8,
+      "id": "tech:imaging_radar_chipset",
+      "name": "Imaging radar chipset (multi-channel RF IC + radar processor)",
+      "role": null,
+      "source_ids": [
+        "arbe_6k_q1_2026_pr_20260528_s1"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "radars",
+        "automotive radar sensor"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:automotive_radar",
+      "name": "Automotive radar",
+      "role": null,
+      "source_ids": [
+        "arbe_6k_q1_2026_pr_20260528_s2",
+        "arbe_6k_q1_2026_pr_20260528_s3"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "arbe_6k_q1_2026_pr_20260528",
+    "evidence_tier": 1,
+    "origin_entity": "Arbe Robotics",
+    "permission_basis": "SEC EDGAR 公開申報文件（6-K Ex.99.1）；只保留研究必要的有限逐字節錄（library/raw/arbe_6k_2025_12_to_2026_09_programs_excerpt.txt）。",
+    "published_at": "2026-05-28",
+    "publisher": "SEC EDGAR",
+    "retrieved_at": "2026-10-27",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Arbe Robotics 6-K（2026-05-28，Q1 2026 財報新聞稿）：開始出貨晶片組給 Hirain 的 L4 專案、開始賣整套雷達（自建產線）、robotaxi 業者用 Phoenix 追加訂單",
+    "url": "https://www.sec.gov/Archives/edgar/data/1861841/000121390026061736/ea029225201ex99-1.htm"
+  },
+  "sources": [
+    {
+      "id": "arbe_6k_q1_2026_pr_20260528_s1",
+      "locator": "Q1 2026 新聞稿 — 開始出貨給 Hirain",
+      "quote": "Arbe began shipping chipsets to Hirain for its L4 project which it announced in December: Hirain, Arbe’s Tier 1, is using Arbe’s chipset for a high-resolution 48x48 imaging radar project with a Chinese automaker."
+    },
+    {
+      "id": "arbe_6k_q1_2026_pr_20260528_s2",
+      "locator": "Q1 2026 新聞稿 — 開始賣整套雷達",
+      "quote": "Arbe begins sales of full radar systems: This complements Arbe’s chipset offerings. Arbe has established a dedicated production line to manufacture its radar systems."
+    },
+    {
+      "id": "arbe_6k_q1_2026_pr_20260528_s3",
+      "locator": "Q1 2026 新聞稿 — robotaxi 追加訂單",
+      "quote": "Arbe received additional orders from global robotaxi players using Phoenix to support L4 autonomy with 360-degree sensing."
+    }
+  ]
+}

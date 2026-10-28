@@ -1,0 +1,126 @@
+{
+  "claims": [
+    {
+      "confidence": 0.65,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：Arbe 或 Hirain 之後的一手寫出這個 L3 專案延後（量產交貨晚於 2027 年第四季）、取消，或改用別家晶片組。核查頻率：每季（Arbe 6-K；Hirain 公告）。觸發後 48 小時：降這條 claim，ARBE 敘事的量與時間窗重寫。",
+      "id": "arbe_hirain_l3_joint_pr_20260908_cl1",
+      "source_ids": [
+        "arbe_hirain_l3_joint_pr_20260908_s1",
+        "arbe_hirain_l3_joint_pr_20260908_s2"
+      ],
+      "statement": "Hirain–Arbe joint release (2026-09-08): one of the world's largest automotive groups selected Hirain's imaging radar, powered by Arbe's radar chipset, for a Level 3 passenger vehicle program in China across multiple brands; Hirain manufactures, supplies and integrates the radar system, with series-production deliveries scheduled to begin in Q4 2027. The automaker and volumes are not named.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {
+        "qualification_status": "designed_in"
+      },
+      "confidence": 0.8,
+      "dst_id": "tech:imaging_radar_chipset",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "arbe_hirain_l3_joint_pr_20260908_s1",
+        "arbe_hirain_l3_joint_pr_20260908_s2"
+      ],
+      "src_id": "co:arbe_robotics"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "tech:automotive_radar",
+      "id": "e2",
+      "relation": "is_component_of",
+      "source_ids": [
+        "arbe_hirain_l3_joint_pr_20260908_s1",
+        "arbe_hirain_l3_joint_pr_20260908_s2"
+      ],
+      "src_id": "tech:imaging_radar_chipset"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "Arbe",
+        "ARBE"
+      ],
+      "attributes": {
+        "ticker": "ARBE"
+      },
+      "confidence": 0.9,
+      "id": "co:arbe_robotics",
+      "name": "Arbe Robotics Ltd.",
+      "role": null,
+      "source_ids": [
+        "arbe_hirain_l3_joint_pr_20260908_s1",
+        "arbe_hirain_l3_joint_pr_20260908_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "imaging radar chipset",
+        "4D imaging radar chipset",
+        "high-resolution radar chipset"
+      ],
+      "attributes": {},
+      "confidence": 0.8,
+      "id": "tech:imaging_radar_chipset",
+      "name": "Imaging radar chipset (multi-channel RF IC + radar processor)",
+      "role": null,
+      "source_ids": [
+        "arbe_hirain_l3_joint_pr_20260908_s1",
+        "arbe_hirain_l3_joint_pr_20260908_s2"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "radars",
+        "automotive radar sensor"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:automotive_radar",
+      "name": "Automotive radar",
+      "role": null,
+      "source_ids": [
+        "arbe_hirain_l3_joint_pr_20260908_s1",
+        "arbe_hirain_l3_joint_pr_20260908_s2"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "arbe_hirain_l3_joint_pr_20260908",
+    "evidence_tier": 1,
+    "origin_entity": "Arbe Robotics",
+    "permission_basis": "SEC EDGAR 公開申報文件（6-K Ex.99.1）；只保留研究必要的有限逐字節錄（library/raw/arbe_6k_2025_12_to_2026_09_programs_excerpt.txt）。",
+    "published_at": "2026-09-08",
+    "publisher": "SEC EDGAR",
+    "retrieved_at": "2026-10-27",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Hirain 與 Arbe 聯合新聞稿（Arbe 6-K 2026-09-08）：全球最大汽車集團之一為中國 L3 乘用車專案選用 Hirain 成像雷達（Arbe 晶片組），Hirain 製造與整合，2027 年第四季開始量產交貨",
+    "url": "https://www.sec.gov/Archives/edgar/data/1861841/000121390026097831/ea030464401ex99-1.htm"
+  },
+  "sources": [
+    {
+      "id": "arbe_hirain_l3_joint_pr_20260908_s1",
+      "locator": "聯合新聞稿 — L3 專案",
+      "quote": "one of the world’s largest automotive groups has selected Hirain’s imaging radar, powered by Arbe’s ultra-high-resolution radar chipset, for a Level 3 automated driving passenger vehicle program in China, across multiple brands under the group. Hirain will manufacture, supply, and integrate the radar system, with series-production deliveries scheduled to begin in Q4 2027, ahead of vehicle start of production."
+    },
+    {
+      "id": "arbe_hirain_l3_joint_pr_20260908_s2",
+      "locator": "聯合新聞稿 — 分工",
+      "quote": "For the program, Hirain will deliver the complete automotive radar system and lead system development, manufacturing, integration, validation, and quality, leveraging its established automotive manufacturing infrastructure. Arbe’s ultra-high-resolution radar chipset and core technology will power the system, generating the dense and detailed radar data required by the vehicle’s central automated-driving platform."
+    }
+  ]
+}
