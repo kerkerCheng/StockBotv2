@@ -1,0 +1,118 @@
+{
+  "claims": [
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：Micron 之後的 10-Q／10-K 的 Industry Conditions 段不再寫需求快過供給或供給分配，或寫出 NAND 供過於求、庫存調整、減產。核查頻率：每季（Micron 10-Q）。觸發後 48 小時：降這條 claim confidence，重讀 tech:nand 讀圖的供需判斷。",
+      "id": "mu_10_k_20261009_cl1",
+      "source_ids": [
+        "mu_10_k_20261009_s1",
+        "mu_10_k_20261009_s3"
+      ],
+      "statement": "Micron FY2026 10-K: AI-driven data center growth accelerated demand for memory and storage at a rate greater than Micron's and the industry's ability to increase supply, leading to supply allocation decisions; robust overall DRAM and NAND demand and constrained supply raised pricing. Micron's NAND is TLC and QLC (no SLC named).",
+      "subject_id": "tech:nand"
+    },
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：Micron 之後的申報或新聞稿寫出新加坡這座 NAND 晶圓廠延後到 2029 以後、縮小或改作他用。核查頻率：每季（Micron 10-Q）。觸發後 48 小時：改這條 claim 的時程，重讀 tech:nand 的擴產名單。",
+      "id": "mu_10_k_20261009_cl2",
+      "source_ids": [
+        "mu_10_k_20261009_s2",
+        "mu_10_k_20261009_s4"
+      ],
+      "statement": "Micron FY2026 10-K: in January 2026 Micron broke ground on an additional advanced wafer fab within its existing Singapore NAND manufacturing complex, providing additional cleanroom space when operational in 2H calendar 2028, to address NAND demand driven by AI and data-centric applications; in 2026 it began volume production of G9 NAND-based PCIe Gen6 data center SSDs for AI training and inference.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "confidence": 0.9,
+      "dst_id": "tech:nand",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "mu_10_k_20261009_s1",
+        "mu_10_k_20261009_s2"
+      ],
+      "src_id": "co:micron_technology"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "Micron",
+        "MU"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:micron_technology",
+      "name": "Micron Technology",
+      "role": "bottleneck_supplier",
+      "source_ids": [
+        "mu_10_k_20261009_s1",
+        "mu_10_k_20261009_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "NAND",
+        "non-volatile memory",
+        "NVM",
+        "Flash memory",
+        "flash memory"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:nand",
+      "name": "NAND / Non-Volatile Memory Manufacturing",
+      "role": null,
+      "source_ids": [
+        "mu_10_k_20261009_s1",
+        "mu_10_k_20261009_s2",
+        "mu_10_k_20261009_s3",
+        "mu_10_k_20261009_s4"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "mu_10_k_20261009",
+    "evidence_tier": 1,
+    "origin_entity": "Micron Technology",
+    "permission_basis": "SEC EDGAR 公開申報文件；只保留研究必要的有限逐字節錄。",
+    "published_at": "2026-10-09",
+    "publisher": "SEC EDGAR",
+    "retrieved_at": "2026-10-27",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Micron Technology FY2026 Form 10-K（2026-10-09 申報，FY 截至 2026-09-03）：AI 帶動的記憶體與儲存需求快過產業供給、已在做供給分配；新加坡 NAND 廠區加建晶圓廠 2028 下半年啟用；G9 NAND PCIe Gen6 資料中心 SSD 量產",
+    "url": "https://www.sec.gov/Archives/edgar/data/723125/000072312526000023/mu-20260903.htm"
+  },
+  "sources": [
+    {
+      "id": "mu_10_k_20261009_s1",
+      "locator": "Part I Item 1 Products — NAND",
+      "quote": "In 2024, we began volume production of Micron G9 NAND, representative of the industry's ninth-generation 3D NAND node. The majority of our NAND bit production in 2026 was on leading-edge Micron G8 and G9 NAND nodes. Our NAND flash includes triple-level cell (“TLC”) and quad-level cell (“QLC”), each with varying levels of storage density, performance, and endurance."
+    },
+    {
+      "id": "mu_10_k_20261009_s2",
+      "locator": "Part I Item 1 CDBU — Data Center SSDs and NAND",
+      "quote": "In 2026, we began volume production of our G9 NAND-based PCIe Gen6 high-performance data center SSDs, which accelerate AI training and inference workloads with faster data transfers and improve energy efficiency."
+    },
+    {
+      "id": "mu_10_k_20261009_s3",
+      "locator": "Item 7 MD&A Industry Conditions — Memory and Storage Demand",
+      "quote": "The AI-driven growth in the data center has accelerated demand for memory and storage at a rate greater than our ability and the industry’s ability to increase supply. This has led to decisions on supply allocation that may impact certain customers and end markets. Robust overall DRAM and NAND demand and constrained supply has led to increased pricing and improved the profitability across our portfolio."
+    },
+    {
+      "id": "mu_10_k_20261009_s4",
+      "locator": "Part I Item 1 Manufacturing — Singapore",
+      "quote": "In January 2026, we broke ground on an additional advanced wafer fab facility located within our existing NAND manufacturing complex. This facility will provide additional cleanroom space when it becomes operational in the second half of calendar 2028, helping address growing market demand for NAND technology driven by the rapid expansion of AI and data-centric applications"
+    }
+  ]
+}

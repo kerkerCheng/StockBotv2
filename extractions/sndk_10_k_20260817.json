@@ -1,0 +1,131 @@
+{
+  "claims": [
+    {
+      "confidence": 0.85,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：Sandisk 或 Kioxia 之後的申報寫出 Flash Ventures 提前終止、產出分配改變，或 Sandisk 開始向合資以外取得快閃晶圓。核查頻率：每季（Sandisk 10-Q）。觸發後 48 小時：重寫這條邊的供給結構，重讀 tech:nand 讀圖的廠商名單。",
+      "id": "sndk_10_k_20260817_cl1",
+      "source_ids": [
+        "sndk_10_k_20260817_s2",
+        "sndk_10_k_20260817_s3",
+        "sndk_10_k_20260817_s4"
+      ],
+      "statement": "Sandisk FY2026 10-K: all of Sandisk's flash-based memory comes from its Flash Ventures joint ventures with Kioxia (Yokkaichi and Kitakami, Japan); Flash Ventures is about 80% of the manufacturing capacity in Kioxia-owned facilities and output is generally split 50/50 between Sandisk and Kioxia. Sandisk's enterprise SSDs serve AI-related workloads among other enterprise uses.",
+      "subject_id": "e1"
+    },
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：Sandisk 之後的 10-Q 寫出 FY2027 資本支出下修，或改稱維持保守資本支出。核查頻率：每季（Sandisk 10-Q）。觸發後 48 小時：改這條 claim，重讀 tech:nand 的擴產名單。",
+      "id": "sndk_10_k_20260817_cl2",
+      "source_ids": [
+        "sndk_10_k_20260817_s5",
+        "sndk_10_k_20260817_s6"
+      ],
+      "statement": "Sandisk FY2026 10-K: Sandisk anticipates increased capital investments in fiscal 2027 as it transitions to newer nodes; output from the Flash Ventures K2 fab in Kitakami began in fiscal 2026, its stated purpose being to transition existing wafer capacity to newer nodes (a node transition, not stated as new wafer capacity).",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "confidence": 0.9,
+      "dst_id": "tech:nand",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "sndk_10_k_20260817_s1",
+        "sndk_10_k_20260817_s2",
+        "sndk_10_k_20260817_s3"
+      ],
+      "src_id": "co:sandisk"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "Sandisk",
+        "SNDK"
+      ],
+      "attributes": {
+        "ticker": "SNDK"
+      },
+      "confidence": 0.9,
+      "id": "co:sandisk",
+      "name": "Sandisk Corporation",
+      "role": null,
+      "source_ids": [
+        "sndk_10_k_20260817_s1",
+        "sndk_10_k_20260817_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "NAND",
+        "non-volatile memory",
+        "NVM",
+        "Flash memory",
+        "flash memory"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:nand",
+      "name": "NAND / Non-Volatile Memory Manufacturing",
+      "role": null,
+      "source_ids": [
+        "sndk_10_k_20260817_s1",
+        "sndk_10_k_20260817_s2",
+        "sndk_10_k_20260817_s3"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "sndk_10_k_20260817",
+    "evidence_tier": 1,
+    "origin_entity": "Sandisk Corporation",
+    "permission_basis": "SEC EDGAR 公開申報文件；只保留研究必要的有限逐字節錄。",
+    "published_at": "2026-08-17",
+    "publisher": "SEC EDGAR",
+    "retrieved_at": "2026-10-27",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Sandisk Corporation FY2026 Form 10-K（2026-08-17 申報，FY 截至 2026-07-03）：快閃晶圓全數來自與 Kioxia 的 Flash Ventures 合資（各 50% 產出、占 Kioxia 廠約 80% 產能）；資料中心 SSD 服務 AI 負載；FY2027 資本支出增加轉新製程，K2 已出貨",
+    "url": "https://www.sec.gov/Archives/edgar/data/2023554/000162828026057406/sndk-20260703.htm"
+  },
+  "sources": [
+    {
+      "id": "sndk_10_k_20260817_s1",
+      "locator": "Part I Item 1 Business 首段",
+      "quote": "Sandisk is a leading global semiconductor memory company with more than 30 years of innovation in NAND flash technology. We are a vertically integrated solutions provider with ownership of chip-level design and IP, front and back-end manufacturing, as well as systems engineering and design."
+    },
+    {
+      "id": "sndk_10_k_20260817_s2",
+      "locator": "Part I Item 1 Manufacturing",
+      "quote": "All of our flash-based memory is obtained from our joint ventures with Kioxia, which provide us with leading-edge, high-quality flash memory wafers."
+    },
+    {
+      "id": "sndk_10_k_20260817_s3",
+      "locator": "Part I Item 1 Flash Ventures",
+      "quote": "Flash Ventures accounts for approximately 80% of the total manufacturing capacity in the facilities owned by Kioxia. We and Kioxia are entitled to purchase a share of Flash Ventures’ output, which generally equals 50% each."
+    },
+    {
+      "id": "sndk_10_k_20260817_s4",
+      "locator": "Part I Item 1 End markets — Datacenter",
+      "quote": "Our high-performance enterprise class SSDs include high-performance flash-based SSDs and software solutions that are optimized for performance applications providing a range of capacity and performance levels primarily for use in enterprise servers and supporting high-volume online transactions, AI-related workloads, data analysis and other enterprise applications."
+    },
+    {
+      "id": "sndk_10_k_20260817_s5",
+      "locator": "Item 7 MD&A Liquidity — capital expenditures",
+      "quote": "For fiscal year 2027, we anticipate increased capital investments as we transition to newer nodes to meet the demand and technology needs of our product portfolio."
+    },
+    {
+      "id": "sndk_10_k_20260817_s6",
+      "locator": "Notes — Flash Ventures K2",
+      "quote": "The primary purpose of K2 is to provide clean room space to continue the transition of existing flash-based wafer capacity to newer flash technology nodes. Output from K2 began in the fiscal year ended July 3, 2026."
+    }
+  ]
+}

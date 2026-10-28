@@ -1,0 +1,7 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/723125/000072312526000023/mu-20260903.htm
+
+Excerpt:
+In 2024, we began volume production of Micron G9 NAND, representative of the industry's ninth-generation 3D NAND node. The majority of our NAND bit production in 2026 was on leading-edge Micron G8 and G9 NAND nodes. Our NAND flash includes triple-level cell (“TLC”) and quad-level cell (“QLC”), each with varying levels of storage density, performance, and endurance.
+In 2026, we began volume production of our G9 NAND-based PCIe Gen6 high-performance data center SSDs, which accelerate AI training and inference workloads with faster data transfers and improve energy efficiency.
+The AI-driven growth in the data center has accelerated demand for memory and storage at a rate greater than our ability and the industry’s ability to increase supply. This has led to decisions on supply allocation that may impact certain customers and end markets. Robust overall DRAM and NAND demand and constrained supply has led to increased pricing and improved the profitability across our portfolio.
+In January 2026, we broke ground on an additional advanced wafer fab facility located within our existing NAND manufacturing complex. This facility will provide additional cleanroom space when it becomes operational in the second half of calendar 2028, helping address growing market demand for NAND technology driven by the rapid expansion of AI and data-centric applications
