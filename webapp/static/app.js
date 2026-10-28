@@ -243,7 +243,8 @@ function renderCard(row) {
     // reason，例：非邊緣的市值與分析師家數；2026-10-28 使用者「看不出來這些公司為何沒有敘事」），這裡照抄不組字。
     const cand = row.candidate || {};
     card.appendChild(el('div', 'card-brief absent',
-      cand.list_group === 'no_narrative' && cand.reason ? cand.reason : '還沒寫短評'));
+      (cand.list_group === 'no_narrative' || cand.list_group === 'not_edge_no_narrative') && cand.reason
+        ? cand.reason : '還沒寫短評'));
   }
   const attention = row.primary_attention;
   if (attention) {
@@ -1200,6 +1201,12 @@ function sharedBetLines(row, tag) {
   return (bet.lines || []).map((text) => el(tag || 'div', 'row-reason', text));
 }
 
+/** 首頁分組的中文（`alpha.candidates.LIST_GROUP_LABELS` 經 `.meta.json` 的那一份；讀不到回 null，不另寫一份）。 */
+function listGroupLabel(key) {
+  const hit = ((VOCAB && VOCAB.list_groups) || []).find((g) => g.key === key);
+  return hit ? hit.label : null;
+}
+
 function candidateLine(view, inQuestions) {
   const panel = view.candidate;
   if (!panel) return null;      // 3.7 之前 materialize 的 artifact 沒有這個面板
@@ -1217,7 +1224,9 @@ function candidateLine(view, inQuestions) {
     if (typeof row.stall_days === 'number') head.appendChild(el('span', 'dim', `　滯留 ${row.stall_days} 天`));
     if (row.sheet_verified === false) head.appendChild(el('span', 'dim', '　持股未驗'));
   } else {
-    const badge = absenceBadge(panel.absence_kind);
+    // 非邊緣＝規定不寫敘事，不是「還沒做」（2026-10-28 使用者）：產生端在 context 宣告 edge_state，字取首頁分組字彙那一份。
+    const notEdge = (panel.context || {}).edge_state === 'not_edge' && listGroupLabel('not_edge_no_narrative');
+    const badge = notEdge ? el('span', 'badge', notEdge) : absenceBadge(panel.absence_kind);
     if (badge) head.appendChild(badge);
     if (panel.reason) head.appendChild(el('span', 'dim', '　' + panel.reason));
   }
@@ -3231,9 +3240,9 @@ async function renderCandidates() {
   // 2026-10-07 起清單住首頁的「沒有敘事」那一組（首頁照候選狀態分組）——這裡原本摺著同一份清單，重複就拿掉，只留一句與連結。
   const secX = el('section', 'panel');
   secX.appendChild(el('h2', null, `沒有敘事、不上板（${counts.no_narrative ?? 0}）`));
-  const noteX = el('p', 'note', '候選狀態是寫敘事時宣告的——這些檔還沒寫敘事，所以不在上面任何一組。'
-    + '要讓一檔上板，路是研究它、寫敘事（研究 session 做），不是這個畫面。是哪幾檔：');
-  const homeLink = el('a', null, '首頁「沒有敘事」那一組');
+  const noteX = el('p', 'note', '候選狀態是寫敘事時宣告的——這些檔沒有敘事，所以不在上面任何一組。'
+    + '分兩種：非邊緣的規定不寫（它的財報當層的證據用）；邊緣的是還沒寫（研究 session 會排到）。是哪幾檔、各自為什麼：');
+  const homeLink = el('a', null, '首頁「不寫敘事（非邊緣）」與「還沒寫敘事」兩組');
   homeLink.href = '#/';
   noteX.appendChild(homeLink);
   noteX.appendChild(document.createTextNode('（依代號字母，不是名次）。'));

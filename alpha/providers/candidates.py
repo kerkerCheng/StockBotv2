@@ -575,9 +575,10 @@ def page_input(context: Mapping[str, Any], ticker: str, company_id: str | None, 
         page_row["derived_label"] = (GROUP_LABELS.get(str(derived)) or SIDE_LABELS.get(str(derived))
                                      or SIDE_LABELS.get(str(row.get("side"))))
     elif sheet.get("status") == "ok":
-        row_absence = {"kind": "not_yet_recorded",
-                       "reason": no_narrative_reason((context.get("edges") or {}).get(str(ticker).upper()), records,
-                                                     today=today)}
+        edge = (context.get("edges") or {}).get(str(ticker).upper())
+        # `edge_state` 跟著缺席走到首頁分組：非邊緣＝規定不寫（不是待做），與「邊緣、還沒寫」分兩組（L12）。
+        row_absence = {"kind": "not_yet_recorded", "reason": no_narrative_reason(edge, records, today=today),
+                       "edge_state": (edge or {}).get("state")}
     else:
         # Sheet 讀不到時「也沒有持有」是沒驗過的否定（3.7 R1；L12）——產生端宣告暫停，不是「還沒做」。
         row_absence = {"kind": "upstream_unavailable",

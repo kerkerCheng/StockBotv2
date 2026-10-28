@@ -489,7 +489,10 @@ def _candidate_panel(candidate: Mapping[str, Any] | None) -> AnalystPanel:
     return AnalystPanel(**base, status=status, source_statuses={"candidates": status},
                         source_absence_kinds={"candidates": state.absence_kind}, lines=tuple(lines), notes=notes,
                         context={"available": row is not None, "today": candidate.get("today"),
-                                 "sheet": dict(candidate.get("sheet") or {})},
+                                 "sheet": dict(candidate.get("sheet") or {}),
+                                 # 沒有敘事時的邊緣判定（產生端宣告；首頁分「不寫（非邊緣）」與「還沒寫」兩組用）
+                                 "edge_state": (candidate.get("row_absence") or {}).get("edge_state") if row is None
+                                 else None},
                         reason=state.reason)
 
 

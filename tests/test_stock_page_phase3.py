@@ -601,6 +601,13 @@ def test_no_narrative_page_says_why_there_is_no_narrative(monkeypatch) -> None:
     assert "非邊緣：7.3B USD、分析師 16 位" in reason and "分析師 ≤12 位" in reason and "超過的是分析師家數" in reason
     edge_page = cand.page_input(_context(), T, CO, three_questions=_tq())
     assert "非邊緣" not in edge_page["row_absence"]["reason"] and "邊緣判定：邊緣" in edge_page["row_absence"]["reason"]
+    # 首頁分組：非邊緣＝「不寫敘事（非邊緣）」，邊緣＝「還沒寫敘事」——邊緣判定經面板 context 走到 overview（L12 分兩組）
+    from webapp.materialize import _candidate_overview
+
+    def group(p):
+        return _candidate_overview(build_analyst_view(_bare_view(), candidate=p).to_dict()["candidate"])["list_group"]
+
+    assert group(page) == "not_edge_no_narrative" and group(edge_page) == "no_narrative"
 
     class _Retracted:
         retracted, created_at, note = True, "2026-10-22T00:46:14+00:00", "非邊緣後撤回"

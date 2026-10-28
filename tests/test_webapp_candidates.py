@@ -141,9 +141,9 @@ def test_frontend_lists_no_narrative_tickers_and_says_how_to_get_on_the_board() 
     from alpha.candidates import LIST_GROUPS
 
     source = (Path(__file__).resolve().parents[1] / "webapp" / "static" / "app.js").read_text(encoding="utf-8")
-    assert "沒有敘事、不上板" in source and "要讓一檔上板，路是研究它、寫敘事" in source
-    assert "首頁「沒有敘事」那一組" in source
-    assert "no_narrative" in LIST_GROUPS                                   # 首頁真的有那一組（不是連到空的地方）
+    assert "沒有敘事、不上板" in source and "非邊緣的規定不寫" in source and "邊緣的是還沒寫" in source
+    assert "首頁「不寫敘事（非邊緣）」與「還沒寫敘事」兩組" in source      # 2026-10-28 拆成兩組（L12）
+    assert {"no_narrative", "not_edge_no_narrative"} <= set(LIST_GROUPS)   # 首頁真的有那兩組（不是連到空的地方）
 
 
 def test_board_rides_get_node_names_from_the_graph_and_fall_back_to_ids(monkeypatch) -> None:

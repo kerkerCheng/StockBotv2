@@ -28,9 +28,13 @@ SIDE_LABELS: Mapping[str, str] = {"not_multiple": "非倍率候選", "edge_unmea
 #: 首頁（單檔判讀清單）的分組（2026-10-07 使用者指示）：候選板同一組字＋兩個出口——沒寫敘事、這次沒讀到（L12：兩件事）。
 #: **順序是閱讀順序，不是名次**：研究時間花最多的在上（已持有、可開、缺 X、等回落——Phase 7 A4「深度」壓在這裡），
 #: 敘事要重寫的其次，判斷過「不要」的在最後；組內一律 ticker 字母序（AGENTS：不得輸出跨檔全序）。
+#: 沒有敘事分兩組（2026-10-28 使用者：「還沒寫敘事」讓 104 檔非邊緣看起來像待做）：`no_narrative`＝邊緣或量不到、
+#: 該寫還沒寫（研究待做）；`not_edge_no_narrative`＝非邊緣、規定不寫（不是待做，放在「不要」之後）。
 LIST_GROUPS: tuple[str, ...] = ("held", "open", "missing", "priced_wait", "precondition_failed", "legacy",
-                                "edge_unmeasurable", "no_narrative", "not_multiple", "pass", "unavailable")
-LIST_GROUP_LABELS: Mapping[str, str] = {**GROUP_LABELS, **SIDE_LABELS, "no_narrative": "還沒寫敘事",
+                                "edge_unmeasurable", "no_narrative", "not_multiple", "pass", "not_edge_no_narrative",
+                                "unavailable")
+LIST_GROUP_LABELS: Mapping[str, str] = {**GROUP_LABELS, **SIDE_LABELS, "no_narrative": "還沒寫敘事（邊緣，該寫）",
+                                        "not_edge_no_narrative": "不寫敘事（非邊緣）",
                                         "unavailable": "候選狀態這次沒讀到"}
 #: 敘事宣告的兩題 → 首屏三個字（§8 第 1 點）；v1 或沒有敘事一律「未答」。
 ANSWER_WORDS: Mapping[str, str] = {"yes": "是", "no": "否", "unmeasurable": "無法量"}

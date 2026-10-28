@@ -128,7 +128,12 @@ def _candidate_overview(panel: Mapping[str, Any]) -> dict[str, Any]:
         return {"list_group": "unavailable", "label": None, "absence_kind": "upstream_unavailable",
                 "reason": f"候選狀態的值 {row.get('derived')!r} 不在首頁分組字彙裡（alpha.candidates.LIST_GROUPS）"}
     kind = datum.get("absence_kind") or panel.get("absence_kind")
-    return {"list_group": "no_narrative" if kind == "not_yet_recorded" else "unavailable", "label": None,
+    group = "unavailable"
+    if kind == "not_yet_recorded":
+        # 非邊緣＝規定不寫，不是待做（產生端在面板 context 宣告 edge_state；不 parse 理由句，L16）
+        not_edge = (panel.get("context") or {}).get("edge_state") == "not_edge"
+        group = "not_edge_no_narrative" if not_edge else "no_narrative"
+    return {"list_group": group, "label": None,
             "absence_kind": kind or "upstream_unavailable", "reason": datum.get("reason") or panel.get("reason")}
 
 
