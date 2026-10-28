@@ -654,3 +654,12 @@ table.pt-table th, table.pt-table td { vertical-align: top; overflow-wrap: anywh
 .account-more { margin-top: 4px; }
 .account-detail { margin: 6px 0 10px; }
 .excess-triple div { white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+/* 個股頁「問 Claude」（2026-10-28）：一顆按鈕，複製不了時攤開那一段讓人自己複製 */
+.ask-claude { margin-top: 8px; }
+.ask-btn { font: inherit; font-size: 13px; padding: 4px 12px; border-radius: 8px; cursor: pointer;
+  border: 1px solid var(--border); background: var(--surface); color: var(--accent); }
+.ask-btn:hover, .ask-btn:focus { border-color: var(--accent); }
+.ask-status { font-size: 12px; }
+.ask-text { display: block; box-sizing: border-box; width: 100%; margin-top: 6px; padding: 8px; font: inherit; font-size: 12px;
+  color: var(--text); background: var(--surface); border: 1px solid var(--border); border-radius: 8px; }

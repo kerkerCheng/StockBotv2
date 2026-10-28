@@ -1408,6 +1408,7 @@ async function renderDetail(ticker) {
   if (what) head.appendChild(what);
   const sub = headerLine(payload, view);
   if (sub) head.appendChild(sub);
+  head.appendChild(askClaudeButton(payload, view));   // 2026-10-28 定案 8：把這一頁帶進對話
   app.appendChild(head);
 
   // 2026-10-08 使用者：「舊有的資訊非必要的就拿掉，除非是給我看的；給機器看的不用顯示出來」。
@@ -1448,6 +1449,74 @@ function headerLine(payload, view) {
   const generated = payload.freshness && payload.freshness.generated_at;
   if (generated) bits.push(`這份判讀產生於 ${String(generated).slice(0, 10)}`);
   return bits.length ? el('div', 'detail-sub', bits.join('｜')) : null;
+}
+
+/* ---------- 個股頁「問 Claude」（2026-10-28 定案 8：APP 怎麼協助理解一間公司、跟 agent 對話展開） ----------
+   一顆按鈕把這一頁的現況組成一段提示、複製到剪貼簿，貼進 Claude Code（這個 repo）的對話裡展開。APP 本身不跑 LLM、不連外
+   （request path 規則不動）；提示裡的每一個字都是這一頁已經印出來的（做什麼、候選狀態、理由、在等什麼），不另算、不另抓。
+   剪貼簿不給用時攤開那一段讓你自己複製——不假裝複製成功。`?ask=1` 把提示印進隱藏的 `#ask-preview`（headless 驗證用，同 selfcheck）。 */
+
+function askClaudePrompt(payload, view) {
+  const lines = view && view.candidate ? lineMap(view.candidate) : {};
+  const state = lines['candidate:state'] && lines['candidate:state'].datum;
+  const row = (state && state.value) || null;
+  const what = payload.what_it_does || {};
+  const name = payload.company_label ? `${payload.company_label}（${payload.ticker}）` : payload.ticker;
+  const day = String((payload.freshness || {}).generated_at || '—').slice(0, 10);
+  const out = [`我想在 StockBotv2 這個 repo 裡深入了解 ${name}。APP 個股頁的現況（判讀產生於 ${day}）：`];
+  if (what.line) out.push(`- 做什麼：${what.line}`);
+  if (row) {
+    out.push(`- 候選狀態：${row.derived_label || row.derived || '—'}`
+      + (row.declared && row.declared !== row.derived ? `（敘事宣告：${row.declared_label || row.declared}）` : '')
+      + (typeof row.stall_days === 'number' ? `，滯留 ${row.stall_days} 天` : ''));
+    if (row.reason) out.push(`- 理由：${row.reason}`);
+    if (row.watch) {
+      const when = [row.watch.until && `${row.watch.until} 醒來重看`, row.watch.expires && `最晚 ${row.watch.expires} 到期`];
+      out.push(`- 在等：${when.filter(Boolean).join('；') || '沒寫醒來與到期日'}`);
+    }
+    (row.preconditions || []).forEach((text) => out.push(`- 前提失效：${text}`));
+    (row.rewrite || []).forEach((text) => out.push(`- ${text}`));
+  } else {
+    out.push('- 候選狀態：這一頁沒有候選狀態（還沒寫敘事，或不在候選範圍）');
+  }
+  out.push('', '請先只讀（不寫任何 authority）它的敘事、它押的那一層的讀圖與層說明，然後告訴我：',
+    '① 這一檔在賭什麼、憑什麼、什麼會推翻它——每一句指得回原文；',
+    '② 讀到邊了嗎：客戶為什麼選這家的變體、什麼會讓它被換掉；答不出就寫「缺 X」；',
+    '③ 現在缺什麼、去哪裡拿——要我提供文件就照 AGENTS「向你要文件」那一區列（文件、為什麼、哪裡拿、替代）。');
+  return out.join('\n');
+}
+
+function askClaudeButton(payload, view) {
+  const box = el('div', 'ask-claude');
+  const button = el('button', 'ask-btn', '問 Claude（複製提示）');
+  button.type = 'button';
+  const status = el('span', 'dim ask-status', '');
+  box.appendChild(button);
+  box.appendChild(status);
+  button.addEventListener('click', async () => {
+    const text = askClaudePrompt(payload, view);
+    try {
+      await navigator.clipboard.writeText(text);
+      status.textContent = '　已複製——貼到 Claude Code（這個 repo）的對話裡。';
+    } catch (err) {
+      status.textContent = '　剪貼簿不給用，請自己複製下面這段：';
+      if (!box.querySelector('textarea')) {
+        const area = el('textarea', 'ask-text');
+        area.value = text;
+        area.readOnly = true;
+        area.rows = 10;
+        box.appendChild(area);
+        area.select();
+      }
+    }
+  });
+  if (/[?&]ask=1\b/.test(window.location.search)) {
+    const preview = el('pre', null, askClaudePrompt(payload, view));
+    preview.id = 'ask-preview';
+    preview.hidden = true;
+    box.appendChild(preview);
+  }
+  return box;
 }
 
 /* ---------- 共用：導覽、行內強調、表格 ----------

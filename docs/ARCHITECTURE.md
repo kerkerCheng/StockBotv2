@@ -666,6 +666,12 @@ L16）。兩份 state artifact 與 `/api/v1/candidates`、`/api/v1/watches` 照�
 （`price_budget.order`）：算得出報酬的那幾檔不是全體的抽樣（brainstorm F8）。positions 讀不到＝503，另兩份讀不到各自印缺席；
 artifact 與 `/api/v1/positions`、`/api/v1/account-scorecard` 照留。
 
+**個股頁「問 Claude」（同一輪第五步；定案 8：APP 怎麼協助理解一間公司、跟 agent 對話展開）：** 頁首一顆按鈕把這一頁的現況組成一段提示
+（做什麼、候選狀態、理由、在等什麼——每一個字都是這一頁已經印出來的，`askClaudePrompt` 只讀 payload、不另抓）複製到剪貼簿，
+貼進 Claude Code（這個 repo）的對話裡展開；提示明講「只讀、不寫任何 authority」，按鈕不是繞過四個人工 gate 的捷徑。
+剪貼簿不給用時攤開那一段讓人自己複製（不假裝成功）；`?ask=1` 把提示印進隱藏的 `#ask-preview` 給 headless 驗。
+APP 仍不跑 LLM、沒有寫入端點、不多開任何路由。
+
 **private path 在 materialize 端遮蔽一次。** read model 的理由句會寫出 authority 檔案路徑
 （例：「找不到 session 判斷檔（library/private/alpha/judgments/…）」）；那對開發者有用，但它是 private
 filesystem 結構，不該經由 HTTP 出去。遮成 `«private-authority»`，**其餘文字逐字保留**。
