@@ -1,0 +1,27 @@
+SOURCE: Superior Plus Corp.（TSX: SPB）2026 年第二季財報稿全套（Earnings Release Full Package）——分部 Adjusted EBITDA 與槓桿有限節錄
+URL: https://www.superiorplus.com/wp-content/uploads/2026/08/SPB-Q2-2026-Earnings-Release-Full-Package-vF.pdf
+PUBLISHED: 2026-08-06（財報稿日期）
+RETRIEVED: 2026-10-28（官網憑證過期，經 WebFetch 存下的同一份 PDF 本機 pypdf 抽字）
+STORAGE: repo_excerpt（公司財報稿有限節錄；逐字截取；分部表欄位：Q2 2026／Q2 2025／前六個月 2026／前六個月 2025，單位百萬）
+NOTE: **供應商一手（自述）**。Adjusted EBITDA 是公司自訂的非一般公認會計原則指標。CNG 事業即 Certarus（同一份財報稿的 CNG Results 段，見 spb_q2_2026_results_certarus_data_center_cng.txt）。
+
+【Highlights】
+Propane delivered a strong first half with stable Adjusted EBITDA compared with a strong first half 2025
+
+【Highlights】
+Second quarter (Q2) Adjusted EBITDA (1) of $36.8 million was up $3.3 million, or 10%, primarily due to a record Q2
+
+【Segment table（Q2 2026／Q2 2025／H1 2026／H1 2025）】
+U.S. Propane Adjusted EBITDA(1) (5.1) – 153.6 163.6
+
+【同表】
+Canadian Propane Adjusted EBITDA(1) 15.7 12.6 71.6 61.7
+
+【同表】
+CNG Adjusted EBITDA(1) 33.6 27.4 72.0 82.5
+
+【同表】
+Adjusted EBITDA from operations(1) 44.2 40.0 297.2 307.8
+
+【Non-GAAP Financial Measures — Leverage Ratio】
+Leverage Ratio is determined by dividing Superior’s Net Debt ($1,638.0 million) by its Adjusted EBITDA ($452.2 million),

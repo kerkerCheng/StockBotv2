@@ -1,0 +1,24 @@
+SOURCE: ERock, Inc. Form 10-Q（2026Q2）——Up-C 雙層股權結構、IPO 募資淨額、營收（三個月與六個月）有限節錄
+URL: https://www.sec.gov/Archives/edgar/data/2110029/000119312526346922/eroc-20260630.htm
+PUBLISHED: 2026-08-12（EDGAR 申報日）
+RETRIEVED: 2026-10-28
+STORAGE: repo_excerpt（SEC 申報有限節錄；本機抽字，逐字截取）
+NOTE: **公司一手**。Class B 股與 ER Holdings 的 Class B Units 成對，可一對一換成 Class A 股；只用 Class A 股數算的市值會低估整家公司的股權價值。
+
+【封面】
+As of August 7, 2026, the registrant had 48,174,023 shares of Class A common stock, par value $0.01 per share, outstanding, and 171,226,057 shares of Class B common stock, par value $0.01 per share, outstanding.
+
+【合併損益表（2026Q2／2025Q2／2026 上半年／2025 上半年，千美元）】
+Total revenues 39,878 68,458 71,614 92,566
+
+【附註 IPO】
+The IPO generated net proceeds of $554.0 million after deducting the underwriting discounts and commissions of approximately $37.5 million and offering expenses of approximately $8.5 million.
+
+【附註 Noncontrolling interest】
+As of June 30, 2026, Continuing Equity Unitholders and Continuing Profits Interest Unitholders own 79.95% of the economic interest of ER Holdings through the ownership of Class B Units and Class M Units.
+
+【同段】
+These unitholders have the right to exchange their common units in ER Holdings (along with the cancellation of the paired shares of Class B Common Stock in ERock) for shares of Class A common stock on a one-to-one basis.
+
+【附註 Stockholders' equity】
+52,372,703 shares of Class A common stock were reserved for issuance upon the exchange of Class B Units issued upon conversion of 57,065,274 Class M Units

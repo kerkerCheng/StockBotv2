@@ -1,0 +1,45 @@
+SOURCE: Stabilis Solutions, Inc. Form 10-Q（2026Q2）——液化產能、資料中心長約投資、流失合約、流動性與債務契約有限節錄
+URL: https://www.sec.gov/Archives/edgar/data/1043186/000143774926027112/slng20260630_10q.htm
+PUBLISHED: 2026-08-12（EDGAR 申報日）
+RETRIEVED: 2026-10-28
+STORAGE: repo_excerpt（SEC 申報有限節錄；本機抽字，逐字截取；營運結果表欄位：本季／去年同季／差額／%，單位千美元）
+NOTE: **供應商一手（自述）**。資料中心長約的客戶未具名（「a world-leading provider of remote and temporary power generation」）。
+
+【MD&A LNG Production and Sales】
+We currently own and operate a liquefier that can produce up to 100,000 LNG gallons per day in George West, Texas and a liquefier that can produce up to 30,000 LNG gallons per day in Port Allen, Louisiana.
+
+【同段】
+We also purchase LNG from third-party production sources which allows us to support customers in markets where we do not own liquefiers.
+
+【MD&A Multi-year On-site Power Generation for a Data Center】
+The supply agreement will require investment of approximately $25.0 million in capital additions and working capital needed to secure LNG supply and fund the commissioning of the project.
+
+【附註 Multi-year, On-site Power Generation for a Data Center】
+The advance payments will offset a percentage of each future invoice over the term of the contract, or until fully offset, at which time credit will cease.
+
+【MD&A Results of Operations】
+During the fourth quarter of 2025, two multi-year customer contracts concluded in accordance with their terms.
+
+【同段】
+The two contracts accounted for approximately 19% and 32% of 2025 revenues, respectively.
+
+【營運結果表】
+Total revenues 11,916 17,309 (5,393 ) (31.2 )
+
+【同表】
+Cost of revenues 9,569 12,724 (3,155 ) (24.8 )
+
+【同表】
+Time charter expense 2,851 — 2,851 n/a
+
+【Liquidity and Capital Resources】
+As of June 30, 2026, we had $4.5 million in unrestricted cash and cash equivalents on hand and $14.3 million in restricted cash, $8.2 million in outstanding debt (net of debt issuance costs) and operating lease obligations
+
+【同段】
+Additionally, the Company has successfully exited from its time charter of the Garibaldi significantly alleviating future cash requirements associated with the time charter.
+
+【同節】
+While we believe we have sufficient liquidity and capital resources to fund our ongoing operations and repay our debt, we will require additional capital to fund business expansion.
+
+【同節（債務契約）】
+in the event the Company is unable to maintain minimum profitability in accordance with its forecast and historical trends, it is reasonably possible that the Company could fail to maintain compliance with its consolidated debt service ratio
