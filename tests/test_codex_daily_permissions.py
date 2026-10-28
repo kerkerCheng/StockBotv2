@@ -192,6 +192,20 @@ def test_edinet_and_dart_history_stay_interactive_entries() -> None:
         assert network_entry not in heartbeat, network_entry
 
 
+def test_tagline_ledger_is_written_only_interactively() -> None:
+    """首頁介紹 ledger（A3 文字、只 append；2026-10-28 首頁 compact）只由互動 session 寫（`python -m alpha taglines --add`）：
+    daily 的步驟清單不得出現寫入子命令；daily ⑬ materialize 只讀（`_taglines_loaded` → `current_taglines`），
+    不得碰寫入函式——要讓無人值守寫它必須重做一次 sandbox impact review（OPERATIONS「APP 首頁 compact」）。"""
+    from crons.daily_task import DAILY_STEPS
+
+    assert "taglines" not in RULES.read_text(encoding="utf-8")
+    tokens = [token for step in DAILY_STEPS for token in step.argv]
+    assert "taglines" not in tokens
+    reader = (ROOT / "webapp" / "materialize.py").read_text(encoding="utf-8")
+    assert "current_taglines" in reader                # 讀的那一端確實接在 materialize（不是沒接線才乾淨）
+    assert "write_taglines" not in reader
+
+
 def test_layer_note_ledger_is_written_only_interactively() -> None:
     """層說明 ledger（A3、append-only；個股頁 plan S4a）只由互動 session 寫（`python -m alpha layer-note --add`）：
     daily 的封閉步驟清單不得出現它；心跳與 `audit invariants`（daily 第 14 步）只讀 ledger 與 registry，

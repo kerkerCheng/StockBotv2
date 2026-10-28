@@ -118,6 +118,16 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 `StockBotv2-Daily` 的 ⑱⑲ 取代（1.2a 停用、2026-09-25 1.2b 刪除）；它們的理由（LLM 失敗心跳照發、永遠 exit 0、Python 不用 `.cmd`、
 發送走 subprocess）搬進 `crons/daily_task.py` 的 docstring，守它們的測試改主詞搬進 `tests/test_daily_task.py`「無人值守入口」節。
 
+### Sandbox impact review 結論（2026-10-28：APP 首頁 compact——介紹 ledger、層中文名、日曆與依層）
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | 新檔 `library/private/alpha/taglines.jsonl`（ignored private、只 append）；寫入端只有互動的 `python -m alpha taglines --add`（`python -m alpha brief --add` 成功後多**讀**它一次、沒寫過就印一行提醒）。無人值守路徑上只多**讀**：daily ⑬ materialize（argv 不變）每輪讀一次這個檔與 `config/node_labels_zh.json`（tracked 字彙），個股頁 artifact 的 `overview` 多 `card`（短名、一句做什麼、押的層、狀態天數、重看日、最後 31 個收盤、三題相對組 30 日照抄）——收盤是同一輪既有的 `price_series`，不多連網。request path：`/api/v1/stocks` 多 `calendar`／`by_layer`／`groups[].expanded` 與每張卡的 `watch.past`／`watch.label`（比重看日與今天；api.py 的 import 多 stdlib `datetime`）。不跑 LLM、不寫任何 authority、不碰圖 |
+| **2 canonical skill／prompt／本檔** | 本節；本檔「首頁介紹」命令；`docs/ARCHITECTURE.md` §6.9「首頁 compact 卡片」；brainstorm `2026-10-28-app-attention-ia.md`。不動任何 skill、prompt |
+| **3 最窄 rule** | daily argv 不變；不新增 step、allowlist；API 路由不變（`#/by-layer` 是前端 hash），APP 仍無寫入端點；寫入只在互動 CLI |
+| **4 contract test** | `tests/test_webapp_home_cards.py`（折線挑點是同一個物件、漲跌只抄三題、沒有組就沒有數、介紹三種來源分開標、已持有不印敘事天數、ledger 只 append 且最新為準、六種拒收、一筆不過整批不寫、跟現行一樣不寫、壞行回報不丟、日曆時間序與兩週窗與已過、別年的重看日印全日期、依層攤開組並另數收合組）；`tests/test_webapp_request_path.py` 白名單加 `datetime`；變異 2／2 |
+| **5 端到端 smoke** | 見 ROADMAP 旁支開發項「APP 照使用者問題重組」①的驗收現值（真資料 190 頁重跑、headless Edge 渲染首頁與 `#/by-layer`） |
+
 ### Sandbox impact review 結論（2026-10-28：`claude -p` 固定 effort——failure log #107）
 
 | 步 | 結論 |
@@ -1076,6 +1086,11 @@ materialize 用**，不動 `discover_tracked_tickers`——那會連帶擴大 ED
 & '.venv\Scripts\python.exe' -m alpha layer-reps mat:inp_epiwafer                    # 列出（標出現行那一份）
 & '.venv\Scripts\python.exe' -m alpha layer-reps mat:inp_epiwafer --add spec.json    # spec：expires、reread_reason、representatives[]（company_id、scope、segment、why、citations）；換版帶 supersedes_id
 #   寫完要在個股頁 B2「路徑上各層」看到：python -m webapp materialize（全部頁；各層一輪只算一次）
+# 首頁介紹（2026-10-28 首頁 compact；短名＋一句做什麼 ≤14 字，只寫做什麼、不寫判斷與數字；一個檔、只 append、不 gate 任何東西）
+& '.venv\Scripts\python.exe' -m alpha taglines                                        # 每家現行那一筆
+& '.venv\Scripts\python.exe' -m alpha taglines --add spec.json                        # spec：[{ticker, short_name, text}]；名冊、字數、禁字核對，一筆不過整批拒收
+#   寫完要在首頁卡片看到：python -m webapp materialize（點名那幾檔也行）；沒寫的卡片印押的層的中文名（config/node_labels_zh.json），再沒有就印「還沒寫介紹」
+#   新敘事寫完順手寫一句（研究 session 的收尾，和敘事同一輪）
 # 閱讀頁（2026-10-07 個股頁 plan S4b；APP #/layer-notes、#/layer/<節點>；daily ⑬ 每天重建）——寫完層說明想馬上在 APP 讀到：
 & '.venv\Scripts\python.exe' -m webapp materialize --layer-notes                         # 只重建閱讀頁（全文、出處的文件自宣告、主張狀態、哪幾頁連過來）
 & '.venv\Scripts\python.exe' -m webapp materialize COHR LITE --layer-notes               # 連個股頁「坐的層」的連結一起更新（只重跑點名的那幾檔）

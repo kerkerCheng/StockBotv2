@@ -347,6 +347,16 @@ def cmd_brief(args: argparse.Namespace) -> int:
               f"｜收掉舊版 {len(result['consumed'])}｜處置 {len(result['acknowledged'])}"
               f"｜加碼條件新登 {len(result.get('confirm_registered') or ())}")
         print(f"  下一步：python -m webapp materialize {ticker}（首屏會長出七句；引用解析不到的格會現形）")
+        # 首頁卡片的一句做什麼（2026-10-28）：寫敘事的這一刻最知道它做什麼——沒寫過就在這裡提醒，不靠人記得（L14）
+        if not args.retract:
+            try:
+                from .providers.taglines import current_taglines
+
+                if str(record.get("company_id")) not in current_taglines()[0]:
+                    print(f"  ⚠ 首頁還沒有它的介紹：python -m alpha taglines --add spec.json"
+                          f"（[{{\"ticker\": \"{ticker}\", \"short_name\": …, \"text\": ≤14 字做什麼}}]）")
+            except Exception:  # noqa: BLE001 — 提醒讀不到不擋敘事寫入
+                pass
         return 0
     records, errors = read_brief_records(ticker)
     if args.format == "json":
@@ -816,6 +826,45 @@ def cmd_layer_reps(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_taglines(args: argparse.Namespace) -> int:
+    """首頁卡片的短名與一句做什麼（2026-10-28 使用者：「10 字左右的介紹吧。不然我也不會點進去」）。
+
+    - `--list`（預設）：每家現行那一筆。
+    - `--add spec.json`：整批 append。spec：`[{"ticker", "short_name", "text"}, …]`（或 `{"items": […]}`）。
+      名冊、字數（做什麼 ≤ 14、短名 ≤ 10）、禁字由本命令核對，任一筆不過整批拒收。
+
+    ⚠ 只寫做什麼、不寫判斷；不 gate 任何東西。寫完要重跑 `python -m webapp materialize` 首頁才看得到。
+    """
+    from .providers.taglines import current_taglines, write_taglines
+
+    if args.add:
+        try:
+            spec = json.loads(Path(args.add).read_text(encoding="utf-8"))
+            items = spec.get("items") if isinstance(spec, dict) else spec
+            if not isinstance(items, list):
+                raise ValueError("spec 要是一個 list，或 {\"items\": [...]}")
+            written = write_taglines(items, author=str((spec.get("author") if isinstance(spec, dict) else None)
+                                                       or "session"))
+        except (KeyError, ValueError, TypeError, AlphaError) as exc:
+            print(f"✗ {exc}", file=sys.stderr)
+            return 2
+        print(f"✓ 寫入 {len(written)} 筆（重跑 `python -m webapp materialize` 首頁才看得到）")
+        for rec in written:
+            print(f"  - {rec['ticker']}｜{rec['short_name']}｜{rec['text']}" + ("（換版）" if rec.get("supersedes_id") else ""))
+        return 0
+    current, errors = current_taglines()
+    rows = sorted(current.values(), key=lambda r: r["ticker"])
+    if args.format == "json":
+        print(json.dumps({"current": rows, "parse_errors": errors}, ensure_ascii=False, indent=2))
+        return 0
+    print(f"# 首頁介紹（現行 {len(rows)} 家）")
+    for r in rows:
+        print(f"- {r['ticker']}｜{r['short_name']}｜{r['text']}｜{r['created_at'][:10]}")
+    if errors:
+        print(f"⚠ 解析失敗 {len(errors)} 行：" + "；".join(errors[:3]))
+    return 0
+
+
 # ⚠ **2026-09-23（Phase 0 Step 0b.1b）：`cmd_entry_criterion` 與 `entry-criterion` 子命令退役（F 組）。**
 # EntryCriterion ledger 的讀寫入口。ledger 檔案本身留在 `library/private/alpha/entry_criteria/`
 # （private append-only，L10：拿不回來的只能 append），但**沒有任何消費端**——進場靠判斷。
@@ -863,6 +912,13 @@ def build_parser() -> argparse.ArgumentParser:
     reps.add_argument("--retract", help="append 一筆撤回紀錄（指定 rep_id）")
     reps.add_argument("--format", choices=("markdown", "json"), default="markdown")
     reps.set_defaults(func=cmd_layer_reps)
+
+    tags = sub.add_parser(
+        "taglines", help="首頁卡片的短名與一句做什麼：--list／--add spec.json（研究 session 寫、只 append、不 gate 任何東西）")
+    tags.add_argument("--list", action="store_true", help="（預設）每家現行那一筆")
+    tags.add_argument("--add", help="整批 append（JSON：[{ticker, short_name, text}]；名冊、字數、禁字由本命令核對）")
+    tags.add_argument("--format", choices=("markdown", "json"), default="markdown")
+    tags.set_defaults(func=cmd_taglines)
 
     edge = sub.add_parser(
         "edge", help="研究時判邊緣（唯讀）：名冊外的代號也能判——同一個判定函式與門檻，缺的輸入用 yfinance 補、逐欄標來源")

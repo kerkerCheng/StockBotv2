@@ -173,16 +173,12 @@ function absenceBadge(kind) {
    stanceBadge／stanceBanner）與 appendReturnBlock（隱含報酬那一格）退役。stance 是 FY+1 模型對估值假設
    derivation 的聚合，隱含報酬是估值鏈的終點——兩者都不在 read model 裡了。 */
 
-function readinessLabel(state) {
-  const table = (VOCAB && VOCAB.readiness_states) || {};
-  return table[state] || '';
-}
+/* ⚠ 2026-10-28：卡片上的 readiness 徽章（readinessBadge／readinessLabel）隨首頁 compact 拿掉——那是給機器看的狀態，
+   個股頁的稽核區照樣印得出來（使用者：「首頁根本不用講這麼多」）。 */
 
-function readinessBadge(state) {
-  const text = { ready: 'ready', ready_with_flags: 'ready · 有旗標', blocked: 'blocked' }[state] || state;
-  const badge = el('span', 'badge badge-' + state, text);
-  badge.title = readinessLabel(state);
-  return badge;
+function truncate(text, limit) {
+  const value = String(text);
+  return value.length > limit ? value.slice(0, limit) + '…' : value;
 }
 
 /* ---------- 清單 ---------- */
@@ -195,90 +191,123 @@ function numberBlock(label, valueText, subText, klass) {
   return box;
 }
 
+/* 首頁卡片（2026-10-28 使用者：「首頁根本不用講這麼多…compact 一點…有 30d 折線圖…10 字左右的介紹吧。不然我也不會點進去」）。
+   只留四樣：名字＋代號｜一句做什麼｜狀態多久與哪天重看｜30 個交易日折線（有主題組的加印本檔與比組）。短評全文、readiness、
+   缺席理由都在個股頁。每一格都是 materialize 端 `overview.card` 的原值；沒寫介紹就說「還沒寫介紹」，不留白（INV-3）。 */
 function renderCard(row) {
-  const card = el('a', 'card');
+  const card = el('a', 'card card-compact');
   card.href = '#/' + encodeURIComponent(row.ticker);
-
-  const head = el('div', 'card-head');
-  const left = el('div');
-  left.appendChild(el('div', 'ticker', row.ticker));
-  left.appendChild(el('div', 'company', row.company_label || row.company_id || ''));
-  head.appendChild(left);
-
-  const badges = el('div', 'badges');
-  badges.appendChild(readinessBadge(row.readiness.state));
-  // 研究完整度（2026-10-07 起不再是首頁分組，留在卡上）：只印兩種不常見、而且下一步不同的終局
-  if (row.closure_terminal === 'settled' || row.closure_terminal === 'awaiting_report') {
-    badges.appendChild(el('span', 'badge badge-fresh', row.closure_label || row.closure_terminal));
-  }
-  // ⚠ 2026-09-23（Phase 0 Step 0b.1b）：stance 徽章（這份判讀是不是我們自己的）隨 FY+1 模型退役。
+  const c = row.card || {};
+  const body = el('div', 'card-body');
+  const title = el('div', 'card-title');
+  title.appendChild(el('span', 'card-name', c.short_name || row.company_label || row.ticker));
+  title.appendChild(el('span', 'card-ticker', row.ticker));
   if (row.freshness && row.freshness.state === 'stale') {
     const b = el('span', 'badge badge-stale', 'stale');
     b.title = row.freshness.rule;
-    badges.appendChild(b);
+    title.appendChild(b);
   }
-  head.appendChild(badges);
-  card.appendChild(head);
-
-  const numbers = el('div', 'numbers');
-  const price = row.price;
-  numbers.appendChild(numberBlock(
-    '現價',
-    fmtQuantity(price.value, price.quote_unit) || '—',
-    price.as_of ? `bar ${price.as_of}` : (price.reason ? '無現價' : '')));
-
-  // ⚠ 2026-09-23（Phase 0 Step 0b.1）：卡片上的「沒賭對，要漲跌多少」與「賭注對了」兩格退役
-  // ——它們是 overview.implied_return／payoff，也就是 ROADMAP 首屏那一列要拿掉的那把尺。
-  // 卡片剩下的數字只有現價（A2 觀測）。「已定價嗎」改由財務三題回答（Phase 3）。
-  card.appendChild(numbers);
-
-  // 卡片＝短評第一句。⚠ 2026-09-23（Phase 0 Step 0b.1）：**尺的縮圖整塊退役**
-  // （尺上原本是現價／沒賭對／賭對／分析師平均／區間）。首屏的單位是句不是格（AGENTS「APP」），
-  // 所以卡片上留下來的是那句話，不是那把尺。
-  const brief = row.brief || {};
-  if (brief.our_bet && typeof brief.our_bet.value === 'string') {
-    card.appendChild(el('div', 'card-brief', brief.our_bet.value));
-  } else {
-    // 缺席要現形：沒寫短評不是空白（INV-3）。沒有敘事的那一組印「為什麼沒有」——理由由產生端給（候選狀態格的
-    // reason，例：非邊緣的市值與分析師家數；2026-10-28 使用者「看不出來這些公司為何沒有敘事」），這裡照抄不組字。
-    const cand = row.candidate || {};
-    card.appendChild(el('div', 'card-brief absent',
-      (cand.list_group === 'no_narrative' || cand.list_group === 'not_edge_no_narrative') && cand.reason
-        ? cand.reason : '還沒寫短評'));
-  }
-  const attention = row.primary_attention;
-  if (attention) {
-    const kind = attention.absence_kind;
-    const tone = attention.settled ? 'settled'
-      : (row.readiness.state === 'blocked' ? 'blocked' : 'flags');
-    const box = el('div', 'attention ' + tone);
-    const head2 = el('div', 'attention-head');
-    head2.appendChild(document.createTextNode(
-      `${plainPanel(attention.panel, PANEL_TITLE[attention.panel] || attention.panel).title}：${attention.status}`));
-    const badge = absenceBadge(kind);
-    if (badge) { head2.appendChild(document.createTextNode(' ')); head2.appendChild(badge); }
-    box.appendChild(head2);
-    if (attention.reason) box.appendChild(el('div', 'attention-body', truncate(attention.reason, 220)));
-    if (row.readiness.blocker_count > 1) {
-      box.appendChild(el('div', 'attention-body',
-        `本節之外另有 ${row.readiness.blocker_count - 1} 項 blocker`));
-    }
-    card.appendChild(box);
-  }
+  body.appendChild(title);
+  const tag = c.tagline || {};
+  // 一句做什麼的來源分開標（L12）：研究寫的介紹照印；沒寫時退到押的層的中文名（前面加「押在」）；再沒有就說還沒寫
+  const tagText = tag.source === 'ledger' ? tag.text : (tag.source === 'layer' ? `押在 ${tag.text}` : '還沒寫介紹');
+  body.appendChild(el('div', 'card-tagline' + (tag.source === 'ledger' ? '' : ' absent'), tagText));
+  body.appendChild(cardStateLine(row));
+  card.appendChild(body);
+  card.appendChild(cardSpark(c));
   return card;
 }
 
-function truncate(text, limit) {
-  const value = String(text);
-  return value.length > limit ? value.slice(0, limit) + '…' : value;
+/* 狀態那一行：候選狀態（照抄）· 這個狀態幾天（敘事連續宣告同一個狀態的天數；狀態不是敘事宣告的就不印）· 哪天重看。 */
+function cardStateLine(row) {
+  const c = row.card || {};
+  const cand = row.candidate || {};
+  const line = el('div', 'card-state');
+  if (cand.label) line.appendChild(el('span', 'card-chip chip-' + (cand.list_group || 'none'), cand.label));
+  if (typeof c.stall_days === 'number') {
+    const days = el('span', 'card-days', c.stall_days === 0 ? '今天起' : `${c.stall_days} 天`);
+    days.title = `這個狀態從 ${c.since || '—'} 起（敘事連續宣告同一個狀態的天數）`;
+    line.appendChild(days);
+  }
+  if (c.watch && c.watch.until) {
+    const label = c.watch.label || c.watch.until;            // 印法由 API 定（別年的印全日期）
+    const when = el('span', 'card-when' + (c.watch.past ? ' past' : ''),
+      c.watch.past ? `${label} 該重看了` : `${label} 重看`);
+    when.title = `研究寫下的重看日 ${c.watch.until}`;
+    line.appendChild(when);
+  }
+  return line;
 }
 
-const PANEL_TITLE = {
-  headline: '頭條', fundamental: '基本面', why: '怎麼算到這裡',
-  research: '研究現況', entry: 'Entry（optional）',
-};
+/* 折線與漲跌。漲跌只印三題「已定價③：相對組 30 個交易日」已算好的數（沒有主題組的檔只畫線）——前端不另算報酬。 */
+function cardSpark(c) {
+  const box = el('div', 'card-spark');
+  const pts = c.spark || [];
+  if (pts.length >= 2) box.appendChild(sparkline(pts));
+  else box.appendChild(el('span', 'card-nospark', '沒有收盤'));
+  const m = c.move;
+  if (m && typeof m.own === 'number') {
+    const own = el('div', 'spark-own', signedPct(m.own));
+    own.title = `${m.label || '30 個交易日'}：本檔 ${signedPct(m.own)}、主題等權組 ${signedPct(m.cohort)}（${m.as_of || ''}）`;
+    box.appendChild(own);
+    box.appendChild(el('div', 'spark-rel', `比組 ${signedPct(m.relative)}`));
+  }
+  return box;
+}
 
-async function renderList() {
+function cardGrid(rows) {
+  const cards = el('div', 'cards cards-compact');
+  rows.forEach((row) => { if (row) cards.appendChild(renderCard(row)); });
+  return cards;
+}
+
+/* 「接下來兩週會揭曉」：日期序由後端排好（時間序不是名次），前端照印。 */
+function renderCalendar(cal) {
+  if (!cal || !(cal.dates || []).length) return null;
+  const box = el('section', 'calendar');
+  box.appendChild(el('h2', 'group-head', `接下來 ${cal.days} 天會揭曉`));
+  const strip = el('div', 'cal-strip');
+  cal.dates.forEach((d) => {
+    const day = el('div', 'cal-day' + (d.past ? ' past' : ''));
+    day.appendChild(el('div', 'cal-date', d.past ? `${d.date.slice(5)} 已過` : d.date.slice(5)));
+    const names = el('div', 'cal-names');
+    (d.stocks || []).forEach((s, i) => {
+      if (i) names.appendChild(document.createTextNode('、'));
+      const a = el('a', null, s.name || s.ticker);
+      a.href = '#/' + encodeURIComponent(s.ticker);
+      a.title = `${s.ticker}${s.state ? '｜' + s.state : ''}`;
+      names.appendChild(a);
+    });
+    day.appendChild(names);
+    strip.appendChild(day);
+  });
+  box.appendChild(strip);
+  if (cal.note) box.appendChild(el('p', 'note', cal.note));
+  return box;
+}
+
+function viewToggle(mode) {
+  const bar = el('div', 'view-toggle');
+  [['state', '依狀態', '#/'], ['layer', '依層', '#/by-layer']].forEach((item) => {
+    const a = el('a', 'toggle-btn' + (item[0] === mode ? ' on' : ''), item[1]);
+    a.href = item[2];
+    bar.appendChild(a);
+  });
+  return bar;
+}
+
+/* 收合的組（不要、無法量、還沒寫、非邊緣…）：照數、點開才畫卡片——攤開哪幾組由後端 `groups[].expanded` 說。 */
+function collapsedGroup(group, rows) {
+  const box = el('details', 'group-collapsed');
+  box.appendChild(el('summary', null, `${group.label}（${rows.length}）`));
+  let drawn = false;
+  box.addEventListener('toggle', () => {
+    if (box.open && !drawn) { box.appendChild(cardGrid(rows)); drawn = true; }
+  });
+  return box;
+}
+
+async function renderList(mode) {
   markNav('stocks');
   const data = await getJSON(`${API}/stocks`);
   app.textContent = '';
@@ -288,33 +317,53 @@ async function renderList() {
       '還沒有任何 materialized 判讀。請在本機跑 `python -m webapp materialize <TICKER>`。'));
     return;
   }
+  const cal = renderCalendar(data.calendar);
+  if (cal) app.appendChild(cal);
+  const byLayer = mode === 'layer' && data.by_layer;
+  app.appendChild(viewToggle(byLayer ? 'layer' : 'state'));
+
+  /* 分段呈現。組序、層序、組內順序都來自 /api/v1/stocks（後端已排好），前端不自己排、不自己命名。 */
+  const groups = data.groups || [];
+  const byTicker = {};
+  data.stocks.forEach((row) => { byTicker[row.ticker] = row; });
+  if (byLayer) {
+    (byLayer.layers || []).forEach((layer) => {
+      const head = el('h2', 'group-head', `${layer.label}（${layer.tickers.length}）`);
+      if (layer.unit_label) head.appendChild(el('span', 'group-sub', layer.unit_label));
+      app.appendChild(head);
+      app.appendChild(cardGrid(layer.tickers.map((t) => byTicker[t])));
+      if ((layer.others || []).length) {
+        app.appendChild(el('p', 'note', '同一層另有：' + layer.others.map((o) => `${o.label} ${o.count}`).join('、')));
+      }
+    });
+    if ((byLayer.unridden || []).length) {
+      app.appendChild(el('h2', 'group-head', `還沒宣告押哪一層（${byLayer.unridden.length}）`));
+      app.appendChild(cardGrid(byLayer.unridden.map((t) => byTicker[t])));
+    }
+    if (byLayer.note) app.appendChild(el('p', 'note', byLayer.note));
+  }
+  if (groups.length) {
+    groups.forEach((group) => {
+      const rows = data.stocks.filter((row) => row.group === group.key);
+      if (!rows.length) return;
+      if (!group.expanded) { app.appendChild(collapsedGroup(group, rows)); return; }
+      if (byLayer) return;                                  // 依層時攤開的組已按層畫過
+      app.appendChild(el('h2', 'group-head', `${group.label}（${rows.length}）`));
+      app.appendChild(cardGrid(rows));
+    });
+    if (data.group_note) app.appendChild(el('p', 'note', data.group_note));
+  } else {
+    app.appendChild(cardGrid(data.stocks));
+  }
+
   /* 常駐計數器。**它必須自己出現**——寫在文件裡的檢查點六天內就被同一個形狀繞過兩次（L14）。
-     ⚠ 2026-09-23：「有幾檔的判讀是我們自己的」隨 stance 退役；剩「已有判讀／有賭注」兩個數。 */
+     2026-10-28：首頁 compact 後搬到頁尾一行（照樣每次都印）。 */
   const counters = data.view_counters;
   if (counters) {
     const bar = el('div', 'counter-bar');
     bar.appendChild(el('strong', null, counters.headline || ''));
     if (counters.note) bar.appendChild(el('span', 'note', counters.note));
     app.appendChild(bar);
-  }
-
-  /* 分段呈現。順序來自 /api/v1/stocks 的 groups（後端已排好），前端不自己排、不自己命名。 */
-  const groups = data.groups || [];
-  if (groups.length) {
-    groups.forEach((group) => {
-      const rows = data.stocks.filter((row) => row.group === group.key);
-      if (!rows.length) return;
-      const head = el('h2', 'group-head', `${group.label}（${rows.length}）`);
-      app.appendChild(head);
-      const cards = el('div', 'cards');
-      rows.forEach((row) => cards.appendChild(renderCard(row)));
-      app.appendChild(cards);
-    });
-    if (data.group_note) app.appendChild(el('p', 'note', data.group_note));
-  } else {
-    const cards = el('div', 'cards');
-    data.stocks.forEach((row) => cards.appendChild(renderCard(row)));
-    app.appendChild(cards);
   }
 
   if (data.unavailable.length) {
@@ -2279,6 +2328,28 @@ function lineChart(series, opts) {
   return wrap;
 }
 
+/* 首頁卡片的折線（2026-10-28）：單一系列（不需圖例）、無軸、線用次要色、最後一點用強調色；hover 讀 <title> 的頭尾兩點。
+   只做座標換算——漲跌數字不在這裡算（卡片照印三題已算好的那幾個）。 */
+function sparkline(points) {
+  const W = 104; const H = 30; const pad = 3;
+  const closes = points.map((p) => p.close);
+  const lo = Math.min.apply(null, closes);
+  const hi = Math.max.apply(null, closes);
+  const span = (hi - lo) || 1;                                   // 座標留白，不是任何財務算術
+  const n = points.length;
+  const x = (i) => pad + (i / (n - 1)) * (W - 2 * pad);
+  const y = (c) => pad + (1 - (c - lo) / span) * (H - 2 * pad);
+  const first = points[0]; const last = points[n - 1];
+  const svg = svgEl('svg', { viewBox: `0 0 ${W} ${H}`, class: 'spark', role: 'img',
+                             'aria-label': `最近 ${n} 個收盤：${first.session_date} 到 ${last.session_date}` });
+  const d = points.map((p, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${y(p.close).toFixed(1)}`).join(' ');
+  svg.appendChild(svgEl('path', { d: d, class: 'spark-line' }));
+  svg.appendChild(svgEl('circle', { cx: x(n - 1).toFixed(1), cy: y(last.close).toFixed(1), r: 2.6, class: 'spark-dot' }));
+  svg.appendChild(svgEl('title', {}, `${first.session_date} 收 ${fmtNumber(first.close, decimalsFor(first.close))}`
+    + ` → ${last.session_date} 收 ${fmtNumber(last.close, decimalsFor(last.close))}`));
+  return svg;
+}
+
 /** 帶正負號的百分比（預設一位小數）。只有這一份——2026-10-08 前追蹤表那邊另有一個同名函式，JS 後宣告的會蓋掉前面的，
  *  兩份剛好都印一位小數才沒出事（同一天新圖表的 `niceTicks` 撞名就讓整頁「無法載入」）。 */
 function signedPct(value, digits = 1) {
@@ -3827,6 +3898,8 @@ async function route() {
     else if (target === 'daily') await renderDaily();
     else if (target === 'layer-notes') await renderLayerNotes();
     else if (target.startsWith('layer/')) await renderLayerNote(target.slice('layer/'.length));
+    // 2026-10-28：首頁「依層」。小寫帶連字號，不會撞到 ticker（ticker 一律大寫）。
+    else if (target === 'by-layer') await renderList('layer');
     else if (target) await renderDetail(target);
     else await renderList();
     if (/[?&]selfcheck=1\b/.test(window.location.search)) setTimeout(selfCheck, 0);

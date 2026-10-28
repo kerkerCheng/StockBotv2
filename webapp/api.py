@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import json
 import os
+from datetime import date, timedelta
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
@@ -138,6 +139,71 @@ _CLOSURE_LABELS: dict[str, str] = {
 }
 #: overview 沒有候選狀態（2026-10-07 之前 materialize 的舊 artifact）——是 artifact 的版本問題，不是「沒有敘事」。
 _STALE_GROUP = {"key": "stale_artifact", "label": "判讀早於這次分組（重跑 materialize 就會歸位）"}
+#: 首頁預設展開的組（2026-10-28 使用者：「單檔判讀頁面太多檔了」）：持有、可開、缺 X、等回落——要你看的；
+#: 其餘（不要、無法量、還沒寫、非邊緣…）收合但照數。組序與中文仍只有 `.meta.json` 那一份，這裡只說哪幾組攤開。
+MAIN_GROUPS: tuple[str, ...] = ("held", "open", "missing", "priced_wait")
+#: 「接下來兩週會揭曉」看多遠（天）。
+CALENDAR_DAYS = 14
+
+
+def _card_name(row: Mapping[str, Any]) -> str:
+    return str(((row.get("card") or {}).get("short_name")) or row.get("company_label") or row.get("ticker") or "")
+
+
+def _calendar(items: Sequence[Mapping[str, Any]], *, today: Any, order: Mapping[str, int]) -> dict[str, Any]:
+    """「接下來兩週會揭曉」：重看日落在今天＋`CALENDAR_DAYS` 天以內的檔。**時間序不是名次**——照日期，同一天照組序、ticker。
+    重看日已過還在等的也列、標「已過」（等待不得消失，INV-2）。重看日來自候選列的 watch（materialize 端照抄進 card）。"""
+    horizon = (today + timedelta(days=CALENDAR_DAYS)).isoformat()
+    days: dict[str, list[Mapping[str, Any]]] = {}
+    for row in items:
+        until = str((((row.get("card") or {}).get("watch")) or {}).get("until") or "")[:10]
+        try:
+            date.fromisoformat(until)
+        except ValueError:
+            continue
+        if until <= horizon:
+            days.setdefault(until, []).append(row)
+    dates = []
+    for day in sorted(days):
+        rows = sorted(days[day], key=lambda r: (order.get(str(r.get("group")), len(order)), str(r.get("ticker") or "")))
+        dates.append({"date": day, "past": day < today.isoformat(),
+                      "stocks": [{"ticker": r.get("ticker"), "name": _card_name(r),
+                                  "state": (r.get("candidate") or {}).get("label")} for r in rows]})
+    return {"days": CALENDAR_DAYS, "today": today.isoformat(), "dates": dates,
+            "note": "重看日是研究寫下的「哪天再看」（財報期限、法說、檢核點）；照日期列，不是名次。"}
+
+
+def _by_layer(items: Sequence[Mapping[str, Any]], *, order: Mapping[str, int],
+              labels: Mapping[str, str]) -> dict[str, Any]:
+    """「依層」：攤開的那幾組照押的層分（一檔押兩層就兩層都出現）；層照節點 id 的字母序（索引不是名次）。
+    每層另數收合組裡押同一層的檔（不要、無法量…）——那一層不是只有你看到的這幾家。沒宣告押哪一層的另成一組。"""
+    layers: dict[str, dict[str, Any]] = {}
+    unridden: list[str] = []
+    for row in items:
+        main = row.get("group") in MAIN_GROUPS
+        rides = ((row.get("card") or {}).get("rides")) or []
+        if not rides and main:
+            unridden.append(str(row.get("ticker")))
+        for ride in rides:
+            node = str(ride.get("node"))
+            entry = layers.setdefault(node, {"node": node, "label": ride.get("label") or node,
+                                             "unit_label": ride.get("unit_label"), "tickers": [], "others": {}})
+            if main:
+                entry["tickers"].append(str(row.get("ticker")))
+            else:
+                group = str(row.get("group"))
+                entry["others"][group] = entry["others"].get(group, 0) + 1
+    shown = []
+    for node in sorted(layers):
+        entry = layers[node]
+        if not entry["tickers"]:
+            continue
+        others = [{"group": g, "label": labels.get(g, g), "count": n}
+                  for g, n in sorted(entry["others"].items(), key=lambda kv: order.get(kv[0], len(order)))]
+        shown.append({**entry, "others": others})
+    return {"layers": shown, "unridden": unridden,
+            "hidden_layers": sum(1 for e in layers.values() if not e["tickers"]),
+            "note": "層照節點 id 的字母序，不是名次；一檔押兩層就兩層都列。"}
 
 
 def _group_of(row: Mapping[str, Any]) -> str:
@@ -188,6 +254,14 @@ async def stocks(request: Request) -> Response:
         overview["generated_at"] = payload["generated_at"]
         overview["research_context_digest"] = payload.get("research_context_digest")
         overview["closure_label"] = _CLOSURE_LABELS[_group_of(overview)]
+        # 重看日過了沒是「今天」的事，不是 materialize 那天的事：在請求時比一次（比日期，不重算任何研究數字）；
+        # 印法也在這裡定：今年的只印月-日，別年的印全日期（2027-05-01 印成「05-01」會被讀成今年）
+        watch = (overview.get("card") or {}).get("watch")
+        if isinstance(watch, Mapping) and watch.get("until"):
+            until, today = str(watch["until"])[:10], date.today().isoformat()
+            overview["card"] = {**overview["card"],
+                                "watch": {**watch, "past": until < today,
+                                          "label": until[5:] if until[:4] == today[:4] else until}}
         items.append(overview)
     # 分組＝候選狀態（2026-10-07 使用者指示；候選板同一個推導，materialize 端已照抄進 overview）。
     # 組序是**閱讀順序，不是名次**：研究時間花最多的在上、判斷「不要」的在最後——順序與中文只有 `.meta.json`
@@ -203,11 +277,15 @@ async def stocks(request: Request) -> Response:
         groups.append(dict(_STALE_GROUP))
     order = {g["key"]: i for i, g in enumerate(groups)}
     items.sort(key=lambda row: (order.get(row["group"], len(order)), str(row.get("ticker") or "")))
+    labels = {str(g["key"]): str(g.get("label") or g["key"]) for g in groups}
     return _json({
         "api_version": API_VERSION,
         "count": len(items),
         "stocks": items,
-        "groups": [{**g, "count": sum(1 for r in items if r.get("group") == g["key"])} for g in groups],
+        "groups": [{**g, "count": sum(1 for r in items if r.get("group") == g["key"]),
+                    "expanded": g["key"] in MAIN_GROUPS} for g in groups],
+        "calendar": _calendar(items, today=date.today(), order=order),
+        "by_layer": _by_layer(items, order=order, labels=labels),
         # 常駐計數器（L14：真正的防呆是會自己出現的計數器，不是要人讀的段落）。
         "view_counters": _view_counters(items),
         "unavailable": unavailable,

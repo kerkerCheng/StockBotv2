@@ -619,6 +619,18 @@ cache-miss 自動重建）；④**socket 封殺**（request 期間 `connect`／`
 **overview 是選取不是計算。** 清單卡片要的那幾格全部照抄 `AnalystView`——沒有百分比換算、沒有幣別換算、
 沒有 gap 重算。單位原樣帶著走（GBp 與 GBP 差 100 倍，`dependencies.quote_unit` 是欄位不是要 parse 的句子）。
 
+**首頁 compact 卡片（2026-10-28 使用者：「首頁根本不用講這麼多…compact 一點…30d 折線圖…10 字左右的介紹吧。不然我也不會點進去」；
+設計來源 `docs/brainstorms/2026-10-28-app-attention-ia.md`）：** `overview.card`（`webapp/materialize.py::_card_overview`）同一條選取規則——
+短名與一句做什麼照抄研究 session 寫的介紹 ledger（`alpha/providers/taglines.py`；`library/private/alpha/taglines.jsonl` 一個檔、只 append、
+整批核對：名冊、≤14 字、禁字表與敘事同一張；寫入只在互動的 `python -m alpha taglines --add`），沒寫就退到押的層的中文名
+（`config/node_labels_zh.json`，呈現用字彙、不進圖），再沒有就是「還沒寫介紹」——三種來源分開標（L12）；押的層照抄敘事 `rides`；
+狀態天數與重看日照抄候選列（畫面上的狀態不是敘事宣告的那個時不印天數：已持有來自 Sheet）；折線是 `price_series` 的最後 31 點（挑點）；
+漲跌**只抄**三題「已定價③：相對組 30 個交易日」的本檔／組／差，沒有主題組就只有線（不另算一個報酬）。
+`/api/v1/stocks` 多三樣、全由後端排好：`groups[].expanded`（攤開持有／可開／缺 X／等回落，`webapp.api.MAIN_GROUPS`；其餘收合照數）、
+`calendar`（重看日落在今天＋14 天以內，照日期——時間序不是名次；過了還在等的標「已過」，INV-2）、`by_layer`（攤開的組照押的層分，
+層照節點 id 字母序，另數同一層收合組的檔數）；每張卡的 `watch.past` 在請求時比今天。前端只畫卡片、折線（座標換算住圖表段）、日曆條與
+`#/by-layer` 切換。
+
 **private path 在 materialize 端遮蔽一次。** read model 的理由句會寫出 authority 檔案路徑
 （例：「找不到 session 判斷檔（library/private/alpha/judgments/…）」）；那對開發者有用，但它是 private
 filesystem 結構，不該經由 HTTP 出去。遮成 `«private-authority»`，**其餘文字逐字保留**。

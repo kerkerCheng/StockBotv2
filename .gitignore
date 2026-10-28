@@ -40,6 +40,7 @@ config/*.json
 !config/substitutability_language.json
 !config/relay_language.json
 !config/demand_anchor_series.json
+!config/node_labels_zh.json
 
 # Claude Code 本機設定（不共用）；project skills 轉接層需納入版本控制
 .claude/*

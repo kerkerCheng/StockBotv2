@@ -137,8 +137,67 @@ def _candidate_overview(panel: Mapping[str, Any]) -> dict[str, Any]:
             "absence_kind": kind or "upstream_unavailable", "reason": datum.get("reason") or panel.get("reason")}
 
 
-def build_overview(view: Mapping[str, Any], *, price_context: Mapping[str, Any] | None = None) -> dict[str, Any]:
-    """清單卡片的投影。**純選取**——這裡沒有任何算術。"""
+#: 首頁卡片的折線取最近幾個已收盤交易日：31 點＝30 個交易日的漲跌，與三題「相對組 30 個交易日」同一個窗。
+CARD_SPARK_SESSIONS = 31
+
+
+def _card_overview(view: Mapping[str, Any], inputs: Mapping[str, Any] | None) -> dict[str, Any]:
+    """首頁卡片（2026-10-28 使用者：「首頁根本不用講這麼多…compact 一點…有 30d 折線圖…10 字左右的介紹」）。**純選取。**
+
+    - 短名與一句做什麼：研究 session 寫的 ledger（`alpha.providers.taglines`）照抄；沒寫時那一句退到押的層的中文名
+      （`config/node_labels_zh.json`），再沒有就是 None（畫面印「還沒寫介紹」）——來源分開標（L12）。
+    - 押的層：敘事宣告的 `rides`（與頁首「做什麼」同一格）；層名先中文、再圖上的英文名。
+    - 狀態多久、哪天重看：候選列的 `since`／`stall_days`／`watch`（候選板同一個推導）照抄。
+    - 折線：這檔自己的已收盤收盤價，取最後 `CARD_SPARK_SESSIONS` 點（挑點，不是模型）。
+    - 漲跌：**只抄**三題「已定價③：相對組 30 個交易日」已算好的三個數（本檔、組、差）；沒有主題組的檔就沒有數，只畫線
+      ——這裡不另算一個報酬（同一個窗兩份數字，L12）。
+    """
+    extra = inputs or {}
+    rec = extra.get("tagline") if isinstance(extra.get("tagline"), Mapping) else None
+    labels = extra.get("labels_zh") if isinstance(extra.get("labels_zh"), Mapping) else {}
+    rides_line = next((line for line in ((view.get("bet") or {}).get("lines") or ())
+                       if str(line.get("key") or "") == "rides"), None)
+    rides = [{"node": str(r.get("node")),
+              "label": labels.get(str(r.get("node"))) or r.get("node_name") or str(r.get("node")),
+              "unit_label": r.get("unit_label"), "kind_label": r.get("kind_label")}
+             for r in (((rides_line or {}).get("datum") or {}).get("value") or ()) if isinstance(r, Mapping)]
+    row = (_line_map(view.get("candidate") or {}).get("candidate:state") or {}).get("value")
+    row = row if isinstance(row, Mapping) else {}
+    watch = row.get("watch") if isinstance(row.get("watch"), Mapping) else None
+    if rec is not None:
+        tagline = {"text": rec.get("text"), "source": "ledger", "written_at": str(rec.get("created_at") or "")[:10] or None}
+    elif rides:
+        tagline = {"text": rides[0]["label"], "source": "layer", "written_at": None}
+    else:
+        tagline = {"text": None, "source": None, "written_at": None}
+    series = [r for r in (extra.get("price_series") or ())
+              if isinstance(r.get("close"), (int, float)) and r.get("session_date")]
+    move = None
+    for line in (view.get("three_questions") or {}).get("lines") or ():
+        if str(line.get("key") or "").endswith(":rel_return_30d"):
+            datum = line.get("datum") or {}
+            detail = (datum.get("dependencies") or {}).get("detail") or {}
+            if datum.get("value") is not None:
+                move = {"relative": datum.get("value"), "own": detail.get("own_return"),
+                        "cohort": detail.get("cohort_mean_return"), "as_of": datum.get("as_of"),
+                        "label": datum.get("label")}
+            break
+    return {
+        "short_name": rec.get("short_name") if rec is not None else None,
+        "tagline": tagline,
+        "rides": rides,
+        "watch": {"until": watch.get("until"), "status": watch.get("status")} if watch and watch.get("until") else None,
+        # 「這個狀態幾天」只在畫面上的狀態就是敘事宣告的那個時才有意義（已持有來自 Sheet，天數卻是敘事宣告「不要」的天數）
+        "since": (str(row.get("since") or "")[:10] or None) if row.get("declared") == row.get("derived") else None,
+        "stall_days": row.get("stall_days") if row.get("declared") == row.get("derived") else None,
+        "spark": [{"session_date": r["session_date"], "close": r["close"]} for r in series[-CARD_SPARK_SESSIONS:]],
+        "move": move,
+    }
+
+
+def build_overview(view: Mapping[str, Any], *, price_context: Mapping[str, Any] | None = None,
+                   card: Mapping[str, Any] | None = None) -> dict[str, Any]:
+    """清單卡片的投影。**純選取**——這裡沒有任何算術。`card`：首頁卡片的頁外輸入（介紹、層中文名、收盤序列）。"""
     headline = view["headline"]
     lines = _line_map(headline)
     fundamental_lines = _line_map(view.get("fundamental") or {})
@@ -171,6 +230,8 @@ def build_overview(view: Mapping[str, Any], *, price_context: Mapping[str, Any] 
         "wipeout": _wipeout_overview(view.get("wipeout") or {}),
         # 2026-10-07（使用者指示）：首頁照候選狀態分組。照抄候選面板（與候選板同一個推導）。
         "candidate": _candidate_overview(view.get("candidate") or {}),
+        # 2026-10-28（使用者指示）：首頁 compact 卡片——短名、一句做什麼、押的層、狀態多久與重看日、30 個交易日折線。
+        "card": _card_overview(view, card),
         # V1：熟成度計數（照抄 research panel 的 catalyst_quantitative_link）
         "ripeness": _cell(_line_map(view.get("research") or {}).get("catalyst_quantitative_link")),
         # 催化劑那一格的形狀（七缺陷之 1）：`ripeness` 在沒有 linked 催化劑時整格無值，
@@ -236,8 +297,12 @@ def materialize_view(analyst_view_dict: Mapping[str, Any], *,
                      path_layers: Mapping[str, Any] | None = None,
                      revenue_mix: Mapping[str, Any] | None = None,
                      bet_share: Mapping[str, Any] | None = None,
-                     event_reaction: Mapping[str, Any] | None = None) -> dict[str, Any]:
+                     event_reaction: Mapping[str, Any] | None = None,
+                     tagline: Mapping[str, Any] | None = None,
+                     labels_zh: Mapping[str, str] | None = None) -> dict[str, Any]:
     """`AnalystView.to_dict()` → artifact payload（含遮蔽、overview、兩個 digest）。純函式。
+
+    `tagline`／`labels_zh`：首頁卡片的短名與一句做什麼（研究 ledger 現行那一筆）、押的層的中文名——呈現用，不進新鮮度身分。
 
     `price_series` 是**脈絡不是判讀**：一條這檔自己的已收盤收盤價序列，讓使用者看得懂
     「現在這個價位在哪」。它不參與任何計算——`freshness_identity` 不含它（價格動了不算認知變了）。
@@ -263,7 +328,9 @@ def materialize_view(analyst_view_dict: Mapping[str, Any], *,
         "research_context_digest": view.get("research_context_digest"),
         "readiness": view["readiness"],
         "refresh": view["refresh"],
-        "overview": build_overview(view, price_context=_price_context(price_series or ())),
+        "overview": build_overview(view, price_context=_price_context(price_series or ()),
+                                   card={"tagline": redact_private_paths(dict(tagline)) if tagline else None,
+                                         "labels_zh": dict(labels_zh or {}), "price_series": list(price_series or ())}),
         "view": view,
         "price_series": [dict(row) for row in (price_series or ())],
         # 尺的脈絡（2026-09-15）：最近 N 個已收盤交易日的高低點與日期。**脈絡不是訊號**：不排序、不決定尺寸；
@@ -539,7 +606,9 @@ def materialize(ticker: str, *, as_of: date | None = None, scenario: str | None 
                 anchors: Mapping[str, Any] | None = None,
                 paths: Mapping[str, Any] | None = None,
                 layer_reps: Mapping[str, Any] | None = None,
-                events: Mapping[str, Any] | None = None) -> tuple[Path, dict[str, Any]]:
+                events: Mapping[str, Any] | None = None,
+                taglines: Mapping[str, Any] | None = None,
+                labels_zh: Mapping[str, str] | None = None) -> tuple[Path, dict[str, Any]]:
     """跑一次完整鏈並寫下 artifact。**只有這裡會連 Neo4j／Engine C／private ledger。**
 
     `readings`：`readings_context()` 的結果（多檔時由 `materialize_many` 載入一次傳進來）；沒給就自己載一次。
@@ -550,6 +619,7 @@ def materialize(ticker: str, *, as_of: date | None = None, scenario: str | None 
     `paths`：路徑上各層（`_path_context`；多檔時載一次——每一層一輪只算一次）；沒給就為這一檔載一次。
     `layer_reps`：層代表公司宣告（`_layer_reps_loaded`；多檔時載一次）——押的那一塊用；沒給就為這一檔載一次。
     `events`：事件之後跟組比的一輪輸入（`_event_context`；多檔時載一次）；沒給就為這一檔載一次。
+    `taglines`／`labels_zh`：首頁卡片的介紹 ledger（`company_id` → 現行那一筆）與層中文名（多檔時載一次）；沒給就載一次。
     """
     from briefing.alpha_view.sources import fetch_alpha_investment_view
     from briefing.analyst_view import build_analyst_view
@@ -580,6 +650,7 @@ def materialize(ticker: str, *, as_of: date | None = None, scenario: str | None 
     event_ctx = events if events is not None else _event_context()
     reaction = _page_event_reaction(str(view.identity.ticker or ticker), view.identity.company_id, analyst_dict,
                                     event_ctx, as_of)
+    tags = taglines if taglines is not None else _taglines_loaded()
     payload = materialize_view(analyst_dict, generated_at=generated_at,
                                price_series=_close_series(ticker),
                                page_extra=page_extra_for(ticker, notes_state, page_diagrams, demand, capture, what,
@@ -587,9 +658,36 @@ def materialize(ticker: str, *, as_of: date | None = None, scenario: str | None 
                                diagrams=page_diagrams,
                                node_names={str(n): names[str(n)] for n in seats if str(n) in names},
                                demand_anchor=demand, capture=capture, what_it_does=what, path_layers=path_layers,
-                               revenue_mix=mix, bet_share=bet, event_reaction=reaction)
+                               revenue_mix=mix, bet_share=bet, event_reaction=reaction,
+                               tagline=tags.get(str(view.identity.company_id)) if view.identity.company_id else None,
+                               labels_zh=labels_zh if labels_zh is not None else node_labels_zh())
     target = store or ArtifactStore()
     return target.write(payload), payload
+
+
+NODE_LABELS_ZH_PATH = Path(__file__).resolve().parents[1] / "config" / "node_labels_zh.json"
+
+
+def node_labels_zh(path: Path | None = None) -> dict[str, str]:
+    """圖節點的中文名（呈現用字彙，`config/node_labels_zh.json`）。讀不到＝空表——卡片照印圖上的英文名，不擋 materialize。"""
+    try:
+        raw = json.loads((path or NODE_LABELS_ZH_PATH).read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return {}
+    labels = raw.get("labels") if isinstance(raw, Mapping) else None
+    return {str(k): str(v) for k, v in (labels or {}).items() if isinstance(v, str) and v.strip()}
+
+
+def _taglines_loaded() -> dict[str, Any]:
+    """首頁介紹 ledger 的現行那一筆（`company_id` → 紀錄）。讀不到＝空——卡片退到層名或「還沒寫介紹」，不擋 materialize。
+    壞行由 `python -m alpha taglines --list` 印出（ledger 自己的帳），這裡不吞也不重報。"""
+    try:
+        from alpha.providers.taglines import current_taglines
+
+        current, _errors = current_taglines()
+        return current
+    except Exception:  # noqa: BLE001 — 介紹是呈現，讀不到不該讓判讀讀不到
+        return {}
 
 
 def _event_context() -> dict[str, Any] | None:
@@ -817,11 +915,13 @@ def materialize_many(tickers: Sequence[str], *, as_of: date | None = None,
     paths = _path_context(as_of, readings, anchors, state_store) if tickers else None
     reps = _layer_reps_loaded(as_of) if tickers else None
     events = _event_context() if tickers else None
+    tags = _taglines_loaded() if tickers else None
+    labels = node_labels_zh() if tickers else None
     for ticker in tickers:
         try:
             path, _ = materialize(ticker, as_of=as_of, store=target, readings=readings, candidates=candidates,
                                   layer_notes=notes_state, diagrams=loaded, node_names=names, anchors=anchors,
-                                  paths=paths, layer_reps=reps, events=events)
+                                  paths=paths, layer_reps=reps, events=events, taglines=tags, labels_zh=labels)
         except Exception as exc:  # noqa: BLE001 — 逐檔隔離；理由原樣回報
             results.append((ticker, None, f"{type(exc).__name__}: {str(exc)[:200]}"))
         else:

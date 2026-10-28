@@ -64,7 +64,8 @@ SERVE_MODULES = ("api.py", "store.py", "contracts.py")
 
 SERVE_IMPORT_ALLOWLIST = {
     "api.py": {
-        "__future__", "json", "os", "pathlib", "typing",
+        # 2026-10-28：`datetime`（stdlib）——首頁「接下來兩週會揭曉」比重看日與今天；不重算任何研究數字。
+        "__future__", "json", "os", "datetime", "pathlib", "typing",
         "starlette.applications", "starlette.exceptions", "starlette.requests",
         "starlette.responses", "starlette.routing",
         ".contracts", ".store",

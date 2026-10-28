@@ -18,6 +18,7 @@
 | [`2026-09-18-verbatim-never-reaches-the-decision.md`](2026-09-18-verbatim-never-reaches-the-decision.md) | L18 的量測與架構；走圖與讀圖必須消費逐字 |
 | [`2026-08-31-event-watch-module-requirements.md`](2026-08-31-event-watch-module-requirements.md) | G7 擴充它（加語意條件 kind）；實作前要讀 |
 | [`2026-10-04-phase7-research-edge-proposal.md`](2026-10-04-phase7-research-edge-proposal.md) | Phase 7（研究使用與量測）的能力盤點、failure analysis、十個 edge 假說、回放與前瞻評估設計、campaign 驗證集、§13 決策流程（APP 的組織原則）；使用者 2026-10-04 定案，Phase 7 plan 從它導出 |
+| [`2026-10-28-app-attention-ia.md`](2026-10-28-app-attention-ia.md) | APP 照使用者問題重組：11 頁收成 5 頁、首頁 compact、圖頁骨架＝層、成績單不排序、「問 Claude」橋；「圖的哪裡有機會」的 zoom-out；發現紀錄 F1–F4（**活的**）。使用者 2026-10-28 照推薦定案 |
 | [`2026-10-05-stock-page-schema.md`](2026-10-05-stock-page-schema.md) | 個股頁 schema：十三塊、單位（題材錨／路徑／層／插槽／公司／事件）、十一條規則、七檔測試集與填得滿表、三檔錨點與時光機、「量 → 錢 → 價」、發現紀錄與回饋紀錄（**活的**，每輪往下加）；S1 凍結判準達成（2026-10-06）、v1.0 等 §14.1 ②③④ 與負錨點驗收；2026-10-06 amendment：S4 層說明升主產品並提前、四段規格、S5 等三份層說明；PLAN_PROPOSAL `plans/2026-10-05-003` |
 
 ## 歷史證據（只在引用實測數字時讀）

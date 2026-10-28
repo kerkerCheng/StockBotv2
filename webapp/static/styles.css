@@ -69,6 +69,48 @@ main { padding: 16px; max-width: 940px; margin: 0 auto; }
   border-radius: var(--radius); padding: 14px;
 }
 .card:active { background: var(--surface-2); }
+
+/* 首頁 compact 卡片（2026-10-28 使用者：「首頁根本不用講這麼多…compact 一點…30d 折線圖…10 字左右的介紹」）。
+   狀態籤一律同一個平淡樣式——不用綠／紅暗示該不該買（候選狀態是 filter 不是燈號）。 */
+.cards-compact { gap: 8px; }
+.card-compact { display: flex; align-items: center; gap: 10px; padding: 10px 12px; }
+.card-compact:hover { border-color: var(--dim); }
+.card-body { flex: 1 1 auto; min-width: 0; }
+.card-title { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
+.card-name { font-size: 15px; font-weight: 650; }
+.card-ticker { color: var(--dim); font-size: 12px; font-variant-numeric: tabular-nums; }
+.card-tagline { font-size: 13px; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.card-tagline.absent { color: var(--dim); }
+.card-state { display: flex; flex-wrap: wrap; gap: 2px 8px; align-items: center; margin-top: 4px;
+              font-size: 12px; color: var(--muted); }
+.card-chip { padding: 0 7px; border-radius: 999px; border: 1px solid var(--border); font-size: 11px; font-weight: 600; }
+.card-when.past { color: var(--flags); }
+.card-spark { flex: 0 0 auto; width: 104px; text-align: right; }
+.spark { width: 104px; height: 30px; display: block; }
+.spark-line { fill: none; stroke: var(--muted); stroke-width: 1.5; stroke-linejoin: round; stroke-linecap: round; }
+.spark-dot { fill: var(--accent); stroke: var(--surface); stroke-width: 1; }
+.spark-own { font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; line-height: 1.3; }
+.spark-rel { font-size: 11px; color: var(--dim); font-variant-numeric: tabular-nums; }
+.card-nospark { font-size: 11px; color: var(--dim); }
+
+/* 「接下來兩週會揭曉」：日期序是時間不是名次；手機上橫向捲動。 */
+.calendar { margin-bottom: 8px; }
+.calendar .group-head { margin-top: 4px; }
+.cal-strip { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
+.cal-day { flex: 0 0 auto; min-width: 84px; max-width: 230px; background: var(--surface);
+           border: 1px solid var(--border); border-radius: 10px; padding: 6px 9px; }
+.cal-day.past { border-color: var(--flags); }
+.cal-date { font-size: 12px; font-weight: 650; color: var(--muted); font-variant-numeric: tabular-nums; }
+.cal-names { font-size: 13px; line-height: 1.45; }
+.cal-names a { color: var(--text); text-decoration: none; }
+.cal-names a:hover { color: var(--accent); }
+
+.view-toggle { display: inline-flex; border: 1px solid var(--border); border-radius: 999px; overflow: hidden; margin: 6px 0 2px; }
+.toggle-btn { padding: 3px 14px; font-size: 13px; color: var(--muted); text-decoration: none; }
+.toggle-btn.on { background: var(--surface-2); color: var(--text); font-weight: 600; }
+.group-sub { margin-left: 8px; font-weight: 400; color: var(--dim); font-size: 12px; }
+.group-collapsed > .cards { margin-top: 8px; }
+
 .card-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
 .ticker { font-size: 17px; font-weight: 650; letter-spacing: .2px; }
 .company { color: var(--muted); font-size: 13px; margin-top: 1px; }
@@ -342,7 +384,7 @@ table.rank.compare td:first-child { color: var(--muted); }
 .group > .group-title { margin-top: 0; }
 
 /* 常駐計數器：第一屏就看得到「有幾檔的判讀是我們自己的」。 */
-.counter-bar { display: flex; flex-direction: column; gap: 4px; margin: 0 0 14px;
+.counter-bar { display: flex; flex-direction: column; gap: 4px; margin: 14px 0;
                padding: 10px 12px; border: 1px solid var(--border); border-radius: 6px; }
 .counter-bar strong { font-size: 15px; }
 .counter-bar .note { margin: 0; }
