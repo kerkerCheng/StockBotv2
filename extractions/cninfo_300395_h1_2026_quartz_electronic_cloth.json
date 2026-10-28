@@ -26,6 +26,19 @@
       ],
       "statement": "Feilihua (quartz cloth supplier, 2026 interim report): with excellent dielectric loss and an ultra-low expansion coefficient, quartz electronic cloth is a preferred material for high-frequency high-speed copper clad laminate (CCL); its customers include global CCL makers. Supplier-side statement of the application; corroborates the buyer-side statements of ITEQ and Taiwan Union Technology.",
       "subject_id": "e2"
+    },
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：菲利華之後的定期報告寫出光纖配套衬管、套管合資項目延後或取消，或光通訊產品停產；或預製棒廠一手點名其他石英器件供應商而沒有菲利華。核查頻率：每半年（年報約 4 月、半年報約 8 月下旬）。觸發後 48 小時：降這條邊 confidence，重讀預製棒石英器件層讀圖的供給側。",
+      "id": "cninfo_300395_h1_2026_quartz_electronic_cloth_cl3",
+      "source_ids": [
+        "cninfo_300395_h1_2026_quartz_electronic_cloth_s8",
+        "cninfo_300395_h1_2026_quartz_electronic_cloth_s9",
+        "cninfo_300395_h1_2026_quartz_electronic_cloth_s10"
+      ],
+      "statement": "Feilihua (300395.SZ) H1 2026 report: its quartz support rods and handle rods are used in fiber preform deposition, sintering and fiber drawing, and its quartz muffle tubes are a key material for preform sintering; it has long-term strategic cooperation with the main fiber preform makers (not named); during H1 2026 it formed a joint venture to build a high-purity quartz project for fiber substrate tubes and jacket tubes — the tubes that become part of the preform are a new, not-yet-producing line in this report. Optical communications is a minor business next to semiconductor and aerospace quartz. Supplier self-report.",
+      "subject_id": "e3"
     }
   ],
   "edges": [
@@ -56,6 +69,30 @@
         "cninfo_300395_h1_2026_quartz_electronic_cloth_s6"
       ],
       "src_id": "mat:pcb_quartz_glass_cloth"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "mat:fiber_preform_quartz_ware",
+      "id": "e3",
+      "relation": "supplies_to",
+      "source_ids": [
+        "cninfo_300395_h1_2026_quartz_electronic_cloth_s8",
+        "cninfo_300395_h1_2026_quartz_electronic_cloth_s9",
+        "cninfo_300395_h1_2026_quartz_electronic_cloth_s10"
+      ],
+      "src_id": "co:feilihua_quartz_glass"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "mat:fiber_preform_quartz_ware",
+      "id": "e4",
+      "relation": "depends_on",
+      "source_ids": [
+        "cninfo_300395_h1_2026_quartz_electronic_cloth_s8"
+      ],
+      "src_id": "tech:optical_fiber_preform"
     }
   ],
   "nodes": [
@@ -127,6 +164,52 @@
         "cninfo_300395_h1_2026_quartz_electronic_cloth_s6"
       ],
       "type": "Material"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "石英玻璃支撑棒",
+        "把手棒",
+        "炉芯管",
+        "光纤配套用衬管",
+        "光纤配套用套管",
+        "quartz muffle tube",
+        "quartz substrate tube",
+        "quartz jacket tube",
+        "silica jacket tube"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "mat:fiber_preform_quartz_ware",
+      "name": "Quartz glass ware for fiber preform deposition, sintering and draw (support/handle rods, muffle tubes, substrate and jacket tubes)",
+      "role": null,
+      "source_ids": [
+        "cninfo_300395_h1_2026_quartz_electronic_cloth_s8",
+        "cninfo_300395_h1_2026_quartz_electronic_cloth_s9",
+        "cninfo_300395_h1_2026_quartz_electronic_cloth_s10"
+      ],
+      "type": "Material"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "glass preform",
+        "glass preforms",
+        "optical fibre preform",
+        "fiber preform",
+        "preform"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:optical_fiber_preform",
+      "name": "Optical fiber preform (glass preform)",
+      "role": null,
+      "source_ids": [
+        "cninfo_300395_h1_2026_quartz_electronic_cloth_s8",
+        "cninfo_300395_h1_2026_quartz_electronic_cloth_s9",
+        "cninfo_300395_h1_2026_quartz_electronic_cloth_s10"
+      ],
+      "type": "TechNode"
     }
   ],
   "schema_version": "0.1",
@@ -140,7 +223,8 @@
     "retrieved_at": "2026-10-19",
     "source_type": "filing",
     "storage_permission": "repo_excerpt",
-    "title": "湖北菲利华石英玻璃（300395.SZ）2026 年半年度报告：石英电子布是高频高速 CCL 的优选材料；石英砂到石英电子布全产业链垂直一体化；超薄石英电子布仍在客户端测试及终端客户认证；上半年石英电子布销售收入 1.53 亿元",
+    "supersedes_extraction_sha256": "a960584b38cfc076364e16732751cfe0c1c422b5ca2d6d04fba1e0fd958d3a2c",
+    "title": "湖北菲利华石英玻璃（300395.SZ）2026 年半年度报告：石英电子布是高频高速 CCL 的优选材料；石英砂到石英电子布全产业链垂直一体化；超薄石英电子布仍在客户端测试及终端客户认证；上半年石英电子布销售收入 1.53 亿元；光通讯：支撑棒、把手棒、炉芯管用于光纤预制棒沉积烧结与拉丝，合资建设光纤配套用衬管、套管项目",
     "url": "http://static.cninfo.com.cn/finalpage/2026-08-21/1225484647.PDF"
   },
   "sources": [
@@ -178,6 +262,21 @@
       "id": "cninfo_300395_h1_2026_quartz_electronic_cloth_s7",
       "locator": "p.3 重要风险提示（四）",
       "quote": "公司石英电子布项目处于客户端测试及终端客户的认证阶段，受到客户产品迭代及适配测试等不确定因素的影响，业务合作及订单存在不确定性，存在未来业务推进不及预期的风险"
+    },
+    {
+      "id": "cninfo_300395_h1_2026_quartz_electronic_cloth_s8",
+      "locator": "第三节 一、主要业务——产品用途",
+      "quote": "石英玻璃支撑棒、把手棒用作光通讯领域光纤预制棒沉积及烧结和光纤拉制中的支撑材料，石英玻璃炉芯管用作光通讯领域光纤预制棒烧结工序的关键材料。"
+    },
+    {
+      "id": "cninfo_300395_h1_2026_quartz_electronic_cloth_s9",
+      "locator": "第三节 一、主要业务——光通讯领域",
+      "quote": "在光通讯领域，公司一直以来与主要光纤光棒生产厂家保持着长期战略合作关系。"
+    },
+    {
+      "id": "cninfo_300395_h1_2026_quartz_electronic_cloth_s10",
+      "locator": "同段",
+      "quote": "公司与合作方组建合资公司，投资建设“光纤配套用高纯精密石英材料项目”，主要生产光纤配套用衬管、套管等产品。"
     }
   ]
 }

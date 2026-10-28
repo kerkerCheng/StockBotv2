@@ -1,0 +1,187 @@
+{
+  "claims": [
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：飛凱之後的定期報告寫出光纖塗料營收衰退、行業產能不再滿載，或寫出主要光纖客戶轉向其他塗料供應商；或光纖廠一手點名其他塗料供應商而沒有飛凱。核查頻率：每半年（年報約 4 月、半年報約 8 月下旬）。觸發後 48 小時：降這條邊 confidence，重讀塗覆樹脂層讀圖的供給側。",
+      "id": "phichem_300398_h1_2026_fiber_coating_cl1",
+      "source_ids": [
+        "phichem_300398_h1_2026_fiber_coating_s3",
+        "phichem_300398_h1_2026_fiber_coating_s4",
+        "phichem_300398_h1_2026_fiber_coating_s5",
+        "phichem_300398_h1_2026_fiber_coating_s6",
+        "phichem_300398_h1_2026_fiber_coating_s7",
+        "phichem_300398_h1_2026_fiber_coating_s8"
+      ],
+      "statement": "PhiChem (300398.SZ) H1 2026 report: it calls itself an important global supplier of UV-curable optical fiber and cable coatings (primary, secondary, ribbon matrix, coloring ink); says the whole fiber industry ran at full capacity in 2026 on AI compute demand and coating demand stayed high; its UV-curable materials segment (which also includes automotive interior coatings) grew 29.84% to RMB 399 million, about a quarter of segment revenue — display and semiconductor materials are the larger businesses. In 2023 it redirected its 10,000 t/a fiber coating expansion project to liquid crystal materials. No market share figure and no customer is named; supplier self-report.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "mat:fiber_coating_resin",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "phichem_300398_h1_2026_fiber_coating_s3",
+        "phichem_300398_h1_2026_fiber_coating_s6",
+        "phichem_300398_h1_2026_fiber_coating_s7"
+      ],
+      "src_id": "co:phichem"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "tech:optical_fiber",
+      "id": "e2",
+      "relation": "is_component_of",
+      "source_ids": [
+        "phichem_300398_h1_2026_fiber_coating_s2"
+      ],
+      "src_id": "mat:fiber_coating_resin"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "飞凯材料",
+        "飛凱材料",
+        "PhiChem",
+        "PhiChem Corporation",
+        "300398.SZ"
+      ],
+      "attributes": {
+        "ticker": "300398.SZ"
+      },
+      "confidence": 0.85,
+      "id": "co:phichem",
+      "name": "上海飞凯材料科技股份有限公司",
+      "role": null,
+      "source_ids": [
+        "phichem_300398_h1_2026_fiber_coating_s1",
+        "phichem_300398_h1_2026_fiber_coating_s2",
+        "phichem_300398_h1_2026_fiber_coating_s3",
+        "phichem_300398_h1_2026_fiber_coating_s4",
+        "phichem_300398_h1_2026_fiber_coating_s5",
+        "phichem_300398_h1_2026_fiber_coating_s6",
+        "phichem_300398_h1_2026_fiber_coating_s7",
+        "phichem_300398_h1_2026_fiber_coating_s8"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "fiber coating",
+        "optical fiber coating",
+        "光纤涂覆材料",
+        "光纤光缆涂覆材料",
+        "紫外固化光纤涂料",
+        "primary coating",
+        "secondary coating",
+        "ribbon matrix"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "mat:fiber_coating_resin",
+      "name": "UV-curable optical fiber coating resin (primary/secondary coating, ribbon matrix, coloring ink)",
+      "role": null,
+      "source_ids": [
+        "phichem_300398_h1_2026_fiber_coating_s1",
+        "phichem_300398_h1_2026_fiber_coating_s2",
+        "phichem_300398_h1_2026_fiber_coating_s3",
+        "phichem_300398_h1_2026_fiber_coating_s4",
+        "phichem_300398_h1_2026_fiber_coating_s5",
+        "phichem_300398_h1_2026_fiber_coating_s6",
+        "phichem_300398_h1_2026_fiber_coating_s7",
+        "phichem_300398_h1_2026_fiber_coating_s8"
+      ],
+      "type": "Material"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "optical fibre",
+        "optical fiber",
+        "bend-insensitive fiber",
+        "single-mode fiber",
+        "fiber"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:optical_fiber",
+      "name": "Optical fiber (single-mode, incl. bend-insensitive)",
+      "role": null,
+      "source_ids": [
+        "phichem_300398_h1_2026_fiber_coating_s1",
+        "phichem_300398_h1_2026_fiber_coating_s2",
+        "phichem_300398_h1_2026_fiber_coating_s3",
+        "phichem_300398_h1_2026_fiber_coating_s4",
+        "phichem_300398_h1_2026_fiber_coating_s5",
+        "phichem_300398_h1_2026_fiber_coating_s6",
+        "phichem_300398_h1_2026_fiber_coating_s7",
+        "phichem_300398_h1_2026_fiber_coating_s8"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "phichem_300398_h1_2026_fiber_coating",
+    "evidence_tier": 1,
+    "origin_entity": "上海飞凯材料科技股份有限公司",
+    "permission_basis": "公開法定申報（深交所創業板半年度報告，公告編號 2026-069；同花順公告鏡像的原 PDF）；只保留研究必要的有限逐字節錄。published_at 取新浪財經公告列表的公告日 2026-08-27（封面只印「2026 年 8 月」）。",
+    "published_at": "2026-08-27",
+    "publisher": "深交所公告（同花順公告鏡像）",
+    "retrieved_at": "2026-10-28",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "上海飞凯材料（300398.SZ）2026 年半年度报告：紫外固化光纤光缆涂覆材料是光纤的核心关键耗材；公司是全球光通信领域重要的涂覆材料供应商（内层、外层、并带涂料与着色油墨）；2026 年全行业光纤产能满负荷、上游涂料需求维持高位；紫外固化材料营收 3.99 亿元、同比 +29.84%；2023 年把 1 万吨光纤涂料扩建募投项目改投液晶材料",
+    "url": "http://notice.10jqka.com.cn/api/pdf/d4f751f80875bcc6.pdf"
+  },
+  "sources": [
+    {
+      "id": "phichem_300398_h1_2026_fiber_coating_s1",
+      "locator": "第二节 公司简介",
+      "quote": "公司的外文名称（如有） PhiChem Corporation"
+    },
+    {
+      "id": "phichem_300398_h1_2026_fiber_coating_s2",
+      "locator": "第三节 一（3）紫外固化材料行业——行业概况",
+      "quote": "公司主营产品紫外固化光纤光缆涂覆材料是其核心关键耗材，直接决定光纤机械强度、传输损耗、使用寿命与环境可靠性。"
+    },
+    {
+      "id": "phichem_300398_h1_2026_fiber_coating_s3",
+      "locator": "同节",
+      "quote": "公司作为全球光通信领域重要的光纤光缆涂覆材料供应商，产品覆盖光纤内层涂覆材料、外层涂覆材料、并带涂覆材料及着色油墨"
+    },
+    {
+      "id": "phichem_300398_h1_2026_fiber_coating_s4",
+      "locator": "同节",
+      "quote": "国内头部本土企业依托长三角全产业链就近配套的协同优势，已占据全球市场主导份额"
+    },
+    {
+      "id": "phichem_300398_h1_2026_fiber_coating_s5",
+      "locator": "第三节 周期性、区域性与季节性特征",
+      "quote": "2026年受AI算力建设全年不间断推进的刚性需求拉动，全行业光纤产能持续处于满负荷运行状态，上游紫外固化材料的需求始终维持高位"
+    },
+    {
+      "id": "phichem_300398_h1_2026_fiber_coating_s6",
+      "locator": "第三节 报告期业绩驱动因素 3",
+      "quote": "人工智能数据中心基础设施扩张拉动光纤材料需求，公司紫外固化材料中光纤光缆涂覆材料作为上游原材料，受益于产业链景气度提升需求呈现复苏趋势，公司营业收入相对去年同期增长近30%。"
+    },
+    {
+      "id": "phichem_300398_h1_2026_fiber_coating_s7",
+      "locator": "第三节 四、主营业务构成（分产品；营业收入、营业成本、毛利率、营收同比、成本同比、毛利率同比）",
+      "quote": "紫外固化材料 398,953,981.45 254,344,763.08 36.25% 29.84% 30.79% -0.46%"
+    },
+    {
+      "id": "phichem_300398_h1_2026_fiber_coating_s8",
+      "locator": "第三节 募集资金使用——变更募集资金投资项目 3）",
+      "quote": "同意将募集资金投资项目“10000t/a紫外固化光纤涂覆材料扩建项目”变更为“年产 50 吨高性能混合液晶及 200 吨高纯电子显示单体材料项目”"
+    }
+  ]
+}
