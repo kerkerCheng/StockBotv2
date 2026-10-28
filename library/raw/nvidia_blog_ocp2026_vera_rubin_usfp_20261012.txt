@@ -1,0 +1,7 @@
+Source URL: https://blogs.nvidia.com/blog/ocp-global-summit-vera-rubin-scale-ai-factories/
+
+Excerpt:
+At OCP, NVIDIA and Cisco announced plans for USFP, a new optical pluggable transceiver module form factor designed to help AI factory builders scale next-generation AI fabrics while improving bandwidth density and power efficiency.
+With approximately the same footprint as the widely adopted 200Gb/s-per-lane OSFP form factor, USFP will provide a path to 400Gb/s-per-lane networking and will extend a transceiver-based deployment model already proven across generations of data center networks.
+The new form factor is designed for the scale and efficiency demands of next generation AI factories, supporting higher-bandwidth fabrics while preserving the flexibility and serviceability that have made pluggable optics a mainstay of modern data centers.
+To help drive an open ecosystem, NVIDIA and Cisco are collaborating with TE Connectivity and Amphenol on cages, connectors and modules, with plans to advance USFP through a community-led, multi-source effort.

@@ -1,0 +1,144 @@
+{
+  "claims": [
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：NVIDIA 或 Cisco 之後的一手（部落格、GTC、法說、規格）寫出 USFP 取消、延後到 400G/lane 之後的世代，或 400G/lane 的 scale-out 網路只用 CPO、不再有可插拔選項。核查頻率：每半年（GTC、OCP、OFC）。觸發後 48 小時：重讀可插拔收發器層與 CPO 層（CPO 層反證③的方向），騎 CPO／外部光源的敘事重答「替代品」那一格。",
+      "id": "nvidia_blog_ocp2026_vera_rubin_usfp_20261012_cl1",
+      "source_ids": [
+        "nvidia_blog_ocp2026_vera_rubin_usfp_20261012_s1",
+        "nvidia_blog_ocp2026_vera_rubin_usfp_20261012_s2",
+        "nvidia_blog_ocp2026_vera_rubin_usfp_20261012_s3",
+        "nvidia_blog_ocp2026_vera_rubin_usfp_20261012_s4"
+      ],
+      "statement": "NVIDIA blog (OCP 2026-10-12): NVIDIA and Cisco announced plans for USFP, an optical pluggable transceiver form factor with about the OSFP footprint that will provide a path to 400Gb/s-per-lane networking and extend the transceiver-based deployment model, preserving the flexibility and serviceability of pluggable optics; NVIDIA and Cisco are working with TE Connectivity and Amphenol on cages, connectors and modules as a community-led, multi-source effort. A plan, not a shipping product; no volumes or dates are stated.",
+      "subject_id": "tech:pluggable_transceiver"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "tech:usfp_form_factor",
+      "id": "e1",
+      "relation": "develops",
+      "source_ids": [
+        "nvidia_blog_ocp2026_vera_rubin_usfp_20261012_s1",
+        "nvidia_blog_ocp2026_vera_rubin_usfp_20261012_s4"
+      ],
+      "src_id": "co:nvidia"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "tech:pluggable_transceiver",
+      "id": "e2",
+      "relation": "is_variant_of",
+      "source_ids": [
+        "nvidia_blog_ocp2026_vera_rubin_usfp_20261012_s1",
+        "nvidia_blog_ocp2026_vera_rubin_usfp_20261012_s2"
+      ],
+      "src_id": "tech:usfp_form_factor"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "NVDA",
+        "NVIDIA Corporation",
+        "Nvidia"
+      ],
+      "attributes": {
+        "ticker": "NVDA"
+      },
+      "confidence": 0.95,
+      "id": "co:nvidia",
+      "name": "NVIDIA",
+      "role": "leader",
+      "source_ids": [
+        "nvidia_blog_ocp2026_vera_rubin_usfp_20261012_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "USFP",
+        "Ultra-Dense Small Form Factor Pluggable"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:usfp_form_factor",
+      "name": "USFP (Ultra-Dense Small Form Factor Pluggable) optical transceiver form factor",
+      "role": null,
+      "source_ids": [
+        "nvidia_blog_ocp2026_vera_rubin_usfp_20261012_s1",
+        "nvidia_blog_ocp2026_vera_rubin_usfp_20261012_s2",
+        "nvidia_blog_ocp2026_vera_rubin_usfp_20261012_s3",
+        "nvidia_blog_ocp2026_vera_rubin_usfp_20261012_s4"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "pluggable transceivers",
+        "800G transceiver",
+        "1.6T transceiver",
+        "1.6T transceivers",
+        "OSFP",
+        "Pluggable Transceivers",
+        "pluggables",
+        "pluggable optical interconnects",
+        "optical pluggables"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:pluggable_transceiver",
+      "name": "Pluggable optical transceiver",
+      "role": null,
+      "source_ids": [
+        "nvidia_blog_ocp2026_vera_rubin_usfp_20261012_s2",
+        "nvidia_blog_ocp2026_vera_rubin_usfp_20261012_s3"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "nvidia_blog_ocp2026_vera_rubin_usfp_20261012",
+    "evidence_tier": 1,
+    "origin_entity": "NVIDIA",
+    "permission_basis": "NVIDIA 官方部落格公開文章；只保留研究必要的有限逐字節錄。",
+    "published_at": "2026-10-12",
+    "publisher": "NVIDIA Blog",
+    "retrieved_at": "2026-10-27",
+    "source_type": "ir_deck",
+    "storage_permission": "repo_excerpt",
+    "title": "OCP Global Summit: Amid Ecosystem Adoption, NVIDIA Opens Vera Rubin Architecture to Help Scale AI Factories Worldwide（NVIDIA 部落格，2026-10-12）：NVIDIA 與 Cisco 發布 USFP 可插拔光模組規格，走向每通道 400G、延續可插拔部署模式，與 TE、Amphenol 多來源推進",
+    "url": "https://blogs.nvidia.com/blog/ocp-global-summit-vera-rubin-scale-ai-factories/"
+  },
+  "sources": [
+    {
+      "id": "nvidia_blog_ocp2026_vera_rubin_usfp_20261012_s1",
+      "locator": "USFP 段第 2 段",
+      "quote": "At OCP, NVIDIA and Cisco announced plans for USFP, a new optical pluggable transceiver module form factor designed to help AI factory builders scale next-generation AI fabrics while improving bandwidth density and power efficiency."
+    },
+    {
+      "id": "nvidia_blog_ocp2026_vera_rubin_usfp_20261012_s2",
+      "locator": "USFP 段第 3 段",
+      "quote": "With approximately the same footprint as the widely adopted 200Gb/s-per-lane OSFP form factor, USFP will provide a path to 400Gb/s-per-lane networking and will extend a transceiver-based deployment model already proven across generations of data center networks."
+    },
+    {
+      "id": "nvidia_blog_ocp2026_vera_rubin_usfp_20261012_s3",
+      "locator": "USFP 段第 5 段",
+      "quote": "The new form factor is designed for the scale and efficiency demands of next generation AI factories, supporting higher-bandwidth fabrics while preserving the flexibility and serviceability that have made pluggable optics a mainstay of modern data centers."
+    },
+    {
+      "id": "nvidia_blog_ocp2026_vera_rubin_usfp_20261012_s4",
+      "locator": "USFP 段第 6 段",
+      "quote": "To help drive an open ecosystem, NVIDIA and Cisco are collaborating with TE Connectivity and Amphenol on cages, connectors and modules, with plans to advance USFP through a community-led, multi-source effort."
+    }
+  ]
+}
