@@ -2716,6 +2716,74 @@
         "Henan Shijia Photons Technology",
         "Shijia"
       ]
+    },
+    {
+      "company_id": "co:sterlite_technologies",
+      "research_ticker": "STLTECH.NS",
+      "market_currency": "INR",
+      "execution_currency": "INR",
+      "execution_venue": "NSE",
+      "display_name": "Sterlite Technologies Limited",
+      "_display_name_source": "STL Q1 FY27 法說逐字稿（2026-07-24，公司官網 stl.tech 刊登）每頁頁首「Sterlite Technologies Limited」；NSE 代號 STLTECH",
+      "_note": "隨光纖鏈開層＋STL 座位入圖包 staged（2026-10-28，drop 即回退；入圖包見 optical_fiber_chain_stl_corning_2026_10_28_action.json）：印度一貫化光纖廠（自製四氯化矽與玻璃預製棒→拉絲→高密度光纜→連接產品）；Q1 FY27 法說寫與一家全球 hyperscaler 簽多年期 11 億美元供貨（到 FY29）、多筆 1 億美元級 hyperscaler 高芯數 IBR 光纜訂單、依產能挑單。系統口徑邊緣（`python -m alpha edge STLTECH.NS`：49.2 億美元、分析師 3 家，2026-10-28）。不放單詞「STL」別名，以免名字比對誤中（failure log #4 的形狀）",
+      "name_aliases": [
+        "Sterlite Technologies",
+        "Sterlite Technologies Limited",
+        "Sterlite Tech",
+        "STLTECH"
+      ]
+    },
+    {
+      "company_id": "co:t_and_s_communications",
+      "research_ticker": "300570.SZ",
+      "market_currency": "CNY",
+      "execution_currency": "CNY",
+      "execution_venue": "SZSE",
+      "display_name": "深圳太辰光通信股份有限公司",
+      "_display_name_source": "2025 年年度报告「股票简称 太辰光 股票代码 300570」「公司的外文名称（如有） T&S Communications Co.,Ltd.」（深交所創業板）",
+      "_note": "隨光纖連接層入圖包 staged（2026-10-28，drop 即回退；入圖包見 fiber_connectivity_ts_communications_corning_2026_10_28_action.json）：MPO／MTP 高密度光纖連接器、陶瓷與 MT 插芯；2024 年報前五大客戶第一名具名 Corning Incorporated（營收 70.10%），2025 年報第一名 68.48%（未具名）；2026 半年報寫子公司特思路自產 MT 插芯已批量供貨。系統口徑邊緣（`python -m alpha edge 300570.SZ`：約 51.8 億美元、分析師 3 家，2026-10-28）。不放單詞「T&S」別名，以免名字比對誤中",
+      "name_aliases": [
+        "太辰光",
+        "太辰光通信",
+        "深圳太辰光通信股份有限公司",
+        "T&S Communications",
+        "T&S Communications Co.,Ltd."
+      ]
+    },
+    {
+      "company_id": "co:phichem",
+      "research_ticker": "300398.SZ",
+      "market_currency": "CNY",
+      "execution_currency": "CNY",
+      "execution_venue": "SZSE",
+      "display_name": "上海飞凯材料科技股份有限公司",
+      "_display_name_source": "2026 年半年度报告「股票简称 飞凯材料 股票代码 300398」「公司的外文名称（如有） PhiChem Corporation」（深交所創業板）",
+      "_note": "隨光纖材料附加包 staged（2026-10-28，drop 即回退；入圖包見 fiber_materials_phichem_feilihua_addon_2026_10_28_action.json）：紫外固化光纖光纜塗覆材料（內層、外層、並帶塗料、著色油墨）；2026 上半年紫外固化材料營收 3.99 億元（+29.84%，含汽車內飾塗料），只占營收約兩成，營收大頭是顯示材料與半導體材料——寫敘事時再量占比。系統口徑邊緣（`python -m alpha edge 300398.SZ`：約 24.1 億美元、分析師 2 家，2026-10-28）",
+      "name_aliases": [
+        "飞凯材料",
+        "飛凱材料",
+        "上海飞凯材料科技股份有限公司",
+        "PhiChem",
+        "PhiChem Corporation"
+      ]
+    },
+    {
+      "company_id": "co:jiangsu_etern",
+      "research_ticker": "600105.SS",
+      "market_currency": "CNY",
+      "execution_currency": "CNY",
+      "execution_venue": "SSE",
+      "display_name": "江苏永鼎股份有限公司",
+      "_display_name_source": "2026 年半年度报告「公司代码：600105 公司简称：永鼎股份」「公司的外文名称 JIANGSU ETERN COMPANY LIMITED」（上交所）",
+      "_note": "隨光纖預製棒第二家邊緣一貫化廠入圖包 staged（2026-10-28，drop 即回退；入圖包見 fiber_preform_jiangsu_etern_2026_10_28_action.json）：光棒→光纖→光纜＋MPO 一貫化，擴產後光棒 1050 噸／年、光纖 3600 萬芯公里；另有海外電力工程、汽車線束、高溫超導等非光通訊業務——寫敘事時再量光通訊占比。系統口徑邊緣（`python -m alpha edge 600105.SS`：約 56.1 億美元、分析師 1 家，2026-10-28）",
+      "name_aliases": [
+        "永鼎股份",
+        "江苏永鼎",
+        "江蘇永鼎",
+        "江苏永鼎股份有限公司",
+        "Jiangsu Etern",
+        "JIANGSU ETERN COMPANY LIMITED"
+      ]
     }
   ]
 }
