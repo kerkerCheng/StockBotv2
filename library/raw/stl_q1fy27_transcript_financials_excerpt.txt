@@ -1,0 +1,30 @@
+SOURCE: Sterlite Technologies Limited（NSE: STLTECH）Q1 FY27 法說逐字稿——接單、營收、獲利、分部與在手訂單有限節錄
+URL: https://stl.tech/wp-content/uploads/2026/07/Transcript-July-24-2026.pdf（公司官網投資人專區）
+PUBLISHED: 2026-07-24（法說會日期，逐字稿每頁頁首）
+RETRIEVED: 2026-10-28
+STORAGE: repo_excerpt（公司刊登的逐字稿有限節錄；本機抽字，逐字截取）
+NOTE: **供應商一手（自述）**。Q2 FY27（2026-10-23 公布）的一手 stl.tech 尚未刊登，本節錄只到 Q1 FY27。
+
+【Ankit Agarwal（MD）：Q1 接單】
+In quarter 1 alone, we secured orders worth INR13,100 crores, which is 1.7x the total order wins of INR7,687 crores recorded in the entire financial year last year.
+
+【同段】
+The momentum is anchored by a landmark multiyear $1.1 billion deal with a global hyperscaler to supply optical connectivity products for next-gen AI data centers through FY29.
+
+【Ajay Jhanjhari（CFO）：財務】
+Revenue reached INR 1,910 crores, representing an extraordinary 87% year-on-year growth.
+
+【同段】
+I'm proud to share that we delivered on this right here in Q1 with INR397 crores in EBITDA, which is up 184% year-on-year. We are now revising our EBITDA margin guidance upward to 23%.
+
+【同段：分部】
+our Data Center segment saw a strong growth, contributing 21% this quarter, up from 1% in FY26.
+
+【同段：分部】
+Looking ahead, we expect the combined data center and Enterprise segment to scale up to 50% of the revenues in the current fiscal, well above the 30% guidance provided in our previous earnings call.
+
+【同段：地區】
+North America share expanded significantly to 54% in the current quarter, up from 39% in FY26, driven by robust demand.
+
+【同段：在手訂單】
+Our open order book stands at a record high of INR18,618 crores, up 2.4x from the last quarter, reflecting healthy order inflows and a strong market confidence.

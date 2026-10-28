@@ -1,0 +1,57 @@
+SOURCE: Sterlite Technologies Limited（NSE: STLTECH）Q2 FY27 法說逐字稿＋合併財務結果表——營收、獲利、接單、在手訂單、分部、擴產有限節錄
+URL: https://stl.tech/wp-content/uploads/2026/10/Investor-Earnings-Transcript.pdf（逐字稿）；https://stl.tech/wp-content/uploads/2026/10/Result Sheet Q2 FY 27_SignedF.pdf（合併結果表，董事會 2026-10-23 核准、會計師 limited review）
+PUBLISHED: 2026-10-23（法說會與董事會日期，逐字稿頁首、結果表附註 1）
+RETRIEVED: 2026-10-28
+STORAGE: repo_excerpt（公司刊登的逐字稿與結果表有限節錄；本機 pypdf 抽字，逐字截取；結果表欄位：Q2 FY27／Q1 FY27／Q2 FY26／H1 FY27／H1 FY26／FY26，單位 ₹ crores）
+NOTE: **供應商一手（自述）**。結果表是合併報表（CONSOLIDATED FINANCIAL RESULTS）。第二家 hyperscaler 未具名。
+
+【逐字稿：Ankit Agarwal（MD）——接單】
+In the first half of FY '27, we secured orders worth INR32,000 crores. This is roughly 4x the orders we won in the whole of FY '26. The largest win this quarter is a new 5-year agreement with a potential value of $1.2 billion. It is with another global hyperscaler for AI-ready optical solutions.
+
+【同段】
+This builds on the $1.11 billion product award letter for optical connectivity that we announced last quarter from another hyperscaler.
+
+【同段——市占與附加銷售】
+our global ex -China OFC market share increased to 9% in H1 FY '27, up from 7% in first half of FY '26.
+
+【逐字稿：CFO——營收】
+This quarter, revenue reached INR2,529 crores, representing growth of 145% year-on-year basis and 32% quarter-on-quarter basis.
+
+【同段——EBITDA】
+Our operational EBITDA for Q2 FY '27 came in at INR685 crores, delivering 27.1% margin or significant quarter-on-quarter expansion of 624 basis points.
+
+【同段——一次性收益】
+Note that reported EBITDA for Q2 FY '27 was INR846 crores, which includes a onetime net gain of INR161 crores from a U.S. tariff refund.
+
+【同段——淨利】
+PAT for Q2 FY '27 reached a record INR517 crores, driven by strong revenue growth, margin expansion. For the first half, PAT reached INR714 crores, up from INR14 crores in H1 FY '26
+
+【同段——分部與地區】
+our Data Center segment saw a strong momentum, contributing 33% in H1 FY '27.
+
+【同段】
+North America shares stood at 61% in H1 FY '27
+
+【同段——在手訂單】
+Our open order book stands at record INR35,274 crores, up 4.6x from INR7,687 crores at the start of this financial year.
+
+【同段】
+Of this, about INR3,021 crores is scheduled for execution in Q3 FY '27 and the rest over Q4 FY '27 and beyond.
+
+【同段——營收結構】
+As our multiyear agreements with hyperscalers and telecom operators scale up, more of our revenue now comes from the scheduled backlog and spot business makes up a negligible share.
+
+【同段——擴產】
+Our disciplined capital allocation entails a mix of brownfield expansion of preform, fiber and cable capacity by 50% and a greenfield facility for preterm solutions with a total capex of INR1,000 crores per year from 2027 to 2029.
+
+【同段——FY29 目標】
+Accordingly, we are upgrading our FY '29 EBITDA margin target to about 30%, up from 27% earlier, while maintaining our FY '29 revenue target at INR20,000 crores.
+
+【問答（Achal Lohade 問預製棒與光纖價格）：Ankit Agarwal】
+So we don't comment on prices specifically.
+
+【結果表：合併分部 EBITDA（Optical networking business）】
+Optical networking business 851 401 136 1,252 273 606
+
+【結果表：合併營收】
+Revenue from operations 2,529 1,910 1,034 4,439 2,054 4,745

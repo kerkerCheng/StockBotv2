@@ -1,0 +1,12 @@
+SOURCE: Corning Incorporated 8-K（2026-10-27）EX-99 第三季新聞稿——光通訊事業成長有限節錄
+URL: https://www.sec.gov/Archives/edgar/data/24741/000002474126000273/glw-20261027xex99xq32026.htm
+PUBLISHED: 2026-10-27（8-K 申報日）
+RETRIEVED: 2026-10-28
+STORAGE: repo_excerpt（SEC 申報有限節錄；本機抽字，逐字截取）
+NOTE: **需求端一手（Corning 自述）**。同一份新聞稿的長約與擴產兩句見 glw_8k_q3_2026_ex99_20261027.txt。
+
+【Q3 重點】
+Optical Communications continued to drive powerful growth, with Q3 sales up 44% to $2.38 billion; Enterprise Networks grew sales 84%, with Gen AI product sales growing more than 100% year over year.
+
+【CEO Wendell Weeks 引言】
+For example, in Optical Communications, faster adoption of our innovations helped us double our Gen AI sales year over year in the quarter, outpacing GPU unit growth.
