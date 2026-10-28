@@ -75,7 +75,7 @@ def main(argv=None) -> int:
         print(f"✗ llm.cwd 不是空目錄：{cwd}——CLI 會把裡面的東西帶進 context", file=sys.stderr)
         return 2
     argv_llm = llm_step.llm_argv(llm["claude_path_resolved"], str(llm["claude_model"]),
-                                 llm_step.schema_text(llm_step.TRIAGE_SCHEMA))
+                                 llm_step.schema_text(llm_step.TRIAGE_SCHEMA), effort=str(llm["claude_effort"]))
     size = int(llm["triage_chunk_size"])
     timeout = float(llm["triage_timeout_minutes"])
     proposals, sessions = [], []

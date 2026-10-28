@@ -84,6 +84,30 @@ def test_graph_without_json_and_unreadable_files_are_red_and_counted(tmp_path: P
     assert "讀不了的抽取檔 1" in summary_line(broken)
 
 
+def test_default_reads_local_only_extractions_too(tmp_path: Path, monkeypatch) -> None:
+    """2026-10-28：第一份 local_only 文件（逐字稿，抽取檔依規定在 library/private/extractions/）一入圖，
+    invariant 與健康審查就同時報「圖上有、沒有任何抽取檔」——只讀 repo 那一處的誤報。"""
+    import loader.sourcedoc_sync as sync
+
+    repo, private = tmp_path / "extractions", tmp_path / "library" / "private" / "extractions"
+    repo.mkdir()
+    private.mkdir(parents=True)
+    _write(repo, "public.json", "public")
+    _write(private, "call.json", "local_only_call")
+    monkeypatch.setattr(sync, "DEFAULT_DIRS", (repo, private))
+    docs = sync.json_source_docs()
+    assert docs["local_only_call"][0]["file"] == "private/extractions/call.json"
+    rows = [{"id": "public", "section": None, "title": "T"}, {"id": "local_only_call", "section": None, "title": "T"}]
+    assert sync.drift(rows, docs)["graph_without_json"] == []
+    assert sync.drift(rows, sync.json_source_docs(repo))["graph_without_json"] == ["local_only_call"]  # 給目錄＝只讀那一處
+
+
+def test_both_call_sites_use_the_default_dirs() -> None:
+    root = Path(__file__).resolve().parent.parent
+    assert "json_source_docs())" in (root / "query" / "health_audit.py").read_text(encoding="utf-8")
+    assert "json_source_docs())" in (root / "audit" / "checks.py").read_text(encoding="utf-8")
+
+
 def test_new_audit_check_is_registered() -> None:
     from audit import CHECKS_BY_NAME
 

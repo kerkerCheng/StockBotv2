@@ -671,3 +671,27 @@ def test_candidate_lines_surface_reading_ledger_parse_errors(tmp_path: Path) -> 
     board["readings"] = {"parse_errors": 2, "parse_error_examples": ["tech_x.jsonl:3: bad"]}
     StateArtifactStore(tmp_path).write(build_candidates_artifact(board))
     assert any("讀圖 ledger 有 2 行解析不了" in line for line in hb._candidate_lines(tmp_path))
+
+
+def _run_with_models(path: Path, models: list[str], **extra) -> Path:
+    steps = [{"key": "01c_radar_propose", "kind": "llm", "status": "ok",
+              "calls": [{"status": "ok", "model": m} for m in models]}] if models else []
+    path.write_text(json.dumps({"run_id": "r", "steps": steps, **extra}), encoding="utf-8")
+    return path
+
+
+def test_llm_model_drift_compares_with_the_last_run_that_called_the_llm(tmp_path: Path) -> None:
+    """2026-10-28：CLI 升版把 sonnet 別名從 5 換成 5.5，心跳沒有任何一行說話。上一輪沒呼叫 LLM（額度、登入過期）就往前找。"""
+    now = datetime(2026, 10, 28, 6, 0, tzinfo=timezone.utc)
+    _run_with_models(tmp_path / "daily_run_2026-10-23.json", ["claude-sonnet-5"])
+    _run_with_models(tmp_path / "daily_run_2026-10-27.json", [])                 # 那天 LLM 全失敗：跳過
+    today = _run_with_models(tmp_path / "daily_run_2026-10-28.json", ["claude-sonnet-5-5"],
+                             llm_model="sonnet", llm_effort="high")
+    record = json.loads(today.read_text(encoding="utf-8"))
+    assert hb.llm_model_drift(record, now=now, record_dir=tmp_path) == "claude-sonnet-5 → claude-sonnet-5-5（上一輪 10-23）"
+    text = "\n".join(hb._daily_run_lines(now=now, record_path=today))
+    assert "LLM：設定 sonnet｜effort high｜實際 claude-sonnet-5-5" in text
+    assert "LLM 實際 model 變了" in text
+    _run_with_models(tmp_path / "daily_run_2026-10-23.json", ["claude-sonnet-5-5"])
+    assert hb.llm_model_drift(record, now=now, record_dir=tmp_path) is None     # 一樣就不印
+    assert "model 變了" not in "\n".join(hb._daily_run_lines(now=now, record_path=today))

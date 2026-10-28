@@ -356,7 +356,9 @@ def events_block(*, digest: Mapping[str, Any] | None, receipt: Mapping[str, Any]
                                                impact_ran=impact is not None and not (impact or {}).get("error"))
         states[LEAD_STATE_WORDS.get(str(status), "lead 不在")] += 1
         seen.update(verdicts)
-        first = re.split(r"[，。；,;]", str(item.get("fact") or item.get("title") or item.get("url") or ""), maxsplit=1)[0]
+        # 半形逗號夾在兩個數字之間是千分位，不是斷句（2026-10-28：「收窄為 1,350 億」被切成「收窄為 1」）
+        first = re.split(r"[，。；;]|(?<!\d),|,(?!\d)",
+                         str(item.get("fact") or item.get("title") or item.get("url") or ""), maxsplit=1)[0]
         line = f"- [{scope}] {_short(first, 60)} {outcome}"
         repeat = _possible_repeat(item, recent_accepted)
         if repeat is not None:
@@ -451,7 +453,8 @@ def status_lines(*, record: Mapping[str, Any] | None, diff_lines: Sequence[str],
 
 
 def health_block(*, record: Mapping[str, Any] | None, record_problem: str | None,
-                 quota: Sequence[Mapping[str, Any]], snapshot: Mapping[str, Any]) -> list[str]:
+                 quota: Sequence[Mapping[str, Any]], snapshot: Mapping[str, Any],
+                 model_drift: str | None = None) -> list[str]:
     """④ 的下半（健康度）：沒問題一行；有問題逐條。被額度擋下的 LLM 步驟併成一行（同一個原因不重複四次）；其他失敗印人話標籤
     與錯誤的最後一行；invariants FAIL、健康紅燈照快照。"""
     problems: list[str] = []
@@ -492,6 +495,8 @@ def health_block(*, record: Mapping[str, Any] | None, record_problem: str | None
     for key, label in (("invariants.fail", "invariants FAIL"), ("health.red", "健康紅燈")):
         if snapshot.get(key):
             problems.append(f"{label} {snapshot[key]}")
+    if model_drift:
+        problems.append(f"LLM 實際 model 變了：{model_drift}——雷達與分類的產量可能跟著變")
     if not problems:
         return [f"- 健康度：正常（daily {done}/{total} 步 ok；invariants、健康審查無紅）"]
     return [f"- 健康度：{len(problems)} 個問題", *(f"  - ⚠ {p}" for p in problems)]
@@ -627,8 +632,13 @@ def compose_brief(*, now: datetime, summary: str, snapshot: Mapping[str, Any], r
                   line(lambda: disproof_line(snapshot), "反證"),
                   line(waits_line, "無到期的等待"),
                   line(lambda: hb._new_names_line(now=now, leads_path=leads_path, hint=False), "新點名")]
+        try:
+            drift = hb.llm_model_drift(record, now=now,
+                                       record_dir=run_record_path.parent if run_record_path else None)
+        except Exception:  # noqa: BLE001 — 比不了就不印這一條，不帶走健康度
+            drift = None
         health = health_block(record=record, record_problem=record_problem,
-                              quota=hb.quota_entries(rows, now=now), snapshot=snapshot)
+                              quota=hb.quota_entries(rows, now=now), snapshot=snapshot, model_drift=drift)
         return ["**④ 狀態與健康度**", *status_lines(record=record, diff_lines=diff_lines, status=status), *health]
 
     blocks.append(guarded("① Lead 抓了什麼", leads_part))

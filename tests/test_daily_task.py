@@ -92,7 +92,7 @@ EXPECTED_STEPS = (
     ("13_materialize", ("-m", "webapp", "materialize", "--tracked", "--registry-listed", "--structure-table",
                         "--beta", "--graph-walk", "--watches", "--positions", "--structure-readings", "--scorecard", "--candidates",
                         "--layer-notes"),
-     25, True, True, "command", False, None, None, None),
+     45, True, True, "command", False, None, None, None),  # 2026-10-28：25 分鐘在 186 檔個股頁時逾時
     ("14_health_audit", ("query/health_audit.py", "--local", "--json"), 5, False, False, "capture", False,
      "health_{date}.json", None, None),
     ("15_invariants", ("-m", "audit", "invariants", "--json"), 5, False, False, "capture", False,
@@ -111,6 +111,18 @@ EXPECTED_STEPS = (
     ("19_publish", ("scripts/publish_daily_brief.py", "--brief-file", "{short_brief}", "--summary", "{summary}"),
      3, False, True, "publish", True, None, None, None),
 )
+
+
+def test_materialize_runs_page_independent_state_before_the_stock_pages() -> None:
+    """2026-10-28：個股頁跑超過時限時，排在後面的全部沒更新。不讀個股頁目錄的帳號計分表與結構讀圖排在前面；
+    候選板與層說明要讀同一輪新寫的個股頁，只能在後面（3.6 審查：候選板放前面會取到上一輪的目錄）。"""
+    source = (ROOT / "webapp" / "__main__.py").read_text(encoding="utf-8")
+    body = source[source.index("def cmd_materialize"):]
+    pages = body.index("materialize_many(")
+    assert body.index("materialize_account_scorecard(store") < pages
+    assert body.index("materialize_structure_readings(store") < pages
+    assert body.index("materialize_candidates(tickers") > pages
+    assert body.index("materialize_layer_notes(store") > pages
 
 
 def test_daily_steps_are_exactly_the_closed_list() -> None:
@@ -203,7 +215,7 @@ def _config(tmp_path: Path, *, executor: str = "none", limit: int = 240) -> Path
         "schedule": {"timezone": "Asia/Taipei", "daily_local_time": "05:30", "task_name": "StockBotv2-Daily",
                      "execution_time_limit_minutes": limit, "expected_duration_minutes": 60,
                      "guard_margin_minutes": 15, "harvest_stale_hours": 30},
-        "llm": {"executor": executor, "claude_path": None, "claude_model": "sonnet",
+        "llm": {"executor": executor, "claude_path": None, "claude_model": "sonnet", "claude_effort": "high",
                 "cwd": str(tmp_path / "llm_cwd"), "triage_timeout_minutes": 15, "triage_chunk_size": 30,
                 "prescreen_timeout_minutes": 15, "prescreen_chunk_size": 3},
         "pq1": {"drain_limit_per_run": 0, "tracked_ticker_sources": {
@@ -672,6 +684,32 @@ def test_llm_cwd_inside_the_repo_fails_closed(tmp_path: Path) -> None:
         load_llm(path, repo_root=tmp_path / "repo")
 
 
+@pytest.mark.parametrize("bad", [None, "", "ultra", "HIGH"])
+def test_llm_effort_is_required_and_closed(tmp_path: Path, bad) -> None:
+    """2026-10-28：不帶 `--effort` 就是 CLI 預設，升版時由 high 悄悄變 medium——所以 effort 必填、只收 CLI 的五個值。"""
+    from engine_b.routine_config import load_llm
+
+    path = _config(tmp_path)
+    data = json.loads(path.read_text(encoding="utf-8"))
+    if bad is None:
+        data["llm"].pop("claude_effort")
+    else:
+        data["llm"]["claude_effort"] = bad
+    path.write_text(json.dumps(data), encoding="utf-8")
+    with pytest.raises(ValueError, match="claude_effort"):
+        load_llm(path)
+
+
+def test_the_real_config_pins_an_effort_and_every_llm_argv_carries_it() -> None:
+    from engine_b.routine_config import CLAUDE_EFFORTS, load_llm
+
+    llm = load_llm()
+    assert llm["claude_effort"] in CLAUDE_EFFORTS
+    for fn in (llm_step.llm_argv, llm_step.radar_argv):
+        argv = fn("C:/x/claude.exe", llm["claude_model"], "{schema}", effort=llm["claude_effort"])
+        assert argv[argv.index("--effort") + 1] == llm["claude_effort"]
+
+
 @pytest.mark.parametrize("key, bad", [("daily_local_time", "5:30"), ("daily_local_time", "25:00"),
                                       ("execution_time_limit_minutes", 10), ("task_name", ""),
                                       ("timezone", "Mars/Base"), ("harvest_stale_hours", 0)])
@@ -778,7 +816,7 @@ RATE_OK = {"type": "rate_limit_event", "rate_limit_info": {
 
 
 def test_llm_argv_is_exactly_the_zero_tool_shape() -> None:
-    argv = llm_step.llm_argv("C:/x/claude.exe", "sonnet", "{schema}")
+    argv = llm_step.llm_argv("C:/x/claude.exe", "sonnet", "{schema}", effort="high")
     assert argv == [
         "C:/x/claude.exe", "-p",
         "--tools", "",
@@ -787,6 +825,7 @@ def test_llm_argv_is_exactly_the_zero_tool_shape() -> None:
         "--settings", '{"disableAllHooks":true,"autoMemoryEnabled":false}',
         "--disable-slash-commands",
         "--model", "sonnet",
+        "--effort", "high",
         "--output-format", "stream-json",
         "--verbose",
         "--include-hook-events",

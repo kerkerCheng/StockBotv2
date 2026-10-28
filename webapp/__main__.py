@@ -131,6 +131,35 @@ def cmd_materialize(args: argparse.Namespace) -> int:
             print(f"✓ positions → {path.name}（{path.stat().st_size:,} bytes；"
                   f"逐檔 {len(payload['rows'])}／真實成交 {len(payload['live']['tickers'])} 檔）")
 
+    # 帳號計分表與結構讀圖不讀個股頁目錄，所以**排在個股頁之前**（2026-10-28：個股頁 186 檔跑超過 daily 的 25 分鐘，
+    # 排在後面的這兩份與候選板、層說明一起沒更新）。候選板與層說明要讀同一輪新寫的個股頁，只能留在後面。
+    # 帳號計分表（Phase 3）：唯一會抓價格的 materializer，所以 fail-soft 且與其他各自獨立。
+    if getattr(args, "account_scorecard", False):
+        total += 1
+        try:
+            path, payload = materialize_account_scorecard(store=state_store)
+        except Exception as exc:  # noqa: BLE001
+            failed += 1
+            print(f"✗ account_scorecard：{type(exc).__name__}: {str(exc)[:200]}", file=sys.stderr)
+        else:
+            accounts = payload.get("accounts") or []
+            calls = sum(int(a.get("named_calls") or 0) for a in accounts)
+            print(f"✓ account_scorecard → {path.name}（{path.stat().st_size:,} bytes；"
+                  f"{len(accounts)} 個帳號／{calls} 則具名點名）")
+    # 結構讀圖：唯讀 ledger ＋ 查圖比對。與其他 state materializer 互不相干，所以**各自 fail-soft**。
+    if getattr(args, "structure_readings", False):
+        total += 1
+        try:
+            path, payload = materialize_structure_readings(store=state_store, as_of=as_of)
+        except Exception as exc:  # noqa: BLE001
+            failed += 1
+            print(f"✗ structure_readings：{type(exc).__name__}: {str(exc)[:200]}", file=sys.stderr)
+        else:
+            c = payload["counts"]
+            print(f"✓ structure_readings → {path.name}（{path.stat().st_size:,} bytes；"
+                  f"現行 {c['current']}／stale {c['stale']}／低級 {c['stale_low']}／過期 {c['expired']}"
+                  f"；該重讀 {payload['needs_reread']['n']}）")
+
 
     # 不給 ticker 且沒要求任何 state ＝ 重跑目錄裡已有的每一檔（原行為）。
     # 只給 --structure-table ＝ 只做結構表，不順手重跑單檔（那是另一件事，也是另一段時間）。
@@ -219,32 +248,6 @@ def cmd_materialize(args: argparse.Namespace) -> int:
                 brief = payload.get("brief") or {}
                 state = "有短版" if brief.get("markdown") else f"沒有短版：{(brief.get('absence') or {}).get('reason')}"
                 print(f"✓ daily → {path.name}（{path.stat().st_size:,} bytes；{state}）")
-    # 帳號計分表（Phase 3）：唯一會抓價格的 materializer，所以 fail-soft 且與其他各自獨立。
-    if getattr(args, "account_scorecard", False):
-        total += 1
-        try:
-            path, payload = materialize_account_scorecard(store=state_store)
-        except Exception as exc:  # noqa: BLE001
-            failed += 1
-            print(f"✗ account_scorecard：{type(exc).__name__}: {str(exc)[:200]}", file=sys.stderr)
-        else:
-            accounts = payload.get("accounts") or []
-            calls = sum(int(a.get("named_calls") or 0) for a in accounts)
-            print(f"✓ account_scorecard → {path.name}（{path.stat().st_size:,} bytes；"
-                  f"{len(accounts)} 個帳號／{calls} 則具名點名）")
-    # 結構讀圖：唯讀 ledger ＋ 查圖比對。與其他 state materializer 互不相干，所以**各自 fail-soft**。
-    if getattr(args, "structure_readings", False):
-        total += 1
-        try:
-            path, payload = materialize_structure_readings(store=state_store, as_of=as_of)
-        except Exception as exc:  # noqa: BLE001
-            failed += 1
-            print(f"✗ structure_readings：{type(exc).__name__}: {str(exc)[:200]}", file=sys.stderr)
-        else:
-            c = payload["counts"]
-            print(f"✓ structure_readings → {path.name}（{path.stat().st_size:,} bytes；"
-                  f"現行 {c['current']}／stale {c['stale']}／低級 {c['stale_low']}／過期 {c['expired']}"
-                  f"；該重讀 {payload['needs_reread']['n']}）")
     print(f"完成 {total - failed}/{total}；下一步：python -m webapp serve")
     return 1 if failed else 0
 

@@ -37,11 +37,16 @@
       "schedule.execution_time_limit_minutes：2026-10-06 由 240 調到 360——各步 timeout 加總改成照實算「每次 × 最多幾次」",
       "（R2 條件 2：預篩最多 4 次、T2 最多 20 次），約 340 分鐘；實際一輪約 20–40 分鐘。改完已跑 register_daily_task.py --apply。",
       "2026-10-07：分類每輪上限 30 → 90（見 triage._doc），每次呼叫 timeout 15 → 8（實測 30 則一次 240 秒），3 次共 24 分；",
-      "加總 363 超過 360，總時限調到 400（它是殺掉卡住行程的保險，不是預期時間）。改完已跑 register_daily_task.py --apply。"
+      "加總 363 超過 360，總時限調到 400（它是殺掉卡住行程的保險，不是預期時間）。改完已跑 register_daily_task.py --apply。",
+      "claude_effort（2026-10-28，必填）：五個 LLM 步驟共用。不寫就是 CLI 預設——2.1.281→2.1.311 自動升版時由 high 變 medium，",
+      "雷達一輪由 4–9 則掉到 1 則。同一份批次實測：雷達 medium 搜 10 收 1／high 32 收 5／max 34 收 2（448 秒）；",
+      "分類 43 則 high 每次約 1 分鐘、max 一次 596–816 秒（超過 triage_timeout 8 分，整步會丟棄）、判定與 high 只差 2 則；",
+      "opus＋xhigh 雷達 33 收 5、分類與 sonnet high 差 4 則（多放行的 3 則是雜訊）。所以 sonnet＋high。"
     ],
     "executor": "claude",
     "claude_path": null,
     "claude_model": "sonnet",
+    "claude_effort": "high",
     "cwd": null,
     "triage_timeout_minutes": 8,
     "triage_chunk_size": 30,

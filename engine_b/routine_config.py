@@ -111,6 +111,9 @@ def load_schedule(path: Path = DEFAULT_CONFIG) -> dict[str, Any]:
 
 #: `llm.executor` 的封閉字彙。一個開關同時管 triage 與語意預篩，也是 R2-a 的回滾開關。
 LLM_EXECUTORS = ("none", "claude")
+#: `llm.claude_effort` 的封閉字彙（`claude --effort` 收的值）。**必填、沒有預設**：不帶 `--effort` 就是 CLI 的預設，
+#: 而 CLI 升版會悄悄改掉它——2026-10-28 實測 2.1.281→2.1.311 由 high 變 medium，雷達一輪由 4–9 則掉到 1 則。
+CLAUDE_EFFORTS = ("low", "medium", "high", "xhigh", "max")
 #: T2 輪詢（daily ⑩e）的每次呼叫 timeout 與每次幾條等待；config 沒寫時用這兩個值。
 #: 每次 1 條是刻意的（R2 條件 1）：⑩g 只認負責這條的那一次呼叫搜過的東西，一次多條就驗不出同一次呼叫裡的照抄。
 POLL_LLM_DEFAULTS: dict[str, Any] = {"poll_timeout_minutes": 3, "poll_chunk_size": 1,
@@ -136,6 +139,9 @@ def load_llm(path: Path = DEFAULT_CONFIG, *, repo_root: Path = ROOT) -> dict[str
     model = llm.get("claude_model")
     if not isinstance(model, str) or not model.strip():
         raise ValueError("llm.claude_model 不可為空（模型只住這裡）")
+    if llm.get("claude_effort") not in CLAUDE_EFFORTS:
+        raise ValueError(f"llm.claude_effort 必須是 {CLAUDE_EFFORTS} 之一（不寫＝CLI 預設，升版會悄悄改）："
+                         f"{llm.get('claude_effort')!r}")
     llm = dict(llm)
     # T2 輪詢（2026-10-06）的兩格沒寫就用預設：缺它們不該讓 triage 與預篩一起停（LLM 設定壞掉會停掉全部 LLM 步驟）；
     # 寫了就照下面同一套驗——打錯的數字比沒有更危險。

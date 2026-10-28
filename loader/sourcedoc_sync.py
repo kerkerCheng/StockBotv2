@@ -14,7 +14,8 @@ title 就蓋上圖（19 個 doc_id 的 JSON 標題互異、11 份圖上掛的是
   （載入順序決定結果）。
 - **stale**（黃）：圖**落後** JSON——JSON 是對的、圖還沒重載；重載就會對齊。
 
-純函式＋讀本機 `extractions/*.json`；不連圖（圖上的值由呼叫端給）。`query/health_audit.py` 與 `audit/checks.py` 共用。
+純函式＋讀本機 `extractions/*.json` 與 `library/private/extractions/*.json`（local_only 文件）；不連圖（圖上的值由呼叫端給）。
+`query/health_audit.py` 與 `audit/checks.py` 共用。
 """
 from __future__ import annotations
 
@@ -37,19 +38,30 @@ def _norm(value: Any) -> str | None:
     return text or None
 
 
+#: 不給目錄時讀的兩處：repo 的 `extractions/`，以及 `storage_permission=local_only` 的文件（逐字稿這類不能進公開 repo 的）
+#: 由 intake 寫在 `library/private/extractions/`（`intake/application.py::_stored_extraction_for_action`）。
+#: 2026-10-28：只讀第一處時，第一份 local_only 文件（Broadcom 法說會）一入圖就被報成「圖上有、沒有任何抽取檔」——
+#: 檔案在、備份也在，invariant 與健康審查卻同時亮紅。
+DEFAULT_DIRS: tuple[Path, ...] = (ROOT / "extractions", ROOT / "library" / "private" / "extractions")
+
+
 def json_source_docs(extraction_dir: Path | None = None) -> dict[str, list[dict[str, Any]]]:
-    """`doc_id → [{file, <FIELDS>…}]`（同一個 doc_id 可能有 base＋addendum 多份檔案）。讀不了的檔案跳過並記錄。"""
-    directory = Path(extraction_dir) if extraction_dir else ROOT / "extractions"
+    """`doc_id → [{file, <FIELDS>…}]`（同一個 doc_id 可能有 base＋addendum 多份檔案）。讀不了的檔案跳過並記錄。
+    給了 `extraction_dir` 就只讀那一處；沒給就讀 `DEFAULT_DIRS`（不存在的目錄當作沒有檔案）。"""
+    directories = (Path(extraction_dir),) if extraction_dir else DEFAULT_DIRS
     out: dict[str, list[dict[str, Any]]] = defaultdict(list)
-    for path in sorted(directory.glob("*.json")):
-        try:
-            source_doc = json.loads(path.read_text(encoding="utf-8")).get("source_doc") or {}
-        except (OSError, json.JSONDecodeError):
-            out["__unreadable__"].append({"file": path.name, **{f: None for f in FIELDS}})
-            continue
-        doc_id = source_doc.get("doc_id")
-        if doc_id:
-            out[str(doc_id)].append({"file": path.name, **{f: _norm(source_doc.get(f)) for f in FIELDS}})
+    for directory in directories:
+        prefix = "" if directory == directories[0] else f"{directory.parent.name}/{directory.name}/"
+        for path in sorted(directory.glob("*.json")):
+            name = prefix + path.name
+            try:
+                source_doc = json.loads(path.read_text(encoding="utf-8")).get("source_doc") or {}
+            except (OSError, json.JSONDecodeError):
+                out["__unreadable__"].append({"file": name, **{f: None for f in FIELDS}})
+                continue
+            doc_id = source_doc.get("doc_id")
+            if doc_id:
+                out[str(doc_id)].append({"file": name, **{f: _norm(source_doc.get(f)) for f in FIELDS}})
     return dict(out)
 
 

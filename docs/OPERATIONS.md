@@ -118,6 +118,16 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 `StockBotv2-Daily` 的 ⑱⑲ 取代（1.2a 停用、2026-09-25 1.2b 刪除）；它們的理由（LLM 失敗心跳照發、永遠 exit 0、Python 不用 `.cmd`、
 發送走 subprocess）搬進 `crons/daily_task.py` 的 docstring，守它們的測試改主詞搬進 `tests/test_daily_task.py`「無人值守入口」節。
 
+### Sandbox impact review 結論（2026-10-28：`claude -p` 固定 effort——failure log #107）
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | daily 的五個 LLM 步驟（①c 雷達、⑦a 分類、⑩b 預篩、⑩e T2、⑪c 摘要）與兩個互動入口（`scripts/triage_catchup.py`、`scripts/trial_daily_brief.py`）的 `claude -p` argv **多一對 `--effort <llm.claude_effort>`**，排在 `--model` 後面（`crons/llm_step.py::llm_argv`，雷達／T2 的 `radar_argv` 由它衍生）。值住 `config/daily_routine.json` 的 `llm.claude_effort`（必填、封閉字彙 low／medium／high／xhigh／max；不寫或寫錯 → `load_llm` raise → 只停 LLM 步驟，同 `claude_model`），現值 `high`。**不新增工具、主機、寫入面**：`--tools`、`--settings`、`--strict-mcp-config`、能力檢查、環境變數白名單、cwd 全部不變；`--effort` 不在任何禁用清單裡，也不放寬任何一格。run record 多 `llm_model`／`llm_effort` 兩欄；心跳段 1 多一行「LLM：設定／effort／實際」，實際 model 與上一輪有呼叫 LLM 的 daily 不同時亮 ⚠（段 1、摘要行、短版健康度三處同一個 `heartbeat.llm_model_drift`，只讀本機 run record）。另：⑬ materialize 時限 25 → 45 分鐘（argv 不變），各步 timeout 加總 390 < 總時限 400 |
+| **2 canonical skill／prompt／本檔** | 本節；`config/daily_routine.json` `llm._doc` 寫明實測（同一份批次：雷達 medium 收 1／high 5／max 2；分類 max 一次 596–816 秒超過 8 分時限）；`docs/reports/phase7/failure-log.md` #107。prompt 不動 |
+| **3 最窄 rule** | `.codex/rules` 仍 0 條（daily 不經 Codex）；不新增 step、allowlist、APP 路由 |
+| **4 contract test** | `tests/test_daily_task.py`：零工具 argv 逐元素相等（含 `--effort high`）、effort 必填且只收五個值（缺、空字串、`ultra`、`HIGH` 都 raise）、正式 config 的值兩種 argv 都帶；`tests/test_radar.py`：雷達 argv 與零工具那份仍只差兩格、effort 跟著走；`tests/test_heartbeat.py`：上一輪沒呼叫 LLM 就往前找、model 一樣不印 |
+| **5 端到端 smoke** | 真資料（10-28 的雷達批次與分類批次，結果只存私有暫存、不套用）：雷達 sonnet 5.5＋high 搜 32 次收 5 則（daily 當天 medium 搜 11 收 1）；分類 43 則 high 2 次呼叫共 126 秒、與 daily 當天差 1 則 |
+
 ### Sandbox impact review 結論（2026-10-27：分類前的內文——failure log #105）
 
 | 步 | 結論 |

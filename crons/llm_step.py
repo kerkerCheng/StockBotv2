@@ -61,9 +61,10 @@ RADAR_SETTINGS_JSON = '{"disableAllHooks":true,"autoMemoryEnabled":false,"permis
 RADAR_FORBIDDEN_FLAGS: tuple[str, ...] = (*FORBIDDEN_LLM_FLAGS, "--permission-prompt-tool")
 
 
-def llm_argv(claude_path: Path | str, model: str, schema_text: str) -> list[str]:
+def llm_argv(claude_path: Path | str, model: str, schema_text: str, *, effort: str) -> list[str]:
     """`--tools` 與 `--setting-sources` 後面的空字串各自是一個元素。`--json-schema` 是
-    `StructuredOutput` 工具的來源——不帶它時 init 的 `tools == []`，兩者同進同出（N4-13）。"""
+    `StructuredOutput` 工具的來源——不帶它時 init 的 `tools == []`，兩者同進同出（N4-13）。
+    `effort` 必填（`llm.claude_effort`）：不帶 `--effort` 就是 CLI 預設，升版會悄悄改掉（2026-10-28 high→medium）。"""
     return [
         str(claude_path), "-p",
         "--tools", "",
@@ -72,6 +73,7 @@ def llm_argv(claude_path: Path | str, model: str, schema_text: str) -> list[str]
         "--settings", LLM_SETTINGS_JSON,
         "--disable-slash-commands",
         "--model", model,
+        "--effort", effort,
         "--output-format", "stream-json",
         "--verbose",
         "--include-hook-events",
@@ -79,10 +81,10 @@ def llm_argv(claude_path: Path | str, model: str, schema_text: str) -> list[str]
     ]
 
 
-def radar_argv(claude_path: Path | str, model: str, schema_text: str) -> list[str]:
+def radar_argv(claude_path: Path | str, model: str, schema_text: str, *, effort: str) -> list[str]:
     """外部雷達（Phase 7 Step 7.0f）的 argv：與 `llm_argv` 只差兩格——`--tools WebSearch` 與放行 `WebSearch` 的
-    `--settings`。其餘（`--strict-mcp-config`、`--setting-sources ""`、關 hook、關 slash command、stream＋hook 事件）照舊。"""
-    argv = llm_argv(claude_path, model, schema_text)
+    `--settings`。其餘（`--strict-mcp-config`、`--setting-sources ""`、`--effort`、關 hook、關 slash command、stream＋hook 事件）照舊。"""
+    argv = llm_argv(claude_path, model, schema_text, effort=effort)
     argv[argv.index("--tools") + 1] = "WebSearch"
     argv[argv.index("--settings") + 1] = RADAR_SETTINGS_JSON
     return argv

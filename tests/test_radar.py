@@ -43,8 +43,9 @@ URL_C = "https://www.digitimes.com/news/a20261003PD201.html"
 # ---------------------------------------------------------------------------
 
 def test_radar_argv_differs_from_the_zero_tool_one_in_exactly_two_values() -> None:
-    zero = llm_step.llm_argv("C:/x/claude.exe", "sonnet", "{schema}")
-    argv = llm_step.radar_argv("C:/x/claude.exe", "sonnet", "{schema}")
+    zero = llm_step.llm_argv("C:/x/claude.exe", "sonnet", "{schema}", effort="high")
+    argv = llm_step.radar_argv("C:/x/claude.exe", "sonnet", "{schema}", effort="high")
+    assert argv[argv.index("--effort") + 1] == "high"                       # effort 跟著零工具那份走、不漏
     diff = [(z, a) for z, a in zip(zero, argv) if z != a]
     assert len(argv) == len(zero) and len(diff) == 2
     assert argv[argv.index("--tools") + 1] == "WebSearch"                    # 只開這一個

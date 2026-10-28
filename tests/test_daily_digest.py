@@ -336,6 +336,17 @@ def test_the_brief_prints_the_llm_sentences_when_there_are_some(tmp_path) -> Non
     assert "LG 拿到冷水機長約" not in "\n".join(lines)
 
 
+def test_radar_fact_is_not_cut_at_a_thousands_separator() -> None:
+    """2026-10-28：「收窄為 1,350 億至 1,450 億美元（原下限…）」在短版被切成「收窄為 1」。半形逗號後面接數字是千分位。"""
+    from crons.daily_brief import events_block
+
+    fact = "Meta 將資本支出指引收窄為 1,350 億至 1,450 億美元, 並未給出 2027 年指引"
+    receipt = {"summary": {"searches": 11, "new": 1, "new_market": 1, "new_theme": 0, "new_watch": 0},
+               "accepted": [{"scope": "market", "title": "Meta", "fact": fact, "lead_id": "lead_m"}]}
+    lines = events_block(digest=None, receipt=receipt, digest_problem=None, radar_problem=None)
+    assert lines[1].startswith("- [市場] Meta 將資本支出指引收窄為 1,350 億至 1,450 億美元 →")   # 千分位不切；「, 並」照切
+
+
 def test_without_a_digest_the_brief_says_why_and_falls_back_to_program_content() -> None:
     from crons.daily_brief import events_block, leads_block
 

@@ -28,7 +28,8 @@ def _run(llm: dict, prompt: str, *, argv_fn, schema, tools, observe=None, timeou
     cwd.mkdir(parents=True, exist_ok=True)
     if any(cwd.iterdir()):
         raise SystemExit(f"llm.cwd 不是空目錄：{cwd}——CLI 會把裡面的東西帶進 context")
-    argv = argv_fn(llm["claude_path_resolved"], str(llm["claude_model"]), llm_step.schema_text(schema))
+    argv = argv_fn(llm["claude_path_resolved"], str(llm["claude_model"]), llm_step.schema_text(schema),
+                   effort=str(llm["claude_effort"]))
     kwargs = {"tools": tools} if tools else {}
     if observe is not None:
         kwargs["observe"] = observe

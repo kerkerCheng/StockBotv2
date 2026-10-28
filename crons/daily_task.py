@@ -232,11 +232,13 @@ DAILY_STEPS: tuple[DailyStep, ...] = (
               ("scripts/backfill_fiscal_year_results.py", "--write"), 10, True, True),
     # `--layer-notes`（2026-10-07 個股頁 plan S4b）：層說明閱讀頁，**只讀** ledger——寫層說明只在互動 session
     # （`tests/test_codex_daily_permissions.py::test_layer_note_ledger_is_written_only_interactively`）。
+    # 時限 25 → 45（2026-10-28）：個股頁約 7 秒一檔，名冊 157 → 186 檔後這步 10-24～10-27 已跑到 1,248–1,396 秒，
+    # 10-28 超過 1,500 秒逾時——排在個股頁後面的候選板、層說明沒更新，短版等回落印的是前一個交易日的收盤。
     DailyStep("13_materialize", "APP materialize",
               ("-m", "webapp", "materialize", "--tracked", "--registry-listed", "--structure-table",
                "--beta", "--graph-walk", "--watches", "--positions", "--structure-readings", "--scorecard",
                "--candidates", "--layer-notes"),
-              25, True, True),
+              45, True, True),
     DailyStep("14_health_audit", "健康審查",
               ("query/health_audit.py", "--local", "--json"),
               5, False, False, kind="capture", capture="health_{date}.json"),
@@ -532,6 +534,9 @@ class DailyRun:
         try:
             self.llm = routine_config.load_llm(self.config_path, repo_root=self.root)
             self.record["llm_executor"] = self.llm["executor"]
+            # 設定的 model 別名與 effort（實際跑到的 model 在每次呼叫的 `calls[].model`；心跳拿它跟上一輪比）
+            self.record["llm_model"] = self.llm["claude_model"]
+            self.record["llm_effort"] = self.llm["claude_effort"]
         except ValueError as exc:
             # LLM 設定壞掉只停 LLM 步驟（R2-a NB-12）：harvest、ETL、備份跟它無關，不陪葬。
             self.llm = None
@@ -831,7 +836,8 @@ class DailyRun:
         if instruction_files:
             return fail("failed", f"llm.cwd 或上層目錄有指令檔 {instruction_files[:3]}——`agents-md@builtin` 會載入它們（R2-a NB-11）")
         argv = spec.get("argv", llm_step.llm_argv)(self.llm["claude_path_resolved"], str(self.llm["claude_model"]),
-                                                    llm_step.schema_text(spec["schema"]))
+                                                    llm_step.schema_text(spec["schema"]),
+                                                    effort=str(self.llm["claude_effort"]))
         env = llm_step.llm_env(self.parent_env)
         runner = self.llm_runner or llm_step.run_claude
         per_call = call_timeout_minutes(step, self.llm, self.radar)
@@ -1012,7 +1018,8 @@ def dry_run_text(config_path: Path = CONFIG_PATH) -> str:
         lines.append(f"排程：每日 {schedule['daily_local_time']}（{schedule['timezone']}）"
                      f"｜工作 {schedule['task_name']}｜時限 {schedule['execution_time_limit_minutes']} 分鐘"
                      f"｜預估 {schedule['expected_duration_minutes']} 分鐘")
-        lines.append(f"LLM：executor={llm['executor']}｜model={llm['claude_model']}｜cwd={llm['cwd_path']}")
+        lines.append(f"LLM：executor={llm['executor']}｜model={llm['claude_model']}｜effort={llm['claude_effort']}"
+                     f"｜cwd={llm['cwd_path']}")
         radar = routine_config.load_radar(config_path)
         lines.append(f"外部雷達：{'開' if radar['enabled'] else '關'}"
                      f"{'' if radar['configured'] else '（config 沒有 radar 區塊）'}｜每日上限 {radar['max_items']} 則"

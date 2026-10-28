@@ -198,7 +198,7 @@ def check_sourcedoc_sync() -> AuditResult:
         from loader.sourcedoc_sync import GRAPH_CYPHER, drift, is_red, json_source_docs, summary_line
 
         rows = sources.graph_rows(GRAPH_CYPHER)
-        result = drift(rows, json_source_docs(ROOT / "extractions"))
+        result = drift(rows, json_source_docs())  # repo＋local_only 兩處，與健康審查同一個預設
         danger = ([f"⛔ {d['doc_id']}.{d['field']}（{d['kind']}）：圖＝{d['graph']!r}；JSON＝{d['json']!r}"
                    for d in result["danger"]]
                   + [f"⛔ {doc_id}：圖上有、沒有任何抽取檔（重建不回來）" for doc_id in result["graph_without_json"]]

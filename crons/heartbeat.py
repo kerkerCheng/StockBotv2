@@ -423,6 +423,37 @@ def _load_run_record(path: Path | None, *, now: datetime) -> tuple[Mapping[str, 
     return record, None
 
 
+def _served_models(record: Mapping[str, Any]) -> list[str]:
+    """這一輪 LLM 步驟實際跑到的 model（每次呼叫 init 事件報的，`calls[].model`）。"""
+    return sorted({str(call.get("model")) for row in record.get("steps") or () if isinstance(row, Mapping)
+                   for call in row.get("calls") or () if isinstance(call, Mapping) and call.get("model")})
+
+
+def llm_model_drift(record: Mapping[str, Any] | None, *, now: datetime, record_dir: Path | None = None) -> str | None:
+    """今天實際跑到的 model 跟上一輪有呼叫 LLM 的 daily 不同 →「舊 → 新（上一輪 MM-DD）」；相同、或比不了 → None。
+
+    2026-10-28：CLI 自動升版把 `sonnet` 別名從 sonnet 5 換成 5.5、預設 effort 由 high 變 medium，雷達一輪由 4–9 則
+    掉到 1 則，沒有任何東西說話。effort 已在 argv 固定（根除）；model 別名本來就會跟著升版走，所以這裡只做顯形。"""
+    if not isinstance(record, Mapping):
+        return None
+    today = _served_models(record)
+    if not today:
+        return None
+    day = now.astimezone().date().isoformat()
+    for path in sorted((record_dir or RUN_RECORD_DIR).glob("daily_run_*.json"), reverse=True):
+        stamp = path.stem.removeprefix("daily_run_")
+        if stamp >= day:
+            continue
+        try:
+            previous = _read_json(path)
+        except (OSError, ValueError):
+            continue
+        models = _served_models(previous) if isinstance(previous, Mapping) else []
+        if models:
+            return None if models == today else f"{'、'.join(models)} → {'、'.join(today)}（上一輪 {stamp[5:]}）"
+    return None
+
+
 def _daily_run_lines(*, now: datetime, record_path: Path | None) -> list[str]:
     record, problem = _load_run_record(record_path, now=now)
     if record is None:
@@ -448,6 +479,13 @@ def _daily_run_lines(*, now: datetime, record_path: Path | None) -> list[str]:
             reasons[key] = reasons.get(key, 0) + 1
         head += f"｜跳過 {len(skipped)}（" + "、".join(f"{k} {n}" for k, n in reasons.items()) + "）"
     lines = [head]
+    served = _served_models(record)
+    if served or record.get("llm_effort"):
+        lines.append(f"LLM：設定 {record.get('llm_model') or '沒記'}｜effort {record.get('llm_effort') or '沒記'}"
+                     f"｜實際 {'、'.join(served) or '這輪沒有呼叫'}")
+    drift = llm_model_drift(record, now=now, record_dir=record_path.parent if record_path else None)
+    if drift:
+        lines.append(f"⚠ **LLM 實際 model 變了**：{drift}——雷達與分類的產量可能跟著變，先對照兩邊的數字")
     violation = record.get("capability_violation")
     if isinstance(violation, Mapping):
         lines.append(f"⚠ **LLM 能力檢查不符（{violation.get('step')}）**：{'；'.join(violation.get('violations') or [])}"
@@ -2825,6 +2863,8 @@ def summary_line(*, now: datetime, snapshot: Mapping[str, Any], run_record_path:
             flags.append("LLM 步驟失敗")
         elif llm and all(r.get("status") == "skipped" and "executor=none" in str(r.get("reason") or "") for r in llm):
             flags.append("LLM 關閉（executor=none）")
+        if llm_model_drift(record, now=now, record_dir=run_record_path.parent if run_record_path else None):
+            flags.append("LLM model 變了")
         if (record.get("schedule_check") or {}).get("status") == "mismatch":
             flags.append("排程不一致")
     touched = snapshot.get("disproof.touched_pending")
