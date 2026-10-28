@@ -1,0 +1,5 @@
+Source URL: https://investors.micron.com/news/press-release/2026/Micron-in-High-Volume-Production-of-HBM4-Designed-for-NVIDIA-Vera-Rubin-PCIe-Gen6-SSD-and-SOCAMM2-03-16-2026/default.aspx
+
+Excerpt:
+Industry's first PCIe® Gen6 SSD in high-volume production3 — the Micron 9650 data center SSD delivers up to two times the read performance of Gen5 at 100% higher performance per watt4 and optimized for agentic AI workloads on NVIDIA BlueField-4 STX architecture
+The Micron 9650 is optimized for energy efficiency and liquid-cooled environments, delivering high-speed, low-latency data access for AI training and inference workloads with the NVIDIA BlueField-4 STX reference architecture, supporting up to 28 GB/s sequential read throughput and 5.5 million random read IOPS.

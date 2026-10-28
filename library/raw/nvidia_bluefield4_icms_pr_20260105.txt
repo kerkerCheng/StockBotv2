@@ -1,0 +1,7 @@
+Source URL: https://nvidianews.nvidia.com/news/nvidia-bluefield-4-powers-new-class-of-ai-native-storage-infrastructure-for-the-next-frontier-of-ai
+
+Excerpt:
+NVIDIA today announced that the NVIDIA BlueField®-4 data processor, part of the full-stack NVIDIA BlueField platform, powers NVIDIA Inference Context Memory Storage Platform, a new class of AI-native storage infrastructure for the next frontier of AI.
+A KV cache cannot be stored on GPUs long term, as this would create a bottleneck for real-time inference in multi-agent systems. AI-native applications require a new kind of scalable infrastructure to store and share this data.
+NVIDIA Rubin cluster-level KV cache capacity, delivering the scale and efficiency required for long-context, multi-turn agentic inference.
+Storage innovators including AIC, Cloudian, DDN, Dell Technologies, HPE, Hitachi Vantara, IBM, Nutanix, Pure Storage, Supermicro, VAST Data and WEKA are among the first building next-generation AI storage platforms with BlueField-4, which will be available in the second half of 2026.

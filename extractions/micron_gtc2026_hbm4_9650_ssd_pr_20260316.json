@@ -1,0 +1,98 @@
+{
+  "claims": [
+    {
+      "confidence": 0.65,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：Micron 之後的財報、10-K 或新聞稿寫出 9650 停產、退出 BlueField-4 STX 參考架構，或 NVIDIA 參考架構文件列出的 SSD 不含 Micron。核查頻率：每季（Micron 財報）。觸發後 48 小時：降這條邊 confidence，重讀本層供給側。",
+      "id": "micron_gtc2026_hbm4_9650_ssd_pr_20260316_cl1",
+      "source_ids": [
+        "micron_gtc2026_hbm4_9650_ssd_pr_20260316_s1",
+        "micron_gtc2026_hbm4_9650_ssd_pr_20260316_s2"
+      ],
+      "statement": "Micron (GTC 2026-03-16): the 9650 data center SSD, the first PCIe Gen6 SSD in high-volume production per Micron, is optimized for agentic AI training and inference workloads on the NVIDIA BlueField-4 STX reference architecture (28 GB/s sequential read, 5.5M random read IOPS). Supplier self-report of design-in to a reference architecture; no customer orders or volumes are stated.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {
+        "qualification_status": "designed_in"
+      },
+      "confidence": 0.75,
+      "dst_id": "tech:ai_context_memory_storage",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "micron_gtc2026_hbm4_9650_ssd_pr_20260316_s1",
+        "micron_gtc2026_hbm4_9650_ssd_pr_20260316_s2"
+      ],
+      "src_id": "co:micron_technology"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "Micron",
+        "MU"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:micron_technology",
+      "name": "Micron Technology, Inc.",
+      "role": "bottleneck_supplier",
+      "source_ids": [
+        "micron_gtc2026_hbm4_9650_ssd_pr_20260316_s1",
+        "micron_gtc2026_hbm4_9650_ssd_pr_20260316_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "NVIDIA Inference Context Memory Storage Platform",
+        "ICMS",
+        "context memory storage",
+        "KV cache storage tier",
+        "BlueField-4 STX",
+        "CMX"
+      ],
+      "attributes": {},
+      "confidence": 0.8,
+      "id": "tech:ai_context_memory_storage",
+      "name": "AI inference context memory storage (KV cache tier on NVMe SSD)",
+      "role": null,
+      "source_ids": [
+        "micron_gtc2026_hbm4_9650_ssd_pr_20260316_s1",
+        "micron_gtc2026_hbm4_9650_ssd_pr_20260316_s2"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "micron_gtc2026_hbm4_9650_ssd_pr_20260316",
+    "evidence_tier": 1,
+    "origin_entity": "Micron Technology",
+    "permission_basis": "Micron 投資人關係網站公開新聞稿；只保留研究必要的有限逐字節錄。",
+    "published_at": "2026-03-16",
+    "publisher": "Micron Investor Relations（GLOBE NEWSWIRE）",
+    "retrieved_at": "2026-10-27",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Micron in High-Volume Production of HBM4 Designed for NVIDIA Vera Rubin, PCIe Gen6 SSD and SOCAMM2（Micron 新聞稿，GTC 2026-03-16）：9650 PCIe Gen6 SSD 量產，針對 NVIDIA BlueField-4 STX 參考架構的代理式 AI 負載最佳化",
+    "url": "https://investors.micron.com/news/press-release/2026/Micron-in-High-Volume-Production-of-HBM4-Designed-for-NVIDIA-Vera-Rubin-PCIe-Gen6-SSD-and-SOCAMM2-03-16-2026/default.aspx"
+  },
+  "sources": [
+    {
+      "id": "micron_gtc2026_hbm4_9650_ssd_pr_20260316_s1",
+      "locator": "GTC 2026 新聞稿 bullet 2",
+      "quote": "Industry's first PCIe® Gen6 SSD in high-volume production3 — the Micron 9650 data center SSD delivers up to two times the read performance of Gen5 at 100% higher performance per watt4 and optimized for agentic AI workloads on NVIDIA BlueField-4 STX architecture"
+    },
+    {
+      "id": "micron_gtc2026_hbm4_9650_ssd_pr_20260316_s2",
+      "locator": "新聞稿 SSD 段",
+      "quote": "The Micron 9650 is optimized for energy efficiency and liquid-cooled environments, delivering high-speed, low-latency data access for AI training and inference workloads with the NVIDIA BlueField-4 STX reference architecture, supporting up to 28 GB/s sequential read throughput and 5.5 million random read IOPS."
+    }
+  ]
+}

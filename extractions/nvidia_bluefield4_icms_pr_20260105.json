@@ -1,0 +1,114 @@
+{
+  "claims": [
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：NVIDIA 之後的新聞稿、法說或 10-Q/10-K 寫出 BlueField-4 儲存平台延後到 2027 以後、取消，或 KV cache 改回留在 HBM／CPU 記憶體不再卸載到 NVMe。核查頻率：每季（NVIDIA 財報與 GTC）。觸發後 48 小時：降這個節點與 NVIDIA→本層的 confidence，重讀本層讀圖的需求側。",
+      "id": "nvidia_bluefield4_icms_pr_20260105_cl1",
+      "source_ids": [
+        "nvidia_bluefield4_icms_pr_20260105_s1",
+        "nvidia_bluefield4_icms_pr_20260105_s2",
+        "nvidia_bluefield4_icms_pr_20260105_s3",
+        "nvidia_bluefield4_icms_pr_20260105_s4"
+      ],
+      "statement": "NVIDIA (CES 2026-01-05): BlueField-4 powers the NVIDIA Inference Context Memory Storage Platform, a storage tier that holds Rubin cluster-level KV cache off the GPU because a KV cache cannot be stored on GPUs long term; AIC, Cloudian, DDN, Dell, HPE, Hitachi Vantara, IBM, Nutanix, Pure Storage, Supermicro, VAST Data and WEKA are among the first building platforms, available in 2H 2026. Vendor announcement; no volumes or customer orders are stated.",
+      "subject_id": "tech:ai_context_memory_storage"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "tech:ai_context_memory_storage",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "nvidia_bluefield4_icms_pr_20260105_s1",
+        "nvidia_bluefield4_icms_pr_20260105_s4"
+      ],
+      "src_id": "co:nvidia"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "NVDA",
+        "NVIDIA Corporation",
+        "Nvidia"
+      ],
+      "attributes": {
+        "ticker": "NVDA"
+      },
+      "confidence": 0.95,
+      "id": "co:nvidia",
+      "name": "NVIDIA",
+      "role": "leader",
+      "source_ids": [
+        "nvidia_bluefield4_icms_pr_20260105_s1",
+        "nvidia_bluefield4_icms_pr_20260105_s3",
+        "nvidia_bluefield4_icms_pr_20260105_s4"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "NVIDIA Inference Context Memory Storage Platform",
+        "ICMS",
+        "context memory storage",
+        "KV cache storage tier",
+        "BlueField-4 STX",
+        "CMX"
+      ],
+      "attributes": {},
+      "confidence": 0.8,
+      "id": "tech:ai_context_memory_storage",
+      "name": "AI inference context memory storage (KV cache tier on NVMe SSD)",
+      "role": null,
+      "source_ids": [
+        "nvidia_bluefield4_icms_pr_20260105_s1",
+        "nvidia_bluefield4_icms_pr_20260105_s2",
+        "nvidia_bluefield4_icms_pr_20260105_s3",
+        "nvidia_bluefield4_icms_pr_20260105_s4"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "nvidia_bluefield4_icms_pr_20260105",
+    "evidence_tier": 1,
+    "origin_entity": "NVIDIA",
+    "permission_basis": "NVIDIA 官方新聞室公開新聞稿；只保留研究必要的有限逐字節錄。",
+    "published_at": "2026-01-05",
+    "publisher": "NVIDIA Newsroom",
+    "retrieved_at": "2026-10-27",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "NVIDIA BlueField-4 Powers New Class of AI-Native Storage Infrastructure for the Next Frontier of AI（NVIDIA 新聞稿，CES 2026-01-05）：BlueField-4 驅動 Inference Context Memory Storage Platform，十二家儲存廠率先建平台，2026 下半年供貨",
+    "url": "https://nvidianews.nvidia.com/news/nvidia-bluefield-4-powers-new-class-of-ai-native-storage-infrastructure-for-the-next-frontier-of-ai"
+  },
+  "sources": [
+    {
+      "id": "nvidia_bluefield4_icms_pr_20260105_s1",
+      "locator": "CES 2026 新聞稿首段",
+      "quote": "NVIDIA today announced that the NVIDIA BlueField®-4 data processor, part of the full-stack NVIDIA BlueField platform, powers NVIDIA Inference Context Memory Storage Platform, a new class of AI-native storage infrastructure for the next frontier of AI."
+    },
+    {
+      "id": "nvidia_bluefield4_icms_pr_20260105_s2",
+      "locator": "新聞稿第三段（為什麼要這一層）",
+      "quote": "A KV cache cannot be stored on GPUs long term, as this would create a bottleneck for real-time inference in multi-agent systems. AI-native applications require a new kind of scalable infrastructure to store and share this data."
+    },
+    {
+      "id": "nvidia_bluefield4_icms_pr_20260105_s3",
+      "locator": "Key capabilities 第一點",
+      "quote": "NVIDIA Rubin cluster-level KV cache capacity, delivering the scale and efficiency required for long-context, multi-turn agentic inference."
+    },
+    {
+      "id": "nvidia_bluefield4_icms_pr_20260105_s4",
+      "locator": "新聞稿末段（合作廠與時程）",
+      "quote": "Storage innovators including AIC, Cloudian, DDN, Dell Technologies, HPE, Hitachi Vantara, IBM, Nutanix, Pure Storage, Supermicro, VAST Data and WEKA are among the first building next-generation AI storage platforms with BlueField-4, which will be available in the second half of 2026."
+    }
+  ]
+}
