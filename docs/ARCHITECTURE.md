@@ -631,6 +631,14 @@ cache-miss 自動重建）；④**socket 封殺**（request 期間 `connect`／`
 層照節點 id 字母序，另數同一層收合組的檔數）；每張卡的 `watch.past` 在請求時比今天。前端只畫卡片、折線（座標換算住圖表段）、日曆條與
 `#/by-layer` 切換。
 
+**頁面照使用者的問題切（2026-10-28 使用者照推薦：11 頁收成 5 頁——公司／每日／圖／成績單／資產配置；data 與 `/api` 不動）：**
+每個導覽連結帶 `data-question`（它回答你的哪一個問題，字串只住 `index.html`），`markNav` 照抄印在導覽列下面；個股頁借用「公司」
+但問的是另一件事，自己帶問句。**候選板與在等什麼兩頁併進首頁**（`#/candidates`、`#/watches` 舊連結落到首頁並說一句）：
+各組檔數 0 也印＋最老滯留（`groups[].count`／`oldest_stall_days`）在首頁最下面一行；持股 Sheet 讀不到時「已持有」那一組帶
+`warning`、檔數印「未驗」（`overview.candidate.sheet_verified` 照抄候選列——0 與沒驗是兩件事，L12）；敘事該重寫的筆數上卡片
+（`card.rewrite`）；停滯與追源需處置搬進心跳 watch 那一行（`engine_b.leads.trace_needs_attention` 是 watches artifact 與心跳共用的判準，
+L16）。兩份 state artifact 與 `/api/v1/candidates`、`/api/v1/watches` 照留——拿掉的是畫面不是資料。
+
 **private path 在 materialize 端遮蔽一次。** read model 的理由句會寫出 authority 檔案路徑
 （例：「找不到 session 判斷檔（library/private/alpha/judgments/…）」）；那對開發者有用，但它是 private
 filesystem 結構，不該經由 HTTP 出去。遮成 `«private-authority»`，**其餘文字逐字保留**。

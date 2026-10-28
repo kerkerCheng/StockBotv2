@@ -134,15 +134,17 @@ def test_the_no_narrative_list_travels_with_the_board_and_counts_as_cognition() 
     assert again["freshness_identity"] != payload["freshness_identity"]
 
 
-def test_frontend_lists_no_narrative_tickers_and_says_how_to_get_on_the_board() -> None:
-    """2026-10-07：清單住首頁「沒有敘事」那一組（`alpha.candidates.LIST_GROUPS`）；候選板只留一句與連結（重複的摺疊拿掉）。"""
+def test_no_narrative_tickers_live_only_on_the_home_page() -> None:
+    """2026-10-07：清單住首頁「沒有敘事」那一組（`alpha.candidates.LIST_GROUPS`）；候選板只留一句與連結。
+    2026-10-28：候選板頁併進首頁（使用者照推薦），那一句與連結也拿掉——首頁的兩組（不寫敘事（非邊緣）／還沒寫敘事，
+    L12 拆開）就是唯一的清單；組名與組序照抄 /api/v1/stocks，攤不攤開由後端說，收合的組點開才畫。"""
     from pathlib import Path
 
     from alpha.candidates import LIST_GROUPS
 
     source = (Path(__file__).resolve().parents[1] / "webapp" / "static" / "app.js").read_text(encoding="utf-8")
-    assert "沒有敘事、不上板" in source and "非邊緣的規定不寫" in source and "邊緣的是還沒寫" in source
-    assert "首頁「不寫敘事（非邊緣）」與「還沒寫敘事」兩組" in source      # 2026-10-28 拆成兩組（L12）
+    assert "function renderCandidates" not in source
+    assert "collapsedGroup(group, rows)" in source and "if (!group.expanded)" in source
     assert {"no_narrative", "not_edge_no_narrative"} <= set(LIST_GROUPS)   # 首頁真的有那兩組（不是連到空的地方）
 
 

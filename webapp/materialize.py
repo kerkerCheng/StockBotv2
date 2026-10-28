@@ -123,7 +123,10 @@ def _candidate_overview(panel: Mapping[str, Any]) -> dict[str, Any]:
     row = datum.get("value")
     if isinstance(row, Mapping):
         if row.get("derived") in LIST_GROUPS:
-            return {"list_group": str(row["derived"]), "label": row.get("derived_label"), "absence_kind": None}
+            # sheet_verified 照抄（2026-10-28）：候選板頁併進首頁後，「已持有 0」與「Sheet 讀不到、已持有判定暫停」
+            # 要在首頁分得開（L12）——候選板原本印「未驗」，這一格是首頁唯一分得出兩者的地方
+            return {"list_group": str(row["derived"]), "label": row.get("derived_label"), "absence_kind": None,
+                    "sheet_verified": row.get("sheet_verified")}
         # 有候選列、值卻不在首頁分組字彙裡＝字彙漏了一格（不是「沒讀到」）：照實寫出那個值
         return {"list_group": "unavailable", "label": None, "absence_kind": "upstream_unavailable",
                 "reason": f"候選狀態的值 {row.get('derived')!r} 不在首頁分組字彙裡（alpha.candidates.LIST_GROUPS）"}
@@ -190,6 +193,8 @@ def _card_overview(view: Mapping[str, Any], inputs: Mapping[str, Any] | None) ->
         # 「這個狀態幾天」只在畫面上的狀態就是敘事宣告的那個時才有意義（已持有來自 Sheet，天數卻是敘事宣告「不要」的天數）
         "since": (str(row.get("since") or "")[:10] or None) if row.get("declared") == row.get("derived") else None,
         "stall_days": row.get("stall_days") if row.get("declared") == row.get("derived") else None,
+        # 敘事該重寫（連結斷了、敘事來源醒來／觸及／到期未判；候選列的 rewrite[] 照數）——沒有候選列＝沒有敘事，不是 0
+        "rewrite": len(row.get("rewrite") or ()) if row else None,
         "spark": [{"session_date": r["session_date"], "close": r["close"]} for r in series[-CARD_SPARK_SESSIONS:]],
         "move": move,
     }
@@ -1552,6 +1557,7 @@ def build_watches_artifact(watch_data: Mapping[str, Any], *, config: Mapping[str
                            generated_at: datetime | None = None) -> dict[str, Any]:
     """Event Watch registry ＋ 追源 backlog → `watches` state artifact。**純函式**。"""
     from engine_b.event_watch import counters
+    from engine_b.leads import trace_needs_attention
 
     stamp = (generated_at or datetime.now(timezone.utc)).astimezone(timezone.utc)
     watches = list(watch_data.get("watches") or ())
@@ -1559,8 +1565,7 @@ def build_watches_artifact(watch_data: Mapping[str, Any], *, config: Mapping[str
     for watch in watches:
         by_status.setdefault(str(watch.get("status")), []).append(_watch_row(watch))
     active = by_status.get("active") or []
-    needs_attention = [dict(row) for row in backlog
-                       if str(row.get("wake_state")) in {"stalled", "expired", "unwatched"}]
+    needs_attention = trace_needs_attention(backlog)        # 判準只有 engine_b.leads 那一份（心跳同一個）
     payload: dict[str, Any] = {
         "schema_version": STATE_SCHEMA_VERSIONS["watches"],
         "kind": "watches",

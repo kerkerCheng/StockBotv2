@@ -702,7 +702,13 @@ def watch_short_line(*, now: datetime) -> str:
     from crons import heartbeat as hb
 
     c = hb.watch_today_counts(now=now)
-    return f"watch：今日醒 {c['woken']}｜到期 {c['expired']}｜語意標旗 {c['semantic_flagged']}"
+    line = f"watch：今日醒 {c['woken']}｜到期 {c['expired']}｜語意標旗 {c['semantic_flagged']}"
+    # 2026-10-28：APP「在等什麼」頁併進首頁——停滯與追源需處置改在這裡現形（短版只在不是 0 時印；完整心跳每天都印）
+    if c.get("stalled"):
+        line += f"｜停滯 {c['stalled']}"
+    if c.get("trace_needs_attention"):
+        line += f"｜追源需處置 {c['trace_needs_attention']}"
+    return line
 
 
 # ---------------------------------------------------------------------------

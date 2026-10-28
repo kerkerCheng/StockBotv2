@@ -118,6 +118,16 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 `StockBotv2-Daily` 的 ⑱⑲ 取代（1.2a 停用、2026-09-25 1.2b 刪除）；它們的理由（LLM 失敗心跳照發、永遠 exit 0、Python 不用 `.cmd`、
 發送走 subprocess）搬進 `crons/daily_task.py` 的 docstring，守它們的測試改主詞搬進 `tests/test_daily_task.py`「無人值守入口」節。
 
+### Sandbox impact review 結論（2026-10-28：候選板與在等什麼併進首頁——心跳 watch 行多兩格）
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | 無人值守路徑只多**讀**：心跳 watch 那一行（完整心跳與短版共用 `crons/heartbeat.py::watch_today_counts`）多讀一次 leads store（`engine_b.leads.load`＋`trace_backlog`，唯讀；讀不到印「讀不到」、不印 0），印「停滯」與「追源需處置」（完整心跳 0 也印，短版不是 0 才印）。daily ⑬ materialize argv 不變：個股頁 `overview.card` 多 `rewrite`（候選列敘事該重寫的筆數）、`overview.candidate` 多 `sheet_verified`（照抄候選列）。request path：`/api/v1/stocks` 的 `groups[]` 多 `oldest_stall_days` 與 `warning`（Sheet 讀不到時只在「已持有」那一組）；前端拿掉 `#/candidates`、`#/watches` 兩頁（舊連結落到首頁並說一句），導覽列每個連結帶 `data-question`。不跑 LLM、不寫任何 authority、不碰圖、不多連網 |
+| **2 canonical skill／prompt／本檔** | 本節；`skills/daily-brief/SKILL.md` APP 畫面表兩行合成「公司 `#/`」一行、`skills/alpha-status/SKILL.md` 兩處畫面位置（已跑 `python scripts/sync_agent_skills.py`）；`AGENTS.md`「搬完」判準句補「而且有一頁真的印出它」（使用者 2026-10-28 照推薦核准）；`docs/ARCHITECTURE.md` §6.9「頁面照使用者的問題切」；CONCEPTS「候選狀態板」 |
+| **3 最窄 rule** | daily argv 不變；不新增 step、allowlist；API 路由不變（`/api/v1/candidates`、`/api/v1/watches` 與兩份 state artifact 照留），APP 仍無寫入端點 |
+| **4 contract test** | `tests/test_webapp_home_cards.py` 第 4 節（0 檔的組照回＋最老滯留、Sheet 讀不到時「已持有」帶 warning 而別組不帶、卡片只帶重寫筆數、兩頁拿掉且舊連結有去處、9 個導覽連結都有問句）；`tests/test_heartbeat_phase1.py`（完整心跳 0 也印、讀不到印「讀不到」、短版 0 不印；`trace_needs_attention` 是 artifact 與心跳共用的一份）；既有三個測試改主詞（`test_webapp_api.py`、`test_webapp_candidates.py`、`test_webapp_graph_walk_watches.py`）；變異 2／2 |
+| **5 端到端 smoke** | 見 ROADMAP 旁支開發項「APP 照使用者問題重組」②的驗收現值 |
+
 ### Sandbox impact review 結論（2026-10-28：APP 首頁 compact——介紹 ledger、層中文名、日曆與依層）
 
 | 步 | 結論 |
@@ -2195,7 +2205,8 @@ weekly prompt 也不呼叫它——沒有呼叫端的提醒不是提醒。連同
   其餘解析不到 `co:*` 的列，Sheet 代號若登記在 `config/holdings_coverage.json` 的 `ignored`（使用者明確決定不研究；
   每筆 `sheet_ticker`／`reason`／`decided_at`，讀者 `portfolio/holdings.py::load_ignored`）就另列「使用者決定不研究」、
   不算解析不到；其餘列「解析不到」（不猜，要不要登記是 identity 的決定）。心跳段 2 常駐印
-  「持股解析不到 N（使用者決定不研究 M）」（0 也印），候選板頁首另列名單、理由與決定日。
+  「持股解析不到 N（使用者決定不研究 M）」（0 也印，解析不到的前 5 個照列名字）。理由與決定日住 `config/holdings_coverage.json`
+  與 candidates artifact——2026-10-28 候選板頁併進首頁後不另上畫面（AGENTS：逐條排除理由是查核用欄位，留在檔裡）。
   設定檔讀不到、版本不對或任何一筆形狀不對 → 整份不採用、全部照列解析不到，並印讀取問題（fail safe：寧可多問一次）。
   （舊的 daily brief 三分類讀者已於 2026-09-23 Phase 0 隨研究側退役，這份設定檔在 4.7b 之前沒有讀者。）
 - ~~**Decision gap dispatch**~~：2026-09-23（Phase 0 Step 0b.4） 退役——`decision_review` 的 go／dispatch／reassess 整組隨 decision_lab 研究側退役，

@@ -174,12 +174,8 @@ function absenceBadge(kind) {
    derivation 的聚合，隱含報酬是估值鏈的終點——兩者都不在 read model 裡了。 */
 
 /* ⚠ 2026-10-28：卡片上的 readiness 徽章（readinessBadge／readinessLabel）隨首頁 compact 拿掉——那是給機器看的狀態，
-   個股頁的稽核區照樣印得出來（使用者：「首頁根本不用講這麼多」）。 */
-
-function truncate(text, limit) {
-  const value = String(text);
-  return value.length > limit ? value.slice(0, limit) + '…' : value;
-}
+   個股頁的稽核區照樣印得出來（使用者：「首頁根本不用講這麼多」）。
+   同日 truncate 隨「在等什麼」頁拿掉（唯一的使用者是那一頁的反證摘要）。 */
 
 /* ---------- 清單 ---------- */
 
@@ -224,6 +220,10 @@ function cardStateLine(row) {
   const cand = row.candidate || {};
   const line = el('div', 'card-state');
   if (cand.label) line.appendChild(el('span', 'card-chip chip-' + (cand.list_group || 'none'), cand.label));
+  // 敘事該重寫（候選列 rewrite[] 的筆數，materialize 端照數）：這張卡的狀態可能已經舊了（2026-10-28 候選板那一區搬來）
+  if (typeof c.rewrite === 'number' && c.rewrite > 0) {
+    line.appendChild(el('span', 'card-chip chip-rewrite', `敘事該重寫 ${c.rewrite}`));
+  }
   if (typeof c.stall_days === 'number') {
     const days = el('span', 'card-days', c.stall_days === 0 ? '今天起' : `${c.stall_days} 天`);
     days.title = `這個狀態從 ${c.since || '—'} 起（敘事連續宣告同一個狀態的天數）`;
@@ -345,13 +345,20 @@ async function renderList(mode) {
   if (groups.length) {
     groups.forEach((group) => {
       const rows = data.stocks.filter((row) => row.group === group.key);
-      if (!rows.length) return;
-      if (!group.expanded) { app.appendChild(collapsedGroup(group, rows)); return; }
+      if (!group.expanded) { if (rows.length) app.appendChild(collapsedGroup(group, rows)); return; }
       if (byLayer) return;                                  // 依層時攤開的組已按層畫過
       app.appendChild(el('h2', 'group-head', `${group.label}（${rows.length}）`));
-      app.appendChild(cardGrid(rows));
+      if (group.warning) app.appendChild(el('p', 'warn', '▲ ' + group.warning));
+      // 攤開的組 0 也印（AGENTS：可開為零就零，不得為了非空放寬條件——讓它非空的路是研究）
+      app.appendChild(rows.length ? cardGrid(rows) : el('p', 'note', '現在 0 檔。'));
     });
-    if (data.group_note) app.appendChild(el('p', 'note', data.group_note));
+    if (byLayer) groups.filter((g) => g.warning).forEach((g) => app.appendChild(el('p', 'warn', '▲ ' + g.warning)));
+    if (data.group_note) app.appendChild(mdParagraph(data.group_note));   // 句子帶 **強調**（2026-10-28：原樣印出星號）
+    /* 各組檔數（0 也印）＋最老滯留——2026-10-28 候選板併進首頁，那一頁最上面那一行搬到這裡（常駐計數器，L14）。
+       判定暫停的組印「未驗」不印數（候選板原本的寫法：0 與「沒驗」是兩件事，L12）。 */
+    app.appendChild(el('p', 'note group-counts', '各組檔數：' + groups.map((g) =>
+      `${g.label} ${g.warning ? '未驗' : g.count}`
+      + (typeof g.oldest_stall_days === 'number' ? `（最老 ${g.oldest_stall_days} 天）` : '')).join('｜')));
   } else {
     app.appendChild(cardGrid(data.stocks));
   }
@@ -1296,9 +1303,9 @@ function candidateLine(view, inQuestions) {
     (row.rewrite || []).forEach((text) => node.appendChild(el('div', 'row-reason', text)));
     if (row.note) node.appendChild(el('div', 'row-reason', row.note));
   }
-  // 候選板是「和其他檔並排看」，不是這一檔的細節（細節在上面三個字點下去的稽核區）。
-  const link = el('a', 'dim', '和其他檔一起看（候選板）→');
-  link.href = '#/candidates';
+  // 「和其他檔並排看」在首頁（2026-10-28 候選板併進首頁），不是這一檔的細節（細節在上面三個字點下去的稽核區）。
+  const link = el('a', 'dim', '和其他檔一起看（公司）→');
+  link.href = '#/';
   node.appendChild(link);
   return node;
 }
@@ -1365,7 +1372,7 @@ function argumentSection(line) {
 }
 
 async function renderDetail(ticker) {
-  markNav('stocks');
+  markNav('stocks', '這一家我們押什麼、憑什麼、什麼會推翻它？');
   let payload;
   try {
     payload = await getJSON(`${API}/stocks/${encodeURIComponent(ticker)}`);
@@ -1453,13 +1460,20 @@ function headerLine(payload, view) {
 
 let TABLE_VOCAB = null;
 
-function markNav(name) {
+/** 標出目前那一頁，並把它回答的問題印在導覽列下面（2026-10-28：每一頁宣告它回答你的哪一個問題；字串只住
+ * index.html 的 data-question，這裡照抄）。`question` 只給「借用導覽列上某一頁、但問的是另一件事」的頁（個股頁）。 */
+function markNav(name, question) {
+  let asked = question || '';
   document.querySelectorAll('.nav a').forEach((link) => {
     const active = link.dataset.view === name;
     link.classList.toggle('active', active);
     if (active) link.setAttribute('aria-current', 'page');
     else link.removeAttribute('aria-current');
+    if (link.dataset.question) link.title = link.dataset.question;
+    if (active && !asked) asked = link.dataset.question || '';
   });
+  const slot = document.getElementById('page-question');
+  if (slot) slot.textContent = asked ? `這一頁回答：${asked}` : '';
 }
 
 /** authority 的固定文字帶著 markdown 強調（**x**、`x`）。這裡只把它們變成 <strong>／<code>，
@@ -2846,148 +2860,11 @@ async function renderStructureReadings() {
   window.scrollTo(0, 0);
 }
 
-function watchRow(row, labels) {
-  const li = el('li');
-  const head = el('div');
-  head.appendChild(el('span', 'ticker-plain', row.detail));
-  li.appendChild(head);
-  const bits = [];
-  if (row.target && row.target.label) bits.push('喚醒 ' + row.target.label);
-  if (row.expires) bits.push('到期 ' + row.expires);
-  if (row.poll_eligible) bits.push('可主動輪詢' + (row.poll_last_checked ? `（上次查 ${row.poll_last_checked}）` : ''));
-  li.appendChild(el('span', 'rule', bits.join('｜')));
-  if (row.stalled && labels) li.appendChild(el('span', 'rule', labels.stalled || ''));
-  if (row.query_hint) li.appendChild(el('span', 'rule', '查詢提示：' + row.query_hint));
-  // watch id 與 kind（內部字彙）不印——你用 pq2 編號跟我說話，watch 由互動 session 用 CLI 處理（2026-10-07：「不需要給我看的…拿掉」）
-  return li;
-}
-
-function watchList(rows, labels) {
-  const list = el('ul', 'weak');
-  rows.forEach((row) => list.appendChild(watchRow(row, labels)));
-  return list;
-}
-
-async function renderWatches() {
-  markNav('watches');
-  let payload;
-  try {
-    payload = await getJSON(`${API}/watches`);
-  } catch (err) {
-    renderStateError(err, '讀不到事件監看');
-    return;
-  }
-  const k = payload.counters || {};
-  const notes = payload.notes || {};
-  const backlog = payload.trace_backlog || {};
-  const labels = backlog.wake_state_labels || {};
-  app.textContent = '';
-  footerWarning.textContent = payload.correlation_warning || '';
-
-  const head = el('div', 'detail-head');
-  head.appendChild(el('h1', null, payload.title));
-  const badges = el('div', 'badges');
-  if (payload.freshness && payload.freshness.state === 'stale') {
-    const b = el('span', 'badge badge-stale', 'stale'); b.title = payload.freshness.rule; badges.appendChild(b);
-  }
-  head.appendChild(badges);
-  app.appendChild(head);
-
-  const sec0 = el('section', 'panel');
-  sec0.appendChild(el('h2', null, '常駐計數器'));
-  sec0.appendChild(kpiRow([
-    { label: '還在等的事件', value: String(k.active), sub: `其中可主動輪詢 ${k.t2_pollable}`, cls: 'hero' },
-    { label: '停滯', value: String(k.stalled), sub: '被動層短期不會再醒' },
-    { label: 'fired 未消化', value: String(k.fired_unconsumed), sub: '已觸發、還沒有人處理' },
-    { label: '追源需處置', value: String((backlog.needs_attention || []).length), sub: `追源 backlog 共 ${backlog.total}` },
-  ]));
-  sec0.appendChild(el('p', 'note', `喚醒去處：pq2 ${k.wake_pq2}｜lead ${k.wake_lead}｜假設 ${k.wake_hypothesis}｜反證 ${k.wake_disproof ?? 0}`));
-  sec0.appendChild(el('p', 'note', notes.budget || ''));
-  app.appendChild(sec0);
-
-  // 反證與確認條件：醒來待檢的先列（要有人判定），在盯的接在後面——分兩組是分區不是排序（artifact 的列序照舊）。
-  // 條件原文照 markdown 印（粗體）；watch id 不印（2026-10-07：「不需要給我看的…拿掉」）。
-  const semantic = payload.semantic || [];
-  if (semantic.length) {
-    const secS = el('section', 'panel');
-    const woken = semantic.filter((row) => row.status === 'fired');
-    const watching = semantic.filter((row) => row.status !== 'fired');
-    secS.appendChild(el('h2', null, `反證與確認條件（醒來待檢 ${woken.length}｜在盯 ${watching.length}）`));
-    secS.appendChild(el('p', 'note', notes.semantic || ''));
-    const conditionList = (rows) => {
-      const list = el('ul', 'weak');
-      rows.forEach((row) => {
-        const li = el('li');
-        li.appendChild(mdParagraph(row.condition || row.detail || ''));
-        const bits = [row.source_ref, '到期 ' + row.expires];
-        if (row.semantic_flag) bits.push('預篩（提示）：' + row.semantic_flag.verdict);
-        li.appendChild(el('span', 'rule', bits.filter(Boolean).join('｜')));
-        list.appendChild(li);
-      });
-      return list;
-    };
-    if (woken.length) {
-      secS.appendChild(el('div', 'group-title', `醒來待檢（${woken.length}）——判定只在互動 session`));
-      secS.appendChild(conditionList(woken));
-    }
-    secS.appendChild(el('div', 'group-title', `在盯（${watching.length}）`));
-    secS.appendChild(conditionList(watching));
-    app.appendChild(secS);
-  }
-
-  if ((payload.stalled || []).length) {
-    const sec1 = el('section', 'panel callout');
-    sec1.appendChild(el('h2', null, `停滯（${payload.stalled.length}）——等下去不會有事發生`));
-    sec1.appendChild(el('p', 'note', notes.stalled || ''));
-    sec1.appendChild(watchList(payload.stalled, labels));
-    app.appendChild(sec1);
-  }
-
-  if ((backlog.needs_attention || []).length) {
-    const sec2 = el('section', 'panel');
-    sec2.appendChild(el('h2', null, `追源 backlog：需要當場處置（${backlog.needs_attention.length}）`));
-    const list = el('ul', 'weak');
-    backlog.needs_attention.forEach((row) => {
-      const li = el('li');
-      li.appendChild(el('div', null, truncate(row.title || row.lead_id, 160)));
-      const bits = [];
-      if (row.wake_state) bits.push(labels[row.wake_state] || row.wake_state);
-      if (row.trace_status) bits.push('追源狀態 ' + row.trace_status);
-      if (row.expires) bits.push('到期 ' + row.expires);
-      li.appendChild(el('span', 'rule', bits.join('｜')));
-      if (row.next_trigger) li.appendChild(el('span', 'rule', '下一個 trigger：' + truncate(row.next_trigger, 160)));
-      list.appendChild(li);
-    });
-    sec2.appendChild(list);
-    app.appendChild(sec2);
-  }
-
-  // 2026-10-07（使用者：「不需要給我看的…不是收起來 是拿掉」）：「全部 N 筆」那個摺疊（兩百多列）拿掉——
-  // 在等的總數在最上面的計數器；這裡只列要有人動的：本輪該主動查的、已觸發未消化、已到期（到期是重問不是丟）。
-  const fired = payload.fired_unconsumed || [];
-  const expired = payload.expired || [];
-  const due = payload.due_this_round || [];
-  const sec3 = el('section', 'panel');
-  sec3.appendChild(el('h2', null, `要有人動的（已觸發未消化 ${fired.length}｜已到期 ${expired.length}｜本輪該主動查 ${due.length}）`));
-  if (fired.length) {
-    sec3.appendChild(el('div', 'group-title', `已觸發、還沒有人處理（${fired.length}）`));
-    sec3.appendChild(watchList(fired, labels));
-  }
-  if (expired.length) {
-    sec3.appendChild(el('div', 'group-title', `已到期（${expired.length}；到期是重問不是丟）`));
-    sec3.appendChild(watchList(expired, labels));
-  }
-  if (due.length) {
-    sec3.appendChild(el('div', 'group-title', `本輪該主動查的（${due.length}，依 budget）`));
-    sec3.appendChild(watchList(due, labels));
-  }
-  if (!fired.length && !expired.length && !due.length) sec3.appendChild(el('p', 'note', '0——沒有要人動的等待。'));
-  sec3.appendChild(el('p', 'note', notes.fired || ''));
-  app.appendChild(sec3);
-
-  app.appendChild(stateFooter(payload));
-  window.scrollTo(0, 0);
-}
+/* ⚠ 2026-10-28：「在等什麼」頁（renderWatches／watchList／watchRow）拿掉——併進首頁（使用者照推薦：11 頁收成 5 頁）。
+   各段去處：重看日→首頁卡片與「接下來兩週會揭曉」；停滯、fired 未消化、追源需處置→每日心跳 watch 那一行（短版不是 0 才印）；
+   反證與確認條件→個股頁（敘事的，每條帶盯它的 watch 狀態）與讀圖頁（讀圖的）；還在等的總數、可主動輪詢、喚醒去處、醒來待檢
+   是 agent 的佇列→`python -m engine_b.event_watch counters`／`semantic-queue`、drain。artifact 與 `/api/v1/watches` 照留
+   （不是收起來，是拿掉畫面）。 */
 
 /* 共用頁尾：只留「這份畫面多新」一行（2026-10-07 使用者：「App 是要給人看的…不需要給我看的…不是收起來 是拿掉」）。
    authority、新鮮度身分、content digest 與「這一頁不是什麼」清單照樣在 artifact 裡（查核用、`/api/v1/*` 讀得到），不印。
@@ -3183,192 +3060,10 @@ async function renderPositions() {
   window.scrollTo(0, 0);
 }
 
-/* ---------- 候選狀態板（candidates state；Phase 3 Step 3.6：推導結果照抄——組內按 ticker 字母，不排序、不給尺寸） ---------- */
-
-const CANDIDATE_ORDER = ['open', 'missing', 'priced_wait', 'pass', 'held'];
-/* 押的那份讀圖不是現行的兩種情形（derive_row 分開寫，L12）。 */
-const RIDE_GONE_TEXT = { superseded: '那一格現行的已是另一份讀圖（該重寫敘事）', not_found: '這次沒讀到那一格的讀圖列' };
-const CANDIDATE_SIDE_ORDER = ['not_multiple', 'edge_unmeasurable', 'legacy', 'precondition_failed'];
-
-function candidateRow(row, detailSet) {
-  const li = el('li');
-  const top = el('div');
-  if (detailSet.has(row.ticker)) {
-    const a = el('a', null, row.ticker);
-    a.href = `#/${encodeURIComponent(row.ticker)}`;
-    top.appendChild(a);
-  } else {
-    top.appendChild(el('strong', null, row.ticker));
-  }
-  const w = row.three_words || {};
-  top.appendChild(el('span', 'dim', `　會死嗎 ${w.will_it_die || '—'}｜已定價 ${w.priced_in || '—'}｜數字裡 ${w.in_numbers || '—'}`));
-  li.appendChild(top);
-  const bits = [];
-  if (row.declared_label && row.derived !== row.declared) bits.push('敘事宣告：' + row.declared_label);
-  // 押在哪一格：節點名（沒有才印 ID）＋單位＋判讀＋那份讀圖現在的狀態——字全由 materialize 端給（2026-09-30）。
-  (row.rides || []).forEach((r) => bits.push(`押在「${r.node_name || r.node}」（${r.unit_label || (r.unit === 'socket' ? '插槽' : '層')}`
-    + `｜判讀 ${r.kind_label || r.kind || '—'}｜${READING_STATUS_TEXT[r.status] || RIDE_GONE_TEXT[r.status] || r.status || '—'}）`));
-  const e = row.edge || {};
-  bits.push(`邊緣：${e.label || e.state || '—'}（市值 ${e.market_cap_label || '—'}｜分析師 ${e.analyst_count ?? '—'}）`);
-  if (row.watch) {
-    bits.push(`在等：${row.watch.until ? row.watch.until + ' 醒來重看' : '沒寫醒來日'}；最晚 ${row.watch.expires || '—'} 到期重問`
-      + (row.watch.status !== 'active' ? `（這筆等待目前是「${row.watch.status}」）` : '') + `（${row.watch.watch_id}）`);
-  }
-  if (row.stall_days !== null && row.stall_days !== undefined) bits.push(`滯留 ${row.stall_days} 天`);
-  li.appendChild(el('span', 'rule', bits.join('｜')));
-  if (row.reason) li.appendChild(el('span', 'rule', '理由：' + row.reason));
-  // 已定價變動（判斷日 → 今天、判斷日以來；只印不判）：句子由 materialize 端組好，前端照抄、不做算術。
-  if (row.priced_since && row.priced_since.line) li.appendChild(el('span', 'rule', row.priced_since.line));
-  if (row.note) li.appendChild(el('span', 'rule', row.note));
-  if (row.held_source) li.appendChild(el('span', 'rule', `Sheet：${row.held_source.sheet_ticker}（解析：${row.held_source.source}）`));
-  confirmLines(row, 'span').forEach((line) => li.appendChild(line));
-  sharedBetLines(row, 'span').forEach((line) => li.appendChild(line));
-  (row.preconditions || []).forEach((p) => li.appendChild(el('span', 'warn', '▲ 前提失效：' + p)));
-  (row.rewrite || []).forEach((p) => li.appendChild(el('span', 'warn', '▲ 該重寫：' + p)));
-  if (row.holdings_verified === false) li.appendChild(el('span', 'warn', '持股未驗（可能其實已持有）'));
-  return li;
-}
-
-async function renderCandidates() {
-  markNav('candidates');
-  let payload;
-  try {
-    payload = await getJSON(`${API}/candidates`);
-  } catch (err) {
-    renderStateError(err, '讀不到候選狀態板');
-    return;
-  }
-  const counts = payload.counts || {};
-  const oldest = payload.oldest_stall_days || {};
-  const labels = payload.group_labels || {};
-  const sideLabels = payload.side_labels || {};
-  const holdings = payload.holdings || {};
-  const detailSet = new Set(payload.analyst_view_tickers || []);
-  app.textContent = '';
-  footerWarning.textContent = payload.correlation_warning || '';
-
-  const head = el('div', 'detail-head');
-  head.appendChild(el('h1', null, payload.title));
-  const badges = el('div', 'badges');
-  if (payload.freshness && payload.freshness.state === 'stale') {
-    const b = el('span', 'badge badge-stale', 'stale'); b.title = payload.freshness.rule; badges.appendChild(b);
-  }
-  head.appendChild(badges);
-  app.appendChild(head);
-
-  const sec0 = el('section', 'panel');
-  sec0.appendChild(el('h2', null, '各組檔數（0 也印）'));
-  const aged = (key) => (counts[key] && oldest[key] !== null && oldest[key] !== undefined) ? `最老滯留 ${oldest[key]} 天` : '';
-  sec0.appendChild(kpiRow(CANDIDATE_ORDER.map((key) => ({
-    label: labels[key] || key,
-    value: (counts[key] === null || counts[key] === undefined) ? '未驗' : String(counts[key]),
-    sub: key === 'held' && counts.held === null ? '持股未讀到' : aged(key),
-    cls: key === 'open' ? 'hero' : undefined,
-  }))));
-  sec0.appendChild(el('p', 'note', CANDIDATE_SIDE_ORDER.map((k) => `${sideLabels[k] || k} ${counts[k] ?? 0}`).join('｜')
-    + `｜無敘事 ${counts.no_narrative ?? 0}（沒有敘事的不上板）`));
-  if (holdings.status !== 'ok') {
-    sec0.appendChild(el('p', 'warn', '▲ ' + (holdings.reason || '持股未讀到，已持有判定暫停')));
-  } else {
-    if ((holdings.unresolved || []).length) {
-      sec0.appendChild(el('p', 'note', `持股解析不到 ${holdings.unresolved.length}：${holdings.unresolved.join('、')}（不猜；要不要登記是 identity 的決定）`));
-    }
-    // 使用者決定不研究（config/holdings_coverage.json，Phase 4 Step 4.7b）：不算「解析不到」，另列並附理由與決定日。
-    (holdings.ignored || []).forEach((item) => {
-      sec0.appendChild(el('p', 'note', `使用者決定不研究：${item.sheet_ticker}（${item.reason}；${item.decided_at}）`));
-    });
-    if (holdings.ignored_problem) {
-      sec0.appendChild(el('p', 'warn', `▲ 不研究名單讀不到（${holdings.ignored_problem}）——全部照列解析不到`));
-    }
-  }
-  app.appendChild(sec0);
-
-  const section = (title, rows, emptyText) => {
-    const sec = el('section', 'panel');
-    sec.appendChild(el('h2', null, `${title}（${rows.length}）`));
-    if (!rows.length) {
-      sec.appendChild(el('p', 'note', emptyText));
-    } else {
-      const list = el('ul', 'weak');
-      rows.forEach((row) => list.appendChild(candidateRow(row, detailSet)));
-      sec.appendChild(list);
-    }
-    app.appendChild(sec);
-  };
-  const groups = payload.groups || {};
-  CANDIDATE_ORDER.forEach((key) => {
-    const empty = key === 'open'
-      ? '0——可開為零就零；讓它非空的路是研究，不是放寬前提。'
-      : (key === 'held' && counts.held === null ? '持股未讀到——已持有判定暫停（不是「沒有持有」）。' : '0');
-    section(labels[key] || key, groups[key] || [], empty);
-  });
-  const sides = payload.side_groups || {};
-  CANDIDATE_SIDE_ORDER.forEach((key) => {
-    if ((sides[key] || []).length) section(sideLabels[key] || key, sides[key], '0');
-  });
-
-  // 沒有敘事、不上板的那幾檔（2026-09-30 使用者回饋「候選板是死的」：原本只有計數，看不到是誰）。
-  // 2026-10-07 起清單住首頁的「沒有敘事」那一組（首頁照候選狀態分組）——這裡原本摺著同一份清單，重複就拿掉，只留一句與連結。
-  const secX = el('section', 'panel');
-  secX.appendChild(el('h2', null, `沒有敘事、不上板（${counts.no_narrative ?? 0}）`));
-  const noteX = el('p', 'note', '候選狀態是寫敘事時宣告的——這些檔沒有敘事，所以不在上面任何一組。'
-    + '分兩種：非邊緣的規定不寫（它的財報當層的證據用）；邊緣的是還沒寫（研究 session 會排到）。是哪幾檔、各自為什麼：');
-  const homeLink = el('a', null, '首頁「不寫敘事（非邊緣）」與「還沒寫敘事」兩組');
-  homeLink.href = '#/';
-  noteX.appendChild(homeLink);
-  noteX.appendChild(document.createTextNode('（依代號字母，不是名次）。'));
-  secX.appendChild(noteX);
-  app.appendChild(secX);
-
-  const rewrite = payload.narrative_rewrite || [];
-  const secW = el('section', 'panel');
-  secW.appendChild(el('h2', null, `敘事該重寫（${rewrite.length}）`));
-  if (!rewrite.length) {
-    secW.appendChild(el('p', 'note', '0'));
-  } else {
-    const list = el('ul', 'weak');
-    rewrite.forEach((b) => list.appendChild(el('li', null, b.kind === 'link'
-      ? `${b.ticker}：連結 ${b.link_source_ref}——${b.label || '已沒有在盯的 watch'}`
-      : `${b.ticker}：敘事來源的 watch ${b.watch_id} 醒來／觸及／到期未判`)));
-    secW.appendChild(list);
-  }
-  app.appendChild(secW);
-
-  const ledger = payload.ledger || {};
-  if (ledger.present === false) {
-    app.appendChild(el('p', 'warn', '▲ 敘事 ledger 目錄不存在——「無敘事」是讀不到，不是真的沒有。'));
-  } else if (ledger.parse_errors) {
-    app.appendChild(el('p', 'warn', `▲ 敘事 ledger 有 ${ledger.parse_errors} 行解析不了（那幾份宣告沒進板）：${(ledger.parse_error_examples || []).join('；')}`));
-  }
-
-  const absentText = (block) => {
-    const parts = Object.entries(block.absent || {}).map(([k, v]) => `${k} ${v}`);
-    return parts.length ? `（${parts.join('、')}）` : '';
-  };
-  const roll = payload.rollup || {};
-  const secR = el('section', 'panel');
-  secR.appendChild(el('h2', null, `三題與四盞燈（${roll.universe ?? '?'} 檔；只數有值與缺席，不是結論）`));
-  const own = roll.priced_in_own || {};
-  const nums = roll.in_numbers || {};
-  const wipe = roll.wipeout || {};
-  const lamps = wipe.lamps || {};
-  const unlit = Object.entries(wipe.unlit_by_kind || {}).map(([k, v]) => `${k} ${v}`).join('、');
-  secR.appendChild(el('p', 'note', `已定價①（自家歷史）有值 ${own.valued ?? '?'}／缺席 ${own.absent_total ?? '?'}${absentText(own)}`));
-  secR.appendChild(el('p', 'note', `出現在數字裡 有值 ${nums.valued ?? '?'}／缺席 ${nums.absent_total ?? '?'}${absentText(nums)}`));
-  secR.appendChild(el('p', 'note', `會死嗎：${wipe.companies ?? '?'} 檔 × 4 盞——紅 ${lamps.red ?? '?'}｜黃 ${lamps.amber ?? '?'}｜綠 ${lamps.green ?? '?'}｜灰（沒量到）${lamps.unlit ?? '?'}${unlit ? `（${unlit}）` : ''}——灰不是綠；四盞都非灰 ${wipe.all_four_non_grey ?? '?'} 檔`));
-  if ((wipe.red_tickers || []).length) {
-    secR.appendChild(el('p', 'note', `有紅燈的檔：${wipe.red_tickers.join('、')}`));
-  }
-  const notRead = roll.not_read || {};
-  if (notRead.n) {
-    secR.appendChild(el('p', 'warn', `▲ 讀不到三題與燈 ${notRead.n} 檔：` + (notRead.tickers || []).map((t) => `${t}（${(notRead.reasons || {})[t] || '—'}）`).join('、')));
-  }
-  const edge = roll.edge || {};
-  secR.appendChild(el('p', 'note', `邊緣判定：邊緣 ${edge.edge ?? 0}｜非邊緣 ${edge.not_edge ?? 0}｜無法量 ${edge.unmeasurable ?? 0}`));
-  app.appendChild(secR);
-
-  app.appendChild(stateFooter(payload));
-}
+/* ⚠ 2026-10-28：「候選板」頁（renderCandidates／candidateRow 與它的三個常數）拿掉——併進首頁（同上）。
+   各段去處：各組檔數（0 也印）與最老滯留→首頁最下面那一行；各組逐列→首頁卡片＋個股頁候選狀態那行（理由、在等什麼、哪天醒）；
+   沒有敘事、不上板→首頁兩個收合組；敘事該重寫→卡片上的「敘事該重寫 N」；持股解析不到→每日短版；三題與四盞燈的 rollup、
+   邊緣判定計數→心跳段 2／段 4（同一份 artifact）。artifact 與 `/api/v1/candidates` 照留。 */
 
 /* ---------- 路由 ---------- */
 
@@ -3889,9 +3584,13 @@ async function route() {
     // ⚠ 2026-09-26（Step 2.6）：`#/coverage`（研究缺口）→ `#/graph-walk`（走圖九型）。
     else if (target === 'graph-walk') await renderGraphWalk();
     else if (target === 'structure-readings') await renderStructureReadings();
-    else if (target === 'watches') await renderWatches();
     else if (target === 'positions') await renderPositions();
-    else if (target === 'candidates') await renderCandidates();
+    // ⚠ 2026-10-28：`#/watches`（在等什麼）與 `#/candidates`（候選板）併進首頁；舊連結落到首頁並說一句，不落到「讀不到判讀」。
+    else if (target === 'watches' || target === 'candidates') {
+      await renderList();
+      app.insertBefore(el('p', 'note',
+        '「候選板」與「在等什麼」已併進這一頁：各組檔數在最下面，重看日在卡片上與最上面的兩週日曆。'), app.firstChild);
+    }
     // 2026-10-02（Phase 5 Step 5.5）：帳號計分表頁——心跳段 5 一直寫「完整表在 APP」，這一頁之前其實不存在。
     else if (target === 'account-scorecard') await renderScorecard();
     // 2026-10-07（個股頁 plan S4b）：層說明。`layer/` 帶斜線與小寫，不會撞到 ticker（ticker 一律大寫、不含斜線）。

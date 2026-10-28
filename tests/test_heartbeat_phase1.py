@@ -284,7 +284,54 @@ def test_woken_today_counts_wakes_that_were_requeued_in_the_same_run(monkeypatch
     monkeypatch.setattr(ew, "load_watches", lambda: {"watches": watches})
     monkeypatch.setattr(ew, "counters", lambda _d: {"fired_unconsumed": 0, "semantic_flagged": 0,
                                                     "semantic_pending_check": 0})
+    _no_trace_backlog(monkeypatch)
     assert "今日醒 3｜" in hb._watch_today_line(now=NOW)
+
+
+def _no_trace_backlog(monkeypatch, rows=()) -> None:
+    """watch 那一行也數追源 backlog（2026-10-28）——測試不讀真實的 leads store。"""
+    from engine_b import leads
+
+    monkeypatch.setattr(leads, "load", lambda: {})
+    monkeypatch.setattr(leads, "trace_backlog", lambda _store: [dict(r) for r in rows])
+
+
+def test_watch_line_prints_stalled_and_trace_needing_attention(monkeypatch) -> None:
+    """2026-10-28：APP「在等什麼」頁併進首頁前，只有那一頁印的停滯與追源需處置先搬進心跳（Daily 先印得出，畫面才能拿掉）。
+    完整心跳每天印（0 也印；讀不到印「讀不到」，不印 0——INV-3）；短版只在不是 0 時印。判準與 watches artifact 同一份（L16）。"""
+    from crons import daily_brief
+    from engine_b import event_watch as ew
+    from engine_b import leads
+
+    base = {"fired_unconsumed": 0, "semantic_flagged": 0, "semantic_pending_check": 0}
+    monkeypatch.setattr(ew, "load_watches", lambda: {"watches": []})
+    monkeypatch.setattr(ew, "counters", lambda _d: {**base, "stalled": 3})
+    _no_trace_backlog(monkeypatch, [{"wake_state": s} for s in ("stalled", "expired", "unwatched", "watching", "pq2_manual")])
+    assert "｜停滯 3｜追源需處置 3" in hb._watch_today_line(now=NOW)
+    assert daily_brief.watch_short_line(now=NOW).endswith("｜停滯 3｜追源需處置 3")
+
+    def gone():
+        raise OSError("leads store gone")
+
+    monkeypatch.setattr(leads, "load", gone)
+    assert "｜追源需處置 讀不到" in hb._watch_today_line(now=NOW)
+
+    monkeypatch.setattr(ew, "counters", lambda _d: {**base, "stalled": 0})
+    _no_trace_backlog(monkeypatch, [{"wake_state": "watching"}])
+    assert "｜停滯 0｜追源需處置 0" in hb._watch_today_line(now=NOW)        # 完整心跳 0 也印
+    short = daily_brief.watch_short_line(now=NOW)
+    assert "停滯" not in short and "追源需處置" not in short                 # 短版 0 不印
+
+
+def test_trace_needs_attention_is_the_one_rule_the_app_artifact_and_heartbeat_share() -> None:
+    from engine_b.leads import TRACE_NEEDS_ATTENTION_STATES, trace_needs_attention
+
+    assert TRACE_NEEDS_ATTENTION_STATES == {"stalled", "expired", "unwatched"}
+    rows = [{"lead_id": s, "wake_state": s} for s in ("stalled", "expired", "unwatched", "watching", "pq2_manual")]
+    assert [r["lead_id"] for r in trace_needs_attention(rows)] == ["stalled", "expired", "unwatched"]
+    assert trace_needs_attention(None) == []
+    source = (Path(__file__).resolve().parents[1] / "webapp" / "materialize.py").read_text(encoding="utf-8")
+    assert "trace_needs_attention(backlog)" in source                       # artifact 不另抄一份狀態集合
 
 
 def test_expiry_line_parts_add_up_to_the_cumulative_total() -> None:

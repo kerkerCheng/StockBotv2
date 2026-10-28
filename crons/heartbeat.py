@@ -1256,21 +1256,30 @@ def _watch_today_line(*, now: datetime, hint: bool = True) -> str:
     c = watch_today_counts(now=now)
     # 2026-10-22：這一格原本叫「未檢」，數的是所有醒來的語意 watch（含敘事來源）；⑤ 的「未檢」只數讀圖／層說明／thesis 來源
     # （敘事來源歸「敘事該重寫」）——同一個字兩個數會讓人搞混（L12），所以這裡改叫「語意醒來待判」，⑤ 才是待做清單。
+    # 2026-10-28：停滯、追源需處置兩格原本只有 APP「在等什麼」頁印——那一頁併進首頁前先搬進心跳（Daily 先印得出，畫面才能拿掉）
+    trace = c.get("trace_needs_attention")
     return (f"watch：今日醒 {c['woken']}｜今日到期 {c['expired']}｜已觸發未消化 {c['fired_unconsumed']}"
             f"｜語意標旗 {c['semantic_flagged']}｜語意醒來待判 {c['semantic_pending_check']}（＝⑤ 未檢＋敘事該重寫的醒來）"
+            f"｜停滯 {c.get('stalled', '讀不到')}｜追源需處置 {'讀不到' if trace is None else trace}"
             + ("（判定只在互動：`python -m engine_b.event_watch semantic-queue`）" if hint else ""))
 
 
-def watch_today_counts(*, now: datetime) -> dict[str, int]:
+def watch_today_counts(*, now: datetime) -> dict[str, int | None]:
     """watch 今日醒／今日到期＋registry 計數器（心跳段 2 與 Discord 短版 ④ 共用——L16）。"""
     from engine_b import event_watch as ew
 
     data = ew.load_watches()
     watches = data.get("watches") or []
     today = now.astimezone().date()
+    try:                                       # 追源 backlog 要有人當場處置的筆數（判準住 engine_b.leads，APP 同一份）
+        from engine_b import leads as leads_mod
+
+        trace = len(leads_mod.trace_needs_attention(leads_mod.trace_backlog(leads_mod.load())))
+    except Exception:  # noqa: BLE001 — 讀不到印「讀不到」，不印 0
+        trace = None
     return {"woken": sum(1 for w in watches if _woke_on(w, today)),
             "expired": sum(1 for w in watches if _local_day(w.get("expired_at")) == today),
-            **ew.counters(data)}
+            **ew.counters(data), "trace_needs_attention": trace}
 
 
 def _registry_tail(store: Mapping[str, Any], rows: list[Mapping[str, Any]]) -> str:

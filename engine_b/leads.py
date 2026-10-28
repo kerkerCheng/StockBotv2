@@ -937,6 +937,16 @@ def onboard_candidates(store: dict[str, Any], *, include_resolved: bool = False)
     )
 
 
+#: 追源 backlog 裡「要有人當場處置」的等待狀態：停滯、到期、沒有 watch 在等它。watches artifact（原 APP「在等什麼」頁
+#: 那一區；2026-10-28 頁面併進首頁）與心跳 watch 那一行共用這一份（L16）。
+TRACE_NEEDS_ATTENTION_STATES: frozenset[str] = frozenset({"stalled", "expired", "unwatched"})
+
+
+def trace_needs_attention(rows: Any) -> list[dict[str, Any]]:
+    """`trace_backlog` 的列裡要有人當場處置的那幾筆（`TRACE_NEEDS_ATTENTION_STATES`）。"""
+    return [dict(row) for row in rows or () if str(row.get("wake_state")) in TRACE_NEEDS_ATTENTION_STATES]
+
+
 def trace_backlog(store: dict[str, Any]) -> list[dict[str, Any]]:
     """列出 parked 的追源未果項目，避免規則書中的 backlog 變成黑洞。
 

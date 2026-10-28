@@ -278,12 +278,21 @@ async def stocks(request: Request) -> Response:
     order = {g["key"]: i for i, g in enumerate(groups)}
     items.sort(key=lambda row: (order.get(row["group"], len(order)), str(row.get("ticker") or "")))
     labels = {str(g["key"]): str(g.get("label") or g["key"]) for g in groups}
+    # 判讀是在持股 Sheet 讀不到時做的那幾檔：「已持有」判定暫停（候選板原本印「未驗」）——那一組的數不是「沒持有」（L12）
+    unverified = sum(1 for r in items if (r.get("candidate") or {}).get("sheet_verified") is False)
+    held_warning = (f"持股 Sheet 讀不到：{unverified} 檔的判讀是在讀不到時做的，已持有判定暫停——"
+                    "這一組的檔數不是「沒持有」（重跑 materialize，Sheet 讀得到後才算數）" if unverified else None)
     return _json({
         "api_version": API_VERSION,
         "count": len(items),
         "stocks": items,
+        # 每一組都回（0 也回——候選板「各組檔數 0 也印」併進首頁那一行）；最老滯留＝組內敘事天數最大的那一個（挑值不是算）
         "groups": [{**g, "count": sum(1 for r in items if r.get("group") == g["key"]),
-                    "expanded": g["key"] in MAIN_GROUPS} for g in groups],
+                    "expanded": g["key"] in MAIN_GROUPS,
+                    "oldest_stall_days": max((d for r in items if r.get("group") == g["key"]
+                                              for d in [((r.get("card") or {}).get("stall_days"))] if isinstance(d, int)),
+                                             default=None),
+                    "warning": held_warning if g["key"] == "held" else None} for g in groups],
         "calendar": _calendar(items, today=date.today(), order=order),
         "by_layer": _by_layer(items, order=order, labels=labels),
         # 常駐計數器（L14：真正的防呆是會自己出現的計數器，不是要人讀的段落）。

@@ -16,7 +16,7 @@ description: >
 > 方向是「圖是中心」（決定紀錄 [`2026-09-22-graph-first-direction-decision.md`](../../docs/brainstorms/2026-09-22-graph-first-direction-decision.md) G1–G12）：
 > **跨檔排序與首選已於 Phase 0 退役**——它們讓研究火力去補格子過 filter（L19）。
 > 取代它們的是：pane 1 印**結構表**（哪條邊薄、走不走得到需求錨）與**候選狀態板**
-> （五值封閉字彙，2026-09-29 Phase 3 Step 3.6 落地：APP `#/candidates`）；追蹤表主統計量是三個 power-law
+> （五值封閉字彙，2026-09-29 Phase 3 Step 3.6 落地；2026-10-28 起畫面在 APP 首頁「公司」`#/`）；追蹤表主統計量是三個 power-law
 > 統計量（D15，已落地）；alpha 格只觀測不設目標（D1）。
 
 ## 定位一句話
@@ -85,7 +85,7 @@ description: >
 
 **(b) 候選狀態板** — 封閉字彙五值：可開／缺 X／已定價等回落／不要／已持有，外加四個附組
 （非倍率候選／邊緣無法量／舊版／前提失效）與「無敘事 N」。**照抄 `candidates` state artifact**
-（`python -m webapp materialize --candidates` 產生；APP `#/candidates`）：各組檔數**0 也印**、組內按 ticker 字母、
+（`python -m webapp materialize --candidates` 產生；APP 首頁「公司」`#/`，2026-10-28 候選板頁併進首頁）：各組檔數**0 也印**、組內按 ticker 字母、
 缺 X／等回落／可開各印最老滯留天數；每列的「敘事宣告」與「推導結果」不同時兩個都寫（例：宣告缺 X、Sheet 持有 → 已持有）。
 **不得用結構表的前幾名冒充它**。「可開」是每檔各自過的前提不是分數，可同時多檔；
 **可開為零就零，不得為了非空放寬條件**——讓它非空的路是研究。artifact 讀不到就照實寫

@@ -54,6 +54,9 @@ body { padding-bottom: env(safe-area-inset-bottom); }
 }
 .brand { color: var(--text); font-weight: 650; text-decoration: none; letter-spacing: .3px; }
 .brand-note { color: var(--dim); font-size: 12px; }
+/* 2026-10-28：目前這一頁回答你的哪一個問題（字串住 index.html 的 data-question）。 */
+.page-question { max-width: 940px; margin: 10px auto 0; padding: 0 16px; color: var(--muted); font-size: 13px; }
+.page-question:empty { display: none; }
 
 main { padding: 16px; max-width: 940px; margin: 0 auto; }
 .loading, .empty { color: var(--muted); }
@@ -85,6 +88,8 @@ main { padding: 16px; max-width: 940px; margin: 0 auto; }
               font-size: 12px; color: var(--muted); }
 .card-chip { padding: 0 7px; border-radius: 999px; border: 1px solid var(--border); font-size: 11px; font-weight: 600; }
 .card-when.past { color: var(--flags); }
+.chip-rewrite { color: var(--flags); border-color: var(--flags); }
+.group-counts { margin-top: 14px; }
 .card-spark { flex: 0 0 auto; width: 104px; text-align: right; }
 .spark { width: 104px; height: 30px; display: block; }
 .spark-line { fill: none; stroke: var(--muted); stroke-width: 1.5; stroke-linejoin: round; stroke-linecap: round; }

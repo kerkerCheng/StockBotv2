@@ -13,20 +13,22 @@
   <a class="brand" href="#/" aria-label="回到清單">StockBot</a>
   <span class="brand-note">已形成的判讀 · 不在點擊時重算</span>
   <nav class="nav" aria-label="主要">
-    <!-- 2026-10-07 使用者回饋：照常用的程度排；「我的部位」改名「追蹤表」（舊店收在頁面最下面）；結構表放最後。 -->
-    <a href="#/" data-view="stocks">單檔判讀</a>
-    <a href="#/daily" data-view="daily">每日</a>
-    <a href="#/candidates" data-view="candidates">候選板</a>
-    <a href="#/layer-notes" data-view="layer-notes">層說明</a>
-    <a href="#/structure-readings" data-view="structure-readings">讀圖</a>
-    <a href="#/graph-walk" data-view="graph-walk">走圖</a>
-    <a href="#/beta" data-view="beta">資產配置</a>
-    <a href="#/positions" data-view="positions">追蹤表</a>
-    <a href="#/watches" data-view="watches">在等什麼</a>
-    <a href="#/account-scorecard" data-view="account-scorecard">帳號計分表</a>
-    <a href="#/structure-table" data-view="structure-table">結構表</a>
+    <!-- 2026-10-07 使用者回饋：照常用的程度排；「我的部位」改名「追蹤表」（舊店收在頁面最下面）；結構表放最後。
+         2026-10-28（使用者照推薦）：每一頁宣告它回答你的哪一個問題（data-question，目前那頁的問題印在導覽列下面）；
+         「候選板」「在等什麼」併進「公司」（原「單檔判讀」）。下一步：層說明／讀圖／走圖／結構表併成「圖」，
+         追蹤表／帳號計分表併成「成績單」（ROADMAP 側項「APP 照使用者問題重組」）。 -->
+    <a href="#/" data-view="stocks" data-question="哪幾檔值得我現在點進去看？">公司</a>
+    <a href="#/daily" data-view="daily" data-question="今天變了什麼、有什麼要我決定？">每日</a>
+    <a href="#/layer-notes" data-view="layer-notes" data-question="這一層在供應鏈裡做什麼、誰在裡面？">層說明</a>
+    <a href="#/structure-readings" data-view="structure-readings" data-question="每一層我們讀出了什麼？">讀圖</a>
+    <a href="#/graph-walk" data-view="graph-walk" data-question="圖上哪裡還有洞沒研究？">走圖</a>
+    <a href="#/beta" data-view="beta" data-question="大盤那部分離目標比例差多少？">資產配置</a>
+    <a href="#/positions" data-view="positions" data-question="我們說過的話，後來對不對？">追蹤表</a>
+    <a href="#/account-scorecard" data-view="account-scorecard" data-question="哪個來源帶來過贏家？">帳號計分表</a>
+    <a href="#/structure-table" data-view="structure-table" data-question="每一檔押在哪一層、同一層還有誰？">結構表</a>
   </nav>
 </header>
+<p id="page-question" class="page-question"></p>
 
 <main id="app" aria-live="polite">
   <p class="loading">載入中…</p>

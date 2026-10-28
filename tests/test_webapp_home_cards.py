@@ -173,9 +173,9 @@ def test_bad_lines_are_reported_not_dropped(tmp_path) -> None:
 # 3. API：日曆、依層、攤開哪幾組
 # ---------------------------------------------------------------------------
 
-def _payload(ticker, group, *, until=None, rides=(), short=None):
+def _payload(ticker, group, *, until=None, rides=(), short=None, stall=5):
     row = {"derived": group, "declared": group, "derived_label": group, "since": "2026-10-01T00:00:00+00:00",
-           "stall_days": 5, "watch": {"until": until, "status": "active"} if until else None}
+           "stall_days": stall, "watch": {"until": until, "status": "active"} if until else None}
     view = _with_card_panels(fake_view(ticker), rides=rides, row=row)
     payload = materialize_view(view, tagline={"short_name": short, "text": "做什麼", "created_at": "2026-10-28T00:00:00+00:00"}
                                if short else None)
@@ -198,7 +198,7 @@ def client(tmp_path):
     other = {**RIDE, "node": "mat:inp_substrate", "node_name": "InP substrate"}
     for payload in (_payload("AAA", "missing", until=soon, rides=[RIDE], short="甲"),
                     _payload("BBB", "priced_wait", until=past, rides=[RIDE, other]),
-                    _payload("CCC", "missing", until=later, rides=[other]),
+                    _payload("CCC", "missing", until=later, rides=[other], stall=12),
                     _payload("DDD", "pass", until=soon, rides=[RIDE]),
                     _payload("EEE", "held")):
         store.write(payload)
@@ -249,3 +249,65 @@ def test_by_layer_lists_main_groups_and_counts_the_rest(client) -> None:
     assert body["by_layer"]["unridden"] == ["EEE"]                   # 持有但敘事沒宣告押哪一層
     expanded = {g["key"] for g in body["groups"] if g["expanded"]}
     assert expanded == set(MAIN_GROUPS)
+
+
+# ---------------------------------------------------------------------------
+# 4. 候選板與在等什麼併進首頁（2026-10-28 使用者照推薦：11 頁收成 5 頁的第二步）
+# ---------------------------------------------------------------------------
+
+def test_every_group_comes_back_with_its_count_and_oldest_stall(client) -> None:
+    """候選板「各組檔數（0 也印）＋最老滯留」那一行搬到首頁最下面：0 檔的組照回，最老滯留＝組內敘事天數最大的那一個（挑值）。"""
+    http, _ = client
+    groups = {g["key"]: g for g in http.get("/api/v1/stocks").json()["groups"]}
+    assert groups["missing"]["count"] == 2 and groups["missing"]["oldest_stall_days"] == 12
+    assert groups["open"]["count"] == 0 and groups["open"]["oldest_stall_days"] is None and groups["open"]["expanded"]
+
+
+def test_held_group_says_unverified_when_the_sheet_was_not_read(tmp_path) -> None:
+    """候選板原本在 Sheet 讀不到時把「已持有」印成「未驗」；首頁「0 也印」不得把它壓成「已持有 0」（L12）。"""
+    from webapp.contracts import canonical_digest
+    from webapp.materialize import _candidate_overview, write_vocabularies
+
+    panel = {"lines": [{"key": "candidate:state", "datum": {"value": dict(ROW, sheet_verified=False)}}]}
+    assert _candidate_overview(panel)["sheet_verified"] is False              # 照抄個股頁那一列
+
+    def written(verified):
+        store = ArtifactStore(tmp_path / str(verified))
+        payload = _payload("AAA", "missing")
+        payload["overview"]["candidate"]["sheet_verified"] = verified
+        payload["content_digest"] = canonical_digest({k: v for k, v in payload.items() if k != "content_digest"})
+        store.write(payload)
+        write_vocabularies(store)
+        groups = TestClient(create_app(tmp_path / str(verified))).get("/api/v1/stocks").json()["groups"]
+        return {g["key"]: g for g in groups}
+
+    unread = written(False)
+    assert "Sheet 讀不到" in unread["held"]["warning"] and unread["missing"]["warning"] is None
+    assert written(True)["held"]["warning"] is None
+
+
+def test_card_counts_the_rewrite_flags_it_does_not_copy_them() -> None:
+    """候選板那一列的「敘事該重寫」搬到卡片上：只帶筆數（是哪幾條、為什麼在個股頁候選狀態那一行）。"""
+    row = dict(ROW, rewrite=["敘事該重寫：ew_1 醒來", "敘事該重寫：ew_2 到期未判"])
+    assert build_overview(_with_card_panels(fake_view(), rides=[RIDE], row=row), card={})["card"]["rewrite"] == 2
+    assert build_overview(_with_card_panels(fake_view(), rides=[RIDE], row=ROW), card={})["card"]["rewrite"] == 0
+    assert build_overview(_with_card_panels(fake_view(), row=None), card={})["card"]["rewrite"] is None
+
+
+def test_the_two_pages_are_gone_and_every_page_says_its_question() -> None:
+    """兩頁拿掉；舊連結落到首頁並說一句（不落到「讀不到判讀」）。每一頁宣告它回答你的哪一個問題——
+    字串只住 index.html 的 data-question，app.js 照抄（不另寫一份）。"""
+    import re
+    from pathlib import Path
+
+    static = Path(__file__).resolve().parents[1] / "webapp" / "static"
+    source = (static / "app.js").read_text(encoding="utf-8")
+    html = (static / "index.html").read_text(encoding="utf-8")
+    for gone in ("function renderCandidates", "function candidateRow", "function renderWatches", "function watchRow"):
+        assert gone not in source, gone
+    assert 'href="#/candidates"' not in html and 'href="#/watches"' not in html
+    assert "target === 'watches' || target === 'candidates'" in source
+    links = re.findall(r'<a href="#/[^"]*" data-view="[^"]+"([^>]*)>([^<]+)</a>', html)
+    assert len(links) == 9 and all(re.search(r'data-question="[^"]+？"', attrs) for attrs, _ in links), links
+    assert links[0][1] == "公司"
+    assert 'id="page-question"' in html and "link.dataset.question" in source

@@ -197,7 +197,8 @@ Lesson 的事發經過與實作落點住 [`docs/lessons-incidents.md`](docs/less
 - **缺席不得被壓成「無資料」。** `absence_kind` 由產生缺席的程式自己宣告（L16）；「刻意不主張」只能來自 append-only 的 Abstention 紀錄，
   settled 不讓 readiness 變好。
 - **昨天和今天一樣的住 APP，今天變了的＋要你決定的住 Daily**；順序是 invariant：APP 先讀得到，Daily 才能不印；
-  **還沒有 APP 畫面的段落一律留在 Daily**，判準是機械的：`python -m webapp status` 列得出那個 kind 才算搬完。
+  **還沒有 APP 畫面的段落一律留在 Daily**，判準是機械的：`python -m webapp status` 列得出那個 kind、**而且有一頁真的印出它**，
+  才算搬完（2026-10-28 使用者照推薦補後半句：併頁時 kind 照在、畫面拿掉，那一段就得先回到 Daily）。
 - **APP 是給人看的，agent 不靠它做判斷**（2026-10-07 使用者）：你和我都不會看的不放——「不是收起來，是拿掉」；
   查核用的欄位（authority、digest、逐條排除理由、凍結的舊店）留在 artifact 與落檔，不必有畫面。上一條只管使用者會看的段落。
 - **APP 沒有任何寫入端點、沒有自己的帳號系統**；認證邊界是 Cloudflare Access，預設只綁 127.0.0.1。四個 gate 不因多一個畫面而放寬。

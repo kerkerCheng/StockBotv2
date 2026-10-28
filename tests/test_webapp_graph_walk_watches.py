@@ -302,12 +302,14 @@ def test_meta_declares_both(client) -> None:
     assert "GET /api/v1/coverage" not in endpoints
 
 
-def test_frontend_has_both_views_and_no_ranking_of_gaps() -> None:
+def test_frontend_has_the_walk_view_and_no_ranking_of_gaps() -> None:
+    """2026-10-28：「在等什麼」頁併進首頁（重看日在卡片與兩週日曆、停滯與追源需處置在心跳 watch 那一行）；
+    watches artifact 與 `/api/v1/watches` 照留（上面兩條測試）。"""
     source = (ROOT / "webapp" / "static" / "app.js").read_text(encoding="utf-8")
-    assert "function renderGraphWalk" in source and "function renderWatches" in source
+    assert "function renderGraphWalk" in source and "function renderWatches" not in source
     assert "function renderCoverage" not in source
     for token in (".sort(", "優先度", "最重要", "建議先做"):
         assert token not in source, token
     html = (ROOT / "webapp" / "static" / "index.html").read_text(encoding="utf-8")
-    assert 'href="#/graph-walk"' in html and 'href="#/watches"' in html
+    assert 'href="#/graph-walk"' in html and 'href="#/watches"' not in html
     assert 'href="#/coverage"' not in html

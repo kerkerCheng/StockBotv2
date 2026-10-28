@@ -557,9 +557,10 @@ def test_priced_in_is_explained_from_one_string_in_one_place(client) -> None:
 
 def test_stock_page_three_words_jump_to_their_numbers_on_the_same_page() -> None:
     """2026-09-30 使用者回饋（「這三個字是要我去候選板看詳細嗎？」）：細節在同一頁——三個字可以點；
-    2026-10-08 起每一題的數字住在那一題那一塊的「數字與出處」（錨點 `tq-<題>`），點了打開它。連到候選板的那一句不再暗示細節在那裡。"""
+    2026-10-08 起每一題的數字住在那一題那一塊的「數字與出處」（錨點 `tq-<題>`），點了打開它。連到候選板的那一句不再暗示細節在那裡。
+    2026-10-28：候選板頁併進首頁，那一句改連首頁（公司）。"""
     source = (ROOT / "webapp" / "static" / "app.js").read_text(encoding="utf-8")
     assert "jumpToNumbers(question)" in source and "node.id = 'tq-' + question" in source
     assert "audit-drill" not in source
-    assert "看候選板 →" not in source and "和其他檔一起看（候選板）→" in source
+    assert "看候選板 →" not in source and "和其他檔一起看（公司）→" in source and "'#/candidates'" not in source
     assert "candidateWatchLine(row.watch)" in source and "'理由：' + row.reason" in source
