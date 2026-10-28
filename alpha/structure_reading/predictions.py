@@ -40,7 +40,7 @@ from .contracts import StructureReading
 #: 會被判對錯的讀法（斷言）。`neither`／`undecided` 是母體、不判。
 ASSERTION_KINDS = frozenset({"moat", "volume"})
 
-#: 終局（封閉字彙，一份讀圖恰好一格）。中文給讀圖頁與心跳用。
+#: 終局（封閉字彙，一份讀圖恰好一格）。中文給追蹤表頁的圖預測對錯表與心跳用。
 OUTCOMES: Mapping[str, str] = {
     "held": "對：同讀法、圖有變（帶新來源）或已到期後重讀",
     "reversed": "錯：被不同讀法取代",

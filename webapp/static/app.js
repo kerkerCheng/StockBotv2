@@ -422,13 +422,7 @@ function drill(title, buildBody) {
   return node;
 }
 
-function kv(label, text) {
-  const row = el('div', 'row');
-  row.appendChild(el('div', 'row-label', label));
-  row.appendChild(el('div', 'row-value', ''));
-  row.appendChild(el('div', 'row-reason', text));
-  return row;
-}
+/* ⚠ 2026-10-28：kv（標籤＋說明一列）隨結構表頁拿掉——唯一的使用者是那一頁的「這份表的視角」。 */
 
 function listOf(items) {
   const list = el('ul', 'notes');
@@ -1028,7 +1022,7 @@ function mixDetail(payload) {
 }
 
 /** 「技術鏈」的展開：它坐的每一層現在讀成什麼（讀圖面板照抄）。節點印名字——層說明的標題、圖上的名字，都沒有才印 ID
- *  （ID 放 title）；哪幾層有層說明連到閱讀頁。完整引文與反證在讀圖頁。 */
+ *  （ID 放 title）；哪幾層有層說明連到閱讀頁。完整引文與反證在圖頁那一層（點層名）。 */
 function seatsDetail(payload, view) {
   const panel = view.readings;
   if (!panel) return null;
@@ -1046,8 +1040,11 @@ function seatsDetail(payload, view) {
     rows.forEach((line) => {
       const m = /^reading:(.+):(layer|socket)$/.exec(line.key) || [];
       const node = m[1] || line.key;
-      const li = el('li', null, `${titles[node] || names[node] || node}（${m[2] === 'socket' ? '插槽' : '層'}）`);
-      li.title = node;
+      const li = el('li');
+      const link = el('a', null, `${titles[node] || names[node] || node}（${m[2] === 'socket' ? '插槽' : '層'}）`);
+      link.href = '#/graph/' + encodeURIComponent(node);       // 2026-10-28：讀圖頁併進圖頁，連到那一層
+      link.title = node;
+      li.appendChild(link);
       const d = line.datum || {};
       li.appendChild(el('span', 'rule', typeof d.value === 'string' && d.value ? d.value
         : (absenceLabel(d.absence_kind) || d.reason || '—')));
@@ -1057,8 +1054,8 @@ function seatsDetail(payload, view) {
     const unread = (ctx.seats || []).length - rows.length;
     if (unread > 0) box.appendChild(el('p', 'note', `它坐的另外 ${unread} 個節點還沒有讀圖。`));
     if (links) box.appendChild(links);
-    const more = el('a', null, '完整的引文與反證在「讀圖」頁 →');
-    more.href = '#/structure-readings';
+    const more = el('a', null, '每一層的引文與反證在「圖」頁 →');
+    more.href = '#/graph';
     box.appendChild(more);
     return box;
   });
@@ -1453,12 +1450,12 @@ function headerLine(payload, view) {
   return bits.length ? el('div', 'detail-sub', bits.join('｜')) : null;
 }
 
-/* ---------- 結構表（structure_table state；照抄 structure_table() 的輸出，不重排、不加權、沒有名次） ----------
-   ⚠ 2026-09-23（Phase 0 Step 0b.3）：這一頁原本是「瓶頸排序」（首選、可行動／純結構兩份序、產業別分組、
-   落差註記）；跨檔排序退役（G1／L19）後只剩逐邊的結構事實。列序是 (company_id, relation, bottleneck)
-   字典序——索引不是名次，畫面上沒有 # 欄。籃子頁與多年視角頁（0a.2 退役 kind）的程式碼同批移除。 */
-
-let TABLE_VOCAB = null;
+/* ---------- 共用：導覽、行內強調、表格 ----------
+   ⚠ 2026-10-28：「結構表」頁（renderStructureTable 與它專用的欄位函式：soleSourceBadge、edgeCell、subCell、anchorCell、
+   hopsText、nodeLabel、RELATION_PLAIN、TABLE_COLUMNS、chainList、TABLE_VOCAB）拿掉——併進「圖」頁（使用者照推薦：11 頁收成 5 頁）。
+   去處：「某一層有哪幾家在供貨」→圖頁每層的公司（結構表 supplies_to 那幾列）；「從需求端走到這一層經過哪幾層」→圖頁每層
+   「讀法、引文與反證」裡的需求鏈；已知限制→圖頁「解讀前要知道」；搜尋→圖頁搜尋（只藏不排）。逐邊的可替代性、獨家、證據強度、
+   合格狀態、離錨幾步是查核欄位：留在 structure_table artifact 與 `python -m query.structure`。 */
 
 /** 標出目前那一頁，並把它回答的問題印在導覽列下面（2026-10-28：每一頁宣告它回答你的哪一個問題；字串只住
  * index.html 的 data-question，這裡照抄）。`question` 只給「借用導覽列上某一頁、但問的是另一件事」的頁（個股頁）。 */
@@ -1501,18 +1498,6 @@ function mdParagraph(text, className) {
   return p;
 }
 
-/** sole_source 是三態：true／false／null。**null 是「未填」，不是 false**——畫面必須分得出來。 */
-function soleSourceBadge(value) {
-  const table = (TABLE_VOCAB && TABLE_VOCAB.sole_source_states) || {};
-  let text; let key;
-  if (value === true) { text = '獨家供應'; key = 'true'; }
-  else if (value === false) { text = '有第二來源'; key = 'false'; }
-  else { text = '沒人說過是不是獨家'; key = 'null'; }
-  const badge = el('span', 'badge ' + (value === true ? 'badge-sole' : 'badge-absence'), text);
-  badge.title = table[key] || '';
-  return badge;
-}
-
 function th(text) { return el('th', null, text); }
 
 function companyCell(row, detailSet) {
@@ -1534,66 +1519,6 @@ function companyCell(row, detailSet) {
   return cell;
 }
 
-/* 關係動詞寫成人話，原始 label 附在 title 供查圖（判準：望文生義還是要查表）。 */
-const RELATION_PLAIN = { supplies_to: '供貨給', depends_on: '依賴', constrained_by: '受限於' };
-
-/** 節點的人話名字（materialize 時從圖取）；圖裡沒有名字才印 ID——不從 ID 猜名字。ID 一律放 title。 */
-function nodeLabel(name, id) {
-  const node = name ? el('span', 'node-name', name) : el('code', null, id);
-  node.title = `圖裡的節點 ID：${id}（可貼回來查）`;
-  return node;
-}
-
-function edgeCell(row) {
-  const cell = el('td', 'rank-edge');
-  const verb = el('div', 'dim', RELATION_PLAIN[row.relation] || row.relation);
-  verb.title = row.relation;
-  cell.appendChild(verb);
-  cell.appendChild(nodeLabel(row.bottleneck_name, row.bottleneck));
-  return cell;
-}
-
-function subCell(row) {
-  const cell = el('td', 'rank-sub');
-  const hasSub = row.substitutability !== null && row.substitutability !== undefined;
-  cell.appendChild(el('span', 'sub-score', hasSub ? `${row.substitutability}/5` : '未填'));
-  cell.appendChild(document.createTextNode(' '));
-  cell.appendChild(soleSourceBadge(row.sole_source));
-  // Phase 6 Step 6.5：**這個值本身**（贏得 sub 值的那一筆）的引文撐不撐得住——旗標跟著值走，只標、不改值。
-  if (row.sub_language_in_quote === false) {
-    const own = el('div', 'dim', '⚠ 這個值的引文沒談可替代性');
-    own.title = row.sub_assertion_id || '';
-    cell.appendChild(own);
-  }
-  // Phase 4 Step 4.4b：這條邊上帶 sub 的每一筆裡，引文沒有任何一個字在談可替代性的筆數（id 在滑鼠提示裡，指得回原文）。
-  const without = row.assertions_without_sub_language || [];
-  if (without.length) {
-    const flag = el('div', 'dim', `引文沒談可替代性 ${without.length} 筆`);
-    flag.title = without.join('\n');
-    cell.appendChild(flag);
-  }
-  return cell;
-}
-
-function anchorCell(row) {
-  const cell = el('td', 'rank-anchor');
-  if (row.demand_anchor) {
-    cell.appendChild(nodeLabel(row.demand_anchor_name, row.demand_anchor));
-    // Phase 6 Step 6.7a：錨逐列——這一列的節點走不到、退回從公司走的，標「公司層」（字彙在滑鼠提示，來自 artifact）。
-    const company = row.anchor_basis === 'company';
-    const hops = el('div', 'dim', company ? `公司層｜公司離它 ${row.demand_hops} 步` : `離它 ${row.demand_hops} 步`);
-    if (row.anchor_basis_label) hops.title = row.anchor_basis_label;
-    cell.appendChild(hops);
-  } else {
-    cell.appendChild(el('span', 'badge badge-blocked', '🔴 找不到誰在花錢'));
-  }
-  return cell;
-}
-
-function hopsText(row) {
-  return (row.demand_hops === null || row.demand_hops === undefined) ? '—' : `${row.demand_hops} 跳`;
-}
-
 function rankTable(rows, columns, detailSet) {
   const wrap = el('div', 'table-wrap');
   const table = el('table', 'rank');
@@ -1612,183 +1537,6 @@ function rankTable(rows, columns, detailSet) {
   // 手機上每一列變一張小卡（2026-10-07：追蹤表兩條線在手機上右邊欄位被切掉；與計分表、層說明同一個 `stackTable`）
   wrap.appendChild(stackTable(table));
   return wrap;
-}
-
-/* 沒有 # 欄：列序是索引不是名次。 */
-const TABLE_COLUMNS = [
-  { title: '標的', cell: companyCell },
-  { title: '卡在哪一層', cell: edgeCell },
-  { title: '有多難換掉', cell: subCell },
-  { title: '證據強度', cell: (row) => { const c = el('td', 'nowrap', row.evidence_label || row.evidence); c.title = row.evidence; return c; } },
-  { title: '合格狀態', cell: (row) => el('td', 'nowrap', row.qualification_status || '—') },
-  { title: '離花錢的人幾步', cell: (row) => el('td', 'nowrap', hopsText(row)) },
-  { title: '誰在花錢', cell: anchorCell },
-];
-
-/* 需求鏈：每一列「誰在花錢 → 這一列卡在哪的節點」（公司層的列 → 這家公司）。節點名取 artifact 的 `chain_names`，沒有才印 ID。 */
-function chainList(rows, notes) {
-  const ul = el('ul', 'notes');
-  rows.forEach((row) => {
-    const li = el('li', null, `${row.ticker || row.company_label || row.company_id} ${RELATION_PLAIN[row.relation] || row.relation} `
-      + `${row.bottleneck_name || row.bottleneck}`);
-    li.title = `${row.company_id} ${row.relation} ${row.bottleneck}`;
-    const sub = el('div', 'dim');
-    if (row.chain && row.chain.length) {
-      sub.textContent = row.chain.map((id, i) => (row.chain_names || [])[i] || id).join(' → ')
-        + `　（距需求端 ${row.demand_hops} 跳${row.anchor_basis === 'company' ? '；公司層' : ''}）`;
-      sub.title = row.chain.join(' → ');
-    }
-    else sub.appendChild(mdInline(notes.no_anchor_chain || ''));
-    li.appendChild(sub);
-    ul.appendChild(li);
-  });
-  return ul;
-}
-
-async function renderStructureTable() {
-  markNav('structure-table');
-  let payload;
-  try {
-    payload = await getJSON(`${API}/structure-table`);
-  } catch (err) {
-    renderStateError(err, '讀不到結構表');
-    return;
-  }
-  TABLE_VOCAB = payload.vocab || {};
-  const detailSet = new Set(payload.analyst_view_tickers || []);
-  const notes = payload.notes || {};
-  const rows = payload.rows || [];
-  app.textContent = '';
-  footerWarning.textContent = payload.correlation_warning || '';
-
-  const head = el('div', 'detail-head');
-  head.appendChild(el('h1', null, payload.title));
-  const badges = el('div', 'badges');
-  const pit = payload.point_in_time || {};
-  badges.appendChild(el('span', 'badge badge-fresh', pit.mode === 'as_of' ? `as-of ${payload.as_of}` : '現況'));
-  if (payload.freshness && payload.freshness.state === 'stale') {
-    const b = el('span', 'badge badge-stale', 'stale');
-    b.title = payload.freshness.rule;
-    badges.appendChild(b);
-  }
-  head.appendChild(badges);
-  app.appendChild(head);
-  // 2026-10-07 使用者回饋（「結構表可以留但我不知道怎麼查」）：一句什麼時候用它。
-  app.appendChild(el('p', 'note', '什麼時候用：想知道某一層（例如 CW 雷射、快接頭）有哪幾家在供貨、'
-    + '從需求端走到這一層經過哪幾層——用下面的「只看某一層」挑；想看一家公司坐在哪幾層，用公司名搜。'));
-
-  // ① 已知限制：契約說「解讀前必讀」，所以不摺疊。
-  const limits = el('section', 'panel');
-  limits.appendChild(el('h2', null, '🔴 已知限制，解讀前必讀'));
-  const ol = el('ol', 'limits');
-  (payload.limitations || []).forEach((text) => {
-    const li = el('li');
-    li.appendChild(mdInline(text));
-    ol.appendChild(li);
-  });
-  limits.appendChild(ol);
-  const cov = payload.coverage || {};
-  limits.appendChild(el('p', 'note',
-    `EdgeAssertion ${cov.assertions} → canonical edge ${cov.canonical_edges}（去重收斂 ${cov.duplicate_collapse} 筆）` +
-    `｜substitutability 有值 ${cov.edges_with_substitutability}/${cov.canonical_edges}` +
-    `｜lead time 有值 ${cov.edges_with_lead_time} 條`));
-  const subLanguage = payload.sub_language;
-  limits.appendChild(el('p', 'note', subLanguage
-    ? `sub 引文不含可替代性語言 ${subLanguage.without}/${subLanguage.checked} 筆帶 sub 的 assertion（字表 ${subLanguage.language}；只印、不放閘——量的是措辭，不是 sub 對不對）`
-    : 'sub 引文不含可替代性語言：這份結構表沒有核對（請重跑 materialize --structure-table）'));
-  // 層計數器（Phase 4 Step 4.4c）：graph_walk artifact 的 layer_stats.summary 照抄——前端不重算、不重組（L16）。
-  try {
-    const walk = await getJSON(`${API}/graph-walk`);
-    const layer = walk.layer_stats;
-    limits.appendChild(el('p', 'note', layer && layer.summary
-      ? layer.summary
-      : '層：graph_walk artifact 沒有 layer_stats（請重跑 materialize --graph-walk）——不是 0'));
-  } catch (err) {
-    limits.appendChild(el('p', 'note', '層：讀不到 graph_walk artifact（upstream_unavailable）——不是 0'));
-  }
-  app.appendChild(limits);
-
-  // ② 結構表：全部列、沒有名次、沒有首選。
-  // 2026-09-30 使用者回饋（「結構表是死的頁面」）：加搜尋（代號／公司／層的名字）與依層篩選——**只篩、不重排**，
-  // 列序照舊是 materialize 當下的索引；篩掉幾條照印（INV-3 的可見面）。
-  const sec1 = el('section', 'panel');
-  sec1.appendChild(el('h2', null, `結構表（${rows.length} 條邊）——卡在哪、多難繞、誰在花錢`));
-  if (notes.order) sec1.appendChild(mdParagraph(notes.order, 'panel-questions'));
-  if (rows.length) {
-    const controls = el('div', 'table-filter');
-    const search = el('input');
-    search.type = 'search';
-    search.placeholder = '搜尋代號、公司或層（例：AXTI、InP）';
-    search.setAttribute('aria-label', '搜尋結構表');
-    const layerSelect = el('select');
-    layerSelect.setAttribute('aria-label', '只看某一層');
-    layerSelect.appendChild(el('option', null, '全部的層'));
-    layerSelect.firstChild.value = '';
-    // 層的選項由 materialize 端給（依名字字母）：前端一律不排序，這個檔連排序呼叫都是禁字。
-    (payload.layers || []).forEach((layer) => {
-      const option = el('option', null, `${layer.name || layer.id}（${layer.edges}）`);
-      option.value = layer.id;
-      layerSelect.appendChild(option);
-    });
-    const shown = el('div', 'dim table-filter-count');
-    controls.appendChild(search);
-    controls.appendChild(layerSelect);
-    controls.appendChild(shown);
-    sec1.appendChild(controls);
-    const holder = el('div');
-    sec1.appendChild(holder);
-    const haystack = (row) => [row.ticker, row.company_label, row.company_id, row.bottleneck_name, row.bottleneck,
-      row.demand_anchor_name, row.demand_anchor].filter(Boolean).join(' ').toLowerCase();
-    const apply = () => {
-      const q = search.value.trim().toLowerCase();
-      const layer = layerSelect.value;
-      const picked = rows.filter((row) => (!layer || row.bottleneck === layer) && (!q || haystack(row).includes(q)));
-      holder.textContent = '';
-      if (picked.length) holder.appendChild(rankTable(picked, TABLE_COLUMNS, detailSet));
-      else holder.appendChild(el('p', 'empty', '這張表沒有符合的邊——清掉搜尋字或換一層再看'));
-      // 需求鏈（原本是「展開：每一列的鏈路」摺疊，兩百多列沒人看）：挑了層或搜了公司，才列那幾條從需求端走過來的路。
-      if ((q || layer) && picked.length) {
-        holder.appendChild(el('div', 'group-title', `這 ${picked.length} 條的需求鏈（誰在花錢 → … → 卡在哪的節點）`));
-        holder.appendChild(chainList(picked, notes));
-      } else if (!q && !layer) {
-        holder.appendChild(el('p', 'note', '挑一層或搜一家公司，表下面就會列出那幾條從需求端走過來的鏈路。'));
-      }
-      shown.textContent = (q || layer) ? `顯示 ${picked.length}／${rows.length} 條（篩掉 ${rows.length - picked.length} 條）` : `全部 ${rows.length} 條`;
-    };
-    search.addEventListener('input', apply);
-    layerSelect.addEventListener('change', apply);
-    apply();
-  } else {
-    sec1.appendChild(el('p', 'empty', '（母體為空：沒有任何公司→向下的邊）'));
-  }
-  // 「需求錨」那一欄的讀法跟著表走（Phase 6 Step 6.7a；文字住 query.bottleneck.ANCHOR_COLUMN_NOTE）。
-  if (notes.anchor_column) sec1.appendChild(mdParagraph(notes.anchor_column));
-  if (notes.no_anchor_reading) sec1.appendChild(mdParagraph(notes.no_anchor_reading));
-  if (notes.table) sec1.appendChild(mdParagraph(notes.table));
-  app.appendChild(sec1);
-
-  // ③④ 診斷（2026-10-07 使用者：「不需要給我看的…不是收起來 是拿掉」）：原本兩個面板（走不到需求錨的原因清單、
-  // 母體排除理由清單）收成「已知限制」裡的兩行數字——INV-3 的可見面留著（排除了幾條、走不到幾個）；逐條原因與理由
-  // 在 artifact 的 `anchor_gaps`／`population` 裡給互動 session 查。⑤ 需求鏈改跟著篩選走（見上面的 `apply`）。
-  const gaps = payload.anchor_gaps || {};
-  limits.appendChild(el('p', 'note', gaps.population
-    ? `瓶頸節點走不到需求錨：${gaps.without_anchor}／${gaps.population} 個（診斷，不改表）`
-    : '瓶頸節點走不到需求錨：母體為 0（圖空或查詢失敗），這一格沒有東西可算'));
-  const pop = payload.population || {};
-  limits.appendChild(el('p', 'note', `母體：圖裡的邊 ${pop.input}｜收進表 ${pop.accepted}｜不是「公司→向下」的邊 ${pop.excluded}`));
-
-  // ⑥ 視角與新鮮度：as-of 排除的 assertion 計數不得消失（INV-3）。
-  if (pit.excluded) {
-    const sec5 = el('section', 'panel');
-    sec5.appendChild(el('h2', null, '這份表的視角'));
-    const kvs = el('div', 'rows');
-    kvs.appendChild(kv('視角', pit.mode === 'as_of' ? `as-of ${payload.as_of}` : '現況'));
-    kvs.appendChild(kv('as-of 視角排除的 assertion', JSON.stringify(pit.excluded)));
-    sec5.appendChild(kvs);
-    app.appendChild(sec5);
-  }
-  app.appendChild(stateFooter(payload));
-  window.scrollTo(0, 0);
 }
 
 /* ---------- 資產配置（beta state；照抄 Engine D beta monitor 的輸出，不重算、不排序） ----------
@@ -2568,10 +2316,11 @@ function renderStateError(err, title) {
   app.appendChild(box);
 }
 
-/* ---------- 走圖（graph_walk state）與在等什麼（watches state） ----------
-   兩頁都是「計數＋清單」——依 dataviz 的 form heuristic，>7 類且每類都有意義時用表格／清單，
-   不是更多顏色；九型的「命中／母體」用 KPI stat tile。**這裡沒有圖表、沒有排序、沒有加總**：
-   九格各自一格，型別順序是閱讀順序（plan 2026-09-25-001 §0 第 7 條）。 */
+/* ---------- 計數格（KPI tile 列） ----------
+   ⚠ 2026-10-28：「走圖」頁（renderGraphWalk、walkFraction、walkHitList、duplicateSide）拿掉——併進「圖」頁。
+   去處：研究缺口（薄層沒人讀、獨家且自報、供給側未填）→圖頁「還沒讀的地方」逐條；其餘六型是圖的整理工作→圖頁一行計數，
+   逐條（含重複節點兩端的逐字，L18）在 `python -m query.graph_walk`（`tests/test_duplicate_nodes.py` 守它印逐字）；
+   九型「命中／母體」一行→心跳段 3。 */
 
 function kpiRow(items) {
   const row = el('div', 'tiles');
@@ -2579,129 +2328,10 @@ function kpiRow(items) {
   return row;
 }
 
-/* 一對重複節點候選。**逐字是主角**：2026-09-18 之前圖裡只有 id 與 name，而兩者都是抽取時
-   LLM 取的——用它們判重複等於用 label 驗 label。所以每一端都要印得出它自己的逐字（L18）。 */
-function duplicateSide(side) {
-  const box = el('div', 'pair-side');
-  if (!side) return box;
-  const head = el('div');
-  head.appendChild(el('code', null, side.node));
-  if (side.name) head.appendChild(el('span', 'dim', '　' + side.name));
-  box.appendChild(head);
-  box.appendChild(el('span', 'rule',
-    `${side.abstraction_level || '—'}｜邊 ${side.degree}｜逐字 ${side.quote_count} 段`));
-  (side.quotes || []).forEach((q) => {
-    const quote = el('div', 'verbatim', q.quote);
-    if (q.locator) quote.appendChild(el('div', 'src', q.locator));
-    box.appendChild(quote);
-  });
-  const hidden = (side.quote_count || 0) - (side.quotes || []).length;
-  if (hidden > 0) box.appendChild(el('span', 'rule', `…另有 ${hidden} 段逐字（python -m query.structure ${side.node} --quotes）`));
-  if (!side.quote_count) box.appendChild(el('span', 'rule', '⚠ 這個節點一段逐字都沒有——它可能是抽取副產品，不是實體'));
-  return box;
-}
-
-function walkFraction(q) {
-  if (q.absence) return q.absence.kind;
-  return `${q.hit_n}／${q.scope_n}`;
-}
-
-function walkHitList(q) {
-  const list = el('ul', 'weak');
-  (q.hits || []).forEach((hit) => {
-    const li = el('li');
-    li.appendChild(mdInline(hit.text || ''));
-    if (q.key === 'duplicate_node') {
-      li.appendChild(el('span', 'rule', (hit.rules || []).join('＋') + '｜' + (hit.same_abstraction_level ? '同層' : '不同層')));
-      li.appendChild(duplicateSide(hit.left));
-      li.appendChild(duplicateSide(hit.right));
-    } else if (hit.suppliers && hit.suppliers.length) {
-      li.appendChild(el('span', 'rule', '供給側：' + hit.suppliers.join('、')));
-    } else if (hit.supplier) {
-      li.appendChild(el('span', 'rule', `供給側：${hit.supplier}｜證據：${hit.evidence_label || '—'}`));
-    } else if (hit.indirect && hit.indirect.length) {
-      li.appendChild(el('span', 'rule', '間接相連：' + hit.indirect.slice(0, 6).join('、')));
-    } else if (hit.supplies && hit.supplies.length) {
-      li.appendChild(el('span', 'rule', '往下供貨：' + hit.supplies.join('、')));
-    } else if (hit.first_seen) {
-      li.appendChild(el('span', 'rule', `首見 ${hit.first_seen}${hit.title ? '｜' + hit.title : ''}`));
-    }
-    if (hit.demand && hit.demand.length) li.appendChild(el('span', 'rule', '需求側：' + hit.demand.join('；')));
-    // Phase 6 Step 6.5：撐住需求側 sub 值的引文有沒有在談可替代性——artifact 給的那一句照抄，前端不重算（L16）
-    if (hit.demand_quote_note) li.appendChild(el('span', 'rule', hit.demand_quote_note));
-    list.appendChild(li);
-  });
-  return list;
-}
-
-async function renderGraphWalk() {
-  markNav('graph-walk');
-  let payload;
-  try {
-    payload = await getJSON(`${API}/graph-walk`);
-  } catch (err) {
-    renderStateError(err, '讀不到走圖');
-    return;
-  }
-  app.textContent = '';
-  footerWarning.textContent = payload.correlation_warning || '';
-
-  const head = el('div', 'detail-head');
-  head.appendChild(el('h1', null, payload.title));
-  const badges = el('div', 'badges');
-  if (payload.freshness && payload.freshness.state === 'stale') {
-    const b = el('span', 'badge badge-stale', 'stale'); b.title = payload.freshness.rule; badges.appendChild(b);
-  }
-  head.appendChild(badges);
-  app.appendChild(head);
-
-  const questions = payload.questions || [];
-  const sec0 = el('section', 'panel');
-  sec0.appendChild(el('h2', null, '九個問句，各自「命中／母體」——不加總、不排序'));
-  sec0.appendChild(kpiRow(questions.map((q) => ({
-    label: `${q.order}. ${q.short}`,
-    value: walkFraction(q),
-    sub: q.absence ? '這次沒讀到——不是 0' : (q.judged ? (q.always_on ? '⚠ 恆亮（≥50%）' : '母體 ≥10') : '母體 <10，只印不判'),
-  }))));
-  app.appendChild(sec0);
-
-  questions.forEach((q) => {
-    const sec = el('section', 'panel');
-    sec.appendChild(el('h2', null, `${q.order}. ${q.short}（${walkFraction(q)}）`));
-    sec.appendChild(el('div', 'panel-questions', `母體：${q.scope_rule}｜命中：${q.hit_rule}`));
-    sec.appendChild(el('p', 'note', '下一步：' + q.next_action));
-    if (q.absence) {
-      sec.appendChild(el('p', 'warn', '▲ ' + q.absence.reason));
-      app.appendChild(sec);
-      return;
-    }
-    if ((q.hits || []).length) sec.appendChild(walkHitList(q));
-    else sec.appendChild(el('p', 'note', '這一型今天沒有命中（母體照印在上面）。'));
-    const extra = q.extra || {};
-    if ((extra.unresolved_names || []).length) {
-      sec.appendChild(el('p', 'note',
-        `另有 ${extra.unresolved_names.length} 個名字 registry 解析不到（不算命中；ID 沒解析對 ≠ 圖中真無此公司）：`
-        + extra.unresolved_names.join('、')));
-    }
-    const ambiguous = Object.entries(extra.ambiguous_names || {});
-    if (ambiguous.length) {
-      sec.appendChild(el('p', 'note',
-        `另有 ${ambiguous.length} 個名字去掉交易所後綴後對到多家（不解析、不猜）：`
-        + ambiguous.map(([name, cands]) => `${name}→${cands.join('／')}`).join('、')));
-    }
-    // 2026-10-07（使用者：「不需要給我看的…拿掉」）：prod: 抽取副產品與 registry note 提過的那幾對不再印——
-    // 它們不在母體、不算命中，是給互動 session 查的（artifact 的 `extra` 照樣帶著）。
-    if ((extra.withdrawn || []).length) sec.appendChild(el('p', 'note', '有紀錄但已全部撤回（不在母體）：' + extra.withdrawn.join('、')));
-    app.appendChild(sec);
-  });
-
-  app.appendChild(stateFooter(payload));
-  window.scrollTo(0, 0);
-}
-
-/* ---------- 讀圖（structure_readings state）與個股頁的讀圖面板（Phase 2 Step 2.7） ----------
-   讀圖是研究判斷（A3）：這裡照抄 ledger 寫下的判讀、單位、引文與反證，加上 materialize 當下與圖比對的**狀態**。
-   不排序、不打分：列序是（節點, 單位）字典序；沒有讀圖的節點不列——那是走圖第 1 型的事。 */
+/* ---------- 讀圖（structure_readings state）：狀態字、個股頁的層說明連結、圖預測對錯表 ----------
+   讀圖是研究判斷（A3）：照抄 ledger 寫下的判讀、單位、引文與反證，加上 materialize 當下與圖比對的**狀態**。
+   ⚠ 2026-10-28：「讀圖」頁（renderStructureReadings、readingRow）拿掉——每一份讀圖的判讀、引文、反證與狀態搬到「圖」頁的層卡片
+   （「讀法、引文與反證」點開）；現行／該重讀計數→圖頁頂端一行；圖預測對錯表→追蹤表頁（「我們說過的話，後來對不對」）。 */
 
 const READING_STATUS_TEXT = {
   current: '現行', stale: '跟圖不一致（該重讀）', stale_low: '只有證據等級變了（不必重讀）', expired: '過期（該重讀）',
@@ -2732,29 +2362,236 @@ function layerNoteLinks(context) {
   return box;
 }
 
-function readingRow(row) {
-  const li = el('li');
-  const head = el('div');
-  head.appendChild(el('code', null, row.node));
-  head.appendChild(el('span', 'dim', `　${row.unit === 'socket' ? '插槽' : '層'}｜${row.kind || '—'}｜`
-    + (READING_STATUS_TEXT[row.status] || '這次沒比對到圖（不是現行）')));
-  li.appendChild(head);
-  li.appendChild(el('span', 'rule', `讀於 ${row.read_on || '—'}｜到期 ${row.expires || '—'}｜${row.reading_id || ''}`
-    + ((row.tickers || []).length ? '｜' + row.tickers.join('、') : '')));
-  if (row.reason) li.appendChild(el('span', 'rule', '狀態理由：' + row.reason));
-  (row.reread_reasons || []).forEach((r) => li.appendChild(el('span', 'rule', '重讀理由：' + r)));
-  if (row.reading) li.appendChild(el('p', 'note', row.reading));
-  (row.citations || []).forEach((c) => {
+/* ---------- 圖（2026-10-28 使用者照推薦：讀圖、走圖、層說明、結構表併成一頁；brainstorm 2026-10-28 定案 6：骨架＝層） ----------
+   回答「圖的哪裡有機會」：哪一層押得下去、哪一層還要讀、那裡坐著哪幾家小公司、錢在不在變多。
+   資料全由 /api/v1/graph 接好、排好（區照字彙表、區內照節點 id、層內公司照首頁的組序）；這裡只畫、只篩（搜尋只藏不排）。 */
+
+function companyChip(c) {
+  const chip = el(c.page ? 'a' : 'span', 'co' + (c.main ? ' co-main' : ' co-dim'));
+  if (c.page) chip.href = '#/' + encodeURIComponent(c.ticker);
+  chip.appendChild(el('span', 'co-name', c.name));
+  if (c.state) chip.appendChild(el('i', null, c.state));
+  chip.title = [c.ticker, c.name, c.state, c.page ? '' : '沒有個股頁'].filter(Boolean).join('｜');
+  return chip;
+}
+
+/** 一層的「讀法、引文與反證」（原讀圖頁每一列的內容）：點開才畫。 */
+function layerReading(layer) {
+  const box = el('div', 'layer-reading');
+  const r = layer.reading || {};
+  if (layer.kind_plain) box.appendChild(el('p', 'note', `${layer.kind_label}＝${layer.kind_plain}`));
+  if (r.text) box.appendChild(mdParagraph(r.text, 'layer-reading-text'));
+  (r.citations || []).forEach((c) => {
     const quote = el('div', 'verbatim', c.quote);
     quote.appendChild(el('div', 'src', `${c.angle}｜${(c.edge || []).join(' ')}｜${c.source_id}`
       + (c.independent ? '｜外部印證' : '')));
-    li.appendChild(quote);
+    box.appendChild(quote);
   });
-  (row.disproof || []).forEach((d) => {
-    li.appendChild(el('span', 'rule', `反證／確認條件：${d.condition}（出處 ${d.source || '—'}｜`
-      + `${d.watch_id ? 'watch ' + d.watch_id + '（' + (d.watch_status || '?') + '）' : '沒有登記 watch'}）`));
+  (r.disproof || []).forEach((d) => {
+    box.appendChild(el('span', 'rule', `反證／確認條件：${d.condition}（出處 ${d.source || '—'}｜`
+      + `${d.watch_id ? '有 watch 在盯（' + (d.watch_status || '?') + '）' : '沒有登記 watch'}）`));
   });
-  return li;
+  if ((layer.chain || []).length) box.appendChild(el('p', 'note', '從需求端走過來：' + layer.chain.join(' → ')));
+  if (layer.reason) box.appendChild(el('p', 'note', '狀態：' + layer.reason));
+  box.appendChild(el('p', 'note', `讀於 ${layer.read_on || '—'}｜到期 ${layer.expires || '—'}`));
+  return box;
+}
+
+function layerCard(layer, zoneKey) {
+  const card = el('div', 'layer-card');
+  card.dataset.node = layer.node;
+  const head = el('div', 'layer-head');
+  head.appendChild(el('span', 'layer-name', layer.label));
+  head.appendChild(el('span', 'layer-unit', layer.unit_label || ''));
+  const kind = el('span', 'layer-kind kind-' + layer.kind, layer.kind_label);
+  if (layer.kind_plain) kind.title = layer.kind_plain;
+  head.appendChild(kind);
+  if (layer.needs_reread) head.appendChild(el('span', 'layer-flag', READING_STATUS_TEXT[layer.status] || '該重讀'));
+  if (layer.layer_note) {
+    const note = el('a', 'layer-note-link', '層說明');
+    note.href = '#/layer/' + encodeURIComponent(layer.node);
+    note.title = layer.layer_note.title || '';
+    head.appendChild(note);
+  }
+  head.appendChild(el('span', 'layer-read', `讀到 ${String(layer.read_on || '—').slice(0, 10)}`));
+  card.appendChild(head);
+
+  const cos = el('div', 'layer-cos');
+  if ((layer.companies || []).length) layer.companies.forEach((c) => cos.appendChild(companyChip(c)));
+  else cos.appendChild(el('span', 'co-none', '圖上還沒有這一層的供應商'));
+  card.appendChild(cos);
+
+  if (layer.growth) {
+    const g = layer.growth;
+    card.appendChild(el('div', 'layer-money', `錢在變多嗎：代表公司營收年增 ${signedPct(g.yoy, 0)}`
+      + `（${g.period || '—'}；${(g.members || []).join('、')}）`));
+  }
+  // 押在還判不出的層上的缺 X：缺的多半就是這一份讀圖（F2：一層多半只押一檔，讀一層推一檔）
+  if (zoneKey === 'undecided' && (layer.waiting || []).length) {
+    card.appendChild(el('div', 'layer-wait', `押在這一層的缺 X：${layer.waiting.join('、')}——缺的多半就是這一份讀圖`));
+  }
+  if ((layer.also_linked || []).length) {
+    card.appendChild(el('div', 'layer-also', '這份讀圖另外關聯（不是這一層的供應商）：' + layer.also_linked.join('、')));
+  }
+  (layer.reread_reasons || []).forEach((r) => card.appendChild(el('div', 'layer-flag-line', '該重讀：' + r)));
+  const more = el('details', 'layer-more');
+  more.appendChild(el('summary', null, '讀法、引文與反證'));
+  more.addEventListener('toggle', () => {
+    if (more.open && more.childElementCount === 1) more.appendChild(layerReading(layer));
+  }, { once: false });
+  card.appendChild(more);
+  card._haystack = [layer.label, layer.node, ...(layer.companies || []).flatMap((c) => [c.name, c.ticker]),
+    ...(layer.also_linked || [])].filter(Boolean).join(' ').toLowerCase();
+  return card;
+}
+
+function graphHoles(holes) {
+  const sec = el('section', 'panel');
+  sec.appendChild(el('h2', null, '還沒讀的地方（研究下一步）'));
+  if (holes.absence) {
+    sec.appendChild(el('p', 'warn', `▲ ${holes.absence.reason}——不是 0`));
+    return sec;
+  }
+  (holes.research || []).forEach((q) => {
+    const block = el('div', 'hole');
+    if (q.absence) {
+      block.appendChild(el('p', 'warn', `▲ ${q.short}：${q.absence.reason}——不是 0`));
+      sec.appendChild(block);
+      return;
+    }
+    block.appendChild(el('div', 'hole-head', `${q.short}：${q.hit_n} 處`));
+    block.appendChild(el('div', 'note', `算一處的條件：${q.hit_rule}（看的是：${q.scope_rule}，共 ${q.scope_n} 個）`));
+    if ((q.hits || []).length) {
+      const list = el('ul', 'weak');
+      q.hits.forEach((h) => {
+        const li = el('li');
+        const link = el('a', null, h.label);
+        link.href = '#/graph/' + encodeURIComponent(h.node);
+        link.title = h.node;
+        li.appendChild(link);
+        if ((h.suppliers || []).length) li.appendChild(el('span', 'dim', `　供應商：${h.suppliers.join('、')}`));
+        list.appendChild(li);
+      });
+      block.appendChild(list);
+    }
+    sec.appendChild(block);
+  });
+  const upkeep = (holes.upkeep || []).filter((q) => !q.absence);
+  if (upkeep.length) {
+    sec.appendChild(el('p', 'note', '圖的整理工作（研究 session 處理，逐條在 `python -m query.graph_walk`）：'
+      + upkeep.map((q) => `${q.short} ${q.hit_n}`).join('、')));
+  }
+  (holes.upkeep || []).filter((q) => q.absence).forEach((q) => sec.appendChild(el('p', 'warn', `▲ ${q.short}：${q.absence.reason}`)));
+  return sec;
+}
+
+async function renderGraph(focus) {
+  markNav('graph');
+  let payload;
+  try {
+    payload = await getJSON(`${API}/graph`);
+  } catch (err) {
+    renderStateError(err, '讀不到圖');
+    return;
+  }
+  app.textContent = '';
+  footerWarning.textContent = payload.correlation_warning || '';
+  const c = payload.counts || {};
+  const kindLabels = payload.kind_labels || {};
+  const zones = payload.zones || [];
+
+  const head = el('div', 'detail-head');
+  head.appendChild(el('h1', null, payload.title || '圖'));
+  app.appendChild(head);
+  const tally = zones.map((z) => (z.kinds || []).map((k) => `${kindLabels[k] || k} ${(c.by_kind || {})[k] || 0}`).join('、'))
+    .filter(Boolean).join('｜');
+  app.appendChild(el('p', 'graph-tally', `${c.layers} 份讀圖：${tally}｜該重讀 ${c.needs_reread ?? '—'}`
+    + `｜錢在變多嗎量得到 ${c.growth_measured} 層｜層說明 ${c.layer_notes ?? '—'} 份`));
+
+  const controls = el('div', 'table-filter');
+  const search = el('input');
+  search.type = 'search';
+  search.placeholder = '搜尋層或公司（例：InP、Coherent、3081）';
+  search.setAttribute('aria-label', '搜尋圖');
+  const shown = el('div', 'dim table-filter-count');
+  controls.appendChild(search);
+  controls.appendChild(shown);
+  app.appendChild(controls);
+
+  const cards = [];
+  const sections = [];
+  zones.forEach((zone) => {
+    const sec = el('details', 'zone');
+    sec.open = Boolean(zone.expanded);
+    sec.appendChild(el('summary', 'zone-head', `${zone.label}（${(zone.layers || []).length}）`));
+    const empty = el('p', 'note', '這一區沒有符合的層。');
+    empty.hidden = true;
+    sec.appendChild(empty);
+    (zone.layers || []).forEach((layer) => {
+      const card = layerCard(layer, zone.key);
+      cards.push(card);
+      sec.appendChild(card);
+    });
+    if (!(zone.layers || []).length) sec.appendChild(el('p', 'note', '現在 0 層。'));
+    sections.push({ sec, empty, zone });
+    app.appendChild(sec);
+  });
+  const apply = () => {
+    const q = search.value.trim().toLowerCase();
+    let visible = 0;
+    cards.forEach((card) => {
+      const hit = !q || card._haystack.includes(q);
+      card.hidden = !hit;
+      if (hit) visible += 1;
+    });
+    sections.forEach(({ sec, empty, zone }) => {
+      const any = Array.from(sec.querySelectorAll('.layer-card')).some((card) => !card.hidden);
+      empty.hidden = !q || any || !(zone.layers || []).length;
+      if (q && any) sec.open = true;
+    });
+    shown.textContent = q ? `顯示 ${visible}／${cards.length} 層（藏起 ${cards.length - visible} 層，順序不變）` : `全部 ${cards.length} 層`;
+  };
+  search.addEventListener('input', apply);
+  apply();
+
+  app.appendChild(graphHoles(payload.holes || {}));
+
+  const notes = payload.notes || {};
+  const tail = el('section', 'panel');
+  tail.appendChild(el('h2', null, '解讀前要知道'));
+  const ol = el('ol', 'limits');
+  (payload.limitations || []).forEach((text) => {
+    const li = el('li');
+    li.appendChild(mdInline(text));
+    ol.appendChild(li);
+  });
+  if (ol.childElementCount) tail.appendChild(ol);
+  [notes.companies, notes.growth, notes.order].filter(Boolean).forEach((text) => tail.appendChild(mdParagraph(text)));
+  if ((payload.withdrawn || []).length) tail.appendChild(el('p', 'note', '有紀錄但已全部撤回的讀圖：' + payload.withdrawn.join('、')));
+  const absences = payload.absences || {};
+  [['structure_table', '坐在這一層的公司與需求鏈這次不印'], ['layer_notes', '層說明連結這次不印'],
+    ['graph_walk', '研究缺口這次不印']].forEach(([key, effect]) => {
+    if (absences[key]) tail.appendChild(el('p', 'warn', `▲ ${absences[key].reason}——${effect}（不是沒有）`));
+  });
+  if ((absences.unreadable_pages || []).length) {
+    tail.appendChild(el('p', 'warn', `▲ 讀不到的個股頁 ${absences.unreadable_pages.length} 檔（它們的短名與狀態這次不印）：`
+      + absences.unreadable_pages.join('、')));
+  }
+  app.appendChild(tail);
+  app.appendChild(stateFooter(payload));
+
+  const target = focus ? cards.find((card) => card.dataset.node === focus) : null;
+  if (target) {
+    const zone = target.closest('details.zone');
+    if (zone) zone.open = true;
+    const more = target.querySelector('details.layer-more');
+    if (more) more.open = true;
+    target.classList.add('layer-focus');
+    target.scrollIntoView({ block: 'start' });
+  } else {
+    if (focus) app.insertBefore(el('p', 'warn', `▲ 圖上沒有 ${focus} 的現行讀圖（可能還沒讀、或已撤回）。`), app.firstChild);
+    window.scrollTo(0, 0);
+  }
 }
 
 /* 圖預測對錯表（Phase 5 Step 5.4）：每一份讀圖斷言一個機械的終局。判定只來自 supersede 鏈與互動判定的反證觸及；
@@ -2813,51 +2650,6 @@ function renderPredictions(table) {
   if (table.source_dates !== 'available') sec.appendChild(el('p', 'warn', '▲ SourceDoc 日期這次讀不到：錯的種類是「日期讀不到」，不是未定日。'));
   sec.appendChild(el('p', 'note', table.stale_note || ''));
   return sec;
-}
-
-async function renderStructureReadings() {
-  markNav('structure-readings');
-  let payload;
-  try {
-    payload = await getJSON(`${API}/structure-readings`);
-  } catch (err) {
-    renderStateError(err, '讀不到讀圖');
-    return;
-  }
-  app.textContent = '';
-  footerWarning.textContent = payload.correlation_warning || '';
-  const head = el('div', 'detail-head');
-  head.appendChild(el('h1', null, payload.title));
-  app.appendChild(head);
-
-  const c = payload.counts || {};
-  const rows = (payload.rows || []).filter((r) => r.reading_id);
-  const sec0 = el('section', 'panel');
-  sec0.appendChild(el('h2', null, `現行讀圖 ${rows.length} 份（層 ${rows.filter((r) => r.unit !== 'socket').length}`
-    + `／插槽 ${rows.filter((r) => r.unit === 'socket').length}）`));
-  sec0.appendChild(kpiRow([
-    { label: '現行', value: String(c.current || 0), sub: '與圖一致、未到期' },
-    { label: '該重讀', value: String((payload.needs_reread || {}).n || 0), sub: '跟圖不一致、過期或被叫醒', cls: 'hero' },
-    { label: '只有證據等級變', value: String(c.stale_low || 0), sub: '記錄，不必重讀' },
-    { label: '過期', value: String(c.expired || 0), sub: '到期未重讀' },
-  ]));
-  app.appendChild(sec0);
-
-  const sec1 = el('section', 'panel');
-  sec1.appendChild(el('h2', null, '每一份讀圖（節點 × 單位；依節點字典序，不是名次）'));
-  const list = el('ul', 'weak');
-  rows.forEach((row) => list.appendChild(readingRow(row)));
-  sec1.appendChild(list);
-  const withdrawn = (payload.rows || []).filter((r) => !r.reading_id);
-  if (withdrawn.length) {
-    sec1.appendChild(el('p', 'note', '有紀錄但已全部撤回：' + withdrawn.map((r) => `${r.node}（${r.unit || '全部單位'}）`).join('、')));
-  }
-  app.appendChild(sec1);
-
-  app.appendChild(renderPredictions(payload.predictions));
-
-  app.appendChild(stateFooter(payload));
-  window.scrollTo(0, 0);
 }
 
 /* ⚠ 2026-10-28：「在等什麼」頁（renderWatches／watchList／watchRow）拿掉——併進首頁（使用者照推薦：11 頁收成 5 頁）。
@@ -3056,6 +2848,13 @@ async function renderPositions() {
 
   // 2026-10-07 使用者（「舊店…連你都不會看就也沒必要給我看了…不是收起來 是拿掉」）：舊店的 ①–⑤（舊 Decision Store 計數、
   // 入圖日 cohort 的樣本效度／聚合／逐檔、賭注收斂）不再印。artifact 照樣帶著，心跳與 outcome 腳本照讀；power-law 三量跟著上面兩條線走。
+  // 圖自己的預測也要量（AGENTS 量測）：圖預測對錯表 2026-10-28 隨讀圖頁併進圖頁時搬來這裡——它答的正是這一頁的問題。
+  try {
+    const readings = await getJSON(`${API}/structure-readings`);
+    app.appendChild(renderPredictions(readings.predictions));
+  } catch (err) {
+    app.appendChild(el('p', 'warn', '▲ 圖預測對錯表這次讀不到（structure_readings artifact）——不是 0。'));
+  }
   app.appendChild(stateFooter(payload));
   window.scrollTo(0, 0);
 }
@@ -3392,68 +3191,15 @@ async function loadLayerNotes() {
   }
 }
 
-async function renderLayerNotes() {
-  markNav('layer-notes');
-  const payload = await loadLayerNotes();
-  if (!payload) return;
-  app.textContent = '';
-  footerWarning.textContent = payload.correlation_warning || '';
-  const head = el('div', 'detail-head');
-  head.appendChild(el('h1', null, payload.title));
-  app.appendChild(head);
-
-  const c = payload.counts || {};
-  const states = c.claim_states || {};
-  const graphAbsence = (payload.graph || {}).absence;
-  const sec0 = el('section', 'panel');
-  sec0.appendChild(kpiRow([
-    { label: '現行', value: String(c.notes || 0), sub: '一層一份、同層每頁共用' },
-    { label: '主張', value: String(c.claims || 0), sub: `沒有 watch 在盯 ${states.unwatched || 0}｜被判觸及 ${states.touched || 0}` },
-    { label: '連過來的個股頁', value: graphAbsence ? '未算' : String(c.pages_linked || 0), sub: graphAbsence ? graphAbsence.reason : '由圖推' },
-    { label: '該重讀', value: String(c.needs_reread || 0), sub: '整份到期、主張觸及或到期、沒人盯', cls: 'hero' },
-  ]));
-  sec0.appendChild(el('p', 'note', `出處 ${c.citations_with_ref || 0} 個裡，文件有自宣告的 ${c.citations_declared || 0} 個——`
-    + '其餘印「文件沒宣告」或為什麼問不到；推一步、沒有出處的不算在內。'));
-  app.appendChild(sec0);
-
-  const sec1 = el('section', 'panel');
-  sec1.appendChild(el('h2', null, '每一份層說明（依節點 id 的字母序，不是名次）'));
-  const list = el('ul', 'weak');
-  (payload.rows || []).forEach((row) => {
-    const li = el('li');
-    const link = el('a', null, row.title);
-    link.href = '#/layer/' + encodeURIComponent(row.node);
-    const top = el('div');
-    top.appendChild(link);
-    li.appendChild(top);
-    const cited = row.cited_by || {};
-    li.appendChild(el('span', 'rule', `${row.node}｜${((payload.labels || {}).units || {})[row.unit] || row.unit}`
-      + `｜重讀日 ${row.expires || '—'}｜主張 ${(row.claims || []).length} 條｜`
-      + (cited.absence ? '連過來的頁：未連（見下一行）' : `連過來的頁 ${(cited.pages || []).length}：`
-        + ((cited.pages || []).map((p) => p.ticker).join('、') || '—'))));
-    if (cited.absence) li.appendChild(el('span', 'rule', `沒有頁連過來：${cited.absence.reason}`));
-    (row.reread || []).forEach((r) => li.appendChild(el('span', 'rule', '該重讀：' + r)));
-    list.appendChild(li);
-  });
-  if (!(payload.rows || []).length) list.appendChild(el('li', null, '一份層說明都還沒寫（`python -m alpha layer-note <node> --add`）'));
-  sec1.appendChild(list);
-  if ((payload.withdrawn || []).length) sec1.appendChild(el('p', 'note', '有紀錄但現行已撤回：' + payload.withdrawn.join('、')));
-  (payload.parse_errors || []).forEach((e) => sec1.appendChild(el('p', 'warn', '▲ ledger 讀不懂：' + e)));
-  (payload.declaration_problems || []).forEach((e) => sec1.appendChild(el('p', 'warn', '▲ 文件自宣告讀不到：' + e)));
-  app.appendChild(sec1);
-
-  app.appendChild(stateFooter(payload));
-  window.scrollTo(0, 0);
-}
-
 async function renderLayerNote(node) {
-  markNav('layer-notes');
+  // ⚠ 2026-10-28：層說明清單頁併進「圖」頁（有層說明的層卡片上有「層說明」連結）；這一頁只剩單一層的閱讀頁。
+  markNav('graph', '這一層在供應鏈裡做什麼、客戶為什麼選這家、什麼會讓它被換掉？');
   const payload = await loadLayerNotes();
   if (!payload) return;
   app.textContent = '';
   footerWarning.textContent = payload.correlation_warning || '';
-  const back = el('a', 'back', '← 全部層說明');
-  back.href = '#/layer-notes';
+  const back = el('a', 'back', '← 圖（這一層）');
+  back.href = '#/graph/' + encodeURIComponent(node);
   app.appendChild(back);
   const row = (payload.rows || []).find((r) => r.node === node);
   if (!row) {
@@ -3577,13 +3323,16 @@ async function route() {
       const meta = await getJSON(`${API}/meta`);
       VOCAB = meta.vocabularies || {};
     }
-    // `structure-table` 等含連字號的路徑是保留字：ticker 一律大寫（store 的 slug 規則），所以不會撞到真實代碼。
-    // ⚠ 2026-09-23（Step 0b.3）：`#/ranking`（瓶頸排序）→ `#/structure-table`；`#/basket`／`#/multi-year` 路由同批移除。
-    if (target === 'structure-table') await renderStructureTable();
+    // 小寫或含連字號的路徑是保留字：ticker 一律大寫（store 的 slug 規則），所以不會撞到真實代碼。
+    // ⚠ 2026-10-28：讀圖、走圖、層說明、結構表併成「圖」（`#/graph`；`#/graph/<node>` 打開那一層）；四個舊路徑落到圖頁並說一句。
+    if (target === 'graph') await renderGraph();
+    else if (target.startsWith('graph/')) await renderGraph(target.slice('graph/'.length));
+    else if (['structure-table', 'graph-walk', 'structure-readings', 'layer-notes'].includes(target)) {
+      await renderGraph();
+      app.insertBefore(el('p', 'note', '「讀圖」「走圖」「層說明」「結構表」已併進這一頁：每一層讀成什麼、坐著誰、錢在不在變多都在層卡片上，'
+        + '還沒讀的地方在下面。'), app.firstChild);
+    }
     else if (target === 'beta') await renderBeta();
-    // ⚠ 2026-09-26（Step 2.6）：`#/coverage`（研究缺口）→ `#/graph-walk`（走圖九型）。
-    else if (target === 'graph-walk') await renderGraphWalk();
-    else if (target === 'structure-readings') await renderStructureReadings();
     else if (target === 'positions') await renderPositions();
     // ⚠ 2026-10-28：`#/watches`（在等什麼）與 `#/candidates`（候選板）併進首頁；舊連結落到首頁並說一句，不落到「讀不到判讀」。
     else if (target === 'watches' || target === 'candidates') {
@@ -3595,7 +3344,6 @@ async function route() {
     else if (target === 'account-scorecard') await renderScorecard();
     // 2026-10-07（個股頁 plan S4b）：層說明。`layer/` 帶斜線與小寫，不會撞到 ticker（ticker 一律大寫、不含斜線）。
     else if (target === 'daily') await renderDaily();
-    else if (target === 'layer-notes') await renderLayerNotes();
     else if (target.startsWith('layer/')) await renderLayerNote(target.slice('layer/'.length));
     // 2026-10-28：首頁「依層」。小寫帶連字號，不會撞到 ticker（ticker 一律大寫）。
     else if (target === 'by-layer') await renderList('layer');

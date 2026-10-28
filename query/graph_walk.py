@@ -627,7 +627,7 @@ def render_markdown(result: Mapping[str, Any]) -> str:
            "> **零 LLM、零分數、不排序。** 九型各自「命中／母體」；型別順序是閱讀順序，不是價值判斷。", "",
            summary_line(result), ""]
     if "layer_stats" in result:
-        # 層計數器（Phase 4 Step 4.4c）：同一行與心跳段 3、結構表頁首共用（`query.layer_stats.summary_line`）。
+        # 層計數器（Phase 4 Step 4.4c）：同一行與心跳段 3 共用（`query.layer_stats.summary_line`）。
         from query.layer_stats import summary_line as layer_summary
 
         layer = result.get("layer_stats")

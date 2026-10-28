@@ -218,8 +218,11 @@ def test_every_alpha_pane_still_has_a_home_after_daily_stopped_embedding_them() 
 
     # ② Daily 必須指得出前三個 pane 的新家（APP），而不是安靜不提
     # 2026-09-26（Step 2.6）：pane 3（哪裡還是空白）的新家由 `#/coverage` 改為 `#/graph-walk`。
-    for pointer in ("#/structure-table", "#/graph-walk", "$alpha-status"):
+    # 2026-10-28：結構表與走圖兩頁併進「圖」——pane 1 的結構與 pane 3 的研究缺口同住 `#/graph`（新家換了，不是沒有）。
+    for pointer in ("#/graph`", "$alpha-status"):
         assert pointer in text, f"Daily 沒有指出 {pointer}"
+    for gone in ("#/structure-table", "#/graph-walk"):
+        assert gone not in text, f"Daily 還指著已併掉的 {gone}"
 
     # ③ Pane 4 於 2026-09-08 也搬進 APP（`positions` kind）→ Daily 只印變動。
     #    **規則本身不變**：還沒有 APP 畫面的段落一律留在 Daily；判準改成機械的——

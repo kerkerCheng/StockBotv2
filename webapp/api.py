@@ -112,6 +112,8 @@ async def meta(request: Request) -> Response:
             f"GET /api/{API_VERSION}/account-scorecard",
             f"GET /api/{API_VERSION}/layer-notes",
             f"GET /api/{API_VERSION}/daily",
+            # 2026-10-28：「圖」頁——讀圖、結構表、層說明、走圖、個股頁在請求時接起來（只接、不重算）
+            f"GET /api/{API_VERSION}/graph",
         ],
         "not_offered": [
             "沒有任何寫入端點：不下單、不記錄選擇、不改 thesis、不入圖、不核准 pq2。",
@@ -438,6 +440,217 @@ async def layer_notes(request: Request) -> Response:
     return await _serve_state(request, "layer_notes")
 
 
+# ---------------------------------------------------------------------------
+# 圖（2026-10-28 使用者照推薦：讀圖、走圖、層說明、結構表併成一頁；brainstorm 2026-10-28 定案 6：骨架＝層）
+# ---------------------------------------------------------------------------
+
+#: 走圖九型裡「還沒讀的機會」（研究缺口）——圖頁逐條印；其餘六型是圖的整理工作（重讀、lead 不在圖、走不到錨、
+#: 沒人供應、建模待補、重複節點），圖頁只印計數，逐條（含重複節點兩端的逐字，L18）在 `python -m query.graph_walk`。
+GRAPH_RESEARCH_HOLES: tuple[str, ...] = ("thin_layer_unread", "sole_supplier_self_reported", "supply_unfilled")
+
+
+def _optional_state(request: Request, kind: str) -> tuple[Mapping[str, Any] | None, dict[str, str] | None]:
+    """讀一份 state artifact；讀不到回 `(None, 缺席)`——圖頁那一格說讀不到，別格照出（不為一份讀不到整頁 503）。"""
+    try:
+        payload, freshness = _state(request).read(kind)
+    except ArtifactUnavailable as exc:
+        return None, {"kind": "upstream_unavailable", "reason": f"{kind} 讀不到：{exc.reason}"}
+    return {**payload, "freshness": freshness.to_dict()}, None
+
+
+def _graph_pages(store: ArtifactStore) -> tuple[dict[str, dict[str, Any]], dict[str, dict[str, Any]], dict[str, str],
+                                               dict[str, str], list[str]]:
+    """個股頁 artifact → (每檔的短名與候選狀態, 每層的「錢在變多嗎」, company_id → 名字, 節點 → 圖上的名字, 讀不到的檔)。
+    「錢在變多嗎」照抄個股頁「路徑上各層」那一格（同一輪 materialize 算的層代表公司營收年增；第一個出現的為準——
+    同一輪各頁共用同一份層序列，`alpha.providers.path_layers`）；只挑值、不重算。"""
+    pages: dict[str, dict[str, Any]] = {}
+    growth: dict[str, dict[str, Any]] = {}
+    companies: dict[str, str] = {}
+    node_names: dict[str, str] = {}
+    unreadable: list[str] = []
+    for ticker, payload, _freshness, _reason in store.read_all():
+        if payload is None:
+            unreadable.append(ticker)
+            continue
+        overview = payload.get("overview") or {}
+        card = overview.get("card") or {}
+        candidate = overview.get("candidate") or {}
+        name = str(card.get("short_name") or payload.get("company_label") or ticker)
+        pages[ticker] = {"ticker": ticker, "name": name, "group": candidate.get("list_group"),
+                         "state": candidate.get("label"), "rides": [str(r.get("node")) for r in card.get("rides") or ()]}
+        if payload.get("company_id"):
+            companies[str(payload["company_id"])] = name
+        for node, text in (payload.get("node_names") or {}).items():
+            if isinstance(text, str) and text:
+                node_names.setdefault(str(node), text)
+        for node, hop in (((payload.get("path_layers") or {}).get("hops")) or {}).items():
+            latest = hop.get("latest") or {}
+            if hop.get("kind") == "layer" and latest.get("yoy") is not None and node not in growth:
+                growth[str(node)] = {"yoy": latest.get("yoy"), "period": latest.get("period"),
+                                     "basis_label": hop.get("basis_label"), "members": list(latest.get("members") or ())}
+    return pages, growth, companies, node_names, unreadable
+
+
+def _graph_suppliers(table: Mapping[str, Any] | None) -> tuple[dict[str, list[dict[str, Any]]],
+                                                               dict[str, list[tuple[str, str]]], dict[str, str]]:
+    """結構表 → (每個節點的供應商：`supplies_to` 那幾列、結構表的列序, 第一條從需求錨走到它的鏈, 節點 → 圖上的名字)。
+    `depends_on`／`constrained_by` 是買方那一側，不算「坐在這一層」（同一張表兩種語意，分開，L12）。"""
+    suppliers: dict[str, list[dict[str, Any]]] = {}
+    chains: dict[str, list[tuple[str, str]]] = {}
+    names: dict[str, str] = {}
+    for row in (table or {}).get("rows") or ():
+        node = str(row.get("bottleneck"))
+        if row.get("bottleneck_name"):
+            names.setdefault(node, str(row["bottleneck_name"]))
+        chain = list(row.get("chain") or ())
+        if node not in chains and row.get("anchor_basis") == "row" and chain:
+            chain_names = list(row.get("chain_names") or ())
+            chains[node] = [(str(cid), str(chain_names[i]) if i < len(chain_names) and chain_names[i] else str(cid))
+                            for i, cid in enumerate(chain)]
+        if row.get("relation") != "supplies_to":
+            continue
+        seen = suppliers.setdefault(node, [])
+        if all(entry["company_id"] != row.get("company_id") for entry in seen):
+            seen.append({"ticker": row.get("ticker"), "company_id": row.get("company_id"),
+                         "label": row.get("company_label") or row.get("company_id")})
+    return suppliers, chains, names
+
+
+async def graph(request: Request) -> Response:
+    """「圖」頁：圖的哪裡有機會——哪一層押得下去、哪一層還要讀、那裡坐著哪幾家小公司、錢在不在變多。
+
+    只**接**已 materialize 的 artifact（讀圖、結構表、層說明、走圖、個股頁），不重算、不重建、不排名：區照 `.meta.json`
+    的 `reading_zones`（押得下去＝候選「可開」騎得上的那兩種判讀），區內照讀圖 artifact 的列序（節點 id 字母序），
+    層內公司照首頁的組序再 ticker（閱讀順序，不是名次），沒有個股頁的照結構表的列序排在後面。
+    讀圖讀不到＝整頁 503（骨架就是它）；其餘任一份讀不到，那一格寫讀不到、別格照出（INV-3）。"""
+    readings, missing = _optional_state(request, "structure_readings")
+    if readings is None:
+        remedy, note = _STATE_NOTES["structure_readings"]
+        return _json({"error": {"kind": "artifact_unavailable", "state_kind": "structure_readings",
+                                "reason": (missing or {}).get("reason"), "remedy": remedy, "note": note}}, status=503)
+    table, table_absence = _optional_state(request, "structure_table")
+    notes, notes_absence = _optional_state(request, "layer_notes")
+    walk, walk_absence = _optional_state(request, "graph_walk")
+    vocab = _read_vocabularies(_store(request)).get("vocabularies") or {}
+    order = {str(g["key"]): i for i, g in enumerate(vocab.get("list_groups") or ())}
+    kinds = vocab.get("reading_kinds") or {}
+    units = vocab.get("reading_units") or {}
+    labels_zh = vocab.get("node_labels_zh") or {}
+
+    pages, growth, companies, page_node_names, unreadable = _graph_pages(_store(request))
+    suppliers, chains, table_names = _graph_suppliers(table)
+    note_rows = {str(r.get("node")): r for r in (notes or {}).get("rows") or ()}
+    for row in (table or {}).get("rows") or ():
+        if row.get("company_id") and row.get("company_label"):
+            companies.setdefault(str(row["company_id"]), str(row["company_label"]))
+
+    def label(node: str) -> str:
+        return str(labels_zh.get(node) or (note_rows.get(node) or {}).get("title") or table_names.get(node)
+                   or page_node_names.get(node) or node)
+
+    def company_chips(node: str) -> list[dict[str, Any]]:
+        with_page, without_page = [], []
+        for entry in suppliers.get(node, ()):
+            page = pages.get(str(entry.get("ticker") or ""))
+            if page:
+                with_page.append({"ticker": page["ticker"], "name": page["name"], "state": page["state"],
+                                  "group": page["group"], "main": page["group"] in MAIN_GROUPS, "page": True})
+            else:
+                without_page.append({"ticker": entry.get("ticker"), "name": str(entry.get("label")), "state": None,
+                                     "group": None, "main": False, "page": False})
+        with_page.sort(key=lambda c: (order.get(str(c["group"]), len(order)), str(c["ticker"])))
+        return with_page + without_page
+
+    layers: list[dict[str, Any]] = []
+    for row in readings.get("rows") or ():
+        if not row.get("reading_id"):
+            continue
+        node, kind = str(row.get("node")), str(row.get("kind"))
+        chips = company_chips(node)
+        shown = {c["ticker"] for c in chips if c["ticker"]}
+        layers.append({
+            "node": node, "label": label(node), "unit": row.get("unit"),
+            "unit_label": units.get(str(row.get("unit"))) or row.get("unit"),
+            "kind": kind, "kind_label": (kinds.get(kind) or {}).get("short") or kind,
+            "kind_plain": (kinds.get(kind) or {}).get("plain"),
+            "status": row.get("status"), "reason": row.get("reason"),
+            "needs_reread": bool(row.get("needs_reread")) or row.get("status") in ("stale", "expired"),
+            "reread_reasons": list(row.get("reread_reasons") or ()),
+            "read_on": row.get("read_on"), "expires": row.get("expires"),
+            "companies": chips,
+            # 這份讀圖另外關聯的標的（研究寫的「關聯標的」，不是圖上的供應商——兩種語意分開印，L12）
+            "also_linked": [t for t in (row.get("tickers") or ()) if t not in shown],
+            "waiting": [pages[t]["name"] for t in sorted(pages)
+                        if pages[t]["group"] == "missing" and node in pages[t]["rides"]],
+            "growth": ({**growth[node], "members": [companies.get(m, m) for m in growth[node]["members"]]}
+                       if node in growth else None),
+            "layer_note": {"title": note_rows[node].get("title")} if node in note_rows else None,
+            "chain": [label(cid) if label(cid) != cid else name for cid, name in chains.get(node, ())] or None,
+            "reading": {"text": row.get("reading"), "citations": list(row.get("citations") or ()),
+                        "disproof": list(row.get("disproof") or ())},
+        })
+
+    zones_vocab = vocab.get("reading_zones")
+    if isinstance(zones_vocab, list) and zones_vocab:
+        zones = [{"key": z.get("key"), "label": z.get("label"), "expanded": bool(z.get("expanded")),
+                  "kinds": list(z.get("kinds") or ()),
+                  "layers": [layer for layer in layers if layer["kind"] in (z.get("kinds") or ())]} for z in zones_vocab]
+        placed = {layer["node"] + "|" + str(layer["unit"]) for z in zones for layer in z["layers"]}
+        stray = [layer for layer in layers if layer["node"] + "|" + str(layer["unit"]) not in placed]
+        if stray:      # 字彙沒涵蓋的判讀種類：照列、說原因，不從頁面消失（INV-3）
+            zones.append({"key": "unzoned", "label": "判讀種類不在分區字彙裡（重跑 materialize）", "expanded": True,
+                          "kinds": sorted({layer["kind"] for layer in stray}), "layers": stray})
+    else:
+        zones = [{"key": "all", "label": "全部的層（字彙表讀不到，這次不分區——重跑 materialize）", "expanded": True,
+                  "kinds": sorted({layer["kind"] for layer in layers}), "layers": layers}]
+
+    by_kind: dict[str, int] = {}
+    for layer in layers:
+        by_kind[layer["kind"]] = by_kind.get(layer["kind"], 0) + 1
+    holes: dict[str, Any] = {"absence": walk_absence, "research": [], "upkeep": []}
+    for q in (walk or {}).get("questions") or ():
+        entry = {"key": q.get("key"), "short": q.get("short"), "hit_n": q.get("hit_n"), "scope_n": q.get("scope_n"),
+                 "scope_rule": q.get("scope_rule"), "hit_rule": q.get("hit_rule"), "absence": q.get("absence")}
+        if q.get("key") in GRAPH_RESEARCH_HOLES:
+            entry["hits"] = [{"node": str(h.get("subject") or ""), "label": label(str(h.get("subject") or "")),
+                              "suppliers": [companies.get(s, s) for s in (h.get("suppliers") or ([h["supplier"]]
+                                            if h.get("supplier") else []))],
+                              "text": h.get("text")} for h in q.get("hits") or ()]
+            holes["research"].append(entry)
+        else:
+            holes["upkeep"].append(entry)
+
+    notes_counts = (notes or {}).get("counts") or {}
+    return _json({
+        "api_version": API_VERSION,
+        "title": "圖",
+        "zones": zones,
+        "counts": {"layers": len(layers), "by_kind": by_kind, "kind_order": list(kinds),
+                   "needs_reread": ((readings.get("needs_reread") or {}).get("n")),
+                   "growth_measured": sum(1 for layer in layers if layer["growth"]),
+                   "layer_notes": notes_counts.get("notes"), "layer_notes_reread": notes_counts.get("needs_reread")},
+        "kind_labels": {k: (v or {}).get("short") for k, v in kinds.items()},
+        "holes": holes,
+        # 已全部撤回的列（整個節點，或節點的某一種單位——後者那一層可能另有現行卡片，所以帶單位）
+        "withdrawn": [label(str(r.get("node"))) + (f"（{units.get(str(r['unit'])) or r['unit']}）" if r.get("unit") else "")
+                      for r in readings.get("rows") or () if not r.get("reading_id")],
+        "limitations": list((table or {}).get("limitations") or ()),
+        "absences": {"structure_table": table_absence, "layer_notes": notes_absence, "graph_walk": walk_absence,
+                     "unreadable_pages": unreadable},
+        "notes": {
+            "order": "區內照節點 id 的字母序（索引不是名次）；層內公司照首頁的組序、再照代號；沒有個股頁的排在後面。",
+            "companies": "坐在這一層＝圖上對這一層有供貨邊的公司（結構表的 supplies_to）；灰的＝不是主清單（不要、無法量、"
+                         "非邊緣、還沒寫敘事）或沒有個股頁。",
+            "growth": "錢在變多嗎：今天只有落後指標（層代表公司同一曆季營收加總的年增，照抄個股頁「路徑上各層」）；"
+                      "還沒宣告代表公司的層量不到、不印。領先的（買方文件、規格、長約）在讀圖正文裡。",
+        },
+        "freshness": readings.get("freshness"),
+        "sources": {"structure_table": (table or {}).get("freshness"), "layer_notes": (notes or {}).get("freshness"),
+                    "graph_walk": (walk or {}).get("freshness")},
+        "correlation_warning": _CORRELATION_WARNING,
+    })
+
+
 async def index(request: Request) -> Response:
     return _static_file("index.html")
 
@@ -529,6 +742,7 @@ def create_app(directory: Path | None = None, state_directory: Path | None = Non
         Route(f"/api/{API_VERSION}/account-scorecard", account_scorecard, methods=["GET"]),
         Route(f"/api/{API_VERSION}/layer-notes", layer_notes, methods=["GET"]),
         Route(f"/api/{API_VERSION}/daily", daily, methods=["GET"]),
+        Route(f"/api/{API_VERSION}/graph", graph, methods=["GET"]),
         Route(f"/api/{API_VERSION}/stocks", stocks, methods=["GET"]),
         Route(f"/api/{API_VERSION}/stocks/{{ticker}}", stock_detail, methods=["GET"]),
     ]

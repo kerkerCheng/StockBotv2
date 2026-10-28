@@ -68,6 +68,9 @@ READING_KINDS: Mapping[str, str] = {
     "neither": "都不是：這個位置本來就不卡（需求側可替代）",
     "undecided": "查了但判不出來——缺哪一格要寫在 reading 裡",
 }
+#: 同一組判讀的短名（2026-10-28 APP「圖」頁的層卡片）：長句是 `READING_KINDS`，這裡只是第二種說法、只有這一份。
+#: 新增判讀種類時兩張表一起補（`tests/test_webapp_graph_page.py` 守鍵一致）。
+READING_KIND_SHORT: Mapping[str, str] = {"moat": "換不掉", "volume": "量", "neither": "都不是", "undecided": "判不出"}
 
 #: 五個角度的 key，與 `query/structure.py::ANGLES` 同一組封閉字彙。
 #: ⚠ 兩邊不一致時寫入端拒收——分類有 SSOT 就不該在第二個地方重造一份（L16）。
@@ -437,7 +440,7 @@ def select_readings(
 
 __all__ = [
     "ANGLE_KEYS", "Citation", "DISPROOF_SOURCE_SELF", "DisproofEntry", "KINDS_REQUIRING_CITATIONS",
-    "KINDS_REQUIRING_DISPROOF", "MIN_QUOTE_CHARS", "READING_KINDS", "READING_UNITS", "RECORD_VERSION",
+    "KINDS_REQUIRING_DISPROOF", "MIN_QUOTE_CHARS", "READING_KINDS", "READING_KIND_SHORT", "READING_UNITS", "RECORD_VERSION",
     "RECORD_VERSION_V1", "RECORD_VERSION_V2", "StructureReading",
     "new_reading_id", "parse_structure_reading_record", "select_reading", "select_readings",
     "structure_reading_record",

@@ -58,6 +58,9 @@ STATE_ROUTES: dict[str, str] = {
     "/api/v1/layer-notes": "layer_notes",
     "/api/v1/daily": "daily",
 }
+#: 在請求時**接**好幾份已 materialize 的 artifact 的路由（不是一份 state kind，所以不在上面那張表）。
+#: 2026-10-28 「圖」頁：讀圖＋結構表＋層說明＋走圖＋個股頁——四種證明照樣每一種都要走到它（L17：新增的路由不得漏證明）。
+COMPOSED_ROUTES: tuple[str, ...] = ("/api/v1/graph",)
 
 #: serve 端的三個模組。`materialize.py` 與 `__main__.py` **不在此列**——它們本來就會跑模型。
 SERVE_MODULES = ("api.py", "store.py", "contracts.py")
@@ -181,7 +184,7 @@ def test_a_full_request_round_imports_no_model_module(served) -> None:
     before = set(sys.modules)
     for path in ("/api/v1/health", "/api/v1/meta", "/api/v1/stocks",
                  "/api/v1/stocks/READY", "/api/v1/stocks/ABSTAIN", "/api/v1/stocks/PENCE",
-                 "/api/v1/stocks/NOPE", *STATE_ROUTES, "/", "/static/app.js"):
+                 "/api/v1/stocks/NOPE", *STATE_ROUTES, *COMPOSED_ROUTES, "/", "/static/app.js"):
         client.get(path)
     added = set(sys.modules) - before
     leaked = sorted(m for m in added
@@ -228,7 +231,7 @@ def test_tree_digest_actually_notices_a_change(tmp_path) -> None:
 def test_requests_change_not_a_single_byte_on_disk(served) -> None:
     client, directory = served
     before = _tree_digest(directory)
-    for path in ("/api/v1/stocks", "/api/v1/stocks/READY", "/api/v1/stocks/ABSTAIN", *STATE_ROUTES):
+    for path in ("/api/v1/stocks", "/api/v1/stocks/READY", "/api/v1/stocks/ABSTAIN", *STATE_ROUTES, *COMPOSED_ROUTES):
         assert client.get(path).status_code == 200, path
     assert _tree_digest(directory) == before
 
@@ -301,6 +304,8 @@ def test_requests_still_work_with_networking_completely_disabled(app_dir, monkey
         assert client.get("/api/v1/stocks").json()["count"] == 3
         for path, kind in STATE_ROUTES.items():
             assert client.get(path).json()["kind"] == kind, path
+        for path in COMPOSED_ROUTES:
+            assert "zones" in client.get(path).json(), path
         assert client.get("/api/v1/stocks/NEVERBUILT").status_code == 503
 
 
@@ -309,7 +314,7 @@ def test_requests_still_work_with_networking_completely_disabled(app_dir, monkey
 # ---------------------------------------------------------------------------
 
 @pytest.mark.parametrize("method", ["post", "put", "patch", "delete"])
-@pytest.mark.parametrize("path", ["/api/v1/stocks", "/api/v1/stocks/READY", *STATE_ROUTES, "/"])
+@pytest.mark.parametrize("path", ["/api/v1/stocks", "/api/v1/stocks/READY", *STATE_ROUTES, *COMPOSED_ROUTES, "/"])
 def test_no_mutation_verb_is_routed_anywhere(served, method: str, path: str) -> None:
     client, _ = served
     assert getattr(client, method)(path).status_code == 405
@@ -323,7 +328,8 @@ def test_every_api_route_is_in_meta_and_walked_by_the_four_proofs(served) -> Non
     listed = {entry.split(" ", 1)[1] for entry in client.get("/api/v1/meta").json()["endpoints"]}
     assert routed == listed, {"沒列進 meta": sorted(routed - listed), "meta 多列": sorted(listed - routed)}
     fixed = {"/api/v1/health", "/api/v1/meta", "/api/v1/stocks", "/api/v1/stocks/{ticker}"}
-    assert routed - fixed == set(STATE_ROUTES), sorted((routed - fixed) ^ set(STATE_ROUTES))
+    walked = set(STATE_ROUTES) | set(COMPOSED_ROUTES)
+    assert routed - fixed == walked, sorted((routed - fixed) ^ walked)
 
 
 def test_api_response_is_semantically_equal_to_the_artifact(served) -> None:

@@ -450,7 +450,7 @@ def reading_status_rows(edges: Sequence[Any], *, today: Any, as_of: Any = None,
             status = reading_status(reading, view.as_dict(), today=today, evidence_rank=rank, aliases=aliases,
                                     evidence_splits=evidence_splits())
             by_graph = needs_reread(status)
-            # 讀圖頁要印得出「判讀憑哪一段原文」與「每條反證登記成哪一筆 watch」（Step 2.7；L18：標籤指得回原始證據）。
+            # 「圖」頁的層卡片（2026-10-28 前是讀圖頁）要印得出「判讀憑哪一段原文」與「每條反證登記成哪一筆 watch」（Step 2.7；L18：標籤指得回原始證據）。
             # watch 以 `reading:<id>#<序>` 指回（`register_reading_watches` 的鍵）；沒登記到就是 None，照實印。
             by_ref = {str(w.get("source_ref")): w for w in watches if str(w.get("source_ref") or "").startswith("reading:")}
             disproof = []

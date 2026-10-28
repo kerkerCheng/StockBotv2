@@ -639,6 +639,18 @@ cache-miss 自動重建）；④**socket 封殺**（request 期間 `connect`／`
 （`card.rewrite`）；停滯與追源需處置搬進心跳 watch 那一行（`engine_b.leads.trace_needs_attention` 是 watches artifact 與心跳共用的判準，
 L16）。兩份 state artifact 與 `/api/v1/candidates`、`/api/v1/watches` 照留——拿掉的是畫面不是資料。
 
+**「圖」頁（同一輪第三步：讀圖、走圖、層說明清單、結構表四頁併成 `#/graph`，回答「圖的哪裡有機會」）：** 骨架是層，每份現行讀圖一張卡。
+`GET /api/v1/graph` 在**請求時**接已 materialize 的 `structure_readings`＋`structure_table`＋`layer_notes`＋`graph_walk`＋個股頁
+（不新增 kind、daily 不動；request path 照樣零寫入零網路，四種證明走 `COMPOSED_ROUTES`）。分區照字彙
+（`webapp/materialize.py::reading_zones` 寫進 `.meta.json`：押得下去＝`alpha.providers.briefs.OPEN_READING_KINDS`、判不出、都不是〔預設收合〕；
+字彙外的 kind 進「未分區」不消失），區內照節點 id、卡內公司照首頁的組序——都不是名次。坐在這一層的公司＝結構表裡 `supplies_to` 那幾列
+（依 company_id 去重；有個股頁的連過去、印短名與候選狀態）；讀圖另外關聯但不是供應商的另列一行。「錢在變多嗎」只印層代表宣告了 yoy 的層（量得到才印、不補）；
+押在判不出的層上的缺 X 印在那張卡上（缺的多半就是這一份讀圖）。名字照 `config/node_labels_zh.json` → 層說明標題 → 結構表 → 個股頁，
+都沒有就印 id（不猜，INV-1）。研究缺口三型（薄層沒人讀、獨家且自報、供給側未填）逐處印；其餘六型是圖的整理工作，只印件數，
+逐條（含重複節點兩端逐字）看 `python -m query.graph_walk`；圖預測對錯表搬到追蹤表頁；層計數那一行只住心跳段 3（查核用）。
+讀不到 `structure_readings`＝503；其餘三份讀不到各自印缺席（不是 0）。四份 artifact 與舊 `/api/v1/*` 照留；舊連結落到「圖」頁並說一句，
+`#/graph/<節點>` 打開那一層，`#/layer/<節點>` 單份閱讀頁照舊（返回連到圖上那一層）。
+
 **private path 在 materialize 端遮蔽一次。** read model 的理由句會寫出 authority 檔案路徑
 （例：「找不到 session 判斷檔（library/private/alpha/judgments/…）」）；那對開發者有用，但它是 private
 filesystem 結構，不該經由 HTTP 出去。遮成 `«private-authority»`，**其餘文字逐字保留**。
@@ -646,7 +658,7 @@ filesystem 結構，不該經由 HTTP 出去。遮成 `«private-authority»`，
 
 **state artifact（2026-09-08，呈現責任重切 B1）：** per-ticker 的 Analyst View 之外，多了**跨標的的 state**
 （`library/private/app/state/<kind>.json`；`webapp/contracts.py::STATE_SCHEMA_VERSIONS` 是封閉的 kind 字彙，
-2026-09-26 起是 `structure_table`／`beta`／`graph_walk`／`watches`／`positions`／`structure_readings`／`account_scorecard`（`coverage` → `graph_walk`，Phase 2 Step 2.6；`structure_readings` 的頁 `#/structure-readings` 於 Step 2.7 上線，每一列帶引用原文與反證登記的 watch id）；
+2026-09-26 起是 `structure_table`／`beta`／`graph_walk`／`watches`／`positions`／`structure_readings`／`account_scorecard`（`coverage` → `graph_walk`，Phase 2 Step 2.6；`structure_readings` 的頁 `#/structure-readings` 於 Step 2.7 上線，每一列帶引用原文與反證登記的 watch id；2026-10-28 併進「圖」頁）；
 `ranking`／`basket`／`multi_year` 已於 Phase 0 退役；2026-09-29 Phase 3 Step 3.6 加 `candidates`；2026-10-07 個股頁 plan S4b 加 `layer_notes`（層說明閱讀頁，§6.15）；同日加 `daily`（Discord 短版照抄，§4.1），共 10 個，查證 `python -m webapp status`）。
 **呈現取捨（2026-10-07 使用者：「App 是要給人看的…不需要給我看的…不是收起來 是拿掉」）：** 畫面只放使用者會看的；
 agent 查核用的欄位（authority、freshness identity、content digest、`this_is_not`、逐條排除理由、凍結的舊店與 history 線、
@@ -1014,7 +1026,8 @@ python -m alpha layer-note <node> --add spec.json  → library/private/alpha/lay
 全文（長的 markdown）住 `library/private/research_notes/layer_notes/`，ledger 以 `body_ref` 指過去；閱讀頁照印 ledger（個股頁 plan S4b）。
 
 **閱讀頁（2026-10-07 個股頁 plan S4b）：** state kind `layer_notes`（`webapp/layer_notes.py` 純函式組 artifact、`webapp/materialize.py::materialize_layer_notes`
-一次載入；APP `#/layer-notes`、`#/layer/<節點>`，GET `/api/v1/layer-notes` 整份給、沒有路徑參數）。三件事各只有一個 owner：
+一次載入；APP `#/layer/<節點>`——清單頁 `#/layer-notes` 於 2026-10-28 併進「圖」頁，有層說明的層卡片帶連結（§6.9）；
+GET `/api/v1/layer-notes` 整份給、沒有路徑參數）。三件事各只有一個 owner：
 ①主張落哪一格＝`alpha.providers.layer_notes.claim_state`（「該重讀」的三種主張理由也問它）；②**文件自宣告**＝`source_declarations`——
 文件自己帶的 `.meta.json` 等級、`doc_id` 完全等於檔名的抽取檔等級、raw 檔頭鍵名含 NOTE／TIER 的宣告段（逐字），三種都沒有才是
 「文件沒宣告」；與層說明自己的證據等級（看誰說的）**並列不合併**——第三方轉錄、AI 摘要、改寫過的節錄的保真度住文件自己那一格（L16）；

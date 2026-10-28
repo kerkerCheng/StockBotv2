@@ -683,6 +683,23 @@ def node_labels_zh(path: Path | None = None) -> dict[str, str]:
     return {str(k): str(v) for k, v in (labels or {}).items() if isinstance(v, str) and v.strip()}
 
 
+def reading_zones() -> list[dict[str, Any]]:
+    """「圖」頁的三區（2026-10-28 使用者照推薦；brainstorm `2026-10-28-app-attention-ia.md` 定案 6：骨架＝層）。
+    「押得下去」＝候選「可開」騎得上的那兩種判讀（`alpha.providers.briefs.OPEN_READING_KINDS`——同一句話只有一份，L16）；
+    每一種判讀恰好落在一區，新增判讀種類沒進任何一區就紅（`tests/test_webapp_graph_page.py`），不會從圖頁安靜消失（INV-3）。
+    區序是閱讀順序，不是名次；區內照節點 id 的字母序。"""
+    from alpha.providers.briefs import OPEN_READING_KINDS
+    from alpha.structure_reading.contracts import READING_KINDS
+
+    return [
+        {"key": "bettable", "label": "押得下去的層（判量或換不掉）", "expanded": True,
+         "kinds": [kind for kind in READING_KINDS if kind in OPEN_READING_KINDS]},
+        {"key": "undecided", "label": "還判不出的層——研究下一步多半在這裡", "expanded": True, "kinds": ["undecided"]},
+        {"key": "not_opportunity", "label": "不是機會的層（判都不是：這個位置本來就不卡）", "expanded": False,
+         "kinds": ["neither"]},
+    ]
+
+
 def _taglines_loaded() -> dict[str, Any]:
     """首頁介紹 ledger 的現行那一筆（`company_id` → 紀錄）。讀不到＝空——卡片退到層名或「還沒寫介紹」，不擋 materialize。
     壞行由 `python -m alpha taglines --list` 印出（ledger 自己的帳），這裡不吞也不重報。"""
@@ -1447,7 +1464,8 @@ def build_graph_walk_artifact(result: Mapping[str, Any], *,
         # 圖上全部節點 id：decompose 選題的「這個錨是不是已經在圖裡」讀它（原本讀 coverage 快照）。
         "graph_nodes": list(result["graph_nodes"]),
         # 層計數器（Phase 4 Step 4.4c；`query.layer_stats`）：ROADMAP Phase 4 ①②③ 與附屬，只印不判。
-        # 心跳段 3 與結構表頁首讀這一段（`summary` 是同一行字，不在消費端重組）。沒有＝這份 artifact 沒算。
+        # 心跳段 3 讀這一段（`summary` 是同一行字，不在消費端重組）。沒有＝這份 artifact 沒算。
+        # 2026-10-28 結構表頁併進「圖」頁後 APP 不再印這一行——它是查核用的計數，住心跳與 CLI。
         "layer_stats": (dict(result["layer_stats"]) if result.get("layer_stats") is not None else None),
         "rules": dict(result["rules"]),
         "this_is_not": list(result["this_is_not"]),
@@ -2374,6 +2392,7 @@ def write_vocabularies(store: ArtifactStore | None = None) -> Path:
     """
     from alpha.absence import ABSENCE_KINDS, SETTLED_ABSENCE_KINDS
     from alpha.candidates import LIST_GROUP_LABELS, LIST_GROUPS
+    from alpha.structure_reading.contracts import READING_KIND_SHORT, READING_KINDS, READING_UNITS
     from briefing.analyst_view.contracts import (
         ACCOUNTING_BASIS_DISPLAY, CORE_PANELS, OPTIONAL_PANELS, PLAIN_ABSENCE_SHORT,
         PLAIN_BET_UNITS, PLAIN_LINE_LABELS, PLAIN_PANEL_TITLES, PLAIN_PRICED_IN, PLAIN_READINESS, PLAIN_WIPEOUT,
@@ -2417,6 +2436,12 @@ def write_vocabularies(store: ArtifactStore | None = None) -> Path:
         # 個股頁 schema v1.0 的合約（2026-10-08，個股頁 S2）：十三塊、元素、缺席宣告、證據等級對照——只有
         # `briefing.analyst_view.page_schema` 那一份，稽核區的填得滿表照這裡的塊與元素排（L16）
         "page_schema": page_schema_payload(),
+        # 「圖」頁（2026-10-28 使用者照推薦：讀圖、走圖、層說明、結構表併成一頁）：三區、判讀短名與節點中文名
+        # 跟著字彙表走到 serve 端（API 不 import alpha）
+        "reading_zones": reading_zones(),
+        "reading_kinds": {kind: {"short": READING_KIND_SHORT[kind], "plain": READING_KINDS[kind]} for kind in READING_KINDS},
+        "reading_units": {unit: text.split("讀圖")[0] for unit, text in READING_UNITS.items()},   # 層／插槽（同候選列的推法）
+        "node_labels_zh": node_labels_zh(),
     }
     path = target.directory / ".meta.json"
     tmp = path.with_suffix(".json.tmp")

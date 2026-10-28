@@ -374,18 +374,20 @@ def test_status_and_verify_commands_include_state(tmp_path, capsys) -> None:
 # ---------------------------------------------------------------------------
 
 def test_frontend_structure_table_view_never_sorts_or_scores() -> None:
-    """畫面只改資訊階層：不得重排、不得算分、不得補權重、不得有名次欄或首選。"""
+    """畫面只改資訊階層：不得重排、不得算分、不得補權重、不得有名次欄或首選。
+    2026-10-28：結構表頁併進「圖」頁（坐在每一層的公司＝結構表裡 `supplies_to` 那幾列）；同一組禁令照守整支 app.js。
+    獨家三態的說明不再有畫面——「獨家且自報」是圖頁「還沒讀的地方」逐處印的研究缺口。"""
     source = (ROOT / "webapp" / "static" / "app.js").read_text(encoding="utf-8")
-    assert "function renderStructureTable" in source
+    assert "function renderStructureTable" not in source and "function renderGraph(" in source
     for retired in ("function renderRanking", "function renderBasket", "function renderMultiYear",
                     "top_pick", "structural_rows", "actionable_rank"):
         assert retired not in source, retired
     assert ".sort(" not in source
     for token in ("weighted", "weights", "score =", "* 0."):
         assert token not in source, token
-    assert "TABLE_VOCAB.sole_source_states" in source     # 三態說明來自 artifact，不是前端自寫
     html = (ROOT / "webapp" / "static" / "index.html").read_text(encoding="utf-8")
-    assert 'href="#/structure-table"' in html and "#/ranking" not in html
+    assert 'href="#/graph"' in html
+    assert 'href="#/structure-table"' not in html and "#/ranking" not in html
 
 
 
@@ -422,8 +424,12 @@ def test_layer_options_cover_every_bottleneck_once_in_name_order_not_rank() -> N
     assert [r["company_id"] for r in payload["rows"]] == ["co:axt", "co:coherent", "co:lumentum", "co:nvidia"]
 
 
-def test_frontend_structure_table_hides_ids_behind_names_and_filters_without_sorting() -> None:
+def test_frontend_graph_page_hides_ids_behind_names_and_filters_without_sorting() -> None:
+    """2026-10-28：結構表頁併進「圖」頁——名字由 `/api/v1/graph` 接好（沒名字才印 id，不猜：
+    `tests/test_webapp_graph_page.py`），前端只印 `c.name`／`layer.label`；搜尋只藏不排，藏起幾層照印（INV-3）。
+    artifact 的 `layers` 選項照留：`engine_b/impact.py` 讀它。"""
     source = (ROOT / "webapp" / "static" / "app.js").read_text(encoding="utf-8")
-    assert "row.bottleneck_name" in source and "row.demand_anchor_name" in source and "chain_names" in source
-    assert "payload.layers" in source and "type = 'search'" in source
-    assert "篩掉" in source                                                # 篩掉幾條照印（INV-3）
+    assert "c.name" in source and "layer.label" in source
+    assert "row.bottleneck_name" not in source and "TABLE_VOCAB." not in source and "const TABLE_VOCAB" not in source
+    assert "type = 'search'" in source
+    assert "藏起" in source and "順序不變" in source

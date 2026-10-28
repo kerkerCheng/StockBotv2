@@ -213,7 +213,7 @@ Daily 的「Alpha Card 摘要」區是同一份 view 的一列精簡版。
 
 ## Pane 3 — 哪裡還是空白（本 skill 唯一的產生器）
 
-跑 `python -m query.graph_walk`（2026-09-26 起；APP `#/graph-walk`）。它報九型問句各自的「命中／母體」，
+跑 `python -m query.graph_walk`（2026-09-26 起；APP「圖」`#/graph` 的「還沒讀的地方」只逐處印研究缺口三型，其餘六型只印件數——逐條看本命令）。它報九型問句各自的「命中／母體」，
 **不排序、不加總**；本 pane 讀其中「沒人供應」（第 7 型＝原 🔴）與「建模待補」（第 8 型＝原 🟡），
 分桶判準仍是 `query/coverage_gaps.py` 那一份。其餘七型（薄層沒人讀、獨家且自報…）照走圖原樣列出，不在這裡重算。
 
@@ -307,7 +307,7 @@ Daily 的「Alpha Card 摘要」區是同一份 view 的一列精簡版。
 
 | 情況 | 用哪個 |
 |---|---|
-| 今天有什麼要核准 | `skills/daily-brief`（只印較昨變動；持久內容在 APP `#/structure-table`／`#/graph-walk`） |
+| 今天有什麼要核准 | `skills/daily-brief`（只印較昨變動；持久內容在 APP「圖」`#/graph`） |
 | 單一標的深挖 | `skills/investment-research` |
 | 由上而下拆解一個系統、產生新節點 | `skills/system-decompose` |
 | 新公司入圖 | `skills/company-onboard` |

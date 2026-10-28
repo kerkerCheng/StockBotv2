@@ -118,6 +118,16 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 `StockBotv2-Daily` 的 ⑱⑲ 取代（1.2a 停用、2026-09-25 1.2b 刪除）；它們的理由（LLM 失敗心跳照發、永遠 exit 0、Python 不用 `.cmd`、
 發送走 subprocess）搬進 `crons/daily_task.py` 的 docstring，守它們的測試改主詞搬進 `tests/test_daily_task.py`「無人值守入口」節。
 
+### Sandbox impact review 結論（2026-10-28：讀圖、走圖、層說明清單、結構表四頁併成「圖」）
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | 無人值守路徑只多**寫字彙**：daily ⑬ materialize（argv 不變）的 `write_vocabularies` 在 `.meta.json` 多四個鍵（`reading_zones`、`reading_kinds`、`reading_units`、`node_labels_zh`——tracked 程式字彙與 `config/node_labels_zh.json` 的照抄）；`config/node_labels_zh.json` 多 78 個層中文名（tracked 字彙）。request path：新 GET `/api/v1/graph`——請求時讀已 materialize 的 `structure_readings`／`structure_table`／`layer_notes`／`graph_walk` 與個股頁 artifact 再接起來（api.py import 不變：stdlib＋starlette＋`.contracts`／`.store`）；不跑 LLM、不寫任何東西、不連網、不碰圖。前端拿掉四頁（舊連結落到「圖」並說一句），圖預測對錯表搬到追蹤表頁 |
+| **2 canonical skill／prompt／本檔** | 本節；本檔閱讀頁命令那一行；`skills/daily-brief/SKILL.md` APP 畫面表「結構表」「走圖」兩行合成「圖 `#/graph`」一行與覆蓋缺口那一句、`skills/alpha-status/SKILL.md` 兩處畫面位置（已跑 `python scripts/sync_agent_skills.py`）；`docs/ARCHITECTURE.md` §6.9「「圖」頁」與兩處舊路由；CONCEPTS「圖頁三區」；程式註解七處（「結構表頁首」「讀圖頁」改成現況） |
+| **3 最窄 rule** | daily argv 不變；不新增 step、allowlist、rule；API 多一條唯讀 GET（沒有路徑參數；`#/graph/<節點>` 是前端 hash），APP 仍無寫入端點；舊 `/api/v1/*` 與四份 state artifact 照留 |
+| **4 contract test** | 新 `tests/test_webapp_graph_page.py`（三區剛好切分讀圖字彙且「押得下去」＝`OPEN_READING_KINDS`、供應商只取 `supplies_to` 且去重、區序與成員、卡上公司／另外關聯／缺 X／錢在變多嗎、研究缺口與整理工作分開、三份讀不到各自印缺席而讀圖讀不到＝503、沒有字彙＝一區全列、字彙外＝未分區、前端靜態檢查）；`tests/test_webapp_request_path.py` 新 `COMPOSED_ROUTES`（模組哨兵、檔案快照、斷網、405 與路由一致性都走到 `/api/v1/graph`）；六個既有測試改主詞（`test_duplicate_nodes.py`、`test_webapp_graph_walk_watches.py`、`test_webapp_structure_table.py` 兩條、`test_webapp_home_cards.py`、`test_daily_brief_skill.py` 的新家指標改 `#/graph` 並斷言舊路由不再被指）；`scripts/retired_mechanism_grep.py` keep-list 刪一條腐壞條目（結構表區塊拿掉後 app.js 不再命中 A 組）；全套 4347 passed／9 failed，修掉這次弄出的 2 條後剩 7 條，都是 `test_full_chain_acceptance.py` 既有的真資料漂移；變異 3／3（供應商混進 `depends_on`、「都不是」掉出分區、搜尋不說「順序不變」——都紅） |
+| **5 端到端 smoke** | 見 ROADMAP 旁支開發項「APP 照使用者問題重組」③的驗收現值 |
+
 ### Sandbox impact review 結論（2026-10-28：候選板與在等什麼併進首頁——心跳 watch 行多兩格）
 
 | 步 | 結論 |
@@ -1101,7 +1111,7 @@ materialize 用**，不動 `discover_tracked_tickers`——那會連帶擴大 ED
 & '.venv\Scripts\python.exe' -m alpha taglines --add spec.json                        # spec：[{ticker, short_name, text}]；名冊、字數、禁字核對，一筆不過整批拒收
 #   寫完要在首頁卡片看到：python -m webapp materialize（點名那幾檔也行）；沒寫的卡片印押的層的中文名（config/node_labels_zh.json），再沒有就印「還沒寫介紹」
 #   新敘事寫完順手寫一句（研究 session 的收尾，和敘事同一輪）
-# 閱讀頁（2026-10-07 個股頁 plan S4b；APP #/layer-notes、#/layer/<節點>；daily ⑬ 每天重建）——寫完層說明想馬上在 APP 讀到：
+# 閱讀頁（2026-10-07 個股頁 plan S4b；APP #/layer/<節點>，清單在「圖」#/graph 的層卡片上（2026-10-28）；daily ⑬ 每天重建）——寫完層說明想馬上在 APP 讀到：
 & '.venv\Scripts\python.exe' -m webapp materialize --layer-notes                         # 只重建閱讀頁（全文、出處的文件自宣告、主張狀態、哪幾頁連過來）
 & '.venv\Scripts\python.exe' -m webapp materialize COHR LITE --layer-notes               # 連個股頁「坐的層」的連結一起更新（只重跑點名的那幾檔）
 # 技術示意圖（2026-10-08 個股頁 plan S5b 第二段；私有、住 library/private/research_notes/diagrams/；APP 個股頁 B4 與閱讀頁）

@@ -173,14 +173,18 @@ def test_module_only_nominates() -> None:
         assert forbidden not in src, f"偵測器不該碰 {forbidden}"
 
 
-def test_the_app_page_prints_the_verbatim_not_just_the_ids() -> None:
-    """APP 那一區塊若只印 id 與 name，它就跟 2026-09-18 之前的工具一樣沒有判斷依據。"""
+def test_the_app_never_shows_a_half_list_of_ids_and_points_at_the_cli_with_the_verbatim() -> None:
+    """APP 那一區塊若只印 id 與 name，它就跟 2026-09-18 之前的工具一樣沒有判斷依據。
+
+    2026-10-28（APP 收成五頁，第三步「圖」頁）翻面、不是刪掉：重複節點是圖的整理工作，使用者不看——
+    APP 只印件數，逐對兩端的逐字住命令列 `python -m query.graph_walk`（AGENTS：「不是收起來，是拿掉」）。
+    守的仍是同一件事：APP 不得長回只有 id 的半套清單；它指到的命令必須真的印出逐字
+    （上面 `test_quotes_reach_the_output_or_the_detector_is_pointless` 驗那一份輸出）。"""
 
     source = Path("webapp/static/app.js").read_text(encoding="utf-8")
-    # Step 2.6：重複節點成為走圖第 9 型，APP 在走圖頁逐對印兩端的逐字（不再是獨立區塊）。
-    assert "function duplicateSide" in source and "function walkHitList" in source
-    assert "q.quote" in source, "APP 區塊必須印出逐字本身"
-    assert "duplicateSide(hit.left)" in source and "duplicateSide(hit.right)" in source
+    assert "function duplicateSide" not in source and "function walkHitList" not in source
+    assert "hit.left" not in source and "hit.right" not in source, "APP 不再逐對列重複節點"
+    assert "python -m query.graph_walk" in source, "APP 只印件數時必須指得出逐條在哪裡"
 
 
 def test_the_queue_segment_points_at_a_consumer_that_really_mentions_it() -> None:

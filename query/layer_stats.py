@@ -1,7 +1,7 @@
 """層計數器（Phase 4 Step 4.4c）：ROADMAP Phase 4 驗收 ①②③ 的常駐計數器——**純函式**，不查圖、不寫任何東西。
 
 唯一連圖的地方是 `query.graph_walk.collect()`（走圖與它共用一次連線）；結果跟著 `graph_walk` artifact 走
-（`layer_stats` 一段），心跳段 3 與結構表頁首讀同一份 artifact，不重算（L16）。
+（`layer_stats` 一段），心跳段 3 讀同一份 artifact，不重算（L16；2026-10-28 起 APP 不再印——結構表頁併進「圖」頁）。
 
 三個數各自回答一個問題，**只印、不判、不排序、沒有門檻**（plan 不可越線 10）：
 
@@ -352,7 +352,7 @@ def compute_layer_stats(*, edges: Sequence[Any], rows: Iterable[Mapping[str, Any
 
 
 def summary_line(stats: Mapping[str, Any] | None) -> str:
-    """心跳段 3、結構表頁首、CLI 共用的一行（L16：呈現只有一份）。讀不到印缺席，不印 0（INV-3）。"""
+    """心跳段 3、CLI 共用的一行（L16：呈現只有一份）。讀不到印缺席，不印 0（INV-3）。"""
     if not stats:
         return "層：layer_stats 讀不到（upstream_unavailable）——不是 0"
     if stats.get("absence"):

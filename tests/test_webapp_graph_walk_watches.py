@@ -304,12 +304,16 @@ def test_meta_declares_both(client) -> None:
 
 def test_frontend_has_the_walk_view_and_no_ranking_of_gaps() -> None:
     """2026-10-28：「在等什麼」頁併進首頁（重看日在卡片與兩週日曆、停滯與追源需處置在心跳 watch 那一行）；
-    watches artifact 與 `/api/v1/watches` 照留（上面兩條測試）。"""
+    watches artifact 與 `/api/v1/watches` 照留（上面兩條測試）。
+    同日（第三步）「走圖」頁併進「圖」頁：研究缺口逐處印在「還沒讀的地方」、圖的整理工作只印件數；
+    graph_walk artifact 與 `/api/v1/graph-walk` 照留（`/api/v1/graph` 在請求時讀它）。"""
     source = (ROOT / "webapp" / "static" / "app.js").read_text(encoding="utf-8")
-    assert "function renderGraphWalk" in source and "function renderWatches" not in source
+    assert "function renderGraph(" in source and "function graphHoles" in source
+    assert "function renderGraphWalk" not in source and "function renderWatches" not in source
     assert "function renderCoverage" not in source
     for token in (".sort(", "優先度", "最重要", "建議先做"):
         assert token not in source, token
     html = (ROOT / "webapp" / "static" / "index.html").read_text(encoding="utf-8")
-    assert 'href="#/graph-walk"' in html and 'href="#/watches"' not in html
+    assert 'href="#/graph"' in html
+    assert 'href="#/graph-walk"' not in html and 'href="#/watches"' not in html
     assert 'href="#/coverage"' not in html
