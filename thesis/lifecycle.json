@@ -95,7 +95,7 @@
       }
     ],
     "check_interval_days": 30,
-    "last_checked": "2026-09-29",
+    "last_checked": "2026-10-29",
     "memo": "thesis/sivers_v4_lane_memo.md",
     "mutations": [
       {
@@ -125,8 +125,8 @@
         "to": "active"
       }
     ],
-    "next_check": "2026-10-29",
-    "note": "2026-09-29 複查（pq2 [655]）：v4 §6 五條 disproof 均未觸發，status 維持 active、無 mutation。08-29 後一手事件四件：①08-31 認股權 1,659,015 股以 SEK 4.53 行使、總股數 356,740,332（已在 v4 股數內，非新增發）；②09-03 投資 USD 30M 擴建 Glasgow，CW DFB 年產能 >1 億顆、預計 2027-Q4 運轉（已入圖；加大 capex 燒錢，資金螺旋第 4 條改在 Q3 報告看現金消耗）；③09-24 高層異動——光子 CTO Andrew McKee（CST Global 共同創辦人）退休、過渡至 2026 年底，David Clark 10-31 起任光子工程副總，無任何財報、審計、營收認列或 ELS／Jabil／Ayar 時程字句（第 5 條未觸）；注意 CTO 交接期與 ELS production readiness 同落在年底；④09-17 Digitimes 轉述推文為 tier-3，已 park、不構成 [632] 觸發。五條語意 watch（ew_0107–ew_0111）皆 active、未醒。下一分辨點不變：Q3 2026-11-26、年底 ELS。｜2026-08-29 v4 memo 完成（proposal tm_fbcf9bfe，pq2 [251] 核准）：Q2 分辨點裁決——2025 營收重編僅 -SEK 4.314M（~1.4%），Ningi 指控量級（~97M/31%）未成立，原 retire gate 未觸發；依 L7 revised → active。v4 矛盾軸心從數字可信度移到執行時間表與稀釋：Jabil 1.6T ramp 延 2027、SEK 825M 增發＋Bootstrap $12M 轉股稀釋 >10%、pipeline USD 1.2B 明示 non-binding、H1 營運現金流 -119.2M。Disproof 五條見 v4 §6；下一分辨點 Q3 2026-11-26（毛利率方向＋photonics 分項）與年底 ELS production readiness。（歷史脈絡見 git history 中本欄 08-28 前版本與 docs/reports/sive-ningi-audit-trace-2026-07-20.md。）",
+    "next_check": "2026-11-28",
+    "note": "2026-10-29 複查（pq2 [889]）：v4 §6 五條 disproof 均未觸發，status 維持 active、無 mutation。09-29 後一手事件三件：①09-29 召集、10-22 臨時股東會決議：會計師 Deloitte→EY——召集公告原文寫明依歐盟 537/2014 第 17 條十年輪替，「Förslaget grundar sig inte på någon oenighet om Bolagets redovisning eller finansiella rapportering」，不是營收認列質疑或審計調整（第 5 條未觸）；P11 員工選擇權最多 7,280,000 股（約 2.0%、無績效條件）＋C 股交付與避險授權，不是大額增發（第 4 條未觸）；②10-20 光達策略客戶下量產訂單——非資料中心，[833] 已把第 1 條限定資料中心（ew_0107 → ew_1443），不算 ELS 確認、也不觸發；③09-24 公告的光子 CTO Andrew McKee 退休（交接到年底）、David Clark 10-31 到任光子工程副總（Amkor 12 年、量產爬坡）——10-05 留給本次判斷的關鍵人物風險：不另加反證、不改 memo，因為它看得到的後果（年底前 ELS production readiness 沒確認）就是第 1 條在盯的（ew_1443），另加一條只會重複計數。二手：10-04 AK&M「出售 Sivers Photonics 給 Nordic Acquisition」是 2024-08-06 舊聞重刊（MFN 2026 無此公告，已 park）；10-13 OCP Wiwynn／Ayar／GUC 展示沒點名雷射供應商（第 3 條未觸）；Jabil 10-K 沒有具名矽光子／CPO 夥伴（第 2 條期限 2027）；10-28 carrioresearch 推文（tier-3）稱 Sivers 已把 CW DFB 量產移到穩懋——跟穩懋自己 2026-08～09 法說簡報（CW-DFB 仍標 Ongoing Qualification）不一致，Sivers↔穩懋代工關係早在圖上（Sivers 2025 年報）；五條都不看代工地點、不觸發，一手（推文說的 9 月 capital markets day，9 月以來的 Sivers 公告裡找不到）留給 pq1 那則 lead（lead_c5a0dea4）去查。反證 watch ew_1443、ew_0108–ew_0111 皆 active、0 標旗，逐則判定都是不相關。下一分辨點不變：Q3 2026-11-26（毛利率方向、photonics 分項、現金消耗）、年底 ELS production readiness（與 CTO 交接同落）。｜2026-09-29 複查（pq2 [655]）：v4 §6 五條 disproof 均未觸發，status 維持 active、無 mutation。08-29 後一手事件四件：①08-31 認股權 1,659,015 股以 SEK 4.53 行使、總股數 356,740,332（已在 v4 股數內，非新增發）；②09-03 投資 USD 30M 擴建 Glasgow，CW DFB 年產能 >1 億顆、預計 2027-Q4 運轉（已入圖；加大 capex 燒錢，資金螺旋第 4 條改在 Q3 報告看現金消耗）；③09-24 高層異動——光子 CTO Andrew McKee（CST Global 共同創辦人）退休、過渡至 2026 年底，David Clark 10-31 起任光子工程副總，無任何財報、審計、營收認列或 ELS／Jabil／Ayar 時程字句（第 5 條未觸）；注意 CTO 交接期與 ELS production readiness 同落在年底；④09-17 Digitimes 轉述推文為 tier-3，已 park、不構成 [632] 觸發。五條語意 watch（ew_0107–ew_0111）皆 active、未醒。下一分辨點不變：Q3 2026-11-26、年底 ELS。｜2026-08-29 v4 memo 完成（proposal tm_fbcf9bfe，pq2 [251] 核准）：Q2 分辨點裁決——2025 營收重編僅 -SEK 4.314M（~1.4%），Ningi 指控量級（~97M/31%）未成立，原 retire gate 未觸發；依 L7 revised → active。v4 矛盾軸心從數字可信度移到執行時間表與稀釋：Jabil 1.6T ramp 延 2027、SEK 825M 增發＋Bootstrap $12M 轉股稀釋 >10%、pipeline USD 1.2B 明示 non-binding、H1 營運現金流 -119.2M。Disproof 五條見 v4 §6；下一分辨點 Q3 2026-11-26（毛利率方向＋photonics 分項）與年底 ELS production readiness。（歷史脈絡見 git history 中本欄 08-28 前版本與 docs/reports/sive-ningi-audit-trace-2026-07-20.md。）",
     "status": "active",
     "ticker": "SIVE.ST"
   }
