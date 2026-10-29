@@ -4,14 +4,16 @@
     "錨→產業對照另供 alpha/providers/closure.py 判「所屬產業尚無 ready 檔」（研究佇列的分散度判準）。",
     "⚠ 2026-09-23（Phase 0 Step 0b.3）：產業別分排序（--by-sector）與籃子頁的「同一個賭注的群」隨跨檔排序退役；本檔不再驅動任何排序或分組呈現。",
     "correlation_notes 是需求錨重疊警告（N 產業 ≠ N 個獨立賭注）；APP 頁尾的相關性警告另有 SSOT，這裡的兩句目前沒有消費端。",
-    "⚠ tech:robotaxi_fleet（[852] 核准的錨、[857] 入圖）刻意不登記：demand_chain 取最短鏈、經 co:nvidia 樞紐時，它會把 NVIDIA 的整片供應鏈（載板、封測、分歧管、快接頭…）改判成 robotaxi 產業——failure log #104（10-23 登記又撤回；10-27 照 [857] 草稿 ⑤ 再做一次、再撤回）。修法提案在 #104；修好之前，新增任何錨前先跑一次「錨鏈改變的節點數」預告。"
+    "⚠ tech:robotaxi_fleet（[852] 核准的錨、[857] 入圖）刻意不登記：demand_chain 取最短鏈、經 co:nvidia 樞紐時，它會把 NVIDIA 的整片供應鏈（載板、封測、分歧管、快接頭…）改判成 robotaxi 產業——failure log #104（10-23 登記又撤回；10-27 照 [857] 草稿 ⑤ 再做一次、再撤回）。修法提案在 #104；修好之前，新增任何錨前先跑一次「錨鏈改變的節點數」預告。",
+    "tech:space_solar_array（[853] 核准的錨、[891] 入圖）2026-10-30 登記成「太空太陽能」：登記前預告（同一張結構表、現有錨 vs 加上它）——493 列裡改判 3 列，全是本來就該歸它的鍺列（co:axt／co:yunnan_germanium supplies_to mat:germanium_substrate、co:yunnan_germanium supplies_to mat:germanium_metal，原本經公司層走到 tech:optical_scale_up），新接上 22 列（[891] 的列）；**鏈上經過公司節點 0 列**；節點層級 24 個節點換錨、全是原本無錨的——co:axt、co:yunnan_germanium 的公司層仍走到 AI 光互連。與 robotaxi 不同處：太陽翼這條鏈不經任何樞紐公司。"
   ],
   "sectors": {
     "AI 光互連／CPO": ["tech:ai_switch", "tech:optical_scale_up", "tech:scale_across"],
     "記憶體": ["tech:hbm", "tech:dram_technology", "tech:dram_manufacturing"],
     "機器人": ["tech:humanoid_robot_systems", "tech:robotic_actuator", "tech:logistics_tote_transfer"],
     "稀土磁材": ["mat:rare_earth_magnets"],
-    "成熟／特殊製程": ["tech:essential_chips_mature_node", "tech:non_leading_edge_fab"]
+    "成熟／特殊製程": ["tech:essential_chips_mature_node", "tech:non_leading_edge_fab"],
+    "太空太陽能": ["tech:space_solar_array"]
   },
   "correlation_notes": [
     "AI 光互連與記憶體共享同一個 AI capex 需求錨——兩組同漲同跌的機率遠高於獨立假設。",
