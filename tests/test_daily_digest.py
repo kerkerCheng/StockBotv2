@@ -504,6 +504,10 @@ def test_the_research_counters_print_zero_and_say_when_they_could_not_be_read() 
     assert lines[-1] == "-# 下一步貼：`/research-drain`"
     quiet = todo_block(snapshot, [LedgerCount(key, label, 0) for key, label in TODO_COUNTERS])
     assert quiet[1] == "- 每一格都是 0" and "未 triage" in quiet[2] and "未檢" in quiet[2]
+    # 0 的格有註記照帶（「新邊沒讀這次沒算」吞掉就和真的 0 同形，INV-3）
+    noted = [LedgerCount(key, label, 0, note="新邊沒讀這次沒算（候選板沒讀到圖）" if key == "todo.narrative" else None)
+             for key, label in TODO_COUNTERS]
+    assert "敘事該重寫（新邊沒讀這次沒算（候選板沒讀到圖））" in todo_block(snapshot, noted)[2]
 
 
 def test_the_disproof_line_always_prints_watching_touched_and_unwatched() -> None:

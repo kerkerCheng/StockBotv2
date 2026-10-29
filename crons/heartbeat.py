@@ -1569,11 +1569,12 @@ def build_queue(*, state_dir: Path | None = None, now: datetime | None = None,
     section.lines.append(_layer_stats_line(walk, walk_absence))
     # 敘事該重寫（Phase 3 Step 3.4／3.6）：敘事來源 watch 醒來／觸及／到期未判＋敘事連結的反證來源已不在盯。
     # 研究工作（consumer＝research-drain），不加進 pq1；**0 也印**——不印會讓它安靜積著（L14）。
+    # 這一行只數 watch 與連結斷；騎舊讀圖、新邊沒讀、前提失效住 ⑤（同一個名字兩個數會讓人搞混，L12——標出它是子集）。
     rewrite = next((seg for seg in observation["segments"] if seg["key"] == "narrative_rewrite"), None)
     if rewrite is not None:
         section.lines.append(
             f"敘事該重寫 {'未讀到' if rewrite['count'] is None else rewrite['count']}"
-            + (f"（其中連結斷 {len(breaks)}）" if breaks is not None
+            + (f"（其中連結斷 {len(breaks)}；只數 watch 與連結斷，全部原因看 ⑤）" if breaks is not None
                else f"（**連結斷未讀到**：{breaks_reason}——上面的數不含它）")
             + (("：" + "、".join(str(e) for e in rewrite.get("examples") or ())) if rewrite.get("examples") else ""))
 
@@ -2867,16 +2868,12 @@ def collect_ledger(*, now: datetime, state_dir: Path | None, leads_path: Path | 
 
             return current_briefs()
 
-        def readings() -> Mapping[Any, Any]:
-            from engine_b.disproof import current_readings
-
-            return current_readings()
-
         store = leads_mod.load(leads_path) if leads_path else leads_mod.load()
+        # 騎舊讀圖、新邊沒讀由候選板 artifact 帶進來（候選板是唯一 owner，2026-10-29）——這裡不再另讀讀圖算一份
         return todo_ledger.collect(
             today=now.astimezone().date(), leads_store=store, watches=ew.load_watches().get("watches") or [],
             todo_items=todo_mod.load().get("items") or [], hypotheses=hyp.load_store().get("hypotheses") or [],
-            briefs=attempt(briefs), current_readings=attempt(readings), reading_needs_reread=attempt(readings_needs),
+            briefs=attempt(briefs), reading_needs_reread=attempt(readings_needs),
             layer_note_reread=attempt(layer_reread), candidates=attempt(candidates), thesis_due=attempt(thesis_due))
     except Exception:  # noqa: BLE001 — 待做清單組不出來不帶走心跳
         return None

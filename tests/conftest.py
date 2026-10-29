@@ -98,6 +98,18 @@ def _isolate_layer_note_ledger(tmp_path_factory, monkeypatch):
     return target
 
 
+@pytest.fixture(autouse=True)
+def _isolate_company_assertions(monkeypatch):
+    """候選板 context 會讀圖上每家公司的 assertion 寫入紀錄（敘事 stale ③，2026-10-29）——測試一律換成空索引
+    （查過了、沒有新邊），不連真的 Neo4j。要測 ③ 的測試往回傳的 dict 填列（鍵＝公司 id）。與上面同一個理由用 autouse：
+    忘記隔離不會有錯誤訊息，只會讓計數跟著真圖變（或在沒有密碼的機器上變成「沒算」）。"""
+    from query import company_assertions
+
+    index: dict[str, list[dict]] = {}
+    monkeypatch.setattr(company_assertions, "load_company_assertions", lambda: index)
+    return index
+
+
 @pytest.fixture
 def tmp_git_repo(tmp_path: Path) -> Path:
     """Create an isolated Git repository with a deterministic identity."""

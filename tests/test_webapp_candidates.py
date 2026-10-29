@@ -121,6 +121,17 @@ def test_materialize_candidates_keeps_an_explicit_empty_universe(monkeypatch, tm
     assert seen == [[], ["SHOULD_NOT_BE_USED"]]
 
 
+def test_the_artifact_says_whether_new_edges_were_checked() -> None:
+    """敘事 stale ③：板上沒有這一格（改版前的 load_board、假板）＝沒算，不是 0；算了沒有也算認知（INV-3）。"""
+    payload = fake_candidates_payload()
+    assert payload["new_edges_check"]["status"] == "unavailable"
+    board = {k: v for k, v in payload.items()}
+    board["new_edges_check"] = {"status": "ok", "reason": None}
+    again = build_candidates_artifact(board, generated_at=datetime(2026, 9, 29, tzinfo=timezone.utc))
+    assert again["new_edges_check"] == {"status": "ok", "reason": None}
+    assert again["freshness_identity"] != payload["freshness_identity"]
+
+
 def test_the_no_narrative_list_travels_with_the_board_and_counts_as_cognition() -> None:
     """2026-09-30：不上板的那幾檔照抄進 artifact（計數旁邊列得出是誰）；燈變色＝認知變了，freshness 跟著變。"""
     payload = fake_candidates_payload()

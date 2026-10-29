@@ -733,7 +733,8 @@ def todo_block(snapshot: Mapping[str, Any], ledger: Sequence[Any] | None = None,
             if row.count is None:
                 unread.append(row.label)
             elif row.count == 0:
-                zero.append(row.label)
+                # 0 的格有註記就照帶（「新邊沒讀這次沒算」吞掉就和真的 0 同形——INV-3；與 render_cells 同一條規則）
+                zero.append(row.label + (f"（{row.note}）" if row.note else ""))
             else:
                 unit = LEDGER_BY_KEY[row.key].unit
                 bits = [b for b in (row.work, f"最老 {row.oldest_days} 天" if row.oldest_days else None, row.note) if b]

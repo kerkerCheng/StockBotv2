@@ -13,8 +13,9 @@
 """
 from __future__ import annotations
 
-from datetime import datetime
-from typing import Any, Callable, Iterable, Mapping, Sequence
+import re
+from datetime import datetime, timezone
+from typing import Any, Callable, Iterable, Mapping, NamedTuple, Sequence
 
 from .narrative.contracts import RECORD_VERSION_V2, InvestorBrief
 from .three_questions import rollup as line_rollup
@@ -47,9 +48,14 @@ LIGHT_ORDER: tuple[str, ...] = ("red", "amber", "green")
 LIGHT_WORDS: Mapping[str, str] = {"red": "紅", "amber": "黃", "green": "綠"}
 #: 「該重寫」的三種狀態（`engine_b.queue_segments.narrative_rewrite_state` 的值）→ 人讀。
 REWRITE_STATE_WORDS: Mapping[str, str] = {"fired": "醒來", "touched": "觸及", "expired": "到期未判"}
+#: 敘事落後於讀圖與圖的兩種原因（ROADMAP「敘事 stale 計數器」①③，2026-10-29）——`rewrite[]` 那一條的開頭。
+#: 寫的一方（`alpha.providers.candidates.derive_row`）與分類的一方（`REWRITE_WHY`）共用這兩個字串（L16）。
+RIDES_SUPERSEDED_PREFIX = "騎的讀圖已換版"
+NEW_EDGES_PREFIX = "圖上有新邊、敘事沒讀過"
 #: 候選列 `rewrite[]` 每一條 → 首頁卡片與個股頁那一行的幾個字（2026-10-29 使用者：「該重寫為啥沒寫…可以五字一目瞭然嗎」）。
 #: 依序比對、先中先贏；原句（含 watch 編號）照舊留在 `rewrite[]`，這裡只分類、不改判斷；認不得的歸「其他」，不丟（INV-3）。
 REWRITE_WHY: tuple[tuple[str, str], ...] = (
+    (RIDES_SUPERSEDED_PREFIX, "騎舊讀圖"), (NEW_EDGES_PREFIX, "新邊沒讀"),
     ("連結 ", "連結斷了"), ("觸及", "條件觸及"), ("醒來", "條件醒了"), ("到期", "到期了"), ("已到", "重看日到了"),
     ("不存在", "等待不見了"), ("在等的 watch 已", "等待結束了"),
 )
@@ -216,6 +222,131 @@ def judgment_version(records: Sequence[InvestorBrief], brief: InvestorBrief) -> 
     return _walk_back(records, brief, lambda prev: priced_judgment_key(prev) == key)
 
 
+# ---------------------------------------------------------------------------
+# 敘事落後於圖（ROADMAP「敘事 stale 計數器」③；2026-10-29 使用者 go）：公司在正文寫完之後有新邊，敘事沒讀過那份文件
+# ---------------------------------------------------------------------------
+
+def body_key(brief: InvestorBrief) -> tuple[Any, ...]:
+    """敘事「正文」的鍵：七格原文＋候選狀態與理由。換騎、只改引用、改 answers 都不改它——換騎包裝成的新版不算重寫過正文。"""
+    cs = brief.candidate_state
+    return (tuple((s.key, s.text) for s in brief.slots), (cs.state, cs.reason) if cs is not None else None)
+
+
+def body_version(records: Sequence[InvestorBrief], brief: InvestorBrief) -> InvestorBrief:
+    """正文最後一次改動的那一版（正文鍵連續相同的最早一版；與滯留、判斷日走同一條鏈，L16）。"""
+    key = body_key(brief)
+    return _walk_back(records, brief, lambda prev: body_key(prev) == key)
+
+
+def normalize_url(url: Any) -> str | None:
+    """同一份文件的網址比對用：去掉 scheme、`www.`、錨點與結尾斜線，主機名小寫；不是 http(s) 網址回 None。"""
+    match = re.match(r"(?i)^https?://(.+)$", str(url or "").strip().rstrip(".,;:。，；："))
+    if not match:
+        return None
+    host, sep, path = match.group(1).split("#")[0].rstrip("/").partition("/")
+    host = host.lower().removeprefix("www.")
+    return host + (sep + path if path else "")
+
+
+_QUOTE_MARKS = str.maketrans({"“": '"', "”": '"', "‘": "'", "’": "'"})
+
+
+def squash(text: Any) -> str:
+    """逐字比對用：拿掉所有空白（PDF 抽字的換行與字間空格）、彎引號換直的、小寫。"""
+    return re.sub(r"\s+", "", str(text or "")).translate(_QUOTE_MARKS).lower()
+
+
+class Cited(NamedTuple):
+    """敘事七格引用過的東西。`raw_refs` 只是路徑——讀檔是 provider 的事（本模組零 I/O）。"""
+
+    docs: frozenset[str]
+    urls: frozenset[str]
+    edges: frozenset[tuple[str, str, str]]
+    raw_refs: tuple[str, ...]
+
+
+def cited_identities(brief: InvestorBrief) -> Cited:
+    """`graph://source/<doc_id>` → doc id；`graph://edge/<src>/<relation>/<dst>` → 那條邊；直接寫網址 → 網址；
+    `library/raw/<檔>` → 檔名（去副檔名）當 doc id，路徑另外收進 `raw_refs`（比逐字用，見 `unread_new_edges`）。"""
+    docs: set[str] = set()
+    urls: set[str] = set()
+    edges: set[tuple[str, str, str]] = set()
+    raw: list[str] = []
+    for slot in brief.slots:
+        for ref in slot.evidence_refs:
+            ref = str(ref).strip().split("#")[0]
+            if ref.startswith("graph://source/"):
+                docs.add(ref.removeprefix("graph://source/"))
+            elif ref.startswith("graph://edge/"):
+                parts = ref.removeprefix("graph://edge/").split("/")
+                if len(parts) == 3:
+                    edges.add((parts[0], parts[1], parts[2]))
+            elif ref.startswith("library/raw/"):
+                docs.add(ref.rsplit("/", 1)[-1].rsplit(".", 1)[0])
+                if ref not in raw:
+                    raw.append(ref)
+            elif (url := normalize_url(ref)) is not None:
+                urls.add(url)
+    return Cited(frozenset(docs), frozenset(urls), frozenset(edges), tuple(raw))
+
+
+def _written_at(value: Any) -> datetime | None:
+    try:
+        stamp = datetime.fromisoformat(str(value))
+    except (TypeError, ValueError):
+        return None
+    return stamp if stamp.tzinfo is not None else stamp.replace(tzinfo=timezone.utc)
+
+
+def _read(row: Mapping[str, Any], cited: Cited, cited_text: str) -> bool:
+    """這一筆 assertion 敘事讀過嗎：文件 id 引過、網址直接引過，或**它的逐字至少一段在敘事引過的 raw 檔裡**。"""
+    if str(row.get("doc_id")) in cited.docs or (normalize_url(row.get("url")) or "") in cited.urls:
+        return True
+    return any(q and q in cited_text for q in (squash(x) for x in row.get("quotes") or ()))
+
+
+def unread_new_edges(assertions: Iterable[Mapping[str, Any]], *, since: datetime, cited: Cited,
+                     cited_text: str = "") -> list[dict[str, Any]]:
+    """公司在正文寫完（`since`）之後有寫入、而且敘事沒讀過的邊——一條邊一筆。
+
+    「讀過」以**邊**為單位：那條邊任何一筆 assertion（不論何時寫入）讀過（`_read`），或敘事直接引用了那條邊——同一輪研究
+    先寫敘事、隨後入圖，邊的來源敘事都引過（2026-10-29 量測 4 份），不是落後。`cited_text`：敘事引過的 raw 檔全文
+    （`squash` 過）。**比逐字、不比網址**：raw 是節錄，同一個網址常有好幾份——9856.HK 引了招股書的一段節錄，10-20 入圖的
+    是同一份招股書的另一段（LPO、LRO 在那裡，敘事沒寫）；3110.T、KSHINTL.NS 檔名不同、邊的逐字就在敘事引的檔裡（讀過）。
+    `docs` 只列 `since` 之後寫入的那幾份（要去讀的）。寫入時間讀不懂的當作新的（往看得見那邊倒，INV-3）。
+    順序：最早寫入時間、再依邊——不是名次。"""
+    since = since if since.tzinfo is not None else since.replace(tzinfo=timezone.utc)
+    by_edge: dict[tuple[str, str, str], list[Mapping[str, Any]]] = {}
+    for a in assertions:
+        by_edge.setdefault((str(a.get("src")), str(a.get("relation")), str(a.get("dst"))), []).append(a)
+    out: list[dict[str, Any]] = []
+    for key, rows in by_edge.items():
+        new = [(r, _written_at(r.get("updated_at"))) for r in rows]
+        new = [(r, t) for r, t in new if t is None or t > since]
+        if not new or key in cited.edges:
+            continue
+        if any(_read(r, cited, cited_text) for r in rows):
+            continue
+        stamps = [t for _, t in new if t is not None]
+        out.append({"src": key[0], "relation": key[1], "dst": key[2],
+                    "at": min(stamps).isoformat() if stamps else None,
+                    "docs": sorted({str(r.get("doc_id")) for r, _ in new if r.get("doc_id")})})
+    return sorted(out, key=lambda e: (e["at"] or "", e["src"], e["relation"], e["dst"]))
+
+
+def new_edge_reason(edge: Mapping[str, Any]) -> str:
+    """`rewrite[]` 那一條：哪條邊、哪天寫入、要讀哪幾份文件（L18：標籤指得回原始證據）。"""
+    day = str(edge.get("at") or "")[:10] or "時間不明"
+    docs = "、".join(edge.get("docs") or ()) or "不明"
+    return f"{NEW_EDGES_PREFIX}：{edge.get('src')} -{edge.get('relation')}-> {edge.get('dst')}（{day} 寫入；文件 {docs}）"
+
+
+def rides_reason(ride: Mapping[str, Any]) -> str:
+    """`rewrite[]` 那一條：騎的那份讀圖、它在哪一格、現行是哪一份。"""
+    return (f"{RIDES_SUPERSEDED_PREFIX}：{ride.get('reading_id')}（{ride.get('node')}；"
+            f"現行 {ride.get('current_reading_id') or '不明'}）")
+
+
 def _signed_pct(value: float) -> str:
     return f"{value * 100:+.1f}%".replace("-", "−")
 
@@ -377,7 +508,9 @@ def assemble_board(rows: Sequence[Mapping[str, Any] | None], *, universe: Sequen
 
 
 __all__ = ["ANSWER_WORDS", "CANDIDATES_THIS_IS_NOT", "GROUPS", "GROUP_LABELS", "IN_NUMBERS_LINES", "LIGHT_ORDER",
-           "LIGHT_WORDS", "LIST_GROUPS", "LIST_GROUP_LABELS", "PRICED_IN_LINES", "REWRITE_STATE_WORDS", "REWRITE_WHY",
-           "SIDE_GROUPS", "SIDE_LABELS", "UNANSWERED",
-           "WIPEOUT_LINES", "assemble_board", "cap_label", "held_index", "judgment_version", "priced_judgment_key",
-           "priced_since", "rewrite_words", "rollup", "stall_since", "stall_version", "three_words"]
+           "LIGHT_WORDS", "LIST_GROUPS", "LIST_GROUP_LABELS", "NEW_EDGES_PREFIX", "PRICED_IN_LINES",
+           "REWRITE_STATE_WORDS", "REWRITE_WHY", "RIDES_SUPERSEDED_PREFIX", "SIDE_GROUPS", "SIDE_LABELS", "UNANSWERED",
+           "WIPEOUT_LINES", "Cited", "assemble_board", "body_key", "body_version", "cap_label", "cited_identities",
+           "held_index", "judgment_version", "new_edge_reason", "normalize_url", "priced_judgment_key", "priced_since",
+           "rewrite_words", "rides_reason", "rollup", "squash", "stall_since", "stall_version", "three_words",
+           "unread_new_edges"]

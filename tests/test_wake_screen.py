@@ -249,7 +249,7 @@ def test_ledger_has_its_own_cell_for_held_wakes() -> None:
     held = _reading_watch("pending", "likely_unrelated")
     rows = {r.key: r for r in todo_ledger.collect(
         today=date(2026, 10, 27), leads_store={"leads": {}}, watches=[held], todo_items=[], hypotheses=[],
-        briefs=None, current_readings=None, reading_needs_reread=0, layer_note_reread=0, candidates=None,
+        briefs=None, reading_needs_reread=0, layer_note_reread=0, candidates=None,
         thesis_due=None, loaders={"classification_gaps": lambda: [], "undisposed": lambda: []})}
     assert rows["todo.wake_hold"].count == 1 and "預篩標無關 1" in rows["todo.wake_hold"].work
     assert rows["todo.semantic"].count == 0

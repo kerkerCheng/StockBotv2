@@ -199,7 +199,10 @@ fetchers/{edgar,mops,mfn,rns}.py ↑      engine_c/etl_yfinance.py → SQLite
 
 > **2026-10-22（使用者「要確保以後的東西都不會被計數漏掉」）待做清單**：短版 ⑤ 與段 3 開頭共用 `engine_b/todo_ledger.py`
 > 的十八格（心跳算一次、計數進快照 `todo.*`）。計數一律呼叫既有的唯一判定（佇列段、分類缺口、影響對照、到期計數…），新增的
-> 只有「接不上的等待」三種與「騎舊讀圖」。**涵蓋登記表 `COVERAGE`**：lead、佇列段、watch、到期類型、pq2 派工、假說、thesis、
+> 只有「接不上的等待」三種與「騎舊讀圖」（2026-10-29 起騎舊讀圖與「新邊沒讀」都由候選板 `derive_row` 算，⑤ 讀整板清單的
+> `kind=rides／new_edges`——候選板是唯一 owner；新邊沒讀＝正文最後一次改動後公司有新邊、敘事沒讀過那條邊的任何一份來源，
+> 「讀過」比文件 id、直接引的網址與邊的逐字在不在敘事引的 raw 檔裡，assertion 與逐字由 `query/company_assertions.py` 唯讀取出）。
+> **涵蓋登記表 `COVERAGE`**：lead、佇列段、watch、到期類型、pq2 派工、假說、thesis、
 > 候選組、讀圖狀態的每一個值都登記去處（⑤ 的格，或 ③／等事件／機械段／終局／研究題庫／Phase plan），測試從各字彙 SSOT 列舉
 > 比對——新狀態沒登記就紅。SessionStart 的 Phase 提示與 ⑤ 最後一行「下一步貼」是同一個函式（`next_prompt`）。
 

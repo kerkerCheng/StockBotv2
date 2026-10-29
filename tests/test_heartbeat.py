@@ -403,9 +403,11 @@ def test_queue_section_injects_link_breaks_and_prints_the_rewrite_count(monkeypa
     monkeypatch.setattr(qs, "observe", spy)
     section = hb.build_queue()
     assert [b["link_source_ref"] for b in calls[0]["narrative_link_breaks"]] == [LINK["link_source_ref"]]
-    assert any(line.startswith("敘事該重寫 1（其中連結斷 1）") for line in section.lines), section.lines
+    # 這一行只數 watch 與連結斷——要標出它是子集，全部原因住 ⑤（同名兩個數，L12）
+    assert any(line.startswith("敘事該重寫 1（其中連結斷 1；只數 watch 與連結斷，全部原因看 ⑤）")
+               for line in section.lines), section.lines
     monkeypatch.setattr(disproof, "current_briefs", lambda: [])
-    assert any(line.startswith("敘事該重寫 0（其中連結斷 0）") for line in hb.build_queue().lines)
+    assert any(line.startswith("敘事該重寫 0（其中連結斷 0；") for line in hb.build_queue().lines)
 
 
 def test_unreadable_leads_file_is_not_the_same_as_an_empty_log(broken_env: dict[str, Path]) -> None:

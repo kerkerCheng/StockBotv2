@@ -94,8 +94,8 @@ def _brief(company: str, *, state: str = "missing", brief_id: str = "ib_1", tick
 
 def _collect(**over):
     params = dict(today=TODAY, leads_store={"leads": {}}, watches=[], todo_items=[], hypotheses=[], briefs=[],
-                  current_readings={}, reading_needs_reread=0, layer_note_reread=0, candidates={"counts": {}},
-                  thesis_due=[])
+                  reading_needs_reread=0, layer_note_reread=0,
+                  candidates={"counts": {}, "new_edges_check": {"status": "ok"}}, thesis_due=[])
     loaders = {"classification_gaps": lambda: [], "undisposed": lambda: [], "parked_without_expiry": lambda: [],
                "stale_lead_entities": lambda: 0, "story_gaps": lambda: []}
     loaders.update(over.pop("loaders", {}))       # 只換掉測試點名的那幾個；其餘不讀真的 ledger
@@ -148,11 +148,50 @@ def test_a_waiting_narrative_may_have_several_wake_watches() -> None:
     assert tl.orphan_wake_briefs(watches, []) == ["ew_0148", "ew_1433"]          # 沒有現行敘事（撤回）
 
 
+def _board(*items, check: str = "ok"):
+    return {"counts": {}, "narrative_rewrite": list(items), "new_edges_check": {"status": check}}
+
+
 def test_a_narrative_riding_a_superseded_reading_needs_a_rewrite() -> None:
-    ride = SimpleNamespace(node="tech:x", unit="layer", reading_id="sr_old")
-    rows = _collect(briefs=[_brief("co:a", state="pass", rides=[ride])],
-                    current_readings={("tech:x", "layer"): SimpleNamespace(reading_id="sr_new")})
-    assert rows["todo.narrative"].count == 1 and "騎舊讀圖 1" in rows["todo.narrative"].work
+    """騎舊讀圖由候選板清單帶進來（kind=rides；候選板是唯一 owner）——⑤ 不自己再讀讀圖算一份。"""
+    ride = {"kind": "rides", "ticker": "A", "company_id": "co:a", "brief_id": "ib_1", "node": "tech:x",
+            "unit": "layer", "reading_id": "sr_old", "current_reading_id": "sr_new"}
+    rows = _collect(candidates=_board(ride, dict(ride, node="tech:y")))
+    row = rows["todo.narrative"]
+    assert row.count == 1 and "騎舊讀圖 1（A）" in row.work and row.note is None   # 同一檔騎兩份舊讀圖只算一檔
+
+
+def test_new_edges_the_narrative_never_read_count_once_per_company_and_name_it() -> None:
+    """敘事 stale ③：正文寫完後圖上有新邊、敘事沒讀過——點名是哪幾檔（drain 照名字去改）；同一檔同時有 watch 醒
+    與新邊沒讀只算一檔。"""
+    brief_watch = {"watch_id": "ew_2", "status": "fired", "kind": "semantic_condition", "source_ref": "brief:ib_1#1",
+                   "disproof_ref": "brief:ib_1#1", "woken_by": {"at": "2026-10-21T00:00:00+00:00"}}
+    edges = {"kind": "new_edges", "ticker": "T", "company_id": "co:a", "brief_id": "ib_1",
+             "edges": [{"src": "co:a", "relation": "SUPPLIES", "dst": "co:b", "at": "2026-10-20", "docs": ["d1"]}]}
+    other = dict(edges, ticker="B", company_id="co:b", brief_id="ib_2")
+    row = _collect(watches=[brief_watch], briefs=[_brief("co:a")], candidates=_board(edges, other))["todo.narrative"]
+    assert row.count == 2 and "新邊沒讀 2（B、T）" in row.work and "watch 醒 1 條" in row.work
+
+
+def test_kinds_the_ledger_does_not_own_are_not_counted_twice() -> None:
+    """連結斷與 watch 待重寫 ⑤ 自己由 watch registry 算；候選板清單裡的同一件事不再加一次。"""
+    board = _board({"kind": "link", "ticker": "A", "company_id": "co:a"},
+                   {"kind": "watch", "ticker": "A", "company_id": "co:a", "watch_id": "ew_1"})
+    assert _collect(candidates=board)["todo.narrative"].count == 0
+
+
+@pytest.mark.parametrize("candidates, note", [
+    (None, "候選板未讀到——騎舊讀圖、新邊沒讀、前提失效沒算進來"),
+    ({"counts": {}, "narrative_rewrite": [], "new_edges_check": {"status": "unavailable", "reason": "SystemExit"}},
+     "新邊沒讀這次沒算（候選板沒讀到圖）"),
+    ({"counts": {}, "narrative_rewrite": []}, "新邊沒讀這次沒算（候選板沒讀到圖）"),   # 改版前的舊 artifact
+])
+def test_new_edges_not_checked_is_said_not_printed_as_zero(candidates, note) -> None:
+    """圖或候選板讀不到時「新邊沒讀」是沒算，不是 0（INV-3）——而且**印出來**：0 的格也帶著註記。"""
+    rows = _collect(candidates=candidates)
+    assert rows["todo.narrative"].count == 0 and rows["todo.narrative"].note == note
+    zero_line = tl.render_cells(list(rows.values()))[1]
+    assert f"敘事該重寫（{note}）" in zero_line
 
 
 def test_an_unreadable_source_is_none_not_zero() -> None:

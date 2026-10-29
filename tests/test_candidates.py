@@ -77,10 +77,12 @@ SELF = {"condition": "若 JX 在 2026-12-31 前宣布新產能投產則供給缺
         "action_48h": "重寫", "entities": [CO], "expires": "2027-03-01", "source": "self", "link_source_ref": None}
 
 
-def _derive(records, *, rows=None, watches=(), edge=EDGE, tq=_DEFAULT, held=HELD_NONE, lifecycle=None, note=None):
+def _derive(records, *, rows=None, watches=(), edge=EDGE, tq=_DEFAULT, held=HELD_NONE, lifecycle=None, note=None,
+            assertions=None, raw_text=None):
     return derive_row(T, CO, records=records, today=TODAY, reading_rows=rows or _rows(), watches=list(watches),
                       lifecycle={} if lifecycle is None else lifecycle, edge=edge,
-                      three_questions=_tq() if tq is _DEFAULT else tq, held=held, three_questions_note=note)
+                      three_questions=_tq() if tq is _DEFAULT else tq, held=held, three_questions_note=note,
+                      company_assertions=assertions, raw_text=raw_text)
 
 
 def _active(wid, **kw):
@@ -605,3 +607,181 @@ def test_rides_carry_chinese_unit_and_kind_labels_from_the_reading_vocabulary() 
     assert ride["unit_label"] == "層" and ride["kind_label"] == READING_KINDS["volume"].split("——")[0]
     gone = _derive([brief], rows={("tech:other", "layer"): {"reading_id": "sr_z"}})["rides"][0]
     assert gone["status"] == "not_found" and gone["kind_label"] is None and gone["unit_label"] == "層"
+
+
+# ---------------------------------------------------------------------------
+# 敘事落後於讀圖與圖（ROADMAP「敘事 stale 計數器」①③，2026-10-29）：候選板是唯一 owner，心跳 ⑤ 讀它的清單
+# ---------------------------------------------------------------------------
+
+NEW_READ = "sr_" + "b" * 16
+
+
+def _version(*, days_ago, supersedes=None, refs=("graph://x",), our_bet="賭層的量。", ride=READ):
+    slots = {k: {**v, "evidence_refs": list(refs)} for k, v in _slots().items()}
+    slots["our_bet"]["text"] = our_bet
+    rec = brief_record(company_id=CO, ticker=T, slots=slots, record_version=RECORD_VERSION_V2,
+                       rides=[{"node": "tech:x", "unit": "layer", "reading_id": ride}],
+                       answers={"priced_in": "yes", "in_numbers": "yes"},
+                       candidate_state={"state": "pass", "watch_id": None, "reason": "貴"}, supersedes_id=supersedes,
+                       created_at=datetime(2026, 9, 29, 3, tzinfo=timezone.utc) - timedelta(days=days_ago))
+    return parse_brief_record(rec)
+
+
+def _assertion(at, *, doc="doc_new", url=None, relation="supplies_to", dst="co:cust"):
+    return {"src": CO, "relation": relation, "dst": dst, "updated_at": at, "doc_id": doc, "url": url}
+
+
+def test_the_body_version_skips_rerides_but_not_a_rewritten_slot() -> None:
+    """換騎包裝成的新版不算重寫過正文（③ 的起點是正文最後一次改動，不是最新一版的日期）。"""
+    from alpha.candidates import body_version
+
+    v1 = _version(days_ago=5)
+    reride = _version(days_ago=1, supersedes=v1.brief_id, ride=NEW_READ)
+    assert body_version([v1, reride], reride).brief_id == v1.brief_id
+    rewritten = _version(days_ago=0, supersedes=reride.brief_id, ride=NEW_READ, our_bet="賭層的量，第二家客戶也來了。")
+    assert body_version([v1, reride, rewritten], rewritten).brief_id == rewritten.brief_id
+
+
+@pytest.mark.parametrize("url, expected", [
+    ("https://www.Example.com/IR/a.pdf#page=3", "example.com/IR/a.pdf"), ("http://example.com/", "example.com"),
+    ("https://example.com/x.", "example.com/x"), ("ftp://example.com/x", None), (None, None),
+    ("library/raw/x.txt", None),
+])
+def test_urls_are_compared_without_scheme_www_anchor_or_trailing_slash(url, expected) -> None:
+    from alpha.candidates import normalize_url
+
+    assert normalize_url(url) == expected
+
+
+def test_cited_identities_read_every_ref_form() -> None:
+    from alpha.candidates import cited_identities
+
+    brief = _version(days_ago=0, refs=("graph://source/doc_a", f"graph://edge/{CO}/supplies_to/co:cust",
+                                       "library/raw/nittobo_2026.txt", "https://www.x.com/p#s"))
+    cited = cited_identities(brief)
+    assert cited.docs == {"doc_a", "nittobo_2026"} and cited.urls == {"x.com/p"}
+    assert cited.edges == {(CO, "supplies_to", "co:cust")} and cited.raw_refs == ("library/raw/nittobo_2026.txt",)
+
+
+def test_unread_new_edges_count_only_edges_the_narrative_never_read() -> None:
+    """以邊為單位：任何一筆來源讀過（doc id、直接引的網址，或逐字在敘事引的 raw 檔裡）、或直接引了那條邊＝讀過；
+    同一輪先寫敘事再入圖的不算落後（2026-10-29 量測 4 份）；時間讀不懂的當新的。"""
+    from alpha.candidates import Cited, squash, unread_new_edges
+
+    since = datetime(2026, 10, 1, tzinfo=timezone.utc)
+    cited = Cited(frozenset({"doc_cited"}), frozenset({"n.com/page"}), frozenset({(CO, "competes_with", "co:rival")}),
+                  ("library/raw/excerpt_a.txt",))
+    text = squash("…NER ガラスの需要は AI サーバー向けで\n非常に伸びており…")          # 敘事引的那份節錄
+    rows = [
+        _assertion("2026-10-10T00:00:00+00:00", doc="doc_new", url="https://n.com/1", dst="co:new"),
+        _assertion("2026-09-01T00:00:00+00:00", doc="doc_old", dst="co:old"),                    # 舊邊
+        _assertion("2026-09-01T00:00:00+00:00", doc="doc_cited", dst="co:same_round"),           # 舊來源引過…
+        _assertion("2026-10-02T00:00:00+00:00", doc="doc_more", dst="co:same_round"),            # …同一條邊的新來源不算
+        _assertion("2026-10-03T00:00:00+00:00", doc="doc_page", url="https://www.n.com/page/", dst="co:page"),
+        _assertion("2026-10-04T00:00:00+00:00", doc="doc_x", relation="competes_with", dst="co:rival"),
+        _assertion("not a time", doc="doc_bad", dst="co:bad"),
+        _assertion("2026-10-05T00:00:00", doc="doc_naive", dst="co:naive"),                      # 沒時區＝UTC
+        _assertion("2026-09-30T23:00:00", doc="doc_naive_old", dst="co:naive_old"),
+        # 3110.T 型：圖上另一個名字，逐字就在敘事引的檔裡（空白、換行不算差別）＝讀過
+        dict(_assertion("2026-10-06T00:00:00+00:00", doc="graph_name", dst="co:renamed"),
+             quotes=["NER ガラスの需要は AI サーバー向けで 非常に伸びており"]),
+        # 9856.HK 型：同一份招股書的另一段節錄，逐字不在敘事引的檔裡＝沒讀過（比網址會當成讀過）
+        dict(_assertion("2026-10-07T00:00:00+00:00", doc="other_excerpt", dst="co:lpo"),
+             quotes=["We offer 1.6T optical transceivers in three primary architectural approaches"]),
+        dict(_assertion("2026-10-08T00:00:00+00:00", doc="doc_blank", dst="co:blank"), quotes=["  \n "]),  # 空逐字不算
+    ]
+    out = unread_new_edges(rows, since=since, cited=cited, cited_text=text)
+    assert [(e["dst"], e["at"], e["docs"]) for e in out] == [
+        ("co:bad", None, ["doc_bad"]), ("co:naive", "2026-10-05T00:00:00+00:00", ["doc_naive"]),
+        ("co:lpo", "2026-10-07T00:00:00+00:00", ["other_excerpt"]),
+        ("co:blank", "2026-10-08T00:00:00+00:00", ["doc_blank"]),
+        ("co:new", "2026-10-10T00:00:00+00:00", ["doc_new"])]
+    # 沒給 raw 全文（讀不到檔）：比不到逐字的那一條照列——往看得見那邊倒
+    assert "co:renamed" in [e["dst"] for e in unread_new_edges(rows, since=since, cited=cited)]
+
+
+def test_raw_text_stays_inside_the_raw_library() -> None:
+    from alpha.providers.candidates import raw_text
+
+    assert raw_text("library/raw/../../AGENTS.md") == "" and raw_text("library/raw/沒有這個檔.txt") == ""
+
+
+def test_a_row_lists_new_edges_since_the_body_was_written_and_says_not_checked_without_the_graph() -> None:
+    v1 = _version(days_ago=5)
+    reride = _version(days_ago=0, supersedes=v1.brief_id, ride=NEW_READ)     # 換騎：正文沒變，起點仍是 v1
+    middle = (datetime(2026, 9, 29, 3, tzinfo=timezone.utc) - timedelta(days=2)).isoformat()
+    rows = _rows(reading_id=NEW_READ)
+    row = _derive([v1, reride], rows=rows, assertions=[_assertion(middle)])
+    assert [e["docs"] for e in row["rewrite_new_edges"]] == [["doc_new"]]
+    assert f"圖上有新邊、敘事沒讀過：{CO} -supplies_to-> co:cust（2026-09-27 寫入；文件 doc_new）" in row["rewrite"]
+    assert row["rewrite_words"] == ["新邊沒讀"]
+    unread = _derive([v1, reride], rows=rows, assertions=None)
+    assert unread["rewrite_new_edges"] is None and unread["rewrite_words"] == []          # 沒算，不是 0
+    clean = _derive([v1, reride], rows=rows, assertions=[])
+    assert clean["rewrite_new_edges"] == [] and clean["rewrite"] == []
+
+
+def test_a_row_reads_the_cited_raw_files_to_decide_what_was_read() -> None:
+    """9856.HK（2026-10-29）：敘事引的是招股書一段節錄；同一份招股書另一段入圖的邊，逐字在節錄裡的（CW-DFB）讀過，
+    不在的（LPO）沒讀過。只讀敘事引的那幾份 raw 檔。"""
+    from alpha.candidates import squash
+
+    refs = ("library/raw/ligent_excerpt.txt",)
+    later = datetime(2026, 9, 29, 5, tzinfo=timezone.utc).isoformat()
+    seen = dict(_assertion(later, doc="ligent_full", dst="tech:cw_dfb"), quotes=["75mW and 100mW high-power CW-DFB"])
+    unseen = dict(_assertion(later, doc="ligent_full", dst="tech:lpo"), quotes=["three primary architectural approaches"])
+    calls: list[str] = []
+
+    def text(ref: str) -> str:
+        calls.append(ref)
+        return squash("…including 75mW and 100mW high-power\nCW-DFB laser chips…")
+
+    row = _derive([_version(days_ago=0, refs=refs)], assertions=[seen, unseen], raw_text=text)
+    assert [e["dst"] for e in row["rewrite_new_edges"]] == ["tech:lpo"] and calls == list(refs)
+    # 兩份檔的頭尾接起來不得湊出一段假的逐字
+    files = {"library/raw/a.txt": squash("…three primary"), "library/raw/b.txt": squash("architectural approaches…")}
+    split = _derive([_version(days_ago=0, refs=tuple(files))], assertions=[unseen], raw_text=files.__getitem__)
+    assert [e["dst"] for e in split["rewrite_new_edges"]] == ["tech:lpo"]
+
+
+def test_riding_a_superseded_reading_is_a_rewrite_reason_that_names_the_current_reading() -> None:
+    row = _derive([_brief(state="pass", reason="貴")], rows=_rows(reading_id=NEW_READ))
+    assert row["rewrite_rides"] == [{"node": "tech:x", "unit": "layer", "reading_id": READ,
+                                     "current_reading_id": NEW_READ}]
+    assert row["rewrite"] == [f"騎的讀圖已換版：{READ}（tech:x；現行 {NEW_READ}）"] and row["rewrite_words"] == ["騎舊讀圖"]
+    gone = _derive([_brief(state="pass", reason="貴")], rows={("tech:other", "layer"): {"reading_id": "sr_z"}})
+    assert gone["rewrite_rides"] == []          # 那一格沒有讀圖列＝讀不到，不是換版
+
+
+def test_the_board_list_carries_rides_and_new_edges_for_the_ledger_to_read() -> None:
+    from alpha.providers.candidates import board_rewrite
+
+    edge = {"src": CO, "relation": "supplies_to", "dst": "co:cust", "at": "2026-09-27T03:00:00+00:00", "docs": ["d"]}
+    ride = {"node": "tech:x", "unit": "layer", "reading_id": READ, "current_reading_id": NEW_READ}
+    row = {"ticker": T, "company_id": CO, "brief_id": "ib_1", "rewrite_watch_ids": [], "rewrite_rides": [ride],
+           "rewrite_new_edges": [edge]}
+    out = board_rewrite([row, dict(row, ticker="ZZZ", rewrite_rides=[], rewrite_new_edges=None)], [])
+    who = {"ticker": T, "company_id": CO, "brief_id": "ib_1"}
+    assert out == [{"kind": "rides", **who, **ride}, {"kind": "new_edges", **who, "edges": [edge]}]
+
+
+def test_load_board_reads_the_graph_once_and_says_when_it_could_not(board_env, _isolate_company_assertions,
+                                                                     monkeypatch) -> None:
+    from alpha.providers.candidates import load_board
+    from query import company_assertions
+
+    def cash():
+        return [{"ticker": "CASH", "shares": 0.0, "bucket": "CASH"}]
+
+    _isolate_company_assertions[CO] = [_assertion("2026-09-28T12:00:00+00:00")]      # ledger 那一版 09-28 00:00 寫的
+    board = load_board([T], today=TODAY, holdings_loader=cash)
+    assert board["new_edges_check"] == {"status": "ok", "reason": None}
+    assert [(b["kind"], b["ticker"]) for b in board["narrative_rewrite"]] == [("new_edges", T)]
+
+    def down():
+        raise SystemExit("請設 NEO4J_PASSWORD")          # `_graph_driver` 缺密碼丟的是 SystemExit，不是 Exception
+
+    monkeypatch.setattr(company_assertions, "load_company_assertions", down)
+    board = load_board([T], today=TODAY, holdings_loader=cash)
+    assert board["new_edges_check"]["status"] == "unavailable" and "SystemExit" in board["new_edges_check"]["reason"]
+    assert board["narrative_rewrite"] == []

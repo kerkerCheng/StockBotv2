@@ -13,12 +13,15 @@ watch registry／讀圖／Engine C／Sheet 的那一半。舊名從這裡再匯�
 from __future__ import annotations
 
 from datetime import date, datetime, timezone
+from functools import lru_cache
+from pathlib import Path
 from typing import Any, Callable, Mapping, Sequence
 
 from ..candidates import (
     ANSWER_WORDS, CANDIDATES_THIS_IS_NOT, GROUP_LABELS, GROUPS, IN_NUMBERS_LINES, PRICED_IN_LINES,
-    REWRITE_STATE_WORDS, SIDE_GROUPS, SIDE_LABELS, UNANSWERED, assemble_board, cap_label, held_index,
-    judgment_version, priced_since, rewrite_words, rollup, stall_since, stall_version, three_words,
+    REWRITE_STATE_WORDS, SIDE_GROUPS, SIDE_LABELS, UNANSWERED, assemble_board, body_version, cap_label,
+    cited_identities, held_index, judgment_version, new_edge_reason, priced_since, rewrite_words, rides_reason, rollup,
+    squash, stall_since, stall_version, three_words, unread_new_edges,
 )
 from ..narrative.contracts import RECORD_VERSION_V2, InvestorBrief, select_brief
 from ..structure_reading.contracts import READING_KINDS, READING_UNITS
@@ -30,6 +33,22 @@ def _valued(three_questions: Mapping[str, Any] | None, question: str, keys: Sequ
     （一組有值、另一組缺席），dict 會讓後一行覆蓋前一行，造成假的「前提失效」（L17：key 真的唯一嗎）。"""
     return any(r.get("key") in keys and r.get("absence_kind") is None
                for r in (three_questions or {}).get(question) or ())
+
+
+_RAW_DIR = Path(__file__).resolve().parents[2] / "library" / "raw"
+
+
+@lru_cache(maxsize=1024)
+def raw_text(ref: str) -> str:
+    """`library/raw/<檔>` 全文，`squash` 過——敘事 stale ③ 比「邊的逐字在不在敘事引過的檔裡」用。
+    檔不在、或路徑跑出 `library/raw/` 就回空字串（那一份只靠檔名比，比不到的邊照列——往看得見那邊倒）。"""
+    path = (_RAW_DIR.parent.parent / ref).resolve()
+    if _RAW_DIR.resolve() not in path.parents:
+        return ""
+    try:
+        return squash(path.read_text(encoding="utf-8", errors="replace"))
+    except OSError:
+        return ""
 
 
 def open_preconditions(brief: InvestorBrief, *, reading_rows: Mapping[tuple[str, str], Mapping[str, Any]],
@@ -194,6 +213,8 @@ def derive_row(ticker: str, company_id: str | None, *, records: Sequence[Investo
                registry: Any = None, own_history_at: Callable[..., Mapping[str, Any]] | None = None,
                bars_at: Callable[[str, date], Sequence[tuple[date, float | None]]] | None = None,
                stories: Mapping[str, Mapping[str, Any]] | None = None,
+               company_assertions: Sequence[Mapping[str, Any]] | None = None,
+               raw_text: Callable[[str], str] | None = None,
                ) -> dict[str, Any] | None:
     """一檔的候選狀態。沒有敘事、也沒有持有 → None（不上板，計數另印「無敘事」）。
 
@@ -201,7 +222,11 @@ def derive_row(ticker: str, company_id: str | None, *, records: Sequence[Investo
     **不進任何狀態判斷**；沒給就由 `shared_bet` 宣告缺席。
 
     `rewrite[]`（**每一列都算，不論宣告哪一態、落哪一組**）：連結斷了（附為什麼斷）、敘事來源 watch 醒來／觸及／
-    到期未判（plan §5 第 6 點：候選板印「敘事該重寫：<watch id> <狀態>」）、缺 X／等回落在等的 watch 已失效。"""
+    到期未判（plan §5 第 6 點：候選板印「敘事該重寫：<watch id> <狀態>」）、缺 X／等回落在等的 watch 已失效、
+    騎的讀圖已換版、圖上有新邊而敘事沒讀過那份文件（ROADMAP「敘事 stale 計數器」①③，2026-10-29——心跳 ⑤ 讀這兩種，
+    不自己再算）。`company_assertions`：這家公司在圖上的 assertion 寫入紀錄（`query.company_assertions`）；
+    None＝圖讀不到，`rewrite_new_edges` 也是 None（沒算，不是 0）。`raw_text`：敘事引的 raw 檔全文的讀法（比邊的逐字；
+    沒給＝只比文件 id、網址與直接引的邊）。"""
     from engine_b import event_watch as ew
     from engine_b.narrative_watches import blocking_for_open, link_breaks, pending_rewrite
     from engine_b.queue_segments import narrative_rewrite_state
@@ -223,6 +248,7 @@ def derive_row(ticker: str, company_id: str | None, *, records: Sequence[Investo
         # 故事層（2026-10-29）：理由的一句故事、缺 X 的短標——寫給這一版敘事的才算（敘事換版就退回印原理由）
         **_reason_story(brief if v2 else None, stories),
         "preconditions": [], "rewrite": [], "rewrite_watch_ids": [], "rewrite_words": [],
+        "rewrite_rides": [], "rewrite_new_edges": [],
         "edge": {**{k: (edge or {}).get(k) for k in ("state", "label", "reasons", "market_cap_usd", "analyst_count")},
                  "market_cap_label": cap_label((edge or {}).get("market_cap_usd"))},
         "held_source": dict(held_info) if held_info else None,
@@ -290,6 +316,22 @@ def derive_row(ticker: str, company_id: str | None, *, records: Sequence[Investo
                                       "（daily 尚未標記），該重寫")
             elif w.get("status") != "active":
                 row["rewrite"].append(f"{GROUP_LABELS[cs.state]}在等的 watch 已 {w.get('status')}，該重寫")
+    # 敘事落後於讀圖與圖（ROADMAP「敘事 stale 計數器」①③，2026-10-29）：①騎的讀圖那一格現行已是另一份；
+    # ③正文最後一次改動之後，圖上這家公司多了敘事沒讀過的邊（以邊為單位；比文件 id、直接引的網址與邊的逐字）。
+    row["rewrite_rides"] = [
+        {"node": r["node"], "unit": r["unit"], "reading_id": r["reading_id"],
+         "current_reading_id": (reading_rows.get((r["node"], r["unit"])) or {}).get("reading_id")}
+        for r in row["rides"] if r.get("status") == "superseded"]
+    row["rewrite"].extend(rides_reason(r) for r in row["rewrite_rides"])
+    if company_assertions is None:
+        row["rewrite_new_edges"] = None
+    else:
+        cited = cited_identities(brief)
+        # 檔與檔之間放一個逐字裡不會有的字，免得兩份檔的頭尾接起來湊出一段假的逐字
+        text = "\x00".join(raw_text(ref) for ref in cited.raw_refs) if raw_text is not None else ""
+        row["rewrite_new_edges"] = unread_new_edges(company_assertions, since=body_version(records, brief).created_at,
+                                                    cited=cited, cited_text=text)
+        row["rewrite"].extend(new_edge_reason(e) for e in row["rewrite_new_edges"])
     row["rewrite_words"] = rewrite_words(row["rewrite"])
     since = stall_since(records, brief)
     row["since"] = since.isoformat()
@@ -415,13 +457,20 @@ def board_rewrite(rows: Sequence[Mapping[str, Any] | None], breaks: Sequence[Map
                   brief_company: Mapping[str, str] | None = None) -> list[dict[str, Any]]:
     """整板「敘事該重寫」清單：連結斷了（全部現行 v2 敘事，`link_breaks`）＋各列的敘事來源 watch 待重寫
     ＋**沒有列帶著的**待重寫 watch（現行敘事已撤回、是 v1、或根本沒有敘事——那家公司不在板上或那一列不是 v2，
-    watch 仍在 narrative_rewrite 段；3.6 覆核：只收現行 v2 列會讓它們在板上消失、audit 卻報「那一列沒帶著」）。"""
+    watch 仍在 narrative_rewrite 段；3.6 覆核：只收現行 v2 列會讓它們在板上消失、audit 卻報「那一列沒帶著」）
+    ＋騎舊讀圖（`kind=rides`，一份讀圖一筆）＋新邊沒讀（`kind=new_edges`，一家公司一筆、帶邊與要讀的文件）——
+    心跳 ⑤「敘事該重寫」讀這份清單的後兩種，不自己再算（ROADMAP「敘事 stale 計數器」同源，2026-10-29）。"""
     from engine_b.queue_segments import narrative_rewrite_state
 
     out = [{"kind": "link", **dict(b)} for b in breaks]
     carried: set[str] = set()
     by_id = {str(w.get("watch_id")): w for w in watches}
     for row in rows:
+        who = {"ticker": (row or {}).get("ticker"), "company_id": (row or {}).get("company_id"),
+               "brief_id": (row or {}).get("brief_id")}
+        out.extend({"kind": "rides", **who, **dict(ride)} for ride in (row or {}).get("rewrite_rides") or ())
+        if (row or {}).get("rewrite_new_edges"):
+            out.append({"kind": "new_edges", **who, "edges": [dict(e) for e in row["rewrite_new_edges"]]})
         for wid in (row or {}).get("rewrite_watch_ids") or ():
             carried.add(str(wid))
             state = narrative_rewrite_state(by_id.get(str(wid)) or {})
@@ -525,12 +574,28 @@ def candidate_context(tickers: Sequence[str], *, today: date | None = None,
         stories, _story_errors = current_stories()
     except Exception:  # noqa: BLE001 — 故事 ledger 讀不到只讓理由照印原文
         stories = {}
+    # 敘事 stale ③（2026-10-29）：每家公司在圖上的 assertion 寫入紀錄。讀不到＝整板宣告「新邊沒讀沒算」（不是 0，INV-3）
+    try:
+        from query.company_assertions import load_company_assertions
+
+        company_assertions, assertions_note = load_company_assertions(), None
+    except (Exception, SystemExit) as exc:  # noqa: BLE001 — `_graph_driver` 缺密碼丟 SystemExit；只讓 ③ 宣告沒算
+        company_assertions, assertions_note = None, f"{type(exc).__name__}: {str(exc)[:80]}"
     return {"today": today, "registry": registry, "universe": universe, "extra": extra, "watches": watches,
             "lifecycle": lifecycle, "reading_rows": reading_rows, "reading_errors": list(reading_errors),
             "retracted_cells": retracted_cells,
             "held": held, "edges": edge_states(sorted(set(universe) | set(extra))),
             "ledger_present": ledger_present, "ledger_tickers": ledger_tickers,
-            "bets": bet_index(structure, seats_from_edges(graph_edges)), "stories": stories}
+            "bets": bet_index(structure, seats_from_edges(graph_edges)), "stories": stories,
+            "company_assertions": company_assertions, "company_assertions_note": assertions_note}
+
+
+def assertions_for(context: Mapping[str, Any], company_id: str | None) -> list[Mapping[str, Any]] | None:
+    """一家公司的 assertion 寫入紀錄；context 沒讀到圖（或沒帶這個鍵）＝None——`derive_row` 就不算 ③，不是 0。"""
+    index = context.get("company_assertions")
+    if index is None:
+        return None
+    return list(index.get(str(company_id), ())) if company_id else []
 
 
 _OVER_EDGE = {"cap_over_edge": "市值", "coverage_over_edge": "分析師家數"}
@@ -588,7 +653,8 @@ def page_input(context: Mapping[str, Any], ticker: str, company_id: str | None, 
                      edge=(context.get("edges") or {}).get(str(ticker).upper()), three_questions=three_questions,
                      held=context["held"], three_questions_note=three_questions_note,
                      bets=context.get("bets"), registry=context.get("registry"),
-                     stories=context.get("stories"))
+                     stories=context.get("stories"),
+                     company_assertions=assertions_for(context, company_id), raw_text=raw_text)
     brief = select_brief(records, as_of=None, today=today)
     v2 = brief if brief is not None and brief.record_version == RECORD_VERSION_V2 else None
     words = (row["three_words"] if row is not None else
@@ -685,7 +751,8 @@ def load_board(tickers: Sequence[str], *, today: date | None = None,
         row = derive_row(ticker, cid, records=records, today=today, reading_rows=reading_rows,
                          watches=watches, lifecycle=lifecycle, edge=edges.get(ticker), three_questions=tq,
                          held=held, three_questions_note=note, bets=bets, registry=registry,
-                         own_history_at=own_history_at, bars_at=adjusted_bars, stories=ctx.get("stories"))
+                         own_history_at=own_history_at, bars_at=adjusted_bars, stories=ctx.get("stories"),
+                         company_assertions=assertions_for(ctx, cid), raw_text=raw_text)
         rows.append(row)
         if row is None:
             no_narrative.append({"ticker": ticker, "company_id": cid,
@@ -706,6 +773,9 @@ def load_board(tickers: Sequence[str], *, today: date | None = None,
                                                            watches=watches, company_ticker=company_ticker,
                                                            brief_company=brief_company))
     board["no_narrative"] = no_narrative
+    # ③ 算了沒有（INV-3）：圖讀不到時「新邊沒讀」是沒算，心跳 ⑤ 照這一格印「未算」，不印成 0
+    board["new_edges_check"] = {"status": "ok" if ctx.get("company_assertions") is not None else "unavailable",
+                                "reason": ctx.get("company_assertions_note")}
     board["rollup"] = rollup({t: tq_by_ticker[t] for t in board_universe},
                              {t: edges.get(t) or {} for t in board_universe}, not_read_reasons=tq_notes)
     board["ledger"] = {"present": ledger_present, "tickers": len(ledger_tickers), "parse_errors": len(parse_errors),
@@ -718,6 +788,7 @@ def load_board(tickers: Sequence[str], *, today: date | None = None,
 
 
 __all__ = ["ANSWER_WORDS", "CANDIDATES_THIS_IS_NOT", "GROUPS", "GROUP_LABELS", "SIDE_GROUPS", "SIDE_LABELS",
-           "UNANSWERED", "assemble_board", "bet_index", "board_rewrite", "candidate_context", "derive_row", "held_index",
+           "UNANSWERED", "assemble_board", "assertions_for", "bet_index", "board_rewrite", "candidate_context",
+           "derive_row", "held_index", "raw_text",
            "knowable_bar_day", "load_board", "open_preconditions", "page_input", "rollup", "shared_bet", "stall_since",
            "three_words"]

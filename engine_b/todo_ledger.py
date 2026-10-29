@@ -163,7 +163,8 @@ COVERAGE: Mapping[str, str] = {
     "lead:requires_user_without_pq2": "todo.broken_waits",
     "watch:orphan_wake_brief": "todo.broken_waits",
     "hypothesis:active_without_watch": "todo.broken_waits",
-    "brief:rides_superseded_reading": "todo.narrative",
+    "brief:rides_superseded_reading": "todo.narrative",   # 候選板清單 kind=rides（候選板是唯一 owner，2026-10-29）
+    "brief:new_edges_unread": "todo.narrative",           # 候選板清單 kind=new_edges：正文寫完後圖上有新邊、敘事沒讀過
     "brief:link_break": "todo.narrative",
     "registry:stale_lead_entities": "todo.registry_rescan",
     "thesis:due_not_minted": "todo.thesis_due",
@@ -257,15 +258,9 @@ def orphan_wake_briefs(watches: Iterable[Mapping[str, Any]], briefs: Iterable[An
                   if w.get("wake_brief") and w.get("status") == "active" and str(w.get("wake_brief")) not in waiting)
 
 
-def rides_superseded(briefs: Iterable[Any], current_readings: Mapping[tuple[str, str], Any]) -> list[str]:
-    """現行敘事騎的讀圖已被同節點同單位的新版取代（騎的是舊讀圖；10-22 盤點 AAOI 一檔）。"""
-    out = set()
-    for brief in briefs:
-        for ride in getattr(brief, "rides", ()) or ():
-            current = current_readings.get((str(ride.node), str(ride.unit)))
-            if current is not None and str(getattr(current, "reading_id", "")) != str(ride.reading_id):
-                out.add(str(getattr(brief, "company_id", "") or getattr(brief, "ticker", "")))
-    return sorted(out)
+#: 候選板清單裡「敘事落後」的兩種（`alpha.providers.candidates.board_rewrite`）→ ⑤ 工作描述的字。
+#: 候選板是唯一 owner（ROADMAP「敘事 stale 計數器」同源，2026-10-29）：⑤ 只讀它的清單，不自己再算一份。
+BEHIND_KINDS: Mapping[str, str] = {"rides": "騎舊讀圖", "new_edges": "新邊沒讀"}
 
 
 def _narrative_companies(watches: Sequence[Mapping[str, Any]], briefs: Sequence[Any]) -> dict[str, list[str]]:
@@ -289,7 +284,7 @@ def _narrative_companies(watches: Sequence[Mapping[str, Any]], briefs: Sequence[
 
 def collect(*, today: date, leads_store: Mapping[str, Any], watches: Sequence[Mapping[str, Any]],
             todo_items: Sequence[Mapping[str, Any]], hypotheses: Sequence[Mapping[str, Any]],
-            briefs: Sequence[Any] | None, current_readings: Mapping[tuple[str, str], Any] | None,
+            briefs: Sequence[Any] | None,
             reading_needs_reread: int | None, layer_note_reread: int | None,
             candidates: Mapping[str, Any] | None, thesis_due: Sequence[str] | None,
             loaders: Mapping[str, Callable[[], Any]] | None = None) -> list[LedgerCount]:
@@ -390,23 +385,33 @@ def collect(*, today: date, leads_store: Mapping[str, Any], watches: Sequence[Ma
         for row in breaks:
             who = str(row.get("company_id") or row.get("ticker") or row.get("brief_id") or "?")
             companies.setdefault(who, []).append("連結斷")
-        rides = rides_superseded(briefs or (), current_readings or {}) if current_readings is not None else []
-        for ticker in rides:
-            companies.setdefault(ticker, []).append("騎舊讀圖")
+        # 騎舊讀圖、新邊沒讀：讀候選板的清單（唯一 owner），點名是哪幾檔——drain 照名字去改（INV-4：指得出 consumer）
+        behind: dict[str, set[str]] = {kind: set() for kind in BEHIND_KINDS}
+        for item in (candidates or {}).get("narrative_rewrite") or ():
+            kind = str(item.get("kind"))
+            if kind in BEHIND_KINDS:
+                companies.setdefault(str(item.get("company_id") or item.get("ticker")), []).append(BEHIND_KINDS[kind])
+                behind[kind].add(str(item.get("ticker")))
         counts = (candidates or {}).get("counts") or {}
         board = [f"{k} {counts.get(k)}" for k in ("precondition_failed", "legacy", "not_multiple") if counts.get(k)]
         extra = sum(int(counts.get(k) or 0) for k in ("precondition_failed", "legacy", "not_multiple"))
         watch_n = sum(1 for ids in companies.values() for i in ids if i.startswith("ew_"))
         stamps = [_woken_at(w) for w in watches if qs.classify_watch(w) == "narrative_rewrite"]
         bits = [f"watch 醒 {watch_n} 條"] if watch_n else []
-        if rides:
-            bits.append(f"騎舊讀圖 {len(rides)}")
+        bits += [f"{BEHIND_KINDS[k]} {len(names)}（{'、'.join(sorted(names))}）" for k, names in behind.items() if names]
         if breaks:
             bits.append(f"連結斷 {len(breaks)}")
         bits += [{"precondition_failed": "前提失效", "legacy": "舊版", "not_multiple": "非邊緣仍有敘事"}[b.split()[0]]
                  + " " + b.split()[1] for b in board]
+        # 沒讀到不是 0（INV-3）：候選板讀不到，後三種都沒算進來；圖讀不到，新邊沒讀沒算
+        if candidates is None:
+            note = "候選板未讀到——騎舊讀圖、新邊沒讀、前提失效沒算進來"
+        elif (candidates.get("new_edges_check") or {}).get("status") != "ok":
+            note = "新邊沒讀這次沒算（候選板沒讀到圖）"
+        else:
+            note = None
         put("todo.narrative", len(companies) + extra, work="；".join(bits) or None,
-            oldest_days=_oldest(stamps, today))
+            oldest_days=_oldest(stamps, today), note=note)
 
     guarded("todo.narrative", narrative)
     put("todo.reading", reading_needs_reread)
@@ -508,13 +513,14 @@ def collect(*, today: date, leads_store: Mapping[str, Any], watches: Sequence[Ma
 # ---------------------------------------------------------------------------
 
 def render_cells(counts: Sequence[LedgerCount]) -> list[str]:
-    """⑤ 兩行：非 0 的逐格（附工作量與最老天數）；0 的只列名字（每格都要出現——L14 常駐）；未讀到的另列。"""
+    """⑤ 兩行：非 0 的逐格（附工作量與最老天數）；0 的列名字（每格都要出現——L14 常駐）、有註記的照帶
+    （「新邊沒讀這次沒算」在 0 的時候吞掉，就和真的 0 同形——INV-3）；未讀到的另列。"""
     live, zero, unread = [], [], []
     for row in counts:
         if row.count is None:
             unread.append(row.label)
         elif row.count == 0:
-            zero.append(row.label)
+            zero.append(row.label + (f"（{row.note}）" if row.note else ""))
         else:
             unit = LEDGER_BY_KEY[row.key].unit
             bits = [b for b in (row.work, f"最老 {row.oldest_days} 天" if row.oldest_days else None, row.note) if b]
@@ -552,6 +558,6 @@ def next_prompt(counts: Sequence[LedgerCount] | Mapping[str, int | None], *, dec
     return "；然後 ".join(parts) if parts else "今天沒有要貼的（研究計數全 0、③ 沒有待決、Phase 沒有下一步）"
 
 
-__all__ = ["COVERAGE", "DESTINATIONS", "LEDGER", "LEDGER_BY_KEY", "LEDGER_KEYS", "LedgerCount", "LedgerRow",
-           "active_hypotheses_without_watch", "collect", "destination_label", "next_prompt", "orphan_wake_briefs",
-           "render_cells", "requires_user_without_pq2", "rides_superseded"]
+__all__ = ["BEHIND_KINDS", "COVERAGE", "DESTINATIONS", "LEDGER", "LEDGER_BY_KEY", "LEDGER_KEYS", "LedgerCount",
+           "LedgerRow", "active_hypotheses_without_watch", "collect", "destination_label", "next_prompt",
+           "orphan_wake_briefs", "render_cells", "requires_user_without_pq2"]
