@@ -597,6 +597,7 @@ def get_wipeout_inputs(ticker: str, *, conn=None) -> dict:
         if base.get("status") == "unavailable":
             return {"ticker": ticker, "status": "unavailable", "reason": "Engine C 快照讀取失敗"}
         financial = {key: base.get(key) for key in _RUNWAY_INPUT_KEYS}
+        financial["operating_cash_flow_ttm"] = base.get("operating_cash_flow_ttm")
         # `derive_runway` 要求 as_of 帶時區；快照存的是日期。補成當日 UTC 午夜，不改變語意。
         financial["source"] = base.get("source")
         financial["as_of"] = (f"{base['as_of']}T00:00:00+00:00" if base.get("as_of") else None)
@@ -683,7 +684,7 @@ def get_probe_financial_baseline(ticker: str, *, conn=None) -> dict:
                 cursor.execute(
                     """
                     SELECT snapshot_date, cash_and_equivalents, total_debt,
-                           free_cash_flow_ttm, fetched_at
+                           free_cash_flow_ttm, fetched_at, operating_cash_flow_ttm
                     FROM financial_snapshots
                     WHERE ticker = %s
                     ORDER BY snapshot_date DESC, fetched_at DESC
@@ -696,7 +697,7 @@ def get_probe_financial_baseline(ticker: str, *, conn=None) -> dict:
             row = connection.execute(
                 """
                 SELECT snapshot_date, cash_and_equivalents, total_debt,
-                       free_cash_flow_ttm, fetched_at
+                       free_cash_flow_ttm, fetched_at, operating_cash_flow_ttm
                 FROM financial_snapshots
                 WHERE ticker = ?
                 ORDER BY snapshot_date DESC, fetched_at DESC
@@ -716,6 +717,8 @@ def get_probe_financial_baseline(ticker: str, *, conn=None) -> dict:
             "fetched_at": str(values[4]),
             "source": "yfinance.info",
         }
+        # 營業現金流（2026-10-29）：不是跑道的必要輸入（缺了照判、燈說分不出本業燒錢還是擴產），所以不進 status 判定。
+        result["operating_cash_flow_ttm"] = values[5] if len(values) > 5 else None
         result["status"] = (
             "observed"
             if all(result[key] is not None for key in _RUNWAY_INPUT_KEYS)

@@ -18,7 +18,7 @@ from typing import Any, Callable, Mapping, Sequence
 from ..candidates import (
     ANSWER_WORDS, CANDIDATES_THIS_IS_NOT, GROUP_LABELS, GROUPS, IN_NUMBERS_LINES, PRICED_IN_LINES,
     REWRITE_STATE_WORDS, SIDE_GROUPS, SIDE_LABELS, UNANSWERED, assemble_board, cap_label, held_index,
-    judgment_version, priced_since, rollup, stall_since, stall_version, three_words,
+    judgment_version, priced_since, rewrite_words, rollup, stall_since, stall_version, three_words,
 )
 from ..narrative.contracts import RECORD_VERSION_V2, InvestorBrief, select_brief
 from ..structure_reading.contracts import READING_KINDS, READING_UNITS
@@ -100,6 +100,10 @@ def bet_index(structure: Mapping[str, Any] | None, seats: Mapping[str, Sequence[
     for node, name in (node_names or {}).items():
         if name:
             names.setdefault(str(node), str(name))
+    # 有中文名的節點用中文（2026-10-29：「是不是新賭注」印英文的錨名，使用者看不懂）；沒有的照圖上的名字
+    from alpha.node_labels import node_labels_zh
+
+    names.update({node: zh for node, zh in node_labels_zh().items() if node in names})
     return {"anchors": anchors, "anchors_absence": absence,
             "anchors_as_of": None if absence else (structure or {}).get("generated_at"),
             "layers": {str(co): list(nodes) for co, nodes in seats.items()}, "names": names}
@@ -152,12 +156,12 @@ def _shared_bet_lines(out: Mapping[str, Any], *, has_anchor: bool, has_layer: bo
     for r in out["rows"]:
         bits = []
         if r["shared_anchors"]:
-            bits.append("需求錨 " + "、".join(
+            bits.append("押同一個需求：" + "、".join(
                 f"{a['name'] or a['node']}{'（公司層）' if 'company' in a['basis'].values() else ''}"
                 for a in r["shared_anchors"]))
         if r["shared_layers"]:
-            bits.append("同一層／插槽 " + "、".join(str(n["name"] or n["node"]) for n in r["shared_layers"]))
-        lines.append(f"和持有的 {r['ticker']} 共用：" + "；".join(bits))
+            bits.append("坐同一層：" + "、".join(str(n["name"] or n["node"]) for n in r["shared_layers"]))
+        lines.append(f"和你持有的 {r['ticker']} " + "；".join(bits))
     if not out["rows"]:
         lines.append("和目前持有的 alpha 檔沒有共用的層" if out["anchors_absence"]
                      else "和目前持有的 alpha 檔沒有共用的需求錨或層")
@@ -167,9 +171,7 @@ def _shared_bet_lines(out: Mapping[str, Any], *, has_anchor: bool, has_layer: bo
         lines.append("這檔在結構表走不到任何需求錨——需求錨無從比對，只比了層")
     if not has_layer:
         lines.append("這檔在圖上沒有坐任何層或插槽——同一層無從比對")
-    as_of = str(out.get("anchors_as_of") or "")[:10]
-    if as_of and any(r["shared_anchors"] for r in out["rows"]):
-        lines.append(f"（需求錨取自 {as_of} 的結構表逐列錨）")
+    # 2026-10-29：「需求錨取自 <日期> 的結構表逐列錨」那一句不再上畫面（使用者：「太多日期很沒必要」）；日期照舊在 `anchors_as_of`。
     return lines
 
 
@@ -206,14 +208,14 @@ def derive_row(ticker: str, company_id: str | None, *, records: Sequence[Investo
         "declared_label": GROUP_LABELS.get(cs.state) if cs else None,
         "derived": None, "group": None, "side": None,
         "reason": cs.reason if cs else None,
-        "preconditions": [], "rewrite": [], "rewrite_watch_ids": [],
+        "preconditions": [], "rewrite": [], "rewrite_watch_ids": [], "rewrite_words": [],
         "edge": {**{k: (edge or {}).get(k) for k in ("state", "label", "reasons", "market_cap_usd", "analyst_count")},
                  "market_cap_label": cap_label((edge or {}).get("market_cap_usd"))},
         "held_source": dict(held_info) if held_info else None,
         "holdings_verified": held.get("status") == "ok",
         "rides": [], "watch": None, "since": None, "stall_days": None,
         # 加碼條件（Phase 7 Step 7.0d）：每條與它的 watch 狀態；觸及只提醒，不是買進訊號、不改候選狀態
-        "confirm": [],
+        "confirm": [], "confirm_summary": None,
         # 是不是新賭注（Phase 7 Step 7.0e）：和持有的 alpha 檔共用的需求錨與層——只呈現，不進任何狀態判斷
         "shared_bet": shared_bet(company_id, ticker, held=held, bets=bets, registry=registry),
         "three_words": three_words(three_questions, brief, not_read=f"未讀到（{three_questions_note}）"
@@ -247,9 +249,10 @@ def derive_row(ticker: str, company_id: str | None, *, records: Sequence[Investo
             row.update(side="legacy")
         return row
     brief_ids = [r.brief_id for r in records]
-    from engine_b.disproof import confirm_rows
+    from engine_b.disproof import confirm_rows, confirm_summary
 
     row["confirm"] = confirm_rows(brief, watches)
+    row["confirm_summary"] = confirm_summary(row["confirm"])      # 個股頁首屏只數在等的那幾條（2026-10-29）
     breaks = link_breaks([brief], watches=watches)
     row["rewrite"].extend(f"連結 {b['link_source_ref']}：{b.get('label')}" for b in breaks)
     pending = pending_rewrite(str(company_id), watches=watches, brief_ids=brief_ids)
@@ -273,6 +276,7 @@ def derive_row(ticker: str, company_id: str | None, *, records: Sequence[Investo
                                       "（daily 尚未標記），該重寫")
             elif w.get("status") != "active":
                 row["rewrite"].append(f"{GROUP_LABELS[cs.state]}在等的 watch 已 {w.get('status')}，該重寫")
+    row["rewrite_words"] = rewrite_words(row["rewrite"])
     since = stall_since(records, brief)
     row["since"] = since.isoformat()
     # 「今天」是排程時區的今天；since 是 UTC 時戳——換到同一個時區再相減，否則台北 00:00–08:00 寫的會多算一天。
@@ -521,13 +525,15 @@ def no_narrative_reason(edge: Mapping[str, Any] | None, records: Sequence[Any], 
     if edge.get("state") == "not_edge":
         line, _due = population_detail("non_multiple", "", {"edge": edge}, board_day=today.isoformat(),
                                        last_brief=None, today=today)
+        # 判定日不上畫面（2026-10-29 使用者：「太多日期很沒必要」）；閉環那一邊照舊帶日期
+        line = line.split("（判定")[0]
         limits = edge.get("thresholds") or {}
         over = [_OVER_EDGE.get(str(r), str(r)) for r in edge.get("reasons") or ()]
         bound = ""
         if limits.get("market_cap_max_usd") and limits.get("analyst_count_max") is not None:
             bound = (f"（門檻：市值 ≤{limits['market_cap_max_usd'] / 1e9:g}B USD、分析師 ≤{limits['analyst_count_max']} 位"
                      + (f"；超過的是{'與'.join(over)}）" if over else "）"))
-        reason = f"不寫敘事——{line}{bound}；非邊緣不寫敘事，它的財報與文件當層的證據用"
+        reason = f"{line}{bound}——非邊緣不寫敘事，它的財報與文件當層的證據用"
     else:
         reason = "沒有敘事、也沒有持有——不上候選板（寫敘事才有候選狀態）"
         if edge.get("label"):
@@ -536,8 +542,13 @@ def no_narrative_reason(edge: Mapping[str, Any] | None, records: Sequence[Any], 
     if latest is not None and getattr(latest, "retracted", False):
         day = str(getattr(latest, "created_at", "") or "")[:10]
         note = str(getattr(latest, "note", "") or "").strip()
-        reason += f"。原本的敘事 {day} 撤回" + (f"：{note[:80]}…" if len(note) > 80 else (f"：{note}" if note else ""))
+        # 撤回說明只在短的時候附上（2026-10-29「理由太冗長看不完」：AMKR 那一筆是一整段查證命令）；全文照舊在 ledger
+        reason += f"。原本的敘事 {day} 撤回" + (f"：{note}" if note and len(note) <= RETRACTION_NOTE_SHOWN else "")
     return reason
+
+
+#: 沒有敘事那一頁的理由裡，撤回說明附上的上限（字）——超過就只寫撤回日（說明在 ledger）。
+RETRACTION_NOTE_SHOWN = 24
 
 
 def page_input(context: Mapping[str, Any], ticker: str, company_id: str | None, *,

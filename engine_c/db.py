@@ -181,10 +181,13 @@ def _ensure_sqlite_schema(conn: sqlite3.Connection) -> None:
     columns = {
         row[1] for row in conn.execute("PRAGMA table_info(financial_snapshots)")
     }
+    # operating_cash_flow_ttm（2026-10-29）：歸零燈要分「本業燒錢」與「擴產花錢」——自由現金流為負同時承載兩件事（L12）。
+    # 既有列留 NULL（那天的營業現金流不可知，不猜）；燈對 NULL 退回舊語意並照說分不出。
     for name in (
         "cash_and_equivalents",
         "total_debt",
         "free_cash_flow_ttm",
+        "operating_cash_flow_ttm",
     ):
         if name not in columns:
             conn.execute(f"ALTER TABLE financial_snapshots ADD COLUMN {name} REAL")
@@ -282,6 +285,7 @@ def upsert_snapshot(conn, snap: dict, *, commit: bool = True) -> None:
         "cash_and_equivalents",
         "total_debt",
         "free_cash_flow_ttm",
+        "operating_cash_flow_ttm",
         "bar_date",
         "price_kind",
         "revenue_estimate_next_fy",
@@ -300,7 +304,7 @@ def upsert_snapshot(conn, snap: dict, *, commit: bool = True) -> None:
             analyst_target_mean, analyst_target_high, analyst_target_low,
             analyst_target_count, fetched_at, bar_date, price_kind,
             revenue_estimate_next_fy, revenue_estimate_next_fy_growth,
-            revenue_estimate_next_fy_analysts, financial_currency
+            revenue_estimate_next_fy_analysts, financial_currency, operating_cash_flow_ttm
         ) VALUES (
             %(ticker)s, %(snapshot_date)s,
             %(gross_margin)s, %(operating_margin)s, %(revenue_ttm)s,
@@ -312,7 +316,7 @@ def upsert_snapshot(conn, snap: dict, *, commit: bool = True) -> None:
             %(analyst_target_low)s, %(analyst_target_count)s, %(fetched_at)s,
             %(bar_date)s, %(price_kind)s,
             %(revenue_estimate_next_fy)s, %(revenue_estimate_next_fy_growth)s,
-            %(revenue_estimate_next_fy_analysts)s, %(financial_currency)s
+            %(revenue_estimate_next_fy_analysts)s, %(financial_currency)s, %(operating_cash_flow_ttm)s
         ) ON CONFLICT (ticker, snapshot_date) DO UPDATE SET
             gross_margin=EXCLUDED.gross_margin,
             operating_margin=EXCLUDED.operating_margin,
@@ -332,7 +336,8 @@ def upsert_snapshot(conn, snap: dict, *, commit: bool = True) -> None:
             revenue_estimate_next_fy=EXCLUDED.revenue_estimate_next_fy,
             revenue_estimate_next_fy_growth=EXCLUDED.revenue_estimate_next_fy_growth,
             revenue_estimate_next_fy_analysts=EXCLUDED.revenue_estimate_next_fy_analysts,
-            financial_currency=EXCLUDED.financial_currency
+            financial_currency=EXCLUDED.financial_currency,
+            operating_cash_flow_ttm=EXCLUDED.operating_cash_flow_ttm
         """
         with conn.cursor() as cur:
             cur.execute(sql, snapshot)
@@ -349,8 +354,8 @@ def upsert_snapshot(conn, snap: dict, *, commit: bool = True) -> None:
             analyst_target_mean, analyst_target_high, analyst_target_low,
             analyst_target_count, fetched_at, bar_date, price_kind,
             revenue_estimate_next_fy, revenue_estimate_next_fy_growth,
-            revenue_estimate_next_fy_analysts, financial_currency
-        ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+            revenue_estimate_next_fy_analysts, financial_currency, operating_cash_flow_ttm
+        ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
         """
         conn.execute(sql, (
             snapshot["ticker"], str(snapshot["snapshot_date"]),
@@ -367,6 +372,7 @@ def upsert_snapshot(conn, snap: dict, *, commit: bool = True) -> None:
             snapshot.get("revenue_estimate_next_fy_growth"),
             snapshot.get("revenue_estimate_next_fy_analysts"),
             snapshot.get("financial_currency"),
+            snapshot.get("operating_cash_flow_ttm"),
         ))
         if commit:
             conn.commit()

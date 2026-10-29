@@ -26,6 +26,9 @@ from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
+# 圖節點的中文名：讀取點只有 `alpha.node_labels`（2026-10-29 候選列也要用，兩邊各讀一份會偏離，L16）；這裡照舊匯出同名。
+from alpha.node_labels import NODE_LABELS_ZH_PATH, node_labels_zh  # noqa: F401
+
 from .diagrams import diagrams_for_nodes, load_diagrams
 from .structure_readings import build_structure_readings_artifact
 from .contracts import (
@@ -195,6 +198,8 @@ def _card_overview(view: Mapping[str, Any], inputs: Mapping[str, Any] | None) ->
         "stall_days": row.get("stall_days") if row.get("declared") == row.get("derived") else None,
         # 敘事該重寫（連結斷了、敘事來源醒來／觸及／到期未判；候選列的 rewrite[] 照數）——沒有候選列＝沒有敘事，不是 0
         "rewrite": len(row.get("rewrite") or ()) if row else None,
+        # 為什麼該重寫的幾個字（2026-10-29：卡片只印「敘事該重寫 2」使用者問「為啥」）——分類在 `alpha.candidates.rewrite_words`
+        "rewrite_words": list(row.get("rewrite_words") or ()) if row else None,
         "spark": [{"session_date": r["session_date"], "close": r["close"]} for r in series[-CARD_SPARK_SESSIONS:]],
         "move": move,
     }
@@ -394,7 +399,8 @@ WHAT_IT_DOES_SHOWN = 3
 
 
 def what_it_does(view: Mapping[str, Any], seats: Sequence[str] | None, names: Mapping[str, str],
-                 diagrams: Sequence[Mapping[str, Any]] | None) -> dict[str, Any]:
+                 diagrams: Sequence[Mapping[str, Any]] | None,
+                 labels_zh: Mapping[str, str] | None = None) -> dict[str, Any]:
     """頁首「做什麼」（個股頁 B0；2026-10-08 使用者：「這個公司在做甚麼東西是我們關注的…像 COHR 就寫個 CW DFB 雷射，
     一目了然」）。純函式。
 
@@ -402,7 +408,9 @@ def what_it_does(view: Mapping[str, Any], seats: Sequence[str] | None, names: Ma
     開發的節點（`seats_from_edges`——圖的事實），寫「圖上它供貨或開發：…」並說敘事還沒宣告押哪一格；兩個都沒有＝具名缺席。
     `seats` 是 None＝圖這一輪讀不到（不是「圖上沒有」，INV-3）。
     `where_line`：這幾個節點在示意圖的哪一格（畫圖器的位置表）；沒有一格畫到就不印（技術鏈那一塊照樣有圖與說明）。
+    `labels_zh`：節點的中文名（`alpha.node_labels`）——有就先用（2026-10-29：頁首印英文的層名，使用者看不懂），沒有照圖上的名字。
     只照抄、不排序、不打分。"""
+    zh = labels_zh or {}
     rides_line = next((line for line in ((view.get("bet") or {}).get("lines") or ())
                        if str(line.get("key") or "") == "rides"), None)
     rides = [r for r in ((rides_line or {}).get("datum") or {}).get("value") or () if isinstance(r, Mapping)]
@@ -413,11 +421,12 @@ def what_it_does(view: Mapping[str, Any], seats: Sequence[str] | None, names: Ma
                             "reason": "圖這一輪讀不到，說不出它供貨或開發哪些節點（敘事也還沒宣告押哪一格）"}}
     if rides:
         source, focus = "rides", [str(r.get("node")) for r in rides]
-        line = "押在：" + "、".join(f"{r.get('node_name') or r.get('node')}（{r.get('unit_label') or r.get('unit')}）"
-                                  for r in rides)
+        line = "押在：" + "、".join(
+            f"{zh.get(str(r.get('node'))) or r.get('node_name') or r.get('node')}（{r.get('unit_label') or r.get('unit')}）"
+            for r in rides)
     elif seat_list:
         source, focus = "seats", seat_list
-        shown = "、".join(names.get(n) or n for n in seat_list[:WHAT_IT_DOES_SHOWN])
+        shown = "、".join(zh.get(n) or names.get(n) or n for n in seat_list[:WHAT_IT_DOES_SHOWN])
         more = f" 等共 {len(seat_list)} 個" if len(seat_list) > WHAT_IT_DOES_SHOWN else ""
         line = f"圖上它供貨或開發：{shown}{more}（敘事還沒宣告押哪一格）"
     else:
@@ -646,7 +655,8 @@ def materialize(ticker: str, *, as_of: date | None = None, scenario: str | None 
     capture = _page_capture(str(view.identity.ticker or ticker), demand, as_of)
     analyst_dict = analyst.to_dict()
     graph_read = isinstance((context or {}).get("seats"), Mapping)        # 讀圖 context 讀不到＝說不出坐哪幾格（不是「沒有」）
-    what = what_it_does(analyst_dict, seats if graph_read else None, names, page_diagrams)
+    zh = labels_zh if labels_zh is not None else node_labels_zh()
+    what = what_it_does(analyst_dict, seats if graph_read else None, names, page_diagrams, zh)
     path_ctx = paths if paths is not None else _path_context(as_of, context, anchor_ctx, None)
     path_layers = _page_path_layers(path_ctx, view.identity.company_id, what)
     mix = _page_revenue_mix(str(view.identity.ticker or ticker), as_of)
@@ -665,22 +675,9 @@ def materialize(ticker: str, *, as_of: date | None = None, scenario: str | None 
                                demand_anchor=demand, capture=capture, what_it_does=what, path_layers=path_layers,
                                revenue_mix=mix, bet_share=bet, event_reaction=reaction,
                                tagline=tags.get(str(view.identity.company_id)) if view.identity.company_id else None,
-                               labels_zh=labels_zh if labels_zh is not None else node_labels_zh())
+                               labels_zh=zh)
     target = store or ArtifactStore()
     return target.write(payload), payload
-
-
-NODE_LABELS_ZH_PATH = Path(__file__).resolve().parents[1] / "config" / "node_labels_zh.json"
-
-
-def node_labels_zh(path: Path | None = None) -> dict[str, str]:
-    """圖節點的中文名（呈現用字彙，`config/node_labels_zh.json`）。讀不到＝空表——卡片照印圖上的英文名，不擋 materialize。"""
-    try:
-        raw = json.loads((path or NODE_LABELS_ZH_PATH).read_text(encoding="utf-8"))
-    except (OSError, ValueError):
-        return {}
-    labels = raw.get("labels") if isinstance(raw, Mapping) else None
-    return {str(k): str(v) for k, v in (labels or {}).items() if isinstance(v, str) and v.strip()}
 
 
 def reading_zones() -> list[dict[str, Any]]:

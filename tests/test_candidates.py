@@ -251,12 +251,14 @@ def test_the_narratives_own_touched_disproof_breaks_open_and_is_carried_on_every
     row = _derive([brief], watches=[touched])
     assert row["side"] == "precondition_failed" and any("待處置" in p for p in row["preconditions"])
     assert row["rewrite"] == ["敘事該重寫：ew_9 觸及"] and row["rewrite_watch_ids"] == ["ew_9"]
+    assert row["rewrite_words"] == ["條件觸及"]          # 卡片與個股頁那一行的幾個字（2026-10-29）
     for state, extra in (("priced_wait", {"watch_id": "ew_1"}), ("pass", {"reason": "貴"})):
         other = _brief(state=state, disproof=[SELF], **extra)
         fired = {**touched, "status": "fired", "judgment": None, "source_ref": f"brief:{other.brief_id}#1"}
         w = [fired, _active("ew_1", kind="date", until="2026-11-13", wake_brief=CO)]
         got = _derive([other], watches=w)
         assert got["group"] == state and got["rewrite"] == ["敘事該重寫：ew_9 醒來"]
+        assert got["rewrite_words"] == ["條件醒了"]
 
 
 @pytest.mark.parametrize("source, label", [
@@ -270,6 +272,7 @@ def test_a_broken_link_says_why_it_broke_for_every_state_and_breaks_open(source,
     watches = [] if source is None else [{"watch_id": "ew_r", "source_ref": f"reading:{READ}#1", **source}]
     row = _derive([_brief(disproof=[LINK])], watches=watches)
     assert row["side"] == "precondition_failed" and len(row["rewrite"]) == 1 and label in row["rewrite"][0]
+    assert row["rewrite_words"] == ["連結斷了"]          # 斷的原因含「觸及」「到期」也先認連結（先中先贏）
     passed = _derive([_brief(state="pass", reason="太貴", disproof=[LINK])], watches=watches)
     assert passed["group"] == "pass" and label in passed["rewrite"][0]
 
@@ -298,21 +301,31 @@ def test_edge_unmeasurable() -> None:
     assert row["side"] == "edge_unmeasurable"
 
 
-@pytest.mark.parametrize("watch, text", [
-    ({"watch_id": "ew_1", "status": "consumed", "expires": "2027-01-01"}, "已 consumed"),
-    ({"watch_id": "ew_1", "status": "active", "expires": "2026-09-01"}, "已過到期日 2026-09-01"),
-    (None, "不存在"),
+@pytest.mark.parametrize("watch, text, word", [
+    ({"watch_id": "ew_1", "status": "consumed", "expires": "2027-01-01"}, "已 consumed", "等待結束了"),
+    ({"watch_id": "ew_1", "status": "active", "expires": "2026-09-01"}, "已過到期日 2026-09-01", "到期了"),
+    (None, "不存在", "等待不見了"),
 ])
-def test_a_lapsed_wait_is_flagged_for_rewrite_with_what_happened(watch, text) -> None:
+def test_a_lapsed_wait_is_flagged_for_rewrite_with_what_happened(watch, text, word) -> None:
     row = _derive([_brief(state="missing", watch_id="ew_1")], watches=[watch] if watch else [])
     assert row["group"] == "missing" and any(text in r for r in row["rewrite"]), row["rewrite"]
+    assert row["rewrite_words"] == [word]
 
 
 def test_a_woken_wait_is_listed_once_not_twice() -> None:
     w = {"watch_id": "ew_1", "status": "fired", "kind": "date", "until": "2026-09-01", "expires": "2027-01-01",
          "wake_brief": CO}
     row = _derive([_brief(state="missing", watch_id="ew_1")], watches=[w])
-    assert row["rewrite"] == ["敘事該重寫：ew_1 醒來"]
+    assert row["rewrite"] == ["敘事該重寫：ew_1 醒來"] and row["rewrite_words"] == ["條件醒了"]
+
+
+def test_rewrite_words_never_drop_a_reason_and_count_repeats() -> None:
+    """2026-10-29 使用者：「該重寫為啥沒寫…可以五字一目瞭然嗎」——每一條原因都歸一個短詞，認不得的歸「其他」（INV-3），
+    同一個詞出現幾次就寫幾次（不靜默合併）；原句照舊留在 `rewrite[]`。"""
+    from alpha.candidates import rewrite_words
+
+    assert rewrite_words(["敘事該重寫：ew_1 醒來", "敘事該重寫：ew_2 醒來", "一句沒見過的原因"]) == ["條件醒了 × 2", "其他"]
+    assert rewrite_words([]) == [] and rewrite_words(None) == []
 
 
 def test_v1_is_legacy_and_three_words_are_unanswered() -> None:
@@ -527,6 +540,7 @@ def test_a_date_wait_whose_day_arrived_but_daily_has_not_fired_is_flagged() -> N
     w = _active("ew_1", kind="date", until="2026-09-29", wake_brief=CO)
     row = _derive([_brief(state="missing", watch_id="ew_1")], watches=[w])
     assert any("在等的日子 2026-09-29 已到" in r for r in row["rewrite"]), row["rewrite"]
+    assert row["rewrite_words"] == ["重看日到了"]
 
 
 def test_the_board_carries_rewrite_watches_of_companies_without_a_current_v2_row() -> None:

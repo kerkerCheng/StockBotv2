@@ -433,6 +433,16 @@ def confirm_line(condition: str, state: str, *, until: Any = None, touched_at: s
     return f"加碼條件：{condition}｜{CONFIRM_STATES[state]}{when}"
 
 
+def confirm_summary(rows: Sequence[Mapping[str, Any]]) -> str | None:
+    """個股頁首屏「錯了怎麼知道」那一塊的一句：還在等的加碼條件幾條（2026-10-29「1815.TWO 真的太長了」——觸及／醒來／
+    到期／未盯的照 `confirm_line` 逐條印，在盯的只數）。沒有任何一條在盯＝None。字住這裡的理由同 `confirm_line`。"""
+    waiting = sum(1 for r in rows if r.get("state") == "active")
+    if not waiting:
+        return None
+    return (f"加碼條件 {waiting} 條在等，還沒有一條觸及" if waiting == len(rows)
+            else f"其餘加碼條件 {waiting} 條在等")
+
+
 def condition_key(watch: Mapping[str, Any]) -> tuple[str, str]:
     """（來源, 正規化文字）——條件的身分（計數與 downside 同一個鍵；位置不算身分，RB-2）。"""
     return (str(watch.get("source_ref") or "").split("#", 1)[0], normalize(watch.get("condition")))

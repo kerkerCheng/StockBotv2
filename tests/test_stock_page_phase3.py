@@ -613,6 +613,14 @@ def test_no_narrative_page_says_why_there_is_no_narrative(monkeypatch) -> None:
         retracted, created_at, note = True, "2026-10-22T00:46:14+00:00", "非邊緣後撤回"
 
     assert "原本的敘事 2026-10-22 撤回：非邊緣後撤回" in cand.no_narrative_reason(not_edge, [_Retracted()], today=TODAY)
+    # 2026-10-29（「理由太冗長看不完」「太多日期很沒必要」）：判定日不上畫面；長的撤回說明（AMKR 那一筆是整段查證命令）只寫撤回日
+    assert "（判定" not in reason
+
+    class _LongNote(_Retracted):
+        note = "2026-10-29 python -m alpha edge AMKR → 非邊緣（市值 10.49B 美元 > 100 億門檻、分析師 10 家）"
+
+    long = cand.no_narrative_reason(not_edge, [_LongNote()], today=TODAY)
+    assert long.endswith("原本的敘事 2026-10-22 撤回") and "python -m" not in long
 
 
 def test_legacy_narrative_gets_the_board_label_not_a_dash(monkeypatch) -> None:

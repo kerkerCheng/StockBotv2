@@ -55,43 +55,76 @@ FULL_YEAR_DAYS: int = 365
 
 
 def _flag(colour: str | None, reason: str, *, rule: str, inputs: Mapping[str, Any],
-          absence_kind: str | None = None) -> dict[str, Any]:
+          absence_kind: str | None = None, short: str | None = None) -> dict[str, Any]:
+    """`short`：首屏那一行用的幾個字（2026-10-29 使用者：「燈號跟訊息也不直覺」——四盞燈收成一行，每盞只說一小句）。
+    有顏色就必須有；灰燈沒有（灰的那幾盞在首屏只列名字「沒查到：…」）。"""
     if colour is not None and colour not in FLAG_COLOURS:
         raise ValueError(f"未登記的燈色：{colour!r}；已知 {FLAG_COLOURS}")
     if colour is None and not absence_kind:
         raise ValueError("沒有顏色的燈必須宣告 absence_kind——缺席不得被壓成一句「無資料」")
     if colour is not None and absence_kind:
         raise ValueError("有顏色的燈不得帶缺席語意")
-    return {"colour": colour, "reason": reason, "absence_kind": absence_kind,
-            "rule": rule, "inputs": dict(inputs)}
+    if colour is not None and not short:
+        raise ValueError("有顏色的燈必須帶 short（首屏那一行的一小句）")
+    return {"colour": colour, "reason": reason, "short": short if colour is not None else None,
+            "absence_kind": absence_kind, "rule": rule, "inputs": dict(inputs)}
 
 
-_CASH_RULE = (f"自由現金流 ≥ 0 → 綠（自籌）；燒錢且現金跑道短於 {GOING_CONCERN_HORIZON_MONTHS} 個月"
-              "（IFRS／UK going-concern 最短評估期）→ 紅；燒錢但跑道長於它 → 黃；三個輸入缺一 → 灰")
+def _operating(runway: Mapping[str, Any]) -> float | None:
+    """近四季營業現金流（選填輸入，2026-10-29）。沒有＝分不出「本業燒錢」還是「擴產花錢」，燈退回自由現金流的舊判法並照說。"""
+    value = runway.get("operating_cash_flow_ttm")
+    return float(value) if isinstance(value, (int, float)) and not isinstance(value, bool) else None
+
+
+# 2026-10-29：自由現金流為負同時承載「本業燒錢」與「擴產花錢」（L12）——190 檔裡最差一盞紅的 47 檔，有 32 檔近四季有獲利，
+# 抽查 6 檔（台光電、Oracle、Coherent、AAON、Williams、Amkor）營業現金流全為正，燈卻寫「本業又在燒錢」。
+# 拆開的判法：營業現金流 < 0 才是本業燒錢；營業現金流 ≥ 0、自由現金流 < 0 是擴產花的比賺的多（要不要擴產是公司選的）。
+_CASH_RULE = (f"自由現金流 ≥ 0 → 綠（自籌）。自由現金流 < 0 時看營業現金流：< 0（本業燒錢）且現金撐不到 "
+              f"{GOING_CONCERN_HORIZON_MONTHS} 個月（IFRS／UK going-concern 最短評估期）→ 紅、撐得過 → 黃；"
+              f"≥ 0（本業賺錢、擴產花得比賺得多）且現金付得起 {GOING_CONCERN_HORIZON_MONTHS} 個月的差額 → 綠、付不起 → 黃；"
+              "營業現金流沒有資料 → 照自由現金流判（撐不到 → 紅、撐得過 → 黃）並說分不出是哪一種；現金、債務、自由現金流缺一 → 灰")
 
 
 def cash_runway_flag(runway: Mapping[str, Any] | None) -> dict[str, Any]:
-    """`runway` 是 `shared.runway.derive_runway` 的輸出形狀（status／runway_months／三個輸入）。"""
+    """`runway` 是 `shared.runway.derive_runway` 的輸出形狀（status／runway_months／三個必要輸入＋選填的營業現金流）。"""
     runway = dict(runway or {})
     inputs = {k: runway.get(k) for k in ("cash_and_equivalents", "total_debt", "free_cash_flow_ttm",
-                                         "as_of", "source", "status", "runway_months")}
+                                         "operating_cash_flow_ttm", "as_of", "source", "status", "runway_months")}
     status = runway.get("status")
     if status == "self_funding":
-        return _flag("green", "本業賺得出現金（自由現金流為正）——不用靠借錢或增資過日子", rule=_CASH_RULE, inputs=inputs)
+        return _flag("green", "本業賺得出現金（自由現金流為正）——不用靠借錢或增資過日子", rule=_CASH_RULE, inputs=inputs,
+                     short="本業賺得到現金")
     if status == "calculated":
         months = runway.get("runway_months")
         if not isinstance(months, (int, float)):
             return _flag(None, "跑道狀態宣稱已算出，卻沒有月數", rule=_CASH_RULE, inputs=inputs,
                          absence_kind="upstream_unavailable")
-        if months < GOING_CONCERN_HORIZON_MONTHS:
-            return _flag("red", "在燒錢，照現在的速度手上的現金撐不到一年", rule=_CASH_RULE, inputs=inputs)
-        return _flag("amber", "在燒錢，但手上的現金撐得過一年", rule=_CASH_RULE, inputs=inputs)
+        short_of_year = months < GOING_CONCERN_HORIZON_MONTHS
+        operating = _operating(runway)
+        if operating is not None and operating >= 0:
+            if short_of_year:
+                return _flag("amber", "本業賺得出現金，但擴產花得比賺得多，手上的現金付不到一年的差額——擴產要再借錢或增資",
+                             rule=_CASH_RULE, inputs=inputs, short="擴產的錢不夠付一年")
+            return _flag("green", "本業賺得出現金；擴產花得比賺得多，但手上的現金付得起一年以上的差額",
+                         rule=_CASH_RULE, inputs=inputs, short="本業賺錢，擴產的錢夠")
+        if operating is not None:
+            if short_of_year:
+                return _flag("red", "本業在燒錢，照現在的速度手上的現金撐不到一年", rule=_CASH_RULE, inputs=inputs,
+                             short="本業燒錢，現金撐不到一年")
+            return _flag("amber", "本業在燒錢，但手上的現金撐得過一年", rule=_CASH_RULE, inputs=inputs,
+                         short="本業燒錢，現金撐得過一年")
+        if short_of_year:
+            return _flag("red", "花的錢比賺的多，照現在的速度手上的現金撐不到一年（沒有營業現金流的資料，分不出是本業燒錢還是擴產）",
+                         rule=_CASH_RULE, inputs=inputs, short="現金撐不到一年")
+        return _flag("amber", "花的錢比賺的多，但手上的現金撐得過一年（沒有營業現金流的資料，分不出是本業燒錢還是擴產）",
+                     rule=_CASH_RULE, inputs=inputs, short="花得比賺得多，撐得過一年")
     return _flag(None, "現金、債務、自由現金流缺一個就不判（只用部分數字會算出看起來精確的錯值）",
                  rule=_CASH_RULE, inputs=inputs, absence_kind="upstream_unavailable")
 
 
-_DEBT_RULE = ("現金 ≥ 總債 → 綠（淨現金）；淨負債且自由現金流 ≥ 0 → 黃；淨負債且在燒錢 → 紅。"
-              "**純符號比較，沒有門檻**——歸零的機制是「要還的錢多於手上的錢，而且自己生不出來」")
+_DEBT_RULE = ("現金 ≥ 總債 → 綠（淨現金）；淨負債時看本業：營業現金流 ≥ 0（或沒有營業現金流資料時自由現金流 ≥ 0）→ 黃；"
+              "營業現金流 < 0（本業燒錢）→ 紅；沒有營業現金流資料且自由現金流 < 0 → 紅並說分不出是本業燒錢還是擴產。"
+              "**純符號比較，沒有門檻**——歸零的機制是「要還的錢多於手上的錢，而且本業生不出來」")
 
 
 def debt_flag(runway: Mapping[str, Any] | None) -> dict[str, Any]:
@@ -100,19 +133,28 @@ def debt_flag(runway: Mapping[str, Any] | None) -> dict[str, Any]:
     cash = runway.get("cash_and_equivalents")
     debt = runway.get("total_debt")
     fcf = runway.get("free_cash_flow_ttm")
+    operating = _operating(runway)
     inputs = {"cash_and_equivalents": cash, "total_debt": debt, "free_cash_flow_ttm": fcf,
-              "as_of": runway.get("as_of"), "source": runway.get("source")}
+              "operating_cash_flow_ttm": operating, "as_of": runway.get("as_of"), "source": runway.get("source")}
     if not isinstance(cash, (int, float)) or not isinstance(debt, (int, float)):
         return _flag(None, "缺現金或債務的數字，不判", rule=_DEBT_RULE, inputs=inputs,
                      absence_kind="upstream_unavailable")
     if cash >= debt:
-        return _flag("green", "手上的現金比欠的債多——不怕還債", rule=_DEBT_RULE, inputs=inputs)
+        return _flag("green", "手上的現金比欠的債多——不怕還債", rule=_DEBT_RULE, inputs=inputs, short="現金比債多")
+    if operating is not None:
+        if operating >= 0:
+            return _flag("amber", "欠的比手上的現金多，但本業每年賺得出現金——靠自己還得出來", rule=_DEBT_RULE,
+                         inputs=inputs, short="債比現金多，本業賺得還")
+        return _flag("red", "欠的比手上的現金多、本業又在燒錢——債到期得靠再借錢或增資", rule=_DEBT_RULE, inputs=inputs,
+                     short="債比現金多，本業又在燒錢")
     if not isinstance(fcf, (int, float)):
         return _flag(None, "欠的比手上的現金多，但缺自由現金流——判不出還不還得出來", rule=_DEBT_RULE,
                      inputs=inputs, absence_kind="upstream_unavailable")
     if fcf >= 0:
-        return _flag("amber", "欠的比手上的現金多，但本業每年賺得出現金——靠自己還得出來", rule=_DEBT_RULE, inputs=inputs)
-    return _flag("red", "欠的比手上的現金多、本業又在燒錢——債到期得靠再借錢或增資", rule=_DEBT_RULE, inputs=inputs)
+        return _flag("amber", "欠的比手上的現金多，但每年賺得出現金——靠自己還得出來", rule=_DEBT_RULE, inputs=inputs,
+                     short="債比現金多，賺得還")
+    return _flag("red", "欠的比手上的現金多、花的錢又比賺的多——債到期可能要再借錢或增資（沒有營業現金流的資料，"
+                 "分不出是本業燒錢還是擴產）", rule=_DEBT_RULE, inputs=inputs, short="債比現金多，花得比賺得多")
 
 
 _DILUTION_RULE = (
@@ -236,7 +278,7 @@ def dilution_flag(shares_series: Sequence[tuple[date, float]] | None,
                       context_summary=_document_text(context) if context else None)
         if documents:
             return _flag("amber", "過去一年發過新股（股數變多、每股分到的變少），也有增資說明書或私募公告",
-                         rule=_DILUTION_RULE, inputs=inputs)
+                         rule=_DILUTION_RULE, inputs=inputs, short="一年內增資過")
         if offerings.get("status") != "ok":
             inputs["offering_reason"] = offerings.get("reason")
             return _flag(None, "有發新股的金額，但募資文件清單讀不到——不判黃也不判綠",
@@ -263,7 +305,7 @@ def dilution_flag(shares_series: Sequence[tuple[date, float]] | None,
         return _flag(None, "股數增加了，但沒有發新股的紀錄——分不出是發給員工的股票酬勞還是沒標出來的增資",
                      rule=_DILUTION_RULE, inputs=inputs, absence_kind="insufficient_evidence")
     return _flag("green", "過去一年沒有發新股，股數也沒有增加", rule=_DILUTION_RULE,
-                 inputs=inputs)
+                 inputs=inputs, short="一年沒增資")
 
 
 _GOING_CONCERN_RULE = (
@@ -294,9 +336,11 @@ def going_concern_flag(observation: Mapping[str, Any] | None) -> dict[str, Any]:
         return _flag(None, "同一天有好幾筆會計師意見的判讀，不挑一個", rule=_GOING_CONCERN_RULE,
                      inputs=inputs, absence_kind="insufficient_evidence")
     if opinion == "substantial_doubt":
-        return _flag("red", "會計師在查核報告裡警告：公司能不能繼續經營下去有重大疑慮", rule=_GOING_CONCERN_RULE, inputs=inputs)
+        return _flag("red", "會計師在查核報告裡警告：公司能不能繼續經營下去有重大疑慮", rule=_GOING_CONCERN_RULE, inputs=inputs,
+                     short="會計師警告經營有疑慮")
     if opinion == "no_substantial_doubt":
-        return _flag("green", "會計師的查核報告沒有警告公司經營不下去", rule=_GOING_CONCERN_RULE, inputs=inputs)
+        return _flag("green", "會計師的查核報告沒有警告公司經營不下去", rule=_GOING_CONCERN_RULE, inputs=inputs,
+                     short="會計師沒警告")
     if opinion == "not_reviewed":
         return _flag(None, "已登記「還沒讀會計師的查核報告」", rule=_GOING_CONCERN_RULE, inputs=inputs,
                      absence_kind="not_yet_recorded")

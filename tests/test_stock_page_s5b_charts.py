@@ -66,12 +66,14 @@ def test_the_demand_anchor_lives_in_b2_and_only_copies_the_materialized_series()
     bars = _body("anchorBars")
     for copied in ("p.value", "p.period", ".yoy", "s.components"):
         assert copied in bars, f"錨圖少照抄了 {copied}"
+    for arithmetic in ("value / ", "value - ", " / prior", "reduce((", "Math.pow"):
+        assert arithmetic not in bars, f"錨圖不得自己算：{arithmetic}"
+    # 2026-10-29 使用者（「這三個折疊起來的可不可以消化過再給我」）：可知日、推算的是哪幾家、代理說明、走到哪個錨
+    # 是給查核的出處——不再上畫面（照舊在 artifact 與 API）；細節只留研究寫的這條鏈怎麼走。
     detail = _body("chainDetail")
-    for copied in ("payload.demand_anchor", "last.known_on", "last.derived", "s.proxy", "demand.anchors"):
-        assert copied in detail, f"錨的細節少照抄了 {copied}"
-    for body in (bars, detail):
-        for arithmetic in ("value / ", "value - ", " / prior", "reduce((", "Math.pow"):
-            assert arithmetic not in body, f"錨圖不得自己算：{arithmetic}"
+    assert "argument:chain" in detail and "argumentSection(line)" in detail
+    for gone in ("payload.demand_anchor", "last.known_on", "last.derived", "s.proxy", "demand.anchors"):
+        assert gone not in detail, f"錨的出處不再上畫面：{gone}"
 
 
 def test_the_capture_chart_lives_in_b2_and_only_copies_the_materialized_ratio() -> None:
@@ -81,12 +83,12 @@ def test_the_capture_chart_lives_in_b2_and_only_copies_the_materialized_ratio() 
     figure = _body("captureFigure")
     for copied in ("payload.capture", "p.per_billion", "cap.absence.reason"):
         assert copied in figure, f"吃到多少少照抄了 {copied}"
+    for arithmetic in ("revenue_usd /", "/ p.anchor", "* 1e9", "/ last.per_usd", "Math.pow"):
+        assert arithmetic not in figure, f"吃到多少不得自己算：{arithmetic}"
+    # 換匯的季均價與可知日 2026-10-29 起不上畫面（同上：給查核的出處，照舊在 artifact 與 API）
     detail = _body("chainDetail")
-    for copied in ("payload.capture", "last.per_usd", "last.known_on", "cap.revenue_source"):
-        assert copied in detail, f"吃到多少的細節少照抄了 {copied}"
-    for body in (figure, detail):
-        for arithmetic in ("revenue_usd /", "/ p.anchor", "* 1e9", "/ last.per_usd", "Math.pow"):
-            assert arithmetic not in body, f"吃到多少不得自己算：{arithmetic}"
+    for gone in ("payload.capture", "last.per_usd", "last.known_on", "cap.revenue_source"):
+        assert gone not in detail, f"吃到多少的出處不再上畫面：{gone}"
 
 
 def test_diagrams_show_as_images_in_b4_and_on_the_layer_page_labelled_as_illustration() -> None:
@@ -127,14 +129,14 @@ def test_selfcheck_runs_only_on_request_and_never_touches_the_network() -> None:
 
 
 def test_the_path_ladder_lives_in_b2_and_only_copies_the_materialized_lines() -> None:
-    """個股頁 S3c（2026-10-09）：B2「路徑上各層」照抄 materialize 的 `path_layers`——年增、代表公司幾家、缺席原因都在
-    `alpha.path_layers` 算好；前端不算年增、不排序；押的格那幾條先列、其餘收在一個展開；代表公司的理由在 B2 的細節。"""
-    assert "pathFigure(payload)" in _body("blockVisuals")
-    fig = _body("pathFigure")
-    for copied in ("payload.path_layers", "h.latest.yoy", "h.latest.coverage", "h.absence", "pl.absence.reason",
-                   "p.focus", "h.proxy", "includes_page_company"):
+    """個股頁 S3c（2026-10-09）：B2「路徑上各層」照抄 materialize 的 `path_layers`——年增在 `alpha.path_layers` 算好；
+    前端不算年增、不排序。2026-10-29 使用者（「這三個折疊起來的可不可以消化過再給我」）：消化成句——押的格那幾條路每條
+    一句（「錢怎麼走到它：A → B → C」，層名用中文名），其餘只寫起點、不再收在展開裡；缺席原因、代表公司的理由不上畫面。"""
+    assert "pathSentences(payload)" in _body("blockVisuals") and "function pathFigure(" not in SOURCE
+    fig = _body("pathSentences")
+    for copied in ("payload.path_layers", "h.latest.yoy", "p.focus", "nodeLabel(node, h.name)", "錢怎麼走到它"):
         assert copied in fig, f"路徑上各層少照抄了 {copied}"
-    for forbidden in (".sort(", "value / ", "/ prior", "reduce(("):
-        assert forbidden not in fig, f"路徑上各層不得自己算或排：{forbidden}"
+    for forbidden in (".sort(", "value / ", "/ prior", "reduce((", "drill("):
+        assert forbidden not in fig, f"路徑上各層不得自己算、排或再收進展開：{forbidden}"
     detail = _body("chainDetail")
-    assert "payload.path_layers" in detail and "r.why" in detail and "latest.missing" in detail
+    assert "payload.path_layers" not in detail and "r.why" not in detail and "latest.missing" not in detail

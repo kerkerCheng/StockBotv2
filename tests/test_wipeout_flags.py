@@ -127,6 +127,49 @@ def test_debt_lamp_refuses_rather_than_guessing_when_an_input_is_missing() -> No
     assert debt_flag(_runway(cash=50.0, debt=100.0, fcf=None))["colour"] is None
 
 
+def test_expansion_spending_is_not_operating_burn() -> None:
+    """2026-10-29：自由現金流為負同時承載「本業燒錢」與「擴產花錢」（L12）。營業現金流 ≥ 0 的擴產者不亮紅——
+    台光電（營業現金流 +136.9 億、自由現金流 −60.5 億台幣、淨負債）那一型，改前兩盞燈一紅一黃。"""
+    expansion = dict(_runway(cash=22.6, debt=28.5, fcf=-6.05, months=22.6 / (6.05 / 12)), operating_cash_flow_ttm=13.7)
+    assert debt_flag(expansion)["colour"] == "amber"
+    assert cash_runway_flag(expansion)["colour"] == "green"
+    # 擴產的差額付不起一年 → 黃（要再借錢或增資），仍不是紅
+    tight = dict(_runway(cash=1.0, debt=28.5, fcf=-6.05, months=1.0 / (6.05 / 12)), operating_cash_flow_ttm=13.7)
+    assert cash_runway_flag(tight)["colour"] == "amber"
+    # 本業真的在燒錢 → 照舊紅
+    burning = dict(_runway(cash=1.0, debt=28.5, fcf=-6.05, months=2.0), operating_cash_flow_ttm=-3.0)
+    assert debt_flag(burning)["colour"] == "red" and cash_runway_flag(burning)["colour"] == "red"
+    assert "本業" in debt_flag(burning)["reason"]
+
+
+def test_without_operating_cash_flow_the_lamp_says_it_cannot_tell_burn_from_expansion() -> None:
+    """沒有營業現金流的資料：照自由現金流判（舊顏色不變），但理由句不得說「本業在燒錢」——那是沒量到的事。"""
+    flag = debt_flag(_runway(cash=50.0, debt=100.0, fcf=-10.0))
+    assert flag["colour"] == "red" and "分不出" in flag["reason"] and "本業又在燒錢" not in flag["reason"]
+    runway = cash_runway_flag(_runway(months=GOING_CONCERN_HORIZON_MONTHS - 0.1))
+    assert runway["colour"] == "red" and "分不出" in runway["reason"]
+
+
+def test_runway_carries_operating_cash_flow_only_from_the_same_source() -> None:
+    """人工觀測補的跑道與快照的營業現金流不是同一份——不得拼在一起（PIT／provenance）。"""
+    from shared.runway import derive_runway
+
+    snap = {"cash_and_equivalents": 10.0, "total_debt": 5.0, "free_cash_flow_ttm": -1.0,
+            "operating_cash_flow_ttm": 2.0, "source": "yfinance.info", "as_of": "2026-10-29T00:00:00+00:00"}
+    assert derive_runway(snap)["operating_cash_flow_ttm"] == 2.0
+    manual = {"cash_and_equivalents": 10.0, "total_debt": 5.0, "free_cash_flow_ttm": -1.0,
+              "source": "10-Q", "as_of": "2026-10-01T00:00:00+00:00"}
+    assert "operating_cash_flow_ttm" not in derive_runway(dict(snap, free_cash_flow_ttm=None), manual_observation=manual)
+
+
+def test_every_lit_lamp_carries_a_short_phrase_and_grey_ones_do_not() -> None:
+    """首屏收成一行（2026-10-29 使用者：「燈號跟訊息也不直覺」）：有顏色的燈都有 short；灰燈沒有（型別層擋）。"""
+    lit = [cash_runway_flag(_runway(fcf=5.0, status="self_funding", months=None)), debt_flag(_runway()),
+           going_concern_flag({"value": {"opinion": "no_substantial_doubt"}})]
+    assert all(f["colour"] and f["short"] for f in lit)
+    assert going_concern_flag(None)["short"] is None
+
+
 # ---------------------------------------------------------------------------
 # 4. 稀釋：窗不滿一個完整會計年度就不判色
 # ---------------------------------------------------------------------------

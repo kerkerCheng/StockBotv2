@@ -47,6 +47,23 @@ LIGHT_ORDER: tuple[str, ...] = ("red", "amber", "green")
 LIGHT_WORDS: Mapping[str, str] = {"red": "紅", "amber": "黃", "green": "綠"}
 #: 「該重寫」的三種狀態（`engine_b.queue_segments.narrative_rewrite_state` 的值）→ 人讀。
 REWRITE_STATE_WORDS: Mapping[str, str] = {"fired": "醒來", "touched": "觸及", "expired": "到期未判"}
+#: 候選列 `rewrite[]` 每一條 → 首頁卡片與個股頁那一行的幾個字（2026-10-29 使用者：「該重寫為啥沒寫…可以五字一目瞭然嗎」）。
+#: 依序比對、先中先贏；原句（含 watch 編號）照舊留在 `rewrite[]`，這裡只分類、不改判斷；認不得的歸「其他」，不丟（INV-3）。
+REWRITE_WHY: tuple[tuple[str, str], ...] = (
+    ("連結 ", "連結斷了"), ("觸及", "條件觸及"), ("醒來", "條件醒了"), ("到期", "到期了"), ("已到", "重看日到了"),
+    ("不存在", "等待不見了"), ("在等的 watch 已", "等待結束了"),
+)
+
+
+def rewrite_words(rewrite: Iterable[str] | None) -> list[str]:
+    """`rewrite[]` 的原句 → 幾個字（同一種原因多條寫「× N」）。順序照第一次出現（不是名次）。"""
+    counts: dict[str, int] = {}
+    for text in rewrite or ():
+        text = str(text)
+        word = next((w for key, w in REWRITE_WHY
+                     if (text.startswith(key) if key == "連結 " else key in text)), "其他")
+        counts[word] = counts.get(word, 0) + 1
+    return [f"{word} × {n}" if n > 1 else word for word, n in counts.items()]
 PRICED_IN_LINES: tuple[str, ...] = ("own_history_pctile", "cohort_median", "rel_return_30d", "rel_return_90d")
 #: 營收序列與占比序列（2026-10-14 拆成兩行，L12）：任一行有值，「出現在數字裡了嗎」就量得到。
 IN_NUMBERS_LINES: tuple[str, ...] = ("in_numbers_series", "in_numbers_mix_series")
@@ -360,7 +377,7 @@ def assemble_board(rows: Sequence[Mapping[str, Any] | None], *, universe: Sequen
 
 
 __all__ = ["ANSWER_WORDS", "CANDIDATES_THIS_IS_NOT", "GROUPS", "GROUP_LABELS", "IN_NUMBERS_LINES", "LIGHT_ORDER",
-           "LIGHT_WORDS", "LIST_GROUPS", "LIST_GROUP_LABELS", "PRICED_IN_LINES", "REWRITE_STATE_WORDS", "SIDE_GROUPS",
-           "SIDE_LABELS", "UNANSWERED",
+           "LIGHT_WORDS", "LIST_GROUPS", "LIST_GROUP_LABELS", "PRICED_IN_LINES", "REWRITE_STATE_WORDS", "REWRITE_WHY",
+           "SIDE_GROUPS", "SIDE_LABELS", "UNANSWERED",
            "WIPEOUT_LINES", "assemble_board", "cap_label", "held_index", "judgment_version", "priced_judgment_key",
-           "priced_since", "rollup", "stall_since", "stall_version", "three_words"]
+           "priced_since", "rewrite_words", "rollup", "stall_since", "stall_version", "three_words"]

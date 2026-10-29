@@ -63,8 +63,10 @@ main { padding: 16px; max-width: 940px; margin: 0 auto; }
 
 /* ---------- 清單 ---------- */
 
-.cards { display: grid; gap: var(--gap); grid-template-columns: 1fr; }
-@media (min-width: 720px) { .cards { grid-template-columns: 1fr 1fr; } }
+/* minmax(0, 1fr)：`1fr` 的下限是內容寬，介紹那一行 nowrap 會把整欄撐出畫面（2026-10-29 390px 量到溢出 226px）——
+   下限歸零，介紹才會照 ellipsis 截短 */
+.cards { display: grid; gap: var(--gap); grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 720px) { .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 
 .card {
   display: block; text-decoration: none; color: inherit;
@@ -485,6 +487,9 @@ table.rank.compare td:first-child { color: var(--muted); }
   border: 1px solid var(--border); border-radius: 999px; padding: .15rem .6rem;
 }
 .brief-card .candidate-words .word-link:hover { background: var(--surface-2); }
+/* 2026-10-29：會不會死一行（`lampLine`）可能比一個字長——可以換行、靠左 */
+.brief-card .candidate-words .lamp-line { white-space: normal; text-align: left; }
+.brief-card .seats-line a { margin: 0 .1rem; }
 .brief-card .lamp-notes { margin: .1rem 0 .3rem; }
 .lamp-plain { margin-bottom: 6px; }
 .lamp-row { font-size: 14px; line-height: 1.6; margin: 2px 0; }

@@ -220,9 +220,11 @@ function cardStateLine(row) {
   const cand = row.candidate || {};
   const line = el('div', 'card-state');
   if (cand.label) line.appendChild(el('span', 'card-chip chip-' + (cand.list_group || 'none'), cand.label));
-  // 敘事該重寫（候選列 rewrite[] 的筆數，materialize 端照數）：這張卡的狀態可能已經舊了（2026-10-28 候選板那一區搬來）
+  // 敘事該重寫（候選列 rewrite[]，materialize 端照數）：這張卡的狀態可能已經舊了（2026-10-28 候選板那一區搬來）。
+  // 2026-10-29 起寫原因（兩到四個字，`alpha.candidates.rewrite_words`），不只寫筆數；舊 artifact 照印筆數。
   if (typeof c.rewrite === 'number' && c.rewrite > 0) {
-    line.appendChild(el('span', 'card-chip chip-rewrite', `敘事該重寫 ${c.rewrite}`));
+    line.appendChild(el('span', 'card-chip chip-rewrite', (c.rewrite_words || []).length
+      ? `該重寫：${c.rewrite_words.join('、')}` : `敘事該重寫 ${c.rewrite}`));
   }
   if (typeof c.stall_days === 'number') {
     const days = el('span', 'card-days', c.stall_days === 0 ? '今天起' : `${c.stall_days} 天`);
@@ -446,6 +448,12 @@ function plainLine(key, fallback) {
   return table[key] || fallback || key;
 }
 
+/** 圖節點的中文名（`config/node_labels_zh.json` 經 `.meta.json`）；沒有中文名印圖上的名字，再沒有印代號（不猜，INV-1）。 */
+function nodeLabel(node, fallback) {
+  const table = (VOCAB && VOCAB.node_labels_zh) || {};
+  return table[node] || fallback || node;
+}
+
 /* ---------- 單檔判讀 ----------
    2026-09-08 使用者回饋：「太多展開、太多字、全部是內部術語，基本上看不懂」；2026-10-08：「舊有的資訊非必要的就拿掉，
    除非是給我看的；給機器看的不用顯示出來」。現在一頁＝頁首＋十三塊（`briefCard`），塊底下一個展開放論證與數字。
@@ -471,9 +479,11 @@ function priceFigure(payload) {
     emptyNote: '沒有取到這檔的收盤序列——沒有折線不是價格為 0。',
   }));
   const note = (VOCAB && VOCAB.price_series_note) || '';
-  // 字彙裡的 `**…**` 是粗體標記——照 markdown 印（2026-10-08 實測：當成純文字會把兩個星號原樣露出來）
-  wrap.appendChild(mdParagraph((series.length ? `收盤價：${series[0].session_date} 起 ${series.length} 個交易日` +
-    (price.quote_unit ? `（${price.quote_unit}）。` : '。') : '') + note, 'chart-legend'));
+  // 2026-10-29（「太多日期很沒必要」）：圖下只寫是什麼與單位；起日、交易日數與字彙那段說明（脈絡不是訊號）放 title。
+  // 字彙裡的 `**…**` 是粗體標記——title 是純文字，拿掉星號
+  const legend = el('div', 'chart-legend', `收盤價${price.quote_unit ? `（${price.quote_unit}）` : ''}`);
+  legend.title = (series.length ? `${series[0].session_date} 起 ${series.length} 個交易日。` : '') + note.replace(/\*\*/g, '');
+  wrap.appendChild(legend);
   // 2026-10-07：「表格版：每一個交易日的收盤」拿掉（使用者：「不需要給我看的…拿掉」）——十字線 tooltip 讀得到每一天的值。
   return wrap;
 }
@@ -649,8 +659,17 @@ function briefCard(payload, view) {
   // ⚠ 2026-09-23（Phase 0 Step 0b.1）：「目標價到了」那個徽章退役（`target_reached` 隨目標價退役）。
   // AGENTS D3 的判準沒有退役——`realized` 只提醒、不觸發出場；它現在的家是心跳段 2 的候選狀態板。
   const available = Boolean(panel && panel.context && panel.context.available);
-  // 個股頁 S5（2026-10-08）：首屏照 page_schema 的段與塊排。**每一頁都用這個版面**（2026-10-08 使用者「舊的非必要就拿掉」：
-  // 沒有敘事的頁也照十三塊排——研究要寫的塊印「還沒寫」，機械的塊照樣有燈、有圖），不再有第二套舊版面。
+  // 非邊緣、沒有敘事＝規定不寫（2026-10-28 使用者），不是待做：只留候選那一行與它坐在哪幾層——十三塊照排只會印滿「還沒寫」，
+  // 讓 105 檔看起來像欠著（2026-10-29 使用者：「我看很多個股還缺敘事」）。財報當層的證據用，層的讀法在「圖」頁。
+  const notEdge = !available && ((view.candidate || {}).context || {}).edge_state === 'not_edge';
+  if (notEdge) {
+    const line = candidateLine(view, true);
+    if (line) node.appendChild(line);
+    const seats = seatsSentence(payload, view);
+    if (seats) node.appendChild(seats);
+    return node;
+  }
+  // 個股頁 S5（2026-10-08）：首屏照 page_schema 的段與塊排；2026-10-29 起沒內容的塊不印（`schemaBlock` 回 null）。
   const screen = schemaFirstScreen(payload, view, available ? panel : null);
   // 頁首那一行狀態（schema B0：候選狀態、理由、在等什麼）放在十三塊之前。
   const line = candidateLine(view, Boolean(screen));
@@ -710,20 +729,29 @@ function schemaFirstScreen(payload, view, panel) {
     (panel.lines || []).filter((row) => row.key.indexOf('brief:') === 0).forEach((row) => story.appendChild(storyRow(row)));
     box.appendChild(story);
   }
+  // 2026-10-29 使用者：「營收哪裡來 事件與影響多大 我想知道 但現在只看到一堆斜體字…根本不會去看」——每塊的缺席句不再上首屏：
+  // 研究該寫還沒寫的塊（合約宣告了格、這份敘事沒有）收成頁尾一行「還沒寫：…」；什麼都沒有的塊整塊不印（內容在 API 照舊）。
+  const unwritten = [];
   screen.sections.forEach((section) => {
     const sec = el('div', 'ss-section ss-' + section.key);
     sec.appendChild(el('div', 'ss-section-title', section.title));
     (section.blocks || []).forEach((key) => {
       const block = blocks[key] || { key, title: key, question: '' };
-      sec.appendChild(schemaBlock(payload, view, lines, block, readings[key] || {}));
+      const reading = readings[key] || {};
+      const node = schemaBlock(payload, view, lines, block, reading);
+      if (panel && (reading.slots || []).length && !(reading.slots || []).some((slot) => lines['brief:' + slot])) {
+        unwritten.push(block.title);
+      }
+      if (node) sec.appendChild(node);
     });
-    box.appendChild(sec);
+    if (sec.childNodes.length > 1) box.appendChild(sec);
   });
+  if (unwritten.length) box.appendChild(el('p', 'note ss-unwritten', '還沒寫：' + unwritten.join('、')));
   return box;
 }
 
-/** 一塊：讀法（短評的格依序、再放既有元件）；都沒有就印合約的 pending、或「還沒寫」（沒有敘事的頁）。
- *  接著是這一塊的圖，最後一個展開（`blockDetail`）。不改任何一格、不加字。 */
+/** 一塊：讀法（短評的格依序、再放既有元件）、這一塊的圖、最後一個展開（`blockDetail`）。不改任何一格、不加字。
+ *  2026-10-29：缺席說明句（`ss-pending`）不上首屏——有展開就搬進展開，沒有就不印（API 照舊有）；整塊什麼都沒有回 null。 */
 function schemaBlock(payload, view, lines, block, reading) {
   const node = el('div', 'fq ss-block');
   node.id = 'blk-' + block.key;
@@ -732,21 +760,19 @@ function schemaBlock(payload, view, lines, block, reading) {
   node.appendChild(head);
   const story = el('div', 'story');
   (reading.slots || []).forEach((slot) => { if (lines['brief:' + slot]) story.appendChild(storyRow(lines['brief:' + slot])); });
-  if (story.childNodes.length) {
-    node.appendChild(story);
-  } else if (reading.pending) {
-    // 讀法句還沒有：照印合約的缺席句（有元件也印——B3 有營收、讀法句還沒寫）
-    node.appendChild(el('div', 'row-reason ss-pending', reading.pending));
-  } else if ((reading.slots || []).length && !(reading.parts || []).length) {
-    node.appendChild(el('div', 'row-reason ss-pending', '還沒寫（這一檔還沒有研究寫的敘事）'));
-  } else if (!(reading.parts || []).length) {
-    node.appendChild(el('div', 'row-reason ss-pending', '還沒寫'));
-  }
+  if (story.childNodes.length) node.appendChild(story);
   (reading.parts || []).forEach((part) => questionPart(view, part).forEach((n) => node.appendChild(n)));
-  blockVisuals(payload, view, block.key).forEach((n) => node.appendChild(n));
+  const absent = [];
+  blockVisuals(payload, view, block.key).forEach((n) => {
+    if (n.classList && n.classList.contains('ss-pending')) absent.push(n); else node.appendChild(n);
+  });
   const detail = blockDetail(payload, view, block.key);
-  if (detail) node.appendChild(detail);
-  return node;
+  if (detail) {
+    const body = detail.querySelector('.block-detail');
+    if (body) absent.forEach((n) => body.appendChild(n));
+    node.appendChild(detail);
+  }
+  return node.childNodes.length > 1 ? node : null;
 }
 
 /** 塊底下的展開（2026-10-08 使用者：「給我看的留，給機器看的拿掉」）：這一塊給人讀的論證與要核對的數字。
@@ -758,7 +784,7 @@ function blockDetail(payload, view, key) {
   if (key === 'B6') return numbersDrill(view, 'priced_in', () => [pricedInPlain(), marketMultiples(view)]);
   if (key === 'B3') return numbersDrill(view, 'in_numbers', () => mixDetail(payload));
   if (key === 'B8') return downsideDetail(view);
-  if (key === 'B9') return numbersDrill(view, 'will_it_die', () => [wipeoutUnlitRule(view)]);
+  if (key === 'B9') return numbersDrill(view, 'will_it_die', () => [lampsBlock(view, true), wipeoutUnlitRule(view)]);
   if (key === 'B11') return timelineDetail(view);
   return null;
 }
@@ -796,103 +822,56 @@ function wipeoutUnlitRule(view) {
   return rule ? el('div', 'row-reason', rule) : null;
 }
 
-/** 「需求傳導」的展開：這條鏈怎麼走（圖的敘述＋圖裡 claim 的引文，照抄原論證卡的第一段），以及錨與吃到多少的出處——
- *  走到哪個錨、哪天起每一家都申報了、哪幾家由年初累計差分推算、它是代理、換匯用哪一季的季均價。2026-10-08 使用者：
- *  圖下那一坨小字不用——圖只留 Y 軸與量，這些照抄 materialize 的 `demand_anchor`／`capture`，放這裡給要查的時候看。 */
+/** 「需求傳導」的展開：這條鏈怎麼走（研究寫的論證＋圖裡 claim 的引文，照抄原論證卡的第一段）。
+ *  ⚠ 2026-10-29 使用者（「這三個折疊起來的可不可以消化過再給我」）：錨的可知日、哪幾家由累計差分推算、換匯的季均價、
+ *  各層代表公司的宣告理由與重看日——給查核的出處——不再上畫面（APP 是給人看的；它們照舊在 artifact 與 `/api/v1/stocks/<T>`）。
+ *  人要的那一半消化成句放在塊裡（`pathSentences`）；這裡只留研究寫的論證。 */
 function chainDetail(payload, view) {
   const line = view.argument ? lineMap(view.argument)['argument:chain'] : null;
-  const demand = payload.demand_anchor || {};
-  const cap = payload.capture || {};
-  const notes = [];
-  const anchors = demand.anchors || [];
-  if (anchors.length) {
-    notes.push('它走到的需求錨：' + anchors.map((a) => `${a.name || a.node}`
-      + (a.basis === 'company' ? '（退回公司層才走到）' : '')).join('、'));
-  }
-  (demand.series || []).forEach((s) => {
-    const pts = s.points || [];
-    if (!pts.length) return;
-    const last = pts[pts.length - 1];
-    notes.push(`${s.label}：最新一期 ${last.period}，${last.known_on} 起${s.aggregation === 'single' ? '申報' : '每一家都申報了'}`
-      + ((last.derived || []).length && s.aggregation !== 'single' ? `（${last.derived.join('、')} 由年初累計差分推算）` : '')
-      + `。${s.proxy || ''}`);
-  });
-  const cpts = cap.points || [];
-  if (cpts.length) {
-    const last = cpts[cpts.length - 1];
-    notes.push(`吃到多少：營收用${cap.revenue_source || '—'}`
-      + (last.per_usd ? `；換美元用季均價（FRED H.10，${last.period} 一美元 ${fmtNumber(last.per_usd, 2)} ${CURRENCY_WORD[last.currency] || last.currency}）` : '')
-      + `；${last.known_on} 起營收、錨、匯率都齊。往上＝吃到的比例變大。`);
-  }
-  // 路徑上各層（S3c）：有宣告代表公司的層，逐家印用哪一種營收、為什麼代表、最新一季誰沒進來（照抄 materialize）
-  const hops = (payload.path_layers || {}).hops || {};
-  Object.keys(hops).forEach((node) => {
-    const h = hops[node];
-    (h.representatives || []).forEach((r) => {
-      notes.push(`${h.name}｜代表公司 ${r.name}（${r.scope_label}${r.segment ? '：' + r.segment : ''}）：${r.why}`);
-    });
-    const latest = h.latest || {};
-    (latest.missing || []).forEach((m) => notes.push(`${h.name}｜${latest.period} 沒算進來：${m.name || m.company} ${m.reason}`));
-    if (h.declaration) {
-      notes.push(`${h.name}｜代表公司宣告於 ${h.declaration.declared_on}，重看日 ${h.declaration.expires}`
-        + (h.declaration.overdue ? '（已過重看日）' : ''));
-    }
-  });
-  if (!line && !notes.length) return null;
-  return drill('細節：這條鏈怎麼走、錨、吃到多少與各層代表公司的出處', () => {
+  const d = (line && line.datum) || {};
+  const deps = d.dependencies || {};
+  const hasText = typeof d.value === 'string' && d.value;
+  if (!line || (!hasText && !(deps.long_form || []).length && !(deps.citations || []).length)) return null;
+  return drill('這條鏈怎麼走（研究寫的論證與引文）', () => {
     const box = el('div', 'block-detail');
-    if (line) box.appendChild(argumentSection(line));
-    notes.forEach((text) => box.appendChild(el('div', 'row-reason', text)));
+    box.appendChild(argumentSection(line));
     return box;
   });
 }
 
-/** 路徑上各層（B2，個股頁 S3c）：錢從需求錨往下走到它坐的層，每一節一行——年增（層＝研究宣告的代表公司加總、公司＝它自己）
- *  或產生端宣告的缺席原因。押的格那幾條路徑先列、其餘收在一個展開；順序照 materialize（索引不是名次）。只照抄、不算。 */
-function pathFigure(payload) {
+/** 路徑上各層（B2，個股頁 S3c），消化成句（2026-10-29 使用者：「這三個折疊起來的可不可以消化過再給我」）：
+ *  押的格那幾條路每條一句——錢從需求錨往下走到它；有數字的那一節寫年增（層＝研究宣告的代表公司加總、公司＝整家營收），
+ *  沒有數字的只寫名字。其餘路徑只寫起點。缺席原因、期別、代表公司家數不上首屏（照舊在 API）。
+ *  全部照抄 materialize 的 `path_layers`；順序是索引不是名次，只照抄、不算。 */
+function pathSentences(payload) {
   const pl = payload.path_layers;
-  if (!pl) return null;
-  const box = el('div', 'path-layers');
-  box.appendChild(el('div', 'chart-axis-title', '路徑上各層：錢從需求錨往下，經過的每一層有沒有在長'));
-  if (pl.absence) {
-    box.appendChild(el('div', 'row-reason ss-pending', pl.absence.reason || absenceLabel(pl.absence.kind) || '沒有'));
-    return box;
-  }
+  if (!pl || pl.absence) return [];
   const hops = pl.hops || {};
-  const hopRow = (node) => {
-    const h = hops[node] || { name: node, kind_label: '' };
-    const row = el('div', 'path-hop');
-    row.appendChild(el('span', 'path-kind', h.kind_label || ''));
-    row.appendChild(el('span', 'path-name', h.name || node));
-    let text = '';
-    if (h.kind === 'anchor') {
-      text = (h.series || []).filter((s) => typeof s.yoy === 'number')
-        .map((s) => `${s.label} ${fmtPercent(s.yoy)}（${s.period}）`).join('；') || ((h.absence || {}).reason || '');
-    } else if (h.latest) {
-      text = `年增 ${fmtPercent(h.latest.yoy)}（${h.latest.period}${h.latest.coverage ? `，代表公司 ${h.latest.coverage} 家` : ''}）`
-        + (h.kind === 'company' ? `｜${h.proxy || ''}` : '') + (h.includes_page_company ? '｜含本公司' : '');
-    } else {
-      text = (h.absence || {}).reason || '沒有';
+  const what = payload.what_it_does || {};
+  const focus = new Set(what.focus || []);
+  const hopText = (node) => {
+    const h = hops[node] || {};
+    const name = nodeLabel(node, h.name);
+    if (h.kind !== 'anchor' && h.latest && typeof h.latest.yoy === 'number') {
+      return `${name}（${h.kind === 'company' ? '整家營收' : ''}年增 ${fmtPercent(h.latest.yoy)}）`;
     }
-    row.appendChild(el('span', h.latest || h.kind === 'anchor' ? 'path-value' : 'path-value path-absent', text));
-    return row;
-  };
-  const pathBox = (p) => {
-    const one = el('div', 'path-one');
-    p.nodes.forEach((node) => one.appendChild(hopRow(node)));
-    return one;
+    return name + (focus.has(node) ? `（它${what.source === 'rides' ? '押' : ''}在這）` : '');
   };
   const paths = pl.paths || [];
   const shown = paths.filter((p) => p.focus);
   const head = shown.length ? shown : paths.slice(0, 1);
-  head.forEach((p) => box.appendChild(pathBox(p)));
+  const out = head.map((p) => el('div', 'row-reason path-line', '錢怎麼走到它：' + (p.nodes || []).map(hopText).join(' → ')));
   const rest = paths.filter((p) => head.indexOf(p) < 0);
-  if (rest.length) box.appendChild(drill(`其他 ${rest.length} 條路徑`, () => {
-    const more = el('div', 'block-detail');
-    rest.forEach((p) => more.appendChild(pathBox(p)));
-    return more;
-  }));
-  return box;
+  if (rest.length) {
+    const starts = [];
+    rest.forEach((p) => {
+      const first = (p.nodes || [])[0];
+      const name = first ? nodeLabel(first, (hops[first] || {}).name) : null;
+      if (name && starts.indexOf(name) < 0) starts.push(name);
+    });
+    out.push(el('div', 'row-reason', `另有 ${rest.length} 條路也走到它` + (starts.length ? `（起點：${starts.join('、')}）` : '')));
+  }
+  return out;
 }
 
 /** 營收從哪來（B3，個股頁 S3d）：分部／產品線占比——一塊一列（名字｜長度＝占比的條｜百分比，前一次的占比括號裡），
@@ -909,8 +888,10 @@ function mixFigures(payload) {
     if (!latest) return;
     const box = el('div', 'mix-box');
     const prev = (s.points || []).length > 1 ? s.points[s.points.length - 2] : null;
-    box.appendChild(el('div', 'chart-axis-title',
-      `${s.label}營收占比（${latest.period || latest.as_of}${prev ? `；括號是前一次 ${prev.period || prev.as_of}` : ''}）`));
+    const title = el('div', 'chart-axis-title',
+      `${s.label}營收占比（${latest.period || latest.as_of}${prev ? '；括號是前一次' : ''}）`);
+    if (prev) title.title = `前一次是 ${prev.period || prev.as_of}`;
+    box.appendChild(title);
     if (s.note) box.appendChild(el('div', 'row-reason', s.note));
     (latest.parts || []).forEach((p) => {
       const row = el('div', 'mix-row');
@@ -930,8 +911,13 @@ function mixFigures(payload) {
   if (mix.absences && mix.absences.regions) out.push(el('div', 'row-reason ss-pending', `地區營收：${mix.absences.regions.reason}`));
   [['customers', '客戶集中度'], ['backlog', 'backlog 與長約']].forEach(([key, label]) => {
     const item = mix[key];
-    if (item) out.push(el('div', 'row-reason', `${label}（${item.as_of}）：${item.headline}`));
-    else if (mix.absences && mix.absences[key]) out.push(el('div', 'row-reason ss-pending', `${label}：${mix.absences[key].reason}`));
+    if (item) {
+      const line = el('div', 'row-reason', `${label}：${item.headline}`);
+      line.title = `記於 ${item.as_of}；全文與出處在「數字與出處」`;
+      out.push(line);
+    } else if (mix.absences && mix.absences[key]) {
+      out.push(el('div', 'row-reason ss-pending', `${label}：${mix.absences[key].reason}`));
+    }
   });
   (mix.conflicts || []).forEach((c) => out.push(el('div', 'row-reason',
     `${c.label || c.field}（${c.as_of}）有 ${(c.ids || []).length} 筆同時生效的紀錄`
@@ -946,14 +932,16 @@ function betShareLines(payload) {
   if (!bet) return [];
   if (bet.absence) return [el('div', 'row-reason ss-pending', `押的那一塊：${bet.absence.reason}`)];
   return (bet.items || []).map((item) => {
+    const name = nodeLabel(item.node, item.node_name);
     if (item.value === 'share') {
-      const prev = typeof item.prev_share === 'number' ? `；前一次 ${fmtRatioPct(item.prev_share, 1)}` : '';
+      const prev = typeof item.prev_share === 'number' ? `，前一次 ${fmtRatioPct(item.prev_share, 1)}` : '';
       const newer = item.newer_conflict ? `——較新的 ${item.newer_conflict} 那一次有多筆同時生效的紀錄、不挑一個，這裡是前一次` : '';
-      return el('div', 'row-reason', `押的那一塊：「${item.node_name}」由研究宣告用「${item.segment}」分部代表——`
-        + `占營收 ${fmtRatioPct(item.share, 1)}（${item.period}${prev}）${newer}`);
+      const line = el('div', 'row-reason', `押的「${name}」占營收 ${fmtRatioPct(item.share, 1)}（用「${item.segment}」分部${prev}）${newer}`);
+      line.title = `${item.period}；哪一個分部代表押的那一塊是研究宣告的（理由在「數字與出處」）`;
+      return line;
     }
     if (item.value === 'whole_company') {
-      return el('div', 'row-reason', `押的那一塊：「${item.node_name}」由研究宣告用全公司營收代表——整家公司就是押的那一塊`);
+      return el('div', 'row-reason', `押的「${name}」就是整家公司（研究宣告用全公司營收代表）`);
     }
     return el('div', 'row-reason ss-pending', `押的那一塊：${item.reason}`);
   });
@@ -984,19 +972,23 @@ function eventReactionLines(payload) {
   }
   (er.events || []).forEach((e) => {
     const price = e.price_before
-      ? `｜事件前收盤 ${fmtNumber(e.price_before.close, 2)}${e.price_before.unit ? ' ' + e.price_before.unit : ''}（${e.price_before.date}）`
+      ? `事件前收盤 ${fmtNumber(e.price_before.close, 2)}${e.price_before.unit ? ' ' + e.price_before.unit : ''}（${e.price_before.date}）`
       : '';
-    const late = e.date_basis === 'woken_at' ? '（這是系統發現它醒的日子，事件可能更早）'
-      : (e.date_basis === 'watch_date' ? '（研究定的日子，事件本身可能早幾天）' : '');
+    const late = e.date_basis === 'woken_at' ? '這是系統發現它醒的日子，事件可能更早'
+      : (e.date_basis === 'watch_date' ? '研究定的日子，事件本身可能早幾天' : '');
     const parts = (e.reactions || []).map((r) => {
-      if (r.absence) return `相對「${r.theme}」組：${r.absence}`;
-      const windows = (r.windows || []).map((w) => (w.pending ? `${w.n} 日 還沒滿`
+      if (r.absence) return `比「${r.theme}」組：${r.absence}`;
+      const windows = (r.windows || []).map((w) => (w.pending ? `${w.n} 日還沒滿`
         : (w.absence ? `${w.n} 日 ${w.absence}` : `${w.n} 日 ${signedPct(w.relative)}`)));
-      return `相對「${r.theme}」組：${windows.join('、')}`;
+      return `比「${r.theme}」組 ${windows.join('、')}`;
     });
-    if (e.reaction_absence) parts.push(`相對同組：${e.reaction_absence.reason}`);
-    out.push(el('div', 'row-reason', `${e.date} ${e.kind_label}${late}：${e.label || '—'}${price}`
-      + (parts.length ? `｜${parts.join('；')}` : '')));
+    if (e.reaction_absence) parts.push(`比同組：${e.reaction_absence.reason}`);
+    // 2026-10-29（「事件與影響多大 我想知道」「太多日期很沒必要」）：一件一句——哪天、什麼事、之後比同組多漲或少漲多少；
+    // 事件種類、日期的由來與事件前收盤放 title
+    const line = el('div', 'row-reason', `${dayLabel(e.date)} ${e.label || e.kind_label || '—'}`
+      + (parts.length ? `：${parts.join('；')}` : ''));
+    line.title = [e.kind_label, late, price].filter(Boolean).join('｜');
+    out.push(line);
   });
   if ((er.total || 0) > (er.events || []).length) {
     out.push(el('div', 'row-reason', `（另有 ${er.total - er.events.length} 件較早的事，沒列）`));
@@ -1021,6 +1013,39 @@ function mixDetail(payload) {
   return out;
 }
 
+/** 非邊緣頁（規定不寫敘事）只留的那一句：它坐在圖上哪幾層、每層現在讀成什麼——讀圖那一格的讀法（「｜」前那一半；
+ *  「與圖一致、未到期」這類狀態字不上畫面）。層名可點，連到圖頁那一層；沒讀過的層只寫名字。最多列 6 個，其餘只數。 */
+const SEATS_SHOWN = 6;
+
+function seatsSentence(payload, view) {
+  const panel = view.readings;
+  const ctx = (panel && panel.context) || {};
+  const names = payload.node_names || {};
+  const seats = ctx.seats || Object.keys(names);
+  const box = el('div', 'row-reason seats-line');
+  if (!seats.length) {
+    box.textContent = '它在圖上還沒有坐任何一層';
+    return box;
+  }
+  const read = {};
+  ((panel && panel.lines) || []).filter((line) => line.role === 'reading').forEach((line) => {
+    const m = /^reading:(.+):(layer|socket)$/.exec(line.key) || [];
+    const d = line.datum || {};
+    if (m[1] && typeof d.value === 'string' && d.value) read[m[1]] = d.value.split('｜')[0];
+  });
+  box.appendChild(document.createTextNode('它坐的層：'));
+  seats.slice(0, SEATS_SHOWN).forEach((node, i) => {
+    if (i) box.appendChild(document.createTextNode('、'));
+    const link = el('a', null, nodeLabel(node, names[node]));
+    link.href = '#/graph/' + encodeURIComponent(node);
+    link.title = node;
+    box.appendChild(link);
+    if (read[node]) box.appendChild(document.createTextNode(`（${read[node]}）`));
+  });
+  if (seats.length > SEATS_SHOWN) box.appendChild(document.createTextNode(` 等共 ${seats.length} 層`));
+  return box;
+}
+
 /** 「技術鏈」的展開：它坐的每一層現在讀成什麼（讀圖面板照抄）。節點印名字——層說明的標題、圖上的名字，都沒有才印 ID
  *  （ID 放 title）；哪幾層有層說明連到閱讀頁。完整引文與反證在圖頁那一層（點層名）。 */
 function seatsDetail(payload, view) {
@@ -1041,7 +1066,7 @@ function seatsDetail(payload, view) {
       const m = /^reading:(.+):(layer|socket)$/.exec(line.key) || [];
       const node = m[1] || line.key;
       const li = el('li');
-      const link = el('a', null, `${titles[node] || names[node] || node}（${m[2] === 'socket' ? '插槽' : '層'}）`);
+      const link = el('a', null, `${titles[node] || nodeLabel(node, names[node])}（${m[2] === 'socket' ? '插槽' : '層'}）`);
       link.href = '#/graph/' + encodeURIComponent(node);       // 2026-10-28：讀圖頁併進圖頁，連到那一層
       link.title = node;
       li.appendChild(link);
@@ -1127,10 +1152,12 @@ function questionPart(view, part) {
   const lines = view.candidate ? lineMap(view.candidate) : {};
   const state = lines['candidate:state'] && lines['candidate:state'].datum;
   const row = state && state.value;
-  if (part === 'priced_in' || part === 'in_numbers' || part === 'will_it_die') return wordsBlock(view, [part]);
-  if (part === 'wipeout') return [lampsBlock(view, true)].filter(Boolean);
+  if (part === 'priced_in' || part === 'in_numbers') return wordsBlock(view, [part]);
+  // 會不會死：一行（最差那盞的詞＋不是綠的那幾盞的短句）；四盞燈的全句住「數字與出處」（2026-10-29）
+  if (part === 'will_it_die') return [lampLine(view)].filter(Boolean);
+  if (part === 'wipeout') return [];
   if (part === 'disproof') return disproofBrief(view);
-  if (part === 'confirm') return confirmLines(row);
+  if (part === 'confirm') return confirmBrief(row);
   if (part === 'shared_bet') return sharedBetLines(row);
   return [el('div', 'row-reason', `（這一題的元件 ${part} 這版畫面還不認得）`)];
 }
@@ -1150,15 +1177,37 @@ function jumpToNumbers(question) {
   box.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-/** 候選狀態在等的那一筆 watch：哪天醒、最晚哪天到期重問。watch id 放 title（查得到，但不擋在句子裡）。 */
+/** 候選狀態在等的那一筆 watch：只印哪天重看（2026-10-29 使用者：「太多日期很沒必要」）——今年的寫月-日。
+ *  最晚到期日、等待狀態與 watch id 放 title（查得到，但不擋在句子裡）。 */
 function candidateWatchLine(watch) {
+  const day = watch.until || watch.expires;
+  // 等待已經不在盯（醒了、收了、不存在）＝該重看了；日子到了但 daily 還沒標的，由「敘事該重寫」那一行講
+  const woke = watch.status && watch.status !== 'active';
+  const line = el('div', woke ? 'warn' : 'row-reason',
+    day ? `${dayLabel(day)} ${woke ? '該重看了' : '重看'}` : '在等（沒寫醒來與到期日）');
   const bits = [];
   if (watch.until) bits.push(`${watch.until} 那天醒來重看`);
   if (watch.expires) bits.push(`最晚 ${watch.expires} 到期重問（到期是重問，不是丟掉）`);
   if (watch.status && watch.status !== 'active') bits.push(`這筆等待目前是「${watch.status}」`);
-  const line = el('div', 'row-reason', '在等：' + (bits.join('；') || '沒寫醒來與到期日'));
-  line.title = 'watch ' + watch.watch_id;
+  line.title = bits.concat(['watch ' + watch.watch_id]).join('；');
   return line;
+}
+
+/** 日期的短印法：今年的寫「月-日」，別年的印全日期（卡片的重看日同一個規則）。 */
+function dayLabel(iso) {
+  const text = String(iso || '').slice(0, 10);
+  return text.slice(0, 4) === String(new Date().getFullYear()) ? text.slice(5) : text;
+}
+
+/** 「錯了怎麼知道」首屏的確認條件：觸及／醒來／到期／未盯的逐條印（整句照 `confirm_line`），還在等的只印
+ *  materialize 組好的一句（`confirm_summary`；這一類字只住 `engine_b/disproof.py`，前端不組——見 `confirmLines`）。 */
+function confirmBrief(row) {
+  const all = (row && row.confirm) || [];
+  const moving = all.filter((c) => c.state && c.state !== 'active' && c.state !== 'closed');
+  const out = confirmLines({ confirm: moving });
+  if (row && row.confirm_summary) out.push(el('div', 'row-reason', row.confirm_summary));
+  else if (!('confirm_summary' in (row || {}))) return confirmLines(row);     // 舊 artifact：照舊逐條
+  return out;
 }
 
 /** 敘事的 confirm 條件（Phase 7 Step 7.0d）：每條一句，**整句由 materialize 端組好**（`engine_b/disproof.py::confirm_line`），
@@ -1197,6 +1246,42 @@ function lampsBlock(view, withGreen) {
   return box;
 }
 
+/** 會不會死（B9）一行（2026-10-29 使用者：「會不會死我不知道灰字這麼多要幹嘛 燈號跟訊息也不直覺」）：最差那盞的顏色寫成
+ *  一個詞，後面接不是綠的那幾盞的短句（`short`，`alpha.wipeout` 給的——前端不判色、不組理由），全綠就接四盞的短句；
+ *  沒量到的列名字（灰＝沒查到，不是沒事——有灰燈時綠不說「不會死」，只說查到的沒事）。
+ *  點了打開「數字與出處」：四盞燈的全句與算出它的數字都在那裡。 */
+const LAMP_WORDS = { red: '危險', amber: '要留意', green: '不會死', green_partial: '查到的都沒事' };
+
+function lampLine(view) {
+  const panel = view.wipeout;
+  if (!panel) return null;
+  const names = lampNames();
+  const lit = { red: [], amber: [], green: [] };
+  const grey = [];
+  (panel.lines || []).filter((line) => line.role === 'wipeout').forEach((line) => {
+    const value = (line.datum || {}).value || {};
+    const name = names[line.key] || plainLine(line.key, line.display_label).replace(/^歸零旗標：/, '');
+    if (lit[value.colour]) lit[value.colour].push(value.short || name);
+    else grey.push(name);
+  });
+  const worst = ['red', 'amber', 'green'].find((c) => lit[c].length);
+  let text = '⬜ 沒查到：' + grey.join('、');
+  if (worst) {
+    const said = worst === 'green' ? lit.green : lit.red.concat(lit.amber);
+    const word = worst === 'green' && grey.length ? LAMP_WORDS.green_partial : LAMP_WORDS[worst];
+    text = `${WIPEOUT_COLOURS[worst].mark} ${word}：${said.join('、')}`
+      + (worst !== 'green' && lit.green.length ? '；其他沒事' : '')
+      + (grey.length ? `（沒查到：${grey.join('、')}）` : '');
+  }
+  const box = el('div', 'candidate-words');
+  const button = el('button', 'word word-link lamp-line', text + ' ↓');
+  button.type = 'button';
+  button.title = '打開四盞燈的全句與數字';
+  button.addEventListener('click', () => jumpToNumbers('will_it_die'));
+  box.appendChild(button);
+  return box;
+}
+
 /** 燈名：page_schema 的 B9 元素名（`wipeout/<key>` 那一條 line 對到的元素；合約只有一份，前端不另寫）。 */
 function lampNames() {
   const out = {};
@@ -1226,18 +1311,24 @@ function wordsBlock(view, questions) {
   return [words];
 }
 
-/** ③ 每條反證與盯它的 watch 狀態——照抄 downside 面板（論證層那張卡同一份；這裡只印條件與狀態，細節在那張卡）。 */
+/** ③ 反證（照抄 downside 面板）：首屏只逐條印要你看的（觸及待處置／醒來待判／到期待複查／未盯），在盯的只數條數
+ *  （2026-10-29：「1815.TWO 真的太長了」）。每一條的條件、多久看一次、觸發後做什麼在這一塊的展開裡。 */
 function disproofBrief(view) {
   const panel = view.downside;
   if (!panel) return [];
   const lines = (panel.lines || []).filter((line) => line.role === 'downside');
-  if (!lines.length) {
-    return [el('div', 'row-reason', downsideAbsenceHead(panel) + (panel.reason ? '：' + panel.reason : ''))];
-  }
-  return lines.map((line) => {
-    const r = line.datum.value || {};
-    return el('div', 'row-reason', `反證：${r.condition || ''}｜${r.state_label || '—'}${r.until ? `（到期 ${r.until}）` : ''}`);
+  if (!lines.length) return [el('div', 'row-reason', downsideAbsenceHead(panel))];
+  const rows = lines.map((line) => line.datum.value || {});
+  const moving = rows.filter((r) => r.state && r.state !== 'active');
+  const out = moving.map((r) => {
+    const line = el('div', 'warn', `反證${r.state_label ? `（${r.state_label}）` : ''}：${r.condition || ''}`);
+    if (r.watch_id) line.title = 'watch ' + r.watch_id;
+    return line;
   });
+  const calm = rows.length - moving.length;
+  if (!moving.length) out.push(el('div', 'row-reason', `反證 ${rows.length} 條都在盯，還沒有一條觸及`));
+  else if (calm) out.push(el('div', 'row-reason', `其餘反證 ${calm} 條在盯`));
+  return out;
 }
 
 /** downside 沒有任何一列時的標題：「名下還沒有反證」與「這次沒讀到反證的來源」下一步不同（3.7 R1），跟著產生端宣告的分型走。 */
@@ -1297,7 +1388,15 @@ function candidateLine(view, inQuestions) {
   }
   if (row) {
     (row.preconditions || []).forEach((text) => node.appendChild(el('div', 'row-reason', '前提失效：' + text)));
-    (row.rewrite || []).forEach((text) => node.appendChild(el('div', 'row-reason', text)));
+    // 敘事該重寫：一行、每個原因兩到四個字（`alpha.candidates.rewrite_words`；2026-10-29 使用者：「該重寫為啥沒寫…一目了然」）；
+    // 原句放 title。舊 artifact 沒帶 `rewrite_words` 就照舊逐句印。
+    if ((row.rewrite_words || []).length) {
+      const why = el('div', 'warn', '敘事該重寫：' + row.rewrite_words.join('、'));
+      why.title = (row.rewrite || []).join('\n');
+      node.appendChild(why);
+    } else {
+      (row.rewrite || []).forEach((text) => node.appendChild(el('div', 'row-reason', text)));
+    }
     if (row.note) node.appendChild(el('div', 'row-reason', row.note));
   }
   // 「和其他檔並排看」在首頁（2026-10-28 候選板併進首頁），不是這一檔的細節（細節在上面三個字點下去的稽核區）。
@@ -1724,8 +1823,7 @@ function blockVisuals(payload, view, key) {
   const out = [];
   if (key === 'B2') {
     anchorFigures(payload).forEach((n) => out.push(n));
-    const path = pathFigure(payload);
-    if (path) out.push(path);
+    pathSentences(payload).forEach((n) => out.push(n));
     const capture = captureFigure(payload);
     if (capture) out.push(capture);
   }
@@ -1802,9 +1900,11 @@ function rulerChart(view) {
   const wrap = el('div', 'chart-wrap');
   wrap.appendChild(svg);
   const cdet = cohort ? ((cohort.dependencies || {}).detail || {}) : {};
-  wrap.appendChild(el('div', 'chart-legend', `今天 ${fmtMultiple(det.multiple_today)} 倍＝自家近三年第 ${fmtNumber(d.value, 0)} 百分位`
-    + `（三年裡約 ${fmtNumber(d.value, 0)}% 的交易日倍數比今天低）。倍數＝${RULER_BASIS[basis] || basis}，對數刻度`
-    + (cohort ? `；同組＝${cdet.theme || '主題等權組'}（同口徑 ${cdet.n_same_basis || '?'} 檔），只當脈絡。` : '；沒有同口徑的主題等權組。')));
+  // 2026-10-29（「太多日期很沒必要」）：圖下一句話——今天比近三年幾成的日子貴；同組是哪一組、幾檔同口徑放 title
+  const legend = el('div', 'chart-legend', `今天 ${fmtMultiple(det.multiple_today)} 倍，比近三年 ${fmtNumber(d.value, 0)}% 的交易日貴`
+    + `（${RULER_BASIS[basis] || basis}，對數刻度${cohort ? '；菱形是同組中位，只當脈絡' : ''}）`);
+  legend.title = cohort ? `同組＝${cdet.theme || '主題等權組'}（同口徑 ${cdet.n_same_basis || '?'} 檔）` : '沒有同口徑的主題等權組';
+  wrap.appendChild(legend);
   return wrap;
 }
 
@@ -1923,11 +2023,11 @@ function diagramFigure(d, mine, who, focus, focusWord) {
     });
   }
   box.appendChild(frame);
-  // 「圖上：…」是畫圖那天圖上的供應商——日期跟著印，之後新入圖的不會自己出現在圖裡
-  box.appendChild(el('div', 'chart-legend', `示意｜${d.caption || ''}${d.drawn_at ? `｜${d.drawn_at} 畫` : ''}`));
+  // 「圖上：…」是畫圖那天圖上的供應商（之後新入圖的不會自己出現在圖裡）——畫圖日 2026-10-29 起放進出處那一行，圖下不印日期
+  box.appendChild(el('div', 'chart-legend', `示意｜${d.caption || ''}`));
   const sources = d.sources || [];
   if (sources.length) {
-    box.appendChild(drill(`出處 ${sources.length} 份`, () => {
+    box.appendChild(drill(`出處 ${sources.length} 份${d.drawn_at ? `（${d.drawn_at} 畫）` : ''}`, () => {
       const list = el('div', 'ss-cells');
       sources.forEach((s) => list.appendChild(el('div', 'attention-body', `${s.what || ''}　${s.ref || ''}`)));
       return list;

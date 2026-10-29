@@ -169,6 +169,8 @@ def fetch_snapshot(ticker: str) -> dict | None:
         "cash_and_equivalents": _sf(info.get("totalCash")),
         "total_debt":           _sf(info.get("totalDebt")),
         "free_cash_flow_ttm":   _sf(info.get("freeCashflow")),
+        # 2026-10-29：歸零燈分「本業燒錢」（營業現金流 < 0）與「擴產花錢」（營業現金流 ≥ 0、自由現金流 < 0）。
+        "operating_cash_flow_ttm": _sf(info.get("operatingCashflow")),
         "ev_revenue":           _sf(info.get("enterpriseToRevenue")),
         "pe_trailing":          _sf(info.get("trailingPE")),
         "pe_forward":           _sf(info.get("forwardPE")),

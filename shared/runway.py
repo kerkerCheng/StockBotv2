@@ -69,6 +69,11 @@ def derive_runway(
         "source": source["source"],
         "as_of": source["as_of"],
     }
+    # 營業現金流（2026-10-29，選填）：只在三個必要輸入也取自同一份來源時帶上——人工觀測補的跑道與快照的營業現金流
+    # 不是同一天同一份，混用會把兩個來源拼成一個看起來一致的值（PIT／provenance）。
+    operating = _finite(source.get("operating_cash_flow_ttm"))
+    if operating is not None:
+        result["operating_cash_flow_ttm"] = operating
     if free_cash_flow >= 0:
         return result | {"status": "self_funding", "runway_months": None}
     return result | {

@@ -41,6 +41,15 @@ def test_without_a_declared_bet_it_lists_the_graph_nodes_and_says_the_bet_is_not
     assert few["line"] == "圖上它供貨或開發：Alpha node（敘事還沒宣告押哪一格）" and few["where_line"] is None
 
 
+def test_chinese_node_names_come_first_when_the_label_table_has_them() -> None:
+    """2026-10-29 使用者（手機截圖）：頁首印英文的層名看不懂——`labels_zh`（`alpha.node_labels`）有中文名就先用，
+    押的格與圖上的節點同一個規則；沒有中文名的照圖上的名字（不猜）。"""
+    zh = {"tech:cw_dfb_laser": "高功率 CW DFB 雷射"}
+    assert what_it_does(_view([CW]), [], {}, None, zh)["line"] == "押在：高功率 CW DFB 雷射（層）"
+    seats = what_it_does(_view(), ["tech:cw_dfb_laser", "tech:b"], {"tech:b": "B node"}, None, zh)
+    assert seats["line"] == "圖上它供貨或開發：高功率 CW DFB 雷射、B node（敘事還沒宣告押哪一格）"
+
+
 def test_nothing_known_is_a_named_absence_and_an_unread_graph_is_not_nothing() -> None:
     nothing = what_it_does(_view(), [], {}, [DIAGRAM])
     assert nothing["line"] is None and nothing["absence"]["kind"] == "not_yet_recorded"
