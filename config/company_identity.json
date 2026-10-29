@@ -1755,14 +1755,17 @@
       "market_currency": "CNY",
       "display_name": "Yunnan Lincang Xinyuan Germanium Industry Co.,LTD",
       "_display_name_source": "yfinance longName（2026-10-15）；深交所 002428（云南临沧鑫圆锗业股份有限公司，简称云南锗业）",
-      "_note": "InP 晶片（襯底）由控股子公司雲南鑫耀半導體材料有限公司生產；入圖包見 inp_substrate_yunnan_germanium_2026_10_15_action.json",
+      "_note": "InP 晶片（襯底）由控股子公司雲南鑫耀半導體材料有限公司生產；入圖包見 inp_substrate_yunnan_germanium_2026_10_15_action.json；2026-10-29 加控股孫公司「云南中科鑫圆晶体材料有限公司」（中科鑫圆）為別名：2025 年報 p.11「云南中科鑫圆晶体材料有限公司负责光伏级锗产品生产」、p.79「同意控股子公司云南鑫耀半导体材料有限公司以10,000万元自有资金对孙公司云南中科鑫圆晶体材料有限公司进行增资……控股孙公司中科鑫圆」、p.33 增資後持股 55.83%——已併表、本身未上市的唯一太陽能鍺晶片主體，電科藍天問詢回覆（上交所 2025-09-27）具名的是它；可投資的載體只有母公司，照 co:optics_technology_holding 先例顯式登記成母公司別名（INV-1：名冊明寫，不是猜）。隨太空太陽翼入圖包 staged，drop 即回退",
       "name_aliases": [
         "Yunnan Germanium",
         "云南锗业",
         "雲南鍺業",
         "云南临沧鑫圆锗业",
         "云南临沧鑫圆锗业股份有限公司",
-        "Yunnan Lincang Xinyuan Germanium"
+        "Yunnan Lincang Xinyuan Germanium",
+        "云南中科鑫圆晶体材料有限公司",
+        "中科鑫圆",
+        "雲南中科鑫圓"
       ]
     },
     {
@@ -2783,6 +2786,236 @@
         "江苏永鼎股份有限公司",
         "Jiangsu Etern",
         "JIANGSU ETERN COMPANY LIMITED"
+      ]
+    },
+    {
+      "company_id": "co:cetc_lantian",
+      "research_ticker": "688818.SS",
+      "market_currency": "CNY",
+      "execution_currency": "CNY",
+      "execution_venue": "SSE",
+      "display_name": "CETC Lantian Technology Co., Ltd.",
+      "_display_name_source": "yfinance longName（2026-10-29）；上交所科創板 688818（中电科蓝天科技股份有限公司，简称电科蓝天；招股說明書 2026-02-05 簽署，發行日 2026-01-30、發行價 9.47 元）",
+      "_note": "隨太空太陽翼入圖包 staged（2026-10-29，drop 即回退；入圖包見 space_solar_array_cetc_lantian_2026_10_29_action.json）：宇航電源系統商（太陽電池陣、鋰離子蓄電池組、電源控制設備）；招股說明書 p.172：2024 年配套 144／285 個國內航天器（約 50.5%）；問詢回覆 p.32：截至 2025-08，千帆已發射組網衛星的電源分系統均由它供應、國網由它與 811 所供應。全資子公司天津蓝天太阳科技有限公司（蓝天太阳，招股說明書釋義 p.13）自產三結砷化鎵外延片——以別名併入。參股 50% 的天津恒电（中國衛星控制）不併入：另建 co:tianjin_hengdian，invests_in control=false。系統口徑非邊緣（`python -m alpha edge 688818.SS`：121.1 億美元，2026-10-29）",
+      "name_aliases": [
+        "电科蓝天",
+        "電科藍天",
+        "中电科蓝天",
+        "中电科蓝天科技股份有限公司",
+        "CETC Lantian",
+        "蓝天太阳",
+        "天津蓝天太阳科技有限公司"
+      ]
+    },
+    {
+      "company_id": "co:tianjin_hengdian",
+      "research_ticker": null,
+      "display_name": "天津恒电空间电源有限公司",
+      "_display_name_source": "電科藍天審核問詢函回覆（上交所 2025-09-27）p.205 供應商表「天津恒电空间电源有限公司」；英文正式名稱未取得一手",
+      "_note": "非上市（研究 ticker 明確 null，INV-1）：同一份回覆 p.60「股东为中国东方红卫星股份有限公司（中国卫星，600118.SH）、电科蓝天，双方各持股50%，天津恒电实际控制人为中国卫星」——照 [837] 的合資式建模：本節點＋co:china_spacesat invests_in（control=true）＋co:cetc_lantian invests_in（control=false）；⚠ 不登記成任一家的別名：兩個可投資載體，而且中國衛星同時是電科藍天的衛星客戶。業務：太空三結砷化鎵電池片（電科藍天剛性電池片主要向它買，2024 年 4.43 億元，p.205）",
+      "name_aliases": [
+        "天津恒电",
+        "天津恒電",
+        "恒电空间"
+      ]
+    },
+    {
+      "company_id": "co:china_spacesat",
+      "research_ticker": "600118.SS",
+      "market_currency": "CNY",
+      "execution_currency": "CNY",
+      "execution_venue": "SSE",
+      "display_name": "China Spacesat Co.,Ltd.",
+      "_display_name_source": "yfinance longName（2026-10-29）；上交所 600118（中国东方红卫星股份有限公司，简称中国卫星；電科藍天審核問詢函回覆 p.60「中国东方红卫星股份有限公司（中国卫星，600118.SH）」）",
+      "_note": "隨太空太陽翼入圖包 staged（2026-10-29，drop 即回退）：航天科技集團下屬衛星製造與應用公司；天津恒电（太空電池片）的實際控制人（各 50%，問詢回覆 p.60），同時是電科藍天的商業航天客戶（招股說明書 p.173）——互為客戶與供應商，照 research-drain Step 4-3 不當客戶資本承諾。⚠ 不收短名「中国卫星」：中文整串比對會撞「中国卫星网络集团有限公司」（中國星網，另一家）。系統口徑邊緣（`python -m alpha edge 600118.SS`：99.4 億美元、分析師 1 家，2026-10-29）",
+      "name_aliases": [
+        "中国东方红卫星股份有限公司",
+        "中國東方紅衛星股份有限公司",
+        "China Spacesat"
+      ]
+    },
+    {
+      "company_id": "co:changelight",
+      "research_ticker": "300102.SZ",
+      "market_currency": "CNY",
+      "execution_currency": "CNY",
+      "execution_venue": "SZSE",
+      "display_name": "Xiamen Changelight Co., Ltd.",
+      "_display_name_source": "yfinance longName（2026-10-29）；深交所創業板 300102（厦门乾照光电股份有限公司，简称乾照光电；電科藍天問詢回覆 p.226「上市公司厦门乾照光电股份有限公司（300102.SZ）」）",
+      "_note": "隨太空太陽翼入圖包 staged（2026-10-29，drop 即回退）：LED 外延片與晶片廠，兼做高性能砷化鎵太陽電池；電科藍天委託外延片加工的第一大廠（2024 年 1.17 億元，問詢回覆 p.223），供應主體是子公司扬州乾照光电有限公司（p.226 主要股東欄：上市公司厦门乾照光电股份有限公司（300102.SZ））——短名「乾照光电」整串會在子公司名裡命中，子公司出貨解析到上市母公司（INV-1，同 co:huaming 先例）。系統口徑邊緣無法量（`python -m alpha edge 300102.SZ`：20.7 億美元、分析師家數 yfinance 沒有，2026-10-29），依 INV-3 留在母體",
+      "name_aliases": [
+        "乾照光电",
+        "乾照光電",
+        "厦门乾照光电股份有限公司",
+        "扬州乾照光电有限公司",
+        "Changelight",
+        "Xiamen Changelight"
+      ]
+    },
+    {
+      "company_id": "co:nanchang_kaixun",
+      "research_ticker": null,
+      "display_name": "南昌凯迅光电股份有限公司",
+      "_display_name_source": "電科藍天審核問詢函回覆 p.223、p.226 供應商表「南昌凯迅光电股份有限公司」；英文正式名稱未取得一手",
+      "_note": "非上市（研究 ticker 明確 null，INV-1）：同一份回覆 p.226 主要股東「王向武（30.28%）、长治市南烨实业集团有限公司（23.02%）、郭宇麟（11.78%）、上海晋能国际贸易有限公司（10.00%）」、企業性質民營；同一份回覆 p.197、p.228 寫成「南昌凯讯光电」（同一家：供應商表與股東表都寫凯迅），兩種寫法都收",
+      "name_aliases": [
+        "南昌凯迅光电",
+        "南昌凯讯光电",
+        "南昌凱迅光電",
+        "凯迅光电"
+      ]
+    },
+    {
+      "company_id": "co:sanan_optoelectronics",
+      "research_ticker": "600703.SS",
+      "market_currency": "CNY",
+      "execution_currency": "CNY",
+      "execution_venue": "SSE",
+      "display_name": "Sanan Optoelectronics Co.,Ltd",
+      "_display_name_source": "yfinance longName（2026-10-29）；上交所 600703（三安光电股份有限公司，简称三安光电；電科藍天問詢回覆 p.226「上市公司三安光电股份有限公司（600703.SH）」）",
+      "_note": "隨太空太陽翼入圖包 staged（2026-10-29，drop 即回退）：LED／化合物半導體廠；電科藍天 2023–2024 年委託外延片加工的廠商之一，供應主體是子公司天津三安光电有限公司（問詢回覆 p.226 主要股東欄：上市公司三安光电股份有限公司（600703.SH））——短名「三安光电」整串會在子公司名裡命中，子公司出貨解析到上市母公司（INV-1）。系統口徑邊緣（`python -m alpha edge 600703.SS`：67.5 億美元、分析師 3 家，2026-10-29）",
+      "name_aliases": [
+        "三安光电",
+        "三安光電",
+        "三安光电股份有限公司",
+        "Sanan Optoelectronics"
+      ]
+    },
+    {
+      "company_id": "co:zhuhai_jifa",
+      "research_ticker": null,
+      "display_name": "珠海积发电子科技有限公司",
+      "_display_name_source": "電科藍天審核問詢函回覆 p.226、p.228「珠海积发电子科技有限公司」",
+      "_note": "非上市（研究 ticker 明確 null，INV-1）：同一份回覆 p.226 主要股東「刘征宇（88.20%）、黄德珍（6.02%）、刘慧敏（5.78%）」、民營；2022 年電科藍天委託外延片加工第二大（1,666.99 萬元，p.228），2023–2024 年不在前五",
+      "name_aliases": [
+        "珠海积发",
+        "珠海積發"
+      ]
+    },
+    {
+      "company_id": "co:zhongge_tech",
+      "research_ticker": null,
+      "display_name": "中锗科技有限公司",
+      "_display_name_source": "電科藍天審核問詢函回覆 p.213、p.221「中锗科技有限公司」；英文正式名稱未取得一手",
+      "_note": "非上市（研究 ticker 明確 null，INV-1）：有限公司本身不能在 A 股掛牌；工商資料（企查查，非一手）寫疑似實控人王卿伟 56.73%，媒體寫毅達資本 A 輪（電子工程專輯）——母公司是不是上市公司沒有一手，不猜。業務：太陽能電池襯底用鍺晶片（電科藍天剛性外延片用的鍺襯底兩家之一，2024 年 5,005.22 萬元）",
+      "name_aliases": [
+        "中锗科技",
+        "中鍺科技"
+      ]
+    },
+    {
+      "company_id": "co:shenyang_zhongke_xinyu",
+      "research_ticker": null,
+      "display_name": "沈阳中科新宇空间智能装备有限公司",
+      "_display_name_source": "電科藍天審核問詢函回覆 p.205、p.227「沈阳中科新宇空间智能装备有限公司」",
+      "_note": "非上市（研究 ticker 明確 null，INV-1）：同一份回覆 p.227 主要股東「沈阳中科天盛自动化技术有限公司（100.00%）」、企業性質地方國有企業。業務：太陽翼展開機構與驅動機構（電科藍天 2024 年 6,212.39 萬元，單一來源／詢比價）",
+      "name_aliases": [
+        "沈阳中科新宇",
+        "瀋陽中科新宇"
+      ]
+    },
+    {
+      "company_id": "co:sia_cas",
+      "research_ticker": null,
+      "display_name": "中国科学院沈阳自动化研究所",
+      "_display_name_source": "電科藍天審核問詢函回覆 p.205「中国科学院沈阳自动化研究所」",
+      "_note": "研究機構（研究 ticker 明確 null，INV-1）。業務：太陽翼結構機構、驅動機構（電科藍天 2024 年 4,296.04 萬元，詢比價）",
+      "name_aliases": [
+        "沈阳自动化研究所",
+        "中科院沈阳自动化所",
+        "沈阳自动化所"
+      ]
+    },
+    {
+      "company_id": "co:beijing_xuanyu",
+      "research_ticker": null,
+      "display_name": "北京轩宇空间科技有限公司",
+      "_display_name_source": "電科藍天審核問詢函回覆 p.208「北京轩宇空间科技有限公司」",
+      "_note": "非上市（有限公司，研究 ticker 明確 null，INV-1）；股東與母公司這份回覆沒寫，未查。業務：驅動機構（電科藍天 2022 年 238.94 萬元、詢比價，p.208）",
+      "name_aliases": [
+        "北京轩宇",
+        "北京軒宇"
+      ]
+    },
+    {
+      "company_id": "co:sisp",
+      "research_ticker": null,
+      "display_name": "上海空间电源研究所",
+      "_display_name_source": "電科藍天招股說明書 p.175「上海空间电源研究所始建于1960年，是航天科技集团第八研究院下属空间电源专业研究所」；審核問詢函回覆 p.23「上海空间电源研究所（简称“811所”）」",
+      "_note": "研究機構（航天科技集團八院下屬，研究 ticker 明確 null，INV-1）。太陽電池陣（剛性、柔性）與電池片（以自用為主）都做；國網星座已發射組網衛星的電源分系統由電科藍天與它供應（問詢回覆 p.32）",
+      "name_aliases": [
+        "811所",
+        "上海空間電源研究所"
+      ]
+    },
+    {
+      "company_id": "co:suzhou_fuchang",
+      "research_ticker": null,
+      "display_name": "苏州馥昶空间技术有限公司",
+      "_display_name_source": "電科藍天審核問詢函回覆 p.24「苏州馥昶空间技术有限公司（以下简称“苏州馥昶”）」",
+      "_note": "非上市（有限公司，研究 ticker 明確 null，INV-1）；同一份回覆 p.24「苏州馥昶实际控制人：倪家伟」、民營。電源系統級配套商，具備剛性、柔性太陽電池陣生產能力（p.24、p.63–64）",
+      "name_aliases": [
+        "苏州馥昶",
+        "蘇州馥昶"
+      ]
+    },
+    {
+      "company_id": "co:zhongshan_dehua",
+      "research_ticker": null,
+      "display_name": "中山德华芯片技术有限公司",
+      "_display_name_source": "電科藍天審核問詢函回覆 p.24「中山德华芯片技术有限公司（以下简称“中山德华”）」",
+      "_note": "非上市（有限公司，研究 ticker 明確 null，INV-1）；股東與母公司這份回覆沒寫，未查——母公司若是上市公司，這一格的可投資載體會漏（照實寫未查，INV-3）。提供電源單機級產品，具備剛性、柔性太陽電池陣生產能力（p.24、p.63–64）",
+      "name_aliases": [
+        "中山德华",
+        "中山德華"
+      ]
+    },
+    {
+      "company_id": "co:shenzhen_xinyuan",
+      "research_ticker": null,
+      "display_name": "深圳市航天新源科技有限公司",
+      "_display_name_source": "電科藍天審核問詢函回覆 p.24「深圳市航天新源科技有限公司（以下简称“深圳新源”）」",
+      "_note": "非上市（有限公司，研究 ticker 明確 null，INV-1）；股東與母公司這份回覆沒寫，未查。提供電源單機級產品，具備剛性、柔性太陽電池陣生產能力（p.24、p.63–64）",
+      "name_aliases": [
+        "深圳新源",
+        "航天新源"
+      ]
+    },
+    {
+      "company_id": "co:5n_plus",
+      "research_ticker": "VNP.TO",
+      "market_currency": "CAD",
+      "execution_currency": "CAD",
+      "execution_venue": "TSX",
+      "display_name": "5N Plus Inc.",
+      "_display_name_source": "yfinance longName（2026-10-29，VNP.TO、CAD、交易所 TOR）；St. George 新聞稿 2026-09-22「5N Plus Inc. (TSX:VNP)」",
+      "_note": "隨太空太陽翼入圖包 v2 staged（2026-10-29，drop 即回退）：特種半導體與高性能材料；Specialty Semiconductors 產品含「epitaxial semiconductor substrates, space solar cells and assemblies」（Q2 2026 MD&A p.3）。全資子公司 AZUR SPACE Solar Power GmbH（德國 Heilbronn，太空三結電池與 CIC）以別名併入：電科藍天招股說明書 p.176「2021 年 11 月，5N Plus 收購 Azur 公司 100%股权」、p.182「太空太阳能电池及组件（由Azur生产）」——已併表、本身未上市，可投資的載體只有母公司，照 co:optics_technology_holding 先例顯式登記（INV-1：名冊明寫，不是猜）。St. George（Utah）廠 2014 年起全資，把鍺等轉成晶圓與襯底（新聞稿 2026-09-22）。系統口徑邊緣（`python -m alpha edge VNP.TO`：18.2 億美元、分析師 8 家，2026-10-29）",
+      "name_aliases": [
+        "5N Plus",
+        "5N+",
+        "AZUR SPACE Solar Power GmbH",
+        "AZUR SPACE",
+        "Azur Space",
+        "AZUR",
+        "Azur"
+      ]
+    },
+    {
+      "company_id": "co:rocket_lab",
+      "research_ticker": "RKLB",
+      "market_currency": "USD",
+      "execution_currency": "USD",
+      "execution_venue": "NASDAQ",
+      "display_name": "Rocket Lab Corporation",
+      "_display_name_source": "yfinance longName（2026-10-29，RKLB、USD、交易所 NMS）；10-K FY2025（SEC EDGAR CIK 1819994，2026-02-26）",
+      "_note": "隨太空太陽翼入圖包 v2 staged（2026-10-29，drop 即回退）：發射與太空系統；太空太陽能電池、CIC、太陽陣列垂直整合、Albuquerque 從電池做到陣列（10-K FY2025）。SolAero Technologies Corp.（2022-01 併入，10-K）以別名併入；營運子公司 Rocket Lab USA（產品頁版權列）同列別名。鍺基三結（ZTJ 家族）與無鍺 IMM（IMM-α、2026-09-08 量產發布的 IMM Apex）兩條線都做。系統口徑非邊緣（`python -m alpha edge RKLB`：362.9 億美元、分析師 20 家，2026-10-29）",
+      "name_aliases": [
+        "Rocket Lab",
+        "Rocket Lab USA",
+        "Rocket Lab USA, Inc.",
+        "SolAero",
+        "SolAero Technologies",
+        "SolAero Technologies Corp."
       ]
     }
   ]
