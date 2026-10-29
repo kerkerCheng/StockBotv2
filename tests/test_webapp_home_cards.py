@@ -276,6 +276,27 @@ def test_the_missing_label_only_replaces_the_state_in_the_missing_group() -> Non
     assert held["missing_label"] is None and held["label"] == "已持有"
 
 
+def test_the_pass_reason_rides_only_on_cards_in_the_pass_group() -> None:
+    """首頁「不要」卡片印理由那一句（故事層；2026-10-29 使用者：「不要也要理由，我現在看不到」）：只在落「不要」組時給。
+    落「邊緣無法量」的檔敘事也可能宣告不要（真資料 300489.SZ、CCXI、ENA.V），卡片的狀態不是不要，理由會對不上，不給；
+    還沒寫故事就沒有那一句，不從原文截一段來湊。前端照抄那一格。"""
+    from pathlib import Path
+
+    from webapp.materialize import _candidate_overview
+
+    def card(**row):
+        return _candidate_overview({"lines": [{"key": "candidate:state", "datum": {"value": dict(ROW, **row)}}]})
+
+    passed = card(derived="pass", declared="pass", derived_label="不要", reason_story="不要：這一層不卡。")
+    assert passed["reason_story"] == "不要：這一層不卡。" and passed["label"] == "不要"
+    assert card(derived="edge_unmeasurable", declared="pass", derived_label="邊緣無法量",
+                reason_story="不要：這一層不卡。")["reason_story"] is None
+    assert card(derived="missing", declared="missing", derived_label="缺 X", reason_story="缺：占比量不到。")["reason_story"] is None
+    assert card(derived="pass", declared="pass", derived_label="不要")["reason_story"] is None
+    js = (Path(__file__).resolve().parents[1] / "webapp" / "static" / "app.js").read_text(encoding="utf-8")
+    assert "(row.candidate || {}).reason_story" in js and "'card-reason'" in js
+
+
 def test_held_group_says_unverified_when_the_sheet_was_not_read(tmp_path) -> None:
     """候選板原本在 Sheet 讀不到時把「已持有」印成「未驗」；首頁「0 也印」不得把它壓成「已持有 0」（L12）。"""
     from webapp.contracts import canonical_digest

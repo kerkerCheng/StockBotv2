@@ -131,8 +131,11 @@ def _candidate_overview(panel: Mapping[str, Any]) -> dict[str, Any]:
             # 缺 X 的短標（故事層，2026-10-29）：首頁卡片印「缺：二代占比」——使用者：「缺x是缺啥 可以五字一目瞭然嗎」。
             # 只在落「缺 X」組時給：已持有的檔敘事也可能宣告缺 X，但卡片的狀態是「已持有」，不得被短標蓋掉
             label = row.get("missing_label") if row.get("derived") == "missing" else None
+            # 不要的理由那一句（故事層，2026-10-29 使用者：「不要也要理由，我現在看不到」）：只在落「不要」組時給——
+            # 落「邊緣無法量」的檔敘事也可能宣告不要（300489.SZ、CCXI、ENA.V），卡片的狀態卻不是不要，理由會跟狀態對不上
+            reason = row.get("reason_story") if row.get("derived") == "pass" else None
             return {"list_group": str(row["derived"]), "label": row.get("derived_label"), "absence_kind": None,
-                    "sheet_verified": row.get("sheet_verified"), "missing_label": label}
+                    "sheet_verified": row.get("sheet_verified"), "missing_label": label, "reason_story": reason}
         # 有候選列、值卻不在首頁分組字彙裡＝字彙漏了一格（不是「沒讀到」）：照實寫出那個值
         return {"list_group": "unavailable", "label": None, "absence_kind": "upstream_unavailable",
                 "reason": f"候選狀態的值 {row.get('derived')!r} 不在首頁分組字彙裡（alpha.candidates.LIST_GROUPS）"}

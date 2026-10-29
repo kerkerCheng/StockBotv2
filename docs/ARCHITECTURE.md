@@ -927,7 +927,7 @@ AnalystView.brief（optional）→ APP 首屏 briefCard；六張卡收進「為�
   首屏印**故事**，敘事那一格原文降為**依據**，收進那一塊唯一的展開——兩種讀者（拿手機的人／查核的人）不再搶同一個句子（L12）。
   故事是另一本 append-only ledger（`library/private/alpha/stories.jsonl`，`alpha/providers/stories.py`；規則 `alpha/narrative/story.py`），
   **一筆對一版敘事（`brief_id`）**：七格各一句、只有故事的兩格（`revenue` 營收從哪來、`events` 最近發生什麼——自帶 `library/raw/` 引用，
-  page schema 以 `story_slots` 宣告、每格放一次、必須有 `pending` 退路）、候選理由一句（≤80 字）與缺 X 的短標（≤6 字，只有缺 X 寫）。
+  page schema 以 `story_slots` 宣告、每格放一次、必須有 `pending` 退路）、候選理由一句（≤80 字）與缺 X 的短標（≤6 字，只有缺 X 寫）——首頁卡片照抄：落「缺 X」組印短標、落「不要」組印理由那一句（只在落那一組時給，L12）。
   寫入端擋：每格 ≤160 字、完整日期與「M 月 D 日」、相對年、內部 id、系統詞、英文長串、長引文、禁字表、會填出日期的 placeholder
   （含 `when` 的 `{next_checkpoint_date}`——它填名冊上最近的未來催化劑日，日子一過就變「（尚無）」，2026-10-29 收緊）。read model 以 `story_at(brief_id, as_of=)` 取（INV-6：as-of 視角只看那時已寫的），builder 只在故事對的
   是**現行那一版**時出 `story:<格>` Datum（依據格的引用照抄、`dependencies.basis_line` 指回依據）；compose 與敘事格同一個面板

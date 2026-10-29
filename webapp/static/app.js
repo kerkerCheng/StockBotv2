@@ -209,6 +209,9 @@ function renderCard(row) {
   const tagText = tag.source === 'ledger' ? tag.text : (tag.source === 'layer' ? `押在 ${tag.text}` : '還沒寫介紹');
   body.appendChild(el('div', 'card-tagline' + (tag.source === 'ledger' ? '' : ' absent'), tagText));
   body.appendChild(cardStateLine(row));
+  // 不要的理由一句（故事層，materialize 端只在落「不要」組時給；2026-10-29 使用者：「不要也要理由，我現在看不到」）
+  const reason = (row.candidate || {}).reason_story;
+  if (reason) body.appendChild(el('div', 'card-reason', reason));
   card.appendChild(body);
   card.appendChild(cardSpark(c));
   return card;
