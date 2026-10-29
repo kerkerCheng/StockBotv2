@@ -1,7 +1,7 @@
 {
   "_comment": "source-trace 結果的封閉字彙。engine_b/lead_refs.py 是唯一 loader；annotate／advance 拒絕未登記值。照 config/lead_classification.json 的先例——判斷需要有地方落腳，沒有字彙時判斷會逐次飄移。",
   "_why": "2026-08-25 實測：trace_status 原本是自由字串，資料中累積出 15 種寫法，其中 9 種是單一 session 內自創的同義詞（primary_source_obtained／primary_source_obtained_tier2／primary_source_contradicts_claim／quote_misattributed／confirmed_tier2_macro_anchor／no_verifiable_atom／off_thesis_scope／out_of_scope_user_decision／awaiting_customer_named_disclosure）。後果不是難看而是靜默失效：trace_backlog 用 terminal 值判斷一筆 lead 該不該留在 backlog，寫成未登記的同義詞不會報錯，只會讓已完成的 lead 永遠掛在 backlog、或讓真的在等的 lead 被漏掉。",
-  "_terminal_contract": "terminal=true 代表追源已結束、不需要再排回 pq1，trace_backlog 會排除它。terminal=false 代表仍在等某件事發生，必須同時具備可執行的觸發條件（trace_trigger_entities 或 trace_requires_user），否則 trace_backlog 會標成 auto_trigger_reachable=false——那不是在等，是已經死了。",
+  "_terminal_contract": "terminal=true 代表追源已結束、不需要再排回 pq1，trace_backlog 會排除它。terminal=false 代表仍在等某件事發生，必須有對應的 Event Watch（觸發條件點名的已登記公司的一手，或沒點名時等觸發條件寫的日子——日期型等待也算在等）或 trace_requires_user，否則 trace_backlog 會標成 wake_state=unwatched——那不是在等，是已經死了。（[321] 起等待的 authority 是 Event Watch registry；舊的 auto_trigger_reachable 只答「有沒有標的可比對」，已退役。2026-10-29 這句還寫著舊判準，讓 drain 以為沒有已登記標的就不能停在非終局。）",
   "version": 1,
   "statuses": {
     "original_obtained": {
