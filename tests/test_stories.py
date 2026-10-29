@@ -64,7 +64,7 @@ def _spec(brief, **over) -> dict:
              "priced_in": "已定價：自家三年 {own_history_basis} 第 {own_history_pctile} 百分位；{analyst_count} 位分析師在追。",
              "our_bet": "不賭它：這一層賭的是量，量分給多家；它是大廠，倍率不會出在它身上。",
              "what_must_be_true": "不要的理由只有一條：它不是邊緣公司。錯的訊號是雷射降價、訂單遞延。",
-             "when": "下一個檢核點是 {next_checkpoint_date} 的六吋磷化銦產能倍增。",
+             "when": "下一個檢核點是 12 月初的六吋磷化銦產能倍增。",
              "revenue": "資料中心與通訊約占營收四分之三，雷射那一塊沒有單獨揭露。",
              "events": "最近沒有會改變判斷的事。"}
     spec = {"brief_id": brief.brief_id, "slots": slots,
@@ -105,10 +105,18 @@ def test_each_basis_habit_is_caught(text, kind) -> None:
 
 
 def test_what_a_story_may_keep() -> None:
-    """不擋的：年份與季度的粒度、型號縮寫、短的引號、「什麼時候知道」那一格的檢核日、反證這個詞。"""
+    """不擋的：年份與季度的粒度、型號縮寫、短的引號、「什麼時候知道」那一格的月份字、反證這個詞。"""
     assert story_problems("demand", "2027 年第一季開始出貨 HBM4 用的 CW DFB 雷射；客戶說「產能不夠」。") == []
-    assert story_problems("when", "下一次知道是 {next_checkpoint_date} 的財報。") == []
+    assert story_problems("when", "下一次知道是 11 月中的第三季財報。") == []
     assert story_problems("what_must_be_true", "錯的訊號（反證）是降價。") == []
+
+
+def test_the_checkpoint_placeholder_is_refused_even_in_the_when_slot() -> None:
+    """`{next_checkpoint_date}` 填的是名冊上最近的未來催化劑日，日子一過就換人或變「（尚無）」——2026-10-29 寫完
+    85 份當天，用了它的 5 份裡 2 份頁上已印「最近的觀測點是（尚無）的第三季報」（brainstorm F17）。「什麼時候知道」
+    那一格也一樣擋，錯誤訊息要講得出為什麼、該怎麼寫。"""
+    problems = story_problems("when", "最近的觀測點是 {next_checkpoint_date} 的第三季報。")
+    assert any("會填出日期" in p and "最近的未來催化劑日" in p and "月份字" in p for p in problems), problems
 
 
 def test_length_counts_placeholders_as_their_filled_width() -> None:
@@ -193,8 +201,10 @@ def test_the_read_model_carries_the_story_of_the_current_brief_only() -> None:
 
     brief = _brief()
     spec = _spec(brief)
+    # 2026-10-29 以前寫的故事可能帶檢核日 placeholder：寫入端已不收，讀取端照填（as-of 回看也要讀得出當時那一句）
+    legacy = {**spec["slots"], "when": "下一個檢核點是 {next_checkpoint_date} 的六吋磷化銦產能倍增。"}
     record = {"story_id": "st_" + "1" * 16, "brief_id": brief.brief_id, "created_at": "2026-10-29T08:00:00+00:00",
-              "slots": spec["slots"], "evidence": {"revenue": ["library/raw/x.txt"], "events": ["graph://source/y"]}}
+              "slots": legacy, "evidence": {"revenue": ["library/raw/x.txt"], "events": ["graph://source/y"]}}
     values = {"own_history_basis": "P/S", "own_history_pctile": "94", "analyst_count": "16",
               "in_numbers_latest": "+17.4%", "next_checkpoint_date": "2026-12-31"}
     told = {d.key: d for d in _story_slots(record, brief, values, today=TODAY)}

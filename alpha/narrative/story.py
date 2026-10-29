@@ -42,10 +42,11 @@ CANDIDATE_STORY_MAX = 80
 MISSING_LABEL_MAX = 6
 PLACEHOLDER_WIDTH = 8
 
-#: 會填出日期的 placeholder：故事不用（日期留在依據）。`next_checkpoint_date` 只准出現在「什麼時候知道」那一格——
-#: 那一格本來就是在講哪一天。
+#: 會填出日期的 placeholder：故事**每一格都不用**（日期留在依據；「什麼時候知道」寫月份字「11 月中」）。
+#: `next_checkpoint_date` 原本准「什麼時候知道」那一格用，2026-10-29 拿掉：它填的是名冊上**最近的未來催化劑日**，
+#: 不是句子講的那個裁決點，日子一過就換成下一個或「（尚無）」——85 份故事 5 份用了，寫完當天 2 份已印
+#: 「最近的觀測點是（尚無）的第三季報」（brainstorm F17）。
 STORY_DATE_PLACEHOLDERS: frozenset[str] = frozenset({"in_numbers_as_of", "in_numbers_mix_as_of", "next_checkpoint_date"})
-STORY_DATE_SLOT = "when"
 
 #: 日期：ISO、年月日、月日、斜線日期。年份、季度、「1 月下旬」這種粒度不擋——故事講的是「什麼時候知道」，不是哪一天寫的。
 STORY_DATE_PATTERN = re.compile(
@@ -82,8 +83,7 @@ def story_length(text: str) -> int:
 
 
 def story_problems(key: str, text: object, *, limit: int = STORY_MAX) -> list[str]:
-    """一句故事的問題清單（空＝可以寫）。`key` 是格名（`demand`…）或 `candidate`；只用來寫錯誤訊息與判
-    `next_checkpoint_date` 准不准用。"""
+    """一句故事的問題清單（空＝可以寫）。`key` 是格名（`demand`…）或 `candidate`；只用來寫錯誤訊息。"""
     label = STORY_SLOT_LABELS.get(key, "候選理由" if key == "candidate" else key)
     where = f"故事〔{label}〕"
     if not isinstance(text, str) or not text.strip():
@@ -105,9 +105,10 @@ def story_problems(key: str, text: object, *, limit: int = STORY_MAX) -> list[st
     for name in SIMPLE_PLACEHOLDER.findall(PARAM_PLACEHOLDER.sub("", text)):
         if name not in PLACEHOLDERS_V2:
             out.append(f"{where} 用了未登記的 placeholder {{{name}}}；已知 {sorted(PLACEHOLDERS_V2)}")
-        elif name in STORY_DATE_PLACEHOLDERS and not (name == "next_checkpoint_date" and key == STORY_DATE_SLOT):
+        elif name in STORY_DATE_PLACEHOLDERS:
             out.append(f"{where} 用了會填出日期的 {{{name}}}——日期留在依據"
-                       + ("（{next_checkpoint_date} 只在「什麼時候知道」那一格用）" if name == "next_checkpoint_date" else ""))
+                       + ("（它填的是名冊上最近的未來催化劑日，日子一過就變；寫月份字，例：11 月中）"
+                          if name == "next_checkpoint_date" else ""))
     leftover = SIMPLE_PLACEHOLDER.sub("", PARAM_PLACEHOLDER.sub("", text))
     if "{" in leftover or "}" in leftover:
         out.append(f"{where} 有不成對或格式錯誤的大括號")
@@ -132,7 +133,7 @@ _VALUE_DATE_NOTE = re.compile(r"\s*（[^（）]*\d{4}-\d{2}-\d{2}[^（）]*）\s
 
 def story_values(values: Mapping[str, str | None], *, today: date) -> dict[str, str | None]:
     """敘事的 placeholder 值 → 故事模式的值（**純格式化**，不算任何數）：值尾端的日期括號拿掉；`next_checkpoint_date`
-    印成「11 月 14 日」（不同年才帶年份）。其他照抄。"""
+    印成「11 月 14 日」（不同年才帶年份；2026-10-29 起寫入端不准故事用它，這裡留給之前寫的與 as-of 回看）。其他照抄。"""
     out: dict[str, str | None] = {}
     for key, value in values.items():
         out[key] = _VALUE_DATE_NOTE.sub("", value) if isinstance(value, str) else value
