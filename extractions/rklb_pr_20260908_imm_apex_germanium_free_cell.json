@@ -1,0 +1,173 @@
+{
+  "claims": [
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：Rocket Lab 10-Q／10-K 或星座營運商一手具名低軌星座改用 IMM Apex（無鍺路線轉強），或 Rocket Lab 寫出 IMM Apex 量產延後、良率問題（轉弱）。核查頻率：每季（Rocket Lab 10-Q）。觸發後 48 小時：更新本 claim，重讀電池片層與鍺襯底層讀圖——無鍺路線會不會吃掉鍺襯底需求。",
+      "id": "rklb_pr_20260908_imm_apex_germanium_free_cell_cl1",
+      "source_ids": [
+        "rklb_pr_20260908_imm_apex_germanium_free_cell_s1",
+        "rklb_pr_20260908_imm_apex_germanium_free_cell_s2",
+        "rklb_pr_20260908_imm_apex_germanium_free_cell_s3",
+        "rklb_pr_20260908_imm_apex_germanium_free_cell_s4"
+      ],
+      "statement": "Rocket Lab press release 2026-09-08: production release of IMM Apex (inverted metamorphic), 31.5% beginning-of-life efficiency and 40% lower cell mass; it is free of the germanium substrates used for conventional multi-junction space cells for three decades and is a mechanical and electrical drop-in replacement for heritage cells on germanium; manufacturing in multi-100-kilowatt volumes; more than 1,100 satellites on orbit are powered by Rocket Lab solar products. No named constellation customer or order for IMM Apex in the release (self-report).",
+      "subject_id": "e2"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "tech:imm_germanium_free_cell",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "rklb_pr_20260908_imm_apex_germanium_free_cell_s1",
+        "rklb_pr_20260908_imm_apex_germanium_free_cell_s3"
+      ],
+      "src_id": "co:rocket_lab"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:space_tj_solar_cell",
+      "id": "e2",
+      "relation": "competes_with",
+      "source_ids": [
+        "rklb_pr_20260908_imm_apex_germanium_free_cell_s2"
+      ],
+      "src_id": "tech:imm_germanium_free_cell"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:space_solar_array",
+      "id": "e3",
+      "relation": "is_component_of",
+      "source_ids": [
+        "rklb_pr_20260908_imm_apex_germanium_free_cell_s2",
+        "rklb_pr_20260908_imm_apex_germanium_free_cell_s4"
+      ],
+      "src_id": "tech:imm_germanium_free_cell"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "Rocket Lab Corporation",
+        "Rocket Lab USA",
+        "SolAero Technologies",
+        "RKLB"
+      ],
+      "attributes": {
+        "ticker": "RKLB"
+      },
+      "confidence": 0.9,
+      "id": "co:rocket_lab",
+      "name": "Rocket Lab",
+      "role": null,
+      "source_ids": [
+        "rklb_pr_20260908_imm_apex_germanium_free_cell_s1",
+        "rklb_pr_20260908_imm_apex_germanium_free_cell_s3",
+        "rklb_pr_20260908_imm_apex_germanium_free_cell_s4"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "IMM Apex",
+        "Inverted Metamorphic (IMM)",
+        "inverted metamorphic space solar cell",
+        "IMM solar cell"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:imm_germanium_free_cell",
+      "name": "Inverted metamorphic (IMM) germanium-free space solar cell",
+      "role": null,
+      "source_ids": [
+        "rklb_pr_20260908_imm_apex_germanium_free_cell_s1",
+        "rklb_pr_20260908_imm_apex_germanium_free_cell_s2",
+        "rklb_pr_20260908_imm_apex_germanium_free_cell_s3"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "三结砷化镓太阳电池",
+        "空间单体太阳电池",
+        "砷化镓太阳电池片",
+        "space triple-junction solar cell"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:space_tj_solar_cell",
+      "name": "Space triple-junction GaAs solar cell (GaInP/GaInAs/Ge)",
+      "role": null,
+      "source_ids": [
+        "rklb_pr_20260908_imm_apex_germanium_free_cell_s2"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "end_demand",
+      "aliases": [
+        "太阳电池阵",
+        "太阳电池翼",
+        "空间太阳电池阵",
+        "space solar array",
+        "spacecraft solar array"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:space_solar_array",
+      "name": "Spacecraft solar array (solar wing)",
+      "role": null,
+      "source_ids": [
+        "rklb_pr_20260908_imm_apex_germanium_free_cell_s2",
+        "rklb_pr_20260908_imm_apex_germanium_free_cell_s4"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "rklb_pr_20260908_imm_apex_germanium_free_cell",
+    "evidence_tier": 2,
+    "origin_entity": "Rocket Lab Corporation",
+    "permission_basis": "上市公司官網公開新聞稿（量產發布）；只保留研究必要的有限逐字節錄。published_at 取新聞稿日期列「Long Beach, California. Sept. 8, 2026」。",
+    "published_at": "2026-09-08",
+    "publisher": "Rocket Lab（公司官網新聞稿）",
+    "retrieved_at": "2026-10-29",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "Rocket Lab Introduces High-Efficiency Solar Cell to Reduce Reliance on Supply-Constrained Critical Minerals（Rocket Lab 新聞稿 2026-09-08）：IMM Apex 量產發布——無鍺襯底、可直接替換鍺基電池、multi-100-kilowatt 量產",
+    "url": "https://rocketlabcorp.com/updates/rocket-lab-introduces-high-efficiency-solar-cell-to-reduce-reliance-on-supply-constrained-critical-minerals/"
+  },
+  "sources": [
+    {
+      "id": "rklb_pr_20260908_imm_apex_germanium_free_cell_s1",
+      "locator": "新聞稿首段（Long Beach, California. Sept. 8, 2026）",
+      "quote": "Long Beach, California. Sept. 8, 2026 – Rocket Lab Corporation (Nasdaq: RKLB), a global leader in launch services and space systems, today announced the production release of Inverted Metamorphic (IMM) Apex, the latest iteration of its next-generation solar cell designed to deliver exceptional efficiency and reliability for space applications. IMM Apex boasts a Beginning of Life solar conversion efficiency of 31.5% and 40% lower cell mass, giving it best-in-class specific power (watts per kilogram) while maintaining excellent radiation hardness and performance over temperature."
+    },
+    {
+      "id": "rklb_pr_20260908_imm_apex_germanium_free_cell_s2",
+      "locator": "新聞稿第二段",
+      "quote": "IMM Apex is free of the germanium substrates used for conventional, multi-junction solar cells produced for the last three decades. By eliminating reliance on this critical mineral, IMM Apex mitigates rising costs and supply chain constraints currently facing the space power industry. Crucially, IMM Apex is a mechanical and electrical drop-in replacement for heritage solar cell products on germanium, meaning customers can integrate it into existing systems without major investments to re-tool for new cell technology."
+    },
+    {
+      "id": "rklb_pr_20260908_imm_apex_germanium_free_cell_s3",
+      "locator": "新聞稿第三段",
+      "quote": "In addition to being free from germanium supply constraints, optimized manufacturing processes and targeted capital investments have enabled efficient manufacturing in multi-100-kilowatt volumes to meet growing demand."
+    },
+    {
+      "id": "rklb_pr_20260908_imm_apex_germanium_free_cell_s4",
+      "locator": "新聞稿末段",
+      "quote": "More than 1,100 satellites on orbit are powered by Rocket Lab solar products."
+    }
+  ]
+}

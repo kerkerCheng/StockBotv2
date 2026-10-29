@@ -1,0 +1,863 @@
+{
+  "claims": [
+    {
+      "confidence": 0.85,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：中國星網、上海垣信、電科藍天或 811 所的一手寫出千帆或國網新一批衛星的電源分系統改由別家（苏州馥昶、中山德华、深圳新源等）供應。核查頻率：每半年（電科藍天半年報、年報）。觸發後 48 小時：更新本 claim，重讀太陽翼層讀圖。",
+      "id": "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_cl1",
+      "source_ids": [
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s20",
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s2"
+      ],
+      "statement": "CETC Lantian SSE inquiry reply (2025-09) p.32: as of August 2025 the power subsystems of all launched Qianfan network satellites were supplied by CETC Lantian, and those of launched Guowang network satellites by CETC Lantian and 811所 (上海空间电源研究所). p.60: it makes the solar arrays from space cells bought from 天津恒电, whose epiwafers come mainly from its own subsidiary 蓝天太阳. Concentration is time-varying (claim, not edge attribute).",
+      "subject_id": "e14"
+    },
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：電科藍天或天津恒电的一手寫出剛性電池片改向乾照或自產（蓝天太阳）為主，或第四家國內廠商通過宇航級鑑定並批量供貨。核查頻率：每半年。觸發後 48 小時：更新本 claim，重讀電池片層讀圖。",
+      "id": "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_cl2",
+      "source_ids": [
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s1",
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s4",
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s5"
+      ],
+      "statement": "CETC Lantian inquiry reply: 天津恒电 (中国卫星 and CETC Lantian 50% each, actually controlled by 中国卫星, p.60) makes space triple-junction GaAs cells; CETC Lantian buys them single-source for high-efficiency cells 'because 天津恒电 is one of very few suppliers able to mass-produce them' and by competitive quotes for low-efficiency cells (2024: RMB 443.27m, 24.90% of array-material purchases, p.205). Domestic makers of space-grade cells are mainly 天津恒电, 811所 (mostly for its own use) and 乾照光电; 天津恒电's price is below 乾照's quotes by less than 10% (p.150).",
+      "subject_id": "e1"
+    },
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：電科藍天定期報告寫出自有外延產能擴到不再委外，或委外廠商只剩一家，或委外的外延片轉用於傳統航天的高效產品。核查頻率：每半年。觸發後 48 小時：更新本 claim，重讀外延片層讀圖。",
+      "id": "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_cl3",
+      "source_ids": [
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s10",
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s11",
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s12",
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s13"
+      ],
+      "statement": "CETC Lantian inquiry reply p.228: with space-power orders rising, its own epiwafer capacity is saturated and it outsources processing to 乾照光电, 南昌凯迅光电 and others; the outsourced epi uses the previous, lower-end process generation, is mostly for commercial space and has lower conversion efficiency than its own; it supplies the Ge wafers and process materials itself. p.223: outsourcing began in 2021 when its own triple-junction epi capacity fell short; each processor passed sample validation before a processing contract. 2024 processors: 扬州乾照 RMB 117m, 南昌凯迅 RMB 24m, 天津三安 RMB 10.5m (p.227); 2022 included 珠海积发 (p.228).",
+      "subject_id": "mat:tj_gaas_epiwafer"
+    },
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：電科藍天或鍺襯底廠的一手寫出鍺片改為單一來源，或供給轉緊（交期拉長、採購價轉升、出口或配額管制波及國內）。核查頻率：每半年。觸發後 48 小時：更新本 claim，重讀鍺襯底層讀圖。",
+      "id": "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_cl4",
+      "source_ids": [
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s6",
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s7",
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s8",
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s9"
+      ],
+      "statement": "CETC Lantian inquiry reply p.221: it buys the Ge substrates for its rigid triple-junction epiwafers (own and outsourced) mainly from 云南中科鑫圆晶体材料有限公司 and 中锗科技有限公司, both by competitive quotes (询比价); 2024 purchases RMB 60.4m and 50.1m (p.213); unit prices from the two show no significant difference (p.222).",
+      "subject_id": "mat:germanium_substrate"
+    },
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：電科藍天定期報告或其他太陽翼廠的一手寫出 SADA 新增合格供應商、改為自製，或低軌星座改用不需驅動機構的固定翼。核查頻率：每半年。觸發後 48 小時：更新本 claim，重讀 SADA 層讀圖。",
+      "id": "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_cl5",
+      "source_ids": [
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s14",
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s15",
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s16"
+      ],
+      "statement": "CETC Lantian inquiry reply p.205: it buys solar-array drive mechanisms from 沈阳中科新宇 (2024: RMB 62.1m, single source or competitive quotes), justified as an early domestic maker of deployment and drive mechanisms where 'very few suppliers have in-orbit application experience'; also from 中国科学院沈阳自动化研究所 (2024: RMB 43.0m, competitive quotes) and, in 2022, 北京轩宇空间科技 (RMB 2.4m, p.208). A customer's single-source justification, not a verified sole_source.",
+      "subject_id": "e11"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "tech:space_tj_solar_cell",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s2",
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s4",
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s5"
+      ],
+      "src_id": "co:tianjin_hengdian"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:space_tj_solar_cell",
+      "id": "e2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s5"
+      ],
+      "src_id": "co:sisp"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:space_tj_solar_cell",
+      "id": "e3",
+      "relation": "supplies_to",
+      "source_ids": [
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s5"
+      ],
+      "src_id": "co:changelight"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "mat:germanium_substrate",
+      "id": "e4",
+      "relation": "supplies_to",
+      "source_ids": [
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s6",
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s7",
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s9"
+      ],
+      "src_id": "co:yunnan_germanium"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "mat:germanium_substrate",
+      "id": "e5",
+      "relation": "supplies_to",
+      "source_ids": [
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s6",
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s8",
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s9"
+      ],
+      "src_id": "co:zhongge_tech"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "mat:tj_gaas_epiwafer",
+      "id": "e6",
+      "relation": "supplies_to",
+      "source_ids": [
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s2",
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s10"
+      ],
+      "src_id": "co:cetc_lantian"
+    },
+    {
+      "attributes": {
+        "qualification_status": "qualified"
+      },
+      "confidence": 0.9,
+      "dst_id": "mat:tj_gaas_epiwafer",
+      "id": "e7",
+      "relation": "supplies_to",
+      "source_ids": [
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s10",
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s11",
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s12",
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s13"
+      ],
+      "src_id": "co:changelight"
+    },
+    {
+      "attributes": {
+        "qualification_status": "qualified"
+      },
+      "confidence": 0.85,
+      "dst_id": "mat:tj_gaas_epiwafer",
+      "id": "e8",
+      "relation": "supplies_to",
+      "source_ids": [
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s10",
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s11",
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s12"
+      ],
+      "src_id": "co:nanchang_kaixun"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "mat:tj_gaas_epiwafer",
+      "id": "e9",
+      "relation": "supplies_to",
+      "source_ids": [
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s11",
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s12"
+      ],
+      "src_id": "co:sanan_optoelectronics"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "mat:tj_gaas_epiwafer",
+      "id": "e10",
+      "relation": "supplies_to",
+      "source_ids": [
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s13"
+      ],
+      "src_id": "co:zhuhai_jifa"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "tech:solar_array_sada",
+      "id": "e11",
+      "relation": "supplies_to",
+      "source_ids": [
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s14"
+      ],
+      "src_id": "co:shenyang_zhongke_xinyu"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "tech:solar_array_sada",
+      "id": "e12",
+      "relation": "supplies_to",
+      "source_ids": [
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s15"
+      ],
+      "src_id": "co:sia_cas"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:solar_array_sada",
+      "id": "e13",
+      "relation": "supplies_to",
+      "source_ids": [
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s16"
+      ],
+      "src_id": "co:beijing_xuanyu"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "tech:space_solar_array",
+      "id": "e14",
+      "relation": "supplies_to",
+      "source_ids": [
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s2",
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s20"
+      ],
+      "src_id": "co:cetc_lantian"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "tech:space_solar_array",
+      "id": "e15",
+      "relation": "supplies_to",
+      "source_ids": [
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s17",
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s20"
+      ],
+      "src_id": "co:sisp"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "tech:space_solar_array",
+      "id": "e16",
+      "relation": "supplies_to",
+      "source_ids": [
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s17",
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s18"
+      ],
+      "src_id": "co:suzhou_fuchang"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "tech:space_solar_array",
+      "id": "e17",
+      "relation": "supplies_to",
+      "source_ids": [
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s17",
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s18"
+      ],
+      "src_id": "co:zhongshan_dehua"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "tech:space_solar_array",
+      "id": "e18",
+      "relation": "supplies_to",
+      "source_ids": [
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s17",
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s18"
+      ],
+      "src_id": "co:shenzhen_xinyuan"
+    },
+    {
+      "attributes": {
+        "control": true
+      },
+      "confidence": 0.9,
+      "dst_id": "co:tianjin_hengdian",
+      "id": "e19",
+      "relation": "invests_in",
+      "source_ids": [
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s1"
+      ],
+      "src_id": "co:china_spacesat"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "co:tianjin_hengdian",
+      "id": "e20",
+      "relation": "invests_in",
+      "source_ids": [
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s1"
+      ],
+      "src_id": "co:cetc_lantian"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "tech:space_solar_array",
+      "id": "e21",
+      "relation": "is_component_of",
+      "source_ids": [
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s2"
+      ],
+      "src_id": "tech:space_tj_solar_cell"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "tech:space_tj_solar_cell",
+      "id": "e22",
+      "relation": "is_component_of",
+      "source_ids": [
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s2"
+      ],
+      "src_id": "mat:tj_gaas_epiwafer"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "mat:tj_gaas_epiwafer",
+      "id": "e23",
+      "relation": "is_component_of",
+      "source_ids": [
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s6"
+      ],
+      "src_id": "mat:germanium_substrate"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "tech:space_solar_array",
+      "id": "e24",
+      "relation": "is_component_of",
+      "source_ids": [
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s3",
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s14",
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s15"
+      ],
+      "src_id": "tech:solar_array_sada"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "电科蓝天",
+        "中电科蓝天科技股份有限公司",
+        "688818.SS"
+      ],
+      "attributes": {
+        "ticker": "688818.SS"
+      },
+      "confidence": 0.9,
+      "id": "co:cetc_lantian",
+      "name": "CETC Lantian Technology",
+      "role": null,
+      "source_ids": [
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s1",
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "天津恒电",
+        "天津恒电空间电源有限公司"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:tianjin_hengdian",
+      "name": "Tianjin Hengdian Space Power Source",
+      "role": null,
+      "source_ids": [
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s1",
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s2",
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s4"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "中国东方红卫星股份有限公司",
+        "600118.SS"
+      ],
+      "attributes": {
+        "ticker": "600118.SS"
+      },
+      "confidence": 0.9,
+      "id": "co:china_spacesat",
+      "name": "China Spacesat",
+      "role": null,
+      "source_ids": [
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "乾照光电",
+        "厦门乾照光电股份有限公司",
+        "扬州乾照光电有限公司",
+        "300102.SZ"
+      ],
+      "attributes": {
+        "ticker": "300102.SZ"
+      },
+      "confidence": 0.9,
+      "id": "co:changelight",
+      "name": "Xiamen Changelight",
+      "role": null,
+      "source_ids": [
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s5",
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s10",
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s12"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "equipment_epitaxy",
+      "aliases": [
+        "南昌凯迅光电股份有限公司",
+        "南昌凯讯光电"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:nanchang_kaixun",
+      "name": "Nanchang Kaixun Photoelectric",
+      "role": null,
+      "source_ids": [
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s10",
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s11",
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s12"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "三安光电",
+        "三安光电股份有限公司",
+        "天津三安光电有限公司",
+        "600703.SS"
+      ],
+      "attributes": {
+        "ticker": "600703.SS"
+      },
+      "confidence": 0.9,
+      "id": "co:sanan_optoelectronics",
+      "name": "Sanan Optoelectronics",
+      "role": null,
+      "source_ids": [
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s11",
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s12"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "equipment_epitaxy",
+      "aliases": [
+        "珠海积发电子科技有限公司"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:zhuhai_jifa",
+      "name": "Zhuhai Jifa Electronic Technology",
+      "role": null,
+      "source_ids": [
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s13"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "云南锗业",
+        "雲南鍺業",
+        "Yunnan Lincang Xinyuan Germanium Industry",
+        "云南临沧鑫圆锗业股份有限公司"
+      ],
+      "attributes": {
+        "ticker": "002428.SZ"
+      },
+      "confidence": 0.9,
+      "id": "co:yunnan_germanium",
+      "name": "Yunnan Germanium",
+      "role": null,
+      "source_ids": [
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s6",
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s7"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "中锗科技有限公司",
+        "中锗科技"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:zhongge_tech",
+      "name": "Zhongge Technology",
+      "role": null,
+      "source_ids": [
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s6",
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s8"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "沈阳中科新宇空间智能装备有限公司",
+        "沈阳中科新宇"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:shenyang_zhongke_xinyu",
+      "name": "Shenyang Zhongke Xinyu Space Intelligent Equipment",
+      "role": null,
+      "source_ids": [
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s14"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "中国科学院沈阳自动化研究所"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:sia_cas",
+      "name": "Shenyang Institute of Automation, CAS",
+      "role": null,
+      "source_ids": [
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s15"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "北京轩宇空间科技有限公司"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:beijing_xuanyu",
+      "name": "Beijing Xuanyu Space Technology",
+      "role": null,
+      "source_ids": [
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s16"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "上海空间电源研究所",
+        "811所"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:sisp",
+      "name": "Shanghai Institute of Space Power-Sources (811)",
+      "role": null,
+      "source_ids": [
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s5",
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s17",
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s19",
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s20"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "苏州馥昶空间技术有限公司",
+        "苏州馥昶"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "co:suzhou_fuchang",
+      "name": "Suzhou Fuchang Space Technology",
+      "role": null,
+      "source_ids": [
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s17",
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s18",
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s19"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "中山德华芯片技术有限公司",
+        "中山德华"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "co:zhongshan_dehua",
+      "name": "Zhongshan Dehua Chip Technology",
+      "role": null,
+      "source_ids": [
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s17",
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s18",
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s19"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "深圳市航天新源科技有限公司",
+        "深圳新源"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "co:shenzhen_xinyuan",
+      "name": "Shenzhen Aerospace Xinyuan Technology",
+      "role": null,
+      "source_ids": [
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s17",
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s18",
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s19"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "end_demand",
+      "aliases": [
+        "太阳电池阵",
+        "太阳电池翼",
+        "空间太阳电池阵",
+        "space solar array",
+        "spacecraft solar array"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:space_solar_array",
+      "name": "Spacecraft solar array (solar wing)",
+      "role": null,
+      "source_ids": [
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s2",
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s3",
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s17"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "三结砷化镓太阳电池",
+        "空间单体太阳电池",
+        "砷化镓太阳电池片",
+        "space triple-junction solar cell"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:space_tj_solar_cell",
+      "name": "Space triple-junction GaAs solar cell (GaInP/GaInAs/Ge)",
+      "role": null,
+      "source_ids": [
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s2",
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s4",
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s5"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "equipment_epitaxy",
+      "aliases": [
+        "三结砷化镓外延片",
+        "砷化镓外延片",
+        "triple-junction GaAs epiwafer"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "mat:tj_gaas_epiwafer",
+      "name": "Triple-junction GaAs epitaxial wafer (grown on Ge substrate)",
+      "role": null,
+      "source_ids": [
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s2",
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s10",
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s12"
+      ],
+      "type": "Material"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "Ge substrate",
+        "germanium"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "mat:germanium_substrate",
+      "name": "Germanium (Ge) substrate",
+      "role": null,
+      "source_ids": [
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s6"
+      ],
+      "type": "Material"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "太阳翼展开机构和驱动机构",
+        "太阳翼驱动机构",
+        "solar array drive assembly"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:solar_array_sada",
+      "name": "Solar array deployment and drive mechanisms (SADA)",
+      "role": null,
+      "source_ids": [
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s14",
+        "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s15"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers",
+    "evidence_tier": 1,
+    "origin_entity": "中电科蓝天科技股份有限公司",
+    "permission_basis": "上交所科創板發行上市審核問詢函回覆（公開披露）；只保留研究必要的有限逐字節錄。回覆封面只寫「二〇二五年九月」，published_at 取上交所披露日 2025-09-27（披露 URL 路徑 002096_20250927）。",
+    "published_at": "2025-09-27",
+    "publisher": "上海证券交易所",
+    "retrieved_at": "2026-10-29",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "关于中电科蓝天科技股份有限公司首次公开发行股票并在科创板上市申请文件的审核问询函之回复（2025-09）：太陽電池陣生產材料、鍺片、外延片委託加工的供應商表；天津恒电持股；太陽電池陣同行業單位；千帆／國網電源分系統供應",
+    "url": "https://static.sse.com.cn/stock/disclosure/announcement/c/202509/002096_20250927_RRAP.pdf"
+  },
+  "sources": [
+    {
+      "id": "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s1",
+      "locator": "PDF p.60（頁碼 8-1-59）：（2）發行人砷化鎵太陽電池片外採原因與天津恒电合作背景",
+      "quote": "天津恒电系电科蓝天参股公司，股东为中国东方红卫星股份有限公司（中国卫星，600118.SH）、电科蓝天，双方各持股50%，天津恒电实际控制人为中国卫星。"
+    },
+    {
+      "id": "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s2",
+      "locator": "PDF p.60（頁碼 8-1-59）：（2）發行人砷化鎵太陽電池片外採原因與天津恒电合作背景",
+      "quote": "天津恒电主营业务为太阳电池片的研发、生产和销售，太阳电池片是太阳电池阵（翼）的原材料。发行人空间太阳电池阵首先由下属子公司蓝天太阳完成主要原材料砷化镓外延片的生产，天津恒电向发行人及其他供应商采购砷化镓外延片后，加工成空间单体太阳电池，发行人向天津恒电采购空间单体太阳电池后，加工成空间太阳电池阵。"
+    },
+    {
+      "id": "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s3",
+      "locator": "PDF p.205（頁碼 8-1-204）：1、太陽電池陣生產材料（主要供應商情況）",
+      "quote": "1、太阳电池阵生产材料报告期各期，发行人太阳电池阵生产材料主要供应商情况如下"
+    },
+    {
+      "id": "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s4",
+      "locator": "PDF p.205（頁碼 8-1-204）：太陽電池陣生產材料主要供應商表（2024 年度）",
+      "quote": "2024年度1天津恒电空间电源有限公司砷化镓太阳电池--44,326.61 24.90%单一来源采购/询比价采购对于低转换效率产品采用询比价采购方式；对于高转换效率三结砷化镓太阳电池产品，因天津恒电是市场极少数能够批量生产的供应商，部分产品询比价采购，其他满足公司单一来源采购的要求，符合相关采购办法"
+    },
+    {
+      "id": "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s5",
+      "locator": "PDF p.150（頁碼 8-1-149）：向天津恒电採購的公允性——（2）產品價格與非關聯方不存在重大差異",
+      "quote": "国内具备生产满足宇航电源需求的太阳电池片技术的厂家主要有天津恒电、811所和乾照光电等，其中811所生产的太阳电池片以自用为主。天津恒电生产的太阳电池片由于规模效应、工艺优化、不断提高成品率，成本相对乾照光电报价较低，但是差异基本在10%以内。"
+    },
+    {
+      "id": "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s6",
+      "locator": "PDF p.221（頁碼 8-1-220）：（2）鍺片",
+      "quote": "（2）锗片报告期内，发行人主要向云南中科鑫圆晶体材料有限公司和中锗科技有限公司采购刚性外延片加工所用的锗衬底片，采购产品用于自产和委外的刚性三结砷化镓太阳电池外延片加工项目"
+    },
+    {
+      "id": "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s7",
+      "locator": "PDF p.213（頁碼 8-1-212）：主要供應商表（2024 年度，鍺片列）",
+      "quote": "2云南中科鑫圆晶体材料有限公司锗片--6,043.59 3.40%询比价采购-其产品为公司砷化镓太阳电池外延片的原材料，产能稳定，质量可靠，双方合作基础稳定"
+    },
+    {
+      "id": "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s8",
+      "locator": "PDF p.213（頁碼 8-1-212）：主要供應商表（2024 年度，鍺片列）",
+      "quote": "4中锗科技有限公司锗片--5,005.22 2.81%询比价采购-其产品为公司砷化镓太阳电池外延片的原材料，产能稳定，质量可靠，双方合作基础稳定"
+    },
+    {
+      "id": "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s9",
+      "locator": "PDF p.222（頁碼 8-1-221）：（2）鍺片（採購情況表之後）",
+      "quote": "综上，报告期内，发行人向云南中科鑫圆晶体材料有限公司及中锗科技有限公司采购锗衬底片的采购单价不存在显著差异。"
+    },
+    {
+      "id": "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s10",
+      "locator": "PDF p.228（頁碼 8-1-227）：（2）外延片委託加工不涉及關鍵工序或關鍵技術",
+      "quote": "外延片方面，近年来我国航天事业快速发展，宇航电源订单持续增加，发行人外延片自有产能产量已饱和，发行人在自有产能无法满足订单需求的情况下委托乾照光电、南昌凯讯光电等单位进行加工，公司委托外部单位进行加工的外延片工艺属于上一代低端工艺，更多用于商业航天领域，通常光电转换效率低于发行人自产的外延片，委托加工的核心原材料锗片以及工艺材料由发行人提供。"
+    },
+    {
+      "id": "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s11",
+      "locator": "PDF p.223（頁碼 8-1-222）：（一）主要委外加工商的基本情況和選擇依據、交易金額、合作背景、定價原則（2024 年度）",
+      "quote": "2024年度1扬州乾照光电有限公司询比价采购11,697.77根据市场价格确定2021年始发行人自产三结砷化镓外延片的产能已无法满足生产需求，通过市场调研邀请其提供样品验证，产品验证合格后签订委托加工合同开始合作2南昌凯迅光电股份有限公司询比价采购2,399.91根据市场价格确定随着发行人三结砷化镓外延片委外加工业务的持续增长，通过市场调研邀请南昌凯迅光电股份有限公司提供样品验证，产品验证合格后签订委托加工合同开始合作3天津三安光电有限公司询比价采购1,050.52根据市场价格确定2022年发行人新开发的柔性三结砷化镓太阳电池，因部分柔性电池芯片工序的产能不足，与天津三安光电建立业务关系"
+    },
+    {
+      "id": "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s12",
+      "locator": "PDF p.227（頁碼 8-1-226）：（1）委外加工採購的內容、金額、占比（2024 年度）",
+      "quote": "2024年度1扬州乾照光电有限公司外延片加工11,697.77-49.31%2南昌凯迅光电股份有限公司外延片加工2,399.91-10.12%3天津三安光电有限公司外延片加工1,050.52-4.43%"
+    },
+    {
+      "id": "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s13",
+      "locator": "PDF p.228（頁碼 8-1-227）：（1）委外加工採購的內容、金額、占比（2022 年度）",
+      "quote": "2022年度1扬州乾照光电有限公司外延片加工6,053.86-47.96%2珠海积发电子科技有限公司外延片加工1,666.99-13.21%"
+    },
+    {
+      "id": "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s14",
+      "locator": "PDF p.205（頁碼 8-1-204）：太陽電池陣生產材料主要供應商表（2024 年度）",
+      "quote": "2沈阳中科新宇空间智能装备有限公司驱动机构--6,212.39 3.49%单一来源采购/询比价采购较早实现太阳翼展开机构和驱动机构国产化，极少数供应商具备空间在轨应用经验，部分产品询比价采购，其他满足单一来源采购的要求，符合相关采购办法其产品有成功的空间应用经验，可依据公司技术要求进行自主研发，产品质量稳定，双方合作关系稳定"
+    },
+    {
+      "id": "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s15",
+      "locator": "PDF p.205（頁碼 8-1-204）：太陽電池陣生產材料主要供應商表（2024 年度）",
+      "quote": "3中国科学院沈阳自动化研究所多型号太阳翼结构机构、驱动机构--4,296.04 2.41%询比价采购-其产品有成功的空间应用经验，可依据公司技术要求进行自主研发，产品质量稳定，双方合作关系稳定"
+    },
+    {
+      "id": "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s16",
+      "locator": "PDF p.208（頁碼 8-1-207）：太陽電池陣生產材料主要供應商表（2022 年度）",
+      "quote": "4北京轩宇空间科技有限公司驱动机构--238.94 0.13%询比价采购-该公司具备相应的测评资质且满足航天项目需求，该公司运营情况良好，双方合作关系稳定"
+    },
+    {
+      "id": "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s17",
+      "locator": "PDF p.63（頁碼 8-1-62）：2、同行業公司是否具備各類型產品的研發生產能力",
+      "quote": "目前发行人太阳电池阵的同行业单位分为体制内传统单位及民营商业单位两大类。其中，传统单位主要包括上海空间电源研究所，民营商业单位主要包括苏州馥昶、中山德华、深圳新源等。传统单位方面，上海空间电源研究所具备刚性、柔性两种太阳电池阵的生产能力，在刚性太阳电池阵方面具有丰富的工程经验，但柔性太阳电池阵目前在轨较少。"
+    },
+    {
+      "id": "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s18",
+      "locator": "PDF p.64（頁碼 8-1-63）：2、同行業公司是否具備各類型產品的研發生產能力",
+      "quote": "民营商业单位方面，苏州馥昶、中山德华、深圳新源等公司具备刚性、柔性太阳电池阵生产能力，柔性太阳电池阵仅部分公司具有在轨经验。"
+    },
+    {
+      "id": "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s19",
+      "locator": "PDF p.24（頁碼 8-1-23）：（2）商業航天領域市場競爭格局",
+      "quote": "商业航天领域的其他宇航电源供应商主要为811所、513所、苏州馥昶空间技术有限公司（以下简称“苏州馥昶”）、深圳市魔方卫星科技有限公司（以下简称“魔方卫星”）、中山德华芯片技术有限公司（以下简称“中山德华”）、深圳市航天新源科技有限公司（以下简称“深圳新源”）等。其中，811所、苏州馥昶提供电源系统级产品，513所、魔方卫星、中山德华、深圳新源提供电源单机级产品。"
+    },
+    {
+      "id": "cetc_lantian_688818_inquiry_reply_20250927_space_solar_suppliers_s20",
+      "locator": "PDF p.32（頁碼 8-1-31）：商業航天市場的競爭力",
+      "quote": "截至2025年8月，千帆星座已发射组网卫星电源分系统均由发行人供应，国网星座已发射组网卫星电源分系统由发行人和811所供应。"
+    }
+  ]
+}

@@ -1,0 +1,319 @@
+{
+  "claims": [
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：中國星網或上海垣信的一手（或電科藍天定期報告）寫出星座規劃縮減、延後，或新一批衛星改用非砷化鎵太陽翼（矽、鈣鈦礦）。核查頻率：每半年（電科藍天半年報、年報）。觸發後 48 小時：更新本 claim，重讀 tech:space_solar_array 底下各層（電池片、外延片、鍺襯底、蓋片、SADA）的讀圖。",
+      "id": "cetc_lantian_688818_prospectus_20260205_space_solar_chain_cl1",
+      "source_ids": [
+        "cetc_lantian_688818_prospectus_20260205_space_solar_chain_s8",
+        "cetc_lantian_688818_prospectus_20260205_space_solar_chain_s9",
+        "cetc_lantian_688818_prospectus_20260205_space_solar_chain_s10"
+      ],
+      "statement": "CETC Lantian prospectus (signed 2026-02-05), glossary: the Qianfan (G60) constellation plans 15,000 satellites (operator 上海垣信卫星科技有限公司) and the Guowang (GW) constellation 12,999 (operator 中国卫星网络集团有限公司). Its commercial-space power-system customers include 中国卫星网络集团有限公司, 中国东方红卫星股份有限公司, 上海格思航天科技有限公司 and private satellite makers (银河航天, 哈尔滨工大卫星, 椭圆时空). Constellation sizes are plans, not orders; solar-array area per satellite is not given (time-varying, kept out of node attributes).",
+      "subject_id": "tech:space_solar_array"
+    },
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：電科藍天年報、半年報或客戶一手寫出國內配套覆蓋率掉到 40% 以下，或千帆、國網新一批衛星的電源分系統改由別家供應。核查頻率：每半年。觸發後 48 小時：更新本 claim 與太陽翼層讀圖。",
+      "id": "cetc_lantian_688818_prospectus_20260205_space_solar_chain_cl2",
+      "source_ids": [
+        "cetc_lantian_688818_prospectus_20260205_space_solar_chain_s6",
+        "cetc_lantian_688818_prospectus_20260205_space_solar_chain_s7"
+      ],
+      "statement": "CETC Lantian prospectus p.172: the main domestic space power-system suppliers are CETC Lantian, 上海空间电源研究所, 苏州馥昶空间技术有限公司 and 山东航天电子技术研究所; in 2024 CETC Lantian supplied power units or systems for 144 spacecraft out of the 285 Chinese spacecraft counted by BryceTech (about 50.5% coverage). p.30: it holds an important position among the power-system suppliers of the Qianfan, Guowang and Jilin-1 constellations. Share is time-varying (kept in this claim, not in edge attributes).",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "tech:space_solar_array",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "cetc_lantian_688818_prospectus_20260205_space_solar_chain_s7",
+        "cetc_lantian_688818_prospectus_20260205_space_solar_chain_s6"
+      ],
+      "src_id": "co:cetc_lantian"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "tech:space_solar_array",
+      "id": "e2",
+      "relation": "is_component_of",
+      "source_ids": [
+        "cetc_lantian_688818_prospectus_20260205_space_solar_chain_s4",
+        "cetc_lantian_688818_prospectus_20260205_space_solar_chain_s5"
+      ],
+      "src_id": "tech:space_tj_solar_cell"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "tech:space_solar_array",
+      "id": "e3",
+      "relation": "is_component_of",
+      "source_ids": [
+        "cetc_lantian_688818_prospectus_20260205_space_solar_chain_s4",
+        "cetc_lantian_688818_prospectus_20260205_space_solar_chain_s5"
+      ],
+      "src_id": "mat:space_coverglass"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "tech:space_tj_solar_cell",
+      "id": "e4",
+      "relation": "is_component_of",
+      "source_ids": [
+        "cetc_lantian_688818_prospectus_20260205_space_solar_chain_s3",
+        "cetc_lantian_688818_prospectus_20260205_space_solar_chain_s2"
+      ],
+      "src_id": "mat:tj_gaas_epiwafer"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "mat:tj_gaas_epiwafer",
+      "id": "e5",
+      "relation": "is_component_of",
+      "source_ids": [
+        "cetc_lantian_688818_prospectus_20260205_space_solar_chain_s1",
+        "cetc_lantian_688818_prospectus_20260205_space_solar_chain_s3",
+        "cetc_lantian_688818_prospectus_20260205_space_solar_chain_s2"
+      ],
+      "src_id": "mat:germanium_substrate"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:space_tj_solar_cell",
+      "id": "e6",
+      "relation": "supplies_to",
+      "source_ids": [
+        "cetc_lantian_688818_prospectus_20260205_space_solar_chain_s12",
+        "cetc_lantian_688818_prospectus_20260205_space_solar_chain_s11"
+      ],
+      "src_id": "co:5n_plus"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "电科蓝天",
+        "中电科蓝天科技股份有限公司",
+        "688818.SS"
+      ],
+      "attributes": {
+        "ticker": "688818.SS"
+      },
+      "confidence": 0.9,
+      "id": "co:cetc_lantian",
+      "name": "CETC Lantian Technology",
+      "role": null,
+      "source_ids": [
+        "cetc_lantian_688818_prospectus_20260205_space_solar_chain_s7",
+        "cetc_lantian_688818_prospectus_20260205_space_solar_chain_s6"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "end_demand",
+      "aliases": [
+        "太阳电池阵",
+        "太阳电池翼",
+        "空间太阳电池阵",
+        "space solar array",
+        "spacecraft solar array"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:space_solar_array",
+      "name": "Spacecraft solar array (solar wing)",
+      "role": null,
+      "source_ids": [
+        "cetc_lantian_688818_prospectus_20260205_space_solar_chain_s4",
+        "cetc_lantian_688818_prospectus_20260205_space_solar_chain_s5",
+        "cetc_lantian_688818_prospectus_20260205_space_solar_chain_s8",
+        "cetc_lantian_688818_prospectus_20260205_space_solar_chain_s9",
+        "cetc_lantian_688818_prospectus_20260205_space_solar_chain_s7"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "三结砷化镓太阳电池",
+        "空间单体太阳电池",
+        "砷化镓太阳电池片",
+        "space triple-junction solar cell"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:space_tj_solar_cell",
+      "name": "Space triple-junction GaAs solar cell (GaInP/GaInAs/Ge)",
+      "role": null,
+      "source_ids": [
+        "cetc_lantian_688818_prospectus_20260205_space_solar_chain_s2",
+        "cetc_lantian_688818_prospectus_20260205_space_solar_chain_s4",
+        "cetc_lantian_688818_prospectus_20260205_space_solar_chain_s5"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "equipment_epitaxy",
+      "aliases": [
+        "三结砷化镓外延片",
+        "砷化镓外延片",
+        "triple-junction GaAs epiwafer"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "mat:tj_gaas_epiwafer",
+      "name": "Triple-junction GaAs epitaxial wafer (grown on Ge substrate)",
+      "role": null,
+      "source_ids": [
+        "cetc_lantian_688818_prospectus_20260205_space_solar_chain_s3"
+      ],
+      "type": "Material"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "Ge substrate",
+        "germanium"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "mat:germanium_substrate",
+      "name": "Germanium (Ge) substrate",
+      "role": null,
+      "source_ids": [
+        "cetc_lantian_688818_prospectus_20260205_space_solar_chain_s1",
+        "cetc_lantian_688818_prospectus_20260205_space_solar_chain_s3"
+      ],
+      "type": "Material"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "抗辐射玻璃盖片",
+        "抗辐照玻璃盖片",
+        "玻璃盖片",
+        "space solar coverglass"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "mat:space_coverglass",
+      "name": "Radiation-resistant space solar coverglass",
+      "role": null,
+      "source_ids": [
+        "cetc_lantian_688818_prospectus_20260205_space_solar_chain_s4",
+        "cetc_lantian_688818_prospectus_20260205_space_solar_chain_s5"
+      ],
+      "type": "Material"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "5N+",
+        "AZUR SPACE Solar Power GmbH",
+        "AZUR SPACE",
+        "VNP.TO"
+      ],
+      "attributes": {
+        "ticker": "VNP.TO"
+      },
+      "confidence": 0.9,
+      "id": "co:5n_plus",
+      "name": "5N Plus",
+      "role": null,
+      "source_ids": [
+        "cetc_lantian_688818_prospectus_20260205_space_solar_chain_s12",
+        "cetc_lantian_688818_prospectus_20260205_space_solar_chain_s11"
+      ],
+      "type": "Company"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "cetc_lantian_688818_prospectus_20260205_space_solar_chain",
+    "evidence_tier": 1,
+    "origin_entity": "中电科蓝天科技股份有限公司",
+    "permission_basis": "上市公司依法公開的招股說明書（上交所科創板 688818）；只保留研究必要的有限逐字節錄。published_at 取招股說明書簽署日期 2026-02-05（PDF p.7「招股说明书签署日期 2026年2月5日」）；PDF 取自東方財富公告鏡像（AN202602041819773519）。",
+    "published_at": "2026-02-05",
+    "publisher": "上海证券交易所（东方财富公告 PDF 镜像）",
+    "retrieved_at": "2026-10-29",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "中电科蓝天科技股份有限公司首次公开发行股票并在科创板上市招股说明书（2026-02-05 簽署）：三結砷化鎵／鍺襯底／外延片釋義、太陽電池陣主要生產材料、2024 年配套 144／285 個國內航天器、千帆與國網規劃",
+    "url": "https://pdf.dfcfw.com/pdf/H2_AN202602041819773519_1.pdf"
+  },
+  "sources": [
+    {
+      "id": "cetc_lantian_688818_prospectus_20260205_space_solar_chain_s1",
+      "locator": "釋義（PDF p.16，頁碼 1-1-15）",
+      "quote": "锗基衬底指锗晶片衬底，外延生长的载体，生长外延片所需的主要原材料之一"
+    },
+    {
+      "id": "cetc_lantian_688818_prospectus_20260205_space_solar_chain_s2",
+      "locator": "釋義（PDF p.16，頁碼 1-1-15）",
+      "quote": "三结砷化镓指目前空间单体太阳电池普遍采用的一种材料结构，采用晶格匹配的镓铟磷（GaInP）/镓铟砷（GaInAs）/锗（Ge）三结结构"
+    },
+    {
+      "id": "cetc_lantian_688818_prospectus_20260205_space_solar_chain_s3",
+      "locator": "釋義（PDF p.16，頁碼 1-1-15）",
+      "quote": "砷化镓外延片指锗晶片衬底外延生长三结砷化镓的产物，用于制造空间单体太阳电池的基础材料"
+    },
+    {
+      "id": "cetc_lantian_688818_prospectus_20260205_space_solar_chain_s4",
+      "locator": "第五節 業務與技術：主要原材料採購（PDF p.189，頁碼 1-1-188）",
+      "quote": "其中，太阳电池阵生产材料主要包括空间单体太阳电池、抗辐射玻璃盖片、太阳电池翼结构等"
+    },
+    {
+      "id": "cetc_lantian_688818_prospectus_20260205_space_solar_chain_s5",
+      "locator": "第五節 業務與技術：（七）主要產品的工藝流程圖 1、宇航電源業務（1）空間太陽電池陣（PDF p.127，頁碼 1-1-126）",
+      "quote": "空间太阳电池阵的主要生产流程为：在超净间内，完成空间单体太阳电池与互连片及旁路二极管的焊接，将玻璃盖片粘贴于空间单体太阳电池正面，制成CIC太阳电池，使空间单体太阳电池具备优良的抗空间粒子辐照损伤的能力。"
+    },
+    {
+      "id": "cetc_lantian_688818_prospectus_20260205_space_solar_chain_s6",
+      "locator": "第五節 業務與技術：三、行業地位及行業競爭情況 1、宇航電源行業競爭格局（PDF p.172，頁碼 1-1-171）",
+      "quote": "目前市场中宇航电源厂商集中度较高，主要的电源系统供应商为发行人、上海空间电源研究所、苏州馥昶空间技术有限公司和山东航天电子技术研究所等。2024年度，由公司配套电源单机或系统的航天器合计144个。根据BryceTech，2024年中国共发射卫星、飞船、空间站等航天器285个，按照该口径计算公司宇航电源产品在国内市场覆盖率约为50.5%。"
+    },
+    {
+      "id": "cetc_lantian_688818_prospectus_20260205_space_solar_chain_s7",
+      "locator": "第二節 概覽（PDF p.30，頁碼 1-1-29）",
+      "quote": "在近年来兴起的商业航天卫星电源系统领域，公司大力推进高性能、大规模、轻量化、低成本的星座电源产品体系，在千帆星座、国网星座、吉林一号遥感星座等我国重大商业航天星座的电源系统供应商中处于重要地位。"
+    },
+    {
+      "id": "cetc_lantian_688818_prospectus_20260205_space_solar_chain_s8",
+      "locator": "釋義（PDF p.16，頁碼 1-1-15）",
+      "quote": "千帆星座指千帆星座（Qianfan Constellation,G60,Global Multimedia Satellite），即“全球多媒体卫星”，也称“G60星链”，是中国正在建造的大型卫星互联网星座，主要用于宽带通信，规划发射卫星数量15,000颗，运营单位为上海垣信卫星科技有限公司，研制单位为上海微小卫星工程中心与上海格思航天科技有限公司"
+    },
+    {
+      "id": "cetc_lantian_688818_prospectus_20260205_space_solar_chain_s9",
+      "locator": "釋義（PDF p.16，頁碼 1-1-15）",
+      "quote": "国网星座指国网星座，又称GW星座，是中国首个卫星互联网计划，主要用于宽带通信，规划发射卫星数量12,999颗，运营单位为中国卫星网络集团有限公司"
+    },
+    {
+      "id": "cetc_lantian_688818_prospectus_20260205_space_solar_chain_s10",
+      "locator": "第五節 業務與技術：商業航天衛星電源系統領域的客戶（PDF p.173，頁碼 1-1-172）",
+      "quote": "在商业航天卫星电源系统领域，公司目前合作的客户包括中国卫星网络集团有限公司、中国东方红卫星股份有限公司、特定客户12、上海格思航天科技有限公司等国有单位，银河航天（北京）科技有限公司、哈尔滨工大卫星技术有限公司、椭圆时空（北京）科技有限公司等民营商业航天公司，以及清华大学、浙江大学、西北工业大学等多所高校。"
+    },
+    {
+      "id": "cetc_lantian_688818_prospectus_20260205_space_solar_chain_s11",
+      "locator": "第五節 業務與技術：（二）發行人所屬細分行業內的主要企業——1、宇航電源行業主要企業（5）AZUR（PDF p.176，頁碼 1-1-175）",
+      "quote": "AZUR公司成立于1964年，主营业务是空间单体太阳电池及其阵列。该公司曾为1969年发射的第一颗德国卫星“AZUR”开发和制造太阳电池，至今已为多项深空科学任务及哈勃太空望远镜、罗塞塔、金星快车、火星快车、赫歇尔-普朗克等共计600多个太空项目提供了1,000多万个硅太阳电池和300万个砷化镓太阳电池产品。2021年11月，5N Plus收购Azur公司100%股权。"
+    },
+    {
+      "id": "cetc_lantian_688818_prospectus_20260205_space_solar_chain_s12",
+      "locator": "第五節 業務與技術：（五）發行人與同行業可比公司的比較情況——同行業可比公司 1 VNP.TO 5N Plus（PDF p.182，頁碼 1-1-181）",
+      "quote": "5N Plus是全球领先的特种半导体及高性能材料生产商，于2021年11月收购Azur公司100%股权，进一步扩大其特种半导体产品组合。5N Plus特种半导体产品主要包括半导体化合物、半导体晶圆、超高纯度金属、外延半导体衬底、太空太阳能电池及组件（由Azur生产）等，应用在地面可再生能源、卫星及成像领域；高性能材料主要为铋化学品、高纯度金属、低熔点合金等，应用于制药、医疗保健以及工业等多个领域。收购Azur后，5N Plus成为全球重要的宇航电源供应商之一。"
+    }
+  ]
+}

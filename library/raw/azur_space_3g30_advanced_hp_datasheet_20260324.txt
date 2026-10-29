@@ -1,0 +1,20 @@
+Source URL: https://www.azurspace.com/media/uploads/file_links/file/bdb_00010894-02-00_3g30-advanced_hp.pdf
+
+Excerpt:
+[EXCERPT — 有限逐字引文] AZUR SPACE Solar Power GmbH — SPACE | 3G30-Advanced (HP) 30% Triple-Junction (TJ) III-V Bare Solar Cells & Assemblies（DB 00010894-02，Issue date 2026-03-24）
+
+Source: https://www.azurspace.com/media/uploads/file_links/file/bdb_00010894-02-00_3g30-advanced_hp.pdf
+PUBLISHED: 2026-03-24
+RETRIEVED: 2026-10-29（本機 PDF 抽字（pypdf）、逐字截取；換行與重複空白收成一格、行尾連字號接回）
+
+【規格書 p.1 首段】
+AZUR SPACE’s 3G30-Advanced bare solar cells and solar cell assemblies (“SCA”), or CICs (Cell-interconnect-coverglass) are the ideal solution for space power applications in conventional or in New Space segments.
+
+【規格書 p.1 第二段（3G30C-Advanced 裸片）】
+The 3G30C-Advanced bare cell device is a space-qualified InGaP/GaAs/Ge triple-junction solar cell originating from a 150 mm germanium (Ge) substrate and provides 30% class beginning-of-life (BOL) efficiency.
+
+【規格書 p.1 第三段（3G30A 組件）】
+The 3G30A assembly includes a bare 3G30C-Advanced solar cell, a corner-mounted silicon bypass diode, welded in-plane silver-coated Kovar interconnectors (“ICs”), and a 100 µm AR coated coverglass bonded with space-grade heritage adhesive.
+
+【規格書 p.1 第五段（鑑定與產地）】
+The 3G30-Advanced technology, cells and assemblies are ECSS-E-ST-20-08C (Rev. 1) qualified. These devices are all produced in our mature MRL-10 Heilbronn facility.

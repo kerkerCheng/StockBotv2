@@ -1,0 +1,198 @@
+{
+  "claims": [
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：雲南鍺業定期報告寫出光伏級鍺產品銷量轉降、並歸因於衛星需求放緩或客戶改用無鍺電池（2026 上半年光伏級鍺產品營收已年減 26.87%，庫內 library/raw/yng_002428_h1_2026_report_excerpt.txt，原因未寫）。核查頻率：每季（季報）＋半年報與年報拆產品。觸發後 48 小時：更新本 claim，重讀鍺襯底層讀圖。",
+      "id": "yng_002428_ar_2025_space_solar_ge_wafer_cl1",
+      "source_ids": [
+        "yng_002428_ar_2025_space_solar_ge_wafer_s1",
+        "yng_002428_ar_2025_space_solar_ge_wafer_s2",
+        "yng_002428_ar_2025_space_solar_ge_wafer_s3",
+        "yng_002428_ar_2025_space_solar_ge_wafer_s4"
+      ],
+      "statement": "Yunnan Germanium 2025 annual report: its PV-grade germanium products are mainly germanium wafers for solar cells (p.10), produced by its controlled grandson company 云南中科鑫圆晶体材料有限公司 (p.11; subsidiary 云南鑫耀 injected RMB 100m in 2025-11, p.79); PV-grade germanium sales volume rose in 2025 mainly because LEO satellite constellations in China, the US and elsewhere entered dense deployment, raising demand for space-solar germanium wafers (p.22). Supplier self-report; volumes and revenue are time-varying (Engine C).",
+      "subject_id": "e1"
+    },
+    {
+      "confidence": 0.65,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：雲南鍺業定期報告或中國商務部一手寫出國內鍺原料再度轉緊（鍺價轉升、原料短缺、出口管制擴大），或對美鍺出口禁令暫停到期未延長並波及西方三結電池的鍺襯底供應（暫停到 2026-11-27：媒體轉述商務部 2025 年第 72 號公告，本包未見一手）。核查頻率：每季（雲南鍺業季報）＋商務部公告。觸發後 48 小時：更新本 claim，重讀鍺原料層與鍺襯底層讀圖。",
+      "id": "yng_002428_ar_2025_space_solar_ge_wafer_cl2",
+      "source_ids": [
+        "yng_002428_ar_2025_space_solar_ge_wafer_s7",
+        "yng_002428_ar_2025_space_solar_ge_wafer_s8",
+        "yng_002428_ar_2025_space_solar_ge_wafer_s6",
+        "yng_002428_ar_2025_space_solar_ge_wafer_s5"
+      ],
+      "statement": "Yunnan Germanium 2025 annual report p.13: in 2025, with germanium prices high, domestic primary germanium output rose and low-grade germanium-bearing material and historical inventory flowed into the market, so the tight raw-material supply 'eased significantly'; PV germanium demand grew fast on LEO deployment but did not offset supply growth and substitution, so domestic prices fell; overseas new mine capacity was released only in small amounts, overseas supply remained tight and overseas spot prices stayed high. Global primary germanium comes mainly as a zinc-smelting by-product, from standalone germanium deposits and germanium-bearing lignite (p.13). Its own germanium products use ore from its own mines plus purchased raw material (p.11); its mined ore is not sold externally and its material-grade products are germanium ingots and GeO2 (p.10). Supplier self-report on industry conditions; prices and volumes are time-varying (Engine C).",
+      "subject_id": "mat:germanium_metal"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "mat:germanium_substrate",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "yng_002428_ar_2025_space_solar_ge_wafer_s1",
+        "yng_002428_ar_2025_space_solar_ge_wafer_s2",
+        "yng_002428_ar_2025_space_solar_ge_wafer_s3"
+      ],
+      "src_id": "co:yunnan_germanium"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "mat:germanium_metal",
+      "id": "e2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "yng_002428_ar_2025_space_solar_ge_wafer_s5",
+        "yng_002428_ar_2025_space_solar_ge_wafer_s9",
+        "yng_002428_ar_2025_space_solar_ge_wafer_s6"
+      ],
+      "src_id": "co:yunnan_germanium"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "mat:germanium_substrate",
+      "id": "e3",
+      "relation": "is_component_of",
+      "source_ids": [
+        "yng_002428_ar_2025_space_solar_ge_wafer_s9",
+        "yng_002428_ar_2025_space_solar_ge_wafer_s5",
+        "yng_002428_ar_2025_space_solar_ge_wafer_s1"
+      ],
+      "src_id": "mat:germanium_metal"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "云南锗业",
+        "雲南鍺業",
+        "Yunnan Lincang Xinyuan Germanium Industry",
+        "云南临沧鑫圆锗业股份有限公司"
+      ],
+      "attributes": {
+        "ticker": "002428.SZ"
+      },
+      "confidence": 0.9,
+      "id": "co:yunnan_germanium",
+      "name": "Yunnan Germanium",
+      "role": null,
+      "source_ids": [
+        "yng_002428_ar_2025_space_solar_ge_wafer_s2",
+        "yng_002428_ar_2025_space_solar_ge_wafer_s4",
+        "yng_002428_ar_2025_space_solar_ge_wafer_s5"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "Ge substrate",
+        "germanium"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "mat:germanium_substrate",
+      "name": "Germanium (Ge) substrate",
+      "role": null,
+      "source_ids": [
+        "yng_002428_ar_2025_space_solar_ge_wafer_s1",
+        "yng_002428_ar_2025_space_solar_ge_wafer_s3"
+      ],
+      "type": "Material"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "锗锭",
+        "金属锗",
+        "区熔锗锭",
+        "二氧化锗",
+        "germanium ingot",
+        "germanium metal"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "mat:germanium_metal",
+      "name": "Germanium metal (zone-refined Ge ingot, GeO2)",
+      "role": null,
+      "source_ids": [
+        "yng_002428_ar_2025_space_solar_ge_wafer_s5",
+        "yng_002428_ar_2025_space_solar_ge_wafer_s9",
+        "yng_002428_ar_2025_space_solar_ge_wafer_s8",
+        "yng_002428_ar_2025_space_solar_ge_wafer_s7"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "yng_002428_ar_2025_space_solar_ge_wafer",
+    "evidence_tier": 1,
+    "origin_entity": "云南临沧鑫圆锗业股份有限公司",
+    "permission_basis": "上市公司依法公開的年度報告；只保留研究必要的有限逐字節錄。published_at 取巨潮刊登日 2026-04-23（年報封面「2026 年4 月」）。本機抽字用深交所披露站同一份 PDF（disc.static.szse.cn …/2026-04-23/5bcb24dd-095c-46e3-916f-790fa2cb4b5a.PDF），同段逐字對照過庫內 library/raw/yng_002428_ar_2025_excerpt.txt（巨潮 1225152695）。",
+    "published_at": "2026-04-23",
+    "publisher": "深圳证券交易所（巨潮资讯网）",
+    "retrieved_at": "2026-10-29",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "云南临沧鑫圆锗业股份有限公司 2025年年度报告：控股孫公司中科鑫圆負責光伏級鍺產品（太陽能電池用鍺晶片）；低軌衛星星座進入密集部署期，光伏級鍺產品銷量上升",
+    "url": "http://static.cninfo.com.cn/finalpage/2026-04-23/1225152695.PDF"
+  },
+  "sources": [
+    {
+      "id": "yng_002428_ar_2025_space_solar_ge_wafer_s1",
+      "locator": "第三節 管理層討論與分析：一、報告期內公司從事的主要業務（年報全文 p.10）",
+      "quote": "深加工方面，光伏级锗产品主要为太阳能电池用锗晶片"
+    },
+    {
+      "id": "yng_002428_ar_2025_space_solar_ge_wafer_s2",
+      "locator": "第三節：經營模式（年報全文 p.11）",
+      "quote": "下游深加工产品方面，由子公司负责不同系列的产品生产。昆明云锗高新技术有限公司负责红外级锗产品生产，武汉云晶飞光纤材料有限公司负责光纤级锗产品生产，云南鑫耀半导体材料有限公司及下属湖北鑫耀半导体有限公司负责化合物半导体材料生产，云南中科鑫圆晶体材料有限公司负责光伏级锗产品生产。"
+    },
+    {
+      "id": "yng_002428_ar_2025_space_solar_ge_wafer_s3",
+      "locator": "第三節：四、主營業務分析——產銷量變動原因（年報全文 p.22）",
+      "quote": "②光伏级锗产品本年销售量较上年上升，主要系随着中美等国低轨卫星星座进入密集部署期，用于空间太阳能电池用锗晶片需求增加，光伏级锗产品需求增加使得销量同比上升。"
+    },
+    {
+      "id": "yng_002428_ar_2025_space_solar_ge_wafer_s4",
+      "locator": "十八、公司子公司重大事項（年報全文 p.79）",
+      "quote": "同意控股子公司云南鑫耀半导体材料有限公司以10,000万元自有资金对孙公司云南中科鑫圆晶体材料有限公司进行增资。2025年11月12日，控股孙公司中科鑫圆收到了关于本次增资的全部价款，并完成了上述增资事项的工商变更登记手续。"
+    },
+    {
+      "id": "yng_002428_ar_2025_space_solar_ge_wafer_s5",
+      "locator": "第三節 管理層討論與分析：一、報告期內公司從事的主要業務——1、公司業務和產品（年報全文 p.10）",
+      "quote": "公司主要业务为锗矿开采、锗系列产品与化合物半导体材料的精深加工及研究开发。目前公司矿山开采的矿石及粗加工产品不对外销售，仅作为公司及子公司下游加工的原料。公司目前材料级锗产品主要为锗锭（金属锗）、二氧化锗；"
+    },
+    {
+      "id": "yng_002428_ar_2025_space_solar_ge_wafer_s6",
+      "locator": "第三節：2、經營模式（年報全文 p.11）",
+      "quote": "锗系列产品所需原料由自有矿山供应及外购原料共同构成，辅助材料则由外部供应；化合物半导体材料产品所需原辅料全部从外部采购。"
+    },
+    {
+      "id": "yng_002428_ar_2025_space_solar_ge_wafer_s7",
+      "locator": "第三節：二、報告期內公司所處行業情況——（三）公司所處行業的發展情況（年報全文 p.13）",
+      "quote": "报告期内，在锗价处于高位运行的刺激下，国内原生锗产量有所增长，低品位含锗物料及历史库存加速流入市场，原料供应紧张局面显著缓解。需求方面，红外领域用锗受锗价上涨及替代材料应用的影响需求减少，光伏用锗受益于低轨卫星部署的推进需求快速增长，光纤用锗在AI算力建设、数据中心扩容等拉动下需求回暖。但新兴领域的需求增量难以抵消供应增长以及材料替代带来的压力，导致2025年国内锗价整体震荡回落。2025年行业海外矿山新增产能逐步少量释放，但海外供应依然紧张，海外现货价格维持在高位。"
+    },
+    {
+      "id": "yng_002428_ar_2025_space_solar_ge_wafer_s8",
+      "locator": "第三節：1、公司所處行業的發展趨勢（1）鍺行業（年報全文 p.13）",
+      "quote": "全球原生锗主要来自锌冶炼的副产品、独立锗矿床、含锗褐煤提取。近几年，全球原生锗总产量相对稳定，锌冶炼厂的综合回收占比最多，且全球范围内来自于锌、钴冶炼体系的原生锗原料占比正在稳步增加，国内多家企业同样加强了对锌、钴冶炼过程中锗资源的综合回收利用；其次是从锗矿开采、含锗煤、铜等其他有色金属生产综合回收。除中国外，海外国家多数通过锌冶炼副产品中提取锗。因此，锗的供给受上述多种含锗矿山的开采量共同影响。"
+    },
+    {
+      "id": "yng_002428_ar_2025_space_solar_ge_wafer_s9",
+      "locator": "第三節：三、核心競爭力分析——1、產業優勢（年報全文 p.15）",
+      "quote": "公司通过锗矿开采、火法富集生产锗精矿，通过湿法提纯、区熔精炼生产高纯二氧化锗、锗锭，可供直接销售，也可供精深加工生产高附加值的高端产品。"
+    }
+  ]
+}

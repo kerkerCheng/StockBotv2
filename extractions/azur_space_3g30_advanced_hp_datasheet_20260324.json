@@ -1,0 +1,145 @@
+{
+  "claims": [],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "tech:space_tj_solar_cell",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "azur_space_3g30_advanced_hp_datasheet_20260324_s2",
+        "azur_space_3g30_advanced_hp_datasheet_20260324_s1",
+        "azur_space_3g30_advanced_hp_datasheet_20260324_s4"
+      ],
+      "src_id": "co:5n_plus"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:space_solar_array",
+      "id": "e2",
+      "relation": "is_component_of",
+      "source_ids": [
+        "azur_space_3g30_advanced_hp_datasheet_20260324_s3",
+        "azur_space_3g30_advanced_hp_datasheet_20260324_s1"
+      ],
+      "src_id": "mat:space_coverglass"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "5N+",
+        "AZUR SPACE Solar Power GmbH",
+        "AZUR SPACE",
+        "VNP.TO"
+      ],
+      "attributes": {
+        "ticker": "VNP.TO"
+      },
+      "confidence": 0.9,
+      "id": "co:5n_plus",
+      "name": "5N Plus",
+      "role": null,
+      "source_ids": [
+        "azur_space_3g30_advanced_hp_datasheet_20260324_s1",
+        "azur_space_3g30_advanced_hp_datasheet_20260324_s4"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "三结砷化镓太阳电池",
+        "空间单体太阳电池",
+        "砷化镓太阳电池片",
+        "space triple-junction solar cell"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:space_tj_solar_cell",
+      "name": "Space triple-junction GaAs solar cell (GaInP/GaInAs/Ge)",
+      "role": null,
+      "source_ids": [
+        "azur_space_3g30_advanced_hp_datasheet_20260324_s2",
+        "azur_space_3g30_advanced_hp_datasheet_20260324_s1"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "抗辐射玻璃盖片",
+        "抗辐照玻璃盖片",
+        "玻璃盖片",
+        "space solar coverglass"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "mat:space_coverglass",
+      "name": "Radiation-resistant space solar coverglass",
+      "role": null,
+      "source_ids": [
+        "azur_space_3g30_advanced_hp_datasheet_20260324_s3"
+      ],
+      "type": "Material"
+    },
+    {
+      "abstraction_level": "end_demand",
+      "aliases": [
+        "太阳电池阵",
+        "太阳电池翼",
+        "空间太阳电池阵",
+        "space solar array",
+        "spacecraft solar array"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:space_solar_array",
+      "name": "Spacecraft solar array (solar wing)",
+      "role": null,
+      "source_ids": [
+        "azur_space_3g30_advanced_hp_datasheet_20260324_s1"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "azur_space_3g30_advanced_hp_datasheet_20260324",
+    "evidence_tier": 1,
+    "origin_entity": "AZUR SPACE Solar Power GmbH",
+    "permission_basis": "製造商官網公開的產品規格書；只保留研究必要的有限逐字節錄。published_at 取規格書頁首「Issue date: 24-Mar-2026」。AZUR SPACE 是 5N Plus 全資子公司（電科藍天招股說明書 p.176），名冊以別名併入 co:5n_plus。",
+    "published_at": "2026-03-24",
+    "publisher": "AZUR SPACE Solar Power GmbH（官網產品文件）",
+    "retrieved_at": "2026-10-29",
+    "source_type": "datasheet",
+    "storage_permission": "repo_excerpt",
+    "title": "AZUR SPACE 3G30-Advanced (HP) 產品規格書（DB 00010894-02，2026-03-24）：InGaP/GaAs/Ge 三結太空電池、源自 150 mm 鍺襯底；裸片、SCA／CIC 組件（矽旁路二極體、鍍銀 Kovar 互連片、蓋片、太空級膠）",
+    "url": "https://www.azurspace.com/media/uploads/file_links/file/bdb_00010894-02-00_3g30-advanced_hp.pdf"
+  },
+  "sources": [
+    {
+      "id": "azur_space_3g30_advanced_hp_datasheet_20260324_s1",
+      "locator": "規格書 p.1 首段",
+      "quote": "AZUR SPACE’s 3G30-Advanced bare solar cells and solar cell assemblies (“SCA”), or CICs (Cell-interconnect-coverglass) are the ideal solution for space power applications in conventional or in New Space segments."
+    },
+    {
+      "id": "azur_space_3g30_advanced_hp_datasheet_20260324_s2",
+      "locator": "規格書 p.1 第二段（3G30C-Advanced 裸片）",
+      "quote": "The 3G30C-Advanced bare cell device is a space-qualified InGaP/GaAs/Ge triple-junction solar cell originating from a 150 mm germanium (Ge) substrate and provides 30% class beginning-of-life (BOL) efficiency."
+    },
+    {
+      "id": "azur_space_3g30_advanced_hp_datasheet_20260324_s3",
+      "locator": "規格書 p.1 第三段（3G30A 組件）",
+      "quote": "The 3G30A assembly includes a bare 3G30C-Advanced solar cell, a corner-mounted silicon bypass diode, welded in-plane silver-coated Kovar interconnectors (“ICs”), and a 100 µm AR coated coverglass bonded with space-grade heritage adhesive."
+    },
+    {
+      "id": "azur_space_3g30_advanced_hp_datasheet_20260324_s4",
+      "locator": "規格書 p.1 第五段（鑑定與產地）",
+      "quote": "The 3G30-Advanced technology, cells and assemblies are ECSS-E-ST-20-08C (Rev. 1) qualified. These devices are all produced in our mature MRL-10 Heilbronn facility."
+    }
+  ]
+}

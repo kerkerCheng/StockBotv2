@@ -1,0 +1,97 @@
+{
+  "claims": [
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：5N Plus 季度 MD&A 寫出 Specialty Semiconductors backlog 掉到 270 天以下，或不再寫地面再生能源與太空太陽能的 effective backlog 超過未來 12 個月。核查頻率：每季（5N Plus MD&A）。觸發後 48 小時：更新本 claim，重讀電池片層讀圖。",
+      "id": "vnp_tsx_q2_2026_mda_space_solar_backlog_cl1",
+      "source_ids": [
+        "vnp_tsx_q2_2026_mda_space_solar_backlog_s1",
+        "vnp_tsx_q2_2026_mda_space_solar_backlog_s2"
+      ],
+      "statement": "5N Plus Q2 2026 MD&A (2026-08-03): the Specialty Semiconductors segment sells semiconductor compounds, semiconductor wafers, ultra-high-purity metals, epitaxial semiconductor substrates, space solar cells and assemblies (p.3); segment backlog was 365 days of annualized revenue at 2026-06-30, the cap under its definition, and the effective backlog for the terrestrial renewable energy and space solar power sectors surpassed the next twelve months (p.8). Supplier self-report; backlog is time-varying (claim, not edge attribute).",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:space_tj_solar_cell",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "vnp_tsx_q2_2026_mda_space_solar_backlog_s1",
+        "vnp_tsx_q2_2026_mda_space_solar_backlog_s2"
+      ],
+      "src_id": "co:5n_plus"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "5N+",
+        "AZUR SPACE Solar Power GmbH",
+        "AZUR SPACE",
+        "VNP.TO"
+      ],
+      "attributes": {
+        "ticker": "VNP.TO"
+      },
+      "confidence": 0.9,
+      "id": "co:5n_plus",
+      "name": "5N Plus",
+      "role": null,
+      "source_ids": [
+        "vnp_tsx_q2_2026_mda_space_solar_backlog_s1",
+        "vnp_tsx_q2_2026_mda_space_solar_backlog_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "三结砷化镓太阳电池",
+        "空间单体太阳电池",
+        "砷化镓太阳电池片",
+        "space triple-junction solar cell"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:space_tj_solar_cell",
+      "name": "Space triple-junction GaAs solar cell (GaInP/GaInAs/Ge)",
+      "role": null,
+      "source_ids": [
+        "vnp_tsx_q2_2026_mda_space_solar_backlog_s1"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "vnp_tsx_q2_2026_mda_space_solar_backlog",
+    "evidence_tier": 1,
+    "origin_entity": "5N Plus Inc.",
+    "permission_basis": "TSX 上市公司依法公開的季度 MD&A；只保留研究必要的有限逐字節錄。published_at 取 MD&A 內文「includes any significant developments until August 3, 2026, the date on which the MD&A …」（p.1）。",
+    "published_at": "2026-08-03",
+    "publisher": "5N Plus Inc.（公司官網投資人文件；SEDAR+ 申報）",
+    "retrieved_at": "2026-10-29",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "5N Plus Inc. Management's Discussion and Analysis, Q2 2026（2026-08-03）：Specialty Semiconductors 產品含磊晶半導體襯底、太空太陽能電池與組件；地面再生能源與太空太陽能的 effective backlog 超過未來 12 個月",
+    "url": "https://www.5nplus.com/media/uploads/documents/b2026-08-03__q2_2026_mda.pdf"
+  },
+  "sources": [
+    {
+      "id": "vnp_tsx_q2_2026_mda_space_solar_backlog_s1",
+      "locator": "Description of the Business — Reporting segments: Specialty Semiconductors（PDF p.3）",
+      "quote": "Operating in North America and Europe, the Specialty Semiconductors segment manufactures and sells products used in several applications, such as renewable energy, space satellites and imaging. Typical end markets include photovoltaics (terrestrial and space-related solar energy), medical imaging, infrared imaging, optoelectronics and advanced electronics. These products are sold as semiconductor compounds, semiconductor wafers, ultra-high-purity metals, epitaxial semiconductor substrates, space solar cells and assemblies."
+    },
+    {
+      "id": "vnp_tsx_q2_2026_mda_space_solar_backlog_s2",
+      "locator": "Backlog and Bookings（PDF p.8）",
+      "quote": "Backlog for Specialty Semiconductors represented 365 days of annualized revenue on June 30, 2026, which is the same level as at March 31, 2026. While the estimated number of days based on annualized revenue cannot exceed 365 days per the Company’s definition of backlog, the effective backlog under Specialty Semiconductors for the terrestrial renewable energy and space solar power sectors surpassed the next twelve months on June 30, 2026."
+    }
+  ]
+}

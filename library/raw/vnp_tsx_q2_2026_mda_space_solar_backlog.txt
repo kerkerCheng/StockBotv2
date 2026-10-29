@@ -1,0 +1,17 @@
+Source URL: https://www.5nplus.com/media/uploads/documents/b2026-08-03__q2_2026_mda.pdf
+
+Excerpt:
+[EXCERPT — 有限逐字引文] 5N Plus Inc. Management's Discussion and Analysis — Q2 2026（三個月與六個月期間截至 2026-06-30；MD&A 日期 2026-08-03）
+
+Source: https://www.5nplus.com/media/uploads/documents/b2026-08-03__q2_2026_mda.pdf
+PUBLISHED: 2026-08-03
+RETRIEVED: 2026-10-29（本機 PDF 抽字（pypdf）、逐字截取；換行與重複空白收成一格、標點前的空白拿掉）
+
+【Description of the Business — Reporting segments: Specialty Semiconductors（PDF p.3）】
+Operating in North America and Europe, the Specialty Semiconductors segment manufactures and sells products used in several applications, such as renewable energy, space satellites and imaging. Typical end markets include photovoltaics (terrestrial and space-related solar energy), medical imaging, infrared imaging, optoelectronics and advanced electronics. These products are sold as semiconductor compounds, semiconductor wafers, ultra-high-purity metals, epitaxial semiconductor substrates, space solar cells and assemblies.
+
+【Backlog and Bookings（PDF p.8）】
+Backlog for Specialty Semiconductors represented 365 days of annualized revenue on June 30, 2026, which is the same level as at March 31, 2026. While the estimated number of days based on annualized revenue cannot exceed 365 days per the Company’s definition of backlog, the effective backlog under Specialty Semiconductors for the terrestrial renewable energy and space solar power sectors surpassed the next twelve months on June 30, 2026.
+
+【Q2 2026 Highlights — Specialty Semiconductors（PDF p.4）】
+Specialty Semiconductors revenue reached $89.2 million in Q2 2026, representing a 25% increase compared to Q2 2025, primarily driven by higher volumes in terrestrial renewable energy and a more favourable product mix in space solar power.

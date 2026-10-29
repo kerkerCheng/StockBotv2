@@ -1,0 +1,20 @@
+Source URL: https://rocketlabcorp.com/updates/rocket-lab-introduces-high-efficiency-solar-cell-to-reduce-reliance-on-supply-constrained-critical-minerals/
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Rocket Lab 新聞稿：Rocket Lab Introduces High-Efficiency Solar Cell to Reduce Reliance on Supply-Constrained Critical Minerals（2026-09-08）
+
+Source: https://rocketlabcorp.com/updates/rocket-lab-introduces-high-efficiency-solar-cell-to-reduce-reliance-on-supply-constrained-critical-minerals/
+PUBLISHED: 2026-09-08
+RETRIEVED: 2026-10-29（本機 HTML 轉文字、逐字截取；空白收成一格）
+
+【新聞稿首段（Long Beach, California. Sept. 8, 2026）】
+Long Beach, California. Sept. 8, 2026 – Rocket Lab Corporation (Nasdaq: RKLB), a global leader in launch services and space systems, today announced the production release of Inverted Metamorphic (IMM) Apex, the latest iteration of its next-generation solar cell designed to deliver exceptional efficiency and reliability for space applications. IMM Apex boasts a Beginning of Life solar conversion efficiency of 31.5% and 40% lower cell mass, giving it best-in-class specific power (watts per kilogram) while maintaining excellent radiation hardness and performance over temperature.
+
+【新聞稿第二段】
+IMM Apex is free of the germanium substrates used for conventional, multi-junction solar cells produced for the last three decades. By eliminating reliance on this critical mineral, IMM Apex mitigates rising costs and supply chain constraints currently facing the space power industry. Crucially, IMM Apex is a mechanical and electrical drop-in replacement for heritage solar cell products on germanium, meaning customers can integrate it into existing systems without major investments to re-tool for new cell technology.
+
+【新聞稿第三段】
+In addition to being free from germanium supply constraints, optimized manufacturing processes and targeted capital investments have enabled efficient manufacturing in multi-100-kilowatt volumes to meet growing demand.
+
+【新聞稿末段】
+More than 1,100 satellites on orbit are powered by Rocket Lab solar products.

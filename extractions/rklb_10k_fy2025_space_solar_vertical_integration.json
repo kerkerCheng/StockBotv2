@@ -1,0 +1,92 @@
+{
+  "claims": [],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "tech:space_solar_array",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "rklb_10k_fy2025_space_solar_vertical_integration_s1",
+        "rklb_10k_fy2025_space_solar_vertical_integration_s3"
+      ],
+      "src_id": "co:rocket_lab"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "Rocket Lab Corporation",
+        "Rocket Lab USA",
+        "SolAero Technologies",
+        "RKLB"
+      ],
+      "attributes": {
+        "ticker": "RKLB"
+      },
+      "confidence": 0.9,
+      "id": "co:rocket_lab",
+      "name": "Rocket Lab",
+      "role": null,
+      "source_ids": [
+        "rklb_10k_fy2025_space_solar_vertical_integration_s1",
+        "rklb_10k_fy2025_space_solar_vertical_integration_s2",
+        "rklb_10k_fy2025_space_solar_vertical_integration_s3"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "end_demand",
+      "aliases": [
+        "太阳电池阵",
+        "太阳电池翼",
+        "空间太阳电池阵",
+        "space solar array",
+        "spacecraft solar array"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:space_solar_array",
+      "name": "Spacecraft solar array (solar wing)",
+      "role": null,
+      "source_ids": [
+        "rklb_10k_fy2025_space_solar_vertical_integration_s1",
+        "rklb_10k_fy2025_space_solar_vertical_integration_s3"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "rklb_10k_fy2025_space_solar_vertical_integration",
+    "evidence_tier": 1,
+    "origin_entity": "Rocket Lab Corporation",
+    "permission_basis": "SEC 公開申報的 10-K；只保留研究必要的有限逐字節錄。published_at 取 EDGAR 申報日 2026-02-26。",
+    "published_at": "2026-02-26",
+    "publisher": "U.S. Securities and Exchange Commission（EDGAR）",
+    "retrieved_at": "2026-10-29",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Rocket Lab Corporation Form 10-K（FY2025，2026-02-26）：太空太陽能電池、CIC、太陽陣列垂直整合；Albuquerque 從電池做到陣列；SolAero Technologies 2022-01 併入",
+    "url": "https://www.sec.gov/Archives/edgar/data/1819994/000181999426000013/rklb-20251231.htm"
+  },
+  "sources": [
+    {
+      "id": "rklb_10k_fy2025_space_solar_vertical_integration_s1",
+      "locator": "Part I, Item 1. Business — Space Systems（solar power solutions）",
+      "quote": "Solar power solutions include a suite of vertically-integrated space solar cell, Coverglass Interconnected Cells (“CICs”) and solar array products, each specifically designed for missions to low Earth orbit, medium Earth orbit, geosynchronous orbit or interplanetary applications. Rocket Lab’s space solar cells, CICs and panels are among the highest performing in the world and support civil space exploration, science, defense and intelligence, and commercial markets."
+    },
+    {
+      "id": "rklb_10k_fy2025_space_solar_vertical_integration_s2",
+      "locator": "Part I, Item 1. Business — Space Systems（併購沿革）",
+      "quote": "including legacy missions enabled by Sinclair Interplanetary (acquired April 2020), Advanced Solutions, Incorporated (acquired October 2021), Planetary Systems Corporation (acquired November 2021), SolAero Technologies Corp. (acquired January 2022) and GEOST LLC (“GEOST”) (acquired August 2025)."
+    },
+    {
+      "id": "rklb_10k_fy2025_space_solar_vertical_integration_s3",
+      "locator": "Part I, Item 1. Business — Manufacturing／Facilities: Albuquerque, New Mexico Solar Cell Production Facility",
+      "quote": "Our solar cell through solar array production activities are conducted at our Albuquerque, New Mexico facility. From this location we research, develop, design and manufacture solar power solutions in an approximately 160,000 square foot production, research and development complex."
+    }
+  ]
+}

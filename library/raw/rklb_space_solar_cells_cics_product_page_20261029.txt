@@ -1,0 +1,14 @@
+Source URL: https://rocketlabcorp.com/space-systems/solar/space-solar-cellscics/
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Rocket Lab — Space Solar Cells/CICs 產品頁（無發布日；2026-10-29 取得）
+
+Source: https://rocketlabcorp.com/space-systems/solar/space-solar-cellscics/
+PUBLISHED: null（頁面沒有發布日）
+RETRIEVED: 2026-10-29（本機 HTML 轉文字、逐字截取；空白收成一格（頁面按鈕字「Datasheet」照頁面原樣保留））
+
+【產品頁：ZTJ family of triple-junction solar cells 區塊】
+ZTJ family of triple-junction solar cells We offer a suite of vertically-integrated space solar panel products, each specifically designed for missions to LEO, MEO, GEO or interplanetary applications. ZTJ-Ω Triple-junction solar cells 30.2% Minimum Average BOL Efficiency Optimized for Low Earth Orbit (LEO) Missions Datasheet ZTJ Standard triple-junction solar cells 29.5% Minimum Average BOL Efficiency Excellent Performance under LILT (Low-Intensity Low-Temperature) Conditions Datasheet ZTJ+ Triple junction solar cells Comparable BOL Efficiency to ZTJ Optimized for High-Radiation Space Environments
+
+【產品頁：Z4J 區塊】
+Z4J 30.0% Minimum Average Efficiency 4-junction n-on-p solar cell on germanium substrate Superior radiation hardness and temperature performance compared to other Germanium based solar cells

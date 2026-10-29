@@ -1,0 +1,85 @@
+{
+  "claims": [],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "tech:space_tj_solar_cell",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "rklb_space_solar_cells_cics_product_page_20261029_s1",
+        "rklb_space_solar_cells_cics_product_page_20261029_s2"
+      ],
+      "src_id": "co:rocket_lab"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "Rocket Lab Corporation",
+        "Rocket Lab USA",
+        "SolAero Technologies",
+        "RKLB"
+      ],
+      "attributes": {
+        "ticker": "RKLB"
+      },
+      "confidence": 0.9,
+      "id": "co:rocket_lab",
+      "name": "Rocket Lab",
+      "role": null,
+      "source_ids": [
+        "rklb_space_solar_cells_cics_product_page_20261029_s1",
+        "rklb_space_solar_cells_cics_product_page_20261029_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "三结砷化镓太阳电池",
+        "空间单体太阳电池",
+        "砷化镓太阳电池片",
+        "space triple-junction solar cell"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:space_tj_solar_cell",
+      "name": "Space triple-junction GaAs solar cell (GaInP/GaInAs/Ge)",
+      "role": null,
+      "source_ids": [
+        "rklb_space_solar_cells_cics_product_page_20261029_s1",
+        "rklb_space_solar_cells_cics_product_page_20261029_s2"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "rklb_space_solar_cells_cics_product_page_20261029",
+    "evidence_tier": 1,
+    "origin_entity": "Rocket Lab USA",
+    "permission_basis": "製造商官網公開的產品頁；只保留研究必要的有限逐字節錄。頁面沒有發布或更新日期（只有頁尾「©2026 Rocket Lab USA」），published_at 留 null（L11-5：不用取得日冒充），取得日 2026-10-29。",
+    "published_at": null,
+    "publisher": "Rocket Lab（官網產品頁）",
+    "retrieved_at": "2026-10-29",
+    "source_type": "datasheet",
+    "storage_permission": "repo_excerpt",
+    "title": "Rocket Lab「Space Solar Cells/CICs」產品頁（2026-10-29 取得；頁面沒有發布日）：ZTJ 三結電池家族（ZTJ-Ω 為低軌最佳化）、Z4J 鍺襯底四結",
+    "url": "https://rocketlabcorp.com/space-systems/solar/space-solar-cellscics/"
+  },
+  "sources": [
+    {
+      "id": "rklb_space_solar_cells_cics_product_page_20261029_s1",
+      "locator": "產品頁：ZTJ family of triple-junction solar cells 區塊",
+      "quote": "ZTJ family of triple-junction solar cells We offer a suite of vertically-integrated space solar panel products, each specifically designed for missions to LEO, MEO, GEO or interplanetary applications. ZTJ-Ω Triple-junction solar cells 30.2% Minimum Average BOL Efficiency Optimized for Low Earth Orbit (LEO) Missions Datasheet ZTJ Standard triple-junction solar cells 29.5% Minimum Average BOL Efficiency Excellent Performance under LILT (Low-Intensity Low-Temperature) Conditions Datasheet ZTJ+ Triple junction solar cells Comparable BOL Efficiency to ZTJ Optimized for High-Radiation Space Environments"
+    },
+    {
+      "id": "rklb_space_solar_cells_cics_product_page_20261029_s2",
+      "locator": "產品頁：Z4J 區塊",
+      "quote": "Z4J 30.0% Minimum Average Efficiency 4-junction n-on-p solar cell on germanium substrate Superior radiation hardness and temperature performance compared to other Germanium based solar cells"
+    }
+  ]
+}

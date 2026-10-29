@@ -1,0 +1,107 @@
+{
+  "claims": [
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：5N Plus 季報或新聞稿寫出 St. George 擴產延後、縮小或取消。核查頻率：每季（5N Plus MD&A）。觸發後 48 小時：更新本 claim，重讀鍺襯底層讀圖。",
+      "id": "vnp_pr_20260922_st_george_expansion_germanium_substrates_cl1",
+      "source_ids": [
+        "vnp_pr_20260922_st_george_expansion_germanium_substrates_s1",
+        "vnp_pr_20260922_st_george_expansion_germanium_substrates_s2",
+        "vnp_pr_20260922_st_george_expansion_germanium_substrates_s3",
+        "vnp_pr_20260922_st_george_expansion_germanium_substrates_s4"
+      ],
+      "statement": "5N Plus press release 2026-09-22: it plans to expand its St. George, Utah facility by about 50% to grow capabilities for defence, space solar, medical imaging and industrial sensing; construction to begin in Q3 2026 and be completed by the second half of 2027. St. George (wholly owned since 2014) transforms germanium, indium antimonide, gallium arsenide, CdTe and CZT into semiconductor materials, wafers, substrates and selected components for applications from infrared optics to space solar power; its capabilities span material recovery, refining and purification, crystal growth, cutting and polishing. A capacity plan, not shipments; the release does not split germanium from the other materials.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "mat:germanium_substrate",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "vnp_pr_20260922_st_george_expansion_germanium_substrates_s3",
+        "vnp_pr_20260922_st_george_expansion_germanium_substrates_s4"
+      ],
+      "src_id": "co:5n_plus"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "5N+",
+        "AZUR SPACE Solar Power GmbH",
+        "AZUR SPACE",
+        "VNP.TO"
+      ],
+      "attributes": {
+        "ticker": "VNP.TO"
+      },
+      "confidence": 0.9,
+      "id": "co:5n_plus",
+      "name": "5N Plus",
+      "role": null,
+      "source_ids": [
+        "vnp_pr_20260922_st_george_expansion_germanium_substrates_s1",
+        "vnp_pr_20260922_st_george_expansion_germanium_substrates_s3"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "Ge substrate",
+        "germanium"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "mat:germanium_substrate",
+      "name": "Germanium (Ge) substrate",
+      "role": null,
+      "source_ids": [
+        "vnp_pr_20260922_st_george_expansion_germanium_substrates_s3"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "vnp_pr_20260922_st_george_expansion_germanium_substrates",
+    "evidence_tier": 2,
+    "origin_entity": "5N Plus Inc.",
+    "permission_basis": "上市公司官網公開新聞稿（產能擴張通知）；只保留研究必要的有限逐字節錄。published_at 取新聞稿日期列「September 22, 2026 | Montréal, Québec」。",
+    "published_at": "2026-09-22",
+    "publisher": "5N Plus Inc.（公司官網新聞稿）",
+    "retrieved_at": "2026-10-29",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "5N+ to Expand St. George, Utah Production Facility by 50% to Support Future Growth（5N Plus 新聞稿 2026-09-22）：St. George 把鍺、銻化銦、砷化鎵等轉成晶圓、襯底，應用含太空太陽能；擴產約 50%、2027 下半年完工",
+    "url": "https://www.5nplus.com/en/news/5n-to-expand-st-george-utah-production-facility-by/"
+  },
+  "sources": [
+    {
+      "id": "vnp_pr_20260922_st_george_expansion_germanium_substrates_s1",
+      "locator": "新聞稿首段（2026-09-22）",
+      "quote": "5N Plus Inc. (TSX:VNP) (“5N+” or “the Company”), a leading global producer of specialty semiconductors and performance materials, today announced plans to expand its St. George, Utah facility by approximately 50%. The expansion project aims to provide a capital-efficient and scalable platform to grow 5N+’s advanced materials capabilities for defence, space solar, medical imaging and industrial sensing applications."
+    },
+    {
+      "id": "vnp_pr_20260922_st_george_expansion_germanium_substrates_s2",
+      "locator": "新聞稿第三段",
+      "quote": "Construction is expected to begin in Q3 2026 and to be completed by the second half of 2027."
+    },
+    {
+      "id": "vnp_pr_20260922_st_george_expansion_germanium_substrates_s3",
+      "locator": "新聞稿：St. George 廠介紹段",
+      "quote": "The St. George facility, wholly owned by 5N+ since 2014, transforms germanium, indium antimonide, gallium arsenide, cadmium telluride and cadmium zinc telluride into high-value semiconductor materials, wafers, substrates and selected components. Applications range from infrared optics and defence electro-optical systems to space solar power and medical CT scanners."
+    },
+    {
+      "id": "vnp_pr_20260922_st_george_expansion_germanium_substrates_s4",
+      "locator": "新聞稿：St. George 廠介紹段（能力）",
+      "quote": "Its integrated capabilities span material recovery, refining and purification, along with semiconductor crystal growth, precision cutting and polishing, and specialized product and process development."
+    }
+  ]
+}

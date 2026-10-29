@@ -1,0 +1,17 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1819994/000181999426000013/rklb-20251231.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Rocket Lab Corporation — Form 10-K for the fiscal year ended December 31, 2025（EDGAR 2026-02-26）
+
+Source: https://www.sec.gov/Archives/edgar/data/1819994/000181999426000013/rklb-20251231.htm
+PUBLISHED: 2026-02-26
+RETRIEVED: 2026-10-29（SEC EDGAR HTML 轉文字、逐字截取；空白收成一格）
+
+【Part I, Item 1. Business — Space Systems（solar power solutions）】
+Solar power solutions include a suite of vertically-integrated space solar cell, Coverglass Interconnected Cells (“CICs”) and solar array products, each specifically designed for missions to low Earth orbit, medium Earth orbit, geosynchronous orbit or interplanetary applications. Rocket Lab’s space solar cells, CICs and panels are among the highest performing in the world and support civil space exploration, science, defense and intelligence, and commercial markets.
+
+【Part I, Item 1. Business — Space Systems（併購沿革）】
+including legacy missions enabled by Sinclair Interplanetary (acquired April 2020), Advanced Solutions, Incorporated (acquired October 2021), Planetary Systems Corporation (acquired November 2021), SolAero Technologies Corp. (acquired January 2022) and GEOST LLC (“GEOST”) (acquired August 2025).
+
+【Part I, Item 1. Business — Manufacturing／Facilities: Albuquerque, New Mexico Solar Cell Production Facility】
+Our solar cell through solar array production activities are conducted at our Albuquerque, New Mexico facility. From this location we research, develop, design and manufacture solar power solutions in an approximately 160,000 square foot production, research and development complex.
