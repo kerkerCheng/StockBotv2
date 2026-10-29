@@ -21,6 +21,7 @@ from datetime import date, datetime, timezone
 from typing import Any, Mapping, Sequence
 
 from ..errors import ContractViolation
+from ..identity import canonical_evidence_ref
 from .contracts import (
     ASSUMPTION_DERIVATIONS, ASSUMPTION_DRIVERS, ASSUMPTION_SCENARIOS, BASE_SCENARIO, TOTAL_SCOPE,
     AssumptionSelection, FiscalPeriod, OperatingAssumption,
@@ -233,11 +234,15 @@ def select_assumptions(
     today: date,
     evidence_index: Mapping[str, Any],
     parse_errors: Sequence[str] = (),
+    entity_aliases: Mapping[str, str] | None = None,
 ) -> tuple[tuple[OperatingAssumption, ...], AssumptionSelection]:
     """挑出**在 T 時刻存在、針對目標期間、證據解析得到**的假設；其餘逐筆計數。
 
     順序刻意固定：先 as-of（T 之後寫的紀錄根本不存在），再期間，再 retract／supersede，
     最後才解析證據——解析是最後一關，因為它要的是「有資格參賽的紀錄」的證據。
+
+    `entity_aliases`：假設寫下之後節點被合併（例：2026-10-17 [777]），引用的邊換了 id——照 registry 換成 canonical
+    再查一次（`alpha.identity.canonical_evidence_ref`；換完仍必須在 index 裡），換過的記進 `selection.renamed`。
     """
     cutoff = as_of or today
     reasons: dict[str, int] = {}
@@ -275,11 +280,20 @@ def select_assumptions(
         latest_by_key[record.key] = record
 
     accepted: list[OperatingAssumption] = []
+    renamed: list[tuple[str, str, str]] = []
     for record in latest_by_key.values():
         if record.retracted:
             _reject(record.assumption_id, "retracted")
             continue
-        unresolved = [r for r in record.evidence_refs if r not in evidence_index]
+        unresolved: list[str] = []
+        for ref in record.evidence_refs:
+            if ref in evidence_index:
+                continue
+            canonical = canonical_evidence_ref(ref, entity_aliases) if entity_aliases else ref
+            if canonical != ref and canonical in evidence_index:
+                renamed.append((record.assumption_id, ref, canonical))
+            else:
+                unresolved.append(ref)
         if unresolved:
             _reject(record.assumption_id, "unresolved_evidence")
             rejected[-1] = (record.assumption_id,
@@ -293,6 +307,7 @@ def select_assumptions(
         accepted_count=len(accepted),
         reasons=dict(reasons),
         rejected=tuple(rejected),
+        renamed=tuple(renamed),
     )
     return tuple(accepted), selection
 

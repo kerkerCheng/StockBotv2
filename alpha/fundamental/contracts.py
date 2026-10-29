@@ -638,6 +638,8 @@ class AssumptionSelection:
     accepted_count: int
     reasons: Mapping[str, int]
     rejected: tuple[tuple[str, str], ...] = ()   # (assumption_id, reason)
+    #: 經合併別名換名才解析得到的引用 (assumption_id, 原引用, canonical)——會改變輸出的輸入要出現在輸出裡（L12）
+    renamed: tuple[tuple[str, str, str], ...] = ()
 
     @property
     def filtered_count(self) -> int:

@@ -24,7 +24,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
-from typing import ClassVar
+from typing import ClassVar, Mapping
 
 from .errors import IdentityError
 
@@ -172,6 +172,21 @@ class ExternalProviderId:
 
     def __str__(self) -> str:
         return f"{self.provider}:{self.value}"
+
+
+def canonical_evidence_ref(ref: str, entity_aliases: Mapping[str, str]) -> str:
+    """evidence ref 路徑裡**整段等於**已登記別名的 id 換成 canonical，其餘一字不動
+    （`graph://edge/<src>/<rel>/<dst>` 的兩個端點）。
+
+    ⚠ 本模組不做 identity resolution：`entity_aliases`（{別名 id: canonical id}）由呼叫端從唯一的 registry
+    （`identity.entities`／`config/entity_aliases.json`，語意合併必帶 pq2 核准收據）讀來遞進來，這裡只**套用**。
+    用途：判斷或假設寫下之後節點被合併，舊紀錄引用的邊換了 id——換完仍必須落在目前的 evidence index 裡，
+    不是放寬比對（session_assessor.compose_signal、fundamental.assumptions.select_assumptions 兩處共用）。
+    """
+    scheme, sep, path = ref.partition("://")
+    if not sep:
+        return ref
+    return scheme + sep + "/".join(entity_aliases.get(part, part) for part in path.split("/"))
 
 
 #: 這些型別在語意上是**純量識別字串**，只是被包成型別以免互相賦值（INV-1）。

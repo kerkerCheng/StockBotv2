@@ -824,6 +824,9 @@ def build_alpha_investment_view(
     #: Phase 3 Step 3.7：argument 鏈段的需求端——騎的讀圖（或坐的層／插槽的現行讀圖）＋需求側客戶。
     #: 取數層（`sources._chain_readings`）由一次載入的讀圖 context 切好帶進來；None＝這次沒給（印「沒讀到」）。
     chain_readings: Mapping[str, Any] | None = None,
+    #: {別名 id: canonical id}（`config/entity_aliases.json`，取數層讀好帶進來）：節點合併後，假設 ledger 引用的舊 id
+    #: 照它換成 canonical 再解析（`select_assumptions` docstring）；None＝不換（照舊嚴格比對）。
+    entity_aliases: Mapping[str, str] | None = None,
 ) -> AlphaInvestmentView:
     """組裝一家公司的 `AlphaInvestmentView`。所有參數都是已取好的既有 authority 輸出。
 
@@ -933,14 +936,16 @@ def build_alpha_investment_view(
     # 也只登記模型那一條 scenario（base），overlay 進來會把同一條件重複印成「等待中」好幾次。
     base_records = [r for r in assumption_records if str(getattr(r, "scenario", "base") or "base") == "base"]
     assumption_rejections: dict[str, str] = {}
+    assumption_renamed: tuple[tuple[str, str, str], ...] = ()
     if target_period is not None and base_records:
         evidence_index: dict[str, Any] = {ref.ref: ref for ref in context.evidence_refs}
         for ref in financial_evidence:
             evidence_index.setdefault(ref.ref, ref)
         _accepted, assumption_selection = select_assumptions(
             base_records, target=target_period, as_of=context.as_of, today=today,
-            evidence_index=evidence_index)
+            evidence_index=evidence_index, entity_aliases=entity_aliases)
         assumption_rejections = dict(assumption_selection.rejected)
+        assumption_renamed = assumption_selection.renamed
     artifacts += artifacts_from_assumptions(
         base_records, build_at=build_at, rejection=assumption_rejections,
         base_period_end=(getattr(getattr(base_actuals, "period", None), "end", None) if base_actuals is not None else None))
@@ -1893,6 +1898,15 @@ def build_alpha_investment_view(
             "thesis/*.json 與檢核點沒有歷史，一律 not_applicable；到期狀態以 as_of 為今天判定")
     if signal is not None and judgment_not_current:
         warnings.append(f"session 判斷 {STATUS_LABEL.get(judgment_status, judgment_status)}：{stale_reason}")
+    # 節點合併後照別名表換名才對上的引用（session 判斷＋假設 ledger）：會改變輸出的輸入要出現在輸出裡（L12）
+    renamed = [(r["cited"], r["resolved"]) for r in
+               ((signal.metadata or {}).get("renamed_refs") or () if signal is not None else ())]
+    renamed += [(cited, resolved) for _id, cited, resolved in assumption_renamed]
+    if renamed:
+        pairs = sorted(set(renamed))
+        warnings.append(
+            f"有 {len(renamed)} 條引用（session 判斷與假設 ledger）是節點合併後照別名表（config/entity_aliases.json）"
+            "換成 canonical 才對上的：" + "；".join(f"{cited} → {resolved}" for cited, resolved in pairs[:3]))
     if attention:
         counts = report.counts
         warnings.append(

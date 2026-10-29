@@ -125,7 +125,10 @@ def cmd_research(args: argparse.Namespace) -> int:
     try:
         if args.judgment:
             judgment = json.loads(Path(args.judgment).read_text(encoding="utf-8"))
-            signal = compose_signal(build, judgment)
+            from .providers.structure_readings import entity_alias_map
+
+            # 對稱面（read model 同一個做法）：節點合併後的別名 id 照 registry 換成 canonical，其餘一樣嚴格
+            signal = compose_signal(build, judgment, entity_aliases=entity_alias_map())
             from .contracts import _canonical
             payload = _canonical(signal)
 

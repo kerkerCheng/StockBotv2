@@ -24,6 +24,7 @@ from alpha.models import compose_signal
 from alpha.providers import assumptions as assumption_ledger
 from alpha.providers import briefs as brief_ledger
 from alpha.providers import abstentions as abstention_ledger
+from alpha.providers.structure_readings import entity_alias_map
 from alpha.narrative import select_brief
 from alpha.narrative.contracts import RECORD_VERSION_V2
 from identity.currency import resolve_quote_unit
@@ -79,8 +80,10 @@ def _compose_signal(
         judgment = json.loads(judgment_path.read_text(encoding="utf-8"))
     except (OSError, ValueError) as exc:
         return None, f"判斷檔無法讀取：{type(exc).__name__}"
+    # 節點合併後舊判斷引用的別名 id 照 registry 換成 canonical（換過的會印在 view 的 warnings；compose_signal docstring）
     try:
-        return compose_signal(build, judgment, allow_stale_context=allow_stale), None
+        return compose_signal(build, judgment, allow_stale_context=allow_stale,
+                              entity_aliases=entity_alias_map()), None
     except ContractViolation as exc:
         return None, f"判斷檔未通過契約驗證：{str(exc)[:200]}"
 
@@ -509,6 +512,7 @@ def fetch_alpha_investment_view(
         narrative_context=narrative_context,
         consensus_history=consensus_history,
         chain_readings=chain_readings,
+        entity_aliases=entity_alias_map(),
     )
 
 

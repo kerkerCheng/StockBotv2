@@ -334,6 +334,7 @@ KEEP: dict[tuple[str,str],str] = {
     ('tests/test_engine_c_coverage.py','H'): 'kept_file: Engine C 夾具含 pe_forward',
     ('tests/test_engine_c_probe_financial.py','H'): 'kept_file: Engine C 夾具含 pe_forward',
     ('tests/test_estimate_revision.py','H'): 'kept_file: 估計修正測試用 pe_forward 序列（Engine C 欄位）',
+    ('tests/test_merged_alias_refs.py','H'): 'kept_file: 假設 ledger 選取（alpha.fundamental.assumptions.select_assumptions，ledger 邏輯留）的合併別名換名測試',
     ('tests/test_opinion_stance.py','H'): 'kept_file: overlay ledger 閘門測試讀 alpha.fundamental.contracts 字彙',
     ('tests/test_overlay_scope_gate.py','H'): 'kept_file: overlay scope 閘門測試讀 alpha.fundamental.assumptions／contracts',
     ('tests/test_refresh_engine.py','H'): 'kept_file: refresh 測試讀 alpha.fundamental.assumptions（ledger 邏輯留）',

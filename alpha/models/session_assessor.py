@@ -39,7 +39,7 @@ from ..contracts import (
 )
 from ..errors import ContractViolation
 from ..evidence_quality import assess_evidence_quality
-from ..identity import CompanyId, Ticker
+from ..identity import CompanyId, Ticker, canonical_evidence_ref
 
 MODEL_NAME = "session-assessor"
 MODEL_VERSION = "v1"
@@ -318,6 +318,7 @@ def build_packet(build: Any) -> JudgmentPacket:
 
 def compose_signal(
     build: Any, judgment: Mapping[str, Any], *, allow_stale_context: bool = False,
+    entity_aliases: Mapping[str, str] | None = None,
 ) -> AlphaSignal:
     """驗證 session 的判斷並組成 `AlphaSignal`。
 
@@ -330,9 +331,16 @@ def compose_signal(
     寫進 `metadata["context_mismatch"]`——view 要能呈現「有一份舊判斷」而不是把它藏起來，
     但呈現時必須標 stale。引用解析那一關**不因此放寬**：refs 仍必須落在目前 context 內。
     `python -m alpha research --judgment` 維持嚴格（預設值）。
+
+    `entity_aliases`（{別名 id: canonical id}，呼叫端從 `config/entity_aliases.json` 讀來遞進來；模型層不讀檔）：
+    判斷寫下之後節點被合併（2026-10-17 [777]：`tech:inp_6inch_fab` → `tech:six_inch_inp_production`），
+    舊判斷引用的邊就換了 id。**這不是放寬解析**：別名表是 registry（語意合併必帶 pq2 核准收據，INV-1 解析走 registry），
+    只換整段等於別名的 id，換完仍必須落在目前 context 內；每一條換過的記進 `metadata["renamed_refs"]`
+    （有才寫），view 照印——會改變輸出的輸入必須出現在輸出裡（L12）。
     """
     context: ResearchContext = build.context
     index = {ref.ref: ref for ref in context.evidence_refs}
+    renamed_refs: list[dict[str, str]] = []
 
     # ⚠ 判斷是對**某一份** ResearchContext 做的。context 變了（新的行情、新入圖的邊）
     # 而判斷沒重做時，必須**明說是哪一種失敗**——否則它會退化成「引用不存在」，
@@ -394,8 +402,14 @@ def compose_signal(
         resolved: list[EvidenceRef] = []
         missing: list[str] = []
         for raw in raw_refs:
-            ref = index.get(str(raw))
-            (resolved.append(ref) if ref is not None else missing.append(str(raw)))
+            cited = str(raw)
+            ref = index.get(cited)
+            if ref is None and entity_aliases:
+                canonical = canonical_evidence_ref(cited, entity_aliases)
+                if canonical != cited and canonical in index:
+                    ref = index[canonical]
+                    renamed_refs.append({"axis": axis, "cited": cited, "resolved": canonical})
+            (resolved.append(ref) if ref is not None else missing.append(cited))
         if missing:
             # ⚠ 兩種失敗必須分開講（L12）：「這個 ref 不存在」與「這個 ref 存在但不屬於
             # 這一層」是不同的事，混成一句會讓真正的 laundering 藏在合法的層級錯誤裡。
@@ -478,6 +492,8 @@ def compose_signal(
             "judged_at": str(judgment.get("_produced_at") or "") or None,
             # None＝判斷就是對目前 context 做的；非 None＝舊判斷（只在 allow_stale_context 下出現）
             "context_mismatch": context_mismatch,
+            # 經合併別名換名才對上的引用（有才寫：沒有合併的判斷 metadata 一字不變）
+            **({"renamed_refs": renamed_refs} if renamed_refs else {}),
         },
         **{f"{axis}_score": scores[axis] for axis in AXES},
     )
