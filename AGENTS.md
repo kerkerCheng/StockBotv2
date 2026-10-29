@@ -194,6 +194,8 @@ Lesson 的事發經過與實作落點住 [`docs/lessons-incidents.md`](docs/less
   查證：`python -m pytest tests/test_webapp_request_path.py`。
 - **首屏的單位是句不是格**：第一層短評、第二層論證、第三層才是格（稽核區）。文字由研究 session 寫進 append-only ledger，
   數字由 authority 填 placeholder，首屏禁字表型別層拒收；沒寫短評就印「還沒寫短評」。
+- **首屏是故事、不是紀錄（2026-10-29）：** 給人讀的一句和給查核用的依據分兩層寫；故事要讀得出為什麼能投、為什麼不能，
+  日期、出處、原文留在依據；故事不比依據多主張。
 - **缺席不得被壓成「無資料」。** `absence_kind` 由產生缺席的程式自己宣告（L16）；「刻意不主張」只能來自 append-only 的 Abstention 紀錄，
   settled 不讓 readiness 變好。
 - **昨天和今天一樣的住 APP，今天變了的＋要你決定的住 Daily**；順序是 invariant：APP 先讀得到，Daily 才能不印；
