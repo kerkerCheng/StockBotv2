@@ -2869,11 +2869,13 @@ function renderPositionLanes(payload, detailSet, card) {
       + `每一列只跟自己所屬的組比（排除本檔）；不是組員的列印「不比」，不借別的題材的組｜組裡取不到價的成員 ${missingTotal} 檔，不進組平均。`));
   }
   const budget = payload.price_budget || {};
-  if ((budget.truncated || []).length) {
-    // 截掉的代號不逐一列（2026-10-28：76 個代號一整段）——逐檔表裡每一檔寫明「被截掉、不是沒有價」
-    sec.appendChild(el('p', 'warn', `取價超過上限 ${budget.cap} 檔，截掉 ${budget.truncated.length} 檔——那幾檔的報酬格是缺席`
-      + '（逐檔表裡每一檔都寫明），不是沒有價。'
-      + (budget.order ? `截的順序：${budget.order}——算得出報酬的那幾檔不是全體的抽樣，點圖要這樣讀。` : '')));
+  // 2026-10-29 使用者：取價上限拿掉（原本照代號截掉後段、美歐掛牌先被截）。每一檔都去抓；抓不到序列的檔數照印——
+  // 一天突然變多＝取價出事（限流），不是那幾檔沒有價。代號不逐一列，逐檔表裡每一檔寫明。
+  if ((budget.unpriced || []).length) {
+    const limited = (budget.rate_limited || []).length;
+    sec.appendChild(el('p', 'warn', `取價 ${budget.requested} 檔裡抓不到序列 ${budget.unpriced.length} 檔`
+      + (limited ? `（其中被限流 ${limited} 檔——明天重抓會回來）` : '')
+      + '——那幾檔的報酬格是缺席（逐檔表裡每一檔都寫明），不是 0。'));
   }
   const barsNote = closingBarsNote(budget);
   if (barsNote) sec.appendChild(barsNote);

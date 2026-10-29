@@ -195,7 +195,7 @@ def test_the_tracker_counts_what_its_default_fetchers_dropped(tmp_path, monkeypa
     monkeypatch.setattr(ew, "_local_timezone", lambda: timezone(timedelta(hours=8)))
     oist = ML.OIST
 
-    def fake_close(symbol, start, *, states=None):
+    def fake_close(symbol, start, *, states=None, failures=None):    # failures：2026-10-29 取價上限拿掉時多的例外種類
         states[symbol] = "dropped_unfinished" if symbol == "AAA" else "closed"
         return ML._loader(symbol, start)
 

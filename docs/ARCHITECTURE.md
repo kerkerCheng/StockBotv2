@@ -662,8 +662,8 @@ L16）。兩份 state artifact 與 `/api/v1/candidates`、`/api/v1/watches` 照�
 每則都算的版本、點名前漲幅、追源成功率、假設命中率、no-go 率與濾掉理由點開那個帳號才畫；取價筆數與組成員清單是查核用，拿掉
 （截掉、缺價、組讀不到照樣說）。`#/account-scorecard` 捲到那一段並說一句。圖預測對錯表照終局分組（`.meta.json` 的
 `prediction_outcomes`：順序與不算對錯的那兩種都只有 `alpha.structure_reading.predictions` 一份）——對、錯、現行點開才畫（有錯的預設打開），
-改寫與非斷言只印件數，層名照 `config/node_labels_zh.json`（沒有就印代號）。取價被截時照印 outcome 腳本宣告的截的順序
-（`price_budget.order`）：算得出報酬的那幾檔不是全體的抽樣（brainstorm F8）。positions 讀不到＝503，另兩份讀不到各自印缺席；
+改寫與非斷言只印件數，層名照 `config/node_labels_zh.json`（沒有就印代號）。取價不設上限（2026-10-29 使用者；原本 60 檔照代號截後段、
+美歐掛牌先被截，brainstorm F8）：每一檔都去抓，抓不到序列的檔數與其中被限流幾檔照印（`price_budget.unpriced`／`rate_limited`）。positions 讀不到＝503，另兩份讀不到各自印缺席；
 artifact 與 `/api/v1/positions`、`/api/v1/account-scorecard` 照留。
 
 **個股頁「問 Claude」（同一輪第五步；定案 8：APP 怎麼協助理解一間公司、跟 agent 對話展開）：** 頁首一顆按鈕把這一頁的現況組成一段提示

@@ -400,10 +400,10 @@ def _apply_benchmarks(rows: list[dict], benchmarks: Mapping[str, Mapping[date, f
 # 三條 lane（Phase 5 Step 5.2；plan §0.4 A1）：「買得準不準」與「判斷準不準」要兩個分母（L12）
 # ---------------------------------------------------------------------------
 
-#: 新 lane（paper＋live）＋主題等權組成員＋基準，去重後一輪最多取價幾檔——**這是無人值守的網路 surface 上限**
-#: （daily 步驟 05 跑本腳本；照 `engine_b/account_scorecard.py::MAX_PRICED_SYMBOLS` 的做法）：超過就截斷、截掉的印出來，
-#: 基準永遠留著。history lane 的 22 檔沿用原路徑、不在這個上限裡（plan §3 sandbox impact review）。
-MAX_LANE_SYMBOLS = 60
+#: ⚠ 2026-10-29 使用者（「抓價還有上限？這邊修掉吧」）：原本的取價上限 `MAX_LANE_SYMBOLS = 60` 拿掉。它照代號截後段——
+#: paper 照代號排，英文代號（美、歐掛牌）先被截；10-29 要 150 檔、抓 60，paper 135 列裡 77 列沒有報酬（brainstorm F8），
+#: 「我們說的對不對」只量到亞洲掛牌那一半。現在新 lane＋組成員＋基準去重後**全部取價**：檔數只隨敘事、成交、組成員長
+#: （三者都由互動 session／人工寫入），每輪照印「要幾檔、抓不到幾檔」（`price_budget`）。sandbox impact review 住 OPERATIONS。
 
 TRADE_LOG = ROOT / "library" / "trades" / "trade_log.jsonl"
 LEADS_PATH = ROOT / "library" / "leads" / "pending_leads.json"
@@ -709,10 +709,12 @@ def _price_paper_row(row: dict, *, series: Mapping[date, float], quote_unit: str
 
 
 def _provider_close_series(symbol: str, start: date, *,
-                           states: dict[str, str | None] | None = None) -> tuple[dict[date, float], str | None]:
+                           states: dict[str, str | None] | None = None,
+                           failures: dict[str, str] | None = None) -> tuple[dict[date, float], str | None]:
     """新 lane 的取價：provider 已收盤序列＋它自報的報價單位（yfinance `history_metadata.currency`）。NaN 與非正數不收
     （歐洲標的會回 NaN 的未完成 K 棒）；盤中未收盤的當日 K 棒由 `closed_points` 拿掉（Phase 6 Step 6.7c）。
-    抓不到回 `({}, None)`，由呼叫端標缺席。"""
+    抓不到回 `({}, None)`，由呼叫端標缺席；`failures` 給了就記下例外的種類（單檔 `history()` 被限流時 yfinance 1.5 會丟
+    `YFRateLimitError`——與「provider 沒有這檔」分開數，2026-10-29 取價上限拿掉時一起補）。"""
     from alpha.providers.close_series import closed_points
 
     try:
@@ -724,6 +726,8 @@ def _provider_close_series(symbol: str, start: date, *,
         unit = metadata.get("currency")
     except Exception as exc:  # noqa: BLE001 — 單檔失敗只讓那一格缺席
         print(f"  ⚠ {symbol} 收盤序列抓取失敗：{type(exc).__name__}: {exc}", file=sys.stderr)
+        if failures is not None:
+            failures[symbol] = type(exc).__name__
         return {}, None
     points, state = closed_points(hist.items(), metadata)
     if states is not None:
@@ -837,8 +841,7 @@ def collect(*, no_benchmark: bool = False, today: date | None = None,
             cohorts: tuple[Sequence[Any], Sequence[str]] | None = None,
             is_beta: Callable[[str], bool] | None = None,
             resolve: Callable[[Mapping[str, Any]], Mapping[str, Any]] | None = None,
-            quote_unit_for: Callable[[str | None, str | None], str | None] | None = None,
-            max_symbols: int = MAX_LANE_SYMBOLS) -> dict[str, Any]:
+            quote_unit_for: Callable[[str | None, str | None], str | None] | None = None) -> dict[str, Any]:
     """三條 lane 的資料收集（Phase 5 Step 5.2）。**render 與 APP 讀同一個函式**——APP 端另算一份會立刻開始偏離（L13）。
 
     回 `{"lanes": {live, paper, history}, "benchmarks", "theme_cohort", "price_budget", "today"}`：每條 lane 的 `rows`
@@ -911,7 +914,7 @@ def collect(*, no_benchmark: bool = False, today: date | None = None,
         cohort_info = {"mode": "per_row", "cohorts": [], "parse_errors": [], "absence": cohort_unavailable,
                        "absence_labels": dict(ROW_COHORT_ABSENCE_LABELS)}
 
-    # 取價（新 lane＋組成員；有上限）。最早需要的起點＝各列錨點往前 PRE_ANCHOR_DAYS＋15 天。
+    # 取價（新 lane＋組成員；全部取，不設上限——2026-10-29）。最早需要的起點＝各列錨點往前 PRE_ANCHOR_DAYS＋15 天。
     wanted: dict[str, date] = {}
 
     def want(symbol: str | None, anchor: date | None) -> None:
@@ -933,34 +936,26 @@ def collect(*, no_benchmark: bool = False, today: date | None = None,
             want(member.ticker, earliest)
     always = [PRIMARY_BENCHMARK, REFERENCE_BENCHMARK]
     order = always + [s for s in wanted if s not in always]
-    keep = order[:max(max_symbols, len(always))]
-    truncated = order[len(keep):]
-    loader = price_loader or partial(_provider_close_series, states=bar_states)
+    failures: dict[str, str] = {}
+    loader = price_loader or partial(_provider_close_series, states=bar_states, failures=failures)
     series: dict[str, dict[date, float]] = {}
     units: dict[str, str | None] = {}
-    for symbol in keep:
+    for symbol in order:
         if symbol in always:
-            continue                         # 基準由 `_benchmark_series` 抓（既有路徑），這裡只算進額度
+            continue                         # 基準由 `_benchmark_series` 抓（既有路徑），這裡只算進檔數
         series[symbol], units[symbol] = loader(symbol, wanted[symbol])
-    budget = {"cap": max_symbols, "requested": len(order), "fetched": len(keep), "truncated": truncated,
-              "note": "history lane 的 22 檔沿用原路徑、不在這個上限裡",
-              # 截的順序由這裡宣告（2026-10-28 成績單：被截的是這個順序的後段——paper 照代號，所以英文代號〔美、歐掛牌〕先被截，
-              # 算得出報酬的那幾檔不是全體的抽樣；畫面照印這一句，不另猜）
-              "order": "基準 → live → paper（照代號：數字代號在前、英文代號在後）→ 主題等權組成員；超過上限就截掉後段"}
+    # 抓不到序列的逐檔列出：那幾列是 no_price_series 缺席。被限流（YFRateLimitError）的另外數——檔數每輪照印，
+    # 一天突然變多就是取價出事，不是那幾檔沒有價（INV-3）。注入的 loader 不記例外種類。
+    unpriced = [symbol for symbol in order if symbol not in always and not series.get(symbol)]
+    budget = {"requested": len(order), "fetched": len(order), "unpriced": unpriced,
+              "rate_limited": [symbol for symbol in unpriced if failures.get(symbol) == "YFRateLimitError"],
+              "note": "history lane 的 22 檔沿用原路徑、另外取價"}
 
     unit_of = quote_unit_for or _market_quote_unit
     for row in live["rows"]:
         symbol = yfinance_symbol(row["execution_symbol"])
-        if symbol in truncated:
-            row["absence_kind"] = "truncated"
-            row["note"].append(f"取價超過上限 {max_symbols} 檔被截掉——不是沒有價")
-            continue
         _price_live_row(row, series=series.get(symbol) or {}, provider_unit=units.get(symbol), today=today)
     for row in paper_rows:
-        if row["ticker"] in truncated:
-            row.setdefault("absence_kind", "truncated")
-            row["note"].append(f"取價超過上限 {max_symbols} 檔被截掉——不是沒有價")
-            continue
         _price_paper_row(row, series=series.get(row["ticker"]) or {},
                          quote_unit=unit_of(row.get("company_id"), row["ticker"]), today=today)
 
@@ -1445,9 +1440,12 @@ def render_lanes(collected: Mapping[str, Any]) -> list[str]:
         out.append(f"- ⚠ 主題等權組 ledger 有 {len(cohort['parse_errors'])} 行壞行（不靜默丟棄）："
                    + "；".join(cohort["parse_errors"][:3]))
     budget = collected.get("price_budget") or {}
-    out.append(f"- 取價：要 {budget.get('requested')} 檔、抓 {budget.get('fetched')} 檔（上限 {budget.get('cap')}）"
-               + (f"｜**截掉 {len(budget['truncated'])} 檔：{'、'.join(budget['truncated'])}**" if budget.get("truncated") else "")
-               + "｜history 的 22 檔沿用原路徑、不在這個上限裡")
+    unpriced = budget.get("unpriced") or []
+    limited = budget.get("rate_limited") or []
+    out.append(f"- 取價：{budget.get('requested')} 檔全部去抓（含 2 個基準；不設上限）"
+               + (f"｜**抓不到序列 {len(unpriced)} 檔（其中被限流 {len(limited)} 檔）：{'、'.join(unpriced)}**"
+                  if unpriced else "｜每一檔都抓到了")
+               + "｜history 的 22 檔沿用原路徑、另外取價")
     # Phase 6 Step 6.7c：盤中跑時才會有東西（daily 05:30 各市場都已收盤）——有才印，檔名逐一列出（句子住 owner）。
     from alpha.providers.close_series import closing_bars_line
 

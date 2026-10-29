@@ -434,12 +434,67 @@ def test_unreadable_ledger_is_upstream_unavailable_on_every_row_not_not_in_any_c
     assert {r["theme_cohort_absence"]["kind"] for r in broken["lanes"]["paper"]["rows"]} == {"upstream_unavailable"}
 
 
-def test_price_cap_truncates_members_first_and_prints_what_was_cut(tmp_path, collected) -> None:
-    capped = _collect(tmp_path, max_symbols=5)
-    budget = capped["price_budget"]
-    assert budget["truncated"] and budget["fetched"] == 5 and budget["requested"] > 5
-    assert set(budget["truncated"]) <= {"MEM1", "MEM2", "AAA", "GGG.L"}          # 基準永遠留著、成交先於組成員
-    assert "QQQ" not in budget["truncated"] and "SOXX" not in budget["truncated"]
+def test_every_wanted_symbol_is_priced_even_past_the_old_cap(tmp_path) -> None:
+    """2026-10-29 使用者「抓價還有上限？這邊修掉吧」：原本 60 檔上限照代號截後段（美、歐掛牌先被截；F8）。
+    比舊上限多的 paper 列也要每一檔都去抓——上限回來（或任何截斷）這條會紅。"""
+    many = {**BRIEFS, **{f"T{i:02d}": ([_Brief(f"ib_t{i}", f"co:t{i}", _at("2026-09-29"), candidate_state=_State("pass"))], [])
+                         for i in range(70)}}
+    calls: list[str] = []
+
+    def counting(symbol: str, start: date):
+        calls.append(symbol)
+        return _loader(symbol, start)
+
+    out = _collect(tmp_path, briefs=many, price_loader=counting)
+    budget = out["price_budget"]
+    assert {f"T{i:02d}" for i in range(70)} <= set(calls)
+    assert budget["requested"] == budget["fetched"] == len(calls) + 2               # ＋2 個基準（另一條路徑抓）
+    assert "truncated" not in budget and "cap" not in budget
+    assert not any(r.get("absence_kind") == "truncated" for r in out["lanes"]["paper"]["rows"])
+
+
+def test_symbols_without_a_series_are_listed_not_silently_dropped(tmp_path, collected) -> None:
+    """抓不到序列的逐檔列在 `price_budget.unpriced`（限流時 yfinance 只回空、不 raise——檔數一天突然變多就是取價出事）；
+    那幾列各自是 no_price_series 缺席，不是 0（INV-3）。"""
+    many = {**BRIEFS, "NOPX": ([_Brief("ib_n1", "co:nopx", _at("2026-09-29"), candidate_state=_State("pass"))], [])}
+    out = _collect(tmp_path, briefs=many)
+    assert collected["price_budget"]["unpriced"] == ["BACKX"]                     # 夾具裡 BACKX（回填的成交代號）本來就沒有序列
+    assert out["price_budget"]["unpriced"] == ["BACKX", "NOPX"]
+    assert _row(out, "paper", "NOPX")["absence_kind"] == "no_price_series"
+
+
+def test_rate_limited_symbols_are_counted_apart_from_missing_ones(tmp_path, monkeypatch) -> None:
+    """被限流（YFRateLimitError）與「provider 沒有這檔」分開數：前者明天重抓會回來，後者不會（L12）。"""
+    def fake(symbol, start, *, states=None, failures=None):
+        if symbol == "MEM1":
+            failures["MEM1"] = "YFRateLimitError"
+            return {}, None
+        return _loader(symbol, start)
+
+    monkeypatch.setattr(OIST, "_provider_close_series", fake)
+    out = _collect(tmp_path, price_loader=None)
+    budget = out["price_budget"]
+    assert budget["rate_limited"] == ["MEM1"] and set(budget["unpriced"]) == {"BACKX", "MEM1"}
+    assert "被限流 1 檔" in "\n".join(OIST.render_lanes(out))
+
+
+def test_the_default_loader_records_the_exception_kind(monkeypatch) -> None:
+    import types
+
+    class YFRateLimitError(Exception):
+        pass
+
+    class _Ticker:
+        def __init__(self, symbol):
+            self.symbol = symbol
+
+        def history(self, **kwargs):
+            raise YFRateLimitError("Too Many Requests. Rate limited. Try after a while.")
+
+    monkeypatch.setitem(sys.modules, "yfinance", types.SimpleNamespace(Ticker=_Ticker))
+    failures: dict[str, str] = {}
+    assert OIST._provider_close_series("AAA", date(2026, 9, 1), failures=failures) == ({}, None)
+    assert failures == {"AAA": "YFRateLimitError"}
 
 
 def test_empty_lanes_print_no_rows_yet_never_zero_percent(tmp_path, collected) -> None:
