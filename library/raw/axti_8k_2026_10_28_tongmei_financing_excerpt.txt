@@ -1,0 +1,30 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1051627/000121390026113058/ea0309774-8k_axt.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] AXT, Inc. 8-K（2026-10-28 申報；事件日 2026-10-27）——子公司北京通美私募融資（Item 1.01）＋新聞稿（EX-99.1，Item 7.01）
+DATE: 2026-10-28
+RETRIEVED: 2026-10-29（SEC EDGAR 原文 HTML 由 daily 語意層抽字存檔、空白正規化，逐字）
+NOTE: 發行人自己的申報（L8：擴產用途是發行人自述；投資人中「既有客戶的關係企業」未具名）。
+
+【Item 1.01：投資人與金額】
+"Tongmei and AXT, as Tongmei’s controlling shareholder, entered into a Share Subscription Agreement, a Supplemental Agreement (Investor’s Rights Agreement) and a Redemption Support Agreement (collectively, the “Agreements”) with BNK-B3 HK Holdings Limited, a limited liability company duly established and validly existing under the laws of Hong Kong, which entity is managed by a leading Asia asset manager (the “Lead Investor”), and certain institutional investors, including an institutional investor who is an affiliate of an existing customer (collectively, the “Investors”)."
+"The Agreements provide for an investment by the Investors of a minimum of RMB 1,912,350,000 (approximately US$285 million) (the “Minimum Amount”) and up to a maximum of RMB 3,668,639,053.25 (approximately US$545 million) (the “Maximum Amount”) in the ordinary shares of Tongmei, subject to customary closing conditions."
+"Concurrently with the Agreements, AXT agreed to recapitalize Tongmei by subscribing for 342,998,797 ordinary shares for the RMB equivalent of US$400 million on or prior to the closing of transactions contemplated by the Agreements."
+"Tongmei intends to use the proceeds for further expansion of its manufacturing capacity for its indium phosphide semiconductor substrates, expansion of its principal business operations, capital expenditures and general working capital."
+"Assuming the Maximum Amount of the investment, AXT will own approximately 73.40% of Tongmei following the consummation of the transaction."
+
+【Item 1.01：交割條件】
+"If closing(s) for the Minimum Amount by the Investors have not occurred by December 20, 2026, the Share Subscription Agreement will terminate, although the parties agreed to reasonably consider an extension if required approvals by Governmental Authorities, as defined in the Agreements are still pending."
+
+【Item 1.01：Redemption Rights】
+"each Investor has the right, but not the obligation, to require Tongmei to redeem its shares if (i) Tongmei has not completed a Qualified IPO by the three (3)-year anniversary of the closing date"
+"The term “Qualified IPO” means the first underwritten public offering of Tongmei’s equity securities on a qualified exchange, including the Main Board of the Hong Kong Stock Exchange, with an offering price per share that would enable each Investor to achieve a return equal to or exceeding an annual internal rate of return of thirteen percent (13%), compounded annually."
+"In the event of a notice of a redemption right by an Investor, the per share redemption price equals (i) the per share subscription price paid by the Investor; (ii) a return on the per share subscription price, calculated at the per annum rate equal to eight percent (8%) (the “Applicable Rate”), compounded annually on each anniversary of the closing date for the period from the closing date to the exit date, plus (iii) any declared or accrued but unpaid dividends or distributions through the exit date."
+
+【Item 1.01：AXT Purchase Option】
+"Under the Redemption Support Agreement, upon an Investor’s exercise of its redemption right pursuant to a redemption notice, AXT may, but is not obligated to, elect to purchase the shares covered by the notice at the redemption price instead of Tongmei."
+"AXT may pay in cash (which AXT may satisfy with an unsecured promissory note), in shares of AXT common stock valued at the volume-weighted average price on Nasdaq over the ninety (90) consecutive trading days ending the trading day before the exit date (only if the agreed conditions are satisfied), or a combination of cash (including the promissory note) and AXT common stock (only if the agreed conditions are satisfied), with the same form of payment applying to all exercising Investors."
+
+【EX-99.1 新聞稿】
+"Funds raised by Tongmei will be used to advance capacity expansion for indium phosphide wafers at a time when demand for these wafers is outpacing supply. Proceeds will also be used to increase capacity at our raw material companies in China."
+"The closing of the financing is subject to a number of customary conditions, including, but not limited to, receipt of required filings from the applicable governmental authorities, and is expected to occur in December 2026."
