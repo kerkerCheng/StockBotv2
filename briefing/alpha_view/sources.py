@@ -362,6 +362,7 @@ def fetch_alpha_investment_view(
         except Exception as exc:  # noqa: BLE001 — 讀不到就是沒有短評，但要現形
             brief_records, brief_errors = [], [f"短評 ledger 讀取失敗：{type(exc).__name__}"]
         current_brief = select_brief(brief_records, as_of=as_of, today=today)
+        story_record = _story_for(current_brief, as_of=as_of)
         chain_readings = _chain_readings(seat_readings, str(company_id) if company_id else None, current_brief)
         fetch_narrative = getattr(graph_provider, "get_narrative_context", None)
         if callable(fetch_narrative):
@@ -509,11 +510,25 @@ def fetch_alpha_investment_view(
         three_questions=three_questions, three_questions_reason=three_questions_reason,
         three_questions_absence_kind=three_questions_absence,
         brief_records=brief_records, brief_parse_errors=brief_errors,
+        story_record=story_record,
         narrative_context=narrative_context,
         consensus_history=consensus_history,
         chain_readings=chain_readings,
         entity_aliases=entity_alias_map(),
     )
+
+
+def _story_for(brief: Any, *, as_of: date | None) -> Mapping[str, Any] | None:
+    """現行那一版敘事的故事（2026-10-29；故事層 ledger `alpha.providers.stories`）；回看過去只取那天以前寫的（INV-6）。
+    沒有敘事、沒寫故事、或 ledger 讀不到 → None（首屏退回印依據；讀不到不讓 view 失敗——故事是呈現層，依據照舊在）。"""
+    if brief is None:
+        return None
+    try:
+        from alpha.providers.stories import story_at
+
+        return story_at(brief.brief_id, as_of=as_of)
+    except Exception:  # noqa: BLE001 — 故事 ledger 讀不到只讓首屏印依據
+        return None
 
 
 def _chain_readings(context: Mapping[str, Any] | None, company_id: str | None, brief: Any) -> dict[str, Any]:

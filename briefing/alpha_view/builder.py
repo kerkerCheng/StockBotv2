@@ -24,7 +24,7 @@ section 與它們的模型一起拿掉；本檔不再 import `alpha.valuation`�
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import date
+from datetime import date, datetime
 from typing import Any, Mapping, Sequence
 
 from alpha.causal import CausalPath, CompanyImpact, StructuralEvent
@@ -408,6 +408,7 @@ def _investor_brief_section(
     names: Mapping[str, str] | None = None,
     fundamentals: Sequence[Datum] = (),
     reporting_currency: str | None = None,
+    story: Mapping[str, Any] | None = None,
 ) -> InvestorBriefSection:
     # ⚠ **2026-09-23（Phase 0 Step 0b.1b）：那把尺（現價／沒賭對／賭對／判斷錯了）整格退役。**
     # ROADMAP「個股頁」那一節的「首屏」列明文「拿掉」。它是這個 section 唯一讀 `ir`／`payoff`／`downside`
@@ -449,9 +450,49 @@ def _investor_brief_section(
                        reason=(f"{len(absent)} 格有數字尚無" if absent else None), as_of=reference_day,
                        warnings=("短評文字是 session 判斷（append-only ledger），數字由既有 Datum 填入；"
                                  "每一句的引用見各格 evidence_refs",))
+    told = _story_slots(story, brief, values, today=today)
     return InvestorBriefSection(meta=meta, slots=tuple(slots), status_light=light,
                                 brief_id=brief.brief_id, is_not=BRIEF_IS_NOT,
-                                rides=_rides_datum(brief, names or {}))
+                                rides=_rides_datum(brief, names or {}),
+                                story=told, story_id=(str(story["story_id"]) if told else None))
+
+
+A_STORY = "alpha://narrative/story"
+
+
+def _story_slots(story: Mapping[str, Any] | None, brief: Any, values: Mapping[str, str | None], *,
+                 today: date) -> tuple[Datum, ...]:
+    """這一版敘事的故事（2026-10-29；`alpha.providers.stories`）→ 每格一個 `story:<格>`。**純選取＋格式化**：
+    文字照抄故事 ledger、數字由敘事同一張值表填（故事模式拿掉值尾的日期）。故事寫給另一版敘事（敘事換版了）＝不算數，
+    回空——首屏退回印依據，待做清單 ⑤ 的「故事還沒寫」數到它（`stories.story_gaps`，L16）。
+    七格的引用就是依據那一格的引用；只有故事的兩格帶自己的引用。"""
+    from alpha.narrative.story import STORY_ONLY_KEYS, STORY_SLOT_LABELS, fill_story, story_values
+
+    if not story or brief is None or story.get("brief_id") != brief.brief_id:
+        return ()
+    texts = story.get("slots") if isinstance(story.get("slots"), Mapping) else {}
+    own_refs = story.get("evidence") if isinstance(story.get("evidence"), Mapping) else {}
+    basis_refs = {s.key: tuple(s.evidence_refs) for s in brief.slots}
+    shown = story_values(values, today=today)
+    try:
+        written = datetime.fromisoformat(str(story.get("created_at"))).date()
+    except ValueError:
+        written = None
+    out: list[Datum] = []
+    for key, label in STORY_SLOT_LABELS.items():
+        text = texts.get(key)
+        if not isinstance(text, str) or not text.strip():
+            continue
+        filled, gaps = fill_story(text, shown, absent=ABSENT)
+        refs = tuple(str(r) for r in own_refs.get(key) or ()) if key in STORY_ONLY_KEYS else basis_refs.get(key, ())
+        out.append(Datum(
+            key=f"story:{key}", label=label, value=filled, status="partial" if gaps else "available",
+            basis="session_judgment", authority=A_STORY, as_of=written, evidence_refs=refs,
+            reason=(f"有 {len(gaps)} 個數字尚無：{'、'.join(gaps)}（印成{ABSENT}，不補 0）" if gaps else None),
+            dependencies={"raw_text": text, "missing": gaps, "story_id": story.get("story_id"),
+                          "brief_id": brief.brief_id,
+                          "basis_line": None if key in STORY_ONLY_KEYS else f"brief:{key}"}))
+    return tuple(out)
 
 
 #: 騎的單位 → 人讀（讀圖字彙的前半句：「層讀圖：…」→「層」）。
@@ -819,6 +860,8 @@ def build_alpha_investment_view(
     three_questions_absence_kind: str = "upstream_unavailable",
     brief_records: Sequence[Any] = (),
     brief_parse_errors: Sequence[str] = (),
+    #: 故事層（2026-10-29）：現行那一版敘事的故事紀錄（`alpha.providers.stories.current_stories` 的一筆）；None＝沒有。
+    story_record: Mapping[str, Any] | None = None,
     narrative_context: Mapping[str, Any] | None = None,
     consensus_history: Sequence[tuple[date, float, Any]] = (),
     #: Phase 3 Step 3.7：argument 鏈段的需求端——騎的讀圖（或坐的層／插槽的現行讀圖）＋需求側客戶。
@@ -1938,6 +1981,7 @@ def build_alpha_investment_view(
         refresh_overall=refresh_section.overall, gap=expectation_gap_section,
         three_questions=three_questions, names=dict((narrative_context or {}).get("node_names") or {}),
         fundamentals=fundamentals_section.items, reporting_currency=reporting_currency,
+        story=story_record,
         )
 
     return AlphaInvestmentView(

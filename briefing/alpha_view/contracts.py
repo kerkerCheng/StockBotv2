@@ -608,6 +608,11 @@ class InvestorBriefSection:
     #: reading_id}]`。`bet` 面板的「騎層或插槽」照抄它。沒有 v2 敘事＝帶 absence_kind 的缺席，不是空 list。
     #: 預設 None 只給舊測試夾具；正式 builder 一律給一格。
     rides: "Datum | None" = None
+    #: 故事層（2026-10-29；`alpha.providers.stories`）：這一版敘事的故事，每格一個 `story:<格>` Datum——七格的故事
+    #: ＋只有故事的兩格（`revenue`、`events`）。**依據照舊是 `slots`**（首屏的展開照印）。故事是另一版敘事寫的
+    #: （敘事換版了）就不算數：空 tuple、`story_id` None，首屏退回印依據。
+    story: tuple[Datum, ...] = ()
+    story_id: str | None = None
 
 
 @dataclass(frozen=True, slots=True)

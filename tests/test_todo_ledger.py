@@ -24,6 +24,7 @@ TODAY = date(2026, 10, 22)
 
 def _vocabularies() -> dict[str, set[str]]:
     from alpha.candidates import GROUPS, SIDE_GROUPS
+    from alpha.providers.stories import STORY_GAP_KINDS
     from alpha.structure_reading.staleness import READING_STATUSES
     from crons.heartbeat import THESIS_STATUSES
     from engine_b import event_watch as ew
@@ -40,11 +41,12 @@ def _vocabularies() -> dict[str, set[str]]:
         "thesis": set(THESIS_STATUSES),
         "candidate": set(GROUPS) | set(SIDE_GROUPS) | {"no_narrative"},
         "reading": set(READING_STATUSES),
+        "story": set(STORY_GAP_KINDS),
     }
 
 
 @pytest.mark.parametrize("prefix", ["lead", "segment", "watch", "expiry", "dispatch", "hypothesis", "thesis",
-                                    "candidate", "reading"])
+                                    "candidate", "reading", "story"])
 def test_every_state_in_every_vocabulary_has_a_registered_destination(prefix: str) -> None:
     missing = sorted(v for v in _vocabularies()[prefix] if f"{prefix}:{v}" not in tl.COVERAGE)
     assert not missing, (f"{prefix} 有狀態沒登記去處：{missing}——新增狀態時先在 engine_b/todo_ledger.py 的 COVERAGE "
@@ -93,10 +95,11 @@ def _brief(company: str, *, state: str = "missing", brief_id: str = "ib_1", tick
 def _collect(**over):
     params = dict(today=TODAY, leads_store={"leads": {}}, watches=[], todo_items=[], hypotheses=[], briefs=[],
                   current_readings={}, reading_needs_reread=0, layer_note_reread=0, candidates={"counts": {}},
-                  thesis_due=[],
-                  loaders={"classification_gaps": lambda: [], "undisposed": lambda: [],
-                           "parked_without_expiry": lambda: [], "stale_lead_entities": lambda: 0})
-    params.update(over)
+                  thesis_due=[])
+    loaders = {"classification_gaps": lambda: [], "undisposed": lambda: [], "parked_without_expiry": lambda: [],
+               "stale_lead_entities": lambda: 0, "story_gaps": lambda: []}
+    loaders.update(over.pop("loaders", {}))       # 只換掉測試點名的那幾個；其餘不讀真的 ledger
+    params.update(over, loaders=loaders)
     return {row.key: row for row in tl.collect(**params)}
 
 
@@ -169,6 +172,25 @@ def test_thesis_due_counts_only_what_has_not_been_minted() -> None:
     pool = [{"type": "thesis_lifecycle", "title": "thesis axt_inp 該核查", "resolved_at": None}]
     rows = _collect(todo_items=pool, thesis_due=["axt_inp", "sivers"])
     assert rows["todo.thesis_due"].count == 1 and rows["todo.thesis_due"].work == "sivers"
+
+
+def test_story_gaps_count_per_company_and_split_never_from_a_new_brief_version() -> None:
+    """⑤「故事還沒寫」＝`python -m alpha stories --gaps` 同一個判定（L16）：敘事換版的那檔照樣算——故事過期會自己出現。"""
+    from alpha.providers.stories import STORY_GAP_KINDS, story_gaps
+
+    briefs = [_brief("co:a", brief_id="ib_new", ticker="A"), _brief("co:b", brief_id="ib_b", ticker="B"),
+              _brief("co:c", brief_id="ib_c", ticker="C")]
+    gaps = story_gaps(briefs, stories={"ib_c": {"story_id": "st_c"}}, all_story_briefs={"ib_old": "co:a"})
+    assert [(g["ticker"], g["kind"]) for g in gaps] == [("A", "stale"), ("B", "never")]
+    assert {g["kind"] for g in gaps} == set(STORY_GAP_KINDS)
+    row = _collect(loaders={"story_gaps": lambda: gaps})["todo.story"]
+    assert row.count == 2 and row.work == "從沒寫 1；敘事換版 1"
+
+    def boom():
+        raise OSError("ledger 壞了")
+
+    unread = _collect(loaders={"story_gaps": boom})["todo.story"]
+    assert unread.count is None and "OSError" in unread.reason
 
 
 def test_edge_without_narrative_ignores_non_edge_companies() -> None:

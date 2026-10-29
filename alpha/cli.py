@@ -868,6 +868,87 @@ def cmd_taglines(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_stories(args: argparse.Namespace) -> int:
+    """個股頁的故事層（2026-10-29 使用者：「理由太冗長看不完」，同時「還是很 appreciate 這種說故事的方式」）。
+
+    - `--list`（預設）：現行的故事（給 TICKER 就只列那一檔，印每一格）。
+    - `--check spec.json`：乾跑——跟 `--add` 同一份核對，不寫檔。
+    - `--add spec.json`：一筆或一批（`[…]` 或 `{"items": […]}`）；每筆 `{ticker, brief_id, slots, evidence, candidate}`。
+      **先全部核對、全過才寫**（任一筆不過整批不寫，逐筆說原因）。
+    - `--gaps`：現行敘事裡還沒有故事的（從沒寫／敘事換版、故事過期）——與待做清單 ⑤ 同一份判定。
+
+    ⚠ 故事只是那一格的人話：依據照舊在敘事那一格；不 gate 任何東西、不改候選狀態。寫完重跑
+    `python -m webapp materialize <TICKER>`（候選短標要再跑 `--candidates`）首屏才看得到。
+    """
+    from .providers.stories import current_stories, gaps_now, prepare_story, write_story
+
+    def _items(raw: Any) -> list[Any]:
+        items = raw.get("items") if isinstance(raw, dict) and "items" in raw else raw
+        return items if isinstance(items, list) else [items]
+
+    if args.add or args.check:
+        try:
+            items = _items(json.loads(Path(args.add or args.check).read_text(encoding="utf-8")))
+        except (OSError, ValueError) as exc:
+            print(f"✗ spec 讀不到：{exc}", file=sys.stderr)
+            return 2
+        failed = 0
+        for spec in items:
+            ticker = str((spec or {}).get("ticker") or "") if isinstance(spec, dict) else ""
+            try:
+                if not ticker:
+                    raise ValueError("每一筆都要寫 ticker")
+                _record, problems = prepare_story(ticker, spec)
+            except (AlphaError, ValueError) as exc:
+                problems = [str(exc)]
+            if problems:
+                failed += 1
+                print(f"✗ {ticker or '（沒寫 ticker）'}：\n  - " + "\n  - ".join(problems), file=sys.stderr)
+            else:
+                print(f"✓ {ticker} 過")
+        if failed:
+            print(f"✗ {failed}／{len(items)} 筆沒過——{'整批沒寫' if args.add else '乾跑，沒寫'}", file=sys.stderr)
+            return 2
+        if args.check:
+            print(f"✓ {len(items)} 筆全過（乾跑，沒寫）")
+            return 0
+        for spec in items:
+            record = write_story(str(spec["ticker"]), spec)
+            print(f"  寫入 {record['ticker']} {record['story_id']}（對 {record['brief_id']}）"
+                  + ("（換版）" if record.get("supersedes_id") else ""))
+        print(f"✓ 寫入 {len(items)} 筆；下一步：python -m webapp materialize <TICKER>（候選短標再跑 --candidates）")
+        return 0
+    if args.gaps:
+        gaps, errors = gaps_now()
+        if args.format == "json":
+            print(json.dumps({"gaps": gaps, "parse_errors": errors}, ensure_ascii=False, indent=2))
+            return 0
+        never = [g for g in gaps if g["kind"] == "never"]
+        stale = [g for g in gaps if g["kind"] == "stale"]
+        print(f"# 故事還沒寫 {len(gaps)} 檔（從沒寫 {len(never)}｜敘事換版、故事過期 {len(stale)}）")
+        for g in gaps:
+            print(f"- {g['ticker']}｜{'從沒寫' if g['kind'] == 'never' else '過期'}｜{g['brief_id']}")
+        if errors:
+            print(f"⚠ 故事 ledger 解析失敗 {len(errors)} 行：" + "；".join(errors[:3]))
+        return 0
+    current, errors = current_stories()
+    rows = sorted(current.values(), key=lambda r: (r["ticker"], r["brief_id"]))
+    if args.ticker:
+        rows = [r for r in rows if r["ticker"].upper() == args.ticker.upper()]
+    if args.format == "json":
+        print(json.dumps({"current": rows, "parse_errors": errors}, ensure_ascii=False, indent=2))
+        return 0
+    print(f"# 故事（現行 {len(rows)} 筆；只算寫給某一版敘事的最新一筆——那一版是不是現行看 --gaps）")
+    for r in rows:
+        print(f"- {r['ticker']}｜{r['brief_id']}｜{r['created_at'][:10]}｜{(r.get('candidate') or {}).get('story') or ''}")
+        if args.ticker:
+            for key, text in (r.get("slots") or {}).items():
+                print(f"    {key}：{text}")
+    if errors:
+        print(f"⚠ 解析失敗 {len(errors)} 行：" + "；".join(errors[:3]))
+    return 0
+
+
 # ⚠ **2026-09-23（Phase 0 Step 0b.1b）：`cmd_entry_criterion` 與 `entry-criterion` 子命令退役（F 組）。**
 # EntryCriterion ledger 的讀寫入口。ledger 檔案本身留在 `library/private/alpha/entry_criteria/`
 # （private append-only，L10：拿不回來的只能 append），但**沒有任何消費端**——進場靠判斷。
@@ -922,6 +1003,16 @@ def build_parser() -> argparse.ArgumentParser:
     tags.add_argument("--add", help="整批 append（JSON：[{ticker, short_name, text}]；名冊、字數、禁字由本命令核對）")
     tags.add_argument("--format", choices=("markdown", "json"), default="markdown")
     tags.set_defaults(func=cmd_taglines)
+
+    told = sub.add_parser(
+        "stories", help="個股頁的故事層：--list／--check spec.json／--add spec.json／--gaps（每版敘事一份人話；依據照舊在敘事）")
+    told.add_argument("ticker", nargs="?", help="只列這一檔（--list 時印每一格）")
+    told.add_argument("--list", action="store_true", help="（預設）現行的故事")
+    told.add_argument("--check", help="乾跑：核對一筆或一批 spec，不寫檔")
+    told.add_argument("--add", help="寫入一筆或一批（先全部核對、全過才寫）")
+    told.add_argument("--gaps", action="store_true", help="現行敘事裡還沒有故事的（從沒寫／過期）")
+    told.add_argument("--format", choices=("markdown", "json"), default="markdown")
+    told.set_defaults(func=cmd_stories)
 
     edge = sub.add_parser(
         "edge", help="研究時判邊緣（唯讀）：名冊外的代號也能判——同一個判定函式與門檻，缺的輸入用 yfinance 補、逐欄標來源")

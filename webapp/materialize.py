@@ -128,8 +128,11 @@ def _candidate_overview(panel: Mapping[str, Any]) -> dict[str, Any]:
         if row.get("derived") in LIST_GROUPS:
             # sheet_verified 照抄（2026-10-28）：候選板頁併進首頁後，「已持有 0」與「Sheet 讀不到、已持有判定暫停」
             # 要在首頁分得開（L12）——候選板原本印「未驗」，這一格是首頁唯一分得出兩者的地方
+            # 缺 X 的短標（故事層，2026-10-29）：首頁卡片印「缺：二代占比」——使用者：「缺x是缺啥 可以五字一目瞭然嗎」。
+            # 只在落「缺 X」組時給：已持有的檔敘事也可能宣告缺 X，但卡片的狀態是「已持有」，不得被短標蓋掉
+            label = row.get("missing_label") if row.get("derived") == "missing" else None
             return {"list_group": str(row["derived"]), "label": row.get("derived_label"), "absence_kind": None,
-                    "sheet_verified": row.get("sheet_verified")}
+                    "sheet_verified": row.get("sheet_verified"), "missing_label": label}
         # 有候選列、值卻不在首頁分組字彙裡＝字彙漏了一格（不是「沒讀到」）：照實寫出那個值
         return {"list_group": "unavailable", "label": None, "absence_kind": "upstream_unavailable",
                 "reason": f"候選狀態的值 {row.get('derived')!r} 不在首頁分組字彙裡（alpha.candidates.LIST_GROUPS）"}

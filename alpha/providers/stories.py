@@ -24,6 +24,8 @@ from alpha.errors import ContractViolation
 _ROOT = Path(__file__).resolve().parents[2]
 STORIES_PATH = _ROOT / "library" / "private" / "alpha" / "stories.jsonl"
 _REQUIRED = ("story_id", "brief_id", "company_id", "ticker", "created_at")
+#: 缺故事的兩種（`story_gaps` 的 kind；⑤ 涵蓋登記表從這裡列舉——L16）：從沒寫過／敘事換版、故事過期。
+STORY_GAP_KINDS: tuple[str, ...] = ("never", "stale")
 
 
 def story_id(brief_id: str, created_at: str, body: Mapping[str, Any]) -> str:
@@ -65,6 +67,21 @@ def current_stories(*, path: Path | None = None) -> tuple[dict[str, dict[str, An
         if head is None or (rec["created_at"], rec["story_id"]) > (head["created_at"], head["story_id"]):
             out[rec["brief_id"]] = rec
     return out, errors
+
+
+def story_at(brief_id: str, *, as_of: date | None = None, path: Path | None = None) -> dict[str, Any] | None:
+    """一版敘事在 `as_of` 那天收盤時現行的故事（INV-6：回看過去不得拿之後才寫的故事）；`as_of` None＝現在。
+    沒有就 None。"""
+    records, _errors = read_records(path=path)
+    head: dict[str, Any] | None = None
+    for rec in records:
+        if rec["brief_id"] != brief_id:
+            continue
+        if as_of is not None and rec["created_at"][:10] > as_of.isoformat():
+            continue
+        if head is None or (rec["created_at"], rec["story_id"]) > (head["created_at"], head["story_id"]):
+            head = rec
+    return head
 
 
 def _raw_ref_problem(ref: str) -> str | None:
@@ -130,6 +147,23 @@ def write_story(ticker: str, spec: Mapping[str, Any], *, path: Path | None = Non
                 brief_loader: Callable[[str], tuple[Sequence[Any], Sequence[str]]] | None = None) -> dict[str, Any]:
     """唯一的寫入入口。`spec`：`brief_id`（必須是這一檔**現行**那一版）、`slots`、`evidence`、`candidate`。
     任一條不過就整筆拒收。回寫入的那一筆。"""
+    record, problems = prepare_story(ticker, spec, path=path, registry=registry, now=now, today=today,
+                                     author=author, brief_loader=brief_loader)
+    if problems:
+        raise ContractViolation(f"{ticker} 的故事拒收（沒寫）：\n  - " + "\n  - ".join(problems))
+    target = path or STORIES_PATH
+    target.parent.mkdir(parents=True, exist_ok=True)
+    with target.open("a", encoding="utf-8") as handle:
+        handle.write(json.dumps(record, ensure_ascii=False, sort_keys=True) + "\n")
+    return record
+
+
+def prepare_story(ticker: str, spec: Mapping[str, Any], *, path: Path | None = None, registry: Any = None,
+                  now: datetime | None = None, today: date | None = None, author: str = "session",
+                  brief_loader: Callable[[str], tuple[Sequence[Any], Sequence[str]]] | None = None
+                  ) -> tuple[dict[str, Any], list[str]]:
+    """寫入前的全部核對（不寫檔）：回 `(要寫的那一筆, 問題清單)`——`write_story` 與乾跑（`--check`）共用同一份。
+    名冊查不到、沒有現行 v2 敘事、`brief_id` 不是現行那一版：直接 raise（那一筆根本沒有對象）。"""
     from shared.redaction import sensitive_payload_path
 
     from alpha.narrative.contracts import RECORD_VERSION_V2, select_brief
@@ -165,13 +199,7 @@ def write_story(ticker: str, spec: Mapping[str, Any], *, path: Path | None = Non
         record["supersedes_id"] = head["story_id"]
     if sensitive_payload_path(dict(record), "stories") is not None:
         problems.append("內容像密鑰，拒收")
-    if problems:
-        raise ContractViolation(f"{ticker} 的故事拒收（沒寫）：\n  - " + "\n  - ".join(problems))
-    target = path or STORIES_PATH
-    target.parent.mkdir(parents=True, exist_ok=True)
-    with target.open("a", encoding="utf-8") as handle:
-        handle.write(json.dumps(record, ensure_ascii=False, sort_keys=True) + "\n")
-    return record
+    return record, problems
 
 
 def story_gaps(briefs: Iterable[Any], *, stories: Mapping[str, Mapping[str, Any]],
@@ -189,5 +217,30 @@ def story_gaps(briefs: Iterable[Any], *, stories: Mapping[str, Mapping[str, Any]
     return sorted(out, key=lambda r: (r["ticker"], r["brief_id"]))
 
 
-__all__ = ["STORIES_PATH", "current_stories", "read_records", "story_gaps", "story_id", "story_spec_problems",
-           "write_story"]
+def current_v2_briefs(*, today: date | None = None) -> list[Any]:
+    """每檔現行的 v2 敘事——與個股頁同一個選法（`select_brief`；L16：「現行那一版」只有一個定義）。"""
+    from alpha.narrative.contracts import RECORD_VERSION_V2, select_brief
+
+    from .briefs import BRIEF_DIR, read_brief_records
+
+    out: list[Any] = []
+    if not BRIEF_DIR.is_dir():
+        return out
+    for ledger in sorted(BRIEF_DIR.glob("*.jsonl")):
+        records, _errors = read_brief_records(ledger.stem)
+        brief = select_brief(records, as_of=None, today=today or date.today())
+        if brief is not None and brief.record_version == RECORD_VERSION_V2:
+            out.append(brief)
+    return out
+
+
+def gaps_now(*, today: date | None = None, path: Path | None = None) -> tuple[list[dict[str, Any]], list[str]]:
+    """現在還沒有故事的現行敘事（⑤「故事還沒寫」與 `python -m alpha stories --gaps` 共用，L16）與故事 ledger 的壞行。"""
+    records, errors = read_records(path=path)
+    current, _errors = current_stories(path=path)
+    written = {str(r["brief_id"]): str(r["company_id"]) for r in records}
+    return story_gaps(current_v2_briefs(today=today), stories=current, all_story_briefs=written), errors
+
+
+__all__ = ["STORIES_PATH", "STORY_GAP_KINDS", "current_stories", "current_v2_briefs", "gaps_now", "prepare_story", "read_records",
+           "story_at", "story_gaps", "story_id", "story_spec_problems", "write_story"]

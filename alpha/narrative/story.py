@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 import re
+from datetime import date
 from typing import Mapping
 
 from .contracts import FORBIDDEN_TERMS, PARAM_PLACEHOLDER, PLACEHOLDERS_V2, SIMPLE_PLACEHOLDER, SLOT_LABELS_V2
@@ -124,6 +125,48 @@ def story_problems(key: str, text: object, *, limit: int = STORY_MAX) -> list[st
     return out
 
 
+#: 值尾端的日期括號（`market_cap` 填出「37.6 億 USD（2026-10-02）」、`revenue_ttm` 填出「…（近四季，快照 2026-10-02）」）：
+#: 故事模式拿掉——日期是依據的字（它照舊在依據那一格與稽核區）。
+_VALUE_DATE_NOTE = re.compile(r"\s*（[^（）]*\d{4}-\d{2}-\d{2}[^（）]*）\s*$")
+
+
+def story_values(values: Mapping[str, str | None], *, today: date) -> dict[str, str | None]:
+    """敘事的 placeholder 值 → 故事模式的值（**純格式化**，不算任何數）：值尾端的日期括號拿掉；`next_checkpoint_date`
+    印成「11 月 14 日」（不同年才帶年份）。其他照抄。"""
+    out: dict[str, str | None] = {}
+    for key, value in values.items():
+        out[key] = _VALUE_DATE_NOTE.sub("", value) if isinstance(value, str) else value
+    when = values.get("next_checkpoint_date")
+    if isinstance(when, str):
+        try:
+            day = date.fromisoformat(when[:10])
+        except ValueError:
+            day = None
+        if day is not None:
+            out["next_checkpoint_date"] = (f"{day.month} 月 {day.day} 日" if day.year == today.year
+                                           else f"{day.year} 年 {day.month} 月 {day.day} 日")
+    return out
+
+
+#: 兩個中文字（含全形標點）之間的一格空白：placeholder 兩側習慣留空白（「第 {own_history_pctile} 百分位」），
+#: 填出來是中文（「12 月 31 日」「（尚無）」）時那一格就多餘——「12 月 31 日 的」。數字與英文兩側的空白不動。
+_CJK_GAP = re.compile(r"(?<=[　-〿一-鿿＀-￯]) (?=[　-〿一-鿿＀-￯])")
+
+
+def fill_story(text: str, values: Mapping[str, str | None], *, absent: str) -> tuple[str, list[str]]:
+    """一句故事填值：回 `(填好的句子, 缺值的 placeholder)`；缺值印 `absent`（與敘事同一個「（尚無）」，不補 0）。"""
+    missing: list[str] = []
+
+    def _sub(match: re.Match[str]) -> str:
+        value = values.get(match.group(1))
+        if value is None:
+            missing.append(match.group(0))
+            return absent
+        return value
+
+    return _CJK_GAP.sub("", SIMPLE_PLACEHOLDER.sub(_sub, text)), missing
+
+
 def missing_label_problems(label: object) -> list[str]:
     """缺 X 的短標（首頁卡片「缺：<短標>」）：一個名詞片語、≤ `MISSING_LABEL_MAX` 字、不帶標點與 placeholder。"""
     if not isinstance(label, str) or not label.strip():
@@ -144,5 +187,5 @@ __all__ = [
     "CANDIDATE_STORY_MAX", "MISSING_LABEL_MAX", "PLACEHOLDER_WIDTH", "STORY_DATE_PLACEHOLDERS", "STORY_MAX",
     "STORY_ONLY_KEYS", "STORY_ONLY_SLOTS", "STORY_RELATIVE_YEARS", "STORY_SLOT_KEYS", "STORY_SLOT_LABELS",
     "STORY_SYSTEM_WORDS",
-    "missing_label_problems", "story_length", "story_problems",
+    "fill_story", "missing_label_problems", "story_length", "story_problems", "story_values",
 ]

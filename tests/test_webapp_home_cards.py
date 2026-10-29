@@ -263,6 +263,19 @@ def test_every_group_comes_back_with_its_count_and_oldest_stall(client) -> None:
     assert groups["open"]["count"] == 0 and groups["open"]["oldest_stall_days"] is None and groups["open"]["expanded"]
 
 
+def test_the_missing_label_only_replaces_the_state_in_the_missing_group() -> None:
+    """首頁卡片「缺：<短標>」（故事層 2026-10-29）只在落「缺 X」組時給；已持有的檔敘事也可能宣告缺 X，
+    卡片的狀態仍是「已持有」——真資料 SIVE.ST 曾被短標蓋成「缺：客戶具名」。"""
+    from webapp.materialize import _candidate_overview
+
+    def card(**row):
+        return _candidate_overview({"lines": [{"key": "candidate:state", "datum": {"value": dict(ROW, **row)}}]})
+
+    assert card(derived="missing", derived_label="缺 X", missing_label="二代占比")["missing_label"] == "二代占比"
+    held = card(derived="held", derived_label="已持有", declared="missing", missing_label="客戶具名")
+    assert held["missing_label"] is None and held["label"] == "已持有"
+
+
 def test_held_group_says_unverified_when_the_sheet_was_not_read(tmp_path) -> None:
     """候選板原本在 Sheet 讀不到時把「已持有」印成「未驗」；首頁「0 也印」不得把它壓成「已持有 0」（L12）。"""
     from webapp.contracts import canonical_digest

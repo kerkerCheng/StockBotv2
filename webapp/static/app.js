@@ -219,7 +219,9 @@ function cardStateLine(row) {
   const c = row.card || {};
   const cand = row.candidate || {};
   const line = el('div', 'card-state');
-  if (cand.label) line.appendChild(el('span', 'card-chip chip-' + (cand.list_group || 'none'), cand.label));
+  // 缺 X 寫出缺什麼（故事層的短標，2026-10-29 使用者：「缺x是缺啥 可以五字一目瞭然嗎」）；沒寫短標照印狀態名。
+  const chip = cand.missing_label ? `缺：${cand.missing_label}` : cand.label;
+  if (chip) line.appendChild(el('span', 'card-chip chip-' + (cand.list_group || 'none'), chip));
   // 敘事該重寫（候選列 rewrite[]，materialize 端照數）：這張卡的狀態可能已經舊了（2026-10-28 候選板那一區搬來）。
   // 2026-10-29 起寫原因（兩到四個字，`alpha.candidates.rewrite_words`），不只寫筆數；舊 artifact 照印筆數。
   if (typeof c.rewrite === 'number' && c.rewrite > 0) {
@@ -758,21 +760,46 @@ function schemaBlock(payload, view, lines, block, reading) {
   const head = el('h3', 'fq-title', block.title);
   if (block.question) head.title = block.question;
   node.appendChild(head);
+  // 故事層（2026-10-29）：有故事的格印故事，那一格的原文（依據：日期、出處、寫作經過）收進這一塊的展開；
+  // 沒寫故事（或敘事換版了）照印原文。只有故事的格（B3 營收從哪來、B5 最近發生什麼）沒寫就不印——缺席句不上首屏。
   const story = el('div', 'story');
-  (reading.slots || []).forEach((slot) => { if (lines['brief:' + slot]) story.appendChild(storyRow(lines['brief:' + slot])); });
+  const basis = [];
+  (reading.slots || []).forEach((slot) => {
+    const told = lines['story:' + slot];
+    const said = lines['brief:' + slot];
+    if (told) {
+      story.appendChild(storyRow(told));
+      if (said) basis.push(basisRow(said));
+    } else if (said) {
+      story.appendChild(storyRow(said));
+    }
+  });
+  (reading.story_slots || []).forEach((slot) => { if (lines['story:' + slot]) story.appendChild(storyRow(lines['story:' + slot])); });
   if (story.childNodes.length) node.appendChild(story);
   (reading.parts || []).forEach((part) => questionPart(view, part).forEach((n) => node.appendChild(n)));
   const absent = [];
   blockVisuals(payload, view, block.key).forEach((n) => {
     if (n.classList && n.classList.contains('ss-pending')) absent.push(n); else node.appendChild(n);
   });
-  const detail = blockDetail(payload, view, block.key);
+  // 每塊最多一個展開（2026-09-08「太多展開」）：依據併進這一塊既有的展開，最前面；這一塊沒有展開才另開「依據」。
+  const detail = blockDetail(payload, view, block.key) || (basis.length ? drill('依據', () => el('div', 'block-detail')) : null);
   if (detail) {
     const body = detail.querySelector('.block-detail');
-    if (body) absent.forEach((n) => body.appendChild(n));
+    if (body) {
+      basis.slice().reverse().forEach((n) => body.insertBefore(n, body.firstChild));
+      absent.forEach((n) => body.appendChild(n));
+    }
     node.appendChild(detail);
   }
   return node.childNodes.length > 1 ? node : null;
+}
+
+/** 依據一格（故事層）：敘事那一格的原文——研究為了稽核寫的日期、出處、寫作經過都在這裡，照抄不刪。 */
+function basisRow(line) {
+  const row = el('div', 'basis-row');
+  row.appendChild(el('div', 'story-label', '依據：' + plainLine(line.key, line.display_label)));
+  row.appendChild(el('div', 'story-text basis-text', String(line.datum.value || '')));
+  return row;
 }
 
 /** 塊底下的展開（2026-10-08 使用者：「給我看的留，給機器看的拿掉」）：這一塊給人讀的論證與要核對的數字。
@@ -1375,7 +1402,13 @@ function candidateLine(view, inQuestions) {
     if (panel.reason) head.appendChild(el('span', 'dim', '　' + panel.reason));
   }
   node.appendChild(head);
-  if (row && row.reason) node.appendChild(el('div', 'row-reason', '理由：' + row.reason));
+  // 理由先印故事（一兩句，故事層 2026-10-29「理由太冗長看不完」），原理由收進「依據」；沒寫故事照印原理由。
+  if (row && row.reason_story) {
+    node.appendChild(el('div', 'row-reason', '理由：' + row.reason_story));
+    if (row.reason) node.appendChild(drill('依據', () => el('div', 'row-reason basis-text', row.reason)));
+  } else if (row && row.reason) {
+    node.appendChild(el('div', 'row-reason', '理由：' + row.reason));
+  }
   if (row && row.watch) node.appendChild(candidateWatchLine(row.watch));
   // 五題版面：confirm 條件、三個字與白話、燈已放在③②④底下（Phase 7 Step 7.0e），這一行只留候選狀態本身。
   if (!inQuestions) {

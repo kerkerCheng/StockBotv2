@@ -427,6 +427,10 @@ table.rank.compare td:first-child { color: var(--muted); }
 .brief-card .ss-section .fq:first-of-type { border-top: 0; }
 .brief-card .ss-pending { font-style: italic; opacity: .75; }
 .brief-card .ss-block details { margin-top: .25rem; }
+/* 故事層（2026-10-29）：依據＝那一格的原文，收在展開最前面；小一號字、不搶故事。 */
+.basis-row { padding: .35rem 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+.basis-row .story-label { font-weight: 600; opacity: .75; }
+.basis-text { line-height: 1.55; opacity: .9; overflow-wrap: anywhere; }
 .brief-card .ss-cells .attention-body { overflow-wrap: anywhere; }
 .numbers-strip .headline-numbers .num-value { font-size: 19px; }
 .brief-card .badge-light { margin-left: .5rem; }

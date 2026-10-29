@@ -148,6 +148,34 @@ entity 型等待只比「發文的是不是這家公司」——醒來先擋著�
   （系統不自動改）；**到期沒觸及**＝「確認事件沒在期限內發生」，本身就是資訊，照實處置（`still_holds`／`thesis_changed`／`retired`）。
   它不是反證：不算進「反證：在盯／觸及」，也不擋可開。契約上是選填欄（寫入端不擋），但**持有或可開、且候選狀態不是「不要」的敘事要寫**——ROADMAP Phase 7 驗收②（2026-10-21 A9）；形狀見 packet 的 `brief_frame.spec_shape`。**持有但判「不要」的非倍率持股**（例：COHR）不在敘事寫 `confirm[]`——它的加碼與反證住 thesis（`thesis/lifecycle.json` 指的 memo；反證由 `todo sync` 登記成 watch），要補就走 thesis mutation（人工 gate），不拿敘事代寫。
 
+**段「故事」（個股頁首屏的人話；2026-10-29 使用者看手機：「理由太冗長看不完」，同時「還是很 appreciate 這種說故事的方式……
+至少是一個故事我可以理解為什麼我可以投資或不能」）**：故事是敘事那一格的人話，**依據不搬家**——原文、日期、出處照舊住敘事，
+首屏的展開裡照印。兩個入口：①**每寫一版敘事（新寫、換版、改狀態），同一個邊界內接著寫它的故事**——換版那一刻舊故事就不算數，
+首屏退回印依據；②⑤「故事還沒寫」有數（從沒寫／敘事換版）——三段固定清空後、走圖之前清。
+
+```powershell
+& '.venv\Scripts\python.exe' -m alpha stories --gaps                  # 缺哪幾檔（與 ⑤ 同一份判定）
+& '.venv\Scripts\python.exe' -m alpha brief <T>                       # 依據：故事只能說這裡有的
+& '.venv\Scripts\python.exe' -m alpha stories <T>                     # 舊故事（換版時照舊故事改）
+& '.venv\Scripts\python.exe' -m alpha stories --check spec.json       # 乾跑：逐條說哪裡不過
+& '.venv\Scripts\python.exe' -m alpha stories --add spec.json         # 一批全過才寫
+& '.venv\Scripts\python.exe' -m webapp materialize <T…> --candidates   # 個股頁與首頁卡片才看得到
+```
+
+spec：`{ticker, brief_id, slots: {敘事七格 ＋ revenue（營收從哪來）＋ events（最近發生什麼、影響多大）}, evidence: {revenue: [library/raw/…], events: […]}, candidate: {story, missing_label}}`。寫入端擋得到的（字數、完整日期、相對年、內部 id、系統詞、英文長串、長引文、禁字表）`--check` 會逐條說，不必背；**擋不到的是下面四條**：
+
+- **讀者是拿手機的人，要的是「為什麼可以投資或不能」**：每格一到兩句；主詞是公司、產品、客戶，動詞是發生過的事。
+- **拿掉查核用的，留下因果**：讀圖版本、「寫這句時」的口徑、逐家點名、英文逐字、日期（裁決點寫「11 月上旬」）照舊在依據裡；
+  留下的是誰付錢、卡不卡在它、客戶為什麼選它、什麼會換掉它、翻倍要什麼為真、錯的訊號。
+- **故事不比依據多主張**：不加新事實與新數字（數字用敘事的 placeholder 或依據裡寫明的數）；營收、事件兩格沒有依據格，evidence 指 `library/raw/` 的一手檔。
+  「讀到邊」照舊——依據答不出客戶為什麼選它，故事就寫缺什麼，不得為了好讀寫成有。
+- **候選理由一句（≤80 字）講為什麼是這個狀態；缺 X 的短標 ≤6 字、看了就知道缺什麼**（「客戶具名」「合約金額」）。
+  ⚠ `{next_checkpoint_date}` 是最近的未來催化劑日，未必是你要講的那一個——`when` 寫月份字較安全。
+
+例（COHR「卡在哪」，依據 459 字 → 故事 96 字）：依據寫了讀圖版本與日期、圖上 11 家逐家點名與各自何時補產能、NVIDIA 部落格的英文逐字、
+季報「非獨家」、Lumentum 內製兩成；故事是「卡的是這一層的量，不是它：做這種雷射的有十來家，補產能的速度量不到；NVIDIA 把它和
+Lumentum、住友並列，協議也是非獨家。它和別家不同在六吋磷化銦產線；會讓它被換掉的是買家自己做。」
+
 以下是**三段固定**：
 
 1. **所有「使用者已授權、還沒做完」的項目** — 放著不動是本 skill 要修的那個 bug。

@@ -175,13 +175,25 @@ def _shared_bet_lines(out: Mapping[str, Any], *, has_anchor: bool, has_layer: bo
     return lines
 
 
+def _reason_story(brief: InvestorBrief | None, stories: Mapping[str, Mapping[str, Any]] | None) -> dict[str, Any]:
+    """候選理由的故事（`reason_story`）與缺 X 的短標（`missing_label`，只有宣告缺 X 才有）。故事 ledger 照抄，不改字；
+    沒有這一版敘事的故事＝兩格 None（理由照印原文）。"""
+    story = (stories or {}).get(brief.brief_id) if brief is not None else None
+    candidate = (story or {}).get("candidate") if isinstance((story or {}).get("candidate"), Mapping) else {}
+    state = brief.candidate_state.state if brief is not None and brief.candidate_state else None
+    label = candidate.get("missing_label") if state == "missing" else None
+    return {"reason_story": candidate.get("story") or None, "missing_label": label or None,
+            "story_id": (story or {}).get("story_id")}
+
+
 def derive_row(ticker: str, company_id: str | None, *, records: Sequence[InvestorBrief], today: date,
                reading_rows: Mapping[tuple[str, str], Mapping[str, Any]], watches: Sequence[Mapping[str, Any]],
                lifecycle: Mapping[str, Any] | None, edge: Mapping[str, Any] | None,
                three_questions: Mapping[str, Any] | None, held: Mapping[str, Any],
                three_questions_note: str | None = None, bets: Mapping[str, Any] | None = None,
                registry: Any = None, own_history_at: Callable[..., Mapping[str, Any]] | None = None,
-               bars_at: Callable[[str, date], Sequence[tuple[date, float | None]]] | None = None
+               bars_at: Callable[[str, date], Sequence[tuple[date, float | None]]] | None = None,
+               stories: Mapping[str, Mapping[str, Any]] | None = None,
                ) -> dict[str, Any] | None:
     """一檔的候選狀態。沒有敘事、也沒有持有 → None（不上板，計數另印「無敘事」）。
 
@@ -208,6 +220,8 @@ def derive_row(ticker: str, company_id: str | None, *, records: Sequence[Investo
         "declared_label": GROUP_LABELS.get(cs.state) if cs else None,
         "derived": None, "group": None, "side": None,
         "reason": cs.reason if cs else None,
+        # 故事層（2026-10-29）：理由的一句故事、缺 X 的短標——寫給這一版敘事的才算（敘事換版就退回印原理由）
+        **_reason_story(brief if v2 else None, stories),
         "preconditions": [], "rewrite": [], "rewrite_watch_ids": [], "rewrite_words": [],
         "edge": {**{k: (edge or {}).get(k) for k in ("state", "label", "reasons", "market_cap_usd", "analyst_count")},
                  "market_cap_label": cap_label((edge or {}).get("market_cap_usd"))},
@@ -504,12 +518,19 @@ def candidate_context(tickers: Sequence[str], *, today: date | None = None,
             research = str(registry.research_ticker(cid) or "").upper()
             if research and research not in universe:
                 extra[research] = cid
+    from .stories import current_stories
+
+    # 故事層（2026-10-29）：候選理由的一句故事與缺 X 的短標——只呈現，不進任何狀態判斷；讀不到就沒有（照印原理由）
+    try:
+        stories, _story_errors = current_stories()
+    except Exception:  # noqa: BLE001 — 故事 ledger 讀不到只讓理由照印原文
+        stories = {}
     return {"today": today, "registry": registry, "universe": universe, "extra": extra, "watches": watches,
             "lifecycle": lifecycle, "reading_rows": reading_rows, "reading_errors": list(reading_errors),
             "retracted_cells": retracted_cells,
             "held": held, "edges": edge_states(sorted(set(universe) | set(extra))),
             "ledger_present": ledger_present, "ledger_tickers": ledger_tickers,
-            "bets": bet_index(structure, seats_from_edges(graph_edges))}
+            "bets": bet_index(structure, seats_from_edges(graph_edges)), "stories": stories}
 
 
 _OVER_EDGE = {"cap_over_edge": "市值", "coverage_over_edge": "分析師家數"}
@@ -566,7 +587,8 @@ def page_input(context: Mapping[str, Any], ticker: str, company_id: str | None, 
                      watches=context["watches"], lifecycle=context["lifecycle"],
                      edge=(context.get("edges") or {}).get(str(ticker).upper()), three_questions=three_questions,
                      held=context["held"], three_questions_note=three_questions_note,
-                     bets=context.get("bets"), registry=context.get("registry"))
+                     bets=context.get("bets"), registry=context.get("registry"),
+                     stories=context.get("stories"))
     brief = select_brief(records, as_of=None, today=today)
     v2 = brief if brief is not None and brief.record_version == RECORD_VERSION_V2 else None
     words = (row["three_words"] if row is not None else
@@ -663,7 +685,7 @@ def load_board(tickers: Sequence[str], *, today: date | None = None,
         row = derive_row(ticker, cid, records=records, today=today, reading_rows=reading_rows,
                          watches=watches, lifecycle=lifecycle, edge=edges.get(ticker), three_questions=tq,
                          held=held, three_questions_note=note, bets=bets, registry=registry,
-                         own_history_at=own_history_at, bars_at=adjusted_bars)
+                         own_history_at=own_history_at, bars_at=adjusted_bars, stories=ctx.get("stories"))
         rows.append(row)
         if row is None:
             no_narrative.append({"ticker": ticker, "company_id": cid,

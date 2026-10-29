@@ -24,8 +24,9 @@ from typing import Any, Mapping, Sequence
 
 from alpha.absence import ABSENCE_KINDS, default_absence_kind
 
-PAGE_SCHEMA_VERSION = "stock-page-schema/1.4"   # 1.1（S3c）拿掉 B2 同層各家、路徑上各層接上；1.2（S3d）B3 營收結構與 backlog 接上；
-#                                                  1.3（S3d 第二段）台股年報地區別、押的那一塊接上；1.4（S3e）事件之後跟組比接上
+PAGE_SCHEMA_VERSION = "stock-page-schema/1.5"   # 1.1（S3c）拿掉 B2 同層各家、路徑上各層接上；1.2（S3d）B3 營收結構與 backlog 接上；
+#                                                  1.3（S3d 第二段）台股年報地區別、押的那一塊接上；1.4（S3e）事件之後跟組比接上；
+#                                                  1.5（2026-10-29 故事層）B3、B5 的一句故事接上
 
 #: 單位（§5.1）：每塊、每個元素都要宣告掛在哪個單位。
 UNITS: Mapping[str, str] = {
@@ -135,6 +136,8 @@ ELEMENTS: tuple[PageElement, ...] = (
     PageElement("B3.backlog", "B3", "backlog 與長約（金額、期間、預付）", "company", "mechanical", ("@backlog",),
                 "not_yet_recorded",
                 "Engine C 人工觀測 backlog（個股頁 S3d）：研究從年報或申報表記下；很多地區的準則不要求揭露在手訂單，照實寫"),
+    PageElement("B3.story", "B3", "營收從哪來（一句故事）", "company", "research", ("brief/story:revenue",),
+                "not_yet_recorded", "故事層 ledger（`python -m alpha stories`）現行那一版敘事的「營收從哪來」"),
     PageElement("B3.bet_share", "B3", "押的那一塊占營收多少", "company", "mechanical", ("@bet_share",),
                 "not_yet_recorded",
                 "敘事押的層 × 層代表公司宣告 × 分部占比（2026-10-14）：押的層宣告這家用某個分部代表，就印那個分部在最新一次"
@@ -146,6 +149,8 @@ ELEMENTS: tuple[PageElement, ...] = (
     PageElement("B4.diagram", "B4", "示意圖（從終端系統到這一層）", "layer", "research", ("@diagrams",),
                 "not_yet_recorded", "研究筆記的技術示意圖：涵蓋這一頁坐的層的圖"),
     # B5 事件
+    PageElement("B5.story", "B5", "最近發生什麼、影響多大（一句故事）", "event", "research", ("brief/story:events",),
+                "not_yet_recorded", "故事層 ledger（`python -m alpha stories`）現行那一版敘事的「最近發生什麼」"),
     PageElement("B5.catalyst", "B5", "事件：碰到哪一塊營收、多大、何時進營收", "event", "research",
                 ("research/catalyst_shape", "research/catalyst_quantitative_link"), "not_yet_recorded",
                 "thesis 的催化劑（lifecycle）"),
@@ -212,6 +217,9 @@ class BlockReading:
     slots: tuple[str, ...] = ()
     parts: tuple[str, ...] = ()
     pending: str | None = None
+    #: 只有故事、敘事裡沒有對應格的格（2026-10-29 故事層；`alpha.narrative.story.STORY_ONLY_KEYS`）：寫了故事就印那一句，
+    #: 沒寫就照舊是 `pending` 那一句的缺席（所以兩者可以並存——`pending` 是這一格沒寫時的宣告）。
+    story_slots: tuple[str, ...] = ()
 
 
 #: 首屏（個股頁 S5，2026-10-08；使用者選 B：S5 先做、S3 那幾格先印「還沒做」）。形式照 brainstorm §5 回饋 #11：
@@ -229,10 +237,11 @@ BLOCK_READINGS: tuple[BlockReading, ...] = (
     BlockReading("B1", slots=("our_bet", "bottleneck", "position")),
     BlockReading("B2", slots=("demand",)),
     # 2026-10-08 使用者：「對我來說都是營收，一起看最好」——「出現在數字裡了嗎」與營收柱從 B7 搬來營收從哪來（同一段、首屏上半）
-    BlockReading("B3", parts=("in_numbers",),
+    BlockReading("B3", parts=("in_numbers",), story_slots=("revenue",),
                  pending="還沒寫：營收結構的一句讀法要研究寫；產品、地區、客戶比例的機械資料在個股頁 S3d（還沒做）"),
     BlockReading("B4", pending="還沒寫：技術鏈的一句讀法要研究寫；坐的層有層說明時，展開裡連得過去"),
-    BlockReading("B5", pending="還沒寫：事件與影響多大的一句讀法要研究寫；相對同組的反應在下面（機械算的，只照實印）"),
+    BlockReading("B5", story_slots=("events",),
+                 pending="還沒寫：事件與影響多大的一句讀法要研究寫；相對同組的反應在下面（機械算的，只照實印）"),
     BlockReading("B6", slots=("priced_in",), parts=("priced_in",)),
     BlockReading("B7", slots=("what_must_be_true",)),
     BlockReading("B8", parts=("disproof", "confirm")),
@@ -287,6 +296,14 @@ def _first_screen_problems(block_keys: Sequence[str]) -> list[str]:
     parts = [p for r in BLOCK_READINGS for p in r.parts]
     if sorted(parts) != sorted(FIRST_SCREEN_PARTS) or len(parts) != len(set(parts)):
         problems.append(f"首屏元件要各放一次：{parts}")
+    from alpha.narrative.story import STORY_ONLY_KEYS
+
+    told = [s for r in BLOCK_READINGS for s in r.story_slots]
+    if sorted(told) != sorted(STORY_ONLY_KEYS) or len(told) != len(set(told)):
+        problems.append(f"只有故事的格要各放一次：{told}")
+    for r in BLOCK_READINGS:
+        if r.story_slots and not (r.pending or "").strip():
+            problems.append(f"{r.block} 有只有故事的格，卻沒宣告沒寫故事時印什麼（pending）")
     for r in BLOCK_READINGS:
         # 敘事的格與 pending 不並存（兩個都在講「那一句讀法」）；元件＋pending 可以（2026-10-08：B3 有營收的元件、讀法句還沒寫）
         if r.slots and r.pending:
@@ -414,7 +431,8 @@ def schema_payload() -> dict[str, Any]:
         "first_screen": {
             "sections": [{"key": s["key"], "title": s["title"], "blocks": list(s["blocks"])}
                          for s in FIRST_SCREEN_SECTIONS],
-            "readings": {r.block: {"slots": list(r.slots), "parts": list(r.parts), "pending": r.pending}
+            "readings": {r.block: {"slots": list(r.slots), "parts": list(r.parts), "pending": r.pending,
+                                   "story_slots": list(r.story_slots)}
                          for r in BLOCK_READINGS},
         },
     }

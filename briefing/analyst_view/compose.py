@@ -283,7 +283,10 @@ def _brief_panel(view: AlphaInvestmentView) -> AnalystPanel:
     # ⚠ **2026-09-23（Phase 0 Step 0b.1b）：`brief_scale`（那把尺）與 `brief_multiple_question`
     # （要翻倍需要什麼為真）兩行退役。** 尺上是現價／沒賭對／賭對／判斷錯了，ROADMAP 首屏那一列
     # 明文「拿掉」；要翻倍那一句讀多年反向橋（D 組）。首屏剩下的是七句話與一顆狀態燈。
-    lines = (tuple(_line(d.key, d.label, d, "brief") for d in ib.slots)
+    # 故事層（2026-10-29）：`story:<格>` 跟依據 `brief:<格>` 並排帶上——首屏印故事、依據收進那一塊的展開；
+    # 沒有故事（從沒寫、或敘事換版了）就沒有這幾行，首屏照舊印依據。
+    told = tuple(getattr(ib, "story", ()) or ())
+    lines = (tuple(_line(d.key, d.label, d, "brief") for d in (*ib.slots, *told))
              + (_line("brief_status_light", ib.status_light.label, ib.status_light, "brief"),))
     return AnalystPanel(
         key="brief", title="投資人短評：這檔在賭什麼",
@@ -297,9 +300,10 @@ def _brief_panel(view: AlphaInvestmentView) -> AnalystPanel:
         source_sections=("investor_brief",), source_statuses={"investor_brief": ib.meta.status},
         source_absence_kinds=_absence_kinds(investor_brief=ib.meta),
         lines=lines, notes=ib.is_not,
-        evidence=_evidence_for(view, ib.slots),
+        evidence=_evidence_for(view, (*ib.slots, *told)),
         context={"capability": ib.meta.capability, "brief_id": ib.brief_id,
-                 "evidence_unlisted": _unlisted_refs(view, ib.slots),
+                 "story_id": getattr(ib, "story_id", None),
+                 "evidence_unlisted": _unlisted_refs(view, (*ib.slots, *told)),
                  "available": ib.meta.status not in VALUELESS_STATUSES,
                  "optional_rule": "短評是 optional：沒寫只表示「還沒寫短評」，不代表這檔研究不完整；"
                                   "文字是研究 session 的判斷（append-only），數字由既有 Datum 填入，不得手打"},

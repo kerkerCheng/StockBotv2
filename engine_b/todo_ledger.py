@@ -56,6 +56,11 @@ LEDGER: tuple[LedgerRow, ...] = (
     LedgerRow("todo.thesis_due", "thesis 該核查未進 pq2", "條", "`python -m engine_b.todo sync`（鑄 thesis_lifecycle）"),
     LedgerRow("todo.gated", "工單收尾", "筆", "`python -m engine_b.todo gated`"),
     LedgerRow("todo.edge_no_narrative", "邊緣卻沒敘事", "檔", "研究那一檔、寫第一份敘事（非邊緣的不寫）"),
+    # 2026-10-29 使用者（個股頁）：「怎麼確保呈現的精神不變…之後才不會又慢慢爛掉」——敘事換版、故事就過期，
+    # 首屏退回印依據；過期與沒寫是會自己出現的計數，不是要人記得的事（L14）
+    LedgerRow("todo.story", "故事還沒寫", "檔",
+              "`python -m alpha stories --gaps` → 照 research-drain「故事」段寫 → `python -m alpha stories --check "
+              "spec.json` → `--add spec.json`"),
 )
 LEDGER_KEYS: tuple[str, ...] = tuple(r.key for r in LEDGER)
 LEDGER_BY_KEY: Mapping[str, LedgerRow] = {r.key: r for r in LEDGER}
@@ -148,6 +153,9 @@ COVERAGE: Mapping[str, str] = {
     "reading:stale_low": "terminal",             # 只有證據等級變：記錄、不優先
     "reading:stale": "todo.reading",
     "reading:expired": "todo.reading",
+    # --- 個股頁故事（alpha.providers.stories.STORY_GAP_KINDS）
+    "story:never": "todo.story",
+    "story:stale": "todo.story",                 # 敘事換版：舊故事不算數，首屏退回印依據
     # --- 其他來源
     "impact:undisposed": "todo.undisposed",
     "lead:classification_gap": "todo.unclassified",
@@ -286,7 +294,7 @@ def collect(*, today: date, leads_store: Mapping[str, Any], watches: Sequence[Ma
             candidates: Mapping[str, Any] | None, thesis_due: Sequence[str] | None,
             loaders: Mapping[str, Callable[[], Any]] | None = None) -> list[LedgerCount]:
     """⑤ 每一格的計數。注入的值是呼叫端讀過的 authority（心跳讀 artifact 與 ledger）；None＝那個 authority 沒讀到。
-    `loaders`：要另外讀檔才算得出的格（停放未處置對照、名冊重算、缺分類）——測試可換掉。"""
+    `loaders`：要另外讀檔才算得出的格（停放未處置對照、名冊重算、缺分類、故事還沒寫）——測試可換掉。"""
     from engine_b import event_watch as ew
     from engine_b import queue_segments as qs
 
@@ -482,6 +490,16 @@ def collect(*, today: date, leads_store: Mapping[str, Any], watches: Sequence[Ma
         put("todo.edge_no_narrative", len(rows_), work="、".join(str(r.get("ticker")) for r in rows_[:5]) or None)
 
     guarded("todo.edge_no_narrative", edge_no_narrative)
+
+    def story() -> None:
+        from alpha.providers.stories import gaps_now
+
+        gaps = (loaders.get("story_gaps") or (lambda: gaps_now(today=today)[0]))()
+        kinds = {"never": "從沒寫", "stale": "敘事換版"}
+        bits = [f"{label} {n}" for kind, label in kinds.items() if (n := sum(1 for g in gaps if g["kind"] == kind))]
+        put("todo.story", len(gaps), work="；".join(bits) or None)
+
+    guarded("todo.story", story)
     return [rows[r.key] for r in LEDGER]
 
 

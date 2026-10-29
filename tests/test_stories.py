@@ -167,3 +167,127 @@ def test_a_new_brief_version_makes_the_old_story_stale_by_itself(tmp_path) -> No
     written = {bid: rec["company_id"] for bid, rec in stories.items()}
     gaps = story_gaps([new, _brief(ticker="AXTI", company="co:axt")], stories=stories, all_story_briefs=written)
     assert [(g["ticker"], g["kind"]) for g in gaps] == [("AXTI", "never"), ("COHR", "stale")]
+
+
+# ---------------------------------------------------------------------------
+# 讀取端（B-2）：read model 的 `story:<格>`、候選的短標、首屏合約、前端、CLI
+# ---------------------------------------------------------------------------
+
+def test_story_mode_values_drop_date_notes_and_say_the_checkpoint_in_words() -> None:
+    """故事模式只改格式、不算數：值尾端的日期括號拿掉（日期是依據的字）、檢核日印成「11 月 14 日」，別年才帶年份。"""
+    from alpha.narrative.story import fill_story, story_values
+
+    shown = story_values({"market_cap": "37.6 億 USD（2026-10-02）", "revenue_ttm": "1.2 億 USD（近四季，快照 2026-10-02）",
+                          "next_checkpoint_date": "2026-11-14", "analyst_count": "5", "cohort_median": None},
+                         today=TODAY)
+    assert shown == {"market_cap": "37.6 億 USD", "revenue_ttm": "1.2 億 USD", "next_checkpoint_date": "11 月 14 日",
+                     "analyst_count": "5", "cohort_median": None}
+    assert story_values({"next_checkpoint_date": "2027-03-31"}, today=TODAY)["next_checkpoint_date"] == "2027 年 3 月 31 日"
+    text, gaps = fill_story("市值 {market_cap}、同組 {cohort_median}。", shown, absent="（尚無）")
+    assert text == "市值 37.6 億 USD、同組（尚無）。" and gaps == ["{cohort_median}"]
+
+
+def test_the_read_model_carries_the_story_of_the_current_brief_only() -> None:
+    """`story:<格>` 只認寫給現行那一版敘事的故事；七格的引用＝依據那一格的引用，只有故事的兩格帶自己的引用。"""
+    from briefing.alpha_view.builder import _story_slots
+
+    brief = _brief()
+    spec = _spec(brief)
+    record = {"story_id": "st_" + "1" * 16, "brief_id": brief.brief_id, "created_at": "2026-10-29T08:00:00+00:00",
+              "slots": spec["slots"], "evidence": {"revenue": ["library/raw/x.txt"], "events": ["graph://source/y"]}}
+    values = {"own_history_basis": "P/S", "own_history_pctile": "94", "analyst_count": "16",
+              "in_numbers_latest": "+17.4%", "next_checkpoint_date": "2026-12-31"}
+    told = {d.key: d for d in _story_slots(record, brief, values, today=TODAY)}
+    assert list(told) == [f"story:{k}" for k in ("demand", "position", "bottleneck", "priced_in", "our_bet",
+                                                  "what_must_be_true", "when", "revenue", "events")]
+    assert told["story:when"].value == "下一個檢核點是 12 月 31 日的六吋磷化銦產能倍增。"
+    assert told["story:priced_in"].value.startswith("已定價：自家三年 P/S 第 94 百分位")
+    assert told["story:revenue"].evidence_refs == ("library/raw/x.txt",)
+    assert told["story:bottleneck"].evidence_refs == ("graph://x",)
+    assert told["story:bottleneck"].dependencies["basis_line"] == "brief:bottleneck"
+    assert told["story:events"].dependencies["basis_line"] is None
+    assert _story_slots({**record, "brief_id": "ib_" + "0" * 16}, brief, values, today=TODAY) == ()
+    assert _story_slots(None, brief, values, today=TODAY) == ()
+
+
+def test_looking_back_never_sees_a_story_written_later(tmp_path) -> None:
+    """INV-6：回看 T 那天的頁，只拿 T 以前寫的故事；不給 as_of＝現行那一筆。"""
+    from alpha.providers.stories import story_at
+
+    path = tmp_path / "stories.jsonl"
+    brief = _brief(state="missing", ticker="AXTI", company="co:axt")
+    early = _spec(brief, candidate={"story": "缺：第一版。", "missing_label": "基板占比"})
+    _write(tmp_path, brief, early, now=datetime(2026, 10, 20, 9, tzinfo=timezone.utc))
+    late = _spec(brief, candidate={"story": "缺：第二版。", "missing_label": "基板占比"})
+    _write(tmp_path, brief, late, now=datetime(2026, 10, 28, 9, tzinfo=timezone.utc))
+    assert story_at(brief.brief_id, as_of=date(2026, 10, 25), path=path)["candidate"]["story"] == "缺：第一版。"
+    assert story_at(brief.brief_id, path=path)["candidate"]["story"] == "缺：第二版。"
+    assert story_at(brief.brief_id, as_of=date(2026, 10, 19), path=path) is None
+
+
+def test_the_candidate_row_carries_the_reason_story_and_the_missing_label() -> None:
+    """首頁卡片「缺：<短標>」與首屏的短理由照抄故事 ledger；敘事換版（故事寫給別版）就兩格都沒有、理由照印原文。"""
+    from alpha.providers.candidates import _reason_story
+
+    missing = _brief(state="missing", ticker="AXTI", company="co:axt")
+    story = {"story_id": "st_" + "2" * 16, "candidate": {"story": "缺：基板占比量不到。", "missing_label": "基板占比"}}
+    assert _reason_story(missing, {missing.brief_id: story}) == {
+        "reason_story": "缺：基板占比量不到。", "missing_label": "基板占比", "story_id": "st_" + "2" * 16}
+    assert _reason_story(missing, {"ib_other": story}) == {"reason_story": None, "missing_label": None, "story_id": None}
+    passed = _brief()
+    assert _reason_story(passed, {passed.brief_id: story})["missing_label"] is None   # 不是缺 X 就不印短標
+    assert _reason_story(None, {missing.brief_id: story})["reason_story"] is None
+
+
+def test_the_first_screen_contract_places_each_story_only_slot_once() -> None:
+    from alpha.narrative.story import STORY_ONLY_KEYS
+    from briefing.analyst_view.page_schema import check_schema, schema_payload
+
+    assert check_schema() == []
+    readings = schema_payload()["first_screen"]["readings"]
+    placed = [s for r in readings.values() for s in r["story_slots"]]
+    assert sorted(placed) == sorted(STORY_ONLY_KEYS)
+    assert readings["B3"]["story_slots"] == ["revenue"] and readings["B5"]["story_slots"] == ["events"]
+    # 沒寫故事時那一塊照舊宣告缺席（pending 是那一格沒寫時的那一句）
+    assert readings["B3"]["pending"] and readings["B5"]["pending"]
+
+
+def test_the_front_end_prints_the_story_first_and_keeps_the_basis_one_click_away() -> None:
+    """app.js：每塊先找 `story:<格>`、沒有才印依據；依據併進那一塊的展開；只有故事的格照合約的 story_slots；
+    首頁卡片印缺 X 的短標；候選理由先印故事。"""
+    from pathlib import Path
+
+    js = (Path(__file__).resolve().parents[1] / "webapp" / "static" / "app.js").read_text(encoding="utf-8")
+    for token in ("lines['story:' + slot]", "reading.story_slots", "function basisRow", "basis.push(basisRow(said))",
+                  "cand.missing_label", "row.reason_story"):
+        assert token in js, token
+
+
+def test_the_cli_writes_a_batch_only_when_every_story_passes(tmp_path, monkeypatch) -> None:
+    """`python -m alpha stories --add`：先全部核對、全過才寫；`--check` 永遠不寫。"""
+    import json
+
+    import alpha.providers.stories as stories_mod
+    from alpha.cli import build_parser
+
+    written: list[str] = []
+
+    def fake_prepare(ticker, spec, **_kw):
+        return {"ticker": ticker}, (["故事〔需求〕 約 200 字，上限 160"] if ticker == "BAD" else [])
+
+    def fake_write(ticker, spec, **_kw):
+        written.append(ticker)
+        return {"ticker": ticker, "story_id": "st_x", "brief_id": spec.get("brief_id")}
+
+    monkeypatch.setattr(stories_mod, "prepare_story", fake_prepare)
+    monkeypatch.setattr(stories_mod, "write_story", fake_write)
+    batch = tmp_path / "batch.json"
+    batch.write_text(json.dumps([{"ticker": "COHR", "brief_id": "ib_a"}, {"ticker": "BAD", "brief_id": "ib_b"}]),
+                     encoding="utf-8")
+    run = lambda *argv: (lambda a: a.func(a))(build_parser().parse_args(["stories", *argv]))   # noqa: E731
+    assert run("--add", str(batch)) == 2 and written == []
+    assert run("--check", str(batch)) == 2 and written == []
+    good = tmp_path / "good.json"
+    good.write_text(json.dumps({"items": [{"ticker": "COHR", "brief_id": "ib_a"}]}), encoding="utf-8")
+    assert run("--check", str(good)) == 0 and written == []
+    assert run("--add", str(good)) == 0 and written == ["COHR"]

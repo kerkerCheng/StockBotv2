@@ -923,6 +923,18 @@ AnalystView.brief（optional）→ APP 首屏 briefCard；六張卡收進「為�
   （讀圖面板同一個函式）。比對索引在 `candidate_context` 一次建好（`bet_index`），候選板與個股頁同一個 `derive_row`。缺席由產生端宣告：
   Sheet 讀不到＝持有判定暫停（`upstream_unavailable`，不是「沒有共用」）；結構表讀不到＝需求錨這半邊沒比、層照比；走不到任何需求錨照實寫。
   欄位名不帶部位語彙（個股頁的 key 掃描：`held`、`holdings` 不得當欄位名）——「持有」只以 `state` 的值出現，與候選狀態同一個字。
+- **故事層與依據層（2026-10-29 個股頁 B；使用者看手機：「理由太冗長看不完」、同時「還是很 appreciate 這種說故事的方式」）**：
+  首屏印**故事**，敘事那一格原文降為**依據**，收進那一塊唯一的展開——兩種讀者（拿手機的人／查核的人）不再搶同一個句子（L12）。
+  故事是另一本 append-only ledger（`library/private/alpha/stories.jsonl`，`alpha/providers/stories.py`；規則 `alpha/narrative/story.py`），
+  **一筆對一版敘事（`brief_id`）**：七格各一句、只有故事的兩格（`revenue` 營收從哪來、`events` 最近發生什麼——自帶 `library/raw/` 引用，
+  page schema 以 `story_slots` 宣告、每格放一次、必須有 `pending` 退路）、候選理由一句（≤80 字）與缺 X 的短標（≤6 字，只有缺 X 寫）。
+  寫入端擋：每格 ≤160 字、完整日期與「M 月 D 日」、相對年、內部 id、系統詞、英文長串、長引文、禁字表；日期 placeholder 只准 `when`
+  的 `{next_checkpoint_date}`。read model 以 `story_at(brief_id, as_of=)` 取（INV-6：as-of 視角只看那時已寫的），builder 只在故事對的
+  是**現行那一版**時出 `story:<格>` Datum（依據格的引用照抄、`dependencies.basis_line` 指回依據）；compose 與敘事格同一個面板
+  （role `brief`）。**敘事換版，舊故事就不算數**：首屏退回印依據、⑤「故事還沒寫」多一檔（`engine_b/todo_ledger.py` 的 `todo.story`，
+  與 `python -m alpha stories --gaps` 同一個判定 `story_gaps`；涵蓋登記表從 `STORY_GAP_KINDS` 列舉）——過期是會自己出現的計數，
+  不是要人記得的事（L14）。它不 gate 任何東西、不寫 watch、不改候選狀態。寫法守則（擋不到的那四條＋前後對照）住
+  `skills/research-drain/SKILL.md`「段『故事』」。查證：`python -m alpha stories --gaps`。
 
 **為什麼數字用 placeholder：** session 打的數字會過期、會錯、會與 authority 不一致；placeholder 讓句子永遠
 讀到 materialize 當下的值，而且填不到時那一格自己現形（`partial`＋理由），不是留白。
