@@ -53,8 +53,12 @@ check 通過後**取鎖再開跑**（2026-09-02 起雙向互斥：排程 harvest
 ```powershell
 & '.venv\Scripts\python.exe' scripts\writer_guard.py acquire --minutes <預計時長> --purpose "research-drain"
 # …工作…
+& '.venv\Scripts\python.exe' -m webapp materialize --tracked --registry-listed --candidates   # 收尾重算（約 20 分鐘，背景跑）
 & '.venv\Scripts\python.exe' scripts\writer_guard.py release
 ```
+
+**收尾先重算、再放鎖，重算完重啟 8790 的 serve**（2026-10-29：判完的 watch、撤回的敘事只改了 registry 與 ledger，
+個股頁沒重算，首頁 8 張卡片照印早上 6 點的「敘事該重寫」——佇列早就清完，使用者卻問「該重寫為啥沒寫」，L13）。
 
 鎖有 TTL，session 崩潰最多卡排程一個 TTL；loop 模式每輪醒來重新 acquire（同 owner 是續期）。
 
