@@ -1,0 +1,49 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1047127/000104712726000052/amkr-20260930.htm
+Source URL (EX-99.1 press release): https://www.sec.gov/Archives/edgar/data/1047127/000104712726000049/amkr9302026erex-991.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Amkor Technology 10-Q（2026-09-30 季度，2026-10-27 申報）＋ Q3 2026 財報新聞稿（8-K EX-99.1，2026-10-26）——營收、產品別、終端市場占比、客戶預付、合約負債、資本支出、亞利桑那廠、現金與借款、第四季指引
+DATE: 2026-10-27（10-Q）／2026-10-26（新聞稿）
+RETRIEVED: 2026-10-29（SEC EDGAR 原文 HTML 本機抽字、空白正規化；表格儲存格以空白分隔，逐字）
+NOTE: 發行人自己的申報（L8：客戶預付與產能協議的金額是發行人揭露；客戶未具名）。
+
+【10-Q Note：Net sales by product（in thousands；三個月 2026／2025；九個月 2026／2025）】
+"Advanced products (1) $ 1,631,580 $ 1,683,505 $ 4,560,257 $ 3,975,800"
+"Mainstream products (2) 358,977 303,463 1,012,966 844,135"
+"Total net sales $ 1,990,557 $ 1,986,968 $ 5,573,223 $ 4,819,935"
+"(1) Advanced products include flip chip, memory and wafer-level processing and related test services."
+
+【10-Q Note：Net sales by end market（三個月 2026／2025；九個月 2026／2025）】
+"Communications (smartphones, tablets) 37 % 51 % 40 % 44 %"
+"Computing (data center, infrastructure, PC/laptop, storage) 26 % 19 % 23 % 21 %"
+"Automotive, industrial and other (ADAS, electrification, infotainment, safety) 22 % 16 % 22 % 19 %"
+"Consumer (AR & gaming, connected home, home electronics, wearables) 15 % 14 % 15 % 16 %"
+
+【10-Q MD&A：Net sales】
+"The computing and automotive and industrial end markets both grew 37% for the three months ended September 30, 2026 compared to 2025, primarily due to strength in datacenter and ADAS applications. The communications end market decreased 28% for the three months ended September 30, 2026 compared to 2025, primarily driven by timing for transfer of SiP programs from our factories in Korea to Vietnam and related preproduction activities."
+
+【10-Q Note：Contract Liabilities】
+"Contract liabilities were $547.6 million and $390.8 million as of September 30, 2026 and December 31, 2025, respectively."
+"As of September 30, 2026, $200.0 million of standby letters of credit were issued and outstanding related to customer advance payments received."
+
+【10-Q MD&A：Liquidity】
+"As of September 30, 2026, we had cash and cash equivalents and short-term investments of $2,376.2 million."
+"We enter into customer advance payment agreements from time to time, some of which require standby letters of credit. As of September 30, 2026, we expect to receive approximately $1.9 billion of customer advance payments in the next 12 months, $200 million of which will require a standby letter of credit upon receipt. In October 2026, we entered into an advance payment agreement with a customer pursuant to which we expect to receive approximately $1.3 billion in 2027."
+"We expect that our 2026 capital expenditures will be approximately $2.5 billion. The increase from 2025 is primarily due to the construction of the Arizona Facility."
+"Our capital expenditures totaled $1,236.8 million for the nine months ended September 30, 2026 compared to $472.5 million for the nine months ended September 30, 2025."
+
+【10-Q Note：Arizona Facility】
+"As of September 30, 2026, we incurred costs of $553.3 million, including capitalized interest of $8.5 million, related to construction of the Arizona Facility."
+
+【10-Q Risk Factors：Debt；Customers】
+"As of September 30, 2026, our total debt balance was $2,467.2 million, of which $149.5 million was classified as a current liability and $845.8 million was collateralized indebtedness."
+"Our ten largest customers accounted for, in the aggregate, 72% of our net sales for the year ended December 31, 2025."
+
+【EX-99.1 新聞稿：Quarterly Financial Results（$ in millions；Q3 2026／Q2 2026／Q3 2025）】
+"Net sales $1,991 $1,898 $1,987"
+"Gross margin 18.3% 16.8% 14.3%"
+"“Amkor delivered a strong quarter, with record revenue in Computing and Automotive & Industrial end markets and continued margin expansion, despite expected weakness in Communications,” said Kevin Engel, Amkor’s president and chief executive officer. “We are executing on our strategy, advancing key customer programs and benefiting from expanding customer commitments that improve visibility and support disciplined investment to meet future demand.”"
+
+【EX-99.1 新聞稿：Business Outlook（第四季 2026）】
+"•Net sales of $1.9 billion to $2.0 billion"
+"•Gross margin of 18.0% to 19.0%"
