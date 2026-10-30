@@ -816,3 +816,42 @@ def test_load_board_reads_the_graph_once_and_says_when_it_could_not(board_env, _
     board = load_board([T], today=TODAY, holdings_loader=cash)
     assert board["new_edges_check"]["status"] == "unavailable" and "SystemExit" in board["new_edges_check"]["reason"]
     assert board["narrative_rewrite"] == []
+# ---------------------------------------------------------------------------
+# 缺 X 三分法與文件請求（ROADMAP「缺 X 三分法與文件請求上限」；failure log #117；2026-10-30）
+# ---------------------------------------------------------------------------
+
+def test_missing_kind_is_declared_only_on_missing_and_open_document_requests_ride_the_row() -> None:
+    """`missing_kind` 只有缺 X 能帶、字彙封閉、沒寫就不進 payload（舊紀錄的 brief_id 不變）；待辦池開著的文件請求併到列上，
+    計數分「已開口／可拿未開口／未分」；池沒讀到（None）前兩格是 None＝未算，不印 0（INV-3）。"""
+    from alpha.candidates import missing_request_counts
+    from alpha.errors import ContractViolation
+    from alpha.narrative.contracts import CandidateState
+
+    with pytest.raises(ContractViolation, match="missing_kind 只有"):
+        CandidateState(state="open", missing_kind="filing")
+    with pytest.raises(ContractViolation, match="missing_kind 必須是"):
+        CandidateState(state="missing", watch_id="ew_1", missing_kind="broker")
+    assert "missing_kind" not in CandidateState(state="missing", watch_id="ew_1").as_dict()
+    assert CandidateState(state="missing", watch_id="ew_1", missing_kind="user_document").as_dict()["missing_kind"] == "user_document"
+
+    rec = brief_record(company_id=CO, ticker=T, slots=_slots(), record_version=RECORD_VERSION_V2,
+                       rides=[{"node": "tech:x", "unit": "layer", "reading_id": READ}],
+                       answers={"priced_in": "yes", "in_numbers": "yes"},
+                       candidate_state={"state": "missing", "watch_id": "ew_1", "reason": "客戶具名", "missing_kind": "user_document"},
+                       created_at=datetime(2026, 9, 29, 3, tzinfo=timezone.utc))
+    brief = parse_brief_record(rec)
+    assert brief.candidate_state.missing_kind == "user_document"
+    watches = [_active("ew_1", kind="date", wake_brief=CO, until="2026-11-14")]
+    asked = derive_row(T, CO, records=[brief], today=TODAY, reading_rows=_rows(), watches=watches, lifecycle={}, edge=EDGE,
+                       three_questions=_tq(), held=HELD_NONE, open_document_requests=[897])
+    unasked = _derive([brief], watches=watches)                  # 沒給池（單檔頁、測試）＝None
+    assert asked["group"] == "missing" and asked["missing_kind"] == "user_document" and asked["document_requests"] == [897]
+    assert unasked["document_requests"] is None
+    assert missing_request_counts([asked]) == {"asked": 1, "fetchable_unasked": 0, "unclassified": 0}
+    assert missing_request_counts([dict(asked, document_requests=[])]) == {"asked": 0, "fetchable_unasked": 1, "unclassified": 0}
+    assert missing_request_counts([unasked]) == {"asked": None, "fetchable_unasked": None, "unclassified": 0}
+    legacy = _derive([_brief(state="missing", watch_id="ew_1")], watches=watches)
+    assert legacy["missing_kind"] is None
+    assert missing_request_counts([dict(legacy, document_requests=[])]) == {"asked": 0, "fetchable_unasked": 0, "unclassified": 1}
+    board = assemble_board([dict(asked), dict(legacy, document_requests=[])], universe=[T], held=HELD_NONE, narrative_rewrite=[])
+    assert board["counts"]["missing_asked"] == 1 and board["counts"]["missing_unclassified"] == 1

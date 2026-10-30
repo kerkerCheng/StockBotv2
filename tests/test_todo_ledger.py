@@ -181,7 +181,7 @@ def test_kinds_the_ledger_does_not_own_are_not_counted_twice() -> None:
 
 
 @pytest.mark.parametrize("candidates, note", [
-    (None, "候選板未讀到——騎舊讀圖、新邊沒讀、前提失效沒算進來"),
+    (None, "候選板未讀到——騎舊讀圖、新邊沒讀、已回落、前提失效沒算進來"),
     ({"counts": {}, "narrative_rewrite": [], "new_edges_check": {"status": "unavailable", "reason": "SystemExit"}},
      "新邊沒讀這次沒算（候選板沒讀到圖）"),
     ({"counts": {}, "narrative_rewrite": []}, "新邊沒讀這次沒算（候選板沒讀到圖）"),   # 改版前的舊 artifact

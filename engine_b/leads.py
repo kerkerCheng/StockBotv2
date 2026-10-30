@@ -1040,6 +1040,12 @@ def trace_backlog(store: dict[str, Any]) -> list[dict[str, Any]]:
             "unreachable_reason": reason,
             "review_title": refs.get("trace_review_title"),
             "review_hint": refs.get("trace_review_hint"),
+            # 缺 X 三分法 ④（2026-10-30）：公司、管道、搜尋字、日期區間、拿到能不能翻候選狀態——跟著 lead refs 走到待辦池
+            "review_company": refs.get("trace_review_company"),
+            "review_channel": refs.get("trace_review_channel"),
+            "review_search": refs.get("trace_review_search"),
+            "review_window": refs.get("trace_review_window"),
+            "review_flips_state": refs.get("trace_review_flips_state"),
         })
     return sorted(rows, key=lambda row: (not row["requires_user"], row["lead_id"]))
 

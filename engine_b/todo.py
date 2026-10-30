@@ -209,6 +209,73 @@ def document_requests(pool: Mapping[str, Any]) -> list[dict[str, Any]]:
     return [item for item in _awaiting_user(pool) if is_document_request(item)]
 
 
+#: 同時開著的文件請求上限 K（2026-10-30 使用者「好 可以」定 5：注意力預算，照 G7 每日硬上限的形狀；failure log #117）。
+#: **程式只印不擋**：上限由 research-drain 執行（額度滿了只在敘事標 `missing_kind=user_document`、不鑄）。
+DOCUMENT_REQUEST_DISPLAY_LIMIT = 5
+
+
+def _flips_state(item: Mapping[str, Any]) -> bool:
+    return str(item.get("flips_state") or "").strip().lower() in {"1", "true", "yes"}
+
+
+def document_request_order(items: Iterable[Mapping[str, Any]]) -> list[dict[str, Any]]:
+    """③b 的順序：拿到就能翻候選狀態（可開／不要）的先，再按開口時間（最早開的先）——不是分數，不跨檔比研究價值。"""
+    return sorted((dict(i) for i in items),
+                  key=lambda i: (not _flips_state(i), str(i.get("added_at") or ""), int(i["n"])))
+
+
+def group_document_requests(items: Iterable[Mapping[str, Any]]) -> list[tuple[str, list[dict[str, Any]]]]:
+    """按管道分組（元大／凱基／嘉信／IB…，lead ref `trace_review_channel`）；沒標的歸「未標管道」。保持傳入順序。"""
+    groups: dict[str, list[dict[str, Any]]] = {}
+    for item in items:
+        groups.setdefault(str(item.get("channel") or "未標管道"), []).append(dict(item))
+    return list(groups.items())
+
+
+def document_request_subject(item: Mapping[str, Any]) -> str:
+    """分組行裡的主詞：標題開頭的「公司（代號）」；沒有括號就取標題前 12 字——不印 `co:*`（AGENTS：不假設使用者能還原主詞）。"""
+    title = " ".join(str(item.get("title") or "").split()).removeprefix("向你要文件：")
+    match = re.match(r"^(.{1,28}?[（(][^）)]{1,12}[）)])", title)        # 「CECO Environmental（CECO）」要裝得下
+    return match.group(1) if match else title[:12]
+
+
+def document_request_cell(item: Mapping[str, Any]) -> str:
+    """分組行的一格：`[n] 主詞 搜「…」 日期區間`（搜尋字與日期區間來自 lead refs；沒標就只印主詞）。"""
+    bits = [f"[{item['n']}] {document_request_subject(item)}"]
+    if item.get("search"):
+        bits.append(f"搜「{item['search']}」")
+    if item.get("window"):
+        bits.append(str(item["window"]))
+    if _flips_state(item):
+        bits.append("拿到能翻候選狀態")
+    return " ".join(bits)
+
+
+def _resolution_verb(item: Mapping[str, Any]) -> str | None:
+    res = item.get("resolution")
+    return str(res.get("verb")) if isinstance(res, Mapping) else (str(res) if res else None)
+
+
+def document_request_scorecard(pool: Mapping[str, Any], *, state_by_company: Mapping[str, str] | None
+                               ) -> dict[str, int | None]:
+    """文件請求計分（ROADMAP「缺 X 三分法與文件請求上限」⑤，2026-10-30）——只數池裡 `source_trace_review` 的終局，不判好壞：
+    開了／你給了（`user_document`）／沒有（drop）／還在等（未結案）／讀完交報告（dispatch completed）／之後候選狀態不再是缺 X
+    （結案且標了公司的，對照候選板現行分組——只對照、不證明是文件解的）／未標公司（算不進最後一格的）。
+    `state_by_company`＝None 時最後一格回 None（候選板沒讀到＝未算，不是 0）。"""
+    items = [i for i in pool.get("items") or () if is_document_request(i)]
+    out: dict[str, int | None] = {
+        "opened": len(items), "given": sum(1 for i in items if i.get("user_document")),
+        "dropped": sum(1 for i in items if _resolution_verb(i) == "drop"),
+        "waiting": sum(1 for i in items if not i.get("resolved_at")),
+        "reported": sum(1 for i in items if i.get("dispatch_status") == "completed"),
+        "untagged": sum(1 for i in items if not i.get("company_id")),
+    }
+    tagged = [i for i in items if i.get("company_id") and i.get("resolved_at")]
+    out["state_changed"] = (None if state_by_company is None else
+                            sum(1 for i in tagged if state_by_company.get(str(i["company_id"])) not in (None, "missing")))
+    return out
+
+
 def _key(item_type: str, ref_id: str) -> tuple[str, str]:
     return (item_type, ref_id)
 
@@ -1625,6 +1692,10 @@ def sync(
             item["company_id"] = str(row["company_id"])
         if row.get("ticker"):
             item["ticker"] = str(row["ticker"])
+        # 向你要文件的管道、搜尋字、日期區間、拿到能不能翻候選狀態（缺 X 三分法 ④，2026-10-30）：既有 item 下一次 sync 一併補上
+        for key in ("channel", "search", "window", "flips_state"):
+            if row.get(key):
+                item[key] = str(row[key])
         # 反證被判觸及（C3）：item 記下它涵蓋的 watch_id；有新的觸及時，若它躺在「等事件」區就叫回來
         # （比照 `watch_wake`）——否則觸及會安靜地躺在等事件那一區。
         if row.get("disproof_watch_ids"):
@@ -1993,9 +2064,11 @@ def _collect_source_trace_rows() -> list[dict[str, Any]]:
 
     from engine_b.leads import load, trace_backlog
 
-    rows = trace_backlog(load())
-    return [
-        {
+    out: list[dict[str, Any]] = []
+    for row in trace_backlog(load()):
+        if not row["requires_user"]:
+            continue
+        item: dict[str, Any] = {
             "type": "source_trace_review",
             "ref_id": row["lead_id"],
             "title": str(
@@ -2009,9 +2082,15 @@ def _collect_source_trace_rows() -> list[dict[str, Any]]:
             ),
             "source": "source_trace",
         }
-        for row in rows
-        if row["requires_user"]
-    ]
+        # 缺 X 三分法 ④（2026-10-30）：公司、管道、搜尋字、日期區間、拿到能不能翻候選狀態——跟著 lead refs 走到
+        # 狀態塊的「已開口」與 ③b 的分組行（L16）。**有寫才帶**：沒標的 item 不出現這幾個鍵（分組行印「未標管道」、
+        # 段 3 印「未標公司」），collector 列的形狀對既有來源一字不變。
+        for key, src in (("company_id", "review_company"), ("channel", "review_channel"), ("search", "review_search"),
+                         ("window", "review_window"), ("flips_state", "review_flips_state")):
+            if row.get(src):
+                item[key] = str(row[src])
+        out.append(item)
+    return out
 
 
 def collect_from_research_actions() -> list[dict[str, Any]]:

@@ -81,7 +81,10 @@ STATE_SCHEMA_VERSIONS: dict[str, str] = {
     # /2（2026-10-02 Phase 5 Step 5.5）：多 `theme_cohort` 段與 `excess_{h}d_vs_theme_cohort` 格（第三個基準）。
     # /3（2026-10-06 多主題等權組 S1）：`theme_cohort` 改成 `{mode, cohorts: [...], absence}`；每則點名只跟自己所屬的組比。
     "account_scorecard": "stockbot-app/account_scorecard/3",
-    "candidates": "stockbot-app/candidates/1",
+    # /2（2026-10-30 等回落的價格叫醒＋缺 X 三分法）：列多 `pulled_back`／`missing_kind`／`document_requests`，counts 多
+    # `priced_wait_pulled_back`、`priced_wait_unknown`、`missing_asked`、`missing_fetchable_unasked`、`missing_unclassified`，
+    # 板多 `document_requests_check`，清單多 `kind=pulled_back`。
+    "candidates": "stockbot-app/candidates/2",
     # 2026-10-07（個股頁 plan S4b）：層說明的純文字閱讀頁——ledger 全文、出處與文件自宣告、每條主張的 watch 狀態、
     # 哪幾頁連過來 → 9。不做版面與示意圖（S5）。
     "layer_notes": "stockbot-app/layer_notes/1",

@@ -309,6 +309,12 @@ class BriefSlot:
 #: 候選狀態（Phase 3 Step 3.4，使用者定案 #2）。寫的人能宣告的只有前四個；**`held`（已持有）一律由 Sheet 推導**，不收。
 CANDIDATE_STATES_DECLARABLE: tuple[str, ...] = ("open", "missing", "priced_wait", "pass")
 CANDIDATE_STATES: tuple[str, ...] = (*CANDIDATE_STATES_DECLARABLE, "held")
+#: 缺 X 的三分法（2026-10-30 使用者「好 可以」；failure log #117；ROADMAP「缺 X 三分法與文件請求上限」②）：
+#: `filing`＝X 會在下一份公開文件出現（等事件）、`layer`＝X 是層的問題（層深讀的入口）、`user_document`＝X 可能寫在使用者
+#: 拿得到的券商報告／法說 memo 裡（向使用者要文件；同時開著的請求上限由 drain 執行、程式只印）。只有 `missing` 能帶；
+#: 舊紀錄沒寫＝「未分」，不壓成任何一種（L12）。
+MISSING_KINDS: tuple[str, ...] = ("filing", "layer", "user_document")
+MISSING_KIND_LABELS: dict[str, str] = {"filing": "等 filing", "layer": "層的問題", "user_document": "你去券商拿得到"}
 #: 三題中由寫的人宣告的兩題（會死嗎由四盞燈機械回答，不由人答）。
 ANSWER_KEYS: tuple[str, ...] = ("priced_in", "in_numbers")
 ANSWER_VALUES: tuple[str, ...] = ("yes", "no", "unmeasurable")
@@ -422,6 +428,8 @@ class CandidateState:
     state: str
     watch_id: str | None = None
     reason: str | None = None
+    #: 缺 X 的三分（`MISSING_KINDS`，2026-10-30）：只有 state=missing 能帶；None＝未分（舊敘事沒寫，重寫時補）
+    missing_kind: str | None = None
 
     def __post_init__(self) -> None:
         if self.state == "held":
@@ -432,9 +440,17 @@ class CandidateState:
             raise ContractViolation(f"candidate_state={self.state} 必須帶 watch_id（缺 X／等回落都要指向一筆在等的 watch）")
         if self.state == "pass" and not str(self.reason or "").strip():
             raise ContractViolation("candidate_state=pass 必須帶 reason（「不要」附理由、append-only）")
+        if self.missing_kind is not None:
+            if self.state != "missing":
+                raise ContractViolation(f"missing_kind 只有 candidate_state=missing 能帶（收到 state={self.state!r}）")
+            if self.missing_kind not in MISSING_KINDS:
+                raise ContractViolation(f"missing_kind 必須是 {MISSING_KINDS} 之一（收到 {self.missing_kind!r}）")
 
     def as_dict(self) -> dict[str, Any]:
-        return {"state": self.state, "watch_id": self.watch_id, "reason": self.reason}
+        out: dict[str, Any] = {"state": self.state, "watch_id": self.watch_id, "reason": self.reason}
+        if self.missing_kind is not None:        # 沒寫就不進 payload——舊紀錄的 brief_id 是從這個 dict 算出來的，不能變
+            out["missing_kind"] = self.missing_kind
+        return out
 
 
 @dataclass(frozen=True, slots=True)
@@ -775,7 +791,8 @@ def _parse_v2_fields(raw: Mapping[str, Any]) -> dict[str, Any]:
                if isinstance(ans, Mapping) else None)
     cs = raw.get("candidate_state")
     candidate = (CandidateState(state=str(cs.get("state") or ""), watch_id=(str(cs["watch_id"]) if cs.get("watch_id") else None),
-                                reason=(str(cs["reason"]) if cs.get("reason") else None))
+                                reason=(str(cs["reason"]) if cs.get("reason") else None),
+                                missing_kind=(str(cs["missing_kind"]) if cs.get("missing_kind") else None))
                  if isinstance(cs, Mapping) else None)
     hnc = raw.get("history_not_comparable")
     history = (HistoryNotComparable(since=_iso_day(hnc.get("since"), "history_not_comparable.since"),

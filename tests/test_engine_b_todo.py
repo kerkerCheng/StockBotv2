@@ -1338,3 +1338,26 @@ def test_a_recommendation_is_advice_written_on_the_item_and_never_resolves_it() 
     todo.resolve(pool, n_manual, "drop", reason="x", receipt="authority:user_directive;ref:test")
     with pytest.raises(todo.TodoError):
         todo.recommend(pool, n_manual, "go", reason="已結案的不收")
+def test_document_requests_group_by_channel_order_flips_first_and_score_their_outcomes() -> None:
+    """缺 X 三分法 ④⑤（2026-10-30）：③b 按管道分組、拿到能翻候選狀態的先（再按開口時間）；計分只數終局、最後一格對照候選板，
+    候選板沒讀到就 None（未算），不是 0。"""
+    a = {"n": 1, "type": "source_trace_review", "title": "向你要文件：華城（1519）AIDC 客戶",
+         "added_at": "2026-10-30T09:00:00+00:00", "channel": "元大／凱基", "search": "華城（或 1519）",
+         "window": "2026-07-01～10-30", "flips_state": "false", "company_id": "co:fortune_electric"}
+    b = {"n": 2, "type": "source_trace_review", "title": "向你要文件：全新光電法說簡報",
+         "added_at": "2026-10-06T00:00:00+00:00", "channel": "元大／凱基", "flips_state": "true",
+         "company_id": "co:visual_photonics", "resolved_at": "2026-10-20T00:00:00+00:00",
+         "resolution": {"verb": "go"}, "user_document": "inbox/x.pdf", "dispatch_status": "completed"}
+    c = {"n": 3, "type": "source_trace_review", "title": "向你要文件：CECO 排放系統占比",
+         "added_at": "2026-10-30T09:00:00+00:00", "resolved_at": "2026-10-30T10:00:00+00:00", "resolution": "drop"}
+    ordered = todo.document_request_order([a, b, c])
+    assert [i["n"] for i in ordered] == [2, 1, 3]
+    assert [(k, [i["n"] for i in v]) for k, v in todo.group_document_requests(ordered)] == [
+        ("元大／凱基", [2, 1]), ("未標管道", [3])]
+    assert todo.document_request_cell(a) == "[1] 華城（1519） 搜「華城（或 1519）」 2026-07-01～10-30"
+    assert todo.document_request_cell(b) == "[2] 全新光電法說簡報 拿到能翻候選狀態"
+    pool = {"items": [a, b, c]}
+    score = todo.document_request_scorecard(
+        pool, state_by_company={"co:visual_photonics": "priced_wait", "co:fortune_electric": "missing"})
+    assert score == {"opened": 3, "given": 1, "dropped": 1, "waiting": 1, "reported": 1, "untagged": 1, "state_changed": 1}
+    assert todo.document_request_scorecard(pool, state_by_company=None)["state_changed"] is None

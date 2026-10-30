@@ -55,10 +55,14 @@ REWRITE_STATE_WORDS: Mapping[str, str] = {"fired": "醒來", "touched": "觸及"
 #: 寫的一方（`alpha.providers.candidates.derive_row`）與分類的一方（`REWRITE_WHY`）共用這兩個字串（L16）。
 RIDES_SUPERSEDED_PREFIX = "騎的讀圖已換版"
 NEW_EDGES_PREFIX = "圖上有新邊、敘事沒讀過"
+#: 等回落的價格叫醒（ROADMAP「等回落的價格叫醒」；failure log #116；2026-10-30 使用者照推薦定案：錨只有一個＝最後一次宣告
+#: 已定價那天）：收盤低於那天的收盤＝「已回落」，`rewrite[]` 多這一條、進 ⑤「敘事該重寫」重問——只叫醒，不判定、不給動作、
+#: 不排序、不改候選狀態。
+PULLED_BACK_PREFIX = "已回落"
 #: 候選列 `rewrite[]` 每一條 → 首頁卡片與個股頁那一行的幾個字（2026-10-29 使用者：「該重寫為啥沒寫…可以五字一目瞭然嗎」）。
 #: 依序比對、先中先贏；原句（含 watch 編號）照舊留在 `rewrite[]`，這裡只分類、不改判斷；認不得的歸「其他」，不丟（INV-3）。
 REWRITE_WHY: tuple[tuple[str, str], ...] = (
-    (RIDES_SUPERSEDED_PREFIX, "騎舊讀圖"), (NEW_EDGES_PREFIX, "新邊沒讀"),
+    (RIDES_SUPERSEDED_PREFIX, "騎舊讀圖"), (NEW_EDGES_PREFIX, "新邊沒讀"), (PULLED_BACK_PREFIX, "已回落"),
     ("連結 ", "連結斷了"), ("觸及", "條件觸及"), ("醒來", "條件醒了"), ("到期", "到期了"), ("已到", "重看日到了"),
     ("不存在", "等待不見了"), ("在等的 watch 已", "等待結束了"),
 )
@@ -416,6 +420,41 @@ def priced_since(ticker: str, brief: InvestorBrief, judged: InvestorBrief, *, ju
 
 
 # ---------------------------------------------------------------------------
+# 等回落的價格叫醒（ROADMAP；failure log #116）與缺 X 三分法（failure log #117）的常駐計數——2026-10-30
+# ---------------------------------------------------------------------------
+
+def pulled_back(info: Mapping[str, Any] | None) -> bool | None:
+    """等回落的價格叫醒：收盤是否低於**最後一次宣告已定價那天**的收盤（`priced_since.return_since` 的基準就是那一天，
+    重新宣告就重設）。算不出來（bars 沒給、判斷日量不到）回 None——「沒算」與「沒回落」不同形（INV-3）。"""
+    ret = (info or {}).get("return_since")
+    return None if ret is None else bool(float(ret) < 0)
+
+
+def pulled_back_reason(info: Mapping[str, Any]) -> str:
+    """`rewrite[]` 那一條。**不帶 %**：那個數字每天變，而 `rewrite[]` 進候選板的認知指紋（Daily 的「認知變了」）；
+    % 在同一列的 `priced_since.line` 與心跳／短版的等回落行（首次等待以來的 % 只當脈絡、不叫醒）。"""
+    return f"{PULLED_BACK_PREFIX}：收盤低於最後一次宣告已定價那天（{str(info.get('judgment_day'))[5:10]}）的收盤，重問已定價"
+
+
+def pullback_counts(wait_rows: Iterable[Mapping[str, Any]]) -> dict[str, int]:
+    """等回落那一組的常駐計數：已回落幾檔、沒算幾檔（舊 artifact 的列沒有這個鍵也算沒算）。"""
+    rows = list(wait_rows)
+    return {"pulled_back": sum(1 for r in rows if r.get("pulled_back") is True),
+            "unknown": sum(1 for r in rows if r.get("pulled_back") is None)}
+
+
+def missing_request_counts(missing_rows: Iterable[Mapping[str, Any]]) -> dict[str, int | None]:
+    """缺 X 那一組的常駐計數（三分法 ①）：已開口（待辦池裡有開著的文件請求）、可拿但未開口（`missing_kind=user_document`
+    而沒有開著的請求）、未分（敘事沒寫三分）。任一列的 `document_requests` 是 None（池沒讀到、舊 artifact）→ 前兩格 None＝未算。"""
+    rows = list(missing_rows)
+    known = all(r.get("document_requests") is not None for r in rows)
+    return {"asked": sum(1 for r in rows if r.get("document_requests")) if known else None,
+            "fetchable_unasked": (sum(1 for r in rows if r.get("missing_kind") == "user_document"
+                                      and not r.get("document_requests")) if known else None),
+            "unclassified": sum(1 for r in rows if not r.get("missing_kind"))}
+
+
+# ---------------------------------------------------------------------------
 # 整板與 rollup
 # ---------------------------------------------------------------------------
 
@@ -514,6 +553,9 @@ def assemble_board(rows: Sequence[Mapping[str, Any] | None], *, universe: Sequen
               **{s: len(sides[s]) for s in SIDE_GROUPS}, "no_narrative": no_narrative}
     oldest = {g: max((r["stall_days"] for r in groups[g] if isinstance(r.get("stall_days"), int)), default=None)
               for g in ("open", "missing", "priced_wait")}
+    # 等回落的價格叫醒與缺 X 三分法（2026-10-30）：兩組各自的常駐計數器——算法只有一份（心跳段 2／短版 ④ 讀列重算同一條）
+    counts.update({f"priced_wait_{k}": v for k, v in pullback_counts(groups["priced_wait"]).items()},
+                  **{f"missing_{k}": v for k, v in missing_request_counts(groups["missing"]).items()})
     return {"groups": groups, "side_groups": sides, "counts": counts, "oldest_stall_days": oldest,
             "universe": sorted(universe),
             "holdings": {"status": held.get("status"), "reason": held.get("reason"),
@@ -526,9 +568,10 @@ def assemble_board(rows: Sequence[Mapping[str, Any] | None], *, universe: Sequen
 
 __all__ = ["ANSWER_WORDS", "CANDIDATES_THIS_IS_NOT", "GROUPS", "GROUP_LABELS", "IN_NUMBERS_LINES", "LIGHT_ORDER",
            "LIGHT_WORDS", "LIST_GROUPS", "LIST_GROUP_LABELS", "NEW_EDGES_PREFIX", "PRICED_IN_LINES",
-           "REWRITE_STATE_WORDS", "REWRITE_WHY", "RIDES_SUPERSEDED_PREFIX", "SIDE_GROUPS", "SIDE_LABELS", "UNANSWERED",
+           "PULLED_BACK_PREFIX", "REWRITE_STATE_WORDS", "REWRITE_WHY", "RIDES_SUPERSEDED_PREFIX", "SIDE_GROUPS", "SIDE_LABELS", "UNANSWERED",
            "WIPEOUT_LINES", "Cited", "assemble_board", "body_key", "body_version", "cap_label", "cited_identities",
            "edge_note",
-           "held_index", "judgment_version", "new_edge_reason", "normalize_url", "priced_judgment_key", "priced_since",
+           "held_index", "judgment_version", "missing_request_counts", "new_edge_reason", "normalize_url",
+           "priced_judgment_key", "priced_since", "pullback_counts", "pulled_back", "pulled_back_reason",
            "rewrite_words", "rides_reason", "rollup", "squash", "stall_since", "stall_version", "three_words",
            "unread_new_edges"]

@@ -20,8 +20,8 @@ from typing import Any, Callable, Mapping, Sequence
 from ..candidates import (
     ANSWER_WORDS, CANDIDATES_THIS_IS_NOT, GROUP_LABELS, GROUPS, IN_NUMBERS_LINES, PRICED_IN_LINES,
     REWRITE_STATE_WORDS, SIDE_GROUPS, SIDE_LABELS, UNANSWERED, assemble_board, body_version, cap_label,
-    cited_identities, edge_note, held_index, judgment_version, new_edge_reason, priced_since, rewrite_words, rides_reason,
-    rollup,
+    cited_identities, edge_note, held_index, judgment_version, new_edge_reason, priced_since, pulled_back,
+    pulled_back_reason, rewrite_words, rides_reason, rollup,
     squash, stall_since, stall_version, three_words, unread_new_edges,
 )
 from ..narrative.contracts import RECORD_VERSION_V2, InvestorBrief, select_brief
@@ -216,6 +216,7 @@ def derive_row(ticker: str, company_id: str | None, *, records: Sequence[Investo
                stories: Mapping[str, Mapping[str, Any]] | None = None,
                company_assertions: Sequence[Mapping[str, Any]] | None = None,
                raw_text: Callable[[str], str] | None = None,
+               open_document_requests: Sequence[int] | None = None,
                ) -> dict[str, Any] | None:
     """一檔的候選狀態。沒有敘事、也沒有持有 → None（不上板，計數另印「無敘事」）。
 
@@ -260,6 +261,13 @@ def derive_row(ticker: str, company_id: str | None, *, records: Sequence[Investo
         "held_source": dict(held_info) if held_info else None,
         "holdings_verified": held.get("status") == "ok",
         "rides": [], "watch": None, "since": None, "stall_days": None,
+        # 缺 X 三分法（2026-10-30）：敘事宣告的 missing_kind（filing／layer／user_document；舊敘事沒寫＝None「未分」）
+        "missing_kind": cs.missing_kind if cs else None,
+        # 待辦池裡還開著、標了這家公司的「向你要文件」編號（load_board 讀池；None＝池沒讀到或單檔頁沒帶，不是 0）
+        "document_requests": (sorted(int(n) for n in open_document_requests)
+                              if open_document_requests is not None else None),
+        # 等回落的價格叫醒（2026-10-30）：收盤低於最後一次宣告已定價那天的收盤；None＝沒算（不是等回落、或 bars 沒給）
+        "pulled_back": None,
         # 加碼條件（Phase 7 Step 7.0d）：每條與它的 watch 狀態；觸及只提醒，不是買進訊號、不改候選狀態
         "confirm": [], "confirm_summary": None,
         # 是不是新賭注（Phase 7 Step 7.0e）：和持有的 alpha 檔共用的需求錨與層——只呈現，不進任何狀態判斷
@@ -338,7 +346,6 @@ def derive_row(ticker: str, company_id: str | None, *, records: Sequence[Investo
         row["rewrite_new_edges"] = unread_new_edges(company_assertions, since=body_version(records, brief).created_at,
                                                     cited=cited, cited_text=text)
         row["rewrite"].extend(new_edge_reason(e) for e in row["rewrite_new_edges"])
-    row["rewrite_words"] = rewrite_words(row["rewrite"])
     since = stall_since(records, brief)
     row["since"] = since.isoformat()
     # 「今天」是排程時區的今天；since 是 UTC 時戳——換到同一個時區再相減，否則台北 00:00–08:00 寫的會多算一天。
@@ -347,6 +354,14 @@ def derive_row(ticker: str, company_id: str | None, *, records: Sequence[Investo
     row["priced_since"] = (_priced_since_row(ticker, records, brief, three_questions=three_questions, today=today,
                                              own_history_at=own_history_at, bars_at=bars_at)
                            if own_history_at is not None and bars_at is not None else None)
+    # 等回落的價格叫醒（ROADMAP「等回落的價格叫醒」；failure log #116；2026-10-30 使用者照推薦定案）：錨只有一個＝
+    # **最後一次宣告已定價那天**（`judgment_version`——重新宣告就重設；首次等待日只印當脈絡、不叫醒）。收盤低於那天的收盤
+    # ＝已回落：`rewrite[]` 多一條、進 ⑤「敘事該重寫」重問——只叫醒，不判定、不給動作、不排序、不改候選狀態。
+    if cs.state == "priced_wait":
+        row["pulled_back"] = pulled_back(row["priced_since"])
+        if row["pulled_back"]:
+            row["rewrite"].append(pulled_back_reason(row["priced_since"]))
+    row["rewrite_words"] = rewrite_words(row["rewrite"])
     if row["group"] == "held":
         return row
     state = (edge or {}).get("state")
@@ -470,8 +485,9 @@ def board_rewrite(rows: Sequence[Mapping[str, Any] | None], breaks: Sequence[Map
     """整板「敘事該重寫」清單：連結斷了（全部現行 v2 敘事，`link_breaks`）＋各列的敘事來源 watch 待重寫
     ＋**沒有列帶著的**待重寫 watch（現行敘事已撤回、是 v1、或根本沒有敘事——那家公司不在板上或那一列不是 v2，
     watch 仍在 narrative_rewrite 段；3.6 覆核：只收現行 v2 列會讓它們在板上消失、audit 卻報「那一列沒帶著」）
-    ＋騎舊讀圖（`kind=rides`，一份讀圖一筆）＋新邊沒讀（`kind=new_edges`，一家公司一筆、帶邊與要讀的文件）——
-    心跳 ⑤「敘事該重寫」讀這份清單的後兩種，不自己再算（ROADMAP「敘事 stale 計數器」同源，2026-10-29）。"""
+    ＋騎舊讀圖（`kind=rides`，一份讀圖一筆）＋新邊沒讀（`kind=new_edges`，一家公司一筆、帶邊與要讀的文件）
+    ＋已回落（`kind=pulled_back`，一檔一筆、只帶錨那一天——每天變的 % 不進清單，2026-10-30）——
+    心跳 ⑤「敘事該重寫」讀這份清單的後三種，不自己再算（ROADMAP「敘事 stale 計數器」同源，2026-10-29）。"""
     from engine_b.queue_segments import narrative_rewrite_state
 
     out = [{"kind": "link", **dict(b)} for b in breaks]
@@ -483,6 +499,9 @@ def board_rewrite(rows: Sequence[Mapping[str, Any] | None], breaks: Sequence[Map
         out.extend({"kind": "rides", **who, **dict(ride)} for ride in (row or {}).get("rewrite_rides") or ())
         if (row or {}).get("rewrite_new_edges"):
             out.append({"kind": "new_edges", **who, "edges": [dict(e) for e in row["rewrite_new_edges"]]})
+        if (row or {}).get("pulled_back"):
+            # 等回落的價格叫醒（2026-10-30）：一檔一筆，只帶錨（最後一次宣告那天）——⑤ 讀這一種點名、drain 重問
+            out.append({"kind": "pulled_back", **who, "judgment_day": (row.get("priced_since") or {}).get("judgment_day")})
         for wid in (row or {}).get("rewrite_watch_ids") or ():
             carried.add(str(wid))
             state = narrative_rewrite_state(by_id.get(str(wid)) or {})
@@ -703,6 +722,26 @@ def page_input(context: Mapping[str, Any], ticker: str, company_id: str | None, 
                                       retracted_cells=context.get("retracted_cells") or ())}
 
 
+def open_document_requests_by_company() -> tuple[dict[str, list[int]], dict[str, Any]]:
+    """待辦池裡還開著的「向你要文件」（`engine_b.todo.document_requests`，唯一名單）→ `company_id → [n]`，與一格「讀了沒有」。
+    池讀不到 → `({}, {"status": "unavailable", …})`：列上 `document_requests=None`、狀態塊印「未算」，不印成 0（INV-3）。
+    沒標公司的請求（舊的、或 lead refs 沒寫 `trace_review_company`）併不到任何一列，列在 `unassigned` 讓它現形。只讀池。"""
+    try:
+        from engine_b import todo as todo_mod
+
+        items = todo_mod.document_requests(todo_mod.load())
+    except Exception as exc:  # noqa: BLE001 — 池壞了只讓這一格說讀不到，不帶走整板
+        return {}, {"status": "unavailable", "reason": f"{type(exc).__name__}: {str(exc)[:120]}"}
+    by_company: dict[str, list[int]] = {}
+    unassigned: list[int] = []
+    for item in items:
+        if item.get("company_id"):
+            by_company.setdefault(str(item["company_id"]), []).append(int(item["n"]))
+        else:
+            unassigned.append(int(item["n"]))
+    return by_company, {"status": "ok", "open": len(items), "unassigned": sorted(unassigned)}
+
+
 def load_board(tickers: Sequence[str], *, today: date | None = None,
                holdings_loader: Callable[[], Sequence[Mapping[str, Any]]] | None = None,
                context: Mapping[str, Any] | None = None,
@@ -722,6 +761,8 @@ def load_board(tickers: Sequence[str], *, today: date | None = None,
     ctx = context if context is not None else candidate_context(tickers, today=today,
                                                                  holdings_loader=holdings_loader, structure=structure)
     today = ctx["today"]
+    # 缺 X 三分法 ①（2026-10-30）：待辦池裡還開著的「向你要文件」對公司併到列上——池只讀；讀不到列上是 None、計數印「未算」
+    doc_requests, doc_check = open_document_requests_by_company()
     registry = ctx["registry"]
     bets = ctx.get("bets")
     universe, extra, edges, held = ctx["universe"], ctx["extra"], ctx["edges"], ctx["held"]
@@ -764,7 +805,9 @@ def load_board(tickers: Sequence[str], *, today: date | None = None,
                          watches=watches, lifecycle=lifecycle, edge=edges.get(ticker), three_questions=tq,
                          held=held, three_questions_note=note, bets=bets, registry=registry,
                          own_history_at=own_history_at, bars_at=adjusted_bars, stories=ctx.get("stories"),
-                         company_assertions=assertions_for(ctx, cid), raw_text=raw_text)
+                         company_assertions=assertions_for(ctx, cid), raw_text=raw_text,
+                         open_document_requests=(doc_requests.get(str(cid), []) if doc_check["status"] == "ok"
+                                                 else None))
         rows.append(row)
         if row is None:
             no_narrative.append({"ticker": ticker, "company_id": cid,
@@ -785,6 +828,7 @@ def load_board(tickers: Sequence[str], *, today: date | None = None,
                                                            watches=watches, company_ticker=company_ticker,
                                                            brief_company=brief_company))
     board["no_narrative"] = no_narrative
+    board["document_requests_check"] = doc_check
     # ③ 算了沒有（INV-3）：圖讀不到時「新邊沒讀」是沒算，心跳 ⑤ 照這一格印「未算」，不印成 0
     board["new_edges_check"] = {"status": "ok" if ctx.get("company_assertions") is not None else "unavailable",
                                 "reason": ctx.get("company_assertions_note")}

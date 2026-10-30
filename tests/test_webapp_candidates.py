@@ -19,6 +19,7 @@ _ROW = {"ticker": "AXTI", "company_id": "co:axt", "brief_id": "ib_x", "record_ve
         "rides": [{"node": "mat:inp_substrate", "unit": "layer", "reading_id": "sr_x", "kind": "volume", "status": "current"}],
         "watch": {"watch_id": "ew_0148", "status": "active", "until": "2026-11-13", "expires": "2027-01-15"},
         "since": "2026-09-29T05:48:00+00:00", "stall_days": 0,
+        "pulled_back": False, "missing_kind": None, "document_requests": [],
         "three_words": {"will_it_die": "黃（灰 1）", "priced_in": "是", "in_numbers": "是"}, "note": None}
 
 

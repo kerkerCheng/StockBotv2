@@ -258,9 +258,10 @@ def orphan_wake_briefs(watches: Iterable[Mapping[str, Any]], briefs: Iterable[An
                   if w.get("wake_brief") and w.get("status") == "active" and str(w.get("wake_brief")) not in waiting)
 
 
-#: 候選板清單裡「敘事落後」的兩種（`alpha.providers.candidates.board_rewrite`）→ ⑤ 工作描述的字。
+#: 候選板清單裡「敘事落後」的三種（`alpha.providers.candidates.board_rewrite`）→ ⑤ 工作描述的字。
 #: 候選板是唯一 owner（ROADMAP「敘事 stale 計數器」同源，2026-10-29）：⑤ 只讀它的清單，不自己再算一份。
-BEHIND_KINDS: Mapping[str, str] = {"rides": "騎舊讀圖", "new_edges": "新邊沒讀"}
+#: `pulled_back`（2026-10-30，failure log #116）：等回落的收盤低於最後一次宣告已定價那天——叫醒重問，不是動作。
+BEHIND_KINDS: Mapping[str, str] = {"rides": "騎舊讀圖", "new_edges": "新邊沒讀", "pulled_back": "已回落"}
 
 
 def _narrative_companies(watches: Sequence[Mapping[str, Any]], briefs: Sequence[Any]) -> dict[str, list[str]]:
@@ -405,7 +406,7 @@ def collect(*, today: date, leads_store: Mapping[str, Any], watches: Sequence[Ma
                  + " " + b.split()[1] for b in board]
         # 沒讀到不是 0（INV-3）：候選板讀不到，後三種都沒算進來；圖讀不到，新邊沒讀沒算
         if candidates is None:
-            note = "候選板未讀到——騎舊讀圖、新邊沒讀、前提失效沒算進來"
+            note = "候選板未讀到——騎舊讀圖、新邊沒讀、已回落、前提失效沒算進來"
         elif (candidates.get("new_edges_check") or {}).get("status") != "ok":
             note = "新邊沒讀這次沒算（候選板沒讀到圖）"
         else:

@@ -177,5 +177,11 @@ def test_a_malformed_config_fails_closed(tmp_path) -> None:
 def test_the_shipped_config_maps_the_ai_anchors_to_the_capex_and_nvidia_series() -> None:
     cfg = load_config()
     assert cfg["series"]["hyperscaler_cash_capex"]["components"] == ["co:microsoft", "co:google", "co:amazon", "co:meta"]
-    assert series_keys_for(["tech:ai_switch"], cfg) == ["hyperscaler_cash_capex", "nvidia_revenue"]
+    assert series_keys_for(["tech:ai_switch"], cfg) == ["hyperscaler_cash_capex", "nvidia_revenue",
+                                                        "oracle_cash_capex", "coreweave_cash_capex"]
+    # 融資型買家（2026-10-30）：Oracle 會計季（8／11／2／5 月底）對不上曆季、CoreWeave 2025-03 才掛牌——各自單一型、不相加；
+    # OpenAI、xAI 私有沒有申報值 → 序列標「已知至少」
+    for key, company in (("oracle_cash_capex", "co:oracle"), ("coreweave_cash_capex", "co:coreweave")):
+        assert cfg["series"][key]["aggregation"] == "single" and cfg["series"][key]["components"] == [company]
+        assert "已知至少" in cfg["series"][key]["label"]
     assert series_keys_for(["tech:dram_technology"], cfg) == []

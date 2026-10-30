@@ -134,6 +134,11 @@ entity 型等待只比「發文的是不是這家公司」——醒來先擋著�
 與「缺 X」「已定價等回落」在等的事（`wake_brief` watch）**醒來、被判觸及或到期未判**都進這一段——不鑄 pq2、
 不進假設對照。下一步是**重寫那一檔的敘事**（研究；寫敘事是強模型的工作，便宜模型只列出來交回）：
 
+- ⓪ **已回落也進這一段**（2026-10-30，failure log #116；ROADMAP「等回落的價格叫醒」）：等回落的檔收盤低於**最後一次宣告已定價
+  那天**的收盤——候選板每天算（`rewrite[]` 印「已回落：…」、心跳 ⑤「敘事該重寫」計入、狀態塊「等回落 N（已回落 M）」）。
+  **這是叫醒重問，不是動作、不是門檻**：重讀已定價那一格與自家三年百分位，重新宣告候選狀態（可開／仍等回落／不要）；
+  重新宣告就重設錨，首次等待日以來的 % 只在等回落行當脈絡。沒有 watch 要 consume（它不住 registry，隔天價格回去就自己消失）。
+
 - ⓐ 讀那一檔的現行敘事（`python -m alpha brief <T>`）與觸發的 watch（`python -m engine_b.event_watch list`）；
 - ⓑ 重跑 `python -m alpha research <T>` 的 packet（`brief_frame` 是 v2）與三題稽核區；
 - ⓑ′ **連結斷了**（2026-09-29 Step 3.6；心跳段 3「敘事該重寫 N（其中連結斷 M）」、候選板那一列的「該重寫」）：敘事
@@ -231,6 +236,15 @@ Lumentum、住友並列，協議也是非獨家。它和別家不同在六吋磷
    先宣告賭注騎在層還是插槽；三題引用稽核區的數字；候選狀態＋有到期的 watch。**三項必查**（三個錯都是「證據在手上卻沒讀到」）：
    ①致股東報告書／經營者的話（failure log #32）②財報表頭是個體還是合併（#35）③這一層在圖上有沒有同義節點（#36：讀圖與走圖只讀其中一個 id）。
    「缺 X」的 X 若是層的問題（幾家能做、客戶為什麼選、什麼會換掉它）→ 那是**層深讀**的入口（下方），不在段 5 深挖個股。
+   **缺 X 三分法**（2026-10-30 使用者「好 可以」；failure log #117；ROADMAP「缺 X 三分法與文件請求上限」）：每一檔缺 X 寫敘事時
+   `candidate_state.missing_kind` 必答三選一——`filing`（X 會在下一份公開文件出現：等事件，watch 的 until 寫那一天）、
+   `layer`（X 是層的問題：層深讀的入口，上一行）、`user_document`（X 可能寫在使用者拿得到的券商報告／法說 memo 裡）。
+   第三種照 source-trace「向使用者要文件」鑄請求（park 時 `trace_requires_user=true`），lead refs **必填**
+   `trace_review_company`（co:*）、`trace_review_channel`（元大／凱基／嘉信／IB）、`trace_review_search`、`trace_review_window`、
+   `trace_review_flips_state`（拿到就能翻成可開／不要＝true）——狀態塊的「已開口」與 ③b 的分組行讀這幾欄，沒填的印「未標」。
+   **同時開著的請求上限 K=5**（`todo.DOCUMENT_REQUEST_DISPLAY_LIMIT`；注意力預算，程式只印不擋，由本 skill 執行）：
+   額度滿了就只標 `user_document`、不鑄，等額度；先開「拿到就能翻候選狀態」的，再按滯留天數。
+   狀態塊印「缺 X N（已開口 M｜可拿未開口 K｜未分 U）」——未分＝舊敘事沒寫三分，重寫時補；0 也印。
    **深度優先**：第 N 檔未到終局不開第 N+1 檔，除非它卡在 pq2 或世界。終局三種：ready／
    剩餘 blocker 全部 settled／全部掛在 pq2 編號上。每一格的路（判準機械，見 `alpha/absence.py`）：
    - `not_yet_recorded`／`upstream_unavailable` 的基期實績、指引 → 抓一手財報寫 mechanical 觀測（不碰 gate）

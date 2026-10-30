@@ -239,6 +239,26 @@
         "value_type": "string",
         "description": "source trace review 標題"
       },
+      "trace_review_company": {
+        "value_type": "string",
+        "description": "向你要文件：這份文件是為哪家名冊公司要的（co:*）——待辦池 item 帶 company_id，候選板把開著的請求併到那家的列上、狀態塊數「已開口」（缺 X 三分法 ①，2026-10-30）"
+      },
+      "trace_review_channel": {
+        "value_type": "string",
+        "description": "向你要文件：去哪個 App／管道拿（元大／凱基／嘉信／IB／MOPS／公開網址…）——③b 按這一欄一行一組；沒寫歸「未標管道」（缺 X 三分法 ④）"
+      },
+      "trace_review_search": {
+        "value_type": "string",
+        "description": "向你要文件：在那個 App 裡的搜尋字（例「華城（或 1519）」）——③b 分組行照印"
+      },
+      "trace_review_window": {
+        "value_type": "string",
+        "description": "向你要文件：要找的日期區間（例「2026-07-01～10-30」）——③b 分組行照印"
+      },
+      "trace_review_flips_state": {
+        "value_type": "string",
+        "description": "向你要文件：拿到就能把候選狀態翻成可開或不要嗎（true／false）——③b 先列 true 的（上限 K 之內先開這種），不是分數"
+      },
       "trace_status": {
         "value_type": "string",
         "description": "source-trace 結構化狀態"

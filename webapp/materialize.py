@@ -1994,6 +1994,9 @@ def build_candidates_artifact(board: Mapping[str, Any], *, generated_at: datetim
         "narrative_rewrite": list(board.get("narrative_rewrite") or ()),
         # 敘事 stale ③ 算了沒有（2026-10-29）：圖讀不到時「新邊沒讀」是沒算——心跳 ⑤ 照這一格印，不印成 0（INV-3）
         "new_edges_check": dict(board.get("new_edges_check") or {"status": "unavailable", "reason": "板上沒有這一格"}),
+        # 缺 X 三分法 ①（2026-10-30）：待辦池讀了沒有——讀不到時列上的 `document_requests` 是 None、狀態塊印「未算」
+        "document_requests_check": dict(board.get("document_requests_check")
+                                        or {"status": "unavailable", "reason": "板上沒有這一格"}),
         # 不上板的那幾檔（沒有敘事、也沒有持有）：計數在 counts.no_narrative，這裡列出是誰（2026-09-30）。
         "no_narrative": list(board.get("no_narrative") or ()),
         "ledger": dict(board.get("ledger") or {}),

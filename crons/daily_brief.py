@@ -538,22 +538,26 @@ def decisions_block(*, actionable: Sequence[Mapping[str, Any]] | None, problem: 
     return lines, batch
 
 
-def documents_block(*, asking: Sequence[Mapping[str, Any]] | None, problem: str | None, todo_mod: Any) -> list[str]:
+def documents_block(*, asking: Sequence[Mapping[str, Any]] | None, problem: str | None, todo_mod: Any,
+                    today: date | None = None) -> list[str]:
     """③b 等你提供的文件（2026-10-07 使用者：「隔離一區讓我知道 也不要讓我直接 go 提供文件才算 go」）。
-    與心跳段 3 同一份名單（`todo.document_requests`）；0 也印一行。跟 ③ 同一則訊息（沒有自己的 `###`）。"""
-    from crons.heartbeat import PQ2_LIST_LIMIT
-
+    與心跳段 3 同一份名單（`todo.document_requests`）；0 也印一行。跟 ③ 同一則訊息（沒有自己的 `###`）。
+    2026-10-30（缺 X 三分法 ④）：短版只印**按管道一行一組**（筆數、主詞、搜尋字、日期區間）＋今天新開的；整份逐筆清單住
+    完整心跳段 3 與 `todo list`。同時開著的上限 `todo.DOCUMENT_REQUEST_DISPLAY_LIMIT` 印在標題（程式只印不擋，由 drain 執行）。"""
     if asking is None:
         return [f"**③b 等你提供的文件：讀不到（{problem}）**"]
     if not asking:
         return ["**③b 等你提供的文件：沒有**", "-# 提供文件才算 go，批次 go 不收這一區"]
-    ordered = sorted(asking, key=lambda i: int(i["n"]))
-    lines = [f"**③b 等你提供的文件（{len(asking)}）**"]
-    for item in ordered[:PQ2_LIST_LIMIT]:
-        title = " ".join(str(item.get("title") or "").split()).removeprefix("向你要文件：")
-        lines.append(f"- [{item['n']}] {_clip(title, 80)}")
-    if len(ordered) > PQ2_LIST_LIMIT:
-        lines.append(f"-# 其餘 {len(ordered) - PQ2_LIST_LIMIT} 筆在完整心跳段 3")
+    ordered = todo_mod.document_request_order(asking)
+    limit = todo_mod.DOCUMENT_REQUEST_DISPLAY_LIMIT
+    lines = [f"**③b 等你提供的文件（{len(asking)}｜同時開著的上限 {limit}）**"]
+    for channel, group in todo_mod.group_document_requests(ordered):
+        lines.append(f"- {channel} {len(group)}：" + "；".join(todo_mod.document_request_cell(i) for i in group))
+    new = [i for i in ordered if today is not None and str(i.get("added_at") or "")[:10] == today.isoformat()]
+    if new:                                                   # 主詞已在上面的分組行，這裡只印編號（短版不重複）
+        lines.append("- 今天新開：" + "、".join(f"[{i['n']}]" for i in new))
+    if len(asking) > limit:
+        lines.append(f"-# 超過上限 {limit}：新的只在敘事標「可拿但未開口」、等額度；整份清單在完整心跳段 3 或 `todo list`")
     excludes = todo_mod.go_plain("source_trace_review")["excludes"]
     lines.append("-# 提供文件才算 go，批次 go 不收這一區：有文件就直接給我（放 library/private/inbox/ 或貼路徑），"
                  f"拿不到回 `<編號> drop`｜不含：{excludes}")
@@ -863,7 +867,7 @@ def compose_brief(*, now: datetime, summary: str, snapshot: Mapping[str, Any], r
             actionable = asking = None
             problem = type(exc).__name__
         lines, batch[0] = decisions_block(actionable=actionable, problem=problem, todo_mod=todo_mod)
-        return [*lines, "", *documents_block(asking=asking, problem=problem, todo_mod=todo_mod)]
+        return [*lines, "", *documents_block(asking=asking, problem=problem, todo_mod=todo_mod, today=today)]
 
     def line(build: Any, label: str) -> list[str]:
         try:

@@ -146,7 +146,8 @@ def test_document_requests_are_their_own_block_and_not_in_the_go_batch() -> None
 
     asking = [{"n": 724, "type": "source_trace_review", "title": "向你要文件：全新光電券商報告"}]
     lines = hb._document_request_lines(asking, todo_mod=todo_mod)
-    assert lines[0].strip().startswith("[724] 全新光電券商報告")
+    assert lines[0].strip() == "未標管道 1：[724] 全新光電券商報告"       # 2026-10-30：先按管道一行一組（沒標的歸未標管道）
+    assert lines[1].strip().startswith("[724] 全新光電券商報告")
     assert "go" in lines[-1] and "drop" in lines[-1] and "入圖" in lines[-1]
     decisions = hb._pq2_item_lines([{"n": 715, "type": "ra_admission", "title": "InP 磊晶片層建層"}], todo_mod=todo_mod)
     assert not any("724" in line for line in decisions)
@@ -320,7 +321,7 @@ def test_retired_panels_declare_an_absence_instead_of_disappearing(tmp_path: Pat
     StateArtifactStore(state_dir).write(fake_candidates_payload())
     changes = "\n".join(hb.build_changes(now=now, state_dir=state_dir, thesis_path=tmp_path / "nope.json").lines)
     positions = "\n".join(hb.build_positions(state_dir=state_dir).lines)
-    assert "候選：可開 0｜缺 X 0｜等回落 1（最老 0 天）｜不要 0｜已持有 0" in changes, changes
+    assert "候選：可開 0｜缺 X 0｜等回落 1（最老 0 天｜已回落 0）｜不要 0｜已持有 0" in changes, changes
     # 2026-10-22：「無敘事」拆開——沒有邊緣判定的兩列算「量不到卻沒敘事」（待做，⑤ 也有），不是非倍率
     assert "量不到卻沒敘事 2" in changes and "持股解析不到 1（使用者決定不研究 0）：7803.T" in changes
     assert "三題（3 檔）：已定價① 有值 1／缺席 2" in changes and "不是結論" in changes

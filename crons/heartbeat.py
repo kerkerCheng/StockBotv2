@@ -882,17 +882,48 @@ def candidate_counts(board: Mapping[str, Any]) -> dict[str, Any]:
                legacy=counts.get("legacy", 0), precondition_failed=counts.get("precondition_failed", 0),
                with_old=int(counts.get("not_multiple") or 0), non_edge=non_edge, unmeasured=unmeasured,
                edge_gap=len(no_narr) - non_edge - unmeasured, oldest=dict(board.get("oldest_stall_days") or {}))
+    # 等回落的價格叫醒與缺 X 三分法（2026-10-30）：讀列重算（算法在 `alpha.candidates`，與 assemble_board 同一份）——
+    # 舊 artifact 的列沒有這兩個鍵，照實印「沒算」「未算」，不壓成 0
+    from alpha.candidates import missing_request_counts, pullback_counts
+
+    groups = board.get("groups") or {}
+    pb = pullback_counts([r for r in groups.get("priced_wait") or () if isinstance(r, Mapping)])
+    mr = missing_request_counts([r for r in groups.get("missing") or () if isinstance(r, Mapping)])
+    out.update(pulled_back=pb["pulled_back"], pull_unknown=pb["unknown"], missing_asked=mr["asked"],
+               missing_fetchable_unasked=mr["fetchable_unasked"], missing_unclassified=mr["unclassified"])
     return out
 
 
 def candidate_states_text(c: Mapping[str, Any]) -> str:
-    """封閉字彙的五個候選狀態（AGENTS：可開／缺 X／已定價等回落／不要／已持有），**0 也印**、有檔才印最老滯留。"""
+    """封閉字彙的五個候選狀態（AGENTS：可開／缺 X／已定價等回落／不要／已持有），**0 也印**、有檔才印最老滯留。
+    2026-10-30 起兩個狀態各多幾格常駐計數：缺 X 的「已開口（文件請求）｜可拿未開口｜未分」（三分法 ①）、等回落的「已回落」
+    （收盤低於最後一次宣告已定價那天；叫醒重問，不是動作）。沒算出來的印「未算」「沒算」，不壓成 0（INV-3）。"""
     def aged(key: str) -> str:
         n, d = c.get(key, 0), (c.get("oldest") or {}).get(key)
         return f"{n}（最老 {d} 天）" if n and d is not None else f"{n}"
 
+    def missing() -> str:
+        n, d = c.get("missing", 0), (c.get("oldest") or {}).get("missing")
+        if not n:
+            return f"{n}"
+        asked, fetch = c.get("missing_asked"), c.get("missing_fetchable_unasked")
+        bits = ([f"最老 {d} 天"] if d is not None else []) + [
+            f"已開口 {'未算' if asked is None else asked}", f"可拿未開口 {'未算' if fetch is None else fetch}"]
+        if c.get("missing_unclassified"):
+            bits.append(f"未分 {c['missing_unclassified']}")
+        return f"{n}（{'｜'.join(bits)}）"
+
+    def wait() -> str:
+        n, d = c.get("priced_wait", 0), (c.get("oldest") or {}).get("priced_wait")
+        if not n:
+            return f"{n}"
+        bits = ([f"最老 {d} 天"] if d is not None else []) + [f"已回落 {c.get('pulled_back', 0)}"]
+        if c.get("pull_unknown"):
+            bits.append(f"沒算 {c['pull_unknown']}")
+        return f"{n}（{'｜'.join(bits)}）"
+
     held = "未驗（持股未讀到）" if c.get("held") is None else str(c.get("held"))
-    return f"可開 {aged('open')}｜缺 X {aged('missing')}｜等回落 {aged('priced_wait')}｜不要 {c.get('pass', 0)}｜已持有 {held}"
+    return f"可開 {aged('open')}｜缺 X {missing()}｜等回落 {wait()}｜不要 {c.get('pass', 0)}｜已持有 {held}"
 
 
 def _candidate_lines(state_dir: Path | None) -> list[str]:
@@ -1035,7 +1066,8 @@ def priced_wait_short_lines(state_dir: Path | None, *, today: date,
         name = label(row) if label else str(row.get("ticker"))
         text = (f"- {name}：等 {row.get('stall_days', '?')} 天｜百分位 {_pctile((start or {}).get('value'))}"
                 f"→{_pctile((info.get('now') or {}).get('value'))}"
-                f"｜股價 {_signed(ret) if ret is not None else '量不到'}｜{when}")
+                f"｜股價 {_signed(ret) if ret is not None else '量不到'}"
+                + ("｜**已回落**" if row.get("pulled_back") else "") + f"｜{when}")
         rows.append((due or date.max, text, (info.get("now") or {}).get("as_of"), name))
     rows.sort(key=lambda r: r[0])
     closes = sorted({str(r[2])[5:10] for r in rows if r[2]})
@@ -1045,7 +1077,9 @@ def priced_wait_short_lines(state_dir: Path | None, *, today: date,
                      or ((r.get("priced_since") or {}).get("wait_since") or {}).get("then_source") == "recomputed"
                      for r in wait)
     legend = ("-# 百分位＝自家三年估值位置，越低越便宜；股價＝等回落起點以來（調整後收盤）；沒有門檻，到重看日由你重判"
-              + (f"｜{close_text}" if close_text else "") + ("｜起點的值有回算的" if recomputed else ""))
+              + (f"｜{close_text}" if close_text else "") + ("｜起點的值有回算的" if recomputed else "")
+              + ("｜已回落＝收盤低於最後一次宣告已定價那天（叫醒重問，不是動作）" if any(r.get("pulled_back") for r in wait)
+                 else ""))
     return [f"**等回落 {len(wait)} 檔**", *(r[1] for r in rows), legend]
 
 
@@ -1640,17 +1674,26 @@ PQ2_LIST_LIMIT = 10
 
 
 def _document_request_lines(items: Sequence[Mapping[str, Any]], *, todo_mod: Any) -> list[str]:
-    """向你要文件逐筆＋一行怎麼回（2026-10-07）。「不含」取自 `todo.GO_AUTHORIZATION`（L16）。
-    批次 `go` 不收這一區——提供文件才算 go。"""
+    """向你要文件：先按管道一行一組（元大／凱基／嘉信／IB：筆數、主詞、搜尋字、日期區間——缺 X 三分法 ④，2026-10-30），
+    再逐筆列到同時開著的上限 `todo.DOCUMENT_REQUEST_DISPLAY_LIMIT`（其餘寫「其餘 N 筆」；程式只印不擋，上限由 drain 執行），
+    最後一行怎麼回。順序：拿到就能翻候選狀態的先、再按開口時間（`todo.document_request_order`）。
+    「不含」取自 `todo.GO_AUTHORIZATION`（L16）。批次 `go` 不收這一區——提供文件才算 go。"""
     if not items:
         return []
-    ordered = sorted(items, key=lambda i: int(i["n"]))
-    lines = []
-    for item in ordered[:PQ2_LIST_LIMIT]:
+    ordered = todo_mod.document_request_order(items)
+    limit = todo_mod.DOCUMENT_REQUEST_DISPLAY_LIMIT
+    lines = [f"  {channel} {len(group)}：" + "；".join(todo_mod.document_request_cell(i) for i in group)
+             for channel, group in todo_mod.group_document_requests(ordered)]
+    for item in ordered[:limit]:
         title = " ".join(str(item.get("title") or "").split()).removeprefix("向你要文件：")
         lines.append(f"  [{item['n']}] {title[:80]}{'…' if len(title) > 80 else ''}")
-    if len(ordered) > PQ2_LIST_LIMIT:
-        lines.append(f"  其餘 {len(ordered) - PQ2_LIST_LIMIT} 筆（`python -m engine_b.todo list`）")
+    if len(ordered) > limit:
+        lines.append(f"  其餘 {len(ordered) - limit} 筆（`python -m engine_b.todo list`）｜同時開著的超過上限 {limit}："
+                     "新的只在敘事標 missing_kind=user_document（可拿但未開口）、等額度")
+    untagged = [int(i["n"]) for i in ordered if not i.get("company_id")]
+    if untagged:
+        lines.append(f"  未標公司 {len(untagged)}（併不到候選列、狀態塊的「已開口」數不到它）：{'、'.join(f'[{n}]' for n in untagged)}"
+                     "——lead refs 補 trace_review_company")
     excludes = todo_mod.go_authorization("source_trace_review")["go_excludes"]
     lines.append(f"  有文件就直接給我（放 library/private/inbox/ 或貼路徑）＝go，我讀完交報告；拿不到回 `<編號> drop`｜不含：{excludes}")
     return lines
@@ -2363,6 +2406,24 @@ def _nav_line(nav: Mapping[str, Any] | None) -> str:
 # 段 5｜帳號計分表（每天）
 # ---------------------------------------------------------------------------
 
+def _document_request_score_line(state_dir: Path | None) -> str:
+    """段 5 一行：開了／你給了／沒有（drop）／還在等／讀完交報告／之後候選狀態不再是缺 X（只對照、不證明是文件解的）／未標公司。
+    池讀不到就丟給呼叫端印讀不到；候選板讀不到時「之後候選狀態」那格印未算（INV-3）。"""
+    from engine_b import todo as todo_mod
+
+    pool = todo_mod.load()
+    board, absence = _load_state(state_dir, "candidates")
+    states = None
+    if absence is None:
+        states = {str(r.get("company_id")): group for group, rows in (board.get("groups") or {}).items()
+                  for r in rows or () if isinstance(r, Mapping) and r.get("company_id")}
+    s = todo_mod.document_request_scorecard(pool, state_by_company=states)
+    changed = "未算（候選板未讀到）" if s["state_changed"] is None else str(s["state_changed"])
+    return (f"文件請求計分：開了 {s['opened']}｜你給了 {s['given']}｜沒有（drop）{s['dropped']}｜還在等 {s['waiting']}"
+            f"｜讀完交報告 {s['reported']}｜之後候選狀態不再是缺 X {changed}（只對照、不證明是文件解的）"
+            f"｜未標公司 {s['untagged']}｜同時開著的上限 {todo_mod.DOCUMENT_REQUEST_DISPLAY_LIMIT}")
+
+
 def build_scorecard(*, state_dir: Path | None = None, previous: Mapping[str, Any] | None = None) -> Section:
     """D5 帳號計分表：**每天印** tier 分布＋較昨變化（Phase 1 Step 1.8；原本只在 weekly）。完整表在 APP。
 
@@ -2370,6 +2431,11 @@ def build_scorecard(*, state_dir: Path | None = None, previous: Mapping[str, Any
     讀不到就誠實說讀不到，**不偷偷重建**（APP 呈現契約的同一條紀律）。`previous` 是上一份快照的值。
     """
     section = Section(5, SECTION_TITLES[4])
+    # 文件請求計分（2026-10-30，ROADMAP「缺 X 三分法與文件請求上限」⑤）：常駐、每天印；算法在 `engine_b.todo`
+    try:
+        section.lines.append(_document_request_score_line(state_dir))
+    except Exception as exc:  # noqa: BLE001 — 這一行壞掉不帶走計分表
+        section.lines.append(f"文件請求計分：盤點失敗（{type(exc).__name__}；upstream_unavailable）")
     card, absence = _load_state(state_dir, "account_scorecard")
     if absence is not None or not card:
         section.absence = absence or Absence(

@@ -20,6 +20,7 @@ from alpha.narrative.contracts import new_brief_id, undated_position_claims
 from alpha.providers.briefs import WriteContext, read_brief_records, write_brief
 from alpha.providers.candidates import derive_row, open_preconditions
 from engine_b import event_watch as ew
+from webapp.contracts import STATE_SCHEMA_VERSIONS
 
 CO, T = "co:axt", "AXTI"
 READ = "sr_" + "a" * 16
@@ -247,7 +248,8 @@ def _artifact(tmp_path: Path, wait_rows) -> Path:
 
     state = tmp_path / "state"
     state.mkdir(parents=True)
-    payload = {"schema_version": "stockbot-app/candidates/1", "kind": "candidates", "generated_at": "2026-10-20T22:00:00+00:00",
+    payload = {"schema_version": STATE_SCHEMA_VERSIONS["candidates"], "kind": "candidates",
+               "generated_at": "2026-10-20T22:00:00+00:00",
                "groups": {"priced_wait": wait_rows, "missing": []}, "side_groups": {}, "counts": {}}
     (state / "candidates.json").write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
     return state
@@ -270,7 +272,8 @@ def test_the_heartbeat_prints_zero_and_each_wait_row_and_the_short_line_keeps_da
     # 短版（2026-10-28 使用者核可的排版）：起點是**等回落起點**（09-29，同一筆等待），不是 10-15 的判斷日；百分位取整數
     short = hb.priced_wait_short_lines(full, today=TODAY)
     assert short[0] == "**等回落 1 檔**"
-    assert short[1] == f"- AXTI：等 {row['stall_days']} 天｜百分位 87→88｜股價 −22.2%｜⚠ 沒有重看日（接不上的等待）"
+    # 2026-10-30：10-20 收 77.85 低於最後宣告（10-15）那天的 90 → 標「已回落」（叫醒重問，不是動作）
+    assert short[1] == f"- AXTI：等 {row['stall_days']} 天｜百分位 87→88｜股價 −22.2%｜**已回落**｜⚠ 沒有重看日（接不上的等待）"
     assert short[-1].startswith("-# 百分位＝自家三年估值位置") and "收盤日 10-20" in short[-1]
     assert "起點的值有回算的" in short[-1]
     for word in ("該", "燈", "買", "賣"):
@@ -335,3 +338,32 @@ def test_no_basis_on_either_side_prints_no_none() -> None:
     out = priced_since(T, brief, brief, judgment_day="2026-10-15", then={"absence_kind": "inputs_incompatible"},
                        then_source="recomputed", now={"absence_kind": "inputs_incompatible"}, return_since=None)
     assert "None" not in out["line"] and "自家三年 量不到" in out["line"]
+# ---- 等回落的價格叫醒（ROADMAP「等回落的價格叫醒」；failure log #116；2026-10-30 使用者照推薦定案） ----
+
+def test_a_close_below_the_last_declaration_wakes_the_wait_and_a_redeclaration_resets_the_anchor() -> None:
+    """錨只有一個＝最後一次宣告已定價那天（10-15 改判）。收盤低於那天的收盤 → `pulled_back`、`rewrite[]` 多一條（句子不帶 %：
+    天天變的數字不進認知指紋）、整板清單多一筆 kind=pulled_back（只帶錨那一天）、counts 多一格；重新宣告後錨重設——比首次等待
+    （09-29）低、比最後宣告高就不醒，首次等待以來的 % 只當脈絡；bars 沒給＝沒算（None），不是沒回落；不是等回落的列一律 None。"""
+    from alpha.candidates import PULLED_BACK_PREFIX, assemble_board, pullback_counts
+    from alpha.providers.candidates import board_rewrite
+
+    row, _ = _derive(_chain())                                   # 10-14 收 90 → 10-20 收 77.85：低於最後宣告那天
+    assert row["pulled_back"] is True
+    assert [r for r in row["rewrite"] if r.startswith(PULLED_BACK_PREFIX)] == [
+        f"{PULLED_BACK_PREFIX}：收盤低於最後一次宣告已定價那天（10-15）的收盤，重問已定價"]
+    assert "已回落" in row["rewrite_words"]
+    listed = [b for b in board_rewrite([row], []) if b["kind"] == "pulled_back"]
+    assert listed == [{"kind": "pulled_back", "ticker": T, "company_id": CO, "brief_id": row["brief_id"],
+                       "judgment_day": "2026-10-15"}]
+    board = assemble_board([row], universe=[T], held=HELD_NONE, narrative_rewrite=listed)
+    assert board["counts"]["priced_wait_pulled_back"] == 1 and board["counts"]["priced_wait_unknown"] == 0
+    # 重新宣告（10-15 改判）後錨重設：比 09-29 首次等待的 100 低、比 10-14 的 90 高 → 不醒
+    row, _ = _derive(_chain(), bars=[(date(2026, 9, 28), 100.0), (date(2026, 10, 14), 90.0), (date(2026, 10, 20), 95.0)])
+    assert row["pulled_back"] is False and not any(r.startswith(PULLED_BACK_PREFIX) for r in row["rewrite"])
+    assert row["priced_since"]["wait_since"]["return"] < 0 < row["priced_since"]["return_since"]
+    # bars 沒給＝沒算，不是沒回落
+    row, _ = _derive(_chain(), bars=[])
+    assert row["pulled_back"] is None and pullback_counts([row]) == {"pulled_back": 0, "unknown": 1}
+    # 缺 X 也會跌，但它不在等價格——一律 None
+    row, _ = _derive([parse_brief_record(_rec(at=_at(10, 15), state="missing", watch_id="ew_wait"))])
+    assert row["group"] == "missing" and row["pulled_back"] is None

@@ -3,7 +3,8 @@
     "需求錨序列（個股頁 S3a，2026-10-08；brainstorm 2026-10-05-stock-page-schema §5.4 B2「錨的變化」）：圖上的需求錨節點 → 這個題材的錨序列。",
     "這是字彙——日後加一列就能補（L2）；不在 anchors 上的錨＝「題材沒宣告錨」，個股頁 B2 照實印缺席，不臨時湊一條頂替。",
     "序列是 A2：Engine C fundamental_history 的 SEC 申報值（alpha/demand_anchor.py 組）。可知日＝申報日；多家加總時取最晚的那一家（INV-6）。",
-    "DRAM、成熟製程、機器人、稀土的錨還沒有序列（2026-10-08）：它們的需求不只 AI 資本支出，硬掛會讓錨講錯故事。"
+    "DRAM、成熟製程、機器人、稀土的錨還沒有序列（2026-10-08）：它們的需求不只 AI 資本支出，硬掛會讓錨講錯故事。",
+    "融資型資料中心買家（2026-10-30，ROADMAP「融資型資料中心 capex 進需求錨」）：Oracle 與 CoreWeave 各一條單一型序列——Oracle 會計季（8／11／2／5 月底）對不上曆季、CoreWeave 2025-03 才掛牌，所以不與四大相加；OpenAI、xAI 私有沒有申報值，這一塊的總量只到「已知至少」。"
   ],
   "series": {
     "hyperscaler_cash_capex": {
@@ -21,12 +22,28 @@
       "aggregation": "single",
       "currency": "USD",
       "proxy": "NVIDIA 自己的會計季（1 月底結算），不與曆季相加"
+    },
+    "oracle_cash_capex": {
+      "label": "融資型買家：Oracle 現金資本支出（已知至少）",
+      "metric": "capex_quarter",
+      "components": ["co:oracle"],
+      "aggregation": "single",
+      "currency": "USD",
+      "proxy": "融資型資料中心買家的已知至少：Oracle 自己的會計季（8／11／2／5 月底結算），不與曆季相加；代理：現金流量表的「購置不動產、廠房與設備」——含非 AI 支出、不含融資租賃；OpenAI、xAI 私有沒有申報值"
+    },
+    "coreweave_cash_capex": {
+      "label": "融資型買家：CoreWeave 現金資本支出（已知至少）",
+      "metric": "capex_quarter",
+      "components": ["co:coreweave"],
+      "aggregation": "single",
+      "currency": "USD",
+      "proxy": "融資型資料中心買家的已知至少：CoreWeave 曆季結算、2025-03 掛牌後才有申報值；代理同上——含非 AI 支出、不含融資租賃；OpenAI、xAI 私有沒有申報值"
     }
   },
   "anchors": {
-    "tech:ai_switch": ["hyperscaler_cash_capex", "nvidia_revenue"],
-    "tech:optical_scale_up": ["hyperscaler_cash_capex", "nvidia_revenue"],
-    "tech:scale_across": ["hyperscaler_cash_capex", "nvidia_revenue"],
-    "tech:hbm": ["hyperscaler_cash_capex", "nvidia_revenue"]
+    "tech:ai_switch": ["hyperscaler_cash_capex", "nvidia_revenue", "oracle_cash_capex", "coreweave_cash_capex"],
+    "tech:optical_scale_up": ["hyperscaler_cash_capex", "nvidia_revenue", "oracle_cash_capex", "coreweave_cash_capex"],
+    "tech:scale_across": ["hyperscaler_cash_capex", "nvidia_revenue", "oracle_cash_capex", "coreweave_cash_capex"],
+    "tech:hbm": ["hyperscaler_cash_capex", "nvidia_revenue", "oracle_cash_capex", "coreweave_cash_capex"]
   }
 }
