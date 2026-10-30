@@ -144,7 +144,7 @@ COVERAGE: Mapping[str, str] = {
     "candidate:pass": "terminal",
     "candidate:held": "terminal",
     "candidate:not_multiple": "todo.narrative",  # 非邊緣卻有敘事：撤回（research-drain 規定不替非倍率寫敘事）
-    "candidate:edge_unmeasurable": "wait",       # 有敘事、等量得到覆蓋家數；敘事本身照常有 watch
+    "candidate:edge_unmeasurable": "wait",       # 宣告可開、邊緣判定少一個輸入：不放行、等量得到（2026-10-30 起缺 X／不要照敘事分組）
     "candidate:legacy": "todo.narrative",
     "candidate:precondition_failed": "todo.narrative",
     "candidate:no_narrative": "todo.edge_no_narrative",   # 只算邊緣或量不到的；非邊緣的是終局（不寫敘事）

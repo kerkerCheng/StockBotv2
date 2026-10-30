@@ -53,7 +53,10 @@ def test_candidate_snapshot_keys_come_from_the_candidate_vocabulary() -> None:
     from alpha.providers.candidates import GROUPS, SIDE_GROUPS
 
     keys = [k for k in hb.SNAPSHOT_KEYS if k.startswith("candidate.")]
-    assert keys == [f"candidate.{g}" for g in (*GROUPS, *SIDE_GROUPS)] + ["candidate.no_narrative"]
+    # open_unmeasurable 不在字彙裡（2026-10-30）：附組 edge_unmeasurable 改成只裝宣告可開，舊鍵留給全部量不到的檔
+    assert keys == [f"candidate.{g}" for g in (*GROUPS, *SIDE_GROUPS)] + ["candidate.open_unmeasurable",
+                                                                          "candidate.no_narrative"]
+    assert hb.SNAPSHOT_KEYS["candidate.edge_unmeasurable"] == "候選 邊緣無法量"
 
 
 def test_diff_prints_only_changed_keys_and_counts_the_rest() -> None:

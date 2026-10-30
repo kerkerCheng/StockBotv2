@@ -132,10 +132,12 @@ def _candidate_overview(panel: Mapping[str, Any]) -> dict[str, Any]:
             # 只在落「缺 X」組時給：已持有的檔敘事也可能宣告缺 X，但卡片的狀態是「已持有」，不得被短標蓋掉
             label = row.get("missing_label") if row.get("derived") == "missing" else None
             # 不要的理由那一句（故事層，2026-10-29 使用者：「不要也要理由，我現在看不到」）：只在落「不要」組時給——
-            # 落「邊緣無法量」的檔敘事也可能宣告不要（300489.SZ、CCXI、ENA.V），卡片的狀態卻不是不要，理由會跟狀態對不上
+            # 已持有的檔敘事也可能宣告不要，卡片的狀態卻是已持有。（10-29 那時邊緣無法量也會蓋掉宣告；10-30 起只蓋可開）
             reason = row.get("reason_story") if row.get("derived") == "pass" else None
+            # 邊緣判定少一個輸入的標記（2026-10-30）：產生端給的整句照抄（「邊緣無法量：缺分析師家數」），不在這裡造字
             return {"list_group": str(row["derived"]), "label": row.get("derived_label"), "absence_kind": None,
-                    "sheet_verified": row.get("sheet_verified"), "missing_label": label, "reason_story": reason}
+                    "sheet_verified": row.get("sheet_verified"), "missing_label": label, "reason_story": reason,
+                    "edge_note": row.get("edge_note")}
         # 有候選列、值卻不在首頁分組字彙裡＝字彙漏了一格（不是「沒讀到」）：照實寫出那個值
         return {"list_group": "unavailable", "label": None, "absence_kind": "upstream_unavailable",
                 "reason": f"候選狀態的值 {row.get('derived')!r} 不在首頁分組字彙裡（alpha.candidates.LIST_GROUPS）"}

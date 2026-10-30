@@ -686,9 +686,13 @@ def candidate_short_lines(state_dir: Path | None) -> list[str]:
     board, absence = hb._load_state(state_dir, "candidates")
     if absence is not None:
         return [f"- 候選：{absence.reason}（{absence.kind}）"]
+    from alpha.candidates import SIDE_LABELS
+
     c = hb.candidate_counts(board)
+    # 邊緣無法量＝卡片上帶標記的檔數（2026-10-30 起不是分組）；宣告可開而不放行的那一附組不是 0 才印
     cover = f"- 覆蓋：邊緣無法量 {c['edge_unmeasurable']}｜邊緣卻沒敘事 {c['edge_gap']}"
-    for key, label in (("unmeasured", "量不到卻沒敘事"), ("legacy", "舊版"), ("precondition_failed", "前提失效")):
+    for key, label in (("open_unmeasurable", SIDE_LABELS["edge_unmeasurable"]), ("unmeasured", "量不到卻沒敘事"),
+                       ("legacy", "舊版"), ("precondition_failed", "前提失效")):
         if c.get(key):
             cover += f"｜{label} {c[key]}"
     lines = [f"- 候選：{hb.candidate_states_text(c)}", cover]

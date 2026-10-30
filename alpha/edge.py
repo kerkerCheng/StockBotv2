@@ -2,7 +2,8 @@
 
 門檻住 `config/alpha_screen.json`（`market_cap_max_usd` **AND** `analyst_count_max`，2026-09-19 由 16 檔實測斷點定）；
 本檔**不新增門檻、不調數字**。它不排序、不打分、不給尺寸：候選板用它把「非邊緣」的檔放進「非倍率候選」組
-（宣告 `open` 也不算可開），缺市值或覆蓋的放進「邊緣無法量」組（不靜默放行、不靜默濾掉，`_absence_policy`）。
+（宣告 `open` 也不算可開），缺市值或覆蓋的：宣告 `open` 的放進「可開但邊緣無法量」組（不靜默放行、不靜默濾掉，
+`_absence_policy`），其餘照敘事分組、列上帶標記（2026-10-30：缺的是篩選的輸入，不是敘事的 X）。
 
 純函式。取數（市值正規化：報價單位 → 結算幣別 → USD）在 `alpha/providers/edge.py`，materialize 時做一次；
 **資本路徑只讀 artifact，不即時打 FX 或行情**（plan §4.3）。

@@ -92,6 +92,7 @@ main { padding: 16px; max-width: 940px; margin: 0 auto; }
 .card-reason { margin-top: 4px; font-size: 12px; line-height: 1.45; color: var(--muted); overflow-wrap: anywhere; }
 .card-when.past { color: var(--flags); }
 .chip-rewrite { color: var(--flags); border-color: var(--flags); }
+.chip-edge { color: var(--dim); font-weight: 400; }
 .group-counts { margin-top: 14px; }
 .card-spark { flex: 0 0 auto; width: 104px; text-align: right; }
 .spark { width: 104px; height: 30px; display: block; }

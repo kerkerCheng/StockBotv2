@@ -348,6 +348,80 @@ def test_candidate_lines_say_held_is_unverified_when_the_sheet_was_unreadable(tm
     assert any("持股未讀到，已持有判定暫停（upstream_unavailable）" in line for line in lines)
 
 
+def test_edge_unmeasurable_counts_tagged_rows_and_prints_the_held_back_open_apart(tmp_path: Path) -> None:
+    """2026-10-30：邊緣無法量是列上的標記、不是分組——「邊緣無法量 N」數照敘事分組而帶標記的列，加上附組裡宣告可開、
+    不放行的列；附組另印（短版不是 0 才印）。10-30 之前的 artifact（附組裝全部、宣告缺 X）數出來一樣，也不會被讀成可開。"""
+    from crons import daily_brief
+    from webapp.materialize import build_candidates_artifact
+    from webapp.store import StateArtifactStore
+
+    from test_webapp_candidates import _ROW, fake_candidates_payload
+
+    unmeasured = {"state": "unmeasurable", "label": "邊緣無法量", "reasons": ["coverage_unavailable"]}
+    tagged = {**_ROW, "ticker": "3163.TWO", "declared": "missing", "derived": "missing", "group": "missing",
+              "edge": unmeasured, "edge_note": "邊緣無法量：缺分析師家數"}
+    held_back = {**tagged, "ticker": "ZZZ", "declared": "open", "derived": "edge_unmeasurable", "group": None,
+                 "side": "edge_unmeasurable"}
+    payload = fake_candidates_payload()
+    board = {k: payload[k] for k in ("groups", "side_groups", "oldest_stall_days", "narrative_rewrite", "ledger",
+                                     "rollup", "universe", "today", "holdings")}
+    board["groups"] = {**payload["groups"], "missing": [tagged]}
+    board["side_groups"] = {**payload["side_groups"], "edge_unmeasurable": [held_back]}
+    board["counts"] = dict(payload["counts"], missing=1, edge_unmeasurable=1)
+    c = hb.candidate_counts(board)
+    assert (c["missing"], c["edge_unmeasurable"], c["open_unmeasurable"]) == (1, 2, 1)
+    StateArtifactStore(tmp_path).write(build_candidates_artifact(board))
+    assert "｜邊緣無法量 2（其中宣告可開、不放行 1）" in hb._candidate_lines(tmp_path)[0]
+    cover = daily_brief.candidate_short_lines(tmp_path)[1]
+    assert cover.startswith("- 覆蓋：邊緣無法量 2｜") and "｜可開但邊緣無法量 1" in cover
+
+    old = dict(board, groups=payload["groups"],
+               side_groups={**payload["side_groups"], "edge_unmeasurable": [{**tagged, "derived": "edge_unmeasurable",
+                                                                            "group": None, "side": "edge_unmeasurable"}]},
+               counts=dict(payload["counts"], edge_unmeasurable=1))
+    c_old = hb.candidate_counts(old)
+    assert (c_old["edge_unmeasurable"], c_old["open_unmeasurable"]) == (1, 0)
+    StateArtifactStore(tmp_path).write(build_candidates_artifact(old))
+    assert "可開但邊緣無法量" not in daily_brief.candidate_short_lines(tmp_path)[1]
+
+
+def test_snapshot_keeps_the_unmeasurable_key_meaning_across_the_regroup(tmp_path: Path) -> None:
+    """2026-10-30 改分組那天：舊鍵 `candidate.edge_unmeasurable` 照舊數全部量不到的檔——較昨不得印出假的「1→0」；
+    附組（宣告可開、不放行）換新鍵、首日起比對。"""
+    from datetime import date
+
+    from webapp.materialize import build_candidates_artifact
+    from webapp.store import StateArtifactStore
+
+    from test_webapp_candidates import _ROW, fake_candidates_payload
+
+    unmeasured = {"state": "unmeasurable", "label": "邊緣無法量", "reasons": ["coverage_unavailable"]}
+    row = {**_ROW, "ticker": "3163.TWO", "declared": "missing", "edge": unmeasured}
+    payload = fake_candidates_payload()
+    board = {k: payload[k] for k in ("groups", "side_groups", "oldest_stall_days", "narrative_rewrite", "ledger",
+                                     "rollup", "universe", "today", "holdings")}
+    old = dict(board, side_groups={**payload["side_groups"], "edge_unmeasurable": [
+        {**row, "derived": "edge_unmeasurable", "group": None, "side": "edge_unmeasurable"}]},
+        counts=dict(payload["counts"], edge_unmeasurable=1))
+    new = dict(board, groups={**payload["groups"], "missing": [
+        {**row, "derived": "missing", "group": "missing", "edge_note": "邊緣無法量：缺分析師家數"}]},
+        counts=dict(payload["counts"], missing=1))
+
+    def snap(b: dict) -> dict:
+        StateArtifactStore(tmp_path).write(build_candidates_artifact(b))
+        return hb.collect_snapshot(now=datetime(2026, 10, 30, tzinfo=timezone.utc), state_dir=tmp_path,
+                                   leads_path=tmp_path / "nope.json", thesis_path=tmp_path / "nope2.json",
+                                   run_record_path=None, capture_dir=None)
+
+    yesterday, today = snap(old), snap(new)
+    assert (yesterday["candidate.edge_unmeasurable"], today["candidate.edge_unmeasurable"]) == (1, 1)
+    assert (yesterday["candidate.open_unmeasurable"], today["candidate.open_unmeasurable"]) == (0, 0)
+    yesterday.pop("candidate.open_unmeasurable")                  # 10-30 之前的快照沒有這個鍵
+    line = hb.snapshot_diff_lines(today, yesterday, previous_date="2026-10-29", today=date(2026, 10, 30))[0]
+    assert "邊緣無法量 1→" not in line and "候選 缺 X 0→1" in line, line
+    assert "首日 1 項（今天起比對：候選 可開但邊緣無法量）" in line, line
+
+
 @pytest.mark.parametrize("holdings, expected", [
     ({"unresolved": [], "ignored": [], "ignored_problem": None}, "持股解析不到 0（使用者決定不研究 0）"),
     ({"unresolved": [], "ignored": [{"sheet_ticker": "7803.T", "reason": "不研究", "decided_at": "2026-07-29"}],

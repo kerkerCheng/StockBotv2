@@ -20,7 +20,8 @@ from typing import Any, Callable, Mapping, Sequence
 from ..candidates import (
     ANSWER_WORDS, CANDIDATES_THIS_IS_NOT, GROUP_LABELS, GROUPS, IN_NUMBERS_LINES, PRICED_IN_LINES,
     REWRITE_STATE_WORDS, SIDE_GROUPS, SIDE_LABELS, UNANSWERED, assemble_board, body_version, cap_label,
-    cited_identities, held_index, judgment_version, new_edge_reason, priced_since, rewrite_words, rides_reason, rollup,
+    cited_identities, edge_note, held_index, judgment_version, new_edge_reason, priced_since, rewrite_words, rides_reason,
+    rollup,
     squash, stall_since, stall_version, three_words, unread_new_edges,
 )
 from ..narrative.contracts import RECORD_VERSION_V2, InvestorBrief, select_brief
@@ -218,6 +219,9 @@ def derive_row(ticker: str, company_id: str | None, *, records: Sequence[Investo
                ) -> dict[str, Any] | None:
     """一檔的候選狀態。沒有敘事、也沒有持有 → None（不上板，計數另印「無敘事」）。
 
+    邊緣：非邊緣進「非倍率候選」；邊緣判定少一個輸入時**只擋宣告可開**（附組「可開但邊緣無法量」），
+    缺 X／等回落／不要照敘事分組、列上帶 `edge_note`（2026-10-30）。
+
     `bets`／`registry`：首屏「是不是新賭注」的比對輸入（`bet_index`，Phase 7 Step 7.0e）——只呈現在 `shared_bet`，
     **不進任何狀態判斷**；沒給就由 `shared_bet` 宣告缺席。
 
@@ -251,6 +255,8 @@ def derive_row(ticker: str, company_id: str | None, *, records: Sequence[Investo
         "rewrite_rides": [], "rewrite_new_edges": [],
         "edge": {**{k: (edge or {}).get(k) for k in ("state", "label", "reasons", "market_cap_usd", "analyst_count")},
                  "market_cap_label": cap_label((edge or {}).get("market_cap_usd"))},
+        # 邊緣判定少一個輸入時的那一句（下面判邊緣時才填；已持有、非邊緣、舊版不填）——是標記，不是分組
+        "edge_note": None,
         "held_source": dict(held_info) if held_info else None,
         "holdings_verified": held.get("status") == "ok",
         "rides": [], "watch": None, "since": None, "stall_days": None,
@@ -348,7 +354,13 @@ def derive_row(ticker: str, company_id: str | None, *, records: Sequence[Investo
         row.update(side="not_multiple", derived="not_multiple")
         return row
     if state != "edge":
-        row.update(side="edge_unmeasurable", derived="edge_unmeasurable")
+        # 缺輸入不放行（`alpha.edge`）——要擋的只有宣告可開的那一種；缺 X／等回落／不要照敘事分組、帶標記
+        # （2026-10-30 使用者「好 改吧」：原本一律蓋掉宣告，敘事寫的 X 與「不要」的理由都被藏進這一組，L12）
+        row["edge_note"] = edge_note(edge)
+        if cs.state == "open":
+            row.update(side="edge_unmeasurable", derived="edge_unmeasurable")
+            return row
+        row.update(group=cs.state, derived=cs.state)
         return row
     if cs.state == "open":
         blocking = blocking_for_open(str(company_id), ticker, watches=watches, lifecycle=lifecycle,

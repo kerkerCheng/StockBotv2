@@ -256,6 +256,8 @@ def render_analyst_view_markdown(view: AnalystView) -> str:
         head_line = f"- 候選狀態：**{markdown_text(str(row.get('derived_label') or row.get('derived') or '—'))}**"
         if row.get("declared") and row.get("declared") != row.get("derived"):
             head_line += f"（敘事宣告：{markdown_text(str(row.get('declared_label') or row.get('declared')))}）"
+        if row.get("edge_note"):                       # 邊緣判定少一個輸入：標記，不是狀態（2026-10-30）
+            head_line += f"｜{markdown_text(str(row['edge_note']))}"
         if row.get("stall_days") is not None:
             head_line += f"｜滯留 {row.get('stall_days')} 天"
         lines.append(head_line)

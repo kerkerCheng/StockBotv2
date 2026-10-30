@@ -8,7 +8,7 @@
 相依，而且請求路徑測試的「request path 不得載入模型／IO 模組」哨兵在 fixture 階段就被預載瞎掉（通過與失效同形，L13）。
 
 封閉字彙：五組 `GROUPS`（可開／缺 X／已定價等回落／不要／已持有）＋四個附組 `SIDE_GROUPS`
-（非倍率候選／邊緣無法量／舊版／前提失效）。**組內按 ticker 字母**；沒有分數、沒有名次（AGENTS 消費契約）。
+（非倍率候選／可開但邊緣無法量／舊版／前提失效）。**組內按 ticker 字母**；沒有分數、沒有名次（AGENTS 消費契約）。
 可開為零就零——讓它非空的路是研究，不是放寬任何一條前提（硬約束 7）。
 """
 from __future__ import annotations
@@ -17,6 +17,7 @@ import re
 from datetime import datetime, timezone
 from typing import Any, Callable, Iterable, Mapping, NamedTuple, Sequence
 
+from .edge import EDGE_LABELS
 from .narrative.contracts import RECORD_VERSION_V2, InvestorBrief
 from .three_questions import rollup as line_rollup
 
@@ -24,7 +25,9 @@ GROUPS: tuple[str, ...] = ("open", "missing", "priced_wait", "pass", "held")
 GROUP_LABELS: Mapping[str, str] = {"open": "可開", "missing": "缺 X", "priced_wait": "已定價等回落",
                                    "pass": "不要", "held": "已持有"}
 SIDE_GROUPS: tuple[str, ...] = ("not_multiple", "edge_unmeasurable", "legacy", "precondition_failed")
-SIDE_LABELS: Mapping[str, str] = {"not_multiple": "非倍率候選", "edge_unmeasurable": "邊緣無法量",
+#: `edge_unmeasurable` 只裝**宣告可開**、邊緣判定少一個輸入的檔（缺輸入不放行）；缺 X／等回落／不要照敘事分組、
+#: 列上帶 `edge_note`（2026-10-30 使用者「好 改吧」：原本一律蓋掉宣告，9 檔裡 5 檔缺 X、4 檔不要都被藏進這一組——L12）。
+SIDE_LABELS: Mapping[str, str] = {"not_multiple": "非倍率候選", "edge_unmeasurable": "可開但邊緣無法量",
                                   "legacy": "舊版（缺候選狀態）", "precondition_failed": "前提失效"}
 #: 首頁（單檔判讀清單）的分組（2026-10-07 使用者指示）：候選板同一組字＋兩個出口——沒寫敘事、這次沒讀到（L12：兩件事）。
 #: **順序是閱讀順序，不是名次**：研究時間花最多的在上（已持有、可開、缺 X、等回落——Phase 7 A4「深度」壓在這裡），
@@ -90,6 +93,20 @@ def cap_label(value: Any) -> str | None:
         return f"{float(value) / 1e9:.1f}B USD" if value is not None else None
     except (TypeError, ValueError):
         return None
+
+
+#: 邊緣判定少了哪個輸入（`alpha.edge.EDGE_REASONS` 的兩個 `*_unavailable`）的人話。
+_EDGE_MISSING_WORDS: Mapping[str, str] = {"market_cap_unavailable": "市值", "coverage_unavailable": "分析師家數"}
+
+
+def edge_note(edge: Mapping[str, Any] | None) -> str:
+    """邊緣判定少一個輸入時，卡片與個股頁照印的那一句（產生端給字，畫面不造字——L16）：「邊緣無法量：缺分析師家數」。
+    它說的是**篩選的輸入**缺了，不是敘事的 X（2026-10-30 使用者：「無法量是因為缺東西？那為何不是放缺 X」）。
+    判定本身沒有（舊 artifact、這一檔沒算到）就照實寫沒有判定，不猜缺哪一個。"""
+    reasons = [str(r) for r in (edge or {}).get("reasons") or ()]
+    missing = [_EDGE_MISSING_WORDS.get(r, r) for r in reasons if r.endswith("_unavailable")]
+    label = EDGE_LABELS["unmeasurable"]
+    return f"{label}：缺{'、'.join(missing)}" if missing else f"{label}：沒有判定"
 
 
 # ---------------------------------------------------------------------------
@@ -511,6 +528,7 @@ __all__ = ["ANSWER_WORDS", "CANDIDATES_THIS_IS_NOT", "GROUPS", "GROUP_LABELS", "
            "LIGHT_WORDS", "LIST_GROUPS", "LIST_GROUP_LABELS", "NEW_EDGES_PREFIX", "PRICED_IN_LINES",
            "REWRITE_STATE_WORDS", "REWRITE_WHY", "RIDES_SUPERSEDED_PREFIX", "SIDE_GROUPS", "SIDE_LABELS", "UNANSWERED",
            "WIPEOUT_LINES", "Cited", "assemble_board", "body_key", "body_version", "cap_label", "cited_identities",
+           "edge_note",
            "held_index", "judgment_version", "new_edge_reason", "normalize_url", "priced_judgment_key", "priced_since",
            "rewrite_words", "rides_reason", "rollup", "squash", "stall_since", "stall_version", "three_words",
            "unread_new_edges"]

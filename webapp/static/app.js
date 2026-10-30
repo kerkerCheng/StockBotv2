@@ -225,6 +225,8 @@ function cardStateLine(row) {
   // 缺 X 寫出缺什麼（故事層的短標，2026-10-29 使用者：「缺x是缺啥 可以五字一目瞭然嗎」）；沒寫短標照印狀態名。
   const chip = cand.missing_label ? `缺：${cand.missing_label}` : cand.label;
   if (chip) line.appendChild(el('span', 'card-chip chip-' + (cand.list_group || 'none'), chip));
+  // 邊緣判定少一個輸入（2026-10-30）：是標記不是狀態——卡片照敘事分組，這一句照印產生端給的字（「邊緣無法量：缺分析師家數」）
+  if (cand.edge_note) line.appendChild(el('span', 'card-chip chip-edge', cand.edge_note));
   // 敘事該重寫（候選列 rewrite[]，materialize 端照數）：這張卡的狀態可能已經舊了（2026-10-28 候選板那一區搬來）。
   // 2026-10-29 起寫原因（兩到四個字，`alpha.candidates.rewrite_words`），不只寫筆數；舊 artifact 照印筆數。
   if (typeof c.rewrite === 'number' && c.rewrite > 0) {
@@ -1395,6 +1397,7 @@ function candidateLine(view, inQuestions) {
     if (row.declared && row.declared !== row.derived) {
       head.appendChild(el('span', 'dim', `（敘事宣告：${row.declared_label || row.declared}）`));
     }
+    if (row.edge_note) head.appendChild(el('span', 'dim', '　' + row.edge_note));   // 標記，不是狀態（2026-10-30）
     if (typeof row.stall_days === 'number') head.appendChild(el('span', 'dim', `　滯留 ${row.stall_days} 天`));
     if (row.sheet_verified === false) head.appendChild(el('span', 'dim', '　持股未驗'));
   } else {
@@ -1603,6 +1606,7 @@ function askClaudePrompt(payload, view) {
   if (row) {
     out.push(`- 候選狀態：${row.derived_label || row.derived || '—'}`
       + (row.declared && row.declared !== row.derived ? `（敘事宣告：${row.declared_label || row.declared}）` : '')
+      + (row.edge_note ? `；${row.edge_note}` : '')
       + (typeof row.stall_days === 'number' ? `，滯留 ${row.stall_days} 天` : ''));
     if (row.reason) out.push(`- 理由：${row.reason}`);
     if (row.watch) {

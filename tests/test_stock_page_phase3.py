@@ -623,6 +623,28 @@ def test_no_narrative_page_says_why_there_is_no_narrative(monkeypatch) -> None:
     assert long.endswith("原本的敘事 2026-10-22 撤回") and "python -m" not in long
 
 
+def test_an_unmeasurable_edge_is_a_tag_on_the_card_and_the_page_not_the_group(monkeypatch) -> None:
+    """2026-10-30 使用者「好 改吧」：邊緣判定少一個輸入時，宣告等回落的檔落「等回落」組（不是附組），首頁卡片與
+    文字版個股頁都帶同一句標記——字由產生端給（`alpha.candidates.edge_note`），materialize 與 render 只照抄。"""
+    import alpha.providers.briefs as briefs_mod
+    from alpha.providers import candidates as cand
+    from briefing.analyst_view import render_analyst_view_markdown
+    from webapp.materialize import _candidate_overview
+
+    unmeasured = {"state": "unmeasurable", "label": "邊緣無法量", "reasons": ["coverage_unavailable"],
+                  "market_cap_usd": 1.6e9, "analyst_count": None}
+    monkeypatch.setattr(briefs_mod, "read_brief_records", lambda ticker: ([_brief()], []))
+    page = cand.page_input(_context(edges={T: unmeasured}), T, CO, three_questions=_tq())
+    assert page["row"]["group"] == "priced_wait" and page["row"]["edge_note"] == "邊緣無法量：缺分析師家數"
+    view = build_analyst_view(_bare_view(), candidate=page)
+    overview = _candidate_overview(view.to_dict()["candidate"])
+    assert overview["list_group"] == "priced_wait" and overview["edge_note"] == "邊緣無法量：缺分析師家數"
+    assert "邊緣無法量：缺分析師家數" in render_analyst_view_markdown(view)
+    edge_page = cand.page_input(_context(), T, CO, three_questions=_tq())           # 邊緣：沒有標記
+    assert _candidate_overview(build_analyst_view(_bare_view(), candidate=edge_page)
+                               .to_dict()["candidate"])["edge_note"] is None
+
+
 def test_legacy_narrative_gets_the_board_label_not_a_dash(monkeypatch) -> None:
     import alpha.providers.briefs as briefs_mod
     from alpha.providers import candidates as cand

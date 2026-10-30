@@ -871,7 +871,14 @@ def candidate_counts(board: Mapping[str, Any]) -> dict[str, Any]:
     non_edge = sum(1 for r in no_narr if (r.get("edge") or {}).get("state") == "not_edge")
     unmeasured = sum(1 for r in no_narr if (r.get("edge") or {}).get("state") not in ("not_edge", "edge"))
     out: dict[str, Any] = {key: counts.get(key, 0) for key in ("open", "missing", "priced_wait", "pass")}
-    out.update(held=counts.get("held"), edge_unmeasurable=counts.get("edge_unmeasurable", 0),
+    # 邊緣無法量（2026-10-30 起是列上的標記、不是分組）：上板、非持有的 v2 敘事裡邊緣判定少一個輸入的檔數——
+    # 照敘事分組的那幾檔（缺 X／等回落／不要）加上附組裡宣告可開、不放行的那幾檔。舊 artifact（附組裝全部）數出來一樣。
+    side = [r for r in (board.get("side_groups") or {}).get("edge_unmeasurable") or () if isinstance(r, Mapping)]
+    tagged = [r for key in ("open", "missing", "priced_wait", "pass") for r in (board.get("groups") or {}).get(key) or ()]
+    unmeasurable = len(side) + sum(1 for r in tagged if isinstance(r, Mapping)
+                                   and (r.get("edge") or {}).get("state") not in ("edge", "not_edge"))
+    out.update(held=counts.get("held"), edge_unmeasurable=unmeasurable,
+               open_unmeasurable=sum(1 for r in side if r.get("declared") == "open"),
                legacy=counts.get("legacy", 0), precondition_failed=counts.get("precondition_failed", 0),
                with_old=int(counts.get("not_multiple") or 0), non_edge=non_edge, unmeasured=unmeasured,
                edge_gap=len(no_narr) - non_edge - unmeasured, oldest=dict(board.get("oldest_stall_days") or {}))
@@ -897,6 +904,7 @@ def _candidate_lines(state_dir: Path | None) -> list[str]:
                 f"三題：{absence.reason}（{absence.kind}）"]
     c = candidate_counts(board)
     lines = [f"候選：{candidate_states_text(c)}｜邊緣無法量 {c['edge_unmeasurable']}"
+             f"（其中宣告可開、不放行 {c['open_unmeasurable']}）"
              f"｜舊版 {c['legacy']}｜前提失效 {c['precondition_failed']}"
              f"｜非倍率 {c['with_old'] + c['non_edge']}（有舊敘事 {c['with_old']}｜不寫敘事 {c['non_edge']}）"
              f"｜邊緣卻沒敘事 {c['edge_gap']}｜量不到卻沒敘事 {c['unmeasured']}"]
@@ -2476,6 +2484,10 @@ SNAPSHOT_KEYS: dict[str, str] = {
     # 候選板（Phase 3 Step 3.6）：每一組一鍵——由候選推導的封閉字彙導出，不抄一份（L16）。
     **{f"candidate.{g}": f"候選 {CANDIDATE_GROUP_LABELS[g]}" for g in CANDIDATE_GROUPS},
     **{f"candidate.{g}": f"候選 {CANDIDATE_SIDE_LABELS[g]}" for g in CANDIDATE_SIDE_GROUPS},
+    # 邊緣無法量（2026-10-30 起是列上的標記）：舊鍵照舊數全部量不到的檔（語意不變，較昨不會印出假的 9→0；
+    # 這一行覆寫上一行給它的中文，位置不變）；附組只剩宣告可開、不放行的檔，換新鍵、首日起比對（L12）。
+    "candidate.edge_unmeasurable": "候選 邊緣無法量",
+    "candidate.open_unmeasurable": f"候選 {CANDIDATE_SIDE_LABELS['edge_unmeasurable']}",
     "candidate.no_narrative": "候選 無敘事",
     # 追蹤表三條 lane（Phase 5 Step 5.2）：列數與曾達 2 倍——較昨 diff 看得到第一筆回填、第一份新敘事、第一個 2 倍。
     "positions.lane.paper.n": "追蹤表 paper 列數", "positions.lane.live.n": "追蹤表 live 列數",
@@ -2626,7 +2638,10 @@ def collect_snapshot(*, now: datetime, state_dir: Path | None, leads_path: Path,
         if absence is not None:
             return {}
         counts = board.get("counts") or {}
-        return {f"candidate.{k}": counts.get(k) for k in (*CANDIDATE_GROUPS, *CANDIDATE_SIDE_GROUPS, "no_narrative")}
+        c = candidate_counts(board)
+        return {**{f"candidate.{k}": counts.get(k) for k in (*CANDIDATE_GROUPS, *CANDIDATE_SIDE_GROUPS, "no_narrative")},
+                "candidate.edge_unmeasurable": c["edge_unmeasurable"],
+                "candidate.open_unmeasurable": c["open_unmeasurable"]}
 
     def positions() -> dict[str, Any]:
         payload, absence = _load_state(state_dir, "positions")

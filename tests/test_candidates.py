@@ -298,9 +298,40 @@ def test_not_edge_declared_open_is_not_a_multiple_candidate() -> None:
     assert row["group"] is None and row["side"] == "not_multiple" and row["declared"] == "open"
 
 
-def test_edge_unmeasurable() -> None:
-    row = _derive([_brief()], edge={"state": "unmeasurable", "reasons": ["cap_missing"]})
-    assert row["side"] == "edge_unmeasurable"
+UNMEASURED = {"state": "unmeasurable", "label": "邊緣無法量", "reasons": ["coverage_unavailable"],
+              "market_cap_usd": 1.6e9, "analyst_count": None}
+
+
+def test_edge_unmeasurable_only_holds_back_a_declared_open() -> None:
+    """2026-10-30 使用者「好 改吧」：邊緣無法量缺的是**篩選的輸入**，不是敘事的 X——缺輸入不放行，要擋的只有宣告可開。"""
+    row = _derive([_brief()], edge=UNMEASURED)
+    assert row["side"] == "edge_unmeasurable" and row["derived"] == "edge_unmeasurable" and row["group"] is None
+    assert row["declared"] == "open" and row["edge_note"] == "邊緣無法量：缺分析師家數"
+
+
+@pytest.mark.parametrize("state, watch_id, reason", [
+    ("missing", "ew_1", None), ("priced_wait", "ew_1", None), ("pass", None, "這一層不卡"),
+])
+def test_edge_unmeasurable_keeps_the_narratives_own_state_and_carries_a_tag(state, watch_id, reason) -> None:
+    """原本一律蓋掉宣告：真資料 9 檔裡 5 檔缺 X、4 檔不要被藏進附組，缺 X 與不要的檔數各少算（L12）。"""
+    row = _derive([_brief(state=state, watch_id=watch_id, reason=reason)], edge=UNMEASURED,
+                  watches=[_active("ew_1")] if watch_id else ())
+    assert row["group"] == state and row["derived"] == state and row["side"] is None
+    assert row["edge_note"] == "邊緣無法量：缺分析師家數"
+
+
+def test_edge_note_says_which_input_is_missing_and_is_absent_when_the_edge_is_known() -> None:
+    from alpha.candidates import edge_note
+
+    assert _derive([_brief()])["edge_note"] is None                                      # 邊緣：沒有標記
+    assert _derive([_brief(state="pass", reason="x")],
+                   edge={"state": "not_edge", "reasons": ["cap_over_edge"]})["edge_note"] is None   # 非邊緣另一組
+    held = {"status": "ok", "by_company": {CO: {"sheet_ticker": "AXTI", "source": "registry_ticker"}}}
+    assert _derive([_brief(state="pass", reason="x")], edge=UNMEASURED, held=held)["edge_note"] is None  # 已持有優先
+    assert edge_note({"reasons": ["market_cap_unavailable", "coverage_unavailable"]}) == "邊緣無法量：缺市值、分析師家數"
+    assert edge_note(None) == "邊緣無法量：沒有判定"                                       # 沒有判定不猜缺哪一個
+    no_edge = _derive([_brief(state="pass", reason="x")], edge=None)
+    assert no_edge["group"] == "pass" and no_edge["edge_note"] == "邊緣無法量：沒有判定"
 
 
 @pytest.mark.parametrize("watch, text, word", [
