@@ -108,6 +108,34 @@ def test_pending_cohort_members_read_only_open_frozen_theme_cohort_specs() -> No
     assert closure.pending_cohort_members(pool) == {"3017.TW": 701, "3653.TW": 701}
 
 
+def test_pending_cohort_members_include_the_excluded_companies_of_the_new_chain() -> None:
+    """failure log #114：新鏈的「第一份敘事」以鏈計——組外的公司同樣要等組落地。10-30 [894] 待核准時，排除名單上的
+    乾照、三安、中國衛星、Rocket Lab 被閉環列成可推進（名單是散文，機器認不得）。排除名單的 `company_ids` 經名冊轉 ticker。"""
+    tickers = {"co:changelight": "300102.SZ", "co:rocket_lab": "RKLB", "co:tianjin_hengdian": None}
+    spec = {"kind": "theme_cohort", "spec": {
+        "members": [{"ticker": "688818.SS"}, {"ticker": "VNP.TO"}],
+        "excluded": [{"name": "乾照光電（300102.SZ）", "company_ids": ["co:changelight"]},
+                     {"name": "Rocket Lab（RKLB）", "company_ids": ["co:rocket_lab"]},
+                     {"name": "天津恒电", "company_ids": ["co:tianjin_hengdian"]},     # 未上市：名冊 ticker 是 null，不算
+                     {"name": "千帆、中國星網", "company_ids": []},
+                     {"name": "舊 spec 沒有這個鍵"}]}}                                  # 舊 spec：照舊不算
+    pool = _pool({"n": 894, "frozen_spec": spec})
+    assert closure.pending_cohort_members(pool, tickers.get) == {
+        "688818.SS": 894, "VNP.TO": 894, "300102.SZ": 894, "RKLB": 894}
+    # 沒給 resolve（舊呼叫端）：只有成員——排除名單要經名冊才轉得成 ticker（INV-1：不從名字猜代號）
+    assert closure.pending_cohort_members(pool) == {"688818.SS": 894, "VNP.TO": 894}
+
+
+def test_the_narrative_writer_also_refuses_an_excluded_company_of_a_pending_cohort(monkeypatch) -> None:
+    """寫入端與佇列讀同一份（`pending_cohort_members`）：組外的新鏈公司第一份敘事同樣整筆拒收，直到組落地。"""
+    monkeypatch.setattr(provider, "_last_brief_day", lambda _t: None)
+    monkeypatch.setattr(provider, "_research_ticker", lambda cid, registry=None: {"co:changelight": "300102.SZ"}.get(cid))
+    monkeypatch.setattr("engine_b.todo.load", lambda *a, **k: _pool({"n": 894, "frozen_spec": {
+        "kind": "theme_cohort", "spec": {"members": [{"ticker": "VNP.TO"}],
+                                         "excluded": [{"name": "乾照光電", "company_ids": ["co:changelight"]}]}}}))
+    assert provider.first_narrative_awaiting_cohort("300102.SZ") == 894
+
+
 def test_awaiting_cohort_rows_are_not_queued_and_are_listed_with_their_number() -> None:
     from dataclasses import replace
 

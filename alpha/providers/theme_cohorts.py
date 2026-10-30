@@ -138,16 +138,69 @@ def resolve_members(spec: Mapping[str, Any], *, registry: Any = None) -> list[st
     return problems
 
 
+def _named_listed_companies(text: str, registry: Any) -> list[tuple[str, str]]:
+    """這段排除名字點名的、**有 research ticker** 的名冊公司 → [(company_id, ticker)]。
+
+    兩種寫法都認：名字（`query.bottleneck.quote_names_company`——名字比對的唯一 owner，含共用寫法不算）與
+    交易代號整詞（分大小寫；spec 慣例寫成「名（代號）」）。量過（2026-10-30，[894] 的九項）：名字認得五家、
+    「中國衛星（600118.SS）」只有代號認得（名冊只有簡體名）。"""
+    from query.bottleneck import quote_names_company, shared_name_forms
+
+    shared = shared_name_forms(registry)
+    hits: list[tuple[str, str]] = []
+    for company in registry.companies:
+        ticker = company.research_ticker
+        if not ticker:
+            continue
+        codes = {ticker, *company.aliases}
+        named = quote_names_company(text, company, shared=shared) or any(
+            re.search(r"(?<![A-Za-z0-9_.])" + re.escape(code) + r"(?![A-Za-z0-9_])", text) for code in codes if code)
+        if named:
+            hits.append((company.company_id, ticker))
+    return hits
+
+
+def resolve_excluded(spec: Mapping[str, Any], *, registry: Any = None, require_declared: bool = False) -> list[str]:
+    """排除名單的身分核對 → 問題清單（空＝沒問題；failure log #114）。
+
+    - 宣告的 `company_ids` 每一個都要在名冊。
+    - `require_declared`（鑄號端 `engine_b.todo.propose_theme_cohort` 用）：每一項都要有 `company_ids`（一家名冊公司都沒點名
+      就寫 `[]`），而且名字點名的有代號名冊公司（`_named_listed_companies`）一家都不能漏。寫入端（`append_cohort_record`）
+      不套這一條——寫進去的必須是核准的那一份，鑄號前的舊 spec 照原樣落地。
+    為什麼要宣告：組提案還在 pq2 時，閉環與 `alpha brief --add` 要認得「組外的新鏈公司」（它們的第一份敘事同樣要等組落地，
+    failure log #26）——散文名字機器認不得，10-18 台玻、10-30 四家都因此被列成可推進。"""
+    if registry is None:
+        from identity.registry import get_registry
+
+        registry = get_registry()
+    problems = []
+    for entry in validate_spec(spec)["excluded"]:
+        declared = entry.get("company_ids")
+        if declared is None:
+            if require_declared:
+                problems.append(f"excluded「{entry['name']}」缺 company_ids（點名了哪幾家名冊公司；一家都沒有就寫 []）")
+            continue
+        for cid in declared:
+            if not registry.has_company(cid):
+                problems.append(f"excluded「{entry['name']}」：{cid} 不在 registry")
+        if require_declared:
+            missing = [f"{cid}（{ticker}）" for cid, ticker in _named_listed_companies(entry["name"], registry)
+                       if cid not in declared]
+            if missing:
+                problems.append(f"excluded「{entry['name']}」點名了名冊公司 {'、'.join(missing)}，company_ids 沒寫")
+    return problems
+
+
 def append_cohort_record(record: Mapping[str, Any], *, directory: Path | None = None, registry: Any = None) -> Path:
     """append 一筆（已由 `cohort_record()` 驗證過的）紀錄；只 append，永不改寫既有行。"""
     parsed = parse_cohort_record(record)
     sensitive = sensitive_payload_path(dict(record), "theme_cohort")
     if sensitive is not None:
         raise ContractViolation(f"secret-bearing theme cohort rejected at {sensitive}")
-    problems = resolve_members({k: record.get(k) for k in ("theme", "members", "excluded", "reason",
-                                                            "supersedes_id")}, registry=registry)
+    spec_part = {k: record.get(k) for k in ("theme", "members", "excluded", "reason", "supersedes_id")}
+    problems = resolve_members(spec_part, registry=registry) + resolve_excluded(spec_part, registry=registry)
     if problems:
-        raise ContractViolation("成員身分解析不到：" + "；".join(problems))
+        raise ContractViolation("成員或排除名單身分解析不到：" + "；".join(problems))
     path = ledger_path(parsed.theme, directory=directory)
     existing, _ = read_cohort_records(parsed.theme, directory=directory)
     if any(r.cohort_id == parsed.cohort_id for r in existing):
@@ -166,4 +219,4 @@ def memberships(ticker: str, cohorts: list[ThemeCohort]) -> list[ThemeCohort]:
 
 
 __all__ = ["THEME_COHORT_DIR", "append_cohort_record", "current_cohorts", "ledger_path", "memberships",
-           "read_cohort_records", "resolve_members", "slug"]
+           "read_cohort_records", "resolve_excluded", "resolve_members", "slug"]

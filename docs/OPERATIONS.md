@@ -554,7 +554,7 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 主題等權組（互動）：
 ```powershell
 & '.venv\Scripts\python.exe' -m alpha theme-cohort [<TICKER>]                       # 唯讀：現行的組／一檔屬於哪幾組
-& '.venv\Scripts\python.exe' -m engine_b.todo add-theme-cohort --spec <spec.json>   # 研究步驟：凍結 spec 進一個 pq2 編號
+& '.venv\Scripts\python.exe' -m engine_b.todo add-theme-cohort --spec <spec.json>   # 研究步驟：凍結 spec 進一個 pq2 編號（excluded 每項必寫 company_ids，2026-10-30）
 & '.venv\Scripts\python.exe' -m engine_b.todo complete-theme-cohort <n>             # 使用者 go 之後：比對 digest 才寫 ledger（bare go 拒收）
 ```
 

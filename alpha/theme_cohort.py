@@ -29,6 +29,8 @@ _ID_FIELDS = ("theme", "members", "excluded", "reason", "decided_on", "pq2_ref",
               "created_at", "author")
 #: spec（凍結進 pq2 的那一份）的欄位。`decided_on`／`pq2_ref`／`created_at` 由寫入端補，不在 spec 裡。
 SPEC_FIELDS = ("theme", "members", "excluded", "reason", "supersedes_id")
+#: excluded 每一項的欄位。`company_ids`＝這一項點名的名冊公司（2026-10-30 起鑄號必填，見 `validate_spec`）。
+EXCLUDED_FIELDS = ("name", "reason", "company_ids")
 
 
 @dataclass(frozen=True)
@@ -43,7 +45,7 @@ class ThemeCohort:
     cohort_id: str
     theme: str
     members: tuple[CohortMember, ...]
-    excluded: tuple[Mapping[str, str], ...]
+    excluded: tuple[Mapping[str, Any], ...]
     reason: str
     decided_on: date
     pq2_ref: int
@@ -95,9 +97,26 @@ def validate_spec(spec: Mapping[str, Any]) -> dict[str, Any]:
     excluded = []
     for e in raw_excluded:
         if not isinstance(e, Mapping):
-            raise ContractViolation("excluded 每一項必須是 {name, reason}")
-        excluded.append({"name": _nonempty(e.get("name"), "excluded[].name"),
-                         "reason": _nonempty(e.get("reason"), "excluded[].reason")})
+            raise ContractViolation("excluded 每一項必須是 {name, reason, company_ids}")
+        unknown_keys = sorted(set(e) - set(EXCLUDED_FIELDS))
+        if unknown_keys:
+            raise ContractViolation(f"excluded「{e.get('name')}」有未登記的欄位 {unknown_keys}；只收 {list(EXCLUDED_FIELDS)}")
+        entry: dict[str, Any] = {"name": _nonempty(e.get("name"), "excluded[].name"),
+                                 "reason": _nonempty(e.get("reason"), "excluded[].reason")}
+        # 2026-10-30（failure log #114）：排除的是哪幾家名冊公司——閉環與敘事寫入端靠它認得「組外的新鏈公司」。
+        # 沒有這個鍵的是舊 spec／舊紀錄：照原樣正規化（digest 與 cohort_id 不變）；新 spec 由鑄號端要求必填。
+        if "company_ids" in e:
+            ids = e.get("company_ids")
+            if not isinstance(ids, (list, tuple)):
+                raise ContractViolation(f"excluded「{entry['name']}」的 company_ids 必須是 list（一家名冊公司都沒點名就寫 []）")
+            clean_ids = [str(c).strip() for c in ids]
+            bad = [c for c in clean_ids if not c.startswith("co:")]
+            if bad:
+                raise ContractViolation(f"excluded「{entry['name']}」的 company_ids 必須是 co:*（收到 {bad}）")
+            if len(set(clean_ids)) != len(clean_ids):
+                raise ContractViolation(f"excluded「{entry['name']}」的 company_ids 重複")
+            entry["company_ids"] = clean_ids
+        excluded.append(entry)
     supersedes = spec.get("supersedes_id")
     if supersedes is not None and not str(supersedes).startswith("tc_"):
         raise ContractViolation("supersedes_id 必須是 tc_ 開頭的既有 cohort_id")

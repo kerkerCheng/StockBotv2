@@ -91,8 +91,9 @@ class BacklogRow:
     population_reason: str | None = None
     #: 邊緣沒座位：「坐哪一層」短檢查到期了嗎（90 天內有 v2 敘事＝查過）。用到今天，所以 provider 算（本檔無時鐘）。
     short_check_due: bool | None = None
-    #: 等主題組（2026-10-08，Phase 7 failure log #26）：這一檔**還沒有任何 v2 敘事**、而且在一個還沒落地的主題等權組提案
-    #: （pq2 凍結的 spec）裡 → 那個 pq2 編號。plan 7.1 ④：那條鏈的組要在第一份敘事之前定義（已定價的相對比較才有事先登記的
+    #: 等主題組（2026-10-08，Phase 7 failure log #26）：這一檔**還沒有任何 v2 敘事**、而且被一個還沒落地的主題等權組提案
+    #: （pq2 凍結的 spec）點名——成員，或 2026-10-30 起排除名單的 `company_ids`（#114）→ 那個 pq2 編號。
+    #: plan 7.1 ④：那條鏈的組要在第一份敘事之前定義（已定價的相對比較才有事先登記的
     #: 參照）；10-05 散熱四檔照閉環佇列寫了敘事、組晚落地，驗收⑤不成立。provider 讀待辦池算好帶進來（本檔不讀檔）。
     awaiting_cohort: int | None = None
     #: 等入圖（2026-10-08，Phase 7 failure log #51）：邊緣沒座位、短檢查結論①補供貨邊——focus 是這一檔的 `ra_admission`
@@ -206,19 +207,31 @@ def row_from_artifact(ticker: str, payload: Mapping[str, Any], *,
     )
 
 
-def pending_cohort_members(pool: Mapping[str, Any]) -> dict[str, int]:
-    """還沒落地的主題等權組提案裡的成員 → 那個 pq2 編號（failure log #26）。純函式，只讀待辦池的結構化欄位：
-    未結案、`frozen_spec.kind == "theme_cohort"` 的項目（`engine_b.todo.propose_theme_cohort` 凍結的 spec）。
-    同一檔出現在兩個未落地的提案裡取編號小的（先提的那個）。"""
+def pending_cohort_members(pool: Mapping[str, Any], resolve: Any = None) -> dict[str, int]:
+    """還沒落地的主題等權組提案點名的檔（成員**與排除名單**）→ 那個 pq2 編號（failure log #26／#114）。純函式，只讀待辦池的
+    結構化欄位：未結案、`frozen_spec.kind == "theme_cohort"` 的項目（`engine_b.todo.propose_theme_cohort` 凍結的 spec）。
+    同一檔出現在兩個未落地的提案裡取編號小的（先提的那個）。
+
+    排除名單：新鏈的「第一份敘事」以鏈計、不以檔計——組外的公司同樣要等組落地（#26 第 2 次）。它讀 excluded 條目的
+    `company_ids`（2026-10-30 起鑄號必填），`resolve(company_id)` 由 provider 給（查名冊的 research ticker；讀不到回 None
+    ——那一家就不算，不猜）；沒給 `resolve`、或舊 spec 沒有 `company_ids`，排除名單照舊不算。"""
     out: dict[str, int] = {}
     for item in sorted((i for i in (pool.get("items") or ()) if not i.get("resolved_at")), key=lambda i: i["n"]):
         frozen = item.get("frozen_spec") or {}
         if frozen.get("kind") != "theme_cohort":
             continue
-        for member in (frozen.get("spec") or {}).get("members") or ():
+        spec = frozen.get("spec") or {}
+        for member in spec.get("members") or ():
             ticker = str(member.get("ticker") or "").upper()
             if ticker:
                 out.setdefault(ticker, int(item["n"]))
+        if resolve is None:
+            continue
+        for entry in spec.get("excluded") or ():
+            for company_id in entry.get("company_ids") or ():
+                ticker = str(resolve(str(company_id)) or "").upper()
+                if ticker:
+                    out.setdefault(ticker, int(item["n"]))
     return out
 
 

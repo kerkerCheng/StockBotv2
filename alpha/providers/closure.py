@@ -98,18 +98,15 @@ def collect_backlog(*, artifact_dir: Path | None = None, state_dir: Path | None 
         from engine_b.todo import load as load_pool
         from identity import get_registry
 
-        registry = get_registry()
+        registry = get_registry()      # 讀不到 → 三格整批不套、寫進 notes（不讓每一家各自安靜地回 None）
 
         def _resolve(company_id: str) -> str | None:
-            try:
-                return getattr(registry.company(company_id), "research_ticker", None)
-            except Exception:  # noqa: BLE001
-                return None
+            return _research_ticker(company_id, registry)
 
         pool = load_pool()
         deferred = deferred_tickers(pool, _resolve)
-        # 等主題組（failure log #26）：還沒落地的組提案裡的成員（沒寫過敘事的才算，見下面）
-        pending_cohort = pending_cohort_members(pool)
+        # 等主題組（failure log #26／#114）：還沒落地的組提案點名的檔——成員與排除名單（沒寫過敘事的才算，見下面）
+        pending_cohort = pending_cohort_members(pool, _resolve)
         # 等入圖（failure log #51）：短檢查結論①的 ra_admission 還在 pq2——focus 讀 RA 紀錄，讀不到那一號就不算
         from intake.actions import read_action
 
@@ -158,7 +155,8 @@ def collect_backlog(*, artifact_dir: Path | None = None, state_dir: Path | None 
 
 
 def first_narrative_awaiting_cohort(ticker: str) -> int | None:
-    """這一檔還沒有任何 v2 敘事、而且在一個還沒落地的主題組提案裡 → 那個 pq2 編號；否則 None（failure log #26）。
+    """這一檔還沒有任何 v2 敘事、而且被一個還沒落地的主題組提案點名（成員或排除名單）→ 那個 pq2 編號；否則 None
+    （failure log #26／#114）。
 
     敘事寫入端（`python -m alpha brief <T> --add`）與閉環佇列讀同一份資料（`alpha.closure.pending_cohort_members`）。
     待辦池讀不到 → None（不擋；佇列那一端同樣照舊——讀不到不是「組已落地」，但擋寫入要有收據）。
@@ -168,7 +166,19 @@ def first_narrative_awaiting_cohort(ticker: str) -> int | None:
     try:
         from engine_b.todo import load as load_pool
 
-        return pending_cohort_members(load_pool()).get(str(ticker).upper())
+        return pending_cohort_members(load_pool(), _research_ticker).get(str(ticker).upper())
+    except Exception:  # noqa: BLE001
+        return None
+
+
+def _research_ticker(company_id: str, registry: Any = None) -> str | None:
+    """名冊的 research ticker；讀不到回 None（那一家就不算，不猜）。`collect_backlog` 先讀好名冊再傳進來。"""
+    try:
+        if registry is None:
+            from identity import get_registry
+
+            registry = get_registry()
+        return getattr(registry.company(company_id), "research_ticker", None)
     except Exception:  # noqa: BLE001
         return None
 

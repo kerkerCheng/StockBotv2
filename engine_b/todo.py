@@ -1262,7 +1262,7 @@ def propose_theme_cohort(pool: dict[str, Any], spec: Mapping[str, Any], *, at: s
     同一份 spec 重提得到同一個編號（ref_id 含 digest）；改了任何一個字就是另一個編號——核准綁的是內容。
     """
     from alpha.errors import ContractViolation
-    from alpha.providers.theme_cohorts import resolve_members
+    from alpha.providers.theme_cohorts import resolve_excluded, resolve_members
     from alpha.theme_cohort import spec_digest, validate_spec
 
     try:
@@ -1272,6 +1272,10 @@ def propose_theme_cohort(pool: dict[str, Any], spec: Mapping[str, Any], *, at: s
     problems = resolve_members(clean)
     if problems:
         raise TodoError("成員身分解析不到（INV-1，不猜）：" + "；".join(problems))
+    # 排除名單也要指得到名冊公司（failure log #114）：組落地前，閉環與敘事寫入端靠它擋組外新鏈公司的第一份敘事
+    problems = resolve_excluded(clean, require_declared=True)
+    if problems:
+        raise TodoError("排除名單沒寫清楚是哪幾家名冊公司：" + "；".join(problems))
     digest = spec_digest(clean)
     tickers = "、".join(m["ticker"] for m in clean["members"])
     item = upsert(
@@ -2609,7 +2613,8 @@ def main(argv: list[str] | None = None) -> int:
         "add-theme-cohort",
         help="把主題等權組成分 spec 凍結進一個 manual pq2 編號（研究步驟用；互動專用）",
     )
-    p_add_tc.add_argument("--spec", required=True, help="spec JSON 檔（theme／members／excluded／reason）")
+    p_add_tc.add_argument("--spec", required=True,
+                          help="spec JSON 檔（theme／members／excluded／reason；excluded 每項 {name, reason, company_ids}）")
 
     p_complete_tc = sub.add_parser(
         "complete-theme-cohort",
