@@ -3017,6 +3017,40 @@
         "SolAero Technologies",
         "SolAero Technologies Corp."
       ]
+    },
+    {
+      "company_id": "co:qioptiq",
+      "research_ticker": null,
+      "display_name": "Teledyne Qioptiq",
+      "_display_name_source": "Teledyne 交割新聞稿（2025-02-03，teledyne-ade.com）「The acquired business will now be included in Teledyne's Aerospace and Defense Electronics segment and operate under the name Teledyne Qioptiq.」；NASA GRC 簡報（2023-04-20）p.22 寫作「Qioptiq」",
+      "_note": "隨太空蓋片層入圖包 staged（2026-10-30，drop 即回退）：英國 Northern Wales 的光學系統事業（Qioptiq® 品牌）——太空級太陽電池蓋片（摻鈰硼矽玻璃 CMG／CMX／CMO，NASA GRC 2023-04-20 簡報 p.22）。2025-02-03 起屬 Teledyne Technologies（NYSE: TDY）：交割新聞稿「The acquisition includes the optical systems business known under the Qioptiq® brand based in Northern Wales, UK」「proprietary glass used in space and satellite applications」。⚠ 不登記成 Teledyne 的別名：本包的第三方一手早於收購（NASA 2023-04，當時屬 Excelitas），照 co:coolit_systems 先例分開登記；Excelitas 保留的其他光電事業不是這一家（INV-1）。研究 ticker 明確 null——可投資的載體只有母公司 TDY，系統口徑非邊緣（`python -m alpha edge TDY`：314.0 億美元、分析師 12 家，2026-10-30），而且蓋片只占它很小一塊",
+      "name_aliases": [
+        "Qioptiq",
+        "Teledyne Qioptiq"
+      ]
+    },
+    {
+      "company_id": "co:qinhuangdao_xingjian",
+      "research_ticker": null,
+      "display_name": "秦皇岛星箭特种玻璃有限公司",
+      "_display_name_source": "秦皇岛发布（秦皇岛市互联网信息办公室，新浪轉載 2022-07-27）「这种抗辐照玻璃盖片由秦皇岛星箭特种玻璃有限公司自主研发生产」；英文正式名稱未取得一手",
+      "_note": "隨太空蓋片層入圖包 staged（2026-10-30，drop 即回退）：河北秦皇岛的空間用抗輻照玻璃蓋片與 OSR 玻璃基片廠；問天、夢天實驗艙太陽電池帆板的柔性抗輻照玻璃蓋片（兩份媒體稿轉述公司）。非上市（研究 ticker 明確 null，INV-1）；股權結構未取得一手（中玻網、百度百科寫「有限责任公司（自然人投资或控股）」，二手、未核）。經濟參考報 2023-07-05 記者寫它「已经成为中国航天科技集团在同行业中唯一合格供应商」——媒體轉述，入圖包不主張 sole_source",
+      "name_aliases": [
+        "星箭特种玻璃",
+        "秦皇岛星箭",
+        "星箭公司",
+        "秦皇島星箭特種玻璃有限公司"
+      ]
+    },
+    {
+      "company_id": "co:schott",
+      "research_ticker": null,
+      "display_name": "SCHOTT AG",
+      "_display_name_source": "SCHOTT 新聞稿（SpaceNews 2025-12-09）「SCHOTT® Solar Glass exos is a registered trademark of SCHOTT AG.」",
+      "_note": "隨太空蓋片層入圖包 staged（2026-10-30，drop 即回退）：德國 Mainz 的特種玻璃集團；同稿 boilerplate「The company belongs to the Carl Zeiss Foundation」——非上市，研究 ticker 明確 null（INV-1）。2025 年發表太空太陽電池蓋片 SCHOTT® Solar Glass exos，與 AZUR SPACE（co:5n_plus）共同開發，摻鈰材料依 ECSS 鑑定中",
+      "name_aliases": [
+        "SCHOTT"
+      ]
     }
   ]
 }

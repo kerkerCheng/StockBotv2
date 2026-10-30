@@ -1,0 +1,26 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1051627/000143774926033941/axti20260905_8k.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] AXT, Inc. 8-K（2026-10-29 申報）——第三季 2026 財報新聞稿（EX-99.1「AXT, Inc. Announces Third Quarter 2026 Financial Results」）
+DATE: 2026-10-29
+RETRIEVED: 2026-10-30（SEC EDGAR 原文 HTML 由 daily 語意層抽字存檔、空白正規化，逐字）
+NOTE: 發行人自己的新聞稿（L8：需求與產能的說法是發行人自述）。全文 0 次 price／pricing／ASP／mix／outlook／guidance／backlog——毛利率的歸因與定價要等 Q3 10-Q 的 MD&A（約 2026-11-13）。
+
+【CEO 引言】
+"Our revenue in Q3 reached a record $73.4 million, up 54 percent from the prior quarter and up 162 percent year over year, driven by exceptionally strong customer demand for our indium phosphide material."
+"We entered 2026 with a commitment to double our indium phosphide capacity and I am pleased to report that not only have we surpassed that goal but we have more than quadrupled our 2026 indium phosphide revenue opportunity through additional productivity gains and the expansion of our capabilities for high-value, large diameter products."
+
+【第三季數字】
+"Revenue for the third quarter of 2026 was $73.4 million, compared with $47.6 million for the second quarter of 2026 and $28.0 million for the third quarter of 2025."
+"GAAP gross margin was 56.0 percent of revenue for the third quarter of 2026, compared with 44.9 percent of revenue for the second quarter of 2026 and 22.3 percent for the third quarter of 2025."
+"GAAP net income, after minority interests, for the third quarter of 2026 was a net income of $25.7 million, or $0.39 diluted income per share, compared with a net income of $11.1 million, or $0.17 per share, for the second quarter of 2026 and a net loss of $1.9 million, or $0.04 per share, for the third quarter of 2025."
+
+【資產負債表（千美元；2026-09-30 對 2025-12-31）】
+"Cash and cash equivalents $ 485,472 $ 120,266"
+"Inventories 103,658 81,651"
+
+【Forward-looking 與風險句（不是揭露的事件）】
+"These risks, uncertainties and assumptions include, but are not limited to, the receipt of export permits for our indium phosphide substrates, the withdrawal, cancellations or requests for redemptions by private equity funds in China of their investments in Tongmei"
+
+【公司簡介（終端市場）】
+"End markets include 5G infrastructure, data center connectivity (silicon photonics), passive optical networks, LED lighting, lasers, sensors, power amplifiers for wireless devices and satellite solar cells."

@@ -1,0 +1,38 @@
+SOURCE: AXT, Inc. 2026 年第三季法說會逐字稿（第三方轉錄：gloom.sh；機器轉錄）
+URL: https://gloom.sh/stocks/axti/transcripts/q3-2026
+CROSS-CHECK: https://www.investing.com/news/transcripts/earnings-call-transcript-axt-tops-q3-2026-estimates-but-shares-fall-93CH-4985374（全文逐字稿；本機下載 403，只經 WebFetch 讀到，數字與講者句意一致，未逐字核對）；https://www.marketbeat.com/instant-alerts/transcript-what-axt-axti-said-on-its-q3-earnings-call-2026-10-29/（摘要，非逐字）
+PUBLISHED: 2026-10-29（法說會日期＝8-K 財報發布日 2026-10-29，美東盤後）
+RETRIEVED: 2026-10-30
+STORAGE: repo_excerpt（逐字稿有限節錄）
+NOTE: 第三方機器轉錄（非發行人申報、tier 1-2）；ASR 把「indium phosphide」轉成「Indian FOSFied／Indian FOSFID／Indian Fosified」、Lumentum 轉成「Lamentum」、wafers 轉成「way for us／waivers」——以下引文照轉錄稿逐字保留，不改字。講者標示照轉錄稿（時間戳＋姓名）；28:32 段轉錄稿標「Unidentified Management」。申報原文（Q3 10-Q MD&A）約 2026-11-13，毛利率歸因與合約條款以申報為準。發行人自述（L8：需求、產能與競爭力的說法都是供應商自己說的）。
+
+[02:50 Gary Fischer, Chief Financial Officer]
+"To break down, our Q326 revenue for you by product category, Indian FOSFied was 54.3 million , primarily from data center applications. Galium arsenide was 9.1 million . Geranium substrates were 344,000 . Finally, revenue from our consolidated raw material companies in Q3 was 9.7 million . The top five customers generated approximately 35% of total revenue, and one customer was over the 10% level."
+"Gross margins showed continued gain in the third quarter, driven by an increase in total volume and a favorable product mix. In addition, market prices for Indian FOSFied have increased, and a shift from three-inch to four-inch way for us has also contributed."
+"During Q3, we signed a long-term supply agreement with Lamentum. Under the terms of the agreement, we received a prepayment for waivers of 43.5 million ."
+
+[09:20 Morris Young, Chief Executive Officer]
+"We entered 2026 with a commitment to double our Indian FOSFID capacity. And I'm pleased to report that we surpassed that goal in August and continue our expansion as an ongoing effort. We are currently in the design phase of converting a newly acquired adjacent building for Indian FOSFID production with work expected to begin within the next several months"
+"With backlog now above $500 million , including long-term multi-year agreements, short-term contracts of less than 12 months, and spot purchase orders. Demand remains ahead of supply, even as we accelerate the pace of our"
+
+[19:05 Gary Fischer, Chief Financial Officer]
+"As of today, we have approximately 90 million in revenue that can be realized in Q4 across our substrate product lines and raw materials, for which we either already have a permit to ship or for which a permit is not required. We have a high degree of confidence in recognizing this revenue in Q4."
+
+[22:09 Gary Fischer, Chief Financial Officer]
+"As usual, the gross margin is hugely driven by volume, which we've always said, and it's hugely driven by mix."
+
+[28:32 Unidentified Management]
+"It is a lot higher than we projected recently, of course. And that's that's in part because of this migration to larger wafer sizes. And it's also in part to an increase in ASPs. And we've been building out out an ASP plan as we move forward. In Q3, we recorded an Indian Fosified revenue of 54.3 million dollars. And that's probably going to go up in in Q4. Total projection of Q4 being around the 90 million dollar mark."
+
+[31:13 Morris Young, Chief Executive Officer（同一段落內另有「Morris has already pointed out」——轉錄稿未另標講者，可能是另一位主管接話）]
+"So as we stand right now, we are significantly overbooked. All of our customers are on allocation and the market out there every month we see additional growth. As we look at our capacity moving into 27 and then beyond into 28 , the opportunities for us here and the demand for us outstrips any capacity that we can put in place."
+"Even long-term supply agreements that we we're having off of customers, we're being asked to increase 2X or 3X . So the plans that we have to, again, quote, double our capacity in 2027, I'm not sure we'll even get our head above water with 2027."
+
+[39:41 Morris Young, Chief Executive Officer 段落]
+"Historically, we've we've built and shipped for China because we don't need permits. Again, everybody is now on allocation. We're we're accepting backlog as we see this, but we're also seeing a longer lead time out nine plus months on a lot of this stuff. So of course, as we see longer lead times, we see more of these supply agreements. We see more demand coming this way. The backlog is just going to grow."
+
+[52:11 Morris Young, Chief Executive Officer]
+"Well, you know, the number is roughly double. You know, the challenge is this, I think we're going to be more than double into 2026. So if you take end of 2025 as one, we're probably going to be 2.75 or three at the end of 2026, right? And I think right now our goal is to double again in 2027."
+
+[轉錄站自寫的摘要欄（不是講者原話，只當索引）]
+"Q4 realizable revenue approximately $90 million permits secured or not required Q4 non-GAAP operating expenses approximately $13 million Q4 non-GAAP net income 57 to 59 cents per share Q4 GAAP net income 56 to 58 cents per share"
