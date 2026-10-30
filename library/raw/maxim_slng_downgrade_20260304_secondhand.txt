@@ -1,0 +1,18 @@
+SOURCE: Simply Wall St 刊於 Yahoo Finance「How The Stabilis Solutions (SLNG) Story Is Shifting As LNG Growth Expectations Reset」——轉述 Maxim Group 2026-03-04 把 SLNG 由 Buy 降為 Hold
+URL: https://finance.yahoo.com/news/stabilis-solutions-slng-story-shifting-190939855.html
+PUBLISHED: 2026-03-10（文章日期；降評日 2026-03-04）
+RETRIEVED: 2026-10-31
+STORAGE: repo_excerpt（第三方報導有限節錄；網頁擷取，逐字截取）
+NOTE: **二手轉述**——Maxim 報告原文沒有拿到（券商報告不進 repo）。只能當線索與脈絡，不能當一手證據（L11：多個二手≠一手已證實）。分析師 Tate Sullivan（Maxim Group）是 SLNG 唯一的賣方覆蓋（Engine C 共識 1 家）。降評在資料中心長約公布（2026-02-17）之後兩週。2026-10-31 以網頁原文（去標籤、空白正規化）逐段核對全部命中。
+
+【文章】
+On March 4, 2026, Maxim cut its rating to Hold from Buy
+
+【同上（理由一：船用燃料時程）】
+longer estimated timeline for more ships to use natural gas as engine fuel, which tempers the pace of potential volume growth
+
+【同上（理由二：資本與門檻）】
+higher capital requirements for liquefied natural gas delivery infrastructure, limited barriers to entry
+
+【同上（模型下修）】
+lower revenue, EBITDA, delivered liquefied natural gas volumes, and gross margin per gallon

@@ -1,0 +1,36 @@
+SOURCE: Stabilis Solutions, Inc. Form 8-K（Item 2.02／7.01）附件 99.1 新聞稿「STABILIS SOLUTIONS ANNOUNCES PRELIMINARY FOURTH QUARTER 2025 RESULTS, PROVIDES BUSINESS UPDATE」——資料中心長約第一次公開、Galveston 計畫、兩份大合約結束
+URL: https://www.sec.gov/Archives/edgar/data/1043186/000143774926004242/ex_917347.htm
+PUBLISHED: 2026-02-17（新聞稿日期＝EDGAR 申報日，accession 0001437749-26-004242）
+RETRIEVED: 2026-10-31
+STORAGE: repo_excerpt（SEC 申報附件有限節錄；本機抽字，逐字截取）
+NOTE: **供應商一手（自述）**。這是資料中心長約**第一次公開**的文件（10-Q 寫「In February 2026, the Company was awarded」）；同一份新聞稿同時公布第四季初步數字與兩份大合約結束——股價反應不能只歸給長約。客戶未具名。
+
+【開頭】
+today announced preliminary fourth quarter 2025 results and issued an update on recent strategic milestones, including the award of a historic, multi-year take-or-pay LNG supply agreement with an estimated contract value of $200 million, commencing in 2027.
+
+【$200 MILLION DATA CENTER CONTRACT AWARD】
+Stabilis was recently awarded a multi-year take-or-pay contract to supply LNG for a U.S. behind-the-meter power generation application for a world-leading provider of remote and temporary power generation and energy services.
+
+【同段】
+Stabilis anticipates total revenue under the initial two-year term of the contract of approximately $200 million.
+
+【同段】
+This contract represents the Company’s first-ever contract in support of data center behind-the-meter power generation, consistent with its strategic focus on growing, high-value vertical markets.
+
+【GALVESTON LNG LIQUEFACTION AND BUNKERING PROJECT】
+Stabilis continues to advance its proposed Galveston liquefaction facility and Jones Act-compliant LNG bunkering vessel (“the Project”) toward an expected Final Investment Decision (“FID”) by the end of the first quarter 2026.
+
+【同段】
+The total capital required for the Project is estimated at $350 million to $400 million.
+
+【CONCLUSION OF MULTI-YEAR LNG SUPPLY CONTRACTS】
+The completed contracts were for temporary remote power in Louisiana, and the Company’s truck-to-vessel LNG marine bunkering services in Galveston, Texas.
+
+【同段】
+The two contracts accounted for approximately 19% and 32% of 2025 revenues, respectively.
+
+【MANAGEMENT COMMENTARY（Casey Crenshaw）】
+we anticipate 2026 will be a transitional year for our organization as we prepare to support new, long-term customer agreements, while continuing to advance toward FID under our Galveston LNG project
+
+【同上】
+On an annualized basis, we expect this contract will represent approximately $100 million in revenue – more than our total, consolidated annual revenue in any year since our inception, with an anticipated contract commencement planned for the first quarter 2027.

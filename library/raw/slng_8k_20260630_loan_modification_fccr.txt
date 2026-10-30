@@ -1,0 +1,12 @@
+SOURCE: Stabilis Solutions, Inc. Form 8-K（Item 1.01／2.03）——與 The Huntington National Bank 的 Second Modification Agreement（循環額度債務契約改寫）
+URL: https://www.sec.gov/Archives/edgar/data/1043186/000143774926022140/slng20260629_8k.htm
+PUBLISHED: 2026-06-30（EDGAR 申報日；協議日 2026-06-29，accession 0001437749-26-022140）
+RETRIEVED: 2026-10-31
+STORAGE: repo_excerpt（SEC 申報有限節錄；本機抽字，逐字截取）
+NOTE: **供應商一手**。另一筆債（AmeriState 定期貸款，年度測償債覆蓋率）的條款在 10-Q，見 slng_10q_2026q2_restricted_cash_covenants_atm_excerpt.txt。
+
+【Item 1.01】
+The Second Modification Agreement amends the Loan Agreement to, among other things: (i) revise the financial covenant under the Loan Agreement to require the Borrowers to maintain a minimum Fixed Charge Coverage Ratio of 1.20 to 1.00, tested as of the last day of each fiscal quarter on a trailing twelve-month basis, commencing with the fiscal quarter ending March 31, 2027; and (ii) establish a segregated, blocked deposit account maintained with and under the control of the Bank (the “Cash Collateral Account”), funded with at least $5,000,000, as collateral security for the obligations under the Loan Agreement.
+
+【同段】
+Until the Borrowers demonstrate compliance with the minimum Fixed Charge Coverage Ratio for two consecutive fiscal quarters, commencing with the fiscal quarter ending March 31, 2027, availability under the revolving credit facility is limited to the amount on deposit in the Cash Collateral Account (subject to a cap of $10,000,000), after which availability will be determined by the borrowing base, up to a maximum of $10,000,000, and the Cash Collateral Account will be terminated and released to the Borrowers.

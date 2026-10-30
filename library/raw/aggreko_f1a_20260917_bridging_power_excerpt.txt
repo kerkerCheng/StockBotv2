@@ -1,0 +1,24 @@
+SOURCE: Aggreko Inc. Form F-1/A（美國 IPO 註冊聲明修正版）——自我描述、資料中心過渡供電的需求背景有限節錄
+URL: https://www.sec.gov/Archives/edgar/data/2134090/000110465926108544/tmq-20260917xf1a.htm
+PUBLISHED: 2026-09-17（EDGAR 申報日，accession 0001104659-26-108544；初版 F-1 2026-08-24，accession 0001104659-26-100313）
+RETRIEVED: 2026-10-31
+STORAGE: repo_excerpt（SEC 申報有限節錄；本機抽字，逐字截取）
+NOTE: Aggreko 是 Stabilis 2025 年超過一成營收的客戶（Stabilis 10-K）；**Stabilis 資料中心長約的客戶是不是 Aggreko，沒有任何一份文件寫**（推論，L11）。2026-10-31 全文檢索：F-1/A 沒有出現「Stabilis」，也沒有「LNG」——客戶端的申報沒有點名燃料供應商。下面的需求背景段是 Aggreko 引述 IEA／EPRI（第三方數字經發行人轉述）。
+
+【Segment information（Americas）】
+The Americas segment serves customers in the United States, Canada, and Latin America with a focus on providing temporary power generation, energy services, and temperature control solutions to a wide range of industries and customers.
+
+【Business】
+We provide temporary power, temperature control, oil-free compressed air and related solutions (for example, fuel, logistics and technical services) as well as energy saving measures.
+
+【Industry（Delayed time-to-power creates a need for bridging and flexible solutions）】
+the IEA estimates that grid infrastructure may take
+
+【同段（跨頁接續）】
+approximately five to 15 years to plan, permit and build, while solar photovoltaic (PV) and wind projects may be developed in approximately one to five years and data centers in one to three years.
+
+【Industry（Supply constraints on new gas power generation capacity）】
+According to Electric Power Research Institute (the “EPRI”), order-to-delivery timescales for large natural gas turbines are now more than five years. Similarly, smaller turbines now take 18 to 36 months.
+
+【Business（案例）】
+Due to the poor grid infrastructure in the UK, our customer, a global technology company, is waiting for a grid connection and has contracted with us for an initial 24 month period, which is ongoing.

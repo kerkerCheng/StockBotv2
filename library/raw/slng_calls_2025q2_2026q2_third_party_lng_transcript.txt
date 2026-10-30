@@ -1,0 +1,42 @@
+SOURCE: Stabilis Solutions 法說會逐字稿（The Motley Fool 轉錄）——2025 年第二季（2025-08-07）與 2026 年第二季（2026-08-12）
+URL: https://www.fool.com/earnings/call-transcripts/2026/08/18/stabilis-solutions-slng-q2-2026-earnings-call-transcript/（2026Q2）；https://www.fool.com/earnings/call-transcripts/2026/01/27/stabilis-solutions-slng-earnings-call-transcript/（頁面日期 2026-01-27，內容是 2025-08-07 的 2025Q2 法說）
+PUBLISHED: 2025-08-07、2026-08-12（法說日；頁面刊出日 2026-01-27、2026-08-18）
+RETRIEVED: 2026-10-31
+STORAGE: repo_excerpt（第三方逐字稿有限節錄；網頁擷取，逐字截取）
+NOTE: **供應商一手口述（自述），經第三方轉錄**——不是申報文件，措辭以錄音為準。「主要用外購 LNG」是公司講自己的營運方式；「differentiates us」是自我評價，L8 不能當獨立佐證。「long-term backup」是董事長分的四種資料中心案子之一（施工、試運轉、過渡供電、長期備援——管線或電網斷時才點火），不是泛指長約。2026-10-31 以網頁原文（去標籤、空白與引號正規化）逐段核對全部命中。
+
+【2025-08-07，J. Casey Crenshaw】
+And one of the things to remember about Stabilis is we don't only make our own LNG, we have supply arrangements with 30-plus other liquefiers around the United States.
+
+【2025-08-07，J. Casey Crenshaw（同段）】
+And if it's close to one of our liquefiers, we'll get our own LNG. If it's not, we'll use one of our third-party offtake agreements.
+
+【2025-08-07，J. Casey Crenshaw】
+In our power generation end market, we're seeing increased interest in LNG as a bridge and backup fueling solution to meet the rising electric demand from the data centers and other energy-intensive infrastructure.
+
+【2026-08-12，J. Casey Crenshaw】
+Currently, our power generation contracts are being served largely with third-party provided LNG, which speaks to the core strength of our model.
+
+【2026-08-12，Andrew Puhala】
+Second, our asset-light approach allows us to serve this growth largely with third-party LNG, which limits the incremental capital required to support it.
+
+【2026-08-12，J. Casey Crenshaw】
+The Bridge Power project we're working on is a two-year committed project.
+
+【2026-08-12，J. Casey Crenshaw】
+And while we currently estimate a six-month term, it could well extend beyond that.
+
+【2026-08-12，J. Casey Crenshaw】
+So we do not have a long-term backup contract to date.
+
+【2026-08-12，J. Casey Crenshaw】
+This is a market where our ability to deliver high-purity product reliability and to engineer solutions around each customer's specific technical requirements truly differentiates us.
+
+【2026-08-12，J. Casey Crenshaw】
+driven primarily by this contract, we expect company revenues in 2027 to exceed $100 million.
+
+【2026-08-12，J. Casey Crenshaw（長約）】
+a behind-the-meter power generation project to provide bridge power for a U.S. data center that extends into early 2029 and is expected to generate approximately $100 million of revenue annually over its two-year term.
+
+【2026-08-12，Andrew Puhala（毛利口徑）】
+The third, our contracts are designed to pass through commodity price risk. Taken together, we would expect a materially larger revenue base in 2027 to translate into meaningful growth in adjusted EBITDA dollars and expansion in our adjusted EBITDA margin to the high teens as project execution accelerates.

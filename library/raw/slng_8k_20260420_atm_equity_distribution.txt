@@ -1,0 +1,15 @@
+SOURCE: Stabilis Solutions, Inc. Form 8-K（Item 1.01）——與 Johnson Rice 的 Equity Distribution Agreement（ATM）
+URL: https://www.sec.gov/Archives/edgar/data/1043186/000143774926012703/slng20250327d_8k.htm
+PUBLISHED: 2026-04-20（EDGAR 申報日；協議日 2026-04-17，accession 0001437749-26-012703；同日 424B5 accession 0001437749-26-012701）
+RETRIEVED: 2026-10-31
+STORAGE: repo_excerpt（SEC 申報有限節錄；本機抽字，逐字截取）
+NOTE: **供應商一手**。ATM 是「可以賣」不是「已經賣」——到 2026-06-30 一股沒賣（見 slng_10q_2026q2_restricted_cash_covenants_atm_excerpt.txt）。上限受 S-3 General Instruction I.B.6（公眾流通市值三分之一／12 個月）限制。
+
+【Item 1.01 Equity Distribution Agreement】
+On April 17, 2026, Stabilis Solutions, Inc. (the “Company”), entered into an Equity Distribution Agreement (the “Agreement”) with Johnson Rice & Company L.L.C. (the “Sales Agent”). Pursuant to the terms of the Agreement, the Company may sell from time to time through the Sales Agent shares of the Company’s common stock, par value $0.001 per share (“Common Stock”), with an aggregate sales price of up to $10,146,795 (the “Shares”).
+
+【同段（用途）】
+The Company intends to use the net proceeds from the issuances and sales of common stock offered hereby for general corporate purposes, including, but not limited to, repayment or refinancing of outstanding debt, financing of capital expenditures, expanding liquefaction infrastructure, scaling operations, financing acquisitions or investments or other business opportunities, share repurchases, including from insider / affiliate shareholders and general working capital purposes.
+
+【同節（佣金）】
+The Company will pay a commission to the Sales Agent of up to 3.0% of the gross offering proceeds of the Shares sold pursuant to the Agreement and will pay the Sales Agent all expenses incident to the performance of its obligations under the Agreement.

@@ -1,0 +1,12 @@
+SOURCE: Stabilis Solutions, Inc. Form 8-K（Item 4.01 Changes in Registrant's Certifying Accountant）——HL&B 辭任（資產被 CohnReznick 收購）、改聘 CohnReznick；2025 年查核意見沒有因不確定性修正
+URL: https://www.sec.gov/Archives/edgar/data/1043186/000143774926023321/slng20260619_8k.htm
+PUBLISHED: 2026-07-10（EDGAR 申報日；事件日 2026-07-08，accession 0001437749-26-023321）
+RETRIEVED: 2026-10-31
+STORAGE: repo_excerpt（SEC 申報有限節錄；本機抽字，逐字截取）
+NOTE: 這是「會死嗎：going concern」那一盞的一手依據——說的是 **2025、2024 年度**的查核意見；2026 年度的意見要等 2027 年的 10-K。
+
+【Item 4.01】
+HL&B notified the Company on July 8, 2026 that it has resigned as the Company’s independent registered public accounting firm. On July 8, 2026, the Audit Committee of the Company’s Board of Directors approved the appointment of CohnReznick as the Company’s new independent registered public accounting firm for the fiscal year ending December 31, 2026.
+
+【同節】
+The audit reports of HL&B on the Company's consolidated financial statements as of December 31, 2025 and 2024 and for each of the two years in the period ended December 31, 2025 contained no adverse opinion or disclaimer of opinion and were not qualified or modified as to uncertainty, audit scope or accounting principles.

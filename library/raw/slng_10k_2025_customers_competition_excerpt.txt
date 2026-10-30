@@ -1,0 +1,35 @@
+SOURCE: Stabilis Solutions, Inc. Form 10-K（FY2025）——超過一成營收的客戶、資料中心段、競爭段、長約執行風險有限節錄
+URL: https://www.sec.gov/Archives/edgar/data/1043186/000143774926007090/slng20251231_10k.htm
+PUBLISHED: 2026-03-05（EDGAR 申報日，accession 0001437749-26-007090）
+RETRIEVED: 2026-10-31
+STORAGE: repo_excerpt（SEC 申報有限節錄；本機抽字，逐字截取；客戶表單位千美元）
+NOTE: **供應商一手（自述）**。10-K 具名的是 2025 年超過一成營收的三家客戶；**資料中心長約的客戶沒有具名**——「它是 Aggreko」是推論（描述相近、Aggreko 是 2025 年臨時遠端發電大客戶），任何一份文件都沒寫（L11）。「one of the largest fleets」「unique among LNG providers」是自我評價，L8 不能當獨立佐證。
+
+【Item 1A Risk Factors】
+For the year ended December 31, 2025, Carnival Corporation, Aggreko Plc and Space Exploration Technologies Corp each accounted for more than 10% of our revenues.
+
+【附註 客戶集中度表（Revenue；欄位：2025／%／2024／%）】
+Customer 1
+$ 22,425 32.9 % $ 24,599 33.6 %
+Customer 2
+13,248 19.4 % 14,115 19.3 %
+Customer 3
+9,896 14.5 % 6,082 8.3 %
+
+【Item 1 Remote Power including for Data Centers】
+During the fourth quarter of 2025, the Company concluded a multi-year contract for temporary remote power in Louisiana in accordance with its terms. The contract accounted for approximately 19% of 2025 revenues.
+
+【Item 1 Remote Power Generation including Data Centers】
+The Company believes that LNG offers speed to market and the ability to store significant volumes of natural gas in the event the data center is unable to access the electrical grid or natural gas delivered by a pipeline.
+
+【Item 1 Competitive Strengths】
+We believe we own one of the largest fleets of small-scale cryogenic transportation, storage, and vaporization equipment in North America.
+
+【Item 1 Competition】
+We also compete with other fuel sources including pipeline natural gas and compressed natural gas ("CNG").
+
+【同節】
+Location is often a primary competitive factor as transportation costs limit the distance LNG can be transported at competitive prices.
+
+【Item 1A Risk Factors（資料中心長約）】
+In the event, the data center is unable to properly integrate LNG into their operations, if we are unable to integrate additions of new equipment and personnel necessary to successfully deliver LNG to the customer, or if our sources of LNG are inadequate to service this contract, we may incur losses in cash flow and loss to our reputation related to future projects.

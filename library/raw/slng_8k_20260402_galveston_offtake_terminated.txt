@@ -1,0 +1,18 @@
+SOURCE: Stabilis Solutions, Inc. Form 8-K（Item 8.01 Other Events）——Galveston 液化廠主要承購合約終止、FID 延後
+URL: https://www.sec.gov/Archives/edgar/data/1043186/000143774926011104/slng20260401_8k.htm
+PUBLISHED: 2026-04-02（EDGAR 申報日；事件日 2026-03-31，accession 0001437749-26-011104）
+RETRIEVED: 2026-10-31
+STORAGE: repo_excerpt（SEC 申報有限節錄；本機抽字，逐字截取）
+NOTE: **供應商一手（自述）**。承購方未具名（「a leading investment-grade global marine operator」）。
+
+【Item 8.01】
+On March 31, 2026, Stabilis GDS, Inc., ("Stabilis GDS"), a wholly-owned subsidiary of Stabilis Solutions, Inc. (“Stabilis” and collectively with Stabilis GDS, “the Company”) terminated its previously announced 10-year agreement with a leading investment-grade global marine operator to supply Liquefied Natural Gas (“LNG”) from the Company’s proposed 350,000 gallon-per-day Galveston liquefaction facility.
+
+【同段】
+The agreement contemplated the supply of approximately 50 million gallons of LNG per year, representing roughly 40% of the facility’s planned liquefaction capacity, with minimum volume commitments of approximately 32% of planned capacity.
+
+【同節】
+During negotiations with prospective financing partners, the Company was requested to modify certain provisions of the agreement as a condition to completing project financing. The counterparty did not agree to the proposed modifications, and the Company elected to terminate the agreement.
+
+【同節】
+As a result, the Company expects delays to the anticipated final investment decision, project financing, and development timeline for the Galveston LNG facility.

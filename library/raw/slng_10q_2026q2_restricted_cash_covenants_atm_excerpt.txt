@@ -1,0 +1,39 @@
+SOURCE: Stabilis Solutions, Inc. Form 10-Q（2026Q2）——受限現金（客戶預付）、計價方式、在建工程、債務契約、ATM、船期終止付款有限節錄
+URL: https://www.sec.gov/Archives/edgar/data/1043186/000143774926027112/slng20260630_10q.htm
+PUBLISHED: 2026-08-12（EDGAR 申報日，accession 0001437749-26-027112）
+RETRIEVED: 2026-10-31
+STORAGE: repo_excerpt（SEC 申報有限節錄；本機抽字，逐字截取）
+NOTE: **供應商一手**。同一份 10-Q 的另兩份節錄：slng_10q_2026q2_btm_dc_lng_take_or_pay_200m.txt、slng_10q_2026q2_capacity_liquidity_excerpt.txt。計價那兩句是全公司的寫法，**不是資料中心長約本身的條款**（長約的價格、最低量、提前解約、續約都沒有揭露）。
+
+【附註 Restricted Cash and Cash Equivalents】
+Our restricted cash relates to $20.0 million of advance payments, received from a customer, related to a customer project scheduled to commence during the first quarter of 2027 and continuing through the first quarter of 2029. The use of the advance payments is restricted to the purchase of equipment, securing LNG supply and commissioning expenses incurred by the Company specific to the customer project.
+
+【附註 Revenue Recognition】
+LNG product sales agreements may include both fixed and variable fees per gallon of LNG but are representative of the stand-alone selling price for LNG at the time the contract is negotiated.
+
+【MD&A Recent Developments】
+The Company's customer pricing structure for natural gas is primarily based off a monthly index and may absorb most, if not all, volatility associated with the price of natural gas
+
+【附註 Property, Plant and Equipment】
+Construction in progress of $23.7 million and $14.9 million at June 30, 2026 and December 31, 2025, respectively, primarily relate to the deployment and build-out of liquefaction assets and the purchase of additional liquefaction assets for the Company’s contract for power generation for a data center that begins in 2027 and its proposed Galveston LNG liquefaction facility.
+
+【附註 Debt（AmeriState）】
+The AmeriState Loan Agreement requires the Company to meet certain financial covenants which include a debt-to-net-worth ratio of not more than 9.1 to 1.0 and a debt service coverage ratio of not less than 1.2 to 1.0 as of the last day of each calendar year. During the three months ended June 30, 2026, the Company amended its AmeriState Loan Agreement to clarify that compliance with its financial covenants is measured and calculated only on an annual basis at December 31, of each year.
+
+【Liquidity and Capital Resources】
+The Company has availability under its debt agreements of $5.0 million.
+
+【同節】
+As of June 30, 2026, the Company was in compliance with all financial covenants under its debt agreements.
+
+【同節】
+it is reasonably possible that the Company could fail to maintain compliance with its consolidated debt service ratio which, if not cured or waived, would give AmeriState Bank the right to accelerate repayment of outstanding borrowings under the AmeriState Secured Term Loan Facility, which totaled $7.6 million as of June 30, 2026.
+
+【同節（船期終止）】
+The Company owes a termination fee of $0.8 million payable January 1, 2027, as well as payment of $1.1 million of previously deferred rent and operating costs during the third quarter of 2026
+
+【同節（資本支出承諾）】
+At June 30, 2026, the Company had open purchase orders and commitments related to capital expenditures of approximately $7.0 million
+
+【同節（Shelf／ATM）】
+The Company is subject to General Instruction I.B.6. of Form S-3 that limits the amount of securities that the Company may sell under the Shelf Registration to no more than one-third of the Company’s public float (currently $10.2 million) in any twelve-month period. The Company has made no issuances under the Shelf Registration and related ATM at June 30, 2026.
