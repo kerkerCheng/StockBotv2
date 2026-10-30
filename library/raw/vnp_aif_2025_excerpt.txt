@@ -1,0 +1,16 @@
+Source URL: https://www.5nplus.com/media/uploads/documents/b2026-02-24_5n_plus_inc._-_aif_-_fy2025.pdf
+
+Excerpt:
+[EXCERPT — 有限逐字引文] 5N Plus Inc. Annual Information Form — fiscal year 2025（2026-02-24）
+DATE: 2026-02-24
+RETRIEVED: 2026-10-30（PDF 本機抽字（pypdf）、逐字截取；PDF 斷行接回、以一格空白接；表格欄位因抽字壓成一行）
+NOTE: 發行人自述（競爭者與產能是公司自己的說法，L8）。
+
+【Three-Year History（2024：First Solar；AZUR capacity）】
+On June 4, 2024, 5N+ announced that it had renewed its supply agreement with First Solar. Under the supply agreement, 5N+ would increase its supply of cadmium telluride (CdTe) semiconductor materials to First Solar for the manufacturing of thin - film photovoltaic (PV) solar modules. This was aligned with 5N+’s announced plans to increase capacity to serve high‐value, high‐growth end markets.  This supply agreement with First Solar represented a 50% increase in volume over the next two calendar years compared to the previous agreement. On October 15, 2024, 5N+ announced that its wholly -owned subsidiary, AZUR SPACE Solar Power GmbH (“AZUR”) , had completed its previously announced 2024 production capacity program ahead of schedule and expanded its capacity by 35%, surpassing its initial 30% increase target.
+
+【Three-Year History（2025：First Solar 2027–2028）】
+On August 5, 2025, 5N+ announced that it had entered into a new and expanded supply agreement with First Solar, Inc. (NASDAQ: FSLR) including revised terms to the contract period underway (2025 -2026) to reflect increased semiconductor compound volume commitments, as well the terms for the subsequent contract period (2027-2028), also reflecting increased volumes.
+
+【Specialty Semiconductors — Competition】
+Competition We have a limited number of competitors , few of which are as fully integrated or have a similar range of products  and capabilities as we do. Accordingly, they are not in a position to provide the same comprehensive set of services and products as we do. Main competitors depending on the market and metal considered include Umicore in Belgium, IQE plc in the United Kingdom and Vital Chemicals Co., Ltd. in China. As for AZUR, apart from some local capabilities in Russia, China and Japan, who do not operate in western markets, our main competitors are Spectrolab, a Boeing company and SolAero Technologies, Inc., a Rocket Lab Company, both located in the United States. We continue to expect the competitive landscape to change as our markets develop and attract more interest.  More

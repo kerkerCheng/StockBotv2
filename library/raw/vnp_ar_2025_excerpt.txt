@@ -1,0 +1,16 @@
+Source URL: https://www.5nplus.com/media/uploads/documents/b5n_plus_inc._-_2025_annual_report.pdf
+
+Excerpt:
+[EXCERPT — 有限逐字引文] 5N Plus Inc. 2025 Annual Report（Message from the Chief Executive Officer；財報附註 segment information）
+DATE: 2026-02-24
+RETRIEVED: 2026-10-30（PDF 本機抽字（pypdf）、逐字截取；PDF 斷行接回、以一格空白接；表格欄位因抽字壓成一行）
+NOTE: 發行人自述（致股東信：需求、產能、管線都是公司自己的說法，L8）；財報附註為合併口徑（US$ 千元）。
+
+【Message from the Chief Executive Officer（p.9）】
+A trusted partner for industry changemakers With unwavering focus and targeted investments in our Specialty Semiconductors business, 5N+ has secured its status as supplier of choice outside of China. Our clients operate in industries that are reshaping the global economy and their need for the advanced materials we offer is only getting stronger from renewable energy, space exploration to national defense. Last year, we expanded and extended our agreement with U.S. solar technology leader First Solar, Inc. to support its domestic manufacturing solar energy growth plans. Under the new contract, we are significantly increasing production and delivery of thin-film semiconductor materials over a multi-year period. Germany-based AZUR Space has continued to scale up operations to meet unprecedented demand for space-grade solar cells globally. The momentum is reflected in our robust long-term project pipeline which extends beyond 2028. To capture additional demand, we increased production capacity at our Heilbronn site by 30% in 2025 and we expect to add another 25% by the end of 2026.
+
+【Message from the Chief Executive Officer（p.10：germanium award）】
+In early 2026, we also received a sizable financial award from the U.S. government’s defense sector to increase germanium recycling and refining capacity at our St. George, Utah facility over a two-year period. This will enable us to feed optics and solar germanium crystal supply chains in this market for imaging, sensing and space solar applications.
+
+【Notes — Segment information（revenue total；customer concentration）】
+Total 391,062 289,281 For the year ended December 31, 2025, one customer represented approximately 32% (2024 – 26%) of revenues all of which is within the Specialty Semiconductors segment.
