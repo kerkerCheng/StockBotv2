@@ -2233,31 +2233,6 @@ def build_positions(*, state_dir: Path | None) -> Section:
     # 圖預測對錯表（Phase 5 Step 5.4）：讀圖 artifact 的 `predictions` 照抄一行；只印不判、不排序。
     section.lines.append(_predictions_line(state_dir))
 
-    # 賭注收斂（V4，2026-09-19）：**不依賴賣出的驗證序列**。等權報酬與 power-law 都以股價
-    # 為錨點，而本圖標的同漲同跌；共識修正不受 beta 污染，也不需要賣出就能驗證。
-    # ⚠ 這裡只**讀** artifact，不算任何東西。
-    if pos_absence is not None:
-        section.lines.append(f"賭注收斂：{pos_absence.reason}（{pos_absence.kind}）")
-    else:
-        conv = positions.get("bet_convergence") or {}
-        if not conv:
-            section.lines.append("賭注收斂：這份 positions artifact 沒有 bet_convergence 鍵（upstream_unavailable）")
-        elif not conv.get("n_bets"):
-            # 「還沒有人下注」與「下了注但共識沒動」是相反的結論，不得印成同一個 0%（L12）。
-            section.lines.append(
-                f"賭注收斂：**還沒有任何一檔寫下賭注**（掃過 {conv.get('scanned', '?')} 檔）"
-                "——這不是 0%，是還沒有分子也沒有分母")
-        else:
-            lo, hi = conv.get("shortest_window_days"), conv.get("longest_window_days")
-            window_text = (f"｜已觀測 {lo}–{hi} 天" if lo is not None else "")
-            waiting = conv.get("not_yet_observable") or 0
-            waiting_text = (f"｜**賭注寫下後還沒有共識抓取 {waiting}**" if waiting else "")
-            section.lines.append(
-                f"賭注收斂（共識朝我們移動了嗎）：有賭注 {conv.get('n_bets', '?')} 檔"
-                f"｜朝我們 {conv.get('toward_us', '?')}｜反向 {conv.get('away_from_us', '?')}"
-                f"｜共識沒動 {conv.get('unchanged', '?')}{waiting_text}{window_text}"
-                "　←窗短時「沒動」幾乎是必然，不是市場否定了我們")
-
     # alpha 全歸零淨值少幾 %（D2）。**純呈現、零門檻**：它就是 alpha 佔 NAV 的比例本身，
     # 不是建議、不是上限。沒有 alpha 部位時它是 0，而那是一個真實的答案不是缺席。
     if beta_absence is not None:
