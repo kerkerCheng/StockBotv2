@@ -1,0 +1,87 @@
+{
+  "claims": [],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.65,
+      "dst_id": "mat:space_coverglass",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "qinhuangdao_fabu_20220727_xingjian_coverglass_wentian_s2",
+        "qinhuangdao_fabu_20220727_xingjian_coverglass_wentian_s1"
+      ],
+      "src_id": "co:qinhuangdao_xingjian"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "星箭特种玻璃",
+        "秦皇岛星箭",
+        "星箭公司"
+      ],
+      "attributes": {},
+      "confidence": 0.8,
+      "id": "co:qinhuangdao_xingjian",
+      "name": "秦皇岛星箭特种玻璃有限公司",
+      "role": null,
+      "source_ids": [
+        "qinhuangdao_fabu_20220727_xingjian_coverglass_wentian_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "抗辐射玻璃盖片",
+        "抗辐照玻璃盖片",
+        "玻璃盖片",
+        "space solar coverglass"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "mat:space_coverglass",
+      "name": "Radiation-resistant space solar coverglass",
+      "role": null,
+      "source_ids": [
+        "qinhuangdao_fabu_20220727_xingjian_coverglass_wentian_s1",
+        "qinhuangdao_fabu_20220727_xingjian_coverglass_wentian_s2"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "qinhuangdao_fabu_20220727_xingjian_coverglass_wentian",
+    "evidence_tier": 3,
+    "origin_entity": "秦皇岛发布（秦皇岛市互联网信息办公室官方帳號；稿內圖片為企業供圖）",
+    "origin_linkage": "same_origin",
+    "permission_basis": "地方政府網信辦官方帳號公開發布、入口網站轉載；只保留研究必要的有限逐字節錄。published_at 取頁面署日「2022.07.27 09:04」。",
+    "published_at": "2022-07-27",
+    "publisher": "新浪財經（轉載秦皇岛发布）",
+    "retrieved_at": "2026-10-30",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "秦皇岛：星箭特种玻璃为“问天”护航（秦皇岛发布／秦皇岛市互联网信息办公室，新浪財經轉載，2022-07-27）：问天实验舱太阳能电池帆板表面的轻量化柔性抗辐照玻璃盖片由秦皇岛星箭特种玻璃有限公司自主研发生产、约 130 平方米",
+    "url": "https://finance.sina.cn/2022-07-27/detail-imizmscv3685609.d.html"
+  },
+  "sources": [
+    {
+      "id": "qinhuangdao_fabu_20220727_xingjian_coverglass_wentian_s1",
+      "locator": "首段：问天实验舱发射",
+      "quote": "覆盖在问天实验舱太阳能电池帆板表面的轻量化柔性抗辐照玻璃盖片，就出自河北秦皇岛。"
+    },
+    {
+      "id": "qinhuangdao_fabu_20220727_xingjian_coverglass_wentian_s2",
+      "locator": "第二段：生產者與用量",
+      "quote": "这种抗辐照玻璃盖片由秦皇岛星箭特种玻璃有限公司自主研发生产，在问天实验舱太阳能电池帆板表面应用了约130平方米。"
+    },
+    {
+      "id": "qinhuangdao_fabu_20220727_xingjian_coverglass_wentian_s3",
+      "locator": "第三段：總經理介紹",
+      "quote": "秦皇岛星箭特种玻璃有限公司总经理卢弈霖介绍，这种抗辐照玻璃盖片具有轻量化、高强度、高柔性等特点，它的厚度不足一毫米，但在太空环境中，能耐受1000℃高温不炸裂。"
+    }
+  ]
+}

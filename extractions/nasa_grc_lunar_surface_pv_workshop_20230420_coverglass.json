@@ -1,0 +1,84 @@
+{
+  "claims": [],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "mat:space_coverglass",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "nasa_grc_lunar_surface_pv_workshop_20230420_coverglass_s1",
+        "nasa_grc_lunar_surface_pv_workshop_20230420_coverglass_s2"
+      ],
+      "src_id": "co:qioptiq"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "Qioptiq"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "co:qioptiq",
+      "name": "Teledyne Qioptiq",
+      "role": null,
+      "source_ids": [
+        "nasa_grc_lunar_surface_pv_workshop_20230420_coverglass_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "抗辐射玻璃盖片",
+        "抗辐照玻璃盖片",
+        "玻璃盖片",
+        "space solar coverglass"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "mat:space_coverglass",
+      "name": "Radiation-resistant space solar coverglass",
+      "role": null,
+      "source_ids": [
+        "nasa_grc_lunar_surface_pv_workshop_20230420_coverglass_s1",
+        "nasa_grc_lunar_surface_pv_workshop_20230420_coverglass_s2"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "nasa_grc_lunar_surface_pv_workshop_20230420_coverglass",
+    "evidence_tier": 2,
+    "origin_entity": "NASA Glenn Research Center",
+    "permission_basis": "美國政府機構（NASA）公開技術簡報；只保留研究必要的有限逐字節錄。published_at 取封面頁日期「April 20, 2023」。",
+    "published_at": "2023-04-20",
+    "publisher": "NASA Technical Reports Server（NTRS）",
+    "retrieved_at": "2026-10-30",
+    "source_type": "paper",
+    "storage_permission": "repo_excerpt",
+    "title": "Power Systems for the Lunar Surface Virtual Technical Workshop: Photovoltaics（NASA Glenn Research Center，Dr. Timothy Peshek，2023-04-20，PS–02339–1017）：太空太陽電池蓋片＝摻鈰硼矽玻璃、3–20 mil；Qioptiq 是太空級蓋片供應商（CMG、CMX、CMO）",
+    "url": "https://ntrs.nasa.gov/api/citations/20230005271/downloads/CLPS_PV.pdf"
+  },
+  "sources": [
+    {
+      "id": "nasa_grc_lunar_surface_pv_workshop_20230420_coverglass_s1",
+      "locator": "簡報 p.22「Solar Cell Coverglass」：供應商列",
+      "quote": "Qioptiq supplier of space qualified covers – Qioptiq CMG, CMX, CMO; matched to CTE of Ge & Si PV technology, various UV absorption"
+    },
+    {
+      "id": "nasa_grc_lunar_surface_pv_workshop_20230420_coverglass_s2",
+      "locator": "簡報 p.22「Solar Cell Coverglass」：材料與厚度",
+      "quote": "Solar Cell Coverglass • Ceria-doped borosilicate glass (UV absorptive) • 3-mil to 20-mil standard thicknesses (proton/electron radiation shielding)"
+    },
+    {
+      "id": "nasa_grc_lunar_surface_pv_workshop_20230420_coverglass_s3",
+      "locator": "簡報 p.1 封面",
+      "quote": "Power Systems for the Lunar Surface Virtual Technical Workshop: Photovoltaics Dr. Timothy Peshek, Chief Photovoltaic and Electrochem Branch NASA Glenn Research Center April 20, 2023"
+    }
+  ]
+}

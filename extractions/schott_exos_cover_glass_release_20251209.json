@@ -1,0 +1,142 @@
+{
+  "claims": [
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "speculative",
+      "disproof_condition": "條件：SCHOTT 或 5N Plus（AZUR SPACE）的一手寫出 exos 完成 ECSS 鑑定、首次飛行或具名客戶與出貨（升成 supplies_to），或寫出停止這個產品。核查頻率：每半年（5N Plus 季度 MD&A、SCHOTT 新聞稿）。觸發後 48 小時：改寫本 claim 與 develops 邊（升 supplies_to 或撤回），重讀蓋片層。",
+      "id": "schott_exos_cover_glass_release_20251209_cl1",
+      "source_ids": [
+        "schott_exos_cover_glass_release_20251209_s1",
+        "schott_exos_cover_glass_release_20251209_s2",
+        "schott_exos_cover_glass_release_20251209_s3",
+        "schott_exos_cover_glass_release_20251209_s5"
+      ],
+      "statement": "SCHOTT press release (SpaceNews press-release column, 2025-12-09): SCHOTT launched SCHOTT Solar Glass exos, a solar cell cover glass for next-generation space missions, developed together with AZUR SPACE Solar Power (a 5N Plus company) with ESA funding and DLR support; AZUR conducted testing and initial validation. The body says the cerium-doped material is undergoing qualification under ECSS standards, while the subtitle calls it fully certified — the release contradicts itself, so this claim takes the body (qualification in progress). No named customer, volume or flight heritage.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "mat:space_coverglass",
+      "id": "e1",
+      "relation": "develops",
+      "source_ids": [
+        "schott_exos_cover_glass_release_20251209_s1",
+        "schott_exos_cover_glass_release_20251209_s3"
+      ],
+      "src_id": "co:schott"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "co:5n_plus",
+      "id": "e2",
+      "relation": "partnership_with",
+      "source_ids": [
+        "schott_exos_cover_glass_release_20251209_s4",
+        "schott_exos_cover_glass_release_20251209_s2"
+      ],
+      "src_id": "co:schott"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "SCHOTT"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:schott",
+      "name": "SCHOTT AG",
+      "role": null,
+      "source_ids": [
+        "schott_exos_cover_glass_release_20251209_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "5N+",
+        "AZUR SPACE Solar Power GmbH",
+        "AZUR SPACE",
+        "VNP.TO"
+      ],
+      "attributes": {
+        "ticker": "VNP.TO"
+      },
+      "confidence": 0.9,
+      "id": "co:5n_plus",
+      "name": "5N Plus",
+      "role": null,
+      "source_ids": [
+        "schott_exos_cover_glass_release_20251209_s2",
+        "schott_exos_cover_glass_release_20251209_s4"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "抗辐射玻璃盖片",
+        "抗辐照玻璃盖片",
+        "玻璃盖片",
+        "space solar coverglass"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "mat:space_coverglass",
+      "name": "Radiation-resistant space solar coverglass",
+      "role": null,
+      "source_ids": [
+        "schott_exos_cover_glass_release_20251209_s1",
+        "schott_exos_cover_glass_release_20251209_s3"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "schott_exos_cover_glass_release_20251209",
+    "evidence_tier": 2,
+    "origin_entity": "SCHOTT AG",
+    "permission_basis": "公司新聞稿（SpaceNews 新聞稿欄、SCHOTT 署名）；只保留研究必要的有限逐字節錄。published_at 取頁面 datePublished「2025-12-09」（schott.com 原稿本機連不上，未逐字核對其日期）。",
+    "published_at": "2025-12-09",
+    "publisher": "SpaceNews（Press Release 欄，作者 SCHOTT）",
+    "retrieved_at": "2026-10-30",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "SCHOTT launches high-performance cover glass for next-generation space solar cells（SCHOTT 新聞稿，SpaceNews 新聞稿欄 by SCHOTT，2025-12-09）：SCHOTT® Solar Glass exos 與 AZUR SPACE（5N Plus 子公司）共同開發、ESA 資助、AZUR 做測試與初步驗證；摻鈰材料依 ECSS 標準鑑定中",
+    "url": "https://spacenews.com/schott-launches-high-performance-cover-glass-for-next-generation-space-solar-cells/"
+  },
+  "sources": [
+    {
+      "id": "schott_exos_cover_glass_release_20251209_s1",
+      "locator": "新聞稿首段：產品發表",
+      "quote": "SCHOTT, a global leader in specialty glass and advanced materials, announced the launch of SCHOTT® Solar Glass exos, an innovative solar cell cover glass designed for next-generation space missions."
+    },
+    {
+      "id": "schott_exos_cover_glass_release_20251209_s2",
+      "locator": "新聞稿首段：共同開發與驗證",
+      "quote": "Developed with funding from the European Space Agency (ESA) and supported by the German Aerospace Center (DLR), exos was developed together with AZUR SPACE Solar Power (a 5N Plus company), Europe’s leading developer of multi-junction solar cells, which also conducted testing and initial validation."
+    },
+    {
+      "id": "schott_exos_cover_glass_release_20251209_s3",
+      "locator": "新聞稿內文：鑑定狀態",
+      "quote": "The cerium-doped material is undergoing qualification in accordance with European Cooperation for Space Standardization (ECSS) standards."
+    },
+    {
+      "id": "schott_exos_cover_glass_release_20251209_s4",
+      "locator": "新聞稿：AZUR SPACE 高管引言",
+      "quote": "“AZUR SPACE is proud to work with SCHOTT to secure a stable and large-scale, 100% European supply chain for solar cell assemblies,” said Executive Vice President Specialty Semiconductors, Roland Dubois, head of AZUR SPACE."
+    },
+    {
+      "id": "schott_exos_cover_glass_release_20251209_s5",
+      "locator": "新聞稿副標（與內文鑑定狀態不一致）",
+      "quote": "Engineered for use in both space agency missions and satellite constellations, this fully certified solar cell cover glass delivers high scalability and cost efficiency."
+    }
+  ]
+}

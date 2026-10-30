@@ -1,0 +1,17 @@
+Source URL: https://ntrs.nasa.gov/api/citations/20230005271/downloads/CLPS_PV.pdf
+
+Excerpt:
+[EXCERPT — 有限逐字引文] NASA Glenn Research Center — Power Systems for the Lunar Surface Virtual Technical Workshop: Photovoltaics（2023-04-20）
+
+Source: https://ntrs.nasa.gov/api/citations/20230005271/downloads/CLPS_PV.pdf
+PUBLISHED: 2023-04-20
+RETRIEVED: 2026-10-30（本機 PDF 抽字（pypdf）、逐字截取；換行與重複空白收成一格）
+
+【簡報 p.22「Solar Cell Coverglass」：供應商列】
+Qioptiq supplier of space qualified covers – Qioptiq CMG, CMX, CMO; matched to CTE of Ge & Si PV technology, various UV absorption
+
+【簡報 p.22「Solar Cell Coverglass」：材料與厚度】
+Solar Cell Coverglass • Ceria-doped borosilicate glass (UV absorptive) • 3-mil to 20-mil standard thicknesses (proton/electron radiation shielding)
+
+【簡報 p.1 封面】
+Power Systems for the Lunar Surface Virtual Technical Workshop: Photovoltaics Dr. Timothy Peshek, Chief Photovoltaic and Electrochem Branch NASA Glenn Research Center April 20, 2023

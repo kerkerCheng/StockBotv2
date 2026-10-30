@@ -1,0 +1,86 @@
+{
+  "claims": [],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.65,
+      "dst_id": "mat:space_coverglass",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "jjckb_20230705_xingjian_space_glass_s1",
+        "jjckb_20230705_xingjian_space_glass_s2"
+      ],
+      "src_id": "co:qinhuangdao_xingjian"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "星箭特种玻璃",
+        "秦皇岛星箭",
+        "星箭公司"
+      ],
+      "attributes": {},
+      "confidence": 0.8,
+      "id": "co:qinhuangdao_xingjian",
+      "name": "秦皇岛星箭特种玻璃有限公司",
+      "role": null,
+      "source_ids": [
+        "jjckb_20230705_xingjian_space_glass_s1",
+        "jjckb_20230705_xingjian_space_glass_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "抗辐射玻璃盖片",
+        "抗辐照玻璃盖片",
+        "玻璃盖片",
+        "space solar coverglass"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "mat:space_coverglass",
+      "name": "Radiation-resistant space solar coverglass",
+      "role": null,
+      "source_ids": [
+        "jjckb_20230705_xingjian_space_glass_s1"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "jjckb_20230705_xingjian_space_glass",
+    "evidence_tier": 3,
+    "origin_entity": "经济参考报（新华社主管；记者专访星箭公司董事长，内容为公司自己的说法）",
+    "permission_basis": "全國性媒體公開報導；只保留研究必要的有限逐字節錄（媒體，非一手）。published_at 取稿頭日期「2023-07-05」。",
+    "published_at": "2023-07-05",
+    "publisher": "经济参考报（新华社）",
+    "retrieved_at": "2026-10-30",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "一块航天玻璃的“极限突破”（经济参考报，记者汪子旭、郭雅茹，2023-07-05）：星箭公司董事长卢勇——中国空间站用了星箭特种玻璃 40 余万片、梦天实验舱太阳电池帆板的柔性抗辐照玻璃盖片、2010 年国产化后价格降至国外十分之一；记者：星箭是中国航天科技集团同行业唯一合格供应商",
+    "url": "http://www.jjckb.cn/2023-07/05/c_1310730872.htm"
+  },
+  "sources": [
+    {
+      "id": "jjckb_20230705_xingjian_space_glass_s1",
+      "locator": "董事長卢勇引言：中國空間站與夢天實驗艙",
+      "quote": "中国空间站上总共使用了星箭特种玻璃40余万片，比以往的常规产品减重20%左右。其中，梦天实验舱能源系统中采用的太阳电池帆板轻量化柔性抗辐照玻璃盖片，厚度仅有0.1毫米左右，相当于人的头发丝，可以有效减少对太阳光的反射，滤去有害紫外线，同时提高太阳电池对空间带电粒子辐射损伤的耐受能力，减少太阳电池性能的衰降。"
+    },
+    {
+      "id": "jjckb_20230705_xingjian_space_glass_s2",
+      "locator": "記者敘述：合格供應商",
+      "quote": "星箭公司已经成为中国航天科技集团在同行业中唯一合格供应商，从“神舟”系列载人飞船、“嫦娥探月工程”系列卫星，到“天宫”系列太空实验室、“天问一号”火星探测器"
+    },
+    {
+      "id": "jjckb_20230705_xingjian_space_glass_s3",
+      "locator": "董事長卢勇：國產化與價格",
+      "quote": "最终研发成功并于2010年实现国产化，在质量稳定的前提下，价格降至国外的十分之一。"
+    }
+  ]
+}
