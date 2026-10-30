@@ -17,13 +17,28 @@
       }
     ],
     "check_interval_days": 90,
-    "last_checked": "2026-09-17",
+    "last_checked": "2026-10-30",
     "memo": "thesis/axt_inp_v1_lane_memo.md",
+    "mutations": [
+      {
+        "at": "2026-10-30T02:17:49.020775+00:00",
+        "author": "research-drain 2026-10-30（互動 session）",
+        "evidence_refs": [
+          "https://www.sec.gov/Archives/edgar/data/1051627/000143774926033941/axti20260905_8k.htm",
+          "lead:lead_a7b906d1c37a32f66ba861b4ca195cfa",
+          "thesis/axt_inp_v1_lane_memo.md#7b"
+        ],
+        "from": "active",
+        "proposal_id": "tm_08e3b769a7478fd5734bd246764d2529",
+        "rationale": "§7b 的推翻條件已成立：「Q3 2026 營收 ≥ US$60M → variant 的核心前提（2H 每季持平於 Q2 的 US$47.589M、全年 US$169.7M）被推翻」。AXT 8-K（2026-10-29，Q3 財報新聞稿）逐字：「Revenue for the third quarter of 2026 was $73.4 million, compared with $47.6 million for the second quarter of 2026」——季增 54%，比門檻高 US$13.4M。§7b 註明這條「機器對照不到、今天靠人」，所以沒有 watch 會響，由 research-drain 讀反證待檢時對照到。同一份文件另有三件事要一起複查：①第 1 條前半成立（「GAAP gross margin was 56.0 percent」，Q2 44.9%），後半（ASP 上漲為主因）新聞稿沒寫——全文 0 次 price／pricing／ASP／mix，成長歸因於「exceptionally strong customer demand」與產能、良率、大尺寸產品能力；②第 5 條方向相反、此後不會成立（§7 末段已寫它在 v4 框架下可能反了）；③CEO 寫 2026 InP 產能倍增的承諾已超過、2026 InP 營收機會擴到四倍以上——v4「InP 需求真、但 AXT 非結構性受益者（供給側 2028 前大幅擴張）」的核心論點要重判。48 小時動作照 §7b 是重寫兩條 variant 假設（oa_56b08e724e0c146c／oa_e4022700b5209d7b）或改記 Abstention；那兩條的消費端（估值橋、implied return）2026-09-23 已退役，要不要重寫、改成什麼由複查決定，本提案不動它們。下一步：核准後轉 review_required；複查與 Q3 10-Q（約 2026-11-13：Lumentum 合約 exhibit、MD&A 的毛利率主因、PE 贖回金額）一起做，結論另提 revised 或 retired。",
+        "to": "review_required"
+      }
+    ],
     "next_check": "2026-11-15",
-    "note": "2026-08-02 首建 → 2026-08-03 紅隊後改寫 v3 → 2026-08-04 disproof 第 6 條觸發後 revise 為 v4，依 L7 由 review_required 回到 active（thesis 修正後成立，disproof 條件已更新）。v4 核心論點：InP 需求為真且首次由 AXT 以外來源確認（JX 官方公告稱持續收到客戶因設備擴充而來的大幅增產要求），但 AXT 並非結構性受益者——供給側在 2028 年前將大幅擴張：JX 四年最多 1,200 億日圓、產能拉到 FY2025 的 7-10 倍（官方新聞稿，已入圖 jx_metals_inp_capacity_pr_2026_06_16）；住友 180 億日圓、FY2028 達 FY2024 的 3.1 倍（tier 3 轉述日經，待追一手）。JX 投資額約為住友的 6.7 倍。最關鍵且市場未討論的一點是時序：AXT 三份長約全簽在 JX 2026-06-16 公告之後（Coherent 6/25 生效、Lumentum 7/26 簽署），可能是供需反轉前的防禦性鎖客而非議價權；但合約談判週期通常數月，因果無法從公開資料判定。方向由偏多轉為謹慎偏空。評分維持 26/30 PASS，最弱環節仍為可信度 3/5——v4 的核心供給側證據全部落在 AXT 的 context slice 之外，因圖中缺 AXT↔JX 的 competes_with 邊（住友有、JX 沒有），補該邊是提升可信度最直接的一步。ASP 追源兩輪均未果，週期／結構之爭未裁決。裁決點：2026 Q3 財報毛利率（是否維持 44%+、是否揭露 ASP）＋ Q3 10-Q 的 Lumentum 合約 exhibit（定價機制與交付條款）。任一 disproof 觸發須 48h 內人工決策。 ｜2026-09-17（pq2 [600] 使用者 go）：新增 lane memo 第 7b 節——把當日寫下的 FY2026 variant 賭注（每股約 US$47，對現價 −26.96%）與第 7 節既有六條 disproof 對齊。實測三條裡有兩條**已經存在**（對美出口許可、ASP 揭露），真正缺的只有一條：**Q3 2026 營收 ≥ US$60M**——原有第 5 條問的是下界（低於 Q2 的 47.589M），而 variant 賭的是沒有大幅上行，**中間那一段 47.6M～60M 先前沒有任何條件在看**。已補上核查頻率（每季，隨 Q3／Q4 財報）與觸發後 48 小時動作（重寫兩條 variant 假設，或改寫成 bet/variant.overlay 的 Abstention）。⚠ 同時誠實記下：這三條每季核查**今天靠人**，機器對照不到（`metric_observations` 只從 fiscal_year_results 攤平，季別／半年別在 OBSERVATION_PERIOD_KINDS 下表達不出來，已進 ROADMAP backlog）。⚠ 第 7 節有幾條是 v3（偏多）沿用、方向在 v4（謹慎偏空）之後可能已經反了，本次刻意不動——逐條重判方向是一次完整 thesis 重寫，「順手改掉半組判準」比留著不一致更危險。",
+    "note": "2026-10-30 Q3 核查點複查（pq2 [892]；同日 [893] 轉 review_required）：裁決點的答案——①營收 7,340 萬美元（Q2 4,760 萬、季增 54%），§7b「Q3 營收 ≥ 6,000 萬美元」推翻條件成立，variant 的 2H 持平前提被推翻（→ [893]）；②GAAP 毛利率 56.0%（Q2 44.9%），「維持 44%+」成立；③ASP 與 InP 分項：8-K 全文 0 次 price／pricing／ASP，法說 CFO 給了 InP 分項（5,430 萬美元，主要資料中心），毛利率歸因原句「driven by an increase in total volume and a favorable product mix. In addition, market prices for [InP] have increased」——漲價是附帶的一項，不是主因，週期／結構之爭仍沒裁決（第三方機器轉錄，以 10-Q MD&A 為準）；④CEO：2026 InP 產能倍增的承諾 8 月已超過、相鄰新廠房設計中——v4「需求真、但 AXT 非結構性受益者」的供給側前提要和 JX／住友擴產一起重判。Lumentum 長約預付晶圓款 4,350 萬美元（CFO 原句）。複查已寫進 InP 讀圖 sr_5bd84c00 與 AXTI 敘事 ib_57cb9d4b；結論（revised 或 retired）和 Q3 10-Q（約 2026-11-13：Lumentum 合約 exhibit 的定價機制、MD&A 毛利率主因）一起做，另提 thesis mutation。名下反證續盯到 10-Q。一手：library/raw/axti_8k_2026_10_29_q3_2026_results_excerpt.txt、library/raw/axti_q3_2026_earnings_call_transcript_excerpt.txt。 ｜2026-08-02 首建 → 2026-08-03 紅隊後改寫 v3 → 2026-08-04 disproof 第 6 條觸發後 revise 為 v4，依 L7 由 review_required 回到 active（thesis 修正後成立，disproof 條件已更新）。v4 核心論點：InP 需求為真且首次由 AXT 以外來源確認（JX 官方公告稱持續收到客戶因設備擴充而來的大幅增產要求），但 AXT 並非結構性受益者——供給側在 2028 年前將大幅擴張：JX 四年最多 1,200 億日圓、產能拉到 FY2025 的 7-10 倍（官方新聞稿，已入圖 jx_metals_inp_capacity_pr_2026_06_16）；住友 180 億日圓、FY2028 達 FY2024 的 3.1 倍（tier 3 轉述日經，待追一手）。JX 投資額約為住友的 6.7 倍。最關鍵且市場未討論的一點是時序：AXT 三份長約全簽在 JX 2026-06-16 公告之後（Coherent 6/25 生效、Lumentum 7/26 簽署），可能是供需反轉前的防禦性鎖客而非議價權；但合約談判週期通常數月，因果無法從公開資料判定。方向由偏多轉為謹慎偏空。評分維持 26/30 PASS，最弱環節仍為可信度 3/5——v4 的核心供給側證據全部落在 AXT 的 context slice 之外，因圖中缺 AXT↔JX 的 competes_with 邊（住友有、JX 沒有），補該邊是提升可信度最直接的一步。ASP 追源兩輪均未果，週期／結構之爭未裁決。裁決點：2026 Q3 財報毛利率（是否維持 44%+、是否揭露 ASP）＋ Q3 10-Q 的 Lumentum 合約 exhibit（定價機制與交付條款）。任一 disproof 觸發須 48h 內人工決策。 ｜2026-09-17（pq2 [600] 使用者 go）：新增 lane memo 第 7b 節——把當日寫下的 FY2026 variant 賭注（每股約 US$47，對現價 −26.96%）與第 7 節既有六條 disproof 對齊。實測三條裡有兩條**已經存在**（對美出口許可、ASP 揭露），真正缺的只有一條：**Q3 2026 營收 ≥ US$60M**——原有第 5 條問的是下界（低於 Q2 的 47.589M），而 variant 賭的是沒有大幅上行，**中間那一段 47.6M～60M 先前沒有任何條件在看**。已補上核查頻率（每季，隨 Q3／Q4 財報）與觸發後 48 小時動作（重寫兩條 variant 假設，或改寫成 bet/variant.overlay 的 Abstention）。⚠ 同時誠實記下：這三條每季核查**今天靠人**，機器對照不到（`metric_observations` 只從 fiscal_year_results 攤平，季別／半年別在 OBSERVATION_PERIOD_KINDS 下表達不出來，已進 ROADMAP backlog）。⚠ 第 7 節有幾條是 v3（偏多）沿用、方向在 v4（謹慎偏空）之後可能已經反了，本次刻意不動——逐條重判方向是一次完整 thesis 重寫，「順手改掉半組判準」比留著不一致更危險。",
     "prior_disproof_trigger": "第 7 節第 6 條（Sumitomo 或 JX Advanced Metals 宣布 InP 擴產）已觸發，且是兩家同時、規模遠大於預期。JX 金屬 2026-06-16 官方新聞稿（tier 1，非當事人自報）逐字：『今後4か年にわたり最大1,200億円の設備投資を実施する方針を決定』、『これまで公表した投資と合わせて生産能力を2025年度比で7～10倍に引き上げる予定』，地點為磯原工場加新設常陸那珂據點，資金來自 2026-05 發行的可轉債。住友電工另於 2026-07 上修擴產計畫至 180 億日圓、FY2028 產能達 FY2024 的 3.1 倍（TrendForce 轉述日經，tier 3 待追一手）。此事實實質反駁 v3 對 AXT『增量產能關鍵來源』的定位——兩個競爭者都在大規模投入增量產能，且 JX 的投資額約為住友的 6.7 倍。時序另有一層未探討的解讀：AXT 的 Coherent（2026-06-25）與 Lumentum（2026-07-26）長約，都簽在 JX 6/16 公告之後，六年期合約可能是供需反轉前的防禦性鎖客而非議價權展現。依 L7 須於 48 小時內人工決策：revise（納入供給側擴張後重估）或 retire。",
     "revised_at": "2026-08-04",
-    "status": "active",
+    "status": "review_required",
     "ticker": "AXTI"
   },
   "coherent_cpo": {
