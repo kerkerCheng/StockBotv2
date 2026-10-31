@@ -319,3 +319,6 @@
 **發現未排程**：
 - 寫入端對 `answers.in_numbers=yes` 的檢查（稽核區沒值就得答量不到）是對的，但澳洲申報人的季報本身就是一手數字——「系統量不到」與「文件寫了」在敘事裡要分兩句寫，LYC.AX 這版照此寫（1 例，不排程）。
 - `--company-id` 鑄的 manual pq2 不會讓 closure 認成 defer（`deferred_tickers` 只看 `deferred_at`，要使用者 pending 過才有）；本輪照 10-30 先例用 `closure-gate --skip` 顯式宣告，理由寫在這裡（1 例，不排程）。
+
+**補記（同日，使用者「901 go」）**：`alpha abstention 300943.SZ --add` 寫入 `ab_138a198261325ab2`，[901] 以收據 `authority:abstention_ledger;ref:ab_138a198261325ab2` 結案；materialize 後 300943.SZ 的讀圖格 `deliberate_abstention`（settled），closure-gate **不帶 skip 也 closed（每一檔都到終局）**；8790 重啟、health `code.stale=false`。
+- 發現未排程：Abstention 的 `readings` 層 subject 字彙只有 `demand_side`（「它在需求側、不坐任何層」），寫入端拒收提案原本的 `no_seat_until_acquisition`；控股端（座位在參股公司）符合它的操作意義「不坐任何層」但不是買方——改用 `demand_side` 並在理由第一句寫明取的是哪一半。要不要把字彙拆成「需求側」與「沒有座位」兩個 subject 是 contract 題（Z2），1 例，不排程；第 2 例再提。
