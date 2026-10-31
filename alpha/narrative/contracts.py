@@ -551,6 +551,27 @@ def undated_position_claims(text: str, *, require_price_word: bool = False) -> l
     return out
 
 
+#: 寫死的燈色（2026-10-31 使用者「都做」；failure log #120；ROADMAP「首屏敘事不寫死燈色與價格報酬」）：會死嗎的四盞燈由
+#: authority 每天重算、首屏另有一行；敘事寫「現金跑道紅燈」，燈一變就錯——4971.TWO、AAON 寫的紅燈在 10-29 燈的規則改版後
+#: 變成黃燈，首屏照印。只在寫入端擋（`alpha/providers/briefs.py` ⑩、故事 `story_problems`），不在 parse（舊紀錄照讀）。
+#: 只認「燈的名字＋顏色」的寫法：單獨的「綠燈」不擋——「主管機關開綠燈」是核准的意思，不是這四盞燈（L16：不用會誤報的比對）。
+#: 10-31 回放（`current_v2_briefs`，與個股頁同一個選法）：現行 88 份 v2 敘事命中 8 處（5 份）、故事 1 處，逐句看過都是講這四盞燈。
+LAMP_COLOUR_CLAIM = re.compile(r"(?:現金跑道|跑道|負債|稀釋|going concern|會死嗎|歸零|盞)[^。；，]{0,8}?(?:[紅黃灰]燈|(?<!開)綠燈)")
+#: 寫了收盤價（同一個 ROADMAP 項）：9-30 使用者定案首屏不放價格報酬（相對組漲幅只在稽核區，首屏要談就用文字描述）；
+#: 10-28 新鏈 9 份敘事的已定價那一格照樣寫「調整後收盤由 … 元漲到 … 元」。**只印不擋**（使用者 10-31 照推薦：先看它印出什麼）。
+PRICE_QUOTE_CLAIM = re.compile(r"收盤[^。；]{0,30}?\d+(?:\.\d+)?\s*(?:美元|元|加元|盧比|港元|日圓|歐元|英鎊|克朗)")
+
+
+def lamp_colour_claims(text: str) -> list[str]:
+    """寫死燈色的句子（寫入端拒收用）。"""
+    return [s.strip() for s in _SENTENCE_SPLIT.split(text or "") if LAMP_COLOUR_CLAIM.search(s)]
+
+
+def price_quote_claims(text: str) -> list[str]:
+    """寫了收盤價的句子（寫入端只印）。"""
+    return [s.strip() for s in _SENTENCE_SPLIT.split(text or "") if PRICE_QUOTE_CLAIM.search(s)]
+
+
 @dataclass(frozen=True, slots=True)
 class InvestorBrief:
     """一份短評（append-only；改一句＝append 一筆新的 supersede 舊的）。"""
@@ -838,6 +859,7 @@ __all__ = [
     "BRIEF_SLOTS_V2", "CANDIDATE_STATES", "CANDIDATE_STATES_DECLARABLE", "CandidateState", "HistoryNotComparable",
     "NarrativeConfirm", "NarrativeDisproof", "PLACEHOLDERS_V2", "PRICED_DATE_MARK", "PRICED_POSITION_WORDS",
     "PricedSnapshot", "RECORD_VERSION_V1", "RECORD_VERSION_V2", "RECORD_VERSIONS", "undated_position_claims",
+    "LAMP_COLOUR_CLAIM", "PRICE_QUOTE_CLAIM", "lamp_colour_claims", "price_quote_claims",
     "RIDE_UNITS",
     "Ride", "SLOT_KEYS_V2", "SLOT_LABELS_V2", "WHAT_MUST_BE_TRUE_FORBIDDEN", "placeholder_vocab", "slot_keys",
     "slot_labels",

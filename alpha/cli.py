@@ -273,7 +273,9 @@ def cmd_brief(args: argparse.Namespace) -> int:
     - `--add spec.json`：append 一筆 v2。spec：`{"slots": {"demand": {"text": …, "evidence_refs": […]}, …},
       "rides": […], "disproof": […], "answers": {…}, "candidate_state": {…}, "history_not_comparable": null,
       "acknowledged_touched": […], "confirm": […], "supersedes_id": …, "note": …}`（形狀見 `python -m alpha research <T>` packet 的
-      `brief_frame.spec_shape`）。寫入當下檢查讀圖現行、供給側、watch、answers、可開前提，不過就整筆拒收並逐條說明；
+      `brief_frame.spec_shape`）。選填 `"depth_check": {…}`（宣告可開前的深挖清單，鍵見 `alpha.narrative.depth_check`；
+      **只在宣告可開時印出還缺哪幾項、不擋、不存檔**，2026-10-31 failure log #119）。
+      寫入當下檢查讀圖現行、供給側、watch、answers、可開前提，不過就整筆拒收並逐條說明；
       通過後 `disproof[]` 自動登記成語意 watch（已在盯的只連結）、`confirm[]`（加碼條件，Phase 7 Step 7.0d）各登記一筆
       `condition_role=confirm` 的語意 watch、舊版還 active 的 `brief:` watch 收掉。
     - `--retract <id>`：append 一筆撤回紀錄（沿用被撤那筆的版本；撤回 v2 只收它登記、還 active 的 watch）。
@@ -349,6 +351,14 @@ def cmd_brief(args: argparse.Namespace) -> int:
         print(f"  watch：新登 {len(result['registered'])}｜連結既有 {len(result['linked'])}"
               f"｜收掉舊版 {len(result['consumed'])}｜處置 {len(result['acknowledged'])}"
               f"｜加碼條件新登 {len(result.get('confirm_registered') or ())}")
+        for notice in result.get("notices") or ():
+            print(f"  ⚠ {notice}")
+        # 宣告可開前的深挖清單（2026-10-31，failure log #119）：spec 的 `depth_check` 只在這裡讀、不進紀錄——只印、不擋
+        if args.add and ((spec.get("candidate_state") or {}).get("state")) == "open":
+            from .narrative.depth_check import depth_check_lines
+
+            for line in depth_check_lines(spec.get("depth_check")):
+                print(line)
         print(f"  下一步：python -m webapp materialize {ticker}（首屏會長出七句；引用解析不到的格會現形）")
         # 首頁卡片的一句做什麼（2026-10-28）：寫敘事的這一刻最知道它做什麼——沒寫過就在這裡提醒，不靠人記得（L14）
         if not args.retract:

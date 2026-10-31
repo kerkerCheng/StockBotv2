@@ -13,8 +13,8 @@ from typing import Any, Mapping, Sequence
 
 from shared.redaction import sensitive_payload_path
 
-from ..narrative.contracts import (LINKABLE_SOURCE_PREFIXES, RAW_EXCERPT_PREFIX, InvestorBrief, parse_brief_record,
-                                   undated_position_claims)
+from ..narrative.contracts import (LINKABLE_SOURCE_PREFIXES, RAW_EXCERPT_PREFIX, InvestorBrief, lamp_colour_claims,
+                                   parse_brief_record, price_quote_claims, undated_position_claims)
 from ..errors import ContractViolation
 
 _ROOT = Path(__file__).resolve().parents[2]
@@ -331,7 +331,27 @@ def v2_write_problems(parsed: InvestorBrief, *, ctx: WriteContext, existing: Seq
     # ⑨ 一手節錄要指得回（批次二 E12；failure log #50；L18）：`library/raw/<檔名>` 的檔要真的在、而且不得跳出 library/raw
     #   ——證據清單照這個路徑列，指不回的引用列出來只會是一個死連結。
     problems.extend(raw_excerpt_problems(parsed, root=_ROOT))
+
+    # ⑩ 寫死的燈色（2026-10-31，failure log #120）：會死嗎的燈每天重算、首屏另有一行——敘事寫「現金跑道紅燈」，燈一變就錯
+    #   （4971.TWO、AAON 10-29 改燈的規則後由紅變黃，首屏照印）。只擋寫入；舊紀錄照讀（不放 parse 路徑）。
+    for label, text in [*((s.key, s.text) for s in parsed.slots),
+                        ("candidate_state.reason", (cs.reason or "") if cs is not None else "")]:
+        for sentence in lamp_colour_claims(text):
+            problems.append(f"{label}：寫死了燈色——會死嗎的燈每天重算、首屏另有一行；改寫成燈背後的事實"
+                            f"（本業在燒錢、欠的比手上的現金多…）：{sentence[:40]}")
     return problems
+
+
+def v2_write_notices(parsed: InvestorBrief) -> list[str]:
+    """只印、不擋的提示（2026-10-31，failure log #120）：已定價那一格與候選理由寫了收盤價——9-30 使用者定案首屏不放價格報酬
+    （相對組漲幅只在稽核區）。先看它印出什麼（L16：比對文字的檢查會誤報），要擋另議。"""
+    priced = parsed.slot("priced_in")
+    reason = parsed.candidate_state.reason if parsed.candidate_state is not None else None
+    notices: list[str] = []
+    for label, text in (("priced_in", priced.text if priced is not None else ""), ("candidate_state.reason", reason or "")):
+        for sentence in price_quote_claims(text):
+            notices.append(f"{label}：寫了收盤價——首屏不放價格報酬（9-30 使用者定案），改用文字描述方向：{sentence[:40]}")
+    return notices
 
 
 def raw_excerpt_problems(parsed: InvestorBrief, *, root: Path) -> list[str]:
@@ -409,8 +429,9 @@ def write_brief(record: Mapping[str, Any], *, ctx: WriteContext, directory: Path
     path = append_brief_record(record, directory=directory)
     summary = register_brief_watches(parsed, data=ctx.watches, company_brief_ids=brief_ids)
     ew.save_watches(ctx.watches, watches_path)
-    return {"path": str(path), "brief_id": parsed.brief_id, **summary}
+    notices = v2_write_notices(parsed) if parsed.record_version == RECORD_VERSION_V2 and not parsed.retracted else []
+    return {"path": str(path), "brief_id": parsed.brief_id, **summary, "notices": notices}
 
 
 __all__ = ["BRIEF_DIR", "CURRENT_READING_STATUSES", "OPEN_READING_KINDS", "PRICED_IN_WRITE_LINES", "WriteContext", "append_brief_record", "priced_snapshot",
-           "ledger_path", "read_brief_records", "v2_write_problems", "write_brief"]
+           "ledger_path", "read_brief_records", "v2_write_notices", "v2_write_problems", "write_brief"]

@@ -222,6 +222,12 @@ def test_trace_backlog_keeps_legacy_parked_trace_visible(tmp_path, capsys) -> No
         ),
         "review_title": None,
         "review_hint": None,
+        # 2026-10-30 缺 X 三分法：文件請求的管道五鍵（lead refs 沒寫就是 None）。
+        "review_company": None,
+        "review_channel": None,
+        "review_search": None,
+        "review_window": None,
+        "review_flips_state": None,
         # 具名標的：讓「新 lead 是否與此 parked 有關」可確定性比對，
         # 不必每次重讀 next_trigger 自由文字。此例文字無 cashtag 故為空。
         "entities": [],

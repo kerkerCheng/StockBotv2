@@ -20,7 +20,8 @@ import re
 from datetime import date
 from typing import Mapping
 
-from .contracts import FORBIDDEN_TERMS, PARAM_PLACEHOLDER, PLACEHOLDERS_V2, SIMPLE_PLACEHOLDER, SLOT_LABELS_V2
+from .contracts import (FORBIDDEN_TERMS, PARAM_PLACEHOLDER, PLACEHOLDERS_V2, SIMPLE_PLACEHOLDER, SLOT_LABELS_V2,
+                        lamp_colour_claims)
 
 #: 只有故事、敘事裡沒有對應格的兩格（個股頁 B3、B5；F13：十三塊有 4 塊在敘事裡沒有格，首屏永遠印「還沒寫」）。
 #: 它們沒有依據那一格可以指回，所以這兩格的故事**自己帶引用**（`evidence_refs`）。
@@ -100,6 +101,9 @@ def story_problems(key: str, text: object, *, limit: int = STORY_MAX) -> list[st
     for word in STORY_SYSTEM_WORDS:
         if word.lower() in lowered:
             out.append(f"{where} 含系統用語「{word}」——讀的人不必知道系統怎麼運作")
+    # 寫死的燈色（2026-10-31，failure log #120）：燈每天重算、首屏另有一行——故事寫「現金跑道紅燈」，燈一變就錯
+    for sentence in lamp_colour_claims(text):
+        out.append(f"{where} 寫死了燈色——燈每天重算、首屏另有一行；講燈背後的事實：{sentence[:24]}")
     if PARAM_PLACEHOLDER.search(text):
         out.append(f"{where} 用了帶參數的 placeholder——v2 沒有這種字彙")
     for name in SIMPLE_PLACEHOLDER.findall(PARAM_PLACEHOLDER.sub("", text)):
