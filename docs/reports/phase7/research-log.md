@@ -313,3 +313,9 @@
 - MP 非邊緣（7.05B／16 家）不寫；#110 第 3 次（LYC.AX、AMKR 都是門檻 ±1 家／±10% 內翻轉），ROADMAP 旁支新增「邊緣門檻的遲滯與在門檻上計數器」○。
 
 **段 4 走圖**：九型命中逐筆對 10-17／10-22／10-27／10-28 四份終局表（`library/private/wf_tmp/diff_gw_terminals_1031.py`），新命中 0；供給側未填 3／8 母體 <10 只印不判。
+
+**收尾**：`engine_b.cli drain` 段 0–1 全零、pq1 空；短版 ⑤ 二十格全 0；`audit invariants --only QueueSegments` PASS；closure-gate closed（到終局 76／顯式跳過 1：300943.SZ 掛 [901]）；候選板可開 0／缺 X 38／等回落 4／不要 46／已持有 2／無敘事 106（可開為零就零）。watch 計數器非零但不是待做：停滯 3、到期 3（都已有 `expiry_resolution`，同 10-30）。全量 materialize 197/197 後重啟 8790，health `code.stale=false`。相關測試 237 passed（todo_ledger、heartbeat、daily digest、webapp request path）。新鑄 pq2：[901] 一筆；新 watch：`ew_1935`（Lynas）、`ew_1936`（Amkor）。decompose：本輪沒有新錨提案（距上次掃題材 4 天，門檻 7 天）。
+
+**發現未排程**：
+- 寫入端對 `answers.in_numbers=yes` 的檢查（稽核區沒值就得答量不到）是對的，但澳洲申報人的季報本身就是一手數字——「系統量不到」與「文件寫了」在敘事裡要分兩句寫，LYC.AX 這版照此寫（1 例，不排程）。
+- `--company-id` 鑄的 manual pq2 不會讓 closure 認成 defer（`deferred_tickers` 只看 `deferred_at`，要使用者 pending 過才有）；本輪照 10-30 先例用 `closure-gate --skip` 顯式宣告，理由寫在這裡（1 例，不排程）。
