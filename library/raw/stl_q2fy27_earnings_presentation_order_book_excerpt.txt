@@ -1,0 +1,24 @@
+SOURCE: Sterlite Technologies Limited（STL）Q2 FY27 Earnings Call Presentation——第 24 頁「Record Order Book Drives Multi-Year Revenue Visibility」、第 25 頁「Consolidated Financials: Abridged Version」節錄
+URL: https://stl.tech/wp-content/uploads/2026/10/Q2FY27%20-%20Earnings%20Call%20Presentation.pdf（下載頁 https://stl.tech/download/ 「Latest Q2' FY 27 Financial Results」）
+PUBLISHED: 2026-10（Q2 FY27 法說，季度截至 2026-09-30；檔案上傳於 2026 年 10 月，頁面沒有標明確切日期）
+RETRIEVED: 2026-10-31
+STORAGE: repo_excerpt（pypdf 抽字；圖表只剩數列與標籤）
+NOTE: 在手訂單（open order book / backlog）以 INR Cr.（千萬盧比）計：FY26 7,687 → H1FY27 35,274（4.6x）；排程：Q3FY27 3,021、Q4FY27 & Beyond 32,253。第 25 頁 Q2 FY27 EBITDA 846 Cr 帶星號（含一次性項目；法說逐字稿說營業 EBITDA 685 Cr、另有 161 Cr 美國關稅退款）。
+
+=== PAGE 24 ===
+Record Order Book Drives Multi-Year Revenue Visibility
+Open order book / Backlog (INR Cr.)        Order book spread / Backlog Schedule (INR Cr.)
+FY26 7,687   H1FY27 35,274   4.6x
+Q3FY27 3,021   Q4FY27 & Beyond 32,253
+Will be updated after data is received
+
+=== PAGE 25 ===
+Consolidated Financials: Abridged Version
+P&L (INR Cr.)        Q1 FY27   Q2 FY26   Q2 FY27
+Revenue              1,910     1,034     2,529
+EBITDA               397       141       846*
+EBITDA %             20.8%     13.6%     33.5%
+Depreciation         (85)      (80)      (109)
+EBIT                 312       61        737
+Finance Costs        (55)      (55)      (63)
+PBT (Before share of Associates and JV)  257   6   674

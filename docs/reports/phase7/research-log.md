@@ -295,3 +295,21 @@
 - **#121 修好**（ROADMAP 旁支「只改字面值的換版不重設判斷日」）：敘事選填 `restates`，判斷日與正文版遇到就跳回被重述的那一版。動手前回放：新舊走法對 474 版 v2 敘事逐筆比對差異 0（現有紀錄都沒有這一欄，行為不變）。
 - 13 份各補一版重述（文字照抄 10-31 字面值換版，`restates` 指換字前那一版）＋13 份故事照抄：判斷日／正文版／滯留起點 13／13 回到換版前；候選板 4971.TWO 判斷日 10-06（−26.5%）、AAON 10-08（−22.6%）、BW／PSIX／STLTECH.NS 10-28，已回落 3 → 4。補償叫醒 `ew_1870` 收掉（consumed，收據寫明被修法取代）。
 - 這幾檔在 10-31 各有三版（換字前、字面值換版、重述）：中間那一版沒宣告，是修法之前寫的；之後只改字面值一律直接寫 `restates`（SKILL 段 5）。
+
+## 十三、2026-10-31 晚（使用者 `/research-drain`、「繼續」）
+
+**開工計數**（短版 ⑤）：待深挖 lead 31、未檢 23、叫醒擋下待確認 2、敘事該重寫 11、T2 命中待檢 8、停放未處置對照 9、接不上的等待 3、邊緣卻沒敘事 2。
+
+**機械段**：consume-fired、todo sync、standing-go 跑完後未檢／叫醒擋下／T2／停放未處置全歸零。「接不上的等待 3」是假陽性——三則都是「向你要文件」型（[897]–[899] 都開著），收集器從 lead 推出 pq2 項目、lead 這端永遠不會回寫 `pq2_ref`；`todo_ledger.requires_user_without_pq2` 補讀待辦池未結案項目的 `ref_id`（對稱面同 `leads.parked_without_expiry`），3 → 0（測試 +1）。
+
+**敘事該重寫 11 → 0**：等回落四檔的已回落叫醒照 ⓪ 重答——3081.TWO `ib_4ea3946ae2a167c7`（10-28 法說與 MOPS 簡報）、4979.TWO `ib_10c3162318d18749`、AXTI `ib_22424c1f01f6ca63`（騎 InP 基板 `sr_5bd84c00f10ad7da`）、STLTECH.NS `ib_f84942c958a64495`（Q2 FY27 簡報的在手訂單）——四檔仍「已定價等回落」，錨重設、叫醒照登；300395.SZ `ib_1c0bba935e67a6e4`、002270.SZ `ib_fbaef401915f3723` 讀第三季報告後仍缺 X（filing）；FormFactor 第三季法說後換版 `ib_db66057e95962670`（不要，判斷不變）。七則故事同步寫入、materialize。
+
+**pq1 31 則全部停放**（`engine_b.cli drain` 順序；停放理由逐條處置直接命中的 watch）：一手拿到（`original_obtained`）21 則——京元電（MOPS：NVIDIA International, Inc. 預付＋Fort Worth 廠房；非邊緣 99.9 億美元／16 家，7 條 watch 不相關）、nVent 與 FormFactor 第三季法說、CCXI 8-K（贖回與募資；不要不變）、源杰與長飛第三季報告（長飛：預製棒層在位者缺席，日後 `ra_admission`）、AXT 四則（同源）、景碩兩則、光寶科五則、Lumentum Hurlston 專訪兩則；不追（`not_pursued`）8 則——日月光、Marvell–Lumentum 傳聞、三星 HBM4 法說（ew_0762 自述不觸及）、CXMT、緯穎、Prometheus、Amazon capex（錨只收 10-Q）、Intel 兩則、TrendForce DRAM；部分（`partial`＋收據）2 則——HD Hyundai Electric（DART 잠정실적拿到，新接單與在手訂單只有媒體轉述；ew_1332 判未達「轉為下滑」）、Hyosung Heavy（同形；ew_1332 方向相反）。DART 無 API key 的路（`dsab007/detailSearch.ax` → `main.do` 的 `viewDoc` → `viewer.do`）記在 `library/private/tmp/dart_simple.py`。一手節錄 23 份進 `library/raw/`。
+
+**段 5 每檔閉環**（closure-gate 未到終局 3：LYC.AX、300943.SZ、AMKR）：
+- LYC.AX：10-22 因家數 >12 撤回，10-31 `alpha edge` 回到 12 家（8.57B 美元）翻回邊緣、缺 brief。讀 10-28 的 2027 財年第一季季報（NdPr 2,082 噸創高、Dy＋Tb 23 噸、季營收 3.101 億澳元年增 55%、均價 102.1 澳元／公斤年增 88%、保底價覆蓋過半、12 月季停機一個月；節錄 `lynas_asx_quarterly_sept_2026_excerpt.txt`）與 2026 年報的分部（單一分部、全賣澳洲以外、沒有單一客戶揭露）與 JARE 貸款段。重發 `ib_514f4fefdd74a1d0`：缺 X（filing；`ew_1935` 2027-02-05 醒）——重稀土量距 JARE 確定採購規模還遠、已定價量不到；騎 `sr_6f81993effe57dcf` 不換；出現在數字裡了嗎寫入端擋「yes」（稽核區沒機械序列，印（尚無）就得答量不到），改量不到、文字寫明季報說的是價不是量。故事 `st_868a735a0adfb336`、首頁介紹補上。
+- AMKR：10-29 因市值 104.9 億撤回，10-31 97.9 億／10 家翻回。第三季 10-Q 之後沒有新一手，照 10-29 那版重發 `ib_4ff1d4605b6fa314`（缺 X filing；`ew_1936` 2027-02-26 醒、可輪詢）；寫入端要求 `supersedes_id` 指最新一筆（撤回紀錄 `ib_29e6181d78ea931d`），不是被撤回的那版。故事 `st_9b7b2c810bc0704a`。
+- 300943.SZ（春晖智控）：blocker 是讀圖格 `upstream_unavailable`「圖上沒有它供貨或開發的層」——它自己不坐任何層，座位在 38.69% 權益法投資的春晖仪表（收購其餘 61.31% 深交所「已问询」）。既不是補供貨邊、也不是需求側；誠實終局是 Abstention（刻意不主張、收購完成或終止時撤回重寫）。提案檔 `library/private/alpha/abstention_proposals/300943.SZ_readings_no_seat.json`，鑄 **[901]**（帶 `--company-id`，closure 認成掛在 pq2），等 go。
+- MP 非邊緣（7.05B／16 家）不寫；#110 第 3 次（LYC.AX、AMKR 都是門檻 ±1 家／±10% 內翻轉），ROADMAP 旁支新增「邊緣門檻的遲滯與在門檻上計數器」○。
+
+**段 4 走圖**：九型命中逐筆對 10-17／10-22／10-27／10-28 四份終局表（`library/private/wf_tmp/diff_gw_terminals_1031.py`），新命中 0；供給側未填 3／8 母體 <10 只印不判。

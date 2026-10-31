@@ -234,14 +234,20 @@ def active_hypotheses_without_watch(hypotheses: Iterable[Mapping[str, Any]],
 
 
 def requires_user_without_pq2(leads: Mapping[str, Mapping[str, Any]],
-                              watches: Iterable[Mapping[str, Any]]) -> list[str]:
+                              watches: Iterable[Mapping[str, Any]],
+                              todo_items: Iterable[Mapping[str, Any]] = ()) -> list[str]:
     """停放、寫著等使用者（trace_requires_user），卻沒有 pq2_ref、也沒有 active 追源 watch 的 lead——完全隱形
-    （`parked_without_expiry` 豁免了它：以為 pq2 那端有生命週期，其實那端沒有項目；2026-10-22 盤點 2 則）。"""
+    （`parked_without_expiry` 豁免了它：以為 pq2 那端有生命週期，其實那端沒有項目；2026-10-22 盤點 2 則）。
+    對稱面同 `leads.parked_without_expiry`：待辦池有**未結案**項目以 `ref_id` 指回這筆 lead 也算有 pq2——「向你要文件」型的
+    `source_trace_review` 是收集器從 lead 推出來的，lead 這端永遠不會回寫 `pq2_ref`；只看 lead 這端，每一筆開了口的都被算成
+    接不上（2026-10-31 實測 3 則全是這一型：[897]–[899] 都開著）。"""
     watched = {str(w.get("wake_lead")) for w in watches if w.get("wake_lead") and w.get("status") in ("active", "fired")}
+    asked = {str(i.get("ref_id")) for i in todo_items if i.get("ref_id") and not i.get("resolved_at")}
     out = []
     for lead_id, lead in leads.items():
         refs = lead.get("refs") or {}
-        if lead.get("status") != "parked" or lead_id in watched or str(refs.get("pq2_ref") or "").strip():
+        if (lead.get("status") != "parked" or lead_id in watched or lead_id in asked
+                or str(refs.get("pq2_ref") or "").strip()):
             continue
         if str(refs.get("trace_requires_user") or "").lower() in {"1", "true", "yes"}:
             out.append(str(lead_id))
@@ -461,7 +467,7 @@ def collect(*, today: date, leads_store: Mapping[str, Any], watches: Sequence[Ma
         from engine_b.leads import parked_without_expiry
 
         holes = (loaders.get("parked_without_expiry") or (lambda: parked_without_expiry(dict(leads_store))))()
-        users = requires_user_without_pq2(leads, watches)
+        users = requires_user_without_pq2(leads, watches, todo_items)
         orphans = orphan_wake_briefs(watches, briefs or ()) if briefs is not None else []
         hyps = active_hypotheses_without_watch(hypotheses, watches)
         parts = [(len(holes), "停放沒到期"), (len(users), "等使用者卻沒 pq2"), (len(orphans), "敘事不等的喚醒 watch"),

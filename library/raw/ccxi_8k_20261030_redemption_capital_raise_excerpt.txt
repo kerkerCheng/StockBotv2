@@ -1,0 +1,12 @@
+SOURCE: Churchill Capital Corp XI（CCXI）Form 8-K（Item 7.01），filed 2026-10-30，accession 0001213900-26-114063
+URL: https://www.sec.gov/Archives/edgar/data/2074973/000121390026114063/ea0310303-8k425_church11.htm
+PUBLISHED: 2026-10-30
+RETRIEVED: 2026-10-31
+STORAGE: repo_excerpt（SEC 公開申報節錄）
+NOTE: 與 Agility Robotics 的合併案：贖回期限已過，Agility 在本交易與相關融資的總募資額預計約 4.65 億美元（扣交易費用前）；股東特別大會 2026-11-02。CCXI 現行敘事判「不要（不坐任何層：Agility 是人形機器人整機廠、需求側）」——本則不改判；合併完成後代號與名冊（co:churchill_capital_xi／co:agility_robotics）要對齊。
+
+"As previously disclosed, on June 24, 2026, Churchill Capital Corp XI, a Cayman Islands exempted company ("Churchill"), entered into an Agreement and Plan of Merger … by and among Churchill, BLB Merger Sub, Inc., … and Agility Robotics, Inc., a Delaware corporation ("Agility")."
+"As previously disclosed, Churchill has scheduled an extraordinary general meeting of its shareholders (the "Extraordinary General Meeting") for November 2, 2026, at 9:00 a.m. Eastern Time, to consider and vote upon, among other matters, a proposal to approve the Merger Agreement and the proposed transaction"
+"Item 7.01. Regulation FD Disclosure. On October 30, 2026, Churchill and Agility jointly issued a press release announcing, among other things, that following the expiration of Churchill's redemption deadline, Agility's gross capital raise in connection with the proposed transaction and related financings is expected to be approximately $465 million, before transaction expenses."
+"Shareholders who wish to withdraw their previously submitted redemption request may do so at any time prior to the scheduled vote at the Extraordinary General Meeting."
+Forward-looking statements section mentions: "Agility's more than $300 million in multi-year orders for Digit 5; the expected deployment of Digit at the nine customer facilities for which Agility has reported deployment commitments and at two additional GXO facilities beginning in early 2027"

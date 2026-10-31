@@ -140,6 +140,18 @@ def test_broken_waits_catch_the_four_kinds_seen_on_2026_10_22() -> None:
     assert all(w in row.work for w in ("停放沒到期 1", "等使用者卻沒 pq2 1", "敘事不等的喚醒 watch 1", "假說沒 watch 1"))
 
 
+def test_requires_user_without_pq2_sees_open_todo_items_pointing_back() -> None:
+    """對稱面同 `leads.parked_without_expiry`：「向你要文件」的 pq2 項目以 ref_id 指回 lead、lead 不回寫 pq2_ref——
+    開著的項目算有 pq2；已結案的不算（2026-10-31 實測 [897]–[899] 三則全被算成接不上）。"""
+    leads = {"L1": {"status": "parked", "refs": {"trace_requires_user": "true"}},
+             "L2": {"status": "parked", "refs": {"trace_requires_user": "true"}},
+             "L3": {"status": "parked", "refs": {"trace_requires_user": "true"}}}
+    items = [{"ref_id": "L2", "resolved_at": None}, {"ref_id": "L3", "resolved_at": "2026-10-30T00:00:00+00:00"}]
+    assert tl.requires_user_without_pq2(leads, [], items) == ["L1", "L3"]
+    rows = _collect(leads_store={"leads": leads}, todo_items=items)
+    assert "等使用者卻沒 pq2 2" in rows["todo.broken_waits"].work
+
+
 def test_a_waiting_narrative_may_have_several_wake_watches() -> None:
     """AXTI：候選狀態指 ew_0148，財報後另登一筆 ew_1433——兩筆都在等，不是孤兒。"""
     watches = [{"watch_id": "ew_0148", "status": "active", "wake_brief": "co:axt"},

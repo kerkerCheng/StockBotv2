@@ -1,0 +1,10 @@
+SOURCE: The Asia Business Daily（아시아경제 英文版）〈[Conference Call] Samsung Electronics: "Q3 HBM4 Revenue Surges More Than Threefold... Next Year's Supply Already Sold Out"〉（Kwon Hyeonji）——二手；轉述三星電子 2026-10-29 第三季法說會發言
+URL: https://www.asiae.co.kr/en/article/enterprise-CEO/2026102911191454019
+PUBLISHED: 2026-10-29
+RETRIEVED: 2026-10-31
+STORAGE: repo_excerpt（媒體報導有限引文；三星法說原始稿未抓——三星 IR 只公布簡報與音檔，逐字稿由第三方產出）
+NOTE: HBM 層讀圖反證 ew_0762 要的是「Samsung 的 HBM 認證與量產被客戶一手寫明」——這裡全是三星自己說的（供應商自述，L8），不算觸及。可用的量訊號：HBM4 第三季營收季增三倍以上、占三星 HBM 營收約六成；2027 年 HBM 供應「已在目標價格水準售罄」、客戶仍在追加——買方被鎖量的形狀，但出自供應商之口。
+
+Samsung Electronics said, "Thanks to our differentiated performance competitiveness, our HBM4 sales more than tripled in the third quarter from the previous quarter, and HBM4 accounted for around 60% of our total HBM sales. This fully meets the HBM4 sales target we set out at our last earnings announcement."
+"Based on these HBM4 sales results, we believe we achieved our third-quarter target of securing an HBM market share on par with our overall DRAM market share, a goal we had aimed to reach in the second half of this year."
+Regarding negotiations for 2027 supply, the company said, "With our HBM products receiving favorable reviews for their competitiveness, negotiations for 2027 supply have been completed at our target price level, which reflects that competitiveness, and the supply is already sold out. Even after the full sellout, we continue to receive requests from major customers for additional supply."

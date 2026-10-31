@@ -1,0 +1,16 @@
+SOURCE: nVent Electric plc（NVT）Q3 2026 Earnings Call（2026-10-30）——The Motley Fool 第三方逐字稿（tier 2，未對公司錄音核對）
+URL: https://www.fool.com/earnings/call-transcripts/2026/10/30/nvent-electric-nvt-q3-2026-earnings-call-transcript/
+PUBLISHED: 2026-10-30
+RETRIEVED: 2026-10-31
+STORAGE: repo_excerpt（逐字稿有限引文）
+NOTE: nVent 不在名冊；它是液冷（CDU／機櫃液冷）、資料中心機櫃與電力連接的在位者（大型股）。可用在液冷相關層說明當在位者證據：第三季營收 15.15 億美元（+44% 有機）、基礎設施垂直有機 +70%、在手訂單 26 億美元創高、有機接單低雙位數成長（去年同期 +65%）；供應商也在擴產、「增量要以要求的速度拉上來很費力」；新的模組化液冷平台已開始接單、Supercomputing 展示；Blaine 2（液冷與資料中心方案）2026 年上半年投產；收購 Maverick Power（配電、800V DC 機櫃）。沒有任何一句講 CDU 的交期、配額或客戶預付。
+
+Beth A. Wozniak (CEO): "In Q3, for total nVent, we continued to have strong orders and backlog. Organic orders grew low-double-digits, on top of 65% growth a year ago. In addition, backlog remained healthy and grew sequentially to $2.6 billion."
+"Infrastructure led the way with organic sales up over 70%. Primarily driven by outstanding growth in data centers."
+"We have been investing in new capacity for liquid cooling, engineered building solutions, power connections, and cable management. … In our high growth areas within infrastructure, our suppliers are working to keep pace with our growth and are also investing in capacity expansions. It is a lot of work to increase volumes with the velocity required."
+"We also announced Blaine 2, which is another site for liquid cooling and data center solutions. And so, again, that also will be into production going into mid-first half of 2026."
+"But I will say this, starting off Q4, orders are very--or, you know, in October, orders are very strong."
+On the new modular liquid cooling product: "So, we have been taking orders for our new modular cooling products and platform. We will also be showcasing that at Supercompute. There is a lot of interest in this product … certainly, there is a significant interest in this product from all types of data center companies."
+On 800V DC and cooling intensity: "So as we know, there are that the chips require more power. More power means more heat. More heat means more cooling. So as we think about, you know, the future, the demand for liquid cooling is only going to increase."
+"With Maverick, we estimate nVent's total data center opportunity expands to approximately $2 million per megawatt."
+Gary Corona (CFO): "Sales of $1.515 billion were up 44%. Both on a reported and organic basis as compared to last year." "This year, we expect to invest approximately $140 million in CapEx up 50%. … Most of this increased investment is for new capacity to support growth in data centers, power utilities, and supply chain resiliency."

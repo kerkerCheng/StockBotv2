@@ -1,0 +1,16 @@
+SOURCE: Gazettabyte〈Lumentum's CEO on the colliding worlds of chips and optics〉——Lumentum CEO Michael Hurlston 訪談（記者 Roy Rubenstein 的產業媒體；CEO 直接引言＝供應商自述，媒體轉述＝tier 3）
+URL: https://gazettabyte.com/the-colliding-worlds-of-chips-and-optics/
+PUBLISHED: 2026-10-30
+RETRIEVED: 2026-10-31
+STORAGE: repo_excerpt（有限引文）
+NOTE: 對 NPO 層（tech:near_package_optics）與 CW 雷射層的需求側時點：非 NVIDIA 客戶的 NPO／scale-up 光學採用由「最早 2029」提前到「2027 年底、2028 年初」（CEO 自述）；scale-up 轉換 2027 開始、2028–2029 明顯、2030 起放量；NVIDIA 的 20 億美元投資「首要是為了鎖我們的產能」，另有遠大於 20 億美元的供應協議；Greensboro 收購 Qorvo 的 GaAs 廠改做 6 吋 InP，第五座 InP 廠、2028 年初投產；兩年內想把營收組合更偏向元件（雷射與次組件）。沒有客戶具名（「one large customer」＝推一步是 NVIDIA）。
+
+"Lumentum believed Nvidia's scale-up co-packaged optics solutions would ship in the second half of 2027 into early 2028, and the rest of the market in 2029 at the earliest. But the interest in near-packaged optics is a response to Nvidia's move to incorporate optics more fully inside the rack."
+"We've seen a dramatic pull-in to late 2027, almost the same time frame as Nvidia, and certainly early 2028," says Hurlston. "Since our presentation at OFC 2026, maybe even until early summer, we were conflating CPO and NPO, and thought the timing was later than it's ended up being."
+"The transition in the scale-up network starts in 2027, becomes visible in earnest in 2028 and 2029, and hits its stride in 2030 and beyond, he says."
+"Many other customers favour the use of near-packaged optics. These include hyperscalers with their custom ASICs, CPU makers, and switch makers now considering scale-up. Here, the focus of near-packaged optics is mainly for connectivity inside the rack."
+"Lumentum supplies lasers for Nvidia for this scale-out co-packaged optics configuration."
+"A large share of the money has gone into Greensboro, North Carolina, where Lumentum acquired a 240,000-square-foot gallium arsenide fabrication plant (fab) from Qorvo and is converting it to make 6-inch indium phosphide wafers. It is the company's fifth indium phosphide fab with production expected to start in early 2028."
+"The reason Nvidia made this investment first and foremost is to get our capacity. They wanted to be a first mover to lock up the capacity." … "What wasn't covered in the $2 billion investment was that there was a massive supply agreement, valued at much more than $2 billion, that was the linchpin of the investment."
+"In two years, I'd like to be biased much more to components," says Hurlston.
+"the company's revenue has gone from $1.6 billion in fiscal year 2025 (ending in June 2025) to $3.0 billion in fiscal year 2026, with guidance for the first-quarter fiscal year 2027 (quarter ending in September) at a mid-point of $1.25 billion."

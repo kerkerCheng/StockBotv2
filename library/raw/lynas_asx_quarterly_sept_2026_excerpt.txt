@@ -1,0 +1,59 @@
+Source URL: https://cdn-api.markitdigital.com/apiman-gateway/ASX/asx-research/1.0/file/2924-03154748-6A1352172 （ASX 公告「Quarterly Activities Report」，Lynas Rare Earths Ltd，ASX:LYC；公告時間 2026-10-28 21:12 UTC，文件日期 29 October 2026）
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Lynas Rare Earths Quarterly Report for the period ended 30 September 2026（Q1 FY27）節錄：季營收、售價、保底價覆蓋、NdPr 與 Dy／Tb 產量、重稀土擴產進度、12 月季停機、現金
+RETRIEVED: 2026-10-31（ASX 公開檔案端點抽字、空白正規化後逐字核對；表格列照抽字原樣；本報告的銷售與財務資訊公司註明 unaudited）
+
+【p.1 Highlights】（欄序 Q1 FY26 / Q4 FY26 / Q1 FY27）
+"Quarterly gross sales revenue: A$200.2m A$288.9m A$310.1m"
+"Sales receipts: A$171.3m A$297.1m A$266.6m"
+"Closing cash and short-term deposits: A$1,060m A$1,209m A$1,212m"
+"Total REO production: 3,993t 3,481t 4,254t"
+"NdPr production: 2,003t 1,857t 2,082t"
+"Cash payments for CAPEX, exploration and development A$65.7m A$27.8m A$28.7m"
+
+【p.1 CEO Review】
+"Production of 2,082 tonnes of NdPr and 23 tonnes of Dy and Tb was achieved during the quarter. This production result reflects the work of the operations team to overcome ore concentrate quality challenges that affected downstream processing during the June 2026 quarter."
+"Quarterly sales revenue of A$310.1m was 55% higher than in the prior corresponding period (Q1 FY26) and is the highest quarterly sales revenue achieved since Q4 FY22. The average selling price across all rare earth products during the period was a record A$102.1/kg. The 88% increase in average selling price compared to the prior corresponding period (Q1 FY26) continues to be driven by improved market pricing, increased bundling of light and heavy rare earths for magnet customers, and a further increase in the premium achieved above the market index, including as a result of floor price agreements which now cover over 50% of Lynas' production."
+"This included progress on construction of the expanded Heavy Rare Earths (HRE) facility at Lynas Malaysia, following the commencement of production of Dy in May 2025, Tb in June 2025 and Sm in March 2026. Construction activities are currently focused on concreting works for the Solvent Extraction, Motor Control Centre and Control Room buildings. Procurement of long lead items is progressing and the project is being sequenced to prioritise production of Gadolinium and then Yttrium."
+
+【p.2 JS Link／LS Eco Energy】
+"Lynas will supply rare earth materials to the JS Link magnet factory in Yesan, South Korea, and the planned factory in Malaysia at commercial prices under an exclusive supply arrangement until January 2038."
+"Lynas and LS Eco Energy continue to work towards the definitive agreement for the long-term metal processing arrangement, including HRE metal making, covering the use of Lynas' rare earth products at a metal making facility to be constructed by LS Eco Energy in Vietnam."
+
+【p.2–3 Proposed acquisition of Meteoric Resources】
+"on 1 October 2026, Lynas announced the Company had entered into a binding Scheme Implementation Deed under which it is proposed that Lynas will acquire 100% of the shares in Meteoric Resources ("Meteoric") at a fixed exchange ratio of 0.0207 new Lynas shares for each Meteoric share"
+"Adding the potential for an average annual production of approximately 3,862 tonnes of NdPr and 127 tonnes of DyTb over Caldeira's life-of-mine, based on Meteoric's DFS production target, at a competitive cost base;"
+
+【p.5 Sales & Market Development】（欄序 Q1 FY26 / Q2 FY26 / Q3 FY26 / Q4 FY26 / Q1 FY27）
+"Sales Volume REOt 3,691 2,359 3,131 2,941 3,039"
+"Gross Sales Revenue A$200.2m A$201.9m A$265.0m A$288.9m A$310.1m"
+"Average Selling Price A$54.3/kg A$85.6/kg A$84.6/kg A$98.2/kg A$102.1/kg"
+"Sales Receipts (cash) A$171.3m A$185.0m A$233.0m A$297.1m A$266.6m"
+"OEMs across a number of market sectors continue to seek to lock in contracts for direct rare earth supply to support these new outside China supply chains. This is accompanied by an increasing understanding by OEMs of the value of these new resilient supply chains and the requirement to pay pricing independent of the market index, including acceptance of floor prices."
+"Lynas continues to focus on accelerating the ramp up in heavy rare earth production capacity to meet growing demand and is uniquely positioned to act as a one-stop shop for magnet maker customers as the only commercial scale producer of light and heavy rare earth oxides outside of China."
+
+【p.6 Operations — Downstream】（欄序 Q1 FY26 / Q2 FY26 / Q3 FY26 / Q4 FY26 / Q1 FY27）
+"Ready for Sale Production Volume Total REO 3,993t 2,382t 3,233t 3,481t 4,254t"
+"Ready for Sale Production Volume NdPr 2,003t 1,404t 1,996t 1,857t 2,082t"
+"Ready for Sale Production Volume Dy, Tb 9t 26t 8t 19t 23t"
+"Lynas Malaysia achieved a new production record of 2,082t Ready for Sale Production Volume of NdPr, continuing progress towards targeted nameplate capacity of 900t of NdPr finished product per month."
+"HRE production for Dy and Tb increased through the quarter."
+"Planned maintenance at Lynas Malaysia will be undertaken in the December quarter, which will result in lower production volumes during the quarter compared with Q1 FY27. The planned maintenance works will result in a shutdown of approximately one month."
+"Due to the strong demand for HREs, the Mt Weld team is conducting a study on the resequencing of cutbacks in the Mt Weld life of mine plan with the potential to bring forward access to HRE enriched zones within the Mt Weld ore reserve."
+
+【p.7 Finance — Cash flow, September 26 quarter, A$ million】
+"Receipts from customers 266.6"
+"Net proceeds from issue of convertible note 29.0"
+"Payment for production, administration and royalty costs (185.2)"
+"Payments for capex, exploration and development (28.7)"
+"Payments for subscription of convertible bonds (29.9)"
+"Purchase of shares or stock in other companies (52.3)"
+"OPENING CASH AND SHORT-TERM DEPOSITS 1,209.1"
+"CLOSING CASH AND SHORT-TERM DEPOSITS 1,212.5"
+"(3) Purchase of equity in JS Link for the amount of KRW 53.4bn."
+
+【p.8 Corporate】
+"The 2026 Annual General Meeting of Lynas shareholders will be held on 25 November 2026 at 10am Sydney time"
+
+NOTE（抽字者備註，不是原文）：本季報沒有美國國防部（DoW）Seadrift 重稀土廠或 3 月 LOI 採購進度的段落；沒有客戶別或地區別的銷售拆分；Dy／Tb 的銷售量（相對於產量）也沒有單列。
