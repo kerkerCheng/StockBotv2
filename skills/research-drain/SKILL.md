@@ -509,7 +509,7 @@ Samsung／SKH 側」）。這種問題 park 成 pq2 並繼續下一條，收尾�
 ② commit ＋ push；③ 回覆裡寫明「已清 N／剩 M」與下一條要做什麼。
 續跑的 session 從 Step 0 重讀狀態接手。
 
-⚠ **撞到避讓窗也是中斷，處置完全相同。** 跑到一半 `writer_guard verify` 回 exit 2，
+⚠ **撞到避讓窗也是中斷，處置完全相同。** 跑到一半重跑 `writer_guard check` 回 exit 2（沒有 `verify` 子命令；2026-11-01 更正），
 或時間逼近 daily 窗，一律照中斷程序收乾淨後停——**不要「再做完這一條就好」**：
 留一個 `researching` 懸空的 lead 給排程去撞，正是本 guard 要防的事。
 
@@ -558,7 +558,7 @@ Samsung／SKH 側」）。這種問題 park 成 pq2 並繼續下一條，收尾�
 
 ### ③ 硬中斷（立即在下一個邊界停，不評估）
 
-- `writer_guard check`／`verify` 回 exit 2
+- `writer_guard check` 回 exit 2（里程碑續跑時重跑；沒有 `verify` 子命令）
 - 時間進入 daily 避讓窗
 - 使用者插話
 - 呼叫端有給項目上限且已達到（例：`/research-drain 最多做 5 個項目`）

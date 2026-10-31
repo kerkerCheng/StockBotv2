@@ -322,3 +322,21 @@
 
 **補記（同日，使用者「901 go」）**：`alpha abstention 300943.SZ --add` 寫入 `ab_138a198261325ab2`，[901] 以收據 `authority:abstention_ledger;ref:ab_138a198261325ab2` 結案；materialize 後 300943.SZ 的讀圖格 `deliberate_abstention`（settled），closure-gate **不帶 skip 也 closed（每一檔都到終局）**；8790 重啟、health `code.stale=false`。
 - 發現未排程：Abstention 的 `readings` 層 subject 字彙只有 `demand_side`（「它在需求側、不坐任何層」），寫入端拒收提案原本的 `no_seat_until_acquisition`；控股端（座位在參股公司）符合它的操作意義「不坐任何層」但不是買方——改用 `demand_side` 並在理由第一句寫明取的是哪一半。要不要把字彙拆成「需求側」與「沒有座位」兩個 subject 是 contract 題（Z2），1 例，不排程；第 2 例再提。
+
+## 十四、2026-11-01 凌晨（使用者 `/research-drain`）
+
+**開工計數**（`engine_b.cli drain` 首行）：段 1 反證待檢 7、叫醒擋下待確認 6、敘事該重寫 3（三條就是被叫醒的 brief 來源 watch，不是另外三檔）；段 5 到終局 77／77；pq1 空；待辦池 13（向你要文件 3、等事件 10、待你決定 0）。外面新進 lead 0。
+
+**機械段**：consume-fired 0、todo sync 新增 0、standing-go 候選 0。sync 裡的 `check_watches` 叫醒 16 次，全部來自 10-30 晚景碩與光寶科的董事會重訊（已在 10-31 drain 停放的那幾則）。
+
+**反證待檢 7＋敘事該重寫 3 → 0**：兩份重訊各叫醒一組語意 watch——景碩「限制員工權利新股收買註銷」（員工未達既得條件、註銷 10,200 股、減資 102,000 元、比率 0.00%）叫醒玻璃核心載板／低 CTE 玻纖布／帶載體極薄銅箔／德福／載板降價 9 條（ew_0421、1159、1160、1161、1341、1342、1348、1389、1505）；光寶科「對 LITE-ON VIETNAM CO., LTD. 現金增資 1.1 億美元、用途『產能擴增支出需求』」叫醒 LIDR 敘事的 AEye 反證 ew_1595。全文都讀（MOPS 重訊自帶 raw_text），一條都沒觸及，逐組 `judge --touches no` 回 active；三條 brief 來源（ew_1348／1389／1595）同時離開「敘事該重寫」，301511.SZ、1802.TW、LIDR 三檔敘事不改。
+
+**叫醒擋下待確認 6 → 0**：景碩 598 億專案資本支出（只寫「為擴充營運所需」、依客戶需求彈性調整）叫醒讀圖 ew_0416（玻纖布層等需求側客戶）與追源 ew_1919；光寶科兩則越南子公司增資（2.1 億＋1.1 億美元，只寫「產能擴增」）叫醒追源 ew_1920、1922、1923、1924。六條 `wake-judge --touches no`，lead 照舊停放、停放理由一字不動（本來就含這幾則）。預篩還沒跑（daily 05:15 才跑），「判定一致」計分這六筆不算。
+
+**段 5**：closure-gate exit 0（到終局 77：ready 76／settled 1；母體外 119：非倍率 106、邊緣沒座位已查 13）。**段 4 走圖**：55 筆命中逐筆對 10-17／10-22／10-27／10-28 四份終局表（`library/private/wf_tmp/diff_gw_terminals_1101.py`），新命中 0；供給側未填 3／8 母體 <10 只印不判。**故事**：缺 0。**T2 命中**：0。
+
+**停止條件成立**：drain 段 0–1 全零、pq1 空；`event_watch counters` fired_unconsumed 0、semantic_pending_check 0、wake_held 0、expiry_* 全 0；`audit invariants --only QueueSegments` PASS；短版 ⑤ 二十格全 0；候選板可開 0／缺 X 38（已開口 3｜可拿未開口 0｜未分 33）／等回落 4（已回落 0）／不要 46／已持有 2。非零但不是待做：停滯 3、到期 3（同 10-31）；「追源需處置 1」＝ew_0092（AMD Helios CPO 推文的 related_entity_signal，09-17 Phase 6 補期限那批：標的已消化過一輪、等 2027-01-15 到期由使用者決定）——`TRACE_NEEDS_ATTENTION_STATES` 把 stalled 算進「需處置」，而它自己的 wake_state_reason 寫「不需要人決定」（L12 的形狀，1 例，不排程；第 2 例再提）。
+
+**發現並當下修（failure log #122）**：ew_1919–1924 被同一場董事會的 sibling 重訊叫醒，根因是「published_at 早於建立日就不叫醒」那道閘拿 `created_at[:10]`（UTC 日期）去對 MOPS 的台北日期——停放時建的追源 watch `created_at`＝lead 進 pq1 的時間（daily 05:43 台北＝10-30 21:43Z），UTC 10-30 對台北 10-30 算「不早於」；entity 型與語意型兩個 matcher 各寫一份、都錯。反向對 EDGAR 是靜默漏接（台北 08:00–12:00 建的 watch 把前一晚美東的 8-K 當回補舊文件擋掉；還沒撞到實例）。修法：`_created_day` 把建立時刻換算到 published_at 那本日曆（`mops:`→Asia/Taipei、`edgar:`／sec.gov→America/New_York、其餘 UTC 不變）。重播今天 16 次叫醒（`library/private/tmp/replay_wakes_1101.py`）：5 次不發生、11 次照舊；`tests/test_published_calendar.py` 7 條。段 5.5 ④ 三問：不改使用者能核准什麼／是「同一本日曆上比」（MOPS 收緊、EDGAR 邊界補漏，不是放寬）／不動封閉字彙、無第二 owner → 當下修。
+
+**收尾**：全量 materialize 197/197（候選板可開 0／缺 X 38／等回落 4／不要 46／已持有 2／無敘事 106）後重啟 8790（00:59，health `code.stale=false`）；writer lock 釋放。測試：`test_published_calendar`＋`test_semantic_watch`＋`test_trace_wait_plan` 87 passed；`-k "watch or wake or queue_segments or heartbeat or todo_ledger or daily_digest or semantic"` 578 passed（3911 deselected）。decompose 本輪無新 lead、無新錨提案；距上次掃題材 5 天（門檻 7）。新鑄 pq2：0；新 watch：0；敘事改動：0。順手更正 research-drain SKILL 兩處「`writer_guard verify`」（子命令不存在，實際是 `check`）。

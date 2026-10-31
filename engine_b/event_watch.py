@@ -145,6 +145,43 @@ def _today(now: datetime | None = None) -> date:
     return moment.astimezone(_local_timezone()).date()
 
 
+#: lead 的 `published_at` 是**發行方日曆**的日期：MOPS 重訊寫台北當天、EDGAR 的 filing date 寫美東當天。
+#: 其餘來源沒有宣告日曆，維持 UTC（原行為）。「早於建立日的舊文件不叫醒」那道閘要把 watch 的 `created_at`（UTC）
+#: 換算到同一本日曆再比，否則比的是兩本日曆。
+PUBLISHED_AT_CALENDARS: dict[str, str] = {"mops": "Asia/Taipei", "edgar": "America/New_York"}
+
+
+def _published_calendar(lead: Mapping[str, Any]) -> tzinfo:
+    """這則 lead 的 `published_at` 寫在哪一本日曆上（來源宣告：`source` 前綴或 sec.gov 網址；認不出就 UTC）。"""
+    from urllib.parse import urlsplit
+    from zoneinfo import ZoneInfo
+
+    source = str(lead.get("source") or "")
+    if source.startswith("mops:"):
+        return ZoneInfo(PUBLISHED_AT_CALENDARS["mops"])
+    if source.startswith("edgar:") or urlsplit(str(lead.get("url") or "")).netloc == "www.sec.gov":
+        return ZoneInfo(PUBLISHED_AT_CALENDARS["edgar"])
+    return timezone.utc
+
+
+def _created_day(created: Any, lead: Mapping[str, Any]) -> date | None:
+    """watch 建立時刻落在這則 lead 的 `published_at` 日曆上的哪一天；讀不成時間回 None（不猜）。
+
+    2026-11-01：原本取 `created_at[:10]`＝UTC 日期。停放時建的追源 watch 的 `created_at`＝lead 進 pq1 的時間，而 daily
+    在台北 05:15–07:05 分類（UTC 前一天 21:15–23:05）：前一晚的 MOPS 重訊（台北 10-30）對 10-31 05:43 建的 watch 算
+    「不早於建立日（UTC 10-30）」，同一場董事會的 sibling 重訊把剛建的追源 watch 全部叫醒（當天 16 次叫醒裡 5 次：
+    ew_1919–1924）。反向：台北 08:00–12:00 建的 watch（UTC 當天、美東前一天）會把前一晚美東的 8-K 當回補舊文件靜默擋掉。
+    同一本日曆上比，兩邊都消失；`_today()` 在 2026-09-26 為到期判斷修過同一類（L12：同一輪兩個「今天」）。
+    """
+    try:
+        moment = datetime.fromisoformat(str(created or ""))
+    except ValueError:
+        return None
+    if moment.tzinfo is None:
+        moment = moment.replace(tzinfo=timezone.utc)
+    return moment.astimezone(_published_calendar(lead)).date()
+
+
 # 一個財報週期（90 天）＋緩衝。最常見的等待模式是「下一份季報會不會揭露」；
 # 等滿一輪還沒出現就結案——追源型轉終局 `watch_expired` 並由心跳計數（A3，不佔 pq2、也不無聲續等）。
 DEFAULT_TRACE_TTL_DAYS = 120
@@ -558,10 +595,6 @@ def check_watches(
         elif kind in ENTITY_MATCH_KINDS and leads:
             targets = set(watch.get("entities") or ())
             created = str(watch.get("created_at") or "")
-            try:
-                created_day = date.fromisoformat(created[:10])
-            except ValueError:
-                created_day = None
             consumed = set(watch.get("consumed_entities") or ())
             consumed_leads = set(watch.get("consumed_leads") or ())
             from engine_b.entities import lead_entities
@@ -602,10 +635,12 @@ def check_watches(
                     continue
                 # 回補的舊文件不是新事件：EDGAR lookback 與新 feed 首跑會把舊文件以今天的 first_seen 登記
                 # （同語意 watch 的 ④；failure log #1）。published_at 讀不懂就只看 first_seen，並計數。
+                # 建立日換算到 published_at 那本日曆（`_created_day`；2026-11-01 同日同源重訊叫醒剛建的追源 watch）。
                 raw_published = lead.get("published_at")
                 published = parse_published(raw_published)
                 if raw_published and published is None and stats is not None:
                     stats["published_at_unparsed"] = stats.get("published_at_unparsed", 0) + 1
+                created_day = _created_day(created, lead)
                 if published is not None and created_day is not None and published < created_day:
                     continue
                 shared = sorted(targets & lead_entities(lead))
@@ -863,10 +898,6 @@ def _semantic_matches(watch: Mapping[str, Any], leads: Mapping[str, Any], *,
     excluded = {str(f).strip().upper() for f in load_config()["ownership_forms_excluded"]}
     targets = set(watch.get("entities") or ())
     created = str(watch.get("created_at") or "")
-    try:
-        created_day = date.fromisoformat(created[:10])
-    except ValueError:
-        created_day = None
     consumed = set(watch.get("consumed_leads") or ())
     out: list[tuple[str, list[str]]] = []
     for lead_id, lead in leads.items():
@@ -882,6 +913,7 @@ def _semantic_matches(watch: Mapping[str, Any], leads: Mapping[str, Any], *,
         published = parse_published(raw_published)
         if raw_published and published is None and stats is not None:
             stats["published_at_unparsed"] = stats.get("published_at_unparsed", 0) + 1
+        created_day = _created_day(created, lead)     # 建立日換算到 published_at 那本日曆（同 entity 型）
         if published is not None and created_day is not None and published < created_day:
             continue
         shared = sorted(targets & lead_entities(lead))
