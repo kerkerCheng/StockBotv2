@@ -598,6 +598,10 @@ class InvestorBrief:
     confirm: tuple[NarrativeConfirm, ...] = ()
     #: 寫入當下的已定價①（只有 `write_brief` 寫；不進 id）。7.0 之前的紀錄都沒有——缺席照讀，不得要求存在（INV-3）。
     priced_at_write: PricedSnapshot | None = None
+    #: 只改字面值的換版（2026-10-31 使用者「修吧」；failure log #121）：這一版重述哪一版的判斷——判斷日與正文版沿用那一版
+    #: （`alpha.candidates`），不因改字歸零。v2 的**選填**欄，只在有值時進 id；能不能宣告由寫入端核對（同一條鏈上的祖先、
+    #: 候選狀態與 answers 與它相同）。
+    restates: str | None = None
 
     def __post_init__(self) -> None:
         if self.record_version not in RECORD_VERSIONS:
@@ -618,9 +622,11 @@ class InvestorBrief:
                 raise ContractViolation(f"brief 七格缺一不可；缺 {missing}——少一格就不是前因後果，是片段")
         if self.record_version == RECORD_VERSION_V2:
             self._check_v2_static()
-        elif (self.rides or self.disproof or self.answers or self.candidate_state
-              or self.history_not_comparable or self.acknowledged_touched or self.confirm or self.priced_at_write):
+        elif (self.rides or self.disproof or self.answers or self.candidate_state or self.history_not_comparable
+              or self.acknowledged_touched or self.confirm or self.priced_at_write or self.restates):
             raise ContractViolation("v1 紀錄不得帶 v2 的結構化欄位——v1 照讀、不補寫")
+        if self.restates is not None and (not self.restates.startswith("ib_") or self.restates == self.brief_id):
+            raise ContractViolation(f"restates 必須是另一版敘事的 brief_id（收到 {self.restates!r}）")
 
     def _check_v2_static(self) -> None:
         """v2 的**內容**規則（寫在紀錄上的東西本身就違規）。寫入當下才成立的檢查（讀圖現行、watch active、
@@ -677,7 +683,7 @@ _ID_FIELDS_V2 = (*_ID_FIELDS, "record_version", "rides", "disproof", "answers", 
 
 #: 只在**非空**時才進 v2 id 欄位集合的選填欄（Phase 7 Step 7.0d）。⚠ 直接加進 `_ID_FIELDS_V2` 會讓既有每一行的 id
 #: 都變——`payload.get(k)` 對缺席的鍵取 None，None 也會被寫進 canonical JSON（plan §13 已知陷阱）。
-_ID_FIELDS_V2_OPTIONAL = ("confirm",)
+_ID_FIELDS_V2_OPTIONAL = ("confirm", "restates")
 
 
 def new_brief_id(payload: Mapping[str, Any]) -> str:
@@ -708,12 +714,14 @@ def brief_record(
     history_not_comparable: Mapping[str, Any] | None = None,
     acknowledged_touched: Sequence[Mapping[str, Any]] = (),
     confirm: Sequence[Mapping[str, Any]] = (),
+    restates: str | None = None,
 ) -> dict[str, Any]:
     """建一筆可寫進 ledger 的紀錄（先經 `InvestorBrief` 驗證，驗不過就不產生）。
 
     `record_version` 預設 v1 只是為了既有呼叫端與夾具；**新寫的正式入口（`alpha brief --add`）一律 v2**。
 
     `slots` 可以是 `{key: {"text": …, "evidence_refs": […]}}` 或同形的 list（帶 `key`）。
+    `restates`：只改字面值的換版宣告重述哪一版（v2 選填；沒寫不進 payload，failure log #121）。
     """
     stamp = created_at or datetime.now(timezone.utc)
     if stamp.tzinfo is None:
@@ -742,6 +750,10 @@ def brief_record(
         payload.update(_v2_payload(rides=rides, disproof=disproof, answers=answers, candidate_state=candidate_state,
                                    history_not_comparable=history_not_comparable,
                                    acknowledged_touched=acknowledged_touched, confirm=confirm))
+        if restates:
+            payload["restates"] = str(restates)
+    elif restates:
+        raise ContractViolation("v1 紀錄不得帶 restates——v1 照讀、不補寫")
     payload["brief_id"] = new_brief_id(payload)
     parse_brief_record(payload)          # 驗證；不合法就在這裡炸，不會寫進 ledger
     return payload
@@ -768,6 +780,7 @@ def parse_brief_record(raw: Mapping[str, Any]) -> InvestorBrief:
         supersedes_id=(str(raw["supersedes_id"]) if raw.get("supersedes_id") else None),
         retracted=bool(raw.get("retracted")), context_digest=(str(raw["context_digest"]) if raw.get("context_digest") else None),
         record_version=version, note=str(raw.get("note") or ""), **structured,
+        restates=(str(raw["restates"]) if raw.get("restates") else None),
     )
 
 

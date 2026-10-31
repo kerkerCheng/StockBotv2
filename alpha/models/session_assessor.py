@@ -252,7 +252,8 @@ def _brief_frame() -> dict[str, Any]:
             "confirm": [{"condition": "客戶自己的一手文件具名它供貨並走到量產（至少 20 字、可否證）",
                          "check_frequency": "每季", "action_48h": "重寫敘事：寫明確認了什麼、候選狀態換不換",
                          "entities": ["co:…"], "expires": "YYYY-MM-DD", "source": "self"}],
-            "supersedes_id": "ib_…（重寫時）", "note": "可選"},
+            "supersedes_id": "ib_…（重寫時）", "note": "可選",
+            "restates": "ib_…（只改字面值的換版才寫：重述哪一版，判斷日不歸零；failure log #121）"},
     }
 
 

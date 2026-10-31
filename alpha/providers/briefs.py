@@ -339,6 +339,43 @@ def v2_write_problems(parsed: InvestorBrief, *, ctx: WriteContext, existing: Seq
         for sentence in lamp_colour_claims(text):
             problems.append(f"{label}：寫死了燈色——會死嗎的燈每天重算、首屏另有一行；改寫成燈背後的事實"
                             f"（本業在燒錢、欠的比手上的現金多…）：{sentence[:40]}")
+
+    # ⑪ 只改字面值的換版宣告重述哪一版（2026-10-31 使用者「修吧」；failure log #121）
+    if parsed.restates is not None:
+        problems.extend(restates_problems(parsed, existing))
+    return problems
+
+
+def restates_problems(parsed: InvestorBrief, existing: Sequence[InvestorBrief]) -> list[str]:
+    """⑪：`restates` 指的那一版必須是這一版 supersedes 鏈上的祖先，之後沒有撤回；它與它之後到這一版之間的每一版，
+    候選狀態（state／watch／missing_kind）、answers、歷史不可比宣告都與這一版相同——結構化的判斷一個都沒變才算
+    只改字面值（文字是不是只改字面值，由寫的人負責；`note` 寫明改了什麼）。回問題清單。"""
+    def judged(b: InvestorBrief) -> tuple[Any, ...]:
+        cs = b.candidate_state
+        return ((cs.state, cs.watch_id, cs.missing_kind) if cs is not None else None,
+                b.answers.as_dict() if b.answers is not None else None,
+                b.history_not_comparable.as_dict() if b.history_not_comparable is not None else None)
+
+    by_id = {r.brief_id: r for r in existing}
+    chain: list[InvestorBrief] = []
+    cur_id, seen = parsed.supersedes_id, set()
+    while cur_id and cur_id in by_id and cur_id not in seen:
+        seen.add(cur_id)
+        chain.append(by_id[cur_id])
+        if cur_id == parsed.restates:
+            break
+        cur_id = by_id[cur_id].supersedes_id
+    if not chain or chain[-1].brief_id != parsed.restates:
+        return [f"restates：{parsed.restates} 不在這一版的 supersedes 鏈上——只能重述這條鏈上更早的一版"]
+    target = chain[-1]
+    problems: list[str] = []
+    if any(r.retracted and r.created_at > target.created_at for r in existing):
+        problems.append(f"restates：{target.brief_id} 之後有撤回紀錄——撤回打斷連續，不能跨過它重述")
+    want = judged(parsed)
+    for b in chain:
+        if judged(b) != want:
+            problems.append(f"restates：{b.brief_id}（{b.created_on}）的候選狀態／answers／歷史不可比宣告與這一版不同——"
+                            "結構化的判斷變了就不是只改字面值，不寫 restates")
     return problems
 
 
@@ -434,4 +471,5 @@ def write_brief(record: Mapping[str, Any], *, ctx: WriteContext, directory: Path
 
 
 __all__ = ["BRIEF_DIR", "CURRENT_READING_STATUSES", "OPEN_READING_KINDS", "PRICED_IN_WRITE_LINES", "WriteContext", "append_brief_record", "priced_snapshot",
-           "ledger_path", "read_brief_records", "v2_write_notices", "v2_write_problems", "write_brief"]
+           "ledger_path", "read_brief_records", "restates_problems", "v2_write_notices", "v2_write_problems",
+           "write_brief"]

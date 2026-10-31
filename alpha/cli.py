@@ -274,7 +274,9 @@ def cmd_brief(args: argparse.Namespace) -> int:
       "rides": […], "disproof": […], "answers": {…}, "candidate_state": {…}, "history_not_comparable": null,
       "acknowledged_touched": […], "confirm": […], "supersedes_id": …, "note": …}`（形狀見 `python -m alpha research <T>` packet 的
       `brief_frame.spec_shape`）。選填 `"depth_check": {…}`（宣告可開前的深挖清單，鍵見 `alpha.narrative.depth_check`；
-      **只在宣告可開時印出還缺哪幾項、不擋、不存檔**，2026-10-31 failure log #119）。
+      **只在宣告可開時印出還缺哪幾項、不擋、不存檔**，2026-10-31 failure log #119）。選填 `"restates": "<brief_id>"`：
+      只改字面值的換版宣告重述哪一版——判斷日與正文版沿用那一版，不因改字歸零（failure log #121；寫入端核對是同一條鏈上的
+      祖先、候選狀態與 answers 都沒變）。
       寫入當下檢查讀圖現行、供給側、watch、answers、可開前提，不過就整筆拒收並逐條說明；
       通過後 `disproof[]` 自動登記成語意 watch（已在盯的只連結）、`confirm[]`（加碼條件，Phase 7 Step 7.0d）各登記一筆
       `condition_role=confirm` 的語意 watch、舊版還 active 的 `brief:` watch 收掉。
@@ -314,7 +316,7 @@ def cmd_brief(args: argparse.Namespace) -> int:
                     answers=spec.get("answers"), candidate_state=spec.get("candidate_state"),
                     history_not_comparable=spec.get("history_not_comparable"),
                     acknowledged_touched=spec.get("acknowledged_touched") or (),
-                    confirm=spec.get("confirm") or ())
+                    confirm=spec.get("confirm") or (), restates=spec.get("restates"))
             except (KeyError, ValueError, TypeError, AlphaError) as exc:
                 print(f"✗ 短評不合法：{exc}", file=sys.stderr)
                 return 2

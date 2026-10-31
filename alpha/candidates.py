@@ -185,18 +185,32 @@ def three_words(three_questions: Mapping[str, Any] | None, brief: InvestorBrief 
 
 
 def _walk_back(records: Sequence[InvestorBrief], brief: InvestorBrief,
-               same: Callable[[InvestorBrief], bool]) -> InvestorBrief:
+               same: Callable[[InvestorBrief], bool] | None = None, *,
+               key: Callable[[InvestorBrief], Any] | None = None) -> InvestorBrief:
     """沿 `supersedes` 鏈往回，回傳 `same` 連續成立的最早那一版（滯留與已定價判斷日共用這一條路，L16）。
     **撤回打斷連續**：撤回用**時間**判，不看鏈上有沒有經過撤回紀錄——新版可以直接 supersede 被撤的那一筆（撤回紀錄
-    本身不在鏈上），所以只要兩筆之間有任何一筆撤回紀錄落在 (prev, cur] 之間，那段時間就沒有生效的宣告。"""
+    本身不在鏈上），所以只要兩筆之間有任何一筆撤回紀錄落在 (prev, cur] 之間，那段時間就沒有生效的宣告。
+
+    給 `key`（判斷日、正文版）時比「鍵與起點相同」，而且**遇到 `restates` 就跳到被重述的那一版、改用它的鍵往回比**
+    （只改字面值的換版，2026-10-31 failure log #121）：中間那幾版——包括沒宣告的字面值換版——不算改判；之後照抄同一段
+    文字的版本走到重述那一版時，一樣會跳回去。滯留（`same`）不跳：重述那一版的候選狀態與 watch 本來就與被重述的相同。"""
     by_id = {r.brief_id: r for r in records}
     retractions = [r.created_at for r in records if r.retracted]
     cur, seen = brief, {brief.brief_id}
-    while cur.supersedes_id and cur.supersedes_id in by_id and cur.supersedes_id not in seen:
-        prev = by_id[cur.supersedes_id]
+    want = key(brief) if key is not None else None
+    while True:
+        jump = key is not None and cur.restates is not None and cur.restates in by_id and cur.restates not in seen
+        nxt = cur.restates if jump else cur.supersedes_id
+        if not nxt or nxt not in by_id or nxt in seen:
+            break
+        prev = by_id[nxt]
         seen.add(prev.brief_id)
-        if prev.retracted or prev.record_version != RECORD_VERSION_V2 or not same(prev) \
+        if prev.retracted or prev.record_version != RECORD_VERSION_V2 \
                 or any(prev.created_at < t <= cur.created_at for t in retractions):
+            break
+        if jump:
+            want = key(prev)
+        elif not (same(prev) if key is None else key(prev) == want):
             break
         cur = prev
     return cur
@@ -239,8 +253,7 @@ def priced_judgment_key(brief: InvestorBrief) -> tuple[Any, ...]:
 def judgment_version(records: Sequence[InvestorBrief], brief: InvestorBrief) -> InvestorBrief:
     """最後一次真的改判的那一版（判斷鍵連續相同的最早一版）——換騎包裝成新日期的版本不算判斷日（2026-10-21：
     現行 73 份裡 23 份的現行版日期 ≠ 判斷日）。"""
-    key = priced_judgment_key(brief)
-    return _walk_back(records, brief, lambda prev: priced_judgment_key(prev) == key)
+    return _walk_back(records, brief, key=priced_judgment_key)
 
 
 # ---------------------------------------------------------------------------
@@ -255,8 +268,7 @@ def body_key(brief: InvestorBrief) -> tuple[Any, ...]:
 
 def body_version(records: Sequence[InvestorBrief], brief: InvestorBrief) -> InvestorBrief:
     """正文最後一次改動的那一版（正文鍵連續相同的最早一版；與滯留、判斷日走同一條鏈，L16）。"""
-    key = body_key(brief)
-    return _walk_back(records, brief, lambda prev: body_key(prev) == key)
+    return _walk_back(records, brief, key=body_key)
 
 
 def normalize_url(url: Any) -> str | None:
