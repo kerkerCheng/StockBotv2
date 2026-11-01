@@ -319,7 +319,7 @@ def corroboration(origin: str, subject: str, docs: Iterable[OriginDoc], registry
       （技術節點之間的邊）→ 外部印證，照舊。
     - **登記的發布者**：只在過了 `publisher_lifts` 的那幾份文件裡找（逐份）；一份都沒過 → 媒體轉述（照舊）。
       主詞是公司時要有一段「具名主詞、而且不是轉述句」的引文才給外部印證——**那份文件宣告 `independent` 時不套
-      轉述檢查**（具名照樣要；ROADMAP「翻案靠逐份宣告」，plan §0.6 #2）；否則媒體轉述＋`relay`（有具名、都是轉述）
+      轉述檢查**（具名照樣要；docs/archive/roadmap-phase-delivery-log.md「翻案靠逐份宣告」〔原 ROADMAP Phase 6 列〕，plan §0.6 #2）；否則媒體轉述＋`relay`（有具名、都是轉述）
       或 `unnamed`／`no_name_forms`。
     - **解析不到**：聯合公告偵測（去註解後的字串具名 ≥2 家名冊公司、含主詞以外者）→ 雙方聯合；否則待判定。照舊。
 

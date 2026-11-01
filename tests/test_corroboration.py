@@ -100,7 +100,7 @@ def test_5_one_relay_quote_and_one_named_own_quote_in_the_same_origin_corroborat
 
 
 def test_6_media_document_declared_independent_corroborates_without_the_relay_check(pubs) -> None:
-    # 宣告 independent 的文件不套轉述（plan §0.6 #2：ROADMAP「翻案靠逐份宣告」）；具名照樣要
+    # 宣告 independent 的文件不套轉述（plan §0.6 #2：docs/archive/roadmap-phase-delivery-log.md「翻案靠逐份宣告」，原 ROADMAP Phase 6 列）；具名照樣要
     v = _verdict("Reuters", SUPPLIER, ["Lumentum is the only qualified supplier, the person said"], pubs,
                  linkage=INDEPENDENT)
     assert (v.level, v.withheld) == ("externally_corroborated", None)

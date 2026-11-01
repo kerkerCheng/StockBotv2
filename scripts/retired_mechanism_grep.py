@@ -380,13 +380,13 @@ KEEP_MCP: dict[str,str] = {
     'docs/plans/2026-09-24-001-feat-phase1-waiting-heartbeat-plan.md': 'historical_record: completed plan（Phase 1；C5 停用遠端入口的決定）',
     'docs/plans/2026-09-25-001-feat-phase2-reading-units-graph-walk-plan.md': 'historical_record: 本次退役的決定紀錄（§0.4 A6 五欄、Step 2.1）',
     # ---- 活文件裡的紀錄列 ----
-    'docs/ROADMAP.md': 'historical_record: 旁支「Graph MCP 退役 ✅」列與 Phase 2 列是這次退役的決定與交付紀錄；Phase 0 退役清單的盤點範圍（2026-09-22）；硬約束 12 的改寫註記',
+    'docs/ROADMAP.md': 'historical_record: 已交付索引的「Graph MCP 退役」一行、Phase 0 退役清單的封存指標（I 組）、硬約束 12 的改寫註記；原列 2026-11-01 逐字封存於 docs/archive/',
     'docs/plans/README.md': 'historical_record: plan 索引列的主題描述（2026-07-24 v1.1 的 leads 同步、Phase 2 的退役項）',
 }
 #: 活文件整檔放行會讓之後新增的字樣被靜默吞掉（R2-a #2）——這幾個檔**釘住命中數**：數字變了就算未列命中，
 #: 由改的人逐處看過後再改這裡的數字。只釘仍會被編輯的檔；歷史目錄與已 completed 的 plan 不會再變，不釘。
 KEEP_MCP_PIN: dict[str,int] = {
-    'docs/ROADMAP.md': 30,
+    'docs/ROADMAP.md': 4,  # 2026-11-01 減量：30 → 4（Graph MCP 退役列與 Phase 0 退役清單逐字搬進 docs/archive/）
     'docs/plans/README.md': 2,
     'docs/plans/2026-09-25-001-feat-phase2-reading-units-graph-walk-plan.md': 41,
 }

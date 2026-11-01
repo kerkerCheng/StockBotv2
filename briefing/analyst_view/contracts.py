@@ -63,14 +63,14 @@ QUESTIONS: Mapping[str, str] = {
 
 #: 核心 panel（決定 `readiness`）與 optional panel（**不**決定 readiness）。
 #:
-#: ⚠ **2026-09-23（Phase 0 Step 0b.1）換過一次**（ROADMAP「個股頁」對照表＋使用者定案 A）：
+#: ⚠ **2026-09-23（Phase 0 Step 0b.1）換過一次**（docs/archive/roadmap-phase-delivery-log.md「個股頁」對照表＋使用者定案 A）：
 #:   舊：`("headline", "fundamental", "why", "research")`，主流程是
 #:       Evidence → Internal Forecast → Valuation → Horizon → Implied Return。
 #:   新：短評與論證是核心，估值鏈整條退役。`fundamental` **降為選配**（它是稽核區的原始數字，
 #:       不是判讀完整度的條件）；`why` 退役；`wipeout`（歸零旗標）升核心——AGENTS「歸零旗標是燈不是數字」
 #:       把它列為量測，而量測缺席不該被讀成「沒事」。
 #:   讀圖面板 Phase 2 才加，所以現在不在列（`brief` 的 70/73 missing 是真實 backlog，不是規則錯）。
-#: ⚠ **2026-09-30（Phase 3 Step 3.7）：`readings` 升核心**（ROADMAP「Readiness 規則同步換」；接回 Phase 0 偏差 #16
+#: ⚠ **2026-09-30（Phase 3 Step 3.7）：`readings` 升核心**（docs/archive/roadmap-phase-delivery-log.md「Readiness 規則同步換」；接回 Phase 0 偏差 #16
 #:   「review_required 的路」）。讀圖面板在讀圖 stale 時自己是 `review_required` → readiness `ready_with_flags`；
 #:   **它的狀態只由讀圖對圖決定，不吃 `refresh.overall`**（今天的 `review_required` 全是退役估值鏈殘留）。
 #:   沒有讀圖的公司因此多一個 blocker（`not_yet_recorded`）——真實 backlog，下一步是寫讀圖（research-drain 段 5）。

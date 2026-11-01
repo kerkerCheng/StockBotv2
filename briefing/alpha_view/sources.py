@@ -379,7 +379,7 @@ def fetch_alpha_investment_view(
                 narrative_context = {"error": f"{type(exc).__name__}: {str(exc)[:120]}"}
         # ⚠ **2026-09-23（Phase 0 Step 0b.1b）：E 組（賭注四價 overlay）整組退役。**
         # 原本這裡把整條估值鏈**再跑兩次**（variant／downside），算出「賭對了值多少／判斷錯了值多少」
-        # 那四個價格。ROADMAP「個股頁」對照表把 `bet` 的四個價格列進「拿掉」；`bet` 面板已於 0b.1a
+        # 那四個價格。docs/archive/roadmap-phase-delivery-log.md「個股頁」對照表把 `bet` 的四個價格列進「拿掉」；`bet` 面板已於 0b.1a
         # 改成純文字（讀短評的 `our_bet`）。
         # ⚠ **`bet/variant.overlay` 這本 append-only ledger 的資料留著**（L10：拿不回來的只能 append）
         # ——退役的是「拿它算四個價格」這件事，不是那些紀錄。Abstention（刻意不主張）同樣留著。

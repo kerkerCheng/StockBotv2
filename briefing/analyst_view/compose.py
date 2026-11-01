@@ -337,7 +337,7 @@ def _argument_panel(view: AlphaInvestmentView) -> AnalystPanel:
 
 
 def _bet_panel(view: AlphaInvestmentView) -> AnalystPanel:
-    """賭注（optional）：**純文字**——`our_bet` 那一句＋騎的層或插槽＋什麼必須為真（ROADMAP「個股頁」那一節「論證」列）。
+    """賭注（optional）：**純文字**——`our_bet` 那一句＋騎的層或插槽＋什麼必須為真（docs/archive/roadmap-phase-delivery-log.md「個股頁」那一節「論證」列）。
 
     2026-09-23（Phase 0 Step 0b.1）由四個價格改成一句話；2026-09-30（Phase 3 Step 3.7）補齊另外兩件：
     「騎層或插槽」照抄敘事的 `rides[]`（read model 的 `investor_brief.rides`），「什麼必須為真」照抄短評那一格
