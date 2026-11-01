@@ -888,13 +888,17 @@ def candidate_counts(board: Mapping[str, Any]) -> dict[str, Any]:
                not_edge_pending=counts.get("not_edge_pending"), on_threshold=counts.get("on_threshold"))
     # 等回落的價格叫醒與缺 X 三分法（2026-10-30）：讀列重算（算法在 `alpha.candidates`，與 assemble_board 同一份）——
     # 舊 artifact 的列沒有這兩個鍵，照實印「沒算」「未算」，不壓成 0
-    from alpha.candidates import missing_request_counts, pullback_counts
+    from alpha.candidates import missing_request_counts, priced_only_counts, pullback_counts
 
     groups = board.get("groups") or {}
-    pb = pullback_counts([r for r in groups.get("priced_wait") or () if isinstance(r, Mapping)])
+    wait_rows = [r for r in groups.get("priced_wait") or () if isinstance(r, Mapping)]
+    pb = pullback_counts(wait_rows)
     mr = missing_request_counts([r for r in groups.get("missing") or () if isinstance(r, Mapping)])
+    # 只差已定價（2026-11-01；failure log #123）：同一份算法；舊 artifact 的列沒有 open_gaps → 印「未算」，不壓成 0
+    po = priced_only_counts(wait_rows)
     out.update(pulled_back=pb["pulled_back"], pull_unknown=pb["unknown"], missing_asked=mr["asked"],
-               missing_fetchable_unasked=mr["fetchable_unasked"], missing_unclassified=mr["unclassified"])
+               missing_fetchable_unasked=mr["fetchable_unasked"], missing_unclassified=mr["unclassified"],
+               priced_only=po["priced_only"], priced_only_unknown=po["priced_only_unknown"])
     return out
 
 
@@ -924,6 +928,12 @@ def candidate_states_text(c: Mapping[str, Any]) -> str:
         bits = ([f"最老 {d} 天"] if d is not None else []) + [f"已回落 {c.get('pulled_back', 0)}"]
         if c.get("pull_unknown"):
             bits.append(f"沒算 {c['pull_unknown']}")
+        # 只差已定價（2026-11-01；failure log #123）：可開前提都成立、只剩價格判斷的檔數——沒算的照實印，不壓成 0
+        unknown = int(c.get("priced_only_unknown") or 0)
+        if "priced_only" not in c or unknown >= n:
+            bits.append("只差已定價 未算")
+        else:
+            bits.append(f"只差已定價 {c.get('priced_only', 0)}" + (f"（{unknown} 未算）" if unknown else ""))
         return f"{n}（{'｜'.join(bits)}）"
 
     held = "未驗（持股未讀到）" if c.get("held") is None else str(c.get("held"))
@@ -1085,7 +1095,8 @@ def priced_wait_short_lines(state_dir: Path | None, *, today: date,
         text = (f"- {name}：等 {row.get('stall_days', '?')} 天｜百分位 {_pctile((start or {}).get('value'))}"
                 f"→{_pctile((info.get('now') or {}).get('value'))}"
                 f"｜股價 {_signed(ret) if ret is not None else '量不到'}"
-                + ("｜**已回落**" if row.get("pulled_back") else "") + f"｜{when}")
+                + ("｜**已回落**" if row.get("pulled_back") else "")
+                + ("｜**只差已定價**" if row.get("open_gaps") == [] else "") + f"｜{when}")
         rows.append((due or date.max, text, (info.get("now") or {}).get("as_of"), name))
     rows.sort(key=lambda r: r[0])
     closes = sorted({str(r[2])[5:10] for r in rows if r[2]})
@@ -1097,7 +1108,9 @@ def priced_wait_short_lines(state_dir: Path | None, *, today: date,
     legend = ("-# 百分位＝自家三年估值位置，越低越便宜；股價＝等回落起點以來（調整後收盤）；沒有門檻，到重看日由你重判"
               + (f"｜{close_text}" if close_text else "") + ("｜起點的值有回算的" if recomputed else "")
               + ("｜已回落＝收盤低於最後一次宣告已定價那天（叫醒重問，不是動作）" if any(r.get("pulled_back") for r in wait)
-                 else ""))
+                 else "")
+              + ("｜只差已定價＝可開的四個機械前提都成立，剩下的是價格判斷，由你來下（只是標記，不是動作）"
+                 if any(r.get("open_gaps") == [] for r in wait) else ""))
     return [f"**等回落 {len(wait)} 檔**", *(r[1] for r in rows), legend]
 
 

@@ -208,6 +208,9 @@ def _card_overview(view: Mapping[str, Any], inputs: Mapping[str, Any] | None) ->
         "rewrite": len(row.get("rewrite") or ()) if row else None,
         # 為什麼該重寫的幾個字（2026-10-29：卡片只印「敘事該重寫 2」使用者問「為啥」）——分類在 `alpha.candidates.rewrite_words`
         "rewrite_words": list(row.get("rewrite_words") or ()) if row else None,
+        # 只差已定價（2026-11-01；failure log #123）：等回落列假設改宣告可開時前提都成立——產生端給布林，畫面照印晶片；
+        # 列上沒有 open_gaps 清單（不是等回落、舊 artifact）＝None，不是 False
+        "priced_only": (row.get("open_gaps") == []) if isinstance(row.get("open_gaps"), list) else None,
         "spark": [{"session_date": r["session_date"], "close": r["close"]} for r in series[-CARD_SPARK_SESSIONS:]],
         "move": move,
     }

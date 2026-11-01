@@ -701,7 +701,12 @@ alpha／beta 界線用 `risk/hard_caps.py` 匯出的 `beta_instrument_for`／`is
 `counts.not_edge_pending` 常駐、閉環母體同一格留在母體；翻回來不加遲滯。板另帶 `on_threshold[]`（整個宇宙裡落在上限 ±1 家或 ±10% 帶內的檔，`alpha/edge.py::on_threshold`；
 心跳段 2、短版 ④、closure-gate 照抄；只計數、不排序、不改門檻；回放工具 `python -m alpha edge <T…> --replay --from D`）；
 邊緣無法量只擋宣告可開（附組「可開但邊緣無法量」），其餘照敘事分組、帶 `edge_note`（2026-10-30）；宣告可開每天重驗四個前提（押的讀圖仍現行且是護城河／量、answers 的稽核行沒變全缺席、歸屬本檔的 watch 沒有待判、
-連結的反證來源仍在盯），破了進「前提失效」。每一列（不論宣告哪一態）另帶 `rewrite[]`：連結斷了（附為什麼斷——來源收掉／被判觸及／
+連結的反證來源仍在盯），破了進「前提失效」。**只差已定價**（2026-11-01 使用者指示；failure log #123；candidates/4）：
+等回落列（非持有）用同一個 `open_preconditions` 假設改宣告可開再驗一次，結果放 `open_gaps`（不重用 `preconditions`——那一格是「宣告可開、
+前提失效」，L12），另加它不查的兩項：沒押讀圖（`OPEN_GAP_NO_RIDES`）、邊緣不是「邊緣」（無法量照抄 `edge_note`，今天判非邊緣 `OPEN_GAP_NOT_EDGE`）；
+`[]`＝只差已定價這個價格判斷、None＝沒算（不是等回落、已持有、舊版）。只呈現：不改分組、不進 `rewrite[]`、不叫醒，可開為零就零；
+計數 `counts.priced_wait_priced_only`／`_unknown`（`alpha.candidates.priced_only_counts` 一份），心跳狀態塊與短版 ④ 等回落行、
+首頁卡片晶片（`_card_overview.priced_only`，產生端給布林）、個股頁候選行照印。⚠ 它不認證深挖清單（`depth_check` 只印不存）。每一列（不論宣告哪一態）另帶 `rewrite[]`：連結斷了（附為什麼斷——來源收掉／被判觸及／
 到期未判，L12）、敘事來源 watch 醒來／觸及／到期未判（plan §5 第 6 點）、缺 X／等回落在等的 watch 已失效。「連結斷了」的唯一判定是
 `engine_b/narrative_watches.py::link_breaks`，佇列段 `narrative_rewrite`（經 `observe(narrative_link_breaks=…)` 注入）、audit
 （QueueSegments、QueueLiveness 的兩週滯留）、心跳段 3 共用；audit 的 rewrite 類「有去處」另查候選板該檔列帶著那筆 watch

@@ -273,7 +273,9 @@ def test_the_heartbeat_prints_zero_and_each_wait_row_and_the_short_line_keeps_da
     short = hb.priced_wait_short_lines(full, today=TODAY)
     assert short[0] == "**等回落 1 檔**"
     # 2026-10-30：10-20 收 77.85 低於最後宣告（10-15）那天的 90 → 標「已回落」（叫醒重問，不是動作）
-    assert short[1] == f"- AXTI：等 {row['stall_days']} 天｜百分位 87→88｜股價 −22.2%｜**已回落**｜⚠ 沒有重看日（接不上的等待）"
+    # 2026-11-01（failure log #123）：押量的讀圖現行、沒有待處置反證、邊緣——可開前提都成立，多標「只差已定價」
+    assert short[1] == (f"- AXTI：等 {row['stall_days']} 天｜百分位 87→88｜股價 −22.2%｜**已回落**｜**只差已定價**"
+                        "｜⚠ 沒有重看日（接不上的等待）")
     assert short[-1].startswith("-# 百分位＝自家三年估值位置") and "收盤日 10-20" in short[-1]
     assert "起點的值有回算的" in short[-1]
     for word in ("該", "燈", "買", "賣"):

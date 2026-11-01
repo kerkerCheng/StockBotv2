@@ -508,6 +508,22 @@ def pullback_counts(wait_rows: Iterable[Mapping[str, Any]]) -> dict[str, int]:
             "unknown": sum(1 for r in rows if r.get("pulled_back") is None)}
 
 
+#: 只差已定價（2026-11-01 使用者指示；failure log #123）：等回落列**假設**把已定價當脈絡、改宣告可開，可開的前提逐項還缺什麼
+#: （`row["open_gaps"]`）。四個機械前提只有 `alpha.providers.candidates.open_preconditions` 一份；這裡只放它不查、
+#: 但寫入端與分組本來就擋的兩項的字——沒押讀圖（寫入端拒收沒押讀圖的可開）、今天判非邊緣（宣告可開不放行）。
+#: 邊緣判定少一個輸入那一項照抄 `edge_note`（產生端給字，L16）。
+OPEN_GAP_NO_RIDES = "沒有押任何讀圖（可開至少要押一格）"
+OPEN_GAP_NOT_EDGE = "今天判非邊緣（宣告可開也不放行）"
+
+
+def priced_only_counts(wait_rows: Iterable[Mapping[str, Any]]) -> dict[str, int]:
+    """等回落那一組「只差已定價」的常駐計數：可開前提都成立、只剩已定價這個價格判斷的檔數，與沒算的檔數（列上沒有
+    `open_gaps` 清單——舊 artifact）。**只數不判**：不是驗收數字（G10 不數通過 filter 的檔數）、不是買進訊號、不改分組。"""
+    rows = list(wait_rows)
+    return {"priced_only": sum(1 for r in rows if r.get("open_gaps") == []),
+            "priced_only_unknown": sum(1 for r in rows if not isinstance(r.get("open_gaps"), list))}
+
+
 def missing_request_counts(missing_rows: Iterable[Mapping[str, Any]]) -> dict[str, int | None]:
     """缺 X 那一組的常駐計數（三分法 ①）：已開口（待辦池裡有開著的文件請求）、可拿但未開口（`missing_kind=user_document`
     而沒有開著的請求）、未分（敘事沒寫三分）。任一列的 `document_requests` 是 None（池沒讀到、舊 artifact）→ 前兩格 None＝未算。"""
@@ -621,6 +637,8 @@ def assemble_board(rows: Sequence[Mapping[str, Any] | None], *, universe: Sequen
     # 等回落的價格叫醒與缺 X 三分法（2026-10-30）：兩組各自的常駐計數器——算法只有一份（心跳段 2／短版 ④ 讀列重算同一條）
     counts.update({f"priced_wait_{k}": v for k, v in pullback_counts(groups["priced_wait"]).items()},
                   **{f"missing_{k}": v for k, v in missing_request_counts(groups["missing"]).items()})
+    # 只差已定價（2026-11-01；failure log #123）：等回落裡可開前提都成立的檔數——算法只有 `priced_only_counts` 一份
+    counts.update({f"priced_wait_{k}": v for k, v in priced_only_counts(groups["priced_wait"]).items()})
     # 遲滯（2026-11-01）：今天才翻成非邊緣、還沒列撤回建議的列——照敘事分組，這裡只計數（0 也印；不是待做）
     counts["not_edge_pending"] = sum(1 for row in rows if row is not None and row.get("edge_pending"))
     return {"groups": groups, "side_groups": sides, "counts": counts, "oldest_stall_days": oldest,
@@ -635,12 +653,13 @@ def assemble_board(rows: Sequence[Mapping[str, Any] | None], *, universe: Sequen
 
 __all__ = ["ANSWER_WORDS", "CANDIDATES_THIS_IS_NOT", "GROUPS", "GROUP_LABELS", "IN_NUMBERS_LINES", "LIGHT_ORDER",
            "LIGHT_WORDS", "LIST_GROUPS", "LIST_GROUP_LABELS", "NEW_EDGES_PREFIX", "NOT_EDGE_PENDING_PREFIX",
-           "ON_THRESHOLD_WORDS", "PRICED_IN_LINES",
+           "ON_THRESHOLD_WORDS", "OPEN_GAP_NO_RIDES", "OPEN_GAP_NOT_EDGE", "PRICED_IN_LINES",
            "PULLED_BACK_PREFIX", "REWRITE_STATE_WORDS", "REWRITE_WHY", "RIDES_SUPERSEDED_PREFIX", "SIDE_GROUPS", "SIDE_LABELS", "UNANSWERED",
            "WIPEOUT_LINES", "Cited", "assemble_board", "body_key", "body_version", "cap_label", "cited_identities",
            "edge_note",
            "held_index", "judgment_version", "missing_request_counts", "new_edge_reason", "normalize_url",
            "not_edge_pending_note", "on_threshold_entries", "on_threshold_line",
-           "priced_judgment_key", "priced_since", "pullback_counts", "pulled_back", "pulled_back_reason",
+           "priced_judgment_key", "priced_only_counts", "priced_since", "pullback_counts", "pulled_back",
+           "pulled_back_reason",
            "rewrite_words", "rides_reason", "rollup", "squash", "stall_since", "stall_version", "three_words",
            "unread_new_edges"]

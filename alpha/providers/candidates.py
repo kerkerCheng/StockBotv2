@@ -18,8 +18,8 @@ from pathlib import Path
 from typing import Any, Callable, Mapping, Sequence
 
 from ..candidates import (
-    ANSWER_WORDS, CANDIDATES_THIS_IS_NOT, GROUP_LABELS, GROUPS, IN_NUMBERS_LINES, PRICED_IN_LINES,
-    REWRITE_STATE_WORDS, SIDE_GROUPS, SIDE_LABELS, UNANSWERED, assemble_board, body_version, cap_label,
+    ANSWER_WORDS, CANDIDATES_THIS_IS_NOT, GROUP_LABELS, GROUPS, IN_NUMBERS_LINES, OPEN_GAP_NO_RIDES, OPEN_GAP_NOT_EDGE,
+    PRICED_IN_LINES, REWRITE_STATE_WORDS, SIDE_GROUPS, SIDE_LABELS, UNANSWERED, assemble_board, body_version, cap_label,
     cited_identities, edge_note, held_index, judgment_version, new_edge_reason, not_edge_pending_note,
     on_threshold_entries, priced_since, pulled_back,
     pulled_back_reason, rewrite_words, rides_reason, rollup,
@@ -275,6 +275,9 @@ def derive_row(ticker: str, company_id: str | None, *, records: Sequence[Investo
                               if open_document_requests is not None else None),
         # 等回落的價格叫醒（2026-10-30）：收盤低於最後一次宣告已定價那天的收盤；None＝沒算（不是等回落、或 bars 沒給）
         "pulled_back": None,
+        # 只差已定價（2026-11-01 使用者指示；failure log #123）：等回落列假設把已定價當脈絡改宣告可開，可開的前提逐項還缺什麼。
+        # []＝前提都成立、只剩已定價這個價格判斷；None＝沒算（不是等回落、已持有、舊版敘事）。只呈現，不改分組
+        "open_gaps": None,
         # 加碼條件（Phase 7 Step 7.0d）：每條與它的 watch 狀態；觸及只提醒，不是買進訊號、不改候選狀態
         "confirm": [], "confirm_summary": None,
         # 是不是新賭注（Phase 7 Step 7.0e）：和持有的 alpha 檔共用的需求錨與層——只呈現，不進任何狀態判斷
@@ -372,6 +375,20 @@ def derive_row(ticker: str, company_id: str | None, *, records: Sequence[Investo
     if row["group"] == "held":
         return row
     state = (edge or {}).get("state")
+    if cs.state == "priced_wait":
+        # 只差已定價（2026-11-01 使用者「你講的都算方向正確…可以直接改?」；failure log #123）：A1 第 4 點「已定價是脈絡不是
+        # 否決」，但等回落不進使用者的決策時刻——10-21 有三檔四個前提全過、只差這一格，沒有任何地方印出來。
+        # 這裡用**同一個** `open_preconditions` 假設改宣告可開再驗一次（不另寫一份；可開本身的路徑不動），加兩項它不查、
+        # 寫入端與分組本來就擋的：沒押讀圖、邊緣不是「邊緣」。只呈現：不改分組、不進 rewrite[]、不叫醒（可開為零就零）。
+        blocking = blocking_for_open(str(company_id), ticker, watches=watches, lifecycle=lifecycle,
+                                     brief_ids=brief_ids, current_brief=brief)
+        gaps = [] if brief.rides else [OPEN_GAP_NO_RIDES]
+        if state == "not_edge":
+            gaps.append(OPEN_GAP_NOT_EDGE)
+        elif state != "edge":
+            gaps.append(edge_note(edge))
+        row["open_gaps"] = gaps + open_preconditions(brief, reading_rows=reading_rows, three_questions=three_questions,
+                                                     blocking=blocking, breaks=breaks)
     if state == "not_edge":
         if not_edge_confirmed(edge):
             row.update(side="not_multiple", derived="not_multiple")

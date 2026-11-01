@@ -20,6 +20,8 @@ _ROW = {"ticker": "AXTI", "company_id": "co:axt", "brief_id": "ib_x", "record_ve
         "watch": {"watch_id": "ew_0148", "status": "active", "until": "2026-11-13", "expires": "2027-01-15"},
         "since": "2026-09-29T05:48:00+00:00", "stall_days": 0,
         "pulled_back": False, "missing_kind": None, "document_requests": [],
+        # 只差已定價（2026-11-01；candidates/4）：邊緣、押量的讀圖現行、沒有待處置反證——假設改宣告可開，前提都成立
+        "open_gaps": [],
         "three_words": {"will_it_die": "黃（灰 1）", "priced_in": "是", "in_numbers": "是"}, "note": None}
 
 
