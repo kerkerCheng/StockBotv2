@@ -897,7 +897,11 @@ def compose_brief(*, now: datetime, summary: str, snapshot: Mapping[str, Any], r
         wait = line(lambda: hb.priced_wait_short_lines(state_dir, today=today,
                                                        label=lambda r: company_label(company_id=r.get("company_id"),
                                                                                      ticker=r.get("ticker"))), "等回落")
-        return ["### ④ 狀態與健康度", *health, *line(lambda: candidate_short_lines(state_dir), "候選"),
+        # LLM 額度每天一行（ROADMAP「週額度常駐計數器」②，2026-11-01）：兩個窗的用量與重置，週用量 ≥ 門檻粗體——只印不擋；
+        # 沒有可讀的用量就說為什麼（沒有執行紀錄／這一輪沒有呼叫回報）
+        quota_line = line(lambda: "- " + hb.quota_usage_line(hb.quota_usage(rows), now=now, record=record,
+                                                            record_problem=record_problem), "LLM 額度")
+        return ["### ④ 狀態與健康度", *health, *quota_line, *line(lambda: candidate_short_lines(state_dir), "候選"),
                 *(["", *wait, ""] if wait else []),
                 *line(lambda: "- " + watch_short_line(now=now), "watch"),
                 *line(lambda: "- " + disproof_line(snapshot), "反證"),

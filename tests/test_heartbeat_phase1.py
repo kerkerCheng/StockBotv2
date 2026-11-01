@@ -489,8 +489,13 @@ def test_quota_line_says_how_much_is_used_when_it_resets_and_prints_once(tmp_pat
     path = tmp_path / "run.json"
     path.write_text(json.dumps(record), encoding="utf-8")
     taipei = NOW.astimezone(timezone(timedelta(hours=8)))
-    quota = [l for l in hb._prescreen_and_quota_lines(now=taipei, record_path=path) if "LLM 額度" in l]
+    lines = hb._prescreen_and_quota_lines(now=taipei, record_path=path)
+    quota = [l for l in lines if "LLM 額度接近上限" in l]
     assert len(quota) == 1
     line = quota[0]
     assert "7 天額度已用 67%" in line and "10-05 23:00 重置" in line
     assert "07a_triage_propose、10b_prescreen_propose" in line and "心跳照發" in line
+    # 用量每天一行（2026-11-01）：警告行之後、也只印一次；舊格式只記一窗，另一窗寫「未回報」而不是 0%
+    usage = [l for l in lines if l.startswith("LLM 額度：")]
+    assert usage == ["LLM 額度：7 天 67%（10-05 23:00 重置）｜5 小時 未回報（舊格式只記一窗）"]
+    assert lines.index(usage[0]) > lines.index(line)

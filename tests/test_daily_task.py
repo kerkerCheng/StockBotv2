@@ -952,7 +952,9 @@ def test_good_stream_is_ok_and_records_rate_limit_and_capabilities() -> None:
     outcome, popen = _run_claude([INIT_OK, RATE_OK, RESULT_OK])
     assert outcome.status == "ok" and outcome.structured == {"items": []}
     assert outcome.rate_limit == {"status": "allowed", "rateLimitType": "five_hour", "utilization": 0.2,
-                                  "resetsAt": None}                      # 這個夾具沒帶重置時間
+                                  "resetsAt": None,                      # 這個夾具沒帶重置時間
+                                  # 每個窗都記（ROADMAP「週額度常駐計數器」①，2026-11-01）；缺的欄位是 None、不補 0
+                                  "windows": {"five_hour": {"utilization": 0.2, "resetsAt": None, "status": None}}}
     record = outcome.as_record()
     assert record["init_capabilities"]["tools"] == ["StructuredOutput"]
     assert record["init_capabilities"]["memory_paths"] == "<absent>"
@@ -1322,7 +1324,12 @@ def test_rate_limit_keeps_reset_time_and_usage_from_the_real_event_shape() -> No
             "unifiedWindows": {"five_hour": {"utilization": 0.07, "resetsAt": 1790821800},
                                "seven_day": {"utilization": 0.67, "resetsAt": 1791212400}}}
     assert llm_step._rate_limit(real) == {"status": "allowed_warning", "rateLimitType": "seven_day",
-                                          "utilization": 0.67, "resetsAt": 1791212400}
+                                          "utilization": 0.67, "resetsAt": 1791212400,
+                                          # 兩個窗都記（2026-11-01）；10-01 的事件各窗沒帶 status → None
+                                          "windows": {"five_hour": {"utilization": 0.07, "resetsAt": 1790821800,
+                                                                    "status": None},
+                                                      "seven_day": {"utilization": 0.67, "resetsAt": 1791212400,
+                                                                    "status": None}}}
     only_window = {"status": "allowed", "rateLimitType": "five_hour",
                    "unifiedWindows": {"five_hour": {"utilization": 0.2, "resetsAt": 1790821800}}}
     assert llm_step._rate_limit(only_window)["resetsAt"] == 1790821800      # 頂層沒有就讀那一窗

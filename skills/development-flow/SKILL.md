@@ -163,6 +163,8 @@ phase closure 且下一階段高度依賴／implementer 自認判斷不了 fix �
 說明「為什麼這題值得第二份 token」，然後等使用者決定。
 **例外：Phase 結案的 R2 已常規 opt-in**（`AGENTS.md`「協作與邊界」，2026-09-22）——執行者可直接發 `WORK_REQUEST` 給乾淨 context 的 reviewer；
 執行環境不能 spawn 時，把 `WORK_REQUEST` 原文交回，由使用者貼給新 session。
+**spawn 任何 reviewer／workflow 前先讀週額度**：`python -m crons.llm_quota`（要當下的數加 `--probe`）；週用量 ≥ 80% 時先把
+那個數說出來再開——只印不擋（ROADMAP「週額度常駐計數器」③；2026-10-09、10-17 整批 agent 撞額度）。
 
 真的要委派時，`WORK_REQUEST` 只給下列內容，**不給自己的推理過程**：
 

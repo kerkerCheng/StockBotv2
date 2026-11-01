@@ -57,6 +57,7 @@ Get-Content library\private\heartbeat\daily_run_<YYYY-MM-DD>.json    # 每步 st
 | T2 輪詢（⑩d–⑩g）沒跑完或一直「沒真的查」 | 段 3「T2 輪詢：本輪沒跑完（<步驟> <狀態>：<理由>）」或拒收裡「沒真的查 N」；有該查的、卻超過 `min_recheck_days` 沒有任何一次輪詢時整行 ⚠＋摘要行「T2 輪詢 N 天沒跑」。回滾：`config/event_watch.json` 的 `sweep_budget_per_run` 調 0（或 `llm.executor=none` 連同其他 LLM 步驟一起停） |
 | T2 命中掛著沒人判定 | 段 3「**命中待檢 N**（最老 D 天）」；超過兩週 `audit invariants` 的 QueueLiveness 亮紅。判定：`python -m engine_b.watch_poll queue` → `judge` |
 | ⑪c 每日摘要沒產生（額度、timeout、全部句子被拒） | 短版 ①②「（LLM 摘要今天沒產生（<步驟> <狀態>）——改列…）」：① 退回分流判 go 的標題、② 退回雷達收據的原文標題與一句事實；④ 健康度把被額度擋下的 LLM 步驟併成一行並印重置時間。只停摘要：`config/daily_routine.json` 的 `max_llm_calls.digest` 調 0 |
+| 週額度快用完（用完時 daily 的分類、預篩、雷達、T2 輪詢、摘要都會 `rate_limited`） | 短版 ④ 每天一行「LLM 額度：7 天 X%（重置）｜5 小時 Y%（重置）」，週 ≥ 80% 粗體＋摘要行「⚠ 週額度已用 X%」（**只印不擋**；門檻量到 2026-12-01 再定）；互動 session 開 workflow／大量 fan-out 前 `python -m crons.llm_quota`（要當下的數加 `--probe`） |
 | ⑯ 備份 fail closed「不安全的 raw evidence 引用」 | 某筆 lead 的 ref 以 `library/raw/` 開頭卻不是單一路徑（2026-10-07 事發：`trace_attempts_ref` 寫成「路徑＋說明」）。持鎖用 `python -m engine_b.cli annotate <lead> --ref "<key>=已查：library/raw/…"` 改正後 `python scripts\backup_private.py run`；寫入端 10-07 起當場拒收同型 |
 | 開跑時工作區不乾淨 | 段 1 ⚠ 列出路徑（照跑） |
 | 保險檢查觸發（LLM 步驟前後指紋變了） | **沒有心跳也沒有 Discord**（心跳會 import 被改的檔）；開 session 時 `crons/routine_hint.py` 第一句說出來 |
@@ -84,6 +85,7 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 & '.venv\Scripts\python.exe' crons\heartbeat.py --format json      # 機器可讀
 & '.venv\Scripts\python.exe' crons\heartbeat.py --out .\hb.md       # 寫 UTF-8 檔，交給既有 publisher
 & '.venv\Scripts\python.exe' crons\heartbeat.py --out .\hb.md --brief-out .\brief.md   # 另寫 Discord 短版
+& '.venv\Scripts\python.exe' -m crons.llm_quota            # LLM 額度（7 天／5 小時）：今天 daily 最後一次呼叫回報的數；--probe 跑一次最小 claude -p 讀當下
 ```
 
 **Discord 送的是短版**（2026-10-07 使用者：「心跳太雜」；`crons/daily_brief.py`）：① lead 抓了什麼 ② 市場大事

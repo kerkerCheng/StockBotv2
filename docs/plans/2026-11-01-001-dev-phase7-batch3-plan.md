@@ -12,7 +12,7 @@
 | # | ROADMAP 列 | 做什麼（一句） | Zoom／Review | 狀態 |
 |---|---|---|---|---|
 | A | 邊緣門檻的遲滯與「在門檻上」計數器 ○ | 撤回建議只在**連續兩次**判定都非邊緣後才出現；候選板、心跳、closure-gate 多一格「在門檻上」 | Z1／R1 | ✅ 11-01（回放 K=1 撤回建議 5 → K=2 4＋1 待確認；真資料在門檻上 20、待確認 0） |
-| B | 週額度常駐計數器 ○ | daily 短版 ④ 每天印週額度與 5 小時用量；互動 fan-out 前有命令可讀同一個數 | Z1／R1 | ○ |
+| B | 週額度常駐計數器 ○ | daily 短版 ④ 每天印週額度與 5 小時用量；互動 fan-out 前有命令可讀同一個數 | Z1／R1 | ✅ 11-01（兩窗都記；④ 每天一行＋摘要行旗（≥ 80% 只印不擋）；`python -m crons.llm_quota [--probe]`；真資料：daily 06:30 的紀錄 7 天 86%、探針 12:00 當下 **99%**） |
 | C | 敘事 stale 計數器 ◐（剩 ②④＋寫入端拒收） | ②騎的讀圖 kind 變了、④供給側家數變了也列「該重寫」；寫入端拒收一字不改的換版 | Z1–Z2／R1 | ○ |
 | D | 成交紀錄遺留 ①②③④⑥⑧⑨⑩ | `scripts/record_trade.py` 的八個已知小洞 | Z1／**R2**（資本路徑） | ○ |
 | E | 海外財報來源 ◐（剩 ②20-F） | 20-F 年度封面股數進 Engine C；ADS 比率要使用者選就停 | Z2／R1 | ○ |
@@ -71,3 +71,47 @@ failure log #110 末欄、ARCHITECTURE 候選板段、CONCEPTS 邊緣判定、re
 **真資料（11-01 全量 materialize）：** 在門檻上 20 檔（分析師 11–13 家 17 檔、市值 9.0B–11.0B 美元 3 檔；其中有敘事 6 檔：002270.SZ、002837.SZ、6268.T、
 AMKR、MXL、SPB.TO）、非邊緣待確認 0、非倍率仍有敘事 0；心跳段 2 第二行與 closure-gate 都印得出名單。測試：`tests/test_edge_hysteresis.py` 15 條＋
 `tests/test_candidates.py`／`test_coverage_counts.py`／`test_webapp_candidates_series.py` 改動；相關 12 檔 336 passed。
+全套 2065 passed（修一條：心跳快照鍵清單多兩個計數器）；commit `1c57bad3`。
+
+## B 週額度常駐計數器
+
+```
+INTAKE
+Zoom: Z1（`llm_step._rate_limit` 多記每個窗；心跳段 3／短版 ④ 多一行、摘要行多一旗；一個新的唯讀 CLI；不動任何 authority、
+      不動 daily 的步驟清單與 LLM argv）
+Review: R1（無人值守路徑只多「記」與「印」；探針是互動命令、與 daily 同一組 argv／白名單／能力檢查；六條 R2 trigger 都不命中）
+Case: ROADMAP 列：雷達 10-04 起 24 天有 8 天沒跑，週額度用完 2 次共 6 天（10-09～10-12、10-24～10-25）；互動 session 10-09、
+      10-17 兩次整批 agent 撞額度（記憶 feedback-fanout-token-cost）
+```
+
+**現況（2026-11-01 唯讀）：** `_rate_limit` 只留 `rateLimitType` 指的那一窗（今天的執行紀錄 17 次呼叫全是 `seven_day 0.86
+allowed_warning`，5 小時窗看不到）；心跳段 3 與短版 ④ 的額度行只在不是 `allowed` 才印（`quota_entries`）；互動 session 沒有任何命令可讀。
+11-01 探針抓到的原始事件：`status: allowed_warning` 時 `unifiedWindows` 兩窗都在、各帶 `utilization`／`resetsAt`／`status`
+（five_hour 0.53 allowed、seven_day 0.97 allowed_warning）。ROADMAP ① 的疑問「平常 allowed 時帶不帶 seven_day」本輪抓不到
+（週額度已在警告區）——程式對缺窗的處理是印「未回報」、不猜；11-02 23:00 重置後下一輪 daily 的紀錄就會回答。
+
+**做什麼：** ①`_rate_limit` 多 `windows`（每個窗三格：utilization／resetsAt／status；沒有 unifiedWindows 就 `{}`）——執行紀錄
+`calls[].rate_limit` 自動帶著。②`crons.heartbeat.quota_usage(rows)`（最後一次有回報的呼叫；舊格式讀成一窗、另一窗「未回報」）＋
+`quota_usage_line`（短版 ④ 每天一行：「LLM 額度：7 天 X%（重置）｜5 小時 Y%（重置）」，週 ≥ 門檻粗體；沒有可讀用量說為什麼）＋
+`quota_flag`（摘要行「週額度已用 X%」，只管 7 天窗）；門檻 `QUOTA_FLAG_THRESHOLD = 0.80` 只印不擋；完整心跳段 3 在警告行之後
+也印用量行。③`python -m crons.llm_quota [--probe] [--json]`：讀同一個函式；`--probe` 另跑一次最小 `claude -p`（haiku、low、零工具、
+與 daily 同一組 argv 與白名單、cwd 同一個空目錄）讀當下的數；exit 永遠 0。development-flow skill R2 段：spawn 前先跑它。
+
+**四問：** ①顯形（兩個常駐計數：短版 ④ 每天一行、摘要行的旗）。②程式。③加記兩窗＋印；沒有拿掉任何東西。④最先壞掉的那一筆：
+**舊格式的執行紀錄**（11-01 以前 `rate_limit` 沒有 `windows`）——`quota_usage` 把它讀成一個窗、另一窗印「未回報（舊格式只記一窗）」，
+不印 0%；看過：今天的紀錄（17 次呼叫、舊格式）印「7 天 86%｜5 小時 未回報」。
+
+**驗收（現有資料）：** 執行紀錄每次呼叫有兩個窗（11-02 起的 `calls[].rate_limit.windows`）；短版 ④ 每天出現週額度一行（11-02 起）；
+一個月內週額度用完導致 daily LLM 步驟 `rate_limited` 的天數（基準 24 天 6 天；量到 12-01，門檻 0.80 到那天再定）。
+機制：測試＋變異（拿掉 `windows` → 紅；0.79 → 不加旗 → 綠）。**前置：** 無。
+
+**落地（2026-11-01）：** `crons/llm_step.py`（`_rate_limit` 的 `windows`、`RATE_LIMIT_WINDOW_KEYS`）；`crons/heartbeat.py`
+（`QUOTA_FLAG_THRESHOLD`、`QUOTA_WINDOW_ORDER`、`_schedule_zone`／`_reset_text`（從 `quota_entries` 抽出共用）、`quota_usage`、
+`quota_usage_line`、`quota_flag`；`_quota_lines_from` 加用量行；`summary_line` 加旗）；`crons/daily_brief.py`（④ 多一行，自己降級）；
+`crons/llm_quota.py`（新；CLI＋探針）。文件：ROADMAP 列搬進已交付索引（原列逐字封存 archive/roadmap-backlog-log.md）、盤點句的查證命令
+改成只看粗體名稱後的標記（原命令 `grep -v "✅"` 會把內文帶 ✅ 的 ◐ 列也濾掉）、OPERATIONS 心跳段命令＋失敗模式表一列、ARCHITECTURE 段 3 敘述、
+development-flow skill R2 段、plans README。測試：`tests/test_llm_quota.py` 11 條；`test_daily_task` 兩處逐項相等、`test_heartbeat_phase1`
+用量行隨改；四檔 212 passed；變異①拿掉 windows → 2 條紅、②0.79 不加旗／0.80 加旗。
+**真資料：** `python -m crons.llm_quota` → 「**7 天 86%**（11-02 23:00 重置；≥ 80% 只印不擋）｜5 小時 未回報（舊格式只記一窗）」（daily 06:30，
+17 次呼叫）；`--probe` 約 12:00 → 「**7 天 99%**｜5 小時 79%」（haiku，2.9 秒，0.0005 美元）——白天互動 session 吃掉 13 個百分點；
+11-02 05:30 的 daily 會在週額度重置（11-02 23:00）之前起跑，LLM 步驟預期 `rate_limited`（這就是基準要數的那種日子）。

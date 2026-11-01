@@ -200,12 +200,20 @@ class LlmOutcome:
         }
 
 
+#: 每個窗記下的三格（`unifiedWindows.<窗>` 的欄位；缺就是 None，不補 0——INV-3）。
+RATE_LIMIT_WINDOW_KEYS: tuple[str, ...] = ("utilization", "resetsAt", "status")
+
+
 def _rate_limit(info: Mapping[str, Any]) -> dict[str, Any]:
     """`utilization` 實測不在頂層，在 `unifiedWindows.<rateLimitType>` 底下（2026-09-24 探針）。
 
     2026-10-01 探針（`status: allowed_warning` 時）：頂層有 `resetsAt`（Unix 秒）與 `utilization`，
     `unifiedWindows.<窗>` 各自也帶 `utilization`／`resetsAt`——兩處都讀，頂層優先。原本丟了 `resetsAt`，
-    心跳只能印「重置 ?」、也看不出用了幾成（使用者 2026-10-01 問「LLM 額度是什麼問題」）。"""
+    心跳只能印「重置 ?」、也看不出用了幾成（使用者 2026-10-01 問「LLM 額度是什麼問題」）。
+
+    2026-11-01（ROADMAP「週額度常駐計數器」①）：`windows` 把 `unifiedWindows` 底下**每個窗**都記下（11-01 探針：
+    `five_hour` 與 `seven_day` 各帶 `utilization`／`resetsAt`／`status`）——原本只記 `rateLimitType` 指的那一窗，
+    5 小時窗在報警時看不到 7 天窗用了幾成，週額度用完之前沒有任何地方看得到「快用完了」。沒有 `unifiedWindows` 就是 `{}`。"""
     kind = info.get("rateLimitType")
     windows = info.get("unifiedWindows") or {}
     window = windows.get(kind) if isinstance(windows, Mapping) and kind else None
@@ -214,7 +222,10 @@ def _rate_limit(info: Mapping[str, Any]) -> dict[str, Any]:
     if isinstance(window, Mapping):
         utilization = window.get("utilization") if utilization is None else utilization
         resets_at = window.get("resetsAt") if resets_at is None else resets_at
-    return {"status": info.get("status"), "rateLimitType": kind, "utilization": utilization, "resetsAt": resets_at}
+    recorded = {str(name): {key: win.get(key) for key in RATE_LIMIT_WINDOW_KEYS}
+                for name, win in (windows.items() if isinstance(windows, Mapping) else ()) if isinstance(win, Mapping)}
+    return {"status": info.get("status"), "rateLimitType": kind, "utilization": utilization, "resetsAt": resets_at,
+            "windows": recorded}
 
 
 def run_claude(prompt: str, *, argv: Sequence[str], cwd: Path, env: Mapping[str, str],

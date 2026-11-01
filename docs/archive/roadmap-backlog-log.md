@@ -127,3 +127,19 @@ candidates artifact /3。回放命令 `python -m alpha edge <T…> --replay --fr
 K＝2（本次）撤回建議 4（各晚一天；LYC.AX 11-01 待確認）／重寫 3；K＝3 撤回建議 3（AMKR 兩天的出走不翻）／重寫 2。英維克 7 天、THK 5 天、LYC.AX 第一次
 9 天的出走不是單日雜訊——遲滯只擋 LYC.AX 11-01 這種隔日翻回的；K 要不要加大由使用者決定（本次照 ROADMAP 寫的連續兩次）。測試 `tests/test_edge_hysteresis.py`
 ＋`tests/test_candidates.py` 三條；變異：拿掉前一次比對 → 紅、前一次沒讀到 → 待確認而不是非倍率 → 綠。
+
+| **週額度常駐計數器（保住 daily 的 LLM 步驟）** ○（2026-10-28 系統提出；使用者問「搜尋上限現在會卡嗎」時查出） | ①每次 `claude -p` 的 `rate_limit_event` 帶 `unifiedWindows.<窗>` 各自的使用率（2026-10-01 探針；七天那一格平常有沒有帶要先抓一則原始事件確認，沒帶就改讀 `/usage` 類的本機來源），目前只記 `rateLimitType` 指的那一個——改成五小時與七天兩個都記進執行紀錄；②短版 ④ 每天印「週額度已用 X%（重置日）」，心跳摘要行在 ≥ 門檻時加旗（門檻先只印、不擋，量一個月再定）；③互動 session 開 workflow／大量 fan-out 前讀同一個數。只印不擋：研究不因它停，daily 也不因它換模型 | 雷達 10-04 起 24 天有 8 天沒跑：**週額度用完 2 次共 6 天**（10-09～10-12、10-24～10-25，互動研究與 workflow 把整週吃光，05:30 的 daily 起來就沒額度——`daily_run_<日>.json` 的 01c 為 `rate_limited`、seven_day utilization 1）、登入過期 2 天（10-26～10-27）。用完之前沒有任何地方看得到「快用完了」（L14：防呆要是會自己出現的計數器）；10-28 起 daily 改 opus＋xhigh，同一個池子抽得更快 | 執行紀錄每次呼叫有兩個窗口的使用率；短版 ④ 每天出現週額度一行；一個月內週額度用完導致 daily LLM 步驟 `rate_limited` 的天數（基準：24 天 6 天） | 無（`crons/llm_step.py` 已解析 rate_limit_event） |
+
+**✅ 交付 2026-11-01（週額度常駐計數器）：** ①`crons/llm_step.py::_rate_limit` 多 `windows`——`unifiedWindows` 底下**每個窗**各記
+utilization／resetsAt／status（11-01 探針：`status: allowed_warning` 時 `five_hour` 與 `seven_day` 都在、各帶 status；ROADMAP ① 的疑問
+「平常 allowed 時帶不帶 seven_day」本輪抓不到——週額度已在警告區；程式對缺窗印「未回報」、不猜，11-02 23:00 重置後的 daily 紀錄會回答）；
+執行紀錄 `calls[].rate_limit.windows` 自動帶著。②`crons.heartbeat.quota_usage`（最後一次有回報的呼叫；舊格式讀成一窗、另一窗印
+「未回報（舊格式只記一窗）」，不印 0%）＋`quota_usage_line`（短版 ④ 每天一行「LLM 額度：7 天 X%（重置）｜5 小時 Y%（重置）」，週 ≥ 門檻
+粗體；沒有可讀用量說為什麼）＋`quota_flag`（摘要行「週額度已用 X%」，只管 7 天窗）；門檻 `QUOTA_FLAG_THRESHOLD = 0.80` **只印不擋**；
+完整心跳段 3 在警告行之後也印用量行。③`python -m crons.llm_quota [--probe] [--json]` 讀同一個函式；`--probe` 另跑一次最小 `claude -p`
+（haiku、effort low、零工具、與 daily 同一組 argv／環境白名單／cwd 空目錄檢查）讀當下的數；exit 永遠 0。development-flow skill R2 段：
+spawn 任何 reviewer／workflow 前先跑它。**真資料 11-01：** 今天的紀錄（舊格式、17 次呼叫）印「**7 天 86%**｜5 小時 未回報（舊格式只記一窗）」；
+探針約 12:00 當下 **7 天 99%**（11-02 23:00 重置）、5 小時 79%——與 daily 06:30 的 86% 差 13 個百分點是白天互動 session 用掉的，正是
+「daily 的數不含白天」要加 `--probe` 的理由；探針一次 2.9 秒、0.0005 美元。測試 `tests/test_llm_quota.py` 11 條＋`test_daily_task`／
+`test_heartbeat_phase1` 兩處逐項相等隨改；變異：拿掉 `windows` → 2 條紅；0.79 不加旗、0.80 加旗。**門檻量到 2026-12-01 再定**（基準：
+24 天裡 6 天 `rate_limited`）。查證：`python -m crons.llm_quota`；`python -m crons.heartbeat` 段 3 的「LLM 額度：」行。

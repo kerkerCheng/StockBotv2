@@ -1872,6 +1872,109 @@ def quota_lines(*, now: datetime, record_path: Path | None) -> list[str]:
 #: daily 裡的 LLM 步驟（看額度用）。2026-10-07：T2 輪詢與每日摘要也是 LLM 步驟——額度用完時它們一樣被擋（L17 對稱面）。
 LLM_PROPOSE_KEYS: tuple[str, ...] = ("01c_radar_propose", "07a_triage_propose", "10b_prescreen_propose",
                                      "10e_poll_propose", "11c_digest_propose")
+#: 週額度的旗門檻（ROADMAP「週額度常駐計數器」②，2026-11-01）：7 天窗用量 ≥ 這個比例時心跳摘要行加旗、短版 ④ 那一行粗體
+#: ——**只印不擋**（研究不因它停、daily 不因它換模型），量一個月再定。事發：10-04 起 24 天裡週額度用完 2 次共 6 天
+#: （daily 的 LLM 步驟 `rate_limited`），用完之前沒有任何地方看得到「快用完了」。
+QUOTA_FLAG_THRESHOLD = 0.80
+#: 用量那一行的窗順序：先週、再 5 小時；其餘認不得的窗照原名排後面。
+QUOTA_WINDOW_ORDER: tuple[str, ...] = ("seven_day", "five_hour")
+
+
+def _schedule_zone(now: datetime) -> Any:
+    """重置時間印**排程時區**（台北）——2026-10-07 前用 `now.tzinfo`，而 daily 傳進來的 now 是 UTC：心跳印「10-06 23:40 重置」，
+    CLI 自己說的是「resets 7:40am (Asia/Taipei)」（同一個時刻、兩個鐘；時區只有 config 那一份，L16）。"""
+    try:
+        from engine_b.event_watch import _local_timezone
+
+        return _local_timezone()
+    except Exception:  # noqa: BLE001 — 排程設定讀不到就退回 now 自己的時區，照印
+        return now.tzinfo
+
+
+def _reset_text(stamp: Any, *, zone: Any) -> str:
+    try:
+        return datetime.fromtimestamp(float(stamp), timezone.utc).astimezone(zone).strftime("%m-%d %H:%M")
+    except (TypeError, ValueError, OverflowError, OSError):
+        return "?"
+
+
+def quota_usage(rows: Mapping[str, Any], *, keys: Sequence[str] = LLM_PROPOSE_KEYS) -> dict[str, Any] | None:
+    """最後一次有回報額度的 `claude -p` 呼叫看到的**每個窗**的用量（ROADMAP「週額度常駐計數器」①，2026-11-01）。
+
+    短版 ④ 每天那一行、心跳摘要行的旗、`python -m crons.llm_quota` 讀的都是這一個（一個 owner，L16）。
+    回 `{"windows": {窗: {"utilization", "resetsAt", "status"}}, "step", "calls", "legacy"}`；沒有任何呼叫回報 → None
+    （不是 0%，INV-3）。`legacy`：2026-11-01 之前的紀錄只記 `rateLimitType` 指的那一窗——照讀成一個窗，另一窗印「未回報」。
+    `keys`：讀哪幾步的呼叫（daily 的五個 LLM 步驤；探針傳自己的 key）。"""
+    latest: dict[str, Any] | None = None
+    calls = 0
+    for key in keys:
+        for call in (rows.get(key) or {}).get("calls") or []:
+            limit = call.get("rate_limit") if isinstance(call, Mapping) else None
+            if not isinstance(limit, Mapping) or not limit:
+                continue
+            calls += 1
+            windows = limit.get("windows")
+            if isinstance(windows, Mapping) and windows:
+                picked = {str(name): {"utilization": win.get("utilization"), "resetsAt": win.get("resetsAt"),
+                                      "status": win.get("status")}
+                          for name, win in windows.items() if isinstance(win, Mapping)}
+                legacy = False
+            elif limit.get("rateLimitType"):
+                picked = {str(limit["rateLimitType"]): {"utilization": limit.get("utilization"),
+                                                        "resetsAt": limit.get("resetsAt"), "status": limit.get("status")}}
+                legacy = True
+            else:
+                continue
+            latest = {"windows": picked, "step": key, "legacy": legacy}
+    if latest is None:
+        return None
+    return {**latest, "calls": calls}
+
+
+def _window_text(kind: str, window: Mapping[str, Any] | None, *, zone: Any, legacy: bool) -> str:
+    name = QUOTA_WINDOW_WORDS.get(kind, f" {kind} ").strip()
+    if window is None:
+        return f"{name} 未回報" + ("（舊格式只記一窗）" if legacy else "")
+    reset = (f"{_reset_text(window.get('resetsAt'), zone=zone)} 重置" if window.get("resetsAt") is not None
+             else "重置 ?")
+    used = window.get("utilization")
+    if isinstance(used, bool) or not isinstance(used, (int, float)):
+        return f"{name} 用量沒回報（{reset}）"
+    if kind == "seven_day" and used >= QUOTA_FLAG_THRESHOLD:
+        return f"**{name} {used:.0%}**（{reset}；≥ {QUOTA_FLAG_THRESHOLD:.0%} 只印不擋）"
+    return f"{name} {used:.0%}（{reset}）"
+
+
+def quota_usage_line(usage: Mapping[str, Any] | None, *, now: datetime, record: Mapping[str, Any] | None = None,
+                     record_problem: str | None = None) -> str:
+    """短版 ④ 每天那一行（ROADMAP「週額度常駐計數器」②）：「LLM 額度：7 天 X%（重置）｜5 小時 Y%（重置）」；
+    週用量 ≥ 門檻那一格粗體。沒有可讀的用量要說出為什麼（INV-3）：沒有執行紀錄／這一輪的 LLM 步驟沒有呼叫回報。"""
+    if usage is None:
+        if record is None:
+            return f"LLM 額度：{record_problem or '今天沒有 daily 執行紀錄'}——沒有可讀的用量"
+        steps = [r for r in record.get("steps") or [] if isinstance(r, Mapping) and r.get("kind") == "llm"]
+        if not steps:
+            return "LLM 額度：這一輪的 LLM 步驟沒有呼叫回報用量（沒有 LLM 步驟）"
+        tally: dict[str, int] = {}
+        for row in steps:
+            tally[str(row.get("status"))] = tally.get(str(row.get("status")), 0) + 1
+        return (f"LLM 額度：這一輪的 LLM 步驟沒有呼叫回報用量（LLM 步驟 {len(steps)} 步："
+                + "、".join(f"{k} {v}" for k, v in tally.items()) + "）")
+    zone = _schedule_zone(now)
+    windows = usage.get("windows") or {}
+    order = [*QUOTA_WINDOW_ORDER, *sorted(k for k in windows if k not in QUOTA_WINDOW_ORDER)]
+    return "LLM 額度：" + "｜".join(_window_text(k, windows.get(k), zone=zone, legacy=bool(usage.get("legacy")))
+                                   for k in order)
+
+
+def quota_flag(usage: Mapping[str, Any] | None) -> str | None:
+    """心跳摘要行的旗（ROADMAP「週額度常駐計數器」②）：週用量 ≥ `QUOTA_FLAG_THRESHOLD` →「週額度已用 X%」；其餘 None。
+    只管 7 天窗——5 小時窗幾小時就回來，印在 ④ 那一行就夠。只印不擋。"""
+    window = ((usage or {}).get("windows") or {}).get("seven_day") or {}
+    used = window.get("utilization")
+    if isinstance(used, bool) or not isinstance(used, (int, float)) or used < QUOTA_FLAG_THRESHOLD:
+        return None
+    return f"週額度已用 {used:.0%}"
 
 
 def quota_entries(rows: Mapping[str, Any], *, now: datetime) -> list[dict[str, Any]]:
@@ -1886,21 +1989,10 @@ def quota_entries(rows: Mapping[str, Any], *, now: datetime) -> list[dict[str, A
                 if key not in entry["steps"]:
                     entry["steps"].append(key)
     out = []
-    # 重置時間印**排程時區**（台北）——2026-10-07 前用 `now.tzinfo`，而 daily 傳進來的 now 是 UTC：心跳印「10-06 23:40 重置」，
-    # CLI 自己說的是「resets 7:40am (Asia/Taipei)」（同一個時刻、兩個鐘；時區只有 config 那一份，L16）
-    try:
-        from engine_b.event_watch import _local_timezone
-
-        zone = _local_timezone()
-    except Exception:  # noqa: BLE001 — 排程設定讀不到就退回 now 自己的時區，照印
-        zone = now.tzinfo
+    zone = _schedule_zone(now)        # 重置時間印排程時區（台北），不跟著 now 走
     for (status, kind), entry in seen.items():
         used = entry.get("utilization")
-        try:
-            reset_text = datetime.fromtimestamp(float(entry.get("resetsAt")), timezone.utc).astimezone(
-                zone).strftime("%m-%d %H:%M")
-        except (TypeError, ValueError, OverflowError, OSError):
-            reset_text = "?"
+        reset_text = _reset_text(entry.get("resetsAt"), zone=zone)
         out.append({"status": status, "kind": kind, "steps": list(entry["steps"]),
                     "status_words": QUOTA_STATUS_WORDS.get(str(status), ""),
                     "window_words": QUOTA_WINDOW_WORDS.get(str(kind), f" {kind or '?'} "),
@@ -1911,10 +2003,16 @@ def quota_entries(rows: Mapping[str, Any], *, now: datetime) -> list[dict[str, A
 
 def _quota_lines_from(rows: Mapping[str, Any], *, now: datetime) -> list[str]:
     # 額度：寫成人話——用了幾成、幾點重置、用完會怎樣（2026-10-01 使用者問「LLM 額度是什麼問題」）。
-    return [f"⚠ **LLM 額度{e['status_words']}**（{e['status']}）：Claude 訂閱{e['window_words']}額度{e['used_text']}，"
-            f"{e['reset_text']} 重置（{'、'.join(e['steps'])}）——整個帳號的用量，含互動 session；用完時 daily 的分類、"
-            "預篩與外部雷達會暫停（記成 rate_limited），心跳照發"
-            for e in quota_entries(rows, now=now)]
+    lines = [f"⚠ **LLM 額度{e['status_words']}**（{e['status']}）：Claude 訂閱{e['window_words']}額度{e['used_text']}，"
+             f"{e['reset_text']} 重置（{'、'.join(e['steps'])}）——整個帳號的用量，含互動 session；用完時 daily 的分類、"
+             "預篩與外部雷達會暫停（記成 rate_limited），心跳照發"
+             for e in quota_entries(rows, now=now)]
+    # 用量每天一行（ROADMAP「週額度常駐計數器」②，2026-11-01）：兩個窗都印、不是 allowed 也印；沒有呼叫回報就不印
+    # （短版 ④ 那一行會說為什麼）。
+    usage = quota_usage(rows)
+    if usage is not None:
+        lines.append(quota_usage_line(usage, now=now))
+    return lines
 
 
 def radar_rejected(summary: Mapping[str, Any]) -> int:
@@ -2999,6 +3097,10 @@ def summary_line(*, now: datetime, snapshot: Mapping[str, Any], run_record_path:
             flags.append("LLM 關閉（executor=none）")
         if llm_model_drift(record, now=now, record_dir=run_record_path.parent if run_record_path else None):
             flags.append("LLM model 變了")
+        # 週額度 ≥ 門檻加旗（ROADMAP「週額度常駐計數器」②，2026-11-01）：只印不擋；數字與短版 ④ 同一個函式
+        quota = quota_flag(quota_usage({str(r.get("key")): r for r in steps}))
+        if quota:
+            flags.append(quota)
         if (record.get("schedule_check") or {}).get("status") == "mismatch":
             flags.append("排程不一致")
     touched = snapshot.get("disproof.touched_pending")
