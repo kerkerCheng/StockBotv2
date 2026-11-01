@@ -110,10 +110,10 @@ def test_the_status_block_prints_priced_only_and_never_turns_not_computed_into_z
     from crons import heartbeat as hb
 
     base = {"open": 0, "missing": 0, "priced_wait": 2, "pass": 0, "held": 0, "oldest": {"priced_wait": 3},
-            "pulled_back": 0}
-    assert "等回落 2（最老 3 天｜已回落 0｜只差已定價 1）" in hb.candidate_states_text(
+            "pulled_back": 0, "reopen_met": 0, "reopen_not_computed": 0}
+    assert "等回落 2（最老 3 天｜已回落 0｜重開達成 0｜只差已定價 1）" in hb.candidate_states_text(
         {**base, "priced_only": 1, "priced_only_unknown": 0})
-    assert "等回落 2（最老 3 天｜已回落 0｜只差已定價 未算）" in hb.candidate_states_text(base)   # 舊計數沒有這一格
+    assert "等回落 2（最老 3 天｜已回落 0｜重開達成 0｜只差已定價 未算）" in hb.candidate_states_text(base)   # 舊計數沒有這一格
     assert "只差已定價 未算" in hb.candidate_states_text({**base, "priced_only": 0, "priced_only_unknown": 2})
     assert "只差已定價 1（1 未算）" in hb.candidate_states_text({**base, "priced_only": 1, "priced_only_unknown": 1})
     assert "只差已定價" not in hb.candidate_states_text({**base, "priced_wait": 0})                   # 0 檔不多印

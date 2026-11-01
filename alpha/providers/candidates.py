@@ -22,7 +22,7 @@ from ..candidates import (
     PRICED_IN_LINES, REWRITE_STATE_WORDS, SIDE_GROUPS, SIDE_LABELS, UNANSWERED, assemble_board, body_version, cap_label,
     cited_identities, edge_note, held_index, judgment_version, new_edge_reason, not_edge_pending_note,
     on_threshold_entries, priced_since, pulled_back,
-    pulled_back_reason, rewrite_words, rides_reason, rollup,
+    pulled_back_reason, rewrite_words, rides_reason, rollup, NO_REOPEN_REASON, reopen_met_reason, reopen_status,
     squash, stall_since, stall_version, three_words, unread_new_edges,
 )
 from ..edge import not_edge_confirmed
@@ -278,6 +278,9 @@ def derive_row(ticker: str, company_id: str | None, *, records: Sequence[Investo
         # 只差已定價（2026-11-01 使用者指示；failure log #123）：等回落列假設把已定價當脈絡改宣告可開，可開的前提逐項還缺什麼。
         # []＝前提都成立、只剩已定價這個價格判斷；None＝沒算（不是等回落、已持有、舊版敘事）。只呈現，不改分組
         "open_gaps": None,
+        # 等回落的重開條件（2026-11-01；failure log #124）：`reopen_status` 的現況（None＝不是等回落或沒寫）、沒寫重開條件
+        # （True／False；None＝不是等回落）、叫醒看哪一個（reopen｜pulled_back；None＝不是等回落）
+        "reopen": None, "reopen_missing": None, "wake_by": None,
         # 加碼條件（Phase 7 Step 7.0d）：每條與它的 watch 狀態；觸及只提醒，不是買進訊號、不改候選狀態
         "confirm": [], "confirm_summary": None,
         # 是不是新賭注（Phase 7 Step 7.0e）：和持有的 alpha 檔共用的需求錨與層——只呈現，不進任何狀態判斷
@@ -369,8 +372,19 @@ def derive_row(ticker: str, company_id: str | None, *, records: Sequence[Investo
     # ＝已回落：`rewrite[]` 多一條、進 ⑤「敘事該重寫」重問——只叫醒，不判定、不給動作、不排序、不改候選狀態。
     if cs.state == "priced_wait":
         row["pulled_back"] = pulled_back(row["priced_since"])
-        if row["pulled_back"]:
+        # 重開條件（2026-11-01 使用者「兩點都照你建議吧」＝Q1 換成；failure log #124）：寫了可比對的重開條件，叫醒只看它——
+        # 達成才進 rewrite[]，回落本身不再叫醒（10-31 四次回落叫醒、四次重寫、零次改變）。沒寫（舊紀錄）與「不適用：」照 #116
+        # 的回落叫醒；沒寫的另進一次「沒寫重開條件」讓 drain 補寫。只比對、不判定、不改候選狀態、不給動作。
+        row["reopen"] = reopen_status(cs.reopen, row["priced_since"])
+        row["reopen_missing"] = cs.reopen is None
+        row["wake_by"] = "reopen" if (row["reopen"] or {}).get("machine") else "pulled_back"
+        if row["wake_by"] == "reopen":
+            if row["reopen"]["met"] is True:
+                row["rewrite"].append(reopen_met_reason(row["reopen"]))
+        elif row["pulled_back"]:
             row["rewrite"].append(pulled_back_reason(row["priced_since"]))
+        if row["reopen_missing"]:
+            row["rewrite"].append(NO_REOPEN_REASON)
     row["rewrite_words"] = rewrite_words(row["rewrite"])
     if row["group"] == "held":
         return row
@@ -504,8 +518,13 @@ def _priced_since_row(ticker: str, records: Sequence[InvestorBrief], brief: Inve
                      else wcut)
             wait = {"day": wday.isoformat(), "then": wthen, "then_source": wsource,
                     "return": _return_between(bars, wbase, today)}
-    return priced_since(ticker, brief, judged, judgment_day=jday.isoformat(), then=then, then_source=source, now=now,
-                        return_since=_return_between(bars, base_day, today), wait=wait)
+    out = priced_since(ticker, brief, judged, judgment_day=jday.isoformat(), then=then, then_source=source, now=now,
+                       return_since=_return_between(bars, base_day, today), wait=wait)
+    if out is not None:
+        # 重開條件比的收盤（2026-11-01）：與「判斷日以來」同一條調整後收盤序列的最新一點；序列沒有就是 None（今天量不到）
+        last = _close_on_or_before(bars, today)
+        out["close_now"] = {"session_date": last[0].isoformat(), "close": last[1]} if last else None
+    return out
 
 
 def _until_reached(watch: Mapping[str, Any], today: date) -> bool:
@@ -536,9 +555,16 @@ def board_rewrite(rows: Sequence[Mapping[str, Any] | None], breaks: Sequence[Map
         out.extend({"kind": "rides", **who, **dict(ride)} for ride in (row or {}).get("rewrite_rides") or ())
         if (row or {}).get("rewrite_new_edges"):
             out.append({"kind": "new_edges", **who, "edges": [dict(e) for e in row["rewrite_new_edges"]]})
-        if (row or {}).get("pulled_back"):
-            # 等回落的價格叫醒（2026-10-30）：一檔一筆，只帶錨（最後一次宣告那天）——⑤ 讀這一種點名、drain 重問
+        if (row or {}).get("pulled_back") and (row or {}).get("wake_by", "pulled_back") != "reopen":
+            # 等回落的價格叫醒（2026-10-30）：一檔一筆，只帶錨（最後一次宣告那天）——⑤ 讀這一種點名、drain 重問。
+            # 2026-11-01 起寫了可比對重開條件的列不再因回落叫醒（使用者照推薦：換成重開條件）
             out.append({"kind": "pulled_back", **who, "judgment_day": (row.get("priced_since") or {}).get("judgment_day")})
+        if ((row or {}).get("reopen") or {}).get("met") is True:
+            # 重開條件達成（2026-11-01；failure log #124）：一檔一筆，只帶條件本身——⑤ 點名、drain 重問已定價
+            out.append({"kind": "reopen_met", **who, "condition": reopen_met_reason(row["reopen"])})
+        if (row or {}).get("reopen_missing") is True:
+            # 沒寫重開條件（舊紀錄）：一檔一筆——⑤ 點名、drain 補寫一版
+            out.append({"kind": "no_reopen", **who})
         for wid in (row or {}).get("rewrite_watch_ids") or ():
             carried.add(str(wid))
             state = narrative_rewrite_state(by_id.get(str(wid)) or {})

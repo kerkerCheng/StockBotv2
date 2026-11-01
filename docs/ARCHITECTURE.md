@@ -706,7 +706,13 @@ alpha／beta 界線用 `risk/hard_caps.py` 匯出的 `beta_instrument_for`／`is
 前提失效」，L12），另加它不查的兩項：沒押讀圖（`OPEN_GAP_NO_RIDES`）、邊緣不是「邊緣」（無法量照抄 `edge_note`，今天判非邊緣 `OPEN_GAP_NOT_EDGE`）；
 `[]`＝只差已定價這個價格判斷、None＝沒算（不是等回落、已持有、舊版）。只呈現：不改分組、不進 `rewrite[]`、不叫醒，可開為零就零；
 計數 `counts.priced_wait_priced_only`／`_unknown`（`alpha.candidates.priced_only_counts` 一份），心跳狀態塊與短版 ④ 等回落行、
-首頁卡片晶片（`_card_overview.priced_only`，產生端給布林）、個股頁候選行照印。⚠ 它不認證深挖清單（`depth_check` 只印不存）。每一列（不論宣告哪一態）另帶 `rewrite[]`：連結斷了（附為什麼斷——來源收掉／被判觸及／
+首頁卡片晶片（`_card_overview.priced_only`，產生端給布林）、個股頁候選行照印。⚠ 它不認證深挖清單（`depth_check` 只印不存）。
+**等回落的重開條件**（2026-11-01 使用者「兩點都照你建議吧」；failure log #124；candidates/5）：等回落列帶 `reopen`（`alpha.candidates.reopen_status`：
+敘事寫的價位／自家三年百分位 vs 今天——收盤取「判斷日以來」同一條調整後收盤序列的最新一點 `priced_since.close_now`；任一達成＝met，
+量不到又沒有別的達成＝None，不是沒達成）、`reopen_missing`、`wake_by`。寫了可比對條件的列**叫醒只看它**（達成才進 `rewrite[]` 與
+清單 `kind=reopen_met`，回落本身不再叫醒、不出 `kind=pulled_back`、不算進已回落）；沒寫的舊紀錄照 #116 回落叫醒，另進一次
+`kind=no_reopen`（⑤ 點名、drain 補寫一版）；「不適用：」照 #116。叫醒理由只寫條件本身、不帶今天的數字（`rewrite[]` 進認知指紋）。
+加上或改重開條件算改判（判斷鍵含整個 `candidate_state`），滯留與正文版不動。每一列（不論宣告哪一態）另帶 `rewrite[]`：連結斷了（附為什麼斷——來源收掉／被判觸及／
 到期未判，L12）、敘事來源 watch 醒來／觸及／到期未判（plan §5 第 6 點）、缺 X／等回落在等的 watch 已失效。「連結斷了」的唯一判定是
 `engine_b/narrative_watches.py::link_breaks`，佇列段 `narrative_rewrite`（經 `observe(narrative_link_breaks=…)` 注入）、audit
 （QueueSegments、QueueLiveness 的兩週滯留）、心跳段 3 共用；audit 的 rewrite 類「有去處」另查候選板該檔列帶著那筆 watch
@@ -815,9 +821,11 @@ AnalystView.brief（optional）→ APP 首屏 briefCard；六張卡收進「為�
   不改 `record_version`、不改 id 欄位集合——既有紀錄逐位相同。
 - 結構化欄位（全部進 v2 的 id 欄位集合；v1 的集合一個字不動）：`rides[]`（騎的讀圖）、`disproof[]`（寫入即登記成 `brief:<id>#n` 語意 watch；
   已在盯的只以來源鍵 `link_source_ref` 連結）、`answers`（已定價嗎／出現在數字裡了嗎：yes／no／unmeasurable）、`candidate_state`
-  （open／missing／priced_wait／pass；**held 不收**，由 Sheet 推導）、`history_not_comparable`、`acknowledged_touched[]`。
+  （open／missing／priced_wait／pass；**held 不收**，由 Sheet 推導；等回落另帶 `reopen`＝重開條件 {text, price_at_or_below,
+  own_pctile_at_or_below}，2026-11-01，沒寫不進 payload、舊紀錄 id 不變、數字一律寫成 float）、`history_not_comparable`、`acknowledged_touched[]`。
 - **寫入當下才成立的檢查只放寫入端**（`alpha/providers/briefs.py::v2_write_problems`）：讀圖現行（current／stale_low）、本公司在讀圖快照供給側、
-  answers 與稽核行一致、缺 X／等回落指向本公司 active 的 `wake_brief` watch、可開三前提、該重寫的 watch 逐條處置、
+  answers 與稽核行一致、缺 X／等回落指向本公司 active 的 `wake_brief` watch、**新寫的等回落必帶重開條件**（至少一個可機械比對的值，
+  或 text 以「不適用：」開頭；只改字面值的 `restates` 不擋；2026-11-01 failure log #124）、可開三前提、該重寫的 watch 逐條處置、
   **重押讀圖時格層 `evidence_refs` 不得指向同一節點同一單位已被取代的讀圖**（Phase 7 Step 7.0c；只拒收並列出該換成哪個 id，不自動改寫）。
   放在 parse 路徑，舊紀錄日後會解析失敗、從候選板安靜消失。
 - **敘事來源的等待**：`wake_brief=<co:*>`（缺 X／等回落在等的事）與 `brief:` 語意 watch 醒來、觸及、到期都進佇列段 `narrative_rewrite`

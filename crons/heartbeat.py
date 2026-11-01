@@ -888,7 +888,7 @@ def candidate_counts(board: Mapping[str, Any]) -> dict[str, Any]:
                not_edge_pending=counts.get("not_edge_pending"), on_threshold=counts.get("on_threshold"))
     # 等回落的價格叫醒與缺 X 三分法（2026-10-30）：讀列重算（算法在 `alpha.candidates`，與 assemble_board 同一份）——
     # 舊 artifact 的列沒有這兩個鍵，照實印「沒算」「未算」，不壓成 0
-    from alpha.candidates import missing_request_counts, priced_only_counts, pullback_counts
+    from alpha.candidates import missing_request_counts, priced_only_counts, pullback_counts, reopen_counts
 
     groups = board.get("groups") or {}
     wait_rows = [r for r in groups.get("priced_wait") or () if isinstance(r, Mapping)]
@@ -896,9 +896,11 @@ def candidate_counts(board: Mapping[str, Any]) -> dict[str, Any]:
     mr = missing_request_counts([r for r in groups.get("missing") or () if isinstance(r, Mapping)])
     # 只差已定價（2026-11-01；failure log #123）：同一份算法；舊 artifact 的列沒有 open_gaps → 印「未算」，不壓成 0
     po = priced_only_counts(wait_rows)
+    # 重開條件（2026-11-01；failure log #124）：同一份算法；舊 artifact 沒有這幾格 → reopen_not_computed，印「未算」
+    ro = reopen_counts(wait_rows)
     out.update(pulled_back=pb["pulled_back"], pull_unknown=pb["unknown"], missing_asked=mr["asked"],
                missing_fetchable_unasked=mr["fetchable_unasked"], missing_unclassified=mr["unclassified"],
-               priced_only=po["priced_only"], priced_only_unknown=po["priced_only_unknown"])
+               priced_only=po["priced_only"], priced_only_unknown=po["priced_only_unknown"], **ro)
     return out
 
 
@@ -928,6 +930,15 @@ def candidate_states_text(c: Mapping[str, Any]) -> str:
         bits = ([f"最老 {d} 天"] if d is not None else []) + [f"已回落 {c.get('pulled_back', 0)}"]
         if c.get("pull_unknown"):
             bits.append(f"沒算 {c['pull_unknown']}")
+        # 重開條件（2026-11-01；failure log #124）：達成的檔數 0 也印（同已回落）；沒寫的、量不到的不是 0 才印；沒算照實印
+        if "reopen_met" not in c or int(c.get("reopen_not_computed") or 0) >= n:
+            bits.append("重開達成 未算")
+        else:
+            bits.append(f"重開達成 {c.get('reopen_met', 0)}")
+            if c.get("no_reopen"):
+                bits.append(f"沒寫重開 {c['no_reopen']}")
+            if c.get("reopen_unknown"):
+                bits.append(f"重開量不到 {c['reopen_unknown']}")
         # 只差已定價（2026-11-01；failure log #123）：可開前提都成立、只剩價格判斷的檔數——沒算的照實印，不壓成 0
         unknown = int(c.get("priced_only_unknown") or 0)
         if "priced_only" not in c or unknown >= n:
@@ -1058,6 +1069,17 @@ def _pctile(value: Any) -> str:
     return "量不到" if value is None else str(int(float(value) + 0.5))
 
 
+def _wake_mark(row: Mapping[str, Any]) -> str:
+    """短版等回落行的叫醒標記（2026-11-01；failure log #124）：寫了可比對重開條件的印條件與距離（達成就加粗），
+    回落不再叫醒、也不再印「已回落」；沒寫的照 #116 印已回落，另標「沒寫重開條件」。字由候選板組好（`reopen.line`），這裡照抄。"""
+    reopen = row.get("reopen") if isinstance(row.get("reopen"), Mapping) else None
+    if reopen and reopen.get("machine"):
+        mark = "｜**重開條件達成**" if reopen.get("met") is True else f"｜{reopen.get('line')}"
+    else:
+        mark = "｜**已回落**" if row.get("pulled_back") else ""
+    return mark + ("｜沒寫重開條件" if row.get("reopen_missing") is True else "")
+
+
 def priced_wait_short_lines(state_dir: Path | None, *, today: date,
                             label: Callable[[Mapping[str, Any]], str] | None = None) -> list[str]:
     """Discord 短版 ④ 的「等回落」小塊：一檔一行「名字：等幾天｜百分位 起點→今天｜股價 起點以來｜重看日」＋一行小字圖例。
@@ -1095,7 +1117,7 @@ def priced_wait_short_lines(state_dir: Path | None, *, today: date,
         text = (f"- {name}：等 {row.get('stall_days', '?')} 天｜百分位 {_pctile((start or {}).get('value'))}"
                 f"→{_pctile((info.get('now') or {}).get('value'))}"
                 f"｜股價 {_signed(ret) if ret is not None else '量不到'}"
-                + ("｜**已回落**" if row.get("pulled_back") else "")
+                + _wake_mark(row)
                 + ("｜**只差已定價**" if row.get("open_gaps") == [] else "") + f"｜{when}")
         rows.append((due or date.max, text, (info.get("now") or {}).get("as_of"), name))
     rows.sort(key=lambda r: r[0])
@@ -1107,8 +1129,10 @@ def priced_wait_short_lines(state_dir: Path | None, *, today: date,
                      for r in wait)
     legend = ("-# 百分位＝自家三年估值位置，越低越便宜；股價＝等回落起點以來（調整後收盤）；沒有門檻，到重看日由你重判"
               + (f"｜{close_text}" if close_text else "") + ("｜起點的值有回算的" if recomputed else "")
-              + ("｜已回落＝收盤低於最後一次宣告已定價那天（叫醒重問，不是動作）" if any(r.get("pulled_back") for r in wait)
-                 else "")
+              + ("｜已回落＝收盤低於最後一次宣告已定價那天（叫醒重問，不是動作）"
+                 if any(r.get("pulled_back") and r.get("wake_by", "pulled_back") != "reopen" for r in wait) else "")
+              + ("｜重開＝敘事寫的「到哪裡就重開」，達成只叫醒重問、不改狀態"
+                 if any(isinstance(r.get("reopen"), Mapping) and r["reopen"].get("machine") for r in wait) else "")
               + ("｜只差已定價＝可開的四個機械前提都成立，剩下的是價格判斷，由你來下（只是標記，不是動作）"
                  if any(r.get("open_gaps") == [] for r in wait) else ""))
     return [f"**等回落 {len(wait)} 檔**", *(r[1] for r in rows), legend]

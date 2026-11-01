@@ -88,7 +88,10 @@ STATE_SCHEMA_VERSIONS: dict[str, str] = {
     # `not_edge_pending`、`on_threshold`，板多 `on_threshold[]`、`on_threshold_band`。
     # /4（2026-11-01 只差已定價；failure log #123）：等回落列多 `open_gaps`（假設改宣告可開時前提逐項的失效理由，
     # 空＝只差已定價），counts 多 `priced_wait_priced_only`、`priced_wait_priced_only_unknown`。
-    "candidates": "stockbot-app/candidates/4",
+    # /5（2026-11-01 等回落的重開條件；failure log #124）：等回落列多 `reopen`（現況與一句 line）、`reopen_missing`、
+    # `wake_by`（reopen｜pulled_back）；counts 多 `priced_wait_reopen_met`／`_reopen_unknown`／`_no_reopen`／
+    # `_reopen_not_computed`；清單多 `kind=reopen_met`、`kind=no_reopen`；寫了可比對重開條件的列不再出 `kind=pulled_back`。
+    "candidates": "stockbot-app/candidates/5",
     # 2026-10-07（個股頁 plan S4b）：層說明的純文字閱讀頁——ledger 全文、出處與文件自宣告、每條主張的 watch 狀態、
     # 哪幾頁連過來 → 9。不做版面與示意圖（S5）。
     "layer_notes": "stockbot-app/layer_notes/1",

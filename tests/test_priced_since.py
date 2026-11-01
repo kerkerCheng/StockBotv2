@@ -41,14 +41,20 @@ def _slots(priced=PRICED, bottleneck="三家供應、產能同時補不上。") 
             "when": {"text": "{next_checkpoint_date} 財報。", "evidence_refs": ev}}
 
 
+REOPEN = {"text": "回到 70 以下或自家三年百分位 70 以下就重開：那是 Q2 營收跳升前的估值", "price_at_or_below": 70.0,
+          "own_pctile_at_or_below": 70.0}
+
+
 def _rec(*, at: datetime, state="priced_wait", watch_id="ew_wait", reason="寫入時第 88 百分位", priced=PRICED,
-         answers=None, supersedes=None, evidence="graph://x", priced_at_write=None, bottleneck=None) -> dict:
+         answers=None, supersedes=None, evidence="graph://x", priced_at_write=None, bottleneck=None,
+         reopen=None) -> dict:
     slots = _slots(priced=priced, **({"bottleneck": bottleneck} if bottleneck else {}))
     slots["demand"]["evidence_refs"] = [evidence]
     rec = brief_record(company_id=CO, ticker=T, slots=slots, record_version=RECORD_VERSION_V2,
                        rides=[{"node": "tech:x", "unit": "layer", "reading_id": READ}],
                        answers=answers or {"priced_in": "yes", "in_numbers": "yes"},
-                       candidate_state={"state": state, "watch_id": watch_id, "reason": reason},
+                       candidate_state={"state": state, "watch_id": watch_id, "reason": reason,
+                                        **({"reopen": reopen} if reopen else {})},
                        supersedes_id=supersedes, created_at=at)
     if priced_at_write is not None:
         rec["priced_at_write"] = priced_at_write
@@ -176,7 +182,8 @@ def _ctx(own=88.0):
 
 
 def _fresh(watch_id, **kw) -> dict:
-    return _rec(at=datetime.now(timezone.utc), watch_id=watch_id, **kw)
+    # 新寫入：2026-11-01 起等回落必帶重開條件（failure log #124），寫入端才不會先在這一格拒收
+    return _rec(at=datetime.now(timezone.utc), watch_id=watch_id, **{"reopen": REOPEN, **kw})
 
 
 def test_the_writer_records_the_percentile_it_saw_and_it_does_not_change_the_id(tmp_path: Path) -> None:
@@ -274,8 +281,9 @@ def test_the_heartbeat_prints_zero_and_each_wait_row_and_the_short_line_keeps_da
     assert short[0] == "**等回落 1 檔**"
     # 2026-10-30：10-20 收 77.85 低於最後宣告（10-15）那天的 90 → 標「已回落」（叫醒重問，不是動作）
     # 2026-11-01（failure log #123）：押量的讀圖現行、沒有待處置反證、邊緣——可開前提都成立，多標「只差已定價」
-    assert short[1] == (f"- AXTI：等 {row['stall_days']} 天｜百分位 87→88｜股價 −22.2%｜**已回落**｜**只差已定價**"
-                        "｜⚠ 沒有重看日（接不上的等待）")
+    # 2026-11-01（failure log #124）：這條鏈是舊紀錄、沒寫重開條件——照 #116 印已回落，另標「沒寫重開條件」
+    assert short[1] == (f"- AXTI：等 {row['stall_days']} 天｜百分位 87→88｜股價 −22.2%｜**已回落**｜沒寫重開條件"
+                        "｜**只差已定價**｜⚠ 沒有重看日（接不上的等待）")
     assert short[-1].startswith("-# 百分位＝自家三年估值位置") and "收盤日 10-20" in short[-1]
     assert "起點的值有回算的" in short[-1]
     for word in ("該", "燈", "買", "賣"):

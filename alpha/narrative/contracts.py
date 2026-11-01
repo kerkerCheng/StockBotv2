@@ -29,6 +29,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 import re
 from dataclasses import dataclass, field
 from datetime import date, datetime, timezone
@@ -430,6 +431,8 @@ class CandidateState:
     reason: str | None = None
     #: 缺 X 的三分（`MISSING_KINDS`，2026-10-30）：只有 state=missing 能帶；None＝未分（舊敘事沒寫，重寫時補）
     missing_kind: str | None = None
+    #: 等回落的重開條件（`Reopen`，2026-11-01）：只有 state=priced_wait 能帶；None＝沒寫（舊紀錄照讀，新寫的由寫入端擋）
+    reopen: "Reopen | None" = None
 
     def __post_init__(self) -> None:
         if self.state == "held":
@@ -445,12 +448,58 @@ class CandidateState:
                 raise ContractViolation(f"missing_kind 只有 candidate_state=missing 能帶（收到 state={self.state!r}）")
             if self.missing_kind not in MISSING_KINDS:
                 raise ContractViolation(f"missing_kind 必須是 {MISSING_KINDS} 之一（收到 {self.missing_kind!r}）")
+        if self.reopen is not None and self.state != "priced_wait":
+            raise ContractViolation(f"reopen 只有 candidate_state=priced_wait 能帶（收到 state={self.state!r}）")
 
     def as_dict(self) -> dict[str, Any]:
         out: dict[str, Any] = {"state": self.state, "watch_id": self.watch_id, "reason": self.reason}
         if self.missing_kind is not None:        # 沒寫就不進 payload——舊紀錄的 brief_id 是從這個 dict 算出來的，不能變
             out["missing_kind"] = self.missing_kind
+        if self.reopen is not None:              # 同上：沒寫就不進 payload
+            out["reopen"] = self.reopen.as_dict()
         return out
+
+
+#: 重開條件「兩個值都寫不出來」時 text 的開頭（寫理由）。
+REOPEN_NOT_APPLICABLE_PREFIX = "不適用："
+
+
+@dataclass(frozen=True, slots=True)
+class Reopen:
+    """等回落的重開條件（2026-11-01 使用者「兩點都照你建議吧」；failure log #124；plan 2026-11-01-002 P1）。
+
+    寫敘事的人宣告「股價或自家三年百分位到哪裡就重開」——**每份敘事自己寫的判斷**（同反證條件），不是系統門檻
+    （AGENTS「已定價不設門檻」照舊：系統沒有一個全體適用的數字）。達成只叫醒重問，不改候選狀態、不給動作。
+    `price_at_or_below`：研究代號報價單位的收盤價（和候選板的收盤序列同一條，調整後收盤；分割後要換版）；
+    `own_pctile_at_or_below`：三題稽核區那一條自家三年百分位（0–100）。兩個都寫不出來時 text 以「不適用：」開頭寫理由。"""
+    text: str
+    price_at_or_below: float | None = None
+    own_pctile_at_or_below: float | None = None
+
+    def __post_init__(self) -> None:
+        if not str(self.text or "").strip():
+            raise ContractViolation("reopen.text 必須寫一句話：到哪裡就重開、為什麼是這個數")
+        for key in ("price_at_or_below", "own_pctile_at_or_below"):
+            value = getattr(self, key)
+            if value is not None and (isinstance(value, bool) or not isinstance(value, (int, float))
+                                      or not math.isfinite(value) or value <= 0):
+                raise ContractViolation(f"reopen.{key} 必須是正數或 null（收到 {value!r}）")
+        if self.own_pctile_at_or_below is not None and self.own_pctile_at_or_below > 100:
+            raise ContractViolation("reopen.own_pctile_at_or_below 是自家三年百分位（0–100）")
+        if not self.machine_checkable and not str(self.text).strip().startswith(REOPEN_NOT_APPLICABLE_PREFIX):
+            raise ContractViolation("reopen 至少要一個可機械比對的值（price_at_or_below／own_pctile_at_or_below）；"
+                                    f"兩個都寫不出來時 text 以「{REOPEN_NOT_APPLICABLE_PREFIX}」開頭寫理由")
+
+    @property
+    def machine_checkable(self) -> bool:
+        return self.price_at_or_below is not None or self.own_pctile_at_or_below is not None
+
+    def as_dict(self) -> dict[str, Any]:
+        # 數字一律寫成 float：70 與 70.0 是同一個條件，不能因為寫法不同算出兩個 brief_id
+        return {"text": self.text,
+                "price_at_or_below": None if self.price_at_or_below is None else float(self.price_at_or_below),
+                "own_pctile_at_or_below": (None if self.own_pctile_at_or_below is None
+                                           else float(self.own_pctile_at_or_below))}
 
 
 @dataclass(frozen=True, slots=True)
@@ -826,7 +875,8 @@ def _parse_v2_fields(raw: Mapping[str, Any]) -> dict[str, Any]:
     cs = raw.get("candidate_state")
     candidate = (CandidateState(state=str(cs.get("state") or ""), watch_id=(str(cs["watch_id"]) if cs.get("watch_id") else None),
                                 reason=(str(cs["reason"]) if cs.get("reason") else None),
-                                missing_kind=(str(cs["missing_kind"]) if cs.get("missing_kind") else None))
+                                missing_kind=(str(cs["missing_kind"]) if cs.get("missing_kind") else None),
+                                reopen=_reopen(cs.get("reopen")))
                  if isinstance(cs, Mapping) else None)
     hnc = raw.get("history_not_comparable")
     history = (HistoryNotComparable(since=_iso_day(hnc.get("since"), "history_not_comparable.since"),
@@ -856,6 +906,19 @@ def _parse_v2_fields(raw: Mapping[str, Any]) -> dict[str, Any]:
             "priced_at_write": priced}
 
 
+def _reopen(raw: Any) -> Reopen | None:
+    """`candidate_state.reopen` 的解析：沒寫＝None；寫了就必須是物件（數字照收 int／float，其餘交給 `Reopen` 擋）。"""
+    if raw is None:
+        return None
+    if not isinstance(raw, Mapping):
+        raise ContractViolation("candidate_state.reopen 必須是物件 {text, price_at_or_below, own_pctile_at_or_below}")
+    extra = set(raw) - {"text", "price_at_or_below", "own_pctile_at_or_below"}
+    if extra:
+        raise ContractViolation(f"candidate_state.reopen 不認得的鍵：{sorted(extra)}")
+    return Reopen(text=str(raw.get("text") or ""), price_at_or_below=raw.get("price_at_or_below"),
+                  own_pctile_at_or_below=raw.get("own_pctile_at_or_below"))
+
+
 def select_brief(records: Sequence[InvestorBrief], *, as_of: date | None, today: date) -> InvestorBrief | None:
     """as-of 視角下生效的那一份：`created_at <= T`、最新者勝出、最新若是撤回就沒有。"""
     cutoff = as_of or today
@@ -870,6 +933,7 @@ __all__ = [
     "RAW_EXCERPT_PREFIX",
     "ACK_DISPOSITIONS", "ANSWER_KEYS", "ANSWER_VALUES", "Acknowledgement", "Answers", "BRIEF_FRAME_V2",
     "BRIEF_SLOTS_V2", "CANDIDATE_STATES", "CANDIDATE_STATES_DECLARABLE", "CandidateState", "HistoryNotComparable",
+    "REOPEN_NOT_APPLICABLE_PREFIX", "Reopen",
     "NarrativeConfirm", "NarrativeDisproof", "PLACEHOLDERS_V2", "PRICED_DATE_MARK", "PRICED_POSITION_WORDS",
     "PricedSnapshot", "RECORD_VERSION_V1", "RECORD_VERSION_V2", "RECORD_VERSIONS", "undated_position_claims",
     "LAMP_COLOUR_CLAIM", "PRICE_QUOTE_CLAIM", "lamp_colour_claims", "price_quote_claims",

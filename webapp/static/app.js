@@ -1439,6 +1439,14 @@ function candidateLine(view, inQuestions) {
         ? el('div', 'row-reason dim', '不看已定價的話，可開還缺：' + row.open_gaps.join('；'))
         : el('div', 'row-reason', '只差已定價：可開的四個機械前提都成立，剩下的是價格判斷，由你來下（只是標記，不是動作）'));
     }
+    // 等回落的重開條件（2026-11-01；failure log #124）：敘事寫的「到哪裡就重開」與今天的距離（產生端組好的字，照印）
+    if (row.reopen && row.reopen.line) {
+      node.appendChild(el('div', 'row-reason', (row.reopen.met === true ? '重開條件達成——' : '') + row.reopen.line));
+      if (row.reopen.text) node.appendChild(el('div', 'row-reason dim', '為什麼是這個數：' + row.reopen.text));
+    }
+    if (row.reopen_missing === true) {
+      node.appendChild(el('div', 'row-reason dim', '這份等回落還沒寫重開條件，下一次重寫會補上'));
+    }
     // 敘事該重寫：一行、每個原因兩到四個字（`alpha.candidates.rewrite_words`；2026-10-29 使用者：「該重寫為啥沒寫…一目了然」）；
     // 原句放 title。舊 artifact 沒帶 `rewrite_words` 就照舊逐句印。
     if ((row.rewrite_words || []).length) {

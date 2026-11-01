@@ -22,6 +22,8 @@ _ROW = {"ticker": "AXTI", "company_id": "co:axt", "brief_id": "ib_x", "record_ve
         "pulled_back": False, "missing_kind": None, "document_requests": [],
         # 只差已定價（2026-11-01；candidates/4）：邊緣、押量的讀圖現行、沒有待處置反證——假設改宣告可開，前提都成立
         "open_gaps": [],
+        # 重開條件（2026-11-01；candidates/5）：舊紀錄沒寫——照回落叫醒、另進一次「沒寫重開條件」
+        "reopen": None, "reopen_missing": True, "wake_by": "pulled_back",
         "three_words": {"will_it_die": "黃（灰 1）", "priced_in": "是", "in_numbers": "是"}, "note": None}
 
 

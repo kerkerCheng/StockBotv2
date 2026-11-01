@@ -37,11 +37,12 @@ def _slots() -> dict:
 
 
 def _brief(*, state="open", watch_id=None, reason=None, days_ago=0, supersedes=None, disproof=(),
-           answers=None, ticker=T, company=CO, retracted=False):
+           answers=None, ticker=T, company=CO, retracted=False, reopen=None):
     rec = brief_record(company_id=company, ticker=ticker, slots=_slots(), record_version=RECORD_VERSION_V2,
                        rides=[{"node": "tech:x", "unit": "layer", "reading_id": READ}], disproof=list(disproof),
                        answers=answers or {"priced_in": "yes", "in_numbers": "yes"},
-                       candidate_state={"state": state, "watch_id": watch_id, "reason": reason},
+                       candidate_state={"state": state, "watch_id": watch_id, "reason": reason,
+                                        **({"reopen": reopen} if reopen else {})},
                        supersedes_id=supersedes, retracted=retracted,
                        created_at=datetime(2026, 9, 29, 3, tzinfo=timezone.utc) - timedelta(days=days_ago))
     return parse_brief_record(rec)
@@ -254,7 +255,9 @@ def test_the_narratives_own_touched_disproof_breaks_open_and_is_carried_on_every
     assert row["side"] == "precondition_failed" and any("待處置" in p for p in row["preconditions"])
     assert row["rewrite"] == ["敘事該重寫：ew_9 觸及"] and row["rewrite_watch_ids"] == ["ew_9"]
     assert row["rewrite_words"] == ["條件觸及"]          # 卡片與個股頁那一行的幾個字（2026-10-29）
-    for state, extra in (("priced_wait", {"watch_id": "ew_1"}), ("pass", {"reason": "貴"})):
+    # 等回落帶重開條件＝現行格式（2026-11-01 起新寫的必帶）；沒帶的舊紀錄另多一條「沒寫重開條件」，由 test_reopen 守
+    reopen = {"text": "回到 50 以下就重開", "price_at_or_below": 50.0}
+    for state, extra in (("priced_wait", {"watch_id": "ew_1", "reopen": reopen}), ("pass", {"reason": "貴"})):
         other = _brief(state=state, disproof=[SELF], **extra)
         fired = {**touched, "status": "fired", "judgment": None, "source_ref": f"brief:{other.brief_id}#1"}
         w = [fired, _active("ew_1", kind="date", until="2026-11-13", wake_brief=CO)]

@@ -321,7 +321,7 @@ def test_retired_panels_declare_an_absence_instead_of_disappearing(tmp_path: Pat
     StateArtifactStore(state_dir).write(fake_candidates_payload())
     changes = "\n".join(hb.build_changes(now=now, state_dir=state_dir, thesis_path=tmp_path / "nope.json").lines)
     positions = "\n".join(hb.build_positions(state_dir=state_dir).lines)
-    assert "候選：可開 0｜缺 X 0｜等回落 1（最老 0 天｜已回落 0｜只差已定價 1）｜不要 0｜已持有 0" in changes, changes
+    assert "候選：可開 0｜缺 X 0｜等回落 1（最老 0 天｜已回落 0｜重開達成 0｜沒寫重開 1｜只差已定價 1）｜不要 0｜已持有 0" in changes, changes
     # 2026-10-22：「無敘事」拆開——沒有邊緣判定的兩列算「量不到卻沒敘事」（待做，⑤ 也有），不是非倍率
     assert "量不到卻沒敘事 2" in changes and "持股解析不到 1（使用者決定不研究 0）：7803.T" in changes
     assert "三題（3 檔）：已定價① 有值 1／缺席 2" in changes and "不是結論" in changes

@@ -286,6 +286,12 @@ def v2_write_problems(parsed: InvestorBrief, *, ctx: WriteContext, existing: Seq
                             "（thesis／讀圖的語意 watch、別家的、或前一版 brief: 的都不行）")
         elif w.get("kind") not in ew.WAKE_BRIEF_KINDS:
             problems.append(f"candidate_state：watch {cs.watch_id} 的 kind {w.get('kind')} 不在 {sorted(ew.WAKE_BRIEF_KINDS)}")
+    # ④b 等回落的重開條件（2026-11-01 使用者「兩點都照你建議吧」；failure log #124；plan 2026-11-01-002 P1）：新寫的等回落
+    #    必須寫「到哪裡就重開」——沒有出口的等待會一直等下去。只改字面值的重述（restates）沿用被重述那一版的判斷，不擋。
+    if cs is not None and cs.state == "priced_wait" and cs.reopen is None and parsed.restates is None:
+        problems.append("candidate_state：等回落要寫重開條件 reopen——一句話 text＋price_at_or_below 或 "
+                        "own_pctile_at_or_below（兩個都寫不出來時 text 以「不適用：」開頭寫理由）；"
+                        "達成只叫醒重問，不改狀態（failure log #124）")
 
     # ⑤ 該重寫的 watch 逐條處置（不論是否帶 supersedes_id、不論前一筆是否撤回）
     pending = {str(w.get("watch_id")) for w in pending_rewrite(company, watches=watches, brief_ids=brief_ids)}
@@ -348,11 +354,13 @@ def v2_write_problems(parsed: InvestorBrief, *, ctx: WriteContext, existing: Seq
 
 def restates_problems(parsed: InvestorBrief, existing: Sequence[InvestorBrief]) -> list[str]:
     """⑪：`restates` 指的那一版必須是這一版 supersedes 鏈上的祖先，之後沒有撤回；它與它之後到這一版之間的每一版，
-    候選狀態（state／watch／missing_kind）、answers、歷史不可比宣告都與這一版相同——結構化的判斷一個都沒變才算
-    只改字面值（文字是不是只改字面值，由寫的人負責；`note` 寫明改了什麼）。回問題清單。"""
+    候選狀態（state／watch／missing_kind／重開條件）、answers、歷史不可比宣告都與這一版相同——結構化的判斷一個都沒變才算
+    只改字面值（文字是不是只改字面值，由寫的人負責；`note` 寫明改了什麼）。回問題清單。
+    重開條件（2026-11-01）進判斷鍵：改它就是改判，不能包裝成只改字面值（L12）。"""
     def judged(b: InvestorBrief) -> tuple[Any, ...]:
         cs = b.candidate_state
-        return ((cs.state, cs.watch_id, cs.missing_kind) if cs is not None else None,
+        return ((cs.state, cs.watch_id, cs.missing_kind, cs.reopen.as_dict() if cs.reopen is not None else None)
+                if cs is not None else None,
                 b.answers.as_dict() if b.answers is not None else None,
                 b.history_not_comparable.as_dict() if b.history_not_comparable is not None else None)
 

@@ -59,10 +59,15 @@ NEW_EDGES_PREFIX = "圖上有新邊、敘事沒讀過"
 #: 已定價那天）：收盤低於那天的收盤＝「已回落」，`rewrite[]` 多這一條、進 ⑤「敘事該重寫」重問——只叫醒，不判定、不給動作、
 #: 不排序、不改候選狀態。
 PULLED_BACK_PREFIX = "已回落"
+#: 等回落的重開條件（2026-11-01 使用者「兩點都照你建議吧」；failure log #124；plan 2026-11-01-002 P1）：寫了可比對的重開條件，
+#: 叫醒就只看它——達成才進 `rewrite[]`（取代上面的已回落叫醒）；沒寫的舊紀錄進一次「沒寫重開條件」，讓 drain 補寫。
+REOPEN_MET_PREFIX = "重開條件達成"
+NO_REOPEN_PREFIX = "等回落沒寫重開條件"
 #: 候選列 `rewrite[]` 每一條 → 首頁卡片與個股頁那一行的幾個字（2026-10-29 使用者：「該重寫為啥沒寫…可以五字一目瞭然嗎」）。
 #: 依序比對、先中先贏；原句（含 watch 編號）照舊留在 `rewrite[]`，這裡只分類、不改判斷；認不得的歸「其他」，不丟（INV-3）。
 REWRITE_WHY: tuple[tuple[str, str], ...] = (
     (RIDES_SUPERSEDED_PREFIX, "騎舊讀圖"), (NEW_EDGES_PREFIX, "新邊沒讀"), (PULLED_BACK_PREFIX, "已回落"),
+    (REOPEN_MET_PREFIX, "重開達成"), (NO_REOPEN_PREFIX, "沒寫重開"),
     ("連結 ", "連結斷了"), ("觸及", "條件觸及"), ("醒來", "條件醒了"), ("到期", "到期了"), ("已到", "重看日到了"),
     ("不存在", "等待不見了"), ("在等的 watch 已", "等待結束了"),
 )
@@ -502,10 +507,77 @@ def pulled_back_reason(info: Mapping[str, Any]) -> str:
 
 
 def pullback_counts(wait_rows: Iterable[Mapping[str, Any]]) -> dict[str, int]:
-    """等回落那一組的常駐計數：已回落幾檔、沒算幾檔（舊 artifact 的列沒有這個鍵也算沒算）。"""
-    rows = list(wait_rows)
+    """等回落那一組的常駐計數：已回落幾檔、沒算幾檔（舊 artifact 的列沒有這個鍵也算沒算）。
+    2026-11-01 起只數**回落仍是叫醒條件**的列（`wake_by` 不是 reopen）：寫了可比對重開條件的列由 `reopen_counts` 數，
+    同一檔不在兩格各算一次（舊 artifact 沒有 `wake_by`＝照舊算回落）。"""
+    rows = [r for r in wait_rows if r.get("wake_by", "pulled_back") != "reopen"]
     return {"pulled_back": sum(1 for r in rows if r.get("pulled_back") is True),
             "unknown": sum(1 for r in rows if r.get("pulled_back") is None)}
+
+
+def _num(value: float) -> str:
+    """條件裡的數字：不帶多餘的零、不用科學記號（韓元股價七位數）。"""
+    return f"{float(value):.4f}".rstrip("0").rstrip(".")
+
+
+def _reopen_terms(spec: Mapping[str, Any]) -> list[str]:
+    terms = []
+    if spec.get("price_at_or_below") is not None:
+        terms.append(f"收盤 ≤ {_num(spec['price_at_or_below'])}")
+    if spec.get("own_pctile_at_or_below") is not None:
+        terms.append(f"自家三年百分位 ≤ {_num(spec['own_pctile_at_or_below'])}")
+    return terms
+
+
+def reopen_status(reopen: Any, info: Mapping[str, Any] | None) -> dict[str, Any] | None:
+    """等回落列的重開條件現況——**只比對、不判定**（failure log #124）：寫的人宣告的價位／自家百分位 vs 今天。
+
+    `reopen`：`alpha.narrative.contracts.Reopen` 或 None（沒寫，回 None）。`info`：同一列的 `priced_since`
+    （`now`＝今天的自家三年百分位那一行、`close_now`＝候選板那條收盤序列的最新一點）。
+    `machine`＝有可比對的值；`met`：任一個可比對的值已達成 True、都量得到而都沒達成 False、有一個量不到又沒有別的達成 None
+    （沒算 ≠ 沒達成，INV-3）；「不適用：」那種沒有可比對的值，`met` 是 None、叫醒照舊看回落。`line` 只給畫面與心跳（含今天的值，
+    每天變）；叫醒那一句（`reopen_met_reason`）只寫條件本身，不帶今天的數字（不進認知指紋的每日抖動）。"""
+    if reopen is None:
+        return None
+    spec = reopen.as_dict() if hasattr(reopen, "as_dict") else dict(reopen)
+    close_row = (info or {}).get("close_now") or {}
+    close = close_row.get("close")
+    pctile = ((info or {}).get("now") or {}).get("value")
+    checks: list[bool | None] = []
+    parts: list[str] = []
+    if spec.get("price_at_or_below") is not None:
+        limit = float(spec["price_at_or_below"])
+        checks.append(None if close is None else float(close) <= limit)
+        parts.append(f"收盤 ≤ {_num(limit)}（" + ("今天量不到" if close is None else
+                     f"今 {_num(close)}，差 {_signed_pct(limit / float(close) - 1)}") + "）")
+    if spec.get("own_pctile_at_or_below") is not None:
+        limit = float(spec["own_pctile_at_or_below"])
+        checks.append(None if pctile is None else float(pctile) <= limit)
+        parts.append(f"自家三年百分位 ≤ {_num(limit)}（" + ("今天量不到" if pctile is None else
+                     f"今 {int(float(pctile) + 0.5)}") + "）")
+    met = True if any(c is True for c in checks) else (False if checks and all(c is False for c in checks) else None)
+    line = ("重開：" + " 或 ".join(parts)) if parts else f"重開：{spec.get('text')}"
+    return {**spec, "machine": bool(checks), "met": met, "close_now": close,
+            "close_as_of": close_row.get("session_date"), "pctile_now": pctile, "line": line}
+
+
+def reopen_met_reason(status: Mapping[str, Any]) -> str:
+    """`rewrite[]` 那一條：只寫條件本身（不帶今天的數字——`rewrite[]` 進認知指紋，同 `pulled_back_reason`）。"""
+    return f"{REOPEN_MET_PREFIX}：{' 或 '.join(_reopen_terms(status))}，重問已定價"
+
+
+#: 沒寫重開條件的那一條（舊紀錄；寫入端 2026-11-01 起擋新寫的）——drain 讀到就補寫一版。
+NO_REOPEN_REASON = f"{NO_REOPEN_PREFIX}：補寫「到哪裡就重開」（收盤或自家三年百分位），沒有出口的等待會一直等下去"
+
+
+def reopen_counts(wait_rows: Iterable[Mapping[str, Any]]) -> dict[str, int]:
+    """等回落那一組的重開條件常駐計數：達成幾檔、寫了可比對條件但今天量不到幾檔、沒寫幾檔，與沒算（舊 artifact）幾檔。"""
+    rows = list(wait_rows)
+    status = [r.get("reopen") for r in rows if isinstance(r.get("reopen"), Mapping)]
+    return {"reopen_met": sum(1 for s in status if s.get("met") is True),
+            "reopen_unknown": sum(1 for s in status if s.get("machine") and s.get("met") is None),
+            "no_reopen": sum(1 for r in rows if r.get("reopen_missing") is True),
+            "reopen_not_computed": sum(1 for r in rows if "reopen_missing" not in r)}
 
 
 #: 只差已定價（2026-11-01 使用者指示；failure log #123）：等回落列**假設**把已定價當脈絡、改宣告可開，可開的前提逐項還缺什麼
@@ -639,6 +711,8 @@ def assemble_board(rows: Sequence[Mapping[str, Any] | None], *, universe: Sequen
                   **{f"missing_{k}": v for k, v in missing_request_counts(groups["missing"]).items()})
     # 只差已定價（2026-11-01；failure log #123）：等回落裡可開前提都成立的檔數——算法只有 `priced_only_counts` 一份
     counts.update({f"priced_wait_{k}": v for k, v in priced_only_counts(groups["priced_wait"]).items()})
+    # 重開條件（2026-11-01；failure log #124）：達成／量不到／沒寫／沒算——算法只有 `reopen_counts` 一份
+    counts.update({f"priced_wait_{k}": v for k, v in reopen_counts(groups["priced_wait"]).items()})
     # 遲滯（2026-11-01）：今天才翻成非邊緣、還沒列撤回建議的列——照敘事分組，這裡只計數（0 也印；不是待做）
     counts["not_edge_pending"] = sum(1 for row in rows if row is not None and row.get("edge_pending"))
     return {"groups": groups, "side_groups": sides, "counts": counts, "oldest_stall_days": oldest,
@@ -653,13 +727,14 @@ def assemble_board(rows: Sequence[Mapping[str, Any] | None], *, universe: Sequen
 
 __all__ = ["ANSWER_WORDS", "CANDIDATES_THIS_IS_NOT", "GROUPS", "GROUP_LABELS", "IN_NUMBERS_LINES", "LIGHT_ORDER",
            "LIGHT_WORDS", "LIST_GROUPS", "LIST_GROUP_LABELS", "NEW_EDGES_PREFIX", "NOT_EDGE_PENDING_PREFIX",
-           "ON_THRESHOLD_WORDS", "OPEN_GAP_NO_RIDES", "OPEN_GAP_NOT_EDGE", "PRICED_IN_LINES",
+           "NO_REOPEN_PREFIX", "NO_REOPEN_REASON", "ON_THRESHOLD_WORDS", "OPEN_GAP_NO_RIDES", "OPEN_GAP_NOT_EDGE",
+           "PRICED_IN_LINES", "REOPEN_MET_PREFIX",
            "PULLED_BACK_PREFIX", "REWRITE_STATE_WORDS", "REWRITE_WHY", "RIDES_SUPERSEDED_PREFIX", "SIDE_GROUPS", "SIDE_LABELS", "UNANSWERED",
            "WIPEOUT_LINES", "Cited", "assemble_board", "body_key", "body_version", "cap_label", "cited_identities",
            "edge_note",
            "held_index", "judgment_version", "missing_request_counts", "new_edge_reason", "normalize_url",
            "not_edge_pending_note", "on_threshold_entries", "on_threshold_line",
            "priced_judgment_key", "priced_only_counts", "priced_since", "pullback_counts", "pulled_back",
-           "pulled_back_reason",
+           "pulled_back_reason", "reopen_counts", "reopen_met_reason", "reopen_status",
            "rewrite_words", "rides_reason", "rollup", "squash", "stall_since", "stall_version", "three_words",
            "unread_new_edges"]
