@@ -121,6 +121,13 @@ def test_an_unmeasurable_input_is_not_a_miss() -> None:
     assert reopen_counts([row])["reopen_unknown"] == 1
 
 
+def test_not_computed_is_not_unmeasurable() -> None:
+    """個股頁單檔不載價格：沒算＝只印條件本身、met 是 None、computed 是 False；不寫成「今天量不到」（L12）。"""
+    status = reopen_status(Reopen(text="回到 70 以下", price_at_or_below=70.0, own_pctile_at_or_below=60.0), None)
+    assert status["computed"] is False and status["met"] is None
+    assert status["line"] == "重開：收盤 ≤ 70 或 自家三年百分位 ≤ 60" and "量不到" not in status["line"]
+
+
 def test_an_old_record_keeps_the_pullback_wake_and_is_asked_to_add_a_condition_once() -> None:
     row, _ = _derive(_chain(), bars=BARS)
     assert row["wake_by"] == "pulled_back" and row["reopen"] is None and row["reopen_missing"] is True

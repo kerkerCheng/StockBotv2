@@ -540,6 +540,8 @@ def reopen_status(reopen: Any, info: Mapping[str, Any] | None) -> dict[str, Any]
     if reopen is None:
         return None
     spec = reopen.as_dict() if hasattr(reopen, "as_dict") else dict(reopen)
+    # 沒算（這條路徑不載價格——個股頁單檔）與量不到（算了、今天沒有值）分開寫（L12）：沒算就只印條件本身
+    computed = info is not None
     close_row = (info or {}).get("close_now") or {}
     close = close_row.get("close")
     pctile = ((info or {}).get("now") or {}).get("value")
@@ -548,16 +550,17 @@ def reopen_status(reopen: Any, info: Mapping[str, Any] | None) -> dict[str, Any]
     if spec.get("price_at_or_below") is not None:
         limit = float(spec["price_at_or_below"])
         checks.append(None if close is None else float(close) <= limit)
-        parts.append(f"收盤 ≤ {_num(limit)}（" + ("今天量不到" if close is None else
-                     f"今 {_num(close)}，差 {_signed_pct(limit / float(close) - 1)}") + "）")
+        today_text = ("" if not computed else "（今天量不到）" if close is None else
+                      f"（今 {_num(close)}，差 {_signed_pct(limit / float(close) - 1)}）")
+        parts.append(f"收盤 ≤ {_num(limit)}{today_text}")
     if spec.get("own_pctile_at_or_below") is not None:
         limit = float(spec["own_pctile_at_or_below"])
         checks.append(None if pctile is None else float(pctile) <= limit)
-        parts.append(f"自家三年百分位 ≤ {_num(limit)}（" + ("今天量不到" if pctile is None else
-                     f"今 {int(float(pctile) + 0.5)}") + "）")
+        today_text = ("" if not computed else "（今天量不到）" if pctile is None else f"（今 {int(float(pctile) + 0.5)}）")
+        parts.append(f"自家三年百分位 ≤ {_num(limit)}{today_text}")
     met = True if any(c is True for c in checks) else (False if checks and all(c is False for c in checks) else None)
     line = ("重開：" + " 或 ".join(parts)) if parts else f"重開：{spec.get('text')}"
-    return {**spec, "machine": bool(checks), "met": met, "close_now": close,
+    return {**spec, "machine": bool(checks), "met": met, "computed": computed, "close_now": close,
             "close_as_of": close_row.get("session_date"), "pctile_now": pctile, "line": line}
 
 
