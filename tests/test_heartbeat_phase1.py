@@ -53,10 +53,14 @@ def test_candidate_snapshot_keys_come_from_the_candidate_vocabulary() -> None:
     from alpha.providers.candidates import GROUPS, SIDE_GROUPS
 
     keys = [k for k in hb.SNAPSHOT_KEYS if k.startswith("candidate.")]
-    # open_unmeasurable 不在字彙裡（2026-10-30）：附組 edge_unmeasurable 改成只裝宣告可開，舊鍵留給全部量不到的檔
+    # open_unmeasurable 不在字彙裡（2026-10-30）：附組 edge_unmeasurable 改成只裝宣告可開，舊鍵留給全部量不到的檔。
+    # 2026-11-01（ROADMAP「邊緣門檻的遲滯與在門檻上計數器」）：最後兩個是計數器、不是組——不進 GROUPS／SIDE_GROUPS 字彙
     assert keys == [f"candidate.{g}" for g in (*GROUPS, *SIDE_GROUPS)] + ["candidate.open_unmeasurable",
-                                                                          "candidate.no_narrative"]
+                                                                          "candidate.no_narrative",
+                                                                          "candidate.not_edge_pending",
+                                                                          "candidate.on_threshold"]
     assert hb.SNAPSHOT_KEYS["candidate.edge_unmeasurable"] == "候選 邊緣無法量"
+    assert hb.SNAPSHOT_KEYS["candidate.on_threshold"] == "候選 在門檻上"
 
 
 def test_diff_prints_only_changed_keys_and_counts_the_rest() -> None:

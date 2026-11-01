@@ -84,7 +84,9 @@ STATE_SCHEMA_VERSIONS: dict[str, str] = {
     # /2（2026-10-30 等回落的價格叫醒＋缺 X 三分法）：列多 `pulled_back`／`missing_kind`／`document_requests`，counts 多
     # `priced_wait_pulled_back`、`priced_wait_unknown`、`missing_asked`、`missing_fetchable_unasked`、`missing_unclassified`，
     # 板多 `document_requests_check`，清單多 `kind=pulled_back`。
-    "candidates": "stockbot-app/candidates/2",
+    # /3（2026-11-01 邊緣門檻的遲滯＋在門檻上計數器）：列多 `edge_pending`、`edge.on_threshold`／`edge.prior`，counts 多
+    # `not_edge_pending`、`on_threshold`，板多 `on_threshold[]`、`on_threshold_band`。
+    "candidates": "stockbot-app/candidates/3",
     # 2026-10-07（個股頁 plan S4b）：層說明的純文字閱讀頁——ledger 全文、出處與文件自宣告、每條主張的 watch 狀態、
     # 哪幾頁連過來 → 9。不做版面與示意圖（S5）。
     "layer_notes": "stockbot-app/layer_notes/1",

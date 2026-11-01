@@ -693,7 +693,11 @@ agent 查核用的欄位（authority、freshness identity、content digest、`th
 心跳與 APP 的 fake payload 只 import 它，不經 `alpha.providers`（那會把 Neo4j／Engine C／yfinance 載進來）；推導住 `alpha/providers/candidates.py`（候選板、心跳、個股頁、成交收據共用一個函式），
 持股身分解析住 `portfolio/holdings.py`（`engine_b/cli.py::_held` 也呼叫它，但保留自己的語意：全部持股、含 beta、Sheet 讀不到 fail closed）；
 alpha／beta 界線用 `risk/hard_caps.py` 匯出的 `beta_instrument_for`／`is_beta_symbol`（與硬擋同一條線）。每列回
-`{declared, derived, preconditions[], edge, edge_note, held_source, …}`：已持有（Sheet、alpha、股數 > 0）優先；非邊緣進「非倍率候選」；
+`{declared, derived, preconditions[], edge, edge_note, edge_pending, held_source, …}`：已持有（Sheet、alpha、股數 > 0）優先；非邊緣進「非倍率候選」——
+**2026-11-01 起要連續兩次**：今天與前一次（`edge["prior"]`＝輸入日 `inputs_as_of` 前一天的 as-of 判定，`alpha/providers/edge.py::attach_prior_judgments`，
+同一天第二次 materialize 不算第二次）都判非邊緣才進；今天才翻的列帶 `edge_pending`＋`edge_note`「非邊緣待確認」照敘事分組（宣告可開的進「可開但邊緣無法量」附組），
+`counts.not_edge_pending` 常駐、閉環母體同一格留在母體；翻回來不加遲滯。板另帶 `on_threshold[]`（整個宇宙裡落在上限 ±1 家或 ±10% 帶內的檔，`alpha/edge.py::on_threshold`；
+心跳段 2、短版 ④、closure-gate 照抄；只計數、不排序、不改門檻；回放工具 `python -m alpha edge <T…> --replay --from D`）；
 邊緣無法量只擋宣告可開（附組「可開但邊緣無法量」），其餘照敘事分組、帶 `edge_note`（2026-10-30）；宣告可開每天重驗四個前提（押的讀圖仍現行且是護城河／量、answers 的稽核行沒變全缺席、歸屬本檔的 watch 沒有待判、
 連結的反證來源仍在盯），破了進「前提失效」。每一列（不論宣告哪一態）另帶 `rewrite[]`：連結斷了（附為什麼斷——來源收掉／被判觸及／
 到期未判，L12）、敘事來源 watch 醒來／觸及／到期未判（plan §5 第 6 點）、缺 X／等回落在等的 watch 已失效。「連結斷了」的唯一判定是

@@ -20,10 +20,12 @@ from typing import Any, Callable, Mapping, Sequence
 from ..candidates import (
     ANSWER_WORDS, CANDIDATES_THIS_IS_NOT, GROUP_LABELS, GROUPS, IN_NUMBERS_LINES, PRICED_IN_LINES,
     REWRITE_STATE_WORDS, SIDE_GROUPS, SIDE_LABELS, UNANSWERED, assemble_board, body_version, cap_label,
-    cited_identities, edge_note, held_index, judgment_version, new_edge_reason, priced_since, pulled_back,
+    cited_identities, edge_note, held_index, judgment_version, new_edge_reason, not_edge_pending_note,
+    on_threshold_entries, priced_since, pulled_back,
     pulled_back_reason, rewrite_words, rides_reason, rollup,
     squash, stall_since, stall_version, three_words, unread_new_edges,
 )
+from ..edge import not_edge_confirmed
 from ..narrative.contracts import RECORD_VERSION_V2, InvestorBrief, select_brief
 from ..structure_reading.contracts import READING_KINDS, READING_UNITS
 from .briefs import CURRENT_READING_STATUSES, OPEN_READING_KINDS, PRICED_IN_WRITE_LINES
@@ -254,10 +256,15 @@ def derive_row(ticker: str, company_id: str | None, *, records: Sequence[Investo
         **_reason_story(brief if v2 else None, stories),
         "preconditions": [], "rewrite": [], "rewrite_watch_ids": [], "rewrite_words": [],
         "rewrite_rides": [], "rewrite_new_edges": [],
-        "edge": {**{k: (edge or {}).get(k) for k in ("state", "label", "reasons", "market_cap_usd", "analyst_count")},
+        "edge": {**{k: (edge or {}).get(k) for k in ("state", "label", "reasons", "market_cap_usd", "analyst_count",
+                                                     "on_threshold", "inputs_as_of", "prior", "prior_absence")},
                  "market_cap_label": cap_label((edge or {}).get("market_cap_usd"))},
-        # 邊緣判定少一個輸入時的那一句（下面判邊緣時才填；已持有、非邊緣、舊版不填）——是標記，不是分組
+        # 邊緣判定少一個輸入時的那一句（下面判邊緣時才填；已持有、非邊緣確認、舊版不填）——是標記，不是分組；
+        # 2026-11-01 起「非邊緣待確認」（今天才翻成非邊緣）也寫在這一格
         "edge_note": None,
+        # 遲滯（ROADMAP「邊緣門檻的遲滯與在門檻上計數器」，2026-11-01）：今天判非邊緣、前一次不是 → 這裡帶前一次是什麼；
+        # None＝不適用（不是非邊緣、或連續兩次已確認進「非倍率候選」）
+        "edge_pending": None,
         "held_source": dict(held_info) if held_info else None,
         "holdings_verified": held.get("status") == "ok",
         "rides": [], "watch": None, "since": None, "stall_days": None,
@@ -366,7 +373,20 @@ def derive_row(ticker: str, company_id: str | None, *, records: Sequence[Investo
         return row
     state = (edge or {}).get("state")
     if state == "not_edge":
-        row.update(side="not_multiple", derived="not_multiple")
+        if not_edge_confirmed(edge):
+            row.update(side="not_multiple", derived="not_multiple")
+            return row
+        # 遲滯（2026-11-01；failure log #110 第 4 次）：今天才翻成非邊緣（前一次判邊緣／無法量／沒有更早的／沒讀到）——
+        # 不列撤回建議，照敘事分組、列上帶標記；宣告可開的照「缺輸入不放行」那條既有的路（同一個附組、同一句標記）
+        prior = (edge or {}).get("prior") or {}
+        row["edge_pending"] = {"prior_state": prior.get("state") if prior else None,
+                               "prior_inputs_as_of": prior.get("inputs_as_of") if prior else None,
+                               "prior_absence": (edge or {}).get("prior_absence")}
+        row["edge_note"] = not_edge_pending_note(edge)
+        if cs.state == "open":
+            row.update(side="edge_unmeasurable", derived="edge_unmeasurable")
+            return row
+        row.update(group=cs.state, derived=cs.state)
         return row
     if state != "edge":
         # 缺輸入不放行（`alpha.edge`）——要擋的只有宣告可開的那一種；缺 X／等回落／不要照敘事分組、帶標記
@@ -555,7 +575,7 @@ def candidate_context(tickers: Sequence[str], *, today: date | None = None,
     from risk.hard_caps import is_beta_symbol
 
     from . import briefs as briefs_provider
-    from .edge import edge_states
+    from .edge import edge_states_with_prior
     from .structure_readings import reading_status_rows, seats_from_edges
 
     today = today or ew._today()
@@ -615,7 +635,8 @@ def candidate_context(tickers: Sequence[str], *, today: date | None = None,
     return {"today": today, "registry": registry, "universe": universe, "extra": extra, "watches": watches,
             "lifecycle": lifecycle, "reading_rows": reading_rows, "reading_errors": list(reading_errors),
             "retracted_cells": retracted_cells,
-            "held": held, "edges": edge_states(sorted(set(universe) | set(extra))),
+            # 今天的判定＋今天判非邊緣的檔的前一次判定（遲滯，2026-11-01）；兩趟共用一個 FX 快取
+            "held": held, "edges": edge_states_with_prior(sorted(set(universe) | set(extra))),
             "ledger_present": ledger_present, "ledger_tickers": ledger_tickers,
             "bets": bet_index(structure, seats_from_edges(graph_edges)), "stories": stories,
             "company_assertions": company_assertions, "company_assertions_note": assertions_note}
@@ -828,6 +849,14 @@ def load_board(tickers: Sequence[str], *, today: date | None = None,
                                                            watches=watches, company_ticker=company_ticker,
                                                            brief_company=brief_company))
     board["no_narrative"] = no_narrative
+    # 在門檻上（ROADMAP「邊緣門檻的遲滯與在門檻上計數器」，2026-11-01）：整個宇宙逐檔、ticker 字母序——只計數、不排序、不改門檻。
+    # 帶寬的人話由產生端給（心跳、closure-gate 照抄，L16）；宇宙空就是空 list（不是沒算）、帶寬 None。
+    from alpha.edge import band_label
+
+    board["on_threshold"] = on_threshold_entries({t: edges.get(t) for t in board_universe},
+                                                 {str(r.get("ticker")) for r in rows if r})
+    board["on_threshold_band"] = band_label(next((e.get("thresholds") for e in edges.values() if e), None))
+    board["counts"]["on_threshold"] = len(board["on_threshold"])
     board["document_requests_check"] = doc_check
     # ③ 算了沒有（INV-3）：圖讀不到時「新邊沒讀」是沒算，心跳 ⑤ 照這一格印「未算」，不印成 0
     board["new_edges_check"] = {"status": "ok" if ctx.get("company_assertions") is not None else "unavailable",

@@ -58,7 +58,7 @@ def test_a_zero_count_with_a_zero_estimate_is_a_placeholder_not_zero_coverage() 
 def test_the_three_counts_travel_with_the_edge_state(monkeypatch) -> None:
     from alpha.providers import edge
 
-    monkeypatch.setattr(mn, "screen_inputs", lambda tickers, db_path=None: {
+    monkeypatch.setattr(mn, "screen_inputs", lambda tickers, db_path=None, **_kw: {
         "SOI.PA": {"market_cap_usd": 5.8e9, "analyst_count": 19,
                    "coverage_counts": {"eps_0y": 6, "revenue_0y": 16, "target_price": 19}}})
     got = edge.edge_states(["SOI.PA"], thresholds=TH)["SOI.PA"]
@@ -66,3 +66,21 @@ def test_the_three_counts_travel_with_the_edge_state(monkeypatch) -> None:
     assert [(c["source"], c["count"]) for c in got["coverage_counts"]] == [
         ("eps_0y", 6), ("revenue_0y", 16), ("target_price", 19)]
     assert all(c["label"] for c in got["coverage_counts"])
+
+
+def test_as_of_only_sees_rows_fetched_up_to_that_day_and_reports_the_input_day() -> None:
+    """邊緣門檻的遲滯（2026-11-01）：「前一次判定」＝只看取得日 ≤ 輸入日前一天的列重算（INV-6）；`inputs_as_of` 回報實際用到的日子。"""
+    from datetime import date
+
+    conn = _conn()
+    _estimate(conn, "LYC.AX", "eps", 12, day="2026-10-30")
+    _estimate(conn, "LYC.AX", "eps", 13, day="2026-10-31")        # 10-31 翻成 13 家
+    _target(conn, "LYC.AX", 12, day="2026-10-29")
+    assert mn.coverage_counts("LYC.AX", conn)["eps_0y"] == 13
+    assert mn.coverage_counts("LYC.AX", conn, as_of=date(2026, 10, 30))["eps_0y"] == 12
+    assert mn.coverage_counts("LYC.AX", conn, as_of=date(2026, 10, 28)) == {"eps_0y": None, "revenue_0y": None,
+                                                                             "target_price": None}
+    assert mn.inputs_as_of("LYC.AX", conn) == "2026-10-31"
+    assert mn.inputs_as_of("LYC.AX", conn, as_of=date(2026, 10, 30)) == "2026-10-30"
+    assert mn.inputs_as_of("LYC.AX", conn, as_of=date(2026, 10, 28)) is None
+    assert mn.inputs_as_of("NOPE", conn) is None

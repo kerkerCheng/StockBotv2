@@ -293,9 +293,50 @@ def test_link_breaks_feed_the_narrative_rewrite_queue_segment() -> None:
     assert seg["count"] == 1 and "來源不存在" in seg["examples"][0]
 
 
+#: 連續兩次判非邊緣（今天與前一次都是）——撤回建議可以出現（遲滯，2026-11-01）。
+NOT_EDGE_TWICE = {"state": "not_edge", "reasons": ["cap_over_edge"], "inputs_as_of": "2026-09-29",
+                  "prior": {"state": "not_edge", "label": "非邊緣", "inputs_as_of": "2026-09-28"}}
+#: 今天才翻成非邊緣（前一次判邊緣）——待確認，不是非倍率。
+NOT_EDGE_FIRST = {"state": "not_edge", "reasons": ["coverage_over_edge"], "analyst_count": 13, "inputs_as_of": "2026-09-29",
+                  "prior": {"state": "edge", "label": "邊緣", "analyst_count": 12, "inputs_as_of": "2026-09-28"}}
+
+
 def test_not_edge_declared_open_is_not_a_multiple_candidate() -> None:
-    row = _derive([_brief()], edge={"state": "not_edge", "reasons": ["cap_over_edge"]})
+    row = _derive([_brief()], edge=NOT_EDGE_TWICE)
     assert row["group"] is None and row["side"] == "not_multiple" and row["declared"] == "open"
+    assert row["edge_pending"] is None and row["edge_note"] is None
+
+
+def test_a_first_day_not_edge_is_pending_not_a_retraction_suggestion() -> None:
+    """ROADMAP「邊緣門檻的遲滯」①（failure log #110 第 4 次：LYC.AX 10-22 撤、10-31 發、11-01 再撤）：今天才翻成非邊緣的檔
+    不進「非倍率候選」——缺 X／等回落／不要照敘事分組、帶標記；宣告可開的照缺輸入不放行那條路。"""
+    row = _derive([_brief(state="missing", watch_id="ew_1")], edge=NOT_EDGE_FIRST, watches=[_active("ew_1")])
+    assert row["group"] == "missing" and row["side"] is None and row["derived"] == "missing"
+    assert row["edge_pending"] == {"prior_state": "edge", "prior_inputs_as_of": "2026-09-28", "prior_absence": None}
+    assert row["edge_note"] == "非邊緣待確認：今天判非邊緣、前一次（2026-09-28）判邊緣——明天再看，連續 2 次才列撤回建議"
+    assert row["edge"]["prior"]["state"] == "edge" and row["edge"]["inputs_as_of"] == "2026-09-29"   # 前一次跟著列走到板上
+    opened = _derive([_brief()], edge=NOT_EDGE_FIRST)
+    assert opened["side"] == "edge_unmeasurable" and opened["group"] is None and opened["edge_pending"]
+    assert opened["edge_note"].startswith("非邊緣待確認")
+    board = assemble_board([row, opened, _derive([_brief(state="pass", reason="貴")], edge=NOT_EDGE_TWICE)],
+                           universe=[T], held=HELD_NONE, narrative_rewrite=[])
+    assert board["counts"]["not_edge_pending"] == 2 and board["counts"]["not_multiple"] == 1
+
+
+@pytest.mark.parametrize("edge, text", [
+    ({"state": "not_edge", "reasons": ["cap_over_edge"], "inputs_as_of": "2026-09-29", "prior": None,
+      "prior_absence": "OperationalError: locked"}, "前一次判定沒讀到（OperationalError: locked）"),
+    ({"state": "not_edge", "reasons": ["cap_over_edge"], "inputs_as_of": "2026-09-29",
+      "prior": {"state": "unmeasurable", "inputs_as_of": None}}, "沒有更早的判定紀錄"),
+    ({"state": "not_edge", "reasons": ["cap_over_edge"], "inputs_as_of": "2026-09-29",
+      "prior": {"state": "unmeasurable", "inputs_as_of": "2026-09-28"}}, "前一次（2026-09-28）判邊緣無法量"),
+    ({"state": "not_edge", "reasons": ["cap_over_edge"]}, "前一次判定沒讀到"),           # 舊 artifact 形狀：沒有 prior 鍵
+])
+def test_an_unreadable_or_missing_prior_judgment_waits_instead_of_retracting(edge, text) -> None:
+    """讀不到往「不撤回」那一邊倒（撤回是使用者的動作、多等一天便宜）；三種「不是非邊緣」分開寫（L12、INV-3）。"""
+    row = _derive([_brief(state="pass", reason="貴")], edge=edge)
+    assert row["group"] == "pass" and row["side"] is None and row["edge_pending"]
+    assert text in row["edge_note"] and row["edge_note"].startswith("非邊緣待確認")
 
 
 UNMEASURED = {"state": "unmeasurable", "label": "邊緣無法量", "reasons": ["coverage_unavailable"],
@@ -324,8 +365,7 @@ def test_edge_note_says_which_input_is_missing_and_is_absent_when_the_edge_is_kn
     from alpha.candidates import edge_note
 
     assert _derive([_brief()])["edge_note"] is None                                      # 邊緣：沒有標記
-    assert _derive([_brief(state="pass", reason="x")],
-                   edge={"state": "not_edge", "reasons": ["cap_over_edge"]})["edge_note"] is None   # 非邊緣另一組
+    assert _derive([_brief(state="pass", reason="x")], edge=NOT_EDGE_TWICE)["edge_note"] is None   # 非邊緣（確認）另一組
     held = {"status": "ok", "by_company": {CO: {"sheet_ticker": "AXTI", "source": "registry_ticker"}}}
     assert _derive([_brief(state="pass", reason="x")], edge=UNMEASURED, held=held)["edge_note"] is None  # 已持有優先
     assert edge_note({"reasons": ["market_cap_unavailable", "coverage_unavailable"]}) == "邊緣無法量：缺市值、分析師家數"
@@ -446,7 +486,7 @@ def board_env(monkeypatch, tmp_path):
     monkeypatch.setattr(disproof, "load_lifecycle", lambda: {})
     monkeypatch.setattr(qstruct, "_load_edges", lambda: [])
     monkeypatch.setattr(sr, "reading_status_rows", lambda *a, **k: ([], []))
-    monkeypatch.setattr(edge_mod, "edge_states", lambda tickers: {t: dict(EDGE) for t in tickers})
+    monkeypatch.setattr(edge_mod, "edge_states", lambda tickers, **_kw: {t: dict(EDGE) for t in tickers})
     state = {"tq_fail": set(), "hnc": {}}
 
     def tq(ticker, *, today, history_not_comparable):

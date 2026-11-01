@@ -1030,6 +1030,11 @@ def build_parser() -> argparse.ArgumentParser:
         "edge", help="研究時判邊緣（唯讀）：名冊外的代號也能判——同一個判定函式與門檻，缺的輸入用 yfinance 補、逐欄標來源")
     edge.add_argument("tickers", nargs="+", help="代號，例如 3324.TWO 3110.T（照交易所後綴寫）")
     edge.add_argument("--format", choices=("markdown", "json"), default="markdown")
+    edge.add_argument("--replay", action="store_true",
+                      help="逐日回放判定（只讀取得日 ≤ 那一天的 Engine C 列；名冊內的檔），並對「連續 K 次非邊緣才列撤回建議」"
+                           "K＝1／2／3 各印撤回建議與重寫出現幾次——遲滯的驗收命令（ROADMAP 2026-11-01）")
+    edge.add_argument("--from", dest="replay_from", help="回放起日（YYYY-MM-DD；--replay 必填）")
+    edge.add_argument("--to", dest="replay_to", help="回放迄日（YYYY-MM-DD；預設今天）")
     edge.set_defaults(func=cmd_edge)
 
     cohort = sub.add_parser(
@@ -1110,11 +1115,60 @@ def cmd_audit_moved(_args: argparse.Namespace) -> int:
     return 2
 
 
+def cmd_edge_replay(args: argparse.Namespace, tickers: list[str]) -> int:
+    """`alpha edge --replay`：逐日重算判定序列，對 K＝1（遲滯前的現行規則）／2（本次）／3 各數撤回建議與重寫出現幾次。
+    驗收寫成「現有資料回放後建議出現幾次」，不是「幾檔通過 filter」（AGENTS L14）。唯讀。"""
+    from datetime import date as _date
+
+    from .edge import EDGE_LABELS, replay_retraction_suggestions
+    from .providers.edge import replay_edge_states
+
+    if not args.replay_from:
+        print("✗ --replay 要給 --from YYYY-MM-DD", file=sys.stderr)
+        return 2
+    start = _date.fromisoformat(args.replay_from)
+    end = _date.fromisoformat(args.replay_to) if args.replay_to else _date.today()
+    series = replay_edge_states(tickers, start=start, end=end)
+    report: dict[str, Any] = {}
+    for ticker in tickers:
+        days = [(d, e["state"]) for d, e in series[ticker]]
+        by_k = {k: replay_retraction_suggestions(days, confirm_runs=k) for k in (1, 2, 3)}
+        report[ticker] = {"days": [{"date": d.isoformat(), "state": e["state"], "analyst_count": e.get("analyst_count"),
+                                    "market_cap_usd": e.get("market_cap_usd"), "inputs_as_of": e.get("inputs_as_of"),
+                                    "on_threshold": e.get("on_threshold")} for d, e in series[ticker]],
+                         "by_confirm_runs": {str(k): {"suggestions": [d.isoformat() for d in r["suggestions"]],
+                                                      "rewrites": [d.isoformat() for d in r["rewrites"]],
+                                                      "pending_at_end": r["pending_at_end"]} for k, r in by_k.items()},
+                         "runs": [{"state": s, "from": a.isoformat(), "to": b.isoformat()} for s, a, b in by_k[1]["runs"]]}
+    if args.format == "json":
+        print(json.dumps(report, ensure_ascii=False, indent=2, default=str))
+        return 0
+    print(f"回放 {start}～{end}（取得日 ≤ 當天的 Engine C 列；匯率用當下那一份）。有敘事時連續 K 次非邊緣 → 撤回建議；"
+          "沒敘事時判邊緣 → 重寫（不加遲滯）。")
+    for ticker in tickers:
+        rep = report[ticker]
+        print(f"\n## {ticker}")
+        for run in rep["runs"]:
+            first = next(e for e in rep["days"] if e["date"] == run["from"])
+            cnt = first["analyst_count"]
+            cap = first["market_cap_usd"]
+            cap_s = f"{cap / 1e9:.2f}B" if cap is not None else "—"
+            span = run["from"] if run["from"] == run["to"] else f"{run['from']}～{run['to']}"
+            print(f"- {span}：{EDGE_LABELS.get(run['state'], run['state'])}（起日 {cnt if cnt is not None else '—'} 家、{cap_s}）")
+        for k, r in rep["by_confirm_runs"].items():
+            tail = "；期末有一檔待確認" if r["pending_at_end"] else ""
+            print(f"  K={k}：撤回建議 {len(r['suggestions'])}（{'、'.join(r['suggestions']) or '—'}）"
+                  f"／重寫 {len(r['rewrites'])}（{'、'.join(r['rewrites']) or '—'}）{tail}")
+    return 0
+
+
 def cmd_edge(args: argparse.Namespace) -> int:
     """研究時判邊緣（failure log #43）：名冊外的代號也能判，判定與門檻同候選板；唯讀。"""
     from .providers.edge import adhoc_edge_states
 
     tickers = [t.strip() for t in args.tickers if t.strip()]
+    if getattr(args, "replay", False):
+        return cmd_edge_replay(args, tickers)
     rows = adhoc_edge_states(tickers)
     if args.format == "json":
         print(json.dumps(rows, ensure_ascii=False, indent=2, default=str))

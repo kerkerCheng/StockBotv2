@@ -1999,6 +1999,10 @@ def build_candidates_artifact(board: Mapping[str, Any], *, generated_at: datetim
                                         or {"status": "unavailable", "reason": "板上沒有這一格"}),
         # 不上板的那幾檔（沒有敘事、也沒有持有）：計數在 counts.no_narrative，這裡列出是誰（2026-09-30）。
         "no_narrative": list(board.get("no_narrative") or ()),
+        # 在門檻上（ROADMAP「邊緣門檻的遲滯與在門檻上計數器」，2026-11-01）：整個宇宙逐檔；板上沒有這一格（舊板）＝None，
+        # 不是 []（INV-3）。**不進 freshness_identity**——市值每天在動，落不落在帶內不是認知變了。
+        "on_threshold": (list(board["on_threshold"]) if board.get("on_threshold") is not None else None),
+        "on_threshold_band": board.get("on_threshold_band"),
         "ledger": dict(board.get("ledger") or {}),
         "readings": dict(board.get("readings") or {}),
         "rollup": dict(board.get("rollup") or {}),
@@ -2105,6 +2109,8 @@ def candidate_series_row(payload: Mapping[str, Any]) -> dict[str, Any]:
         "side": {side: counts.get(side) for side in SIDE_GROUPS},
         "no_narrative": counts.get("no_narrative"),
         "oldest_stall_days": dict(payload.get("oldest_stall_days") or {}),
+        # 邊緣門檻的遲滯與在門檻上（2026-11-01）：量「7 天內翻轉幾檔」要的兩個數——舊 artifact 沒有＝null，不是 0
+        "edge": {"on_threshold": counts.get("on_threshold"), "not_edge_pending": counts.get("not_edge_pending")},
         "generated_at": payload.get("generated_at"),
     }
 

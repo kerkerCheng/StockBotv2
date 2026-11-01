@@ -15,9 +15,9 @@ from __future__ import annotations
 
 import re
 from datetime import datetime, timezone
-from typing import Any, Callable, Iterable, Mapping, NamedTuple, Sequence
+from typing import Any, Callable, Collection, Iterable, Mapping, NamedTuple, Sequence
 
-from .edge import EDGE_LABELS
+from .edge import EDGE_LABELS, NOT_EDGE_CONFIRM_RUNS, ON_THRESHOLD_KEYS
 from .narrative.contracts import RECORD_VERSION_V2, InvestorBrief
 from .three_questions import rollup as line_rollup
 
@@ -111,6 +111,59 @@ def edge_note(edge: Mapping[str, Any] | None) -> str:
     missing = [_EDGE_MISSING_WORDS.get(r, r) for r in reasons if r.endswith("_unavailable")]
     label = EDGE_LABELS["unmeasurable"]
     return f"{label}：缺{'、'.join(missing)}" if missing else f"{label}：沒有判定"
+
+
+#: 非邊緣待確認那一句的開頭（遲滯；ROADMAP「邊緣門檻的遲滯與在門檻上計數器」，2026-11-01）。寫的一方與讀的一方共用這個字串。
+NOT_EDGE_PENDING_PREFIX = "非邊緣待確認"
+
+
+def not_edge_pending_note(edge: Mapping[str, Any] | None) -> str:
+    """今天判非邊緣、前一次不是（或沒讀到）時，卡片與個股頁照印的那一句（產生端給字——L16）。三種「不是」分開寫（L12）：
+    前一次判邊緣／無法量（帶那一次的輸入日）、沒有更早的判定紀錄（Engine C 更早沒有列）、前一次判定沒讀到（帶理由）。"""
+    edge = dict(edge or {})
+    prior = edge.get("prior")
+    if prior is None:
+        absence = edge.get("prior_absence")
+        why = f"前一次判定沒讀到（{absence}）" if absence else "前一次判定沒讀到"
+    elif not prior.get("inputs_as_of"):
+        why = "沒有更早的判定紀錄"
+    else:
+        state = str(prior.get("state"))
+        why = f"前一次（{prior['inputs_as_of']}）判{EDGE_LABELS.get(state, state)}"
+    return f"{NOT_EDGE_PENDING_PREFIX}：今天判非邊緣、{why}——明天再看，連續 {NOT_EDGE_CONFIRM_RUNS} 次才列撤回建議"
+
+
+#: 在門檻上的那一條輸入的人話。
+ON_THRESHOLD_WORDS: Mapping[str, str] = {"market_cap": "市值", "analyst_count": "分析師"}
+
+
+def on_threshold_entries(edges: Mapping[str, Mapping[str, Any] | None],
+                         narrated: Collection[str]) -> list[dict[str, Any]]:
+    """整個宇宙裡落在門檻帶內的檔（`edge["on_threshold"]` 非空），**ticker 字母序、只計數不排序**。
+    每筆帶數字與哪一條在帶內，`has_narrative` 讓人分得出「翻了會撤回」與「翻了會寫第一份」。純函式。"""
+    out: list[dict[str, Any]] = []
+    for ticker in sorted(edges):
+        edge = dict(edges[ticker] or {})
+        which = [str(k) for k in (edge.get("on_threshold") or ()) if str(k) in ON_THRESHOLD_KEYS]
+        if not which:
+            continue
+        out.append({"ticker": ticker, "state": edge.get("state"), "label": edge.get("label"),
+                    "analyst_count": edge.get("analyst_count"), "market_cap_usd": edge.get("market_cap_usd"),
+                    "market_cap_label": cap_label(edge.get("market_cap_usd")), "which": which,
+                    "has_narrative": ticker in narrated})
+    return out
+
+
+def on_threshold_line(entry: Mapping[str, Any]) -> str:
+    """一筆在門檻上的檔 → 「LYC.AX（非邊緣；分析師 13 家）」——只印在帶內的那幾個數。"""
+    bits = []
+    for key in entry.get("which") or ():
+        if key == "analyst_count" and entry.get("analyst_count") is not None:
+            bits.append(f"分析師 {entry['analyst_count']} 家")
+        elif key == "market_cap" and entry.get("market_cap_label"):
+            bits.append(f"市值 {entry['market_cap_label']}")
+    label = entry.get("label") or str(entry.get("state"))
+    return f"{entry.get('ticker')}（{label}" + (f"；{'、'.join(bits)}" if bits else "") + "）"
 
 
 # ---------------------------------------------------------------------------
@@ -568,6 +621,8 @@ def assemble_board(rows: Sequence[Mapping[str, Any] | None], *, universe: Sequen
     # 等回落的價格叫醒與缺 X 三分法（2026-10-30）：兩組各自的常駐計數器——算法只有一份（心跳段 2／短版 ④ 讀列重算同一條）
     counts.update({f"priced_wait_{k}": v for k, v in pullback_counts(groups["priced_wait"]).items()},
                   **{f"missing_{k}": v for k, v in missing_request_counts(groups["missing"]).items()})
+    # 遲滯（2026-11-01）：今天才翻成非邊緣、還沒列撤回建議的列——照敘事分組，這裡只計數（0 也印；不是待做）
+    counts["not_edge_pending"] = sum(1 for row in rows if row is not None and row.get("edge_pending"))
     return {"groups": groups, "side_groups": sides, "counts": counts, "oldest_stall_days": oldest,
             "universe": sorted(universe),
             "holdings": {"status": held.get("status"), "reason": held.get("reason"),
@@ -579,11 +634,13 @@ def assemble_board(rows: Sequence[Mapping[str, Any] | None], *, universe: Sequen
 
 
 __all__ = ["ANSWER_WORDS", "CANDIDATES_THIS_IS_NOT", "GROUPS", "GROUP_LABELS", "IN_NUMBERS_LINES", "LIGHT_ORDER",
-           "LIGHT_WORDS", "LIST_GROUPS", "LIST_GROUP_LABELS", "NEW_EDGES_PREFIX", "PRICED_IN_LINES",
+           "LIGHT_WORDS", "LIST_GROUPS", "LIST_GROUP_LABELS", "NEW_EDGES_PREFIX", "NOT_EDGE_PENDING_PREFIX",
+           "ON_THRESHOLD_WORDS", "PRICED_IN_LINES",
            "PULLED_BACK_PREFIX", "REWRITE_STATE_WORDS", "REWRITE_WHY", "RIDES_SUPERSEDED_PREFIX", "SIDE_GROUPS", "SIDE_LABELS", "UNANSWERED",
            "WIPEOUT_LINES", "Cited", "assemble_board", "body_key", "body_version", "cap_label", "cited_identities",
            "edge_note",
            "held_index", "judgment_version", "missing_request_counts", "new_edge_reason", "normalize_url",
+           "not_edge_pending_note", "on_threshold_entries", "on_threshold_line",
            "priced_judgment_key", "priced_since", "pullback_counts", "pulled_back", "pulled_back_reason",
            "rewrite_words", "rides_reason", "rollup", "squash", "stall_since", "stall_version", "three_words",
            "unread_new_edges"]

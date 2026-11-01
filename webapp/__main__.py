@@ -567,6 +567,12 @@ def cmd_closure_gate(args: argparse.Namespace) -> int:
     # 未到終局那批卡在哪——與品質計數器同一個理由掛在這裡：每輪本來就會跑 closure-gate，
     # 掛上去它才會自己出現。它回答的不是「還剩幾檔」而是「剩下的檔寫得出有資訊的判斷嗎」。
     profile = closure.open_profile(rows, skip=args.skip or ())
+    # 在門檻上（ROADMAP「邊緣門檻的遲滯與在門檻上計數器」，2026-11-01）：掛在這裡的理由與上面幾個計數器相同——每輪必跑，
+    # 掛上去才會自己出現（L14）。讀候選板那一格照抄；板上沒有＝未算。
+    from alpha.providers.closure import on_threshold_inputs
+
+    on_threshold = on_threshold_inputs(StateArtifactStore(resolve_state_dir(
+        Path(args.dir) if args.dir else None, Path(args.state_dir) if args.state_dir else None)))
     if args.format == "json":
         print(json.dumps({
             "state": result.state, "open_count": result.open_count,
@@ -609,6 +615,8 @@ def cmd_closure_gate(args: argparse.Namespace) -> int:
             "open_profile": profile,
             # 7.0g-2：母體外逐檔列名（非倍率／邊緣沒座位已查），附理由
             "outside": closure.summarize(rows).get("outside"),
+            # 2026-11-01：在門檻上（候選板那一格照抄；entries=None＝未算）
+            "on_threshold": on_threshold,
         }, ensure_ascii=False, indent=2))
     else:
         mark = {"closed": "✅", "open": "▶", "unknown": "✗"}[result.state]
@@ -626,6 +634,8 @@ def cmd_closure_gate(args: argparse.Namespace) -> int:
                   f"{'、'.join(awaiting)}")
         # 7.0g-2：母體外逐檔列名——退出閉環不是「做完了」，也不得安靜消失（#22 選項②、INV-3）
         for line in closure.render_outside(closure.summarize(rows)):
+            print(f"- {line}")
+        for line in closure.render_on_threshold(on_threshold):
             print(f"- {line}")
         for note in notes:
             print(f"- 未讀到：{note}")

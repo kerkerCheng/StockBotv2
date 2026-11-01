@@ -695,8 +695,10 @@ def candidate_short_lines(state_dir: Path | None) -> list[str]:
     c = hb.candidate_counts(board)
     # 邊緣無法量＝卡片上帶標記的檔數（2026-10-30 起不是分組）；宣告可開而不放行的那一附組不是 0 才印
     cover = f"- 覆蓋：邊緣無法量 {c['edge_unmeasurable']}｜邊緣卻沒敘事 {c['edge_gap']}"
+    # 非邊緣待確認／在門檻上（遲滯，2026-11-01）：短版不是 0 才印；完整心跳段 2 每天印名單
     for key, label in (("open_unmeasurable", SIDE_LABELS["edge_unmeasurable"]), ("unmeasured", "量不到卻沒敘事"),
-                       ("legacy", "舊版"), ("precondition_failed", "前提失效")):
+                       ("legacy", "舊版"), ("precondition_failed", "前提失效"),
+                       ("not_edge_pending", "非邊緣待確認"), ("on_threshold", "在門檻上")):
         if c.get(key):
             cover += f"｜{label} {c[key]}"
     lines = [f"- 候選：{hb.candidate_states_text(c)}", cover]

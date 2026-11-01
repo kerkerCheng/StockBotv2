@@ -61,7 +61,9 @@ def test_row_copies_the_artifact_counts_and_keeps_an_absent_held_as_null(tmp_pat
     assert row["counts"] == {"open": 0, "missing": 0, "priced_wait": 1, "pass": 0, "held": None}
     assert row["side"] == {"not_multiple": 0, "edge_unmeasurable": 0, "legacy": 0, "precondition_failed": 0}
     assert row["no_narrative"] == 2 and row["oldest_stall_days"] == {"open": None, "missing": None, "priced_wait": 0}
-    assert set(row) == {"date", "counts", "side", "no_narrative", "oldest_stall_days", "generated_at"}
+    # 遲滯與在門檻上（2026-11-01）：舊板沒有這兩格＝null，不是 0
+    assert row["edge"] == {"on_threshold": None, "not_edge_pending": None}
+    assert set(row) == {"date", "counts", "side", "no_narrative", "oldest_stall_days", "edge", "generated_at"}
 
 
 def test_only_the_default_state_dir_writes_the_real_series(tmp_path) -> None:

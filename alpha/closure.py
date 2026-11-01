@@ -295,11 +295,13 @@ SHORT_CHECK_DAYS = 90
 
 
 def population_for(*, held: bool | None, has_thesis: bool | None, candidate_state: str | None,
-                   edge_state: str | None, has_seat: bool | None) -> tuple[str, str]:
+                   edge_state: str | None, has_seat: bool | None, edge_pending: bool | None = None) -> tuple[str, str]:
     """→ (母體, 理由代碼)。**每一檔各自判的是非題，不跨檔比較**（G2）。純函式。
 
     讀不到（None）的那一格一律往「留在母體」那一邊倒：邊緣判定讀不到 → in；座位讀不到 → in——
     不因為讀不到就退出（INV-3）。非邊緣只看邊緣判定（市值 AND 覆蓋，`config/alpha_screen.json`）。
+    `edge_pending`（2026-11-01 遲滯）：今天才翻成非邊緣、候選板還沒列撤回建議 → 留在母體（`not_edge_pending`）——
+    母體與候選板不得一邊撤、一邊留。
     """
     if held:
         return "in", "held"
@@ -308,6 +310,8 @@ def population_for(*, held: bool | None, has_thesis: bool | None, candidate_stat
     if candidate_state in _CANDIDATE_STATES_IN:
         return "in", "candidate"
     if edge_state == "not_edge":
+        if edge_pending:
+            return "in", "not_edge_pending"
         return "non_multiple", "not_edge"
     if edge_state in ("edge", "unmeasurable"):
         if has_seat is False:
@@ -443,6 +447,21 @@ def render_outside(summary: Mapping[str, Any]) -> list[str]:
         (f"等主題組 {len(cohort)} 檔（還沒寫過敘事、主題組提案還在 pq2——組落地前不排，go＋complete 之後自動回佇列）"
          + ("：" + "、".join(f"{t}（[{n}]）" for t, n in cohort) if cohort else "")),
     ]
+
+
+def render_on_threshold(inputs: Mapping[str, Any] | None) -> list[str]:
+    """「在門檻上」那一行（ROADMAP「邊緣門檻的遲滯與在門檻上計數器」，2026-11-01）：候選板那一格照抄——檔數、帶寬、名單；
+    **0 也印**；板上沒有這一格或讀不到印「未算」＋理由（INV-3）。只計數、不排序、不改門檻。"""
+    from .candidates import on_threshold_line
+
+    data = dict(inputs or {})
+    entries = data.get("entries")
+    if entries is None:
+        return [f"在門檻上：未算（{data.get('absence') or '候選板沒有這一格'}）"]
+    band = data.get("band") or "上限 ±1 家或 ±10%"
+    names = "、".join(on_threshold_line(e) for e in entries if isinstance(e, Mapping))
+    return [f"在門檻上 {len(entries)} 檔（{band}；只計數、不排序、不改門檻——翻出去的檔連續兩次才列撤回建議）"
+            + (f"：{names}" if names else "")]
 
 
 def render_awaiting_report(summary: Mapping[str, Any], *, today: date | None = None) -> list[str]:

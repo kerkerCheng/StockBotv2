@@ -131,7 +131,8 @@ def collect_backlog(*, artifact_dir: Path | None = None, state_dir: Path | None 
             has_thesis=(None if thesis is None else r.ticker.upper() in thesis),
             candidate_state=info.get("candidate_state"),
             edge_state=info.get("edge_state"),
-            has_seat=(None if seats is None else r.ticker.upper() in seats))
+            has_seat=(None if seats is None else r.ticker.upper() in seats),
+            edge_pending=info.get("edge_pending"))
         reason, due = population_detail(population, code, info, board_day=board_day,
                                         last_brief=_last_brief_day(r.ticker) if population == "edge_no_seat" else None,
                                         today=today)
@@ -240,7 +241,8 @@ def board_inputs(candidates_payload: Any) -> tuple[dict[str, dict[str, Any]], st
         if not ticker:
             return
         edge = row.get("edge") if isinstance(row.get("edge"), dict) else None
-        entry = out.setdefault(ticker, {"held": False, "candidate_state": None, "edge_state": None, "edge": None})
+        entry = out.setdefault(ticker, {"held": False, "candidate_state": None, "edge_state": None, "edge": None,
+                                        "edge_pending": False})
         if group == "held":
             entry["held"] = True
         state = group if group not in (None, "held") else row.get("declared")
@@ -248,6 +250,9 @@ def board_inputs(candidates_payload: Any) -> tuple[dict[str, dict[str, Any]], st
             entry["candidate_state"] = state
         if edge is not None:
             entry["edge"], entry["edge_state"] = edge, edge.get("state")
+        # 遲滯（2026-11-01）：候選板說「今天才翻成非邊緣、待確認」就照抄——母體不自己重判
+        if row.get("edge_pending"):
+            entry["edge_pending"] = True
 
     for group, rows_ in (payload.get("groups") or {}).items():
         for row in rows_ or ():
@@ -258,6 +263,20 @@ def board_inputs(candidates_payload: Any) -> tuple[dict[str, dict[str, Any]], st
     for row in payload.get("no_narrative") or ():
         _put(row, None)
     return out, (str(payload.get("today")) if payload.get("today") else None)
+
+
+def on_threshold_inputs(state_store: Any) -> dict[str, Any]:
+    """closure-gate 印「在門檻上」要的那一格：候選板 artifact 的 `on_threshold[]` 與帶寬**照抄**（L16）。
+    讀不到或板上沒有這一格 → `entries=None`＋理由（印「未算」，不是 0；INV-3）。"""
+    try:
+        payload, _fresh = state_store.read("candidates")
+    except Exception as exc:  # noqa: BLE001
+        return {"entries": None, "band": None, "absence": f"候選板 state 讀不到：{type(exc).__name__}"}
+    entries = payload.get("on_threshold")
+    if entries is None:
+        return {"entries": None, "band": None, "absence": "候選板沒有這一格（舊 artifact，重跑 materialize --candidates）"}
+    return {"entries": [dict(e) for e in entries], "band": payload.get("on_threshold_band"), "absence": None,
+            "board_day": payload.get("today")}
 
 
 def population_detail(population: str, code: str, info: Any, *, board_day: str | None,
@@ -317,4 +336,4 @@ def _anchor_to_sector() -> dict[str, str]:
             for anchor in (anchors or [])}
 
 
-__all__ = ["collect_backlog"]
+__all__ = ["collect_backlog", "on_threshold_inputs"]

@@ -874,14 +874,18 @@ def candidate_counts(board: Mapping[str, Any]) -> dict[str, Any]:
     # 邊緣無法量（2026-10-30 起是列上的標記、不是分組）：上板、非持有的 v2 敘事裡邊緣判定少一個輸入的檔數——
     # 照敘事分組的那幾檔（缺 X／等回落／不要）加上附組裡宣告可開、不放行的那幾檔。舊 artifact（附組裝全部）數出來一樣。
     side = [r for r in (board.get("side_groups") or {}).get("edge_unmeasurable") or () if isinstance(r, Mapping)]
+    # 2026-11-01 起這個附組也裝「宣告可開、今天才翻成非邊緣（待確認）」的列（遲滯）——只數邊緣判定真的少輸入的那幾列
+    side_unmeasured = [r for r in side if (r.get("edge") or {}).get("state") not in ("edge", "not_edge")]
     tagged = [r for key in ("open", "missing", "priced_wait", "pass") for r in (board.get("groups") or {}).get(key) or ()]
-    unmeasurable = len(side) + sum(1 for r in tagged if isinstance(r, Mapping)
-                                   and (r.get("edge") or {}).get("state") not in ("edge", "not_edge"))
+    unmeasurable = len(side_unmeasured) + sum(1 for r in tagged if isinstance(r, Mapping)
+                                              and (r.get("edge") or {}).get("state") not in ("edge", "not_edge"))
     out.update(held=counts.get("held"), edge_unmeasurable=unmeasurable,
-               open_unmeasurable=sum(1 for r in side if r.get("declared") == "open"),
+               open_unmeasurable=sum(1 for r in side_unmeasured if r.get("declared") == "open"),
                legacy=counts.get("legacy", 0), precondition_failed=counts.get("precondition_failed", 0),
                with_old=int(counts.get("not_multiple") or 0), non_edge=non_edge, unmeasured=unmeasured,
-               edge_gap=len(no_narr) - non_edge - unmeasured, oldest=dict(board.get("oldest_stall_days") or {}))
+               edge_gap=len(no_narr) - non_edge - unmeasured, oldest=dict(board.get("oldest_stall_days") or {}),
+               # 邊緣門檻的遲滯與在門檻上（2026-11-01）：舊 artifact 沒有這兩格 → None（印「未算」），不壓成 0
+               not_edge_pending=counts.get("not_edge_pending"), on_threshold=counts.get("on_threshold"))
     # 等回落的價格叫醒與缺 X 三分法（2026-10-30）：讀列重算（算法在 `alpha.candidates`，與 assemble_board 同一份）——
     # 舊 artifact 的列沒有這兩個鍵，照實印「沒算」「未算」，不壓成 0
     from alpha.candidates import missing_request_counts, pullback_counts
@@ -934,11 +938,25 @@ def _candidate_lines(state_dir: Path | None) -> list[str]:
         return [f"候選板：{absence.reason}（{absence.kind}）",
                 f"三題：{absence.reason}（{absence.kind}）"]
     c = candidate_counts(board)
+    pending = "未算" if c.get("not_edge_pending") is None else c["not_edge_pending"]
     lines = [f"候選：{candidate_states_text(c)}｜邊緣無法量 {c['edge_unmeasurable']}"
              f"（其中宣告可開、不放行 {c['open_unmeasurable']}）"
              f"｜舊版 {c['legacy']}｜前提失效 {c['precondition_failed']}"
              f"｜非倍率 {c['with_old'] + c['non_edge']}（有舊敘事 {c['with_old']}｜不寫敘事 {c['non_edge']}）"
+             # 遲滯（2026-11-01）：「有舊敘事」只數連續兩次判非邊緣的；今天才翻的另印，不是待做
+             f"｜非邊緣待確認 {pending}"
              f"｜邊緣卻沒敘事 {c['edge_gap']}｜量不到卻沒敘事 {c['unmeasured']}"]
+    # 在門檻上（ROADMAP「邊緣門檻的遲滯與在門檻上計數器」，2026-11-01）：每天印檔數與名單；只計數、不排序、不改門檻。
+    # 板上沒有這一格（舊 artifact）印「未算」，不印 0（INV-3）。名單與帶寬的字都由候選板給（L16）。
+    from alpha.candidates import on_threshold_line
+
+    entries = board.get("on_threshold")
+    if entries is None:
+        lines.append("在門檻上：未算（候選板沒有這一格——舊 artifact，重跑 materialize --candidates）")
+    else:
+        band = board.get("on_threshold_band") or "上限 ±1 家或 ±10%"
+        names = "、".join(on_threshold_line(e) for e in entries if isinstance(e, Mapping))
+        lines.append(f"在門檻上 {len(entries)}（{band}；只計數、不排序、不改門檻）" + (f"：{names}" if names else ""))
     holdings = board.get("holdings") or {}
     if holdings.get("status") != "ok":
         lines.append(f"  持股未讀到，已持有判定暫停（upstream_unavailable）：{holdings.get('reason')}")
@@ -2530,6 +2548,9 @@ SNAPSHOT_KEYS: dict[str, str] = {
     "candidate.edge_unmeasurable": "候選 邊緣無法量",
     "candidate.open_unmeasurable": f"候選 {CANDIDATE_SIDE_LABELS['edge_unmeasurable']}",
     "candidate.no_narrative": "候選 無敘事",
+    # 邊緣門檻的遲滯與在門檻上（2026-11-01）：今天才翻成非邊緣的檔數、落在門檻帶內的檔數
+    "candidate.not_edge_pending": "候選 非邊緣待確認",
+    "candidate.on_threshold": "候選 在門檻上",
     # 追蹤表三條 lane（Phase 5 Step 5.2）：列數與曾達 2 倍——較昨 diff 看得到第一筆回填、第一份新敘事、第一個 2 倍。
     "positions.lane.paper.n": "追蹤表 paper 列數", "positions.lane.live.n": "追蹤表 live 列數",
     **{f"positions.lane.{lane}.reached_2x_ever": f"{lane} 曾達 2 倍" for lane in ("history", "paper", "live")},
@@ -2682,7 +2703,9 @@ def collect_snapshot(*, now: datetime, state_dir: Path | None, leads_path: Path,
         c = candidate_counts(board)
         return {**{f"candidate.{k}": counts.get(k) for k in (*CANDIDATE_GROUPS, *CANDIDATE_SIDE_GROUPS, "no_narrative")},
                 "candidate.edge_unmeasurable": c["edge_unmeasurable"],
-                "candidate.open_unmeasurable": c["open_unmeasurable"]}
+                "candidate.open_unmeasurable": c["open_unmeasurable"],
+                "candidate.not_edge_pending": c.get("not_edge_pending"),
+                "candidate.on_threshold": c.get("on_threshold")}
 
     def positions() -> dict[str, Any]:
         payload, absence = _load_state(state_dir, "positions")
