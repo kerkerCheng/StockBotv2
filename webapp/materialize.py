@@ -1342,7 +1342,8 @@ def build_beta_artifact(report: Mapping[str, Any], *, series_by_key: Mapping[str
         },
         "vocab": {
             "sleeve_labels": {s["sleeve"]: s["label"] for s in sleeves},
-            "gap_state_labels": {k: _gap_state_label(k) for k in ("below_band", "on_target", "above_band", "unknown")},
+            "gap_state_labels": {k: _gap_state_label(k) for k in ("below_band", "on_target", "above_band", "unknown",
+                                                                  "observed_only")},
             "price_status_labels": {"observed": "行情正常", "insufficient_history": "歷史不足",
                                     "unavailable": "資料不足", "quarantined": "資料不足（TWSE 官方較新，暫時隔離）",
                                     "stale": "資料不足（行情過期）"},

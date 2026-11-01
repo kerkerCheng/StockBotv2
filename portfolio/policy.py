@@ -317,7 +317,20 @@ def validate_target_allocation(source: Mapping[str, Any]) -> dict[str, Any]:
     normalized_sleeves: dict[str, dict[str, Any]] = {}
     for name in sorted(expected):
         spec = sleeves.get(name)
-        if not isinstance(spec, Mapping) or not {"target", "band", "role"} <= _public_keys(spec):
+        if not isinstance(spec, Mapping):
+            raise TargetAllocationError(f"sleeve {name} fields do not match schema")
+        if spec.get("observed_only") is True:
+            # 只觀測（AGENTS「alpha 格只觀測、不設目標」2026-09-16 D1；2026-11-01 落地）：實際佔比照印、不比。
+            # 只有 beta 清單之外的那一格可以只觀測——beta 五格的目標保留（沒有目標時「誰跌深投誰」就回來）；
+            # 只觀測又帶目標＝兩種語意擠一格（L12），一律 fail closed。
+            if name not in _TARGET_ONLY_SLEEVES:
+                raise TargetAllocationError(f"sleeve {name} is a beta sleeve and must keep its target")
+            if spec.get("target") is not None or spec.get("band") is not None:
+                raise TargetAllocationError(f"sleeve {name} is observed_only and must not carry target or band")
+            normalized_sleeves[name] = {"target": None, "band": None, "observed_only": True,
+                                        "role": _text(spec.get("role"), f"sleeve_role:{name}")}
+            continue
+        if not {"target", "band", "role"} <= _public_keys(spec):
             raise TargetAllocationError(f"sleeve {name} fields do not match schema")
         target = _finite_fraction(spec.get("target"), f"sleeve_target:{name}")
         band = _finite_fraction(spec.get("band"), f"sleeve_band:{name}", positive=True)
@@ -326,9 +339,14 @@ def validate_target_allocation(source: Mapping[str, Any]) -> dict[str, Any]:
             "band": band,
             "role": _text(spec.get("role"), f"sleeve_role:{name}"),
         }
-    total = sum(item["target"] for item in normalized_sleeves.values())
-    if not math.isclose(total, 1.0, rel_tol=0.0, abs_tol=1e-9):
-        raise TargetAllocationError("sleeve targets must sum to 1.0")
+    targeted = [item["target"] for item in normalized_sleeves.values() if not item.get("observed_only")]
+    total = sum(targeted)
+    if len(targeted) == len(normalized_sleeves):
+        if not math.isclose(total, 1.0, rel_tol=0.0, abs_tol=1e-9):
+            raise TargetAllocationError("sleeve targets must sum to 1.0")
+    elif total > 1.0 + 1e-9:
+        # 有只觀測的格時，設了目標的那幾格合計不得超過 1.0；其餘不設目標（不是只觀測那一格的目標）
+        raise TargetAllocationError("targeted sleeves must not sum above 1.0")
 
     warnings = source.get("correlation_warnings")
     if not isinstance(warnings, list) or not warnings:

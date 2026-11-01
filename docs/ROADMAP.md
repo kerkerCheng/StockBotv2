@@ -75,6 +75,7 @@
 
 > 日期＝交付日。這裡只留落點，讓程式註解裡的 `ROADMAP「標題」` 找得到；要看做了什麼、數字怎麼變，讀封存列。
 
+- 2026-11-01 **alpha 格只觀測**——2026-09-16 D1 落地（使用者「兩點都照你建議吧」）：`config/target_allocation.json` 的 alpha 格 `observed_only`、不帶目標；配置差距只印實際佔比、不進「低於／高於目標」摘要、不引導新資金；beta 五格目標不動（合計 0.90）、全部有目標時總和仍須 1.0；`tests/test_alpha_observed_only.py`；plan `plans/2026-11-01-002-dev-priced-wait-proposal.md` P3
 - 2026-11-01 **週額度常駐計數器**——每次 `claude -p` 的 `rate_limit.windows` 記下每個窗（`crons/llm_step.py::_rate_limit`）；短版 ④ 每天一行「LLM 額度：7 天 X%（重置）｜5 小時 Y%（重置）」、週用量 ≥ 80% 粗體＋摘要行「週額度已用 X%」（`crons.heartbeat.quota_usage`／`quota_flag`；**只印不擋**，門檻量到 2026-12-01 再定）；互動 session 開 workflow／fan-out 前 `python -m crons.llm_quota [--probe]` 讀同一個數。11-01 真資料：daily 06:30 的紀錄 7 天 86%、探針 12:00 當下 99%（5 小時 79%）；基準 24 天裡 6 天 `rate_limited`；`tests/test_llm_quota.py`；plan `plans/2026-11-01-001-dev-phase7-batch3-plan.md` B
 - 2026-11-01 **邊緣門檻的遲滯與在門檻上計數器**——撤回建議要**連續兩次**判非邊緣（今天＋輸入日前一天的 as-of 判定；`alpha/providers/edge.py::attach_prior_judgments`），今天才翻的列帶「非邊緣待確認——明天再看」照敘事分組、閉環母體留著；候選板／心跳段 2／closure-gate 印「在門檻上」（上限 ±1 家或 ±10%）名單，只計數；門檻值不動。回放 10-21～11-01 四檔：現行規則撤回建議 5／重寫 3 → 4（＋1 待確認）／3（`python -m alpha edge 002837.SZ 6481.T LYC.AX AMKR --replay --from 2026-10-21`）；`tests/test_edge_hysteresis.py`；plan `plans/2026-11-01-001-dev-phase7-batch3-plan.md` A
 - 2026-10-31 **只改字面值的換版不重設判斷日**——敘事 v2 選填 `restates`，判斷日與正文版沿用被重述那一版；`tests/test_brief_restates.py`

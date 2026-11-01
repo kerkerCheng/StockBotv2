@@ -1147,7 +1147,7 @@ alpha 原則上不用貸款資金是使用者自己的紀律，**系統不建 ga
   **已投入的非現金部位**（不含現金；cash floor 是另一個 authority）。
   查證：`python -c "import json;d=json.load(open('config/target_allocation.json'));print(d['basis'], sorted(d['sleeves']))"`
   ⚠ 2026-09-16 D1：**alpha 格改 `observed_only`**（只印不比），beta 五格目標保留——沒有目標時「誰跌深投誰」就回來。
-  落地前 config 六格都還有 `target`；查證：`python -c "import json;print(json.load(open('config/target_allocation.json'))['sleeves']['alpha'])"`。
+  **2026-11-01 落地**（使用者「兩點都照你建議吧」；plan `2026-11-01-002` P3）：alpha 格 `observed_only: true`、不帶 target／band（只觀測又帶目標、或 beta 格標只觀測，`validate_target_allocation` 一律 fail closed）；有只觀測的格時，設了目標的格合計不得超過 1.0（現行 beta 五格 0.90，其餘**不是** alpha 的目標），全部有目標時仍須剛好 1.0。`build_allocation_gap` 對它只印實際佔比、state＝`observed_only`、差距 None，不進「低於／高於目標」摘要；報表兩格寫「不設」、差距寫「不比」（刻意不比≠未知）；APP 只印實際佔比、不畫灰帶。查證：`python -c "import json;print(json.load(open('config/target_allocation.json'))['sleeves']['alpha'])"` 看得到 `observed_only`。
 - **相對水位** 只用位置指標：52 週區間位置（主要）、距 52 週高點、距 SMA200，
   全部取自商品**自身**價格序列。⚠ **不得用動能指標表達水位**：RSI 量的是最近漲跌的
   單邊程度，與「站在自己區間哪裡」可以完全脫鉤，而且它正是 2026-08-01 測失敗的輸入，

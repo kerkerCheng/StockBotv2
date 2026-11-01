@@ -223,8 +223,9 @@ def build_allocation_gap(
     entries: list[dict[str, Any]] = []
     for name in sleeve_order:
         spec = target_policy["sleeves"][name]
-        target = float(spec["target"])
-        band = float(spec["band"])
+        observed_only = spec.get("observed_only") is True
+        target = None if observed_only else float(spec["target"])
+        band = None if observed_only else float(spec["band"])
         is_residual = name in residual_sleeves
         base_value = invested_by_sleeve.get(name)
         reason = report_reason
@@ -243,6 +244,9 @@ def build_allocation_gap(
         )
         if actual is None:
             state = "unknown"
+        elif observed_only:
+            # 只觀測（2026-09-16 D1，2026-11-01 落地）：實際佔比照印，不比、不進「低於／高於目標」摘要、不引導新資金
+            state = "observed_only"
         # band 是容忍區間，邊界本身算到位；1e-9 只是吸收浮點誤差，
         # 不讓 0.40−0.05 這種算式把剛好落在邊界的值判成偏離。
         elif actual < target - band - 1e-9:
@@ -257,8 +261,9 @@ def build_allocation_gap(
             "target": target,
             "band": band,
             "actual": actual,
-            "gap": actual - target if actual is not None else None,
+            "gap": actual - target if actual is not None and target is not None else None,
             "state": state,
+            "observed_only": observed_only,
             "invested_base": base_value if reason is None else None,
             "actual_source": (
                 "residual_non_beta_holdings" if is_residual else "policy_instruments"
@@ -530,6 +535,7 @@ def _gap_state_label(value: Any) -> str:
         "on_target": "到位（區間內、無偏好）",
         "above_band": "高於目標區間",
         "unknown": "算不到",
+        "observed_only": "只觀測、不設目標（不比、不引導新資金）",
     }.get(str(value), str(value))
 
 
@@ -714,11 +720,17 @@ def _allocation_gap_lines(report: Mapping[str, Any], currency: str | None) -> li
         state = _gap_state_label(entry.get("state"))
         if actual is None:
             state = f"{state}（{_gap_reason_label(entry.get('unavailable_reason'))}）"
+        if entry.get("observed_only"):
+            # 只觀測（2026-11-01 落地）：目標與容忍區間兩格寫「不設」，差距不算——不是「未知」，是刻意不比
+            target_cells, gap_cell = "不設 | 不設", "不比"
+        else:
+            target_cells = f"{_pct(entry['target'])} | ±{_pct(entry['band'])}"
+            gap_cell = "算不到" if entry.get("gap") is None else _signed_pct(entry.get("gap"))
         lines.append(
             f"| {entry['sleeve']}（{_sleeve_label(entry['sleeve'])}） | {entry['role']} | "
-            f"{_pct(entry['target'])} | ±{_pct(entry['band'])} | "
+            f"{target_cells} | "
             f"{'算不到' if actual is None else _pct(actual)} | "
-            f"{'算不到' if entry.get('gap') is None else _signed_pct(entry.get('gap'))} | "
+            f"{gap_cell} | "
             f"{state} |"
         )
     below = [

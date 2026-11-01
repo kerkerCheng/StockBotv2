@@ -109,7 +109,8 @@ def test_policy_returns_detached_sorted_view() -> None:
     )
 
 
-def test_repository_target_allocation_covers_every_sleeve_and_sums_to_one() -> None:
+def test_repository_target_allocation_covers_every_sleeve_and_beta_targets_fit_under_one() -> None:
+    """2026-11-01：alpha 格只觀測（AGENTS 2026-09-16 D1 落地）——不帶目標；beta 五格目標照舊、合計不超過 1.0。"""
     target = load_target_allocation()
     policy = load_beta_policy()
 
@@ -118,8 +119,11 @@ def test_repository_target_allocation_covers_every_sleeve_and_sums_to_one() -> N
     beta_sleeves = {str(item["sleeve"]) for item in policy["instruments"]}
     assert beta_sleeves < set(target["sleeves"]), "每個 beta sleeve 都必須有目標比例"
     assert set(target["sleeves"]) - beta_sleeves == {"alpha"}
-    assert sum(item["target"] for item in target["sleeves"].values()) == pytest.approx(1.0)
-    assert all(item["band"] > 0 for item in target["sleeves"].values())
+    assert target["sleeves"]["alpha"] == {"target": None, "band": None, "observed_only": True,
+                                          "role": target["sleeves"]["alpha"]["role"]}
+    beta = [target["sleeves"][name] for name in beta_sleeves]
+    assert all(item["target"] is not None and item["band"] > 0 for item in beta), "beta 五格的目標保留"
+    assert sum(item["target"] for item in beta) == pytest.approx(0.90)
     # 兩條相關性警告是輸出的一部分，不得被移除
     names = {item["name"] for item in target["correlation_warnings"]}
     assert len(names) == 2
@@ -135,6 +139,9 @@ def test_repository_target_allocation_covers_every_sleeve_and_sums_to_one() -> N
         # 少一格 sleeve：不能安靜當成 0%，必須 fail closed
         lambda t: t["sleeves"].pop("alpha"),
         lambda t: t["sleeves"]["beta_core"].update(target=0.9),
+        # 只觀測又帶目標＝兩種語意擠一格（L12）；beta 格不得只觀測（目標保留）
+        lambda t: t["sleeves"]["alpha"].update(target=0.1, band=0.05),
+        lambda t: t["sleeves"]["beta_core"].update(observed_only=True, target=None, band=None),
         lambda t: t.update(basis="nav"),
         lambda t: t.update(correlation_warnings=[]),
         lambda t: t["rebalancing"].update(method="sell_to_rebalance"),

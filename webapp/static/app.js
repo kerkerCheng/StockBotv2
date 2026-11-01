@@ -2160,8 +2160,10 @@ function gapRows(sleeves) {
     name.appendChild(el('span', 'key swatch-' + s.slot));
     name.appendChild(document.createTextNode(s.label));
     head.appendChild(name);
-    head.appendChild(el('div', 'gap-nums',
-      `目標 ${fmtRatioPct(s.target, 1)}｜容忍 ±${fmtRatioPct(s.band, 1)}｜實際 ${fmtRatioPct(s.actual, 1) || '算不到'}`));
+    // 只觀測（alpha 格，2026-11-01 落地）：不印目標與容忍區間、不畫灰帶與差距條——是刻意不比，不是缺值
+    head.appendChild(el('div', 'gap-nums', s.observed_only
+      ? `只觀測、不設目標｜實際 ${fmtRatioPct(s.actual, 1) || '算不到'}`
+      : `目標 ${fmtRatioPct(s.target, 1)}｜容忍 ±${fmtRatioPct(s.band, 1)}｜實際 ${fmtRatioPct(s.actual, 1) || '算不到'}`));
     row.appendChild(head);
     const right = el('div');
     const track = el('div', 'gap-track');
