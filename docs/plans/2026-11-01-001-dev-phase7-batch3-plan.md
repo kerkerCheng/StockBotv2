@@ -76,6 +76,9 @@ failure log #110 末欄、ARCHITECTURE 候選板段、CONCEPTS 邊緣判定、re
 AMKR、MXL、SPB.TO）、非邊緣待確認 0、非倍率仍有敘事 0；心跳段 2 第二行與 closure-gate 都印得出名單。測試：`tests/test_edge_hysteresis.py` 15 條＋
 `tests/test_candidates.py`／`test_coverage_counts.py`／`test_webapp_candidates_series.py` 改動；相關 12 檔 336 passed。
 全套 2065 passed（修一條：心跳快照鍵清單多兩個計數器）；commit `1c57bad3`。
+**補記（2026-11-01 晚，雲端 session）：** 「全套」不是全部——`tests/test_phase3_full_chain.py` 三條在 `1c57bad3` 之後 ERROR：夾具把
+`edge_states` 換成只收 `tickers` 的 lambda，`edge_states_with_prior` 帶 `db_path`／`thresholds`／`fx_cache` 呼叫它就 TypeError。
+當下修（一行，夾具改收 `**_kw`），三條回綠。雲端容器全套：4,460 passed、13 failed、6 errors、59 skipped——13 failed 與 6 errors 在改動前的程式上一樣（缺 `library/private` 與抽取檔），與本項無關。
 
 ## B 週額度常駐計數器
 

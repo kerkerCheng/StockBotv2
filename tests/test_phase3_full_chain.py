@@ -103,7 +103,8 @@ def chain(monkeypatch, tmp_path):
     out["wait"] = wait
 
     # 4. 候選狀態：整板推導 → artifact（邊緣判定與四盞燈的取數換成夾具；三題就是第 2 段那一份）
-    monkeypatch.setattr(edge_mod, "edge_states", lambda tickers: {t: {"state": "edge", "label": "邊緣", "reasons": [],
+    # 2026-11-01 批次三 A 起 `edge_states_with_prior` 會帶 db_path／thresholds／fx_cache 呼叫它（當下修：夾具沒跟上）
+    monkeypatch.setattr(edge_mod, "edge_states", lambda tickers, **_kw: {t: {"state": "edge", "label": "邊緣", "reasons": [],
                                                                      "market_cap_usd": 1e9, "analyst_count": 1}
                                                                   for t in tickers})
     monkeypatch.setattr(cand, "_wipeout_and_three_questions",
