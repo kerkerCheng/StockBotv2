@@ -1,0 +1,57 @@
+Source URL: https://nsearchives.nseindia.com/corporate/MTARTECH_30102026172855_PRESENTATION.pdf
+
+Excerpt:
+[EXCERPT — 有限逐字引文] MTAR Technologies Limited「Investor Presentation – October 2026」更正版（Revised Investor Presentation，2026-10-30 17:35 NSE 申報；取代同日 00:30 的首版，更正第 9、10 頁營收分類、第 15 頁訂單與第 34 頁 FII 持股）
+DATE: 2026-10-30
+RETRIEVED: 2026-11-01（NSE 公告附件 PDF 本機 pypdf 抽字，空白正規化後逐字；圖表數列為抽字後的列序）
+NOTE: 發行人自述（L8 弱主張）。燃料電池沒有單獨數字——它和水力、風電、其他合成「Clean Energy - Fuel Cells, Hydel & Others」一類；客戶全程未具名（燃料電池只寫「the customer」）。資料中心基礎設施方案的客戶具名 SLB（Schlumberger）。
+
+【更正函】
+"It has come to our attention that certain inadvertent errors were identified in the presentation in respect of the following: • Revenue classification on Slides No. 9 and 10; • Order book details on Slide No. 15; and • Shareholding Pattern (SHP) of Foreign Institutional Investors (FIIs) on Slide No. 34."
+
+【管理層：全年指引】
+"For the current fiscal year, we have guided for revenue growth of 80%, with an EBITDA margin of 24% ±100 bps."
+
+【分部營收（Rs. Cr；FY23／FY24／FY25／FY26／H1FY27；括號為占比）】
+Clean Energy - Civil Nuclear Power：43.8／61.9／18.4／23.6／8.7（8%／11%／3%／3%／1%）
+Aerospace & Defence：64.5／58.7／93.2／103.8／80.2（9%／7%／14%／12%／10%）
+Clean Energy - Fuel Cells, Hydel & Others：441.7／351.2／416.9／615.4／452.1（77%／61%／62%／70%／59%）
+Products & Others：23.7／108.3／147.5／134.1／226.3（4%／19%／22%／15%／29%）
+
+【Clean Energy - Fuel Cells, Hydel & Others】
+"In the Fuel Cells vertical, the Company supplies various products for Solid Oxide fuel cells"
+"The company has robust closing order book of Rs. 4075.5 Cr in Clean Energy by end of Q2 FY 27, providing strong revenue visibility, with significant growth expected across the Clean Energy business, driven by structural tailwinds including rising power demand, the global energy transition, and the rapidly expanding data centre ecosystem."
+"The company has received Rs. 45 Cr of first article orders from SLB to supply sheet metal components and assemblies for data centre infrastructure solutions. Currently, first article execution is under progress. Post the qualification, robust orders are expected in this vertical further diversifying its clean product portfolio"
+"15+ plus years of experience in catering to Solid Oxide Fuel Cells, the company has a long standing relationship with the customer"
+
+【Q2／H1 FY27 損益（Rs. Cr）】
+"Revenue from Operations 406.8 135.6 200.0% 360.7 12.8% 767.5 292.2 162.7%"（Q2 FY27／Q2 FY26／YoY／Q1 FY27／QoQ／H1 FY27／H1 FY26／YoY）
+"EBITDA 99.2 17.0 483.3% 85.1 16.6% 184.2 45.4 305.9%"；"EBITDA % 24.4% 12.5% 23.6% 24.0% 15.5%"
+"Profit for the year 59.8 4.2 1309.5% 50.2 19.1% 110.1 15.1 630.9%"
+
+【訂單（Rs. Cr）】
+"Diversified Order Book of Rs. 5,976.5 Cr as on 30th Sept 2026"
+Order book Build-Up：30 June 2026 5,143.3；Incoming orders for Q2FY27 1,207.2；Sales restated at order book 374.0；30 September 2026 5,976.5
+"Secured orders worth Rs. 1,207.2 Crs across various sectors during Q2FY27."
+訂單組成：Clean Energy- Civil Nuclear Power 13.6%；Clean Energy- Fuel Cell, Hydel & Others 67.2%；Aerospace & Defence 7.2%；Products & Others 12.1%
+地區拆分（Domestic／Export，兩張圓餅）：22%／78%；25%／75%
+
+【民用核電】
+"Recently, the company has received single largest order inflow of Rs. 504 Cr for the kaiga 5 & 6 projects, strengthening it order visibility in civil nuclear power"
+
+【產能擴充】
+"The company is in the process of setting up a greenfield facility to cater to the requirements of Weatherford and other customers in Oil & Gas and support phase 2 expansion of Clean Energy – Fuel cells"
+"The facility is expected to be commissioned by end Nov 2026"
+"In Clean Energy – Fuel Cells, the Company is in the process of expanding its capacities in a phased manner, in line with customer requirements to support the growing demand. Phase 3 expansion to augment the capacities in this vertical will be completed at the new facility by March 2027"
+資料中心基礎設施方案："The Company has leased a manufacturing facility and is in the process of establishing the necessary infrastructure and capabilities"；"Frist article orders shall be executed over the next 6 months"
+
+【資產負債與現金流（Rs. Cr）】
+Borrowings：non-current 147.8（Mar-26 147.7）；current 318.5（Mar-26 221.6）
+Investment（mutual fund）362.0（Mar-26 215.3）；Cash and cash equivalents 0.3（Mar-26 1.0）
+Inventories 678.8（Mar-26 500.5）；Trade receivables 285.8（Mar-26 336.8）；Other Current Liabilities 478.7（Mar-26 254.9）
+"Net Cash from Operating Activities (A) 350.0 39.8"（H1 FY27 vs H1 FY26）；"Net Cash from Investing Activities (B) -407.3 -25.5"；"Net Cash from Financing Activities (C) 56.6 -13.6"
+Net Working Capital (in Days)：Dec-25 266；Mar-26 172；Jun-26 60；Sep-26 50
+
+【市值與股本】
+"Outstanding Shares 3,07,59,591"；"M-cap (Cr) as on 30th Sept 2026 23,886"
+Shareholding（Sept-26）：Promoters 29.23%；FIIs 20.87%；DIIs 27.09%；Public 22.80%

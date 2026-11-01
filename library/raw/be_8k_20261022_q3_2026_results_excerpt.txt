@@ -1,0 +1,18 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1664703/000162828026066890/ex991_q326financialresults.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Bloom Energy Corporation Form 8-K（Items 2.02／7.01／9.01）EX-99.1「第三季 2026 財務結果」新聞稿（2026-10-22 申報；Accession 0001628280-26-066890）
+DATE: 2026-10-22
+RETRIEVED: 2026-11-01（EDGAR 原文經抓取工具回傳的逐字句；原文 HTML 未本機落檔；EX-99.2 補充簡報未讀）
+NOTE: 在位者（Bloom，MTAR 與高力的客戶）自述的營收與指引（時變財務，只當需求側脈絡）；新聞稿本文沒有提到 Oracle、backlog、產能 GW、供應商或交期。
+
+【第三季營收】
+"Revenue of $1,235.8 million increased 138.1%"
+"Product revenue of $1,073.6 million increased 179.4%"
+
+【全年指引上修】
+"Raises full year 2026 revenue guidance to $4.4 billion - $4.6 billion"
+"representing 122% year-over-year growth at the midpoint"
+
+【需求面的一句】
+"What began with hyperscalers is rapidly moving across market segments because every business needs reliable power to grow."

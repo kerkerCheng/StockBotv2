@@ -185,9 +185,23 @@
     ".BO"
    ],
    "tier_cap": 1,
+   "verified": false,
+   "how": "① GET https://api.bseindia.com/BseIndiaAPI/api/AnnSubCategoryGetData/w（params：pageno=1、strCat=-1、strPrevDate=YYYYMMDD、strToDate=YYYYMMDD、strScrip=<BSE 六碼>、strSearch=P、strType=C、subcategory=-1；headers 帶 Referer／Origin=https://www.bseindia.com）→ JSON 的 Table[].ATTACHMENTNAME。② 附件 GET https://www.bseindia.com/xml-data/corpfiling/AttachHis/<ATTACHMENTNAME>（**AttachLive 回 404 HTML，用 AttachHis**）。公司官網的投資人頁常有同一份 PDF，但財報可能是掃描檔（無文字）。⚠ 2026-11-01 用 repo 預設 UA 打 ① 回 Akamai 403「Access Denied」（edgesuite）——同一份 Reg. 30 披露改走 nse_india 取到",
+   "why": "MTARTECH.NS（BSE 543270）需要它。2026-10-23 實測通過：FY26 經審計結果、FY27 第一季新聞稿與投資人簡報、2026-05-14 訂單披露都取到全文；mtar.in 上的 FY26 合併財報是掃描檔，經審計結果改用 BSE 那份。2026-11-01 回 403，標回未驗證（verified 寫的是今天跑不跑得通）；下次跑通再翻回來。"
+  },
+  {
+   "key": "nse_india",
+   "label": "印度 NSE 公司公告 API（同一份 Reg. 30／33 披露，附件在 nsearchives）",
+   "rung": 2,
+   "applies_to": "ticker_suffix",
+   "suffixes": [
+    ".NS",
+    ".BO"
+   ],
+   "tier_cap": 1,
    "verified": true,
-   "how": "① GET https://api.bseindia.com/BseIndiaAPI/api/AnnSubCategoryGetData/w（params：pageno=1、strCat=-1、strPrevDate=YYYYMMDD、strToDate=YYYYMMDD、strScrip=<BSE 六碼>、strSearch=P、strType=C、subcategory=-1；headers 帶 Referer／Origin=https://www.bseindia.com）→ JSON 的 Table[].ATTACHMENTNAME。② 附件 GET https://www.bseindia.com/xml-data/corpfiling/AttachHis/<ATTACHMENTNAME>（**AttachLive 回 404 HTML，用 AttachHis**）。公司官網的投資人頁常有同一份 PDF，但財報可能是掃描檔（無文字）",
-   "why": "MTARTECH.NS（BSE 543270）需要它。2026-10-23 實測通過：FY26 經審計結果、FY27 第一季新聞稿與投資人簡報、2026-05-14 訂單披露都取到全文；mtar.in 上的 FY26 合併財報是掃描檔，經審計結果改用 BSE 那份。"
+   "how": "requests.Session 帶一般瀏覽器 UA（不含任何個人資訊）、Accept=application/json、Referer=https://www.nseindia.com/companies-listing/corporate-filings-announcements：① 先 GET https://www.nseindia.com/（回 403 無妨，cookie 照設）；② GET https://www.nseindia.com/api/corporate-announcements?index=equities&symbol=<NSE 代號> → JSON 列表，每筆 an_dt／desc／attchmntFile；③ 附件直接 GET https://nsearchives.nseindia.com/corporate/<檔名>.pdf（同一個 session）。腳本：library/private/tmp/nse_ann.py。⚠ 同一天可能有更正版（desc 相同、時間較晚）——取同日最後一筆",
+   "why": "2026-11-01 實測通過（MTARTECH）：Q2 FY27 新聞稿、未審計財報（Outcome）、投資人簡報首版與 17:35 的更正版、法說錄音連結都列得到、附件抓得下。當天 bse_india 回 403，這條是 .NS 標的的替代路。"
   },
   {
    "key": "issuer_site",

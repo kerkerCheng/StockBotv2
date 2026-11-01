@@ -1,0 +1,25 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1341439/000119312526435853/d75538dex991.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Oracle Corporation Form 8-K（Item 7.01）EX-99.1「Oracle Investor Day」新聞稿（2026-10-28 申報；Accession 0001193125-26-435853）
+DATE: 2026-10-28
+RETRIEVED: 2026-11-01（EDGAR 原文經抓取工具回傳的逐字句；原文 HTML 未本機落檔）
+NOTE: 發行人自述的長期財務目標（L8 弱主張，時變）；只當錨層級（雲端 capex／融資）脈絡，不入圖。報導（cryptobriefing 10-29）寫的「單一 AI 基礎設施合約約 800 億美元 RPO、capex 約 370 億、年營收約 160 億」不在這份 8-K 裡。
+
+【事件】
+"AUSTIN, Texas, October 28, 2026 — Oracle Corporation (NYSE: ORCL) today hosted an Investor Day in Las Vegas, NV."
+
+【FY30 目標】
+"Set long-term outlook for FY30 of $225 billion+ in total revenue, representing more than 35% CAGR from FY26"
+"non-GAAP operating margin of 40%+"
+"non-GAAP EPS $21+"
+
+【自由現金流與槓桿】
+"set free cash flow target of $30 billion+ for FY29"
+"net debt to adjusted EBITDA will be below 3.5 times in FY29"
+
+【籌資上限】
+"Committed to limiting additional capital raises through FY30 to $20 billion, excluding refinancing of existing debt, split between $10 billion in equity and $10 billion in gross debt"
+
+【FY27 指引】
+"fiscal 2027 outlook for total revenue of at least $90 billion and non-GAAP earnings per share of $8.10"

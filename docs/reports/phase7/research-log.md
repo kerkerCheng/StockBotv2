@@ -340,3 +340,29 @@
 **發現並當下修（failure log #122）**：ew_1919–1924 被同一場董事會的 sibling 重訊叫醒，根因是「published_at 早於建立日就不叫醒」那道閘拿 `created_at[:10]`（UTC 日期）去對 MOPS 的台北日期——停放時建的追源 watch `created_at`＝lead 進 pq1 的時間（daily 05:43 台北＝10-30 21:43Z），UTC 10-30 對台北 10-30 算「不早於」；entity 型與語意型兩個 matcher 各寫一份、都錯。反向對 EDGAR 是靜默漏接（台北 08:00–12:00 建的 watch 把前一晚美東的 8-K 當回補舊文件擋掉；還沒撞到實例）。修法：`_created_day` 把建立時刻換算到 published_at 那本日曆（`mops:`→Asia/Taipei、`edgar:`／sec.gov→America/New_York、其餘 UTC 不變）。重播今天 16 次叫醒（`library/private/tmp/replay_wakes_1101.py`）：5 次不發生、11 次照舊；`tests/test_published_calendar.py` 7 條。段 5.5 ④ 三問：不改使用者能核准什麼／是「同一本日曆上比」（MOPS 收緊、EDGAR 邊界補漏，不是放寬）／不動封閉字彙、無第二 owner → 當下修。
 
 **收尾**：全量 materialize 197/197（候選板可開 0／缺 X 38／等回落 4／不要 46／已持有 2／無敘事 106）後重啟 8790（00:59，health `code.stale=false`）；writer lock 釋放。測試：`test_published_calendar`＋`test_semantic_watch`＋`test_trace_wait_plan` 87 passed；`-k "watch or wake or queue_segments or heartbeat or todo_ledger or daily_digest or semantic"` 578 passed（3911 deselected）。decompose 本輪無新 lead、無新錨提案；距上次掃題材 5 天（門檻 7）。新鑄 pq2：0；新 watch：0；敘事改動：0。順手更正 research-drain SKILL 兩處「`writer_guard verify`」（子命令不存在，實際是 `check`）。
+
+## 十五、2026-11-01 早（使用者 `/research-drain`）
+
+**開工計數**（短版 ⑤）：待深挖 lead 17、未檢 1、敘事該重寫 2（watch 醒 2；非邊緣仍有敘事 1）、T2 命中待檢 2（1 條等待）；段 5 到終局 77／77；待辦池 13（向你要文件 3、等事件 10）。
+
+**機械段**：consume-fired 0、todo sync 新增 0（watch 812；反證對帳「沒有結構化反證 3」由 Step 1.6 補登記）、standing-go 候選 0。
+
+**段 1**：上詮 10-30 重訊（子公司中山上詮總經理退休、特助兼業務副總暫代）叫醒 FAU 層讀圖反證 ew_1079 與上詮敘事的 ew_1123／ew_1124（後兩條就是「敘事該重寫 2」）——全文讀過，一組 `judge --touches no` 回 active，敘事不改。**T2 命中**：ew_1540（MTAR 敘事等 FY27 第二季結果）被 Yahoo／GuruFocus 10-30 法說摘要命中，判觸及 → 敘事列進該重寫。
+
+**敘事該重寫 → MTAR 重寫** `ib_6873140c653e5741`（取代 `ib_75bcc730d2ee5609`；故事 `st_04b78a86c59511c4`）：一手讀了 10-29 新聞稿與未審計財報（兩家全資子公司併入、單一分部）、10-30 更正版投資人簡報（NSE 附件，更正第 9、10 頁營收分類與第 15 頁訂單）、Bloom 10-22 第三季 8-K（營收年增 138%、全年指引上修到 44–46 億美元）。第二季營收 40.68 億盧比（年增 200%）、在手 597.65 億（清潔能源 407.55 億、占 67%）、Kaiga 核電 50.4 億與 SLB 資料中心鈑金首件 4.5 億的單、第二期 11 月底／第三期 2027-03 擴產、全年指引營收 +80%；營運資金天數 172→50、營業現金流 35 億，但借款 36.93→46.63 億、現金 0.03 億。候選狀態仍缺 X（`missing_kind=layer`：插槽讀圖兩半——Bloom 的買方為什麼選 SOFC、Bloom 的第二來源；燃料電池仍沒單拆、大單客戶與交期沒寫、法說逐字稿未申報）；ew_1540 以 `still_holds` 處置，新叫醒 `ew_1951`（2027-02-14 第三季結果，可輪詢）。插槽讀圖 `sr_db33dc55748a1ff2` 不換騎（Bloom 第三季新聞稿沒有第二來源或買方理由）。故事第一版「必須為真」178 字被寫入端擋（上限 160），拿掉日期與出處後過。
+
+**非邊緣仍有敘事 1 → LYC.AX 撤回** `ib_6197543b76dce17f`（撤 10-31 的 `ib_514f4fefdd74a1d0`）：`alpha edge LYC.AX` → 13 家、8.57B 美元、coverage_over_edge；照 10-31 寫下的規則撤回、不加遲滯（failure log #110 第 4 次：門檻 ±1 家翻轉——10-22 撤、10-31 發、11-01 再撤）。
+
+**pq1 17 則全部停放**（`drain` 順序；每則逐條處置 `engine_b.impact` 列出的在盯條件，`library/private/tmp/park.py`）：一手取得 4——源杰三季報的新浪二手（一手 10-31 已入庫，同源 lead_b7510a6f）、NVIDIA 10-21 供應鏈產能新聞稿（SPIL CPO 光引擎 15 倍，已在庫；OOI 仍研究階段）、GXO–Agility 擴站聯合新聞稿（Statesville、Lebanon，2027 年初 Digit 4；節錄 `gxo_agility_expansion_statesville_lebanon_2026_10_26`）、Oracle 10-28 Investor Day 8-K（FY30 營收 2,250 億美元以上、籌資上限 200 億；報導寫的 800 億 RPO 不在 8-K）；不追 13——carrioresearch 五則評論（AXT／Marvell–Lumentum 傳聞、中國光模組、Lumentum 3-2 協議重述、SK 海力士 14 家長約、MSFT／AMZN capex）、Terafab 追加報導（原文沒搜到；等待已由 lead_0f6a3beb 的 ew_1456 持有）、Advantest 與 Trane 財報（名冊外、非邊緣）、鴻海／Altman 媒體轉述、CoWoS 漲價傳聞、美光獎金、上詮人事重訊。一手節錄 6 份進 `library/raw/`。
+
+**段 4 走圖**：55 筆命中逐筆對四份終局表（`diff_gw_terminals_1101.py`），新命中 0。
+
+**段 5**：全量 materialize 197/197 後 closure-gate **closed、不帶 skip**（到終局 77：ready 76／settled 1；母體外 120：非倍率 107（LYC.AX 撤回後歸這裡）、邊緣沒座位已查 13、等入圖 0、等主題組 0）。
+
+**停止條件成立**：`engine_b.cli drain` 段 0–1 全零、pq1 空（triaged_go 0）；`event_watch counters` fired_unconsumed 0、semantic_pending_check 0、wake_held 0、expiry_* 全 0；`audit invariants --only QueueSegments` PASS；短版 ⑤ 二十格全 0（`library/private/tmp/ledger_cells.py`，與心跳同一份判定；全量重算後再印一次仍全 0）；候選板可開 0／缺 X 37／等回落 4／不要 46／已持有 2／無敘事 107（可開為零就零）。非零但不是待做：停滯 3、到期 3（同 10-31，都已有 `expiry_resolution`）。8790 重啟（09:08，health `code.stale=false`）；writer lock 釋放。新鑄 pq2：0；新 watch：`ew_1951`（MTAR）；敘事改動：MTAR 換版、LYC.AX 撤回；故事：MTAR 一則。測試：`test_source_routes` 12 passed。decompose：本輪 17 則 lead 的需求錨都是 AI capex 或人形放量，無新錨提案；距上次掃題材 5 天（門檻 7）。
+
+**發現未排程**：
+- BSE 公告 API（source_routes 10-23 實測可用）今天用 repo 預設 UA 回 Akamai 403「Access Denied」；NSE 的 `/api/corporate-announcements?index=equities&symbol=` 帶瀏覽器 UA 可直接打（首頁 403 無妨），附件在 nsearchives 可下載——`config/source_routes.json` 新增 `nse_india`（verified）、`bse_india` 標回未驗證（當下修，Z0 設定；`test_source_routes` 12 passed）。
+- 投資人簡報同日兩版（MTAR 首版 00:30、更正版 17:35，更正營收分類與訂單頁）：抓 NSE 清單時取同日最後一筆、不是第一筆——寫進 nse_india 的 how（1 例）。
+- LYC.AX 門檻 ±1 家第三次翻轉（10-22 撤、10-31 發、11-01 再撤）：ROADMAP 旁支「邊緣門檻的遲滯與在門檻上計數器」○ 已有，不重列；本輪照 10-31 寫下的規則撤回。
+- Bloom 10-22 第三季 8-K（Items 2.02／7.01）不在 lead 池：co:bloom_energy 的 entity watch（ew_1490／1492）仍 active、沒被它叫醒——EDGAR harvest 是否涵蓋 Bloom 這家非邊緣在位者，下次 daily 看 harvest-health 再判（1 例，不排程）。

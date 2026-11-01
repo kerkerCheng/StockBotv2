@@ -1,0 +1,22 @@
+Source URL: https://mtar.in/wp-content/uploads/2026/10/Press-Release-Q2-FY-27.pdf
+
+Excerpt:
+[EXCERPT — 有限逐字引文] MTAR Technologies Q2 FY27 Investors Press Release（Reg. 30(6) 申報，BSE 543270／NSE MTARTECH；公司官網 PDF；NSE 鏡像 https://nsearchives.nseindia.com/corporate/MTARTECH_29102026173730_Pressrelease_sw.pdf）
+DATE: 2026-10-29
+RETRIEVED: 2026-11-01（公司官網 PDF 本機 pypdf 抽字，空白正規化後逐字）
+NOTE: 發行人自己的申報（L8 弱主張）；新聞稿只有合併損益數字與執行長一句話，沒有分部拆分、沒有訂單、沒有客戶。
+
+【標題】
+"MTAR reports another strong quarter, achieving its highest-ever quarterly revenue in Q2 FY27, with 200% YoY growth in revenue and 483.3% YoY growth in EBITDA"
+
+【YoY Q2 FY27 vs Q2 FY26】
+"Revenue from Operations stood at Rs. 406.8 Cr. in Q2 FY 27 as against Rs. 135.6 Cr. in Q2 FY 26, 200.0% increase YoY"
+"EBITDA reported at Rs. 99.2 Cr. in Q2 FY 27 as compared to Rs. 17.0 Cr. in Q2 FY 26, 483.3% increase YoY"
+"Profit After Tax was at Rs. 59.8 Cr in Q2 FY 27 as against Rs. 4.2 Cr. in Q2 FY 26, 1309.5% increase YoY"
+
+【QoQ Q2 FY27 vs Q1 FY27】
+"Revenue from Operations stood at Rs. 406.8 Cr. in Q2 FY 27 as against Rs. 360.7 Cr. in Q1 FY 27, 12.8% increase QoQ"
+"EBITDA reported at Rs. 99.2 Cr. in Q2 FY 27 as compared to Rs. 85.1 Cr. in Q1 FY 27 , 16.6% increase QoQ"
+
+【執行長】
+"We expect H2 FY27 to be stronger than H1, supported by a robust order book and sustained execution momentum, in line with our annual guidance."

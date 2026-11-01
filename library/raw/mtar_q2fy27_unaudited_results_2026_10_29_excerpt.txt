@@ -1,0 +1,34 @@
+Source URL: https://mtar.in/wp-content/uploads/2026/10/OUTCOME_sw.pdf
+
+Excerpt:
+[EXCERPT — 有限逐字引文] MTAR Technologies「Outcome of Board Meeting」＋ Statement of Unaudited Financial Results for the Quarter and Half Year ended September 30, 2026（Reg. 33 申報；審閱報告 S.R. Batliboi & Associates LLP；NSE 鏡像 https://nsearchives.nseindia.com/corporate/MTARTECH_29102026161929_OUTCOME_sw.pdf）
+DATE: 2026-10-29
+RETRIEVED: 2026-11-01（公司官網 PDF 本機 pypdf 抽字；表格數字照抽字結果，單位 INR millions；掃描件抽字有少數字元錯位，下列只抄對得上欄位的數）
+NOTE: 發行人申報、未經審計（限度審閱）。兩家全資子公司（Gee Pee Aerospace and Defence、Magnatar Aero Systems）2026-10-28 經 NCLT 核准併入本公司（自 2025-04-01 起算），因此不再編合併報表、本期為單體；過去期間重列、影響不重大。單一營運分部（Ind AS 108）——燃料電池沒有分部數字。
+
+【合併說明】
+"Subsequent to the period end, on October 28, 2026, the Hon'ble National Company Law Tribunal ("NCLT"), Hyderabad Bench-II has approved a Scheme of Amalgamation ("Scheme") of Gee Pee Aerospace and Defence Private Limited and Magnatar Aero Systems Private Limited (wholly owned subsidiaries) with the Company with effect from April 01, 2025."
+"As stated in note 2 above, both the subsidiaries have now been merged with the Company as per the Scheme. Accordingly, no consolidated financial statement is required to be prepared by the Company."
+"The Company's business activity falls within a single line of business segment, in terms of Ind AS 108 "Operating Segments"."
+
+【損益（INR millions）】
+Total Revenue from Operations：Q2 FY27 4,067.65；Q1 FY27 3,607.21；Q2 FY26 1,355.93；H1 FY27 7,674.86；H1 FY26 2,921.77；FY26 8,762.06
+Profit before tax：Q2 FY27 802.79；Q2 FY26 56.75；H1 FY27 1,476.80；H1 FY26 204.88
+Net profit for the period：Q2 FY27 598.32；Q1 FY27 502.27；Q2 FY26 42.45；H1 FY27 1,100.58
+Finance costs：Q2 FY27 162.42；H1 FY27 320.89；H1 FY26 120.29
+
+【資產負債（INR millions，30-Sep-2026 vs 31-Mar-2026）】
+Borrowings（non-current）1,478.01 vs 1,476.62；Borrowings（current）3,185.28 vs 2,215.59
+Investment in mutual funds 3,619.97 vs 2,153.39；Cash and cash equivalents 2.87 vs 9.96；Bank balances other than cash 208.77 vs 202.25
+Inventories 6,787.64 vs 5,005.22；Trade receivables 2,858.47 vs 3,368.23
+Trade payables（other than MSME）2,466.20 vs 1,285.51；Other current liabilities 4,786.92 vs 2,549.36
+Property, plant and equipment 6,378.08 vs 4,972.28；Capital work-in-progress 1,129.30 vs 344.01
+
+【現金流（INR millions，半年至 30-Sep-2026 vs 30-Sep-2025）】
+"Net cash flow (used in) / from operating activities (A) 3,499.72 397.89"
+"Purchase of property, plant and equipment, including intangible assets, capital work in progress, capital creditors and capital advances (2,730.50) (266.47)"
+"Investment in units of mutual fund (6,063.09) -"；"Receipts from redemption in units of mutual fund 4,719.40 ="
+"Net cash flow used in investing activities (B) (4,073.23) (255.00)"
+"Proceeds from / (repayment of) short term borrowings 992.54 263.88"
+"Net cash flows from financing activities (C) 566.42 (136.15)"
+"Increase / (decrease) in other current and Non current liabilities 2,177.93 (7.11)"（營運資金變動項）

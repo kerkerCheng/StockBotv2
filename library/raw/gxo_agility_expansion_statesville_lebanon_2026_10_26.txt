@@ -1,0 +1,26 @@
+Source URL: https://www.agilityrobotics.com/content/gxo-and-agility-robotics-expand-partnership-to-accelerate-deployment-of-humanoids-in-u-s-operations
+
+Excerpt:
+[EXCERPT — 有限逐字引文] GXO and Agility Robotics Expand Partnership to Accelerate Deployment of Humanoids in U.S. Operations（Agility Robotics newsroom／GXO 聯合新聞稿，2026-10-26）
+DATE: 2026-10-26
+RETRIEVED: 2026-11-01（Agility 官網 newsroom 頁面；研究 drain 由 The Robot Report 10-26 報導追回原稿）
+NOTE: 買方（GXO，co:gxo_logistics）與供應商（Agility，私人公司、與 CCXI 合併中）聯名的新聞稿——買方具名、承諾擴站，屬客戶端一手；沒有金額、沒有台數、沒有致動器或零件供應商。
+
+【擴站】
+"GXO Logistics, Inc. (NYSE: GXO), the world's largest pure-play contract logistics provider, and Agility Robotics, a leading humanoid robotics and physical AI company, today announced an expansion of their pioneering partnership to advance humanoid automation in logistics with deployments of Agility's Digit humanoid robot to GXO sites in North Carolina and Tennessee."
+
+【2024 首單與既有績效】
+"The announcement builds on the companies' industry-first, multi-year agreement in 2024 to deploy Agility Robotics' Digit® humanoid robot in a live GXO warehouse environment in Flowery Branch, Georgia. The agreement was the industry's first formal commercial deployment of humanoid robots in live operations and the first Robots-as-a-Service (RaaS) agreement for humanoid robots. Since then, Digit has moved more than 100,000 totes at the Flowery Branch facility, demonstrating its ability to perform repetitive material-handling tasks reliably in an active logistics environment."
+
+【買方執行長】
+"\"GXO was the first customer to put Digit to work in live operations under a commercial agreement, and expanding to additional sites is the clearest signal that the value is real,\" said Peggy Johnson, CEO of Agility Robotics."
+
+【站點、機型、時程】
+"Under the expanded agreement, Digit will support e-commerce fulfillment at GXO's Statesville and Lebanon sites, taking on highly repetitive material-handling tasks. Deployments are expected to begin in early 2027 using Digit 4 and will migrate to Digit 5 when it becomes commercially available."
+
+【營運時數與產能】
+"Across its commercial operations and customer programs, Digit has accumulated more than 65,000 hours of real-world operation. That experience has informed the development of Digit 5, Agility's next-generation robot unveiled on September 15, 2026, which is designed for cooperatively safe work in close proximity to people and will address a broader range of industrial workflows."
+"To support broader commercial adoption, Agility has invested in the infrastructure needed to manufacture, deploy and support humanoid robots at scale, including RoboFab, its 70,000-square-foot manufacturing facility in Salem, Oregon, designed for annual production capacity of up to 10,000 robots; Agility Arc; and expanded software, deployment and service capabilities, including its recently announced Pittsburgh expansion."
+
+【上市時程】
+"As previously announced, Agility is preparing to become a public company through its business combination with Churchill Capital Corp XI (Nasdaq: CCXI). The business combination is expected to close in the fourth quarter of 2026, after which the combined company will operate as Agility Robotics and is expected to trade on Nasdaq under the ticker symbol \"AGLT.\""
