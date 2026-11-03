@@ -901,11 +901,15 @@ def compose_brief(*, now: datetime, summary: str, snapshot: Mapping[str, Any], r
         # 沒有可讀的用量就說為什麼（沒有執行紀錄／這一輪沒有呼叫回報）
         quota_line = line(lambda: "- " + hb.quota_usage_line(hb.quota_usage(rows), now=now, record=record,
                                                             record_problem=record_problem), "LLM 額度")
+        # Q3W 裁決（整體盲點審查 2026-11-01 §2 D）：到點沒寫的逐檔點名；名單全部到點且寫完就不印
+        from crons.q3w_verdicts import status_lines as q3w_lines
+
         return ["### ④ 狀態與健康度", *health, *quota_line, *line(lambda: candidate_short_lines(state_dir), "候選"),
                 *(["", *wait, ""] if wait else []),
                 *line(lambda: "- " + watch_short_line(now=now), "watch"),
                 *line(lambda: "- " + disproof_line(snapshot), "反證"),
-                *line(waits_line, "無到期的等待")]
+                *line(waits_line, "無到期的等待"),
+                *line(lambda: [f"- {text}" for text in q3w_lines(today)], "Q3W 裁決")]
 
     def todo_part() -> list[str]:
         try:

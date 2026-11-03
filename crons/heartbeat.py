@@ -1182,6 +1182,13 @@ def build_changes(*, now: datetime, state_dir: Path | None, thesis_path: Path,
         section.lines.extend(_priced_wait_lines(state_dir))
     except Exception as exc:  # noqa: BLE001
         section.lines.append(f"等回落：盤點失敗（{type(exc).__name__}；upstream_unavailable）")
+    # Q3W 裁決（整體盲點審查 2026-11-01 §2 D）：與短版 ④ 同一個函式；名單全部到點且寫完就不印
+    try:
+        from crons.q3w_verdicts import status_lines as q3w_lines
+
+        section.lines.extend(q3w_lines(now.astimezone().date()))
+    except Exception as exc:  # noqa: BLE001 — 這一行壞掉不帶走整段
+        section.lines.append(f"Q3W 裁決：盤點失敗（{type(exc).__name__}；upstream_unavailable）")
 
     # 結構讀圖（Q5，2026-09-17）：讓它**不可能安靜腐壞**。心跳只讀已 materialize 的比對結果，
     # 不查圖、不重新推理——重讀是研究，只在互動 session（D12）。
