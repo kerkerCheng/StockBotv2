@@ -204,6 +204,16 @@
    "why": "2026-11-01 實測通過（MTARTECH）：Q2 FY27 新聞稿、未審計財報（Outcome）、投資人簡報首版與 17:35 的更正版、法說錄音連結都列得到、附件抓得下。當天 bse_india 回 403，這條是 .NS 標的的替代路。"
   },
   {
+   "key": "us_customs_bol",
+   "label": "美國海關進口提單（公開彙整頁）",
+   "rung": 2,
+   "applies_to": "on_request",
+   "tier_cap": 2,
+   "verified": true,
+   "how": "ImportYeti（importyeti.com 公司頁）或 ImportKey 公開頁：以美國收貨人（consignee）或外國託運人（shipper）查，讀提單的品名、收貨人、日期與筆數；只存研究必要的有限 quote 與 locator。**CAPTCHA、登入或付費牆即停**（source-trace §3 access boundary），停了就照「向使用者要文件」開口或記拿不到——不繞過。品名是託運人申報、免費頁只是樣本，寫 claim 時照寫「樣本」。",
+   "why": "只在缺 X 恰是「具名的美國客戶（買不買、買多少）」時走一次——不看代號，所以不列進收據的未走（applies_to=on_request）。來源登記：config/publishers.json 的 U.S. Customs and Border Protection（[774]，government_statistics、evidence_tier 2）。2026-10-17／10-18 實測可用：KSH International（國家實驗室全文＋提單）、華明對 Prolec GE 與 Georgia Transformer 的出貨（ImportYeti）都靠提單找到（cases.md P2 wave 2、failure log #72）。下一次照用：華城 1519.TW、KSH（盲點修法第 15 條，2026-11-03 登記）。"
+  },
+  {
    "key": "issuer_site",
    "label": "發行人自家 newsroom／IR",
    "rung": 3,

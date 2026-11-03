@@ -126,6 +126,8 @@ ASR 只用來找 timestamp；數字、技術詞與 quote 必須回聽核對。
    媒體轉述同一份報告是 `same_origin`。
 3. **規格書／teardown**：teardown 是第三方拆解（tier 2）；datasheet 是供應商自報（見上表）。
 4. **供應商自己的文件**（年報競爭者段、法說）：可以列舉，但不算印證（L8：供應商自稱是弱主張）。
+5. **美國海關進口提單**（路徑表 `us_customs_bol`，按需）：只在缺口恰是「具名的美國客戶」時查一次——提單具名託運人與收貨人，
+   是第三方監管紀錄（tier 2）；CAPTCHA、登入或付費牆即停（§3）。P2 的 KSH International（國家實驗室全文＋提單）與華明的對美出貨都靠提單找到。
 
 找到 → RA request 帶 `layer_enumerations`（`origin_role` 照實填；prepare 會核對引文真的具名每一家）→ pq2 `ra_admission`。
 公開一手找不到、或只有付費 → 先照「向使用者要文件」一節開口（`trace_requires_user=true`）；使用者說拿不到或不要，lead 才停在 `awaiting_named_disclosure`（trigger entities＝這一層的客戶或供應商），

@@ -54,6 +54,10 @@ class Route:
             # 離線近似，方向刻意偏向多列：漏一條的代價遠大於多跑一次 probe。
             return bool(ticker) and not any(
                 ticker.upper().endswith(s) for s in self.foreign_suffixes)
+        if self.applies_to == "on_request":
+            # 按需路徑（2026-11-03，盲點修法第 15 條）：適不適用看的是缺口的內容（例：缺 X 恰是具名美國客戶），
+            # 不是代號——不進 applicable，也不進 park 收據的「未走」（每張收據都多一格就是恆亮，L14-4）；CLI 另段列出。
+            return False
         raise SourceRouteError(f"未登記的 applies_to：{self.applies_to!r}")
 
 
@@ -68,6 +72,10 @@ class RouteRegistry:
         """這個標的可以走哪幾條，依 rung 由淺到深排序。"""
         hit = [r for r in self.routes if r.applies(ticker=ticker, venue=venue)]
         return tuple(sorted(hit, key=lambda r: (r.rung, r.key)))
+
+    def on_request(self) -> tuple[Route, ...]:
+        """按需路徑（`applies_to=on_request`）：何時該走寫在各自的 `why`，由研究者看缺口決定。"""
+        return tuple(sorted((r for r in self.routes if r.applies_to == "on_request"), key=lambda r: (r.rung, r.key)))
 
     def requires_receipt(self, trace_status: str | None) -> bool:
         """這個 trace_status 是「我沒拿到」型嗎？是 → park 必須附 receipt。"""
@@ -195,6 +203,14 @@ def main(argv: list[str] | None = None) -> int:
     print(f"# {args.ticker}（venue={venue}）可走 {len(rows)} 條，✓＝本次已走")
     for line in render(rows, attempted=attempted):
         print(line)
+    extra = registry.on_request()
+    if extra:
+        print()
+        print("# 按需路徑（看缺口、不看代號；不算進收據的「未走」）")
+        for line in render(extra, attempted=attempted):
+            print(line)
+        for r in extra:
+            print(f"    什麼時候走（{r.key}）：{r.why}")
     fmt = registry.file_formats.get("pdf") or {}
     if fmt:
         print()

@@ -91,6 +91,21 @@ def test_unverified_marker_is_not_vacuous() -> None:
     assert "未驗證" in rendered
 
 
+def test_on_request_routes_never_join_the_receipt_and_the_cli_lists_them(capsys) -> None:
+    """盲點修法第 15 條（審查 external-6）：海關提單看缺口、不看代號——不進 applicable、不進收據的「未走」
+    （每張收據都多一格就是恆亮，L14-4）；CLI 另段列出，連同什麼時候走。"""
+    reg = routes.load()
+    customs = next(r for r in reg.routes if r.key == "us_customs_bol")
+    assert (customs.applies_to, customs.rung, customs.tier_cap) == ("on_request", 2, 2)
+    assert reg.on_request() == (customs,)
+    for ticker in ("1519.TW", "KSHINTL.NS", "AXTI", "UNKNOWN"):
+        assert "us_customs_bol" not in {r.key for r in reg.applicable(ticker=ticker, venue=None)}
+    assert "us_customs_bol" not in routes.build_receipt("1519.TW", [])
+    assert routes.main(["1519.TW"]) == 0
+    out = capsys.readouterr().out
+    assert "# 按需路徑" in out and "什麼時候走（us_customs_bol）" in out
+
+
 def test_receipt_names_the_routes_not_walked() -> None:
     """收據的價值在於**逐條寫出沒走的**，而不是宣稱走過了。"""
     receipt = routes.build_receipt("002472.SZ", ["local_library"])
