@@ -575,6 +575,8 @@ const TQ_DETAIL_LABELS = {
   total_debt: '總債', market_cap_usd: '市值（美元）', base_outstanding: '期初股數', base_date: '期初日',
   last_outstanding: '最新股數', last_date: '最新日', change: '股數變化', issued_total: '期間發行金額',
   days_since_last: '距上次發行（天）', offering_summary: '募資文件', context_summary: '其他文件',
+  revenue_basis: '營收口徑', cover_date: '股數封面日', cover_age_days: '封面距今（天）',
+  ordinary_per_listed_unit: '一個掛牌單位＝幾股普通股', listed_unit_source: '比率出處', listed_unit_rejected: '比率沒登記的封面',
 };
 const TQ_DETAIL_PERCENT = { change: true, coverage: true };
 const TQ_DETAIL_SKIP = { source: true, as_of: true, status: true };

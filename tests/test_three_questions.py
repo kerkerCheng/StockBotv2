@@ -466,3 +466,94 @@ def test_cohort_record_is_content_addressed_and_the_digest_binds_the_spec() -> N
     assert parsed.tickers == ("AXTI", "SIVE.ST") and parsed.pq2_ref == 700
     assert select_current([parsed], as_of=date(2026, 9, 29)) is None
     assert select_current([parsed], as_of=date(2026, 9, 30)) == parsed
+
+
+# ---------------------------------------------------------------------------
+# 2026-11-03 批次三 E（使用者「E 2A」）：20-F 年報申報人的已定價①——年度點、封面 13 個月
+# ---------------------------------------------------------------------------
+
+def _yearly(value: float, *, first: int = 2021, last: int = 2025) -> list[dict]:
+    return [{"period_start": f"{y}-01-01", "period_end": f"{y}-12-31", "filed": f"{y + 1}-03-20",
+             "accession": f"F{y}", "value": value, "currency": "USD"} for y in range(first, last + 1)]
+
+
+def _covers(*years: int, value: float = 1000.0) -> list[dict]:
+    """每年一份年報封面（封面日 3/1、跟年報同一天 3/20 申報）；值已是掛牌單位（取數層換過）。"""
+    return [{"period_end": f"{y}-03-01", "filed": f"{y}-03-20", "accession": f"F{y - 1}", "value": value} for y in years]
+
+
+def _annual(**over) -> dict:
+    inp = _domestic(filer_class="foreign_annual", revenue_kind="annual", revenue_quarters=[], operating_income_quarters=[],
+                    revenue_annual=_yearly(400.0), operating_income_annual=_yearly(-5.0), cash=[], total_debt=[],
+                    shares_cover=_covers(2022, 2023, 2024, 2025, 2026),
+                    listed_unit={"ordinary_per_listed_unit": 2.0, "listed_unit_source": "20-F 前言", "entries": [],
+                                 "rejected": []})
+    inp.update(over)
+    return inp
+
+
+def test_an_annual_filer_with_a_registered_ratio_gets_a_value_from_one_yearly_point() -> None:
+    from alpha.contracts import FORBIDDEN_POSITION_TOKENS
+
+    row = tq.own_history(_annual(), today=TODAY)
+    assert row["absence_kind"] is None and row["basis"] == "P/S" and row["value"] is not None
+    price_today = _annual()["price_bars"][-1][1]
+    detail = row["detail"]
+    assert detail["multiple_today"] == round(price_today * 1000.0 / 400.0, 4)        # 一個會計年度，不是四年加總
+    assert detail["revenue_basis"].startswith("年度點") and detail["cover_date"] == "2026-03-01"
+    assert detail["cover_age_days"] == (TODAY - date(2026, 3, 1)).days
+    assert detail["ordinary_per_listed_unit"] == 2.0 and detail["listed_unit_source"] == "20-F 前言"
+    assert detail["coverage"] == 1.0 and "年報申報人" in row["rule"] and "396 天" in row["rule"]
+    assert not {k for k in detail if set(k.lower().split("_")) & FORBIDDEN_POSITION_TOKENS}   # 欄名不帶部位語意
+
+
+def test_an_annual_filer_without_a_registered_ratio_stays_inputs_incompatible() -> None:
+    row = tq.own_history(_annual(listed_unit=None), today=TODAY)
+    assert row["absence_kind"] == "inputs_incompatible" and "ordinary_per_listed_unit" in row["reason"]
+
+
+def test_a_cover_older_than_thirteen_months_today_makes_the_whole_line_absent() -> None:
+    """不拿舊股數冒充當天：最新一份封面 2025-03-20 申報、今天 2026-09-29（558 天沒有新封面）——整列缺席並印兩個日期。"""
+    row = tq.own_history(_annual(shares_cover=_covers(2022, 2023, 2024, 2025)), today=TODAY)
+    assert row["absence_kind"] == "insufficient_evidence" and "13 個月" in row["reason"]
+    assert "2025-03-20 申報" in row["reason"] and "2025-03-01" in row["reason"]
+    assert row["detail"]["cover_date"] == "2025-03-01" and row["detail"]["cover_filed"] == "2025-03-20"
+    assert row["value"] is None
+
+
+def test_a_fiscal_year_end_cover_date_does_not_open_a_gap_every_spring() -> None:
+    """20-F 封面股數的日期多半是會計年度末（HIMX、POET：12-31，隔年 3 月底申報）。13 個月從封面日起算，每年 2 月到新年報
+    申報之間都會整列缺席（2026-11-03 實測覆蓋率 0.84）——那是年報還沒到期，不是「沒有新封面」：從申報日起算，覆蓋率照滿。"""
+    year_end = [{"period_end": f"{y}-12-31", "filed": f"{y + 1}-03-27", "accession": f"F{y}", "value": 1000.0}
+                for y in range(2021, 2026)]
+    row = tq.own_history(_annual(shares_cover=year_end), today=TODAY)
+    assert row["absence_kind"] is None and row["detail"]["coverage"] == 1.0
+    assert row["detail"]["cover_date"] == "2025-12-31" and row["detail"]["cover_filed"] == "2026-03-27"
+    assert row["detail"]["cover_age_days"] == (TODAY - date(2025, 12, 31)).days          # 股數本身的新舊照印
+
+
+def test_days_whose_cover_has_gone_stale_are_not_samples() -> None:
+    """窗中間缺一份封面（2024）：2023-03-01 那份過了 396 天之後、2025 那份申報之前的日子不是樣本——覆蓋率照實印。"""
+    full = tq.own_history(_annual(), today=TODAY)
+    gappy = _annual(shares_cover=_covers(2022, 2023, 2025, 2026))
+    holed = tq.own_history(gappy, today=TODAY)
+    assert holed["absence_kind"] is None and holed["detail"]["samples"] < full["detail"]["samples"]
+    assert holed["detail"]["coverage"] < 1.0
+    days = {d for d, _ in tq._multiple_series(gappy, basis="P/S")}
+    assert date(2024, 6, 3) not in days and date(2024, 3, 25) in days    # 2023-03-01＋460 天不算；＋390 天照算
+
+
+def test_an_annual_filer_judges_its_basis_from_the_yearly_operating_income() -> None:
+    """營業利益同樣取年度點：年度營業利益 ≥ 0、同一期末有債務與現金 → EV/S（季度那兩組是空的也一樣）。"""
+    balance = [{"period_end": r["period_end"], "filed": r["filed"], "accession": r["accession"]} for r in _yearly(0.0)]
+    inp = _annual(operating_income_annual=_yearly(30.0), cash=[dict(b, value=50.0) for b in balance],
+                  total_debt=[dict(b, value=20.0) for b in balance])
+    assert tq.decide_basis(inp, TODAY)[0] == "EV/S"
+    assert tq.own_history(inp, today=TODAY)["basis"] == "EV/S"
+
+
+def test_listed_units_whose_cover_predates_the_ratio_are_printed_not_dropped() -> None:
+    rejected = [{"period_end": "2009-03-31", "status": "listed_unit_ratio_unregistered", "reason": "r"}]
+    row = tq.own_history(_annual(listed_unit={"ordinary_per_listed_unit": 2.0, "listed_unit_source": "s",
+                                              "entries": [], "rejected": rejected}), today=TODAY)
+    assert row["detail"]["listed_unit_rejected"] == rejected

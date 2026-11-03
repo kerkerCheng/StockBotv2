@@ -28,8 +28,11 @@
 - tag 白名單；同一期間、同一份申報裡白名單 tag 給出不同的數 → 拒寫該期並列進報告（不挑一個）。
 - 同一期間出現多種計價單位 → 拒寫（不換算）。
 - 封面股數同一份申報出現多個值（多股類分維度申報）→ 拒寫，**不加總**。
-- **10-K／10-Q 國內申報人**存季度＋年度；**20-F／40-F 發行人只存年度點**、不存封面股數（ADS 與普通股不是同一種
-  證券單位）。誰是哪一種由 `classify_filer` 一個函式判（回填、增量、三題、稀釋燈都呼叫它）。
+- **10-K／10-Q 國內申報人**存季度＋年度；**20-F／40-F 發行人只存年度點**（含年報封面股數）。誰是哪一種由 `classify_filer`
+  一個函式判（回填、增量、三題、稀釋燈都呼叫它）。
+- 封面股數照申報的原單位存＝**普通股**。掛牌的若是 ADS，兩者不是同一種證券單位——換算比率住名冊
+  （`identity.registry.ListedUnitRatio`，帶生效日與出處），由三題的取數層照封面日換成掛牌單位；沒登記的讀取端不算（2026-11-03 批次三 E；
+  原本 20-F 的封面股數整類不存，ARBE、HIMX、POET 的已定價①因此恆為 inputs_incompatible）。
 - companyfacts 比 EDGAR submissions 舊（`fetchers.edgar_xbrl.companyfacts_lag_status`）→ 這一檔**這一輪不寫**、
   記缺席；抓不到 submissions → 照寫並記「落後未知」（不是「沒落後」）。
 
@@ -431,7 +434,7 @@ def build_fundamental_rows(facts: Mapping[str, Any], *, ticker: str, filer: str,
                            fetched_at: str) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     """companyfacts → `(fundamental_history 的列, 拒寫清單)`。**純函式**：不連網、不寫檔。
 
-    `filer`：`domestic_quarterly` 存季度＋年度＋封面股數；`foreign_annual` 只存年度點（不存封面股數）；
+    `filer`：`domestic_quarterly` 存季度＋年度＋封面股數；`foreign_annual` 只存年度點（含 20-F／40-F 封面股數，原單位＝普通股）；
     `unknown` 一列都不產生（呼叫端記缺席）。
     """
     if filer not in FILER_CLASSES:
@@ -532,8 +535,7 @@ def build_fundamental_rows(facts: Mapping[str, Any], *, ticker: str, filer: str,
                                  rejected=rejected, horizon=horizon, emit=emit)
 
     for metric, spec in INSTANT_TAGS.items():
-        if metric == "shares_outstanding_cover" and filer != "domestic_quarterly":
-            continue
+        # 封面股數兩類申報人都存（`forms` 已限定 10-K／10-Q 或 20-F／40-F）；ADS 的換算不在這裡（見檔頭）。
         candidates = [f for namespace, tags in spec for tag in tags
                       for f in _facts(facts, namespace, tag, forms=forms) if f.start is None]
         reason = ("同一份申報的封面股數有多個值（多股類分別申報）——不加總" if metric == "shares_outstanding_cover"

@@ -386,7 +386,10 @@ def render_analyst_view_markdown(view: AnalystView) -> str:
                 f"口徑 {deps.get('basis')}" if deps.get("basis") else "",
                 # 自家歷史百分位的覆蓋率（Phase 4 Step 4.7c）：只印，不設門檻
                 (f"樣本 {detail.get('samples')}／窗內交易日 {detail['trading_days_in_window']}"
-                 f"（覆蓋率 {detail.get('coverage')}）") if detail.get("trading_days_in_window") else "") if x)
+                 f"（覆蓋率 {detail.get('coverage')}）") if detail.get("trading_days_in_window") else "",
+                # 年報申報人（2026-11-03 批次三 E，使用者「E 2A」）：營收是年度點、股數一年一份——口徑與封面新舊照印
+                (f"營收 {detail.get('revenue_basis')}｜股數封面 {detail['cover_date']}"
+                 f"（距今 {detail.get('cover_age_days')} 天）") if detail.get("cover_date") else "") if x)
             reason = (f" — `{markdown_text(datum.absence_kind)}`：{markdown_text(datum.reason or '')}"
                       if not datum.is_known else "")
             lines.append(f"- **{markdown_text(line.display_label)}**：{markdown_text(_plain_value(datum)) if datum.is_known else _plain_value(datum)}"

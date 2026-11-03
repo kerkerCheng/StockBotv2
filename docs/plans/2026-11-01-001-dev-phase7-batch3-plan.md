@@ -15,7 +15,7 @@
 | B | 週額度常駐計數器 ○ | daily 短版 ④ 每天印週額度與 5 小時用量；互動 fan-out 前有命令可讀同一個數 | Z1／R1 | ✅ 11-01（兩窗都記；④ 每天一行＋摘要行旗（≥ 80% 只印不擋）；`python -m crons.llm_quota [--probe]`；真資料：daily 06:30 的紀錄 7 天 86%、探針 12:00 當下 **99%**） |
 | C | 敘事 stale 計數器 ◐（剩 ②④＋寫入端拒收） | ②騎的讀圖 kind 變了、④供給側家數變了也列「該重寫」；寫入端拒收一字不改的換版 | Z1–Z2／R1 | ✅ 11-03（回放 497 版：⑫ 會擋下 30 次換騎——判讀變了 1＝AEVA、家數變了 29；現行 89 份 ②0 ④0） |
 | D | 成交紀錄遺留 ①②③④⑥⑧⑨⑩ | `scripts/record_trade.py` 的八個已知小洞 | Z1／**R2**（資本路徑） | ✅ 2026-11-03（R2 NO_GO（B1、B2）→ 使用者「D 照修法做＋負數價格一起擋」→ 修正 → 窄範圍覆核 GO，見 D 節末） |
-| E | 海外財報來源 ◐（剩 ②20-F） | 20-F 年度封面股數進 Engine C；ADS 比率要使用者選就停 | Z2／R1 | ◐ 使用者 11-03「E 1A 2A」→ 施工中 |
+| E | 海外財報來源 ◐（剩 ②20-F） | 20-F 年度封面股數進 Engine C；ADS 比率要使用者選就停 | Z2／R1 | ✅ 2026-11-03（使用者「E 1A 2A」；ARBE、HIMX、POET 已定價① 缺席 → 有值） |
 
 > **2026-11-01 12:10 停在 B 之後：** B 自己的探針量到週額度 **99%**（11-02 23:00 重置；daily 06:30 的紀錄是 86%，白天互動 session 吃掉
 > 13 個百分點）。C（Z1–Z2 真資料回放）、D（資本路徑，收尾要一位 R2 reviewer）、E 都會再吃同一個池子，而 11-02 05:30 的 daily 起跑在重置之前
@@ -246,7 +246,7 @@ non-blocking 一條當下修（L17，B2 的對稱面）：建倉路徑現金格�
 測試 +1（52 → 53）、變異 2 種各自轉紅（不再讀、訊息退回「現金沒動」）；這條是同一判法的鏡像、只動失敗分支，由主 agent 對照程式碼覆核，
 沒有再開覆核。順帶改掉 OPERATIONS 一句過時的「既有列寫到一半沒有還原、ROADMAP 待排程」。
 
-## E 海外財報來源 ②20-F 年度封面股數——PLAN_PROPOSAL（AWAITING_HUMAN）
+## E 海外財報來源 ②20-F 年度封面股數——✅ 2026-11-03（PLAN_PROPOSAL → 使用者「E 1A 2A」→ 交付，見本節末）
 
 ```
 INTAKE
@@ -280,3 +280,28 @@ TTM（一年一點）。**做不到、要你選的兩件事：**
 
 **驗收（照 ROADMAP 那一列）：** 邊緣檔「已定價①」從缺席變有值的檔數——1A＋2A＝3（ARBE、HIMX、POET）、1B＋2A＝2、2B＝0。
 **不動：** 換匯（報表幣 ≠ 結算幣的 TSM、UMC、XPEV、NBIS 照舊缺席）、6-K 季度（不是機械來源）。
+
+**使用者 11-03：「E 1A 2A」。交付（2026-11-03）：**
+- **名冊（1A）**：`identity.registry.ListedUnitRatio`＋`CompanyIdentity.ordinary_per_listed_unit`（`effective_from`／`ordinary_shares`／`source`，形狀封閉；
+  鍵不對、出處空白、比率非正、null 不在第一段、生效日沒遞增、非 ISO 日期——任一條整份名冊拒載，同 alias 衝突）。登記三家：
+  **HIMX** `null → 1`、`2009-08-10 → 2`（20-F FY2025 Item 7.A 逐字：「we also changed our ADS ratio effective August 10, 2009 from one ADS representing
+  one ordinary share to one ADS representing two ordinary shares」；前言「each of which represents two ordinary shares」FY2020–FY2025 六份同一句）；
+  **ARBE**、**POET** `null → 1`（封面普通股直接掛牌，出處寫哪幾份）。
+- **回填**：拿掉 20-F／40-F 封面股數那個 `continue`，照原單位（普通股）存。`--tickers ARBE HIMX POET` 回填一次（SEC＋yfinance；UA 是預設字串、
+  `.env` 與 shell 都沒有 `EDGAR_CONTACT_EMAIL`），拒寫 0。
+- **取數**（`engine_c.three_question_inputs.to_listed_units`）：每份封面除以**它自己封面日**那天生效的比率——HIMX 2009 年配股＋併股讓普通股加倍、
+  ADS 比率 1 → 2、ADS 數不變，按價格日的比率會把舊封面算成一半。換算出處與「比率沒登記的封面」放 `listed_unit`；沒登記＝不換、判定層照舊缺席。
+  另讀 `operating_income_annual`（回填本來就存，沒人讀）。
+- **判定（2A）**：`PERIOD_KINDS["annual"]`＝一年一點、營收最多 550 天（與「出現在數字裡了嗎」的 20-F 年度營收同一個數）、營業利益同樣取年度點判口徑；
+  最新封面**申報後** 396 天沒有新封面的那一天不算樣本、今天超過整列缺席。稽核區印 `revenue_basis`（年度點）、`cover_date`、`cover_age_days`、
+  `cover_filed`、比率與出處（欄名不帶 `shares`：`FORBIDDEN_POSITION_TOKENS`）；APP 標籤與 markdown 稽核區同步。
+- ⚠ **13 個月從申報日起算，不從封面日**（施工中量到、改了）：HIMX、POET 的 20-F 封面股數日期是會計年度末（Form 20-F 封面要「as of the close of
+  the period」），從那天起算正常一輪就要約 15 個月——每年 2 月到新年報申報（3 月底–4 月初）都整列缺席，實測覆蓋率 0.84。那是年報還沒到期，
+  不是「沒有新封面」；從申報日起算＝一年一份＋一個月寬限，遲交才缺席，覆蓋率 1.0。股數本身的新舊（`cover_age_days`）照印。
+- **測試**：`test_three_questions.py` +7、`test_three_question_inputs.py` +2、`test_identity_registry.py` +3（參數化 8 種壞形狀）、
+  `test_engine_c_history.py` 改 1（20-F 封面照存、6-K 不收）。**變異 12 種各自轉紅**：回填照舊不存（1）、比率按今天（1）、不換算（2）、
+  沒登記也照算（2）、窗內不看封面新舊（1）、今天不看封面新舊（1）、13 個月從封面日起算（1）、年度點改四期加總（3）、口徑讀季度那組（1）、
+  沒登記的封面不印（1）、名冊 null 不限第一段（1）、生效日不必遞增（1）。
+- **真資料（驗收）**：ARBE **13.2**（P/S 今天 50.2，三年 28.8–368.3）、HIMX **81.4**（P/S 2.19，0.77–5.07；1.74 億 ADS＝3.49 億普通股 ÷ 2——比率 1 會讓市值高一倍）、
+  POET **46.3**（P/S 591，三年 53–17,027）——**缺席 → 有值 3 檔**，三檔覆蓋率都 1.0（750／750）。EFXT 照舊缺席（報表幣 CAD≠USD）。
+  其他 20-F 申報人沒登記比率、照舊缺席；它們的封面股數等下一份 20-F 或全體回填時才進庫（daily 增量只在有新申報時重抓）。

@@ -15,6 +15,9 @@
 - `monthly_revenue`／`monthly_conflicts`：`engine_c.history.monthly_revenue_as_of`（可用日＝法定期限）。
 - `segment_shares`：`segment_revenue_share`／`product_line_revenue_share` 人工觀測（每個觀測日一點）。
 - 台股：`shares_cover` 改取 `tw_share_capital_observations`（季報股本換算、可知日＝法定期限；`shares_rejected` 帶核對沒過的季）。
+- 20-F／40-F 年報申報人（2026-11-03 批次三 E）：`revenue_annual`／`operating_income_annual` 是年度點；`shares_cover` 是年報封面股數
+  （普通股）**換成主掛牌的交易單位**——每一列除以它自己封面日那天生效的比率（名冊 `ordinary_per_listed_unit`，
+  `to_listed_units`），換算的出處放 `listed_unit`。名冊沒登記＝不換、不放 `listed_unit`，已定價①由判定層宣告 inputs_incompatible。
 - `gate`：這一檔的已定價①在取數這一層就知道算不了的（台股一筆可用的季報股數都沒有、非美非台沒有歷史來源…）——
   `{absence_kind, reason}`，由產生缺席的這段程式自己宣告（L16）。
 """
@@ -28,6 +31,8 @@ _METRIC_KEYS = {
     "revenue_quarter": "revenue_quarters", "revenue_annual": "revenue_annual",
     "operating_income_quarter": "operating_income_quarters", "cash": "cash", "total_debt": "total_debt",
     "shares_outstanding_cover": "shares_cover",
+    # 20-F／40-F 年報申報人判口徑用（2026-11-03 批次三 E；回填本來就存，只是沒人讀）
+    "operating_income_annual": "operating_income_annual",
     # 日韓財報來源 S1（2026-10-21）：日本 EDINET 的半年序列
     "revenue_half": "revenue_halves", "operating_income_half": "operating_income_halves",
 }
@@ -73,6 +78,32 @@ def split_near_period_end(rows: list[dict[str, Any]], splits: list[tuple[date, f
                          "observation_id": row.get("accession"),
                          "reason": f"除權日 {hit.isoformat()} 在期末前 {days} 天內——期末股數可能是分割前（6594.T 2024-09-27 實測），"
                                    "整期不用，由前一期股數乘分割比例接續"})
+    return kept, rejected
+
+
+def to_listed_units(rows: list[dict[str, Any]], company: Any) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    """年報封面股數（普通股）→ 主掛牌的交易單位：每一列除以**它自己封面日**那天生效的比率（`CompanyIdentity.
+    ordinary_per_listed_unit_on`）。封面日比名冊第一段的生效日還早的那一列不用、計數進 shares_rejected（INV-3）。
+
+    為什麼按封面日、不按價格日：改比率那天普通股數常常跟著變（HIMX 2009-08-10：配股＋併股讓普通股加倍、ADS 比率 1→2，
+    ADS 數不變）——舊封面的普通股配新比率會把掛牌單位算成一半。換成封面日當時的掛牌單位之後，其後的變化交給 `splits`
+    （價格那一側記的分割本來就是掛牌單位的；比率改了而普通股沒變時，ADS 價格那一側會記一次分割，同樣接得上）。"""
+    kept, rejected = [], []
+    for row in rows:
+        try:
+            end = date.fromisoformat(str(row["period_end"])[:10])
+        except (TypeError, ValueError, KeyError):
+            end = None
+        ratio = company.ordinary_per_listed_unit_on(end) if end is not None else None
+        if ratio is None:
+            first = company.ordinary_per_listed_unit[0].effective_from if company.ordinary_per_listed_unit else None
+            rejected.append({"period_end": end.isoformat() if end else row.get("period_end"),
+                             "status": "listed_unit_ratio_unregistered", "observation_id": row.get("accession"),
+                             "reason": (f"封面日早於名冊第一段比率的生效日 {first.isoformat() if first else '（沒有）'}——"
+                                        "那天一個掛牌單位是幾股普通股沒登記，不猜")})
+            continue
+        kept.append({**row, "value": float(row["value"]) / ratio.ordinary_shares,
+                     "ordinary_value": row["value"], "ordinary_per_listed_unit": ratio.ordinary_shares})
     return kept, rejected
 
 
@@ -180,6 +211,21 @@ def get_three_question_inputs(ticker: str, *, conn: Any, today: date, company_id
         inp["revenue_kind"] = "quarterly"
     elif klass == "foreign_annual":
         inp["revenue_kind"] = "annual"
+        from identity.registry import get_registry
+
+        company = get_registry().company(company_id) if company_id else None
+        now = company.ordinary_per_listed_unit_on(today) if company is not None else None
+        if company is not None and company.ordinary_per_listed_unit:
+            # ⚠ 稽核區欄名不得帶 `shares`（`alpha.contracts.FORBIDDEN_POSITION_TOKENS`）——換算的出處與不用的封面都收在 `listed_unit`
+            kept, rejected = to_listed_units(inp["shares_cover"], company)
+            inp["shares_cover"] = kept
+            inp["listed_unit"] = {
+                "ordinary_per_listed_unit": now.ordinary_shares if now is not None else None,
+                "listed_unit_source": now.source if now is not None else None,
+                "entries": [{"effective_from": e.effective_from.isoformat() if e.effective_from else None,
+                             "ordinary_shares": e.ordinary_shares, "source": e.source}
+                            for e in company.ordinary_per_listed_unit],
+                "rejected": rejected}
     elif klass == "jp_semiannual":
         inp.update(revenue_kind="semiannual", source="engine_c：price_history＋fundamental_history（EDINET）",
                    shares_basis="期末發行（議決権の状況）−自己保有株式；相互保有與信託持有不扣")
@@ -213,4 +259,4 @@ def get_three_question_inputs(ticker: str, *, conn: Any, today: date, company_id
     return inp
 
 
-__all__ = ["SPLIT_NEAR_PERIOD_END_DAYS", "get_three_question_inputs", "split_near_period_end"]
+__all__ = ["SPLIT_NEAR_PERIOD_END_DAYS", "get_three_question_inputs", "split_near_period_end", "to_listed_units"]

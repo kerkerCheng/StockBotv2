@@ -257,7 +257,9 @@ def test_domestic_filer_gets_quarters_annuals_derived_q4_and_rejections_with_rea
     assert all(r["filed"] and r["accession"] and r["fetched_at"] == FETCHED for r in rows)
 
 
-def test_foreign_annual_filer_stores_only_annual_points_and_no_cover_shares() -> None:
+def test_foreign_annual_filer_stores_annual_points_and_the_cover_shares_as_ordinary() -> None:
+    """2026-11-03 批次三 E：20-F 的封面股數照原單位（普通股）存——ADS 的換算住名冊、由三題的取數層做，回填不猜比率。
+    6-K（不是年報）的封面股數照舊不收。"""
     facts = _companyfacts({
         ("ifrs-full", "Revenue"): [
             _fact("2025-01-01", "2025-12-31", 900, "F25", "20-F", "2026-04-16", unit="EUR"),
@@ -266,12 +268,16 @@ def test_foreign_annual_filer_stores_only_annual_points_and_no_cover_shares() ->
         ("ifrs-full", "CashAndCashEquivalents"): [
             _fact(None, "2025-12-31", 80, "F25", "20-F", "2026-04-16", unit="EUR")],
         ("dei", "EntityCommonStockSharesOutstanding"): [
-            _fact(None, "2025-12-31", 5_000, "F25", "20-F", "2026-04-16", unit="shares")],
+            _fact(None, "2026-03-31", 5_000, "F25", "20-F", "2026-04-16", unit="shares"),
+            _fact(None, "2025-10-31", 4_000, "K3", "6-K", "2025-11-01", unit="shares")],
     })
     rows, _ = hb.build_fundamental_rows(facts, ticker="ADR", filer="foreign_annual", today=TODAY,
                                         fetched_at=FETCHED)
-    assert {r["metric"] for r in rows} == {"revenue_annual", "cash"}
-    assert all(r["form"].startswith("20-F") and r["currency"] == "EUR" for r in rows)
+    assert {r["metric"] for r in rows} == {"revenue_annual", "cash", "shares_outstanding_cover"}
+    assert all(r["form"].startswith("20-F") for r in rows)
+    assert all(r["currency"] == "EUR" for r in rows if r["metric"] != "shares_outstanding_cover")
+    cover, = [r for r in rows if r["metric"] == "shares_outstanding_cover"]
+    assert (cover["value"], cover["currency"], cover["period_end"], cover["filed"]) == (5_000, "shares", "2026-03-31", "2026-04-16")
 
 
 def test_unknown_filer_produces_no_rows() -> None:

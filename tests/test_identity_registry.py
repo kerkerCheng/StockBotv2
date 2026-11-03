@@ -4,6 +4,8 @@ import ast
 import json
 from pathlib import Path
 
+import pytest
+
 from shared.identity_resolution import resolve_identity
 from identity.registry import TICKER_MAP, get_registry
 from loader.load_to_neo4j import TICKER_MAP as LOADER_TICKER_MAP
@@ -240,3 +242,56 @@ def test_real_registry_names_are_complete_except_documented_gaps() -> None:
     assert all(missing.values()), "沒補 display_name 的公司必須在 _note 寫理由"
     shared = shared_name_forms(get_registry())
     assert shared <= {"openlight", "openlight photonics", "openlight photonics inc."}, shared
+
+
+def _ratio_registry(tmp_path, ratios):
+    from identity.registry import IdentityRegistry
+
+    path = tmp_path / "company_identity.json"
+    path.write_text(json.dumps({"version": 1, "companies": [
+        {"company_id": "co:x", "research_ticker": "XYZ", "ordinary_per_listed_unit": ratios}]}), encoding="utf-8")
+    return IdentityRegistry.from_path(path)
+
+
+def test_listed_unit_ratio_is_looked_up_by_its_effective_date(tmp_path) -> None:
+    """2026-11-03 批次三 E（使用者「E 1A」）：一個掛牌單位＝幾股普通股，帶生效日與出處；比第一段還早＝沒登記（不猜）。"""
+    from datetime import date
+
+    company = _ratio_registry(tmp_path, [
+        {"effective_from": None, "ordinary_shares": 1, "source": "改比率前"},
+        {"effective_from": "2009-08-10", "ordinary_shares": 2, "source": "改比率後"}]).company("co:x")
+    assert company.ordinary_per_listed_unit_on(date(2009, 8, 9)).ordinary_shares == 1.0
+    assert company.ordinary_per_listed_unit_on(date(2009, 8, 10)).ordinary_shares == 2.0
+    later = _ratio_registry(tmp_path, [{"effective_from": "2009-08-10", "ordinary_shares": 2, "source": "s"}]).company("co:x")
+    assert later.ordinary_per_listed_unit_on(date(2009, 8, 9)) is None
+    assert _ratio_registry(tmp_path, None).company("co:x").ordinary_per_listed_unit == ()
+
+
+@pytest.mark.parametrize("ratios, message", [
+    ([{"effective_from": None, "ordinary_shares": 2}], "鍵必須恰好是"),                                   # 沒寫出處
+    ([{"effective_from": None, "ordinary_shares": 2, "source": " "}], "必須寫出處"),
+    ([{"effective_from": None, "ordinary_shares": True, "source": "s"}], "大於 0 的有限數"),
+    ([{"effective_from": None, "ordinary_shares": 0, "source": "s"}], "大於 0 的有限數"),
+    ([{"effective_from": "2009-08-10", "ordinary_shares": 2, "source": "s"},
+      {"effective_from": None, "ordinary_shares": 1, "source": "s"}], "只有第一段可以是 null"),
+    ([{"effective_from": "2010-01-01", "ordinary_shares": 2, "source": "s"},
+      {"effective_from": "2009-08-10", "ordinary_shares": 1, "source": "s"}], "必須比前一段晚"),
+    ([{"effective_from": "8/10/2009", "ordinary_shares": 2, "source": "s"}], "不是 ISO 日期"),
+    ([], "非空的 list"),
+])
+def test_a_malformed_listed_unit_ratio_refuses_to_load_the_whole_registry(tmp_path, ratios, message) -> None:
+    """錯一格就整份拒載（同 alias 衝突）：比率錯了市值就錯，寧可啟動失敗。"""
+    with pytest.raises(ValueError, match=message):
+        _ratio_registry(tmp_path, ratios)
+
+
+def test_real_registry_listed_unit_ratios_name_their_filing() -> None:
+    """名冊現值：三家 20-F 申報人登記了比率（ARBE、POET 普通股直接掛牌＝1；HIMX 2009-08-10 起 1 ADS＝2 股），每段都寫出處。"""
+    from datetime import date
+
+    registry = get_registry()
+    got = {c.company_id: c for c in registry.companies if c.ordinary_per_listed_unit}
+    assert set(got) == {"co:arbe_robotics", "co:himax", "co:poet_technologies"}
+    assert got["co:himax"].ordinary_per_listed_unit_on(date(2026, 11, 3)).ordinary_shares == 2.0
+    assert got["co:himax"].ordinary_per_listed_unit_on(date(2009, 8, 9)).ordinary_shares == 1.0
+    assert all("20-F" in e.source or "同一句" in e.source for c in got.values() for e in c.ordinary_per_listed_unit)

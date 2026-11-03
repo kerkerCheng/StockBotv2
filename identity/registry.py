@@ -2,7 +2,9 @@
 from __future__ import annotations
 
 import json
+import math
 from dataclasses import dataclass
+from datetime import date
 from functools import lru_cache
 from pathlib import Path
 from types import MappingProxyType
@@ -13,6 +15,57 @@ from identity.currency import resolve_quote_unit
 
 _ROOT = Path(__file__).resolve().parent.parent
 _DEFAULT_REGISTRY_PATH = _ROOT / "config" / "company_identity.json"
+
+
+@dataclass(frozen=True)
+class ListedUnitRatio:
+    """研究用主掛牌的一個交易單位＝幾股普通股，從哪天起（2026-11-03 批次三 E，使用者「E 1A」）。
+
+    SEC companyfacts 的封面股數（`dei:EntityCommonStockSharesOutstanding`）是**普通股**；掛牌的若是 ADS（HIMX：1 ADS＝2 股），
+    市值＝掛牌單位的價格 × 普通股 ÷ 比率。比率是 mechanical——任何人重讀那份申報都得到同一個數——所以住名冊、帶出處；
+    **沒登記＝不算**（`alpha.three_questions.own_history` 照舊 `inputs_incompatible`，不猜）。直接掛牌普通股的登記 1。
+    """
+
+    effective_from: date | None   # None＝從掛牌起（只有第一段可以）
+    ordinary_shares: float
+    source: str                   # 哪份申報的哪一句（逐字）
+
+
+_LISTED_UNIT_KEYS = frozenset({"effective_from", "ordinary_shares", "source"})
+
+
+def _listed_unit_ratios(company_id: str, raw: Any) -> tuple[ListedUnitRatio, ...]:
+    """名冊的 `ordinary_per_listed_unit`：形狀封閉，錯一格就整份名冊拒載——同 alias 衝突：寧可啟動失敗，不要算錯市值。"""
+
+    if raw is None:
+        return ()
+    if not isinstance(raw, list) or not raw:
+        raise ValueError(f"{company_id}：ordinary_per_listed_unit 必須是非空的 list")
+    out: list[ListedUnitRatio] = []
+    for index, item in enumerate(raw):
+        where = f"{company_id}：ordinary_per_listed_unit[{index}]"
+        if not isinstance(item, dict) or set(item) != _LISTED_UNIT_KEYS:
+            raise ValueError(f"{where} 的鍵必須恰好是 {sorted(_LISTED_UNIT_KEYS)}")
+        shares = item["ordinary_shares"]
+        if isinstance(shares, bool) or not isinstance(shares, (int, float)) or not math.isfinite(shares) or shares <= 0:
+            raise ValueError(f"{where}.ordinary_shares 必須是大於 0 的有限數（給的是 {shares!r}）")
+        source = item["source"]
+        if not isinstance(source, str) or not source.strip():
+            raise ValueError(f"{where}.source 必須寫出處（哪份申報的哪一句）")
+        start = item["effective_from"]
+        if start is None:
+            if index:
+                raise ValueError(f"{where}.effective_from 只有第一段可以是 null（從掛牌起）")
+            day = None
+        else:
+            try:
+                day = date.fromisoformat(str(start))
+            except ValueError as exc:
+                raise ValueError(f"{where}.effective_from 不是 ISO 日期：{start!r}") from exc
+            if out and out[-1].effective_from is not None and day <= out[-1].effective_from:
+                raise ValueError(f"{where}.effective_from 必須比前一段晚")
+        out.append(ListedUnitRatio(day, float(shares), source.strip()))
+    return tuple(out)
 
 
 def _quote_code(raw: Any) -> str | None:
@@ -77,6 +130,17 @@ class CompanyIdentity:
     # 由它派生（2026-10-01 Phase 4 Step 4.1c；原本寫死在 `identity/execution.py`）。**不進 `by_ticker`**：
     # 持股解析走 execution 別名反查那一條規則（`portfolio/holdings.py`），不是 ticker 比對。
     execution_symbol: str | None = None
+    # 主掛牌一個交易單位＝幾股普通股（`ListedUnitRatio`，帶生效日與出處；2026-11-03 批次三 E）。空＝沒登記。
+    ordinary_per_listed_unit: tuple[ListedUnitRatio, ...] = ()
+
+    def ordinary_per_listed_unit_on(self, day: date) -> ListedUnitRatio | None:
+        """`day` 那天生效的比率；比第一段的生效日還早、或沒登記＝None（呼叫端不猜）。"""
+
+        hit = None
+        for entry in self.ordinary_per_listed_unit:
+            if entry.effective_from is None or entry.effective_from <= day:
+                hit = entry
+        return hit
 
 
 class IdentityRegistry:
@@ -163,6 +227,8 @@ class IdentityRegistry:
                 ),
                 execution_symbol=(str(item["execution_symbol"]).strip().upper() or None
                                   if item.get("execution_symbol") is not None else None),
+                ordinary_per_listed_unit=_listed_unit_ratios(
+                    str(item["company_id"]), item.get("ordinary_per_listed_unit")),
             )
             for item in raw_companies
         )

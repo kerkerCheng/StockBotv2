@@ -517,6 +517,18 @@
       "display_name": "Himax Technologies, Inc.",
       "name_aliases": [
         "Himax"
+      ],
+      "ordinary_per_listed_unit": [
+        {
+          "effective_from": null,
+          "ordinary_shares": 1,
+          "source": "20-F FY2025（filed 2026-03-27）Item 7.A：「we also changed our ADS ratio effective August 10, 2009 from one ADS representing one ordinary share to one ADS representing two ordinary shares」——改比率之前 1 ADS＝1 股"
+        },
+        {
+          "effective_from": "2009-08-10",
+          "ordinary_shares": 2,
+          "source": "同一句；前言「\"ADSs\" refers to our American depositary shares, each of which represents two ordinary shares」（20-F FY2020–FY2025 六份同一句）"
+        }
       ]
     },
     {
@@ -1020,6 +1032,13 @@
       "display_name": "POET Technologies Inc.",
       "name_aliases": [
         "POET"
+      ],
+      "ordinary_per_listed_unit": [
+        {
+          "effective_from": null,
+          "ordinary_shares": 1,
+          "source": "20-F 封面「Common Shares, no par value｜POET｜Nasdaq Capital Market」（FY2023–FY2025 三份，filed 2024-03-28、2025-04-01、2026-03-31）——普通股直接掛牌"
+        }
       ]
     },
     {
@@ -2285,6 +2304,13 @@
       "display_name": "Arbe Robotics Ltd.",
       "market_currency": "USD",
       "name_aliases": [],
+      "ordinary_per_listed_unit": [
+        {
+          "effective_from": null,
+          "ordinary_shares": 1,
+          "source": "20-F 封面「Ordinary shares, par value NIS 0.000216 per share｜ARBE｜The Nasdaq Stock Market LLC」（FY2023–FY2025 三份；FY2022 那份 filed 2023-03-22 交易所寫 NASDAQ Capital Market；四份全文都沒有 American Depositary）——普通股直接掛牌"
+        }
+      ],
       "research_ticker": "ARBE"
     },
     {

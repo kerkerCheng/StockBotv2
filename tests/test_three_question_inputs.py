@@ -87,3 +87,54 @@ def test_taiwan_and_non_us_gates_are_declared_where_the_absence_is_known() -> No
     eu = get_three_question_inputs("IQE.L", conn=conn, today=TODAY)
     assert eu["filer_class"] == "unknown" and "非美國" in eu["gate"]["reason"]
     assert eu["price_quote_unit"] == "GBp" and eu["price_to_settlement"] == 0.01   # minor unit 由 registry 解析
+
+
+# ---------------------------------------------------------------------------
+# 2026-11-03 批次三 E（使用者「E 1A 2A」）：20-F 的封面股數換成掛牌單位
+# ---------------------------------------------------------------------------
+
+def _company(*ratios):
+    from identity.registry import CompanyIdentity, ListedUnitRatio
+
+    return CompanyIdentity(company_id="co:x", research_ticker="XYZ",
+                           ordinary_per_listed_unit=tuple(ListedUnitRatio(d, r, "s") for d, r in ratios))
+
+
+def test_cover_shares_become_listed_units_at_each_cover_dates_own_ratio() -> None:
+    """HIMX 型（2009-08-10 配股＋併股讓普通股加倍、ADS 比率 1 → 2，ADS 數不變）：按**封面日**的比率換——
+    舊封面的普通股配新比率會把掛牌單位算成一半。比第一段生效日還早的封面不用、照實列進 shares_rejected。"""
+    from engine_c.three_question_inputs import to_listed_units
+
+    rows = [{"period_end": "2009-03-31", "accession": "A", "value": 100.0},
+            {"period_end": "2010-03-31", "accession": "B", "value": 200.0}]
+    kept, rejected = to_listed_units(rows, _company((None, 1.0), (date(2009, 8, 10), 2.0)))
+    assert [r["value"] for r in kept] == [100.0, 100.0] and rejected == []
+    assert [r["ordinary_value"] for r in kept] == [100.0, 200.0] and [r["ordinary_per_listed_unit"] for r in kept] == [1.0, 2.0]
+    kept, rejected = to_listed_units(rows, _company((date(2009, 8, 10), 2.0)))
+    assert [r["value"] for r in kept] == [100.0]
+    assert rejected[0]["status"] == "listed_unit_ratio_unregistered" and rejected[0]["period_end"] == "2009-03-31"
+    assert rejected[0]["observation_id"] == "A" and "2009-08-10" in rejected[0]["reason"]
+
+
+def _foreign(conn, ticker: str) -> None:
+    hb.insert_fundamentals(conn, [
+        {**_row("revenue_annual", "2025-12-31", "2026-03-27", 900.0, form="20-F", start="2025-01-01", accn="F25"), "ticker": ticker},
+        {**_row("shares_outstanding_cover", "2026-02-28", "2026-03-27", 350.0, form="20-F", accn="F25",
+                currency="shares"), "ticker": ticker},
+    ])
+
+
+def test_a_registered_foreign_filer_gets_listed_units_and_an_unregistered_one_does_not() -> None:
+    """名冊登記了比率（HIMX：2009-08-10 起 1 ADS＝2 股）＝封面股數除以 2、出處進 `listed_unit`；沒登記＝照原單位、不放
+    `listed_unit`（判定層照舊 inputs_incompatible，不猜）。"""
+    conn = _conn()
+    _foreign(conn, "HIMX")
+    himx = get_three_question_inputs("HIMX", conn=conn, today=TODAY, company_id="co:himax")
+    assert himx["filer_class"] == "foreign_annual" and himx["revenue_kind"] == "annual"
+    assert [r["value"] for r in himx["shares_cover"]] == [175.0] and himx["shares_cover"][0]["ordinary_value"] == 350.0
+    assert himx["listed_unit"]["ordinary_per_listed_unit"] == 2.0 and "20-F" in himx["listed_unit"]["listed_unit_source"]
+    assert himx["listed_unit"]["rejected"] == [] and [e["ordinary_shares"] for e in himx["listed_unit"]["entries"]] == [1.0, 2.0]
+    _foreign(conn, "XYZ")
+    plain = get_three_question_inputs("XYZ", conn=conn, today=TODAY, company_id=None)
+    assert plain["filer_class"] == "foreign_annual" and "listed_unit" not in plain
+    assert [r["value"] for r in plain["shares_cover"]] == [350.0]

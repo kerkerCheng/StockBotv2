@@ -43,11 +43,28 @@ _QUARTER_GAP = (80, 100)
 #: TTM 與淨負債的最新一期距 d 最多多舊（天）：一季（~91 天）＋申報期限與緩衝。超過＝那一天的財報已經過期，
 #: 樣本不算（2026-09-29 Step 3.5 試跑：COHR 的營業利益 tag 停在 2024-06，舊版拿兩年前的 TTM 當「今天」判成 EV/S）。
 FUNDAMENTAL_MAX_AGE_DAYS = 200
+#: 年度申報人（20-F／40-F；2026-11-03 批次三 E，使用者「E 2A」）：一年一點——「TTM」就是 d 之前已申報的最近一個會計年度。
+#: 550 天＝一年 365＋20-F 法定期限 4 個月＋緩衝（與季度 200、半年 290 同一條推導；「出現在數字裡了嗎」的 20-F 年度營收同一個數）。
+ANNUAL_MAX_AGE_DAYS = 550
+#: 年度申報人的股數一年才更新一次（年報封面）：最新一份封面**申報**之後超過 13 個月還沒有新封面，那一天不算樣本，
+#: 今天超過就整列缺席——不拿舊股數冒充當天（使用者「E 2A」；POET 一年內 76.5M → 132.3M，用上一份封面算市值最多低估約四成，
+#: 封面日與距今天數照印在稽核區）。⚠ 從申報日起算、不從封面日：20-F 封面股數的日期多半是會計年度末（Form 20-F 封面要
+#: 「as of the close of the period」），從那天起算正常一輪就要約 15 個月，13 個月會讓每年 2–4 月整列缺席
+#: （2026-11-03 實測 HIMX、POET 覆蓋率 0.84）——那不是「沒有新封面」，是年報還沒到期。
+ANNUAL_COVER_MAX_AGE_DAYS = 396
 #: 期間種類（日韓財報來源 S1，2026-10-21；使用者「日韓 AAA」Q1 A 半年 TTM）：幾期加總、相鄰期末間隔、最新一期最多多舊。
 #: 半年的 290 天＝半年 182 天＋有報法定 3 個月＋緩衝（與季度 200 天同一條推導）。季度那一組等於上面兩個常數。
+#: `cover_max_age`：封面股數最多多舊（只有年度那一組有；季度與半年的股數跟著季報／半年報走，照舊不設）。
 PERIOD_KINDS: Mapping[str, Mapping[str, Any]] = {
     "quarter": {"n": 4, "gap": _QUARTER_GAP, "max_age": FUNDAMENTAL_MAX_AGE_DAYS},
     "half": {"n": 2, "gap": (170, 200), "max_age": 290},
+    "annual": {"n": 1, "gap": (0, 0), "max_age": ANNUAL_MAX_AGE_DAYS, "cover_max_age": ANNUAL_COVER_MAX_AGE_DAYS},
+}
+#: 每種期間讀哪兩組列：(營收, 營業利益)——取數層 `engine_c.three_question_inputs` 的鍵。
+_PERIOD_ROWS: Mapping[str, tuple[str, str]] = {
+    "quarter": ("revenue_quarters", "operating_income_quarters"),
+    "half": ("revenue_halves", "operating_income_halves"),
+    "annual": ("revenue_annual", "operating_income_annual"),
 }
 #: 日本、韓國那幾行在 `_RULE_OWN`／`_RULE_NUMBERS` 之後另接的口徑說明（美股、台股的規則字串逐字不動）。
 _RULE_OWN_JP = ("｜日本（EDINET）：TTM 營收＝d 之前已申報的最近兩個連續半年（相鄰期末 170–200 天；下半年＝年度−上半年，標 derived），"
@@ -56,6 +73,11 @@ _RULE_OWN_JP = ("｜日本（EDINET）：TTM 營收＝d 之前已申報的最近
 _RULE_OWN_KR = ("｜韓國（OpenDART）：股數＝股式總數現況的普通股流通股數（distb_stock_co），只算普通股；"
                 "第四季＝年度−9 個月累計（標 derived）；可知日＝最新更正版的接收日")
 _RULE_NUMBERS_JP_KR = "（日本：EDINET 半年營收，最近 6 個半年；韓國：DART 季營收，最近 8 季）"
+_RULE_OWN_ANNUAL = ("｜20-F／40-F 年報申報人：TTM 營收＝d 之前已申報的最近一個會計年度（年度點，一年一點；最新一期最多 "
+                    f"{ANNUAL_MAX_AGE_DAYS} 天），營業利益同樣取年度點判口徑；股數＝d 之前已申報的最新一份年報封面股數（普通股）"
+                    "÷ 名冊登記的「一個掛牌單位＝幾股普通股」（按每份封面日當時的比率；沒登記不算），"
+                    f"最新一份封面申報後超過 {ANNUAL_COVER_MAX_AGE_DAYS} 天（13 個月）還沒有新封面的那一天不算樣本——"
+                    "不拿舊股數冒充當天")
 
 _RULE_OWN = (
     "每個交易日 d：市值＝當天 raw 收盤 ×（d 之前最新一份封面股數 × 其後到 d 的分割比例）；"
@@ -116,7 +138,8 @@ def _as_of_map(rows: Sequence[Mapping[str, Any]], d: date) -> dict[date, Mapping
 def ttm(quarters: Sequence[Mapping[str, Any]], d: date, *, kind: str = "quarter"
         ) -> tuple[float | None, date | None, str | None]:
     """d 時刻已知的最近 n 個**連續**期間之和 → `(值, 最新一期期末, 幣別)`；不足或不連續回 None。
-    `kind`：`quarter`（四季，預設）｜`half`（兩個半年，日本 EDINET）——期數與相鄰間隔取 `PERIOD_KINDS`。"""
+    `kind`：`quarter`（四季，預設）｜`half`（兩個半年，日本 EDINET）｜`annual`（一個會計年度，20-F／40-F）——
+    期數與相鄰間隔取 `PERIOD_KINDS`。"""
     spec = PERIOD_KINDS[kind]
     n, (gap_lo, gap_hi) = int(spec["n"]), spec["gap"]
     known = _as_of_map(quarters, d)
@@ -159,6 +182,15 @@ def shares_on(cover: Sequence[Mapping[str, Any]], splits: Sequence[tuple[date, f
     return shares
 
 
+def cover_on(cover: Sequence[Mapping[str, Any]], d: date) -> tuple[date, date] | None:
+    """d 時刻已申報的最新一份封面股數（`shares_on` 用的那一份）的 `(封面日, 申報日)`；沒有就 None。"""
+    known = _as_of_map(cover, d)
+    if not known:
+        return None
+    end = max(known)
+    return end, (_iso(known[end].get("filed")) or end)
+
+
 def net_debt_on(cash: Sequence[Mapping[str, Any]], debt: Sequence[Mapping[str, Any]], d: date
                 ) -> tuple[float | None, date | None]:
     """同一期末的債務 − 現金（兩者都要 d 時刻已申報）；沒有同期的一對就回 None——不拿不同期相減。"""
@@ -181,7 +213,9 @@ def _multiple_series(inp: Mapping[str, Any], *, basis: str) -> list[tuple[date, 
     splits = [(s, r) for s, r in (inp.get("splits") or ())]
     pk = _period_kind(inp)
     max_age = int(PERIOD_KINDS[pk]["max_age"])
-    rev_rows = inp.get("revenue_halves" if pk == "half" else "revenue_quarters") or ()
+    cover_max_age = PERIOD_KINDS[pk].get("cover_max_age")
+    rev_rows = inp.get(_PERIOD_ROWS[pk][0]) or ()
+    cover = inp.get("shares_cover") or ()
     out: list[tuple[date, float]] = []
     for d, close_raw in bars:
         if close_raw is None:
@@ -192,7 +226,11 @@ def _multiple_series(inp: Mapping[str, Any], *, basis: str) -> list[tuple[date, 
             revenue, last_end, _ = ttm(rev_rows, d, kind=pk)
             if last_end is None or (d - last_end).days > max_age:
                 continue                                 # 那一天的營收 TTM 已經過期——不拿舊數字冒充當天
-        shares = shares_on(inp.get("shares_cover") or (), splits, d)
+        if cover_max_age is not None:
+            latest = cover_on(cover, d)
+            if latest is None or (d - latest[1]).days > int(cover_max_age):
+                continue                                 # 年報申報人：申報後 13 個月沒有新封面——不拿舊股數冒充當天
+        shares = shares_on(cover, splits, d)
         if not revenue or revenue <= 0 or not shares:
             continue
         cap = float(close_raw) * factor * shares
@@ -207,8 +245,10 @@ def _multiple_series(inp: Mapping[str, Any], *, basis: str) -> list[tuple[date, 
 
 
 def _period_kind(inp: Mapping[str, Any]) -> str:
-    """`semiannual`（日本 EDINET）用半年；其餘用季度（美股 10-Q、韓國 DART、台股另走月營收）。"""
-    return "half" if inp.get("revenue_kind") == "semiannual" else "quarter"
+    """`semiannual`（日本 EDINET）用半年；`annual`（20-F／40-F 年報申報人）用年度點；其餘用季度
+    （美股 10-Q、韓國 DART、台股另走月營收）。"""
+    kind = inp.get("revenue_kind")
+    return "half" if kind == "semiannual" else "annual" if kind == "annual" else "quarter"
 
 
 def decide_basis(inp: Mapping[str, Any], today: date) -> tuple[str, str]:
@@ -217,14 +257,14 @@ def decide_basis(inp: Mapping[str, Any], today: date) -> tuple[str, str]:
         return "P/S", "台股月營收沒有營業利益 → 一律 P/S"
     pk = _period_kind(inp)
     max_age = int(PERIOD_KINDS[pk]["max_age"])
-    half = pk == "half"
-    op, op_end, _ = ttm(inp.get("operating_income_halves" if half else "operating_income_quarters") or (), today, kind=pk)
-    _rev, rev_end, _ = ttm(inp.get("revenue_halves" if half else "revenue_quarters") or (), today, kind=pk)
+    rev_key, op_key = _PERIOD_ROWS[pk]
+    op, op_end, _ = ttm(inp.get(op_key) or (), today, kind=pk)
+    _rev, rev_end, _ = ttm(inp.get(rev_key) or (), today, kind=pk)
     nd, nd_end = net_debt_on(inp.get("cash") or (), inp.get("total_debt") or (), today)
     if op is None:
         return "P/S", "今天的 TTM 營業利益取不到 → P/S"
     if op_end != rev_end or (today - op_end).days > max_age:
-        return "P/S", (f"TTM 營業利益的最新一季（{op_end}）與營收（{rev_end}）不同步或已過期——不拿舊的營業利益判口徑 → P/S")
+        return "P/S", (f"TTM 營業利益的最新一期（{op_end}）與營收（{rev_end}）不同步或已過期——不拿舊的營業利益判口徑 → P/S")
     if op < 0:
         return "P/S", "今天 TTM 營業利益 < 0（虧損期）→ P/S"
     if nd is None or nd_end is None or (today - nd_end).days > max_age:
@@ -237,7 +277,8 @@ def own_history(inp: Mapping[str, Any], *, today: date,
     """已定價①。`inp` 的形狀見 `engine_c.three_question_inputs.get_three_question_inputs`。"""
     key, label = "own_history_pctile", "已定價①：自家歷史百分位"
     rule = _RULE_OWN + (_RULE_OWN_JP if inp.get("revenue_kind") == "semiannual" else
-                        _RULE_OWN_KR if inp.get("filer_class") == "kr_quarterly" else "")
+                        _RULE_OWN_KR if inp.get("filer_class") == "kr_quarterly" else
+                        _RULE_OWN_ANNUAL if inp.get("revenue_kind") == "annual" else "")
     gate = inp.get("gate")
     if gate:
         return line(key, label, rule=rule, absence_kind=gate["absence_kind"], reason=gate["reason"])
@@ -256,10 +297,12 @@ def own_history(inp: Mapping[str, Any], *, today: date,
         return line(key, label, rule=rule, absence_kind="inputs_incompatible",
                     reason=f"報表幣別 {'／'.join(report_ccy)} ≠ 報價結算幣別 {settlement}（不換匯）",
                     detail={"report_currency": report_ccy, "settlement_currency": settlement})
-    if inp.get("filer_class") == "foreign_annual":
+    listed = inp.get("listed_unit")
+    if inp.get("filer_class") == "foreign_annual" and not listed:
+        # 2026-11-03 批次三 E：名冊登記了比率（`identity.registry.ListedUnitRatio`）才算；沒登記照舊不猜。
         return line(key, label, rule=rule, absence_kind="inputs_incompatible",
-                    reason="20-F／40-F 發行人：companyfacts 的股數是普通股，掛牌的可能是 ADS——"
-                           "兩者不是同一種證券單位，比率沒有登記，不猜（只存年度點）",
+                    reason="20-F／40-F 發行人：companyfacts 的股數是普通股，掛牌的可能是 ADS——名冊沒有登記"
+                           "一個掛牌單位＝幾股普通股（`ordinary_per_listed_unit`），不猜",
                     detail={"filer_class": "foreign_annual"})
     bars = inp.get("price_bars") or ()
     if not bars:
@@ -270,6 +313,25 @@ def own_history(inp: Mapping[str, Any], *, today: date,
         return line(key, label, rule=rule, absence_kind="insufficient_evidence",
                     reason=f"最後一個收盤是 {last_bar.isoformat()}，距今 {days_since} 天（超過 {PRICE_FRESH_DAYS} 天）",
                     detail={"days_since_last": days_since})
+    annual: dict[str, Any] = {}
+    if _period_kind(inp) == "annual":
+        # 年度點的口徑與股數新舊照印在稽核區（使用者「E 2A」）；今天的封面超過 13 個月＝整列缺席，不拿舊股數冒充當天。
+        # ⚠ 欄名不得帶 `shares`（`alpha.contracts.FORBIDDEN_POSITION_TOKENS`：封面股數不是部位，但欄名要讓人分得出來）
+        latest = cover_on(inp.get("shares_cover") or (), last_bar)
+        annual = {"revenue_basis": "年度點（d 之前已申報的最近一個會計年度；一年一點）",
+                  "cover_date": latest[0].isoformat() if latest else None,
+                  "cover_age_days": (today - latest[0]).days if latest else None,
+                  "cover_filed": latest[1].isoformat() if latest else None,
+                  **{k: v for k, v in (listed or {}).items() if k in ("ordinary_per_listed_unit", "listed_unit_source")}}
+        if (listed or {}).get("rejected"):
+            annual["listed_unit_rejected"] = list(listed["rejected"])    # 封面日早於名冊第一段比率的那幾份（INV-3）
+        if latest is None or (last_bar - latest[1]).days > ANNUAL_COVER_MAX_AGE_DAYS:
+            return line(key, label, rule=rule, absence_kind="insufficient_evidence",
+                        reason=(f"最新一份年報封面股數是 {latest[1].isoformat()} 申報的（封面日 {latest[0].isoformat()}），"
+                                f"到最後一個收盤 {(last_bar - latest[1]).days} 天沒有新封面（超過 {ANNUAL_COVER_MAX_AGE_DAYS} 天＝13 個月）"
+                                "——不拿舊股數冒充當天"
+                                if latest else "沒有任何一份已申報的年報封面股數——市值組不出來"),
+                        detail=annual)
     basis, basis_reason = decide_basis(inp, today)
     series = [(d, v) for d, v in _multiple_series(inp, basis=basis)
               if d >= today - timedelta(days=365 * HISTORY_YEARS)]
@@ -277,7 +339,7 @@ def own_history(inp: Mapping[str, Any], *, today: date,
         return line(key, label, rule=rule, basis=basis, absence_kind="insufficient_evidence",
                     reason=f"今天（{last_bar.isoformat()}）的 {basis} 算不出來（{basis_reason}；"
                            "TTM 營收、股數或淨負債缺一或已過期）",
-                    detail={"basis_reason": basis_reason, "samples": len(series)})
+                    detail={"basis_reason": basis_reason, "samples": len(series), **annual})
     window_days = (series[-1][0] - series[0][0]).days
     today_value = series[-1][1]
     past = [v for _, v in series[:-1]]
@@ -290,7 +352,7 @@ def own_history(inp: Mapping[str, Any], *, today: date,
               "window_start": series[0][0].isoformat(), "window_end": series[-1][0].isoformat(),
               "window_days": window_days, "min": round(min(v for _, v in series), 4),
               "median": round(median(v for _, v in series), 4), "max": round(max(v for _, v in series), 4),
-              "days_since_last": days_since}
+              "days_since_last": days_since, **annual}
     if inp.get("shares_rejected"):
         # 台股：交叉核對沒過或同季衝突的季整季不用——稽核區逐筆印出，不讓「少了一段樣本」看起來像沒事（INV-3）。
         detail["shares_rejected"] = list(inp["shares_rejected"])
@@ -478,7 +540,7 @@ def in_numbers(inp: Mapping[str, Any], *, today: date) -> list[dict[str, Any]]:
 #: 的量級）、月營收 75（法定期限次月 10 日＋一個月緩衝）。超過就不是「現在的數字」——缺席並印 days_since_last。
 _BASIS_EDINET = "EDINET 半年營收（YoY 對同一個半年；下半年＝年度−上半年）"
 _BASIS_DART = "DART 季營收（YoY 對同一季）"
-_SERIES_MAX_AGE = {"EDGAR 季營收（YoY 對同一季）": 200, "20-F 年度營收（YoY）": 550,
+_SERIES_MAX_AGE = {"EDGAR 季營收（YoY 對同一季）": 200, "20-F 年度營收（YoY）": ANNUAL_MAX_AGE_DAYS,
                    _BASIS_EDINET: 290, _BASIS_DART: 200}
 _MONTHLY_MAX_AGE = 75
 
@@ -576,7 +638,8 @@ def rollup(results: Iterable[Mapping[str, Any]]) -> dict[str, dict[str, int]]:
 
 
 __all__ = [
+    "ANNUAL_COVER_MAX_AGE_DAYS", "ANNUAL_MAX_AGE_DAYS",
     "HISTORY_YEARS", "PRICE_FRESH_DAYS", "QUESTIONS", "QUESTION_LABELS", "RELATIVE_WINDOWS",
-    "cohort_median", "decide_basis", "evaluate", "in_numbers", "line", "monthly_ttm", "net_debt_on",
+    "cohort_median", "cover_on", "decide_basis", "evaluate", "in_numbers", "line", "monthly_ttm", "net_debt_on",
     "own_history", "relative_returns", "rollup", "shares_on", "trailing_return", "ttm",
 ]
