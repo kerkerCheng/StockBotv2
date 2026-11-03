@@ -707,6 +707,8 @@ def test_the_brief_puts_document_requests_in_their_own_block(tmp_path, monkeypat
                      {"type": "source_trace_review", "ref_id": "lead_doc", "title": "向你要文件：全新光電券商報告"}])
     monkeypatch.setattr(todo, "load", lambda *a, **k: pool)
     monkeypatch.setattr(hb, "quota_entries", lambda rows, now: [])
+    # ③ 的只差已定價讀真實候選板（2026-11-03 第 3 條）——這條只驗文件那一區，隔開它（有它的排版見 test_priced_only_decision）
+    monkeypatch.setattr(hb, "priced_only_names", lambda state_dir, **_kw: ([], None))
     leads_path = tmp_path / "pending_leads.json"
     leads_path.write_text(json.dumps({"leads": {}, "harvest_log": []}), encoding="utf-8")
     text = daily_brief.compose_brief(now=NOW, summary="Daily｜球在你 1｜等你給文件 1", snapshot={},

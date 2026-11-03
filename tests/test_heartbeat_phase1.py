@@ -58,7 +58,8 @@ def test_candidate_snapshot_keys_come_from_the_candidate_vocabulary() -> None:
     assert keys == [f"candidate.{g}" for g in (*GROUPS, *SIDE_GROUPS)] + ["candidate.open_unmeasurable",
                                                                           "candidate.no_narrative",
                                                                           "candidate.not_edge_pending",
-                                                                          "candidate.on_threshold"]
+                                                                          "candidate.on_threshold",
+                                                                          "candidate.priced_only"]
     assert hb.SNAPSHOT_KEYS["candidate.edge_unmeasurable"] == "候選 邊緣無法量"
     assert hb.SNAPSHOT_KEYS["candidate.on_threshold"] == "候選 在門檻上"
 

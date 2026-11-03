@@ -672,8 +672,13 @@ def priced_only_counts(wait_rows: Iterable[Mapping[str, Any]]) -> dict[str, int]
     """等回落那一組「只差已定價」的常駐計數：可開前提都成立、只剩已定價這個價格判斷的檔數，與沒算的檔數（列上沒有
     `open_gaps` 清單——舊 artifact）。**只數不判**：不是驗收數字（G10 不數通過 filter 的檔數）、不是買進訊號、不改分組。"""
     rows = list(wait_rows)
-    return {"priced_only": sum(1 for r in rows if r.get("open_gaps") == []),
+    return {"priced_only": len(priced_only_rows(rows)),
             "priced_only_unknown": sum(1 for r in rows if not isinstance(r.get("open_gaps"), list))}
+
+
+def priced_only_rows(wait_rows: Iterable[Mapping[str, Any]]) -> list[Mapping[str, Any]]:
+    """「只差已定價」的那幾列（`open_gaps` 是空清單）——`priced_only_counts` 數的、短版 ③ 列的都是它（L16：判斷只有一份）。"""
+    return [r for r in wait_rows if isinstance(r, Mapping) and r.get("open_gaps") == []]
 
 
 def missing_request_counts(missing_rows: Iterable[Mapping[str, Any]]) -> dict[str, int | None]:
@@ -814,7 +819,8 @@ __all__ = ["ANSWER_WORDS", "CANDIDATES_THIS_IS_NOT", "GROUPS", "GROUP_LABELS", "
            "edge_note",
            "held_index", "judgment_version", "missing_request_counts", "new_edge_reason", "normalize_url",
            "not_edge_pending_note", "on_threshold_entries", "on_threshold_line",
-           "priced_judgment_key", "priced_only_counts", "priced_since", "pullback_counts", "pulled_back",
+           "priced_judgment_key", "priced_only_counts", "priced_only_rows", "priced_since", "pullback_counts",
+           "pulled_back",
            "pulled_back_reason", "reopen_counts", "reopen_met_reason", "reopen_status",
            "rewrite_words", "rides_reason", "rollup", "squash", "stall_since", "stall_version", "three_words",
            "unread_new_edges",

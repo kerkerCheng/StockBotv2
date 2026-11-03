@@ -39,7 +39,7 @@ def _vocabularies() -> dict[str, set[str]]:
         "dispatch": {str(d) if d else "none" for d in qs.DISPATCH_STATUSES},
         "hypothesis": set(hypotheses.HYPOTHESIS_STATUSES),
         "thesis": set(THESIS_STATUSES),
-        "candidate": set(GROUPS) | set(SIDE_GROUPS) | {"no_narrative"},
+        "candidate": set(GROUPS) | set(SIDE_GROUPS) | {"no_narrative", "priced_only"},
         "reading": set(READING_STATUSES),
         "story": set(STORY_GAP_KINDS),
     }

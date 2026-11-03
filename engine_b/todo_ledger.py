@@ -141,6 +141,9 @@ COVERAGE: Mapping[str, str] = {
     "candidate:open": "wait",                    # 可開每天重驗前提，前提失效進 todo.narrative
     "candidate:missing": "wait",                 # wake_brief watch 有到期
     "candidate:priced_wait": "wait",
+    # 只差已定價（`alpha.candidates.priced_only_rows`：等回落裡可開的機械前提都成立）：剩下的價格判斷是使用者的 → 短版 ③
+    # （盲點修法 §1 第 3 條，2026-11-03；failure log #123、#124：四次價格叫醒、四次重寫仍等回落，它一直不在「待你決定」）
+    "candidate:priced_only": "decision",
     "candidate:pass": "terminal",
     "candidate:held": "terminal",
     "candidate:not_multiple": "todo.narrative",  # 非邊緣卻有敘事：撤回（research-drain 規定不替非倍率寫敘事）

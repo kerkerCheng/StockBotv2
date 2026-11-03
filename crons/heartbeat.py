@@ -1028,6 +1028,27 @@ def _priced_rows(state_dir: Path | None) -> tuple[list[Mapping[str, Any]], list[
     return wait, [r for r in rows if isinstance(r, Mapping) and r.get("priced_since")], None
 
 
+def priced_only_names(state_dir: Path | None, *, label: Callable[[Mapping[str, Any]], str] | None = None
+                      ) -> tuple[list[str] | None, str | None]:
+    """等回落裡「只差已定價」的檔（盲點修法 §1 第 3 條；failure log #123）→ (名字, 讀不到的理由)。價格判斷是使用者的，
+    所以它住短版 ③ 待你決定、不住 ④ 的等待；判斷只有 `alpha.candidates.priced_only_rows` 一份（L16）。
+    候選板讀不到回 (None, 理由)——未讀到不是 0（INV-3）。"""
+    from alpha.candidates import priced_only_rows
+
+    wait, _priced, absence = _priced_rows(state_dir)
+    if absence is not None:
+        return None, absence.reason
+    return [label(r) if label else str(r.get("ticker")) for r in priced_only_rows(wait)], None
+
+
+def priced_only_queue_line(names: Sequence[str] | None, problem: str | None) -> str:
+    """完整心跳段 3 的一行：沒有 pq2 編號、不進批次指令，但球在你——0 也印（L14），讀不到照說（INV-3）。"""
+    if names is None:
+        return f"只差已定價：讀不到（{problem}）"
+    return (f"**只差已定價 {len(names)}**（可開的機械前提都成立，價格判斷由你下；短版 ③）"
+            + ("：" + "、".join(names) if names else ""))
+
+
 def _priced_wait_lines(state_dir: Path | None) -> list[str]:
     """段 2「等回落 N」＋每檔一句（判斷日的自家三年百分位 → 今天、判斷日以來報酬；句子由候選板組好，這裡照抄）＋
     來源計數「記下 X｜回算 Y｜量不到 Z」——資料品質計數器，**不印**「幾份降了幾 pp」這種隱性門檻。0 檔也印。"""
@@ -1731,6 +1752,7 @@ def build_queue(*, state_dir: Path | None = None, now: datetime | None = None,
     # 逐筆（Phase 1 Step 1.8）：go／不含的字串取自 `todo.GO_AUTHORIZATION`（L16：不在這裡另寫一份），
     # 使用者不展開就知道 go 會做什麼、不會做什麼（AGENTS 收尾摘要契約）。
     section.lines.extend(_pq2_item_lines(actionable, todo_mod=todo_mod))
+    section.lines.append(priced_only_queue_line(*priced_only_names(state_dir)))
     # 等你提供的文件（2026-10-06 使用者指示：拿不到的來源要開口、不 park；10-07：「隔離一區讓我知道 也不要讓我直接 go
     # 提供文件才算 go」）。名單只有 `todo.document_requests()` 一份（L16）；0 也印（L14）。
     section.lines.append(
@@ -2729,6 +2751,8 @@ SNAPSHOT_KEYS: dict[str, str] = {
     # 邊緣門檻的遲滯與在門檻上（2026-11-01）：今天才翻成非邊緣的檔數、落在門檻帶內的檔數
     "candidate.not_edge_pending": "候選 非邊緣待確認",
     "candidate.on_threshold": "候選 在門檻上",
+    # 只差已定價（盲點修法 §1 第 3 條，2026-11-03）：摘要行「球在你」旁邊印它——③ 列了它，球在你的數不能只數 pq2
+    "candidate.priced_only": "候選 只差已定價",
     # 追蹤表三條 lane（Phase 5 Step 5.2）：列數與曾達 2 倍——較昨 diff 看得到第一筆回填、第一份新敘事、第一個 2 倍。
     "positions.lane.paper.n": "追蹤表 paper 列數", "positions.lane.live.n": "追蹤表 live 列數",
     **{f"positions.lane.{lane}.reached_2x_ever": f"{lane} 曾達 2 倍" for lane in ("history", "paper", "live")},
@@ -2882,7 +2906,8 @@ def collect_snapshot(*, now: datetime, state_dir: Path | None, leads_path: Path,
                 "candidate.edge_unmeasurable": c["edge_unmeasurable"],
                 "candidate.open_unmeasurable": c["open_unmeasurable"],
                 "candidate.not_edge_pending": c.get("not_edge_pending"),
-                "candidate.on_threshold": c.get("on_threshold")}
+                "candidate.on_threshold": c.get("on_threshold"),
+                "candidate.priced_only": counts.get("priced_wait_priced_only")}
 
     def positions() -> dict[str, Any]:
         payload, absence = _load_state(state_dir, "positions")
@@ -3160,6 +3185,9 @@ def summary_line(*, now: datetime, snapshot: Mapping[str, Any], run_record_path:
     asking = snapshot.get("pq2.source_trace_review")
     if asking:
         head += f"｜等你給文件 {asking}"
+    priced_only = snapshot.get("candidate.priced_only")
+    if priced_only:
+        head += f"｜只差已定價 {priced_only}"
     flags: list[str] = []
     try:
         log = list((_read_json(leads_path) or {}).get("harvest_log") or [])

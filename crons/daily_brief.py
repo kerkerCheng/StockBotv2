@@ -491,20 +491,38 @@ def _impact_text(graph_impact: Any) -> str | None:
     return f"{delta}｜來源：{sources}"
 
 
+def priced_only_block(names: Sequence[str] | None, problem: str | None) -> list[str]:
+    """③ 的「只差已定價」（盲點修法 §1 第 3 條，2026-11-03；failure log #123）：等回落裡可開的機械前提都成立、只剩價格判斷的檔。
+    價格判斷是使用者的，所以住 ③、不只是 ④ 等回落那一行的標記；沒有 pq2 編號、不進批次指令。0 檔不印（④ 候選那一行照印 0）。"""
+    if names is None:
+        return [f"**只差已定價：讀不到（{problem}）**"]
+    if not names:
+        return []
+    return [f"**只差已定價 {len(names)} 檔：{'、'.join(names)}**",
+            "- 可開的機械前提都成立，剩下的是「已定價嗎」——價格判斷由你下，系統不判、不給門檻",
+            "- 回法：互動 session 說「<代號> 可開」或「<代號> 不要（理由）」；不說就照等回落，到重看日再問你"]
+
+
 def decisions_block(*, actionable: Sequence[Mapping[str, Any]] | None, problem: str | None,
-                    todo_mod: Any) -> tuple[list[str], str | None]:
+                    todo_mod: Any, priced_only: Sequence[str] | None = (),
+                    priced_problem: str | None = None) -> tuple[list[str], str | None]:
     """③ 待你決定：一條一塊——**[編號] 主詞**、細節一行、go＝、不含、圖會變、建議（2026-10-28 使用者核可的排版）。
     清單與批次指令跟心跳段 3 同一份（`todo.actionable_items`、`heartbeat.recommended_batch`）；go／不含的白話取自
     `todo.GO_PLAIN`（與 `GO_AUTHORIZATION` 同鍵，L16）。回（這一塊的行, 建議的批次指令或 None）——批次指令由
-    `compose_brief` 單獨放最後一則。2026-10-07 起不含向你要文件（③b）。"""
+    `compose_brief` 單獨放最後一則。2026-10-07 起不含向你要文件（③b）。只差已定價（`priced_only_block`）排在編號前面。"""
     from crons.heartbeat import PQ2_LIST_LIMIT, recommended_batch
 
+    priced = priced_only_block(priced_only, priced_problem)
     if actionable is None:
-        return [f"### ③ 待你決定（讀不到：{problem}）"], None
-    lines = [f"### ③ 待你決定（{len(actionable)}）"]
+        return [f"### ③ 待你決定（讀不到：{problem}）", *priced], None
+    extra = f"＋只差已定價 {len(priced_only)}" if priced_only else ""
+    lines = [f"### ③ 待你決定（{len(actionable)}{extra}）", *priced]
     if not actionable:
-        lines.append("- 沒有")
+        if not priced:
+            lines.append("- 沒有")
         return lines, None
+    if priced:
+        lines.append("")
     items = sorted(actionable, key=lambda i: int(i["n"]))
     shown = items[:PQ2_LIST_LIMIT]
     for index, item in enumerate(shown):
@@ -872,7 +890,13 @@ def compose_brief(*, now: datetime, summary: str, snapshot: Mapping[str, Any], r
         except Exception as exc:  # noqa: BLE001
             actionable = asking = None
             problem = type(exc).__name__
-        lines, batch[0] = decisions_block(actionable=actionable, problem=problem, todo_mod=todo_mod)
+        try:
+            priced, priced_problem = hb.priced_only_names(
+                state_dir, label=lambda r: company_label(company_id=r.get("company_id"), ticker=r.get("ticker")))
+        except Exception as exc:  # noqa: BLE001 — 候選板讀不到不帶走 pq2 那幾塊
+            priced, priced_problem = None, type(exc).__name__
+        lines, batch[0] = decisions_block(actionable=actionable, problem=problem, todo_mod=todo_mod,
+                                          priced_only=priced, priced_problem=priced_problem)
         return [*lines, "", *documents_block(asking=asking, problem=problem, todo_mod=todo_mod, today=today)]
 
     def line(build: Any, label: str) -> list[str]:
