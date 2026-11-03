@@ -76,7 +76,7 @@ B6 參考尺（自家三年倍數最低／中位／最高／今天，對數刻�
 研究 session 畫、出處必填，載入閘要「同一張 SVG 的量測紀錄、字疊字／出框／壓框線 0」——截圖抓到量測當時沒量的壓框線後補進量測，變異 5／5 抓到）；
 趨勢線、堆疊、事件卡要的需求錨序列、地區別、事件相對反應都在 S3，S3 落地時接。**S5c ✅ 2026-10-08**：`?selfcheck=1&w=390` 機械量測
 （整頁溢出＋SVG 字疊字），八個個股頁＋十個其他頁溢出 0、字疊字 0（beta 13 張 SVG 含在內），正反對照各抓到 | Edge headless 實點七檔、溢出 0；畫面與填得滿表一致 | S2、S4，且 ≥3 份層說明已存在（2026-10-06 amendment）；S3 不再是前置（2026-10-08 amendment，使用者選 B） |
-| **S6 維護** | 層說明到期重讀接走圖第 4 型；回饋紀錄常駐 | 機制存在與否 | S5 |
+| **S6 維護**（設計 2026-11-03 已出，見「S6 維護——設計」節；待使用者選兩題） | 層說明到期重讀接走圖第 4 型；回饋紀錄常駐 | 機制存在與否 | S5 |
 
 ## Success criteria（整體）
 
@@ -196,6 +196,56 @@ C2（曆季長度含閏年 2024Q1＝91 天、差 5 天收 6 天拒、某季唯�
 都獨立驗過；真資料重驗點名五季與雲端四大 76 期。非阻擋三條：`fetchers/fred.py` 檔頭還寫「七天」（已改成指向上界常數）；三筆以上同季
 碰撞時 gaps 會重複一列（只在 artifact、不上畫面，不修）；「31 頁 521 季不變」的全頁回放審查者沒有重做（只驗點名的）。
 **S3a、S3b 關閉。**
+
+## S6 維護——設計（PLAN_PROPOSAL，2026-11-03；使用者「S6 先出設計」；AWAITING_HUMAN）
+
+```
+INTAKE
+Zoom: Z2（走圖第 4 型多一個母體；層說明「該重讀」多一個圖那一側的理由；回饋紀錄一本新 ledger＋合約測試）
+Review: R1（不碰四個 gate、資本與 append-only authority 的既有紀錄；走圖照舊零 LLM、不排序）
+Case: S5 結案記下的兩件事（Steps 表 S6 列）；ROADMAP「個股頁 schema」◐ 只剩 S6
+```
+
+**現況（2026-11-03 唯讀）：**
+- 走圖第 4 型 **0／75**：母體只有結構讀圖（`python -m query.graph_walk --json` 的 `reading_stale`）。
+- 層說明 **9 份現行、20 條主張（在盯 19、醒來待判 1）**；「該重讀」只住 ⑤ `todo.layer_note`（今天 0）與 audit，四種理由全是時間或 watch
+  那一側（整份重讀日已過、主張到期／觸及／沒盯；`alpha.providers.layer_notes.layer_note_reread_rows`）。最早的重讀日 2026-12-31
+  （`mat:inp_epiwafer`、`tech:brazed_plate_heat_exchanger`）。
+- **洞：圖那一側沒有人看層說明。** 結構讀圖有 `needs_reread_by_graph`（圖跟讀圖對不上就亮），層說明沒有——那一層在層說明寫成之後才入圖的邊
+  （新供應商、新變體）不會讓它亮，要等重讀日（最長數月）。候選板已有同一件事的判法：`alpha.candidates.unread_new_edges`
+  （正文寫完之後才寫入、而且沒讀過的邊；比逐字、不比網址，2026-10-29 量過）。
+- 回饋紀錄：brainstorm `2026-10-05-stock-page-schema` §8 表 **39 列**（到 10-06、canvas v0–v0.5）；v1.0 凍結（10-07）後的回饋散在本檔
+  Amendment F（10-08 五點）、G（10-09）與 brainstorm `2026-10-28-app-attention-ia`——沒有一處常駐，「每列指得出版本與元素」驗不了。
+  schema 現行 `stock-page-schema/1.5`（`briefing/analyst_view/page_schema.py::PAGE_SCHEMA_VERSION`）。
+
+**S6a 層說明接走圖第 4 型：**
+1. `layer_note_reread_rows` 多一個理由「新邊沒讀」：公司指向這個節點的邊（`SEAT_RELATIONS`＝`supplies_to`／`develops`，與個股頁「坐的層」
+   同一份 `seats_from_edges`），在這份層說明寫成（`created_at`）之後
+   才寫入、而且層說明的出處沒讀過——**直接呼叫 `unread_new_edges`**（同一個判法，L16），「讀過」用層說明自己的 citations（raw 檔名、lead id）
+   與 raw 全文比逐字。⑤ `todo.layer_note` 照舊是所有理由的聯集，自動多數這一種。
+2. 走圖第 4 型母體＝現行結構讀圖＋現行層說明（每節點一份）；命中＝讀圖照舊（圖那一側 stale 或過期）＋層說明「整份重讀日已過」或「新邊沒讀」。
+   主張那三種（到期、觸及、沒盯）是 watch 那一側，留在 ⑤、不進第 4 型——同結構讀圖現在的切法（第 4 型只問圖與時間；watch 醒來是佇列段的事）。
+   命中一句：「`{node}` 的層說明該重讀：{理由}」，下一步 `python -m alpha layer-note <node> --add`（換版）。
+3. `collect()` 照第 4 型讀圖的先例經 `alpha.providers.layer_notes` 取（`query/` 只有 `collect()` 能碰 provider，`tests/test_layer_separation.py`）。
+
+**S6b 回饋紀錄常駐：**
+- 一本 append-only 的 JSONL，例：`docs/feedback/stock-page.jsonl`（tracked；只收使用者對個股頁／APP 的話，不含券商原文）。一列：`id`、`date`、
+  `said`（原話或濃縮，標是哪一種）、`elements`（page schema 的塊 key，或「首屏」「全部」「規則 N」幾個跨塊 key——封閉字彙由 `page_schema.py` 導出）、
+  `schema_version`（當時的版本；凍結前的列寫 `canvas/v0.x`）、`outcome`（改了什麼，或不改＋理由）、`ref`（commit、plan 節或 ROADMAP 列）。
+- **它不是待辦池**：要開發的事唯一載體仍是 ROADMAP，這裡只寫指向（AGENTS「不建立與待辦池競爭的第二個狀態源」）。
+- 合約測試：元素在封閉字彙裡、版本是出現過的版本、`ref` 非空、壞行不靜默丟。
+- 回填：§8 的 39 列逐字搬（brainstorm 那張表留著，表頭加一句「之後住 …jsonl」）；凍結後的 F、G 與 10-28 的回饋照原文補列。
+- 誰寫：互動 session 收到對個股頁或 APP 的意見時 append 一列（AGENT_WORKFLOW 加一句；不新增命令，測試擋格式）。
+
+**要你選的：**
+1. 回饋紀錄的形狀：**A（推薦）**JSONL＋合約測試（「每列指得出版本與元素」機器驗得了）；B 留 markdown 表（人讀方便，欄位錯了較難擋）。
+2. 範圍：**A（推薦）**只收個股頁／APP（S6 的原意）；B 全系統的使用者回饋（daily 短版、心跳…）都進同一本——元素字彙要另定、範圍大。
+
+**驗收：**第 4 型母體 75 → 84（＋9 份層說明），命中照實印（今天預期 0；12-31 之後兩份到期會亮）；「新邊沒讀」實作前先量 9 份各有幾條，
+數字寫進交付；回饋紀錄列數＝39＋凍結後補的列，每列過合約測試；⑤ `todo.layer_note` 與第 4 型的層說明命中來自同一個函式（一邊有一邊沒有＝紅）。
+**不動：**走圖其餘八型、層說明寫入端與 watch 規則、候選狀態。
+**如果這個設計是錯的，最先壞掉的是哪一筆（L11-6）：**`mat:inp_epiwafer` 的層說明——出處是 raw 節錄時，邊的逐字若不在節錄裡，「新邊沒讀」會把讀過的
+邊判成沒讀（候選板 10-29 量過同一種情形）；實作時先對這一份跑，假陽性就收窄到「出處完全沒提到那家公司」。
 
 ## 已替你決定（收據；可否決）
 
