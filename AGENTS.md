@@ -244,6 +244,8 @@ Lesson 的事發經過與實作落點住 [`docs/lessons-incidents.md`](docs/less
 - **任何 unattended routine 的 executable surface 變更，都必須在同一個 change 完成 sandbox impact review**；
   **不得用 broad permission 掩蓋整合缺口**——只放行能由既有人工 gate、action type 與 receipt 約束的最窄 command prefix。
 - **subagent 委派預設關閉、每次明確 opt-in**；回傳只是 review packet；不得委派任何寫入、核准、入圖、thesis mutation、資本配置、commit／push。
+  **研究側的常規 opt-in 只有一種**（2026-11-02 使用者：「隨機抽查 開subagent這件事 其實你就當成我是開綠燈吧」；開發側見上面的 R2 條）：入圖包隨機抽查——
+  抽中的包交乾淨 context 的唯讀 reviewer 從頭核、回 review packet；抽中與否、核出什麼都不改 gate，入圖仍是人工 `go`。比例與加密規則住 ARCHITECTURE。
 - **Push 是常規動作**；push 前 `git ls-files library/private` 應為空。
 - **通知不是 authority**；Canonical Brief 只有一份；發送失敗不得阻斷。
 - **不建立與待辦池競爭的第二個狀態源**；daily brief 不留檔；題材掃描報告留檔但不是 current-state truth。

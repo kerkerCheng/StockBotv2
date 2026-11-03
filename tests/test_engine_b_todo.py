@@ -1338,6 +1338,46 @@ def test_a_recommendation_is_advice_written_on_the_item_and_never_resolves_it() 
     todo.resolve(pool, n_manual, "drop", reason="x", receipt="authority:user_directive;ref:test")
     with pytest.raises(todo.TodoError):
         todo.recommend(pool, n_manual, "go", reason="已結案的不收")
+
+
+def test_an_admission_recommendation_must_say_the_one_thing_you_judge_or_declare_it_mechanical() -> None:
+    """盲點修法第 20 條②（2026-11-03；使用者 11-02「我很相信你的建議，你該怎麼替我把關?」）：入圖包的第一行只寫要你判斷的
+    一句，沒有判斷成分的標「純機械」——寫在建議上、由 `judgment_text` 印（短版 ③、心跳段 3、todo list 同一句）。
+    入圖包不寫就拒收；其他類型不收這一行；沒寫的舊包照說沒寫（未宣告一律當要你判斷）。變異：拿掉入圖包的必填 → 紅。"""
+    pool = _pool_with({"type": "ra_admission", "ref_id": "ra_1", "title": "A"},
+                      {"type": "manual", "ref_id": "m1", "title": "B"})
+    n_ra, n_manual = sorted(i["n"] for i in todo.active_items(pool))
+    assert todo.judgment_text(todo.get(pool, n_ra)) == "要你判斷：沒寫（未宣告一律當要你判斷）"
+    assert todo.judgment_text(todo.get(pool, n_manual)) is None
+    with pytest.raises(todo.TodoError, match="要你判斷的一句"):
+        todo.recommend(pool, n_ra, "go", reason="供給側 0→1")
+    with pytest.raises(todo.TodoError, match="只寫在入圖包上"):
+        todo.recommend(pool, n_manual, "go", reason="x", judgment="這算不算")
+    todo.recommend(pool, n_ra, "go", reason="供給側 0→1", judgment="  太辰光自述的 70% 算不算 Corning 依賴  ")
+    assert todo.get(pool, n_ra)["recommendation"]["judgment"] == "太辰光自述的 70% 算不算 Corning 依賴"
+    assert todo.judgment_text(todo.get(pool, n_ra)) == "要你判斷：太辰光自述的 70% 算不算 Corning 依賴"
+    todo.recommend(pool, n_ra, "drop", reason="已被取代", judgment=todo.MECHANICAL)
+    assert todo.judgment_text(todo.get(pool, n_ra)) == "純機械（沒有要你判斷的成分）"
+    assert todo.get(pool, n_ra)["history"][-1]["old"]["judgment"].startswith("太辰光")
+    todo.recommend(pool, n_manual, "go", reason="x")                        # 其他類型照舊
+    assert "judgment" not in todo.get(pool, n_manual)["recommendation"]
+    assert "↳ 要你判斷" not in todo._item_line(todo.get(pool, n_manual))
+    assert todo._item_line(todo.get(pool, n_ra)).split("\n")[1].strip() == "↳ 純機械（沒有要你判斷的成分）"
+
+
+def test_the_cli_takes_judgment_or_mechanical_but_not_both(tmp_path, capsys) -> None:
+    pool_path = tmp_path / "pool.json"
+    todo.save(_pool_with({"type": "ra_admission", "ref_id": "ra_1", "title": "A"}), pool_path)
+    n = todo.active_items(todo.load(pool_path))[0]["n"]
+    assert todo.main(["--pool", str(pool_path), "recommend", str(n), "--verb", "go", "--reason", "x"]) == 1
+    assert "要你判斷的一句" in capsys.readouterr().err
+    assert todo.main(["--pool", str(pool_path), "recommend", str(n), "--verb", "go", "--reason", "x", "--mechanical"]) == 0
+    assert todo.load(pool_path)["items"][0]["recommendation"]["judgment"] == todo.MECHANICAL
+    with pytest.raises(SystemExit):
+        todo.main(["--pool", str(pool_path), "recommend", str(n), "--verb", "go", "--reason", "x", "--mechanical",
+                   "--judgment", "y"])
+
+
 def test_document_requests_group_by_channel_order_flips_first_and_score_their_outcomes() -> None:
     """缺 X 三分法 ④⑤（2026-10-30）：③b 按管道分組、拿到能翻候選狀態的先（再按開口時間）；計分只數終局、最後一格對照候選板，
     候選板沒讀到就 None（未算），不是 0。"""

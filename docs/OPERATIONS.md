@@ -123,6 +123,16 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 `StockBotv2-Daily` 的 ⑱⑲ 取代（1.2a 停用、2026-09-25 1.2b 刪除）；它們的理由（LLM 失敗心跳照發、永遠 exit 0、Python 不用 `.cmd`、
 發送走 subprocess）搬進 `crons/daily_task.py` 的 docstring，守它們的測試改主詞搬進 `tests/test_daily_task.py`「無人值守入口」節。
 
+### Sandbox impact review 結論（2026-11-03：入圖包把關——第一行、抽查、計數器；盲點修法 plan 2026-11-02-001 §3 第 20 條）
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | daily ⑱ 心跳（argv 不變）：⑤ 多一格「入圖包抽中待核」（`todo_ledger.collect` → `engine_b.admission_audit.status`）、短版 ④ 多一行「入圖包 N 月：照建議｜偏離｜沒寫建議｜事後抓到包內缺陷｜每 X 包抽 1、抽中待核」——**多讀一份 tracked 檔** `docs/feedback/admission-audit.jsonl`（唯讀、驗形狀），pool 本來就讀；③ 與心跳段 3 的入圖包多印第一行（`todo.judgment_text`，只讀 pool 既有的建議）。不新增主機、請求、憑證、寫入目的地。抽查帳讀壞 → ⑤ 那一格未讀到（不是 0）、④ 那一行帶 ⚠；**抽查本身不在無人值守路徑上**：reviewer 子代理只由互動 session 開（研究側常規 opt-in），`admission_audit record` 只在互動 session 寫。`todo recommend` 的入圖包必帶 `--judgment／--mechanical`——無人值守不寫建議（`todo sync` 的被取代自動 drop 建議改寫純機械，同一條路） |
+| **2 canonical skill／prompt／本檔** | 本節；AGENTS「subagent 委派」補研究側常規 opt-in 一句（使用者 11-03「Ok 做完吧」核准 plan §6 的逐字 diff；括號改寫成「開發側見上面的 R2 條」——原稿「常規 opt-in 只有一種」與既有的 Phase 結案 R2 常規 opt-in 相牴）；ARCHITECTURE §4「入圖包把關」；research-drain Step 2「入圖包的第一行與抽查」與 Step 6 建議指令；daily-brief ③ 排版。prompt 不動 |
+| **3 最窄 rule** | daily argv 不變；不新增 step、allowlist、rule；APP 不動；`.codex/rules` 仍 0 條 |
+| **4 contract test** | 新 `tests/test_admission_audit.py`：抽樣可重現、巢狀、約 1/10 與 1/5；起算日前不在母體；四種狀態（drop 掉的不必核）；計數讀 pool 既有欄位、缺陷讀帳；上月有缺陷而沒偏離才加密；帳的形狀 10 種、壞行／日期倒退／同包抽查兩次都報；`record` 的抽查只收抽中的包；⑤ 那一格與帳讀不懂＝未讀到。`tests/test_engine_b_todo.py` 兩條（入圖包必填、其他類型不收、CLI 互斥）、`tests/test_daily_digest.py` ③ 第一行、`tests/test_ra_prepare_supersede.py` 自動 drop 標純機械、`tests/test_todo_ledger.py` 涵蓋表列舉 `AUDIT_STATES`。變異 10／10 紅 |
+| **5 端到端 smoke** | 11-03 真資料（只讀）：⑤「入圖包抽中待核」0、短版 ④「入圖包 11 月：照建議 0｜偏離 0｜沒寫建議 0｜事後抓到包內缺陷 0｜每 10 包抽 1、抽中待核 0」（11 月還沒有入圖包結案；10 月附建議的 78 包全部照建議、偏離 0）；`todo list` 的 [891]、[895] 第一行印「要你判斷：沒寫（未宣告一律當要你判斷）」。下一個編號 902 若是入圖包就會抽中 |
+
 ### Sandbox impact review 結論（2026-11-03：買得到嗎——paper lane 不收買不到的檔；盲點修法 plan 2026-11-02-001 §3 第 19 條）
 
 | 步 | 結論 |

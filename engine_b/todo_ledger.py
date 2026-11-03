@@ -55,6 +55,10 @@ LEDGER: tuple[LedgerRow, ...] = (
     LedgerRow("todo.registry_rescan", "名冊變動未重算", "則", "`python -m engine_b.cli registry-rescan`"),
     LedgerRow("todo.thesis_due", "thesis 該核查未進 pq2", "條", "`python -m engine_b.todo sync`（鑄 thesis_lifecycle）"),
     LedgerRow("todo.gated", "工單收尾", "筆", "`python -m engine_b.todo gated`"),
+    # 盲點修法第 20 條③（2026-11-03；使用者 11-02「隨機抽查 開subagent這件事 其實你就當成我是開綠燈吧」）
+    LedgerRow("todo.admission_audit", "入圖包抽中待核", "包",
+              "`python -m engine_b.admission_audit status` → 抽中的包交乾淨 context 唯讀 reviewer 從頭核"
+              "（research-drain「入圖包抽查」）→ `python -m engine_b.admission_audit record <n> --found-by 抽查 …`"),
     LedgerRow("todo.edge_no_narrative", "邊緣卻沒敘事", "檔", "研究那一檔、寫第一份敘事（非邊緣的不寫）"),
     # 2026-10-29 使用者（個股頁）：「怎麼確保呈現的精神不變…之後才不會又慢慢爛掉」——敘事換版、故事就過期，
     # 首屏退回印依據；過期與沒寫是會自己出現的計數，不是要人記得的事（L14）
@@ -182,6 +186,11 @@ COVERAGE: Mapping[str, str] = {
     "plan:open_step": "phase_plan",
     "roadmap:pending_user": "phase_plan",
     "failure_log:open": "phase_plan",
+    # --- 入圖包抽查（engine_b.admission_audit.AUDIT_STATES；盲點修法第 20 條）
+    "admission_audit:not_sampled": "terminal",
+    "admission_audit:sampled_unreviewed": "todo.admission_audit",
+    "admission_audit:reviewed": "terminal",
+    "admission_audit:dropped": "terminal",       # 抽中但使用者已 drop：gate 已經說不，不必再核
 }
 
 
@@ -307,7 +316,7 @@ def collect(*, today: date, leads_store: Mapping[str, Any], watches: Sequence[Ma
             candidates: Mapping[str, Any] | None, thesis_due: Sequence[str] | None,
             loaders: Mapping[str, Callable[[], Any]] | None = None) -> list[LedgerCount]:
     """⑤ 每一格的計數。注入的值是呼叫端讀過的 authority（心跳讀 artifact 與 ledger）；None＝那個 authority 沒讀到。
-    `loaders`：要另外讀檔才算得出的格（停放未處置對照、名冊重算、缺分類、故事還沒寫）——測試可換掉。"""
+    `loaders`：要另外讀檔才算得出的格（停放未處置對照、名冊重算、缺分類、故事還沒寫、入圖包抽查帳）——測試可換掉。"""
     from engine_b import event_watch as ew
     from engine_b import queue_segments as qs
 
@@ -517,6 +526,20 @@ def collect(*, today: date, leads_store: Mapping[str, Any], watches: Sequence[Ma
 
     guarded("todo.thesis_due", thesis)
     put("todo.gated", (seg.get("gated_gate_resolved") or 0) + (seg.get("gated_no_pointer") or 0))
+
+    def admission_audit() -> None:
+        from engine_b import admission_audit as aa
+
+        audit_rows, problems = (loaders.get("admission_audit_ledger") or aa.load_ledger)()
+        if problems:                        # 帳讀不懂就不知道哪幾包核過：未讀到，不是 0（INV-3）
+            rows["todo.admission_audit"].reason = f"抽查帳：{problems[0][:60]}"
+            return
+        pending = aa.status(todo_items, audit_rows, today=today)["unreviewed"]
+        added = {int(i["n"]): i.get("added_at") for i in todo_items if i.get("n") is not None}
+        put("todo.admission_audit", len(pending), work="、".join(f"[{n}]" for n in pending) or None,
+            oldest_days=_oldest((added.get(n) for n in pending), today))
+
+    guarded("todo.admission_audit", admission_audit)
 
     def edge_no_narrative() -> None:
         if candidates is None:

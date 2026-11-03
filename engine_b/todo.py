@@ -328,14 +328,32 @@ def get(pool: Mapping[str, Any], n: int) -> dict[str, Any]:
 
 #: 寫在編號上的建議（2026-10-08 使用者：「待我決定的批次回覆 一樣就要給我單行可複製建議的操作」）。
 RECOMMENDATION_KEY = "recommendation"
+#: 入圖包的第一行（盲點修法第 20 條②，2026-11-03；使用者 11-02「我很相信你的建議，你該怎麼替我把關?」）：包裡要你判斷的
+#: 那一句（「這算不算」），沒有判斷成分的宣告 `MECHANICAL`。寫在建議裡、跟著建議覆蓋；**未宣告一律當要你判斷**
+#: （AGENTS gate 判準「未宣告一律當 judgment」）。短版 ③、心跳段 3、`todo list` 都由 `judgment_text` 印同一句（L16）。
+JUDGMENT_KEY = "judgment"
+MECHANICAL = "純機械"
+JUDGMENT_TYPES = frozenset({"ra_admission"})
 
 
-def recommend(pool: Mapping[str, Any], n: int, verb: str, *, reason: str, at: str | None = None) -> dict[str, Any]:
+def judgment_text(item: Mapping[str, Any]) -> str | None:
+    """入圖包第一行要印的字；不是入圖包回 None。沒寫的照說沒寫——它會自己現形，不是空白。"""
+    if str(item.get("type") or "") not in JUDGMENT_TYPES:
+        return None
+    said = " ".join(str((item.get(RECOMMENDATION_KEY) or {}).get(JUDGMENT_KEY) or "").split())
+    if said == MECHANICAL:
+        return f"{MECHANICAL}（沒有要你判斷的成分）"
+    return f"要你判斷：{said}" if said else "要你判斷：沒寫（未宣告一律當要你判斷）"
+
+
+def recommend(pool: Mapping[str, Any], n: int, verb: str, *, reason: str, judgment: str | None = None,
+              at: str | None = None) -> dict[str, Any]:
     """鑄號的 session 把它對這個編號的建議寫上去（動詞＋一句理由）；心跳與 daily 短版照抄，組出可直接複製的批次那一行。
 
     **建議不是授權**：不 resolve、不改任何狀態，使用者回 go／drop 才算數。理由要答得出「go 會讓哪個數字變」，drop 要附
     查過 pool 現值的查證命令（AGENTS「建議只由 ground truth 導出」）。向你要文件那一區不收建議——提供文件才算 go。
-    同一個編號再寫一次＝覆蓋（建議跟著最新的研究走），舊的那筆留在 `history`。"""
+    同一個編號再寫一次＝覆蓋（建議跟著最新的研究走），舊的那筆留在 `history`。
+    入圖包（`JUDGMENT_TYPES`）必帶 `judgment`：要你判斷的一句，或 `MECHANICAL`；其他類型不收（只有入圖包有這一行）。"""
     if verb not in VERBS:
         raise TodoError(f"建議的動詞只收 {VERBS}（收到 {verb!r}）")
     text = " ".join(str(reason or "").split())
@@ -344,10 +362,16 @@ def recommend(pool: Mapping[str, Any], n: int, verb: str, *, reason: str, at: st
     item = get(pool, n)
     if item.get("type") == "source_trace_review":
         raise TodoError(f"[{n}] 是向你要文件：提供文件才算 go，不寫建議")
+    said = " ".join(str(judgment or "").split())
+    if str(item.get("type") or "") in JUDGMENT_TYPES:
+        if not said:
+            raise TodoError(f"[{n}] 是入圖包：要附「要你判斷的一句」（--judgment），沒有判斷成分就標 --mechanical")
+    elif said:
+        raise TodoError(f"[{n}] 不是入圖包：「要你判斷的一句」只寫在入圖包上")
     old = item.get(RECOMMENDATION_KEY)
     if old:
         item.setdefault("history", []).append({"at": at or _now(), "event": "recommendation_replaced", "old": old})
-    item[RECOMMENDATION_KEY] = {"verb": verb, "reason": text, "at": at or _now()}
+    item[RECOMMENDATION_KEY] = {"verb": verb, "reason": text, "at": at or _now(), **({JUDGMENT_KEY: said} if said else {})}
     return item
 
 
@@ -1686,7 +1710,7 @@ def sync(
         if row.get("superseded_by") and (item.get(RECOMMENDATION_KEY) or {}).get("verb") != "drop":
             recommend(pool, int(item["n"]), "drop",
                       reason=f"已被 {row['superseded_by']} 取代（prepare --supersedes 的收據）；apply 會拒收這一筆",
-                      at=stamp)
+                      judgment=MECHANICAL if str(item.get("type") or "") in JUDGMENT_TYPES else None, at=stamp)
         # 同理：標的歸屬。既有 item 在下一次 sync 一併補上（upsert 是同一條路）。
         if row.get("company_id"):
             item["company_id"] = str(row["company_id"])
@@ -2475,6 +2499,9 @@ def _item_line(item: Mapping[str, Any]) -> str:
     # 做什麼（title）＋ go 授權什麼／不含什麼（GO_AUTHORIZATION，L16：分類跟著資料走）。
     # 已 dispatch 的項目不吃 go，不重複授權邊界。
     line = f"  [{item['n']}] {item['title']}{flag}"
+    judged = judgment_text(item)
+    if judged:                               # 入圖包的第一行：要你判斷的一句（盲點修法第 20 條②）
+        line += f"\n        ↳ {judged}"
     if not item.get("dispatch_status"):
         scope = go_authorization(str(item.get("type") or ""))
         line += f"\n        ↳ go＝{scope['go_authorizes']}；不含{scope['go_excludes']}"
@@ -2628,6 +2655,9 @@ def main(argv: list[str] | None = None) -> int:
     p_rec.add_argument("numbers", nargs="+")
     p_rec.add_argument("--verb", required=True, choices=VERBS)
     p_rec.add_argument("--reason", required=True, help="一句理由：go 會讓哪個數字變；drop 附查過 pool 現值的查證命令")
+    p_judge = p_rec.add_mutually_exclusive_group()
+    p_judge.add_argument("--judgment", help="入圖包必填其一：包裡要你判斷的那一句（「這算不算」）")
+    p_judge.add_argument("--mechanical", action="store_true", help="入圖包必填其一：沒有要你判斷的成分（純機械）")
 
     p_res = sub.add_parser("resolve", help="處理編號：go／drop／pending")
     p_res.add_argument("numbers", nargs="+")
@@ -2814,7 +2844,8 @@ def main(argv: list[str] | None = None) -> int:
         failures = 0
         for raw in args.numbers:
             try:
-                recommend(pool, int(raw), args.verb, reason=args.reason)
+                recommend(pool, int(raw), args.verb, reason=args.reason,
+                          judgment=MECHANICAL if args.mechanical else args.judgment)
                 print(f"✓ [{raw}] 建議 {args.verb}")
             except (TodoError, ValueError) as exc:
                 failures += 1

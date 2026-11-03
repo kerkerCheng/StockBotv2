@@ -531,6 +531,9 @@ def decisions_block(*, actionable: Sequence[Mapping[str, Any]] | None, problem: 
         if index:
             lines.append("")
         lines.append(f"**[{item['n']}] {head}**")
+        judged = todo_mod.judgment_text(item)
+        if judged:                             # 入圖包第一行：要你判斷的一句（盲點修法第 20 條②）
+            lines.append(f"- {judged}")
         if detail:
             lines.append(f"- {_clip(detail, 70)}")
         lines.extend([f"- go＝{plain['go']}", f"- 不含：{plain['excludes']}"])
@@ -931,12 +934,15 @@ def compose_brief(*, now: datetime, summary: str, snapshot: Mapping[str, Any], r
                                                             record_problem=record_problem), "LLM 額度")
         # Q3W 裁決（整體盲點審查 2026-11-01 §2 D）：到點沒寫的逐檔點名；名單全部到點且寫完就不印
         from crons.q3w_verdicts import status_lines as q3w_lines
+        # 入圖包把關的計數器（盲點修法第 20 條④，2026-11-03）：本月照建議／偏離／沒寫建議／事後抓到缺陷＋抽中待核——0 也印
+        from engine_b.admission_audit import short_line as admission_line
 
         return ["### ④ 狀態與健康度", *health, *quota_line, *line(lambda: candidate_short_lines(state_dir), "候選"),
                 *(["", *wait, ""] if wait else []),
                 *line(lambda: "- " + watch_short_line(now=now), "watch"),
                 *line(lambda: "- " + disproof_line(snapshot), "反證"),
                 *line(waits_line, "無到期的等待"),
+                *line(lambda: "- " + admission_line(today=today), "入圖包抽查"),
                 *line(lambda: [f"- {text}" for text in q3w_lines(today)], "Q3W 裁決")]
 
     def todo_part() -> list[str]:

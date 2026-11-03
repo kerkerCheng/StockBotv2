@@ -143,6 +143,19 @@ fetchers/{edgar,mops,mfn,rns}.py ↑      engine_c/etl_yfinance.py → SQLite
 - **fetchers：** `fetchers/edgar.py`（美股 SEC EDGAR）、`fetchers/mops.py`（台股 MOPS）、`fetchers/mfn.py`（瑞典 MFN，Nasdaq Stockholm／First North）、`fetchers/rns.py`（英國 RNS，經 investegate 鏡像）。四支同構：只從公開來源把指定文件寫到 `library/raw/`，meta 帶 `published_at` 與其依據；**mfn／rns 是互動式入口，不進無人值守**（2026-09-17 Phase 1 Step 1.1；放行是另一次 impact review 的事）。
 - **daily harvest：** `crons/harvest_leads.py` 以 X API `since_id`＋EDGAR watch 抓
   metadata → triage PASS → routine 依 priority 自動 pq1 → prepared RA 才進 pq2。
+- **入圖包把關（2026-11-03，盲點修法第 20 條；使用者 11-02「我很相信你的建議，你該怎麼替我把關?」）：** 四層。
+  ①apply 入口的程式檢查（`scripts/apply_ra_admission.py` 四道、L8、逐字，既有）。
+  ②每包第一行只寫要你判斷的一句、沒有判斷成分的標「純機械」：寫在建議上（`engine_b.todo recommend --judgment／--mechanical`，
+  入圖包必填其一、其他類型不收；`prepare --supersedes` 的自動 drop 建議標純機械），`todo.judgment_text` 是短版 ③、心跳段 3、
+  `todo list` 共用的那一句（L16），沒寫印「沒寫（未宣告一律當要你判斷）」。
+  ③抽樣（`engine_b/admission_audit.py`）：每個 `ra_admission` 編號抽不抽中由編號當種子決定（可重現、挑不了）——**每 10 包抽 1；
+  上個月「事後抓到包內缺陷 K>0 而偏離 M=0」這個月每 5 包抽 1**（加密時集合只變大、不換人）；2026-11-03 起鑄的包才在母體。
+  抽中的包交乾淨 context 的唯讀 reviewer 從頭核（AGENTS 研究側唯一的常規 opt-in；流程住 `skills/research-drain`「入圖包抽查」），
+  互動 session `admission_audit record` 進 `docs/feedback/admission-audit.jsonl`（tracked、append-only、形狀封閉；同一包抽查只一列，
+  事後發現的缺陷任何入圖包都收；`record` 的抽查只收抽中的包）。抽中待核是 ⑤「入圖包抽中待核」，使用者已 drop 的不必核。
+  ④計數器：短版 ④ 每天一行「入圖包 N 月：照建議｜偏離｜沒寫建議｜事後抓到包內缺陷｜每 X 包抽 1、抽中待核」——照建議與偏離讀 pool
+  既有的 `recommendation.verb` 與 `resolution`（零 schema 變更、全部入圖包），缺陷數讀抽查帳。
+  **抽中與否、核出什麼都不改 gate**：入圖仍是人工 `go`，reviewer 不寫任何東西。
 - **2026-09-16 定案、尚未交付（規格，不是現況；ROADMAP Phase 3／6）：** X 帳號登記表（封閉清單，tier
   `probation`／`measured`／`trusted`，只影響 pq1 優先序）＋每則貼文自動蓋章（貼文時間＋當日收盤價＋具名實體）
   ＋每週計分表五欄、materialize 進 APP（D5）；MOPS 重訊 watcher 與台股每月營收 datum；parked lead 超過 60 天

@@ -27,6 +27,7 @@ def _vocabularies() -> dict[str, set[str]]:
     from alpha.providers.stories import STORY_GAP_KINDS
     from alpha.structure_reading.staleness import READING_STATUSES
     from crons.heartbeat import THESIS_STATUSES
+    from engine_b import admission_audit
     from engine_b import event_watch as ew
     from engine_b import hypotheses, leads
     from engine_b import queue_segments as qs
@@ -42,11 +43,12 @@ def _vocabularies() -> dict[str, set[str]]:
         "candidate": set(GROUPS) | set(SIDE_GROUPS) | {"no_narrative", "priced_only"},
         "reading": set(READING_STATUSES),
         "story": set(STORY_GAP_KINDS),
+        "admission_audit": set(admission_audit.AUDIT_STATES),
     }
 
 
 @pytest.mark.parametrize("prefix", ["lead", "segment", "watch", "expiry", "dispatch", "hypothesis", "thesis",
-                                    "candidate", "reading", "story"])
+                                    "candidate", "reading", "story", "admission_audit"])
 def test_every_state_in_every_vocabulary_has_a_registered_destination(prefix: str) -> None:
     missing = sorted(v for v in _vocabularies()[prefix] if f"{prefix}:{v}" not in tl.COVERAGE)
     assert not missing, (f"{prefix} 有狀態沒登記去處：{missing}——新增狀態時先在 engine_b/todo_ledger.py 的 COVERAGE "

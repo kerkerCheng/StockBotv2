@@ -128,6 +128,8 @@ def test_sync_marks_the_superseded_number_and_recommends_drop(tmp_path: Path, mo
     todo.sync(pool, list(rows.values()), reconciled={})
     by_ref = {item["ref_id"]: item for item in pool["items"]}
     assert by_ref[old["action_id"]]["recommendation"]["verb"] == "drop"
+    # 被取代是收據、不是判斷：第一行宣告純機械（盲點修法第 20 條②）
+    assert by_ref[old["action_id"]]["recommendation"]["judgment"] == todo.MECHANICAL
     assert "recommendation" not in by_ref[newer["action_id"]]
 
 

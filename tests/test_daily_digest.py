@@ -572,9 +572,10 @@ def test_decisions_reuse_the_heartbeat_list_and_say_none_when_empty() -> None:
     item = {"n": 715, "type": "ra_admission", "title": "InP 磊晶片層建層：IQE 供 6 吋",
             "graph_impact": "新增 1 節點、2 邊、2 claims（另 2 筆已在圖上或逐字保留）｜來源：NVIDIA（tier 1）、Micron Technology（tier 1）"}
     lines, batch = decisions_block(actionable=[item], problem=None, todo_mod=todo)
-    # 一條一塊：粗體主詞、細節、go＝、不含（白話，取自 todo.GO_PLAIN）、圖會變
-    assert lines[:6] == ["### ③ 待你決定（1）", "**[715] InP 磊晶片層建層**", "- IQE 供 6 吋", "- go＝把這一包寫進圖",
-                         "- 不含：改敘事或 thesis、下單",
+    # 一條一塊：粗體主詞、要你判斷的一句（入圖包；盲點修法第 20 條②——沒寫照說沒寫）、細節、go＝、不含（白話，取自
+    # todo.GO_PLAIN）、圖會變
+    assert lines[:7] == ["### ③ 待你決定（1）", "**[715] InP 磊晶片層建層**", "- 要你判斷：沒寫（未宣告一律當要你判斷）",
+                         "- IQE 供 6 吋", "- go＝把這一包寫進圖", "- 不含：改敘事或 thesis、下單",
                          "- 圖會變：新增 1 節點、2 邊、2 claims｜來源 NVIDIA、Micron Technology（tier 1）"]
     assert batch is None and "都沒寫建議" in lines[-1]
     assert "讀不到" in decisions_block(actionable=None, problem="OSError", todo_mod=todo)[0][0]
@@ -588,7 +589,8 @@ def test_the_decisions_end_with_one_copyable_line_built_from_the_recommendations
 
     items = [
         {"n": 736, "type": "manual", "title": "載板鏈對照組", "recommendation": {"verb": "go", "reason": "日東紡敘事要先有對照組"}},
-        {"n": 739, "type": "ra_admission", "title": "分接開關層補華明", "recommendation": {"verb": "go", "reason": "供給側 0→1"}},
+        {"n": 739, "type": "ra_admission", "title": "分接開關層補華明",
+         "recommendation": {"verb": "go", "reason": "供給側 0→1", "judgment": "華明自述的國內份額算不算主要供應商"}},
         {"n": 741, "type": "manual", "title": "舊題目", "recommendation": {"verb": "drop", "reason": "pool 現值已無對應（todo list 查過）"}},
         {"n": 742, "type": "manual", "title": "沒寫建議的"},
         {"n": 743, "type": "watch_decision", "title": "到期", "recommendation": {"verb": "pending", "reason": "等 Q3"}},
@@ -596,6 +598,10 @@ def test_the_decisions_end_with_one_copyable_line_built_from_the_recommendations
     lines, batch = decisions_block(actionable=items, problem=None, todo_mod=todo)
     assert batch == "736 739 go 741 drop"
     assert "- 建議 go：日東紡敘事要先有對照組" in lines
+    # 入圖包的第一行是要你判斷的一句；其他類型沒有這一行
+    assert lines[lines.index("**[739] 分接開關層補華明**") + 1] == "- 要你判斷：華明自述的國內份額算不算主要供應商"
+    assert not any(x.startswith("- 要你判斷") or x.startswith("- 純機械") for x in
+                   lines[lines.index("**[736] 載板鏈對照組**"):lines.index("**[739] 分接開關層補華明**")])
     assert any(x.startswith("-# 沒寫建議：[742]、[743]") for x in lines)
     assert any("[743] 是到期的等待：批次裡只能 drop" in x for x in lines)
     assert not any("`736" in x for x in lines)                                  # 批次指令不在 ③ 裡，是最後一則

@@ -401,7 +401,7 @@ ref 解析，不是一支前置查詢命令。
 
 | 終局 | 條件 | 動作 |
 |---|---|---|
-| **產出入圖包** | 有可核准的 graph delta | `prepare_research_action.py --dry-run`（看入圖副作用；不寫、不鑄號）→ 乾淨再正式 `prepare_research_action.py`（只跑一次）→ `advance action_prepared` → 取得 pq2 編號 |
+| **產出入圖包** | 有可核准的 graph delta | `prepare_research_action.py --dry-run`（看入圖副作用；不寫、不鑄號）→ 乾淨再正式 `prepare_research_action.py`（只跑一次）→ `advance action_prepared` → 取得 pq2 編號 → `todo recommend` 帶 `--judgment "<要你判斷的一句>"` 或 `--mechanical` → `python -m engine_b.admission_audit status`：抽中就照下面「入圖包抽查」做 |
 | **產出 onboard 包** | 標的不在 registry，但四維初判（瓶頸地位／需求錨／客戶端資本承諾／純度）值得入圖 | 打包 registry 條目＋首批 extraction＋L8 來源清單成 ra_admission packet 取號（`AGENTS.md`「Onboard 也走 pq2」）——**不要 park 成開放式 scope 問題** |
 | **誠實 park** | 追源未果／被一手否定／只屬 Engine C 時變觀測／沒有唯一 focus／四維初判不過 | `advance parked` ＋ 完整 trace refs |
 
@@ -422,6 +422,27 @@ watch 等的就是這句點名的已登記公司（2026-10-08）；沒點名任�
 
 ⚠ **2026-09-22（Phase 0）：工單（decision gap）原本的第三種終局「研究完成後重新評估、
 以新 decision receipt 結案」已退役**（ROADMAP Phase 0／G12）。終局回到兩種：packet 或誠實 park。
+
+### 入圖包的第一行與抽查（2026-11-03 起；盲點修法第 20 條，使用者 11-02「我很相信你的建議，你該怎麼替我把關?」）
+
+**第一行只寫要你判斷的一句。** 鑄號後寫建議時一併寫：包裡有「這算不算」（自述的份額算不算依賴、兩個名字是不是同一家、
+媒體轉述算不算第三方）就寫成一句 `--judgment`；包裡全是逐字、結構化數字、指得出位置的事實就標 `--mechanical`。
+入圖包不寫會被拒收；寫不出那一句，多半是包還沒想清楚。短版 ③、心跳段 3、`todo list` 都把它印在主詞下第一行。
+
+**抽查**（比例與加密規則住 ARCHITECTURE §4「入圖包把關」）：
+1. 鑄號後跑 `python -m engine_b.admission_audit status`；新號是 `sampled_unreviewed` 就在同一段核完——⑤「入圖包抽中待核」
+   收尾要歸零。使用者已 drop 的不必核。
+2. **乾淨 context 的唯讀 reviewer**（Agent 工具開子代理；使用者 11-02 常規 opt-in，**只涵蓋抽中的包**——沒抽中的包要 reviewer
+   是另一次委派，要使用者逐次 opt-in）。提示必寫：只讀（不寫任何檔、不跑 prepare／apply／todo／event_watch 的寫入命令、
+   不 commit／push、不核准）；**對外請求不帶使用者 email，SEC 用 repo 預設 UA**；從頭核 packet（`library/private/research_actions/<ra_id>.json`
+   的 payload 與決策區塊）對照每個來源的原文：①逐字引文真的在來源裡、具體型號與公司名逐字出現（L6）②`published_at`
+   不是抓取日（L11-5）③L8：多文件入圖至少 3 個不同 `origin_entity`、`sole_source` 有客戶端或第三方印證、同一供應商自稱的標 weak
+   ④主詞方向（誰供給誰）與 quote 一致 ⑤圖影響數字與 payload 一致 ⑥第一行那一句是不是真的是包裡要判斷的事，標「純機械」的包裡
+   有沒有藏著「這算不算」。回 review packet：乾淨／有缺陷＋缺陷逐條（每條指得出 packet 哪一段、哪個來源）。
+3. 記帳：`python -m engine_b.admission_audit record <n> --found-by 抽查 --verdict 乾淨|有缺陷 [--defect "…"]… --note "<核了什麼／怎麼處理>"`。
+4. 有缺陷：還沒 go 的走 `prepare --supersedes` 出新版（新編號）並在收尾說明；已入圖的走更正走廊、failure log 記一筆。都不改 gate。
+5. **任何時候**發現入圖包有錯（不限抽中、不限本段）：`record <n> --found-by 事後 …`——這是計數器「事後抓到包內缺陷」的來源；
+   當月有缺陷而使用者一次都沒偏離建議，下個月自動加密成每 5 包抽 1。
 
 ---
 
@@ -670,7 +691,8 @@ Samsung／SKH 側」）。這種問題 park 成 pq2 並繼續下一條，收尾�
   鑄一個 `manual` 型編號，讓使用者在批次行裡一起決定；**同時 open ≤2、drop 過沒新 lead 不重生**。
   核准仍逐題、系統不自行開題，decompose gate 不因此放寬。沒有合格候選就寫「本輪無新錨」。
 - **最後一行單獨給可複製的批次指令**（如 `341 342 343 go 344 drop`）；**鑄的每個編號同時寫建議**
-  （`python -m engine_b.todo recommend <n> --verb go|drop|pending --reason "<go 會讓哪個數字變>"`）——
+  （`python -m engine_b.todo recommend <n> --verb go|drop|pending --reason "<go 會讓哪個數字變>"`；入圖包另帶
+  `--judgment "<要你判斷的一句>"` 或 `--mechanical`，見 Step 2「入圖包的第一行與抽查」）——
   daily 短版的 ③ 照抄它組出同一行（2026-10-08 使用者指示；沒寫的編號會列在「沒寫建議」）
 - **本輪的否定結果**：哪些研究做完後結論是「不是瓶頸」——這一段不得省略，
   它是這個 skill 最容易被誤讀成「沒產出」的部分

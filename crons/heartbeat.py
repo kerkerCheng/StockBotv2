@@ -1879,7 +1879,9 @@ def _pq2_item_lines(actionable: Sequence[Mapping[str, Any]], *, todo_mod: Any) -
         rec = item.get("recommendation") or {}
         rec_text = (f"｜建議 {rec.get('verb')}：{_short_text(rec.get('reason'), 60)}"
                     if rec.get("verb") in ("go", "drop", "pending") else "")
+        judged = todo_mod.judgment_text(item)          # 入圖包：要你判斷的一句（盲點修法第 20 條②）
         lines.append(f"  [{item['n']}] {title[:70]}{'…' if len(title) > 70 else ''}"
+                     f"{f'｜{judged}' if judged else ''}"
                      f"｜go＝{auth['go_authorizes']}｜不含：{auth['go_excludes']}{rec_text}")
     if len(items) > PQ2_LIST_LIMIT:
         lines.append(f"  其餘 {len(items) - PQ2_LIST_LIMIT} 筆（`python -m engine_b.todo list`）")
