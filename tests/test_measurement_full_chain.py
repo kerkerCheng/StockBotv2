@@ -108,7 +108,9 @@ def test_prediction_outcomes_reach_the_artifact_the_heartbeat_and_the_api(tmp_pa
     from alpha.providers import structure_readings as sr
     from webapp import materialize as mat
 
-    from test_structure_reading_v3 import CUSTOMER_Q, LAYER, SOCKET, _cite, _quotes, _structure, _two_halves, _v3
+    from test_structure_reading_v3 import (
+        CUSTOMER_Q, DEMAND_Q, LAYER, SOCKET, _cite, _quotes, _structure, _two_halves, _v3,
+    )
 
     ledger = tmp_path / "readings"
     monkeypatch.setattr(sr, "STRUCTURE_READING_DIR", ledger)
@@ -123,8 +125,10 @@ def test_prediction_outcomes_reach_the_artifact_the_heartbeat_and_the_api(tmp_pa
              citations=_two_halves(LAYER))
     r4 = _v3(other, unit="layer", kind="moat", created_at=_utc("2026-09-26"), expires=date(2026, 12, 24),
              citations=_two_halves(other))
+    # neither 也要付「換得掉」的證據（盲點修法第 12 條）：引 r4 已引過的那段買方原文——不多一份來源
     r5 = _v3(other, unit="layer", kind="neither", created_at=_utc("2026-09-28"), expires=date(2026, 12, 28),
-             supersedes_id=r4["reading_id"], structure=changed(other), citations=[], disproof=[])
+             supersedes_id=r4["reading_id"], structure=changed(other), disproof=[],
+             citations=[dict(_cite("demand_side", DEMAND_Q, "doc_demand", other), basis="buyer_fact")])
     for record, node in ((r1, SOCKET), (r2, SOCKET), (r3, LAYER), (r4, other), (r5, other)):
         sr.append_reading_record(record, directory=ledger, quotes=_quotes(node))
 

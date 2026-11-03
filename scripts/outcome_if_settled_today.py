@@ -451,6 +451,20 @@ def _local_day(stamp: Any) -> date | None:
     return _local_date(stamp)
 
 
+def _reading_kinds() -> dict[str, str]:
+    """全部讀圖紀錄（含已被取代的）→ {reading_id: kind}。敘事騎的是寫的時候那一份，所以舊的也要查得到；
+    有壞行的 ledger 讓整張表 raise（騎的那份可能就在壞行裡——查不到不得當成沒騎 neither）。"""
+    from alpha.providers.structure_readings import known_nodes, read_reading_records
+
+    out: dict[str, str] = {}
+    for node in known_nodes():
+        records, errors = read_reading_records(node)
+        if errors:
+            raise ValueError(f"讀圖 ledger {node} 有 {len(errors)} 行壞行")
+        out.update({r.reading_id: r.kind for r in records})
+    return out
+
+
 def _read_trade_log(path: Path) -> tuple[list[dict], list[str]]:
     """trade_log（append-only）。檔案不存在＝還沒有任何成交（不是讀不到）；壞行列進 problems，不靜默丟棄（INV-3）。"""
     if not path.is_file():
@@ -631,7 +645,9 @@ def first_named_by(company_id: str | None, leads: Mapping[str, Mapping[str, Any]
 def paper_lane_plan(briefs: Mapping[str, tuple[Sequence[Any], Sequence[str]]], *, today: date,
                     leads: Mapping[str, Mapping[str, Any]] | None,
                     access_data: Mapping[str, Any] | None = None,
-                    access_problem: str | None = None) -> tuple[list[dict], dict]:
+                    access_problem: str | None = None,
+                    reading_kinds: Mapping[str, str] | None = None,
+                    readings_problem: str | None = None) -> tuple[list[dict], dict]:
     """每檔**最早一筆未撤回的 `investor-brief/v2`**＝paper 錨點（不是 `select_brief` 的現行那筆）。純函式，不取價。
 
     回 `(rows, filter_report)`——每個 filter 都報 input／accepted／filtered／reasons（INV-3）：沒有 v2 的檔不是 paper 列；
@@ -645,7 +661,9 @@ def paper_lane_plan(briefs: Mapping[str, tuple[Sequence[Any], Sequence[str]]], *
     report = {"input": len(briefs), "accepted": 0,
               "filtered": {"no_v2": [], "ledger_unreadable": [], "not_buyable": []},
               "access": {"computed": access_data is not None, "problem": access_problem, "why": {},
-                         "expired": [], "unregistered": []}}
+                         "expired": [], "unregistered": []},
+              # 騎在 neither 層上的（盲點修法第 12 條）：讀圖判讀表沒給＝沒算（不是「都沒騎 neither」——L12）
+              "readings": {"computed": reading_kinds is not None, "problem": readings_problem}}
     for ticker, (records, errors) in sorted(briefs.items()):
         v2 = sorted((r for r in records if r.record_version == RECORD_VERSION_V2 and not r.retracted),
                     key=lambda r: (r.created_at, r.brief_id))
@@ -680,6 +698,8 @@ def paper_lane_plan(briefs: Mapping[str, tuple[Sequence[Any], Sequence[str]]], *
             "anchor_state": cs.state if cs is not None else None,
             "current_brief_id": current.brief_id if current is not None else None,
             "current_state": current_state,
+            # 騎的讀圖（現行那一版；撤回了就看第一份）有沒有 neither：True／False；None＝沒算或騎的讀圖查不到
+            "rides_neither": _rides_neither_flag(current if current is not None else first, reading_kinds),
             "v2_records": len(v2),
             "earliest_v1": min(r.created_at for r in v1).isoformat() if v1 else None,
             "note": [],
@@ -888,6 +908,27 @@ def drawdown_count(rows: Sequence[Mapping[str, Any]]) -> dict:
 SMALL_SAMPLE_N = 6
 
 
+def _rides_neither_flag(brief: Any, reading_kinds: Mapping[str, str] | None) -> bool | None:
+    """這份敘事騎的讀圖有沒有判 neither 的（盲點修法第 12 條）。沒騎任何讀圖＝False；表沒給或騎的那份查不到＝None。"""
+    if reading_kinds is None:
+        return None
+    kinds = [reading_kinds.get(r.reading_id) for r in (getattr(brief, "rides", ()) or ())]
+    if "neither" in kinds:
+        return True
+    return None if None in kinds else False
+
+
+def rides_neither_group(rows: Sequence[Mapping[str, Any]], *, lane: str) -> dict:
+    """騎在 neither 層上的列（盲點修法第 12 條；審查 research_quality-5：讀圖偏向「換得掉」時，系統既擋了人、又永遠量不出來）。
+    等權與曾達 2 倍照 `_by_state` 同一套；n 不到 `SMALL_SAMPLE_N` 帶小樣本旗。只印、不判、不改任何狀態。"""
+    group = [r for r in rows if r.get("rides_neither") is True]
+    power = power_law_aggregate(list(group), lane=lane)
+    return {"n": len(group), "aggregate": equal_weight_aggregate(list(group)),
+            "reached_2x_ever": power.get("reached_2x_ever"), "peak_measured": power.get("peak_measured"),
+            "small_sample": len(group) < SMALL_SAMPLE_N, "tickers": sorted(str(r.get("ticker")) for r in group),
+            "unknown": sorted(str(r.get("ticker")) for r in rows if r.get("rides_neither") is None)}
+
+
 def _by_state(rows: Sequence[Mapping[str, Any]], *, key: str, missing: str, lane: str) -> dict[str, dict]:
     """依某個狀態欄分組各算一次等權與曾達 2 倍（各組 n 加總＝列數）；沒有那一欄的列歸 `missing`。"""
     groups: dict[str, list] = {}
@@ -928,7 +969,8 @@ def lane_summary(rows: Sequence[Mapping[str, Any]], *, lane: str) -> dict:
         "measurement_start": min(anchors).isoformat() if anchors else None,
         "aggregate": equal_weight_aggregate(list(rows)),
         **({"by_current_state": _by_state(rows, key="current_state", missing="missing", lane=lane),
-            "by_anchor_state": _by_state(rows, key="anchor_state", missing="unknown", lane=lane)} if paper else {}),
+            "by_anchor_state": _by_state(rows, key="anchor_state", missing="unknown", lane=lane),
+            "rides_neither": rides_neither_group(rows, lane=lane)} if paper else {}),
         "power_law": power_law_aggregate(list(rows), lane=lane),
         "theme_cohort_excess": {"n": len(excess), "mean": (sum(excess) / len(excess)) if excess else None,
                                 "of": len(measured),
@@ -964,6 +1006,7 @@ def collect(*, no_benchmark: bool = False, today: date | None = None,
             quote_unit_for: Callable[[str | None, str | None], str | None] | None = None,
             disproof_inputs: tuple[Sequence[Mapping[str, Any]] | None, Mapping[str, Any] | None] | None = None,
             access_loader: Callable[[], Mapping[str, Any]] | None = None,
+            reading_kinds_loader: Callable[[], Mapping[str, str]] | None = None,
             ) -> dict[str, Any]:
     """三條 lane 的資料收集（Phase 5 Step 5.2）。**render 與 APP 讀同一個函式**——APP 端另算一份會立刻開始偏離（L13）。
 
@@ -1017,11 +1060,18 @@ def collect(*, no_benchmark: bool = False, today: date | None = None,
     except Exception as exc:  # noqa: BLE001
         access_data = None
         access_problem = f"config/execution_access.json 讀不到（{type(exc).__name__}: {str(exc)[:120]}）"
+    # 騎在 neither 層上的（盲點修法第 12 條）：讀圖 ledger 讀壞只讓這一格沒算，整條 lane 照走
+    try:
+        reading_kinds, readings_problem = (reading_kinds_loader or _reading_kinds)(), None
+    except Exception as exc:  # noqa: BLE001
+        reading_kinds = None
+        readings_problem = f"讀圖 ledger 讀不到（{type(exc).__name__}: {str(exc)[:120]}）"
     brief_map: Mapping[str, tuple[Sequence[Any], Sequence[str]]] | None = None
     try:
         brief_map = briefs if briefs is not None else _read_briefs(brief_dir)
         paper_rows, paper_filter = paper_lane_plan(brief_map, today=today, leads=leads,
-                                                   access_data=access_data, access_problem=access_problem)
+                                                   access_data=access_data, access_problem=access_problem,
+                                                   reading_kinds=reading_kinds, readings_problem=readings_problem)
         paper_absence = None
     except Exception as exc:  # noqa: BLE001
         brief_map = None                     # 讀壞了：下面「反證曾被判觸及」整格記讀不到，不當成沒觸及
@@ -1571,6 +1621,22 @@ def lanes_payload(collected: Mapping[str, Any]) -> dict:
     return out
 
 
+def _rides_neither_line(group: Mapping[str, Any], readings: Mapping[str, Any]) -> str:
+    """paper 的「騎在 neither 層上」一行（盲點修法第 12 條）：沒算就說沒算；查不到騎的讀圖的列名字逐一印。"""
+    head = "  - 騎在 neither 層上（換得掉）"
+    if not readings.get("computed"):
+        return f"{head}：沒算（{readings.get('problem') or '呼叫端沒給讀圖判讀'}）——不是 0"
+    tickers = group.get("tickers") or []
+    line = (f"{head}：{group.get('n', 0)} 列" + (f"（{'、'.join(tickers)}）" if tickers else "")
+            + f"｜等權絕對 {_pct((group.get('aggregate') or {}).get('absolute'))}"
+            f"（量得到 {(group.get('aggregate') or {}).get('measured', 0)}）｜曾達 2 倍 {group.get('reached_2x_ever')}/"
+            f"{group.get('peak_measured')}" + ("｜🟠 小樣本（只印不判）" if group.get("small_sample") else ""))
+    unknown = group.get("unknown") or []
+    if unknown:
+        line += f"｜⚠ 騎的讀圖查不到 {len(unknown)} 列：{'、'.join(unknown)}"
+    return line
+
+
 def render_lanes(collected: Mapping[str, Any]) -> list[str]:
     """三條 lane 分段印（Phase 5 Step 5.2）。**只印不比、不排序、不設門檻**；空 lane 印「還沒有列」，不印 0%。"""
     out = ["", "## 三條 lane——分母分開，不得合併讀（live 量買得準不準、paper 量判斷準不準、history 只是歷史）"]
@@ -1662,6 +1728,9 @@ def render_lanes(collected: Mapping[str, Any]) -> list[str]:
                 out.append(f"  - {title} {state}：{group['n']} 列｜等權絕對 {_pct(group['aggregate']['absolute'])}"
                            f"（量得到 {group['aggregate']['measured']}）｜曾達 2 倍 {group['reached_2x_ever']}/"
                            f"{group['peak_measured']}" + ("｜🟠 小樣本（只印不判）" if group.get("small_sample") else ""))
+        if lane == "paper":
+            out.append(_rides_neither_line(summary.get("rides_neither") or {},
+                                           (collected["lanes"]["paper"].get("filter") or {}).get("readings") or {}))
         chase = summary["chase"]
         label = {"history": "入圖前已漲", "paper": "敘事前已漲", "live": "成交前已漲"}[lane]
         out.append(f"- {label}：{chase['chasing']}/{chase['paired']}"

@@ -639,3 +639,40 @@ def test_readings_context_seats_are_supplies_and_develops_to_non_company_nodes(t
     assert context["seats"] == {SIVERS: [SOCKET], "co:ayar_labs": [SOCKET]}   # 公司對公司的邊不算「坐在」
     row = context["by_node"][SOCKET][0]
     assert row["unit_label"] == "插槽" and row["kind_label"].startswith("B：") and row["status_label"]
+
+
+# ---------------------------------------------------------------------------
+# 盲點修法第 12 條（2026-11-03）：neither（換得掉）也要付證據
+# ---------------------------------------------------------------------------
+
+def _basis_cite(basis: str) -> dict:
+    return dict(_cite("supply_side", CUSTOMER_Q, "doc_customer", LAYER), basis=basis)
+
+
+def test_citation_basis_is_a_closed_vocabulary_and_absent_basis_keeps_old_ids() -> None:
+    """basis 是封閉字彙（供應商自述不在裡面）；沒宣告時 as_dict 不寫這個鍵——舊紀錄重算 id 一個字都不變。"""
+    from alpha.structure_reading.contracts import REPLACEABLE_BASES
+
+    plain = _v3(LAYER, unit="layer", kind="neither", disproof=[])
+    assert all("basis" not in c for c in plain["citations"])
+    with pytest.raises(ContractViolation, match="basis 未登記"):
+        _v3(LAYER, unit="layer", kind="neither", disproof=[], citations=[_basis_cite("supplier_says")])
+    cited = _v3(LAYER, unit="layer", kind="neither", disproof=[], citations=[_basis_cite("buyer_fact")])
+    assert cited["citations"][0]["basis"] == "buyer_fact" and cited["reading_id"] != plain["reading_id"]
+    assert set(REPLACEABLE_BASES) == {"buyer_fact", "buyer_policy", "third_party", "media"}
+    # 舊的 neither（沒有 basis）照讀：規則只在寫入端，解析不回溯
+    assert parse_structure_reading_record(plain).kind == "neither"
+
+
+def test_a_new_neither_reading_without_a_replaceable_basis_is_rejected_at_write(tmp_path) -> None:
+    """寫入端擋（審查 research_quality-5：「換不掉」要付證據、「換得掉」免費）：新的 neither 至少一段引用標 basis；
+    undecided 照舊不必；撤回不檢查。變異：拿掉寫入端那一條 → 紅。"""
+    from alpha.providers.structure_readings import append_reading_record
+
+    with pytest.raises(ContractViolation, match="換得掉"):
+        append_reading_record(_v3(LAYER, unit="layer", kind="neither", disproof=[]), directory=tmp_path,
+                              quotes=_quotes(LAYER))
+    ok = _v3(LAYER, unit="layer", kind="neither", disproof=[], citations=[_basis_cite("buyer_fact")])
+    append_reading_record(ok, directory=tmp_path, quotes=_quotes(LAYER))
+    undecided = _v3(LAYER, unit="layer", kind="undecided", disproof=[], supersedes_id=ok["reading_id"])
+    append_reading_record(undecided, directory=tmp_path, quotes=_quotes(LAYER))

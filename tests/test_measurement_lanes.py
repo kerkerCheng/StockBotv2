@@ -51,6 +51,7 @@ class _Brief:
     record_version: str = "investor-brief/v2"
     retracted: bool = False
     candidate_state: _State | None = field(default=None)
+    rides: tuple = ()
 
     @property
     def created_on(self) -> date:
@@ -150,7 +151,7 @@ def _collect(tmp_path: Path, *, history=None, cohorts=None, events=EVENTS, **ove
         trade_log_path=_write_log(tmp_path, events), briefs=BRIEFS, leads=LEADS,
         cohorts=([COHORT], []) if cohorts is None else cohorts,
         is_beta=lambda s: s in BETA, resolve=_resolve, quote_unit_for=lambda cid, t: QUOTE_UNITS.get(cid),
-        access_loader=lambda: ACCESS)
+        access_loader=lambda: ACCESS, reading_kinds_loader=lambda: {})
     kwargs.update(overrides)
     return OIST.collect(**kwargs)
 
@@ -257,7 +258,8 @@ def test_paper_lane_anchors_on_the_first_v2_not_the_current_one(collected) -> No
     report = collected["lanes"]["paper"]["filter"]
     assert report == {"input": 3, "accepted": 2,
                       "filtered": {"no_v2": ["OLD"], "ledger_unreadable": [], "not_buyable": []},
-                      "access": {"computed": True, "problem": None, "why": {}, "expired": [], "unregistered": []}}
+                      "access": {"computed": True, "problem": None, "why": {}, "expired": [], "unregistered": []},
+                      "readings": {"computed": True, "problem": None}}
     aaa = _row(collected, "paper", "AAA")
     assert (aaa["brief_id"], aaa["anchor_date"], aaa["anchor_state"]) == ("ib_a2", date(2026, 9, 29), "priced_wait")
     assert (aaa["current_brief_id"], aaa["current_state"], aaa["v2_records"]) == ("ib_a3", "open", 2)
@@ -809,3 +811,47 @@ def test_no_benchmark_diagnostic_run_never_writes_the_series(monkeypatch) -> Non
     monkeypatch.setattr(sys, "argv", ["outcome_if_settled_today.py"])
     assert OIST.main() == 0
     assert calls == [False, True]
+
+
+def test_paper_rows_riding_a_neither_layer_get_their_own_line_with_a_small_sample_flag(tmp_path) -> None:
+    """盲點修法第 12 條：騎在 neither 層上的列另印一行（只印、帶小樣本旗）；騎的那份查不到的逐一列名；讀圖判讀表讀不到＝
+    沒算、不是 0。變異：旗永遠 False → 紅。"""
+    from types import SimpleNamespace
+
+    ride = SimpleNamespace(reading_id="sr_neither")
+    briefs = {**BRIEFS, "GGG.L": ([_Brief("ib_g1", "co:ggg", _at("2026-09-29"), candidate_state=_State("pass"),
+                                          rides=(ride,))], [])}
+    collected = _collect(tmp_path, briefs=briefs, reading_kinds_loader=lambda: {"sr_neither": "neither"})
+    assert _row(collected, "paper", "GGG.L")["rides_neither"] is True
+    assert _row(collected, "paper", "AAA")["rides_neither"] is False                 # 沒騎讀圖
+    group = OIST.lane_summary(collected["lanes"]["paper"]["rows"], lane="paper")["rides_neither"]
+    assert (group["n"], group["tickers"], group["small_sample"], group["unknown"]) == (1, ["GGG.L"], True, [])
+    assert any(x.startswith("  - 騎在 neither 層上（換得掉）：1 列（GGG.L）") and x.endswith("🟠 小樣本（只印不判）")
+               for x in OIST.render_lanes(collected))
+    missing = _collect(tmp_path, briefs=briefs, reading_kinds_loader=lambda: {})
+    assert _row(missing, "paper", "GGG.L")["rides_neither"] is None
+    assert any("⚠ 騎的讀圖查不到 1 列：GGG.L" in x for x in OIST.render_lanes(missing))
+
+    def broken():
+        raise OSError("disk")
+
+    down = _collect(tmp_path, briefs=briefs, reading_kinds_loader=broken)
+    assert any(x.startswith("  - 騎在 neither 層上（換得掉）：沒算（讀圖 ledger 讀不到（OSError")
+               for x in OIST.render_lanes(down))
+
+
+def test_reading_kinds_cover_superseded_readings_and_a_bad_ledger_is_not_computed(monkeypatch) -> None:
+    """敘事騎的是寫的時候那一份——舊的（已被取代）也要查得到；任何一本有壞行就整張表不算（騎的那份可能就在壞行裡）。"""
+    from types import SimpleNamespace
+
+    from alpha.providers import structure_readings as sr
+
+    books = {"tech:a": ([SimpleNamespace(reading_id="sr_old", kind="neither"),
+                         SimpleNamespace(reading_id="sr_new", kind="volume")], []),
+             "tech:b": ([SimpleNamespace(reading_id="sr_b", kind="undecided")], [])}
+    monkeypatch.setattr(sr, "known_nodes", lambda: list(books))
+    monkeypatch.setattr(sr, "read_reading_records", lambda node: books[node])
+    assert OIST._reading_kinds() == {"sr_old": "neither", "sr_new": "volume", "sr_b": "undecided"}
+    books["tech:b"] = (books["tech:b"][0], ["第 2 行壞了"])
+    with pytest.raises(ValueError, match="壞行"):
+        OIST._reading_kinds()

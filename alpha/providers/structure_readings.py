@@ -19,7 +19,9 @@ from typing import Any, Iterable, Mapping, Sequence
 from shared.redaction import sensitive_payload_path
 
 from ..errors import ContractViolation
-from ..structure_reading.contracts import StructureReading, parse_structure_reading_record
+from ..structure_reading.contracts import (
+    KINDS_REQUIRING_REPLACEABLE_BASIS, StructureReading, parse_structure_reading_record,
+)
 
 _ROOT = Path(__file__).resolve().parents[2]
 STRUCTURE_READING_DIR = _ROOT / "library" / "private" / "alpha" / "structure_readings"
@@ -212,6 +214,10 @@ def append_reading_record(record: Mapping[str, Any], *, directory: Path | None =
                 f"（最新是 {head.reading_id if head else '沒有'}）——換版只取代現行那一份，否則取代鏈會分岔")
     if not parsed.retracted:
         problems = verify_disproof_sources(record, existing)
+        if parsed.kind in KINDS_REQUIRING_REPLACEABLE_BASIS and not any(c.basis for c in parsed.citations):
+            # 盲點修法第 12 條（2026-11-03）：「換得掉」也要付證據——寫入端擋新的，舊紀錄不回溯（契約解析不跑這條）
+            problems.append("neither（換得掉）也要付證據：至少一段引用標 basis（buyer_fact 買方事實／buyer_policy 買方政策／"
+                            "third_party 第三方／media 媒體）——供應商自述不算；判不出來請寫 undecided 並說缺哪一格")
         if parsed.citations:
             if quotes is None:
                 problems.append("這筆有引用，但沒有給同一份快照的逐字（quotes）——核對不了就不寫")

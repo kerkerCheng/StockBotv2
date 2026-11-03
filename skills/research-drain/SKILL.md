@@ -310,6 +310,9 @@ Lumentum、住友並列，協議也是非獨家。它和別家不同在六吋磷
      沒有讀圖）的下一步是**寫那一層或插槽的讀圖**——強模型、研究：`python -m query.structure <node> --quotes` →
      `python -m alpha structure-reading <node> --add spec.json`（兩半各至少一段引用）；那一層若已由走圖第 1 型
      （薄層沒人讀）排入，就在那裡一起做，不重複開題。坐在哪幾個節點見個股頁讀圖面板的 `seats`。
+     **判 neither（換得掉）也要付證據**（2026-11-03 盲點修法第 12 條）：至少一段引用標 `basis`——`buyer_fact`（買方的一手寫明
+     向不只一家買、或換過家）／`buyer_policy`（買方明文的雙源或多源）／`third_party`／`media`；供應商自述不算（收緊、不是放寬 L8）。
+     拿不出就寫 `undecided` 並說缺哪一格——寫入端拒收沒有 basis 的 neither。
      **不得為了讓閉環收斂把讀圖缺席標成 settled**——「刻意不主張」只能來自 Abstention 紀錄（它是研究結論，要寫得出理由）。
      `readings=upstream_unavailable` 有兩種，看理由句（產生端寫明）：「圖上沒有它供貨或開發的層或插槽」＝先補圖的供貨／開發邊（入圖走 pq2 `ra_admission`），或判定它在需求側（寫進敘事）；「這次沒讀到圖或讀圖 ledger」＝先修取數。兩者都不是去寫讀圖。
      `readings=review_required`（讀圖 stale，readiness 只帶 flag）→ 走圖第 4 型重讀，不在段 5 處理。

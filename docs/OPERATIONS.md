@@ -123,6 +123,16 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 `StockBotv2-Daily` 的 ⑱⑲ 取代（1.2a 停用、2026-09-25 1.2b 刪除）；它們的理由（LLM 失敗心跳照發、永遠 exit 0、Python 不用 `.cmd`、
 發送走 subprocess）搬進 `crons/daily_task.py` 的 docstring，守它們的測試改主詞搬進 `tests/test_daily_task.py`「無人值守入口」節。
 
+### Sandbox impact review 結論（2026-11-03：neither 也要付「換得掉」的證據＋追蹤表騎在 neither 層上那一行；盲點修法 plan 2026-11-02-001 §2 第 12 條）
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | **寫入面只在互動 session**：`python -m alpha structure-reading <node> --add`（`append_reading_record`）多擋一條「新的 neither 沒有引用標 basis」——無人值守不寫讀圖。daily ⑤ `scripts/outcome_if_settled_today.py` 與 ⑬ `materialize --positions` 共用的 `collect()`（argv 不變）**多讀全部讀圖 ledger**（`library/private/alpha/structure_readings/*.jsonl`，唯讀；`_reading_kinds` 建 reading_id → 判讀，含已被取代的）；paper 過濾報告多 `readings`（computed／problem）、每列多 `rides_neither`、報告 paper 段多一行（只印、帶小樣本旗）。positions artifact 照抄（加鍵不升契約版，先例同下一節）。讀圖 ledger 讀壞或有壞行＝那一行印「沒算」，整條 lane 照走。不新增主機、請求、憑證、寫入目的地 |
+| **2 canonical skill／prompt／本檔** | 本節；ARCHITECTURE §6.14「換得掉也要付證據」；research-drain 段 5 寫讀圖那一點（basis 四型、拿不出寫 undecided）。prompt 不動 |
+| **3 最窄 rule** | daily argv 不變；不新增 step、allowlist、rule；APP 不動；`.codex/rules` 仍 0 條 |
+| **4 contract test** | `tests/test_structure_reading_v3.py` 兩條（basis 封閉字彙、沒宣告不寫鍵＝舊 id 不變、舊 neither 照讀；寫入端擋沒有 basis 的新 neither、undecided 不受影響）；`tests/test_measurement_lanes.py` 兩條（騎 neither 的列一行＋小樣本旗、查不到逐檔列名、讀圖 ledger 讀不到＝沒算；判讀表含已被取代的、任何一本有壞行就整張不算）；`tests/test_measurement_full_chain.py` 的 neither 夾具改引 r4 已引過的買方原文（不多一份來源、量測結果不變）。變異 8／8 紅 |
+| **5 端到端 smoke** | 11-03 真資料（只讀、不取價）：讀圖 248 份（neither 36）；paper 137 列裡騎在 neither 層上的 19 列（002837.SZ、300102.SZ、600703.SS、6213.TW、6805.TW、8996.TW、9856.HK、AAON、AEVA、AVGO、FN、HIMX、MOD、MRVL、MTRS.ST、MXL、SHA0.DE、TSM、VNP.TO），查不到 0。審查與 plan §7 寫「只有富世達 6805.TW」——這裡的口徑是敘事騎的那一份讀圖的判讀（含已被取代的），沒有回頭核對當時怎麼數 |
+
 ### Sandbox impact review 結論（2026-11-03：入圖包把關——第一行、抽查、計數器；盲點修法 plan 2026-11-02-001 §3 第 20 條）
 
 | 步 | 結論 |

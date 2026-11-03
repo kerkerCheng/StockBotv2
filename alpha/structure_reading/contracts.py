@@ -91,6 +91,13 @@ _ID_FIELDS_V3 = _ID_FIELDS_V2 + ("unit", "citations")
 KINDS_REQUIRING_DISPROOF = frozenset({"moat", "volume"})
 #: 這兩種讀法必須引用需求側與供給側各至少一段原文（v3 起，A2）——A/B 判準表讀的正是這兩半。
 KINDS_REQUIRING_CITATIONS = frozenset({"moat", "volume"})
+#: `neither` 也要付證據（2026-11-03，盲點修法第 12 條；審查 research_quality-5：「換不掉」要付證據、「換得掉」免費——
+#: 讀圖若偏向 neither，系統既擋了人、又永遠量不出來）：至少一段引用標出「換得掉」憑的是哪一型來源。
+#: **寫入端**擋新的（`alpha.providers.structure_readings.append_reading_record`）；契約的解析讀舊紀錄時也會跑，所以不放這裡——舊的不回溯。
+KINDS_REQUIRING_REPLACEABLE_BASIS = frozenset({"neither"})
+#: 「換得掉」的來源型別（封閉字彙）：買方事實（買方的一手寫明向不只一家買、或換過家）／買方政策（明文的雙源或多源）／
+#: 第三方／媒體。供應商自述不在裡面——收緊，不是放寬 L8。
+REPLACEABLE_BASES = ("buyer_fact", "buyer_policy", "third_party", "media")
 #: 引用的原文片段最短長度：太短的片段（「sole source」）在任何一段逐字裡都找得到，核對不出憑的是哪一段。
 MIN_QUOTE_CHARS = 20
 #: 反證的出處（v3）：本份寫下的，或沿用同節點 ledger 裡既有的某一份（Phase 1 待決 #19：追回原文不必跳兩層）。
@@ -158,8 +165,12 @@ class Citation:
     source_id: str
     #: 插槽護城河用：這段原文的來源不是該供應商自己，且解析得到（L8：sole_source 需客戶端或第三方印證）。
     independent: bool = False
+    #: 「換得掉」憑的來源型別（neither 用；`REPLACEABLE_BASES`）。None＝沒宣告；as_dict 只在有值時寫——舊紀錄的 id 不變。
+    basis: str | None = None
 
     def __post_init__(self) -> None:
+        if self.basis is not None and self.basis not in REPLACEABLE_BASES:
+            raise ContractViolation(f"citation.basis 未登記：{self.basis!r}；已知 {list(REPLACEABLE_BASES)}")
         if self.angle not in ANGLE_KEYS:
             raise ContractViolation(f"citation.angle 未登記：{self.angle!r}；已知 {list(ANGLE_KEYS)}")
         if len(self.edge) != 3 or not all(str(x).strip() for x in self.edge):
@@ -170,8 +181,11 @@ class Citation:
             raise ContractViolation("citation.source_id 必填（SourceDoc id）")
 
     def as_dict(self) -> dict[str, Any]:
-        return {"angle": self.angle, "edge": list(self.edge), "quote": self.quote,
-                "source_id": self.source_id, "independent": self.independent}
+        out = {"angle": self.angle, "edge": list(self.edge), "quote": self.quote,
+               "source_id": self.source_id, "independent": self.independent}
+        if self.basis is not None:
+            out["basis"] = self.basis
+        return out
 
 
 def _strict_bool(value: Any) -> bool:
@@ -194,6 +208,7 @@ def _citations(raw: Any) -> tuple[Citation, ...]:
             quote=str(item.get("quote") or ""),
             source_id=str(item.get("source_id") or ""),
             independent=_strict_bool(item.get("independent", False)),
+            basis=str(item["basis"]) if item.get("basis") is not None else None,
         ))
     return tuple(out)
 
@@ -440,6 +455,7 @@ def select_readings(
 
 __all__ = [
     "ANGLE_KEYS", "Citation", "DISPROOF_SOURCE_SELF", "DisproofEntry", "KINDS_REQUIRING_CITATIONS",
+    "KINDS_REQUIRING_REPLACEABLE_BASIS", "REPLACEABLE_BASES",
     "KINDS_REQUIRING_DISPROOF", "MIN_QUOTE_CHARS", "READING_KINDS", "READING_KIND_SHORT", "READING_UNITS", "RECORD_VERSION",
     "RECORD_VERSION_V1", "RECORD_VERSION_V2", "StructureReading",
     "new_reading_id", "parse_structure_reading_record", "select_reading", "select_readings",
