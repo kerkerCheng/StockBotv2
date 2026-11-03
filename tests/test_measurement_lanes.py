@@ -292,6 +292,53 @@ def test_by_state_flags_small_groups_and_names_rows_without_the_field() -> None:
     assert groups["unknown"]["n"] == 1 and groups["unknown"]["small_sample"] is True
 
 
+def test_drawdown_counts_deep_rows_and_names_unread_disproof_states() -> None:
+    """盲點修法 §2 第 10 條①（審查 strategy-4：反證找上贏家、輸家沉默）：自錨點跌 ≥30% 的列、其中名下反證曾被判觸及幾列；
+    反證狀態讀不到的另計，不當成沒觸及（INV-3）。"""
+    rows = [{"ticker": "A", "absolute_return": -0.35, "disproof_touched": True},
+            {"ticker": "B", "absolute_return": -0.30, "disproof_touched": False},     # 恰在線上：算
+            {"ticker": "C", "absolute_return": -0.50, "disproof_touched": None},      # 反證狀態讀不到
+            {"ticker": "D", "absolute_return": -0.29, "disproof_touched": True},      # 沒跌到線
+            {"ticker": "E", "absolute_return": None, "disproof_touched": True}]       # 量不到報酬
+    assert OIST.drawdown_count(rows) == {"deep": 3, "touched": 1, "unknown": 1, "tickers": ["A", "B", "C"]}
+
+
+def test_disproof_touched_reads_every_versions_rides_and_never_counts_a_confirm() -> None:
+    """「曾」要認舊版騎過的讀圖（真資料：registry 僅有的 2 筆觸及都在 AXTI 換版前騎的讀圖上）；加碼條件觸及不是反證；
+    ledger 有壞行、沒有 co:*、registry 或 lifecycle 讀不到 → None。"""
+    from types import SimpleNamespace as NS
+
+    from engine_b import event_watch as ew
+
+    yes = {"touches": "yes"}
+    watches = [{"watch_id": "w1", "source_ref": "reading:sr_old#4", "disproof_ref": "reading:sr_old#4", "judgment": yes},
+               {"watch_id": "w2", "source_ref": "brief:ib_y#c1", "disproof_ref": "brief:ib_y#c1",
+                "condition_role": ew.CONFIRM_ROLE, "judgment": yes}]
+    briefs = {"X": ([NS(brief_id="ib_old", company_id="co:x", rides=(NS(reading_id="sr_old"),), disproof=()),
+                     NS(brief_id="ib_new", company_id="co:x", rides=(NS(reading_id="sr_new"),), disproof=())], []),
+              "Y": ([NS(brief_id="ib_y", company_id="co:y", rides=(), disproof=())], []),
+              "Z": ([NS(brief_id="ib_z", company_id="co:z", rides=(), disproof=())], ["第 3 行壞了"])}
+
+    def rows():
+        return [{"ticker": t, "company_id": c} for t, c in (("X", "co:x"), ("Y", "co:y"), ("Z", "co:z"), ("Q", None))]
+
+    marked = rows()
+    OIST._apply_disproof_touched([marked], briefs=briefs, watches=watches, lifecycle={})
+    assert [r["disproof_touched"] for r in marked] == [True, False, None, None]
+    for kwargs in ({"watches": None, "lifecycle": {}}, {"watches": watches, "lifecycle": None}):
+        unread = rows()
+        OIST._apply_disproof_touched([unread], briefs=briefs, **kwargs)
+        assert all(r["disproof_touched"] is None for r in unread)
+
+
+def test_every_lane_prints_its_drawdown_line(collected) -> None:
+    summary = OIST.lane_summary(collected["lanes"]["paper"]["rows"], lane="paper")
+    assert set(summary["drawdown"]) == {"deep", "touched", "unknown", "tickers"}
+    lines = OIST.render_lanes(collected)
+    assert sum(1 for x in lines if x.startswith("- 自錨點跌 ≥30%：")) == sum(
+        1 for lane in OIST.LANE_KEYS if collected["lanes"][lane]["rows"])
+
+
 def test_quote_unit_is_settled_on_both_ends_gbp_pence_is_not_pounds(collected) -> None:
     ggg = _row(collected, "paper", "GGG.L")
     assert ggg["anchor_ccy"] == "GBP" and ggg["anchor_price"] == pytest.approx(0.44)   # 44 便士 → 0.44 英鎊

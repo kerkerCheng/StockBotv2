@@ -782,6 +782,46 @@ def chase_count(rows: Sequence[Mapping[str, Any]]) -> dict:
             "tickers": [str(r.get("ticker")) for r in chasing]}
 
 
+#: 自錨點報酬到這裡（含）算「跌深」——盲點修法 §2 第 10 條①（審查 strategy-4）的線；只印的記號，不是出場規則。
+DRAWDOWN_LINE = -0.30
+
+
+def _apply_disproof_touched(lane_rows: Sequence[Sequence[dict]], *,
+                            briefs: Mapping[str, tuple[Sequence[Any], Sequence[str]]] | None,
+                            watches: Sequence[Mapping[str, Any]] | None, lifecycle: Mapping[str, Any] | None) -> None:
+    """每列標 `disproof_touched`：名下有沒有任何一條反證**曾被判觸及**（judgment touches=yes，含已處置的）。
+    名下＝`attributed_watches`（歸屬的單一 SSOT）**逐版**呼叫取聯集——「曾」要認舊版騎過的讀圖（真資料：registry 僅有的
+    2 筆觸及都在 AXTI 換版前騎的 InP 讀圖上，只認現行那版會漏）。thesis 只認現行 memo（SSOT 的範圍）。
+    watch registry、敘事 ledger 或 thesis lifecycle 讀不到、該檔 ledger 有壞行、沒有 co:* → None（沒讀到不是沒觸及，INV-3）。"""
+    from engine_b import event_watch as ew
+    from engine_b.narrative_watches import attributed_watches
+
+    by_company = {str(records[0].company_id): (records, errors)
+                  for records, errors in (briefs or {}).values() if records}
+    for rows in lane_rows:
+        for row in rows:
+            company_id = str(row.get("company_id") or "")
+            records, errors = by_company.get(company_id, ((), ()))
+            if watches is None or lifecycle is None or briefs is None or not company_id.startswith("co:") or errors:
+                row["disproof_touched"] = None
+                continue
+            ticker = str(row.get("research_ticker") or row.get("ticker") or "")
+            mine = {w["watch_id"]: w for brief in (records or (None,))
+                    for w in attributed_watches(company_id, ticker, watches=watches, lifecycle=lifecycle,
+                                                brief_ids=[r.brief_id for r in records], current_brief=brief)}
+            row["disproof_touched"] = any(w.get("disproof_ref") and not ew.is_confirm(w)
+                                          and (w.get("judgment") or {}).get("touches") == "yes" for w in mine.values())
+
+
+def drawdown_count(rows: Sequence[Mapping[str, Any]]) -> dict:
+    """自錨點報酬 ≤ `DRAWDOWN_LINE` 的列，其中名下反證曾被判觸及幾列（盲點修法 §2 第 10 條①；審查 strategy-4：
+    反證找上贏家、輸家沉默——「該觸發卻沒東西可觸發」這一側原本沒有計數器）。只印、不改出場規則。純函式。"""
+    deep = [r for r in rows if r.get("absolute_return") is not None and r["absolute_return"] <= DRAWDOWN_LINE]
+    return {"deep": len(deep), "touched": sum(1 for r in deep if r.get("disproof_touched") is True),
+            "unknown": sum(1 for r in deep if r.get("disproof_touched") is None),
+            "tickers": [str(r.get("ticker")) for r in deep]}
+
+
 #: 分組 n 不到這個數就帶小樣本旗（對齊 registration 判讀線最小的 n：H1 的 n ≥ 6）——只是印的記號，不是判讀線。
 SMALL_SAMPLE_N = 6
 
@@ -832,6 +872,7 @@ def lane_summary(rows: Sequence[Mapping[str, Any]], *, lane: str) -> dict:
                                 "absent": {k: sorted(v) for k, v in sorted(cohort_absent.items())},
                                 "absent_labels": dict(sorted(absent_labels.items()))},
         "chase": chase_count(rows),
+        "drawdown": drawdown_count(rows),
         "absences": sorted({str(r["absence_kind"]) for r in rows if r.get("absence_kind")}),
     }
 
@@ -854,7 +895,9 @@ def collect(*, no_benchmark: bool = False, today: date | None = None,
             cohorts: tuple[Sequence[Any], Sequence[str]] | None = None,
             is_beta: Callable[[str], bool] | None = None,
             resolve: Callable[[Mapping[str, Any]], Mapping[str, Any]] | None = None,
-            quote_unit_for: Callable[[str | None, str | None], str | None] | None = None) -> dict[str, Any]:
+            quote_unit_for: Callable[[str | None, str | None], str | None] | None = None,
+            disproof_inputs: tuple[Sequence[Mapping[str, Any]] | None, Mapping[str, Any] | None] | None = None,
+            ) -> dict[str, Any]:
     """三條 lane 的資料收集（Phase 5 Step 5.2）。**render 與 APP 讀同一個函式**——APP 端另算一份會立刻開始偏離（L13）。
 
     回 `{"lanes": {live, paper, history}, "benchmarks", "theme_cohort", "price_budget", "today"}`：每條 lane 的 `rows`
@@ -899,11 +942,13 @@ def collect(*, no_benchmark: bool = False, today: date | None = None,
             leads = (json.loads(LEADS_PATH.read_text(encoding="utf-8")).get("leads") or {})
         except (OSError, ValueError):
             leads = None                     # 讀不到＝first_named_by 缺席（upstream_unavailable），不是「沒人點名」
+    brief_map: Mapping[str, tuple[Sequence[Any], Sequence[str]]] | None = None
     try:
-        paper_rows, paper_filter = paper_lane_plan(briefs if briefs is not None else _read_briefs(brief_dir),
-                                                   today=today, leads=leads)
+        brief_map = briefs if briefs is not None else _read_briefs(brief_dir)
+        paper_rows, paper_filter = paper_lane_plan(brief_map, today=today, leads=leads)
         paper_absence = None
     except Exception as exc:  # noqa: BLE001
+        brief_map = None                     # 讀壞了：下面「反證曾被判觸及」整格記讀不到，不當成沒觸及
         paper_rows, paper_filter = [], {"input": None, "accepted": 0, "filtered": {}}
         paper_absence = {"kind": "upstream_unavailable",
                          "reason": f"paper lane 組不出來（{type(exc).__name__}: {str(exc)[:120]}）"}
@@ -986,6 +1031,17 @@ def collect(*, no_benchmark: bool = False, today: date | None = None,
         _apply_theme_cohort(rows, cohort_list, series, unavailable=cohort_unavailable)
     for entry in cohort_info.get("cohorts") or []:
         entry["missing_members"] = sorted(t for t in entry["members"] if not series.get(t))
+    # 盲點修法 §2 第 10 條①：跌深的列名下反證有沒有被判觸及過。registry／lifecycle 讀不到就整格 None（不擋其餘）。
+    if disproof_inputs is None:
+        from engine_b import event_watch as ew
+        from engine_b.disproof import load_lifecycle
+
+        try:
+            watch_rows: Sequence[Mapping[str, Any]] | None = ew.load_watches()["watches"]
+        except (OSError, ValueError, KeyError):
+            watch_rows = None
+        disproof_inputs = (watch_rows, load_lifecycle())
+    _apply_disproof_touched(lane_rows, briefs=brief_map, watches=disproof_inputs[0], lifecycle=disproof_inputs[1])
 
     return {
         "lanes": {"history": {"rows": results, "unavailable": unavailable, "absence": None},
@@ -1506,6 +1562,11 @@ def render_lanes(collected: Mapping[str, Any]) -> list[str]:
         label = {"history": "入圖前已漲", "paper": "敘事前已漲", "live": "成交前已漲"}[lane]
         out.append(f"- {label}：{chase['chasing']}/{chase['paired']}"
                    + (f"（{'、'.join(chase['tickers'])}）" if chase["tickers"] else ""))
+        deep = summary["drawdown"]
+        out.append(f"- 自錨點跌 ≥{-DRAWDOWN_LINE:.0%}：{deep['deep']} 列｜其中名下反證曾被判觸及 {deep['touched']}"
+                   + (f"｜反證狀態讀不到 {deep['unknown']}" if deep["unknown"] else "")
+                   + (f"（{'、'.join(deep['tickers'])}）" if deep["tickers"] else "")
+                   + "——只印、不改出場規則（反證有沒有找上輸家）")
         if lane != "history":
             out.extend(render_power_law(summary["power_law"]))
         if summary["absences"]:
