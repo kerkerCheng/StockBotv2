@@ -24,6 +24,7 @@ from ..candidates import (
     on_threshold_entries, priced_since, pulled_back,
     pulled_back_reason, rewrite_words, rides_reason, rollup, NO_REOPEN_REASON, reopen_met_reason, reopen_status,
     squash, stall_since, stall_version, three_words, unread_new_edges,
+    BODY_BEHIND_KINDS, body_behind_readings, body_behind_reasons,
 )
 from ..edge import not_edge_confirmed
 from ..narrative.contracts import RECORD_VERSION_V2, InvestorBrief, select_brief
@@ -219,6 +220,7 @@ def derive_row(ticker: str, company_id: str | None, *, records: Sequence[Investo
                company_assertions: Sequence[Mapping[str, Any]] | None = None,
                raw_text: Callable[[str], str] | None = None,
                open_document_requests: Sequence[int] | None = None,
+               readings_by_id: Mapping[str, Any] | None = None,
                ) -> dict[str, Any] | None:
     """一檔的候選狀態。沒有敘事、也沒有持有 → None（不上板，計數另印「無敘事」）。
 
@@ -233,7 +235,9 @@ def derive_row(ticker: str, company_id: str | None, *, records: Sequence[Investo
     騎的讀圖已換版、圖上有新邊而敘事沒讀過那份文件（ROADMAP「敘事 stale 計數器」①③，2026-10-29——心跳 ⑤ 讀這兩種，
     不自己再算）。`company_assertions`：這家公司在圖上的 assertion 寫入紀錄（`query.company_assertions`）；
     None＝圖讀不到，`rewrite_new_edges` 也是 None（沒算，不是 0）。`raw_text`：敘事引的 raw 檔全文的讀法（比邊的逐字；
-    沒給＝只比文件 id、網址與直接引的邊）。"""
+    沒給＝只比文件 id、網址與直接引的邊）。
+    `readings_by_id`：全部讀圖紀錄（含已被取代的）——②④「正文寫的時候騎的那份讀圖」要查得到舊紀錄（2026-11-03）；
+    None＝沒載入，`rewrite_reading_changes` 也是 None（沒算，不是 0）。"""
     from engine_b import event_watch as ew
     from engine_b.narrative_watches import blocking_for_open, link_breaks, pending_rewrite
     from engine_b.queue_segments import narrative_rewrite_state
@@ -256,6 +260,9 @@ def derive_row(ticker: str, company_id: str | None, *, records: Sequence[Investo
         **_reason_story(brief if v2 else None, stories),
         "preconditions": [], "rewrite": [], "rewrite_watch_ids": [], "rewrite_words": [],
         "rewrite_rides": [], "rewrite_new_edges": [],
+        # 敘事 stale ②④（2026-11-03）：正文版騎的讀圖 vs 這一格現行的讀圖，判讀或供給側家數變了（`body_behind_readings`）；
+        # 沒比成的格數另計（讀圖紀錄找不到——不是 0）
+        "rewrite_reading_changes": [], "reading_change_unchecked": 0,
         "edge": {**{k: (edge or {}).get(k) for k in ("state", "label", "reasons", "market_cap_usd", "analyst_count",
                                                      "on_threshold", "inputs_as_of", "prior", "prior_absence")},
                  "market_cap_label": cap_label((edge or {}).get("market_cap_usd"))},
@@ -350,6 +357,18 @@ def derive_row(ticker: str, company_id: str | None, *, records: Sequence[Investo
          "current_reading_id": (reading_rows.get((r["node"], r["unit"])) or {}).get("reading_id")}
         for r in row["rides"] if r.get("status") == "superseded"]
     row["rewrite"].extend(rides_reason(r) for r in row["rewrite_rides"])
+    # ②④（2026-11-03）：正文最後一次改動時騎的讀圖，跟這一格現行的讀圖比判讀與供給側家數。騎舊讀圖（①）的格也比——
+    # 只換騎就夠（①）還是正文要改（②④），要分得出來。
+    if readings_by_id is None:
+        row["rewrite_reading_changes"] = None
+        row["reading_change_unchecked"] = None
+    else:
+        entries, unchecked = body_behind_readings(
+            body_version(records, brief), brief, readings_by_id=readings_by_id,
+            current_cells={cell: (r or {}).get("reading_id") for cell, r in reading_rows.items()})
+        row["rewrite_reading_changes"] = entries
+        row["reading_change_unchecked"] = unchecked
+        row["rewrite"].extend(reason for entry in entries for reason in body_behind_reasons(entry))
     if company_assertions is None:
         row["rewrite_new_edges"] = None
     else:
@@ -541,7 +560,8 @@ def board_rewrite(rows: Sequence[Mapping[str, Any] | None], breaks: Sequence[Map
     """整板「敘事該重寫」清單：連結斷了（全部現行 v2 敘事，`link_breaks`）＋各列的敘事來源 watch 待重寫
     ＋**沒有列帶著的**待重寫 watch（現行敘事已撤回、是 v1、或根本沒有敘事——那家公司不在板上或那一列不是 v2，
     watch 仍在 narrative_rewrite 段；3.6 覆核：只收現行 v2 列會讓它們在板上消失、audit 卻報「那一列沒帶著」）
-    ＋騎舊讀圖（`kind=rides`，一份讀圖一筆）＋新邊沒讀（`kind=new_edges`，一家公司一筆、帶邊與要讀的文件）
+    ＋騎舊讀圖（`kind=rides`，一份讀圖一筆）＋判讀變了／供給家數變了（`kind=reading_kind`／`supply_count`，一格一筆，2026-11-03）
+    ＋新邊沒讀（`kind=new_edges`，一家公司一筆、帶邊與要讀的文件）
     ＋已回落（`kind=pulled_back`，一檔一筆、只帶錨那一天——每天變的 % 不進清單，2026-10-30）——
     心跳 ⑤「敘事該重寫」讀這份清單的後三種，不自己再算（ROADMAP「敘事 stale 計數器」同源，2026-10-29）。"""
     from engine_b.queue_segments import narrative_rewrite_state
@@ -553,6 +573,10 @@ def board_rewrite(rows: Sequence[Mapping[str, Any] | None], breaks: Sequence[Map
         who = {"ticker": (row or {}).get("ticker"), "company_id": (row or {}).get("company_id"),
                "brief_id": (row or {}).get("brief_id")}
         out.extend({"kind": "rides", **who, **dict(ride)} for ride in (row or {}).get("rewrite_rides") or ())
+        # ②④（2026-11-03）：一格一個 change 一筆（kind＝reading_kind／supply_count，`BODY_BEHIND_KINDS`）——四種訊號各自計數
+        for entry in (row or {}).get("rewrite_reading_changes") or ():
+            out.extend({"kind": change, **who, **{k: v for k, v in dict(entry).items() if k != "changes"}}
+                       for change in entry.get("changes") or () if change in BODY_BEHIND_KINDS)
         if (row or {}).get("rewrite_new_edges"):
             out.append({"kind": "new_edges", **who, "edges": [dict(e) for e in row["rewrite_new_edges"]]})
         if (row or {}).get("pulled_back") and (row or {}).get("wake_by", "pulled_back") != "reopen":
@@ -638,6 +662,15 @@ def candidate_context(tickers: Sequence[str], *, today: date | None = None,
     graph_edges = _load_edges()
     rows_raw, reading_errors = reading_status_rows(graph_edges, today=today, watches=watches)
     reading_rows = {(r.get("node"), r.get("unit")): r for r in rows_raw if r.get("reading_id")}
+    # 敘事 stale ②④（2026-11-03）：全部讀圖紀錄（含已被取代的）——「正文寫的時候騎的那份」多半已不是現行。
+    # 讀不到＝整板宣告「判讀／家數變了沒算」（不是 0，INV-3）
+    try:
+        from .structure_readings import known_nodes, read_reading_records
+
+        readings_by_id = {rec.reading_id: rec for node in known_nodes() for rec in read_reading_records(node)[0]}
+        readings_note = None
+    except Exception as exc:  # noqa: BLE001 — 只讓 ②④ 宣告沒算
+        readings_by_id, readings_note = None, f"{type(exc).__name__}: {str(exc)[:80]}"
     # 有紀錄但沒有現行的格子＝全部撤回（`reading_status_rows` 的兩種 reading_id=None 列；整個節點撤回時 unit 是 None）。
     retracted_cells = sorted({(str(r.get("node")), r.get("unit")) for r in rows_raw if not r.get("reading_id")},
                              key=str)
@@ -682,7 +715,8 @@ def candidate_context(tickers: Sequence[str], *, today: date | None = None,
             "held": held, "edges": edge_states_with_prior(sorted(set(universe) | set(extra))),
             "ledger_present": ledger_present, "ledger_tickers": ledger_tickers,
             "bets": bet_index(structure, seats_from_edges(graph_edges)), "stories": stories,
-            "company_assertions": company_assertions, "company_assertions_note": assertions_note}
+            "company_assertions": company_assertions, "company_assertions_note": assertions_note,
+            "readings_by_id": readings_by_id, "readings_by_id_note": readings_note}
 
 
 def assertions_for(context: Mapping[str, Any], company_id: str | None) -> list[Mapping[str, Any]] | None:
@@ -749,7 +783,8 @@ def page_input(context: Mapping[str, Any], ticker: str, company_id: str | None, 
                      held=context["held"], three_questions_note=three_questions_note,
                      bets=context.get("bets"), registry=context.get("registry"),
                      stories=context.get("stories"),
-                     company_assertions=assertions_for(context, company_id), raw_text=raw_text)
+                     company_assertions=assertions_for(context, company_id), raw_text=raw_text,
+                     readings_by_id=context.get("readings_by_id"))
     brief = select_brief(records, as_of=None, today=today)
     v2 = brief if brief is not None and brief.record_version == RECORD_VERSION_V2 else None
     words = (row["three_words"] if row is not None else
@@ -871,7 +906,8 @@ def load_board(tickers: Sequence[str], *, today: date | None = None,
                          own_history_at=own_history_at, bars_at=adjusted_bars, stories=ctx.get("stories"),
                          company_assertions=assertions_for(ctx, cid), raw_text=raw_text,
                          open_document_requests=(doc_requests.get(str(cid), []) if doc_check["status"] == "ok"
-                                                 else None))
+                                                 else None),
+                         readings_by_id=ctx.get("readings_by_id"))
         rows.append(row)
         if row is None:
             no_narrative.append({"ticker": ticker, "company_id": cid,
@@ -904,6 +940,11 @@ def load_board(tickers: Sequence[str], *, today: date | None = None,
     # ③ 算了沒有（INV-3）：圖讀不到時「新邊沒讀」是沒算，心跳 ⑤ 照這一格印「未算」，不印成 0
     board["new_edges_check"] = {"status": "ok" if ctx.get("company_assertions") is not None else "unavailable",
                                 "reason": ctx.get("company_assertions_note")}
+    # ②④ 算了沒有（2026-11-03）：讀圖紀錄讀不到＝沒算；讀到了但有幾格的舊讀圖找不到也要說（`unchecked`，不是 0）
+    unchecked = sum(int(r.get("reading_change_unchecked") or 0) for r in rows if r)
+    board["reading_change_check"] = ({"status": "ok", "reason": None, "unchecked": unchecked}
+                                     if ctx.get("readings_by_id") is not None else
+                                     {"status": "unavailable", "reason": ctx.get("readings_by_id_note"), "unchecked": None})
     board["rollup"] = rollup({t: tq_by_ticker[t] for t in board_universe},
                              {t: edges.get(t) or {} for t in board_universe}, not_read_reasons=tq_notes)
     board["ledger"] = {"present": ledger_present, "tickers": len(ledger_tickers), "parse_errors": len(parse_errors),

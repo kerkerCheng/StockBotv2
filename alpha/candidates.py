@@ -55,6 +55,13 @@ REWRITE_STATE_WORDS: Mapping[str, str] = {"fired": "醒來", "touched": "觸及"
 #: 寫的一方（`alpha.providers.candidates.derive_row`）與分類的一方（`REWRITE_WHY`）共用這兩個字串（L16）。
 RIDES_SUPERSEDED_PREFIX = "騎的讀圖已換版"
 NEW_EDGES_PREFIX = "圖上有新邊、敘事沒讀過"
+#: 敘事 stale ②④（2026-11-03，批次三 C；failure log #93）：正文最後一次改動時騎的那份讀圖，與這一格現行的讀圖相比——
+#: ②判讀（kind）變了、④供給側家數變了。比的是讀圖紀錄的結構（kind 與快照的供給側公司），**不解析正文的「N 家」字面**
+#: （正文的家數常是客戶數——「三家具名客戶」——比字面會誤報，L16）。寫的一方與寫入端拒收共用 `body_behind_readings`。
+READING_KIND_CHANGED_PREFIX = "騎的讀圖判讀變了"
+SUPPLY_COUNT_CHANGED_PREFIX = "供給側家數變了"
+#: 候選板清單（`board_rewrite`）的 kind 與 `body_behind_readings` 每筆 `changes[]` 的值——同一組字。
+BODY_BEHIND_KINDS: tuple[str, ...] = ("reading_kind", "supply_count")
 #: 等回落的價格叫醒（ROADMAP「等回落的價格叫醒」；failure log #116；2026-10-30 使用者照推薦定案：錨只有一個＝最後一次宣告
 #: 已定價那天）：收盤低於那天的收盤＝「已回落」，`rewrite[]` 多這一條、進 ⑤「敘事該重寫」重問——只叫醒，不判定、不給動作、
 #: 不排序、不改候選狀態。
@@ -66,6 +73,7 @@ NO_REOPEN_PREFIX = "等回落沒寫重開條件"
 #: 候選列 `rewrite[]` 每一條 → 首頁卡片與個股頁那一行的幾個字（2026-10-29 使用者：「該重寫為啥沒寫…可以五字一目瞭然嗎」）。
 #: 依序比對、先中先贏；原句（含 watch 編號）照舊留在 `rewrite[]`，這裡只分類、不改判斷；認不得的歸「其他」，不丟（INV-3）。
 REWRITE_WHY: tuple[tuple[str, str], ...] = (
+    (READING_KIND_CHANGED_PREFIX, "判讀變了"), (SUPPLY_COUNT_CHANGED_PREFIX, "家數變了"),
     (RIDES_SUPERSEDED_PREFIX, "騎舊讀圖"), (NEW_EDGES_PREFIX, "新邊沒讀"), (PULLED_BACK_PREFIX, "已回落"),
     (REOPEN_MET_PREFIX, "重開達成"), (NO_REOPEN_PREFIX, "沒寫重開"),
     ("連結 ", "連結斷了"), ("觸及", "條件觸及"), ("醒來", "條件醒了"), ("到期", "到期了"), ("已到", "重看日到了"),
@@ -438,6 +446,74 @@ def rides_reason(ride: Mapping[str, Any]) -> str:
             f"現行 {ride.get('current_reading_id') or '不明'}）")
 
 
+# ---------------------------------------------------------------------------
+# 敘事落後於讀圖（ROADMAP「敘事 stale 計數器」②④；2026-11-03 批次三 C）：正文寫的時候騎的那份讀圖，跟這一格現行的
+# 讀圖比——判讀或供給側家數變了，正文就是寫給另一張圖的。換騎（只換 rides、正文一字不改）不算重寫過正文（`body_key`）。
+# ---------------------------------------------------------------------------
+
+def supply_side_companies(reading: Any) -> frozenset[str]:
+    """讀圖快照供給側的公司（`angles.supply_side` 每條邊的主詞，只收 `co:*`）。寫入端「只能押自己在供給側的讀圖」與
+    ④家數比對共用這一個（L16）。"""
+    return frozenset(str(edge[0]) for edge in ((getattr(reading, "angles", {}) or {}).get("supply_side") or ())
+                     if isinstance(edge, (list, tuple)) and edge and str(edge[0]).startswith("co:"))
+
+
+def body_behind_readings(body: InvestorBrief, brief: InvestorBrief, *, readings_by_id: Mapping[str, Any],
+                         current_cells: Mapping[tuple[str, str], str | None]) -> tuple[list[dict[str, Any]], int]:
+    """`brief` 每一格（節點, 單位）：正文版 `body`（`body_version`）騎的讀圖 vs 這一格現行的讀圖（`current_cells`；
+    這一格沒有現行就比 `brief` 自己騎的那份）。判讀（kind）或供給側家數不同 → 一格一筆，`changes` ⊆ `BODY_BEHIND_KINDS`。
+
+    回 `(筆, 沒比成的格數)`：讀圖紀錄找不到（ledger 壞行、被刪）的格**不算 0**，計進第二個數（INV-3）。
+    正文版沒騎這一格（之後才加騎）不比——正文本來就不是寫給它的；兩邊同一份讀圖不比。順序照 `brief.rides`。"""
+    then_by_cell = {(r.node, r.unit): r.reading_id for r in body.rides}
+    out: list[dict[str, Any]] = []
+    unchecked = 0
+    for ride in brief.rides:
+        cell = (ride.node, ride.unit)
+        then_id = then_by_cell.get(cell)
+        now_id = current_cells.get(cell) or ride.reading_id
+        if then_id is None or then_id == now_id:
+            continue
+        then, now = readings_by_id.get(then_id), readings_by_id.get(now_id)
+        if then is None or now is None:
+            unchecked += 1
+            continue
+        s0, s1 = supply_side_companies(then), supply_side_companies(now)
+        changes = [kind for kind, changed in (("reading_kind", getattr(then, "kind", None) != getattr(now, "kind", None)),
+                                              ("supply_count", len(s0) != len(s1))) if changed]
+        if not changes:
+            continue
+        out.append({"node": ride.node, "unit": ride.unit, "body_brief_id": body.brief_id,
+                    "body_reading_id": then_id, "current_reading_id": now_id,
+                    "body_kind": getattr(then, "kind", None), "current_kind": getattr(now, "kind", None),
+                    "body_supply": len(s0), "current_supply": len(s1),
+                    "added": sorted(s1 - s0), "removed": sorted(s0 - s1), "changes": changes})
+    return out, unchecked
+
+
+def _kind_text(kind: Any) -> str:
+    from .structure_reading.contracts import READING_KIND_SHORT
+
+    return f"{kind}（{READING_KIND_SHORT[kind]}）" if kind in READING_KIND_SHORT else str(kind)
+
+
+def body_behind_reasons(entry: Mapping[str, Any]) -> list[str]:
+    """`rewrite[]` 的句子（一個 change 一句）：哪一格、正文寫於哪份讀圖、現行是哪份、變了什麼（L18：指得回讀圖 id 與公司 id）。"""
+    where = f"{entry.get('node')}（{entry.get('unit')}）"
+    out = []
+    if "reading_kind" in (entry.get("changes") or ()):
+        out.append(f"{READING_KIND_CHANGED_PREFIX}：{where} 正文寫於 {entry.get('body_reading_id')} 判讀 "
+                   f"{_kind_text(entry.get('body_kind'))} 之時，現行 {entry.get('current_reading_id')} 判讀 "
+                   f"{_kind_text(entry.get('current_kind'))}——換騎不夠，正文要改")
+    if "supply_count" in (entry.get("changes") or ()):
+        delta = "；".join(x for x in (f"多 {'、'.join(entry.get('added') or ())}" if entry.get("added") else "",
+                                      f"少 {'、'.join(entry.get('removed') or ())}" if entry.get("removed") else "") if x)
+        out.append(f"{SUPPLY_COUNT_CHANGED_PREFIX}：{where} 正文寫於供給側 {entry.get('body_supply')} 家之時"
+                   f"（{entry.get('body_reading_id')}），現行 {entry.get('current_reading_id')} {entry.get('current_supply')} 家"
+                   + (f"（{delta}）" if delta else "") + "——寫到家數或競爭格局的句子要對一次")
+    return out
+
+
 def _signed_pct(value: float) -> str:
     return f"{value * 100:+.1f}%".replace("-", "−")
 
@@ -740,4 +816,6 @@ __all__ = ["ANSWER_WORDS", "CANDIDATES_THIS_IS_NOT", "GROUPS", "GROUP_LABELS", "
            "priced_judgment_key", "priced_only_counts", "priced_since", "pullback_counts", "pulled_back",
            "pulled_back_reason", "reopen_counts", "reopen_met_reason", "reopen_status",
            "rewrite_words", "rides_reason", "rollup", "squash", "stall_since", "stall_version", "three_words",
-           "unread_new_edges"]
+           "unread_new_edges",
+           "BODY_BEHIND_KINDS", "READING_KIND_CHANGED_PREFIX", "SUPPLY_COUNT_CHANGED_PREFIX", "body_behind_readings",
+           "body_behind_reasons", "supply_side_companies"]

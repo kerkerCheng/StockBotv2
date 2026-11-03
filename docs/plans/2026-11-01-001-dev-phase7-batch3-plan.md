@@ -13,13 +13,15 @@
 |---|---|---|---|---|
 | A | 邊緣門檻的遲滯與「在門檻上」計數器 ○ | 撤回建議只在**連續兩次**判定都非邊緣後才出現；候選板、心跳、closure-gate 多一格「在門檻上」 | Z1／R1 | ✅ 11-01（回放 K=1 撤回建議 5 → K=2 4＋1 待確認；真資料在門檻上 20、待確認 0） |
 | B | 週額度常駐計數器 ○ | daily 短版 ④ 每天印週額度與 5 小時用量；互動 fan-out 前有命令可讀同一個數 | Z1／R1 | ✅ 11-01（兩窗都記；④ 每天一行＋摘要行旗（≥ 80% 只印不擋）；`python -m crons.llm_quota [--probe]`；真資料：daily 06:30 的紀錄 7 天 86%、探針 12:00 當下 **99%**） |
-| C | 敘事 stale 計數器 ◐（剩 ②④＋寫入端拒收） | ②騎的讀圖 kind 變了、④供給側家數變了也列「該重寫」；寫入端拒收一字不改的換版 | Z1–Z2／R1 | ○ |
+| C | 敘事 stale 計數器 ◐（剩 ②④＋寫入端拒收） | ②騎的讀圖 kind 變了、④供給側家數變了也列「該重寫」；寫入端拒收一字不改的換版 | Z1–Z2／R1 | ✅ 11-03（回放 497 版：⑫ 會擋下 30 次換騎——判讀變了 1＝AEVA、家數變了 29；現行 89 份 ②0 ④0） |
 | D | 成交紀錄遺留 ①②③④⑥⑧⑨⑩ | `scripts/record_trade.py` 的八個已知小洞 | Z1／**R2**（資本路徑） | ○ |
 | E | 海外財報來源 ◐（剩 ②20-F） | 20-F 年度封面股數進 Engine C；ADS 比率要使用者選就停 | Z2／R1 | ○ |
 
 > **2026-11-01 12:10 停在 B 之後：** B 自己的探針量到週額度 **99%**（11-02 23:00 重置；daily 06:30 的紀錄是 86%，白天互動 session 吃掉
 > 13 個百分點）。C（Z1–Z2 真資料回放）、D（資本路徑，收尾要一位 R2 reviewer）、E 都會再吃同一個池子，而 11-02 05:30 的 daily 起跑在重置之前
 > ——照 development-flow「spawn 前先讀週額度、≥ 80% 先說出來」停下，C–E 與 S6 討論等使用者決定是否重置後接續。commit A `1c57bad3`、B `8883a8a6`。
+> **2026-11-03 接續**（使用者「繼續吧」）：週額度已重置（`python -m crons.llm_quota` → 7 天 1%）；11-02 那天 99% 仍全部跑完（沒有
+> `rate_limited`），11-03 在 `allowed` 時也帶了 seven_day 窗——B 留下的「平常帶不帶七天窗」有答案了：帶。
 
 ## A 邊緣門檻的遲滯與「在門檻上」計數器
 
@@ -122,3 +124,35 @@ development-flow skill R2 段、plans README。測試：`tests/test_llm_quota.py
 **真資料：** `python -m crons.llm_quota` → 「**7 天 86%**（11-02 23:00 重置；≥ 80% 只印不擋）｜5 小時 未回報（舊格式只記一窗）」（daily 06:30，
 17 次呼叫）；`--probe` 約 12:00 → 「**7 天 99%**｜5 小時 79%」（haiku，2.9 秒，0.0005 美元）——白天互動 session 吃掉 13 個百分點；
 11-02 05:30 的 daily 會在週額度重置（11-02 23:00）之前起跑，LLM 步驟預期 `rate_limited`（這就是基準要數的那種日子）。
+
+## C 敘事 stale 計數器 ②④＋寫入端拒收「一字不改」
+
+```
+INTAKE
+Zoom: Z1–Z2（候選列多一種 rewrite 原因與整板清單兩個 kind；寫入端多一道拒收 ⑫；candidates artifact /6（雲端 session 11-01 已用掉 /4、/5）；⑤ 讀新 kind。
+      敘事紀錄的 contract 不動——拒收只看既有欄位）
+Review: R1（A3 研究判斷的寫入規則收緊、不放寬任何 gate；不碰資本與 append-only 的既有紀錄；六條 R2 trigger 都不命中）
+Case: failure log #93（10-20 使用者點名）：AEVA 換騎跨過 undecided→neither、COHR／LITE／SIVE.ST 換騎跨過 7→9 家，正文一字不改
+```
+
+**現況（2026-11-03 唯讀）：** ①騎舊讀圖、③新邊沒讀 10-29 已交付；②④ 沒有任何程式在算——寫入端只檢查 rides 現行、在供給側，
+正文一字不改的換騎照收。量測：現行 89 份 v2 裡 25 份的正文版早於現行版、11 份換騎過，判讀與家數都沒變（②0、④0，與 10-29 一致）。
+
+**判法（落地前跑過試圖讓它變假的回放，L11-6）：** 比讀圖紀錄的**結構**——正文版（`body_version`）騎的讀圖 vs 這一格現行的讀圖：
+`kind` 不同＝②；快照供給側公司數不同＝④。**不解析正文的「N 家」**：真資料的「N 家」多半是客戶數（「三家具名客戶」「一家不具名的客戶」），
+比字面會誤報（L16）。ROADMAP ④ 原句「正文寫死的家數與現行讀圖供給家數不同」量成「供給家數自正文寫成後變了」——涵蓋原句的
+COHR／LITE／SIVE.ST，也涵蓋正文沒寫數字、競爭格局已變的情形。同樣家數換了成員不算（回放 0 次）。
+
+**四問：** ①根除（寫入端 ⑫ 擋住「一字不改就過」）＋顯形（候選列與 ⑤ 的兩種新原因）。②程式。③加一道比對；拿掉的是「換騎不看判讀與家數」。
+④最先壞掉的那一筆：**判斷不變、只想換騎的那一次寫入**——現在要在正文裡寫一句新的判讀或家數為什麼不改變結論；回放顯示這種情形
+過去 30 次（判讀 1、家數 29），都是正文該對一次的情形（例：3363 光纖陣列 2→6 家、6805 快接頭 2→6 家）。
+
+**落地（2026-11-03）：** `alpha/candidates.py`（`supply_side_companies`、`body_behind_readings`、`body_behind_reasons`、兩個前綴與
+`BODY_BEHIND_KINDS`、`REWRITE_WHY` 兩個五字）；`alpha/providers/briefs.py`（`_supply_side` 改呼叫同一個函式、⑫ `body_behind_problems`）；
+`alpha/providers/candidates.py`（`derive_row(readings_by_id=…)` 的 `rewrite_reading_changes`／`reading_change_unchecked`、`board_rewrite`
+兩個 kind、`candidate_context` 載入全部讀圖紀錄、板上 `reading_change_check`）；`webapp/materialize.py`＋`webapp/contracts.py`（/6、check 進
+freshness_identity）；`engine_b/todo_ledger.py`（`BEHIND_KINDS` 兩格、`COVERAGE` 兩格、沒算／沒比成的註記）。文件：ROADMAP 列搬進已交付索引
+（原列逐字封存 archive；順手補上 B 那一列漏掉的表頭）、failure log #93 末欄、ARCHITECTURE 待做清單段、research-drain skill ⓑ‴。
+測試：`tests/test_narrative_stale_24.py` 12 條、`tests/test_todo_ledger.py` 夾具與兩條；變異 4 種各自轉紅（3／2／2／4）。
+**真資料：** materialize 後 `reading_change_check` ok、沒比成 0、②0 ④0；⑤「敘事該重寫 6 檔（watch 醒 12 條；已回落 1（AXTI））」照舊、
+沒有沒算註記；serve 重啟（/6）health stale=false。

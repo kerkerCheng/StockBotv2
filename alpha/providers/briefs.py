@@ -150,8 +150,10 @@ def _registry(ctx: WriteContext) -> Any:
 
 
 def _supply_side(reading: Any) -> set[str]:
-    return {str(edge[0]) for edge in ((getattr(reading, "angles", {}) or {}).get("supply_side") or ())
-            if isinstance(edge, (list, tuple)) and edge and str(edge[0]).startswith("co:")}
+    # 與敘事 stale ④ 的家數比對同一個（`alpha.candidates.supply_side_companies`，L16）
+    from ..candidates import supply_side_companies
+
+    return set(supply_side_companies(reading))
 
 
 def _demand_side(reading: Any) -> set[str]:
@@ -349,7 +351,30 @@ def v2_write_problems(parsed: InvestorBrief, *, ctx: WriteContext, existing: Seq
     # ⑪ 只改字面值的換版宣告重述哪一版（2026-10-31 使用者「修吧」；failure log #121）
     if parsed.restates is not None:
         problems.extend(restates_problems(parsed, existing))
+
+    # ⑫ 換騎不能跨過判讀或家數改變（ROADMAP「敘事 stale 計數器」②④；failure log #93：AEVA 10-19 換騎跨過
+    #   undecided→neither、COHR／LITE／SIVE.ST 換騎跨過供給側 7→9 家，正文都一字不改）。正文（七格＋候選狀態與理由，`body_key`）
+    #   沒改的這一版，騎的讀圖跟正文寫的時候騎的那份比：判讀或供給側家數不同就拒收——改寫受影響的句子再寫。
+    #   比的是讀圖紀錄的結構，不看 note 寫什麼、不解析正文的「N 家」。正文改過（或第一版）就不比。
+    problems.extend(body_behind_problems(parsed, existing=existing, readings_by_id=ctx.readings_by_id))
     return problems
+
+
+def body_behind_problems(parsed: InvestorBrief, *, existing: Sequence[InvestorBrief],
+                         readings_by_id: Mapping[str, Any]) -> list[str]:
+    """⑫：這一版正文沒改、騎的讀圖判讀或供給側家數與正文版騎的那份不同 → 問題清單（`alpha.candidates` 同一個比對）。"""
+    from ..candidates import body_behind_readings, body_behind_reasons, body_version
+
+    if parsed.retracted:
+        return []
+    body = body_version([*existing, parsed], parsed)
+    if body.brief_id == parsed.brief_id:
+        return []
+    entries, _unchecked = body_behind_readings(
+        body, parsed, readings_by_id=readings_by_id,
+        current_cells={(r.node, r.unit): r.reading_id for r in parsed.rides})
+    return [f"rides：{reason}（這一版正文與 {body.brief_id}（{body.created_on}）一字不差；換騎跨過判讀或家數改變不收，"
+            "改寫受影響的句子再寫）" for entry in entries for reason in body_behind_reasons(entry)]
 
 
 def restates_problems(parsed: InvestorBrief, existing: Sequence[InvestorBrief]) -> list[str]:
@@ -479,5 +504,6 @@ def write_brief(record: Mapping[str, Any], *, ctx: WriteContext, directory: Path
 
 
 __all__ = ["BRIEF_DIR", "CURRENT_READING_STATUSES", "OPEN_READING_KINDS", "PRICED_IN_WRITE_LINES", "WriteContext", "append_brief_record", "priced_snapshot",
+           "body_behind_problems",
            "ledger_path", "read_brief_records", "restates_problems", "v2_write_notices", "v2_write_problems",
            "write_brief"]

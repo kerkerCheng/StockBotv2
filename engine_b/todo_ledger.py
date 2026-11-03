@@ -165,6 +165,8 @@ COVERAGE: Mapping[str, str] = {
     "hypothesis:active_without_watch": "todo.broken_waits",
     "brief:rides_superseded_reading": "todo.narrative",   # 候選板清單 kind=rides（候選板是唯一 owner，2026-10-29）
     "brief:new_edges_unread": "todo.narrative",           # 候選板清單 kind=new_edges：正文寫完後圖上有新邊、敘事沒讀過
+    "brief:reading_kind_changed": "todo.narrative",       # 候選板清單 kind=reading_kind：正文寫時騎的讀圖判讀與現行不同（2026-11-03）
+    "brief:supply_count_changed": "todo.narrative",       # 候選板清單 kind=supply_count：供給側家數與正文寫時不同（2026-11-03）
     "brief:link_break": "todo.narrative",
     "registry:stale_lead_entities": "todo.registry_rescan",
     "thesis:due_not_minted": "todo.thesis_due",
@@ -268,7 +270,10 @@ def orphan_wake_briefs(watches: Iterable[Mapping[str, Any]], briefs: Iterable[An
 #: 候選板是唯一 owner（ROADMAP「敘事 stale 計數器」同源，2026-10-29）：⑤ 只讀它的清單，不自己再算一份。
 #: `pulled_back`（2026-10-30，failure log #116）：等回落的收盤低於最後一次宣告已定價那天——叫醒重問，不是動作。
 #: `reopen_met`／`no_reopen`（2026-11-01，failure log #124）：等回落寫的重開條件達成（取代回落叫醒）／舊紀錄沒寫重開條件、該補寫。
-BEHIND_KINDS: Mapping[str, str] = {"rides": "騎舊讀圖", "new_edges": "新邊沒讀", "pulled_back": "已回落",
+#: `reading_kind`／`supply_count`（2026-11-03，ROADMAP「敘事 stale 計數器」②④）：正文寫的時候騎的讀圖與這一格現行的
+#: 讀圖相比，判讀變了／供給側家數變了——換騎不夠，正文要改。
+BEHIND_KINDS: Mapping[str, str] = {"rides": "騎舊讀圖", "reading_kind": "判讀變了", "supply_count": "家數變了",
+                                   "new_edges": "新邊沒讀", "pulled_back": "已回落",
                                    "reopen_met": "重開達成", "no_reopen": "沒寫重開"}
 
 
@@ -412,13 +417,20 @@ def collect(*, today: date, leads_store: Mapping[str, Any], watches: Sequence[Ma
             bits.append(f"連結斷 {len(breaks)}")
         bits += [{"precondition_failed": "前提失效", "legacy": "舊版", "not_multiple": "非邊緣仍有敘事"}[b.split()[0]]
                  + " " + b.split()[1] for b in board]
-        # 沒讀到不是 0（INV-3）：候選板讀不到，後三種都沒算進來；圖讀不到，新邊沒讀沒算
+        # 沒讀到不是 0（INV-3）：候選板讀不到，後幾種都沒算進來；圖讀不到，新邊沒讀沒算；讀圖紀錄讀不到（或舊板沒有這一格），
+        # 判讀／家數變了沒算
         if candidates is None:
-            note = "候選板未讀到——騎舊讀圖、新邊沒讀、已回落、重開條件、前提失效沒算進來"
-        elif (candidates.get("new_edges_check") or {}).get("status") != "ok":
-            note = "新邊沒讀這次沒算（候選板沒讀到圖）"
+            note = "候選板未讀到——騎舊讀圖、判讀／家數變了、新邊沒讀、已回落、重開條件、前提失效沒算進來"
         else:
-            note = None
+            notes = []
+            if (candidates.get("new_edges_check") or {}).get("status") != "ok":
+                notes.append("新邊沒讀這次沒算（候選板沒讀到圖）")
+            check = candidates.get("reading_change_check") or {}
+            if check.get("status") != "ok":
+                notes.append("判讀／家數變了這次沒算（候選板沒讀到讀圖紀錄，或是舊板）")
+            elif check.get("unchecked"):
+                notes.append(f"判讀／家數變了有 {check['unchecked']} 格沒比成（正文寫時騎的讀圖紀錄找不到）")
+            note = "；".join(notes) or None
         put("todo.narrative", len(companies) + extra, work="；".join(bits) or None,
             oldest_days=_oldest(stamps, today), note=note)
 

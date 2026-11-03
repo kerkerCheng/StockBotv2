@@ -202,7 +202,11 @@ fetchers/{edgar,mops,mfn,rns}.py ↑      engine_c/etl_yfinance.py → SQLite
 > 只有「接不上的等待」三種與「騎舊讀圖」（2026-10-29 起騎舊讀圖與「新邊沒讀」都由候選板 `derive_row` 算，⑤ 讀整板清單的
 > `kind=rides／new_edges／pulled_back`——候選板是唯一 owner；已回落（2026-10-30，ROADMAP「等回落的價格叫醒」）＝等回落的收盤低於
 > 最後一次宣告已定價那天的收盤——不住 watch registry、候選板每天重算、`rewrite[]` 那句不帶 %（天天變的數字不進認知指紋）；新邊沒讀＝正文最後一次改動後公司有新邊、敘事沒讀過那條邊的任何一份來源，
-> 「讀過」比文件 id、直接引的網址與邊的逐字在不在敘事引的 raw 檔裡，assertion 與逐字由 `query/company_assertions.py` 唯讀取出）。
+> 「讀過」比文件 id、直接引的網址與邊的逐字在不在敘事引的 raw 檔裡，assertion 與逐字由 `query/company_assertions.py` 唯讀取出；
+> **判讀變了／家數變了**（2026-11-03，ROADMAP「敘事 stale 計數器」②④）＝正文最後一次改動時（`body_version`）騎的那份讀圖，與這一格
+> 現行的讀圖相比 kind 不同／快照供給側公司數不同——`alpha.candidates.body_behind_readings` 一個函式，候選列 `rewrite_reading_changes`、
+> 整板 `kind=reading_kind／supply_count`、寫入端 ⑫（`alpha/providers/briefs.py::body_behind_problems`：正文一字不改卻跨過這兩種改變的
+> 換騎拒收）共用；比讀圖紀錄的結構、不解析正文「N 家」；讀圖紀錄讀不到＝板上 `reading_change_check` 宣告沒算）。
 > **涵蓋登記表 `COVERAGE`**：lead、佇列段、watch、到期類型、pq2 派工、假說、thesis、
 > 候選組、讀圖狀態的每一個值都登記去處（⑤ 的格，或 ③／等事件／機械段／終局／研究題庫／Phase plan），測試從各字彙 SSOT 列舉
 > 比對——新狀態沒登記就紅。SessionStart 的 Phase 提示與 ⑤ 最後一行「下一步貼」是同一個函式（`next_prompt`）。

@@ -95,7 +95,8 @@ def _brief(company: str, *, state: str = "missing", brief_id: str = "ib_1", tick
 def _collect(**over):
     params = dict(today=TODAY, leads_store={"leads": {}}, watches=[], todo_items=[], hypotheses=[], briefs=[],
                   reading_needs_reread=0, layer_note_reread=0,
-                  candidates={"counts": {}, "new_edges_check": {"status": "ok"}}, thesis_due=[])
+                  candidates={"counts": {}, "new_edges_check": {"status": "ok"},
+                              "reading_change_check": {"status": "ok", "unchecked": 0}}, thesis_due=[])
     loaders = {"classification_gaps": lambda: [], "undisposed": lambda: [], "parked_without_expiry": lambda: [],
                "stale_lead_entities": lambda: 0, "story_gaps": lambda: []}
     loaders.update(over.pop("loaders", {}))       # 只換掉測試點名的那幾個；其餘不讀真的 ledger
@@ -160,8 +161,9 @@ def test_a_waiting_narrative_may_have_several_wake_watches() -> None:
     assert tl.orphan_wake_briefs(watches, []) == ["ew_0148", "ew_1433"]          # 沒有現行敘事（撤回）
 
 
-def _board(*items, check: str = "ok"):
-    return {"counts": {}, "narrative_rewrite": list(items), "new_edges_check": {"status": check}}
+def _board(*items, check: str = "ok", reading_check: dict | None = None):
+    return {"counts": {}, "narrative_rewrite": list(items), "new_edges_check": {"status": check},
+            "reading_change_check": reading_check or {"status": "ok", "unchecked": 0}}
 
 
 def test_a_narrative_riding_a_superseded_reading_needs_a_rewrite() -> None:
@@ -185,6 +187,16 @@ def test_new_edges_the_narrative_never_read_count_once_per_company_and_name_it()
     assert row.count == 2 and "新邊沒讀 2（B、T）" in row.work and "watch 醒 1 條" in row.work
 
 
+def test_reading_kind_and_supply_count_changes_are_named_and_counted_once_per_company() -> None:
+    """敘事 stale ②④（2026-11-03）：候選板清單 kind=reading_kind／supply_count——⑤ 點名是哪幾檔；同一檔兩種都有只算一檔。"""
+    base = {"ticker": "AEVA", "company_id": "co:aeva", "brief_id": "ib_1", "node": "tech:npo", "unit": "layer",
+            "body_reading_id": "sr_old", "current_reading_id": "sr_new"}
+    row = _collect(candidates=_board(dict(base, kind="reading_kind"), dict(base, kind="supply_count"),
+                                     dict(base, kind="supply_count", ticker="COHR", company_id="co:cohr")))["todo.narrative"]
+    assert row.count == 2 and row.note is None
+    assert "判讀變了 1（AEVA）" in row.work and "家數變了 2（AEVA、COHR）" in row.work
+
+
 def test_kinds_the_ledger_does_not_own_are_not_counted_twice() -> None:
     """連結斷與 watch 待重寫 ⑤ 自己由 watch registry 算；候選板清單裡的同一件事不再加一次。"""
     board = _board({"kind": "link", "ticker": "A", "company_id": "co:a"},
@@ -193,10 +205,15 @@ def test_kinds_the_ledger_does_not_own_are_not_counted_twice() -> None:
 
 
 @pytest.mark.parametrize("candidates, note", [
-    (None, "候選板未讀到——騎舊讀圖、新邊沒讀、已回落、重開條件、前提失效沒算進來"),
-    ({"counts": {}, "narrative_rewrite": [], "new_edges_check": {"status": "unavailable", "reason": "SystemExit"}},
+    (None, "候選板未讀到——騎舊讀圖、判讀／家數變了、新邊沒讀、已回落、重開條件、前提失效沒算進來"),
+    ({"counts": {}, "narrative_rewrite": [], "new_edges_check": {"status": "unavailable", "reason": "SystemExit"},
+      "reading_change_check": {"status": "ok", "unchecked": 0}},
      "新邊沒讀這次沒算（候選板沒讀到圖）"),
-    ({"counts": {}, "narrative_rewrite": []}, "新邊沒讀這次沒算（候選板沒讀到圖）"),   # 改版前的舊 artifact
+    ({"counts": {}, "narrative_rewrite": []},                                          # 改版前的舊 artifact：兩種都沒算
+     "新邊沒讀這次沒算（候選板沒讀到圖）；判讀／家數變了這次沒算（候選板沒讀到讀圖紀錄，或是舊板）"),
+    ({"counts": {}, "narrative_rewrite": [], "new_edges_check": {"status": "ok"},
+      "reading_change_check": {"status": "ok", "unchecked": 2}},
+     "判讀／家數變了有 2 格沒比成（正文寫時騎的讀圖紀錄找不到）"),
 ])
 def test_new_edges_not_checked_is_said_not_printed_as_zero(candidates, note) -> None:
     """圖或候選板讀不到時「新邊沒讀」是沒算，不是 0（INV-3）——而且**印出來**：0 的格也帶著註記。"""
