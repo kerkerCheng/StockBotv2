@@ -36,10 +36,12 @@ def _slots() -> dict:
             "when": {"text": "{next_checkpoint_date} 財報。", "evidence_refs": ev}}
 
 
-def _brief(*, state="open", watch_id=None, reason=None, days_ago=0, supersedes=None, disproof=(),
+def _brief(*, state="open", watch_id=None, reason=None, days_ago=0, supersedes=None, disproof=_DEFAULT,
            answers=None, ticker=T, company=CO, retracted=False, reopen=None):
+    # 預設帶一條自己的反證：2026-11-03 起可開的起始門要「反證已寫下且有到期」（第 18＋16 條）
+    disproof = [SELF] if disproof is _DEFAULT else list(disproof)
     rec = brief_record(company_id=company, ticker=ticker, slots=_slots(), record_version=RECORD_VERSION_V2,
-                       rides=[{"node": "tech:x", "unit": "layer", "reading_id": READ}], disproof=list(disproof),
+                       rides=[{"node": "tech:x", "unit": "layer", "reading_id": READ}], disproof=disproof,
                        answers=answers or {"priced_in": "yes", "in_numbers": "yes"},
                        candidate_state={"state": state, "watch_id": watch_id, "reason": reason,
                                         **({"reopen": reopen} if reopen else {})},
@@ -165,9 +167,9 @@ def test_unreadable_or_empty_sheet_suspends_held_instead_of_saying_not_held(reso
     硬擋對同一份 [] 也回 unmeasurable。"""
     held = held_index(resolution, is_beta=is_beta_symbol, failure=failure)
     assert held["status"] == "upstream_unavailable" and "暫停" in held["reason"]
-    row = _derive([_brief(state="priced_wait", watch_id="ew_1")],
+    row = _derive([_brief(state="missing", watch_id="ew_1")],
                   watches=[_active("ew_1", kind="date", until="2026-11-13", wake_brief=CO)], held=held)
-    assert row["holdings_verified"] is False and row["group"] == "priced_wait"
+    assert row["holdings_verified"] is False and row["group"] == "missing"
     board = assemble_board([row], universe=[T], held=held, narrative_rewrite=[])
     assert board["counts"]["held"] is None                           # 缺席，不是 0
     if resolution is not None:
@@ -255,9 +257,7 @@ def test_the_narratives_own_touched_disproof_breaks_open_and_is_carried_on_every
     assert row["side"] == "precondition_failed" and any("待處置" in p for p in row["preconditions"])
     assert row["rewrite"] == ["敘事該重寫：ew_9 觸及"] and row["rewrite_watch_ids"] == ["ew_9"]
     assert row["rewrite_words"] == ["條件觸及"]          # 卡片與個股頁那一行的幾個字（2026-10-29）
-    # 等回落帶重開條件＝現行格式（2026-11-01 起新寫的必帶）；沒帶的舊紀錄另多一條「沒寫重開條件」，由 test_reopen 守
-    reopen = {"text": "回到 50 以下就重開", "price_at_or_below": 50.0}
-    for state, extra in (("priced_wait", {"watch_id": "ew_1", "reopen": reopen}), ("pass", {"reason": "貴"})):
+    for state, extra in (("missing", {"watch_id": "ew_1"}), ("pass", {"reason": "貴"})):
         other = _brief(state=state, disproof=[SELF], **extra)
         fired = {**touched, "status": "fired", "judgment": None, "source_ref": f"brief:{other.brief_id}#1"}
         w = [fired, _active("ew_1", kind="date", until="2026-11-13", wake_brief=CO)]
@@ -351,10 +351,13 @@ def test_edge_unmeasurable_only_holds_back_a_declared_open() -> None:
     row = _derive([_brief()], edge=UNMEASURED)
     assert row["side"] == "edge_unmeasurable" and row["derived"] == "edge_unmeasurable" and row["group"] is None
     assert row["declared"] == "open" and row["edge_note"] == "邊緣無法量：缺分析師家數"
+    # 11-03 前的等回落讀成可開：同樣不放行（2026-11-03 第 18＋16 條；之前它照敘事分組進等回落）
+    old = _derive([_brief(state="priced_wait", watch_id="ew_1")], edge=UNMEASURED, watches=[_active("ew_1")])
+    assert (old["side"], old["declared"], old["declared_retired"]) == ("edge_unmeasurable", "open", "priced_wait")
 
 
 @pytest.mark.parametrize("state, watch_id, reason", [
-    ("missing", "ew_1", None), ("priced_wait", "ew_1", None), ("pass", None, "這一層不卡"),
+    ("missing", "ew_1", None), ("pass", None, "這一層不卡"),
 ])
 def test_edge_unmeasurable_keeps_the_narratives_own_state_and_carries_a_tag(state, watch_id, reason) -> None:
     """原本一律蓋掉宣告：真資料 9 檔裡 5 檔缺 X、4 檔不要被藏進附組，缺 X 與不要的檔數各少算（L12）。"""

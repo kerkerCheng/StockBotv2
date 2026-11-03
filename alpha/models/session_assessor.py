@@ -225,10 +225,13 @@ def _brief_frame() -> dict[str, Any]:
             "例如短檢查讀的公司自己的 10-K——先存成檔再引用；寫入時檢查檔案在，個股頁證據清單照列）；"
             "禁字表裡的內部名詞一出現就拒收。"
             "結構化欄位：rides[]（只能押本公司在供給側的現行讀圖）、disproof[]（寫入即登記成 watch；已在盯的只填 "
-            "link_source_ref）、answers（已定價嗎／出現在數字裡了嗎）、candidate_state（缺 X／等回落要先用 "
+            "link_source_ref）、answers（已定價嗎／出現在數字裡了嗎）、candidate_state（可開照起始門：會死嗎不是紅、押的那一層"
+            "判讀不是 neither、反證已寫下且有到期、已定價寫成一句脈絡——已定價不擋可開，已定價時翻倍條件寫得更嚴；缺 X 要先用 "
             "`python -m engine_b.event_watch add --wake-brief <co:*> …` 建好 watch）、confirm[]（**加碼條件**：「這件事發生＝"
             "結構被確認了」——客戶自己的文件點名它、合格走到量產、數字出現在營收裡；寫入即登記成 watch、有到期；觸及只提醒，"
-            "**不是買進訊號、不改候選狀態**；契約上是選填欄，但持有或可開的敘事要寫——ROADMAP Phase 7 驗收②）。存檔：python -m alpha brief <T> --add spec.json"),
+            "**不是買進訊號、不改候選狀態**；契約上是選填欄，但持有或可開的敘事要寫——ROADMAP Phase 7 驗收②）、"
+            "depth_check（深挖清單十項：引用｜不適用：理由｜加碼條件：c<n>｜缺：…；讀到邊是加碼的門、不是起始的門——"
+            "還沒查的項目 ⑤「加碼條件還沒查」會數）。存檔：python -m alpha brief <T> --add spec.json"),
         "slots": [{"key": k, "label": v, **BRIEF_FRAME_V2[k]} for k, v in BRIEF_SLOTS_V2],
         "placeholders": dict(PLACEHOLDERS_V2),
         "forbidden_terms": list(FORBIDDEN_TERMS),
@@ -245,13 +248,15 @@ def _brief_frame() -> dict[str, Any]:
                           "entities": ["co:…"], "expires": "YYYY-MM-DD", "source": "self",
                           "link_source_ref": None}],
             "answers": {"priced_in": "yes|no|unmeasurable", "in_numbers": "yes|no|unmeasurable"},
-            "candidate_state": {"state": "open|missing|priced_wait|pass", "watch_id": "ew_…（缺 X／等回落必填）",
+            "candidate_state": {"state": "open|missing|pass", "watch_id": "ew_…（缺 X 必填）",
                                 "reason": "（不要必填）"},
             "history_not_comparable": None,
             "acknowledged_touched": [],
             "confirm": [{"condition": "客戶自己的一手文件具名它供貨並走到量產（至少 20 字、可否證）",
                          "check_frequency": "每季", "action_48h": "重寫敘事：寫明確認了什麼、候選狀態換不換",
                          "entities": ["co:…"], "expires": "YYYY-MM-DD", "source": "self"}],
+            "depth_check": {"latest_report": "library/raw/…（引用）", "latest_call": "不適用：沒有法說，只有股東會",
+                            "why_chosen": "加碼條件：c1", "replaced_by": "缺：還沒查"},
             "supersedes_id": "ib_…（重寫時）", "note": "可選",
             "restates": "ib_…（只改字面值的換版才寫：重述哪一版，判斷日不歸零；failure log #121）"},
     }

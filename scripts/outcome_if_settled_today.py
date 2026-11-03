@@ -687,8 +687,9 @@ def paper_lane_plan(briefs: Mapping[str, tuple[Sequence[Any], Sequence[str]]], *
         current = select_brief(list(records), as_of=None, today=today)
         v1 = [r for r in records if r.record_version == RECORD_VERSION_V1]
         cs = first.candidate_state if first is not None else None
+        # 現行照讀法（11-03 前的等回落讀成可開，`CandidateState.effective`）；錨點那天照當時寫的字（INV-6：不改寫當時說的話）
         current_state = ("retracted" if current is None
-                         else current.candidate_state.state if current.candidate_state is not None else "legacy_v1")
+                         else current.candidate_state.effective if current.candidate_state is not None else "legacy_v1")
         company_id = first.company_id if first is not None else (records[0].company_id if records else None)
         row = {
             "lane": "paper", "ticker": ticker, "research_ticker": ticker, "company_id": company_id,
@@ -963,6 +964,7 @@ def lane_summary(rows: Sequence[Mapping[str, Any]], *, lane: str) -> dict:
     # 混在聚合裡。依**現行**狀態分組各算一次（加鍵、不改既有鍵；各組 n 加總＝paper 列數）。
     # 錨點那天的狀態另分一次（盲點修法 §2 第 9 條；審查 measurement-2）：「照系統當時說的做會怎樣」——宣告可開／等回落／
     # 缺 X／不要那天起的等權與三量；n 不到 `SMALL_SAMPLE_N` 帶小樣本旗，只印不判（同月同題材，12-22 前多半是雜訊）。
+    # 錨點照當時寫的字（11-03 前的等回落照舊是等回落，INV-6）；現行照讀法（等回落讀成可開）。
     paper = lane == "paper"
     return {
         "lane": lane, "label": LANE_LABELS[lane], "n": len(rows), "measured": len(measured),

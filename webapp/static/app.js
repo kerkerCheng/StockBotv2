@@ -227,12 +227,7 @@ function cardStateLine(row) {
   if (chip) line.appendChild(el('span', 'card-chip chip-' + (cand.list_group || 'none'), chip));
   // 邊緣判定少一個輸入（2026-10-30）：是標記不是狀態——卡片照敘事分組，這一句照印產生端給的字（「邊緣無法量：缺分析師家數」）
   if (cand.edge_note) line.appendChild(el('span', 'card-chip chip-edge', cand.edge_note));
-  // 只差已定價（2026-11-01；failure log #123）：等回落、可開的四個機械前提都成立——剩下的是價格判斷（產生端給布林，照印）
-  if (c.priced_only === true) {
-    const only = el('span', 'card-chip chip-edge', '只差已定價');
-    only.title = '可開的四個機械前提都成立，剩下的是「已定價」這個價格判斷，由你來下（只是標記，不是動作）';
-    line.appendChild(only);
-  }
+  // ⚠ 2026-11-03（盲點修法第 18＋16 條）：「只差已定價」晶片隨等回落併回可開退役——已定價不擋可開，可開的卡片照可開印
   // 敘事該重寫（候選列 rewrite[]，materialize 端照數）：這張卡的狀態可能已經舊了（2026-10-28 候選板那一區搬來）。
   // 2026-10-29 起寫原因（兩到四個字，`alpha.candidates.rewrite_words`），不只寫筆數；舊 artifact 照印筆數。
   if (typeof c.rewrite === 'number' && c.rewrite > 0) {
@@ -1435,20 +1430,7 @@ function candidateLine(view, inQuestions) {
   }
   if (row) {
     (row.preconditions || []).forEach((text) => node.appendChild(el('div', 'row-reason', '前提失效：' + text)));
-    // 只差已定價（2026-11-01；failure log #123）：等回落列假設把已定價當脈絡改宣告可開，前提逐項還缺什麼（產生端給清單）
-    if (Array.isArray(row.open_gaps)) {
-      node.appendChild(row.open_gaps.length
-        ? el('div', 'row-reason dim', '不看已定價的話，可開還缺：' + row.open_gaps.join('；'))
-        : el('div', 'row-reason', '只差已定價：可開的四個機械前提都成立，剩下的是價格判斷，由你來下（只是標記，不是動作）'));
-    }
-    // 等回落的重開條件（2026-11-01；failure log #124）：敘事寫的「到哪裡就重開」與今天的距離（產生端組好的字，照印）
-    if (row.reopen && row.reopen.line) {
-      node.appendChild(el('div', 'row-reason', (row.reopen.met === true ? '重開條件達成——' : '') + row.reopen.line));
-      if (row.reopen.text) node.appendChild(el('div', 'row-reason dim', '為什麼是這個數：' + row.reopen.text));
-    }
-    if (row.reopen_missing === true) {
-      node.appendChild(el('div', 'row-reason dim', '這份等回落還沒寫重開條件，下一次重寫會補上'));
-    }
+    // ⚠ 2026-11-03（第 18＋16 條）：只差已定價、重開條件兩行隨等回落併回可開退役（候選列不再帶 open_gaps／reopen）
     // 敘事該重寫：一行、每個原因兩到四個字（`alpha.candidates.rewrite_words`；2026-10-29 使用者：「該重寫為啥沒寫…一目了然」）；
     // 原句放 title。舊 artifact 沒帶 `rewrite_words` 就照舊逐句印。
     if ((row.rewrite_words || []).length) {

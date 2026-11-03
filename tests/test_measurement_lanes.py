@@ -40,6 +40,13 @@ OIST = _oist()
 class _State:
     state: str
 
+    @property
+    def effective(self) -> str:
+        """同 `CandidateState.effective`（2026-11-03：舊的等回落讀成可開）——現行狀態照讀法、錨點照當時的字。"""
+        from alpha.narrative.contracts import CANDIDATE_STATES_RETIRED
+
+        return CANDIDATE_STATES_RETIRED.get(self.state, self.state)
+
 
 @dataclass(frozen=True)
 class _Brief:

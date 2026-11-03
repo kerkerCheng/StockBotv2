@@ -58,22 +58,26 @@ def test_a_bad_line_is_kept_verbatim_and_does_not_swallow_the_file(tmp_path) -> 
 def test_row_copies_the_artifact_counts_and_keeps_an_absent_held_as_null(tmp_path) -> None:
     """照抄 artifact 的 `counts`：五組＋四附組＋無敘事；持股讀不到時 `held` 是 None——序列裡是 null，不是 0。"""
     row = mat.candidate_series_row(_payload("2026-10-02", held=None))
-    assert row["counts"] == {"open": 0, "missing": 0, "priced_wait": 1, "pass": 0, "held": None}
+    # 2026-11-03（第 18＋16 條）起四組：等回落併回可開，序列不再有 priced_wait 那一格
+    assert row["counts"] == {"open": 0, "missing": 0, "pass": 0, "held": None}
     assert row["side"] == {"not_multiple": 0, "edge_unmeasurable": 0, "legacy": 0, "precondition_failed": 0}
-    assert row["no_narrative"] == 2 and row["oldest_stall_days"] == {"open": None, "missing": None, "priced_wait": 0}
+    assert row["no_narrative"] == 2 and row["oldest_stall_days"] == {"open": 0, "missing": None}
     # 遲滯與在門檻上（2026-11-01）：舊板沒有這兩格＝null，不是 0
     assert row["edge"] == {"on_threshold": None, "not_edge_pending": None}
-    # 只差已定價（2026-11-03；決定紀錄 §10.1 條 2 讀這一格）：舊板沒有＝null，不是 0
-    assert row["priced_only"] == {"count": None, "unknown": None}
-    assert set(row) == {"date", "counts", "side", "no_narrative", "oldest_stall_days", "edge", "priced_only",
+    assert set(row) == {"date", "counts", "side", "no_narrative", "oldest_stall_days", "edge", "addon_unchecked",
                         "generated_at"}
 
 
-def test_row_copies_the_priced_only_counts_including_zero() -> None:
-    """有算的板照抄：0 就是 0（名單恆為 0 正是條 2 要量的形狀），沒算的另記一格。"""
+def test_row_copies_the_addon_unchecked_count_including_zero() -> None:
+    """加碼條件還沒查（第 18＋16 條）：有算的板照抄、0 就是 0；舊板或持股讀不到（板上是 None／沒有這格）＝null，不是 0。"""
     payload = _payload("2026-11-03")
-    payload["counts"] = dict(payload["counts"], priced_wait_priced_only=0, priced_wait_priced_only_unknown=2)
-    assert mat.candidate_series_row(payload)["priced_only"] == {"count": 0, "unknown": 2}
+    assert mat.candidate_series_row(payload)["addon_unchecked"] == 1
+    payload["counts"] = dict(payload["counts"], addon_unchecked=0)
+    assert mat.candidate_series_row(payload)["addon_unchecked"] == 0
+    payload["counts"] = dict(payload["counts"], addon_unchecked=None)
+    assert mat.candidate_series_row(payload)["addon_unchecked"] is None
+    payload["counts"] = {k: v for k, v in payload["counts"].items() if k != "addon_unchecked"}
+    assert mat.candidate_series_row(payload)["addon_unchecked"] is None
 
 
 def test_only_the_default_state_dir_writes_the_real_series(tmp_path) -> None:
@@ -105,7 +109,8 @@ def test_materialize_appends_after_writing_the_artifact(fake_board, tmp_path) ->
     series = tmp_path / "state" / "measurement" / "candidate_state_series.jsonl"
     rows = [json.loads(line) for line in _lines(series)]
     assert path.is_file() and len(rows) == 1
-    merged = {**rows[0]["counts"], **rows[0]["side"], "no_narrative": rows[0]["no_narrative"]}
+    merged = {**rows[0]["counts"], **rows[0]["side"], "no_narrative": rows[0]["no_narrative"],
+              "addon_unchecked": rows[0]["addon_unchecked"]}
     assert merged == payload["counts"] and rows[0]["date"] == payload["today"]
     mat.materialize_candidates(tickers=["AXTI"], store=store)                # 同日重跑
     assert len(_lines(series)) == 1

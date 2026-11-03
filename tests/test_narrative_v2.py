@@ -145,7 +145,7 @@ def test_a_valid_open_brief_writes_and_registers_its_disproof(tmp_path: Path) ->
 
 @pytest.mark.parametrize("ctx_kw, message", [
     ({"status": "stale"}, "只有 current／stale_low"),
-    ({"kind": "undecided"}, "護城河或量"),
+    ({"kind": "neither"}, "判讀是 neither"),            # 2026-11-03 起 undecided 可開；neither（換得掉）照擋
     ({"reading": _reading(supply=(OTHER,), demand=(CO,))}, "需求側"),
     ({"tq": _tq()}, "cohort_median"),
 ])

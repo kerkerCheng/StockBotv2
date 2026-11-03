@@ -9,10 +9,11 @@ Websearch 大事件 TL;DR、幾件事待我決定、健康度等等」。
    上面是**我們做了哪些處理**（同日使用者：「我們做了哪些處理的數字也要印」）：分類幾則（go／no-go、LLM／互動）、
    還沒分類（其中無內文）、研究到終局幾條（入圖包／已入圖／停放；lead 的轉移紀錄 10-07 起才有）、待深挖。
 ② 市場大事：雷達收據收下的每一則（事實首句 → 現在的處置）；收據不在才退回 LLM 摘要。
-③ 待你決定：pq2 要你決定的每一條，一條一塊（主詞、go 是什麼、不含什麼、圖會變什麼、建議）。
+③ 待你決定：pq2 要你決定的每一條，一條一塊（主詞、go 是什麼、不含什麼、圖會變什麼、建議）；前面是「可開待你選」——
+   起始門都過、這一版敘事你還沒選的檔（進／不要／等到條件；2026-11-03 盲點修法第 18＋16 條），沒有編號、不進批次指令。
 ③b 等你提供的文件：向你要文件的每一條，**獨立一區、批次 go 不收**——提供文件才算 go（同日使用者：「隔離一區讓我知道
    也不要讓我直接 go 提供文件才算 go」；名單只有 `todo.document_requests()` 一份）。
-④ 狀態與健康度：**每天都印**的基本狀態（daily 步數與出錯的步驟、候選五格檔數與最老滯留、等回落逐檔、watch 今日醒／
+④ 狀態與健康度：**每天都印**的基本狀態（daily 步數與出錯的步驟、候選四格檔數與最老滯留、你的決定、watch 今日醒／
    到期／標旗、反證在盯與未盯、無到期的等待——2026-10-07 使用者：「daily 心跳基本重要的 status 還是要印」）。
 ⑤ 下一次研究要做的：常駐計數器（`engine_b.todo_ledger`）——非 0 的逐格，0 的格名字印在小字裡（L14：每格都出現）。
 最後一則：③ 的建議批次指令，**單獨一則、inline code**——手機上一點就複製（2026-10-28 使用者：「最後給我一次複製的
@@ -491,37 +492,66 @@ def _impact_text(graph_impact: Any) -> str | None:
     return f"{delta}｜來源：{sources}"
 
 
-def priced_only_block(names: Sequence[str] | None, problem: str | None) -> list[str]:
-    """③ 的「只差已定價」（盲點修法 §1 第 3 條，2026-11-03；failure log #123）：等回落裡可開的機械前提都成立、只剩價格判斷的檔。
-    價格判斷是使用者的，所以住 ③、不只是 ④ 等回落那一行的標記；沒有 pq2 編號、不進批次指令。0 檔不印（④ 候選那一行照印 0）。"""
-    if names is None:
-        return [f"**只差已定價：讀不到（{problem}）**"]
-    if not names:
+def _pctile(value: Any) -> str:
+    return "量不到" if value is None else str(int(float(value) + 0.5))
+
+
+def _signed(value: float) -> str:
+    return f"{value * 100:+.1f}%".replace("-", "−")
+
+
+def open_choice_lines(rows: Sequence[Mapping[str, Any]], *, label: Any = None) -> list[str]:
+    """可開待你選的每一檔一行：「名字：可開幾天｜已定價答什麼｜自家三年百分位 判斷日→今天｜判斷日以來」。已定價是脈絡、
+    不是門檻（2026-11-03 第 18＋16 條：已定價不擋可開）——數字照抄候選板的 `priced_since`，不另算（L16）。
+    候選板的可開列一律是 v2 敘事；`priced_since` 是 None＝答量不到、今天也量不到（只有那時候不出列）。"""
+    out = []
+    for row in rows:
+        name = label(row) if label else str(row.get("ticker"))
+        info = row.get("priced_since") if isinstance(row.get("priced_since"), Mapping) else None
+        if info is None:
+            priced = "已定價答量不到（今天也量不到）"
+        else:
+            word = {"yes": "是", "no": "否"}.get(str(info.get("answer")), "量不到")
+            priced = (f"已定價答{word}｜自家三年百分位 {_pctile((info.get('then') or {}).get('value'))}"
+                      f"→{_pctile((info.get('now') or {}).get('value'))}")
+            if info.get("return_since") is not None:
+                priced += f"｜判斷日以來 {_signed(float(info['return_since']))}"
+        out.append(f"- {name}：可開 {row.get('stall_days', '?')} 天｜{priced}")
+    return out
+
+
+def open_choice_block(lines: Sequence[str] | None, problem: str | None) -> list[str]:
+    """③ 的「可開待你選」（2026-11-03 第 18＋16 條；決定紀錄 §10.1 停止條件第一子句量的就是它）：起始門都過、這一版敘事
+    你還沒選的檔。進／不要／等到條件是你的，所以住 ③；沒有 pq2 編號、不進批次指令；0 檔不印（④ 候選那一行照印可開 0）。"""
+    if lines is None:
+        return [f"**可開待你選：讀不到（{problem}）**"]
+    if not lines:
         return []
-    return [f"**只差已定價 {len(names)} 檔：{'、'.join(names)}**",
-            "- 可開的機械前提都成立，剩下的是「已定價嗎」——價格判斷由你下，系統不判、不給門檻",
-            "- 回法：互動 session 說「<代號> 可開」或「<代號> 不要（理由）」；不說就照等回落，到重看日再問你"]
+    return [f"**可開 {len(lines)} 檔待你選**（起始門都過、這一版敘事你還沒選；已定價是脈絡、不是門檻）", *lines,
+            "- 回法：進＝下單後照成交記；不要／等到條件＝看了沒買 `python scripts/record_trade.py looked --symbol <代號> "
+            "--choice 不要|等到條件 --why …`——記過的這一版不再列，敘事換版再問"]
 
 
 def decisions_block(*, actionable: Sequence[Mapping[str, Any]] | None, problem: str | None,
-                    todo_mod: Any, priced_only: Sequence[str] | None = (),
-                    priced_problem: str | None = None) -> tuple[list[str], str | None]:
+                    todo_mod: Any, open_choice: Sequence[str] | None = (),
+                    open_problem: str | None = None) -> tuple[list[str], str | None]:
     """③ 待你決定：一條一塊——**[編號] 主詞**、細節一行、go＝、不含、圖會變、建議（2026-10-28 使用者核可的排版）。
     清單與批次指令跟心跳段 3 同一份（`todo.actionable_items`、`heartbeat.recommended_batch`）；go／不含的白話取自
     `todo.GO_PLAIN`（與 `GO_AUTHORIZATION` 同鍵，L16）。回（這一塊的行, 建議的批次指令或 None）——批次指令由
-    `compose_brief` 單獨放最後一則。2026-10-07 起不含向你要文件（③b）。只差已定價（`priced_only_block`）排在編號前面。"""
+    `compose_brief` 單獨放最後一則。2026-10-07 起不含向你要文件（③b）。可開待你選（`open_choice_block`，傳進來的是
+    `open_choice_lines` 組好的行；None＝讀不到）排在編號前面。"""
     from crons.heartbeat import PQ2_LIST_LIMIT, recommended_batch
 
-    priced = priced_only_block(priced_only, priced_problem)
+    choice = open_choice_block(open_choice, open_problem)
     if actionable is None:
-        return [f"### ③ 待你決定（讀不到：{problem}）", *priced], None
-    extra = f"＋只差已定價 {len(priced_only)}" if priced_only else ""
-    lines = [f"### ③ 待你決定（{len(actionable)}{extra}）", *priced]
+        return [f"### ③ 待你決定（讀不到：{problem}）", *choice], None
+    extra = f"＋可開待你選 {len(open_choice)}" if open_choice else ""
+    lines = [f"### ③ 待你決定（{len(actionable)}{extra}）", *choice]
     if not actionable:
-        if not priced:
+        if not choice:
             lines.append("- 沒有")
         return lines, None
-    if priced:
+    if choice:
         lines.append("")
     items = sorted(actionable, key=lambda i: int(i["n"]))
     shown = items[:PQ2_LIST_LIMIT]
@@ -704,7 +734,7 @@ def captured_problems(*, now: datetime, capture_dir: Path | None) -> tuple[list[
 
 
 def candidate_short_lines(state_dir: Path | None) -> list[str]:
-    """④ 的候選兩行：五個狀態（封閉字彙，0 也印、有檔印最老滯留）＋覆蓋（邊緣無法量、邊緣卻沒敘事每天印；舊版、
+    """④ 的候選兩行：四個狀態（封閉字彙，0 也印、有檔印最老滯留）＋覆蓋（邊緣無法量、邊緣卻沒敘事每天印；舊版、
     前提失效、量不到卻沒敘事不是 0 才印）。數字與心跳段 2 同一個函式（`heartbeat.candidate_counts`）。"""
     from crons import heartbeat as hb
 
@@ -894,12 +924,13 @@ def compose_brief(*, now: datetime, summary: str, snapshot: Mapping[str, Any], r
             actionable = asking = None
             problem = type(exc).__name__
         try:
-            priced, priced_problem = hb.priced_only_names(
-                state_dir, label=lambda r: company_label(company_id=r.get("company_id"), ticker=r.get("ticker")))
+            rows, open_problem = hb.open_choice_rows(state_dir)
+            choice = None if rows is None else open_choice_lines(
+                rows, label=lambda r: company_label(company_id=r.get("company_id"), ticker=r.get("ticker")))
         except Exception as exc:  # noqa: BLE001 — 候選板讀不到不帶走 pq2 那幾塊
-            priced, priced_problem = None, type(exc).__name__
+            choice, open_problem = None, type(exc).__name__
         lines, batch[0] = decisions_block(actionable=actionable, problem=problem, todo_mod=todo_mod,
-                                          priced_only=priced, priced_problem=priced_problem)
+                                          open_choice=choice, open_problem=open_problem)
         return [*lines, "", *documents_block(asking=asking, problem=problem, todo_mod=todo_mod, today=today)]
 
     def line(build: Any, label: str) -> list[str]:
@@ -924,10 +955,7 @@ def compose_brief(*, now: datetime, summary: str, snapshot: Mapping[str, Any], r
         fails, reds = captured_problems(now=now, capture_dir=capture_dir)
         health = health_block(record=record, record_problem=record_problem, quota=hb.quota_entries(rows, now=now),
                               snapshot=snapshot, model_drift=drift, invariant_fails=fails, red_sections=reds)
-        # 2026-10-21 使用者問「價格一直跌，等回落能及時反應嗎」：只印不判，壞了只壞自己這一塊
-        wait = line(lambda: hb.priced_wait_short_lines(state_dir, today=today,
-                                                       label=lambda r: company_label(company_id=r.get("company_id"),
-                                                                                     ticker=r.get("ticker"))), "等回落")
+        # ⚠ 2026-11-03（第 18＋16 條）：④ 的「等回落」小塊隨等回落併回可開退役——可開的已定價脈絡改在 ③ 可開待你選那幾行
         # LLM 額度每天一行（ROADMAP「週額度常駐計數器」②，2026-11-01）：兩個窗的用量與重置，週用量 ≥ 門檻粗體——只印不擋；
         # 沒有可讀的用量就說為什麼（沒有執行紀錄／這一輪沒有呼叫回報）
         quota_line = line(lambda: "- " + hb.quota_usage_line(hb.quota_usage(rows), now=now, record=record,
@@ -941,7 +969,6 @@ def compose_brief(*, now: datetime, summary: str, snapshot: Mapping[str, Any], r
 
         return ["### ④ 狀態與健康度", *health, *quota_line, *line(lambda: candidate_short_lines(state_dir), "候選"),
                 *line(lambda: "- " + decision_line(today=today), "你的決定"),
-                *(["", *wait, ""] if wait else []),
                 *line(lambda: "- " + watch_short_line(now=now), "watch"),
                 *line(lambda: "- " + disproof_line(snapshot), "反證"),
                 *line(waits_line, "無到期的等待"),

@@ -284,12 +284,13 @@ def rank_backlog(rows: Sequence[BacklogRow]) -> list[BacklogRow]:
 
 
 #: 閉環母體的封閉字彙（2026-10-07，Phase 7 Step 7.0g-2；plan A4、failure log #22 選項②）。
-#: in＝已持有 ∪ 有 thesis（使用者明示）∪（邊緣或量不到 ∩ 供給側有座位）∪ 現行候選（缺 X／等回落／可開）；
+#: in＝已持有 ∪ 有 thesis（使用者明示）∪（邊緣或量不到 ∩ 供給側有座位）∪ 現行候選（缺 X／可開；舊的等回落讀成可開）；
 #: non_multiple＝非邊緣、沒持有、沒有 thesis、不是現行候選——不寫敘事，它的文件進層說明當在位者或客戶的證據；
 #: edge_no_seat＝邊緣或量不到但圖上沒有供貨座位——做一次「坐哪一層」短檢查，90 天後重問。
 POPULATIONS: tuple[str, ...] = ("in", "non_multiple", "edge_no_seat")
-#: 現行候選（這幾個狀態本身就是「還在研究」，不論邊緣與座位都留在母體）。
-_CANDIDATE_STATES_IN: frozenset[str] = frozenset({"missing", "priced_wait", "open"})
+#: 現行候選（這幾個狀態本身就是「還在研究」，不論邊緣與座位都留在母體）。候選板的列照讀法給狀態
+#: （`CandidateState.effective`，2026-11-03 起等回落併回可開），這裡不必認得退役的字。
+_CANDIDATE_STATES_IN: frozenset[str] = frozenset({"missing", "open"})
 #: 邊緣沒座位的短檢查多久重問一次（天）。
 SHORT_CHECK_DAYS = 90
 

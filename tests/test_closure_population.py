@@ -25,7 +25,7 @@ def test_population_truth_table() -> None:
     f = closure.population_for
     assert f(held=True, has_thesis=False, candidate_state=None, edge_state="not_edge", has_seat=False)[0] == "in"
     assert f(held=False, has_thesis=True, candidate_state=None, edge_state="not_edge", has_seat=False)[0] == "in"
-    for state in ("missing", "priced_wait", "open"):
+    for state in ("missing", "open"):                    # 候選板照讀法給狀態：舊的等回落已是 open（2026-11-03）
         assert f(held=False, has_thesis=False, candidate_state=state, edge_state="not_edge", has_seat=False)[0] == "in"
     assert f(held=False, has_thesis=False, candidate_state="pass", edge_state="not_edge", has_seat=True) == \
         ("non_multiple", "not_edge")
@@ -44,9 +44,14 @@ def test_unreadable_inputs_keep_the_ticker_in_the_population() -> None:
 
 
 def test_already_priced_is_not_a_population_rule() -> None:
-    """「已定價」不設門檻（AGENTS）：等回落的候選留在母體，不因為已定價就退出。"""
-    assert closure.population_for(held=False, has_thesis=False, candidate_state="priced_wait",
+    """「已定價」不設門檻（AGENTS）：已定價的可開（2026-11-03 起舊的等回落也讀成可開）留在母體，不因為已定價就退出。"""
+    assert closure.population_for(held=False, has_thesis=False, candidate_state="open",
                                   edge_state="edge", has_seat=False)[0] == "in"
+    from alpha.providers.closure import board_inputs
+
+    board = {"groups": {"open": [{"ticker": "AXTI", "declared": "open", "declared_retired": "priced_wait",
+                                  "edge": {"state": "edge"}}]}}
+    assert board_inputs(board)[0]["AXTI"]["candidate_state"] == "open"
 
 
 # ---- 佇列：queued ----

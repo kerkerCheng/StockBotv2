@@ -321,7 +321,8 @@ def test_retired_panels_declare_an_absence_instead_of_disappearing(tmp_path: Pat
     StateArtifactStore(state_dir).write(fake_candidates_payload())
     changes = "\n".join(hb.build_changes(now=now, state_dir=state_dir, thesis_path=tmp_path / "nope.json").lines)
     positions = "\n".join(hb.build_positions(state_dir=state_dir).lines)
-    assert "候選：可開 0｜缺 X 0｜等回落 1（最老 0 天｜已回落 0｜重開達成 0｜沒寫重開 1｜只差已定價 1）｜不要 0｜已持有 0" in changes, changes
+    # 2026-11-03（第 18＋16 條）：四個候選狀態——fake 的那一列是舊的等回落，讀成可開
+    assert "候選：可開 1（最老 0 天）｜缺 X 0｜不要 0｜已持有 0" in changes and "等回落" not in changes, changes
     # 2026-10-22：「無敘事」拆開——沒有邊緣判定的兩列算「量不到卻沒敘事」（待做，⑤ 也有），不是非倍率
     assert "量不到卻沒敘事 2" in changes and "持股解析不到 1（使用者決定不研究 0）：7803.T" in changes
     assert "三題（3 檔）：已定價① 有值 1／缺席 2" in changes and "不是結論" in changes
@@ -452,7 +453,7 @@ def test_snapshot_candidate_keys_are_read_from_the_artifact(tmp_path: Path) -> N
     values = hb.collect_snapshot(now=datetime(2026, 9, 29, tzinfo=timezone.utc), state_dir=tmp_path,
                                  leads_path=tmp_path / "nope.json", thesis_path=tmp_path / "nope2.json",
                                  run_record_path=None, capture_dir=None)
-    assert values["candidate.priced_wait"] == 1 and values["candidate.open"] == 0
+    assert values["candidate.open"] == 1 and values["candidate.missing"] == 0 and "candidate.priced_wait" not in values
     assert values["candidate.no_narrative"] == 2
     empty = hb.collect_snapshot(now=datetime(2026, 9, 29, tzinfo=timezone.utc), state_dir=tmp_path / "none",
                                 leads_path=tmp_path / "nope.json", thesis_path=tmp_path / "nope2.json",
@@ -733,7 +734,7 @@ def test_snapshot_keeps_held_unverified_as_none_not_zero(tmp_path: Path) -> None
     values = hb.collect_snapshot(now=datetime(2026, 9, 29, tzinfo=timezone.utc), state_dir=tmp_path,
                                  leads_path=tmp_path / "nope.json", thesis_path=tmp_path / "nope2.json",
                                  run_record_path=None, capture_dir=None)
-    assert values["candidate.held"] is None and values["candidate.priced_wait"] == 1
+    assert values["candidate.held"] is None and values["candidate.open"] == 1
 
 
 def test_candidate_lines_surface_reading_ledger_parse_errors(tmp_path: Path) -> None:

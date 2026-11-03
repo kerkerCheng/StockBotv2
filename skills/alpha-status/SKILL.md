@@ -43,7 +43,7 @@ description: >
 | 結構長什麼樣（哪條邊薄、走不走得到錨） | `query/bottleneck.py` 的逐邊 rows | `python -m query.bottleneck` |
 | 哪裡是空白、該去研究的洞 | `query/graph_walk.py`（第 7／8 型沿用 `query/coverage_gaps.py` 的分桶） | `python -m query.graph_walk` |
 | 覆蓋厚薄（市值／分析師家數） | Engine C `financial_snapshots`／`consensus_coverage_observations` | 見 §pane 1 |
-| 候選狀態（可開／缺 X／已定價等回落／不要／已持有） | `alpha/providers/candidates.py` 的推導（敘事 `candidate_state` × Sheet 持有 × 前提每天重驗），`candidates` state artifact | APP `#/candidates`／`python -m webapp materialize --candidates`／心跳段 2 |
+| 候選狀態（可開／缺 X／不要／已持有；2026-11-03 起等回落併回可開） | `alpha/providers/candidates.py` 的推導（敘事 `candidate_state` × Sheet 持有 × 起始門每天重驗），`candidates` state artifact | APP `#/candidates`／`python -m webapp materialize --candidates`／心跳段 2 |
 | 部位與計數器 | APP 的 `positions` state artifact | `python -m webapp status`／`python -m crons.heartbeat` 段 4 |
 | 注意力佇列現況 | `engine_b/priority.py` 的分類 | `python -m engine_b.cli drain` |
 
@@ -83,11 +83,11 @@ description: >
 2026-09-23 起**沒有門檻**——`substitutability` 未填或很低的邊都在表上，各自帶著自己的值）。
 **照抄順序即可，不得宣稱那是優先序**；`demand_anchor` 為空的列不是候選，但要列出來並說明。
 
-**(b) 候選狀態板** — 封閉字彙五值：可開／缺 X／已定價等回落／不要／已持有，外加四個附組
+**(b) 候選狀態板** — 封閉字彙四值：可開／缺 X／不要／已持有（2026-11-03 起；舊的等回落讀成可開），外加四個附組
 （非倍率候選／可開但邊緣無法量／舊版／前提失效）與「無敘事 N」；邊緣無法量的其他檔照敘事分組、列上帶標記。**照抄 `candidates` state artifact**
 （`python -m webapp materialize --candidates` 產生；APP 首頁「公司」`#/`，2026-10-28 候選板頁併進首頁）：各組檔數**0 也印**、組內按 ticker 字母、
-缺 X／等回落／可開各印最老滯留天數；每列的「敘事宣告」與「推導結果」不同時兩個都寫（例：宣告缺 X、Sheet 持有 → 已持有）。
-**不得用結構表的前幾名冒充它**。「可開」是每檔各自過的前提不是分數，可同時多檔；
+缺 X／可開各印最老滯留天數；每列的「敘事宣告」與「推導結果」不同時兩個都寫（例：宣告缺 X、Sheet 持有 → 已持有）。
+**不得用結構表的前幾名冒充它**。「可開」是每檔各自過的起始門不是分數，可同時多檔（加碼條件還沒查的檔數另印，那是研究的工作）；
 **可開為零就零，不得為了非空放寬條件**——讓它非空的路是研究。artifact 讀不到就照實寫
 「候選板讀不到（`upstream_unavailable`）」；持股讀不到時已持有組印「未驗」，不得寫成 0。
 

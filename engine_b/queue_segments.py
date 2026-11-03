@@ -94,7 +94,7 @@ SEGMENTS: tuple[Segment, ...] = (
         "research", "research-drain「敘事該重寫」段：讀那一檔現行敘事與觸發的 watch → "
                     "python -m alpha brief <T> --add spec.json（v2；`acknowledged_touched` 逐條處置，不列就拒收；"
                     "連結斷了的那一條：來源換版就把 link_source_ref 換成新來源鍵，來源被觸及／到期就先看來源那一邊的處置再改寫）",
-        "Phase 3 Step 3.4：`brief:` 語意 watch（敘事自己的反證）與 `wake_brief` watch（「缺 X」「已定價等回落」在等的事）"
+        "Phase 3 Step 3.4：`brief:` 語意 watch（敘事自己的反證）與 `wake_brief` watch（「缺 X」在等的事；11-03 前等回落的舊紀錄也帶著）"
         "醒來、觸及或到期都不鑄 pq2、不進假設對照——下一步是重寫敘事，而重寫是研究。換版與撤回不會吞掉它們。"
         "Step 3.6：敘事 `disproof[].link_source_ref` 連到的 watch 已不在盯（`narrative_watches.link_breaks`，附為什麼斷）"
         "也算這一段的工作——它不是任何一筆 watch 的狀態，由呼叫端注入 `observe(narrative_link_breaks=…)`。",

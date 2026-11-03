@@ -167,11 +167,11 @@ def test_an_expired_confirm_also_asks_for_a_rewrite(tmp_path: Path) -> None:
 
 
 def test_the_board_lists_each_confirm_and_a_touched_one_is_a_reminder_not_a_state_change() -> None:
-    from tests.test_candidates import EDGE, HELD_NONE, READ, _rows, _tq
+    from tests.test_candidates import EDGE, HELD_NONE, READ, SELF, _rows, _tq
     from alpha.providers.candidates import derive_row
 
     rec = brief_record(company_id=CO, ticker=T, slots=_record()["slots"], record_version=RECORD_VERSION_V2,
-                       rides=[{"node": "tech:x", "unit": "layer", "reading_id": READ}], disproof=[],
+                       rides=[{"node": "tech:x", "unit": "layer", "reading_id": READ}], disproof=[SELF],
                        answers={"priced_in": "yes", "in_numbers": "yes"},
                        candidate_state={"state": "open", "watch_id": None, "reason": None},
                        confirm=[_confirm()], created_at=datetime(2026, 9, 29, 3, tzinfo=timezone.utc))

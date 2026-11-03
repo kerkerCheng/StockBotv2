@@ -18,16 +18,16 @@ from pathlib import Path
 from typing import Any, Callable, Mapping, Sequence
 
 from ..candidates import (
-    ANSWER_WORDS, CANDIDATES_THIS_IS_NOT, GROUP_LABELS, GROUPS, IN_NUMBERS_LINES, OPEN_GAP_NO_RIDES, OPEN_GAP_NOT_EDGE,
+    ANSWER_WORDS, CANDIDATES_THIS_IS_NOT, GROUP_LABELS, GROUPS, IN_NUMBERS_LINES, RETIRED_STATE_LABELS,
     PRICED_IN_LINES, REWRITE_STATE_WORDS, SIDE_GROUPS, SIDE_LABELS, UNANSWERED, assemble_board, body_version, cap_label,
     cited_identities, edge_note, held_index, judgment_version, new_edge_reason, not_edge_pending_note,
-    on_threshold_entries, priced_since, pulled_back,
-    pulled_back_reason, rewrite_words, rides_reason, rollup, NO_REOPEN_REASON, reopen_met_reason, reopen_status,
-    squash, stall_since, stall_version, three_words, unread_new_edges,
+    on_threshold_entries, priced_since, rewrite_words, rides_reason, rollup,
+    squash, stall_since, three_words, unread_new_edges, wipeout_worst,
     BODY_BEHIND_KINDS, body_behind_readings, body_behind_reasons,
 )
 from ..edge import not_edge_confirmed
-from ..narrative.contracts import RECORD_VERSION_V2, InvestorBrief, select_brief
+from ..narrative.contracts import CANDIDATE_STATES_RETIRED, RECORD_VERSION_V2, InvestorBrief, select_brief
+from ..narrative.depth_check import unchecked_items
 from ..structure_reading.contracts import READING_KINDS, READING_UNITS
 from .briefs import CURRENT_READING_STATUSES, OPEN_READING_KINDS, PRICED_IN_WRITE_LINES
 
@@ -58,33 +58,48 @@ def raw_text(ref: str) -> str:
 def open_preconditions(brief: InvestorBrief, *, reading_rows: Mapping[tuple[str, str], Mapping[str, Any]],
                        three_questions: Mapping[str, Any] | None, blocking: Sequence[str],
                        breaks: Sequence[Mapping[str, Any]]) -> list[str]:
-    """「可開」每天重驗的四個前提；回傳失效理由（空＝全部成立）。"""
+    """「可開」的起始門，每天重驗；回傳失效理由（空＝全部成立）。
+
+    2026-11-03 起（盲點修法第 18＋16 條；AGENTS「讀到邊是加碼的門、不是起始的門」）起始門＝會死嗎不是紅、押的那一層讀過
+    且判讀不是 neither、反證已寫下且有到期、已定價寫成一句脈絡（v2 契約本來就要七格與 answers）——加上本來就有的
+    「宣告時的稽核行還在」「沒有待處置的反證」「連結來源仍在盯」。讀到邊與深挖清單是加碼條件，不在這裡。
+    寫入端（`alpha.providers.briefs.v2_write_problems` ⑥）擋同一套，這裡是每天的對稱面（L17）。"""
     failed: list[str] = []
-    for ride in brief.rides:                                                   # ① 騎的讀圖仍現行、判讀仍是護城河或量
+    if not brief.rides:                                                        # ① 押的那一層讀過、判讀不是 neither
+        # 寫入端擋新寫的；舊紀錄（11-03 前的等回落讀成可開）可能沒押——驗不了押的層，不放行
+        failed.append("沒有押任何讀圖（起始門要押的那一層讀過、判讀不是 neither）")
+    for ride in brief.rides:
         row = reading_rows.get((ride.node, ride.unit))
         if row is None or row.get("reading_id") != ride.reading_id:
             failed.append(f"押的讀圖 {ride.reading_id} 已不是現行（現行 {row.get('reading_id') if row else '沒有'}）")
         elif row.get("status") not in CURRENT_READING_STATUSES:
             failed.append(f"押的讀圖 {ride.reading_id} 狀態 {row.get('status')}（只有 current／stale_low 算現行）")
         elif row.get("kind") not in OPEN_READING_KINDS:
-            failed.append(f"押的讀圖 {ride.reading_id} 判讀是 {row.get('kind')}（可開要護城河或量）")
-    answers = brief.answers                                                    # ② answers 的稽核行沒有全變缺席
-    if answers is not None:
-        if three_questions is None:
-            failed.append("這次讀不到三題稽核區，answers 驗不了（fail closed）")
-        else:
-            if answers.priced_in in ("yes", "no") and not _valued(three_questions, "priced_in", PRICED_IN_LINES):
-                failed.append("已定價的稽核行已全部缺席（宣告時有值）")
-            if answers.in_numbers in ("yes", "no") and not _valued(three_questions, "in_numbers", IN_NUMBERS_LINES):
-                failed.append("出現在數字裡的稽核行已缺席（宣告時有值）")
-            # 對稱面（ROADMAP 已定價變動計數器）：答量不到、今天量得到了——宣告時的前提也失效了。稽核行用**寫入端同一份**
-            # （不含相對組漲幅：它有值並不強迫答 yes／no，用 PRICED_IN_LINES 會讓量不到的列大批誤判失效）。
-            if answers.priced_in == "unmeasurable" and _valued(three_questions, "priced_in", PRICED_IN_WRITE_LINES):
-                failed.append("已定價答量不到，今天稽核行有值（宣告時量不到）")
-            if answers.in_numbers == "unmeasurable" and _valued(three_questions, "in_numbers", IN_NUMBERS_LINES):
-                failed.append("出現在數字裡答量不到，今天稽核行有值（宣告時量不到）")
-    failed.extend(f"待處置的反證 watch：{b}" for b in blocking)                # ③ 歸屬本檔的 watch 沒有待判
-    failed.extend(f"連結 {b['link_source_ref']}：{b.get('label') or '已換版'}" for b in breaks)   # ④ 連結來源仍在盯
+            failed.append(f"押的讀圖 {ride.reading_id} 判讀是 {row.get('kind')}（起始門要押的那一層判讀不是 neither）")
+    if not brief.disproof:                                                     # ② 反證已寫下且有到期
+        failed.append("沒寫反證（起始門要反證已寫下且有到期——知道什麼時候認錯才開始）")
+    if three_questions is None:                                                # ③ 會死嗎不是紅、answers 的稽核行還在
+        failed.append("這次讀不到三題稽核區，會死嗎與 answers 都驗不了（fail closed）")
+    else:
+        worst, grey = wipeout_worst(three_questions)
+        if worst == "red":
+            failed.append("會死嗎是紅（四盞燈至少一盞紅）——起始門要會死嗎不是紅")
+        elif worst is None:
+            failed.append(f"會死嗎四盞燈都讀不到（灰 {grey}）——驗不了不是紅（fail closed）")
+    answers = brief.answers
+    if answers is not None and three_questions is not None:
+        if answers.priced_in in ("yes", "no") and not _valued(three_questions, "priced_in", PRICED_IN_LINES):
+            failed.append("已定價的稽核行已全部缺席（宣告時有值）")
+        if answers.in_numbers in ("yes", "no") and not _valued(three_questions, "in_numbers", IN_NUMBERS_LINES):
+            failed.append("出現在數字裡的稽核行已缺席（宣告時有值）")
+        # 對稱面（ROADMAP 已定價變動計數器）：答量不到、今天量得到了——宣告時的前提也失效了。稽核行用**寫入端同一份**
+        # （不含相對組漲幅：它有值並不強迫答 yes／no，用 PRICED_IN_LINES 會讓量不到的列大批誤判失效）。
+        if answers.priced_in == "unmeasurable" and _valued(three_questions, "priced_in", PRICED_IN_WRITE_LINES):
+            failed.append("已定價答量不到，今天稽核行有值（宣告時量不到）")
+        if answers.in_numbers == "unmeasurable" and _valued(three_questions, "in_numbers", IN_NUMBERS_LINES):
+            failed.append("出現在數字裡答量不到，今天稽核行有值（宣告時量不到）")
+    failed.extend(f"待處置的反證 watch：{b}" for b in blocking)                # ④ 歸屬本檔的 watch 沒有待判
+    failed.extend(f"連結 {b['link_source_ref']}：{b.get('label') or '已換版'}" for b in breaks)   # ⑤ 連結來源仍在盯
     return failed
 
 
@@ -225,13 +240,17 @@ def derive_row(ticker: str, company_id: str | None, *, records: Sequence[Investo
     """一檔的候選狀態。沒有敘事、也沒有持有 → None（不上板，計數另印「無敘事」）。
 
     邊緣：非邊緣進「非倍率候選」；邊緣判定少一個輸入時**只擋宣告可開**（附組「可開但邊緣無法量」），
-    缺 X／等回落／不要照敘事分組、列上帶 `edge_note`（2026-10-30）。
+    缺 X／不要照敘事分組、列上帶 `edge_note`（2026-10-30）。
+
+    宣告一律照讀法分組（`CandidateState.effective`）：11-03 前的「已定價等回落」讀成可開、走同一道起始門，
+    `declared_retired` 照留當時寫的字（舊紀錄不回寫）。`addon_unchecked`：可開或已持有（敘事不是「不要」）的檔，深挖清單
+    還沒查的項目（`alpha.narrative.depth_check.unchecked_items`）——⑤「加碼條件還沒查」數它；其餘列是空清單。
 
     `bets`／`registry`：首屏「是不是新賭注」的比對輸入（`bet_index`，Phase 7 Step 7.0e）——只呈現在 `shared_bet`，
     **不進任何狀態判斷**；沒給就由 `shared_bet` 宣告缺席。
 
     `rewrite[]`（**每一列都算，不論宣告哪一態、落哪一組**）：連結斷了（附為什麼斷）、敘事來源 watch 醒來／觸及／
-    到期未判（plan §5 第 6 點：候選板印「敘事該重寫：<watch id> <狀態>」）、缺 X／等回落在等的 watch 已失效、
+    到期未判（plan §5 第 6 點：候選板印「敘事該重寫：<watch id> <狀態>」）、缺 X（與舊的等回落）在等的 watch 已失效、
     騎的讀圖已換版、圖上有新邊而敘事沒讀過那份文件（ROADMAP「敘事 stale 計數器」①③，2026-10-29——心跳 ⑤ 讀這兩種，
     不自己再算）。`company_assertions`：這家公司在圖上的 assertion 寫入紀錄（`query.company_assertions`）；
     None＝圖讀不到，`rewrite_new_edges` 也是 None（沒算，不是 0）。`raw_text`：敘事引的 raw 檔全文的讀法（比邊的逐字；
@@ -248,12 +267,15 @@ def derive_row(ticker: str, company_id: str | None, *, records: Sequence[Investo
         return None
     v2 = brief is not None and brief.record_version == RECORD_VERSION_V2
     cs = brief.candidate_state if v2 else None
+    eff = cs.effective if cs else None
     row: dict[str, Any] = {
         "ticker": ticker, "company_id": company_id,
         "brief_id": brief.brief_id if brief else None,
         "record_version": brief.record_version if brief else None,
-        "declared": cs.state if cs else None,
-        "declared_label": GROUP_LABELS.get(cs.state) if cs else None,
+        "declared": eff,
+        "declared_label": GROUP_LABELS.get(eff) if eff else None,
+        # 當時寫的是退役的宣告值（11-03 前的等回落）才有——照讀成 `declared`，這一格只讓稽核分得出來
+        "declared_retired": cs.state if cs and cs.state in CANDIDATE_STATES_RETIRED else None,
         "derived": None, "group": None, "side": None,
         "reason": cs.reason if cs else None,
         # 故事層（2026-10-29）：理由的一句故事、缺 X 的短標——寫給這一版敘事的才算（敘事換版就退回印原理由）
@@ -280,16 +302,12 @@ def derive_row(ticker: str, company_id: str | None, *, records: Sequence[Investo
         # 待辦池裡還開著、標了這家公司的「向你要文件」編號（load_board 讀池；None＝池沒讀到或單檔頁沒帶，不是 0）
         "document_requests": (sorted(int(n) for n in open_document_requests)
                               if open_document_requests is not None else None),
-        # 等回落的價格叫醒（2026-10-30）：收盤低於最後一次宣告已定價那天的收盤；None＝沒算（不是等回落、或 bars 沒給）
-        "pulled_back": None,
-        # 只差已定價（2026-11-01 使用者指示；failure log #123）：等回落列假設把已定價當脈絡改宣告可開，可開的前提逐項還缺什麼。
-        # []＝前提都成立、只剩已定價這個價格判斷；None＝沒算（不是等回落、已持有、舊版敘事）。只呈現，不改分組
-        "open_gaps": None,
-        # 等回落的重開條件（2026-11-01；failure log #124）：`reopen_status` 的現況（None＝不是等回落或沒寫）、沒寫重開條件
-        # （True／False；None＝不是等回落）、叫醒看哪一個（reopen｜pulled_back；None＝不是等回落）
-        "reopen": None, "reopen_missing": None, "wake_by": None,
         # 加碼條件（Phase 7 Step 7.0d）：每條與它的 watch 狀態；觸及只提醒，不是買進訊號、不改候選狀態
         "confirm": [], "confirm_summary": None,
+        # 加碼條件還沒查（2026-11-03，第 18＋16 條）：可開或已持有（敘事不是「不要」）才有加碼這件事——深挖清單還沒查的
+        # 項目名；已持有沒有 v2 敘事＝十項都還沒查。等回落的價格叫醒、重開條件、只差已定價隨等回落退役，列上不再有那幾格
+        "addon_unchecked": (unchecked_items(brief.depth_check_map if v2 else None)
+                            if eff == "open" or (held_info is not None and eff != "pass") else []),
         # 是不是新賭注（Phase 7 Step 7.0e）：和持有的 alpha 檔共用的需求錨與層——只呈現，不進任何狀態判斷
         "shared_bet": shared_bet(company_id, ticker, held=held, bets=bets, registry=registry),
         "three_words": three_words(three_questions, brief, not_read=f"未讀到（{three_questions_note}）"
@@ -338,18 +356,18 @@ def derive_row(ticker: str, company_id: str | None, *, records: Sequence[Investo
         w = next((w for w in watches if w.get("watch_id") == cs.watch_id), None)
         row["watch"] = {"watch_id": cs.watch_id, "status": (w or {}).get("status", "不存在"),
                         "until": (w or {}).get("until"), "expires": (w or {}).get("expires")}
+        # 舊的等回落讀成可開，但那筆等待照舊有到期——結束了就叫重寫（重寫時寫不出等回落，舊紀錄就這樣自然換掉）
+        who = GROUP_LABELS.get(cs.state) or RETIRED_STATE_LABELS.get(cs.state, cs.state)
         if cs.watch_id not in row["rewrite_watch_ids"]:                       # 醒來／到期已由上面那條列過
             if w is None:
-                row["rewrite"].append(f"{GROUP_LABELS[cs.state]}在等的 watch {cs.watch_id} 不存在，該重寫")
+                row["rewrite"].append(f"{who}在等的 watch {cs.watch_id} 不存在，該重寫")
             elif w.get("status") == "active" and ew.past_expiry(w, today=today):
-                row["rewrite"].append(f"{GROUP_LABELS[cs.state]}在等的 watch 已過到期日 {w.get('expires')}"
-                                      "（daily 尚未標記），該重寫")
+                row["rewrite"].append(f"{who}在等的 watch 已過到期日 {w.get('expires')}（daily 尚未標記），該重寫")
             elif w.get("status") == "active" and w.get("kind") == "date" and _until_reached(w, today):
                 # 對稱面（寫入端 settle_due 兩種轉換都做）：date 已到 until、daily 還沒把它轉成 fired
-                row["rewrite"].append(f"{GROUP_LABELS[cs.state]}在等的日子 {w.get('until')} 已到"
-                                      "（daily 尚未標記），該重寫")
+                row["rewrite"].append(f"{who}在等的日子 {w.get('until')} 已到（daily 尚未標記），該重寫")
             elif w.get("status") != "active":
-                row["rewrite"].append(f"{GROUP_LABELS[cs.state]}在等的 watch 已 {w.get('status')}，該重寫")
+                row["rewrite"].append(f"{who}在等的 watch 已 {w.get('status')}，該重寫")
     # 敘事落後於讀圖與圖（ROADMAP「敘事 stale 計數器」①③，2026-10-29）：①騎的讀圖那一格現行已是另一份；
     # ③正文最後一次改動之後，圖上這家公司多了敘事沒讀過的邊（以邊為單位；比文件 id、直接引的網址與邊的逐字）。
     row["rewrite_rides"] = [
@@ -386,42 +404,12 @@ def derive_row(ticker: str, company_id: str | None, *, records: Sequence[Investo
     row["priced_since"] = (_priced_since_row(ticker, records, brief, three_questions=three_questions, today=today,
                                              own_history_at=own_history_at, bars_at=bars_at)
                            if own_history_at is not None and bars_at is not None else None)
-    # 等回落的價格叫醒（ROADMAP「等回落的價格叫醒」；failure log #116；2026-10-30 使用者照推薦定案）：錨只有一個＝
-    # **最後一次宣告已定價那天**（`judgment_version`——重新宣告就重設；首次等待日只印當脈絡、不叫醒）。收盤低於那天的收盤
-    # ＝已回落：`rewrite[]` 多一條、進 ⑤「敘事該重寫」重問——只叫醒，不判定、不給動作、不排序、不改候選狀態。
-    if cs.state == "priced_wait":
-        row["pulled_back"] = pulled_back(row["priced_since"])
-        # 重開條件（2026-11-01 使用者「兩點都照你建議吧」＝Q1 換成；failure log #124）：寫了可比對的重開條件，叫醒只看它——
-        # 達成才進 rewrite[]，回落本身不再叫醒（10-31 四次回落叫醒、四次重寫、零次改變）。沒寫（舊紀錄）與「不適用：」照 #116
-        # 的回落叫醒；沒寫的另進一次「沒寫重開條件」讓 drain 補寫。只比對、不判定、不改候選狀態、不給動作。
-        row["reopen"] = reopen_status(cs.reopen, row["priced_since"])
-        row["reopen_missing"] = cs.reopen is None
-        row["wake_by"] = "reopen" if (row["reopen"] or {}).get("machine") else "pulled_back"
-        if row["wake_by"] == "reopen":
-            if row["reopen"]["met"] is True:
-                row["rewrite"].append(reopen_met_reason(row["reopen"]))
-        elif row["pulled_back"]:
-            row["rewrite"].append(pulled_back_reason(row["priced_since"]))
-        if row["reopen_missing"]:
-            row["rewrite"].append(NO_REOPEN_REASON)
+    # 2026-11-03：等回落的價格叫醒（#116）、重開條件（#124）、只差已定價（#123）隨等回落併回可開一起退役——已定價是可開那一列
+    # 的脈絡（`priced_since` 照印），價格動了不再叫研究重寫；要不要等價格是使用者在短版 ③ 的選擇（看了沒買）。
     row["rewrite_words"] = rewrite_words(row["rewrite"])
     if row["group"] == "held":
         return row
     state = (edge or {}).get("state")
-    if cs.state == "priced_wait":
-        # 只差已定價（2026-11-01 使用者「你講的都算方向正確…可以直接改?」；failure log #123）：A1 第 4 點「已定價是脈絡不是
-        # 否決」，但等回落不進使用者的決策時刻——10-21 有三檔四個前提全過、只差這一格，沒有任何地方印出來。
-        # 這裡用**同一個** `open_preconditions` 假設改宣告可開再驗一次（不另寫一份；可開本身的路徑不動），加兩項它不查、
-        # 寫入端與分組本來就擋的：沒押讀圖、邊緣不是「邊緣」。只呈現：不改分組、不進 rewrite[]、不叫醒（可開為零就零）。
-        blocking = blocking_for_open(str(company_id), ticker, watches=watches, lifecycle=lifecycle,
-                                     brief_ids=brief_ids, current_brief=brief)
-        gaps = [] if brief.rides else [OPEN_GAP_NO_RIDES]
-        if state == "not_edge":
-            gaps.append(OPEN_GAP_NOT_EDGE)
-        elif state != "edge":
-            gaps.append(edge_note(edge))
-        row["open_gaps"] = gaps + open_preconditions(brief, reading_rows=reading_rows, three_questions=three_questions,
-                                                     blocking=blocking, breaks=breaks)
     if state == "not_edge":
         if not_edge_confirmed(edge):
             row.update(side="not_multiple", derived="not_multiple")
@@ -433,21 +421,21 @@ def derive_row(ticker: str, company_id: str | None, *, records: Sequence[Investo
                                "prior_inputs_as_of": prior.get("inputs_as_of") if prior else None,
                                "prior_absence": (edge or {}).get("prior_absence")}
         row["edge_note"] = not_edge_pending_note(edge)
-        if cs.state == "open":
+        if eff == "open":
             row.update(side="edge_unmeasurable", derived="edge_unmeasurable")
             return row
-        row.update(group=cs.state, derived=cs.state)
+        row.update(group=eff, derived=eff)
         return row
     if state != "edge":
-        # 缺輸入不放行（`alpha.edge`）——要擋的只有宣告可開的那一種；缺 X／等回落／不要照敘事分組、帶標記
+        # 缺輸入不放行（`alpha.edge`）——要擋的只有宣告可開的那一種；缺 X／不要照敘事分組、帶標記
         # （2026-10-30 使用者「好 改吧」：原本一律蓋掉宣告，敘事寫的 X 與「不要」的理由都被藏進這一組，L12）
         row["edge_note"] = edge_note(edge)
-        if cs.state == "open":
+        if eff == "open":
             row.update(side="edge_unmeasurable", derived="edge_unmeasurable")
             return row
-        row.update(group=cs.state, derived=cs.state)
+        row.update(group=eff, derived=eff)
         return row
-    if cs.state == "open":
+    if eff == "open":
         blocking = blocking_for_open(str(company_id), ticker, watches=watches, lifecycle=lifecycle,
                                      brief_ids=brief_ids, current_brief=brief)
         row["preconditions"] = open_preconditions(brief, reading_rows=reading_rows, three_questions=three_questions,
@@ -455,7 +443,7 @@ def derive_row(ticker: str, company_id: str | None, *, records: Sequence[Investo
         if row["preconditions"]:
             row.update(side="precondition_failed", derived="precondition_failed")
             return row
-    row.update(group=cs.state, derived=cs.state)
+    row.update(group=eff, derived=eff)
     return row
 
 
@@ -505,7 +493,7 @@ def _priced_since_row(ticker: str, records: Sequence[InvestorBrief], brief: Inve
                       three_questions: Mapping[str, Any] | None, today: date,
                       own_history_at: Callable[..., Mapping[str, Any]],
                       bars_at: Callable[[str, date], Sequence[tuple[date, float | None]]]) -> dict[str, Any] | None:
-    """判斷日的自家三年百分位 → 今天，與判斷日以來報酬（調整後收盤）；等回落另印起點（同一筆等待連續的最早一版）。
+    """判斷日的自家三年百分位 → 今天，與判斷日以來報酬（調整後收盤）。
     判斷日印日曆日；回算的截點與報酬基準一律用 `knowable_bar_day`（同一個函式，三處共用）。"""
     from engine_b import event_watch as ew
 
@@ -513,9 +501,7 @@ def _priced_since_row(ticker: str, records: Sequence[InvestorBrief], brief: Inve
     now = next((dict(r) for r in (three_questions or {}).get("priced_in") or () if r.get("key") == "own_history_pctile"),
                None)
     answer = brief.answers.priced_in if brief.answers else None
-    state = brief.candidate_state.state if brief.candidate_state else None
-    if answer not in ("yes", "no") and state != "priced_wait" \
-            and not (answer == "unmeasurable" and (now or {}).get("value") is not None):
+    if answer not in ("yes", "no") and not (answer == "unmeasurable" and (now or {}).get("value") is not None):
         return None                                    # 不會出列的不必回算（R2：40 份答量不到、147 次多餘取數）
     judged = judgment_version(records, brief)
     jday = judged.created_at.astimezone(tz).date()
@@ -526,24 +512,8 @@ def _priced_since_row(ticker: str, records: Sequence[InvestorBrief], brief: Inve
     except Exception:  # noqa: BLE001 — 報酬算不出來就不印報酬，百分位照印
         bars = []
     base_day = (date.fromisoformat(str(then["as_of"])[:10]) if source == "recorded" and then.get("as_of") else jcut)
-    wait = None
-    if state == "priced_wait":
-        start = stall_version(records, brief)
-        wday = start.created_at.astimezone(tz).date()
-        if wday != jday:
-            wcut = knowable_bar_day(start.created_at)
-            wthen, wsource = _then_row(ticker, start, wcut, own_history_at)
-            wbase = (date.fromisoformat(str(wthen["as_of"])[:10]) if wsource == "recorded" and wthen.get("as_of")
-                     else wcut)
-            wait = {"day": wday.isoformat(), "then": wthen, "then_source": wsource,
-                    "return": _return_between(bars, wbase, today)}
-    out = priced_since(ticker, brief, judged, judgment_day=jday.isoformat(), then=then, then_source=source, now=now,
-                       return_since=_return_between(bars, base_day, today), wait=wait)
-    if out is not None:
-        # 重開條件比的收盤（2026-11-01）：與「判斷日以來」同一條調整後收盤序列的最新一點；序列沒有就是 None（今天量不到）
-        last = _close_on_or_before(bars, today)
-        out["close_now"] = {"session_date": last[0].isoformat(), "close": last[1]} if last else None
-    return out
+    return priced_since(ticker, brief, judged, judgment_day=jday.isoformat(), then=then, then_source=source, now=now,
+                        return_since=_return_between(bars, base_day, today))
 
 
 def _until_reached(watch: Mapping[str, Any], today: date) -> bool:
@@ -561,9 +531,9 @@ def board_rewrite(rows: Sequence[Mapping[str, Any] | None], breaks: Sequence[Map
     ＋**沒有列帶著的**待重寫 watch（現行敘事已撤回、是 v1、或根本沒有敘事——那家公司不在板上或那一列不是 v2，
     watch 仍在 narrative_rewrite 段；3.6 覆核：只收現行 v2 列會讓它們在板上消失、audit 卻報「那一列沒帶著」）
     ＋騎舊讀圖（`kind=rides`，一份讀圖一筆）＋判讀變了／供給家數變了（`kind=reading_kind`／`supply_count`，一格一筆，2026-11-03）
-    ＋新邊沒讀（`kind=new_edges`，一家公司一筆、帶邊與要讀的文件）
-    ＋已回落（`kind=pulled_back`，一檔一筆、只帶錨那一天——每天變的 % 不進清單，2026-10-30）——
-    心跳 ⑤「敘事該重寫」讀這份清單的後三種，不自己再算（ROADMAP「敘事 stale 計數器」同源，2026-10-29）。"""
+    ＋新邊沒讀（`kind=new_edges`，一家公司一筆、帶邊與要讀的文件）——
+    心跳 ⑤「敘事該重寫」讀這份清單，不自己再算（ROADMAP「敘事 stale 計數器」同源，2026-10-29）。
+    已回落、重開條件達成、沒寫重開條件三種（`pulled_back`／`reopen_met`／`no_reopen`）2026-11-03 隨等回落退役。"""
     from engine_b.queue_segments import narrative_rewrite_state
 
     out = [{"kind": "link", **dict(b)} for b in breaks]
@@ -579,16 +549,6 @@ def board_rewrite(rows: Sequence[Mapping[str, Any] | None], breaks: Sequence[Map
                        for change in entry.get("changes") or () if change in BODY_BEHIND_KINDS)
         if (row or {}).get("rewrite_new_edges"):
             out.append({"kind": "new_edges", **who, "edges": [dict(e) for e in row["rewrite_new_edges"]]})
-        if (row or {}).get("pulled_back") and (row or {}).get("wake_by", "pulled_back") != "reopen":
-            # 等回落的價格叫醒（2026-10-30）：一檔一筆，只帶錨（最後一次宣告那天）——⑤ 讀這一種點名、drain 重問。
-            # 2026-11-01 起寫了可比對重開條件的列不再因回落叫醒（使用者照推薦：換成重開條件）
-            out.append({"kind": "pulled_back", **who, "judgment_day": (row.get("priced_since") or {}).get("judgment_day")})
-        if ((row or {}).get("reopen") or {}).get("met") is True:
-            # 重開條件達成（2026-11-01；failure log #124）：一檔一筆，只帶條件本身——⑤ 點名、drain 重問已定價
-            out.append({"kind": "reopen_met", **who, "condition": reopen_met_reason(row["reopen"])})
-        if (row or {}).get("reopen_missing") is True:
-            # 沒寫重開條件（舊紀錄）：一檔一筆——⑤ 點名、drain 補寫一版
-            out.append({"kind": "no_reopen", **who})
         for wid in (row or {}).get("rewrite_watch_ids") or ():
             carried.add(str(wid))
             state = narrative_rewrite_state(by_id.get(str(wid)) or {})

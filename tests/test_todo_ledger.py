@@ -40,7 +40,7 @@ def _vocabularies() -> dict[str, set[str]]:
         "dispatch": {str(d) if d else "none" for d in qs.DISPATCH_STATUSES},
         "hypothesis": set(hypotheses.HYPOTHESIS_STATUSES),
         "thesis": set(THESIS_STATUSES),
-        "candidate": set(GROUPS) | set(SIDE_GROUPS) | {"no_narrative", "priced_only"},
+        "candidate": set(GROUPS) | set(SIDE_GROUPS) | {"no_narrative"},
         "reading": set(READING_STATUSES),
         "story": set(STORY_GAP_KINDS),
         "admission_audit": set(admission_audit.AUDIT_STATES),
@@ -207,7 +207,7 @@ def test_kinds_the_ledger_does_not_own_are_not_counted_twice() -> None:
 
 
 @pytest.mark.parametrize("candidates, note", [
-    (None, "候選板未讀到——騎舊讀圖、判讀／家數變了、新邊沒讀、已回落、重開條件、前提失效沒算進來"),
+    (None, "候選板未讀到——騎舊讀圖、判讀／家數變了、新邊沒讀、前提失效沒算進來"),
     ({"counts": {}, "narrative_rewrite": [], "new_edges_check": {"status": "unavailable", "reason": "SystemExit"},
       "reading_change_check": {"status": "ok", "unchecked": 0}},
      "新邊沒讀這次沒算（候選板沒讀到圖）"),
@@ -312,13 +312,16 @@ def test_next_prompt_pushes_drain_only_on_progress_or_age() -> None:
     哪一檔離決定更近、最老不到 7 天 → 只剩維護，不推 drain；題材到期照提。"""
     quiet = tl.next_prompt(_ledger(semantic=(3, 0, 2), leads=(5, 0, 3)), theme_due=True)
     assert quiet.startswith("只剩維護") and "掃題材" in quiet and "未檢 3" in quiet and "待深挖 lead 5" in quiet
-    assert tl.next_prompt(_ledger(semantic=(3, 0, 2), narrative=(1, 1, 0))).startswith("`/research-drain`（進展：重開達成／已回落 1）")
+    assert tl.next_prompt(_ledger(semantic=(3, 0, 2), addon_unchecked=(1, 1, 0))).startswith(
+        "`/research-drain`（進展：加碼條件還沒查 1）")
+    # 2026-11-03（第 18＋16 條）：敘事該重寫不再是進展格（它的進展件數「重開達成／已回落」隨等回落退役）
+    assert tl.next_prompt(_ledger(semantic=(3, 0, 2), narrative=(1, 1, 0))).startswith("只剩維護")
     assert "進展：使用者 go 的工單 1" in tl.next_prompt(_ledger(leads=(2, 1, 1)))
     assert tl.next_prompt(_ledger(semantic=(3, 0, 8))).startswith("`/research-drain`（最老 8 天）")
     assert tl.next_prompt(_ledger(disproof_touched=(1, 1, None))).startswith(
         "`/research-drain`（反證觸及：48 小時內）（進展：反證觸及 1）")
-    # 進展格算不出（候選板讀不到 → 重開達成沒算）不是 0：照舊推（INV-3）
-    assert tl.next_prompt(_ledger(semantic=(3, 0, 2), narrative=(0, None, None))).startswith(
+    # 進展格算不出（候選板讀不到 → 加碼條件還沒查沒算）不是 0：照舊推（INV-3）
+    assert tl.next_prompt(_ledger(semantic=(3, 0, 2), addon_unchecked=(None, None, None))).startswith(
         "`/research-drain`（進展格算不出，照舊推）")
 
 
@@ -331,15 +334,16 @@ def test_the_snapshot_path_makes_the_same_call() -> None:
     assert tl.next_prompt({r.key: r.count for r in ledger}).startswith("`/research-drain`（進展格算不出")
 
 
-def test_collect_counts_reopen_met_and_approved_orders_as_progress() -> None:
+def test_retired_price_kinds_are_no_longer_counted_and_addon_rows_are_progress() -> None:
+    """2026-11-03（第 18＋16 條）：已回落、重開達成、沒寫重開三種隨等回落退役——候選板清單就算還帶著（舊板）也不數；
+    進展改由「加碼條件還沒查」那一格給（候選板讀不到＝None，不是 0）。"""
     reopen = {"kind": "reopen_met", "ticker": "AXTI", "company_id": "co:axt", "brief_id": "ib_1"}
-    rows = _collect(candidates=_board(reopen, dict(reopen, kind="no_reopen", ticker="X", company_id="co:x")))
-    assert rows["todo.narrative"].count == 2 and rows["todo.narrative"].progress == 1   # 沒寫重開是維護，不是進展
-    assert _collect(candidates=None)["todo.narrative"].progress is None
-    # 已回落（沒寫重開條件的舊紀錄的叫醒）同算進展；同一檔兩種都在只算一件
-    legacy = dict(reopen, kind="pulled_back", ticker="Y", company_id="co:y")
-    both = _collect(candidates=_board(reopen, legacy, dict(reopen, kind="pulled_back")))
-    assert both["todo.narrative"].progress == 2
+    rows = _collect(candidates=_board(reopen, dict(reopen, kind="no_reopen", ticker="X", company_id="co:x"),
+                                      dict(reopen, kind="pulled_back", ticker="Y", company_id="co:y")))
+    assert rows["todo.narrative"].count == 0
+    assert set(tl.PROGRESS_LABELS) == {"todo.disproof_touched", "todo.confirm_touched", "todo.addon_unchecked",
+                                       "todo.leads"}
+    assert _collect(candidates=None)["todo.addon_unchecked"].progress is None
     assert rows["todo.semantic"].progress == 0 and rows["todo.leads"].progress == 0
 
 

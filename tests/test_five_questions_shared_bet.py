@@ -217,7 +217,7 @@ def test_the_board_and_the_stock_page_carry_the_same_shared_bet(monkeypatch: pyt
                             registry=registry)
     assert page["row"]["shared_bet"] == board["shared_bet"]
     assert [r["ticker"] for r in board["shared_bet"]["rows"]] == ["PEER"]
-    assert board["group"] == "priced_wait"                                     # 候選狀態照宣告，不被它改（G1、G6）
+    assert board["group"] == "missing"                                         # 候選狀態照宣告，不被它改（G1、G6）
 
 
 def test_bet_structure_reads_the_structure_table_artifact_and_declares_when_it_cannot() -> None:

@@ -10,31 +10,31 @@ from webapp.contracts import STATE_KINDS, validate_state_artifact
 from webapp.materialize import build_candidates_artifact
 from webapp.store import StateArtifactStore
 
+#: 一列 11-03 前的等回落舊紀錄（candidates/7：讀成可開、`declared_retired` 照留當時的字；等回落那幾格已退役）
 _ROW = {"ticker": "AXTI", "company_id": "co:axt", "brief_id": "ib_x", "record_version": "investor-brief/v2",
-        "declared": "priced_wait", "declared_label": "已定價等回落", "derived": "priced_wait", "group": "priced_wait",
-        "side": None, "reason": "貴", "preconditions": [], "rewrite": [],
+        "declared": "open", "declared_label": "可開", "declared_retired": "priced_wait", "derived": "open",
+        "group": "open", "side": None, "reason": "貴", "preconditions": [], "rewrite": [],
         "edge": {"state": "edge", "label": "邊緣", "reasons": ["within_edge"], "market_cap_usd": 4.8e9, "analyst_count": 5,
                  "market_cap_label": "4.8B USD"},
         "held_source": None, "holdings_verified": True,
         "rides": [{"node": "mat:inp_substrate", "unit": "layer", "reading_id": "sr_x", "kind": "volume", "status": "current"}],
         "watch": {"watch_id": "ew_0148", "status": "active", "until": "2026-11-13", "expires": "2027-01-15"},
         "since": "2026-09-29T05:48:00+00:00", "stall_days": 0,
-        "pulled_back": False, "missing_kind": None, "document_requests": [],
-        # 只差已定價（2026-11-01；candidates/4）：邊緣、押量的讀圖現行、沒有待處置反證——假設改宣告可開，前提都成立
-        "open_gaps": [],
-        # 重開條件（2026-11-01；candidates/5）：舊紀錄沒寫——照回落叫醒、另進一次「沒寫重開條件」
-        "reopen": None, "reopen_missing": True, "wake_by": "pulled_back",
+        "missing_kind": None, "document_requests": [],
+        # 加碼條件還沒查（candidates/7）：深挖清單還沒查的項目
+        "addon_unchecked": ["讀到邊：客戶為什麼選它的變體"],
         "three_words": {"will_it_die": "黃（灰 1）", "priced_in": "是", "in_numbers": "是"}, "note": None}
 
 
 def fake_candidates_payload(holdings: dict | None = None) -> dict:
     board = {
         "today": "2026-09-29",
-        "groups": {"open": [], "missing": [], "priced_wait": [dict(_ROW)], "pass": [], "held": []},
+        "groups": {"open": [dict(_ROW)], "missing": [], "pass": [], "held": []},
         "side_groups": {"not_multiple": [], "edge_unmeasurable": [], "legacy": [], "precondition_failed": []},
-        "counts": {"open": 0, "missing": 0, "priced_wait": 1, "pass": 0, "held": 0, "not_multiple": 0,
-                   "edge_unmeasurable": 0, "legacy": 0, "precondition_failed": 0, "no_narrative": 2},
-        "oldest_stall_days": {"open": None, "missing": None, "priced_wait": 0},
+        "counts": {"open": 1, "missing": 0, "pass": 0, "held": 0, "not_multiple": 0,
+                   "edge_unmeasurable": 0, "legacy": 0, "precondition_failed": 0, "no_narrative": 2,
+                   "addon_unchecked": 1},
+        "oldest_stall_days": {"open": 0, "missing": None},
         "holdings": holdings if holdings is not None else {
             "status": "ok", "reason": None, "unresolved": ["7803.T"], "ignored": [], "ignored_problem": None,
             "beta_excluded": 3, "zero_shares": 0},
@@ -63,7 +63,7 @@ def test_candidates_is_a_registered_kind_and_the_payload_validates() -> None:
     assert "candidates" in STATE_KINDS
     payload = fake_candidates_payload()
     assert validate_state_artifact("candidates", payload) is payload
-    assert payload["counts"]["open"] == 0                              # 0 也印
+    assert payload["counts"]["missing"] == 0                           # 0 也印
     assert any("不是排序" in s for s in payload["this_is_not"])
 
 
@@ -99,7 +99,7 @@ def test_the_route_serves_the_artifact_verbatim(tmp_path) -> None:
     StateArtifactStore(tmp_path / "state").write(fake_candidates_payload())
     client = TestClient(create_app(tmp_path))
     body = client.get("/api/v1/candidates").json()
-    assert body["kind"] == "candidates" and body["groups"]["priced_wait"][0]["ticker"] == "AXTI"
+    assert body["kind"] == "candidates" and body["groups"]["open"][0]["ticker"] == "AXTI"
     missing = TestClient(create_app(tmp_path / "empty")).get("/api/v1/candidates")
     assert missing.status_code == 503 and "可開為 0" in missing.json()["error"]["note"]
 
@@ -172,7 +172,7 @@ def test_board_rides_get_node_names_from_the_graph_and_fall_back_to_ids(monkeypa
     board = {"groups": payload["groups"], "side_groups": payload["side_groups"]}
     monkeypatch.setattr(mat, "_graph_node_names", lambda ids: {"mat:inp_substrate": "Indium Phosphide (InP) substrate"})
     mat._attach_ride_node_names(board)
-    assert board["groups"]["priced_wait"][0]["rides"][0]["node_name"] == "Indium Phosphide (InP) substrate"
+    assert board["groups"]["open"][0]["rides"][0]["node_name"] == "Indium Phosphide (InP) substrate"
 
     fresh = fake_candidates_payload()
     board = {"groups": fresh["groups"], "side_groups": fresh["side_groups"]}
@@ -182,4 +182,4 @@ def test_board_rides_get_node_names_from_the_graph_and_fall_back_to_ids(monkeypa
 
     monkeypatch.setattr(mat, "_graph_node_names", down)
     mat._attach_ride_node_names(board)
-    assert "node_name" not in board["groups"]["priced_wait"][0]["rides"][0]
+    assert "node_name" not in board["groups"]["open"][0]["rides"][0]

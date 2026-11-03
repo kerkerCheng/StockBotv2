@@ -194,7 +194,9 @@ def settle_due(data: dict[str, Any], company_id: str, *, brief_ids: Iterable[str
 # 寫入後的 hook（由 `alpha/providers/briefs.py` 呼叫：append 之前先在副本上預演一次，append 之後正式跑；冪等）
 # ---------------------------------------------------------------------------
 
-#: 敘事「在等」的兩個候選狀態——只有這兩種的敘事有喚醒 watch（`wake_brief`）。
+#: 敘事「在等」的候選狀態——只有這兩種的敘事有喚醒 watch（`wake_brief`）。⚠ 2026-11-03 等回落併回可開：新紀錄寫不出
+#: 等回落（寫入端 ④⁰），`priced_wait` 只剩舊紀錄——它讀成可開，但當時建的喚醒 watch 照舊等到期、醒了叫重寫（重寫時寫不出
+#: 等回落，舊紀錄就這樣換掉），所以仍算「在等」：不是接不上的等待（`engine_b.todo_ledger.orphan_wake_briefs` 讀這一份）。
 WAITING_STATES = frozenset({"missing", "priced_wait"})
 
 

@@ -4,6 +4,9 @@
 舊版本點時回算、截點＝判斷日前一天（daily 05:30 才抓前一天收盤），回算不到照實寫量不到、**不拿今天的值頂替**（INV-6）；
 ③寫入端自動記下 `priced_at_write`、不收手寫、不進 id；④已定價那一格與候選理由的位置詞沒寫日期就拒收（只擋寫入，舊紀錄照讀）；
 ⑤答量不到而今天有值＝前提失效（對稱面），稽核行用寫入端那一份、不含相對組漲幅；⑥心跳與短版只印不判。
+
+⚠ 2026-11-03（盲點修法第 18＋16 條）等回落併回可開：`_rec` 預設造的是 11-03 前的等回落**舊紀錄**——讀的路徑照讀（讀成可開、
+判斷鍵照當時寫的字），心跳段 2 改印可開那幾檔的已定價脈絡；寫入端的測試改寫可開（新寫的等回落拒收，見 test_open_two_gates）。
 """
 from __future__ import annotations
 
@@ -47,11 +50,11 @@ REOPEN = {"text": "回到 70 以下或自家三年百分位 70 以下就重開�
 
 def _rec(*, at: datetime, state="priced_wait", watch_id="ew_wait", reason="寫入時第 88 百分位", priced=PRICED,
          answers=None, supersedes=None, evidence="graph://x", priced_at_write=None, bottleneck=None,
-         reopen=None) -> dict:
+         reopen=None, disproof=()) -> dict:
     slots = _slots(priced=priced, **({"bottleneck": bottleneck} if bottleneck else {}))
     slots["demand"]["evidence_refs"] = [evidence]
     rec = brief_record(company_id=CO, ticker=T, slots=slots, record_version=RECORD_VERSION_V2,
-                       rides=[{"node": "tech:x", "unit": "layer", "reading_id": READ}],
+                       rides=[{"node": "tech:x", "unit": "layer", "reading_id": READ}], disproof=list(disproof),
                        answers=answers or {"priced_in": "yes", "in_numbers": "yes"},
                        candidate_state={"state": state, "watch_id": watch_id, "reason": reason,
                                         **({"reopen": reopen} if reopen else {})},
@@ -123,9 +126,11 @@ def test_an_old_version_is_recomputed_at_the_day_before_the_judgment_and_marked_
     assert info["return_since"] == pytest.approx(77.85 / 90.0 - 1)             # 基準＝判斷日前一天最後一根
     assert "判斷日 10-15" in info["line"] and "回算" in info["line"] and "→ 今天 第 88.0" in info["line"]
     assert "−13.5%" in info["line"]
-    # 等回落起點（同一筆等待連續的最早一版）與判斷日不同 → 另印
-    assert info["wait_since"]["day"] == "2026-09-29" and "等回落自 09-29" in info["line"]
-    assert info["wait_since"]["return"] == pytest.approx(77.85 / 100.0 - 1) and calls[1] == date(2026, 9, 28)
+    # 2026-11-03：舊的等回落讀成可開——「等回落自…（同一筆等待）」那一段隨等回落退役，只回算判斷日那一次
+    assert "wait_since" not in info and "等回落" not in info["line"] and len(calls) == 1
+    # 讀成可開、走同一道起始門：這條舊鏈沒寫反證、四盞燈這裡沒給——起始門不過，進前提失效（不是靜默放行）
+    assert (row["declared"], row["declared_retired"], row["side"]) == ("open", "priced_wait", "precondition_failed")
+    assert any("沒寫反證" in p for p in row["preconditions"]) and any("fail closed" in p for p in row["preconditions"])
 
 
 def test_a_recorded_snapshot_wins_over_recomputing_and_its_bar_is_the_return_base() -> None:
@@ -146,7 +151,7 @@ def test_when_the_judgment_day_cannot_be_measured_today_is_never_used_in_its_pla
     assert "判斷日 10-15：自家三年 P/S 量不到（insufficient_evidence）" in line and "→ 今天 第 88.0" in line
 
 
-def test_only_yes_no_wait_or_unmeasurable_but_valued_today_get_a_line() -> None:
+def test_only_yes_no_or_unmeasurable_but_valued_today_get_a_line() -> None:
     brief = parse_brief_record(_rec(at=_at(10, 15), state="missing", watch_id="ew_wait",
                                     answers={"priced_in": "unmeasurable", "in_numbers": "yes"}))
     kw = dict(judgment_day="2026-10-15", then={"absence_kind": "insufficient_evidence"}, then_source="recomputed",
@@ -181,9 +186,16 @@ def _ctx(own=88.0):
     return ctx, wake["watch_id"]
 
 
+#: 新寫的可開要過起始門：反證已寫下且有到期（2026-11-03 第 18＋16 條）
+FRESH_DISPROOF = {"condition": "若 JX 在 2026-12-31 前宣布新產能投產則供給缺口消失，量的賭注不成立", "check_frequency": "每季",
+                  "action_48h": "重寫", "entities": [CO], "source": "self", "link_source_ref": None}
+
+
 def _fresh(watch_id, **kw) -> dict:
-    # 新寫入：2026-11-01 起等回落必帶重開條件（failure log #124），寫入端才不會先在這一格拒收
-    return _rec(at=datetime.now(timezone.utc), watch_id=watch_id, **{"reopen": REOPEN, **kw})
+    # 新寫入：2026-11-03 起寫不出等回落（併回可開）——寫可開、帶一條有到期的反證；理由照舊可寫（位置詞規則照驗）
+    expires = (date.today() + timedelta(days=200)).isoformat()
+    return _rec(at=datetime.now(timezone.utc), **{"state": "open", "watch_id": None, "reason": None,
+                                                  "disproof": ({**FRESH_DISPROOF, "expires": expires},), **kw})
 
 
 def test_the_writer_records_the_percentile_it_saw_and_it_does_not_change_the_id(tmp_path: Path) -> None:
@@ -250,57 +262,37 @@ def test_answering_unmeasurable_while_the_write_side_line_is_valued_today_breaks
 
 # ---- 心跳與短版 ----
 
-def _artifact(tmp_path: Path, wait_rows) -> Path:
+def _artifact(tmp_path: Path, open_rows) -> Path:
     import json
 
     state = tmp_path / "state"
     state.mkdir(parents=True)
     payload = {"schema_version": STATE_SCHEMA_VERSIONS["candidates"], "kind": "candidates",
                "generated_at": "2026-10-20T22:00:00+00:00",
-               "groups": {"priced_wait": wait_rows, "missing": []}, "side_groups": {}, "counts": {}}
+               "groups": {"open": open_rows, "missing": []}, "side_groups": {}, "counts": {}}
     (state / "candidates.json").write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
     return state
 
 
-def test_the_heartbeat_prints_zero_and_each_wait_row_and_the_short_line_keeps_dates_intact(tmp_path, monkeypatch) -> None:
+def test_the_heartbeat_prints_zero_and_each_open_row_with_its_priced_context(tmp_path, monkeypatch) -> None:
+    """2026-11-03 起心跳段 2 印可開那幾檔的已定價脈絡（取代等回落那一塊）；短版 ④ 的等回落小塊退役——
+    可開的已定價脈絡改在 ③ 可開待你選那幾行（test_open_two_gates）。"""
     from crons import heartbeat as hb
 
     row, _ = _derive(_chain())
     monkeypatch.setattr(hb, "_load_state", lambda state_dir, kind: (None, SimpleNamespace(reason="未讀到", kind="x"))
                         if state_dir is None else (__import__("json").loads((state_dir / "candidates.json")
                                                                             .read_text(encoding="utf-8")), None))
-    monkeypatch.setattr(ew, "load_watches", lambda: {"watches": []})
+    assert hb._open_priced_lines(None) == ["可開的已定價脈絡：未讀到（x）"]
     empty = _artifact(tmp_path / "a", [])
-    assert hb._priced_wait_lines(empty)[0].startswith("等回落 0") and hb.priced_wait_short_lines(empty, today=TODAY) == []
+    assert hb._open_priced_lines(empty)[0].startswith("可開 0 的已定價脈絡")
     full = _artifact(tmp_path / "b", [row])
-    lines = hb._priced_wait_lines(full)
-    assert lines[0].startswith("等回落 1") and lines[1].strip() == row["priced_since"]["line"]
+    lines = hb._open_priced_lines(full)
+    assert lines[0].startswith("可開 1") and lines[1].strip() == row["priced_since"]["line"]
     assert "記下 0｜回算 1" in lines[-1]
-    # 短版（2026-10-28 使用者核可的排版）：起點是**等回落起點**（09-29，同一筆等待），不是 10-15 的判斷日；百分位取整數
-    short = hb.priced_wait_short_lines(full, today=TODAY)
-    assert short[0] == "**等回落 1 檔**"
-    # 2026-10-30：10-20 收 77.85 低於最後宣告（10-15）那天的 90 → 標「已回落」（叫醒重問，不是動作）
-    # 2026-11-01（failure log #123）：押量的讀圖現行、沒有待處置反證、邊緣——可開前提都成立，多標「只差已定價」
-    # 2026-11-01（failure log #124）：這條鏈是舊紀錄、沒寫重開條件——照 #116 印已回落，另標「沒寫重開條件」
-    assert short[1] == (f"- AXTI：等 {row['stall_days']} 天｜百分位 87→88｜股價 −22.2%｜**已回落**｜沒寫重開條件"
-                        "｜**只差已定價**｜⚠ 沒有重看日（接不上的等待）")
-    assert short[-1].startswith("-# 百分位＝自家三年估值位置") and "收盤日 10-20" in short[-1]
-    assert "起點的值有回算的" in short[-1]
     for word in ("該", "燈", "買", "賣"):
-        assert word not in "\n".join(short)
-    # 判斷日（10-15 改判）那天的百分位跟等回落起點不同時，短版仍從起點算（10-28 真實的華星光：判斷日 79.7、起點 89.4）
-    import copy
-
-    moved = copy.deepcopy(row)
-    moved["priced_since"]["then"] = {**moved["priced_since"]["then"], "value": 79.7}
-    assert "百分位 87→88" in hb.priced_wait_short_lines(_artifact(tmp_path / "c", [moved]), today=TODAY)[1]
-    # 重看日：三天內加粗、過了標 ⚠、更遠照印；名字由呼叫端給（名冊）
-    for until, expected in (("2026-10-23", "**10-23 重看**"), ("2026-10-20", "**⚠ 重看日 10-20 已過**"),
-                            ("2026-11-14", "｜11-14 重看")):
-        monkeypatch.setattr(ew, "load_watches", lambda u=until: {"watches": [
-            {"watch_id": "ew_w", "status": "active", "wake_brief": CO, "until": u}]})
-        got = hb.priced_wait_short_lines(full, today=TODAY, label=lambda r: f"AXT {r['ticker']}")[1]
-        assert got.startswith("- AXT AXTI：") and got.endswith(expected), got
+        assert word not in "\n".join(lines)
+    assert not hasattr(hb, "priced_wait_short_lines") and not hasattr(hb, "_priced_wait_lines")
 
 
 # ---- R2（2026-10-21）的條件 ----
@@ -314,11 +306,6 @@ def test_a_version_written_before_the_daily_run_only_knew_the_bar_before_yesterd
     early = _rec(at=datetime(2026, 10, 16, 16, 38, tzinfo=timezone.utc))
     row, calls = _derive([parse_brief_record(early)])
     assert row["priced_since"]["judgment_day"] == "2026-10-17" and calls[0] == date(2026, 10, 15)
-
-
-def test_the_wait_start_says_it_was_recomputed_and_from_which_close() -> None:
-    row, _ = _derive(_chain())
-    assert "等回落自 09-29（同一筆等待）：第 86.8（09-28 收盤，回算）" in row["priced_since"]["line"]
 
 
 def test_a_transient_unreadable_snapshot_falls_back_to_recomputing() -> None:
@@ -348,32 +335,21 @@ def test_no_basis_on_either_side_prints_no_none() -> None:
     out = priced_since(T, brief, brief, judgment_day="2026-10-15", then={"absence_kind": "inputs_incompatible"},
                        then_source="recomputed", now={"absence_kind": "inputs_incompatible"}, return_since=None)
     assert "None" not in out["line"] and "自家三年 量不到" in out["line"]
-# ---- 等回落的價格叫醒（ROADMAP「等回落的價格叫醒」；failure log #116；2026-10-30 使用者照推薦定案） ----
 
-def test_a_close_below_the_last_declaration_wakes_the_wait_and_a_redeclaration_resets_the_anchor() -> None:
-    """錨只有一個＝最後一次宣告已定價那天（10-15 改判）。收盤低於那天的收盤 → `pulled_back`、`rewrite[]` 多一條（句子不帶 %：
-    天天變的數字不進認知指紋）、整板清單多一筆 kind=pulled_back（只帶錨那一天）、counts 多一格；重新宣告後錨重設——比首次等待
-    （09-29）低、比最後宣告高就不醒，首次等待以來的 % 只當脈絡；bars 沒給＝沒算（None），不是沒回落；不是等回落的列一律 None。"""
-    from alpha.candidates import PULLED_BACK_PREFIX, assemble_board, pullback_counts
+
+# ---- 等回落的價格叫醒（failure log #116，2026-10-30）——2026-11-03 隨等回落併回可開退役 ----
+
+def test_a_close_below_the_last_declaration_no_longer_wakes_anything() -> None:
+    """已定價不擋可開（第 18＋16 條），價格動了不再叫研究重寫：收盤低於最後宣告那天（10-14 收 90 → 10-20 收 77.85）——
+    `rewrite[]` 不多一條、整板清單沒有已回落／重開那三種、counts 沒有 `priced_wait_*`；判斷日以來照印（脈絡，不是叫醒）。"""
+    from alpha.candidates import assemble_board
     from alpha.providers.candidates import board_rewrite
 
-    row, _ = _derive(_chain())                                   # 10-14 收 90 → 10-20 收 77.85：低於最後宣告那天
-    assert row["pulled_back"] is True
-    assert [r for r in row["rewrite"] if r.startswith(PULLED_BACK_PREFIX)] == [
-        f"{PULLED_BACK_PREFIX}：收盤低於最後一次宣告已定價那天（10-15）的收盤，重問已定價"]
-    assert "已回落" in row["rewrite_words"]
-    listed = [b for b in board_rewrite([row], []) if b["kind"] == "pulled_back"]
-    assert listed == [{"kind": "pulled_back", "ticker": T, "company_id": CO, "brief_id": row["brief_id"],
-                       "judgment_day": "2026-10-15"}]
+    row, _ = _derive(_chain())
+    assert row["priced_since"]["return_since"] < 0 and "判斷日以來 −13.5%" in row["priced_since"]["line"]
+    assert not any("已回落" in r or "重開" in r for r in row["rewrite"])
+    assert not {"pulled_back", "reopen", "reopen_missing", "wake_by", "open_gaps"} & set(row)
+    listed = board_rewrite([row], [])
+    assert not [b for b in listed if b["kind"] in ("pulled_back", "reopen_met", "no_reopen")]
     board = assemble_board([row], universe=[T], held=HELD_NONE, narrative_rewrite=listed)
-    assert board["counts"]["priced_wait_pulled_back"] == 1 and board["counts"]["priced_wait_unknown"] == 0
-    # 重新宣告（10-15 改判）後錨重設：比 09-29 首次等待的 100 低、比 10-14 的 90 高 → 不醒
-    row, _ = _derive(_chain(), bars=[(date(2026, 9, 28), 100.0), (date(2026, 10, 14), 90.0), (date(2026, 10, 20), 95.0)])
-    assert row["pulled_back"] is False and not any(r.startswith(PULLED_BACK_PREFIX) for r in row["rewrite"])
-    assert row["priced_since"]["wait_since"]["return"] < 0 < row["priced_since"]["return_since"]
-    # bars 沒給＝沒算，不是沒回落
-    row, _ = _derive(_chain(), bars=[])
-    assert row["pulled_back"] is None and pullback_counts([row]) == {"pulled_back": 0, "unknown": 1}
-    # 缺 X 也會跌，但它不在等價格——一律 None
-    row, _ = _derive([parse_brief_record(_rec(at=_at(10, 15), state="missing", watch_id="ew_wait"))])
-    assert row["group"] == "missing" and row["pulled_back"] is None
+    assert not [k for k in board["counts"] if k.startswith("priced_wait")]

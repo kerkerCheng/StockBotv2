@@ -91,10 +91,10 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 ```
 
 **Discord 送的是短版**（2026-10-07 使用者：「心跳太雜」；`crons/daily_brief.py`）：① lead 抓了什麼 ② 市場大事
-（這兩塊是 ⑪c 的 TL;DR，沒產生就退回程式組的來源計數與雷達收據原文）③ 待你決定（pq2 編號之前先列「只差已定價」——等回落裡
-可開的機械前提都成立、只剩價格判斷的檔，沒有編號、不進批次指令；2026-11-03 盲點修法 §1 第 3 條）④ 狀態與健康度（**每天都印**：daily 步數、
+（這兩塊是 ⑪c 的 TL;DR，沒產生就退回程式組的來源計數與雷達收據原文）③ 待你決定（pq2 編號之前先列「可開 N 檔待你選」——起始門過了、
+這一版敘事還沒選過的可開，沒有編號、不進批次指令；2026-11-03 盲點修法第 18＋16 條，取代同日 §1 第 3 條的「只差已定價」）④ 狀態與健康度（**每天都印**：daily 步數、
 較昨變動、候選各格與最老滯留、watch 今日、反證與加碼條件、無到期的等待、新點名；同日使用者：「基本重要的 status 還是要印」）
-⑤ 下一次研究——**歸零＝不漏球的唯一清單**（2026-10-22 起由 `engine_b/todo_ledger.py` 組：十八格、工作量與最老天數、0 的格列名字、
+⑤ 下一次研究——**歸零＝不漏球的唯一清單**（2026-10-22 起由 `engine_b/todo_ledger.py` 組：格數見 `LEDGER`、工作量與最老天數、0 的格列名字、
 讀不到另列；最後一行「下一步貼」由計數機械導出，全 0 時寫「今天沒有要貼的」）。每一種狀態落在哪一格（或為什麼不是研究待做）
 登記在同一檔的 `COVERAGE`，`tests/test_todo_ledger.py` 守著：新增狀態沒登記就紅。數字與心跳同一份快照、同一批函式；每一塊、④ 的每一行各自降級。
 ① 的「新進」窗從上一次心跳起算（`engine_b.digest.window_start`；讀不到或超過 72 小時才退回 26 小時）。
@@ -132,6 +132,16 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 | **3 最窄 rule** | daily argv 不變；不新增 step、allowlist、rule；`record_trade` 在 `.claude/**`（tracked）、`.codex/**`、`crons/**`、`config/**` 仍 0 命中（`crons/daily_brief.py` 只 import 讀者 `portfolio.looked_log`，不碰寫入入口）；APP 不動；`.codex/rules` 仍 0 條。⚠ 使用者本機 gitignored 的 `Bash(python *)` 一樣涵蓋這個子入口（見 5.3 那一節，本項不改權限檔） |
 | **4 contract test** | 新 `tests/test_looked_log.py` 6 條：寫入端拒收缺理由、缺敘事版本、「進」與不在字彙的選擇、解析不到的公司；append-only（壞行、重複都報、多一欄被拒＝不收尺寸）；計數只數帶收據的買進與當月；`short_line` 讀兩本；`record_trade.py looked` 預設不寫、`--apply` 寫一列且收據 `side`＝看了沒買、Sheet 0 寫、重跑不重寫、trade_log 不建檔；beta／空理由／沒敘事拒收（exit 2／2／4）。`tests/test_daily_digest.py` 候選板讀不到時那一行照印。變異 11／11 紅 |
 | **5 端到端 smoke** | 沒有真實寫入：looked_log 是 append-only authority，第一筆由使用者的選擇觸發。11-03 真資料只讀：短版 ④ 印「你的決定 11 月：進 0｜不要 0｜等到條件 0」 |
+
+### Sandbox impact review 結論（2026-11-03：可開分起始與加碼兩道門——等回落併回可開、短版 ③「可開待你選」、⑤「加碼條件還沒查」；盲點修法 plan 2026-11-02-001 §6 第 18＋16 條）
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | daily ⑬ materialize 與 ⑱ 心跳（argv 都不變）。⑬ 寫的 `candidates` artifact 升 `candidates/7`（`groups` 少 `priced_wait`、列多 `addon_unchecked`／`declared_retired`）、序列 `candidate_state_series.jsonl` 每行的 `priced_only` 換成 `addon_unchecked`（同一檔、同一路徑，舊行照留）。⑱ 短版 ③ 開頭多「可開 N 檔待你選」、完整心跳待你決定那一段多一行，讀既有 `candidates` artifact＋第 17 條已在讀的 `library/trades/looked_log.jsonl`（唯讀）；⑤ 多一格「加碼條件還沒查」（同一份 artifact）；狀態塊少「等回落（已回落）」那一行。不新增檔案、主機、憑證、不寫任何 authority。**互動寫入面**：`alpha brief --add` 的 spec 多收選填 `depth_check`、拒收新的 `priced_wait`——同一個入口、同一個檔 |
+| **2 canonical skill／prompt／本檔** | AGENTS 兩句（「讀到邊是加碼的門」「候選狀態四值＋起始門」；使用者 11-03「Ok 做完吧」核准 plan §6 逐字 diff）；ARCHITECTURE `candidates` kind 與 v2 契約；CONCEPTS「起始門與加碼條件」；`skills/research-drain` 段 5、`skills/daily-brief` ③、`skills/alpha-status`；研究 packet 的 `brief_frame`（`alpha/models/session_assessor.py`：候選狀態三值、`depth_check` 範例）——只給互動研究 session 讀，無人值守 prompt 不動 |
+| **3 最窄 rule** | daily argv 不變；不新增 step、allowlist、rule；`.codex/rules` 仍 0 條。APP 仍沒有寫入端點（請求路徑只讀 artifact）。⚠ 長駐的 serve（8790）對 `/7` artifact 回 503 直到重啟——升版當天 materialize 後重啟一次（見「契約升版」） |
+| **4 contract test** | 新 `tests/test_open_two_gates.py`：起始門四項各自擋（會死嗎紅、四盞全灰 fail closed、押 neither、沒反證）、判不出可開、寫入端拒收新的等回落與舊紀錄照讀成可開、`depth_check` 只在有寫時進 id、加碼條件指得到 `confirm[]`、⑤ 那一格（持股讀不到＝None、舊板沒有那一格＝說沒算）、短版 ③ 選過的不再列；圖頁三區「押得下去」不收判不出（`BETTABLE_READING_KINDS` 與起始門分開，L12）；成績單退役字照當時的字分組 |
+| **5 端到端 smoke** | 11-03 真資料 `materialize --tracked --registry-listed --candidates`（197／197）→ `candidates/7`：可開 1（STLTECH.NS，舊等回落讀成可開、過了起始門）／缺 X 37／不要 46／已持有 2／前提失效 3（3081.TWO、4979.TWO、AXTI：擋住的都是醒來待判的反證 watch）／加碼條件還沒查 2（STLTECH.NS、SIVE.ST）；序列 11-03 那一行換成新門值。`--positions` 重跑：paper 137 列的「現在」沒有 priced_wait（可開 4），錨點照留當時的字（priced_wait 3）。APP 重啟後 health `code.stale=false`；headless Edge 渲染首頁（「可開（1）」）、STLTECH.NS 個股頁、成績單（「已定價等回落（11-03 前的說法，現讀成可開）」3 檔另成一組）、圖頁（押得下去 22、還判不出 40——判不出沒有跑進押得下去）都沒有錯誤框 |
 
 ### Sandbox impact review 結論（2026-11-03：neither 也要付「換得掉」的證據＋追蹤表騎在 neither 層上那一行；盲點修法 plan 2026-11-02-001 §2 第 12 條）
 

@@ -93,7 +93,11 @@ STATE_SCHEMA_VERSIONS: dict[str, str] = {
     # `_reopen_not_computed`；清單多 `kind=reopen_met`、`kind=no_reopen`；寫了可比對重開條件的列不再出 `kind=pulled_back`。
     # /6（2026-11-03 敘事 stale ②④）：列多 `rewrite_reading_changes`／`reading_change_unchecked`，清單多
     # `kind=reading_kind`／`supply_count`，板多 `reading_change_check`。
-    "candidates": "stockbot-app/candidates/6",
+    # /7（2026-11-03 盲點修法第 18＋16 條：可開分起始與加碼兩道門）：`groups` 少 `priced_wait`（舊的等回落讀成可開）；列少
+    # `pulled_back`／`open_gaps`／`reopen`／`reopen_missing`／`wake_by`，多 `declared_retired`（當時寫的退役字）、
+    # `addon_unchecked`（深挖清單還沒查的項目）；counts 少 `priced_wait_*`、多 `addon_unchecked`；清單少
+    # `kind=pulled_back`／`reopen_met`／`no_reopen`。舊 /6 的形狀照它讀不對，所以升版（舊 artifact 讀成不可用，重跑 materialize）。
+    "candidates": "stockbot-app/candidates/7",
     # 2026-10-07（個股頁 plan S4b）：層說明的純文字閱讀頁——ledger 全文、出處與文件自宣告、每條主張的 watch 狀態、
     # 哪幾頁連過來 → 9。不做版面與示意圖（S5）。
     "layer_notes": "stockbot-app/layer_notes/1",

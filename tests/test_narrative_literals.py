@@ -2,7 +2,8 @@
 
 守的事：①敘事任何一格與候選理由寫死燈色（「現金跑道紅燈」）寫入端拒收——燈每天重算、首屏另有一行；只擋寫入，舊紀錄照讀；
 「開綠燈」這種核准的意思不擋（L16）。②已定價那一格寫收盤價只印不擋（寫入結果帶 notices）。③故事也不准寫死燈色。
-④深挖清單：沒給、缺幾項、「不適用：理由」算答了、「缺：…」算沒答、不認得的鍵另列。
+④深挖清單：沒給、缺幾項、「不適用：理由」算查過、「缺：…」算沒查、不認得的鍵由契約擋（2026-11-03 第 18＋16 條起是
+  加碼條件、存進敘事——完整規則見 test_open_two_gates）。
 """
 from __future__ import annotations
 
@@ -15,7 +16,7 @@ import pytest
 from alpha.errors import ContractViolation
 from alpha.narrative import RECORD_VERSION_V2, brief_record, parse_brief_record
 from alpha.narrative.contracts import lamp_colour_claims, price_quote_claims
-from alpha.narrative.depth_check import DEPTH_CHECK_KEYS, depth_check_gaps, depth_check_lines
+from alpha.narrative.depth_check import DEPTH_CHECK_KEYS, depth_check_lines, depth_check_problems, unchecked_items
 from alpha.narrative.story import story_problems
 from alpha.providers.briefs import WriteContext, write_brief
 from engine_b import event_watch as ew
@@ -119,18 +120,18 @@ def test_a_story_with_a_lamp_colour_is_refused_and_the_fact_passes() -> None:
 
 # ---- ④ 深挖清單 ----
 
-def test_no_depth_check_on_an_open_narrative_says_so() -> None:
+def test_no_depth_check_says_the_addon_cell_will_count_it() -> None:
     (line,) = depth_check_lines(None)
-    assert "沒有深挖清單" in line and "只印、不擋" in line
+    assert "沒有深挖清單" in line and "加碼條件還沒查" in line
 
 
-def test_missing_items_are_listed_and_not_applicable_counts_as_answered() -> None:
+def test_unchecked_items_are_listed_and_not_applicable_counts_as_checked() -> None:
     given = {k: "library/raw/x.txt" for k in DEPTH_CHECK_KEYS}
     given["latest_call"] = "不適用：公司不辦法說"
     given["core_premise"] = "缺：只有供應商自述"
-    given["typo_key"] = "x"
-    missing, unknown = depth_check_gaps(given)
-    assert missing == ["所押讀圖的核心前提有供應商自述以外的證據（L8）"] and unknown == ["typo_key"]
-    lines = depth_check_lines(given)
-    assert "還缺 1 項" in lines[0] and "不認得的鍵" in lines[1]
-    assert depth_check_lines({k: "sr_" + "c" * 16 for k in DEPTH_CHECK_KEYS}) == ["  ✓ 深挖清單 10 項都答了"]
+    assert unchecked_items(given) == ["所押讀圖的核心前提有供應商自述以外的證據（L8）"]
+    assert "加碼條件還沒查 1 項" in depth_check_lines(given)[0]
+    assert depth_check_problems({**given, "typo_key": "x"}, confirm_count=0) == [
+        "depth_check 有不認得的鍵：['typo_key']（鍵見 alpha.narrative.depth_check）"]
+    assert depth_check_lines({k: "sr_" + "c" * 16 for k in DEPTH_CHECK_KEYS}) == [
+        "  ✓ 深挖清單 10 項都查過（引用 10｜不適用 0｜加碼條件 0）"]

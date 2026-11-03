@@ -15,7 +15,7 @@ from pathlib import Path
 
 from starlette.testclient import TestClient
 
-from alpha.candidates import GROUP_LABELS, PAPER_STATE_EXITS
+from alpha.candidates import GROUP_LABELS, PAPER_STATE_EXITS, RETIRED_STATE_LABELS
 from alpha.narrative.contracts import CANDIDATE_STATES_DECLARABLE
 from webapp.api import create_app
 from webapp.materialize import write_vocabularies
@@ -39,6 +39,7 @@ PAPER = [
     _paper_row("DDD", "missing", "legacy_v1", None),
     _paper_row("EEE", "weird_state", "pass", 0.0),
     _paper_row("FFF", None, "retracted", None),
+    _paper_row("GGG", "priced_wait", "open", 0.05),       # 11-03 前宣告的等回落（退役字）：照當時的字分組
 ]
 
 
@@ -77,13 +78,17 @@ def test_claims_partition_every_paper_row_and_the_declared_four_always_print(tmp
     body = _client(tmp_path).get("/api/v1/report-card").json()
     claims = body["claims"]
     keys = [c["key"] for c in claims]
-    assert keys[:4] == list(CANDIDATE_STATES_DECLARABLE)                      # 宣告得出的四種在前，0 也印
-    assert [c["label"] for c in claims[:4]] == [GROUP_LABELS[k] for k in CANDIDATE_STATES_DECLARABLE]
+    n = len(CANDIDATE_STATES_DECLARABLE)
+    assert keys[:n] == list(CANDIDATE_STATES_DECLARABLE)                      # 宣告得出的三種在前，0 也印
+    assert [c["label"] for c in claims[:n]] == [GROUP_LABELS[k] for k in CANDIDATE_STATES_DECLARABLE]
     by = {c["key"]: c for c in claims}
     assert by["open"]["n"] == 0 and by["open"]["rows"] == []                 # 我們沒說過可開＝0，不是沒資料
     assert sorted(t for c in claims for t in (r["ticker"] for r in c["rows"])) == sorted(r["ticker"] for r in PAPER)
     assert "weird_state" in by and by["weird_state"]["declared"] is False    # 字彙外：照列，不消失
     assert by["unrecorded"]["rows"][0]["ticker"] == "FFF"                     # 沒記下：自己一組
+    # 退役字（2026-11-03 第 18＋16 條）：當時說等回落就照等回落分組、印當時的字（INV-6），「現在」照今天的讀法
+    assert by["priced_wait"]["label"] == RETIRED_STATE_LABELS["priced_wait"] and by["priced_wait"]["declared"] is False
+    assert by["priced_wait"]["rows"][0]["current_label"] == GROUP_LABELS["open"]
     assert by["pass"]["n"] == 2 and by["pass"]["measured"] == 2
     assert by["missing"]["n"] == 2 and by["missing"]["measured"] == 1
 
@@ -152,7 +157,7 @@ def test_missing_pieces_are_absences_and_missing_positions_is_503(tmp_path) -> N
 def test_without_the_vocabulary_groups_follow_the_data_and_say_why(tmp_path) -> None:
     body = _client(tmp_path, vocab=False).get("/api/v1/report-card").json()
     assert body["claims_absence"]["kind"] == "vocabulary_unavailable"
-    assert {c["key"] for c in body["claims"]} == {"pass", "missing", "weird_state", "unrecorded"}   # 0 的組這次不印
+    assert {c["key"] for c in body["claims"]} == {"pass", "missing", "weird_state", "unrecorded", "priced_wait"}  # 0 的組這次不印
     assert sum(c["n"] for c in body["claims"]) == len(PAPER)
 
 

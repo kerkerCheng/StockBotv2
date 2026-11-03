@@ -273,11 +273,12 @@ def cmd_brief(args: argparse.Namespace) -> int:
     - `--add spec.json`：append 一筆 v2。spec：`{"slots": {"demand": {"text": …, "evidence_refs": […]}, …},
       "rides": […], "disproof": […], "answers": {…}, "candidate_state": {…}, "history_not_comparable": null,
       "acknowledged_touched": […], "confirm": […], "supersedes_id": …, "note": …}`（形狀見 `python -m alpha research <T>` packet 的
-      `brief_frame.spec_shape`）。選填 `"depth_check": {…}`（宣告可開前的深挖清單，鍵見 `alpha.narrative.depth_check`；
-      **只在宣告可開時印出還缺哪幾項、不擋、不存檔**，2026-10-31 failure log #119）。選填 `"restates": "<brief_id>"`：
+      `brief_frame.spec_shape`）。選填 `"depth_check": {…}`（深挖清單，鍵與四種寫法見 `alpha.narrative.depth_check`；
+      2026-11-03 第 18＋16 條起是**加碼條件**、**存進敘事**（有寫才進 id，之前的紀錄 id 不變）——可開或已持有的檔還沒查的
+      項目 ⑤「加碼條件還沒查」會數；宣告可開或有寫清單時印一行還缺哪幾項）。選填 `"restates": "<brief_id>"`：
       只改字面值的換版宣告重述哪一版——判斷日與正文版沿用那一版，不因改字歸零（failure log #121；寫入端核對是同一條鏈上的
       祖先、候選狀態與 answers 都沒變）。
-      寫入當下檢查讀圖現行、供給側、watch、answers、可開前提，不過就整筆拒收並逐條說明；
+      寫入當下檢查讀圖現行、供給側、watch、answers、可開的起始門，不過就整筆拒收並逐條說明；
       通過後 `disproof[]` 自動登記成語意 watch（已在盯的只連結）、`confirm[]`（加碼條件，Phase 7 Step 7.0d）各登記一筆
       `condition_role=confirm` 的語意 watch、舊版還 active 的 `brief:` watch 收掉。
     - `--retract <id>`：append 一筆撤回紀錄（沿用被撤那筆的版本；撤回 v2 只收它登記、還 active 的 watch）。
@@ -316,7 +317,8 @@ def cmd_brief(args: argparse.Namespace) -> int:
                     answers=spec.get("answers"), candidate_state=spec.get("candidate_state"),
                     history_not_comparable=spec.get("history_not_comparable"),
                     acknowledged_touched=spec.get("acknowledged_touched") or (),
-                    confirm=spec.get("confirm") or (), restates=spec.get("restates"))
+                    confirm=spec.get("confirm") or (), restates=spec.get("restates"),
+                    depth_check=spec.get("depth_check"))
             except (KeyError, ValueError, TypeError, AlphaError) as exc:
                 print(f"✗ 短評不合法：{exc}", file=sys.stderr)
                 return 2
@@ -334,7 +336,8 @@ def cmd_brief(args: argparse.Namespace) -> int:
                       "history_not_comparable": (target.history_not_comparable.as_dict()
                                                  if target.history_not_comparable else None),
                       "acknowledged_touched": [a.as_dict() for a in target.acknowledged_touched],
-                      "confirm": [c.as_dict() for c in target.confirm]}
+                      "confirm": [c.as_dict() for c in target.confirm],
+                      "depth_check": dict(target.depth_check) or None}
             record = brief_record(
                 company_id=target.company_id, ticker=ticker,
                 slots=[{"key": s.key, "text": s.text, "evidence_refs": list(s.evidence_refs)} for s in target.slots],
@@ -355,8 +358,9 @@ def cmd_brief(args: argparse.Namespace) -> int:
               f"｜加碼條件新登 {len(result.get('confirm_registered') or ())}")
         for notice in result.get("notices") or ():
             print(f"  ⚠ {notice}")
-        # 宣告可開前的深挖清單（2026-10-31，failure log #119）：spec 的 `depth_check` 只在這裡讀、不進紀錄——只印、不擋
-        if args.add and ((spec.get("candidate_state") or {}).get("state")) == "open":
+        # 深挖清單（2026-10-31 failure log #119；2026-11-03 起是加碼條件、存進敘事）：宣告可開或有寫清單就印還缺哪幾項——
+        # 只印；形狀不合由契約擋、引用指不回由寫入端擋
+        if args.add and (((spec.get("candidate_state") or {}).get("state")) == "open" or spec.get("depth_check")):
             from .narrative.depth_check import depth_check_lines
 
             for line in depth_check_lines(spec.get("depth_check")):

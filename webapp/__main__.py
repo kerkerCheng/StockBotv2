@@ -214,7 +214,7 @@ def cmd_materialize(args: argparse.Namespace) -> int:
         else:
             c = payload["counts"]
             print(f"✓ candidates → {path.name}（{path.stat().st_size:,} bytes；"
-                  f"可開 {c.get('open')}／缺 X {c.get('missing')}／等回落 {c.get('priced_wait')}／不要 {c.get('pass')}"
+                  f"可開 {c.get('open')}／缺 X {c.get('missing')}／不要 {c.get('pass')}"
                   f"／已持有 {'未驗' if c.get('held') is None else c.get('held')}／無敘事 {c.get('no_narrative')}）")
     # 層說明閱讀頁（個股頁 plan S4b）：同樣放在單檔之後——「哪幾頁連過來」只列這個 store 真的有的個股頁。各自 fail-soft。
     if getattr(args, "layer_notes", False) and as_of is not None:

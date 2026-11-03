@@ -208,9 +208,7 @@ def _card_overview(view: Mapping[str, Any], inputs: Mapping[str, Any] | None) ->
         "rewrite": len(row.get("rewrite") or ()) if row else None,
         # 為什麼該重寫的幾個字（2026-10-29：卡片只印「敘事該重寫 2」使用者問「為啥」）——分類在 `alpha.candidates.rewrite_words`
         "rewrite_words": list(row.get("rewrite_words") or ()) if row else None,
-        # 只差已定價（2026-11-01；failure log #123）：等回落列假設改宣告可開時前提都成立——產生端給布林，畫面照印晶片；
-        # 列上沒有 open_gaps 清單（不是等回落、舊 artifact）＝None，不是 False
-        "priced_only": (row.get("open_gaps") == []) if isinstance(row.get("open_gaps"), list) else None,
+        # ⚠ 2026-11-03（盲點修法第 18＋16 條）：「只差已定價」那一格隨等回落併回可開退役
         "spark": [{"session_date": r["session_date"], "close": r["close"]} for r in series[-CARD_SPARK_SESSIONS:]],
         "move": move,
     }
@@ -693,15 +691,16 @@ def materialize(ticker: str, *, as_of: date | None = None, scenario: str | None 
 
 def reading_zones() -> list[dict[str, Any]]:
     """「圖」頁的三區（2026-10-28 使用者照推薦；brainstorm `2026-10-28-app-attention-ia.md` 定案 6：骨架＝層）。
-    「押得下去」＝候選「可開」騎得上的那兩種判讀（`alpha.providers.briefs.OPEN_READING_KINDS`——同一句話只有一份，L16）；
+    「押得下去」＝讀圖判這一層換不掉或量的那兩種判讀（`alpha.providers.briefs.BETTABLE_READING_KINDS`——同一句話只有一份，L16；
+    2026-11-03 前與可開的起始門同一份，起始門多收了判不出，兩句話分開——判不出的層照樣在「還判不出」）；
     每一種判讀恰好落在一區，新增判讀種類沒進任何一區就紅（`tests/test_webapp_graph_page.py`），不會從圖頁安靜消失（INV-3）。
     區序是閱讀順序，不是名次；區內照節點 id 的字母序。"""
-    from alpha.providers.briefs import OPEN_READING_KINDS
+    from alpha.providers.briefs import BETTABLE_READING_KINDS
     from alpha.structure_reading.contracts import READING_KINDS
 
     return [
         {"key": "bettable", "label": "押得下去的層（判量或換不掉）", "expanded": True,
-         "kinds": [kind for kind in READING_KINDS if kind in OPEN_READING_KINDS]},
+         "kinds": [kind for kind in READING_KINDS if kind in BETTABLE_READING_KINDS]},
         {"key": "undecided", "label": "還判不出的層——研究下一步多半在這裡", "expanded": True, "kinds": ["undecided"]},
         {"key": "not_opportunity", "label": "不是機會的層（判都不是：這個位置本來就不卡）", "expanded": False,
          "kinds": ["neither"]},
@@ -1984,7 +1983,7 @@ def build_candidates_artifact(board: Mapping[str, Any], *, generated_at: datetim
     payload: dict[str, Any] = {
         "schema_version": STATE_SCHEMA_VERSIONS["candidates"],
         "kind": "candidates",
-        "title": "候選狀態板（可開／缺 X／已定價等回落／不要／已持有）",
+        "title": "候選狀態板（可開／缺 X／不要／已持有）",
         "generated_at": stamp.isoformat(),
         "as_of": None,
         "point_in_time": {"mode": "current", "as_of": None, "excluded": None},
@@ -2108,8 +2107,10 @@ def candidate_series_path(store: StateArtifactStore) -> Path:
 
 
 def candidate_series_row(payload: Mapping[str, Any]) -> dict[str, Any]:
-    """候選板 artifact → 序列的一行：五組與四個附組的檔數、無敘事數、最老滯留天數。**照抄 artifact 的 `counts`**，
-    不另算一份（`held` 在持股讀不到時是 `None`——照抄成 `null`，不是 0）。"""
+    """候選板 artifact → 序列的一行：四組與四個附組的檔數、無敘事數、最老滯留天數。**照抄 artifact 的 `counts`**，
+    不另算一份（`held` 在持股讀不到時是 `None`——照抄成 `null`，不是 0）。
+    ⚠ 2026-11-03（盲點修法第 18＋16 條）起 `counts` 沒有 `priced_wait`（舊的等回落讀成可開）：之前的行照留（append-only），
+    讀序列的人要以 11-03 為界分開讀 `counts.open`（決定紀錄 §10.3）。"""
     from alpha.candidates import GROUPS, SIDE_GROUPS
 
     counts = payload.get("counts") or {}
@@ -2121,9 +2122,9 @@ def candidate_series_row(payload: Mapping[str, Any]) -> dict[str, Any]:
         "oldest_stall_days": dict(payload.get("oldest_stall_days") or {}),
         # 邊緣門檻的遲滯與在門檻上（2026-11-01）：量「7 天內翻轉幾檔」要的兩個數——舊 artifact 沒有＝null，不是 0
         "edge": {"on_threshold": counts.get("on_threshold"), "not_edge_pending": counts.get("not_edge_pending")},
-        # 只差已定價（2026-11-03 起記；決定紀錄 §10.1：條 2 改讀「只差已定價的名單恆為 0 或恆非 0」）——舊 artifact 沒有＝null
-        "priced_only": {"count": counts.get("priced_wait_priced_only"),
-                        "unknown": counts.get("priced_wait_priced_only_unknown")},
+        # 加碼條件還沒查（2026-11-03 第 18＋16 條起記；取代同日起記的「只差已定價」——那一格隨等回落退役）：
+        # 持股讀不到時是 null（已持有那一半數不到），不是 0
+        "addon_unchecked": counts.get("addon_unchecked"),
         "generated_at": payload.get("generated_at"),
     }
 
@@ -2429,8 +2430,10 @@ def write_vocabularies(store: ArtifactStore | None = None) -> Path:
     而不是在 APP 端再寫一份「absence_kind 是什麼意思」的對照表。
     """
     from alpha.absence import ABSENCE_KINDS, SETTLED_ABSENCE_KINDS
-    from alpha.candidates import GROUP_LABELS, LIST_GROUP_LABELS, LIST_GROUPS, PAPER_STATE_EXITS
-    from alpha.narrative.contracts import CANDIDATE_STATES_DECLARABLE
+    from alpha.candidates import (
+        GROUP_LABELS, LIST_GROUP_LABELS, LIST_GROUPS, PAPER_STATE_EXITS, RETIRED_STATE_LABELS,
+    )
+    from alpha.narrative.contracts import CANDIDATE_STATES_DECLARABLE, CANDIDATE_STATES_RETIRED
     from alpha.structure_reading.contracts import READING_KIND_SHORT, READING_KINDS, READING_UNITS
     from alpha.structure_reading.predictions import OUTCOMES, UNJUDGED_OUTCOMES
     from briefing.analyst_view.contracts import (
@@ -2471,6 +2474,8 @@ def write_vocabularies(store: ArtifactStore | None = None) -> Path:
         # 成績單（2026-10-28）：paper 線照「寫下判斷那天宣告的候選狀態」分組——組＝敘事能宣告的那幾種（0 也印；
         # 已持有來自 Sheet，不是我們說的話）；「現在」的兩個出口（撤回、舊版）的中文也跟著字彙走（L16）
         "claim_groups": [{"key": key, "label": GROUP_LABELS[key]} for key in CANDIDATE_STATES_DECLARABLE],
+        # 退役的宣告值（2026-11-03 等回落併回可開）：寫下那天宣告等回落的 paper 列照當時的字分組（INV-6），中文跟著字彙走
+        "retired_states": [{"key": key, "label": RETIRED_STATE_LABELS[key]} for key in CANDIDATE_STATES_RETIRED],
         "paper_state_exits": [{"key": key, "label": label} for key, label in PAPER_STATE_EXITS.items()],
         # 圖預測對錯表的終局：閱讀順序（JSON 寫檔會把 dict 的鍵排序，順序要用 list 帶）與不算對錯的那兩種（改寫、非斷言：
         # 成績單只印件數）——都只有 `alpha.structure_reading.predictions` 那一份

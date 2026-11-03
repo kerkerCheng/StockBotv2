@@ -53,7 +53,7 @@ def _brief(*, disproof=(), rides=True):
     rec = brief_record(company_id=CO, ticker=T, slots=_slots(), record_version=RECORD_VERSION_V2,
                        rides=[{"node": "mat:inp_substrate", "unit": "layer", "reading_id": READ}] if rides else [],
                        disproof=list(disproof), answers={"priced_in": "no", "in_numbers": "yes"},
-                       candidate_state={"state": "priced_wait", "watch_id": "ew_wait", "reason": "等回落"},
+                       candidate_state={"state": "missing", "watch_id": "ew_wait", "reason": "缺：客戶沒具名"},
                        created_at=datetime(2026, 9, 29, 3, tzinfo=timezone.utc))
     return parse_brief_record(rec)
 
@@ -260,14 +260,14 @@ def test_candidate_input_hands_the_view_three_questions_to_the_same_derivation(m
 # ---------------------------------------------------------------------------
 
 def test_candidate_panel_copies_the_row_and_three_words_and_never_affects_readiness() -> None:
-    row = {"ticker": T, "derived": "priced_wait", "derived_label": "已定價等回落", "declared": "priced_wait",
+    row = {"ticker": T, "derived": "missing", "derived_label": "缺 X", "declared": "missing",
            "rewrite": [], "preconditions": [], "stall_days": 1, "note": None}
     words = {"will_it_die": "黃（灰 1）", "priced_in": "否", "in_numbers": "是"}
     analyst = build_analyst_view(_bare_view(), candidate={"row": row, "three_words": words, "today": "2026-09-30",
                                                           "sheet": {"status": "ok"}, "downside": {"rows": []}})
     panel = analyst.candidate
     by_key = {line.key: line.datum for line in panel.lines}
-    assert panel.status == "available" and by_key["candidate:state"].value["derived_label"] == "已定價等回落"
+    assert panel.status == "available" and by_key["candidate:state"].value["derived_label"] == "缺 X"
     assert [by_key[f"candidate:{k}"].value for k in ("will_it_die", "priced_in", "in_numbers")] == ["黃（灰 1）", "否", "是"]
     assert "candidate" not in {b.panel for b in analyst.readiness.blocker_details}
     off = build_analyst_view(_bare_view(), candidate={"row": None, "three_words": {**words, "priced_in": "未答"},
@@ -624,7 +624,7 @@ def test_no_narrative_page_says_why_there_is_no_narrative(monkeypatch) -> None:
 
 
 def test_an_unmeasurable_edge_is_a_tag_on_the_card_and_the_page_not_the_group(monkeypatch) -> None:
-    """2026-10-30 使用者「好 改吧」：邊緣判定少一個輸入時，宣告等回落的檔落「等回落」組（不是附組），首頁卡片與
+    """2026-10-30 使用者「好 改吧」：邊緣判定少一個輸入時，宣告缺 X 的檔落「缺 X」組（不是附組），首頁卡片與
     文字版個股頁都帶同一句標記——字由產生端給（`alpha.candidates.edge_note`），materialize 與 render 只照抄。"""
     import alpha.providers.briefs as briefs_mod
     from alpha.providers import candidates as cand
@@ -635,10 +635,10 @@ def test_an_unmeasurable_edge_is_a_tag_on_the_card_and_the_page_not_the_group(mo
                   "market_cap_usd": 1.6e9, "analyst_count": None}
     monkeypatch.setattr(briefs_mod, "read_brief_records", lambda ticker: ([_brief()], []))
     page = cand.page_input(_context(edges={T: unmeasured}), T, CO, three_questions=_tq())
-    assert page["row"]["group"] == "priced_wait" and page["row"]["edge_note"] == "邊緣無法量：缺分析師家數"
+    assert page["row"]["group"] == "missing" and page["row"]["edge_note"] == "邊緣無法量：缺分析師家數"
     view = build_analyst_view(_bare_view(), candidate=page)
     overview = _candidate_overview(view.to_dict()["candidate"])
-    assert overview["list_group"] == "priced_wait" and overview["edge_note"] == "邊緣無法量：缺分析師家數"
+    assert overview["list_group"] == "missing" and overview["edge_note"] == "邊緣無法量：缺分析師家數"
     assert "邊緣無法量：缺分析師家數" in render_analyst_view_markdown(view)
     edge_page = cand.page_input(_context(), T, CO, three_questions=_tq())           # 邊緣：沒有標記
     assert _candidate_overview(build_analyst_view(_bare_view(), candidate=edge_page)
@@ -780,7 +780,7 @@ def test_markdown_renders_every_new_panel_and_no_python_repr(monkeypatch) -> Non
                  narrative_context={"node_names": {"mat:inp_substrate": "InP 基板"}})
     text = render_analyst_view_markdown(build_analyst_view(
         view, readings={"seats": ["mat:inp_substrate"], "readings": [_reading("stale")]},
-        candidate={"row": {"derived": "priced_wait", "derived_label": "已定價等回落", "declared": "priced_wait",
+        candidate={"row": {"derived": "missing", "derived_label": "缺 X", "declared": "missing",
                            "rewrite": [], "preconditions": [], "stall_days": 1},
                    "three_words": {"will_it_die": "黃（灰 1）", "priced_in": "否", "in_numbers": "是"},
                    "downside": {"rows": [{"source": "brief", "source_label": "敘事自己登記的反證", "condition": SELF_COND,
@@ -789,7 +789,7 @@ def test_markdown_renders_every_new_panel_and_no_python_repr(monkeypatch) -> Non
     for heading in ("## 這檔現在在哪一格", "## 讀圖：它坐的那一層結構變了沒（核心）", "## 錯了怎麼知道",
                     "## 財務三題的數字", "## 賭注：我們賭什麼、押在哪一層、什麼必須為真"):
         assert heading in text, heading
-    assert "已定價等回落" in text and "B：量的賭注" in text and "ew\\_1" in text
+    assert "缺 X" in text and "B：量的賭注" in text and "ew\\_1" in text
     assert "「InP 基板」（層）" in text and "{'node'" not in text and "\nNone" not in text
     assert "核心四段" not in text
 

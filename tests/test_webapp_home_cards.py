@@ -37,7 +37,7 @@ def _with_card_panels(view, *, rides=(), row=None, rel=None):
 
 RIDE = {"node": "tech:cw_dfb_laser", "node_name": "High-power CW DFB laser", "unit_label": "層",
         "kind_label": "B：量的賭注"}
-ROW = {"derived": "priced_wait", "declared": "priced_wait", "derived_label": "已定價等回落",
+ROW = {"derived": "missing", "declared": "missing", "derived_label": "缺 X",
        "since": "2026-10-15T14:48:05+00:00", "stall_days": 13,
        "watch": {"until": "2026-11-14", "status": "active", "watch_id": "ew_1", "expires": "2027-01-31"}}
 
@@ -197,7 +197,7 @@ def client(tmp_path):
     past = (today - timedelta(days=2)).isoformat()
     other = {**RIDE, "node": "mat:inp_substrate", "node_name": "InP substrate"}
     for payload in (_payload("AAA", "missing", until=soon, rides=[RIDE], short="甲"),
-                    _payload("BBB", "priced_wait", until=past, rides=[RIDE, other]),
+                    _payload("BBB", "open", until=past, rides=[RIDE, other]),
                     _payload("CCC", "missing", until=later, rides=[other], stall=12),
                     _payload("DDD", "pass", until=soon, rides=[RIDE]),
                     _payload("EEE", "held")):
@@ -243,9 +243,9 @@ def test_by_layer_lists_main_groups_and_counts_the_rest(client) -> None:
     body = http.get("/api/v1/stocks").json()
     layers = {layer["node"]: layer for layer in body["by_layer"]["layers"]}
     assert list(layers) == sorted(layers)                           # 節點 id 序，不是名次
-    assert layers["tech:cw_dfb_laser"]["tickers"] == ["AAA", "BBB"]  # 不要（DDD）不攤開、照數
+    assert layers["tech:cw_dfb_laser"]["tickers"] == ["BBB", "AAA"]  # 層內照組序（可開在缺 X 之前）；不要（DDD）不攤開、照數
     assert [(o["group"], o["count"]) for o in layers["tech:cw_dfb_laser"]["others"]] == [("pass", 1)]
-    assert layers["mat:inp_substrate"]["tickers"] == ["CCC", "BBB"]  # 層內照組序（缺 X 在等回落之前）、再照 ticker
+    assert layers["mat:inp_substrate"]["tickers"] == ["BBB", "CCC"]  # 同組內再照 ticker
     assert body["by_layer"]["unridden"] == ["EEE"]                   # 持有但敘事沒宣告押哪一層
     expanded = {g["key"] for g in body["groups"] if g["expanded"]}
     assert expanded == set(MAIN_GROUPS)
@@ -260,7 +260,8 @@ def test_every_group_comes_back_with_its_count_and_oldest_stall(client) -> None:
     http, _ = client
     groups = {g["key"]: g for g in http.get("/api/v1/stocks").json()["groups"]}
     assert groups["missing"]["count"] == 2 and groups["missing"]["oldest_stall_days"] == 12
-    assert groups["open"]["count"] == 0 and groups["open"]["oldest_stall_days"] is None and groups["open"]["expanded"]
+    assert groups["open"]["count"] == 1 and groups["open"]["oldest_stall_days"] == 5 and groups["open"]["expanded"]
+    assert groups["legacy"]["count"] == 0 and groups["legacy"]["oldest_stall_days"] is None
 
 
 def test_the_missing_label_only_replaces_the_state_in_the_missing_group() -> None:

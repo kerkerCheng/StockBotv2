@@ -230,7 +230,7 @@ def supply_seats(structure_payload: Any, registry: Any) -> frozenset[str]:
 def board_inputs(candidates_payload: Any) -> tuple[dict[str, dict[str, Any]], str | None]:
     """候選板 artifact → `{ticker: {held, candidate_state, edge_state, edge}}`（7.0g-2）。**照抄 artifact，不重算**（L16）。
 
-    候選狀態取列所在的組（open／missing／priced_wait／pass／held）；附組（例：邊緣量不到）的列取它宣告的狀態。
+    候選狀態取列所在的組（open／missing／pass／held）；附組（例：邊緣量不到）的列取它宣告的狀態（照讀法——舊的等回落是 open）。
     沒有敘事那幾檔（`no_narrative`）只有邊緣判定。
     """
     payload = candidates_payload or {}

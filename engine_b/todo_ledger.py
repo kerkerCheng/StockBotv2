@@ -60,6 +60,11 @@ LEDGER: tuple[LedgerRow, ...] = (
               "`python -m engine_b.admission_audit status` → 抽中的包交乾淨 context 唯讀 reviewer 從頭核"
               "（research-drain「入圖包抽查」）→ `python -m engine_b.admission_audit record <n> --found-by 抽查 …`"),
     LedgerRow("todo.edge_no_narrative", "邊緣卻沒敘事", "檔", "研究那一檔、寫第一份敘事（非邊緣的不寫）"),
+    # 盲點修法第 18＋16 條（2026-11-03；使用者同日問「那系統會叫我去深挖嗎？還是得靠我自主？」——研究 session 去深挖）：
+    # 加碼條件的 watch 只會被**新**文件叫醒，答案若在已經存在的年報、法說裡不會自己醒——要有一格叫人去查
+    LedgerRow("todo.addon_unchecked", "加碼條件還沒查", "檔",
+              "research-drain 段 5「加碼條件還沒查」：深挖清單十項逐項查（引用｜不適用：理由｜加碼條件：c<n>）→ "
+              "`python -m alpha brief <T> --add spec.json`（depth_check）"),
     # 2026-10-29 使用者（個股頁）：「怎麼確保呈現的精神不變…之後才不會又慢慢爛掉」——敘事換版、故事就過期，
     # 首屏退回印依據；過期與沒寫是會自己出現的計數，不是要人記得的事（L14）
     LedgerRow("todo.story", "故事還沒寫", "檔",
@@ -75,7 +80,7 @@ LEDGER_BY_KEY: Mapping[str, LedgerRow] = {r.key: r for r in LEDGER}
 
 #: 目的地（封閉）：⑤ 的格（`todo.*`）或下面幾種「不是研究待做」。
 DESTINATIONS: Mapping[str, str] = {
-    "decision": "③ 待你決定／③b 等你提供的文件（pq2；球在使用者）",
+    "decision": "③ 待你決定（pq2 編號、可開待你選）／③b 等你提供的文件（球在使用者）",
     "wait": "有到期的等事件（醒來或到期才回到某一格；『無到期的等待』與『接不上的等待』兩格守著）",
     "mechanical": "daily 機械段自己清（清不掉時由對應的格或 daily 健康度現形）",
     "terminal": "終局（不是待做）",
@@ -142,12 +147,10 @@ COVERAGE: Mapping[str, str] = {
     "thesis:revised": "decision",                # 改寫 memo 掛 pq2（例：COHR [836]）；is_due 沒鑄的進 todo.thesis_due
     "thesis:retired": "terminal",
     # --- 候選板（alpha.candidates 的組）
-    "candidate:open": "wait",                    # 可開每天重驗前提，前提失效進 todo.narrative
+    # 可開：每天重驗起始門（失效進 todo.narrative）；要不要進是使用者的 → 短版 ③「可開待你選」（這一版敘事還沒選過的）；
+    # 加碼條件還沒查進 todo.addon_unchecked（2026-11-03 第 18＋16 條：等回落與只差已定價併回可開，那兩個登記一起拿掉）
+    "candidate:open": "decision",
     "candidate:missing": "wait",                 # wake_brief watch 有到期
-    "candidate:priced_wait": "wait",
-    # 只差已定價（`alpha.candidates.priced_only_rows`：等回落裡可開的機械前提都成立）：剩下的價格判斷是使用者的 → 短版 ③
-    # （盲點修法 §1 第 3 條，2026-11-03；failure log #123、#124：四次價格叫醒、四次重寫仍等回落，它一直不在「待你決定」）
-    "candidate:priced_only": "decision",
     "candidate:pass": "terminal",
     "candidate:held": "terminal",
     "candidate:not_multiple": "todo.narrative",  # 非邊緣卻有敘事：撤回（research-drain 規定不替非倍率寫敘事）
@@ -175,6 +178,8 @@ COVERAGE: Mapping[str, str] = {
     "brief:reading_kind_changed": "todo.narrative",       # 候選板清單 kind=reading_kind：正文寫時騎的讀圖判讀與現行不同（2026-11-03）
     "brief:supply_count_changed": "todo.narrative",       # 候選板清單 kind=supply_count：供給側家數與正文寫時不同（2026-11-03）
     "brief:link_break": "todo.narrative",
+    # 可開／已持有的深挖清單還有沒查的項目（`alpha.candidates.addon_unchecked_rows`；2026-11-03 第 18＋16 條）
+    "depth_check:unchecked": "todo.addon_unchecked",
     "registry:stale_lead_entities": "todo.registry_rescan",
     "thesis:due_not_minted": "todo.thesis_due",
     "disproof:touched": "todo.disproof_touched",
@@ -272,22 +277,24 @@ def requires_user_without_pq2(leads: Mapping[str, Mapping[str, Any]],
 def orphan_wake_briefs(watches: Iterable[Mapping[str, Any]], briefs: Iterable[Any]) -> list[str]:
     """還在等的 wake_brief watch，但那家公司的現行敘事**不在等**（撤回、改判不要／可開／已持有）——醒了會替一份
     不在等的敘事產生重寫工作（failure log #34；10-22 KLIC／MXL／HPS-A.TO／FORM 四筆）。
-    ⚠ 只看狀態、不看 watch_id：一份缺 X／等回落的敘事可以有好幾筆喚醒（AXTI 的 ew_0148 與財報後的 ew_1433）。"""
+    ⚠ 只看狀態、不看 watch_id：一份缺 X／等回落的敘事可以有好幾筆喚醒（AXTI 的 ew_0148 與財報後的 ew_1433）。
+    「在等」照 `engine_b.narrative_watches.WAITING_STATES`（寫入時收喚醒 watch 的同一份，L16）——舊的等回落讀成可開，
+    但當時建的喚醒照舊等到期、醒了叫重寫，不算接不上。"""
+    from engine_b.narrative_watches import WAITING_STATES
+
     waiting = {str(getattr(b, "company_id", "")) for b in briefs
-               if getattr(getattr(b, "candidate_state", None), "state", None) in ("missing", "priced_wait")}
+               if getattr(getattr(b, "candidate_state", None), "state", None) in WAITING_STATES}
     return sorted(str(w.get("watch_id")) for w in watches
                   if w.get("wake_brief") and w.get("status") == "active" and str(w.get("wake_brief")) not in waiting)
 
 
-#: 候選板清單裡「敘事落後」的三種（`alpha.providers.candidates.board_rewrite`）→ ⑤ 工作描述的字。
+#: 候選板清單裡「敘事落後」的幾種（`alpha.providers.candidates.board_rewrite`）→ ⑤ 工作描述的字。
 #: 候選板是唯一 owner（ROADMAP「敘事 stale 計數器」同源，2026-10-29）：⑤ 只讀它的清單，不自己再算一份。
-#: `pulled_back`（2026-10-30，failure log #116）：等回落的收盤低於最後一次宣告已定價那天——叫醒重問，不是動作。
-#: `reopen_met`／`no_reopen`（2026-11-01，failure log #124）：等回落寫的重開條件達成（取代回落叫醒）／舊紀錄沒寫重開條件、該補寫。
 #: `reading_kind`／`supply_count`（2026-11-03，ROADMAP「敘事 stale 計數器」②④）：正文寫的時候騎的讀圖與這一格現行的
 #: 讀圖相比，判讀變了／供給側家數變了——換騎不夠，正文要改。
+#: 已回落（#116）、重開達成／沒寫重開（#124）2026-11-03 隨等回落併回可開退役：價格動了不再叫研究重寫。
 BEHIND_KINDS: Mapping[str, str] = {"rides": "騎舊讀圖", "reading_kind": "判讀變了", "supply_count": "家數變了",
-                                   "new_edges": "新邊沒讀", "pulled_back": "已回落",
-                                   "reopen_met": "重開達成", "no_reopen": "沒寫重開"}
+                                   "new_edges": "新邊沒讀"}
 
 
 def _narrative_companies(watches: Sequence[Mapping[str, Any]], briefs: Sequence[Any]) -> dict[str, list[str]]:
@@ -434,7 +441,7 @@ def collect(*, today: date, leads_store: Mapping[str, Any], watches: Sequence[Ma
         # 沒讀到不是 0（INV-3）：候選板讀不到，後幾種都沒算進來；圖讀不到，新邊沒讀沒算；讀圖紀錄讀不到（或舊板沒有這一格），
         # 判讀／家數變了沒算
         if candidates is None:
-            note = "候選板未讀到——騎舊讀圖、判讀／家數變了、新邊沒讀、已回落、重開條件、前提失效沒算進來"
+            note = "候選板未讀到——騎舊讀圖、判讀／家數變了、新邊沒讀、前提失效沒算進來"
         else:
             notes = []
             if (candidates.get("new_edges_check") or {}).get("status") != "ok":
@@ -446,9 +453,7 @@ def collect(*, today: date, leads_store: Mapping[str, Any], watches: Sequence[Ma
                 notes.append(f"判讀／家數變了有 {check['unchecked']} 格沒比成（正文寫時騎的讀圖紀錄找不到）")
             note = "；".join(notes) or None
         put("todo.narrative", len(companies) + extra, work="；".join(bits) or None,
-            oldest_days=_oldest(stamps, today), note=note,
-            # 已回落＝沒寫重開條件的舊紀錄的叫醒（重開達成取代它）：兩者都是「等的價格到了」，同算進展（L17 對稱面）
-            progress=None if candidates is None else len(behind["reopen_met"] | behind["pulled_back"]))
+            oldest_days=_oldest(stamps, today), note=note)
 
     guarded("todo.narrative", narrative)
     put("todo.reading", reading_needs_reread)
@@ -549,6 +554,30 @@ def collect(*, today: date, leads_store: Mapping[str, Any], watches: Sequence[Ma
 
     guarded("todo.edge_no_narrative", edge_no_narrative)
 
+    def addon_unchecked() -> None:
+        # 可開／已持有、深挖清單還有沒查的檔（`alpha.candidates.addon_unchecked_rows`——候選板計數同一份，L16）。
+        # 候選板沒讀到、持股沒讀到（已持有那一半數不到）、舊板（列上沒有這一格）都是未讀到，不是 0（INV-3）
+        from alpha.candidates import ADDON_GROUPS, addon_unchecked_rows
+        from alpha.narrative.contracts import RECORD_VERSION_V2
+
+        cell = rows["todo.addon_unchecked"]
+        groups = (candidates or {}).get("groups") or {}
+        if candidates is None:
+            cell.reason, cell.progress = "候選板未讀到", None
+            return
+        if ((candidates.get("holdings") or {}).get("status") or "ok") != "ok":
+            cell.reason, cell.progress = "持股沒讀到——已持有那一半數不到", None
+            return
+        if any("addon_unchecked" not in r for g in ADDON_GROUPS for r in groups.get(g) or ()):
+            cell.reason, cell.progress = "候選板是舊版（列上沒有加碼條件那一格）", None
+            return
+        found = addon_unchecked_rows(groups)
+        work = "、".join(f"{r.get('ticker')}（{len(r['addon_unchecked'])} 項）" if r.get("record_version") == RECORD_VERSION_V2
+                         else f"{r.get('ticker')}（沒有 v2 敘事）" for r in found)
+        put("todo.addon_unchecked", len(found), work=work or None, progress=len(found))
+
+    guarded("todo.addon_unchecked", addon_unchecked)
+
     def story() -> None:
         from alpha.providers.stories import gaps_now
 
@@ -588,9 +617,10 @@ def render_cells(counts: Sequence[LedgerCount]) -> list[str]:
 #: 「進展格」（盲點修法 §1 第 2 條，2026-11-03；整體盲點審查 2026-11-01 §1.3：十天 15 段 drain、週額度 99%、候選狀態轉換 0，
 #: 推薦條件是「任何研究格 > 0」，而停放是合法終局、歸零永遠做得到）。判準：**會叫人動手的數字，要問它歸零時有沒有任何一檔
 #: 離決定更近；沒有的只當健康度、只在太老時叫人。** 推 `/research-drain` 只看下列幾件、或任一格最老 ≥ `MAINTENANCE_NUDGE_DAYS` 天。
-#: 只差已定價／可開不在這裡：價格判斷是使用者的（短版 ③），drain 歸零不了它，放進來就是恆亮的燈（L14-4）。
+#: 可開待你選不在這裡：要不要進是使用者的（短版 ③），drain 歸零不了它，放進來就是恆亮的燈（L14-4）。
+#: 2026-11-03（第 18＋16 條）：「重開達成／已回落」隨等回落退役；「加碼條件還沒查」進來——查完一檔，那一檔的加碼決定就有根據。
 PROGRESS_LABELS: Mapping[str, str] = {"todo.disproof_touched": "反證觸及", "todo.confirm_touched": "加碼條件觸及",
-                                      "todo.narrative": "重開達成／已回落", "todo.leads": "使用者 go 的工單"}
+                                      "todo.addon_unchecked": "加碼條件還沒查", "todo.leads": "使用者 go 的工單"}
 MAINTENANCE_NUDGE_DAYS = 7
 #: `snapshot_progress` 的鍵——心跳快照「只存不比」的封閉清單由這裡導出（L16）。
 SNAPSHOT_PROGRESS_KEYS: tuple[str, ...] = ("todo.progress", "todo.oldest_days")

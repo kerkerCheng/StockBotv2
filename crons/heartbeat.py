@@ -920,13 +920,13 @@ def candidate_counts(board: Mapping[str, Any]) -> dict[str, Any]:
     no_narr = [r for r in board.get("no_narrative") or () if isinstance(r, Mapping)]
     non_edge = sum(1 for r in no_narr if (r.get("edge") or {}).get("state") == "not_edge")
     unmeasured = sum(1 for r in no_narr if (r.get("edge") or {}).get("state") not in ("not_edge", "edge"))
-    out: dict[str, Any] = {key: counts.get(key, 0) for key in ("open", "missing", "priced_wait", "pass")}
+    out: dict[str, Any] = {key: counts.get(key, 0) for key in ("open", "missing", "pass")}
     # 邊緣無法量（2026-10-30 起是列上的標記、不是分組）：上板、非持有的 v2 敘事裡邊緣判定少一個輸入的檔數——
-    # 照敘事分組的那幾檔（缺 X／等回落／不要）加上附組裡宣告可開、不放行的那幾檔。舊 artifact（附組裝全部）數出來一樣。
+    # 照敘事分組的那幾檔（缺 X／不要）加上附組裡宣告可開、不放行的那幾檔。舊 artifact（附組裝全部）數出來一樣。
     side = [r for r in (board.get("side_groups") or {}).get("edge_unmeasurable") or () if isinstance(r, Mapping)]
     # 2026-11-01 起這個附組也裝「宣告可開、今天才翻成非邊緣（待確認）」的列（遲滯）——只數邊緣判定真的少輸入的那幾列
     side_unmeasured = [r for r in side if (r.get("edge") or {}).get("state") not in ("edge", "not_edge")]
-    tagged = [r for key in ("open", "missing", "priced_wait", "pass") for r in (board.get("groups") or {}).get(key) or ()]
+    tagged = [r for key in ("open", "missing", "pass") for r in (board.get("groups") or {}).get(key) or ()]
     unmeasurable = len(side_unmeasured) + sum(1 for r in tagged if isinstance(r, Mapping)
                                               and (r.get("edge") or {}).get("state") not in ("edge", "not_edge"))
     out.update(held=counts.get("held"), edge_unmeasurable=unmeasurable,
@@ -936,28 +936,21 @@ def candidate_counts(board: Mapping[str, Any]) -> dict[str, Any]:
                edge_gap=len(no_narr) - non_edge - unmeasured, oldest=dict(board.get("oldest_stall_days") or {}),
                # 邊緣門檻的遲滯與在門檻上（2026-11-01）：舊 artifact 沒有這兩格 → None（印「未算」），不壓成 0
                not_edge_pending=counts.get("not_edge_pending"), on_threshold=counts.get("on_threshold"))
-    # 等回落的價格叫醒與缺 X 三分法（2026-10-30）：讀列重算（算法在 `alpha.candidates`，與 assemble_board 同一份）——
-    # 舊 artifact 的列沒有這兩個鍵，照實印「沒算」「未算」，不壓成 0
-    from alpha.candidates import missing_request_counts, priced_only_counts, pullback_counts, reopen_counts
+    # 缺 X 三分法（2026-10-30）：讀列重算（算法在 `alpha.candidates`，與 assemble_board 同一份）——
+    # 舊 artifact 的列沒有這兩個鍵，照實印「未算」，不壓成 0
+    from alpha.candidates import missing_request_counts
 
     groups = board.get("groups") or {}
-    wait_rows = [r for r in groups.get("priced_wait") or () if isinstance(r, Mapping)]
-    pb = pullback_counts(wait_rows)
     mr = missing_request_counts([r for r in groups.get("missing") or () if isinstance(r, Mapping)])
-    # 只差已定價（2026-11-01；failure log #123）：同一份算法；舊 artifact 的列沒有 open_gaps → 印「未算」，不壓成 0
-    po = priced_only_counts(wait_rows)
-    # 重開條件（2026-11-01；failure log #124）：同一份算法；舊 artifact 沒有這幾格 → reopen_not_computed，印「未算」
-    ro = reopen_counts(wait_rows)
-    out.update(pulled_back=pb["pulled_back"], pull_unknown=pb["unknown"], missing_asked=mr["asked"],
-               missing_fetchable_unasked=mr["fetchable_unasked"], missing_unclassified=mr["unclassified"],
-               priced_only=po["priced_only"], priced_only_unknown=po["priced_only_unknown"], **ro)
+    out.update(missing_asked=mr["asked"], missing_fetchable_unasked=mr["fetchable_unasked"],
+               missing_unclassified=mr["unclassified"])
     return out
 
 
 def candidate_states_text(c: Mapping[str, Any]) -> str:
-    """封閉字彙的五個候選狀態（AGENTS：可開／缺 X／已定價等回落／不要／已持有），**0 也印**、有檔才印最老滯留。
-    2026-10-30 起兩個狀態各多幾格常駐計數：缺 X 的「已開口（文件請求）｜可拿未開口｜未分」（三分法 ①）、等回落的「已回落」
-    （收盤低於最後一次宣告已定價那天；叫醒重問，不是動作）。沒算出來的印「未算」「沒算」，不壓成 0（INV-3）。"""
+    """封閉字彙的四個候選狀態（AGENTS：可開／缺 X／不要／已持有），**0 也印**、有檔才印最老滯留。
+    2026-10-30 起缺 X 多幾格常駐計數「已開口（文件請求）｜可拿未開口｜未分」（三分法 ①）；沒算出來的印「未算」，
+    不壓成 0（INV-3）。2026-11-03（第 18＋16 條）等回落併回可開：它的「已回落／重開達成／只差已定價」一起拿掉。"""
     def aged(key: str) -> str:
         n, d = c.get(key, 0), (c.get("oldest") or {}).get(key)
         return f"{n}（最老 {d} 天）" if n and d is not None else f"{n}"
@@ -973,32 +966,8 @@ def candidate_states_text(c: Mapping[str, Any]) -> str:
             bits.append(f"未分 {c['missing_unclassified']}")
         return f"{n}（{'｜'.join(bits)}）"
 
-    def wait() -> str:
-        n, d = c.get("priced_wait", 0), (c.get("oldest") or {}).get("priced_wait")
-        if not n:
-            return f"{n}"
-        bits = ([f"最老 {d} 天"] if d is not None else []) + [f"已回落 {c.get('pulled_back', 0)}"]
-        if c.get("pull_unknown"):
-            bits.append(f"沒算 {c['pull_unknown']}")
-        # 重開條件（2026-11-01；failure log #124）：達成的檔數 0 也印（同已回落）；沒寫的、量不到的不是 0 才印；沒算照實印
-        if "reopen_met" not in c or int(c.get("reopen_not_computed") or 0) >= n:
-            bits.append("重開達成 未算")
-        else:
-            bits.append(f"重開達成 {c.get('reopen_met', 0)}")
-            if c.get("no_reopen"):
-                bits.append(f"沒寫重開 {c['no_reopen']}")
-            if c.get("reopen_unknown"):
-                bits.append(f"重開量不到 {c['reopen_unknown']}")
-        # 只差已定價（2026-11-01；failure log #123）：可開前提都成立、只剩價格判斷的檔數——沒算的照實印，不壓成 0
-        unknown = int(c.get("priced_only_unknown") or 0)
-        if "priced_only" not in c or unknown >= n:
-            bits.append("只差已定價 未算")
-        else:
-            bits.append(f"只差已定價 {c.get('priced_only', 0)}" + (f"（{unknown} 未算）" if unknown else ""))
-        return f"{n}（{'｜'.join(bits)}）"
-
     held = "未驗（持股未讀到）" if c.get("held") is None else str(c.get("held"))
-    return f"可開 {aged('open')}｜缺 X {missing()}｜等回落 {wait()}｜不要 {c.get('pass', 0)}｜已持有 {held}"
+    return f"可開 {aged('open')}｜缺 X {missing()}｜不要 {c.get('pass', 0)}｜已持有 {held}"
 
 
 def _candidate_lines(state_dir: Path | None) -> list[str]:
@@ -1066,147 +1035,58 @@ def _candidate_lines(state_dir: Path | None) -> list[str]:
 
 
 def _priced_rows(state_dir: Path | None) -> tuple[list[Mapping[str, Any]], list[Mapping[str, Any]], Any]:
-    """(等回落那幾列, 板上所有帶 priced_since 的列, 缺席)。只讀 candidates artifact（零網路）。"""
+    """(可開那幾列, 板上所有帶 priced_since 的列, 缺席)。只讀 candidates artifact（零網路）。"""
     board, absence = _load_state(state_dir, "candidates")
     if absence is not None:
         return [], [], absence
     rows = [r for group in (board.get("groups") or {}).values() for r in group or ()]
     rows += [r for group in (board.get("side_groups") or {}).values() for r in group or ()]
-    wait = [r for r in (board.get("groups") or {}).get("priced_wait") or ()]
-    return wait, [r for r in rows if isinstance(r, Mapping) and r.get("priced_since")], None
+    opened = [r for r in (board.get("groups") or {}).get("open") or () if isinstance(r, Mapping)]
+    return opened, [r for r in rows if isinstance(r, Mapping) and r.get("priced_since")], None
 
 
-def priced_only_names(state_dir: Path | None, *, label: Callable[[Mapping[str, Any]], str] | None = None
-                      ) -> tuple[list[str] | None, str | None]:
-    """等回落裡「只差已定價」的檔（盲點修法 §1 第 3 條；failure log #123）→ (名字, 讀不到的理由)。價格判斷是使用者的，
-    所以它住短版 ③ 待你決定、不住 ④ 的等待；判斷只有 `alpha.candidates.priced_only_rows` 一份（L16）。
-    候選板讀不到回 (None, 理由)——未讀到不是 0（INV-3）。"""
-    from alpha.candidates import priced_only_rows
+def open_choice_rows(state_dir: Path | None, *, looked_path: Path | None = None
+                     ) -> tuple[list[Mapping[str, Any]] | None, str | None]:
+    """可開待你選（2026-11-03 盲點修法第 18＋16 條；決定紀錄 §10.1 停止條件第一子句量的就是它）→ (列, 讀不到的理由)。
 
-    wait, _priced, absence = _priced_rows(state_dir)
+    候選板「可開」組裡、**這一版敘事**還沒在看了沒買（`portfolio.looked_log`）記過選擇的列：選過（不要／等到條件）就不再列，
+    敘事換版再問——選擇綁的是當時讀的那一版；買了由 Sheet 推成已持有、自己離開可開。進／不要／等到條件是使用者的，
+    所以它住短版 ③ 待你決定、不進批次指令。候選板讀不到回 (None, 理由)——未讀到不是 0（INV-3）；看了沒買讀不懂的行
+    不藏任何一列（寧可多問一次）。只讀 artifact 與 ledger、零網路。"""
+    from portfolio import looked_log as ll
+
+    opened, _priced, absence = _priced_rows(state_dir)
     if absence is not None:
         return None, absence.reason
-    return [label(r) if label else str(r.get("ticker")) for r in priced_only_rows(wait)], None
+    entries, _problems = ll.load(looked_path)
+    chosen = {(e.company_id, e.brief_id) for e in entries}
+    return [r for r in opened if (r.get("company_id"), r.get("brief_id")) not in chosen], None
 
 
-def priced_only_queue_line(names: Sequence[str] | None, problem: str | None) -> str:
+def open_choice_queue_line(rows: Sequence[Mapping[str, Any]] | None, problem: str | None) -> str:
     """完整心跳段 3 的一行：沒有 pq2 編號、不進批次指令，但球在你——0 也印（L14），讀不到照說（INV-3）。"""
-    if names is None:
-        return f"只差已定價：讀不到（{problem}）"
-    return (f"**只差已定價 {len(names)}**（可開的機械前提都成立，價格判斷由你下；短版 ③）"
-            + ("：" + "、".join(names) if names else ""))
+    if rows is None:
+        return f"可開待你選：讀不到（{problem}）"
+    return (f"**可開待你選 {len(rows)}**（起始門都過、這一版敘事你還沒選；進／不要／等到條件由你下，短版 ③）"
+            + ("：" + "、".join(str(r.get("ticker")) for r in rows) if rows else ""))
 
 
-def _priced_wait_lines(state_dir: Path | None) -> list[str]:
-    """段 2「等回落 N」＋每檔一句（判斷日的自家三年百分位 → 今天、判斷日以來報酬；句子由候選板組好，這裡照抄）＋
-    來源計數「記下 X｜回算 Y｜量不到 Z」——資料品質計數器，**不印**「幾份降了幾 pp」這種隱性門檻。0 檔也印。"""
-    wait, priced, absence = _priced_rows(state_dir)
+def _open_priced_lines(state_dir: Path | None) -> list[str]:
+    """段 2「可開 N 的已定價脈絡」＋每檔一句（判斷日的自家三年百分位 → 今天、判斷日以來報酬；句子由候選板組好，這裡照抄）＋
+    來源計數「記下 X｜回算 Y｜量不到 Z」——資料品質計數器，**不印**「幾份降了幾 pp」這種隱性門檻。0 檔也印。
+    2026-11-03 起已定價不擋可開（第 18＋16 條），這一句是可開那幾檔的脈絡（取代原本的等回落那一塊）。"""
+    opened, priced, absence = _priced_rows(state_dir)
     if absence is not None:
-        return [f"等回落：{absence.reason}（{absence.kind}）"]
-    lines = [f"等回落 {len(wait)}（判斷日的自家三年百分位 → 今天｜只印不判，不設門檻）"]
-    for row in wait:
+        return [f"可開的已定價脈絡：{absence.reason}（{absence.kind}）"]
+    lines = [f"可開 {len(opened)} 的已定價脈絡（判斷日的自家三年百分位 → 今天｜只印不判，不設門檻）"]
+    for row in opened:
         info = row.get("priced_since") or {}
-        lines.append("  " + (info.get("line") or f"{row.get('ticker')}：判斷日 vs 今天沒有算（舊 artifact 或 loader 沒給）"))
+        lines.append("  " + (info.get("line") or f"{row.get('ticker')}：已定價答量不到、今天也量不到（或判斷日 vs 今天沒有算）"))
     recorded = sum(1 for r in priced if (r["priced_since"].get("then_source") == "recorded"))
     absent = sum(1 for r in priced if (r["priced_since"].get("then") or {}).get("value") is None)
     lines.append(f"  已定價判斷日百分位：記下 {recorded}｜回算 {len(priced) - recorded}｜判斷日量不到 {absent}"
-                 f"（板上答 yes／no、等回落或答量不到而今天有值的共 {len(priced)} 份）")
+                 f"（板上答 yes／no、或答量不到而今天有值的共 {len(priced)} 份）")
     return lines
-
-
-def _signed(value: float) -> str:
-    return f"{value * 100:+.1f}%".replace("-", "−")
-
-
-#: 短版「等回落」的重看日在這幾天內就加粗（只是排版提示，不是門檻——到那天由人重判）。
-RECHECK_SOON_DAYS = 3
-
-
-def _wait_wake_days() -> dict[str, list[str]]:
-    """company_id → 還在等的喚醒 watch 的 until（ISO 日期字串）。讀不到回空——只少重看日，不帶走整塊。"""
-    try:
-        from engine_b import event_watch as ew
-
-        wakes: dict[str, list[str]] = {}
-        for w in ew.load_watches().get("watches") or ():
-            if w.get("wake_brief") and w.get("status") == "active" and w.get("until"):
-                wakes.setdefault(str(w["wake_brief"]), []).append(str(w["until"]))
-        return wakes
-    except Exception:  # noqa: BLE001
-        return {}
-
-
-def _pctile(value: Any) -> str:
-    return "量不到" if value is None else str(int(float(value) + 0.5))
-
-
-def _wake_mark(row: Mapping[str, Any]) -> str:
-    """短版等回落行的叫醒標記（2026-11-01；failure log #124）：寫了可比對重開條件的印條件與距離（達成就加粗），
-    回落不再叫醒、也不再印「已回落」；沒寫的照 #116 印已回落，另標「沒寫重開條件」。字由候選板組好（`reopen.line`），這裡照抄。"""
-    reopen = row.get("reopen") if isinstance(row.get("reopen"), Mapping) else None
-    if reopen and reopen.get("machine"):
-        mark = "｜**重開條件達成**" if reopen.get("met") is True else f"｜{reopen.get('line')}"
-    else:
-        mark = "｜**已回落**" if row.get("pulled_back") else ""
-    return mark + ("｜沒寫重開條件" if row.get("reopen_missing") is True else "")
-
-
-def priced_wait_short_lines(state_dir: Path | None, *, today: date,
-                            label: Callable[[Mapping[str, Any]], str] | None = None) -> list[str]:
-    """Discord 短版 ④ 的「等回落」小塊：一檔一行「名字：等幾天｜百分位 起點→今天｜股價 起點以來｜重看日」＋一行小字圖例。
-
-    2026-10-21 使用者問「價格一直跌，等回落能及時反應嗎」；10-22 兩次問「回落多少才變可開」——答案是沒有門檻（AGENTS
-    「已定價不設門檻」），到重看日由人重判，所以每檔印已等幾天、下次重看哪天（取這家所有還在等的喚醒 watch 最早的 until；
-    ew_1433 比候選列上的 ew_0148 早醒）。10-28 使用者核可的排版：起點用**等回落起點**（同一筆等待、判斷日換版也不重設），
-    百分位取整數、重看日在 `RECHECK_SOON_DAYS` 天內加粗、收盤日寫在圖例。0 檔回空（候選那一行已印「等回落 0」）。"""
-    wait, _priced, absence = _priced_rows(state_dir)
-    if absence is not None:
-        return [f"- 等回落：{absence.reason}"]
-    if not wait:
-        return []
-    wakes = _wait_wake_days()
-    rows = []
-    for row in wait:
-        info = row.get("priced_since") or {}
-        ws = info.get("wait_since") or {}
-        start = ws.get("then") if ws.get("return") is not None else info.get("then")
-        ret = ws.get("return") if ws.get("return") is not None else info.get("return_since")
-        nxt = min(wakes.get(str(row.get("company_id")), []) or [""])[:10]
-        try:
-            due = date.fromisoformat(nxt) if nxt else None
-        except ValueError:
-            due = None
-        if due is None:
-            when = "⚠ 沒有重看日（接不上的等待）"
-        elif due < today:
-            when = f"**⚠ 重看日 {nxt[5:]} 已過**"
-        elif (due - today).days <= RECHECK_SOON_DAYS:
-            when = f"**{nxt[5:]} 重看**"
-        else:
-            when = f"{nxt[5:]} 重看"
-        name = label(row) if label else str(row.get("ticker"))
-        text = (f"- {name}：等 {row.get('stall_days', '?')} 天｜百分位 {_pctile((start or {}).get('value'))}"
-                f"→{_pctile((info.get('now') or {}).get('value'))}"
-                f"｜股價 {_signed(ret) if ret is not None else '量不到'}"
-                + _wake_mark(row)
-                + ("｜**只差已定價**" if row.get("open_gaps") == [] else "") + f"｜{when}")
-        rows.append((due or date.max, text, (info.get("now") or {}).get("as_of"), name))
-    rows.sort(key=lambda r: r[0])
-    closes = sorted({str(r[2])[5:10] for r in rows if r[2]})
-    close_text = ("收盤日 " + closes[0] if len(closes) == 1 else
-                  "收盤日 " + "、".join(f"{r[3]} {str(r[2])[5:10]}" for r in rows if r[2]) if closes else "")
-    recomputed = any((r.get("priced_since") or {}).get("then_source") == "recomputed"
-                     or ((r.get("priced_since") or {}).get("wait_since") or {}).get("then_source") == "recomputed"
-                     for r in wait)
-    legend = ("-# 百分位＝自家三年估值位置，越低越便宜；股價＝等回落起點以來（調整後收盤）；沒有門檻，到重看日由你重判"
-              + (f"｜{close_text}" if close_text else "") + ("｜起點的值有回算的" if recomputed else "")
-              + ("｜已回落＝收盤低於最後一次宣告已定價那天（叫醒重問，不是動作）"
-                 if any(r.get("pulled_back") and r.get("wake_by", "pulled_back") != "reopen" for r in wait) else "")
-              + ("｜重開＝敘事寫的「到哪裡就重開」，達成只叫醒重問、不改狀態"
-                 if any(isinstance(r.get("reopen"), Mapping) and r["reopen"].get("machine") for r in wait) else "")
-              + ("｜只差已定價＝可開的四個機械前提都成立，剩下的是價格判斷，由你來下（只是標記，不是動作）"
-                 if any(r.get("open_gaps") == [] for r in wait) else ""))
-    return [f"**等回落 {len(wait)} 檔**", *(r[1] for r in rows), legend]
 
 
 def build_changes(*, now: datetime, state_dir: Path | None, thesis_path: Path,
@@ -1248,11 +1128,12 @@ def build_changes(*, now: datetime, state_dir: Path | None, thesis_path: Path,
     candidate_lines = _candidate_lines(state_dir)
     section.lines.append(candidate_lines[0])
     section.lines.extend(line for line in candidate_lines[1:-1])
-    # 已定價變動（ROADMAP 已定價變動常駐計數器，2026-10-21）：等回落各檔「判斷日 → 今天」——只印不判。
+    # 已定價變動（ROADMAP 已定價變動常駐計數器，2026-10-21）：可開各檔「判斷日 → 今天」——只印不判。
+    # 2026-11-03 起等回落併回可開，這一塊從等回落換成可開那幾檔的已定價脈絡。
     try:
-        section.lines.extend(_priced_wait_lines(state_dir))
+        section.lines.extend(_open_priced_lines(state_dir))
     except Exception as exc:  # noqa: BLE001
-        section.lines.append(f"等回落：盤點失敗（{type(exc).__name__}；upstream_unavailable）")
+        section.lines.append(f"可開的已定價脈絡：盤點失敗（{type(exc).__name__}；upstream_unavailable）")
     # Q3W 裁決（整體盲點審查 2026-11-01 §2 D）：與短版 ④ 同一個函式；名單全部到點且寫完就不印
     try:
         from crons.q3w_verdicts import status_lines as q3w_lines
@@ -1800,7 +1681,7 @@ def build_queue(*, state_dir: Path | None = None, now: datetime | None = None,
     # 逐筆（Phase 1 Step 1.8）：go／不含的字串取自 `todo.GO_AUTHORIZATION`（L16：不在這裡另寫一份），
     # 使用者不展開就知道 go 會做什麼、不會做什麼（AGENTS 收尾摘要契約）。
     section.lines.extend(_pq2_item_lines(actionable, todo_mod=todo_mod))
-    section.lines.append(priced_only_queue_line(*priced_only_names(state_dir)))
+    section.lines.append(open_choice_queue_line(*open_choice_rows(state_dir)))
     # 等你提供的文件（2026-10-06 使用者指示：拿不到的來源要開口、不 park；10-07：「隔離一區讓我知道 也不要讓我直接 go
     # 提供文件才算 go」）。名單只有 `todo.document_requests()` 一份（L16）；0 也印（L14）。
     section.lines.append(
@@ -2810,8 +2691,9 @@ SNAPSHOT_KEYS: dict[str, str] = {
     # 邊緣門檻的遲滯與在門檻上（2026-11-01）：今天才翻成非邊緣的檔數、落在門檻帶內的檔數
     "candidate.not_edge_pending": "候選 非邊緣待確認",
     "candidate.on_threshold": "候選 在門檻上",
-    # 只差已定價（盲點修法 §1 第 3 條，2026-11-03）：摘要行「球在你」旁邊印它——③ 列了它，球在你的數不能只數 pq2
-    "candidate.priced_only": "候選 只差已定價",
+    # 可開待你選（2026-11-03 第 18＋16 條；取代同日的「只差已定價」）：摘要行「球在你」旁邊印它——③ 列了它，
+    # 球在你的數不能只數 pq2。換鍵、首日起比對（語意不同，L12）
+    "candidate.open_undecided": "候選 可開待你選",
     # 追蹤表三條 lane（Phase 5 Step 5.2）：列數與曾達 2 倍——較昨 diff 看得到第一筆回填、第一份新敘事、第一個 2 倍。
     "positions.lane.paper.n": "追蹤表 paper 列數", "positions.lane.live.n": "追蹤表 live 列數",
     **{f"positions.lane.{lane}.reached_2x_ever": f"{lane} 曾達 2 倍" for lane in ("history", "paper", "live")},
@@ -2961,12 +2843,13 @@ def collect_snapshot(*, now: datetime, state_dir: Path | None, leads_path: Path,
             return {}
         counts = board.get("counts") or {}
         c = candidate_counts(board)
+        undecided, _problem = open_choice_rows(state_dir)
         return {**{f"candidate.{k}": counts.get(k) for k in (*CANDIDATE_GROUPS, *CANDIDATE_SIDE_GROUPS, "no_narrative")},
                 "candidate.edge_unmeasurable": c["edge_unmeasurable"],
                 "candidate.open_unmeasurable": c["open_unmeasurable"],
                 "candidate.not_edge_pending": c.get("not_edge_pending"),
                 "candidate.on_threshold": c.get("on_threshold"),
-                "candidate.priced_only": counts.get("priced_wait_priced_only")}
+                "candidate.open_undecided": None if undecided is None else len(undecided)}
 
     def positions() -> dict[str, Any]:
         payload, absence = _load_state(state_dir, "positions")
@@ -3241,12 +3124,12 @@ def summary_line(*, now: datetime, snapshot: Mapping[str, Any], run_record_path:
     today = now.astimezone().date().isoformat()
     actionable = snapshot.get("pq2.actionable")
     head = f"Daily {today}｜球在你 {'未讀到' if actionable is None else actionable}"
+    undecided = snapshot.get("candidate.open_undecided")
+    if undecided:
+        head += f"｜可開待你選 {undecided}"
     asking = snapshot.get("pq2.source_trace_review")
     if asking:
         head += f"｜等你給文件 {asking}"
-    priced_only = snapshot.get("candidate.priced_only")
-    if priced_only:
-        head += f"｜只差已定價 {priced_only}"
     flags: list[str] = []
     try:
         log = list((_read_json(leads_path) or {}).get("harvest_log") or [])

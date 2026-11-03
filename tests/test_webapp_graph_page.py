@@ -1,7 +1,7 @@
 """「圖」頁（2026-10-28 使用者照推薦：讀圖、走圖、層說明、結構表併成一頁；brainstorm 2026-10-28 定案 6：骨架＝層）。
 
 守四件事：
-1. **三區只有一份、每一種判讀恰好一區**：押得下去＝候選「可開」騎得上的那兩種判讀（`OPEN_READING_KINDS`，L16）；
+1. **三區只有一份、每一種判讀恰好一區**：押得下去＝讀圖判換不掉或量的那兩種判讀（`BETTABLE_READING_KINDS`，L16）；
    新增判讀種類沒進任何一區就紅——不會從圖頁安靜消失（INV-3）。
 2. **`/api/v1/graph` 只接不算**：區內照讀圖 artifact 的列序；坐在這一層＝結構表 `supplies_to`（買方那一側不算，L12）；
    層內公司照首頁組序再代號、沒有個股頁的排後面；「錢在變多嗎」照抄個股頁的層序列；讀圖另外關聯的標的分開印。
@@ -16,7 +16,7 @@ from pathlib import Path
 import pytest
 from starlette.testclient import TestClient
 
-from alpha.providers.briefs import OPEN_READING_KINDS
+from alpha.providers.briefs import BETTABLE_READING_KINDS, OPEN_READING_KINDS
 from alpha.structure_reading.contracts import READING_KIND_SHORT, READING_KINDS
 from webapp.api import GRAPH_RESEARCH_HOLES, _graph_suppliers, create_app
 from webapp.contracts import canonical_digest
@@ -39,7 +39,10 @@ def test_every_reading_kind_lands_in_exactly_one_zone() -> None:
     zones = reading_zones()
     placed = [kind for zone in zones for kind in zone["kinds"]]
     assert sorted(placed) == sorted(READING_KINDS)                     # 一種不少、一種不重
-    assert set(zones[0]["kinds"]) == set(OPEN_READING_KINDS)           # 押得下去＝可開騎得上的那兩種（同一份）
+    assert set(zones[0]["kinds"]) == set(BETTABLE_READING_KINDS)       # 押得下去＝判換不掉或量的那兩種（同一份）
+    # 2026-11-03（第 18＋16 條）：起始門多收判不出——那是這一檔能不能開始，不是這一層判了什麼；判不出照樣在自己那一區（L12）
+    assert "undecided" in OPEN_READING_KINDS and "undecided" not in zones[0]["kinds"]
+    assert "neither" not in OPEN_READING_KINDS
     assert [z["key"] for z in zones] == ["bettable", "undecided", "not_opportunity"]
     assert set(READING_KIND_SHORT) == set(READING_KINDS)               # 短名與長句同一組鍵
 

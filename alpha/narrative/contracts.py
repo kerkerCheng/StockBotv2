@@ -36,6 +36,7 @@ from datetime import date, datetime, timezone
 from typing import Any, Mapping, Sequence
 
 from ..errors import ContractViolation
+from .depth_check import DEPTH_CHECK_KEYS, depth_check_problems
 
 RECORD_VERSION = "investor-brief/v1"
 #: v1＝原七格（含已退役的估值 placeholder）；**照讀、不改寫**，新寫一律 v2（Phase 3 Step 3.4，ROADMAP A1）。
@@ -307,8 +308,13 @@ class BriefSlot:
         return tuple(placeholders_in(self.text))
 
 
-#: 候選狀態（Phase 3 Step 3.4，使用者定案 #2）。寫的人能宣告的只有前四個；**`held`（已持有）一律由 Sheet 推導**，不收。
-CANDIDATE_STATES_DECLARABLE: tuple[str, ...] = ("open", "missing", "priced_wait", "pass")
+#: 候選狀態（Phase 3 Step 3.4，使用者定案 #2）。寫的人能宣告的只有這三個；**`held`（已持有）一律由 Sheet 推導**，不收。
+#: 2026-11-03（盲點修法第 18＋16 條；AGENTS「候選狀態是封閉字彙：可開／缺 X／不要／已持有」）：「已定價等回落」併回可開——
+#: 已定價寫成可開裡的一句脈絡，不是一個分組。
+CANDIDATE_STATES_DECLARABLE: tuple[str, ...] = ("open", "missing", "pass")
+#: 退役的宣告值 → 現在怎麼讀。舊紀錄照讀（append-only、不回寫、brief_id 不變），一律讀成右邊那一態（`CandidateState.effective`）；
+#: 新寫的由寫入端拒收（`alpha.providers.briefs.v2_write_problems`）——放在 parse 路徑擋，舊紀錄會解析失敗、從候選板安靜消失。
+CANDIDATE_STATES_RETIRED: Mapping[str, str] = {"priced_wait": "open"}
 CANDIDATE_STATES: tuple[str, ...] = (*CANDIDATE_STATES_DECLARABLE, "held")
 #: 缺 X 的三分法（2026-10-30 使用者「好 可以」；failure log #117；ROADMAP「缺 X 三分法與文件請求上限」②）：
 #: `filing`＝X 會在下一份公開文件出現（等事件）、`layer`＝X 是層的問題（層深讀的入口）、`user_document`＝X 可能寫在使用者
@@ -431,16 +437,18 @@ class CandidateState:
     reason: str | None = None
     #: 缺 X 的三分（`MISSING_KINDS`，2026-10-30）：只有 state=missing 能帶；None＝未分（舊敘事沒寫，重寫時補）
     missing_kind: str | None = None
-    #: 等回落的重開條件（`Reopen`，2026-11-01）：只有 state=priced_wait 能帶；None＝沒寫（舊紀錄照讀，新寫的由寫入端擋）
+    #: 等回落的重開條件（`Reopen`，2026-11-01）：只有 state=priced_wait 能帶。2026-11-03 等回落退役後只剩舊紀錄帶著它
+    #: （照讀、不再叫醒任何東西）
     reopen: "Reopen | None" = None
 
     def __post_init__(self) -> None:
         if self.state == "held":
             raise ContractViolation("candidate_state 不收 held——「已持有」一律由 Sheet 推導，寫的人不能宣告（定案 #2）")
-        if self.state not in CANDIDATE_STATES_DECLARABLE:
+        if self.state not in CANDIDATE_STATES_DECLARABLE and self.state not in CANDIDATE_STATES_RETIRED:
             raise ContractViolation(f"candidate_state.state 必須是 {CANDIDATE_STATES_DECLARABLE} 之一（收到 {self.state!r}）")
         if self.state in ("missing", "priced_wait") and not str(self.watch_id or "").strip():
-            raise ContractViolation(f"candidate_state={self.state} 必須帶 watch_id（缺 X／等回落都要指向一筆在等的 watch）")
+            raise ContractViolation(f"candidate_state={self.state} 必須帶 watch_id（缺 X 要指向一筆在等的 watch；"
+                                    "舊紀錄的等回落也都帶著）")
         if self.state == "pass" and not str(self.reason or "").strip():
             raise ContractViolation("candidate_state=pass 必須帶 reason（「不要」附理由、append-only）")
         if self.missing_kind is not None:
@@ -450,6 +458,12 @@ class CandidateState:
                 raise ContractViolation(f"missing_kind 必須是 {MISSING_KINDS} 之一（收到 {self.missing_kind!r}）")
         if self.reopen is not None and self.state != "priced_wait":
             raise ContractViolation(f"reopen 只有 candidate_state=priced_wait 能帶（收到 state={self.state!r}）")
+
+    @property
+    def effective(self) -> str:
+        """現在怎麼讀這一態：退役的宣告值換成接手它的那一態（舊的等回落讀成可開，2026-11-03），其餘原樣。
+        候選板、滯留、喚醒 watch 的歸屬都讀這一個；成績單的「錨點那天宣告的狀態」照原字（當時說的話不改寫，INV-6）。"""
+        return CANDIDATE_STATES_RETIRED.get(self.state, self.state)
 
     def as_dict(self) -> dict[str, Any]:
         out: dict[str, Any] = {"state": self.state, "watch_id": self.watch_id, "reason": self.reason}
@@ -467,6 +481,8 @@ REOPEN_NOT_APPLICABLE_PREFIX = "不適用："
 @dataclass(frozen=True, slots=True)
 class Reopen:
     """等回落的重開條件（2026-11-01 使用者「兩點都照你建議吧」；failure log #124；plan 2026-11-01-002 P1）。
+
+    ⚠ 2026-11-03 等回落併回可開（盲點修法第 18＋16 條）：新紀錄寫不出等回落，這個形狀只剩舊紀錄照讀——不叫醒、不印、不比對。
 
     寫敘事的人宣告「股價或自家三年百分位到哪裡就重開」——**每份敘事自己寫的判斷**（同反證條件），不是系統門檻
     （AGENTS「已定價不設門檻」照舊：系統沒有一個全體適用的數字）。達成只叫醒重問，不改候選狀態、不給動作。
@@ -651,6 +667,9 @@ class InvestorBrief:
     #: （`alpha.candidates`），不因改字歸零。v2 的**選填**欄，只在有值時進 id；能不能宣告由寫入端核對（同一條鏈上的祖先、
     #: 候選狀態與 answers 與它相同）。
     restates: str | None = None
+    #: 深挖清單＝加碼條件查到哪裡（2026-11-03 盲點修法第 18＋16 條；`alpha.narrative.depth_check`）：((鍵, 寫法), …) 照清單順序。
+    #: v2 的**選填**欄，只在有寫時進 id——之前的紀錄（10-31 起 CLI 只印不存）一位都不變。
+    depth_check: tuple[tuple[str, str], ...] = ()
 
     def __post_init__(self) -> None:
         if self.record_version not in RECORD_VERSIONS:
@@ -672,7 +691,7 @@ class InvestorBrief:
         if self.record_version == RECORD_VERSION_V2:
             self._check_v2_static()
         elif (self.rides or self.disproof or self.answers or self.candidate_state or self.history_not_comparable
-              or self.acknowledged_touched or self.confirm or self.priced_at_write or self.restates):
+              or self.acknowledged_touched or self.confirm or self.priced_at_write or self.restates or self.depth_check):
             raise ContractViolation("v1 紀錄不得帶 v2 的結構化欄位——v1 照讀、不補寫")
         if self.restates is not None and (not self.restates.startswith("ib_") or self.restates == self.brief_id):
             raise ContractViolation(f"restates 必須是另一版敘事的 brief_id（收到 {self.restates!r}）")
@@ -683,7 +702,11 @@ class InvestorBrief:
         if self.answers is None:
             raise ContractViolation("v2 必須帶 answers（已定價嗎／出現在數字裡了嗎；可以是 unmeasurable，不能不答）")
         if self.candidate_state is None:
-            raise ContractViolation("v2 必須帶 candidate_state（可開／缺 X／已定價等回落／不要）")
+            raise ContractViolation("v2 必須帶 candidate_state（可開／缺 X／不要）")
+        problems = depth_check_problems(dict(self.depth_check) if self.depth_check else None,
+                                        confirm_count=len(self.confirm))
+        if problems:
+            raise ContractViolation("；".join(problems))
         slots = {s.key: s for s in self.slots}
         priced = slots.get("priced_in")
         if priced is not None and "{own_history_pctile}" not in priced.text:
@@ -710,6 +733,11 @@ class InvestorBrief:
     def created_on(self) -> date:
         return self.created_at.date()
 
+    @property
+    def depth_check_map(self) -> dict[str, str]:
+        """深挖清單 `{鍵: 寫法}`；沒寫是空 dict（⑤「加碼條件還沒查」把它算成十項都還沒查）。"""
+        return dict(self.depth_check)
+
     def slot(self, key: str) -> BriefSlot | None:
         return next((s for s in self.slots if s.key == key), None)
 
@@ -732,7 +760,7 @@ _ID_FIELDS_V2 = (*_ID_FIELDS, "record_version", "rides", "disproof", "answers", 
 
 #: 只在**非空**時才進 v2 id 欄位集合的選填欄（Phase 7 Step 7.0d）。⚠ 直接加進 `_ID_FIELDS_V2` 會讓既有每一行的 id
 #: 都變——`payload.get(k)` 對缺席的鍵取 None，None 也會被寫進 canonical JSON（plan §13 已知陷阱）。
-_ID_FIELDS_V2_OPTIONAL = ("confirm", "restates")
+_ID_FIELDS_V2_OPTIONAL = ("confirm", "restates", "depth_check")
 
 
 def new_brief_id(payload: Mapping[str, Any]) -> str:
@@ -764,6 +792,7 @@ def brief_record(
     acknowledged_touched: Sequence[Mapping[str, Any]] = (),
     confirm: Sequence[Mapping[str, Any]] = (),
     restates: str | None = None,
+    depth_check: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """建一筆可寫進 ledger 的紀錄（先經 `InvestorBrief` 驗證，驗不過就不產生）。
 
@@ -771,6 +800,7 @@ def brief_record(
 
     `slots` 可以是 `{key: {"text": …, "evidence_refs": […]}}` 或同形的 list（帶 `key`）。
     `restates`：只改字面值的換版宣告重述哪一版（v2 選填；沒寫不進 payload，failure log #121）。
+    `depth_check`：深挖清單（v2 選填；沒寫或空的不進 payload，2026-11-03 盲點修法第 18＋16 條）。
     """
     stamp = created_at or datetime.now(timezone.utc)
     if stamp.tzinfo is None:
@@ -798,11 +828,12 @@ def brief_record(
     if record_version == RECORD_VERSION_V2:
         payload.update(_v2_payload(rides=rides, disproof=disproof, answers=answers, candidate_state=candidate_state,
                                    history_not_comparable=history_not_comparable,
-                                   acknowledged_touched=acknowledged_touched, confirm=confirm))
+                                   acknowledged_touched=acknowledged_touched, confirm=confirm,
+                                   depth_check=depth_check))
         if restates:
             payload["restates"] = str(restates)
-    elif restates:
-        raise ContractViolation("v1 紀錄不得帶 restates——v1 照讀、不補寫")
+    elif restates or depth_check:
+        raise ContractViolation("v1 紀錄不得帶 restates／depth_check——v1 照讀、不補寫")
     payload["brief_id"] = new_brief_id(payload)
     parse_brief_record(payload)          # 驗證；不合法就在這裡炸，不會寫進 ledger
     return payload
@@ -834,12 +865,13 @@ def parse_brief_record(raw: Mapping[str, Any]) -> InvestorBrief:
 
 
 def _v2_payload(*, rides, disproof, answers, candidate_state, history_not_comparable,
-                acknowledged_touched, confirm=()) -> dict[str, Any]:
+                acknowledged_touched, confirm=(), depth_check=None) -> dict[str, Any]:
     """v2 結構化欄位 → 正規化的 payload（先建型別物件驗證、再轉回 dict——id 由正規化後的 dict 算，決定論）。
-    `confirm` 只在非空時才出現在 payload（也才進 id）——沒寫加碼條件的紀錄與 7.0d 之前逐位相同。"""
+    `confirm`／`depth_check` 只在非空時才出現在 payload（也才進 id）——沒寫的紀錄與加這兩欄之前逐位相同。"""
     parsed = _parse_v2_fields({"rides": list(rides), "disproof": list(disproof), "answers": answers,
                                "candidate_state": candidate_state, "history_not_comparable": history_not_comparable,
-                               "acknowledged_touched": list(acknowledged_touched), "confirm": list(confirm)})
+                               "acknowledged_touched": list(acknowledged_touched), "confirm": list(confirm),
+                               "depth_check": depth_check or None})
     out = {
         "rides": [r.as_dict() for r in parsed["rides"]],
         "disproof": [d.as_dict() for d in parsed["disproof"]],
@@ -851,6 +883,8 @@ def _v2_payload(*, rides, disproof, answers, candidate_state, history_not_compar
     }
     if parsed["confirm"]:
         out["confirm"] = [c.as_dict() for c in parsed["confirm"]]
+    if parsed["depth_check"]:
+        out["depth_check"] = dict(parsed["depth_check"])
     return out
 
 
@@ -890,6 +924,12 @@ def _parse_v2_fields(raw: Mapping[str, Any]) -> dict[str, Any]:
         entities=tuple(sorted({str(e).strip() for e in (c.get("entities") or ()) if str(e).strip()})),
         expires=_iso_day(c.get("expires"), "confirm[].expires"), source=str(c.get("source") or ""))
         for c in seq("confirm"))
+    dc = raw.get("depth_check")
+    if dc is not None and not isinstance(dc, Mapping):
+        raise ContractViolation("depth_check 必須是 {鍵: 寫法} 的物件（鍵見 alpha.narrative.depth_check）")
+    # 照清單順序（不認得的鍵排最後——它會被 `_check_v2_static` 擋下，這裡不吞）；值原樣交給形狀檢查（非字串也照留，才擋得到）
+    depth = tuple(sorted(((str(k), v) for k, v in (dc or {}).items()),
+                         key=lambda kv: DEPTH_CHECK_KEYS.index(kv[0]) if kv[0] in DEPTH_CHECK_KEYS else 99))
     paw = raw.get("priced_at_write")
     if paw is not None and not isinstance(paw, Mapping):
         raise ContractViolation("priced_at_write 必須是物件")
@@ -903,7 +943,7 @@ def _parse_v2_fields(raw: Mapping[str, Any]) -> dict[str, Any]:
               if paw else None)
     return {"rides": rides, "disproof": disproof, "answers": answers, "candidate_state": candidate,
             "history_not_comparable": history, "acknowledged_touched": acks, "confirm": confirm,
-            "priced_at_write": priced}
+            "priced_at_write": priced, "depth_check": depth}
 
 
 def _reopen(raw: Any) -> Reopen | None:
@@ -932,7 +972,8 @@ def select_brief(records: Sequence[InvestorBrief], *, as_of: date | None, today:
 __all__ = [
     "RAW_EXCERPT_PREFIX",
     "ACK_DISPOSITIONS", "ANSWER_KEYS", "ANSWER_VALUES", "Acknowledgement", "Answers", "BRIEF_FRAME_V2",
-    "BRIEF_SLOTS_V2", "CANDIDATE_STATES", "CANDIDATE_STATES_DECLARABLE", "CandidateState", "HistoryNotComparable",
+    "BRIEF_SLOTS_V2", "CANDIDATE_STATES", "CANDIDATE_STATES_DECLARABLE", "CANDIDATE_STATES_RETIRED", "CandidateState",
+    "HistoryNotComparable",
     "REOPEN_NOT_APPLICABLE_PREFIX", "Reopen",
     "NarrativeConfirm", "NarrativeDisproof", "PLACEHOLDERS_V2", "PRICED_DATE_MARK", "PRICED_POSITION_WORDS",
     "PricedSnapshot", "RECORD_VERSION_V1", "RECORD_VERSION_V2", "RECORD_VERSIONS", "undated_position_claims",

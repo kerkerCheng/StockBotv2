@@ -421,8 +421,8 @@ def add_watch(
     # 喚醒目標恰好擇一（[321] 由二選一擴充；Phase 1 Step 1.4 加 disproof_ref）：pq2 編號（翻醒 waiting 項）、
     # 假設 id（fact-check 到點）、lead id（追源線索排回 pq1）、或反證來源（語意條件，指回 memo／讀圖）。
     # Phase 1 Step 1.5 再加 wake_reading（讀圖節點：需求側客戶出了新一手文件 → 該節點列進 needs_reread）。
-    # Phase 3 Step 3.4 再加 wake_brief（公司 co:*）：敘事宣告「缺 X」「已定價等回落」時在等的那件事——醒來或到期
-    # 都進佇列段 `narrative_rewrite`（該重寫敘事），不鑄 pq2、不進假設對照。
+    # Phase 3 Step 3.4 再加 wake_brief（公司 co:*）：敘事宣告「缺 X」時在等的那件事（11-03 前「已定價等回落」的舊紀錄
+    # 也帶著它，照舊等到期）——醒來或到期都進佇列段 `narrative_rewrite`（該重寫敘事），不鑄 pq2、不進假設對照。
     targets = [bool(wake_pq2), bool(hypothesis_ref), bool(wake_lead), bool(disproof_ref), bool(wake_reading),
                bool(wake_brief)]
     if sum(targets) != 1:
@@ -1153,7 +1153,7 @@ def counters(data: Mapping[str, Any], *, coverage: frozenset[str] | None = None)
         # Phase 7 Step 7.0d：加碼條件分開數——它不是反證
         "wake_confirm": sum(1 for w in active if is_confirm(w)),
         "wake_reading": sum(1 for w in active if w.get("wake_reading")),
-        # Phase 3 Step 3.4：敘事宣告「缺 X」「已定價等回落」在等的事（醒來／到期＝該重寫敘事）
+        # Phase 3 Step 3.4：敘事宣告「缺 X」在等的事（醒來／到期＝該重寫敘事；舊的等回落紀錄也帶著）
         "wake_brief": sum(1 for w in active if w.get("wake_brief")),
         "semantic_unreachable": (None if coverage is None else
                                  sum(1 for w in watching if not is_reachable(w, coverage))),
@@ -1647,7 +1647,7 @@ def main(argv: list[str] | None = None) -> int:
     )
     add.add_argument(
         "--wake-brief", default="",
-        help="co:*——敘事宣告「缺 X」「已定價等回落」時在等的事（kind 限 date／entity_filing_signal／"
+        help="co:*——敘事宣告「缺 X」時在等的事（kind 限 date／entity_filing_signal／"
              "related_entity_signal；醒來或到期進 narrative_rewrite，Phase 3 Step 3.4）")
     add.add_argument("--poll", action="store_true")
     add.add_argument("--query-hint", default="")

@@ -143,9 +143,9 @@ _CLOSURE_LABELS: dict[str, str] = {
 }
 #: overview 沒有候選狀態（2026-10-07 之前 materialize 的舊 artifact）——是 artifact 的版本問題，不是「沒有敘事」。
 _STALE_GROUP = {"key": "stale_artifact", "label": "判讀早於這次分組（重跑 materialize 就會歸位）"}
-#: 首頁預設展開的組（2026-10-28 使用者：「單檔判讀頁面太多檔了」）：持有、可開、缺 X、等回落——要你看的；
-#: 其餘（不要、無法量、還沒寫、非邊緣…）收合但照數。組序與中文仍只有 `.meta.json` 那一份，這裡只說哪幾組攤開。
-MAIN_GROUPS: tuple[str, ...] = ("held", "open", "missing", "priced_wait")
+#: 首頁預設展開的組（2026-10-28 使用者：「單檔判讀頁面太多檔了」）：持有、可開、缺 X——要你看的（2026-11-03 等回落
+#: 併回可開）；其餘（不要、無法量、還沒寫、非邊緣…）收合但照數。組序與中文仍只有 `.meta.json` 那一份，這裡只說哪幾組攤開。
+MAIN_GROUPS: tuple[str, ...] = ("held", "open", "missing")
 #: 「接下來兩週會揭曉」看多遠（天）。
 CALENDAR_DAYS = 14
 
@@ -665,8 +665,9 @@ async def report_card(request: Request) -> Response:
     """「成績單」頁：我們說過的話、追過的來源，後來對不對。
 
     只**接**已 materialize 的 positions＋account_scorecard＋structure_readings（的圖預測對錯表），不重算、不加新數字：
-    paper 線照「寫下判斷那天宣告的候選狀態」分組——組照 `.meta.json` 的 `claim_groups`（敘事能宣告的四種，0 也印），
-    字彙外或沒記下的狀態照列在後面（不消失，INV-3）；組內照 artifact 的列序（代號字母序），**不照報酬排**（排了就是
+    paper 線照「寫下判斷那天宣告的候選狀態」分組——組照 `.meta.json` 的 `claim_groups`（敘事現在能宣告的幾種，0 也印），
+    退役的宣告值（11-03 前的等回落，中文在 `retired_states`）、字彙外或沒記下的狀態照列在後面（不消失，INV-3；
+    當時說的話照當時的字分組，不改寫成今天的讀法——INV-6）；組內照 artifact 的列序（代號字母序），**不照報酬排**（排了就是
     跨檔全序，G1），也不算組平均（量測才幾週，平均是雜訊；brainstorm F4）。
     positions 讀不到＝整頁 503（骨架就是它）；另兩份讀不到，那一段寫讀不到、別段照出。"""
     positions, missing = _optional_state(request, "positions")
@@ -679,7 +680,8 @@ async def report_card(request: Request) -> Response:
     vocab = _read_vocabularies(_store(request)).get("vocabularies") or {}
     declared = [str(g["key"]) for g in vocab.get("claim_groups") or () if g.get("key")]
     labels = {str(g["key"]): str(g.get("label") or g["key"])
-              for key in ("list_groups", "claim_groups", "paper_state_exits") for g in vocab.get(key) or ()}
+              for key in ("list_groups", "claim_groups", "retired_states", "paper_state_exits")
+              for g in vocab.get(key) or ()}
     labels.setdefault(CLAIM_UNRECORDED, "寫下那天的狀態沒記下")
 
     # 每列多兩個中文標籤（複本，不動讀進來的 payload）；其餘照抄

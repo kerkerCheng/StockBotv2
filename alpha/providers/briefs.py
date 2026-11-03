@@ -13,8 +13,9 @@ from typing import Any, Mapping, Sequence
 
 from shared.redaction import sensitive_payload_path
 
-from ..narrative.contracts import (LINKABLE_SOURCE_PREFIXES, RAW_EXCERPT_PREFIX, InvestorBrief, lamp_colour_claims,
-                                   parse_brief_record, price_quote_claims, undated_position_claims)
+from ..narrative.contracts import (CANDIDATE_STATES_RETIRED, LINKABLE_SOURCE_PREFIXES, RAW_EXCERPT_PREFIX,
+                                   InvestorBrief, lamp_colour_claims, parse_brief_record, price_quote_claims,
+                                   undated_position_claims)
 from ..errors import ContractViolation
 
 _ROOT = Path(__file__).resolve().parents[2]
@@ -72,8 +73,12 @@ def append_brief_record(record: Mapping[str, Any], *, directory: Path | None = N
 # v2 的寫入端（Phase 3 Step 3.4）：寫入當下才成立的檢查只放這裡，不放 parse 路徑（plan §13）
 # ---------------------------------------------------------------------------
 
-#: 「可開」要求騎的讀圖判讀是護城河或量（`undecided` 不行）。
-OPEN_READING_KINDS: frozenset[str] = frozenset({"moat", "volume"})
+#: 讀圖判這一層押得下去的兩種判讀（護城河或量）——APP「圖」頁「押得下去的層」那一區（`webapp.materialize.reading_zones`）。
+BETTABLE_READING_KINDS: frozenset[str] = frozenset({"moat", "volume"})
+#: 「可開」的起始門要押的那一層讀過、而且判讀不是 `neither`（換得掉）——`undecided`（查了判不出）可以：讀到邊是加碼的門、
+#: 不是起始的門（2026-11-03 盲點修法第 18＋16 條；決定紀錄 §10.1 條 2 作答 (a)）。之前只收護城河或量、與上面那一組同一份；
+#: 11-03 起是兩句話（L12）：圖頁分區說的是**這一層**判了什麼，起始門說的是**這一檔**能不能開始——判不出的層照樣在「還判不出」那一區。
+OPEN_READING_KINDS: frozenset[str] = BETTABLE_READING_KINDS | {"undecided"}
 #: 讀圖「現行」＝這兩態：`stale_low` 只有低等級變動、不進重讀佇列——不算現行的話，可開會被一個修不回來的狀態打掉。
 CURRENT_READING_STATUSES: frozenset[str] = frozenset({"current", "stale_low"})
 #: 已定價那一格引用的稽核行。相對組漲幅（③）2026-09-30 起只在稽核區、不上首屏，所以不在這裡——它有值不強迫答 yes／no。
@@ -273,9 +278,15 @@ def v2_write_problems(parsed: InvestorBrief, *, ctx: WriteContext, existing: Seq
             problems.append(f"answers.in_numbers={parsed.answers.in_numbers}：position 引用的 "
                             f"{'、'.join('{' + p + '}' for p in cited)} 在稽核區沒有值，印出來是（尚無）——有值的是 {hint}")
 
-    # ④ candidate_state：缺 X／等回落 → 本公司 wake_brief、active、kind 合法
+    # ④⁰ 退役的宣告值（2026-11-03 盲點修法第 18＋16 條；AGENTS「候選狀態是封閉字彙：可開／缺 X／不要／已持有」）：
+    #    舊紀錄照讀成可開，新寫的拒收——只改字面值的重述（restates）也一樣：它要沿用的判斷已經不在字彙裡
     cs = parsed.candidate_state
-    if cs is not None and cs.state in ("missing", "priced_wait"):
+    if cs is not None and cs.state in CANDIDATE_STATES_RETIRED:
+        problems.append(f"candidate_state：「已定價等回落」2026-11-03 已併回可開——已定價寫在 priced_in 那一格當脈絡"
+                        f"（已定價時翻倍條件寫得更嚴），候選狀態照起始門宣告 {CANDIDATE_STATES_RETIRED[cs.state]}／missing／pass；"
+                        "要不要等價格是使用者在 ③ 的選擇（看了沒買），不是候選狀態")
+    # ④ candidate_state：缺 X → 本公司 wake_brief、active、kind 合法
+    if cs is not None and cs.state == "missing":
         w = next((w for w in watches if w.get("watch_id") == cs.watch_id), None)
         if w is None:
             problems.append(f"candidate_state：watch {cs.watch_id} 不存在")
@@ -288,12 +299,7 @@ def v2_write_problems(parsed: InvestorBrief, *, ctx: WriteContext, existing: Seq
                             "（thesis／讀圖的語意 watch、別家的、或前一版 brief: 的都不行）")
         elif w.get("kind") not in ew.WAKE_BRIEF_KINDS:
             problems.append(f"candidate_state：watch {cs.watch_id} 的 kind {w.get('kind')} 不在 {sorted(ew.WAKE_BRIEF_KINDS)}")
-    # ④b 等回落的重開條件（2026-11-01 使用者「兩點都照你建議吧」；failure log #124；plan 2026-11-01-002 P1）：新寫的等回落
-    #    必須寫「到哪裡就重開」——沒有出口的等待會一直等下去。只改字面值的重述（restates）沿用被重述那一版的判斷，不擋。
-    if cs is not None and cs.state == "priced_wait" and cs.reopen is None and parsed.restates is None:
-        problems.append("candidate_state：等回落要寫重開條件 reopen——一句話 text＋price_at_or_below 或 "
-                        "own_pctile_at_or_below（兩個都寫不出來時 text 以「不適用：」開頭寫理由）；"
-                        "達成只叫醒重問，不改狀態（failure log #124）")
+    # ④b（等回落的重開條件，2026-11-01）隨等回落一起退役（2026-11-03）：新紀錄寫不出等回落，上面 ④⁰ 已擋
 
     # ⑤ 該重寫的 watch 逐條處置（不論是否帶 supersedes_id、不論前一筆是否撤回）
     pending = {str(w.get("watch_id")) for w in pending_rewrite(company, watches=watches, brief_ids=brief_ids)}
@@ -303,12 +309,18 @@ def v2_write_problems(parsed: InvestorBrief, *, ctx: WriteContext, existing: Seq
     if acked - pending:
         problems.append(f"acknowledged_touched 處置了不在「該重寫」狀態的 watch：{sorted(acked - pending)}")
 
-    # ⑥ 可開的三個前提（lifecycle 讀不到由 `blocking_for_open` fail closed，R2-a C3）
+    # ⑥ 可開的起始門（2026-11-03 盲點修法第 18＋16 條；AGENTS「候選狀態是封閉字彙」那一句）：押的那一層判讀不是 neither、
+    #   反證已寫下且有到期（到期晚於今天由 ② 驗）、沒有待處置的反證 watch（lifecycle 讀不到由 `blocking_for_open` fail closed，
+    #   R2-a C3）。「已定價寫成一句脈絡」是 v2 契約（priced_in 那一格與 answers 必寫）；「會死嗎不是紅」每天重算、寫入端不載燈，
+    #   只在候選板驗（`alpha.providers.candidates.open_preconditions`）。讀到邊與深挖清單是加碼條件，不在這裡擋。
     if cs is not None and cs.state == "open":
         for ride in parsed.rides:
             row = status_by_ride.get((ride.node, ride.unit)) or {}
             if row.get("kind") not in OPEN_READING_KINDS:
-                problems.append(f"open：押的 {ride.reading_id} 判讀是 {row.get('kind')}——可開要護城河或量")
+                problems.append(f"open：押的 {ride.reading_id} 判讀是 {row.get('kind')}——起始門要押的那一層讀過、"
+                                "而且判讀不是 neither（換得掉）")
+        if not parsed.disproof:
+            problems.append("open：起始門要反證已寫下且有到期（disproof[] 至少一條）——知道什麼時候認錯才開始")
         blocking = blocking_for_open(company, ticker, watches=watches, lifecycle=ctx.lifecycle, brief_ids=brief_ids,
                                      current_brief=parsed, acknowledged=acked)
         if blocking:
@@ -357,6 +369,27 @@ def v2_write_problems(parsed: InvestorBrief, *, ctx: WriteContext, existing: Seq
     #   沒改的這一版，騎的讀圖跟正文寫的時候騎的那份比：判讀或供給側家數不同就拒收——改寫受影響的句子再寫。
     #   比的是讀圖紀錄的結構，不看 note 寫什麼、不解析正文的「N 家」。正文改過（或第一版）就不比。
     problems.extend(body_behind_problems(parsed, existing=existing, readings_by_id=ctx.readings_by_id))
+
+    # ⑬ 深挖清單的引用要指得回（2026-11-03 盲點修法第 18＋16 條；L18）：寫成引用的項目算「查過」，所以引用的一手節錄要在
+    #   library/raw、讀圖 id 要真的存在——指不回的引用等於沒查卻算查過。其他寫法（網址、不適用、加碼條件、缺）不在這裡驗
+    #   （形狀由契約擋）。
+    problems.extend(depth_check_ref_problems(parsed, readings_by_id=ctx.readings_by_id, root=_ROOT))
+    return problems
+
+
+def depth_check_ref_problems(parsed: InvestorBrief, *, readings_by_id: Mapping[str, Any], root: Path) -> list[str]:
+    """⑬：`depth_check` 裡寫成 `library/raw/…` 的檔要在 library/raw 底下、`sr_…` 要是讀圖 id。回問題清單。"""
+    raw_dir = (root / "library" / "raw").resolve()
+    problems: list[str] = []
+    for key, value in parsed.depth_check:
+        text = str(value).strip()
+        if text.startswith(RAW_EXCERPT_PREFIX):
+            path = (root / text).resolve()
+            if raw_dir not in path.parents or not path.is_file():
+                problems.append(f"depth_check.{key}：{text} 在 library/raw 找不到（或跳出了 library/raw）——"
+                                "一手節錄要先存成檔再引用")
+        elif text.startswith("sr_") and text not in readings_by_id:
+            problems.append(f"depth_check.{key}：{text} 不是任何讀圖 id")
     return problems
 
 
@@ -503,7 +536,7 @@ def write_brief(record: Mapping[str, Any], *, ctx: WriteContext, directory: Path
     return {"path": str(path), "brief_id": parsed.brief_id, **summary, "notices": notices}
 
 
-__all__ = ["BRIEF_DIR", "CURRENT_READING_STATUSES", "OPEN_READING_KINDS", "PRICED_IN_WRITE_LINES", "WriteContext", "append_brief_record", "priced_snapshot",
-           "body_behind_problems",
+__all__ = ["BETTABLE_READING_KINDS", "BRIEF_DIR", "CURRENT_READING_STATUSES", "OPEN_READING_KINDS", "PRICED_IN_WRITE_LINES", "WriteContext", "append_brief_record", "priced_snapshot",
+           "body_behind_problems", "depth_check_ref_problems",
            "ledger_path", "read_brief_records", "restates_problems", "v2_write_notices", "v2_write_problems",
            "write_brief"]

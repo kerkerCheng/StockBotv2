@@ -5,7 +5,8 @@
 
 ⚠ 2026-09-23（Phase 0 Step 0b.1b，C／H 組）：`target_reached`（現價對兩個目標價的比較）與
 `bet_recorded_on`（賭注寫下那天）退役——目標價隨估值鏈與 E 組退役，沒有目標價就沒有「到了沒」。
-AGENTS「`realized` 只提醒、不觸發出場」的判準沒退役，它的新家是候選狀態「已定價等回落」（Phase 3）。
+AGENTS「`realized` 只提醒、不觸發出場」的判準沒退役，它的家曾是候選狀態「已定價等回落」（Phase 3；2026-11-03 併回可開，
+已定價改當可開那一列的脈絡）。
 `consensus_progress` 的 `our_value` 今天恆為 None（內部 EPS 已退役）：`closed_fraction` 是 None、不是 0，
 量到的只有共識本身從起點到現值的移動。
 

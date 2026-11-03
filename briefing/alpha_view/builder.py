@@ -1967,8 +1967,8 @@ def build_alpha_investment_view(
         warnings.append("Decision Store 的 catalyst／disproof／expiry 設定不完整：" + "；".join(problems))
     # ⚠ **2026-09-23（Phase 0 Step 0b.1b）：`target_reached`（目標價到了沒）退役。**
     # 它比的是現價 vs base／賭注目標價，兩個目標價都隨估值鏈與 E 組退役。
-    # **AGENTS D3 的判準沒有退役**（`realized` 只提醒、不觸發出場）——它現在的家是候選狀態
-    # 「已定價等回落」（Phase 3 的五值封閉字彙），而不是一個由目標價算出來的布林。
+    # **AGENTS D3 的判準沒有退役**（`realized` 只提醒、不觸發出場）——它的家曾是候選狀態「已定價等回落」（Phase 3 的
+    # 五值封閉字彙）；2026-11-03 等回落併回可開後，已定價是可開那一列的脈絡、要不要等價格是使用者的選擇，判準照舊。
     argument_section = _argument_section(
         company_label=identity_section.company_label, company_id=identity_section.company_id,
         structural=structural_section, variant=variant_section, falsification=falsification_section,

@@ -545,7 +545,9 @@ def test_the_brief_prints_the_status_block_and_each_line_degrades_alone(tmp_path
     assert "較昨變動" not in block
     assert "- 候選：讀不到（OSError）" in block
     assert "- 你的決定 10 月：進 " in block                 # 盲點修法第 17 條：候選板讀不到不帶走這一行（讀的是兩本 log）
-    assert "- 等回落：讀不到（OSError）" in block
+    assert "等回落" not in block                             # 2026-11-03 第 18＋16 條：④ 的等回落小塊退役
+    decisions = text.split("### ③ 待你決定", 1)[1].split("### ④", 1)[0]
+    assert "**可開待你選：讀不到（OSError）**" in decisions  # ③ 的可開待你選讀不到照說，不帶走 pq2 那幾塊
     assert "- watch：今日醒 1｜到期 0｜語意標旗 2" in block
     assert "- 反證：在盯 5｜**觸及待處置 未讀到**" in block
     assert "- 無到期的等待 0" in block
@@ -714,8 +716,8 @@ def test_the_brief_puts_document_requests_in_their_own_block(tmp_path, monkeypat
                      {"type": "source_trace_review", "ref_id": "lead_doc", "title": "向你要文件：全新光電券商報告"}])
     monkeypatch.setattr(todo, "load", lambda *a, **k: pool)
     monkeypatch.setattr(hb, "quota_entries", lambda rows, now: [])
-    # ③ 的只差已定價讀真實候選板（2026-11-03 第 3 條）——這條只驗文件那一區，隔開它（有它的排版見 test_priced_only_decision）
-    monkeypatch.setattr(hb, "priced_only_names", lambda state_dir, **_kw: ([], None))
+    # ③ 的可開待你選讀真實候選板（2026-11-03 第 18＋16 條）——這條只驗文件那一區，隔開它（排版見 test_open_two_gates）
+    monkeypatch.setattr(hb, "open_choice_rows", lambda state_dir, **_kw: ([], None))
     leads_path = tmp_path / "pending_leads.json"
     leads_path.write_text(json.dumps({"leads": {}, "harvest_log": []}), encoding="utf-8")
     text = daily_brief.compose_brief(now=NOW, summary="Daily｜球在你 1｜等你給文件 1", snapshot={},
