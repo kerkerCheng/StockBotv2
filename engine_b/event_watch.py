@@ -1380,6 +1380,8 @@ def judge(data: dict[str, Any], watch_id: str, *, touches: bool, note: str,
     - `touches=False` → `reactivate`（note 必填）：觸發 lead 已在 consumed_leads，不會再叫醒；到期仍由 expires 收斂。
     - `touches=True` → consume＋寫 `judgment`（`quote`＝文件逐字，**必填**；L18：標籤要指得回原文）。
       **等待不在這裡消失**：thesis 來源的由 `thesis_lifecycle` 那一筆接住、讀圖來源的列進 `needs_reread`（C3／A5；Step 1.5）。
+    每次判定附叫醒它那一則的預篩 verdict（別則的舊標旗不算、沒標記 None）——量預篩準不準用（`prescreen_agreement`；
+    `judge_wake` 的對稱面；2026-11-03 盲點修法 §1 第 6 條，INV-5）。
     """
     if not str(note or "").strip():
         raise EventWatchError("judge 必須附 note（為什麼判定觸及／無關）")
@@ -1389,7 +1391,8 @@ def judge(data: dict[str, Any], watch_id: str, *, touches: bool, note: str,
         if watch.get("kind") != SEMANTIC_KIND or watch.get("status") != "fired":
             raise EventWatchError(f"只能判定 fired 的語意 watch：{watch_id}")
         judgment = {"at": _now(), "touches": "yes" if touches else "no", "note": note,
-                    "lead_id": (watch.get("woken_by") or {}).get("lead_id")}
+                    "lead_id": (watch.get("woken_by") or {}).get("lead_id"),
+                    "prescreen_verdict": (flag_for_current(watch) or {}).get("verdict")}
         announcement = (watch.get("woken_by") or {}).get("announcement")
         if announcement:      # 批次二 E2：量「例行重訊類別占語意判定的比例」用（INV-5：先量測後放閘）
             judgment["announcement_category"] = announcement.get("category")
@@ -1440,6 +1443,37 @@ def routine_judgment_share(data: Mapping[str, Any], *, days: int = 7, today: dat
     routine = sum(1 for j in judgments if j.get("announcement_category") in ROUTINE)
     return {"days": days, "judgments": len(judgments), "routine": routine,
             "with_category": sum(1 for j in judgments if j.get("announcement_category"))}
+
+
+def prescreen_agreement(data: Mapping[str, Any], *, days: int = 30, today: date | None = None) -> dict[str, int]:
+    """近 N 天語意判定的「預篩 vs 互動」逐格數（盲點修法 §1 第 6 條；INV-5：先量測後放閘）：一致、預篩說觸及→判無關、
+    預篩說無關→判觸及、預篩看不出、沒標旗。
+
+    11-03 以前的判定沒記 verdict：只在現存標旗正是叫醒那一則（lead 相同）、而且標在判定之前時對回去，另計 `backfilled`。
+    對不回去的算沒標旗——標旗會被下一次叫醒蓋掉，所以「沒標旗」不能讀成預篩漏跑。"""
+    since = ((today or _today()) - timedelta(days=days)).isoformat()
+    counts = dict.fromkeys(("judged", "agreed", "said_touches_judged_no", "said_unrelated_judged_yes",
+                            "cannot_tell", "unflagged", "backfilled"), 0)
+    for watch in data["watches"]:
+        if watch.get("kind") != SEMANTIC_KIND:
+            continue
+        flag = watch.get("semantic_flag") if isinstance(watch.get("semantic_flag"), Mapping) else {}
+        for entry in [*(watch.get("judgments") or []), *([watch["judgment"]] if watch.get("judgment") else [])]:
+            if str(entry.get("at") or "") < since:
+                continue
+            counts["judged"] += 1
+            verdict = entry.get("prescreen_verdict")
+            if ("prescreen_verdict" not in entry and entry.get("lead_id") and flag.get("lead_id") == entry["lead_id"]
+                    and str(flag.get("at") or "") <= str(entry.get("at") or "")):
+                verdict = flag.get("verdict")
+                counts["backfilled"] += 1
+            if verdict not in ("likely_touches", "likely_unrelated"):
+                counts["cannot_tell" if verdict == "cannot_tell" else "unflagged"] += 1
+                continue
+            said_touches, judged_yes = verdict == "likely_touches", entry.get("touches") == "yes"
+            counts["agreed" if said_touches == judged_yes
+                   else "said_touches_judged_no" if said_touches else "said_unrelated_judged_yes"] += 1
+    return {"days": days, **counts}
 
 
 def primary_coverage() -> frozenset[str]:
@@ -1652,6 +1686,14 @@ def main(argv: list[str] | None = None) -> int:
               f"近 {wake['days']} 天互動判定 {wake['judged']} 筆（判無關 {wake['judged_unrelated']}）｜"
               f"預篩標無關的：判定一致 {wake['prescreen_unrelated_agreed']}、擋錯 {wake['prescreen_unrelated_wrong']}"
               "（#96：量夠再談要不要讓標無關的直接回去續等，INV-5）")
+        agree = prescreen_agreement(data)
+        wrong = agree["said_touches_judged_no"] + agree["said_unrelated_judged_yes"]
+        print(f"預篩 vs 互動（近 {agree['days']} 天語意判定 {agree['judged']} 筆）：一致 {agree['agreed']}｜"
+              + (f"**不一致 {wrong}**" if wrong else "不一致 0")
+              + f"（預篩說可能觸及→判無關 {agree['said_touches_judged_no']}、"
+              f"預篩說無關→判觸及 {agree['said_unrelated_judged_yes']}）｜預篩看不出 {agree['cannot_tell']}｜"
+              f"沒標旗 {agree['unflagged']}｜其中 {agree['backfilled']} 筆是 11-03 前的判定、從現存標旗對回去的"
+              "（盲點修法第 6 條：語意叫醒的預篩從沒量過，量夠再談，INV-5）")
         return 0
     if args.cmd == "wake-queue":
         from engine_b.leads import load as load_leads
