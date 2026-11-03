@@ -272,6 +272,26 @@ def test_the_paper_lane_is_also_summarised_by_current_state(collected) -> None:
     assert any(line.startswith("  - 現行狀態 open：1 列") for line in lines)
 
 
+def test_the_paper_lane_is_also_summarised_by_anchor_state_with_a_small_sample_flag(collected) -> None:
+    """盲點修法 §2 第 9 條（審查 measurement-2）：錨點那天的狀態另分一次——「照系統當時說的做會怎樣」；各組 n 加總＝paper 列數，
+    n 不到 6 帶小樣本旗、只印不判。live／history 不分。"""
+    rows = collected["lanes"]["paper"]["rows"]
+    groups = OIST.lane_summary(rows, lane="paper")["by_anchor_state"]
+    assert sum(g["n"] for g in groups.values()) == len(rows)
+    assert set(groups) == {str(r.get("anchor_state") or "unknown") for r in rows}
+    assert all(g["small_sample"] for g in groups.values())                      # 夾具每組都不到 6 列
+    assert "by_anchor_state" not in OIST.lane_summary(collected["lanes"]["live"]["rows"], lane="live")
+    lines = OIST.render_lanes(collected)
+    assert any(x.startswith("  - 錨點那天的狀態 ") and x.endswith("🟠 小樣本（只印不判）") for x in lines)
+
+
+def test_by_state_flags_small_groups_and_names_rows_without_the_field() -> None:
+    rows = [{"anchor_state": "open", "absolute_return": 0.1}] * OIST.SMALL_SAMPLE_N + [{"absolute_return": 0.2}]
+    groups = OIST._by_state(rows, key="anchor_state", missing="unknown", lane="paper")
+    assert groups["open"]["n"] == OIST.SMALL_SAMPLE_N and groups["open"]["small_sample"] is False
+    assert groups["unknown"]["n"] == 1 and groups["unknown"]["small_sample"] is True
+
+
 def test_quote_unit_is_settled_on_both_ends_gbp_pence_is_not_pounds(collected) -> None:
     ggg = _row(collected, "paper", "GGG.L")
     assert ggg["anchor_ccy"] == "GBP" and ggg["anchor_price"] == pytest.approx(0.44)   # 44 便士 → 0.44 英鎊

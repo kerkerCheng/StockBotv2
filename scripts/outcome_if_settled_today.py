@@ -782,6 +782,24 @@ def chase_count(rows: Sequence[Mapping[str, Any]]) -> dict:
             "tickers": [str(r.get("ticker")) for r in chasing]}
 
 
+#: 分組 n 不到這個數就帶小樣本旗（對齊 registration 判讀線最小的 n：H1 的 n ≥ 6）——只是印的記號，不是判讀線。
+SMALL_SAMPLE_N = 6
+
+
+def _by_state(rows: Sequence[Mapping[str, Any]], *, key: str, missing: str, lane: str) -> dict[str, dict]:
+    """依某個狀態欄分組各算一次等權與曾達 2 倍（各組 n 加總＝列數）；沒有那一欄的列歸 `missing`。"""
+    groups: dict[str, list] = {}
+    for r in rows:
+        groups.setdefault(str(r.get(key) or missing), []).append(r)
+    out: dict[str, dict] = {}
+    for state, group in sorted(groups.items()):
+        power = power_law_aggregate(list(group), lane=lane)
+        out[state] = {"n": len(group), "aggregate": equal_weight_aggregate(list(group)),
+                      "reached_2x_ever": power.get("reached_2x_ever"), "peak_measured": power.get("peak_measured"),
+                      "small_sample": len(group) < SMALL_SAMPLE_N}
+    return out
+
+
 def lane_summary(rows: Sequence[Mapping[str, Any]], *, lane: str) -> dict:
     """一條 lane 的三量＋等權＋對主題等權組的超額。**每條 lane 各算、分母分開**；空 lane 回 n 0（呈現端印「還沒有列」）。"""
     measured = [r for r in rows if r.get("absolute_return") is not None]
@@ -799,20 +817,15 @@ def lane_summary(rows: Sequence[Mapping[str, Any]], *, lane: str) -> dict:
             absent_labels[str(kind)] = str(absence.get("label") or kind)
     # 批次二 E15（7.5 前置）：paper 的錨點是每檔最早一筆未撤回 v2——10-20 撤回的非倍率敘事仍以 7.0g 前的「不要」當錨點，
     # 混在聚合裡。依**現行**狀態分組各算一次（加鍵、不改既有鍵；各組 n 加總＝paper 列數）。
-    by_state: dict[str, dict] = {}
-    if lane == "paper":
-        groups: dict[str, list] = {}
-        for r in rows:
-            groups.setdefault(str(r.get("current_state") or "missing"), []).append(r)
-        for state, group in sorted(groups.items()):
-            power = power_law_aggregate(list(group), lane=lane)
-            by_state[state] = {"n": len(group), "aggregate": equal_weight_aggregate(list(group)),
-                               "reached_2x_ever": power.get("reached_2x_ever"), "peak_measured": power.get("peak_measured")}
+    # 錨點那天的狀態另分一次（盲點修法 §2 第 9 條；審查 measurement-2）：「照系統當時說的做會怎樣」——宣告可開／等回落／
+    # 缺 X／不要那天起的等權與三量；n 不到 `SMALL_SAMPLE_N` 帶小樣本旗，只印不判（同月同題材，12-22 前多半是雜訊）。
+    paper = lane == "paper"
     return {
         "lane": lane, "label": LANE_LABELS[lane], "n": len(rows), "measured": len(measured),
         "measurement_start": min(anchors).isoformat() if anchors else None,
         "aggregate": equal_weight_aggregate(list(rows)),
-        **({"by_current_state": by_state} if lane == "paper" else {}),
+        **({"by_current_state": _by_state(rows, key="current_state", missing="missing", lane=lane),
+            "by_anchor_state": _by_state(rows, key="anchor_state", missing="unknown", lane=lane)} if paper else {}),
         "power_law": power_law_aggregate(list(rows), lane=lane),
         "theme_cohort_excess": {"n": len(excess), "mean": (sum(excess) / len(excess)) if excess else None,
                                 "of": len(measured),
@@ -1484,9 +1497,11 @@ def render_lanes(collected: Mapping[str, Any]) -> list[str]:
         for kind, tickers in (excess.get("absent") or {}).items():
             label = (excess.get("absent_labels") or {}).get(kind, kind)
             out.append(f"  - 對組超額缺席 {len(tickers)} 列（{label}；{kind}）：{'、'.join(tickers)}")
-        for state, group in (summary.get("by_current_state") or {}).items():
-            out.append(f"  - 現行狀態 {state}：{group['n']} 列｜等權絕對 {_pct(group['aggregate']['absolute'])}"
-                       f"（量得到 {group['aggregate']['measured']}）｜曾達 2 倍 {group['reached_2x_ever']}/{group['peak_measured']}")
+        for title, key in (("現行狀態", "by_current_state"), ("錨點那天的狀態", "by_anchor_state")):
+            for state, group in (summary.get(key) or {}).items():
+                out.append(f"  - {title} {state}：{group['n']} 列｜等權絕對 {_pct(group['aggregate']['absolute'])}"
+                           f"（量得到 {group['aggregate']['measured']}）｜曾達 2 倍 {group['reached_2x_ever']}/"
+                           f"{group['peak_measured']}" + ("｜🟠 小樣本（只印不判）" if group.get("small_sample") else ""))
         chase = summary["chase"]
         label = {"history": "入圖前已漲", "paper": "敘事前已漲", "live": "成交前已漲"}[lane]
         out.append(f"- {label}：{chase['chasing']}/{chase['paired']}"
