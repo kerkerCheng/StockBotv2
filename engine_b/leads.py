@@ -63,6 +63,9 @@ ALL_STATUSES: frozenset[str] = frozenset(ALLOWED_TRANSITIONS)
 HARVEST_RESULTS: frozenset[str] = frozenset(
     {"ok", "fetch_failed", "parse_failed", "budget_exhausted"})
 HARVEST_FAILURE_CLASSES: frozenset[str] = FAILURE_CLASSES
+#: MOPS 全市場那一批的 harvest_log 來源前綴（2026-11-03 盲點修法 §1 第 4 條）：帶全市場的過濾報告（`filter`），
+#: 心跳段 1 自己一行、不算一個來源。⚠ 不用 `mops:` 開頭——lead 來源判斷（`announcement_category` 等）認的是 `mops:`。
+MOPS_BATCH_SOURCE_PREFIX = "mops-batch:"
 
 
 class LeadStateError(ValueError):
@@ -1615,8 +1618,12 @@ def record_run(
     failure_class: str | None = None,
     cost_usd: float | None = None,
     provenance_errors: int | None = None,
+    filter_report: Mapping[str, Any] | None = None,
 ) -> None:
     """記一次 harvest run 結果。
+
+    `filter_report`（2026-11-03）：這一輪的過濾報告（例：MOPS 全市場 `select_tickers` 的 input／accepted／
+    filtered_not_watched／filtered_unresolved_ticker），存成 `filter`——INV-3：每個 filter 都能報它丟了什麼。
 
     `provenance_errors`（Phase 1 Step 1.4）：這一輪有幾筆來源宣告驗證失敗（lead 仍登記、只是沒帶宣告）。
     只有非零才寫——它必須在 harvest log 上現形，不得被 `_register_all` 的泛用 ValueError 吞掉（INV-3）。parse_failed／fetch_failed 都必須誠實入帳
@@ -1644,6 +1651,8 @@ def record_run(
         entry["cost_usd"] = round(float(cost_usd), 4)
     if provenance_errors:
         entry["provenance_errors"] = int(provenance_errors)
+    if filter_report is not None:
+        entry["filter"] = {str(k): int(v) for k, v in filter_report.items()}
     store["harvest_log"].append(entry)
 
 

@@ -466,9 +466,15 @@ def fetch_material_announcements(market: str) -> list[dict[str, Any]]:
     payload = _get(url).json()
     if not isinstance(payload, list):
         raise MopsOpenDataError(f"{url} 回傳的不是陣列")
-    rows = [_announcement_row(item, market=market, source_url=url)
-            for item in payload if isinstance(item, Mapping)]
-    return [row for row in rows if row is not None]
+    rows = []
+    for item in payload:
+        row = _announcement_row(item, market=market, source_url=url) if isinstance(item, Mapping) else None
+        # 代號解析不出來的列不丟（INV-3；2026-11-03 盲點修法 §1 第 4 條）：留一列空代號，`select_tickers` 才數得到
+        # 「代號解析不出」——丟在這裡，那一格恆為 0，版型變了也看不見（L14-4）
+        code = _text(_first(item, "公司代號", "SecuritiesCompanyCode", "Code")) if isinstance(item, Mapping) else ""
+        rows.append(row if row is not None else {"market": market, "company_code": code, "ticker": "",
+                                                 "source_url": url})
+    return rows
 
 
 def select_tickers(

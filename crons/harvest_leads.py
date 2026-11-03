@@ -821,6 +821,9 @@ def harvest_mops(config: dict, store: dict, *, seen_at: str | None = None) -> No
                 leads.record_run(store, source=f"mops:{ticker.upper()}",
                                  result="fetch_failed", new=0, run_at=seen_at,
                                  failure_class=classify_access_failure(exc))
+            # 全市場那一批也記失敗：心跳段 1 只看每個市場最後一筆，失敗要蓋過上一輪的數（不比時間戳——正式排程不傳 seen_at）
+            leads.record_run(store, source=f"{leads.MOPS_BATCH_SOURCE_PREFIX}{market}", result="fetch_failed", new=0,
+                             run_at=seen_at, failure_class=classify_access_failure(exc))
             print(f"[harvest] mops {market} fetch_failed: {exc}", file=sys.stderr)
             continue
         for ticker in market_tickers:
@@ -834,6 +837,11 @@ def harvest_mops(config: dict, store: dict, *, seen_at: str | None = None) -> No
             leads.record_run(store, source=source, result="ok", new=new, run_at=seen_at,
                              provenance_errors=len(errors))
             print(f"[harvest] {source} ok: {new} new / {len(items)} announcements")
+        # 全市場的 INV-3 報告（盲點修法 §1 第 4 條）：名冊外幾則、代號解析不出幾則——逐檔各自的報告沒有意義，以前整份丟掉
+        _accepted, report = select_tickers(rows, market_tickers)
+        leads.record_run(store, source=f"{leads.MOPS_BATCH_SOURCE_PREFIX}{market}", result="ok", new=0,
+                         run_at=seen_at, filter_report=report)
+        print(f"[harvest] mops {market} 全市場：{report}")
 
 
 def run(config: dict, store: dict, *, seen_at: str | None = None) -> dict:

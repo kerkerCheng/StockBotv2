@@ -53,6 +53,7 @@ Get-Content library\private\heartbeat\daily_run_<YYYY-MM-DD>.json    # 每步 st
 | 互動 session 持有 writer lock | 段 1「⚠ 沒拿到 writer lock」，所有寫入步驟跳過 |
 | 排程設定與 config 不一致／讀不到 | 段 1「⚠ 排程設定與 config 不一致」＋修正命令；讀不到印 unknown |
 | harvest 超過 `harvest_stale_hours` 沒跑 | 段 1 ⚠；段 3「harvest N 天沒跑——0 不代表沒有新文件」 |
+| MOPS 全市場重訊抓不到、或來源版型變了 | 段 1「MOPS 全市場重訊（最後一輪）：上市 輸入 N｜名冊內 A｜名冊外 B｜代號解析不出 C；上櫃 …」——抓不到那個市場印「**抓不到**（原因）」、不留上一輪的數；「代號解析不出」突然非 0＝版型變了（2026-11-03 起；harvest_log 每市場每輪一筆 `mops-batch:<市場>`，不算一個來源） |
 | ⑯ Drive 上傳失敗（`auth_expired`／`delivery_failed`） | 段 1「失敗 1：16_backup」＋備份行 ⚠「Drive <狀態>（最後成功上傳：N 天前）」；本機那份照留、⑯b 照驗。修好後 `python scripts\backup_private.py upload` 補傳（token 過期先 `auth`） |
 | T2 輪詢（⑩d–⑩g）沒跑完或一直「沒真的查」 | 段 3「T2 輪詢：本輪沒跑完（<步驟> <狀態>：<理由>）」或拒收裡「沒真的查 N」；有該查的、卻超過 `min_recheck_days` 沒有任何一次輪詢時整行 ⚠＋摘要行「T2 輪詢 N 天沒跑」。回滾：`config/event_watch.json` 的 `sweep_budget_per_run` 調 0（或 `llm.executor=none` 連同其他 LLM 步驟一起停） |
 | T2 命中掛著沒人判定 | 段 3「**命中待檢 N**（最老 D 天）」；超過兩週 `audit invariants` 的 QueueLiveness 亮紅。判定：`python -m engine_b.watch_poll queue` → `judge` |

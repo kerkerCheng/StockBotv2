@@ -171,6 +171,28 @@ def _x_spend_cap() -> float:
         return 0.0
 
 
+#: MOPS 全市場重訊的兩個市場（`fetchers.mops_open_data.MARKETS`）→ 人讀標籤。
+MOPS_MARKET_LABELS: Mapping[str, str] = {"twse": "上市", "tpex": "上櫃"}
+
+
+def mops_batch_line(batches: Mapping[str, Mapping[str, Any]]) -> str | None:
+    """段 1：MOPS 全市場重訊每個市場最後一輪的過濾報告（盲點修法 §1 第 4 條；INV-3：每個 filter 都能報 input／accepted／
+    filtered／reasons）。名冊外那幾百則以前只在 `select_tickers` 的回傳裡、被整份丟掉。還沒有紀錄（舊 harvest_log）就不印；
+    0 照印（L14）；最後一輪抓不到就說抓不到，不留上一輪的數。"""
+    if not batches:
+        return None
+    parts = []
+    for market in sorted(batches):
+        row, label = batches[market], MOPS_MARKET_LABELS.get(market, market)
+        report = row.get("filter")
+        if row.get("result") != "ok" or not isinstance(report, Mapping):
+            parts.append(f"{label} **抓不到**（{row.get('failure_class') or row.get('result')}）")
+            continue
+        parts.append(f"{label} 輸入 {report.get('input')}｜名冊內 {report.get('accepted')}"
+                     f"｜名冊外 {report.get('filtered_not_watched')}｜代號解析不出 {report.get('filtered_unresolved_ticker')}")
+    return "MOPS 全市場重訊（最後一輪）：" + "；".join(parts)
+
+
 def build_freshness(*, now: datetime, state_dir: Path | None, leads_path: Path,
                     run_record_path: Path | None = None, capture_dir: Path | None = None) -> Section:
     """daily 執行紀錄、harvest 來源 ok／fail、行情最新交易日、APP 今天有沒有 materialize。"""
@@ -191,9 +213,15 @@ def build_freshness(*, now: datetime, state_dir: Path | None, leads_path: Path,
     except (OSError, ValueError) as exc:
         log = []
         harvest_absence = Absence("upstream_unavailable", f"leads 檔讀不到：{type(exc).__name__}")
+    from engine_b.leads import MOPS_BATCH_SOURCE_PREFIX
+
     latest: dict[str, Mapping[str, Any]] = {}
+    batches: dict[str, Mapping[str, Any]] = {}
     for row in log:
         source = str(row.get("source") or "?")
+        if source.startswith(MOPS_BATCH_SOURCE_PREFIX):     # 全市場那一批的過濾報告：自己一行，不算一個來源
+            batches[source[len(MOPS_BATCH_SOURCE_PREFIX):]] = row
+            continue
         latest[source] = row
     if latest:
         # ⚠ `budget_exhausted` 不算失敗——它是預算保護生效，不是來源壞掉（L12：兩種語意分開）。
@@ -209,6 +237,9 @@ def build_freshness(*, now: datetime, state_dir: Path | None, leads_path: Path,
         stale = _harvest_staleness(newest, now=now)
         if stale is not None:
             section.lines.append(stale)
+        mops = mops_batch_line(batches)
+        if mops:
+            section.lines.append(mops)
         month = now.astimezone(timezone.utc).strftime("%Y-%m")
         spend = sum(float(r.get("cost_usd") or 0)
                     for r in log
