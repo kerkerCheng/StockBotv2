@@ -2121,6 +2121,9 @@ def candidate_series_row(payload: Mapping[str, Any]) -> dict[str, Any]:
         "oldest_stall_days": dict(payload.get("oldest_stall_days") or {}),
         # 邊緣門檻的遲滯與在門檻上（2026-11-01）：量「7 天內翻轉幾檔」要的兩個數——舊 artifact 沒有＝null，不是 0
         "edge": {"on_threshold": counts.get("on_threshold"), "not_edge_pending": counts.get("not_edge_pending")},
+        # 只差已定價（2026-11-03 起記；決定紀錄 §10.1：條 2 改讀「只差已定價的名單恆為 0 或恆非 0」）——舊 artifact 沒有＝null
+        "priced_only": {"count": counts.get("priced_wait_priced_only"),
+                        "unknown": counts.get("priced_wait_priced_only_unknown")},
         "generated_at": payload.get("generated_at"),
     }
 

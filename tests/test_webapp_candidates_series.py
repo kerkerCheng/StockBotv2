@@ -63,7 +63,17 @@ def test_row_copies_the_artifact_counts_and_keeps_an_absent_held_as_null(tmp_pat
     assert row["no_narrative"] == 2 and row["oldest_stall_days"] == {"open": None, "missing": None, "priced_wait": 0}
     # 遲滯與在門檻上（2026-11-01）：舊板沒有這兩格＝null，不是 0
     assert row["edge"] == {"on_threshold": None, "not_edge_pending": None}
-    assert set(row) == {"date", "counts", "side", "no_narrative", "oldest_stall_days", "edge", "generated_at"}
+    # 只差已定價（2026-11-03；決定紀錄 §10.1 條 2 讀這一格）：舊板沒有＝null，不是 0
+    assert row["priced_only"] == {"count": None, "unknown": None}
+    assert set(row) == {"date", "counts", "side", "no_narrative", "oldest_stall_days", "edge", "priced_only",
+                        "generated_at"}
+
+
+def test_row_copies_the_priced_only_counts_including_zero() -> None:
+    """有算的板照抄：0 就是 0（名單恆為 0 正是條 2 要量的形狀），沒算的另記一格。"""
+    payload = _payload("2026-11-03")
+    payload["counts"] = dict(payload["counts"], priced_wait_priced_only=0, priced_wait_priced_only_unknown=2)
+    assert mat.candidate_series_row(payload)["priced_only"] == {"count": 0, "unknown": 2}
 
 
 def test_only_the_default_state_dir_writes_the_real_series(tmp_path) -> None:
