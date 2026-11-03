@@ -589,15 +589,21 @@ def _prepare_research_action_impl(
             "problems": [_safe_error_message(item) for item in subjects["rejections"][:50]],
             "prerequisites": [_safe_error_message(item) for item in subjects["prerequisites"][:50]],
         }
+    # 庫內已有幾份由機器數（failure log #58：寫的人自己宣告「0」、實際 8 份）——只印、不放閘
+    from intake.library_mentions import receipt as library_mention_receipt
+
+    mentions = library_mention_receipt(request.get("focus_company_id"))
     if dry_run:
         try:
             return research_actions.preview_action(
-                payload, root=root, merge_side_effects=_merge_side_effect_receipt(normalized_documents))
+                payload, root=root, merge_side_effects=_merge_side_effect_receipt(normalized_documents),
+                library_mentions=mentions)
         except (OSError, RuntimeError, ValueError) as exc:
             return {"status": "rejected", "error": _safe_error_message(exc)}
     try:
         record = research_actions.create_action(
-            payload, root=root, merge_side_effects=_merge_side_effect_receipt(normalized_documents))
+            payload, root=root, merge_side_effects=_merge_side_effect_receipt(normalized_documents),
+            library_mentions=mentions)
     except (OSError, RuntimeError, ValueError) as exc:
         return {"status": "rejected", "error": _safe_error_message(exc)}
     result = {

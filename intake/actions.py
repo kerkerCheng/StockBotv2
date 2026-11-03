@@ -852,6 +852,12 @@ def _validate_record(record: object) -> dict:
             or not _valid_evidence_receipt(side_check.get("evidence"))
             or not _valid_increment_receipt(side_check.get("increment"))):
         raise ValueError("Research Action merge side effect receipt is invalid")
+    mention_check = record.get("library_mention_check")
+    if mention_check is not None:
+        from intake.library_mentions import valid as valid_mentions
+
+        if not valid_mentions(mention_check):
+            raise ValueError("Research Action library mention receipt is invalid")
 
     manifest = record.get("document_manifest")
     if not isinstance(manifest, list) or not manifest:
@@ -1162,6 +1168,9 @@ def render_review_packet(record: dict, *, now: datetime | None = None) -> str | 
     lines.extend(_render_layer_enumerations(record))
     lines.extend(_render_sub_language(record))
     lines.extend(_render_merge_side_effects(record))
+    from intake.library_mentions import render_lines as render_mentions
+
+    lines.extend(render_mentions(record.get("library_mention_check")))   # 決策區塊才印（例子是檔名）；公開報告不印
     for field in ("search_summary", "l8_notes", "counterevidence_and_gaps"):
         lines.extend(["", f"## {REPORT_HEADINGS[field]}", "", report[field]])
     lines.extend(_render_private_context(record, public=False))
@@ -1238,12 +1247,13 @@ def _quota_usage(root: Path) -> tuple[int, int]:
 
 def create_action(
     payload: dict, *, root: Path = ROOT, now: datetime | None = None,
-    merge_side_effects: dict | None = None,
+    merge_side_effects: dict | None = None, library_mentions: dict | None = None,
 ) -> dict:
     """Persist a validated immutable action and return its full record.
 
     `merge_side_effects`：prepare 當下對圖算的入圖副作用收據（`intake.application._merge_side_effect_receipt`；
     Phase 6 Step 6.2d）。**不進 payload、不進 digest**——它依賴當下的圖（同 sub 引文核對的收據）；只印、不放閘。
+    `library_mentions`：「庫內已有幾份」的機器數（`intake.library_mentions.receipt`；failure log #58）——同樣不進 digest、只印。
     """
 
     current = now or _now()
@@ -1315,6 +1325,8 @@ def create_action(
             record["sub_language_check"] = sub_check
         if merge_side_effects is not None:
             record["merge_side_effect_check"] = merge_side_effects
+        if library_mentions is not None:
+            record["library_mention_check"] = library_mentions
         _validate_record(record)
         _write_new_json(_action_path(action_id, root), record)
     return copy.deepcopy(record)
@@ -1340,7 +1352,7 @@ def _checked_for_create(payload: dict) -> tuple[dict, dict | None, dict | None]:
 
 def preview_action(
     payload: dict, *, root: Path = ROOT, now: datetime | None = None,
-    merge_side_effects: dict | None = None,
+    merge_side_effects: dict | None = None, library_mentions: dict | None = None,
 ) -> dict:
     """乾跑（`prepare_research_action.py --dry-run`；failure log #3 修後殘留）：跑 `create_action` 同一串檢查、算 digest、
     印 packet 同一個函式組的「入圖副作用」——**不取 store 鎖、不寫 staging、不配 action id**，所以 sync 不會為它鑄號。
@@ -1352,6 +1364,8 @@ def preview_action(
     digest = canonical_action_digest(normalized)
     existing = _ready_with_digest(digest, root=root, now=current)
     preview = {"merge_side_effect_check": merge_side_effects} if merge_side_effects is not None else {}
+    from intake.library_mentions import render_lines as render_mentions
+
     return {
         "status": "dry_run",
         "action_digest": digest,
@@ -1360,6 +1374,7 @@ def preview_action(
         "sub_language_check": sub_check,
         "layer_enumeration_check": layer_check,
         "side_effects": "\n".join(_render_merge_side_effects(preview)).strip(),
+        "library_mentions": "\n".join(render_mentions(library_mentions)).strip(),
         "next_action": "乾跑沒有寫任何東西。副作用乾淨就拿掉 --dry-run 正式 prepare（只跑一次）；不乾淨就改草稿再乾跑。",
     }
 
