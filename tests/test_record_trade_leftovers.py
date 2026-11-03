@@ -21,11 +21,19 @@ from tests.test_record_trade import _BUY, _present_inputs, _sheet_rows, _wire_sh
 # ---------------------------------------------------------------------------
 
 
-def _wire_partial(monkeypatch, tmp_path, *, mode: str, readback: dict | None = None, second_fails: bool = False):
-    """既有列 --apply：假 Sheet 有狀態——寫入照 mode 寫幾格後丟例外，回讀讀狀態（`readback` 可蓋掉某一格）。"""
+def _wire_partial(monkeypatch, tmp_path, *, mode: str, readback: dict | None = None, second_fails: bool = False,
+                  late_after_reads: int | None = None, recheck: float = 0.0):
+    """既有列 --apply：假 Sheet 有狀態——寫入照 mode 寫幾格後丟例外，回讀讀狀態（`readback` 可蓋掉某一格）。
+
+    `late_after_reads`：伺服器更晚才套用——第一次寫入丟例外時一格都沒落地，回讀滿這麼多格之後才整批套用（R2 覆核 B2）。
+    `recheck`：`ABSENT_RECHECK_SECONDS`（預設 0＝不再讀，測試不睡）；`time.sleep` 換成記下秒數。"""
     module, calls = _wire_sheet(monkeypatch, tmp_path, rows=_sheet_rows(AXTI=1_000.0))
+    module.ABSENT_RECHECK_SECONDS = recheck
     cells = {"B2": "10.0", "C2": "100", "D5": "50000"}
-    calls["write_calls"] = []
+    calls["write_calls"], calls["slept"], calls["late"] = [], [], []
+    import time as _time
+
+    monkeypatch.setattr(_time, "sleep", lambda s: calls["slept"].append(s))
 
     def write(writes):
         calls["write_calls"].append([dict(w) for w in writes])
@@ -40,11 +48,23 @@ def _wire_partial(monkeypatch, tmp_path, *, mode: str, readback: dict | None = N
         landed = {"none": 0, "first": 1, "all": len(writes)}[mode]
         for w in writes[:landed]:
             cells[w["a1"]] = str(w["value"])
+        if late_after_reads is not None:
+            calls["late"] = [dict(w) for w in writes]
         raise ConnectionError("回應中斷")
 
+    reads = []
+
+    def read(a1):
+        reads.append(a1)
+        if calls["late"] and late_after_reads is not None and len(reads) > late_after_reads:
+            for w in calls["late"]:
+                cells[w["a1"]] = str(w["value"])
+            calls["late"] = []
+        return (readback or {}).get(a1, cells[a1])
+
     monkeypatch.setattr(gsheets, "write_portfolio_cells", write)
-    monkeypatch.setattr(gsheets, "read_cell_value", lambda a1: (readback or {}).get(a1, cells[a1]))
-    calls["cells"] = cells
+    monkeypatch.setattr(gsheets, "read_cell_value", read)
+    calls["cells"], calls["reads_cells"] = cells, reads
     return module, calls
 
 
@@ -54,12 +74,31 @@ def _log(module) -> list[dict]:
     return [json.loads(line) for line in module.TRADE_LOG.read_text(encoding="utf-8").splitlines() if line.strip()]
 
 
-def test_nothing_landed_says_so_and_records_nothing(monkeypatch, tmp_path, capsys) -> None:
-    module, calls = _wire_partial(monkeypatch, tmp_path, mode="none")
+def test_nothing_landed_says_so_records_nothing_and_does_not_promise_a_safe_rerun(monkeypatch, tmp_path, capsys) -> None:
+    """R2 覆核 B2：原本說「照原命令重跑……不會重複寫」——錯：重跑會重讀 Sheet，伺服器更晚才套用時就算兩次。
+    現在隔幾秒再讀一次（同建倉路徑），仍全舊才說沒寫進去，而且叫人重跑前先核對那幾格、列出寫入前的值。"""
+    module, calls = _wire_partial(monkeypatch, tmp_path, mode="none", recheck=3.0)
     assert module.main(_BUY + ["--apply"]) == 2
     assert _log(module) == [] and len(calls["write_calls"]) == 1
+    assert calls["slept"] == [3.0] and len(calls["reads_cells"]) == 6            # 讀兩輪、每輪三格
     err = capsys.readouterr().err
-    assert "三格回讀都還是寫入前的值" in err and "可以照原命令重跑 --apply" in err
+    assert "三格回讀（第一次與隔 3 秒再讀）都還是寫入前的值" in err
+    assert "重跑 --apply 之前先看一眼 Sheet" in err and "B2＝10.0" in err and "不會重複寫" not in err
+
+
+def test_a_write_the_server_applies_a_few_seconds_late_is_found_by_the_second_read(monkeypatch, tmp_path) -> None:
+    """B2 的對稱面：第一輪回讀三格都還是舊值、伺服器幾秒後才套用——第二輪讀到全新，照常記事件（不叫人重跑、不算兩次）。"""
+    module, calls = _wire_partial(monkeypatch, tmp_path, mode="none", late_after_reads=3, recheck=3.0)
+    assert module.main(_BUY + ["--apply"]) == 0
+    entry, = _log(module)
+    assert "隔 3 秒再讀" in entry["sheet_write_note"] and "三格都是新值" in entry["sheet_write_note"]
+    assert calls["cells"] == {"B2": "20.0", "C2": "150.0", "D5": "48000.0"} and len(calls["write_calls"]) == 1
+
+
+def test_without_a_recheck_the_message_says_it_only_read_once(monkeypatch, tmp_path, capsys) -> None:
+    module, _calls = _wire_partial(monkeypatch, tmp_path, mode="none")
+    assert module.main(_BUY + ["--apply"]) == 2
+    assert "（只讀了一次）" in capsys.readouterr().err
 
 
 def test_everything_landed_is_recorded_with_a_readback_note(monkeypatch, tmp_path, capsys) -> None:
@@ -240,6 +279,34 @@ def test_a_hand_written_market_value_row_refuses_a_share_change(monkeypatch, tmp
         assert "market_value_base 是手寫值" in capsys.readouterr().err
 
 
+def test_a_row_inserted_between_the_two_reads_is_not_mistaken_for_a_clean_row(monkeypatch, tmp_path, capsys) -> None:
+    """R2 覆核 N3：值與公式是兩次讀取，中間有人插一列——公式表的第 2 列已是別的列。原本照比、回 []（漏擋）；現在代號／券商
+    對不上就是「沒能確認」（印出來、照常進行，與公式讀不到同一個出口）。"""
+    values, formulas = _grids(hand_written_row2=True)
+    shifted = [formulas[0], ["NEW", "IB", "觀察", "1", "=D2*1", "=SUM($E$2:$E$6)"]] + formulas[1:]
+    assert gsheets.manual_formula_columns(values, shifted, row=2) is None
+    module, calls = _wire_sheet(monkeypatch, tmp_path, rows=_sheet_rows(AXTI=1_000.0))
+    monkeypatch.setattr(gsheets, "read_portfolio_values",
+                        lambda *, formulas=False, sheet=None: shifted if formulas else values)
+    assert module.main(_BUY) == 0
+    assert "沒能確認市值是不是公式" in capsys.readouterr().out
+
+
+def test_a_hand_written_cell_off_the_market_value_chain_is_named_as_such(monkeypatch, tmp_path, capsys) -> None:
+    """R2 覆核 N4：偵測範圍是所有多數是公式的欄（fail closed 不縮）；訊息照實說是哪幾欄，不在市值鏈上就不說 NAV 會錯。"""
+    head = _HEAD + ["company"]
+    values, formulas = _grids(hand_written_row2=False)
+    values = [head] + [r + [f"name{i}"] for i, r in enumerate(values[1:])]
+    formulas = [head] + [r + ([f"=X{i}"] if i else ["AXT 手寫"]) for i, r in enumerate(formulas[1:])]
+    assert gsheets.manual_formula_columns(values, formulas, row=2) == ["company"]
+    module, _calls = _wire_sheet(monkeypatch, tmp_path, rows=_sheet_rows(AXTI=1_000.0))
+    monkeypatch.setattr(gsheets, "read_portfolio_values",
+                        lambda *, formulas_=None, formulas_grid=None, formulas=False, sheet=None, v=values, f=formulas: f if formulas else v)
+    assert module.main(_BUY) == 2
+    err = capsys.readouterr().err
+    assert "company 是手寫值" in err and "不在市值鏈上" in err and "NAV 會量錯" not in err
+
+
 def test_an_unreadable_formula_grid_is_said_and_the_trade_goes_on(monkeypatch, tmp_path, capsys) -> None:
     module, calls = _wire_sheet(monkeypatch, tmp_path, rows=_sheet_rows(AXTI=1_000.0))
 
@@ -321,12 +388,54 @@ def test_row_deleted_refuses_without_its_preconditions(monkeypatch, tmp_path, ca
     assert message in capsys.readouterr().err
 
 
+def test_row_deleted_takes_only_sales_because_a_buy_would_pass_the_caps_unmeasured(monkeypatch, tmp_path, capsys) -> None:
+    """R2 覆核 B1：買進配 --row-deleted＝已持有 0＋log-only 不加成交額，5% 上限與槓桿 cap 恆判通過——超過上限的買進
+    不用 override 就寫進 append-only 的 trade_log（探針：8% NAV、TQQQ 都 pass）。只收賣出；碰 Sheet 之前就擋。"""
+    def boom(*a, **k):
+        raise AssertionError("不該讀 Sheet")
+
+    for symbol, shares, price in (("AXTI", "40", "200"), ("TQQQ", "400", "100")):
+        module, _calls = _wire_sheet(monkeypatch, tmp_path / symbol, rows=_sheet_rows(QQQ=5_000.0))
+        monkeypatch.setattr(gsheets, "read_portfolio_values", boom)
+        argv = ["--symbol", symbol, "--side", "buy", "--shares", shares, "--price", price,
+                "--executed-at", "2026-11-02T14:00:00-05:00", "--broker", "IB", "--currency", "USD",
+                "--log-only", "--row-deleted"] + (["--why", "測試"] if symbol == "AXTI" else [])
+        assert module.main(argv) == 2 and not module.TRADE_LOG.exists()
+        assert "只收賣出" in capsys.readouterr().err
+
+
+def test_row_deleted_needs_the_broker_spelled_out(monkeypatch, tmp_path, capsys) -> None:
+    """R2 覆核 N1：沒有那一列可以讀券商——原本默默預設 IB 寫進 append-only 的 trade_log。"""
+    module, _calls = _wire_sheet(monkeypatch, tmp_path, rows=_sheet_rows(QQQ=5_000.0))
+    argv = [a for i, a in enumerate(_SELL) if a != "--broker" and (i == 0 or _SELL[i - 1] != "--broker")]
+    assert module.main(argv + ["--log-only", "--row-deleted", "--currency", "USD"]) == 2
+    assert "必須明給 --broker" in capsys.readouterr().err and not module.TRADE_LOG.exists()
+
+
 def test_row_deleted_refuses_when_the_row_is_still_there(monkeypatch, tmp_path, capsys) -> None:
     rows = _sheet_rows(QQQ=5_000.0) + [{"ticker": "AXTI", "broker": "IB", "bucket": "觀察", "market_value_base": 0.0,
                                         "nav_base": 100_000.0, "base_currency": "USD", "currency": "USD", "shares": 0.0}]
     module, _calls = _wire_sheet(monkeypatch, tmp_path, rows=rows)
     assert module.main(_SELL + ["--log-only", "--row-deleted", "--currency", "USD"]) == 2
     assert "Sheet 還有" in capsys.readouterr().err and not module.TRADE_LOG.exists()
+
+
+@pytest.mark.parametrize("argv, wanted, unwanted", [
+    (_SELL, "--row-deleted --currency <成交幣別> --broker <券商>", "買進請先"),
+    (_BUY, "買進請先在 Sheet 加好那一列", "--row-deleted"),
+])
+def test_log_only_without_the_row_points_sales_to_row_deleted_and_buys_to_the_sheet(monkeypatch, tmp_path, capsys,
+                                                                                    argv, wanted, unwanted) -> None:
+    """定位不到那一列時的指路跟著 B1 走：--row-deleted 只收賣出，買進不能指去那裡（指了只會再被擋一次）。"""
+    module, _calls = _wire_sheet(monkeypatch, tmp_path, rows=_sheet_rows(QQQ=5_000.0))
+
+    def missing(requests, values=None):
+        raise ValueError("symbol=AXTI、broker=IB 命中 0 列")
+
+    monkeypatch.setattr(gsheets, "locate_portfolio_cells", missing)
+    assert module.main(list(argv) + ["--log-only"]) == 2 and not module.TRADE_LOG.exists()
+    err = capsys.readouterr().err
+    assert wanted in err and unwanted not in err
 
 
 # ---------------------------------------------------------------------------
@@ -340,3 +449,46 @@ def test_log_only_prints_the_current_values_not_a_diff(monkeypatch, tmp_path, ca
     out = capsys.readouterr().out
     assert "將變更的儲存格" not in out and "10 → 20" not in out and "100 → 150" not in out
     assert "Sheet 那一列現在：shares 10" in out and "avg_cost 100" in out
+
+
+# ---------------------------------------------------------------------------
+# R2 覆核 N7（使用者 11-03「負數價格一起擋」）：股數與成交價必須大於 0
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize("flag, value", [("--price", "-200"), ("--price", "0"), ("--price", "nan"), ("--price", "inf"),
+                                         ("--shares", "-10"), ("--shares", "0"), ("--shares", "nan")])
+def test_a_non_positive_price_or_share_count_is_refused_before_the_sheet_is_read(monkeypatch, tmp_path, capsys,
+                                                                                  flag, value) -> None:
+    """負的成交價讓成交額變負、硬擋的增量變負而判通過，Sheet 卻照加股數、現金反而變多（探針：已持有 4.9% 買 10 @ -200 → pass）。"""
+    module, calls = _wire_sheet(monkeypatch, tmp_path, rows=_sheet_rows(AXTI=4_900.0))
+    argv = list(_BUY)
+    argv[argv.index(flag) + 1] = value
+    for extra in ([], ["--apply"], ["--log-only"]):
+        assert module.main(argv + extra) == 2
+    assert calls["reads"] == [] and calls["writes"] == [] and not module.TRADE_LOG.exists()
+    assert "必須是大於 0 的有限數" in capsys.readouterr().err
+
+
+# ---------------------------------------------------------------------------
+# R2 覆核 N5：建倉路徑的現金回讀改用同一個判定——新舊顯示分不出時不刪列、不記，請人看
+# ---------------------------------------------------------------------------
+
+
+def test_an_open_position_cash_readback_that_fits_both_values_is_not_rolled_back(monkeypatch, tmp_path, capsys) -> None:
+    """建倉成功、現金寫入丟例外、現金格只顯示整數：寫入前 5000、要寫 4999.7，讀回「5,000」——兩個都對得上。原本判「舊值」並刪掉
+    新列還原（現金其實可能已經扣了）；現在判分不出：不刪、不記、請人看。"""
+    from tests.test_record_trade_open_position import _OPEN, _wire_open
+
+    module, calls = _wire_open(monkeypatch, tmp_path, cash_network=True)
+    calls["cash_now"] = "5,000"
+    argv = list(_OPEN)
+    argv[argv.index("--shares") + 1], argv[argv.index("--price") + 1] = "1", "0.3"
+    assert module.main(argv + ["--apply"]) == 2
+    assert calls["deleted"] == [] and not module.TRADE_LOG.exists()
+    assert "無法確認" in capsys.readouterr().err
+    # 對照：成交 2 元、要寫 4998，讀回「5000」——新值顯示會是 4998，分得出：照舊判「舊值」、刪列還原
+    module, calls2 = _wire_open(monkeypatch, tmp_path / "b", cash_network=True)
+    calls2["cash_now"] = "5000"
+    argv[argv.index("--price") + 1] = "2"
+    assert module.main(argv + ["--apply"]) == 2 and calls2["deleted"] != [] and not module.TRADE_LOG.exists()

@@ -367,6 +367,10 @@ def manual_formula_columns(values: list[list[Any]], formulas: list[list[Any]], *
         return None
     if str(_cell(values, headers, row, "bucket")).strip().upper() == "CASH":
         return None
+    # 值與公式是兩次讀取：中間有人插列或刪列，公式表的第 row 列就是別的列（R2 覆核 N3）——代號與券商對不上就是沒能確認。
+    if any(str(_cell(values, headers, row, c)).strip() != str(_cell(formulas, headers, row, c)).strip()
+           for c in ("symbol", "broker", "bucket") if c in headers):
+        return None
     positions = [r for r in range(2, len(values) + 1) if str(_cell(values, headers, r, "bucket")).strip().upper() != "CASH"]
     formula_columns = [h for h in headers
                        if sum(str(_cell(formulas, headers, r, h)).startswith("=") for r in positions) * 3 >= len(positions) * 2]
