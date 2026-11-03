@@ -1431,6 +1431,8 @@ _GRAPH_WALK_AUTHORITY = {
     "inputs": {
         "graph": "Neo4j（collapse_assertions ＋ classify_evidence；coverage_gaps.scan；duplicate_nodes.scan）",
         "readings": "alpha.providers.structure_readings.reading_status_rows（與 structure_readings kind 同一份算法）",
+        "layer_notes": "alpha.providers.layer_notes.layer_note_walk_rows（第 4 型的層說明；與 layer_notes kind 的該重讀同一支 "
+                       "layer_note_graph_reasons；新邊沒讀＝query.company_assertions＋alpha.candidates.unread_new_edges）",
         "leads": "engine_b.leads.load（triaged_go／researching）",
     },
 }
@@ -2256,20 +2258,26 @@ def materialize_layer_notes(*, pages: Sequence[str], store: StateArtifactStore |
     snapshot = ledger_snapshot()
     notes = snapshot["notes"]
     watches = list(ew.load_watches().get("watches") or ())
-    reread = {row["node"]: row["reasons"] for row in layer_note_reread_rows(notes, watches, today=ew._today())}
     declarations = source_declarations(ref for note in notes.values() for ref in note_citation_refs(note))
     try:
+        from alpha.providers.layer_notes import layer_note_new_edges
         from alpha.providers.structure_readings import seats_from_edges
+        from query.company_assertions import load_company_assertions
         from query.structure import _load_edges
 
         edges = _load_edges() if notes else []
         seats: dict[str, list[str]] | None = seats_from_edges(edges)
         graph_nodes: frozenset[str] | None = frozenset({e.src for e in edges} | {e.dst for e in edges})
+        # 新邊沒讀（個股頁 S6a）：與走圖第 4 型、心跳 ⑤ 同一支判法；心跳讀這裡的 `new_edges`（它不連圖）
+        new_edges: dict[str, list[dict[str, Any]]] | None = (layer_note_new_edges(notes, load_company_assertions())
+                                                            if notes else {})
         graph_absence = None
-    except Exception as exc:  # noqa: BLE001 — 圖讀不到只讓「哪幾頁連過來」說讀不到
-        seats, graph_nodes = None, None
+    except (Exception, SystemExit) as exc:  # noqa: BLE001 — 圖讀不到只讓「哪幾頁連過來」「新邊沒讀」說讀不到；缺密碼丟 SystemExit
+        seats, graph_nodes, new_edges = None, None, None
         graph_absence = {"kind": "upstream_unavailable",
-                         "reason": f"這次沒讀到圖（{type(exc).__name__}）——「哪幾頁連過來」整欄未算，不是 0"}
+                         "reason": f"這次沒讀到圖（{type(exc).__name__}）——「哪幾頁連過來」與「新邊沒讀」整欄未算，不是 0"}
+    reread = {row["node"]: row["reasons"]
+              for row in layer_note_reread_rows(notes, watches, today=ew._today(), new_edges=new_edges)}
     registry = get_registry()
     wanted = {co for co, nodes in (seats or {}).items() if set(nodes) & set(notes)}
     wanted |= {e for note in notes.values() for claim in note.claims for e in claim.entities}
@@ -2284,6 +2292,8 @@ def materialize_layer_notes(*, pages: Sequence[str], store: StateArtifactStore |
         row["cited_by"] = cited_by(node, row["unit"], seats=seats, graph_nodes=graph_nodes, companies=companies,
                                    pages=page_set)
         row["diagrams"] = diagrams_for_nodes(loaded_diagrams, [node])
+        # 結構化的「新邊沒讀」（None＝這次沒讀到圖、沒算）：查核用、不上畫面——理由句已在 `reread` 裡
+        row["new_edges"] = None if new_edges is None else [dict(e) for e in new_edges.get(node, ())]
         rows.append(row)
     payload = build_layer_notes_artifact(
         rows=redact_private_paths(rows), parse_errors=redact_private_paths(snapshot["errors"]),

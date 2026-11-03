@@ -407,7 +407,8 @@ def test_the_heartbeat_prints_the_layer_note_line_even_at_zero(tmp_path, monkeyp
     from engine_b import event_watch as ew
 
     monkeypatch.setattr(ew, "load_watches", lambda *a, **k: {"watches": []})
-    assert hb._layer_note_lines(now=datetime(2026, 10, 7, tzinfo=timezone.utc)) == [
+    now = datetime(2026, 10, 7, tzinfo=timezone.utc)
+    assert hb._layer_note_lines(now=now, state_dir=tmp_path) == [
         "層說明：一份都還沒寫（`python -m alpha layer-note <node> --add`）"]
     from alpha.providers import layer_notes
 
@@ -415,12 +416,115 @@ def test_the_heartbeat_prints_the_layer_note_line_even_at_zero(tmp_path, monkeyp
     path = layer_notes.ledger_path(record["node"])                 # conftest 已導向空的暫存目錄
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(record, ensure_ascii=False) + "\n", encoding="utf-8")
-    lines = hb._layer_note_lines(now=datetime(2026, 10, 7, tzinfo=timezone.utc))
+    lines = hb._layer_note_lines(now=now, state_dir=tmp_path)
     assert lines[0].startswith("層說明 1 份｜**該重讀 1**") and "沒有 watch 在盯" in lines[1]
+    # 個股頁 S6a：state 目錄裡沒有 layer_notes artifact——「新邊沒讀」沒算要說出來，不當成 0
+    assert "⚠ 新邊沒讀未算 1 份（layer_notes artifact 讀不到" in lines[0]
     values = hb.collect_snapshot(now=datetime(2026, 10, 7, tzinfo=timezone.utc), state_dir=tmp_path,
                                  leads_path=tmp_path / "nope.json", thesis_path=tmp_path / "nope2.json",
                                  run_record_path=None, capture_dir=None)
     assert values["layer_note.current"] == 1 and values["layer_note.reread"] == 1
+
+
+def _assertion(src, relation, dst, *, at, doc, quotes=()):
+    return {"id": f"a_{src}_{doc}", "src": src, "relation": relation, "dst": dst, "updated_at": at, "doc_id": doc,
+            "url": None, "quotes": list(quotes)}
+
+
+def test_new_edges_are_seat_edges_written_after_the_note_that_its_sources_never_read(tmp_path) -> None:
+    """個股頁 S6a：「新邊沒讀」＝公司坐到這個節點的邊、在這一份寫成之後才入圖、而且這一份的出處沒讀過——判法是敘事 stale ③
+    那一支（`unread_new_edges`）。讀過有三種：引了同一份文件（raw 檔名＝文件 id）、邊的逐字在引的 raw 全文裡、在引的 lead 原文裡。
+    變異：拿掉 `is_seat_edge` 的過濾 → 需求側 `depends_on` 那條會被列進來（紅）；`since` 改成不比時間 → 舊邊被列進來（紅）。"""
+    from alpha.providers.layer_notes import layer_note_new_edges
+
+    note = parse_layer_note_record(_rec())                   # 2026-10-07 寫成；出處 raw:doc_a、lead:lead_x1
+    node = note.node
+    (tmp_path / "doc_a.txt").write_text("Header\nIQE ships InP epiwafers to Coherent for CW lasers.\n", encoding="utf-8")
+    after, before = "2026-10-20T00:00:00+00:00", "2026-10-01T00:00:00+00:00"
+    index = {node: [
+        _assertion("co:old", "supplies_to", node, at=before, doc="doc_old", quotes=["old supplier quote"]),
+        _assertion("co:unread", "supplies_to", node, at=after, doc="doc_z", quotes=["Unread Co starts epi volume"]),
+        _assertion("co:in_raw", "supplies_to", node, at=after, doc="doc_y",
+                   quotes=["IQE ships InP   epiwafers to Coherent"]),            # 空白不同、逐字在 doc_a 裡
+        _assertion("co:same_doc", "develops", node, at=after, doc="doc_a", quotes=["not in the excerpt"]),
+        _assertion("co:in_lead", "develops", node, at=after, doc="doc_l", quotes=["lead body sentence"]),
+        _assertion("co:customer", "depends_on", node, at=after, doc="doc_u", quotes=["demand side, not a seat"]),
+    ]}
+    out = layer_note_new_edges({node: note}, index, raw_dir=tmp_path,
+                               lead_text=lambda lead_id: "the lead body sentence here" if lead_id == "lead_x1" else "")
+    assert [(e["src"], e["relation"]) for e in out[node]] == [("co:unread", "supplies_to")]
+    assert out[node][0]["docs"] == ["doc_z"] and out[node][0]["at"].startswith("2026-10-20")
+    # 圖上沒有任何 assertion 的節點：算過、沒有（空 list，不是缺席）
+    assert layer_note_new_edges({node: note}, {}, raw_dir=tmp_path, lead_text=lambda _i: "") == {node: []}
+
+
+def test_graph_reasons_feed_both_the_walk_rows_and_the_reread_rows() -> None:
+    """S6a 驗收：走圖第 4 型與 ⑤ 的層說明命中來自同一支（`layer_note_graph_reasons`）——一邊有一邊沒有＝紅。
+    watch 那一側（主張沒人盯）只在 ⑤、不進第 4 型。`new_edges=None`（沒讀到圖）不得長出「新邊沒讀」。"""
+    from alpha.providers.layer_notes import NEW_EDGES_PREFIX, layer_note_reread_rows, layer_note_walk_rows
+
+    note = parse_layer_note_record(_rec())
+    notes = {note.node: note}
+    edge = {"src": "co:unread", "relation": "supplies_to", "dst": note.node, "at": "2026-10-20T00:00:00+00:00",
+            "docs": ["doc_z"]}
+    today = date(2026, 10, 21)
+    walk = layer_note_walk_rows(notes, today=today, new_edges={note.node: [edge]})
+    assert walk[0]["graph_reasons"] == [f"{NEW_EDGES_PREFIX}：co:unread -supplies_to-> {note.node}（2026-10-20 寫入；文件 doc_z）"]
+    reread = layer_note_reread_rows(notes, [_watch(note)], today=today, new_edges={note.node: [edge]})
+    assert reread[0]["graph_reasons"] == walk[0]["graph_reasons"] == reread[0]["reasons"]
+    for row in walk:                                                   # 第 4 型有的，⑤ 一定有
+        if row["graph_reasons"]:
+            match = [r for r in reread if r["node"] == row["node"]]
+            assert match and set(row["graph_reasons"]) <= set(match[0]["reasons"])
+    # 沒人盯的主張是 watch 那一側：進 ⑤、不進第 4 型
+    unwatched = layer_note_reread_rows(notes, [], today=today, new_edges={note.node: []})
+    assert unwatched[0]["graph_reasons"] == [] and "沒有 watch 在盯" in unwatched[0]["reasons"][0]
+    assert layer_note_walk_rows(notes, today=today, new_edges={note.node: []})[0]["graph_reasons"] == []
+    # 沒讀到圖：不長出新邊理由（呼叫端自己說未算）
+    assert layer_note_reread_rows(notes, [_watch(note)], today=today, new_edges=None) == []
+    # 整份重讀日也是時間那一側：兩邊都有
+    late = date(2027, 2, 1)
+    assert "整份重讀日 2027-01-31 已過" in layer_note_walk_rows(notes, today=late, new_edges={})[0]["graph_reasons"][0]
+    assert "整份重讀日 2027-01-31 已過" in layer_note_reread_rows(notes, [_watch(note)], today=late)[0]["reasons"][0]
+
+
+def test_the_heartbeat_takes_new_edges_from_the_artifact_only_for_the_current_version(tmp_path, monkeypatch) -> None:
+    """心跳不連圖：「新邊沒讀」讀 materialize 寫下的 layer_notes artifact，只收 note_id 與現行一致的那幾列（S6a）。
+    artifact 讀不到 → ⑤ 那一格未讀到（None），不拿只算 watch 那一側的數冒充全部。變異：不比 note_id → 換版那一行紅。"""
+    from crons import heartbeat as hb
+    from alpha.providers import layer_notes
+    from engine_b import event_watch as ew
+
+    record = _rec()
+    note = parse_layer_note_record(record)
+    path = layer_notes.ledger_path(record["node"])
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(record, ensure_ascii=False) + "\n", encoding="utf-8")
+    monkeypatch.setattr(ew, "load_watches", lambda *a, **k: {"watches": [_watch(note)]})
+    edge = {"src": "co:unread", "relation": "supplies_to", "dst": note.node, "at": "2026-10-20T00:00:00+00:00",
+            "docs": ["doc_z"]}
+    now = datetime(2026, 10, 21, tzinfo=timezone.utc)
+
+    def artifact(note_id, new_edges):
+        return lambda state_dir, kind: (({"rows": [{"node": note.node, "note_id": note_id, "new_edges": new_edges}]}, None)
+                                        if kind == "layer_notes" else ({}, hb.Absence("upstream_unavailable", "x")))
+
+    monkeypatch.setattr(hb, "_load_state", artifact(note.note_id, [edge]))
+    notes, rows, gap, ok = hb.layer_note_reread(now=now, state_dir=tmp_path)
+    assert ok and gap is None and rows[0]["reasons"][0].startswith("圖上有新邊、層說明沒讀過：co:unread")
+    assert hb.layer_note_todo_count(now=now, state_dir=tmp_path) == 1
+    assert "co:unread" in "\n".join(hb._layer_note_lines(now=now, state_dir=tmp_path))
+    # materialize 之後換版：舊版的結果不拿來用，說出沒算到
+    monkeypatch.setattr(hb, "_load_state", artifact("ln_older_version", [edge]))
+    notes, rows, gap, ok = hb.layer_note_reread(now=now, state_dir=tmp_path)
+    assert rows == [] and gap.startswith("新邊沒讀未算 1 份（materialize 之後換版")
+    assert hb.layer_note_todo_count(now=now, state_dir=tmp_path) == 0
+    # 那一次沒讀到圖（artifact 列的 new_edges 是 None）：同樣說沒算到
+    monkeypatch.setattr(hb, "_load_state", artifact(note.note_id, None))
+    assert hb.layer_note_reread(now=now, state_dir=tmp_path)[2].startswith("新邊沒讀未算 1 份")
+    # artifact 整份讀不到：⑤ 未讀到，不是 0
+    monkeypatch.setattr(hb, "_load_state", lambda state_dir, kind: ({}, hb.Absence("upstream_unavailable", "讀不到")))
+    assert hb.layer_note_todo_count(now=now, state_dir=tmp_path) is None
 
 
 def test_all_nodes_skips_a_broken_first_line(tmp_path) -> None:

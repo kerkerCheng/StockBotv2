@@ -248,17 +248,27 @@ def test_artifact_validates_and_identity_tracks_cognition_not_time(tmp_path) -> 
     assert not {"rank", "score", "size", "weight", "candidate_state"} & set(one["rows"][0])
 
 
-def test_materialize_end_to_end_reads_ledger_graph_and_registry(tmp_path, monkeypatch) -> None:
-    """真的走 materialize：ledger（conftest 導向的空目錄）＋假的圖＋真的名冊；圖讀不到時全文照印、只有連過來那一欄說讀不到。"""
+def test_materialize_end_to_end_reads_ledger_graph_and_registry(tmp_path, monkeypatch,
+                                                                 _isolate_company_assertions) -> None:
+    """真的走 materialize：ledger（conftest 導向的空目錄）＋假的圖＋真的名冊；圖讀不到時全文照印、只有連過來那一欄說讀不到。
+    個股頁 S6a：寫成之後入圖、出處沒讀過的公司邊進「該重讀」，結構化的那一份照抄在列上給心跳讀（`new_edges`）。"""
     import query.structure
     from alpha.providers import layer_notes
     from engine_b import event_watch as ew
+    from engine_b import leads
     from webapp.materialize import materialize_layer_notes
     from webapp.store import StateArtifactStore
 
     raw, ext = _raw_tree(tmp_path)
     monkeypatch.setattr(layer_notes, "RAW_DIR", raw)
     monkeypatch.setattr(layer_notes, "EXTRACTION_DIR", ext)
+    monkeypatch.setattr(leads, "load", lambda *a, **k: {"leads": {"lead_x1": {"raw_text": "lead 原文"}}})
+    _isolate_company_assertions[NODE] = [
+        {"id": "a1", "src": "co:danfoss", "relation": "supplies_to", "dst": NODE, "updated_at": "2026-10-20T00:00:00+00:00",
+         "doc_id": "doc_new", "url": None, "quotes": ["Danfoss ships external laser modules"]},
+        {"id": "a2", "src": CO, "relation": "supplies_to", "dst": NODE, "updated_at": "2026-10-20T00:00:00+00:00",
+         "doc_id": "doc_a", "url": None, "quotes": ["引過的那一份"]},                       # 同一份文件＝讀過
+    ]
     record = _record()
     path = layer_notes.ledger_path(record["node"])
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -279,6 +289,11 @@ def test_materialize_end_to_end_reads_ledger_graph_and_registry(tmp_path, monkey
     # 壞行與一行都讀不出 node 的檔都現形（INV-3）
     assert any(":2:" in e for e in payload["parse_errors"]) and any("orphan.jsonl" in e for e in payload["parse_errors"])
     assert payload["declaration_problems"] == ["broken.json"]
+    # 新邊沒讀：只有 Danfoss 那條（Coherent 那條引了同一份文件）
+    assert [(e["src"], e["docs"]) for e in row["new_edges"]] == [("co:danfoss", ["doc_new"])]
+    assert row["reread"] == ["圖上有新邊、層說明沒讀過：co:danfoss -supplies_to-> tech:external_laser_source"
+                             "（2026-10-20 寫入；文件 doc_new）"]
+    assert payload["counts"]["needs_reread"] == 1
 
     def no_graph():
         raise ConnectionError("bolt down")
@@ -286,8 +301,11 @@ def test_materialize_end_to_end_reads_ledger_graph_and_registry(tmp_path, monkey
     monkeypatch.setattr(query.structure, "_load_edges", no_graph)
     _path, down = materialize_layer_notes(store=store, pages=["COHR"])
     assert down["graph"]["absence"]["kind"] == "upstream_unavailable"
+    assert "新邊沒讀" in down["graph"]["absence"]["reason"]
     assert down["rows"][0]["cited_by"]["absence"]["kind"] == "upstream_unavailable"
     assert down["rows"][0]["sections"][0]["text"] == row["sections"][0]["text"]     # 全文不靠圖
+    # 圖讀不到：「新邊沒讀」是沒算（None），不是沒有（[]）；理由也不長出來
+    assert down["rows"][0]["new_edges"] is None and down["rows"][0]["reread"] == []
 
 
 # ---- 個股頁「坐的層」→ 閱讀頁 ----

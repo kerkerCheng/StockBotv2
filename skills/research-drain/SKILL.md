@@ -342,6 +342,11 @@ Lumentum、住友並列，協議也是非獨家。它和別家不同在六吋磷
      重讀五個角度 → `alpha structure-reading <node> --add`（帶 `supersedes_id`）。
      ⚠ **只做 `stale`／`expired`**：`stale_low`（只有 evidence 等級變）刻意不進——恆亮＝零鑑別力（L14-4）。
      ⚠ 「客戶出新文件叫醒的重讀」不在這一型，在段 `fired_reading_reread`（同一件事不算兩次）。
+     **層說明的命中**（`kind=layer_note`；2026-11-03 個股頁 S6a）：理由只有圖與時間兩種——「整份重讀日已過」或
+     「圖上有新邊、層說明沒讀過」（命中列的 `new_edges[]` 帶邊與它的文件）。讀那份文件、改受影響的段 → 換版
+     `python -m alpha layer-note <node> --add spec.json`（帶 `supersedes_id`）；換版後寫成時間晚於那條邊、或那份文件進了出處，
+     命中就自己滅——**不要為了滅燈換一個字不改的版**，讀過沒有要改的就在換版的段裡寫明讀了什麼。主張到期／觸及／沒盯是 watch 那一側，
+     不在這一型（短版 ⑤「層說明該重讀」照舊是兩側的聯集）。
      ⚠ **變化若被標成 `disproof_trigger`**（反向路徑新增），那是**既有 disproof 的觸發**：
      依 L7 要在 48 小時內處置。但 **thesis 要不要改是四個人工 gate 之一**——鑄成 `thesis_mutation` 型 pq2 編號，**不要自己改 thesis**。
      「供給側多一家」2026-10-21 起不再是機械觸發（批次二 E11，failure log #68）：家數會隨我們多讀一份文件單調上升——

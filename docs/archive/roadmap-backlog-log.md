@@ -170,3 +170,33 @@ spawn 任何 reviewer／workflow 前先跑它。**真資料 11-01：** 今天的
 - **成交紀錄（`record_trade.py`）**——R2 覆核 non-blocking、都不會寫錯 Sheet 金額：①既有列路徑寫到一半丟網路例外時沒有還原（要用同一套「例外後回讀比對」）；②5% 單筆硬擋的已持有加總按原字串不按 `canonical_symbol`（只在手寫 `TYO:` 列再用 `--also-at-other-broker` 時觸發）；③beta 判別不先正規化；④分數股在 Sheet 四捨五入時，開列失敗後的回讀認不出自己那一列；⑥手寫市值的列加碼後市值不跟著變（2026-10-01 起 Sheet 沒有這種列）；⑧`--fx-to-base` 沒有合理性檢查（用同一列 `market_usd／shares` 反推隱含匯率比對）；⑨使用者自己刪列後想用 `--log-only` 補記，沒有合法旗標；⑩`--log-only` 仍印股數與成本對照（純顯示）。
 
 **✅ 交付 2026-11-03（批次三 D；R2 覆核見 plan D 節）：** ①既有列寫入丟網路例外 → 逐格回讀四分（舊值／新值／同值／分不出或認不得）：全舊＝隔 3 秒再讀一次仍是寫入前的值才判此刻沒寫進去、不記——**不承諾重跑安全**（伺服器可能更晚才套用、逐格比對擋不住；訊息逐格印寫入前的值，叫人重跑前先看一眼；R2 覆核 B2 修正）；全新＝照常記並標 `sheet_write_note`；寫一半＝補寫其餘格（expected 是寫入前的值、照舊逐格重讀）、回讀全新才記——往前補、不往回還原（讀回的是格式化字串，分數股寫回會失真）；認不得或分不出＝請人看、不補寫、不記。②③`canonical_symbol` 搬到 `identity/symbols.py`（`fetchers.gsheets.canonical_symbol` 是同一個函式物件），已持有加總、`beta_instrument_for`、`risk/snapshot.py` 的別名表、`portfolio/policy.py` 的別名唯一性四處都比正規化後的寫法。④`_is_our_row` 股數比顯示值（`display_matches`：容許顯示最後一位的半個單位，讀不成數字一律不算）；建倉路徑的現金回讀改用同一個判定，讀到舊值也隔 3 秒再讀一次才刪新列（窄範圍覆核 non-blocking，B2 的對稱面）。⑥既有列多讀一次公式原文，用建倉同一條多數規則判那一列的公式欄有沒有手寫值，有就拒絕（dry-run 也擋；訊息分市值鏈上與不在鏈上兩種說法）；讀不到、對不上或兩次讀取之間那一列換了（symbol／券商／bucket 不同）＝印「沒能確認」照常進行。⑧買進、成交幣 ≠ 基準幣時，同一列「市值 ÷ 股數 ÷ 成交價」反推匯率，比值超出 0.5–2 拒收（`--log-only` 只提醒、建倉印沒能核對）；接近 1 的幣別給成倒數抓不到。⑨`--row-deleted`（只配 `--log-only`、只收賣出、必給 `--currency` 與 `--broker`、Sheet 還有那一列拒收；事件多記 `sheet_row: deleted_by_user`；只收賣出與必給券商是 R2 覆核 B1、N1 修正——買進配刪列會讓硬擋量不到已持有而恆判通過）。⑩`--log-only` 只印現值；順帶拿掉 `--log-only` 的「會變負數」檢查（Sheet 已是成交後，清倉後改成 0 再補記原本被擋）。另 `--shares`／`--price` 必須是大於 0 的有限數、讀 Sheet 前就擋（R2 覆核 N7：負的成交價讓硬擋的增量變負而判通過）。**真資料（Sheet 唯讀）：** 19 列持股手寫市值 0、沒能確認 0；寫法與正規化不同的列 0、beta 判別原字串與正規化都 14 列；8 列非 USD 的反推匯率對 yfinance 比值 0.983–1.000；乾跑 0050.TW 正確匯率照用、給倒數 32.6 → exit 2（高 983 倍）。
+
+# 2026-11-03 個股頁 schema 交付——從 ROADMAP「旁支開發項」搬出的列（逐字封存）
+
+> 搬出時間：2026-11-03（plan `docs/plans/2026-10-05-003-feat-stock-page-schema-proposal.md`「S6 維護——設計」節；使用者「S6 1A 2A」）。
+> ROADMAP「已交付的旁支（索引）」留一行落點；原列照搬出時的樣子逐字保存在這裡，交付敘述接在原列之後。
+
+| 項目 | 做什麼 | 為什麼 | 驗收（機制存在與否） | 前置 |
+|---|---|---|---|---|
+| **個股頁 schema** ◐（S0–S5 ✅ 2026-10-05 → 10-15；**剩 S6 維護——設計已出（2026-11-03，plan「S6 維護——設計」節），待使用者選兩題**；2026-10-05 使用者指示；brainstorm [`2026-10-05-stock-page-schema`](brainstorms/2026-10-05-stock-page-schema.md)、PLAN_PROPOSAL [`2026-10-05-003`](plans/2026-10-05-003-feat-stock-page-schema-proposal.md)，Z3；S0–S5 的歷程與 amendment D–G 逐字封存於 archive/roadmap-backlog-log.md 2026-11-01 節；查證：`python -m webapp status` 列得出 `layer_notes`、`python -m alpha layer-note mat:inp_epiwafer`） | 個股頁改由 schema 驅動：十三塊，每塊宣告問題、單位（題材錨／路徑／層／插槽／公司／事件）、誰寫、要看到什麼、缺席出口；技術與層的內容掛在節點上、同層共用（研究 ledger「層說明」）——S0 畫布、S4 層說明、S2 合約、S3 機械資料、S5 版面都已交付。**S6 維護**：層說明到期重讀接走圖第 4 型、回饋紀錄常駐；先設計再開工 | 使用者三輪回饋（第一輪 v1–v4 只對聯亞成立）；S5 結案時記下 S6 的兩件事還沒有落點：層說明到期後的重讀沒有接進走圖第 4 型、回饋紀錄沒有常駐的地方 | 因層說明改變候選狀態的筆數、層說明主張登記成 watch 的裁決（registry）；每份層說明被 ≥2 頁引用（研究 ledger＋結構表）；回饋紀錄每列指得出版本與元素 | 使用者選 S6 設計的兩題（回饋紀錄的形狀、範圍）後開工（沿用「S2 起每個 Step 使用者點名」） |
+
+**✅ 交付 2026-11-03（S6；使用者「S6 1A 2A」——回饋紀錄用 JSONL＋合約測試、只收個股頁與 APP）：**
+**S6a 層說明接走圖第 4 型。** 層說明「該重讀」的理由分兩側：圖與時間那一側（整份重讀日已過、**新邊沒讀**）只由
+`alpha.providers.layer_notes.layer_note_graph_reasons` 出，走圖第 4 型與 ⑤ `todo.layer_note` 都呼叫它；watch 那一側（主張到期／觸及／沒盯）
+照舊只在 ⑤。「新邊沒讀」直接呼叫候選板的 `alpha.candidates.unread_new_edges`（L16：同一個判法）——公司坐在這個節點上的邊
+（`structure_readings.is_seat_edge`，`seats_from_edges` 也改問它）、在這份層說明寫成之後才寫入、而且層說明的出處沒讀過（引用的 raw 檔名＝
+邊的文件 id，或邊的逐字在引用的 raw 全文、lead 原文裡；不比網址）。第 4 型母體＝現行讀圖＋現行層說明（`query.graph_walk.layer_note_rows_or_none`：
+as-of 視角拒答（INV-6）、ledger 有壞行整型降級成未算）；閱讀頁每份層說明多 `new_edges`（圖讀不到＝整欄 None 並寫進缺席理由，不寫成「沒有」）；
+心跳不連圖，只讀 `layer_notes` artifact 裡同一版（note_id 相符）的 `new_edges`，沒覆蓋到的印「新邊沒讀未算 N 份」，artifact 讀不到時 ⑤ 這一格是未讀到、不是 0。
+**實作前先量（唯讀，9 份現行層說明）：** 8 份 0 條；`tech:external_laser_source`（10-17 版）2 條——`co:tfc_optical -supplies_to->`（10-27 入圖，
+出處是天孚 10-23 的 CPO FAU／ELS 量產出貨公告；層說明只在 Broadcom 夥伴投影片的 ELSFP 組裝名單裡帶到 TFC＝階段變了，真陽性）、
+`co:lumentum -develops->`（10-22 入圖，出處 `lite_transcript_q4fy2026`：上一版 10-07 引過、現行版沒引＝接近假陽性，重讀時把出處補回來就滅）。
+設計預留的收窄（「出處完全沒提到那家公司」）會連 TFC 那條一起濾掉，所以**不收窄**（收據，可否決）；設計點名最先會壞的 `mat:inp_epiwafer` 是 0 條。
+**真資料：** 第 4 型 0／75 → 1／84（讀圖 75＋層說明 9），其餘八型的母體與命中不變；變異 11／11（不過濾坐層、不比寫成時間、不比逐字、⑤ 漏併圖那一側、
+母體只數讀圖、讀不到不降級、壞行照算、心跳不比版本、artifact 讀不到照數、閱讀頁沒帶新邊、沒算寫成沒有）。
+**S6b 回饋紀錄常駐。** `docs/feedback/stock-page.jsonl`（tracked、append-only），合約 `briefing/analyst_view/feedback_log.py`、測試
+`tests/test_stock_page_feedback.py`：形狀封閉（沒有狀態、優先序、到期——不是待辦池）、元素是封閉字彙（`page_schema.BLOCKS` 的塊鍵＋跨塊鍵＋
+APP 導覽列五頁；導覽列加一頁沒跟上就紅）、版本是出現過的版本（`page_schema.CANVAS_VERSIONS`＋`PAGE_SCHEMA_HISTORY`，最後一個＝現行版）、
+壞行與跳號都印出來。回填 68 列：brainstorm §8 #1–#39 逐字（測試核對兩邊一致；那張表留作原件）＋凍結後 29 列（plan 003 Amendment E 2、F 5、G 2，
+brainstorm `2026-10-28-app-attention-ia` §1 的 4 列與 §5 第二至五輪 16 列）；其他對話裡的回饋沒有逐一回溯（這本裡沒有≠使用者沒說過，L11-5）。
+誰寫：互動 session 收到意見時 append 一列（`docs/AGENT_WORKFLOW.md`）。變異 5／5（不驗跳號、APP 頁不在字彙、ref 空白也收、形狀不封閉、升版忘了登記）。

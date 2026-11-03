@@ -27,6 +27,16 @@ from alpha.absence import ABSENCE_KINDS, default_absence_kind
 PAGE_SCHEMA_VERSION = "stock-page-schema/1.5"   # 1.1（S3c）拿掉 B2 同層各家、路徑上各層接上；1.2（S3d）B3 營收結構與 backlog 接上；
 #                                                  1.3（S3d 第二段）台股年報地區別、押的那一塊接上；1.4（S3e）事件之後跟組比接上；
 #                                                  1.5（2026-10-29 故事層）B3、B5 的一句故事接上
+#: 頁面合約出現過的版本（舊 → 新；最後一個＝現行，測試核對）。回饋紀錄（`briefing/analyst_view/feedback_log.py`，個股頁 S6b）
+#: 的版本只收這裡與 `CANVAS_VERSIONS`——**升版時在這裡加一個**，否則新版本的回饋登記不進去。
+PAGE_SCHEMA_HISTORY: tuple[str, ...] = (
+    "stock-page-schema/1.0", "stock-page-schema/1.1", "stock-page-schema/1.2", "stock-page-schema/1.3",
+    "stock-page-schema/1.4", "stock-page-schema/1.5",
+)
+#: 凍結前（S1 磨合輪，2026-10-05 → 10-06）畫布的 schema 版本；v1.0 凍結（2026-10-07）之後不再增加。
+CANVAS_VERSIONS: tuple[str, ...] = (
+    "canvas/v0", "canvas/v0.1", "canvas/v0.2", "canvas/v0.3", "canvas/v0.4", "canvas/v0.5", "canvas/v0.6",
+)
 
 #: 單位（§5.1）：每塊、每個元素都要宣告掛在哪個單位。
 UNITS: Mapping[str, str] = {
@@ -438,7 +448,7 @@ def schema_payload() -> dict[str, Any]:
     }
 
 
-__all__ = ["BLOCKS", "BLOCK_READINGS", "BlockReading", "DECLARABLE_ABSENCES", "ELEMENTS", "EVIDENCE_LEVEL_MAP",
-           "FIRST_SCREEN_SECTIONS", "PAGE_SCHEMA_VERSION", "PageBlock",
+__all__ = ["BLOCKS", "BLOCK_READINGS", "BlockReading", "CANVAS_VERSIONS", "DECLARABLE_ABSENCES", "ELEMENTS",
+           "EVIDENCE_LEVEL_MAP", "FIRST_SCREEN_SECTIONS", "PAGE_SCHEMA_HISTORY", "PAGE_SCHEMA_VERSION", "PageBlock",
            "PageElement", "SOURCES", "UNITS", "VALUE_STATUSES", "check_schema", "fill_summary", "fill_table",
            "schema_payload"]

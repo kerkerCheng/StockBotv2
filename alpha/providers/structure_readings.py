@@ -553,13 +553,19 @@ def _layer_note_index() -> dict[str, Any]:
                             for node, note in notes.items()}}
 
 
+def is_seat_edge(src: str, relation: str, dst: str) -> bool:
+    """這條邊是不是「公司坐在一個節點上」：`co:*` 對非公司節點的 `supplies_to`／`develops`。**判準只有這一句**——
+    `seats_from_edges` 與層說明的「新邊沒讀」（`alpha.providers.layer_notes.layer_note_new_edges`，個股頁 S6a）都問它（L16）。"""
+    return str(src).startswith("co:") and relation in SEAT_RELATIONS and not str(dst).startswith("co:")
+
+
 def seats_from_edges(edges: Iterable[Any]) -> dict[str, list[str]]:
     """`co:*` → 它 `supplies_to`／`develops` 到的非公司節點（讀圖只寫在層與插槽上）。**唯一一份**：讀圖面板
     （`seat_readings_context`）與首屏「是不是新賭注」的同一層比對（`alpha.providers.candidates.bet_index`，Phase 7 Step 7.0e）
     都用它——坐在哪一層不得兩邊各算一份（L16）。"""
     seats: dict[str, set[str]] = {}
     for edge in edges:
-        if edge.src.startswith("co:") and edge.relation in SEAT_RELATIONS and not edge.dst.startswith("co:"):
+        if is_seat_edge(edge.src, edge.relation, edge.dst):
             seats.setdefault(edge.src, set()).add(edge.dst)
     return {co: sorted(nodes) for co, nodes in seats.items()}
 
@@ -645,7 +651,7 @@ def known_nodes(*, directory: Path | None = None) -> list[str]:
 
 
 __all__ = ["STRUCTURE_READING_DIR", "append_reading_record", "demand_side_customers", "evidence_rank", "evidence_splits",
-           "fetch_structure_snapshot_with_quotes", "fetch_structure_snapshot", "known_nodes", "ledger_path",
+           "fetch_structure_snapshot_with_quotes", "fetch_structure_snapshot", "is_seat_edge", "known_nodes", "ledger_path",
            "read_reading_records",
            "register_reading_watches", "reread_reasons", "seat_readings_context", "seat_readings_for", "seats_from_edges",
            "verify_citations",

@@ -133,10 +133,12 @@ QUESTION_TYPES: tuple[QuestionType, ...] = (
         "需求側至少一條 sub≥4、且供給側 ≥1 家的節點", "供給側每一條邊的 substitutability 都沒填",
         "補供給側 substitutability（研究，入圖走 pq2）"),
     QuestionType(
-        "reading_stale", "讀圖該重讀",
+        "reading_stale", "讀圖／層說明該重讀",
         "`{node}`（{unit}）的讀圖跟圖不一致或過期：{summary}",
-        "現行讀圖（節點, 單位）", "圖那一側判 stale 或已過期（stale_low 不算）",
-        "python -m alpha structure-reading <node> --unit <unit> --check → 重讀"),
+        "現行讀圖（節點, 單位）＋現行層說明（每節點一份；個股頁 S6a）",
+        "讀圖：圖那一側判 stale 或已過期（stale_low 不算）；層說明：整份重讀日已過，或寫成之後入圖的公司邊它的出處沒讀過",
+        "讀圖：python -m alpha structure-reading <node> --unit <unit> --check → 重讀；"
+        "層說明：python -m alpha layer-note <node> --add（換版）"),
     QuestionType(
         "lead_not_in_graph", "lead 點名不在圖",
         "lead `{lead_id}` 點名 {companies}，圖上沒有",
@@ -259,11 +261,18 @@ def layer_questions(edges: Sequence[CanonicalEdge], *,
     }
 
 
-def reading_stale(reading_rows: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
-    """第 4 型：現行讀圖裡，圖那一側判該重讀的。`reading_rows` 由讀圖 provider 給（同一份算法）。
+#: 第 4 型層說明那一筆的句子（讀圖那一筆用型別的 `question`）。
+LAYER_NOTE_STALE_QUESTION = "`{node}` 的層說明該重讀：{summary}"
 
-    ⚠ 只看 `needs_reread_by_graph`：watch 那一側（客戶出新文件、反證被判觸及）是佇列段
-    `fired_reading_reread` 的事，在這裡再算一次就是同一件事兩個計數器。
+
+def reading_stale(reading_rows: Sequence[Mapping[str, Any]],
+                  layer_note_rows: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
+    """第 4 型：現行讀圖與現行層說明裡，圖那一側（與時間）判該重讀的。兩份列都由 provider 給（同一份算法，L16）：
+    讀圖＝`reading_status_rows`；層說明＝`alpha.providers.layer_notes.layer_note_walk_rows`（`graph_reasons`：
+    整份重讀日已過、新邊沒讀——⑤ 的該重讀也經同一支 `layer_note_graph_reasons`，個股頁 S6a）。
+
+    ⚠ 只看圖與時間那一側：watch 那一側（客戶出新文件、反證或主張被判觸及、主張沒人盯）是佇列段
+    `fired_reading_reread` 與 ⑤ 的事，在這裡再算一次就是同一件事兩個計數器。
     """
     current = [r for r in reading_rows if r.get("reading_id")]
     hits = []
@@ -275,9 +284,19 @@ def reading_stale(reading_rows: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
                      "reading_id": row.get("reading_id"), "summary": summary,
                      "text": QUESTION_BY_KEY["reading_stale"].question.format(
                          node=row["node"], unit=row.get("unit"), summary=summary)})
+    for row in layer_note_rows:
+        reasons = list(row.get("graph_reasons") or ())
+        if not reasons:
+            continue
+        summary = "；".join(reasons)
+        hits.append({"subject": row["node"], "unit": row.get("unit"), "kind": "layer_note",
+                     "note_id": row.get("note_id"), "summary": summary, "reasons": reasons,
+                     "new_edges": list(row.get("new_edges") or ()),
+                     "text": LAYER_NOTE_STALE_QUESTION.format(node=row["node"], summary=summary)})
     # 撤回到沒有現行的那幾列不是母體（沒有讀圖可以過期），但要現形（INV-3）。
     withdrawn = sorted(f"{r.get('node')}（{r.get('unit') or '全部單位'}）" for r in reading_rows if not r.get("reading_id"))
-    return {"hits": hits, "scope_n": len(current), "extra": {"withdrawn": withdrawn}}
+    return {"hits": hits, "scope_n": len(current) + len(layer_note_rows),
+            "extra": {"withdrawn": withdrawn, "scope_readings": len(current), "scope_layer_notes": len(layer_note_rows)}}
 
 
 def lead_not_in_graph(leads: Mapping[str, Mapping[str, Any]] | Iterable[Mapping[str, Any]], *,
@@ -418,6 +437,7 @@ def duplicate_questions(duplicate_buckets: Mapping[str, Sequence[Mapping[str, An
 
 def walk(*, edges: Sequence[CanonicalEdge], graph_nodes: Iterable[str],
          reading_rows: Sequence[Mapping[str, Any]] | None,
+         layer_note_rows: Sequence[Mapping[str, Any]] | None,
          leads: Mapping[str, Mapping[str, Any]] | Iterable[Mapping[str, Any]] | None,
          registry: Any,
          coverage_rows: Sequence[Mapping[str, Any]],
@@ -425,8 +445,8 @@ def walk(*, edges: Sequence[CanonicalEdge], graph_nodes: Iterable[str],
          anchors: Iterable[str] | None = None) -> dict[str, Any]:
     """九型一次走完。**每型各自一格，沒有任何跨型別合成的數字。**
 
-    `reading_rows`／`leads` 給 `None` ＝ 這次沒讀到那個 authority：該型印 `upstream_unavailable`，
-    不印 0（INV-3）。
+    `reading_rows`／`layer_note_rows`／`leads` 給 `None` ＝ 這次沒讀到那個 authority：該型印 `upstream_unavailable`，
+    不印 0（INV-3）。`layer_note_rows` 沒有預設：沒寫就當空的，會把層說明悄悄從第 4 型的母體拿掉（個股頁 S6a）。
     """
     graph = sorted(set(graph_nodes))
     readings = list(reading_rows) if reading_rows is not None else None
@@ -440,7 +460,9 @@ def walk(*, edges: Sequence[CanonicalEdge], graph_nodes: Iterable[str],
     parts.update(layer_questions(edges, read_nodes=read_nodes, current_layer_nodes=current_layer_nodes,
                                  stale_layer_readings=stale_layer_readings,
                                  open_leads=open_leads_by_subject(leads) if leads is not None else None))
-    parts["reading_stale"] = reading_stale(readings) if readings is not None else None
+    # 第 4 型的母體是讀圖＋層說明：任何一邊讀不到就整型降級——只用一邊算出的數會把另一邊的「該重讀」安靜吃掉（INV-3）
+    parts["reading_stale"] = (reading_stale(readings, list(layer_note_rows))
+                              if readings is not None and layer_note_rows is not None else None)
     parts["lead_not_in_graph"] = (lead_not_in_graph(leads, graph_nodes=graph, registry=registry)
                                   if leads is not None else None)
     parts["supplier_no_anchor"] = supplier_no_anchor(edges, anchors=anchors)
@@ -462,7 +484,7 @@ def walk(*, edges: Sequence[CanonicalEdge], graph_nodes: Iterable[str],
             questions.append({**base, "hit_n": None, "scope_n": None, "judged": False, "rate": None,
                               "always_on": None, "hits": [], "extra": {},
                               "absence": {"kind": "upstream_unavailable",
-                                          "reason": "這次沒讀到這一型的 authority（讀圖 ledger 或 leads）——不是 0"}})
+                                          "reason": "這次沒讀到這一型的 authority（讀圖 ledger、層說明 ledger 或 leads）——不是 0"}})
             continue
         hit_n, scope_n = len(part["hits"]), int(part["scope_n"])
         judged = scope_n >= SCOPE_JUDGE_MIN
@@ -500,14 +522,15 @@ def _driver():
 
 
 def collect(*, today: date | None = None, as_of: date | None = None) -> dict[str, Any]:
-    """讀圖（一次連線）＋ leads ＋ 讀圖 ledger → `walk()`。
+    """讀圖（一次連線）＋ leads ＋ 讀圖 ledger ＋ 層說明 ledger → `walk()`。
 
-    ⚠ 這是 `query/` 裡**唯一** import `alpha/` 的地方（讀圖狀態的算法住讀圖 provider，
-    與讀圖 artifact 同一份；`tests/test_layer_separation.py` 守這個例外只有一個）。
+    ⚠ 這一段（`collect` 到「呈現」之間）是 `query/` 裡**唯一** import `alpha/` 的地方：讀圖狀態的算法住讀圖 provider、
+    層說明的「該重讀」住層說明 provider，與各自的 artifact 同一份（`tests/test_graph_walk.py` 守這個例外只在這一段）。
     """
     from identity import entities
     from identity.registry import get_registry
     from query.bottleneck import fetch_assertions
+    from query.company_assertions import fetch_company_assertions
     from query.coverage_gaps import scan as scan_coverage
     from query.duplicate_nodes import bucketize, pair_candidates
     from query.duplicate_nodes import scan as scan_duplicates
@@ -528,12 +551,15 @@ def collect(*, today: date | None = None, as_of: date | None = None) -> dict[str
             duplicate_rows = scan_duplicates(session)
             # 層計數器要的另一樣：與凍結集合同口徑的層節點清單。
             layer_nodes = [r["id"] for r in session.run(LAYER_NODES_CYPHER, types=list(LAYER_TYPES))]
+            # 第 4 型層說明的「新邊沒讀」（個股頁 S6a）：每筆 assertion 的寫入時間與逐字（敘事 stale ③ 同一份查詢）
+            company_assertions = session.execute_read(fetch_company_assertions)
     finally:
         driver.close()
     edges = _classify_edges(rows, quotes)
     duplicate_buckets = bucketize(pair_candidates(duplicate_rows), entities.load())
 
     reading_rows = reading_rows_or_none(edges, today=today or date.today(), as_of=as_of)
+    layer_note_rows = layer_note_rows_or_none(company_assertions, today=today or date.today(), as_of=as_of)
     leads: Mapping[str, Mapping[str, Any]] | None
     try:
         from engine_b import leads as leads_mod
@@ -541,11 +567,34 @@ def collect(*, today: date | None = None, as_of: date | None = None) -> dict[str
         leads = leads_mod.load().get("leads") or {}
     except Exception:  # noqa: BLE001
         leads = None
-    result = walk(edges=edges, graph_nodes=graph_nodes, reading_rows=reading_rows, leads=leads,
-                  registry=get_registry(), coverage_rows=coverage_rows,
+    result = walk(edges=edges, graph_nodes=graph_nodes, reading_rows=reading_rows, layer_note_rows=layer_note_rows,
+                  leads=leads, registry=get_registry(), coverage_rows=coverage_rows,
                   duplicate_buckets=duplicate_buckets, duplicate_node_total=len(duplicate_rows))
     result["layer_stats"] = layer_stats_or_absence(edges=edges, rows=rows, quotes=quotes, layer_nodes=layer_nodes)
     return result
+
+
+def layer_note_rows_or_none(company_assertions: Mapping[str, Sequence[Mapping[str, Any]]], *, today: date,
+                            as_of: date | None = None,
+                            directory: Path | None = None) -> list[dict[str, Any]] | None:
+    """走圖第 4 型要的層說明列（每份現行層說明一列，帶 `graph_reasons`）；**讀不到、任何一行壞掉、或要 as-of 視角，都回
+    `None`**——第 4 型整型降級（同 `reading_rows_or_none`：壞行可能正是某節點的現行層說明，不印殘缺資料算出的數）。
+
+    as-of 明確拒絕（INV-6）：「新邊沒讀」比的是現在的圖與現在的層說明，拿它回答「T 時刻該不該重讀」就是用當前值冒充。"""
+    if as_of is not None:
+        return None
+    try:
+        from alpha.providers.layer_notes import layer_note_new_edges, layer_note_walk_rows, ledger_snapshot
+
+        snapshot = ledger_snapshot(directory=directory)
+        if snapshot["errors"]:
+            print(f"⚠ 層說明 ledger 有 {len(snapshot['errors'])} 個問題（例：{snapshot['errors'][0][:120]}）"
+                  "——第 4 型降級為 upstream_unavailable", file=sys.stderr)
+            return None
+        notes = snapshot["notes"]
+        return layer_note_walk_rows(notes, today=today, new_edges=layer_note_new_edges(notes, company_assertions))
+    except Exception:  # noqa: BLE001 — 層說明讀不到只讓第 4 型降級，其餘照走
+        return None
 
 
 def reading_rows_or_none(edges, *, today: date, as_of: date | None = None,

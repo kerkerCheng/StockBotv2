@@ -107,9 +107,21 @@ def fake_readings():
     ]
 
 
+def fake_layer_note_rows():
+    """`alpha.providers.layer_notes.layer_note_walk_rows` 的形狀：每份現行層說明一列（沒有理由的也在母體裡）。"""
+    edge = {"src": "co:new", "relation": "supplies_to", "dst": "tech:els", "at": "2026-10-27T00:00:00+00:00",
+            "docs": ["doc_new"]}
+    return [
+        {"node": "mat:quiet", "note_id": "ln_q", "unit": "layer", "title": "沒事的那一層", "new_edges": [],
+         "graph_reasons": []},
+        {"node": "tech:els", "note_id": "ln_e", "unit": "layer", "title": "外部光源", "new_edges": [edge],
+         "graph_reasons": ["圖上有新邊、層說明沒讀過：co:new -supplies_to-> tech:els（2026-10-27 寫入；文件 doc_new）"]},
+    ]
+
+
 def run_walk(**overrides):
     kw = dict(edges=fake_graph(), graph_nodes=["co:a", "co:b", "mat:thin", ANCHOR],
-              reading_rows=fake_readings(), leads=fake_leads(), registry=REGISTRY,
+              reading_rows=fake_readings(), layer_note_rows=[], leads=fake_leads(), registry=REGISTRY,
               coverage_rows=fake_coverage(),
               duplicate_buckets={"unmentioned": [{"pair": ["tech:eml", "tech:inp_eml"], "rules": ["id_token_subset"],
                                                   "same_abstraction_level": True, "left": None, "right": None}],
@@ -159,9 +171,11 @@ def test_there_is_no_cross_type_number_anywhere_in_the_result() -> None:
 
 def test_summary_line_prints_zero_and_absence_differently() -> None:
     result = run_walk(reading_rows=[])
-    assert "讀圖該重讀 0／0" in gw.summary_line(result)
+    assert "讀圖／層說明該重讀 0／0" in gw.summary_line(result)
+    # 個股頁 S6a：層說明 ledger 讀不到也是整型缺席，不是只算讀圖那一半
+    assert "讀圖／層說明該重讀 upstream_unavailable" in gw.summary_line(run_walk(layer_note_rows=None))
     result = run_walk(reading_rows=None)
-    assert "讀圖該重讀 upstream_unavailable" in gw.summary_line(result)
+    assert "讀圖／層說明該重讀 upstream_unavailable" in gw.summary_line(result)
     # 讀不到 ledger 就不能宣稱「沒人讀過」——第 1 型一起降級，不是 0。
     assert "薄層沒人讀 upstream_unavailable" in gw.summary_line(result)
     assert _q(result, "reading_stale")["hit_n"] is None
@@ -204,10 +218,15 @@ def test_query_layer_imports_alpha_only_in_the_graph_walk_composition() -> None:
                 offenders.append((path.name, node.lineno))
             elif isinstance(node, ast.Import) and any(a.name.split(".")[0] == "alpha" for a in node.names):
                 offenders.append((path.name, node.lineno))
-    assert [name for name, _ in offenders] == ["graph_walk.py"], offenders
+    assert {name for name, _ in offenders} == {"graph_walk.py"}, offenders
     source = (ROOT / "query" / "graph_walk.py").read_text(encoding="utf-8")
-    collect_src = source[source.index("def collect("):source.index("# 呈現")]
+    # 例外只在組裝段（`collect` 到「呈現」之間）：讀圖狀態與層說明的「該重讀」各住自己的 provider（個股頁 S6a 起兩條）
+    start, end = source.index("def collect("), source.index("# 呈現")
+    first, last = source[:start].count("\n") + 1, source[:end].count("\n") + 1
+    assert all(first <= line <= last for _, line in offenders), offenders
+    collect_src = source[start:end]
     assert "from alpha.providers.structure_readings import reading_status_rows" in collect_src
+    assert "from alpha.providers.layer_notes import" in collect_src
 
 
 # ---------------------------------------------------------------------------
@@ -291,6 +310,33 @@ def test_reading_stale_counts_the_graph_side_only_and_scope_is_current_readings(
     assert [(h["subject"], h["unit"]) for h in q["hits"]] == [("prod:supernova", "socket")]
     assert "供給側多一家" in q["hits"][0]["text"]
     assert q["extra"]["withdrawn"] == ["tech:gone（全部單位）"]
+
+
+def test_reading_stale_scope_adds_every_current_layer_note_and_hits_only_its_graph_side() -> None:
+    """個股頁 S6a：母體＝現行讀圖＋現行層說明（每份一列，沒有理由的也算）；命中只看 `graph_reasons`
+    （整份重讀日已過、新邊沒讀）——主張到期／觸及／沒盯是 ⑤ 的事。變異：母體只數讀圖 → scope 那一行紅。"""
+    q = _q(run_walk(layer_note_rows=fake_layer_note_rows()), "reading_stale")
+    assert q["scope_n"] == 2 + 2
+    assert (q["extra"]["scope_readings"], q["extra"]["scope_layer_notes"]) == (2, 2)
+    note_hits = [h for h in q["hits"] if h.get("kind") == "layer_note"]
+    assert [h["subject"] for h in note_hits] == ["tech:els"]                    # mat:quiet 在母體、不命中
+    hit = note_hits[0]
+    assert hit["text"].startswith("`tech:els` 的層說明該重讀：圖上有新邊、層說明沒讀過：co:new")
+    assert hit["note_id"] == "ln_e" and hit["new_edges"][0]["docs"] == ["doc_new"]
+    # 讀圖那一筆照舊（不帶 kind）
+    assert [h["subject"] for h in q["hits"] if not h.get("kind")] == ["prod:supernova"]
+
+
+def test_layer_note_rows_degrade_on_a_bad_line_and_refuse_an_as_of_view(tmp_path, monkeypatch) -> None:
+    """壞行與讀不到同形（同讀圖 #33）；as-of 明確拒絕（INV-6：新邊沒讀比的是現在的圖）。空 ledger 是 0 份，不是缺席。"""
+    from alpha.providers import layer_notes as provider
+
+    assert gw.layer_note_rows_or_none({}, today=date(2026, 11, 3), directory=tmp_path) == []
+    assert gw.layer_note_rows_or_none({}, today=date(2026, 11, 3), as_of=date(2026, 10, 1), directory=tmp_path) is None
+    (tmp_path / "mat_x.jsonl").write_text("{壞掉的一行\n", encoding="utf-8")
+    assert gw.layer_note_rows_or_none({}, today=date(2026, 11, 3), directory=tmp_path) is None
+    monkeypatch.setattr(provider, "ledger_snapshot", lambda **k: (_ for _ in ()).throw(OSError("讀不到")))
+    assert gw.layer_note_rows_or_none({}, today=date(2026, 11, 3)) is None
 
 
 def test_lead_not_in_graph_separates_unresolved_names_from_companies_missing_from_the_graph() -> None:

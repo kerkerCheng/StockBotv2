@@ -29,7 +29,7 @@ def _walk_markdown(pairs, canonical=None) -> str:
     「逐字到得了輸出」要驗的是那一份輸出（L13：驗收是產出到了消費者手上）。"""
     from query.graph_walk import render_markdown as walk_markdown, walk
 
-    result = walk(edges=[], graph_nodes=[], reading_rows=[], leads={}, registry=_NoLeadsRegistry(),
+    result = walk(edges=[], graph_nodes=[], reading_rows=[], layer_note_rows=[], leads={}, registry=_NoLeadsRegistry(),
                   coverage_rows=[], duplicate_buckets=bucketize(pairs, canonical or {}),
                   duplicate_node_total=2)
     return walk_markdown(result)

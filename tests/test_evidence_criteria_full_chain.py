@@ -156,8 +156,8 @@ def _chain(tmp_path: Path, monkeypatch, publishers, *, after: bool, evidence_bas
                                 baseline=BASELINE, registry=registry, language=LANG, publishers=publishers,
                                 evidence_baseline=evidence_baseline)
     nodes = sorted({n for r in ROWS for n in (r["src"], r["dst"])})
-    result = walk(edges=edges, graph_nodes=nodes, reading_rows=[], leads={}, registry=registry, coverage_rows=[],
-                  duplicate_buckets={}, duplicate_node_total=0, anchors=())
+    result = walk(edges=edges, graph_nodes=nodes, reading_rows=[], layer_note_rows=[], leads={}, registry=registry,
+                  coverage_rows=[], duplicate_buckets={}, duplicate_node_total=0, anchors=())
     result["layer_stats"] = stats
     state = tmp_path / ("state_after" if after else "state_before")
     StateArtifactStore(state).write(build_graph_walk_artifact(result, generated_at=NOW))

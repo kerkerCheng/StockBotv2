@@ -16,10 +16,13 @@
 沒寫就用整份的重讀日（INV-2）。換版或撤回時，同節點其他每一份還在盯的條件收掉、觸及未處置的標 handled、
 到期待決的記 `source_superseded`——與讀圖同一條規則（同一個節點同時只有一份現行，舊條件不得掛著變孤兒）。
 
-**該重讀（`layer_note_reread_rows`，R2 C2）：** 逐節點、**不依賴結構讀圖**（轉換型節點永遠沒有讀圖）。理由四種：
-整份重讀日到期、主張到期未處置、主張被判觸及未處置、主張沒有 watch 在盯。心跳與 audit 讀這一份。
-到期分類（`expiry_class`）走 `reread`：不鑄號，重問＝換版。主張落哪一格只有一個判定（`claim_state`）——
-「該重讀」與閱讀頁（S4b）都問它。
+**該重讀（`layer_note_reread_rows`，R2 C2）：** 逐節點、**不依賴結構讀圖**（轉換型節點永遠沒有讀圖）。理由五種，分兩側：
+- **圖與時間那一側**（`layer_note_graph_reasons`；走圖第 4 型只問這一側）：整份重讀日已過；**新邊沒讀**（個股頁 S6a，
+  2026-11-03）——公司坐到這個節點的邊（`is_seat_edge`）在這一份寫成之後才入圖、而且這一份的出處沒讀過
+  （`layer_note_new_edges`；判法就是敘事 stale ③ 那一支 `alpha.candidates.unread_new_edges`，L16）。
+- **watch 那一側**：主張到期未處置、主張被判觸及未處置、主張沒有 watch 在盯。
+心跳、⑤ 與 audit 讀這一份（聯集）。到期分類（`expiry_class`）走 `reread`：不鑄號，重問＝換版。主張落哪一格只有一個判定
+（`claim_state`）——「該重讀」與閱讀頁（S4b）都問它。
 
 **閱讀頁（個股頁 plan S4b；`note_page_row`）：** 照印全文、出處與每條主張的 watch 狀態；每個出處旁另印**文件自宣告**
 （`source_declarations`：文件自己帶的等級與開頭的說明，逐字）。層說明的證據等級看的是「誰說的」，文件自宣告看的是
@@ -336,17 +339,114 @@ def claim_watch_rows(note: LayerNote, watches: Sequence[Mapping[str, Any]]) -> l
     return rows
 
 
+#: 「新邊沒讀」那一條的主詞（句型與敘事 stale ③ 同一支 `alpha.candidates.new_edge_reason`）。
+NEW_EDGES_PREFIX = "圖上有新邊、層說明沒讀過"
+#: 比逐字時讀的 raw 檔（PDF 等二進位檔讀成文字只是雜訊；它們靠檔名＝文件 id 比）。
+_READ_SUFFIXES = frozenset({".txt", ".md", ".htm", ".html"})
+
+
+def _squashed_file(path: Path) -> str:
+    from alpha.candidates import squash
+
+    try:
+        return squash(path.read_text(encoding="utf-8", errors="replace"))
+    except OSError:
+        return ""
+
+
+def _lead_text_reader() -> Any:
+    """lead id → 原文（lead registry 只讀一次；讀不到就全部當空字串——只剩檔名可比，比不到的邊照列）。"""
+    store: dict[str, Any] | None = None
+
+    def read(lead_id: str) -> str:
+        nonlocal store
+        if store is None:
+            try:
+                from engine_b import leads
+
+                store = leads.load().get("leads") or {}
+            except Exception:  # noqa: BLE001 — 讀不到只讓 lead 出處少一段可比的文字（往看得見那邊倒）
+                store = {}
+        return str((store.get(lead_id) or {}).get("raw_text") or "")
+
+    return read
+
+
+def note_read_set(note: LayerNote, *, raw_dir: Path | None = None, lead_text: Any = None) -> tuple[Any, str]:
+    """這一份層說明讀過什麼 → (`alpha.candidates.Cited`, 讀過的全文)。只認它自己的出處：`raw:<檔名>` → 檔名當文件 id、
+    全文比逐字；`lead:<id>` → 那則 lead 的原文比逐字。**不比網址**（同一個網址常有好幾份節錄，敘事 stale ③ 同一條）。
+    檔或 lead 讀不到就只剩檔名可比——比不到的邊照列（往看得見那邊倒，INV-3）。"""
+    from alpha.candidates import Cited, squash
+
+    raw_dir = raw_dir or RAW_DIR
+    lead_text = lead_text or _lead_text_reader()
+    refs = note_citation_refs(note)
+    stems = sorted({ref.split(":", 1)[1] for ref in refs if ref.startswith("raw:")})
+    texts = [_squashed_file(path) for stem in stems for path in sorted(raw_dir.glob(f"{glob.escape(stem)}.*"))
+             if path.stem == stem and path.suffix.lower() in _READ_SUFFIXES]
+    texts += [squash(lead_text(ref.split(":", 1)[1])) for ref in sorted(set(refs)) if ref.startswith("lead:")]
+    return Cited(frozenset(stems), frozenset(), frozenset(), ()), "\x00".join(t for t in texts if t)
+
+
+def layer_note_new_edges(notes: Mapping[str, LayerNote], assertions: Mapping[str, Sequence[Mapping[str, Any]]], *,
+                         raw_dir: Path | None = None, lead_text: Any = None) -> dict[str, list[dict[str, Any]]]:
+    """每份現行層說明的「新邊沒讀」（個股頁 S6a）：公司坐到這個節點的邊（`is_seat_edge`），在這一份寫成（`created_at`）
+    之後才入圖、而且這一份的出處沒讀過。**判法直接呼叫 `alpha.candidates.unread_new_edges`**——敘事 stale ③ 同一支（L16）。
+
+    `assertions`：節點 id → 碰到它的每一筆 assertion（`query.company_assertions.fetch_company_assertions`）。
+    每份都有一格（空 list＝算過、沒有）；圖讀不到是呼叫端的事——不要傳空 dict 冒充「沒有新邊」。
+    ⚠ 換版就滅：新的一版 `created_at` 在那些邊之後，它們不再是「新的」（L14-4：會滅）。"""
+    from alpha.candidates import unread_new_edges
+
+    from .structure_readings import is_seat_edge
+
+    lead_text = lead_text or _lead_text_reader()
+    out: dict[str, list[dict[str, Any]]] = {}
+    for node in sorted(notes):
+        note = notes[node]
+        seat = [a for a in assertions.get(node, ()) if str(a.get("dst")) == node
+                and is_seat_edge(str(a.get("src")), str(a.get("relation")), node)]
+        cited, text = note_read_set(note, raw_dir=raw_dir, lead_text=lead_text)
+        out[node] = unread_new_edges(seat, since=note.created_at, cited=cited, cited_text=text)
+    return out
+
+
+def layer_note_graph_reasons(note: LayerNote, *, today: date,
+                             new_edges: Sequence[Mapping[str, Any]] | None = None) -> list[str]:
+    """圖與時間那一側的「該重讀」：整份重讀日已過、新邊沒讀。**走圖第 4 型與 ⑤ 都經這一支**（S6a 驗收：一邊有一邊沒有＝紅）；
+    watch 那一側（主張到期／觸及／沒盯）是佇列段的事，不在這裡。"""
+    from alpha.candidates import new_edge_reason
+
+    reasons: list[str] = []
+    if note.expires is not None and note.expires < today:
+        reasons.append(f"整份重讀日 {note.expires.isoformat()} 已過：{note.reread_reason}")
+    reasons.extend(new_edge_reason(edge, prefix=NEW_EDGES_PREFIX) for edge in new_edges or ())
+    return reasons
+
+
+def layer_note_walk_rows(notes: Mapping[str, LayerNote], *, today: date,
+                         new_edges: Mapping[str, Sequence[Mapping[str, Any]]]) -> list[dict[str, Any]]:
+    """走圖第 4 型的層說明母體：每份現行層說明一列（沒有理由的也在，`graph_reasons` 空），依節點 id 排。"""
+    return [{"node": node, "note_id": notes[node].note_id, "unit": notes[node].unit, "title": notes[node].title,
+             "new_edges": [dict(e) for e in new_edges.get(node, ())],
+             "graph_reasons": layer_note_graph_reasons(notes[node], today=today, new_edges=new_edges.get(node))}
+            for node in sorted(notes)]
+
+
 def layer_note_reread_rows(notes: Mapping[str, LayerNote], watches: Sequence[Mapping[str, Any]], *,
-                           today: date) -> list[dict[str, Any]]:
-    """逐節點的「該重讀」（R2 C2：不依賴結構讀圖；R2 F6：整份重讀日也有消費端）。只回有理由的節點，依節點 id 排。"""
+                           today: date,
+                           new_edges: Mapping[str, Sequence[Mapping[str, Any]]] | None = None) -> list[dict[str, Any]]:
+    """逐節點的「該重讀」（R2 C2：不依賴結構讀圖；R2 F6：整份重讀日也有消費端）。只回有理由的節點，依節點 id 排。
+
+    `new_edges`（S6a）：`layer_note_new_edges` 的結果；None＝這次沒讀到圖、「新邊沒讀」沒算——呼叫端要自己說「未算」，
+    不印成 0（INV-3）。不在 mapping 裡的節點同樣當沒算。每列另帶 `graph_reasons`（圖與時間那一側，走圖第 4 型讀它）。"""
     from engine_b import event_watch as ew
 
     rows = []
     for node in sorted(notes):
         note = notes[node]
-        reasons: list[str] = []
-        if note.expires is not None and note.expires < today:
-            reasons.append(f"整份重讀日 {note.expires.isoformat()} 已過：{note.reread_reason}")
+        graph = layer_note_graph_reasons(note, today=today, new_edges=(new_edges or {}).get(node))
+        reasons: list[str] = list(graph)
         for row in claim_watch_rows(note, watches):
             label = ew.condition_label(row["condition"])
             if row["state"] == "unwatched":
@@ -356,7 +456,8 @@ def layer_note_reread_rows(notes: Mapping[str, LayerNote], watches: Sequence[Map
             elif row["state"] == "expired":
                 reasons.append(f"層說明主張等滿一輪都沒發生：{label}（換版時換新一批）")
         if reasons:
-            rows.append({"node": node, "note_id": note.note_id, "title": note.title, "reasons": reasons})
+            rows.append({"node": node, "note_id": note.note_id, "title": note.title, "reasons": reasons,
+                         "graph_reasons": graph})
     return rows
 
 
@@ -550,8 +651,9 @@ def note_page_row(note: LayerNote, *, watches: Sequence[Mapping[str, Any]], decl
 
 
 __all__ = [
-    "CLAIM_STATES", "DECLARATION_ABSENCES", "EXTRACTION_DIR", "LAYER_NOTE_DIR", "SOURCE_PREFIX", "all_nodes",
-    "append_note_record", "claim_state", "claim_watch_rows", "current_notes", "layer_note_reread_rows", "ledger_path",
-    "ledger_snapshot", "note_citation_refs", "note_page_row", "read_note_records", "register_note_watches",
+    "CLAIM_STATES", "DECLARATION_ABSENCES", "EXTRACTION_DIR", "LAYER_NOTE_DIR", "NEW_EDGES_PREFIX", "SOURCE_PREFIX",
+    "all_nodes", "append_note_record", "claim_state", "claim_watch_rows", "current_notes", "layer_note_graph_reasons",
+    "layer_note_new_edges", "layer_note_reread_rows", "layer_note_walk_rows", "ledger_path", "ledger_snapshot",
+    "note_citation_refs", "note_page_row", "note_read_set", "read_note_records", "register_note_watches",
     "source_declarations", "verify_citation_refs", "write_note",
 ]

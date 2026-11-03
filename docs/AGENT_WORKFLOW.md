@@ -242,6 +242,7 @@ reviewer 判 NO_GO 後**不要**進入 `Reviewer → Worker → Reviewer → Wor
 | sandbox impact review 五步 | unattended routine 的 executable surface 變更必經 | 不是 code review。它只問「這條命令會不會在無人值守時做出沒被 gate 約束的事」 |
 | `scripts/sync_agent_skills.py` | canonical skill → `.claude`／`.agents` 轉接層 | 轉接層**不是** SSOT，不手改 |
 | `scripts/verify_test_nonvacuity.py` | 證明斷言不是空跑（故意違規 → 確認會紅） | 不是覆蓋率工具 |
+| `docs/feedback/stock-page.jsonl` | 使用者對個股頁與 APP 的回饋紀錄（2026-11-03 個股頁 S6b）：互動 session 收到這類意見時 append 一列——原話或濃縮、元素、當時的 schema 版本、怎麼處理、記在哪裡；格式由 `tests/test_stock_page_feedback.py` 擋（合約 `briefing/analyst_view/feedback_log.py`），沒有命令 | **不是待辦池、不是開發載體**：要做的事照常進 ROADMAP，這裡只寫指向；daily 短版、心跳這類回饋不收 |
 
 **四個人工 gate 不因為多了一套開發流程而放寬**：graph admission／Engine C 判讀寫入／
 thesis mutation／live choice-fill。

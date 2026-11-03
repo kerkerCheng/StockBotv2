@@ -433,11 +433,12 @@ def unread_new_edges(assertions: Iterable[Mapping[str, Any]], *, since: datetime
     return sorted(out, key=lambda e: (e["at"] or "", e["src"], e["relation"], e["dst"]))
 
 
-def new_edge_reason(edge: Mapping[str, Any]) -> str:
-    """`rewrite[]` 那一條：哪條邊、哪天寫入、要讀哪幾份文件（L18：標籤指得回原始證據）。"""
+def new_edge_reason(edge: Mapping[str, Any], *, prefix: str = NEW_EDGES_PREFIX) -> str:
+    """`rewrite[]` 那一條：哪條邊、哪天寫入、要讀哪幾份文件（L18：標籤指得回原始證據）。
+    `prefix`：主詞——層說明的「該重讀」用同一句型、換主詞（`alpha.providers.layer_notes`，個股頁 S6a）。"""
     day = str(edge.get("at") or "")[:10] or "時間不明"
     docs = "、".join(edge.get("docs") or ()) or "不明"
-    return f"{NEW_EDGES_PREFIX}：{edge.get('src')} -{edge.get('relation')}-> {edge.get('dst')}（{day} 寫入；文件 {docs}）"
+    return f"{prefix}：{edge.get('src')} -{edge.get('relation')}-> {edge.get('dst')}（{day} 寫入；文件 {docs}）"
 
 
 def rides_reason(ride: Mapping[str, Any]) -> str:

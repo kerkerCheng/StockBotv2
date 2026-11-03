@@ -1965,6 +1965,21 @@ NOTE 或 TIER 的宣告段（逐字）；三種都沒有才印「文件沒宣告
 | **4 permission contract test** | `test_layer_note_ledger_is_written_only_interactively` 改成比對寫入子命令的 argv 記號（`"layer-note"`；原本比子字串，會把唯讀旗標 `--layer-notes` 也算進去），另斷言 daily 確實帶 `--layer-notes`（不是沒接線才乾淨），並把閱讀頁那一端（`webapp/materialize.py`、`webapp/layer_notes.py`）列進「不得出現寫入函式」；`tests/test_webapp_request_path.py` 的 `STATE_ROUTES` 加 `/api/v1/layer-notes`（四種證明：import 白名單、模組哨兵、檔案快照、斷網，與 405）。變異：daily 拿掉 `--layer-notes`、daily 多一步 `-m alpha layer-note`、閱讀頁 import `write_note`——都紅 |
 | **5 端到端 smoke** | 2026-10-07 真資料（暫存目錄）：現行 5 份、主張 6 條全部在盯、出處 125 個裡文件有自宣告 122（沒宣告的是同一份 `lumentum_ofc2026_investor_briefing` 的 3 次引用）；連過來的個股頁 5 頁——外部光源 3（COHR、LITE、POET；O-Net 名冊沒有研究代號另列）、FAU 2（3363.TWO、COHR）、快接頭 1（6805.TW；Danfoss 另列）、InP 磊晶與板式熱交換器 0（圖上還沒有這兩個節點，等 pq2 [715]／[721]）。今早 daily 產的 6 個個股頁與新程式重產的逐頁比對：readiness、讀圖面板狀態、缺席分型、`freshness_identity` 6/6 相同，context 只多連結。「該重讀」重構前後在真資料上逐字相同（3 個日期＋4 種假 registry）。headless Edge 實點 `#/layer-notes`、`#/layer/tech%3Aexternal_laser_source`、`#/layer/mat%3Ainp_epiwafer`、`#/COHR`（讀圖面板兩個連結） |
 
+### 層說明接走圖第 4 型＋回饋紀錄（個股頁 plan S6，2026-11-03 完成 sandbox impact review）
+
+「該重讀」多一個圖那一側的理由「圖上有新邊、層說明沒讀過」，與「整份重讀日已過」同由 `layer_note_graph_reasons` 出；走圖第 4 型母體加進
+現行層說明（ARCHITECTURE §6.15「圖那一側的重讀」）。回饋紀錄 `docs/feedback/stock-page.jsonl` 是 tracked 文件，只有互動 session append。
+
+**sandbox impact review 五步：**
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | daily ⑬ 的 argv **不變**；`--graph-walk` 與 `--layer-notes` **只多讀、不多寫**：走圖的 `collect()` 在既有那一個唯讀 session 裡多跑一次 `query.company_assertions.fetch_company_assertions`（候選板 materialize 已經在跑的同一份查詢）、多讀層說明 ledger、層說明引用的 `library/raw/` 文字檔（.txt／.md／.htm／.html）與 lead registry；閱讀頁多開一次同樣的唯讀連線（`load_company_assertions`）讀同樣幾樣。寫入仍只有原本那兩份 derived cache（`graph_walk.json` 多 `scope_readings`／`scope_layer_notes` 與層說明命中、`layer_notes.json` 每份多 `new_edges`），atomic。心跳多讀 `layer_notes` artifact（唯讀、不連圖）。**不寫任何 authority**、無新網路主機或憑證、不呼叫 LLM、不碰 `.git`。圖讀不到＝閱讀頁 `new_edges` 整欄 None 並寫進缺席理由；層說明 ledger 有壞行或要 as-of 視角＝第 4 型整型 `upstream_unavailable`（INV-3、INV-6）。回饋紀錄沒有命令、沒有無人值守的寫入端；APP 沒有新路由 |
+| **2 skill／prompt／本檔** | 不動 daily prompt；`skills/research-drain/SKILL.md` 走圖 ④ 加「層說明的命中」怎麼處置（只改內文，name／description 沒動，不必重跑 sync）；`docs/AGENT_WORKFLOW.md` §10 加回饋紀錄一列；ARCHITECTURE §6.15 與 `graph_walk` kind；本節 |
+| **3 最窄 rule** | **沒有新增任何 rule**（rules 仍 0 條）；daily 封閉步驟清單與 ⑬ argv 都不變（`tests/test_daily_task.py` 逐項相等） |
+| **4 contract test** | `tests/test_graph_walk.py`（母體加進每份現行層說明、只命中圖那一側；ledger 壞行降級、as-of 拒答；`query/` import `alpha/` 只在 `collect()` 那一段）、`tests/test_layer_note.py`（新邊＝坐層、寫成之後、出處沒讀過——舊邊、同一份文件、逐字在 raw 或 lead 原文、需求側的 `depends_on` 都不算；⑤ 與第 4 型同一個函式；心跳只用同一版的 `new_edges`、沒覆蓋印「未算」）、`tests/test_webapp_layer_notes.py`（閱讀頁 `new_edges` 與該重讀、圖讀不到＝None）、新 `tests/test_stock_page_feedback.py`（合約、前 39 列逐字等於 brainstorm §8、字彙跟著 page schema 與導覽列、不是待辦池）；變異 11／11＋5／5 |
+| **5 端到端 smoke** | 2026-11-03 真資料（writer lock 下）：`materialize --graph-walk --layer-notes` → 走圖「讀圖／層說明該重讀 1／84」（之前 0／75），命中 `tech:external_laser_source`（Lumentum、TFC 兩條新邊），其餘八型母體與命中不變；閱讀頁「現行 9 份／主張 20 條（沒人盯 0）／該重讀 1 份」。互動手跑心跳（不帶 `--write-snapshot`）：段 2「層說明 9 份｜該重讀 1」照印兩條理由、沒有「未算」；短版 ⑤「層說明該重讀 1 份」 |
+
 ---
 
 ## 遠端操作

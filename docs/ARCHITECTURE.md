@@ -736,7 +736,7 @@ Engine C `technical_observations` 的 `session_date`＋`close_adjusted`——那
 調色盤用 dataviz 參考實例的已驗證值（深淺兩套）。`freshness_identity` 只含各 sleeve 狀態／各檔行情狀態／風險警告，
 價格心跳變了不算認知變了。
 
-**`graph_walk` kind（2026-09-26 Phase 2 Step 2.6；取代 `coverage`）：** 照抄 `query.graph_walk.collect()`——九型問句（封閉字彙 `QUESTION_TYPES`：薄層沒人讀、獨家且自報、供給側未填、讀圖該重讀、lead 點名不在圖、供貨走不到錨、沒人供應、建模待補、重複節點）各自的「命中／母體」與每一筆問句。**不排序、不打分、不加總**：型別順序是閱讀順序；母體 ≥10 且命中率 ≥50% 的型別標「恆亮」（L14-4）。讀圖狀態那一型與讀圖 artifact 共用`alpha.providers.structure_readings.reading_status_rows`（`query/` 只有 `graph_walk.collect()` 一處 import `alpha/`）。第 7／8／9 型沿用下面 coverage 的分桶與 `query/duplicate_nodes.py`，不搬不重算；佇列段 `graph_holes` 取代`coverage_gaps`／`duplicate_node_candidates`／`stale_structure_readings` 三段，consumer 是 research-drain 第三段；段計數＝**有命中的型別數**（`engine_b.queue_segments.graph_holes_count`，稽核與心跳共用一份；2026-09-29 Phase 3 Step 3.1a 起，原本是異單位的命中筆數之和、也不再加進 `research_total`）。
+**`graph_walk` kind（2026-09-26 Phase 2 Step 2.6；取代 `coverage`）：** 照抄 `query.graph_walk.collect()`——九型問句（封閉字彙 `QUESTION_TYPES`：薄層沒人讀、獨家且自報、供給側未填、讀圖／層說明該重讀、lead 點名不在圖、供貨走不到錨、沒人供應、建模待補、重複節點）各自的「命中／母體」與每一筆問句。**不排序、不打分、不加總**：型別順序是閱讀順序；母體 ≥10 且命中率 ≥50% 的型別標「恆亮」（L14-4）。讀圖狀態那一型與讀圖 artifact 共用`alpha.providers.structure_readings.reading_status_rows`；同一型的層說明那一半（2026-11-03 個股頁 S6a：母體＝現行讀圖＋現行層說明，命中＝整份重讀日已過或「圖上有新邊、層說明沒讀過」）與短版 ⑤「層說明該重讀」共用 `alpha.providers.layer_notes.layer_note_graph_reasons`，新邊的判法就是候選板的 `alpha.candidates.unread_new_edges`（`query/` 只有 `graph_walk.collect()` 那一段 import `alpha/`）。第 7／8／9 型沿用下面 coverage 的分桶與 `query/duplicate_nodes.py`，不搬不重算；佇列段 `graph_holes` 取代`coverage_gaps`／`duplicate_node_candidates`／`stale_structure_readings` 三段，consumer 是 research-drain 第三段；段計數＝**有命中的型別數**（`engine_b.queue_segments.graph_holes_count`，稽核與心跳共用一份；2026-09-29 Phase 3 Step 3.1a 起，原本是異單位的命中筆數之和、也不再加進 `research_total`）。
 
 **`coverage`／`watches` kind（2026-09-08 B2b；`coverage` 已由 `graph_walk` 取代，下述分桶仍是第 7／8 型的判準）：** 前者照抄 `query.coverage_gaps.scan()` 的分桶，並把 🔴 桶依
 **前綴**切成「真正該挖的子瓶頸（`tech:`／`mat:`）」與「抽取產生的產品名詞（`prod:`）」——那是機械比對不是語意判斷，
@@ -1093,6 +1093,13 @@ GET `/api/v1/layer-notes` 整份給、沒有路徑參數）。三件事各只有
 「文件沒宣告」；與層說明自己的證據等級（看誰說的）**並列不合併**——第三方轉錄、AI 摘要、改寫過的節錄的保真度住文件自己那一格（L16）；
 ③「哪幾頁連過來」＝圖的 `seats_from_edges`，與個股頁讀圖面板「坐的層」同一支（面板列出坐的層裡有層說明的、連到閱讀頁，**不改面板狀態與
 readiness**）。缺席由產生端宣告：轉換不是層／圖上沒有任何邊碰到這個節點／沒有公司坐／這次沒讀到圖（`webapp.layer_notes.CITED_BY_ABSENCES`）。
+
+**圖那一側的重讀（2026-11-03 個股頁 plan S6a）：** 「該重讀」的理由分兩側——圖與時間（整份重讀日已過、**圖上有新邊、層說明沒讀過**）
+只由 `alpha.providers.layer_notes.layer_note_graph_reasons` 出，走圖第 4 型與短版 ⑤ 都呼叫它；watch 那一側（主張到期／觸及／沒盯）只在 ⑤。
+新邊＝公司坐在這個節點上的邊（`structure_readings.is_seat_edge`，與 `seats_from_edges` 同一句判準）在層說明寫成之後才寫入、而且出處沒讀過——
+判法就是候選板的 `alpha.candidates.unread_new_edges`（引用的 raw 檔名＝邊的文件 id，或邊的逐字在引用的 raw／lead 原文裡；不比網址）。
+閱讀頁每份帶 `new_edges`（圖讀不到＝None 並寫進缺席理由，不是空）；心跳不連圖，只讀 artifact 裡同一版（note_id 相符）的 `new_edges`，
+沒覆蓋到的印「新邊沒讀未算 N 份」。
 
 **示意圖（2026-10-08 個股頁 S5b 第二段；schema 規則 5、6、9）：** 研究 session 畫的技術示意圖住 `library/private/research_notes/diagrams/`
 （私有）：`<id>.json` 說明檔（標題、說明、`nodes_shown`、出處必填；可帶 `layout`）、`<id>.svg`、`<id>.check.json` 量測紀錄。

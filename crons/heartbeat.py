@@ -1220,7 +1220,7 @@ def build_changes(*, now: datetime, state_dir: Path | None, thesis_path: Path,
                     f"其中 **{triggers['n']} 份同時是 disproof 觸發**（供給側多一家／反向路徑變動）："
                     + "、".join(str(n) for n in (triggers.get("nodes") or [])[:5])
                     + "——thesis 要不要改由人決定，系統只標記")
-    section.lines.extend(_layer_note_lines(now=now))
+    section.lines.extend(_layer_note_lines(now=now, state_dir=state_dir))
     section.lines.append(_layer_rep_line(now=now))
 
     # ⚠ 2026-09-23（Phase 0 Step 0b.1b，C／H 組）：原本這裡印「目標倍數背離 N 檔」（估值假設 ledger 的
@@ -1258,17 +1258,49 @@ def _layer_rep_line(*, now: datetime) -> str:
     return line
 
 
-def _layer_note_lines(*, now: datetime) -> list[str]:
-    """層說明（2026-10-07 個股頁 plan S4a，R2 C2）：份數與逐節點的「該重讀」——**不依賴結構讀圖**（轉換型節點
-    永遠沒有讀圖）；理由四種：整份重讀日已過、主張到期未處置、主張被判觸及未處置、主張沒有 watch 在盯。
-    0 也印（常駐計數器，L14）；讀不到就說讀不到，不印 0（INV-3）。"""
-    try:
-        from alpha.providers.layer_notes import current_notes, layer_note_reread_rows
-        from engine_b import event_watch as ew
+def layer_note_reread(*, now: datetime,
+                      state_dir: Path | None) -> tuple[dict[str, Any], list[dict[str, Any]], str | None, bool]:
+    """層說明的「該重讀」——段 2 那一行、快照計數、⑤ 三處共用這一支（不各算一份，L16）。
 
-        notes = current_notes()
-        rows = layer_note_reread_rows(notes, ew.load_watches().get("watches") or [],
-                                      today=ew._today(now))
+    整份重讀日與 watch 那一側現讀 ledger；**「新邊沒讀」要連圖，心跳不連圖**（個股頁 S6a）：讀 materialize 寫下的
+    `layer_notes` artifact 每列的 `new_edges`（與走圖第 4 型同一支判法），只收 `note_id` 與現行一致的那幾列——materialize
+    之後換版的那一份不拿舊版的結果。回 (現行層說明, 該重讀列, 「新邊沒讀」沒算到的說明或 None, artifact 讀得到嗎)；
+    沒算到的照印，不當成「沒有新邊」（INV-3）。"""
+    from alpha.providers.layer_notes import current_notes, layer_note_reread_rows
+    from engine_b import event_watch as ew
+
+    notes = current_notes()
+    payload, absence = _load_state(state_dir, "layer_notes")
+    by_node = {str(r.get("node")): r for r in payload.get("rows") or ()} if absence is None else {}
+    new_edges: dict[str, list[Any]] = {}
+    for node, note in notes.items():
+        row = by_node.get(node) or {}
+        if row.get("note_id") == note.note_id and row.get("new_edges") is not None:
+            new_edges[node] = list(row["new_edges"])
+    missing = sorted(set(notes) - set(new_edges))
+    rows = layer_note_reread_rows(notes, ew.load_watches().get("watches") or [], today=ew._today(now),
+                                  new_edges=new_edges)
+    gap = None
+    if missing:
+        why = absence.reason if absence is not None else "materialize 之後換版，或那一次沒讀到圖"
+        gap = f"新邊沒讀未算 {len(missing)} 份（{why}）"
+    return notes, rows, gap, absence is None
+
+
+def layer_note_todo_count(*, now: datetime, state_dir: Path | None) -> int | None:
+    """⑤ `todo.layer_note`：該重讀的層說明份數。「新邊沒讀」住 `layer_notes` artifact（S6a）——artifact 整份讀不到＝這一格
+    未讀到（同 `todo.reading` 讀 artifact），不拿只算了 watch 那一側的數冒充全部（INV-3）；只有 materialize 之後換版的
+    那幾份沒算到時照數（新的一版寫成之後才入圖的邊才算新，換版就滅）。"""
+    notes, rows, _gap, artifact_ok = layer_note_reread(now=now, state_dir=state_dir)
+    return None if notes and not artifact_ok else len(rows)
+
+
+def _layer_note_lines(*, now: datetime, state_dir: Path | None = None) -> list[str]:
+    """層說明（2026-10-07 個股頁 plan S4a，R2 C2）：份數與逐節點的「該重讀」——**不依賴結構讀圖**（轉換型節點
+    永遠沒有讀圖）；理由五種：整份重讀日已過、新邊沒讀（S6a，讀 artifact）、主張到期未處置、主張被判觸及未處置、
+    主張沒有 watch 在盯。0 也印（常駐計數器，L14）；讀不到就說讀不到，不印 0（INV-3）。"""
+    try:
+        notes, rows, gap, _artifact_ok = layer_note_reread(now=now, state_dir=state_dir)
     except Exception as exc:  # noqa: BLE001 — 這一行讀不到不帶走整段
         return [f"層說明：讀不到（{type(exc).__name__}）——該重讀未算"]
     if not notes:
@@ -1276,6 +1308,8 @@ def _layer_note_lines(*, now: datetime) -> list[str]:
     line = f"層說明 {len(notes)} 份｜**該重讀 {len(rows)}**"
     if rows:
         line += "：" + "、".join(r["node"] for r in rows[:5]) + ("…" if len(rows) > 5 else "")
+    if gap:
+        line += f"｜⚠ {gap}"
     lines = [line]
     for row in rows[:10]:
         reasons = list(row["reasons"])
@@ -2751,11 +2785,7 @@ def collect_snapshot(*, now: datetime, state_dir: Path | None, leads_path: Path,
                 "reading.needs_reread": (payload.get("needs_reread") or {}).get("n")}
 
     def layer_notes() -> dict[str, Any]:
-        from alpha.providers.layer_notes import current_notes, layer_note_reread_rows
-        from engine_b import event_watch as ew
-
-        notes = current_notes()
-        rows = layer_note_reread_rows(notes, ew.load_watches().get("watches") or [], today=ew._today(now))
+        notes, rows, _gap, _artifact_ok = layer_note_reread(now=now, state_dir=state_dir)
         return {"layer_note.current": len(notes), "layer_note.reread": len(rows)}
 
     def walk() -> dict[str, Any]:
@@ -3072,11 +3102,8 @@ def collect_ledger(*, now: datetime, state_dir: Path | None, leads_path: Path | 
             payload, absence = _load_state(state_dir, "structure_readings")
             return None if absence is not None else (payload.get("needs_reread") or {}).get("n")
 
-        def layer_reread() -> int:
-            from alpha.providers.layer_notes import current_notes, layer_note_reread_rows
-
-            return len(layer_note_reread_rows(current_notes(), ew.load_watches().get("watches") or [],
-                                              today=ew._today(now)))
+        def layer_reread() -> int | None:
+            return layer_note_todo_count(now=now, state_dir=state_dir)
 
         def candidates() -> Mapping[str, Any] | None:
             payload, absence = _load_state(state_dir, "candidates")
