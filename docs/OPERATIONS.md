@@ -123,6 +123,16 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 `StockBotv2-Daily` 的 ⑱⑲ 取代（1.2a 停用、2026-09-25 1.2b 刪除）；它們的理由（LLM 失敗心跳照發、永遠 exit 0、Python 不用 `.cmd`、
 發送走 subprocess）搬進 `crons/daily_task.py` 的 docstring，守它們的測試改主詞搬進 `tests/test_daily_task.py`「無人值守入口」節。
 
+### Sandbox impact review 結論（2026-11-03：看了沒買的收據——A5 第二本＋短版 ④「你的決定」；盲點修法 plan 2026-11-02-001 §2 第 17 條）
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | daily ⑱ 心跳（argv 不變）：短版 ④ 多一行「你的決定 N 月：進｜不要｜等到條件」（`portfolio.looked_log.short_line`）——**多讀兩份 tracked 檔**：`library/trades/looked_log.jsonl`（還沒有＝0）與 `library/trades/trade_log.jsonl`，都唯讀、驗形狀；壞行與重複寫進那一行的 ⚠，不靜默丟（INV-3）；整行讀不到只壞自己（「你的決定：讀不到」）。**寫入面只在互動 session**：`scripts/record_trade.py looked` 多一個子入口（同一支、同一種收據）——讀 Sheet 一次（readonly，與成交同一組 `fetch_portfolio`）、本機敘事／候選板／個股頁 artifact，**只 append `looked_log.jsonl` 一列**；Sheet 寫入函式 0 呼叫、trade_log 不建檔、不連 Neo4j、不打行情。預設 dry-run。不新增主機、憑證 |
+| **2 canonical skill／prompt／本檔** | 本節與「記錄看了沒買」；AGENTS「沒買也是決定」一句（使用者 11-03「Ok 做完吧」核准 plan §6 的逐字 diff）；ARCHITECTURE A5 列與「看了沒買」一條；`skills/daily-brief` 「使用者對候選說了選擇，當下記下來」一段。prompt 不動 |
+| **3 最窄 rule** | daily argv 不變；不新增 step、allowlist、rule；`record_trade` 在 `.claude/**`（tracked）、`.codex/**`、`crons/**`、`config/**` 仍 0 命中（`crons/daily_brief.py` 只 import 讀者 `portfolio.looked_log`，不碰寫入入口）；APP 不動；`.codex/rules` 仍 0 條。⚠ 使用者本機 gitignored 的 `Bash(python *)` 一樣涵蓋這個子入口（見 5.3 那一節，本項不改權限檔） |
+| **4 contract test** | 新 `tests/test_looked_log.py` 6 條：寫入端拒收缺理由、缺敘事版本、「進」與不在字彙的選擇、解析不到的公司；append-only（壞行、重複都報、多一欄被拒＝不收尺寸）；計數只數帶收據的買進與當月；`short_line` 讀兩本；`record_trade.py looked` 預設不寫、`--apply` 寫一列且收據 `side`＝看了沒買、Sheet 0 寫、重跑不重寫、trade_log 不建檔；beta／空理由／沒敘事拒收（exit 2／2／4）。`tests/test_daily_digest.py` 候選板讀不到時那一行照印。變異 11／11 紅 |
+| **5 端到端 smoke** | 沒有真實寫入：looked_log 是 append-only authority，第一筆由使用者的選擇觸發。11-03 真資料只讀：短版 ④ 印「你的決定 11 月：進 0｜不要 0｜等到條件 0」 |
+
 ### Sandbox impact review 結論（2026-11-03：neither 也要付「換得掉」的證據＋追蹤表騎在 neither 層上那一行；盲點修法 plan 2026-11-02-001 §2 第 12 條）
 
 | 步 | 結論 |
@@ -1384,6 +1394,23 @@ materialize 用**，不動 `discover_tracked_tickers`——那會連帶擴大 ED
 它是「發生了什麼」的稽核軌跡，**不是持股真相**——後者永遠只有 Sheet。
 2026-09-16 D14 再確認：**Sheet 是部位真相**（含貸款額度、投入標的與現金），Decision Store 只留可選 receipt；
 alpha 原則上不用貸款資金是使用者自己的紀律，本腳本**不加 gate**。
+
+### 記錄「看了沒買」（2026-11-03，盲點修法第 17 條；AGENTS「沒買也是決定」）
+
+使用者在決策時段對一檔候選說「不要（理由）」或「等到 <條件>」→ 互動 session 當下記：
+
+```powershell
+& '.venv\Scripts\python.exe' scripts\record_trade.py looked --symbol AXTI --choice 等到條件 `
+    --why "<他的話：等到什麼／為什麼不要>"            # 先不加 --apply 看收據，再加 --apply 寫一次
+```
+
+- 「進」不走這條：下單後照上面記成交（`--side buy`，同一種研究收據）。`--choice` 只收 `不要`／`等到條件`。
+- 寫進 tracked `library/trades/looked_log.jsonl`（append-only，與 trade_log 同處）；一列帶當時現行 v2 敘事的 brief_id 與整份研究收據
+  （`side`＝看了沒買，組法與成交同一支）。**不寫 Sheet、不寫 trade_log、不過硬擋**（沒有成交）；Sheet 只讀，讀不到不擋（公司改由名冊解析、收據照實記）。
+- 拒收：缺理由（exit 2）、beta 代號（exit 2）、沒有現行 v2 敘事（exit 4——「沒買」要指得出當時讀的是哪一版，先寫敘事）、解析不到公司。
+  同一筆重跑不重寫。
+- 讀者只有一個：短版 ④「你的決定 N 月：進｜不要｜等到條件」（進＝trade_log 裡帶研究收據的買進）。它不改敘事的候選狀態、不鑄號、
+  不產生任何動作。形狀住 `portfolio/looked_log.py`。
 
 ### Google Sheet 的 Dashboard 分頁（2026-10-02 v6）
 

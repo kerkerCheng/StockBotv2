@@ -936,8 +936,11 @@ def compose_brief(*, now: datetime, summary: str, snapshot: Mapping[str, Any], r
         from crons.q3w_verdicts import status_lines as q3w_lines
         # 入圖包把關的計數器（盲點修法第 20 條④，2026-11-03）：本月照建議／偏離／沒寫建議／事後抓到缺陷＋抽中待核——0 也印
         from engine_b.admission_audit import short_line as admission_line
+        # 你的決定（盲點修法第 17 條，2026-11-03）：本月進／不要／等到條件——決定紀錄 §10.1 停止條件第一子句量的就是它；0 也印
+        from portfolio.looked_log import short_line as decision_line
 
         return ["### ④ 狀態與健康度", *health, *quota_line, *line(lambda: candidate_short_lines(state_dir), "候選"),
+                *line(lambda: "- " + decision_line(today=today), "你的決定"),
                 *(["", *wait, ""] if wait else []),
                 *line(lambda: "- " + watch_short_line(now=now), "watch"),
                 *line(lambda: "- " + disproof_line(snapshot), "反證"),

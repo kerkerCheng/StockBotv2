@@ -143,6 +143,8 @@ Lesson 的事發經過與實作落點住 [`docs/lessons-incidents.md`](docs/less
 - **Capital Authority：** 私人 Sheet 只保留 `cash_floor` 與 `credit_facility`；credential scope 只有 readonly；**未動用額度不算 NAV／cash／allocation**；
   每次提款、標的與 tranche 都是 explicit manual review，「高信心」不構成 machine permission。
 - **部位真相是 Google Sheet（2026-09-16）**；「當時憑什麼決定」的收據跟著成交事件走，舊 Decision Store 凍結唯讀（2026-09-22）。alpha 原則上不用貸款資金是使用者自己的紀律，**系統不建 gate**。
+- **沒買也是決定（2026-11-03）**：決策時段看過的可開，每檔的選擇（進／不要／等到條件）連一句理由與當時的敘事版本，
+  跟成交事件走同一條路、同一種收據，append-only（A5）——它回答「當時憑什麼沒買」；系統不由它產生任何動作、不由它算尺寸。
 - **曝險邊界：** `bucket=CASH` 計入 NAV 不計曝險；未知非現金持股按 unlevered direct issuer ＋ alpha exposure 誠實降級，不因缺 mapping 阻擋；
   issuer look-through 覆蓋恆為 `partial`，人類輸出一律寫「已知至少 X%」。既有 frozen decision 不回寫。
 - **退休貸款資本目標（2026-07-28）：** 使用者約 30 歲、退休約 60 歲；可長抱至到期的貸款資本以約 30 年後淨終值最大化為方向，

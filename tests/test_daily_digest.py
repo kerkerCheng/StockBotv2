@@ -544,6 +544,7 @@ def test_the_brief_prints_the_status_block_and_each_line_degrades_alone(tmp_path
     block = text.split("### ④ 狀態與健康度", 1)[1].split("### ⑤", 1)[0]
     assert "較昨變動" not in block
     assert "- 候選：讀不到（OSError）" in block
+    assert "- 你的決定 10 月：進 " in block                 # 盲點修法第 17 條：候選板讀不到不帶走這一行（讀的是兩本 log）
     assert "- 等回落：讀不到（OSError）" in block
     assert "- watch：今日醒 1｜到期 0｜語意標旗 2" in block
     assert "- 反證：在盯 5｜**觸及待處置 未讀到**" in block

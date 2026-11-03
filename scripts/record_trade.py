@@ -29,10 +29,16 @@
    收據寫 `narrative: backfilled`，**不讀敘事、候選板、個股頁**（不拿今天的判斷冒充當時，INV-6）。硬擋照算
    （`--log-only` 語意）；`--apply`／`--open-position`／Sheet 讀寫路徑一行不動。回填哪幾筆由使用者照 Sheet 下指令。
 
+8. **看了沒買（2026-11-03，盲點修法第 17 條；AGENTS「沒買也是決定」）。** 決策時段看過、選了「不要」或「等到條件」的那一檔，
+   用 `looked` 入口記進 `library/trades/looked_log.jsonl`（同處、append-only）：收據同一個組法（`side`＝看了沒買），
+   **不碰 Sheet 寫入、不寫 trade_log、不過硬擋**（沒有成交）。寫入端拒收缺理由與缺敘事版本（現行不是 v2 敘事 → exit 4）；
+   beta 不收；預設 dry-run。形狀與讀者住 `portfolio/looked_log.py`。
+
 用法：
     python scripts/record_trade.py --symbol QQQ --side buy --shares 10 \\
         --price 687.79 --executed-at 2026-07-31T13:04:53-04:00 \\
         --broker IB --note "IB Trade notification ..." [--apply]
+    python scripts/record_trade.py looked --symbol AXTI --choice 等到條件 --why "<一句：等到什麼>" [--apply]
 """
 from __future__ import annotations
 
@@ -49,6 +55,8 @@ _ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(_ROOT))
 
 TRADE_LOG = _ROOT / "library" / "trades" / "trade_log.jsonl"
+#: 看了沒買（盲點修法第 17 條）：與 trade_log 同處的第二本；測試換成暫存檔。
+LOOKED_LOG = _ROOT / "library" / "trades" / "looked_log.jsonl"
 
 #: 硬擋擋下時的 exit code（與 2＝輸入／持股不合法區分，讓呼叫端與測試分得出「被煞車擋」）。
 EXIT_HARD_CAP = 3
@@ -427,8 +435,66 @@ def _print_verdict(verdict) -> None:
               f"（cap {measures['leveraged_effective_cap']:.0%}）")
 
 
+def looked_main(argv: list[str]) -> int:
+    """看了沒買（盲點修法第 17 條）：一次「不要」或「等到條件」的決定 → `looked_log` 一列，附與成交同一種研究收據。
+    只讀 Sheet（解析公司與持有）、不寫 Sheet、不寫 trade_log、不過硬擋（沒有成交）。預設 dry-run。"""
+    from portfolio import looked_log, research_receipt
+    from risk.hard_caps import is_beta_symbol
+
+    ap = argparse.ArgumentParser(prog="record_trade.py looked",
+                                 description="看了沒買：決策時段看過、選了不要或等到條件——記進 looked_log（A5）")
+    ap.add_argument("--symbol", required=True, help="代號（研究 ticker 或 Sheet symbol）")
+    ap.add_argument("--choice", required=True, choices=looked_log.CHOICES)
+    ap.add_argument("--why", required=True, help="一句理由；等到條件要寫等到什麼")
+    ap.add_argument("--apply", action="store_true", help="實際寫入；省略則只顯示收據")
+    args = ap.parse_args(argv)
+    if not args.why.strip():
+        print("✗ 看了沒買要附 --why「<一句>」——缺理由不記（寫入端拒收）", file=sys.stderr)
+        return 2
+    if is_beta_symbol(args.symbol):
+        print(f"✗ {args.symbol} 是 beta：看了沒買只記 alpha 候選", file=sys.stderr)
+        return 2
+    try:
+        today = _today()
+        today_problem = None
+    except Exception as exc:  # noqa: BLE001 — 排程時區讀不到：退回本機日期、照實記
+        from datetime import date
+
+        today, today_problem = date.today(), f"排程時區讀不到（{type(exc).__name__}）——「今天」退回本機日期"
+    from fetchers import gsheets
+
+    try:
+        sheet_rows, sheet_error = list(gsheets.fetch_portfolio(strict_operational=True)), None
+    except Exception as exc:  # noqa: BLE001 — 讀不到不擋：公司改由名冊解析、收據照實記
+        sheet_rows, sheet_error = None, f"{type(exc).__name__}: {str(exc)[:160]}"
+    inputs = _research_inputs(args.symbol, today=today, sheet_rows=sheet_rows, sheet_error=sheet_error)
+    if today_problem:
+        inputs["problems"].append(today_problem)
+    receipt = research_receipt.build_receipt(side=looked_log.KIND, why=args.why.strip(), symbol=args.symbol,
+                                             today=today, inputs=inputs, held_before=None, log_only=False)
+    _print_receipt(receipt)
+    try:
+        entry = looked_log.build_entry(symbol=args.symbol, choice=args.choice, why=args.why, today=today,
+                                       recorded_at=_now(), receipt=receipt)
+    except ValueError as exc:
+        print(f"\n✗ 未寫入：{exc}", file=sys.stderr)
+        return EXIT_NARRATIVE if receipt.get("narrative") != "present" else 2
+    if looked_log.already_recorded(entry, LOOKED_LOG):
+        print(f"\n⚠ 這一筆（{entry['decision_id']}）已在 {_shown(LOOKED_LOG)}；重複執行不會再寫。")
+        return 0
+    if not args.apply:
+        print(f"\n（dry-run）會寫一列進 {_shown(LOOKED_LOG)}：{entry['symbol']} {entry['choice']}——加 --apply 才寫")
+        return 0
+    looked_log.append(entry, LOOKED_LOG)
+    print(f"\n✓ 看了沒買：{entry['symbol']} {entry['choice']}（{entry['decision_id']}）→ {_shown(LOOKED_LOG)}")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
-    args = build_parser().parse_args(argv)
+    raw = list(sys.argv[1:] if argv is None else argv)
+    if raw[:1] == ["looked"]:                      # 看了沒買（盲點修法第 17 條）：同一支、同一種收據、不碰成交路徑
+        return looked_main(raw[1:])
+    args = build_parser().parse_args(raw)
     if args.override and not args.reason.strip():
         print("✗ --override 必須附 --reason「<理由>」；沒有理由的放行不留收據，拒絕", file=sys.stderr)
         return 2

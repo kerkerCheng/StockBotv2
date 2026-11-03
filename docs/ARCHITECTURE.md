@@ -23,7 +23,7 @@
 | **A2 財務觀測** | 帶時戳的財務／市場／共識觀測 | ETL（可重建）＋ append-only 人工 ledger | 混合 | Engine C（`engine_c/`） |
 | **A3 研究判斷／Alpha** | 「我們相信什麼、憑什麼、什麼會推翻它」 | 研究流程（session 提議 → schema 驗證） | **可重算** | `alpha/`（Phase 1–6 建立） |
 | **A4 Portfolio／Risk** | 目前曝險、目標配置、硬上限 | policy config ＋ Google Sheet（外部 authority） | 可重算 | `portfolio/`＋`risk/` |
-| **A5 資本決策／問責** | 「當時憑什麼決定、使用者選了什麼、後來對不對」 | 明確的人工動作 | **append-only，Git 救不回** | `library/trades/trade_log.jsonl`（成交事件內嵌收據，`scripts/record_trade.py` 寫；硬擋 `risk/hard_caps.py`）；舊 Decision Store（`decision_lab/`）frozen 2026-09-22，唯讀歷史 |
+| **A5 資本決策／問責** | 「當時憑什麼決定、使用者選了什麼、後來對不對」 | 明確的人工動作 | **append-only，Git 救不回** | `library/trades/trade_log.jsonl`（成交事件內嵌收據，`scripts/record_trade.py` 寫；硬擋 `risk/hard_caps.py`）＋同處的 `looked_log.jsonl`（看了沒買，2026-11-03；`record_trade.py looked` 寫）；舊 Decision Store（`decision_lab/`）frozen 2026-09-22，唯讀歷史 |
 
 ### 四引擎的「不負責什麼」（這一欄比引擎命名有價值）
 
@@ -1144,6 +1144,13 @@ readiness**）。缺席由產生端宣告：轉換不是層／圖上沒有任何
 - Decision facts 存於 ignored `library/private/decision_lab/`；只允許 backup／restore，**不再寫入、不做破壞性 reset**。
   歷史唯一一筆 live choice（2026-08-18 COHR 10 股）留作稽核。查證：`python -m decision_lab status`（sha256 對 Phase 0 基準）。
 - A5 的現行落點：成交事件內嵌收據住 `library/trades/trade_log.jsonl`（`scripts/record_trade.py`）；資本硬擋住 `risk/hard_caps.py`（§8.2）。
+- **看了沒買（2026-11-03，盲點修法第 17 條；AGENTS「沒買也是決定」）**：決策時段看過、使用者選了「不要」或「等到條件」的那一檔，
+  記進同處的 `library/trades/looked_log.jsonl`（tracked、append-only；形狀與讀者住 `portfolio/looked_log.py`）——選「進」的就是成交事件，
+  三種選擇因此都留得下。唯一入口 `python scripts/record_trade.py looked --symbol <T> --choice 不要|等到條件 --why "<一句>" [--apply]`：
+  與成交同一支、同一個收據組法（`research_receipt.build_receipt`，`side`＝看了沒買）；只讀 Sheet、不寫 Sheet、不寫 trade_log、
+  不過硬擋（沒有成交）；寫入端拒收缺理由、缺敘事版本（現行不是 v2 → exit 4）、beta、重寫同一筆；預設 dry-run。
+  **系統不由它產生動作、不由它算尺寸**；讀者只有短版 ④ 每天一行「你的決定 N 月：進｜不要｜等到條件」（進＝trade_log 帶研究收據的買進）——
+  決定紀錄 §10.1 停止條件第一子句（可開非空、而使用者的決定為 0）量的就是它。
   U7（2026-08-28）拆掉的是憑空的建議尺寸，不是煞車；Phase 0 把煞車搬到真的有人走的路上。
 
 ---
