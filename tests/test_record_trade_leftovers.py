@@ -492,3 +492,25 @@ def test_an_open_position_cash_readback_that_fits_both_values_is_not_rolled_back
     calls2["cash_now"] = "5000"
     argv[argv.index("--price") + 1] = "2"
     assert module.main(argv + ["--apply"]) == 2 and calls2["deleted"] != [] and not module.TRADE_LOG.exists()
+
+
+def test_an_open_position_cash_readback_is_read_again_before_rolling_back(monkeypatch, tmp_path, capsys) -> None:
+    """D 第二輪覆核 non-blocking（B2 的對稱面，L17）：建倉成功、現金寫入丟例外、第一次回讀還是寫入前的 5000——伺服器晚幾秒才套用。
+    只讀一次就刪列，Sheet 會留下扣了現金卻沒有持股列；隔幾秒再讀到新值＝照常記、不刪。兩次都是舊值才刪，而且不說「現金沒動」。"""
+    from tests.test_record_trade_open_position import _OPEN, _wire_open
+
+    module, calls = _wire_open(monkeypatch, tmp_path, cash_network=True)
+    module.ABSENT_RECHECK_SECONDS = 0.001
+    answers = iter(["5000", "3000"])
+    monkeypatch.setattr(gsheets, "read_cell_value", lambda a1: next(answers))
+    assert module.main(_OPEN + ["--apply"]) == 0
+    assert calls["deleted"] == [] and module.TRADE_LOG.exists()
+    capsys.readouterr()
+    module, calls = _wire_open(monkeypatch, tmp_path / "b", cash_network=True)
+    module.ABSENT_RECHECK_SECONDS = 0.001
+    reads = []
+    monkeypatch.setattr(gsheets, "read_cell_value", lambda a1: reads.append(a1) or "5000")
+    assert module.main(_OPEN + ["--apply"]) == 2
+    assert calls["deleted"] == [5] and len(reads) == 2 and not module.TRADE_LOG.exists()
+    err = capsys.readouterr().err
+    assert "隔 0.001 秒再讀" in err and "重跑前先看一眼現金格" in err and "現金沒動" not in err

@@ -908,7 +908,9 @@ def main(argv: list[str] | None = None) -> int:
         else:
             outcome = _cash_outcome(gsheets, cash_a1, old=cash_cell["current"], new=new_cash)
             if outcome == "old":
-                print("  回讀現金格仍是寫入前的值——現金沒動，刪掉新列還原：", file=sys.stderr)
+                again = f"（第一次與隔 {ABSENT_RECHECK_SECONDS:g} 秒再讀）" if ABSENT_RECHECK_SECONDS else "（只讀了一次）"
+                print(f"  回讀現金格{again}都還是寫入前的值——刪掉新列還原。⚠ 伺服器仍可能更晚才套用：重跑前先看一眼現金格 "
+                      f"{cash_a1} 還是 {cash_cell['current']}（不是的話先手動改回再重跑）：", file=sys.stderr)
                 return _rollback(gsheets, opened, fill, plan)
             if outcome != "new":
                 print(f"  ⚠⚠ 無法確認：第 {opened['row']} 列新建倉已在，現金格 {cash_a1} 回讀是 {outcome!r}"
@@ -1054,8 +1056,14 @@ def _cell_outcome(gsheets, a1: str, *, old: str, new: float) -> tuple[str, str]:
 
 def _cash_outcome(gsheets, a1: str, *, old: str, new: float) -> str:
     """建倉路徑：寫入丟例外後回讀現金格——`old`＝沒寫進去、`new`＝已寫進去、其他＝回傳讀到的原值（或讀不到的理由）。
-    判定與既有列路徑同一個（`_cell_outcome`）；分不出的一律回原值，交給呼叫端請人看。"""
+    判定與既有列路徑同一個（`_cell_outcome`）；分不出的一律回原值，交給呼叫端請人看。讀到舊值時照既有列路徑隔
+    `ABSENT_RECHECK_SECONDS` 再讀一次（2026-11-03 R2 覆核 B2 的對稱面：只讀一次就刪列，晚到的現金寫入會留下沒有持股列的扣款）。"""
     kind, now = _cell_outcome(gsheets, a1, old=old, new=new)
+    if kind == "old" and ABSENT_RECHECK_SECONDS:
+        import time
+
+        time.sleep(ABSENT_RECHECK_SECONDS)
+        kind, now = _cell_outcome(gsheets, a1, old=old, new=new)
     return kind if kind in ("old", "new") else now
 
 
