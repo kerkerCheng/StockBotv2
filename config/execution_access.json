@@ -1,0 +1,41 @@
+{
+  "version": 1,
+  "_doc": "買得到嗎（盲點修法第 19 條，2026-11-03；loader 與唯一判法：identity/execution_access.py）。使用者 2026-11-02「我基本上是台股+IB，IB有就有」、2026-11-03「IB這些都可以下」。一個市場一條規則（鍵＝研究代號的交易所後綴，美股沒有後綴寫 US），表上的市場＝買得到；個別代號可例外。買不到的只當層證據與主題組成員：不寫個股敘事、不進 paper lane（追蹤表）。例外必帶出處、查核日、重查日——過了重查日例外失效、照市場規則算回買得到，追蹤表 paper 的過濾行標「例外過期」（重問，不是丟）；重查後續期或刪掉。名冊出現表上沒有的市場時 tests/test_execution_access.py 會紅：先問使用者買不買得到，再加一格。",
+  "markets": {
+    "TW": {"channel": "台灣券商", "basis": "使用者 2026-11-02「我基本上是台股+IB」"},
+    "TWO": {"channel": "台灣券商", "basis": "使用者 2026-11-02「我基本上是台股+IB」"},
+    "US": {"channel": "IB", "basis": "IB 既有市場；使用者沒逐一搜過（2026-11-02「IB有就有」）"},
+    "T": {"channel": "IB", "basis": "IB 既有市場；使用者沒逐一搜過（2026-11-02「IB有就有」）"},
+    "HK": {"channel": "IB", "basis": "IB 既有市場；使用者沒逐一搜過（2026-11-02「IB有就有」）"},
+    "ST": {"channel": "IB", "basis": "IB 既有市場；使用者持有 SIVE.ST"},
+    "DE": {"channel": "IB", "basis": "IB 既有市場；使用者沒逐一搜過（2026-11-02「IB有就有」）"},
+    "TO": {"channel": "IB", "basis": "IB 既有市場；使用者沒逐一搜過（2026-11-02「IB有就有」）"},
+    "L": {"channel": "IB", "basis": "IB 既有市場；使用者沒逐一搜過（2026-11-02「IB有就有」）"},
+    "PA": {"channel": "IB", "basis": "IB 既有市場；使用者沒逐一搜過（2026-11-02「IB有就有」）"},
+    "AX": {"channel": "IB", "basis": "IB 既有市場；使用者沒逐一搜過（2026-11-02「IB有就有」）"},
+    "SW": {"channel": "IB", "basis": "IB 既有市場；使用者沒逐一搜過（2026-11-02「IB有就有」）"},
+    "HE": {"channel": "IB", "basis": "IB 既有市場；使用者沒逐一搜過（2026-11-02「IB有就有」）"},
+    "KS": {"channel": "IB", "basis": "使用者 2026-11-03「IB這些都可以下」（問的是 000660.KS）"},
+    "NS": {"channel": "IB", "basis": "使用者 2026-11-03「IB這些都可以下」（問的是 STLTECH.NS）"},
+    "SS": {"channel": "IB（滬股通）", "basis": "使用者 2026-11-03「IB這些都可以下」（問的是 688498.SS）；個別代號要在 HKEX 滬股通合資格名單上"},
+    "SZ": {"channel": "IB（深股通）", "basis": "使用者 2026-11-03「IB這些都可以下」（問的是 300394.SZ、002463.SZ）；個別代號要在 HKEX 深股通合資格名單上"},
+    "VI": {"channel": "IB", "basis": "使用者 2026-11-03「IB這些都可以下」（問的是 ATS.VI）"},
+    "V": {"channel": "IB", "basis": "使用者 2026-11-03「IB這些都可以下」（問的是 ENA.V）"}
+  },
+  "exceptions": {
+    "688836.SS": {
+      "buyable": false,
+      "why": "不在 HKEX 滬股通合資格名單（買賣皆可）上——IB 的 A 股走滬深港通",
+      "source": "https://www.hkex.com.hk/-/media/HKEX-Market/Mutual-Market/Stock-Connect/Eligible-Stocks/View-All-Eligible-Securities_xls/SSE_Securities.xls（2026-11-03 版，1,906 檔）",
+      "checked": "2026-11-03",
+      "recheck_by": "2026-12-21"
+    },
+    "688818.SS": {
+      "buyable": false,
+      "why": "不在 HKEX 滬股通合資格名單（買賣皆可）上——IB 的 A 股走滬深港通",
+      "source": "https://www.hkex.com.hk/-/media/HKEX-Market/Mutual-Market/Stock-Connect/Eligible-Stocks/View-All-Eligible-Securities_xls/SSE_Securities.xls（2026-11-03 版，1,906 檔）",
+      "checked": "2026-11-03",
+      "recheck_by": "2026-12-21"
+    }
+  }
+}

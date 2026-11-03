@@ -98,6 +98,10 @@ QUOTE_UNITS = {"co:aaa": "USD", "co:ggg": "GBp"}
 BENCH = {"QQQ": _series(date(2026, 9, 1), [100.0] * 29 + [101.0] * 3),   # 09-29 收 100、09-30 起 101
          "SOXX": _series(date(2026, 9, 1), [200.0] * 32)}
 BETA = {"QQQ", "LON:VWRA"}
+#: 買得到嗎（盲點修法第 19 條；`identity.execution_access` 的形狀）：夾具兩個市場都買得到、沒有例外——不讀 repo 的 config
+ACCESS = {"markets": {"US": {"channel": "IB", "basis": "夾具"}, "L": {"channel": "IB", "basis": "夾具"}}, "exceptions": {}}
+NOT_BUYABLE = {"buyable": False, "why": "夾具：不在合資格名單上", "source": "夾具", "checked": "2026-09-01",
+               "recheck_by": "2026-12-21"}
 HOLDINGS = {"LIVEX": {"company_id": "co:livex", "research_ticker": "LIVEX", "source": "registry_ticker"},
             "BACKX": {"company_id": "co:livex", "research_ticker": "LIVEX", "source": "registry_ticker"},
             "EURX.F": {"company_id": "co:eurx", "research_ticker": "EURX", "source": "registry_ticker"}}
@@ -145,7 +149,8 @@ def _collect(tmp_path: Path, *, history=None, cohorts=None, events=EVENTS, **ove
         benchmark_loader=lambda symbols, start, end: {s: BENCH[s] for s in symbols},
         trade_log_path=_write_log(tmp_path, events), briefs=BRIEFS, leads=LEADS,
         cohorts=([COHORT], []) if cohorts is None else cohorts,
-        is_beta=lambda s: s in BETA, resolve=_resolve, quote_unit_for=lambda cid, t: QUOTE_UNITS.get(cid))
+        is_beta=lambda s: s in BETA, resolve=_resolve, quote_unit_for=lambda cid, t: QUOTE_UNITS.get(cid),
+        access_loader=lambda: ACCESS)
     kwargs.update(overrides)
     return OIST.collect(**kwargs)
 
@@ -250,7 +255,9 @@ def test_paper_lane_anchors_on_the_first_v2_not_the_current_one(collected) -> No
     rows = collected["lanes"]["paper"]["rows"]
     assert [r["ticker"] for r in rows] == ["AAA", "GGG.L"]
     report = collected["lanes"]["paper"]["filter"]
-    assert report == {"input": 3, "accepted": 2, "filtered": {"no_v2": ["OLD"], "ledger_unreadable": []}}
+    assert report == {"input": 3, "accepted": 2,
+                      "filtered": {"no_v2": ["OLD"], "ledger_unreadable": [], "not_buyable": []},
+                      "access": {"computed": True, "problem": None, "why": {}, "expired": [], "unregistered": []}}
     aaa = _row(collected, "paper", "AAA")
     assert (aaa["brief_id"], aaa["anchor_date"], aaa["anchor_state"]) == ("ib_a2", date(2026, 9, 29), "priced_wait")
     assert (aaa["current_brief_id"], aaa["current_state"], aaa["v2_records"]) == ("ib_a3", "open", 2)
@@ -259,6 +266,55 @@ def test_paper_lane_anchors_on_the_first_v2_not_the_current_one(collected) -> No
     assert (aaa["anchor_raw"], aaa["current_raw"], aaa["absolute_return"]) == (100, 120, pytest.approx(0.20))
     # 首次點名它的 lead：first_seen 最早那則（edgar 07-22 早於 x 07-25）
     assert aaa["first_named_by"]["source"] == "edgar:AAA" and aaa["first_named_absence"] is None
+
+
+def test_paper_lane_drops_what_the_user_cannot_buy_and_names_it(tmp_path) -> None:
+    """盲點修法第 19 條（registration 2026-11-03）：買不到的不是 paper 列——過濾報告列名、附理由，追蹤表那一行印出來。
+
+    變異：拿掉 `buyable is False` 那一支 → GGG.L 還在 rows，第一條紅；不記理由 → why 紅；render 不印買不到 → 最後一條紅。"""
+    collected = _collect(tmp_path, access_loader=lambda: {**ACCESS, "exceptions": {"GGG.L": NOT_BUYABLE}})
+    paper = collected["lanes"]["paper"]
+    assert [r["ticker"] for r in paper["rows"]] == ["AAA"]
+    report = paper["filter"]
+    assert report["accepted"] == 1 and report["filtered"]["not_buyable"] == ["GGG.L"]
+    assert report["access"]["why"] == {"GGG.L": "夾具：不在合資格名單上"}
+    assert OIST.lane_summary(paper["rows"], lane="paper")["n"] == 1
+    line = next(x for x in OIST.render_lanes(collected) if x.startswith("- 敘事 ledger"))
+    assert "進 lane 1" in line and "買不到 1（GGG.L）" in line and "⚠" not in line
+
+
+def test_expired_exception_and_unregistered_market_stay_in_the_lane_but_are_named(tmp_path) -> None:
+    """例外過了重查日＝照市場規則算回來、列名要人重查（重問，不是丟；INV-2）；市場不在表上＝不知道，照收、列名（不猜）。
+
+    變異：過期照樣排除 → GGG.L 不在 rows，第一段紅；不列過期 → expired 紅；市場沒登記當成買得到不列名 → unregistered 紅。"""
+    stale = {**NOT_BUYABLE, "checked": "2026-08-01", "recheck_by": "2026-10-01"}       # TODAY＝10-02，過了一天
+    collected = _collect(tmp_path, access_loader=lambda: {**ACCESS, "exceptions": {"GGG.L": stale}})
+    report = collected["lanes"]["paper"]["filter"]
+    assert [r["ticker"] for r in collected["lanes"]["paper"]["rows"]] == ["AAA", "GGG.L"]
+    assert report["filtered"]["not_buyable"] == [] and report["access"]["expired"] == ["GGG.L"]
+    line = next(x for x in OIST.render_lanes(collected) if x.startswith("- 敘事 ledger"))
+    assert "例外過了重查日 1" in line and "GGG.L" in line
+    on_the_day = {**NOT_BUYABLE, "recheck_by": "2026-10-02"}                              # 重查日當天仍有效
+    same_day = _collect(tmp_path, access_loader=lambda: {**ACCESS, "exceptions": {"GGG.L": on_the_day}})
+    assert same_day["lanes"]["paper"]["filter"]["filtered"]["not_buyable"] == ["GGG.L"]
+    only_us = _collect(tmp_path, access_loader=lambda: {"markets": {"US": ACCESS["markets"]["US"]}, "exceptions": {}})
+    report = only_us["lanes"]["paper"]["filter"]
+    assert report["accepted"] == 2 and report["access"]["unregistered"] == ["GGG.L"]
+
+
+def test_unreadable_access_config_is_not_computed_not_all_buyable(tmp_path) -> None:
+    """config 讀壞只讓這一格沒算：paper 照舊全收、整條 lane 不缺席，過濾行寫明「沒算」（L12：沒算 ≠ 都買得到）。
+
+    變異：讀壞時整條 lane 缺席 → absence 紅；computed 照寫 True → 第二條紅；render 不提 → 最後一條紅。"""
+    def broken():
+        raise ValueError("壞掉的 config")
+
+    collected = _collect(tmp_path, access_loader=broken)
+    paper = collected["lanes"]["paper"]
+    assert paper["absence"] is None and [r["ticker"] for r in paper["rows"]] == ["AAA", "GGG.L"]
+    assert paper["filter"]["access"]["computed"] is False and "壞掉的 config" in paper["filter"]["access"]["problem"]
+    line = next(x for x in OIST.render_lanes(collected) if x.startswith("- 敘事 ledger"))
+    assert "買得到嗎沒算" in line and "不是都買得到" in line
 
 
 def test_the_paper_lane_is_also_summarised_by_current_state(collected) -> None:

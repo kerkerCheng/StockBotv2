@@ -629,21 +629,39 @@ def first_named_by(company_id: str | None, leads: Mapping[str, Mapping[str, Any]
 
 
 def paper_lane_plan(briefs: Mapping[str, tuple[Sequence[Any], Sequence[str]]], *, today: date,
-                    leads: Mapping[str, Mapping[str, Any]] | None) -> tuple[list[dict], dict]:
+                    leads: Mapping[str, Mapping[str, Any]] | None,
+                    access_data: Mapping[str, Any] | None = None,
+                    access_problem: str | None = None) -> tuple[list[dict], dict]:
     """每檔**最早一筆未撤回的 `investor-brief/v2`**＝paper 錨點（不是 `select_brief` 的現行那筆）。純函式，不取價。
 
     回 `(rows, filter_report)`——每個 filter 都報 input／accepted／filtered／reasons（INV-3）：沒有 v2 的檔不是 paper 列；
-    ledger 有壞行的檔照列但標 `ledger_unreadable` 缺席（壞的那行可能正是第一份 v2，錨點認不準）。"""
+    ledger 有壞行的檔照列但標 `ledger_unreadable` 缺席（壞的那行可能正是第一份 v2，錨點認不準）。
+    買不到的不是 paper 列（盲點修法第 19 條，registration 2026-11-03；判法 `identity.execution_access`）：
+    例外過了重查日、市場沒登記的照收但列名；`access_data` 沒給＝沒算（照舊全收、報告寫明，不是「都買得到」——L12）。"""
     from alpha.narrative.contracts import RECORD_VERSION_V1, RECORD_VERSION_V2, select_brief
+    from identity.execution_access import access
 
     rows: list[dict] = []
-    report = {"input": len(briefs), "accepted": 0, "filtered": {"no_v2": [], "ledger_unreadable": []}}
+    report = {"input": len(briefs), "accepted": 0,
+              "filtered": {"no_v2": [], "ledger_unreadable": [], "not_buyable": []},
+              "access": {"computed": access_data is not None, "problem": access_problem, "why": {},
+                         "expired": [], "unregistered": []}}
     for ticker, (records, errors) in sorted(briefs.items()):
         v2 = sorted((r for r in records if r.record_version == RECORD_VERSION_V2 and not r.retracted),
                     key=lambda r: (r.created_at, r.brief_id))
         if not v2 and not errors:
             report["filtered"]["no_v2"].append(ticker)
             continue
+        if access_data is not None:
+            got = access(ticker, today=today, data=access_data)
+            if got.buyable is False:
+                report["filtered"]["not_buyable"].append(ticker)
+                report["access"]["why"][ticker] = got.why
+                continue
+            if got.exception_expired:
+                report["access"]["expired"].append(ticker)
+            if got.buyable is None:
+                report["access"]["unregistered"].append(ticker)
         report["accepted"] += 1
         if errors:
             report["filtered"]["ledger_unreadable"].append(ticker)
@@ -945,6 +963,7 @@ def collect(*, no_benchmark: bool = False, today: date | None = None,
             resolve: Callable[[Mapping[str, Any]], Mapping[str, Any]] | None = None,
             quote_unit_for: Callable[[str | None, str | None], str | None] | None = None,
             disproof_inputs: tuple[Sequence[Mapping[str, Any]] | None, Mapping[str, Any] | None] | None = None,
+            access_loader: Callable[[], Mapping[str, Any]] | None = None,
             ) -> dict[str, Any]:
     """三條 lane 的資料收集（Phase 5 Step 5.2）。**render 與 APP 讀同一個函式**——APP 端另算一份會立刻開始偏離（L13）。
 
@@ -990,10 +1009,19 @@ def collect(*, no_benchmark: bool = False, today: date | None = None,
             leads = (json.loads(LEADS_PATH.read_text(encoding="utf-8")).get("leads") or {})
         except (OSError, ValueError):
             leads = None                     # 讀不到＝first_named_by 缺席（upstream_unavailable），不是「沒人點名」
+    # 買得到嗎（盲點修法第 19 條）：config 讀壞只讓「買不到的不進 paper」沒算——照舊全收、過濾報告寫明，整條 lane 照走
+    try:
+        from identity.execution_access import load as load_access
+
+        access_data, access_problem = (access_loader or load_access)(), None
+    except Exception as exc:  # noqa: BLE001
+        access_data = None
+        access_problem = f"config/execution_access.json 讀不到（{type(exc).__name__}: {str(exc)[:120]}）"
     brief_map: Mapping[str, tuple[Sequence[Any], Sequence[str]]] | None = None
     try:
         brief_map = briefs if briefs is not None else _read_briefs(brief_dir)
-        paper_rows, paper_filter = paper_lane_plan(brief_map, today=today, leads=leads)
+        paper_rows, paper_filter = paper_lane_plan(brief_map, today=today, leads=leads,
+                                                   access_data=access_data, access_problem=access_problem)
         paper_absence = None
     except Exception as exc:  # noqa: BLE001
         brief_map = None                     # 讀壞了：下面「反證曾被判觸及」整格記讀不到，不當成沒觸及
@@ -1598,8 +1626,20 @@ def render_lanes(collected: Mapping[str, Any]) -> list[str]:
         if lane == "paper":
             report = collected["lanes"]["paper"].get("filter") or {}
             filtered = report.get("filtered") or {}
-            out.append(f"- 敘事 ledger {report.get('input', 0)} 本：進 lane {report.get('accepted', 0)}｜沒有 v2 "
-                       f"{len(filtered.get('no_v2') or [])}｜ledger 有壞行 {len(filtered.get('ledger_unreadable') or [])}")
+            access_report = report.get("access") or {}
+            not_buyable = list(filtered.get("not_buyable") or [])
+            line = (f"- 敘事 ledger {report.get('input', 0)} 本：進 lane {report.get('accepted', 0)}｜沒有 v2 "
+                    f"{len(filtered.get('no_v2') or [])}｜ledger 有壞行 {len(filtered.get('ledger_unreadable') or [])}"
+                    f"｜買不到 {len(not_buyable)}" + (f"（{'、'.join(not_buyable)}）" if not_buyable else ""))
+            if not access_report.get("computed"):
+                line += f"｜⚠ 買得到嗎沒算（{access_report.get('problem') or '呼叫端沒給'}）——照舊全收，不是都買得到"
+            if access_report.get("expired"):
+                line += (f"｜⚠ 買不到的例外過了重查日 {len(access_report['expired'])}（照市場規則算回來了）："
+                         f"{'、'.join(access_report['expired'])}——重查後續期或刪")
+            if access_report.get("unregistered"):
+                line += (f"｜⚠ 市場沒登記買不買得到 {len(access_report['unregistered'])}："
+                         f"{'、'.join(access_report['unregistered'])}——問使用者再登記")
+            out.append(line)
         if not rows:
             out.append(f"- {LANE_EMPTY[lane]}")
             continue

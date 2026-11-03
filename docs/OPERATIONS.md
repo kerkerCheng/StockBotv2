@@ -123,6 +123,16 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 `StockBotv2-Daily` 的 ⑱⑲ 取代（1.2a 停用、2026-09-25 1.2b 刪除）；它們的理由（LLM 失敗心跳照發、永遠 exit 0、Python 不用 `.cmd`、
 發送走 subprocess）搬進 `crons/daily_task.py` 的 docstring，守它們的測試改主詞搬進 `tests/test_daily_task.py`「無人值守入口」節。
 
+### Sandbox impact review 結論（2026-11-03：買得到嗎——paper lane 不收買不到的檔；盲點修法 plan 2026-11-02-001 §3 第 19 條）
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | daily ⑤ `scripts/outcome_if_settled_today.py` 與 ⑬ `python -m webapp materialize --positions` 共用的 `collect()`（argv 都不變）：**多讀一份本機 config** `config/execution_access.json`（`identity.execution_access.load`：唯讀、驗形狀），不新增主機、請求、憑證、寫入目的地。paper lane 不收買不到的檔（今天 688836.SS 一列）；過濾報告多 `filtered.not_buyable` 與 `access`（computed／problem／why／expired／unregistered），positions artifact 照抄（加鍵不升契約版，先例同上一節）；報告的 paper 過濾行多「買不到 N」與三種 ⚠（沒算、例外過了重查日、市場沒登記）。config 讀壞只讓這一格沒算——照舊全收、寫明「沒算」，整條 lane 不缺席。**HKEX 合資格名單不在無人值守路徑上抓**：互動 session 寫 A 股第一份敘事前對一次、例外的重查日到了重查 |
+| **2 canonical skill／prompt／本檔** | 本節；research-drain SKILL 段 5「買不到的」一點；`docs/reports/phase7/registration.md` 2026-11-03 第 19 條那段（規則與改前數字先 commit `1d7c7e34`，改後數字 append 在同段）；plan 2026-11-02-001 §3／§8。prompt 不動 |
+| **3 最窄 rule** | daily argv 不變；不新增 step、allowlist、rule；APP 路由不變、仍無寫入端點；`.codex/rules` 仍 0 條 |
+| **4 contract test** | 新 `tests/test_execution_access.py`：名冊每個市場都要在表上（剎車——新市場進名冊就紅，先問使用者）、判法（例外、市場規則、市場不在表上＝不知道、重查日當天仍有效、過了失效並標過期、查的時候轉大寫）、形狀驗證 10 種；`tests/test_measurement_lanes.py` 三條：買不到的不收且列名附理由、例外過期與市場沒登記照收且列名、config 讀壞＝沒算不是都買得到（夾具注入 `access_loader`，不讀 repo 的 config）。變異 13／13 紅 |
+| **5 端到端 smoke** | 11-03 真資料：HKEX 當天的合資格名單（滬股通 1,906、深股通 2,081，以 600519、300750 確認讀法）對名冊 26 檔 A 股——24 在、688836.SS 與 688818.SS 不在；`materialize --positions` 42 秒，paper 138 → 137 列（過濾行「買不到 1（688836.SS）」）、籃子 −18.2% → −18.7%、最大單檔貢獻者 688836.SS（+38.7%）→ CLF（+18.3%）；例外過期 0、市場沒登記 0 |
+
 ### Sandbox impact review 結論（2026-11-03：Form 4 先讀交易代碼——含 P 的不 auto no_go；盲點修法 plan 2026-11-02-001 §2 第 15 條後半）
 
 | 步 | 結論 |
