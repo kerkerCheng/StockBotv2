@@ -93,7 +93,7 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 **Discord 送的是短版**（2026-10-07 使用者：「心跳太雜」；`crons/daily_brief.py`）：① lead 抓了什麼 ② 市場大事
 （這兩塊是 ⑪c 的 TL;DR，沒產生就退回程式組的來源計數與雷達收據原文）③ 待你決定（pq2 編號之前先列「可開 N 檔待你選」——起始門過了、
 這一版敘事還沒選過的可開，沒有編號、不進批次指令；2026-11-03 盲點修法第 18＋16 條，取代同日 §1 第 3 條的「只差已定價」）④ 狀態與健康度（**每天都印**：daily 步數、
-較昨變動、候選各格與最老滯留、watch 今日、反證與加碼條件、無到期的等待、新點名；同日使用者：「基本重要的 status 還是要印」）
+較昨變動、候選各格與最老滯留、逾期型反證 0 條的持有／可開敘事、watch 今日、反證與加碼條件、無到期的等待、新點名；同日使用者：「基本重要的 status 還是要印」）
 ⑤ 下一次研究——**歸零＝不漏球的唯一清單**（2026-10-22 起由 `engine_b/todo_ledger.py` 組：格數見 `LEDGER`、工作量與最老天數、0 的格列名字、
 讀不到另列；最後一行「下一步貼」由計數機械導出，全 0 時寫「今天沒有要貼的」）。每一種狀態落在哪一格（或為什麼不是研究待做）
 登記在同一檔的 `COVERAGE`，`tests/test_todo_ledger.py` 守著：新增狀態沒登記就紅。數字與心跳同一份快照、同一批函式；每一塊、④ 的每一行各自降級。
@@ -142,6 +142,16 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 | **3 最窄 rule** | daily argv 不變；不新增 step、allowlist、rule；`.codex/rules` 仍 0 條。APP 仍沒有寫入端點（請求路徑只讀 artifact）。⚠ 長駐的 serve（8790）對 `/7` artifact 回 503 直到重啟——升版當天 materialize 後重啟一次（見「契約升版」） |
 | **4 contract test** | 新 `tests/test_open_two_gates.py`：起始門四項各自擋（會死嗎紅、四盞全灰 fail closed、押 neither、沒反證）、判不出可開、寫入端拒收新的等回落與舊紀錄照讀成可開、`depth_check` 只在有寫時進 id、加碼條件指得到 `confirm[]`、⑤ 那一格（持股讀不到＝None、舊板沒有那一格＝說沒算）、短版 ③ 選過的不再列；圖頁三區「押得下去」不收判不出（`BETTABLE_READING_KINDS` 與起始門分開，L12）；成績單退役字照當時的字分組 |
 | **5 端到端 smoke** | 11-03 真資料 `materialize --tracked --registry-listed --candidates`（197／197）→ `candidates/7`：可開 1（STLTECH.NS，舊等回落讀成可開、過了起始門）／缺 X 37／不要 46／已持有 2／前提失效 3（3081.TWO、4979.TWO、AXTI：擋住的都是醒來待判的反證 watch）／加碼條件還沒查 2（STLTECH.NS、SIVE.ST）；序列 11-03 那一行換成新門值。`--positions` 重跑：paper 137 列的「現在」沒有 priced_wait（可開 4），錨點照留當時的字（priced_wait 3）。APP 重啟後 health `code.stale=false`；headless Edge 渲染首頁（「可開（1）」）、STLTECH.NS 個股頁、成績單（「已定價等回落（11-03 前的說法，現讀成可開）」3 檔另成一組）、圖頁（押得下去 22、還判不出 40——判不出沒有跑進押得下去）都沒有錯誤框 |
+
+### Sandbox impact review 結論（2026-11-03：逾期型反證——敘事反證多一個 `deadline` 宣告、短版 ④ 一行；盲點修法 plan 2026-11-02-001 §7 第 10 條②）
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | daily ⑬ materialize 寫的 `candidates` artifact 升 `candidates/8`（列多 `deadline_disproof`、counts 多 `no_deadline`）；⑱ 心跳段 2 與短版 ④ 多一行，讀的是同一份 artifact。互動 `alpha brief --add` 寫完多印一行提醒，已持有與否讀本機候選板 artifact（唯讀、零網路、讀不到不猜）。不新增檔案、主機、憑證、不寫任何 authority |
+| **2 canonical skill／prompt／本檔** | ARCHITECTURE（v2 契約、`candidates` kind）、CONCEPTS「逾期型反證」、`skills/research-drain` 起始門那一條；研究 packet 的 `brief_frame`（`spec_shape.disproof` 多 `deadline`）——只給互動研究 session 讀。AGENTS 不動 |
+| **3 最窄 rule** | daily argv 不變；不新增 step、allowlist、rule；`.codex/rules` 仍 0 條；APP 請求路徑不變（升版當天重啟 serve） |
+| **4 contract test** | 新 `tests/test_deadline_disproof.py`：沒寫＝false、只在 true 時進 payload（舊 id 不動、寫 false 與不寫同一份）、字串／數字／null 拒收；列的條數（沒有 v2 敘事＝None）、可開與已持有才數、缺 X 不數、持股讀不到＝None；狀態行 0 也印、舊板未算、讀不到照說；寫入提醒只在宣告可開或候選板上已持有、讀不到不提醒 |
+| **5 端到端 smoke** | 11-04 真資料 `materialize --candidates` → `candidates/8`：逾期型反證 0 條的持有／可開敘事 3（STLTECH.NS、COHR、SIVE.ST——欄位今天才有，現行敘事全是 0 條）；APP 重啟後 health `code.stale=false`、`/api/v1/candidates` 200；手動跑一次心跳（`--out` 寫暫存檔、不寫快照、不發送）：段 2 與短版 ④ 都印出那一行，短版 ③ 照印「可開 1 檔待你選」 |
 
 ### Sandbox impact review 結論（2026-11-03：neither 也要付「換得掉」的證據＋追蹤表騎在 neither 層上那一行；盲點修法 plan 2026-11-02-001 §2 第 12 條）
 

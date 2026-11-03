@@ -726,6 +726,10 @@ alpha／beta 界線用 `risk/hard_caps.py` 匯出的 `beta_instrument_for`／`is
 `加碼條件：c<n>`——c<n> 指向同一份的 `confirm[]`，寫入端 ⑬ 驗得到；只在非空時進 id 欄位集合，舊紀錄 id 不變）；列帶 `addon_unchecked`
 （還沒查的項目，只算可開與已持有；沒有 v2 敘事＝十項都沒查），`counts.addon_unchecked`（持股讀不到＝None，已持有那一半數不到）→
 ⑤「加碼條件還沒查」，drain 收尾歸零（加碼條件的 watch 只被**新**文件叫醒，答案若在既有的年報、法說裡不會自己醒）。
+**逾期型反證**（2026-11-03 盲點修法第 10 條②；candidates/8）：列帶 `deadline_disproof`（這一版敘事標 `deadline` 的反證條數，沒有 v2 敘事＝None），
+`counts.no_deadline`＝可開與已持有裡一條都沒有的檔數（`alpha.candidates.no_deadline_rows`；持股讀不到＝None）→ 心跳段 2 與短版 ④ 一行
+（`alpha.candidates.deadline_line`，0 也印、舊板印未算）；`alpha brief --add` 宣告可開或候選板上是已持有而一條都沒有時印一行提醒
+（`alpha/providers/candidates.py::deadline_reminder`；已持有讀候選板 artifact，讀不到不猜）。只計數與提醒，不擋任何東西。
 **已定價等回落併回可開**：`CANDIDATE_STATES_DECLARABLE` 少一格、寫入端 ④⁰ 拒收新的 `priced_wait`；舊紀錄讀成可開
 （`CandidateState.effective`／`CANDIDATE_STATES_RETIRED`）、走同一道起始門、不回寫——成績單 paper 線的錨點狀態與判斷鍵照讀當時的字
 （INV-6；中文 `alpha.candidates.RETIRED_STATE_LABELS`，經 `.meta.json` 的 `retired_states` 跟著資料走）。只差已定價（11-01，candidates/4）、
@@ -841,7 +845,8 @@ AnalystView.brief（optional）→ APP 首屏 briefCard；六張卡收進「為�
   × 名冊報價單位的換算係數——係數由 sources 從 `identity/currency.py` 查好注入，builder 不碰 identity；不做匯率）與 `revenue_ttm`（快照 TTM，日期是取數日）；`{price}` 與已定價的數字仍不得出現在這一格（型別層）。
   不改 `record_version`、不改 id 欄位集合——既有紀錄逐位相同。
 - 結構化欄位（全部進 v2 的 id 欄位集合；v1 的集合一個字不動）：`rides[]`（騎的讀圖）、`disproof[]`（寫入即登記成 `brief:<id>#n` 語意 watch；
-  已在盯的只以來源鍵 `link_source_ref` 連結）、`answers`（已定價嗎／出現在數字裡了嗎：yes／no／unmeasurable）、`candidate_state`
+  已在盯的只以來源鍵 `link_source_ref` 連結；`deadline`＝逾期型宣告，條件寫成「X 未在 expires 前發生」，只收 true／false、只在 true 時進 payload，
+  舊紀錄 id 不變——2026-11-03 第 10 條②，到期照舊是重問）、`answers`（已定價嗎／出現在數字裡了嗎：yes／no／unmeasurable）、`candidate_state`
   （open／missing／pass；**held 不收**，由 Sheet 推導；2026-11-03 起 priced_wait 退役——舊紀錄照 parse、讀成可開，寫入端 ④⁰ 拒收新的；
   舊紀錄的 `reopen` 重開條件照存、不再讀）、`depth_check`（深挖清單十項，選填，2026-11-03）、`history_not_comparable`、`acknowledged_touched[]`。
 - **寫入當下才成立的檢查只放寫入端**（`alpha/providers/briefs.py::v2_write_problems`）：讀圖現行（current／stale_low）、本公司在讀圖快照供給側、

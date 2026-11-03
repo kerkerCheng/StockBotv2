@@ -585,6 +585,26 @@ def addon_unchecked_rows(groups: Mapping[str, Sequence[Mapping[str, Any]]]) -> l
     return [r for g in ADDON_GROUPS for r in groups.get(g) or () if r.get("addon_unchecked")]
 
 
+def no_deadline_rows(groups: Mapping[str, Sequence[Mapping[str, Any]]]) -> list[Mapping[str, Any]]:
+    """可開與已持有裡、現行 v2 敘事一條逾期型反證都沒有的列（`row["deadline_disproof"] == 0`；2026-11-03 盲點修法第 10 條②）。
+    沒有 v2 敘事的已持有（`None`）不在這裡——那是「沒有敘事」，不是「0 條」（L12）。順序照組、組內照板，不是名次。"""
+    return [r for g in ADDON_GROUPS for r in groups.get(g) or () if r.get("deadline_disproof") == 0]
+
+
+def deadline_line(board: Mapping[str, Any]) -> str:
+    """心跳段 2 與短版 ④ 的一行（第 10 條②；審查 strategy-4：事件型反證要等一份新文件才醒，輸家常常什麼都不發）：
+    逾期型反證 0 條的持有／可開敘事 N（逐檔）。**0 也印**（常駐計數器，L14）；持股沒讀到＝已持有那一半數不到、舊板（列上
+    沒有這一格）＝未算，都不壓成 0（INV-3）。只計數、不排序、不擋任何東西。"""
+    label = "逾期型反證 0 條的持有／可開敘事"
+    groups, counts = board.get("groups") or {}, board.get("counts") or {}
+    if "no_deadline" not in counts or any("deadline_disproof" not in r for g in ADDON_GROUPS for r in groups.get(g) or ()):
+        return f"{label}：未算（候選板是舊版——重跑 materialize --candidates）"
+    if counts["no_deadline"] is None:
+        return f"{label}：讀不到（持股沒讀到——已持有那一半數不到）"
+    names = "、".join(str(r.get("ticker")) for r in no_deadline_rows(groups))
+    return f"{label} {counts['no_deadline']}" + (f"：{names}" if names else "")
+
+
 def missing_request_counts(missing_rows: Iterable[Mapping[str, Any]]) -> dict[str, int | None]:
     """缺 X 那一組的常駐計數（三分法 ①）：已開口（待辦池裡有開著的文件請求）、可拿但未開口（`missing_kind=user_document`
     而沒有開著的請求）、未分（敘事沒寫三分）。任一列的 `document_requests` 是 None（池沒讀到、舊 artifact）→ 前兩格 None＝未算。"""
@@ -699,6 +719,8 @@ def assemble_board(rows: Sequence[Mapping[str, Any] | None], *, universe: Sequen
     counts.update({f"missing_{k}": v for k, v in missing_request_counts(groups["missing"]).items()})
     # 加碼條件還沒查（2026-11-03）：可開＋已持有裡深挖清單還有沒查的檔——持股沒讀到時已持有那一半數不到，整格 None（不是少算）
     counts["addon_unchecked"] = len(addon_unchecked_rows(groups)) if held_ok else None
+    # 逾期型反證 0 條的持有／可開敘事（2026-11-03 第 10 條②）：同上，持股沒讀到整格 None
+    counts["no_deadline"] = len(no_deadline_rows(groups)) if held_ok else None
     # 遲滯（2026-11-01）：今天才翻成非邊緣、還沒列撤回建議的列——照敘事分組，這裡只計數（0 也印；不是待做）
     counts["not_edge_pending"] = sum(1 for row in rows if row is not None and row.get("edge_pending"))
     return {"groups": groups, "side_groups": sides, "counts": counts, "oldest_stall_days": oldest,
@@ -716,8 +738,8 @@ __all__ = ["ADDON_GROUPS", "ANSWER_WORDS", "CANDIDATES_THIS_IS_NOT", "GROUPS", "
            "ON_THRESHOLD_WORDS", "PRICED_IN_LINES", "RETIRED_STATE_LABELS",
            "REWRITE_STATE_WORDS", "REWRITE_WHY", "RIDES_SUPERSEDED_PREFIX", "SIDE_GROUPS", "SIDE_LABELS", "UNANSWERED",
            "WIPEOUT_LINES", "Cited", "addon_unchecked_rows", "assemble_board", "body_key", "body_version", "cap_label",
-           "cited_identities", "edge_note",
-           "held_index", "judgment_version", "missing_request_counts", "new_edge_reason", "normalize_url",
+           "cited_identities", "deadline_line", "edge_note",
+           "held_index", "judgment_version", "missing_request_counts", "new_edge_reason", "no_deadline_rows", "normalize_url",
            "not_edge_pending_note", "on_threshold_entries", "on_threshold_line",
            "priced_judgment_key", "priced_since",
            "rewrite_words", "rides_reason", "rollup", "squash", "stall_since", "stall_version", "three_words",

@@ -308,6 +308,9 @@ def derive_row(ticker: str, company_id: str | None, *, records: Sequence[Investo
         # 項目名；已持有沒有 v2 敘事＝十項都還沒查。等回落的價格叫醒、重開條件、只差已定價隨等回落退役，列上不再有那幾格
         "addon_unchecked": (unchecked_items(brief.depth_check_map if v2 else None)
                             if eff == "open" or (held_info is not None and eff != "pass") else []),
+        # 逾期型反證條數（2026-11-03，第 10 條②）：這一版敘事標 `deadline` 的反證幾條；沒有 v2 敘事＝None（不是 0 條）。
+        # 板上「逾期型反證 0 條的持有／可開敘事」數的是可開與已持有裡這一格是 0 的列（`alpha.candidates.no_deadline_rows`）
+        "deadline_disproof": sum(1 for d in brief.disproof if d.deadline) if v2 else None,
         # 是不是新賭注（Phase 7 Step 7.0e）：和持有的 alpha 檔共用的需求錨與層——只呈現，不進任何狀態判斷
         "shared_bet": shared_bet(company_id, ticker, held=held, bets=bets, registry=registry),
         "three_words": three_words(three_questions, brief, not_read=f"未讀到（{three_questions_note}）"
@@ -916,8 +919,40 @@ def load_board(tickers: Sequence[str], *, today: date | None = None,
     return board
 
 
+# ---------------------------------------------------------------------------
+# 逾期型反證的寫入提醒（2026-11-03 盲點修法第 10 條②）
+# ---------------------------------------------------------------------------
+
+def deadline_reminder(record: Mapping[str, Any], *, held: bool | None) -> str | None:
+    """`alpha brief --add` 寫完印的一行提醒：宣告可開、或候選板上是已持有的敘事，一條逾期型反證（`disproof[].deadline: true`）
+    都沒有就提醒——**只印、不擋**（審查 strategy-4：事件型反證要等一份新文件才醒，輸家常常什麼都不發）。`held`＝候選板
+    artifact 上是不是已持有（`held_on_board`；None＝讀不到——不猜，短版 ④「逾期型反證 0 條」每天會點名）。撤回與 v1 不提醒。"""
+    if record.get("retracted") or record.get("record_version") != RECORD_VERSION_V2:
+        return None
+    if (record.get("candidate_state") or {}).get("state") != "open" and held is not True:
+        return None
+    if any(d.get("deadline") is True for d in record.get("disproof") or ()):
+        return None
+    return ("  ⚠ 這一版沒有逾期型反證（disproof[].deadline: true）——持有／可開的敘事至少一條寫成「X 未在 D 前發生」："
+            "輸家常常什麼都不發，事件型反證等不到新文件就不會醒（只提醒、不擋；短版 ④ 每天點名）")
+
+
+def held_on_board(ticker: str) -> bool | None:
+    """候選板 artifact 上這一檔是不是已持有（寫入時的提醒用）。讀不到、或那一版板子持股沒讀到＝None——不讀 Sheet、零網路。"""
+    try:
+        from webapp.store import StateArtifactStore
+
+        board, _freshness = StateArtifactStore().read("candidates")
+    except Exception:  # noqa: BLE001
+        return None
+    if (board.get("holdings") or {}).get("status") != "ok":
+        return None
+    return any(str(r.get("ticker") or "").upper() == str(ticker).upper()
+               for r in (board.get("groups") or {}).get("held") or ())
+
+
 __all__ = ["ANSWER_WORDS", "CANDIDATES_THIS_IS_NOT", "GROUPS", "GROUP_LABELS", "SIDE_GROUPS", "SIDE_LABELS",
            "UNANSWERED", "assemble_board", "assertions_for", "bet_index", "board_rewrite", "candidate_context",
-           "derive_row", "held_index", "raw_text",
+           "deadline_reminder", "derive_row", "held_index", "held_on_board", "raw_text",
            "knowable_bar_day", "load_board", "open_preconditions", "page_input", "rollup", "shared_bet", "stall_since",
            "three_words"]

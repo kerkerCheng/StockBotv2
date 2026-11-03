@@ -752,7 +752,10 @@ def candidate_short_lines(state_dir: Path | None) -> list[str]:
                        ("not_edge_pending", "非邊緣待確認"), ("on_threshold", "在門檻上")):
         if c.get(key):
             cover += f"｜{label} {c[key]}"
-    lines = [f"- 候選：{hb.candidate_states_text(c)}", cover]
+    # 逾期型反證（2026-11-03 盲點修法第 10 條②）：每天印、0 也印——常駐計數器，不靠人記得（L14）
+    from alpha.candidates import deadline_line
+
+    lines = [f"- 候選：{hb.candidate_states_text(c)}", cover, f"- {deadline_line(board)}"]
     holdings = board.get("holdings") or {}
     if holdings.get("status") == "ok" and holdings.get("unresolved"):
         lines.append(f"- 持股解析不到 {len(holdings['unresolved'])}：{'、'.join(map(str, holdings['unresolved'][:5]))}")

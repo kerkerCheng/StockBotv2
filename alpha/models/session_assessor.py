@@ -225,7 +225,8 @@ def _brief_frame() -> dict[str, Any]:
             "例如短檢查讀的公司自己的 10-K——先存成檔再引用；寫入時檢查檔案在，個股頁證據清單照列）；"
             "禁字表裡的內部名詞一出現就拒收。"
             "結構化欄位：rides[]（只能押本公司在供給側的現行讀圖）、disproof[]（寫入即登記成 watch；已在盯的只填 "
-            "link_source_ref）、answers（已定價嗎／出現在數字裡了嗎）、candidate_state（可開照起始門：會死嗎不是紅、押的那一層"
+            "link_source_ref；持有／可開的敘事至少一條寫成「X 未在 D 前發生」並標 deadline: true——輸家常常什麼都不發，"
+            "事件型反證等不到新文件就不會醒）、answers（已定價嗎／出現在數字裡了嗎）、candidate_state（可開照起始門：會死嗎不是紅、押的那一層"
             "判讀不是 neither、反證已寫下且有到期、已定價寫成一句脈絡——已定價不擋可開，已定價時翻倍條件寫得更嚴；缺 X 要先用 "
             "`python -m engine_b.event_watch add --wake-brief <co:*> …` 建好 watch）、confirm[]（**加碼條件**：「這件事發生＝"
             "結構被確認了」——客戶自己的文件點名它、合格走到量產、數字出現在營收裡；寫入即登記成 watch、有到期；觸及只提醒，"
@@ -246,7 +247,8 @@ def _brief_frame() -> dict[str, Any]:
             "rides": [{"node": "tech:…", "unit": "layer", "reading_id": "sr_…"}],
             "disproof": [{"condition": "原文逐字…", "check_frequency": "每季", "action_48h": "…",
                           "entities": ["co:…"], "expires": "YYYY-MM-DD", "source": "self",
-                          "link_source_ref": None}],
+                          "link_source_ref": None,
+                          "deadline": "true｜false（逾期型：條件寫成「X 未在 expires 前發生」——持有／可開至少一條；不寫＝false）"}],
             "answers": {"priced_in": "yes|no|unmeasurable", "in_numbers": "yes|no|unmeasurable"},
             "candidate_state": {"state": "open|missing|pass", "watch_id": "ew_…（缺 X 必填）",
                                 "reason": "（不要必填）"},

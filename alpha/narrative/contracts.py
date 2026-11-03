@@ -375,11 +375,17 @@ class NarrativeDisproof:
     expires: date
     source: str
     link_source_ref: str | None = None
+    #: 逾期型（2026-11-03，盲點修法第 10 條②；審查 strategy-4：事件型反證要等一份新文件才醒，輸家常常什麼都不發）：
+    #: 條件寫成「X 未在 expires 前發生」，到期本身就是觸發。只是宣告——到期照舊是重問，不自動判觸及、不改出場規則。
+    #: as_dict 只在 True 時寫——舊紀錄的 brief_id 不變。
+    deadline: bool = False
 
     def __post_init__(self) -> None:
         _nonempty(self.condition, "disproof[].condition")
         _nonempty(self.check_frequency, "disproof[].check_frequency（L7：核查頻率）")
         _nonempty(self.action_48h, "disproof[].action_48h（L7：觸發後 48 小時動作）")
+        if not isinstance(self.deadline, bool):
+            raise ContractViolation(f"disproof[].deadline 只收 true／false（收到 {self.deadline!r}）——逾期型反證的宣告，不寫＝false")
         if not any(str(e).startswith("co:") for e in self.entities):
             raise ContractViolation("disproof[].entities 至少一個 co:*（語意 watch 只認 co:*；INV-1）")
         if not isinstance(self.expires, date):
@@ -393,9 +399,12 @@ class NarrativeDisproof:
                 "disproof[].link_source_ref 必須是既有 watch 的來源鍵（thesis:…#n、reading:…#n 或 layer_note:…#n）")
 
     def as_dict(self) -> dict[str, Any]:
-        return {"condition": self.condition, "check_frequency": self.check_frequency, "action_48h": self.action_48h,
-                "entities": sorted(self.entities), "expires": self.expires.isoformat(), "source": self.source,
-                "link_source_ref": self.link_source_ref}
+        out = {"condition": self.condition, "check_frequency": self.check_frequency, "action_48h": self.action_48h,
+               "entities": sorted(self.entities), "expires": self.expires.isoformat(), "source": self.source,
+               "link_source_ref": self.link_source_ref}
+        if self.deadline:
+            out["deadline"] = True
+        return out
 
 
 @dataclass(frozen=True, slots=True)
@@ -902,7 +911,9 @@ def _parse_v2_fields(raw: Mapping[str, Any]) -> dict[str, Any]:
         action_48h=str(d.get("action_48h") or ""),
         entities=tuple(sorted({str(e).strip() for e in (d.get("entities") or ()) if str(e).strip()})),
         expires=_iso_day(d.get("expires"), "disproof[].expires"), source=str(d.get("source") or ""),
-        link_source_ref=(str(d["link_source_ref"]) if d.get("link_source_ref") else None)) for d in seq("disproof"))
+        link_source_ref=(str(d["link_source_ref"]) if d.get("link_source_ref") else None),
+        # 逾期型（第 10 條②）：沒寫＝false；寫了就照原值交給契約驗（字串 "true"、1、null 都拒收，不猜）
+        deadline=d["deadline"] if "deadline" in d else False) for d in seq("disproof"))
     ans = raw.get("answers")
     answers = (Answers(priced_in=str(ans.get("priced_in") or ""), in_numbers=str(ans.get("in_numbers") or ""))
                if isinstance(ans, Mapping) else None)

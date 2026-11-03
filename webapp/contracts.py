@@ -97,7 +97,9 @@ STATE_SCHEMA_VERSIONS: dict[str, str] = {
     # `pulled_back`／`open_gaps`／`reopen`／`reopen_missing`／`wake_by`，多 `declared_retired`（當時寫的退役字）、
     # `addon_unchecked`（深挖清單還沒查的項目）；counts 少 `priced_wait_*`、多 `addon_unchecked`；清單少
     # `kind=pulled_back`／`reopen_met`／`no_reopen`。舊 /6 的形狀照它讀不對，所以升版（舊 artifact 讀成不可用，重跑 materialize）。
-    "candidates": "stockbot-app/candidates/7",
+    # /8（2026-11-03 盲點修法第 10 條②：逾期型反證）：列多 `deadline_disproof`（這一版敘事標 deadline 的反證條數；沒有 v2 敘事＝null），
+    # counts 多 `no_deadline`（可開與已持有裡一條都沒有的檔數；持股讀不到＝null）。
+    "candidates": "stockbot-app/candidates/8",
     # 2026-10-07（個股頁 plan S4b）：層說明的純文字閱讀頁——ledger 全文、出處與文件自宣告、每條主張的 watch 狀態、
     # 哪幾頁連過來 → 9。不做版面與示意圖（S5）。
     "layer_notes": "stockbot-app/layer_notes/1",

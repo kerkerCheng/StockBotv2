@@ -997,6 +997,10 @@ def _candidate_lines(state_dir: Path | None) -> list[str]:
         band = board.get("on_threshold_band") or "上限 ±1 家或 ±10%"
         names = "、".join(on_threshold_line(e) for e in entries if isinstance(e, Mapping))
         lines.append(f"在門檻上 {len(entries)}（{band}；只計數、不排序、不改門檻）" + (f"：{names}" if names else ""))
+    # 逾期型反證（2026-11-03 盲點修法第 10 條②）：0 也印；舊板＝未算、持股沒讀到＝讀不到——整句由候選板給（L16）
+    from alpha.candidates import deadline_line
+
+    lines.append(deadline_line(board))
     holdings = board.get("holdings") or {}
     if holdings.get("status") != "ok":
         lines.append(f"  持股未讀到，已持有判定暫停（upstream_unavailable）：{holdings.get('reason')}")

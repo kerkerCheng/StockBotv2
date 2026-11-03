@@ -365,6 +365,13 @@ def cmd_brief(args: argparse.Namespace) -> int:
 
             for line in depth_check_lines(spec.get("depth_check")):
                 print(line)
+        # 逾期型反證（2026-11-03 盲點修法第 10 條②）：宣告可開、或候選板上是已持有，一條都沒有就提醒——只印、不擋
+        if args.add:
+            from .providers.candidates import deadline_reminder, held_on_board
+
+            reminder = deadline_reminder(record, held=held_on_board(ticker))
+            if reminder:
+                print(reminder)
         print(f"  下一步：python -m webapp materialize {ticker}（首屏會長出七句；引用解析不到的格會現形）")
         # 首頁卡片的一句做什麼（2026-10-28）：寫敘事的這一刻最知道它做什麼——沒寫過就在這裡提醒，不靠人記得（L14）
         if not args.retract:
