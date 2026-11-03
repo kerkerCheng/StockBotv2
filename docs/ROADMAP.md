@@ -47,7 +47,7 @@
 ## Phase 表
 
 > 標記：▶ 進行中｜◐ 部分交付、剩下的寫在該列｜○ 未開工｜✅ 完成。研究項（pq2）不占本表。
-> **開著的（2026-11-01 盤點；同日批次三 A、B 交付後，晚上加「候選板標出只差已定價」◐；11-03 批次三 C 交付）：Phase 7 ▶；旁支 ◐ 3、○ 0。** 查證（列出標記不是 ✅ 的表格列；◐ 列的內文會有 ✅，所以只看粗體名稱後面那一格）：`grep -n "^| \*\*" docs/ROADMAP.md | grep -v "\*\* ✅"`
+> **開著的（2026-11-03 盤點；同日個股頁 schema S6、候選板標出只差已定價交付）：Phase 7 ▶；旁支 ◐ 1、○ 0。** 查證（列出標記不是 ✅ 的表格列；◐ 列的內文會有 ✅，所以只看粗體名稱後面那一格）：`grep -n "^| \*\*" docs/ROADMAP.md | grep -v "\*\* ✅"`
 > **推進規則：** Verdict 為 `GO` 且沒有待使用者決定的問題時直接接續，Step 與 Phase 邊界一視同仁；六條停止條件住 `AGENTS.md`「協作與邊界」。
 > **執行者是便宜模型時 Z1 以上預設 R1**（development-flow）。
 
@@ -67,12 +67,12 @@
 | 項目 | 做什麼 | 為什麼 | 驗收（機制存在與否） | 前置 |
 |---|---|---|---|---|
 | **海外財報來源** ◐（①台股 ✅ 2026-10-05、②20-F ✅ 2026-11-03、③日本 EDINET ✅／④韓國 OpenDART ✅ 2026-10-21，**剩中港、歐洲、加澳未驗證**；2026-09-30 使用者「之後再加、要排程」，2026-10-04 使用者「研究過程用到就一起做」——研究撞到哪個市場的缺口就做那一格，照 development-flow 一格一驗收，範圍大或有要使用者選的就停下問；Phase 3 closeout §5 #14；盤點 `docs/reports/2026-09-30-overseas-data-sources.md`；①的 plan `plans/2026-10-05-001-feat-tw-historical-shares-proposal.md`、③④的 plan `plans/2026-10-21-002-feat-jp-kr-filings-plan.md`（查證命令見該 plan「現況」那一行；OpenDART 個資 2 年重新同意掛 [835] pending 到 2028-09-21）；①③④ 的交付敘述逐字封存於 archive/roadmap-backlog-log.md 2026-11-01 節） | **剩中港、歐洲、加澳**（未驗證來源）。已做：①台股歷史股數（MOPS t163sb05；12 檔台股 12/12 有值）、②20-F 年度封面股數（ARBE、HIMX、POET 3/3；掛牌單位比率住名冊 `ordinary_per_listed_unit`，幣別不換照舊）、③日本 EDINET 13/13、④韓國 OpenDART 6/6 寫入 `fundamental_history` | 邊緣候選 22 檔裡 18 檔是海外或 20-F，已定價的主參照（自家三年百分位）全部缺；非台股海外 13 檔的「出現在數字裡」也缺（2026-09-30 盤點時的數；台日韓補完後只剩 20-F 與未驗證市場） | 每補一個市場：該市場邊緣檔的自家百分位從缺席變有值的檔數（個股頁稽核區）；可知日用申報日，不用抓取日（INV-6） | ②不用申請 key；中港、歐洲、加澳先驗來源 |
-| **候選板標出只差已定價** ◐（程式 ✅ 2026-11-01 雲端 session；**剩真資料驗收**：本機 materialize 一次後候選板、心跳與短版印出；使用者 11-01「我覺得你講的都算方向正確…可以直接改?」；failure log #123；查證：`python -m crons.heartbeat` 段 2 候選行的「只差已定價」、`python -m webapp status` 的 candidates/4） | 等回落列假設把已定價當脈絡、改宣告可開，用**同一個** `open_preconditions` 驗前提，結果放 `open_gaps`（另加它不查的兩項：沒押讀圖、邊緣不是邊緣）；心跳狀態塊、短版 ④ 等回落行、首頁卡片晶片、個股頁候選行照印；research-drain 段 5 ⓪：標了就只重答已定價那一格、收尾摘要點名給使用者下價格判斷。**不改分組、不改可開的前提**；把已定價改成可開裡的脈絡（A1 第 4 點的完整版）是使用者的決定，見 `plans/2026-11-01-002-dev-priced-wait-proposal.md` | 10-21 Q3W 處置紀錄：3081.TWO、4979.TWO、AXTI 四個機械前提全過、只差已定價；10-31 三檔被價格叫醒重答仍寫等回落；等回落不進使用者的決策時刻（A1 第 1 點），A1 第 4 點卻說已定價是脈絡不是否決——價格判斷實際由寫敘事的 session 下掉（3 檔同形） | 候選板每一列等回落帶前提清單（候選板＝敘事＋讀圖＋registry 推導）、使用者看得到；⚠ 標了幾檔不是驗收（G10）。效力看慢迴路：等回落 → 可開／不要／已持有在重看日之前的轉換數（敘事 ledger；10-30：0）與使用者對標了的檔留下的決定（成交紀錄或敘事換版）；`tests/test_priced_only.py` 18 條、變異 7 種全紅 | 本機 materialize 一次（雲端容器沒有 `library/private`） |
 
 ### 已交付的旁支（索引；原列逐字封存於 [`archive/roadmap-backlog-log.md`](archive/roadmap-backlog-log.md) 2026-11-01 起各節，含每項的驗收數字與查證命令）
 
 > 日期＝交付日。這裡只留落點，讓程式註解裡的 `ROADMAP「標題」` 找得到；要看做了什麼、數字怎麼變，讀封存列。
 
+- 2026-11-03 **候選板標出只差已定價**（程式 11-01 雲端 session、真資料 11-03 本機 materialize；使用者 11-01「我覺得你講的都算方向正確…可以直接改?」；failure log #123）——等回落列用可開的同一個前提檢查算缺口，空清單＝只差已定價：心跳狀態塊、短版（11-03 起進 ③ 待你決定，盲點修法 §1 第 3 條）、首頁卡片、個股頁照印；不改分組、不改可開的前提；`tests/test_priced_only.py`；plan `plans/2026-11-01-002-dev-priced-wait-proposal.md` P0。**真資料**：等回落 4 列裡只差已定價 1（STLTECH.NS）；10-21 預期的 3081.TWO、4979.TWO、AXTI 各有醒來待判的反證，判完才會進來
 - 2026-11-03 **個股頁 schema**（S0–S5 10-05 → 10-15；S6 維護 11-03，使用者「S6 1A 2A」）——十三塊 schema 驅動個股頁（`briefing/analyst_view/page_schema.py`）、層說明 ledger（`python -m alpha layer-note <node>`）；S6：層說明的整份重讀日與「新邊沒讀」接走圖第 4 型（與 ⑤ 同一個函式 `layer_note_graph_reasons`；母體 75 → 84、命中 0 → 1）、回饋紀錄常駐 `docs/feedback/stock-page.jsonl`（回填 68 列；`tests/test_stock_page_feedback.py`）；plan `plans/2026-10-05-003-feat-stock-page-schema-proposal.md`
 - 2026-11-03 **敘事 stale 計數器**（①③＋同源 10-29；②④＋寫入端拒收 11-03）——正文最後一次改動時騎的讀圖 vs 這一格現行的讀圖：判讀（kind）或供給側家數變了 → 候選列 `rewrite[]`、整板 `kind=reading_kind／supply_count`、⑤「敘事該重寫」點名（`alpha.candidates.body_behind_readings`；比讀圖結構、不解析正文「N 家」）；寫入端 ⑫ 拒收正文一字不改卻跨過這兩種改變的換騎。回放 497 版：正文沒改的換騎 115，判讀變了 1（AEVA 10-19）、家數變了 29（含 COHR／LITE／SIVE.ST）；現行 89 份 ②0 ④0；`tests/test_narrative_stale_24.py`；plan `plans/2026-11-01-001-dev-phase7-batch3-plan.md` C
 - 2026-11-03 **海外財報來源 ②20-F**（使用者「E 1A 2A」）——名冊 `ordinary_per_listed_unit`（一個掛牌單位＝幾股普通股，帶生效日與出處；沒登記＝照舊 inputs_incompatible）；回填收 20-F 封面股數（原單位＝普通股），取數層按封面日當時的比率換成掛牌單位；已定價①對年報申報人用年度點（營收最多 550 天、營業利益同樣取年度點判口徑），最新封面申報後 13 個月沒有新封面的那一天不算樣本、今天超過整列缺席，稽核區印「年度點」與封面日、申報日、距今天數；`tests/test_three_questions.py`、`test_three_question_inputs.py`、`test_identity_registry.py`；plan `plans/2026-11-01-001-dev-phase7-batch3-plan.md` E。**真資料**：ARBE 13.2、HIMX 81.4、POET 46.3（缺席 → 有值 3 檔，覆蓋率都 1.0）；EFXT 照舊缺席（CAD≠USD）

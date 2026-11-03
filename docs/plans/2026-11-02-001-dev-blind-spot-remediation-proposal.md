@@ -10,6 +10,7 @@ derived_from: docs/reports/2026-11-01-system-blind-spot-audit.md（8 視角＋�
 
 > 狀態：**方向已核准、AGENTS 逐字改法待使用者看一次 diff**。雲端 session 額度將盡，本檔是交接；下一個 session（本機、強模型）從 §4 接續。
 > 本檔只寫、不實作。現況數字是 2026-11-01 的快照，動手前照各項查證命令重跑。
+> **2026-11-03 本機 session**：§4 第 1–3、6 步完成；第 4 步（§6 AGENTS diff）與 §7 兩個契約改法等使用者看過回 go；第 5 步等使用者回答。逐項見 §8。
 
 ## 0. 使用者定案（逐字，2026-11-01～11-02 雲端 session）
 
@@ -74,3 +75,127 @@ derived_from: docs/reports/2026-11-01-system-blind-spot-audit.md（8 視角＋�
 - 12-22 前不開新 feed（EDGAR 全文檢索等）、新 lane（除第 9 條加分組鍵）、第二模型逐條裁決（除第 20 條抽樣）、營收叫醒（等第 14 條的量）——審查的完整性批評指出「加機制 vs 停加機制」是存活發現間最大的矛盾，§10 原文已選了邊。
 - 不放寬四個人工 gate；不放寬 L8；不給尺寸、不排序、不首選、不算目標價。
 - 不加 X 帳號、不砍帳號（H6 沒有對「對其他管道早不早」的尺；Q4 R3 加一欄「X 點名過、系統 park、後來前四分之一」）。
+
+## 6. AGENTS 逐字 diff 草稿（2026-11-03 起草；§4 第 4 步——使用者看過、回 go 才改 AGENTS 與實作）
+
+> 三處一起看。`<核准日>` 套用時換成使用者回 go 的日期。按本檔准入判準，句子裡不寫函數、表、比例；比例與實作落點住 ARCHITECTURE。
+> 跟現行第 169 行「反證用來決定何時認錯，不是進場的前置條件」的關係：起始門要的是反證**寫下**（知道何時認錯），不是要它先被驗過，兩句不衝突。
+
+**18＋16（第 160–161、164–165 行）**
+
+```diff
+   **讀到邊才算讀懂（2026-10-06）：** 一份讀圖或敘事若答不出「客戶為什麼選這家的變體、什麼會讓它被換掉」，它讀的是點不是邊；
+-  答不出就寫「缺 X」並向使用者要文件，不得用供應商自述補（L8）。
++  答不出就寫成加碼條件並向使用者要文件，不得用供應商自述補（L8）。**讀到邊是加碼的門、不是起始的門**（<核准日>；
++  決定紀錄 §10.1 條 2 作答 (a)：門對邊緣小公司天生答不齊，是設計太嚴、不是方向錯）。
+```
+
+```diff
+-- **候選狀態是封閉字彙：可開／缺 X／已定價等回落／不要／已持有。** 「可開」是每檔各自過的 filter 不是分數，可同時多檔；
+-  **可開為零就零，不得為了非空放寬條件**——讓它非空的路是研究。「缺 X」與「等回落」必鑄 watch；「不要」附理由、append-only。
++- **候選狀態是封閉字彙：可開／缺 X／不要／已持有。** 「可開」是每檔各自過的起始門、不是分數，可同時多檔：會死嗎不是紅、
++  押的那一層讀過且判讀不是 neither、反證已寫下且有到期、「已定價嗎」寫成一句脈絡（已定價時翻倍條件寫得更嚴）。
++  讀到邊與深挖清單是**加碼條件**，住同一份敘事、各自鑄 watch；起始與加碼是兩個時點，不是尺寸。
++  **可開為零就零，不得為了非空放寬條件**——讓它非空的路是研究；門的設計只由使用者在決定紀錄裡改。「缺 X」必鑄 watch；「不要」附理由、append-only。
+```
+
+**17（第 145 行之後補一點）**
+
+```diff
+ - **部位真相是 Google Sheet（2026-09-16）**；「當時憑什麼決定」的收據跟著成交事件走，舊 Decision Store 凍結唯讀（2026-09-22）。alpha 原則上不用貸款資金是使用者自己的紀律，**系統不建 gate**。
++- **沒買也是決定（<核准日>）**：決策時段看過的可開與只差已定價，每檔的選擇（進／不要／等到條件）連一句理由與當時的敘事版本，
++  跟成交事件走同一條路、同一種收據，append-only（A5）——它回答「當時憑什麼沒買」；系統不由它產生任何動作、不由它算尺寸。
+```
+
+**20（第 246 行之後補一句）**
+
+```diff
+ - **subagent 委派預設關閉、每次明確 opt-in**；回傳只是 review packet；不得委派任何寫入、核准、入圖、thesis mutation、資本配置、commit／push。
++  **常規 opt-in 只有一種**（2026-11-02 使用者：「隨機抽查 開subagent這件事 其實你就當成我是開綠燈吧」）：入圖包隨機抽查——
++  抽中的包交乾淨 context 的唯讀 reviewer 從頭核、回 review packet；抽中與否、核出什麼都不改 gate，入圖仍是人工 `go`。比例與加密規則住 ARCHITECTURE。
+```
+
+**go 之後的實作範圍**（每項各自 commit；18＋16 與 17 是 Z2，照 development-flow）：
+- 18＋16：`open_preconditions` 改起始四項、讀到邊與深挖清單搬進 `confirm[]`；等回落併回可開（封閉字彙少一格，候選板、心跳、APP、序列跟著改；
+  舊紀錄的等回落照「可開＋已定價脈絡」讀，不回寫）；research-drain 段 5；plan 2026-11-01-002 P2 改 ✅。
+- 17：「看了沒買」的載體——與 `library/trades/` 成交紀錄同處、同收據格式、kind＝看了沒買；寫入端拒收缺理由或缺敘事版本的；測試＋變異同一個 change。
+- 20：ARCHITECTURE 寫比例（每 10 包抽 1、K>0 且 M=0 就加密）；skills 改入圖包呈現（第一行只寫要你判斷的一句，無判斷成分的標「純機械」）；
+  計數器「本月照建議 go N／偏離 M／事後抓到包內缺陷 K」讀 `todo_pool.json` 既有欄位，零 schema 變更。
+
+## 7. 兩個契約改法（2026-11-03 起草；L17「動 contract 給 proposal」——使用者看過、回 go 才實作）
+
+**第 12 條：讀圖 `neither` 也要付「換得掉」的證據（Z1–Z2）。** 既有 v3 讀圖 neither 36 份（全部版本）——契約的 `__post_init__`
+讀舊紀錄時也會跑，所以規則放**寫入端**擋新的，舊的不回溯。
+
+```diff
+ # alpha/structure_reading/contracts.py
+ KINDS_REQUIRING_CITATIONS = frozenset({"moat", "volume"})
++#: `neither` 也要付證據（<核准日>，盲點修法第 12 條；審查 research_quality-5：「換不掉」要付證據、「換得掉」免費——
++#: 讀圖若偏向 neither，系統既擋了人、又永遠量不出來）：至少一段引用標出「換得掉」憑的是哪一型來源。寫入端擋新的、舊的不回溯。
++KINDS_REQUIRING_REPLACEABLE_BASIS = frozenset({"neither"})
++#: 「換得掉」的來源型別（封閉字彙）：買方事實／買方政策／第三方／媒體。供應商自述不在裡面——收緊，不是放寬 L8。
++REPLACEABLE_BASES = ("buyer_fact", "buyer_policy", "third_party", "media")
+
+ class Citation:
+     independent: bool = False
++    #: 「換得掉」憑的來源型別（neither 用）。None＝沒宣告；as_dict 只在有值時寫——舊紀錄的 id 不變。
++    basis: str | None = None
+     def __post_init__(self) -> None:
++        if self.basis is not None and self.basis not in REPLACEABLE_BASES:
++            raise ContractViolation(f"citation.basis 未登記：{self.basis!r}；已知 {list(REPLACEABLE_BASES)}")
+
+ # alpha/providers/structure_readings.py::append_reading_record
+     if not parsed.retracted:
+         problems = verify_disproof_sources(record, existing)
++        if parsed.kind in KINDS_REQUIRING_REPLACEABLE_BASIS and not any(c.basis for c in parsed.citations):
++            problems.append("neither（換得掉）也要付證據：至少一段引用標 basis（買方事實／買方政策／第三方／媒體）——"
++                            "供應商自述不算；判不出來請寫 undecided 並說缺哪一格")
+```
+
+另：追蹤表 paper lane 加子行「騎在 neither 層上的邊緣公司：N 列｜等權絕對｜曾達 2 倍」（只印、帶小樣本旗；審查時只有富世達 6805.TW）；
+research-drain 寫讀圖那段補一句。預期副作用：之後的 neither 會有一部分改寫成 undecided——這正是收緊要的。
+
+**第 10 條②：敘事反證多一個「逾期型」宣告（Z1）。** 計數器要分得出「X 未在 D 前發生」型的反證，今天的欄位分不出來；
+用字串比對去猜是會誤報的 linter（L16），所以加一個宣告欄。
+
+```diff
+ # alpha/narrative/contracts.py::NarrativeDisproof
+     source: str
+     link_source_ref: str | None = None
++    #: 逾期型（<核准日>，盲點修法第 10 條②；審查 strategy-4：事件型反證要等一份新文件才醒，輸家常常什麼都不發）：
++    #: 條件寫成「X 未在 expires 前發生」，到期本身就是觸發。只是宣告——到期照舊是重問，不自動判觸及、不改出場規則。
++    #: as_dict 只在 True 時寫——舊紀錄的 brief_id 不變。
++    deadline: bool = False
+```
+
+另：候選板 counts 多一格、短版狀態塊印「逾期型反證 0 條的持有／可開敘事 N（逐檔）」（今天可開 0、持有 2：COHR、SIVE.ST）——
+plan 原寫「追蹤表」，建議改這裡：它數的是現行敘事、不是 lane 的列；`alpha brief --add` 宣告可開或已持有時一條都沒有就印一行提醒
+（只印、不擋）；research-drain 段 5 一句「持有／可開敘事至少一條反證寫成『X 未在 D 前發生』並標 `deadline: true`」。
+
+## 8. 進度（2026-11-03 本機 session；依 §4 順序）
+
+| § | 項 | 狀態 |
+|---|---|---|
+| §4-1 | §1 第 1 條 Q3W 裁決回填＋「到點 N｜已寫 M」 | ✅ `639e889a` |
+| §4-2 | §1 第 2 條 drain 提示只在進展格推 | ✅ `7f399a96`（偏差：只差已定價／可開不算進展格——它們進 ③ 待你決定） |
+| §4-2 | §1 第 3 條 只差已定價進 ③ | ✅ `d2c55b25`；真資料 ③＝STLTECH.NS 1 檔（預期的 3081／4979／AXTI 各有醒來待判的反證 watch，要判完才會進來） |
+| §4-2 | §1 第 4 條 MOPS 全市場報告進段 1 | ✅ `e684c028`（多修一處：fetcher 原本先丟掉代號解析不出的列） |
+| §4-2 | §1 第 5 條 ConfigBoundaries | ✅ `14d1ed07` |
+| §4-2 | §1 第 6 條 預篩 vs 互動一致率 | ✅ `40b290c1`；近 30 天 467 筆，對回去 123：一致 109、不一致 3、看不出 11 |
+| §4-2 | §1 第 20a 條 #58 庫內已有幾份 | ✅ `bfbdff2b`；#57 不做：結構上已修，字串偵測 10-21 已否決 |
+| §4-2 | 第 21／22／24 條 | ✅ `6f816063`、`44abe853` |
+| §4-3 | §2 第 8、13 條＋量測三條 登記 | ✅ `bb0a0c39`（先於任何計算） |
+| §2 | 第 7 條 | ✅ `aec4b775` |
+| §2 | 第 9 條 by_anchor_state | ✅ `c9939d63` |
+| §2 | 第 10 條① 跌深 vs 反證觸及 | ✅ `1e9922c6`；真資料 paper 36：1（AXTI）、history 6：0 |
+| §2 | 第 10 條② 逾期型反證 | 待看 §7 diff |
+| §2 | 第 11 條 AXTI 10-Q 複查逐條寫方向與時窗 | 研究；10-Q 約 11-13，跟 [896] 一起做 |
+| §2 | 第 12 條 neither 付證據 | 待看 §7 diff |
+| §2 | 第 14 條 月營收重答數 | ✅ 登記 `3e19605a`；結果 11-14 append 在 cases.md Q3W 處置紀錄 |
+| §2 | 第 15 條前半 海關提單按需路徑 | ✅ `f8806991` |
+| §2 | 第 15 條後半 Form 4 code P 拿出 auto no_go | ✅ `007682e4`（附 sandbox impact review）；實測 466 份 Form 4 裡 23 份含 P，21 份是 TSM——3.5 個月約多 23 則進分類層，多半會被篩掉 |
+| §2 | 最後一列 ②第二基準 | ✅ `91e69899`；名單 T0 → 11-03 −25.6%，paper 對它超額 +0.4% |
+| §2 | 最後一列 ①敘事事實抽樣、③影子重寫 | ①每段 drain 收尾照 skill 抽；③ 2026-12 起 |
+| §4-4 | 18＋16、17、20 的 AGENTS diff | 待使用者看 §6 |
+| §4-5 | 19 六個市場、23 數字 | 待使用者 |
+| §4-6 | materialize＋P0＋H15 凍結 | ✅ `f66a0c29`（P0：個股頁與首頁卡片都印出只差已定價；H15 邊緣 80、鄰組 16）；ROADMAP 旁支「候選板標出只差已定價」搬進已交付（原列逐字封存） |
