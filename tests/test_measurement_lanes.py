@@ -416,8 +416,8 @@ def test_second_benchmark_is_printed_beside_the_cohort_excess_and_excludes_the_r
     assert row["watchlist_return"] == pytest.approx(0.05) and row["excess_watchlist"] == pytest.approx(0.15)
     summary = OIST.lane_summary(out["lanes"]["paper"]["rows"], lane="paper")
     assert summary["watchlist_excess"]["n"] == sum(1 for r in out["lanes"]["paper"]["rows"] if "excess_watchlist" in r)
-    basket = out["watchlist_benchmark"]                       # 不排除任何一檔：AAA ＋20%、MEM1 ＋10%、MEM2 0%
-    assert basket["return"] == pytest.approx(0.10) and basket["members_used"] == 3 and basket["missing"] == ["WLX"]
+    whole = out["watchlist_benchmark"]                        # 不排除任何一檔：AAA ＋20%、MEM1 ＋10%、MEM2 0%
+    assert whole["return"] == pytest.approx(0.10) and whole["members_used"] == 3 and whole["missing"] == ["WLX"]
     text = "\n".join(OIST.render_lanes(out))
     assert "第二基準 §5.2 觀察名單等權" in text and "取不到價：WLX" in text
     assert "  - 對 §5.2 觀察名單等權超額（第二基準，只並印）：" in text
