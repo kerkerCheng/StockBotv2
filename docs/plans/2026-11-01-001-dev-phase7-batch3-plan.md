@@ -14,8 +14,8 @@
 | A | 邊緣門檻的遲滯與「在門檻上」計數器 ○ | 撤回建議只在**連續兩次**判定都非邊緣後才出現；候選板、心跳、closure-gate 多一格「在門檻上」 | Z1／R1 | ✅ 11-01（回放 K=1 撤回建議 5 → K=2 4＋1 待確認；真資料在門檻上 20、待確認 0） |
 | B | 週額度常駐計數器 ○ | daily 短版 ④ 每天印週額度與 5 小時用量；互動 fan-out 前有命令可讀同一個數 | Z1／R1 | ✅ 11-01（兩窗都記；④ 每天一行＋摘要行旗（≥ 80% 只印不擋）；`python -m crons.llm_quota [--probe]`；真資料：daily 06:30 的紀錄 7 天 86%、探針 12:00 當下 **99%**） |
 | C | 敘事 stale 計數器 ◐（剩 ②④＋寫入端拒收） | ②騎的讀圖 kind 變了、④供給側家數變了也列「該重寫」；寫入端拒收一字不改的換版 | Z1–Z2／R1 | ✅ 11-03（回放 497 版：⑫ 會擋下 30 次換騎——判讀變了 1＝AEVA、家數變了 29；現行 89 份 ②0 ④0） |
-| D | 成交紀錄遺留 ①②③④⑥⑧⑨⑩ | `scripts/record_trade.py` 的八個已知小洞 | Z1／**R2**（資本路徑） | ○ |
-| E | 海外財報來源 ◐（剩 ②20-F） | 20-F 年度封面股數進 Engine C；ADS 比率要使用者選就停 | Z2／R1 | ○ |
+| D | 成交紀錄遺留 ①②③④⑥⑧⑨⑩ | `scripts/record_trade.py` 的八個已知小洞 | Z1／**R2**（資本路徑） | ◐ 11-03 實作完成；**R2 NO_GO（B1、B2）→ AWAITING_HUMAN**；程式在分支 `dev/batch3-d`、未合併（D 節在該分支） |
+| E | 海外財報來源 ◐（剩 ②20-F） | 20-F 年度封面股數進 Engine C；ADS 比率要使用者選就停 | Z2／R1 | ◐ **PLAN_PROPOSAL → AWAITING_HUMAN**（兩個要你選：HIMX 的 ADS 比率住哪、年報申報人算不算已定價①） |
 
 > **2026-11-01 12:10 停在 B 之後：** B 自己的探針量到週額度 **99%**（11-02 23:00 重置；daily 06:30 的紀錄是 86%，白天互動 session 吃掉
 > 13 個百分點）。C（Z1–Z2 真資料回放）、D（資本路徑，收尾要一位 R2 reviewer）、E 都會再吃同一個池子，而 11-02 05:30 的 daily 起跑在重置之前
@@ -156,3 +156,42 @@ freshness_identity）；`engine_b/todo_ledger.py`（`BEHIND_KINDS` 兩格、`COV
 測試：`tests/test_narrative_stale_24.py` 12 條、`tests/test_todo_ledger.py` 夾具與兩條；變異 4 種各自轉紅（3／2／2／4）。
 **真資料：** materialize 後 `reading_change_check` ok、沒比成 0、②0 ④0；⑤「敘事該重寫 6 檔（watch 醒 12 條；已回落 1（AXTI））」照舊、
 沒有沒算註記；serve 重啟（/6）health stale=false。
+
+## D 成交紀錄遺留 ①②③④⑥⑧⑨⑩（指路）
+
+實作、測試、真資料與 R2 回報都在分支 `dev/batch3-d`（commit `6f75730b`）的本檔「## D」節——R2 NO_GO 之後不自動修、不合併（AGENTS「協作與邊界」）。兩條 blocking：**B1** `--row-deleted` 配買進讓 5% 上限與槓桿 cap 恆判 pass；**B2**「一格都沒寫進去」的訊息宣稱重跑不會重複寫（錯：伺服器稍後套用時重跑算兩次）。修法方向與 non-blocking N1–N8 見該節末。
+
+## E 海外財報來源 ②20-F 年度封面股數——PLAN_PROPOSAL（AWAITING_HUMAN）
+
+```
+INTAKE
+Zoom: Z2（engine_c 回填收 20-F 封面股數；三題「已定價①」對年報申報人的口徑；名冊多一個掛牌單位欄位）
+Review: R1（A2 財務觀測可重建；名冊欄位是 contract——打開它要使用者選）
+Case: ROADMAP「海外財報來源」剩 ②；邊緣候選裡 3 檔（ARBE、HIMX、POET）的「已定價①」恆為 inputs_incompatible
+```
+
+**現況（2026-11-03 唯讀；DB 與 SEC 實測，UA 用 repo 預設、不帶 email）：**
+- 三檔都判 `foreign_annual`（最近 18 個月沒有 10-Q、有 20-F）；`fundamental_history` 有 `revenue_annual`（到 FY2025）、`cash`，
+  **沒有封面股數**（`engine_c/history_backfill.py` 對非 domestic 刻意 `continue`）、**沒有季度營收**（20-F 只有年度）。
+- SEC companyfacts 的 20-F 有年度 `dei:EntityCommonStockSharesOutstanding`：ARBE 8 筆、HIMX 16 筆、POET 9 筆（最新一筆封面日 2026-03）。
+- 掛牌單位（20-F 封面與內文原文）：**ARBE**「Ordinary shares, par value NIS 0.000216 per share｜ARBE｜Nasdaq」＝普通股直接掛牌；
+  **POET**「Common Shares, no par value｜POET｜Nasdaq Capital Market」＝普通股直接掛牌；**HIMX**「Ordinary Shares … * Not for trading, but only in
+  connection with the listing … of American Depositary Shares」＋內文「ADSs … each of which represents two ordinary shares」＋「a change in our ADS ratio
+  from one ADS representing one ordinary share to one ADS representing two ordinary shares」——**比率會隨時間變**。
+- 封面股數的變化：POET 42.5M（2024-03）→ 76.5M（2025-04）→ 132.3M（2026-03）；ARBE 78.2M → 105.2M → 122.6M。
+
+**只改程式做得到的部分：** 回填收 20-F 封面股數（拿掉那個 `continue`，股數照記原單位＝普通股）；「已定價①」對年報申報人用年度營收當
+TTM（一年一點）。**做不到、要你選的兩件事：**
+
+1. **HIMX 的掛牌單位比率住哪裡？**（名冊多一個欄位是 contract，L2）
+   - **A（推薦）**：`config/company_identity.json` 的 listing 多一個 `ordinary_per_listed_unit`，**帶生效日**（一個列表：從哪天起一單位＝幾股普通股、
+     出處＝哪份申報的哪一句）；沒登記＝照舊 inputs_incompatible（不猜）。HIMX 現在登記 2（出處 FY2025 20-F），1:1 的那一段要先查到改比率的日期才登記。
+   - B：不支援 ADS，只做普通股直接掛牌的（ARBE、POET）；HIMX 照舊缺席。
+2. **年度申報人的「已定價①」要不要算？**營收一年一點、股數一年一點——POET 一年內股數 76.5M → 132.3M，用上一份封面股數算市值，
+   下一份 20-F 出來前最多低估約四成。
+   - **A（推薦）**：算，但稽核區照印「年度點」口徑與股數的封面日、距今天數；股數超過 13 個月沒有新封面就整列缺席（不拿舊股數冒充當天）。
+     首屏那一句仍要引用稽核區的數字（AGENTS「已定價」）。
+   - B：不算，照舊缺席（20-F 發行人的「已定價①」恆為無法量）。
+
+**驗收（照 ROADMAP 那一列）：** 邊緣檔「已定價①」從缺席變有值的檔數——1A＋2A＝3（ARBE、HIMX、POET）、1B＋2A＝2、2B＝0。
+**不動：** 換匯（報表幣 ≠ 結算幣的 TSM、UMC、XPEV、NBIS 照舊缺席）、6-K 季度（不是機械來源）。
