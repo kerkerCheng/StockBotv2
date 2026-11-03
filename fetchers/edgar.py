@@ -213,6 +213,48 @@ def fetch_filing_text(cik: str, accession: str, primary_doc: str) -> str | None:
         return None
 
 
+#: Form 4 的 primary_doc 是 XSL 轉譯頁（…/<accession>/xslF345X06/edgar.xml）；原始 XML 在同一個 accession 底下、拿掉那一段。
+_FORM4_XSL_SEGMENT = re.compile(r"/xslF345X\d+/")
+
+
+def form4_raw_xml_url(url: str) -> str:
+    return _FORM4_XSL_SEGMENT.sub("/", url, count=1)
+
+
+def form4_transaction_codes(xml_text: str) -> list[str]:
+    """Form 4 原始 XML 的 non-derivative 交易代碼（排序去重；P＝公開市場或私下買進、S＝賣出、A＝授予、M＝行使……）。
+    衍生性那一表不算——選擇權行使、RSU 歸屬不是「花自己的錢在市場上買」。XML 壞了 raise ValueError。"""
+    import xml.etree.ElementTree as ET
+
+    try:
+        root = ET.fromstring(xml_text)
+    except ET.ParseError as exc:
+        raise ValueError(f"Form 4 XML 解析失敗：{exc}") from exc
+    codes: set[str] = set()
+    for txn in root.iter():
+        if txn.tag.rsplit("}", 1)[-1] != "nonDerivativeTransaction":
+            continue
+        for node in txn.iter():
+            if node.tag.rsplit("}", 1)[-1] == "transactionCode" and (node.text or "").strip():
+                codes.add(node.text.strip().upper())
+    return sorted(codes)
+
+
+def fetch_form4_transaction_codes(url: str) -> list[str] | None:
+    """抓 Form 4 原始 XML、回交易代碼（2026-11-03 盲點修法第 15 條後半）；抓不到或解析不了回 None——呼叫端照舊處理並計數（INV-3）。
+    header 與限速同 `fetch_filing_text`（SEC 的公平存取規則；不另寫一套）。"""
+    headers = _build_headers()
+    headers["Host"] = "www.sec.gov"
+    rate_sleep()
+    try:
+        resp = requests.get(form4_raw_xml_url(url), headers=headers, timeout=30)
+        resp.raise_for_status()
+        return form4_transaction_codes(resp.text)
+    except Exception as e:  # noqa: BLE001 — 網路與解析都算讀不到
+        print(f"[edgar] Form 4 交易代碼讀不到 {url}: {e}", file=sys.stderr)
+        return None
+
+
 _INDEX_ROW = re.compile(r"<tr[^>]*>(.*?)</tr>", re.S | re.I)
 _INDEX_CELL = re.compile(r"<td[^>]*>(.*?)</td>", re.S | re.I)
 _INDEX_HREF = re.compile(r'href="(?:/ix\?doc=)?(/Archives/edgar/data/[^"]+)"', re.I)

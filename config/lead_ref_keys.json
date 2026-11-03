@@ -333,6 +333,12 @@
         "value_type": "string",
         "description": "雷達從今天輪替到的哪一個讀過的層找到這則（節點 id；只收批次 rotation_layers 裡有的，雷達精進 C3，2026-10-21）"
       }
+    },
+    "edgar_insider": {
+      "insider_transaction_codes": {
+        "value_type": "string_list",
+        "description": "Form 4 原始 XML 的 non-derivative 交易代碼（harvest 讀，fetchers.edgar.form4_transaction_codes；P＝公開市場或私下買進、S＝賣出、A＝授予、M＝行使）。含 P 的不 auto no_go、留給分類層（2026-11-03 盲點修法第 15 條後半）；讀不到的照舊 auto no_go，數在 harvest log 的 filter.form4_unread"
+      }
     }
   }
 }

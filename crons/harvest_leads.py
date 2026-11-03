@@ -21,6 +21,7 @@ import re
 import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from typing import Callable
 from urllib.error import URLError
 from urllib.request import Request, urlopen
 from xml.etree import ElementTree as ET
@@ -202,6 +203,12 @@ AUTO_NO_GO_REASON = (
 )
 
 
+#: 要讀交易代碼的內部人持股申報型別（2026-11-03 盲點修法第 15 條後半；審查：分析師初評、指數納入、內部人公開市場買進是小型股
+#: 重評價常見的觸發，Form 4 卻全部 auto no_go）——含 P（公開市場或私下買進）的留在 pending 交給分類層，其餘照舊 auto no_go。
+INSIDER_CODE_FORMS = frozenset({"4", "4/A"})
+INSIDER_PURCHASE_CODE = "P"
+
+
 def _register_all(
     store: dict,
     source: str,
@@ -211,8 +218,14 @@ def _register_all(
     auto_no_go_forms: frozenset[str] = frozenset(),
     provenance: dict | None = None,
     errors: list[str] | None = None,
+    insider_codes: Callable[[str], list[str] | None] | None = None,
+    insider_report: dict[str, int] | None = None,
 ) -> int:
     """`provenance`（Phase 1 Step 1.4）：這個來源的宣告（source_class、company_id）；`form_type` 取自 item。
+
+    `insider_codes`（2026-11-03）：新的 Form 4 先讀交易代碼（`fetchers.edgar.fetch_form4_transaction_codes`）——代碼記進
+    refs `insider_transaction_codes`；含 P 的不 auto no_go；讀不到照舊 auto no_go。`insider_report` 數新申報／買進／讀不到
+    （呼叫端寫進 harvest log 的 `filter`；INV-3：這個 filter 也要報得出丟了什麼）。
 
     ⚠ 來源宣告驗證失敗**不得**走下面那條 `except ValueError: continue`——那會把整筆 lead 靜默跳過
     （INV-3）。它先被單獨接住：記進 `errors`（呼叫端寫進 harvest log 的 `provenance_errors`），
@@ -244,6 +257,21 @@ def _register_all(
         if is_new:
             new += 1
             form = str(item.get("form_type") or "")
+            if form and form in auto_no_go_forms and insider_codes is not None and form in INSIDER_CODE_FORMS:
+                report = insider_report if insider_report is not None else {}
+                report["form4_new"] = report.get("form4_new", 0) + 1
+                codes = insider_codes(item["url"])
+                if codes is None:
+                    report["form4_unread"] = report.get("form4_unread", 0) + 1     # 照舊 auto no_go，但數得出來
+                else:
+                    if codes:
+                        try:
+                            leads.annotate_refs(store, lead_id, refs={"insider_transaction_codes": codes})
+                        except ValueError as exc:
+                            print(f"[harvest] {lead_id} 交易代碼沒記上：{exc}", file=sys.stderr)
+                    if INSIDER_PURCHASE_CODE in codes:
+                        report["form4_purchase"] = report.get("form4_purchase", 0) + 1
+                        continue                                    # 公開市場買進：留在 pending，由分類層判
             if form and form in auto_no_go_forms:
                 # 註冊後立刻 triage 成 triaged_no_go：記錄留著（可 grep、可
                 # requeue-campaign 叫回），但不進 pending → 不進 triage 佇列 → 不吃 drain。
@@ -697,7 +725,7 @@ def harvest_edgar(config: dict, store: dict, *, seen_at: str | None = None) -> N
     if not tickers:
         return
     try:
-        from fetchers.edgar import get_cik, get_filings
+        from fetchers.edgar import fetch_form4_transaction_codes, get_cik, get_filings
     except ImportError as exc:
         for ticker in tickers:
             leads.record_run(store, source=f"edgar:{ticker.upper()}",
@@ -719,12 +747,14 @@ def harvest_edgar(config: dict, store: dict, *, seen_at: str | None = None) -> N
             continue
         items = filings_to_leads(ticker, cik, filings)
         errors: list[str] = []
+        insider_report: dict[str, int] = {}
         # EDGAR 天生一手；公司由 ticker 經 registry 解析（查不到＝null，不猜；INV-1）
         new = _register_all(store, source, items, seen_at,
                             auto_no_go_forms=auto_no_go, errors=errors,
-                            provenance={"source_class": "primary", "company_id": _registry_company(ticker)})
+                            provenance={"source_class": "primary", "company_id": _registry_company(ticker)},
+                            insider_codes=fetch_form4_transaction_codes, insider_report=insider_report)
         leads.record_run(store, source=source, result="ok", new=new, run_at=seen_at,
-                         provenance_errors=len(errors))
+                         provenance_errors=len(errors), filter_report=insider_report or None)
         print(f"[harvest] {source} ok: {new} new / {len(items)} filings")
 
 

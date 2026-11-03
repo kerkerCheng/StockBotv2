@@ -193,6 +193,20 @@ def mops_batch_line(batches: Mapping[str, Mapping[str, Any]]) -> str | None:
     return "MOPS 全市場重訊（最後一輪）：" + "；".join(parts)
 
 
+def form4_line(latest: Mapping[str, Mapping[str, Any]]) -> str | None:
+    """段 1：EDGAR Form 4 的交易代碼過濾（盲點修法 §2 第 15 條後半；INV-3）——各檔最後一輪有新申報的加總：新幾份、
+    含 P（公開市場買進，留給分類層）幾份、交易代碼讀不到（照舊 auto no_go）幾份。讀不到非 0 才標粗（恆亮不帶資訊，L14-4）；
+    最後一輪都沒有新申報就不印。"""
+    rows = [row["filter"] for source, row in latest.items()
+            if source.startswith("edgar:") and isinstance(row.get("filter"), Mapping) and "form4_new" in row["filter"]]
+    if not rows:
+        return None
+    total = {key: sum(int(r.get(key) or 0) for r in rows) for key in ("form4_new", "form4_purchase", "form4_unread")}
+    unread = f"**交易代碼讀不到 {total['form4_unread']}**" if total["form4_unread"] else "交易代碼讀不到 0"
+    return (f"EDGAR Form 4（各檔最後一輪，{len(rows)} 檔有新申報）：新 {total['form4_new']}｜"
+            f"公開市場買進 {total['form4_purchase']}（留給分類層，不 auto no_go）｜{unread}")
+
+
 def build_freshness(*, now: datetime, state_dir: Path | None, leads_path: Path,
                     run_record_path: Path | None = None, capture_dir: Path | None = None) -> Section:
     """daily 執行紀錄、harvest 來源 ok／fail、行情最新交易日、APP 今天有沒有 materialize。"""
@@ -240,6 +254,9 @@ def build_freshness(*, now: datetime, state_dir: Path | None, leads_path: Path,
         mops = mops_batch_line(batches)
         if mops:
             section.lines.append(mops)
+        form4 = form4_line(latest)
+        if form4:
+            section.lines.append(form4)
         month = now.astimezone(timezone.utc).strftime("%Y-%m")
         spend = sum(float(r.get("cost_usd") or 0)
                     for r in log

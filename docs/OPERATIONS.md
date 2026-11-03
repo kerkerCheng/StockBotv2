@@ -54,6 +54,7 @@ Get-Content library\private\heartbeat\daily_run_<YYYY-MM-DD>.json    # 每步 st
 | 排程設定與 config 不一致／讀不到 | 段 1「⚠ 排程設定與 config 不一致」＋修正命令；讀不到印 unknown |
 | harvest 超過 `harvest_stale_hours` 沒跑 | 段 1 ⚠；段 3「harvest N 天沒跑——0 不代表沒有新文件」 |
 | MOPS 全市場重訊抓不到、或來源版型變了 | 段 1「MOPS 全市場重訊（最後一輪）：上市 輸入 N｜名冊內 A｜名冊外 B｜代號解析不出 C；上櫃 …」——抓不到那個市場印「**抓不到**（原因）」、不留上一輪的數；「代號解析不出」突然非 0＝版型變了（2026-11-03 起；harvest_log 每市場每輪一筆 `mops-batch:<市場>`，不算一個來源） |
+| EDGAR Form 4 的交易代碼讀不到 | 段 1「EDGAR Form 4（各檔最後一輪，N 檔有新申報）：新 N｜公開市場買進 P（留給分類層）｜**交易代碼讀不到 U**」——讀不到的照舊 auto no_go（與改動前相同），只是數得出來；U 突然接近「新」＝SEC 的網址或版型變了。查一份：`python -c "from fetchers.edgar import fetch_form4_transaction_codes as f; print(f('<lead 的 url>'))"`（2026-11-03 起；harvest log 每個 `edgar:<T>` 那一輪的 `filter`） |
 | ⑯ Drive 上傳失敗（`auth_expired`／`delivery_failed`） | 段 1「失敗 1：16_backup」＋備份行 ⚠「Drive <狀態>（最後成功上傳：N 天前）」；本機那份照留、⑯b 照驗。修好後 `python scripts\backup_private.py upload` 補傳（token 過期先 `auth`） |
 | T2 輪詢（⑩d–⑩g）沒跑完或一直「沒真的查」 | 段 3「T2 輪詢：本輪沒跑完（<步驟> <狀態>：<理由>）」或拒收裡「沒真的查 N」；有該查的、卻超過 `min_recheck_days` 沒有任何一次輪詢時整行 ⚠＋摘要行「T2 輪詢 N 天沒跑」。回滾：`config/event_watch.json` 的 `sweep_budget_per_run` 調 0（或 `llm.executor=none` 連同其他 LLM 步驟一起停） |
 | T2 命中掛著沒人判定 | 段 3「**命中待檢 N**（最老 D 天）」；超過兩週 `audit invariants` 的 QueueLiveness 亮紅。判定：`python -m engine_b.watch_poll queue` → `judge` |
@@ -121,6 +122,16 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 ~~無人值守進入點 `crons/heartbeat_task.py`＋工作 `StockBotv2-Heartbeat`（07:00）~~——2026-09-24 Phase 1 Step 1.2a 起由
 `StockBotv2-Daily` 的 ⑱⑲ 取代（1.2a 停用、2026-09-25 1.2b 刪除）；它們的理由（LLM 失敗心跳照發、永遠 exit 0、Python 不用 `.cmd`、
 發送走 subprocess）搬進 `crons/daily_task.py` 的 docstring，守它們的測試改主詞搬進 `tests/test_daily_task.py`「無人值守入口」節。
+
+### Sandbox impact review 結論（2026-11-03：Form 4 先讀交易代碼——含 P 的不 auto no_go；盲點修法 plan 2026-11-02-001 §2 第 15 條後半）
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | daily ① `crons/harvest_leads.py`（argv 不變）：每一份**新登記**的 Form 4／4A 多一個 GET——同一份申報的原始 XML（`www.sec.gov/Archives/edgar/data/<cik>/<accession>/<檔名>.xml`，拿掉 XSL 那一段），走 `fetchers.edgar.fetch_form4_transaction_codes`：header 與限速同 `fetch_filing_text`（`_build_headers`＋`rate_sleep`；`www.sec.gov` 原本就是 harvest 連的主機——`get_cik` 讀 `company_tickers.json`），不新增主機、憑證或 header。量：過去 466 份 Form 4 lead 約 3.5 個月（2026-07-22～11-02），一天約 4–5 份；舊的不重抓（只在 `is_new` 時讀）。寫入：lead refs 多 `insider_transaction_codes`（`config/lead_ref_keys.json` 登記，字彙）；含 P 的 lead 留在 pending——之後走既有的 ⑥ triage 批次（先抓內文）與 ⑦a 分類，不新增步驟；harvest log 每個 `edgar:<T>` 那一輪多 `filter`（form4_new／form4_purchase／form4_unread）；心跳段 1 多一行（只讀 harvest log）。讀不到＝照舊 auto no_go（與改動前相同） |
+| **2 canonical skill／prompt／本檔** | 本節與失敗表一列；`config/lead_ref_keys.json` 一個鍵；plan 2026-11-02-001 進度段。triage prompt 不動（分類層讀到的是 ⑥ 抓的申報內文） |
+| **3 最窄 rule** | daily argv 不變；不新增 step、allowlist、rule；APP 不動；`.codex/rules` 仍 0 條 |
+| **4 contract test** | 新 `tests/test_form4_purchase.py`：原始 XML 網址、只認 non-derivative 的代碼（小寫照認、衍生性的 M 不算、壞 XML raise）；含 P 留 pending 且記 refs、其餘照舊 auto no_go 且記 refs、讀不到照舊 auto no_go 且不記、8-K 不受影響、報告三格；沒給讀代碼的呼叫端行為不變；`harvest_edgar` 把報告寫進 log；段 1 加總各檔最後一輪、讀不到非 0 才標粗、非 EDGAR 不算。變異 10／10 紅 |
+| **5 端到端 smoke** | 11-03 真資料：466 份 Form 4 lead 的原始 XML 全部讀得到（0 份讀不到）；代碼分布 S 193、F 161、A 93、M 43、G 26、**P 23**、C 22、D 14、J 8、沒有 non-derivative 交易 10。含 P 的 23 份：TSM 21（2026-08-30～10-08，大型股、照邊緣門檻不會研究）、JBL 1（08-13）、GFS 1（07-22）——照這個基準，3.5 個月約多 23 則進分類層，多半會被分類層篩掉；最近 60 份（10-22～11-02）0 份含 P |
 
 ### Sandbox impact review 結論（2026-11-03：追蹤表多兩格——跌深的反證觸及、§5.2 觀察名單第二基準；盲點修法 plan 2026-11-02-001 §2 第 10 條①與最後一列）
 
