@@ -1231,6 +1231,8 @@ gate 只有一道門），drop 會把提案收掉、不換號重生。入口：`
 
 `AGENTS.md` 自 2026-09-22 起只寫目標與邊界，**指名函數、表、門檻值或 Phase 的句子一律住這裡**
 （決定紀錄 G10：`docs/brainstorms/2026-09-22-graph-first-direction-decision.md`）。下列每一項在 AGENTS 都還有對應的判準句；這裡是它的落點與查證。
+其中純讀 config 就答得出的四列（常規授權封閉、alpha 格只觀測、資本表達層已移除、beta 擇時已關）自 2026-11-03 起由
+`python -m audit invariants --only ConfigBoundaries` 每次 audit 都查（盲點修法 §1 第 5 條）；表內的查證命令照留。
 
 | 判準（住 AGENTS） | 落點／現況／查證 |
 |---|---|

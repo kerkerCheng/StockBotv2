@@ -279,6 +279,7 @@ PASS  GraphFinancialJoin  graph∖registry = 0
 | `Orphans` | INV-3 | F-17/20 | 無 disposition 的 item |
 | `QueueLiveness` | INV-4 | F-09～F-16 | `queued_without_consumer`／`watching_without_next_action`／`expired_still_scheduled`／`blocked_without_reason`／`stalled_over_threshold` |
 | `GateDiscrimination` | INV-5 | F-26 | 每個 gate 的觸發率與清除率（恆亮／不會滅偵測） |
+| `ConfigBoundaries` | INV-5 | — | ARCHITECTURE §8.2 純讀 config 的四條：alpha 只觀測、5% 單筆上限、beta 無擇時訊號、常規授權封閉（2026-11-03） |
 | `PointInTime` | INV-6 | F-27/28/31 | as-of fallback 次數、`published_at` 覆蓋率、`bar_date` 覆蓋率 |
 | `EvidenceProvenance` | INV-6 | F-36 | 無 `EvidenceRef` 的 score |
 | `GraphFinancialJoin` | INV-1 | F-03/04 | A→C join key 兩側對齊 |

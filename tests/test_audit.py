@@ -25,7 +25,7 @@ from audit.sources import SourceUnavailable
 def test_every_check_names_an_invariant_and_an_owner() -> None:
     """沒有 owner 的檢查＝沒有人會實作它（L13 的「管子只接一頭」）。"""
     checks = audit.all_checks()
-    assert len(checks) == 14   # 2026-10-01 Phase 4 Step 4.2e 加 SourceDocSync
+    assert len(checks) == 15   # 2026-10-01 Phase 4 Step 4.2e 加 SourceDocSync；2026-11-03 盲點修法 §1 第 5 條加 ConfigBoundaries
     for check in checks:
         assert check.invariant.startswith("INV-"), check.name
         assert check.owner_phase.startswith("Phase "), check.name

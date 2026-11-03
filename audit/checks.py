@@ -1575,3 +1575,104 @@ def check_decision_lineage() -> AuditResult:
                   len(rows))
 
     return _guard("DecisionLineage", run)
+
+
+# ---------------------------------------------------------------------------
+# INV-5 — ConfigBoundaries（量測或明文決定拿掉的東西不得從 config 回來；ARCHITECTURE §8.2）
+# ---------------------------------------------------------------------------
+
+#: U7（`65fb3b02`）從 `probe_lane` 拿掉的尺寸 cap；之後任何 `*_cap`／`*ceiling*` 鍵同樣是尺寸語意回來了。
+_REMOVED_PROBE_CAPS = frozenset({"single_probe_nav_cap", "probe_book_nav_cap", "axis_ceilings", "live_adv_fraction_cap"})
+#: beta 擇時訊號的鍵名（AGENTS「訊號的地位」：RSI／MACD／tier／pace 不得以任何名義回到 beta）——**整鍵比對、不比子字串**：
+#: `policy_version` 含 rsi，子字串比對就是會誤報的 linter（L16）。
+_BETA_SIGNAL_KEYS = frozenset({"signal", "signals", "rsi", "macd", "tier", "pace"})
+#: AGENTS「常規授權類別」永不列入的 pq2 類型（live／付費／decompose 選題都以 `manual` 型鑄號，所以 manual 也永不列入）。
+_NEVER_STANDING = frozenset({"ra_admission", "engine_c_observation", "thesis_mutation", "thesis_lifecycle",
+                             "source_trace_review", "manual"})
+
+
+def _keys_anywhere(node: object) -> set[str]:
+    if isinstance(node, dict):
+        return {str(k) for k in node} | {k for v in node.values() for k in _keys_anywhere(v)}
+    if isinstance(node, list):
+        return {k for v in node for k in _keys_anywhere(v)}
+    return set()
+
+
+def check_config_boundaries() -> AuditResult:
+    """ARCHITECTURE §8.2 裡純讀 config 就答得出的四條，從「要人記得跑的查證命令」變成每天跑的 check（盲點修法 §1 第 5 條）：
+
+    ① alpha 格只觀測：`target_allocation.json` 的 `sleeves.alpha.observed_only` 是 true、沒有 target／band；
+    ② 單筆上限仍是 5% NAV、`probe_lane` 沒有尺寸 cap（`investment_policy.json`）；
+    ③ `beta_policy.json` 沒有擇時訊號的鍵（整鍵比對，任何深度）；
+    ④ 常規授權封閉：唯一 loader 驗得過、`authorized` 不含 AGENTS 永不列入的類型。
+
+    讀不到的那一條不算通過（模組 docstring ②：SKIPPED，不是 PASS）。
+    """
+    findings: list[str] = []
+    unread: list[str] = []
+    examined = 0
+
+    def read(name: str) -> dict | None:
+        try:
+            payload = json.loads((ROOT / "config" / name).read_text(encoding="utf-8"))
+        except (OSError, ValueError) as exc:
+            unread.append(f"config/{name}（{type(exc).__name__}）")
+            return None
+        if not isinstance(payload, dict):
+            unread.append(f"config/{name}（不是 object）")
+            return None
+        return payload
+
+    allocation = read("target_allocation.json")
+    if allocation is not None:
+        examined += 1
+        alpha = (allocation.get("sleeves") or {}).get("alpha")
+        if not isinstance(alpha, dict) or alpha.get("observed_only") is not True:
+            findings.append("target_allocation.json：sleeves.alpha.observed_only 不是 true——alpha 格只觀測、不設目標")
+        elif {"target", "band"} & set(alpha):
+            findings.append(f"target_allocation.json：sleeves.alpha 帶了 {sorted({'target', 'band'} & set(alpha))}"
+                            "——只觀測的格子不得有目標")
+
+    policy = read("investment_policy.json")
+    if policy is not None:
+        examined += 1
+        if policy.get("single_position_nav_cap") != 0.05:
+            findings.append(f"investment_policy.json：single_position_nav_cap＝{policy.get('single_position_nav_cap')!r}"
+                            "，應為 0.05（5% 單筆上限是硬擋）")
+        caps = sorted(k for k in (policy.get("probe_lane") or {})
+                      if k in _REMOVED_PROBE_CAPS or k.endswith("_cap") or "ceiling" in k)
+        if caps:
+            findings.append(f"investment_policy.json：probe_lane 有尺寸 cap {caps}——資本表達層已於 U7 移除，系統不給部位尺寸")
+
+    beta = read("beta_policy.json")
+    if beta is not None:
+        examined += 1
+        hits = sorted(k for k in _keys_anywhere(beta) if k.lower() in _BETA_SIGNAL_KEYS)
+        if hits:
+            findings.append(f"beta_policy.json：出現擇時訊號的鍵 {hits}——beta 定投擇時已關（2026-08-01 三次實測），不是降級使用")
+
+    standing_path = ROOT / "config" / "standing_authorization.json"
+    if not standing_path.is_file():
+        unread.append("config/standing_authorization.json（不存在）")
+    else:
+        from engine_b import standing_authorization as sa
+
+        examined += 1
+        try:
+            standing = sa.load(standing_path)
+        except sa.StandingAuthorizationError as exc:
+            findings.append(f"standing_authorization.json：唯一 loader 拒絕載入——{exc}")
+        else:
+            leaked = sorted(_NEVER_STANDING & set(standing.authorized))
+            if leaked:
+                findings.append(f"standing_authorization.json：authorized 含永不列入的類型 {leaked}"
+                                "——這些 go 攔的是 authority，不是注意力")
+
+    if findings:
+        return fail("ConfigBoundaries", f"{len(findings)} 條邊界破了",
+                    _clip(findings + [f"未讀到：{u}" for u in unread]), examined)
+    if unread:
+        return skip("ConfigBoundaries", f"讀不到 {'、'.join(unread)}——讀到的 {examined} 條沒破，但讀不到的那條不算通過",
+                    summary="partially_unreadable")
+    return ok("ConfigBoundaries", "alpha 只觀測、5% 單筆上限、probe_lane 無尺寸 cap、beta 無擇時訊號、常規授權封閉", examined)
