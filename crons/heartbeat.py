@@ -2984,7 +2984,18 @@ class Heartbeat:
     ledger: list[Any] | None = None
 
 
-def compose_heartbeat(
+def compose_heartbeat(**kwargs: Any) -> Heartbeat:
+    """固定五段，順序固定，**任何情況下都回五個 Section**；另組快照、橫幅與摘要行（各自降級）。
+
+    快照、⑤ 待做清單、段 3 都要「停放未處置對照」——一次心跳之內只算一次（`engine_b.impact.shared_undisposed`；
+    2026-11-03 當下修：原本算三次，占整份心跳九成時間，daily ⑱ 12 天從 22 秒漲到 100 秒）。參數見 `_compose_heartbeat`。"""
+    from engine_b import impact as im
+
+    with im.shared_undisposed():
+        return _compose_heartbeat(**kwargs)
+
+
+def _compose_heartbeat(
     *,
     now: datetime | None = None,
     state_dir: Path | None = None,
@@ -2994,7 +3005,6 @@ def compose_heartbeat(
     capture_dir: Path | None = None,
     snapshot_dir: Path | None = None,
 ) -> Heartbeat:
-    """固定五段，順序固定，**任何情況下都回五個 Section**；另組快照、橫幅與摘要行（各自降級）。"""
     moment = now or datetime.now(timezone.utc)
     today = moment.astimezone().date()
     leads = leads_path or ROOT / "library" / "leads" / "pending_leads.json"

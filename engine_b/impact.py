@@ -18,6 +18,8 @@ NVHBM 那則（X 帳號 10-18）停放時寫「圖上沒有讀圖可接」，其
 from __future__ import annotations
 
 import argparse
+import contextlib
+import hashlib
 import json
 import re
 import sys
@@ -235,8 +237,39 @@ def _instant(value: Any) -> datetime | None:
         return None
 
 
+#: 一次心跳之內共用的 `undisposed` 結果（2026-11-03 當下修，L14-5 維持營運）：心跳的快照、⑤ 待做清單、段 3 那一行各算一次——
+#: 同一份 lead store、同一份對照算三次，占整份心跳九成時間，而且隨停放的 lead 變多線性變慢（daily ⑱ 10-23 的 22 秒 → 11-03 的
+#: 100 秒，那一步的上限是 3 分鐘）。**只在 `shared_undisposed()` 範圍內生效**：範圍外每次照算，長駐行程拿不到舊的對照；
+#: 鍵是 store 內容的 digest＋`since`，自己給 `ctx` 的呼叫照算（對照不同）。
+_SHARED: dict[tuple[str, str], list[dict[str, str]]] | None = None
+
+
+@contextlib.contextmanager
+def shared_undisposed():
+    """範圍內同一份 lead store 的 `undisposed(store)` 只算一次（巢狀時沿用外層那一份）。"""
+    global _SHARED
+    outer = _SHARED
+    _SHARED = {} if outer is None else outer
+    try:
+        yield
+    finally:
+        _SHARED = outer
+
+
 def undisposed(store: Mapping[str, Mapping[str, Any]], ctx: Context | None = None, *,
                since: str = DISPOSITION_SINCE) -> list[dict[str, str]]:
+    """同 `_undisposed`；在 `shared_undisposed()` 範圍內、沒給 `ctx` 時，同一份 store 只算一次（回的是複本）。"""
+    if _SHARED is None or ctx is not None:
+        return _undisposed(store, ctx, since=since)
+    blob = json.dumps(store, sort_keys=True, ensure_ascii=False, default=str)
+    key = (hashlib.sha256(blob.encode("utf-8")).hexdigest(), since)
+    if key not in _SHARED:
+        _SHARED[key] = _undisposed(store, None, since=since)
+    return [dict(row) for row in _SHARED[key]]
+
+
+def _undisposed(store: Mapping[str, Mapping[str, Any]], ctx: Context | None = None, *,
+                since: str = DISPOSITION_SINCE) -> list[dict[str, str]]:
     """`since` 起停放的 lead × 它對照出的在盯條件（樞紐只計數的不算）裡，停放理由沒寫到那個 watch id 的組合。
     寫 `ew_0762` 或完整 id 都算寫到（LLM 與人都常截掉日期尾綴——#92 同一件事）。常駐計數器：處置完就歸零、不恆亮。
     **停放之後才登記的 watch 不算**（2026-10-23 L17 當下修：一份新讀圖登三條條件，就讓每則碰到那家公司的舊停放各多三筆，

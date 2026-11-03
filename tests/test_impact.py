@@ -180,6 +180,29 @@ def test_no_recent_parked_lead_means_the_counter_does_not_even_load_the_context(
     assert im.undisposed({"L_old": _parked("L_old", "2026-10-19T03:00:00+00:00", "x")}) == []
 
 
+def test_one_heartbeat_computes_the_undisposed_pairs_once_per_store(monkeypatch) -> None:
+    """2026-11-03 當下修：心跳的快照、⑤、段 3 各算一次（占九成時間）。範圍內同一份 store 只算一次、回的是複本；
+    內容不同就重算；自己給 ctx 照算；範圍外每次照算（長駐行程不會拿到舊的對照）。"""
+    monkeypatch.setattr(im, "HUB_SHARE", 1.1)
+    ctx = _ctx(BRIEFS)
+    monkeypatch.setattr(im, "load_context", lambda: ctx)
+    calls = []
+    real = im._undisposed
+    monkeypatch.setattr(im, "_undisposed", lambda store, c=None, *, since: calls.append(c) or real(store, c, since=since))
+    store = {"L_new": _parked("L_new", "2026-10-21T03:00:00+00:00", "MTAR 自述")}
+    with im.shared_undisposed():
+        first = im.undisposed(store)
+        first[0]["watch_id"] = "被改掉"                                       # 回的是複本：改它不影響下一個讀者
+        again = im.undisposed({k: dict(v) for k, v in store.items()})       # 另一個 dict、同樣內容
+        assert again == [{"lead_id": "L_new", "watch_id": "ew_1"}] and len(calls) == 1
+        im.undisposed({**store, "L_two": _parked("L_two", "2026-10-22T03:00:00+00:00", "x")})
+        im.undisposed(store, ctx)
+        assert len(calls) == 3
+    im.undisposed(store)
+    im.undisposed(store)
+    assert len(calls) == 5
+
+
 def test_the_heartbeat_line_prints_zero_or_the_pairs_with_a_way_to_fix_them(monkeypatch) -> None:
     from crons.heartbeat import _undisposed_line
 
