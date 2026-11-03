@@ -296,6 +296,51 @@ def test_next_prompt_says_when_a_cell_was_not_read() -> None:
     assert "未讀到" in tl.next_prompt(counts)
 
 
+def _ledger(**cells):
+    """LedgerCount 序列：每格 (count, progress, oldest_days)；沒寫的格全 0。"""
+    out = []
+    for row in tl.LEDGER:
+        count, progress, oldest = cells.get(row.key.removeprefix("todo."), (0, 0, None))
+        out.append(tl.LedgerCount(row.key, row.label, count, oldest_days=oldest, progress=progress))
+    return out
+
+
+def test_next_prompt_pushes_drain_only_on_progress_or_age() -> None:
+    """盲點修法 §1 第 2 條（整體盲點審查 2026-11-01 §1.3：十天 15 段 drain、候選狀態轉換 0）：格子非 0、但沒有一格歸零會讓
+    哪一檔離決定更近、最老不到 7 天 → 只剩維護，不推 drain；題材到期照提。"""
+    quiet = tl.next_prompt(_ledger(semantic=(3, 0, 2), leads=(5, 0, 3)), theme_due=True)
+    assert quiet.startswith("只剩維護") and "掃題材" in quiet and "未檢 3" in quiet and "待深挖 lead 5" in quiet
+    assert tl.next_prompt(_ledger(semantic=(3, 0, 2), narrative=(1, 1, 0))).startswith("`/research-drain`（進展：重開達成／已回落 1）")
+    assert "進展：使用者 go 的工單 1" in tl.next_prompt(_ledger(leads=(2, 1, 1)))
+    assert tl.next_prompt(_ledger(semantic=(3, 0, 8))).startswith("`/research-drain`（最老 8 天）")
+    assert tl.next_prompt(_ledger(disproof_touched=(1, 1, None))).startswith(
+        "`/research-drain`（反證觸及：48 小時內）（進展：反證觸及 1）")
+    # 進展格算不出（候選板讀不到 → 重開達成沒算）不是 0：照舊推（INV-3）
+    assert tl.next_prompt(_ledger(semantic=(3, 0, 2), narrative=(0, None, None))).startswith(
+        "`/research-drain`（進展格算不出，照舊推）")
+
+
+def test_the_snapshot_path_makes_the_same_call() -> None:
+    """SessionStart 只讀得到快照：`snapshot_progress` 存的兩個值讓 Mapping 路徑做同一個判斷；舊快照沒有這兩個鍵就照舊推。"""
+    ledger = _ledger(semantic=(3, 0, 2))
+    snap = {**{r.key: r.count for r in ledger}, **tl.snapshot_progress(ledger)}
+    assert snap["todo.progress"] == 0 and snap["todo.oldest_days"] == 2
+    assert tl.next_prompt(snap).startswith("只剩維護")
+    assert tl.next_prompt({r.key: r.count for r in ledger}).startswith("`/research-drain`（進展格算不出")
+
+
+def test_collect_counts_reopen_met_and_approved_orders_as_progress() -> None:
+    reopen = {"kind": "reopen_met", "ticker": "AXTI", "company_id": "co:axt", "brief_id": "ib_1"}
+    rows = _collect(candidates=_board(reopen, dict(reopen, kind="no_reopen", ticker="X", company_id="co:x")))
+    assert rows["todo.narrative"].count == 2 and rows["todo.narrative"].progress == 1   # 沒寫重開是維護，不是進展
+    assert _collect(candidates=None)["todo.narrative"].progress is None
+    # 已回落（沒寫重開條件的舊紀錄的叫醒）同算進展；同一檔兩種都在只算一件
+    legacy = dict(reopen, kind="pulled_back", ticker="Y", company_id="co:y")
+    both = _collect(candidates=_board(reopen, legacy, dict(reopen, kind="pulled_back")))
+    assert both["todo.narrative"].progress == 2
+    assert rows["todo.semantic"].progress == 0 and rows["todo.leads"].progress == 0
+
+
 # ---------------------------------------------------------------------------
 # 四、敘事撤回或不再等：喚醒 watch 一起收（failure log #34 ⑥）
 # ---------------------------------------------------------------------------

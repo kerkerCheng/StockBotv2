@@ -452,7 +452,10 @@ def test_compose_returns_five_sections_snapshot_and_summary(tmp_path: Path) -> N
                                 capture_dir=tmp_path, snapshot_dir=tmp_path / "snap")
     assert [s.order for s in beat.sections] == [1, 2, 3, 4, 5]
     assert beat.sections[1].lines[0].startswith("較昨變動：尚無上一份快照")
-    assert set(beat.snapshot) == set(hb.SNAPSHOT_KEYS) and beat.summary.startswith("Daily ")
+    assert set(beat.snapshot) == set(hb.SNAPSHOT_KEYS) | set(hb.SNAPSHOT_SIDE_KEYS)
+    assert beat.summary.startswith("Daily ")
+    # 只存不比：side 鍵不在 diff 的清單裡（天天 +1 的最老天數放進去就是恆亮的一項）
+    assert not set(hb.SNAPSHOT_SIDE_KEYS) & set(hb.SNAPSHOT_KEYS)
 
 
 def test_daily_summary_template_reads_the_heartbeat_summary_file(tmp_path: Path) -> None:

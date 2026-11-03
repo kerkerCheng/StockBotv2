@@ -26,7 +26,8 @@ D12（2026-09-16 使用者定案）把 Daily 拆成三層——心跳／分類�
 （這與 INV-6 不衝突：INV-6 禁的是**靜默**回傳當前值，而這裡每一次降級都出現在輸出裡。）
 
 **段 2 的第一行是「較昨變動」（Phase 1 Step 1.8）。** 每次 daily 寫一份快照
-（`library/private/heartbeat/snapshots/<日期>.json`，鍵是封閉清單 `SNAPSHOT_KEYS`、留 14 天），心跳只印跟上一份比
+（`library/private/heartbeat/snapshots/<日期>.json`，鍵是封閉清單 `SNAPSHOT_KEYS`＋只存不比的 `SNAPSHOT_SIDE_KEYS`、
+留 14 天），心跳只印跟上一份比
 **變了的鍵**，其餘印「N 項相同」。快照是 derived、只給 diff 用，**不是** current-state authority（AGENTS：不建立
 與待辦池競爭的第二個狀態源）。沒有上一份（第一天、或中間斷了很多天）就誠實印出來，不假裝有。
 
@@ -83,6 +84,7 @@ from alpha.candidates import GROUPS as CANDIDATE_GROUPS  # noqa: E402
 from alpha.candidates import SIDE_GROUPS as CANDIDATE_SIDE_GROUPS  # noqa: E402
 from alpha.candidates import SIDE_LABELS as CANDIDATE_SIDE_LABELS  # noqa: E402
 from engine_b.todo_ledger import LEDGER as TODO_LEDGER  # noqa: E402
+from engine_b.todo_ledger import SNAPSHOT_PROGRESS_KEYS as TODO_PROGRESS_KEYS  # noqa: E402
 
 #: 段序是封閉字彙：**五段，不多不少**。ARCHITECTURE §4.1 是它的規格來源。
 SECTION_TITLES: tuple[str, ...] = (
@@ -2736,6 +2738,9 @@ SNAPSHOT_KEYS: dict[str, str] = {
     # 待做清單（2026-10-22 使用者：「要確保以後的東西都不會被計數漏掉」）：短版 ⑤ 的每一格——由 LEDGER 導出（L16）
     **{row.key: f"待做 {row.label}" for row in TODO_LEDGER},
 }
+#: 快照多存、**不進**較昨 diff 的鍵（另一張封閉清單）：SessionStart 的「下一步貼」只讀得到快照，靠它們做跟短版 ⑤
+#: 同一個判斷（盲點修法 §1 第 2 條）；`todo.oldest_days` 天天 +1，放進 diff 就是恆亮的一項（L14-4）。
+SNAPSHOT_SIDE_KEYS: tuple[str, ...] = TODO_PROGRESS_KEYS
 #: 較昨變動一行最多列幾項（其餘寫「另 N 項」）。
 DIFF_LIMIT = 12
 
@@ -3053,8 +3058,12 @@ def _compose_heartbeat(
     except Exception:  # noqa: BLE001
         snapshot = {key: None for key in SNAPSHOT_KEYS}
     ledger = collect_ledger(now=moment, state_dir=state_dir, leads_path=leads)
+    snapshot.update(dict.fromkeys(SNAPSHOT_SIDE_KEYS))
     if ledger is not None:
         snapshot.update({row.key: row.count for row in ledger})
+        from engine_b.todo_ledger import snapshot_progress
+
+        snapshot.update(snapshot_progress(ledger))
     try:
         previous, previous_date = load_previous_snapshot(snapshots, today=today)
     except Exception:  # noqa: BLE001

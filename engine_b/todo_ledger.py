@@ -201,10 +201,11 @@ class LedgerCount:
     oldest_days: int | None = None
     note: str | None = None
     reason: str | None = None         # 未讀到的理由
+    progress: int | None = 0          # 這一格裡「歸零時有一檔離決定更近」的件數（`PROGRESS_LABELS`）；None＝算不出
 
     def as_dict(self) -> dict[str, Any]:
         return {"key": self.key, "label": self.label, "count": self.count, "work": self.work,
-                "oldest_days": self.oldest_days, "note": self.note, "reason": self.reason}
+                "oldest_days": self.oldest_days, "note": self.note, "reason": self.reason, "progress": self.progress}
 
 
 def _days_since(stamp: Any, today: date) -> int | None:
@@ -322,6 +323,7 @@ def collect(*, today: date, leads_store: Mapping[str, Any], watches: Sequence[Ma
             fn()
         except Exception as exc:  # noqa: BLE001 — 一格讀不到不帶走其他格（INV-3：未讀到 ≠ 0）
             rows[key].count, rows[key].reason = None, f"{type(exc).__name__}: {str(exc)[:60]}"
+            rows[key].progress = None
 
     breaks = []
     if briefs is not None:
@@ -370,7 +372,7 @@ def collect(*, today: date, leads_store: Mapping[str, Any], watches: Sequence[Ma
             bits.append(f"含已 go 的工單 {orders}")
         if withheld:
             bits.append(f"另 {len(withheld)} 則缺分類先補（drain 會扣著）")
-        put("todo.leads", count, oldest_days=_oldest(stamps, today), note="；".join(bits) or None)
+        put("todo.leads", count, oldest_days=_oldest(stamps, today), note="；".join(bits) or None, progress=orders)
 
     guarded("todo.leads", lead_work)
 
@@ -432,7 +434,9 @@ def collect(*, today: date, leads_store: Mapping[str, Any], watches: Sequence[Ma
                 notes.append(f"判讀／家數變了有 {check['unchecked']} 格沒比成（正文寫時騎的讀圖紀錄找不到）")
             note = "；".join(notes) or None
         put("todo.narrative", len(companies) + extra, work="；".join(bits) or None,
-            oldest_days=_oldest(stamps, today), note=note)
+            oldest_days=_oldest(stamps, today), note=note,
+            # 已回落＝沒寫重開條件的舊紀錄的叫醒（重開達成取代它）：兩者都是「等的價格到了」，同算進展（L17 對稱面）
+            progress=None if candidates is None else len(behind["reopen_met"] | behind["pulled_back"]))
 
     guarded("todo.narrative", narrative)
     put("todo.reading", reading_needs_reread)
@@ -455,13 +459,15 @@ def collect(*, today: date, leads_store: Mapping[str, Any], watches: Sequence[Ma
 
         c = disproof.disproof_counts(list(watches), readings=disproof.current_readings(),
                                      coverage=None, layer_notes=disproof.current_layer_notes())
-        put("todo.disproof_touched", None if c.get("lifecycle_unreadable") else c["touched_pending"])
+        value = None if c.get("lifecycle_unreadable") else c["touched_pending"]
+        put("todo.disproof_touched", value, progress=value)
         k = disproof.confirm_counts(list(watches))
-        put("todo.confirm_touched", k["touched_pending"])
+        put("todo.confirm_touched", k["touched_pending"], progress=k["touched_pending"])
 
     guarded("todo.disproof_touched", touched)
     if rows["todo.confirm_touched"].count is None and rows["todo.disproof_touched"].reason:
         rows["todo.confirm_touched"].reason = rows["todo.disproof_touched"].reason
+        rows["todo.confirm_touched"].progress = None
 
     def expired() -> None:
         c = ew.expiry_counters({"watches": list(watches)}, today=today)
@@ -553,23 +559,73 @@ def render_cells(counts: Sequence[LedgerCount]) -> list[str]:
     return lines
 
 
+#: 「進展格」（盲點修法 §1 第 2 條，2026-11-03；整體盲點審查 2026-11-01 §1.3：十天 15 段 drain、週額度 99%、候選狀態轉換 0，
+#: 推薦條件是「任何研究格 > 0」，而停放是合法終局、歸零永遠做得到）。判準：**會叫人動手的數字，要問它歸零時有沒有任何一檔
+#: 離決定更近；沒有的只當健康度、只在太老時叫人。** 推 `/research-drain` 只看下列幾件、或任一格最老 ≥ `MAINTENANCE_NUDGE_DAYS` 天。
+#: 只差已定價／可開不在這裡：價格判斷是使用者的（短版 ③），drain 歸零不了它，放進來就是恆亮的燈（L14-4）。
+PROGRESS_LABELS: Mapping[str, str] = {"todo.disproof_touched": "反證觸及", "todo.confirm_touched": "加碼條件觸及",
+                                      "todo.narrative": "重開達成／已回落", "todo.leads": "使用者 go 的工單"}
+MAINTENANCE_NUDGE_DAYS = 7
+#: `snapshot_progress` 的鍵——心跳快照「只存不比」的封閉清單由這裡導出（L16）。
+SNAPSHOT_PROGRESS_KEYS: tuple[str, ...] = ("todo.progress", "todo.oldest_days")
+
+
+def progress_summary(counts: Sequence[LedgerCount]) -> dict[str, Any]:
+    """進展件數（任一進展格算不出 → None，未讀到不是 0）、明細、有工作的格裡最老幾天。短版「下一步貼」與心跳快照的
+    `todo.progress`／`todo.oldest_days`（SessionStart 提示讀快照）同一份算法（L16）。"""
+    rows = [r for r in counts if r.key in PROGRESS_LABELS]
+    total = None if any(r.progress is None for r in rows) else sum(int(r.progress or 0) for r in rows)
+    parts = [f"{PROGRESS_LABELS[r.key]} {r.progress}" for r in rows if r.progress]
+    oldest = max((r.oldest_days for r in counts if r.count and r.oldest_days is not None), default=None)
+    return {"progress": total, "parts": parts, "oldest_days": oldest}
+
+
+def snapshot_progress(counts: Sequence[LedgerCount]) -> dict[str, int | None]:
+    """心跳快照多存的兩個值（不進較昨 diff）：`phase_status_hint` 只讀得到快照，靠它們做同一個判斷。"""
+    summary = progress_summary(counts)
+    return dict(zip(SNAPSHOT_PROGRESS_KEYS, (summary["progress"], summary["oldest_days"]), strict=True))
+
+
 def next_prompt(counts: Sequence[LedgerCount] | Mapping[str, int | None], *, decision_batch: str | None = None,
                 phase_step: str | None = None, theme_due: bool = False) -> str:
     """下一步貼什麼——**只由計數機械導出**，而且有「沒有要貼的」分支（L14：恆亮的燈沒有資訊量）。
 
-    順序：③ 有建議的批次行 → 任何研究格 > 0 推 `/research-drain` → 研究全 0 但 Phase plan 有下一步推 `/phase-run`
-    → 題材掃描到期說「掃題材」→ 全 0「今天沒有要貼的」。"""
-    values = ({r.key: r.count for r in counts} if not isinstance(counts, Mapping) else dict(counts))
+    順序：③ 有建議的批次行 → 研究格 > 0 而且（進展格非 0、或最老 ≥ 7 天、或進展算不出）推 `/research-drain`；
+    研究格 > 0 但只剩維護 → 「只剩維護」（照 plan Q8 每週 2–3 次清）＋題材到期照提 → 研究全 0 但 Phase plan 有下一步推
+    `/phase-run` → 題材掃描到期說「掃題材」→ 全 0「今天沒有要貼的」。"""
+    if isinstance(counts, Mapping):
+        values = dict(counts)
+        # 快照沒有這兩個鍵（2026-11-03 之前的舊快照）→ 判不了是不是只剩維護，照舊推 drain
+        summary = {"progress": values.get("todo.progress") if "todo.progress" in values else None, "parts": [],
+                   "oldest_days": values.get("todo.oldest_days")}
+    else:
+        values = {r.key: r.count for r in counts}
+        summary = progress_summary(counts)
     labels = {r.key: r.label for r in LEDGER}
     nonzero = [(k, v) for k, v in values.items() if k in labels and isinstance(v, int) and v > 0]
     unread = [k for k in LEDGER_KEYS if values.get(k) is None]
     parts: list[str] = []
     if decision_batch:
         parts.append(f"先貼 ③ 那一行：`{decision_batch}`")
-    if nonzero:
+    progress, oldest = summary["progress"], summary["oldest_days"]
+    stale = oldest is not None and oldest >= MAINTENANCE_NUDGE_DAYS
+    if nonzero and (progress is None or progress > 0 or stale):
         urgent = "（反證觸及：48 小時內）" if values.get("todo.disproof_touched") else ""
         clear = "、".join(f"{labels[k]} {v}" for k, v in nonzero)
-        parts.append(f"`/research-drain`{urgent}——要清的：{clear}")
+        why = []
+        if progress is None:
+            why.append("進展格算不出，照舊推")
+        elif progress:
+            why.append(("進展：" + "、".join(summary["parts"])) if summary["parts"] else f"進展 {progress} 件")
+        if stale:
+            why.append(f"最老 {oldest} 天")
+        parts.append(f"`/research-drain`{urgent}（{'；'.join(why)}）——要清的：{clear}")
+    elif nonzero:
+        clear = "、".join(f"{labels[k]} {v}" for k, v in nonzero)
+        parts.append(f"只剩維護（沒有一格歸零會讓哪一檔離決定更近、最老不到 {MAINTENANCE_NUDGE_DAYS} 天："
+                     f"照 plan Q8 每週 2–3 次清，今天不必為它開 `/research-drain`）——要清的：{clear}")
+        if theme_due:
+            parts.append("說「掃題材」（題材掃描已到期）")
     elif phase_step:
         parts.append(f"`/phase-run`（研究計數全 0；下一個 Step：{phase_step}）")
     elif theme_due:
@@ -580,5 +636,6 @@ def next_prompt(counts: Sequence[LedgerCount] | Mapping[str, int | None], *, dec
 
 
 __all__ = ["BEHIND_KINDS", "COVERAGE", "DESTINATIONS", "LEDGER", "LEDGER_BY_KEY", "LEDGER_KEYS", "LedgerCount",
-           "LedgerRow", "active_hypotheses_without_watch", "collect", "destination_label", "next_prompt",
-           "orphan_wake_briefs", "render_cells", "requires_user_without_pq2"]
+           "LedgerRow", "MAINTENANCE_NUDGE_DAYS", "PROGRESS_LABELS", "SNAPSHOT_PROGRESS_KEYS",
+           "active_hypotheses_without_watch", "collect", "destination_label", "next_prompt", "orphan_wake_briefs",
+           "progress_summary", "render_cells", "requires_user_without_pq2", "snapshot_progress"]

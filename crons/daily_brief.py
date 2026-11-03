@@ -780,7 +780,11 @@ def next_step_line(*, snapshot: Mapping[str, Any], ledger: Sequence[Any] | None,
         theme_due = False
     counts = ledger if ledger is not None else {key: snapshot.get(key) for key, _ in TODO_COUNTERS}
     text = next_prompt(counts, decision_batch=None, phase_step=phase_step, theme_due=bool(theme_due))
-    return text.split("——", 1)[0] if text.startswith("`/research-drain`") else text
+    # 要清的格上面已逐行列出：「——要清的：…」只留在 SessionStart 那一行（drain 與只剩維護兩種開頭都切；後面的「；然後」照留）
+    if text.startswith(("`/research-drain`", "只剩維護")):
+        head, _, rest = text.partition("——")
+        return head + ("；然後 " + rest.split("；然後 ", 1)[1] if "；然後 " in rest else "")
+    return text
 
 
 def copy_line(batch: str | None) -> list[str]:
