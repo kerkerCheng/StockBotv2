@@ -2422,11 +2422,12 @@ def build_positions(*, state_dir: Path | None) -> Section:
         lanes = positions.get("lanes")
         # 三條 lane（Phase 5 Step 5.2）：分母分開——live 量買得準不準、paper 量判斷準不準、history 只是歷史。
         section.lines.append(_lane_count_line(lanes, positions.get("theme_cohort")))
-        history_excess = ((lanes or {}).get("history") or {}).get("theme_cohort_excess") or {}
+        history = (lanes or {}).get("history") or {}
         section.lines.append(
             f"追蹤表 {aggregate.get('n', '?')} 檔｜等權絕對 {_pct(aggregate.get('absolute'))}"
             f"｜對 {aggregate.get('benchmark', '?')} 超額 {_pct(aggregate.get('excess'))}"
-            + (f"｜對主題等權組超額 {_cohort_excess_text(history_excess)}" if lanes is not None else "")
+            + (f"｜對主題等權組超額 {_cohort_excess_text(history.get('theme_cohort_excess') or {})}"
+               f"｜對 §5.2 觀察名單超額 {_watchlist_excess_text(history)}" if lanes is not None else "")
             + f"｜正式結算過 {counters.get('measured_outcomes', '?')} 筆"
         )
         health = positions.get("anchor_health") or {}
@@ -2575,6 +2576,13 @@ def _cohort_excess_text(excess: Mapping[str, Any]) -> str:
     return f"{_pct(excess.get('mean'))}（{excess.get('n')}/{excess.get('of')} 列）"
 
 
+def _watchlist_excess_text(entry: Mapping[str, Any]) -> str:
+    """第二基準（registration 2026-11-03「量測追加三條」②）：對 §5.2 觀察名單等權的超額，在主題組超額旁並印。
+    舊 artifact 沒有這一格就照說，不印成「還沒有值」（L12：沒算 ≠ 算了沒有）。"""
+    excess = entry.get("watchlist_excess")
+    return "artifact 還沒有這一格" if excess is None else _cohort_excess_text(excess)
+
+
 def _lane_power_line(lane: str, entry: Mapping[str, Any] | None) -> str:
     """一條 lane 一行：三量（D15）＋對主題等權組的超額。空 lane 印 outcome 腳本給的那句「還沒有列」。"""
     label = _LANE_SHORT[lane]
@@ -2600,7 +2608,8 @@ def _lane_power_line(lane: str, entry: Mapping[str, Any] | None) -> str:
             f"／其餘 {top.get('rest_n', '?')} 檔 {_pct(top.get('rest_contribution'))}"
             f"｜曾達 2 倍 {power.get('reached_2x_ever', '?')}/{power.get('n', '?')}"
             f"（現價仍達 {power.get('reached_2x_now', '?')}）｜{maturity_text}"
-            f"｜對主題等權組超額 {_cohort_excess_text(entry.get('theme_cohort_excess') or {})}")
+            f"｜對主題等權組超額 {_cohort_excess_text(entry.get('theme_cohort_excess') or {})}"
+            f"｜對 §5.2 觀察名單超額 {_watchlist_excess_text(entry)}")
 
 
 _WRONG_OUTCOMES = ("reversed", "disproof_touched", "retracted")

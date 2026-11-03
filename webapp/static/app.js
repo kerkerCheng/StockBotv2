@@ -2990,6 +2990,10 @@ function laneSummaryText(entry) {
     `等權 ${signedPct(agg.absolute)}`, `比 ${agg.benchmark || 'QQQ'} ${signedPct(agg.excess)}`,
     (ex.n ? `比自己所屬的組 ${signedPct(ex.mean)}（${ex.n}/${ex.of} 列）` : '比自己所屬的組：還沒有值')
       + (absent.length ? `（不比：${absent.join('、')}）` : ''),
+    // 第二基準（registration 2026-11-03 ②）：§5.2 觀察名單等權，只並印；舊 artifact 沒有這一格就照說
+    !entry.watchlist_excess ? '比 §5.2 觀察名單：artifact 還沒有這一格'
+      : (entry.watchlist_excess.n ? `比 §5.2 觀察名單 ${signedPct(entry.watchlist_excess.mean)}（${entry.watchlist_excess.n}/${entry.watchlist_excess.of} 列）`
+        : '比 §5.2 觀察名單：還沒有值'),
     `曾達 2 倍 ${pl.reached_2x_ever ?? '—'}/${pl.n ?? '—'}（現價仍達 ${pl.reached_2x_now ?? '—'}）`].join('｜');
 }
 

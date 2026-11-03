@@ -280,6 +280,8 @@ def test_frontend_puts_sample_validity_before_the_numbers() -> None:
     assert "const LANE_ORDER = ['live', 'paper'];" in source            # history 線不印
     summary = _js_function(source, "laneSummaryText")
     assert summary.index("算得出報酬") < summary.index("等權"), "樣本數必須排在報酬之前"
+    # 第二基準（registration 2026-11-03 ②）在主題組那一格之後並印；舊 artifact 沒有這一格要照說
+    assert summary.index("比自己所屬的組") < summary.index("比 §5.2 觀察名單") and "artifact 還沒有這一格" in summary
     power = _js_function(source, "lanePowerLawText")
     for field in ("basket_total_return", "top_contributor", "rest_contribution", "maturity", "分母還沒出現"):
         assert field in power, field

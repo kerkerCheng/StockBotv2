@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import re
 import sys
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta, timezone
@@ -331,6 +332,41 @@ def test_disproof_touched_reads_every_versions_rides_and_never_counts_a_confirm(
         assert all(r["disproof_touched"] is None for r in unread)
 
 
+def test_watchlist_benchmark_matches_the_registration_table_row_by_row() -> None:
+    """第二基準的名單 SSOT 是 registration §5.2 那張表（T0 列、看任何價格之前列的 43 檔）；程式常數逐列對得上，之後追加的不併入。"""
+    text = (ROOT / "docs" / "reports" / "phase7" / "registration.md").read_text(encoding="utf-8")
+    section = text.split("### 5.2 AI 基礎設施觀察名單", 1)[1].split("### 5.3", 1)[0]
+    tickers = [line.split("|")[2].strip() for line in section.splitlines() if re.match(r"^\| \d+ \|", line)]
+    assert len(tickers) == 43 and tuple(tickers) == OIST.WATCHLIST_BENCHMARK
+
+
+def test_second_benchmark_is_printed_beside_the_cohort_excess_and_excludes_the_row_itself(tmp_path, monkeypatch) -> None:
+    """registration 2026-11-03「量測追加三條」②：每列同一個窗、對 §5.2 觀察名單等權（排除本檔）的超額，lane 摘要與報告並印；
+    名單 T0 → 今天一行，取不到價的成員逐檔列出（INV-3）。"""
+    import engine_b.event_watch as ew
+
+    monkeypatch.setattr(ew, "_local_timezone", lambda: timezone(timedelta(hours=8)))
+    monkeypatch.setattr(OIST, "WATCHLIST_BENCHMARK", ("AAA", "MEM1", "MEM2", "WLX"))
+    monkeypatch.setattr(OIST, "WATCHLIST_T0", date(2026, 9, 29))
+    calls: list[str] = []
+
+    def counting(symbol: str, start: date):
+        calls.append(symbol)
+        return _loader(symbol, start)
+
+    out = _collect(tmp_path, price_loader=counting)
+    assert "WLX" in calls and "WLX" in out["price_budget"]["unpriced"]   # 名單每一檔都去抓；抓不到照列
+    row = _row(out, "paper", "AAA")                          # 09-29 → 10-02 ＋20%；名單排除本檔：MEM1 ＋10%、MEM2 0%、WLX 沒價
+    assert row["watchlist_return"] == pytest.approx(0.05) and row["excess_watchlist"] == pytest.approx(0.15)
+    summary = OIST.lane_summary(out["lanes"]["paper"]["rows"], lane="paper")
+    assert summary["watchlist_excess"]["n"] == sum(1 for r in out["lanes"]["paper"]["rows"] if "excess_watchlist" in r)
+    basket = out["watchlist_benchmark"]                       # 不排除任何一檔：AAA ＋20%、MEM1 ＋10%、MEM2 0%
+    assert basket["return"] == pytest.approx(0.10) and basket["members_used"] == 3 and basket["missing"] == ["WLX"]
+    text = "\n".join(OIST.render_lanes(out))
+    assert "第二基準 §5.2 觀察名單等權" in text and "取不到價：WLX" in text
+    assert "  - 對 §5.2 觀察名單等權超額（第二基準，只並印）：" in text
+
+
 def test_every_lane_prints_its_drawdown_line(collected) -> None:
     summary = OIST.lane_summary(collected["lanes"]["paper"]["rows"], lane="paper")
     assert set(summary["drawdown"]) == {"deep", "touched", "unknown", "tickers"}
@@ -525,8 +561,12 @@ def test_symbols_without_a_series_are_listed_not_silently_dropped(tmp_path, coll
     那幾列各自是 no_price_series 缺席，不是 0（INV-3）。"""
     many = {**BRIEFS, "NOPX": ([_Brief("ib_n1", "co:nopx", _at("2026-09-29"), candidate_state=_State("pass"))], [])}
     out = _collect(tmp_path, briefs=many)
-    assert collected["price_budget"]["unpriced"] == ["BACKX"]                     # 夾具裡 BACKX（回填的成交代號）本來就沒有序列
-    assert out["price_budget"]["unpriced"] == ["BACKX", "NOPX"]
+
+    def unpriced(o):                                     # 夾具不替第二基準的觀察名單給價（那 43 檔照樣被列進 unpriced）
+        return [s for s in o["price_budget"]["unpriced"] if s not in OIST.WATCHLIST_BENCHMARK]
+
+    assert unpriced(collected) == ["BACKX"]                                       # 夾具裡 BACKX（回填的成交代號）本來就沒有序列
+    assert unpriced(out) == ["BACKX", "NOPX"]
     assert _row(out, "paper", "NOPX")["absence_kind"] == "no_price_series"
 
 
@@ -541,7 +581,7 @@ def test_rate_limited_symbols_are_counted_apart_from_missing_ones(tmp_path, monk
     monkeypatch.setattr(OIST, "_provider_close_series", fake)
     out = _collect(tmp_path, price_loader=None)
     budget = out["price_budget"]
-    assert budget["rate_limited"] == ["MEM1"] and set(budget["unpriced"]) == {"BACKX", "MEM1"}
+    assert budget["rate_limited"] == ["MEM1"] and set(budget["unpriced"]) - set(OIST.WATCHLIST_BENCHMARK) == {"BACKX", "MEM1"}
     assert "被限流 1 檔" in "\n".join(OIST.render_lanes(out))
 
 
@@ -648,6 +688,9 @@ def test_heartbeat_section_four_prints_each_lane_and_snapshot_keys(tmp_path, col
     assert "追蹤表 history 0｜paper 2｜live 3（beta 事件 1 不進 lane）｜主題等權組 1 組（每列只比自己的組）" in text
     assert "敘事前已漲（paper）" in text
     assert "paper（第一份 v2 敘事日起）：2 檔｜量測起始 2026-09-29" in text and "對主題等權組超額" in text
+    assert text.count("｜對 §5.2 觀察名單超額 ") == 3                    # history 那一行＋paper／live 各一行（第二基準並印）
+    assert hb._watchlist_excess_text({}) == "artifact 還沒有這一格"                       # 舊 artifact：沒算 ≠ 算了沒有
+    assert hb._watchlist_excess_text({"watchlist_excess": {"n": 0, "of": 2, "mean": None}}) == "還沒有值（2 列量得到報酬）"
     # live 3 列只有 1 列算得出報酬（另兩列缺席）：三量的分母是 1，不是 3
     assert "live（trade_log 成交）：1 檔｜量測起始 2026-09-25" in text
     values = hb.collect_snapshot(now=datetime(2026, 10, 2, tzinfo=timezone.utc), state_dir=state_dir,

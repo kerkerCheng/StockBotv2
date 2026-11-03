@@ -57,6 +57,19 @@ POINTER = ROOT / "library" / "private" / "runtime_pointer.json"
 PRIMARY_BENCHMARK = "QQQ"
 REFERENCE_BENCHMARK = "SOXX"
 
+# 第二基準（registration 2026-11-03「量測追加三條」②；盲點修法 plan 2026-11-02-001 §2 最後一列）：主題等權組全是名冊成員，
+# 「超額」量的是名冊內選股，不是圖對外部世界的增量——所以並印對「§5.2 觀察名單」等權的超額。名單是 registration §5.2 在 T0
+# （2026-10-04）列、看任何價格之前列的 43 檔；之後追加的（10-05 IC 載板 6 檔、10-08 富世達）都不併入。**只並印**，不取代主題組
+# 超額與任何既有判讀線。名單的 SSOT 是 registration §5.2 那張表，`tests/test_measurement_lanes.py` 逐列核對兩邊一致。
+WATCHLIST_T0 = date(2026, 10, 4)
+WATCHLIST_BENCHMARK: tuple[str, ...] = (
+    "CRDO", "300502.SZ", "300394.SZ", "5803.T", "CIEN", "3450.TW", "6451.TW",
+    "267260.KS", "298040.KS", "010120.KS", "1519.TW", "1503.TW", "POWL", "HPS-A.TO", "CLF", "GEV", "ENR.DE", "BE", "NVTS",
+    "VRT", "3017.TW", "3324.TWO", "2308.TW", "8996.TW", "3653.TW", "MOD", "NVT",
+    "6515.TW", "6223.TWO", "3131.TWO", "3583.TW", "FORM", "CAMT", "BESI.AS", "042700.KS",
+    "MU", "000660.KS", "005930.KS", "SNDK", "285A.T", "2408.TW", "2344.TW", "3006.TW",
+)
+
 # 單位 sanity check 的可接受量級區間（Engine C 最新價 ÷ provider 最新價）。
 # 差一兩個交易日落在區間內；GBp/GBP 這種登記錯誤會是 ~100x，必然出界。
 UNIT_SANITY_RANGE = (0.5, 2.0)
@@ -774,6 +787,37 @@ def _apply_theme_cohort(rows: Sequence[dict], cohorts: Sequence[Any], series: Ma
         row["excess_theme_cohort"] = row["absolute_return"] - result["return"]
 
 
+def _watchlist_basket() -> Any:
+    """§5.2 觀察名單當成一個等權組（`cohort_return` 只讀 `members[].ticker／company_id`）；成員沒有 co:*，排除本檔只比代號。"""
+    from types import SimpleNamespace
+
+    return SimpleNamespace(members=tuple(SimpleNamespace(ticker=t, company_id=None) for t in WATCHLIST_BENCHMARK))
+
+
+def _apply_watchlist_benchmark(rows: Sequence[dict], series: Mapping[str, Mapping[date, float]]) -> None:
+    """第二基準：每列同一個窗（錨點到今天或賣出那天）的 §5.2 觀察名單等權報酬（排除本檔）與對它的超額——只並印。
+    量不到報酬、沒有窗、名單一檔都取不到價的列不寫（lane 摘要的 `of` 照數，n 少多少就是缺多少）。"""
+    from alpha.theme_cohort import cohort_return
+
+    basket = _watchlist_basket()
+    for row in rows:
+        if row.get("absolute_return") is None or not row.get("anchor_date") or not row.get("current_date"):
+            continue
+        result = cohort_return(basket, start=row["anchor_date"], end=row["current_date"], series=series,
+                               exclude_ticker=row.get("research_ticker") or row.get("ticker"))
+        if result["return"] is not None:
+            row["watchlist_return"] = result["return"]
+            row["excess_watchlist"] = row["absolute_return"] - result["return"]
+
+
+def watchlist_summary(series: Mapping[str, Mapping[date, float]], *, today: date) -> dict:
+    """§5.2 觀察名單等權 T0 → 今天（報告頭一行；取不到價的成員逐檔列出，INV-3）。"""
+    from alpha.theme_cohort import cohort_return
+
+    result = cohort_return(_watchlist_basket(), start=WATCHLIST_T0, end=today, series=series)
+    return {"t0": WATCHLIST_T0.isoformat(), "today": today.isoformat(), **result}
+
+
 def chase_count(rows: Sequence[Mapping[str, Any]]) -> dict:
     """錨點前 30 日漲幅大於錨點後的列數——history 叫「入圖前已漲」、paper 叫「敘事前已漲」。純函式。"""
     paired = [r for r in rows if r.get("pre_anchor_return") is not None and r.get("absolute_return") is not None]
@@ -844,6 +888,7 @@ def lane_summary(rows: Sequence[Mapping[str, Any]], *, lane: str) -> dict:
     """一條 lane 的三量＋等權＋對主題等權組的超額。**每條 lane 各算、分母分開**；空 lane 回 n 0（呈現端印「還沒有列」）。"""
     measured = [r for r in rows if r.get("absolute_return") is not None]
     excess = [r["excess_theme_cohort"] for r in measured if r.get("excess_theme_cohort") is not None]
+    watch_excess = [r["excess_watchlist"] for r in measured if r.get("excess_watchlist") is not None]
     anchors = [r["anchor_date"] for r in measured if r.get("anchor_date")]
     # 量得到報酬、卻沒有對組超額的列：依缺席種類逐檔列名（INV-3：filter 要報得出誰、為什麼）。
     # 標籤跟著缺席走（`alpha.theme_cohort.cohort_absence` 宣告；L16），消費端不另寫一份對照表。
@@ -871,6 +916,9 @@ def lane_summary(rows: Sequence[Mapping[str, Any]], *, lane: str) -> dict:
                                 "of": len(measured),
                                 "absent": {k: sorted(v) for k, v in sorted(cohort_absent.items())},
                                 "absent_labels": dict(sorted(absent_labels.items()))},
+        # 第二基準（registration 2026-11-03「量測追加三條」②）：對 §5.2 觀察名單等權的超額，只並印
+        "watchlist_excess": {"n": len(watch_excess), "of": len(measured),
+                             "mean": (sum(watch_excess) / len(watch_excess)) if watch_excess else None},
         "chase": chase_count(rows),
         "drawdown": drawdown_count(rows),
         "absences": sorted({str(r["absence_kind"]) for r in rows if r.get("absence_kind")}),
@@ -992,6 +1040,8 @@ def collect(*, no_benchmark: bool = False, today: date | None = None,
     for cohort in cohort_list:
         for member in cohort.members:
             want(member.ticker, earliest)
+    for symbol in WATCHLIST_BENCHMARK:      # 第二基準：固定 43 檔（registration §5.2），無人值守路徑不會讓它變多
+        want(symbol, min(earliest, WATCHLIST_T0))
     always = [PRIMARY_BENCHMARK, REFERENCE_BENCHMARK]
     order = always + [s for s in wanted if s not in always]
     failures: dict[str, str] = {}
@@ -1029,6 +1079,7 @@ def collect(*, no_benchmark: bool = False, today: date | None = None,
     for rows in lane_rows:
         _apply_benchmarks(rows, benchmarks)
         _apply_theme_cohort(rows, cohort_list, series, unavailable=cohort_unavailable)
+        _apply_watchlist_benchmark(rows, series)
     for entry in cohort_info.get("cohorts") or []:
         entry["missing_members"] = sorted(t for t in entry["members"] if not series.get(t))
     # 盲點修法 §2 第 10 條①：跌深的列名下反證有沒有被判觸及過。registry／lifecycle 讀不到就整格 None（不擋其餘）。
@@ -1049,6 +1100,7 @@ def collect(*, no_benchmark: bool = False, today: date | None = None,
                   "live": live},
         "benchmarks": benchmarks,
         "theme_cohort": cohort_info,
+        "watchlist_benchmark": watchlist_summary(series, today=today),
         # 取價那一段多一格 `closing_bars`（Phase 6 Step 6.7c）：基準也抓完了才算，所以在這裡補進去。
         "price_budget": {**budget, "closing_bars": summarize_bar_states(bar_states)},
         "today": today,
@@ -1508,6 +1560,14 @@ def render_lanes(collected: Mapping[str, Any]) -> list[str]:
     if cohort.get("parse_errors"):
         out.append(f"- ⚠ 主題等權組 ledger 有 {len(cohort['parse_errors'])} 行壞行（不靜默丟棄）："
                    + "；".join(cohort["parse_errors"][:3]))
+    watchlist = collected.get("watchlist_benchmark")
+    if watchlist:
+        missing = watchlist.get("missing") or []
+        out.append(f"- 第二基準 §5.2 觀察名單等權（T0 {watchlist['t0']} 列的 {len(WATCHLIST_BENCHMARK)} 檔；registration "
+                   f"2026-11-03 ②）：{watchlist['t0']} → {watchlist['today']} {_pct(watchlist.get('return'))}"
+                   f"（取得 {watchlist.get('members_used')}/{watchlist.get('members_total')}）"
+                   + (f"｜取不到價：{'、'.join(missing)}" if missing else "")
+                   + "——只並印，不取代主題組超額與任何判讀線")
     budget = collected.get("price_budget") or {}
     unpriced = budget.get("unpriced") or []
     limited = budget.get("rate_limited") or []
@@ -1553,6 +1613,10 @@ def render_lanes(collected: Mapping[str, Any]) -> list[str]:
         for kind, tickers in (excess.get("absent") or {}).items():
             label = (excess.get("absent_labels") or {}).get(kind, kind)
             out.append(f"  - 對組超額缺席 {len(tickers)} 列（{label}；{kind}）：{'、'.join(tickers)}")
+        watch = summary["watchlist_excess"]
+        out.append("  - 對 §5.2 觀察名單等權超額（第二基準，只並印）："
+                   + (f"{_pct(watch['mean'])}（{watch['n']}/{watch['of']} 列有值）" if watch["n"]
+                      else f"還沒有值（{watch['of']} 列量得到報酬）"))
         for title, key in (("現行狀態", "by_current_state"), ("錨點那天的狀態", "by_anchor_state")):
             for state, group in (summary.get(key) or {}).items():
                 out.append(f"  - {title} {state}：{group['n']} 列｜等權絕對 {_pct(group['aggregate']['absolute'])}"

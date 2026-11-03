@@ -122,6 +122,16 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 `StockBotv2-Daily` 的 ⑱⑲ 取代（1.2a 停用、2026-09-25 1.2b 刪除）；它們的理由（LLM 失敗心跳照發、永遠 exit 0、Python 不用 `.cmd`、
 發送走 subprocess）搬進 `crons/daily_task.py` 的 docstring，守它們的測試改主詞搬進 `tests/test_daily_task.py`「無人值守入口」節。
 
+### Sandbox impact review 結論（2026-11-03：追蹤表多兩格——跌深的反證觸及、§5.2 觀察名單第二基準；盲點修法 plan 2026-11-02-001 §2 第 10 條①與最後一列）
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | daily ⑤ `scripts/outcome_if_settled_today.py` 與 ⑬ `python -m webapp materialize --positions` 共用的 `collect()`（argv 都不變）：①**多讀三份本機檔**（commit `1e9922c6`；這份審查當時漏寫，在這裡補）——`library/leads/event_watches.json`（`ew.load_watches`）、`thesis/lifecycle.json`（`engine_b.disproof.load_lifecycle`）、本來就在讀的敘事 ledger；唯讀，讀不到整格記 None、不擋其餘列；②**取價多 43 個固定代號**（registration §5.2 的觀察名單，程式常數 `WATCHLIST_BENCHMARK`；與既有的列去重）——同一個 `yf.Ticker(...).history(...)`、同一組主機、無新憑證；名單是常數，無人值守路徑不會讓它自己變多（測試逐列核對 registration 那張表）。寫入：positions artifact 的每條 lane 摘要多 `drawdown`、`watchlist_excess` 兩鍵、每列多 `disproof_touched`、`watchlist_return`／`excess_watchlist`；報告多三行；契約不升版（先例：10-21 加 `by_current_state`）。心跳段 4 每條 lane 行多「對 §5.2 觀察名單超額」（只讀 artifact，舊 artifact 印「artifact 還沒有這一格」）。APP 成績單兩條線的摘要多一格（request path 不變：照抄 artifact） |
+| **2 canonical skill／prompt／本檔** | 本節；`docs/reports/phase7/registration.md` 2026-11-03「量測追加三條」②（登記先於本 change）；plan 2026-11-02-001 進度段。skill、prompt 不動 |
+| **3 最窄 rule** | daily argv 不變；不新增 step、allowlist、rule；APP 路由不變、仍無寫入端點；`.codex/rules` 仍 0 條 |
+| **4 contract test** | `tests/test_measurement_lanes.py`：跌深計數（恰在線上算、讀不到另計、量不到報酬不算）、反證觸及逐版取聯集且加碼條件不算、壞行／沒有 co:*／registry 或 lifecycle 讀不到記 None、每條有列的 lane 印一行；第二基準名單與 registration 表逐列相同（43 檔）、每列排除本檔、名單每一檔都去抓且抓不到照列、報告頭一行與 lane 子行、心跳三行並印且舊 artifact 照說；`tests/test_webapp_positions.py`：成績單摘要在主題組那一格之後並印。變異：第 10 條① 7／7、第二基準 8／8 紅 |
+| **5 端到端 smoke** | 11-03 真資料：`--no-benchmark` 試跑 182 檔全部抓到、0 檔被限流（40 秒）；觀察名單 43／43 取得，T0 → 11-03 −25.6%；paper 對它超額 +0.4%（138／138 列）、history −5.0%（22／22）；跌深 paper 36 列（反證曾被判觸及 1：AXTI）、history 6 列（0）。`materialize --positions` 42 秒；headless Edge 渲染成績單印出「比 §5.2 觀察名單 +0.4%（138/138 列）」、沒有載入錯誤 |
+
 ### Sandbox impact review 結論（2026-10-29：成績單取價不設上限；舊判斷與假設照別名表解析——使用者指示＋failure log #112）
 
 | 步 | 結論 |
