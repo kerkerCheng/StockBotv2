@@ -158,6 +158,9 @@ def build_parser() -> argparse.ArgumentParser:
     ap.add_argument("--company", default=None, help="--open-position 可選：新列的公司名")
     ap.add_argument("--also-at-other-broker", action="store_true",
                     help="--open-position：這個代號已在別家券商有列、真的是在新券商建倉時才給（預設拒收：多半是 --broker 給錯）")
+    ap.add_argument("--row-deleted", action="store_true",
+                    help="只配 --log-only：Sheet 那一列已由你自己刪掉（例：清倉後刪列）——不定位、不比對；必須明給 --currency，"
+                         "Sheet 還有那一列就拒收")
     ap.add_argument("--backfill-before-receipts", default=None, metavar="理由",
                     help="回填收據機制上線（2026-09-30）前的舊 alpha 成交：只准配 --log-only、成交日要早於上線日、必附理由；"
                          "收據標 backfilled、不讀今天的敘事")
@@ -459,6 +462,12 @@ def main(argv: list[str] | None = None) -> int:
         print(f"✗ --fx-to-base 必須是大於 0 的有限數（給的是 {args.fx_to_base}）：它是「1 成交幣等於多少 NAV 基準幣」",
               file=sys.stderr)
         return 2
+    if args.row_deleted and not args.log_only:
+        print("✗ --row-deleted 只配 --log-only（那一列已經不在 Sheet，本腳本沒有格子可寫）", file=sys.stderr)
+        return 2
+    if args.row_deleted and not (args.currency or "").strip():
+        print("✗ --row-deleted 必須明給 --currency——沒有那一列可以讀幣別，trade_log 的幣別是 append-only、不猜", file=sys.stderr)
+        return 2
     if args.open_position and (args.side != "buy" or args.log_only):
         print("✗ --open-position 只用在買進，而且要由本腳本寫 Sheet（不能配 --log-only）", file=sys.stderr)
         return 2
@@ -548,6 +557,18 @@ def main(argv: list[str] | None = None) -> int:
             shares_cell = cost_cell = None
             cash_cell = None if skip_cash else gsheets.locate_portfolio_cells([cash_request], values=sheet_values)[0]
             old_shares = old_cost = 0.0
+        elif args.row_deleted:
+            # 使用者自己刪了那一列（2026-11-03 成交紀錄遺留 ⑨）：沒有格子可定位。只確認它**真的不在**——還在就是一般的 --log-only。
+            if sheet_rows is None:
+                raise ValueError(f"Sheet 解析不了（{sheet_error}）——確認不了那一列真的刪了；修好再補記")
+            still = [str(r.get("ticker")) for r in sheet_rows
+                     if gsheets.canonical_symbol(str(r.get("ticker") or "")) == gsheets.canonical_symbol(args.symbol)
+                     and str(r.get("broker") or "").strip().casefold() == args.broker.strip().casefold()]
+            if still:
+                raise ValueError(f"Sheet 還有 {still[0]}（{args.broker}）那一列——不是刪掉的列；拿掉 --row-deleted，照一般 --log-only 記")
+            shares_cell = cost_cell = cash_cell = None
+            old_shares = old_cost = 0.0
+            skip_cash = True
         else:
             requests = [
                 {"match": {"symbol": args.symbol, "broker": args.broker}, "column": "shares"},
@@ -589,13 +610,16 @@ def main(argv: list[str] | None = None) -> int:
                            and str(r.get("broker") or "").strip().casefold() == args.broker.strip().casefold()]
             hint = (f"\n  代號請寫成 Sheet 的寫法 {same_broker[0]}（{args.broker} 那一列）" if same_broker else
                     f"\n  {args.symbol} 在 {'、'.join(elsewhere)} 有列——是不是 --broker 沒給對？" if elsewhere else
+                    "\n  那一列是你清倉後自己刪掉的？補記請加 --row-deleted --currency <成交幣別>" if args.log_only else
                     "\n  Sheet 還沒有這一列？首次建倉請加 --open-position --broker … --currency … --cash-column … --bucket …")
         print(f"✗ {'首次建倉：' if args.open_position else ''}{exc}{hint}", file=sys.stderr)
         return 2
     old_cash = 0.0 if skip_cash else _number(cash_cell["current"])
 
     new_shares = old_shares + signed_shares
-    if new_shares < 0:
+    # --log-only 的 Sheet 已是成交後的狀態：拿它當「成交前」再扣一次沒有意義（2026-11-03 成交紀錄遺留 ⑩ 同一件事——
+    # 清倉後把股數改成 0 再補記，原本被這裡以「會變負數」擋下）。
+    if new_shares < 0 and not args.log_only:
         print(f"✗ 賣出 {args.shares} 股會使持股變成 {new_shares}，中止", file=sys.stderr)
         return 2
     if args.side == "buy":
@@ -635,19 +659,32 @@ def main(argv: list[str] | None = None) -> int:
         else:
             print(f"  {cash_a1:<16} {args.cash_column:<15} {old_cash:,.2f} → {new_cash:,.2f}"
                   f"{'   ← 插列後下移一列' if cash_a1 != cash_cell['a1'] else ''}")
+    elif args.row_deleted:
+        print("\nSheet 那一列：已由你刪除（--row-deleted）——不定位、不比對、不寫；只記事件")
+    elif args.log_only:
+        # 不印「舊 → 新」（2026-11-03 成交紀錄遺留 ⑩）：Sheet 已是成交後的狀態，拿它當「舊」再算一次「新」是錯的數字，
+        # 照著手改就算兩次。現金也不印（第三次覆核 F2：日圓成交配預設 cash_usd 會印出不適用的數字）。
+        print(f"\nSheet 那一列現在：shares {old_shares:g}｜avg_cost {old_cost:g}（{shares_cell['a1']}、{cost_cell['a1']}）")
+        print("  （--log-only：現金格不比對、不寫；Sheet 由你手動更新——不印「舊 → 新」）")
     else:
-        print(f"\n將變更的儲存格（僅此{'兩' if skip_cash or args.log_only else '三'}格，其餘欄位不動）：")
+        print(f"\n將變更的儲存格（僅此{'兩' if skip_cash else '三'}格，其餘欄位不動）：")
         print(f"  {shares_cell['a1']:<16} shares          {old_shares:g} → {new_shares:g}")
         print(f"  {cost_cell['a1']:<16} avg_cost        {old_cost} → {new_cost}"
               f"   ← 由本腳本計算，非通知逐字值")
-        if args.log_only:
-            # --log-only 不碰現金格、也不比現金欄幣別——印出現金的前後對照會被照著手改（第三次覆核 F2：
-            # 日圓成交配預設 cash_usd 會印出 H21 18,700 → −16,300 這種不適用的數字）。
-            print("  （--log-only：現金格不比對、不寫；Sheet 由你手動更新）")
-        elif skip_cash:
+        if skip_cash:
             print("  （現金列不改：--cash-column none，金流不經 Sheet 現金列，由使用者另行更新）")
         else:
             print(f"  {cash_cell['a1']:<16} {args.cash_column:<15} {old_cash:,.2f} → {new_cash:,.2f}")
+
+    if plan is None and not args.log_only:
+        refused = _manual_value_refusal(gsheets, sheet_values, shares_cell["a1"])
+        if refused:
+            print(refused, file=sys.stderr)
+            return 2
+    refused = _fx_sanity(args, sheet_rows, opening=plan is not None)
+    if refused:
+        print(refused, file=sys.stderr)
+        return 2
 
     # 兩道硬擋：dry-run 也擋（讓人在 --apply 之前就看到會被擋），override 留收據。
     verdict = _hard_cap_verdict(args, sheet_rows, sheet_error)
@@ -763,12 +800,12 @@ def main(argv: list[str] | None = None) -> int:
                 "recorded_at": _now(),
                 "sheet_writes": [],
                 "sheet_update": "manual_by_user",
+                **({"sheet_row": "deleted_by_user"} if args.row_deleted else {}),
                 **receipt,
             }
         )
         print(f"\n✓ 事件已記於 {_shown(TRADE_LOG)}；"
-              "Sheet 未被改動（已由使用者手動更新）。")
-        print("  上方 diff 僅供對照，不是待執行的變更。")
+              f"Sheet 未被改動（{'那一列已由你刪除' if args.row_deleted else '已由使用者手動更新'}）。")
         return 0
 
     if not skip_cash and new_cash < 0:
@@ -842,20 +879,24 @@ def main(argv: list[str] | None = None) -> int:
     except Exception as exc:  # noqa: BLE001 — 網路類：可能已套用、也可能沒有——回讀決定，不猜（R2 覆核 blocking #3）
         print(f"\n✗ 寫入回應失敗（{type(exc).__name__}: {str(exc)[:200]}）", file=sys.stderr)
         if not opened:
-            print("  ⚠ 既有列路徑沒有還原：部分儲存格可能已寫入——請手動核對 "
-                  + "、".join(w["a1"] for w in writes) + "；事件紀錄沒有寫。", file=sys.stderr)
-            return 2
-        outcome = _cash_outcome(gsheets, cash_a1, old=cash_cell["current"], new=new_cash)
-        if outcome == "old":
-            print("  回讀現金格仍是寫入前的值——現金沒動，刪掉新列還原：", file=sys.stderr)
-            return _rollback(gsheets, opened, fill, plan)
-        if outcome != "new":
-            print(f"  ⚠⚠ 無法確認：第 {opened['row']} 列新建倉已在，現金格 {cash_a1} 回讀是 {outcome!r}"
-                  f"（預期 {cash_cell['current']} 或 {new_cash}）。不刪、不記事件——請手動核對 Sheet。", file=sys.stderr)
-            return 2
-        confirmed_note = "現金寫入回應失敗，回讀確認已套用（新列與現金都寫進 Sheet）"
-        print(f"  {confirmed_note}——照常記事件。", file=sys.stderr)
-        result = {"written": [{"a1": cash_a1, "from": cash_cell["current"], "to": new_cash, "confirmed_by_readback": True}]}
+            # 既有列（2026-11-03 成交紀錄遺留 ①）：逐格回讀決定——沒寫／全寫／寫一半就往前補，認不得才請人看。
+            settled = _settle_partial_write(gsheets, writes)
+            if settled["status"] != "landed":
+                return 2
+            confirmed_note, result = settled["note"], {"written": settled["written"]}
+        else:
+            outcome = _cash_outcome(gsheets, cash_a1, old=cash_cell["current"], new=new_cash)
+            if outcome == "old":
+                print("  回讀現金格仍是寫入前的值——現金沒動，刪掉新列還原：", file=sys.stderr)
+                return _rollback(gsheets, opened, fill, plan)
+            if outcome != "new":
+                print(f"  ⚠⚠ 無法確認：第 {opened['row']} 列新建倉已在，現金格 {cash_a1} 回讀是 {outcome!r}"
+                      f"（預期 {cash_cell['current']} 或 {new_cash}）。不刪、不記事件——請手動核對 Sheet。", file=sys.stderr)
+                return 2
+            confirmed_note = "現金寫入回應失敗，回讀確認已套用（新列與現金都寫進 Sheet）"
+            print(f"  {confirmed_note}——照常記事件。", file=sys.stderr)
+            result = {"written": [{"a1": cash_a1, "from": cash_cell["current"], "to": new_cash,
+                                   "confirmed_by_readback": True}]}
     written = list(opened["written"] if opened else []) + list(result["written"])
     _append_trade(
         {
@@ -888,21 +929,156 @@ def _shifted_a1(a1: str, insert_at: int | None) -> str:
     return f"{sheet}!{letters}{row + 1 if row >= insert_at else row}"
 
 
-def _cash_outcome(gsheets, a1: str, *, old: str, new: float) -> str:
-    """寫入丟例外後回讀現金格：`old`＝沒寫進去、`new`＝已寫進去、其他＝回傳讀到的原值（或讀不到的理由）。"""
+def _manual_value_refusal(gsheets, sheet_values: list, shares_a1: str) -> str | None:
+    """既有列改股數之前：那一列的公式欄有沒有手寫值（2026-11-03 成交紀錄遺留 ⑥）。回拒收訊息，或 None。
+
+    手寫市值的列改了股數、市值不跟著變——NAV 與 5% 上限都量錯，而且回讀抓不到（數字照樣 > 0）。多讀一次公式原文，
+    只拿來比形狀（同 `--open-position`）；公式讀不到或那一列對不上＝印「沒能確認」、照常進行——跟上線前一樣，不新增一種失敗。"""
+    import re
+
+    hit = re.search(r"(\d+)$", str(shares_a1 or ""))
+    row = int(hit.group(1)) if hit else None
     try:
-        now = gsheets.read_cell_value(a1)
+        formulas = gsheets.read_portfolio_values(formulas=True)
+    except Exception as exc:  # noqa: BLE001 — 沒能確認，不是「沒有手寫值」
+        print(f"\n⚠ 沒能確認市值是不是公式（公式讀不到：{type(exc).__name__}）——照常進行；"
+              "那一列若是手寫市值，改了股數市值也不會跟著變")
+        return None
+    manual = gsheets.manual_formula_columns(sheet_values, formulas, row=row) if row else None
+    if manual is None:
+        print(f"\n⚠ 沒能確認市值是不是公式（{f'第 {row} 列' if row else shares_a1}在兩次讀取裡對不上，或不是持股列）——照常進行")
+        return None
+    if manual:
+        return (f"✗ Sheet 第 {row} 列的 {'、'.join(manual)} 是手寫值（不是公式）——股數一改，它不會跟著變，NAV 與 5% 上限都會量錯。"
+                "先把那幾格改回公式再記；或你手動改好 Sheet 後用 --log-only 只記事件。未寫入任何東西")
+    return None
+
+
+def _fx_sanity(args: argparse.Namespace, sheet_rows: list | None, *, opening: bool) -> str | None:
+    """`--fx-to-base` 的合理性（2026-11-03 成交紀錄遺留 ⑧）：用同一列「市值 ÷ 股數 ÷ 成交價」反推匯率比對。回拒收訊息，或 None。
+
+    只看買進（賣出不量硬擋、匯率不用）、成交幣 ≠ 基準幣、給了匯率。比值超出 0.5–2 倍就拒收：倒數（日圓、台幣）與小數點位移都差
+    十倍以上，價格一天的漂移遠小於兩倍。⚠ 接近 1 的幣別（歐元對美元）給成倒數只差兩成，抓不到——也不會把硬擋量錯很多。
+    `--log-only` 只提醒（成交可能是很久以前，價差大）；首次建倉沒有同一列，照實說沒能核對。"""
+    if args.side != "buy" or args.fx_to_base is None:
+        return None
+    base = next((str(r.get("base_currency") or "").strip().upper() for r in (sheet_rows or []) if r.get("base_currency")), None)
+    if not base or base == args.currency:
+        return None
+    if opening:
+        print("\n（沒能核對 --fx-to-base：首次建倉沒有同一列可反推匯率）")
+        return None
+    from fetchers.gsheets import canonical_symbol
+
+    row = next((r for r in (sheet_rows or [])
+                if canonical_symbol(str(r.get("ticker") or "")) == canonical_symbol(args.symbol)
+                and str(r.get("broker") or "").strip().casefold() == args.broker.strip().casefold()), None)
+
+    def finite(value) -> float | None:
+        try:
+            number = float(value)
+        except (TypeError, ValueError):
+            return None
+        return number if math.isfinite(number) and number > 0 else None
+
+    value, shares = finite((row or {}).get("market_value_base")), finite((row or {}).get("shares"))
+    if value is None or shares is None or not args.price > 0:
+        print("\n（沒能核對 --fx-to-base：Sheet 那一列沒有可反推的市值或股數）")
+        return None
+    implied = value / shares / args.price
+    ratio = args.fx_to_base / implied
+    line = (f"--fx-to-base {args.fx_to_base:g}，同一列反推約 {implied:.3g}（市值 {value:,.2f} {base} ÷ {shares:g} 股 ÷ "
+            f"成交價 {args.price:g} {args.currency}）")
+    if 0.5 <= ratio <= 2.0:
+        print(f"\n匯率核對：{line}——差不到兩倍，照用")
+        return None
+    gap = f"高 {ratio:,.0f} 倍" if ratio > 1 else f"低 {1 / ratio:,.0f} 倍"
+    if args.log_only:
+        print(f"\n⚠ 匯率核對：{line}——{gap}（--log-only 只提醒：成交可能是很久以前、價差大）")
+        return None
+    return (f"✗ 匯率核對沒過：{line}——{gap}（容許 0.5–2 倍）。常見是給成倒數或小數點位移；確認 1 {args.currency} 等於多少 "
+            f"{base} 再跑。未寫入任何東西")
+
+
+_COUNT_WORD = {1: "一", 2: "兩", 3: "三"}
+
+
+def _cell_outcome(gsheets, a1: str, *, old: str, new: float) -> tuple[str, str]:
+    """寫入丟例外後回讀一格：(kind, 讀到的字串或讀不到的理由)。
+
+    kind：`old`＝還是寫入前的值；`new`＝已是新值（顯示值容許四捨五入，`gsheets.display_matches`）；`same`＝新舊數值相同，
+    寫沒寫都一樣；`ambiguous`＝新舊顯示一樣、數值不同，分不出寫了沒；`other`＝都不是（含讀不到、讀不成數字）。"""
+    try:
+        now = str(gsheets.read_cell_value(a1))
     except Exception as exc:  # noqa: BLE001
-        return f"讀不到（{type(exc).__name__}）"
+        return "other", f"讀不到（{type(exc).__name__}）"
+    is_old = now.strip() == str(old).strip()
+    if not is_old:
+        try:
+            is_old = _number(now) == _number(old)        # 只差千分位之類的格式
+        except ValueError:
+            pass
+    is_new = gsheets.display_matches(now, new)
+    if is_old and is_new:
+        try:
+            return ("same" if abs(_number(old) - float(new)) < 1e-9 else "ambiguous"), now
+        except ValueError:
+            return "ambiguous", now
+    return ("old" if is_old else "new" if is_new else "other"), now
+
+
+def _cash_outcome(gsheets, a1: str, *, old: str, new: float) -> str:
+    """建倉路徑：寫入丟例外後回讀現金格——`old`＝沒寫進去、`new`＝已寫進去、其他＝回傳讀到的原值（或讀不到的理由）。
+    判定與既有列路徑同一個（`_cell_outcome`）；分不出的一律回原值，交給呼叫端請人看。"""
+    kind, now = _cell_outcome(gsheets, a1, old=old, new=new)
+    return kind if kind in ("old", "new") else now
+
+
+def _settle_partial_write(gsheets, writes: list[dict]) -> dict:
+    """既有列路徑：寫入丟網路例外後逐格回讀決定（2026-11-03 成交紀錄遺留 ①；原本一律印「請手動核對」）。
+
+    全舊＝一格都沒寫進去（可照原命令重跑：寫入前逐格比對，伺服器稍後才套用時重跑會被擋下）；全新＝已套用、照常記；
+    寫一半＝**往前補**其餘格（expected 是寫入前的值，照舊逐格重讀），回讀全新才記——不往回還原：Sheet 讀回的是格式化後的字串，
+    分數股寫回會失真，而往前補的每一格都是這筆成交本來就要寫的值。認不得或分不出的格一律請人看、不補寫、不記。
+    回 `{"status": "landed", "note", "written"}`，或 `{"status": "absent"|"unknown"}`（訊息已印）。"""
+    cells = "、".join(w["a1"] for w in writes)
+
+    def describe(rows) -> str:
+        return "；".join(f"{w['a1']} 回讀 {now!r}（寫入前 {w['expected']!r}、要寫 {w['value']}）" for w, _kind, now in rows)
+
+    readings = [(w, *_cell_outcome(gsheets, w["a1"], old=w["expected"], new=w["value"])) for w in writes]
+    odd = [r for r in readings if r[1] in ("other", "ambiguous")]
+    if odd:
+        print(f"  ⚠⚠ 回讀認不得：{describe(odd)}——不補寫、不記事件；請手動核對 {cells}", file=sys.stderr)
+        return {"status": "unknown"}
+    pending = [w for w, kind, _ in readings if kind == "old"]
+    landed = [w for w, kind, _ in readings if kind == "new"]
+    confirmed = [{"a1": w["a1"], "from": w["expected"], "to": w["value"], "confirmed_by_readback": True} for w in writes]
+    if not pending:
+        note = f"寫入回應失敗，回讀確認已套用（{_COUNT_WORD.get(len(writes), len(writes))}格都是新值）"
+        print(f"  {note}——照常記事件。", file=sys.stderr)
+        return {"status": "landed", "note": note, "written": confirmed}
+    if not landed:
+        print(f"  {_COUNT_WORD.get(len(writes), len(writes))}格回讀都還是寫入前的值——一格都沒寫進去；事件紀錄沒有寫。"
+              "可以照原命令重跑 --apply（寫入前逐格比對：伺服器若稍後才套用，重跑會被比對擋下、不會重複寫）。", file=sys.stderr)
+        return {"status": "absent"}
+    print(f"  回讀發現寫了一半：{'、'.join(w['a1'] for w in landed)} 已是新值、{'、'.join(w['a1'] for w in pending)} 還是舊值"
+          f"——補寫其餘 {len(pending)} 格（寫入前照舊逐格比對）", file=sys.stderr)
     try:
-        value = _number(now)
-    except ValueError:
-        return now
-    if abs(value - _number(old)) < 0.005:
-        return "old"
-    if abs(value - float(new)) < 0.005:
-        return "new"
-    return now
+        gsheets.write_portfolio_cells([dict(w) for w in pending])
+    except Exception as exc:  # noqa: BLE001 — 含 StaleCellError（同時被手改）：停在寫了一半，請人看
+        print(f"  ⚠⚠ 補寫失敗（{type(exc).__name__}: {str(exc)[:160]}）——Sheet 可能停在寫了一半；請手動核對 {cells}"
+              f"（要寫的值：{'、'.join(f'{w['a1']}＝{w['value']}' for w in writes)}）；事件紀錄沒有寫。", file=sys.stderr)
+        return {"status": "unknown"}
+    check = [(w, *_cell_outcome(gsheets, w["a1"], old=w["expected"], new=w["value"])) for w in writes]
+    bad = [r for r in check if r[1] not in ("new", "same")]
+    if bad:
+        print(f"  ⚠⚠ 補寫後回讀不是新值：{describe(bad)}——請手動核對 {cells}；事件紀錄沒有寫。", file=sys.stderr)
+        return {"status": "unknown"}
+    note = (f"寫入回應失敗，回讀發現寫了一半（{'、'.join(w['a1'] for w in landed)} 已套用）；"
+            f"補寫其餘 {len(pending)} 格（{'、'.join(w['a1'] for w in pending)}）並回讀確認")
+    print(f"  {note}——照常記事件。", file=sys.stderr)
+    return {"status": "landed", "note": note, "written": confirmed}
 
 
 def _rollback(gsheets, opened, fill, plan=None) -> int:

@@ -40,6 +40,7 @@ if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
 from identity.execution import get_execution_aliases as _neutral_execution_aliases
+from identity.symbols import canonical_symbol as _canonical_symbol
 
 try:
     from dotenv import load_dotenv
@@ -327,17 +328,49 @@ _SYMBOL_CURRENCY = (
 )
 
 
-def canonical_symbol(symbol: str) -> str:
-    """比對同一檔用，照 Sheet 市值公式的規則（公式把它們當同一檔，比對也要）；正規化的方向一律是**公司名冊的寫法**：
-    大寫；`TPE:XXXX` 與裸的台股數字代號補成 `XXXX.TW`；日股 `TYO:XXXX` 補成 `XXXX.T`（R2 覆核 2026-09-30：只處理台股時，
-    同一檔日股的兩種寫法被當成兩檔——同券商開出重複列、5% 上限少算已持有；同日使用者定案 Sheet 改用名冊寫法，
-    這裡跟著以名冊寫法為準，不為 Sheet 另做別名）。"""
-    s = symbol.strip().upper()
-    if re.fullmatch(r"TPE:[0-9]{4,6}[A-Z]?", s):
-        s = s[4:]
-    if re.fullmatch(r"TYO:[0-9]+", s):
-        return s[4:] + ".T"
-    return f"{s}.TW" if re.fullmatch(r"[0-9]{4,6}[A-Z]?", s) else s
+#: 比對同一檔的正規化（規則與理由見 `identity/symbols.py`；2026-11-03 批次三 D 搬家——資本硬擋也要用同一條，
+#: `risk/` 不為一條字串規則 import I/O 層）。這裡是同一個函式物件。
+canonical_symbol = _canonical_symbol
+
+
+def display_matches(display: Any, value: float) -> bool:
+    """Sheet 讀回的**顯示值**（FORMATTED_VALUE）是不是 `value` 四捨五入後的樣子（2026-11-03 批次三 D，成交紀錄遺留 ①④）。
+
+    容許的誤差＝顯示到最後一位的半個單位：`0.33` 容 0.005、`100` 容 0.5、`1.2E+03` 容 50。分數股在 Sheet 顯示兩位時，
+    寫進去的 0.3333 讀回是 `0.33`——用 1e-9 比就認不出自己剛寫的值（④）。千分位逗號照去；**讀不成數字一律不算**
+    （`$3,000`、`Loading...`、空字串——不猜它是什麼，交給呼叫端當「認不得」）。"""
+    from decimal import Decimal, InvalidOperation
+
+    text = str(display if display is not None else "").replace(",", "").strip()
+    try:
+        shown = Decimal(text)
+    except InvalidOperation:
+        return False
+    if not shown.is_finite():
+        return False
+    exponent = shown.as_tuple().exponent
+    return abs(float(shown) - float(value)) <= 0.5 * 10.0 ** int(exponent) + 1e-9
+
+
+def manual_formula_columns(values: list[list[Any]], formulas: list[list[Any]], *, row: int) -> list[str] | None:
+    """第 `row` 列在「公式欄」裡寫的是手寫值的那幾欄（2026-11-03 批次三 D，成交紀錄遺留 ⑥）。
+
+    公式欄＝持股列（非 CASH）裡 ≥ 三分之二是公式的欄——與 `plan_new_position` 判標準公式同一條多數規則。
+    手寫市值的列改了股數、市值不跟著變，NAV 與 5% 都量錯；呼叫端拿到非空 list 就拒絕改股數。
+    回 None＝**沒能確認**（兩次讀取欄位對不上、那一列不在表裡、那一列是 CASH）——不是「沒有手寫值」。"""
+    if not values or not formulas:
+        return None
+    headers = [str(h).strip().lower() for h in values[0]]
+    if [str(h).strip().lower() for h in formulas[0]] != headers or "bucket" not in headers:
+        return None
+    if not 1 < row <= len(values) or row > len(formulas):
+        return None
+    if str(_cell(values, headers, row, "bucket")).strip().upper() == "CASH":
+        return None
+    positions = [r for r in range(2, len(values) + 1) if str(_cell(values, headers, r, "bucket")).strip().upper() != "CASH"]
+    formula_columns = [h for h in headers
+                       if sum(str(_cell(formulas, headers, r, h)).startswith("=") for r in positions) * 3 >= len(positions) * 2]
+    return [h for h in formula_columns if not str(_cell(formulas, headers, row, h)).startswith("=")]
 
 
 def _symbol_currency_problem(symbol: str, currency: str) -> str | None:
@@ -561,10 +594,11 @@ def _is_our_row(values: list[list[Any]], row: int, fill: Mapping[str, Any]) -> b
     headers = [str(h).strip().lower() for h in (values[0] if values else [])]
     if not {"symbol", "broker", "shares"} <= set(headers) or not 1 < row <= len(values):
         return False
+    # 股數比**顯示值**（2026-11-03 成交紀錄遺留 ④）：Sheet 讀回的是格式化後的字串，分數股顯示兩位時 0.3333 讀回 `0.33`，
+    # 原本比 1e-9 就認不出自己剛寫的那一列——開列失敗後的回讀判成「不是我們的」，該刪的新列留在 Sheet。
     try:
-        shares_ok = abs(float(str(_cell(values, headers, row, "shares")).replace(",", "") or 0)
-                        - float(fill.get("shares") or 0)) < 1e-9
-    except ValueError:
+        shares_ok = display_matches(_cell(values, headers, row, "shares"), float(fill.get("shares") or 0))
+    except (TypeError, ValueError):
         return False
     return (str(_cell(values, headers, row, "symbol")).strip() == str(fill.get("symbol", "")).strip()
             and str(_cell(values, headers, row, "broker")).strip().casefold()

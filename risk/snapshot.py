@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any, Mapping, Sequence
 
 from identity.registry import IdentityRegistry, get_registry
+from identity.symbols import canonical_symbol
 
 
 def _finite(value: Any, *, non_negative: bool = False) -> float | None:
@@ -79,8 +80,10 @@ def build_portfolio_components(
             "unclassified_instruments": [],
         }
     registry = registry or get_registry()
+    # 別名表與查表兩邊都正規化（2026-11-03 成交紀錄遺留 ③ 的對稱面）：Sheet 一列寫 `TPE:00631L` 時原本查不到、
+    # 被算成 alpha——槓桿 ETF 的 nominal／effective 少算，硬擋與觀測一起量錯。
     aliases = {
-        str(alias).upper(): instrument
+        canonical_symbol(str(alias)): instrument
         for instrument in policy["instruments"]
         for alias in instrument["sheet_aliases"]
     }
@@ -126,7 +129,7 @@ def build_portfolio_components(
         if is_cash:
             cash += value
             continue
-        instrument = aliases.get(ticker)
+        instrument = aliases.get(canonical_symbol(ticker))
         if instrument is None:
             alpha_total += value
             issuer = _direct_issuer_key(row, registry=registry)

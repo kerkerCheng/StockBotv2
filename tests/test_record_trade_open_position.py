@@ -310,7 +310,8 @@ def test_one_trade_reads_the_sheet_once_and_every_stage_gets_that_copy(monkeypat
     monkeypatch.setattr(gsheets, "fetch_portfolio", lambda *, strict_operational=False, values=None:
                         seen.append(values) or _sheet_rows())
     assert module.main(_BUY + ["--apply"]) == 0
-    assert calls["reads"] == [False]                                  # 值只讀一次
+    # 值只讀一次；2026-11-03（成交紀錄遺留 ⑥）起既有列多讀一次公式原文——只比形狀、判那一列有沒有手寫市值，不做數字決定
+    assert calls["reads"] == [False, True]
     assert seen == [[["symbol"]]] and calls["located_with"] == [[["symbol"]]]   # 解析與定位拿的是同一份
 
 
@@ -955,7 +956,8 @@ def test_log_only_does_not_print_a_cash_diff_that_does_not_apply(monkeypatch, tm
     assert module.main(["--symbol", "AXTI", *_ROW, "--currency", "JPY", "--fx-to-base", "0.0068", "--log-only"]) == 0
     out = capsys.readouterr().out
     assert "--log-only：現金格不比對、不寫" in out and "cash_usd" not in out
-    assert "僅此兩格" in out                                          # 第四次覆核 NB3：標題不說三格
+    # 第四次覆核 NB3 原本驗標題說「兩格」；2026-11-03（成交紀錄遺留 ⑩）起 --log-only 整個不印「將變更的儲存格」，只印現值
+    assert "將變更的儲存格" not in out and "三格" not in out and "Sheet 那一列現在" in out
 
 
 def test_a_wrong_currency_hint_also_asks_to_check_the_row(monkeypatch, tmp_path, capsys) -> None:

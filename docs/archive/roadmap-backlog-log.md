@@ -164,3 +164,9 @@ spawn 任何 reviewer／workflow 前先跑它。**真資料 11-01：** 今天的
 換了成員 0 次（不在範圍）。**現行 89 份 v2：②0、④0、沒比成 0**（與 10-29 重量一致）。測試 `tests/test_narrative_stale_24.py` 12 條；
 `tests/test_todo_ledger.py` 夾具與兩條隨改；變異：拿掉 ⑫ → 3 紅、只比騎的那份不比現行格 → 2 紅、改比成員 → 2 紅、拿掉判讀比對 → 4 紅。
 查證：`python -m crons.heartbeat` 段 3／短版 ⑤ 的「敘事該重寫」；候選板 artifact 的 `reading_change_check`。
+
+**原「已交付列留下的遺留小項」第一條（逐字；2026-11-03 交付後移出 ROADMAP）：**
+
+- **成交紀錄（`record_trade.py`）**——R2 覆核 non-blocking、都不會寫錯 Sheet 金額：①既有列路徑寫到一半丟網路例外時沒有還原（要用同一套「例外後回讀比對」）；②5% 單筆硬擋的已持有加總按原字串不按 `canonical_symbol`（只在手寫 `TYO:` 列再用 `--also-at-other-broker` 時觸發）；③beta 判別不先正規化；④分數股在 Sheet 四捨五入時，開列失敗後的回讀認不出自己那一列；⑥手寫市值的列加碼後市值不跟著變（2026-10-01 起 Sheet 沒有這種列）；⑧`--fx-to-base` 沒有合理性檢查（用同一列 `market_usd／shares` 反推隱含匯率比對）；⑨使用者自己刪列後想用 `--log-only` 補記，沒有合法旗標；⑩`--log-only` 仍印股數與成本對照（純顯示）。
+
+**✅ 交付 2026-11-03（批次三 D；R2 覆核見 plan D 節）：** ①既有列寫入丟網路例外 → 逐格回讀四分（舊值／新值／同值／分不出或認不得）：全舊＝沒寫進去、可照原命令重跑；全新＝照常記並標 `sheet_write_note`；寫一半＝補寫其餘格（expected 是寫入前的值、照舊逐格重讀）、回讀全新才記——往前補、不往回還原（讀回的是格式化字串，分數股寫回會失真）；認不得或分不出＝請人看、不補寫、不記。②③`canonical_symbol` 搬到 `identity/symbols.py`（`fetchers.gsheets.canonical_symbol` 是同一個函式物件），已持有加總、`beta_instrument_for`、`risk/snapshot.py` 的別名表、`portfolio/policy.py` 的別名唯一性四處都比正規化後的寫法。④`_is_our_row` 股數比顯示值（`display_matches`：容許顯示最後一位的半個單位，讀不成數字一律不算）；建倉路徑的現金回讀改用同一個判定。⑥既有列多讀一次公式原文，用建倉同一條多數規則判那一列的公式欄有沒有手寫值，有就拒絕（dry-run 也擋）；讀不到或對不上＝印「沒能確認」照常進行。⑧買進、成交幣 ≠ 基準幣時，同一列「市值 ÷ 股數 ÷ 成交價」反推匯率，比值超出 0.5–2 拒收（`--log-only` 只提醒、建倉印沒能核對）；接近 1 的幣別給成倒數抓不到。⑨`--row-deleted`（只配 `--log-only`、必給 `--currency`、Sheet 還有那一列拒收；事件多記 `sheet_row: deleted_by_user`）。⑩`--log-only` 只印現值；順帶拿掉 `--log-only` 的「會變負數」檢查（Sheet 已是成交後，清倉後改成 0 再補記原本被擋）。**真資料（Sheet 唯讀）：** 19 列持股手寫市值 0、沒能確認 0；寫法與正規化不同的列 0、beta 判別原字串與正規化都 14 列；8 列非 USD 的反推匯率對 yfinance 比值 0.983–1.000；乾跑 0050.TW 正確匯率照用、給倒數 32.6 → exit 2（高 983 倍）。

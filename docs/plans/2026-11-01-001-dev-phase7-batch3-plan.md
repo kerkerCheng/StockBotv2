@@ -14,8 +14,8 @@
 | A | 邊緣門檻的遲滯與「在門檻上」計數器 ○ | 撤回建議只在**連續兩次**判定都非邊緣後才出現；候選板、心跳、closure-gate 多一格「在門檻上」 | Z1／R1 | ✅ 11-01（回放 K=1 撤回建議 5 → K=2 4＋1 待確認；真資料在門檻上 20、待確認 0） |
 | B | 週額度常駐計數器 ○ | daily 短版 ④ 每天印週額度與 5 小時用量；互動 fan-out 前有命令可讀同一個數 | Z1／R1 | ✅ 11-01（兩窗都記；④ 每天一行＋摘要行旗（≥ 80% 只印不擋）；`python -m crons.llm_quota [--probe]`；真資料：daily 06:30 的紀錄 7 天 86%、探針 12:00 當下 **99%**） |
 | C | 敘事 stale 計數器 ◐（剩 ②④＋寫入端拒收） | ②騎的讀圖 kind 變了、④供給側家數變了也列「該重寫」；寫入端拒收一字不改的換版 | Z1–Z2／R1 | ✅ 11-03（回放 497 版：⑫ 會擋下 30 次換騎——判讀變了 1＝AEVA、家數變了 29；現行 89 份 ②0 ④0） |
-| D | 成交紀錄遺留 ①②③④⑥⑧⑨⑩ | `scripts/record_trade.py` 的八個已知小洞 | Z1／**R2**（資本路徑） | ◐ 11-03 實作完成；**R2 NO_GO（B1、B2）→ AWAITING_HUMAN**；程式在分支 `dev/batch3-d`、未合併（D 節在該分支） |
-| E | 海外財報來源 ◐（剩 ②20-F） | 20-F 年度封面股數進 Engine C；ADS 比率要使用者選就停 | Z2／R1 | ◐ **PLAN_PROPOSAL → AWAITING_HUMAN**（兩個要你選：HIMX 的 ADS 比率住哪、年報申報人算不算已定價①） |
+| D | 成交紀錄遺留 ①②③④⑥⑧⑨⑩ | `scripts/record_trade.py` 的八個已知小洞 | Z1／**R2**（資本路徑） | ◐ R2 NO_GO（B1、B2）→ 使用者 11-03「D 照修法做＋負數價格一起擋」→ 施工中（分支 `dev/batch3-d`） |
+| E | 海外財報來源 ◐（剩 ②20-F） | 20-F 年度封面股數進 Engine C；ADS 比率要使用者選就停 | Z2／R1 | ◐ 使用者 11-03「E 1A 2A」→ 施工中 |
 
 > **2026-11-01 12:10 停在 B 之後：** B 自己的探針量到週額度 **99%**（11-02 23:00 重置；daily 06:30 的紀錄是 86%，白天互動 session 吃掉
 > 13 個百分點）。C（Z1–Z2 真資料回放）、D（資本路徑，收尾要一位 R2 reviewer）、E 都會再吃同一個池子，而 11-02 05:30 的 daily 起跑在重置之前
@@ -157,9 +157,68 @@ freshness_identity）；`engine_b/todo_ledger.py`（`BEHIND_KINDS` 兩格、`COV
 **真資料：** materialize 後 `reading_change_check` ok、沒比成 0、②0 ④0；⑤「敘事該重寫 6 檔（watch 醒 12 條；已回落 1（AXTI））」照舊、
 沒有沒算註記；serve 重啟（/6）health stale=false。
 
-## D 成交紀錄遺留 ①②③④⑥⑧⑨⑩（指路）
+## D 成交紀錄遺留 ①②③④⑥⑧⑨⑩
 
-實作、測試、真資料與 R2 回報都在分支 `dev/batch3-d`（commit `6f75730b`）的本檔「## D」節——R2 NO_GO 之後不自動修、不合併（AGENTS「協作與邊界」）。兩條 blocking：**B1** `--row-deleted` 配買進讓 5% 上限與槓桿 cap 恆判 pass；**B2**「一格都沒寫進去」的訊息宣稱重跑不會重複寫（錯：伺服器稍後套用時重跑算兩次）。修法方向與 non-blocking N1–N8 見該節末。
+```
+INTAKE
+Zoom: Z1（`scripts/record_trade.py` 既有列寫入的例外分支、顯示與兩個新旗標；`fetchers/gsheets.py` 兩個純函式與 `_is_our_row`；
+      `risk/hard_caps.py`、`risk/snapshot.py` 的代號比對改走同一條正規化；`canonical_symbol` 搬到 `identity/symbols.py`）
+Review: R2（資本路徑：硬擋的已持有加總與 beta 判別、Sheet 寫入的例外分支、trade_log 的新欄位——六條 trigger 命中「資本／append-only」）
+Case: 2026-09-30 R2 四輪覆核留下的 non-blocking（原在 ROADMAP「已交付列留下的遺留小項」第一條，交付後移到已交付索引「成交紀錄遺留八項」）
+```
+
+**現況（2026-11-03 唯讀）：** 八項都還在——①既有列路徑丟網路例外只印「請手動核對」；②`_held_value_for_symbol` 比原字串；③`beta_instrument_for`
+與 `risk/snapshot.py` 的別名表比原字串（`TPE:0050`、`TPE:00631L` 被當 alpha——後者的槓桿 cap 沒比）；④`_is_our_row` 股數比 1e-9；
+⑥既有列不讀公式；⑧`--fx-to-base` 只驗 > 0；⑨沒有旗標；⑩`--log-only` 照印「舊 → 新」。
+
+**判法（每項一句）：**
+- ① 例外後逐格回讀，每格分四種：還是舊值、已是新值、新舊顯示一樣分不出（`ambiguous`；新舊數值真的相同時是 `same`，無害）、其他（含讀不到）。
+  全舊＝沒寫進去（exit 2，可照原命令重跑——寫入前逐格比對，伺服器稍後才套用時重跑會被擋下）；全新＝記事件並標 `sheet_write_note`；
+  寫一半＝**補寫其餘格**（expected 是寫入前的值，照舊逐格重讀），回讀全新才記；其他或分不出＝請手動核對、不補寫、不記。
+  **往前補、不往回還原**：Sheet 讀回的是格式化後的字串，分數股寫回會失真；而往前補的每一格都是這筆成交本來就要寫的值。
+- 顯示值比對統一成 `gsheets.display_matches(display, value)`：容許的誤差＝顯示到最後一位的半個單位（`0.33` 容 0.005、`100` 容 0.5）；
+  讀不成數字一律不算（`$3,000`、`Loading...`、空字串）。建倉路徑的現金回讀（`_cash_outcome`）改用同一個判定。
+- ②③ `canonical_symbol` 搬到 `identity/symbols.py`（純函式；`risk/` 不為一條字串規則 import I/O 層），`fetchers.gsheets.canonical_symbol`
+  是同一個函式物件；已持有加總、beta 判別、snapshot 別名表三處兩邊都正規化。
+- ④ `_is_our_row` 的股數比對改 `display_matches`。
+- ⑥ 既有列（非 `--log-only`）多讀一次公式，用建倉同一條多數規則（≥ 三分之二的持股列是公式的欄＝公式欄）判那一列有沒有手寫值；
+  有就拒絕（dry-run 也擋，exit 2）——股數一改、手寫的市值不跟著變，NAV 與 5% 都量錯。公式讀不到或那一列對不上＝印「沒能確認」、照常進行
+  （跟上線前一樣，不新增一種失敗）。`--log-only` 不擋：Sheet 已由使用者手動改好。
+- ⑧ 買進、成交幣 ≠ 基準幣、給了 `--fx-to-base` 時，用同一列（代號正規化＋券商）的「市值 ÷ 股數 ÷ 成交價」反推匯率；比值超出 [0.5, 2]
+  就拒收（exit 2，印反推值）——日圓、台幣的倒數與小數點位移都差十倍以上，價格一天的漂移遠小於兩倍；**接近 1 的幣別（歐元對美元）
+  給成倒數只差兩成、抓不到**，也不會把硬擋量錯很多。`--log-only` 只警告（成交可能是很久以前）；首次建倉沒有同一列，印「沒能核對」。
+- ⑨ `--row-deleted`：只配 `--log-only`、必須明給 `--currency`（沒有那一列可以讀幣別）、Sheet 還有那一列就拒收；不定位；事件多記
+  `sheet_row: deleted_by_user`。`--log-only` 定位不到時的提示多一行指路。
+- ⑩ `--log-only` 改印「Sheet 那一列現在：shares …｜avg_cost …」，不印「舊 → 新」。
+
+**四問：** ①根除（①⑧⑨ 把「請手動核對」「沒檢查」「沒有旗標」換成機械判定；②③④ 同一檔的兩種寫法、四捨五入的顯示當同一件事）。②程式。
+③加的是比對與一個旗標；拿掉的是 ⑩ 的對照與 ① 的「一律請人看」。④最先壞掉的那一筆：**⑧ 一筆價格當天漂移超過兩倍的成交**（不會發生在
+加碼既有列的常態；真的發生時拒收訊息印出反推值，改正匯率或換用 `--log-only` 都走得通）；**⑥ 一列手寫市值的持股**（2026-10-01 起 Sheet
+沒有這種列——唯讀查證見下）。
+
+**落地（2026-11-03）：** `identity/symbols.py`（新；`canonical_symbol` 搬家）；`fetchers/gsheets.py`（`display_matches`、`manual_formula_columns`、
+`_is_our_row` 比顯示值、`canonical_symbol` 改成同一個函式物件）；`risk/hard_caps.py`（已持有加總、beta 判別兩邊正規化）、`risk/snapshot.py`
+（別名表與查表正規化）、`portfolio/policy.py`（別名唯一性在正規化後成立）；`scripts/record_trade.py`（`--row-deleted`、`_manual_value_refusal`、
+`_fx_sanity`、`_cell_outcome`／`_cash_outcome`／`_settle_partial_write`、`--log-only` 的顯示與負數檢查）。文件：OPERATIONS「記錄成交」、
+ROADMAP（遺留小項移出、已交付索引一行；原文逐字封存 archive）。
+**測試：** `tests/test_record_trade_leftovers.py` 36 條；`test_record_trade_open_position.py` 兩處隨改（既有列多讀一次公式＝`[False, True]`；
+`--log-only` 不再印「僅此兩格」標題）。**變異 10 種各自轉紅：** 顯示值退回 1e-9（4）、已持有比原字串（1）、beta 判別比原字串（1）、snapshot 比原字串（1）、
+不查手寫值（3）、「那一列還在」比不到（1）、寫入例外退回一律請人看（7）、不核對匯率（5）、同值當成沒寫（1）、policy 唯一性比原字串（1）。
+**真資料（Sheet 唯讀）：** ⑥ 19 列持股手寫值 0、沒能確認 0；②③ 寫法與正規化不同的列 0、beta 判別原字串與正規化都 14 列；⑧ 8 列非 USD 的反推匯率
+（市值 ÷ 股數 ÷ yfinance 最新收盤）對 yfinance 匯率比值 0.983–1.000；乾跑 0050.TW（TAISHIN）`--fx-to-base 0.0307` 照用、給倒數 32.6 → exit 2（高 983 倍），
+trade_log 沒動。① 在真 Sheet 上不做故障注入（要真的寫），只靠替身的五種情形。
+
+**R2（2026-11-03，乾淨 context 的唯讀 reviewer；全套 4613 passed；變異數字與本節一致）：NO_GO → AWAITING_HUMAN（不自動修）。**
+- **B1** `--row-deleted` 配買進：那一列已刪＝已持有 0，`--log-only` 又不加成交額——5% 上限與槓桿 cap 恆判 pass，超過上限的買進不用 override
+  就寫進 append-only 的 trade_log（探針：8% NAV 的買進 exit 0、`post_trade_weight=0.0`；TQQQ 同樣 pass）。主 agent 對照程式碼確認成立。
+  修法方向：`--row-deleted` 只收賣出（文件寫的用途就是清倉後刪列），或買進一律 `unmeasurable`、要 `--override --reason`。
+- **B2** ①「一格都沒寫進去」的訊息說照原命令重跑「會被比對擋下、不會重複寫」——錯：重跑會重讀 Sheet，伺服器稍後才套用時，套用後的值
+  被當成寫入前，比對照過、股數與現金算兩次（探針：10 → 20 → 30）。建倉路徑早有 `ABSENT_RECHECK_SECONDS` 隔幾秒再讀，既有列沒做對稱面（L17）。
+  修法方向：absent 時照建倉路徑再讀一次；訊息改成「重跑前先核對這幾格仍是寫入前的值」；OPERATIONS、本節、archive 三處同步。
+- non-blocking：N1 `--row-deleted` 沒要求明給 `--broker`（預設 IB 寫進 append-only）；N2 `TPE:2330`／`TPE:00631L` 寫法改照 beta_policy 分類
+  （宣稱改成「沒有放寬，只有依 policy 修正分類」；真 Sheet 0 列受影響）；N3 手寫值檢查沒防兩次讀取之間插列（該比對公式表那一列的 symbol／broker）；
+  N4 手寫值檢查涵蓋所有公式欄、訊息只講市值；N5 建倉路徑的現金回讀在新舊顯示相同時改判「分不出」（較安全，沒有測試）；N6 `fetchers/build_dashboard.py`
+  的槓桿別名沒正規化（只影響 Sheet 顯示）；N7 既有的洞：`--price`／`--shares` 沒驗 > 0（負價格讓硬擋 delta 為負而 pass）——另登記；N8 文件已註明的限制。
 
 ## E 海外財報來源 ②20-F 年度封面股數——PLAN_PROPOSAL（AWAITING_HUMAN）
 

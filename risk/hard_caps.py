@@ -32,6 +32,7 @@ import math
 from dataclasses import asdict, dataclass, field
 from typing import Any, Mapping, Sequence
 
+from identity.symbols import canonical_symbol
 from portfolio.policy import load_beta_policy
 from risk.policy import load_policy
 from risk.snapshot import build_portfolio_components
@@ -110,9 +111,11 @@ def beta_instrument_for(symbol: str, beta_policy: Mapping[str, Any]) -> Mapping[
     **alpha／beta 界線的唯一判別**（Phase 3 Step 3.6 匯出，使用者 2026-09-29 #17：只匯出、行為不變）：
     硬擋用它決定哪條 cap 適用，候選板用它把 beta 持股排出「已持有」——兩邊是同一條線，不各抄一份（L16）。
     """
-    key = symbol.strip().upper()
+    # 兩邊都正規化（2026-11-03 成交紀錄遺留 ③）：`TPE:0050`、`TPE:00631L` 與 `0050.TW`、`00631L.TW` 是同一檔——
+    # 原本比原字串，前者被當成 alpha：槓桿 ETF 的 cap 沒比、只比 5%。
+    key = canonical_symbol(symbol)
     for instrument in beta_policy["instruments"]:
-        if key in {str(alias).upper() for alias in instrument["sheet_aliases"]}:
+        if key in {canonical_symbol(str(alias)) for alias in instrument["sheet_aliases"]}:
             return instrument
     return None
 
@@ -127,10 +130,12 @@ def is_beta_symbol(symbol: str, beta_policy: Mapping[str, Any] | None = None) ->
 
 
 def _held_value_for_symbol(rows: Sequence[Mapping[str, Any]], symbol: str) -> float:
-    key = symbol.strip().upper()
+    # 同一檔的兩種寫法一起加（2026-11-03 成交紀錄遺留 ②）：Sheet 一列 `TYO:7803`、成交寫 `7803.T` 時原本 held＝0，
+    # 5% 上限少算已持有。跨券商照舊一起加。
+    key = canonical_symbol(symbol)
     total = 0.0
     for row in rows:
-        if str(row.get("ticker") or "").strip().upper() != key:
+        if canonical_symbol(str(row.get("ticker") or "")) != key:
             continue
         value = _finite(row.get("market_value_base"))
         if value is not None:

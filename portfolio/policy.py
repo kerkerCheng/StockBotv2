@@ -6,6 +6,8 @@ import math
 from pathlib import Path
 from typing import Any, Mapping
 
+from identity.symbols import canonical_symbol
+
 
 DEFAULT_POLICY_PATH = Path(__file__).resolve().parents[1] / "config" / "beta_policy.json"
 DEFAULT_TARGET_ALLOCATION_PATH = (
@@ -224,9 +226,12 @@ def validate_beta_policy(source: Mapping[str, Any]) -> dict[str, Any]:
         if ticker not in sheet_aliases:
             raise BetaPolicyError("canonical ticker must be one sheet alias")
         for alias in sheet_aliases:
-            if alias in alias_owner and alias_owner[alias] != ticker:
+            # 比對一律走正規化後的寫法（`identity.symbols.canonical_symbol`；2026-11-03 起 beta 判別與 snapshot 都是），
+            # 所以「唯一」也要在正規化之後成立：`0050` 歸一檔、`0050.TW` 歸另一檔時，判別會安靜地取第一個。
+            key = canonical_symbol(alias)
+            if key in alias_owner and alias_owner[key] != ticker:
                 raise BetaPolicyError("sheet alias belongs to multiple instruments")
-            alias_owner[alias] = ticker
+            alias_owner[key] = ticker
         benchmark_key = _text(raw.get("benchmark_key"), "benchmark_key").casefold()
         benchmark_symbol = _text(raw.get("benchmark_symbol"), "benchmark_symbol").upper()
         existing_symbol = benchmark_symbols.setdefault(benchmark_key, benchmark_symbol)
