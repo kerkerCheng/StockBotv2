@@ -127,6 +127,16 @@ RA packet 的「入圖後證據等級會變的邊」（`loader.merge_side_effect
 個股讀取模型「替代難度」的旁註。**只印**：不改任何 sub、不改走圖母體、不進 Q1；**不進 `EdgeView.key()`**，所以不進讀圖的
 `result_digest` 與 staleness 快照列——字表升版或補一段引文不會讓讀圖變 stale。
 
+**人工核准的屬性決議走到讀圖**（2026-11-04；brainstorm 2026-10-28 F19）：`collapse_assertions` 逐屬性取最高 confidence 之後，
+再套 `library/resolutions/` 的核准決議（`query.bottleneck.approved_resolutions`；壞檔照 schema 驗證 fail closed）。決議怎麼對上衝突、
+候選集合換了算不算 stale，唯一 owner 仍是 `loader.edge_resolution` 的 `build_edge_states`＋`build_projection`——這裡只把
+EdgeAssertion 列轉成它的輸入形狀再呼叫。`choose_value` 換值（sub 旗標跟著換成給出那個值、confidence 最高的那一筆），其餘三種
+action 印「核准決議不給值」；邊帶 `resolved`（屬性 → action），結構表列 `resolved_attributes`、`query.structure` 的格子標「（核准）」。
+**不讀邊上的 `r.attributes`**：loader 每次重載都覆寫它，只重投影部分邊的遷移會讓它漂移（10-23 遷移後 9 條；failure log #126）。
+as-of 視圖（`project_assertions_as_of`）在列上帶 `projection_as_of`，只套核准日不晚於它的決議（INV-6）。`resolved` 不進
+`EdgeView.key()`——值真的變了讀圖才 stale。候選集合已換（stale）或還沒決議（open）的衝突照舊取最高 confidence，投影那邊不給值，
+兩邊對這種衝突仍不一致（11-04：0 條）。
+
 ---
 
 ## 4. 管道層（Engine B discovery → 入庫）

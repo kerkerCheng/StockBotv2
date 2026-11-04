@@ -41,8 +41,10 @@ import os
 import re
 from collections import Counter, defaultdict
 from dataclasses import dataclass, field
-from datetime import date
+from datetime import date, datetime
 from functools import lru_cache
+from pathlib import Path
+from types import MappingProxyType
 from typing import Any, Iterable, Mapping
 
 # 向下（找瓶頸）的邊型：只有這些的 substitutability 有意義。
@@ -578,15 +580,164 @@ class CanonicalEdge:
     #: 為 true（持股過半、合資共同控制、母子公司——逐字寫得出比例或母子關係）。少數股權不是（見 `related_parties`）。
     #: 其他關係恆為 False。不進 digest。
     control: bool = False
+    #: 哪幾格的值來自**人工核准的屬性決議**（F19，2026-11-04）：`CanonicalEdge` 欄位名 → 決議的 action
+    #: （`choose_value`／`unknown`／`split_scope`／`move_to_observation`）。值是 None、這裡又有那一格＝**決議判不給值**，
+    #: 不是「沒有文件發言過」——缺席由產生它的程式宣告（L16）。不進 digest：digest 讀的是值，值變了才算變。
+    resolved: dict = field(default_factory=dict)
 
 
-def collapse_assertions(rows: Iterable[Mapping[str, Any]]) -> dict[tuple, CanonicalEdge]:
+#: 斷言列上的時點標記：`project_assertions_as_of` 寫、`collapse_assertions` 讀（F19）。as-of 視角下的決議也要照
+#: 「T 那天核准了沒」篩——只篩斷言、不篩決議，T 那天的讀圖就會用上 T 之後才核准的值（INV-6）。標記跟著列走（L16），
+#: 呼叫端不必記得另傳日期。
+AS_OF_ROW_KEY = "projection_as_of"
+
+#: 決議覆寫得到的屬性：斷言上的屬性名 → `CanonicalEdge` 的欄位（＝`collapse_assertions` 收斂的那五格）。
+RESOLVABLE_ATTRIBUTES: dict[str, str] = {
+    "substitutability": "substitutability",
+    "sole_source": "sole_source",
+    "qualification_status": "qualification_status",
+    "ramp_execution": "ramp_execution",
+    "structural_lead_time_weeks": "lead_time_weeks",
+}
+
+
+def _canonical_value(field_name: str, value: Any) -> Any:
+    """收斂與決議共用的一份型別規則：sub／ramp／交期取整數（布林與非數字＝None）、sole_source 取布林、合格狀態照抄。"""
+    if value is None:
+        return None
+    if field_name in ("substitutability", "ramp_execution", "lead_time_weeks"):
+        return int(value) if isinstance(value, (int, float)) and not isinstance(value, bool) else None
+    if field_name == "sole_source":
+        return bool(value)
+    return value
+
+
+def approved_resolutions(resolution_dir: str | Path | None = None) -> Mapping[str, Mapping[str, Any]]:
+    """人工核准的屬性決議（`library/resolutions/*.json`；讀法只有 `loader.edge_resolution.load_resolutions` 一份，會驗 schema）。
+
+    依檔名、mtime、大小快取——同一個程序重讀不必重驗，檔案一變就重讀。驗不過就丟例外（fail closed）：
+    決議壞掉時寧可讀圖停下，也不靜默退回逐文件取最高 confidence——那正是 F19 的錯。"""
+    from loader.edge_resolution import DEFAULT_RESOLUTION_DIR
+
+    directory = Path(resolution_dir or DEFAULT_RESOLUTION_DIR)
+    if not directory.exists():
+        return {}
+    signature = tuple(sorted((p.name, p.stat().st_mtime_ns, p.stat().st_size) for p in directory.glob("*.json")))
+    return _load_resolutions_cached(str(directory), signature)
+
+
+@lru_cache(maxsize=4)
+def _load_resolutions_cached(directory: str, signature: tuple) -> Mapping[str, Mapping[str, Any]]:
+    from loader.edge_resolution import load_resolutions
+
+    return MappingProxyType(load_resolutions(directory))
+
+
+def _approved_on(resolution: Mapping[str, Any]) -> date:
+    return datetime.fromisoformat(str(resolution["approved_at"]).replace("Z", "+00:00")).date()
+
+
+def resolved_attribute_values(
+    rows: Iterable[Mapping[str, Any]],
+    resolutions: Mapping[str, Mapping[str, Any]],
+    *,
+    as_of: date | None = None,
+) -> dict[tuple, dict[str, tuple[str, Any]]]:
+    """`(src, relation, dst)` → `{CanonicalEdge 欄位: (action, 值)}`：人工核准、而且仍對得上這批列的候選集合的屬性決議。
+
+    判定全部交給決議那一側的唯一 owner——`query.edge_conflicts.build_edge_states` 算候選集合與雜湊、
+    `loader.edge_resolution.build_projection` 決定核准值（與寫回圖上 `r.attributes` 的是同一個函式）；這裡只把讀圖用的
+    列轉成它要的形狀（L16：不在讀圖這一側另造一套）。候選集合變了（決議過期）就不套——那一格照舊逐文件取最高
+    confidence，過期決議由健康審查點名。`as_of`：只套核准日不晚於那天的決議（INV-6）；候選集合也是那天看得到的那一批，
+    兩道條件都要過。`choose_value` 給選定的值；`unknown`／`split_scope`／`move_to_observation` 給 None（決議判不給值）。
+    """
+    from loader.edge_resolution import build_projection
+    from loader.load_to_neo4j import edge_key as make_edge_key
+    from query.edge_conflicts import build_edge_states
+
+    applicable = {cid: r for cid, r in resolutions.items() if as_of is None or _approved_on(r) <= as_of}
+    if not applicable:
+        return {}
+    wanted = {str(r.get("edge_key")) for r in applicable.values()}
+    triples: dict[str, tuple[str, str, str]] = {}
+    assertions: list[dict[str, Any]] = []
+    for row in rows:
+        src, rel, dst, aid = row.get("src"), row.get("relation"), row.get("dst"), row.get("assertion_id")
+        if not (is_entity_id(src) and is_entity_id(dst) and rel and aid):
+            continue
+        key = make_edge_key(str(src), str(rel), str(dst))
+        if key not in wanted:
+            continue
+        triples[key] = (str(src), str(rel), str(dst))
+        # `source_ids` 要照實帶：決議的驗證會核對「支持的來源 id」是不是這些候選自己的（`fetch_assertions` 有取這一欄）。
+        assertions.append({
+            "id": str(aid), "edge_key": key, "src_id": str(src), "relation": str(rel), "dst_id": str(dst),
+            "attributes": parse_attributes(row.get("attributes")), "confidence": row.get("confidence"),
+            "source_ids": list(row.get("source_ids") or []), "source_doc_id": row.get("source_doc_id"),
+            "origin_entity": row.get("origin"), "evidence_tier": None, "published_at": row.get("published_at"),
+        })
+    if not assertions:
+        return {}
+    projection = build_projection(build_edge_states(assertions), applicable)
+    out: dict[tuple, dict[str, tuple[str, Any]]] = {}
+    for key, edge in projection.items():
+        for attribute, meta in edge["attribute_resolution_meta"].items():
+            field_name = RESOLVABLE_ATTRIBUTES.get(attribute)
+            if field_name is None or meta.get("status") != "approved":
+                continue
+            out.setdefault(triples[key], {})[field_name] = (str(meta["action"]), edge["attributes"].get(attribute))
+    return out
+
+
+def _sub_winner(rows: Iterable[Mapping[str, Any]], key: tuple, value: int | None) -> str | None:
+    """決議值的 sub 旗標跟著**決議選的那個值**走（Phase 6 Step 6.5 的同一條規則）：同一條邊上給出這個值的 assertion 裡
+    confidence 最高的那筆（同分先到者贏，與收斂一致）；決議判不給值＝None。"""
+    if value is None:
+        return None
+    best, best_conf = None, -1.0
+    for row in rows:
+        if (str(row.get("src")), str(row.get("relation")), str(row.get("dst"))) != key:
+            continue
+        sub = _canonical_value("substitutability", parse_attributes(row.get("attributes")).get("substitutability"))
+        conf = float(row.get("confidence") or 0.0)
+        if sub == value and conf > best_conf:
+            best, best_conf = (str(row["assertion_id"]) if row.get("assertion_id") else None), conf
+    return best
+
+
+def _apply_resolutions(grouped: dict[tuple, CanonicalEdge], rows: list[Mapping[str, Any]],
+                       resolutions: Mapping[str, Mapping[str, Any]]) -> None:
+    """核准決議蓋過逐文件的最高 confidence（F19）。列帶 `AS_OF_ROW_KEY` 就只套那天之前核准的（多個標記取最早的一天）。"""
+    if not resolutions or not grouped:
+        return
+    marks = [row[AS_OF_ROW_KEY] for row in rows if row.get(AS_OF_ROW_KEY) is not None]
+    overrides = resolved_attribute_values(rows, resolutions, as_of=min(marks) if marks else None)
+    for key, fields in overrides.items():
+        edge = grouped.get(key)
+        if edge is None:
+            continue
+        for field_name, (action, value) in sorted(fields.items()):
+            setattr(edge, field_name, _canonical_value(field_name, value))
+            edge.resolved[field_name] = action
+            if field_name == "substitutability":
+                edge.sub_assertion_id = _sub_winner(rows, key, edge.substitutability)
+
+
+def collapse_assertions(rows: Iterable[Mapping[str, Any]], *,
+                        resolutions: Mapping[str, Mapping[str, Any]] | None = None) -> dict[tuple, CanonicalEdge]:
     """把 EdgeAssertion 收斂成 canonical edge。
 
     同一條 (src, relation, dst) 可能有多份文件各講一次。**取最高 confidence 那一份的
     屬性值，不加總、不平均**——加總會讓分數變成 ingestion 量的函數；平均會讓一份低品質
     文件稀釋一份一手 filing。`documents` 記下份數但不參與排序。
+
+    **人工核准的屬性決議蓋過上面那條規則**（F19，2026-11-04）：文件之間對同一格說法不一、使用者核准過怎麼判的，
+    印核准的值（`choose_value`）或不給值（其餘 action），`resolved` 記下是哪幾格。之前讀圖、走圖、結構表都只讀逐文件
+    取最高 confidence，24 個核准決議裡 9 個印出來的和決議不同（同一條邊兩個值、下游各讀一個，L12）。
+    `resolutions` 不給＝讀 `library/resolutions` 現值（`approved_resolutions()`）；給 `{}`＝不套任何決議。
+    列帶 `AS_OF_ROW_KEY`（as-of 投影）時只套核准日不晚於那天的決議（INV-6）。
     """
+    rows = list(rows)
     grouped: dict[tuple, CanonicalEdge] = {}
     # ⚠ **逐屬性**記最佳 confidence，不是整條邊記一個。首版對整條邊只取
     # 「confidence 最高那份 assertion」的全部屬性，於是若該份剛好沒填
@@ -634,25 +785,15 @@ def collapse_assertions(rows: Iterable[Mapping[str, Any]]) -> dict[tuple, Canoni
             edge.origin_assertions.setdefault(str(row["origin"]), []).append(
                 (row.get("assertion_id") or None, doc_id or None, row.get("origin_linkage") or None))
 
-        sub = attrs.get("substitutability")
-        if _take(key, edge, "substitutability",
-                 int(sub) if isinstance(sub, (int, float)) and not isinstance(sub, bool) else None,
-                 conf):
-            edge.sub_assertion_id = str(row["assertion_id"]) if row.get("assertion_id") else None
-        ramp = attrs.get("ramp_execution")
-        _take(key, edge, "ramp_execution",
-              int(ramp) if isinstance(ramp, (int, float)) and not isinstance(ramp, bool) else None,
-              conf)
-        lt = attrs.get("structural_lead_time_weeks")
-        _take(key, edge, "lead_time_weeks",
-              int(lt) if isinstance(lt, (int, float)) and not isinstance(lt, bool) else None,
-              conf)
-        _take(key, edge, "qualification_status", attrs.get("qualification_status"), conf)
-        if attrs.get("sole_source") is not None:
-            _take(key, edge, "sole_source", bool(attrs["sole_source"]), conf)
+        # 型別規則與決議共用一份（`_canonical_value`）：assertion 上的屬性名 → 邊的欄位照 `RESOLVABLE_ATTRIBUTES`。
+        for attribute, field_name in RESOLVABLE_ATTRIBUTES.items():
+            if (_take(key, edge, field_name, _canonical_value(field_name, attrs.get(attribute)), conf)
+                    and field_name == "substitutability"):
+                edge.sub_assertion_id = str(row["assertion_id"]) if row.get("assertion_id") else None
         # 控制是聯集（任一份文件寫出控制就是）：它是關係人判定的輸入，不是最可信那份的屬性值（E9）。
         if rel == "acquired" or (rel == "invests_in" and attrs.get("control") is True):
             edge.control = True
+    _apply_resolutions(grouped, rows, approved_resolutions() if resolutions is None else resolutions)
     return grouped
 
 
@@ -893,6 +1034,8 @@ def _table_row(edge, registry, upward, *, without_sub_language: list[str] | None
         # 這一列印的 sub 是哪一筆給的、那一筆的引文撐不撐得住（只印、不改 sub、不改順序）。
         "sub_assertion_id": edge.sub_assertion_id,
         "sub_language_in_quote": sub_language_in_quote,
+        # 哪幾格是人工核准的決議（F19）：欄位名 → action。值是 None 而這裡有那一格＝決議判不給值，不是未填。
+        "resolved_attributes": dict(sorted(edge.resolved.items())),
     }
 
 
@@ -903,8 +1046,11 @@ def structure_table(
     quotes_by_assertion: Mapping[str, Iterable[str]],
     sub_language_flags: Mapping[str, bool] | None = None,
     sub_language_label: str | None = None,
+    resolutions: Mapping[str, Mapping[str, Any]] | None = None,
 ) -> dict[str, Any]:
     """輸出「公司 × 向下邊」的結構表，附鏈路、需求錨點與證據等級。**不排序、不設門檻、不給首選。**
+
+    `resolutions`：照傳給 `collapse_assertions`（不給＝讀 `library/resolutions` 現值；F19）。
 
     ⚠ 2026-09-23（Step 0b.3）：這裡原本是 `rank_bottlenecks()`——同一批列、外加排序鍵、
     `min_substitutability` 門檻、兩份序與 top-N。那些整組退役；列上的每一格與 `anchor_gaps`／
@@ -925,7 +1071,7 @@ def structure_table(
     from query.sub_language import canonical_sub_language
 
     rows = list(rows)
-    canonical = collapse_assertions(rows)
+    canonical = collapse_assertions(rows, resolutions=resolutions)
     without_by_edge: dict[tuple, list[str]] | None = None
     if sub_language_flags is not None:
         without_by_edge = defaultdict(list)
@@ -1025,7 +1171,8 @@ def fetch_assertions(session) -> list[dict[str, Any]]:
                d.origin_entity AS origin, d.source_type AS source_type,
                d.origin_linkage AS origin_linkage,
                e.source_doc_id AS source_doc_id, d.published_at AS published_at,
-               d.retrieved_at AS retrieved_at, e.id AS assertion_id
+               d.retrieved_at AS retrieved_at, e.id AS assertion_id,
+               e.source_ids AS source_ids
         """
     ).data()
 
@@ -1094,6 +1241,9 @@ def project_assertions_as_of(
     **未定日一律排除並計數**——「我找不到日期」不等於「它在 T 之前」（L11-5）。
     把未定日當成可用等於讓回測看到未來，而那是回測最沒有價值的失敗方式：
     它會給出一個好看且完全不可信的結果。
+
+    留下的列是**副本**、多帶 `AS_OF_ROW_KEY`（F19）：收斂時據它只套那天之前核准的決議。不改傳進來的列——
+    當前視角與 as-of 視角常共用同一份快取（`alpha.providers.graph_neo4j`）。
     """
     kept: list[Mapping[str, Any]] = []
     future = undated = dated = 0
@@ -1106,7 +1256,7 @@ def project_assertions_as_of(
         if published > as_of:
             future += 1
             continue
-        kept.append(row)
+        kept.append({**row, AS_OF_ROW_KEY: as_of})
     return AsOfProjection(as_of=as_of, rows=tuple(kept), excluded_future=future,
                           excluded_undated=undated, dated_total=dated)
 

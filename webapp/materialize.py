@@ -1099,7 +1099,16 @@ def build_structure_table_artifact(result: Mapping[str, Any], *, registry: Any,
             "sole_source_states": {
                 "true": "有文件說這條邊是唯一來源（強弱看 evidence：供應商自稱只算弱印證）",
                 "false": "有文件說有第二來源",
-                "null": "圖上沒有任何文件對這條邊的 sole_source 發言過——**未填不是否**",
+                "null": "圖上沒有任何文件對這條邊的 sole_source 發言過——**未填不是否**；"
+                        "這一列的 `resolved_attributes` 有 sole_source 時則是人工核准的決議判不給值",
+            },
+            # 列上 `resolved_attributes`（F19，2026-11-04）：哪幾格的值來自人工核准的屬性決議（欄位名 → action）。
+            # 字義照 `skills/evidence-conflict-resolution/SKILL.md` 第 4 步的判準。
+            "resolved_attributes": {
+                "choose_value": "文件之間說法不一；同一範圍的狀態隨時間前進、較新文件明確取代舊的，使用者核准了這個值",
+                "unknown": "文件之間真正互斥、判不出（或原文對不上），使用者核准的決議是不給值",
+                "split_scope": "文件講的客戶、產品、地區或定義不同；決議是拆範圍（要人工改 schema），這一格先不給值",
+                "move_to_observation": "短缺、利用率、物流或特定日期的交期這類時變數字；決議改記觀測（要人工改 schema），這一格不給值",
             },
         },
         "this_is_not": list(STRUCTURE_TABLE_THIS_IS_NOT),

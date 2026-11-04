@@ -136,6 +136,9 @@ class EdgeView:
     sub_language_in_quote: bool | None = None
     #: 我們最早何時取得引用它的文件（`CanonicalEdge.first_retrieved`）。**不進 `key()`**：同一條邊多讀一份文件不得改變 digest。
     first_retrieved: str | None = None
+    #: 哪幾格是人工核准的屬性決議（`CanonicalEdge.resolved`，F19）：欄位名 → action。**不進 `key()`**：digest 讀的是值，
+    #: 決議把值改了 digest 自然會變；標記本身不得讓決議前後同值的讀圖變 stale。
+    resolved: dict = field(default_factory=dict)
 
     def as_dict(self) -> dict[str, Any]:
         return {
@@ -145,6 +148,7 @@ class EdgeView:
             "evidence": self.evidence, "documents": self.documents,
             "sub_language_in_quote": self.sub_language_in_quote,
             "first_retrieved": self.first_retrieved,
+            "resolved": dict(self.resolved),
         }
 
     def key(self) -> tuple:
@@ -204,7 +208,16 @@ def _view(edge: CanonicalEdge) -> EdgeView:
         evidence=edge.evidence, documents=edge.documents,
         sub_language_in_quote=edge.sub_language_in_quote,
         first_retrieved=getattr(edge, "first_retrieved", None),
+        resolved=dict(getattr(edge, "resolved", None) or {}),
     )
+
+
+def _resolved_cell(text: str, view: EdgeView, field_name: str) -> str:
+    """讀圖表的一格：核准決議給的值標「（核准）」；決議判不給值印出來，不印成「—」（那是「沒有文件發言過」，F19）。"""
+    action = view.resolved.get(field_name)
+    if action is None:
+        return text
+    return f"{text}（核准）" if action == "choose_value" else f"核准決議不給值（{action}）"
 
 
 def build_structure(node: str, edges: Iterable[CanonicalEdge]) -> StructureView:
@@ -441,10 +454,13 @@ def render_markdown(view: StructureView,
         for e in sorted(rows, key=lambda r: -(r.substitutability or 0)):
             # 這個 sub 值的引文撐不撐得住（Phase 6 Step 6.5）：只印、不改值；不進 digest
             sub_note = "（⚠引文沒談可替代性）" if e.sub_language_in_quote is False else ""
+            sub_text = str(e.substitutability) if e.substitutability is not None else "—"
+            sole_text = "✓" if e.sole_source else ("✗" if e.sole_source is False else "—")
             out.append(
-                f"| `{e.src}` {e.relation} `{e.dst}` | {e.substitutability if e.substitutability is not None else '—'}{sub_note} "
-                f"| {'✓' if e.sole_source else ('✗' if e.sole_source is False else '—')} "
-                f"| {e.qualification_status or '—'} | {e.evidence or '—'} | {e.documents} |"
+                f"| `{e.src}` {e.relation} `{e.dst}` | {_resolved_cell(sub_text, e, 'substitutability')}{sub_note} "
+                f"| {_resolved_cell(sole_text, e, 'sole_source')} "
+                f"| {_resolved_cell(e.qualification_status or '—', e, 'qualification_status')} "
+                f"| {e.evidence or '—'} | {e.documents} |"
             )
             if quotes is None:
                 continue
