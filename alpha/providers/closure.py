@@ -107,16 +107,8 @@ def collect_backlog(*, artifact_dir: Path | None = None, state_dir: Path | None 
         deferred = deferred_tickers(pool, _resolve)
         # 等主題組（failure log #26／#114）：還沒落地的組提案點名的檔——成員與排除名單（沒寫過敘事的才算，見下面）
         pending_cohort = pending_cohort_members(pool, _resolve)
-        # 等入圖（failure log #51）：短檢查結論①的 ra_admission 還在 pq2——focus 讀 RA 紀錄，讀不到那一號就不算
-        from intake.actions import read_action
-
-        def _focus_ticker(ref_id: str) -> str | None:
-            try:
-                return _resolve(str(read_action(ref_id)["payload"].get("focus_company_id") or ""))
-            except Exception:  # noqa: BLE001
-                return None
-
-        pending_admission = pending_admission_focus(pool, _focus_ticker)
+        # 等入圖（failure log #51）：短檢查結論①的 ra_admission 還在 pq2——⑤「邊緣卻沒敘事」讀同一份（pending_admission_tickers）
+        pending_admission = pending_admission_tickers(pool, registry)
     except Exception as exc:  # noqa: BLE001
         pending_cohort, pending_admission = {}, {}
         notes.append(f"pq2 待辦池讀不到，本輪不套「使用者已 defer」「等主題組」「等入圖」：{type(exc).__name__}")
@@ -170,6 +162,21 @@ def first_narrative_awaiting_cohort(ticker: str) -> int | None:
         return pending_cohort_members(load_pool(), _research_ticker).get(str(ticker).upper())
     except Exception:  # noqa: BLE001
         return None
+
+
+def pending_admission_tickers(pool: Any, registry: Any = None) -> dict[str, int]:
+    """等入圖（failure log #51）：還沒結案的 `ra_admission` focus 的那一檔 → pq2 編號。閉環佇列與 ⑤「邊緣卻沒敘事」
+    （`engine_b.todo_ledger`）讀這一份（L16；2026-11-04 300757.SZ：⑤ 照舊叫人寫一份要等入圖才寫得了的敘事）。
+    focus 讀 RA 紀錄的 `payload.focus_company_id` 再查名冊；讀不到那一號就不算（不猜）。"""
+    from intake.actions import read_action
+
+    def _focus_ticker(ref_id: str) -> str | None:
+        try:
+            return _research_ticker(str(read_action(ref_id)["payload"].get("focus_company_id") or ""), registry)
+        except Exception:  # noqa: BLE001
+            return None
+
+    return pending_admission_focus(pool, _focus_ticker)
 
 
 def _research_ticker(company_id: str, registry: Any = None) -> str | None:

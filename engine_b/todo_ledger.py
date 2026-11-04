@@ -550,7 +550,18 @@ def collect(*, today: date, leads_store: Mapping[str, Any], watches: Sequence[Ma
         if candidates is None:
             return
         rows_ = [r for r in candidates.get("no_narrative") or () if (r.get("edge") or {}).get("state") != "not_edge"]
-        put("todo.edge_no_narrative", len(rows_), work="、".join(str(r.get("ticker")) for r in rows_[:5]) or None)
+        # 等入圖（failure log #51 的對稱面）：短檢查結論①的入圖包還在 pq2，閉環佇列判「不排」——這格扣掉、點名在註記
+        try:
+            from alpha.providers.closure import pending_admission_tickers
+
+            awaiting = (loaders.get("pending_admission") or (lambda: pending_admission_tickers({"items": todo_items})))()
+            note = "、".join(f"{r.get('ticker')} 等入圖 [{awaiting[str(r.get('ticker')).upper()]}]" for r in rows_
+                            if str(r.get("ticker")).upper() in awaiting) or None
+            rows_ = [r for r in rows_ if str(r.get("ticker")).upper() not in awaiting]
+        except Exception as exc:  # noqa: BLE001 — 讀不到等入圖就照舊全數計，不讓整格未讀到
+            note = f"等入圖讀不到（{type(exc).__name__}），照舊全數計"
+        put("todo.edge_no_narrative", len(rows_), work="、".join(str(r.get("ticker")) for r in rows_[:5]) or None,
+            note=note)
 
     guarded("todo.edge_no_narrative", edge_no_narrative)
 

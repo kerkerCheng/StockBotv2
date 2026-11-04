@@ -100,7 +100,7 @@ def _collect(**over):
                   candidates={"counts": {}, "new_edges_check": {"status": "ok"},
                               "reading_change_check": {"status": "ok", "unchecked": 0}}, thesis_due=[])
     loaders = {"classification_gaps": lambda: [], "undisposed": lambda: [], "parked_without_expiry": lambda: [],
-               "stale_lead_entities": lambda: 0, "story_gaps": lambda: []}
+               "stale_lead_entities": lambda: 0, "story_gaps": lambda: [], "pending_admission": lambda: {}}
     loaders.update(over.pop("loaders", {}))       # 只換掉測試點名的那幾個；其餘不讀真的 ledger
     params.update(over, loaders=loaders)
     return {row.key: row for row in tl.collect(**params)}
@@ -268,6 +268,34 @@ def test_edge_without_narrative_ignores_non_edge_companies() -> None:
                                              {"ticker": "TINY", "edge": {"state": "edge"}}]}
     rows = _collect(candidates=board)
     assert rows["todo.edge_no_narrative"].count == 1 and rows["todo.edge_no_narrative"].work == "TINY"
+
+
+def test_edge_without_narrative_names_but_does_not_count_a_company_awaiting_admission() -> None:
+    # failure log #51 的對稱面（2026-11-04 300757.SZ）：短檢查結論①的入圖包還在 pq2，閉環佇列判「不排」，⑤ 不得照舊叫人寫敘事
+    board = {"counts": {}, "no_narrative": [{"ticker": "TINY", "edge": {"state": "edge"}},
+                                             {"ticker": "300757.SZ", "edge": {"state": "edge"}}]}
+    row = _collect(candidates=board, loaders={"pending_admission": lambda: {"300757.SZ": 905}})["todo.edge_no_narrative"]
+    assert (row.count, row.work, row.note) == (1, "TINY", "300757.SZ 等入圖 [905]")
+
+    def boom():
+        raise OSError("待辦池壞了")
+
+    unread = _collect(candidates=board, loaders={"pending_admission": boom})["todo.edge_no_narrative"]
+    assert unread.count == 2 and "等入圖讀不到（OSError）" in unread.note    # 讀不到不扣、也不讓整格未讀到
+
+
+def test_pending_admission_tickers_resolves_the_focus_through_the_research_action(monkeypatch) -> None:
+    from alpha.providers import closure as provider
+
+    actions = {"ra_a": {"payload": {"focus_company_id": "co:robotechnik_intelligent"}}}
+    monkeypatch.setattr("intake.actions.read_action", lambda ref_id: actions[ref_id])
+    monkeypatch.setattr(provider, "_research_ticker", lambda cid, registry=None: {
+        "co:robotechnik_intelligent": "300757.SZ"}.get(cid))
+    pool = {"items": [{"n": 905, "type": "ra_admission", "ref_id": "ra_a"},
+                      {"n": 906, "type": "ra_admission", "ref_id": "ra_missing"},          # 讀不到那一號就不算
+                      {"n": 700, "type": "ra_admission", "ref_id": "ra_a", "resolved_at": "2026-11-01"},
+                      {"n": 897, "type": "source_trace_review", "ref_id": "ra_a"}]}
+    assert provider.pending_admission_tickers(pool) == {"300757.SZ": 905}
 
 
 # ---------------------------------------------------------------------------
