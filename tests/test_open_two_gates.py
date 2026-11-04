@@ -275,6 +275,31 @@ def test_a_raw_excerpt_in_the_depth_check_must_exist(tmp_path: Path) -> None:
                     directory=tmp_path / "b", watches_path=tmp_path / "w.json")
 
 
+def test_a_citation_may_carry_a_note_and_every_cited_path_and_reading_is_checked(tmp_path: Path) -> None:
+    """2026-11-04 drain：⑬ 原本整串當一個路徑——「library/raw/x.txt（第三季新聞稿）」檔明明在也拒收，接在後面的第二個
+    引用反而不驗。改成值裡每一個路徑與讀圖 id 都驗（檔名可含全形逗號）。變異：退回整串比對 → 第一條紅；只驗開頭 → 第二、四條紅。"""
+    from types import SimpleNamespace
+
+    from alpha.providers.briefs import depth_check_ref_problems
+
+    (tmp_path / "library" / "raw").mkdir(parents=True)
+    (tmp_path / "library" / "private" / "inbox").mkdir(parents=True)
+    (tmp_path / "library" / "raw" / "a.txt").write_text("x", encoding="utf-8")
+    (tmp_path / "library" / "private" / "inbox" / "報告_甲，乙_中文.pdf").write_text("x", encoding="utf-8")
+    (tmp_path / "library" / "outside.txt").write_text("x", encoding="utf-8")
+    reading = "sr_" + "a" * 16
+
+    def problems(value: str) -> list[str]:
+        return depth_check_ref_problems(SimpleNamespace(depth_check=(("latest_report", value),)),
+                                        readings_by_id={reading: object()}, root=tmp_path)
+
+    assert problems("library/raw/a.txt（第三季新聞稿與三表）") == []
+    assert len(problems("library/raw/a.txt（新聞稿）＋ library/raw/沒有.txt（10-Q）")) == 1
+    assert problems("library/private/inbox/報告_甲，乙_中文.pdf（p.3）") == []
+    assert problems(f"{reading}（第三方列舉）") == [] and len(problems(f"library/raw/a.txt ＋ sr_{'b' * 16}")) == 1
+    assert len(problems("library/raw/../outside.txt")) == 1 and len(problems("sr_bogus（註）")) == 1
+
+
 # ---------------------------------------------------------------------------
 # ④ ⑤「加碼條件還沒查」
 # ---------------------------------------------------------------------------

@@ -377,21 +377,41 @@ def v2_write_problems(parsed: InvestorBrief, *, ctx: WriteContext, existing: Seq
     return problems
 
 
+def _cited_file(text: str, start: int, base: Path, root: Path) -> bool:
+    """`text[start:]` 開頭是不是一個在 `base` 底下的檔：候選終點是每個副檔名之後與整串結尾，取第一個存在的
+    （引用後面可以接註解；檔名本身可能含全形逗號，所以不以標點切）。"""
+    import re
+
+    ends = [start + m.end() for m in re.finditer(r"\.[A-Za-z0-9]{1,6}(?![A-Za-z0-9])", text[start:])] + [len(text)]
+    for end in ends:
+        path = (root / text[start:end].strip()).resolve()
+        if base in path.parents and path.is_file():
+            return True
+    return False
+
+
 def depth_check_ref_problems(parsed: InvestorBrief, *, readings_by_id: Mapping[str, Any], root: Path) -> list[str]:
-    """⑬：`depth_check` 裡寫成 `library/raw/…`／`library/private/…` 的檔要在那個目錄底下（私人節錄同一條，2026-11-04 R2
-    對稱面）、`sr_…` 要是讀圖 id。回問題清單。"""
+    """⑬：`depth_check` 裡寫到的每一個 `library/raw/…`／`library/private/…` 都要是那個目錄底下的檔（私人節錄同一條，
+    2026-11-04 R2 對稱面）、每一個 `sr_…` 都要是讀圖 id。回問題清單。
+
+    引用後面可以接註解（`library/raw/x.txt（第三季新聞稿）`——skill 寫的是「開頭限」）；2026-11-04 drain 起改成值裡**每一個**
+    路徑與讀圖 id 都驗（原本整串當一個路徑：接了註解就拒收，第二個以後的引用反而不驗）。"""
+    import re
+
     problems: list[str] = []
     for key, value in parsed.depth_check:
         text = str(value).strip()
         for prefix, label in ((RAW_EXCERPT_PREFIX, "library/raw"), ("library/private/", "library/private")):
-            if text.startswith(prefix):
-                base = (root / prefix).resolve()
-                path = (root / text).resolve()
-                if base not in path.parents or not path.is_file():
-                    problems.append(f"depth_check.{key}：{text} 在 {label} 找不到（或跳出了 {label}）——"
-                                    "節錄要先存成檔再引用")
-        if text.startswith("sr_") and text not in readings_by_id:
-            problems.append(f"depth_check.{key}：{text} 不是任何讀圖 id")
+            base = (root / prefix).resolve()
+            for match in re.finditer(re.escape(prefix), text):
+                if not _cited_file(text, match.start(), base, root):
+                    problems.append(f"depth_check.{key}：{text[match.start():match.start() + 80]} 在 {label} 找不到"
+                                    f"（或跳出了 {label}）——節錄要先存成檔再引用")
+        head = re.split(r"[\s（(＋+，,；;、]", text, maxsplit=1)[0]
+        ids = set(re.findall(r"(?<![0-9A-Za-z_])sr_[0-9a-f]{16}(?![0-9a-f])", text)) | ({head} if head.startswith("sr_") else set())
+        for reading_id in sorted(ids):
+            if reading_id not in readings_by_id:
+                problems.append(f"depth_check.{key}：{reading_id} 不是任何讀圖 id")
     return problems
 
 
