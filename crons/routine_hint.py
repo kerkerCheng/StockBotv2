@@ -6,6 +6,11 @@ daily（`crons/daily_task.py`）是唯一的心跳來源——**它自己當掉�
 - 本地時間已過 `daily_local_time`＋`expected_duration_minutes`，今天卻沒有 `daily_run_<日期>.json`；或
 - 紀錄裡有 `integrity_violation`（保險檢查觸發、已中止，心跳與發送都沒跑）、或紀錄停在 `running`。
 
+**紀錄資料夾本身不存在＝讀不到，不是「沒跑」**（2026-11-04；L11-5「我找不到」與「它不存在」是兩個 claim）：雲端 session 的容器
+沒有 `library/private/heartbeat`，原本每開一次雲端 session 就喊一次「daily 沒跑」——11-01、11-02、11-04 都被轉述成事故，喊久了
+真的沒跑那天就沒人信（L14-4 恆亮）。改成 `records_unreadable_note`：Claude 雲端（`CLAUDE_CODE_REMOTE=true`）印一行說明、
+不要求轉述；其他情況照樣要求轉述，但寫「讀不到」——本機（跑 daily 的那台）看到它，是紀錄資料夾不見了。
+
 另外**每次開 session 都印一行「距上次掃題材 N 天」**（Phase 1 Step 1.9，定案 B：session 開頭常駐）——weekly 退役後
 題材掃描只在互動 session 由使用者發起，沒有排程會提醒它；天數 ≥ `config/daily_routine.json` 的
 `theme_scan.nudge_after_days` 時改成要求轉述的版本。
@@ -18,9 +23,11 @@ daily（`crons/daily_task.py`）是唯一的心跳來源——**它自己當掉�
 from __future__ import annotations
 
 import json
+import os
 import sys
 from datetime import datetime, timedelta
 from pathlib import Path
+from typing import Mapping
 from zoneinfo import ZoneInfo
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -32,7 +39,9 @@ RUN_DIR = ROOT / "library" / "private" / "heartbeat"
 
 def daily_problem(*, now: datetime | None = None, config_path: Path = CONFIG,
                   run_dir: Path = RUN_DIR) -> str | None:
-    """回傳要說的原因；沒事回 None。"""
+    """回傳要說的原因；沒事回 None。紀錄資料夾不存在＝這台機器判斷不了，也回 None（由 `records_unreadable_note` 說）。"""
+    if not run_dir.is_dir():
+        return None
     schedule = json.loads(config_path.read_text(encoding="utf-8"))["schedule"]
     tz = ZoneInfo(str(schedule["timezone"]))
     moment = (now or datetime.now(tz)).astimezone(tz)
@@ -66,6 +75,22 @@ def daily_problem(*, now: datetime | None = None, config_path: Path = CONFIG,
     return None
 
 
+def records_unreadable_note(run_dir: Path = RUN_DIR, *, environ: Mapping[str, str] | None = None) -> str | None:
+    """紀錄資料夾不存在時要說的那一句；資料夾在就回 None（照 `daily_problem` 判）。"""
+    if run_dir.is_dir():
+        return None
+    try:
+        where = run_dir.relative_to(ROOT).as_posix()
+    except ValueError:
+        where = str(run_dir)
+    env = os.environ if environ is None else environ
+    if str(env.get("CLAUDE_CODE_REMOTE") or "").strip().lower() == "true":
+        return (f"daily 執行紀錄：雲端 session 讀不到（這台機器沒有 `{where}`）——不代表 daily 沒跑；"
+                "要確認看本機收到的短版")
+    return (f"【請在第一則回覆開頭轉述】這台機器讀不到 daily 執行紀錄（`{where}` 不存在）——不代表 daily 沒跑；"
+            "若這是跑 daily 的那台本機，就是紀錄資料夾不見了，先查 library/private 是否完整")
+
+
 def theme_scan_hint(*, today=None, config_path: Path = CONFIG, reports_dir: Path | None = None) -> tuple[str, bool]:
     """(那一行, 是否達門檻)。達門檻（或從沒掃過）→ 要求轉述；否則是一行普通的常駐計數。"""
     from engine_b.routine_config import load_theme_scan
@@ -87,9 +112,13 @@ def main() -> int:
     # 只用 additionalContext 一個通道（見模組 docstring）；兩件事合成同一段文字。
     messages: list[str] = []
     try:
-        problem = daily_problem()
-        if problem:
-            messages.append(f"【請在第一則回覆開頭轉述】今天的 daily 沒有跑完：{problem}")
+        note = records_unreadable_note(RUN_DIR)
+        if note:
+            messages.append(note)
+        else:
+            problem = daily_problem(run_dir=RUN_DIR)
+            if problem:
+                messages.append(f"【請在第一則回覆開頭轉述】今天的 daily 沒有跑完：{problem}")
     except Exception:  # noqa: BLE001
         pass
     try:

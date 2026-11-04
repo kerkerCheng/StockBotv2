@@ -756,6 +756,35 @@ def test_routine_hint_speaks_only_when_the_daily_did_not_finish(tmp_path: Path) 
     assert "running" in daily_problem(now=after, config_path=config, run_dir=run_dir)
 
 
+def test_routine_hint_says_unreadable_not_did_not_run_when_the_records_folder_is_missing(tmp_path: Path) -> None:
+    """2026-11-04：雲端容器沒有 library/private/heartbeat——原本每開一次雲端 session 就喊「daily 沒跑」（11-01、11-02、11-04
+    都被轉述成事故）。資料夾不存在＝讀不到，不是沒跑（L11-5）；資料夾在、今天沒紀錄才是沒跑。"""
+    from crons.routine_hint import daily_problem, records_unreadable_note
+
+    config = _config(tmp_path)
+    missing = tmp_path / "no_such_dir"
+    after = datetime(2026, 9, 24, 7, 0, tzinfo=timezone(timedelta(hours=8)))
+    assert daily_problem(now=after, config_path=config, run_dir=missing) is None
+    cloud = records_unreadable_note(missing, environ={"CLAUDE_CODE_REMOTE": "true"})
+    assert cloud and "不代表 daily 沒跑" in cloud and not cloud.startswith("【請在第一則回覆開頭轉述】")
+    other = records_unreadable_note(missing, environ={})
+    assert other.startswith("【請在第一則回覆開頭轉述】") and "不代表 daily 沒跑" in other and "沒有跑完" not in other
+    present = tmp_path / "runs"
+    present.mkdir()
+    assert records_unreadable_note(present, environ={}) is None
+    assert "沒有 daily 執行紀錄" in daily_problem(now=after, config_path=config, run_dir=present)
+
+
+def test_routine_hint_main_never_calls_a_missing_folder_a_missed_run(tmp_path: Path, monkeypatch, capsys) -> None:
+    import crons.routine_hint as rh
+
+    monkeypatch.setattr(rh, "RUN_DIR", tmp_path / "no_such_dir")
+    monkeypatch.setenv("CLAUDE_CODE_REMOTE", "true")
+    assert rh.main() == 0
+    text = json.loads(capsys.readouterr().out)["hookSpecificOutput"]["additionalContext"]
+    assert "雲端 session 讀不到" in text and "daily 沒有跑完" not in text
+
+
 @pytest.mark.parametrize("days,nudge", [(6, False), (7, True)])
 def test_routine_hint_theme_scan_line_both_sides(tmp_path: Path, days: int, nudge: bool) -> None:
     """Phase 1 Step 1.9：每次開 session 都有一行「距上次掃題材 N 天」；達門檻（7）改成要求轉述的版本。"""
@@ -778,15 +807,19 @@ def test_routine_hint_theme_scan_line_both_sides(tmp_path: Path, days: int, nudg
 def test_routine_hint_always_prints_the_theme_line_and_never_breaks(monkeypatch, capsys) -> None:
     from crons import routine_hint as rh
 
-    monkeypatch.setattr(rh, "daily_problem", lambda: None)
+    # 2026-11-04 起 main 先問紀錄資料夾讀不讀得到（`records_unreadable_note`），再問 daily_problem——兩個都換掉，
+    # 測試才不看跑測試那台機器有沒有 library/private/heartbeat
+    monkeypatch.setattr(rh, "records_unreadable_note", lambda *a, **k: None)
+    monkeypatch.setattr(rh, "daily_problem", lambda *a, **k: None)
     monkeypatch.setattr(rh, "theme_scan_hint", lambda: ("距上次掃題材 3 天（上次 x，門檻 7 天）", False))
     assert rh.main() == 0
     payload = json.loads(capsys.readouterr().out)
     assert payload["hookSpecificOutput"]["additionalContext"] == "距上次掃題材 3 天（上次 x，門檻 7 天）"
 
-    def boom():
+    def boom(*a, **k):
         raise RuntimeError("x")
 
+    monkeypatch.setattr(rh, "records_unreadable_note", boom)
     monkeypatch.setattr(rh, "daily_problem", boom)
     monkeypatch.setattr(rh, "theme_scan_hint", boom)
     assert rh.main() == 0 and capsys.readouterr().out == "", "hook 絕不能讓 session 開不起來"
