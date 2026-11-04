@@ -1,0 +1,167 @@
+{
+  "claims": [
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：雲南鍺業公告未取得或未能維持兩用物項出口許可、AOI 取消《年度合同》或採購訂單，或 2027 年半年報／年報的境外營收沒有隨合同跳升（2026 上半年境外營收 1,062 萬元、占 1.45%），或 AOI 的申報或法說寫出與公告矛盾的內容。核查頻率：每季（雲南鍺業季報、半年報、年報與臨時公告；AOI 的 10-Q／10-K與財報法說）。觸發後 48 小時：e1 的 claim 降信心或提撤回，重讀磷化銦基板層（mat:inp_substrate）的供給側與雲南鍺業敘事。",
+      "id": "yng_002428_ann_2026_054_aoi_inp_lta_cl1",
+      "source_ids": [
+        "yng_002428_ann_2026_054_aoi_inp_lta_s1",
+        "yng_002428_ann_2026_054_aoi_inp_lta_s2",
+        "yng_002428_ann_2026_054_aoi_inp_lta_s3",
+        "yng_002428_ann_2026_054_aoi_inp_lta_s4",
+        "yng_002428_ann_2026_054_aoi_inp_lta_s7",
+        "yng_002428_ann_2026_054_aoi_inp_lta_s8",
+        "yng_002428_ann_2026_054_aoi_inp_lta_s9"
+      ],
+      "statement": "Yunnan Germanium's SZSE announcement 2026-054 (dated 2026-11-04) states that its controlled subsidiary Yunnan Xinyao signed a Long-Term Supply Agreement with Applied Optoelectronics, Inc. (AOI, NASDAQ: AAOI): AOI expects to buy 180,000 4-inch N-type InP substrates a year, 900,000 in total, over 2027-2031, with actual prices and quantities set by later annual contracts, purchase orders and Chinese export-license approvals; plus a 2027 annual contract for 180,000 wafers worth USD 194.4 million excluding tax (about 122% of Yunnan Germanium's 2025 audited revenue). The annual contract requires obtaining and keeping a dual-use export license; if not, AOI may cancel and demand refunds. The filing calls it a deepening of an existing cooperation. Supplier self-report: AOI has not filed it; it shows neither share, exclusivity, nor why AOI chose this supplier.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "co:applied_optoelectronics",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "yng_002428_ann_2026_054_aoi_inp_lta_s1",
+        "yng_002428_ann_2026_054_aoi_inp_lta_s2",
+        "yng_002428_ann_2026_054_aoi_inp_lta_s3",
+        "yng_002428_ann_2026_054_aoi_inp_lta_s8"
+      ],
+      "src_id": "co:yunnan_germanium"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "mat:inp_substrate",
+      "id": "e2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "yng_002428_ann_2026_054_aoi_inp_lta_s1",
+        "yng_002428_ann_2026_054_aoi_inp_lta_s2",
+        "yng_002428_ann_2026_054_aoi_inp_lta_s6"
+      ],
+      "src_id": "co:yunnan_germanium"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "云南锗业",
+        "雲南鍺業",
+        "云南临沧鑫圆锗业股份有限公司"
+      ],
+      "attributes": {
+        "ticker": "002428.SZ"
+      },
+      "confidence": 0.9,
+      "id": "co:yunnan_germanium",
+      "name": "Yunnan Germanium",
+      "role": null,
+      "source_ids": [
+        "yng_002428_ann_2026_054_aoi_inp_lta_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "AOI",
+        "AAOI",
+        "应用光电公司"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:applied_optoelectronics",
+      "name": "Applied Optoelectronics, Inc.",
+      "role": "bottleneck_supplier",
+      "source_ids": [
+        "yng_002428_ann_2026_054_aoi_inp_lta_s1",
+        "yng_002428_ann_2026_054_aoi_inp_lta_s5"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "InP substrate",
+        "磷化铟衬底"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "mat:inp_substrate",
+      "name": "Indium Phosphide (InP) substrate",
+      "role": null,
+      "source_ids": [
+        "yng_002428_ann_2026_054_aoi_inp_lta_s2",
+        "yng_002428_ann_2026_054_aoi_inp_lta_s6"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "yng_002428_ann_2026_054_aoi_inp_lta",
+    "evidence_tier": 1,
+    "origin_entity": "云南临沧鑫圆锗业股份有限公司",
+    "permission_basis": "上市公司依法公開的交易所公告；只保留研究必要的逐字節錄（公告本身約四千字，未刪段）。published_at 取公告末署日期 2026-11-04（深交所清單 publishTime 同日；上海證券報 11-03 20:02 已報導，即前一晚盤後披露）。",
+    "published_at": "2026-11-04",
+    "publisher": "深圳证券交易所",
+    "retrieved_at": "2026-11-04",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "云南临沧鑫圆锗业股份有限公司 关于签订日常经营重大合同的公告（公告编号 2026-054）：控股子公司云南鑫耀与 Applied Optoelectronics, Inc.（AOI）签订 2027–2031 年 4 英寸 N 型磷化铟衬底《长期供货协议》及 2027 年《年度合同》",
+    "url": "https://disc.static.szse.cn/download/disc/disk03/finalpage/2026-11-04/1b654ea9-9c97-4de2-954c-312fd5a58497.PDF"
+  },
+  "sources": [
+    {
+      "id": "yng_002428_ann_2026_054_aoi_inp_lta_s1",
+      "locator": "特别提示 1、合同类型及金额",
+      "quote": "云南临沧鑫圆锗业股份有限公司（下称“公司”）控股子公司云南鑫耀半导体材料有限公司（下称“云南鑫耀”）与客户 Applied Optoelectronics,Inc.（下称“AOI”)签订了《长期供货协议》"
+    },
+    {
+      "id": "yng_002428_ann_2026_054_aoi_inp_lta_s2",
+      "locator": "特别提示 1、合同类型及金额",
+      "quote": "AOI 预计于 2027 年至 2031 年期间向云南鑫耀每年采购 18 万片、合计 90 万片 4 英寸 N 型磷化铟衬底，实际价格和交付数量以后续年度合同、采购订单及出口许可证批准情况为准。"
+    },
+    {
+      "id": "yng_002428_ann_2026_054_aoi_inp_lta_s3",
+      "locator": "特别提示 1、合同类型及金额",
+      "quote": "约定 2027 年度 AOI 采购数量为 18 万片，对应金额为 19,440 万美元（不含税），实际金额视出口许可批准数量及采购订单情况而定。"
+    },
+    {
+      "id": "yng_002428_ann_2026_054_aoi_inp_lta_s4",
+      "locator": "特别提示 2、生效条件",
+      "quote": "《年度合同》自双方签署之日起生效，合同履行以取得并维持两用物项出口许可为前提。"
+    },
+    {
+      "id": "yng_002428_ann_2026_054_aoi_inp_lta_s5",
+      "locator": "二、交易对手方介绍",
+      "quote": "AOI 是一家美国光通信企业，1997 年 2 月 28 日在德克萨斯州组建，2013 年 9 月在纳斯达克挂牌上市，股票代码为 AAOI。"
+    },
+    {
+      "id": "yng_002428_ann_2026_054_aoi_inp_lta_s6",
+      "locator": "三、合同主要内容（二）《年度合同》2",
+      "quote": "合同标的：4 英寸 N 型磷化铟衬底；"
+    },
+    {
+      "id": "yng_002428_ann_2026_054_aoi_inp_lta_s7",
+      "locator": "三、合同主要内容（二）《年度合同》6、其他条款",
+      "quote": "如云南鑫耀未能按期取得或维持相关出口许可，AOI 有权取消合同或受影响的采购订单并要求退还相应款项。"
+    },
+    {
+      "id": "yng_002428_ann_2026_054_aoi_inp_lta_s8",
+      "locator": "四、合同对上市公司的影响",
+      "quote": "本次合同的签署，是子公司云南鑫耀与该客户在原有良好合作基础上的进一步深化合作"
+    },
+    {
+      "id": "yng_002428_ann_2026_054_aoi_inp_lta_s9",
+      "locator": "一、合同签署概况",
+      "quote": "折合人民币约 130,531.82 万元（按照 2026 年 11 月 2 日汇率中间价 1 美元≈6.7146 人民币折算），占公司 2025 年度经审计营业收入的比例为 122.46%。"
+    }
+  ]
+}
