@@ -31,8 +31,9 @@
 
 8. **看了沒買（2026-11-03，盲點修法第 17 條；AGENTS「沒買也是決定」）。** 決策時段看過、選了「不要」或「等到條件」的那一檔，
    用 `looked` 入口記進 `library/trades/looked_log.jsonl`（同處、append-only）：收據同一個組法（`side`＝看了沒買），
-   **不碰 Sheet 寫入、不寫 trade_log、不過硬擋**（沒有成交）。寫入端拒收缺理由與缺敘事版本（現行不是 v2 敘事 → exit 4）；
-   beta 不收；預設 dry-run。形狀與讀者住 `portfolio/looked_log.py`。
+   **不碰 Sheet 寫入、不寫 trade_log、不過硬擋**（沒有成交）。寫入端拒收缺理由與缺敘事版本（現行不是 v2 敘事 → exit 4）、
+   代號解析不到公司（INV-1 → exit 2）、候選板上那一列不是現行那一版（板舊了就先重跑 materialize，2026-11-04 R2 → exit 2）；
+   等到條件帶 `--until`（不給＝30 天後重問）；beta 不收；預設 dry-run。形狀與讀者住 `portfolio/looked_log.py`。
 
 用法：
     python scripts/record_trade.py --symbol QQQ --side buy --shares 10 \\
@@ -437,7 +438,11 @@ def _print_verdict(verdict) -> None:
 
 def looked_main(argv: list[str]) -> int:
     """看了沒買（盲點修法第 17 條）：一次「不要」或「等到條件」的決定 → `looked_log` 一列，附與成交同一種研究收據。
-    只讀 Sheet（解析公司與持有）、不寫 Sheet、不寫 trade_log、不過硬擋（沒有成交）。預設 dry-run。"""
+    只讀 Sheet（解析公司與持有）、不寫 Sheet、不寫 trade_log、不過硬擋（沒有成交）。預設 dry-run。
+    記下的敘事版本必須是候選板上那一版（2026-11-04 R2：板比敘事舊就拒收、請先重跑 materialize）；同一版的同一個選擇還在
+    生效時不重記（`looked_log.repeat_of`）。"""
+    from datetime import date
+
     from portfolio import looked_log, research_receipt
     from risk.hard_caps import is_beta_symbol
 
@@ -446,6 +451,8 @@ def looked_main(argv: list[str]) -> int:
     ap.add_argument("--symbol", required=True, help="代號（研究 ticker 或 Sheet symbol）")
     ap.add_argument("--choice", required=True, choices=looked_log.CHOICES)
     ap.add_argument("--why", required=True, help="一句理由；等到條件要寫等到什麼")
+    ap.add_argument("--until", default=None,
+                    help=f"等到條件：哪一天重問（YYYY-MM-DD；不給＝{looked_log.WAIT_DEFAULT_DAYS} 天後）；不要不收")
     ap.add_argument("--apply", action="store_true", help="實際寫入；省略則只顯示收據")
     args = ap.parse_args(argv)
     if not args.why.strip():
@@ -454,12 +461,17 @@ def looked_main(argv: list[str]) -> int:
     if is_beta_symbol(args.symbol):
         print(f"✗ {args.symbol} 是 beta：看了沒買只記 alpha 候選", file=sys.stderr)
         return 2
+    until = None
+    if args.until is not None:
+        try:
+            until = date.fromisoformat(args.until)
+        except ValueError:
+            print(f"✗ --until 要是 YYYY-MM-DD：{args.until!r}", file=sys.stderr)
+            return 2
     try:
         today = _today()
         today_problem = None
     except Exception as exc:  # noqa: BLE001 — 排程時區讀不到：退回本機日期、照實記
-        from datetime import date
-
         today, today_problem = date.today(), f"排程時區讀不到（{type(exc).__name__}）——「今天」退回本機日期"
     from fetchers import gsheets
 
@@ -475,18 +487,33 @@ def looked_main(argv: list[str]) -> int:
     _print_receipt(receipt)
     try:
         entry = looked_log.build_entry(symbol=args.symbol, choice=args.choice, why=args.why, today=today,
-                                       recorded_at=_now(), receipt=receipt)
+                                       recorded_at=_now(), receipt=receipt, until=until)
     except ValueError as exc:
         print(f"\n✗ 未寫入：{exc}", file=sys.stderr)
+        # 解析不到公司是名冊的事、不是缺敘事（下一步不同，L12）：exit 2；現行不是 v2 敘事才是 exit 4
+        if not receipt.get("company_id"):
+            return 2
         return EXIT_NARRATIVE if receipt.get("narrative") != "present" else 2
-    if looked_log.already_recorded(entry, LOOKED_LOG):
-        print(f"\n⚠ 這一筆（{entry['decision_id']}）已在 {_shown(LOOKED_LOG)}；重複執行不會再寫。")
+    try:
+        entries, problems = looked_log.load(LOOKED_LOG)
+    except (OSError, UnicodeDecodeError) as exc:
+        print(f"\n✗ 未寫入：{_shown(LOOKED_LOG)} 讀不到（{type(exc).__name__}）——修好再記（不知道這一版選過沒有）",
+              file=sys.stderr)
+        return 2
+    for problem in problems:
+        print(f"⚠ {problem}")
+    repeat = looked_log.repeat_of(entry, entries, today=today, until_given=until is not None)
+    if repeat is not None:
+        waited = f"、等到 {repeat.until.isoformat()}" if repeat.until else ""
+        print(f"\n⚠ 已記過（{repeat.date.isoformat()} {repeat.choice}{waited}：{repeat.why}）——同一版敘事的同一個選擇"
+              "還在生效，不重記" + ("；要改重問的日子就明給 --until" if repeat.choice == "等到條件" else "") + "。")
         return 0
+    when = f"，{entry['until']} 起列回可開待你選重問" if entry["until"] else ""
     if not args.apply:
-        print(f"\n（dry-run）會寫一列進 {_shown(LOOKED_LOG)}：{entry['symbol']} {entry['choice']}——加 --apply 才寫")
+        print(f"\n（dry-run）會寫一列進 {_shown(LOOKED_LOG)}：{entry['symbol']} {entry['choice']}{when}——加 --apply 才寫")
         return 0
     looked_log.append(entry, LOOKED_LOG)
-    print(f"\n✓ 看了沒買：{entry['symbol']} {entry['choice']}（{entry['decision_id']}）→ {_shown(LOOKED_LOG)}")
+    print(f"\n✓ 看了沒買：{entry['symbol']} {entry['choice']}{when}（{entry['decision_id']}）→ {_shown(LOOKED_LOG)}")
     return 0
 
 

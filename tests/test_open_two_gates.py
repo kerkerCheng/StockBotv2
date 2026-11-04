@@ -53,9 +53,10 @@ def _slots() -> dict:
 
 
 def _record(*, state="open", watch_id=None, reason=None, at=None, disproof=(DISPROOF,), confirm=(), depth_check=None,
-            supersedes=None, reopen=None) -> dict:
+            supersedes=None, reopen=None, rides=None) -> dict:
     return brief_record(company_id=CO, ticker=T, slots=_slots(), record_version=RECORD_VERSION_V2,
-                        rides=[{"node": "tech:x", "unit": "layer", "reading_id": READ}], disproof=list(disproof),
+                        rides=([{"node": "tech:x", "unit": "layer", "reading_id": READ}] if rides is None
+                               else list(rides)), disproof=list(disproof),
                         answers={"priced_in": "yes", "in_numbers": "yes"},
                         candidate_state={"state": state, "watch_id": watch_id, "reason": reason,
                                          **({"reopen": reopen} if reopen else {})},
@@ -115,10 +116,20 @@ def test_an_old_priced_wait_rides_the_same_start_gate_as_open(tmp_path: Path) ->
     row = _derive([old])
     assert (row["group"], row["declared"], row["declared_retired"]) == ("open", "open", "priced_wait")
     assert row["declared_label"] == "可開" and row["preconditions"] == []
+    assert row["declared_retired_label"].startswith("已定價等回落")        # 當時寫的字（11-04 R2：畫面印它）
+    assert _derive([_brief()])["declared_retired_label"] is None
     failed = _derive([old], kind="neither")
     assert failed["side"] == "precondition_failed" and failed["group"] is None
     for gone in ("pulled_back", "open_gaps", "reopen", "reopen_missing", "wake_by"):
         assert gone not in row                                          # 價格叫醒、重開、只差已定價都退役
+
+
+def test_an_old_priced_wait_without_a_ridden_reading_fails_closed() -> None:
+    """舊等回落可能沒押讀圖（當時的契約只要求可開押）：讀成可開也驗不了押的那一層——不放行（R2 變異 M1 存活，補這一條）。"""
+    old = _brief(state="priced_wait", watch_id="ew_wait", reason="已定價", rides=())
+    row = _derive([old])
+    assert row["side"] == "precondition_failed" and row["group"] is None
+    assert any("沒有押任何讀圖" in p for p in row["preconditions"])
 
 
 def test_writing_priced_wait_is_refused_with_where_it_went(tmp_path: Path) -> None:
@@ -130,10 +141,22 @@ def test_writing_priced_wait_is_refused_with_where_it_went(tmp_path: Path) -> No
 
 
 def test_an_old_wait_followed_by_open_keeps_counting_the_stall() -> None:
+    """同一段（讀成可開）：版本鏈照連——但天數不把 11-03 前的等回落算成可開（11-04 R2：那時給人看的是等回落；INV-6）。
+    變異：stall_since 不看退役字 → 第二、三條紅。"""
+    from alpha.candidates import RETIRED_READ_SINCE, stall_since
+
     a = _record(state="priced_wait", watch_id="ew_1", reason="已定價", at=datetime(2026, 10, 1, 3, tzinfo=timezone.utc))
     b = _record(at=datetime(2026, 11, 2, 3, tzinfo=timezone.utc), supersedes=a["brief_id"])
     records = [parse_brief_record(r) for r in (a, b)]
     assert stall_version(records, records[-1]).brief_id == a["brief_id"]
+    assert stall_since(records, records[-1]) == records[-1].created_at       # 11-02 照原字就是可開：從那天算
+    only_old = [parse_brief_record(a)]
+    assert stall_since(only_old, only_old[0]) == RETIRED_READ_SINCE           # 只有等回落：從讀成可開那一刻算
+    row = _derive(only_old)
+    assert row["group"] == "open" and row["stall_days"] == 0                  # TODAY＝11-03（上線當天）＝第 0 天
+    late = parse_brief_record(_record(state="priced_wait", watch_id="ew_1", reason="已定價",
+                                      at=datetime(2026, 11, 3, 1, tzinfo=timezone.utc)))
+    assert stall_since([late], late) == late.created_at                       # 上線後才寫的不受影響
 
 
 # ---------------------------------------------------------------------------
@@ -192,10 +215,48 @@ def test_depth_check_is_saved_only_when_written_and_old_ids_do_not_move() -> Non
     ({"why_chosen": "加碼條件：客戶 10-K"}, (CONFIRM,), "c<n>"),
     ({"why_chosen": "  "}, (), "非空字串"),
     ({"latest_call": "不適用："}, (), "理由"),
+    ({"latest_call": "待查"}, (), "四種之一"),                      # 11-04 R2：不認得的字不算查過、拒收
+    ({"dilution": "看過了，沒問題"}, (), "四種之一"),
 ])
 def test_a_malformed_depth_check_is_refused_by_the_contract(depth_check, confirm, match) -> None:
     with pytest.raises(ContractViolation, match=match):
         _record(confirm=confirm, depth_check=depth_check)
+
+
+def test_only_the_four_forms_count_as_checked() -> None:
+    """11-04 R2（L18）：引用要指得回來源（`CITATION_PREFIXES`）——「待查」「看過了」不算查過，⑤ 照數。
+    變異：is_checked 退回「不以缺開頭就算」→ 紅。"""
+    from alpha.narrative.depth_check import CITATION_PREFIXES, is_checked, value_form
+
+    for good in ("library/raw/a.md", "library/private/b.md", "sr_" + "a" * 16, "graph:doc_1", "engine_c:AXTI#gm",
+                 "alpha://three_questions/v1/AXTI#in_numbers_series", "thesis/axti.md#1", "https://x.com/a"):
+        assert value_form(good) == "cite" and is_checked(good), good
+    assert {value_form("不適用：沒有法說"), value_form("加碼條件：c1"), value_form("缺：還沒讀")} == {
+        "not_applicable", "addon", "unchecked"}
+    for bad in ("待查", "看過了", "加碼條件：客戶 10-K", "不適用：", "", None, 3):
+        assert not is_checked(bad), bad
+    assert len(CITATION_PREFIXES) == len(set(CITATION_PREFIXES))
+    left = unchecked_items({**ALL_CHECKED, "dilution": "待查"})
+    assert left == ["稀釋"]
+
+
+def test_a_rewrite_that_drops_checked_items_is_reminded_not_refused() -> None:
+    """11-04 R2：為別的原因重寫沒抄清單，⑤ 會把那一檔數回去——寫入時點名掉了哪幾項；沒掉、或上一版本來沒查的不印。"""
+    from alpha.narrative.depth_check import dropped_checks_line
+
+    before = {**ALL_CHECKED, "why_chosen": "缺：客戶沒具名"}
+    line = dropped_checks_line(before, {"latest_report": ALL_CHECKED["latest_report"]})
+    assert line.startswith("  ⚠ 上一版查過的 8 項這一版沒寫") and "讀到邊：客戶為什麼選它的變體" not in line
+    assert dropped_checks_line(before, before) is None and dropped_checks_line(None, None) is None
+    assert dropped_checks_line({"dilution": "缺"}, None) is None
+
+
+def test_a_private_excerpt_in_the_depth_check_must_exist_too(tmp_path: Path) -> None:
+    """⑬ 對稱面（11-04 R2）：私人節錄與一手節錄同一條——檔要在。"""
+    ctx, _wid = _ctx()
+    with pytest.raises(ContractViolation, match="library/private"):
+        write_brief(_fresh(depth_check={"latest_report": "library/private/沒有這個檔.md"}), ctx=ctx,
+                    directory=tmp_path / "b", watches_path=tmp_path / "w.json")
 
 
 def test_unchecked_items_and_the_lines_say_what_is_left() -> None:
@@ -233,6 +294,12 @@ def test_the_addon_cell_counts_open_and_held_rows_with_items_left() -> None:
     # 已持有、敘事判「不要」的非倍率持股（例：COHR）：加碼與反證住 thesis（research-drain ⓓ），不數加碼條件
     held_pass = _derive([_brief(state="pass", reason="非倍率持股，加碼與反證住 thesis")], held=held)
     assert held_pass["group"] == "held" and held_pass["addon_unchecked"] == []
+    # 板上的計數：持股讀到才數；讀不到時已持有那一半數不到——整格 None，不是少算（R2 變異 M5 存活，補這一段）
+    board = assemble_board([complete, partial, missing], universe=[T], held=HELD_NONE, narrative_rewrite=[])
+    assert board["counts"]["addon_unchecked"] == 1
+    blind = assemble_board([complete, partial, missing], universe=[T], narrative_rewrite=[],
+                           held={"status": "unavailable", "reason": "Sheet 讀不到"})
+    assert blind["counts"]["addon_unchecked"] is None
 
 
 def _ctx(kind="volume"):
@@ -270,13 +337,16 @@ LOOKED_RECEIPT = {"version": "research-receipt/v1", "side": "看了沒買", "nar
                   "company_id": "co:aaa", "research_ticker": "AAA", "declared": {"brief_id": "ib_a1"}}
 
 
-def _looked(tmp_path: Path, brief_id: str) -> Path:
+def _looked(tmp_path: Path, brief_id: str, *, choice: str = "不要", until: date | None = None) -> Path:
+    """記一次看了沒買：收據裡候選板那一列就是這一版（寫入端要板上那一版，2026-11-04 R2）。"""
     from portfolio import looked_log as ll
 
     path = tmp_path / "looked.jsonl"
-    ll.append(ll.build_entry(symbol="AAA", choice="不要", why="翻倍條件太遠", today=TODAY,
+    board = {"candidate_as_of": TODAY.isoformat(),
+             "candidate": {"ticker": "AAA", "company_id": "co:aaa", "brief_id": brief_id, "group": "open"}}
+    ll.append(ll.build_entry(symbol="AAA", choice=choice, why="翻倍條件太遠", today=TODAY, until=until,
                              recorded_at="2026-11-03T02:00:00+00:00",
-                             receipt={**LOOKED_RECEIPT, "declared": {"brief_id": brief_id}}), path)
+                             receipt={**LOOKED_RECEIPT, "declared": {"brief_id": brief_id}, "derived": board}), path)
     return path
 
 
@@ -294,6 +364,112 @@ def test_open_rows_this_version_already_chosen_are_not_asked_again(monkeypatch, 
     monkeypatch.undo()
     rows, problem = hb.open_choice_rows(tmp_path / "none")
     assert rows is None and problem                                                     # 讀不到＝None＋理由，不是 []
+
+
+def test_only_the_open_group_is_asked_not_a_failed_precondition(monkeypatch, tmp_path: Path) -> None:
+    """可開待你選只讀「可開」組——前提失效那一組（附組）不混進來（R2 變異 M6 存活，補這一條）。"""
+    from crons import heartbeat as hb
+
+    board = {"groups": {"open": OPEN_ROWS[:1], "missing": [OPEN_ROWS[1]]},
+             "side_groups": {"precondition_failed": [{"ticker": "CCC", "company_id": "co:ccc", "brief_id": "ib_c1"}]}}
+    monkeypatch.setattr(hb, "_load_state", lambda state_dir, kind: (board, None))
+    rows, _ = hb.open_choice_rows(tmp_path, looked_path=tmp_path / "none.jsonl")
+    assert [r["ticker"] for r in rows] == ["AAA"]
+
+
+def test_a_wait_comes_back_on_its_day_and_is_counted_while_it_waits(monkeypatch, tmp_path: Path) -> None:
+    """2026-11-04 R2（INV-2）：等到條件到期那天起列回來、附上次等的是什麼；在等的那幾天由「等到條件 M 檔在等」每天現形。"""
+    from crons import heartbeat as hb
+    from crons.daily_brief import open_choice_block, open_choice_lines, open_waiting_line
+
+    monkeypatch.setattr(hb, "_load_state", lambda state_dir, kind: ({"groups": {"open": OPEN_ROWS}}, None))
+    looked = _looked(tmp_path, "ib_a2", choice="等到條件", until=date(2026, 11, 20))
+    rows, _ = hb.open_choice_rows(tmp_path, looked_path=looked, today=date(2026, 11, 19))
+    assert [r["ticker"] for r in rows] == ["BBB"]
+    waiting, _ = hb.open_choice_waiting(tmp_path, looked_path=looked, today=date(2026, 11, 19))
+    assert [(r["ticker"], e.until.isoformat()) for r, e in waiting] == [("AAA", "2026-11-20")]
+    assert hb.open_choice_queue_line(rows, None, waiting).endswith("｜等到條件 1 檔在等（最近 2026-11-20 重問）：AAA")
+    line = open_waiting_line(waiting)
+    assert line == "- 等到條件 1 檔在等（最近 2026-11-20 重問）：AAA（2026-11-20：翻倍條件太遠）"
+    assert open_choice_block([], None, line) == [line]                         # 沒有待選、還有在等 → 那一句照印
+    rows, _ = hb.open_choice_rows(tmp_path, looked_path=looked, today=date(2026, 11, 20))
+    assert [r["ticker"] for r in rows] == ["AAA", "BBB"]
+    assert rows[0]["wait_expired"] == {"until": "2026-11-20", "why": "翻倍條件太遠"}
+    assert open_choice_lines(rows[:1])[0].endswith("｜上次說等到條件（翻倍條件太遠），2026-11-20 到期重問")
+    assert hb.open_choice_waiting(tmp_path, looked_path=looked, today=date(2026, 11, 20))[0] == []
+
+
+def test_the_heartbeat_and_the_brief_judge_the_wait_on_their_own_today(monkeypatch, tmp_path: Path) -> None:
+    """11-04 R2 覆核：心跳段 3 與短版 ③ 都收 `now`——等到條件到不到期看那一輪的今天，不看真實時鐘。假的 now 一天在到期前、
+    一天在到期當天：前者不列、後者列回來（不管真實時鐘是哪天）。變異：today_local 不吃 now、或回固定日子 → 紅。"""
+    import json
+
+    from crons import daily_brief
+    from crons import heartbeat as hb
+    from engine_b import todo
+
+    monkeypatch.setattr(hb, "_load_state", lambda state_dir, kind: ({"groups": {"open": OPEN_ROWS}}, None))
+    monkeypatch.setattr("portfolio.looked_log.LOOKED_LOG", _looked(tmp_path, "ib_a2", choice="等到條件",
+                                                                   until=date(2026, 11, 20)))
+    eve, due = (datetime(2026, 11, d, 1, 0, tzinfo=timezone.utc) for d in (19, 20))
+    queue = {when: hb.build_queue(state_dir=tmp_path, now=when).lines for when in (eve, due)}
+    assert any(x.startswith("**可開待你選 1**") and "等到條件 1 檔在等" in x for x in queue[eve])
+    assert any(x.startswith("**可開待你選 2**") and x.endswith("：AAA、BBB") for x in queue[due])
+    # 短版 ③：交下去的今天就是這一則的 today（由 now 換算）
+    seen: list = []
+    monkeypatch.setattr(hb, "open_choice_rows", lambda state_dir, **kw: seen.append(kw.get("today")) or ([], None))
+    monkeypatch.setattr(hb, "open_choice_waiting", lambda state_dir, **kw: seen.append(kw.get("today")) or ([], None))
+    monkeypatch.setattr(todo, "load", lambda *a, **k: todo.empty_pool())
+    monkeypatch.setattr(hb, "quota_entries", lambda rows, now: [])
+    leads = tmp_path / "pending_leads.json"
+    leads.write_text(json.dumps({"leads": {}, "harvest_log": []}), encoding="utf-8")
+    daily_brief.compose_brief(now=due, summary="Daily", snapshot={}, run_record_path=tmp_path / "missing.json",
+                              leads_path=leads, heartbeat_dir=tmp_path, state_dir=tmp_path)
+    assert seen and set(seen) == {date(2026, 11, 20)}
+
+
+def test_the_narrative_writer_reminds_when_a_rewrite_drops_checked_items(monkeypatch, tmp_path: Path, capsys) -> None:
+    """11-04 R2 覆核：`alpha brief --add` 取代上一版時，從 ledger 找到被取代的那一版、點名沒抄的項目——走整段 CLI，
+    寫入與脈絡換成假的（不寫任何檔）。變異：找上一版用錯鍵 → 提醒永遠不印 → 紅。"""
+    import json
+
+    import alpha.providers.briefs as briefs
+    from alpha import cli
+    from alpha.providers import closure as provider
+
+    previous = _brief(confirm=(CONFIRM,), depth_check={**ALL_CHECKED, "why_chosen": "加碼條件：c1"})
+    monkeypatch.setattr(provider, "first_narrative_awaiting_cohort", lambda _t: None)
+    monkeypatch.setattr(briefs, "WriteContext", SimpleNamespace(load=lambda ticker: None))
+    monkeypatch.setattr(briefs, "write_brief", lambda record, ctx: {"path": "（假）", "registered": [], "linked": [],
+                                                                    "consumed": [], "acknowledged": []})
+    monkeypatch.setattr(briefs, "read_brief_records", lambda ticker: ([previous], []))
+    monkeypatch.setattr("alpha.providers.candidates.held_on_board", lambda ticker: None)
+    raw = _fresh(depth_check={"latest_report": ALL_CHECKED["latest_report"]}, supersedes=previous.brief_id)
+    spec = {key: raw[key] for key in ("slots", "rides", "disproof", "answers", "candidate_state", "depth_check")}
+    spec["supersedes_id"] = previous.brief_id
+    path = tmp_path / "spec.json"
+    path.write_text(json.dumps(spec, ensure_ascii=False), encoding="utf-8")
+    assert cli.main(["brief", T, "--add", str(path)]) == 0
+    out = capsys.readouterr().out
+    assert "上一版查過的 9 項這一版沒寫" in out and "讀到邊：客戶為什麼選它的變體" in out
+    spec["supersedes_id"] = None                                           # 不是取代：不印
+    path.write_text(json.dumps(spec, ensure_ascii=False), encoding="utf-8")
+    assert cli.main(["brief", T, "--add", str(path)]) == 0
+    assert "上一版查過的" not in capsys.readouterr().out
+
+
+def test_an_unreadable_looked_log_is_said_not_raised(monkeypatch, tmp_path: Path) -> None:
+    """2026-11-04 R2：帳整本讀不到（編碼壞了）→ (None, 理由)；完整心跳段 3 照樣組得出來（pq2 清單不被帶走）。"""
+    from crons import heartbeat as hb
+
+    monkeypatch.setattr(hb, "_load_state", lambda state_dir, kind: ({"groups": {"open": OPEN_ROWS}}, None))
+    bad = tmp_path / "looked.jsonl"
+    bad.write_bytes("看了沒買".encode("big5"))
+    rows, problem = hb.open_choice_rows(tmp_path, looked_path=bad)
+    assert rows is None and "看了沒買的帳讀不到（UnicodeDecodeError）" in problem
+    monkeypatch.setattr("portfolio.looked_log.LOOKED_LOG", bad)
+    lines = hb.build_queue(state_dir=tmp_path, now=NOW).lines
+    assert any(x.startswith("可開待你選：讀不到（看了沒買的帳讀不到") for x in lines) and len(lines) > 1
 
 
 def test_the_decision_block_lists_each_open_row_with_its_priced_context_and_stays_out_of_the_batch() -> None:

@@ -10,7 +10,7 @@
 決定紀錄 §10.1 條 2 作答 (a)：十項對邊緣小公司天生答不齊——拿它擋可開，可開自 10-02 起每天都是 0。可開改由起始門決定
 （`alpha.providers.candidates.open_preconditions`）；這份清單搬去當**加碼條件**，寫法四種：
 
-- 引用（`library/raw/…`、`sr_…`、網址…）＝查過、答案在那份文件裡；
+- 引用（開頭是 `CITATION_PREFIXES` 之一：`library/raw/…`、`sr_…`、網址……）＝查過、答案在那份文件裡；
 - 「不適用：理由」＝這一項對這一檔不成立（沒有法說的小公司不該永遠卡在缺）；
 - 「加碼條件：c<n>」＝查過、現有文件答不了——寫成這一版 `confirm[]` 第 n 條（各自鑄 watch，新文件對上就醒）；
 - 「缺：…」＝還沒查。
@@ -40,10 +40,15 @@ DEPTH_CHECK_ITEMS: tuple[tuple[str, str], ...] = (
     ("core_premise", "所押讀圖的核心前提有供應商自述以外的證據（L8）"),
 )
 DEPTH_CHECK_KEYS: tuple[str, ...] = tuple(k for k, _ in DEPTH_CHECK_ITEMS)
-#: 一項的三種前綴（第四種寫法＝引用：不以這三個開頭的非空字串）。
+#: 一項的三種前綴（第四種寫法＝引用，見下）。
 NOT_APPLICABLE_PREFIX = "不適用："
 ADDON_PREFIX = "加碼條件："
 UNCHECKED_PREFIX = "缺"
+#: 「引用」這一種寫法的開頭——敘事 evidence_refs 實際用的那幾種（一手節錄、私人節錄、讀圖 id、圖、Engine C、alpha 推導、
+#: thesis memo、網址）。四種寫法都不是的字（「待查」「看過了」）不算查過、寫入端拒收（2026-11-04 R2：原本任何不以「缺」
+#: 開頭的字都算查過，寫「待查」就能把 ⑤「加碼條件還沒查」歸零——L18：標籤要指得回證據；L16：同義詞也拒收）。
+CITATION_PREFIXES: tuple[str, ...] = ("library/raw/", "library/private/", "sr_", "graph:", "engine_c:", "alpha://",
+                                      "thesis/", "https://", "http://")
 _ADDON_REF = re.compile(r"^加碼條件：c([1-9][0-9]*)(?![0-9])")
 
 
@@ -53,9 +58,24 @@ def addon_index(value: Any) -> int | None:
     return int(match.group(1)) if match else None
 
 
+def value_form(value: Any) -> str | None:
+    """一項的寫法：`cite`（引用）｜`not_applicable`｜`addon`｜`unchecked`；四種都不是（空的、非字串、「不適用：」沒理由、
+    「加碼條件：」後面不是 c<n>、不認得的字）回 None。「查過」與寫入端的形狀檢查共用這一個判斷（L16）。"""
+    if not isinstance(value, str) or not value.strip():
+        return None
+    text = value.strip()
+    if text.startswith(UNCHECKED_PREFIX):
+        return "unchecked"
+    if text.startswith(NOT_APPLICABLE_PREFIX):
+        return "not_applicable" if text[len(NOT_APPLICABLE_PREFIX):].strip() else None
+    if text.startswith(ADDON_PREFIX):
+        return "addon" if addon_index(text) is not None else None
+    return "cite" if text.startswith(CITATION_PREFIXES) else None
+
+
 def is_checked(value: Any) -> bool:
-    """查過＝非空字串、而且不是「缺…」——引用、「不適用：理由」、「加碼條件：c<n>」都算。"""
-    return isinstance(value, str) and bool(value.strip()) and not value.strip().startswith(UNCHECKED_PREFIX)
+    """查過＝引用（開頭是 `CITATION_PREFIXES` 之一）、「不適用：理由」、「加碼條件：c<n>」；「缺…」、空的、四種都不是的都不算。"""
+    return value_form(value) in ("cite", "not_applicable", "addon")
 
 
 def unchecked_items(depth_check: Mapping[str, Any] | None) -> list[str]:
@@ -92,6 +112,9 @@ def depth_check_problems(depth_check: Any, *, confirm_count: int) -> list[str]:
                 problems.append(f"depth_check.{key}：指向 confirm[{n}]，但這一版只有 {confirm_count} 條加碼條件")
         elif text.startswith(NOT_APPLICABLE_PREFIX) and not text[len(NOT_APPLICABLE_PREFIX):].strip():
             problems.append(f"depth_check.{key}：「不適用：」後面要寫理由")
+        elif value_form(text) is None:
+            problems.append(f"depth_check.{key}：寫法要是四種之一——引用（開頭 {'、'.join(CITATION_PREFIXES)}）｜"
+                            f"不適用：理由｜加碼條件：c<n>｜缺：…（收到 {text[:30]!r}；沒查就寫「缺：…」）")
     return problems
 
 
@@ -109,5 +132,19 @@ def depth_check_lines(depth_check: Mapping[str, Any] | None) -> list[str]:
             f"｜加碼條件 {addon}）"]
 
 
-__all__ = ["ADDON_PREFIX", "DEPTH_CHECK_ITEMS", "DEPTH_CHECK_KEYS", "NOT_APPLICABLE_PREFIX", "UNCHECKED_PREFIX",
-           "addon_index", "depth_check_lines", "depth_check_problems", "is_checked", "unchecked_items"]
+def dropped_checks_line(previous: Mapping[str, Any] | None, current: Mapping[str, Any] | None) -> str | None:
+    """重寫時上一版查過、這一版沒寫成查過的項目（2026-11-04 R2：為別的原因重寫——換騎、處置醒來的 watch——沒抄清單，
+    ⑤ 那一檔就跳回還沒查）→ 一行提醒；沒有掉的回 None。只印、不擋：這一版沒查就是沒查，不自動沿用（敘事是當時的判斷）。"""
+    before = dict(previous) if isinstance(previous, Mapping) else {}
+    after = dict(current) if isinstance(current, Mapping) else {}
+    dropped = [label for key, label in DEPTH_CHECK_ITEMS if is_checked(before.get(key)) and not is_checked(after.get(key))]
+    if not dropped:
+        return None
+    return (f"  ⚠ 上一版查過的 {len(dropped)} 項這一版沒寫（⑤ 會把它們數回還沒查）：" + "、".join(dropped)
+            + "——還成立就把那幾項抄過來（只提醒、不擋）")
+
+
+__all__ = ["ADDON_PREFIX", "CITATION_PREFIXES", "DEPTH_CHECK_ITEMS", "DEPTH_CHECK_KEYS", "NOT_APPLICABLE_PREFIX",
+           "UNCHECKED_PREFIX",
+           "addon_index", "depth_check_lines", "depth_check_problems", "dropped_checks_line", "is_checked",
+           "unchecked_items", "value_form"]

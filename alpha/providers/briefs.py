@@ -378,17 +378,19 @@ def v2_write_problems(parsed: InvestorBrief, *, ctx: WriteContext, existing: Seq
 
 
 def depth_check_ref_problems(parsed: InvestorBrief, *, readings_by_id: Mapping[str, Any], root: Path) -> list[str]:
-    """⑬：`depth_check` 裡寫成 `library/raw/…` 的檔要在 library/raw 底下、`sr_…` 要是讀圖 id。回問題清單。"""
-    raw_dir = (root / "library" / "raw").resolve()
+    """⑬：`depth_check` 裡寫成 `library/raw/…`／`library/private/…` 的檔要在那個目錄底下（私人節錄同一條，2026-11-04 R2
+    對稱面）、`sr_…` 要是讀圖 id。回問題清單。"""
     problems: list[str] = []
     for key, value in parsed.depth_check:
         text = str(value).strip()
-        if text.startswith(RAW_EXCERPT_PREFIX):
-            path = (root / text).resolve()
-            if raw_dir not in path.parents or not path.is_file():
-                problems.append(f"depth_check.{key}：{text} 在 library/raw 找不到（或跳出了 library/raw）——"
-                                "一手節錄要先存成檔再引用")
-        elif text.startswith("sr_") and text not in readings_by_id:
+        for prefix, label in ((RAW_EXCERPT_PREFIX, "library/raw"), ("library/private/", "library/private")):
+            if text.startswith(prefix):
+                base = (root / prefix).resolve()
+                path = (root / text).resolve()
+                if base not in path.parents or not path.is_file():
+                    problems.append(f"depth_check.{key}：{text} 在 {label} 找不到（或跳出了 {label}）——"
+                                    "節錄要先存成檔再引用")
+        if text.startswith("sr_") and text not in readings_by_id:
             problems.append(f"depth_check.{key}：{text} 不是任何讀圖 id")
     return problems
 

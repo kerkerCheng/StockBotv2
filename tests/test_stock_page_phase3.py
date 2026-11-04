@@ -276,6 +276,30 @@ def test_candidate_panel_copies_the_row_and_three_words_and_never_affects_readin
     assert {line.key: line.datum.value for line in off.lines}["candidate:priced_in"] == "未答", "不上板也印三個字"
 
 
+def test_a_retired_declaration_is_printed_as_written_not_as_read() -> None:
+    """2026-11-04 R2：11-03 前寫等回落的舊紀錄讀成可開（`declared`＝open），掉進前提失效時匯出不得印「敘事宣告：可開」——
+    印當時寫的字（`declared_retired_label`；舊 artifact 沒有這一格就印原字）。INV-6：不拿今天的讀法改寫當時說的話。"""
+    from briefing.analyst_view import render_analyst_view_markdown
+
+    row = {"ticker": T, "derived": "precondition_failed", "derived_label": "前提失效", "declared": "open",
+           "declared_label": "可開", "declared_retired": "priced_wait",
+           "declared_retired_label": "已定價等回落（11-03 前的說法，現讀成可開）",
+           "rewrite": [], "preconditions": ["會死嗎是紅"], "stall_days": 1, "note": None}
+    words = {"will_it_die": "紅（灰 0）", "priced_in": "是", "in_numbers": "是"}
+
+    def text(r):
+        return render_analyst_view_markdown(build_analyst_view(_bare_view(), candidate={
+            "row": r, "three_words": words, "today": "2026-11-04", "sheet": {"status": "ok"},
+            "downside": {"rows": []}})).replace("\\", "")
+
+    assert "（敘事宣告：已定價等回落（11-03 前的說法，現讀成可開））" in text(row)
+    assert "敘事宣告：可開" not in text(row)
+    old = {k: v for k, v in row.items() if k != "declared_retired_label"}
+    assert "（敘事宣告：priced_wait）" in text(old)
+    plain = {**row, "declared_retired": None, "declared_retired_label": None}
+    assert "（敘事宣告：可開）" in text(plain)                                  # 不是退役字照舊印讀法
+
+
 def test_candidate_and_downside_panels_keep_the_producer_declared_absence() -> None:
     for given, kind in ((None, "upstream_unavailable"),
                         ({"absence": {"kind": "point_in_time_unavailable", "reason": "as-of"}}, "point_in_time_unavailable")):

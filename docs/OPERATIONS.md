@@ -123,6 +123,16 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 `StockBotv2-Daily` 的 ⑱⑲ 取代（1.2a 停用、2026-09-25 1.2b 刪除）；它們的理由（LLM 失敗心跳照發、永遠 exit 0、Python 不用 `.cmd`、
 發送走 subprocess）搬進 `crons/daily_task.py` 的 docstring，守它們的測試改主詞搬進 `tests/test_daily_task.py`「無人值守入口」節。
 
+### Sandbox impact review 結論（2026-11-04：第 17 條與第 18＋16 條的 R2 條件修正——看了沒買記板上那一版、等到條件有到期、「你的決定」只數可開；退役字照當時的字印、可開天數從讀成可開起算、深挖清單「查過」要指得回）
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | daily ⑬ materialize（argv 不變）：`candidates` 列多一格 `declared_retired_label`（加法、不升版）、退役字那幾列的滯留從 `alpha.candidates.RETIRED_READ_SINCE` 起算——同一份 artifact、同一條序列檔（今天那一行照舊覆蓋）。daily ⑱ 心跳（argv 不變）：可開待你選改讀看了沒買每檔最後一次的選擇（等到條件到期那天列回來）、多一句「等到條件 M 檔在等」（同一本帳、唯讀）；帳整本讀不到時那一行說讀不到，不再往上炸掉段 3 的 pq2 清單與快照的候選計數；短版 ④「你的決定」只數當時是可開的、其餘另列。**互動寫入面**：`record_trade.py looked` 多 `--until`、多兩道拒收（候選板上那一列不是現行那一版；解析不到公司改 exit 2）——同一個入口、同一個檔、只 append；`alpha brief --add` 多印一行「上一版查過的沒抄」（只讀敘事 ledger），深挖清單多擋不認得的寫法與指不回的私人節錄。不新增主機、請求、憑證、寫入目的地 |
+| **2 canonical skill／prompt／本檔** | 本節與「記錄看了沒買」；ARCHITECTURE（看了沒買、`candidates` kind、v2 契約、圖頁分區、成績單分組）；CONCEPTS「起始門與加碼條件」；`skills/research-drain` 段 5（起始門哪幾項寫入端驗、深挖清單四種寫法、加碼條件要文件那一步、重寫抄清單）、`skills/daily-brief` ③ 與「當下記下來」那一段。AGENTS 不動（等到條件不進等待 registry 是使用者 11-04 核准的例外，住 ARCHITECTURE 與 plan §8）。無人值守 prompt 不動 |
+| **3 最窄 rule** | daily argv 不變；不新增 step、allowlist、rule；`record_trade` 在 `.claude/**`（tracked）、`.codex/**`、`crons/**`、`config/**` 仍 0 命中（心跳只 import 讀者）；`.codex/rules` 仍 0 條；APP 仍沒有寫入端點（契約不升版；改了 app.js 照例重啟 serve） |
+| **4 contract test** | `tests/test_looked_log.py` 13 條（板上版本、到期、重記、重複只算一次、半行、只數可開、trade_log 讀不懂報出、`--until`、exit 2）；`tests/test_open_two_gates.py` 補到期重問與「在等」那一句、帳讀不到不炸、只讀可開組、退役字中文、滯留起算、深挖清單四種寫法、私人節錄、沒抄提醒、舊紀錄沒押讀圖 fail closed、持股讀不到加碼格＝None；`tests/test_stock_page_phase3.py` 匯出印當時的字。變異 23／23 紅。窄範圍覆核（CONDITIONAL_GO，兩個測試洞）後補：心跳段 3、快照、短版 ③ 的「今天」由 `now` 換算傳下去（`looked_log.today_local(now)`，不看真實時鐘）、`alpha brief --add` 的沒抄提醒走整段 CLI 的測試——覆核者那兩種改壞法加三個變體 5／5 紅 |
+| **5 端到端 smoke** | 11-04 真資料 `materialize AXTI 3081.TWO 4979.TWO STLTECH.NS --candidates`：STLTECH.NS 可開 1 天（原 7）、`oldest_stall_days.open` 1；三檔前提失效的列與個股頁帶「已定價等回落（11-03 前的說法，現讀成可開）」。APP 重啟後 health `code.stale=false`；headless Edge 渲染 AXTI 個股頁「前提失效（敘事宣告：已定價等回落…）」、首頁與 STLTECH.NS 沒有錯誤框。手跑心跳（`--out` 暫存、不寫快照、不發送）：③「可開 1 天」、④「你的決定 11 月：進 0｜不要 0｜等到條件 0（只數當時是可開的…）」。`record_trade.py looked --symbol STLTECH.NS --choice 等到條件` 乾跑：過板上版本檢查、「2026-12-04 起列回可開待你選重問」、沒寫任何檔（帳仍 0 列） |
+
 ### Sandbox impact review 結論（2026-11-03：看了沒買的收據——A5 第二本＋短版 ④「你的決定」；盲點修法 plan 2026-11-02-001 §2 第 17 條）
 
 | 步 | 結論 |
@@ -1421,16 +1431,18 @@ alpha 原則上不用貸款資金是使用者自己的紀律，本腳本**不加
 
 ```powershell
 & '.venv\Scripts\python.exe' scripts\record_trade.py looked --symbol AXTI --choice 等到條件 `
-    --why "<他的話：等到什麼／為什麼不要>"            # 先不加 --apply 看收據，再加 --apply 寫一次
+    --why "<他的話：等到什麼／為什麼不要>" [--until 2026-12-15]   # 先不加 --apply 看收據，再加 --apply 寫一次
 ```
 
 - 「進」不走這條：下單後照上面記成交（`--side buy`，同一種研究收據）。`--choice` 只收 `不要`／`等到條件`。
 - 寫進 tracked `library/trades/looked_log.jsonl`（append-only，與 trade_log 同處）；一列帶當時現行 v2 敘事的 brief_id 與整份研究收據
   （`side`＝看了沒買，組法與成交同一支）。**不寫 Sheet、不寫 trade_log、不過硬擋**（沒有成交）；Sheet 只讀，讀不到不擋（公司改由名冊解析、收據照實記）。
-- 拒收：缺理由（exit 2）、beta 代號（exit 2）、沒有現行 v2 敘事（exit 4——「沒買」要指得出當時讀的是哪一版，先寫敘事）、解析不到公司。
-  同一筆重跑不重寫。
-- 讀者只有一個：短版 ④「你的決定 N 月：進｜不要｜等到條件」（進＝trade_log 裡帶研究收據的買進）。它不改敘事的候選狀態、不鑄號、
-  不產生任何動作。形狀住 `portfolio/looked_log.py`。
+- 等到條件帶 `--until`（他說了哪天就照寫；不給＝30 天後）：到期那天起「可開待你選」把它列回來重問；`不要` 不收 `--until`。
+- 拒收：缺理由（exit 2）、beta 代號（exit 2）、解析不到公司（exit 2——補名冊或改用研究 ticker）、沒有現行 v2 敘事（exit 4——「沒買」要指得出
+  當時讀的是哪一版，先寫敘事）、**候選板上那一列比現行敘事舊**（exit 2——2026-11-04 R2：先 `python -m webapp materialize --candidates`，請他讀新的那一版再記）。
+  同一版敘事的同一個選擇還在生效時重跑不重寫（改理由的標點、隔天重跑都一樣）；換選擇、等到條件到期後重問、明給不同的 `--until` 才寫新的一列。
+- 讀者兩個：短版 ④「你的決定 N 月：進｜不要｜等到條件」（只數當時是可開的；加碼買進與對缺 X 的不要另列）與短版 ③ 的可開待你選。
+  它不改敘事的候選狀態、不鑄號、不產生任何動作。形狀住 `portfolio/looked_log.py`。
 
 ### Google Sheet 的 Dashboard 分頁（2026-10-02 v6）
 

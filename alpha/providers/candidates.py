@@ -276,6 +276,10 @@ def derive_row(ticker: str, company_id: str | None, *, records: Sequence[Investo
         "declared_label": GROUP_LABELS.get(eff) if eff else None,
         # 當時寫的是退役的宣告值（11-03 前的等回落）才有——照讀成 `declared`，這一格只讓稽核分得出來
         "declared_retired": cs.state if cs and cs.state in CANDIDATE_STATES_RETIRED else None,
+        # 它的中文（11-04 R2：個股頁與「問 Claude」原本把讀法 `declared_label` 標成「敘事宣告」——當時說的是等回落就印等回落，
+        # INV-6）。加法欄、不升版：讀不到它的舊 artifact 由畫面退回印原字
+        "declared_retired_label": (RETIRED_STATE_LABELS.get(cs.state, cs.state)
+                                   if cs and cs.state in CANDIDATE_STATES_RETIRED else None),
         "derived": None, "group": None, "side": None,
         "reason": cs.reason if cs else None,
         # 故事層（2026-10-29）：理由的一句故事、缺 X 的短標——寫給這一版敘事的才算（敘事換版就退回印原理由）

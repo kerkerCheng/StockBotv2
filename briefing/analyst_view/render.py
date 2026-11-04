@@ -254,7 +254,9 @@ def render_analyst_view_markdown(view: AnalystView) -> str:
     if state is not None and state.is_known and isinstance(state.value, Mapping):
         row = state.value
         head_line = f"- 候選狀態：**{markdown_text(str(row.get('derived_label') or row.get('derived') or '—'))}**"
-        if row.get("declared") and row.get("declared") != row.get("derived"):
+        if row.get("declared_retired"):                # 當時寫的是退役的宣告值：印當時的字（2026-11-04 R2；INV-6）
+            head_line += (f"（敘事宣告：{markdown_text(str(row.get('declared_retired_label') or row['declared_retired']))}）")
+        elif row.get("declared") and row.get("declared") != row.get("derived"):
             head_line += f"（敘事宣告：{markdown_text(str(row.get('declared_label') or row.get('declared')))}）"
         if row.get("edge_note"):                       # 邊緣判定少一個輸入：標記，不是狀態（2026-10-30）
             head_line += f"｜{markdown_text(str(row['edge_note']))}"

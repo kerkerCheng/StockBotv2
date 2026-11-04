@@ -27,6 +27,9 @@ GROUP_LABELS: Mapping[str, str] = {"open": "可開", "missing": "缺 X", "pass":
 #: 退役的宣告值的中文（`alpha.narrative.contracts.CANDIDATE_STATES_RETIRED`）：候選板讀成可開，這裡只給成績單「錨點那天宣告的
 #: 狀態」與稽核用——當時說的是等回落就照實印（INV-6：不拿今天的讀法改寫當時說的話）。
 RETIRED_STATE_LABELS: Mapping[str, str] = {"priced_wait": "已定價等回落（11-03 前的說法，現讀成可開）"}
+#: 退役的宣告值從哪一刻起讀成接手它的那一態（第 18＋16 條上線：2026-11-03 台北 00:00）。滯留從這一刻起算——在這之前那幾版
+#: 給人看的是等回落、不是可開（11-04 R2：STLTECH.NS 11-03 才進可開，短版 ③ 卻印「可開 7 天」；INV-6）。
+RETIRED_READ_SINCE = datetime(2026, 11, 2, 16, 0, tzinfo=timezone.utc)
 SIDE_GROUPS: tuple[str, ...] = ("not_multiple", "edge_unmeasurable", "legacy", "precondition_failed")
 #: `edge_unmeasurable` 只裝**宣告可開**、邊緣判定少一個輸入的檔（缺輸入不放行）；缺 X／不要照敘事分組、
 #: 列上帶 `edge_note`（2026-10-30 使用者「好 改吧」：原本一律蓋掉宣告，9 檔裡 5 檔缺 X、4 檔不要都被藏進這一組——L12）。
@@ -292,8 +295,21 @@ def stall_version(records: Sequence[InvestorBrief], brief: InvestorBrief) -> Inv
 
 def stall_since(records: Sequence[InvestorBrief], brief: InvestorBrief) -> datetime:
     """沿 `supersedes` 鏈往回，取**連續宣告同一 state** 的最早一筆 `created_at`——撤回之後到重寫之前那段「沒有宣告」，
-    不算進滯留。"""
-    return stall_version(records, brief).created_at
+    不算進滯留。鏈上寫的是退役字（11-03 前的等回落）的那幾版，起點不早於 `RETIRED_READ_SINCE`（那之前它給人看的不是
+    可開）；照原字就是這一態的版本照它自己的時間——取整段裡最早的那一個（11-04 R2）。"""
+    first = stall_version(records, brief)
+    by_id = {r.brief_id: r for r in records}
+    chain, cur = [brief], brief
+    while cur.brief_id != first.brief_id and cur.supersedes_id in by_id:
+        cur = by_id[cur.supersedes_id]
+        chain.append(cur)
+
+    def start(version: InvestorBrief) -> datetime:
+        cs = version.candidate_state
+        retired = cs is not None and cs.state != cs.effective
+        return max(version.created_at, RETIRED_READ_SINCE) if retired else version.created_at
+
+    return min(start(version) for version in chain)
 
 
 # ---------------------------------------------------------------------------
@@ -735,7 +751,7 @@ def assemble_board(rows: Sequence[Mapping[str, Any] | None], *, universe: Sequen
 
 __all__ = ["ADDON_GROUPS", "ANSWER_WORDS", "CANDIDATES_THIS_IS_NOT", "GROUPS", "GROUP_LABELS", "IN_NUMBERS_LINES",
            "LIGHT_ORDER", "LIGHT_WORDS", "LIST_GROUPS", "LIST_GROUP_LABELS", "NEW_EDGES_PREFIX", "NOT_EDGE_PENDING_PREFIX",
-           "ON_THRESHOLD_WORDS", "PRICED_IN_LINES", "RETIRED_STATE_LABELS",
+           "ON_THRESHOLD_WORDS", "PRICED_IN_LINES", "RETIRED_READ_SINCE", "RETIRED_STATE_LABELS",
            "REWRITE_STATE_WORDS", "REWRITE_WHY", "RIDES_SUPERSEDED_PREFIX", "SIDE_GROUPS", "SIDE_LABELS", "UNANSWERED",
            "WIPEOUT_LINES", "Cited", "addon_unchecked_rows", "assemble_board", "body_key", "body_version", "cap_label",
            "cited_identities", "deadline_line", "edge_note",

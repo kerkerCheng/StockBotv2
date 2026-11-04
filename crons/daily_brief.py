@@ -516,33 +516,51 @@ def open_choice_lines(rows: Sequence[Mapping[str, Any]], *, label: Any = None) -
                       f"→{_pctile((info.get('now') or {}).get('value'))}")
             if info.get("return_since") is not None:
                 priced += f"｜判斷日以來 {_signed(float(info['return_since']))}"
-        out.append(f"- {name}：可開 {row.get('stall_days', '?')} 天｜{priced}")
+        expired = row.get("wait_expired") if isinstance(row.get("wait_expired"), Mapping) else None
+        again = f"｜上次說等到條件（{expired.get('why')}），{expired.get('until')} 到期重問" if expired else ""
+        out.append(f"- {name}：可開 {row.get('stall_days', '?')} 天｜{priced}{again}")
     return out
 
 
-def open_choice_block(lines: Sequence[str] | None, problem: str | None) -> list[str]:
+def open_waiting_line(waiting: Sequence[tuple[Mapping[str, Any], Any]] | None, *, label: Any = None) -> str | None:
+    """③ 的「等到條件 M 檔在等」那一句（2026-11-04 R2：等到條件有到期；這筆等待不在等待 registry，所以每天印在這裡）：
+    每檔附等到哪天、等的是什麼。沒有在等的回 None（不印）。"""
+    from crons.heartbeat import open_waiting_text
+
+    head = open_waiting_text(waiting)
+    if head is None or not waiting:
+        return None
+    each = "、".join(f"{label(row) if label else row.get('ticker')}（{entry.until.isoformat()}：{entry.why}）"
+                     for row, entry in waiting)
+    return f"- {head}：{each}"
+
+
+def open_choice_block(lines: Sequence[str] | None, problem: str | None, waiting: str | None = None) -> list[str]:
     """③ 的「可開待你選」（2026-11-03 第 18＋16 條；決定紀錄 §10.1 停止條件第一子句量的就是它）：起始門都過、這一版敘事
-    你還沒選的檔。進／不要／等到條件是你的，所以住 ③；沒有 pq2 編號、不進批次指令；0 檔不印（④ 候選那一行照印可開 0）。"""
+    你還沒選（或等到條件已到期）的檔。進／不要／等到條件是你的，所以住 ③；沒有 pq2 編號、不進批次指令；0 檔不印（④ 候選
+    那一行照印可開 0）——但還有等到條件在等時，那一句照印（`open_waiting_line`）。"""
     if lines is None:
         return [f"**可開待你選：讀不到（{problem}）**"]
     if not lines:
-        return []
+        return [waiting] if waiting else []
     return [f"**可開 {len(lines)} 檔待你選**（起始門都過、這一版敘事你還沒選；已定價是脈絡、不是門檻）", *lines,
+            *([waiting] if waiting else []),
             "- 回法：進＝下單後照成交記；不要／等到條件＝看了沒買 `python scripts/record_trade.py looked --symbol <代號> "
-            "--choice 不要|等到條件 --why …`——記過的這一版不再列，敘事換版再問"]
+            "--choice 不要|等到條件 --why … [--until YYYY-MM-DD]`——不要＝這一版不再列；等到條件＝到期那天（不給＝30 天後）"
+            "列回來重問；敘事換版一律再問"]
 
 
 def decisions_block(*, actionable: Sequence[Mapping[str, Any]] | None, problem: str | None,
                     todo_mod: Any, open_choice: Sequence[str] | None = (),
-                    open_problem: str | None = None) -> tuple[list[str], str | None]:
+                    open_problem: str | None = None, open_waiting: str | None = None) -> tuple[list[str], str | None]:
     """③ 待你決定：一條一塊——**[編號] 主詞**、細節一行、go＝、不含、圖會變、建議（2026-10-28 使用者核可的排版）。
     清單與批次指令跟心跳段 3 同一份（`todo.actionable_items`、`heartbeat.recommended_batch`）；go／不含的白話取自
     `todo.GO_PLAIN`（與 `GO_AUTHORIZATION` 同鍵，L16）。回（這一塊的行, 建議的批次指令或 None）——批次指令由
     `compose_brief` 單獨放最後一則。2026-10-07 起不含向你要文件（③b）。可開待你選（`open_choice_block`，傳進來的是
-    `open_choice_lines` 組好的行；None＝讀不到）排在編號前面。"""
+    `open_choice_lines` 組好的行；None＝讀不到；`open_waiting`＝等到條件在等的那一句）排在編號前面。"""
     from crons.heartbeat import PQ2_LIST_LIMIT, recommended_batch
 
-    choice = open_choice_block(open_choice, open_problem)
+    choice = open_choice_block(open_choice, open_problem, open_waiting)
     if actionable is None:
         return [f"### ③ 待你決定（讀不到：{problem}）", *choice], None
     extra = f"＋可開待你選 {len(open_choice)}" if open_choice else ""
@@ -926,14 +944,21 @@ def compose_brief(*, now: datetime, summary: str, snapshot: Mapping[str, Any], r
         except Exception as exc:  # noqa: BLE001
             actionable = asking = None
             problem = type(exc).__name__
+        waiting = None
         try:
-            rows, open_problem = hb.open_choice_rows(state_dir)
-            choice = None if rows is None else open_choice_lines(
-                rows, label=lambda r: company_label(company_id=r.get("company_id"), ticker=r.get("ticker")))
+            # 「今天」用這一則的 today（由 now 換算），不讓等到條件的到期改看真實時鐘（11-04 R2 覆核）
+            rows, open_problem = hb.open_choice_rows(state_dir, today=today)
+
+            def name(r: Mapping[str, Any]) -> str:
+                return company_label(company_id=r.get("company_id"), ticker=r.get("ticker"))
+
+            choice = None if rows is None else open_choice_lines(rows, label=name)
+            if rows is not None:
+                waiting = open_waiting_line(hb.open_choice_waiting(state_dir, today=today)[0], label=name)
         except Exception as exc:  # noqa: BLE001 — 候選板讀不到不帶走 pq2 那幾塊
             choice, open_problem = None, type(exc).__name__
         lines, batch[0] = decisions_block(actionable=actionable, problem=problem, todo_mod=todo_mod,
-                                          open_choice=choice, open_problem=open_problem)
+                                          open_choice=choice, open_problem=open_problem, open_waiting=waiting)
         return [*lines, "", *documents_block(asking=asking, problem=problem, todo_mod=todo_mod, today=today)]
 
     def line(build: Any, label: str) -> list[str]:

@@ -665,7 +665,8 @@ L16）。兩份 state artifact 與 `/api/v1/candidates`、`/api/v1/watches` 照�
 **「圖」頁（同一輪第三步：讀圖、走圖、層說明清單、結構表四頁併成 `#/graph`，回答「圖的哪裡有機會」）：** 骨架是層，每份現行讀圖一張卡。
 `GET /api/v1/graph` 在**請求時**接已 materialize 的 `structure_readings`＋`structure_table`＋`layer_notes`＋`graph_walk`＋個股頁
 （不新增 kind、daily 不動；request path 照樣零寫入零網路，四種證明走 `COMPOSED_ROUTES`）。分區照字彙
-（`webapp/materialize.py::reading_zones` 寫進 `.meta.json`：押得下去＝`alpha.providers.briefs.OPEN_READING_KINDS`、判不出、都不是〔預設收合〕；
+（`webapp/materialize.py::reading_zones` 寫進 `.meta.json`：押得下去＝`alpha.providers.briefs.BETTABLE_READING_KINDS`（護城河／量——起始門的
+`OPEN_READING_KINDS` 多收未定，2026-11-03 兩者分開，判不出的層不得併回押得下去；L12）、判不出、都不是〔預設收合〕；
 字彙外的 kind 進「未分區」不消失），區內照節點 id、卡內公司照首頁的組序——都不是名次。坐在這一層的公司＝結構表裡 `supplies_to` 那幾列
 （依 company_id 去重；有個股頁的連過去、印短名與候選狀態）；讀圖另外關聯但不是供應商的另列一行。「錢在變多嗎」只印層代表宣告了 yoy 的層（量得到才印、不補）；
 押在判不出的層上的缺 X 印在那張卡上（缺的多半就是這一份讀圖）。名字照 `config/node_labels_zh.json` → 層說明標題 → 結構表 → 個股頁，
@@ -677,7 +678,8 @@ L16）。兩份 state artifact 與 `/api/v1/candidates`、`/api/v1/watches` 照�
 **「成績單」頁（同一輪第四步：追蹤表與帳號計分表併成一頁，路由沿用 `#/positions`；回答「我們說過的話、追過的來源，後來對不對」）：**
 `GET /api/v1/report-card` 在請求時接 `positions`＋`account_scorecard`＋`structure_readings` 的圖預測對錯表（不新增 kind；四種證明照走）。
 兩條線的樣本數、量測起始與 power-law 三量照舊在最上面（樣本效度先於數字）；paper 線改照**寫下判斷那天宣告的候選狀態**分組——
-組＝`.meta.json` 的 `claim_groups`（`CANDIDATE_STATES_DECLARABLE` 四種，0 也印；已持有來自 Sheet，不是我們說的話），字彙外或沒記下的
+組＝`.meta.json` 的 `claim_groups`（`CANDIDATE_STATES_DECLARABLE` 三種，0 也印；11-03 起退役的等回落照寫下那天的原字分在
+`retired_states` 那一組，INV-6；已持有來自 Sheet，不是我們說的話），字彙外或沒記下的
 狀態另列在後面（不消失）；組內照 artifact 的列序（代號），**不照報酬排、路由不算組平均**（量測才幾週，平均是雜訊；brainstorm F4）。
 每組一張點圖（一點一檔、橫軸是寫下後到現在、同格往上疊，「2 倍」那條線一定畫得到），逐檔表點開才畫；「現在」的狀態印中文——
 兩個出口（撤回、舊版）的標籤住 `alpha.candidates.PAPER_STATE_EXITS`，經 `.meta.json` 的 `paper_state_exits` 走到畫面（L16；之前印 `pass → retracted`）。
@@ -722,8 +724,10 @@ alpha／beta 界線用 `risk/hard_caps.py` 匯出的 `beta_instrument_for`／`is
 押的讀圖仍現行且判讀不是 neither（`alpha/providers/briefs.py::OPEN_READING_KINDS`＝護城河／量／未定）、反證已寫下（`disproof[]` 至少一條；
 到期由寫入端擋）、會死嗎四盞燈沒有紅（`alpha.candidates.wipeout_worst`；四盞都灰＝驗不了，fail closed）、answers 的稽核行沒變全缺席、
 歸屬本檔的 watch 沒有待判、連結的反證來源仍在盯——破了進「前提失效」；寫入端 ⑥ 擋寫入當下驗得到的那幾項（讀圖判讀、反證、待處置的反證 watch）。
-**讀到邊與十項深挖清單不在門裡，是加碼條件**：敘事帶選填的 `depth_check`（`alpha/narrative/depth_check.py`：每項寫引用｜`不適用：理由`｜
-`加碼條件：c<n>`——c<n> 指向同一份的 `confirm[]`，寫入端 ⑬ 驗得到；只在非空時進 id 欄位集合，舊紀錄 id 不變）；列帶 `addon_unchecked`
+**讀到邊與十項深挖清單不在門裡，是加碼條件**：敘事帶選填的 `depth_check`（`alpha/narrative/depth_check.py`：每項四種寫法——引用（開頭限
+`CITATION_PREFIXES`：一手／私人節錄、讀圖 id、圖、Engine C、alpha 推導、thesis、網址；節錄檔與讀圖 id 寫入端 ⑬ 驗得到）｜`不適用：理由`｜
+`加碼條件：c<n>`（指向同一份的 `confirm[]`）｜`缺：…`；四種都不是的字（「待查」）契約拒收、不算查過——2026-11-04 R2，L18；只在非空時進 id
+欄位集合，舊紀錄 id 不變；取代上一版時上一版查過、這一版沒寫的項目由 `alpha brief --add` 印一行提醒〔`dropped_checks_line`，只印不擋〕）；列帶 `addon_unchecked`
 （還沒查的項目，只算可開與已持有；沒有 v2 敘事＝十項都沒查），`counts.addon_unchecked`（持股讀不到＝None，已持有那一半數不到）→
 ⑤「加碼條件還沒查」，drain 收尾歸零（加碼條件的 watch 只被**新**文件叫醒，答案若在既有的年報、法說裡不會自己醒）。
 **逾期型反證**（2026-11-03 盲點修法第 10 條②；candidates/8）：列帶 `deadline_disproof`（這一版敘事標 `deadline` 的反證條數，沒有 v2 敘事＝None），
@@ -736,7 +740,8 @@ alpha／beta 界線用 `risk/hard_caps.py` 匯出的 `beta_instrument_for`／`is
 等回落的重開條件與價格叫醒（10-30／11-01，candidates/5）同日退役；舊紀錄寫過的 `reopen` 照存、不再讀。可開那一句已定價只當脈絡：
 短版 ③「可開 N 檔待你選」（`crons/daily_brief.py::open_choice_block`）逐檔印可開天數、已定價答案、自家三年百分位、判斷日以來漲跌，
 完整心跳待你決定那一段一行（`crons/heartbeat.py::open_choice_queue_line`）；這一版敘事選過的不再列（`crons/heartbeat.py::open_choice_rows`：
-看了沒買 `library/trades/looked_log.jsonl` 的（公司, brief_id）對上就算選過；敘事換版再問）。每一列（不論宣告哪一態）另帶 `rewrite[]`：連結斷了（附為什麼斷——來源收掉／被判觸及／
+看了沒買 `library/trades/looked_log.jsonl` 每個（公司, brief_id）最後一次的選擇——不要＝這一版不再列；等到條件＝到 `until` 那天列回來、附上次
+等的是什麼；敘事換版一律再問；還在等的由 `open_choice_waiting` 每天印「等到條件 M 檔在等」；帳整本讀不到＝讀不到、不炸段 3，2026-11-04 R2）。每一列（不論宣告哪一態）另帶 `rewrite[]`：連結斷了（附為什麼斷——來源收掉／被判觸及／
 到期未判，L12）、敘事來源 watch 醒來／觸及／到期未判（plan §5 第 6 點）、缺 X 在等的 watch 已失效（11-03 前等回落舊紀錄的叫醒 watch 照算，
 `engine_b/narrative_watches.py::WAITING_STATES`）。「連結斷了」的唯一判定是
 `engine_b/narrative_watches.py::link_breaks`，佇列段 `narrative_rewrite`（經 `observe(narrative_link_breaks=…)` 注入）、audit
@@ -848,9 +853,13 @@ AnalystView.brief（optional）→ APP 首屏 briefCard；六張卡收進「為�
   已在盯的只以來源鍵 `link_source_ref` 連結；`deadline`＝逾期型宣告，條件寫成「X 未在 expires 前發生」，只收 true／false、只在 true 時進 payload，
   舊紀錄 id 不變——2026-11-03 第 10 條②，到期照舊是重問）、`answers`（已定價嗎／出現在數字裡了嗎：yes／no／unmeasurable）、`candidate_state`
   （open／missing／pass；**held 不收**，由 Sheet 推導；2026-11-03 起 priced_wait 退役——舊紀錄照 parse、讀成可開，寫入端 ④⁰ 拒收新的；
-  舊紀錄的 `reopen` 重開條件照存、不再讀）、`depth_check`（深挖清單十項，選填，2026-11-03）、`history_not_comparable`、`acknowledged_touched[]`。
+  舊紀錄的 `reopen` 重開條件照存、不再讀；畫面上「敘事宣告」印當時的字〔列上 `declared_retired_label`〕、滯留從讀成可開那一刻
+  〔`alpha.candidates.RETIRED_READ_SINCE`〕起算，不把之前的等回落天數算成可開——2026-11-04 R2，INV-6）、`depth_check`（深挖清單十項，選填，
+  2026-11-03）、`history_not_comparable`、`acknowledged_touched[]`。
 - **寫入當下才成立的檢查只放寫入端**（`alpha/providers/briefs.py::v2_write_problems`）：讀圖現行（current／stale_low）、本公司在讀圖快照供給側、
-  answers 與稽核行一致、缺 X 指向本公司 active 的 `wake_brief` watch、可開的起始門（⑥）、`depth_check` 的加碼條件指得到 `confirm[]`（⑬）、該重寫的 watch 逐條處置、
+  answers 與稽核行一致、缺 X 指向本公司 active 的 `wake_brief` watch、可開的起始門裡寫入當下驗得到的那幾項（⑥：押的讀圖判讀不是 neither、
+  反證已寫、沒有待處置的反證 watch——**會死嗎不在寫入端驗**，寫入端不載燈，紅燈的可開照收、隔天由候選板落前提失效）、
+  `depth_check` 的加碼條件指得到 `confirm[]`、節錄檔與讀圖 id 指得回（⑬）、該重寫的 watch 逐條處置、
   **重押讀圖時格層 `evidence_refs` 不得指向同一節點同一單位已被取代的讀圖**（Phase 7 Step 7.0c；只拒收並列出該換成哪個 id，不自動改寫）。
   放在 parse 路徑，舊紀錄日後會解析失敗、從候選板安靜消失。
 - **敘事來源的等待**：`wake_brief=<co:*>`（缺 X 在等的事；11-03 前等回落舊紀錄的照算）與 `brief:` 語意 watch 醒來、觸及、到期都進佇列段 `narrative_rewrite`
@@ -1154,11 +1163,17 @@ readiness**）。缺席由產生端宣告：轉換不是層／圖上沒有任何
 - A5 的現行落點：成交事件內嵌收據住 `library/trades/trade_log.jsonl`（`scripts/record_trade.py`）；資本硬擋住 `risk/hard_caps.py`（§8.2）。
 - **看了沒買（2026-11-03，盲點修法第 17 條；AGENTS「沒買也是決定」）**：決策時段看過、使用者選了「不要」或「等到條件」的那一檔，
   記進同處的 `library/trades/looked_log.jsonl`（tracked、append-only；形狀與讀者住 `portfolio/looked_log.py`）——選「進」的就是成交事件，
-  三種選擇因此都留得下。唯一入口 `python scripts/record_trade.py looked --symbol <T> --choice 不要|等到條件 --why "<一句>" [--apply]`：
+  三種選擇因此都留得下。唯一入口 `python scripts/record_trade.py looked --symbol <T> --choice 不要|等到條件 --why "<一句>" [--until D] [--apply]`：
   與成交同一支、同一個收據組法（`research_receipt.build_receipt`，`side`＝看了沒買）；只讀 Sheet、不寫 Sheet、不寫 trade_log、
-  不過硬擋（沒有成交）；寫入端拒收缺理由、缺敘事版本（現行不是 v2 → exit 4）、beta、重寫同一筆；預設 dry-run。
-  **系統不由它產生動作、不由它算尺寸**；讀者只有短版 ④ 每天一行「你的決定 N 月：進｜不要｜等到條件」（進＝trade_log 帶研究收據的買進）——
-  決定紀錄 §10.1 停止條件第一子句（可開非空、而使用者的決定為 0）量的就是它。
+  不過硬擋（沒有成交）；寫入端拒收缺理由、解析不到公司（INV-1 → exit 2）、缺敘事版本（現行不是 v2 → exit 4）、**候選板上那一列不是現行那一版**
+  （板讀不到、不是今天的、沒有這一檔、或版本 ≠ 現行 → exit 2、先重跑 materialize；2026-11-04 R2：記下的必須是使用者在板上讀的那一版，
+  否則「可開待你選」會把沒看過的新版當成選過——成交的收據遇到同一件事只記不擋，看了沒買不是成交所以擋，INV-6）、beta；
+  同一版敘事的同一個選擇還在生效時不重記（`looked_log.repeat_of`：隔天重跑、改一個標點不再多一列）；預設 dry-run。
+  **等到條件有到期**（`until`，不給＝30 天後；INV-2）：到期那天列回可開待你選重問。這筆等待住這本帳、**不進等待 registry**——registry 的喚醒
+  目標是封閉字彙，為它加一種要動 contract（2026-11-04 使用者核准的例外）；補償是短版 ③／心跳段 3 每天一句「等到條件 M 檔在等（最近 D 重問）」。
+  **系統不由它產生動作、不由它算尺寸**；讀者是短版 ④ 每天一行「你的決定 N 月：進｜不要｜等到條件」——決定紀錄 §10.1 停止條件第一子句
+  （可開非空、而使用者的決定為 0）量的就是它，所以**只數當時是可開的**（收據裡候選板那一列的組；進＝trade_log 帶研究收據的買進），
+  加碼買進與對缺 X 的「不要」另列、收據沒有那一列的另說分不出（INV-3）——以及上面的可開待你選。
   U7（2026-08-28）拆掉的是憑空的建議尺寸，不是煞車；Phase 0 把煞車搬到真的有人走的路上。
 
 ---

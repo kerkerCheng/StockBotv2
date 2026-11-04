@@ -1397,7 +1397,10 @@ function candidateLine(view, inQuestions) {
   const row = state && state.value;
   if (row) {
     head.appendChild(el('strong', null, row.derived_label || row.derived || '—'));
-    if (row.declared && row.declared !== row.derived) {
+    if (row.declared_retired) {
+      // 當時寫的是退役的宣告值（11-03 前的等回落）：印當時的字，不印讀法（2026-11-04 R2；INV-6）
+      head.appendChild(el('span', 'dim', `（敘事宣告：${row.declared_retired_label || row.declared_retired}）`));
+    } else if (row.declared && row.declared !== row.derived) {
       head.appendChild(el('span', 'dim', `（敘事宣告：${row.declared_label || row.declared}）`));
     }
     if (row.edge_note) head.appendChild(el('span', 'dim', '　' + row.edge_note));   // 標記，不是狀態（2026-10-30）
@@ -1609,7 +1612,8 @@ function askClaudePrompt(payload, view) {
   if (what.line) out.push(`- 做什麼：${what.line}`);
   if (row) {
     out.push(`- 候選狀態：${row.derived_label || row.derived || '—'}`
-      + (row.declared && row.declared !== row.derived ? `（敘事宣告：${row.declared_label || row.declared}）` : '')
+      + (row.declared_retired ? `（敘事宣告：${row.declared_retired_label || row.declared_retired}）`
+        : (row.declared && row.declared !== row.derived ? `（敘事宣告：${row.declared_label || row.declared}）` : ''))
       + (row.edge_note ? `；${row.edge_note}` : '')
       + (typeof row.stall_days === 'number' ? `，滯留 ${row.stall_days} 天` : ''));
     if (row.reason) out.push(`- 理由：${row.reason}`);

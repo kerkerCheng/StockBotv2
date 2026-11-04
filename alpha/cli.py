@@ -365,6 +365,15 @@ def cmd_brief(args: argparse.Namespace) -> int:
 
             for line in depth_check_lines(spec.get("depth_check")):
                 print(line)
+        # 清單沒抄（2026-11-04 R2）：取代上一版時，上一版查過、這一版沒寫成查過的項目——⑤ 會把那一檔數回去；只印、不擋
+        if args.add and record.get("supersedes_id"):
+            from .narrative.depth_check import dropped_checks_line
+
+            previous = next((r for r in read_brief_records(ticker)[0] if r.brief_id == record["supersedes_id"]), None)
+            dropped = dropped_checks_line(previous.depth_check_map if previous is not None else None,
+                                          spec.get("depth_check"))
+            if dropped:
+                print(dropped)
         # 逾期型反證（2026-11-03 盲點修法第 10 條②）：宣告可開、或候選板上是已持有，一條都沒有就提醒——只印、不擋
         if args.add:
             from .providers.candidates import deadline_reminder, held_on_board

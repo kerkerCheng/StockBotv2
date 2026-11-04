@@ -1049,30 +1049,84 @@ def _priced_rows(state_dir: Path | None) -> tuple[list[Mapping[str, Any]], list[
     return opened, [r for r in rows if isinstance(r, Mapping) and r.get("priced_since")], None
 
 
-def open_choice_rows(state_dir: Path | None, *, looked_path: Path | None = None
-                     ) -> tuple[list[Mapping[str, Any]] | None, str | None]:
-    """可開待你選（2026-11-03 盲點修法第 18＋16 條；決定紀錄 §10.1 停止條件第一子句量的就是它）→ (列, 讀不到的理由)。
-
-    候選板「可開」組裡、**這一版敘事**還沒在看了沒買（`portfolio.looked_log`）記過選擇的列：選過（不要／等到條件）就不再列，
-    敘事換版再問——選擇綁的是當時讀的那一版；買了由 Sheet 推成已持有、自己離開可開。進／不要／等到條件是使用者的，
-    所以它住短版 ③ 待你決定、不進批次指令。候選板讀不到回 (None, 理由)——未讀到不是 0（INV-3）；看了沒買讀不懂的行
-    不藏任何一列（寧可多問一次）。只讀 artifact 與 ledger、零網路。"""
+def _open_choice(state_dir: Path | None, *, looked_path: Path | None
+                 ) -> tuple[list[Mapping[str, Any]] | None, dict[tuple[str, str], Any] | None, str | None]:
+    """(可開那幾列, 看了沒買每個（公司, 敘事版本）最後一次的選擇, 讀不到的理由)。只讀 artifact 與 ledger、零網路。"""
     from portfolio import looked_log as ll
 
     opened, _priced, absence = _priced_rows(state_dir)
     if absence is not None:
-        return None, absence.reason
-    entries, _problems = ll.load(looked_path)
-    chosen = {(e.company_id, e.brief_id) for e in entries}
-    return [r for r in opened if (r.get("company_id"), r.get("brief_id")) not in chosen], None
+        return None, None, absence.reason
+    try:
+        entries, _problems = ll.load(looked_path)
+    except (OSError, UnicodeDecodeError, ValueError) as exc:
+        # 帳整本讀不到（2026-11-04 R2）：不知道哪幾檔選過——說讀不到；不讓它往上炸掉段 3 的 pq2 清單與快照的其他候選計數
+        return None, None, f"看了沒買的帳讀不到（{type(exc).__name__}）——不知道哪幾檔你已經選過"
+    return opened, ll.standing(entries), None
 
 
-def open_choice_queue_line(rows: Sequence[Mapping[str, Any]] | None, problem: str | None) -> str:
-    """完整心跳段 3 的一行：沒有 pq2 編號、不進批次指令，但球在你——0 也印（L14），讀不到照說（INV-3）。"""
+def open_choice_rows(state_dir: Path | None, *, looked_path: Path | None = None, today: date | None = None
+                     ) -> tuple[list[Mapping[str, Any]] | None, str | None]:
+    """可開待你選（2026-11-03 盲點修法第 18＋16 條；決定紀錄 §10.1 停止條件第一子句量的就是它）→ (列, 讀不到的理由)。
+
+    候選板「可開」組裡、**這一版敘事**還沒在看了沒買（`portfolio.looked_log`）記過、或記過但已不生效的列：選了不要就這一版
+    不再列；選了等到條件就等到 `until` 那天，那天起列回來、附上次等的是什麼（`wait_expired`；INV-2：每個等待都有到期）；
+    敘事換版一律再問——選擇綁的是當時讀的那一版；買了由 Sheet 推成已持有、自己離開可開。進／不要／等到條件是使用者的，
+    所以它住短版 ③ 待你決定、不進批次指令。候選板或帳讀不到回 (None, 理由)——未讀到不是 0（INV-3）；看了沒買讀不懂的行
+    不藏任何一列（寧可多問一次）。"""
+    from portfolio import looked_log as ll
+
+    opened, standing, problem = _open_choice(state_dir, looked_path=looked_path)
+    if opened is None or standing is None:
+        return None, problem
+    day = today or ll.today_local()
+    out: list[Mapping[str, Any]] = []
+    for row in opened:
+        last = standing.get((row.get("company_id"), row.get("brief_id")))
+        if last is not None and ll.hides(last, today=day):
+            continue
+        if last is not None and last.choice == "等到條件":
+            row = {**row, "wait_expired": {"until": last.until.isoformat() if last.until else None, "why": last.why}}
+        out.append(row)
+    return out, None
+
+
+def open_choice_waiting(state_dir: Path | None, *, looked_path: Path | None = None, today: date | None = None
+                        ) -> tuple[list[tuple[Mapping[str, Any], Any]] | None, str | None]:
+    """可開裡因為等到條件還沒到期而不列的那幾檔 → ([(列, 那一次選擇)], 讀不到的理由)。這筆等待住看了沒買的帳、不在等待
+    registry（2026-11-04 使用者核准的例外）——補償就是這一份：短版 ③ 與段 3 每天印「等到條件 M 檔在等，最近哪天重問」，
+    它不會在畫面上消失（L14）。"""
+    from portfolio import looked_log as ll
+
+    opened, standing, problem = _open_choice(state_dir, looked_path=looked_path)
+    if opened is None or standing is None:
+        return None, problem
+    day = today or ll.today_local()
+    out = []
+    for row in opened:
+        last = standing.get((row.get("company_id"), row.get("brief_id")))
+        if last is not None and last.choice == "等到條件" and ll.hides(last, today=day):
+            out.append((row, last))
+    return sorted(out, key=lambda pair: (pair[1].until, str(pair[0].get("ticker") or ""))), None
+
+
+def open_waiting_text(waiting: Sequence[tuple[Mapping[str, Any], Any]] | None) -> str | None:
+    """「等到條件 M 檔在等（最近 D 重問）」——沒有在等的回 None（不印）；讀不到由呼叫端照可開待你選那一行說。"""
+    if not waiting:
+        return None
+    return f"等到條件 {len(waiting)} 檔在等（最近 {waiting[0][1].until.isoformat()} 重問）"
+
+
+def open_choice_queue_line(rows: Sequence[Mapping[str, Any]] | None, problem: str | None,
+                           waiting: Sequence[tuple[Mapping[str, Any], Any]] | None = None) -> str:
+    """完整心跳段 3 的一行：沒有 pq2 編號、不進批次指令，但球在你——0 也印（L14），讀不到照說（INV-3）；
+    等到條件還在等的另起半句（`open_waiting_text`）。"""
     if rows is None:
         return f"可開待你選：讀不到（{problem}）"
+    wait = open_waiting_text(waiting)
     return (f"**可開待你選 {len(rows)}**（起始門都過、這一版敘事你還沒選；進／不要／等到條件由你下，短版 ③）"
-            + ("：" + "、".join(str(r.get("ticker")) for r in rows) if rows else ""))
+            + ("：" + "、".join(str(r.get("ticker")) for r in rows) if rows else "")
+            + (f"｜{wait}：" + "、".join(str(r.get("ticker")) for r, _ in waiting) if wait and waiting else ""))
 
 
 def _open_priced_lines(state_dir: Path | None) -> list[str]:
@@ -1685,7 +1739,13 @@ def build_queue(*, state_dir: Path | None = None, now: datetime | None = None,
     # 逐筆（Phase 1 Step 1.8）：go／不含的字串取自 `todo.GO_AUTHORIZATION`（L16：不在這裡另寫一份），
     # 使用者不展開就知道 go 會做什麼、不會做什麼（AGENTS 收尾摘要契約）。
     section.lines.extend(_pq2_item_lines(actionable, todo_mod=todo_mod))
-    section.lines.append(open_choice_queue_line(*open_choice_rows(state_dir)))
+    from portfolio.looked_log import today_local
+
+    choice_day = today_local(moment)                   # 等到條件到期看的是這一輪的今天，不是真實時鐘（11-04 R2 覆核）
+    choice_rows, choice_problem = open_choice_rows(state_dir, today=choice_day)
+    waiting, _waiting_problem = (open_choice_waiting(state_dir, today=choice_day) if choice_rows is not None
+                                 else (None, None))
+    section.lines.append(open_choice_queue_line(choice_rows, choice_problem, waiting))
     # 等你提供的文件（2026-10-06 使用者指示：拿不到的來源要開口、不 park；10-07：「隔離一區讓我知道 也不要讓我直接 go
     # 提供文件才算 go」）。名單只有 `todo.document_requests()` 一份（L16）；0 也印（L14）。
     section.lines.append(
@@ -2847,7 +2907,9 @@ def collect_snapshot(*, now: datetime, state_dir: Path | None, leads_path: Path,
             return {}
         counts = board.get("counts") or {}
         c = candidate_counts(board)
-        undecided, _problem = open_choice_rows(state_dir)
+        from portfolio.looked_log import today_local
+
+        undecided, _problem = open_choice_rows(state_dir, today=today_local(now))
         return {**{f"candidate.{k}": counts.get(k) for k in (*CANDIDATE_GROUPS, *CANDIDATE_SIDE_GROUPS, "no_narrative")},
                 "candidate.edge_unmeasurable": c["edge_unmeasurable"],
                 "candidate.open_unmeasurable": c["open_unmeasurable"],
