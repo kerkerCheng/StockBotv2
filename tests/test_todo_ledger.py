@@ -314,8 +314,11 @@ def test_next_prompt_pushes_drain_only_on_progress_or_age() -> None:
     assert quiet.startswith("只剩維護") and "掃題材" in quiet and "未檢 3" in quiet and "待深挖 lead 5" in quiet
     assert tl.next_prompt(_ledger(semantic=(3, 0, 2), addon_unchecked=(1, 1, 0))).startswith(
         "`/research-drain`（進展：加碼條件還沒查 1）")
-    # 2026-11-03（第 18＋16 條）：敘事該重寫不再是進展格（它的進展件數「重開達成／已回落」隨等回落退役）
-    assert tl.next_prompt(_ledger(semantic=(3, 0, 2), narrative=(1, 1, 0))).startswith("只剩維護")
+    # 2026-11-03（第 18＋16 條）：敘事該重寫的「重開達成／已回落」隨等回落退役；2026-11-04 起它的進展只數持股或可開名下
+    # 被敘事反證卡著的檔（tests/test_decision_progress.py）——進展 0 的敘事落後照舊只看年紀
+    assert tl.next_prompt(_ledger(semantic=(3, 0, 2), narrative=(1, 0, 0))).startswith("只剩維護")
+    assert tl.next_prompt(_ledger(narrative=(1, 1, 0))).startswith(
+        "`/research-drain`（進展：持股或可開名下的敘事反證待處置 1）")
     assert "進展：使用者 go 的工單 1" in tl.next_prompt(_ledger(leads=(2, 1, 1)))
     assert tl.next_prompt(_ledger(semantic=(3, 0, 8))).startswith("`/research-drain`（最老 8 天）")
     assert tl.next_prompt(_ledger(disproof_touched=(1, 1, None))).startswith(
@@ -341,8 +344,8 @@ def test_retired_price_kinds_are_no_longer_counted_and_addon_rows_are_progress()
     rows = _collect(candidates=_board(reopen, dict(reopen, kind="no_reopen", ticker="X", company_id="co:x"),
                                       dict(reopen, kind="pulled_back", ticker="Y", company_id="co:y")))
     assert rows["todo.narrative"].count == 0
-    assert set(tl.PROGRESS_LABELS) == {"todo.disproof_touched", "todo.confirm_touched", "todo.addon_unchecked",
-                                       "todo.leads"}
+    assert {"todo.disproof_touched", "todo.confirm_touched", "todo.addon_unchecked",
+            "todo.leads"} <= set(tl.PROGRESS_LABELS)          # 2026-11-04 再加四格「持股或可開名下」（test_decision_progress）
     assert _collect(candidates=None)["todo.addon_unchecked"].progress is None
     assert rows["todo.semantic"].progress == 0 and rows["todo.leads"].progress == 0
 

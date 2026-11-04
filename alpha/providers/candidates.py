@@ -18,7 +18,7 @@ from pathlib import Path
 from typing import Any, Callable, Mapping, Sequence
 
 from ..candidates import (
-    ANSWER_WORDS, CANDIDATES_THIS_IS_NOT, GROUP_LABELS, GROUPS, IN_NUMBERS_LINES, RETIRED_STATE_LABELS,
+    ANSWER_WORDS, CANDIDATES_THIS_IS_NOT, GROUP_LABELS, GROUPS, IN_NUMBERS_LINES, RETIRED_STATE_LABELS, START_GATE_SINCE,
     PRICED_IN_LINES, REWRITE_STATE_WORDS, SIDE_GROUPS, SIDE_LABELS, UNANSWERED, assemble_board, body_version, cap_label,
     cited_identities, edge_note, held_index, judgment_version, new_edge_reason, not_edge_pending_note,
     on_threshold_entries, priced_since, rewrite_words, rides_reason, rollup,
@@ -258,7 +258,7 @@ def derive_row(ticker: str, company_id: str | None, *, records: Sequence[Investo
     `readings_by_id`：全部讀圖紀錄（含已被取代的）——②④「正文寫的時候騎的那份讀圖」要查得到舊紀錄（2026-11-03）；
     None＝沒載入，`rewrite_reading_changes` 也是 None（沒算，不是 0）。"""
     from engine_b import event_watch as ew
-    from engine_b.narrative_watches import blocking_for_open, link_breaks, pending_rewrite
+    from engine_b.narrative_watches import blocking_watches, link_breaks, pending_rewrite
     from engine_b.queue_segments import narrative_rewrite_state
 
     brief = select_brief(records, as_of=None, today=today)
@@ -285,6 +285,12 @@ def derive_row(ticker: str, company_id: str | None, *, records: Sequence[Investo
         # 故事層（2026-10-29）：理由的一句故事、缺 X 的短標——寫給這一版敘事的才算（敘事換版就退回印原理由）
         **_reason_story(brief if v2 else None, stories),
         "preconditions": [], "rewrite": [], "rewrite_watch_ids": [], "rewrite_words": [],
+        # 卡著這一列的反證 watch id（2026-11-04 盲點審查複查）：只有持股、宣告可開（含前提失效）的列算——⑤ 的進展格只數
+        # 「持股或可開名下」的反證工作（`engine_b.todo_ledger.decision_rows`）。None＝這一列沒算（缺 X／不要／附組），不是 0
+        "blocking_watch_ids": None,
+        # 缺 X 的正文是不是起始門改版前寫的（2026-11-04 盲點審查複查；`alpha.candidates.START_GATE_SINCE`）——⑤「缺 X 還是
+        # 舊門寫的」數它。None＝不是缺 X（不適用）
+        "declared_before_start_gate": None,
         "rewrite_rides": [], "rewrite_new_edges": [],
         # 敘事 stale ②④（2026-11-03）：正文版騎的讀圖 vs 這一格現行的讀圖，判讀或供給側家數變了（`body_behind_readings`）；
         # 沒比成的格數另計（讀圖紀錄找不到——不是 0）
@@ -337,6 +343,11 @@ def derive_row(ticker: str, company_id: str | None, *, records: Sequence[Investo
                                  "status": r.get("status") if same else ("superseded" if r is not None else "not_found")})
     if held_info is not None:                                                   # Sheet 持有 → 已持有，宣告照留
         row.update(derived="held", group="held")
+        # 持股不走起始門，但它的反證醒了就是出場紀律的工作（48 小時）——判定與起始門同一份（L16）；
+        # 沒有 v2 敘事也算（thesis 的反證照樣歸屬它）
+        row["blocking_watch_ids"] = [wid for wid, _ in blocking_watches(
+            str(company_id), ticker, watches=watches, lifecycle=lifecycle,
+            brief_ids=[r.brief_id for r in records], current_brief=brief if v2 else None) if wid]
         if brief is None:
             row["note"] = "已持有、缺敘事"
         elif not v2:
@@ -413,6 +424,10 @@ def derive_row(ticker: str, company_id: str | None, *, records: Sequence[Investo
                            if own_history_at is not None and bars_at is not None else None)
     # 2026-11-03：等回落的價格叫醒（#116）、重開條件（#124）、只差已定價（#123）隨等回落併回可開一起退役——已定價是可開那一列
     # 的脈絡（`priced_since` 照印），價格動了不再叫研究重寫；要不要等價格是使用者在短版 ③ 的選擇（看了沒買）。
+    # 舊門寫的缺 X：正文最後一次改動（`body_version`——換騎、只改引用不算重寫過）早於寫入端換門的那一刻。
+    # 判斷要留在理由裡：重判後仍缺 X，理由要寫明缺的是起始門哪一項（理由改了，正文就換了）
+    if eff == "missing":
+        row["declared_before_start_gate"] = body_version(records, brief).created_at < START_GATE_SINCE
     row["rewrite_words"] = rewrite_words(row["rewrite"])
     if row["group"] == "held":
         return row
@@ -443,8 +458,10 @@ def derive_row(ticker: str, company_id: str | None, *, records: Sequence[Investo
         row.update(group=eff, derived=eff)
         return row
     if eff == "open":
-        blocking = blocking_for_open(str(company_id), ticker, watches=watches, lifecycle=lifecycle,
-                                     brief_ids=brief_ids, current_brief=brief)
+        pending = blocking_watches(str(company_id), ticker, watches=watches, lifecycle=lifecycle,
+                                   brief_ids=brief_ids, current_brief=brief)
+        row["blocking_watch_ids"] = [wid for wid, _ in pending if wid]
+        blocking = [reason for _, reason in pending]
         row["preconditions"] = open_preconditions(brief, reading_rows=reading_rows, three_questions=three_questions,
                                                   blocking=blocking, breaks=breaks)
         if row["preconditions"]:

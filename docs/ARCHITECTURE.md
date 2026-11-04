@@ -223,6 +223,11 @@ fetchers/{edgar,mops,mfn,rns}.py ↑      engine_c/etl_yfinance.py → SQLite
 > **涵蓋登記表 `COVERAGE`**：lead、佇列段、watch、到期類型、pq2 派工、假說、thesis、
 > 候選組、讀圖狀態的每一個值都登記去處（⑤ 的格，或 ③／等事件／機械段／終局／研究題庫／Phase plan），測試從各字彙 SSOT 列舉
 > 比對——新狀態沒登記就紅。SessionStart 的 Phase 提示與 ⑤ 最後一行「下一步貼」是同一個函式（`next_prompt`）。
+> **「下一步貼」只看進展格**（`PROGRESS_LABELS`，2026-11-03 盲點修法 §1 第 2 條；判準：會叫人動手的數字，要問它歸零時有沒有一檔離決定更近）
+> 或任一格最老 ≥ 7 天。2026-11-04 起未檢、叫醒擋下、到期沒人處置、敘事該重寫四格的進展只數**卡著持股或可開**的反證——候選板列上的
+> `blocking_watch_ids`（持股、可開、前提失效三組才算；判定與起始門同一個 `engine_b.narrative_watches.blocking_watches`）；
+> 其餘列的反證照舊只看年紀。另有一次性的「缺 X 還是舊門寫的」（缺 X 列的 `declared_before_start_gate`：正文版早於
+> `alpha.candidates.START_GATE_SINCE`，寫入端換起始門的那一刻）。候選板讀不到、舊板、持股讀不到＝進展算不出，照舊推 drain（INV-3）。
 
 > **2026-09-24（Phase 1 Step 1.8）心跳改版**：五段不增不減。段 2 第一行是**較昨變動**——⑱ 帶 `--write-snapshot` 寫
 > `library/private/heartbeat/snapshots/<日期>.json`（鍵是封閉清單 `crons/heartbeat.SNAPSHOT_KEYS`、留 14 天；derived、只給 diff，

@@ -65,6 +65,12 @@ LEDGER: tuple[LedgerRow, ...] = (
     LedgerRow("todo.addon_unchecked", "加碼條件還沒查", "檔",
               "research-drain 段 5「加碼條件還沒查」：深挖清單十項逐項查（引用｜不適用：理由｜加碼條件：c<n>）→ "
               "`python -m alpha brief <T> --add spec.json`（depth_check）"),
+    # 2026-11-04 盲點審查複查：起始門改了，但舊門寫的缺 X 只在各自的 watch 醒來或到期才重寫（Q3 財報季剛重寫的那幾份等的是
+    # 2027 的年報）——一次性的母體，清完恆為 0（新的缺 X 都在新門下寫）
+    LedgerRow("todo.old_gate_missing", "缺 X 還是舊門寫的", "檔",
+              "research-drain 段 5「舊門缺 X 重判」：X 是起始門缺的（押的層沒讀、判讀是 neither、反證沒寫、會死嗎紅）→ 換版、"
+              "理由寫明缺起始門哪一項；X 是加碼門缺的（讀到邊、客戶具名、營收拆分、深挖清單）→ 換版宣告可開、X 寫進 confirm[] "
+              "→ `python -m alpha brief <T> --add spec.json`"),
     # 2026-10-29 使用者（個股頁）：「怎麼確保呈現的精神不變…之後才不會又慢慢爛掉」——敘事換版、故事就過期，
     # 首屏退回印依據；過期與沒寫是會自己出現的計數，不是要人記得的事（L14）
     LedgerRow("todo.story", "故事還沒寫", "檔",
@@ -180,6 +186,8 @@ COVERAGE: Mapping[str, str] = {
     "brief:link_break": "todo.narrative",
     # 可開／已持有的深挖清單還有沒查的項目（`alpha.candidates.addon_unchecked_rows`；2026-11-03 第 18＋16 條）
     "depth_check:unchecked": "todo.addon_unchecked",
+    # 起始門改版前寫的缺 X（`alpha.candidates.START_GATE_SINCE`；2026-11-04）：重判一次
+    "candidate:missing_before_start_gate": "todo.old_gate_missing",
     "registry:stale_lead_entities": "todo.registry_rescan",
     "thesis:due_not_minted": "todo.thesis_due",
     "disproof:touched": "todo.disproof_touched",
@@ -316,6 +324,26 @@ def _narrative_companies(watches: Sequence[Mapping[str, Any]], briefs: Sequence[
     return out
 
 
+#: 「持股或可開名下」的列（2026-11-04 盲點審查複查）：持股的反證醒了是出場紀律的工作（48 小時）；宣告可開的列（含前提失效）
+#: 被反證卡住，判完就回到短版 ③ 或改判——這兩種歸零時都有一檔離決定更近（`PROGRESS_LABELS` 的判準）。其餘列（缺 X、不要、附組）的
+#: 反證工作照舊只看年紀。
+DECISION_ROWS: tuple[tuple[str, str], ...] = (("groups", "held"), ("groups", "open"), ("side_groups", "precondition_failed"))
+
+
+def decision_rows(candidates: Mapping[str, Any] | None) -> tuple[list[Mapping[str, Any]] | None, str | None]:
+    """持股、可開、前提失效三組的列（候選板唯一 owner；列上的 `blocking_watch_ids` 由 `engine_b.narrative_watches.
+    blocking_watches` 算，起始門同一份判定——L16）。回 (列, None)，或 (None, 為什麼算不出)：候選板沒讀到、持股沒讀到
+    （持股名下的反證數不到）、舊板（列上沒有那一格）——算不出不是 0（INV-3）。"""
+    if candidates is None:
+        return None, "候選板未讀到"
+    if ((candidates.get("holdings") or {}).get("status") or "ok") != "ok":
+        return None, "持股沒讀到——持股名下的反證數不到"
+    rows = [r for bucket, group in DECISION_ROWS for r in ((candidates.get(bucket) or {}).get(group) or ())]
+    if any(not isinstance(r.get("blocking_watch_ids"), list) for r in rows):
+        return None, "候選板是舊版（列上沒有卡住的 watch 那一格）"
+    return rows, None
+
+
 def collect(*, today: date, leads_store: Mapping[str, Any], watches: Sequence[Mapping[str, Any]],
             todo_items: Sequence[Mapping[str, Any]], hypotheses: Sequence[Mapping[str, Any]],
             briefs: Sequence[Any] | None,
@@ -355,6 +383,13 @@ def collect(*, today: date, leads_store: Mapping[str, Any], watches: Sequence[Ma
     observation = qs.observe(leads=leads, watches=watches, todo_items=todo_items,
                              forward_view_backlog=None, graph_holes=None, narrative_link_breaks=breaks)
     seg = {s["key"]: s["count"] for s in observation["segments"]}
+    held_or_open, _ = decision_rows(candidates)
+    decision_ids = (None if held_or_open is None
+                    else {str(i) for r in held_or_open for i in r["blocking_watch_ids"]})
+
+    def decision_progress(items: Iterable[Mapping[str, Any]]) -> int | None:
+        """這一格的 watch 裡，卡著持股或可開那幾列的條數（`decision_rows`）；算不出是 None。"""
+        return None if decision_ids is None else sum(1 for w in items if str(w.get("watch_id")) in decision_ids)
 
     gaps_holder: dict[str, set[str]] = {"ids": set()}
 
@@ -399,7 +434,8 @@ def collect(*, today: date, leads_store: Mapping[str, Any], watches: Sequence[Ma
         pending_watches = [w for w in watches if qs.classify_watch(w) == "semantic_pending_check"]
         groups = ew.semantic_queue_groups(pending_watches, leads_store)
         put("todo.semantic", len(pending_watches), work=f"{len(groups)} 次判定" if pending_watches else None,
-            oldest_days=_oldest((_woken_at(w) for w in pending_watches), today))
+            oldest_days=_oldest((_woken_at(w) for w in pending_watches), today),
+            progress=decision_progress(pending_watches))
 
     guarded("todo.semantic", semantic)
 
@@ -411,7 +447,7 @@ def collect(*, today: date, leads_store: Mapping[str, Any], watches: Sequence[Ma
         if held:
             bits.append(f"預篩標無關 {unrelated}、還沒預篩 {len(held) - unrelated}")
         put("todo.wake_hold", len(held), work="；".join(bits) or None,
-            oldest_days=_oldest((_woken_at(w) for w in held), today))
+            oldest_days=_oldest((_woken_at(w) for w in held), today), progress=decision_progress(held))
 
     guarded("todo.wake_hold", wake_hold)
 
@@ -452,8 +488,13 @@ def collect(*, today: date, leads_store: Mapping[str, Any], watches: Sequence[Ma
             elif check.get("unchecked"):
                 notes.append(f"判讀／家數變了有 {check['unchecked']} 格沒比成（正文寫時騎的讀圖紀錄找不到）")
             note = "；".join(notes) or None
+        # 進展（2026-11-04）：持股或可開的列，被**敘事來源**的反證卡著（醒來／觸及／到期未判、本版沒處置）的檔數——
+        # 重寫完它就回到 ③ 或改判；騎舊讀圖、新邊沒讀這類落後照舊只看年紀
+        progress = (None if held_or_open is None else
+                    sum(1 for r in held_or_open
+                        if set(r["blocking_watch_ids"]) & {str(i) for i in r.get("rewrite_watch_ids") or ()}))
         put("todo.narrative", len(companies) + extra, work="；".join(bits) or None,
-            oldest_days=_oldest(stamps, today), note=note)
+            oldest_days=_oldest(stamps, today), note=note, progress=progress)
 
     guarded("todo.narrative", narrative)
     put("todo.reading", reading_needs_reread)
@@ -488,7 +529,9 @@ def collect(*, today: date, leads_store: Mapping[str, Any], watches: Sequence[Ma
 
     def expired() -> None:
         c = ew.expiry_counters({"watches": list(watches)}, today=today)
-        put("todo.expired", c["expiry_unresolved"])
+        # 進展只數卡著持股或可開的那幾條（`expiry_unresolved` 的同一個定義：expired 而且沒有 expiry_resolution）
+        unresolved = [w for w in watches if w.get("status") == "expired" and not w.get("expiry_resolution")]
+        put("todo.expired", c["expiry_unresolved"], progress=decision_progress(unresolved))
 
     guarded("todo.expired", expired)
 
@@ -578,6 +621,24 @@ def collect(*, today: date, leads_store: Mapping[str, Any], watches: Sequence[Ma
 
     guarded("todo.addon_unchecked", addon_unchecked)
 
+    def old_gate_missing() -> None:
+        # 缺 X 列上的 `declared_before_start_gate`（候選板唯一 owner，L16）。候選板沒讀到、舊板（列上沒有那一格）都是未讀到，
+        # 不是 0（INV-3）。每一檔重判完都可能直接可開——是進展格
+        cell = rows["todo.old_gate_missing"]
+        if candidates is None:
+            cell.reason, cell.progress = "候選板未讀到", None
+            return
+        waiting = list((candidates.get("groups") or {}).get("missing") or ())
+        if any("declared_before_start_gate" not in r for r in waiting):
+            cell.reason, cell.progress = "候選板是舊版（缺 X 列上沒有起始門改版前那一格）", None
+            return
+        found = [r for r in waiting if r.get("declared_before_start_gate")]
+        put("todo.old_gate_missing", len(found), work="、".join(str(r.get("ticker")) for r in found[:8]) or None,
+            oldest_days=max((r["stall_days"] for r in found if isinstance(r.get("stall_days"), int)), default=None),
+            progress=len(found))
+
+    guarded("todo.old_gate_missing", old_gate_missing)
+
     def story() -> None:
         from alpha.providers.stories import gaps_now
 
@@ -619,8 +680,16 @@ def render_cells(counts: Sequence[LedgerCount]) -> list[str]:
 #: 離決定更近；沒有的只當健康度、只在太老時叫人。** 推 `/research-drain` 只看下列幾件、或任一格最老 ≥ `MAINTENANCE_NUDGE_DAYS` 天。
 #: 可開待你選不在這裡：要不要進是使用者的（短版 ③），drain 歸零不了它，放進來就是恆亮的燈（L14-4）。
 #: 2026-11-03（第 18＋16 條）：「重開達成／已回落」隨等回落退役；「加碼條件還沒查」進來——查完一檔，那一檔的加碼決定就有根據。
+#: 2026-11-04（盲點審查複查）：未檢、叫醒擋下、到期沒人處置、敘事該重寫四格裡**卡著持股或可開**的反證進來（`decision_rows`）——
+#: 醒來待判的反證原本只算年紀：3081.TWO、4979.TWO、AXTI 離可開只差一次判定，提示卻寫「只剩維護」；持股的反證醒了最慢 7 天才叫人，
+#: 「出場認反證、48 小時」實際變成 7 天。其餘列（缺 X、不要）的反證照舊只看年紀——全算進來就回到恆亮（L14-4）。
 PROGRESS_LABELS: Mapping[str, str] = {"todo.disproof_touched": "反證觸及", "todo.confirm_touched": "加碼條件觸及",
-                                      "todo.addon_unchecked": "加碼條件還沒查", "todo.leads": "使用者 go 的工單"}
+                                      "todo.addon_unchecked": "加碼條件還沒查", "todo.leads": "使用者 go 的工單",
+                                      "todo.semantic": "持股或可開名下的反證醒來待判",
+                                      "todo.wake_hold": "持股或可開名下的叫醒擋下",
+                                      "todo.expired": "持股或可開名下的反證到期沒判",
+                                      "todo.narrative": "持股或可開名下的敘事反證待處置",
+                                      "todo.old_gate_missing": "缺 X 還是舊門寫的"}
 MAINTENANCE_NUDGE_DAYS = 7
 #: `snapshot_progress` 的鍵——心跳快照「只存不比」的封閉清單由這裡導出（L16）。
 SNAPSHOT_PROGRESS_KEYS: tuple[str, ...] = ("todo.progress", "todo.oldest_days")
@@ -692,6 +761,7 @@ def next_prompt(counts: Sequence[LedgerCount] | Mapping[str, int | None], *, dec
 
 
 __all__ = ["BEHIND_KINDS", "COVERAGE", "DESTINATIONS", "LEDGER", "LEDGER_BY_KEY", "LEDGER_KEYS", "LedgerCount",
-           "LedgerRow", "MAINTENANCE_NUDGE_DAYS", "PROGRESS_LABELS", "SNAPSHOT_PROGRESS_KEYS",
-           "active_hypotheses_without_watch", "collect", "destination_label", "next_prompt", "orphan_wake_briefs",
+           "DECISION_ROWS", "LedgerRow", "MAINTENANCE_NUDGE_DAYS", "PROGRESS_LABELS", "SNAPSHOT_PROGRESS_KEYS",
+           "active_hypotheses_without_watch", "collect", "decision_rows", "destination_label", "next_prompt",
+           "orphan_wake_briefs",
            "progress_summary", "render_cells", "requires_user_without_pq2", "snapshot_progress"]

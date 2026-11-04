@@ -30,6 +30,12 @@ RETIRED_STATE_LABELS: Mapping[str, str] = {"priced_wait": "已定價等回落（
 #: 退役的宣告值從哪一刻起讀成接手它的那一態（第 18＋16 條上線：2026-11-03 台北 00:00）。滯留從這一刻起算——在這之前那幾版
 #: 給人看的是等回落、不是可開（11-04 R2：STLTECH.NS 11-03 才進可開，短版 ③ 卻印「可開 7 天」；INV-6）。
 RETIRED_READ_SINCE = datetime(2026, 11, 2, 16, 0, tzinfo=timezone.utc)
+#: 起始門改版的寫入端生效時刻（第 18＋16 條，commit 3c4a223b：2026-11-03 23:33:32 台北）。在這之前寫下的缺 X 是在舊門下寫的——
+#: 舊門要讀到邊＋十項深挖＋不能已定價才可開，那時的 X 有一部分在新門下只是加碼條件（2026-11-04 盲點審查複查：門改了，舊的缺 X
+#: 只在各自的 watch 醒來或到期才重寫，Q3 財報季剛重寫的那幾份等的是 2027 的年報）。⑤「缺 X 還是舊門寫的」數它，研究 session 重判一次。
+#: ⚠ 不用 `RETIRED_READ_SINCE`：那是「舊等回落從哪一刻起讀成可開」（呈現，取當天 00:00）；這裡問的是「寫的時候寫入端擋的是哪一道門」，
+#: 取晚的那一刻——寧可多重判一份，不要漏。
+START_GATE_SINCE = datetime(2026, 11, 3, 15, 33, 32, tzinfo=timezone.utc)
 SIDE_GROUPS: tuple[str, ...] = ("not_multiple", "edge_unmeasurable", "legacy", "precondition_failed")
 #: `edge_unmeasurable` 只裝**宣告可開**、邊緣判定少一個輸入的檔（缺輸入不放行）；缺 X／不要照敘事分組、
 #: 列上帶 `edge_note`（2026-10-30 使用者「好 改吧」：原本一律蓋掉宣告，9 檔裡 5 檔缺 X、4 檔不要都被藏進這一組——L12）。
@@ -751,7 +757,7 @@ def assemble_board(rows: Sequence[Mapping[str, Any] | None], *, universe: Sequen
 
 __all__ = ["ADDON_GROUPS", "ANSWER_WORDS", "CANDIDATES_THIS_IS_NOT", "GROUPS", "GROUP_LABELS", "IN_NUMBERS_LINES",
            "LIGHT_ORDER", "LIGHT_WORDS", "LIST_GROUPS", "LIST_GROUP_LABELS", "NEW_EDGES_PREFIX", "NOT_EDGE_PENDING_PREFIX",
-           "ON_THRESHOLD_WORDS", "PRICED_IN_LINES", "RETIRED_READ_SINCE", "RETIRED_STATE_LABELS",
+           "ON_THRESHOLD_WORDS", "PRICED_IN_LINES", "RETIRED_READ_SINCE", "RETIRED_STATE_LABELS", "START_GATE_SINCE",
            "REWRITE_STATE_WORDS", "REWRITE_WHY", "RIDES_SUPERSEDED_PREFIX", "SIDE_GROUPS", "SIDE_LABELS", "UNANSWERED",
            "WIPEOUT_LINES", "Cited", "addon_unchecked_rows", "assemble_board", "body_key", "body_version", "cap_label",
            "cited_identities", "deadline_line", "edge_note",

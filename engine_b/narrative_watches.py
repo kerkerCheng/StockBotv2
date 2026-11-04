@@ -78,17 +78,21 @@ def pending_rewrite(company_id: str, *, watches: Sequence[Mapping[str, Any]],
             if narrative_rewrite_state(w) is not None]
 
 
-def blocking_for_open(company_id: str, ticker: str, *, watches: Sequence[Mapping[str, Any]],
-                      lifecycle: Mapping[str, Any] | None, brief_ids: Iterable[str],
-                      current_brief: Any = None, acknowledged: Iterable[str] = ()) -> list[str]:
-    """「可開」前提③：歸屬本檔的 watch 裡，還有沒有醒來待判、觸及待處置、到期未判的（敘事來源的已在本版處置的不算）。
-    回傳人讀的理由清單（空＝沒有擋的）。"""
+def blocking_watches(company_id: str, ticker: str, *, watches: Sequence[Mapping[str, Any]],
+                     lifecycle: Mapping[str, Any] | None, brief_ids: Iterable[str],
+                     current_brief: Any = None, acknowledged: Iterable[str] = ()) -> list[tuple[str | None, str]]:
+    """「可開」前提③的**唯一判定**：歸屬本檔的 watch 裡，還有沒有醒來待判、觸及待處置、到期未判的（敘事來源的已在本版
+    處置的不算）。回 (watch_id, 人讀的理由)；lifecycle 讀不到那一條沒有 watch_id（None）。空＝沒有擋的。
+
+    兩個消費端讀同一份（L16）：`blocking_for_open`（寫入端與候選板的起始門，只要理由）與候選板列上的 `blocking_watch_ids`
+    （⑤ 的進展格數「持股或可開名下」的反證工作——2026-11-04 整體盲點審查複查：醒來待判的反證算在「未檢」，不是進展格，
+    3081.TWO、4979.TWO、AXTI 離可開只差一次判定、提示卻寫「只剩維護」，持股的反證醒來最慢要等 7 天才叫人）。"""
     acked = set(acknowledged)
-    reasons = []
+    out: list[tuple[str | None, str]] = []
     if lifecycle is None:
         # R2-a C3：讀不到 lifecycle＝thesis 來源的 watch 歸屬不到本檔——擋不住「醒來待判」就等於 fail open。
         # 與 `engine_b/disproof.py` 對 None 的處理一致：fail closed。
-        reasons.append("thesis lifecycle 讀不到——本檔 thesis 來源的反證 watch 無法歸屬，前提③確認不了（fail closed）")
+        out.append((None, "thesis lifecycle 讀不到——本檔 thesis 來源的反證 watch 無法歸屬，前提③確認不了（fail closed）"))
     for w in attributed_watches(company_id, ticker, watches=watches, lifecycle=lifecycle, brief_ids=brief_ids,
                                 current_brief=current_brief):
         wid = str(w.get("watch_id"))
@@ -99,16 +103,25 @@ def blocking_for_open(company_id: str, ticker: str, *, watches: Sequence[Mapping
         if is_narrative_watch(w):
             state = narrative_rewrite_state(w)
             if state is not None and wid not in acked:
-                reasons.append(f"{wid}（敘事來源，{state}，本版沒處置）")
+                out.append((wid, f"{wid}（敘事來源，{state}，本版沒處置）"))
             continue
         judgment = w.get("judgment") or {}
         if w.get("status") == "fired" and w.get("kind") == ew.SEMANTIC_KIND:
-            reasons.append(f"{wid}（{_src(w)}：醒來待判）")
+            out.append((wid, f"{wid}（{_src(w)}：醒來待判）"))
         elif judgment.get("touches") == "yes" and not judgment.get("handled"):
-            reasons.append(f"{wid}（{_src(w)}：判定觸及、待處置）")
+            out.append((wid, f"{wid}（{_src(w)}：判定觸及、待處置）"))
         elif w.get("status") == "expired" and not w.get("expiry_resolution") and w.get("kind") == ew.SEMANTIC_KIND:
-            reasons.append(f"{wid}（{_src(w)}：到期未判）")
-    return reasons
+            out.append((wid, f"{wid}（{_src(w)}：到期未判）"))
+    return out
+
+
+def blocking_for_open(company_id: str, ticker: str, *, watches: Sequence[Mapping[str, Any]],
+                      lifecycle: Mapping[str, Any] | None, brief_ids: Iterable[str],
+                      current_brief: Any = None, acknowledged: Iterable[str] = ()) -> list[str]:
+    """「可開」前提③：人讀的理由清單（空＝沒有擋的）。判定只住 `blocking_watches`。"""
+    return [reason for _, reason in blocking_watches(company_id, ticker, watches=watches, lifecycle=lifecycle,
+                                                      brief_ids=brief_ids, current_brief=current_brief,
+                                                      acknowledged=acknowledged)]
 
 
 #: 連結算「還活著」的 watch 狀態：在等（active）或已醒待判（fired，那是來源那一邊的事件，連結本身沒斷）。
@@ -295,6 +308,7 @@ def register_brief_watches(record: Any, *, data: dict[str, Any], company_brief_i
     return summary
 
 
-__all__ = ["LINK_BREAK_REASONS", "LIVE_LINK_STATUSES", "attributed_watches", "blocking_for_open", "link_break_reason",
+__all__ = ["LINK_BREAK_REASONS", "LIVE_LINK_STATUSES", "attributed_watches", "blocking_for_open", "blocking_watches",
+           "link_break_reason",
            "link_breaks", "narrative_watches_of",
            "pending_rewrite", "register_brief_watches", "settle_due", "thesis_memos"]
