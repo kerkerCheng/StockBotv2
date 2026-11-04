@@ -3077,6 +3077,21 @@
       "name_aliases": [
         "SCHOTT"
       ]
+    },
+    {
+      "_display_name_source": "yfinance longName（2026-11-04）；交易所 SHZ；中文全名取自深交所公告 2026-028、2026-043 的抬頭",
+      "_note": "名冊批次草稿（2026-11-04）：CPO／矽光耦合設備供給側（全資子公司 ficonTEC Service GmbH，2025-05 起全資；公告 2026-043 第二節）；lead_631e48d6 核到深交所重大合同公告 2026-028、2026-043；系統口徑 edge（約 76.6 億美元、分析師 3 家）",
+      "company_id": "co:robotechnik_intelligent",
+      "display_name": "RoboTechnik Intelligent Technology Co., Ltd.",
+      "market_currency": "CNY",
+      "name_aliases": [
+        "罗博特科智能科技股份有限公司",
+        "罗博特科",
+        "羅博特科",
+        "ficonTEC Service GmbH",
+        "ficonTEC"
+      ],
+      "research_ticker": "300757.SZ"
     }
   ]
 }
