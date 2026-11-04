@@ -1,0 +1,156 @@
+{
+  "claims": [
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：中際旭創的定期報告、公告或投資人關係紀錄寫出 NPO 改用其他矽光代工或自製、與 Tower 的合作終止，或 Tower 的 6-K、20-F、法說寫出中際旭創縮減或取消 2027–2028 的產能合約與預付。核查頻率：每季（Tower 季報 6-K 與法說；中際旭創季報、半年報、年報與投資人關係活動紀錄）。觸發後 48 小時：e1 的 claim 降信心或提撤回，重讀矽光子 PIC 層（tech:silicon_photonics_pic）與 NPO 節點的供給側。",
+      "id": "tsem_innolight_npo_6k_2026_11_03_cl1",
+      "source_ids": [
+        "tsem_innolight_npo_6k_2026_11_03_s2",
+        "tsem_innolight_npo_6k_2026_11_03_s3",
+        "tsem_innolight_npo_6k_2026_11_03_s4",
+        "tsem_innolight_npo_6k_2026_11_03_s5"
+      ],
+      "statement": "Tower Semiconductor's Form 6-K press release of 2026-11-03, issued jointly with Innolight (Zhongji Innolight) and quoting Innolight's CTO, states that Innolight's first Near-Package Optics (NPO) device has entered early production on Tower's PH18M silicon photonics process flow at Tower's California fab, and that Innolight has taped out multiple NPO products on Tower's 300mm silicon photonics platform. Tower's president calls Innolight a cornerstone manufacturing customer across four Tower facilities (Newport Beach California, San Antonio Texas, Israel and Japan). The customer is named and quoted in the same document; it states no volume, share, exclusivity or price, and does not say whether Innolight also uses other silicon photonics foundries.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "co:zhongji_innolight",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "tsem_innolight_npo_6k_2026_11_03_s2",
+        "tsem_innolight_npo_6k_2026_11_03_s3",
+        "tsem_innolight_npo_6k_2026_11_03_s4",
+        "tsem_innolight_npo_6k_2026_11_03_s5"
+      ],
+      "src_id": "co:tower_semiconductor"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:near_package_optics",
+      "id": "e2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "tsem_innolight_npo_6k_2026_11_03_s1",
+        "tsem_innolight_npo_6k_2026_11_03_s2",
+        "tsem_innolight_npo_6k_2026_11_03_s3"
+      ],
+      "src_id": "co:zhongji_innolight"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "foundry_packaging",
+      "aliases": [
+        "TSEM",
+        "TowerJazz",
+        "Tower",
+        "Tower Semiconductor Ltd."
+      ],
+      "attributes": {
+        "ticker": "TSEM"
+      },
+      "confidence": 0.9,
+      "id": "co:tower_semiconductor",
+      "name": "Tower Semiconductor",
+      "role": null,
+      "source_ids": [
+        "tsem_innolight_npo_6k_2026_11_03_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "Innolight",
+        "中際旭創",
+        "中际旭创",
+        "300308.SZ"
+      ],
+      "attributes": {
+        "ticker": "300308.SZ"
+      },
+      "confidence": 0.85,
+      "id": "co:zhongji_innolight",
+      "name": "Zhongji Innolight",
+      "role": "leader",
+      "source_ids": [
+        "tsem_innolight_npo_6k_2026_11_03_s1",
+        "tsem_innolight_npo_6k_2026_11_03_s4"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "NPO",
+        "near package optics",
+        "near-packaged optics"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 3
+      },
+      "confidence": 0.9,
+      "id": "tech:near_package_optics",
+      "name": "Near-Packaged Optics (NPO)",
+      "role": null,
+      "source_ids": [
+        "tsem_innolight_npo_6k_2026_11_03_s1",
+        "tsem_innolight_npo_6k_2026_11_03_s6"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "tsem_innolight_npo_6k_2026_11_03",
+    "evidence_tier": 1,
+    "origin_entity": "Tower Semiconductor Ltd.",
+    "permission_basis": "美國 SEC 公開申報（Tower Semiconductor 的 Form 6-K，2026-11-03 新聞稿）；只保留新聞稿正文的逐字節錄（封面、簽名、About 段與前瞻聲明未收）。published_at 取新聞稿署日 2026-11-03（EDGAR 同日收件）。",
+    "published_at": "2026-11-03",
+    "publisher": "SEC EDGAR",
+    "retrieved_at": "2026-11-04",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Tower Semiconductor Form 6-K（2026-11-03）：Tower Semiconductor and Innolight Advance High-Performance Near-Package Optics for AI Infrastructure——中際旭創第一個 NPO 元件以 Tower PH18M 矽光製程（美國加州廠）進入早期量產，另在 Tower 300mm 矽光平台完成多個 NPO 產品投片",
+    "url": "https://www.sec.gov/Archives/edgar/data/928876/000117891326004972/zk2636316.htm"
+  },
+  "sources": [
+    {
+      "id": "tsem_innolight_npo_6k_2026_11_03_s1",
+      "locator": "新聞稿第 1 段",
+      "quote": "Tower Semiconductor (NASDAQ/TASE: TSEM), the leading foundry for high-value analog semiconductor solutions, and Innolight, a leading provider of optical connectivity solutions for data center and AI infrastructure applications, today announced their continued collaboration on emerging Near-Package Optics (NPO) applications."
+    },
+    {
+      "id": "tsem_innolight_npo_6k_2026_11_03_s2",
+      "locator": "新聞稿第 2 段",
+      "quote": "Innolight has achieved a key milestone in the development of its Near-Package Optics (NPO) portfolio with its first NPO device entering early production using Tower's PH18M Silicon Photonics process flow running in Tower’s US CA factory."
+    },
+    {
+      "id": "tsem_innolight_npo_6k_2026_11_03_s3",
+      "locator": "新聞稿第 2 段",
+      "quote": "In parallel, Innolight has taped-out multiple NPO products on Tower's 300mm Silicon Photonics platform to support future product generations."
+    },
+    {
+      "id": "tsem_innolight_npo_6k_2026_11_03_s4",
+      "locator": "新聞稿：中際旭創 CTO Oliver Sun 引言",
+      "quote": "said Oliver Sun, CTO of Innolight. \"Our collaboration with Tower provides us with industry leading capabilities enabling us to accelerate the development of NPO solutions to meet the evolving needs of hyperscale and AI data center customers.\""
+    },
+    {
+      "id": "tsem_innolight_npo_6k_2026_11_03_s5",
+      "locator": "新聞稿：Tower 總裁 Marco Racanelli 引言",
+      "quote": "Innolight continues to be a critical technology partner for Tower’s silicon photonics roadmap as well as cornerstone manufacturing customer now across four of our facilities, two in the US (Newport Beach California and San Antonio Texas) and one each in Israel and Japan"
+    },
+    {
+      "id": "tsem_innolight_npo_6k_2026_11_03_s6",
+      "locator": "新聞稿第 3 段",
+      "quote": "NPO architectures are emerging as one of the preferred approaches for next-generation optical interconnects."
+    }
+  ]
+}

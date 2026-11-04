@@ -1,0 +1,27 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/928876/000117891326004972/zk2636316.htm
+
+Excerpt:
+SOURCE: Tower Semiconductor Ltd., Form 6-K（2026-11-03）新聞稿「Tower Semiconductor and Innolight Advance High-Performance Near-Package Optics for AI Infrastructure」——SEC EDGAR 原檔
+URL: https://www.sec.gov/Archives/edgar/data/928876/000117891326004972/zk2636316.htm
+PUBLISHED: 2026-11-03（新聞稿署日 MIGDAL HAEMEK, Israel and SUZHOU, China, November 3, 2026）
+EXCERPT: 新聞稿正文逐字（斷行接回；未收封面、簽名、About 段與前瞻聲明）
+
+Tower Semiconductor and Innolight Advance High-Performance Near-Package Optics
+
+for AI Infrastructure
+
+Leveraging Tower's 200mm and 300mm Silicon Photonics platforms, the collaboration supports multiple generations
+
+of Near-Packaged Optics development for AI infrastructure
+
+MIGDAL HAEMEK, Israel and SUZHOU, China, November 3, 2026 – Tower Semiconductor (NASDAQ/TASE: TSEM), the leading foundry for high-value analog semiconductor solutions, and Innolight, a leading provider of optical connectivity solutions for data center and AI infrastructure applications, today announced their continued collaboration on emerging Near-Package Optics (NPO) applications. The collaboration combines Innolight's expertise in optical interconnect solutions with Tower's high-volume 200mm and 300mm Silicon Photonics manufacturing platforms to address the increasing performance and bandwidth requirements of next-generation AI infrastructure.
+
+Leveraging Tower's high-volume 200mm and 300mm Silicon Photonics platforms, Innolight has achieved a key milestone in the development of its Near-Package Optics (NPO) portfolio with its first NPO device entering early production using Tower's PH18M Silicon Photonics process flow running in Tower’s US CA factory. In parallel, Innolight has taped-out multiple NPO products on Tower's 300mm Silicon Photonics platform to support future product generations.
+
+As AI workloads continue to scale, NPO architectures are emerging as one of the preferred approaches for next-generation optical interconnects. These emerging architectures are expected to drive additional demand beyond today's pluggable optical module market, driving the new phase of optical interconnect solutions for AI and cloud infrastructure.
+
+"Near-Package Optics is emerging as a key technology for next-generation AI and cloud infrastructure," said Oliver Sun, CTO of Innolight. "Our collaboration with Tower provides us with industry leading capabilities enabling us to accelerate the development of NPO solutions to meet the evolving needs of hyperscale and AI data center customers."
+
+NPO architectures typically require substantially higher optical channel counts than conventional pluggable optical modules, often integrating 16 or more channels on a single device. As channel counts increase, manufacturing expertise, process control, and yield performance become increasingly critical. Tower's leadership in high-volume Silicon Photonics manufacturing and its advanced 200mm and 300mm SiPho platforms provide the process uniformity, high-yield performance, and rich device offerings needed to support these increasingly complex designs. The platform also enables monolithic integration of multiple photonic functions, including wavelength division multiplexing and demultiplexing on a single chip, enabling increased functionality with compact size while optimizing performance and scalability.
+
+“Given their market and product leadership, Innolight continues to be a critical technology partner for Tower’s silicon photonics roadmap as well as cornerstone manufacturing customer now across four of our facilities, two in the US (Newport Beach California and San Antonio Texas) and one each in Israel and Japan,” said Dr. Marco Racanelli, President, Tower Semiconductor. “By combining Innolight's innovation in optical connectivity with Tower's differentiated Silicon Photonics technologies and manufacturing expertise, we continue to advance solutions that address the demands of future optical networks.”
