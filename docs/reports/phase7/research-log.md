@@ -392,3 +392,21 @@
 - COHR 的 Q3W 到點未寫：FY27 第一季財報在美東 11-04 盤後（台北 11-05 清晨），本輪寫不了。
 
 **停止條件成立**：`engine_b.cli drain` 段 0–1 全零、pq1 空（段 5 到終局 76／未到終局 0）；`event_watch counters` fired_unconsumed 0、semantic_pending_check 0、wake_held 0、expiry_* 全 0；`audit invariants --only QueueSegments` PASS；closure-gate exit 0；短版 ⑤ 二十二格全 0（全量 materialize 197/197 之後的心跳）；候選板可開 9／缺 X 32／不要 47／已持有 2／無敘事 106。本日候選狀態移動：缺 X → 可開 5（AEHR、002428.SZ、300570.SZ、VNP.TO、SILEX.ST）、等回落（舊版）→ 可開 4（3081.TWO、4979.TWO、AXTI、STLTECH.NS）、無敘事 → 不要 1（600118.SS）；SIVE.ST 仍缺 X。非零但不是待做：停滯 3、到期 3（同 10-31）；追源需處置 1＝ew_0092（同 11-01）；健康紅燈 1＝AXTI thesis 在 review_required，等 Q3 10-Q 一起複查（[896]，11-16）；逾期型反證 0 條的持有／可開敘事 6 → 1，剩 COHR——非倍率持股的反證住 thesis，補要走 thesis mutation（[836] 財報後改寫 lane memo 時一起提），不拿敘事代寫；Q3W 到點未寫 1：COHR（上一條）。8790 重啟（18:51，health `code.stale=false`）；writer lock 釋放。新鑄 pq2（全日）：[902]、[903]、[904]。decompose：本輪沒有新錨提案（CPO 耦合／對位設備在 AI capex 錨內，要不要拆是使用者選題）；距上次掃題材 8 天（門檻 7），本輪不掃。
+
+## 十七、2026-11-04 晚（使用者「902 903 904 go」「建議現在做的可以做掉」；中途壓縮一次）
+
+**go 三筆**：[902] 入圖（雲南鍺業子公司雲南鑫耀→AOI 2027–2031 磷化銦基板長約，`5ed67877`）、[904] 入圖（Tower→中際旭創 NPO 早期量產，`74e34c05`）、[903] 名冊登記羅博特科 300757.SZ（含全資子公司 ficonTEC；只登記身分，`caf47864`）。
+
+**「建議現在做」＝F19**：人工核准的屬性決議走到讀圖工具（`1e8735aa`，本機 commit、**未 push**）——真資料 28／28 份決議生效、讀圖工具印的與決議不同 9 → 0；投影漂移 9 → 0（全量重投影，failure log #126）；全套 4795 passed。Phase 7 開發 Step 常規 R2 回 **CONDITIONAL_GO**：F1 更正走廊重載後「證據等級預告」「圖影響」會降級（`rows_after_load` 不帶 `source_ids`；16 份文件、39 筆 supporting 引用暴露）、F2 一份決議的 supporting 來源被更正改掉時所有預設收斂都 raise（要使用者選：全域 fail closed，或逐條隔離）、F3–F7 非阻斷——等使用者決定，F19 不 push。
+
+**下游換版**（F19 讓讀圖工具改印核准值）：
+- 讀圖六份換版、判讀都不改：諧波減速機 `sr_bc71af9008edae9e`、稀土磁材 `sr_f6888e317022f5ea`、CW DFB 雷射 `sr_4f1640e81bd5f841`、外部光源 `sr_0103be4fc3ede304`、CPO `sr_b38454c20adc3ceb`、NPO `sr_f374bdfe9a32e5d5`；三份 neither（外部光源、CPO、NPO）照 11-03 盲點修法第 12 條補標引用 basis（buyer_policy：Meta 的 multi-sourcing／multi-vendor；buyer_fact：NVIDIA 部落格點名三家；third_party：Broadcom 生態系；media：TechNews 轉述台積電）。
+- 敘事 21 份換版：只換連結 10 份（2455.TW、3081.TWO、3234.TWO、4979.TWO、6680.HK、688313.SS、9856.HK、COHR、SIVE.ST、USAR）；HIMX、6324.T 換騎時被「量得到就要答」擋下，已定價改答 yes（自家歷史百分位 81.5、82.4），6324.T 出現在數字裡改答 no；AEVA「卡在哪」補 NPO 供給側三家、中際旭創進入早期量產；「量不到」但稽核區今天有值 12 筆（7 檔：2768.T、5411.T、6268.T、5706.T、3110.T、ARBE、POET）→ 0；AAOI 讀 [902] 新邊（長約是它自己雷射產線的料，不是客戶端具名，「不要」不變）。5411.T 順手更正「GO 供貨邊已打包等入圖」——那條邊 10-07 已入圖。故事缺 0。
+
+**羅博特科短檢查**（closure-gate 唯一擋著的一檔：邊緣、沒座位、沒敘事）：在深股通合資格名單上（HKEX 11-04 版）；讀 2025 年報、2026 半年報的業務段與客戶段，和兩份重大合同公告（2026-028、2026-043）。結論①補供貨邊：半年報「在 CPO 领域」段寫 ficonTEC 配合核心客戶完成雙面晶圓測試與晶粒測試設備的驗證後，取得多筆量產訂單、部分已確收——坐圖上既有的「CPO 全堆疊測試」層（第四家）。營收大宗是耦合封裝設備（同一集團客戶累計約 12.61 億元訂單；兩份公告的交易對手豁免披露），圖上沒有對應的層；「CPO 封裝與系統組裝」「模組組裝」兩層的供給側是代工組裝廠，掛上去會讓一條邊承載兩種意思（L12），所以不掛——要不要拆一層是使用者的 decompose 選題。入圖包 `ra_037389be0a373658d44aa3ff42425f68` 鑄 [905]（乾跑兩次都乾淨才正式跑一次；九句引文由產生器斷言是半年報抽字的子字串；抽查沒抽中）；自家庫命中 1 份 TrendForce 10-13 節錄（第三方的能力描述，只當脈絡）。closure-gate 列「等入圖（[905]）」。
+
+**發現**：
+- F20「量不到」過期沒人點名（寫入端只在換版時擋，9 檔）、F21 故事層沒有「已定價位置詞要帶日期」的檢查（20／90 份）、F22 投影漂移根因（1 次）——brainstorm `2026-10-28-app-attention-ia` 的開發候選，未排程。
+- ⑤「邊緣卻沒敘事」不認等入圖（#51 的對稱面，第 2 次；failure log #127）：當下修——閉環佇列與 ⑤ 共用 `pending_admission_tickers`，⑤ 扣掉等入圖的檔、在註記點名；測試 2 條、變異 2 個都紅。
+
+**停止條件成立**：`engine_b.cli drain` 段 0–1 全零、pq1 空（段 5 到終局 76／未到終局 0；母體外 121＝非倍率 106、邊緣沒座位已查 14、等入圖 1）；`event_watch counters` fired_unconsumed 0、semantic_pending_check 0、wake_held 0、expiry_* 全 0；`audit invariants --only QueueSegments` PASS；closure-gate exit 0；短版 ⑤ 二十二格全 0（「邊緣卻沒敘事」註記 300757.SZ 等入圖 [905]）；候選板可開 9／缺 X 32／不要 47／已持有 2／無敘事 107（全量 materialize 203/203）。非零但不是待做：停滯 3、到期 3（同上一節）。新鑄 pq2：[905]。距上次掃題材 8 天（門檻 7），本輪不掃。
