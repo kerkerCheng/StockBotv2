@@ -80,7 +80,7 @@
    "tier_cap": 1,
    "verified": true,
    "how": "POST https://www.szse.cn/api/disc/announcement/annList（json: seDate/stock/channelCode）→ attachPath → https://disc.static.szse.cn/download/<attachPath>",
-   "why": "2026-09-11 實測通過（002472 的 132 頁半年報）。⚠ CNINFO 那條回 HTML、被擋，不要再試。"
+   "why": "2026-09-11 實測通過（002472 的 132 頁半年報）。當天 CNINFO 回 HTML、被擋；2026-11-04 巨潮 hisAnnouncement/query 實測可用（見 cninfo 那一條）——當天那句「不要再試」已過期。"
   },
   {
    "key": "sse",
@@ -92,8 +92,22 @@
    ],
    "tier_cap": 1,
    "verified": false,
-   "how": "清單（2026-10-23 實測可用）：GET https://query.sse.com.cn/security/stock/queryCompanyBulletinNew.do（params：isPagination=true、pageHelp.pageSize=100、pageHelp.pageNo=1、START_DATE／END_DATE=YYYY-MM-DD、SECURITY_CODE=<六碼>、TITLE=<關鍵字，可空>；headers 必帶 Referer=https://www.sse.com.cn/）→ JSON 的 URL 欄是 static.sse.com.cn 的 PDF 路徑。**PDF 本體抓不到**：static.sse.com.cn 回 JS challenge（不繞過）。本體改走同一份文件的其他一手鏡像——A＋H 兩地上市的走 HKEX 披露易；或巨潮資訊 static.cninfo.com.cn 的 PDF（300489 半年報實測可用；SSE 掛牌的還沒試）",
+   "how": "清單（2026-10-23 實測可用）：GET https://query.sse.com.cn/security/stock/queryCompanyBulletinNew.do（params：isPagination=true、pageHelp.pageSize=100、pageHelp.pageNo=1、START_DATE／END_DATE=YYYY-MM-DD、SECURITY_CODE=<六碼>、TITLE=<關鍵字，可空>；headers 必帶 Referer=https://www.sse.com.cn/）→ JSON 的 URL 欄是 static.sse.com.cn 的 PDF 路徑。**PDF 本體抓不到**：static.sse.com.cn 回 JS challenge（不繞過）。本體改走同一份文件的其他一手鏡像——A＋H 兩地上市的走 HKEX 披露易；或巨潮資訊 static.cninfo.com.cn 的 PDF（300489 半年報實測可用；SSE 掛牌的 2026-11-04 實測可用：600118 半年報與第三季報——清單也可改走 cninfo 那一條）",
    "why": "688017.SS／688836.SS／688498.SS 需要它。2026-10-23：688498（源杰）清單可列，本體是用 HKEX 的 H 股申請版本取得的。**清單通、本體不通，所以仍標未驗證**——驗證指的是拿得到文件本身，不是列得出標題。"
+  },
+  {
+   "key": "cninfo",
+   "label": "巨潮資訊網（A 股公告與投資者關係活動記錄表）",
+   "rung": 2,
+   "applies_to": "ticker_suffix",
+   "suffixes": [
+    ".SZ",
+    ".SS"
+   ],
+   "tier_cap": 1,
+   "verified": true,
+   "how": "一般 UA（不含任何個人資訊）：① orgId——POST http://www.cninfo.com.cn/new/information/topSearch/query（form：keyWord=<六碼>&maxNum=5）；② 清單——POST http://www.cninfo.com.cn/new/hisAnnouncement/query（form：stock=<六碼>,<orgId>、column=szse 或 sse、plate=sz 或 sh、seDate=<起>~<迄>、searchkey 可空、pageNum、pageSize）：tabName=fulltext 是公告，tabName=relation 是投資者關係活動記錄表（特定對象調研、業績說明會的問答）；③ 本體——GET http://static.cninfo.com.cn/<adjunctUrl>。腳本：library/private/wf_tmp/cninfo_search.py（第 6 個參數是 tabName）",
+   "why": "2026-11-04 實測通過：002428、300570 的投資者關係活動記錄表（relation）與 600118 的半年報、第三季報（fulltext）都列得到、本體抓得下。A 股沒有法說逐字稿，深挖清單「最新一場法說或股東會的逐字」的答案在 relation——同日兩檔曾寫成「互動易沒有路線」，是沒試。"
   },
   {
    "key": "mops",

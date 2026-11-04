@@ -1,0 +1,18 @@
+SOURCE: Sterlite Technologies Limited（NSE: STLTECH）Q2 FY27 財務結果表（CONSOLIDATED／STANDALONE FINANCIAL RESULTS FOR THE QUARTER AND HALF YEAR ENDED SEPTEMBER 30, 2026）——股本、EPS 與附註 3、4 有限節錄
+URL: https://stl.tech/wp-content/uploads/2026/10/Result%20Sheet%20Q2%20FY%2027_SignedF.pdf
+PUBLISHED: 2026-10-23（董事會核准日；同一份結果表的營收與分部節錄見 library/raw/stl_q2fy27_transcript_results_excerpt.txt）
+RETRIEVED: 2026-11-04
+STORAGE: repo_excerpt（pypdf 抽字，逐字截取）
+NOTE: 給 STL 敘事深挖清單的「稀釋」：上半年 QIP 增發 25,728,500 股（每股 583.01 盧比、合計 1,500 crore＝150 億盧比），對 6 月後的 514,057,433 股約 5.0%（推算）；募得的錢主要用來還借款。稀釋 EPS 比基本 EPS 低約一成（Q2 9.36 對 10.32），結果表沒寫是哪一種潛在股份造成的——列出的債券都是不可轉換（Non-Convertible Debentures）。
+
+[合併結果表]
+"Paid-up equity share capital (face value of ₹ 2 per share fully paid-up) 103 98 98 103 98 98"（Q2 FY27／Q1 FY27／Q2 FY26／H1 FY27／H1 FY26／FY26，₹ crores）
+"Basic EPS (₹) 10.32 4.03 0.08 14.25 0.28 1.15"
+"Diluted EPS (₹) 9.36 3.71 0.08 12.93 0.28 1.11"
+
+[附註 3]
+"During the period ended September 30, 2026, the Company has allotted 25,728,500 equity shares of face value Rs. 2 each at an issue price of Rs. 583.01 per equity share aggregating to Rs. 1,500 crores pursuant to Qualified Institutions Placement (QIP) under the provisions of Chapter VI of the Securities and Exchange Board of India (Issue of Capital and Disclosure Requirements) Regulations, 2018, as amended (the "SEBI ICDR Regulations"), and section 42 and 62 of the Companies Act, 2013, including the rules made thereunder, each as amended. Pursuant to the QIP issue promoter's shareholding in the Company has been reduced from 44.44% as on March 31, 2026 to 42.29%."
+"……been utilised for (i) repayment, in full or part, of certain outstanding borrowings availed by the Company and its Subsidiaries; (ii) general corporate purposes and (iii) toward share issues expenses except for Rs. 2.68 crores which is lying in QIP escrow account."
+
+[附註 4]
+"During the period ended September 30, 2026, the Company allotted 1,96,395 equity shares of Rs. 2 each fully paid up, upon the exercise of Employee Stock Options. Post this allotment, the paid-up equity share capital of the Company stands increased from Rs. 103 crores divided into 513,861,038 equity shares of Rs. 2 each to Rs. 103 crores divided into 514,057,433 equity shares of Rs. 2 each."

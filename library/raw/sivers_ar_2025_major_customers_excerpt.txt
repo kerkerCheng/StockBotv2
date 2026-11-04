@@ -1,0 +1,17 @@
+SOURCE: Sivers Semiconductors AB Annual Report 2025（合併財報附註 Note 5 Operating segments：Information about major customers，PDF 第 39 頁）
+URL: https://www.sivers-semiconductors.com/wp-content/uploads/2026/05/Sivers_annualreport_2025_2.pdf
+PUBLISHED: 2026-05-13（查核報告簽署日；年度截至 2025-12-31）
+RETRIEVED: 2026-11-04
+STORAGE: repo_excerpt（pypdf 抽字，逐字截取一段）
+NOTE: 給 SIVE.ST 敘事深挖清單的「客戶集中度」：2025 年三家客戶各超過合併營收一成、合計 183.4 百萬克朗（約占年報合併營收 306.6 百萬克朗——306,558 千克朗、Note 32 更正錯誤後——的六成，推算），三家都在無線分部——光子分部沒有一家過一成；公司不揭露客戶名字。2026 第二季報告把 2025 全年營收列為重編後的 302.8，與年報差的原因本節錄沒查。
+
+"Information about major customers
+During the financial year ended December 31, 2025, three customers each accounted for more than 10 percent of the Group’s total revenue. Revenue from these customers amounted to SEK 183.4 million (2024: three customers, SEK 96.5 million).
+Customer A: SEK 79.4 (75.3) million
+Customer B: SEK 55.2 (16.9) million
+Customer C: SEK 48.7 (4.4) million
+These revenues were attributable to the following operating segments:
+Customer A: Wireless
+Customer B: Wireless
+Customer C: Wireless
+The Group does not disclose the identity of major customers."

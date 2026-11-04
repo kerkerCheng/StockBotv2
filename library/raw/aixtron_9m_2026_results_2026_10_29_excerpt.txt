@@ -1,0 +1,21 @@
+SOURCE: AIXTRON SE 9M/2026（第三季）財報新聞稿（公司新聞稿；經 finanzwire 轉載的全文）
+URL: https://www.finanzwire.com/press-release/aixtron-se-etr-aixa-ai-driven-demand-fuels-strong-order-momentum-N5UhnqcFXPc
+PUBLISHED: 2026-10-29
+RETRIEVED: 2026-11-04
+STORAGE: repo_excerpt（有限逐字引文）
+NOTE: 給聯亞敘事反證⑥（AIXTRON 的雷射設備大批出貨再延後）與磊晶層說明主張 A3：上半年報（2026-07-30，library/raw/aixtron_h1_2026_results_2026_07_30.txt）說「Major laser system shipments are expected to begin in Q3/2026」；這一份沒有再說延後，寫的是產出逐季增加、年底前再增加，在手設備訂單 5.494 億歐元、能見度到 2027。沒有點名任何客戶（聯亞、Lumentum 都沒出現）——對聯亞是推一步。訂單與在手金額是時變數字，不入圖（L4）。
+
+"Demand for InP-based optical components continued to grow rapidly in Q3/2026 and represents the majority of AIXTRON's order backlog."
+
+"The expansion of AI data-center networks remains the key structural driver for high-speed optical interconnects."
+
+"optoelectronics accounting for approx. 68% and power electronics for 24% of equipment orders."
+
+"AIXTRON is increasing manufacturing output in close cooperation with its suppliers to meet expected shipment volumes in the coming quarters."
+
+"Output has risen sequentially throughout 2026 and is expected to increase further by year-end."
+
+"The company confirms its guidance for fiscal year 2026, published on April 14, 2026. Revenues are expected to be EUR 560 million ± EUR 30 million, with a gross margin of about 42% and an EBIT margin between 17% and 20%."
+
+[CEO quote — Dr. Felix Grawert]
+"Optoelectronics accounted for roughly 68% of our equipment order intake in the third quarter, reflecting exceptionally strong demand for AI-driven optical connectivity. With an equipment order backlog of EUR 549.4 million, we have revenue visibility well into 2027. At the same time, improving customer utilization, renewed order activity and preparations for new capacity provide increasing evidence of a recovery in GaN and SiC power electronics. Together, these trends reinforce our expectation of a strong growth year in 2027, led by optoelectronics,"

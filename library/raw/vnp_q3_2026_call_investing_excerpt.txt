@@ -1,0 +1,18 @@
+SOURCE: 5N Plus Inc.（TSX: VNP）2026 第三季法說（2026-11-03，CEO Richard Perron、CFO Alban Fournier）——Investing.com 加拿大站刊登的逐字稿
+URL: https://ca.investing.com/news/stock-market-news/earnings-call-transcript-5n-plus-tops-q3-2026-estimates-as-revenue-jumps-30-93CH-4925769
+PUBLISHED: 2026-11-03（法說日期；Investing.com 刊登時間未記）
+RETRIEVED: 2026-11-04
+STORAGE: repo_excerpt（⚠ 經抓取工具轉錄，不是本機抽字：本機直接下載 Investing.com 回 403，Benzinga、GuruFocus 的逐字稿頁也回 403；工具讀同一頁兩次，只收第二次指名逐字回傳、標明在逐字稿段的整句——逐字性本機沒能對原文核過）
+NOTE: 給 VNP.TO 敘事深挖清單的「最新一場法說或股東會的逐字」。和第三季 MD&A 一致（太空實際積壓仍超過 12 個月）；新的兩點是下一期太空電池擴產在評估、鍺原料夠但越來越貴。發行人自述（L8 弱）；沒有具名的太空買方。
+
+[Richard Perron，太空電池擴產]
+"With the project pipeline extending well into 2030, the team is developing and evaluating scenarios for the next phase of solar cell expansion."
+"So for space, with all those opportunities arising in Europe, and the continued growth in the North American market, we're at a point where we need to think much bigger"
+"Their projection launches in 2029, 2030, and 2031."
+
+[Alban Fournier，特種半導體積壓]
+"with the effective backlog for this segment continuing to well surpass the 12-month mark."
+
+[Richard Perron，鍺原料]
+"Today, there's plenty of germanium available in various areas of Europe, North America, and Canada"
+"But one thing for sure, it is more and more expensive"

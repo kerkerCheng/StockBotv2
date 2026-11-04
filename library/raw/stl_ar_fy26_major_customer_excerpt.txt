@@ -1,0 +1,8 @@
+SOURCE: Sterlite Technologies Limited Annual Report FY2026（合併財報附註：Segment／Geographical Information）
+URL: https://stl.tech/wp-content/uploads/2026/07/Annual-Report-FY2026_Final.pdf
+PUBLISHED: 2026-07（AGM 通知同月上傳；年度截至 2026-03-31）
+RETRIEVED: 2026-11-04
+STORAGE: repo_excerpt（pypdf 抽字，逐字截取一句）
+NOTE: 給 STL 敘事深挖清單的「客戶集中度」：FY25、FY26 都沒有單一客戶超過合併營收一成。FY27 起兩家 hyperscaler 的多年長約開始出貨（11.1 億美元 FY27–FY29、12 億美元五年），推一步：FY27 可能出現過一成的客戶——要等 FY27 年報同一個附註。
+
+"No individual customer contributed more than 10% of Group's Total Revenue for the year ended March 31, 2026 and March 31, 2025"

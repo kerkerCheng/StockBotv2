@@ -1,0 +1,34 @@
+SOURCE: Silex Microsystems AB (publ)（Nasdaq Stockholm: SILEX）——Interim report January-September 2026（PDF）
+URL: https://storage.mfn.se/b94f2722-95c2-42ca-baf5-c90dd6c9b7d0/silex-q3-2026-interim-report.pdf（發布頁：https://www.silexmicrosystems.com/en/silex-microsystems-interim-report-for-the-third-quarter-2026-strong-sales-and-profitability/）
+PUBLISHED: 2026-11-04 07:30 CET（Regulatory；EU MAR 公告）
+RETRIEVED: 2026-11-04
+STORAGE: repo_excerpt（發行人法定季報有限節錄；pypdf 抽字、逐字照抄，換行併成空白）
+NOTE: 發行人自己的季報（自述，L8 弱）。給 SILEX.ST 第三季後重寫：第一次寫出 OCS 占總營收約三成、為「several leading players」代工；仍沒有任何客戶名字，也沒寫鏡陣列是哪一家的。
+
+[CEO 段（第 3 頁）]
+"In OCS, where Silex manufactures MEMS for several leading players, we are seeing growing interest from hyperscalers and a gradual transition from development projects to commercial deployments. OCS currently accounts for approximately 30 percent of Silex’s total net sales. Life Science, the fastest growing market, currently accounts for approximately 20 percent of total net sales, with a large share coming from production customers, while we have also gained many new development customers."
+
+[第三季摘要（第 2 頁）]
+"Operating profit (EBIT) amounted to SEKm 148 (108), an EBIT margin of 35.8% (31.9%)"
+
+[關鍵數字表（第 2 頁；抽字欄位黏在一起——欄：Jul–Sep 2026、2025｜Jan–Sep 2026、2025｜R12｜2025 全年）]
+"Net sales413 339 1,181 982 1,584 1,385"
+"Cash flow from operating activities amounted to SEKm 145 (30)"
+
+[第三季營收（第 4 頁）]
+"Continued strong demand for AI and optical circuit switches drove an increase in net sales of SEKm 74, or 68.3%, in the Telecom end market."
+
+[一到九月營收]
+"Development projects accounted for 48.5% (42.0%) of the net sales and increased by SEKm 161 compared with the corresponding period last year."
+"At the same time, net sales from production projects increased by SEKm 38 and accounted for 51.5% (58.0%) of net sales."
+"Net sales in the Telecom end market increased by SEKm 114, or 36.9%, compared with the corresponding period last year."
+
+[財務狀況]
+"The increase in total liabilities was primarily attributable to higher advance payments from customers, which amounted to SEKm 172 (104), partially offset by the decrease in interest-bearing liabilities."
+"Net debt, defined as interest-bearing liabilities, less cash and cash equivalents, amounted to SEKm -961 (102) at the end of the period."
+
+[風險段]
+"Credit risk related to customers is considered limited due to the Group's credit assessment procedures, advance invoicing and diversified exposure across geographies and end markets, despite a concentrated customer base."
+
+[財務行事曆]
+"Year-end report 2026 18 February 2027"

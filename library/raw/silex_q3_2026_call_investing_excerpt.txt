@@ -1,0 +1,15 @@
+SOURCE: Silex Microsystems Q3 2026 法說（2026-11-04 10:00 CET，CEO Edvard Kälvesten、CFO Maria Engström）——Investing.com 刊登的逐字稿
+URL: https://www.investing.com/news/transcripts/earnings-call-transcript-silex-microsystems-posts-strong-q3-2026-growth-93CH-4997950
+PUBLISHED: 2026-11-04（法說日期）
+RETRIEVED: 2026-11-04
+STORAGE: repo_excerpt（⚠ 經抓取工具轉錄，不是本機抽字：工具指名逐字回傳整段發言（含提問），本機沒能對原文核過；只收工具回傳的完整發言段）
+NOTE: 發行人自述（L8 弱）。「The only OCS customer who really is in production in the world today」是它對自己最大那位 OCS 客戶的描述，客戶仍沒點名；10 家開發中的 OCS 客戶「有望明年轉量產」是期待、不是訂單。
+
+[ABG Sundal Collier 分析師 Simon Granath 提問]
+"As usual, I'd like to start on the OCS topic and ask for further color as how you see demand into 2027, especially on visibility on growth with your largest customer, but also to understand if the new OCS customers, which we know are in development phase, are already now contributing meaningfully to the figures."
+
+[Edvard Kälvesten 回答]
+"As you know, Simon, we are not guiding going forward into next year, but what we can say that the demand is high. We are continuing to deliver in the production for the biggest customer, big customer who is in production. The only OCS customer who really is in production in the world today. But also in addition, the 10 development customer we have are in different phases, and we have good hopes that some of them will transfer into production in next year."
+
+[Edvard Kälvesten，瑞典擴產]
+"So that is continuing the expansion of the cleanroom in Sweden with increasing capacity 15%-20%, and up to 35% additional when that is up to speed, that fab."

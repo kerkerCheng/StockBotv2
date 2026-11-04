@@ -1,0 +1,17 @@
+SOURCE: Lumentum Holdings Inc. Form 8-K（2026-11-02，第 2.02 項）Exhibit 99.1 新聞稿〈LUMENTUM ANNOUNCES FIRST QUARTER OF FISCAL YEAR 2027 FINANCIAL RESULTS〉
+URL: https://www.sec.gov/Archives/edgar/data/1633978/000162828026068655/lite_ex991xq1fy27.htm
+PUBLISHED: 2026-11-02
+RETRIEVED: 2026-11-04
+STORAGE: repo_excerpt（有限逐字引文：標題重點與執行長引言段；財務表未收）
+NOTE: 給外部光源層說明 v3（tech:external_laser_source）與 CW DFB 雷射層讀圖用——「第二個大型 NPO／CPO 案、採購承諾超過 50 億美元」是供應商自述、客戶不具名（L8 弱）；沒有寫這個案子賣的是雷射晶片、外部光源模組還是整個光引擎。營收與承諾金額是時變數字，不入圖（L4）。
+
+[Highlights]
+"• Net revenue of $1.26 billion • GAAP gross margin of 51.0%; Non-GAAP gross margin of 53.2% • GAAP operating margin of 28.5%; Non-GAAP operating margin of 42.3% • Forecasting second quarter of fiscal year 2027 revenue of $1.575 billion to $1.625 billion; non-GAAP operating margin of 45.0% to 46.0%; and non-GAAP diluted net income per share of $5.90 to $6.20."
+
+[CEO quote — Michael Hurlston]
+"Lumentum built on its strong momentum in the first fiscal quarter of 2027, delivering growth across all our businesses, with pump lasers and optical circuit switches (OCS) being the leading contributors. During the quarter, we secured our second major NPO/CPO win, backed by purchase commitments exceeding $5 billion. Additionally, our OCS demand visibility has expanded significantly in recent months, positioning optical switching to become a multi-billion-dollar annual revenue stream. Finally, we continue to see strength in our cloud modules business which is showing improvement on the gross margin line,"
+
+"Looking ahead, we anticipate adding approximately $350 million in sequential growth in our second quarter, a figure greater than the quarterly revenue of the whole company just two years ago. Furthermore, we project our second quarter operating margin to exceed 45 percent."
+
+[Fiscal First Quarter Highlights]
+"Net revenue for the first quarter of fiscal year 2027 was $1.26 billion, with GAAP net income of $360.3 million, or $3.54 per diluted share. Net revenue for the fourth quarter of fiscal year 2026 was $1.01 billion, with GAAP net loss of $7.2 billion, or $84.65 per diluted share. Net revenue for the first quarter of fiscal year 2026 was $533.8 million, with GAAP net income of $4.2 million, or $0.05 per diluted share."
