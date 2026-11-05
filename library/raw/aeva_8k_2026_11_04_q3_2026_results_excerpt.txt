@@ -1,0 +1,19 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1789029/000119312526447222/aeva-20261104.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Aeva Technologies, Inc. 8-K（2026-11-04 申報）——第三季 2026 財報新聞稿（EX-99.1「Aeva Reports Third Quarter 2026 Results」）
+DATE: 2026-11-04
+RETRIEVED: 2026-11-05（SEC EDGAR 原文 HTML 由 daily 語意層抽字存檔、空白正規化，逐字）
+NOTE: 發行人自己的新聞稿（L8：客戶與需求的說法是發行人自述）。新聞稿沒有拆出光互連（Optical Connectivity）的營收金額，聯合開發客戶（JDA customer）與第二家光通訊客戶都沒具名；10-Q 尚未申報。
+
+【標題與重點】
+"Expanded Product Portfolio in Optical Connectivity with Ultra-High Power Sources and Modules to Address Significant and Growing Demand for AI Data Center Applications"
+"First revenues in Optical Connectivity with deliveries of UHP chipsets to JDA customer for integration and validation; deepening collaboration with JDA customer to jointly pursue interest from additional hyperscalers"
+"Expanded Optical Connectivity product portfolio with Ultra-High Power (UHP) chipsets, SPECTRA multiwavelength arrays and MESA multichannel assemblies to meet significant and growing demand; increasing momentum across AI compute companies and optical solutions providers, including commercial negotiations with a second optical customer"
+
+【財務】
+"Revenue of $6.7 million in Q3 2026, compared to revenue of $3.6 million in Q3 2025"
+"Total available liquidity of $272.5 million as of September 30, 2026, consisting of $147.5 million in cash, cash equivalents and marketable securities and $125.0 million in an available facility"
+
+【現金流量表（千美元；九個月，2026 vs 2025）】
+"Proceeds from equity-related funding in connection with the JDA" 5,500 ／ 32,500
