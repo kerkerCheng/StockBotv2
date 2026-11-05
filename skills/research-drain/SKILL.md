@@ -205,6 +205,11 @@ Lumentum、住友並列，協議也是非獨家。它和別家不同在六吋磷
    - **`manual` 型已授權項**（`todo list` 的 manual 段，hint 註明使用者指示者）——
      ⚠ 2026-09-01 實測：[325] 授權後一天沒被排入，因為當時本段只寫了工單。
      **佇列定義漏掉的授權項不會自己出現**（L16 的形狀：分類存在，沒送到消費端手上）。
+   - **thesis 複查（`thesis_lifecycle` 編號）等的文件到了、或等待到期翻回待你決定**——使用者先前已核准「等那份文件一起複查」
+     （例：[896] 照 [893] 等 AXT Q3 10-Q），複查的研究就是已授權未做完：讀那份文件、對照 memo 的推翻條件、寫 memo 新版草稿與
+     revised／retired 的建議（`todo recommend <n>`），再交使用者——**改 lifecycle 是 thesis mutation，仍是人工 gate、不在 drain 做**。
+     文件還沒來就不做；等待期間健康審查「Thesis 到期核查」印黃燈、寫出等什麼到哪天，過期或沒掛編號才紅（2026-11-05 使用者問
+     「到期 thesis 核查包含在 research drain 裡面嗎」：axt_inp 10-31 起連紅 6 天、沒有任何人做得了事，failure log #128）。
 2. **`triaged_go` 線索** — 順序**只認 `engine_b.cli drain` 的輸出**。
    ⚠ 不得另建排序：`engine_b/priority.py` 是 pq1 排序的唯一權威，
    「我覺得這條比較有趣」正是它要防的東西。

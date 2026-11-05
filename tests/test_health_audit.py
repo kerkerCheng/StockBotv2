@@ -14,6 +14,7 @@ from query.health_audit import (
     lifecycle_due,
     load_resolution_hashes,
     split_conflicts_by_resolution,
+    thesis_due_section,
     ticker_map_gaps,
 )
 
@@ -45,6 +46,39 @@ def test_lifecycle_due_selects_expired_and_review_required() -> None:
     due_ids = [d["thesis_id"] for d in lifecycle_due(lifecycle, date(2026, 7, 18))]
 
     assert due_ids == ["broken_date", "expired", "review", "today"]
+
+
+def _review(thesis_id: str = "axt_inp") -> dict:
+    return {"thesis_id": thesis_id, **_entry(status="review_required", next_check="2026-11-15")}
+
+
+def _waiting(until: str, *, n: int = 896, **extra) -> dict:
+    return {"n": n, "type": "thesis_lifecycle", "ref_id": "axt_inp",
+            "waiting_on": {"trigger": "AXT 2026 Q3 Form 10-Q 申報", "until": until}, **extra}
+
+
+def test_review_required_waiting_on_a_dated_event_is_yellow_and_says_what_it_waits_for() -> None:
+    # 2026-11-05：axt_inp 10-31 起連紅 6 天——[896] 照使用者核准等 Q3 10-Q，沒有任何人做得了事（L14-4 恆亮）
+    color, lines = thesis_due_section([_review()], [_waiting("2026-11-16")], date(2026, 11, 5))
+    assert color == "yellow"
+    assert lines == ["- `axt_inp`（status=review_required，next_check=2026-11-15）"
+                     "——等 [896]：AXT 2026 Q3 Form 10-Q 申報（到 2026-11-16）"]
+
+
+def test_review_required_turns_red_when_the_wait_expires_or_nobody_holds_it() -> None:
+    today = date(2026, 11, 17)
+    assert thesis_due_section([_review()], [_waiting("2026-11-16")], date(2026, 11, 16))[0] == "yellow"  # 當天仍在等
+    assert thesis_due_section([_review()], [_waiting("2026-11-16")], today)[0] == "red"          # 等待過期
+    assert thesis_due_section([_review()], [], today)[0] == "red"                                # 沒有編號
+    assert thesis_due_section([_review()], None, today)[0] == "red"                              # 待辦池讀不到
+    awake = {"n": 896, "type": "thesis_lifecycle", "ref_id": "axt_inp"}
+    color, lines = thesis_due_section([_review()], [awake], today)                              # 醒來、球在你
+    assert color == "red" and lines[0].endswith("——[896] 球在你")
+    resolved = _waiting("2026-11-30", resolved_at="2026-11-10")
+    assert thesis_due_section([_review()], [resolved], today)[0] == "red"                        # 已結案的不算在等
+    routine = {"thesis_id": "x", **_entry(next_check="2026-11-01")}
+    assert thesis_due_section([routine], [], today)[0] == "yellow"                               # 例行到期照舊黃
+    assert thesis_due_section([], [], today) == ("green", [])
 
 
 def test_l7_field_gaps_flags_missing_fields() -> None:

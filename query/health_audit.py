@@ -153,6 +153,30 @@ def lifecycle_due(lifecycle: dict, today: date) -> list[dict]:
     return due
 
 
+def thesis_due_section(due: list[dict], pool_items: list[dict] | None, today: date) -> tuple[str, list[str]]:
+    """「Thesis 到期核查」的燈色與逐行。review_required 掛著未結案的 `thesis_lifecycle` 編號、而且等待還沒過期
+    （`waiting_on.until` ≥ today）→ 黃，寫出在等什麼、到哪天；沒有編號、等待已過期、球在你、或待辦池讀不到 → 紅
+    （INV-3：讀不到不當成在等）。事發 2026-11-05：axt_inp 10-31 起連紅 6 天——[896] 照使用者核准的 [893] 等 Q3 10-Q，
+    沒有任何人做得了事；恆亮的燈沒有鑑別力（L14-4）。"""
+    open_items = {str(i.get("ref_id")): i for i in (pool_items or ())
+                  if i.get("type") == "thesis_lifecycle" and not i.get("resolved_at")}
+    lines, red = [], False
+    for entry in due:
+        line = f"- `{entry['thesis_id']}`（status={entry.get('status')}，next_check={entry.get('next_check')}）"
+        if entry.get("status") == "review_required":
+            item = open_items.get(entry["thesis_id"]) if pool_items is not None else None
+            waiting = (item or {}).get("waiting_on") or {}
+            until = str(waiting.get("until") or "")[:10]     # 與 engine_b.todo 叫醒同一個比法：當天仍在等，過了才重問
+            if until and until >= today.isoformat():         # 沒有編號時 until 是空字串
+                line += f"——等 [{item.get('n')}]：{waiting.get('trigger')}（到 {until}）"
+            else:
+                red = True
+                line += ("——待辦池讀不到" if pool_items is None else "——沒有掛 pq2 編號" if item is None
+                         else f"——[{item.get('n')}] 等待已過期（{until}）" if until else f"——[{item.get('n')}] 球在你")
+        lines.append(line)
+    return ("red" if red else ("yellow" if due else "green")), lines
+
+
 def l7_field_gaps(memo_text: str) -> list[str]:
     """回傳 memo 缺少的 L7 必要欄位名稱（核查頻率 / 觸發後 48h 動作）。"""
 
@@ -457,15 +481,17 @@ def run_local_audit(*, today: date | None = None) -> str:  # pragma: no cover - 
     # 4. Thesis lifecycle 到期 + memo 檔案檢查
     lifecycle = _load_lifecycle()
     due = lifecycle_due(lifecycle, today)
-    due_lines = [
-        f"- `{entry['thesis_id']}`（status={entry.get('status')}，next_check={entry.get('next_check')}）"
-        for entry in due
-    ]
-    has_review = any(entry.get("status") == "review_required" for entry in due)
+    try:
+        from engine_b.todo import load as load_pool
+
+        pool_items = list(load_pool().get("items") or [])
+    except Exception:  # noqa: BLE001 — 讀不到待辦池：review_required 照舊紅
+        pool_items = None
+    due_color, due_lines = thesis_due_section(due, pool_items, today)
     report.extend(
         _section(
             "Thesis 到期核查",
-            "red" if has_review else ("yellow" if due else "green"),
+            due_color,
             due_lines if lifecycle else ["- ⚠ thesis/lifecycle.json 不存在或無法解析"],
         )
     )
