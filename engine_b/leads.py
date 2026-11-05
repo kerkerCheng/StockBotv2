@@ -511,6 +511,15 @@ def trace_wait_plan(lead: Mapping[str, Any]) -> tuple[str, list[str]] | None:
     return (kind, entities)
 
 
+def _stale_trace_wake(lead: Mapping[str, Any], watch: Mapping[str, Any]) -> bool:
+    """lead 停放時已明示不等（`trace_trigger_kind=none`），它上一輪留下的追源 watch 醒了也不排回（failure log #130：
+    「終局」重停放後舊 watch 仍在盯，Lumentum 每份申報都把 OCS 那三條叫醒一次）。假說查核等非追源 watch 不在此列。"""
+    from engine_b import event_watch as ew
+
+    return ((lead.get("refs") or {}).get("trace_trigger_kind") == TRACE_NO_WAIT
+            and watch.get("kind") in ew.TRACE_WATCH_KINDS)
+
+
 def default_trace_trigger(lead: Mapping[str, Any], trigger: str, *, trace_status: str = "",
                           registry: Any = None) -> dict[str, Any]:
     """停放時沒有明示觸發標的，由觸發條件文字推一次（failure log #1、#15）。
@@ -686,7 +695,12 @@ def advance(
         trigger = str(merged.get("trace_next_trigger") or "").strip()
         explicit = {"trace_trigger_kind", "trace_trigger_entities"} & set(cleaned_ref)
         requires_user = str(merged.get("trace_requires_user") or "").lower() in {"1", "true", "yes"}
-        if trigger and not explicit and not requires_user:
+        if trigger and not requires_user and _NO_WAIT_TRIGGER_RE.match(trigger):
+            # 寫「無」就是不等，明示傳了空標的也一樣（failure log #130：明示 [] 跳過推斷，落成日期型 watch、到期白叫醒一次）
+            if cleaned_ref.get("trace_trigger_entities") or cleaned_ref.get("trace_trigger_kind") not in (None, TRACE_NO_WAIT):
+                raise LeadStateError(f"{lead_id} 觸發條件寫「無」卻明示了等待標的或種類——兩者擇一")
+            cleaned_ref.update({"trace_trigger_kind": TRACE_NO_WAIT, "trace_trigger_entities": []})
+        elif trigger and not explicit and not requires_user:
             cleaned_ref.update(default_trace_trigger(lead, trigger, trace_status=str(merged.get("trace_status") or "")))
         _stamp_source_routes_receipt(lead, cleaned_ref)
     current = lead["status"]
@@ -1398,7 +1412,8 @@ def _requeue_related_trace_backlog(
                 continue
             # #96：只比發文公司的叫醒先擋著（留 fired）——預篩標了觸及或看不出、或互動判定觸及，consume-fired 才排回；
             # 擋下的由 `event_watch wake-queue` 現形，不重排、不重停（停放理由與處置一筆都不動）。
-            if not ew.wake_released(watch):
+            # 已明示不等的 lead 也留 fired，由 consume-fired 收掉並記理由（#130）。
+            if _stale_trace_wake(candidate, watch) or not ew.wake_released(watch):
                 continue
             shared = watch.get("woken_by", {}).get("shared_entities") or []
             try:
@@ -1545,6 +1560,10 @@ def consume_fired_lead_watches(
             consumed.append({"watch_id": watch_id, "lead_id": lead_id, "reason": "lead 不存在"})
             continue
         status = str(lead.get("status") or "")
+        if status == "parked" and _stale_trace_wake(lead, watch):
+            ew.consume_fired(watch_data, watch_id)
+            consumed.append({"watch_id": watch_id, "lead_id": lead_id, "reason": "lead 已明示不等（trace_trigger_kind=none）"})
+            continue
         if status == "parked" and not ew.wake_released(watch):
             held.append({"watch_id": watch_id, "lead_id": lead_id, "trigger_lead": str(woken.get("lead_id") or ""),
                          "screen": str(ew.wake_screen(watch))})

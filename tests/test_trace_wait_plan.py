@@ -147,6 +147,44 @@ def test_terminal_without_a_trigger_and_explicit_no_wait_are_not_holes() -> None
     assert leads.parked_without_expiry(store) == []
 
 
+def test_no_wait_holds_when_the_caller_also_passes_an_empty_entity_list() -> None:
+    """failure log #130：停放腳本明示傳 `trace_trigger_entities: []`，跳過了「無」的判讀，落成日期型 watch——到期白叫醒一次
+    （2026-11-05 drain 九則）。寫「無」又點名標的是自相矛盾，拒收。"""
+    store = leads.empty_store()
+    done = _lead(store, source="x:a", url="https://x.com/a/4", title="t", at="2026-08-01T00:00:00+00:00")
+    leads.advance(store, done, "parked", ref={"parked_reason": "原文已取得", "trace_status": "original_obtained",
+                                              "trace_next_trigger": "無；結構 atom 已在圖上", "trace_trigger_entities": []})
+    assert store["leads"][done]["refs"]["trace_trigger_kind"] == "none"
+    assert not [w for w in ew.load_watches()["watches"] if w.get("wake_lead") == done]
+    both = _lead(store, source="x:a", url="https://x.com/a/5", title="t", at="2026-08-01T00:00:00+00:00")
+    with pytest.raises(leads.LeadStateError, match="兩者擇一"):
+        leads.advance(store, both, "parked", ref={"parked_reason": "r", "trace_status": "partial",
+                                                  "trace_next_trigger": "無", "trace_trigger_entities": ["co:axt"]})
+
+
+def test_a_re_park_that_says_no_wait_is_not_requeued_by_the_previous_rounds_watch() -> None:
+    """#130 對稱面（lead_2af9cb66 的形狀）：上一輪等 AXT 的申報，醒來研究完重停放寫「無」，舊 watch 仍在盯——
+    下一份 AXT 申報不得再把它排回；consume-fired 收掉並記理由（INV-3）。"""
+    store = leads.empty_store()
+    parked = _lead(store, source="x:a", url="https://x.com/a/ocs", title="$AXTI 轉述", at="2026-08-01T00:00:00+00:00")
+    leads.advance(store, parked, "parked", ref={
+        "parked_reason": "原文已取得", "trace_status": "original_obtained", "trace_requires_user": "false",
+        "trace_next_trigger": "AXT 下一份 10-Q"})
+    _lead(store, source="edgar:AXTI", url="https://sec.gov/axti/8k-1", title="AXTI 8-K", tier=1,
+          at="2026-08-02T00:00:00+00:00", company_id="co:axt", form_type="8-K")
+    assert store["leads"][parked]["status"] == "triaged_go"
+    leads.advance(store, parked, "parked", ref={"parked_reason": "誤醒；終局", "trace_next_trigger": "無；終局"})
+    old = _watch_for(parked)    # 上一輪的 watch 還在盯（停放當下提早收要動封閉字彙，另提案）
+    _lead(store, source="edgar:AXTI", url="https://sec.gov/axti/8k-2", title="AXTI 8-K", tier=1,
+          at="2026-08-03T00:00:00+00:00", company_id="co:axt", form_type="8-K")
+    assert store["leads"][parked]["status"] == "parked", "已明示不等的 lead 不得被上一輪的 watch 排回"
+    data = ew.load_watches()
+    result = leads.consume_fired_lead_watches(store, data)
+    assert result["requeued"] == [] and [c["watch_id"] for c in result["consumed"]] == [old["watch_id"]]
+    assert next(w for w in data["watches"] if w["watch_id"] == old["watch_id"])["status"] == "consumed"
+    assert store["leads"][parked]["status"] == "parked"
+
+
 def test_an_ownership_filing_lead_never_gets_a_watch() -> None:
     """持股申報等的是下一份持股申報，而持股申報刻意不叫醒任何 watch——建了也醒不了。"""
     store = leads.empty_store()
