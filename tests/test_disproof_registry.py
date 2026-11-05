@@ -190,6 +190,27 @@ def test_generator_requires_structured_disproof_matching_the_section() -> None:
     assert error is None and len(out) == 2
 
 
+def test_envelope_schema_accepts_the_structured_disproof_the_generator_requires() -> None:
+    """2026-11-05（failure log #129）：Step 1.5 要 envelope 帶 `disproof_conditions`，schema 頂層卻
+    `additionalProperties: false`——過得了反證檢查的 envelope 一定被 schema 擋、memo 被標「引用鏈無法驗證」。
+    同一份 envelope 的兩個消費端必須收同一份；條目形狀仍鎖死。"""
+    from thesis.evidence_manifest import validate_envelope
+    from thesis.generate_lane_memo import _structured_disproof
+
+    cond = {"condition": "第一條條件寫在這裡足夠二十個字以上", "entities": [SIVERS],
+            "check_frequency": "每季", "action_48h": "重讀", "expires": "2027-06-30"}
+    item = {"evidence_ref": "E1", "type": "claim", "claim_id": "c1", "edge_key": None, "attributes": [],
+            "assertion_ids": [], "source_ids": ["s1"], "purpose": "p"}
+    inventory = {"claims": {"c1": {"source_ids": ["s1"]}}, "sources": {"s1": {"quote": "q"}}, "edges": {}}
+    envelope = {"memo_markdown": "[E1]\n" + AXT_STYLE, "evidence_items": [item],
+                "disproof_conditions": [cond, dict(cond, condition="第二條")]}
+    assert _structured_disproof(envelope)[1] is None
+    result = validate_envelope(envelope, inventory)
+    assert result["ok"], result["errors"]
+    extra = dict(envelope, disproof_conditions=[dict(cond, note="多的欄位"), dict(cond, condition="第二條")])
+    assert not validate_envelope(extra, inventory)["ok"]
+
+
 # ---------------------------------------------------------------------------
 # thesis 對帳
 # ---------------------------------------------------------------------------

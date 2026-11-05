@@ -10,6 +10,21 @@
       "type": "string",
       "minLength": 1
     },
+    "disproof_conditions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["condition", "entities", "check_frequency", "action_48h"],
+        "properties": {
+          "condition": {"type": "string", "minLength": 1},
+          "entities": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+          "check_frequency": {"type": "string", "minLength": 1},
+          "action_48h": {"type": "string", "minLength": 1},
+          "expires": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"}
+        }
+      }
+    },
     "evidence_items": {
       "type": "array",
       "minItems": 1,
