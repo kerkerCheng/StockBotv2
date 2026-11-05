@@ -213,11 +213,10 @@ def _view(edge: CanonicalEdge) -> EdgeView:
 
 
 def _resolved_cell(text: str, view: EdgeView, field_name: str) -> str:
-    """讀圖表的一格：核准決議給的值標「（核准）」；決議判不給值印出來，不印成「—」（那是「沒有文件發言過」，F19）。"""
-    action = view.resolved.get(field_name)
-    if action is None:
-        return text
-    return f"{text}（核准）" if action == "choose_value" else f"核准決議不給值（{action}）"
+    """讀圖表的一格：標籤與結構表同一份（`query.bottleneck.resolved_cell`）。"""
+    from query.bottleneck import resolved_cell
+
+    return resolved_cell(text, view.resolved.get(field_name))
 
 
 def build_structure(node: str, edges: Iterable[CanonicalEdge]) -> StructureView:
@@ -405,15 +404,25 @@ def _withheld_note(withheld: str | None, relay_terms: Iterable[str] = ()) -> str
 
 
 def _sub_distribution(rows: Iterable[EdgeView]) -> str:
-    """供給側的**分布**——單一最大值不是答案，分布才是。"""
-    values = [e.substitutability for e in rows]
-    filled = sorted((v for v in values if v is not None), reverse=True)
-    unfilled = sum(1 for v in values if v is None)
-    if not filled and not unfilled:
+    """供給側的**分布**——單一最大值不是答案，分布才是。值是 None 的分三種說（F19 R2 F3）：沒有文件發言過＝未填；
+    核准決議判不給值、決議失效各自計——同一張表的格子已經這樣印，分布不得把它們併回「未填」。"""
+    from query.bottleneck import INVALID_RESOLUTION
+
+    rows = list(rows)
+    filled = sorted((e.substitutability for e in rows if e.substitutability is not None), reverse=True)
+    actions = [e.resolved.get("substitutability") for e in rows if e.substitutability is None]
+    unfilled = sum(1 for a in actions if a is None)
+    invalid = sum(1 for a in actions if a == INVALID_RESOLUTION)
+    withheld = len(actions) - unfilled - invalid
+    if not filled and not actions:
         return "（無）"
-    parts = ["／".join(str(v) for v in filled) or "（都沒填）"]
+    parts = ["／".join(str(v) for v in filled) or ("（都沒填）" if unfilled == len(actions) else "（沒有值）")]
     if unfilled:
         parts.append(f"另有 {unfilled} 條未填")
+    if withheld:
+        parts.append(f"{withheld} 條核准決議不給值")
+    if invalid:
+        parts.append(f"{invalid} 條決議失效、待重核")
     return "｜".join(parts)
 
 

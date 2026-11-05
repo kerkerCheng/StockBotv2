@@ -136,6 +136,17 @@ action 印「核准決議不給值」；邊帶 `resolved`（屬性 → action）
 as-of 視圖（`project_assertions_as_of`）在列上帶 `projection_as_of`，只套核准日不晚於它的決議（INV-6）。`resolved` 不進
 `EdgeView.key()`——值真的變了讀圖才 stale。候選集合已換（stale）或還沒決議（open）的衝突照舊取最高 confidence，投影那邊不給值，
 兩邊對這種衝突仍不一致（11-04：0 條）。
+**決議失效的範圍**（2026-11-05 R2 F2；使用者選 (b) 逐條隔離）：雜湊相符、`_validate_decision_against_conflict` 卻不過——多半是支持它的
+文件走更正走廊重載、`source_ids` 變了而值沒變（[841] 那種拿掉一個引用）。**讀圖側只隔離那一格**（`build_projection(on_invalid="isolate")`）：
+值給 None、`resolved` 標 `invalid`，格子印「決議失效、待重核」——不印未驗證的值，也不退回逐文件最高 confidence（那可能是使用者否決過的值）；
+別條邊、別一格照套，物化、`alpha structure-reading add`、敘事寫入、`python -m query.structure` 都照跑。**寫圖側照舊整批停**
+（`project_graph`／`project_edge_keys` 的預設 `on_invalid="raise"`：入圖當下變 `pending_graph`）。計數與點名在健康審查
+「未處置 edge conflict」那一節（紅；判定與讀圖同一個函式 `invalid_resolutions`）。復原只有一條：使用者重核——重出提案、
+`python loader/edge_resolution.py approve <提案> --approved-by … --approved-at … --replace-stale`（判讀 gate），重核後那一格自己回來。
+入圖預告重建列（`loader.merge_side_effects.rows_after_load`）帶 `source_ids`，否則重宣告持有 supporting assertion 的文件時預告必定失效（R2 F1）。
+**as-of 視角有 2／28 份決議永遠套不上**（11-04 實測，R2 F6；即使 as_of＝今天）：它們的候選裡有未定日的 assertion，as-of 投影把它排除、
+候選集合就不同——Nabtesco→`tech:rv_reducer` 的 sub（剛好同值 3）、HDS 的 `unknown`（as-of 印 2，現在視角印 None）。沒有洩漏未來
+（INV-6 成立），但 as-of 會印出使用者已判「不給值」的值、而且沒有標記。
 
 ---
 

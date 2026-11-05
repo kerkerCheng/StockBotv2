@@ -36,19 +36,20 @@ def _row(aid: str, sub, conf: float, *, published: str = "2026-06-01") -> dict:
 
 
 def _resolution(rows, *, action: str = "choose_value", value=None, supporting=(), rejected=(),
-                approved_at: str = "2026-09-10T10:00:00+08:00") -> dict:
-    """照 `_validate_decision_against_conflict` 的規則組一份決議（候選集合雜湊與真的 detector 同一個函式算）。"""
+                approved_at: str = "2026-09-10T10:00:00+08:00", key: str = KEY, sources=None) -> dict:
+    """照 `_validate_decision_against_conflict` 的規則組一份決議（候選集合雜湊與真的 detector 同一個函式算）。
+    `sources` 不給＝每筆支持的 assertion 取 `<id>_s1`（`_row` 的來源 id）。"""
     candidates = [{"assertion_id": r["assertion_id"], "value": json.loads(r["attributes"])["substitutability"]}
                   for r in rows]
-    cid = conflict_id(KEY, "substitutability")
+    cid = conflict_id(key, "substitutability")
     digest = _candidate_set_hash(candidates)
     return {cid: {
         "schema_version": "1", "resolution_id": f"resolution_{cid.removeprefix('conflict_')}_{digest[:12]}",
-        "conflict_id": cid, "edge_key": KEY, "attribute": "substitutability", "candidate_set_hash": digest,
+        "conflict_id": cid, "edge_key": key, "attribute": "substitutability", "candidate_set_hash": digest,
         "action": action, "selected_value": value if action == "choose_value" else None,
         "supporting_assertion_ids": list(supporting), "rejected_assertion_ids": list(rejected),
-        "supporting_source_ids": [f"{a}_s1" for a in supporting], "rationale": "測試用決議",
-        "resolved_confidence": 0.8, "approved_by": "tester", "approved_at": approved_at,
+        "supporting_source_ids": list(sources) if sources is not None else [f"{a}_s1" for a in supporting],
+        "rationale": "測試用決議", "resolved_confidence": 0.8, "approved_by": "tester", "approved_at": approved_at,
     }}
 
 
@@ -145,3 +146,112 @@ def test_resolution_files_are_read_through_the_schema_and_fail_closed(tmp_path) 
     (tmp_path / f"{cid}.json").write_text(json.dumps(broken, ensure_ascii=False), encoding="utf-8")
     with pytest.raises(ResolutionValidationError):
         approved_resolutions(tmp_path)
+
+
+# ---------------------------------------------------------------------------
+# 2026-11-05 R2 條件與非阻斷（使用者「照審查建議修，條件二選 b」）
+# ---------------------------------------------------------------------------
+
+def test_redeclaring_a_document_that_holds_a_supporting_assertion_keeps_the_decision() -> None:
+    """R2 F1：更正走廊重宣告同一份文件（值不變），入圖預告重建的列要帶 `source_ids`——少了它，決議核對支持的來源 id
+    時對不到，「證據等級預告」「圖影響」就降成讀不到。"""
+    from loader.load_to_neo4j import evidence_id
+    from loader.merge_side_effects import rows_after_load
+
+    a1, a2 = evidence_id("doc_one", "e1"), evidence_id("doc_two", "e1")
+    rows = [{**_row(a1, 5, 0.9), "source_doc_id": "doc_one", "source_ids": ["doc_one_s1"]},
+            {**_row(a2, 4, 0.6), "source_doc_id": "doc_two", "source_ids": ["doc_two_s1"]}]
+    res = _resolution(rows, value=4, supporting=(a2,), rejected=(a1,), sources=("doc_two_s1",))
+    redeclared = {"source_doc": {"doc_id": "doc_two", "origin_entity": SRC, "source_type": "filing",
+                                 "published_at": "2026-06-01"},
+                  "sources": [{"id": "doc_two_s1", "quote": "逐字"}],
+                  "edges": [{"id": "e1", "src_id": SRC, "relation": REL, "dst_id": DST,
+                             "attributes": {"substitutability": 4}, "confidence": 0.6, "source_ids": ["doc_two_s1"]}]}
+
+    after, _quotes = rows_after_load(rows, {}, {}, [redeclared])
+    assert next(r for r in after if r["assertion_id"] == a2)["source_ids"] == ["doc_two_s1"]
+    edge = collapse_assertions(after, resolutions=res)[TRIPLE]
+    assert (edge.substitutability, edge.resolved) == (4, {"substitutability": "choose_value"})
+
+
+def _other_edge_rows():
+    other = ("co:other", REL, DST)
+    rows = [{**_row(f"b{i}", sub, conf), "src": "co:other"} for i, (sub, conf) in enumerate([(5, 0.9), (2, 0.6)], 1)]
+    return other, rows, _resolution(rows, value=2, supporting=("b2",), rejected=("b1",), key=edge_key(*other))
+
+
+def test_an_invalid_decision_is_isolated_to_its_own_cell_and_named() -> None:
+    """R2 F2(b)（使用者 11-05 選）：雜湊相符、支持的來源 id 卻對不到（[841] 那種更正拿掉一個引用）——只有那一格標
+    「決議失效、待重核」、不給值（不印未驗證的值、也不退回被否決的最高 confidence），別條邊的決議照套、不丟例外。"""
+    from loader.edge_resolution import build_projection, invalid_resolutions
+    from query.edge_conflicts import build_edge_states
+
+    rows = [_row("a1", 5, 0.9), _row("a2", 4, 0.6)]
+    broken = _resolution(rows, value=4, supporting=("a2",), rejected=("a1",), sources=("a2_s9",))
+    other, other_rows, fine = _other_edge_rows()
+
+    edges = collapse_assertions([*rows, *other_rows], resolutions={**broken, **fine})
+    assert (edges[TRIPLE].substitutability, edges[TRIPLE].sub_assertion_id, edges[TRIPLE].resolved) == (
+        None, None, {"substitutability": "invalid"})
+    assert (edges[other].substitutability, edges[other].resolved) == (2, {"substitutability": "choose_value"})
+    # 格子標籤只有一份（讀圖表與結構表共用）；分布那一行也會出現同一串字，所以直接驗格子
+    assert [qb.resolved_cell("5/5", a) for a in (None, "choose_value", "unknown", "invalid")] == [
+        "5/5", "5/5（核准）", "核准決議不給值（unknown）", "決議失效、待重核"]
+    assert "決議失效、待重核" in render_markdown(build_structure(DST, edges.values()))
+
+    states = build_edge_states([{"id": r["assertion_id"], "edge_key": edge_key(r["src"], r["relation"], r["dst"]),
+                                 "src_id": r["src"], "relation": r["relation"], "dst_id": r["dst"],
+                                 "attributes": json.loads(r["attributes"]), "confidence": r["confidence"],
+                                 "source_ids": r["source_ids"], "source_doc_id": r["source_doc_id"],
+                                 "origin_entity": r["origin"], "evidence_tier": None,
+                                 "published_at": r["published_at"]} for r in [*rows, *other_rows]])
+    (named,) = invalid_resolutions(states, {**broken, **fine})
+    assert (named["edge_key"], named["attribute"], named["status"]) == (KEY, "substitutability", "invalid")
+    assert "a2_s9" in named["error"]
+    with pytest.raises(ResolutionValidationError):        # 寫圖那一側照舊整批停（project_graph／project_edge_keys）
+        build_projection(states, {**broken, **fine})
+
+
+def test_a_gap_decided_by_a_resolution_is_not_counted_as_unfilled() -> None:
+    """R2 F3：值是 None 的分三種說——沒有文件發言過（未填）、核准決議判不給值、決議失效；結構表 CLI 與供給側分布
+    不得把後兩種併回「未填」。"""
+    from query.structure import _sub_distribution
+
+    rows = [_row("a1", 5, 0.9), _row("a2", 3, 0.6)]
+    withheld = collapse_assertions(rows, resolutions=_resolution(rows, action="unknown"))[TRIPLE]
+    plain = collapse_assertions([{**_row("c1", None, 0.5), "src": "co:plain"}], resolutions={})[("co:plain", REL, DST)]
+    other, other_rows, fine = _other_edge_rows()
+    valued = collapse_assertions(other_rows, resolutions=fine)[other]
+    supply = build_structure(DST, [withheld, plain, valued]).angles["supply_side"]
+    assert _sub_distribution(supply) == "2｜另有 1 條未填｜1 條核准決議不給值"
+    assert _sub_distribution([e for e in supply if e.src == SRC]) == "（沒有值）｜1 條核准決議不給值"
+    assert _sub_distribution([e for e in supply if e.src == "co:plain"]) == "（都沒填）｜另有 1 條未填"
+
+    table = structure_table(rows, _FakeRegistry(), quotes_by_assertion={},
+                            resolutions=_resolution(rows, action="unknown"))
+    assert "核准決議不給值（unknown）" in qb.render_markdown(table)
+
+
+def test_a_confidence_tie_gives_the_sub_flag_to_the_first_row() -> None:
+    """R2 F4（M2）：給出核准值的幾筆 confidence 同分時，sub 旗標給先到的那筆（與收斂同一條規則）。"""
+    rows = [_row("a1", 5, 0.9), _row("a2", 4, 0.7), _row("a3", 4, 0.7)]
+    res = _resolution(rows, value=4, supporting=("a2", "a3"), rejected=("a1",))
+    assert collapse_assertions(rows, resolutions=res)[TRIPLE].sub_assertion_id == "a2"
+
+
+def test_rows_with_different_as_of_marks_use_the_earliest_day() -> None:
+    """R2 F4（M3）：一批列帶不同的 as-of 標記時取最早那天——保守的那一邊，不讓較晚的標記把之後才核准的決議帶進來。"""
+    rows = [{**_row("a1", 5, 0.9), AS_OF_ROW_KEY: date(2026, 8, 1)},
+            {**_row("a2", 4, 0.6), AS_OF_ROW_KEY: date(2026, 9, 30)}]
+    res = _resolution(rows, value=4, supporting=("a2",), rejected=("a1",))
+    assert collapse_assertions(rows, resolutions=res)[TRIPLE].substitutability == 5
+
+
+def test_a_decision_approved_on_the_as_of_day_is_known_that_day() -> None:
+    """R2 F4（M7）：核准當天就算已知（台北日期；`approved_at` 帶時區）。"""
+    rows = [_row("a1", 5, 0.9, published="2026-06-01"), _row("a2", 4, 0.6, published="2026-06-02")]
+    res = _resolution(rows, value=4, supporting=("a2",), rejected=("a1",), approved_at="2026-09-10T10:00:00+08:00")
+    on_day = project_assertions_as_of(rows, date(2026, 9, 10))
+    assert collapse_assertions(on_day.rows, resolutions=res)[TRIPLE].substitutability == 4
+    day_before = project_assertions_as_of(rows, date(2026, 9, 9))
+    assert collapse_assertions(day_before.rows, resolutions=res)[TRIPLE].substitutability == 5

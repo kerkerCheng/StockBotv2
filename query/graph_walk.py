@@ -250,7 +250,9 @@ def layer_questions(edges: Sequence[CanonicalEdge], *,
                              "text": QUESTION_BY_KEY["sole_supplier_self_reported"].question.format(node=node, co=co)})
         if suppliers:
             scope_with_supply += 1
-            if all(e.substitutability is None for e in supply):
+            # 決議判不給值、決議失效的那幾條不是「未填」（F19 R2 F3）：沒值的全是這兩種時不命中——那要重核，不是研究
+            if all(e.substitutability is None for e in supply) and any(
+                    not (getattr(e, "resolved", None) or {}).get("substitutability") for e in supply):
                 unfilled.append({"subject": node, "suppliers": suppliers, "demand": demand,
                                  "text": QUESTION_BY_KEY["supply_unfilled"].question.format(
                                      node=node, n=len(suppliers))})

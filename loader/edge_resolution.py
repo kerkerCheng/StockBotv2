@@ -270,8 +270,17 @@ def _candidate_as_of(attribute_state: dict) -> str | None:
 def build_projection(
     edge_states: dict[str, dict],
     resolutions: dict[str, dict],
+    *,
+    on_invalid: str = "raise",
 ) -> dict[str, dict]:
-    """Build conflict-safe canonical attributes without touching Neo4j."""
+    """Build conflict-safe canonical attributes without touching Neo4j.
+
+    `on_invalid`：候選集合雜湊相符、`_validate_decision_against_conflict` 卻不過的決議（多半是支持它的文件被更正、
+    來源 id 變了而值沒變）。`"raise"`（寫圖：`project_graph`／`project_edge_keys`）照舊整批停；`"isolate"`（讀圖：
+    `query.bottleneck.resolved_attribute_values`）只隔離那一格——meta 標 `status="invalid"`、這一格不給值，其餘照常
+    （2026-11-05 使用者選 R2 F2(b)：一份決議出事不讓每天的讀圖、敘事寫入與物化一起停）。"""
+    if on_invalid not in ("raise", "isolate"):
+        raise ValueError(f"on_invalid must be 'raise' or 'isolate': {on_invalid!r}")
 
     projection: dict[str, dict] = {}
     for edge_key, edge in edge_states.items():
@@ -310,7 +319,19 @@ def build_projection(
                     "current_candidate_set_hash": state["candidate_set_hash"],
                 }
                 continue
-            _validate_decision_against_conflict(resolution, state)
+            try:
+                _validate_decision_against_conflict(resolution, state)
+            except ResolutionValidationError as exc:
+                if on_invalid == "raise":
+                    raise
+                open_conflicts.append(attribute)
+                metadata[attribute] = {
+                    "status": "invalid",
+                    "resolution_id": resolution["resolution_id"],
+                    "action": resolution.get("action"),
+                    "error": str(exc),
+                }
+                continue
             action = resolution["action"]
             if action == "choose_value":
                 attributes[attribute] = resolution["selected_value"]
@@ -330,6 +351,18 @@ def build_projection(
             "attribute_resolution_meta": metadata,
         }
     return projection
+
+
+def invalid_resolutions(edge_states: dict[str, dict], resolutions: dict[str, dict]) -> list[dict]:
+    """雜湊仍相符、驗證卻不過的決議（讀圖那一格標「決議失效、待重核」）：健康審查逐條點名，重核走
+    `approve --replace-stale`（判讀 gate）。判定與讀圖同一個函式（`build_projection(on_invalid="isolate")`）。"""
+    projection = build_projection(edge_states, resolutions, on_invalid="isolate")
+    return [
+        {"edge_key": edge_key, "attribute": attribute, **meta}
+        for edge_key, edge in sorted(projection.items())
+        for attribute, meta in sorted(edge["attribute_resolution_meta"].items())
+        if meta.get("status") == "invalid"
+    ]
 
 
 def _driver():

@@ -583,6 +583,7 @@ class CanonicalEdge:
     #: 哪幾格的值來自**人工核准的屬性決議**（F19，2026-11-04）：`CanonicalEdge` 欄位名 → 決議的 action
     #: （`choose_value`／`unknown`／`split_scope`／`move_to_observation`）。值是 None、這裡又有那一格＝**決議判不給值**，
     #: 不是「沒有文件發言過」——缺席由產生它的程式宣告（L16）。不進 digest：digest 讀的是值，值變了才算變。
+    #: `INVALID_RESOLUTION`（`invalid`）＝決議的雜湊仍相符、驗證卻不過（2026-11-05 R2 F2(b)）：這一格不給值、待使用者重核。
     resolved: dict = field(default_factory=dict)
 
 
@@ -599,6 +600,23 @@ RESOLVABLE_ATTRIBUTES: dict[str, str] = {
     "ramp_execution": "ramp_execution",
     "structural_lead_time_weeks": "lead_time_weeks",
 }
+
+
+#: `CanonicalEdge.resolved` 的「決議失效、待重核」：雜湊相符、驗證不過的決議只隔離那一格（`build_projection(on_invalid=
+#: "isolate")`），不印它的值、也不退回逐文件取最高 confidence（那可能是使用者否決過的值）。
+INVALID_RESOLUTION = "invalid"
+
+
+def resolved_cell(text: str, action: str | None) -> str:
+    """讀圖表、結構表的一格（標籤只有這一份）：核准給的值標「（核准）」；決議判不給值、決議失效各自說出來——
+    不印成「—」或「未填」（那是「沒有文件發言過」，F19）。"""
+    if action is None:
+        return text
+    if action == "choose_value":
+        return f"{text}（核准）"
+    if action == INVALID_RESOLUTION:
+        return "決議失效、待重核"
+    return f"核准決議不給值（{action}）"
 
 
 def _canonical_value(field_name: str, value: Any) -> Any:
@@ -650,6 +668,8 @@ def resolved_attribute_values(
     列轉成它要的形狀（L16：不在讀圖這一側另造一套）。候選集合變了（決議過期）就不套——那一格照舊逐文件取最高
     confidence，過期決議由健康審查點名。`as_of`：只套核准日不晚於那天的決議（INV-6）；候選集合也是那天看得到的那一批，
     兩道條件都要過。`choose_value` 給選定的值；`unknown`／`split_scope`／`move_to_observation` 給 None（決議判不給值）。
+    雜湊相符、驗證卻不過的決議只隔離那一格：`(INVALID_RESOLUTION, None)`，其餘照套（2026-11-05 使用者選 R2 F2(b)；
+    之前任何一份失效就讓每個預設收斂都丟例外——物化、讀圖寫入、敘事寫入、`query.structure` 一起停）。
     """
     from loader.edge_resolution import build_projection
     from loader.load_to_neo4j import edge_key as make_edge_key
@@ -678,14 +698,17 @@ def resolved_attribute_values(
         })
     if not assertions:
         return {}
-    projection = build_projection(build_edge_states(assertions), applicable)
+    projection = build_projection(build_edge_states(assertions), applicable, on_invalid="isolate")
     out: dict[tuple, dict[str, tuple[str, Any]]] = {}
     for key, edge in projection.items():
         for attribute, meta in edge["attribute_resolution_meta"].items():
             field_name = RESOLVABLE_ATTRIBUTES.get(attribute)
-            if field_name is None or meta.get("status") != "approved":
+            if field_name is None:
                 continue
-            out.setdefault(triples[key], {})[field_name] = (str(meta["action"]), edge["attributes"].get(attribute))
+            if meta.get("status") == "invalid":
+                out.setdefault(triples[key], {})[field_name] = (INVALID_RESOLUTION, None)
+            elif meta.get("status") == "approved":
+                out.setdefault(triples[key], {})[field_name] = (str(meta["action"]), edge["attributes"].get(attribute))
     return out
 
 
@@ -1346,7 +1369,9 @@ def render_markdown(result: Mapping[str, Any]) -> str:
     for r in result["rows"]:
         ticker = r["ticker"] or "—"
         sole = "｜sole_source" if r["sole_source"] else ""
-        sub = "未填" if r["substitutability"] is None else f"{r['substitutability']}/5"
+        resolved = r.get("resolved_attributes") or {}
+        sub = resolved_cell("未填" if r["substitutability"] is None else f"{r['substitutability']}/5",
+                            resolved.get("substitutability"))
         # 這個值本身（贏得值的那一筆）撐不撐得住——Phase 6 Step 6.5；跟逐筆清單分開說（一個是值、一個是全部帶 sub 的筆數）
         if r.get("sub_language_in_quote") is False:
             sub += "｜⚠這個值的引文沒談可替代性"
@@ -1358,7 +1383,7 @@ def render_markdown(result: Mapping[str, Any]) -> str:
         out.append(
             f"| {r['company_id']}（{ticker}） | {r['relation']} → `{r['bottleneck']}` "
             f"| {sub}{sole} | {EVIDENCE_LABEL[r['evidence']]} "
-            f"| {r['qualification_status'] or '—'} | {r['documents']} "
+            f"| {resolved_cell(r['qualification_status'] or '—', resolved.get('qualification_status'))} | {r['documents']} "
             f"| {anchor} |"
         )
 

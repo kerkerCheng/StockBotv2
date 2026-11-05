@@ -247,6 +247,20 @@ def test_thin_sole_and_unfilled_read_the_same_structure_as_query_structure() -> 
     assert unfilled["scope_n"] == 3 and [h["subject"] for h in unfilled["hits"]] == ["mat:sole"]
 
 
+def test_a_layer_whose_missing_values_are_all_decided_by_resolutions_is_not_unfilled() -> None:
+    """F19 R2 F3：決議判不給值、決議失效不是「未填」——沒值的全是這兩種時不命中（那要重核，不是研究）；
+    還有一條真的沒人發言過就照舊命中。"""
+    edges = fake_graph()
+    solo = [e for e in edges if e.src == "co:solo"]
+    assert solo and all(e.substitutability is None for e in solo)
+    for e in solo:
+        e.resolved = {"substitutability": "unknown"}
+    assert _q(run_walk(edges=edges), "supply_unfilled")["hits"] == []
+    for e in solo:
+        e.resolved = {"substitutability": "invalid"}
+    assert _q(run_walk(edges=edges), "supply_unfilled")["hits"] == []
+
+
 def test_a_current_reading_of_any_unit_takes_a_layer_out_of_thin_layer_unread() -> None:
     readings = fake_readings() + [{"node": "mat:thin", "unit": "layer", "reading_id": "sr_3",
                                    "status": "current", "needs_reread_by_graph": False}]

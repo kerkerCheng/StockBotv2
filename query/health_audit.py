@@ -388,10 +388,17 @@ def run_local_audit(*, today: date | None = None) -> str:  # pragma: no cover - 
             stale_resolutions = sort_conflicts(
                 stale_resolutions, active_edge_keys=active_keys
             )
+            # 雜湊相符、驗證卻不過的決議：讀圖只隔離那一格（R2 F2(b)），這裡逐條點名、亮紅——判定與讀圖同一個函式
+            try:
+                from loader.edge_resolution import invalid_resolutions, load_resolutions
+
+                invalid_res = invalid_resolutions(states, load_resolutions(DEFAULT_RESOLUTION_DIR))
+            except Exception as exc:  # noqa: BLE001 — 決議檔讀不了要說出來，不併進「Neo4j 連線失敗」
+                invalid_res = [{"resolution_id": "—", "edge_key": "—", "attribute": "—", "error": f"決議檔讀不了：{exc}"}]
         driver.close()
     except Exception as exc:
         report.extend(_section("圖層巡檢", "red", [f"- Neo4j 連線失敗：{exc}"]))
-        conflicts, stale_resolutions, active_keys = [], [], set()
+        conflicts, stale_resolutions, active_keys, invalid_res = [], [], set(), []
     else:
         report.extend(
             _section(
@@ -455,12 +462,16 @@ def run_local_audit(*, today: date | None = None) -> str:  # pragma: no cover - 
             f"- `{c['conflict_id']}` `{c['edge_key']}`.{c['attribute']}"
             "（🔁 resolution 已過期：candidate set 有新證據，需重審）"
             for c in stale_resolutions
+        ] + [
+            f"- `{r['resolution_id']}` `{r['edge_key']}`.{r['attribute']}（⛔ 決議失效、待重核：{r['error']}——讀圖那一格不給值；"
+            "重核 `python loader/edge_resolution.py approve <提案> --approved-by … --approved-at … --replace-stale`）"
+            for r in invalid_res
         ]
         report.extend(
             _section(
                 "未處置 edge conflict（M1：active 引用邊必須為零）",
                 "red"
-                if active_conflicts or stale_resolutions
+                if active_conflicts or stale_resolutions or invalid_res
                 else ("yellow" if conflicts else "green"),
                 conflict_lines,
             )

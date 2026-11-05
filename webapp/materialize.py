@@ -1105,10 +1105,13 @@ def build_structure_table_artifact(result: Mapping[str, Any], *, registry: Any,
             # 列上 `resolved_attributes`（F19，2026-11-04）：哪幾格的值來自人工核准的屬性決議（欄位名 → action）。
             # 字義照 `skills/evidence-conflict-resolution/SKILL.md` 第 4 步的判準。
             "resolved_attributes": {
-                "choose_value": "文件之間說法不一；同一範圍的狀態隨時間前進、較新文件明確取代舊的，使用者核准了這個值",
+                # 理由不寫死（F19 R2 F5：25 份 choose_value 至少 5 份不是「較新取代舊的」）——每份的理由在決議的 rationale（L18）
+                "choose_value": "文件之間說法不一，使用者核准了這個值（理由見那份決議的 rationale）",
                 "unknown": "文件之間真正互斥、判不出（或原文對不上），使用者核准的決議是不給值",
                 "split_scope": "文件講的客戶、產品、地區或定義不同；決議是拆範圍（要人工改 schema），這一格先不給值",
                 "move_to_observation": "短缺、利用率、物流或特定日期的交期這類時變數字；決議改記觀測（要人工改 schema），這一格不給值",
+                "invalid": "核准過的決議驗證不過（多半是支持它的文件被更正、來源 id 變了而值沒變）：這一格先不給值，"
+                           "待使用者重核（`loader/edge_resolution.py approve … --replace-stale`）",
             },
         },
         "this_is_not": list(STRUCTURE_TABLE_THIS_IS_NOT),

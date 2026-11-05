@@ -265,6 +265,9 @@ def rows_after_load(rows: list[Mapping[str, Any]], links: Mapping[str, Any], sou
                 "source_doc_id": doc_id,
                 "published_at": source_doc.get("published_at") or template.get("published_at"),
                 "assertion_id": aid,
+                # 載入是 `ea.source_ids = $source_ids`（照抽取檔覆寫）——收斂套決議時要核對支持的來源 id，少了這欄，
+                # 重宣告持有 supporting assertion 的文件時預告必定失敗（2026-11-04 R2 F1）
+                "source_ids": [str(s) for s in edge.get("source_ids") or ()],
             }
             link_after[aid] = {str(s) for s in edge.get("source_ids") or ()}
     return list(after.values()), quotes_by_assertion(link_after, quotes_after)
