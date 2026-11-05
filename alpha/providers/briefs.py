@@ -325,6 +325,15 @@ def v2_write_problems(parsed: InvestorBrief, *, ctx: WriteContext, existing: Seq
                                      current_brief=parsed, acknowledged=acked)
         if blocking:
             problems.append("open：還有待處置的反證 watch——" + "；".join(blocking))
+        # 候選板起始門 ③ 的對稱面（failure log #131）：已定價答 yes／no 時稽核行至少一行有值，清單用候選板**同一份**
+        # （L16）——全部缺席還答 yes，寫得進去、當天物化就是「前提失效」（300757.SZ 11-05：A 股自家百分位沒接、不在任何組）。
+        # 出現在數字裡那一題不必另擋：v2 的 position 必引用 placeholder，③ 已要求引用的那一行有值。
+        from ..candidates import PRICED_IN_LINES
+        value = parsed.answers.priced_in if parsed.answers else None
+        if value in ("yes", "no") and tq is not None and not any(
+                r.get("key") in PRICED_IN_LINES and r.get("absence_kind") is None for r in tq.get("priced_in") or ()):
+            problems.append(f"open：answers.priced_in={value}，但已定價的稽核行 {list(PRICED_IN_LINES)} 全部缺席——"
+                            "量不到就答 unmeasurable（候選板每天用同一條重驗）")
 
     # ⑦ 重押讀圖時格層引用跟著換（Phase 6 待決 #16，L18；Phase 7 Step 7.0c）：rides[] 押的是某節點、某單位的現行讀圖，
     #   任何一格的 evidence_refs 就不得指向**同一節點同一單位**已被取代的讀圖——讀的人點進去會看到舊讀圖。

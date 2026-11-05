@@ -228,6 +228,21 @@ def test_unmeasurable_only_when_the_audit_lines_are_all_absent(tmp_path: Path) -
     _write(tmp_path, rec, _ctx(tq=all_absent))
 
 
+def test_open_answering_priced_needs_an_audit_line_with_a_value(tmp_path: Path) -> None:
+    """failure log #131：候選板起始門 ③ 的對稱面——可開答已定價 yes、稽核行全部缺席就拒收（300757.SZ 11-05 寫得進去、
+    當天物化判前提失效）。只有相對組漲幅有值照收（候選板同一份清單）；不是可開不擋（候選板只對可開重驗）。"""
+    all_absent = _tq(own_history_pctile="upstream_unavailable", cohort_median="not_yet_recorded",
+                     rel_return_30d="not_yet_recorded", rel_return_90d="not_yet_recorded")
+    with pytest.raises(ContractViolation, match="answers.priced_in=yes.*全部缺席"):
+        _write(tmp_path, _record(), _ctx(tq=all_absent))
+    with pytest.raises(ContractViolation, match="answers.priced_in=no.*全部缺席"):
+        _write(tmp_path, _record(answers={"priced_in": "no", "in_numbers": "yes"}), _ctx(tq=all_absent))
+    _write(tmp_path / "b", _record(answers={"priced_in": "unmeasurable", "in_numbers": "yes"}), _ctx(tq=all_absent))
+    only_rel = _tq(own_history_pctile="upstream_unavailable", cohort_median="not_yet_recorded")
+    _write(tmp_path / "c", _record(), _ctx(tq=only_rel))
+    _write(tmp_path / "d", _record(state="pass", reason="換得掉"), _ctx(tq=all_absent))
+
+
 def test_in_numbers_yes_must_cite_a_placeholder_that_has_a_value(tmp_path: Path) -> None:
     """2026-10-14：{in_numbers_latest}（營收年增）與 {in_numbers_mix_latest}（占比）拆開後的補償控制（L15）——只有占比序列的
     公司答 yes 卻引用年增，印出來是（尚無）；型別層兩個都收（舊紀錄照讀），寫入端要引用到有值的那個。"""
