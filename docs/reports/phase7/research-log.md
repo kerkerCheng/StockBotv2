@@ -475,3 +475,5 @@
 - 名冊 6501.T 有英文別名「Hitachi Energy」、沒有中文「日立能源」：題材掃描那則中文 lead 解析不到（1 例）。
 - 雙鴻（3324.TWO）11-18 法說的簡報可能不會被 harvest 收進來（未驗證；到時看 daily 有沒有帶進來）。
 - MLCC：圖上沒有的一層，在 AI capex 錨內（不是新錨）——要不要拆一層是使用者的 decompose 選題。
+
+**停止條件成立**：`engine_b.cli drain` 段 0–1 全零、pq1 空（段 5 到終局 79：ready 77／settled 2；未到終局 0；母體外 118＝非倍率 104、邊緣沒座位已查 13、等入圖 1）；`event_watch counters` fired_unconsumed 0、semantic_pending_check 0、wake_held 0、expiry_* 全 0；`audit invariants --only QueueSegments` PASS；closure-gate exit 0；走圖 55 筆命中、新命中 0；⑤ 二十二格全 0（全量物化 198/198，再物化讀圖、走圖、watch、層說明之後的心跳；「邊緣卻沒敘事」註記 5801.T 等入圖 [909]）；候選板可開 13／缺 X 31／不要 46／已持有 2／無敘事 105。**本段候選狀態移動 6**：前提失效 → 可開 2（002428.SZ、SILEX.ST）、缺 X → 可開 2（3363.TWO、ATS.VI）、不要 → 缺 X 1（NVTS）、無敘事 → 可開 1（INIO）；**鑄 ra_admission 2**（[908]、[909]，都沒被抽查抽中）。非零但不是待做：停滯 3、到期 3、追源需處置 1、邊緣無法量 9；逾期型反證 0 條的持有／可開敘事 1＝COHR（同 11-04）。8790 重啟、writer lock 釋放（見收尾）。新鑄 pq2：[908]、[909]。decompose：本輪沒有新錨提案。
