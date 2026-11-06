@@ -1,0 +1,23 @@
+[EXCERPT — 公開文件之有限逐字引文] AT&S Half-year Financial Report 2026/27（2026-11-05）
+Source: https://ats.net/en/download/half-year-financial-report-2026-27/
+Published: 2026-11-05 | Origin: AT&S | Retrieved: 2026-11-06（PDF 27 頁，pypdf 轉文字；只修斷行與 PDF 抽字的多餘空格，字句照原文）
+
+p.4（Business developments and situation）："Consolidated revenue rose from € 846.3 million in the comparative period to € 1,230.6 million in the first half of 2026/27 (increase of € 384.3 million or 45.4 %). In the Microelectronics segment, revenue was € 347.3 Mio. €, or 82.9 %, higher than in the prior-year comparative period. The positive development was driven by demand for IC substrates and the start of production at the new plant in Kulim, Malaysia."
+p.4 表：EBITDA 409.0（PY 174.7）；EBITDA margin 33.2%（PY 20.6%）；EBIT 226.4（PY 0.0）；Profit for the period 166.2（PY (63.5)）；Earnings per share (€) 3.98（PY (1.86)）。
+
+p.5（Business development by segments）："The share of the Electronics Solutions segment in total third party revenue decreased from 56.7% to 37.7%. The share of the Microelectronics segment in revenue rose to 62.3% (previous year: 43.3%)."
+
+p.6（Microelectronics segment）："The segment's revenue amounted to € 766.4 million, up by € 347.3 million or 82.9% above the prior-year revenue of € 419.1 million. This increase is attributable to higher volumes, higher prices, and the expansion of production in Kulim, Malaysia, and Leoben, Austria."
+p.6："EBITDA improved by € 256.9 million or 324.7% from € 79.1 million to € 336.0 million." "Overall, this resulted in an EBITDA margin of 43.8%, which is higher than in the previous year (18.9%)."
+
+p.10（資產負債表，€ 千）：Contract liabilities（非流動）1,038,463（2026-03-31：759,076）；Contract liabilities（流動）167,420（126,816）。
+p.11（現金流量表）：Changes in contract liabilities 419,015（PY 4,030）。
+p.18（Assets and Finances）："Other receivables also include receivables from customer prepayments totaling €211.0 million (March 31, 2026: €0.0 million)."
+p.19（Current and non-current contract liabilities）："In the first six months an amount of € 106.9 million was released. Due to the existence of a significant financing component, a liability of € 5.9 million was recognized for interest. Additions amounted to € 421.0 million."
+p.19（Hybrid capital）："In June 2026, AT&S AG issued a hybrid convertible bond in the amount of €400.0 million, which was recognized in equity net of transaction costs, since this bond has an indefinite maturity and there is no contractual obligation to repay it on a specific date."
+
+p.22（Investment projects）："The investments required for this amount to €1.5 to 2.0 billion. All planned investments are supported and financed by long-term customer commitments."
+
+p.8（Outlook）："AT&S is currently expanding its capacity in the Microelectronics business unit and expects this to have a positive impact on revenue and earnings already in the current fiscal year."
+
+註：半年報沒有寫客戶名字的營收占比、沒有 backlog 數字、也沒有可轉債的轉換價格（轉換價見 library/raw/ats_hybrid_convertible_conversion_price_eqs_2026_06_16.txt）。

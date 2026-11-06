@@ -1,0 +1,56 @@
+Navitas Semiconductor Corporation — Form 10-Q for the quarterly period ended September 30, 2026（excerpt）
+Filed: 2026-11-03（accession 0001628280-26-069551）
+Source: https://www.sec.gov/Archives/edgar/data/1821769/000162828026069551/nvts-20260930.htm
+Retrieved: 2026-11-06（research-drain；逐字摘錄，段名為摘錄者所加）
+
+[Cover]
+269,507,528 shares of Class A Common Stock and 0 shares of Class B Common Stock were outstanding at November 2, 2026.
+
+[Condensed consolidated statements of operations]
+Net revenues $ 13,991 $ 10,112 $ 33,118 $ 38,620
+（三個月 2026／2025、九個月 2026／2025；單位千美元）
+Net loss $ ( 37,108 ) $ ( 19,234 ) $ ( 299,111 ) $ ( 85,138 )
+
+[Balance sheet]
+Cash and cash equivalents $ 531,479 $ 236,857
+（2026-09-30／2025-12-31；千美元）
+
+[Note — Execution of At-The-Market Sales Agreements]
+During the three months ended June 30, 2026, the Company sold approximately 17.4 million shares of Class A common stock in at-the-market offerings, for gross proceeds of approximately $380.7 million and offering-related costs of approximately $7.6 million. The sales were made under two Sales Agreements: the first, entered into on May 11, 2026, terminated on May 12, 2026 upon completion of its $ 125.0 million offering, and the second, entered into on June 8, 2026, provides for sales of up to $ 500.0 million. No shares were sold under either agreement during the three months ended September 30, 2026, and approximately $244.3 million remained available under the second agreement as of September 30, 2026.
+
+[Note 4 — Significant customers and credit concentrations]
+A majority of the Company’s revenues are attributable to sales of the Company’s products to distributors of electronic components. These distributors sell the Company’s products to a range of end users, including original equipment manufacturers and merchant power supply manufacturers.
+The following customers represented 10% or more of the Company’s net revenues for the three and nine months ended September 30, 2026 and 2025:
+Distributor A 55 % * 63 % *
+* Customer revenues or accounts receivable represented less than 10% of total revenues or accounts receivable.
+
+[Note — Acquisition of Claros, Inc.]
+On October 6, 2026 , the Company acquired all of the outstanding equity interests of Claros, Inc. (“Claros”), a developer of power management solutions for artificial intelligence data-center applications , pursuant to an Agreement and Plan of Merger dated August 24, 2026.
+Consideration transferred consisted of approximately $ 126 million in cash, net of approximately $ 9.4 million of cash acquired, subject to customary post-closing adjustments, and 6,912,669 shares of Class A common stock with an acquisition-date fair value of approximately $ 82.7 million
+
+[Note — Legal proceedings]
+On or about July 7, 2026, Wolfspeed filed a patent infringement lawsuit in the United States District Court for the District of Delaware against the Company and several of its affiliates. The lawsuit alleges that certain Navitas GaN and SiC products infringe multiple Wolfspeed patents
+On or about July 22, 2026, Renesas Electronics Corporation and Renesas Electronics America Inc. (together, “Renesas”) filed a lawsuit against the Company and two of the Company’s employees who are former employees of Renesas, including the Company’s chief executive officer, alleging misappropriation of trade secrets, breach of contract and other claims.
+
+[MD&A — Overview]
+We focus primarily on high-power markets, including AI data centers, energy and grid infrastructure, performance computing, and industrial electrification.
+Our revenue represents the sale of semiconductors through specialized distributors to original equipment manufacturers, their suppliers, and other end customers. We consider the domicile of our end customers, rather than the distributors we sell to directly, to be the basis of attributing revenues from external customers to individual countries.
+
+[MD&A — Net revenues by end-customer country（三個月，2026／2025；千美元與占比）]
+China $ 4,063 29 % $ 5,258 52 %
+United States 7,383 53 2,124 21
+Asia excluding China 1,108 8 1,011 10
+[（九個月，2026／2025）]
+China $ 10,809 33 % $ 20,082 52 %
+United States 14,915 45 9,269 24
+Asia excluding China 3,649 11 4,248 11
+
+The increase in sales of $3.9 million, or 38%, for the three months ended September 30, 2026, was primarily due to growth in U.S. data center related revenue. For the nine months ended September 30, 2026, there was a decrease of $5.5 million, or 14%, primarily due to a decline in sales of mobile products in the Asia region, primarily China, and consumer markets, partially offset by an increase in U.S. data center related revenue.
+
+[MD&A — Liquidity]
+We believe that our current levels of cash and cash equivalents, even after giving effect to the Claros acquisition, are sufficient to finance our operations, working capital requirements, and capital expenditures for the foreseeable future.
+Net cash used in operating activities for the nine months ended September 30, 2026 was $66.9 million compared to $34.8 million for the nine months ended September 30, 2025. ... The working capital outflow in 2026 primarily reflected a $19.1 million increase in inventories, a $12.1 million increase in prepaid expenses and other current assets, primarily related to wafer supply prepayments to a foundry partner, and payments of restructuring liabilities accrued as of December 31, 2025. Our net loss of $299.1 million for the nine months ended September 30, 2026 included non-cash expenses, primarily consisting of a $211.0 million loss from the change in fa[ir value ...]
+
+摘錄者註（不是原文）：
+- 10-Q 沒有寫任何資料中心客戶的名字，也沒有拆出資料中心（或 AI 基礎設施）營收的金額；「U.S. data center related revenue」只出現在營收增減的原因句。
+- 美國終端客戶的營收是依終端客戶所在地歸屬（不是經銷商），第三季 738.3 萬美元、占 53%（去年同期 212.4 萬、21%）。

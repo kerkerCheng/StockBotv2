@@ -1,0 +1,27 @@
+Source URL: https://www.fool.com/earnings/call-transcripts/2026/10/27/innio-inio-q3-2026-earnings-call-transcript/
+
+Excerpt:
+[EXCERPT — 有限逐字引文] INNIO 2026 年第三季法說（2026-10-27）第三方逐字稿（Motley Fool）：在手訂單價格改善、多數設備訂單 take-or-pay 附頭期款與取消費；在手加產能保留約 19 GW；年產能由 2025 年 3.5 GW 擴到 2030 年 10 GW 以上；最大客戶占訂單比重；不接 NeoCloud；分析師問資料中心開發商的信用風險。註：只收講者原話段落，不收 Motley Fool 編輯寫的摘要框；轉錄稿是第三方整理，公司說法屬自述（L8）
+PUBLISHED: 2026-10-27
+RETRIEVED: 2026-11-06（EDGAR 原文 HTML 本機抽字、空白正規化後以起訖標記切出，逐字）
+
+【CFO：在手訂單品質】
+"First, pricing in the backlog continues to improve. As orders convert, this is expected to have a sustained positive impact on our bottom line. Second, most equipment orders are take or pay. With associated down payments and cancellation fees. These terms demonstrate customer commitment and provide certainty as we allocate capacity."
+
+【CFO：在手加產能保留】
+"Today, that combined number stands at about 19 GW, compared with the over 15 GW figure of last quarter. As a reminder, this is a combined figure across our equipment order backlog and slot reservations. These slot reservations are distinguished from our equipment order backlog but are still noncancelable and nontradable."
+
+【CFO：產能擴充】
+"Our expansion projects in Jenbach and Waukesha remain well on track as we scale from 3.5 GW of annual capacity in 2025 toward our expectation of more than 10 GW by 2030. As Olaf mentioned, we recently built the first Jenbacher generator unit at the Waukesha site. An important milestone toward realizing our planned capacity growth. We will release additional slots in measured, conservative stages, tied to the ramp meeting timing and specification requirements."
+
+【客戶篩選與最大客戶占比】
+"We prioritize customers that have either secured long term take agreements with hyperscalers or Frontier AI Labs, or have a clear line of sight to securing such agreements. We can also confirm that we have not allocated any meaningful volumes to NeoCloud operators. Let's move on to the right hand side where we show how our equipment order intake is evolving. Our largest customer accounted for approximately 20% of order intake in 2024, and 41% in 2025. In our preliminary near term outlook, the largest customer share is approximately 21%."
+
+【公司說客戶為什麼選它（自述）】
+"There are 6 key reasons. First, our solutions allow for modular deployment, which shortens the time to power. Second, we have a proven technology, with a large and global installed base of 44 gigawatts installed over decades. Third, our solutions have the ability to follow rapid AI load swings. Fourth, we have competitive life cycle costs. Fifth, our solutions have operational flexibility across use cases. And sixth, we deliver strong environmental performance, including near zero water consumption."
+
+【分析師問信用風險】
+"You can understand obviously, the last couple of weeks in credit markets have focused, you know, extensively on credit risk around new data center developers"
+
+【答：不接 NeoCloud 與土地開發商】
+"We usually do not work with land developers as I already specified, or mentioned here last time, the last earnings call, And the NeoClouds very often work with LAN developers and reason we are not working with them is because they are very far away from the end customer And when they order the equipment, there is normally no back-to-back."

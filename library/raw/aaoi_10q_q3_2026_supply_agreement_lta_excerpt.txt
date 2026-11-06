@@ -1,0 +1,21 @@
+來源：Applied Optoelectronics, Inc.（AAOI）Form 10-Q，季度截至 2026-09-30，2026-11-05 申報
+https://www.sec.gov/Archives/edgar/data/1158114/000143774926035282/aaoi20260930_10q.htm
+節錄三段，原文逐字（2026-11-06 取得）。
+
+==== 一、Note 19. Subsequent Events（財報附註）====
+Loan Agreement
+On October 30, 2026, subsequent to the end of the reporting period, the Company entered into a $200 million credit agreement with a syndicate of lenders, with East West Bank acting as administrative agent (the "EWB Loan"), and terminated the BOKF Credit Facility. The EWB Loan provides for $30 million in revolving commitments and $170 million in initial term loan commitments, matures on October 30, 2030, subject to certain earlier maturity provisions, and permits the Company to request up to $50 million in incremental term loan commitments, subject to specified conditions.
+
+ATM Completion
+On October 1, 2026, the Company completed its third ATM Offering, selling approximately 5.7 million shares at a weighted average price of $105.36 per share, providing proceeds of approximately $588 million, net of expenses and underwriting discounts and commissions.
+
+Supply Agreement
+On November 2, 2026, the Company entered into a five-year supply framework agreement and an annual purchase contract with a supplier for the purchase of a key raw material used in certain of its products. The annual contract provides for purchases of up to approximately $194.4 million and requires the Company to make aggregate prepayments of up to $40.0 million, including $20.0 million payable during 2026. No prepayments had been made as of the filing date. The supplier's ability to export and deliver the material is subject to obtaining and maintaining required regulatory approvals in China, and actual purchase quantities are subject to the quantities approved for export. If the required approvals are not obtained or maintained, the Company may cancel the annual contract and affected purchase orders and require the refund of applicable prepayments and other amounts paid. Because the agreements were entered into after September 30, 2026, no amounts relating to the agreements have been reflected in the Company's condensed consolidated financial statements as of that date.
+
+==== 二、MD&A（Liquidity 段）====
+On November 2, 2026, we entered into supply agreements to secure a source of a key raw material used in certain of our products. The agreements include material purchase and prepayment commitments and are subject to risks relating to required regulatory approvals in China. If performed as contemplated, the agreements may materially affect our future liquidity, inventory levels and working-capital requirements. See Note 19, "Subsequent Events," to our condensed consolidated financial statements for additional information.
+
+==== 三、MD&A（Trends and Other Matters Affecting Our Business）====
+Demand for our data center products remained strong during the nine months ended September 30, 2026, driven by continued investments by hyperscale customers in artificial intelligence, cloud computing and high-speed networking infrastructure. We experienced significant growth in sales of data center products during the period, reflecting increased customer deployments and demand for higher speed optical connectivity solutions. Subsequent to September 30, 2026, we signed a 3-year long term agreement (LTA) with a major hyperscale data center customer. Under this long term agreement, this customer is obligated, with certain conditions, to purchase 10% of certain 1.6 Tb data center transceiver products from us during the three-year period beginning June, 2026 and ending May, 2029. We are obligated to supply these products, including building any additional manufacturing capacity needed to fulfill this demand. We have also agreed to certain maximum pricing levels over the term of this agreement. Actual purchase volumes and revenue under the LTA will depend on the customer's demand for the covered products, the satisfaction of the applicable conditions and our ability to meet our supply obligatio[ns…]
+
+註：10-Q 全文沒有出現供應商名字，也沒有寫這項「key raw material」是什麼；全文也沒有 FCC、ELSFP、DSP、TIA、photodiode 等字（2026-11-06 以全文關鍵字比對）。

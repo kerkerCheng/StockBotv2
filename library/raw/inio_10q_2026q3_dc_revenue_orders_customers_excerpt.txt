@@ -1,0 +1,36 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/2109150/000162828026067448/inio-20260930.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] INNIO N.V. Form 10-Q（2026Q3，2026-10-27）：資料中心營收 4.63 億美元（去年同期 0.385 億）、前九月設備訂單約七成來自資料中心、前五大客戶占前九月營收約 54%、美國擴產爬坡風險、現金流與負債、IPO 全為大股東售股
+PUBLISHED: 2026-10-27
+RETRIEVED: 2026-11-06（EDGAR 原文 HTML 本機抽字、空白正規化後以起訖標記切出，逐字）
+
+【MD&A 設備分部營收（第三季）】
+"Revenue for our Equipment segment increased by 86.3% to $777.6 million for the three months ended September 30, 2026 from $417.4 million for the three months ended September 30, 2025. This increase was mainly due to the continuous high demand for our Type 6 engines in the data center business line, and increased sales of our VHP engines in the compression business line. Data center revenue, within Equipment revenue, increased by 1104.1% to $463.0 million for the three months ended September 30, 2026 from $38.5 million for the three months ended September 30, 2025. This increase was primarily due to a continued build out of data center infrastructure in North America. Power solutions revenue, within Equipment revenue, decreased by 26.7% to $239.4 million for the three months ended September 30, 2026 from $326.8 million for the three months ended September 30, 2025. This decrease was mainly driven by lower sales of our Type 6 and Type 9 products in Europe due to four major non-repeat projects."
+
+【MD&A 資料中心營收（前九月）】
+"Data center revenue, within Equipment revenue, increased by 284.4% to $802.4 million for the nine months ended September 30, 2026 from $208.7 million for the nine months ended September 30, 2025. This increase was primarily due to a continued build out of data center infrastructure in North America."
+
+【風險因子：擴產爬坡與訂單集中】
+"expansion in Trenton, New Jersey and Waukesha, Wisconsin exposes us to heightened ramp up and fulfillment risks, including the risk of a mismatch between the speed of our production ramp and the delivery timelines we have committed to in customer contracts. If the ramp up of our equipment, facilities, hiring, onboarding and training progresses more slowly than planned, we may be unable to deliver engines at the volumes and dates reflected in our backlog and prior sales commitments. For the nine months ended September 30, 2026, approximately 70% of our Equipment Order Intake was generated from data centers, which heightens the potential impact of any ramp up slippage on our backlog concentration. This could lead to re-sequencing of orders, delays, cost overruns, liquidated damages or other contractual penalties, renegotiations or cancellations and reputational harm, particularly for some of our large data center customers to whom our contracts provide favorable terms, such as penalties we owe for any delivery delays, equipment non-conformance and equipment failures"
+
+【風險因子：客戶集中】
+"A substantial portion of our revenue, order intake and backlog is driven by a limited number of customers. Our top five largest customers by revenue accounted for approximately 54% of our revenue for the nine months ended September 30, 2026, and approximately 34%, 27% and 28% of our revenue for the years ended December 31, 2025, 2024 and 2023, respectively."
+
+【MD&A 現金流】
+"Net cash provided by operating activities 741.5 309.4 Additions to property, plant, and equipment 6 ( 187.3 ) ( 67.6 ) Additions to intangible assets ( 11.8 ) ( 14.0 ) Acquisitions, net of cash acquired 4 ( 44.6 ) — All other investing activities 0.4 2.4 Net cash used for investing activities ( 243.3 ) ( 79.2 )"
+
+【流動性：現金與循環額度】
+"including existing cash and cash equivalents of $1,195.8 million as of September 30, 2026, operating cash flows and committed but undrawn credit facilities. In June 2026, we amended and extended our RCF, ancillary facilities and guarantee facility. See “— Liquidity and Capital Resources—Senior Facilities Agreement .” As of September 30, 2026, our €210 million RCF was undrawn"
+
+【負債：定期貸款】
+"As of September 30, 2026, € 1,100.0 million and $ 1,332.8 million were outstanding under Term Loan B – EUR and Term Loan B – USD, respectively, and the applicable margin for each facility was 1.75 %."
+
+【近期發展：IPO】
+"On June 5, 2026, we closed our IPO, which consisted of 103,500,000 common shares sold by our Principal Shareholder at a public offering price of $27.00 per common share, including the exercise in full of the underwriters’ option to purchase additional common shares. We did not receive any proceeds from the sale of common shares by the Principal Shareholder in the offering."
+
+【分部表（第三季，2026 與 2025）】
+"Three Months Ended September 30, 2026 (in millions of $) Equipment Service Total from Reportable Segments Total revenue 777.6 390.3 1,167.9 Less: Significant segment expenses regularly provided to the CODM (a) Cost of goods and services sold ( 580.4 ) ( 219.8 ) ( 800.2 ) Research and development ( 20.9 ) ( 11.3 ) ( 32.2 ) Selling, general and administrative expenses ( 59.9 ) ( 49.8 ) ( 109.7 ) Depreciation and amortization 14.4 11.8 26.2 Other non-cash items (b) 1.5 1.0 2.5 Management adjustments (c) 0.8 1.4 2.2 Other segment items (d) ( 0.3 ) 0.1 ( 0.2 ) Adjusted Segment EBITDA (e) 132.8 123.7 256.5 Three Months Ended September 30, 2025 (in millions of $) Equipment Service Total from Reportable Segments Total revenue 417.4 325.3 742.7 Less: Significant segment expenses regularly provided to the CODM (a) Cost of goods and services sold ( 310.6 ) ( 191.5 ) ( 502.1 ) Research and development ( 15.6 ) ( 14.7 ) ( 30.3 ) Selling, general and administrative expenses ( 41.8 ) ( 46.2 ) ( 88.0 ) Depreciation and amortization 12.5 15.6 28.1 Other non-cash items (b) 1.3 1.0 2.3 Management adjustments (c) 0.2 0.8 1.0 Other segment items (d) 2.3 ( 0.2 ) 2.1 Adjusted Segment EBITDA (e) 65.7 90.1 155.8"
+
+【風險因子：擴產與稼動】
+"For example, we are expanding capacities across engine assembly, component manufacturing and containerization, including increasing the utilization of our Waukesha, Wisconsin and Welland, Ontario facilities to support regional production and delivery, as well as our containerization project in Trenton, New Jersey and the addition of new dedicated sites in Texas."

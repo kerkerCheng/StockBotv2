@@ -1,0 +1,24 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/3197/000119312526342536/ceco-20260630.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] CECO Environmental Corp. Form 10-Q（2026Q2，2026-08-10）：第二季營收 2.85 億美元（+53.7%，有機 +44%；約 82.1% 是持有滿一年的業務、其餘增加來自 6 月 1 日完成合併的 Thermon）；有機成長最大來源是發電市場；工程系統部門營收增加由大型燃氣發電專案的在手交貨帶動；第二季訂單 7.985 億美元（+192%），主要來自大型燃氣發電專案的排放與排氣系統；上半年營業現金流 −3,240 萬美元
+PUBLISHED: 2026-08-10
+RETRIEVED: 2026-11-06（EDGAR 原文 HTML 本機抽字、空白正規化後以起訖標記切出，逐字；同時對過 2026-11-03 研究留下的抽字檔）
+
+【MD&A 營收（第二季，2026 與 2025）】
+"Net sales for the three months ended June 30, 2026 increased $99.6 million, or 53.7%, to $285.0 million compared with $185.4 million for the three months ended June 30, 2025, inclusive of organic growth of 44%. Approximately 82.1% of net sales for the three months ended June 30, 2026 is attributable to organic revenue, which the Company defines as revenue from businesses owned for more than twelve months. The increase in organic revenue is driven by strong order intake in preceding quarters, which contributes to the backlog position."
+
+【MD&A 營收：有機成長來源與併購】
+"The largest contributor to organic revenue growth is demand for products and solutions serving power generation end markets. The remainder of the increase in net sales is attributable to the recent acquisition and integration of Thermon."
+
+【MD&A 訂單（第二季）】
+"Orders booked increased $524.4 million, or 192%, to $798.5 million during the three months ended June 30, 2026 compared with $274.1 million in the three months ended June 30, 2025, inclusive of organic growth of 185%, as defined as the change in orders excluding the impact of orders recorded in the twelve month period subsequent to acquisition dates. The increase is primarily driven by demand for the Company’s emissions and exhaust systems applications supporting large-scale natural gas power generation projects."
+
+【部門：工程系統（Engineered Systems，第二季）】
+"Our Engineered Systems segment net sales increased $45.2 million to $173.7 million for the three months ended June 30, 2026 compared with $128.5 million for the three months ended June 30, 2025, inclusive of organic growth of 54.3%. The increase is led by backlog execution on large scale natural gas power generation projects."
+
+【MD&A 營業現金流（上半年）】
+"For the six months ended June 30, 2026, $32.4 million of cash was used in operating activities compared with $19.4 million used in operations in the prior year period"
+
+【附註：Thermon 合併完成】
+"On June 1, 2026, the Company consummated the previously announced merger with Thermon in accordance with the terms of the Merger Agreement."

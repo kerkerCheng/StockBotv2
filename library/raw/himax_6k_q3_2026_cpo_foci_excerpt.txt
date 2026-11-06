@@ -1,0 +1,11 @@
+來源：Himax Technologies, Inc.（HIMX）Form 6-K，2026-11-05 申報（附件為第三季財報新聞稿，TAINAN, Taiwan, Nov. 05, 2026, GLOBE NEWSWIRE）
+https://www.sec.gov/Archives/edgar/data/1342338/000117184326007146/f6k_110526.htm
+節錄 CPO 兩段，原文逐字（2026-11-06 取得）。
+
+==== 一、新聞稿開頭重點 ====
+- On CPO, Himax continues to focus on further improving manufacturing yields and establishing stable MP capabilities to support the next phase of production scaling. The Company is glad to see its strategic partner, FOCI, announced capital expenditure for the expansion of both fab space and manufacturing equipment in preparation for FAU MP. Himax remains confident that CPO business will begin making a meaningful contribution to both top and bottom lines starting in 2027
+
+==== 二、正文 CPO 段 ====
+On CPO business, Himax continues to work closely with strategic partner, FOCI, focusing on further improving manufacturing yields and establishing stable mass production capabilities to support the next phase of production scaling. As part of these ongoing efforts, FOCI announced earlier today that its Board of Directors approved capital expenditures in the amount of NT$3.33 billion (approximately US$100 million) for the expansion of both fab space and manufacturing equipment in preparation for FAU mass production. Engineering ramps are already underway, with shipments expected to expand quarter by quarter from this point onward. While the timing of mass production is ultimately a call to be made by the Company's end customers, Himax remains confident that the Company's CPO business will begin making a meaningful contribution to both top and bottom lines starting in 2027. At the same time, Himax continues to engage with a growing number of customers and advance the joint development of next-generation optical solutions featuring higher fiber counts, enhanced optical precision, and increasingly sophisticated designs, including WDM (Wavelength Division Multiplexing), targeting the surging bandwidth demands of HPC and AI data centers. Himax is uniquely positioned to drive further advancements in FAU technology and performance, leveraging the fundamental strengths of the Company's proprietary WLO technology.
+
+註：新聞稿沒有具名 CPO 的終端客戶或平台；「Company's end customers」與「Company's CPO business」裡的 Company 指 Himax。

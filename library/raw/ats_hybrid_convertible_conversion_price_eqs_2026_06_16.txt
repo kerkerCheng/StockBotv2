@@ -1,0 +1,8 @@
+[EXCERPT — 公開文件之有限逐字引文] EQS Corporate News 2026-06-16：AT&S announces the Reference Share Price and the Conversion Price of the new deeply subordinated perpetual convertible bond with an early redemption option for the Company
+Source: https://www.eqs-news.com/news/corporate/ats-announces-the-reference-share-price-and-the-conversion-price-of-the-new-deeply-subordinated-perpetual-convertible-bond-with-an-early-redemption-option-for-the-company/508359ee-5aa0-4888-9249-16b834d96e16_en
+Published: 2026-06-16 19:05 | Origin: AT&S | Retrieved: 2026-11-06（curl 取 HTML，本機逐字比對）
+
+"• The reference share price of the Bond is EUR 195.5780 (being the volume weighted average price of the Shares on the Vienna Stock Exchange on 16 June 2026)."
+"• The resulting initial conversion price of the Bond is EUR 254.2514 (including the conversion premium of 30.0%)."
+
+註（推算，不是原文）：全額 4 億歐元照初始轉換價換股約 157 萬股，約是 3,885 萬股（Engine C 快照的流通股數）的 4%。

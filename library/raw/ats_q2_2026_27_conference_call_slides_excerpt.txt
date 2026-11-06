@@ -1,0 +1,12 @@
+[EXCERPT — 公開文件之有限逐字引文] AT&S Conference Call Q2 2026/27 簡報（2026-11-05）
+Source: https://ats.net/en/download/conference-call-q2-2026-27/
+Published: 2026-11-05 | Origin: AT&S | Retrieved: 2026-11-06（PDF 18 頁，pypdf 轉文字；是投影片不是逐字稿——AT&S 沒有公開法說逐字稿）
+
+p.2："Further customer diversification in Kulim" "Project execution at all sites fully on track" "Market fundamentals remain strong"
+p.3："FC-BGA substrates 2025: $ 8 bn 2030: $ 23 BN"；"AT&S technology tour in October to all key U.S. tech customers confirmed strong demand for solutions & significant opportunities ahead"
+p.5（AT&S in Kulim – ready for expansion）："Kulim 1 - AMD" "Room for 4 lines" "4th line committed"；"Kulim 2" "Room for 5 lines" "3 lines confirmed for long-standing customer" "4th line announced for Marvell" "5th line TBA"；"Space for Kulim 3 on the current site"
+p.7："AI infrastructure investments drive long-term growth – fully backed by customer commitments"；"Kulim: Approx. € 2.0 billion till 2028/29"；"Chongqing: high double-digit million range till summer 2027"
+p.8（Q2）："Revenue: Driven by strong demand from AI- & HPC-applications, sequential QoQ acceleration with 23% cc growth" "Margin: Higher utilization, improved pricing and a favorable volume/mix support strong margin expansion of 12.5%-pts." "Material availability continues to be tight" "Approx. € 35 MM contribution from new customer agreements"
+p.9（Microelectronics）："Revenue: Production ramps and higher utilization drives revenue growth across all sites" "Margin: Operational leverage, improved pricing, and a shift towards more complex substrates supports margin expansion" "Expansion projects in Kulim and Chongqing fully on track to start"
+
+註：簡報沒有寫 Kulim 2 那一位「long-standing customer」是誰。

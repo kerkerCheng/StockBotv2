@@ -1,0 +1,18 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/2109150/000119312526256992/liberty_-_424b4.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] INNIO N.V. 424B4（IPO 公開說明書，2026-06-04）：承銷價 27 美元、9,000 萬股全由大股東出售、公司不拿款；上市後 7.5 億股、大股東約 88% 表決權；鎖定期 180 天；2025 年現金流量表
+PUBLISHED: 2026-06-04
+RETRIEVED: 2026-11-06（EDGAR 原文 HTML 本機抽字、空白正規化後以起訖標記切出，逐字）
+
+【封面】
+"The initial public offering price is $27.00 per common share. We have been approved to list our common shares on the Nasdaq Global Select Market (“Nasdaq”) under the symbol “INIO.” Immediately following the completion of this offering, our Principal Shareholder will hold an aggregate of 660,000,000 common shares, representing approximately 88% of the voting power of our outstanding share capital"
+
+【股數】
+"Following completion of the Reorganization, we have 750,000,000 common shares outstanding, which excludes: • 11,250,000 common shares reserved for future issuance under our 2026 Plan"
+
+【鎖定期】
+"Our directors and executive officers, and our sole shareholder, which is the selling shareholder (such persons, “lock-up parties”), entered into lock-up agreements with the underwriters prior to the commencement of this offering pursuant to which each lock-up party, with limited exceptions, for a period of 180 days after the date of this prospectus"
+
+【2025 年現金流量表】
+"Net cash provided by operating activities 547.9 392.0 149.3 Additions to property, plant, and equipment 6 (151.0 ) (68.3 ) (64.0 ) Additions to intangible assets (20.2 ) (18.3 ) (14.2 )"

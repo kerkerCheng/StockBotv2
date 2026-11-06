@@ -1,0 +1,30 @@
+Navitas (NVTS) Q3 2026 Earnings Call Transcript（excerpt）
+Publisher: The Motley Fool（第三方轉錄，不是公司發布的逐字稿；公司 IR 沒有公開逐字稿）
+Source: https://www.fool.com/earnings/call-transcripts/2026/11/04/navitas-nvts-q3-2026-earnings-call-transcript/
+Call date: 2026-11-03（第三季財報當天）；Retrieved: 2026-11-06（research-drain；逐字摘錄，說話人照轉錄稿）
+
+[轉錄稿摘要欄（Motley Fool 編輯所寫，不是發言原文）]
+Q4 Revenue Guidance -- $15.5 million to $16.5 million, which at the midpoint reflects 119% year-over-year growth.
+AI Infrastructure Revenue Mix -- projected to exceed 40% of total sales by the end of 2026.
+The company reported a significant order of 1 million units for an 800-volt DC-DC conversion board, supporting the upcoming shift to native 800-volt data center racks.
+
+[Chris Allexandre（CEO），prepared remarks]
+Total revenue was on the high end of guidance at $14 million, up 33% sequentially and 38% year-over-year, marking the company's first quarter of year-over-year growth since 2024.
+Book-to-bill remains well above 1 and has been for the last several months, and we currently have solid backlog extending into mid-2027.
+We anticipate AI infrastructure to represent more than 40% of our total revenue exiting this year, and we believe this business is poised to triple in the calendar 2027.
+Since our previous conference call, we announced our collaboration with NVIDIA on an 800-volt to 12-volt power delivery board for next-generation AI infrastructure.
+The first inflection, pre-800 volt, is already well underway. ... Products based on our SiC technology addressing this opportunity are in production and driving accelerated growth in the fourth quarter and the first half of 2027 across multiple hyperscalers and OEM ODM.
+We continue to believe Native 800-volt solution will be in production before the end of 2027 and be material in 2028. Today, we are sampling and progressing with customers on more than a dozen programs
+
+[Tonya Stevens（CFO），prepared remarks]
+Similar to the previous quarter, the sequential $12.9 million increase in Q3 inventory primarily reflects our measured investment to support AI data center customers' future anticipated long-term growth.
+
+[Q&A — Chris Allexandre]
+the book-to-bill last quarter or Q3 was actually two and has been consistently way above one for the last two quarters
+we've actually got a pretty large order, 1 million units of GaN devices for an 800-volt DC-DC high-density brick for Inflection 3
+So, the beauty of Inflection 2 is not just a SiC play. It's also a GaN play, right? And here, we've seen, in some cases, we're sole source. In some cases, we are gain sharing, right?
+
+摘錄者註（不是原文）：
+- 法說沒有點名任何一家下單客戶；100 萬顆的訂單沒寫是誰下的。NVIDIA 那一句是「合作」開發 800V 轉 12V 電源板，不是採購。
+- 「in some cases, we're sole source」是供應商自述（L8：不能當自己是瓶頸的獨立佐證）。
+- 「gain sharing」照轉錄稿原樣保留，語意應是 share（多家分配），轉錄可能有誤。

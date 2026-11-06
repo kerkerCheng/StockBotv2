@@ -1,0 +1,9 @@
+[EXCERPT — 公開文件之有限逐字引文] AT&S Annual Financial Report 2025/26（Notes to the Consolidated Financial Statements as of March 31, 2026，p.29 Segment Reporting）
+Source: https://ats.net/en/download/annual-financial-report-2025-26/
+Origin: AT&S | Retrieved: 2026-11-06（PDF 304 頁，pypdf 轉文字）
+
+"Revenue broken down by region, based on customers' headquarters:"（€ 千，2025/26｜2024/25）Americas 1,453,550｜1,225,540；Revenue 1,790,776｜1,589,626。
+
+"76.5% of total revenue (previous year: 71.3%) is attributable to the five largest customers in terms of revenue, where the range is between 3% and 31% (previous year: 2% and 29%)."
+
+註：年報這一段沒有寫前五大客戶的名字。

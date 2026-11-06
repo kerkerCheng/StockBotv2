@@ -1,0 +1,15 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/2109150/000162828026067394/ex991.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] INNIO N.V. 2026 年第三季財報新聞稿（8-K Ex.99.1，2026-10-27）：營收 11.68 億美元（+57%）、設備訂單 21.76 億（+10%）、設備在手 79.63 億（+142%）、全年營收指引上調到 39–40 億；Liberty 450 MW、Aggreko 至少 450 MW、另一客戶 620 MW 追加
+PUBLISHED: 2026-10-27
+RETRIEVED: 2026-11-06（EDGAR 原文 HTML 本機抽字、空白正規化後以起訖標記切出，逐字）
+
+【重點】
+"Record Revenue: $1.2 billion, up 57% year-over-year, marking the first $1 billion-plus revenue quarter in INNIO’s history • Equipment Growth: Equipment revenue increased 86% year-over-year to $777.6 million, reflecting disciplined backlog execution and large-scale data center deliveries • Services Growth : Services revenue reached $390.3 million, up 20% year-over-year, supported by the Company’s growing installed base • Continued Order Momentum: Equipment Order Intake reached $2.2 billion, up 10% year-over-year, with broad-based momentum across Data Center and Compression • Equipment Order Backlog: $8.0 billion, up 142% year-over-year, further increasing multi-year revenue visibility • Net income : $109.2 million in Q3 2026, compared with $39.5 million in Q3 2025 • Strong Profitability: Adjusted EBITDA 1 increased 70% year-over-year to $245.4 million, with growth outpacing revenue while INNIO continued to invest in manufacturing capacity • Raised Fiscal Year 2026 outlook: Total Revenue guidance raised by $100 million to $3.9 - $4.0 billion and Adjusted EBITDA 2 guidance raised by $60 million to $780 - $800 million"
+
+【公司動態】
+"620 MW follow-on order - adding to the 1.1 GW booked in Q2 2026 - and a long-term lifecycle service agreement for the first 500 MW of previously ordered capacity, including major overhauls extending into a second engine lifetime • 450 MW order for next generation data center projects in North America from Liberty Energy - with behind-the-meter power solutions to be delivered by 2028 • Long-term extension of strategic partnership with Aggreko through 2031 - includes a minimum of 450 MW of Jenbacher engine capacity to be ordered and delivered by the end of 2027 and access to agreed capacity levels for the remainder of the agreement and a multi-year service agreement for the existing fleet"
+
+【集團數字表】
+"Net sales 1,167.9 742.7 2,774.2 1,896.2 Net income (loss) 109.2 39.5 83.3 136.9 Net Income (loss) margin 9.4 % 5.3 % 3.0 % 7.2 % Diluted EPS 0.15 0.05 0.12 0.18 NON-GAAP Metrics Adjusted EBITDA 245.4 144.2 540.2 402.2 Adjusted EBITDA Margin 21.0 % 19.4 % 19.5 % 21.2 % Adjusted Net Income 3 111.1 46.3 177.5 148.6 Diluted Adjusted EPS 3 0.15 0.06 0.24 0.20 Key Performance Indicators Equipment Order intake 4 2,175.9 1,975.2 6,083.8 3,178.4 Equipment Order Backlog 4 7,963.4 3,292.9 7,963.4 3,292.9 Power Delivered (GW) 1.2 1.1 3.0 2.5"
