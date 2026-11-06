@@ -1,0 +1,135 @@
+{
+  "claims": [
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：羅博特科的季報、半年報、年報、公告或投資者關係活動紀錄寫出 CPO 晶圓／晶粒測試設備的量產訂單取消、延後或減值，或之後的定期報告不再提這類設備的量產訂單與確收。核查頻率：每季（季報、半年報、年報與投資者關係活動紀錄）。觸發後 48 小時：e1 的 claim 降信心或提撤回，重讀 CPO 全堆疊測試層（tech:cpo_full_stack_test）的供給側。",
+      "id": "rbtk_300757_h1_2026_cpo_test_cl1",
+      "source_ids": [
+        "rbtk_300757_h1_2026_cpo_test_s3",
+        "rbtk_300757_h1_2026_cpo_test_s5",
+        "rbtk_300757_h1_2026_cpo_test_s6",
+        "rbtk_300757_h1_2026_cpo_test_s7",
+        "rbtk_300757_h1_2026_cpo_test_s8"
+      ],
+      "statement": "RoboTechnik's (300757.SZ) 2026 interim report (published 2026-08-26) says, in its CPO paragraph, that after its wholly owned subsidiary ficonTEC completed development and validation of double-sided wafer test equipment and die test equipment with a core customer in 2025, the company won multiple mass-production orders for that equipment, part of which has been delivered and recognized as revenue; its product table lists high-speed wafer, die and chip test equipment and high-speed silicon-photonics module / CPO module test equipment. Supplier self-report: the customer is not named and the CPO test orders are not quantified. The optoelectronics and semiconductor segment (RMB 488.2 million in 1H26, 81.16% of main-business revenue) is not split between test and coupling/packaging equipment, and the largest disclosed orders (about RMB 1.261 billion from one customer group) are packaging equipment for pluggable modules, which this edge does not cover. No share, exclusivity or sole-source claim.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:cpo_full_stack_test",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "rbtk_300757_h1_2026_cpo_test_s3",
+        "rbtk_300757_h1_2026_cpo_test_s5"
+      ],
+      "src_id": "co:robotechnik_intelligent"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "test_yield",
+      "aliases": [
+        "罗博特科智能科技股份有限公司",
+        "罗博特科",
+        "羅博特科",
+        "300757.SZ",
+        "ficonTEC"
+      ],
+      "attributes": {
+        "ticker": "300757.SZ"
+      },
+      "confidence": 0.9,
+      "id": "co:robotechnik_intelligent",
+      "name": "RoboTechnik Intelligent Technology",
+      "role": "test",
+      "source_ids": [
+        "rbtk_300757_h1_2026_cpo_test_s1",
+        "rbtk_300757_h1_2026_cpo_test_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "test_yield",
+      "aliases": [
+        "full-stack test",
+        "CPO test",
+        "全堆疊測試"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:cpo_full_stack_test",
+      "name": "CPO 全堆疊測試（full-stack test）",
+      "role": null,
+      "source_ids": [
+        "rbtk_300757_h1_2026_cpo_test_s5"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "rbtk_300757_h1_2026_cpo_test",
+    "evidence_tier": 1,
+    "origin_entity": "罗博特科智能科技股份有限公司",
+    "permission_basis": "上市公司依法公開的半年度報告；只保留研究必要的有限逐字節錄。published_at 取巨潮刊登日 2026-08-26（報告封面「2026 年 8 月」、公告編號 2026-046）。",
+    "published_at": "2026-08-26",
+    "publisher": "深圳证券交易所（巨潮资讯网）",
+    "retrieved_at": "2026-11-04",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "罗博特科智能科技股份有限公司 2026 年半年度报告：全資子公司 ficonTEC 配合核心客戶完成 CPO 雙面晶圓測試設備及晶粒測試設備的開發和驗證後，取得多筆量產化訂單、部分已交付並確認收入；光電子及半導體封測設備占主營 81.16%",
+    "url": "http://static.cninfo.com.cn/finalpage/2026-08-26/1225507370.PDF"
+  },
+  "sources": [
+    {
+      "id": "rbtk_300757_h1_2026_cpo_test_s1",
+      "locator": "頁首（每頁；半年報全文）",
+      "quote": "罗博特科智能科技股份有限公司 2026 年半年度报告全文"
+    },
+    {
+      "id": "rbtk_300757_h1_2026_cpo_test_s2",
+      "locator": "第三节 管理层讨论与分析：一、（一）主营业务及主要产品（半年報全文 p.9）",
+      "quote": "本报告期，公司持续深化全球化发展战略 ，加速完成对全资子公司 ficonTEC的整合协同，光电子及半导体业务板块实现较大幅度增长，成为公司业绩核心增长引擎。在光电子及半导体业务领域，公司于 2025 年 5 月成功收购全球光电子及半导体自动化封装和测试领域领先的设备制造商 ficonTEC，其生产的设备主要用于光子元器件的微组装及测试，包括硅光芯片、量子器件、光模块、激光雷达、大功率激光器、光学传感器、生物传感器的封装和测试等，应用于光计算、光互连及光感知领域。"
+    },
+    {
+      "id": "rbtk_300757_h1_2026_cpo_test_s3",
+      "locator": "第三节：一、（一）主要业务、产品及下游应用领域表——光电子及半导体封测设备及系统（测试设备列；半年報全文 p.9）",
+      "quote": "高速晶圆测试设备、高速晶粒测试设备、高速芯片测试设备、自动光学检测设备、高速硅光模组/CPO 模组测试设备"
+    },
+    {
+      "id": "rbtk_300757_h1_2026_cpo_test_s4",
+      "locator": "第三节：一、（一）主要业务、产品及下游应用领域表——光电子及半导体封测设备及系统（耦合与贴片设备列；半年報全文 p.9）",
+      "quote": "光子器件集成耦合设备、光纤预制设备、Bond 自动化超高精度贴片设备、激光巴条堆叠设备"
+    },
+    {
+      "id": "rbtk_300757_h1_2026_cpo_test_s5",
+      "locator": "第三节：（三）报告期内主要业绩驱动因素——1、在 CPO 领域（半年報全文 p.11）",
+      "quote": "在 CPO 领域，作为适配高速率、高算力应用场景的核心技术路径，CPO 产业化进程正全面提速，行业整体已进入由技术验证向大规模商业化跨越的关键阶段。自 2025 年 ficonTEC 配合核心客户完成了双面晶圆测试设备及晶粒测试设备的开发和验证后，公司相继取得前述设备的多笔量产化订单，部分量产化订单已陆续完成交付及收入确认。"
+    },
+    {
+      "id": "rbtk_300757_h1_2026_cpo_test_s6",
+      "locator": "第三节：（三）报告期内主要业绩驱动因素——1、光伏业务持续承压，光电子及半导体业务大幅增长（半年報全文 p.11）",
+      "quote": "另一方面，在光电子及半导体业务方面，公司凭借 ficonTEC 在可插拔光模块（含 NPO）、CPO、OCS 全技术路径覆盖的优势及其领先的技术优势和市场地位，随着 AI 对光互联爆发式增长需求的驱动，公司本报告期光电子及半导体封测设备业务实现了快速增长，该业务板块实现营业收入 48,822.84 万元。"
+    },
+    {
+      "id": "rbtk_300757_h1_2026_cpo_test_s7",
+      "locator": "第三节：（三）1、同段（半年報全文 p.11）",
+      "quote": "本报告期，光电子及半导体业务板块营收占公司主营业务收入比重为 81.16%，大幅提升，已成为公司业绩增长的核心驱动力。"
+    },
+    {
+      "id": "rbtk_300757_h1_2026_cpo_test_s8",
+      "locator": "第三节：（三）1、在可插拔光模块领域（半年報全文 p.11）",
+      "quote": "公司的封装设备已获得客户广泛认可，公司本报告期内已收到同一集团客户累计高达约 12.61 亿元的订单。"
+    },
+    {
+      "id": "rbtk_300757_h1_2026_cpo_test_s9",
+      "locator": "第三节：（三）报告期内主要业绩驱动因素——首段（半年報全文 p.11）",
+      "quote": "截至本报告披露日，尚未确认收入的在手订单金额约 33.86 亿元，在手订单充足，主要为光电子及半导体业务订单，约为 24.52 亿元，创历史新高，为公司未来业绩持续增长提供坚实支撑。"
+    }
+  ]
+}
