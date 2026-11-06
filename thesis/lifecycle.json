@@ -44,16 +44,30 @@
   "coherent_cpo": {
     "catalyst_checkpoints": [
       {
-        "basis": "memo note 只寫「12 月」，未給確切日；取月初以免錯過",
-        "date": "2026-12-01",
+        "basis": "v3 memo 第 7 行「下一個檢核點：2027-02 第二季 FY2027 財報」；next_check 2027-02-12 取財報後",
+        "date": "2027-02-12",
         "date_confidence": "estimated",
-        "decides": "產能倍增是否如期——memo header 既有檢核點",
-        "what": "六吋 InP 產能倍增檢核點"
+        "decides": "CPO 用的 400mW CW 雷射是否開始認列營收（公司 2026-11-04 法說自述）",
+        "what": "第二季 FY2027 財報"
+      },
+      {
+        "basis": "v3 memo 第 17 行催化劑：2027-03 季 PhotonLink 營收破 1 億美元；該季在第三季 FY2027 財報揭露，取 5 月中",
+        "date": "2027-05-14",
+        "date_confidence": "estimated",
+        "decides": "PhotonLink 2027-03 季營收是否超過 1 億美元（公司 2026-11-04 自己寫下的數）",
+        "what": "第三季 FY2027 財報"
+      },
+      {
+        "basis": "v3 memo 第 17 行催化劑：CY27 底前 PhotonLink 每季 2.5 億美元與第二次 InP 倍增；2027-12 季在 2028-02 財報揭露",
+        "date": "2028-02-11",
+        "date_confidence": "estimated",
+        "decides": "CY27 底 PhotonLink 每季是否超過 2.5 億美元、自有 InP 產能是否再倍增（公司 2026-11-04 自己寫下的數）",
+        "what": "第二季 FY2028 財報"
       }
     ],
     "check_interval_days": 90,
-    "last_checked": "2026-09-21",
-    "memo": "thesis/coherent_cpo_v2_lane_memo.md",
+    "last_checked": "2026-11-06",
+    "memo": "thesis/coherent_cpo_v3_lane_memo.md",
     "mutations": [
       {
         "at": "2026-09-19T05:44:40.354150+00:00",
@@ -85,11 +99,30 @@
         "proposal_id": "tm_19715e6780f4be9ad63dcd26be6de49c",
         "rationale": "【[636] 本機複查結論：revise，不 retire】\n\n複查觸發於 disproof_conditions[1]（「出現第二家取得 NVIDIA CPO 外部光源 design win 的供應商」），\n2026-09-19 以 [629] 判定已觸發並轉入 review_required；48h 動作的前半（把 sole_source 降級）已由 [627] 執行。\n本筆是後半：重新評估整條 thesis。\n\n【被推翻的部分——memo §1 variant 的「唯一」框架】\nNVIDIA 自家 silicon photonics partner blog 在 header『Lumentum, Sumitomo, and Coherent』之下逐字寫\n「These vendors provide ELS assembly, optical alignment, and test with the silicon photonics engine」\n（nvidia_sipho_blog_partner_roles_s5，origin_entity=NVIDIA，客戶端）；同日 NVIDIA–Lumentum 新聞稿逐字\n「The nonexclusive agreement includes an NVIDIA multibillion purchase commitment and future capacity access\nrights for advanced laser components」，投資額同為 20 億美元（nvda_lumentum_partnership_pr_2026_03_02_s1/s2）；\nCoherent 自己的 10-Q（tier-1 法定文件）也逐字寫「The non-exclusive agreement」。\n→ memo §1 的「圖中唯一有客戶端文件證實深度綁定的 CPO 雷射供應商」在「唯一」這個字上已被客戶端文件否證。\n查證：圖中 `co:coherent supplies_to co:nvidia` 目前 `sole_source=false`、`substitutability=5` 但\nresolved_confidence 僅 0.6（2026-07-18 使用者裁決時即註明「全為供應商自報」）。\n\n【新增的第二個反向壓力——品類層】\n[642] 的 Open CPX MSA Specification Rev 1.0（發證機構，非賣方，tier 1）逐字\n「Both ELM and ILM can intermate with Type-1 or Type-2 CPX sockets」，整合雷射模組 ILM 有自己的正規化產品碼；\n[643] 另實測 `tech:cpo depends_on tech:external_laser_source` 的 substitutability=5 沒有任何一段逐字在講\n可替代性，且走的是無人工閘門的 auto 路徑。兩者都還在等核准，但方向一致：\n**外部光源作為「品類」的不可替代程度被高估了。**\n\n【沒有被推翻、而且是排序真正吃的部分】\n2026-09-21 實測 `python -m query.bottleneck`：COHR 仍在 #2／#3／#5／#7。其中 #2\n`co:coherent depends_on mat:inp_substrate`（5/5、外部印證、qualified）與 #3\n`co:coherent depends_on tech:inp_6inch_fab`（5/5、外部印證、qualified）**都不是 ELS 那條邊，也不是 NVIDIA 那條邊**\n——它們是 InP 垂直整合與六吋產能的位置。memo §4 認定的主瓶頸（高功率 CW DFB 雷射＋六吋 InP 產線）沒有被本輪任何證據動到。\nNVIDIA 的 multibillion 採購承諾與 capacity rights 也仍然成立——**非獨家不等於不存在**（L11-1：措辭精度本身是一個 claim）。\n\n【所以 revise 要改什麼（核准後執行，不在本筆一併做）】\n1. §1 variant：把「唯一供應商溢價」換成「三家具名 ELS 供應商之下，InP 垂直整合的成本與產能位置＋份額」；\n   隱含報酬的兩欄拆解不得因此保留無證據的倍數折價（2026-09-09 原則）。\n2. §6：新增 ILM／Open CPX 這條品類層 counter-path，並註明它是「規格允許」不是「有人做得出來」\n   （規格對 ILM 與 ELM 的熱／功耗規範對稱，但無任何具名 ILM 客戶或出貨）。\n3. §4：把 sole_source 那段改寫為已否證，保留 substitutability=5 但標明 resolved_confidence 0.6 全為自報。\n4. disproof：[641] 已於 2026-09-21 新增一條盯 `revenue_growth[Datacenter & Communications]` 的反證\n   （連兩季分部年增率 <35%；2 倍路徑需 4 年 CAGR 54.2%），revise 時併入 memo §6／§7。\n\n【刻意不做】不 retire。retire 是終局、要復活必須重建 thesis；而本輪否證的是一個措辭與一個品類層程度判斷，\n不是需求鏈本身。也不在本筆改寫 memo 內容或 variant——那是 revise 核准後的產出，不是轉狀態的副作用（沿用 [629] 的分工）。",
         "to": "revised"
+      },
+      {
+        "at": "2026-11-06T05:22:25.189756+00:00",
+        "author": "claude-code-session-2026-11-05（[836]）",
+        "evidence_refs": [
+          "graph://edge/co:coherent/supplies_to/co:nvidia",
+          "graph://source/nvidia_sipho_blog_partner_roles",
+          "https://gloom.sh/stocks/cohr/transcripts/q1-2027",
+          "https://www.sec.gov/Archives/edgar/data/820318/000082031826000023/iivi-20260930.htm",
+          "https://www.sec.gov/Archives/edgar/data/820318/000119312526447200/d176836d8k.htm",
+          "lifecycle_mutation:tm_19715e6780f4be9ad63dcd26be6de49c",
+          "thesis/coherent_cpo_v3_lane_memo.evidence.json",
+          "thesis/coherent_cpo_v3_lane_memo.md",
+          "todo://pq2/836"
+        ],
+        "from": "revised",
+        "proposal_id": "tm_12ea4d53697f794de6f2af0acaddbd96",
+        "rationale": "【[836] 研究完成：COHR thesis v3 lane memo，提案 revised → active】\n\n依據：2026-09-21 [636] revise 決議（tm_19715e67）列的四處改寫已在 thesis/coherent_cpo_v3_lane_memo.md 完成：\n①§1 差異點拿掉「唯一供應商溢價」，改成三家具名 ELS 供應商（NVIDIA 文章點名 Lumentum、住友、Coherent）之下的自有 InP 產能位置與份額；\n②§4 sole_source 寫成已否證；Coherent→NVIDIA 的 substitutability=5 保留，但標明全為自報（resolved_confidence 0.6）；\n③§6 補 Open CPX 整合雷射模組（ILM）這條品類層的路，註明規格允許、沒有具名客戶或出貨；\n④[641] 盯營收的反證併入 §6——原條文的門檻來自多年橋，多年橋已在 Phase 0 退役，改成盯公司 2026-11-04 自己寫下的三個數（PhotonLink 2027-03 季 >1 億美元、CY27 底前每季 >2.5 億、FY2027 pro forma 營收成長 >60%）。\n\n新事實（2026-11-04 第一季 FY2027；圖外，pq1 等入圖）：8-K 投影片寫自有 InP 產能年增一倍、比承諾早一季，CY27 底前再倍增——v2 的 12 月檢核點提前回答（原承諾寫產量、這次寫產能）；\n第一季另簽約 200 億美元／五年的 PhotonLink 長約，CY2028 初開始認列；10-Q 寫 InP「industry-wide shortage」，協議 non-exclusive 不變。\n法說（gloom.sh 自動轉錄、弱）說那份長約的客戶不是 NVIDIA、CPO 用的 400mW CW 雷射本季開始有營收、基板有五家以上供應商。v2 的五條反證（ew_0102–0106）本季都判無關。\n\n為什麼轉 active、不續留 revised：revised 只允許轉 active（L7）；09-21 決議要的改寫已完成。留在 revised 等於繼續拿 v2 盯反證——v2 第 3 條（第二供應商 qualify）的同義條件 09-19 已在判斷層觸發（[629]），第 1 條（12 月檢核點）已被 11-04 的 8-K 回答，等於盯錯的東西。\n\n核准後同一個 change 會做（只寫 thesis/lifecycle.json，不寫圖）：status → active、next_check → 2027-02-12（第二季財報後）；memo 指標 v2 → v3；\ncatalyst_checkpoints 的「2026-12-01 六吋倍增」換成三個：2027-02 第二季財報（400mW CW 雷射的 CPO 營收開始）、2027-05 第三季財報（PhotonLink 2027-03 季是否破 1 億美元）、2028-02（CY27 底的再倍增與每季 2.5 億）；\n之後 `todo sync` 自動收掉 v2 的五條 watch、登記 v3 的五條。\n\n不含：入圖（11-04 的 COHR 8-K、10-Q 與 LITE 10-Q 都還在 pq1，入圖另走 ra_admission）、任何資本動作與 live、v3 memo 以外的敘事改寫。\n\nEvidence gate：manifest 通過；gate 未過只因 E16、E17 兩條可替代性值全為 Coherent 自報（刻意單列、照實標記），memo 維持 Research Note。memo 不 gate 任何東西。",
+        "to": "active"
       }
     ],
-    "next_check": "2026-12-01",
-    "note": "memo 於 2026-07-17 conflict-resolved 重生成（commit 6ec70c7）；12 月另有六吋 InP 產能倍增檢核點",
-    "status": "revised",
+    "next_check": "2027-02-12",
+    "note": "memo 於 2026-11-05 改寫為 v3（[836]，[906] 核准轉 active）；v2 的 12 月六吋 InP 倍增檢核點已由 2026-11-04 8-K 投影片提前回答（產能年增一倍、早一季，Coherent 自報）",
+    "status": "active",
     "ticker": "COHR"
   },
   "sivers": {
