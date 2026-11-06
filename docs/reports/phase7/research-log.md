@@ -432,3 +432,13 @@
 **收尾物化撞到 failure log #131**：300757 已定價答 yes、稽核區四行全缺席——寫入端收下、候選板當天判前提失效。寫入端 ⑥ 補上候選板那條的對稱面（測試 1 條、變異 4 個全紅、真實資料試送第二版只報這一條）；第三版 `ib_c8afaa3f507dbed3` 改答 unmeasurable（同 002428.SZ、300570.SZ），回到可開。
 
 **停止條件成立**：`engine_b.cli drain` 段 0–1 全零、pq1 空（段 5 到終局 77／未到終局 0；母體外 120＝非倍率 106、邊緣沒座位已查 14、等入圖 0）；`event_watch counters` fired_unconsumed 0、semantic_pending_check 0、wake_held 0、expiry_* 全 0；`audit invariants --only QueueSegments` PASS；closure-gate exit 0；⑤ 二十二格全 0（重新物化讀圖與候選板之後——收尾前那份心跳讀的是早上的板，印「讀圖該重讀 5」「前提失效 5」都是舊數）；走圖 55 筆命中、新命中 0；候選板可開 10／缺 X 32／不要 47／已持有 2／無敘事 106。**本段候選狀態移動 6**：前提失效 → 可開 5（002428.SZ、AXTI：押的 InP 基板讀圖換版後換騎；3081.TWO、4979.TWO、SILEX.ST：名下醒來的反證 watch 判完不觸及）、無敘事 → 可開 1（300757.SZ）；**鑄 ra_admission 1**（[907]）。非零但不是待做：停滯 3、到期 3；追源需處置 1＝ew_0092（AMD Helios CPO 推文，2027-01-15 到期兜底）。新鑄 pq2：[906]、[907]。距上次掃題材 9 天（門檻 7），本輪不掃。
+
+## 十九、2026-11-06（使用者「可以push 906 907 go」）
+
+**push 與 [905]**：本機領先的 11 筆 push（`caf47864..6e659610`）；[905] 發布 `a87c52ec`、`complete-ra 905` 結案。
+
+**[906]**：`complete-thesis-mutation 906`——COHR thesis（coherent_cpo）revised → active、下次核查 2027-02-12。提案理由寫明的 memo 指標 v2 → v3、檢核點換成三個（2027-02 第二季、2027-05 第三季、2028-02 財報），`apply_proposal` 不支援，照核准內容手補（failure log #132，修法要你點頭）；`todo sync` 反證對帳收掉 v2 的 ew_0102–0106、登記 v3 的 ew_2191–2195，`audit invariants --only Orphans` PASS（`99e1ebde`）。
+
+**[907]**：經 `scripts/apply_ra_admission.py` 入圖（環宇 develops CW DFB 雷射層）、發布 `cfb21bdf`、`complete-ra 907` 結案。下游：CW DFB 讀圖換版 `sr_66fd90d4e2384bd9`——判讀 volume 不變（開發者 1 → 2、供給側 13 家不變；環宇只寫研發與「規劃」後段產線，反證①要的量、產能或開出時點沒寫，未觸發）；七檔只換連結（COHR、SIVE.ST、2455.TW、3234.TWO、688313.SS、3081.TWO、4979.TWO），4979.TWO 同版處置三條被 11-05 可轉債注意交易公告叫醒的 watch（ew_2098／2099／2100，still_holds）；故事照抄改指新版；3081.TWO、4979.TWO 由前提失效回到可開。4991.TWO 不換騎：它在這一層只在開發者角度、不在供給側，寫入端也不讓押。
+
+**沒做**：當天 daily 帶進來的待深挖 lead 49、未檢 44、叫醒擋下待確認 23、watch 醒來的敘事 9 檔（含 002428.SZ、SILEX.ST 的前提失效）、T2 命中 1、邊緣卻沒敘事 2（5801.T、INIO）——daily 判「只剩維護」，留給下一段 drain。候選板可開 8／缺 X 32／不要 47／已持有 2／無敘事 106；故事缺 0。
