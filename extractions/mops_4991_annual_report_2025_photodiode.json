@@ -24,6 +24,21 @@
       ],
       "statement": "GCS Holdings annual report 2025 (shareholder letter): it develops high-speed optical-communication products including 200G PD and related transmitter components to meet data-center customers' demand for 100G to 1.6T and faster optical transceiver modules — photodiodes are a receive-side component of pluggable optical transceivers. Supplier statement of the application; no transceiver maker is named.",
       "subject_id": "e2"
+    },
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "speculative",
+      "disproof_condition": "條件：到 2027-06-30 為止，環宇的季報、法說簡報或 2026 年報仍只寫 CW Laser「研發／開發」，沒有寫出貨、營收或客戶驗證，或不再列 70／100mW 連續波雷射產品。核查頻率：每季（環宇法說簡報與季報，MOPS；2026 年報約 2027-05）。觸發後 48 小時：重跑 python -m query.structure tech:cw_dfb_laser，e3 降 confidence 或退役，並在 CW DFB 層讀圖與 4991.TWO 敘事註記。",
+      "id": "mops_4991_annual_report_2025_photodiode_cl3",
+      "source_ids": [
+        "mops_4991_annual_report_2025_photodiode_s9",
+        "mops_4991_annual_report_2025_photodiode_s5",
+        "mops_4991_annual_report_2025_photodiode_s6",
+        "mops_4991_annual_report_2025_photodiode_s7",
+        "mops_4991_annual_report_2025_photodiode_s8"
+      ],
+      "statement": "GCS Holdings' own 2025 annual report says it 'invested in CW Laser R&D' and is 'starting to develop other components such as CW Laser', lists 70mW and 100mW continuous-wave lasers among its own-brand optoelectronic products as light sources suited to silicon-photonics transceivers, set up an Asia operations center through a wholly owned subsidiary and plans a back-end line in Hsinchu Science Park; in April 2026 it subscribed to a capital increase of 威力富 (a III-V specialty foundry; 60.05%) to expand capacity. Written first-hand stops at R&D/development: no shipment, revenue or named customer for CW lasers. A media relay of its earnings call (MoneyDJ 2026-03-05) says 70mW passed customer validation and began shipping — tier 2, not used for any attribute (L8, L11-3).",
+      "subject_id": "e3"
     }
   ],
   "edges": [
@@ -50,6 +65,20 @@
         "mops_4991_annual_report_2025_photodiode_s1"
       ],
       "src_id": "tech:pluggable_transceiver"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.6,
+      "dst_id": "tech:cw_dfb_laser",
+      "id": "e3",
+      "relation": "develops",
+      "source_ids": [
+        "mops_4991_annual_report_2025_photodiode_s9",
+        "mops_4991_annual_report_2025_photodiode_s5",
+        "mops_4991_annual_report_2025_photodiode_s6",
+        "mops_4991_annual_report_2025_photodiode_s7"
+      ],
+      "src_id": "co:gcs_holdings"
     }
   ],
   "nodes": [
@@ -61,7 +90,9 @@
         "GCS Holdings",
         "Global Communication Semiconductors"
       ],
-      "attributes": {},
+      "attributes": {
+        "ticker": "4991.TWO"
+      },
       "confidence": 0.9,
       "id": "co:gcs_holdings",
       "name": "GCS Holdings（環宇-KY）",
@@ -70,7 +101,9 @@
         "mops_4991_annual_report_2025_photodiode_s1",
         "mops_4991_annual_report_2025_photodiode_s2",
         "mops_4991_annual_report_2025_photodiode_s3",
-        "mops_4991_annual_report_2025_photodiode_s4"
+        "mops_4991_annual_report_2025_photodiode_s4",
+        "mops_4991_annual_report_2025_photodiode_s5",
+        "mops_4991_annual_report_2025_photodiode_s9"
       ],
       "type": "Company"
     },
@@ -104,13 +137,39 @@
         "pluggable optical interconnects",
         "optical pluggables"
       ],
-      "attributes": {},
+      "attributes": {
+        "ramp_difficulty_intrinsic": 3
+      },
       "confidence": 0.9,
       "id": "tech:pluggable_transceiver",
       "name": "Pluggable optical transceiver",
       "role": null,
       "source_ids": [
         "mops_4991_annual_report_2025_photodiode_s1"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "CW laser",
+        "internal laser diode",
+        "high-power CW laser",
+        "CW DFB",
+        "CW DFB laser",
+        "DFB laser",
+        "high-power DFB laser"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 4
+      },
+      "confidence": 0.9,
+      "id": "tech:cw_dfb_laser",
+      "name": "High-power CW DFB laser",
+      "role": null,
+      "source_ids": [
+        "mops_4991_annual_report_2025_photodiode_s6",
+        "mops_4991_annual_report_2025_photodiode_s7"
       ],
       "type": "TechNode"
     }
@@ -123,11 +182,11 @@
     "permission_basis": "公開資訊觀測站公開年報；只保留研究必要的有限逐字節錄。published_at 取 MOPS 上傳時間（115/05/19）。",
     "published_at": "2026-05-19",
     "publisher": "公開資訊觀測站（股東會年報）",
-    "retrieved_at": "2026-10-19",
+    "retrieved_at": "2026-11-05",
     "source_type": "filing",
     "storage_permission": "repo_excerpt",
-    "supersedes_extraction_sha256": "f6a8510f73cf3ecb2965a8db5aa396bdd38488be1cafa62783327623ac2330f3",
-    "title": "環宇-KY（GCS Holdings）2025 年報：200G PD 供資料中心 100G–1.6T 光收發模組、自述「光探測器PD產品在2025年度已有極高的市佔率表現」；自有品牌光電元件營收年增約 44%；第一大客戶占 66.19%",
+    "supersedes_extraction_sha256": "abd7a2cdedae3c30a6fa46991af9693f0c2eb9a64d878124167f096471da364f",
+    "title": "環宇-KY（GCS Holdings）2025 年報：200G PD 供資料中心 100G–1.6T 光收發模組、自述「光探測器PD產品在2025年度已有極高的市佔率表現」；自有品牌光電元件營收年增約 44%；第一大客戶占 66.19%；投入 CW 雷射研發（產品清單列 70／100mW 連續波雷射，給矽光子模組）、2026-04 增資威力富（III-V 代工）擴產",
     "url": "https://doc.twse.com.tw/server-java/t57sb01?step=9&kind=F&co_id=4991&filename=2025_4991_20260603F04.pdf"
   },
   "sources": [
@@ -150,6 +209,31 @@
       "id": "mops_4991_annual_report_2025_photodiode_s4",
       "locator": "風險管理——銷貨集中",
       "quote": "本公司主要代工客戶多為全球一流IDM大廠或無晶圓廠設 計公司，而自有品牌光電元件產品之主要客戶則多為具規模之 下游封裝廠或模組廠商。2025及2024年度對第一大客戶之銷貨 淨額佔公司總銷貨淨額之比率分別為66.19%及57.88%。"
+    },
+    {
+      "id": "mops_4991_annual_report_2025_photodiode_s5",
+      "locator": "壹、致股東報告書（年報頁碼 4）",
+      "quote": "另外，本公司並投入CW Laser (連續波雷射元件)產品相關研發， 2025年由本公司100%持 有之子公司環翔科技股份有限公司設立亞洲營運中心，並規劃於新竹科學園區設置後段產 線。"
+    },
+    {
+      "id": "mops_4991_annual_report_2025_photodiode_s6",
+      "locator": "營運概況——主要產品：(3)自有品牌光電元件產品(AOC)（年報頁碼 75）",
+      "quote": "- 70mW及100mW連續波雷射(Continuous Wave Lasers): 由於AI 及數據中心高速傳輸需求持續及規格升級，傳統光收發模組在 資料傳輸上耗用功率較多，故發展矽光子模組(CPO)進行相關 整合。而矽光子（SiPh）製程中可將雷射光調變與分波等功能 進行整合，雷射元件以提供光源為主，而CW 雷射元件具備低 雜訊、高穩定度、高功率、長時間運作、相較於EML具備更 高性價比等特性，適合搭配矽光子模組短距離傳輸之光收發模 組產品所需。"
+    },
+    {
+      "id": "mops_4991_annual_report_2025_photodiode_s7",
+      "locator": "營運概況——發展遠景之有利因素 c.光通訊產品技術累積及完整性（年報頁碼 97）",
+      "quote": "本公司正在研發更高傳輸速度 (400G/Lane ) 的光探 測器，並著手開發其他元件如CW Laser，將可提供完整的光通訊元 件晶片組 (Complete Optical Chipset)。"
+    },
+    {
+      "id": "mops_4991_annual_report_2025_photodiode_s8",
+      "locator": "貳、公司簡介——一、設立日期及集團簡介（年報頁碼 6）",
+      "quote": "另本公司為擴充產能，於2026年4月完成對威力富科技股份有限公司之現金增 資股份認購，持股比例為60.05%，威力富科技股份有限公司係三五族化合物半導 體專業代工廠。"
+    },
+    {
+      "id": "mops_4991_annual_report_2025_photodiode_s9",
+      "locator": "封面",
+      "quote": "英屬蓋曼群島商環宇通訊半導體控股股份有限公司"
     }
   ]
 }
