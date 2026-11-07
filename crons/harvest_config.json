@@ -72,8 +72,10 @@
   ],
   "edgar_watch": {
     "note": "只記 filing metadata（form/日期/URL），不下載全文。8-K/10-K/10-Q/Form 4 高優先；S-8 等註冊雜訊交 triage 判。下載＋抽取仍由使用者點名 research 動詞觸發。⚠ forms 是 exact match（fetchers/edgar.py get_filings），不做 prefix 比對：把 ticker 加進 watch 但該事件的 form 不在下方清單，watcher 看起來在跑卻永遠看不到它——CCXI 就是這樣，加進 watch 是為了 [74]/[114] 等的 S-4，但 S-4 原本不在清單。S-4/S-4A 為 SPAC 併購財務揭露本體（8-K/425 只是宣布遞交，不含財務）。2026-08-15：同一個坑第二次發生，這次是**外國發行人的 form 家族**。TSEM 早就在 tickers 裡，但 Tower 是以色列發行人、近期申報為 6-K ×727／20-F ×19、零筆 8-K／10-K／10-Q，於是 watcher 每天照跑卻永遠命中 0 筆——連 Tower／IQE 的 InP epiwafer 協議都沒看到（當時是靠 yahoo:iqe-l feed 撿到的）。POET（加拿大發行人）同型：6-K ×383／20-F ×11。已補 6-K 與 20-F。**加 ticker 前先查該公司實際申報的 form 家族**（data.sec.gov/submissions/CIK<10碼>.json 的 filings.recent.form 分布），不要假設美股 form 集合適用。",
-    "_derive_note": "derive_from_tracked=true 時，實際監看清單為下方手動清單 ∪ tracked universe（thesis lifecycle＋未結案 cohort＋themes.txt 核心公司）中的美股。手動清單是**下限不是全集**：derivation 的上游任一暫時讀不到都會讓 tracked 縮小，若採取代語意就會靜默停止監看既有標的，而漏掉的 filing 沒人會發現。derivation 只補「已追蹤卻沒 watcher」這一側的漂移——CCXI 與 META 就是這樣漏掉的（§10.11）。外國發行人（IQE.L／SIVE.ST）由 us_edgar_candidates 依交易所後綴與非 USD 報價幣別排除，EDGAR 沒有它們的申報；改由 feeds 監看。",
+    "_derive_note": "derive_from_tracked=true 時，實際監看清單為下方手動清單 ∪ tracked universe（thesis lifecycle＋未結案 cohort＋themes.txt 核心公司）中的美股。手動清單是**下限不是全集**：derivation 的上游任一暫時讀不到都會讓 tracked 縮小，若採取代語意就會靜默停止監看既有標的，而漏掉的 filing 沒人會發現。derivation 只補「已追蹤卻沒 watcher」這一側的漂移——CCXI 與 META 就是這樣漏掉的（§10.11）。外國發行人（IQE.L／SIVE.ST）由 us_edgar_candidates 依交易所後綴與非 USD 報價幣別排除，EDGAR 沒有它們的申報；改由 feeds 監看。2026-11-07（Phase 7 failure log #133）再加兩個推導來源，同一個併入語意、各自 fail-safe（routine_config.edgar_watch_scope；harvest 與語意等待的一手涵蓋面 primary_coverage 共用這一個定義）：derive_from_narratives＝現行 v2 敘事的美股（研究物件 09-22 由 thesis 換成敘事，tracked 沒跟上——MXL、PSIX、POWI 的第三季 10-Q 申報了沒人讀，敘事寫的反證叫不醒）；derive_from_waits＝還在盯的語意等待所等的美股（讀圖、層筆記的反證多半等客戶的申報：Corning、Bloom Energy、Dover…）。兩者都只進 EDGAR 監看、不進 pq1 的 tracked（那裡是排序加權）。同日補 40-F（加拿大發行人的年報；Enerflex 申報 6-K／40-F）。冷啟動（新進監看的公司第一次抓）照舊登記最近 lookback_count 份、照常進分類——不另設回補規則：過去 167 筆冷啟動回補裡 7 筆後來入圖（AXT 的 8-K 叢集、POET 的 6-K、AAOI 擴產），整批 no_go 會丟掉這種；語意等待本來就不吃 watch 建立前發布的文件。",
     "derive_from_tracked": true,
+    "derive_from_narratives": true,
+    "derive_from_waits": true,
     "tickers": [
       "AAOI",
       "AMAT",
@@ -96,7 +98,8 @@
       "S-4",
       "S-4/A",
       "6-K",
-      "20-F"
+      "20-F",
+      "40-F"
     ],
     "_auto_no_go_note": "auto_no_go_forms：harvest 註冊後立刻 triage 成 triaged_no_go，不進 pending、不吃 pq1 drain 預算。**不是把它從 forms 移除**——移除會連「大額裁量性內部人賣出」的脈絡一起丟（2026-09-11 實測 AAOI officer 賣 32,172 股、未勾 10b5-1，那是候選標的的決策脈絡）。留著 lead 記錄可 grep、可用 `engine_b.cli requeue-campaign` 明確叫回。⚠ 這裡的值必須是 forms 的子集，load_config 會擋——列一個不在 forms 裡的 form，規則看起來生效、實際是死設定。",
     "auto_no_go_forms": [

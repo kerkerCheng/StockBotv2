@@ -123,6 +123,16 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 `StockBotv2-Daily` 的 ⑱⑲ 取代（1.2a 停用、2026-09-25 1.2b 刪除）；它們的理由（LLM 失敗心跳照發、永遠 exit 0、Python 不用 `.cmd`、
 發送走 subprocess）搬進 `crons/daily_task.py` 的 docstring，守它們的測試改主詞搬進 `tests/test_daily_task.py`「無人值守入口」節。
 
+### Sandbox impact review 結論（2026-11-07：EDGAR 監看多兩個推導來源——現行敘事的美股、還在盯的等待所等的美股；Phase 7 failure log #133）
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | daily ① `crons/harvest_leads.py`（argv 不變）：監看清單由 24 → 73 檔（11-07 量：敘事推導 +27、等待推導 +22），多出的請求全在原本就連的兩台主機——每檔每天一次 `data.sec.gov` submissions，新登記的 Form 4 各一次 `www.sec.gov` 原始 XML（同 11-03 那一節；限速 `rate_sleep` 不變）。多讀兩份本機檔、都只讀：`library/private/alpha/briefs/*.jsonl`（現行敘事，經 `alpha.providers.stories.current_v2_briefs`）與 `library/leads/event_watches.json`（daily 其他步驟本來就讀寫它）。寫入面不變：只寫 lead store 與 harvest log。量：多出的非持股申報平常每天約 2.4 則進分類（上限 90 不 binding）、Form 4 約 7 則（自動 no_go）；冷啟動第一天每檔最多 `lookback_count` 份（11-07 估非持股 187 份），照常進分類、幾天內消化（同 10-07 X 回補 109 則的先例），其中發布日不早於等待建立日的會叫醒約 74 條語意等待——那是之前漏讀的第三季申報 |
+| **2 canonical skill／prompt／本檔** | 本節；`crons/harvest_config.json` 的 `_derive_note` 與兩個開關；失敗表 #133 那一列。prompt 不動 |
+| **3 最窄 rule** | daily argv 不變；不新增 step、allowlist、rule；APP 不動；`.codex/rules` 仍 0 條 |
+| **4 contract test** | `tests/test_daily_routine_config.py`：兩個推導各自一個開關、外國發行人照舊排除；三個來源各自降級（一份讀不到其餘照常、回報少了哪份）；等待推導只數語意、active／fired、名冊查得到的實體；`primary_coverage` 與 harvest 同一個定義。`tests/test_engine_b_leads.py`：三個開關必須是 boolean；少一份推導時 harvest 照抓其餘、stderr 說得出少了哪份。變異 7 個全紅 |
+| **5 端到端 smoke** | 11-07 真資料（唯讀）：正式設定下清單 73 檔、三份推導都讀得到；73 檔全在 SEC 現行代號表（不會走 `get_cik` 的寬鬆備援，#135）；等待 registry 的 `semantic_unreachable` 191 → 106、反證全部叫不醒的現行敘事 46 → 23（剩下的 23 份逐份核過，敘事的公司全在非 EDGAR 市場：陸 9、歐 6（瑞士、英、德、法）、加 TSX 4、印 3、日 1）。harvest 本身的抓取迴圈沒改，真跑留給 11-08 的 daily：查 harvest log 有 `edgar:MXL` 等新來源的 ok |
+
 ### Sandbox impact review 結論（2026-11-04：第 17 條與第 18＋16 條的 R2 條件修正——看了沒買記板上那一版、等到條件有到期、「你的決定」只數可開；退役字照當時的字印、可開天數從讀成可開起算、深挖清單「查過」要指得回）
 
 | 步 | 結論 |

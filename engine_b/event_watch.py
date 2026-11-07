@@ -1492,11 +1492,8 @@ def primary_coverage() -> frozenset[str]:
     tickers: set[str] = set()
     watch = config.get("edgar_watch") or {}
     if watch:
-        try:
-            tracked = routine_config.discover_tracked_tickers(routine_config.load_config())
-        except Exception:  # noqa: BLE001 — derivation 失敗只縮小涵蓋面（手動清單仍是下限）
-            tracked = frozenset()
-        tickers |= set(routine_config.edgar_watch_tickers(watch, tracked=tracked))
+        # 與 harvest 同一個定義（推導讀不到只縮小涵蓋面，手動清單仍是下限）；2026-11-07 起含現行敘事的美股（#133）
+        tickers |= set(routine_config.edgar_watch_scope(watch)[0])
     mops = config.get("mops_watch") or {}
     if mops:
         taiwan = frozenset(t for company in registry.companies

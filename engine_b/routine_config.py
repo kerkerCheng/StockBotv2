@@ -313,6 +313,8 @@ def edgar_watch_tickers(
     watch: Mapping[str, Any],
     *,
     tracked: frozenset[str] = frozenset(),
+    narratives: frozenset[str] = frozenset(),
+    waits: frozenset[str] = frozenset(),
 ) -> list[str]:
     """EDGAR watch 的實際監看清單。
 
@@ -321,11 +323,71 @@ def edgar_watch_tickers(
     themes.txt）任何一個暫時讀不到都會讓 tracked 縮小，若採取代語意就會靜默停止監看
     既有標的——而漏掉的 filing 不會有人發現。手動清單因此是**下限**，derivation 只補
     「已追蹤卻沒 watcher」這一側的漂移（CCXI 與 META 就是這樣漏掉的，見 §10.11）。
+
+    `derive_from_narratives`（2026-11-07，Phase 7 failure log #133）：現行 v2 敘事的美股也併入——研究物件 09-22 由
+    thesis 換成敘事，tracked 沒跟上，敘事寫的反證因此叫不醒（MXL、PSIX、POWI 的第三季 10-Q 申報了沒人讀）。
+    **只進 EDGAR 監看，不進 tracked**：tracked 同時是 pq1 的排序加權，敘事的公司不因此往前排。
+    `derive_from_waits`（同日，L17 對稱面）：還在盯的語意等待在等誰的申報——讀圖、層筆記的反證多半等的是客戶
+    （Corning、Bloom Energy、Dover…），那幾家沒有敘事，只補敘事就只修了發現它的那一例。
     """
     manual = {str(t).strip().upper() for t in (watch.get("tickers") or []) if str(t).strip()}
-    if not watch.get("derive_from_tracked"):
-        return sorted(manual)
-    return sorted(manual | us_edgar_candidates(tracked))
+    derived: set[str] = set()
+    if watch.get("derive_from_tracked"):
+        derived |= us_edgar_candidates(tracked)
+    if watch.get("derive_from_narratives"):
+        derived |= us_edgar_candidates(narratives)
+    if watch.get("derive_from_waits"):
+        derived |= us_edgar_candidates(waits)
+    return sorted(manual | derived)
+
+
+def narrative_tickers() -> frozenset[str]:
+    """現行 v2 敘事的研究代號——「現行那一版」與個股頁同一個選法（`current_v2_briefs`；L16）。"""
+    from alpha.providers.stories import current_v2_briefs
+
+    return frozenset(
+        ticker for brief in current_v2_briefs()
+        if (ticker := str(getattr(brief, "ticker", "") or "").strip().upper())
+    )
+
+
+def waiting_tickers() -> frozenset[str]:
+    """還在盯（active／fired）的語意等待，實體在名冊上的研究代號——與 `semantic_unreachable` 數的是同一群 watch。
+    實體查不到名冊就不算（INV-1：不憑名字猜）。"""
+    from engine_b import event_watch as ew
+    from identity.registry import get_registry
+
+    registry = get_registry()
+    out: set[str] = set()
+    for watch in ew.load_watches()["watches"]:
+        if watch.get("kind") != ew.SEMANTIC_KIND or watch.get("status") not in ("active", "fired"):
+            continue
+        for entity in watch.get("entities") or ():
+            company = registry.company(str(entity))
+            if ticker := str(getattr(company, "research_ticker", "") or "").strip().upper():
+                out.add(ticker)
+    return frozenset(out)
+
+
+def edgar_watch_scope(watch: Mapping[str, Any]) -> tuple[list[str], list[str]]:
+    """EDGAR 監看的實際清單＋沒讀到的推導來源——harvest 與 `event_watch.primary_coverage` 共用（L16：監看範圍
+    只有一個定義；兩邊各算一次時，叫不叫得醒的計數會和真的有沒有抓脫鉤）。
+
+    三個推導來源**各自** fail-safe：一個讀不到只少它那一份，不讓其他來源或手動清單跟著縮小；沒讀到的寫進第二個回傳值，
+    由呼叫端說出來（INV-3）。"""
+    failures: list[str] = []
+    derived: dict[str, frozenset[str]] = {}
+    sources = (("derive_from_tracked", "tracked", lambda: discover_tracked_tickers(load_config())),
+               ("derive_from_narratives", "narratives", narrative_tickers),
+               ("derive_from_waits", "waits", waiting_tickers))
+    for flag, name, derive in sources:
+        if not watch.get(flag):
+            continue
+        try:
+            derived[name] = frozenset(derive())
+        except Exception as exc:  # noqa: BLE001 — 上游讀不到只少這一份
+            failures.append(f"{flag}：{type(exc).__name__}: {exc}")
+    return edgar_watch_tickers(watch, **derived), failures
 
 
 def mops_watch_tickers(

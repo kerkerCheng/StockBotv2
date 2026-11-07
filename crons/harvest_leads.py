@@ -85,6 +85,10 @@ def load_config(path: Path | str = DEFAULT_CONFIG_PATH) -> dict:
         orphan = sorted(set(auto_no_go) - set(watch.get("forms") or []))
         if orphan:
             raise ValueError(f"edgar_watch.auto_no_go_forms 不在 forms 裡：{orphan}")
+        # 推導開關是行為開關：寫成字串 "false" 也會被讀成開（L16-3）
+        for key in ("derive_from_tracked", "derive_from_narratives", "derive_from_waits"):
+            if key in watch and not isinstance(watch[key], bool):
+                raise ValueError(f"edgar_watch.{key} 必須是 boolean")
     mops = data.get("mops_watch") or {}
     if mops:
         if not isinstance(mops.get("tickers"), list):
@@ -687,20 +691,18 @@ def refresh_x_lead(config: dict, store: dict, lead_id: str) -> dict:
 
 
 def _edgar_watch_tickers(watch: dict) -> list[str]:
-    """手動清單 ∪ tracked universe 中的美股（見 routine_config.edgar_watch_tickers）。
+    """手動清單 ∪ tracked universe 的美股 ∪ 現行敘事的美股（見 routine_config.edgar_watch_scope）。
 
-    derivation 的上游讀不到時 fail-safe 回手動清單：少監看幾檔新標的可以事後補，
-    靜默停止監看既有標的則不會有人發現。
+    derivation 的上游讀不到時 fail-safe：各來源各自降級（沒讀到的那一份印出來），全壞時回手動清單——
+    少監看幾檔新標的可以事後補，靜默停止監看既有標的則不會有人發現。
     """
     try:
-        from engine_b.routine_config import (
-            discover_tracked_tickers,
-            edgar_watch_tickers,
-            load_config,
-        )
+        from engine_b.routine_config import edgar_watch_scope
 
-        tracked = discover_tracked_tickers(load_config()) if watch.get("derive_from_tracked") else frozenset()
-        return edgar_watch_tickers(watch, tracked=tracked)
+        tickers, failures = edgar_watch_scope(watch)
+        for failure in failures:
+            print(f"[harvest] edgar watch 少了一份推導（其餘照常）: {failure}", file=sys.stderr)
+        return tickers
     except Exception as exc:  # noqa: BLE001 derivation 失敗不得讓既有監看歸零
         print(f"[harvest] edgar watch derivation failed, 退回手動清單: {exc}", file=sys.stderr)
         return sorted({str(t).strip().upper() for t in (watch.get("tickers") or []) if str(t).strip()})

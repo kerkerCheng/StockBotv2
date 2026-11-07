@@ -446,6 +446,31 @@ def test_auto_no_go_forms_must_be_a_subset_of_harvested_forms(tmp_path: Path) ->
         harvest_leads.load_config(bad)
 
 
+def test_edgar_watch_derive_flags_must_be_boolean(tmp_path: Path) -> None:
+    """推導開關是行為開關：字串 "false" 在 Python 裡是真值，寫錯會靜默打開（L16-3；#133 2026-11-07）。"""
+    for key in ("derive_from_tracked", "derive_from_narratives", "derive_from_waits"):
+        bad = tmp_path / f"{key}.json"
+        bad.write_text(json.dumps({"feeds": [], "edgar_watch": {"tickers": [], "forms": ["8-K"], key: "false"}}),
+                       encoding="utf-8")
+        with pytest.raises(ValueError, match=key):
+            harvest_leads.load_config(bad)
+
+
+def test_harvest_says_which_edgar_derivation_it_could_not_read(monkeypatch, capsys) -> None:
+    """一個推導來源讀不到：其餘照抓，而且 stderr 說得出少了哪一份（INV-3；#133）。"""
+    from engine_b import routine_config
+
+    def boom():
+        raise OSError("敘事帳本讀不到")
+
+    monkeypatch.setattr(routine_config, "narrative_tickers", boom)
+    monkeypatch.setattr(routine_config, "waiting_tickers", lambda: frozenset({"GLW"}))
+    got = harvest_leads._edgar_watch_tickers(
+        {"tickers": ["AMAT"], "derive_from_narratives": True, "derive_from_waits": True})
+    assert got == ["AMAT", "GLW"]
+    assert "derive_from_narratives" in capsys.readouterr().err
+
+
 # --- config fail closed ---------------------------------------------------
 
 def test_load_config_fail_closed_on_missing_fields(tmp_path: Path) -> None:
