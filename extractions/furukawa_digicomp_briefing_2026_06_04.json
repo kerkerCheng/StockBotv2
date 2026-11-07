@@ -1,0 +1,203 @@
+{
+  "claims": [
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：古河的決算簡報、質疑應答錄或年報寫出 HVLP／高周波回路箔的需要減速、降價、稼動率下滑或高付加價值品比率回落，或銅箔事業的上修被撤回。核查頻率：每季（古河決算簡報與質疑應答錄）。觸發後 48 小時：e1 的 claim 降信心，重讀 HVLP 銅箔層（mat:hvlp_copper_foil）的供給側。",
+      "id": "furukawa_digicomp_briefing_2026_06_04_cl1",
+      "source_ids": [
+        "furukawa_digicomp_briefing_2026_06_04_s1",
+        "furukawa_digicomp_briefing_2026_06_04_s2",
+        "furukawa_digicomp_briefing_2026_06_04_s3"
+      ],
+      "statement": "Furukawa Electric's 2026-06-04 information-components business briefing says its copper foil business has shifted its product portfolio toward AI servers, that HVLP copper foil sales have grown since fiscal 2023 on AI server demand, and that it is meeting expected high demand for HVLP4-class foil with its F0X-WS foil to support AI server boards worldwide. These are the company's own statements; the deck names no customers and gives no HVLP volumes or market share.",
+      "subject_id": "e1"
+    },
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：古河的決算或事業說明會寫出 DC 內 DFB 需要減速、降價、DFB 增產效果下修，或岩手前工程新廠（2028 年 4 月量產）延後或縮減。核查頻率：每季（古河決算簡報與質疑應答錄）。觸發後 48 小時：e2 的 claim 降信心，重讀 CW DFB 雷射層（tech:cw_dfb_laser）的供給側。",
+      "id": "furukawa_digicomp_briefing_2026_06_04_cl2",
+      "source_ids": [
+        "furukawa_digicomp_briefing_2026_06_04_s4",
+        "furukawa_digicomp_briefing_2026_06_04_s5",
+        "furukawa_digicomp_briefing_2026_06_04_s6",
+        "furukawa_digicomp_briefing_2026_06_04_s7",
+        "furukawa_digicomp_briefing_2026_06_04_s8",
+        "furukawa_digicomp_briefing_2026_06_04_s9",
+        "furukawa_digicomp_briefing_2026_06_04_s10"
+      ],
+      "statement": "The same briefing lists DFB laser chips and external light sources (ELS) among Furukawa's intra-data-center products, citing rising light-source demand from 400G/800G, says it is developing and expanding sales of high-power DFB/ELS for 800G/1.6T with expanding adoption in next-generation CPO architectures, says intra-data-center DFB laser chip demand is expanding, and states that demand for high-power DFB laser chips as external light sources is expanding rapidly. It lays out a ¥38 billion capacity investment announced in December 2025, including a new front-end wafer fab at Iwate with mass production scheduled for April 2028, targeting a tenfold profit increase by fiscal 2030 versus fiscal 2025. The deck names no customers and gives no DFB volumes or share.",
+      "subject_id": "e2"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "mat:hvlp_copper_foil",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "furukawa_digicomp_briefing_2026_06_04_s1",
+        "furukawa_digicomp_briefing_2026_06_04_s2",
+        "furukawa_digicomp_briefing_2026_06_04_s3"
+      ],
+      "src_id": "co:furukawa_electric"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:cw_dfb_laser",
+      "id": "e2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "furukawa_digicomp_briefing_2026_06_04_s4",
+        "furukawa_digicomp_briefing_2026_06_04_s5",
+        "furukawa_digicomp_briefing_2026_06_04_s6",
+        "furukawa_digicomp_briefing_2026_06_04_s7"
+      ],
+      "src_id": "co:furukawa_electric"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "古河電工",
+        "古河電気工業",
+        "Furukawa Electric"
+      ],
+      "attributes": {
+        "ticker": "5801.T"
+      },
+      "confidence": 0.9,
+      "id": "co:furukawa_electric",
+      "name": "Furukawa Electric Co., Ltd.",
+      "role": null,
+      "source_ids": [
+        "furukawa_digicomp_briefing_2026_06_04_s1",
+        "furukawa_digicomp_briefing_2026_06_04_s2",
+        "furukawa_digicomp_briefing_2026_06_04_s3",
+        "furukawa_digicomp_briefing_2026_06_04_s4",
+        "furukawa_digicomp_briefing_2026_06_04_s5",
+        "furukawa_digicomp_briefing_2026_06_04_s6",
+        "furukawa_digicomp_briefing_2026_06_04_s7"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "HVLP",
+        "HVLP copper foil",
+        "HVLP4",
+        "HVLP 銅箔",
+        "超低轮廓铜箔"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "mat:hvlp_copper_foil",
+      "name": "HVLP copper foil (hyper-very-low-profile electrodeposited copper foil)",
+      "role": null,
+      "source_ids": [
+        "furukawa_digicomp_briefing_2026_06_04_s1",
+        "furukawa_digicomp_briefing_2026_06_04_s2",
+        "furukawa_digicomp_briefing_2026_06_04_s3"
+      ],
+      "type": "Material"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "CW laser",
+        "internal laser diode",
+        "high-power CW laser",
+        "CW DFB",
+        "CW DFB laser",
+        "DFB laser",
+        "high-power DFB laser"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 4
+      },
+      "confidence": 0.9,
+      "id": "tech:cw_dfb_laser",
+      "name": "High-power CW DFB laser",
+      "role": null,
+      "source_ids": [
+        "furukawa_digicomp_briefing_2026_06_04_s4",
+        "furukawa_digicomp_briefing_2026_06_04_s5",
+        "furukawa_digicomp_briefing_2026_06_04_s6",
+        "furukawa_digicomp_briefing_2026_06_04_s7"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "furukawa_digicomp_briefing_2026_06_04",
+    "evidence_tier": 2,
+    "origin_entity": "Furukawa Electric Co., Ltd.",
+    "permission_basis": "發行人 IR 網站公開下載的事業說明會簡報；資料聲明著作權歸古河、禁止無斷複製，只保留研究所需的有限逐字引文與原始 URL。published_at 取 2026-06-26：說明會是 06-04，但我們讀的這版 PDF 建立日與伺服器 Last-Modified 都是 06-26，取保守的那一天。",
+    "published_at": "2026-06-26",
+    "publisher": "Furukawa Electric Co., Ltd.",
+    "retrieved_at": "2026-11-06",
+    "source_type": "ir_deck",
+    "storage_permission": "repo_excerpt",
+    "title": "Furukawa Electric — 事業説明会（情報コンポーネント領域）2026-06-04：銅箔事業（HVLP 銅箔、AI サーバ向け）與ファイテル製品事業（DC 內 DFB レーザチップ、ELS、岩手前工程新廠）",
+    "url": "https://www.furukawaelectric.com/ir/library/briefing/pdf/2026/20260604_digicomp.pdf"
+  },
+  "sources": [
+    {
+      "id": "furukawa_digicomp_briefing_2026_06_04_s1",
+      "locator": "p.22「銅箔：事業展開」標題句",
+      "quote": "市場変化に合わせ、製品PF転換によりAIサーバ向けに注力、高付加価値品の増で事業成長を実現"
+    },
+    {
+      "id": "furukawa_digicomp_briefing_2026_06_04_s2",
+      "locator": "p.23「銅箔：売上高の推移」標題句",
+      "quote": "2023年以降のAIサーバ需要増によりHVLP銅箔が伸長、高付加価値品売上高比率増による利益増"
+    },
+    {
+      "id": "furukawa_digicomp_briefing_2026_06_04_s3",
+      "locator": "p.23 HVLP 銅箔欄的說明",
+      "quote": "生成AIの伸長により、23年度以降需要が急拡大。高需要を見込むHVLP4クラスの銅箔に対し当社のF0X-WS箔を軸にこの需要に応え、世界のAIサーバ基板を支え、成長を実現"
+    },
+    {
+      "id": "furukawa_digicomp_briefing_2026_06_04_s4",
+      "locator": "p.25「ファイテル製品：今後の事業展開」DC 內解決方案第一項",
+      "quote": "■DFBレーザチップ、ELS*1・DC内高速化(400G/800G)に伴う光源の需要増加"
+    },
+    {
+      "id": "furukawa_digicomp_briefing_2026_06_04_s5",
+      "locator": "p.25 同頁第三項",
+      "quote": "■ 800G/1.6T向け高出力DFB/ELSの製品開発と拡販・CPO *2向け次世代アーキテクチャでの採用拡大"
+    },
+    {
+      "id": "furukawa_digicomp_briefing_2026_06_04_s6",
+      "locator": "p.26「ファイテル製品：売上高の推移」標題句",
+      "quote": "DC内向けDFBに加え、DC間向けSOA、ラマン増幅器用励起光源の需要も取り込み、高付加価値品の売上が拡大"
+    },
+    {
+      "id": "furukawa_digicomp_briefing_2026_06_04_s7",
+      "locator": "p.27「2030年に向けた成長投資」市場環境",
+      "quote": "・外部光源として、高出力DFBレーザチップの需要が急拡大"
+    },
+    {
+      "id": "furukawa_digicomp_briefing_2026_06_04_s8",
+      "locator": "p.27 投資與事業目標",
+      "quote": "投資総額*380億円利益拡大(2030年度目標/2025年度比)10倍"
+    },
+    {
+      "id": "furukawa_digicomp_briefing_2026_06_04_s9",
+      "locator": "p.27 前工程新廠",
+      "quote": "1) 前工程(ウェハプロセス)拠点：FFOD岩手工場(新設)・ジャパンセミコンダクター岩手事業所内に新設・東芝グループの半導体製造実績を持つ同社協力を得て、高効率で安定的な供給体制を確立(2028年4月量産開始予定)"
+    },
+    {
+      "id": "furukawa_digicomp_briefing_2026_06_04_s10",
+      "locator": "p.27 投資總額的註",
+      "quote": "* 2025年12月発表の増産投資金額"
+    }
+  ]
+}

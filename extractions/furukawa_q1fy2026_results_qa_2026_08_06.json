@@ -1,0 +1,255 @@
+{
+  "claims": [
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：古河下一季以後的決算或質疑應答錄撤回銅箔的上修，或寫出高機能銅箔的品種構成改善停止、需要減速。核查頻率：每季（古河決算簡報與質疑應答錄）。觸發後 48 小時：e1 的 claim 降信心，重讀 HVLP 銅箔層的供給側。",
+      "id": "furukawa_q1fy2026_results_qa_2026_08_06_cl1",
+      "source_ids": [
+        "furukawa_q1fy2026_results_qa_2026_08_06_s1"
+      ],
+      "statement": "In its 2026-08-06 first-quarter results Q&A, Furukawa Electric attributes an approximately ¥2.5 billion full-year upward revision in copper foil mainly to a product mix improvement toward high-function copper foil on AI data center demand.",
+      "subject_id": "e1"
+    },
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：古河的決算或質疑應答錄寫出光纖產量不再頂到能力上限（稼動率下降、恢復外販或降價），或 2028 年度下期起的ローラブルリボンケーブル產能倍增延後、縮減。核查頻率：每季（古河決算簡報與質疑應答錄）。觸發後 48 小時：e3 的 claim 降信心，重讀光纖層（tech:optical_fiber）缺不缺那一半。",
+      "id": "furukawa_q1fy2026_results_qa_2026_08_06_cl2",
+      "source_ids": [
+        "furukawa_q1fy2026_results_qa_2026_08_06_s2",
+        "furukawa_q1fy2026_results_qa_2026_08_06_s3",
+        "furukawa_q1fy2026_results_qa_2026_08_06_s4",
+        "furukawa_q1fy2026_results_qa_2026_08_06_s5"
+      ],
+      "statement": "The same Q&A says Furukawa's optical fiber output is nearly at capacity relative to demand, that fiber is the bottleneck, and that it is restraining external fiber sales while focusing on processing fiber into high-function cables; it produces rollable ribbon cable in Japan, Brazil and the United States and aims to double rollable ribbon cable capacity from the second half of fiscal 2028. Its optical solutions operating profit upgrade is attributed to data center sales growth, mix improvement and price revisions. The bottleneck statement is the supplier's own assessment, not independent evidence, and no customers or purchase commitment terms are disclosed.",
+      "subject_id": "e3"
+    },
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：古河的決算或質疑應答錄寫出 DFB 需要減速、DFB 增產效果下修或產能擴充暫停。核查頻率：每季（古河決算簡報與質疑應答錄）。觸發後 48 小時：e2 的 claim 降信心，重讀 CW DFB 雷射層的供給側。",
+      "id": "furukawa_q1fy2026_results_qa_2026_08_06_cl3",
+      "source_ids": [
+        "furukawa_q1fy2026_results_qa_2026_08_06_s6",
+        "furukawa_q1fy2026_results_qa_2026_08_06_s7"
+      ],
+      "statement": "The same Q&A says demand for DFB is very strong and that Furukawa has expanded DFB production capacity to more than five times the fiscal 2023 level, and that about ¥5.5 billion of the full-year upgrade comes from laser chips such as DFB and SOA, mainly from the effect of increased production rather than selling prices.",
+      "subject_id": "e2"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "mat:hvlp_copper_foil",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "furukawa_q1fy2026_results_qa_2026_08_06_s1"
+      ],
+      "src_id": "co:furukawa_electric"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:cw_dfb_laser",
+      "id": "e2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "furukawa_q1fy2026_results_qa_2026_08_06_s6",
+        "furukawa_q1fy2026_results_qa_2026_08_06_s7"
+      ],
+      "src_id": "co:furukawa_electric"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:optical_fiber",
+      "id": "e3",
+      "relation": "supplies_to",
+      "source_ids": [
+        "furukawa_q1fy2026_results_qa_2026_08_06_s2"
+      ],
+      "src_id": "co:furukawa_electric"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:optical_fiber_cable",
+      "id": "e4",
+      "relation": "supplies_to",
+      "source_ids": [
+        "furukawa_q1fy2026_results_qa_2026_08_06_s2",
+        "furukawa_q1fy2026_results_qa_2026_08_06_s3",
+        "furukawa_q1fy2026_results_qa_2026_08_06_s4",
+        "furukawa_q1fy2026_results_qa_2026_08_06_s5"
+      ],
+      "src_id": "co:furukawa_electric"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "古河電工",
+        "古河電気工業",
+        "Furukawa Electric"
+      ],
+      "attributes": {
+        "ticker": "5801.T"
+      },
+      "confidence": 0.9,
+      "id": "co:furukawa_electric",
+      "name": "Furukawa Electric Co., Ltd.",
+      "role": null,
+      "source_ids": [
+        "furukawa_q1fy2026_results_qa_2026_08_06_s1",
+        "furukawa_q1fy2026_results_qa_2026_08_06_s2",
+        "furukawa_q1fy2026_results_qa_2026_08_06_s3",
+        "furukawa_q1fy2026_results_qa_2026_08_06_s4",
+        "furukawa_q1fy2026_results_qa_2026_08_06_s5",
+        "furukawa_q1fy2026_results_qa_2026_08_06_s6",
+        "furukawa_q1fy2026_results_qa_2026_08_06_s7"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "HVLP",
+        "HVLP copper foil",
+        "HVLP4",
+        "HVLP 銅箔",
+        "超低轮廓铜箔"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "mat:hvlp_copper_foil",
+      "name": "HVLP copper foil (hyper-very-low-profile electrodeposited copper foil)",
+      "role": null,
+      "source_ids": [
+        "furukawa_q1fy2026_results_qa_2026_08_06_s1"
+      ],
+      "type": "Material"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "CW laser",
+        "internal laser diode",
+        "high-power CW laser",
+        "CW DFB",
+        "CW DFB laser",
+        "DFB laser",
+        "high-power DFB laser"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 4
+      },
+      "confidence": 0.9,
+      "id": "tech:cw_dfb_laser",
+      "name": "High-power CW DFB laser",
+      "role": null,
+      "source_ids": [
+        "furukawa_q1fy2026_results_qa_2026_08_06_s6",
+        "furukawa_q1fy2026_results_qa_2026_08_06_s7"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "optical fibre",
+        "optical fiber",
+        "bend-insensitive fiber",
+        "single-mode fiber",
+        "fiber"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:optical_fiber",
+      "name": "Optical fiber (single-mode, incl. bend-insensitive)",
+      "role": null,
+      "source_ids": [
+        "furukawa_q1fy2026_results_qa_2026_08_06_s2"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "optical fibre cable",
+        "OFC",
+        "high fiber count cable",
+        "high-density cable",
+        "IBR cable",
+        "ribbon cable",
+        "optical fiber, cable"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:optical_fiber_cable",
+      "name": "Optical fiber cable (incl. high-fiber-count data center cable)",
+      "role": null,
+      "source_ids": [
+        "furukawa_q1fy2026_results_qa_2026_08_06_s2",
+        "furukawa_q1fy2026_results_qa_2026_08_06_s3",
+        "furukawa_q1fy2026_results_qa_2026_08_06_s4",
+        "furukawa_q1fy2026_results_qa_2026_08_06_s5"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "furukawa_q1fy2026_results_qa_2026_08_06",
+    "evidence_tier": 2,
+    "origin_entity": "Furukawa Electric Co., Ltd.",
+    "permission_basis": "發行人 IR 網站公開下載的決算說明會質疑應答錄（要旨）；只保留研究所需的有限逐字引文與原始 URL。published_at 取 PDF 建立日與伺服器 Last-Modified 2026-08-07（說明會 08-06）。",
+    "published_at": "2026-08-07",
+    "publisher": "Furukawa Electric Co., Ltd.",
+    "retrieved_at": "2026-11-06",
+    "source_type": "transcript",
+    "storage_permission": "repo_excerpt",
+    "title": "Furukawa Electric — 2027 年 3 月期第 1 四半期決算 アナリスト・機関投資家向け説明会 質疑応答録（要旨）：銅箔上修（AI データセンタ向け高機能銅箔）、DFB 產能為 2023 年度的五倍以上、光纖產量近能力上限",
+    "url": "https://www.furukawaelectric.com/ir/library/finalreport/pdf/2027/20260806_online-qa.pdf"
+  },
+  "sources": [
+    {
+      "id": "furukawa_q1fy2026_results_qa_2026_08_06_s1",
+      "locator": "第 1 問答（業績予想上修的產品別要因）",
+      "quote": "銅箔は通期で約 25 億円を上方修正し、AI データセンタ向け需要を背景とした高機能銅箔への品種構成改善が主な要因。"
+    },
+    {
+      "id": "furukawa_q1fy2026_results_qa_2026_08_06_s2",
+      "locator": "第 3 問答（光纖・纜線產能）",
+      "quote": "足元では、光ファイバの生産量が需要に対してほぼ能力上限。ボトルネックはファイバであり、外販を抑えながら、高機能ケーブルに加工して販売することに注力。"
+    },
+    {
+      "id": "furukawa_q1fy2026_results_qa_2026_08_06_s3",
+      "locator": "第 1 問答（光ソリューション）",
+      "quote": "営業利益の上方修正要因としては、データセンタ向けの売上増、品種構成の改善、価格見直しによる効果が、上期で約 35 億円、下期で約 55 億円。下期はローラブルリボンケーブルの増加も含め、上期より効果が拡大する見込み。"
+    },
+    {
+      "id": "furukawa_q1fy2026_results_qa_2026_08_06_s4",
+      "locator": "第 4 問答（1,000 億円能力增強）",
+      "quote": "ローラブルリボンケーブルについては、日本、ブラジル、米国の 3 拠点で生産しており、これらの拠点で投資を実施。"
+    },
+    {
+      "id": "furukawa_q1fy2026_results_qa_2026_08_06_s5",
+      "locator": "第 3 問答",
+      "quote": "2028 年度下期以降に、ローラブルリボンケーブルの生産能力を 2 倍にすることを目指す。"
+    },
+    {
+      "id": "furukawa_q1fy2026_results_qa_2026_08_06_s6",
+      "locator": "第 1 問答（情報コンポーネント）",
+      "quote": "DFB、SOA などのレーザチップ関連で通期約 55 億円を見直し。主因は販売価格ではなく増産効果。"
+    },
+    {
+      "id": "furukawa_q1fy2026_results_qa_2026_08_06_s7",
+      "locator": "第 3 問答",
+      "quote": "DFB については需要が非常に強く、生産能力を 2023 年度比で 5 倍超まで拡大。"
+    }
+  ]
+}
