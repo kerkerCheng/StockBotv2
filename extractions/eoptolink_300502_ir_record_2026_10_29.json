@@ -1,0 +1,94 @@
+{
+  "claims": [
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：新易盛的季報、年報或投資者關係活動記錄表寫出原材料（含 DSP）供應已恢復正常、備貨週期縮短，或光模組廠、雲端業者的一手寫出模組 DSP 供給充足、交期回到正常。核查頻率：每季（新易盛季報與投資者關係活動記錄表；中際旭創、Coherent、AAOI 的季報與法說）。觸發後 48 小時：e1 的 claim 降信心，重讀模組 DSP 層（tech:optical_module_dsp）缺不缺那一半。",
+      "id": "eoptolink_300502_ir_record_2026_10_29_cl1",
+      "source_ids": [
+        "eoptolink_300502_ir_record_2026_10_29_s1",
+        "eoptolink_300502_ir_record_2026_10_29_s2"
+      ],
+      "statement": "Eoptolink's investor relations activity record No. 2026-006 (conference call of 2026-10-29, filed on CNINFO) answers two questions framed around optical module DSPs. Asked about industry feedback that DSP and other core materials were tight in the third quarter, the company says raw material supply this year is tight overall and not limited to a single material, and that core raw material stocking cycles have lengthened further as industry delivery volumes grow quickly. Asked whether DSP dragged third-quarter shipments, it says the tightness on the raw material side had some impact and that it has stocked core raw materials for next year. The company's own answers do not name DSP, any DSP supplier, a lead time in weeks, an allocation, a prepayment to a DSP supplier or a quantified shipment impact.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:optical_module_dsp",
+      "id": "e1",
+      "relation": "depends_on",
+      "source_ids": [
+        "eoptolink_300502_ir_record_2026_10_29_s1",
+        "eoptolink_300502_ir_record_2026_10_29_s2"
+      ],
+      "src_id": "co:eoptolink"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "Eoptolink Technology Inc., Ltd.",
+        "新易盛"
+      ],
+      "attributes": {
+        "ticker": "300502.SZ"
+      },
+      "confidence": 0.85,
+      "id": "co:eoptolink",
+      "name": "Eoptolink",
+      "role": null,
+      "source_ids": [
+        "eoptolink_300502_ir_record_2026_10_29_s1",
+        "eoptolink_300502_ir_record_2026_10_29_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "optical module DSP",
+        "DSPs inside optical modules"
+      ],
+      "attributes": {},
+      "confidence": 0.8,
+      "id": "tech:optical_module_dsp",
+      "name": "Optical module DSP (data-center optical interconnect)",
+      "role": null,
+      "source_ids": [
+        "eoptolink_300502_ir_record_2026_10_29_s1",
+        "eoptolink_300502_ir_record_2026_10_29_s2"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "eoptolink_300502_ir_record_2026_10_29",
+    "evidence_tier": 2,
+    "origin_entity": "Eoptolink Technology Inc., Ltd.",
+    "permission_basis": "深交所上市公司依規披露的投資者關係活動記錄表（巨潮資訊網公開 PDF）；只保留時間、接待人員與問答正文的逐字節錄（參與單位名單未收）。published_at 取記錄表日期 2026-10-29（巨潮同日上傳）。",
+    "published_at": "2026-10-29",
+    "publisher": "巨潮资讯网（深交所指定信息披露网站）",
+    "retrieved_at": "2026-11-06",
+    "source_type": "transcript",
+    "storage_permission": "repo_excerpt",
+    "title": "新易盛投資者關係活動記錄表 編號 2026-006（2026-10-29 電話會議）：被問「三季度行业反馈 DSP 等核心物料紧张」答原材料供應整體偏緊、不局限於單一物料、核心原材料備貨週期進一步拉長；被問 DSP 是否拖累第三季出貨答原材料端緊張造成一定影響",
+    "url": "http://static.cninfo.com.cn/finalpage/2026-10-29/1225645963.PDF"
+  },
+  "sources": [
+    {
+      "id": "eoptolink_300502_ir_record_2026_10_29_s1",
+      "locator": "問答第 2 題",
+      "quote": "2.三季度行业反馈 DSP 等核心物料紧张，目前供应链情况及后续进展如何？答：今年原材料供应整体偏紧，且不局限于单一物料。随着行业交付体量的快速增长，核心原材料备货周期进一步拉长，需充分做好提前规划。"
+    },
+    {
+      "id": "eoptolink_300502_ir_record_2026_10_29_s2",
+      "locator": "問答第 13 題",
+      "quote": "13.DSP 在三季度是否拖累出货？能否量化影响？Q4 其他元器件是否仍有干扰？答：三季度原材料端的紧张造成了一定的影响。公司已对明年核心原材料进行充分储备，具体量级暂无法公开披露"
+    }
+  ]
+}
