@@ -1,0 +1,95 @@
+{
+  "claims": [
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：中際旭創的季報、年報或投資者關係活動記錄表寫出 DSP 供應已不緊、價格開始下降，或不再需要鎖量、預付。核查頻率：每季（中際旭創季報與投資者關係活動記錄表）。觸發後 48 小時：e1 的 claim 降信心，重讀模組 DSP 層（tech:optical_module_dsp）量的那一半。",
+      "id": "innolight_300308_ir_record_2026_10_29_cl1",
+      "source_ids": [
+        "innolight_300308_ir_record_2026_10_29_s1",
+        "innolight_300308_ir_record_2026_10_29_s2"
+      ],
+      "statement": "Zhongji Innolight's investor relations activity record No. 2026-009 (conference call of 2026-10-29, filed on CNINFO) says that DSP is a key material for optical modules and that, as industry demand rises, its supply is tight; that the company, as an important supplier to its customers, can obtain the DSPs it needs in line with its share and its overall supply is well secured; and that because DSP capacity is tight, prices are firm. The same record says some core materials remain tight to varying degrees, that the company arranged key materials in advance through early stocking, long-term agreements, prepayments and new suppliers, and that it expects core material supply to improve gradually over the next several quarters as suppliers release capacity. It does not name any DSP supplier, a lead time in weeks or an allocation quantity.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:optical_module_dsp",
+      "id": "e1",
+      "relation": "depends_on",
+      "source_ids": [
+        "innolight_300308_ir_record_2026_10_29_s1",
+        "innolight_300308_ir_record_2026_10_29_s2"
+      ],
+      "src_id": "co:zhongji_innolight"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "Zhongji Innolight Co., Ltd.",
+        "中际旭创",
+        "中際旭創"
+      ],
+      "attributes": {
+        "ticker": "300308.SZ"
+      },
+      "confidence": 0.85,
+      "id": "co:zhongji_innolight",
+      "name": "Zhongji Innolight",
+      "role": "leader",
+      "source_ids": [
+        "innolight_300308_ir_record_2026_10_29_s1",
+        "innolight_300308_ir_record_2026_10_29_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "optical module DSP",
+        "DSPs inside optical modules"
+      ],
+      "attributes": {},
+      "confidence": 0.8,
+      "id": "tech:optical_module_dsp",
+      "name": "Optical module DSP (data-center optical interconnect)",
+      "role": null,
+      "source_ids": [
+        "innolight_300308_ir_record_2026_10_29_s1",
+        "innolight_300308_ir_record_2026_10_29_s2"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "innolight_300308_ir_record_2026_10_29",
+    "evidence_tier": 2,
+    "origin_entity": "Zhongji Innolight Co., Ltd.",
+    "permission_basis": "深交所上市公司依規披露的投資者關係活動記錄表（巨潮資訊網公開 PDF）；只保留時間、接待人員與正文的逐字節錄（參與單位名單未收）。published_at 取記錄表日期（巨潮同日上傳）。",
+    "published_at": "2026-10-29",
+    "publisher": "巨潮资讯网（深交所指定信息披露网站）",
+    "retrieved_at": "2026-11-07",
+    "source_type": "transcript",
+    "storage_permission": "repo_excerpt",
+    "title": "中際旭創投資者關係活動記錄表 編號 2026-009（2026-10-29 電話會議）：DSP 是光模組的關鍵物料、供給偏緊張、DSP 產能偏緊價格堅挺；部分核心物料仍緊張，以長協、預付款、導入新供應商提前安排，預計後續幾季逐步改善",
+    "url": "http://static.cninfo.com.cn/finalpage/2026-10-29/1225645972.PDF"
+  },
+  "sources": [
+    {
+      "id": "innolight_300308_ir_record_2026_10_29_s1",
+      "locator": "二、公司高管介绍 2026 年前三季度整体经营情况（物料段）",
+      "quote": "在需求快速增长的同时，部分核心物料供应仍存在不同程度的紧张。公司通过前期积极备料，并采取签订长协、预付款、导入新供应商等多种方式提前安排关键物料，有效应对物料紧张，实现了收入较快的环比增长。后续几个季度，随着供应商产能逐步释放，预计核心物料供给将逐步改善，公司交付能力有望进一步提升。"
+    },
+    {
+      "id": "innolight_300308_ir_record_2026_10_29_s2",
+      "locator": "三、投资者问答环节 Q1／A1",
+      "quote": "Q1：关于物料准备，DSP 整体供应情况如何？明年 800G、1.6T 的DSP 需求和供应情况如何？近期价格是否变化，能否较好传导至下游？A1：DSP 是光模块的关键物料，随着行业需求提升，供给偏紧张。公司作为客户的重要供应商，能够获得与份额相匹配的所需 DSP，整体供应保障情况较好。由于 DSP 产能偏紧，价格较为坚挺。公司正积极适应相关变化。"
+    }
+  ]
+}

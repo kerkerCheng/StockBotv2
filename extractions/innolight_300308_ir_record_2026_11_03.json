@@ -1,0 +1,95 @@
+{
+  "claims": [
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：中際旭創的季報、年報或投資者關係活動記錄表寫出 DSP 供應已不緊、價格開始下降，或不再需要鎖量、預付。核查頻率：每季（中際旭創季報與投資者關係活動記錄表）。觸發後 48 小時：e1 的 claim 降信心，重讀模組 DSP 層（tech:optical_module_dsp）量的那一半。",
+      "id": "innolight_300308_ir_record_2026_11_03_cl1",
+      "source_ids": [
+        "innolight_300308_ir_record_2026_11_03_s1",
+        "innolight_300308_ir_record_2026_11_03_s2"
+      ],
+      "statement": "Zhongji Innolight's investor relations activity record No. 2026-010 (conference call of 2026-11-03, filed on CNINFO) says, when asked how many DSPs it has locked for 1.6T next year, that the DSP volume it has locked is close to its order demand and matches the share it has won at customers; and, when asked whether core material supply improved in the fourth quarter versus the third, that material supply is gradually improving and some core materials are expected to improve marginally over the next several quarters. It does not name any DSP supplier or quantity.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:optical_module_dsp",
+      "id": "e1",
+      "relation": "depends_on",
+      "source_ids": [
+        "innolight_300308_ir_record_2026_11_03_s1",
+        "innolight_300308_ir_record_2026_11_03_s2"
+      ],
+      "src_id": "co:zhongji_innolight"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "Zhongji Innolight Co., Ltd.",
+        "中际旭创",
+        "中際旭創"
+      ],
+      "attributes": {
+        "ticker": "300308.SZ"
+      },
+      "confidence": 0.85,
+      "id": "co:zhongji_innolight",
+      "name": "Zhongji Innolight",
+      "role": "leader",
+      "source_ids": [
+        "innolight_300308_ir_record_2026_11_03_s1",
+        "innolight_300308_ir_record_2026_11_03_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "optical module DSP",
+        "DSPs inside optical modules"
+      ],
+      "attributes": {},
+      "confidence": 0.8,
+      "id": "tech:optical_module_dsp",
+      "name": "Optical module DSP (data-center optical interconnect)",
+      "role": null,
+      "source_ids": [
+        "innolight_300308_ir_record_2026_11_03_s1",
+        "innolight_300308_ir_record_2026_11_03_s2"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "innolight_300308_ir_record_2026_11_03",
+    "evidence_tier": 2,
+    "origin_entity": "Zhongji Innolight Co., Ltd.",
+    "permission_basis": "深交所上市公司依規披露的投資者關係活動記錄表（巨潮資訊網公開 PDF）；只保留時間、接待人員與正文的逐字節錄（參與單位名單未收）。published_at 取記錄表日期（巨潮同日上傳）。",
+    "published_at": "2026-11-03",
+    "publisher": "巨潮资讯网（深交所指定信息披露网站）",
+    "retrieved_at": "2026-11-07",
+    "source_type": "transcript",
+    "storage_permission": "repo_excerpt",
+    "title": "中際旭創投資者關係活動記錄表 編號 2026-010（2026-11-03 電話會議）：明年 1.6T 的 DSP 鎖量與訂單需求接近、與客戶處份額相匹配；物料供給逐步改善、一些核心物料預計接下來幾季邊際改善",
+    "url": "http://static.cninfo.com.cn/finalpage/2026-11-03/1225656565.PDF"
+  },
+  "sources": [
+    {
+      "id": "innolight_300308_ir_record_2026_11_03_s1",
+      "locator": "二、Q&A Q4／A4",
+      "quote": "Q4：四季度核心物料供应相较三季度是否进一步改善？A4：物料供给在逐步改善中，预计一些核心物料均会在接下来的几个季度边际改善，公司的出货量也有望连续几个季度保持环比提升。"
+    },
+    {
+      "id": "innolight_300308_ir_record_2026_11_03_s2",
+      "locator": "二、Q&A Q12／A12",
+      "quote": "Q12：明年 1.6T 所需 DSP 已锁定多少数量？A12：公司锁定的 DSP 规模与订单需求较为接近，也和在客户那里取得的份额相匹配。"
+    }
+  ]
+}
