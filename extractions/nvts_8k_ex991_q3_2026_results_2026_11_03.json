@@ -1,0 +1,95 @@
+{
+  "claims": [
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：Navitas 的 10-Q、10-K 或財報稿寫出 GaN 功率元件不再出貨給 AI 基礎設施相關應用，或 GlobalFoundries 的 GaN 代工中止且沒有替代產線。核查頻率：每季（Navitas 10-Q／10-K 與財報稿）。觸發後 48 小時：e1 的 claim 降信心，重讀 Power GaN 層（tech:power_gan）。",
+      "id": "nvts_8k_ex991_q3_2026_results_2026_11_03_cl1",
+      "source_ids": [
+        "nvts_8k_ex991_q3_2026_results_2026_11_03_s1",
+        "nvts_8k_ex991_q3_2026_results_2026_11_03_s2"
+      ],
+      "statement": "Navitas Semiconductor's third-quarter 2026 results press release (Form 8-K Exhibit 99.1, filed 2026-11-03) says the company announced first shipments of its latest Gen 5 GaNFast devices, manufactured in the United States through GlobalFoundries, to accelerate AI infrastructure deployments, and describes Navitas as pioneering GaN, high-voltage and ultra-high-voltage SiC, and IVR technologies. It does not name any AI data-center customer, a GaN shipment volume or a GaN revenue amount.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:power_gan",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "nvts_8k_ex991_q3_2026_results_2026_11_03_s1",
+        "nvts_8k_ex991_q3_2026_results_2026_11_03_s2"
+      ],
+      "src_id": "co:navitas"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "Navitas Semiconductor",
+        "NVTS"
+      ],
+      "attributes": {
+        "ticker": "NVTS"
+      },
+      "confidence": 0.9,
+      "id": "co:navitas",
+      "name": "Navitas Semiconductor Corporation",
+      "role": null,
+      "source_ids": [
+        "nvts_8k_ex991_q3_2026_results_2026_11_03_s1",
+        "nvts_8k_ex991_q3_2026_results_2026_11_03_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "Power GaN"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 4
+      },
+      "confidence": 0.9,
+      "id": "tech:power_gan",
+      "name": "Power Gallium Nitride (Power GaN)",
+      "role": null,
+      "source_ids": [
+        "nvts_8k_ex991_q3_2026_results_2026_11_03_s1",
+        "nvts_8k_ex991_q3_2026_results_2026_11_03_s2"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "nvts_8k_ex991_q3_2026_results_2026_11_03",
+    "evidence_tier": 2,
+    "origin_entity": "Navitas Semiconductor Corporation",
+    "permission_basis": "美國 SEC 法定公開申報（Form 8-K 第 2.02 項附件 99.1 財報稿，furnished）；只保留有限逐字引文與原始 URL。published_at 取 EDGAR 申報日 2026-11-03（稿頭日期同日）。",
+    "published_at": "2026-11-03",
+    "publisher": "U.S. SEC EDGAR",
+    "retrieved_at": "2026-11-07",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Navitas Semiconductor — Third Quarter 2026 financial results press release (Form 8-K Exhibit 99.1, filed 2026-11-03): first shipments of U.S.-made Gen 5 GaNFast devices through GlobalFoundries for AI infrastructure; GaN, SiC and IVR portfolio",
+    "url": "https://www.sec.gov/Archives/edgar/data/1821769/000162828026069489/exhibit991-navitassemicond.htm"
+  },
+  "sources": [
+    {
+      "id": "nvts_8k_ex991_q3_2026_results_2026_11_03_s1",
+      "locator": "Business, Customer and Technology Highlights（第三季財報稿）",
+      "quote": "Announced first shipments of the latest Gen 5 GaNFast devices manufactured in the United States through GlobalFoundries to accelerate AI infrastructure deployments."
+    },
+    {
+      "id": "nvts_8k_ex991_q3_2026_results_2026_11_03_s2",
+      "locator": "稿頭（dateline 段）",
+      "quote": "Navitas Semiconductor (Nasdaq: NVTS), a leader in next-generation power semiconductors and power delivery solutions, pioneering GaN, high-voltage and ultra-high-voltage SiC, and IVR technologies"
+    }
+  ]
+}

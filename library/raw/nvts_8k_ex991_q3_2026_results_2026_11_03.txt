@@ -1,0 +1,15 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1821769/000162828026069489/exhibit991-navitassemicond.htm
+
+Excerpt:
+SOURCE: Navitas Semiconductor Corporation — Form 8-K（2026-11-03，accession 0001628280-26-069489）Exhibit 99.1 第三季財報稿
+URL: https://www.sec.gov/Archives/edgar/data/1821769/000162828026069489/exhibit991-navitassemicond.htm
+PUBLISHED: 2026-11-03（EDGAR 申報日；稿頭日期同日）
+EXCERPT: 有限逐字引文（HTML 轉文字、空白攤平）；段名為摘錄者所加
+
+【稿頭】Navitas Semiconductor (Nasdaq: NVTS), a leader in next-generation power semiconductors and power delivery solutions, pioneering GaN, high-voltage and ultra-high-voltage SiC, and IVR technologies
+
+【Business, Customer and Technology Highlights】Announced first shipments of the latest Gen 5 GaNFast devices manufactured in the United States through GlobalFoundries to accelerate AI infrastructure deployments.
+
+【Business, Customer and Technology Highlights】Collaborated with NVIDIA on an 800 V-to-12 V power delivery board to support next-generation AI infrastructure architectures requiring higher power density and efficiency
+
+【Forward-looking statements — Risks Related to High-Power Markets】our predictions for the use of GaN- and SiC-based products in 800 V AI data center power applications depend on assumptions regarding the acceptance and growth of 800 V systems themselves
