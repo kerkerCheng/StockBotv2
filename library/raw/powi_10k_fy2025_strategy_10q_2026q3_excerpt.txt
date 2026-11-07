@@ -1,0 +1,28 @@
+SOURCE: Power Integrations, Inc. — Form 10-K（fiscal year 2025；SEC EDGAR accession 0000833640-26-000037）與 Form 10-Q（quarter ended 2026-09-30；accession 0000833640-26-000156）
+URL: https://www.sec.gov/Archives/edgar/data/833640/000083364026000037/powi-20251231x10k.htm ；https://www.sec.gov/Archives/edgar/data/833640/000083364026000156/powi-20260930.htm
+PUBLISHED: 2026-02-06（10-K）；2026-11-05（10-Q）
+RETRIEVED: 2026-11-07
+STORAGE: repo_excerpt（美國法定公開申報有限節錄；HTML 轉文字、空白攤平後逐字照抄）
+NOTE: 發行人自己的年報與季報（自述）。2026-11-07 量測抽樣①抽中 POWI 敘事 ib_f4c788a5b4122f7e 時補的節錄：舊節錄 powi_10k_fy2025_10q_2026q2_short_check_excerpt.txt 只收了「We expect such applications…」與「several years」兩句、沒收它們之間的段落關係——10-K 原文是兩段：第一段「additional products incorporating GaN transistors」→ 預期應用含資料中心 AI 電源（沒寫時程）；第二段以「Additionally」開頭，講給電動車驅動模組、比今天的氮化鎵更高功率的技術（含垂直氮化鎵），「several years」寫在這一段。第三季 10-Q 的終端市場表仍是四格、沒有資料中心；資料中心只出現在風險因子的一般敘述。
+
+=== Form 10-K（FY2025，filed 2026-02-06）Item 1 Business — Strategy ===
+
+"We are developing additional products incorporating GaN transistors, which we believe will enable us to address higher-power applications than we address with our current range of products, and further expand our SAM as discussed above. We expect such applications to include power supplies used in data centers delivering artificial intelligence (“AI”) services, in communications network infrastructure equipment and in onboard-charging circuitry for EVs, among others."
+
+"Additionally, we are developing GaN technologies capable of supporting higher power output than today’s GaN devices, with an aim of developing products to address power-switching modules in EV drivetrains, which currently incorporate SiC and IGBT modules. In July 2024 we acquired the assets of Odyssey Semiconductor, a developer of vertical GaN technology, in an effort to accelerate our development of higher-power GaN devices. We believe the development of such technologies will take several years to complete."
+
+=== Form 10-K（FY2025）Item 1 Business — Sales（經銷占比） ===
+
+"Direct sales to OEMs and merchant power supply manufacturers represented approximately 31%, 30% and 31% of our net product revenue in 2025, 2024 and 2023, respectively, while sales to distributors accounted for the remainder in each of the corresponding years."
+
+=== Form 10-Q（quarter ended 2026-09-30，filed 2026-11-05）Item 2 MD&A ===
+
+"Our revenue was $125.5 million and $118.9 million in the three months ended September 30, 2026 and 2025, respectively, and $352.7 million and $340.3 million in the nine months ended September 30, 2026 and 2025, respectively. The increase in revenue for the three-month period reflected higher sales in the industrial and communications end markets. The increase in revenue for the nine -month period primarily reflected higher sales in the industrial end market."
+
+"Our top ten customers, including distributors that resell to OEMs and merchant power-supply contract manufacturers, accounted for approximately 82% and 80% of our revenue for the three and nine months ended September 30, 2026 and approximately 81% in each of the corresponding periods of 2025."
+
+"End Market 2026 2025 2026 2025 Communications 12 % 11 % 11 % 11 % Computer 13 % 13 % 12 % 13 % Consumer 32 % 34 % 35 % 37 % Industrial 43 % 42 % 42 % 39 %"（三個月／去年同期／九個月／去年同期）
+
+=== Form 10-Q（Q3 2026）Item 1A Risk Factors（資料中心唯一出現處） ===
+
+"For example, infrastructure investments in AI have increased substantially, driving significant demand increases in the data center computing market and straining the supply chain."

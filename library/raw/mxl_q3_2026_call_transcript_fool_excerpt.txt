@@ -1,0 +1,37 @@
+MaxLinear (MXL) Q3 2026 Earnings Call Transcript（excerpt）
+Publisher: The Motley Fool（第三方轉錄，不是公司發布的逐字稿；轉錄稿有聽寫錯字，照原樣保留）
+Source: https://www.fool.com/earnings/call-transcripts/2026/10/22/maxlinear-mxl-q3-2026-earnings-call-transcript/
+Call date: 2026-10-22（第三季財報當天）；Retrieved: 2026-11-07（research-drain；逐字摘錄，說話人照轉錄稿）
+
+[Kishore Seendripu（CEO），prepared remarks（轉錄稿原樣：data server 應是 data center）]
+Reflecting this momentum, we are raising our 26 optical data server revenue outlook to $250 million to $270 million. With strong visibility in bookings extending beyond 2027, we expect another significant step up in revenue next year.
+
+[Kishore Seendripu（CEO），prepared remarks]
+Keystone, our 5 nanometer CMOS 100 gigabit per lean PAM 4 SerDes family, continues to ramp rapidly in high volume production across multiple hyperscalers.
+
+[Kishore Seendripu（CEO），prepared remarks]
+we are seeing accelerating customer activity around Rushmore based 200 gigabit per lane PAM 4 1.6 terabit architectures where qualification programs are advancing toward production deployments in 2027.
+
+[Steven G. Litchfield（CFO），prepared remarks]
+This included a substantial prepayment for wafers supporting rising demand for our data center products for which we have committed order backlog throughout 2027.
+
+[Q&A：Christopher Rolland（Susquehanna）問]
+Can you talk about how you see constraints in the optical market playing out? Is it Is it DSP? Is it other parts lasers, etcetera?
+
+[Q&A：Kishore Seendripu（CEO）答]
+I think the optic supply is easing. We are really constrained by foundries on the DSP supply. And the data center build out is really accelerating.
+
+[Q&A：Kishore Seendripu（CEO）答（同一段，轉錄稿原樣：fat capacity 應是 fab capacity）]
+So, however, the fat capacity is not coming online. Those are these are huge multiyear efforts. And so there is really, really a fab capacity shortage, I would say. And so the DSP supply is a pretty strong supply constraint.
+
+[Q&A：Steven G. Litchfield（CFO）答 Cody Acree（StoneX）]
+we are booking products throughout 2027 into 2028. You know, lead times for optical products are, you know, 26, 28 weeks. But customers are certainly coming in and placing orders out much further than that just kind of given they wanna secure supply.
+
+[Q&A：Tore Svanberg（Stifel）問]
+I noticed you did not have any 10% customers this quarter.
+
+[Q&A：Kishore Seendripu（CEO）答 Tore Svanberg]
+the second part is that our revenues are quite broad based. it is across all the major module makers.
+
+[Q&A：Kishore Seendripu（CEO）答 Cody Acree（認證資源）]
+you have 10 module makers, and that is not unrealistic. And then all of the 10 want to go simultaneously get their modules ready to go to the data center qual. We will have to pick and choose.

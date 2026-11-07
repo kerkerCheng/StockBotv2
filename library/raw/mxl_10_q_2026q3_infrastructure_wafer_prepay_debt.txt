@@ -1,0 +1,37 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1288469/000128846926000061/mxl-20260930.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] MaxLinear, Inc. Form 10-Q（quarter ended 2026-09-30，申報 2026-10-22）節錄：部門營收、基礎設施成長歸因、預付晶圓、負債與流動性
+
+Source: https://www.sec.gov/Archives/edgar/data/1288469/000128846926000061/mxl-20260930.htm
+Published: 2026-10-22 | Origin: MaxLinear, Inc. | Retrieved: 2026-11-07
+
+【Item 2 MD&A — Overview（前九個月營收來源）】
+In the nine months ended September 30, 2026, net revenue was $524.1 million, which was derived in part from sales of high-speed optical interconnect solutions sold into optical modules for data-center, metro and long-haul networks
+
+【Item 2 MD&A — Net Revenue by market（千美元；2026Q3／2025Q3／變動；前九個月同）】
+Infrastructure $ 124,907 $ 40,343 $ 84,564 210 % $ 272,737 $ 101,613 $ 171,124 168 % % of net revenue 57 % 32 % 52 % 31 % Broadband 53,345 58,236 (4,891) (8) % 141,853 146,675 (4,822) (3) % % of net revenue 24 % 46 % 27 % 44 %
+
+【Item 2 MD&A — Net Revenue（第三季基礎設施成長歸因）】
+The increase in infrastructure net revenue of $84.6 million was driven by increases in the volume of shipments of optical, products for data center applications, high-performance analog, and wireless backhaul products.
+
+【Note 12 — Revenue from Contracts with Customers（經銷商占比）】
+Revenues from sales through the Company’s distributors accounted for 48% and 36% of net revenue for the three months ended September 30, 2026 and 2025, respectively.
+
+【Note 11 — 出貨目的地占營收（第三季／去年同季／前九個月／去年同期）】
+Hong Kong 52 % 46 % 50 % 48 % Mainland China 12 % * 12 % * Vietnam 12 % 15 % 11 % 12 %
+
+【Item 2 MD&A — Cash Flows from Operating Activities】
+Net cash used in operating activities was $17.7 million for the nine months ended September 30, 2026, compared to net cash provided by operating activities of $9.2 million for the nine months ended September 30, 2025. The decrease in operating cash flows was primarily driven by investments in our working capital, which reduced operating cash flow by approximately $137.6 million primarily due to prepayments for wafers and purchases of inventory supporting rising demand for certain data center products.
+
+【Item 2 MD&A — Liquidity（負債）】
+As of September 30, 2026, $125.0 million of principal was outstanding under a senior secured term B loan facility or the “Initial Term Loan under the June 23, 2021 Credit Agreement” and an aggregate principal amount of $40.0 million was outstanding under the Revolving Facility.
+
+【Item 2 MD&A — Liquidity（現金與十二個月資金）】
+We believe that our $81.1 million of cash and cash equivalents at September 30, 2026, plus potential additional borrowings under our Revolving Facility, will be sufficient to fund our projected operating requirements for at least the next twelve months.
+
+【Item 2 MD&A — Liquidity（10-16 第三次修約）】
+On October 16, 2026, the June 23, 2021 Credit Agreement was further amended to among other things, provide for $70 million in incremental revolving commitments under the Revolving Facility and to modify the financial covenants to reduce the threshold under the liquidity covenant from $80 million to $60 million, tested as of the last day of any fiscal quarter.
+
+【Item 2 MD&A — 合約義務】
+Total inventory purchase and other contractual obligations increased from $209.6 million as of December 31, 2025 to $347.6 million as of September 30, 2026 driven by increased sales demand

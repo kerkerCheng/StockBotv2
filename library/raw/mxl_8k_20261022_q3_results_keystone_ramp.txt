@@ -1,0 +1,19 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1288469/000128846926000060/a09302026exhibit991.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] MaxLinear, Inc. Form 8-K（2026-10-22）附件 99.1 財報稿節錄：第三季營收、Keystone PAM4 DSP 放量、第四季展望、成長集中風險
+
+Source: https://www.sec.gov/Archives/edgar/data/1288469/000128846926000060/a09302026exhibit991.htm
+Published: 2026-10-22 | Origin: MaxLinear, Inc. | Retrieved: 2026-11-07
+
+【標題重點】
+•Q3 net revenue of $218.1 million, up 29% sequentially and up 72% year over year •Infrastructure business up 210% year over year reflecting accelerated adoption of optical AI data center products
+
+【Management Commentary（執行長）】
+“Strong momentum in our optical AI data center business reflects the volume ramp of our Keystone PAM4 DSP platform, as well as the strength of our expanding infrastructure portfolio and customer activity centered around our Rushmore and Annapurna product families of 1.6T-capable optical and electrical products.
+
+【Fourth Quarter 2026 Business Outlook（百萬美元）】
+Fourth Quarter 2026 Business Outlook The Company estimates the following (in millions): GAAP Non-GAAP (except for revenue) Revenue $240 - $260 $240 - $260
+
+【前瞻聲明的風險（成長集中）】
+our dependence on the ramp of our optical data center and related connectivity products and the concentration of our anticipated growth in a limited number of hyperscale customers and scale-up and scale-out AI-platform programs
