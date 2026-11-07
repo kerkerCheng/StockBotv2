@@ -513,3 +513,14 @@
 - INIO：市值 10.33B 跨過門檻、今天判非邊緣（前一次邊緣），機械移出可開到「非邊緣待確認」——連續兩次才列撤回建議，不是研究改判。
 
 **停止條件成立**：`engine_b.cli drain` 段 0–1 全零、pq1 空（triaged_go 0、action_prepared 1＝[912]）；段 5 到終局 79（ready 78／settled 1）、未到終局 1＝NVTS（卡 pq2 [911]，`--skip NVTS`）、母體外 117（非倍率 104、邊緣沒座位已查 13、等入圖 0）；`event_watch counters` fired_unconsumed 0、semantic_pending_check 0、wake_held 0、expiry_* 全 0；standing-go 候選 0；`audit invariants --only QueueSegments` PASS；closure-gate exit 0；走圖 55 筆命中、新命中 0；⑤ 二十二格全 0（全量物化 198/198，再物化讀圖、走圖、watch、層說明之後的心跳）；候選板可開 12／缺 X 34／不要 44／已持有 2／無敘事 104。**本段候選狀態移動 3**：不要 → 缺 X 2（MXL、300489.SZ）、無敘事 → 缺 X 1（5801.T）；另 INIO 可開 → 非邊緣待確認是機械移動、不算。**鑄 ra_admission 3**（[910]、[911]、[912]，都沒被抽查抽中）。非零但不是待做：停滯 3、到期 3（已處置：lead 早已終局 2、讀圖到期 1）、追源需處置 1、邊緣無法量 9、在門檻上 21；逾期型反證 0 條的持有／可開敘事 1＝COHR（同 11-04）；語意叫不醒 190 → 191。程式修正 `9317c940`（#134）。8790 重啟、writer lock 釋放（見收尾）。新鑄 pq2：[910]、[911]、[912]。decompose：本輪沒有新錨提案。
+
+## 二十二、2026-11-07 傍晚（使用者「910 911 912 go」）
+
+**[910]／[911]／[912]**：經 `scripts/apply_ra_admission.py` 入圖（四道檢查通過）、`scripts/commit_pending_intake.py` 發布（`e259dc63`、`1b70bbf7`、`05e6466b`）、`complete-ra` 結案；三包都沒被入圖抽查抽中。下游：
+- **模組 DSP 層**讀圖第四版 `sr_ad028e11a75d4cb9`（volume 不改）：中際旭創 10-29、11-03 兩份投資者關係活動記錄表由圖外改成圖上引用、需求側 4 → 5 條，沒有新事實；反證①–③出處改寫成沿用上一版。MXL 換騎 `ib_440dd84748e6056f`＋故事 `st_e264ae73df6a78df`（缺 X 不變）。
+- **Power GaN 層**第一份讀圖 `sr_33e1591376daceef`：判不出（undecided）——供給側圖上 2 家（GlobalFoundries、Navitas）都是供應商自述；需求側 0 條、走不到任何需求錨。缺的那一格：買方或第三方的一手寫明 AI 資料中心電源用 GaN、量多大、向誰買。另記窗口：Navitas 自己說原生 800V 2027 年底前量產、2028 年才有量，那張 100 萬顆的 GaN 訂單是給 800V DC-DC 電源磚。NVTS 換騎 `ib_c6498238f5b2fb2e`＋故事 `st_608408b3686943ba`：仍缺 X，X① 由「押的那一層沒有讀圖」改成上面那一格，補 missing_kind＝layer；段 5 的 NVTS 由未到終局變成到終局（ready）。
+- **[912]**（光智供貨給 Coherent）：磷化銦基板層讀圖沒有過期（新邊是公司對公司，不改層的五個角度）；300489.SZ、AXTI 的正文本來就寫了這件事，不換版。
+- **段 4**：56 筆命中、新 1＝`co:navitas` 供貨走不到錨——intentional（[911] 刻意只建供貨邊、客戶沒具名；第一份讀圖寫明缺需求側）；終局表 `docs/reports/phase7/graph-walk-terminals-2026-11-07.md`。
+- **COHR 新邊沒讀**（全量物化後 ⑤ 敘事該重寫 1）：[912] 那條「光智供貨給 Coherent」是 COHR 名下的新邊——讀了公告 2026-069，位置格補「六吋磷化銦產線要用的基板，向光智（先锐）簽了 2027–2029 長期供貨意向（不低於 6.01 億美元；最終協議與出口許可未定，Coherent 自己沒申報）」並引用；判斷（不要：非倍率持股）、answers、反證不變。新版 `ib_04236381b4fb7cba`＋故事 `st_dd45c9312a7c0987`。
+
+**停止條件成立**：段 0–1 全零；pq1 空（triaged_go 0、action_prepared 0）；段 5 到終局 80（ready 79／settled 1）、未到終局 0——closure-gate 不必 `--skip`、exit 0；`event_watch counters` fired_unconsumed 0、semantic_pending_check 0、wake_held 0、expiry_* 全 0；`audit invariants --only QueueSegments`、`--only Orphans` PASS；走圖 56 筆命中、新命中 0（co:navitas 已記終局）；⑤ 二十二格全 0（全量物化 198/198，再物化讀圖、走圖、watch、層說明，COHR 換版後再跑一次心跳）。候選板可開 12／缺 X 34／不要 44／已持有 2／無敘事 104——**本段候選狀態移動 0**（NVTS 仍缺 X，只是 X① 由「沒讀圖」換成讀圖寫明的那一格）／**鑄 ra_admission 0**。
