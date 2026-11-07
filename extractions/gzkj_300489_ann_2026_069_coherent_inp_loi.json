@@ -1,0 +1,175 @@
+{
+  "claims": [
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：光智科技公告意向協議終止、最終供應協議談判破裂或條款大幅縮減（金額低於 6.01 億美元或期間縮短），或先锐未取得六吋磷化铟衬底出口許可、協議無法履行或取消；或 Coherent 的申報、法說寫出與公告矛盾的內容。核查頻率：每月（光智科技深交所公告）＋季報、半年報、年報；Coherent 的 10-Q／10-K 與財報法說。觸發後 48 小時：e1 的 claim 降信心或提撤回，重讀磷化銦基板層（mat:inp_substrate）的供給側與光智科技、AXTI 的敘事。",
+      "id": "gzkj_300489_ann_2026_069_coherent_inp_loi_cl1",
+      "source_ids": [
+        "gzkj_300489_ann_2026_069_coherent_inp_loi_s1",
+        "gzkj_300489_ann_2026_069_coherent_inp_loi_s2",
+        "gzkj_300489_ann_2026_069_coherent_inp_loi_s4",
+        "gzkj_300489_ann_2026_069_coherent_inp_loi_s5",
+        "gzkj_300489_ann_2026_069_coherent_inp_loi_s6",
+        "gzkj_300489_ann_2026_069_coherent_inp_loi_s7",
+        "gzkj_300489_ann_2026_069_coherent_inp_loi_s9"
+      ],
+      "statement": "Optics Technology Holding's (300489.SZ) announcement 2026-069 dated 2026-11-06 states that its controlled subsidiary Guangdong Xianrui Technology signed a long-term supply Letter of Intent with Coherent Corp.: Xianrui is to supply 6-inch InP substrates to Coherent's plants in Switzerland and Sweden during 2027-2029, with an estimated transaction amount of no less than USD 601 million; the buyer wishes to secure this supply. It is a letter of intent: the parties will negotiate a final supply agreement covering technical specifications, qualification, pricing, prepayment, delivery, export licensing and other terms, whose timing is uncertain; Xianrui must obtain export licenses for 6-inch InP substrates or the agreement may not be performed or may be cancelled. Supplier self-report: Coherent has not filed it; it shows neither share, exclusivity, nor why Coherent chose this supplier beyond the issuer's own description.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "co:coherent",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "gzkj_300489_ann_2026_069_coherent_inp_loi_s1",
+        "gzkj_300489_ann_2026_069_coherent_inp_loi_s2",
+        "gzkj_300489_ann_2026_069_coherent_inp_loi_s3",
+        "gzkj_300489_ann_2026_069_coherent_inp_loi_s4"
+      ],
+      "src_id": "co:optics_technology_holding"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "mat:inp_substrate",
+      "id": "e2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "gzkj_300489_ann_2026_069_coherent_inp_loi_s2",
+        "gzkj_300489_ann_2026_069_coherent_inp_loi_s9"
+      ],
+      "src_id": "co:optics_technology_holding"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "光智科技",
+        "光智科技股份有限公司",
+        "Optics Technology Holding Co.,Ltd"
+      ],
+      "attributes": {
+        "ticker": "300489.SZ"
+      },
+      "confidence": 0.9,
+      "id": "co:optics_technology_holding",
+      "name": "Optics Technology Holding",
+      "role": null,
+      "source_ids": [
+        "gzkj_300489_ann_2026_069_coherent_inp_loi_s1",
+        "gzkj_300489_ann_2026_069_coherent_inp_loi_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "COHR",
+        "Coherent Corp"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": null,
+        "ticker": "COHR"
+      },
+      "confidence": 0.9,
+      "id": "co:coherent",
+      "name": "Coherent",
+      "role": "bottleneck_supplier",
+      "source_ids": [
+        "gzkj_300489_ann_2026_069_coherent_inp_loi_s3",
+        "gzkj_300489_ann_2026_069_coherent_inp_loi_s8"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "InP",
+        "indium phosphide",
+        "InP wafer",
+        "InP substrate",
+        "6-inch indium phosphide wafer substrate",
+        "磷化铟衬底"
+      ],
+      "attributes": {
+        "concentration_score": 4,
+        "ramp_difficulty_intrinsic": 5
+      },
+      "confidence": 0.9,
+      "id": "mat:inp_substrate",
+      "name": "Indium Phosphide (InP) substrate",
+      "role": null,
+      "source_ids": [
+        "gzkj_300489_ann_2026_069_coherent_inp_loi_s2"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "gzkj_300489_ann_2026_069_coherent_inp_loi",
+    "evidence_tier": 1,
+    "origin_entity": "光智科技股份有限公司",
+    "permission_basis": "上市公司依法公開的交易所公告（巨潮资讯网，深交所創業板指定披露平台）；只保留研究必要的逐字節錄（公告本身約三千字，未刪段）。published_at 取公告末署日期 2026-11-06（巨潮公告清單同日）。",
+    "published_at": "2026-11-06",
+    "publisher": "巨潮资讯网（深圳证券交易所）",
+    "retrieved_at": "2026-11-07",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "光智科技股份有限公司 关于控股子公司签署长期供货意向协议的公告（公告编号 2026-069）：控股子公司广东先锐科技与 Coherent Corp. 签署 2027–2029 年 6 英寸磷化铟衬底长期供货意向协议（预计不低于 6.01 亿美元）",
+    "url": "http://static.cninfo.com.cn/finalpage/2026-11-06/1225660893.PDF"
+  },
+  "sources": [
+    {
+      "id": "gzkj_300489_ann_2026_069_coherent_inp_loi_s1",
+      "locator": "特别提示 1.基本情况",
+      "quote": "光智科技股份有限公司（以下简称“公司”）控股子公司广东先锐科技有限公司（以下简称“先锐科技”）与 Coherent Corp.签署了《LETTER OF INTENT》（长期供货意向协议，以下简称“本协议”）。"
+    },
+    {
+      "id": "gzkj_300489_ann_2026_069_coherent_inp_loi_s2",
+      "locator": "一、协议的签署情况",
+      "quote": "近日，先锐科技与 Coherent Corp.签署了长期供货意向协议，本协议约定先锐科技在 2027–2029 年期间为 Coherent Corp.位于瑞士和瑞典的工厂提供 6 英寸磷化铟衬底，预计交易金额不低于 6.01 亿美元。"
+    },
+    {
+      "id": "gzkj_300489_ann_2026_069_coherent_inp_loi_s3",
+      "locator": "三、协议主要内容",
+      "quote": "买方：Coherent Corp."
+    },
+    {
+      "id": "gzkj_300489_ann_2026_069_coherent_inp_loi_s4",
+      "locator": "三、协议主要内容（合作内容）",
+      "quote": "合作内容：买方希望确保先锐科技在 2027–2029 年期间为 Coherent Corp.位于瑞士和瑞典的工厂提供 6 英寸磷化铟衬底"
+    },
+    {
+      "id": "gzkj_300489_ann_2026_069_coherent_inp_loi_s5",
+      "locator": "三、协议主要内容（最终协议）",
+      "quote": "最终协议将包含技术规格、资质要求、定价、预付款、交付、出口许可、质量、保修、赔偿及终止等惯常条款与条件。"
+    },
+    {
+      "id": "gzkj_300489_ann_2026_069_coherent_inp_loi_s6",
+      "locator": "特别提示 2.重要风险提示（2）",
+      "quote": "本协议约定先锐科技需取得 6 英寸磷化铟衬底的出口许可证，若许可审批进度或审批结果不及预期，或相关政策要求发生调整，导致先锐科技未能按预期进度取得许可，可能导致协议无法按约履行甚至取消。"
+    },
+    {
+      "id": "gzkj_300489_ann_2026_069_coherent_inp_loi_s7",
+      "locator": "特别提示 2.重要风险提示（1）",
+      "quote": "本次签订的协议为双方基于长期合作意向而达成，双方将本着诚信原则谈判，并积极推进签署最终供应协议（以下简称“最终协议”），但最终协议签署时间尚存在不确定性，且其具体条款可能与本协议存在差异"
+    },
+    {
+      "id": "gzkj_300489_ann_2026_069_coherent_inp_loi_s8",
+      "locator": "二、交易对方基本情况介绍",
+      "quote": "交易对方简要介绍：Coherent Corp.总部成立于 1971 年，是一家垂直整合型制造企业"
+    },
+    {
+      "id": "gzkj_300489_ann_2026_069_coherent_inp_loi_s9",
+      "locator": "四、对公司的影响 2",
+      "quote": "本协议的签订，是国际知名企业对公司 6 英寸磷化铟产品指标、品质稳定性以及交付配套能力的持续认可"
+    }
+  ]
+}
