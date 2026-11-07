@@ -1,0 +1,25 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/67347/000110465926122523/mod-20260930x10q.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Modine Manufacturing Company Form 10-Q（quarter ended September 30, 2026；FY2027 Q2），Notes 與 Item 2 MD&A
+Filed: 2026-11-04（accession 0001104659-26-122523）
+RETRIEVED: 2026-11-07（EDGAR 全文本機抓取，每段斷言是全文子字串）
+NOTE: CDU 營收仍沒有單獨拆出（全文「CDU」0 處；「coolant distribution units」只出現在產品清單）；全文沒有「lead time」。
+
+【Note — Segment information（Data Centers 產品）】
+The Data Centers segment is managed regionally and sells data center cooling solutions, including chillers, precision air handling units, computer room air conditioning and air handler units, fan walls, rear-door heat exchangers, coolant distribution units and immersion solutions.
+
+【MD&A — Comparison of the three months ended September 30, 2026 and 2025（全公司）】
+Second quarter net sales of $994.4 million were $255.5 million, or 35 percent, higher than the second quarter of the prior year, primarily due to $214.7 million of higher sales in our Data Centers segment, primarily driven by sales growth to hyperscale data center customers in North America.
+
+【MD&A — Second quarter highlights（全公司毛利率）】
+Gross margin declined 160 basis points to 20.7 percent, primarily due to lower gross margin in the Data Centers segment, largely driven by higher material costs.
+
+【MD&A — Data Centers segment（三個月）】
+Data Centers net sales increased $214.7 million, or 95 percent, from the second quarter of fiscal 2026 to the second quarter of fiscal 2027, primarily due to higher sales volume in North America, driven by sales growth to hyperscale customers.
+
+【MD&A — Data Centers segment cost of sales（三個月）】
+In addition, cost of sales was impacted by temporary operating inefficiencies, including the impact of supplier constraints for certain key components.
+
+【MD&A — Data Centers segment gross margin（三個月）】
+As a result of the higher sales and increased cost of sales as a percentage of sales, gross profit increased $31.7 million, or 58 percent, and gross margin declined 470 basis points to 19.7 percent.

@@ -119,6 +119,22 @@ def test_the_checkpoint_placeholder_is_refused_even_in_the_when_slot() -> None:
     assert any("會填出日期" in p and "最近的未來催化劑日" in p and "月份字" in p for p in problems), problems
 
 
+def test_a_position_word_next_to_the_daily_percentile_is_refused_in_the_story() -> None:
+    """failure log #137（#94 的對稱面）：百分位每天重填、故事的位置詞不會——MOD 的故事寫「第 5 百分位，在中間」
+    （10-17 寫的時候在中間，11-07 掉到第 5）。故事不准寫日期，所以已定價那一格的位置詞一律擋；候選理由只擋講到價格的句子；
+    別的格不查（「循環底部」「中段製程」講的是別的事）。"""
+    assert any("位置詞「中間」" in p for p in story_problems(
+        "priced_in", "沒有已定價：自家三年歷史第 {own_history_pctile} 百分位，在中間；9 位分析師在追。"))
+    assert any("位置詞「偏貴」" in p for p in story_problems(
+        "priced_in", "已定價嗎：在自己三年歷史偏貴的那一端，第三季的放量價格先走了一段。"))
+    assert any("位置詞「中段」" in p for p in story_problems("priced_in", "還沒定價：在自己三年的中段。"))
+    assert any("位置詞「高檔」" in p for p in story_problems("candidate", "就算補齊，價格已在高檔。",
+                                                          limit=CANDIDATE_STORY_MAX))
+    assert story_problems("priced_in", "已定價：自家三年 {own_history_basis} 第 {own_history_pctile} 百分位。") == []
+    assert story_problems("candidate", "不要：它坐的這一層在循環底部。", limit=CANDIDATE_STORY_MAX) == []
+    assert story_problems("bottleneck", "卡在中段製程，價格不是重點。") == []
+
+
 def test_length_counts_placeholders_as_their_filled_width() -> None:
     assert story_length("年增 {in_numbers_latest}") == len("年增") + 8
     assert story_problems("demand", "字" * STORY_MAX) == []

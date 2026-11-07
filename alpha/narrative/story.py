@@ -13,6 +13,7 @@
 故事是因果，不是紀錄：讀得出「為什麼能投、為什麼不能」，拿掉的是贅字，不是故事。所以擋的都是「依據的字」——
 日期（只留「哪一季、哪一年」這種粒度）、內部編號、系統用語、整段英文原文、長引文，以及超過字數。
 數字照舊只能是 placeholder（數字由 authority 填，首屏規則；`contracts.PLACEHOLDERS_V2`），但不准用會填出日期的那幾個。
+跟著每天重算的值走的結論也擋：寫死的燈色、已定價的位置詞（「在中間」「偏貴端」——數字會動、這句不會，failure log #120、#137）。
 """
 from __future__ import annotations
 
@@ -21,7 +22,7 @@ from datetime import date
 from typing import Mapping
 
 from .contracts import (FORBIDDEN_TERMS, PARAM_PLACEHOLDER, PLACEHOLDERS_V2, SIMPLE_PLACEHOLDER, SLOT_LABELS_V2,
-                        lamp_colour_claims)
+                        lamp_colour_claims, undated_position_claims)
 
 #: 只有故事、敘事裡沒有對應格的兩格（個股頁 B3、B5；F13：十三塊有 4 塊在敘事裡沒有格，首屏永遠印「還沒寫」）。
 #: 它們沒有依據那一格可以指回，所以這兩格的故事**自己帶引用**（`evidence_refs`）。
@@ -104,6 +105,12 @@ def story_problems(key: str, text: object, *, limit: int = STORY_MAX) -> list[st
     # 寫死的燈色（2026-10-31，failure log #120）：燈每天重算、首屏另有一行——故事寫「現金跑道紅燈」，燈一變就錯
     for sentence in lamp_colour_claims(text):
         out.append(f"{where} 寫死了燈色——燈每天重算、首屏另有一行；講燈背後的事實：{sentence[:24]}")
+    # 已定價的位置詞（failure log #94 的對稱面，#137）：敘事那一格可以寫明日期，故事不准寫日期——位置詞在故事裡只會凍住
+    # （MOD「第 5 百分位，在中間」）。已定價那一格每句都查；候選理由只查講到價格的句子（同敘事端）。
+    if key in ("priced_in", "candidate"):
+        for words, sentence in undated_position_claims(text, require_price_word=key == "candidate"):
+            out.append(f"{where} 用了位置詞「{'、'.join(words)}」——百分位每天重填、這句不會；故事讓數字自己說，"
+                       f"位置的判斷留在依據（敘事那一格寫明日期）：{sentence[:24]}")
     if PARAM_PLACEHOLDER.search(text):
         out.append(f"{where} 用了帶參數的 placeholder——v2 沒有這種字彙")
     for name in SIMPLE_PLACEHOLDER.findall(PARAM_PLACEHOLDER.sub("", text)):

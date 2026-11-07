@@ -89,6 +89,24 @@ def test_the_fact_behind_the_lamp_and_a_regulatory_green_light_pass(tmp_path: Pa
     assert lamp_colour_claims("法院對負債重整開綠燈") == [] and lamp_colour_claims("負債亮紅燈、跑道綠燈")
 
 
+@pytest.mark.parametrize("text", [
+    "另外，會死嗎的負債燈是紅的。",                     # HIMX 10-08 的寫法（11-07 燈已轉黃、首屏照印紅）
+    "缺：會不會死那一盞負債燈是紅的——欠的比現金多。",   # MXL 11-07 故事的寫法
+    "稽核區四盞燈都是灰。",                             # 5706.T 的寫法
+    "現金跑道燈由紅轉黃。",
+])
+def test_the_inverted_word_order_is_the_same_lamp_claim(text: str) -> None:
+    """failure log #137：#120 只認「紅燈」，倒裝的「燈是紅的」過了寫入端（L16：同義詞也拒收）。"""
+    assert lamp_colour_claims(text)
+    assert any("寫死了燈色" in p for p in story_problems("our_bet", text))
+
+
+def test_lamp_words_without_a_colour_still_pass() -> None:
+    assert lamp_colour_claims("燈號只表達行情資料狀態。") == []
+    assert lamp_colour_claims("負債：欠的比手上的現金多，本業現金流為正。") == []
+    assert lamp_colour_claims("負債燈是用 6 月底的資料算的。") == []     # 講燈的資料，不講顏色
+
+
 def test_an_old_record_with_a_lamp_colour_still_parses() -> None:
     """規則只在寫入端：放進 parse 路徑，6 份現行敘事會解析失敗、從候選板上安靜消失（INV-3）。"""
     old = _record("ew_x", at=datetime(2026, 10, 16, 4, tzinfo=timezone.utc),
