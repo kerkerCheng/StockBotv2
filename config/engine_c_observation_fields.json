@@ -134,7 +134,7 @@
         "engine_c_financial",
         "engine_c_manual"
       ],
-      "why": "yfinance 在財報後常暫時清空 free_cash_flow_ttm，runway 因此變成 manual_required 並讓 coverage gate 歸零。shared.runway.derive_runway（原 decision_lab）早就接受並驗證 manual_runway（含 timestamp future／stale 檢查），卻沒有任何地方提供它——這個欄位就是那條缺掉的走廊。value 必須是 JSON 物件，含 cash_and_equivalents、total_debt、free_cash_flow_ttm 三個數值，單位與 financial_snapshots 一致（報表原幣別絕對金額），可另帶 note 說明取自哪一段一手文件；三者缺一即視為未提供，不做部分推導。 ｜verifiability=mechanical：現金／總債／自由現金流三個數字直接抄自報表，本來就規定 value 必須是含三個數值的 JSON 物件；它同時有 auto_source，人工值存在只是因為 yfinance 在財報後會暫時清空。",
+      "why": "yfinance 在財報後常暫時清空 free_cash_flow_ttm，runway 因此變成 manual_required 並讓 coverage gate 歸零。shared.runway.derive_runway（原 decision_lab）早就接受並驗證 manual_runway（含 timestamp future／stale 檢查），卻沒有任何地方提供它——這個欄位就是那條缺掉的走廊。value 必須是 JSON 物件，含 cash_and_equivalents、total_debt、free_cash_flow_ttm 三個數值，單位與 financial_snapshots 一致（報表原幣別絕對金額），可另帶 note 說明取自哪一段一手文件；可另帶 operating_cash_flow_ttm（同一份文件的近四季營業現金流，選填；2026-11-07 起解析端會帶上——歸零燈靠它分「本業燒錢」與「擴產花得比賺得多」）；三者缺一即視為未提供，不做部分推導。 ｜verifiability=mechanical：現金／總債／自由現金流三個數字直接抄自報表，本來就規定 value 必須是含三個數值的 JSON 物件；它同時有 auto_source，人工值存在只是因為 yfinance 在財報後會暫時清空。",
       "verifiability": "mechanical"
     },
     {

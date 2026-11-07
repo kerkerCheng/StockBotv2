@@ -282,6 +282,11 @@ def _parse_runway_inputs(value, source_note, as_of) -> dict | None:
         if isinstance(raw, bool) or not isinstance(raw, (int, float)):
             return None
         numbers[key] = float(raw)
+    # 營業現金流（選填，2026-11-07）：快照那條路 10-29 已帶，人工這條漏了（L17 對稱面）——沒帶時燈分不出
+    # 本業燒錢還是擴產。同一筆觀測＝同一份文件，derive_runway 才收（不混兩個來源）；不是數值就不帶。
+    operating = payload.get("operating_cash_flow_ttm")
+    if isinstance(operating, (int, float)) and not isinstance(operating, bool):
+        numbers["operating_cash_flow_ttm"] = float(operating)
     return numbers | {"source": str(source_note), "as_of": str(as_of)}
 
 

@@ -228,6 +228,25 @@ def test_runway_inputs_require_all_three_numbers_and_provenance() -> None:
     assert _parse_runway_inputs(bool_value, "src", "2026-06-30") is None
 
 
+def test_runway_inputs_carry_optional_operating_cash_flow_from_the_same_observation() -> None:
+    """營業現金流選填：同一筆觀測寫了才帶（燈才分得出本業燒錢與擴產，L12）；沒寫或不是數值就不帶，三個必要數值的規則不變。"""
+    from shared.runway import derive_runway
+
+    from alpha.wipeout import debt_flag
+
+    with_ocf = json.dumps({"cash_and_equivalents": 70_474e6, "total_debt": 316_662e6,
+                           "free_cash_flow_ttm": -18_002e6, "operating_cash_flow_ttm": 28_116e6})
+    parsed = _parse_runway_inputs(with_ocf, "5801.T 決算短信", "2026-03-31T00:00:00+00:00")
+    assert parsed["operating_cash_flow_ttm"] == 28_116e6
+    runway = derive_runway({}, manual_observation=parsed)
+    assert runway["operating_cash_flow_ttm"] == 28_116e6
+    assert debt_flag(runway)["colour"] == "amber"  # 本業賺錢、擴產花得多——不是「分不出」的紅
+
+    for bad in ({}, {"operating_cash_flow_ttm": True}, {"operating_cash_flow_ttm": "28116"}):
+        payload = json.dumps({"cash_and_equivalents": 1, "total_debt": 2, "free_cash_flow_ttm": -1} | bad)
+        assert "operating_cash_flow_ttm" not in _parse_runway_inputs(payload, "src", "2026-06-30")
+
+
 def test_runway_inputs_field_is_registered_and_not_a_gate_member() -> None:
     registry = get_observation_field_registry()
     spec = registry.get("runway_inputs")
