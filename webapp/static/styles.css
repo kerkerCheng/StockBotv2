@@ -102,6 +102,15 @@ main { padding: 16px; max-width: 940px; margin: 0 auto; }
 .spark-rel { font-size: 11px; color: var(--dim); font-variant-numeric: tabular-nums; }
 .card-nospark { font-size: 11px; color: var(--dim); }
 
+/* 大盤同期（2026-11-08）：首頁最上面一行；只是脈絡——不上色。手機上換行。 */
+.bench-line { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 12px; font-size: 13px; color: var(--muted);
+              margin: 0 0 8px; }
+.bench-head { font-size: 12px; color: var(--dim); }
+.bench-item { white-space: nowrap; }
+.bench-sym { font-weight: 600; color: var(--text); margin-right: 4px; }
+.bench-val { font-variant-numeric: tabular-nums; }
+.bench-span { font-size: 11px; color: var(--dim); }
+
 /* 「接下來兩週會揭曉」：日期序是時間不是名次；手機上橫向捲動。 */
 .calendar { margin-bottom: 8px; }
 .calendar .group-head { margin-top: 4px; }

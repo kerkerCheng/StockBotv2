@@ -271,6 +271,42 @@ function cardGrid(rows) {
   return cards;
 }
 
+/* 大盤同期（2026-11-08 使用者：「這一頁最上面簡單列一下 指標性大盤 qqq Soxx 之類的 同區間的變化」）：照抄 API 的
+   `benchmarks`（materialize 端抓、算——各自市場最近 30 個交易日，與卡片上的漲跌同一個算法）。只是脈絡：不上色、不比、不排。
+   區間照市場各印一次（假日不同、起點就不同）；讀不到就說讀不到（INV-3）。 */
+function renderBenchmarks(b) {
+  if (!b) return null;
+  const box = el('div', 'bench-line');
+  const rows = b.rows || [];
+  if (!rows.length) {
+    box.appendChild(el('span', 'bench-head', `大盤同期：${b.absence || '沒有資料'}`));
+    return box;
+  }
+  box.appendChild(el('span', 'bench-head', `大盤同期（各 ${b.window_sessions || 30} 個交易日）`));
+  rows.forEach((r) => {
+    const item = el('span', 'bench-item');
+    item.appendChild(el('span', 'bench-sym', r.short || r.symbol));
+    item.appendChild(el('span', 'bench-val', typeof r.return === 'number' ? signedPct(r.return) : '—'));
+    item.title = typeof r.return === 'number'
+      ? `${r.label}：${r.start} 收盤 → ${r.end} 收盤（${r.market} ${r.sessions} 個交易日）`
+      : `${r.label}：${r.absence || '沒有值'}`;
+    box.appendChild(item);
+  });
+  const spans = [];
+  rows.forEach((r) => {
+    if (!r.start || !r.end) return;
+    const span = `${r.market} ${r.start.slice(5)}→${r.end.slice(5)}`;
+    if (spans.indexOf(span) < 0) spans.push(span);
+  });
+  if (spans.length) box.appendChild(el('span', 'bench-span', spans.join('｜')));
+  // 沒抓到的那幾檔把原因印出來——手機沒有滑過提示，只印「—」等於沒說為什麼
+  const missing = rows.filter((r) => typeof r.return !== 'number');
+  if (missing.length) {
+    box.appendChild(el('span', 'bench-span', missing.map((r) => `${r.short || r.symbol}：${r.absence || '沒有值'}`).join('｜')));
+  }
+  return box;
+}
+
 /* 「接下來兩週會揭曉」：日期序由後端排好（時間序不是名次），前端照印。 */
 function renderCalendar(cal) {
   if (!cal || !(cal.dates || []).length) return null;
@@ -327,6 +363,8 @@ async function renderList(mode) {
       '還沒有任何 materialized 判讀。請在本機跑 `python -m webapp materialize <TICKER>`。'));
     return;
   }
+  const bench = renderBenchmarks(data.benchmarks);
+  if (bench) app.appendChild(bench);
   const cal = renderCalendar(data.calendar);
   if (cal) app.appendChild(cal);
   const byLayer = mode === 'layer' && data.by_layer;

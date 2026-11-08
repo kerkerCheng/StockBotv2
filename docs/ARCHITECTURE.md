@@ -675,6 +675,12 @@ cache-miss 自動重建）；④**socket 封殺**（request 期間 `connect`／`
 層照節點 id 字母序，另數同一層收合組的檔數）；每張卡的 `watch.past` 在請求時比今天。前端只畫卡片、折線（座標換算住圖表段）、日曆條與
 `#/by-layer` 切換。
 
+**首頁最上面一行「大盤同期」（2026-11-08 使用者：「首屏的比組跟幾趴是什麼時間區間的？可以在這一頁最上面簡單列一下指標性大盤…
+同區間的變化嗎？看你推薦列哪幾檔」）：** 哪幾檔住 `webapp.materialize.HOME_BENCHMARKS`（QQQ、SOXX、IWM、0050；換一檔只改那裡）；
+`materialize --candidates` 抓已收盤日線、用卡片同一個視窗與算法（`alpha.three_questions.RELATIVE_WINDOWS[0]`、`trailing_return`——
+各自市場最近 30 個交易日、調整後收盤）算漲跌，每檔帶自己的起訖日，寫進候選板 artifact 的 `benchmarks`（不進 freshness_identity）；
+`/api/v1/stocks` 照抄（讀不到、舊板沒有這一格都回缺席與怎麼補）。**只是脈絡：不上色、不比、不排、不換算金額**（訊號的地位）。
+
 **頁面照使用者的問題切（2026-10-28 使用者照推薦：11 頁收成 5 頁——公司／每日／圖／成績單／資產配置；data 與 `/api` 不動）：**
 每個導覽連結帶 `data-question`（它回答你的哪一個問題，字串只住 `index.html`），`markNav` 照抄印在導覽列下面；個股頁借用「公司」
 但問的是另一件事，自己帶問句。**候選板與在等什麼兩頁併進首頁**（`#/candidates`、`#/watches` 舊連結落到首頁並說一句）：

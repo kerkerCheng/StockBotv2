@@ -243,6 +243,19 @@ def _view_counters(items: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
     }
 
 
+def _benchmarks(request: Request) -> dict[str, Any]:
+    """首頁最上面那一行：大盤同期（2026-11-08 使用者指示）。**照抄**候選板 artifact 的 `benchmarks`——取價與算術都在
+    materialize 端，請求路徑不抓、不算。讀不到就說讀不到與怎麼補，不回空列冒充「大盤沒資料」（INV-3）。"""
+    try:
+        payload, _freshness = _state(request).read("candidates")
+    except ArtifactUnavailable as exc:
+        return {"rows": [], "absence": f"候選板讀不到：{exc.reason}"}
+    block = payload.get("benchmarks")
+    if not isinstance(block, Mapping):
+        return {"rows": [], "absence": "候選板上還沒有這一格——重跑 `python -m webapp materialize --candidates`"}
+    return dict(block)
+
+
 async def stocks(request: Request) -> Response:
     """清單／總覽。壞掉的 artifact **不靜默丟棄**——以 `unavailable` 一併回報（INV-3）。"""
     store = _store(request)
@@ -297,6 +310,7 @@ async def stocks(request: Request) -> Response:
                                               for d in [((r.get("card") or {}).get("stall_days"))] if isinstance(d, int)),
                                              default=None),
                     "warning": held_warning if g["key"] == "held" else None} for g in groups],
+        "benchmarks": _benchmarks(request),
         "calendar": _calendar(items, today=date.today(), order=order),
         "by_layer": _by_layer(items, order=order, labels=labels),
         # 常駐計數器（L14：真正的防呆是會自己出現的計數器，不是要人讀的段落）。

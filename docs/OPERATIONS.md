@@ -123,6 +123,16 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 `StockBotv2-Daily` 的 ⑱⑲ 取代（1.2a 停用、2026-09-25 1.2b 刪除）；它們的理由（LLM 失敗心跳照發、永遠 exit 0、Python 不用 `.cmd`、
 發送走 subprocess）搬進 `crons/daily_task.py` 的 docstring，守它們的測試改主詞搬進 `tests/test_daily_task.py`「無人值守入口」節。
 
+### Sandbox impact review 結論（2026-11-08：首頁最上面一行「大盤同期」——使用者指示）
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | daily ⑬ materialize（argv 不變）：`--candidates` 多抓 4 檔已收盤日線（QQQ、SOXX、IWM、0050.TW；`webapp.materialize.home_benchmarks`，與卡片折線同一支 `fetch_close_series`）——同一台 yfinance 主機（⑬ 本來就逐檔抓卡片折線、邊緣判定的 FX），每輪多 4 個請求；抓不到只記理由、候選板照寫。寫入面不變：同一份 `candidates.json` 多一格 `benchmarks`（加法、不升版；不進 freshness_identity——行情每天在動，不是認知變了）。請求路徑：`/api/v1/stocks` 多讀一次 state 目錄的 `candidates.json`（唯讀、約 15 ms），不連外、不寫、不算——讀不到或舊板沒有這一格就回缺席與怎麼補 |
+| **2 canonical skill／prompt／本檔** | 本節；ARCHITECTURE「首頁 compact 卡片」後一段；ROADMAP 已交付旁支索引一行。skill 與無人值守 prompt 不動 |
+| **3 最窄 rule** | daily argv 不變；不新增 step、allowlist、rule；`.codex/rules` 仍 0 條；APP 仍沒有寫入端點、契約不升版（改了 `app.js` 照例重啟 serve） |
+| **4 contract test** | `tests/test_webapp_home_benchmarks.py` 8 條：視窗與算法是卡片那一個（`RELATIVE_WINDOWS[0]`、`trailing_return`）、起訖日、抓不到與不夠長照列並說為什麼（不是 0）、多抓一根、收盤狀態計數、不進 freshness_identity、抓失敗候選板照寫、API 照抄與兩種缺席、首頁先畫這一行且前端不算。變異 11／11 紅。既有兩支會跑 `materialize_candidates` 的測試改成不連網 |
+| **5 端到端 smoke** | 11-08 真資料 `materialize --candidates`：QQQ −11.9%、SOXX −28.5%、IWM −2.9%、0050 −16.9%；美股 09-25→11-06（與 AXTI 卡片同一段）、台股 09-21→11-06（與 3081.TWO 卡片同一段）；收盤狀態 4 檔都已收盤。serve 重啟後 health `code.stale=false`；headless Edge 渲染首頁與依層：那一行在日曆之前、窄螢幕自動換行、沒有錯誤框。缺席那條路：暫存 state 目錄放一份 SOXX 抓不到的候選板、8799 試跑 serve 渲染——SOXX 印「—」、原因印在同一行（手機沒有滑過提示），試跑完停掉並刪暫存目錄 |
+
 ### Sandbox impact review 結論（2026-11-07：EDGAR 監看多兩個推導來源——現行敘事的美股、還在盯的等待所等的美股；Phase 7 failure log #133）
 
 | 步 | 結論 |

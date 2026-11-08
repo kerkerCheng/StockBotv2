@@ -120,6 +120,7 @@ def test_materialize_candidates_keeps_an_explicit_empty_universe(monkeypatch, tm
 
     monkeypatch.setattr(cand, "load_board", fake_load)
     monkeypatch.setattr(mat, "_graph_node_names", lambda ids: {})          # 測試不連真的圖
+    monkeypatch.setattr(mat, "home_benchmarks", lambda: {"rows": [], "absence": "測試不抓大盤"})   # 測試不連網
     monkeypatch.setattr(ArtifactStore, "tickers", lambda self: ["SHOULD_NOT_BE_USED"])
     mat.materialize_candidates(tickers=[], store=StateArtifactStore(tmp_path))
     mat.materialize_candidates(tickers=None, store=StateArtifactStore(tmp_path))

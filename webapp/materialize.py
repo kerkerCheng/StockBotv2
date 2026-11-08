@@ -1971,6 +1971,63 @@ def positions_lanes(outcome: Any, collected: Mapping[str, Any]) -> dict[str, Any
 
 
 # ---------------------------------------------------------------------------
+# 首頁最上面那一行：大盤同期（2026-11-08 使用者：「首屏的比組跟幾趴是什麼時間區間的？可以在這一頁最上面簡單列一下
+# 指標性大盤 qqq Soxx 之類的同區間的變化嗎？看你推薦列哪幾檔」）。跟候選板一起抓、一起寫（`benchmarks` 那一格）。
+# ---------------------------------------------------------------------------
+
+#: 列哪幾檔（閱讀順序，不是名次）：美股大型科技、半導體（題材本身）、美股小型股（我們押的是邊緣小公司——看得出是小型股
+#: 一起跌還是只有題材在跌）、台股大型股（候選裡台股最多）。換一檔只改這裡。**只是脈絡**：不比、不排、不換算金額
+#: （AGENTS「訊號的地位」：位置指標拿去排序或調尺寸就變回訊號）。SOXX 自 2021 年起追蹤 NYSE 半導體指數，不是費半。
+HOME_BENCHMARKS: tuple[Mapping[str, str], ...] = (
+    {"symbol": "QQQ", "short": "QQQ", "label": "那斯達克 100", "market": "美股"},
+    {"symbol": "SOXX", "short": "SOXX", "label": "美國半導體", "market": "美股"},
+    {"symbol": "IWM", "short": "IWM", "label": "羅素 2000 小型股", "market": "美股"},
+    {"symbol": "0050.TW", "short": "0050", "label": "台灣 50", "market": "台股"},
+)
+
+
+def benchmark_moves(series: Mapping[str, Sequence[Mapping[str, Any]]], *,
+                    specs: Sequence[Mapping[str, str]] = HOME_BENCHMARKS) -> list[dict[str, Any]]:
+    """已收盤序列 `{symbol: [{session_date, close}]}` → 每檔最近 N 個交易日的漲跌。**純函式**。
+
+    N 與算法都是卡片那一個（`alpha.three_questions.RELATIVE_WINDOWS[0]`、`trailing_return`）：各自市場的交易日，
+    假日不同起點就不同，所以每檔帶自己的起訖日。抓不到或不足 N+1 根的照列、說為什麼——不是 0（INV-3）。"""
+    from alpha.three_questions import RELATIVE_WINDOWS, trailing_return
+
+    n = RELATIVE_WINDOWS[0]
+    rows: list[dict[str, Any]] = []
+    for spec in specs:
+        row: dict[str, Any] = {**dict(spec), "sessions": n, "return": None, "start": None, "end": None, "absence": None}
+        bars = [(date.fromisoformat(str(p["session_date"])[:10]), float(p["close"]))
+                for p in series.get(spec["symbol"]) or () if p.get("close") is not None]
+        value, last = trailing_return(bars, n)
+        if not bars:
+            row["absence"] = "抓不到收盤序列（provider 沒回；可能被限流）"
+        elif value is None or last is None:
+            row["absence"] = f"已收盤只有 {len(bars)} 根，不足 {n + 1} 根"
+        else:
+            # 起點＝`trailing_return` 拿來除的那一根（它取 usable[-1-n]；bars 這裡沒有 None，兩邊是同一串）
+            row.update({"return": round(value, 4), "start": bars[-1 - n][0].isoformat(), "end": last.isoformat()})
+        rows.append(row)
+    return rows
+
+
+def home_benchmarks(*, fetch: Any = None, now: datetime | None = None) -> dict[str, Any]:
+    """抓 `HOME_BENCHMARKS` 的已收盤日線並算漲跌。取價與卡片折線、計分表同一支（`fetch_close_series`，yfinance 唯讀；
+    盤中未收盤的最後一根照 `closed_points` 拿掉並計數）。只在 materialize 跑——請求路徑不抓外部資料。"""
+    from alpha.providers.close_series import fetch_close_series, summarize_bar_states
+    from alpha.three_questions import RELATIVE_WINDOWS
+
+    n = RELATIVE_WINDOWS[0]
+    states: dict[str, str | None] = {}
+    series = (fetch or fetch_close_series)([spec["symbol"] for spec in HOME_BENCHMARKS], sessions=n + 1, now=now,
+                                           states=states)
+    return {"window_sessions": n, "rows": benchmark_moves(series), "bar_states": summarize_bar_states(states),
+            "fetched_at": (now or datetime.now(timezone.utc)).astimezone(timezone.utc).isoformat(),
+            "note": f"各自市場最近 {n} 個交易日的調整後收盤漲跌，與卡片上的漲跌同一個算法；只是脈絡——不比、不排、不換算金額。"}
+
+
+# ---------------------------------------------------------------------------
 # state artifact：`candidates`（候選狀態板；Phase 3 Step 3.6）
 # ---------------------------------------------------------------------------
 
@@ -2030,6 +2087,9 @@ def build_candidates_artifact(board: Mapping[str, Any], *, generated_at: datetim
         # Phase 7 Step 7.0g-1：資料檢查的取數（closure-gate 讀它印）。**不進 freshness_identity**——資料品質不是認知，
         # 而且匯率每天在動；放進去會讓 Daily 天天以為「認知變了」。
         "data_checks": dict(board.get("data_checks") or {}),
+        # 首頁最上面那一行：大盤同期（2026-11-08 使用者指示；`home_benchmarks`）。**不進 freshness_identity**——行情每天在動，
+        # 不是認知變了（同 data_checks）。板上沒有這一格＝缺席並說為什麼，不是空列冒充「大盤沒資料」（INV-3）。
+        "benchmarks": dict(board.get("benchmarks") or {"rows": [], "absence": "板上沒有這一格（這一輪沒抓大盤）"}),
         "this_is_not": list(CANDIDATES_THIS_IS_NOT),
         "materializer": {
             "version": CANDIDATES_MATERIALIZER_VERSION,
@@ -2067,7 +2127,8 @@ def materialize_candidates(*, tickers: Sequence[str] | None = None, store: State
                            generated_at: datetime | None = None,
                            context: Mapping[str, Any] | None = None) -> tuple[Path, dict[str, Any]]:
     """推導整板並寫下 artifact。**不寫任何 authority**：讀敘事 ledger、讀圖對圖、watch registry、Engine C（三題 ?mode=ro；
-    四盞燈與邊緣判定走一般連線）、Sheet（readonly）、邊緣判定的 FX（yfinance，與 `--beta` 同一個 get_fx_snapshot）。
+    四盞燈與邊緣判定走一般連線）、Sheet（readonly）、邊緣判定的 FX（yfinance，與 `--beta` 同一個 get_fx_snapshot）、
+    首頁最上面那一行的大盤日線（yfinance，`home_benchmarks`；2026-11-08）。
     `tickers`：宇宙；沒給就用 APP 已 materialize 的那幾檔（`ArtifactStore().tickers()`）。"""
     from alpha.providers.candidates import load_board
 
@@ -2090,6 +2151,11 @@ def materialize_candidates(*, tickers: Sequence[str] | None = None, store: State
             "band": list(REVENUE_MAGNITUDE_BAND), "pairs": revenue_magnitude_pairs(sorted({str(t) for t in universe}))}}
     except Exception as exc:  # noqa: BLE001
         board["data_checks"] = {"revenue_magnitude": {"absence": f"{type(exc).__name__}: {str(exc)[:160]}"}}
+    # 首頁最上面那一行（2026-11-08 使用者指示）：大盤同期。同上——抓不到只記理由、候選板照寫。
+    try:
+        board["benchmarks"] = home_benchmarks()
+    except Exception as exc:  # noqa: BLE001
+        board["benchmarks"] = {"rows": [], "absence": f"大盤沒抓到（{type(exc).__name__}: {str(exc)[:160]}）"}
     payload = build_candidates_artifact(board, generated_at=generated_at)
     target = store or StateArtifactStore()
     written = target.write(payload)

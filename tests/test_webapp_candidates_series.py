@@ -100,6 +100,7 @@ def fake_board(monkeypatch):
 
     monkeypatch.setattr(cand, "load_board", fake_load)
     monkeypatch.setattr(mat, "_graph_node_names", lambda ids: {})          # 測試不連真的圖
+    monkeypatch.setattr(mat, "home_benchmarks", lambda: {"rows": [], "absence": "測試不抓大盤"})   # 測試不連網
 
 
 def test_materialize_appends_after_writing_the_artifact(fake_board, tmp_path) -> None:
