@@ -37,6 +37,14 @@ def test_the_prompt_says_read_only() -> None:
     assert "缺 X" in prompt and "向你要文件" in prompt        # 讀到邊、向使用者要文件照 AGENTS 那兩條
 
 
+def test_the_prompt_points_at_a_checklist_that_exists() -> None:
+    # 2026-11-09：提示點名研究 skill 的「完整重讀」五項；那一段被改名或刪掉，提示就指向空處（L13）
+    prompt = _function("askClaudePrompt")
+    assert "skills/research-drain/SKILL.md" in prompt and "「完整重讀」" in prompt
+    skill = (ROOT / "skills" / "research-drain" / "SKILL.md").read_text(encoding="utf-8")
+    assert "**完整重讀＝清單之外的五項回掃**" in skill
+
+
 def test_a_blocked_clipboard_shows_the_text_instead_of_pretending() -> None:
     button = _function("askClaudeButton")
     assert "navigator.clipboard.writeText" in button
