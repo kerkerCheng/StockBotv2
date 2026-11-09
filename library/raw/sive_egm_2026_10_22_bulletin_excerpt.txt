@@ -1,0 +1,13 @@
+SOURCE: Sivers Semiconductors AB, "Bulletin from Sivers Semiconductors AB's Extraordinary General Meeting on 22 October 2026"（MFN／Cision 新聞稿）
+URL: https://mfn.se/all/a/sivers-semiconductors/bulletin-from-sivers-semiconductors-abs-extraordinary-general-meeting-on-22-october-2026-9195dae4
+PUBLISHED: 2026-10-22（datePublished 2026-10-22T22:27:33Z）
+RETRIEVED: 2026-11-09
+STORAGE: repo_excerpt（HTML 正文逐字節錄：改選會計師與 P11 兩段；聯絡人與公司簡介未收）
+NOTE: 給 SIVE 敘事「會死嗎」與稀釋那兩格。2025 年報查核報告的持續經營重大不確定性是 Deloitte 簽的（2026-05-13）；2026 年度年報改由 EY 查核。公告沒寫換會計師的理由。發行人自述（L8 弱主張）。
+
+[Election of auditor]
+"The Extraordinary General Meeting resolved, in accordance with the Nomination Committee's proposal, to terminate the assignment of the Company's auditor Deloitte AB and to elect Ernst & Young AB as new auditor for the period until the close of the next Annual General Meeting."
+
+[Resolution on a long-term incentive program]
+"The Extraordinary General Meeting resolved to introduce a long-term incentive program (the "P11") for employees of the group in the United States, Scotland, Sweden, India and China."
+"P11 comprises a maximum of 7,280,000 stock options entitling to purchase of the same number of shares, corresponding to approximately 2.0 per cent of the shares and votes in the Company after dilution. The stock options are granted free of charge, are not subject to any performance conditions, and may not be transferred or pledged."

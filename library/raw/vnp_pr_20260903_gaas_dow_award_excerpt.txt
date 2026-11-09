@@ -1,0 +1,9 @@
+SOURCE: 5N Plus Inc.（TSX: VNP）新聞稿〈5N+ Selected to Establish Domestic Production of Gallium Arsenide Components for U.S. Defence Applications Through US$7.3M Award〉
+URL: https://www.newswire.ca/news-releases/5n-selected-to-establish-domestic-production-of-gallium-arsenide-components-for-u-s-defence-applications-through-us-7-3m-award-880532462.html
+PUBLISHED: 2026-09-03 07:45 ET（Cision／Newswire.ca 刊登時間）
+RETRIEVED: 2026-11-09
+STORAGE: repo_excerpt（發行人新聞稿有限節錄；HTML 轉文字、空白攤平後逐字照抄）
+NOTE: 發行人自述（政府買方自己的公告沒讀到）。Phase 7 完整重讀（太空三結電池片層；5N Plus 敘事）用：補助的對象是國防用的砷化鎵元件、建在 St. George；「可延伸到太空太陽電池的襯底」是它自己說的可能性——不是太空三結電池的訂單，加碼條件 c1（買方一手寫出太空三結電池的交期、配額、預付、長約或具名量）沒碰到。
+
+"today announced that it has been selected by the U.S. Department of War to receive a US$7.3 million award to establish domestic production of gallium arsenide components for U.S. defence applications."
+"The capabilities that will be developed at the Company's Utah facility could also support future production of GaAs substrates and other advanced semiconductor materials for additional defence and space applications, including space solar cells and high-frequency semiconductor devices."

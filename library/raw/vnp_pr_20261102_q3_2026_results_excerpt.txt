@@ -1,0 +1,13 @@
+SOURCE: 5N Plus Inc.（TSX: VNP）新聞稿〈5N+ Reports Third Quarter of 2026 Financial Results〉
+URL: https://www.newswire.ca/news-releases/5n-reports-third-quarter-of-2026-financial-results-839040791.html
+PUBLISHED: 2026-11-02 17:00 ET（Cision／Newswire.ca 刊登時間）
+RETRIEVED: 2026-11-09
+STORAGE: repo_excerpt（發行人新聞稿有限節錄；HTML 轉文字、空白攤平後逐字照抄——「Backlog 1」「Net debt 1」的 1 是原文的註腳號）
+NOTE: 發行人自述。Phase 7 完整重讀（太空三結電池片層；5N Plus 敘事）用：①全公司積壓降到 299 天、比上一季少 14 天——特種半導體部門仍頂在定義上限 365 天（第三季 MD&A，`vnp_tsx_q3_2026_mda_space_solar_backlog.txt`），敘事反證第 1 條看的是部門那一個數，沒碰到；②淨負債與淨負債對 EBITDA（候選理由「會死嗎」那一句的出處）；③St. George 的砷化鎵產線與擴廠。沒有點名太空客戶、沒有拆出太空營收。
+
+Highlights：
+"Backlog 1 stood at $447.3 million, representing 299 days of annualized revenue as at September 30, 2026, 14 days lower than in the previous quarter and 12 days lower than as at September 30, 2025."
+"Net debt 1 was $32.4 million as at September 30, 2026, compared to $50.3 million as at December 31, 2025, while the Company's net-debt-to-EBITDA ratio 1 stood at 0.31x as at September 30, 2026."
+
+CEO 引言：
+"This includes advancing recently announced gallium arsenide (GaAs) production and facility expansion plans at St. George, Utah, to support growing demand across defence, space solar, medical imaging and industrial sensing applications."

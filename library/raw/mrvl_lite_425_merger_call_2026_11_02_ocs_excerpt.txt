@@ -1,0 +1,13 @@
+SOURCE: Marvell Technology, Inc. Rule 425 申報——Marvell 與 Lumentum 2026-11-02 併購聯合電話會逐字稿（Subject Company: Lumentum Holdings Inc.）
+URL: https://www.sec.gov/Archives/edgar/data/1633978/000119312526443876/d178787d425.htm
+PUBLISHED: 2026-11-02（EDGAR filingDate）
+RETRIEVED: 2026-11-09
+STORAGE: repo_excerpt（美國 SEC 申報有限節錄；HTML 轉文字、空白攤平後逐字照抄）
+NOTE: 收購方與被收購方的自述。Phase 7 完整重讀（OCS MEMS 鏡陣列層；Silex 敘事反證第 3 條回掃）用：提到 OCS 的只有下面一句，講自家晶圓廠的段落講的是磷化銦雷射——**沒寫 OCS 的 MEMS 鏡在哪裡做**。另三份 425 是 Lumentum 的社群貼文（accession 0001193125-26-443887、445616、448735；貼文日 11-02、11-02、11-04），文字裡沒有「MEMS」「optical circuit」「OCS」；0001193125-26-443872 是 Marvell 11-02 給員工的簡報，抓回來只有封面文字，簡報本身沒讀到。
+
+Lumentum 段（OCS）：
+"Lumentum has become a key provider of MEMS-based optical circuit switches, also known as OCS, which are increasingly being adopted by customers to augment their network switching architectures for additional resiliency and reconfigurability."
+
+Lumentum 段（自家晶圓廠——講的是雷射）：
+"Lumentum owns and operates a significant footprint of specialty indium phosphide fabs, giving us one of the scarcest and most strategically valuable manufacturing capabilities in the entire semiconductor industry."
+"We maintain full control over our front-end fabs, alongside a flexible, hybrid, back-end assembly and test model, which combines internal capacity with that of contract manufacturing partners."
