@@ -1,0 +1,17 @@
+Source URL: https://finance.yahoo.com/markets/stocks/articles/hammond-power-solutions-reports-record-221500961.html
+Original: GlobeNewswire 2026-10-29「Hammond Power Solutions Reports Record Third Quarter 2026 Financial Results」
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Hammond Power Solutions Inc.（TSX: HPS.A）2026 年第三季財報新聞稿
+DATE: 2026-10-29
+RETRIEVED: 2026-11-10（Yahoo Finance 轉載的 GlobeNewswire 全文，HTML 抽字後逐字切出；金額單位為加幣千元，引文照原樣）
+NOTE: 發行人新聞稿（自述）。全文沒有交期（lead time）、配額或預付的字樣；乾式變壓器沒有單獨數字。
+
+"GUELPH, Ontario, Oct. 29, 2026 (GLOBE NEWSWIRE) -- Hammond Power Solutions Inc. ("HPS" or the "Company") (TSX: HPS.A) a leading provider of magnetic and power electronic solutions, today announced its financial results for the third quarter 2026."
+"Third quarter 2026 represents the first full quarter in which AEG's results are included in HPS's consolidated results."
+"Beginning in the third quarter of 2026, following the acquisition of AEG Power Solutions ("AEG") on June 29, 2026, HPS began reporting its results through two reportable operating segments: Power Magnetics and Integrated Electrical Solutions ("IES")."
+"Sales for the third quarter were $446,263, compared to $218,341 in the third quarter of 2025, an increase of $227,922 or 104.4%."
+"Power Magnetics sales in the U.S. market were $288,728 in the third quarter of 2026, increasing 87.9% from $153,699 in the third quarter of 2025. The U.S. market continued to drive significant year-over-year growth, driven by increases in data centre shipments, along with modest improvements in industrial markets versus the prior year."
+"The Company's Quarter 3, 2026 Power Magnetics backlog increased by 61.1% as compared to Quarter 3, 2025, primarily due to large project orders driven by data centre activity. Backlog decreased 3.8% from Quarter 2, 2026. While Quarter 3 2026 bookings were higher than in Quarter 2 2026, shipments (excluding AEG) were also higher by 12%, driving a decrease in backlog."
+"Gross margin reached 34.4%, up from 30.1% a year ago, as pricing actions, higher factory output, more custom products and better efficiency helped us offset tariffs and rising copper and aluminum costs." (Richard Vollering, CFO)
+"IES sales were $90,754 for the quarter made up of a mixture of end markets including oil and gas, power generation, and offshore wind. Other emerging markets with notable shipments in the quarter include nuclear and data centres."
