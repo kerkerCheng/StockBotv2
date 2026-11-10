@@ -25,7 +25,7 @@ import json
 import sys
 from datetime import date
 from pathlib import Path
-from typing import Any
+from typing import Any, Mapping
 
 from .contracts import AXES, content_digest
 from .errors import AlphaError, PointInTimeUnsupported
@@ -140,10 +140,16 @@ def cmd_research(args: argparse.Namespace) -> int:
 
         packet = build_packet(build)
         payload = packet.to_json()
+        if not getattr(args, "prices", False):
+            # 研究畫面預設遮價格（failure log #152：Q3W 寫裁決行之前不看價格）；要答已定價那一格再加 --prices
+            from .price_mask import mask_packet
+
+            payload = json.dumps(mask_packet(json.loads(payload)), ensure_ascii=False, indent=2, default=str)
         if args.out:
             Path(args.out).write_text(payload, encoding="utf-8")
             print(f"packet → {args.out}（{len(payload)} bytes，"
-                  f"digest {packet.context_digest[:20]}…）")
+                  f"digest {packet.context_digest[:20]}…"
+                  f"{'' if getattr(args, 'prices', False) else '；價格欄已遮，要看加 --prices'}）")
             print("\n下一步：讀 packet 的 axis_prompts，寫判斷 JSON，然後")
             print(f"  python -m alpha research {args.ticker} --judgment <judgment.json>")
         else:
@@ -151,6 +157,78 @@ def cmd_research(args: argparse.Namespace) -> int:
         return 0
     finally:
         graph.driver.close()
+
+
+def _light_value(question: str, row: Mapping[str, Any]) -> str:
+    """一行稽核的值（人讀）：燈色換字、序列印最近四點、其餘照印；有口徑就附在後面。"""
+    from .candidates import LIGHT_WORDS
+
+    value = row.get("value")
+    basis = f"（{row['basis']}）" if row.get("basis") else ""
+    if question == "will_it_die":
+        return LIGHT_WORDS.get(str(value), str(value))
+    if isinstance(value, list):
+        bits = []
+        for point in value[-4:]:
+            when = point.get("data_month") or point.get("period_end") or point.get("as_of") or "?"
+            if point.get("yoy") is not None:
+                bits.append(f"{when} 年增 {point['yoy']:+.1%}")
+            elif "revenue_mix" in point:
+                bits.append(f"{when} {json.dumps(point['revenue_mix'], ensure_ascii=False)}")
+            else:
+                bits.append(f"{when} 年增（算不出）")
+        return "；".join(bits) + basis
+    return f"{value}{basis}"
+
+
+def _render_lights(ticker: str, result: Mapping[str, Any] | None, unread: str | None) -> str:
+    """一檔的研究讀燈（人讀）：會死嗎、出現在數字裡了嗎、已定價嗎——順序照起始門要先看的。"""
+    from .three_questions import QUESTION_LABELS
+
+    if result is None:
+        return f"\n## {ticker}\n  未讀到：{unread}"
+    lines = [f"\n## {ticker}（{result.get('today')}）"]
+    for question in ("will_it_die", "in_numbers", "priced_in"):
+        lines.append(QUESTION_LABELS[question])
+        for row in result.get(question) or ():
+            label = str(row.get("label") or row.get("key"))
+            label = label.split("：", 1)[1] if label.startswith(QUESTION_LABELS[question] + "：") else label
+            if row.get("absence_kind"):
+                lines.append(f"  - {label}：缺席 {row['absence_kind']}——{row.get('reason')}")
+            else:
+                lines.append(f"  - {label}：{_light_value(question, row)}")
+    return "\n".join(lines)
+
+
+def cmd_lights(args: argparse.Namespace) -> int:
+    """研究讀燈（failure log #152，2026-11-10）：會死嗎四盞燈、出現在數字裡了嗎、已定價嗎——與候選板同一個串接點。
+
+    **已定價的值與市值預設遮掉**（Q3W：寫裁決行之前不看價格；遮掉印成一個字串，不是 null——遮掉與缺席不同形）。
+    要答已定價那一格再加 `--prices`。唯讀：Engine C 正式庫、敘事 ledger；不寫任何東西。"""
+    from .price_mask import PRICES_HINT, PRICES_SHOWN, mask_three_questions
+    from .providers import candidates as candidates_provider
+
+    failed = 0
+    out: dict[str, dict[str, Any]] = {}
+    for raw in args.tickers:
+        try:
+            resolved, _company_id = _resolve_company(raw)
+        except AlphaError as exc:
+            print(f"✗ {raw}：{exc}", file=sys.stderr)
+            failed += 1
+            continue
+        ticker = str(resolved)
+        result, unread = candidates_provider.lights_for(ticker)
+        if result is not None and not args.prices:
+            result = mask_three_questions(result)
+        out[ticker] = {"result": result, "unread": unread}
+    if args.format == "json":
+        print(json.dumps(out, ensure_ascii=False, indent=2, default=str))
+    else:
+        print(PRICES_SHOWN if args.prices else PRICES_HINT)
+        for ticker, item in out.items():
+            print(_render_lights(ticker, item["result"], item["unread"]))
+    return 2 if failed else 0
 
 
 def cmd_assumptions(args: argparse.Namespace) -> int:
@@ -392,6 +470,19 @@ def cmd_brief(args: argparse.Namespace) -> int:
                           f"（[{{\"ticker\": \"{ticker}\", \"short_name\": …, \"text\": ≤14 字做什麼}}]）")
             except Exception:  # noqa: BLE001 — 提醒讀不到不擋敘事寫入
                 pass
+        return 0
+    if getattr(args, "show", None):
+        # 讀一版全文（failure log #152）：不必再直接開 jsonl——寫入端記下的已定價① 預設遮掉，--prices 拿原樣
+        from .price_mask import PRICES_HINT, PRICES_SHOWN, mask_brief_record
+        from .providers.briefs import raw_record
+
+        raw = raw_record(ticker, None if args.show == "current" else args.show)
+        if raw is None:
+            print(f"✗ {ticker} " + ("沒有現行的敘事（沒寫過，或最新一筆是撤回）" if args.show == "current"
+                                    else f"的 ledger 裡沒有 {args.show}"), file=sys.stderr)
+            return 2
+        print(PRICES_SHOWN if args.prices else PRICES_HINT)
+        print(json.dumps(raw if args.prices else mask_brief_record(raw), ensure_ascii=False, indent=2))
         return 0
     records, errors = read_brief_records(ticker)
     if args.format == "json":
@@ -1086,6 +1177,9 @@ def build_parser() -> argparse.ArgumentParser:
     brief.add_argument("--add", help="append 一筆短評（JSON spec 檔路徑；七格缺一不可）")
     brief.add_argument("--retract", help="append 一筆撤回紀錄（指定 brief_id）")
     brief.add_argument("--rationale", help="撤回理由")
+    brief.add_argument("--show", nargs="?", const="current",
+                       help="印一版全文（不給 id＝現行那一份；寫入端記下的已定價①預設遮掉，failure log #152）")
+    brief.add_argument("--prices", action="store_true", help="--show 不遮價格（Q3W 名單內的檔先寫完裁決行）")
     brief.add_argument("--format", choices=("markdown", "json"), default="markdown")
     brief.set_defaults(func=cmd_brief)
 
@@ -1112,8 +1206,17 @@ def build_parser() -> argparse.ArgumentParser:
                           help="（預設行為，保留為顯式旗標）")
     research.add_argument("-o", "--out", help="packet 輸出路徑")
     research.add_argument("--judgment", help="session 寫好的判斷 JSON")
+    research.add_argument("--prices", action="store_true",
+                          help="packet 不遮價格（預設遮掉市價、市值、目標價、本益比；failure log #152）")
     research.add_argument("--format", choices=("markdown", "json"), default="markdown")
     research.set_defaults(func=cmd_research)
+
+    lights = sub.add_parser(
+        "lights", help="研究讀燈（唯讀）：會死嗎四盞燈、出現在數字裡了嗎、已定價嗎——已定價的值與市值預設遮掉")
+    lights.add_argument("tickers", nargs="+", help="代號（名冊的研究代號）")
+    lights.add_argument("--prices", action="store_true", help="不遮價格（要答已定價那一格時；Q3W 名單內的檔先寫完裁決行）")
+    lights.add_argument("--format", choices=("markdown", "json"), default="markdown")
+    lights.set_defaults(func=cmd_lights)
 
     audit = sub.add_parser(
         "audit",

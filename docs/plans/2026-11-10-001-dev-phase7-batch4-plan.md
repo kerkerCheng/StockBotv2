@@ -18,7 +18,7 @@
 | B | #140 | 敘事「錯的訊號」每一條標它對應的反證編號，寫入端核 | Z2／R1 | ✅ 11-10（回放 AXTI 11-07 版印出「通美融資沒能交割」；現行 93 份會拒收 0、換版時提醒 21） |
 | C | #150 | 敘事的裁決時點過了（或引用的文件已到）提醒換版、候選板計數 | Z2／R1 | ✅ 11-10（候選板點名 17 檔：申報 7、日期 7、佔位字 3；逐一看過都是真的過了；11-11 起再多 8） |
 | D | #143 | 讀圖條件寫「新進者」而圖上同一節點的公司不在 entities，收據印出 | Z1／R1 | ✅ 11-10（回放 275 份讀圖印出 3 筆，全是 CW DFB 三版漏了環宇） |
-| E | #152 | 研究讀燈與稽核區的唯讀出口遮價格欄 | — | ○ |
+| E | #152 | 研究讀燈與稽核區的唯讀出口遮價格欄 | Z2／R1 | ✅ 11-10（Q3W 名單 28 檔預設輸出的價格欄 0 個、原樣 339 個，四盞燈照印） |
 | F | #141 | 私有券商報告存 sidecar 索引（不抄內容），drain 讀某檔時列出點名它的報告 | — | ○ |
 | G | #32＋#139 | 敘事／讀圖寫入收據列出同一公司自家庫已有、沒引用的一手（只印不擋） | — | ○ |
 | H | #148 | MOPS 重訊補抓前幾天、新進範圍回補 90 天 | — | ○ |
@@ -187,3 +187,40 @@ failure log 另外三個 case（8996.TW 條件點名的美超微、VNP.TO 的 Yo
 **落地（2026-11-10）：** `alpha/structure_reading/entrants.py`；`alpha/providers/structure_readings.py::entrant_notices`；`alpha/cli.py`
 （`cmd_structure_reading` 收據）；research-drain 段 4 ④。CW DFB 那一條要不要補環宇是研究判斷，照 failure log 原處置：下一版讀圖手動補
 （換版代價是騎它的敘事換騎，不為這一條單獨換）。
+
+## E 研究讀燈與讀敘事全文的出口遮價格欄（#152）
+
+```
+INTAKE
+Zoom: Z2（三個互動出口的預設輸出變了：研究 packet、新命令 alpha lights、alpha brief --show；不碰 artifact、ledger、APP）
+Review: R1（只讀；無人值守路徑不變；六條 R2 trigger 都不命中）
+Case: failure log #152（11-10 一輪 Q3W 被動曝光 5 次：主 session 印 3163.TWO 稽核區看到「−32.9%」、子代理讀 2455.TW 時工具印出
+      priced_at_write、C／H2 組讀 IQE.L 等個股頁物化檔帶到價格欄、兩組 grep 私有券商報告帶到目標價與收盤價）
+```
+
+**現況（2026-11-10 唯讀）：** 研究讀三題稽核區**沒有正式命令**——`library/private/tmp`、`wf_tmp` 裡各 session 自寫了十幾支
+`three_questions_for(...)` dump 腳本，整份印出（含已定價三行的值與 detail）；讀上一版敘事全文沒有出口，直接開 ledger jsonl（帶
+`priced_at_write`）；`python -m alpha research <T>` 的 packet 帶 `deterministic.market` 的市價與市值、`consensus` 的目標價與本益比；
+個股頁物化檔光價格欄就有十幾處（走勢、收盤、市值、目標價、事件後報酬）。Q3W 名單 28 檔（#152 點名的四檔都在裡面）照原樣輸出三題，
+價格欄 339 個。
+
+**做什麼：** `alpha/price_mask.py`（純函式）——三題稽核區遮已定價每一行的值與 detail、稀釋那盞的市值兩個鍵；packet 遮市價、市值、
+目標價、三個本益比類欄位、市場隱含兩欄；敘事紀錄遮 `priced_at_write`。遮掉印成「〔已遮：價格〕」（字串、不是 null——遮掉與缺席不同形，
+L12）；缺席與理由照印（量不到是研究要知道的）；出現在數字裡了嗎整段照印。三個出口預設遮、加 `--prices` 拿原樣：新命令
+`python -m alpha lights <T…>`（與候選板同一個串接點 `_wipeout_and_three_questions`、同一份 history_not_comparable，L16）、
+`alpha research` 的 packet、`alpha brief <T> --show [<id>]`（讀一版全文）。research-drain ⓑ、起始門、ⓔ（Q3W）與派工提示改走這幾個出口。
+
+**四問：** ①顯形＋拿掉資訊落差（遮在出口，不靠自報）。②程式（出口）＋寫的人（加 `--prices` 是有意識的動作）。③加一個出口、改兩個
+出口的預設；拿掉的是「研究要看燈就得 dump 整份」那條路——十幾支 tmp 腳本不再需要。④最先壞掉的那一筆：寫已定價那一格的人
+（要答 yes／no／量不到）——預設遮掉後得加 `--prices`，SKILL 寫明；敘事的已定價格寫的是 placeholder（`{own_history_pctile}` 等，
+render 時由 authority 填），寫入端本身不受影響。個股頁與候選板物化檔照印價格（那是給使用者看的）；券商報告正文的目標價不在本項
+（F 的索引讓研究不必 grep 全文，讀那幾頁時照 SKILL 跳過封面）。
+
+**驗收（現有資料）：** Q3W 名單 28 檔 `alpha lights --format json` 預設輸出的價格欄 **0** 個（原樣 339）、會死嗎有燈 62 盞照印、
+未讀到 0；3163.TWO 的「−32.9%」那一行印成遮掉。packet：IQE.L、AXTI 預設輸出市價、市值、目標價等有值的欄全部遮掉（`--prices` 照原樣）；
+`alpha brief 2455.TW --show` 的 `priced_at_write` 遮掉。機制：`tests/test_price_mask.py` 11 條＋變異 10／10 變紅（已定價的值不遮、
+detail 不遮、會死嗎市值不遮、遮掉印成 null、封包目標價不遮、缺席也印成遮掉、research 預設不遮、lights 的 --prices 沒作用、
+brief --show 不遮、讀燈不帶現行敘事的歷史不可比）。**前置：** 無。
+**落地（2026-11-10）：** `alpha/price_mask.py`；`alpha/providers/candidates.py::lights_for`；`alpha/providers/briefs.py::raw_record`；
+`alpha/cli.py`（`lights`、`research --prices`、`brief --show/--prices`）；research-drain ⓑ、起始門、ⓔ、派工提示。
+**sandbox：** 只動互動命令；daily 不呼叫這幾個出口，可執行面沒變，不另寫 OPERATIONS 結論。

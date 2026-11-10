@@ -44,6 +44,33 @@ def read_brief_records(ticker: str, *, directory: Path | None = None) -> tuple[l
     return records, errors
 
 
+def current_brief_id(ticker: str) -> str | None:
+    """現行那一份的 id（`select_brief`，排程時區的今天）；沒寫過或最新一筆是撤回回 None。"""
+    from engine_b import event_watch as ew
+
+    from ..narrative.contracts import select_brief
+
+    current = select_brief(read_brief_records(ticker)[0], as_of=None, today=ew._today())
+    return current.brief_id if current is not None else None
+
+
+def raw_record(ticker: str, brief_id: str | None = None) -> dict[str, Any] | None:
+    """ledger 裡的一行原樣（`alpha brief --show`，failure log #152）：沒給 id＝現行那一份；找不到回 None。
+    遮價格由呼叫端做（`alpha.price_mask.mask_brief_record`）——讀全文不必再直接開 jsonl。"""
+    wanted = brief_id or current_brief_id(ticker)
+    path = ledger_path(ticker)
+    if wanted is None or not path.is_file():
+        return None
+    for line in path.read_text(encoding="utf-8").splitlines():
+        try:
+            raw = json.loads(line) if line.strip() else None
+        except ValueError:
+            continue                     # 壞行由 read_brief_records 計數（INV-3）；這裡只找指定的那一筆
+        if isinstance(raw, dict) and raw.get("brief_id") == wanted:
+            return raw
+    return None
+
+
 def append_brief_record(record: Mapping[str, Any], *, directory: Path | None = None) -> Path:
     """append 一筆（已由 `brief_record()` 驗證過的）紀錄；只 append，永不改寫既有行。"""
     parsed = parse_brief_record(record)
@@ -636,6 +663,6 @@ def write_brief(record: Mapping[str, Any], *, ctx: WriteContext, directory: Path
 
 
 __all__ = ["BETTABLE_READING_KINDS", "BRIEF_DIR", "CURRENT_READING_STATUSES", "OPEN_READING_KINDS", "PRICED_IN_WRITE_LINES", "WriteContext", "append_brief_record", "priced_snapshot",
-           "body_behind_problems", "checkpoint_notices", "depth_check_ref_problems",
-           "ledger_path", "read_brief_records", "restates_problems", "v2_write_notices", "v2_write_problems",
+           "body_behind_problems", "checkpoint_notices", "current_brief_id", "depth_check_ref_problems",
+           "ledger_path", "raw_record", "read_brief_records", "restates_problems", "v2_write_notices", "v2_write_problems",
            "write_brief", "wrong_signal_ref_problems"]

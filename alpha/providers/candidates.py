@@ -612,6 +612,30 @@ def _wipeout_and_three_questions(ticker: str, *, today: date, history_not_compar
         return None, f"{type(exc).__name__}: {str(exc)[:120]}"
 
 
+def _history_not_comparable(brief: InvestorBrief | None) -> Mapping[str, Any] | None:
+    """現行敘事宣告的「歷史不可比」（只有 v2 會寫）；候選板與研究讀燈同一個判斷（L16）。"""
+    return (brief.history_not_comparable.as_dict()
+            if brief is not None and brief.record_version == RECORD_VERSION_V2 and brief.history_not_comparable
+            else None)
+
+
+def _current_brief(ticker: str, today: date) -> InvestorBrief | None:
+    from . import briefs as briefs_provider
+
+    records, _errors = briefs_provider.read_brief_records(ticker)
+    return select_brief(records, as_of=None, today=today)
+
+
+def lights_for(ticker: str, *, today: date | None = None) -> tuple[Mapping[str, Any] | None, str | None]:
+    """研究讀燈（failure log #152；`python -m alpha lights`）：一檔的四盞燈＋三題，**原樣**——遮價格由呼叫端做
+    （`alpha.price_mask`）。與候選板同一個串接點、同一份 history_not_comparable（現行敘事寫的那一份；L16）。唯讀。"""
+    from engine_b import event_watch as ew
+
+    today = today or ew._today()
+    return _wipeout_and_three_questions(ticker, today=today,
+                                        history_not_comparable=_history_not_comparable(_current_brief(ticker, today)))
+
+
 def candidate_context(tickers: Sequence[str], *, today: date | None = None,
                       holdings_loader: Callable[[], Sequence[Mapping[str, Any]]] | None = None,
                       board: bool = True, structure: Mapping[str, Any] | None = None) -> dict[str, Any]:
@@ -906,10 +930,7 @@ def load_board(tickers: Sequence[str], *, today: date | None = None,
             brief_company[f"brief:{rec.brief_id}"] = rec.company_id
             company_ticker.setdefault(rec.company_id, ticker)
         brief = select_brief(records, as_of=None, today=today)
-        hnc = (brief.history_not_comparable.as_dict()
-               if brief is not None and brief.record_version == RECORD_VERSION_V2 and brief.history_not_comparable
-               else None)
-        tq, note = _wipeout_and_three_questions(ticker, today=today, history_not_comparable=hnc)
+        tq, note = _wipeout_and_three_questions(ticker, today=today, history_not_comparable=_history_not_comparable(brief))
         tq_by_ticker[ticker] = tq
         if note:
             tq_notes[ticker] = note
@@ -1007,5 +1028,5 @@ def held_on_board(ticker: str) -> bool | None:
 __all__ = ["ANSWER_WORDS", "CANDIDATES_THIS_IS_NOT", "GROUPS", "GROUP_LABELS", "SIDE_GROUPS", "SIDE_LABELS",
            "UNANSWERED", "assemble_board", "assertions_for", "bet_index", "board_rewrite", "candidate_context",
            "deadline_reminder", "derive_row", "held_index", "held_on_board", "raw_text",
-           "knowable_bar_day", "load_board", "open_preconditions", "page_input", "rollup", "shared_bet", "stall_since",
-           "three_words"]
+           "knowable_bar_day", "lights_for", "load_board", "open_preconditions", "page_input", "rollup", "shared_bet",
+           "stall_since", "three_words"]

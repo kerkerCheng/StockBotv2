@@ -72,6 +72,8 @@
 
 > 日期＝交付日。這裡只留落點，讓程式註解裡的 `ROADMAP「標題」` 找得到；要看做了什麼、數字怎麼變，讀封存列。
 
+- 2026-11-10 **研究讀燈與讀敘事全文的出口遮價格欄**（failure log #152；使用者「開發 … #152 … 照推薦做」）——新命令 `python -m alpha lights <T…>`（會死嗎、出現在數字裡了嗎、已定價嗎；與候選板同一個串接點）、`alpha research` 的 packet、`alpha brief <T> --show [<id>]` 預設把已定價的值與 detail、市值、市價、目標價、本益比、`priced_at_write` 印成「〔已遮：價格〕」（字串不是 null；缺席照印），加 `--prices` 拿原樣；APP 與物化檔不動；`alpha/price_mask.py`、`tests/test_price_mask.py`；research-drain ⓑ、起始門、ⓔ、派工提示；plan 同上 E。**真資料**：Q3W 名單 28 檔預設輸出的價格欄 0 個（原樣 339），四盞燈照印
+
 - 2026-11-10 **讀圖反證寫「新進」卻漏列 develops 的公司就在收據點名**（failure log #143；使用者「開發 … #143 … 照推薦做」）——寫「新進」的那一條，快照 developers 角度 `develops` 這一層、不在那一條 entities 的公司，`alpha structure-reading --add` 寫入後印在收據（附 research ticker；只提醒、不擋；算不成只印一行，等待登記照跑）；`alpha/structure_reading/entrants.py`、`alpha/providers/structure_readings.py::entrant_notices`、`tests/test_reading_entrants.py`；research-drain 段 4 ④ 補一句；plan 同上 D。**真資料**：回放 275 份讀圖印出 3 筆，全是 CW DFB 三版漏了環宇（4991.TWO）；條件點名但不在名冊的公司（美超微、York 等）不在本項，補名冊走 pq2
 
 - 2026-11-10 **何時格的裁決點已過就叫重寫**（failure log #150；使用者「開發 … #150 … 照推薦做」）——三種「過了」只看日期：何時格寫的日子（寫下時還沒開始的最早一個；旬是一段）已過、點名的 SEC 定期報告（10-Q／10-K／20-F／40-F，lead 池 `edgar:` 來源）在寫下之後交了、`{next_checkpoint_date}` 寫成某件事的日子而寫下那天名冊上的下一個檢核點已過；「寫下那天」從何時格這段文字最早出現的那一版算。候選列 `rewrite[]`（首屏「裁決點過了」）、整板清單 kind=checkpoint、⑤ 點名、板上 `checkpoint_check`；寫入收據只印兩個提示；`alpha/narrative/checkpoints.py`、`tests/test_narrative_checkpoints.py`；plan 同上 C。**真資料**：候選板 11-10 點名 17 檔（申報 7、日期 7、佔位字 3），逐檔看過都是真的過了；11-11 起再多 8 檔；回放 PSIX 10-31 版 11-05～11-10 會被點名；EFXT（6-K）抓不到
