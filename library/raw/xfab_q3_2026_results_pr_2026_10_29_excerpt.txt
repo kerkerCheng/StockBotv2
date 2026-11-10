@@ -1,0 +1,16 @@
+Source URL: https://www.xfab.com/investors （Press_Release_X-FAB_Q3_2026_Results_29Oct2026_ENG.pdf；投資人頁的下載連結帶有時效 token，此處只記頁面）
+
+Excerpt:
+[EXCERPT — 有限逐字引文] X-FAB Silicon Foundries SE（XFAB.PA）「Press Release October 29, 2026」第三季財報
+DATE: 2026-10-29
+RETRIEVED: 2026-11-10（公司官網 PDF 以 pypdf 抽字，換行併成空白，其餘逐字）
+NOTE: 發行人新聞稿（自述）。全文沒有具名的資料中心或共同封裝光學（CPO）客戶；沒有光子量產時程的字樣。
+
+"Bookings in the third quarter increased 38% year-on-year and 30% sequentially to USD 224.7 million, the highest level in two years, resulting in a book-to-bill ratio of 1.12."
+"Third-quarter automotive revenue totaled USD 119.1 million*, down 19% year-on-year but up 3% sequentially. Inventory corrections no longer weighed on X-FAB's automotive bookings, which increased significantly in the third quarter."
+"Strong demand for battery management systems and an AI data center test application drove a production ramp, while X-FAB also secured several major design wins during the quarter. These include a silicon photomultiplier for a medical scanner, a handheld ultrasound application, and an actuator for optical circuit switches in data centers."
+"X-FAB's heterogeneous integration technology for integrating light sources is attracting strong customer interest, and photonics prototyping revenue is growing."
+"In the third quarter, wide bandgap revenue reached USD 16.2 million*, up 68% year-on-year and 52% sequentially. Silicon carbide (SiC) accounted for most of the wide bandgap revenue with X-FAB recording an all-time high number of SiC wafers sold in the third quarter, up 45% year-on-year, while customer traction continued to grow."
+"New wide bandgap opportunities include solid-state circuit breakers (SSCBs) as an emerging application for both SiC and GaN power semiconductors, driven by the need for fast and efficient power protection in next-generation data centers and energy infrastructure. X-FAB has secured two SSCB-related development agreements during the third quarter, with several additional opportunities under negotiation."
+"Cash and cash equivalents totaled USD 196.0 million at the end of the quarter, an increase of USD 32.5 million from the previous quarter. Net debt amounted to USD 315.5 million, up USD 3.2 million from the previous quarter."
+（* excluding impact from revenue recognized over time according to IFRS 15）
