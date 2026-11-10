@@ -1,0 +1,24 @@
+Source URL: https://www.munters.com/globalassets/story-page-import-images/munters-interim-report-jan-sep-2026.pdf
+Press release: https://www.munters.com/en-gb/news-media/press-releases/2026/significant-order-growth-as-operational-improvements-progress/
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Munters Group AB（MTRS.ST）Interim report January–September 2026 與同日新聞稿「Significant order growth as operational improvements progress」
+DATE: 2026-10-23
+RETRIEVED: 2026-11-10（公司官網 PDF 以 pypdf 抽字、新聞稿 HTML 抽字；PDF 換行併成空白，其餘逐字）
+NOTE: 發行人季報（自述）。全文（22 頁）沒有「CDU」字樣；交期、零件短缺、客戶預付都是資料中心事業（DCT）或集團層級，沒有分產品。
+
+新聞稿：
+"Order intake increased +70%, driven by strong demand in Data Center Technologies (DCT) and AirTech."
+"DCT's margin fell, reflecting changed product mix, component shortages and ramp-up inefficiencies."
+"Negative cash flow from operating activities, mainly explained by inventory build-up within DCT though somewhat mitigated by advances from customers."
+"DCT was a major contributor, with order intake more than doubling year-on-year, outpacing growth in an exceptionally strong underlying data center market."
+"The supply-chain situation has partly improved, although constraints remain industry-wide and need to be taken into account going forward." (CEO 段落)
+"On behalf of the management team, I look forward to welcoming you to our Capital Markets Day on November 11, where we will share more about our future strategic direction."
+
+季報 Data Center Technologies（July - September 2026）：
+"Order intake increased +129% organically (currency effects -2%), reflecting high demand in the data center market and a strong contribution from DCT's expanded product offering. Order growth was broad-based across products, customer groups and regions."
+"Net sales increased 14% organically (currency effects +1%), supported by deliveries from the strong backlog. Higher production volumes and improved capacity utilization at the expanded facility in Virginia also contributed to the increase. Shortages of selected components continued to limit throughput."
+"Price increases have been implemented to compensate for higher material costs as well as tariffs. Due to long lead times, the positive earnings impact will materialize gradually."
+（January – September 2026）"The ramp-up of chiller production in Virginia and shortages of key components across the entire product range continued to constrain throughput and operating efficiency across the wider business."
+DCT 表：External order backlog（MSEK）2026-09-30 22,927；2025-09-30 6,581；2025 年底 13,787。Order intake（MSEK）Q3 2026 4,907；Q3 2025 2,164。
+集團資產負債表：Advances from customers（MSEK）2026-09-30 4,094；2025-09-30 2,109。
