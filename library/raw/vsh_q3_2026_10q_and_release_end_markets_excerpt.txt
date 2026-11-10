@@ -1,0 +1,15 @@
+SOURCE: Vishay Intertechnology — Form 10-Q（季度截至 2026-10-03）與第三季財報新聞稿（8-K Ex.99.1）
+URL: https://www.sec.gov/Archives/edgar/data/103730/000010373026000080/form10q.htm ；https://www.sec.gov/Archives/edgar/data/103730/000010373026000079/vsh-20261104.htm
+PUBLISHED: 2026-11-04（兩份同日）
+RETRIEVED: 2026-11-11
+STORAGE: repo_excerpt（SEC 申報有限節錄；HTML 抽字、空白攤平後逐字照抄）
+NOTE: 發行人自己的申報（自述）。research-drain 段 0「無內文」lead 讀全文（lead_64c1276b、lead_2c7be92c）。兩份全文以 regex「data cent|artificial intel|\bAI\b」搜尋命中 0——沒有資料中心、AI 或伺服器的字；終端市場表沒有資料中心一格。
+
+=== 第三季財報新聞稿（Highlights） ===
+"3Q 2026 revenues of $978.9 million - 3Q 2026 gross margin was 25.5% - 3Q 2026 operating margin was 9.4% - 3Q 2026 diluted EPS of $0.37 - 3Q 2026 book-to-bill of 1.29 with book-to-bill of 1.28 for semiconductors and 1.31 for passive components - Backlog at quarter end was 6.6 months"
+
+=== 10-Q（Note：Sales by end market，dollars in thousands） ===
+"Sales by end market are presented below: Fiscal quarters ended Nine fiscal months ended October 3, 2026 September 27, 2025 October 3, 2026 September 27, 2025 Industrial $ 389,961 $ 271,880 $ 1,036,154 $ 783,834 Automotive 307,492 286,606 886,207 811,141 Military and Aerospace 97,041 79,139 279,096 235,944 Healthcare 43,972 38,794 128,016 113,225 Other* 140,473 114,221 407,291 323,982 Tariff refunds passed through to customers - - (30,008 ) - Total Revenue $ 978,939 $ 790,640 $ 2,706,756 $ 2,268,126 *Power supplies, telecommunications, consumer products, and computing."
+
+=== 10-Q（MD&A） ===
+"The order level remained at a high level and backlog continued to increase."

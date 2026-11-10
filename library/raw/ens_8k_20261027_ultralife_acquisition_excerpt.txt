@@ -1,0 +1,11 @@
+SOURCE: EnerSys — Form 8-K（2026-10-27）Exhibit 99.1 新聞稿「EnerSys To Acquire Ultralife」
+URL: https://www.sec.gov/Archives/edgar/data/1289308/000119312526434415/d143472dex991.htm
+PUBLISHED: 2026-10-27
+RETRIEVED: 2026-11-11
+STORAGE: repo_excerpt（SEC 申報有限節錄；HTML 抽字、空白攤平後逐字照抄）
+NOTE: 發行人自己的新聞稿（自述）。research-drain 敘事該重寫（何時格裁決點 11 月上旬已過）時查 EDGAR：10-27 之後到 11-11 只有這份 8-K 與收購要約的 SC TO-C／SC TO-T（EnerSys 是收購方），FY2027 第二季財報還沒交。
+
+=== Exhibit 99.1 ===
+"EnerSys To Acquire Ultralife, Expanding Differentiated Battery Technologies and Accelerating Growth in Defense Market"
+"EnerSys (NYSE: ENS), a global leader in stored energy solutions for industrial, infrastructure, and defense applications, today announced that it has entered into a definitive agreement to acquire Ultralife (NASDAQ:ULBI) for $16.00 per share in cash, representing a 166% premium to Ultralife’s unaffected closing share price on October 26, 2026. The transaction represents an enterprise value of approximately $320 million."
+"Ultralife is a leading provider of rechargeable and non-rechargeable batteries, battery systems, and related accessories for military communications and other specialized applications. The company serves government, defense, and commercial customers globally and generated $191 million in revenue in fiscal 2025."
