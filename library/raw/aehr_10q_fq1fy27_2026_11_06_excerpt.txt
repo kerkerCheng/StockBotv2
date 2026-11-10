@@ -1,0 +1,16 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1040470/000165495426009601/aehr_10q.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Aehr Test Systems Form 10-Q（quarterly period ended September 25, 2026；2026-11-06 申報）客戶集中度、地區營收
+DATE: 2026-11-06
+RETRIEVED: 2026-11-10（EDGAR 原文 HTML 本機去標籤、空白正規化後逐字切出）
+NOTE: 發行人申報；客戶以代號列示、沒有具名。表頭三欄依序為 Three Months Ended September 25, 2026／August 29, 2025／One Month Ended June 26, 2026（會計年度改制的過渡月）。「*」＝低於 10%。
+
+【營收客戶集中度（Concentration of Credit Risk 附註）】
+"Customer A 47.5 % * 46.4 % Customer B 25.1 % * * Customer C * 42.6 % * Customer D * 21.8 % * Customer E * 11.6 % 39.9 %"
+
+【應收帳款客戶集中度（September 25, 2026／June 26, 2026／May 29, 2026）】
+"The Company had gross accounts receivable from individual customers in excess of 10% of gross accounts receivable as follows: September 25, June 26, May 29, 2026 2026 2026 Customer A 44.3 % 17.2 % 18.8 % Customer B 22.7 % 21.1 % 19.3 % Customer F * 38.3 % 35.0 %"
+
+【地區營收（MD&A, Revenue by Geography；千美元）】
+"Revenue by Geography Three Months Ended September 25, August 29, Percent (Dollars in thousands) 2026 2025 Change Asia $ 22,174 $ 2,476 796 % United States 8,802 4,812 83 % Europe and Middle East 2,031 3,681 (45 )% Total revenues $ 33,007 $ 10,969 201 % Asia as a percentage of total revenues 67.2 % 22.6 % United States as a percentage of total revenues 26.7 % 43.9 %"
