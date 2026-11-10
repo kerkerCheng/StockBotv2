@@ -1,0 +1,18 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1342338/000117184326007146/exh_991.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Himax Technologies, Inc. Form 6-K Exhibit 99.1「Reports Third Quarter 2026 Financial Results; Provides Fourth Quarter 2026 Guidance」
+DATE: 2026-11-05
+RETRIEVED: 2026-11-10（EDGAR 原文抽字，空白正規化後逐字切出）
+NOTE: 發行人新聞稿（自述，L8 弱主張）；CPO 營收沒有分項揭露、客戶沒具名。
+
+【營收與指引】
+"Q3 2026 revenues were $246.8 million, a sequential increase of 8.5%"
+"Himax Q4 2026 revenues to decline 22% to 26% QoQ."
+"Himax’s Q4 revenue is projected to decline QoQ, primarily due to corrections in automotive TDDI and DDIC products, reflecting abrupt, short-term order adjustments by certain customers."
+
+【CPO】
+"On CPO business, Himax continues to work closely with strategic partner, FOCI, focusing on further improving manufacturing yields and establishing stable mass production capabilities to support the next phase of production scaling. As part of these ongoing efforts, FOCI announced earlier today that its Board of Directors approved capital expenditures in the amount of NT$3.33 billion (approximately US$100 million) for the expansion of both fab space and manufacturing equipment in preparation for FAU mass production. Engineering ramps are already underway, with shipments expected to expand quarter by quarter from this point onward. While the timing of mass production is ultimately a call to be made by the Company’s end customers, Himax remains confident that the Company’s CPO business will begin making a meaningful contribution to both top and bottom lines starting in 2027."
+
+【WLO 車用】
+"Himax is pleased to share that a leading global technology company has selected Himax’s WLO technology to enable its advanced optical sensing solution to support autonomous driving. ... Shipments are expected to commence in upcoming quarters."

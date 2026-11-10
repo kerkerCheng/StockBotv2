@@ -1,0 +1,19 @@
+SOURCE: Applied Optoelectronics, Inc.（AAOI）2026 年第三季財報法說會逐字稿——Motley Fool Transcribing 第三方轉錄（非發行人文件）
+URL: https://fool.com/earnings/call-transcripts/2026/11/06/applied-optics-aaoi-q3-2026-earnings-call-transcript
+PUBLISHED: 2026-11-05（法說日，美東時間）
+RETRIEVED: 2026-11-10
+STORAGE: repo_excerpt（HTML 抽字、空白攤平；只取講者原話，不取編輯摘要框）
+NOTE: 第三方轉錄（tier 2）；供應商自述（L8 弱主張），長約客戶沒具名。用途：AAOI「不要」敘事何時格換版、假說 hy_0004（Rosenblatt 峰會截圖）對照。長約條款與 1.6T 在手訂單見 aaoi_q3_2026_call_transcript_tradingkey_excerpt.txt。
+
+【營收與毛利（執行長準備稿）】
+"We delivered record revenue of $269.9 million, in line with our expectations and non-GAAP gross margin of 28.7%, slightly below our expectation due to product mix"
+
+【長約（執行長、財務長）】
+"In October, we signed a multiyear long-term agreement or LTA with a Tier 1 hyperscale data center customer."
+"this customer has agreed to purchase a minimum of 10% of its required 1.6 terabit transceivers from AOI over the 3-year period from June 2026 through May 2029."
+"In turn, AOI has committed to supplying this volume and to agreed pricing, including some price reductions over the period. The customer made no commitment of capital as part of this LTA."
+"besides the first LTA, I think the second LTA is in the final stage. We expect to sign it within a few weeks."
+
+【需求與產能】
+"we expect demand for 800G and 1.6 terabit modules to exceed our production capacity throughout 2027."
+"we remain committed to grow our revenue and profitability, albeit on a slightly delayed schedule."
