@@ -1,0 +1,12 @@
+Source URL: https://www.asmpt.com/en/investor-relations/news-events/asmpt-announces-2026-third-quarter-results-record-group-bookings-and-strong-earnings-across-semi-smt/
+
+Excerpt:
+[EXCERPT — 有限逐字引文] ASMPT Limited（0522.HK）「ASMPT Announces 2026 Third Quarter Results Record Group Bookings and Strong Earnings Across SEMI & SMT」公司 IR 新聞稿
+DATE: 2026-10-28
+RETRIEVED: 2026-11-10（公司官網 HTML 抽字，空白正規化後逐字切出）
+NOTE: 發行人新聞稿（自述）。打線機的訂單與營收沒有單獨數字。
+
+"(Hong Kong, 28 October 2026) – ASMPT Limited (ASMPT / the Group / the Company) (Stock code: 0522) ... announced its unaudited results for the three months ended 30 September 2026 (Q3 2026)."
+"Group Bookings at a record high of HK$8.85 billion (US$1.13 billion), up 24.7% QoQ and 137.9% YoY, with book-to-bill ratio of 1.69, highest since Q1 2021."
+"AI-related demand also continued to support the SEMI mainstream business, particularly in power management and AI server-board applications for data centres. Revenue and bookings remained elevated, with wire bonding and die bonding tools supported by AI infrastructure expansion and high utilisation in OSATs."
+"The Group expects Q4 2026 revenue to be between US$670 million and US$730 million, up 4.6% QoQ and 37.5% YoY at mid-point of US$700 million, which is above the market consensus. This will be driven by double-digit SMT revenue growth, while SEMI revenue is expected to be flat due to longer lead times of AP products."
