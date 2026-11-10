@@ -1,0 +1,16 @@
+SOURCE: AAON, Inc.（NASDAQ: AAON）Form 10-Q（截至 2026-09-30 的季度）
+URL: https://www.sec.gov/Archives/edgar/data/824142/000082414226000088/aaon-20260930.htm
+PUBLISHED: 2026-11-09（EDGAR 申報日）
+RETRIEVED: 2026-11-10
+STORAGE: repo_excerpt（發行人申報有限節錄；HTML 轉文字（fetchers.edgar）、空白攤平後逐字照抄）
+NOTE: 發行人自述。8996.TW 高力敘事加碼條件 c1（ew_2478_2026-11-10，11-09 被這份 10-Q 與同日 8-K 新聞稿叫醒，共用實體 co:aaon）的處置依據：全文沒有 Kaori、brazed、plate heat exchanger、CDU 任何一個字；BASX 資料中心液冷的量在漲，但只寫原物料與大多數零件在美國國內採購，沒有點名板式熱交換器的供應商——c1 沒觸及。
+
+積壓訂單（MD&A）：
+"At September 30, 2026, our consolidated backlog is $1,854.5 million, an increase of 40.5%, or $534.4 million, as compared to September 30, 2025."
+"Backlog is up from a year ago for both AAON-branded products and BASX-branded products with BASX-branded products increasing 51.1%, or $458.3 million, when compared to September 30, 2025."
+"Most of these orders were associated with the BASX-branded data center liquid cooling solutions."
+
+原物料與零件來源（MD&A）：
+"The principal high volume raw materials used in our manufacturing processes are steel, copper, and aluminum, and are obtained from domestic suppliers."
+"We also purchase from domestic manufacturers certain components, including coils, compressors, motors, and electrical controls."
+"While we source our raw materials and most components domestically, our domestic suppliers have historically increased prices when tariffs increase."

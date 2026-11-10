@@ -1,0 +1,51 @@
+SOURCE: USA Rare Earth, Inc.（Nasdaq: USAR）Form 8-K（Items 2.02、9.01）EX-99.1 新聞稿〈USA Rare Earth Reports Third Quarter 2026 Financial Results〉
+URL: https://www.sec.gov/Archives/edgar/data/1970622/000197062226000066/exhibit991-earningsrelease.htm
+PUBLISHED: 2026-11-09（EDGAR 申報日；新聞稿同日美股收盤後）
+RETRIEVED: 2026-11-10（EDGAR 原文經 repo 的 fetchers.edgar 預設 UA 抓取、HTML 抽字、空白攤平後逐字照抄；項目符號「•」略去）
+STORAGE: repo_excerpt（發行人申報之有限逐字節錄）
+NOTE: 發行人自述（L8：第一批磁材的買方沒具名）。Phase 7 照 11-03 起始門重判（USA Rare Earth 敘事）用：①磁材的第一筆營收在 2026 年 9 月（Stillwater 燒結塊材，賣給一家沒具名的高性能材料製造商；金額沒拆）；②第三季營收 300.2 萬美元、銷貨成本 2,288.4 萬，毛損；③9 月底現金與約當現金 10.91 億美元（含受限 11.64 億）、非流動應付票據 3.06 億、權利金義務 3.62 億；第三季營業活動用掉 1.44 億；前九月資本支出與設備訂金 1.91 億、PIPE 增資 15 億；存貨 0.89 億（年初 0.19 億；9 月併入 Serra Verde，增加的來源要看 10-Q——磁材層讀圖反證②「庫存累積」判觸及與否時用）；④前瞻聲明仍把「把與客戶的商談、備忘錄轉成確定訂單」列為風險——磁材仍沒有確定協議的旁證；⑤公司自排里程碑：2026 年底前成品磁材原型賣給多家客戶、2027 年第二季 Stillwater 1b 線投入運轉（合計 1,200 噸）、Serra Verde 第一階段 2027 年第二季到 4,000 噸速率（2026-09-04 的 8-K 寫的是 2026 年底，見 usar_8k_2026_09_04_serra_verde_completion.txt）。同一份 8-K 的第三季 10-Q 截至台北 2026-11-10 清晨還沒申報（非加速申報人，法定期限 11-16）。財務表單位千美元；表列欄位依序為 2026 第三季、2025 第三季、2026 前九月、2025 前九月（資產負債表為 2026-09-30、2025-12-31）。
+
+Key Highlights：
+"Cash, cash equivalents and restricted cash balance as of September 30, 2026 of $1.2 billion"
+"Revenues for Q3’2026 of $3.0 million"
+"Generated first ever revenue from the sale of neodymium-iron-boron (“NdFeB”) permanent magnets"
+
+Third Quarter Business Updates（Stillwater 磁材）：
+"In September 2026, the Company sold the first NdFeb magnets produced at its 600 tpa magnet manufacturing facility in Stillwater, OK. The initial sales comprised sintered NdFeB block magnets, sold to a high-performance materials manufacturing company."
+"The Company has installed the first magnet finishing line at Stillwater, with a second finishing line expected to be installed by the end of 2026, which will broaden the Company’s product offering."
+
+Third Quarter Business Updates（Serra Verde）：
+"This Stage 1 expansion is now ramping up to 4,000 metric tonnes per annum (“tpa”) of total rare earth oxide (TREO), while Stage 2, which is targeting to add a further 2,400 tpa of capacity by the end of 2027, is expected to complete construction and commence commissioning in Q3 2027."
+
+Recent Developments：
+"In October 2026, the Company commenced the shipping and sales of heavy mixed rare earth carbonate (“MREC”) to US SIEE, LLC under a 15-year, 100% take-or-pay offtake agreement."
+
+Key Operational Targets：
+"By end of 2026: Finished magnet prototype sales to multiple customers from Stillwater"
+"Q2 2027: Commission Line 1b at Stillwater, adding an additional 600 tpa of magnet manufacturing capacity for a total of 1,200 tpa"
+"Q2 2027: Serra Verde Stage 1 ramp complete, 4,000 tpa TREO run rate"
+
+Forward-looking Statements（風險列舉，節錄兩項）：
+"our ability to convert current commercial discussions and/or memorandums of understanding with customers for the sale of our neo magnets and other products into definitive orders"
+"our designation on an export control list by China which has had and is expected to continue to have an adverse impact on our ability to source key raw materials, equipment, supplies and technical services from China"
+
+Condensed Consolidated Statements of Operations：
+"Revenue $ 3,002 $ — $ 14,521 $ —"
+"Cost of revenue 22,884 — 35,880 —"
+"Gross loss (19,882) — (21,359) —"
+
+Financial Highlights／Condensed Consolidated Statements of Cash Flows：
+"Net cash used in operating activities (143,687) (2,849) (219,011) (21,087)"
+"Capital expenditures and equipment deposits (190,919) (13,398)"
+"Proceeds from issuance of common stock under PIPE financing 1,500,000 199,996"
+"Cash, cash equivalents and restricted cash, end of period $ 1,163,599 $ 257,609"
+
+Condensed Consolidated Balance Sheets：
+"Cash and cash equivalents $ 1,090,877 $ 359,925"
+"Inventories 88,836 18,535"
+"Royalty obligation, current 31,518 —"
+"Notes payable, non-current 305,559 —"
+"Royalty obligation, non-current 330,711 —"
+
+Reconciliation of Non-GAAP Financial Measures（股數）：
+"Weighted-average diluted shares 284,921 102,589 237,526 95,609"

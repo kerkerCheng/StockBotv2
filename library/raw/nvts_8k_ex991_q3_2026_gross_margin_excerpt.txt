@@ -1,0 +1,17 @@
+SOURCE: Navitas Semiconductor Corporation（NVTS）Form 8-K EX-99.1 新聞稿〈Navitas Semiconductor Announces Third Quarter 2026 Financial Results〉
+URL: https://www.sec.gov/Archives/edgar/data/1821769/000162828026069489/exhibit991-navitassemicond.htm
+PUBLISHED: 2026-11-03（EDGAR 申報日；新聞稿同日盤後）
+RETRIEVED: 2026-11-10（EDGAR 原文經 repo 的 fetchers.edgar 預設 UA 抓取、HTML 抽字、空白攤平後逐字照抄；項目符號「•」略去）
+STORAGE: repo_excerpt（發行人申報之有限逐字節錄）
+NOTE: 發行人自己的申報（L8）。Phase 7 照 11-03 起始門重判（Navitas 敘事深挖清單「毛利率／產能利用率」那一項）：第三季 GAAP 毛利率 21.5%（含無形資產攤銷約 250 萬美元）、non-GAAP 40.0%（前一季 39.5%、去年同季 38.7%），第四季 non-GAAP 指引 40.5%±1 個百分點。它是無晶圓廠（晶圓由 GlobalFoundries 等代工），沒有自己的產能利用率可揭露。同一份新聞稿的第四季營收指引與 AI 基礎設施占比另見 nvts_8k_ex991_q3_2026_q4_guidance_ai_infra_excerpt.txt。
+
+Third Quarter 2026 Financial Highlights：
+"Gross Margin: GAAP gross margin for the quarter was 21.5%, compared to 0.4% in the second quarter of 2026 and (2.0%) in the third quarter of 2025."
+"GAAP gross margin includes approximately $2.5 million of cost associated with amortization of intangibles for the current quarter and $4.0 million for each of the prior periods."
+"On a non-GAAP basis, gross margin for the quarter was 40.0% compared to 39.5% in the prior quarter and 38.7% in the third quarter of 2025."
+
+Fourth Quarter 2026 Business Outlook：
+"Non-GAAP gross margin is expected to be 40.5%, plus or minus 100 basis points, which at the midpoint represents a 50-basis point increase."
+
+Business, Customer and Technology Highlights：
+"Announced first shipments of the latest Gen 5 GaNFast devices manufactured in the United States through GlobalFoundries to accelerate AI infrastructure deployments."

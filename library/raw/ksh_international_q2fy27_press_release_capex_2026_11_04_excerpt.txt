@@ -1,0 +1,27 @@
+SOURCE: KSH International Limited（NSE: KSHINTL；BSE: 544664）2026-11-04 交易所申報兩份——Q2／H1 FY2027 財報新聞稿（Regulation 30 Press Release）、擴產與資本支出核准公告（Intimation of capacity expansion and capex approval）
+URL: https://kshinternational.com/investor-relations-documents/Announcements-and-Notices/KSHIntimation_Q2UFRPressRelease04112026Signed.pdf；https://kshinternational.com/investor-relations-documents/Announcements-and-Notices/KSHIntimationofCapacityExpansion_04112026FinalSigned.pdf
+PUBLISHED: 2026-11-04（董事會當天；公司官網投資人關係頁，給 BSE／NSE 的同一份申報）
+RETRIEVED: 2026-11-09
+STORAGE: repo_excerpt（發行人申報有限節錄；公司官網 PDF 本機抽字、空白攤平後逐字照抄——PDF 抽字留下的怪空格〔「six -months」「exports ’ share」〕照原樣；BSE／NSE 原址對本機 UA 回 403／逾時，沒開）
+NOTE: **發行人自述**（L8：供應商自述，不是 CTC 層緊不緊的獨立證據）。Phase 7 完整重讀（CTC 銅導線層；KSH 敘事；Q3W 名單第 8 列的財報後文件）用：①第二季每噸 EBITDA 約 101,400 盧比（Q1 93,325、去年同季 65,500），公司自己的歸因是出口占比、利用率、盧比走弱與營運效率——沒寫「價格」也沒寫 CTC 占比；②出口營收年增 108%、季增 44%，出口占營收 32%（Q1 26%；Q1 法說口頭說約 27%）；③裝置產能 57,845 噸（第二期提前完成），以現有產能計利用率 75%；第三期擴到約 72,200 噸（2028 財年第一季，即 2028-04～06），最多 18.5 億盧比、內部資金加長期借款；④上半年營業現金流正 4.26 億、總債從 Q1 的 48.10 億降到 34.13 億、負債比 0.38 倍；⑤新的 HVDC 變壓器用特殊線材試單（出口）與 Powergrid 核准 765kV。財報本體（董事會決議附件）數字一致：Q2 營收 13,196.54 百萬盧比、上半年營業現金流 425.71 百萬。沒有客戶名、沒有 Hitachi 框架的量、沒有美國占比。
+
+【新聞稿 p.2 Key Developments for Q2 FY2027】
+"Q2 FY27 Revenue from Operations grew 85% over the prior year, driven by volume growth, mix and higher copper prices."
+"EBITDA in Q2 FY27 was Rs 897 million, up 95% from a year ago, while PAT of Rs 480 million increased 62% compared to Q2 FY26, and was 14% higher than Q1 FY27;"
+"while EBITDA/Ton of approx. Rs 101,400 in Q2 FY27, improved 55% from Rs 65,500 a year ago and was driven largely by a meaningfully higher export contribution and better utilisation, together with a weaker Rupee and operating efficiencies;"
+
+【新聞稿 p.3】
+"Installed capacity on September 30, 2026 was 57,845 MTs, largely completing our Phase 2 expansion six -months ahead of schedule"
+"In particular, export revenue surged 108% in Q2 FY27 compared to a year ago and 44% higher than Q1 FY27."
+"As a result, exports ’ share of revenue improved to 32% in Q2 FY27, up from 26% in Q1 FY27;"
+"positive operating cash flow of Rs 426 million during the first half of FY27"
+"Consequently, debt-to-equity improved to 0.38x from 0.57x last quarter."
+"During Q2, we received a new trial export order to supply Specialized wires for HVDC transformers"
+"Meanwhile, last month Powergrid gave our Supa facility approval to manufacture specialized wires for 765kV transformers and reactors."
+
+【新聞稿 p.2 管理層引言／p.3 New Capacity Expansion (Phase-3)】
+"our Board has approved a Phase 3 expansion at Supa for Specialized wires that would result in total capacity increasing to 72,200 MTs by Q1 FY2029"
+"The Company intends to spend up to Rs 1,850 million to finance this expansion, including the purchase of an additional 10 acres of land in Supa, along with building, plant and machinery, and will be funded through a combination of internal accruals and long-term debt."
+
+【擴產公告 Annexure – A】
+"Existing capacity utilization 75%"

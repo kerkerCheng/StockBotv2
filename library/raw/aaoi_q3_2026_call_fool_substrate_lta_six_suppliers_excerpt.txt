@@ -1,0 +1,18 @@
+SOURCE: Applied Optoelectronics, Inc.（AAOI）2026 年第三季財報法說會逐字稿——Motley Fool Transcribing 第三方轉錄（非發行人文件）
+URL: https://www.fool.com/earnings/call-transcripts/2026/11/06/applied-optics-aaoi-q3-2026-earnings-call-transcript/
+PUBLISHED: 2026-11-05（法說日，美東時間；轉錄稿 2026-11-06 03:38 EST 刊出）
+RETRIEVED: 2026-11-09
+STORAGE: repo_excerpt（HTML 抽字、空白攤平；只取講者原話段落，不取 Motley Fool 編輯寫的摘要框；段名為摘錄者所加）
+NOTE: 第三方轉錄（tier 2）；買方 AOI 自己的話（磷化銦基板的買方）。執行長在轉錄稿被標成「Chih-Hsiang Lin」（即 Thompson Lin 林正軒）。執行長沒有點名供應商：分析師說的「每月約 1.5 萬片」＝每年 18 萬片，對得上雲南鍺業公告 2026-054 的 AOI 長約（2027–2031 每年 18 萬片 4 吋）與 AOI 第三季 10-Q 期後事項那份 2026-11-02 的供應協議（上限約 1.944 億美元）；分析師說「You announced」，但公告的是賣方雲南鍺業，AOI 只在 10-Q 寫「a supplier」「a key raw material」。財務長同場說「we're fine through 2027 on indium phosphide」那一段已在 aaoi_q3_2026_call_transcript_tradingkey_excerpt.txt，這裡不重收。用途：雲南鍺業敘事的「客戶為什麼選它、什麼會讓它被換掉」（讀到邊）；磷化銦基板層的買方多來源化（第三家美系買方說自己有六家基板供應商）。
+
+
+【分析師 Timothy Savageaux（Northland）問：那份基板協議（他說的量是每月約 1.5 萬片）夠不夠、何時開始買】
+"You announced an agreement for substrates. I think it was earlier this week, could have been a month ago, the way things are going here, but -- and my question was, it's a pretty substantial quantity. I think it's like 15,000 wafers a month. And is that enough to support your target kind of run rate level exiting '27 of up near $500 million a month?"
+"And then when that agreement kind of goes into effect when you expect to start purchasing those substrates?"
+
+【執行長 Thompson Lin（轉錄稿標「Chih-Hsiang Lin」）答：協議主要是為 2028 年，因為供應商還在擴產】
+"Yes, it'll be much, much bigger. And this -- actually, the agreement is more for, like, for 2028 because the supplier's still expanding the capacity."
+"For the newest MOCVD, G10 MOCVD, every month, every MOCVD you need about 600 4-inch substrates."
+
+【同一段：基板有六家供應商；簽長約是為了確保供給與存貨；同時和日本兩家、德國一家合作】
+"Right now, as we emphasize, we have six suppliers for substrate, but we are working with all of them. But to make sure we have enough supply, including enough inventory because of the potential risk factor. That's why we signed an LTA with this supplier. And actually, we are working with other suppliers at the same time too, including two in Japan and one in Germany."

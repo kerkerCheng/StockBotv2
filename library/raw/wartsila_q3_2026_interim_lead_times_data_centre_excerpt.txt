@@ -1,0 +1,14 @@
+SOURCE: Wärtsilä Corporation（Nasdaq Helsinki: WRT1V）〈Wärtsilä’s Interim Report January–September 2026〉（公司官網新聞頁，CEO 評論段）
+URL: https://www.wartsila.com/media/news/27-10-2026-wartsila-s-interim-report-january-september-2026-3806530
+PUBLISHED: 2026-10-27 08:30 UTC+2（頁面標示）
+RETRIEVED: 2026-11-09
+STORAGE: repo_excerpt（發行人公開新聞稿有限節錄；HTML 轉文字、空白攤平後逐字照抄）
+NOTE: 發行人自述（燃氣引擎 OEM，往復式機組層供給側；非 EDGAR 一手）。Phase 7 完整重讀（往復式機組層反證①「窗口關：OEM 寫出交期縮短」）用：寫的是反方向——引擎交期持續拉長、設備交貨時間持續增加，第三季另接一張美國資料中心 282 MW 現場發電（15 台 50SG）。擴產是「earlier announced」的，沒寫提前完成。
+
+【CEO 評論：資料中心】
+"Interest from the data centre segment also remained strong, with a dynamic pipeline of opportunities. During the third quarter, we secured an order to supply a 282 MW onsite power solution for a data centre project in the United States. The project will use 15 Wärtsilä 50SG engines."
+
+【CEO 評論：訂單與交期】
+"Considering the strong Energy order intake, lead times for our engines continue to increase."
+"Equipment delivery times continued to increase, impacting the timing of revenue recognition."
+"The earlier announced capacity expansions in both manufacturing and services strengthen our ability to meet growing customer demand in Energy and Marine."

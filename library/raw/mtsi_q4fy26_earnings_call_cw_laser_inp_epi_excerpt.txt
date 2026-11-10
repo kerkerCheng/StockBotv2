@@ -1,0 +1,17 @@
+SOURCE: MACOM Technology Solutions FY2026 第四季法說會逐字稿（第三方轉錄：gloom.sh；機器轉錄）——InP 雷射、光偵測器與自家磊晶段
+URL: https://gloom.sh/stocks/mtsi/transcripts/q4-2026
+PUBLISHED: 2026-11-05（法說會日期；與 8-K 財報新聞稿同日，accession 0001493594-26-000041）
+RETRIEVED: 2026-11-09（本機抓 HTML、去標籤後逐字比對）
+STORAGE: repo_excerpt（逐字稿有限節錄：CEO 開場白兩段、擴產問答的回答，未刪句）
+NOTE: 第三方機器轉錄（非發行人申報）——同日 8-K 新聞稿（exhibit 99.1）對 IQE 只有前瞻聲明裡一句「recently completed investment in IQE plc」，沒有供應量；所以下面幾句目前只有這一份轉錄稿。ASR 把 MACOM 轉成「MECOM」「Maycom」、phosphide 轉成「phosphite」，數字「1.6T」轉成「1 .6T」，照轉錄稿逐字保留。客戶端（MACOM 是 IQE 的股東兼長期供應協議對手）自述：CW 雷射市場的目標是 2028 年；光偵測器用的 InP 磊晶由自家 Ann Arbor 廠以 MBE 長（低到中量）；**沒提向 IQE 買哪一種、買多少**。給 IQE.L 敘事「MACOM 那一側的量」、加碼條件 c1，以及 InP 磊晶層讀圖「IDM 自己長」那條換掉的路對照用。
+
+[CEO prepared remarks — FY26 accomplishments]
+"First, our fab engineers recently made significant progress improving the quality of our indium phosphide lasers facet, allowing our lasers to better address CW applications."
+"These results support MECOM's strategy to enter the multi-billion dollar CW laser market, which we are targeting for 2028."
+
+[CEO prepared remarks — data center]
+"As we look ahead, we expect to produce significant volumes of 200G PDs as well as 400G PDs and, as I previously mentioned, CW lasers for 800G, 1 .6T, and 3 .2T applications."
+
+[Q&A — manufacturing footprint; CEO answer on Ann Arbor]
+"They are really geared towards, I would say, low and medium volume, indium phosphide."
+"They have an MBE reactor, and they are able to develop their own epi, and that's really one of the key technologies that we bring to our PD product line."

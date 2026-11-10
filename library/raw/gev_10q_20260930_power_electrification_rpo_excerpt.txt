@@ -1,0 +1,23 @@
+SOURCE: GE Vernova Inc.（NYSE: GEV）Form 10-Q（2026 Q3，季末 2026-09-30）有限節錄
+URL: https://www.sec.gov/Archives/edgar/data/1996810/000199681026000163/gev-20260930.htm
+PUBLISHED: 2026-10-28（EDGAR 申報日）
+RETRIEVED: 2026-11-09
+STORAGE: repo_excerpt（SEC 申報有限節錄；repo 的 fetchers.edgar 抓、HTML 轉文字、空白攤平後逐字照抄；表格列照抽字順序原樣）
+NOTE: **燃機 OEM 與變壓器在位者的一手**。Phase 7 完整重讀用：①燃氣鍋爐層讀圖反證 #2 後半（燃機 OEM 寫出交期縮短）——第三季燃機訂單 16.6 GW、出貨 5.3 GW，Power 設備 RPO 從 2025 年底 247 億美元到 544 億美元，Gas Power 獲利來自「favorable pricing」；全文沒有交期縮短的字（查 slot reservation、lead time 兩詞，只命中預付款與 slot reservation 的現金流句）；②大型電力變壓器層——Electrification RPO 增加的原因寫「demand for switchgear and transformers at Power Transmission」（另含併入 Prolec GE 的 50 億美元），Power Transmission 獲利來自量、生產力與「favorable price」；10-25 簽約以約 80 億歐元買 Trench（套管、儀用變壓器、線圈），預計 2027 年底交割。
+
+【MD&A Power 訂單與出貨（單位）】
+"Orders in units 2026 2025 2026 2025 Gas Turbines 112 29 262 114 Heavy-Duty Gas Turbines 55 20 135 69 HA-Turbines 21 13 48 28 Aeroderivatives 57 9 127 45 Gas Turbine Gigawatts 16.6 7.4 36.7 19.6"
+"Sales in units 2026 2025 2026 2025 Gas Turbines 32 20 86 60 Heavy-Duty Gas Turbines 19 14 47 44 HA-Turbines 7 6 15 19 Aeroderivatives 13 6 39 16 Gas Turbine Gigawatts 5.3 4.0 12.8 12.2"
+"RPO September 30, 2026 December 31, 2025 September 30, 2025 Equipment $54,422 $24,707 $18,977"
+"Segment EBITDA increased $1.2 billion (65%) organically*, primarily at Gas Power due to favorable pricing, higher volume, and increased productivity, partially offset by the impact of inflation and additional expenses to support investments at Gas Power and Nuclear Power."
+
+【MD&A 現金流】
+"driven by down payments on orders and slot reservation agreements at Power, and down payments at Electrification"
+
+【MD&A Electrification】
+"RPO as of September 30, 2026 increased $11.9 billion (35%) from December 31, 2025, primarily due to the acquisition of Prolec GE of $5.0 billion and demand for switchgear and transformers at Power Transmission, and demand for alternating current substation solutions, partially offset by decreases in high-voltage direct current solutions at Grid Systems Integration."
+"Segment EBITDA increased $0.6 billion (86%) organically*, primarily at Power Transmission due to higher volume, productivity, and favorable price and at Grid Systems Integration due to higher volume."
+
+【MD&A Trench Group】
+"On October 25, 2026, GE Vernova entered into an agreement with Triton Partners to purchase the Trench Group for approximately 8.0 billion Euros."
+"Trench Group is a global developer, manufacturer, and supplier of specialized high- and medium-voltage electrical components, including bushings, instrument transformers, and coils, with more than 3,000 employees across eleven manufacturing sites."

@@ -1,0 +1,22 @@
+SOURCE: U.S. Department of Energy, "Frequently Asked Questions: Bulk-Power System Executive Order and U.S. Department of Energy Request for Information"（Updated October 6, 2026）有限節錄
+URL: https://www.energy.gov/sites/default/files/2026-10/Bulk%20Power%20System%20EO%20and%20DOE%20RFI%20FAQs.pdf
+PUBLISHED: 2026-10-06（文件首頁「Updated October 6, 2026」）
+RETRIEVED: 2026-11-10
+STORAGE: repo_excerpt（美國政府公開文件有限節錄；PDF 用 pypdf 逐頁抽字、空白攤平後逐字照抄）
+NOTE: **美國政府一手**（行政命令 14421 的主管機關）。Phase 7 完整重讀（分接開關層；華明敘事反證 #4「美國政府一手公告對中國產分接開關加徵關稅、列入限制或禁止採購」）用：①FAQ 自己寫它不創設法律要求、不認定任何設備或廠商是否受管——**不是公告禁止**；②受管設備列舉含「Substation transformers」；③與受管設備相關的「Associated critical components」也可能被考慮——**沒有點名分接開關**；④DOE 在徵詢是否對含外國零組件的設備訂類別規則（意見 2026-10-09 截止）；⑤實施規則照行政命令在 120 天內發布（行政命令 2026-08-26 簽署 → 2026-12-24）。判讀：反證 #4 未觸及，但美國線的風險往零組件那一側靠近一步。
+
+【前言】
+"They do not create new legal requirements; determine whether any specific transaction, equipment, country, person, or vendor is covered; or prejudge future DOE actions."
+
+【1. What does Executive Order 14421 do?】
+"Directs DOE to publish implementing rules or regulations within 120 days, as needed."
+
+【4. What equipment may be within the scope of the executive order?】
+"Substation transformers, reactors, capacitors, voltage regulators, circuit breakers, protective relays, meters, and related equipment."
+"Associated critical components, software, firmware, digital services, maintenance services, remote access capabilities, lifecycle update mechanisms, and supply-chain dependencies may also be considered when they are associated with covered equipment and could present the risks identified in the executive order."
+
+【DOE 徵詢的選項（節錄）】
+"A categorical rule for equipment containing foreign cells, semiconductors, power electronics, software, or other components."
+
+【19. How can the public submit comments or information to DOE?】
+"Responses to the RFI are due October 9, 2026."

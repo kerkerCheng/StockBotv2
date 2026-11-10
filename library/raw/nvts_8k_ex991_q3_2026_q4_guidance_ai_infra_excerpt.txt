@@ -1,0 +1,9 @@
+SOURCE: Navitas Semiconductor Corporation（NVTS）Form 8-K EX-99.1 新聞稿〈Navitas Semiconductor Announces Third Quarter 2026 Financial Results〉
+URL: https://www.sec.gov/Archives/edgar/data/1821769/000162828026069489/exhibit991-navitassemicond.htm
+PUBLISHED: 2026-11-03（EDGAR 申報日；新聞稿同日盤後）
+RETRIEVED: 2026-11-09（EDGAR 原文經 fetchers.edgar 抽字、空白攤平後逐字照抄；項目符號「•」略去）
+STORAGE: repo_excerpt（發行人申報之有限逐字節錄）
+NOTE: 發行人自己的申報（L8）。Phase 7 完整重讀（Navitas 敘事反證第 1 條的門檻來源）：反證第 1 條寫「1,550 萬美元（2026-11-03 給的指引下限）」，庫裡原本只有 Motley Fool 編輯摘要框寫這個區間（nvts_q3_2026_call_transcript_fool_excerpt.txt 自己標了「不是發言原文」）；一手是這份新聞稿的「16.0 million, plus or minus $0.5 million」。另記：新聞稿說的「AI Infrastructure」包含 AI 資料中心與電網、能源基礎設施——「年底占營收四成以上」那一句不全是資料中心。
+"Fourth quarter 2026 net revenues are expected to increase to $16.0 million, plus or minus $0.5 million, which at the midpoint represents 14% sequential growth and 119% year-over-year growth."
+"Growth and record backlog increasingly driven by AI Infrastructure markets, including AI Data Centers and Grid and Energy Infrastructure, which are expected to represent more than 40% of total sales by year-end and contribute to sustained momentum in 2027"
+"Mid-point of fourth quarter guidance represents full-year growth of 7%, with 125% revenue growth from high-power markets, more than offsetting the exit from mobile and low-end consumer business"

@@ -1,0 +1,10 @@
+SOURCE: Super Micro Computer, Inc.（Nasdaq: SMCI）Form 10-Q（季度至 2026-09-30，FY2027 第一季）
+URL: https://www.sec.gov/Archives/edgar/data/1375365/000137536526000027/smci-20260930.htm
+PUBLISHED: 2026-11-06（EDGAR 申報日）
+RETRIEVED: 2026-11-09（EDGAR 原文經 fetchers.edgar 抽字、空白攤平後逐字照抄）
+STORAGE: repo_excerpt（發行人申報之有限逐字節錄）
+NOTE: 買方（高力最大客戶 SMC，推一步是美超微）自己的申報。Phase 7 完整重讀（高力敘事反證第 1 條：美超微被列入實體清單或失去輝達晶片供貨）用：10-Q 全文沒有 Entity List 字樣；起訴的是三名個人，公司另收到大陪審團傳票、要它交出與起訴案相關以及法遵與內控的資料，公司在配合。反證第 1 條沒碰到；它是高力客戶集中風險的脈絡。
+
+"On March 19, 2026, the U.S. Attorney’s Office for the Southern District of New York unsealed an indictment of three individuals either employed or associated with the Company at the time, in connection with an alleged conspiracy to commit export control violations (the “Indictment”)."
+"The Company also received a grand jury subpoena from the U.S. Attorney’s Office for the Southern District of New York seeking documents and information relating to the individuals and facts referenced in the Indictment, as well as the Company’s compliance program and internal controls, and related issues."
+"The Company is cooperating and continues to produce responsive documents in response to the subpoena."

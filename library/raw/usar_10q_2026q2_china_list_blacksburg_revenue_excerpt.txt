@@ -1,0 +1,12 @@
+SOURCE: USA Rare Earth, Inc.（Nasdaq: USAR）Form 10-Q（季度至 2026-06-30）
+URL: https://www.sec.gov/Archives/edgar/data/1970622/000197062226000057/usar-20260630.htm
+PUBLISHED: 2026-08-10（EDGAR 申報日）
+RETRIEVED: 2026-11-09（EDGAR 原文經 fetchers.edgar 抽字、空白攤平後逐字照抄）
+STORAGE: repo_excerpt（發行人申報之有限逐字節錄；補 `usar_10_q_20260810.txt` 沒收的五句）
+NOTE: 發行人自述。Phase 7 完整重讀（USA Rare Earth 敘事）用：①營收全部來自 Less Common Metals 的鑄造與帶狀鑄造合金（不是磁材）；②Blacksburg 廠試車目標 2028 年開始（敘事只寫了規劃產能、沒寫時程）；③中國出口管制名單的風險摘要（同一份 10-Q 已寫，敘事兩版都沒寫）；④流動性：6-30 的現金夠未來十二個月的近期營運與資本支出，長期建廠要再募資（收購 Serra Verde 之前的說法）。封面勾選 Non-accelerated filer、Smaller reporting company、Emerging growth company——季報法定期限是季末後 45 天（Q3：2026-11-14 週六 → 11-16）。
+
+"All of the Company’s revenue is derived from sales of casting and strip casting."
+"Engineering work and equipment procurement are underway, with site work anticipated to commence in the coming months and commissioning targeted to begin in 2028."
+"•Being designated on an export control list by China has had and is expected to continue to have an adverse impact on USAR’s ability to source key raw materials and supplies from China, which has impacted and is expected to continue to impact USAR’s business."
+"We believe that our existing cash and cash equivalents will be sufficient to fund our planned near‑term operating and capital expenditure requirements for at least the next twelve months."
+"However, our long‑term capital requirements, particularly those associated with the full development of the Round Top Project, the build‑out of the Stillwater Facility, the build-out of the Blacksburg Facility, and the build-out of the Less Common Metals – Europe manufacturing facility are expected to exceed our current resources, and we will require additional capital to fund these long‑term initiatives."

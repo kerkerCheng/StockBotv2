@@ -1,0 +1,18 @@
+SOURCE: Caterpillar Inc.（NYSE: CAT）Form 10-Q（quarter ended 2026-09-30）
+URL: https://www.sec.gov/Archives/edgar/data/18230/000001823026000057/cat-20260930.htm
+PUBLISHED: 2026-11-04（EDGAR 申報日；財報新聞稿 8-K 2026-10-29）
+RETRIEVED: 2026-11-09
+STORAGE: repo_excerpt（美國法定公開申報有限節錄；EDGAR 原文 HTML 經 repo 的 fetchers.edgar 抽字、空白攤平後逐字照抄）
+NOTE: 發行人自述（燃氣引擎 OEM，往復式機組層供給側）。Phase 7 完整重讀（往復式機組層、現場燃氣發電層的反證回掃）用：發電銷售年增 30%、大型往復式引擎主要用在資料中心；在手訂單季增 60 億美元、增加最多的是 Power & Energy；第四季「continue to ramp capacity」且預期價格實現有利——沒有一句寫交期縮短、擴產提前或降價（往復式機組層反證①、現場燃氣發電層反證①都沒碰到）。
+
+【Power & Energy 分部銷售表（單位百萬美元；欄位：2026 第三季、2025 第三季、變動、變動率）】
+"Power Generation $ 3,421 $ 2,634 $ 787 30 %"
+"•Power Generation – Sales increased mainly in turbines and turbine-related services and in large reciprocating engines, primarily in data center applications."
+
+【展望】
+"In Power & Energy, demand for both Oil & Gas and Power Generation remains strong in 2026 as compared to 2025. Backlog continues to grow due to strong order rates."
+"In Power & Energy, we anticipate moderate sales growth in the fourth quarter of 2026 as compared to the fourth quarter of 2025 as we continue to ramp capacity."
+"We also expect favorable price realization in Power & Energy."
+
+【在手訂單】
+"At the end of the third quarter of 2026, the dollar amount of backlog believed to be firm was approximately $78.1 billion, about $6.0 billion higher than the second quarter of 2026. The order backlog increased across the three primary segments, with the largest increase in Power & Energy."

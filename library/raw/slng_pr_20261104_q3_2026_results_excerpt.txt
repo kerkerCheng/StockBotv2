@@ -1,0 +1,23 @@
+SOURCE: Stabilis Solutions, Inc.（Nasdaq: SLNG）新聞稿〈Stabilis Solutions Announces Third Quarter 2026 Results〉（Form 8-K Item 2.02 附件 99.1）
+URL: https://www.sec.gov/Archives/edgar/data/1043186/000143774926034943/ex_1005366.htm
+PUBLISHED: 2026-11-04（EDGAR 申報日；新聞稿日期同日）
+RETRIEVED: 2026-11-09
+STORAGE: repo_excerpt（美國法定公開申報附件有限節錄；EDGAR 原文 HTML 經 repo 的 fetchers.edgar 抽字、空白攤平後逐字照抄；表格儲存格以空白相連）
+NOTE: 發行人自述。Stabilis 敘事用：①資料中心相關營收占第三季營收 17%（第二季不到 1%）——來自那份短期試運轉合約；②長約仍照 2027 年第一季開始；③9 月底現金與受限現金合計 1,840 萬美元，其中非受限現金 153.5 萬（2025 年底 745.9 萬），受限 1,683.9 萬是客戶預付、只能用在長約；④第三季營業現金流 390 萬美元含客戶預付 500 萬（公司自己寫）——扣掉預付是負的；⑤流通股 18,596,301 股，與 2025 年底相同（ATM 沒有賣）。
+
+【重點】
+"Data center-related revenue grew to 17% of total revenue in the third quarter, compared to less than 1% in the second quarter of 2026"
+"Previously announced power generation contract for a U.S. data center remains on track to begin in the first quarter of 2027"
+
+【管理層】
+"Demand for small-scale LNG solutions to support behind-the-meter power generation at data centers remains robust, and we continue to pursue additional opportunities in this market that would extend our growth beyond the contracts already in hand,"
+"Demand across our aerospace end-market also remains strong, with revenues from aerospace customers increasing 49% year-over-year as launch and testing activity among our commercial space customers continues to drive LNG volumes."
+"Revenue for the third quarter of 2026 was $14.8 million, a decrease of 27% compared to the third quarter of 2025."
+"Compared to the second quarter of 2026, revenue increased $2.9 million, or 25%, primarily due to the short-term data center contract secured earlier this year."
+
+【營業現金流】
+"Cash flow from operations was $3.9 million for the third quarter of 2026, compared to $2.4 million in the third quarter of last year, primarily reflecting $5.0 million in advance payments from a customer associated with a contract expected to begin in early 2027."
+
+【資產負債表（單位千美元；欄位：2026-09-30、2025-12-31）】
+"Cash and cash equivalents $ 1,535 $ 7,459 Restricted cash and cash equivalents 16,839 —"
+"18,596,301 and 18,596,301 shares issued and outstanding at September 30, 2026 and December 31, 2025, respectively"

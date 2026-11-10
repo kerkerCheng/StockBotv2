@@ -1,0 +1,17 @@
+SOURCE: Teradyne, Inc.（NASDAQ: TER）新聞稿〈Teradyne Announces Production System for Double-Sided Wafer Probe Test for Silicon Photonics〉
+URL: https://investors.teradyne.com/news-events/press-releases/detail/9/teradyne-announces-production-system-for-double-sided-wafer-probe-test-for-silicon-photonics
+PUBLISHED: 2025-03-31 08:30 EDT（公司 IR 網站；同日 Business Wire）
+RETRIEVED: 2026-11-09
+STORAGE: repo_excerpt（第三方新聞稿有限節錄；HTML 轉文字、空白攤平後逐字照抄）
+NOTE: Teradyne 是 ATE（自動測試機）廠，在這個測試單元裡把 ficonTEC 的光學對準、探測與晶圓搬運整合進自己的測試機——是 ficonTEC 的合作夥伴，不是 CPO 量產線的客戶；新聞稿是兩家一起發的行銷文件，L8 下當「第三方夥伴、弱」讀。用途（全堆疊測試層／羅博特科敘事的讀到邊）：①為什麼是 ficonTEC：夥伴自己寫的理由是它的光學對準、探測、晶圓搬運，讓 Teradyne「今天」就推得出量產型雙面晶圓測試——是上市時間，不是換不掉；②什麼會換掉它：同一份新聞稿寫 Teradyne 對其他光學儀器、探針台、對準系統與探針卡開放，客戶自己選——ficonTEC 在這個組合裡不是獨家。沒有點名任何客戶、沒有裝機數。
+
+【夥伴寫為什麼選 ficonTEC】
+"Teradyne, a leading provider of automated test equipment, has partnered with ficonTEC, a global leader in production solutions for photonics assembly and test, to announce the availability of the first high-volume, double-sided wafer probe test cell for silicon photonics."
+"The new test cell integrates Teradyne's UltraFLEXplus automated test equipment (ATE) and programming environment, IG-XL, with ficonTEC's advanced optical alignment, probing, and wafer handling technologies."
+"This collaboration enables the testing of hybrid bonded PIC/EIC wafers in a production environment."
+"this solution addresses the critical need for known good die testing before wafers are diced and packaged into CPO devices or pluggable transceivers."
+
+【夥伴寫它不綁 ficonTEC】
+"While the partnership with ficonTEC enables Teradyne to bring a production-ready system to market today, Teradyne is committed to fostering an open ecosystem for silicon photonics and CPO testing."
+"By ensuring that the UltraFLEXplus is compatible with industry-leading optical instrumentation, probers, alignment systems, and probe cards, Teradyne is delivering a seamless and flexible testing environment for its customers."
+"Our commitment to an open ecosystem ensures our customers can choose the solution that is right for them"

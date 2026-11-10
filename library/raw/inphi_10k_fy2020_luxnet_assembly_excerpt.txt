@@ -1,0 +1,12 @@
+SOURCE: Inphi Corporation Form 10-K（fiscal year ended December 31, 2020）
+URL: https://www.sec.gov/Archives/edgar/data/1160958/000143774921004113/iphi20201231_10k.htm
+PUBLISHED: 2021-02-25
+RETRIEVED: 2026-11-09（EDGAR，repo 的 fetchers.edgar 預設 UA）
+STORAGE: repo_excerpt（法定申報有限節錄；HTML 轉文字、空白攤平後逐字照抄）
+NOTE: 選用。客戶端一手第一次具名華星光（LuxNet Corporation），但角色是晶片的封裝組裝承包商、年份是 2017–2020（EDGAR 全文搜尋：Inphi FY2017–FY2020 四份 10-K 都有「LuxNet Corporation」；Inphi 2021 年 4 月併入 Marvell，Marvell 的申報沒有命中）——講的不是 CW 雷射晶粒，也沒寫為什麼選它（只有一般性的「依賴第三方製造」風險）。用途：華星光敘事「客戶沒具名」那一句的歷史反例，以及它做「後段代工」的形狀有客戶端出處（推一步：與一份私有券商報告的寫法同一個形狀，內容不進 repo）；不支持任何 CW 邊。
+
+製造段：
+"Currently, our principal packaging and assembly contractors are STATS ChipPAC Ltd. (STATS ChipPAC) in Korea, Kyocera Corporation (Kyocera) in Japan, Tong Hsing Electronics Industries Ltd. (Tong Hsing) in Taiwan, Amkor Technology in Korea, LuxNet Corporation (LuxNet) in Taiwan, ASE Technology (ASE) in Taiwan and Malaysia and TF AMD Microelectronics (TF AMD) in Malaysia."
+
+風險段：
+"We also use third-party contract manufacturers for a significant majority of our assembly and test operations, including Kyocera, ASE, Giga Solution, ISE Labs, Presto, Tong Hsing, LuxNet, STATS ChipPAC, TF AMD and GTC."

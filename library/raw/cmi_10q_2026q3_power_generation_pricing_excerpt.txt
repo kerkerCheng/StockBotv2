@@ -1,0 +1,18 @@
+SOURCE: Cummins Inc.（NYSE: CMI）Form 10-Q（quarter ended 2026-09-30）
+URL: https://www.sec.gov/Archives/edgar/data/26172/000002617226000037/cmi-20260930.htm
+PUBLISHED: 2026-11-05（EDGAR 申報日）
+RETRIEVED: 2026-11-09
+STORAGE: repo_excerpt（美國法定公開申報有限節錄；EDGAR 原文 HTML 經 repo 的 fetchers.edgar 抽字、空白攤平後逐字照抄）
+NOTE: 發行人自述（發電機組 OEM，往復式機組層供給側）。這份 10-Q 在 2026-11-07 叫醒往復式機組層讀圖反證②（ew_1715，需求鬆）。讀到的是反方向：Power Systems 的發電產品第三季年增 22%，分部 EBITDA 增加來自量與有利的定價，2026 展望寫發電市場需求維持強勁；全文沒有一句寫買方延後、取消或縮減機組訂單（反證②要的是買方的一手），也沒有交期縮短（反證①）。
+
+【Power Systems 分部 產品線銷售（單位百萬美元；欄位：2026 第三季、2025 第三季、變動、變動率、2026 前九月、2025 前九月、變動、變動率）】
+"Power generation $ 1,557 $ 1,280 $ 277 22 % $ 4,376 $ 3,486 $ 890 26 %"
+
+【Power Systems 分部 EBITDA】
+"Power Systems segment EBITDA for the three months ended September 30, 2026, increased $125 million versus the comparable period in 2025, mainly due to higher volumes and favorable pricing, partially offset by increased compensation expenses."
+
+【全公司營收】
+"Worldwide revenues increased by 13 percent in the three months ended September 30, 2026, compared to the same period in 2025, primarily due to improved demand in North American medium and heavy-duty truck markets and higher demand for power generation equipment, especially in data center applications."
+
+【2026 展望】
+"•We expect demand within markets served by our Power Systems business to remain strong, including the power generation and industrial markets."

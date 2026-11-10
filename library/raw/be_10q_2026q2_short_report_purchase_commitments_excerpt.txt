@@ -1,0 +1,20 @@
+SOURCE: Bloom Energy Corporation — Form 10-Q（quarter ended 2026-06-30）：MD&A 供應鏈段、Item 1A 新增風險因子、Note 12 Commitments、Other Long-Term Assets 附註
+URL: https://www.sec.gov/Archives/edgar/data/1664703/000162828026050247/be-20260630.htm
+PUBLISHED: 2026-07-28
+RETRIEVED: 2026-11-09（repo 的 fetchers.edgar 抓取，HTML 轉文字、空白攤平後逐字照抄）
+STORAGE: repo_excerpt（美國法定公開申報有限節錄）
+NOTE: 發行人自述。Bloom 插槽層反證回掃（2026-11-09）用。①放空報告那一句緊接在 `be_10q_2026q2_suppliers_capacity_excerpt.txt` 已節錄的供應鏈段（take-or-pay 那句）之後，2026-10-27 的插槽讀圖讀了前一句、沒讀這一句；Bloom 說報告質疑的是原料的來源與充足性，它否認——沒寫是哪些原料、哪些供應商。②6-30 的長期採購承諾只有 1,640 萬美元、長期供應商預付款 1.11 億美元——第三季 10-Q 的 58 億美元承諾是這一季之後才出現的。
+
+【供應鏈段（MD&A）】
+"On July 8, 2026, a report was published by a short seller containing allegations regarding, among other things, our supply chain, including the sourcing and sufficiency of certain raw materials used in our products."
+"As stated in our Current Report on Form 8-K furnished on July 9, 2026, we rejected the report’s conclusions regarding our supply chain, and we believe we have sufficient supply of the relevant raw materials to meet our current fuel cell demand and backlog."
+
+【風險因子（Item 1A 新增）】
+"we may be constrained in the manner in which we can proceed against the relevant short seller by applicable state law or issues of commercial confidentiality, including because we treat information regarding our suppliers and sourcing arrangements as confidential and proprietary."
+
+【採購承諾（Note 12）】
+"As of June 30, 2026, we had non-cancelable purchase commitments of $16.4 million with component suppliers and third-party manufacturers, which are expected to be fulfilled beyond the next 12 months."
+"As of December 31, 2025, we had no non-cancelable purchase commitments with component suppliers and third-party manufacturers, which are expected to be fulfilled beyond the next 12 months."
+
+【長期供應商預付款（千美元；6-30 對 2025-12-31）】
+"Vendor advances1 $ 111,374 $ 17,374"

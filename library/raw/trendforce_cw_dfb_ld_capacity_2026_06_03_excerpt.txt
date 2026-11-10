@@ -1,0 +1,15 @@
+SOURCE: TrendForce 新聞稿〈AI Data Center Expansion to Drive Combined Monthly Capacity of EML and CW-DFB LDs to 50.7 Million Units in 2026, Says TrendForce〉（英文版）＋同日簡體中文版〈TrendForce集邦咨询：受惠于AI数据中心规模扩张，预估2026年EML与CW-DFB LD总体月产能达5070万颗〉
+URL: https://www.trendforce.com/presscenter/news/20260603-13077.html ；https://www.trendforce.cn/presscenter/news/20260603-13076.html
+PUBLISHED: 2026-06-03（兩版頁面標示日期）
+RETRIEVED: 2026-11-09
+STORAGE: repo_excerpt（研究機構新聞稿有限節錄；HTML 轉文字、空白攤平後逐字照抄）
+NOTE: 研究機構自產研究（`config/publishers.json` 登記 TrendForce＝industry_research、corroborates=true）。CW DFB 層（聯亞、華星光敘事的卡在哪一格）用：①CW-DFB 雷射產能 Broadcom 與住友並列第一，其次是 Coherent 與「LandMark/LuxNet」——中文版寫明 LandMark＝联亚光电、LuxNet＝华星光通科技，兩家寫成同一格（推一步：聯亞的磊晶與華星光的晶片製程被當成同一條供給；原文沒寫兩家的關係）；四家合計約占產能 74%，沒有個別份額；②NVIDIA、Google、Meta 向 EML 與 CW-DFB 供應商鎖產能——沒有點名誰鎖了誰。原文沒寫任何客戶為什麼選這幾家；是產能排名，不是份額或理由（加碼條件 c2／c1 的字面都沒達到）。比一份私有券商報告（2026-08-18；內容不進 repo）早，是目前找到第三方第一次具名。
+
+英文版：
+"Major players such as NVIDIA, Google, and Meta are securing a stable supply by strategically locking in production capacity from electro-absorption modulated laser (EML) and continuous-wave distributed feedback laser diode (CW-DFB LD) suppliers."
+"Additionally, while NVIDIA-led EML solutions focus on maximizing signal integrity and transmission performance, other CSPs are actively developing CW-DFB LDs for optical circuit switches (OCS) and silicon photonics co-packaged optics (SiPh CPO) solutions."
+"Broadcom and Sumitomo Electric currently lead the industry in CW-DFB LD production capacity, followed by Coherent and LandMark/LuxNet."
+"Together, these suppliers account for approximately 74% of total market capacity."
+
+簡體中文版：
+"Broadcom与Sumitomo Electric在CW-DFB LD产能上并列第一，其次为Coherent（高意）与LandMark（联亚光电） / LuxNet（华星光通科技），占整体产能共计达到74%。"

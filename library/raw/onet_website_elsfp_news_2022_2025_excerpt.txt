@@ -1,0 +1,14 @@
+SOURCE: O-Net Technologies（Shenzhen）Group Co., Ltd. 英文官網新聞：①〈O-Net demonstrated ELSFP successfully of OFC〉②「O-NET Dynamics」新聞列表的 CIOE 2025 一則〈O-Net Makes a Splash at CIOE 2025〉
+URL: ① http://n.o-netcom.com/m/news_view.aspx?Fid=t2%3A4%3A2&Id=525&typefid=4&TypeId=4 ② http://n.o-netcom.com/m/news.aspx?Fid=t2:4:2&TypeId=4
+PUBLISHED: ① 2022-03-25 ② 2025-09-12（頁面標示日期）
+RETRIEVED: 2026-11-09（HTTP 直接抓；HTTPS 憑證過期）
+STORAGE: repo_excerpt（買方自己網站新聞有限節錄；HTML 轉文字、空白攤平後逐字照抄）
+NOTE: 買方自述。Sivers 敘事 O-Net 那一格用：①O-Net 在 2022 年 3 月 OFC 就展示了 8 通道 ELSFP——早於 2025 年 4 月它與 Sivers 的 OEM 合作，當時用誰的雷射原文沒寫；②它自述十年來推出多種自研 III-V 雷射（泵浦、光達用 DFB 種子光源、增益晶片）；③英文新聞列表最新一則（CIOE 2025）把高功率 ELSFP 寫成「self-developed」。三則都沒有出現 Sivers。推一步：O-Net 的外部光源有 Sivers 以外的雷射來源或自研能力——「什麼會讓 Sivers 在 O-Net 被換掉」的買方端線索，不是換掉的證據。中文官網沒有查（見 packet）。
+
+2022 年 OFC：
+"Together with several industry partners and collaborators, O-Net successfully demonstrated the External Laser Small Form-Factor Pluggable (ELSFP) module during the 47th OFC in San Diego, California on March 8-10, 2022."
+"The ELSFP module includes 8 channels of Class VHP Continuous Wave (CW) lasers at 1310nm or CWDM wavelength."
+"In the past ten years, O-Net Technologies has continuously invested in research and development in the core optoelectronic field, and has launched a variety of self-development class III-V laser, including 980nm PUMP and Raman PUMP for optical amplifiers, 1550nm DFB seed laser source for LiDAR, Gain chip for integrated coherent tunable laser and Mixer chip for integrated coherent receiver."
+
+CIOE 2025：
+"this self-developed ELSFP module leverages advanced packaging and thermal management, making it an ideal solution for high-power application scenarios such as data centers and HPC."

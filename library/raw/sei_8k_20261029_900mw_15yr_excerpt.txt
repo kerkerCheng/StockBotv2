@@ -1,0 +1,13 @@
+SOURCE: Solaris Energy Infrastructure, Inc.（NYSE: SEI）Form 8-K（Item 8.01，2026-10-29）＋ Form 10-Q（quarter ended 2026-09-30，2026-11-06）
+URL: https://www.sec.gov/Archives/edgar/data/1697500/000119312526437755/d157948d8k.htm ； https://www.sec.gov/Archives/edgar/data/1697500/000162828026071604/sei-20260930.htm
+PUBLISHED: 2026-10-29（8-K）；2026-11-06（10-Q）
+RETRIEVED: 2026-11-09
+STORAGE: repo_excerpt（美國法定公開申報有限節錄；EDGAR 原文 HTML 經 repo 的 fetchers.edgar 抽字、空白攤平後逐字照抄）
+NOTE: 整合商（現場燃氣發電層供給側）自述。8-K 在 2026-11-07 叫醒現場燃氣發電層讀圖反證①②（ew_1711、ew_1712）。讀到的是反方向：一家投資級的既有客戶再簽約 900 MW、每次部署初始 15 年、可再延 15 年，2027 上半年開始部署——需求側加長約，不是延後、取消或改接電網（②）；也沒有交期縮短或降價（①）。10-Q 另寫 2026-03 向 Colusa 買下 30 台 Baker Hughes NovaLT16 燃機的交貨權（付給 Colusa 6,690 萬美元換交貨權，另付 Baker Hughes 6,430 萬美元逾期里程碑款與暫停相關成本）——設備交貨位子有價，與「設備好取得」相反；Colusa 暫停過訂單是 3 月的事，早於讀圖寫入日（10-28），不是新的需求鬆動。
+
+【8-K Item 8.01】
+"On October 29, 2026, a subsidiary of Solaris Energy Infrastructure, Inc. (the “Company”) entered into an agreement to provide approximately 900 megawatts of power generation, associated balance of plant equipment and operations and maintenance services to a leading, investment-grade, diversified industrial and technology company that is an existing customer of the Company."
+"The agreement is for an initial term of 15 years for each deployment, with an option to extend for an additional 15 years. Deployments under the agreement are expected to begin in the first half of 2027 and scale through 2028."
+
+【10-Q 附註（NovaLT16 燃機交貨權）】
+"At closing, the Company paid Colusa $66.9 million as consideration for the assignment of its contractual delivery rights and paid Baker Hughes $64.3 million in satisfaction of overdue milestone invoices and suspension-related costs that had accrued prior to the assignment, for aggregate closing payments of $131.2 million recorded as construction in progress."

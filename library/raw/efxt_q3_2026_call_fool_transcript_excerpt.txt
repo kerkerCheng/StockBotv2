@@ -1,0 +1,38 @@
+SOURCE: Enerflex（EFXT）2026 年第三季法說（2026-10-29 美東上午）第三方逐字稿〈Enerflex (EFXT) Q3 2026 Earnings Call Transcript〉（Motley Fool Transcribing）
+URL: https://www.fool.com/earnings/call-transcripts/2026/10/29/enerflex-efxt-q3-2026-earnings-call-transcript/
+PUBLISHED: 2026-10-29 3:24PM EST（頁面標示；meta published_time 2026-10-29T19:24:28Z）
+RETRIEVED: 2026-11-09（requests 直接取頁，HTTP 200；HTML 轉文字、空白攤平後逐字照抄——不是 WebFetch 轉述）
+STORAGE: repo_excerpt（第三方逐字稿有限節錄；只收講者原話段落，不收 Motley Fool 編輯寫的摘要框）
+NOTE: **第三方轉錄、公司自述（L8）**。講者：Paul E. Mahoney（President & CEO）、Preet Dhindsa（SVP & CFO）；問答分析師 Keith MacKey（RBC）、Tim Monachello（ATB）。Enerflex 敘事用：
+①第三季 10 億美元訂單裡核心業務（壓縮、處理）在八季平均線內——其餘是表後發電（推得出 450 MW 那份的量級，金額公司沒寫）；
+②在手表後發電 1.8 GW 是從約 7 GW 機會裡挑信用好的對手；還看得到另外 1.5 到 2 GW，卡在設備供給；
+③表後發電合約的毛利高於 ES 歷史毛利，但要 2027 年底、第四季到 2028 年才進數字；
+④擴廠（新增測試廠房與製造廠房）會增加產能；分析師說 ES 有產能限制、擴廠多在 2028 年到位，CEO 說在研究跟夥伴合作加快；
+⑤第四季與全年財報 2027 年 2 月。
+
+【CEO 開場：訂單】
+"During the first 9 months of 2026, Engineered Systems bookings totaled approximately $2 billion and we are on track to exceed $3 billion during 2026."
+"We continue to see growing customer demand for reliable dispatchable power solutions, particularly in support of data center development and in regions where grid infrastructure remains constrained."
+
+【CEO 開場：怎麼賣】
+"Which emphasizes Enerflex's unique capabilities in providing fully integrated solution, spanning design, engineering, equipment supply, commissioning, operations, maintenance, and optimization, in addition to the project and customers where our team focuses their efforts."
+
+【問答：訂單組成（TD Cowen）】
+"The $1 billion bookings has a healthy power component as we have discussed. I mean nothing unusually large in the balance of compression or gas processing."
+"That was a nice order, but it is well within the trailing 8 quarter line in our core business."
+
+【問答：客戶怎麼挑、還有多少（RBC）】
+"So, when I think about companies that have really strong investment grade positions, creditworthiness, strong counterparties, have well developed line of sight of engineering well developed line of sight of the regulatory environment, very close to the local markets that they are participating in."
+"I would tell you today, that I see probably an additional 1.5 to 2 in a very filtered manner, to the description that I laid out there. The gating item, obviously, is going to be equipment supply."
+
+【問答：毛利（ATB，CFO）】
+"we feel those margins are accretive to our current reported historical ES margins, but that is not going to hit until likely late 2027, call it Q4 into 2028."
+
+【問答：產能（ATB）】
+"So there will be a test building, and there will be a fabrication building, are incremental."
+（下一句是分析師 Tim Monachello 的問句，不是公司說的）
+"clearly there is some capacity constraints within the ES business, which you are addressing with these expansions, which will largely come in for 2028."
+"Nothing concrete at this point, but certainly, how do we accelerate with partners And that is definitely something we are working through."
+
+【結尾】
+"We appreciate your time and look forward to sharing our fourth quarter and year end results with you in February."

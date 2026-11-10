@@ -1,0 +1,28 @@
+SOURCE: 全新光電科技股份有限公司（2455）法人說明會簡報（中信證券 2026 第三季前瞻論壇，115/09/04；公開資訊觀測站法說簡報 245520260902M001.pdf）；對照同公司 115/03/04（245520260303M001.pdf）、115/05/27 與 06/09（245520260526M001.pdf）兩份
+URL: https://mopsov.twse.com.tw/nas/STR/245520260902M001.pdf（另 https://mopsov.twse.com.tw/nas/STR/245520260303M001.pdf、https://mopsov.twse.com.tw/nas/STR/245520260526M001.pdf）
+PUBLISHED: 2026-09-02（檔名日期；法說一覽：115/09/04 13:30 台北艾麗酒店）
+RETRIEVED: 2026-11-09
+STORAGE: repo_excerpt（pypdf 逐頁抽字後逐字節錄；簡報是圖文頁，抽字會把版面上的字串成一行）
+NOTE: 發行人自述（L8 弱主張）。這三份簡報 19 版敘事都沒有引用過（敘事一直寫「要等法說」）。讀完的結論：沒有 CW 雷射的量、客戶或變體；產品頁把「CW-Laser」列在光電子產品裡，
+但「2027 Outlook 光電子」那一頁資料中心那一格只寫「PD for 800G」「VCSEL for 400G & 800G」（三月、五月兩版的「2026 Outlook」同一格也是這兩項）；三月版「Future Driving Engines」那一格有「矽光子」，五月、九月版同一格換成「HAMR HDD」（推一步：只是版面改字，簡報沒寫為什麼，不當成「不再提 CW」）。
+光電子供應鏈頁寫磷化銦基板是「2~4 ”」（讀圖 sr_d16f22339e294216 反證③等的是 6 吋磷化銦雷射磊晶量產——這份沒碰到）。
+
+【245520260902M001.pdf p.6 化合物半導體材料特性】
+"光電子產品－ PIN（PD、APD）、VCSEL、LD、SC、 CW-Laser、 GaN on XX"
+
+【p.8 光電子產品 產業供應鏈】
+"AI Data center 2~4 ”InP Substrate"
+"VPEC is a Pure Epi Provider"
+
+【p.9 2023年-2026上半年度損益情形（單位：新台幣仟元）】
+"Revenue 1,924,683 100% 3,380,143 100% 3,241,217 100% 2,694,104 100%"
+"Gross margin 738,137 38% 1,219,726 36% 1,278,964 39% 1,108,914 41%"
+
+【p.11 2027 Outlook 光電子】
+"2027 Outlook 光電子"
+"Data Center High Speed Connectivity"
+"PD for 800G VCSEL for 400G & 800G"
+"AI glass HAMR HDD 無人機"
+
+【對照：245520260303M001.pdf p.10 2026 Outlook 光電子】
+"AI glass 矽光子 無人機"

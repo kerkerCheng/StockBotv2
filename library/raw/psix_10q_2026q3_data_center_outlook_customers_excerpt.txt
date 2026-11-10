@@ -1,0 +1,40 @@
+SOURCE: Power Solutions International, Inc.（Nasdaq: PSIX）Form 10-Q（quarter ended 2026-09-30）
+URL: https://www.sec.gov/Archives/edgar/data/1137091/000162828026071065/psix-20260930.htm
+PUBLISHED: 2026-11-05（EDGAR 申報日）
+RETRIEVED: 2026-11-09
+STORAGE: repo_excerpt（美國法定公開申報有限節錄；EDGAR 原文 HTML 經 repo 的 fetchers.edgar 抽字、空白攤平後逐字照抄）
+NOTE: 發行人自述。Phase 7 完整重讀（往復式機組層；PSI 敘事）用：①資料中心相關產品銷售增加，但公司不預測任何一期的資料中心營收、也沒拆出金額；②下半年展望由「與 2025 下半年持平」上調為「超過 2025 下半年」，理由是大型電力系統訂單進入生產；第四季部分交貨受原料供應限制；③資料中心產品毛利率一般低於油氣產品（敘事反證與已定價都用到）；④客戶集中表：客戶 B、C、F 都沒具名（第二季 10-Q 是 B 22%、C 19%）；⑤證券集體訴訟指控的是資料中心產品線的需求、產能與營運效率說法（早期階段）。2025 下半年營收 3.95 億美元＝2025 年報全年 7.224 億減前九月 5.312 億、再加第三季 2.038 億（本機計算，不是原文）。
+
+【MD&A 營收】
+"Net sales decreased $1.8 million, or 1%, during the three months ended September 30, 2026, compared to the three months ended September 30, 2025, as a result of lower sales of $6.2 million and $1.1 million in the power systems and transportation end markets, respectively, partially offset by an increase of $5.6 million in the industrial end market."
+"Sales in the power systems end market declined primarily due to softness in demand within the oil and gas market partially offset by higher sales of data center related products."
+"The Company continues to see strong demand for data center power solutions; however, the timing and ultimate volume of revenue recognized from that demand remain subject to customer scheduling, manufacturing throughput, supply chain factors and other variables, and the Company is not predicting any specific level of data center revenue in any future period."
+
+【附註 終端市場表（單位千美元；欄位：2026 第三季、占比、2025 第三季、占比、2026 前九月、占比、2025 前九月、占比）】
+"Power Systems $ 163,136 81 % $ 169,370 83 % $ 381,975 79 % $ 432,980 82 %"
+
+【MD&A 展望（Recent Trends and Business Outlook）】
+"Based on the current production schedule and information available as of the date of this Quarterly Report, the Company is raising its outlook and now expects second-half 2026 net sales to exceed second-half 2025 net sales, as larger Power Systems orders move into production and are recognized as revenue."
+"The Company previously expected second-half 2026 net sales to be approximately in line with second-half 2025 net sales."
+"including current material availability constraints affecting certain planned fourth quarter deliveries; there can be no assurance that orders will convert to revenue in any particular quarter."
+"Softness in demand within the oil and gas market is expected to continue, offset by higher sales of data center products, which generally carry lower gross margins than oil and gas products."
+"Consistent with those goals, the Company is actively pursuing several initiatives to enhance and expand manufacturing capacity to meet the increasing demand from data center markets."
+
+【MD&A 毛利】
+"Gross margin was 29.7% and 23.9% during the three months ended September 30, 2026 and 2025, respectively."
+"Capacity ramp-up activities at the Wisconsin operations are continuing, and the Company expects the related production costs to persist."
+
+【附註 客戶集中（占營收超過一成的客戶；欄位：2026 第三季、2025 第三季、2026 前九月、2025 前九月；** 表示不到一成）】
+"Customer B 22 % 18 % 19 % 20 %"
+"Customer C 12 % 11 % 18 % **"
+"Customer F 13 % 17 % ** 14 %"
+
+【附註 剩餘履約義務】
+"For performance obligations that extend beyond one year, the Company had $1.8 million of remaining performance obligations as of September 30, 2026, primarily related to extended warranties."
+
+【附註 收購 MTL（產能）】
+"During the first quarter of 2026, the Company acquired MTL Manufacturing & Equipment, Inc. (“MTL”), which engages in the welding, fabrication, painting, and assembly of steel components. The acquisition expands the Company’s manufacturing capabilities and vertical integration."
+
+【附註 證券集體訴訟】
+"based on alleged misstatements and omissions concerning the Company’s business, operations and prospects, including matters relating to demand, manufacturing capacity and operating inefficiencies for data center product lines."
+"The matter is at an early stage, and the Company cannot reasonably estimate a possible loss or range of loss at this time."

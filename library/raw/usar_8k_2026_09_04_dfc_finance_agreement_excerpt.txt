@@ -1,0 +1,12 @@
+SOURCE: USA Rare Earth, Inc.（Nasdaq: USAR）Form 8-K（2026-09-04；Item 2.01 完成合併、Item 2.03 承接直接財務義務）主文件
+URL: https://www.sec.gov/Archives/edgar/data/1970622/000121390026097399/ea0304001-8k_usarare.htm
+PUBLISHED: 2026-09-04（EDGAR 申報日；合併 2026-09-03 完成）
+RETRIEVED: 2026-11-09（EDGAR 原文經 fetchers.edgar 抽字、空白攤平後逐字照抄）
+STORAGE: repo_excerpt（發行人申報之有限逐字節錄）
+NOTE: 發行人申報。Phase 7 完整重讀（USA Rare Earth 敘事）用：收購 Serra Verde 的對價（現金 3 億美元＋1.268 億股）與合併子公司承接的 DFC 貸款（上限 5.65 億美元：首期上限 4.65 億美元、Term SOFR＋4%、最長 15 年；增額 1 億美元在交割時視為清償）。敘事 10-17 起寫「現金 15.3 億美元、負債很少」——15.3 億是 6-30 的數（收購前），之後付了 3 億現金、子公司承接這筆貸款；交割時首期貸款實際動用多少，這份 8-K 沒寫（L11-5：要看第三季 10-Q）。
+
+"On September 3, 2026 (the “Closing Date”), the parties closed the Merger, and the Merger became effective at the time when the Articles of Merger were registered by the Registrar of Corporate Affairs of the British Virgin Islands (the “Effective Time”)."
+"Pursuant to the Merger Agreement, the aggregate merger consideration (the “Merger Consideration”) consists of (i) an amount of cash equal to $300,000,000 (the “Aggregate Cash Merger Consideration”) and (ii) an aggregate of 126,849,307 shares of common stock, par value $0.0001 per share, of USAR (“USAR Shares”) (the “Aggregate Stock Merger Consideration”)."
+"In connection with the closing of the Merger, Merger Sub assumed on the Closing Date all of the rights and obligations of SVRE under a Finance Agreement, dated as of January 21, 2026 (as amended, the “Finance Agreement”), pursuant to which DFC agreed to provide a loan to SVRE in an aggregate principal amount not to exceed $565,000,000, consisting of (i) a first tranche (the “Initial Loan”) with a principal amount not to exceed $465,000,000 and (ii) a second tranche (the “Incremental Loan”) with a principal amount not to exceed $100,000,000, and the other financing documents to which SVRE was a party."
+"The Initial Loan has a term not to exceed fifteen (15) years from the initial disbursement date and is repayable in up to forty-nine (49) quarterly sculpted installments."
+"Upon payment of the Merger Consideration in respect of the DFC Warrants and payment of all outstanding unpaid fees and accrued but unpaid interest due to DFC in relation to the outstanding principal amount of the Incremental Loan, the outstanding principal amount of the Incremental Loan and all such amounts were deemed repaid in full and all obligations of Merger Sub in respect of the Incremental Loan were deemed irrevocably satisfied and discharged."

@@ -1,0 +1,17 @@
+SOURCE: Applied Digital Corporation（NASDAQ: APLD）Form 10-Q（FY2027 Q1，季末 2026-08-31）與同日財報新聞稿（8-K Ex.99.1）有限節錄
+URL: https://www.sec.gov/Archives/edgar/data/1144879/000114487926000059/apld-20260831.htm；https://www.sec.gov/Archives/edgar/data/1144879/000114487926000057/apldq127earningsrelease.htm
+PUBLISHED: 2026-10-07（EDGAR 申報日）
+RETRIEVED: 2026-11-09
+STORAGE: repo_excerpt（SEC 申報有限節錄；repo 的 fetchers.edgar 抓、HTML 轉文字、空白攤平後逐字照抄）
+NOTE: **客戶端一手**（B&W 燃氣鍋爐案的需求方）。Phase 7 完整重讀（燃氣鍋爐層；B&W 敘事）用：①Applied Digital 2026-10-04 與 Base Electron 簽約 1,200 MW 燃氣電廠的購電合約（15 年、固定月付），案子沒有取消；②**電廠到 2027-03-31 還沒完成融資關帳（financial close），Base Electron 可終止這份購電合約**——一個有日期的檢查點；③Base Electron 由 Applied Digital 的高階主管與董事（含執行長 Cummins）以個人身分擁有並經營，Applied Digital 持股約一成、借它 5,850 萬美元——B&W 的對手方是一家關係人新設的獨立電廠，不是 Applied Digital 本身；④Base Electron「could add multiple gigawatts」是客戶自己寫的可能性，不是第二案的合約。
+
+【10-Q Part II Item 5 Other Information】
+"On October 4, 2026, the Company entered into a Power Purchase Agreement and a related credit support agreement with Base Electron for the purchase of capacity and energy from an approximately 1,200 MW natural gas-fired generation facility to be developed by Base Electron in Center, North Dakota, which is intended to provide dedicated generation for the Company's Polaris Forge 3 campus."
+"The Power Purchase Agreement has a 15-year delivery term and provides for fixed monthly payments based on target contract capacity, and may be terminated by Base Electron if financial close for the facility has not occurred by March 31, 2027."
+"It is owned and managed by certain officers and directors of the Company, including Messrs. Cummins and Zhang and Dr. Nottenburg, acting in their individual capacities, as well as numerous third parties."
+
+【10-Q 附註 7 Related Party Transactions】
+"As of August 31, 2026, the principal balance of the Demand Grid Promissory Note was $58.5 million, which was recorded as a related party loan receivable"
+
+【財報新聞稿 2026-10-07】
+"Base Electron Corp., an independent power producer in which Applied Digital holds an approximately 10% equity interest, is developing front-of-the-meter generation that could add multiple gigawatts of new power in the Dakotas over time."

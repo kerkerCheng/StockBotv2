@@ -101,10 +101,25 @@ def test_the_inverted_word_order_is_the_same_lamp_claim(text: str) -> None:
     assert any("寫死了燈色" in p for p in story_problems("our_bet", text))
 
 
+@pytest.mark.parametrize("text", [
+    "會死嗎：負債燈紅，現金跑道燈黃。",                 # 1802.TW、1815.TWO 10-20 的寫法
+    "會死嗎亮兩盞燈：負債紅（總債多於現金）、現金跑道黃。",  # 3234.TWO 11-10 的寫法
+    "營收仍以汽車為主，負債燈紅",                       # XFAB.PA 候選理由
+    "稀釋燈灰。",
+    "繼續經營燈灰。",                                   # 1815.TWO 10-20 的寫法
+    "會死嗎有兩盞是紅的。",                             # KSHINTL.NS 10-17 的寫法
+])
+def test_a_colour_right_after_the_lamp_name_is_the_same_lamp_claim(text: str) -> None:
+    """failure log #120 第 5 次：燈名緊接顏色（沒有「是」、沒有「燈」）過了寫入端（L16：同義詞也拒收）。"""
+    assert lamp_colour_claims(text)
+    assert any("寫死了燈色" in p for p in story_problems("our_bet", text))
+
+
 def test_lamp_words_without_a_colour_still_pass() -> None:
     assert lamp_colour_claims("燈號只表達行情資料狀態。") == []
     assert lamp_colour_claims("負債：欠的比手上的現金多，本業現金流為正。") == []
     assert lamp_colour_claims("負債燈是用 6 月底的資料算的。") == []     # 講燈的資料，不講顏色
+    assert lamp_colour_claims("表外負債灰色地帶。") == [] and lamp_colour_claims("淨負債率踩到紅線。") == []
 
 
 def test_an_old_record_with_a_lamp_colour_still_parses() -> None:

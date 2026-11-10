@@ -1,0 +1,34 @@
+SOURCE: Stabilis Solutions, Inc.（Nasdaq: SLNG）Form 10-Q（quarter ended 2026-09-30）
+URL: https://www.sec.gov/Archives/edgar/data/1043186/000143774926034978/slng20260930_10q.htm
+PUBLISHED: 2026-11-04（EDGAR 申報日）
+RETRIEVED: 2026-11-09
+STORAGE: repo_excerpt（美國法定公開申報有限節錄；EDGAR 原文 HTML 經 repo 的 fetchers.edgar 抽字、空白攤平後逐字照抄）
+NOTE: 發行人自述。Phase 7 完整重讀（虛擬管線層；Stabilis 敘事）用：①資料中心長約照舊 2027 年第一季開始、到 2029 年第一季，初始期總額約 2 億美元，2,500 萬美元預付已全收；②9 月底遵守全部債務契約——第二季 10-Q 那句「reasonably possible that the Company could fail to maintain compliance with its consolidated debt service ratio」（library/raw/slng_10q_2026q2_restricted_cash_covenants_atm_excerpt.txt）這一季沒有再出現，改寫成持續密切監控、相信拿得到豁免但不保證；③ATM 到 9 月底一股都沒賣（上限「currently $10.2 million」）；④Galveston：FID 預期 2026 年底或 2027 年初、已承諾承購約 16%，不先拿到融資不投入大額資金；⑤槽車與運輸也可以外包（低溫設備車隊不是只有它有）；⑥第三季營收的「較高平均售價」來自客戶組合，不是調價。
+
+【長約】
+"Total revenue under the initial multi-year term of the contract is estimated to be approximately $200 million. The Company received $25.0 million in advance payments from the customer; of which, the final advance payment of $5.0 million was received in the third quarter of 2026."
+"LNG deliveries are expected to commence during the first quarter of 2027 and continue through the first quarter of 2029."
+
+【虛擬管線（業務說明）】
+"We own a fleet of cryogenic trailers to transport and deliver LNG. We also outsource similar equipment and transportation services for LNG from qualified third-party providers as required to support our customer base."
+
+【第三季營收與成本變動】
+"Higher average pricing from favorable customer mix in the Current Quarter compared to the Prior Year Quarter, resulting in an increase in revenues of $0.6 million;"
+"Higher average transportation and liquefaction costs in the Current Quarter compared to the Prior Year Quarter resulting in an increase in cost of revenues of $0.1 million."
+"Cost of revenues. Cost of revenues decreased $4.2 million, or 29%, compared to the Prior Year Quarter. As a percentage of revenue, these costs were 71% and 72% in the Current Quarter and the Prior Year Quarter, respectively."
+
+【流動性與債務契約】
+"Management believes the business will generate sufficient cash flows from its operations along with availability under the Company's debt agreements to fund its ongoing business for the next twelve months."
+"As of September 30, 2026, the Company was in compliance with all financial covenants under its debt agreements."
+"We will continue to monitor covenant compliance closely and evaluate additional actions which may include reducing discretionary capital expenditures, delaying certain growth initiatives, or seeking alternative sources of financing if needed. The Company believes that its relations with its lenders are good and that a waiver could be obtained in the event a violation occurred; however, there can be no assurance that additional actions taken by the Company, if required, could prevent a possible covenant violation or that the Company would be successful in obtaining a covenant waiver in the event a covenant violation occurred."
+
+【ATM】
+"the Company may sell under the Shelf Registration to no more than one-third of the Company’s public float (currently $10.2 million) in any twelve-month period. The Company has made no issuances under the Shelf Registration and related ATM at September 30, 2026."
+
+【Galveston】
+"The Company continues to advance its proposed Galveston liquefaction facility along with a Jones Act-compliant LNG bunkering vessel toward an expected FID later in 2026 or early 2027. The Company has secured customer commitments for approximately 16% of the project’s proposed 350,000 gallons-per-day capacity and remains engaged in discussions with multiple potential customers to secure the remaining offtake."
+"The financing and structure of the proposed Galveston liquefaction facility is anticipated to be in the form of a separate entity with a combination of third-party equity and debt that would be nonrecourse to the Company."
+"The Company does not intend to commit to the use of significant additional funds related to the proposed Galveston LNG liquefaction facility without first securing the financing."
+
+【船期終止】
+"At September 30, 2026, the only remaining obligation is the $0.8 million early termination fee that is payable on January 1, 2027"

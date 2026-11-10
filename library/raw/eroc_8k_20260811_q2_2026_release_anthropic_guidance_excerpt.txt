@@ -1,0 +1,26 @@
+SOURCE: ERock, Inc.（NYSE: EROC）新聞稿〈ERock Reports Second Quarter 2026 Results〉（Form 8-K Item 2.02 附件 99.1）
+URL: https://www.sec.gov/Archives/edgar/data/2110029/000119312526344714/eroc-ex99_1.htm
+PUBLISHED: 2026-08-11（EDGAR 申報日；新聞稿日期同日）
+RETRIEVED: 2026-11-09
+STORAGE: repo_excerpt（美國法定公開申報附件有限節錄；EDGAR 原文 HTML 經 repo 的 fetchers.edgar 抽字、空白攤平後逐字照抄；條列符號另起一行，引文從條列文字起）
+NOTE: 發行人自述。ERock 敘事（往復式機組層）用——10-28 版只讀了第二季 10-Q 與公開說明書，沒讀這份 8-K：
+①客戶具名：Anthropic 470 MW 設備採購單（只有設備）；El Paso Electric 366 MW 發電廠（支援 Meta 的資料中心園區）已開工——10-Q 的四個交易對手沒具名，這份 8-K 點了名；
+②2026 全年指引：營收 4.35 到 4.65 億美元、調整後 EBITDA 300 到 900 萬美元（上半年營收 7,161 萬——下半年要約 3.6 到 3.9 億，本機計算）；
+③6 月底非受限現金 6.266 億美元、沒有負債、2.5 億循環額度未動用；
+④生產承諾排到 2028 年。
+
+【重點】
+"Contracted Power System Sales Backlog increased to approximately $1.7 billion, up 10x year-over-year, driven primarily by accelerating demand from AI data center customers."
+"Executed a 470 MW equipment purchase order with Anthropic, further validating ERock's position as a leading provider of utility-grade onsite power solutions for AI infrastructure and extending production commitments into 2028."
+"Began assembly operations at Hyperion facility. The Houston manufacturing expansion significantly increases ERock's capacity to support contracted customer deliveries."
+"Commenced construction of the 366 MW El Paso Electric generation facility, supporting Meta's data center campus."
+"Ended the quarter with strong liquidity, including $626.6 million of unrestricted cash, no outstanding debt and an undrawn $250 million credit facility as of June 30, 2026."
+
+【財務長】
+"We expect significantly higher generator deliveries and installations as we execute on multiple large customer projects, which is anticipated to drive substantial growth in revenue and Adjusted EBITDA."
+
+【2026 全年指引】
+"The Company is introducing the following full-year 2026 guidance."
+"• Revenue: $435 million to $465 million"
+"• Adjusted EBITDA*: $3 million to $9 million"
+"At the midpoint, the revenue outlook represents approximately 2.5x year-over-year growth."

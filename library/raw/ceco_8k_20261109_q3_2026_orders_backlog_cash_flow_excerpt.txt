@@ -1,0 +1,38 @@
+SOURCE: CECO Environmental Corp.（TXSE: CECO）2026 年第三季財報新聞稿（Form 8-K Exhibit 99.1，Items 2.02／9.01）有限節錄
+URL: https://www.sec.gov/Archives/edgar/data/3197/000119312526452685/ceco-ex99_1.htm
+PUBLISHED: 2026-11-09（EDGAR 申報日；新聞稿日期 November 9, 2026）
+RETRIEVED: 2026-11-09
+STORAGE: repo_excerpt（SEC 申報有限節錄；repo 的 fetchers.edgar 抓、HTML 轉文字、空白攤平後逐字照抄）
+NOTE: Phase 7 完整重讀（排放系統層；CECO 敘事）用：①第三季訂單 7.776 億美元（年增 234%）、在手 21.935 億美元（年增 205%；第二季末為 18.191 億美元，季增約兩成）——在手沒有季減；②在手的專案「remain largely on schedule」——沒有寫大型案延後或取消；③風險段把「the concentration of our orders and backlog in large-scale power generation projects」列為風險——**公司自己寫訂單與在手集中在大型發電專案（沒有拆比例；燃氣占比仍要另找）**；④前三季營業現金流 +1.214 億美元（上半年 −3,240 萬美元，第三季單季 +1.538 億美元），季末現金 7,207 萬美元、債務合計約 5.99 億美元（流動 1,600 萬＋非流動 5.833 億）、公司算的槓桿 2.0 倍；⑤全年訂單指引上調到超過 25 億美元（前三季合計 20.256 億美元＝第一季 4.495 億＋第二季 7.985 億＋第三季 7.776 億，第一、二季數字見各季財報稿）。資料中心約占在手兩成、發電約占六成的說法出自電話會議（二手轉錄），**不在本節錄**。
+
+【Highlights for the Quarter】
+"Orders of $777.6 million, up 234 percent; backlog of $2,193.5 million, up 205 percent"
+"Revenue of $404.4 million, up 105 percent"
+"Free cash flow of $148.4 million, a $137.3 million improvement; adjusted free cash flow of $154.4 million, a $135.4 million improvement, adjusted for cash payments relating to the Thermon transaction made during the quarter."
+"Leverage of 2.0X, a reduction of 0.7X from the closing date of the Thermon acquisition"
+
+【CEO 引言：在手與管道】
+"The continued visibility we have in our $2.2 billion backlog – the vast majority of which is permitted and underway, our rapidly growing $9 billion sales pipeline, and our productivity and synergy initiatives reinforce my confidence in our strategy and my conviction in our ability to deliver significant long-term value creation."
+
+【2026 全年指引更新】
+"Raising full year Orders to exceed $2.5 billion, compared to previous outlook of at least $2.0 billion"
+"The projects in our backlog remain largely on schedule, and our sales pipeline continues to expand in both size and quantity. While we anticipate additional orders to be realized in power markets, I would emphasize that demand for our environmental, industrial and thermal solutions remain equally robust and often are realized later in the project supply chain cycle and generally represent funded, active projects rather than speculative demand,"
+
+【2027 全年展望】
+"The Company introduces its 2027 full year outlook with revenue expected to be between $2.1 billion and $2.3 billion, representing growth of more than 60 percent at the midpoint compared with the midpoint of the Company’s 2026 revenue outlook, and Adjusted EBITDA between $475 million and $525 million, representing growth of more than 130 percent at the midpoint compared with the midpoint of the Company’s 2026 Adjusted EBITDA outlook."
+
+【風險因子（Safe Harbor 段）】
+"the concentration of our orders and backlog in large-scale power generation projects and the level of demand in the end markets we serve; our ability to convert backlog into revenue, including the timing of project execution and the right of customers to cancel or delay orders;"
+"our ability to generate cash flow from operations and to manage working capital, including customer advance payments, progress billings and the timing of customer collections;"
+
+【現金流量表（九個月，千美元）】
+"Billings in excess of costs and estimated earnings on uncompleted contracts 256,488 21,193"
+"Net cash provided by (used in) operating activities 121,397 (4,100 )"
+
+【非 GAAP 調節：營業現金流（百萬美元；第三季 2026、2025；九個月 2026、2025）】
+"Net cash provided by (used in) operating activities $ 153.8 $ 15.3 $ 121.4 $ (4.1 )"
+
+【資產負債表（千美元；2026-09-30、2025-12-31）】
+"Cash and cash equivalents $ 72,066 $ 33,144"
+"Current portion of debt $ 15,999 $ 1,879"
+"Debt, less current portion 583,321 210,559"

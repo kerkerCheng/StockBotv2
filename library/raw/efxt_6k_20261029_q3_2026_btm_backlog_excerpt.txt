@@ -1,0 +1,37 @@
+SOURCE: Enerflex Ltd.（NYSE: EFXT；TSX: EFX）第三季財報 Form 6-K（2026-10-29，accession 0001193125-26-437439）：附件 99.1 新聞稿、99.2 期中財報、99.3 MD&A
+URL: https://www.sec.gov/Archives/edgar/data/1904856/000119312526437439/
+PUBLISHED: 2026-10-29（EDGAR 申報日；新聞稿與法說同日）
+RETRIEVED: 2026-11-09
+STORAGE: repo_excerpt（加拿大發行人向 SEC 提交的公開申報附件有限節錄；EDGAR 原文 HTML 經 repo 的 fetchers.edgar 抽字、空白攤平後逐字照抄）
+NOTE: 發行人自述。Enerflex 敘事（現場燃氣發電層）用：①450 MW 那份表後燃氣發電合約的金額仍沒有單獨揭露，但 MD&A 寫 ES 在手從 2025 年底 11 億美元增到 9 月底 21 億「primarily due to」這份合約——第三季 ES 訂單 10 億美元、第二季 4.88 億、八季平均 4.48 億；②超過 1 GW 那份第四季才進 ES 在手；③表後燃氣發電在手超過 1.75 GW、交到 2028 年；④ES 第三季毛利（折舊攤銷前）17%，與一年前相同；⑤擴廠：2026 年 3,000 到 4,000 萬美元、2027 年約 8,500 萬，公司說會大幅增加 ES 的營收產能；⑥銀行口徑淨負債／EBITDA 約 0.6 倍、遵守債務契約；⑦前九個月沒有單一客戶超過營收一成。
+
+【新聞稿：ES 在手與訂單】
+"Record ES backlog of $2.1 billion as at September 30, 2026 provides strong visibility into future revenue generation and business activity levels."
+"Bookings of $1.0 billion during Q3/26 compared to $339 million in Q3/25, $488 million in Q2/26 and a trailing eight quarter average of $448 million."
+"ES book-to-bill ratio (calculated as bookings divided by revenue) was 3.0x during Q3/26 and 1.3x on a trailing eight-quarter average"
+
+【MD&A：在手增加的原因】
+"ES Backlog of $2.1 billion at September 30, 2026 increased from $1.1 billion at December 31, 2025 primarily due to a newly awarded BTM natural gas-fired power generation project of approximately 450 megawatts for a NAM data center developer, partially offset by advancement of ES projects in NAM during the nine months ended September 30, 2026."
+
+【MD&A：季後超過 1 GW 的合約】
+"Additional Power Generation Award: Subsequent to September 30, 2026, Enerflex secured an award to supply over 1.0 gigawatts of low emission BTM natural gas-fired power generation for a North American data center development."
+"Combined with additional project awards, including the approximately 450 megawatts recorded in the third quarter, Enerflex’s backlog of BTM natural gas-fired power generation now exceeds 1.75 gigawatts, with deliveries extending through 2028."
+"This additional 1.0 gigawatt award will be reflected in ES backlog during the fourth quarter of 2026."
+
+【新聞稿：ES 毛利】
+"ES gross margin before depreciation and amortization was 17% in Q3/26, compared to 17% in Q3/25 and 18% in Q2/26"
+
+【MD&A：擴廠】
+"As previously announced, Enerflex has authorized investments in its ES facilities and capabilities, including $30 million to $40 million included in Enerflex’s 2026 capital expenditure guidance and approximately $85 million expected to be incurred during 2027."
+"These investments, combined with on-going initiatives to enhance collaboration, leverage scale, improve operational efficiency, and solidify capabilities, are expected to significantly increase revenue capacity of Enerflex’s ES business line."
+
+【財務體質】
+"Enerflex’s bank-adjusted net debt-to-EBITDA ratio was approximately 0.6x at the end of Q3/26, down from 1.2x at the end of Q3/25 and 0.8x at the end of Q2/26"
+"At September 30, 2026, the Company was in compliance with its covenants."
+
+【稀釋（MD&A；期中財報損益表，欄位依序：2026 第三季、2025 第三季、2026 前九月、2025 前九月）】
+"On September 30, 2026, Enerflex had 122,102,883 common shares outstanding."
+"Weighted average number of shares outstanding – basic 122,102,894 122,252,809 122,022,058 123,218,877"
+
+【期中財報：客戶集中】
+"For the nine months ended September 30, 2026, the Company had no individual customer which accounted for more than 10% of its revenue (September 30, 2025 – nil)."

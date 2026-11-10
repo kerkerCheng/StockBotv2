@@ -1,0 +1,32 @@
+SOURCE: Babcock & Wilcox Enterprises, Inc.（NYSE: BW）申報有限節錄——2025-11-04 LNTP 新聞稿（8-K Ex.99.3）、FY2025 10-K、2026 Q1 10-Q、2026 Q2 10-Q、2026-11-05 8-K
+URL: https://www.sec.gov/Archives/edgar/data/1630805/000110465925106447/tm2530246d1_ex99-3.htm；https://www.sec.gov/Archives/edgar/data/1630805/000163080526000018/bw-20251231.htm；https://www.sec.gov/Archives/edgar/data/1630805/000163080526000030/bw-20260331.htm；https://www.sec.gov/Archives/edgar/data/1630805/000163080526000068/bw-20260630.htm；https://www.sec.gov/Archives/edgar/data/1630805/000110465926123442/tm2629007d1_8k.htm
+PUBLISHED: 2025-11-04（8-K）／2026-03-16（10-K）／2026-05-11（Q1 10-Q）／2026-08-10（Q2 10-Q）／2026-11-05（8-K）（EDGAR 申報日）
+RETRIEVED: 2026-11-09
+STORAGE: repo_excerpt（SEC 申報有限節錄；repo 的 fetchers.edgar 抓、HTML 轉文字、空白攤平後逐字照抄）
+NOTE: **公司一手**（客戶執行長那一句是 B&W 新聞稿裡引的客戶原話，不是客戶自己的申報）。Phase 7 完整重讀（燃氣鍋爐層；B&W 敘事）用：①Base Electron 案的目標運轉年在 B&W 自己的四份申報裡連續後移——2025-11 新聞稿與 10-K 寫 2028、Q1 10-Q 寫 2029、Q2 10-Q 寫 2030；申報沒寫為什麼後移（查了四份的同一段附註與 Q2 新聞稿的 CEO 引言，Q2 新聞稿同時寫「ahead of expectations and on budget」）；②簽 LNTP 時 B&W 發給 Applied Digital 50 萬股與兩張認股權（260 萬股＋簽正式合約後全數生效的 786 萬股，履約價 4.11 美元），公允價值列負債、對應的客戶合約資產攤銷沖減營收——賣方讓利給客戶；③2025 年 11 月起的 ATM 在 2026 上半年只賣 440 萬股（424B5 的 2,310 萬股是 2025-11 起累計到 2026-05-12）；④6.50% 票據 2026-08-13 全數贖回（同日 NYSE 申報 Form 25 下市）；⑤11-05 的 8-K 只是特別股股利宣告。
+
+【LNTP 新聞稿 2025-11-04（8-K Ex.99.3）】
+"The plant is targeted to begin operation in 2028."
+"Their advanced boiler and steam turbine technology delivers efficiency on par with the simple-cycle gas turbines we evaluated – while enabling faster deployment."
+
+【FY2025 10-K（2026-03-16）附註】
+"The plant is targeted to begin operation in 2028."
+
+【2026 Q1 10-Q（2026-05-11）附註 Revenue Recognition】
+"The plant is targeted to begin commercial operation in 2029."
+
+【2026 Q2 10-Q（2026-08-10）附註 Revenue Recognition／Stockholders' Equity】
+"The plant is targeted to begin commercial operation in 2030."
+"As a result of the signing of the agreement with Base Electron, the Additional Warrant to purchase up to 7.86 million shares of our common stock is fully vested on the same terms as the Initial Warrant."
+"As of June 30, 2026 and December 31, 2025, we calculated the fair value of the Initial Warrant at $34.0 million and $8.3 million, respectively, and as of June 30, 2026, we calculated the fair value of the Additional Warrant at $102.9 million, each of which are recorded in Customer warrants on the Condensed Consolidated Balance Sheets."
+"For the three and six months ended June 30, 2026, amortization expense of $3.1 million and $4.1 million was recognized as a reduction to Revenues in the Condensed Consolidated Statements of Operations."
+"For the six months ended June 30, 2026, 4.4 million shares have been sold pursuant to the 2025 Sales Agreement for net proceeds of $41.9 million."
+
+【2026 Q2 10-Q 封面】
+"The number of shares of the registrant's common stock outstanding at August 4, 2026 was 148,965,066."
+
+【2026 Q2 10-Q 附註 22 Subsequent Events】
+"Pursuant to the Redemption Notice, on August 13, 2026 (the "Redemption Date"), we will redeem all 6.50% Senior Notes at a redemption price equal to 100% of the principal amount together with any make-whole amount and accrued and unpaid interest up to, but excluding, the Redemption Date."
+
+【8-K 2026-11-05 Item 8.01】
+"approved that the Company declare a dividend of $0.4843750 per share of its outstanding 7.75% Series A Cumulative Perpetual Preferred Stock"

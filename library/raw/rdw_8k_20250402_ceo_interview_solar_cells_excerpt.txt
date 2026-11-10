@@ -1,0 +1,12 @@
+SOURCE: Redwire Corporation（NYSE: RDW）Form 8-K Exhibit 99.1——執行長 Peter Cannito 接受 Dave G Investing 訪談的逐字稿（公司自己申報）
+URL: https://www.sec.gov/Archives/edgar/data/1819810/000181981025000100/exhibit991interviewsdistri.htm
+PUBLISHED: 2025-04-02（8-K 申報；訪談 2025-03-20 錄、04-01 上線）
+RETRIEVED: 2026-11-09（repo 的 fetchers.edgar 抓取）
+STORAGE: repo_excerpt（買方申報有限節錄；HTML 轉文字、空白攤平後逐字照抄）
+NOTE: Redwire 做 ROSA 太陽翼，向電池片廠買電池——西方太陽翼廠（太空三結電池片的買方）。用途：國外那一半的另一份買方一手，日期比 York 早一年多、方向相反：2025 年 3 月它說電池片的供應鏈可靠、不急著自己做；把 SolAero（Rocket Lab）、Spectrolab 列為專做電池的廠，Azur 是「entering the market」的其他廠之一——不是說它向 AZUR 買。和 York 2026-05／06 的「capacity constrained、交期超過兩年」對照讀：同一個買方位置，一年後的說法變了（York 與 Redwire 是兩家公司，不能讀成同一個買方改口）。
+
+【買方說電池片供應鏈可靠、不自己做】
+"Never say never, but companies like SolAero, now owned by Rocket Lab, and Spectrolab and others, this is what they wake up every day thinking about, how to incrementally make one cell higher performance."
+"And there's other companies like Azur and others that are entering the market."
+"So, right now we look at it and we say we recognize where we add value in the value chain and we see that there's a reliable supply chain."
+"So it's not overly compelling just to vertically integrate for the sake of vertical integration."

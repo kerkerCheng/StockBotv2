@@ -1,0 +1,12 @@
+SOURCE: Coherent Corp. FY2027 第一季法說會逐字稿（第三方轉錄：gloom.sh；機器轉錄）——PhotonLink 與光纖組件段
+URL: https://gloom.sh/stocks/cohr/transcripts/q1-2027
+PUBLISHED: 2026-11-04（法說會日期；與 8-K 財報同日、美東盤後；同一份轉錄稿另見 library/raw/cohr_q1fy27_earnings_call_substrates_excerpt.txt）
+RETRIEVED: 2026-11-09（本機抓 HTML、去標籤後逐字比對）
+STORAGE: repo_excerpt（逐字稿有限節錄：開場白 PhotonLink 三段，未刪句）
+NOTE: 第三方機器轉錄（非發行人申報）——同日的 8-K 新聞稿（d176836dex991.htm）全文沒有「PhotonLink」「fiber assembly」；10-Q（iivi-20260930.htm）只在研發費用段寫投資「primarily in Transceivers and PhotonLink」，沒有出貨或光纖組件的字——所以下面幾句目前只有這一份轉錄稿；ASR 把 Coherent 轉成「coherence」、VCSEL 轉成「VIXEL」，照轉錄稿逐字保留。買方兼整合廠自述（L8）：說這一季出貨的 CPO 產品包括它自己的光纖組件（fiber assembly solutions），PhotonLink 有 NVIDIA 與另一家「major AI company」兩份長約；**沒寫光纖組件出貨給哪一個平台**。給 FAU 層讀圖反證 #2（Coherent 的 FAU 量產給具名 CPO 平台）與波若威敘事「錯的訊號：NVIDIA 平台的光纖組件改由 Coherent 整套自製」對照用。
+
+[CEO prepared remarks — PhotonLink]
+"It includes lasers, laser modules, complex fiber assemblies, and other optical components, and supports indium-phosphide-based CW lasers and VIXEL-based technologies."
+"In Q1, we signed another significant PhotonLink LTA with a major AI company. The total revenue value of this new LTA is approximately $20 billion over five years, with revenue beginning to ramp in early calendar 28 . This is in addition to our previously announced LTA with NVIDIA."
+"We expect revenue to exceed $100 million in our March quarter and to exceed $250 million per quarter before the end of calendar 27 . Expected shipments in the current quarter include a range of CPO products, including our ultra-high power 400-milliwatt CW laser, our fiber assembly solutions, and other products."
+"PhotonLink is initially being deployed in CPO scale-out applications. We expect to begin shipping PhotonLink products for CPO and NPO scale-up applications in the second half of Calendar 27 ."

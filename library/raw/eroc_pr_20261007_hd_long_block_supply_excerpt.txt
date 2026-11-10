@@ -1,0 +1,29 @@
+SOURCE: ERock, Inc.（NYSE: EROC）新聞稿〈ERock, HD Construction Equipment Sign Multi-Year Engine Long Block Supply Agreement to Accelerate Manufacturing Capacity〉（Business Wire；公司 IR 網站）＋〈ERock Schedules Third Quarter 2026 Results and Conference Call〉
+URL: https://ir.erock.com/news-events/press-releases/detail/136/erock-hd-construction-equipment-sign-multi-year-engine-long-block-supply-agreement-to-accelerate-manufacturing-capacity
+URL2: https://ir.erock.com/news-events/press-releases/detail/137/erock-schedules-third-quarter-2026-results-and-conference-call
+PUBLISHED: 2026-10-07 8:00 am EDT（長缸體供應合約）；2026-10-22 7:00 am EDT（第三季財報時程）——兩份都沒有以 8-K 交 EDGAR（EDGAR 上 9-04 之後沒有 ERock 的申報，查到 2026-11-09）
+RETRIEVED: 2026-11-09（requests 直接取 IR 頁，HTTP 200；HTML 轉文字、空白攤平後逐字照抄）
+STORAGE: repo_excerpt（公司新聞稿有限節錄）
+NOTE: **發行人自述（L8）**；HD Construction Equipment 代表那一句是合約對手的話、寫在 ERock 的新聞稿裡，不是獨立第三方。ERock 敘事（往復式機組層）用：
+①在手 17 億美元（6 月底）的生產排到 2028 年——執行長說「production commitments extending into early 2028」（缺 X「轉換時程」的公司說法；第三季 10-Q 才有數字）；
+②引擎長缸體（long block）是長交期零件，向 Hyundai 子公司 HD Construction Equipment 鎖 2027–2028 的供應；
+③公司自己點名資料中心大客戶「the likes of Meta and Microsoft」——第二季 10-Q 的四個交易對手沒具名，這是公司第一次在新聞稿點名（沒對應到哪一份合約、哪一個交易對手）；
+④第三季財報 11-12 盤前、同日 8:30 法說。
+
+【長缸體供應合約】
+"ERock, Inc. (NYSE: EROC), a leading provider of utility-grade onsite power solutions, today announced that it has entered into an agreement with HD Construction Equipment, a subsidiary of Hyundai, for a multi-year supply of high-efficiency natural gas engine long blocks for ERock’s RockBlock generator."
+"The agreement spans 2027 through 2028 and supports increased production while enhancing ERock’s ability to fulfill large-scale customer orders for data centers, utilities, and other critical infrastructure operators."
+
+【執行長】
+"“Long block supply is the foundation of our production and this agreement secures supply through 2028 as we ramp assembly capacity,” said John Carrington, Chief Executive Officer of ERock."
+"With production commitments extending into early 2028, delivering on schedule for our customers depends on securing the long-lead components, and this agreement directly supports that."
+
+【在手與客戶（公司自述）】
+"This announcement comes amidst a period of sustained strong commercial momentum for ERock, building on a track record that includes major data center contracts with the likes of Meta and Microsoft, more than 400 operational sites and approximately 1.1 GW of installed base."
+"ERock's $1.7 billion contracted backlog as of June 30, 2026 extends production requirements into 2028, and the company's strong balance sheet provides the financial flexibility to secure long-lead components and fund its manufacturing ramp."
+
+【供應方代表（寫在 ERock 新聞稿裡）】
+"This order is a meaningful achievement that validates our engine long block technology in the rapidly emerging data center power market."
+
+【第三季財報時程（10-22）】
+"today announced that it will issue its financial results for the third quarter ended September 30, 2026, before market open on Thursday, November 12."

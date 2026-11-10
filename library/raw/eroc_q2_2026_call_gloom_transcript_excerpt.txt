@@ -1,0 +1,27 @@
+SOURCE: ERock（EROC）2026 年第二季法說（2026-08-12，上市後第一次）第三方逐字稿〈ERock (EROC) Q2 2026 earnings call transcript〉（Gloom）
+URL: https://gloom.sh/stocks/eroc/transcripts/q2-2026
+PUBLISHED: 頁面標示法說「Held August 12, 2026」、長度 47 分鐘；刊出時間頁面沒寫
+RETRIEVED: 2026-11-09（requests 直接取頁，HTTP 200；HTML 轉文字、空白攤平後逐字照抄——不是 WebFetch 轉述）
+STORAGE: repo_excerpt（第三方逐字稿有限節錄；只收講者原話段落，不收網站自己寫的摘要條列）
+NOTE: **第三方轉錄、品質不穩、公司自述（L8）**：這份轉錄有漏字——例如財務長講 2026 年在手轉營收那句變成「Of our billion backlog we expect approximately to million to convert to revenue in 2026」，數字掉了；所以**數字一律以 8-K（library/raw/eroc_8k_20260811_q2_2026_release_anthropic_guidance_excerpt.txt）為準**，本檔只收沒有漏字的整句。講者：John Carrington（CEO）、Ian Blakely（CFO）。ERock 敘事用：
+①在手轉營收時程（缺 X「轉換時程」的公司說法）：財務長說在手大部分在 2027 年底前轉成營收、產能賣到 2027 年並進入 2028 年；
+②客戶為什麼選它（公司說的）：Anthropic 為了供電確定性；El Paso Electric 併網要約五年，ERock 補這段空檔；
+③Anthropic 那張單只有設備，安裝與服務合約另簽、還沒簽；
+④Hyperion 廠年組裝產能年底到約 1.2 GW；第二季毛利率 18.6%、調整後 22.2%。
+
+【CEO：Anthropic】
+"This order reflects the equipment purchase agreement only. As with other large projects, installation and service agreements are typically negotiated and signed separately, and we expect those to follow in the normal course."
+"Anthropic selected EROC to ensure power supply certainty for their quickly growing compute needs."
+
+【CEO：El Paso Electric 與 Meta】
+"El Paso Electric was facing an estimated five-year timeline to deliver grid interconnection"
+"EPE purchased our systems and we are on track to commission the site in approximately 15 months or about four years faster than waiting on the grid."
+"During the initial bridge period, El Paso Electric will collect payments from Meta via PPA. Once grid interconnection is complete, the highly depreciated asset can move into their own rate base, offering ratepayers a significantly lower cost of peak capacity."
+
+【CEO：產能】
+"Hyperion is targeted to increase our annual assembly capacity to approximately 1.2 gigawatts by the end of this year at a cost of only $15 million in additional capital."
+
+【CFO：毛利與在手】
+"Gross profit was $7.4 million, representing a gross margin of 18.6%, and adjusted gross margin was 22.2%."
+"We expect the majority of our backlog to convert to revenue by the end of 2027."
+"With the addition of the Anthropic contract our production capacity is sold out through 2027 and into 2028."

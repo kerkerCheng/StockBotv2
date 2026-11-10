@@ -1,0 +1,46 @@
+SOURCE: Amkor Technology, Inc.（AMKR）2026 年第三季財報法說會逐字稿——Motley Fool Transcribing 第三方轉錄（非發行人文件）
+URL: https://www.fool.com/earnings/call-transcripts/2026/10/26/amkor-amkr-q3-2026-earnings-call-transcript/
+PUBLISHED: 2026-10-26（法說日，美東時間；轉錄稿同日 10:53PM EST 刊出）
+RETRIEVED: 2026-11-09
+STORAGE: repo_excerpt（HTML 抽字、空白攤平；只取講者原話段落，不取 Motley Fool 編輯寫的摘要框；段名為摘錄者所加）
+NOTE: 第三方轉錄（tier 2）；講者是 Amkor 執行長 Kevin Engel、財務長 Megan Faust——發行人自己的話（L8：供應商自述，不是客戶端證據）。用途：Amkor 敘事的完整重讀（2026-11-09）。①NVIDIA 那份南韓協議在 Amkor 這邊落在 HDFO（高密度扇出）的擴產：光州兩棟新廠房「including the recent announcement with NVIDIA」；②運算的成長來自旗艦 HDFO CPU 程式，兩個 2.5D 程式（網通、資料中心）第四季才上線——2.5D 還不在第三季的數字裡；③預付協議不只一家：2025 年以來十來家客戶；④亞利桑那第一期照進度 2027 年底完工、那位客戶在亞利桑那是 2028 年底的爬坡（反證第 1 條沒碰到）；⑤財務長：2027 年資產負債表穩、2028 年以後要不要新增借款還說不準（必須為真第④條）；⑥執行長說封裝正在變成主要瓶頸之一，但沒說是哪一種封裝（先進封裝層反證第 2 條沒碰到）。
+
+【執行長開場：預付與南韓擴產（光州、松島）】
+"Customers are not only planning further ahead, but are also making long-term commitments and providing advance payments tied to future capacity requirements."
+"In Korea, we recently broke ground on 2 new buildings on our Gwangju campus. This additional space is being built to support the continued ramp of HDFO for our data center customers, including the recent announcement with NVIDIA."
+"Following completion of these expansions in 2028, our Korea footprint is expected to increase by 40% from 2025."
+
+【執行長開場：HDFO 與 2.5D 程式】
+"Our flagship HDFO CPU program is scaling."
+"An additional HDFO CPU program for a hyperscaler began ramping in Q3 and 2 new 2.5D programs in networking and data center are expected to come online in Q4."
+
+【財務長：運算的第三季與第四季】
+"During the quarter, we continued to scale our flagship HDFO CPU program and saw growth in other data center programs."
+"Looking ahead to the fourth quarter, we expect revenue to increase low double digits sequentially, driven by ongoing scaling and new program ramps."
+"Q4 is estimated to result in over 50% growth year-on-year and provides strong momentum heading into 2027."
+
+【財務長：亞利桑那第一期與預付】
+"Phase 1 construction remains on schedule for completion by the end of 2027."
+"Since 2025, Amkor has executed advance payment arrangements with a dozen customers, primarily supporting advanced packaging capacity across both Korea and Arizona, and there are several more customer agreements under discussion."
+
+【問答：南韓與亞利桑那的分工、資產可移轉（美銀分析師問 NVIDIA 協議）】
+"Obviously, for Arizona, that ramp is later."
+"So for that customer, that will be more of a 2020 -- late 2028 type ramp profile."
+"The asset fungibility, we think about any high-density fan-out program, 2.5D, even wafer bumping type things, these assets are fungible up and down that stack."
+
+【問答：第三季運算沒到原先說的季增三成（摩根士丹利分析師問是不是供給受限）】
+"I wouldn't say anything related to supply constraints."
+
+【問答：封裝是不是瓶頸、2.5D 程式的份量（瑞銀分析師問）】
+"And I think that has highlighted even more that packaging is becoming one of the key bottlenecks."
+"So customers are really working to make sure they secure capacity into '27 and even into 2028."
+"I think we have programs going on in the xPU, networking programs and things like switches. Those are 2.5D type programs."
+"But I think overall, the scale-wise, the big driver is the key programs we talked about."
+
+【問答：運算 2026、2027 年的成長】
+"I mean, so basically, with our guide, we're expecting over 30% growth in Computing from 2025 to 2026."
+"We would expect a similar growth rate to even higher growth rate into 2027, again, based on that space profile that I outlined already."
+
+【問答：2027 年資本支出與要不要再借錢】
+"So just to recap there, we have the Arizona facility, we gave a framework that '27 could be up to 15% of that $12 billion in '27. And then for Korea in the range of $400 million to $450 million. And then Vietnam, $50 million. So altogether, those are higher than $2 billion just around those programs."
+"So I would say it's still too early to tell whether we would need incremental debt within '28 and beyond. But I would say the balance sheet positioning is solid through 2027."

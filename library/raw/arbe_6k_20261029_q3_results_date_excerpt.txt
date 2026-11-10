@@ -1,0 +1,8 @@
+SOURCE: Arbe Robotics Ltd.（ARBE）Form 6-K EX-99.1 新聞稿〈Arbe to Announce Third Quarter 2026 Financial Results and Hold a Conference Call on November 19, 2026〉
+URL: https://www.sec.gov/Archives/edgar/data/1861841/000121390026113572/ea030922201ex99-1.htm
+PUBLISHED: 2026-10-29（EDGAR 申報日）
+RETRIEVED: 2026-11-10（EDGAR 原文經 fetchers.edgar 抽字、空白攤平後逐字照抄）
+STORAGE: repo_excerpt（發行人申報之有限逐字節錄）
+NOTE: 發行人自己的申報。Phase 7 完整重讀（Arbe 敘事「什麼時候知道」）：第三季財報 11 月 19 日美股開盤前發布、同日法說——敘事原本寫「約 11 月，日期以公司公告為準」，候選狀態的叫醒 watch 設在 11-30（仍在財報之後）。
+"Arbe Robotics Ltd. (Nasdaq: ARBE)(TASE: ARBE), a global leader in perception radar solutions, today announced that it will hold a conference call to discuss its third quarter 2026 financial results on Thursday, November 19, 2026 at 8:30 a.m. ET."
+"The company will issue its financial results before the US market opens that same day."

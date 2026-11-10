@@ -1,0 +1,9 @@
+SOURCE: Vertiv Holdings Co（NYSE: VRT）Form 10-Q（季度至 2026-09-30）
+URL: https://www.sec.gov/Archives/edgar/data/1674101/000162828026067893/vrt-20260930.htm
+PUBLISHED: 2026-10-28（EDGAR 申報日）
+RETRIEVED: 2026-11-09（EDGAR 原文經 fetchers.edgar 抽字、空白攤平後逐字照抄；金額單位百萬美元）
+STORAGE: repo_excerpt（發行人申報之有限逐字節錄）
+NOTE: 圖外（Vertiv 不在 CDU 層的供給側節點，讀圖寫它是最大的 CDU 廠）。Phase 7 完整重讀（CDU 層反證 #1、#3；高力敘事加碼條件 c1）用：全文沒有 CDU、coolant distribution、lead time、shortage 字樣——CDU 交期、配額、因零件短缺延後都沒寫（反證 #1、#3 沒碰到）。另記：前九個月完成三件收購，被收購的是液冷、熱交換與散熱技術的方案商（沒點名）——推一步，最大的 CDU 廠在把熱交換能力收進自己家，對外買板式熱交換器的空間不一定跟著 CDU 的量變大（高力 c1 的反方向脈絡，不是反證）。
+
+"During the nine months ended September 30, 2026, the Company completed three acquisitions with an aggregate total consideration transferred of $331.8, net of cash acquired of $4.7."
+"The acquired businesses are solution providers in liquid cooling technologies, heat-exchange and heat rejection technologies, and custom-engineered structural fabrication."

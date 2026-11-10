@@ -1,0 +1,23 @@
+SOURCE: Power Solutions International, Inc.（Nasdaq: PSIX）新聞稿〈Power Solutions International Announces Third Quarter 2026 Financial Results〉（Form 8-K Item 2.02 附件 99.1）
+URL: https://www.sec.gov/Archives/edgar/data/1137091/000162828026071095/psiearningsrelease-septemb.htm
+PUBLISHED: 2026-11-05（EDGAR 申報日；新聞稿日期同日）
+RETRIEVED: 2026-11-09
+STORAGE: repo_excerpt（美國法定公開申報附件有限節錄；EDGAR 原文 HTML 經 repo 的 fetchers.edgar 抽字、空白攤平後逐字照抄）
+NOTE: 發行人自述。PSI 敘事用：①第三季營收季增 32.5%、年減 1%；②毛利率 29.7% 含不會再有的 380 萬美元關稅退款（約 188 個基點），公司預期第四季毛利率略低於第三季；③9 月底淨現金約 3,430 萬美元、新的 2.2 億美元循環額度到 2029 年；④流通股 9 月底 2,306.6 萬股、2025 年底 2,304.1 萬股（沒有稀釋）。新聞稿全文沒有法說會安排。另：同公司 2026-11-06 的 8-K（Item 5.02）寫財務長 Xun（Ken）Li 11-03 通知辭職、11-27 生效，「not the result of any disagreement」（https://www.sec.gov/Archives/edgar/data/1137091/000119312526451805/d43947d8k.htm，未另存節錄）。
+
+【標題】
+"Net Sales of $202.1 million, up 32.5% Sequentially"
+"Raises Second Half 2026 Net Sales Outlook"
+
+【財務長】
+"Third quarter operating cash flow of $40.9 million enabled us to reduce total debt by $34.9 million and end the quarter with approximately $72.0 million of cash and cash equivalents against total debt of approximately $37.7 million, resulting in a net cash position of approximately $34.3 million, compared with net debt of approximately $55.3 million at the start of the year."
+
+【毛利】
+"as well as a $3.8 million tariff refund recognized in the third quarter of 2026, which contributed approximately 188 basis points to gross margin, partially offset by an unfavorable year-over-year product mix resulting from lower oil and gas sales."
+
+【2026 展望】
+"Apart from the expected non-recurrence of the $3.8 million tariff refund described above, the Company expects fourth quarter 2026 gross margin to be modestly lower than in the third quarter, primarily reflecting this less favorable product mix."
+"The Company expects to provide additional perspective on 2027 with its fourth quarter results."
+
+【資產負債表 股數】
+"23,066 and 23,041 shares outstanding at September 30, 2026 and December 31, 2025, respectively"

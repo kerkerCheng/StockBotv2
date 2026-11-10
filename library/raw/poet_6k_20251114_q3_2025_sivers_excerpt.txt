@@ -1,0 +1,12 @@
+SOURCE: POET Technologies Inc.（NASDAQ: POET）Form 6-K Exhibit 99.1——2025 年第三季業績新聞稿
+URL: https://www.sec.gov/Archives/edgar/data/1437424/000117184325007326/exh_991.htm
+PUBLISHED: 2025-11-14（6-K 申報日）
+RETRIEVED: 2026-11-09（EDGAR，repo 的 fetchers.edgar 預設 UA）
+STORAGE: repo_excerpt（發行人新聞稿有限節錄；HTML 轉文字、空白攤平後逐字照抄）
+NOTE: 買方（POET）自己的季報新聞稿。Sivers 敘事用：合作宣布六週後仍寫「與 Sivers 合作演進光源產品」；這是 POET 申報裡最後一次出現 Sivers——EDGAR 全文搜尋「Sivers Semiconductors」限 6-K，2025-11-14 之後到 2026-11-09 沒有 POET 的命中，POET 2025 年度 20-F（2026-03-31）與 2026 年第二季 MD&A 全文也沒有（本機檔逐字搜尋）。
+
+執行長引言：
+"We are also evolving our light-source product in partnership with Sivers Semiconductors, and expanding into the mobile AI telecom space with NTT Innovative Devices."
+
+營運重點：
+"Advanced POET Starlight light-source strategy through new partnerships with Sivers Semiconductors."

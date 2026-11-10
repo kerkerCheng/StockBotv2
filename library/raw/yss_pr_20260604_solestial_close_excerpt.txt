@@ -1,0 +1,15 @@
+SOURCE: York Space Systems Inc.（NYSE: YSS）新聞稿〈York Space Systems Closes Acquisition of Solestial, U.S.-Sourced Space Solar Capability〉（IR 網站 PDF，4 頁）
+URL: https://s21.q4cdn.com/622448243/files/doc_news/York-Space-Systems-Closes-Acquisition-of-Solestial-U-S--Sourced-Space-Solar-Capability-2026.pdf
+PUBLISHED: 2026-06-04（併購完成日；同日 Business Wire 刊登）
+RETRIEVED: 2026-11-09
+STORAGE: repo_excerpt（買方新聞稿有限節錄；pypdf 抽字、空白攤平後逐字照抄——抽字會掉 fi／fl 連字，挑的句子都不含）
+NOTE: 同一家買方（西方衛星平台商）完成併購時的公告，比 05-19 那份多三件事：①把交期超過兩年寫成三五族的現況並加上「challenges to scale」；②它的策略是自己擁有關鍵子系統、不向受限的海外供應鏈採購；③Solestial 會繼續外賣、同時「deepening integration across York’s spacecraft portfolio」——往自家衛星整合，沒有寫哪一個計畫已經改用、也沒有寫比例。鎵、鍺的比例是 York 自己說的（它沒有附出處），只當買方的理由讀、不當數字用。沒有點名 AZUR／5N Plus。
+
+【三五族電池：交期與擴產】
+"Legacy III-V solutions also carry lead times exceeding two years and face challenges to scale to meet accelerating demand."
+"China controls 99% of the gallium and more than 60% of the germanium required for legacy III-V solar cells, and 93% of the polysilicon used in terrestrial solar panels is produced in China."
+"York believes current solar panel designs will not be sustainable in the future, particularly given the large driving demand required for proliferation of systems."
+
+【買方的策略：自己擁有子系統、往自家衛星整合】
+"The acquisition advances York’s strategy of owning critical subsystems rather than sourcing them from constrained, foreign-dependent supply chains"
+"Solestial will operate as a wholly owned subsidiary, continuing to supply solar technology to external customers while deepening integration across York’s spacecraft portfolio."

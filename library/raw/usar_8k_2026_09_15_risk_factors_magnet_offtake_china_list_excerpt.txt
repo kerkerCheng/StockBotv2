@@ -1,0 +1,21 @@
+SOURCE: USA Rare Earth, Inc.（Nasdaq: USAR）Form 8-K（Item 8.01 補充風險因子）Exhibit 99.1〈Risk Factors〉
+URL: https://www.sec.gov/Archives/edgar/data/1970622/000121390026100190/ea030552601ex99-1.htm
+PUBLISHED: 2026-09-15（EDGAR 申報日）
+RETRIEVED: 2026-11-09（EDGAR 原文經 fetchers.edgar 抽字、空白攤平後逐字照抄）
+STORAGE: repo_excerpt（發行人申報之有限逐字節錄）
+NOTE: 發行人自述。Phase 7 完整重讀（稀土磁材層；USA Rare Earth 敘事）用：①磁材這一塊到 9-15 沒有任何營收、也沒有確定的包銷或銷售協議（敘事缺 X 第一格的一手出處；比 8-10 的 10-Q「還沒有營收」多一句「沒有確定協議」）；②Stillwater 第一段線在量產、第二段在試車；③2026-06-22 被列入中國出口管制名單——中國出口商不得出貨給它、中國以外的廠商轉售中國原產品項要中國許可，已影響向中國採購關鍵原料，也影響 Less Common Metals 的生產與政府資助的里程碑；④Serra Verde 子公司承接 DFC 貸款、礦端現金在條件達成前上不到母公司。這份 8-K 早於 10-17 凍結版與 11-04 現行版，兩版都沒引用。
+
+磁材業務的現況：
+"The Stillwater Facility and Blacksburg Facility are under development and are not yet completed, we have not commenced sales of neo magnets, and we have limited history in commercial magnet-making operations which limits the accuracy of any forward-looking forecasts, prospects or business outlook or plans."
+"We have commissioned and are producing under Phase 1a and are in the process of commissioning Phase 1b at our Stillwater Facility."
+"We do not currently have any revenue or definitive off-take or sales agreements with customers in place in our magnet business."
+
+中國出口管制名單：
+"On June 22, 2026, we were added to China’s export control list, along with several other U.S. companies."
+"Following this designation, exporters in China have been prohibited from exporting certain items to us, and exporters outside China have been prohibited from transferring or providing certain China-origin items to us without a license from the Chinese government, which in practice may be difficult or impossible to obtain."
+"This restriction has had and is expected to continue to have an adverse impact on our ability to source key raw materials and supplies from China, which in turn has impacted and is expected to continue to impact our business."
+"The impact of this designation and the scarcity of certain products in the market due to China’s export control regime and other factors, has and will continue to have an impact on the Company's ability to satisfy related milestones in a timely fashion in the near term."
+
+Serra Verde 的貸款與現金上流限制：
+"In connection with the SVRE Merger, we assumed substantial indebtedness under SVRE’s Retained Finance Agreement with the DFC, which contains restrictive covenants and other requirements that could adversely affect our financial flexibility and operations."
+"As a result, USAR and its other affiliates should not expect to receive any cash dividends, distributions, intercompany loan repayments, management fees or other upstream cash payments from Merger Sub for an extended period following the closing of the SVRE Merger, and may never receive such payments if the foregoing conditions are not satisfied."

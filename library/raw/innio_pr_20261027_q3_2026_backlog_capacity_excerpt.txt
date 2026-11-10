@@ -1,0 +1,11 @@
+SOURCE: INNIO N.V.（Nasdaq: INIO）Form 8-K EX-99.1 新聞稿〈第三季 2026 財務結果〉
+URL: https://www.sec.gov/Archives/edgar/data/2109150/000162828026067394/ex991.htm
+PUBLISHED: 2026-10-27
+RETRIEVED: 2026-11-09（repo 的 fetchers.edgar 抓取，HTML 轉文字、空白攤平後逐字照抄）
+STORAGE: repo_excerpt（美國法定公開申報附件有限節錄）
+NOTE: 發行人自述（往復式燃氣引擎 OEM，Bloom 的對手端）。Bloom 插槽層反證 #5（對手交期縮短或新產能開出）回掃用（2026-11-09）：設備積壓一年翻倍多、擴產「進行中」（北美、奧地利），Liberty 的 450MW 到 2028 才交完——沒有交期縮短或新產能已開出的字；同一份 8-K 的簡報也沒有「lead time」字樣。
+
+"Equipment Order Backlog reached a record $8.0 billion as of September 30, 2026, an increase of 142% year-over-year."
+"With more than $6 billion in Equipment Order Intake year-to-date, we are scaling capacity to meet accelerating demand, particularly for AI infrastructure."
+"Adjusted EBITDA for the quarter also reflected continued investments in product innovations and the expansion of manufacturing capacity in North America and Austria."
+"450 MW order for next generation data center projects in North America from Liberty Energy - with behind-the-meter power solutions to be delivered by 2028"

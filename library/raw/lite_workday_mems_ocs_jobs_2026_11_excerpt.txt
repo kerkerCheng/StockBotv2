@@ -1,0 +1,18 @@
+SOURCE: Lumentum 公開職缺（Workday 求職頁 lumentum.wd5.myworkdayjobs.com/LITE；以站內搜尋「MEMS」列出 27 筆、逐筆抓全文）
+URL: https://lumentum.wd5.myworkdayjobs.com/LITE/job/Canada---Ottawa-Bill-Leathem/Process-Automation-Software-Engineer---MEMS_20261527 ；https://lumentum.wd5.myworkdayjobs.com/LITE/job/Thailand---Pathumthani-Navanakorn/Senior-Engineer---MEMS-Test_20261090 ；https://lumentum.wd5.myworkdayjobs.com/LITE/job/Canada---Ottawa-Bill-Leathem/Advanced-Packaging---Integration-Co-op-Student_20261236-1
+PUBLISHED: 2026-09-08、2026-09-09、2026-11-06（Workday 的 startDate）
+RETRIEVED: 2026-11-09（Workday 公開 JSON 端點，未登入；職缺下架後原網址會失效）
+STORAGE: repo_excerpt（職缺 HTML 抽字、空白攤平後逐字照抄；段名為摘錄者所加）
+NOTE: 發行人自己的文件（徵才，不是產品宣傳）。27 筆命中裡，寫到 MEMS 工作內容的是這三筆：Ottawa 做 MEMS 晶圓系統的製造與測試自動化、OCS 的封裝與氣密；泰國 Navanakorn 做 MEMS 量產測試。其餘命中（英國 Towcester 的磷化銦晶圓廠、San Jose、Greensboro、相模原）只在「希望具備的經驗」列了 MEMS。⚠ 沒有一筆寫 MEMS 晶圓的製程（蝕刻、鍍膜、DRIE 這類），也沒有一筆寫外部代工——答不了鏡片晶圓在哪裡長；只說明晶圓到手之後的測試、封裝在它自己的 Ottawa 與泰國（L11-5：職缺本來就不會寫代工是誰）。
+
+
+【Process Automation Software Engineer - MEMS｜Canada - Ottawa｜REQ 20261527｜刊登 2026-11-06】
+"Join Lumentum’s Ottawa team and help automate semiconductor manufacturing and test processes. You’ll develop software for MEMS wafer systems, working closely with physicists and hardware engineers who are deep technical experts in their fields."
+"Develop, maintain, and support software for semiconductor manufacturing automation and MEMS wafer systems."
+
+【Senior Engineer – MEMS Test｜Thailand - Pathumthani (Navanakorn)｜REQ 20261090｜刊登 2026-09-08】
+"Test Process Ownership: Develop, optimize, and sustain MEMS production test processes to ensure stable manufacturing performance, product quality, and customer requirements."
+
+【Advanced Packaging & Integration Co-op Student｜Canada - Ottawa｜REQ 20261236-1｜刊登 2026-09-09】
+"We are looking for an enthusiastic student to work in the R&D process group within the Advanced Packaging and Integration Team to contribute to the development of our Optical Circuit Switch (OCS), which brings a new level of scalability, latency, and power efficiency to cloud‑scale and AI/ML data center networks. Built on field‑proven Lumentum micro‑electro‑mechanical systems (MEMS) technology with over a trillion mirror operating hours"
+"students will be engaged in the development and execution of package assembly, integration, and sealing processes involving materials science, thermal design and process control considerations."

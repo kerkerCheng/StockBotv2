@@ -1,0 +1,16 @@
+SOURCE: York Space Systems Inc.（NYSE: YSS）新聞稿〈York Space Systems to Acquire Solestial, Securing Critical Space Solar Capability with U.S.-Based Manufacturing〉
+URL: https://ir.yorkspacesystems.com/news/news-details/2026/York-Space-Systems-to-Acquire-Solestial-Securing-Critical-Space-Solar-Capability-with-U-S--Based-Manufacturing/default.aspx
+PUBLISHED: 2026-05-19（公司 IR 網站；同日 Business Wire 刊登；併購協議 2026-05-15 簽、同日另有 8-K 申報協議本身）
+RETRIEVED: 2026-11-09
+STORAGE: repo_excerpt（買方新聞稿有限節錄；HTML 轉文字、空白攤平後逐字照抄）
+NOTE: 西方衛星平台商（太空太陽電池的買方；它最大的客戶是美國太空發展署 SDA，見它 10-Q）自己的公告。用途：太空三結電池片層「國外那一半」第一份買方一手——它寫三五族（III-V，三結砷化鎵屬之）太空太陽電池「capacity constrained」、交期超過兩年；同一份公告的對策是併購矽太空電池廠 Solestial（自己整合進衛星）。兩個方向同時在一份文件裡：①買方寫交期與產能受限（讀圖反證 #2 推向量〔國外〕、敘事加碼條件 c1 的字面）；②買方往矽太空電池走（讀圖反證 #3／敘事反證第 4 條「改用矽」的方向；字面是併購與整合，沒有寫哪一個計畫已經改用）。沒有點名 AZUR／5N Plus。買方在推銷自己剛買的替代品，講三五族的缺點有立場——但交期與產能是它當買方的經驗，L8 下算買方一手。
+
+【買方寫三五族電池的交期與產能】
+"As demand for power in space accelerates, the industry faces a growing gap between mission requirements and available, scalable solutions."
+"Legacy III-V solar solutions remain expensive and capacity constrained, with lead times exceeding two years, while terrestrial silicon alternatives are not designed for space and degrade rapidly under radiation exposure."
+"Both approaches also depend heavily on Chinese-controlled materials and manufacturing, creating supply chain risk for critical missions."
+
+【買方的對策：併購矽太空電池廠、收進自己的供應鏈】
+"The acquisition secures a critical space solar capability within York’s supply chain through U.S.-based manufacturing, strengthening control over a key subsystem while reducing reliance on Chinese-controlled materials and manufacturing."
+"Headquartered in Tempe, Arizona, Solestial has developed a differentiated approach to space solar, producing ultrathin, radiation-hardened silicon solar cells and modules engineered specifically for the space environment."
+"Upon closing, Solestial will operate as a wholly owned subsidiary of York, continuing to serve customers across commercial, civil, and national security markets."

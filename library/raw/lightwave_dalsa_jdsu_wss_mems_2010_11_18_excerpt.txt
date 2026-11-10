@@ -1,0 +1,21 @@
+SOURCE: Lightwave（lightwaveonline.com）新聞〈DALSA delivers MEMS for JDSU's wavelength-selective switches〉——報導 MEMS 代工 DALSA Semiconductor 的公告，含客戶 JDSU 營運副總的話
+URL: https://www.lightwaveonline.com/optical-tech/article/16671127/dalsa-delivers-mems-for-jdsus-wavelength-selective-switches
+PUBLISHED: 2010-11-18
+RETRIEVED: 2026-11-09
+STORAGE: repo_excerpt（HTML 抽字、空白攤平後逐字照抄；段名為摘錄者所加）
+NOTE: 第三方媒體轉述代工廠公告（tier 3），其中 JDSU 營運副總那兩句是客戶端自己的話。JDSU 的光通訊事業 2015 年分拆成 Lumentum；DALSA Semiconductor（魁北克 Bromont）2011 年起屬 Teledyne，今為 Teledyne DALSA。⚠ 講的是 2010 年 WSS（波長選擇開關）用的光學 MEMS 鏡陣列，不是 OCS；報導寫「DALSA will supply the wavelength-selective switches」是記者措辭，代工廠供的是 MEMS 晶片。用途：Silex 敘事「什麼會讓它被換掉」與加碼條件 c2（Lumentum 的鏡片在哪裡做）——Lumentum 說 OCS 建在它累積上兆小時的那套 MEMS 技術上，而那套技術的鏡陣列至少在 2010 年是外包給 DALSA 代工量產；不能讀成 OCS 鏡片現在也由 Teledyne DALSA 做。
+
+
+【導言】
+"NOVEMBER 18, 2010 -- MEMS foundry DALSA Semiconductor, a division of DALSA Corp. (TSX:DSA), says it has qualified a new generation of optical MEMS products for JDSU."
+"DALSA will supply the wavelength-selective switches (WSSs) for JDSU’s reconfigurable optical add/drop multiplexer ( ROADM ) offerings."
+
+【DALSA Semiconductor 執行副總 Claude Jean】
+"after an intense qualification period, DALSA and JDSU are moving to expand production of this latest generation of MEMS based products for the optical communication market."
+
+【JDSU 營運副總 Craig Cocchi（客戶端）】
+"DALSA is a key vendor for JDSU across our market leading WSS portfolio"
+"Their high-performing MEMS technology is helping us to rapidly ramp throughput for our leading range of ROADM products."
+
+【圖說】
+"Figure 2. High-fill-factor MEMS mirror array chip for NxM WSS."

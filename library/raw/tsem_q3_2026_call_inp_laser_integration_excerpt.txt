@@ -1,0 +1,17 @@
+SOURCE: Tower Semiconductor 2026 年第三季法說會逐字稿（第三方轉錄：gloom.sh；機器轉錄）——InP 雷射整合段與整合雷射問答
+URL: https://gloom.sh/stocks/tsem/transcripts/q3-2026
+PUBLISHED: 2026-11-02（法說會日期；與 6-K 第三季財報新聞稿同日，accession 0001178913-26-004949）
+RETRIEVED: 2026-11-09（本機抓 HTML、去標籤後逐字比對）
+STORAGE: repo_excerpt（逐字稿有限節錄：CEO 開場白一段、最後一題問答的回答，未刪句）
+NOTE: 第三方機器轉錄（非發行人申報）——同日 6-K 新聞稿（exhibit_99-1.htm）只寫矽光子第四季年化營收目標 11 億美元，沒有 InP 或雷射的字；所以下面幾句目前只有這一份轉錄稿。ASR 把 indium phosphide 轉成「Indian phosphide」、silicon photonics 轉成「SIFO」、die 轉成「dye」，照轉錄稿逐字保留。客戶端（Tower 是 IQE 的 InP 磊晶客戶，2026-06-15 6-K 具名）自述：InP 雷射以「InP 磊晶小晶粒黏到晶圓上」整合進矽光子晶片，已初步量產；領頭客戶的預測很強，但這塊不在它的營收模型裡、也不肯給滲透率；**沒寫磊晶是誰供的**。給 IQE.L 敘事「Tower 那一側的量」與加碼條件 c1（Tower 寫出 InP 磊晶來自 IQE 並已量產）對照用。
+
+[CEO prepared remarks — integrating new material into SiPho]
+"Longer term, we are building the capability to integrate new material into our SIFO platforms to further expand our served available market."
+"In one such example, we announced initial production for new photonics with a new technology where we integrated Indian phosphide lasers within our silicon photonics dye."
+"This is done through a dyed-a-wafer attach of Indian phosphide epi-chiplets further processed in our factory to create a final dye that incorporates Indian phosphide lasers within our silicon photonics."
+"As this technology ramps, we gain access to the laser market and additional multiples of increase in serviceable market."
+
+[Q&A — Craig-Hallum, laser attach rate; CEO answer]
+"I truly do not have a clear answer to it."
+"Our lead customers there are very, very committed for growth with very strong forecasts."
+"And again, those are numbers that are not yet within the model, but they can be very appreciable, especially as one could imagine, there are appreciably higher ASPs against a very good baseline to begin with."

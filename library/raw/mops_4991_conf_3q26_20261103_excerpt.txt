@@ -1,0 +1,46 @@
+SOURCE: 環宇-KY（GCS Holdings，4991）2026 年第三季線上法說會簡報（2026-11-03，499120261103M001.pdf）；同日重大訊息（第三季合併財報董事會通過、參與子公司威力富科技現金增資）；2026 年 9 月與 10 月營收（公開資訊觀測站月營收備註）
+URL: https://mopsov.twse.com.tw/nas/STR/499120261103M001.pdf ；https://mopsov.twse.com.tw/mops/web/ajax_t05st01（co_id=4991，115/11/03 16:21:40、16:46:06）；https://mopsov.twse.com.tw/mops/web/ajax_t05st10_ifrs（co_id=4991，115 年 9 月、10 月）
+PUBLISHED: 2026-11-03（簡報與重訊）；9 月營收約 2026-10-09、10 月營收 2026-11-10 前（觀測站頁面沒印申報日，2026-11-10 查得到）
+RETRIEVED: 2026-11-10
+STORAGE: repo_excerpt（pypdf 抽字後逐字節錄：損益 QoQ 與 YoY 兩頁、資產負債重點、現金流量；重訊與月營收備註逐字；第三季電子書到 2026-11-09 23:33 還沒上傳）
+NOTE: 給環宇敘事「位置」「必須為真」「何時」三格。簡報 p.7「Revenue Mix % vs Gross Margin - QoQ」是圖片（抽不出字），下列營收結構讀自圖上的資料標籤（8 季，Q4 2024 到 Q3 2026，依序）：
+RF Foundry and Power Electronics Foundry 22%、17%、24%、15%、18%、12%、23%、20%；Opto Foundry 9%、13%、10%、8%、10%、10%、10%、6%；AOC 66%、66%、63%、75%、70%、74%、61%、71%；Other 3%、4%、3%、2%、2%、4%、6%、3%；毛利率 43%、36%、49%、47%、53%、55%、43%、47%。
+2025 年四季的加權（本機算）與年報營業比重一致（AOC≈自有光電元件產品 68.72%、RF≈射頻元件晶圓代工 18.55%、Opto≈光電元件晶圓代工 10.10%），所以圖上的 AOC＝自有光電元件產品。
+本機算：第三季自有光電元件約 844,612 × 71% ≈ 6.00 億元，去年同季約 543,485 × 75% ≈ 4.08 億元（年增約 47%）；第二季約 4.70 億元；前三季占比約 68.6%（2025 全年 68.72%，圖上標籤四捨五入到整數）。
+
+【簡報 p.5 Statements of Comprehensive Income - QoQ（in NT$ thousands；欄序 3Q26、2Q26、3Q25、3Q26 over 2Q26、3Q26 over 3Q25）】
+"Net Operating Revenue 844,612            770,103            543,485            9.7% 55.4%"
+"Gross Margin 47.0% 43.3% 47.4%"
+"Operating Income 162,651 98,046 104,202 65.9% 56.1%"
+"Net Profit Attributable to owners of the Parent 159,082 110,160 14,461 44.4% 1000.1%"
+
+【簡報 p.6 Non-operating Income and Expenses - QoQ】
+"Share of gain (loss) of equity-accounted investees 13,910         19,514         (90,369)"
+
+【簡報 p.8 Statements of Comprehensive Income - YoY（2026 Jan to Sep.、2025 Jan to Sep.）】
+"Net Operating Revenue 2,329,395 100.0% 1,506,638 100.0% 54.6%"
+
+【簡報 p.10 Balance Sheet Highlight（欄序 3Q26、2Q26、3Q25）】
+"Cash and Cash Equivalent 2,509,990     46% 2,232,034   44% 1,027,106   29%"
+"Total Liabilities 687,607        13%649,982      13%521,278      15%"
+
+【簡報 p.11 Cash Flows（欄序 3Q26、2Q26、3Q25）】
+"Cash from Operating Activities 102,578 261,020 297,002"
+"Acquisition of property, plant and equipment (66,772) (92,391) (21,120)"
+"Free Cash Flow (Note)35,806 168,629 275,882"
+
+【簡報 p.5 Note 1（第三季 EPS 的股數）】
+"Note 1: 119,878 and 121,634 thousand shares were used for Y2026 3Q basic EPS and diluted EPS calculation respectively."
+
+【月營收備註：115 年 6 月（營收 326,169 仟元，年增 55.06%）——敘事「6 月的成長公司歸因於代工與權利金」的出處】
+"因晶圓代工訂單需求持續穩健，且權利金收入持續增加，致本月銷量較去年同期增加55%。"
+
+【月營收備註：115 年 9 月（營收 435,025 仟元，年增 112.94%）】
+"因自有光電元件產品的客戶需求持續成長、基板供應穩定、並晶圓代工訂單需求持續穩健，致本月銷量較去年同期增加113%。"
+
+【月營收備註：115 年 10 月（營收 313,491 仟元，年增 24.63%）】
+"自有光電元件產品AI數據中心客戶需求持續成長、基板供應穩定且晶圓代工訂單需求亦持續穩健，致累積銷量較去年增加50%。"
+
+【重大訊息 115/11/03 16:21:40：參與子公司威力富科技現金增資】
+"交易總金額上限：新台幣209,000,000元"
+"擴充公司產能"

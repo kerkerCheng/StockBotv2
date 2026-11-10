@@ -1,0 +1,23 @@
+SOURCE: MaxLinear, Inc. Form 10-Q（quarter ended 2026-09-30）——Note 8 Debt、租賃負債、資產負債表股數；流動性契約的定義與 10-16 第三次修約
+URL: https://www.sec.gov/Archives/edgar/data/1288469/000128846926000061/mxl-20260930.htm
+PUBLISHED: 2026-10-22（EDGAR 申報日；accession 0001288469-26-000061）
+RETRIEVED: 2026-11-10（repo fetchers.edgar 預設 UA 抓主文件、去標籤後逐字比對）
+STORAGE: repo_excerpt（有限節錄：契約定義兩句、修約後額度一句、到期兩句、租賃負債表一行、股數一行；未刪句）
+NOTE: 補 library/raw/mxl_10_q_2026q3_infrastructure_wafer_prepay_debt.txt 沒節到的四件——①流動性契約算的是「沒受限的現金＋循環額度還沒動用的部分」，不是只算現金（9 月底約 0.81 億＋未動用 0.9 億，對門檻 0.8 億；10-16 修約後額度 2 億、門檻 0.6 億）；②定期貸款 2028-06-23 到期、循環額度 2028-03-23 到期；③租賃負債 2,194 萬美元——敘事裡「總債務約 1.9 億」＝借款本金 1.65 億加租賃負債，與「定期貸款 1.25 億加循環額度 4,000 萬」是兩種口徑（L12）；④股數 9,100 萬股、年初 8,645 萬股。給 MXL 敘事「會死嗎」那一格與新反證 #5（再修約）對照用。
+
+[Note 8 — Debt：Second Amendment 後的財務契約]
+"Further, the financial covenant was modified to require that the Company maintain (a) a total net leverage ratio not to exceed 3.50:1.00 and (b) unrestricted cash plus available and undrawn commitments under the Revolving Facility in an amount of not less than $80.0 million, in each case, tested as of the last day of the fiscal quarter of the Company."
+"As of September 30, 2026, the Company was in compliance with such covenants."
+
+[Note 8 — Debt：到期]
+"As of September 30, 2026, the outstanding principal balance of the Initial Term Loan was $125.0 million, which mature and become due and payable in full on June 23, 2028."
+"The Second Amendment amended the June 23, 2021 Credit Agreement to, among other things, (i) extend the maturity date applicable to the Revolving Facility from June 23, 2026 to March 23, 2028,"
+
+[Subsequent event — Third Amendment（2026-10-16）]
+"After giving effect to the Incremental Commitments, the Revolving Facility provides for total revolving commitments in an aggregate principal amount of up to $200 million."
+
+[Leases — 9 月底到期分析（千美元）]
+"Total lease liabilities 21,943"
+
+[Condensed Consolidated Balance Sheets — 股數（千股）]
+"91,000 shares issued and outstanding at September 30, 2026 and 86,451 shares issued and outstanding at December 31, 2025"

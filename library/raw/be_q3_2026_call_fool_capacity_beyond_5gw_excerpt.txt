@@ -1,0 +1,19 @@
+SOURCE: The Motley Fool〈Bloom Energy (BE) Q3 2026 Earnings Call Transcript〉——Bloom Energy 2026 年第三季法說（2026-10-22）的第三方轉錄
+URL: https://www.fool.com/earnings/call-transcripts/2026/10/22/bloom-energy-be-q3-2026-earnings-call-transcript/
+PUBLISHED: 2026-10-22（法說當天；轉錄頁 datePublished 2026-10-23T00:38:39Z）
+RETRIEVED: 2026-11-09（公開頁面，不需登入；HTML 轉文字、空白攤平後逐字照抄）
+STORAGE: repo_excerpt（第三方轉錄的有限節錄——不是 Bloom 申報的文件；發言內容是 Bloom 管理層與分析師的話，轉錄的字句以轉錄頁為準）
+NOTE: Bloom 插槽層反證 #3（產能擴充延後、縮減，或提前到位、再加碼；現況以最新一季法說為準）回掃用（2026-11-09）。分析師問 Fremont 擴大廠房是不是把年產能從 5GW 以上推到 10GW 以上；執行長答要為 5GW 之後做準備、不給時程、產能不會一步跳上去。全場沒有點名任何供應商，也沒有「supplier」「lead time」字樣。
+
+【問（JPMorgan Mark Strouse）】
+"I was curious if you can just talk about recent decision to expand your real estate footprint in Fremont."
+"And since you have talked about your current manufacturing footprint supporting over 5 gigs of annual output. Should we now assume that is over 10 gigs once that facility is up and running?"
+
+【答（K. R. Sridhar，執行長）】
+"But from a timing perspective, it is very obvious to us that the 5-gigawatt milestone which was just a milestone, in a long journey, we can clearly see that coming, and we need to get prepared for what is after that."
+"And we will never increase our capacity in a step function."
+"We were not going to provide a timeline of when that is gonna happen."
+"But we have strong conviction and there is enough confidence we are getting from the marketplace, to tell us that we should start preparing for past the milestone of the 5-gigawatts."
+
+【財務長 Simon Edwards（準備稿）】
+"Capital expenditures $153 million in the quarter, and $231 million year to date. Driven primarily by investments in machinery and production capacity to support expansion within our existing Fremont and Newark facilities."
