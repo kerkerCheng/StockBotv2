@@ -123,6 +123,16 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 `StockBotv2-Daily` 的 ⑱⑲ 取代（1.2a 停用、2026-09-25 1.2b 刪除）；它們的理由（LLM 失敗心跳照發、永遠 exit 0、Python 不用 `.cmd`、
 發送走 subprocess）搬進 `crons/daily_task.py` 的 docstring，守它們的測試改主詞搬進 `tests/test_daily_task.py`「無人值守入口」節。
 
+### Sandbox impact review 結論（2026-11-10：負債燈只算借款、租賃另列——failure log #118 租賃那一半，使用者指示）
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | daily `engine_c/etl_yfinance.py`（argv 不變）：每檔多一個 yfinance 請求（`Ticker.quarterly_balance_sheet`，同一台主機、無新憑證；本來每檔就打 `info`／`revenue_estimate`／`earnings_estimate`），197 檔就是多 197 個請求；抓失敗或被限流只印一行 WARN、那一檔的租賃留 NULL（燈照總債判並說分不出），快照照寫。寫入面：同一張 `financial_snapshots`、同一列多一欄 `lease_liabilities`（SQLite 自動 ALTER；Postgres 遷移 `20261110_add_lease_liabilities.sql`）。下游：歸零燈多讀這一欄（`engine_c.checklist`、`shared.runway`、`alpha.wipeout`），APP「數字與出處」多兩個標籤 |
+| **2 canonical skill／prompt／本檔** | 本節；CONCEPTS「歸零旗標」；決定紀錄 §10.4；ROADMAP 已交付旁支一行；`config/engine_c_observation_fields.json` 的 runway_inputs 說明。skill 與無人值守 prompt 不動 |
+| **3 最窄 rule** | daily argv 不變；不新增 step、allowlist、rule；`.codex/rules` 仍 0 條；APP 仍沒有寫入端點、契約不升版（改了 `app.js` 照例重啟 serve） |
+| **4 contract test** | `tests/test_wipeout_debt_leases.py`：燈比借款、總債照印、分不出不是 0、租賃 > 總債不扣、量到的 0、人工觀測不拿快照的租賃、快照存讀、ETL 的三條對欄規則（同一個數、一週內＋核含租賃、落後一季分不出）與抓失敗照寫。變異 12／12 紅 |
+| **5 端到端 smoke** | 11-10 真資料：照 daily 的方式全量重跑 ETL 197/197（抓租賃那一步失敗 0；WARN 只有「季報表找不到 info.totalDebt 那一季」32 行）；負債燈翻色 7 檔、全往綠，分不出租賃 40（明細在 plan `2026-11-10-001` A 節）；全量 materialize 後重啟 serve、health `code.stale=false` |
+
 ### Sandbox impact review 結論（2026-11-08：首頁最上面一行「大盤同期」——使用者指示）
 
 | 步 | 結論 |

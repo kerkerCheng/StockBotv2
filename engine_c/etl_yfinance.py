@@ -123,6 +123,102 @@ def _bar_identity(info: dict) -> tuple[str | None, str | None]:
 SNAPSHOT_OPERATING_MARGIN_PERIOD = "latest_quarter"
 SNAPSHOT_GROSS_MARGIN_PERIOD = "annual_or_ttm"
 
+#: 季度資產負債表的租賃列（2026-11-10，failure log #118）：先取合計列，沒有就把長短期兩列有值的加起來。
+#: `info.totalDebt` 含租約（IQE.L 2026-06-30：5,394 萬英鎊＝借款 1,141 萬＋租賃 4,253 萬），負債燈要比的是借款。
+LEASE_TOTAL_ROW = "Capital Lease Obligations"
+LEASE_PART_ROWS: tuple[str, ...] = ("Long Term Capital Lease Obligation", "Current Capital Lease Obligation")
+BALANCE_SHEET_TOTAL_DEBT_ROW = "Total Debt"
+#: 52／53 週制的季末與日曆月底最多差一週，而 Yahoo 季報表的欄用日曆月底標（LITE `mostRecentQuarter` 2026-09-26 → 欄 2026-09-30、
+#: AVGO 2026-08-02 → 欄 2026-07-31）。
+QUARTER_LABEL_DRIFT_DAYS = 7
+#: yfinance info 的金額是 float32 轉來的（MXL info.totalDebt 186,004,992 vs 季報表 186,005,000）：float32 約 7 位有效數字，
+#: 相對差 1e-6 以內算同一個數。
+SAME_NUMBER_REL = 1e-6
+
+
+def _column_date(column) -> date | None:
+    if hasattr(column, "date"):
+        try:
+            return column.date()
+        except (TypeError, ValueError):
+            return None
+    try:
+        return date.fromisoformat(str(column)[:10])
+    except ValueError:
+        return None
+
+
+def _same_number(a: float | None, b: float | None) -> bool:
+    return a is not None and b is not None and abs(a - b) <= SAME_NUMBER_REL * max(abs(a), abs(b), 1.0)
+
+
+def lease_liabilities_from_balance_sheet(frame, period_end: date | None, total_debt: float | None) -> float | None:
+    """`frame`：yfinance `quarterly_balance_sheet`（列＝科目、欄＝期末日）。租賃必須取自 **`info.totalDebt` 那一季**的欄，
+    不拿別季的拼（INV-6）——Yahoo 季報表常晚 info 一季（2026-11-10：AXTI info 已是第三季、表只到第二季），落後的時候就是分不出。
+
+    找那一欄：①Total Debt 跟 `info.totalDebt` 是同一個數的欄（KSHINTL.NS：`mostRecentQuarter` 寫 6 月，info 的總債其實是 3 月那一欄）；
+    ②沒有就取離 `period_end`（`mostRecentQuarter`）一週內最近的欄，再核一次 info 的總債**確實含租賃**——它離「含租賃的總債」比離
+    「扣掉租賃的借款」近才扣（3234.TWO info 3.983 億 vs 季報表 3.999 億、扣掉租賃 3.003 億台幣）；離借款比較近＝info 的總債本來
+    就不含租賃，扣了會把借款低估、塗成綠 → None。
+    那一欄裡：合計列有值 → 它；否則長短期兩列有值的加總；租賃列都沒有值、但 Total Debt 有值 → 0.0（那一季的總債裡沒有租賃這一項——
+    量到的零，不是沒量）；都找不到 → None（分不出租賃）。
+    """
+    if frame is None or getattr(frame, "empty", True) or total_debt is None:
+        return None
+
+    def cell(row: str, column) -> float | None:
+        if row not in frame.index:
+            return None
+        try:
+            return _sf(frame.loc[row, column])
+        except (TypeError, ValueError, KeyError):
+            return None
+
+    def lease_of(column) -> float | None:
+        total = cell(LEASE_TOTAL_ROW, column)
+        if total is not None:
+            return total
+        parts = [value for value in (cell(row, column) for row in LEASE_PART_ROWS) if value is not None]
+        if parts:
+            return sum(parts)
+        return 0.0 if cell(BALANCE_SHEET_TOTAL_DEBT_ROW, column) is not None else None
+
+    same = [c for c in frame.columns if _same_number(cell(BALANCE_SHEET_TOTAL_DEBT_ROW, c), total_debt)]
+    if same:
+        return lease_of(same[0])
+    if period_end is None:
+        return None
+    near = sorted((abs((d - period_end).days), i) for i, c in enumerate(frame.columns)
+                  if (d := _column_date(c)) is not None and abs((d - period_end).days) <= QUARTER_LABEL_DRIFT_DAYS)
+    if not near:
+        return None
+    column = frame.columns[near[0][1]]
+    lease = lease_of(column)
+    if not lease:                      # None（分不出）或量到的 0——0 不必再核含不含
+        return lease
+    bs_total = cell(BALANCE_SHEET_TOTAL_DEBT_ROW, column)
+    if bs_total is None:
+        return None
+    return lease if abs(total_debt - bs_total) < abs(total_debt - (bs_total - lease)) else None
+
+
+def _quarter_lease_liabilities(ticker_obj, info: dict, ticker: str) -> float | None:
+    """與 `info.totalDebt` 同一季的租賃負債；取不到一律 None（燈照總債判並說分不出），不是 0。"""
+    total_debt = _sf(info.get("totalDebt"))
+    if total_debt is None:
+        return None
+    period_end = epoch_to_date(info.get("mostRecentQuarter"))
+    try:
+        frame = ticker_obj.quarterly_balance_sheet
+    except Exception as exc:  # noqa: BLE001 — provider 失敗只降級成「分不出租賃」
+        print(f"[etl] WARN: quarterly_balance_sheet failed for {ticker}: {exc}", file=sys.stderr)
+        return None
+    lease = lease_liabilities_from_balance_sheet(frame, period_end, total_debt)
+    if lease is None and frame is not None and not getattr(frame, "empty", True):
+        print(f"[etl] WARN: {ticker} 季報表找不到 info.totalDebt 那一季（mostRecentQuarter {period_end}）的租賃——"
+              "負債燈照總債判", file=sys.stderr)
+    return lease
+
 
 def fetch_snapshot(ticker: str) -> dict | None:
     """yfinance 抓一個 ticker 的當日快照。"""
@@ -146,6 +242,7 @@ def fetch_snapshot(ticker: str) -> dict | None:
 
     bar_date, price_kind = _bar_identity(info)
     revenue_next = _next_fy_revenue_estimate(t, ticker)
+    lease = _quarter_lease_liabilities(t, info, ticker)
     fetched_at = datetime.now(timezone.utc)
     snapshot_date = date.today()
     return {
@@ -171,6 +268,8 @@ def fetch_snapshot(ticker: str) -> dict | None:
         "free_cash_flow_ttm":   _sf(info.get("freeCashflow")),
         # 2026-10-29：歸零燈分「本業燒錢」（營業現金流 < 0）與「擴產花錢」（營業現金流 ≥ 0、自由現金流 < 0）。
         "operating_cash_flow_ttm": _sf(info.get("operatingCashflow")),
+        # 2026-11-10（#118）：與 total_debt 同一季的租賃負債——負債燈比總債扣掉它的借款；租賃另列。
+        "lease_liabilities":    lease,
         "ev_revenue":           _sf(info.get("enterpriseToRevenue")),
         "pe_trailing":          _sf(info.get("trailingPE")),
         "pe_forward":           _sf(info.get("forwardPE")),

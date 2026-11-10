@@ -15,7 +15,7 @@ from shared.redaction import sensitive_payload_path
 
 from ..narrative.contracts import (CANDIDATE_STATES_RETIRED, LINKABLE_SOURCE_PREFIXES, RAW_EXCERPT_PREFIX,
                                    InvestorBrief, lamp_colour_claims, parse_brief_record, price_quote_claims,
-                                   undated_position_claims)
+                                   undated_position_claims, wrong_signal_items)
 from ..errors import ContractViolation
 
 _ROOT = Path(__file__).resolve().parents[2]
@@ -99,7 +99,8 @@ class WriteContext:
     def __init__(self, *, today: Any, reading_rows: Sequence[Mapping[str, Any]],
                  readings_by_id: Mapping[str, Any], three_questions: Mapping[str, Any] | None,
                  watches: dict[str, Any], lifecycle: Mapping[str, Any] | None, registry: Any = None,
-                 three_questions_reload: Any = None) -> None:
+                 three_questions_reload: Any = None, filings: Sequence[Mapping[str, Any]] | None = None,
+                 calendar_checkpoints: Sequence[Mapping[str, Any]] | None = None) -> None:
         self.today = today
         self.reading_rows = list(reading_rows)
         self.readings_by_id = dict(readings_by_id)
@@ -110,6 +111,10 @@ class WriteContext:
         #: `history_not_comparable` → 重算三題（R2-a N3：敘事宣告「歷史不可比」時，驗 unmeasurable 要用宣告後的
         #: 稽核區，否則自家歷史那一行有值、宣告了反而被拒收）。測試注入時為 None＝不重算。
         self.three_questions_reload = three_questions_reload
+        #: 何時格的裁決點（2026-11-10，failure log #150）：這家公司在 lead 池的 SEC 定期報告、名冊上這一檔的檢核點
+        #: （`alpha.providers.checkpoints`）。None＝沒載入，那一半不核（只印的提示，不擋）。
+        self.filings = filings
+        self.calendar_checkpoints = calendar_checkpoints
 
     @classmethod
     def load(cls, ticker: str, *, today: Any = None) -> "WriteContext":
@@ -142,8 +147,20 @@ class WriteContext:
             except Exception:  # noqa: BLE001 — 讀不到就讓 unmeasurable 的檢查 fail closed
                 return None
 
+        from identity.registry import get_registry
+
+        from .checkpoints import calendar_checkpoints_by_ticker, sec_filings_by_company
+
+        filings, filings_note = sec_filings_by_company()
+        calendar, calendar_note = calendar_checkpoints_by_ticker()
+        registry = get_registry()
+        cid = registry.company_id_for_ticker(str(ticker))
+        # 名冊以 research ticker 為鍵（與候選板同一個鍵；呼叫端可能給 alias）
+        research = str((registry.research_ticker(cid) if cid else None) or ticker).upper()
         return cls(today=today, reading_rows=rows, readings_by_id=readings, three_questions=tq, watches=watches,
-                   lifecycle=load_lifecycle(), three_questions_reload=reload)
+                   lifecycle=load_lifecycle(), three_questions_reload=reload,
+                   filings=None if filings_note else list(filings.get(str(cid), ())),
+                   calendar_checkpoints=None if calendar_note else list(calendar.get(research, ())))
 
 
 def _registry(ctx: WriteContext) -> Any:
@@ -383,7 +400,21 @@ def v2_write_problems(parsed: InvestorBrief, *, ctx: WriteContext, existing: Seq
     #   library/raw、讀圖 id 要真的存在——指不回的引用等於沒查卻算查過。其他寫法（網址、不適用、加碼條件、缺）不在這裡驗
     #   （形狀由契約擋）。
     problems.extend(depth_check_ref_problems(parsed, readings_by_id=ctx.readings_by_id, root=_ROOT))
+
+    # ⑭ 錯的訊號標的反證編號要指得到（2026-11-10，failure log #140）：「（第 N 條）」的 N 是 disproof[] 的順序——指到不存在的
+    #   那一條，等於宣稱有 watch 在盯、其實沒有。沒標編號的條目不擋、只印（`v2_write_notices`；從文字切條會誤切，L16）。
+    problems.extend(wrong_signal_ref_problems(parsed))
     return problems
+
+
+def wrong_signal_ref_problems(parsed: InvestorBrief) -> list[str]:
+    """⑭：「錯的訊號」段每一條標的 disproof[] 編號都要在 1..len(disproof[]) 之內。回問題清單。"""
+    slot = parsed.slot("what_must_be_true")
+    count = len(parsed.disproof)
+    return [f"what_must_be_true：錯的訊號「{item[:40]}」標的第 {n} 條不在 disproof[]（共 {count} 條）——"
+            "編號照 disproof[] 的順序、從 1 起算"
+            for item, refs, _ in wrong_signal_items(slot.text if slot is not None else "")
+            for n in refs if not 1 <= n <= count]
 
 
 def _cited_file(text: str, start: int, base: Path, root: Path) -> bool:
@@ -485,6 +516,42 @@ def v2_write_notices(parsed: InvestorBrief) -> list[str]:
     for label, text in (("priced_in", priced.text if priced is not None else ""), ("candidate_state.reason", reason or "")):
         for sentence in price_quote_claims(text):
             notices.append(f"{label}：寫了收盤價——首屏不放價格報酬（9-30 使用者定案），改用文字描述方向：{sentence[:40]}")
+    # 錯的訊號沒標對應的反證（2026-11-10，failure log #140）：只印——沒有反證就沒有 watch，到期那天不會有東西叫你回來看
+    must = parsed.slot("what_must_be_true")
+    bare = [item for item, refs, reading in wrong_signal_items(must.text if must is not None else "")
+            if not refs and not reading]
+    if bare:
+        notices.append("what_must_be_true：這幾條錯的訊號沒標對應的反證——對到哪一條就寫「（第 N 條）」（N＝disproof[] 的順序；"
+                       "讀圖的反證寫「讀圖第 N 條」或連進 disproof[]），對不到的補一條（有日期寫逾期型）或寫為什麼不補：「"
+                       + "」「".join(item[:40] for item in bare) + "」")
+    return notices
+
+
+def checkpoint_notices(parsed: InvestorBrief, *, existing: Sequence[InvestorBrief], ctx: WriteContext) -> list[str]:
+    """何時格的兩個提示（只印、不擋；2026-11-10，failure log #150）：①這一版照抄的何時格，寫的裁決點已過（PSIX、EFXT 那種
+    重述版）；②把 `{next_checkpoint_date}` 寫成某件事的日子——佔位字每天換成名冊上的下一個日子，那件事一過句子就錯。
+    新寫的何時格「寫下那天」是今天，①不會亮；候選板每天核同一件事（`derive_row`），這裡是寫入當下的對稱面（L17）。"""
+    from engine_b import event_watch as ew
+
+    from ..narrative.checkpoints import (PLACEHOLDER, checkpoint_passed, checkpoint_reason, placeholder_as_event,
+                                         when_text_since)
+
+    slot = parsed.slot("when")
+    text = slot.text if slot is not None else ""
+    notices: list[str] = []
+    try:
+        today = ctx.today if isinstance(ctx.today, date_type) else date_type.fromisoformat(str(ctx.today)[:10])
+        written_on = when_text_since([*existing, parsed], parsed).astimezone(ew._local_timezone()).date()
+        passed = checkpoint_passed(text, written_on=written_on, today=today, filings=ctx.filings or (),
+                                   calendar_checkpoints=ctx.calendar_checkpoints or ())
+    except Exception as exc:  # noqa: BLE001 — append 之後才算的提示：算不成照實說，不讓已寫入的那一版看起來失敗
+        notices.append(f"when：何時格的裁決點這次沒核成（{type(exc).__name__}: {str(exc)[:80]}）——只是提示，寫入照常")
+        passed = None
+    if passed:
+        notices.append(f"when：這一版照抄了舊的何時格——{checkpoint_reason(passed)}")
+    if placeholder_as_event(text):
+        notices.append(f"when：把 {PLACEHOLDER} 寫成某件事的日子——佔位字每天換成名冊上的下一個日子，那件事一過句子就指著"
+                       "別的日子；寫那件事自己的日子，佔位字單獨寫（「…。{next_checkpoint_date}。」）")
     return notices
 
 
@@ -563,11 +630,12 @@ def write_brief(record: Mapping[str, Any], *, ctx: WriteContext, directory: Path
     path = append_brief_record(record, directory=directory)
     summary = register_brief_watches(parsed, data=ctx.watches, company_brief_ids=brief_ids)
     ew.save_watches(ctx.watches, watches_path)
-    notices = v2_write_notices(parsed) if parsed.record_version == RECORD_VERSION_V2 and not parsed.retracted else []
+    notices = ([*v2_write_notices(parsed), *checkpoint_notices(parsed, existing=existing, ctx=ctx)]
+               if parsed.record_version == RECORD_VERSION_V2 and not parsed.retracted else [])
     return {"path": str(path), "brief_id": parsed.brief_id, **summary, "notices": notices}
 
 
 __all__ = ["BETTABLE_READING_KINDS", "BRIEF_DIR", "CURRENT_READING_STATUSES", "OPEN_READING_KINDS", "PRICED_IN_WRITE_LINES", "WriteContext", "append_brief_record", "priced_snapshot",
-           "body_behind_problems", "depth_check_ref_problems",
+           "body_behind_problems", "checkpoint_notices", "depth_check_ref_problems",
            "ledger_path", "read_brief_records", "restates_problems", "v2_write_notices", "v2_write_problems",
-           "write_brief"]
+           "write_brief", "wrong_signal_ref_problems"]

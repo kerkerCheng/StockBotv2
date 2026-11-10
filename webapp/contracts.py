@@ -101,6 +101,8 @@ STATE_SCHEMA_VERSIONS: dict[str, str] = {
     # counts 多 `no_deadline`（可開與已持有裡一條都沒有的檔數；持股讀不到＝null）。
     # 2026-11-04（第 18＋16 條 R2）：列多 `declared_retired_label`（退役宣告值的中文，畫面印「敘事宣告」用）——加法欄、不升版：
     # 舊 /8 artifact 沒有它時畫面退回印 `declared_retired` 原字，不會印成讀法。
+    # 2026-11-10（何時格的裁決點已過；failure log #150）：列多 `checkpoint_passed`、counts 多 `checkpoint_passed`、
+    # 清單多 `kind=checkpoint`、板多 `checkpoint_check`——加法欄、不升版：讀的一方（⑤）把沒有這一格讀成「沒核（舊板）」。
     "candidates": "stockbot-app/candidates/8",
     # 2026-10-07（個股頁 plan S4b）：層說明的純文字閱讀頁——ledger 全文、出處與文件自宣告、每條主張的 watch 狀態、
     # 哪幾頁連過來 → 9。不做版面與示意圖（S5）。

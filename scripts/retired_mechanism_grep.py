@@ -340,6 +340,7 @@ KEEP: dict[tuple[str,str],str] = {
     ('tests/test_refresh_engine.py','H'): 'kept_file: refresh 測試讀 alpha.fundamental.assumptions（ledger 邏輯留）',
     ('tests/test_refresh_fiscal_year_scope.py','H'): 'retirement_note: docstring 記事發（price/pe_forward 推年度）',
     ('tests/test_webapp_request_path.py','H'): 'guard_assertion: request path 不得 import alpha.valuation.model／alpha.fundamental.model',
+    ('tests/test_wipeout_debt_leases.py','H'): 'kept_file: financial_snapshots 整列夾具（upsert_snapshot 的具名參數要每一欄；pe_forward 是欄位名）',
 }
 ACCEPT_AREAS=("code","static","skills","tests","config")
 

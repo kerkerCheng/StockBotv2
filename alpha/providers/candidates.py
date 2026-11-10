@@ -26,6 +26,7 @@ from ..candidates import (
     BODY_BEHIND_KINDS, body_behind_readings, body_behind_reasons,
 )
 from ..edge import not_edge_confirmed
+from ..narrative.checkpoints import checkpoint_passed, checkpoint_reason, when_text_since
 from ..narrative.contracts import CANDIDATE_STATES_RETIRED, RECORD_VERSION_V2, InvestorBrief, select_brief
 from ..narrative.depth_check import unchecked_items
 from ..structure_reading.contracts import READING_KINDS, READING_UNITS
@@ -236,6 +237,8 @@ def derive_row(ticker: str, company_id: str | None, *, records: Sequence[Investo
                raw_text: Callable[[str], str] | None = None,
                open_document_requests: Sequence[int] | None = None,
                readings_by_id: Mapping[str, Any] | None = None,
+               company_filings: Sequence[Mapping[str, Any]] | None = None,
+               calendar_checkpoints: Sequence[Mapping[str, Any]] | None = None,
                ) -> dict[str, Any] | None:
     """一檔的候選狀態。沒有敘事、也沒有持有 → None（不上板，計數另印「無敘事」）。
 
@@ -256,7 +259,10 @@ def derive_row(ticker: str, company_id: str | None, *, records: Sequence[Investo
     None＝圖讀不到，`rewrite_new_edges` 也是 None（沒算，不是 0）。`raw_text`：敘事引的 raw 檔全文的讀法（比邊的逐字；
     沒給＝只比文件 id、網址與直接引的邊）。
     `readings_by_id`：全部讀圖紀錄（含已被取代的）——②④「正文寫的時候騎的那份讀圖」要查得到舊紀錄（2026-11-03）；
-    None＝沒載入，`rewrite_reading_changes` 也是 None（沒算，不是 0）。"""
+    None＝沒載入，`rewrite_reading_changes` 也是 None（沒算，不是 0）。
+    `company_filings`／`calendar_checkpoints`：這家公司在 lead 池的 SEC 定期報告、名冊上這一檔的檢核點
+    （`alpha.providers.checkpoints`）——「何時格的裁決點已過」的申報與佔位字兩半（2026-11-10，failure log #150）；
+    沒給＝那一半不核（日期那一半照核），整板的「核了沒」由 `load_board` 的 `checkpoint_check` 宣告。"""
     from engine_b import event_watch as ew
     from engine_b.narrative_watches import blocking_for_open, link_breaks, pending_rewrite
     from engine_b.queue_segments import narrative_rewrite_state
@@ -289,6 +295,8 @@ def derive_row(ticker: str, company_id: str | None, *, records: Sequence[Investo
         # 敘事 stale ②④（2026-11-03）：正文版騎的讀圖 vs 這一格現行的讀圖，判讀或供給側家數變了（`body_behind_readings`）；
         # 沒比成的格數另計（讀圖紀錄找不到——不是 0）
         "rewrite_reading_changes": [], "reading_change_unchecked": 0,
+        # 何時格的裁決點已過（2026-11-10，failure log #150）：`alpha.narrative.checkpoints.checkpoint_passed` 的結果；None＝沒過
+        "checkpoint_passed": None,
         "edge": {**{k: (edge or {}).get(k) for k in ("state", "label", "reasons", "market_cap_usd", "analyst_count",
                                                      "on_threshold", "inputs_as_of", "prior", "prior_absence")},
                  "market_cap_label": cap_label((edge or {}).get("market_cap_usd"))},
@@ -403,6 +411,15 @@ def derive_row(ticker: str, company_id: str | None, *, records: Sequence[Investo
         row["rewrite_new_edges"] = unread_new_edges(company_assertions, since=body_version(records, brief).created_at,
                                                     cited=cited, cited_text=text)
         row["rewrite"].extend(new_edge_reason(e) for e in row["rewrite_new_edges"])
+    # 何時格的裁決點已過（2026-11-10，failure log #150）：寫的日子過了、點名的定期報告交了、佔位字指的那件事過了——
+    # 只叫重寫、不判斷；「寫下那天」是這段文字最早出現的那一版（照抄的換版不重算）
+    when = brief.slot("when")
+    row["checkpoint_passed"] = checkpoint_passed(
+        when.text if when is not None else "", today=today,
+        written_on=when_text_since(records, brief).astimezone(ew._local_timezone()).date(),
+        filings=company_filings or (), calendar_checkpoints=calendar_checkpoints or ())
+    if row["checkpoint_passed"]:
+        row["rewrite"].append(checkpoint_reason(row["checkpoint_passed"]))
     since = stall_since(records, brief)
     row["since"] = since.isoformat()
     # 「今天」是排程時區的今天；since 是 UTC 時戳——換到同一個時區再相減，否則台北 00:00–08:00 寫的會多算一天。
@@ -538,7 +555,8 @@ def board_rewrite(rows: Sequence[Mapping[str, Any] | None], breaks: Sequence[Map
     ＋**沒有列帶著的**待重寫 watch（現行敘事已撤回、是 v1、或根本沒有敘事——那家公司不在板上或那一列不是 v2，
     watch 仍在 narrative_rewrite 段；3.6 覆核：只收現行 v2 列會讓它們在板上消失、audit 卻報「那一列沒帶著」）
     ＋騎舊讀圖（`kind=rides`，一份讀圖一筆）＋判讀變了／供給家數變了（`kind=reading_kind`／`supply_count`，一格一筆，2026-11-03）
-    ＋新邊沒讀（`kind=new_edges`，一家公司一筆、帶邊與要讀的文件）——
+    ＋新邊沒讀（`kind=new_edges`，一家公司一筆、帶邊與要讀的文件）＋何時格的裁決點已過（`kind=checkpoint`，一家公司一筆，
+    2026-11-10）——
     心跳 ⑤「敘事該重寫」讀這份清單，不自己再算（ROADMAP「敘事 stale 計數器」同源，2026-10-29）。
     已回落、重開條件達成、沒寫重開條件三種（`pulled_back`／`reopen_met`／`no_reopen`）2026-11-03 隨等回落退役。"""
     from engine_b.queue_segments import narrative_rewrite_state
@@ -556,6 +574,10 @@ def board_rewrite(rows: Sequence[Mapping[str, Any] | None], breaks: Sequence[Map
                        for change in entry.get("changes") or () if change in BODY_BEHIND_KINDS)
         if (row or {}).get("rewrite_new_edges"):
             out.append({"kind": "new_edges", **who, "edges": [dict(e) for e in row["rewrite_new_edges"]]})
+        # 何時格的裁決點已過（2026-11-10，failure log #150）：一家公司一筆；哪一種過了寫在 `checkpoint_kind`
+        if (row or {}).get("checkpoint_passed"):
+            out.append({"kind": "checkpoint", **who,
+                        **{("checkpoint_kind" if k == "kind" else k): v for k, v in row["checkpoint_passed"].items()}})
         for wid in (row or {}).get("rewrite_watch_ids") or ():
             carried.add(str(wid))
             state = narrative_rewrite_state(by_id.get(str(wid)) or {})
@@ -675,6 +697,11 @@ def candidate_context(tickers: Sequence[str], *, today: date | None = None,
         company_assertions, assertions_note = load_company_assertions(), None
     except (Exception, SystemExit) as exc:  # noqa: BLE001 — `_graph_driver` 缺密碼丟 SystemExit；只讓 ③ 宣告沒算
         company_assertions, assertions_note = None, f"{type(exc).__name__}: {str(exc)[:80]}"
+    # 何時格的裁決點（2026-11-10，failure log #150）：lead 池的定期報告與名冊的檢核點各讀一次。讀不到＝那一半沒核（不是沒過）
+    from .checkpoints import calendar_checkpoints_by_ticker, sec_filings_by_company
+
+    filings, filings_note = sec_filings_by_company()
+    calendar, calendar_note = calendar_checkpoints_by_ticker()
     return {"today": today, "registry": registry, "universe": universe, "extra": extra, "watches": watches,
             "lifecycle": lifecycle, "reading_rows": reading_rows, "reading_errors": list(reading_errors),
             "retracted_cells": retracted_cells,
@@ -683,7 +710,27 @@ def candidate_context(tickers: Sequence[str], *, today: date | None = None,
             "ledger_present": ledger_present, "ledger_tickers": ledger_tickers,
             "bets": bet_index(structure, seats_from_edges(graph_edges)), "stories": stories,
             "company_assertions": company_assertions, "company_assertions_note": assertions_note,
-            "readings_by_id": readings_by_id, "readings_by_id_note": readings_note}
+            "readings_by_id": readings_by_id, "readings_by_id_note": readings_note,
+            "sec_filings": filings, "sec_filings_note": filings_note,
+            "calendar_checkpoints": calendar, "calendar_checkpoints_note": calendar_note}
+
+
+def checkpoint_inputs(context: Mapping[str, Any], ticker: str, company_id: str | None) -> dict[str, Any]:
+    """`derive_row` 的何時格兩份輸入；context 讀不到（或沒帶這個鍵）＝None——那一半不核，不是「沒過」。"""
+    filings = None if context.get("sec_filings_note") else context.get("sec_filings")
+    calendar = None if context.get("calendar_checkpoints_note") else context.get("calendar_checkpoints")
+    return {"company_filings": None if filings is None else list(filings.get(str(company_id), ())),
+            "calendar_checkpoints": None if calendar is None else list(calendar.get(str(ticker), ()))}
+
+
+def checkpoint_check(context: Mapping[str, Any]) -> dict[str, Any]:
+    """整板「何時格的裁決點」核了幾半：日期永遠核；申報與佔位字各看那份輸入讀到沒有（INV-3：沒核不印成沒過）。"""
+    notes = [n for n in (context.get("sec_filings_note"), context.get("calendar_checkpoints_note")) if n]
+    filings_ok = context.get("sec_filings") is not None and not context.get("sec_filings_note")
+    calendar_ok = context.get("calendar_checkpoints") is not None and not context.get("calendar_checkpoints_note")
+    return {"status": "ok" if filings_ok and calendar_ok else "partial",
+            "filings": "ok" if filings_ok else "unavailable", "calendar": "ok" if calendar_ok else "unavailable",
+            "reason": "；".join(notes) or (None if filings_ok and calendar_ok else "這一輪沒載入")}
 
 
 def assertions_for(context: Mapping[str, Any], company_id: str | None) -> list[Mapping[str, Any]] | None:
@@ -751,7 +798,7 @@ def page_input(context: Mapping[str, Any], ticker: str, company_id: str | None, 
                      bets=context.get("bets"), registry=context.get("registry"),
                      stories=context.get("stories"),
                      company_assertions=assertions_for(context, company_id), raw_text=raw_text,
-                     readings_by_id=context.get("readings_by_id"))
+                     readings_by_id=context.get("readings_by_id"), **checkpoint_inputs(context, ticker, company_id))
     brief = select_brief(records, as_of=None, today=today)
     v2 = brief if brief is not None and brief.record_version == RECORD_VERSION_V2 else None
     words = (row["three_words"] if row is not None else
@@ -874,7 +921,7 @@ def load_board(tickers: Sequence[str], *, today: date | None = None,
                          company_assertions=assertions_for(ctx, cid), raw_text=raw_text,
                          open_document_requests=(doc_requests.get(str(cid), []) if doc_check["status"] == "ok"
                                                  else None),
-                         readings_by_id=ctx.get("readings_by_id"))
+                         readings_by_id=ctx.get("readings_by_id"), **checkpoint_inputs(ctx, ticker, cid))
         rows.append(row)
         if row is None:
             no_narrative.append({"ticker": ticker, "company_id": cid,
@@ -912,6 +959,8 @@ def load_board(tickers: Sequence[str], *, today: date | None = None,
     board["reading_change_check"] = ({"status": "ok", "reason": None, "unchecked": unchecked}
                                      if ctx.get("readings_by_id") is not None else
                                      {"status": "unavailable", "reason": ctx.get("readings_by_id_note"), "unchecked": None})
+    # 何時格的裁決點（2026-11-10）：申報與佔位字兩半核了沒有——日期那一半永遠核
+    board["checkpoint_check"] = checkpoint_check(ctx)
     board["rollup"] = rollup({t: tq_by_ticker[t] for t in board_universe},
                              {t: edges.get(t) or {} for t in board_universe}, not_read_reasons=tq_notes)
     board["ledger"] = {"present": ledger_present, "tickers": len(ledger_tickers), "parse_errors": len(parse_errors),

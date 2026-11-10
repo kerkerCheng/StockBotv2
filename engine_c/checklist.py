@@ -287,6 +287,10 @@ def _parse_runway_inputs(value, source_note, as_of) -> dict | None:
     operating = payload.get("operating_cash_flow_ttm")
     if isinstance(operating, (int, float)) and not isinstance(operating, bool):
         numbers["operating_cash_flow_ttm"] = float(operating)
+    # 租賃負債（選填，2026-11-10 #118）：同一份文件的租賃負債（IFRS 16／ASC 842），負債燈拿總債扣掉它比借款；沒帶＝分不出租賃。
+    lease = payload.get("lease_liabilities")
+    if isinstance(lease, (int, float)) and not isinstance(lease, bool):
+        numbers["lease_liabilities"] = float(lease)
     return numbers | {"source": str(source_note), "as_of": str(as_of)}
 
 
@@ -603,6 +607,7 @@ def get_wipeout_inputs(ticker: str, *, conn=None) -> dict:
             return {"ticker": ticker, "status": "unavailable", "reason": "Engine C 快照讀取失敗"}
         financial = {key: base.get(key) for key in _RUNWAY_INPUT_KEYS}
         financial["operating_cash_flow_ttm"] = base.get("operating_cash_flow_ttm")
+        financial["lease_liabilities"] = base.get("lease_liabilities")
         # `derive_runway` 要求 as_of 帶時區；快照存的是日期。補成當日 UTC 午夜，不改變語意。
         financial["source"] = base.get("source")
         financial["as_of"] = (f"{base['as_of']}T00:00:00+00:00" if base.get("as_of") else None)
@@ -620,6 +625,9 @@ def get_wipeout_inputs(ticker: str, *, conn=None) -> dict:
             runway.setdefault(key, financial.get(key))
         runway.setdefault("source", financial.get("source"))
         runway.setdefault("as_of", financial.get("as_of"))
+        # 租賃負債（2026-11-10 #118）只跟同一份來源的總債走：跑道取自人工觀測時不拿快照的租賃補（兩個來源拼成一個值，PIT）。
+        if runway.get("source") == financial.get("source"):
+            runway.setdefault("lease_liabilities", financial.get("lease_liabilities"))
 
         ph = "%s" if is_pg else "?"
         shares_sql = (
@@ -689,7 +697,8 @@ def get_probe_financial_baseline(ticker: str, *, conn=None) -> dict:
                 cursor.execute(
                     """
                     SELECT snapshot_date, cash_and_equivalents, total_debt,
-                           free_cash_flow_ttm, fetched_at, operating_cash_flow_ttm
+                           free_cash_flow_ttm, fetched_at, operating_cash_flow_ttm,
+                           lease_liabilities
                     FROM financial_snapshots
                     WHERE ticker = %s
                     ORDER BY snapshot_date DESC, fetched_at DESC
@@ -702,7 +711,8 @@ def get_probe_financial_baseline(ticker: str, *, conn=None) -> dict:
             row = connection.execute(
                 """
                 SELECT snapshot_date, cash_and_equivalents, total_debt,
-                       free_cash_flow_ttm, fetched_at, operating_cash_flow_ttm
+                       free_cash_flow_ttm, fetched_at, operating_cash_flow_ttm,
+                       lease_liabilities
                 FROM financial_snapshots
                 WHERE ticker = ?
                 ORDER BY snapshot_date DESC, fetched_at DESC
@@ -724,6 +734,8 @@ def get_probe_financial_baseline(ticker: str, *, conn=None) -> dict:
         }
         # 營業現金流（2026-10-29）：不是跑道的必要輸入（缺了照判、燈說分不出本業燒錢還是擴產），所以不進 status 判定。
         result["operating_cash_flow_ttm"] = values[5] if len(values) > 5 else None
+        # 租賃負債（2026-11-10 #118）：同上，選填——NULL＝分不出租賃（負債燈照總債判並說），不是 0。
+        result["lease_liabilities"] = values[6] if len(values) > 6 else None
         result["status"] = (
             "observed"
             if all(result[key] is not None for key in _RUNWAY_INPUT_KEYS)

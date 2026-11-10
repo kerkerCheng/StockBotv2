@@ -74,6 +74,10 @@ def derive_runway(
     operating = _finite(source.get("operating_cash_flow_ttm"))
     if operating is not None:
         result["operating_cash_flow_ttm"] = operating
+    # 租賃負債（2026-11-10，選填；failure log #118）：負債燈比的是總債扣掉租賃的借款。同上，只跟同一份來源的總債走。
+    lease = _finite(source.get("lease_liabilities"), non_negative=True)
+    if lease is not None:
+        result["lease_liabilities"] = lease
     if free_cash_flow >= 0:
         return result | {"status": "self_funding", "runway_months": None}
     return result | {

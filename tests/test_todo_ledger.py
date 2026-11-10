@@ -16,6 +16,8 @@ import pytest
 from engine_b import todo_ledger as tl
 
 TODAY = date(2026, 10, 22)
+#: 候選板「何時格的裁決點」兩半都核了（2026-11-10）——沒帶這一格的板，⑤ 會多一句「只核了日期」
+CHECKPOINT_OK = {"status": "ok", "filings": "ok", "calendar": "ok", "reason": None}
 
 
 # ---------------------------------------------------------------------------
@@ -98,7 +100,8 @@ def _collect(**over):
     params = dict(today=TODAY, leads_store={"leads": {}}, watches=[], todo_items=[], hypotheses=[], briefs=[],
                   reading_needs_reread=0, layer_note_reread=0,
                   candidates={"counts": {}, "new_edges_check": {"status": "ok"},
-                              "reading_change_check": {"status": "ok", "unchecked": 0}}, thesis_due=[])
+                              "reading_change_check": {"status": "ok", "unchecked": 0},
+                              "checkpoint_check": CHECKPOINT_OK}, thesis_due=[])
     loaders = {"classification_gaps": lambda: [], "undisposed": lambda: [], "parked_without_expiry": lambda: [],
                "stale_lead_entities": lambda: 0, "story_gaps": lambda: [], "pending_admission": lambda: {}}
     loaders.update(over.pop("loaders", {}))       # 只換掉測試點名的那幾個；其餘不讀真的 ledger
@@ -165,7 +168,8 @@ def test_a_waiting_narrative_may_have_several_wake_watches() -> None:
 
 def _board(*items, check: str = "ok", reading_check: dict | None = None):
     return {"counts": {}, "narrative_rewrite": list(items), "new_edges_check": {"status": check},
-            "reading_change_check": reading_check or {"status": "ok", "unchecked": 0}}
+            "reading_change_check": reading_check or {"status": "ok", "unchecked": 0},
+            "checkpoint_check": CHECKPOINT_OK}
 
 
 def test_a_narrative_riding_a_superseded_reading_needs_a_rewrite() -> None:
@@ -199,6 +203,18 @@ def test_reading_kind_and_supply_count_changes_are_named_and_counted_once_per_co
     assert "判讀變了 1（AEVA）" in row.work and "家數變了 2（AEVA、COHR）" in row.work
 
 
+def test_a_passed_checkpoint_is_named_and_counted_once_per_company() -> None:
+    """何時格的裁決點已過（2026-11-10，failure log #150）：候選板清單 kind=checkpoint——⑤ 點名是哪幾檔；同一檔另有別的
+    原因（騎舊讀圖）只算一檔。"""
+    cp = {"kind": "checkpoint", "ticker": "PSIX", "company_id": "co:psix", "brief_id": "ib_1", "checkpoint_kind": "filing",
+          "since": "2026-10-28", "form": "10-Q", "filed": "2026-11-05", "lead_id": "lead_x"}
+    ride = {"kind": "rides", "ticker": "PSIX", "company_id": "co:psix", "brief_id": "ib_1", "node": "tech:x",
+            "unit": "layer", "reading_id": "sr_old", "current_reading_id": "sr_new"}
+    row = _collect(candidates=_board(cp, ride, dict(cp, ticker="AAOI", company_id="co:aaoi")))["todo.narrative"]
+    assert row.count == 2 and row.note is None
+    assert "裁決點過了 2（AAOI、PSIX）" in row.work and "騎舊讀圖 1（PSIX）" in row.work
+
+
 def test_kinds_the_ledger_does_not_own_are_not_counted_twice() -> None:
     """連結斷與 watch 待重寫 ⑤ 自己由 watch registry 算；候選板清單裡的同一件事不再加一次。"""
     board = _board({"kind": "link", "ticker": "A", "company_id": "co:a"},
@@ -207,15 +223,21 @@ def test_kinds_the_ledger_does_not_own_are_not_counted_twice() -> None:
 
 
 @pytest.mark.parametrize("candidates, note", [
-    (None, "候選板未讀到——騎舊讀圖、判讀／家數變了、新邊沒讀、前提失效沒算進來"),
+    (None, "候選板未讀到——騎舊讀圖、判讀／家數變了、新邊沒讀、裁決點過了、前提失效沒算進來"),
     ({"counts": {}, "narrative_rewrite": [], "new_edges_check": {"status": "unavailable", "reason": "SystemExit"},
-      "reading_change_check": {"status": "ok", "unchecked": 0}},
+      "reading_change_check": {"status": "ok", "unchecked": 0}, "checkpoint_check": CHECKPOINT_OK},
      "新邊沒讀這次沒算（候選板沒讀到圖）"),
-    ({"counts": {}, "narrative_rewrite": []},                                          # 改版前的舊 artifact：兩種都沒算
-     "新邊沒讀這次沒算（候選板沒讀到圖）；判讀／家數變了這次沒算（候選板沒讀到讀圖紀錄，或是舊板）"),
+    ({"counts": {}, "narrative_rewrite": []},                                          # 改版前的舊 artifact：三種都沒算
+     "新邊沒讀這次沒算（候選板沒讀到圖）；判讀／家數變了這次沒算（候選板沒讀到讀圖紀錄，或是舊板）；"
+     "裁決點過了只核了日期——申報、佔位字那一半這次沒核（舊板沒有這一格）"),
     ({"counts": {}, "narrative_rewrite": [], "new_edges_check": {"status": "ok"},
-      "reading_change_check": {"status": "ok", "unchecked": 2}},
+      "reading_change_check": {"status": "ok", "unchecked": 2}, "checkpoint_check": CHECKPOINT_OK},
      "判讀／家數變了有 2 格沒比成（正文寫時騎的讀圖紀錄找不到）"),
+    ({"counts": {}, "narrative_rewrite": [], "new_edges_check": {"status": "ok"},             # lead 池讀不到（2026-11-10）
+      "reading_change_check": {"status": "ok", "unchecked": 0},
+      "checkpoint_check": {"status": "partial", "filings": "unavailable", "calendar": "ok",
+                           "reason": "lead 池讀不到（OSError: x）"}},
+     "裁決點過了只核了日期——申報那一半這次沒核（lead 池讀不到（OSError: x））"),
 ])
 def test_new_edges_not_checked_is_said_not_printed_as_zero(candidates, note) -> None:
     """圖或候選板讀不到時「新邊沒讀」是沒算，不是 0（INV-3）——而且**印出來**：0 的格也帶著註記。"""

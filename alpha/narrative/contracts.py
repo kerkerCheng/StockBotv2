@@ -174,6 +174,8 @@ BRIEF_FRAME_V2: Mapping[str, Mapping[str, str]] = {
                   "⚠ **不寫目標價、股價、報酬率**；{price}、{own_history_pctile}、{cohort_median} 仍不得出現在這一格。"
                   "⚠ 不算「倍數回到三年中位數時營收要多少才翻倍」——那一步會把贏家說服走（AXTI 照這樣算會得出要 40 倍營收）。"
                   "⚠ 錯的訊號要是可觀測的條件，不是『情況變差』。"
+                  "⚠ 錯的訊號寫成「錯的訊號：A（第 1 條）；B（第 2、3 條）」——N＝disproof[] 的順序，讀圖自己的反證寫"
+                  "「讀圖第 N 條」；編號指不到拒收、沒標的印出來（2026-11-10，failure log #140）。"
                   "判「不要」的寫出**為什麼翻不了倍**就算數（2026-10-21 使用者照推薦；ROADMAP Phase 7 驗收②）。",
     },
     "when": {
@@ -654,6 +656,45 @@ def price_quote_claims(text: str) -> list[str]:
     return [s.strip() for s in _SENTENCE_SPLIT.split(text or "") if PRICE_QUOTE_CLAIM.search(s)]
 
 
+#: 「錯的訊號」逐條對反證（2026-11-10，failure log #140；使用者「#140 … 照推薦做」）：AXTI 11-07 版「必須為真」格寫了
+#: 「通美融資沒能交割」，disproof[] 卻沒有這一條——12-20 的交割期限沒有任何 watch。寫法沿用研究 session 已在用的「（第 N 條）」
+#: （現行 93 份裡 41 份至少這樣標過一條；N＝disproof[] 的順序、從 1 起算，讀圖的反證先以 link_source_ref 連進 disproof[]）；
+#: 「讀圖第 N 條」指的是讀圖自己的反證（那一條本來就有 watch），算有標、不核編號。
+#: 段落從「錯的訊號…：」起到括號外的第一個「。」，括號外的「；」切條。
+WRONG_SIGNAL_MARK = re.compile(r"錯的訊號[^。：:]{0,12}[：:]")
+_DISPROOF_REF = re.compile(r"(?<!讀圖)(?<!讀圖\s)第\s*(\d+(?:\s*[、,，及和與]\s*第?\s*\d+)*)\s*條")
+_READING_REF = re.compile(r"讀圖\s*第\s*\d+\s*條")
+
+
+def _split_outside_brackets(text: str, *, stop: str, sep: str) -> list[str]:
+    """括號（全形與半形）外遇到 `stop` 就停、遇到 `sep` 就切。"""
+    items, buf, depth = [], [], 0
+    for ch in text:
+        if ch in "（(":
+            depth += 1
+        elif ch in "）)" and depth:
+            depth -= 1
+        if depth == 0 and ch == stop:
+            break
+        if depth == 0 and ch == sep:
+            items.append("".join(buf))
+            buf = []
+            continue
+        buf.append(ch)
+    items.append("".join(buf))
+    return [item.strip() for item in items if item.strip()]
+
+
+def wrong_signal_items(text: str) -> list[tuple[str, tuple[int, ...], bool]]:
+    """「錯的訊號…：」之後逐條：(條目, 標的 disproof[] 編號, 有沒有標讀圖第 N 條)。沒有這個段落＝空清單（不核）。"""
+    out: list[tuple[str, tuple[int, ...], bool]] = []
+    for mark in WRONG_SIGNAL_MARK.finditer(text or ""):
+        for item in _split_outside_brackets(text[mark.end():], stop="。", sep="；"):
+            refs = tuple(int(n) for m in _DISPROOF_REF.finditer(item) for n in re.findall(r"\d+", m.group(1)))
+            out.append((item, refs, bool(_READING_REF.search(item))))
+    return out
+
+
 @dataclass(frozen=True, slots=True)
 class InvestorBrief:
     """一份短評（append-only；改一句＝append 一筆新的 supersede 舊的）。"""
@@ -997,6 +1038,7 @@ __all__ = [
     "NarrativeConfirm", "NarrativeDisproof", "PLACEHOLDERS_V2", "PRICED_DATE_MARK", "PRICED_POSITION_WORDS",
     "PricedSnapshot", "RECORD_VERSION_V1", "RECORD_VERSION_V2", "RECORD_VERSIONS", "undated_position_claims",
     "LAMP_COLOUR_CLAIM", "PRICE_QUOTE_CLAIM", "lamp_colour_claims", "price_quote_claims",
+    "WRONG_SIGNAL_MARK", "wrong_signal_items",
     "RIDE_UNITS",
     "Ride", "SLOT_KEYS_V2", "SLOT_LABELS_V2", "WHAT_MUST_BE_TRUE_FORBIDDEN", "placeholder_vocab", "slot_keys",
     "slot_labels",

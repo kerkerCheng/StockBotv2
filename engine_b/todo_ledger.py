@@ -177,6 +177,7 @@ COVERAGE: Mapping[str, str] = {
     "brief:new_edges_unread": "todo.narrative",           # 候選板清單 kind=new_edges：正文寫完後圖上有新邊、敘事沒讀過
     "brief:reading_kind_changed": "todo.narrative",       # 候選板清單 kind=reading_kind：正文寫時騎的讀圖判讀與現行不同（2026-11-03）
     "brief:supply_count_changed": "todo.narrative",       # 候選板清單 kind=supply_count：供給側家數與正文寫時不同（2026-11-03）
+    "brief:checkpoint_passed": "todo.narrative",          # 候選板清單 kind=checkpoint：何時格寫的裁決點已過（2026-11-10）
     "brief:link_break": "todo.narrative",
     # 可開／已持有的深挖清單還有沒查的項目（`alpha.candidates.addon_unchecked_rows`；2026-11-03 第 18＋16 條）
     "depth_check:unchecked": "todo.addon_unchecked",
@@ -293,8 +294,9 @@ def orphan_wake_briefs(watches: Iterable[Mapping[str, Any]], briefs: Iterable[An
 #: `reading_kind`／`supply_count`（2026-11-03，ROADMAP「敘事 stale 計數器」②④）：正文寫的時候騎的讀圖與這一格現行的
 #: 讀圖相比，判讀變了／供給側家數變了——換騎不夠，正文要改。
 #: 已回落（#116）、重開達成／沒寫重開（#124）2026-11-03 隨等回落併回可開退役：價格動了不再叫研究重寫。
+#: `checkpoint`（2026-11-10，failure log #150）：何時格寫的裁決點已過——寫的日子過了、點名的定期報告交了、佔位字指的那件事過了。
 BEHIND_KINDS: Mapping[str, str] = {"rides": "騎舊讀圖", "reading_kind": "判讀變了", "supply_count": "家數變了",
-                                   "new_edges": "新邊沒讀"}
+                                   "new_edges": "新邊沒讀", "checkpoint": "裁決點過了"}
 
 
 def _narrative_companies(watches: Sequence[Mapping[str, Any]], briefs: Sequence[Any]) -> dict[str, list[str]]:
@@ -441,7 +443,7 @@ def collect(*, today: date, leads_store: Mapping[str, Any], watches: Sequence[Ma
         # 沒讀到不是 0（INV-3）：候選板讀不到，後幾種都沒算進來；圖讀不到，新邊沒讀沒算；讀圖紀錄讀不到（或舊板沒有這一格），
         # 判讀／家數變了沒算
         if candidates is None:
-            note = "候選板未讀到——騎舊讀圖、判讀／家數變了、新邊沒讀、前提失效沒算進來"
+            note = "候選板未讀到——騎舊讀圖、判讀／家數變了、新邊沒讀、裁決點過了、前提失效沒算進來"
         else:
             notes = []
             if (candidates.get("new_edges_check") or {}).get("status") != "ok":
@@ -451,6 +453,11 @@ def collect(*, today: date, leads_store: Mapping[str, Any], watches: Sequence[Ma
                 notes.append("判讀／家數變了這次沒算（候選板沒讀到讀圖紀錄，或是舊板）")
             elif check.get("unchecked"):
                 notes.append(f"判讀／家數變了有 {check['unchecked']} 格沒比成（正文寫時騎的讀圖紀錄找不到）")
+            # 何時格的裁決點（2026-11-10）：日期那一半永遠核；申報（lead 池）或佔位字（名冊）讀不到、或是舊板，那一半沒核
+            cp = candidates.get("checkpoint_check") or {}
+            unread = [w for k, w in (("filings", "申報"), ("calendar", "佔位字")) if cp.get(k) != "ok"]
+            if unread:
+                notes.append(f"裁決點過了只核了日期——{'、'.join(unread)}那一半這次沒核（{cp.get('reason') or '舊板沒有這一格'}）")
             note = "；".join(notes) or None
         put("todo.narrative", len(companies) + extra, work="；".join(bits) or None,
             oldest_days=_oldest(stamps, today), note=note)

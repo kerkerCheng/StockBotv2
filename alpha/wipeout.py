@@ -122,9 +122,34 @@ def cash_runway_flag(runway: Mapping[str, Any] | None) -> dict[str, Any]:
                  rule=_CASH_RULE, inputs=inputs, absence_kind="upstream_unavailable")
 
 
-_DEBT_RULE = ("現金 ≥ 總債 → 綠（淨現金）；淨負債時看本業：營業現金流 ≥ 0（或沒有營業現金流資料時自由現金流 ≥ 0）→ 黃；"
+# 2026-11-10（failure log #118 第 3 次，使用者「#118 只做租賃那一半」）：總債同時承載「到期要還、要再融資的借款」與
+# IFRS 16／ASC 842 掛上資產負債表的租約（L12）——IQE.L 的總債 5,394 萬英鎊裡 4,253 萬是租賃，含租賃判紅、不含是淨現金
+# （公司自己寫的 adjusted net cash）。燈改比借款；租賃另列一行，看得到、不進比較。
+_DEBT_RULE = ("比的是**借款**＝總債扣掉租賃負債（IFRS 16／ASC 842 掛上資產負債表的租約；2026-11-10 起）——租金按月從營運付、"
+              "不會像借款一樣到期一次要還或要再融資，所以租賃另列一行、不算進比的那一邊。沒有租賃的資料 → 照總債判並說總債可能含租約；"
+              "租賃比總債還大（口徑對不上）→ 照總債判。現金 ≥ 借款 → 綠（淨現金）；借款比現金多時看本業："
+              "營業現金流 ≥ 0（或沒有營業現金流資料時自由現金流 ≥ 0）→ 黃；"
               "營業現金流 < 0（本業燒錢）→ 紅；沒有營業現金流資料且自由現金流 < 0 → 紅並說分不出是本業燒錢還是擴產。"
-              "**純符號比較，沒有門檻**——歸零的機制是「要還的錢多於手上的錢，而且本業生不出來」")
+              "**純符號比較，沒有門檻**——歸零的機制是「要還的錢多於手上的錢，而且本業生不出來」。"
+              "⚠ IFRS 下租金的本金那一段列在籌資活動、不在營業現金流——營業現金流對 IFRS 公司偏樂觀（#118 現金流那一半，未改）")
+
+#: 借款的口徑（`inputs["lease_basis"]`）：分得出租賃／沒有租賃的資料／租賃比總債大。只印在稽核層，不參與判色以外的任何事。
+LEASE_BASES: tuple[str, ...] = ("separated", "not_separated", "inconsistent")
+_LEASE_NOTES: Mapping[str, str] = {
+    "not_separated": "（總債可能含租約，分不出來）",
+    "inconsistent": "（租賃比總債還大、口徑對不上，照總債判）",
+}
+
+
+def _borrowings(runway: Mapping[str, Any], debt: float) -> tuple[float, float | None, str]:
+    """（比的那個數, 租賃負債, 口徑）。租賃只跟同一份來源的總債走（`shared.runway.derive_runway` 只在同源時帶上）；
+    沒有就照總債判——**不是當成 0**：分不出來的時候，總債可能含租約（Missing ≠ Zero）。"""
+    lease = runway.get("lease_liabilities")
+    if isinstance(lease, bool) or not isinstance(lease, (int, float)) or lease < 0:
+        return float(debt), None, "not_separated"
+    if lease > debt:
+        return float(debt), float(lease), "inconsistent"
+    return float(debt) - float(lease), float(lease), "separated"
 
 
 def debt_flag(runway: Mapping[str, Any] | None) -> dict[str, Any]:
@@ -139,22 +164,30 @@ def debt_flag(runway: Mapping[str, Any] | None) -> dict[str, Any]:
     if not isinstance(cash, (int, float)) or not isinstance(debt, (int, float)):
         return _flag(None, "缺現金或債務的數字，不判", rule=_DEBT_RULE, inputs=inputs,
                      absence_kind="upstream_unavailable")
-    if cash >= debt:
-        return _flag("green", "手上的現金比欠的債多——不怕還債", rule=_DEBT_RULE, inputs=inputs, short="現金比債多")
+    owed, lease, basis = _borrowings(runway, debt)
+    inputs.update(lease_liabilities=lease, borrowings=owed if basis == "separated" else None, lease_basis=basis)
+    # 分得出租賃才說「借的錢」；分不出來照舊說「欠的債」並補一句為什麼
+    noun, word, note = ("借的錢", "借款", "") if basis == "separated" else ("欠的債", "債", _LEASE_NOTES[basis])
+    if cash >= owed:
+        # 現金 ≥ 總債時一定也 ≥ 借款——分不出租賃也能說「比借的錢多」
+        return _flag("green", "手上的現金比借的錢多——不怕還債" + ("（租約另列，不算借款）" if basis == "separated" and lease
+                                                               else ""),
+                     rule=_DEBT_RULE, inputs=inputs, short="現金比借款多")
     if operating is not None:
         if operating >= 0:
-            return _flag("amber", "欠的比手上的現金多，但本業每年賺得出現金——靠自己還得出來", rule=_DEBT_RULE,
-                         inputs=inputs, short="債比現金多，本業賺得還")
-        return _flag("red", "欠的比手上的現金多、本業又在燒錢——債到期得靠再借錢或增資", rule=_DEBT_RULE, inputs=inputs,
-                     short="債比現金多，本業又在燒錢")
+            return _flag("amber", f"{noun}比手上的現金多，但本業每年賺得出現金——靠自己還得出來{note}", rule=_DEBT_RULE,
+                         inputs=inputs, short=f"{word}比現金多，本業賺得還")
+        return _flag("red", f"{noun}比手上的現金多、本業又在燒錢——{word}到期得靠再借錢或增資{note}", rule=_DEBT_RULE,
+                     inputs=inputs, short=f"{word}比現金多，本業又在燒錢")
     if not isinstance(fcf, (int, float)):
-        return _flag(None, "欠的比手上的現金多，但缺自由現金流——判不出還不還得出來", rule=_DEBT_RULE,
+        return _flag(None, f"{noun}比手上的現金多，但缺自由現金流——判不出還不還得出來{note}", rule=_DEBT_RULE,
                      inputs=inputs, absence_kind="upstream_unavailable")
     if fcf >= 0:
-        return _flag("amber", "欠的比手上的現金多，但每年賺得出現金——靠自己還得出來", rule=_DEBT_RULE, inputs=inputs,
-                     short="債比現金多，賺得還")
-    return _flag("red", "欠的比手上的現金多、花的錢又比賺的多——債到期可能要再借錢或增資（沒有營業現金流的資料，"
-                 "分不出是本業燒錢還是擴產）", rule=_DEBT_RULE, inputs=inputs, short="債比現金多，花得比賺得多")
+        return _flag("amber", f"{noun}比手上的現金多，但每年賺得出現金——靠自己還得出來{note}", rule=_DEBT_RULE,
+                     inputs=inputs, short=f"{word}比現金多，賺得還")
+    return _flag("red", f"{noun}比手上的現金多、花的錢又比賺的多——{word}到期可能要再借錢或增資（沒有營業現金流的資料，"
+                 f"分不出是本業燒錢還是擴產）{note}", rule=_DEBT_RULE, inputs=inputs,
+                 short=f"{word}比現金多，花得比賺得多")
 
 
 _DILUTION_RULE = (
@@ -377,6 +410,6 @@ def tally(flags: Mapping[str, Mapping[str, Any]]) -> dict[str, int]:
     return counts
 
 
-__all__ = ["FLAG_COLOURS", "FULL_YEAR_DAYS", "GOING_CONCERN_HORIZON_MONTHS", "LANE_LABELS",
+__all__ = ["FLAG_COLOURS", "FULL_YEAR_DAYS", "GOING_CONCERN_HORIZON_MONTHS", "LANE_LABELS", "LEASE_BASES",
            "WIPEOUT_LANES", "cash_runway_flag", "debt_flag", "dilution_flag",
            "going_concern_flag", "tally", "wipeout_flags"]

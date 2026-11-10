@@ -536,8 +536,8 @@ def cmd_structure_reading(args: argparse.Namespace) -> int:
     from datetime import date, datetime, timezone
 
     from .providers.structure_readings import (
-        append_reading_record, entity_alias_map, evidence_rank, evidence_splits, fetch_structure_snapshot,
-        fetch_structure_snapshot_with_quotes, read_reading_records, register_reading_watches,
+        append_reading_record, entity_alias_map, entrant_notices, evidence_rank, evidence_splits,
+        fetch_structure_snapshot, fetch_structure_snapshot_with_quotes, read_reading_records, register_reading_watches,
     )
     from .structure_reading import (
         READING_KINDS, READING_UNITS, needs_reread, reading_status, select_readings, structure_reading_record,
@@ -587,12 +587,20 @@ def cmd_structure_reading(args: argparse.Namespace) -> int:
                 supersedes_id=target.reading_id, retracted=True,
                 author=target.author, created_at=datetime.now(timezone.utc),
             )
+        # 反證寫「新進」、圖上 develops 這一層的公司不在 entities（2026-11-10，failure log #143）——只印、不擋；
+        # append 之前算好：算不成只印一行，不能讓 append 之後的等待登記跟著沒跑
+        try:
+            notices = entrant_notices(record) if args.add else []
+        except Exception as exc:  # noqa: BLE001
+            notices = [f"新進者那一項這次沒核成（{type(exc).__name__}: {str(exc)[:80]}）——只是提示，寫入照常"]
         try:
             path = append_reading_record(record, quotes=quotes, related=related)
         except AlphaError as exc:
             print(f"✗ {exc}", file=sys.stderr)
             return 2
         print(f"✓ {record['reading_id']}（{record['unit']}）→ {path}")
+        for line in notices:
+            print(f"  ⚠ {line}")
         return _register_watches(record, register_reading_watches)
 
     today = date.today()

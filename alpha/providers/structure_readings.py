@@ -267,6 +267,26 @@ def demand_side_customers(record: Mapping[str, Any]) -> list[str]:
     return sorted(out)
 
 
+def entrant_notices(record: Mapping[str, Any]) -> list[str]:
+    """寫入收據的提示（只印、不擋；2026-11-10，failure log #143）：反證寫「新進」，圖上 develops 這一層的公司卻不在 entities。
+    公司附 research ticker（名冊有的話）——收據給寫的人看，`co:*` 不夠讀（AGENTS：不假設人從 ID 還原主詞）。"""
+    from identity.registry import get_registry
+
+    from ..structure_reading.entrants import entrant_gaps
+
+    gaps = entrant_gaps(record)
+    if not gaps:
+        return []
+    registry = get_registry()
+
+    def label(cid: str) -> str:
+        ticker = registry.research_ticker(cid)
+        return f"{cid}（{ticker}）" if ticker else cid
+
+    return [f"反證第 {g['n']} 條寫「新進」，圖上 develops 這一層的 {'、'.join(label(c) for c in g['missing'])}"
+            "不在 entities——它們自己公告量產，這一條不會醒（只提醒；要盯就加進 entities 再換版）" for g in gaps]
+
+
 def register_reading_watches(record: Mapping[str, Any], *, watches_path: Path | None = None,
                              directory: Path | None = None) -> dict[str, list[str]]:
     """讀圖 append 成功後的等待登記（Phase 1 Step 1.5；冪等，可重跑）。

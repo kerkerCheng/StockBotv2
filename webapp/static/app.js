@@ -605,14 +605,16 @@ const TQ_DETAIL_LABELS = {
   window_start: '起', window_end: '迄', trading_days_in_window: '窗內交易日', coverage: '覆蓋率',
   theme: '組', n_members: '組內檔數', n_same_basis: '同口徑檔數', currency: '幣別',
   cash_and_equivalents: '現金', free_cash_flow_ttm: '自由現金流（近四季）', runway_months: '現金撐幾個月',
-  total_debt: '總債', market_cap_usd: '市值（美元）', base_outstanding: '期初股數', base_date: '期初日',
+  total_debt: '總債', lease_liabilities: '其中租賃負債（另列，不算借款）', borrowings: '借款（負債燈比的是這個）',
+  market_cap_usd: '市值（美元）', base_outstanding: '期初股數', base_date: '期初日',
   last_outstanding: '最新股數', last_date: '最新日', change: '股數變化', issued_total: '期間發行金額',
   days_since_last: '距上次發行（天）', offering_summary: '募資文件', context_summary: '其他文件',
   revenue_basis: '營收口徑', cover_date: '股數封面日', cover_age_days: '封面距今（天）',
   ordinary_per_listed_unit: '一個掛牌單位＝幾股普通股', listed_unit_source: '比率出處', listed_unit_rejected: '比率沒登記的封面',
 };
 const TQ_DETAIL_PERCENT = { change: true, coverage: true };
-const TQ_DETAIL_SKIP = { source: true, as_of: true, status: true };
+// lease_basis：借款口徑的代碼（分不出租賃時，燈的理由句自己說「總債可能含租約」——代碼不必再印一次）
+const TQ_DETAIL_SKIP = { source: true, as_of: true, status: true, lease_basis: true };
 
 function detailList(detail) {
   const bits = [];

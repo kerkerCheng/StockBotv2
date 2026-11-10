@@ -19,6 +19,7 @@ from datetime import datetime, timezone
 from typing import Any, Callable, Collection, Iterable, Mapping, NamedTuple, Sequence
 
 from .edge import EDGE_LABELS, NOT_EDGE_CONFIRM_RUNS, ON_THRESHOLD_KEYS
+from .narrative.checkpoints import CHECKPOINT_PASSED_PREFIX
 from .narrative.contracts import RECORD_VERSION_V2, InvestorBrief
 from .three_questions import rollup as line_rollup
 
@@ -73,7 +74,9 @@ BODY_BEHIND_KINDS: tuple[str, ...] = ("reading_kind", "supply_count")
 #: 短版 ③ 的選擇（看了沒買）。
 #: 候選列 `rewrite[]` 每一條 → 首頁卡片與個股頁那一行的幾個字（2026-10-29 使用者：「該重寫為啥沒寫…可以五字一目瞭然嗎」）。
 #: 依序比對、先中先贏；原句（含 watch 編號）照舊留在 `rewrite[]`，這裡只分類、不改判斷；認不得的歸「其他」，不丟（INV-3）。
+#: 裁決點已過（2026-11-10，failure log #150）排第一：它的原句帶「已過」「交了」，排後面會被「已到」「到期」那幾條先吃掉。
 REWRITE_WHY: tuple[tuple[str, str], ...] = (
+    (CHECKPOINT_PASSED_PREFIX, "裁決點過了"),
     (READING_KIND_CHANGED_PREFIX, "判讀變了"), (SUPPLY_COUNT_CHANGED_PREFIX, "家數變了"),
     (RIDES_SUPERSEDED_PREFIX, "騎舊讀圖"), (NEW_EDGES_PREFIX, "新邊沒讀"),
     ("連結 ", "連結斷了"), ("觸及", "條件觸及"), ("醒來", "條件醒了"), ("到期", "到期了"), ("已到", "重看日到了"),
@@ -739,6 +742,8 @@ def assemble_board(rows: Sequence[Mapping[str, Any] | None], *, universe: Sequen
     counts["no_deadline"] = len(no_deadline_rows(groups)) if held_ok else None
     # 遲滯（2026-11-01）：今天才翻成非邊緣、還沒列撤回建議的列——照敘事分組，這裡只計數（0 也印；不是待做）
     counts["not_edge_pending"] = sum(1 for row in rows if row is not None and row.get("edge_pending"))
+    # 何時格的裁決點已過（2026-11-10，failure log #150）：照名字在「敘事該重寫」清單裡（kind=checkpoint），這裡只計數
+    counts["checkpoint_passed"] = sum(1 for row in rows if row is not None and row.get("checkpoint_passed"))
     return {"groups": groups, "side_groups": sides, "counts": counts, "oldest_stall_days": oldest,
             "universe": sorted(universe),
             "holdings": {"status": held.get("status"), "reason": held.get("reason"),
@@ -749,7 +754,7 @@ def assemble_board(rows: Sequence[Mapping[str, Any] | None], *, universe: Sequen
             "narrative_rewrite": [dict(b) for b in narrative_rewrite]}
 
 
-__all__ = ["ADDON_GROUPS", "ANSWER_WORDS", "CANDIDATES_THIS_IS_NOT", "GROUPS", "GROUP_LABELS", "IN_NUMBERS_LINES",
+__all__ = ["ADDON_GROUPS", "ANSWER_WORDS", "CANDIDATES_THIS_IS_NOT", "CHECKPOINT_PASSED_PREFIX", "GROUPS", "GROUP_LABELS", "IN_NUMBERS_LINES",
            "LIGHT_ORDER", "LIGHT_WORDS", "LIST_GROUPS", "LIST_GROUP_LABELS", "NEW_EDGES_PREFIX", "NOT_EDGE_PENDING_PREFIX",
            "ON_THRESHOLD_WORDS", "PRICED_IN_LINES", "RETIRED_READ_SINCE", "RETIRED_STATE_LABELS",
            "REWRITE_STATE_WORDS", "REWRITE_WHY", "RIDES_SUPERSEDED_PREFIX", "SIDE_GROUPS", "SIDE_LABELS", "UNANSWERED",
