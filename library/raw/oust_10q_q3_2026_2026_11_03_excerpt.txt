@@ -1,0 +1,18 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1816581/000162828026069640/oust-20260930.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Ouster, Inc. Form 10-Q（quarterly period ended September 30, 2026；2026-11-03 申報）營收歸因、主要客戶、地區營收
+DATE: 2026-11-03
+RETRIEVED: 2026-11-10（EDGAR 原文抽字，空白正規化後逐字切出）
+NOTE: 發行人申報；客戶以代號列示、沒有具名。
+
+【營收歸因（MD&A）】
+"Revenue increased by $19.8 million or 50%, to $59.3 million for the three months ended September 30, 2026 from $39.5 million for the comparable period in the prior year. The increase in revenue was primarily driven by the inclusion of revenue from products acquired through the Stereolabs acquisition, for which there was no comparable revenue contribution in the prior-year period. as well as increased sensor volumes as customers increased their purchase levels compared to the prior year period, offset in part by decreased ASPs."
+"Revenue increased by $55.3 million, or 52%, to $162.5 million for the nine months ended September 30, 2026, from $107.2 million for the comparable period in the prior year."
+
+【主要客戶（10% or more of total revenue；Three Months 2026／2025，Nine Months 2026／2025）】
+"Customer E 15 % 36 % 25 % 26 %"
+
+【地區營收（千美元；Three Months 2026／2025，Nine Months 2026／2025）】
+"Americas $ 34,765 $ 26,348 $ 102,990 $ 66,312"
+"Asia and Pacific 15,307 7,455 35,863 26,092"
