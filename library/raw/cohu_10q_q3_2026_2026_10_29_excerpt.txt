@@ -1,0 +1,11 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/21535/000143774926033843/cohu20260926_10q.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Cohu, Inc. Form 10-Q（quarter ended September 26, 2026；2026-10-29 申報）營收歸因
+DATE: 2026-10-29
+RETRIEVED: 2026-11-10（EDGAR 原文抽字，空白正規化後逐字切出）
+NOTE: 發行人申報。全文搜尋 co-packaged、CPO、silicon photonics、HBM：0 次。
+
+【營收（MD&A）】
+"For the three months ended September 26, 2026, net sales increased 16.1% sequentially to $173.0 million from $149.0 million in the second quarter of fiscal 2026."
+"Our consolidated net sales increased 37.0% to $173.0 million in 2026, compared to $126.2 million in 2025. Net sales for the third quarter of fiscal 2026 increased compared to the same period in fiscal 2025, primarily driven by stronger demand across AI‑based computing applications, industrial and automotive semiconductor markets. Meanwhile, demand in mobile and consumer end markets remained relatively consistent year-over-year."

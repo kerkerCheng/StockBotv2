@@ -1,0 +1,11 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/912093/000162828026071076/viav-20261003.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Viavi Solutions Inc. Form 10-Q（quarter ended October 3, 2026；2027 財年第一季；2026-11-05 申報）營收歸因
+DATE: 2026-11-05
+RETRIEVED: 2026-11-10（EDGAR 原文抽字，空白正規化後逐字切出）
+NOTE: 發行人申報。全文搜尋 co-packaged、CPO、silicon photonics：0 次。
+
+【營收歸因（MD&A）】
+"Net revenue increased by $170.2 million, or 56.9%, during the three months ended October 3, 2026 compared to the same period a year ago. This increase was primarily from strong demand for lab and production and field products, driven by the data center ecosystem, our acquisition of Spirent’s HSE and CE business, as well as demand for our aerospace and defense products. Our acquisition of Spirent’s HSE and CE business contributed $52.7 million during the three months ended October 3, 2026."
+"NSE net revenue increased by $160.1 million, or 74.1%, during the three months ended October 3, 2026 compared to the same period a year ago, primarily driven by higher volume in Lab and Production ($52.7 million contributed by our acquisition of Spirent’s HSE and CE business), Fiber and Access Solutions and Aerospace and Defense, partially offset by lower volume in Wireless."
