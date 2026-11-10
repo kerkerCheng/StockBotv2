@@ -1,0 +1,26 @@
+Source URL: https://www.fool.com/earnings/call-transcripts/2026/08/13/arbe-robotics-arbe-q2-2026-earnings-call-transcript/
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Arbe Robotics（ARBE）2026 第二季法說逐字（法說 2026-08-06 美東 8:30；Motley Fool 轉錄稿 2026-08-13 刊出）——Hirain L4 量產時程、robotaxi、國防、燒錢、全年指引
+RETRIEVED: 2026-11-11（本機抓 HTML、去標籤；HTML 實體（&#x27; 等）還原成標點，其餘逐字）
+STORAGE: 第三方轉錄（Motley Fool），不是公司公布的逐字稿；發言者是 Arbe 管理層（L8：發行人自述）。
+
+【執行長 Ram Machness，Hirain L4 專案】
+"In December, we announced that HiRain radar with our chipset was selected for a Level 4 program with a large Chinese automaker. During the quarter, we continued to ship chipsets to support this customer. HiRain advised us that they are now progressing towards the start of production, which is planned in the next few months."
+
+【執行長，robotaxi】
+"During the second quarter, we showed further progress and our radar systems were integrated into their vehicles. I'm pleased to say that these vehicles have now started on both trials."
+
+【執行長，燒錢與跑道】
+"And given our expected reduced quarterly burn rate, we believe we have sufficient runway to fully execute on our strategy."
+
+【財務長 Karine Pinto-Flomenboim，第二季數字】
+"Revenue for the second quarter of 2026 totaled $0.7 million compared to $0.3 million in Q2 2025. This was our third consecutive quarter of revenue growth. Backlog as of June 30, 2026, was $1 million."
+"As of June 30, 2026, Arbe held $41.9 million in cash, cash equivalents and short-term bank deposits."
+"Arbe continues to expect full year revenue in the range of $4 million to $6 million and an adjusted EBITDA in the range of $28 million loss to $31 million loss."
+
+【問答，robotaxi 時程（回答者照轉錄稿未標名）】
+"And the launch of the development of the per stack based on our radar is now beginning, and we expect to roll out towards end of the year and beginning of next year. And that's with one of the robotaxi providers, there are more coming that are right now in earlier stages."
+
+【轉錄稿要點欄（Motley Fool 編輯整理，不是發言原文）】
+"Management expects the full effect of cost-saving measures to be reflected in the third quarter of 2026, targeting a quarterly cash burn below $7 million."

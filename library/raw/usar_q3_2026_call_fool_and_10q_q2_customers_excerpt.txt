@@ -1,0 +1,27 @@
+Source URL: https://www.fool.com/earnings/call-transcripts/2026/11/10/usa-rare-earth-usar-q3-2026-earnings-call-transcript/
+Source URL (2): https://www.sec.gov/Archives/edgar/data/1970622/000197062226000057/usar-20260630.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] USA Rare Earth（USAR）①2026 第三季法說逐字（法說 2026-11-09 美東 17:00；Motley Fool 轉錄稿 2026-11-10 刊出）——磁材第一筆商用出貨、原型銷售、意向書與 MOU、認證週期、Stillwater 與 Blacksburg 產能、Round Top 時程 ②第二季 10-Q（2026-08-10 申報）Note 11 Concentrations——主要客戶
+RETRIEVED: 2026-11-11（本機抓 HTML、去標籤；HTML 實體（&#x27; 等）還原成標點，其餘逐字；10-Q 為 SEC EDGAR 原文抽字、空白正規化）
+STORAGE: ①是第三方轉錄（Motley Fool），不是公司公布的逐字稿；發言者是 USAR 管理層（L8：發行人自述，買方都沒具名）。第三季 10-Q 到 2026-11-11 還沒申報（非加速申報人，法定期限 11-16）。
+
+【① 執行長 Thras Moraitis，磁材】
+"In addition to the significant progress at Serra Verde, September saw us deliver another important achievement, our first commercial magnet sales from production at Stillwater, sintered NDFE block magnets to a high-performance material manufacturer. We also expect to sell finished magnet prototypes to multiple customers by the year-end. We have signed letters of intent and MOUs covering approximately 2,500 tonnes of magnets and secured purchase orders across the industrial, mobility, aerospace and defense sectors."
+"Installation of Line B, which will double capacity is now underway and is expected to be commissioned in quarter 1 of next year. In September, we broke ground on our magnet facility in Blacksburg, South Carolina. Together with the full build-out of Stillwater, once online, Blacksburg is expected to bring our total U.S. magnet capacity to approximately 10,000 tonnes per annum."
+
+【① 財務長，第三季營收】
+"Revenue for the quarter, which represents sales to third parties was $3 million and included our first revenue from NdFeB magnet sales. As Thras noted, the decrease from the second quarter reflects industry-wide raw material shortages caused by China's export restrictions, most notably in heavy rare earths and Samarium metal. This limited what LCM and Stillwater could produce and sell."
+
+【① 問答】
+"Yes. So we're currently in prototype sales, which means we are proving the fact that we can sell magnets to our customers, but prototype cells are low volumes."
+"It can be anywhere from 6 to 9 months on the low end to as much as 2 years."
+"So we are seeking to be ready to reach FID in the second half of next year."
+
+【② 第二季 10-Q Note 11——Disaggregation of Revenue／Major Customers（Three Months Ended June 30, 2026／Six Months Ended June 30, 2026）】
+"All of the Company’s revenue is derived from sales of casting and strip casting."
+"Customer 1 26 % 37 %"
+"Customer 2 29 % 23 %"
+"Customer 3 23 % 18 %"
+"Customer 4 18 % 17 %"
+"Total revenue $ 5,821 $ 11,519"（In thousands）
