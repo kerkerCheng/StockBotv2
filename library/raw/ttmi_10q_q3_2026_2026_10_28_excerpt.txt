@@ -1,0 +1,16 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1116942/000119312526435875/ttmi-20260928.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] TTM Technologies Form 10-Q（quarter ended September 28, 2026；2026-10-28 申報）營收歸因、資本支出、擴廠租約
+DATE: 2026-10-28
+RETRIEVED: 2026-11-10（EDGAR 原文抽字，空白正規化後逐字切出）
+NOTE: 發行人申報。全文搜尋 laminate、copper、lead time、allocation 在 MD&A 與風險段沒有新的供應說法（只有前瞻泛句 a significant portion of our manufacturing material was provided by international suppliers）。
+
+【營收歸因（MD&A）】
+"Total net sales increased $451.1 million, or 59.9%, to $1,203.9 million for the quarter ended September 28, 2026, from $752.7 million for the quarter ended September 29, 2025. The primary drivers of this increase were due to continued strong demand in our data center and networking end market driven by the continued build out of AI data centers and related applications, as well as strong growth in our medical, industrial, and instrumentation and aerospace and defense end markets."
+
+【資本支出】
+"Our total 2026 capital expenditures are expected to be in the range of $410.0 million to $430.0 million, which we increased primarily due to our recently announced plan to invest an additional $400.0 million in additional capacity expansion to support our growing demand for AI infrastructure."
+
+【擴廠租約】
+"As of September 28, 2026, the Company entered into seven facility lease agreements that have not yet commenced in order to expand manufacturing and corporate capacity. Total undiscounted future minimum lease commitments under these agreements are $ 25,078 for leases that are expected to commence starting in the fourth quarter of 2026 through 2027 with initial terms ranging from five to eight years."

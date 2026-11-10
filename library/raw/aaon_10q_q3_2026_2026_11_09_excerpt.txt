@@ -1,0 +1,24 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/824142/000082414226000088/aaon-20260930.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] AAON, Inc.（The Aaon Group）Form 10-Q（quarter ended September 30, 2026；2026-11-09 申報）品牌營收、backlog、資料中心說法
+DATE: 2026-11-09
+RETRIEVED: 2026-11-10（EDGAR 原文抽字，空白正規化後逐字切出）
+NOTE: 發行人申報；資料中心客戶沒具名。全文沒有 CDU 交期、配額、預付的字樣。
+
+【品牌營收（Three Months Ended September 30, 2026；千美元）】
+"AAON-branded Products $ 283,138 $ 27,091 $ — $ 310,229"
+"BASX-branded Products 354 165,539 231,308 397,201"
+"Total $ 283,492 $ 192,630 $ 231,308 $ 707,430"
+
+【營收歸因】
+"Net sales for the three months ended September 30, 2026, grew 84.1% to $707 million driven by the strong demand and growth of our BASX-branded products. BASX-branded products increased 218.3%, or $272.4 million when compared to the three months ended September 30, 2025."
+
+【Backlog（表頭：September 30, 2026／December 31, 2025／September 30, 2025；千美元）】
+"AAON-branded Products $ 499,341 $ 526,350 $ 423,316"
+"BASX-branded Products 1,355,152 1,302,145 896,824"
+"Total Backlog $ 1,854,493 $ 1,828,495 $ 1,320,140"
+"At September 30, 2026, our consolidated backlog is $1,854.5 million, an increase of 40.5%, or $534.4 million, as compared to September 30, 2025. Backlog is up from a year ago for both AAON-branded products and BASX-branded products with BASX-branded products increasing 51.1%, or $458.3 million, when compared to September 30, 2025. Most of these orders were associated with the BASX-branded data center liquid cooling solutions."
+
+【資料中心】
+"However, a significant portion of our data center sales comes from a limited number of customers, and the timing of their orders and deliveries can vary."
