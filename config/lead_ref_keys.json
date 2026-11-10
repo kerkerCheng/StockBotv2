@@ -339,6 +339,12 @@
         "value_type": "string_list",
         "description": "Form 4 原始 XML 的 non-derivative 交易代碼（harvest 讀，fetchers.edgar.form4_transaction_codes；P＝公開市場或私下買進、S＝賣出、A＝授予、M＝行使）。含 P 的不 auto no_go、留給分類層（2026-11-03 盲點修法第 15 條後半）；讀不到的照舊 auto no_go，數在 harvest log 的 filter.form4_unread"
       }
+    },
+    "mops_history": {
+      "mops_history_query": {
+        "value_type": "string",
+        "description": "MOPS 歷史重訊回補（failure log #148）抓到的這則：重抓它的確切參數（ajax_t05st01 的 step=2 POST）。回補 lead 的 URL 與每日 opendata 同一把去重鍵、點進去不會有這則，追源靠這一欄"
+      }
     }
   }
 }

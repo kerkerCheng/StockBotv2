@@ -8,7 +8,7 @@ mops_open_data.py — 公開資訊觀測站（MOPS）的**結構化開放資料*
 - **本檔**抓的是**已經結構化的數字與公告**，不經 LLM 抽取：月營收是帶時戳的財務觀測，
   依 A1「圖不含時變數字」直接進 Engine C；重訊是 Engine B 的 lead 原料。
 
-五個來源（1–4 於 2026-09-17、5 於 2026-10-05 實測過，不是照文件抄的）：
+六個來源（1–4 於 2026-09-17、5 於 2026-10-05、6 於 2026-11-10 實測過，不是照文件抄的）：
 
 1. 當期月營收（上市）`https://openapi.twse.com.tw/v1/opendata/t187ap05_L`
 2. 當期月營收（上櫃）`https://www.tpex.org.tw/openapi/v1/mopsfin_t187ap05_O`
@@ -16,6 +16,9 @@ mops_open_data.py — 公開資訊觀測站（MOPS）的**結構化開放資料*
 4. 當日重大訊息      `.../t187ap04_L`（上市）與 `.../mopsfin_t187ap04_O`（上櫃）
 5. 資產負債表彙總    `https://mopsov.twse.com.tw/mops/web/ajax_t163sb05`（POST；一季一份、全市場；UTF-8）——
    台股**歷史股數**唯一的機械來源（換算與交叉核對在 `engine_c.tw_share_capital`）
+6. 歷史重大訊息      `https://mopsov.twse.com.tw/mops/web/ajax_t05st01`（POST；一家公司一個年月一頁；UTF-8）——
+   重訊**唯一**補得回來的來源（failure log #148）。列表只有主旨，「說明」要拿列上「詳細資料」按鈕的參數再打一次
+   `step=2`；查無資料、公司不存在都回 200（見 `parse_announcement_history`）
 
 **五個坑，每一個都實測撞過：**
 
@@ -24,7 +27,7 @@ mops_open_data.py — 公開資訊觀測站（MOPS）的**結構化開放資料*
    （`SecuritiesCompanyCode`、`CompanyName`、`Date`）。只照一份鍵名寫死，另一邊會
    **靜默回空集合**——而空集合與「今天真的沒有重訊」同形（L13-2）。
 2. **兩個 opendata endpoint 都只有「當期」**：月營收是最新一個月、重訊是最近一兩天。
-   要**序列**只能走來源 3（一個年月一個 HTML 檔）。
+   要**序列**只能走來源 3（一個年月一個 HTML 檔）；重訊要回補走來源 6（一家公司一個年月一頁）。
 3. **歷史頁是 big5（cp950），且上市版比上櫃版多一個前置欄位。** 欄位不能按位置數，
    要先找到「4 位數字代號」那一格再往後對齊。
 4. **單位是新台幣千元，不是元。** 差 1000 倍。本檔一律原樣回傳千元，並由呼叫端把
@@ -39,10 +42,12 @@ mops_open_data.py — 公開資訊觀測站（MOPS）的**結構化開放資料*
     python -m fetchers.mops_open_data --revenue --market tpex
     python -m fetchers.mops_open_data --revenue --market tpex --year 2026 --month 7
     python -m fetchers.mops_open_data --announcements
+    python -m fetchers.mops_open_data --history 8358.TWO --year 2026 --month 10 --with-detail
 """
 from __future__ import annotations
 
 import argparse
+import html
 import json
 import re
 import sys
@@ -80,6 +85,22 @@ ANNOUNCEMENT_URL: dict[str, str] = {
 REVENUE_HISTORY_URL = "https://mopsov.twse.com.tw/nas/t21/{segment}/t21sc03_{year}_{month}_{kind}.html"
 
 BALANCE_SHEET_URL = "https://mopsov.twse.com.tw/mops/web/ajax_t163sb05"
+
+ANNOUNCEMENT_HISTORY_URL = "https://mopsov.twse.com.tw/mops/web/ajax_t05st01"
+#: 歷史重訊（來源 6）每打一次之後停幾秒。這台主機同時服務月營收、季報股數與年報下載，而無人值守每天要逐檔打一輪
+#: （harvest 的每輪上限住 `crons.harvest_leads.MOPS_HISTORY_LIMITS`）——太密被擋的話，被擋的不只重訊。
+#: 2026-11-10 以 3 秒節流連打 28 檔各 4 個月的列表沒被擋（8 分半、連線逾時 1 次）。
+HISTORY_PACE_SECONDS = 3.0
+#: 歷史查詢回 200 的兩種非列表頁（2026-11-10 實測）：「這個月沒有重訊」與「代號不存在」。其餘認不得的頁一律 raise——
+#: **不回空集合**（L13-2：「沒有重訊」與「抓不到」不得同形）。
+_HISTORY_NO_DATA = "查無需求資料"
+_HISTORY_NO_COMPANY = "之公司不存在"
+#: 列上「詳細資料」按鈕寫進表單的五個參數（`document.t05st01_fm.<欄>.value='…'`）——step=2 照原樣送回去。
+_HISTORY_KEY_FIELDS: tuple[str, ...] = ("seq_no", "spoke_time", "spoke_date", "co_id", "TYPEK")
+_HISTORY_ONCLICK = re.compile(r"\.(seq_no|spoke_time|spoke_date|co_id|TYPEK)\.value='([^']*)'")
+#: 說明頁是「標籤格、值格」交錯排列；只認這幾個標籤。
+_DETAIL_LABELS = frozenset({"序號", "發言日期", "發言時間", "發言人", "發言人職稱", "發言人電話", "主旨", "符合條款",
+                            "事實發生日", "說明"})
 
 #: 資產負債表彙總（t163sb05）一季一份回應、每個產業版型一張表。**只收已登記的兩種版型**——表頭逐字相同才算
 #: （2026-10-05 實測：上市／上櫃 112Q1 與 115Q2 的表頭一字不差，MOPS 用現行版型重出舊季）。
@@ -122,6 +143,16 @@ _TAG = re.compile(r"<[^>]+>")
 
 class MopsOpenDataError(RuntimeError):
     """來源拿不到或回傳的形狀不是我們認得的。**不靜默回空集合。**"""
+
+
+class MopsHistoryError(MopsOpenDataError):
+    """歷史重訊（來源 6）回了 200 但不是能用的東西——帶 harvest_log 要記的 `result`／`failure_class`：
+    版型認不得（parse_failed／parse_error）與代號不存在（parse_failed／not_found）是兩件事，也都不是「沒有重訊」。"""
+
+    def __init__(self, message: str, *, result: str = "parse_failed", failure_class: str = "parse_error") -> None:
+        super().__init__(message)
+        self.result = result
+        self.failure_class = failure_class
 
 
 # ---------------------------------------------------------------------------
@@ -195,6 +226,38 @@ def _text(value: Any) -> str:
     return unicodedata.normalize("NFC", raw).strip()
 
 
+def _html_text(fragment: Any) -> str:
+    """HTML 格 → 文字：先去 tag、再還原 entity（`&nbsp;`、`&amp;`；順序反過來 `&lt;` 會被當成 tag 吃掉）、NFC。
+    **保留換行**——長主旨在當日批次與歷史頁都斷在同一處（`\\r\\n`），而主旨是去重鍵的一部分
+    （`crons.harvest_leads.announcements_to_leads`）。"""
+
+    raw = html.unescape(_TAG.sub("", str(fragment or ""))).replace("\xa0", " ")
+    return unicodedata.normalize("NFC", raw).strip()
+
+
+def _roc_slash_date(value: Any) -> str | None:
+    """`115/10/16` → `2026-10-16`（歷史頁的寫法）；不合法回 None。"""
+
+    parts = str(value or "").strip().split("/")
+    if len(parts) != 3 or not all(part.isdigit() for part in parts):
+        return None
+    return roc_date_to_iso(f"{parts[0]}{int(parts[1]):02d}{int(parts[2]):02d}")
+
+
+def _clock(value: Any) -> str | None:
+    """`144930`（當日批次）或 `14:49:30`（歷史頁）→ `14:49:30`；不合法回 None。兩個來源共用這一個寫法——
+    發言時刻是去重鍵的一部分，各寫一份就會在某個邊角算出兩把鑰匙。"""
+
+    raw = _text(value).replace(":", "")
+    if not raw.isdigit() or len(raw) > 6:
+        return None
+    padded = raw.zfill(6)
+    hour, minute, second = padded[:2], padded[2:4], padded[4:]
+    if int(hour) < 24 and int(minute) < 60 and int(second) < 60:
+        return f"{hour}:{minute}:{second}"
+    return None
+
+
 def _int(value: Any) -> int | None:
     """`"  520,469 "` → `520469`；`-`／空字串 → None（缺料不是 0）。"""
 
@@ -242,14 +305,14 @@ def _get(url: str, *, timeout: int = 40) -> requests.Response:
     return response
 
 
-def _post(url: str, data: Mapping[str, str], *, timeout: int = 60) -> requests.Response:
+def _post(url: str, data: Mapping[str, str], *, timeout: int = 60, pace: float = 0.5) -> requests.Response:
     try:
         response = requests.post(url, data=dict(data), headers=build_headers(), timeout=timeout)
     except requests.RequestException as exc:  # pragma: no cover - 網路
         raise MopsOpenDataError(f"{url} 取得失敗：{type(exc).__name__}: {exc}") from exc
     if response.status_code != 200:
         raise MopsOpenDataError(f"{url} 回應 {response.status_code}")
-    rate_sleep(0.5)
+    rate_sleep(pace)
     return response
 
 
@@ -434,13 +497,7 @@ def _announcement_row(
     if not _CODE.fullmatch(code):
         return None
     spoke_date = roc_date_to_iso(_first(row, "發言日期", "SpokenDate"))
-    raw_time = _text(_first(row, "發言時間", "SpokenTime"))
-    spoke_time = None
-    if raw_time.isdigit() and len(raw_time) <= 6:
-        padded = raw_time.zfill(6)
-        hour, minute, second = padded[:2], padded[2:4], padded[4:]
-        if int(hour) < 24 and int(minute) < 60 and int(second) < 60:
-            spoke_time = f"{hour}:{minute}:{second}"
+    spoke_time = _clock(_first(row, "發言時間", "SpokenTime"))
     return {
         "market": market,
         "company_code": code,
@@ -475,6 +532,115 @@ def fetch_material_announcements(market: str) -> list[dict[str, Any]]:
         rows.append(row if row is not None else {"market": market, "company_code": code, "ticker": "",
                                                  "source_url": url})
     return rows
+
+
+def parse_announcement_history(body: str, *, ticker: str) -> list[dict[str, Any]]:
+    """一頁歷史重訊列表（來源 6）→ 重訊列：形狀與 `_announcement_row` 相同（`detail` 留 None，待 step=2 補），另帶
+    `detail_key`（列上按鈕的五個參數；缺任何一個就是 None）。
+
+    ⚠ `source_url` 刻意填**當日批次**的 endpoint：lead 的 URL 是去重鍵（`announcements_to_leads`），同一則重訊
+    回補與每日抓到必須算出同一把——2026-11-10 拿池裡 20 則現有重訊重組，逐字相同 20／20（含主旨斷行、含 `&`）。
+    實際從哪裡抓的記在 lead 的 refs（`mops_history_query`）。
+
+    查無資料回 `[]`；代號不存在、認不得的頁 raise `MopsHistoryError`。"""
+
+    market, code = market_for_ticker(ticker), company_code(ticker)
+    if market is None or code is None:
+        raise MopsHistoryError(f"{ticker} 認不出交易所或代號", failure_class="not_found")
+    rows: list[dict[str, Any]] = []
+    for raw_row in _ROW.findall(body):
+        cells = [_html_text(cell) for cell in _CELL.findall(raw_row)[:5]]
+        if len(cells) < 5 or cells[0] != code:
+            continue
+        spoke_date = _roc_slash_date(cells[2])
+        if spoke_date is None:
+            continue
+        key = dict(_HISTORY_ONCLICK.findall(raw_row))
+        rows.append({
+            "market": market,
+            "company_code": code,
+            "ticker": ticker_for(market, code),
+            "company_name": cells[1],
+            "subject": cells[4],
+            "clause": None,
+            "fact_date": None,
+            "spoke_date": spoke_date,
+            "spoke_time": _clock(cells[3]),
+            "detail": None,
+            "report_date": None,
+            "source_url": ANNOUNCEMENT_URL[market],
+            "detail_key": key if all(key.get(field) for field in _HISTORY_KEY_FIELDS) else None,
+        })
+    if rows:
+        return rows
+    text = _html_text(body)
+    if _HISTORY_NO_DATA in text:
+        return []
+    if _HISTORY_NO_COMPANY in text:
+        raise MopsHistoryError(f"MOPS 說 {code} 這家公司不存在", failure_class="not_found")
+    raise MopsHistoryError(f"{ticker} 的歷史重訊頁認不得（不是列表、不是查無資料）：{text[:80]}")
+
+
+def fetch_announcement_history(ticker: str, year: int, month: int) -> list[dict[str, Any]]:
+    """一家公司一個年月（西元）的歷史重訊列表（還沒有說明；說明走 `fetch_announcement_detail`）。"""
+
+    code = company_code(ticker)
+    if code is None or market_for_ticker(ticker) is None:
+        raise MopsHistoryError(f"{ticker} 認不出交易所或代號", failure_class="not_found")
+    if not 1 <= int(month) <= 12 or int(year) - 1911 <= 0:
+        raise MopsOpenDataError(f"年月不合法：{year}-{month}")
+    data = {"encodeURIComponent": "1", "step": "1", "firstin": "1", "off": "1", "queryName": "co_id",
+            "inpuType": "co_id", "TYPEK": "all", "co_id": code, "year": str(int(year) - 1911),
+            "month": f"{int(month):02d}"}
+    body = _post(ANNOUNCEMENT_HISTORY_URL, data, pace=HISTORY_PACE_SECONDS).content.decode("utf-8", errors="replace")
+    return parse_announcement_history(body, ticker=ticker)
+
+
+def parse_announcement_detail(body: str) -> dict[str, Any]:
+    """一則重訊的說明頁（step=2）→ `{spoke_date, spoke_time, subject, clause, fact_date, detail}`。
+    找不到「說明」這個標籤＝版型認不得，raise——不回空說明（說明是空的那種公告，標籤照樣在、值是空字串）。"""
+
+    cells = [_html_text(cell) for cell in _CELL.findall(body)]
+    values: dict[str, str] = {}
+    for index, cell in enumerate(cells[:-1]):
+        if cell in _DETAIL_LABELS and cell not in values:
+            values[cell] = cells[index + 1]
+    if "說明" not in values:
+        raise MopsHistoryError(f"說明頁認不得（找不到「說明」）：{_html_text(body)[:80]}")
+    return {
+        "spoke_date": _roc_slash_date(values.get("發言日期")),
+        "spoke_time": _clock(values.get("發言時間")),
+        "subject": values.get("主旨") or None,
+        "clause": re.sub(r"\s+", " ", values.get("符合條款") or "").strip() or None,
+        "fact_date": _roc_slash_date(values.get("事實發生日")),
+        "detail": values.get("說明") or None,
+    }
+
+
+def fetch_announcement_detail(row: Mapping[str, Any]) -> dict[str, Any]:
+    """替 `parse_announcement_history` 的一列補說明（step=2）→ 補好 `detail`／`clause`／`fact_date` 的新列，另帶
+    `history_query`（重抓**這一則**的確切參數——回補 lead 的 URL 只是去重鍵，點進去不會有這則）。
+    **說明頁的發言日期與時刻必須和列相同**——對不上就 raise，不把別則的說明掛到這則的 lead 上。主旨照列上的
+    （它是去重鍵的一部分），不拿說明頁的蓋。"""
+
+    key = row.get("detail_key")
+    if not isinstance(key, Mapping) or not all(key.get(field) for field in _HISTORY_KEY_FIELDS):
+        raise MopsHistoryError("列上沒有「詳細資料」按鈕的參數，抓不到說明")
+    spoke = str(key["spoke_date"])
+    if len(spoke) != 8 or not spoke.isdigit():
+        raise MopsHistoryError(f"按鈕的發言日期認不得：{spoke}")
+    data = {"step": "2", "firstin": "true", "off": "1", **{field: str(key[field]) for field in _HISTORY_KEY_FIELDS},
+            "year": str(int(spoke[:4]) - 1911), "month": spoke[4:6], "b_date": "", "e_date": ""}
+    body = _post(ANNOUNCEMENT_HISTORY_URL, data, pace=HISTORY_PACE_SECONDS).content.decode("utf-8", errors="replace")
+    parsed = parse_announcement_detail(body)
+    if (parsed["spoke_date"], parsed["spoke_time"]) != (row.get("spoke_date"), row.get("spoke_time")):
+        raise MopsHistoryError(f"說明頁的發言時刻 {parsed['spoke_date']} {parsed['spoke_time']} 對不上列的 "
+                               f"{row.get('spoke_date')} {row.get('spoke_time')}")
+    out = dict(row)
+    out.update(clause=parsed["clause"], fact_date=parsed["fact_date"], detail=parsed["detail"],
+               history_query=f"{ANNOUNCEMENT_HISTORY_URL}（POST step=2&"
+                             + "&".join(f"{field}={key[field]}" for field in _HISTORY_KEY_FIELDS) + "）")
+    return out
 
 
 def select_tickers(
@@ -515,14 +681,25 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="MOPS 開放資料：月營收與重大訊息")
     parser.add_argument("--revenue", action="store_true", help="抓月營收")
     parser.add_argument("--announcements", action="store_true", help="抓當日重大訊息")
+    parser.add_argument("--history", metavar="TICKER",
+                        help="一家公司一個年月的歷史重大訊息（要配 --year --month；--with-detail 逐則補說明，一則多打一次）")
+    parser.add_argument("--with-detail", action="store_true", help="搭配 --history：逐則抓說明")
     parser.add_argument("--market", choices=MARKETS, help="不給就兩個市場都抓")
     parser.add_argument("--year", type=int, help="歷史月營收的西元年（要配 --month）")
     parser.add_argument("--month", type=int, help="歷史月營收的月份")
     parser.add_argument("--ticker", action="append", default=[], help="只印這些標的（可重複）")
     args = parser.parse_args(argv)
 
+    if args.history:
+        if not (args.year and args.month):
+            parser.error("--history 要配 --year 與 --month")
+        rows = fetch_announcement_history(args.history.strip().upper(), args.year, args.month)
+        if args.with_detail:
+            rows = [fetch_announcement_detail(row) for row in rows]
+        print(json.dumps({"history": rows}, ensure_ascii=False, indent=2))
+        return 0
     if not args.revenue and not args.announcements:
-        parser.error("至少要有 --revenue 或 --announcements")
+        parser.error("至少要有 --revenue、--announcements 或 --history")
     markets = [args.market] if args.market else list(MARKETS)
     out: dict[str, Any] = {}
     for market in markets:

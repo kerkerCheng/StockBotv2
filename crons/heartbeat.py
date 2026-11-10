@@ -193,6 +193,30 @@ def mops_batch_line(batches: Mapping[str, Mapping[str, Any]]) -> str | None:
     return "MOPS 全市場重訊（最後一輪）：" + "；".join(parts)
 
 
+def mops_history_line(latest: Mapping[str, Mapping[str, Any]]) -> str | None:
+    """段 1：MOPS 重訊回補（failure log #148）各檔最後一輪的加總——補進幾則（**每日漏抓的**與 90 天回補分開數：前者是
+    「當日批次漏了幾則」的常駐計數器）、池裡已有幾則、說明沒抓到幾則（額度用完＋失敗；非 0 標粗——那幾檔這輪不算補完、
+    下輪重來）、90 天回補還沒做的幾檔、抓不到幾檔（是哪幾檔在上一行的失敗清單，`mops-history:<代號>`）。
+    還沒有回補紀錄就不印。"""
+    from engine_b.leads import MOPS_HISTORY_SOURCE_PREFIX
+
+    rows = {source: row for source, row in latest.items() if source.startswith(MOPS_HISTORY_SOURCE_PREFIX)}
+    if not rows:
+        return None
+    done = [row["filter"] for row in rows.values()
+            if row.get("result") == "ok" and isinstance(row.get("filter"), Mapping)]
+
+    def total(key: str, *, initial: bool | None = None) -> int:
+        return sum(int(f.get(key) or 0) for f in done if initial is None or bool(f.get("initial")) == initial)
+
+    pending = total("deferred") + total("detail_failed")
+    detail = f"**說明沒抓到 {pending} 則**（下輪重來）" if pending else "說明沒抓到 0"
+    failed = len(rows) - len(done)
+    return (f"MOPS 重訊回補（各檔最後一輪，{len(rows)} 檔）：補進每日漏抓的 {total('registered', initial=False)} 則"
+            f"＋90 天回補 {total('registered', initial=True)} 則｜池裡已有 {total('in_pool')}｜{detail}"
+            f"｜90 天回補待做 {total('awaiting_backfill')} 檔｜抓不到 {failed} 檔")
+
+
 def form4_line(latest: Mapping[str, Mapping[str, Any]]) -> str | None:
     """段 1：EDGAR Form 4 的交易代碼過濾（盲點修法 §2 第 15 條後半；INV-3）——各檔最後一輪有新申報的加總：新幾份、
     含 P（公開市場買進，留給分類層）幾份、交易代碼讀不到（照舊 auto no_go）幾份。讀不到非 0 才標粗（恆亮不帶資訊，L14-4）；
@@ -254,6 +278,9 @@ def build_freshness(*, now: datetime, state_dir: Path | None, leads_path: Path,
         mops = mops_batch_line(batches)
         if mops:
             section.lines.append(mops)
+        mops_history = mops_history_line(latest)
+        if mops_history:
+            section.lines.append(mops_history)
         form4 = form4_line(latest)
         if form4:
             section.lines.append(form4)

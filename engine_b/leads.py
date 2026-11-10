@@ -66,6 +66,10 @@ HARVEST_FAILURE_CLASSES: frozenset[str] = FAILURE_CLASSES
 #: MOPS 全市場那一批的 harvest_log 來源前綴（2026-11-03 盲點修法 §1 第 4 條）：帶全市場的過濾報告（`filter`），
 #: 心跳段 1 自己一行、不算一個來源。⚠ 不用 `mops:` 開頭——lead 來源判斷（`announcement_category` 等）認的是 `mops:`。
 MOPS_BATCH_SOURCE_PREFIX = "mops-batch:"
+#: MOPS 歷史重訊回補（failure log #148）的 harvest_log 來源前綴與 source_state 鍵前綴：每檔每輪一筆，帶回補的計數
+#: （`filter`）。它算一個來源（抓不到要進段 1 的失敗清單），但回補登記的 lead 照樣是 `mops:<代號>`——同一則重訊不分
+#: 每日抓到還是回補抓到。⚠ 同樣不用 `mops:` 開頭（理由同上）。
+MOPS_HISTORY_SOURCE_PREFIX = "mops-history:"
 
 
 class LeadStateError(ValueError):

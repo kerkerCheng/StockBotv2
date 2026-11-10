@@ -19,12 +19,14 @@ import json
 import os
 import re
 import sys
-from datetime import datetime, timedelta, timezone
+from collections import Counter
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from typing import Callable
 from urllib.error import URLError
 from urllib.request import Request, urlopen
 from xml.etree import ElementTree as ET
+from zoneinfo import ZoneInfo
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
@@ -34,6 +36,17 @@ from engine_b import leads  # noqa: E402
 
 DEFAULT_CONFIG_PATH = ROOT / "crons" / "harvest_config.json"
 DEFAULT_MEDIA_ROOT = ROOT / "library" / "private" / "lead_media"
+#: MOPS 歷史重訊回補（`mops_watch.history`，failure log #148）四個數的上下限。**這是無人值守每天打 MOPS 的量的上限**
+#: （sandbox impact review 的收緊住在這裡，不在設定檔的說明裡）：設定檔寫超過就 fail closed，不是夾到上限照跑。
+MOPS_HISTORY_LIMITS: dict[str, tuple[int, int]] = {
+    "lookback_days": (1, 31),
+    "backfill_days": (7, 180),
+    "backfill_tickers_per_run": (1, 10),
+    "detail_fetch_per_run": (1, 200),
+}
+#: 連續幾檔的列表抓不到就停打這台主機（其餘照記失敗）——被擋時繼續逐檔打只會延長被擋。
+MOPS_HISTORY_CONSECUTIVE_FAILURES = 3
+MOPS_CALENDAR = ZoneInfo("Asia/Taipei")
 _UA = "StockBotv2 daily-harvest (research; contact c3035281@gmail.com)"
 _X_STATUS_URL = re.compile(r"^https://x\.com/([^/]+)/status/(\d+)$")
 
@@ -101,6 +114,16 @@ def load_config(path: Path | str = DEFAULT_CONFIG_PATH) -> dict:
             raise ValueError(
                 "mops_watch 的 tickers 為空且 derive_from_registry=false——"
                 "那會讓 watcher 永遠監看 0 檔卻每天回報成功")
+        history = mops.get("history")
+        if history is not None:
+            if not isinstance(history, dict):
+                raise ValueError("mops_watch.history 必須是 object")
+            for key, (low, high) in MOPS_HISTORY_LIMITS.items():
+                value = history.get(key)
+                if isinstance(value, bool) or not isinstance(value, int) or not low <= value <= high:
+                    raise ValueError(f"mops_watch.history.{key} 必須是 {low}–{high} 的整數（寫的是 {value!r}）")
+            if history["lookback_days"] > history["backfill_days"]:
+                raise ValueError("mops_watch.history.lookback_days 不得大於 backfill_days")
     x_section = data.get("x_accounts") or {}
     if x_section and not isinstance(x_section.get("handles"), list):
         raise ValueError("x_accounts 必須有 handles list")
@@ -810,9 +833,9 @@ def announcements_to_leads(ticker: str, rows: list[dict]) -> list[dict]:
 def harvest_mops(config: dict, store: dict, *, seen_at: str | None = None) -> None:
     """台股重大訊息 watcher（ROADMAP Phase 6 / D15）。
 
-    ⚠ **兩個 opendata endpoint 只有前一營業日那一批**：漏抓一天就是永久漏，補不回來。
-    所以單一 ticker 的解析失敗不得吃掉整批——每個 market 抓一次、分派到各 ticker，
-    fetch 失敗時該 market 的每一檔都記 `fetch_failed`，讓它在心跳第 1 段自己現形。
+    ⚠ **兩個 opendata endpoint 只有前一營業日那一批**（而且台北 05:30 抓的時候不一定齊）：漏的由這一批之後的
+    `harvest_mops_history` 回補（failure log #148）。單一 ticker 的解析失敗仍不得吃掉整批——每個 market 抓一次、
+    分派到各 ticker，fetch 失敗時該 market 的每一檔都記 `fetch_failed`，讓它在心跳第 1 段自己現形。
     """
     watch = config.get("mops_watch") or {}
     tickers = _mops_watch_tickers(watch)
@@ -874,6 +897,189 @@ def harvest_mops(config: dict, store: dict, *, seen_at: str | None = None) -> No
         leads.record_run(store, source=f"{leads.MOPS_BATCH_SOURCE_PREFIX}{market}", result="ok", new=0,
                          run_at=seen_at, filter_report=report)
         print(f"[harvest] mops {market} 全市場：{report}")
+    # 回補（#148）放在當日那一批之後：它出什麼事都不得改動上面已記的當日紀錄
+    summary = harvest_mops_history(config, store, tickers, seen_at=seen_at)
+    if summary:
+        print(f"[harvest] mops 歷史重訊回補：{summary}")
+
+
+def _iso_date(value: object) -> date | None:
+    try:
+        return date.fromisoformat(str(value or "")[:10])
+    except ValueError:
+        return None
+
+
+def _months_between(start: date, end: date) -> list[tuple[int, int]]:
+    """`start` 到 `end`（含）跨過的每個西元年月。"""
+    months: list[tuple[int, int]] = []
+    year, month = start.year, start.month
+    while (year, month) <= (end.year, end.month):
+        months.append((year, month))
+        year, month = (year + 1, 1) if month == 12 else (year, month + 1)
+    return months
+
+
+def _mops_history_order(tickers: list[str]) -> list[str]:
+    """90 天回補的先後：有現行敘事的先（研究正在讀它們——#148 的三則都是讀敘事時手查才發現漏了），其餘照代號。
+    敘事讀不到只是沒有先後，不擋回補。"""
+    try:
+        from engine_b.routine_config import narrative_tickers
+
+        first = narrative_tickers()
+    except Exception as exc:  # noqa: BLE001 — 讀不到敘事只少一個排序鍵
+        print(f"[harvest] mops 回補讀不到現行敘事（照代號排）：{exc}", file=sys.stderr)
+        first = frozenset()
+    return sorted(tickers, key=lambda ticker: (ticker not in first, ticker))
+
+
+def _mops_history_plan(store: dict, tickers: list[str], section: dict,
+                       today: date) -> list[tuple[str, date, str]]:
+    """每檔這輪的 `(代號, 起日, 種類)`。種類：`routine`＝做過 90 天回補，回看幾天（上次完整補到的日子更早就從那天起）；
+    `initial`＝這輪做 90 天回補；`waiting`＝還沒輪到 90 天回補，這輪先回看幾天。回看的排前面——說明額度先給最近漏的。"""
+    lookback = timedelta(days=int(section["lookback_days"]))
+    floor = today - timedelta(days=int(section["backfill_days"]))
+    plan: list[tuple[str, date, str]] = []
+    never: list[str] = []
+    for ticker in tickers:
+        state = leads.get_source_state(store, f"{leads.MOPS_HISTORY_SOURCE_PREFIX}{ticker}")
+        if not state.get("backfill_from"):
+            never.append(ticker)
+            continue
+        start = today - lookback
+        covered = _iso_date(state.get("covered_through"))
+        if covered is not None and covered - timedelta(days=1) < start:
+            start = covered - timedelta(days=1)   # 中間有幾天沒補完（daily 沒跑、說明沒抓到）：從那天接著補
+        plan.append((ticker, max(start, floor), "routine"))
+    ordered = _mops_history_order(never)
+    per_run = int(section["backfill_tickers_per_run"])
+    plan += [(ticker, max(today - lookback, floor), "waiting") for ticker in ordered[per_run:]]
+    return plan + [(ticker, floor, "initial") for ticker in ordered[:per_run]]
+
+
+def _mops_history_ticker(store: dict, ticker: str, start: date, kind: str, today: date, *,
+                         budget: list[int], seen_at: str | None) -> dict[str, int]:
+    """一檔的回補：列出起日到**昨天**的每個月 → 窗內池裡沒有的抓說明、照每日那條路登記。回傳這檔的計數（寫進 `filter`）。
+    列表抓不到就 raise（呼叫端記失敗）；說明沒抓到不 raise——算進計數，這檔這輪不算補完。`budget` 是整輪共用的說明額度。
+
+    ⚠ 窗只到昨天：今天發的重訊是明天當日批次的份——回補先登記的話，明天那一批抓到時變成「池裡已有」，「補進每日漏抓的」
+    就把還沒輪到的算成漏抓（L12：一個計數兩種意思）。今天的明天沒進池，後天的回看自己會補。"""
+    from fetchers.mops_open_data import fetch_announcement_detail, fetch_announcement_history
+
+    end = today - timedelta(days=1)
+    rows = [row for year, month in _months_between(start, end)
+            for row in fetch_announcement_history(ticker, year, month)]
+    window = sorted((row for row in rows if start.isoformat() <= str(row.get("spoke_date") or "") <= end.isoformat()),
+                    key=lambda row: (str(row.get("spoke_date")), str(row.get("spoke_time") or "")), reverse=True)
+    counts = {"listed": len(rows), "in_window": len(window), "in_pool": 0, "registered": 0, "deferred": 0,
+              "detail_failed": 0}
+    errors: list[str] = []
+    provenance = {"source_class": "primary", "company_id": _registry_company(ticker)}
+    source = f"{leads.MOPS_HISTORY_SOURCE_PREFIX}{ticker}"
+    for row in window:
+        if leads.lead_id_for(announcements_to_leads(ticker, [row])[0]["url"]) in store["leads"]:
+            counts["in_pool"] += 1     # 每日那條或前一輪回補登記過：同一把去重鍵，不抓說明、不重登
+            continue
+        if budget[0] <= 0:
+            counts["deferred"] += 1
+            continue
+        budget[0] -= 1
+        try:
+            full = fetch_announcement_detail(row)
+        except Exception as exc:  # noqa: BLE001 — 一則說明壞掉不吃掉這檔其他則
+            counts["detail_failed"] += 1
+            print(f"[harvest] {source} {row.get('spoke_date')} {row.get('spoke_time')} 說明沒抓到：{exc}",
+                  file=sys.stderr)
+            continue
+        item = announcements_to_leads(ticker, [full])[0]
+        if not _register_all(store, f"mops:{ticker}", [item], seen_at, errors=errors, provenance=provenance):
+            continue
+        counts["registered"] += 1
+        try:
+            leads.annotate_refs(store, leads.lead_id_for(item["url"]),
+                                refs={"mops_history_query": full["history_query"]})
+        except ValueError as exc:
+            print(f"[harvest] {source} 重抓參數沒記上：{exc}", file=sys.stderr)
+    complete = not counts["deferred"] and not counts["detail_failed"]
+    if complete and kind != "waiting":
+        fields = {"covered_through": end.isoformat()}
+        if kind == "initial":
+            fields["backfill_from"] = start.isoformat()
+        leads.set_source_state(store, source, **fields)
+    counts.update(window_days=(end - start).days + 1, initial=int(kind == "initial"),
+                  awaiting_backfill=int(kind == "waiting" or (kind == "initial" and not complete)),
+                  provenance_errors=len(errors))
+    return counts
+
+
+def harvest_mops_history(config: dict, store: dict, tickers: list[str], *, seen_at: str | None = None,
+                         today: date | None = None) -> dict[str, int]:
+    """台股重訊回補（failure log #148）。當日批次只有前一營業日——漏抓那天、或公司進監看範圍之前的，以前永久不在池裡
+    （金居 9-14／10-16、高力 10-20 都是讀敘事時逐檔手查才找到）；MOPS 歷史重訊逐公司逐月永久可查（L10），所以：
+
+    ①每檔每天回看 `lookback_days`（到昨天為止——今天的是明天當日批次的份）；上次完整補到的日子更早就從那天起，
+      最多 `backfill_days`。
+    ②還沒做過 `backfill_days` 回補的（新進範圍；上線那天是全部）每輪最多 `backfill_tickers_per_run` 檔、有現行敘事的先，
+      其餘這輪先回看幾天、排下輪。
+    ③窗內池裡已有的（同一把去重鍵）不抓說明、不重登；沒有的抓說明（每輪最多 `detail_fetch_per_run` 則）後照每日那條路
+      登記（`mops:<代號>`、一手、公司由名冊解析），refs 記重抓參數。說明沒抓到的那檔這輪不算補完，下輪從同一天再來（INV-2）。
+
+    每檔每輪記一筆 `mops-history:<代號>`：ok 帶計數（`filter`），抓不到記 fetch_failed／parse_failed——心跳段 1 的失敗清單
+    自己點名、回補那一行加總計數。連續 `MOPS_HISTORY_CONSECUTIVE_FAILURES` 檔抓不到（代號不存在不算）就停打這台主機，
+    其餘照記失敗、`filter.not_attempted=1`（「沒打」與「打了沒拿到」分開數，L12）。回傳本輪加總。"""
+    section = (config.get("mops_watch") or {}).get("history")
+    watched = sorted({str(t).strip().upper() for t in tickers or () if str(t).strip()})
+    if not section or not watched:
+        return {}
+    from fetchers.mops_open_data import MopsHistoryError, MopsOpenDataError
+
+    today = today or datetime.now(MOPS_CALENDAR).date()
+    totals: Counter = Counter()
+    try:
+        plan = _mops_history_plan(store, watched, section, today)
+    except Exception as exc:  # noqa: BLE001 — 排不出計畫也要每檔留一筆失敗，不得安靜跳過整段（INV-3）
+        for ticker in watched:
+            leads.record_run(store, source=f"{leads.MOPS_HISTORY_SOURCE_PREFIX}{ticker}", result="fetch_failed",
+                             new=0, run_at=seen_at, failure_class="unknown")
+        print(f"[harvest] mops 歷史重訊回補排不出計畫：{type(exc).__name__}: {exc}", file=sys.stderr)
+        return {"failed": len(watched)}
+    budget = [int(section["detail_fetch_per_run"])]
+    streak, halted = 0, None
+    for ticker, start, kind in plan:
+        source = f"{leads.MOPS_HISTORY_SOURCE_PREFIX}{ticker}"
+        if halted is not None:
+            leads.record_run(store, source=source, result=halted[0], new=0, run_at=seen_at,
+                             failure_class=halted[1], filter_report={"not_attempted": 1})
+            totals["not_attempted"] += 1
+            continue
+        try:
+            counts = _mops_history_ticker(store, ticker, start, kind, today, budget=budget, seen_at=seen_at)
+        except Exception as exc:  # noqa: BLE001 — 網路、版型、代號都在這裡；記下來，不讓一檔吃掉整輪
+            if isinstance(exc, MopsHistoryError):
+                result, failure = exc.result, exc.failure_class
+            else:   # 抓取層包好的網路錯誤是 transport；其他例外是程式自己的問題，不冒充網路
+                result, failure = "fetch_failed", classify_access_failure(
+                    exc, default="transport_failure" if isinstance(exc, (MopsOpenDataError, OSError)) else "unknown")
+            leads.record_run(store, source=source, result=result, new=0, run_at=seen_at, failure_class=failure)
+            print(f"[harvest] {source} {result}（{failure}）：{exc}", file=sys.stderr)
+            totals["failed"] += 1
+            streak = streak if failure == "not_found" else streak + 1
+            if streak >= MOPS_HISTORY_CONSECUTIVE_FAILURES:
+                halted = (result, failure)
+                print(f"[harvest] MOPS 歷史重訊連續 {streak} 檔抓不到，本輪其餘不再打這台主機（照記失敗）",
+                      file=sys.stderr)
+            continue
+        streak = 0
+        errors = counts.pop("provenance_errors", 0)
+        leads.record_run(store, source=source, result="ok", new=counts["registered"], run_at=seen_at,
+                         provenance_errors=errors, filter_report=counts)
+        for key in ("registered", "in_pool", "deferred", "detail_failed", "awaiting_backfill"):
+            totals[key] += counts[key]
+        totals["ok"] += 1
+        print(f"[harvest] {source} ok（{kind} {start}～{today - timedelta(days=1)}）：補進 {counts['registered']}／窗內 "
+              f"{counts['in_window']}（池裡已有 {counts['in_pool']}、說明待抓 {counts['deferred']}、"
+              f"說明沒抓到 {counts['detail_failed']}）")
+    return dict(totals)
 
 
 def run(config: dict, store: dict, *, seen_at: str | None = None) -> dict:

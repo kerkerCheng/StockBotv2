@@ -54,6 +54,7 @@ Get-Content library\private\heartbeat\daily_run_<YYYY-MM-DD>.json    # 每步 st
 | 排程設定與 config 不一致／讀不到 | 段 1「⚠ 排程設定與 config 不一致」＋修正命令；讀不到印 unknown |
 | harvest 超過 `harvest_stale_hours` 沒跑 | 段 1 ⚠；段 3「harvest N 天沒跑——0 不代表沒有新文件」 |
 | MOPS 全市場重訊抓不到、或來源版型變了 | 段 1「MOPS 全市場重訊（最後一輪）：上市 輸入 N｜名冊內 A｜名冊外 B｜代號解析不出 C；上櫃 …」——抓不到那個市場印「**抓不到**（原因）」、不留上一輪的數；「代號解析不出」突然非 0＝版型變了（2026-11-03 起；harvest_log 每市場每輪一筆 `mops-batch:<市場>`，不算一個來源） |
+| MOPS 重訊回補抓不到、說明沒抓到、或當日批次漏了 | 段 1「MOPS 重訊回補（各檔最後一輪，N 檔）：補進每日漏抓的 a 則＋90 天回補 b 則｜池裡已有 c｜說明沒抓到 d 則｜90 天回補待做 e 檔｜抓不到 f 檔」——d 非 0 標粗（那幾檔這輪不算補完、下輪從同一天再來）；抓不到的檔照樣進上一行的失敗清單（`mops-history:<代號>`，算一個來源）；連續 3 檔抓不到本輪停打 MOPS、其餘記 `filter.not_attempted`。a 是「當日批次漏了幾則」的常駐計數器（failure log #148 的中迴路；2026-11-10 起，見下方「台股重訊回補」） |
 | EDGAR Form 4 的交易代碼讀不到 | 段 1「EDGAR Form 4（各檔最後一輪，N 檔有新申報）：新 N｜公開市場買進 P（留給分類層）｜**交易代碼讀不到 U**」——讀不到的照舊 auto no_go（與改動前相同），只是數得出來；U 突然接近「新」＝SEC 的網址或版型變了。查一份：`python -c "from fetchers.edgar import fetch_form4_transaction_codes as f; print(f('<lead 的 url>'))"`（2026-11-03 起；harvest log 每個 `edgar:<T>` 那一輪的 `filter`） |
 | ⑯ Drive 上傳失敗（`auth_expired`／`delivery_failed`） | 段 1「失敗 1：16_backup」＋備份行 ⚠「Drive <狀態>（最後成功上傳：N 天前）」；本機那份照留、⑯b 照驗。修好後 `python scripts\backup_private.py upload` 補傳（token 過期先 `auth`） |
 | T2 輪詢（⑩d–⑩g）沒跑完或一直「沒真的查」 | 段 3「T2 輪詢：本輪沒跑完（<步驟> <狀態>：<理由>）」或拒收裡「沒真的查 N」；有該查的、卻超過 `min_recheck_days` 沒有任何一次輪詢時整行 ⚠＋摘要行「T2 輪詢 N 天沒跑」。回滾：`config/event_watch.json` 的 `sweep_budget_per_run` 調 0（或 `llm.executor=none` 連同其他 LLM 步驟一起停） |
@@ -1977,10 +1978,10 @@ Get-Content library\private\heartbeat\daily_run_<YYYY-MM-DD>.json          # 03_
 
 | | 重大訊息 | 每月營收 |
 |---|---|---|
-| 來源只有多久 | **只有前一營業日那一批** | 歷史頁按年月**永久可查** |
-| 漏抓的後果 | **永久漏，補不回來** | 隨時 `--backfill` 補得回來（L10） |
-| 落點 | **進 daily harvest**（走既有 `crons\harvest_leads.py` entry） | **互動式入口**，不進無人值守 |
-| 該補時誰說話 | harvest 的 `fetch_failed` 現形在心跳第 1 段 | 心跳第 1 段印「落後 N 個月」 |
+| 來源只有多久 | 當日批次**只有前一營業日那一批**；歷史查詢逐公司逐月可查（2026-11-10 實測，#148） | 歷史頁按年月**永久可查** |
+| 漏抓的後果 | ~~永久漏，補不回來~~ → 每日回補補回（2026-11-10 起，見下方「台股重訊回補」）；它是 lead，晚幾天到就晚幾天被讀 | 隨時 `--backfill` 補得回來（L10） |
+| 落點 | **進 daily harvest**（走既有 `crons\harvest_leads.py` entry；回補在同一步） | **互動式入口**，不進無人值守 |
+| 該補時誰說話 | harvest 的 `fetch_failed` 與回補那一行現形在心跳第 1 段 | 心跳第 1 段印「落後 N 個月」 |
 
 ```powershell
 # 月營收（互動式；每月 11 日後跑一次 --sync 就跟得上）
@@ -2015,6 +2016,35 @@ Get-Content library\private\heartbeat\daily_run_<YYYY-MM-DD>.json          # 03_
 ② **`.codex/rules` 是 Starlark，不吃 Python 的隱式字串串接**——多行 justification 必須用 `+`
 串接。寫成隱式串接時整份 allowlist 載入失敗，11 個 execpolicy 測試同時變紅（與 2026-09-10
 那次同形，這次是測試先攔下來的）。
+
+### 台股重訊回補（failure log #148，2026-11-10 完成 sandbox impact review）
+
+事發：金居（8358.TWO）9-14、10-16 與高力（8996.TW）10-20 的重訊，lead 池裡都沒有——當日批次只有前一營業日那一批，
+漏抓那天、或公司進監看範圍之前的就不在任何地方，研究要自己上 MOPS 逐檔查。MOPS 歷史重訊（`ajax_t05st01`）逐公司逐月
+永久可查，所以回補放進 daily 的同一個 harvest 步驟（`crons\harvest_leads.py::harvest_mops_history`，當日那一批之後）：
+
+- 每檔每天回看 `lookback_days`（7）、**到昨天為止**（今天的是明天當日批次的份——先登記的話「補進每日漏抓的」會把還沒輪到的算成漏）；
+  上次完整補到的日子更早就從那天起接著補，最多 `backfill_days`（90）。
+- 還沒做過 90 天回補的（新進範圍；上線那天是全部）每輪最多 `backfill_tickers_per_run`（3）檔、**有現行敘事的先**，其餘這輪先回看 7 天。
+- 窗內池裡已有的（同一把去重鍵——回補列的 URL 與每日那條逐字相同）不抓說明、不重登；沒有的抓說明（每輪最多 `detail_fetch_per_run`
+  ＝40 則）後照每日那條路登記（`mops:<代號>`、一手、名冊解析公司），refs `mops_history_query` 記重抓這一則的參數。
+- 說明沒抓到（額度用完或失敗）的那檔這輪不算補完，下輪從同一天再來；連續 3 檔抓不到本輪停打 MOPS（其餘照記失敗、`not_attempted`）。
+- 每檔每輪一筆 `mops-history:<代號>`（計數在 `filter`）；心跳段 1 一行加總（見本檔開頭的表）。進度狀態在 lead 池的 `source_state`。
+
+```powershell
+# 要看某檔某月的歷史重訊（研究時查「有沒有漏」不必再開 MOPS 網頁）
+& '.venv\Scripts\python.exe' -m fetchers.mops_open_data --history 8358.TWO --year 2026 --month 10 --with-detail
+```
+
+**sandbox impact review 五步：**
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | **沒有新主機**：`mopsov.twse.com.tw` 已在 daily harvest 的主機清單（2026-09-24 結論）；新端點 `mopsov.twse.com.tw/mops/web/ajax_t05st01`（POST、公開、無憑證；列表一頁一家公司一個月，說明一則一次）。寫入只到既有的 lead 池（`register` 進 pending 交 triage、`source_state` 與 harvest_log 多 `mops-history:*`），不 triage、不入圖、不寫 Engine C、不碰 git。**量的上限在程式裡**：`crons/harvest_leads.py::MOPS_HISTORY_LIMITS`（回看 ≤31 天、回補 ≤180 天、每輪 90 天回補 ≤10 檔、說明 ≤200 則；設定檔寫超過 fail closed），每次請求後停 `fetchers/mops_open_data.py::HISTORY_PACE_SECONDS`（3 秒），連續 3 檔抓不到停打。平常一輪＝監看檔數 ×（1–2 個月）次列表＋漏抓的說明；上線頭幾天另加每輪 ≤3 檔 × 4 個月＋≤40 則說明。harvest 步驟時限 20 分鐘不變。 |
+| **2 skill／prompt／本檔** | 不動 daily prompt 與步驟清單（argv 不變）；本節、本檔開頭心跳表一列、`crons/harvest_config.json` 的 `mops_watch.note` 與 `history` 四個數、`config/lead_ref_keys.json` 一個 refs 鍵。 |
+| **3 最窄 rule** | **沒有新增任何 rule**（Codex rules 仍 0 條；daily 是封閉步驟清單）。 |
+| **4 permission contract test** | `tests/test_mops_history_backfill.py`：`test_history_endpoint_pace_and_review_are_pinned`（端點在既有主機、節流 ≥2 秒、本節寫了端點／主機／上限／節流）、`test_history_limits_fail_closed`（七種超限設定都拒收）、`test_shipped_config_is_within_the_limits`；既有 `test_mops_hosts_are_written_in_the_review_and_monthly_revenue_stays_interactive` 照過。 |
+| **5 端到端 smoke** | 2026-11-10 在 lead 池的記憶體副本上（不存檔）跑金居、高力的 90 天回補：金居窗內 14 則（池裡已有 5、補進 9）、高力窗內 11 則（已有 3、補進 8），說明 17／17 抓到（220–1,612 字）、對不上列 0；#148 的三則——金居 9-14（3 則）、10-16（3 則）、高力 10-20（1 則）——都出了 lead。同日 28 檔 90 天窗只列表量測：窗內 382 則、池裡沒有 246 則，其中**進監看範圍之後仍漏的 30 則**（起因：harvest 在台北 05:30 抓當日批次，批次那時不一定齊——11-10 05:31 上櫃批次只有 2 則，6274.TWO 11-09 四則因此漏；10-30 那一輪沒拿到 10-29 下午上市的至少 14 則）；28 檔各 4 個月的列表以 3 秒節流連打沒被擋（8 分半），連線逾時 1 次（2308.TW——上線後這種照記 fetch_failed、下輪重來）。上線頭約十輪補進那 246 則、之後每天多打約 28 次列表（約 2 分鐘）。 |
 
 
 ### 台股季報股數（Phase 7 旁支開發「台股歷史股數」，2026-10-05 完成 sandbox impact review）

@@ -142,7 +142,9 @@ entity 型等待只比「發文的是不是這家公司」——醒來先擋著�
 
 - ⓐ 讀那一檔的現行敘事（`python -m alpha brief <T>`）與觸發的 watch（`python -m engine_b.event_watch list`），
   並列私有區點名它的報告（`python -m sourcing.private_docs <T>`；券商只指路——讀那幾頁，主張照舊要一手印證，原文與轉述都不進 repo；
-  failure log #141：AXTI 的反方線索在一份 10-20 就讀過的私有報告裡，讀圖與敘事一路沒引用）；
+  failure log #141：AXTI 的反方線索在一份 10-20 就讀過的私有報告裡，讀圖與敘事一路沒引用）；台股另看它近 90 天的重訊在不在池裡——
+  心跳段 1「MOPS 重訊回補」的 90 天回補待做非 0 時（2026-11-11 起約十輪補完），讀台股前用 `python -m fetchers.mops_open_data --history <T>
+  --year Y --month M --with-detail` 手查它近幾個月（failure log #148：金居、高力三則重訊是逐檔上 MOPS 手查才找到）；
 - ⓑ 重跑 `python -m alpha research <T>` 的 packet（`brief_frame` 是 v2）與三題稽核區（`python -m alpha lights <T>`）；
   **兩個都預設遮價格**（failure log #152）：packet 的市價、市值、目標價、本益比，讀燈的已定價三行與稀釋那盞的市值印成
   「〔已遮：價格〕」——缺席照印。要答已定價那一格才加 `--prices`；Q3W 名單內的檔**先寫完裁決行再加**（ⓔ）。讀上一版全文用
