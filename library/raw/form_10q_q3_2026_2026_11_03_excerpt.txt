@@ -1,0 +1,23 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1039399/000103939926000043/form-20260926.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] FormFactor, Inc. Form 10-Q（quarter ended September 26, 2026；2026-11-03 申報）10% 客戶、台灣分部營收、Systems 歸因
+DATE: 2026-11-03
+RETRIEVED: 2026-11-10（EDGAR 原文抽字，空白正規化後逐字切出；千美元）
+NOTE: 發行人申報；Triton 營收沒有單獨拆出。
+
+【10% 客戶（Three Months 2026／2025，Nine Months 2026／2025）】
+"SK hynix Inc. 20.7 % 24.5 % 24.5 % 24.3 %"
+"Intel Corporation * * * 11.2 %"
+"Taiwan Semiconductor Manufacturing Company Ltd. 12.8 % * 11.2 % *"
+"* Less than 10% of revenues."
+
+【分部 × 地區（Three Months Ended September 26, 2026：Probe Cards／Systems／Total；Three Months Ended September 27, 2025：Probe Cards／Systems／Total）】
+"Total $ 221,095 $ 59,452 $ 280,547 $ 166,380 $ 36,296 $ 202,676"
+"Taiwan $ 84,939 $ 30,163 $ 115,102 $ 35,917 $ 10,994 $ 46,911"
+"South Korea 66,576 2,546 69,122 68,644 2,158 70,802"
+"United States 30,303 11,251 41,554 26,802 9,573 36,375"
+
+【Systems 歸因】
+"Systems — The increase in Systems market revenues for the three months ended September 26, 2026, compared to the three months ended September 27, 2025, was primarily driven by sales of Triton, our recently introduced high-volume photonics testing solution, with smaller increases in revenues from sales of cryogenic and thermal systems."
+"Taiwan — Increased demand for our Foundry & Logic and DRAM probe card products and increased demand for Triton, our recently introduced high-volume photonics testing platform within Systems, contributed to the increase in revenues."

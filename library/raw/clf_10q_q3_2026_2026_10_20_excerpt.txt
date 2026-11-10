@@ -1,0 +1,21 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/764065/000076406526000115/clf-20260930.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Cleveland-Cliffs Inc. Form 10-Q（quarter ended September 30, 2026；2026-10-20 申報）不鏽鋼與電工鋼營收、出貨、售價、電工鋼說法
+DATE: 2026-10-20
+RETRIEVED: 2026-11-10（EDGAR 原文抽字，空白正規化後逐字切出；百萬美元、千淨噸）
+NOTE: 發行人申報；電工鋼（GOES／NOES）沒有單獨揭露，只有與不鏽鋼合計的一行。
+
+【營收（Three Months 2026／2025，Nine Months 2026／2025）】
+"Stainless and electrical steel 514 466 1,504 1,344"
+"Total revenues $ 5,612 $ 4,734 $ 15,760 $ 14,297"
+
+【出貨（Three Months 2026／2025／變動，Nine Months 2026／2025／變動）】
+"Stainless and electrical steel 160 149 7 % 462 426 8 %"
+"Total steel shipments by product 4,150 4,029 3 % 12,283 12,459 (1) %"
+
+【售價】
+"Higher steel pricing: Revenue increased by approximately $500 million due to rising pricing, particularly for hot-rolled steel, which increased our average selling price to $1,177 per net ton of steel;"
+
+【電工鋼說法】
+"Because of these industry dynamics and our current customer base, our electrical steel business is expected to continue to achieve strong profitability in the coming years."
