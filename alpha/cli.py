@@ -459,6 +459,16 @@ def cmd_brief(args: argparse.Namespace) -> int:
             reminder = deadline_reminder(record, held=held_on_board(ticker))
             if reminder:
                 print(reminder)
+        # 換版收據（failure log #32；plan 2026-11-10-001 G，使用者 11-10 選 A）：上一版之後進池、這一版沒指到的一手——只印、不擋
+        if args.add:
+            try:
+                from .providers.unread_primary import previous_written_at, receipt_lines, unread_primary
+
+                previous = previous_written_at(read_brief_records(ticker)[0], str(record["brief_id"]))
+                for line in receipt_lines(unread_primary(record, previous)):
+                    print(line)
+            except Exception as exc:  # noqa: BLE001 — 收據沒比成不擋已寫好的敘事，但要說出來（不是比了沒有）
+                print(f"  一手（上一版之後進池）：這次沒比成（{type(exc).__name__}: {str(exc)[:80]}）")
         print(f"  下一步：python -m webapp materialize {ticker}（首屏會長出七句；引用解析不到的格會現形）")
         # 首頁卡片的一句做什麼（2026-10-28）：寫敘事的這一刻最知道它做什麼——沒寫過就在這裡提醒，不靠人記得（L14）
         if not args.retract:

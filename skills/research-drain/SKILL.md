@@ -173,6 +173,8 @@ entity 型等待只比「發文的是不是這家公司」——醒來先擋著�
   所有**該重寫的 watch（`still_holds`／`thesis_changed`／`retired`／`confirmed`＋一句 note）——**不列就拒收**；
   換版與撤回都不會吞掉它們（已過到期日但 daily 還沒標記的，寫入端會先照日期轉成到期）。處置寫成 watch 既有的收據
   （fired → consumed、觸及 → `judgment.handled`、到期 → `expiry_resolution: narrative_rewritten`）。
+  寫入收據的「一手：上一版之後進池、這一版沒指到的 N 則」（2026-11-10，failure log #32；只印、不擋，最多列 5 則）逐則看：讀過且無關就略過；
+  相關的（稀釋、擴產、客戶、裁決點）先讀、改正文、引用，再換一版——「沒指到」是指標比對，不是「沒讀過」的證明。
 - ⓓ **加碼條件**（`confirm[]`、watch 帶 `condition_role=confirm`，2026-10-04 Phase 7 Step 7.0d）也走這一段：
   **觸及＝「結構確認了」的提醒，不是買進訊號**——新的一版以 `confirmed` 處置，在敘事裡寫明確認了什麼、候選狀態換不換
   （系統不自動改）；**到期沒觸及**＝「確認事件沒在期限內發生」，本身就是資訊，照實處置（`still_holds`／`thesis_changed`／`retired`）。
