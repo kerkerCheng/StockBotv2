@@ -206,6 +206,11 @@ trace_requires_user: false
 
 ## 向使用者要文件（2026-10-06）
 
+**開口前先查私有區**：`python -m sourcing.private_docs <T 或 co:*>` 列出使用者交過的券商報告與文件裡點名它的頁碼
+（`library/private/broker_reports/`、`library/private/inbox/`；Grep 工具預設略過 gitignore 的 `library/private/`，別拿它的 0 命中當沒有）。
+列得出就先讀那幾頁再決定要不要開口——failure log #141：1519.TW 的 [897] 要的東西，私有區早有一份。
+使用者交來的文件留在這兩處（`library/private/tmp/` 不掃——凱基 08-18 那份當初就放在 tmp）。
+
 要之前答不出「它說了什麼」，但答得出「它是不是回答這個問題的指定位置」。所以要求分兩種，寫明是哪一種：
 
 | 種類 | 什麼時候 | 要求裡必須有 |

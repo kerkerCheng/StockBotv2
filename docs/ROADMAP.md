@@ -72,6 +72,8 @@
 
 > 日期＝交付日。這裡只留落點，讓程式註解裡的 `ROADMAP「標題」` 找得到；要看做了什麼、數字怎麼變，讀封存列。
 
+- 2026-11-10 **私有券商報告建索引、讀某檔時列出點名它的報告**（failure log #141；使用者「開發 … #141 … 照推薦做」）——`python -m sourcing.private_docs <T 或 co:*>`：掃 `library/private/broker_reports/` 與 `inbox/` 的 PDF／文字檔（頁碼取 PDF），名冊公司被點名的頁碼照 `query.bottleneck.quote_names_company`、台股另認「名稱(代號 TT)」；索引 `library/private/private_docs_index.json` 只存指紋與頁碼、不抄內容，增量重建；抽不出字的照印「沒核」；research-drain ⓐ、缺 X `user_document` 與 source-trace 開口前先跑；`tests/test_private_docs.py`；plan 同上 F。**真資料**：AXTI 列出凱基 08-18 第 5、7 頁、1519.TW 列出元大 09-11 第 25 頁；索引 28 份、名冊 78 家被點名
+
 - 2026-11-10 **研究讀燈與讀敘事全文的出口遮價格欄**（failure log #152；使用者「開發 … #152 … 照推薦做」）——新命令 `python -m alpha lights <T…>`（會死嗎、出現在數字裡了嗎、已定價嗎；與候選板同一個串接點）、`alpha research` 的 packet、`alpha brief <T> --show [<id>]` 預設把已定價的值與 detail、市值、市價、目標價、本益比、`priced_at_write` 印成「〔已遮：價格〕」（字串不是 null；缺席照印），加 `--prices` 拿原樣；APP 與物化檔不動；`alpha/price_mask.py`、`tests/test_price_mask.py`；research-drain ⓑ、起始門、ⓔ、派工提示；plan 同上 E。**真資料**：Q3W 名單 28 檔預設輸出的價格欄 0 個（原樣 339），四盞燈照印
 
 - 2026-11-10 **讀圖反證寫「新進」卻漏列 develops 的公司就在收據點名**（failure log #143；使用者「開發 … #143 … 照推薦做」）——寫「新進」的那一條，快照 developers 角度 `develops` 這一層、不在那一條 entities 的公司，`alpha structure-reading --add` 寫入後印在收據（附 research ticker；只提醒、不擋；算不成只印一行，等待登記照跑）；`alpha/structure_reading/entrants.py`、`alpha/providers/structure_readings.py::entrant_notices`、`tests/test_reading_entrants.py`；research-drain 段 4 ④ 補一句；plan 同上 D。**真資料**：回放 275 份讀圖印出 3 筆，全是 CW DFB 三版漏了環宇（4991.TWO）；條件點名但不在名冊的公司（美超微、York 等）不在本項，補名冊走 pq2

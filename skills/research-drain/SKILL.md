@@ -140,7 +140,9 @@ entity 型等待只比「發文的是不是這家公司」——醒來先擋著�
   沒過就在「前提失效」，照列上寫的那一項重寫（多半是沒寫反證、押的讀圖判 neither、會死嗎紅）。11-03 前等回落建的喚醒 watch
   照舊等到期、醒了照本段重寫——新的一版寫不出等回落（寫入端 ④⁰ 拒收）：過得了起始門就宣告可開，過不了就照證據寫缺 X 或不要。
 
-- ⓐ 讀那一檔的現行敘事（`python -m alpha brief <T>`）與觸發的 watch（`python -m engine_b.event_watch list`）；
+- ⓐ 讀那一檔的現行敘事（`python -m alpha brief <T>`）與觸發的 watch（`python -m engine_b.event_watch list`），
+  並列私有區點名它的報告（`python -m sourcing.private_docs <T>`；券商只指路——讀那幾頁，主張照舊要一手印證，原文與轉述都不進 repo；
+  failure log #141：AXTI 的反方線索在一份 10-20 就讀過的私有報告裡，讀圖與敘事一路沒引用）；
 - ⓑ 重跑 `python -m alpha research <T>` 的 packet（`brief_frame` 是 v2）與三題稽核區（`python -m alpha lights <T>`）；
   **兩個都預設遮價格**（failure log #152）：packet 的市價、市值、目標價、本益比，讀燈的已定價三行與稀釋那盞的市值印成
   「〔已遮：價格〕」——缺席照印。要答已定價那一格才加 `--prices`；Q3W 名單內的檔**先寫完裁決行再加**（ⓔ）。讀上一版全文用
@@ -337,7 +339,8 @@ Lumentum、住友並列，協議也是非獨家。它和別家不同在六吋磷
    **缺 X 三分法**（2026-10-30 使用者「好 可以」；failure log #117；ROADMAP「缺 X 三分法與文件請求上限」）：每一檔缺 X 寫敘事時
    `candidate_state.missing_kind` 必答三選一——`filing`（X 會在下一份公開文件出現：等事件，watch 的 until 寫那一天）、
    `layer`（X 是層的問題：層深讀的入口，上一行）、`user_document`（X 可能寫在使用者拿得到的券商報告／法說 memo 裡）。
-   第三種照 source-trace「向使用者要文件」鑄請求（park 時 `trace_requires_user=true`），lead refs **必填**
+   第三種照 source-trace「向使用者要文件」鑄請求（鑄之前先跑 `python -m sourcing.private_docs <T>`——私有區有點名它的頁就先讀；
+   park 時 `trace_requires_user=true`），lead refs **必填**
    `trace_review_company`（co:*）、`trace_review_channel`（元大／凱基／嘉信／IB）、`trace_review_search`、`trace_review_window`、
    `trace_review_flips_state`（拿到就能翻成可開／不要＝true）——狀態塊的「已開口」與 ③b 的分組行讀這幾欄，沒填的印「未標」。
    **同時開著的請求上限 K=5**（`todo.DOCUMENT_REQUEST_DISPLAY_LIMIT`；注意力預算，程式只印不擋，由本 skill 執行）：
