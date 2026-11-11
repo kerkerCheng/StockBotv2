@@ -3166,6 +3166,98 @@
         "東友ファインケム",
         "Dongwoo Fine-Chem"
       ]
+    },
+    {
+      "company_id": "co:topoint_technology",
+      "research_ticker": "8021.TW",
+      "market_currency": "TWD",
+      "execution_currency": "TWD",
+      "execution_venue": "TWSE",
+      "display_name": "Topoint Technology Co., Ltd.",
+      "_display_name_source": "yfinance longName（2026-11-11，onboard-candidates --tier）；年報封裏「尖點科技股份有限公司」",
+      "_note": "隨 PCB 鑽針層入圖包 staged（2026-11-11，decompose [921]，drop 即回退；入圖包見 pcb_drill_bit_layer_2026_11_11_action.json）：PCB 鑽針（微鑽、塗層、超長刃）與銑刀、鑽孔加工；2025 年營收 97.40% 是精密金屬製品及加工服務（年報 p.60）。系統口徑邊緣無法量（約 18.2 億美元、分析師家數抓不到，2026-11-11）",
+      "name_aliases": [
+        "尖點",
+        "尖點科技",
+        "尖點科技股份有限公司",
+        "Topoint"
+      ]
+    },
+    {
+      "company_id": "co:key_ware_electronics",
+      "research_ticker": "5498.TWO",
+      "market_currency": "TWD",
+      "execution_currency": "TWD",
+      "execution_venue": "TPEx",
+      "display_name": "Key Ware Electronics Co., Ltd.",
+      "_display_name_source": "yfinance longName（2026-11-11）；年報封面「凱崴電子股份有限公司 KEY WARE ELECTRONICS CO., LTD.」",
+      "_note": "隨 PCB 鑽針層入圖包 staged（2026-11-11，decompose [921]，drop 即回退；入圖包見 pcb_drill_bit_layer_2026_11_11_action.json）：PCB 全尺寸鑽針與刀具（2025 年營收 55%）、銅箔基板及鑽孔代工（45%）。系統口徑邊緣無法量（約 3.0 億美元、分析師家數抓不到，2026-11-11）",
+      "name_aliases": [
+        "凱崴",
+        "凱崴電子",
+        "凱崴電子股份有限公司",
+        "KEY WARE ELECTRONICS CO., LTD."
+      ]
+    },
+    {
+      "company_id": "co:tera_autotech",
+      "research_ticker": "6234.TWO",
+      "market_currency": "TWD",
+      "execution_currency": "TWD",
+      "execution_venue": "TPEx",
+      "display_name": "Tera Autotech Corporation",
+      "_display_name_source": "yfinance longName（2026-11-11）；年報內控聲明書「高僑自動化科技股份有限公司」",
+      "_note": "隨 PCB 鑽針層入圖包 staged（2026-11-11，decompose [921]，drop 即回退；入圖包見 pcb_drill_bit_layer_2026_11_11_action.json）：微型鑽頭（2025 年營收 59.70%）與自動化設備（40.30%）。系統口徑邊緣無法量（約 1.7 億美元、分析師家數抓不到，2026-11-11）",
+      "name_aliases": [
+        "高僑",
+        "高僑自動化",
+        "高僑自動化科技股份有限公司"
+      ]
+    },
+    {
+      "company_id": "co:union_tool",
+      "research_ticker": "6278.T",
+      "market_currency": "JPY",
+      "execution_currency": "JPY",
+      "execution_venue": "TSE",
+      "display_name": "Union Tool Co.",
+      "_display_name_source": "yfinance longName（2026-11-11）；尖點 2025 年報 p.63「佑能工具(Union Tool)」",
+      "_note": "隨 PCB 鑽針層入圖包 staged（2026-11-11，decompose [921]，drop 即回退；入圖包見 pcb_drill_bit_layer_2026_11_11_action.json）：日系 PCB 鑽針廠之首（尖點 2025 年報 p.63 的說法；Union Tool 自己的一手尚未讀）。系統口徑邊緣（約 14.4 億美元、分析師 1 家，2026-11-11）",
+      "name_aliases": [
+        "Union Tool",
+        "佑能工具",
+        "ユニオンツール"
+      ]
+    },
+    {
+      "company_id": "co:guangdong_dtech",
+      "research_ticker": "301377.SZ",
+      "market_currency": "CNY",
+      "execution_currency": "CNY",
+      "execution_venue": "SZSE",
+      "display_name": "Guangdong Dtech Technology Co., Ltd.",
+      "_display_name_source": "yfinance longName（2026-11-11）；深交所 301377（广东鼎泰高科技术股份有限公司）",
+      "_note": "隨 PCB 鑽針層入圖包 staged（2026-11-11，decompose [921]，drop 即回退；入圖包見 pcb_drill_bit_layer_2026_11_11_action.json）：PCB 鑽針（自稱全球龍頭；2026 上半年精密刀具占營收 82.41%）。系統口徑非邊緣（約 129.5 億美元、分析師 5 家，2026-11-11）",
+      "name_aliases": [
+        "鼎泰高科",
+        "广东鼎泰高科技术股份有限公司"
+      ]
+    },
+    {
+      "company_id": "co:gold_circuit",
+      "research_ticker": "2368.TW",
+      "market_currency": "TWD",
+      "execution_currency": "TWD",
+      "execution_venue": "TWSE",
+      "display_name": "Gold Circuit Electronics Ltd.",
+      "_display_name_source": "yfinance longName（2026-11-11）；年報末頁「金像電子股份有限公司」",
+      "_note": "隨 PCB 鑽針層入圖包 staged（2026-11-11，decompose [921]，drop 即回退；入圖包見 pcb_drill_bit_layer_2026_11_11_action.json）：PCB 板廠（多層板，產品用於伺服器、AI 伺服器、網路設備；52 層板量產）；在圖上是做板層的供給側與鑽孔設備的買方。系統口徑非邊緣（約 164.2 億美元、分析師 9 家，2026-11-11）",
+      "name_aliases": [
+        "金像電",
+        "金像電子",
+        "金像電子股份有限公司",
+        "Gold Circuit Electronics"
+      ]
     }
   ]
 }
