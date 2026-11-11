@@ -42,6 +42,48 @@ def test_raw_xml_url_and_only_non_derivative_codes() -> None:
         edgar.form4_transaction_codes("<not xml")
 
 
+FORM4_FULL = """<?xml version="1.0"?>
+<ownershipDocument>
+  <documentType>4</documentType>
+  <periodOfReport>2026-10-28</periodOfReport>
+  <issuer><issuerName>TTM TECHNOLOGIES INC</issuerName><issuerTradingSymbol>TTMI</issuerTradingSymbol></issuer>
+  <reportingOwner>
+    <reportingOwnerId><rptOwnerName>Ali Wajid</rptOwnerName></reportingOwnerId>
+    <reportingOwnerRelationship><isDirector>1</isDirector></reportingOwnerRelationship>
+  </reportingOwner>
+  <nonDerivativeTable>
+    <nonDerivativeTransaction>
+      <securityTitle><value>Common Stock</value></securityTitle>
+      <transactionDate><value>2026-10-28</value></transactionDate>
+      <transactionCoding><transactionFormType>4</transactionFormType><transactionCode>P</transactionCode></transactionCoding>
+      <transactionAmounts><transactionShares><value>5000</value></transactionShares>
+        <transactionPricePerShare><value>89.8571</value></transactionPricePerShare>
+        <transactionAcquiredDisposedCode><value>A</value></transactionAcquiredDisposedCode></transactionAmounts>
+      <postTransactionAmounts><sharesOwnedFollowingTransaction><value>30835</value></sharesOwnedFollowingTransaction>
+      </postTransactionAmounts>
+      <ownershipNature><directOrIndirectOwnership><value>D</value></directOrIndirectOwnership></ownershipNature>
+    </nonDerivativeTransaction>
+  </nonDerivativeTable>
+  <footnotes><footnote id="F1">Weighted average price.</footnote></footnotes>
+</ownershipDocument>"""
+
+
+def test_form4_text_copies_the_filing_fields_without_judging() -> None:
+    """2026-11-11：含 P 的 Form 4 留在 pending 交給分類層，分類器卻看不到它——一批 28 則全落到互動 session。
+    給分類器的是申報欄位照抄（誰、什麼身分、哪天、什麼代碼、幾股、多少錢、之後持多少、註腳），不加判讀。"""
+    text = edgar.form4_text(FORM4_FULL)
+    assert text.startswith("Form 4（") and "TTM TECHNOLOGIES INC（TTMI）" in text
+    assert "申報人：Ali Wajid（董事）" in text
+    assert "2026-10-28｜代碼 P｜A 5000 股｜每股 89.8571｜交易後持股 30835｜D" in text
+    assert "註腳 F1：Weighted average price." in text
+    with pytest.raises(ValueError):
+        edgar.form4_text("<not xml")
+    assert edgar.is_ownership_xsl_url(
+        "https://www.sec.gov/Archives/edgar/data/1116942/000119312526436557/xslF345X06/ownership.xml")
+    assert not edgar.is_ownership_xsl_url("https://www.sec.gov/Archives/edgar/data/1/000000000026000001/x8k.htm")
+    assert not edgar.is_ownership_xsl_url("https://example.com/xslF345X06/ownership.xml")
+
+
 def _items() -> list[dict]:
     base = "https://www.sec.gov/Archives/edgar/data/1/00000000012600000{n}/xslF345X06/form4.xml"
     return [{"url": base.format(n=n), "title": f"X {form} filed 2026-11-02 [{n}]", "published_at": "2026-11-02",

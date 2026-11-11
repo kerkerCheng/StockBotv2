@@ -10,7 +10,7 @@
 
 - 送分類：`raw_text`（自帶）、`radar_fact`（雷達模型寫的一句事實，prompt 照實標明不是原文）、`self_described`
   （互動 session 登記的：沒有 `source_class`，標題就是研究 session 讀過來源後寫的摘要）、`cached`／`fetched`
-  （用語意預篩同一組 fetcher、同一個存檔抓全文，批次列帶 `body_text`）。
+  （用語意預篩同一組 fetcher、同一個存檔抓全文，批次列帶 `body_text`；持股申報另讀原始 XML，見 `body_fetcher_for`）。
 - **不送分類**：`no_fetcher`（沒有取全文的方法）、`fetch_failed`（這次抓不到，下一輪重抓）、`deferred`
   （超過本輪抓取上限，下一輪先抓）。它們留在 pending、**不佔分類上限**；心跳「未 triage」那一行與 ⑤「未 triage」格
   印「其中無內文 N」（`held_pending`，不連網），由互動 session 讀全文後 triage。
@@ -71,6 +71,20 @@ def held_pending(leads: Mapping[str, Mapping[str, Any]], *, text_dir: Path = TEX
                   and offline_status({**lead, "lead_id": lid}, text_dir=text_dir) == "missing")
 
 
+def body_fetcher_for(lead: Mapping[str, Any]) -> Callable[[], str | None] | None:
+    """分類取文的方法：持股申報（Form 3／4／5 的 XSL 頁）讀原始 XML 照抄成文字，其餘照 `semantic_prescreen.fetcher_for`。
+
+    只加在這一邊（2026-11-11）：含 P 的 Form 4 留在 pending 是要交給分類層（11-03），沒有取文方法就永遠 `no_fetcher`、
+    落到互動 session（11-11 一批 28 則）。`fetcher_for` 不動——語意 watch 刻意不比對持股申報（大公司的 watch 會被數十則
+    Form 4 淹沒），叫醒預篩的「抓得到嗎」也照舊（L12：同一個函式不承載兩種意思）。"""
+    from fetchers.edgar import fetch_form4_text, is_ownership_xsl_url
+
+    url = str(lead.get("url") or "")
+    if is_ownership_xsl_url(url):
+        return lambda: fetch_form4_text(url)
+    return sp.fetcher_for(lead)
+
+
 def attach(rows: Iterable[Mapping[str, Any]], *, text_dir: Path = TEXT_DIR, fetch: bool = True,
            fetch_limit: int = FETCH_LIMIT_PER_RUN,
            fetcher: Callable[[Mapping[str, Any]], Callable[[], str | None] | None] | None = None,
@@ -78,7 +92,7 @@ def attach(rows: Iterable[Mapping[str, Any]], *, text_dir: Path = TEXT_DIR, fetc
     """(送分類的列, 擋下的列, 各狀態計數)。順序不變；送分類的列帶 `body_status`，抓到全文的另帶 `body_text`。
 
     `fetch=False`：不連網（測試與手動檢視用），要抓的一律記 `deferred`。"""
-    pick = fetcher or sp.fetcher_for
+    pick = fetcher or body_fetcher_for
     sendable: list[dict[str, Any]] = []
     held: list[dict[str, Any]] = []
     counts: Counter = Counter()

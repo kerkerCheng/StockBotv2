@@ -255,6 +255,83 @@ def fetch_form4_transaction_codes(url: str) -> list[str] | None:
         return None
 
 
+def is_ownership_xsl_url(url: str) -> bool:
+    """持股申報（Form 3／4／5）的 XSL 呈現頁網址（`…/<accession>/xslF345X06/…`）。"""
+    from urllib.parse import urlsplit
+
+    parts = urlsplit(str(url or ""))
+    return parts.netloc == "www.sec.gov" and bool(_FORM4_XSL_SEGMENT.search(parts.path))
+
+
+def form4_text(xml_text: str) -> str:
+    """持股申報原始 XML → 分類器讀得懂的純文字（2026-11-11）。只照抄申報欄位、不加判讀：文件類型、發行人、申報人與身分、
+    每筆交易與持有（證券、日期、代碼、取得／處分、股數、每股價、交易後持股、直接／間接）、註腳。XML 壞了 raise ValueError。
+
+    事發：含 P 的 Form 4 留在 pending 是要交給分類層（11-03），但分類取文沒有它的取文方法——每一則都記 `no_fetcher`、
+    落到互動 session（11-11 一批 28 則）。"""
+    import xml.etree.ElementTree as ET
+
+    try:
+        root = ET.fromstring(xml_text)
+    except ET.ParseError as exc:
+        raise ValueError(f"Form 4 XML 解析失敗：{exc}") from exc
+    for node in root.iter():                                  # 去 namespace，下面一律用本地名
+        node.tag = node.tag.rsplit("}", 1)[-1]
+
+    def val(node, path: str) -> str:
+        found = node.find(path)
+        if found is None:
+            return ""
+        inner = found.find("value")
+        return " ".join(str((inner if inner is not None else found).text or "").split())
+
+    lines = [f"Form {val(root, 'documentType') or '?'}（內部人持股申報；SEC 原始 XML 照抄）",
+             f"發行人：{val(root, 'issuer/issuerName')}（{val(root, 'issuer/issuerTradingSymbol')}）；申報期間 {val(root, 'periodOfReport')}"]
+    for owner in root.findall("reportingOwner"):
+        roles = []
+        rel = owner.find("reportingOwnerRelationship")
+        if rel is not None:
+            for flag, label in (("isDirector", "董事"), ("isOfficer", "經理人"), ("isTenPercentOwner", "持股一成以上"),
+                                ("isOther", "其他")):
+                if val(rel, flag).lower() in ("1", "true"):
+                    roles.append(label)
+            if val(rel, "officerTitle"):
+                roles.append(val(rel, "officerTitle"))
+        lines.append(f"申報人：{val(owner, 'reportingOwnerId/rptOwnerName')}（{'、'.join(roles) or '身分沒寫'}）")
+    for table, label in (("nonDerivativeTable", "非衍生性"), ("derivativeTable", "衍生性")):
+        for row in root.findall(f"{table}/*"):
+            after = val(row, "postTransactionAmounts/sharesOwnedFollowingTransaction")
+            direct = val(row, "ownershipNature/directOrIndirectOwnership")
+            if row.tag.endswith("Holding"):
+                lines.append(f"- {label}持有｜{val(row, 'securityTitle')}｜持股 {after}｜{direct}")
+                continue
+            lines.append(f"- {label}交易｜{val(row, 'securityTitle')}｜{val(row, 'transactionDate')}｜"
+                         f"代碼 {val(row, 'transactionCoding/transactionCode')}｜"
+                         f"{val(row, 'transactionAmounts/transactionAcquiredDisposedCode')} "
+                         f"{val(row, 'transactionAmounts/transactionShares')} 股｜"
+                         f"每股 {val(row, 'transactionAmounts/transactionPricePerShare')}｜交易後持股 {after}｜{direct}")
+    for note in root.findall("footnotes/footnote"):
+        lines.append(f"註腳 {note.get('id', '')}：{' '.join(str(note.text or '').split())}")
+    if val(root, "remarks"):
+        lines.append(f"備註：{val(root, 'remarks')}")
+    return "\n".join(lines)
+
+
+def fetch_form4_text(url: str) -> str | None:
+    """抓持股申報原始 XML、回 `form4_text`；抓不到或解析不了回 None（呼叫端記 `fetch_failed`，INV-3）。
+    header 與限速同 `fetch_form4_transaction_codes`。"""
+    headers = _build_headers()
+    headers["Host"] = "www.sec.gov"
+    rate_sleep()
+    try:
+        resp = requests.get(form4_raw_xml_url(url), headers=headers, timeout=30)
+        resp.raise_for_status()
+        return form4_text(resp.text)
+    except Exception as e:  # noqa: BLE001 — 網路與解析都算讀不到
+        print(f"[edgar] Form 4 原文讀不到 {url}: {e}", file=sys.stderr)
+        return None
+
+
 _INDEX_ROW = re.compile(r"<tr[^>]*>(.*?)</tr>", re.S | re.I)
 _INDEX_CELL = re.compile(r"<td[^>]*>(.*?)</td>", re.S | re.I)
 _INDEX_HREF = re.compile(r'href="(?:/ix\?doc=)?(/Archives/edgar/data/[^"]+)"', re.I)

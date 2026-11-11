@@ -101,6 +101,31 @@ def test_an_unreachable_index_is_a_failed_fetch_not_a_cover_only_text(monkeypatc
     assert not list(tmp_path.iterdir()), "抓不到附件時不得留下只有封面的存檔"
 
 
+def test_ownership_filings_get_a_body_for_the_classifier_but_stay_out_of_watch_screening(
+        monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    """2026-11-11：含 P 的 Form 4 留在 pending 是要交給分類層（11-03），但沒有取文方法——一批 28 則全記 no_fetcher、
+    落到互動 session。分類取文讀原始 XML；`fetcher_for`（語意 watch 與叫醒預篩共用）照舊不收持股申報。"""
+    import fetchers.edgar as edgar
+    from engine_b import lead_text
+    from engine_b import semantic_prescreen as sp
+
+    url = "https://www.sec.gov/Archives/edgar/data/1116942/000119312526436557/xslF345X06/ownership.xml"
+    seen = {}
+
+    def fake(u):
+        seen["url"] = u
+        return "Form 4（內部人持股申報；SEC 原始 XML 照抄）\n申報人：Ali Wajid（董事）"
+
+    monkeypatch.setattr(edgar, "fetch_form4_text", fake)
+    lead = {"lead_id": "lead_ttmi4", "status": "pending", "source": "edgar:TTMI", "source_class": "primary",
+            "url": url, "form_type": "4", "title": "TTMI 4 filed 2026-10-28"}
+    assert sp.fetcher_for(lead) is None                 # 語意 watch／叫醒預篩那一邊不變
+    sendable, held, counts = lead_text.attach([lead], text_dir=tmp_path)
+    assert held == [] and [r["body_status"] for r in sendable] == ["fetched"]
+    assert "Ali Wajid" in sendable[0]["body_text"] and seen["url"] == url
+    assert lead_text.held_pending({"lead_ttmi4": lead}, text_dir=tmp_path) == []   # 存檔之後不再算「無內文」
+
+
 def test_a_cover_only_cache_from_before_105_is_refetched(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     """10-27 實測：GFS 6-K 的存檔只有封面（預篩 10-15 存的）。舊存檔不重抓的話，修好抓附件也讀不到。
     重抓的新版仍逐字含主文件——預篩當時驗過的引文仍是子字串。"""
