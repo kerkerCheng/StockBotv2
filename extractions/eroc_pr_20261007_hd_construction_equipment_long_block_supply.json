@@ -1,0 +1,106 @@
+{
+  "claims": [
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：ERock 的 10-Q／10-K／8-K 寫出長缸體供應合約終止、改向別家採購、或長缸體交期延誤拖慢生產。核查頻率：每季（ERock 10-Q、財報新聞稿與法說）。觸發後 48 小時：e1 加註或降 confidence，重寫 ERock 敘事的位置段與錯的訊號。",
+      "id": "eroc_pr_20261007_hd_construction_equipment_long_block_supply_cl1",
+      "source_ids": [
+        "eroc_pr_20261007_hd_construction_equipment_long_block_supply_s1",
+        "eroc_pr_20261007_hd_construction_equipment_long_block_supply_s2",
+        "eroc_pr_20261007_hd_construction_equipment_long_block_supply_s3",
+        "eroc_pr_20261007_hd_construction_equipment_long_block_supply_s4"
+      ],
+      "statement": "Buyer's press release (ERock, 2026-10-07): agreement with HD Construction Equipment, a subsidiary of Hyundai, for a multi-year supply of high-efficiency natural gas engine long blocks for ERock's RockBlock generator, spanning 2027 through 2028. The CEO calls long block supply the foundation of its production and says delivering on schedule depends on securing the long-lead components, with production commitments extending into early 2028. Buyer self-report naming the supplier; amount and volume not stated here (HCE's DART filing of the same date gives USD 285.6 million).",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "co:erock",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "eroc_pr_20261007_hd_construction_equipment_long_block_supply_s1",
+        "eroc_pr_20261007_hd_construction_equipment_long_block_supply_s2"
+      ],
+      "src_id": "co:hd_construction_equipment"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "HD Construction Equipment Co., Ltd.",
+        "HD건설기계"
+      ],
+      "attributes": {
+        "ticker": "267270.KS"
+      },
+      "confidence": 0.9,
+      "id": "co:hd_construction_equipment",
+      "name": "HD Construction Equipment",
+      "role": null,
+      "source_ids": [
+        "eroc_pr_20261007_hd_construction_equipment_long_block_supply_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "ERock, Inc.",
+        "Enchanted Rock"
+      ],
+      "attributes": {
+        "ticker": "EROC"
+      },
+      "confidence": 0.85,
+      "id": "co:erock",
+      "name": "ERock",
+      "role": null,
+      "source_ids": [
+        "eroc_pr_20261007_hd_construction_equipment_long_block_supply_s1"
+      ],
+      "type": "Company"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "eroc_pr_20261007_hd_construction_equipment_long_block_supply",
+    "evidence_tier": 1,
+    "origin_entity": "ERock, Inc.",
+    "permission_basis": "公司新聞稿（ERock IR 網站，Business Wire 發布）；只保留研究必要的有限逐字節錄。published_at 取新聞稿日 2026-10-07（沒有以 8-K 交 EDGAR）。原始節錄見 library/raw/eroc_pr_20261007_hd_long_block_supply_excerpt.txt（2026-11-09 取得）。",
+    "published_at": "2026-10-07",
+    "publisher": "ERock IR 網站（Business Wire）",
+    "retrieved_at": "2026-11-09",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "ERock 新聞稿（2026-10-07）〈ERock, HD Construction Equipment Sign Multi-Year Engine Long Block Supply Agreement to Accelerate Manufacturing Capacity〉：向 Hyundai 子公司 HD Construction Equipment 鎖 2027–2028 的 RockBlock 燃氣引擎長缸體供應；執行長說長缸體是生產的基礎、生產承諾排到 2028 年初",
+    "url": "https://ir.erock.com/news-events/press-releases/detail/136/erock-hd-construction-equipment-sign-multi-year-engine-long-block-supply-agreement-to-accelerate-manufacturing-capacity"
+  },
+  "sources": [
+    {
+      "id": "eroc_pr_20261007_hd_construction_equipment_long_block_supply_s1",
+      "locator": "新聞稿首段",
+      "quote": "ERock, Inc. (NYSE: EROC), a leading provider of utility-grade onsite power solutions, today announced that it has entered into an agreement with HD Construction Equipment, a subsidiary of Hyundai, for a multi-year supply of high-efficiency natural gas engine long blocks for ERock’s RockBlock generator."
+    },
+    {
+      "id": "eroc_pr_20261007_hd_construction_equipment_long_block_supply_s2",
+      "locator": "新聞稿第二段",
+      "quote": "The agreement spans 2027 through 2028 and supports increased production while enhancing ERock’s ability to fulfill large-scale customer orders for data centers, utilities, and other critical infrastructure operators."
+    },
+    {
+      "id": "eroc_pr_20261007_hd_construction_equipment_long_block_supply_s3",
+      "locator": "執行長 John Carrington 引言",
+      "quote": "Long block supply is the foundation of our production and this agreement secures supply through 2028 as we ramp assembly capacity"
+    },
+    {
+      "id": "eroc_pr_20261007_hd_construction_equipment_long_block_supply_s4",
+      "locator": "執行長引言後一段",
+      "quote": "With production commitments extending into early 2028, delivering on schedule for our customers depends on securing the long-lead components, and this agreement directly supports that."
+    }
+  ]
+}

@@ -1,0 +1,110 @@
+{
+  "claims": [
+    {
+      "confidence": 0.85,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：HCE 的 DART 出現這份合約的정정或해지公示，或 ERock 的 10-Q／10-K／8-K 寫出長缸體供應合約終止、改向別家採購或交期延後。核查頻率：每季（HCE 的 DART 公示；ERock 10-Q）。觸發後 48 小時：e1 加註或降 confidence，重寫 ERock 敘事的位置段與錯的訊號。",
+      "id": "hce_dart_20261007_erock_gas_engine_long_block_supply_cl1",
+      "source_ids": [
+        "hce_dart_20261007_erock_gas_engine_long_block_supply_s1",
+        "hce_dart_20261007_erock_gas_engine_long_block_supply_s2",
+        "hce_dart_20261007_erock_gas_engine_long_block_supply_s3",
+        "hce_dart_20261007_erock_gas_engine_long_block_supply_s4"
+      ],
+      "statement": "Supplier-side regulatory disclosure (HD Construction Equipment, DART single sales/supply contract filing, 2026-10-07): a supply contract for engine long blocks for gas power generation with Enchanted Rock, supply region United States, KRW 387.9 billion (USD 285,555,690 at the contract-date rate), term 2027-01-01 to 2028-12-31, 10% advance payment and 90% billed as supply proceeds, signed 2026-10-06; the amount equals 10.27% of the pre-merger 2025 consolidated revenue. Same contract form and terms as the PSI contract filed 2026-11-10.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "co:erock",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "hce_dart_20261007_erock_gas_engine_long_block_supply_s1",
+        "hce_dart_20261007_erock_gas_engine_long_block_supply_s2",
+        "hce_dart_20261007_erock_gas_engine_long_block_supply_s3",
+        "hce_dart_20261007_erock_gas_engine_long_block_supply_s4"
+      ],
+      "src_id": "co:hd_construction_equipment"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "HD Construction Equipment Co., Ltd.",
+        "HD건설기계"
+      ],
+      "attributes": {
+        "ticker": "267270.KS"
+      },
+      "confidence": 0.9,
+      "id": "co:hd_construction_equipment",
+      "name": "HD Construction Equipment",
+      "role": null,
+      "source_ids": [
+        "hce_dart_20261007_erock_gas_engine_long_block_supply_s1",
+        "hce_dart_20261007_erock_gas_engine_long_block_supply_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "ERock, Inc.",
+        "Enchanted Rock"
+      ],
+      "attributes": {
+        "ticker": "EROC"
+      },
+      "confidence": 0.85,
+      "id": "co:erock",
+      "name": "ERock",
+      "role": null,
+      "source_ids": [
+        "hce_dart_20261007_erock_gas_engine_long_block_supply_s1",
+        "hce_dart_20261007_erock_gas_engine_long_block_supply_s2"
+      ],
+      "type": "Company"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "hce_dart_20261007_erock_gas_engine_long_block_supply",
+    "evidence_tier": 1,
+    "origin_entity": "HD Construction Equipment Co., Ltd.",
+    "permission_basis": "DART（金融監督院電子公示）公開公示；只保留研究必要的有限逐字節錄。published_at 取公示日 2026-10-07（rcpNo 20261007800221，단일판매ㆍ공급계약체결）。",
+    "published_at": "2026-10-07",
+    "publisher": "DART 金融監督院電子公示（rcpNo 20261007800221）",
+    "retrieved_at": "2026-11-11",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "HD건설기계 DART 公示「단일판매ㆍ공급계약체결」（2026-10-07）：燃氣發電用引擎長缸體供應合約，對手 Enchanted Rock，3,879 億韓元（285,555,690 美元）、2027-01-01 到 2028-12-31、先收一成預付",
+    "url": "https://dart.fss.or.kr/dsaf001/main.do?rcpNo=20261007800221"
+  },
+  "sources": [
+    {
+      "id": "hce_dart_20261007_erock_gas_engine_long_block_supply_s1",
+      "locator": "1. 판매ㆍ공급계약 구분／2. 계약내역",
+      "quote": "체결계약명 가스 발전용 엔진 롱블럭 공급 계약 2. 계약내역 계약금액(원) 387,927,404,865 최근매출액(원) 3,776,524,012,000 매출액대비(%) 10.27"
+    },
+    {
+      "id": "hce_dart_20261007_erock_gas_engine_long_block_supply_s2",
+      "locator": "3. 계약상대／4. 판매ㆍ공급지역／5. 계약기간／6. 주요 계약조건",
+      "quote": "3. 계약상대 Enchanted Rock - 회사와의 관계 - 4. 판매ㆍ공급지역 미국 5. 계약기간 시작일 2027-01-01 종료일 2028-12-31 6. 주요 계약조건 계약금ㆍ선급금 유무 유 대금지급 조건 등 선수금 10% 및 공급계약 진행에 따른 청구 90%"
+    },
+    {
+      "id": "hce_dart_20261007_erock_gas_engine_long_block_supply_s3",
+      "locator": "9. 기타 투자판단과 관련한 중요사항（美元金額）",
+      "quote": "상기 2항의 계약금액은 USD 285,555,690를 계약체결일 최초고시 매매기준율(1 USD = 1,358.50 원)을 적용하여 환산한 금액입니다."
+    },
+    {
+      "id": "hce_dart_20261007_erock_gas_engine_long_block_supply_s4",
+      "locator": "9. 기타 투자판단과 관련한 중요사항（簽約日）",
+      "quote": "상기 7항의 계약(수주)일자는 Enchanted Rock과 체결한 물품공급계약서의 체결일자입니다."
+    }
+  ]
+}

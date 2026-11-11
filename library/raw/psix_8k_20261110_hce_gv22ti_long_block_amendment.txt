@@ -1,0 +1,20 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1137091/000119312526454122/d165124d8k.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Power Solutions International, Inc. Form 8-K（2026-11-10；accession 0001193125-26-454122，items 1.01、7.01、9.01）
+DATE: 2026-11-10（事件日 2026-11-09）
+RETRIEVED: 2026-11-11（daily 全文存檔 library/private/semantic_text/lead_a159b48ed7fa247e9e3b8fbc7910d136.txt；逐字，空白壓成單一空格）
+NOTE: 買方自己的法定申報，點名供應商 HD Construction Equipment Co., Ltd.；修約全文 PSI 說會附在 FY2026 10-K（部分遮蔽）。
+
+【Item 1.01 Entry into a Material Definitive Agreement】
+"On November 9, 2026, Power Solutions International, Inc. (the “Company”) entered into an amendment (the “Amendment”) to the Supply Agreement, dated December 11, 2007, as previously amended (the “Supply Agreement”). The Amendment, dated as of November 9, 2026, is with HD Construction Equipment Co., Ltd. (“HCE”). HCE is the successor to HD Hyundai Infracore Co., Ltd. (formerly known as Doosan Infracore Co., Ltd.) under the Supply Agreement."
+"Under the Supply Agreement, the Company buys engine long blocks from HCE. The Company integrates them into its power systems products. The Amendment covers HCE’s GV22TI 22-liter natural gas engine long blocks for calendar years 2027 and 2028."
+"The Amendment fixes the unit price for GV22TI engine long blocks for all engines ordered and shipped on or before December 31, 2028. No price increase applies to those engines unless both parties agree in writing. At the fixed price, the agreed 2027 and 2028 volumes represent aggregate purchases of approximately $121.9 million."
+"Under the Amendment, the Company will pay HCE an advance payment equal to 10% of the total contract value of each year’s volume. The advance payment for the 2027 volume is due by November 30, 2026, and the advance payment for the 2028 volume is due by June 30, 2027."
+"If the Company’s actual purchases over the 24-month period are less than 90% of the scheduled volume, the parties will discuss and agree on a recovery mechanism, which may include a price increase applicable in 2029."
+
+【Forward-Looking Statements】
+"Those risks include the Company’s dependence on HCE as a supplier, delivery delays, changes in customer demand, the Company’s obligation to make advance payments before receiving related customer deposits"
+
+【Exhibit 99.1 新聞稿】
+"PSI integrates the engine long blocks into its power systems for stationary power generation, supporting its growth in data centers and other critical infrastructure. Demand for reliable power infrastructure continues to accelerate. Securing long-lead engine capacity is essential to meeting that demand."

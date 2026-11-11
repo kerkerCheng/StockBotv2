@@ -1,0 +1,127 @@
+{
+  "claims": [
+    {
+      "confidence": 0.9,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：PSI 之後的 10-Q／10-K 或 8-K 寫出這份修約終止、交期延後或量暫減（修約允許雙方協議處理），或 24 個月實際採購低於排定量 90%觸發回補機制；或 HCE 的 DART 公示更正、解除這份合約（단일판매ㆍ공급계약 해지／정정）。核查頻率：每季（PSI 10-Q／10-K；HCE 的 DART 公示）。觸發後 48 小時：e1 加註或降 confidence，重寫 PSI 敘事的卡在哪與錯的訊號，重讀往復式機組層的上游段。",
+      "id": "psix_8k_20261110_hce_gv22ti_long_block_amendment_cl1",
+      "source_ids": [
+        "psix_8k_20261110_hce_gv22ti_long_block_amendment_s1",
+        "psix_8k_20261110_hce_gv22ti_long_block_amendment_s2",
+        "psix_8k_20261110_hce_gv22ti_long_block_amendment_s3",
+        "psix_8k_20261110_hce_gv22ti_long_block_amendment_s4",
+        "psix_8k_20261110_hce_gv22ti_long_block_amendment_s5",
+        "psix_8k_20261110_hce_gv22ti_long_block_amendment_s6",
+        "psix_8k_20261110_hce_gv22ti_long_block_amendment_s7"
+      ],
+      "statement": "Buyer-side filing (Power Solutions International 8-K, 2026-11-10, Item 1.01): PSI buys engine long blocks from HD Construction Equipment Co., Ltd. (HCE, successor to HD Hyundai Infracore, formerly Doosan Infracore) under a supply agreement dating from 2007 and integrates them into its power systems. The 2026-11-09 amendment covers HCE's GV22TI 22-liter natural gas engine long blocks for 2027 and 2028 at a fixed unit price, about $121.9 million in aggregate, with a monthly delivery schedule; PSI pays a 10% advance on each year's volume (2027 due by 2026-11-30, 2028 by 2027-06-30), and a shortfall below 90% of scheduled volume may lead to a 2029 price increase. PSI lists its dependence on HCE as a supplier and its obligation to make advance payments before receiving related customer deposits among the risks; the press release says securing long-lead engine capacity is essential to meeting data center and critical infrastructure demand. Buyer prepays supplier (costly signal). No exclusivity or sole-source is stated.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "co:power_solutions_international",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "psix_8k_20261110_hce_gv22ti_long_block_amendment_s1",
+        "psix_8k_20261110_hce_gv22ti_long_block_amendment_s2",
+        "psix_8k_20261110_hce_gv22ti_long_block_amendment_s3",
+        "psix_8k_20261110_hce_gv22ti_long_block_amendment_s4"
+      ],
+      "src_id": "co:hd_construction_equipment"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "HD Construction Equipment Co., Ltd.",
+        "HD건설기계"
+      ],
+      "attributes": {
+        "ticker": "267270.KS"
+      },
+      "confidence": 0.9,
+      "id": "co:hd_construction_equipment",
+      "name": "HD Construction Equipment",
+      "role": null,
+      "source_ids": [
+        "psix_8k_20261110_hce_gv22ti_long_block_amendment_s1",
+        "psix_8k_20261110_hce_gv22ti_long_block_amendment_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "Power Solutions International, Inc."
+      ],
+      "attributes": {
+        "ticker": "PSIX"
+      },
+      "confidence": 0.85,
+      "id": "co:power_solutions_international",
+      "name": "Power Solutions International",
+      "role": null,
+      "source_ids": [
+        "psix_8k_20261110_hce_gv22ti_long_block_amendment_s1",
+        "psix_8k_20261110_hce_gv22ti_long_block_amendment_s2"
+      ],
+      "type": "Company"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "psix_8k_20261110_hce_gv22ti_long_block_amendment",
+    "evidence_tier": 1,
+    "origin_entity": "Power Solutions International, Inc.",
+    "permission_basis": "SEC EDGAR 公開申報；只保留研究必要的有限逐字節錄。published_at 取 EDGAR 申報日 2026-11-10（EDGAR submissions：8-K，items 1.01、7.01、9.01；事件日 2026-11-09）。",
+    "published_at": "2026-11-10",
+    "publisher": "SEC EDGAR（Form 8-K，accession 0001193125-26-454122）",
+    "retrieved_at": "2026-11-11",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Power Solutions International 8-K（2026-11-10）第 1.01 項：與 HD Construction Equipment 修訂 2007 年起的供應合約——GV22TI 22 公升燃氣引擎長缸體 2027–2028 年固定單價、約 1.219 億美元、按月交期，PSI 每年先付一成預付；附新聞稿",
+    "url": "https://www.sec.gov/Archives/edgar/data/1137091/000119312526454122/d165124d8k.htm"
+  },
+  "sources": [
+    {
+      "id": "psix_8k_20261110_hce_gv22ti_long_block_amendment_s1",
+      "locator": "Item 1.01 第一段（合約當事人與承繼關係）",
+      "quote": "On November 9, 2026, Power Solutions International, Inc. (the “Company”) entered into an amendment (the “Amendment”) to the Supply Agreement, dated December 11, 2007, as previously amended (the “Supply Agreement”). The Amendment, dated as of November 9, 2026, is with HD Construction Equipment Co., Ltd. (“HCE”). HCE is the successor to HD Hyundai Infracore Co., Ltd. (formerly known as Doosan Infracore Co., Ltd.) under the Supply Agreement."
+    },
+    {
+      "id": "psix_8k_20261110_hce_gv22ti_long_block_amendment_s2",
+      "locator": "Item 1.01 第二段（買什麼、型號、年度）",
+      "quote": "Under the Supply Agreement, the Company buys engine long blocks from HCE. The Company integrates them into its power systems products. The Amendment covers HCE’s GV22TI 22-liter natural gas engine long blocks for calendar years 2027 and 2028."
+    },
+    {
+      "id": "psix_8k_20261110_hce_gv22ti_long_block_amendment_s3",
+      "locator": "Item 1.01 第二段（固定單價與金額）",
+      "quote": "The Amendment fixes the unit price for GV22TI engine long blocks for all engines ordered and shipped on or before December 31, 2028. No price increase applies to those engines unless both parties agree in writing. At the fixed price, the agreed 2027 and 2028 volumes represent aggregate purchases of approximately $121.9 million."
+    },
+    {
+      "id": "psix_8k_20261110_hce_gv22ti_long_block_amendment_s4",
+      "locator": "Item 1.01 第三段（預付）",
+      "quote": "Under the Amendment, the Company will pay HCE an advance payment equal to 10% of the total contract value of each year’s volume. The advance payment for the 2027 volume is due by November 30, 2026, and the advance payment for the 2028 volume is due by June 30, 2027."
+    },
+    {
+      "id": "psix_8k_20261110_hce_gv22ti_long_block_amendment_s5",
+      "locator": "Item 1.01 第三段（未買足 90% 的回補機制）",
+      "quote": "If the Company’s actual purchases over the 24-month period are less than 90% of the scheduled volume, the parties will discuss and agree on a recovery mechanism, which may include a price increase applicable in 2029."
+    },
+    {
+      "id": "psix_8k_20261110_hce_gv22ti_long_block_amendment_s6",
+      "locator": "Forward-Looking Statements 風險列舉",
+      "quote": "Those risks include the Company’s dependence on HCE as a supplier, delivery delays, changes in customer demand, the Company’s obligation to make advance payments before receiving related customer deposits"
+    },
+    {
+      "id": "psix_8k_20261110_hce_gv22ti_long_block_amendment_s7",
+      "locator": "Exhibit 99.1 新聞稿第二段",
+      "quote": "PSI integrates the engine long blocks into its power systems for stationary power generation, supporting its growth in data centers and other critical infrastructure. Demand for reliable power infrastructure continues to accelerate. Securing long-lead engine capacity is essential to meeting that demand."
+    }
+  ]
+}
