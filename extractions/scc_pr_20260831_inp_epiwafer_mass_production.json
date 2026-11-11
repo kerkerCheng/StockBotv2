@@ -1,0 +1,114 @@
+{
+  "claims": [
+    {
+      "confidence": 0.55,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：住友化學的決算說明資料、統合報告或新聞稿寫出 InP 磊晶片量產延後、縮小或退出，或兩年內（到 2028-08-31）沒有任何客戶端或第三方一手具名用它的 InP 磊晶片。核查頻率：每半年（住友化學中期與年度決算說明資料）。觸發後 48 小時：e1 降 confidence 或加註，重讀 InP 磊晶片層的供給側家數。",
+      "id": "scc_pr_20260831_inp_epiwafer_mass_production_cl1",
+      "source_ids": [
+        "scc_pr_20260831_inp_epiwafer_mass_production_s1",
+        "scc_pr_20260831_inp_epiwafer_mass_production_s2",
+        "scc_pr_20260831_inp_epiwafer_mass_production_s3",
+        "scc_pr_20260831_inp_epiwafer_mass_production_s4",
+        "scc_pr_20260831_inp_epiwafer_mass_production_s5"
+      ],
+      "statement": "Supplier's own press release (Sumitomo Chemical, 2026-08-31): at its Ibaraki Works (Hitachi City) the company established a mass-production system for 4-inch indium phosphide (InP) epitaxial wafers and started sales, describing itself as one of the few epi houses in Japan able to mass-produce InP epiwafers stably, aimed at photonics-electronics convergence for AI data centers and high-speed networks; it targets about JPY 10 billion of InP epiwafer product sales by the mid-2030s, building on more than 25 years of GaAs and GaN epiwafer mass production. Self-report: no customer, device type (laser or photodetector), volume or capacity is named; 4-inch, not 6-inch.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.6,
+      "dst_id": "mat:inp_epiwafer",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "scc_pr_20260831_inp_epiwafer_mass_production_s1",
+        "scc_pr_20260831_inp_epiwafer_mass_production_s2",
+        "scc_pr_20260831_inp_epiwafer_mass_production_s4"
+      ],
+      "src_id": "co:sumitomo_chemical"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "Sumitomo Chemical Co., Ltd.",
+        "住友化学",
+        "住友化学株式会社"
+      ],
+      "attributes": {
+        "ticker": "4005.T"
+      },
+      "confidence": 0.9,
+      "id": "co:sumitomo_chemical",
+      "name": "Sumitomo Chemical",
+      "role": null,
+      "source_ids": [
+        "scc_pr_20260831_inp_epiwafer_mass_production_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "equipment_epitaxy",
+      "aliases": [
+        "InP epiwafer",
+        "InP epi-wafer",
+        "InP epitaxial wafer",
+        "indium phosphide epitaxial wafer",
+        "磷化銦磊晶片"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "mat:inp_epiwafer",
+      "name": "Indium Phosphide (InP) epitaxial wafer (laser and photodetector epi)",
+      "source_ids": [
+        "scc_pr_20260831_inp_epiwafer_mass_production_s1"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "scc_pr_20260831_inp_epiwafer_mass_production",
+    "evidence_tier": 2,
+    "origin_entity": "Sumitomo Chemical Co., Ltd.",
+    "permission_basis": "公司新聞稿（住友化學官網，事業・製品ニュース）；只保留研究必要的有限逐字節錄。published_at 取新聞稿日 2026-08-31（頁內日期「2026年08月31日」）。",
+    "published_at": "2026-08-31",
+    "publisher": "住友化學官網新聞稿",
+    "retrieved_at": "2026-11-11",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "住友化學新聞稿（2026-08-31）〈AIデータセンターの進化を支えるInPエピウエハの量産・販売を開始〉：茨城工場確立 4 吋 InP 磊晶片量產體制並開始販售；自稱國內能穩定量產的少數磊晶廠之一；目標 2030 年代中期 InP 磊晶片營收 100 億日圓",
+    "url": "https://www.sumitomo-chem.co.jp/news/detail/20260831.html"
+  },
+  "sources": [
+    {
+      "id": "scc_pr_20260831_inp_epiwafer_mass_production_s1",
+      "locator": "新聞稿首段",
+      "quote": "住友化学は、茨城工場（茨城県日立市）において、化合物半導体の一種であるインジウムリン（以下、InP）エピウエハ（４インチ品）の量産体制を確立し、販売を開始しました。"
+    },
+    {
+      "id": "scc_pr_20260831_inp_epiwafer_mass_production_s2",
+      "locator": "新聞稿首段（定位）",
+      "quote": "InPエピウエハを安定的に量産可能な国内でも数少ないエピハウスの一つとして、次世代デジタルインフラを支える光電融合 ※ 技術の社会実装に貢献してまいります。"
+    },
+    {
+      "id": "scc_pr_20260831_inp_epiwafer_mass_production_s3",
+      "locator": "新聞稿首段（營收目標）",
+      "quote": "また、2030年代央にはInPエピウエハ製品群で売上高100億円規模を目指します。"
+    },
+    {
+      "id": "scc_pr_20260831_inp_epiwafer_mass_production_s4",
+      "locator": "「InPエピウエハ」段（用途與需求）",
+      "quote": "なかでもInPエピウエハは、電気信号と光信号を高効率で変換する高性能な光半導体デバイスを実現する中核材料として、次世代データセンターや高速ネットワーク分野で活用が急速に広がっており、今後も大幅な需要の拡大が見込まれています。"
+    },
+    {
+      "id": "scc_pr_20260831_inp_epiwafer_mass_production_s5",
+      "locator": "第三段（技術來源）",
+      "quote": "住友化学は、これらの課題に対し、ガリウムヒ素（以下、GaAs）エピウエハおよび窒化ガリウム（以下、GaN）エピウエハの25年以上にわたる量産で培った独自の組成制御技術、薄膜積層技術、結晶成長プロセス制御技術を結集することで、高品位かつ高い生産性を両立するInPエピウエハの量産体制を確立しました。"
+    }
+  ]
+}
