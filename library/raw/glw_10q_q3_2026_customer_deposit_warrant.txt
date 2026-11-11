@@ -1,0 +1,18 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/24741/000002474126000279/glw-20260930.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Corning Incorporated Form 10-Q（期末 2026-09-30；accession 0000024741-26-000279；2026-10-29 申報）
+DATE: 2026-10-29
+RETRIEVED: 2026-11-11（daily ⑩a 全文存檔 library/private/semantic_text/lead_009cff64c7888cfeea5960e409d615bb.txt；逐字，空白壓成單一空格）
+NOTE: 發行人自己的法定申報；10-Q 沒點名預付的客戶，認股權證的買方由同公司 2026-05-06 8-K 第 3.02 項點名（NVIDIA）。
+
+【Note 2 Revenue — Contract Liabilities】
+"Customer deposits allow customers to secure rights to products produced by Corning under long-term supply agreements, typically over periods of up to 10 years."
+"During the second quarter of 2026, the Company recorded an approximate $0.7 billion net contract liability, consisting of a $1.0 billion customer deposit under a long-term supply agreement extending through December 31, 2029, partially offset by $267 million for the long-term portion of a warrant issued to the customer, accounted for as consideration payable to the customer and measured at its grant-date fair value."
+
+【Note 12 Shareholders' Equity — Issuance of Warrants】
+"On May 6, 2026, in connection with the long-term customer partnership to help strengthen U.S. manufacturing for AI infrastructure, the Company entered into a securities purchase agreement (the “Purchase Agreement”) under which the Company issued and sold (i) a warrant (the “Traditional Warrant”) to purchase up to 15 million shares of common stock of the Company at an exercise price of $180.00 per share, and (ii) a pre-funded warrant (the “Pre-Funded Warrant” and, together with the Traditional Warrant, the “Warrants”) to purchase up to 3 million shares of common stock at an exercise price of $0.0001 per share."
+"The Pre-Funded Warrant was issued for cash consideration of $500 million, which approximated its fair value at issuance"
+
+【Consolidated Statements of Cash Flows（九個月）】
+"Customer deposits and government incentives 639 (49)"

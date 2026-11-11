@@ -1,0 +1,13 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/24741/000120677426000273/glw4631061-8k.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Corning Incorporated Form 8-K（2026-05-06；accession 0001206774-26-000273，items 3.02、7.01、9.01）
+DATE: 2026-05-06
+RETRIEVED: 2026-11-11（本機 repo 的 fetchers.edgar，SEC 預設 UA；逐字，空白壓成單一空格）
+NOTE: 發行人自己的法定申報；第 3.02 項點名認股權證的買方是 NVIDIA。
+
+【Item 3.02 Unregistered Sales of Equity Securities】
+"On May 6, 2026, in connection with the long-term partnership with NVIDIA Corporation (“NVIDIA”) described in Item 7.01 below, Corning Incorporated (the “Company”) entered into a securities purchase agreement (the “Purchase Agreement”) with NVIDIA pursuant to which the Company issued and sold to NVIDIA (i) a warrant (the “Traditional Warrant”) to purchase up to 15 million shares of common stock of the Company, par value $0.50 per share (the “Common Stock”), at an exercise price of $180.00 per share, and (ii) a pre-funded warrant (the “Pre-Funded Warrant” and, together with the Traditional Warrant, the “Warrants”) to purchase up to 3 million shares of Common Stock at an exercise price of $0.0001 per share, for an aggregate purchase price of $500 million."
+
+【Exhibit 99.1 首段】
+"NVIDIA (NASDAQ: NVDA) and Corning Incorporated (NYSE: GLW) today announced a multiyear commercial and technology partnership to dramatically expand U.S.-based manufacturing of the advanced optical connectivity solutions needed to power next-generation AI infrastructure."

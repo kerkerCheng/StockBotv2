@@ -1,0 +1,93 @@
+{
+  "claims": [
+    {
+      "confidence": 0.9,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：Corning 的 10-Q／10-K 或 8-K 寫出這份長期夥伴協議終止（Traditional Warrant 依條款隨協議終止而失效），或 NVIDIA 的申報寫出出售或註銷這批認股權證。核查頻率：每季（Corning 10-Q 的 Shareholders' Equity 附註）。觸發後 48 小時：e1 加註終止日期或降 confidence，重讀光纖層讀圖與 Corning 那幾條供貨邊的客戶端承諾。",
+      "id": "glw_8k_20260506_nvidia_warrants_cl1",
+      "source_ids": [
+        "glw_8k_20260506_nvidia_warrants_s1",
+        "glw_8k_20260506_nvidia_warrants_s2"
+      ],
+      "statement": "Corning's Form 8-K of 2026-05-06 (Item 3.02): in connection with the long-term partnership with NVIDIA, Corning issued and sold to NVIDIA a warrant to purchase up to 15 million shares at $180.00 per share and a pre-funded warrant for up to 3 million shares at $0.0001, for an aggregate purchase price of $500 million. The joint press release (Exhibit 99.1) calls it a multiyear commercial and technology partnership to expand U.S.-based manufacturing of advanced optical connectivity. Minority, non-control stake; the filing gives no supply volume.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "co:corning",
+      "id": "e1",
+      "relation": "invests_in",
+      "source_ids": [
+        "glw_8k_20260506_nvidia_warrants_s1"
+      ],
+      "src_id": "co:nvidia"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "GLW"
+      ],
+      "attributes": {
+        "ticker": "GLW"
+      },
+      "confidence": 0.9,
+      "id": "co:corning",
+      "name": "Corning",
+      "role": "material_base",
+      "source_ids": [
+        "glw_8k_20260506_nvidia_warrants_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "NVDA",
+        "NVIDIA Corporation",
+        "Nvidia"
+      ],
+      "attributes": {
+        "ticker": "NVDA"
+      },
+      "confidence": 0.95,
+      "id": "co:nvidia",
+      "name": "NVIDIA",
+      "role": "leader",
+      "source_ids": [
+        "glw_8k_20260506_nvidia_warrants_s1"
+      ],
+      "type": "Company"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "glw_8k_20260506_nvidia_warrants",
+    "evidence_tier": 1,
+    "origin_entity": "Corning Incorporated",
+    "permission_basis": "SEC EDGAR 公開申報；只保留研究必要的有限逐字節錄。published_at 取申報日 2026-05-06（EDGAR submissions：8-K，items 3.02,7.01,9.01）。",
+    "published_at": "2026-05-06",
+    "publisher": "SEC EDGAR",
+    "retrieved_at": "2026-11-11",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Corning 8-K（2026-05-06）第 3.02 項：與 NVIDIA 長期夥伴關係相關，賣給 NVIDIA 認股權證（1,500 萬股、行使價 180 美元）與預付型認股權證（300 萬股），合計價款 5 億美元；附 NVIDIA–Corning 聯合新聞稿",
+    "url": "https://www.sec.gov/Archives/edgar/data/24741/000120677426000273/glw4631061-8k.htm"
+  },
+  "sources": [
+    {
+      "id": "glw_8k_20260506_nvidia_warrants_s1",
+      "locator": "Form 8-K Item 3.02 Unregistered Sales of Equity Securities",
+      "quote": "On May 6, 2026, in connection with the long-term partnership with NVIDIA Corporation (“NVIDIA”) described in Item 7.01 below, Corning Incorporated (the “Company”) entered into a securities purchase agreement (the “Purchase Agreement”) with NVIDIA pursuant to which the Company issued and sold to NVIDIA (i) a warrant (the “Traditional Warrant”) to purchase up to 15 million shares of common stock of the Company, par value $0.50 per share (the “Common Stock”), at an exercise price of $180.00 per share, and (ii) a pre-funded warrant (the “Pre-Funded Warrant” and, together with the Traditional Warrant, the “Warrants”) to purchase up to 3 million shares of Common Stock at an exercise price of $0.0001 per share, for an aggregate purchase price of $500 million."
+    },
+    {
+      "id": "glw_8k_20260506_nvidia_warrants_s2",
+      "locator": "Exhibit 99.1 NVIDIA–Corning 聯合新聞稿（2026-05-06）首段",
+      "quote": "NVIDIA (NASDAQ: NVDA) and Corning Incorporated (NYSE: GLW) today announced a multiyear commercial and technology partnership to dramatically expand U.S.-based manufacturing of the advanced optical connectivity solutions needed to power next-generation AI infrastructure."
+    }
+  ]
+}

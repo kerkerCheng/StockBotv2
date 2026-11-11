@@ -1,0 +1,108 @@
+{
+  "claims": [
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：Corning 之後的 10-Q／10-K 寫出這份到 2029-12-31 的長期供貨協議終止、預付退還，或客戶預付的對象不是 NVIDIA（例如 10-K 附註點名別的客戶）；或 NVIDIA 的申報寫出它沒有對 Corning 的預付。核查頻率：每季（Corning 10-Q 的 Contract Liabilities 附註與 NVIDIA 10-Q 的 prepaid supply agreements）。觸發後 48 小時：e1 降 confidence 或撤回，重讀光纖層讀圖的需求側（客戶端資本承諾那一句）。",
+      "id": "glw_10q_q3_2026_customer_deposit_warrant_cl1",
+      "source_ids": [
+        "glw_10q_q3_2026_customer_deposit_warrant_s1",
+        "glw_10q_q3_2026_customer_deposit_warrant_s2",
+        "glw_10q_q3_2026_customer_deposit_warrant_s3",
+        "glw_10q_q3_2026_customer_deposit_warrant_s4"
+      ],
+      "statement": "Corning's Q3 2026 Form 10-Q: in Q2 2026 Corning recorded a $1.0 billion customer deposit under a long-term supply agreement extending through 2029-12-31, partially offset by $267 million for the long-term portion of a warrant issued to the customer (consideration payable to the customer, recognized as a revenue reduction as sales occur under the agreement). Note 12 describes that warrant: issued May 6, 2026 'in connection with the long-term customer partnership to help strengthen U.S. manufacturing for AI infrastructure' — 15 million shares at $180.00 plus a 3-million-share pre-funded warrant sold for $500 million cash. Corning's 8-K of 2026-05-06 (Item 3.02) names the buyer of exactly these warrants as NVIDIA; the 10-Q itself does not name the customer. Customer deposits 'allow customers to secure rights to products produced by Corning' — a customer capital commitment (customer pays supplier). No product, volume or exclusivity is stated.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "co:nvidia",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "glw_10q_q3_2026_customer_deposit_warrant_s1",
+        "glw_10q_q3_2026_customer_deposit_warrant_s3"
+      ],
+      "src_id": "co:corning"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "GLW"
+      ],
+      "attributes": {
+        "ticker": "GLW"
+      },
+      "confidence": 0.9,
+      "id": "co:corning",
+      "name": "Corning",
+      "role": "material_base",
+      "source_ids": [
+        "glw_10q_q3_2026_customer_deposit_warrant_s1",
+        "glw_10q_q3_2026_customer_deposit_warrant_s3"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "NVDA",
+        "NVIDIA Corporation",
+        "Nvidia"
+      ],
+      "attributes": {
+        "ticker": "NVDA"
+      },
+      "confidence": 0.95,
+      "id": "co:nvidia",
+      "name": "NVIDIA",
+      "role": "leader",
+      "source_ids": [
+        "glw_10q_q3_2026_customer_deposit_warrant_s1",
+        "glw_10q_q3_2026_customer_deposit_warrant_s3"
+      ],
+      "type": "Company"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "glw_10q_q3_2026_customer_deposit_warrant",
+    "evidence_tier": 1,
+    "origin_entity": "Corning Incorporated",
+    "permission_basis": "SEC EDGAR 公開申報；只保留研究必要的有限逐字節錄。published_at 取申報日 2026-10-29（EDGAR：10-Q，期末 2026-09-30）。",
+    "published_at": "2026-10-29",
+    "publisher": "SEC EDGAR",
+    "retrieved_at": "2026-11-11",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Corning 10-Q Q3 2026（期末 2026-09-30；2026-10-29 申報）：第二季一筆 10 億美元客戶預付（長期供貨協議到 2029-12-31），以發給該客戶的認股權證部分抵減；認股權證條件與 5-06 賣給 NVIDIA 的那批相同",
+    "url": "https://www.sec.gov/Archives/edgar/data/24741/000002474126000279/glw-20260930.htm"
+  },
+  "sources": [
+    {
+      "id": "glw_10q_q3_2026_customer_deposit_warrant_s1",
+      "locator": "Notes to Consolidated Financial Statements, Note 2 Revenue — Contract Liabilities",
+      "quote": "During the second quarter of 2026, the Company recorded an approximate $0.7 billion net contract liability, consisting of a $1.0 billion customer deposit under a long-term supply agreement extending through December 31, 2029, partially offset by $267 million for the long-term portion of a warrant issued to the customer, accounted for as consideration payable to the customer and measured at its grant-date fair value."
+    },
+    {
+      "id": "glw_10q_q3_2026_customer_deposit_warrant_s2",
+      "locator": "Note 2 Revenue — Contract Liabilities（同段前一句）",
+      "quote": "Customer deposits allow customers to secure rights to products produced by Corning under long-term supply agreements, typically over periods of up to 10 years."
+    },
+    {
+      "id": "glw_10q_q3_2026_customer_deposit_warrant_s3",
+      "locator": "Note 12 Shareholders' Equity — Issuance of Warrants",
+      "quote": "On May 6, 2026, in connection with the long-term customer partnership to help strengthen U.S. manufacturing for AI infrastructure, the Company entered into a securities purchase agreement (the “Purchase Agreement”) under which the Company issued and sold (i) a warrant (the “Traditional Warrant”) to purchase up to 15 million shares of common stock of the Company at an exercise price of $180.00 per share, and (ii) a pre-funded warrant (the “Pre-Funded Warrant” and, together with the Traditional Warrant, the “Warrants”) to purchase up to 3 million shares of common stock at an exercise price of $0.0001 per share."
+    },
+    {
+      "id": "glw_10q_q3_2026_customer_deposit_warrant_s4",
+      "locator": "Note 12 Shareholders' Equity — Issuance of Warrants（Pre-Funded Warrant）",
+      "quote": "The Pre-Funded Warrant was issued for cash consideration of $500 million, which approximated its fair value at issuance"
+    }
+  ]
+}
