@@ -1,0 +1,10 @@
+Source URL: https://disclosure2.edinet-fsa.go.jp/WZEK0040.aspx?S100YDBM=
+
+Excerpt:
+[EXCERPT — 有限逐字引文] 日東紡績株式会社（3110）有価証券報告書 第165期（2025-04-01～2026-03-31；EDINET 書類 S100YDBM，提出 2026-06-18 10:09）——重要な契約等
+DATE: 2026-06-18
+RETRIEVED: 2026-11-11（EDINET API v2 書類取得 type=5 XBRL→CSV 的テキストブロック，本機 repo 的 fetchers.edinet；逐字）
+NOTE: 發行人自己的法定申報；在這條關係裡日東紡是委託方（買方）。全文節錄見 library/raw/nittobo_yuho_fy2025_customers_contracts_capex_excerpt.txt。
+
+【重要な契約等（表格逐欄接成一行）】
+"５ 【重要な契約等】製品の製造委託契約相手先相手先の所在地契約締結日契約内容南亜塑膠工業股份有限公司台湾2025年11月28日スペシャルガラスクロスの織布製造委託"

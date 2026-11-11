@@ -1,0 +1,92 @@
+{
+  "claims": [
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：日東紡下一份有価証券報告書（約 2027-06）的「重要な契約等」不再列這份委託契約，或日東紡、南亞的一手寫出委託終止或縮減。核查頻率：每年（日東紡有報，6 月）＋每季（日東紡決算説明資料「南亜プラスチックとの協業」那一行）。觸發後 48 小時：e1 加註或降 confidence，重讀日東紡敘事「量從哪裡來」那一句與特殊玻璃布的供給側。",
+      "id": "edinet_3110_yuho_fy2025_s100ydbm_cl1",
+      "source_ids": [
+        "edinet_3110_yuho_fy2025_s100ydbm_s1"
+      ],
+      "statement": "Nitto Boseki's annual securities report for the fiscal year ended 2026-03-31 (EDINET S100YDBM, filed 2026-06-18), section 'Important contracts': a product manufacturing consignment contract with 南亜塑膠工業股份有限公司 (Nan Ya Plastics Corporation, Taiwan), signed 2025-11-28, contract content 'weaving manufacturing consignment of special glass cloth' (スペシャルガラスクロスの織布製造委託). This is the consignor's (buyer's) own statutory disclosure. Nittobo's FY2026 Q1 results presentation (2026-08-05, p.16) lists '南亜プラスチックとの協業（織布工程）' in its special-glass capacity plan. The filing states no volume, no contract term, no exclusivity, and not which special glass (NE or T) is woven.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "co:nitto_boseki",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "edinet_3110_yuho_fy2025_s100ydbm_s1"
+      ],
+      "src_id": "co:nan_ya_plastics"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "Nan Ya Plastics",
+        "南亞塑膠",
+        "南亞塑膠工業股份有限公司",
+        "南亜塑膠工業股份有限公司",
+        "南亜プラスチック"
+      ],
+      "attributes": {
+        "ticker": "1303.TW"
+      },
+      "confidence": 0.9,
+      "id": "co:nan_ya_plastics",
+      "name": "Nan Ya Plastics",
+      "role": null,
+      "source_ids": [
+        "edinet_3110_yuho_fy2025_s100ydbm_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "Nittobo",
+        "日東紡",
+        "日東紡績",
+        "Nitto Boseki"
+      ],
+      "attributes": {
+        "ticker": "3110.T"
+      },
+      "confidence": 0.9,
+      "id": "co:nitto_boseki",
+      "name": "Nitto Boseki",
+      "role": null,
+      "source_ids": [
+        "edinet_3110_yuho_fy2025_s100ydbm_s1"
+      ],
+      "type": "Company"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "edinet_3110_yuho_fy2025_s100ydbm",
+    "evidence_tier": 1,
+    "origin_entity": "Nitto Boseki Co., Ltd.",
+    "permission_basis": "EDINET 公開的有価証券報告書；只保留研究必要的有限逐字節錄。published_at 取提出日 2026-06-18（EDINET 書類一覧：提出 2026-06-18 10:09）。",
+    "published_at": "2026-06-18",
+    "publisher": "EDINET（金融庁）",
+    "retrieved_at": "2026-11-11",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "日東紡績 有価証券報告書 第165期（2025-04-01～2026-03-31）「重要な契約等」：南亜塑膠工業股份有限公司とスペシャルガラスクロスの織布製造委託契約（2025-11-28 締結）",
+    "url": "https://disclosure2.edinet-fsa.go.jp/WZEK0040.aspx?S100YDBM="
+  },
+  "sources": [
+    {
+      "id": "edinet_3110_yuho_fy2025_s100ydbm_s1",
+      "locator": "有価証券報告書 第一部【企業情報】第2【事業の状況】５【重要な契約等】（製品の製造委託契約の表）",
+      "quote": "５ 【重要な契約等】製品の製造委託契約相手先相手先の所在地契約締結日契約内容南亜塑膠工業股份有限公司台湾2025年11月28日スペシャルガラスクロスの織布製造委託"
+    }
+  ]
+}
