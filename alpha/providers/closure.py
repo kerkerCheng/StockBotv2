@@ -223,10 +223,16 @@ def supply_seats(structure_payload: Any, registry: Any) -> frozenset[str]:
 
     `depends_on`／`constrained_by` 是買方那一側，不算座位；`develops`／`invests_in` 結構表本來就不收
     （只有開發中或只有投資邊的公司會落到「邊緣沒座位」，由短檢查分辨，plan §6b 的 L11-6 ④）。
+    供貨目標（`bottleneck`＝邊的 dst）是公司的也不算：座位是坐在層或插槽上，判準只有 `is_seat_edge` 一份（L16）——
+    2026-11-11 267270.KS 只有供 PSI、ERock 的公司對公司邊，閉包留它在母體、讀圖面板卻永遠補不上（L17 當下修）。
     """
+    from alpha.providers.structure_readings import is_seat_edge
+
     out: set[str] = set()
     for row in (structure_payload or {}).get("rows") or ():
         if row.get("relation") != "supplies_to":
+            continue
+        if not is_seat_edge(str(row.get("company_id") or ""), "supplies_to", str(row.get("bottleneck") or "")):
             continue
         ticker = registry.research_ticker(str(row.get("company_id") or ""))
         if ticker:

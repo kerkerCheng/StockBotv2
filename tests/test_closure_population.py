@@ -254,6 +254,20 @@ def test_supply_seat_counts_only_supplies_to() -> None:
     assert provider.supply_seats(payload, _Reg()) == frozenset({"SILEX.ST"})
 
 
+def test_supply_seat_needs_a_layer_target_not_a_company() -> None:
+    """座位是坐在層或插槽上（`is_seat_edge`，讀圖面板同一份）：只有公司對公司供貨邊的公司不算有座位、落到「邊緣沒座位」
+    （2026-11-11 真資料：267270.KS 只供 PSI、ERock 引擎長缸體——閉包留它在母體、讀圖面板永遠補不上）。"""
+    class _Reg:
+        def research_ticker(self, cid):
+            return {"co:hce": "267270.KS", "co:scc": "4005.T"}.get(cid)
+
+    payload = {"rows": [{"company_id": "co:hce", "relation": "supplies_to", "bottleneck": "co:psi"},
+                        {"company_id": "co:hce", "relation": "supplies_to", "bottleneck": "co:erock"},
+                        {"company_id": "co:scc", "relation": "supplies_to", "bottleneck": "co:lumentum"},
+                        {"company_id": "co:scc", "relation": "supplies_to", "bottleneck": "mat:inp_epiwafer"}]}
+    assert provider.supply_seats(payload, _Reg()) == frozenset({"4005.T"})     # 有一條到層就算（聯集）
+
+
 def test_short_check_due_after_ninety_days() -> None:
     today = date(2026, 10, 7)
     reason, due = provider.population_detail("edge_no_seat", "no_supply_seat", {}, board_day="2026-10-07",
