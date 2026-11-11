@@ -1,0 +1,201 @@
+{
+  "claims": [
+    {
+      "confidence": 0.9,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：三星電機的 DART 出現這筆取得的再更正、撤回或處分（지분 처분、합작 해소），或之後的分季／半年報告的他法人出資表沒有글라셈、持股不是 66.2%。核查頻率：每季（三星電機 DART 公示與分季、半年、事業報告的타법인출자 현황）。觸發後 48 小時：e2／e3 加註或降 confidence，重讀玻璃核心層（mat:glass_core）的開發者表。",
+      "id": "semco_dart_20261105_glassem_jv_acquisition_correction_cl1",
+      "source_ids": [
+        "semco_dart_20261105_glassem_jv_acquisition_correction_s1",
+        "semco_dart_20261105_glassem_jv_acquisition_correction_s2",
+        "semco_dart_20261105_glassem_jv_acquisition_correction_s3",
+        "semco_dart_20261105_glassem_jv_acquisition_correction_s4",
+        "semco_dart_20261105_glassem_jv_acquisition_correction_s5",
+        "semco_dart_20261105_glassem_jv_acquisition_correction_s6",
+        "semco_dart_20261105_glassem_jv_acquisition_correction_s7"
+      ],
+      "statement": "Filer-side statutory disclosure (Samsung Electro-Mechanics, DART decision to acquire shares of another company; board resolution 2026-07-02, correction filed 2026-11-05): SEMCO acquires 63,820,000 shares (66.2%) of 글라셈 주식회사 (provisional name in July, confirmed in the correction) for KRW 319.1 billion — KRW 239.1 billion in cash and KRW 80.0 billion in kind — as a newly established joint venture with 동우화인켐(주), a subsidiary of Japan's Sumitomo Chemical, to preempt the glass substrate market. The correction confirms the name, states capital of KRW 48.21 billion on 96,420,000 shares, and moves the payment date from 2026-09-01 to 2026-11-05 because overseas merger filings were delayed. After five years, an unresolved deadlock gives SEMCO a call option on Dongwoo's entire stake at 120% of appraised value and Dongwoo a put option at 80%. Dongwoo's stake is not stated in the filing.",
+      "subject_id": "e2"
+    },
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：三星電機或住友化學的一手（公示、分季／年度報告、法說）寫出글라셈 的玻璃核心事業中止、延後到 2029 年以後，或 2027 年底前兩家的一手仍沒寫出글라셈 開始生產或出貨。核查頻率：每季（三星電機法說與 DART、住友化學決算說明）。觸發後 48 小時：e1 加註或降 confidence；重讀 IC 載板層與 T-glass 布層讀圖裡玻璃核心的時鐘。",
+      "id": "semco_dart_20261105_glassem_jv_acquisition_correction_cl2",
+      "source_ids": [
+        "semco_dart_20261105_glassem_jv_acquisition_correction_s2",
+        "semco_dart_20261105_glassem_jv_acquisition_correction_s3"
+      ],
+      "statement": "Samsung Electro-Mechanics' DART filing lists the main business of the new joint venture 글라셈 주식회사 as 'Glass Core 제조 및 판매' (glass core manufacturing and sales) and gives the purpose of the investment as preempting the glass substrate market. The filing gives no production start, capacity, customers or product specification; the JV has no financials yet. Pre-production: this is a develops relation, not a supply relation.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "mat:glass_core",
+      "id": "e1",
+      "relation": "develops",
+      "source_ids": [
+        "semco_dart_20261105_glassem_jv_acquisition_correction_s2",
+        "semco_dart_20261105_glassem_jv_acquisition_correction_s3"
+      ],
+      "src_id": "co:glassem"
+    },
+    {
+      "attributes": {
+        "control": true
+      },
+      "confidence": 0.9,
+      "dst_id": "co:glassem",
+      "id": "e2",
+      "relation": "invests_in",
+      "source_ids": [
+        "semco_dart_20261105_glassem_jv_acquisition_correction_s1",
+        "semco_dart_20261105_glassem_jv_acquisition_correction_s3",
+        "semco_dart_20261105_glassem_jv_acquisition_correction_s5",
+        "semco_dart_20261105_glassem_jv_acquisition_correction_s6"
+      ],
+      "src_id": "co:samsung_electro_mechanics"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "co:glassem",
+      "id": "e3",
+      "relation": "invests_in",
+      "source_ids": [
+        "semco_dart_20261105_glassem_jv_acquisition_correction_s3",
+        "semco_dart_20261105_glassem_jv_acquisition_correction_s6"
+      ],
+      "src_id": "co:dongwoo_finechem"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "Samsung Electro-Mechanics",
+        "Samsung Electro-Mechanics Co., Ltd."
+      ],
+      "attributes": {
+        "ticker": "009150.KS"
+      },
+      "confidence": 0.95,
+      "id": "co:samsung_electro_mechanics",
+      "name": "Samsung Electro-Mechanics",
+      "role": null,
+      "source_ids": [
+        "semco_dart_20261105_glassem_jv_acquisition_correction_s1",
+        "semco_dart_20261105_glassem_jv_acquisition_correction_s6"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "글라셈"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:glassem",
+      "name": "글라셈 주식회사",
+      "role": null,
+      "source_ids": [
+        "semco_dart_20261105_glassem_jv_acquisition_correction_s2",
+        "semco_dart_20261105_glassem_jv_acquisition_correction_s4"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "동우화인켐",
+        "東友ファインケム株式会社"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:dongwoo_finechem",
+      "name": "동우화인켐(주)",
+      "role": null,
+      "source_ids": [
+        "semco_dart_20261105_glassem_jv_acquisition_correction_s3",
+        "semco_dart_20261105_glassem_jv_acquisition_correction_s6"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "glass core substrate",
+        "Glass Core",
+        "玻璃芯載板",
+        "玻璃核心載板",
+        "유리기판",
+        "玻璃基载板",
+        "玻璃基封装载板"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "mat:glass_core",
+      "name": "Glass core for IC package substrates (glass core substrate)",
+      "role": null,
+      "source_ids": [
+        "semco_dart_20261105_glassem_jv_acquisition_correction_s2"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "semco_dart_20261105_glassem_jv_acquisition_correction",
+    "evidence_tier": 1,
+    "origin_entity": "Samsung Electro-Mechanics Co., Ltd.",
+    "permission_basis": "DART（金融監督院電子公示）公開公示；只保留研究必要的有限逐字節錄。published_at 取記載更正的公示日 2026-11-05（rcpNo 20261105800383，[기재정정]타법인주식및출자증권취득결정）；同一筆取得的原公示是 2026-07-02（rcpNo 20260702800664，公司名當時是暫名）。",
+    "published_at": "2026-11-05",
+    "publisher": "DART 金融監督院電子公示（rcpNo 20261105800383；原公示 20260702800664）",
+    "retrieved_at": "2026-11-11",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "삼성전기 DART 公示「타법인주식및출자증권취득결정」記載更正（2026-11-05；原公示 2026-07-02）：出資 3,191 億韓圜（現金 2,391 億、實物 800 億）取得글라셈 주식회사 66.2%——與日本住友化學子公司동우화인켐合資的新設法人，主業 Glass Core 製造與銷售，目的寫「유리기판 시장 선점」；繳款日因海外結合申報延遲由 9-01 改成 11-05",
+    "url": "https://dart.fss.or.kr/dsaf001/main.do?rcpNo=20261105800383"
+  },
+  "sources": [
+    {
+      "id": "semco_dart_20261105_glassem_jv_acquisition_correction_s1",
+      "locator": "公示標題（申報人）",
+      "quote": "삼성전기/타법인주식및출자증권취득결정/(2026.11.05)타법인주식및출자증권취득결정"
+    },
+    {
+      "id": "semco_dart_20261105_glassem_jv_acquisition_correction_s2",
+      "locator": "1. 발행회사（定名後）",
+      "quote": "1. 발행회사 회사명 글라셈 주식회사 국적 대한민국(Republic of Korea) 대표자 이동우 자본금(원) 48,210,000,000 회사와 관계 - 발행주식총수(주) 96,420,000 주요사업 Glass Core 제조 및 판매"
+    },
+    {
+      "id": "semco_dart_20261105_glassem_jv_acquisition_correction_s3",
+      "locator": "2. 취득내역／3. 지분비율／4. 취득방법／5. 취득목적",
+      "quote": "2. 취득내역 취득주식수(주) 63,820,000 취득금액(원) 319,100,000,000 자기자본(원) 9,797,343,882,863 자기자본대비(%) 3.3 대규모법인여부 해당 3. 취득후 소유주식수 및 지분비율 소유주식수(주) 63,820,000 지분비율(%) 66.2 4. 취득방법 현금 및 현물 출자 5. 취득목적 유리기판 시장 선점을 위하여 일본 스미토모화학의 자회사인 동우화인켐(주)와 합작법인 설립"
+    },
+    {
+      "id": "semco_dart_20261105_glassem_jv_acquisition_correction_s4",
+      "locator": "정정사유／정정사항（公司名、資本額、取得預定日）",
+      "quote": "3. 정정사유 발행회사의 회사명, 자본금 및 당사의 취득예정일 확정에 따른 정정 4. 정정사항 정정항목 정정전 정정후 1. 발행회사 - 회사명 (가칭) 글라셈 주식회사 글라셈 주식회사 2. 발행회사 - 자본금(원) 482,100,000,000 48,210,000,000 6. 취득예정일자 2026-09-01 2026-11-05"
+    },
+    {
+      "id": "semco_dart_20261105_glassem_jv_acquisition_correction_s5",
+      "locator": "13. 기타（現金與實物出資、繳款日延後理由）",
+      "quote": "- 상기 '4. 취득방법'의 현금출자는 2,391억원, 현물출자는 800억원임. - 상기 '6. 취득예정일자'는 출자금 납입일이며, 해외 기업결합신고 지연에 따른 변경임."
+    },
+    {
+      "id": "semco_dart_20261105_glassem_jv_acquisition_correction_s6",
+      "locator": "12. 풋옵션 등 계약（五年後僵局的買權與賣權）",
+      "quote": "(1) 삼성전기의 콜옵션. 발행회사 설립일로부터 5년 이후, 교착상태 해소 협의기간 내에 당사자들이 해당 안건에 관해 합의에 이루지 못한 경우, 삼성전기는 동우화인켐이 소유하고 있는 회사 주식 전부를 회계법인이 평가한 주당 평가가액의 120% 가격으로 매도할 것을 동우화인켐에게 청구할 수 있다. (2) 동우화인켐의 풋옵션. 발행회사 설립일로부터 5년 이후, 교착상태 해소 협의기간 내에 당사자들이 해당 안건에 관해 합의에 이루지 못한 경우, 동우화인켐은 동우화인켐이 소유하고 있는 회사 주식 전부를 회계법인이 평가한 주당 평가가액의 80% 가격으로 매수할 것을 삼성전기에게 청구할 수 있다."
+    },
+    {
+      "id": "semco_dart_20261105_glassem_jv_acquisition_correction_s7",
+      "locator": "10. 이사회결의일",
+      "quote": "10. 이사회결의일(결정일) 2026-07-02"
+    }
+  ]
+}

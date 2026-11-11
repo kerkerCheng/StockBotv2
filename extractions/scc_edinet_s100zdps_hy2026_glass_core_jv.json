@@ -1,0 +1,138 @@
+{
+  "claims": [
+    {
+      "confidence": 0.9,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：住友化學之後的決算短信、半期報告或有價證券報告書寫出這份合資契約解除、合資公司沒有設立，或待售處分群組改回繼續使用（實物出資取消）。核查頻率：每季（決算短信）＋每半年（半期報告、有價證券報告書）。觸發後 48 小時：e1／e2 加註；重讀玻璃核心層開發者表；4005.T 敘事若引用此合資則更正。",
+      "id": "scc_edinet_s100zdps_hy2026_glass_core_jv_cl1",
+      "source_ids": [
+        "scc_edinet_s100zdps_hy2026_glass_core_jv_s1",
+        "scc_edinet_s100zdps_hy2026_glass_core_jv_s2",
+        "scc_edinet_s100zdps_hy2026_glass_core_jv_s3",
+        "scc_edinet_s100zdps_hy2026_glass_core_jv_s4"
+      ],
+      "statement": "Sumitomo Chemical's semi-annual report (FY2026 interim, filed on EDINET 2026-11-10): its wholly owned subsidiary Dongwoo Fine-Chem (東友ファインケム株式会社) signed in July 2026 a joint venture agreement with Samsung Electro-Mechanics (サムスン電機株式会社) to establish a joint venture running a glass core substrate business for advanced semiconductor packages; the JV was scheduled to be established within 2026. Dongwoo will contribute assets in kind to the JV, so JPY 4,039 million of property, plant and equipment and JPY 824 million of directly associated liabilities are classified as a disposal group held for sale, attributed to the ICT & Mobility Solutions segment. The JV's name and the ownership split are not stated in this report.",
+      "subject_id": "e2"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {
+        "control": true
+      },
+      "confidence": 0.9,
+      "dst_id": "co:dongwoo_finechem",
+      "id": "e1",
+      "relation": "invests_in",
+      "source_ids": [
+        "scc_edinet_s100zdps_hy2026_glass_core_jv_s1",
+        "scc_edinet_s100zdps_hy2026_glass_core_jv_s2"
+      ],
+      "src_id": "co:sumitomo_chemical"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "co:samsung_electro_mechanics",
+      "id": "e2",
+      "relation": "partnership_with",
+      "source_ids": [
+        "scc_edinet_s100zdps_hy2026_glass_core_jv_s2",
+        "scc_edinet_s100zdps_hy2026_glass_core_jv_s3"
+      ],
+      "src_id": "co:dongwoo_finechem"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "Sumitomo Chemical Co., Ltd.",
+        "住友化学",
+        "住友化学株式会社"
+      ],
+      "attributes": {
+        "ticker": "4005.T"
+      },
+      "confidence": 0.9,
+      "id": "co:sumitomo_chemical",
+      "name": "Sumitomo Chemical",
+      "role": null,
+      "source_ids": [
+        "scc_edinet_s100zdps_hy2026_glass_core_jv_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "동우화인켐",
+        "東友ファインケム株式会社"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:dongwoo_finechem",
+      "name": "동우화인켐(주)",
+      "role": null,
+      "source_ids": [
+        "scc_edinet_s100zdps_hy2026_glass_core_jv_s2",
+        "scc_edinet_s100zdps_hy2026_glass_core_jv_s3"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "Samsung Electro-Mechanics",
+        "Samsung Electro-Mechanics Co., Ltd."
+      ],
+      "attributes": {
+        "ticker": "009150.KS"
+      },
+      "confidence": 0.95,
+      "id": "co:samsung_electro_mechanics",
+      "name": "Samsung Electro-Mechanics",
+      "role": null,
+      "source_ids": [
+        "scc_edinet_s100zdps_hy2026_glass_core_jv_s2"
+      ],
+      "type": "Company"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "scc_edinet_s100zdps_hy2026_glass_core_jv",
+    "evidence_tier": 1,
+    "origin_entity": "Sumitomo Chemical Co., Ltd.",
+    "permission_basis": "EDINET（金融庁）公開法定申報；只保留研究必要的有限逐字節錄。published_at 取 EDINET 提出日 2026-11-10（表紙 FilingDateCoverPage）。",
+    "published_at": "2026-11-10",
+    "publisher": "EDINET 金融庁（書類管理番号 S100ZDPS，半期報告書）",
+    "retrieved_at": "2026-11-11",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "住友化學 2026 年度半期報告書（EDINET S100ZDPS，2026-11-10 提出）：重要な契約等——全資子公司東友ファインケム 2026 年 7 月與サムスン電機簽合資契約，做先進半導體封裝用玻璃核心基板，合資公司預定 2026 年內設立；注記 9——為對合資公司實物出資，相關資產（有形固定資產 4,039 百萬日圓）與負債（824 百萬日圓）列為待售處分群組，歸 ICT＆モビリティソリューション部門",
+    "url": "https://disclosure2.edinet-fsa.go.jp/WZEK0040.aspx?S100ZDPS="
+  },
+  "sources": [
+    {
+      "id": "scc_edinet_s100zdps_hy2026_glass_core_jv_s1",
+      "locator": "表紙 会社名（申報人）",
+      "quote": "住友化学株式会社"
+    },
+    {
+      "id": "scc_edinet_s100zdps_hy2026_glass_core_jv_s2",
+      "locator": "第 2 部 第 3 重要な契約等 (1)",
+      "quote": "当社の完全子会社である東友ファインケム株式会社は、2026年７月、サムスン電機株式会社との間で、先端半導体パッケージ向けガラスコア基板事業を行う合弁会社の設立に関する合弁契約を締結しました。なお、当該合弁会社は2026年内の設立を予定しております。"
+    },
+    {
+      "id": "scc_edinet_s100zdps_hy2026_glass_core_jv_s3",
+      "locator": "注記 9 売却目的で保有する資産（說明）",
+      "quote": "2026年７月、当社の完全子会社である東友ファインケム株式会社は、サムスン電機株式会社との間で合弁契約を締結しました。これに伴い、2026年内に設立予定の当該合弁会社に対して現物出資を行う予定であることから、対象となる資産及びこれに直接関連する負債を、売却目的で保有する処分グループに分類しております。なお、当該売却目的で保有する処分グループは、ICT＆モビリティソリューションセグメントに帰属しております。"
+    },
+    {
+      "id": "scc_edinet_s100zdps_hy2026_glass_core_jv_s4",
+      "locator": "注記 9 売却目的で保有する資産（表，百萬日圓）",
+      "quote": "(単位：百万円) 前連結会計年度(2026年３月31日) 当中間連結会計期間(2026年９月30日)売却目的で保有する資産 有形固定資産－ 4,039合計－ 4,039 売却目的で保有する資産に直接関連する負債 営業債務及びその他の債務－ 824 合計－ 824"
+    }
+  ]
+}
