@@ -1,0 +1,36 @@
+SOURCE: CECO Environmental Corp.（TXSE: CECO）Form 10-Q（quarterly period ended September 30, 2026）有限節錄
+URL: https://www.sec.gov/Archives/edgar/data/3197/000119312526453470/ceco-20260930.htm
+PUBLISHED: 2026-11-09（EDGAR 申報日；accession 0001193125-26-453470）
+RETRIEVED: 2026-11-11
+STORAGE: repo_excerpt（SEC 申報有限節錄；repo 的 fetchers.edgar 抓、HTML 轉文字、空白攤平後逐字照抄——由腳本按行號取段，不手打）
+NOTE: Phase 7 CECO 敘事換版（2026-11-12，「缺」的等待 ew_1734 到點）用：①第三季營收 4.044 億美元、年增 104.7%、有機成長 41%，有機成長最大的來源是發電市場，其餘來自 Thermon 合併；本季執行專案「without experiencing material delays」；②工程系統部門第三季營收 1.943 億美元（有機 +34%），由大型燃氣發電專案的在手交貨帶動；③Thermon（Thermal Solutions 分部）第三季營收 1.485 億美元——約占合併營收三成七（推一步：148.5／404.4）；④在手 21.935 億美元裡 Thermon 貢獻 2.733 億；⑤前三季營業現金流 +1.214 億美元，主要來自超前請款（billings in excess）增加。燃氣發電仍沒有拆營收或在手的比例。
+
+[MD&A — Consolidated Results — Net sales（three months）]
+Net sales for the three months ended September 30, 2026 increased $206.8 million, or 104.7%, to $404.4 million compared with $197.6 million for the three months ended September 30, 2025, inclusive of organic growth of 41%. Approximately 63% of net sales for the three months ended September 30, 2026 is attributable to organic revenue, which the Company defines as revenue from businesses owned for more than twelve months. The increase in organic revenue is driven by strong order intake in preceding quarters, which contributes to the backlog position. During the quarter, the Company continued to execute customer projects and satisfy contractual commitments without experiencing material delays. The largest contributor to organic revenue growth is demand for products and solutions serving power generation end markets. The remainder of the increase in net sales is attributable to the recent acquisition and integration of Thermon.
+
+[MD&A — Orders booked（three months）]
+Orders booked increased $544.7 million, or 234%, to $777.6 million during the three months ended September 30, 2026 compared with $232.9 million in the three months ended September 30, 2025, inclusive of organic growth of 174%, as defined as the change in orders excluding the impact of orders recorded in the twelve month period subsequent to acquisition dates. The increase is primarily driven by demand for the Company’s emissions and exhaust systems applications supporting large-scale natural gas power generation projects.
+
+[MD&A — Orders booked（nine months）]
+Orders booked increased $1,290.6 million, or 176%, to $2,025.6 million during the nine months ended September 30, 2026 compared with $735.0 million in the nine months ended September 30, 2025, inclusive of organic growth of 161%. The increase is primarily driven by demand for the Company’s emissions and exhaust system applications supporting large-scale natural gas power generation projects.
+
+[MD&A — Engineered Systems segment net sales（three months）]
+Our Engineered Systems segment net sales increased $50.6 million to $194.3 million for the three months ended September 30, 2026 compared with $143.7 million for the three months ended September 30, 2025, inclusive of organic growth of 34%. The increase is led by backlog execution on large scale natural gas power generation projects.
+
+[MD&A — Engineered Systems segment orders booked（three months）]
+Our Engineered Systems segment orders booked increased $358.7 million, or 204%, to $534.2 million during the three months ended September 30, 2026 compared with $175.5 million in the three months ended September 30, 2025, inclusive of organic growth of 159%. The increase is primarily attributable to the Company's energy and power technologies. Investments in energy infrastructure and growth in midstream and downstream markets have resulted in increased demand for emissions, acoustics. and separation/filtration products.
+
+[MD&A — Thermal Solutions Segment]
+The Thermal Solutions segment represents the Thermon business, acquired in June 2026. As such, there is no comparative financial information reflected in the Company's previously filed Quarterly Reports on Form 10-Q.
+
+[MD&A — Thermal Solutions segment net sales]
+Net sales for the Thermal Solutions segment were $148.5 million and $198.1 million for the three and nine months ended September 30, 2026, respectively. Results for the nine-month period reflect Thermon's operations from the acquisition date through September 30, 2026.
+
+[MD&A — Backlog]
+Backlog (i.e., unfulfilled or remaining performance obligations) represents the sales we expect to recognize for our products and services for which control has not yet transferred to the customer. Backlog increased to $2,193.5 million as of September 30, 2026, from $793.1 million as of December 31, 2025. Thermon contributed $273.3 million to our backlog figure as of September 30, 2026, with the remaining increase primarily attributable to our growing orders. Our customers may have the right to cancel a given order. Historically, cancellations have not been significant. Backlog is adjusted on a quarterly basis for adjustments in foreign currency exchange rates. Substantially all backlog is expected to be delivered within 12 to 24 months. Backlog is not defined by GAAP and our methodology for calculating backlog may not be consistent with methodologies used by other companies.
+
+[Liquidity — Operating Activities]
+For the nine months ended September 30, 2026, $121.4 million of cash was provided by operating activities compared with $4.1 million used in operations in the prior year period, representing an increase of $125.5 million. Cash flows from operating activities in the first nine months of 2026 was higher than 2025 primarily due to an increase in billings in excess of costs and estimated earnings on uncompleted contracts, partially offset by an increase in accounts receivable.
+
+[Condensed Consolidated Balance Sheets — current liabilities 列（標題列起 12 行攤平；欄位依序 September 30, 2026／December 31, 2025，單位千美元）]
+Billings in excess of costs and estimated earnings on uncompleted contracts 388,132 123,726 Income taxes payable — 4,738
