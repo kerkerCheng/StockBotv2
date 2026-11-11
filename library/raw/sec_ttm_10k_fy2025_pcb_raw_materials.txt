@@ -1,0 +1,18 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1116942/000119312526051976/ttmi-20251229.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] TTM Technologies Form 10-K（fiscal year ended 2025-12-29）：先進互連產品的主要原料含 carbide drill bits，Most of the raw materials are generally readily available from numerous suppliers；PCB 產業 highly fragmented；Data Center Computing 占營收 24%
+DATE: 2026-02-17
+RETRIEVED: 2026-11-11（原文抽字後空白正規化——換行與連續空白都變成一個空格——再逐字照抄）
+NOTE: 發行人自己的年報。對鑽針層它是客戶端（PCB 板廠買鑽針）：原料段寫「Most of the raw materials」readily available，沒有逐項說鑽針是否在內。HTML 轉文字、空白攤平後逐字照抄。
+
+【Cover page】
+"TTM TECHNOLOGIES, INC. (Exact Name of Registrant as Specified in Its Charter)"
+【Item 1. Business — General】
+"We are a leading global manufacturer of technology products, including mission systems, RF components, RF microwave/microelectronic assemblies, and technologically advanced interconnect products, including PCBs and substrates."
+【Item 1. Business — Suppliers】
+"For advanced interconnect products, primary raw materials include copper clad laminates and chemical solutions such as copper and gold for plating operations, photographic film, carbide drill bits, and plastic for testing fixtures. Most of the raw materials are generally readily available from numerous suppliers in the open market."
+【Item 1. Business — Competition】
+"The PCB industry remains highly fragmented and characterized by intense competition."
+【Item 1. Business — End markets（% of net sales, FY2025 / FY2024 / FY2023）】
+"Data Center Computing 24 20 14"

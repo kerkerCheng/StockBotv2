@@ -1,0 +1,402 @@
+{
+  "claims": [
+    {
+      "confidence": 0.5,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：PCB 板廠（客戶端）的一手寫出 AI 主板的鑽針用量沒有倍增、或鑽針費用占比沒有上升；或尖點、凱崴、高僑月營收年增連續三個月轉負而 AI 伺服器／交換器板出貨仍在增加。核查頻率：每月（三家月營收）＋每季（板廠法說與投資者關係紀錄）。觸發後 48 小時：這條 claim 降 confidence、在 tech:ai_high_layer_pcb depends_on mat:pcb_drill_bit 加註，重讀鑽針層讀圖。",
+      "id": "mops_8021_annual_report_2025_pcb_drill_bits_cl1",
+      "source_ids": [
+        "mops_8021_annual_report_2025_pcb_drill_bits_s4",
+        "mops_8021_annual_report_2025_pcb_drill_bits_s8"
+      ],
+      "statement": "Supplier-side statement (Topoint Technology annual report FY2025): to support AI server platforms, AI server mainboard PCBs have 26–78 layers and M8/M9-class CCL is being introduced; as layer count and board thickness rise, drill aspect ratio rises, drilling gets harder and drill life falls, so one AI mainboard needs several times as many drill bits as before; new hard materials sharply shorten drill life and require step drilling and coated drills, raising both volume and unit price of high-end drill bits. Self-reported by a drill-bit supplier; no customer or third-party source is named.",
+      "subject_id": "e5"
+    },
+    {
+      "confidence": 0.4,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：鼎泰高科、尖點、凱崴、高僑任一份一手寫出訂單不足、產能利用率下滑或降價；或客戶端（TTM、金像電等板廠）的一手寫出鑽針供應寬鬆、交期回到正常。核查頻率：每月（台廠月營收）＋每季（定期報告、法說、投資者關係紀錄）。觸發後 48 小時：這條 claim 降 confidence，重讀鑽針層讀圖的供需段。",
+      "id": "mops_8021_annual_report_2025_pcb_drill_bits_cl2",
+      "source_ids": [
+        "mops_8021_annual_report_2025_pcb_drill_bits_s5",
+        "mops_8021_annual_report_2025_pcb_drill_bits_s9"
+      ],
+      "statement": "Supplier-side statement (Topoint Technology annual report FY2025): since Q2 2025 most drill-bit makers' orders have been full, utilization high and lead times generally extended; only a few makers can supply stably, the market is in short supply and capacity keeps expanding. Self-reported, unnamed peers; dated observation, not a structural lead time.",
+      "subject_id": "mat:pcb_drill_bit"
+    },
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "條件：尖點下一份年報或季報的營業比重、產能數字或市占推估與此不符。核查頻率：每年（年報）＋每季（財報）。觸發後 48 小時：更正這條 claim。",
+      "id": "mops_8021_annual_report_2025_pcb_drill_bits_cl3",
+      "source_ids": [
+        "mops_8021_annual_report_2025_pcb_drill_bits_s2",
+        "mops_8021_annual_report_2025_pcb_drill_bits_s7",
+        "mops_8021_annual_report_2025_pcb_drill_bits_s10"
+      ],
+      "statement": "Topoint Technology reports that precision metal products and processing services (drill bits, router bits and PCB drilling services) were 97.40% of FY2025 revenue; it estimates its share of a USD 0.87 billion global PCB drill-bit market (Business Research Insights) at about 10–15% based on FY2024 revenue; group drill-bit capacity reached 35 million pieces per month in Q1 2026. Share and capacity are time-varying self-reported figures.",
+      "subject_id": "e1"
+    },
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：尖點年報的主要原料供應商換人、供應狀況不再寫「良好」，或碳化鎢棒材因出口管制缺貨的一手出現。核查頻率：每年（年報）＋每季（鎢原料出口管制公告）。觸發後 48 小時：重讀鑽針層讀圖的上游段，碳化鎢棒材研究題（pq1）提前處理。",
+      "id": "mops_8021_annual_report_2025_pcb_drill_bits_cl4",
+      "source_ids": [
+        "mops_8021_annual_report_2025_pcb_drill_bits_s11"
+      ],
+      "statement": "Topoint Technology lists tungsten carbide as its main raw material, supplied by Mitsubishi, Sumitomo and Kyocera of Japan, with supply status 'good' in the FY2025 annual report.",
+      "subject_id": "mat:pcb_drill_bit"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "mat:pcb_drill_bit",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "mops_8021_annual_report_2025_pcb_drill_bits_s1",
+        "mops_8021_annual_report_2025_pcb_drill_bits_s2",
+        "mops_8021_annual_report_2025_pcb_drill_bits_s10"
+      ],
+      "src_id": "co:topoint_technology"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "mat:pcb_drill_bit",
+      "id": "e2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "mops_8021_annual_report_2025_pcb_drill_bits_s3"
+      ],
+      "src_id": "co:union_tool"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "mat:pcb_drill_bit",
+      "id": "e3",
+      "relation": "supplies_to",
+      "source_ids": [
+        "mops_8021_annual_report_2025_pcb_drill_bits_s6"
+      ],
+      "src_id": "co:key_ware_electronics"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "mat:pcb_drill_bit",
+      "id": "e4",
+      "relation": "supplies_to",
+      "source_ids": [
+        "mops_8021_annual_report_2025_pcb_drill_bits_s6"
+      ],
+      "src_id": "co:tera_autotech"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "mat:pcb_drill_bit",
+      "id": "e5",
+      "relation": "depends_on",
+      "source_ids": [
+        "mops_8021_annual_report_2025_pcb_drill_bits_s4",
+        "mops_8021_annual_report_2025_pcb_drill_bits_s8"
+      ],
+      "src_id": "tech:ai_high_layer_pcb"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:ai_high_layer_pcb",
+      "id": "e6",
+      "relation": "is_component_of",
+      "source_ids": [
+        "mops_8021_annual_report_2025_pcb_drill_bits_s4"
+      ],
+      "src_id": "mat:high_speed_ccl"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "tech:ai_high_layer_pcb",
+      "id": "e7",
+      "relation": "enables",
+      "source_ids": [
+        "mops_8021_annual_report_2025_pcb_drill_bits_s4"
+      ],
+      "src_id": "tech:ai_compute_buildout"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.65,
+      "dst_id": "tech:ai_switch",
+      "id": "e8",
+      "relation": "is_component_of",
+      "source_ids": [
+        "mops_8021_annual_report_2025_pcb_drill_bits_s5"
+      ],
+      "src_id": "tech:ai_high_layer_pcb"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "尖點",
+        "尖點科技",
+        "尖點科技股份有限公司",
+        "Topoint"
+      ],
+      "attributes": {
+        "ticker": "8021.TW"
+      },
+      "confidence": 0.9,
+      "id": "co:topoint_technology",
+      "name": "Topoint Technology Co., Ltd.",
+      "role": null,
+      "source_ids": [
+        "mops_8021_annual_report_2025_pcb_drill_bits_s1",
+        "mops_8021_annual_report_2025_pcb_drill_bits_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "Union Tool",
+        "佑能工具",
+        "ユニオンツール"
+      ],
+      "attributes": {
+        "ticker": "6278.T"
+      },
+      "confidence": 0.85,
+      "id": "co:union_tool",
+      "name": "Union Tool Co.",
+      "role": null,
+      "source_ids": [
+        "mops_8021_annual_report_2025_pcb_drill_bits_s3"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "凱崴",
+        "凱崴電子",
+        "凱崴電子股份有限公司",
+        "KEY WARE ELECTRONICS CO., LTD."
+      ],
+      "attributes": {
+        "ticker": "5498.TWO"
+      },
+      "confidence": 0.85,
+      "id": "co:key_ware_electronics",
+      "name": "Key Ware Electronics Co., Ltd.",
+      "role": null,
+      "source_ids": [
+        "mops_8021_annual_report_2025_pcb_drill_bits_s6"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "高僑",
+        "高僑自動化",
+        "高僑自動化科技股份有限公司"
+      ],
+      "attributes": {
+        "ticker": "6234.TWO"
+      },
+      "confidence": 0.85,
+      "id": "co:tera_autotech",
+      "name": "Tera Autotech Corporation",
+      "role": null,
+      "source_ids": [
+        "mops_8021_annual_report_2025_pcb_drill_bits_s6"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "鑽針",
+        "微鑽",
+        "微型鑽頭",
+        "鍍膜鑽針",
+        "钻针",
+        "PCB 钻针",
+        "PCB 鑽針",
+        "carbide drill bits"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "mat:pcb_drill_bit",
+      "name": "PCB micro drill bits (carbide drill bits, incl. router bits)",
+      "role": null,
+      "source_ids": [
+        "mops_8021_annual_report_2025_pcb_drill_bits_s4",
+        "mops_8021_annual_report_2025_pcb_drill_bits_s8"
+      ],
+      "type": "Material"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "AI 伺服器主板",
+        "AI 主板",
+        "AI-PCB",
+        "AI PCB",
+        "高階多層板",
+        "高層數 PCB",
+        "高多层板",
+        "交換機板"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:ai_high_layer_pcb",
+      "name": "High-layer-count PCB for AI servers and switches (multilayer / HDI mainboards)",
+      "role": null,
+      "source_ids": [
+        "mops_8021_annual_report_2025_pcb_drill_bits_s4"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "high-speed CCL",
+        "low-loss CCL",
+        "高速 CCL",
+        "高階 CCL",
+        "高速覆銅板"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "mat:high_speed_ccl",
+      "name": "High-speed copper clad laminate (low-loss CCL, M6–M9 class)",
+      "role": null,
+      "source_ids": [
+        "mops_8021_annual_report_2025_pcb_drill_bits_s4"
+      ],
+      "type": "Material"
+    },
+    {
+      "abstraction_level": "end_demand",
+      "aliases": [
+        "AI data center buildout",
+        "AI system performance drive",
+        "AI frontier lab compute",
+        "AI XPU platform",
+        "HPC AI cluster",
+        "hyperscale AI infrastructure",
+        "AI factory buildout",
+        "agentic AI infrastructure"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:ai_compute_buildout",
+      "name": "AI training/inference cluster buildout",
+      "role": null,
+      "source_ids": [
+        "mops_8021_annual_report_2025_pcb_drill_bits_s4"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "AI datacenter network",
+        "AI networking",
+        "fabric solutions",
+        "switch ASIC",
+        "Ethernet networking for AI"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:ai_switch",
+      "name": "Data-center switch / scale-up network",
+      "role": null,
+      "source_ids": [
+        "mops_8021_annual_report_2025_pcb_drill_bits_s5"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "mops_8021_annual_report_2025_pcb_drill_bits",
+    "evidence_tier": 1,
+    "origin_entity": "Topoint Technology Co., Ltd.",
+    "permission_basis": "公開資訊觀測站公開年報；只保留研究必要的有限逐字節錄。published_at 取 MOPS 上傳時間（115/05/07 13:42:56）。",
+    "published_at": "2026-05-07",
+    "publisher": "公開資訊觀測站（股東會年報）",
+    "retrieved_at": "2026-11-11",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "尖點科技（8021）中華民國 114 年度年報：PCB 鑽針產業概況與競爭——AI 主板 26–78 層、M8／M9 CCL 讓一片 AI 主板所需鑽針為過去數倍；2025 年第二季起多數鑽針業者訂單滿載、交期延長；競爭者（Union Tool、凱崴電子、高僑自動化）；自估全球市占 10–15%；碳化鎢供應商",
+    "url": "https://doc.twse.com.tw/server-java/t57sb01?step=9&kind=F&co_id=8021&filename=2025_8021_20260526F04.pdf"
+  },
+  "sources": [
+    {
+      "id": "mops_8021_annual_report_2025_pcb_drill_bits_s1",
+      "locator": "封裏（發言人資訊上方的公司名）",
+      "quote": "尖點科技股份有限公司"
+    },
+    {
+      "id": "mops_8021_annual_report_2025_pcb_drill_bits_s2",
+      "locator": "伍、營運概況 一、(一) 2. 主要產品及其營業比重（p.60）",
+      "quote": "精密金屬製品 及加工服務 3,472,933 98.08 4,295,634 97.40"
+    },
+    {
+      "id": "mops_8021_annual_report_2025_pcb_drill_bits_s3",
+      "locator": "(二) 產業概況 (A) PCB 及鑽針主要供應商群聚亞洲（p.63）",
+      "quote": "日系鑽針 廠以佑能工具(Union Tool) 為首，仍擁有一定品質水準；歐洲廠商則因為成本及技 術發展因素，市占率逐漸下降，台灣廠商則取而代之。"
+    },
+    {
+      "id": "mops_8021_annual_report_2025_pcb_drill_bits_s4",
+      "locator": "(二) 產業概況 (C) 高階 PCB 用高縱橫比超長刃鑽針提升（p.63）",
+      "quote": "AI 算力基建帶動 PCB 材料規格躍 進，為支撐 AI 伺服器平台，AI 伺服器主板設計 PCB 層數提升至 26~78 層已成標 準，M8、M9 等級 CCL 亦將陸續導入，當板層倍增、板厚提升，鑽針縱橫比大幅 提高，提升鑽孔難度，鑽針使用壽命下滑，生產一片 AI 主板所需鑽針將為過去數 倍之多。"
+    },
+    {
+      "id": "mops_8021_annual_report_2025_pcb_drill_bits_s5",
+      "locator": "(二) 產業概況 (D) 高階鍍膜 PCB 鑽針用量提升（p.63）",
+      "quote": "自 114 年度第二季以來，多數鑽針業者訂單已滿載，產能利用率高居不下， 交期普遍延長，供應鏈壓力浮上檯面。在 AI 伺服器與高速交換器的帶動下，高階 PCB 板層數增加"
+    },
+    {
+      "id": "mops_8021_annual_report_2025_pcb_drill_bits_s6",
+      "locator": "4. 競爭情形（p.64）",
+      "quote": "國內主要競爭同業為凱崴電子及高僑自 動化，各廠商專注於不同產品而有所區隔，國內廠商目前以本公司市 占率最高"
+    },
+    {
+      "id": "mops_8021_annual_report_2025_pcb_drill_bits_s7",
+      "locator": "(二) 2. 市場占有率（p.65）",
+      "quote": "全球 PCB 鑽針市場規模為8.7 億美元，依113年度本公司及子公司之營業收入新台幣35.4 億元計算，推估占全球鑽針市場規模比率約介於10%~15%之間。"
+    },
+    {
+      "id": "mops_8021_annual_report_2025_pcb_drill_bits_s8",
+      "locator": "(二) 3. 市場未來之供需狀況與成長性 (1) 需求面（p.65）",
+      "quote": "新材料與高硬度板材大幅縮短鑽針 壽命，且需採分段鑽孔與鍍膜鑽針以降低斷針率，帶動高階鑽針用量與單價同步 成長。"
+    },
+    {
+      "id": "mops_8021_annual_report_2025_pcb_drill_bits_s9",
+      "locator": "(二) 3. 市場未來之供需狀況與成長性 (2) 供給面（p.66）",
+      "quote": "M9 等高硬度 low-DK 材料應用，提升鑽孔磨耗與技術門檻，帶動高階鑽針需求 成長。目前僅少數廠商具穩定供應能力，市場呈供不應求，產能持續擴充。"
+    },
+    {
+      "id": "mops_8021_annual_report_2025_pcb_drill_bits_s10",
+      "locator": "(二) 4. 競爭利基 (2) 彈性產能調配能力（p.66）",
+      "quote": "集團鑽針 115 年第 1 季達 3,500 萬支的產能規模"
+    },
+    {
+      "id": "mops_8021_annual_report_2025_pcb_drill_bits_s11",
+      "locator": "(三) 主要原料之供應狀況（p.66）",
+      "quote": "碳化鎢 日本三菱、日本住友、日本京瓷 良好"
+    }
+  ]
+}

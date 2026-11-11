@@ -1,0 +1,109 @@
+{
+  "claims": [
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "條件：鼎泰下一份半年報或年報的風險段不再寫新進入者增加；或 PCB 板廠的一手寫出換鑽針供應商需要長的合格期（或相反：隨時可換）。核查頻率：每半年。觸發後 48 小時：重讀鑽針層讀圖的可替代性段。",
+      "id": "cninfo_301377_h1_2026_drill_bit_market_cl1",
+      "source_ids": [
+        "cninfo_301377_h1_2026_drill_bit_market_s2",
+        "cninfo_301377_h1_2026_drill_bit_market_s3"
+      ],
+      "statement": "Guangdong Dtech's own risk disclosure (H1 2026 report): the global PCB drill-bit market is fairly concentrated and competition runs on both price and technology; as downstream demand is released major makers are all expanding capacity; the tool industry has no specific entry barrier and new entrants keep increasing; quality PCB customers usually choose stable, reliable suppliers and are reluctant to switch. Both directions in one disclosure: switching reluctance, but no entry barrier.",
+      "subject_id": "mat:pcb_drill_bit"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "mat:pcb_drill_bit",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "cninfo_301377_h1_2026_drill_bit_market_s1",
+        "cninfo_301377_h1_2026_drill_bit_market_s4"
+      ],
+      "src_id": "co:guangdong_dtech"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "鼎泰高科",
+        "广东鼎泰高科技术股份有限公司"
+      ],
+      "attributes": {
+        "ticker": "301377.SZ"
+      },
+      "confidence": 0.9,
+      "id": "co:guangdong_dtech",
+      "name": "Guangdong Dtech Technology Co., Ltd.",
+      "role": null,
+      "source_ids": [
+        "cninfo_301377_h1_2026_drill_bit_market_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "鑽針",
+        "微鑽",
+        "微型鑽頭",
+        "鍍膜鑽針",
+        "钻针",
+        "PCB 钻针",
+        "PCB 鑽針",
+        "carbide drill bits"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "mat:pcb_drill_bit",
+      "name": "PCB micro drill bits (carbide drill bits, incl. router bits)",
+      "role": null,
+      "source_ids": [
+        "cninfo_301377_h1_2026_drill_bit_market_s2",
+        "cninfo_301377_h1_2026_drill_bit_market_s4"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "cninfo_301377_h1_2026_drill_bit_market",
+    "evidence_tier": 1,
+    "origin_entity": "Guangdong Dtech Technology Co., Ltd.",
+    "permission_basis": "深交所上市公司法定定期報告（巨潮資訊網公開）；只保留研究必要的有限逐字節錄。published_at 取巨潮公告日 2026-08-20。",
+    "published_at": "2026-08-20",
+    "publisher": "巨潮資訊網（深交所上市公司公告）",
+    "retrieved_at": "2026-11-11",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "鼎泰高科（301377.SZ）2026 年半年度報告：風險段——全球 PCB 鑽針市場集中度較高、主要廠商紛紛擴產、刀具行業無針對性准入門檻、新進入者持續增加，但優質 PCB 客戶更換意願較低；M9＋陶瓷混壓用金剛石複合塗層鑽針小批量",
+    "url": "http://static.cninfo.com.cn/finalpage/2026-08-20/1225482423.PDF"
+  },
+  "sources": [
+    {
+      "id": "cninfo_301377_h1_2026_drill_bit_market_s1",
+      "locator": "封面",
+      "quote": "广东鼎泰高科技术股份有限公司 2026 年半年度报告"
+    },
+    {
+      "id": "cninfo_301377_h1_2026_drill_bit_market_s2",
+      "locator": "第三节 管理层讨论与分析 十、公司面临的风险和应对措施 3、市场竞争加剧风险",
+      "quote": "全球 PCB 钻针市场集中度较高，行业竞争呈现价格与技术双轮驱动特点。随着下游需求释放，主要厂商纷纷扩产，"
+    },
+    {
+      "id": "cninfo_301377_h1_2026_drill_bit_market_s3",
+      "locator": "第三节 管理层讨论与分析 十、公司面临的风险和应对措施 3、市场竞争加剧风险（續）",
+      "quote": "刀具行业无针对性准入门槛， 新进入者持续增加。尽管优质 PCB 客户通常选择供应稳定、质量可靠的供应商且更换意愿较低"
+    },
+    {
+      "id": "cninfo_301377_h1_2026_drill_bit_market_s4",
+      "locator": "第三节 管理层讨论与分析 一、报告期内公司从事的主要业务",
+      "quote": "适用于 M9+陶瓷混压材料加工的金刚石复合涂层钻针已进入小批量应用阶段。"
+    }
+  ]
+}

@@ -1,0 +1,144 @@
+{
+  "claims": [
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：鼎泰下一份投資者關係紀錄或定期報告寫出擴產受限（設備、原料、人力）、新進者退出，或客戶端寫出鑽針交期拉長。核查頻率：每季（鼎泰定期報告與投資者關係紀錄）。觸發後 48 小時：改寫鑽針層讀圖「供給多快補上」那一段。",
+      "id": "cninfo_301377_ir_2026_004_drill_bit_capacity_cl1",
+      "source_ids": [
+        "cninfo_301377_ir_2026_004_drill_bit_capacity_s4",
+        "cninfo_301377_ir_2026_004_drill_bit_capacity_s5",
+        "cninfo_301377_ir_2026_004_drill_bit_capacity_s8"
+      ],
+      "statement": "Supply responds quickly (Guangdong Dtech investor-relations record 2026-004): Dtech's monthly drill-bit capacity exceeded 160 million pieces by end-June 2026, and its self-made key equipment allows adding about 10 million pieces of monthly capacity per month; its Thailand base reached 8 million pieces per month; several companies from inside and outside the industry have entered PCB drill bits through acquisitions. Counter-evidence for a durable drill-bit bottleneck.",
+      "subject_id": "mat:pcb_drill_bit"
+    },
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：鼎泰 2026 年三季報或年報的精密刀具營收增速掉到 30% 以下，或紀錄寫出訂單不足、原料短缺。核查頻率：每季。觸發後 48 小時：更正這條 claim、重讀鑽針層讀圖。",
+      "id": "cninfo_301377_ir_2026_004_drill_bit_capacity_cl2",
+      "source_ids": [
+        "cninfo_301377_ir_2026_004_drill_bit_capacity_s2",
+        "cninfo_301377_ir_2026_004_drill_bit_capacity_s3",
+        "cninfo_301377_ir_2026_004_drill_bit_capacity_s6",
+        "cninfo_301377_ir_2026_004_drill_bit_capacity_s7"
+      ],
+      "statement": "Guangdong Dtech reports precision-tool revenue of RMB 1.601 billion in H1 2026, up 114.47% year on year and 82.41% of revenue; it says orders are ample and imported raw materials are in normal supply, alongside long-term cooperation with several domestic cemented-carbide makers.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "mat:pcb_drill_bit",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "cninfo_301377_ir_2026_004_drill_bit_capacity_s1",
+        "cninfo_301377_ir_2026_004_drill_bit_capacity_s3",
+        "cninfo_301377_ir_2026_004_drill_bit_capacity_s4"
+      ],
+      "src_id": "co:guangdong_dtech"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "鼎泰高科",
+        "广东鼎泰高科技术股份有限公司"
+      ],
+      "attributes": {
+        "ticker": "301377.SZ"
+      },
+      "confidence": 0.9,
+      "id": "co:guangdong_dtech",
+      "name": "Guangdong Dtech Technology Co., Ltd.",
+      "role": null,
+      "source_ids": [
+        "cninfo_301377_ir_2026_004_drill_bit_capacity_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "鑽針",
+        "微鑽",
+        "微型鑽頭",
+        "鍍膜鑽針",
+        "钻针",
+        "PCB 钻针",
+        "PCB 鑽針",
+        "carbide drill bits"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "mat:pcb_drill_bit",
+      "name": "PCB micro drill bits (carbide drill bits, incl. router bits)",
+      "role": null,
+      "source_ids": [
+        "cninfo_301377_ir_2026_004_drill_bit_capacity_s4"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "cninfo_301377_ir_2026_004_drill_bit_capacity",
+    "evidence_tier": 1,
+    "origin_entity": "Guangdong Dtech Technology Co., Ltd.",
+    "permission_basis": "深交所上市公司依規在巨潮資訊網公開的投資者關係活動記錄表；只保留研究必要的有限逐字節錄。published_at 取巨潮公告日 2026-09-24。",
+    "published_at": "2026-09-24",
+    "publisher": "巨潮資訊網（深交所上市公司公告）",
+    "retrieved_at": "2026-11-11",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "鼎泰高科（301377.SZ）投资者关系活动记录表 2026-004（2026-08-20～09-24 調研與線上會議）：2026 上半年精密刀具營收 16.01 億元、年增 114.47%；鑽針月產能破 1.6 億支、自製設備每月可新增約 1,000 萬支；泰國 800 萬支；多家企業以收購切入 PCB 鑽針",
+    "url": "http://static.cninfo.com.cn/finalpage/2026-09-24/1225581889.PDF"
+  },
+  "sources": [
+    {
+      "id": "cninfo_301377_ir_2026_004_drill_bit_capacity_s1",
+      "locator": "表頭",
+      "quote": "证券代码：301377 证券简称：鼎泰高科 广东鼎泰高科技术股份有限公司投资者关系活动记录表 编号：2026-004"
+    },
+    {
+      "id": "cninfo_301377_ir_2026_004_drill_bit_capacity_s2",
+      "locator": "表頭（時間）",
+      "quote": "时间 2026 年 8 月 20 日- 2026 年 9 月 24 日"
+    },
+    {
+      "id": "cninfo_301377_ir_2026_004_drill_bit_capacity_s3",
+      "locator": "問答 1",
+      "quote": "其中精密刀具实现营业收入 16.01 亿元，同比增长 114.47%， 占营业收入比重 82.41%"
+    },
+    {
+      "id": "cninfo_301377_ir_2026_004_drill_bit_capacity_s4",
+      "locator": "問答 2",
+      "quote": "截至 2026 年 6 月末，公司钻针月产能已突破 1.6 亿支，在 扩产能力方面，公司钻针扩产所需的自制关键设备产能，可实 现每月新增约 1,000 万支的扩产能力。"
+    },
+    {
+      "id": "cninfo_301377_ir_2026_004_drill_bit_capacity_s5",
+      "locator": "問答 3",
+      "quote": "公司泰国生产基地的钻针月产能目前已达到 800 万支。"
+    },
+    {
+      "id": "cninfo_301377_ir_2026_004_drill_bit_capacity_s6",
+      "locator": "問答 4",
+      "quote": "公司目前订单充足。"
+    },
+    {
+      "id": "cninfo_301377_ir_2026_004_drill_bit_capacity_s7",
+      "locator": "問答 5",
+      "quote": "目前进口原材料 供应正常，同时，公司也与国内多家硬质合金厂商保持着长期 稳定的合作关系。"
+    },
+    {
+      "id": "cninfo_301377_ir_2026_004_drill_bit_capacity_s8",
+      "locator": "問答 6",
+      "quote": "公司注意到近期行业内外多家企业通过收购方式切入 PCB 钻针领域，公司尊重并欢迎良性竞争，相信充分竞争有助于推 动行业技术进步与整体升级。作为全球 PCB 钻针龙头企业"
+    }
+  ]
+}

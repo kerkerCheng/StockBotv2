@@ -1,0 +1,181 @@
+{
+  "claims": [
+    {
+      "confidence": 0.4,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：凱崴 2026 年月營收累計年增低於 50%，或下一份年報不再寫供不應求；或客戶端一手寫出鑽針供應寬鬆。核查頻率：每月（月營收）＋每年（年報）。觸發後 48 小時：這條 claim 降 confidence，重讀鑽針層讀圖的供需段。",
+      "id": "mops_5498_annual_report_2025_pcb_drill_bits_cl1",
+      "source_ids": [
+        "mops_5498_annual_report_2025_pcb_drill_bits_s3",
+        "mops_5498_annual_report_2025_pcb_drill_bits_s4"
+      ],
+      "statement": "Supplier-side statement (Key Ware Electronics annual report FY2025, post-AGM revision): drill heads were 55% of FY2025 revenue and CCL plus drilling services 45%; the company says rising AI server demand, higher PCB layer counts and M8/M9-class laminates will make drill bits and drilling services short in supply, and forecasts 2026 drill-bit and tool sales to grow more than 50%. Self-reported forecast; no customer named.",
+      "subject_id": "mat:pcb_drill_bit"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "mat:pcb_drill_bit",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "mops_5498_annual_report_2025_pcb_drill_bits_s1",
+        "mops_5498_annual_report_2025_pcb_drill_bits_s2",
+        "mops_5498_annual_report_2025_pcb_drill_bits_s3"
+      ],
+      "src_id": "co:key_ware_electronics"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:ai_switch",
+      "id": "e2",
+      "relation": "is_component_of",
+      "source_ids": [
+        "mops_5498_annual_report_2025_pcb_drill_bits_s5"
+      ],
+      "src_id": "tech:ai_high_layer_pcb"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "mat:pcb_drill_bit",
+      "id": "e3",
+      "relation": "depends_on",
+      "source_ids": [
+        "mops_5498_annual_report_2025_pcb_drill_bits_s4",
+        "mops_5498_annual_report_2025_pcb_drill_bits_s5"
+      ],
+      "src_id": "tech:ai_high_layer_pcb"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "凱崴",
+        "凱崴電子",
+        "凱崴電子股份有限公司",
+        "KEY WARE ELECTRONICS CO., LTD."
+      ],
+      "attributes": {
+        "ticker": "5498.TWO"
+      },
+      "confidence": 0.9,
+      "id": "co:key_ware_electronics",
+      "name": "Key Ware Electronics Co., Ltd.",
+      "role": null,
+      "source_ids": [
+        "mops_5498_annual_report_2025_pcb_drill_bits_s1",
+        "mops_5498_annual_report_2025_pcb_drill_bits_s3"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "鑽針",
+        "微鑽",
+        "微型鑽頭",
+        "鍍膜鑽針",
+        "钻针",
+        "PCB 钻针",
+        "PCB 鑽針",
+        "carbide drill bits"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "mat:pcb_drill_bit",
+      "name": "PCB micro drill bits (carbide drill bits, incl. router bits)",
+      "role": null,
+      "source_ids": [
+        "mops_5498_annual_report_2025_pcb_drill_bits_s2"
+      ],
+      "type": "Material"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "AI 伺服器主板",
+        "AI 主板",
+        "AI-PCB",
+        "AI PCB",
+        "高階多層板",
+        "高層數 PCB",
+        "高多层板",
+        "交換機板"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:ai_high_layer_pcb",
+      "name": "High-layer-count PCB for AI servers and switches (multilayer / HDI mainboards)",
+      "role": null,
+      "source_ids": [
+        "mops_5498_annual_report_2025_pcb_drill_bits_s5"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "AI datacenter network",
+        "AI networking",
+        "fabric solutions",
+        "switch ASIC",
+        "Ethernet networking for AI"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:ai_switch",
+      "name": "Data-center switch / scale-up network",
+      "role": null,
+      "source_ids": [
+        "mops_5498_annual_report_2025_pcb_drill_bits_s5"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "mops_5498_annual_report_2025_pcb_drill_bits",
+    "evidence_tier": 1,
+    "origin_entity": "Key Ware Electronics Co., Ltd.",
+    "permission_basis": "公開資訊觀測站公開年報；只保留研究必要的有限逐字節錄。published_at 取 MOPS 上傳時間（115/08/20 16:06:22，股東會後修訂本；原版 115/05/13 上傳）。",
+    "published_at": "2026-08-20",
+    "publisher": "公開資訊觀測站（股東會年報）",
+    "retrieved_at": "2026-11-11",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "凱崴電子（5498）中華民國 114 年度年報（股東會後修訂本）：鑽頭占營收 55%、銅箔基板及鑽孔代工 45%；AI 伺服器、層數提升與 M8／M9 基板讓鑽針及鑽孔代工供不應求，預估 115 年度鑽針刀具銷售成長 50% 以上；交換機板 44–56 層",
+    "url": "https://doc.twse.com.tw/server-java/t57sb01?step=9&kind=F&co_id=5498&filename=2025_5498_20260617F11.pdf"
+  },
+  "sources": [
+    {
+      "id": "mops_5498_annual_report_2025_pcb_drill_bits_s1",
+      "locator": "封面",
+      "quote": "凱崴電子股份有限公司 KEY WARE ELECTRONICS CO., LTD."
+    },
+    {
+      "id": "mops_5498_annual_report_2025_pcb_drill_bits_s2",
+      "locator": "肆、營運概況 一、(一) 1. 所營業務之主要內容（p.42）",
+      "quote": "(1)電子線路板專用全尺寸鑽針、刀具製造及銷售。 (2)電子線路板鑽孔服務，包含：鐳射、機鑽、成型及電測代工。"
+    },
+    {
+      "id": "mops_5498_annual_report_2025_pcb_drill_bits_s3",
+      "locator": "肆、營運概況 一、(一) 2. 主要產品之營業比重（p.42）",
+      "quote": "鑽頭 778,859 55% 銅箔基板及鑽孔代工 628,471 45%"
+    },
+    {
+      "id": "mops_5498_annual_report_2025_pcb_drill_bits_s4",
+      "locator": "致股東報告書 (二) 預期銷售數量及其依據",
+      "quote": "以及M8、M9 等級基板導入，將使得鑽針及鑽孔代工供不應求；本公司預估115 年度鑽針刀具銷售將成長 50%以上"
+    },
+    {
+      "id": "mops_5498_annual_report_2025_pcb_drill_bits_s5",
+      "locator": "肆、營運概況 (二) 產業概況 (2) 核心驅動成長動能（p.43）",
+      "quote": "層數暴增：AI 主板層數從傳統的 12-16 層，跳升至20-30 層以上，部分高 效能交換機板甚至達到 44-56 層。"
+    }
+  ]
+}

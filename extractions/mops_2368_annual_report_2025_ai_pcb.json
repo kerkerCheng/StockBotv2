@@ -1,0 +1,163 @@
+{
+  "claims": [
+    {
+      "confidence": 0.85,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：金像電下一份年報的重要契約不再列這筆或寫解約、縮減。核查頻率：每年（年報）。觸發後 48 小時：更正這條 claim。",
+      "id": "mops_2368_annual_report_2025_ai_pcb_cl1",
+      "source_ids": [
+        "mops_2368_annual_report_2025_ai_pcb_s5",
+        "mops_2368_annual_report_2025_ai_pcb_s6",
+        "mops_2368_annual_report_2025_ai_pcb_s8"
+      ],
+      "statement": "Customer-side capex for drilling (Gold Circuit Electronics annual report FY2025): it has volume capability for 52-layer boards, is developing back-drill residual-copper control, and lists a purchase contract with Tongtai Machine & Tool (東台精機) running 2025-05-26 to 2028-12-31 for 21 five-axis drilling machines and 6 six-axis CCD drilling machines.",
+      "subject_id": "tech:ai_high_layer_pcb"
+    },
+    {
+      "confidence": 0.55,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：Prismark 實績或板廠一手寫出 18 層以上高階多層板成長遠低於此。核查頻率：每半年（板廠年報與法說轉引）。觸發後 48 小時：更正這條 claim。",
+      "id": "mops_2368_annual_report_2025_ai_pcb_cl2",
+      "source_ids": [
+        "mops_2368_annual_report_2025_ai_pcb_s3",
+        "mops_2368_annual_report_2025_ai_pcb_s9"
+      ],
+      "statement": "Industry data relayed by Gold Circuit Electronics (citing Prismark): multilayer boards were the fastest-growing PCB segment in 2025, with boards of 18 layers and above growing about 72.8% in value.",
+      "subject_id": "tech:ai_high_layer_pcb"
+    },
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：金像電下一份年報的原料段寫出某項原料缺貨或交期延長。核查頻率：每年（年報）＋每季（法說）。觸發後 48 小時：重讀做板層與相關材料層讀圖。",
+      "id": "mops_2368_annual_report_2025_ai_pcb_cl3",
+      "source_ids": [
+        "mops_2368_annual_report_2025_ai_pcb_s2",
+        "mops_2368_annual_report_2025_ai_pcb_s7"
+      ],
+      "statement": "Gold Circuit Electronics lists its main raw materials as substrates (laminates), prepreg, copper foil, dry film and plating chemicals, bought from major domestic suppliers with long-term stable supply relationships; drill bits are not listed among its main raw materials.",
+      "subject_id": "tech:ai_high_layer_pcb"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:ai_high_layer_pcb",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "mops_2368_annual_report_2025_ai_pcb_s1",
+        "mops_2368_annual_report_2025_ai_pcb_s4",
+        "mops_2368_annual_report_2025_ai_pcb_s5"
+      ],
+      "src_id": "co:gold_circuit"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "金像電",
+        "金像電子",
+        "金像電子股份有限公司",
+        "Gold Circuit Electronics"
+      ],
+      "attributes": {
+        "ticker": "2368.TW"
+      },
+      "confidence": 0.9,
+      "id": "co:gold_circuit",
+      "name": "Gold Circuit Electronics Ltd.",
+      "role": null,
+      "source_ids": [
+        "mops_2368_annual_report_2025_ai_pcb_s1",
+        "mops_2368_annual_report_2025_ai_pcb_s4"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "AI 伺服器主板",
+        "AI 主板",
+        "AI-PCB",
+        "AI PCB",
+        "高階多層板",
+        "高層數 PCB",
+        "高多层板",
+        "交換機板"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:ai_high_layer_pcb",
+      "name": "High-layer-count PCB for AI servers and switches (multilayer / HDI mainboards)",
+      "role": null,
+      "source_ids": [
+        "mops_2368_annual_report_2025_ai_pcb_s4",
+        "mops_2368_annual_report_2025_ai_pcb_s5"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "mops_2368_annual_report_2025_ai_pcb",
+    "evidence_tier": 1,
+    "origin_entity": "Gold Circuit Electronics Ltd.",
+    "permission_basis": "公開資訊觀測站公開年報；只保留研究必要的有限逐字節錄。published_at 取 MOPS 上傳時間（115/05/07 15:02:44）。",
+    "published_at": "2026-05-07",
+    "publisher": "公開資訊觀測站（股東會年報）",
+    "retrieved_at": "2026-11-11",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "金像電子（2368）中華民國 114 年度年報：印刷電路板用於伺服器、AI 伺服器、網路設備；52 層板量產；背鑽研發；主要原料國內各大廠穩定供應；重要契約——向東台精機買五軸鑽孔機 21 台、六軸 CCD 鑽孔 6 台；Prismark：2025 年 18 層以上高階多層板產值增 72.8%",
+    "url": "https://doc.twse.com.tw/server-java/t57sb01?step=9&kind=F&co_id=2368&filename=2025_2368_20260529F04.pdf"
+  },
+  "sources": [
+    {
+      "id": "mops_2368_annual_report_2025_ai_pcb_s1",
+      "locator": "年報末頁（公司署名，p.111）",
+      "quote": "金像電子股份有限公司 董事長 楊承澤"
+    },
+    {
+      "id": "mops_2368_annual_report_2025_ai_pcb_s2",
+      "locator": "伍、營運概況 (二) 產業概況 2、產業上、中、下游之關聯性（p.82）",
+      "quote": "本公司主要係製造銷售印刷電路板產品，其上游主要原料包括基板、 膠片、銅箔、乾膜、油膜及蝕刻液等化學材料"
+    },
+    {
+      "id": "mops_2368_annual_report_2025_ai_pcb_s3",
+      "locator": "伍、營運概況 (二) 產業概況 3、產品之各種發展趨勢（p.83）",
+      "quote": "從產品結構來看，多層板市場成長動能最為顯著，整體產值預估 增加約 18%，其中 18 層以上高階多層板增幅更高達 72.8%。"
+    },
+    {
+      "id": "mops_2368_annual_report_2025_ai_pcb_s4",
+      "locator": "伍、營運概況 (三) 主要產品之用途（p.90）",
+      "quote": "印刷電路板 個人電腦、工業自動化相關設備、數值控制設備、通 訊設備、智慧型手機、伺服器、AI 伺服器、網際網路 設備、工業用電腦、半導體測試設備"
+    },
+    {
+      "id": "mops_2368_annual_report_2025_ai_pcb_s5",
+      "locator": "伍、營運概況 (四) 競爭利基（p.86）",
+      "quote": "已具備量產微孔 、細線路及 52 層板及厚銅等高難度製程之 量產實 力。"
+    },
+    {
+      "id": "mops_2368_annual_report_2025_ai_pcb_s6",
+      "locator": "伍、營運概況 (一) 研究發展計畫（p.82）",
+      "quote": "J. 背鑽殘銅控制能力提升技術開發"
+    },
+    {
+      "id": "mops_2368_annual_report_2025_ai_pcb_s7",
+      "locator": "伍、營運概況 (二) 主要原料之供應狀況（p.90）",
+      "quote": "其主要內容為基板 、 膠片 、 銅箔、 乾膜及電鍍用之各種化學藥品。採購來源為國內各大廠商，長期供應關係良 好穩定。"
+    },
+    {
+      "id": "mops_2368_annual_report_2025_ai_pcb_s8",
+      "locator": "七、重要契約（p.99）",
+      "quote": "買賣契約 東台精機股份有限公司 114/5/26~117/12/31 五軸鑽孔機*21 台/ 六軸 CCD 鑽孔*6 台"
+    },
+    {
+      "id": "mops_2368_annual_report_2025_ai_pcb_s9",
+      "locator": "伍、營運概況 (二) 產業概況 3、產品之各種發展趨勢（p.83）",
+      "quote": "根據研究機構 Prismark 預估"
+    }
+  ]
+}

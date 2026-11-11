@@ -1,0 +1,115 @@
+{
+  "claims": [
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：TTM 下一份 10-K／10-Q 的 Suppliers 段把鑽針寫成供應受限或交期延長；或其他板廠的一手寫出鑽針缺貨。核查頻率：每季（10-Q）＋每年（10-K）。觸發後 48 小時：更新這條 claim，重讀鑽針層讀圖的可替代性段。",
+      "id": "sec_ttm_10k_fy2025_pcb_raw_materials_cl1",
+      "source_ids": [
+        "sec_ttm_10k_fy2025_pcb_raw_materials_s3",
+        "sec_ttm_10k_fy2025_pcb_raw_materials_s4",
+        "sec_ttm_10k_fy2025_pcb_raw_materials_s5"
+      ],
+      "statement": "Customer-side statement (TTM Technologies FY2025 10-K, filed 2026-02-17): carbide drill bits are among the primary raw materials for its advanced interconnect products (PCBs), and most of its raw materials are generally readily available from numerous suppliers in the open market; the filing does not say whether drill bits are among 'most'. Data center computing was 24% of FY2025 net sales. Counter-evidence to supplier claims of a drill-bit shortage, dated before the 2026 ramp.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "mat:pcb_drill_bit",
+      "id": "e1",
+      "relation": "depends_on",
+      "source_ids": [
+        "sec_ttm_10k_fy2025_pcb_raw_materials_s1",
+        "sec_ttm_10k_fy2025_pcb_raw_materials_s3"
+      ],
+      "src_id": "co:ttm"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "TTM Technologies",
+        "TTM Technologies, Inc."
+      ],
+      "attributes": {
+        "ticker": "TTMI"
+      },
+      "confidence": 0.9,
+      "id": "co:ttm",
+      "name": "TTM Technologies, Inc.",
+      "role": null,
+      "source_ids": [
+        "sec_ttm_10k_fy2025_pcb_raw_materials_s1",
+        "sec_ttm_10k_fy2025_pcb_raw_materials_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "鑽針",
+        "微鑽",
+        "微型鑽頭",
+        "鍍膜鑽針",
+        "钻针",
+        "PCB 钻针",
+        "PCB 鑽針",
+        "carbide drill bits"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "mat:pcb_drill_bit",
+      "name": "PCB micro drill bits (carbide drill bits, incl. router bits)",
+      "role": null,
+      "source_ids": [
+        "sec_ttm_10k_fy2025_pcb_raw_materials_s3"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "sec_ttm_10k_fy2025_pcb_raw_materials",
+    "evidence_tier": 1,
+    "origin_entity": "TTM Technologies, Inc.",
+    "permission_basis": "美國 SEC EDGAR 法定公開申報；只保留研究必要的有限逐字節錄。published_at 取 EDGAR 申報日 2026-02-17（accession 0001193125-26-051976）。",
+    "published_at": "2026-02-17",
+    "publisher": "SEC EDGAR（Form 10-K）",
+    "retrieved_at": "2026-11-11",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "TTM Technologies Form 10-K（fiscal year ended 2025-12-29）：先進互連產品的主要原料含 carbide drill bits，Most of the raw materials are generally readily available from numerous suppliers；PCB 產業 highly fragmented；Data Center Computing 占營收 24%",
+    "url": "https://www.sec.gov/Archives/edgar/data/1116942/000119312526051976/ttmi-20251229.htm"
+  },
+  "sources": [
+    {
+      "id": "sec_ttm_10k_fy2025_pcb_raw_materials_s1",
+      "locator": "Cover page",
+      "quote": "TTM TECHNOLOGIES, INC. (Exact Name of Registrant as Specified in Its Charter)"
+    },
+    {
+      "id": "sec_ttm_10k_fy2025_pcb_raw_materials_s2",
+      "locator": "Item 1. Business — General",
+      "quote": "We are a leading global manufacturer of technology products, including mission systems, RF components, RF microwave/microelectronic assemblies, and technologically advanced interconnect products, including PCBs and substrates."
+    },
+    {
+      "id": "sec_ttm_10k_fy2025_pcb_raw_materials_s3",
+      "locator": "Item 1. Business — Suppliers",
+      "quote": "For advanced interconnect products, primary raw materials include copper clad laminates and chemical solutions such as copper and gold for plating operations, photographic film, carbide drill bits, and plastic for testing fixtures. Most of the raw materials are generally readily available from numerous suppliers in the open market."
+    },
+    {
+      "id": "sec_ttm_10k_fy2025_pcb_raw_materials_s4",
+      "locator": "Item 1. Business — Competition",
+      "quote": "The PCB industry remains highly fragmented and characterized by intense competition."
+    },
+    {
+      "id": "sec_ttm_10k_fy2025_pcb_raw_materials_s5",
+      "locator": "Item 1. Business — End markets（% of net sales, FY2025 / FY2024 / FY2023）",
+      "quote": "Data Center Computing 24 20 14"
+    }
+  ]
+}

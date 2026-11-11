@@ -1,0 +1,161 @@
+{
+  "claims": [
+    {
+      "confidence": 0.5,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：PCB 板廠（客戶端）的一手寫出 AI 主板的鑽針用量沒有倍增、或鑽針費用占比沒有上升；或尖點、凱崴、高僑月營收年增連續三個月轉負而 AI 伺服器／交換器板出貨仍在增加。核查頻率：每月（三家月營收）＋每季（板廠法說與投資者關係紀錄）。觸發後 48 小時：這條 claim 降 confidence、在 tech:ai_high_layer_pcb depends_on mat:pcb_drill_bit 加註，重讀鑽針層讀圖。",
+      "id": "mops_6234_annual_report_2025_micro_drill_cl1",
+      "source_ids": [
+        "mops_6234_annual_report_2025_micro_drill_s3",
+        "mops_6234_annual_report_2025_micro_drill_s5"
+      ],
+      "statement": "Supplier-side statement (Tera Autotech annual report FY2025): micro drills used in AI-PCB see sharply rising demand because harder board materials shorten drill life; the flute-length-to-diameter ratio has risen from 20x to 50x. The company says its micro drills have entered the AI-PCB cloud-rack drill market. Self-reported; no customer named.",
+      "subject_id": "e2"
+    },
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：高僑或其他鑽針廠的一手寫出碳化鎢成本回落或供應中斷。核查頻率：每季（財報）＋每年（年報）。觸發後 48 小時：重讀鑽針層讀圖的上游段。",
+      "id": "mops_6234_annual_report_2025_micro_drill_cl2",
+      "source_ids": [
+        "mops_6234_annual_report_2025_micro_drill_s4"
+      ],
+      "statement": "Tera Autotech reports that tungsten carbide prices began rising in early 2025, raising micro-drill production costs, and that it now also sells micro drills as semi-finished products.",
+      "subject_id": "mat:pcb_drill_bit"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "mat:pcb_drill_bit",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "mops_6234_annual_report_2025_micro_drill_s1",
+        "mops_6234_annual_report_2025_micro_drill_s2",
+        "mops_6234_annual_report_2025_micro_drill_s5"
+      ],
+      "src_id": "co:tera_autotech"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "mat:pcb_drill_bit",
+      "id": "e2",
+      "relation": "depends_on",
+      "source_ids": [
+        "mops_6234_annual_report_2025_micro_drill_s3"
+      ],
+      "src_id": "tech:ai_high_layer_pcb"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "高僑",
+        "高僑自動化",
+        "高僑自動化科技股份有限公司"
+      ],
+      "attributes": {
+        "ticker": "6234.TWO"
+      },
+      "confidence": 0.9,
+      "id": "co:tera_autotech",
+      "name": "Tera Autotech Corporation",
+      "role": null,
+      "source_ids": [
+        "mops_6234_annual_report_2025_micro_drill_s1",
+        "mops_6234_annual_report_2025_micro_drill_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "鑽針",
+        "微鑽",
+        "微型鑽頭",
+        "鍍膜鑽針",
+        "钻针",
+        "PCB 钻针",
+        "PCB 鑽針",
+        "carbide drill bits"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "mat:pcb_drill_bit",
+      "name": "PCB micro drill bits (carbide drill bits, incl. router bits)",
+      "role": null,
+      "source_ids": [
+        "mops_6234_annual_report_2025_micro_drill_s3"
+      ],
+      "type": "Material"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "AI 伺服器主板",
+        "AI 主板",
+        "AI-PCB",
+        "AI PCB",
+        "高階多層板",
+        "高層數 PCB",
+        "高多层板",
+        "交換機板"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:ai_high_layer_pcb",
+      "name": "High-layer-count PCB for AI servers and switches (multilayer / HDI mainboards)",
+      "role": null,
+      "source_ids": [
+        "mops_6234_annual_report_2025_micro_drill_s3",
+        "mops_6234_annual_report_2025_micro_drill_s5"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "mops_6234_annual_report_2025_micro_drill",
+    "evidence_tier": 1,
+    "origin_entity": "Tera Autotech Corporation",
+    "permission_basis": "公開資訊觀測站公開年報；只保留研究必要的有限逐字節錄。published_at 取 MOPS 上傳時間（115/06/11 15:35:51）。",
+    "published_at": "2026-06-11",
+    "publisher": "公開資訊觀測站（股東會年報）",
+    "retrieved_at": "2026-11-11",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "高僑自動化（6234）中華民國 114 年度年報：微型鑽頭占營收 59.7%；AI-PCB 微鑽因板材硬度提高、壽命縮短，需求急遽成長，刃長徑比由 20 倍增至 50 倍；碳化鎢 2025 年初起漲",
+    "url": "https://doc.twse.com.tw/server-java/t57sb01?step=9&kind=F&co_id=6234&filename=2025_6234_20260626F04.pdf"
+  },
+  "sources": [
+    {
+      "id": "mops_6234_annual_report_2025_micro_drill_s1",
+      "locator": "壹、(十) 內部控制制度聲明書（p.40）",
+      "quote": "高僑自動化科技股份有限公司 內部控制制度聲明書"
+    },
+    {
+      "id": "mops_6234_annual_report_2025_micro_drill_s2",
+      "locator": "肆、營運概況 一、(一) 2. 營業比重（p.52）",
+      "quote": "微型鑽頭 286,266 26.74 270,408 41.60 285,513 59.70"
+    },
+    {
+      "id": "mops_6234_annual_report_2025_micro_drill_s3",
+      "locator": "肆、營運概況 (二) 產業概況 (2) 產品種類（p.54）",
+      "quote": "使用在AI-PCB的微鑽因為電路板材料的硬度提高，造成鑽頭壽 命縮短，需求量急遽成長。鑽頭刃長與直徑的比值由20倍增加至50 倍，提高了生產微鑽的設備精度要求。"
+    },
+    {
+      "id": "mops_6234_annual_report_2025_micro_drill_s4",
+      "locator": "肆、營運概況 (二) 5. 競爭情形 (2) 微型鑽頭半成品部份（p.56）",
+      "quote": "從2025年初碳化鎢材料開始上漲，造成微型鑽頭生產成本持續 上升，本公司將微型鑽頭以半成品型態當成產品出售"
+    },
+    {
+      "id": "mops_6234_annual_report_2025_micro_drill_s5",
+      "locator": "肆、營運概況 (三) 技術及研發概況（p.57）",
+      "quote": "本公司微型鑽頭生產技術已成功跨入AI-PCB雲端機櫃用鑽頭市 場，並且在IC載板市場，相對於日系廠商高單價的鑽頭產品更具競 爭力。"
+    }
+  ]
+}
