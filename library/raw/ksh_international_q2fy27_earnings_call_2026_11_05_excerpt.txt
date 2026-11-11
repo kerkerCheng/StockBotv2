@@ -1,0 +1,45 @@
+SOURCE: KSH International Limited（NSE: KSHINTL／BSE: 544664）——Transcript of the Earnings Conference Call held on Thursday, November 05, 2026（Q2／H1 FY27 未經查核財報），2026-11-09 依 SEBI LODR Reg. 30／46(2)(oa) 向 BSE、NSE 申報（20 頁：申報函＋逐字稿 19 頁）
+URL: https://www.bseindia.com/xml-data/corpfiling/AttachLive/e48711cc-c959-4dc3-8fcd-a2a402fbcb45.pdf
+PUBLISHED: 2026-11-09（申報函日期；法說 2026-11-05）
+RETRIEVED: 2026-11-11（BSE 附件路徑直接下載；連結取自 Screener 的 Concalls 清單——BSE 公告 API 回 403、公司官網逐字稿頁還只到第一季）
+STORAGE: repo_excerpt（發行人法說逐字稿之有限逐字節錄；pypdf 抽字、空白攤平，抽字產生的字內空格照抄；頁碼是逐字稿頁首的「Page N of 19」（跨頁寫 p.N–M））
+NOTE: 發行人自述（管理層在法說的話：Rajesh Hegde、Amod Joshi、Dhruv Chopra）。KSHINTL.NS 敘事深挖清單 latest_call 與 pq2 [914] 三個問題：①每噸 EBITDA 跳升是價還是組合——管理層說是 CTC 占比、出口、利用率、盧比走弱，CFO 說加工費率的增加「not that significant」；②Hitachi Energy 五年框架——量還沒定，約兩季內給答案；③美國以外 CTC 緊不緊——沒有直接說，只說出口客戶都在擴產。
+
+【開場：量與每噸 EBITDA 的原因｜p.4】
+"Overall, sales volume was 8842 metric tons in Q2, was up from 7969 metric tons in Q1 and 7037 metric tons a year ago. This represents 26% year-over-year volume growth and 11% higher than Q1 of FY '27. Moving now to our EBITDA per ton performance: In Q2 FY '27, we reported EBITDA per ton of approximately Rs. 1 01,400 per metric ton up from roughly Rs. 93,000 per metric ton in Q1 and Rs. 65,500 per metric ton a year ago. Similar to Q1, the key drivers for this improvement were, number one being the CTC contribution during Q2 remained elevated given the timing of when that capacity was installed, though t he mixed percentage should moderate as we head into H2 of FY '27. Secondly, higher export contributions and volumes during Q2, which are all specialized Magnet Winding Wires, showed a meaningful improvement compared to last year and last quarter. The third point being an increase in consolidated utilization rates to 76% in Q2 of FY '27 versus 73% in Q1 of FY '27 based on available capacity for the quarter. Fourth point being a persistently weaker rupee"
+
+【開場：出口｜p.3】
+"Over the past few quarters, we have talked about having capacity available to expand our export business, given the supply constraints we faced previously. We spent the last 6 months fulfilling various technical qualifications and test shipments and in Q2, we saw the export volumes begin to increase from both existing customers as well as new OEMs. Export revenue in Q2 grew 108% year -over-year and 44% higher than last quarter. As a result, exports represented almost 32% of our revenue in Q2, up from 26% in Q1."
+
+【開場：CTC 占比｜p.4】
+"CTC contribution in Q2 remained elevated as a percentage of the total revenue as standard wire volumes begin to pick up late in the quarter. As the newly commissioned standard wire capacity ramps up, we expect the overall contribution of standard wires to increase and our product mix to progressively move closer to historical levels, heading into H2 of FY '27 and FY 2028."
+
+【開場：特殊線材利用率｜p.5】
+"If we look at our overall available specialized Magnet Winding Wire capacity, our Q2 utilization has exceeded 80%, which as we have previously mentioned is also an important threshold for when we start looking at adding new capacity."
+
+【開場：長期每噸 EBITDA｜p.5】
+"we believe post Phase-3 expansion, a long-term EBITDA per ton of approximately Rs. 85,000 per ton should be sustainable."
+
+【問答：每噸 EBITDA 跳升是不是價（CFO）｜p.8】
+"Amod Joshi: Yes. So, look, the increase in EBITDA per metric ton, like Rajesh had mentioned earlier, is an account of the factors like CTC going up and exports going up and utilization going up, so on and so forth. Then, the contributor to the increase in conversion rate s is not that significant in the overall increase in EBITDA per metric ton."
+
+【問答：定價機制｜p.8】
+"the pricing mechanisms we have with them are, fairly measured irrespective of the demand supply environment. However, the moment you start supplying higher -complexity products, the value -addition rates are higher. And that plays a larger role than a like -for-like sort of price increase."
+
+【問答：不靠漲價｜p.9】
+"we are not trying to increase prices on, we are looking at the product mix, the markets that obviously, as our export percentage increases, that helps us in the EBITDA per ton as well."
+
+【問答：Hitachi 五年框架｜p.11】
+"So in this environment, what happens with these transformer companies is that one is, if you are a qualified supplier, they want to ensure that there is a continuity of supply when their capacity comes up. And qualifications in this business obviously takes a long time. So they would rather, if their current suppliers are, they should have the visibility to expand their capacity also. So your Hitachi, we have a 5-year framework agreement. We are still putting. In terms of volumes and everything , we are still to get that in place. Similarly, with a few other customers also, this discussion is there. And this, we would be able to really, maybe in the next 2 quarters, we would be able to give you an answer on this long- term agreement part of it."
+
+【問答：長約的價格｜p.11】
+"this is still a work in progress. And the idea would be that just as we have the ability to provide visibility on supply, they would have the ability to provide visibility on demand as well as unit economics. So that is still being worked out."
+
+【問答：AI 資料中心的比重｜p.11】
+"AI data centers, etc. , is one of the newer additions to the T&D story. The T&D story is well and truly established with or without it. So when you are talking about, gr id infrastructure build -out, renewables, etc., that is very much still in play. For us, the power generation, transmission, etc. , plays a much larger role, as I said, with the existing drivers in play. For AI data centers, there is special types of transformers, which we do supply, but today is a very small component of our business. So, we don't really anticipate any significant change, if it was to reverse."
+
+【問答：地區｜p.16】
+"about less than 10% of the business or the revenues come from Europe and the Americas. Middle East is also approximately around 10%. And about 73% is within India is what we supply."
+
+【問答：出口客戶｜p.16】
+"almost all of our export customers are basically, what we export is basically to transformer companies around the world. And all of them are expanding capacity and the idea is to keep that wallet share."

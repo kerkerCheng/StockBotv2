@@ -1,0 +1,30 @@
+SOURCE: MTAR Technologies Limited（BSE: 543270／NSE: MTARTECH）——Transcript of Earnings call held on 30.10.2026（Q2 FY27），2026-11-06 依 SEBI LODR Reg. 30 向 BSE、NSE 申報（20 頁：申報函＋逐字稿 19 頁）
+URL: https://www.bseindia.com/xml-data/corpfiling/AttachLive/315a79b0-dc7d-4251-a6c8-3bb01c937c99.pdf
+PUBLISHED: 2026-11-06（申報函日期；法說 2026-10-30）
+RETRIEVED: 2026-11-11（BSE 附件路徑直接下載；連結取自 Screener 的 Concalls 清單——BSE 公告 API 回 403、公司官網投資人頁還只到第一季）
+STORAGE: repo_excerpt（發行人法說逐字稿之有限逐字節錄；pypdf 抽字、空白攤平，抽字產生的字內空格照抄；頁碼是逐字稿頁首的「Page N of 19」（跨頁寫 p.N–M））
+NOTE: 發行人自述（Srinivas Reddy 管理層、Gunneswara Rao 財務）。MTARTECH.NS 敘事深挖清單 latest_call 與 pq2 [915] 兩個問題：①燃料電池第三期（多倍）擴產時程——同日更正版簡報寫「by March 2027」，逐字稿開場寫「overall expansion expected to be completed by June 2028」，問答裡同一位 CEO 說「should be ready by June of next year」：三個日子都是公司自己的話，原文沒有解釋差異；②hot box 供應商——分析師問「you and the South Korean company or is there any other supplier」，CEO 答「No, nobody else」（供應商自述，L8 弱；韓國那一家原文沒具名）。管理層在問答裡沒有自己點名 Bloom 是客戶（點名的是分析師）；「不只 Bloom」那段是說別家燃料電池廠要追上 Bloom 很難。資料中心那座廠的「Phase 1／Phase 2」是另一件事（問句講資料中心訂單），不是燃料電池第三期。
+
+【開場：燃料電池擴產｜p.3】
+"Our Phase 2 capacity expansion is nearing completion with the facility expected to be operational by end of November. Phase 3, which will enhance our manufacturing capacity multi- fold, will be housed in a new dedicated facility with the overall expansion expected to be completed by June 2028."
+
+【開場：資料中心新業務｜p.5】
+"We are currently working on the execution of the first article orders valued at approximately INR45 crores. To support this initiative, we are also establish ing a manufacturing facility and are in the process of establishing the necessary infrastructure and capabilities. And this facility should be operational in a full-f ledged manner by end of March 2027. We have significant t potential for scalability following the successf ul completion and qualification of these first articles with the business having the pote ntial to scale up to INR350 crores to INR 450 crores over the next 2 years."
+
+【問答：第二期之後的 hot box 產能與第三期時程（CEO）｜p.7】
+"See, the Phase 2 capacity, as I said, it's a smaller expansion. It's about 30% higher than our existing capacity. And the multi-fold expansion, as I said, should be ready by June of next year. And look, the order inflows are continuous. I mean we are receiving substantial orders and the demand is a lot more than what we can expect. And most important thing is to get the expansion plan in place, which we are working on that. And fortunately, we are exactly as per our time lines, what we hav e mentioned, and we are working towards that."
+
+【問答：資本支出｜p.7】
+"Actually, our total capex planed is, in the company around INR500 crores, of which INR350 crores for the fuel cells business and remaining INR150 crores for other sectors like oil and gas and aerospace and other verticals. And it is actually 75% planned through the debt and 25% through internal accruals."
+
+【問答：資料中心那座廠的兩期｜p.9】
+"The Phase 1 of the plan, the plan what we have establish ed for the facility should be ready by end of November or beginning of second half of December. And then the Phase 2 will be ready by June of next year. So we are on track with that re quirement of the customers, what we have said at 8x the first article value."
+
+【問答：產能與 hot box 供應商｜p.14–15】
+"So I don't want to talk about the number of units or whatever, but our capacities are being implemented to cover the requirement of the customers in totality. So that's where we are. So the multifold capacity, what we are implementing will cover all t he requirements of the customers, whatever has been given to us. Mihir Manohar Sure, sure. And as of now, there are these 2 suppliers, right, for ho t boxes, you and the South Korean company or is there any other supplier who has developed? MTAR Technologies Limited October 30, 2026 Page 15 of 19 Srinivas Reddy: No, nobody else."
+
+【問答：hot box 是整組｜p.14】
+"Srinivas Reddy: No, it's a complete assembly. I don't want to go into the specifics because of the NDA signed, but it's a complete assembly of the units that we ship to the customer. Jenish Karia: Understood. But the assembled parts, are they sourced domestically? Or are we import dependent on that? Any color on that? Srinivas Reddy: Some of the bought-outs are imported, but most of them are domestic, and we have developed a lot of bought-outs, which we use in the hot box assembly as well."
+
+【問答：不只 Bloom｜p.13–14】
+"Srinivas Reddy: No, it's not exactly we are being on only Bloom or anything like that. See a lot of companies are trying a lot of things, but they need to come up to the level of Bloom is a far-fetched one. It's not MTAR Technologies Limited October 30, 2026 Page 14 of 19 easy. Bloom itself took about 12 to 15 years to develop where they are"

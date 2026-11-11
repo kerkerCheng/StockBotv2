@@ -1,0 +1,9 @@
+SOURCE: Stabilis Solutions, Inc.（SLNG）Form 8-K（items 7.01、9.01），2026-11-10 申報，Exhibit 99.1 新聞稿「STABILIS SOLUTIONS ANNOUNCES THREE-YEAR TAKE-OR-PAY LNG SUPPLY AGREEMENT WITH EXISTING AEROSPACE CUSTOMER」
+URL: https://www.sec.gov/Archives/edgar/data/1043186/000143774926036001/ex_1041801.htm
+PUBLISHED: 2026-11-10（新聞稿日期 Houston, November 10, 2026；EDGAR accession 0001437749-26-036001）
+RETRIEVED: 2026-11-11（SEC EDGAR，repo 預設 UA）
+STORAGE: repo_excerpt（發行人申報之有限逐字節錄）
+NOTE: 發行人自述（新聞稿以 item 7.01 提供、不是 item 1.01 重大合約）；客戶沒具名，合約金額與價格條款沒揭露。
+
+"today announced a three-year take-or-pay LNG supply agreement with an existing commercial aerospace customer in support of its operations at the John C. Stennis Space Center in Hancock County, Mississippi. The take-or-pay commitment covers January 1, 2027 through December 31, 2029. Under the agreement, the customer will purchase its LNG requirements at the site from Stabilis, with a minimum commitment of 230,000 gallons per month and monthly volumes of up to 260,000 gallons. Stabilis expects to supply the customer primarily from its owned liquefaction facility in Port Allen, Louisiana. Stabilis has supplied LNG to the customer at Stennis since 2024."
+"“Our ability to deliver high-purity LNG and engineer fit-for-purpose solutions around each customer’s technical requirements has made Stabilis a trusted supplier to the aerospace industry. This three-year take-or-pay agreement provides contracted minimum volumes and, together with the behind-the-meter data center contract scheduled to begin in the first quarter of 2027, strengthens our visibility into growth across our key end markets next year.”"
