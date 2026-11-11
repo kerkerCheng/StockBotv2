@@ -3143,6 +3143,29 @@
         "住友化學",
         "住友化学株式会社"
       ]
+    },
+    {
+      "company_id": "co:glassem",
+      "research_ticker": null,
+      "display_name": "글라셈 주식회사",
+      "_display_name_source": "삼성전기 DART「타법인주식및출자증권취득결정」記載更正（2026-11-05，rcpNo 20261105800383）發行公司名「글라셈 주식회사」；7-02 原公示（rcpNo 20260702800664）寫「(가칭) 글라셈 주식회사」",
+      "_note": "隨玻璃核心合資入圖包 staged（2026-11-11，drop 即回退；入圖包見 glass_core_glassem_jv_semco_dongwoo_2026_11_11_action.json）：三星電機（co:samsung_electro_mechanics）出資 3,191 億韓圜取得 66.2%、與住友化學全資子公司東友 Fine-Chem（co:dongwoo_finechem）合資的新設法人，主業「Glass Core 제조 및 판매」；繳款日因海外結合申報延遲由 2026-09-01 改成 2026-11-05。未上市：research_ticker 明確 null（INV-1／L9）。英文「GlaSSEM」是韓文媒體的寫法（머니투데이 2026-07-02 等，公示沒有英文名），只當別名",
+      "name_aliases": [
+        "글라셈",
+        "GlaSSEM"
+      ]
+    },
+    {
+      "company_id": "co:dongwoo_finechem",
+      "research_ticker": null,
+      "display_name": "동우화인켐(주)",
+      "_display_name_source": "삼성전기 DART 2026-11-05 記載更正公示「동우화인켐(주)」；住友化學半期報告書 S100ZDPS（2026-11-10）「当社の完全子会社である東友ファインケム株式会社」",
+      "_note": "隨玻璃核心合資入圖包 staged（2026-11-11，drop 即回退；入圖包見 glass_core_glassem_jv_semco_dongwoo_2026_11_11_action.json）：住友化學（co:sumitomo_chemical）在韓國的全資子公司，未上市（research_ticker 明確 null）；2026-07 與三星電機簽合資契約（글라셈，玻璃核心），對合資公司實物出資（住友化學半期報告注記 9：相關資產列為待售處分群組，歸 ICT＆モビリティソリューション部門）。英文「Dongwoo Fine-Chem」是公司慣用英文名，兩份公示都沒寫，只當別名",
+      "name_aliases": [
+        "동우화인켐",
+        "東友ファインケム",
+        "Dongwoo Fine-Chem"
+      ]
     }
   ]
 }
