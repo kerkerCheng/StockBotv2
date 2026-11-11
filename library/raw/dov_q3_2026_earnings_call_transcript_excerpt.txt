@@ -1,0 +1,28 @@
+SOURCE: Dover Corporation 2026 年第三季法說會逐字稿（第三方轉錄：Alpha Spread）
+URL: https://www.alphaspread.com/security/nyse/dov/earnings-calls/q3-2026
+PUBLISHED: 2026-10-22（法說會日期＝8-K 財報發布日 2026-10-22）
+RETRIEVED: 2026-11-11
+STORAGE: repo_excerpt（逐字稿有限節錄）
+NOTE: 第三方轉錄的逐字稿（非發行人申報）；頁面前段有轉錄站自寫的摘要句，不是講者原話，這裡只收講者段。供應商自述（L8）。機械節錄：含 heat exchanger／SWEP／capacity／lead time／CDU／backlog 的句子；全文沒有 CPC、connector、quick disconnect 字樣（快接頭這一季沒談）。
+
+【講稿（Richard Tobin，Climate & Sustainability Technologies）】
+"Climate & Sustainability Technologies accelerated to 18% organic growth in the quarter. Shipments and order rates in brazed plate heat exchangers remain robust across all geographies and major end markets, with notable strength in liquid cooling for data centers, which is initially concentrated in the U.S., but we are now seeing meaningful acceleration in Europe and Asia. Lead times remain extended, and we are actively investing to double our global capacity for large heat exchangers through 2027."
+
+【問答（Steve Tusa 問在手訂單；Richard Tobin 答）】
+"I guess, where we have been capacity constrained is what's driving the backlog into 2027. So the duration of the demand is a good indicator because customers are basically getting in line to just reserve that capacity."
+
+【問答（分析師問 SWEP 有沒有產能限制；Richard Tobin 答）】
+"Well, yes. I mean, we've -- I think that if you go on the slide of our capital investments and if you go back and read the transcript of what I said, yes, we've been capacity constrained all year. It doesn't seem to be preventing the actual build-outs, but everybody is trying to get in front of securing the supply. So there's a lot of signaling effect in there. But we are basically ramping to double capacity into the main product line that's been growing. This is SWEP now, that's been sent into data centers. That will change over time because there'll be a shift between the central cooling system demand, which we see it now, into more CDU mix into the future, and we're taking that into consideration."
+
+【問答（同一位分析師問題裡的數字——是分析師說的，不是公司）】
+"30% growth in data center this year is impressive."
+
+【問答（Amit Mehrotra 問 SWEP 交期；分析師自己說上次約 25 週）】
+"SWEP lead times. Last time I checked in, they were like 25 weeks. Is that still the case?"
+
+【問答（Richard Tobin 答交期）】
+"I don't know what lead times are off the top of my head. I mean, we're bringing on additional capacity sequentially through the year, but with a pretty big jump this quarter going into Q1, then it becomes a big debate of, well, but the lead times keep going out because the orders keep coming in, in advance of that capacity build. Does that wind down in '27? Hard to say. Right now, we don't see it, but we are bringing on more capacity because the fact that we believe in the durability of the demand."
+
+【問答（追問與回答）】
+"But it's not measured in years, it's measured in quarters, right?"
+"Yes, yes. No, no, it's not -- it's not in years."

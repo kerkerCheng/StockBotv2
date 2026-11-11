@@ -1,0 +1,22 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1076930/000119312526453802/novt-20261002.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Novanta Inc. 10-Q（quarter ended October 2, 2026；EDGAR 2026-11-09）節錄：能力別營收、自動化賦能分部、稀土出口許可
+RETRIEVED: 2026-11-11（EDGAR 原文抽字、空白正規化後逐字核對）
+NOTE: 「Robotics and Automation」是按產品能力別拆的營收（含機器人與精密運動、機器人末端工具；ATI 力感測器在這一類，但沒有再拆），不是人形或力感測器的營收。這張表不是第一次出現：第二季 10-Q 已有同一張（novt_10q_q2_2026_capability_revenue_20260805）。發行人申報。
+
+【附註二 Disaggregated Revenue（按產品與技術能力別；千美元；四欄依序為 2026 第三季、2025 第三季、2026 前九月、2025 前九月）】
+"The following table presents revenues disaggregated by the capabilities of the underlying products and technologies during the three and nine months ended October 2, 2026 and September 26, 2025, respectively (in thousands):"
+"Precision Manufacturing $ 51,377 $ 45,180 $ 146,297 $ 133,596"
+"Robotics and Automation 93,978 80,136 266,518 236,558"
+"Automation Enabling Technologies 145,355 125,316 412,815 370,154"
+"Total Revenue $ 305,008 $ 247,836 $ 828,522 $ 722,251"
+
+【附註十七 部門說明（Automation Enabling Technologies 賣什麼）】
+"The Automation Enabling Technologies segment designs, manufactures and markets laser beam steering and scanning solutions, laser sources, robotic and precision motion, robotic end-of-arm tooling, and bearing spindles to customers worldwide."
+
+【MD&A — Automation Enabling Technologies（第三季）】
+"Automation Enabling Technologies segment revenue for the three months ended October 2, 2026 increased $20.0 million, or 16.0%, versus the prior year period, primarily due to a 17.3% increase in sales of robotics and automation products and 13.7% increase in precision manufacturing products, associated with end market demand and new product introductions."
+
+【Risk Factors（稀土出口許可）】
+"For example, certain products within our Precision Manufacturing and Robotics and Automation businesses use rare-earth materials sourced from suppliers in China and magnets manufactured with such materials, the export of which requires a license from the Chinese government. For several months, we have sought but have been unable to obtain the licenses necessary to receive certain shipments of these materials, which has caused delays in fulfilling customer orders and increases in certain manufacturing costs."

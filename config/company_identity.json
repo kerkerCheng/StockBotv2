@@ -3109,6 +3109,40 @@
         "ficonTEC"
       ],
       "research_ticker": "300757.SZ"
+    },
+    {
+      "company_id": "co:hd_construction_equipment",
+      "research_ticker": "267270.KS",
+      "market_currency": "KRW",
+      "execution_currency": null,
+      "execution_venue": null,
+      "display_name": "HD Construction Equipment Co., Ltd.",
+      "_display_name_source": "PSI Form 8-K（2026-11-10，accession 0001193125-26-454122）Item 1.01「HD Construction Equipment Co., Ltd. (“HCE”)」；DART 公示申報人「HD건설기계」（2026-11-10 rcpNo 20261110800183、2026-10-07 rcpNo 20261007800221）",
+      "_note": "隨燃氣引擎長缸體入圖包 staged（2026-11-11，drop 即回退；入圖包見 gas_engine_long_block_hce_psi_erock_2026_11_11_action.json）：原 HD현대건설기계，2026-01-01 吸收合併 HD현대인프라코어（舊 Doosan Infracore）後改名；燃氣發電用引擎長缸體 2027–2028 供 PSI（GV22TI，約 1.219 億美元）與 Enchanted Rock（約 2.856 億美元），兩約都先收一成預付——DART 寫兩約各占合併前 2025 年營收 4.38%、10.27%。營收主體是工程機械。系統口徑邊緣（`python -m alpha edge 267270.KS`：3.28B 美元、分析師 7 家，2026-11-11）。不放縮寫「HCE」（太多同名）；被合併的 HD현대인프라코어（042670.KS，已下市）是另一個法人，不放進別名",
+      "name_aliases": [
+        "HD Construction Equipment",
+        "HD Construction Equipment Co., Ltd.",
+        "HD건설기계",
+        "HD Hyundai Construction Equipment",
+        "HD현대건설기계"
+      ]
+    },
+    {
+      "company_id": "co:sumitomo_chemical",
+      "research_ticker": "4005.T",
+      "market_currency": "JPY",
+      "execution_currency": null,
+      "execution_venue": null,
+      "display_name": "Sumitomo Chemical Co., Ltd.",
+      "_display_name_source": "公司新聞稿頁（sumitomo-chem.co.jp/news/detail/20260831.html）頁尾「Copyright © Sumitomo Chemical Co., Ltd.」與「住友化学株式会社 コーポレートコミュニケーション部」",
+      "_note": "隨 InP 磊晶片層入圖包 staged（2026-11-11，drop 即回退；入圖包見 inp_epiwafer_sumitomo_chemical_2026_11_11_action.json）：2026-08-31 新聞稿寫茨城工場確立 4 吋 InP 磊晶片量產體制並開始販售、目標 2030 年代中期 InP 磊晶片營收 100 億日圓；GaAs、GaN 磊晶片已量產 25 年以上。營收主體是農化、醫藥、化學品，InP 磊晶片占比極小。系統口徑邊緣（`python -m alpha edge 4005.T`：5.33B 美元、分析師 9 家，2026-11-11）。不放「住友」單詞別名（住友電工、住友金屬礦山同名）",
+      "name_aliases": [
+        "Sumitomo Chemical",
+        "Sumitomo Chemical Co., Ltd.",
+        "住友化学",
+        "住友化學",
+        "住友化学株式会社"
+      ]
     }
   ]
 }

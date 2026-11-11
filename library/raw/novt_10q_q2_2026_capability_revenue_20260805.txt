@@ -1,0 +1,12 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1076930/000119312526335404/novt-20260703.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Novanta Inc. 10-Q（quarter ended July 3, 2026；EDGAR 2026-08-05）節錄：能力別營收
+RETRIEVED: 2026-11-11（EDGAR 原文抽字、空白正規化後逐字核對）
+NOTE: 留這份是為了證明「機器人與自動化」的能力別營收在第三季之前就已分項揭露（不是第三季第一次）。發行人申報。
+
+【附註二 Disaggregated Revenue（按產品與技術能力別；千美元；四欄依序為 2026 第二季、2025 第二季、2026 上半年、2025 上半年）】
+"disaggregated by the capabilities of the underlying products and technologies during the three and six months ended July 3, 2026 and June 27, 2025, respectively (in thousands):"
+"Robotics and Automation 88,370 77,835 172,541 156,423"
+"Automation Enabling Technologies 136,215 121,672 267,459 244,839"
+"Total Revenue $ 265,807 $ 241,049 $ 523,514 $ 474,415"

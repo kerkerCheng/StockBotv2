@@ -1,0 +1,15 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/29905/000002990526000033/dov-20260930.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Dover Corporation 10-Q（quarter ended September 30, 2026；EDGAR 2026-10-22）節錄：MD&A — Climate & Sustainability Technologies、Pumps & Process Solutions
+RETRIEVED: 2026-11-11（EDGAR 原文抽字、空白正規化後逐字核對）
+NOTE: 跟第二季 10-Q（dov_10q_q2_2026_heat_exchanger_bookings_20260723）同一套寫法：資料中心冷卻的熱交換器需求加速、訂單含交期較長的單、分部訂單出貨比 1.23（第二季也是 1.23；訂單年增由 45.8% 變 43.1%）。原文沒寫 SWEP 品牌名、沒拆資料中心營收；43.1% 與 1.23 是整個分部（含零售冷凍櫃）的數字。發行人申報（L8：供應商自述）。
+
+【MD&A — Climate & Sustainability Technologies（第三季營收）】
+"The organic revenue growth was primarily driven by continued strong demand in CO2 refrigerant systems and growth in refrigerated door case volumes, as well as accelerating demand for heat exchangers used in data center cooling and other applications."
+
+【MD&A — Climate & Sustainability Technologies（第三季訂單）】
+"Bookings in the third quarter of 2026 increased 43.1% from the prior year comparable quarter. The bookings increase was primarily driven by demand strength in retail refrigeration and heat exchangers, including longer lead-time orders. Segment book-to-bill was 1.23."
+
+【MD&A — Pumps & Process Solutions（第三季訂單；CPC 快接頭在這個分部，本段沒提資料中心或接頭）】
+"Overall bookings increased 9.0% as compared to the prior year comparable quarter. The bookings increase was primarily driven by positive demand trends in industrial pumps and precision components. Segment book-to-bill was 0.98."
