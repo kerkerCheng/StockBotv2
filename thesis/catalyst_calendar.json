@@ -27,11 +27,11 @@
       "ticker": "6268.T",
       "catalyst_checkpoints": [
         {
-          "date": "2026-10-30",
-          "what": "FY2027 上半期決算",
+          "date": "2026-11-13",
+          "what": "2026 年 12 月期 第 3 四半期決算（同日法說）",
           "decides": "人形相關受注／營收是否首次出現任何揭露（法說 Q&A 或補充資料皆可）",
-          "date_confidence": "estimated",
-          "basis": "yfinance calendar 的 Earnings Date（provider 值，未逐檔回公司 IR 頁核對）——依 _date_confidence 規則屬 estimated，照樣排程但呈現時必須標明"
+          "date_confidence": "confirmed",
+          "basis": "公司 IR 行事曆（https://www.nabtesco.com/en/about/ir/calender/，2026-11-11 讀）：「November 13 (Plan) Announcement of Q3 financial result for the fiscal year ending December 2026」。原登記 2026-10-30「FY2027 上半期決算」是 yfinance 的預估、名稱照 3 月制補錯——Nabtesco 的會計年度到 12 月底，上半期 07-31 已發布（failure log #156）"
         }
       ]
     },

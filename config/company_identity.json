@@ -1575,6 +1575,23 @@
       ]
     },
     {
+      "company_id": "co:nan_ya_plastics",
+      "research_ticker": "1303.TW",
+      "market_currency": "TWD",
+      "execution_currency": "TWD",
+      "execution_venue": "TWSE",
+      "display_name": "Nan Ya Plastics Corporation",
+      "_display_name_source": "yfinance longName（2026-11-11）；上市 1303（南亞塑膠工業股份有限公司）",
+      "_note": "隨日東紡委託織布入圖包 staged（2026-11-11，drop 即回退；入圖包見 glass_cloth_nan_ya_nittobo_weaving_2026_11_11_action.json）：台塑集團的南亞塑膠——日東紡有價證券報告書第 165 期「重要な契約等」寫 2025-11-28 與它簽特殊玻璃布的織布製造委託契約（日文寫作「南亜塑膠工業股份有限公司」）。系統口徑非邊緣（市值約 2.29 兆新台幣）。不放單詞「Nan Ya」「南亞」：台塑集團多家共用（南亞電路板 co:nan_ya_pcb、南亞科技）",
+      "name_aliases": [
+        "Nan Ya Plastics",
+        "南亞塑膠",
+        "南亞塑膠工業股份有限公司",
+        "南亜塑膠工業股份有限公司",
+        "南亜プラスチック"
+      ]
+    },
+    {
       "company_id": "co:modine",
       "research_ticker": "MOD",
       "market_currency": "USD",

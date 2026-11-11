@@ -1,0 +1,30 @@
+SOURCE: Superior Plus Corp.（TSX: SPB）2026 Third Quarter Results——財報新聞稿＋MD&A 合訂包（63 頁）
+URL: https://www.superiorplus.com/wp-content/uploads/2026/11/SPB-Q3-2026-Earnings-Release-Full-Package-vF.pdf
+PUBLISHED: 2026-11-10（新聞稿 dateline「TORONTO, November 10, 2026」）
+RETRIEVED: 2026-11-11（公司官網 PDF，curl 下載、pypdf 本機抽字；PDF 抽字斷開的字已接回，其餘逐字）
+STORAGE: repo_excerpt
+NOTE: 發行人自述。SPB.TO 敘事（不要）何時格寫的觀測點「第三季財報：CNG 量與資料中心合約」用。資料中心沒有單獨揭露，全文都和工業合寫（industrial and data center）。CNG 占營運 Adjusted EBITDA 的比重是我們算的：前三季 108.5／313.7 ≈ 34.6%；上半年（前三季減第三季）72.0／297.2 ≈ 24.2%。
+
+【p.1 Q3 2026 Highlights】
+"Adjusted EBITDA(1) of $8.8 million, up $1.2 million, or 16%"
+"Record third quarter Adjusted EBITDA in CNG of $36.5 million driven by continued strength in data center and industrial markets complemented by strong and stable wellsite performance"
+"Superior is revising its 2026 Adjusted EBITDA estimate from approximately 2% growth to a 2% decline, as higher than expected growth in CNG is unlikely to offset a decline in North American Propane"
+
+【p.2 Q3 2026 Segment Performance（$M；三個月 2026／2025｜九個月 2026／2025）】
+"U.S. Propane Adjusted EBITDA(1) (22.2) (14.0) 131.4 149.6"
+"Canadian Propane Adjusted EBITDA(1) 2.2 2.5 73.8 64.2"
+"CNG Adjusted EBITDA(1) 36.5 25.7 108.5 108.2"
+"Adjusted EBITDA from operations(1) 16.5 14.2 313.7 322.0"
+
+【p.3 CNG】
+"CNG Adjusted EBITDA (1) increased $10.8 million, or 42%, to a record $36.5 million, driven by continued growth in its industrial and data center business and increased wellsite activity partially offset by higher operating costs"
+"Volumes increased 23% to 8,722,000 MMBtu, driven by record volumes in both wellsite and industrial end markets"
+"The pipeline for wellsite, industrial, data center and Mobile CNG Fleet FuelingTM work is expected to propel continued gains into 2027"
+
+【p.3 Balance Sheet and Capital Allocation】
+"The increase reflects the reprioritization of capital to investments in the CNG segment, driven by rapidly developing opportunities in power generation for data center customers and growth in the transportation market."
+"Leverage Ratio(1) of 3.8x compared to 3.9x a year ago and 4.0x at prior year-end, reflecting lower net debt balances, partially offset by lower Adjusted EBITDA(1)"
+
+【p.4 2026 Outlook】
+"Anticipated 2026 CNG Adjusted EBITDA growth has improved to ~5% driven by stronger-than-expected growth in the data center and industrial segments coupled with continued strength in the wellsite business. This growth is not expected to offset a decline in propane, driven by capacity investments to improve winter readiness as well as temporarily elevated customer attrition following last winter."
+"CNG Adjusted EBITDA(1) Growth (4%) to (9%) ~5%"
