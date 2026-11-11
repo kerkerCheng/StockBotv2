@@ -14,8 +14,8 @@ from typing import Any, Mapping, Sequence
 from shared.redaction import sensitive_payload_path
 
 from ..narrative.contracts import (CANDIDATE_STATES_RETIRED, LINKABLE_SOURCE_PREFIXES, RAW_EXCERPT_PREFIX,
-                                   InvestorBrief, lamp_colour_claims, parse_brief_record, price_quote_claims,
-                                   undated_position_claims, wrong_signal_items)
+                                   InvestorBrief, explains_no_disproof, lamp_colour_claims, parse_brief_record,
+                                   price_quote_claims, undated_position_claims, wrong_signal_items)
 from ..errors import ContractViolation
 
 _ROOT = Path(__file__).resolve().parents[2]
@@ -546,10 +546,11 @@ def v2_write_notices(parsed: InvestorBrief) -> list[str]:
     # 錯的訊號沒標對應的反證（2026-11-10，failure log #140）：只印——沒有反證就沒有 watch，到期那天不會有東西叫你回來看
     must = parsed.slot("what_must_be_true")
     bare = [item for item, refs, reading in wrong_signal_items(must.text if must is not None else "")
-            if not refs and not reading]
+            if not refs and not reading and not explains_no_disproof(item)]
     if bare:
         notices.append("what_must_be_true：這幾條錯的訊號沒標對應的反證——對到哪一條就寫「（第 N 條）」（N＝disproof[] 的順序；"
-                       "讀圖的反證寫「讀圖第 N 條」或連進 disproof[]），對不到的補一條（有日期寫逾期型）或寫為什麼不補：「"
+                       "讀圖的反證寫「讀圖第 N 條」或連進 disproof[]），對不到的補一條（有日期寫逾期型）或寫為什麼不補"
+                       "（「不設反證：<理由>」）：「"
                        + "」「".join(item[:40] for item in bare) + "」")
     return notices
 

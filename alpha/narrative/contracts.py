@@ -664,6 +664,15 @@ def price_quote_claims(text: str) -> list[str]:
 WRONG_SIGNAL_MARK = re.compile(r"錯的訊號[^。：:]{0,12}[：:]")
 _DISPROOF_REF = re.compile(r"(?<!讀圖)(?<!讀圖\s)第\s*(\d+(?:\s*[、,，及和與]\s*第?\s*\d+)*)\s*條")
 _READING_REF = re.compile(r"讀圖\s*第\s*\d+\s*條")
+#: 寫了為什麼不補（2026-11-11）：寫入端提示叫人「對不到的…或寫為什麼不補」，偵測器卻只認編號——5801.T「——不另登反證，會死嗎的
+#: 負債燈每天重算」、MTARTECH.NS「（不設反證：其他流動負債沒拆出預收款…）」照樣亮。「不（另）設／登反證」後面接「：」或「，」
+#: 再接理由才算寫了；只寫「不設反證」沒有理由照樣印。
+_NO_DISPROOF_REASON = re.compile(r"不(?:另|再)?(?:設|登)反證\s*[：:，,]\s*\S{2,}")
+
+
+def explains_no_disproof(item: str) -> bool:
+    """一條錯的訊號自己寫了為什麼不設反證（「不設反證：<理由>」「不另登反證，<理由>」）。"""
+    return bool(_NO_DISPROOF_REASON.search(item or ""))
 
 
 def _split_outside_brackets(text: str, *, stop: str, sep: str) -> list[str]:
@@ -1038,7 +1047,7 @@ __all__ = [
     "NarrativeConfirm", "NarrativeDisproof", "PLACEHOLDERS_V2", "PRICED_DATE_MARK", "PRICED_POSITION_WORDS",
     "PricedSnapshot", "RECORD_VERSION_V1", "RECORD_VERSION_V2", "RECORD_VERSIONS", "undated_position_claims",
     "LAMP_COLOUR_CLAIM", "PRICE_QUOTE_CLAIM", "lamp_colour_claims", "price_quote_claims",
-    "WRONG_SIGNAL_MARK", "wrong_signal_items",
+    "WRONG_SIGNAL_MARK", "explains_no_disproof", "wrong_signal_items",
     "RIDE_UNITS",
     "Ride", "SLOT_KEYS_V2", "SLOT_LABELS_V2", "WHAT_MUST_BE_TRUE_FORBIDDEN", "placeholder_vocab", "slot_keys",
     "slot_labels",

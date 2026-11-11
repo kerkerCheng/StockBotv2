@@ -88,6 +88,18 @@ def test_untagged_items_are_printed_not_rejected() -> None:
     assert not [n for n in v2_write_notices(tagged) if "錯的訊號" in n]
 
 
+def test_an_item_that_says_why_there_is_no_disproof_is_not_printed() -> None:
+    """提示自己叫人「或寫為什麼不補」——寫了理由就不再印（5801.T、MTARTECH.NS 2026-11-11 的兩種寫法）；
+    只寫「不設反證」、沒有理由的照印（放行的同時收緊：理由要寫出來）。"""
+    told = _brief("錯的訊號：擴產提前（第 1 條）；借款再快速增加而營業現金流沒跟上——不另登反證，會死嗎的負債燈每天重算；"
+                  "預收款回落而營收沒跟上（不設反證：其他流動負債沒拆出預收款，寫成條件不會亮）。")
+    assert wrong_signal_ref_problems(told) == []
+    assert not [n for n in v2_write_notices(told) if "錯的訊號" in n]
+    bare = _brief("錯的訊號：擴產提前（第 1 條）；預收款回落（不設反證）；通美融資沒能交割。")
+    notices = [n for n in v2_write_notices(bare) if "錯的訊號" in n]
+    assert len(notices) == 1 and "預收款回落" in notices[0] and "通美融資沒能交割" in notices[0]
+
+
 # ---------------------------------------------------------------------------
 # ④ 回放：AXTI 11-07 版（`ib_5a2398613c6e7598`）的錯的訊號段落（原文節錄，五條都沒標）
 # ---------------------------------------------------------------------------
