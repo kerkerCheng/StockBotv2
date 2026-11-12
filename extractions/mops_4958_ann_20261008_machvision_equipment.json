@@ -1,0 +1,112 @@
+{
+  "claims": [
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：臻鼎的重訊／年報寫出取消或延後已下單的設備，或同一批設備改向別家採購。核查頻率：每月（MOPS 重訊）＋每年（年報）。觸發後 48 小時：更正這條 claim。",
+      "id": "mops_4958_ann_20261008_machvision_equipment_cl1",
+      "source_ids": [
+        "mops_4958_ann_20261008_machvision_equipment_z1",
+        "mops_4958_ann_20261008_machvision_equipment_z2",
+        "mops_4958_ann_20261008_machvision_equipment_z3",
+        "mops_4958_ann_20261008_machvision_equipment_z4"
+      ],
+      "statement": "Customer-side capital commitment (Zhen Ding Technology material announcement, 2026-10-08): its Huai'an subsidiary Qing Ding Precision Electronics acquired one batch of machinery worth NT$1,013,371,210 from MACHVISION, INC. over 2025-10-09 to 2026-10-08 (cumulative), an unrelated party. The equipment type is not disclosed.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "co:zhen_ding_tech",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "mops_4958_ann_20261008_machvision_equipment_z1",
+        "mops_4958_ann_20261008_machvision_equipment_z3",
+        "mops_4958_ann_20261008_machvision_equipment_z4"
+      ],
+      "src_id": "co:machvision"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "臻鼎",
+        "臻鼎-KY",
+        "臻鼎科技",
+        "Zhen Ding Technology"
+      ],
+      "attributes": {
+        "ticker": "4958.TW"
+      },
+      "confidence": 0.9,
+      "id": "co:zhen_ding_tech",
+      "name": "Zhen Ding Technology Holding Limited",
+      "role": null,
+      "source_ids": [
+        "mops_4958_ann_20261008_machvision_equipment_z1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "equipment_epitaxy",
+      "aliases": [
+        "牧德",
+        "牧德科技",
+        "牧德科技股份有限公司",
+        "MACHVISION",
+        "Machvision"
+      ],
+      "attributes": {
+        "ticker": "3563.TW"
+      },
+      "confidence": 0.85,
+      "id": "co:machvision",
+      "name": "Machvision Inc.",
+      "role": null,
+      "source_ids": [
+        "mops_4958_ann_20261008_machvision_equipment_z4"
+      ],
+      "type": "Company"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "mops_4958_ann_20261008_machvision_equipment",
+    "evidence_tier": 1,
+    "origin_entity": "Zhen Ding Technology Holding Limited",
+    "permission_basis": "台灣上市公司重大訊息（MOPS 歷史重大訊息查詢 t05st01，發言時間 22:14:21、序號 1）；全文短、只保留研究必要的逐字。published_at 取 MOPS 發言日期 115/10/08。url 欄是去重鍵（GET 只會看到 MOPS 首頁）；重抓走 ajax_t05st01 POST step=2&seq_no=1&spoke_time=221421&spoke_date=20261008&co_id=4958&TYPEK=sii。",
+    "published_at": "2026-10-08",
+    "publisher": "公開資訊觀測站（MOPS 重大訊息）",
+    "retrieved_at": "2026-11-11",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "臻鼎-KY（4958）重大訊息 2026-10-08：代子公司慶鼎精密電子（淮安）公告取得機器設備——交易相對人 MACHVISION,INC.（牧德）、一批、2025-10-09～2026-10-08 累計新台幣 10.13 億元",
+    "url": "https://mopsov.twse.com.tw/mops/web/t05st01?co_id=4958&spoke_date=20261008&seq_no=1"
+  },
+  "sources": [
+    {
+      "id": "mops_4958_ann_20261008_machvision_equipment_z1",
+      "locator": "主旨",
+      "quote": "代子公司慶鼎精密電子(淮安)有限公司公告取得機器設備"
+    },
+    {
+      "id": "mops_4958_ann_20261008_machvision_equipment_z2",
+      "locator": "說明 2. 事實發生日",
+      "quote": "事實發生日:114/10/9~115/10/8"
+    },
+    {
+      "id": "mops_4958_ann_20261008_machvision_equipment_z3",
+      "locator": "說明 5. 交易數量與交易總金額",
+      "quote": "交易數量:一批 交易總金額:新台幣1,013,371,210元"
+    },
+    {
+      "id": "mops_4958_ann_20261008_machvision_equipment_z4",
+      "locator": "說明 6. 交易相對人及其與公司之關係",
+      "quote": "交易相對人:MACHVISION,INC. 與公司之關係:無"
+    }
+  ]
+}

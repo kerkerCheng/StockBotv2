@@ -1,0 +1,179 @@
+{
+  "claims": [
+    {
+      "confidence": 0.5,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：牧德下一份年報或季報寫出 PCB AOI 營收轉為年減、或主要客戶改回向 KLA 等海外廠採購；或板廠一手寫出檢測設備改向別家。核查頻率：每月（月營收）＋每季（財報）＋每年（年報）。觸發後 48 小時：這條 claim 降 confidence，重讀檢測設備層讀圖。",
+      "id": "mops_3563_annual_report_2025_pcb_aoi_cl1",
+      "source_ids": [
+        "mops_3563_annual_report_2025_pcb_aoi_m2",
+        "mops_3563_annual_report_2025_pcb_aoi_m3",
+        "mops_3563_annual_report_2025_pcb_aoi_m7",
+        "mops_3563_annual_report_2025_pcb_aoi_m8",
+        "mops_3563_annual_report_2025_pcb_aoi_m9"
+      ],
+      "statement": "Supplier-side statement (Machvision FY2025 annual report): 2025 revenue was NT$3.191 billion, up 108.34%, from visual-inspection (25%), circuit-inspection (33%) and other inspection systems (34%) plus service; its products cover drilling/routing measurement, PCB circuit inspection, HDI and IC-substrate inspection, server-mainboard inspection and four-wire electrical testers; for PCB circuit AOI its main foreign competitors are KLA, CIMS (ex-Camtek PCB) and SCREEN; and in an industry-wide passage on AOI (semiconductor, flat-panel display, LED, PCB and optical lens) it says domestic and foreign users will gradually raise the share of AOI equipment bought from Taiwanese makers. Self-reported.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:pcb_electrical_test_aoi",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "mops_3563_annual_report_2025_pcb_aoi_m1",
+        "mops_3563_annual_report_2025_pcb_aoi_m4",
+        "mops_3563_annual_report_2025_pcb_aoi_m5"
+      ],
+      "src_id": "co:machvision"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.55,
+      "dst_id": "tech:pcb_electrical_test_aoi",
+      "id": "e2",
+      "relation": "depends_on",
+      "source_ids": [
+        "mops_3563_annual_report_2025_pcb_aoi_m5",
+        "mops_3563_annual_report_2025_pcb_aoi_m6"
+      ],
+      "src_id": "tech:ai_high_layer_pcb"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "equipment_epitaxy",
+      "aliases": [
+        "牧德",
+        "牧德科技",
+        "牧德科技股份有限公司",
+        "MACHVISION",
+        "Machvision"
+      ],
+      "attributes": {
+        "ticker": "3563.TW"
+      },
+      "confidence": 0.9,
+      "id": "co:machvision",
+      "name": "Machvision Inc.",
+      "role": null,
+      "source_ids": [
+        "mops_3563_annual_report_2025_pcb_aoi_m1",
+        "mops_3563_annual_report_2025_pcb_aoi_m3"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "equipment_epitaxy",
+      "aliases": [
+        "AOI",
+        "AVI",
+        "自動光學檢測",
+        "外觀檢測",
+        "線路檢測",
+        "電測機",
+        "四線電測",
+        "飛針測試",
+        "线路检测",
+        "PCB inspection",
+        "electrical test"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:pcb_electrical_test_aoi",
+      "name": "PCB automated optical inspection (AOI / AVI) and electrical test equipment",
+      "role": null,
+      "source_ids": [
+        "mops_3563_annual_report_2025_pcb_aoi_m4",
+        "mops_3563_annual_report_2025_pcb_aoi_m5"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "AI 伺服器主板",
+        "AI 主板",
+        "AI-PCB",
+        "AI PCB",
+        "高階多層板",
+        "高層數 PCB",
+        "高多层板",
+        "交換機板"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:ai_high_layer_pcb",
+      "name": "High-layer-count PCB for AI servers and switches (multilayer / HDI mainboards)",
+      "role": null,
+      "source_ids": [
+        "mops_3563_annual_report_2025_pcb_aoi_m6"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "mops_3563_annual_report_2025_pcb_aoi",
+    "evidence_tier": 1,
+    "origin_entity": "Machvision Inc.",
+    "permission_basis": "公開資訊觀測站公開年報；只保留研究必要的有限逐字節錄。published_at 取 MOPS 上傳時間（股東會後修訂本）。",
+    "published_at": "2026-08-07",
+    "publisher": "公開資訊觀測站（股東會年報）",
+    "retrieved_at": "2026-11-11",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "牧德科技（3563）中華民國 114 年度年報（股東會後修訂本）：PCB 鑽孔與成型量測、線路檢查、HDI 與 IC 載板檢查、伺服器主板檢測設備與四線電測機；2025 營收 31.91 億元、年增 108.34%；線路 AOI 的國外對手是 KLA、CIMS、SCREEN；國內外業者漸會提高國產 AOI 採購比例（全產業口徑）",
+    "url": "https://doc.twse.com.tw/server-java/t57sb01?step=9&kind=F&co_id=3563&filename=2025_3563_20260525F11.pdf"
+  },
+  "sources": [
+    {
+      "id": "mops_3563_annual_report_2025_pcb_aoi_m1",
+      "locator": "貳、公司治理報告 · 內部控制制度聲明書（p.50）",
+      "quote": "牧德科技股份有限公司 內部控制制度聲明書"
+    },
+    {
+      "id": "mops_3563_annual_report_2025_pcb_aoi_m2",
+      "locator": "壹、致股東報告書 一、114 年度營業結果（p.1）",
+      "quote": "營業收入 3,191,461 100.00 1,531,831 100.00 1,659,630 108.34"
+    },
+    {
+      "id": "mops_3563_annual_report_2025_pcb_aoi_m3",
+      "locator": "肆、營運概況 一、(一) 2. 主要產品之營業比重（p.63）",
+      "quote": "外觀檢測系列 793,051 25% 線路檢測系列 1,044,825 33% 其他檢測系列 1,104,304 34% 服務收入 249,281 8% 合 計 3,191,461 100%"
+    },
+    {
+      "id": "mops_3563_annual_report_2025_pcb_aoi_m4",
+      "locator": "肆、營運概況 一、(一) 3. 目前之商品（p.64）",
+      "quote": "(5). 四線電測系列 A轉盤式四線自動電測機 B CSP 四線自動電測機 C 治具探針檢查機"
+    },
+    {
+      "id": "mops_3563_annual_report_2025_pcb_aoi_m5",
+      "locator": "肆、營運概況 一、(二) 1. 產業之現況與發展（p.65）",
+      "quote": "本公司目前產品主要係應用於印刷電路板產業，包含：鑽孔與成型製 程之量測與檢測、PCB線路檢查、HDI及 IC 載板檢查、伺服器主板檢測 等設備"
+    },
+    {
+      "id": "mops_3563_annual_report_2025_pcb_aoi_m6",
+      "locator": "肆、營運概況 一、(二) 產業概況（p.66）",
+      "quote": "主要因素為 AI 伺服器需求持續擴 張，帶動高層數板（HLC）、載板、與 HDI 等高階產品出貨亮眼。"
+    },
+    {
+      "id": "mops_3563_annual_report_2025_pcb_aoi_m7",
+      "locator": "肆、營運概況 一、(二) E. 競爭情形（p.68）",
+      "quote": "以PCB線路AOI檢查機為例 ， 現有對手國外包括KLA、 CIMS (原Camtek PCB 部門),及Screen，將為本公司主要的競爭對手。"
+    },
+    {
+      "id": "mops_3563_annual_report_2025_pcb_aoi_m8",
+      "locator": "肆、營運概況 一、(二) D. 設備國產化（p.68）",
+      "quote": "近年來國內設備商能力大幅 提昇，售價也較國外設備合理，需求可快速有效溝通，國內外業者為了 降低成本、提升服務維修品質，漸會提高很多國內AOI設備採購比例。"
+    },
+    {
+      "id": "mops_3563_annual_report_2025_pcb_aoi_m9",
+      "locator": "肆、營運概況 一、(二) D. 設備國產化（p.68）",
+      "quote": "AOI技術 領域非常廣泛，應用層面包括半導體、平面顯示器、LED、PCB、光學 鏡頭等產業。"
+    }
+  ]
+}

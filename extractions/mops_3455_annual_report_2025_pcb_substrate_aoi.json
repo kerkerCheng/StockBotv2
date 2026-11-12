@@ -1,0 +1,115 @@
+{
+  "claims": [
+    {
+      "confidence": 0.55,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "條件：由田下一份年報的 PCB／IC 載板檢測營收占比與此不符，或寫出載板檢測市佔下滑。核查頻率：每年（年報）＋每季（財報）。觸發後 48 小時：更正這條 claim。",
+      "id": "mops_3455_annual_report_2025_pcb_substrate_aoi_cl1",
+      "source_ids": [
+        "mops_3455_annual_report_2025_pcb_substrate_aoi_y2",
+        "mops_3455_annual_report_2025_pcb_substrate_aoi_y4"
+      ],
+      "statement": "Utechzone reports that PCB / IC-substrate automated optical inspection equipment was NT$477 million or 28.45% of 2025 revenue (semiconductor inspection 41.77%, LCD inspection 22.47%, other 7.31%), and says it holds a leading share in IC-substrate visual inspection (basis not stated). Self-reported, dated figures.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "tech:pcb_electrical_test_aoi",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "mops_3455_annual_report_2025_pcb_substrate_aoi_y1",
+        "mops_3455_annual_report_2025_pcb_substrate_aoi_y2",
+        "mops_3455_annual_report_2025_pcb_substrate_aoi_y3"
+      ],
+      "src_id": "co:utechzone"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "equipment_epitaxy",
+      "aliases": [
+        "由田新技",
+        "由田新技股份有限公司",
+        "UTECHZONE",
+        "Utechzone"
+      ],
+      "attributes": {
+        "ticker": "3455.TWO"
+      },
+      "confidence": 0.9,
+      "id": "co:utechzone",
+      "name": "Utechzone Co., Ltd.",
+      "role": null,
+      "source_ids": [
+        "mops_3455_annual_report_2025_pcb_substrate_aoi_y1",
+        "mops_3455_annual_report_2025_pcb_substrate_aoi_y2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "equipment_epitaxy",
+      "aliases": [
+        "AOI",
+        "AVI",
+        "自動光學檢測",
+        "外觀檢測",
+        "線路檢測",
+        "電測機",
+        "四線電測",
+        "飛針測試",
+        "线路检测",
+        "PCB inspection",
+        "electrical test"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:pcb_electrical_test_aoi",
+      "name": "PCB automated optical inspection (AOI / AVI) and electrical test equipment",
+      "role": null,
+      "source_ids": [
+        "mops_3455_annual_report_2025_pcb_substrate_aoi_y3"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "mops_3455_annual_report_2025_pcb_substrate_aoi",
+    "evidence_tier": 1,
+    "origin_entity": "Utechzone Co., Ltd.",
+    "permission_basis": "公開資訊觀測站公開年報；只保留研究必要的有限逐字節錄。published_at 取 MOPS 上傳時間。",
+    "published_at": "2026-06-04",
+    "publisher": "公開資訊觀測站（股東會年報）",
+    "retrieved_at": "2026-11-11",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "由田新技（3455）中華民國 114 年度年報：PCB／IC 載板自動光學檢測設備占 2025 營收 28.45%（4.77 億元）——PCB 線路檢查、AFVI 最終光學檢測、高速檢孔、類載板檢測；自述 IC 載板外觀檢測市佔領先",
+    "url": "https://doc.twse.com.tw/server-java/t57sb01?step=9&kind=F&co_id=3455&filename=2025_3455_20260624F04.pdf"
+  },
+  "sources": [
+    {
+      "id": "mops_3455_annual_report_2025_pcb_substrate_aoi_y1",
+      "locator": "目錄頁抬頭（該頁無頁碼）",
+      "quote": "由田新技股份有限公司"
+    },
+    {
+      "id": "mops_3455_annual_report_2025_pcb_substrate_aoi_y2",
+      "locator": "肆、營運概況 一、(一) 2. 營業比重（114 年度營業收入，新台幣仟元；營業比重 %）（p.51）",
+      "quote": "SEMI 檢測系統 699,768 41.77 PCB/IC 載板 476,696 28.45 LCD 檢測系統 376,418 22.47 其他 122,461 7.31"
+    },
+    {
+      "id": "mops_3455_annual_report_2025_pcb_substrate_aoi_y3",
+      "locator": "肆、營運概況 一、(一) 3. 目前之商品（p.51）",
+      "quote": "PCB 線路檢查設備 PCB AFVI 自動最終光學檢測系統 PCB 高速檢孔設備 類載板自動光學檢測設備"
+    },
+    {
+      "id": "mops_3455_annual_report_2025_pcb_substrate_aoi_y4",
+      "locator": "肆、營運概況 一、(二) 產業概況（p.53）",
+      "quote": "公司長期深耕 PCB 領域 ， 除主推並持續優化領先市佔的IC 載板相關外觀檢測"
+    }
+  ]
+}
