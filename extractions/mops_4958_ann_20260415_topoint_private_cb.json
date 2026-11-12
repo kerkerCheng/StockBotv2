@@ -1,0 +1,103 @@
+{
+  "claims": [
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：臻鼎的重大訊息或財報寫出處分或提前賣回所持尖點私募可轉債、終止與尖點的合作，或尖點財報的關係人交易與主要客戶表寫出對它的營收大幅下滑。核查頻率：每季（尖點財報主要客戶與關係人附註；臻鼎重大訊息）。觸發後 48 小時：重寫尖點敘事「客戶為什麼選它」與鑽針層讀圖的買方段。",
+      "id": "mops_4958_ann_20260415_topoint_private_cb_cl1",
+      "source_ids": [
+        "mops_4958_ann_20260415_topoint_private_cb_s1",
+        "mops_4958_ann_20260415_topoint_private_cb_s2",
+        "mops_4958_ann_20260415_topoint_private_cb_s3",
+        "mops_4958_ann_20260415_topoint_private_cb_s4",
+        "mops_4958_ann_20260415_topoint_private_cb_s5"
+      ],
+      "statement": "Customer-side (Zhen Ding Technology Holding material information on behalf of its Taiwan subsidiary, 2026-04-15): Zhen Ding Technology will subscribe up to NT$190 million face value of Topoint Technology's second private unsecured convertible bonds, subject to Topoint's shareholder approval and board pricing; the stated purpose is strategic investment. The filing itself does not state a supply relationship (Topoint's 2026-05-26 pricing notice names the Zhen Ding group as a major customer).",
+      "subject_id": "co:topoint_technology"
+    }
+  ],
+  "edges": [],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "尖點",
+        "尖點科技",
+        "尖點科技股份有限公司",
+        "Topoint"
+      ],
+      "attributes": {
+        "ticker": "8021.TW"
+      },
+      "confidence": 0.9,
+      "id": "co:topoint_technology",
+      "name": "Topoint Technology Co., Ltd.",
+      "role": null,
+      "source_ids": [
+        "mops_4958_ann_20260415_topoint_private_cb_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "臻鼎",
+        "臻鼎-KY",
+        "臻鼎科技",
+        "Zhen Ding Technology"
+      ],
+      "attributes": {
+        "ticker": "4958.TW"
+      },
+      "confidence": 0.9,
+      "id": "co:zhen_ding_tech",
+      "name": "Zhen Ding Technology Holding Limited",
+      "role": null,
+      "source_ids": [
+        "mops_4958_ann_20260415_topoint_private_cb_s1"
+      ],
+      "type": "Company"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "mops_4958_ann_20260415_topoint_private_cb",
+    "evidence_tier": 1,
+    "origin_entity": "Zhen Ding Technology Holding Limited",
+    "permission_basis": "公開資訊觀測站歷史重大訊息（t05st01 說明全文），上市公司依規公開；只保留研究必要的有限逐字節錄。published_at 取 MOPS 發言日期 2026-04-15。",
+    "published_at": "2026-04-15",
+    "publisher": "公開資訊觀測站（重大訊息）",
+    "retrieved_at": "2026-11-12",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "臻鼎-KY（4958）代子公司臻鼎科技重大訊息 2026-04-15：擬認購尖點科技國內第二次私募無擔保可轉換公司債，認購總面額上限新台幣 1.9 億元；目的「策略投資」；須經尖點股東會通過與董事會定價",
+    "url": "https://mopsov.twse.com.tw/mops/web/t05st01?co_id=4958&spoke_date=20260415&seq_no=1"
+  },
+  "sources": [
+    {
+      "id": "mops_4958_ann_20260415_topoint_private_cb_s1",
+      "locator": "主旨",
+      "quote": "代子公司臻鼎科技股份有限公司公告擬認購尖點科技股份有限公司 國內第二次私募無擔保可轉換公司債"
+    },
+    {
+      "id": "mops_4958_ann_20260415_topoint_private_cb_s2",
+      "locator": "說明 3. 交易單位數量、每單位價格及交易總金額",
+      "quote": "交易總金額：認購總面額不超過新台幣1.9億元"
+    },
+    {
+      "id": "mops_4958_ann_20260415_topoint_private_cb_s3",
+      "locator": "說明 4. 交易相對人及其與公司之關係",
+      "quote": "交易相對人：尖點 與公司之關係：非關係人"
+    },
+    {
+      "id": "mops_4958_ann_20260415_topoint_private_cb_s4",
+      "locator": "說明 9. 其他重要約定事項 (2)",
+      "quote": "(2)本次私募需經尖點股東會決議通過及董事會定價後始得辦理。"
+    },
+    {
+      "id": "mops_4958_ann_20260415_topoint_private_cb_s5",
+      "locator": "說明 16. 取得或處分之具體目的或用途",
+      "quote": "取得或處分之具體目的或用途: 策略投資"
+    }
+  ]
+}

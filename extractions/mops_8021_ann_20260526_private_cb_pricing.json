@@ -1,0 +1,205 @@
+{
+  "claims": [
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：尖點的財報或重大訊息寫出這批私募可轉債被提前贖回、應募人變更，或新廠（中壢）延後、縮小或取消。核查頻率：每季（尖點財報附註十九與重大訊息）。觸發後 48 小時：重寫尖點敘事「客戶為什麼選它」與何時。",
+      "id": "mops_8021_ann_20260526_private_cb_pricing_cl1",
+      "source_ids": [
+        "mops_8021_ann_20260526_private_cb_pricing_s1",
+        "mops_8021_ann_20260526_private_cb_pricing_s2",
+        "mops_8021_ann_20260526_private_cb_pricing_s3",
+        "mops_8021_ann_20260526_private_cb_pricing_s4",
+        "mops_8021_ann_20260526_private_cb_pricing_s5",
+        "mops_8021_ann_20260526_private_cb_pricing_s7",
+        "mops_8021_ann_20260526_private_cb_pricing_s8",
+        "mops_8021_ann_20260526_private_cb_pricing_s9"
+      ],
+      "statement": "Supplier filing (Topoint Technology material information, 2026-05-26): Topoint priced its second private unsecured convertible bonds at NT$595.8 million face value, issued at NT$102,000 per NT$100,000 bond (proceeds NT$607.716 million), with full-conversion dilution of 1.09%; proceeds fund purchasing and building a new plant and ease working capital. The three subscribers - Unimicron, Gold Circuit Electronics and Zhen Ding Technology (the Taiwan subsidiary of Zhen Ding Technology Holding) - are each described as one of the group's major customers; payment period 2026-05-26 to 2026-06-09. Three major buyers financing the supplier's capacity, not a statement that drill bits are short.",
+      "subject_id": "co:topoint_technology"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "co:unimicron",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "mops_8021_ann_20260526_private_cb_pricing_s1",
+        "mops_8021_ann_20260526_private_cb_pricing_s5",
+        "mops_8021_ann_20260526_private_cb_pricing_s6"
+      ],
+      "src_id": "co:topoint_technology"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "co:gold_circuit",
+      "id": "e2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "mops_8021_ann_20260526_private_cb_pricing_s1",
+        "mops_8021_ann_20260526_private_cb_pricing_s7"
+      ],
+      "src_id": "co:topoint_technology"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "co:zhen_ding_tech",
+      "id": "e3",
+      "relation": "supplies_to",
+      "source_ids": [
+        "mops_8021_ann_20260526_private_cb_pricing_s1",
+        "mops_8021_ann_20260526_private_cb_pricing_s8"
+      ],
+      "src_id": "co:topoint_technology"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "尖點",
+        "尖點科技",
+        "尖點科技股份有限公司",
+        "Topoint"
+      ],
+      "attributes": {
+        "ticker": "8021.TW"
+      },
+      "confidence": 0.9,
+      "id": "co:topoint_technology",
+      "name": "Topoint Technology Co., Ltd.",
+      "role": null,
+      "source_ids": [
+        "mops_8021_ann_20260526_private_cb_pricing_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "Unimicron",
+        "Unimicron Technology Corporation",
+        "Unimicron Technology Corp.",
+        "欣興",
+        "欣興電子"
+      ],
+      "attributes": {
+        "ticker": "3037.TW"
+      },
+      "confidence": 0.9,
+      "id": "co:unimicron",
+      "name": "Unimicron Technology",
+      "role": null,
+      "source_ids": [
+        "mops_8021_ann_20260526_private_cb_pricing_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "金像電",
+        "金像電子",
+        "金像電子股份有限公司",
+        "Gold Circuit Electronics"
+      ],
+      "attributes": {
+        "ticker": "2368.TW"
+      },
+      "confidence": 0.9,
+      "id": "co:gold_circuit",
+      "name": "Gold Circuit Electronics Ltd.",
+      "role": null,
+      "source_ids": [
+        "mops_8021_ann_20260526_private_cb_pricing_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "臻鼎",
+        "臻鼎-KY",
+        "臻鼎科技",
+        "Zhen Ding Technology"
+      ],
+      "attributes": {
+        "ticker": "4958.TW"
+      },
+      "confidence": 0.9,
+      "id": "co:zhen_ding_tech",
+      "name": "Zhen Ding Technology Holding Limited",
+      "role": null,
+      "source_ids": [
+        "mops_8021_ann_20260526_private_cb_pricing_s1"
+      ],
+      "type": "Company"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "mops_8021_ann_20260526_private_cb_pricing",
+    "evidence_tier": 1,
+    "origin_entity": "Topoint Technology Co., Ltd.",
+    "permission_basis": "公開資訊觀測站歷史重大訊息（t05st01 說明全文），上市公司依規公開；只保留研究必要的有限逐字節錄。published_at 取 MOPS 發言日期 2026-05-26。",
+    "published_at": "2026-05-26",
+    "publisher": "公開資訊觀測站（重大訊息）",
+    "retrieved_at": "2026-11-12",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "尖點（8021）重大訊息 2026-05-26：第二次私募國內無擔保可轉換公司債定價——總面額新台幣 595,800 仟元、每張 102,000 元（面額 10 萬）、0% 五年、全轉換稀釋 1.09%，用途支應購置與建置新廠；應募人欣興、金像電、臻鼎科技，三家都寫是「本集團主要客戶之一」",
+    "url": "https://mopsov.twse.com.tw/mops/web/t05st01?co_id=8021&spoke_date=20260526&seq_no=3"
+  },
+  "sources": [
+    {
+      "id": "mops_8021_ann_20260526_private_cb_pricing_s1",
+      "locator": "主旨",
+      "quote": "公告本公司私募國內無擔保可轉換公司債定價及其他相關事宜"
+    },
+    {
+      "id": "mops_8021_ann_20260526_private_cb_pricing_s2",
+      "locator": "說明 3.–5. 發行總額、每張面額、發行價格",
+      "quote": "3.發行總額:總發行面額為新台幣595,800仟元，總募集金額607,716仟元。 4.每張面額:每張新台幣100,000元整。 5.發行價格:每張新台幣102,000元整。"
+    },
+    {
+      "id": "mops_8021_ann_20260526_private_cb_pricing_s3",
+      "locator": "說明 9. 募得價款之用途及運用計畫",
+      "quote": "9.募得價款之用途及運用計畫:支應購置與建置新廠之資金需求，緩解本公司營運資金 調度壓力、改善財務結構。"
+    },
+    {
+      "id": "mops_8021_ann_20260526_private_cb_pricing_s4",
+      "locator": "說明 16. 對股權可能稀釋情形",
+      "quote": "16.附有轉換、交換或認股者，對股權可能稀釋情形:1.09%。"
+    },
+    {
+      "id": "mops_8021_ann_20260526_private_cb_pricing_s5",
+      "locator": "說明 19.(1)(A) 應募人：欣興",
+      "quote": "(A)欣興電子股份有限公司 (a)該集團為本公司及子公司(以下簡稱本集團)主 要客戶之一，雙方於國內外均有密切之業務往來。"
+    },
+    {
+      "id": "mops_8021_ann_20260526_private_cb_pricing_s6",
+      "locator": "說明 19.(1)(A)(b) 欣興與尖點子公司",
+      "quote": "(b)對本公司之子公司-欣點科技(股)公司採權益 法之投資公司之母公司，屬關係人。"
+    },
+    {
+      "id": "mops_8021_ann_20260526_private_cb_pricing_s7",
+      "locator": "說明 19.(1)(B) 應募人：金像電",
+      "quote": "(B)金像電子股份有限公司 (a)該集團為本集團主要客戶之一，雙方於國內外均 有密切之業務往來。"
+    },
+    {
+      "id": "mops_8021_ann_20260526_private_cb_pricing_s8",
+      "locator": "說明 19.(1)(C) 應募人：臻鼎科技",
+      "quote": "(C)臻鼎科技股份有限公司 (a)為臻鼎科技控股股份有限公司持股 100%且位於 台灣之子公司，為該集團成員之一。該集團為本 集團主要客戶之一，雙方於國內外均有密切之業 務往來"
+    },
+    {
+      "id": "mops_8021_ann_20260526_private_cb_pricing_s9",
+      "locator": "說明 19.(3) 繳款期間",
+      "quote": "(3)本次私募無擔保可轉換公司債繳款期間自115年5月26日 至115年6月9日止。"
+    }
+  ]
+}

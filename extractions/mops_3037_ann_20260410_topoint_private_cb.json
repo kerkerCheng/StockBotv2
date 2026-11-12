@@ -1,0 +1,118 @@
+{
+  "claims": [
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：欣興的重大訊息或財報寫出處分或提前賣回所持尖點私募可轉債、終止與尖點的合作，或尖點財報的關係人交易與主要客戶表寫出對它的營收大幅下滑。核查頻率：每季（尖點財報主要客戶與關係人附註；欣興重大訊息）。觸發後 48 小時：重寫尖點敘事「客戶為什麼選它」與鑽針層讀圖的買方段。",
+      "id": "mops_3037_ann_20260410_topoint_private_cb_cl1",
+      "source_ids": [
+        "mops_3037_ann_20260410_topoint_private_cb_s1",
+        "mops_3037_ann_20260410_topoint_private_cb_s2",
+        "mops_3037_ann_20260410_topoint_private_cb_s3",
+        "mops_3037_ann_20260410_topoint_private_cb_s4",
+        "mops_3037_ann_20260410_topoint_private_cb_s5"
+      ],
+      "statement": "Customer-side (Unimicron material information, 2026-04-10): Unimicron's board approved subscribing up to NT$210 million of Topoint Technology's second private unsecured convertible bonds, stating the purpose as consolidating the supply-chain relationship and strengthening cooperation; Unimicron says it is a director of a Topoint subsidiary, and its obligation was conditional on Topoint's shareholder approval. A buyer paying into its supplier's financing; the filing does not mention drill bits.",
+      "subject_id": "co:topoint_technology"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "co:unimicron",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "mops_3037_ann_20260410_topoint_private_cb_s1",
+        "mops_3037_ann_20260410_topoint_private_cb_s3",
+        "mops_3037_ann_20260410_topoint_private_cb_s5"
+      ],
+      "src_id": "co:topoint_technology"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "尖點",
+        "尖點科技",
+        "尖點科技股份有限公司",
+        "Topoint"
+      ],
+      "attributes": {
+        "ticker": "8021.TW"
+      },
+      "confidence": 0.9,
+      "id": "co:topoint_technology",
+      "name": "Topoint Technology Co., Ltd.",
+      "role": null,
+      "source_ids": [
+        "mops_3037_ann_20260410_topoint_private_cb_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "Unimicron",
+        "Unimicron Technology Corporation",
+        "Unimicron Technology Corp.",
+        "欣興",
+        "欣興電子"
+      ],
+      "attributes": {
+        "ticker": "3037.TW"
+      },
+      "confidence": 0.9,
+      "id": "co:unimicron",
+      "name": "Unimicron Technology",
+      "role": null,
+      "source_ids": [
+        "mops_3037_ann_20260410_topoint_private_cb_s1"
+      ],
+      "type": "Company"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "mops_3037_ann_20260410_topoint_private_cb",
+    "evidence_tier": 1,
+    "origin_entity": "Unimicron Technology Corp.",
+    "permission_basis": "公開資訊觀測站歷史重大訊息（t05st01 說明全文），上市公司依規公開；只保留研究必要的有限逐字節錄。published_at 取 MOPS 發言日期 2026-04-10。",
+    "published_at": "2026-04-10",
+    "publisher": "公開資訊觀測站（重大訊息）",
+    "retrieved_at": "2026-11-12",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "欣興（3037）重大訊息 2026-04-10：擬認購尖點科技私募無擔保轉換公司債，金額上限新台幣 2.1 億元；目的「鞏固供應鏈關係，強化雙方合作」；欣興是尖點子公司的董事；以尖點股東會通過為先決條件",
+    "url": "https://mopsov.twse.com.tw/mops/web/t05st01?co_id=3037&spoke_date=20260410&seq_no=6"
+  },
+  "sources": [
+    {
+      "id": "mops_3037_ann_20260410_topoint_private_cb_s1",
+      "locator": "主旨",
+      "quote": "本公司公告擬認購尖點科技股份有限公司私募無擔保轉換公司債"
+    },
+    {
+      "id": "mops_3037_ann_20260410_topoint_private_cb_s2",
+      "locator": "說明 5. 交易數量、每單位價格及交易總金額",
+      "quote": "交易總金額：不超過新台幣2.1億。"
+    },
+    {
+      "id": "mops_3037_ann_20260410_topoint_private_cb_s3",
+      "locator": "說明 6. 交易相對人及其與公司之關係",
+      "quote": "交易相對人：尖點科技股份有限公司 與本公司之關係：本公司為其子公司之董事"
+    },
+    {
+      "id": "mops_3037_ann_20260410_topoint_private_cb_s4",
+      "locator": "說明 11. 交付或付款條件、契約限制條款",
+      "quote": "本公司認購該私募轉換公司債之義務， 以尖點之股東會通過該私募案為先決條件之一。"
+    },
+    {
+      "id": "mops_3037_ann_20260410_topoint_private_cb_s5",
+      "locator": "說明 17. 取得或處分之具體目的或用途",
+      "quote": "本公司為鞏固供應鏈關係，強化雙方合作， 故參與認購尖點私募無擔保轉換公司債"
+    }
+  ]
+}

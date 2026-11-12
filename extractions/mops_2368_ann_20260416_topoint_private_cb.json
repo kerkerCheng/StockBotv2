@@ -1,0 +1,111 @@
+{
+  "claims": [
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：金像電的重大訊息或財報寫出處分或提前賣回所持尖點私募可轉債、終止與尖點的合作，或尖點財報的關係人交易與主要客戶表寫出對它的營收大幅下滑。核查頻率：每季（尖點財報主要客戶與關係人附註；金像電重大訊息）。觸發後 48 小時：重寫尖點敘事「客戶為什麼選它」與鑽針層讀圖的買方段。",
+      "id": "mops_2368_ann_20260416_topoint_private_cb_cl1",
+      "source_ids": [
+        "mops_2368_ann_20260416_topoint_private_cb_s1",
+        "mops_2368_ann_20260416_topoint_private_cb_s2",
+        "mops_2368_ann_20260416_topoint_private_cb_s3",
+        "mops_2368_ann_20260416_topoint_private_cb_s4"
+      ],
+      "statement": "Customer-side (Gold Circuit Electronics material information, 2026-04-16): Gold Circuit will subscribe up to NT$200 million of Topoint Technology's private unsecured convertible bonds, stating the purpose as consolidating the supply-chain relationship and strengthening cooperation. A buyer paying into its supplier's financing; the filing does not mention drill bits.",
+      "subject_id": "co:topoint_technology"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "co:gold_circuit",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "mops_2368_ann_20260416_topoint_private_cb_s1",
+        "mops_2368_ann_20260416_topoint_private_cb_s3",
+        "mops_2368_ann_20260416_topoint_private_cb_s4"
+      ],
+      "src_id": "co:topoint_technology"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "尖點",
+        "尖點科技",
+        "尖點科技股份有限公司",
+        "Topoint"
+      ],
+      "attributes": {
+        "ticker": "8021.TW"
+      },
+      "confidence": 0.9,
+      "id": "co:topoint_technology",
+      "name": "Topoint Technology Co., Ltd.",
+      "role": null,
+      "source_ids": [
+        "mops_2368_ann_20260416_topoint_private_cb_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "金像電",
+        "金像電子",
+        "金像電子股份有限公司",
+        "Gold Circuit Electronics"
+      ],
+      "attributes": {
+        "ticker": "2368.TW"
+      },
+      "confidence": 0.9,
+      "id": "co:gold_circuit",
+      "name": "Gold Circuit Electronics Ltd.",
+      "role": null,
+      "source_ids": [
+        "mops_2368_ann_20260416_topoint_private_cb_s1"
+      ],
+      "type": "Company"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "mops_2368_ann_20260416_topoint_private_cb",
+    "evidence_tier": 1,
+    "origin_entity": "Gold Circuit Electronics Ltd.",
+    "permission_basis": "公開資訊觀測站歷史重大訊息（t05st01 說明全文），上市公司依規公開；只保留研究必要的有限逐字節錄。published_at 取 MOPS 發言日期 2026-04-16。",
+    "published_at": "2026-04-16",
+    "publisher": "公開資訊觀測站（重大訊息）",
+    "retrieved_at": "2026-11-12",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "金像電（2368）重大訊息 2026-04-16：擬認購尖點科技私募無擔保轉換公司債，金額上限新台幣 2 億元；目的「鞏固供應鏈關係，強化雙方合作」",
+    "url": "https://mopsov.twse.com.tw/mops/web/t05st01?co_id=2368&spoke_date=20260416&seq_no=2"
+  },
+  "sources": [
+    {
+      "id": "mops_2368_ann_20260416_topoint_private_cb_s1",
+      "locator": "主旨",
+      "quote": "本公司公告擬認購尖點科技股份有限公司私募無擔保轉換公司債"
+    },
+    {
+      "id": "mops_2368_ann_20260416_topoint_private_cb_s2",
+      "locator": "說明 3. 交易單位數量、每單位價格及交易總金額",
+      "quote": "交易總金額：不超過新台幣2億"
+    },
+    {
+      "id": "mops_2368_ann_20260416_topoint_private_cb_s3",
+      "locator": "說明 4. 交易相對人及其與公司之關係",
+      "quote": "交易相對人：尖點科技股份有限公司 與本公司之關係：非關係人"
+    },
+    {
+      "id": "mops_2368_ann_20260416_topoint_private_cb_s4",
+      "locator": "說明 16. 取得或處分之具體目的或用途",
+      "quote": "本公司為鞏固供應鏈關係，強化雙方合作， 故參與認購尖點私募無擔保轉換公司債。"
+    }
+  ]
+}
