@@ -3567,6 +3567,26 @@
         "Mitsubishi Gas Chemical",
         "MGC"
       ]
+    },
+    {
+      "company_id": "co:china_tungsten_hightech",
+      "research_ticker": "000657.SZ",
+      "market_currency": "CNY",
+      "execution_currency": "CNY",
+      "execution_venue": "SZSE",
+      "display_name": "China Tungsten And Hightech Materials Co., Ltd.",
+      "_display_name_source": "yfinance longName（2026-11-12）「China Tungsten And Hightech Materials Co.,Ltd」只補逗號後空格；深交所 000657（中钨高新材料股份有限公司）",
+      "_note": "隨 PCB 鑽針層補座位入圖包 staged（2026-11-12，drop 即回退；入圖包見 pcb_drill_bit_china_tungsten_jinzhou_2026_11_12_action.json）：控股子公司深圳市金洲精工做 PCB 微鑽、全資子公司株洲硬質合金做 PCB 鑽針棒（自述 PCB 刀具全產業鏈龍頭）。系統口徑非邊緣（約 144.4 億美元、分析師 2 家，2026-11-12）。別名收子公司全名（金洲精工、株洲硬質合金）與 TrendForce 的英文寫法；不收「金洲公司」——太泛，浙江金洲管道等同名會誤中",
+      "name_aliases": [
+        "中钨高新",
+        "中鎢高新",
+        "中钨高新材料股份有限公司",
+        "金洲精工",
+        "深圳市金洲精工科技股份有限公司",
+        "株洲硬质合金集团有限公司",
+        "China Tungsten High-Tech",
+        "Shenzhen Jinzhou Precision Technology"
+      ]
     }
   ]
 }
