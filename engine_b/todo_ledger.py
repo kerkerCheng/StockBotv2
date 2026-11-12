@@ -70,6 +70,12 @@ LEDGER: tuple[LedgerRow, ...] = (
     LedgerRow("todo.story", "故事還沒寫", "檔",
               "`python -m alpha stories --gaps` → 照 research-drain「故事」段寫 → `python -m alpha stories --check "
               "spec.json` → `--add spec.json`"),
+    # 2026-11-12 使用者「先修吧」（事實抽樣① 11 份 8 份有錯，過了 registration 2026-11-03 的判讀線）：寫敘事沒有一步逐句對過原文。
+    # 現行每一版敘事（＋它現行的故事）都要有一筆核對紀錄；換版或故事換了就再核（上一版核過、一字不差的句子自動沿用）
+    LedgerRow("todo.fact_check", "敘事還沒逐句核對", "檔",
+              "`python -m alpha brief-check --gaps` → 逐檔 `python -m alpha brief-check <T>` 一句一句對原文行（research-drain"
+              "「逐句核對」段）→ 有錯就重述改字（`restates`）＋故事改字 → `python -m alpha brief-check <T> --record --changed K "
+              "--note …`"),
 )
 LEDGER_KEYS: tuple[str, ...] = tuple(r.key for r in LEDGER)
 LEDGER_BY_KEY: Mapping[str, LedgerRow] = {r.key: r for r in LEDGER}
@@ -166,6 +172,9 @@ COVERAGE: Mapping[str, str] = {
     # --- 個股頁故事（alpha.providers.stories.STORY_GAP_KINDS）
     "story:never": "todo.story",
     "story:stale": "todo.story",                 # 敘事換版：舊故事不算數，首屏退回印依據
+    # --- 敘事逐句核對（alpha.providers.fact_checks.FACT_CHECK_GAP_KINDS；2026-11-12）
+    "fact_check:brief": "todo.fact_check",       # 這一版敘事還沒有核對紀錄
+    "fact_check:story": "todo.fact_check",       # 核過之後故事換了
     # --- 其他來源
     "impact:undisposed": "todo.undisposed",
     "lead:classification_gap": "todo.unclassified",
@@ -325,7 +334,8 @@ def collect(*, today: date, leads_store: Mapping[str, Any], watches: Sequence[Ma
             candidates: Mapping[str, Any] | None, thesis_due: Sequence[str] | None,
             loaders: Mapping[str, Callable[[], Any]] | None = None) -> list[LedgerCount]:
     """⑤ 每一格的計數。注入的值是呼叫端讀過的 authority（心跳讀 artifact 與 ledger）；None＝那個 authority 沒讀到。
-    `loaders`：要另外讀檔才算得出的格（停放未處置對照、名冊重算、缺分類、故事還沒寫、入圖包抽查帳）——測試可換掉。"""
+    `loaders`：要另外讀檔才算得出的格（停放未處置對照、名冊重算、缺分類、故事還沒寫、入圖包抽查帳、敘事還沒逐句核對）——
+    測試可換掉。"""
     from engine_b import event_watch as ew
     from engine_b import queue_segments as qs
 
@@ -619,6 +629,31 @@ def collect(*, today: date, leads_store: Mapping[str, Any], watches: Sequence[Ma
         put("todo.story", len(gaps), work="；".join(bits) or None)
 
     guarded("todo.story", story)
+
+    def fact_check() -> None:
+        # `alpha.providers.fact_checks.gaps_now`——`python -m alpha brief-check --gaps` 同一份判定（L16）。工作量照候選板的組分
+        # （已持有、可開先核）；板沒讀到就照敘事宣告的狀態分、已持有那一組併在宣告裡（註記照寫，INV-3）
+        from alpha.candidates import GROUP_LABELS, GROUPS
+        from alpha.providers.fact_checks import gaps_now
+
+        gaps = (loaders.get("fact_check_gaps") or (lambda: gaps_now(today=today)))()
+        groups = (candidates or {}).get("groups") or {}
+        label_of = {str(r.get("ticker")): GROUP_LABELS[g] for g in GROUPS for r in groups.get(g) or ()}
+        declared = {"open": "可開", "priced_wait": "可開", "missing": "缺 X", "pass": "不要"}
+        by: dict[str, int] = {}
+        for g in gaps:
+            label = label_of.get(str(g["ticker"])) or declared.get(str(g.get("state")), "其他")
+            by[label] = by.get(label, 0) + 1
+        order = ["已持有", "可開", "缺 X", "不要", "其他"]
+        bits = [f"{k} {by[k]}" for k in order if by.get(k)]
+        story_n = sum(1 for g in gaps if g["kind"] == "story")
+        if story_n:
+            bits.append(f"其中故事換了 {story_n}")
+        put("todo.fact_check", len(gaps), work="、".join(bits) or None,
+            oldest_days=_oldest((g.get("since") for g in gaps), today),
+            note=None if candidates is not None else "候選板沒讀到——已持有併在敘事宣告的狀態裡")
+
+    guarded("todo.fact_check", fact_check)
     return [rows[r.key] for r in LEDGER]
 
 

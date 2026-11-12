@@ -26,6 +26,7 @@ CHECKPOINT_OK = {"status": "ok", "filings": "ok", "calendar": "ok", "reason": No
 
 def _vocabularies() -> dict[str, set[str]]:
     from alpha.candidates import GROUPS, SIDE_GROUPS
+    from alpha.providers.fact_checks import FACT_CHECK_GAP_KINDS
     from alpha.providers.stories import STORY_GAP_KINDS
     from alpha.structure_reading.staleness import READING_STATUSES
     from crons.heartbeat import THESIS_STATUSES
@@ -45,12 +46,13 @@ def _vocabularies() -> dict[str, set[str]]:
         "candidate": set(GROUPS) | set(SIDE_GROUPS) | {"no_narrative"},
         "reading": set(READING_STATUSES),
         "story": set(STORY_GAP_KINDS),
+        "fact_check": set(FACT_CHECK_GAP_KINDS),
         "admission_audit": set(admission_audit.AUDIT_STATES),
     }
 
 
 @pytest.mark.parametrize("prefix", ["lead", "segment", "watch", "expiry", "dispatch", "hypothesis", "thesis",
-                                    "candidate", "reading", "story", "admission_audit"])
+                                    "candidate", "reading", "story", "fact_check", "admission_audit"])
 def test_every_state_in_every_vocabulary_has_a_registered_destination(prefix: str) -> None:
     missing = sorted(v for v in _vocabularies()[prefix] if f"{prefix}:{v}" not in tl.COVERAGE)
     assert not missing, (f"{prefix} 有狀態沒登記去處：{missing}——新增狀態時先在 engine_b/todo_ledger.py 的 COVERAGE "
@@ -104,7 +106,7 @@ def _collect(**over):
                               "checkpoint_check": CHECKPOINT_OK}, thesis_due=[])
     loaders = {"classification_gaps": lambda: [], "undisposed": lambda: [], "parked_without_expiry": lambda: [],
                "stale_lead_entities": lambda: 0, "story_gaps": lambda: [], "pending_admission": lambda: {},
-               "pending_cohort": lambda: {}}
+               "pending_cohort": lambda: {}, "fact_check_gaps": lambda: []}
     loaders.update(over.pop("loaders", {}))       # 只換掉測試點名的那幾個；其餘不讀真的 ledger
     params.update(over, loaders=loaders)
     return {row.key: row for row in tl.collect(**params)}
@@ -283,6 +285,27 @@ def test_story_gaps_count_per_company_and_split_never_from_a_new_brief_version()
         raise OSError("ledger 壞了")
 
     unread = _collect(loaders={"story_gaps": boom})["todo.story"]
+    assert unread.count is None and "OSError" in unread.reason
+
+
+def test_fact_check_gaps_count_per_version_grouped_by_the_board_and_unreadable_is_not_zero() -> None:
+    """⑤「敘事還沒逐句核對」＝`python -m alpha brief-check --gaps` 同一個判定（L16）；工作量照候選板的組分（已持有先核）。"""
+    since = "2026-10-20T00:00:00+00:00"
+    gaps = [{"ticker": "A", "kind": "brief", "state": "open", "since": since},
+            {"ticker": "B", "kind": "story", "state": "pass", "since": since},
+            {"ticker": "H", "kind": "brief", "state": "open", "since": since}]
+    board = {"counts": {}, "new_edges_check": {"status": "ok"}, "reading_change_check": {"status": "ok", "unchecked": 0},
+             "checkpoint_check": CHECKPOINT_OK, "groups": {"held": [{"ticker": "H"}], "open": [{"ticker": "A"}]}}
+    row = _collect(candidates=board, loaders={"fact_check_gaps": lambda: gaps})["todo.fact_check"]
+    assert row.count == 3 and row.work == "已持有 1、可開 1、不要 1、其中故事換了 1" and row.oldest_days == 2
+    # 板沒讀到：照敘事宣告的狀態分，註記照寫（INV-3）
+    no_board = _collect(candidates=None, loaders={"fact_check_gaps": lambda: gaps})["todo.fact_check"]
+    assert no_board.work == "可開 2、不要 1、其中故事換了 1" and "候選板沒讀到" in no_board.note
+
+    def boom():
+        raise OSError("ledger 壞了")
+
+    unread = _collect(loaders={"fact_check_gaps": boom})["todo.fact_check"]
     assert unread.count is None and "OSError" in unread.reason
 
 

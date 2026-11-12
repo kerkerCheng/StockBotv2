@@ -1090,6 +1090,98 @@ def cmd_stories(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_brief_check(args: argparse.Namespace) -> int:
+    """敘事逐句核對（2026-11-12 使用者「先修吧」；事實抽樣① 11 份 8 份有錯）：每一句列出它引用的原文裡對得上的行與
+    機械疑點（`alpha.narrative.fact_check`）。唯讀；`--record` 記一筆核對紀錄（`alpha.providers.fact_checks`）。
+    旗標是要先看的句子，不是判定——判定一句對不對的是讀的人（L18）。"""
+    from identity.registry import get_registry
+
+    from .narrative.contracts import RECORD_VERSION_V2, select_brief
+    from .narrative.fact_check import (CheckContext, as_dict, brief_text_from_record, brief_text_from_spec, check_brief,
+                                       render_markdown, summary_line, where_label)
+    from .providers import fact_checks as fc
+    from .providers.briefs import read_brief_records
+    from .providers.stories import current_stories
+
+    if args.gaps:
+        gaps = fc.gaps_now()
+        if args.format == "json":
+            print(json.dumps(gaps, ensure_ascii=False, indent=2))
+            return 0
+        labels = {"open": "可開", "missing": "缺 X", "pass": "不要", "priced_wait": "可開（舊的等回落）"}
+        print(f"現行敘事還沒逐句核對 {len(gaps)} 版（這一版沒核 {sum(g['kind'] == 'brief' for g in gaps)}；"
+              f"故事在核過之後換了 {sum(g['kind'] == 'story' for g in gaps)}）。已持有看 ⑤ 那一格（要讀持股）。")
+        for state in ("open", "priced_wait", "missing", "pass", None):
+            rows = [g for g in gaps if g.get("state") == state]
+            if rows:
+                print(f"- {labels.get(state, '其他')} {len(rows)}：" + "、".join(
+                    g["ticker"] + ("（故事換了）" if g["kind"] == "story" else "") for g in rows))
+        return 0
+    if not args.ticker:
+        print("✗ 要給代號（或用 --gaps 列還沒核的）", file=sys.stderr)
+        return 2
+    ticker = args.ticker.strip()
+    registry = get_registry()
+    company = registry.company_id_for_ticker(ticker)
+    if company is None:
+        print(f"✗ {ticker} 不在名冊——先補名冊，不從公司名猜（INV-1）", file=sys.stderr)
+        return 2
+    records, _errors = read_brief_records(ticker)
+    brief = select_brief(list(records), as_of=None, today=date.today())
+    if args.version:
+        if args.record:
+            print("✗ --record 只記現行那一版（舊版不記）", file=sys.stderr)
+            return 2
+        brief = next((r for r in records if r.brief_id == args.version), None)
+        if brief is None or brief.record_version != RECORD_VERSION_V2:
+            print(f"✗ {ticker} 沒有 v2 版本 {args.version}", file=sys.stderr)
+            return 2
+    if args.spec:
+        spec = json.loads(Path(args.spec).read_text(encoding="utf-8"))
+        text = brief_text_from_spec(spec, ticker=ticker, company_id=company, as_of=date.today())
+    else:
+        if brief is None or brief.record_version != RECORD_VERSION_V2:
+            print(f"✗ {ticker} 沒有現行的 v2 敘事（要核草稿就給 --spec）", file=sys.stderr)
+            return 2
+        text = brief_text_from_record(brief)
+    story: Mapping[str, Any] | None = None
+    if args.story_spec:
+        loaded = json.loads(Path(args.story_spec).read_text(encoding="utf-8"))
+        entries = loaded if isinstance(loaded, list) else [loaded]
+        story = next((e for e in entries if str(e.get("ticker") or ticker).upper() == ticker.upper()), None)
+        if story is None:
+            print(f"✗ {args.story_spec} 裡沒有 {ticker} 的故事", file=sys.stderr)
+            return 2
+    elif not args.spec and not args.no_story and brief is not None:
+        story = current_stories()[0].get(brief.brief_id)
+    names = fc.company_names(registry)
+    fc_records, fc_errors = fc.read_records()
+    if fc_errors:
+        print(f"⚠ 核對紀錄有 {len(fc_errors)} 行讀不懂（上一版核過的句子這次不沿用）：{fc_errors[0]}", file=sys.stderr)
+    ctx = CheckContext(resolve=fc.RefResolver(), names=names, carried=fc.carried_digests(company, fc_records))
+    result = check_brief(text, ctx, story=story, self_names=fc.self_names(company, ticker, names))
+    if args.record:
+        if args.spec or args.story_spec:
+            print("✗ --record 只記寫進去的那一版（現行敘事＋它現行的故事），不記草稿", file=sys.stderr)
+            return 2
+        if args.changed is None or not str(args.note or "").strip():
+            print("✗ --record 要給 --changed（這次核對改了幾句，含寫入前在草稿裡改的）與 --note（一句話）", file=sys.stderr)
+            return 2
+        record = fc.build_record(result, company_id=company, changed=args.changed, note=str(args.note))
+        fc.append_record(record)
+        print(summary_line(result))
+        for c in result.flagged:
+            print(f"- 留著的旗標 {c.sentence.n}（{where_label(c.sentence.where)}）：" + "｜".join(f.kind for f in c.flags))
+        print(f"✓ 記下 {record['check_id']}（{text.brief_id}" + (f"＋故事 {result.story_id}" if result.story_id else "＋沒有故事")
+              + f"；改了 {args.changed} 句）")
+        return 0
+    if args.format == "json":
+        print(json.dumps(as_dict(result), ensure_ascii=False, indent=2))
+        return 0
+    print("\n".join(render_markdown(result, flags_only=args.flags_only)))
+    return 0
+
+
 # ⚠ **2026-09-23（Phase 0 Step 0b.1b）：`cmd_entry_criterion` 與 `entry-criterion` 子命令退役（F 組）。**
 # EntryCriterion ledger 的讀寫入口。ledger 檔案本身留在 `library/private/alpha/entry_criteria/`
 # （private append-only，L10：拿不回來的只能 append），但**沒有任何消費端**——進場靠判斷。
@@ -1192,6 +1284,21 @@ def build_parser() -> argparse.ArgumentParser:
     brief.add_argument("--prices", action="store_true", help="--show 不遮價格（Q3W 名單內的檔先寫完裁決行）")
     brief.add_argument("--format", choices=("markdown", "json"), default="markdown")
     brief.set_defaults(func=cmd_brief)
+
+    check = sub.add_parser(
+        "brief-check", help="敘事逐句核對（唯讀）：每一句列出引用原文裡對得上的行與機械疑點；--record 記核對紀錄；--gaps 還沒核的")
+    check.add_argument("ticker", nargs="?", help="代號（--gaps 不用給）")
+    check.add_argument("--version", help="核某一版（brief_id；事實抽樣抽到舊版時用）——不收 --record")
+    check.add_argument("--spec", help="核還沒寫的敘事（同 `brief --add` 的 spec 檔）")
+    check.add_argument("--story-spec", help="核還沒寫的故事（同 `stories --add` 的 spec 檔；一批時取這一檔）")
+    check.add_argument("--no-story", action="store_true", help="只核敘事，不核它現行的故事")
+    check.add_argument("--flags-only", action="store_true", help="沒有旗標的句子只印一行（不列原文行）")
+    check.add_argument("--record", action="store_true", help="記一筆核對紀錄：現行那一版＋它現行的故事")
+    check.add_argument("--changed", type=int, help="--record：這次核對改了幾句（含寫入前在草稿裡改的）")
+    check.add_argument("--note", help="--record：一句話說核了什麼、改了什麼")
+    check.add_argument("--gaps", action="store_true", help="現行敘事裡還沒逐句核對的（與 ⑤ 同一份判定）")
+    check.add_argument("--format", choices=("markdown", "json"), default="markdown")
+    check.set_defaults(func=cmd_brief_check)
 
     # ⚠ 2026-09-23（Phase 0 Step 0b.1b）：`valuation` 與 `horizon` 子命令隨 C／H 組退役。
     assumptions = sub.add_parser(
