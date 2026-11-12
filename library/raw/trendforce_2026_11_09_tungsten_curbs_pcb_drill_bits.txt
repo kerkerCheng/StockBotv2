@@ -1,0 +1,23 @@
+Source URL: https://www.trendforce.com/news/2026/11/09/news-chinas-tungsten-export-curbs-send-ai-pcb-drill-bit-prices-soaring-nearly-80-global-output-share-highlights-supply-risks
+
+Excerpt:
+Source URL: https://www.trendforce.com/news/2026/11/09/news-chinas-tungsten-export-curbs-send-ai-pcb-drill-bit-prices-soaring-nearly-80-global-output-share-highlights-supply-risks
+
+Excerpt:
+[EXCERPT — 有限逐字引文] TrendForce 2026-11-09（引日經、China Nonferrous Metals News）：中國鎢出口管制讓 AI PCB 鑽針價格漲數倍；中國占全球鎢產量約 79%；鼎泰、金洲靠較便宜的鎢取得市占；金洲 2025 年起六個擴產案、約 8 億支
+DATE: 2026-11-09
+RETRIEVED: 2026-11-12（原文抽字後空白正規化——換行與連續空白都變成一個空格——再逐字照抄）
+NOTE: 第三方新聞（tier 2），轉述日經、鏡報（Mirror Daily）與 China Nonferrous Metals News；不是鑽針買方的一手。「漲數倍」沒有給基期與品項。
+
+【標題】
+"[News] China’s Tungsten Export Curbs Send AI PCB Drill Bit Prices Soaring; Nearly 80% Global Output Share Highlights Supply Risks"
+【第 1 段】
+"China’s export restrictions on critical metals are disrupting supplies of micro drill bits. According to Nikkei , restrictions on tungsten have affected refiners in Japan, Taiwan, the U.S. and Europe, sending drill bit prices soaring severalfold."
+【China’s Tungsten Dominance 段】
+"China accounted for approximately 79% of global tungsten production in 2025, according to the U.S. Geological Survey, as noted by Nikkei."
+【China’s Tungsten Dominance 段】
+"Meanwhile, Chinese manufacturers, including Guangdong Dtech Technology and Shenzhen Jinzhou Precision Technology, have gained market share, benefiting from access to cheaper tungsten supplies, Nikkei notes."
+【China’s Tungsten Dominance 段】
+"Shenzhen Jinzhou Precision Technology, a subsidiary of China Tungsten High-Tech, has launched six capacity expansion projects since 2025, expected to add nearly 800 million micro drill bits in capacity."
+【末段】
+"prices of ammonium paratungstate (APT), an intermediate tungsten product and key pricing benchmark, have surged from around RMB 212,750 (US$31,900) per metric ton in February 2025 to more than RMB 530,000 as of the week of the report."

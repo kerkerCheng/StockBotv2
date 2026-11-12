@@ -1,0 +1,78 @@
+{
+  "claims": [
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：中鎢高新的定期報告或公告寫出南昌二期延後、縮減或取消。核查頻率：每季（中鎢高新定期報告）。觸發後 48 小時：改寫鑽針層讀圖「供給多快補上」那一段。",
+      "id": "cninfo_000657_2026_68_jinzhou_nanchang_phase2_cl1",
+      "source_ids": [
+        "cninfo_000657_2026_68_jinzhou_nanchang_phase2_s2",
+        "cninfo_000657_2026_68_jinzhou_nanchang_phase2_s3",
+        "cninfo_000657_2026_68_jinzhou_nanchang_phase2_s4"
+      ],
+      "statement": "Supply responds (China Tungsten High-tech announcement 2026-68): Jinzhou's Nanchang branch will add front-process semi-finished micro-drill capacity of 430 million pieces per year plus 18 million '131' products and 28 million medium-size drills per year (RMB 147 million, one-year build), because Jinzhou's micro-drill capacity is rising fast and upstream semi-finished capacity must keep pace. Self-reported.",
+      "subject_id": "mat:pcb_drill_bit"
+    }
+  ],
+  "edges": [],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "鑽針",
+        "微鑽",
+        "微型鑽頭",
+        "鍍膜鑽針",
+        "钻针",
+        "PCB 钻针",
+        "PCB 鑽針",
+        "carbide drill bits"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "mat:pcb_drill_bit",
+      "name": "PCB micro drill bits (carbide drill bits, incl. router bits)",
+      "role": null,
+      "source_ids": [
+        "cninfo_000657_2026_68_jinzhou_nanchang_phase2_s1"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "cninfo_000657_2026_68_jinzhou_nanchang_phase2",
+    "evidence_tier": 1,
+    "origin_entity": "China Tungsten And Hightech Materials Co., Ltd.",
+    "permission_basis": "深交所上市公司依規在巨潮資訊網公開的臨時公告；只保留研究必要的有限逐字節錄。published_at 取巨潮公告日 2026-08-24。",
+    "published_at": "2026-08-24",
+    "publisher": "巨潮資訊網（深交所上市公司公告）",
+    "retrieved_at": "2026-11-12",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "中鎢高新（000657.SZ）公告 2026-68：金洲精工南昌分公司精密微型刀具製造基地二期——前工序半成品 4.3 億支／年、131 產品 1,800 萬支／年、中尺寸鑽頭 2,800 萬支／年（總投資 1.47 億元）",
+    "url": "http://static.cninfo.com.cn/finalpage/2026-08-24/1225490812.PDF"
+  },
+  "sources": [
+    {
+      "id": "cninfo_000657_2026_68_jinzhou_nanchang_phase2_s1",
+      "locator": "表頭",
+      "quote": "证券代码：000657 证券简称：中钨高新 公告编号：2026-68 中钨高新材料股份有限公司"
+    },
+    {
+      "id": "cninfo_000657_2026_68_jinzhou_nanchang_phase2_s2",
+      "locator": "正文首段（項目）",
+      "quote": "南昌分公司将实施 131 产品 1800 万支/年，中尺 寸钻头 2800 万支/年，前工序半成品 4.3 亿支/年新增产能项目"
+    },
+    {
+      "id": "cninfo_000657_2026_68_jinzhou_nanchang_phase2_s3",
+      "locator": "一、项目投资概况 1.",
+      "quote": "预计总 投资 1.47 亿元，建设期一年，第二年达产。"
+    },
+    {
+      "id": "cninfo_000657_2026_68_jinzhou_nanchang_phase2_s4",
+      "locator": "二、（一）项目建设必要性",
+      "quote": "随着金洲公司微钻产能的快速提升，生产所需的前工序半成品及 微钻配套的铣刀、钻头产品需同步提升产能。"
+    }
+  ]
+}

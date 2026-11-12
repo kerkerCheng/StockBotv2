@@ -1,0 +1,132 @@
+{
+  "claims": [
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：中鎢高新的定期報告或公告寫出金洲 AI 板微鑽擴產延後、縮減或取消，或微鑽產能利用率下降、降價、訂單減少。核查頻率：每季（中鎢高新定期報告與公告）。觸發後 48 小時：改寫鑽針層讀圖「供給多快補上」那一段。",
+      "id": "cninfo_000657_2026_66_jinzhou_ai_pcb_micro_drill_cl1",
+      "source_ids": [
+        "cninfo_000657_2026_66_jinzhou_ai_pcb_micro_drill_s3",
+        "cninfo_000657_2026_66_jinzhou_ai_pcb_micro_drill_s4",
+        "cninfo_000657_2026_66_jinzhou_ai_pcb_micro_drill_s5",
+        "cninfo_000657_2026_66_jinzhou_ai_pcb_micro_drill_s6"
+      ],
+      "statement": "Supply responds (China Tungsten High-tech announcement 2026-66, board approval 2026-08-20): its controlling subsidiary Shenzhen Jinzhou Precision will add 140 million pieces per year of high-precision micro tools for AI high-speed high-frequency PCBs (total investment RMB 190 million, one-year build, full output in the second year). The company says AI PCB volume growth and material changes drive micro-tool demand and that Jinzhou's existing capacity cannot meet market demand. Self-reported; no customer named.",
+      "subject_id": "mat:pcb_drill_bit"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "mat:pcb_drill_bit",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "cninfo_000657_2026_66_jinzhou_ai_pcb_micro_drill_s1",
+        "cninfo_000657_2026_66_jinzhou_ai_pcb_micro_drill_s3",
+        "cninfo_000657_2026_66_jinzhou_ai_pcb_micro_drill_s7"
+      ],
+      "src_id": "co:china_tungsten_hightech"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "中钨高新",
+        "中鎢高新",
+        "中钨高新材料股份有限公司",
+        "金洲精工",
+        "深圳市金洲精工科技股份有限公司",
+        "株洲硬质合金集团有限公司",
+        "China Tungsten High-Tech",
+        "Shenzhen Jinzhou Precision Technology"
+      ],
+      "attributes": {
+        "ticker": "000657.SZ"
+      },
+      "confidence": 0.9,
+      "id": "co:china_tungsten_hightech",
+      "name": "China Tungsten And Hightech Materials Co., Ltd.",
+      "role": null,
+      "source_ids": [
+        "cninfo_000657_2026_66_jinzhou_ai_pcb_micro_drill_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "鑽針",
+        "微鑽",
+        "微型鑽頭",
+        "鍍膜鑽針",
+        "钻针",
+        "PCB 钻针",
+        "PCB 鑽針",
+        "carbide drill bits"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "mat:pcb_drill_bit",
+      "name": "PCB micro drill bits (carbide drill bits, incl. router bits)",
+      "role": null,
+      "source_ids": [
+        "cninfo_000657_2026_66_jinzhou_ai_pcb_micro_drill_s1"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "cninfo_000657_2026_66_jinzhou_ai_pcb_micro_drill",
+    "evidence_tier": 1,
+    "origin_entity": "China Tungsten And Hightech Materials Co., Ltd.",
+    "permission_basis": "深交所上市公司依規在巨潮資訊網公開的臨時公告；只保留研究必要的有限逐字節錄。published_at 取巨潮公告日 2026-08-24。",
+    "published_at": "2026-08-24",
+    "publisher": "巨潮資訊網（深交所上市公司公告）",
+    "retrieved_at": "2026-11-12",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "中鎢高新（000657.SZ）公告 2026-66：控股子公司深圳市金洲精工新增 AI 高速高頻印製電路板用高精密微型刀具產能 1.4 億支／年（總投資 1.9 億元、建設期一年、第二年達產）；自述金洲現有產能無法滿足市場需求",
+    "url": "http://static.cninfo.com.cn/finalpage/2026-08-24/1225490811.PDF"
+  },
+  "sources": [
+    {
+      "id": "cninfo_000657_2026_66_jinzhou_ai_pcb_micro_drill_s1",
+      "locator": "表頭",
+      "quote": "证券代码：000657 证券简称：中钨高新 公告编号：2026-66 中钨高新材料股份有限公司"
+    },
+    {
+      "id": "cninfo_000657_2026_66_jinzhou_ai_pcb_micro_drill_s2",
+      "locator": "正文首段（董事會）",
+      "quote": "中钨高新材料股份有限公司（以下简称公司）于2026 年8月20 日召开了第十一届董事会第十五次会议"
+    },
+    {
+      "id": "cninfo_000657_2026_66_jinzhou_ai_pcb_micro_drill_s3",
+      "locator": "正文首段（項目）",
+      "quote": "公司控股子公 司深圳市金洲精工科技股份有限公司（以下简称“金洲公司”）将实 施AI高速高频印制电路板用高精密微型刀具产能1.4亿支/年建设项 目"
+    },
+    {
+      "id": "cninfo_000657_2026_66_jinzhou_ai_pcb_micro_drill_s4",
+      "locator": "一、项目投资概况 1.",
+      "quote": "预计总 投资1.9 亿元，建设期一年，第二年达产。"
+    },
+    {
+      "id": "cninfo_000657_2026_66_jinzhou_ai_pcb_micro_drill_s5",
+      "locator": "二、（一）项目建设必要性",
+      "quote": "随着全球AI 产业呈爆发式增长，AI 高速高频印制电路板用量快 速增长及材质的变化，将带动高精密微型刀具需求量快速增长。"
+    },
+    {
+      "id": "cninfo_000657_2026_66_jinzhou_ai_pcb_micro_drill_s6",
+      "locator": "二、（一）项目建设必要性",
+      "quote": "金洲公司现有产能无法满 足市场需求。"
+    },
+    {
+      "id": "cninfo_000657_2026_66_jinzhou_ai_pcb_micro_drill_s7",
+      "locator": "三、对公司的影响",
+      "quote": "本项目建成后有利于金洲公司提升小直径、加长、涂层 AI 高速 高频印制电路板用高精密微型刀具产能"
+    }
+  ]
+}

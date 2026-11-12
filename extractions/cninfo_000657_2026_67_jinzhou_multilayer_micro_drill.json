@@ -1,0 +1,121 @@
+{
+  "claims": [
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：中鎢高新的定期報告或公告寫出多層板微鑽擴產延後、縮減，或產品降價、產能利用率下降。核查頻率：每季（中鎢高新定期報告）。觸發後 48 小時：改寫鑽針層讀圖「供給多快補上」那一段，並看 AI 以外的需求是否轉弱。",
+      "id": "cninfo_000657_2026_67_jinzhou_multilayer_micro_drill_cl1",
+      "source_ids": [
+        "cninfo_000657_2026_67_jinzhou_multilayer_micro_drill_s2",
+        "cninfo_000657_2026_67_jinzhou_multilayer_micro_drill_s3",
+        "cninfo_000657_2026_67_jinzhou_multilayer_micro_drill_s4",
+        "cninfo_000657_2026_67_jinzhou_multilayer_micro_drill_s5"
+      ],
+      "statement": "Supply responds (China Tungsten High-tech announcement 2026-67): Jinzhou will add 155 million pieces per year of precision micro tools for multilayer PCBs (RMB 189 million, one-year build). The stated demand drivers are AI-led upgrading plus EV growth and a consumer-electronics recovery, not AI alone; the company says these products are in short supply and existing capacity cannot meet demand. Self-reported.",
+      "subject_id": "mat:pcb_drill_bit"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "mat:pcb_drill_bit",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "cninfo_000657_2026_67_jinzhou_multilayer_micro_drill_s1",
+        "cninfo_000657_2026_67_jinzhou_multilayer_micro_drill_s2"
+      ],
+      "src_id": "co:china_tungsten_hightech"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "中钨高新",
+        "中鎢高新",
+        "中钨高新材料股份有限公司",
+        "金洲精工",
+        "深圳市金洲精工科技股份有限公司",
+        "株洲硬质合金集团有限公司",
+        "China Tungsten High-Tech",
+        "Shenzhen Jinzhou Precision Technology"
+      ],
+      "attributes": {
+        "ticker": "000657.SZ"
+      },
+      "confidence": 0.9,
+      "id": "co:china_tungsten_hightech",
+      "name": "China Tungsten And Hightech Materials Co., Ltd.",
+      "role": null,
+      "source_ids": [
+        "cninfo_000657_2026_67_jinzhou_multilayer_micro_drill_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "鑽針",
+        "微鑽",
+        "微型鑽頭",
+        "鍍膜鑽針",
+        "钻针",
+        "PCB 钻针",
+        "PCB 鑽針",
+        "carbide drill bits"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "mat:pcb_drill_bit",
+      "name": "PCB micro drill bits (carbide drill bits, incl. router bits)",
+      "role": null,
+      "source_ids": [
+        "cninfo_000657_2026_67_jinzhou_multilayer_micro_drill_s1"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "cninfo_000657_2026_67_jinzhou_multilayer_micro_drill",
+    "evidence_tier": 1,
+    "origin_entity": "China Tungsten And Hightech Materials Co., Ltd.",
+    "permission_basis": "深交所上市公司依規在巨潮資訊網公開的臨時公告；只保留研究必要的有限逐字節錄。published_at 取巨潮公告日 2026-08-24。",
+    "published_at": "2026-08-24",
+    "publisher": "巨潮資訊網（深交所上市公司公告）",
+    "retrieved_at": "2026-11-12",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "中鎢高新（000657.SZ）公告 2026-67：金洲精工新增多層板用精密微型刀具產能 1.55 億支／年（總投資 1.89 億元、建設期一年）；需求理由含 AI、新能源車與消費電子回暖；自述產品供不應求",
+    "url": "http://static.cninfo.com.cn/finalpage/2026-08-24/1225490810.PDF"
+  },
+  "sources": [
+    {
+      "id": "cninfo_000657_2026_67_jinzhou_multilayer_micro_drill_s1",
+      "locator": "表頭",
+      "quote": "证券代码：000657 证券简称：中钨高新 公告编号：2026-67 中钨高新材料股份有限公司"
+    },
+    {
+      "id": "cninfo_000657_2026_67_jinzhou_multilayer_micro_drill_s2",
+      "locator": "正文首段（項目）",
+      "quote": "控股子公司深圳市金洲精工科技股份有限公司（以下简称“金洲公司”） 将实施多层板用精密微型刀具产能1.55 亿支/年建设项目"
+    },
+    {
+      "id": "cninfo_000657_2026_67_jinzhou_multilayer_micro_drill_s3",
+      "locator": "一、项目投资概况 1.",
+      "quote": "预计总 投资1.89 亿元，建设期一年，第二年达产。"
+    },
+    {
+      "id": "cninfo_000657_2026_67_jinzhou_multilayer_micro_drill_s4",
+      "locator": "二、（一）项目建设必要性",
+      "quote": "随着全球经济逐步企稳，加之AI 技术革新带来的产业升级机会， 以及新能源汽车的快速增长，消费电子行业市场需求回暖，将带动多 层印制电路板用精密微型刀具的快速增长。"
+    },
+    {
+      "id": "cninfo_000657_2026_67_jinzhou_multilayer_micro_drill_s5",
+      "locator": "二、（一）项目建设必要性",
+      "quote": "多层板用精密微型刀具产品供不应求。 金洲公司现有产能无法满足市场需求。"
+    }
+  ]
+}

@@ -1,0 +1,84 @@
+{
+  "claims": [
+    {
+      "confidence": 0.65,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：鑽針廠（尖點、鼎泰、高僑、Union Tool）的一手寫出大尺寸鑽針棒缺料、配額或交期拉長（往緊的方向），或中鎢高新寫出鑽針棒產能過剩、降價（往鬆的方向）。核查頻率：每季（各家定期報告）。觸發後 48 小時：重讀鑽針層讀圖的上游段（鑽針棒會不會卡）。",
+      "id": "cninfo_000657_2026_77_zhuying_pcb_drill_rod_cl1",
+      "source_ids": [
+        "cninfo_000657_2026_77_zhuying_pcb_drill_rod_s2",
+        "cninfo_000657_2026_77_zhuying_pcb_drill_rod_s3",
+        "cninfo_000657_2026_77_zhuying_pcb_drill_rod_s4",
+        "cninfo_000657_2026_77_zhuying_pcb_drill_rod_s5"
+      ],
+      "statement": "Upstream input (China Tungsten High-tech announcement 2026-77): its wholly owned Zhuzhou Cemented Carbide will add 20 million PCB drill rods per year for larger drills (diameter > 1.15 mm), saying AI servers sharply raise PCB drill consumption, downstream makers keep expanding, and its existing rod capacity cannot meet demand; the company calls itself the leader of the full PCB-tool chain (rods and drills). Self-reported; buyers' annual reports read earlier (Topoint, Dtech) described carbide rod supply as adequate with three or more qualified suppliers.",
+      "subject_id": "mat:pcb_drill_bit"
+    }
+  ],
+  "edges": [],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "鑽針",
+        "微鑽",
+        "微型鑽頭",
+        "鍍膜鑽針",
+        "钻针",
+        "PCB 钻针",
+        "PCB 鑽針",
+        "carbide drill bits"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "mat:pcb_drill_bit",
+      "name": "PCB micro drill bits (carbide drill bits, incl. router bits)",
+      "role": null,
+      "source_ids": [
+        "cninfo_000657_2026_77_zhuying_pcb_drill_rod_s1"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "cninfo_000657_2026_77_zhuying_pcb_drill_rod",
+    "evidence_tier": 1,
+    "origin_entity": "China Tungsten And Hightech Materials Co., Ltd.",
+    "permission_basis": "深交所上市公司依規在巨潮資訊網公開的臨時公告；只保留研究必要的有限逐字節錄。published_at 取巨潮公告日 2026-10-23。",
+    "published_at": "2026-10-23",
+    "publisher": "巨潮資訊網（深交所上市公司公告）",
+    "retrieved_at": "2026-11-12",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "中鎢高新（000657.SZ）公告 2026-77：全資子公司株洲硬質合金新增 PCB 鑽針棒（直徑 >1.15mm）年產 2,000 萬支提質增效改造（總投資 1.3102 億元）；自述 AI 伺服器讓 PCB 鑽針消耗大幅提升、株硬現有產能無法滿足需求、PCB 刀具全產業鏈龍頭",
+    "url": "http://static.cninfo.com.cn/finalpage/2026-10-23/1225615882.PDF"
+  },
+  "sources": [
+    {
+      "id": "cninfo_000657_2026_77_zhuying_pcb_drill_rod_s1",
+      "locator": "表頭",
+      "quote": "证券代码：000657 证券简称：中钨高新 公告编号：2026-77 中钨高新材料股份有限公司"
+    },
+    {
+      "id": "cninfo_000657_2026_77_zhuying_pcb_drill_rod_s2",
+      "locator": "正文首段（目的）",
+      "quote": "升中大规格（直径>1.15mm）PCB 钻针棒供给能力，提升全系列产品 综合市场占有率，巩固公司PCB 刀具全产业链龙头地位"
+    },
+    {
+      "id": "cninfo_000657_2026_77_zhuying_pcb_drill_rod_s3",
+      "locator": "正文首段（項目）",
+      "quote": "公司株洲硬质合金集团有限公司（以下简称“株硬公司”）将实施 PCB 钻针棒提质增效技术改造项目"
+    },
+    {
+      "id": "cninfo_000657_2026_77_zhuying_pcb_drill_rod_s4",
+      "locator": "二、（一）项目建设必要性",
+      "quote": "AI 服务器 对PCB 钻针消耗大幅提升。当前下游企业持续大规模扩产，市场对直 径1.15mm 以上规格产品需求增长显著。"
+    },
+    {
+      "id": "cninfo_000657_2026_77_zhuying_pcb_drill_rod_s5",
+      "locator": "二、（二）项目建设内容",
+      "quote": "新增年产2000 万支PCB 钻针棒产能提质增 效技术改造项目"
+    }
+  ]
+}

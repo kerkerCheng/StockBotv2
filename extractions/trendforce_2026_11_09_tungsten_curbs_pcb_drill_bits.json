@@ -1,0 +1,166 @@
+{
+  "claims": [
+    {
+      "confidence": 0.55,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：中國撤銷或放寬鎢相關出口管制，或 APT 價格回落到 2025 年 2 月水準附近；或鑽針廠一手寫出原料成本已轉嫁不了、毛利率下滑。核查頻率：每月（APT 報價與商務部公告）＋每季（鑽針廠財報毛利率）。觸發後 48 小時：重讀鑽針層讀圖的上游與定價段。",
+      "id": "trendforce_2026_11_09_tungsten_curbs_pcb_drill_bits_cl1",
+      "source_ids": [
+        "trendforce_2026_11_09_tungsten_curbs_pcb_drill_bits_s2",
+        "trendforce_2026_11_09_tungsten_curbs_pcb_drill_bits_s3",
+        "trendforce_2026_11_09_tungsten_curbs_pcb_drill_bits_s6"
+      ],
+      "statement": "Third-party report (TrendForce citing Nikkei, 2026-11-09): China's tungsten export restrictions hit refiners in Japan, Taiwan, the U.S. and Europe and sent micro drill bit prices up severalfold; China produced about 79% of global tungsten in 2025 (USGS); the APT benchmark rose from about RMB 212,750 per ton in February 2025 to more than RMB 530,000. The price rise is raw-material cost push, not evidence by itself that drill makers hold pricing power.",
+      "subject_id": "mat:pcb_drill_bit"
+    },
+    {
+      "confidence": 0.55,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：鼎泰或中鎢高新的定期報告寫出擴產延後、產能利用率不足以支撐新增產能、或市占下滑。核查頻率：每季。觸發後 48 小時：改寫鑽針層讀圖「供給多快補上」那一段。",
+      "id": "trendforce_2026_11_09_tungsten_curbs_pcb_drill_bits_cl2",
+      "source_ids": [
+        "trendforce_2026_11_09_tungsten_curbs_pcb_drill_bits_s4",
+        "trendforce_2026_11_09_tungsten_curbs_pcb_drill_bits_s5"
+      ],
+      "statement": "Third-party report (TrendForce citing Nikkei and China Nonferrous Metals News): Chinese drill makers Guangdong Dtech and Shenzhen Jinzhou Precision (a China Tungsten High-Tech subsidiary) have gained market share thanks to cheaper tungsten; Jinzhou has launched six capacity expansion projects since 2025, expected to add nearly 800 million micro drill bits of capacity. Supply-side counter-evidence to a durable drill-bit bottleneck.",
+      "subject_id": "mat:pcb_drill_bit"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "mat:pcb_drill_bit",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "trendforce_2026_11_09_tungsten_curbs_pcb_drill_bits_s4",
+        "trendforce_2026_11_09_tungsten_curbs_pcb_drill_bits_s5"
+      ],
+      "src_id": "co:china_tungsten_hightech"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "mat:pcb_drill_bit",
+      "id": "e2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "trendforce_2026_11_09_tungsten_curbs_pcb_drill_bits_s4"
+      ],
+      "src_id": "co:guangdong_dtech"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "中钨高新",
+        "中鎢高新",
+        "中钨高新材料股份有限公司",
+        "金洲精工",
+        "深圳市金洲精工科技股份有限公司",
+        "株洲硬质合金集团有限公司",
+        "China Tungsten High-Tech",
+        "Shenzhen Jinzhou Precision Technology"
+      ],
+      "attributes": {
+        "ticker": "000657.SZ"
+      },
+      "confidence": 0.9,
+      "id": "co:china_tungsten_hightech",
+      "name": "China Tungsten And Hightech Materials Co., Ltd.",
+      "role": null,
+      "source_ids": [
+        "trendforce_2026_11_09_tungsten_curbs_pcb_drill_bits_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "鼎泰高科",
+        "广东鼎泰高科技术股份有限公司"
+      ],
+      "attributes": {
+        "ticker": "301377.SZ"
+      },
+      "confidence": 0.9,
+      "id": "co:guangdong_dtech",
+      "name": "Guangdong Dtech Technology Co., Ltd.",
+      "role": null,
+      "source_ids": [
+        "trendforce_2026_11_09_tungsten_curbs_pcb_drill_bits_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "鑽針",
+        "微鑽",
+        "微型鑽頭",
+        "鍍膜鑽針",
+        "钻针",
+        "PCB 钻针",
+        "PCB 鑽針",
+        "carbide drill bits"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "mat:pcb_drill_bit",
+      "name": "PCB micro drill bits (carbide drill bits, incl. router bits)",
+      "role": null,
+      "source_ids": [
+        "trendforce_2026_11_09_tungsten_curbs_pcb_drill_bits_s1"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "trendforce_2026_11_09_tungsten_curbs_pcb_drill_bits",
+    "evidence_tier": 2,
+    "origin_entity": "TrendForce",
+    "permission_basis": "公開新聞頁；只保留研究必要的有限逐字節錄。published_at 取網址與頁面上的日期 2026-11-09。",
+    "published_at": "2026-11-09",
+    "publisher": "TrendForce（集邦科技新聞）",
+    "retrieved_at": "2026-11-12",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "TrendForce 2026-11-09（引日經、China Nonferrous Metals News）：中國鎢出口管制讓 AI PCB 鑽針價格漲數倍；中國占全球鎢產量約 79%；鼎泰、金洲靠較便宜的鎢取得市占；金洲 2025 年起六個擴產案、約 8 億支",
+    "url": "https://www.trendforce.com/news/2026/11/09/news-chinas-tungsten-export-curbs-send-ai-pcb-drill-bit-prices-soaring-nearly-80-global-output-share-highlights-supply-risks"
+  },
+  "sources": [
+    {
+      "id": "trendforce_2026_11_09_tungsten_curbs_pcb_drill_bits_s1",
+      "locator": "標題",
+      "quote": "[News] China’s Tungsten Export Curbs Send AI PCB Drill Bit Prices Soaring; Nearly 80% Global Output Share Highlights Supply Risks"
+    },
+    {
+      "id": "trendforce_2026_11_09_tungsten_curbs_pcb_drill_bits_s2",
+      "locator": "第 1 段",
+      "quote": "China’s export restrictions on critical metals are disrupting supplies of micro drill bits. According to Nikkei , restrictions on tungsten have affected refiners in Japan, Taiwan, the U.S. and Europe, sending drill bit prices soaring severalfold."
+    },
+    {
+      "id": "trendforce_2026_11_09_tungsten_curbs_pcb_drill_bits_s3",
+      "locator": "China’s Tungsten Dominance 段",
+      "quote": "China accounted for approximately 79% of global tungsten production in 2025, according to the U.S. Geological Survey, as noted by Nikkei."
+    },
+    {
+      "id": "trendforce_2026_11_09_tungsten_curbs_pcb_drill_bits_s4",
+      "locator": "China’s Tungsten Dominance 段",
+      "quote": "Meanwhile, Chinese manufacturers, including Guangdong Dtech Technology and Shenzhen Jinzhou Precision Technology, have gained market share, benefiting from access to cheaper tungsten supplies, Nikkei notes."
+    },
+    {
+      "id": "trendforce_2026_11_09_tungsten_curbs_pcb_drill_bits_s5",
+      "locator": "China’s Tungsten Dominance 段",
+      "quote": "Shenzhen Jinzhou Precision Technology, a subsidiary of China Tungsten High-Tech, has launched six capacity expansion projects since 2025, expected to add nearly 800 million micro drill bits in capacity."
+    },
+    {
+      "id": "trendforce_2026_11_09_tungsten_curbs_pcb_drill_bits_s6",
+      "locator": "末段",
+      "quote": "prices of ammonium paratungstate (APT), an intermediate tungsten product and key pricing benchmark, have surged from around RMB 212,750 (US$31,900) per metric ton in February 2025 to more than RMB 530,000 as of the week of the report."
+    }
+  ]
+}
