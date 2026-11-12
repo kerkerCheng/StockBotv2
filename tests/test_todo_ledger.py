@@ -103,7 +103,8 @@ def _collect(**over):
                               "reading_change_check": {"status": "ok", "unchecked": 0},
                               "checkpoint_check": CHECKPOINT_OK}, thesis_due=[])
     loaders = {"classification_gaps": lambda: [], "undisposed": lambda: [], "parked_without_expiry": lambda: [],
-               "stale_lead_entities": lambda: 0, "story_gaps": lambda: [], "pending_admission": lambda: {}}
+               "stale_lead_entities": lambda: 0, "story_gaps": lambda: [], "pending_admission": lambda: {},
+               "pending_cohort": lambda: {}}
     loaders.update(over.pop("loaders", {}))       # 只換掉測試點名的那幾個；其餘不讀真的 ledger
     params.update(over, loaders=loaders)
     return {row.key: row for row in tl.collect(**params)}
@@ -304,6 +305,38 @@ def test_edge_without_narrative_names_but_does_not_count_a_company_awaiting_admi
 
     unread = _collect(candidates=board, loaders={"pending_admission": boom})["todo.edge_no_narrative"]
     assert unread.count == 2 and "等入圖讀不到（OSError）" in unread.note    # 讀不到不扣、也不讓整格未讀到
+
+
+def test_edge_without_narrative_names_but_does_not_count_a_company_awaiting_its_theme_cohort() -> None:
+    # failure log #161（2026-11-12 [934]）：主題組提案還在 pq2，寫入端拒收第一份敘事、閉環佇列判「等主題組」——⑤ 不得照舊叫人寫
+    board = {"counts": {}, "no_narrative": [{"ticker": "TINY", "edge": {"state": "edge"}},
+                                             {"ticker": "6278.T", "edge": {"state": "edge"}},
+                                             {"ticker": "3167.TW", "edge": {"state": "edge"}}]}
+    row = _collect(candidates=board, loaders={"pending_cohort": lambda: {"6278.T": 934, "3167.TW": 934, "AAPL": 934}})[
+        "todo.edge_no_narrative"]
+    assert (row.count, row.work, row.note) == (1, "TINY", "等主題組 [934]：3167.TW、6278.T")
+
+    both = _collect(candidates=board, loaders={"pending_admission": lambda: {"TINY": 905},
+                                               "pending_cohort": lambda: {"6278.T": 934}})["todo.edge_no_narrative"]
+    assert (both.count, both.note) == (1, "TINY 等入圖 [905]；等主題組 [934]：6278.T")
+
+    def boom():
+        raise OSError("待辦池壞了")
+
+    unread = _collect(candidates=board, loaders={"pending_cohort": boom})["todo.edge_no_narrative"]
+    assert unread.count == 3 and "等主題組讀不到（OSError）" in unread.note    # 讀不到不扣、也不讓整格未讀到
+
+
+def test_edge_without_narrative_reads_the_cohort_proposal_from_the_pool_items() -> None:
+    # 預設 loader 讀待辦池同一份（alpha.closure.pending_cohort_members；L16）：已結案的組不算
+    board = {"counts": {}, "no_narrative": [{"ticker": "6278.T", "edge": {"state": "edge"}},
+                                             {"ticker": "8021.TW", "edge": {"state": "edge"}}]}
+    items = [{"n": 934, "frozen_spec": {"kind": "theme_cohort", "spec": {"members": [{"ticker": "6278.T"}]}}},
+             {"n": 931, "resolved_at": "2026-11-12", "frozen_spec": {"kind": "theme_cohort",
+                                                                     "spec": {"members": [{"ticker": "8021.TW"}]}}}]
+    loaders = {"pending_cohort": None}
+    row = _collect(candidates=board, todo_items=items, loaders=loaders)["todo.edge_no_narrative"]
+    assert (row.count, row.work, row.note) == (1, "8021.TW", "等主題組 [934]：6278.T")
 
 
 def test_pending_admission_tickers_resolves_the_focus_through_the_research_action(monkeypatch) -> None:

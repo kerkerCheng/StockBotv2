@@ -567,6 +567,20 @@ def collect(*, today: date, leads_store: Mapping[str, Any], watches: Sequence[Ma
             rows_ = [r for r in rows_ if str(r.get("ticker")).upper() not in awaiting]
         except Exception as exc:  # noqa: BLE001 — 讀不到等入圖就照舊全數計，不讓整格未讀到
             note = f"等入圖讀不到（{type(exc).__name__}），照舊全數計"
+        # 等主題組（failure log #161，同一格的另一個對稱面）：組提案還在 pq2，寫入端拒收第一份敘事、閉環佇列判「不排」
+        try:
+            from alpha.closure import pending_cohort_members
+            from alpha.providers.closure import _research_ticker
+
+            cohort = (loaders.get("pending_cohort")
+                      or (lambda: pending_cohort_members({"items": todo_items}, _research_ticker)))()
+            held = {n: sorted(str(r.get("ticker")) for r in rows_ if cohort.get(str(r.get("ticker")).upper()) == n)
+                    for n in sorted(set(cohort.values()))}
+            named = "；".join(f"等主題組 [{n}]：{'、'.join(ts)}" for n, ts in held.items() if ts)
+            rows_ = [r for r in rows_ if str(r.get("ticker")).upper() not in cohort]
+        except Exception as exc:  # noqa: BLE001 — 讀不到等主題組同樣照舊全數計
+            named = f"等主題組讀不到（{type(exc).__name__}），照舊全數計"
+        note = "；".join(x for x in (note, named) if x) or None
         put("todo.edge_no_narrative", len(rows_), work="、".join(str(r.get("ticker")) for r in rows_[:5]) or None,
             note=note)
 
