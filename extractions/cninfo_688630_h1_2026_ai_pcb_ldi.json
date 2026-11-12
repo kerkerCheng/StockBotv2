@@ -1,0 +1,261 @@
+{
+  "claims": [
+    {
+      "confidence": 0.5,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：芯碁下一份定期報告寫出 PCB 端 LDI 訂單或營收轉為年減、產能利用率下滑，或交付周期優勢消失；或板廠（客戶端）一手寫出 LDI 改向海外廠或其他國產廠採購。核查頻率：每季（芯碁定期報告、投資者關係紀錄）。觸發後 48 小時：這條 claim 降 confidence，重讀 LDI 層讀圖的供需段。",
+      "id": "cninfo_688630_h1_2026_ai_pcb_ldi_cl1",
+      "source_ids": [
+        "cninfo_688630_h1_2026_ai_pcb_ldi_q2",
+        "cninfo_688630_h1_2026_ai_pcb_ldi_q5",
+        "cninfo_688630_h1_2026_ai_pcb_ldi_q6",
+        "cninfo_688630_h1_2026_ai_pcb_ldi_q7",
+        "cninfo_688630_h1_2026_ai_pcb_ldi_q8"
+      ],
+      "statement": "Supplier-side statement (Circuit Fabology H1 2026 report): H1 2026 revenue was RMB 1.106 billion, up 68.95%, as AI-driven high-end PCB capex lifted both volume and price of high-end LDI equipment; Q1 2026 new orders exceeded RMB 800 million with a full order book; its second plant (design capacity more than twice the first) relieved a capacity-overload bottleneck, long-lead optical and motion-control parts were locked in early, and delivery times shortened, widening its lead-time advantage over overseas peers. Self-reported.",
+      "subject_id": "e1"
+    },
+    {
+      "confidence": 0.5,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：芯碁下一份定期報告寫出 PCB 端 LDI 訂單或營收轉為年減、產能利用率下滑，或交付周期優勢消失；或板廠（客戶端）一手寫出 LDI 改向海外廠或其他國產廠採購。核查頻率：每季（芯碁定期報告、投資者關係紀錄）。觸發後 48 小時：這條 claim 降 confidence，重讀 LDI 層讀圖的供需段。",
+      "id": "cninfo_688630_h1_2026_ai_pcb_ldi_cl2",
+      "source_ids": [
+        "cninfo_688630_h1_2026_ai_pcb_ldi_q3",
+        "cninfo_688630_h1_2026_ai_pcb_ldi_q4"
+      ],
+      "statement": "Supplier-side statement (Circuit Fabology H1 2026 report): LDI for AI compute boards has a clear technology gap and entry barrier versus consumer applications, because AI server mainboards' many layers and complex materials produce strong non-linear shrinkage and warpage over repeated laminations, requiring very high layer-to-layer registration; it says it is one of very few domestic suppliers able to meet AI server and data-centre standards. Self-reported; no customer confirmation.",
+      "subject_id": "e2"
+    },
+    {
+      "confidence": 0.45,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "條件：滬電或金像電的一手（年報主要供應商、重訊、法說）寫出 LDI 主要向別家採購、或沒有芯碁；或芯碁下一份定期報告不再列這兩家。核查頻率：每年（年報）＋每月（金像電重訊）。觸發後 48 小時：更正這條 claim（供應商自稱的客戶降為不成立）。",
+      "id": "cninfo_688630_h1_2026_ai_pcb_ldi_cl3",
+      "source_ids": [
+        "cninfo_688630_h1_2026_ai_pcb_ldi_q9"
+      ],
+      "statement": "Supplier-claimed customer list (Circuit Fabology H1 2026 report): it says it is deeply tied to leading PCB makers including Victory Giant, Avary, Dongshan Precision, Shennan Circuits, Shengyi Electronics, Dynamic, WUS Printed Circuit, Red Board and Gold Circuit Electronics. No customer-side document confirms these purchases.",
+      "subject_id": "e3"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:pcb_ldi_exposure",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "cninfo_688630_h1_2026_ai_pcb_ldi_q1",
+        "cninfo_688630_h1_2026_ai_pcb_ldi_q2",
+        "cninfo_688630_h1_2026_ai_pcb_ldi_q4"
+      ],
+      "src_id": "co:circuit_fabology"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "tech:pcb_ldi_exposure",
+      "id": "e2",
+      "relation": "depends_on",
+      "source_ids": [
+        "cninfo_688630_h1_2026_ai_pcb_ldi_q3"
+      ],
+      "src_id": "tech:ai_high_layer_pcb"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.55,
+      "dst_id": "co:wus_printed_circuit",
+      "id": "e3",
+      "relation": "supplies_to",
+      "source_ids": [
+        "cninfo_688630_h1_2026_ai_pcb_ldi_q9"
+      ],
+      "src_id": "co:circuit_fabology"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.55,
+      "dst_id": "co:gold_circuit",
+      "id": "e4",
+      "relation": "supplies_to",
+      "source_ids": [
+        "cninfo_688630_h1_2026_ai_pcb_ldi_q9"
+      ],
+      "src_id": "co:circuit_fabology"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "equipment_epitaxy",
+      "aliases": [
+        "芯碁微装",
+        "芯碁微裝",
+        "合肥芯碁微电子装备股份有限公司",
+        "Circuit Fabology"
+      ],
+      "attributes": {
+        "ticker": "688630.SS"
+      },
+      "confidence": 0.9,
+      "id": "co:circuit_fabology",
+      "name": "Circuit Fabology Microelectronics Equipment Co., Ltd.",
+      "role": null,
+      "source_ids": [
+        "cninfo_688630_h1_2026_ai_pcb_ldi_q1",
+        "cninfo_688630_h1_2026_ai_pcb_ldi_q4"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "equipment_epitaxy",
+      "aliases": [
+        "LDI",
+        "雷射直接成像",
+        "直接成像曝光機",
+        "直接成像曝光設備",
+        "曝光機",
+        "激光直接成像",
+        "直写光刻",
+        "直接成像设备",
+        "PCB direct imaging",
+        "laser direct imaging"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:pcb_ldi_exposure",
+      "name": "PCB laser direct imaging (LDI) and direct-imaging exposure equipment (circuit and solder-mask layers)",
+      "role": null,
+      "source_ids": [
+        "cninfo_688630_h1_2026_ai_pcb_ldi_q2",
+        "cninfo_688630_h1_2026_ai_pcb_ldi_q3"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "AI 伺服器主板",
+        "AI 主板",
+        "AI-PCB",
+        "AI PCB",
+        "高階多層板",
+        "高層數 PCB",
+        "高多层板",
+        "交換機板"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:ai_high_layer_pcb",
+      "name": "High-layer-count PCB for AI servers and switches (multilayer / HDI mainboards)",
+      "role": null,
+      "source_ids": [
+        "cninfo_688630_h1_2026_ai_pcb_ldi_q3"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "沪电股份",
+        "滬電",
+        "沪士电子",
+        "WUS"
+      ],
+      "attributes": {
+        "ticker": "002463.SZ"
+      },
+      "confidence": 0.9,
+      "id": "co:wus_printed_circuit",
+      "name": "沪士电子股份有限公司",
+      "role": null,
+      "source_ids": [
+        "cninfo_688630_h1_2026_ai_pcb_ldi_q9"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "金像電",
+        "金像電子",
+        "金像電子股份有限公司",
+        "Gold Circuit Electronics"
+      ],
+      "attributes": {
+        "ticker": "2368.TW"
+      },
+      "confidence": 0.9,
+      "id": "co:gold_circuit",
+      "name": "Gold Circuit Electronics Ltd.",
+      "role": null,
+      "source_ids": [
+        "cninfo_688630_h1_2026_ai_pcb_ldi_q9"
+      ],
+      "type": "Company"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "cninfo_688630_h1_2026_ai_pcb_ldi",
+    "evidence_tier": 1,
+    "origin_entity": "Circuit Fabology Microelectronics Equipment Co., Ltd.",
+    "permission_basis": "巨潮資訊網公開的上市公司半年度報告；只保留研究必要的有限逐字節錄。published_at 取巨潮公告日 2026-08-27。",
+    "published_at": "2026-08-27",
+    "publisher": "巨潮資訊網（上市公司公告）",
+    "retrieved_at": "2026-11-11",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "芯碁微裝（688630）2026 年半年度報告：AI 算力帶動高階 PCB 資本開支、高端 LDI 量價齊升，上半年營收 +68.95%；AI 伺服器主板多次壓合的非線性漲縮要求極高的層間對位；二期基地設計產能達一期兩倍以上、緩解產能超載，提前鎖定長交期光學零件；一季度新簽訂單逾 8 億元；自稱深度綁定滬電、金像電子等板廠",
+    "url": "http://static.cninfo.com.cn/finalpage/2026-08-27/1225508738.PDF"
+  },
+  "sources": [
+    {
+      "id": "cninfo_688630_h1_2026_ai_pcb_ldi_q1",
+      "locator": "頁首（p.1）",
+      "quote": "合肥芯碁微电子装备股份有限公司2026 年半年度报告"
+    },
+    {
+      "id": "cninfo_688630_h1_2026_ai_pcb_ldi_q2",
+      "locator": "第二節 七、主要會計數據和財務指標的說明（p.10）",
+      "quote": "报告期内，公司实现营业收入 110,550.29 万元，同比增长 68.95%，归属于上市公司股东的 净利润 28,140.97 万元，同比增长 98.13%，报告期内，受益于 AI 算力产业链拉动高阶 PCB 资本 开支上行，高端 LDI 设备量价齐升；"
+    },
+    {
+      "id": "cninfo_688630_h1_2026_ai_pcb_ldi_q3",
+      "locator": "第三節 一、（一）所屬行業情況（p.14）",
+      "quote": "相较于消费电子等其他应用领域的 LDI 设备，AI 算力场景的 LDI 设备存在显著的技术代差与 准入门槛，如 AI 服务器主板因层数多、材料复杂，在多次压合工艺中会产生剧烈的非线性涨缩与 翘曲，需要设备有极高精度的层间对位能力。"
+    },
+    {
+      "id": "cninfo_688630_h1_2026_ai_pcb_ldi_q4",
+      "locator": "第三節 一、（一）所屬行業情況（p.15）",
+      "quote": "公司是国内极少数能满足 AI 服务器及数据中心严苛标准的高端 LDI 设备供应商，具备量产供 货能力并进入行业头部客户供应链，已成功实现了对该类设备的国产化替代"
+    },
+    {
+      "id": "cninfo_688630_h1_2026_ai_pcb_ldi_q5",
+      "locator": "第三節 二、（二）訂單與產能（p.22）",
+      "quote": "整体设计产能达一期两倍以上，有效缓解产能超载瓶颈。"
+    },
+    {
+      "id": "cninfo_688630_h1_2026_ai_pcb_ldi_q6",
+      "locator": "第三節 二、（二）訂單與產能（p.22）",
+      "quote": "提前锁定长交期核心光学与运 动控制零部件"
+    },
+    {
+      "id": "cninfo_688630_h1_2026_ai_pcb_ldi_q7",
+      "locator": "第三節 二、（二）訂單與產能（p.22）",
+      "quote": "公司全系列设备在手 订单饱满，2026 年一季度新签订单规模突破 8 亿元"
+    },
+    {
+      "id": "cninfo_688630_h1_2026_ai_pcb_ldi_q8",
+      "locator": "第三節 二、（二）訂單與產能（p.22）",
+      "quote": "产能端瓶颈缓解后，公司交付周期有所缩短，相较海外同类厂商 交付时效优势进一步扩大"
+    },
+    {
+      "id": "cninfo_688630_h1_2026_ai_pcb_ldi_q9",
+      "locator": "第三節 三、核心競爭力分析（p.27）",
+      "quote": "并深度绑定胜宏科技、鹏鼎控股、东山精密、深南 电路、生益电子、定颖电子、沪电股份、红板科技、金像电子等海内外头部 PCB 厂商。"
+    }
+  ]
+}

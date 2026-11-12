@@ -1,0 +1,16 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/319201/000031920126000027/klac-20260630.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] KLA（KLAC）2026 會計年度 10-K：PCB and Component Inspection 部門為 PCB 與 IC 載板提供直接成像、檢測、光學成型等；部門營收 FY2026 年增 21%（先進封裝與 PCB 業務）；FY2025 第二季曾因 PCB 業務長期預測持續轉差認列 2.304 億美元商譽減損
+DATE: 2026-08-06
+RETRIEVED: 2026-11-11（原文抽字後空白正規化——換行與連續空白都變成一個空格——再逐字照抄）
+NOTE: 發行人自己的 10-K（自述）。KLA 的 PCB 業務來自 Orbotech（2019 併購）；10-K 沒拆直接成像與檢測各占多少。
+
+【Item 1. Business — General】
+"KLA Corporation and its majority-owned subsidiaries"
+【Item 1. Business — PCB and Component Inspection products（p.5）】
+"Direct imaging, inspection, optical shaping, inkjet and additive printing as well as computer-aided manufacturing and engineering solutions for the PCB and IC substrate market."
+【Item 7. MD&A — Revenues by segment（p.40）】
+"Revenue from our PCB and Component Inspection segment increased 21% in fiscal 2026 compared to fiscal 2025, primarily driven by increased demand from customers investing in advanced packaging technologies, higher revenue from our PCB business, and increased service revenue attributable to growth in the installed base of tools."
+【Item 7. MD&A — Goodwill impairment（p.38）】
+"During the second quarter of fiscal 2025, we noted a continued deterioration of the long-term forecast for our PCB business, which is part of our PCB and Component Inspection reportable segment."

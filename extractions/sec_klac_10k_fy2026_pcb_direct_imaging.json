@@ -1,0 +1,112 @@
+{
+  "claims": [
+    {
+      "confidence": 0.55,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：KLA 下一份 10-Q／10-K 寫出 PCB 業務營收下滑、再認列減損或出售 PCB 業務。核查頻率：每季（10-Q）。觸發後 48 小時：更正這條 claim，重讀 LDI 層讀圖的供給側段。",
+      "id": "sec_klac_10k_fy2026_pcb_direct_imaging_cl1",
+      "source_ids": [
+        "sec_klac_10k_fy2026_pcb_direct_imaging_k3",
+        "sec_klac_10k_fy2026_pcb_direct_imaging_k4"
+      ],
+      "statement": "Supplier-side statement (KLA FY2026 10-K): PCB and Component Inspection segment revenue rose 21% in fiscal 2026, driven mainly by advanced-packaging investment, higher PCB-business revenue and services; but in Q2 fiscal 2025 KLA noted a continued deterioration of the long-term forecast for its PCB business (leading to a goodwill impairment in the segment). Self-reported.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:pcb_ldi_exposure",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "sec_klac_10k_fy2026_pcb_direct_imaging_k1",
+        "sec_klac_10k_fy2026_pcb_direct_imaging_k2"
+      ],
+      "src_id": "co:kla_corp"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "equipment_epitaxy",
+      "aliases": [
+        "KLA",
+        "KLA Corporation",
+        "KLA CORPORATION",
+        "Orbotech"
+      ],
+      "attributes": {
+        "ticker": "KLAC"
+      },
+      "confidence": 0.9,
+      "id": "co:kla_corp",
+      "name": "KLA Corporation",
+      "role": null,
+      "source_ids": [
+        "sec_klac_10k_fy2026_pcb_direct_imaging_k1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "equipment_epitaxy",
+      "aliases": [
+        "LDI",
+        "雷射直接成像",
+        "直接成像曝光機",
+        "直接成像曝光設備",
+        "曝光機",
+        "激光直接成像",
+        "直写光刻",
+        "直接成像设备",
+        "PCB direct imaging",
+        "laser direct imaging"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:pcb_ldi_exposure",
+      "name": "PCB laser direct imaging (LDI) and direct-imaging exposure equipment (circuit and solder-mask layers)",
+      "role": null,
+      "source_ids": [
+        "sec_klac_10k_fy2026_pcb_direct_imaging_k2"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "sec_klac_10k_fy2026_pcb_direct_imaging",
+    "evidence_tier": 1,
+    "origin_entity": "KLA Corporation",
+    "permission_basis": "SEC EDGAR 公開的年度報告；只保留研究必要的有限逐字節錄。published_at 取 EDGAR filed date 2026-08-06。",
+    "published_at": "2026-08-06",
+    "publisher": "SEC EDGAR",
+    "retrieved_at": "2026-11-11",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "KLA（KLAC）2026 會計年度 10-K：PCB and Component Inspection 部門為 PCB 與 IC 載板提供直接成像、檢測、光學成型等；部門營收 FY2026 年增 21%（先進封裝與 PCB 業務）；FY2025 第二季曾因 PCB 業務長期預測持續轉差認列 2.304 億美元商譽減損",
+    "url": "https://www.sec.gov/Archives/edgar/data/319201/000031920126000027/klac-20260630.htm"
+  },
+  "sources": [
+    {
+      "id": "sec_klac_10k_fy2026_pcb_direct_imaging_k1",
+      "locator": "Item 1. Business — General",
+      "quote": "KLA Corporation and its majority-owned subsidiaries"
+    },
+    {
+      "id": "sec_klac_10k_fy2026_pcb_direct_imaging_k2",
+      "locator": "Item 1. Business — PCB and Component Inspection products（p.5）",
+      "quote": "Direct imaging, inspection, optical shaping, inkjet and additive printing as well as computer-aided manufacturing and engineering solutions for the PCB and IC substrate market."
+    },
+    {
+      "id": "sec_klac_10k_fy2026_pcb_direct_imaging_k3",
+      "locator": "Item 7. MD&A — Revenues by segment（p.40）",
+      "quote": "Revenue from our PCB and Component Inspection segment increased 21% in fiscal 2026 compared to fiscal 2025, primarily driven by increased demand from customers investing in advanced packaging technologies, higher revenue from our PCB business, and increased service revenue attributable to growth in the installed base of tools."
+    },
+    {
+      "id": "sec_klac_10k_fy2026_pcb_direct_imaging_k4",
+      "locator": "Item 7. MD&A — Goodwill impairment（p.38）",
+      "quote": "During the second quarter of fiscal 2025, we noted a continued deterioration of the long-term forecast for our PCB business, which is part of our PCB and Component Inspection reportable segment."
+    }
+  ]
+}

@@ -1,0 +1,164 @@
+{
+  "claims": [
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "條件：川寶下一份年報或季報的 PCB 部門營收占比與此不符，或寫出 LDI 打進 AI 伺服器板客戶。核查頻率：每年（年報）＋每季（財報）。觸發後 48 小時：更正這條 claim。",
+      "id": "mops_1595_annual_report_2025_pcb_ldi_cl1",
+      "source_ids": [
+        "mops_1595_annual_report_2025_pcb_ldi_c3",
+        "mops_1595_annual_report_2025_pcb_ldi_c6",
+        "mops_1595_annual_report_2025_pcb_ldi_c7"
+      ],
+      "statement": "Chime Ball Technology reports that its PCB division (exposure machines and DI/LDI direct-imaging equipment) was NT$222 million or 31.03% of 2025 revenue, with semiconductor equipment at 68.97%; consolidated revenue fell 21.77% to NT$716 million as PCB and semiconductor equipment orders fell amid intense price competition in mainland China, and it describes many peers and the rise of the 'red supply chain'. Self-reported, dated figures.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "tech:pcb_ldi_exposure",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "mops_1595_annual_report_2025_pcb_ldi_c1",
+        "mops_1595_annual_report_2025_pcb_ldi_c2"
+      ],
+      "src_id": "co:chime_ball"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.6,
+      "dst_id": "tech:pcb_ldi_exposure",
+      "id": "e2",
+      "relation": "depends_on",
+      "source_ids": [
+        "mops_1595_annual_report_2025_pcb_ldi_c4",
+        "mops_1595_annual_report_2025_pcb_ldi_c5"
+      ],
+      "src_id": "tech:ai_high_layer_pcb"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "equipment_epitaxy",
+      "aliases": [
+        "川寶科技",
+        "川寶科技股份有限公司",
+        "川宝科技",
+        "Chime Ball"
+      ],
+      "attributes": {
+        "ticker": "1595.TWO"
+      },
+      "confidence": 0.9,
+      "id": "co:chime_ball",
+      "name": "Chime Ball Technology Co.,Ltd.",
+      "role": null,
+      "source_ids": [
+        "mops_1595_annual_report_2025_pcb_ldi_c1",
+        "mops_1595_annual_report_2025_pcb_ldi_c3"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "equipment_epitaxy",
+      "aliases": [
+        "LDI",
+        "雷射直接成像",
+        "直接成像曝光機",
+        "直接成像曝光設備",
+        "曝光機",
+        "激光直接成像",
+        "直写光刻",
+        "直接成像设备",
+        "PCB direct imaging",
+        "laser direct imaging"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:pcb_ldi_exposure",
+      "name": "PCB laser direct imaging (LDI) and direct-imaging exposure equipment (circuit and solder-mask layers)",
+      "role": null,
+      "source_ids": [
+        "mops_1595_annual_report_2025_pcb_ldi_c2",
+        "mops_1595_annual_report_2025_pcb_ldi_c5"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "AI 伺服器主板",
+        "AI 主板",
+        "AI-PCB",
+        "AI PCB",
+        "高階多層板",
+        "高層數 PCB",
+        "高多层板",
+        "交換機板"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:ai_high_layer_pcb",
+      "name": "High-layer-count PCB for AI servers and switches (multilayer / HDI mainboards)",
+      "role": null,
+      "source_ids": [
+        "mops_1595_annual_report_2025_pcb_ldi_c4"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "mops_1595_annual_report_2025_pcb_ldi",
+    "evidence_tier": 1,
+    "origin_entity": "Chime Ball Technology Co.,Ltd.",
+    "permission_basis": "公開資訊觀測站公開年報；只保留研究必要的有限逐字節錄。published_at 取 MOPS 上傳時間（115/06/01 12:57:07）。",
+    "published_at": "2026-06-01",
+    "publisher": "公開資訊觀測站（股東會年報）",
+    "retrieved_at": "2026-11-11",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "川寶科技（1595）中華民國 114 年度年報：PCB 部門生產曝光機與 DI／LDI 直接成像曝光設備（占 2025 營收 31.03%）；LDI 已成標準製程、AI 伺服器板層數達 20–30 層以上；2025 營收年減 21.77%、同業眾多與紅色供應鏈崛起",
+    "url": "https://doc.twse.com.tw/server-java/t57sb01?step=9&kind=F&co_id=1595&filename=2025_1595_20260618F04.pdf"
+  },
+  "sources": [
+    {
+      "id": "mops_1595_annual_report_2025_pcb_ldi_c1",
+      "locator": "壹、(九) 1. 內部控制聲明書",
+      "quote": "川寶科技股份有限公司 內部控制制度聲明書"
+    },
+    {
+      "id": "mops_1595_annual_report_2025_pcb_ldi_c2",
+      "locator": "伍、營運概況 一、(一) 1. 所營業務之主要內容（p.65）",
+      "quote": "PCB部門：主要從事於設計、研發、生產符合成本效益之曝光機及DI &LDI直接成像曝光設備，並提供PCB印刷電路板、FPC軟性印刷電路板"
+    },
+    {
+      "id": "mops_1595_annual_report_2025_pcb_ldi_c3",
+      "locator": "伍、營運概況 一、(一) 2. 營業比重（p.65）",
+      "quote": "PCB部門 222,204 31.03% 半導體部門 493,967 68.97% 合計 716,171 100.00%"
+    },
+    {
+      "id": "mops_1595_annual_report_2025_pcb_ldi_c4",
+      "locator": "伍、營運概況 一、(二) 1. 產業之現況及發展（p.66）",
+      "quote": "AI 伺服器板層數要求提高（達 20-30 層以 上），且需使用超低損耗（Ultra Low Loss）材料以確保訊號完整性。"
+    },
+    {
+      "id": "mops_1595_annual_report_2025_pcb_ldi_c5",
+      "locator": "伍、營運概況 一、(二) 1. 產業之現況及發展（p.66）",
+      "quote": "（LDI）已成為標準製程，取代傳統底片曝光，減少偏誤。"
+    },
+    {
+      "id": "mops_1595_annual_report_2025_pcb_ldi_c6",
+      "locator": "壹、致股東報告書 四、外部競爭環境（p.4）",
+      "quote": "同業廠商眾多，加上紅色供應鏈崛起，產業競爭日趨激烈"
+    },
+    {
+      "id": "mops_1595_annual_report_2025_pcb_ldi_c7",
+      "locator": "壹、致股東報告書 二、營業計畫實施成果（p.2）",
+      "quote": "本公司114年合併營業收入為新台幣716,171仟元，相較於113年度合併營業收入 915,514仟元衰退21.77%，主要係因114年度 PCB設備訂單及半導體設備訂單均因 中國大陸持續內捲的負面因素影響下，整體訂單減少營收成長趨緩。"
+    }
+  ]
+}
