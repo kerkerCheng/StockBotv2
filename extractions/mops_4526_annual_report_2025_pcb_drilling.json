@@ -1,0 +1,155 @@
+{
+  "claims": [
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "條件：東台下一份年報的印刷電路板加工機營收占比或金額與此不符，或它改寫 PCB 鑽孔機需求轉弱。核查頻率：每年（年報）＋每季（財報）。觸發後 48 小時：更正這條 claim。",
+      "id": "mops_4526_annual_report_2025_pcb_drilling_cl1",
+      "source_ids": [
+        "mops_4526_annual_report_2025_pcb_drilling_s3",
+        "mops_4526_annual_report_2025_pcb_drilling_s4",
+        "mops_4526_annual_report_2025_pcb_drilling_s5"
+      ],
+      "statement": "Tongtai Machine & Tool reports that PCB processing machines were NT$527 million or 9.84% of FY2025 revenue (machining centres 51.43%, CNC lathes 17.63%); it has sold more than 10,000 PCB mechanical drilling, routing and laser drilling machines cumulatively, and expects demand for high-end PCB drilling machines to keep growing strongly for 2–3 years on AI compute demand. Low purity for this layer; self-reported.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:pcb_mechanical_drilling_equipment",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "mops_4526_annual_report_2025_pcb_drilling_s1",
+        "mops_4526_annual_report_2025_pcb_drilling_s2",
+        "mops_4526_annual_report_2025_pcb_drilling_s3",
+        "mops_4526_annual_report_2025_pcb_drilling_s4"
+      ],
+      "src_id": "co:tongtai_machine_tool"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.65,
+      "dst_id": "tech:pcb_mechanical_drilling_equipment",
+      "id": "e2",
+      "relation": "depends_on",
+      "source_ids": [
+        "mops_4526_annual_report_2025_pcb_drilling_s2",
+        "mops_4526_annual_report_2025_pcb_drilling_s5"
+      ],
+      "src_id": "tech:ai_high_layer_pcb"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "equipment_epitaxy",
+      "aliases": [
+        "東台精機",
+        "東台精機股份有限公司",
+        "Tongtai"
+      ],
+      "attributes": {
+        "ticker": "4526.TW"
+      },
+      "confidence": 0.9,
+      "id": "co:tongtai_machine_tool",
+      "name": "Tongtai Machine & Tool Co., Ltd.",
+      "role": null,
+      "source_ids": [
+        "mops_4526_annual_report_2025_pcb_drilling_s1",
+        "mops_4526_annual_report_2025_pcb_drilling_s3"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "equipment_epitaxy",
+      "aliases": [
+        "PCB 鑽孔機",
+        "鑽孔機",
+        "背鑽機",
+        "CCD 背鑽機",
+        "機械鑽孔機",
+        "成型機",
+        "钻孔机",
+        "背钻",
+        "PCB drilling machine",
+        "back-drilling machine"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:pcb_mechanical_drilling_equipment",
+      "name": "PCB mechanical drilling, back-drilling and routing machines (CCD back-drill, through-hole drilling)",
+      "role": null,
+      "source_ids": [
+        "mops_4526_annual_report_2025_pcb_drilling_s2",
+        "mops_4526_annual_report_2025_pcb_drilling_s4"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "AI 伺服器主板",
+        "AI 主板",
+        "AI-PCB",
+        "AI PCB",
+        "高階多層板",
+        "高層數 PCB",
+        "高多层板",
+        "交換機板"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:ai_high_layer_pcb",
+      "name": "High-layer-count PCB for AI servers and switches (multilayer / HDI mainboards)",
+      "role": null,
+      "source_ids": [
+        "mops_4526_annual_report_2025_pcb_drilling_s2"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "mops_4526_annual_report_2025_pcb_drilling",
+    "evidence_tier": 1,
+    "origin_entity": "Tongtai Machine & Tool Co., Ltd.",
+    "permission_basis": "公開資訊觀測站公開年報；只保留研究必要的有限逐字節錄。published_at 取 MOPS 上傳時間（115/05/28 16:44:22）。",
+    "published_at": "2026-05-28",
+    "publisher": "公開資訊觀測站（股東會年報）",
+    "retrieved_at": "2026-11-11",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "東台精機（4526）中華民國 114 年度年報：TCDM／TCRM-620CL 多軸獨立 CCD 鑽孔機／成型機對應 AI 伺服板的高精密背鑽；印刷電路板加工機占 2025 營收 9.84%；PCB 鑽孔、成型與雷射鑽孔機累計銷售超過 1 萬台；高階 PCB 鑽孔機需求將維持 2–3 年高成長",
+    "url": "https://doc.twse.com.tw/server-java/t57sb01?step=9&kind=F&co_id=4526&filename=2025_4526_20260617F04.pdf"
+  },
+  "sources": [
+    {
+      "id": "mops_4526_annual_report_2025_pcb_drilling_s1",
+      "locator": "壹、(九) 1. 內部控制聲明書（p.59）",
+      "quote": "東台精機股份有限公司 內部控制制度聲明書"
+    },
+    {
+      "id": "mops_4526_annual_report_2025_pcb_drilling_s2",
+      "locator": "壹、致股東報告書 二、營運計畫與研發成果",
+      "quote": "TCDM/TCRM-620CL 多軸獨立 CCD 鑽孔機/成 型機，可完美對應 AI 伺服板所需的高精密背鑽及對鑽加工，亦可勝任高階載板 基板加工與外形成型"
+    },
+    {
+      "id": "mops_4526_annual_report_2025_pcb_drilling_s3",
+      "locator": "伍、營運概況 一、(一) 2. 所營業務之營業比重（p.76）",
+      "quote": "印刷電路板加工機 527,342 9.84"
+    },
+    {
+      "id": "mops_4526_annual_report_2025_pcb_drilling_s4",
+      "locator": "伍、營運概況 一、(二) 4. 競爭情形 (2) PCB 鑽孔機／成型機／雷射鑽孔機（p.82）",
+      "quote": "PCB 機械鑽孔機、成 形機與雷射鑽孔機，經過多年的耕耘機台銷售數量已超越 10,000 台"
+    },
+    {
+      "id": "mops_4526_annual_report_2025_pcb_drilling_s5",
+      "locator": "伍、營運概況 一、(二) 5. 發展遠景之有利因素（p.86）",
+      "quote": "隨著 AI 算力需求爆發，高階 PCB 鑽孔 機與半導體封裝零件加工設備需求將維持 2-3 年的高成長。"
+    }
+  ]
+}

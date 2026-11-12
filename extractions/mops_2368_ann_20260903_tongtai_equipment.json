@@ -1,0 +1,104 @@
+{
+  "claims": [
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：臻鼎、金像電或其他板廠的重訊／年報寫出取消或延後已下單的設備，或同一批設備改向別家採購。核查頻率：每月（MOPS 重訊）＋每年（年報重要契約）。觸發後 48 小時：更正這條 claim，重讀鑽孔設備層讀圖的客戶資本承諾段。",
+      "id": "mops_2368_ann_20260903_tongtai_equipment_cl1",
+      "source_ids": [
+        "mops_2368_ann_20260903_tongtai_equipment_s1",
+        "mops_2368_ann_20260903_tongtai_equipment_s2",
+        "mops_2368_ann_20260903_tongtai_equipment_s3"
+      ],
+      "statement": "Customer-side capital commitment (Gold Circuit Electronics material announcement, 2026-09-03): its Thailand subsidiary acquired one batch of operating machinery worth USD 20,912,237 (about NT$662.6 million) from Tongtai Machine & Tool, an unrelated party; board-approved the same day. The equipment type is not disclosed in the announcement.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "co:gold_circuit",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "mops_2368_ann_20260903_tongtai_equipment_s1",
+        "mops_2368_ann_20260903_tongtai_equipment_s2",
+        "mops_2368_ann_20260903_tongtai_equipment_s3"
+      ],
+      "src_id": "co:tongtai_machine_tool"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "金像電",
+        "金像電子",
+        "金像電子股份有限公司",
+        "Gold Circuit Electronics"
+      ],
+      "attributes": {
+        "ticker": "2368.TW"
+      },
+      "confidence": 0.9,
+      "id": "co:gold_circuit",
+      "name": "Gold Circuit Electronics Ltd.",
+      "role": null,
+      "source_ids": [
+        "mops_2368_ann_20260903_tongtai_equipment_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "equipment_epitaxy",
+      "aliases": [
+        "東台精機",
+        "東台精機股份有限公司",
+        "Tongtai"
+      ],
+      "attributes": {
+        "ticker": "4526.TW"
+      },
+      "confidence": 0.85,
+      "id": "co:tongtai_machine_tool",
+      "name": "Tongtai Machine & Tool Co., Ltd.",
+      "role": null,
+      "source_ids": [
+        "mops_2368_ann_20260903_tongtai_equipment_s3"
+      ],
+      "type": "Company"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "mops_2368_ann_20260903_tongtai_equipment",
+    "evidence_tier": 1,
+    "origin_entity": "Gold Circuit Electronics Ltd.",
+    "permission_basis": "台灣上市公司重大訊息（MOPS 歷史重大訊息查詢 t05st01，發言時間 15:43:51、序號 2）；全文短、只保留研究必要的逐字。published_at 取 MOPS 發言日期 115/09/03。",
+    "published_at": "2026-09-03",
+    "publisher": "公開資訊觀測站（MOPS 重大訊息）",
+    "retrieved_at": "2026-11-11",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "金像電（2368）重大訊息 2026-09-03：代子公司 Gold Circuit Electronics (Thailand) 公告取得設備——交易相對人東台精機、一批、USD 2,091 萬（約新台幣 6.63 億元）",
+    "url": "https://mopsov.twse.com.tw/mops/web/t05st01?co_id=2368&spoke_date=20260903&seq_no=2"
+  },
+  "sources": [
+    {
+      "id": "mops_2368_ann_20260903_tongtai_equipment_s1",
+      "locator": "主旨",
+      "quote": "代子公司Gold Circuit Electronics (Thailand) Co.,Ltd. 公告取得設備"
+    },
+    {
+      "id": "mops_2368_ann_20260903_tongtai_equipment_s2",
+      "locator": "說明 5. 交易單位數量、每單位價格及交易總金額",
+      "quote": "交易單位數量：一批 每單位價格：不適用 交易總金額：USD 20,912,237元，約台幣 662,604,229元"
+    },
+    {
+      "id": "mops_2368_ann_20260903_tongtai_equipment_s3",
+      "locator": "說明 6. 交易相對人及其與公司之關係",
+      "quote": "交易相對人：東台精機股份有限公司 與公司的關係：非關係人"
+    }
+  ]
+}

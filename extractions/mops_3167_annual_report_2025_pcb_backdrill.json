@@ -1,0 +1,182 @@
+{
+  "claims": [
+    {
+      "confidence": 0.5,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：PCB 板廠（客戶端）的一手寫出 AI 板的背鑽／鑽孔設備需求放緩、延後或取消擴產；或大量科技月營收年增連續三個月轉負而 AI 伺服器／交換器板出貨仍在增加。核查頻率：每月（大量月營收）＋每季（板廠法說、重訊、投資者關係紀錄）。觸發後 48 小時：這條 claim 降 confidence，重讀鑽孔設備層讀圖的需求段。",
+      "id": "mops_3167_annual_report_2025_pcb_backdrill_cl1",
+      "source_ids": [
+        "mops_3167_annual_report_2025_pcb_backdrill_s4",
+        "mops_3167_annual_report_2025_pcb_backdrill_s8"
+      ],
+      "statement": "Supplier-side statement (Ta Liang Technology annual report FY2025): AI server mainboards commonly have 28–36 layers (some above 50) and require back-drill depth control finer than 0.15 mm, which drives demand for high-end drilling and measurement equipment; back-drill process demand has risen sharply, hole counts have increased markedly and existing (inner-copper depth measurement) equipment capacity can no longer keep up with customers' process load. Self-reported by an equipment supplier; no customer or third-party source is named.",
+      "subject_id": "e2"
+    },
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "條件：大量下一份年報或季報的營收、營業比重或客戶集中度與此不符；或板廠擴產計畫普遍延後、大量月營收連續三個月年減。核查頻率：每月（月營收）＋每季（財報）＋每年（年報）。觸發後 48 小時：更正這條 claim，重讀鑽孔設備層讀圖的需求段與客戶段。",
+      "id": "mops_3167_annual_report_2025_pcb_backdrill_cl2",
+      "source_ids": [
+        "mops_3167_annual_report_2025_pcb_backdrill_s2",
+        "mops_3167_annual_report_2025_pcb_backdrill_s3",
+        "mops_3167_annual_report_2025_pcb_backdrill_s7"
+      ],
+      "statement": "Ta Liang Technology reports FY2025 revenue of NT$5.078 billion and profit of NT$716 million, both record highs; equipment was 96.01% of revenue (PCB and semiconductor equipment are not split); no customer exceeded 10% of sales in 2024 or 2025, and customers buy its high-priced machines according to annual capacity-expansion and replacement plans, so revenue follows customers' capex. Its Nanjing subsidiary's new plant was completed and in production by end-2025. Revenue and mix are time-varying self-reported figures.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:pcb_mechanical_drilling_equipment",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "mops_3167_annual_report_2025_pcb_backdrill_s1",
+        "mops_3167_annual_report_2025_pcb_backdrill_s5",
+        "mops_3167_annual_report_2025_pcb_backdrill_s6"
+      ],
+      "src_id": "co:ta_liang_technology"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "tech:pcb_mechanical_drilling_equipment",
+      "id": "e2",
+      "relation": "depends_on",
+      "source_ids": [
+        "mops_3167_annual_report_2025_pcb_backdrill_s4",
+        "mops_3167_annual_report_2025_pcb_backdrill_s8"
+      ],
+      "src_id": "tech:ai_high_layer_pcb"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "equipment_epitaxy",
+      "aliases": [
+        "大量科技",
+        "大量科技股份有限公司",
+        "TA LIANG",
+        "Ta Liang Technology"
+      ],
+      "attributes": {
+        "ticker": "3167.TW"
+      },
+      "confidence": 0.9,
+      "id": "co:ta_liang_technology",
+      "name": "Ta Liang Technology Co., Ltd.",
+      "role": null,
+      "source_ids": [
+        "mops_3167_annual_report_2025_pcb_backdrill_s1",
+        "mops_3167_annual_report_2025_pcb_backdrill_s3"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "equipment_epitaxy",
+      "aliases": [
+        "PCB 鑽孔機",
+        "鑽孔機",
+        "背鑽機",
+        "CCD 背鑽機",
+        "機械鑽孔機",
+        "成型機",
+        "钻孔机",
+        "背钻",
+        "PCB drilling machine",
+        "back-drilling machine"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:pcb_mechanical_drilling_equipment",
+      "name": "PCB mechanical drilling, back-drilling and routing machines (CCD back-drill, through-hole drilling)",
+      "role": null,
+      "source_ids": [
+        "mops_3167_annual_report_2025_pcb_backdrill_s4",
+        "mops_3167_annual_report_2025_pcb_backdrill_s6"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "AI 伺服器主板",
+        "AI 主板",
+        "AI-PCB",
+        "AI PCB",
+        "高階多層板",
+        "高層數 PCB",
+        "高多层板",
+        "交換機板"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:ai_high_layer_pcb",
+      "name": "High-layer-count PCB for AI servers and switches (multilayer / HDI mainboards)",
+      "role": null,
+      "source_ids": [
+        "mops_3167_annual_report_2025_pcb_backdrill_s4"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "mops_3167_annual_report_2025_pcb_backdrill",
+    "evidence_tier": 1,
+    "origin_entity": "Ta Liang Technology Co., Ltd.",
+    "permission_basis": "公開資訊觀測站公開年報；只保留研究必要的有限逐字節錄。published_at 取 MOPS 上傳時間（115/07/29 09:26:26，股東會後修訂本；原版 115/04/23 上傳）。",
+    "published_at": "2026-07-29",
+    "publisher": "公開資訊觀測站（股東會年報）",
+    "retrieved_at": "2026-11-11",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "大量科技（3167）中華民國 114 年度年報（股東會後修訂本）：AI 伺服器主板 28–36 層（部分 50 層以上）、背鑽深度控制精度須小於 0.15mm，驅動高階鑽孔與量測設備需求；背鑽孔數暴增讓既有量測設備產能不足；台灣 PCB 鑽孔機與成型機廠商；2025 營收 50.78 億元創新高、無單一客戶占 10% 以上",
+    "url": "https://doc.twse.com.tw/server-java/t57sb01?step=9&kind=F&co_id=3167&filename=2025_3167_20260512F11.pdf"
+  },
+  "sources": [
+    {
+      "id": "mops_3167_annual_report_2025_pcb_backdrill_s1",
+      "locator": "封面",
+      "quote": "大量科技股份有限公司 一一四年度年報"
+    },
+    {
+      "id": "mops_3167_annual_report_2025_pcb_backdrill_s2",
+      "locator": "壹、致股東報告書 一、114 年度營業結果",
+      "quote": "11 4 年營業收入 5,077,937 仟元及獲利 716,187 仟元均創歷史新高。 5. 南京大量數控科技有限公司新廠 產線興建作業已於 114 年底已完成，並已搬遷 進駐生產，提高產能。"
+    },
+    {
+      "id": "mops_3167_annual_report_2025_pcb_backdrill_s3",
+      "locator": "伍、營運概況 一、(一) 2. 主要商品及營業比重（p.63）",
+      "quote": "設備 4,875,827 96.01% 其它(註) 202,110 3.99% 合計 5,077,937 100.00%"
+    },
+    {
+      "id": "mops_3167_annual_report_2025_pcb_backdrill_s4",
+      "locator": "伍、營運概況 一、(二) 4. 競爭情形 (1) PCB 鑽孔機、成型機（p.68）",
+      "quote": "精度門檻大幅收縮，AI 伺服器主板 層數普遍達到 28-36 層，部分尖端產品挑戰 50 層以上，要求背鑽深度控制 精度須小於 0.15mm， 這驅動了對具備 「自動深度補償」 與 「即時數據反饋」 的高階鑽孔與量測設備需求"
+    },
+    {
+      "id": "mops_3167_annual_report_2025_pcb_backdrill_s5",
+      "locator": "伍、營運概況 一、(二) 4. 競爭情形 (1) PCB 鑽孔機、成型機（p.68）",
+      "quote": "本公司具備自主研發控制器及高階背鑽技術 ， 並整合CCD 數位控制 ， 能顯著提升多軸同動精度。"
+    },
+    {
+      "id": "mops_3167_annual_report_2025_pcb_backdrill_s6",
+      "locator": "伍、營運概況 一、(二) 4. 競爭利基 (1) PCB 成型機與鑽孔機（p.71）",
+      "quote": "目前台灣產製 PCB 鑽孔機與成型機的主要廠商除了本公司之外，尚有東台、瀧澤、恩德、友 嘉、力嵩、達航等。"
+    },
+    {
+      "id": "mops_3167_annual_report_2025_pcb_backdrill_s7",
+      "locator": "伍、營運概況 一、(四) 1. 最近二年度主要銷貨客戶資料（p.76）",
+      "quote": "114 年及 113 年無銷售占比 10%以上之客戶，本公司所生產之產品，屬高 單價之專業機器設備 ， 客戶多按年度提升產能及汰舊換新計畫採購設備"
+    },
+    {
+      "id": "mops_3167_annual_report_2025_pcb_backdrill_s8",
+      "locator": "伍、營運概況 三、(二) 計畫開發之新商品 (1) PCB 成型機與鑽孔機（p.83）",
+      "quote": "背鑽 （Back Drill） - 82 - 製程需求大幅提升 ， 孔數量顯著增加 ， 現有設備產能已逐步無法滿足客戶日益成 長之製程負荷。"
+    }
+  ]
+}

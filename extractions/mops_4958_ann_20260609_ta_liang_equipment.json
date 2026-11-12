@@ -1,0 +1,105 @@
+{
+  "claims": [
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：臻鼎、金像電或其他板廠的重訊／年報寫出取消或延後已下單的設備，或同一批設備改向別家採購。核查頻率：每月（MOPS 重訊）＋每年（年報重要契約）。觸發後 48 小時：更正這條 claim，重讀鑽孔設備層讀圖的客戶資本承諾段。",
+      "id": "mops_4958_ann_20260609_ta_liang_equipment_cl1",
+      "source_ids": [
+        "mops_4958_ann_20260609_ta_liang_equipment_s1",
+        "mops_4958_ann_20260609_ta_liang_equipment_s2",
+        "mops_4958_ann_20260609_ta_liang_equipment_s3"
+      ],
+      "statement": "Customer-side capital commitment (Zhen Ding Technology material announcement, 2026-06-09): its subsidiary Qing Ding Precision Electronics (Huai'an) acquired one batch of machinery worth NT$1,049,896,840 from NANJING TA LIANG TECHNOLOGY CO., LTD. (Ta Liang Technology's Nanjing subsidiary), an unrelated party. The equipment type is not disclosed.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "co:zhen_ding_tech",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "mops_4958_ann_20260609_ta_liang_equipment_s1",
+        "mops_4958_ann_20260609_ta_liang_equipment_s2",
+        "mops_4958_ann_20260609_ta_liang_equipment_s3"
+      ],
+      "src_id": "co:ta_liang_technology"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "臻鼎",
+        "臻鼎-KY",
+        "臻鼎科技",
+        "Zhen Ding Technology"
+      ],
+      "attributes": {
+        "ticker": "4958.TW"
+      },
+      "confidence": 0.9,
+      "id": "co:zhen_ding_tech",
+      "name": "Zhen Ding Technology Holding Limited",
+      "role": null,
+      "source_ids": [
+        "mops_4958_ann_20260609_ta_liang_equipment_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "equipment_epitaxy",
+      "aliases": [
+        "大量科技",
+        "大量科技股份有限公司",
+        "TA LIANG",
+        "Ta Liang Technology"
+      ],
+      "attributes": {
+        "ticker": "3167.TW"
+      },
+      "confidence": 0.85,
+      "id": "co:ta_liang_technology",
+      "name": "Ta Liang Technology Co., Ltd.",
+      "role": null,
+      "source_ids": [
+        "mops_4958_ann_20260609_ta_liang_equipment_s3"
+      ],
+      "type": "Company"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "mops_4958_ann_20260609_ta_liang_equipment",
+    "evidence_tier": 1,
+    "origin_entity": "Zhen Ding Technology Holding Limited",
+    "permission_basis": "台灣上市公司重大訊息（MOPS 歷史重大訊息查詢 t05st01，發言時間 17:47:47、序號 1）；全文短、只保留研究必要的逐字。published_at 取 MOPS 發言日期 115/06/09。",
+    "published_at": "2026-06-09",
+    "publisher": "公開資訊觀測站（MOPS 重大訊息）",
+    "retrieved_at": "2026-11-11",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "臻鼎-KY（4958）重大訊息 2026-06-09：代子公司慶鼎精密電子（淮安）公告取得機器設備——交易相對人 NANJING TA LIANG TECHNOLOGY CO.,LTD.、一批、新台幣 10.50 億元",
+    "url": "https://mopsov.twse.com.tw/mops/web/t05st01?co_id=4958&spoke_date=20260609&seq_no=1"
+  },
+  "sources": [
+    {
+      "id": "mops_4958_ann_20260609_ta_liang_equipment_s1",
+      "locator": "主旨",
+      "quote": "代子公司慶鼎精密電子(淮安)有限公司公告取得機器設備"
+    },
+    {
+      "id": "mops_4958_ann_20260609_ta_liang_equipment_s2",
+      "locator": "說明 5. 交易數量與交易總金額",
+      "quote": "交易數量:一批 交易總金額:新台幣1,049,896,840元"
+    },
+    {
+      "id": "mops_4958_ann_20260609_ta_liang_equipment_s3",
+      "locator": "說明 6. 交易相對人及其與公司之關係",
+      "quote": "交易相對人:NANJING TA LIANG TECHNOLOGY CO.,LTD. 與公司之關係:無"
+    }
+  ]
+}
