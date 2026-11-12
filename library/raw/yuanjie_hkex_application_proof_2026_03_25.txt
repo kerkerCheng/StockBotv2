@@ -47,3 +47,23 @@ In 2025, revenue generated from our data center laser chips accounted for 65.4% 
 In parallel, to capture opportunities in SiPh application integration, we specifically designed SiPh-based products based on the emerging optical interconnect packaging approaches such as NPO and CPO, ensuring that we remain at the forefront of the high-performance laser chip market for next-generation data centers. The following graphics illustrate our 300mW high-power CW lasers:
 
 （INDUSTRY OVERVIEW 段的排名表其餘四家匿名為 Company D／B／A／C；匿名公司的身分不在原文，本節錄不推斷）
+
+【INDUSTRY OVERVIEW — Ranking of Global Laser Chip Market for SiPh-based High-speed Optical Interconnect Products 表（PDF 第 108 頁；2026-11-12 補進節錄：同一份 PDF 重新下載、本機抽字、逐字、空白正規化）】
+Ranking Company Sales Revenue (RMB100 million) Market share
+1 Company D 5.0 31.7%
+2 The Company 3.8 23.6%
+3 Company B 2.8 17.6%
+4 Company A 1.8 11.1%
+5 Company C 0.8 5.0%
+Total of Top 5 14.2 89.1%
+Others 1.7 10.9%
+Market total 15.9 100.0%
+Source: Expert Interviews, annual reports, CIC
+
+【INDUSTRY OVERVIEW — 前一張表（Ranking of Global Laser Chip Market for High-Speed Optical Interconnect Products）的表註（PDF 第 107 頁；註 (1) 寫「The same definition applies hereinafter」，公司代號 A–E 在同一段沿用；2026-11-12 補進節錄）】
+(1) Sales revenue refers to revenue generated from external sales in the external sales market and excludes internal sales revenue in the captive supply market. The same definition applies hereinafter.
+(2) Company A, founded in 2015 and headquartered in USA. It was listed on the NASDAQ Stock Market.
+Company B, founded in 1961 and headquartered in USA. It was listed on the NASDAQ Stock Market.
+Company C, founded in 1921 and headquartered in Japan. It was listed on the Tokyo Stock Exchange.
+Company D, founded in 1897 and headquartered in Japan. It was listed on the Tokyo Stock Exchange.
+Company E, founded in 1971 and headquartered in USA. It was listed on the New York Stock Exchange.

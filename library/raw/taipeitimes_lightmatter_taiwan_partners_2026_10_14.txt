@@ -1,0 +1,22 @@
+SOURCE: Taipei Times〈Lightmatter reveals plans for its new technologies〉（By Lisa Wang / Staff reporter；Wed, Oct 14, 2026 page9）
+URL: https://www.taipeitimes.com/News/biz/archives/2026/10/14/2003865908
+PUBLISHED: 2026-10-14（報紙刊出日；文中「yesterday」＝2026-10-13 的線上記者會）
+RETRIEVED: 2026-11-12（本機抓 HTML、去標籤後逐字節錄）
+STORAGE: repo_excerpt（有限逐字引文：導言、FAU 組裝與台灣夥伴、上市時程、短缺各段，未刪句）
+NOTE: 媒體報導（二手）轉述 Lightmatter 與其執行長 Nick Harris；「ecosystem partners」不等於下單，角色沒寫。3163.TWO 敘事逐句核對（2026-11-12）存檔。
+
+【導言】
+"Lightmatter Inc, a US-based optical interconnect solution start-up, yesterday said it plans to ship its first near-packaged optics (NPO) engines and high-density laser network-interface cards (NICs) next year, adding that this would pave the way for full-scale copackaged optics (CPO) engine production in 2028 and 2029."
+
+【FAU 組裝與台灣夥伴】
+"One of the CPO engines with detachable fiber array units is assembled in Taiwan by ASE Technology Holding Co (日月光投控), Lightmatter chief executive officer Nick Harris told a virtual media conference yesterday."
+"Lightmatter also counts Taiwan Semiconductor Manufacturing Co (TSMC, 台積電), chip designer Global Unichip Corp (GUC, 創意電子) and passive fiber optic components maker Browave Corp (波若威) as its silicon photonics ecosystem partners in Taiwan."
+
+【上市時程】
+"Asked about the company’s commercial launches of new products, Harris said NPO and Guide DR could be launched next year and CPO in 2028."
+"“On the CPO side, we work with GUC, and there are others in Taiwan and elsewhere,” he said."
+"Initial, low-volume shipments of CPO are scheduled for next year, while high-volume deployment is expected start in 2028, Harris said."
+
+【短缺】
+"As the optical industry is facing acute laser and optical fiber shortages, Lightmatter uses bidirectional technology to halve optical fiber consumption, Harris said."
+"The company also uses a diversified supply chain and its proprietary Guide platform to mitigate laser shortages, he said."
