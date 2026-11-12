@@ -84,6 +84,24 @@ def test_unlisted_registry_companies_and_names_outside_the_registry_need_no_decl
     assert todo.propose_theme_cohort(pool, ok)["n"] == 1
 
 
+def test_a_supersedes_id_outside_the_same_theme_is_refused_before_a_number_is_minted(tmp_path: Path) -> None:
+    """failure log #162：寫入端只收同一個題材裡的 supersedes_id，鑄號端以前沒驗——[934] 改了題材名，
+    使用者 go 之後 complete 才被拒收。鑄號時就要擋；沿用原題材名的照常鑄號。"""
+    pool, item = _minted()
+    first = todo.complete_theme_cohort(pool, item["n"], at="2026-09-30T02:00:00+00:00", directory=tmp_path)
+    renamed = copy.deepcopy(SPEC)
+    renamed.update(theme="ai_capex 與設備", supersedes_id=first["cohort_id"], reason="改了題材名")
+    before = len(pool["items"])
+    with pytest.raises(todo.TodoError, match="不在「ai_capex 與設備」這個題材的紀錄裡"):
+        todo.propose_theme_cohort(pool, renamed, directory=tmp_path)
+    assert len(pool["items"]) == before
+    same = copy.deepcopy(SPEC)
+    same.update(supersedes_id=first["cohort_id"], reason="同題材換一版")
+    minted = todo.propose_theme_cohort(pool, same, directory=tmp_path)
+    assert minted[todo.FROZEN_SPEC_KEY]["spec"]["supersedes_id"] == first["cohort_id"]
+    assert todo.complete_theme_cohort(pool, minted["n"], directory=tmp_path)["theme"] == "ai_capex"
+
+
 def test_a_spec_frozen_before_company_ids_existed_keeps_its_digest_and_still_lands(tmp_path: Path) -> None:
     """舊的凍結 spec（排除名單沒有 `company_ids`）：正規化結果與 digest 不變，complete 照原樣落地——
     寫進去的必須是使用者核准的那一份（鑄號端的必填不回溯）。"""

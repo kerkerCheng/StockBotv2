@@ -1347,13 +1347,14 @@ _FROZEN_SPEC_COMMANDS: dict[str, str] = {
 }
 
 
-def propose_theme_cohort(pool: dict[str, Any], spec: Mapping[str, Any], *, at: str | None = None) -> dict[str, Any]:
+def propose_theme_cohort(pool: dict[str, Any], spec: Mapping[str, Any], *, at: str | None = None,
+                         directory: Any = None) -> dict[str, Any]:
     """研究步驟提主題等權組成分：驗證 spec、成員身分解析，**凍結進一個 manual pq2 編號**（spec＋digest）。
 
     同一份 spec 重提得到同一個編號（ref_id 含 digest）；改了任何一個字就是另一個編號——核准綁的是內容。
     """
     from alpha.errors import ContractViolation
-    from alpha.providers.theme_cohorts import resolve_excluded, resolve_members
+    from alpha.providers.theme_cohorts import read_cohort_records, resolve_excluded, resolve_members
     from alpha.theme_cohort import spec_digest, validate_spec
 
     try:
@@ -1367,6 +1368,13 @@ def propose_theme_cohort(pool: dict[str, Any], spec: Mapping[str, Any], *, at: s
     problems = resolve_excluded(clean, require_declared=True)
     if problems:
         raise TodoError("排除名單沒寫清楚是哪幾家名冊公司：" + "；".join(problems))
+    # 取代的那一版必須在同一個題材的紀錄裡（failure log #162）：寫入端只收同題材的 supersedes_id，鑄號端以前沒驗——
+    # [934] 改了題材名，使用者 go 之後才被寫入端拒收。組紀錄以題材名為鍵，改名就斷了取代鏈
+    if clean.get("supersedes_id"):
+        existing, _ = read_cohort_records(clean["theme"], directory=directory)
+        if not any(r.cohort_id == clean["supersedes_id"] for r in existing):
+            raise TodoError(f"supersedes_id {clean['supersedes_id']} 不在「{clean['theme']}」這個題材的紀錄裡——"
+                            "題材名要沿用被取代的那一版（組紀錄以題材名為鍵）")
     digest = spec_digest(clean)
     tickers = "、".join(m["ticker"] for m in clean["members"])
     item = upsert(
