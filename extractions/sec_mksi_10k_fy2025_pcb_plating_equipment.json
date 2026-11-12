@@ -1,0 +1,146 @@
+{
+  "claims": [
+    {
+      "confidence": 0.55,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：MKS 下一份 10-K／10-Q 改寫電鍍設備交期（例如不再寫最長 12 個月）、競爭者名單，或寫出電子與封裝市場的設備銷售下滑。核查頻率：每季（10-Q）＋每年（10-K）。觸發後 48 小時：更正這條 claim，重讀電鍍線層讀圖的供給側與交期段。",
+      "id": "sec_mksi_10k_fy2025_pcb_plating_equipment_cl1",
+      "source_ids": [
+        "sec_mksi_10k_fy2025_pcb_plating_equipment_m3",
+        "sec_mksi_10k_fy2025_pcb_plating_equipment_m4",
+        "sec_mksi_10k_fy2025_pcb_plating_equipment_m6",
+        "sec_mksi_10k_fy2025_pcb_plating_equipment_m7",
+        "sec_mksi_10k_fy2025_pcb_plating_equipment_m8"
+      ],
+      "statement": "Supplier-side statement (MKS Inc. FY2025 10-K): its Materials Solutions Division (Atotech) makes plating equipment to customer specification for PCBs and package substrates used in, among others, servers, data centres and AI infrastructure; some of that plating equipment has lead times of up to 12 months, versus about 90 days for most MKS products. It names six competitors in plating equipment: Schmid Group, Process Automation International, Top Creation Machines, Universal Circuit Board Equipment, Almex Technologies and Manz Asia. Electronics and packaging was about 28% of 2025 revenue and grew on higher MSD chemistry and equipment sales and PSD PCB via-drilling systems. Lead time is a dated, self-reported statement.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:pcb_plating_line",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "sec_mksi_10k_fy2025_pcb_plating_equipment_m1",
+        "sec_mksi_10k_fy2025_pcb_plating_equipment_m2",
+        "sec_mksi_10k_fy2025_pcb_plating_equipment_m5"
+      ],
+      "src_id": "co:mks_inc"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "equipment_epitaxy",
+      "aliases": [
+        "MKS Inc.",
+        "MKS Instruments",
+        "Atotech",
+        "ATOTECH"
+      ],
+      "attributes": {
+        "ticker": "MKSI"
+      },
+      "confidence": 0.9,
+      "id": "co:mks_inc",
+      "name": "MKS Inc.",
+      "role": null,
+      "source_ids": [
+        "sec_mksi_10k_fy2025_pcb_plating_equipment_m1",
+        "sec_mksi_10k_fy2025_pcb_plating_equipment_m9"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "equipment_epitaxy",
+      "aliases": [
+        "PCB 電鍍線",
+        "電鍍線",
+        "電鍍設備",
+        "垂直連續電鍍",
+        "垂直連續電鍍設備",
+        "脈衝電鍍線",
+        "龍門式電鍍線",
+        "垂直连续电镀设备",
+        "垂直连续镀铜线",
+        "电镀设备",
+        "VCP",
+        "PCB plating line",
+        "plating equipment"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:pcb_plating_line",
+      "name": "PCB electroplating lines (vertical continuous plating VCP, gantry / pulse plating, horizontal plating)",
+      "role": null,
+      "source_ids": [
+        "sec_mksi_10k_fy2025_pcb_plating_equipment_m2",
+        "sec_mksi_10k_fy2025_pcb_plating_equipment_m5"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "sec_mksi_10k_fy2025_pcb_plating_equipment",
+    "evidence_tier": 1,
+    "origin_entity": "MKS Inc.",
+    "permission_basis": "SEC EDGAR 公開的年度報告；只保留研究必要的有限逐字節錄。published_at 取 EDGAR filed date 2026-02-24。",
+    "published_at": "2026-02-24",
+    "publisher": "SEC EDGAR",
+    "retrieved_at": "2026-11-11",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "MKS Inc.（MKSI）2025 年度 10-K：電子與封裝市場（約占 2025 營收 28%）的組合含 PCB 與載板用電鍍設備（Atotech，2022-08 併購）；部分電鍍設備交期最長 12 個月；具名六家電鍍設備競爭者（Schmid、PAL、Top Creation、Universal Circuit Board Equipment、Almex、Manz Asia）",
+    "url": "https://www.sec.gov/Archives/edgar/data/1049502/000119312526066820/mksi-20251231.htm"
+  },
+  "sources": [
+    {
+      "id": "sec_mksi_10k_fy2025_pcb_plating_equipment_m1",
+      "locator": "Item 1. Business（p.5）",
+      "quote": "MKS Inc., formerly known as MKS Instruments, Inc. (“MKS,” the “Company,” “our,” or “we”), was founded in 1961 as a Massachusetts corporation."
+    },
+    {
+      "id": "sec_mksi_10k_fy2025_pcb_plating_equipment_m2",
+      "locator": "Item 1. Business — Electronics and Packaging Market（p.6）",
+      "quote": "Our portfolio includes photonics components, laser drilling systems, electronics chemistries and plating equipment that are critical for the manufacturing of PCBs and package substrates, and critical to wafer level packaging (“WLP”) applications."
+    },
+    {
+      "id": "sec_mksi_10k_fy2025_pcb_plating_equipment_m3",
+      "locator": "Item 1. Business — Electronics and Packaging Market（p.6）",
+      "quote": "Approximately 28%, 26%, and 25% of our net revenues for 2025, 2024, and 2023, respectively, were from sales to our electronics and packaging market."
+    },
+    {
+      "id": "sec_mksi_10k_fy2025_pcb_plating_equipment_m4",
+      "locator": "Item 1. Business — Materials Solutions Division products（p.7）",
+      "quote": "Advanced chemical processes and production equipment, for the manufacturing of PCBs, package substrates and wafers used in smartphones, computers, other consumer electronics, server and data centers, including infrastructure related to AI, automotive electronics, and the medical and industrial industries."
+    },
+    {
+      "id": "sec_mksi_10k_fy2025_pcb_plating_equipment_m5",
+      "locator": "Item 1. Business — Manufacturing（p.9）",
+      "quote": "and the manufacturing of a range of plating equipment to customer specifications, which utilize these chemicals."
+    },
+    {
+      "id": "sec_mksi_10k_fy2025_pcb_plating_equipment_m6",
+      "locator": "Item 1. Business — Backlog（p.9）",
+      "quote": "Lead times for many of our products are very short, as a large portion of our orders are received and shipped within 90 days. Some of the plating equipment manufactured by MSD has longer lead times of up to 12 months."
+    },
+    {
+      "id": "sec_mksi_10k_fy2025_pcb_plating_equipment_m7",
+      "locator": "Item 1. Business — Competition（p.10）",
+      "quote": "Schmid Group, Process Automation International Limited, Top Creation Machines Co., Ltd., Universal Circuit Board Equipment Co., Ltd., Almex Technologies Inc. and Manz Asia offer products that compete with our plating equipment products."
+    },
+    {
+      "id": "sec_mksi_10k_fy2025_pcb_plating_equipment_m8",
+      "locator": "Item 7. MD&A — Electronics and Packaging Market（p.42）",
+      "quote": "This increase was primarily due to higher chemistry and equipment sales in the electronics market at MSD as well as higher sales of PCB via drilling systems at PSD."
+    },
+    {
+      "id": "sec_mksi_10k_fy2025_pcb_plating_equipment_m9",
+      "locator": "Item 1A. Risk Factors（p.12）",
+      "quote": "Our most recent acquisition of Atotech Limited (“Atotech”) in August 2022"
+    }
+  ]
+}

@@ -1,0 +1,113 @@
+{
+  "claims": [
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：金像電或其他板廠的重訊／年報寫出取消或延後已下單的設備，或同一批設備改向別家採購。核查頻率：每月（MOPS 重訊）＋每年（年報重要契約）。觸發後 48 小時：更正這條 claim，重讀電鍍線層讀圖的客戶資本承諾段。",
+      "id": "mops_2368_ann_20261007_dongwei_equipment_cl1",
+      "source_ids": [
+        "mops_2368_ann_20261007_dongwei_equipment_g1",
+        "mops_2368_ann_20261007_dongwei_equipment_g2",
+        "mops_2368_ann_20261007_dongwei_equipment_g3",
+        "mops_2368_ann_20261007_dongwei_equipment_g4"
+      ],
+      "statement": "Customer-side capital commitment (Gold Circuit Electronics material announcement, 2026-10-07): its Suzhou subsidiary acquired one batch of operating machinery worth RMB 117,600,000 (about NT$558.4 million) from Kunshan Dongwei Technology, an unrelated party, chosen by price comparison and negotiation and approved by the board. The equipment type is not disclosed in the announcement.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "co:gold_circuit",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "mops_2368_ann_20261007_dongwei_equipment_g1",
+        "mops_2368_ann_20261007_dongwei_equipment_g2",
+        "mops_2368_ann_20261007_dongwei_equipment_g3"
+      ],
+      "src_id": "co:kunshan_dongwei"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "金像電",
+        "金像電子",
+        "金像電子股份有限公司",
+        "Gold Circuit Electronics"
+      ],
+      "attributes": {
+        "ticker": "2368.TW"
+      },
+      "confidence": 0.9,
+      "id": "co:gold_circuit",
+      "name": "Gold Circuit Electronics Ltd.",
+      "role": null,
+      "source_ids": [
+        "mops_2368_ann_20261007_dongwei_equipment_g1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "equipment_epitaxy",
+      "aliases": [
+        "東威科技",
+        "东威科技",
+        "昆山東威科技股份有限公司",
+        "昆山东威科技股份有限公司",
+        "Kunshan Dongwei",
+        "Dongwei Technology"
+      ],
+      "attributes": {
+        "ticker": "688700.SS"
+      },
+      "confidence": 0.85,
+      "id": "co:kunshan_dongwei",
+      "name": "Kunshan Dongwei Technology Co., Ltd.",
+      "role": null,
+      "source_ids": [
+        "mops_2368_ann_20261007_dongwei_equipment_g3"
+      ],
+      "type": "Company"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "mops_2368_ann_20261007_dongwei_equipment",
+    "evidence_tier": 1,
+    "origin_entity": "Gold Circuit Electronics Ltd.",
+    "permission_basis": "台灣上市公司重大訊息（MOPS 歷史重大訊息查詢 t05st01，發言時間 14:50:06、序號 1）；全文短、只保留研究必要的逐字。published_at 取 MOPS 發言日期 115/10/07。",
+    "published_at": "2026-10-07",
+    "publisher": "公開資訊觀測站（MOPS 重大訊息）",
+    "retrieved_at": "2026-11-11",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "金像電（2368）重大訊息 2026-10-07：代子公司蘇州金像電子公告取得設備——交易相對人昆山東威科技股份有限公司、一批、人民幣 1.176 億元（約新台幣 5.58 億元），董事會通過",
+    "url": "https://mopsov.twse.com.tw/mops/web/t05st01?co_id=2368&spoke_date=20261007&seq_no=1"
+  },
+  "sources": [
+    {
+      "id": "mops_2368_ann_20261007_dongwei_equipment_g1",
+      "locator": "主旨",
+      "quote": "代子公司蘇州金像電子公告取得設備"
+    },
+    {
+      "id": "mops_2368_ann_20261007_dongwei_equipment_g2",
+      "locator": "說明 5. 交易單位數量、每單位價格及交易總金額",
+      "quote": "交易單位數量：一批 交易總金額：RMB 117,600,000元，約台幣 558,364,800元"
+    },
+    {
+      "id": "mops_2368_ann_20261007_dongwei_equipment_g3",
+      "locator": "說明 6. 交易相對人及其與公司之關係",
+      "quote": "交易相對人：昆山東威科技股份有限公司；與公司之關係：非關係人"
+    },
+    {
+      "id": "mops_2368_ann_20261007_dongwei_equipment_g4",
+      "locator": "說明 11. 本次交易之決定方式",
+      "quote": "決策方式：比價及議價 價格決定之參考依據：參考市場行情 決策單位：董事會"
+    }
+  ]
+}

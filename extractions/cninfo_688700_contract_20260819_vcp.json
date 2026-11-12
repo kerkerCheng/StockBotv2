@@ -1,0 +1,118 @@
+{
+  "claims": [
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：東威後續公告或定期報告寫出這份合同終止、延後交貨或金額調降。核查頻率：每季（東威定期報告）＋臨時公告。觸發後 48 小時：更正這條 claim。",
+      "id": "cninfo_688700_contract_20260819_vcp_cl1",
+      "source_ids": [
+        "cninfo_688700_contract_20260819_vcp_c2",
+        "cninfo_688700_contract_20260819_vcp_c3",
+        "cninfo_688700_contract_20260819_vcp_c4"
+      ],
+      "statement": "Kunshan Dongwei Technology disclosed (2026-08-19) a signed sales contract worth RMB 163.34 million (tax included) for vertical continuous copper plating lines (pulse and DC) and supporting software with an undisclosed second-tier wholly-owned subsidiary of a listed company (unrelated party); depending on delivery batches and acceptance timing, it expects the contract to benefit 2027 results. The buyer's name is withheld as a trade secret.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:pcb_plating_line",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "cninfo_688700_contract_20260819_vcp_c1",
+        "cninfo_688700_contract_20260819_vcp_c2"
+      ],
+      "src_id": "co:kunshan_dongwei"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "equipment_epitaxy",
+      "aliases": [
+        "東威科技",
+        "东威科技",
+        "昆山東威科技股份有限公司",
+        "昆山东威科技股份有限公司",
+        "Kunshan Dongwei",
+        "Dongwei Technology"
+      ],
+      "attributes": {
+        "ticker": "688700.SS"
+      },
+      "confidence": 0.9,
+      "id": "co:kunshan_dongwei",
+      "name": "Kunshan Dongwei Technology Co., Ltd.",
+      "role": null,
+      "source_ids": [
+        "cninfo_688700_contract_20260819_vcp_c1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "equipment_epitaxy",
+      "aliases": [
+        "PCB 電鍍線",
+        "電鍍線",
+        "電鍍設備",
+        "垂直連續電鍍",
+        "垂直連續電鍍設備",
+        "脈衝電鍍線",
+        "龍門式電鍍線",
+        "垂直连续电镀设备",
+        "垂直连续镀铜线",
+        "电镀设备",
+        "VCP",
+        "PCB plating line",
+        "plating equipment"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:pcb_plating_line",
+      "name": "PCB electroplating lines (vertical continuous plating VCP, gantry / pulse plating, horizontal plating)",
+      "role": null,
+      "source_ids": [
+        "cninfo_688700_contract_20260819_vcp_c2"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "cninfo_688700_contract_20260819_vcp",
+    "evidence_tier": 1,
+    "origin_entity": "Kunshan Dongwei Technology Co., Ltd.",
+    "permission_basis": "巨潮資訊網公開的上市公司臨時公告；全文短、只保留研究必要的逐字。published_at 取公告日 2026-08-19。",
+    "published_at": "2026-08-19",
+    "publisher": "巨潮資訊網（上市公司公告）",
+    "retrieved_at": "2026-11-11",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "東威科技（688700）2026-08-19 自願披露簽訂日常經營合同公告（公告編號 2026-034）：垂直連續鍍銅線（脈衝、直流）及配套軟件、人民幣 1.6334 億元（含稅），對方為某上市公司二級全資子公司（豁免披露名稱），預計影響 2027 年業績",
+    "url": "http://static.cninfo.com.cn/finalpage/2026-08-19/1225479220.PDF"
+  },
+  "sources": [
+    {
+      "id": "cninfo_688700_contract_20260819_vcp_c1",
+      "locator": "公告表頭",
+      "quote": "证券代码：688700 证券简称：东威科技 公告编号：2026-034"
+    },
+    {
+      "id": "cninfo_688700_contract_20260819_vcp_c2",
+      "locator": "二、1. 合同標的情況",
+      "quote": "合同标的为垂直连续镀铜线（脉冲、直流）及其配套软件，合同总金额 为 1.6334 亿元（含税）。"
+    },
+    {
+      "id": "cninfo_688700_contract_20260819_vcp_c3",
+      "locator": "二、3. 關聯關係說明",
+      "quote": "对方为某上市公司二级全资子公司，具备较强的合同履约能力，与公司 方面不存在关联关系。"
+    },
+    {
+      "id": "cninfo_688700_contract_20260819_vcp_c4",
+      "locator": "重要內容提示：對上市公司業績的影響",
+      "quote": "受具体交货批次及验收时间的影响，预计本合 同将对公司 2027 年经营业绩产生积极的影响，实际影响可能因市场环境变 化、生产能力限制、技术更新等因素而有所差异。"
+    }
+  ]
+}
