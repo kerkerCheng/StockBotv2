@@ -1,0 +1,110 @@
+{
+  "claims": [
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：台光電、台燿或其他銅箔基板廠的重訊／年報寫出取消或延後已下單的設備、或同一批設備改向別家採購。核查頻率：每月（MOPS 重訊）＋每年（年報重要契約）。觸發後 48 小時：更正這條 claim，重讀含浸機／壓合機層讀圖的客戶資本承諾段。",
+      "id": "mops_2383_ann_20261110_asia_metal_equipment_cl1",
+      "source_ids": [
+        "mops_2383_ann_20261110_asia_metal_equipment_h1",
+        "mops_2383_ann_20261110_asia_metal_equipment_h2",
+        "mops_2383_ann_20261110_asia_metal_equipment_h3",
+        "mops_2383_ann_20261110_asia_metal_equipment_h4"
+      ],
+      "statement": "Customer-side capital commitment (Elite Material material announcement, 2026-11-10): its Zhongshan subsidiary acquired operating machinery from Asia Metal Industries for NT$1,444,061 thousand (multiple transactions), board-approved on 2026-10-28; a second counterparty, Kunshan Ruiping precision coating equipment, reached NT$1,372,294 thousand within one year. The equipment type is not disclosed.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "co:elite_material",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "mops_2383_ann_20261110_asia_metal_equipment_h1",
+        "mops_2383_ann_20261110_asia_metal_equipment_h3",
+        "mops_2383_ann_20261110_asia_metal_equipment_h4"
+      ],
+      "src_id": "co:asia_metal_industries"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "台光電",
+        "台光電子",
+        "Elite Material"
+      ],
+      "attributes": {
+        "ticker": "2383.TW"
+      },
+      "confidence": 0.9,
+      "id": "co:elite_material",
+      "name": "台光電子材料股份有限公司",
+      "role": null,
+      "source_ids": [
+        "mops_2383_ann_20261110_asia_metal_equipment_h1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "equipment_epitaxy",
+      "aliases": [
+        "亞泰金屬",
+        "亞泰金屬工業",
+        "亞泰金屬工業股份有限公司",
+        "Asia Metal Industries"
+      ],
+      "attributes": {
+        "ticker": "6727.TWO"
+      },
+      "confidence": 0.85,
+      "id": "co:asia_metal_industries",
+      "name": "Asia Metal Industries, Inc.",
+      "role": null,
+      "source_ids": [
+        "mops_2383_ann_20261110_asia_metal_equipment_h4"
+      ],
+      "type": "Company"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "mops_2383_ann_20261110_asia_metal_equipment",
+    "evidence_tier": 1,
+    "origin_entity": "台光電子材料股份有限公司",
+    "permission_basis": "台灣上市公司重大訊息（MOPS 歷史重大訊息查詢 t05st01，發言時間 18:23:53、序號 1）；全文短、只保留研究必要的逐字。published_at 取 MOPS 發言日期 115/11/10。",
+    "published_at": "2026-11-10",
+    "publisher": "公開資訊觀測站（MOPS 重大訊息）",
+    "retrieved_at": "2026-11-11",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "台光電（2383）重大訊息 2026-11-10：代子公司中山台光電子材料公告取得供營業用之機器設備——A 交易相對人亞泰金屬工業、新台幣 14.44 億元；B 交易相對人昆山睿平精密涂布設備、一年內累計 13.72 億元；董事會 115/10/28 通過",
+    "url": "https://mopsov.twse.com.tw/mops/web/t05st01?co_id=2383&spoke_date=20261110&seq_no=1"
+  },
+  "sources": [
+    {
+      "id": "mops_2383_ann_20261110_asia_metal_equipment_h1",
+      "locator": "主旨",
+      "quote": "代子公司中山台光電子材料有限公司公告取得供營業用之機器設備"
+    },
+    {
+      "id": "mops_2383_ann_20261110_asia_metal_equipment_h2",
+      "locator": "說明 3. 董事會通過日期",
+      "quote": "董事會通過日期: 民國115年10月28日"
+    },
+    {
+      "id": "mops_2383_ann_20261110_asia_metal_equipment_h3",
+      "locator": "說明 5. 交易數量與交易總金額",
+      "quote": "交易數量：多筆交易 A交易總金額計新台幣1,444,061仟元 B交易總金額一年內與同一相對人累計達新台幣1,372,294仟元"
+    },
+    {
+      "id": "mops_2383_ann_20261110_asia_metal_equipment_h4",
+      "locator": "說明 6. 交易相對人及其與公司之關係",
+      "quote": "A交易相對人：亞泰金屬工業股份有限公司/與公司之關係：無 B交易相對人：昆山睿平精密涂布設備有限公司/與公司之關係：無"
+    }
+  ]
+}

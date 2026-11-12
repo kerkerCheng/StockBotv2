@@ -1,0 +1,206 @@
+{
+  "claims": [
+    {
+      "confidence": 0.5,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：亞泰下一份年報或財報不再寫全球高階含浸設備市占超過 70%、或寫出訂單取消、交期延誤；或銅箔基板廠一手寫出含浸機改向日系或其他廠採購。核查頻率：每月（亞泰月營收、客戶重訊）＋每季（財報）＋每年（年報）。觸發後 48 小時：這條 claim 降 confidence，重讀含浸機層讀圖的供給側段。",
+      "id": "mops_6727_annual_report_2025_ccl_treater_cl1",
+      "source_ids": [
+        "mops_6727_annual_report_2025_ccl_treater_a2",
+        "mops_6727_annual_report_2025_ccl_treater_a3",
+        "mops_6727_annual_report_2025_ccl_treater_a5",
+        "mops_6727_annual_report_2025_ccl_treater_a7"
+      ],
+      "statement": "Supplier-side statement (Asia Metal Industries FY2025 annual report): it is the world's largest maker of high-end impregnation (treater) equipment with a global share above 70%; PCB-substrate process equipment was NT$1.516 billion or 92.78% of 2025 revenue; its main competitors are Japanese makers, which have started partnering with Taiwanese manufacturers on an OEM basis; its second plant has been completed to raise in-house production and capacity. Self-reported; share basis not stated.",
+      "subject_id": "e1"
+    },
+    {
+      "confidence": 0.5,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：銅箔基板廠（客戶端）一手寫出擴產放緩、設備取消，或高階 CCL 供給轉為過剩。核查頻率：每季（台光電、台燿、聯茂法說與財報）。觸發後 48 小時：這條 claim 降 confidence，重讀含浸機層讀圖的需求段。",
+      "id": "mops_6727_annual_report_2025_ccl_treater_cl2",
+      "source_ids": [
+        "mops_6727_annual_report_2025_ccl_treater_a6"
+      ],
+      "statement": "Supplier-side statement (Asia Metal Industries FY2025 annual report): the CCL equipment market shows 'high-end supply short of demand, low-end fierce competition'; demand for ultra-high-layer PCBs, ABF substrates and high-end ultra-low-loss (M8/M9) CCL is surging, material makers and leading PCB makers are sharply raising capex, and suppliers of high-precision wet-process, lamination and exposure equipment face tight supply. Self-reported outlook.",
+      "subject_id": "e2"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:ccl_impregnation_treater",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "mops_6727_annual_report_2025_ccl_treater_a1",
+        "mops_6727_annual_report_2025_ccl_treater_a2",
+        "mops_6727_annual_report_2025_ccl_treater_a4"
+      ],
+      "src_id": "co:asia_metal_industries"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.65,
+      "dst_id": "tech:ccl_impregnation_treater",
+      "id": "e2",
+      "relation": "depends_on",
+      "source_ids": [
+        "mops_6727_annual_report_2025_ccl_treater_a4",
+        "mops_6727_annual_report_2025_ccl_treater_a6"
+      ],
+      "src_id": "mat:high_speed_ccl"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.55,
+      "dst_id": "tech:pcb_lamination_press",
+      "id": "e3",
+      "relation": "depends_on",
+      "source_ids": [
+        "mops_6727_annual_report_2025_ccl_treater_a6"
+      ],
+      "src_id": "mat:high_speed_ccl"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "equipment_epitaxy",
+      "aliases": [
+        "亞泰金屬",
+        "亞泰金屬工業",
+        "亞泰金屬工業股份有限公司",
+        "Asia Metal Industries"
+      ],
+      "attributes": {
+        "ticker": "6727.TWO"
+      },
+      "confidence": 0.9,
+      "id": "co:asia_metal_industries",
+      "name": "Asia Metal Industries, Inc.",
+      "role": null,
+      "source_ids": [
+        "mops_6727_annual_report_2025_ccl_treater_a1",
+        "mops_6727_annual_report_2025_ccl_treater_a2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "equipment_epitaxy",
+      "aliases": [
+        "含浸機",
+        "含浸設備",
+        "含浸塗佈設備",
+        "銅箔基板含浸機",
+        "Treater",
+        "上膠機",
+        "含浸机",
+        "prepreg treater",
+        "impregnation line"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:ccl_impregnation_treater",
+      "name": "CCL / prepreg impregnation (treater) and precision coating lines",
+      "role": null,
+      "source_ids": [
+        "mops_6727_annual_report_2025_ccl_treater_a2",
+        "mops_6727_annual_report_2025_ccl_treater_a4"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "high-speed CCL",
+        "low-loss CCL",
+        "高速 CCL",
+        "高階 CCL",
+        "高速覆銅板"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "mat:high_speed_ccl",
+      "name": "High-speed copper clad laminate (low-loss CCL, M6–M9 class)",
+      "role": null,
+      "source_ids": [
+        "mops_6727_annual_report_2025_ccl_treater_a6"
+      ],
+      "type": "Material"
+    },
+    {
+      "abstraction_level": "equipment_epitaxy",
+      "aliases": [
+        "壓合機",
+        "熱壓機",
+        "真空壓合機",
+        "多層板壓合",
+        "压合机",
+        "プレス装置",
+        "lamination press",
+        "vacuum hot press"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:pcb_lamination_press",
+      "name": "Vacuum hot presses for CCL and multilayer PCB lamination",
+      "role": null,
+      "source_ids": [
+        "mops_6727_annual_report_2025_ccl_treater_a6"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "mops_6727_annual_report_2025_ccl_treater",
+    "evidence_tier": 1,
+    "origin_entity": "Asia Metal Industries, Inc.",
+    "permission_basis": "公開資訊觀測站公開年報；只保留研究必要的有限逐字節錄。published_at 取 MOPS 上傳時間（115/06/04 14:48:16）。",
+    "published_at": "2026-06-04",
+    "publisher": "公開資訊觀測站（股東會年報）",
+    "retrieved_at": "2026-11-11",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "亞泰金屬（6727）中華民國 114 年度年報：全球最大的高階含浸設備製造商、全球市佔率超過 70%；印刷電路板基材製程設備占 2025 營收 92.78%；主要競爭對手是日系廠商；CCL 設備「高階供不應求」——超低損耗 M8/M9 CCL 需求激增、材料大廠大幅擴廠，高階濕製程、壓合與曝光設備供貨吃緊；二廠新建完成",
+    "url": "https://doc.twse.com.tw/server-java/t57sb01?step=9&kind=F&co_id=6727&filename=2025_6727_20260624F04.pdf"
+  },
+  "sources": [
+    {
+      "id": "mops_6727_annual_report_2025_ccl_treater_a1",
+      "locator": "封面",
+      "quote": "亞泰金屬工業股份有限公司"
+    },
+    {
+      "id": "mops_6727_annual_report_2025_ccl_treater_a2",
+      "locator": "壹、致股東報告書 （二）企業發展（p.1）",
+      "quote": "亞泰金屬目前是全球最大的高階含浸設備製造商， 全球市佔率超過 70％"
+    },
+    {
+      "id": "mops_6727_annual_report_2025_ccl_treater_a3",
+      "locator": "伍、營運概況 一、(一) 2. 營業比重（p.56）",
+      "quote": "印刷電路板基材 製程設備 1,371,376 91.12 1,516,106 92.78"
+    },
+    {
+      "id": "mops_6727_annual_report_2025_ccl_treater_a4",
+      "locator": "伍、營運概況 一、(一) 3. 商品項目（p.56）",
+      "quote": "1. 銅箔基板直立式含浸塗佈設備 2. PTFE(鐵氟龍)含浸機"
+    },
+    {
+      "id": "mops_6727_annual_report_2025_ccl_treater_a5",
+      "locator": "伍、營運概況 一、(二) 4. 競爭情形（p.60）",
+      "quote": "本公司在含浸機及塗佈機等市場主要競爭對手為日系廠商，在雙方設備技術 能力差異不大之情況下，公司在價格上的優勢使得公司競爭力優於日系廠商，但 日系廠商近年也開始找台系製造廠合作，採 OEM 方式在市場上爭取訂單"
+    },
+    {
+      "id": "mops_6727_annual_report_2025_ccl_treater_a6",
+      "locator": "伍、營運概況 二、(二) 2. 市場未來之供需狀況與成長性（p.65）",
+      "quote": "未來銅箔基板（CCL）設備市場將迎來強勁的結構性增長，整體呈現「高階供 不應求、低階競爭激烈」 的雙軌供需狀況，隨著超高層 PCB、ABF 載板及高階 CCL （如 超低損耗 M8/M9 規格）的需求激增，材料大廠與 PCB 龍頭大廠正大幅增加資本支出 並積極擴廠。這使得能提供高精度、高良率的高階濕製程、壓合與曝光設備廠商供 貨面臨吃緊。"
+    },
+    {
+      "id": "mops_6727_annual_report_2025_ccl_treater_a7",
+      "locator": "伍、營運概況 一、(四) 近期發展計畫（p.63）",
+      "quote": "E. 二廠新建完成，自製率可提高並增加產能。"
+    }
+  ]
+}

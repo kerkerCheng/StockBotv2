@@ -1,0 +1,104 @@
+{
+  "claims": [
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：台光電、台燿或其他銅箔基板廠的重訊／年報寫出取消或延後已下單的設備、或同一批設備改向別家採購。核查頻率：每月（MOPS 重訊）＋每年（年報重要契約）。觸發後 48 小時：更正這條 claim，重讀含浸機／壓合機層讀圖的客戶資本承諾段。",
+      "id": "mops_2383_ann_20260701_kitagawa_equipment_cl1",
+      "source_ids": [
+        "mops_2383_ann_20260701_kitagawa_equipment_g1",
+        "mops_2383_ann_20260701_kitagawa_equipment_g2",
+        "mops_2383_ann_20260701_kitagawa_equipment_g3"
+      ],
+      "statement": "Customer-side capital commitment (Elite Material material announcement, 2026-07-01): its Zhongshan subsidiary acquired operating machinery from Kitagawa Seiki in multiple transactions totalling NT$512,853 thousand within one year; the equipment type is not disclosed.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "co:elite_material",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "mops_2383_ann_20260701_kitagawa_equipment_g1",
+        "mops_2383_ann_20260701_kitagawa_equipment_g2",
+        "mops_2383_ann_20260701_kitagawa_equipment_g3"
+      ],
+      "src_id": "co:kitagawa_seiki"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "台光電",
+        "台光電子",
+        "Elite Material"
+      ],
+      "attributes": {
+        "ticker": "2383.TW"
+      },
+      "confidence": 0.9,
+      "id": "co:elite_material",
+      "name": "台光電子材料股份有限公司",
+      "role": null,
+      "source_ids": [
+        "mops_2383_ann_20260701_kitagawa_equipment_g1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "equipment_epitaxy",
+      "aliases": [
+        "北川精機",
+        "北川精機株式会社",
+        "北川精機株式會社",
+        "Kitagawa Seiki"
+      ],
+      "attributes": {
+        "ticker": "6327.T"
+      },
+      "confidence": 0.85,
+      "id": "co:kitagawa_seiki",
+      "name": "Kitagawa Seiki Co.,Ltd.",
+      "role": null,
+      "source_ids": [
+        "mops_2383_ann_20260701_kitagawa_equipment_g3"
+      ],
+      "type": "Company"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "mops_2383_ann_20260701_kitagawa_equipment",
+    "evidence_tier": 1,
+    "origin_entity": "台光電子材料股份有限公司",
+    "permission_basis": "台灣上市公司重大訊息（MOPS 歷史重大訊息查詢 t05st01，發言時間 14:43:06、序號 1）；全文短、只保留研究必要的逐字。published_at 取 MOPS 發言日期 115/07/01。",
+    "published_at": "2026-07-01",
+    "publisher": "公開資訊觀測站（MOPS 重大訊息）",
+    "retrieved_at": "2026-11-11",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "台光電（2383）重大訊息 2026-07-01：代子公司中山台光電子材料公告取得供營業用之機器設備——交易相對人北川精機株式會社、多筆交易、一年內累計新台幣 5.13 億元",
+    "url": "https://mopsov.twse.com.tw/mops/web/t05st01?co_id=2383&spoke_date=20260701&seq_no=1"
+  },
+  "sources": [
+    {
+      "id": "mops_2383_ann_20260701_kitagawa_equipment_g1",
+      "locator": "主旨",
+      "quote": "代子公司中山台光電子材料有限公司公告取得供營業用之機器設備"
+    },
+    {
+      "id": "mops_2383_ann_20260701_kitagawa_equipment_g2",
+      "locator": "說明 5. 交易單位數量、每單位價格及交易總金額",
+      "quote": "交易單位數量：多筆交易 交易總金額：一年內與同一相對人交易金額累計達新台幣512,853仟元"
+    },
+    {
+      "id": "mops_2383_ann_20260701_kitagawa_equipment_g3",
+      "locator": "說明 6. 交易相對人及其與公司之關係",
+      "quote": "交易相對人：北川精機株式會社/與公司之關係：無"
+    }
+  ]
+}

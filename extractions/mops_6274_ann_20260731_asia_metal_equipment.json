@@ -1,0 +1,109 @@
+{
+  "claims": [
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：台光電、台燿或其他銅箔基板廠的重訊／年報寫出取消或延後已下單的設備、或同一批設備改向別家採購。核查頻率：每月（MOPS 重訊）＋每年（年報重要契約）。觸發後 48 小時：更正這條 claim，重讀含浸機／壓合機層讀圖的客戶資本承諾段。",
+      "id": "mops_6274_ann_20260731_asia_metal_equipment_cl1",
+      "source_ids": [
+        "mops_6274_ann_20260731_asia_metal_equipment_u1",
+        "mops_6274_ann_20260731_asia_metal_equipment_u2",
+        "mops_6274_ann_20260731_asia_metal_equipment_u3",
+        "mops_6274_ann_20260731_asia_metal_equipment_u4"
+      ],
+      "statement": "Customer-side capital commitment (Taiwan Union Technology material announcement, 2026-07-31): its Thailand and Zhongshan subsidiaries acquired one batch of operating machinery worth NT$4,152,384 thousand from Asia Metal Industries, an unrelated party, board-approved on 2026-07-29. The equipment type is not disclosed.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "co:taiwan_union_technology",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "mops_6274_ann_20260731_asia_metal_equipment_u1",
+        "mops_6274_ann_20260731_asia_metal_equipment_u3",
+        "mops_6274_ann_20260731_asia_metal_equipment_u4"
+      ],
+      "src_id": "co:asia_metal_industries"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "台燿",
+        "Taiwan Union Technology"
+      ],
+      "attributes": {
+        "ticker": "6274.TWO"
+      },
+      "confidence": 0.9,
+      "id": "co:taiwan_union_technology",
+      "name": "台燿科技股份有限公司",
+      "role": null,
+      "source_ids": [
+        "mops_6274_ann_20260731_asia_metal_equipment_u1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "equipment_epitaxy",
+      "aliases": [
+        "亞泰金屬",
+        "亞泰金屬工業",
+        "亞泰金屬工業股份有限公司",
+        "Asia Metal Industries"
+      ],
+      "attributes": {
+        "ticker": "6727.TWO"
+      },
+      "confidence": 0.85,
+      "id": "co:asia_metal_industries",
+      "name": "Asia Metal Industries, Inc.",
+      "role": null,
+      "source_ids": [
+        "mops_6274_ann_20260731_asia_metal_equipment_u4"
+      ],
+      "type": "Company"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "mops_6274_ann_20260731_asia_metal_equipment",
+    "evidence_tier": 1,
+    "origin_entity": "台燿科技股份有限公司",
+    "permission_basis": "台灣上櫃公司重大訊息（MOPS 歷史重大訊息查詢 t05st01，發言時間 18:58:29、序號 1）；全文短、只保留研究必要的逐字。published_at 取 MOPS 發言日期 115/07/31。",
+    "published_at": "2026-07-31",
+    "publisher": "公開資訊觀測站（MOPS 重大訊息）",
+    "retrieved_at": "2026-11-11",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "台燿（6274）重大訊息 2026-07-31：代重要子公司台燿泰國及台燿中山公告取得供營業用之機器設備——交易相對人亞泰金屬工業、一批、新台幣 41.52 億元；董事會 115/7/29 通過",
+    "url": "https://mopsov.twse.com.tw/mops/web/t05st01?co_id=6274&spoke_date=20260731&seq_no=1"
+  },
+  "sources": [
+    {
+      "id": "mops_6274_ann_20260731_asia_metal_equipment_u1",
+      "locator": "主旨",
+      "quote": "代重要子公司TAIWAN UNION TECHNOLOGY (THAILAND)及 台燿科技(中山)公告取得供營業用之機器設備"
+    },
+    {
+      "id": "mops_6274_ann_20260731_asia_metal_equipment_u2",
+      "locator": "說明 3. 董事會通過日期",
+      "quote": "董事會通過日期: 民國115年7月29日"
+    },
+    {
+      "id": "mops_6274_ann_20260731_asia_metal_equipment_u3",
+      "locator": "說明 5. 交易數量與交易總金額",
+      "quote": "交易數量:一批 交易總金額:新台幣4,152,384仟元"
+    },
+    {
+      "id": "mops_6274_ann_20260731_asia_metal_equipment_u4",
+      "locator": "說明 6. 交易相對人及其與公司之關係",
+      "quote": "交易相對人:亞泰金屬工業股份有限公司 其與公司之關係:無"
+    }
+  ]
+}

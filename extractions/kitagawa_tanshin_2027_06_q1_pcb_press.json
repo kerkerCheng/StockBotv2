@@ -1,0 +1,138 @@
+{
+  "claims": [
+    {
+      "confidence": 0.5,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：北川下一份決算短信寫出 PCB 用壓合機銷售轉弱、受注高或受注殘高下滑。核查頻率：每季（決算短信）。觸發後 48 小時：這條 claim 降 confidence，重讀壓合機層讀圖。",
+      "id": "kitagawa_tanshin_2027_06_q1_pcb_press_cl1",
+      "source_ids": [
+        "kitagawa_tanshin_2027_06_q1_pcb_press_k2",
+        "kitagawa_tanshin_2027_06_q1_pcb_press_k3"
+      ],
+      "statement": "Supplier-side statement (Kitagawa Seiki FY2027/6 Q1 results, 2026-11-06): sales of PCB-related press equipment for overseas customers were strong on AI-related investment, lifting industrial-machinery revenue to ¥3,188 million (+182.1% year on year) and operating profit to ¥480 million (+134.9%); its products are designed to individual specifications, so delivery timing and order sizes vary and large projects take a long time to reach revenue. Self-reported; quarterly revenue is lumpy.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:pcb_lamination_press",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "kitagawa_tanshin_2027_06_q1_pcb_press_k1",
+        "kitagawa_tanshin_2027_06_q1_pcb_press_k2"
+      ],
+      "src_id": "co:kitagawa_seiki"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.6,
+      "dst_id": "tech:pcb_lamination_press",
+      "id": "e2",
+      "relation": "depends_on",
+      "source_ids": [
+        "kitagawa_tanshin_2027_06_q1_pcb_press_k2"
+      ],
+      "src_id": "tech:ai_high_layer_pcb"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "equipment_epitaxy",
+      "aliases": [
+        "北川精機",
+        "北川精機株式会社",
+        "北川精機株式會社",
+        "Kitagawa Seiki"
+      ],
+      "attributes": {
+        "ticker": "6327.T"
+      },
+      "confidence": 0.9,
+      "id": "co:kitagawa_seiki",
+      "name": "Kitagawa Seiki Co.,Ltd.",
+      "role": null,
+      "source_ids": [
+        "kitagawa_tanshin_2027_06_q1_pcb_press_k1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "equipment_epitaxy",
+      "aliases": [
+        "壓合機",
+        "熱壓機",
+        "真空壓合機",
+        "多層板壓合",
+        "压合机",
+        "プレス装置",
+        "lamination press",
+        "vacuum hot press"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:pcb_lamination_press",
+      "name": "Vacuum hot presses for CCL and multilayer PCB lamination",
+      "role": null,
+      "source_ids": [
+        "kitagawa_tanshin_2027_06_q1_pcb_press_k2"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "AI 伺服器主板",
+        "AI 主板",
+        "AI-PCB",
+        "AI PCB",
+        "高階多層板",
+        "高層數 PCB",
+        "高多层板",
+        "交換機板"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:ai_high_layer_pcb",
+      "name": "High-layer-count PCB for AI servers and switches (multilayer / HDI mainboards)",
+      "role": null,
+      "source_ids": [
+        "kitagawa_tanshin_2027_06_q1_pcb_press_k2"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "kitagawa_tanshin_2027_06_q1_pcb_press",
+    "evidence_tier": 1,
+    "origin_entity": "Kitagawa Seiki Co.,Ltd.",
+    "permission_basis": "北川精機官網公開的決算短信（TDnet 同日適時開示）；只保留研究必要的有限逐字節錄。published_at 取決算短信封面日期 2026-11-06。",
+    "published_at": "2026-11-06",
+    "publisher": "北川精機 IR（決算短信）",
+    "retrieved_at": "2026-11-11",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "北川精機（6327）2027 年 6 月期第 1 四半期決算短信（2026-11-06）：AI 關連投資帶動海外 PCB 用壓合機銷售好調，產業機械營收 31.88 億日圓、年增 182.1%、營業利益 +134.9%；主力產品照個別規格設計製造，大型案件到認列要很長時間",
+    "url": "https://kitagawaseiki.co.jp/files/libs/5782/20261106152203390.pdf"
+  },
+  "sources": [
+    {
+      "id": "kitagawa_tanshin_2027_06_q1_pcb_press_k1",
+      "locator": "封面",
+      "quote": "2027年６月期 第１四半期決算短信〔日本基準〕（連結）2026年11月６日上場会社名北川精機株式会社"
+    },
+    {
+      "id": "kitagawa_tanshin_2027_06_q1_pcb_press_k2",
+      "locator": "1. (1) 經營成績說明：產業機械事業（p.2）",
+      "quote": "（産業機械事業）当第１四半期連結累計期間は、AI関連投資を背景に海外向けプリント基板関連プレス装置の販売が好調に推移したことにより、売上高3,188百万円（前年同四半期比182.1％増）、営業利益480百万円（前年同四半期比134.9％増）となりました。"
+    },
+    {
+      "id": "kitagawa_tanshin_2027_06_q1_pcb_press_k3",
+      "locator": "1. (1) 經營成績說明（p.2）",
+      "quote": "当社グループの主要製品は、案件毎に個別の仕様に基づいて設計・製造を行うため、納期・受注金額にバラツキがあり、大型案件になるほど売上までに長期間を要し"
+    }
+  ]
+}
