@@ -1,0 +1,121 @@
+{
+  "claims": [
+    {
+      "confidence": 0.5,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：下一份定期報告或說明資料寫出 PCB 化學品（沉銅、電鍍添加劑）營收轉為年減、或伺服器／資料中心相關需求轉弱；或板廠（客戶端）一手寫出改用別家化學品或自行替代。核查頻率：每季（定期報告、決算說明資料）。觸發後 48 小時：這條 claim 降 confidence，重讀電鍍化學品層讀圖的需求段與供給段。",
+      "id": "jcu_irks_20261105_server_pcb_chemicals_cl1",
+      "source_ids": [
+        "jcu_irks_20261105_server_pcb_chemicals_j2",
+        "jcu_irks_20261105_server_pcb_chemicals_j3",
+        "jcu_irks_20261105_server_pcb_chemicals_j4"
+      ],
+      "statement": "Supplier-side statement (JCU Corporation FY2027/3 Q2 results presentation, 2026-11-05): in China, demand for PCBs and package substrates for high-function devices led by server-related uses was strong and its chemical sales rose sharply year on year; in Taiwan, server-related package-substrate demand was strong and chemical sales rose. Its main electronic chemical, via filling (copper-plating additive for PCBs and package substrates), is described as mainly for smartphones and PCs. Self-reported; no server share disclosed.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "mat:pcb_plating_chemicals",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "jcu_irks_20261105_server_pcb_chemicals_j1",
+        "jcu_irks_20261105_server_pcb_chemicals_j2",
+        "jcu_irks_20261105_server_pcb_chemicals_j4",
+        "jcu_irks_20261105_server_pcb_chemicals_j5"
+      ],
+      "src_id": "co:jcu_corp"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "JCU",
+        "株式会社JCU",
+        "株式会社ＪＣＵ",
+        "JCU Corporation"
+      ],
+      "attributes": {
+        "ticker": "4975.T"
+      },
+      "confidence": 0.9,
+      "id": "co:jcu_corp",
+      "name": "JCU Corporation",
+      "role": null,
+      "source_ids": [
+        "jcu_irks_20261105_server_pcb_chemicals_j1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "電鍍藥水",
+        "沉銅藥水",
+        "電鍍添加劑",
+        "水平沉銅",
+        "电镀添加剂",
+        "沉铜",
+        "功能性湿电子化学品",
+        "めっき薬品",
+        "ビアフィリング",
+        "metallization chemistry",
+        "plating chemicals"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "mat:pcb_plating_chemicals",
+      "name": "PCB metallization and electroplating chemistry (electroless copper / direct metallization, acid copper plating and via-fill additives)",
+      "role": null,
+      "source_ids": [
+        "jcu_irks_20261105_server_pcb_chemicals_j4"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "jcu_irks_20261105_server_pcb_chemicals",
+    "evidence_tier": 1,
+    "origin_entity": "JCU Corporation",
+    "permission_basis": "JCU 官網公開的決算說明資料；只保留研究必要的有限逐字節錄。published_at 取資料封面日期 2026-11-05。",
+    "published_at": "2026-11-05",
+    "publisher": "JCU 公司 IR（決算說明資料）",
+    "retrieved_at": "2026-11-11",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "JCU（4975）2027 年 3 月期第 2 四半期決算說明資料（2026-11-05）：中國的伺服器相關 PCB 與封裝基板需求好、藥品營收年增大幅增加；台灣伺服器相關封裝基板需求好；主力產品 via filling（PCB 與封裝基板用銅電鍍添加劑）",
+    "url": "https://www.jcu-i.com/wp/wp-content/uploads/2026/11/irks_20261105.pdf"
+  },
+  "sources": [
+    {
+      "id": "jcu_irks_20261105_server_pcb_chemicals_j1",
+      "locator": "封面",
+      "quote": "67期・2027年3月期 第2四半期決算説明資料 東証プライム 4975 2026年11月5日（木）"
+    },
+    {
+      "id": "jcu_irks_20261105_server_pcb_chemicals_j2",
+      "locator": "p.2 2027年3月期2Q 業績概況（電子分野）",
+      "quote": "■中国はサーバー関連をはじめとする高機能電子デバイス向けプリント基板及び半導体パッケージ基板の 需要が好調に推移し、薬品売上高は前年同期比で大幅に増加"
+    },
+    {
+      "id": "jcu_irks_20261105_server_pcb_chemicals_j3",
+      "locator": "p.2 2027年3月期2Q 業績概況（電子分野）",
+      "quote": "■台湾はサーバー関連をはじめとする高機能電子デバイス向け半導体パッケージ基板の需要が好調に推移し、 薬品売上高は前年同期比で増加"
+    },
+    {
+      "id": "jcu_irks_20261105_server_pcb_chemicals_j4",
+      "locator": "p.11 電子薬品の主力製品",
+      "quote": "ビアフィリング・・・プリント基板及び半導体パッケージ基板向けの銅めっき用添加剤、主にスマートフォン、PC向け"
+    },
+    {
+      "id": "jcu_irks_20261105_server_pcb_chemicals_j5",
+      "locator": "p.29 薬品用途説明",
+      "quote": "(データセンター等のインフラ) 通信サーバー向けプリント基板 など"
+    }
+  ]
+}

@@ -1,0 +1,165 @@
+{
+  "claims": [
+    {
+      "confidence": 0.55,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：下一份定期報告或說明資料寫出 PCB 化學品（沉銅、電鍍添加劑）營收轉為年減、或伺服器／資料中心相關需求轉弱；或板廠（客戶端）一手寫出改用別家化學品或自行替代。核查頻率：每季（定期報告、決算說明資料）。觸發後 48 小時：這條 claim 降 confidence，重讀電鍍化學品層讀圖的需求段與供給段。",
+      "id": "sec_esi_10k_fy2025_pcb_metallization_cl1",
+      "source_ids": [
+        "sec_esi_10k_fy2025_pcb_metallization_x3",
+        "sec_esi_10k_fy2025_pcb_metallization_x5",
+        "sec_esi_10k_fy2025_pcb_metallization_x6"
+      ],
+      "statement": "Supplier-side statement (Element Solutions FY2025 10-K): Circuitry Solutions, about 29% of Electronics segment 2025 net sales, grew 12% reported and 10% organically, primarily because continued AI and data-centre investment drove demand for metallization solutions; its most significant electronics competitors are MKS Instruments, Qnity Electronics, Henkel, Senju Metal and Uyemura. Self-reported.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "mat:pcb_plating_chemicals",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "sec_esi_10k_fy2025_pcb_metallization_x1",
+        "sec_esi_10k_fy2025_pcb_metallization_x2",
+        "sec_esi_10k_fy2025_pcb_metallization_x4"
+      ],
+      "src_id": "co:element_solutions"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.6,
+      "dst_id": "mat:pcb_plating_chemicals",
+      "id": "e2",
+      "relation": "depends_on",
+      "source_ids": [
+        "sec_esi_10k_fy2025_pcb_metallization_x4",
+        "sec_esi_10k_fy2025_pcb_metallization_x5"
+      ],
+      "src_id": "tech:ai_high_layer_pcb"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "Element Solutions",
+        "MacDermid",
+        "MacDermid Alpha",
+        "麦德美乐思"
+      ],
+      "attributes": {
+        "ticker": "ESI"
+      },
+      "confidence": 0.9,
+      "id": "co:element_solutions",
+      "name": "Element Solutions Inc",
+      "role": null,
+      "source_ids": [
+        "sec_esi_10k_fy2025_pcb_metallization_x1",
+        "sec_esi_10k_fy2025_pcb_metallization_x7"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "電鍍藥水",
+        "沉銅藥水",
+        "電鍍添加劑",
+        "水平沉銅",
+        "电镀添加剂",
+        "沉铜",
+        "功能性湿电子化学品",
+        "めっき薬品",
+        "ビアフィリング",
+        "metallization chemistry",
+        "plating chemicals"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "mat:pcb_plating_chemicals",
+      "name": "PCB metallization and electroplating chemistry (electroless copper / direct metallization, acid copper plating and via-fill additives)",
+      "role": null,
+      "source_ids": [
+        "sec_esi_10k_fy2025_pcb_metallization_x4"
+      ],
+      "type": "Material"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "AI 伺服器主板",
+        "AI 主板",
+        "AI-PCB",
+        "AI PCB",
+        "高階多層板",
+        "高層數 PCB",
+        "高多层板",
+        "交換機板"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:ai_high_layer_pcb",
+      "name": "High-layer-count PCB for AI servers and switches (multilayer / HDI mainboards)",
+      "role": null,
+      "source_ids": [
+        "sec_esi_10k_fy2025_pcb_metallization_x5"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "sec_esi_10k_fy2025_pcb_metallization",
+    "evidence_tier": 1,
+    "origin_entity": "Element Solutions Inc",
+    "permission_basis": "SEC EDGAR 公開的年度報告；只保留研究必要的有限逐字節錄。published_at 取 EDGAR filed date 2026-02-18。",
+    "published_at": "2026-02-18",
+    "publisher": "SEC EDGAR",
+    "retrieved_at": "2026-11-11",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Element Solutions（ESI）2025 年度 10-K：電子部門的 Circuitry Solutions（約占部門 2025 營收 29%）做 PCB 濕製程化學品；通孔金屬化產品；2025 年 Circuitry Solutions 有機成長 10%，主因 AI 與資料中心投資帶動金屬化解決方案需求；具名競爭者 MKS、Qnity、Henkel、千住、上村",
+    "url": "https://www.sec.gov/Archives/edgar/data/1590714/000159071426000018/esi-20251231.htm"
+  },
+  "sources": [
+    {
+      "id": "sec_esi_10k_fy2025_pcb_metallization_x1",
+      "locator": "封面",
+      "quote": "Element Solutions Inc"
+    },
+    {
+      "id": "sec_esi_10k_fy2025_pcb_metallization_x2",
+      "locator": "Item 1. Business — Electronics（p.2）",
+      "quote": "Our Electronics segment researches, formulates and sells specialty chemicals and material process technologies for all types of electronics hardware, from complex printed circuit board designs to advanced semiconductor packaging."
+    },
+    {
+      "id": "sec_esi_10k_fy2025_pcb_metallization_x3",
+      "locator": "Item 1. Business — Electronics（p.2）",
+      "quote": "Circuitry Solutions - representing approximately 29% of the segment's 2025 net sales."
+    },
+    {
+      "id": "sec_esi_10k_fy2025_pcb_metallization_x4",
+      "locator": "Item 1. Business — Circuitry Solutions（p.3）",
+      "quote": "Circuit board metallization products are used to plate holes drilled through printed circuit boards to connect opposite sides of the board and multi-layered printed circuit boards."
+    },
+    {
+      "id": "sec_esi_10k_fy2025_pcb_metallization_x5",
+      "locator": "Item 7. MD&A — Electronics net sales（p.31）",
+      "quote": "The increase in organic net sales was primarily due to continued AI and data center investment driving demand for metallization solutions."
+    },
+    {
+      "id": "sec_esi_10k_fy2025_pcb_metallization_x6",
+      "locator": "Item 1. Business — Competitive Environment（p.8）",
+      "quote": "our most significant competitors are MKS Instruments, Qnity Electronics, Inc., Henkel Corporation, Senju Metal Industry Co. and Uyemura International."
+    },
+    {
+      "id": "sec_esi_10k_fy2025_pcb_metallization_x7",
+      "locator": "Glossary（名詞定義表：Electronics）",
+      "quote": "Element Solutions' MacDermid Alpha Electronics Solutions business segment."
+    }
+  ]
+}
