@@ -44,3 +44,25 @@ NOTE: 第三方轉錄（tier 2）；講者是 Amkor 執行長 Kevin Engel、財�
 【問答：2027 年資本支出與要不要再借錢】
 "So just to recap there, we have the Arizona facility, we gave a framework that '27 could be up to 15% of that $12 billion in '27. And then for Korea in the range of $400 million to $450 million. And then Vietnam, $50 million. So altogether, those are higher than $2 billion just around those programs."
 "So I would say it's still too early to tell whether we would need incremental debt within '28 and beyond. But I would say the balance sheet positioning is solid through 2027."
+
+補抽（2026-11-13，逐句核對；同一份 Motley Fool 轉錄全文，本機抓取、逐字）
+
+【問答：資產可移轉的下一句（執行長，同一段答覆）】
+"Obviously, the scale that we're working with this customer is hard to offset. But I'd say, regardless, the technology is very fungible to different customers."
+
+【財務長：第四季手機平板與消費】
+"We expect these conditions to continue in the fourth quarter and for Communications revenue to decline high single digits sequentially."
+
+【財務長：第四季消費】
+"We expect these shortages to continue in the fourth quarter with Consumer revenue declining more than seasonal into the mid-teens percent sequentially."
+
+【問答：2027 年資本支出是廠房（財務長）】
+"we are proceeding with some programs that Kevin outlined that are going to step up CapEx, specifically around facilities."
+
+【同上：設備另計】
+"As it relates to equipment, we do anticipate further expansion on the equipment side."
+
+【問答：擴產靠預付、要不要新增借款（KeyBanc 分析師問、財務長答）】
+"As you think about CapEx timing versus these payments arrangements, can you manage this build-out without incremental debt? Or is it too early to tell? Megan Faust: Thanks, Steve. So with what we have outlined, we are -- obviously, there's going to be significant support in '27. So that even pushes through '28, where there may not even need to be incremental debt at that point."
+
+補記（2026-11-13）：上面 NOTE ② 的「2.5D 還不在第三季的數字裡」是過度讀法——原文只說兩個新的 2.5D 程式「are expected to come online in Q4」，問答裡執行長說「I think we have programs going on in the xPU, networking programs and things like switches. Those are 2.5D type programs.」；NOTE ⑥ 的「主要瓶頸之一」原文是「one of the key bottlenecks」。

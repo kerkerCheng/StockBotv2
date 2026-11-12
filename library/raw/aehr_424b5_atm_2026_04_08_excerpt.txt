@@ -1,0 +1,15 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1040470/000165495426003353/aehr_424b5.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Aehr Test Systems Form 424B5 prospectus supplement（at-the-market 增資）
+DATE: 2026-04-08
+RETRIEVED: 2026-11-13（EDGAR 原文 HTML 本機去標籤、空白正規化後逐字切出）
+NOTE: 發行人申報；金額是上限（up to），實際賣多少看之後的定期報告。
+
+The date of this prospectus supplement is April 8, 2026
+
+We have entered into an Equity Distribution Agreement, or Sales Agreement, with William Blair & Company, L.L.C., or William Blair, and Craig-Hallum Capital Group LLC, or Craig-Hallum, dated April 8, 2026, relating to the sale of shares of our common stock offered by this prospectus supplement and the accompanying prospectus.
+
+In accordance with the terms of the Sales Agreement, under this prospectus supplement and the accompanying prospectus, we may offer and sell shares of our common stock having an aggregate offering price of up to $60,000,000 from time to time through William Blair and Craig-Hallum, each an agent and, collectively, agents.
+
+Sales of our common stock, if any, under this prospectus supplement and the accompanying prospectus will be made in sales deemed to be an “at the market” equity offering as defined in Rule 415 promulgated under the Securities Act of 1933, as amended, or the Securities Act.

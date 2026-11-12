@@ -1,0 +1,15 @@
+[EXCERPT — 有限逐字引文] Arbe Robotics Ltd. Form 20-F（FY2025，2026-03-27）：中國競爭者、可轉債託管款釋出條件
+
+Source: https://www.sec.gov/Archives/edgar/data/1861841/000121390026035653/ea0283041-20f_arbe.htm
+PUBLISHED: 2026-03-27（EDGAR 20-F，accession 0001213900-26-035653）
+RETRIEVED: 2026-11-13（本機抓 HTML 轉文字、空白正規化，逐字；UA 不帶個人資訊）
+NOTE: 發行人申報。補 arbe_20f_fy2025_short_check_excerpt.txt（圖的來源檔，不附加）沒收到的兩段。條件是「upon and subject to satisfaction of the following release conditions」——三條都要滿足，轉股的部分另外先釋出。
+
+【Item 4 Business — Competition（中國）】
+There are also competitors that are more centered around China like Huawei and Caltera.
+
+【Risk Factors — 可轉債託管款釋出條件】
+The proceeds from the sale of bonds were placed in an escrow account, and will be released to the Company upon and subject to satisfaction of the following release conditions or earlier upon conversion of the bonds: ● We win a tender or contract to supply our products as a single supplier of chips of imaging radar (directly or through one of the international Tier 1 manufacturers) to one of ten named major automobile manufactures. ● The average closing trading price of our ordinary shares on Nasdaq is not less than $3.10 per share during 30 consecutive trading days, and the average combined trading volume on Nasdaq and TASE during such 30 trading days is at least 300,000 shares per day. ● The closing price of our ordinary shares on Nasdaq on the date we present to the Trustee the documentation confirming the fulfillment of the above-mentioned conditions precedent, is not less than $3.10. The above release conditions were originally to be satisfied by March 31, 2025, but following an extension dated March 20, 2025 and a second extension dated December 22, 2025, which were approved by the holders of a majority of the outstanding principal amount of bonds, we have until December 31, 2026 to meet the conditions.
+
+【Risk Factors — 條件沒達成的後果】
+If we do not meet the release conditions by December 31, 2026, we will be required to effect an early redemption of the remaining bonds which will result in the use of the funds in the escrow account to pay the bonds and we will be required to pay to the Trustee such additional amounts as are required to pay the interest and any payment due as a result of the differential in the exchange rate.

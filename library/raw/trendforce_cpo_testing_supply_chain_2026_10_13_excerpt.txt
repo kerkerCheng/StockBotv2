@@ -41,3 +41,5 @@ Source: https://www.trendforce.com.tw/insights/cpo-testing-market-opportunities�
 
 【致茂燒機是元件級】
 致茂為全球 SLT 設備龍頭，其光電二極體燒機及可靠度測試系統 Model 58604/58604-C/58606 系列針對 3D Sensing、LD、PD、modulator 等 PIC 元件的可靠度測試。
+
+補記（2026-11-13，逐句核對）：重抓兩份原文全文（10-13 英文新聞稿、07-20 繁中 insight）核過——兩份都沒有出現 Aehr，也沒有「晶圓級燒機」這一段；燒機只寫到致茂（新聞稿「Chroma has capabilities in automated testing and burn-in testing」、insight 的 58604 系列是 PIC 元件的燒機與可靠度測試）。上面 NOTE 的「晶圓級燒機除了 Aehr 沒有第二個名字」是圖上的狀態，不是 TrendForce 寫的。

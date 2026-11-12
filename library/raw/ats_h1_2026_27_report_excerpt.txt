@@ -21,3 +21,9 @@ p.22（Investment projects）："The investments required for this amount to €
 p.8（Outlook）："AT&S is currently expanding its capacity in the Microelectronics business unit and expects this to have a positive impact on revenue and earnings already in the current fiscal year."
 
 註：半年報沒有寫客戶名字的營收占比、沒有 backlog 數字、也沒有可轉債的轉換價格（轉換價見 library/raw/ats_hybrid_convertible_conversion_price_eqs_2026_06_16.txt）。
+
+補抽（2026-11-13，逐句核對）：以下對本機 PDF 原檔逐字核過（只修斷行與抽字的多餘空格）
+p.2（Outlook）："Outlook confirmed: currency-adjusted revenue growth of 45–55% and EBITDA margin of 32–37%"
+p.8（Outlook）："AT&S confirms the outlook for the financial year 2026/27 with constant-currency revenue growth of 45 to 55% compared to the previous year. The expected EBITDA margin of 32 to 37% means another significant increase in profitability."
+p.7（現金）："Cash and cash equivalents amounted to € 826.8 million (March 31, 2026: € 738.5 million)."
+p.7（2026-09-30 淨負債／EBITDA）："The theoretical repayment period for debts, defined as net debt/EBITDA, of 2.0 years was lower than in the previous year (2.2 years)."
