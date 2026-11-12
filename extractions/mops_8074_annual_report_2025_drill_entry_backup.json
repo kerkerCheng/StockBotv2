@@ -1,0 +1,149 @@
+{
+  "claims": [
+    {
+      "confidence": 0.5,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：鉅橡月營收或年報顯示墊板營收轉為年減、或高階載板客戶改用他家；或柳鑫等對手的一手資料寫出在台灣高階載板鑽孔取得份額。核查頻率：每月（月營收）＋每年（年報）。觸發後 48 小時：這條 claim 降 confidence，重讀蓋墊板層讀圖。",
+      "id": "mops_8074_annual_report_2025_drill_entry_backup_cl1",
+      "source_ids": [
+        "mops_8074_annual_report_2025_drill_entry_backup_a2",
+        "mops_8074_annual_report_2025_drill_entry_backup_a4",
+        "mops_8074_annual_report_2025_drill_entry_backup_a5",
+        "mops_8074_annual_report_2025_drill_entry_backup_a6",
+        "mops_8074_annual_report_2025_drill_entry_backup_a8",
+        "mops_8074_annual_report_2025_drill_entry_backup_a10"
+      ],
+      "statement": "Aurona Industries' FY2025 annual report (self-reported): backup boards were 55.57% of 2025 revenue of NT$1.313 billion (phenolic boards 18.84%, other 25.59%); its main revenue is entry and backup boards for PCB / FPC drilling and backup boards for CCL cutting; revenue was NT$1.387, 1.374, 1.135, 1.258 and 1.313 billion in 2021-2025; no customer reached 10% of sales; it calls itself Taiwan's largest phenolic-resin laminate maker with no competitor yet in substrate, HDI and high-frequency applications, and says demand for high-end substrates (ABF, BT) is growing steadily with AI and HPC.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "mat:pcb_drill_entry_backup_board",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "mops_8074_annual_report_2025_drill_entry_backup_a1",
+        "mops_8074_annual_report_2025_drill_entry_backup_a2",
+        "mops_8074_annual_report_2025_drill_entry_backup_a3",
+        "mops_8074_annual_report_2025_drill_entry_backup_a7"
+      ],
+      "src_id": "co:aurona_industries"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "鉅橡",
+        "鉅橡企業",
+        "鉅橡企業股份有限公司",
+        "钜橡企业",
+        "钜橡企业股份有限公司",
+        "Aurona"
+      ],
+      "attributes": {
+        "ticker": "8074.TWO"
+      },
+      "confidence": 0.9,
+      "id": "co:aurona_industries",
+      "name": "Aurona Industries, Inc.",
+      "role": null,
+      "source_ids": [
+        "mops_8074_annual_report_2025_drill_entry_backup_a1",
+        "mops_8074_annual_report_2025_drill_entry_backup_a2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "鑽孔蓋板",
+        "鑽孔墊板",
+        "蓋墊板",
+        "鋁蓋板",
+        "下墊板",
+        "钻孔盖板",
+        "钻孔垫板",
+        "盖垫板",
+        "铝基盖板",
+        "PCB entry board",
+        "PCB backup board",
+        "drill entry sheet",
+        "エントリーシート"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "mat:pcb_drill_entry_backup_board",
+      "name": "PCB drilling entry and backup boards (aluminum / lubricated entry sheets, phenolic and wood-fiber backup boards)",
+      "role": null,
+      "source_ids": [
+        "mops_8074_annual_report_2025_drill_entry_backup_a3"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "mops_8074_annual_report_2025_drill_entry_backup",
+    "evidence_tier": 1,
+    "origin_entity": "Aurona Industries, Inc.",
+    "permission_basis": "公開資訊觀測站公開年報；只保留研究必要的有限逐字節錄。published_at 取 MOPS 上傳時間 115/04/08 14:49:00。",
+    "published_at": "2026-04-08",
+    "publisher": "公開資訊觀測站（股東會年報）",
+    "retrieved_at": "2026-11-11",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "鉅橡企業（8074）中華民國 114 年度年報：PCB／FPCB 鑽孔用上蓋板、下墊板與 CCL 裁切墊板——墊板占 2025 營收 55.57%；營收 2021–2025 在 11.35～13.87 億元之間（2025 年 13.13 億元）；自述國內最大酚醛樹脂積層板廠、高階應用無競爭對手；沒有單一客戶超過一成",
+    "url": "https://doc.twse.com.tw/server-java/t57sb01?step=9&kind=F&co_id=8074&filename=2025_8074_20260429F04.pdf"
+  },
+  "sources": [
+    {
+      "id": "mops_8074_annual_report_2025_drill_entry_backup_a1",
+      "locator": "封面",
+      "quote": "鉅橡企業股份有限公司 114 年度年報"
+    },
+    {
+      "id": "mops_8074_annual_report_2025_drill_entry_backup_a2",
+      "locator": "肆、營運概況 一、(一) 2. 114 年度主要產品之營業比重（p.45）",
+      "quote": "主要銷售之產品 營 業 比 重 墊 板 55.57 % 電 木 板 18.84 % 其 他 25.59 % 合 計 100.00 %"
+    },
+    {
+      "id": "mops_8074_annual_report_2025_drill_entry_backup_a3",
+      "locator": "肆、營運概況 一、(二) 1. 產業之現況與發展（p.45）",
+      "quote": "本公司目前主要營收為印刷電路板 (PCB)及軟性印刷電路板(FPCB)鑽孔制程用之上 蓋板，下墊板及銅箔基板(CCL)切割使用之墊板輔材"
+    },
+    {
+      "id": "mops_8074_annual_report_2025_drill_entry_backup_a4",
+      "locator": "肆、營運概況 二、(一) 3. 市場未來之供需狀況與成長性（p.49）",
+      "quote": "本公司為國內最大之酚醛樹脂積層板製造廠。載板、HDI、高頻板等高階應用仍 無競爭對手 。"
+    },
+    {
+      "id": "mops_8074_annual_report_2025_drill_entry_backup_a5",
+      "locator": "肆、營運概況 一、(三) 1. 最近五年度之研發費用（營業收入淨額，110～114 年，新台幣仟元）（p.47）",
+      "quote": "營業收入淨額 1,386,964 1,373,883 1,135,440 1,257,567 1,312,936"
+    },
+    {
+      "id": "mops_8074_annual_report_2025_drill_entry_backup_a6",
+      "locator": "肆、營運概況 二、(四) 2. 最近二年度主要銷貨客戶資料（113、114 年度，新台幣仟元）（p.52）",
+      "quote": "1 其他 1,257,567 100 無 其他 1,312,936 100 無"
+    },
+    {
+      "id": "mops_8074_annual_report_2025_drill_entry_backup_a7",
+      "locator": "肆、營運概況 二、(一) 2. 市場占有率（p.49）",
+      "quote": "已是知名的 PCB 鑽孔應用的蓋墊板供 應商。"
+    },
+    {
+      "id": "mops_8074_annual_report_2025_drill_entry_backup_a8",
+      "locator": "壹、致股東報告書 二、(三) 2. 行銷政策（p.3）",
+      "quote": "隨著AI、HPC 等高階產品的需求逐漸提升 ， 在高階載板的需求(例:ABF， BT 載板等)也相對穩定的成長 。"
+    },
+    {
+      "id": "mops_8074_annual_report_2025_drill_entry_backup_a10",
+      "locator": "肆、營運概況 二、(四) 2. 主要銷貨客戶資料 · 增減原因（p.52）",
+      "quote": "增減原因：114 年合併營收增加，係因受惠兩岸 PCB 材料出貨成長。"
+    }
+  ]
+}

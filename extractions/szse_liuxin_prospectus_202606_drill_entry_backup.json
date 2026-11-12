@@ -1,0 +1,353 @@
+{
+  "claims": [
+    {
+      "confidence": 0.5,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：柳鑫的更新招股書或問詢回覆顯示 2026 年蓋墊板銷量或高性能產品占比轉為年減，或 CPCA 排名不再第一；或對手（鉅橡、LCOA、利昌）的一手資料寫出高階蓋墊板放量。核查頻率：每季（深交所審核文件）＋每月（鉅橡月營收）。觸發後 48 小時：這條 claim 降 confidence，重讀蓋墊板層讀圖。",
+      "id": "szse_liuxin_prospectus_202606_drill_entry_backup_cl1",
+      "source_ids": [
+        "szse_liuxin_prospectus_202606_drill_entry_backup_l5",
+        "szse_liuxin_prospectus_202606_drill_entry_backup_l10",
+        "szse_liuxin_prospectus_202606_drill_entry_backup_l11",
+        "szse_liuxin_prospectus_202606_drill_entry_backup_l12",
+        "szse_liuxin_prospectus_202606_drill_entry_backup_l13",
+        "szse_liuxin_prospectus_202606_drill_entry_backup_l14",
+        "szse_liuxin_prospectus_202606_drill_entry_backup_l16",
+        "szse_liuxin_prospectus_202606_drill_entry_backup_l17",
+        "szse_liuxin_prospectus_202606_drill_entry_backup_l22"
+      ],
+      "statement": "Supplier-side statement (Shenzhen Newccess / Liuxin ChiNext IPO prospectus, draft accepted 2026-06-12): citing CPCA, it says it has been the largest maker of PCB drilling entry and backup boards with the No.1 global share in 2023-2025; it names LCOA (US), Risho Kogyo (Japan), Aurona Industries (Taiwan) and Guangdong Zhongchen as the other main players and says overall concentration is not high, with many small low-end makers. Revenue rose from RMB 791 million (2023) to RMB 1,144 million (2025), a 20.25% CAGR; sales volume of its PCB functional materials rose 16.29% (2024) and 10.53% (2025) while the average price rose 6.17% and 8.67%, which it attributes to a higher share of pricier products for AI and other high-end uses; utilization of resin-processed capacity was 58.00%, 76.98% and 89.50% (2023-2025); gross margin was 20.82%, 26.13% and 30.18% overall and 30.46%, 37.25% and 39.64% for high-performance products. Self-reported, dated figures.",
+      "subject_id": "e1"
+    },
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：柳鑫更新的招股書或問詢回覆顯示滬電不再是前五大客戶或占比明顯下滑；或滬電的一手資料寫出改用其他蓋墊板供應商。核查頻率：每季（深交所審核文件）＋每年（滬電年報）。觸發後 48 小時：更正這條 claim。",
+      "id": "szse_liuxin_prospectus_202606_drill_entry_backup_cl2",
+      "source_ids": [
+        "szse_liuxin_prospectus_202606_drill_entry_backup_l6",
+        "szse_liuxin_prospectus_202606_drill_entry_backup_l7",
+        "szse_liuxin_prospectus_202606_drill_entry_backup_l8",
+        "szse_liuxin_prospectus_202606_drill_entry_backup_l9"
+      ],
+      "statement": "Supplier-reported customer sales (Liuxin IPO prospectus, audited figures): WUS Printed Circuit (Hudian, 002463.SZ) was its largest customer, RMB 237.17 million or 21.02% of 2025 main-business revenue (14.44% in 2023, 18.72% in 2024); the 2025 top five (WUS, Shengyi group, Shennan Circuits, TTM, Compeq) were 46.38% of main-business revenue, up from 36.22% in 2023.",
+      "subject_id": "e3"
+    },
+    {
+      "confidence": 0.55,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：柳鑫更新的招股書或問詢回覆顯示 TTM 跌出前五大客戶；或 TTM 的一手資料寫出改用其他蓋墊板供應商。核查頻率：每季（深交所審核文件）＋每年（TTM 10-K）。觸發後 48 小時：更正這條 claim。",
+      "id": "szse_liuxin_prospectus_202606_drill_entry_backup_cl3",
+      "source_ids": [
+        "szse_liuxin_prospectus_202606_drill_entry_backup_l6",
+        "szse_liuxin_prospectus_202606_drill_entry_backup_l7",
+        "szse_liuxin_prospectus_202606_drill_entry_backup_l8",
+        "szse_liuxin_prospectus_202606_drill_entry_backup_l18"
+      ],
+      "statement": "Supplier-reported customer sales (Liuxin IPO prospectus, audited figures): TTM Technologies was its No.4 customer in 2025, RMB 43.19 million or 3.83% of main-business revenue.",
+      "subject_id": "e4"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "mat:pcb_drill_entry_backup_board",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "szse_liuxin_prospectus_202606_drill_entry_backup_l1",
+        "szse_liuxin_prospectus_202606_drill_entry_backup_l2",
+        "szse_liuxin_prospectus_202606_drill_entry_backup_l3",
+        "szse_liuxin_prospectus_202606_drill_entry_backup_l4",
+        "szse_liuxin_prospectus_202606_drill_entry_backup_l5"
+      ],
+      "src_id": "co:shenzhen_liuxin"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.55,
+      "dst_id": "mat:pcb_drill_entry_backup_board",
+      "id": "e2",
+      "relation": "depends_on",
+      "source_ids": [
+        "szse_liuxin_prospectus_202606_drill_entry_backup_l11",
+        "szse_liuxin_prospectus_202606_drill_entry_backup_l15"
+      ],
+      "src_id": "tech:ai_high_layer_pcb"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "co:wus_printed_circuit",
+      "id": "e3",
+      "relation": "supplies_to",
+      "source_ids": [
+        "szse_liuxin_prospectus_202606_drill_entry_backup_l6",
+        "szse_liuxin_prospectus_202606_drill_entry_backup_l7",
+        "szse_liuxin_prospectus_202606_drill_entry_backup_l8",
+        "szse_liuxin_prospectus_202606_drill_entry_backup_l9",
+        "szse_liuxin_prospectus_202606_drill_entry_backup_l19"
+      ],
+      "src_id": "co:shenzhen_liuxin"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "co:ttm",
+      "id": "e4",
+      "relation": "supplies_to",
+      "source_ids": [
+        "szse_liuxin_prospectus_202606_drill_entry_backup_l6",
+        "szse_liuxin_prospectus_202606_drill_entry_backup_l7",
+        "szse_liuxin_prospectus_202606_drill_entry_backup_l8",
+        "szse_liuxin_prospectus_202606_drill_entry_backup_l18"
+      ],
+      "src_id": "co:shenzhen_liuxin"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "柳鑫",
+        "柳鑫股份",
+        "柳鑫实业",
+        "柳鑫實業",
+        "深圳市柳鑫实业股份有限公司",
+        "Newccess"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:shenzhen_liuxin",
+      "name": "Shenzhen Newccess Industrial Co., Ltd.",
+      "role": null,
+      "source_ids": [
+        "szse_liuxin_prospectus_202606_drill_entry_backup_l1",
+        "szse_liuxin_prospectus_202606_drill_entry_backup_l2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "鑽孔蓋板",
+        "鑽孔墊板",
+        "蓋墊板",
+        "鋁蓋板",
+        "下墊板",
+        "钻孔盖板",
+        "钻孔垫板",
+        "盖垫板",
+        "铝基盖板",
+        "PCB entry board",
+        "PCB backup board",
+        "drill entry sheet",
+        "エントリーシート"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "mat:pcb_drill_entry_backup_board",
+      "name": "PCB drilling entry and backup boards (aluminum / lubricated entry sheets, phenolic and wood-fiber backup boards)",
+      "role": null,
+      "source_ids": [
+        "szse_liuxin_prospectus_202606_drill_entry_backup_l3",
+        "szse_liuxin_prospectus_202606_drill_entry_backup_l4"
+      ],
+      "type": "Material"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "AI 伺服器主板",
+        "AI 主板",
+        "AI-PCB",
+        "AI PCB",
+        "高階多層板",
+        "高層數 PCB",
+        "高多层板",
+        "交換機板"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "tech:ai_high_layer_pcb",
+      "name": "High-layer-count PCB for AI servers and switches (multilayer / HDI mainboards)",
+      "role": null,
+      "source_ids": [
+        "szse_liuxin_prospectus_202606_drill_entry_backup_l15"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "沪电股份",
+        "滬電",
+        "沪士电子",
+        "WUS"
+      ],
+      "attributes": {
+        "ticker": "002463.SZ"
+      },
+      "confidence": 0.9,
+      "id": "co:wus_printed_circuit",
+      "name": "沪士电子股份有限公司",
+      "role": null,
+      "source_ids": [
+        "szse_liuxin_prospectus_202606_drill_entry_backup_l6",
+        "szse_liuxin_prospectus_202606_drill_entry_backup_l19"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "TTM Technologies",
+        "TTM Technologies, Inc."
+      ],
+      "attributes": {
+        "ticker": "TTMI"
+      },
+      "confidence": 0.9,
+      "id": "co:ttm",
+      "name": "TTM Technologies, Inc.",
+      "role": null,
+      "source_ids": [
+        "szse_liuxin_prospectus_202606_drill_entry_backup_l6",
+        "szse_liuxin_prospectus_202606_drill_entry_backup_l18"
+      ],
+      "type": "Company"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "szse_liuxin_prospectus_202606_drill_entry_backup",
+    "evidence_tier": 1,
+    "origin_entity": "Shenzhen Newccess Industrial Co., Ltd.",
+    "permission_basis": "深交所創業板發行上市審核資訊公開網站公開的招股說明書（申報稿）；只保留研究必要的有限逐字節錄。published_at 取受理日 2026-06-12：披露檔 HTTP Last-Modified 為 2026-06-12 11:35:15 GMT（北京時間 19:35）。",
+    "published_at": "2026-06-12",
+    "publisher": "深圳證券交易所（創業板發行上市審核資訊公開）",
+    "retrieved_at": "2026-11-11",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "柳鑫股份（深圳市柳鑫实业股份有限公司）創業板 IPO 招股說明書（申報稿，2026-06）：PCB 鑽孔蓋墊板——自述 2023–2025 全球蓋墊板市占第一（引 CPCA）；2025 主營前五大客戶滬電 21.02%、生益 9.90%、深南 8.27%、TTM 3.83%、華通 3.37%；銷量 2025 年增 10.53%、均價年增 8.67%",
+    "url": "http://reportdocs.static.szse.cn/UpFiles/rasinfodisc1/202606/RAS_202606_1219352927C3AAAB7342CC9176A162599358AE.pdf"
+  },
+  "sources": [
+    {
+      "id": "szse_liuxin_prospectus_202606_drill_entry_backup_l1",
+      "locator": "第四節 发行人基本情况 一、发行人概况（p.1-1-34）",
+      "quote": "深圳市柳鑫实业股份有限公司 SHENZHEN NEWCCESS INDUSTRIAL CO., LTD."
+    },
+    {
+      "id": "szse_liuxin_prospectus_202606_drill_entry_backup_l2",
+      "locator": "第二節 概览 · 主营业务（p.1-1-21）",
+      "quote": "产品 主要应用于 PCB 精密钻孔制程等领域，下游客户主要为 PCB 制造企业。"
+    },
+    {
+      "id": "szse_liuxin_prospectus_202606_drill_entry_backup_l3",
+      "locator": "释义 二、专业术语「盖板」（p.1-1-14）",
+      "quote": "放于待加工 PCB 上表面、最先与钻针接触的板状复合材料"
+    },
+    {
+      "id": "szse_liuxin_prospectus_202606_drill_entry_backup_l4",
+      "locator": "第五節 业务与技术 · 主要产品「垫板」（p.1-1-91）",
+      "quote": "“垫板”是 PCB 在钻孔加工时垫在待加工的 PCB 下表面的复合材料。"
+    },
+    {
+      "id": "szse_liuxin_prospectus_202606_drill_entry_backup_l5",
+      "locator": "致投资者的声明（p.1-1-2；第五節「发行人市场地位」p.1-1-117 同句）",
+      "quote": "根据 CPCA 数据，公司目前是 PCB 功能材料中盖垫板细分领域规模最大的 企业，2023 年-2025 年公司在全球 PCB 盖垫板领域市场份额连续排名第一。"
+    },
+    {
+      "id": "szse_liuxin_prospectus_202606_drill_entry_backup_l6",
+      "locator": "第五節 三、（二）主要客户情况 · 2025 年度前五大客户（p.1-1-123）",
+      "quote": "2025 年度 1 沪电股份（002463.SZ） 2 生益集团 3 深南电路（002916.SZ） 4 迅达科技（TTMI.O） 5 华通电脑（2313.TW） 合计"
+    },
+    {
+      "id": "szse_liuxin_prospectus_202606_drill_entry_backup_l7",
+      "locator": "第五節 三、（二）主要客户情况 · 2025 年度销售金额（万元；依序为前五名与合计）（p.1-1-123）",
+      "quote": "23,716.57 11,167.82 9,337.03 4,319.35 3,803.92 52,344.69"
+    },
+    {
+      "id": "szse_liuxin_prospectus_202606_drill_entry_backup_l8",
+      "locator": "第五節 三、（二）主要客户情况 · 2025 年度占当期主营业务收入比例（依序为前五名与合计）（p.1-1-123）",
+      "quote": "21.02% 9.90% 8.27% 3.83% 3.37% 46.38%"
+    },
+    {
+      "id": "szse_liuxin_prospectus_202606_drill_entry_backup_l9",
+      "locator": "重大事项提示 · 客户集中度较高的风险（p.1-1-17）",
+      "quote": "前五名客 户合计收入占主营业务收入比例分别为 36.22%、39.50%和 46.38%，其中对沪电 股份单一客户的销售收入占主营业务收入比例分别为 14.44%、18.72%和 21.02%。"
+    },
+    {
+      "id": "szse_liuxin_prospectus_202606_drill_entry_backup_l10",
+      "locator": "第六節 八、（二）3. 主要产品的量价分析（p.1-1-165）",
+      "quote": "报告期内，公司 PCB 功能材料呈现量价齐升趋势，2024 年和 2025 年，销售 数量同比增加 16.29%和 10.53%，均价同比提高 6.17%和 8.67%。"
+    },
+    {
+      "id": "szse_liuxin_prospectus_202606_drill_entry_backup_l11",
+      "locator": "第五節 三、（一）3. 产品销售价格变动分析（p.1-1-123）",
+      "quote": "报告期内，公司应用于 AI 等高端领域的产品需求快速增长，导致价格较高 的产品型号占比有所提高，进而拉高了整体均价。"
+    },
+    {
+      "id": "szse_liuxin_prospectus_202606_drill_entry_backup_l12",
+      "locator": "第五節 三、（一）产能、产量和销量（产量、销量（万平方米）、产能利用率、产销率；依序 2025／2024／2023 年度；仅含需树脂合成改性的产品）（p.1-1-123）",
+      "quote": "3,922.04 4,022.88 89.50% 102.57% 3,165.04 2,950.74 76.98% 93.23% 2,381.75 2,282.56 58.00% 95.84%"
+    },
+    {
+      "id": "szse_liuxin_prospectus_202606_drill_entry_backup_l13",
+      "locator": "第五節 二、（六）1. 竞争格局及行业内主要企业（p.1-1-117）",
+      "quote": "行业内其他 企业主要有美国 Laminating Company of America（LCOA）公司、日本利昌工业 株式会社、中国台湾的钜橡企业股份有限公司以及中国大陆广东中晨实业集团有 限公司等。"
+    },
+    {
+      "id": "szse_liuxin_prospectus_202606_drill_entry_backup_l14",
+      "locator": "第五節 二、（六）1. 竞争格局及行业内主要企业（p.1-1-117）",
+      "quote": "因此公司 PCB 功能材料产品所处行业集中度总体尚不高。在低端市场， 企业数量较多、生产规模较小，产品同质化程度较高。"
+    },
+    {
+      "id": "szse_liuxin_prospectus_202606_drill_entry_backup_l15",
+      "locator": "第五節 · PCB 钻孔工艺难点与 PCB 功能材料解决方案表（p.1-1-103）",
+      "quote": "随着服务器、高端通信行业 发展，高多层 PCB 的占比日 益提升，高多层 PCB 层数 多、厚度大，易出现翘曲， 披锋问题更加严重，已成为 制约高多层 PCB 良率提升、 成本控制和最终产品可靠性 的关键技术瓶颈"
+    },
+    {
+      "id": "szse_liuxin_prospectus_202606_drill_entry_backup_l16",
+      "locator": "第三節 风险因素 · 产品价格与毛利率波动风险（p.1-1-29）",
+      "quote": "报告期内，公司综合毛利率分别为 20.82%、26.13%和 30.18%"
+    },
+    {
+      "id": "szse_liuxin_prospectus_202606_drill_entry_backup_l17",
+      "locator": "重大事项提示 · 经营业绩波动及下滑的风险（p.1-1-18）",
+      "quote": "报告期内，公司营业收入分别为 79,147.46 万元、98,247.58 万元和 114,442.03 万元，复合增长率为 20.25%"
+    },
+    {
+      "id": "szse_liuxin_prospectus_202606_drill_entry_backup_l18",
+      "locator": "释义（p.1-1-13）",
+      "quote": "迅达科技、TTM 指 TTM Technologies, Inc.（证券代码：TTMI.O）"
+    },
+    {
+      "id": "szse_liuxin_prospectus_202606_drill_entry_backup_l19",
+      "locator": "释义（p.1-1-12）",
+      "quote": "沪电股份 指 沪士电子股份有限公司（证券代码：002463.SZ）"
+    },
+    {
+      "id": "szse_liuxin_prospectus_202606_drill_entry_backup_l20",
+      "locator": "第五節 二、（六）4. 同行业可比公司及指标比较情况（p.1-1-121）",
+      "quote": "在 PCB 功能材料的盖垫板领域中，公司的主要竞争对手仅有钜橡企业在中 国台湾上市，其他主要竞争对手为非上市企业。"
+    },
+    {
+      "id": "szse_liuxin_prospectus_202606_drill_entry_backup_l21",
+      "locator": "募集资金运用 · 烟台工厂升级改造项目的必要性（p.1-1-290）",
+      "quote": "特别是高端产品目前仍 处于交付效率难以满足客户需求的状态。"
+    },
+    {
+      "id": "szse_liuxin_prospectus_202606_drill_entry_backup_l22",
+      "locator": "第六節 八、毛利率分析 · 高性能 PCB 功能材料产品（p.1-1-171）",
+      "quote": "报告期内，公司高性能 PCB 功能材料产品毛利率分别为 30.46%、37.25%和 39.64%"
+    },
+    {
+      "id": "szse_liuxin_prospectus_202606_drill_entry_backup_l23",
+      "locator": "第五節 二、（六）4. 同行业可比公司 2025 年度指标表 · 钜橡企业列（营业收入、毛利率、归母净利润、可比产品、可比产品收入；万元，Wind 换算人民币）（p.1-1-121）",
+      "quote": "29,868.16 22.88% 2,432.41 PCB 盖垫板 16,597.74"
+    }
+  ]
+}

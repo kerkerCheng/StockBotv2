@@ -1,0 +1,124 @@
+{
+  "claims": [
+    {
+      "confidence": 0.45,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "條件：三菱瓦斯化學官網撤下 LE シート頁，或公告停產／出售這條產品線。核查頻率：每年。觸發後 48 小時：這條邊降 confidence 或標成歷史。",
+      "id": "mgc_web_le_sheet_drill_entry_cl1",
+      "source_ids": [
+        "mgc_web_le_sheet_drill_entry_m2",
+        "mgc_web_le_sheet_drill_entry_m3"
+      ],
+      "statement": "Mitsubishi Gas Chemical's product page (undated) describes LE SHEET as an entry sheet for mechanical drilling with a water-soluble lubricant layer on 70-150 μm aluminum sheet, which suppresses drill-bit wear and lets PCB makers stack more panels per drilling pass. No share, revenue or customer figures.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "mat:pcb_drill_entry_backup_board",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "mgc_web_le_sheet_drill_entry_m1",
+        "mgc_web_le_sheet_drill_entry_m2",
+        "mgc_web_le_sheet_drill_entry_m4"
+      ],
+      "src_id": "co:mitsubishi_gas_chemical"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "三菱ガス化学",
+        "三菱ガス化学株式会社",
+        "三菱瓦斯化学",
+        "三菱瓦斯化學",
+        "Mitsubishi Gas Chemical",
+        "MGC"
+      ],
+      "attributes": {
+        "ticker": "4182.T"
+      },
+      "confidence": 0.85,
+      "id": "co:mitsubishi_gas_chemical",
+      "name": "Mitsubishi Gas Chemical Company, Inc.",
+      "role": null,
+      "source_ids": [
+        "mgc_web_le_sheet_drill_entry_m1",
+        "mgc_web_le_sheet_drill_entry_m5"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "鑽孔蓋板",
+        "鑽孔墊板",
+        "蓋墊板",
+        "鋁蓋板",
+        "下墊板",
+        "钻孔盖板",
+        "钻孔垫板",
+        "盖垫板",
+        "铝基盖板",
+        "PCB entry board",
+        "PCB backup board",
+        "drill entry sheet",
+        "エントリーシート"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "mat:pcb_drill_entry_backup_board",
+      "name": "PCB drilling entry and backup boards (aluminum / lubricated entry sheets, phenolic and wood-fiber backup boards)",
+      "role": null,
+      "source_ids": [
+        "mgc_web_le_sheet_drill_entry_m2"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "mgc_web_le_sheet_drill_entry",
+    "evidence_tier": 2,
+    "origin_entity": "Mitsubishi Gas Chemical Company, Inc.",
+    "permission_basis": "公開官網產品頁；只保留研究必要的有限逐字節錄。頁面沒有標日期、HTTP 回應也沒有 Last-Modified，依 L11-5 published_at 留 null（不用抓取日 2026-11-11 冒充）。",
+    "published_at": null,
+    "publisher": "三菱ガス化学 官網",
+    "retrieved_at": "2026-11-11",
+    "source_type": "datasheet",
+    "storage_permission": "repo_excerpt",
+    "title": "三菱瓦斯化學官網產品頁「プリント配線板加工用穴明け補助材『LEシート』」：鋁片（70–150μm）上塗水溶性潤滑層的機械鑽孔蓋板，抑制鑽針磨耗、可增加疊板數",
+    "url": "https://www.mgc.co.jp/products/sc/lesheet/"
+  },
+  "sources": [
+    {
+      "id": "mgc_web_le_sheet_drill_entry_m1",
+      "locator": "頁面標題",
+      "quote": "プリント配線板加工用穴明け補助材「LEシート」 | 事業・製品 | 三菱ガス化学株式会社"
+    },
+    {
+      "id": "mgc_web_le_sheet_drill_entry_m2",
+      "locator": "產品說明首段",
+      "quote": "LEシートは、アルミニウムシート（70-150μ）上に、水溶性の滑剤層を有する、メカニカルドリル用のエントリーシートです。"
+    },
+    {
+      "id": "mgc_web_le_sheet_drill_entry_m3",
+      "locator": "產品說明首段",
+      "quote": "ドリルビットの磨耗を抑制し、ドリルビットの長寿命化が可能になるほか、スルーホール加工時の重ね枚数を増やす事により、孔あけコストの低減が可能になります。"
+    },
+    {
+      "id": "mgc_web_le_sheet_drill_entry_m4",
+      "locator": "製品に関するお問い合わせ（承辦事業部）",
+      "quote": "機能化学品事業部門 電子材料事業部"
+    },
+    {
+      "id": "mgc_web_le_sheet_drill_entry_m5",
+      "locator": "頁尾",
+      "quote": "Copyright © MITSUBISHI GAS CHEMICAL COMPANY, INC. All rights reserved."
+    }
+  ]
+}
