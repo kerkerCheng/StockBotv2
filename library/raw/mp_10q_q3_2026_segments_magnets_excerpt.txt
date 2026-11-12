@@ -1,0 +1,21 @@
+SOURCE: MP Materials Corp.（MP）Form 10-Q，2026 年第三季（期間截至 2026-09-30）
+URL: https://www.sec.gov/Archives/edgar/data/1801368/000180136826000057/mp-20260930.htm
+PUBLISHED: 2026-11-06
+RETRIEVED: 2026-11-12（EDGAR 主文件 HTML 抽字；連續空白正規化）
+STORAGE: repo_excerpt（發行人季報之有限逐字節錄）
+NOTE: 發行人自述（10-Q，未經查核）。金額單位千美元；營收表四欄依序是 2026 年 7–9 月、2025 年 7–9 月、2026 年 1–9 月、2025 年 1–9 月。Q3W 名單第 12 列（非倍率，10-22 敘事已機械撤回）——只當磁材層 mat:rare_earth_magnets 的證據，不做股價裁決（docs/reports/phase7/cases.md）。磁材分部第三季的營收只有磁材前驅產品，成品 NdFeB 磁鐵沒有單獨的營收列。
+
+【Note: Revenue category by segment】
+"Magnetic precursor products 18,623 21,912 56,225 46,964"
+"NdPr oxide and metal $ 100,961 $ 30,911 $ 266,531 $ 80,277"
+"Total revenue $ 147,655 $ 53,553 $ 346,794 $ 171,756"
+"NdPr oxide and metal revenue was primarily generated from sales made under the Company’s distribution agreement with Sumitomo Corporation of Americas as well as an offtake agreement with a leading U.S. technology and industrial company entered into during the first quarter of 2026."
+【Note: Segment information — Magnetics】
+"The Magnetics segment includes (i) the Independence Facility, where the Company produces and sells magnetic precursor products and, beginning in December 2025, commenced manufacturing NdFeB permanent magnets, and (ii) the 10X Facility."
+【Note 1 — DoW Transactions】
+"construct a second domestic magnet manufacturing facility in Northlake, Texas (the “10X Facility”), which construction commenced in spring 2026"
+【Note — Apple】
+"As of September 30, 2026, the Company had received, or was entitled to collect, cumulative prepayments from Apple of $80.0 million. The Company has not yet recognized any of this amount as revenue."
+【Item 2. MD&A — Magnetics】
+"In July 2026, we launched Project Swarm, an initiative through which U.S. and allied drone and motor manufacturers may reserve future magnet production capacity from the 10X Facility."
+"We are in the final stages of commissioning magnet manufacturing equipment at Independence and continue to develop engineering and manufacturing technology to process NdPr oxide and metal into NdFeB magnets."

@@ -1,0 +1,30 @@
+SOURCE: SEC EDGAR——Element Solutions Inc（ESI）①2026 年第三季 10-Q（2026-10-22 申報）②2025 年度 10-K（2026-02-18）③8-K（2026-08-27，Item 1.02 終止合併協議）④Rule 425 溝通文件（2026-07-28，與 Solstice 的合併案）
+URL: https://www.sec.gov/Archives/edgar/data/1590714/000159071426000073/esi-20260930.htm
+URL: https://www.sec.gov/Archives/edgar/data/1590714/000159071426000018/esi-20251231.htm
+URL: https://www.sec.gov/Archives/edgar/data/1590714/000110465926102559/tm2624245d1_8k.htm
+URL: https://www.sec.gov/Archives/edgar/data/1590714/000110465926087343/tm2621453d1_425.htm
+PUBLISHED: ①2026-10-22 ②2026-02-18 ③2026-08-28（EDGAR 收件；報告日 2026-08-27）④2026-07-28
+RETRIEVED: 2026-11-12（fetchers.edgar 抽字，repo 預設 UA；連續空白正規化）
+STORAGE: repo_excerpt（發行人申報之有限逐字節錄）
+NOTE: 發行人自述。金額單位百萬美元。10-Q 營收表四欄依序是 2026 年 7–9 月、2025 年 7–9 月、2026 年 1–9 月、2025 年 1–9 月。Circuitry Solutions 同時做 PCB 與記憶體儲存裝置用化學品，沒有再拆。2026 年的 Micromax、EFC 是併購進來的新業務（2025 年同期為 —）。
+
+【① 10-Q Item 2 營收表（Electronics）】
+"Assembly Solutions $ 368.6 $ 237.8 $ 1,063.1 $ 652.9"
+"Circuitry Solutions 162.2 137.8 461.9 388.8"
+"Micromax 137.8 — 331.2 —"
+"Total Electronics 779.6 465.2 2,180.1 1,298.9"
+【① 10-Q Item 2 營收表（合計）】
+"Total net sales $ 995.3 $ 656.1 $ 2,813.2 $ 1,875.0"
+【① 10-Q Item 2 第三季營收說明】
+"Circuitry Solutions: net sales increased 18% on a reported basis and 16% on an organic basis. Foreign exchange had a positive impact of 2% on reported net sales. The increase in organic net sales was primarily due to continued AI and data center investment driving demand for metallization solutions."
+【① 10-Q Item 2 Circuitry Solutions 業務說明】
+"Our product portfolio is focused on specialized consumable chemical processes and materials, such as circuit formation, primary metallization, electroplate, surface finishes and flexible/formable films."
+【② 10-K Item 7 合併營收（2025、2024）】
+"Net sales $ 2,551.2 $ 2,456.9"
+【② 10-K Item 1 Electronics】
+"Circuitry Solutions - representing approximately 29% of the segment's 2025 net sales."
+【③ 8-K Item 1.02】
+"On August 27, 2026, Element Solutions, Solstice and the Merger Subs entered into a Termination Agreement (the “Termination Agreement”) under which the parties mutually agreed to terminate the Merger Agreement."
+"neither Element Solutions nor Solstice will be responsible for any payments to the other party as a result of the termination of the Merger Agreement."
+【④ Rule 425（2026-07-28）】
+"in connection with its proposed acquisition by Solstice Advanced Materials Inc. (“Solstice”)."
