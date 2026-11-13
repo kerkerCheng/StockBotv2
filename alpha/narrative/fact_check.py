@@ -13,7 +13,9 @@
 1. 列出它引用的原文裡**對得上的那幾行**（檔名：行號）——讀的人一句一句並排對，不必自己翻檔；
 2. 標出機械看得出的疑點（`FLAG_KINDS`）：引號裡的字不在原文、數字（年份、日期、月份、季、百分比、金額、數量詞）對不回原文、
    英文名稱或名冊公司名不在原文、限定詞（主要、多數、唯一、首家……）在對到的那幾行找不到對應字、整句沒對到任何一行、
-   句子有數字或名稱但引用全是這裡核不了的種類（Engine C、三題、外部網址）。
+   句子有數字或名稱但引用全是這裡核不了的種類（Engine C、三題、外部網址）；2026-11-13 起另一種：對得上的只有我們自己寫的字
+   （節錄檔的 NOTE 段與改寫、讀圖判讀、自家筆記——`SourceLine.own`；列出來的那一行也標「自家文字」）。
+   保留語氣被拿掉（expected 寫成已發生）量過、機械查不準，不在這裡（`qualifier_problems` 之後的註記）。
 
 ## 它不做什麼
 
@@ -39,6 +41,7 @@ FLAG_KINDS: Mapping[str, str] = {
     "number_missing": "數字對不回引用的原文",
     "name_missing": "名稱不在引用的原文",
     "qualifier_missing": "限定詞在對到的原文行找不到對應字",
+    "own_text_only": "只對到我們自己寫的字（註記、改寫、讀圖判讀、筆記），一手原文沒對到",
     "no_match": "沒對到引用原文的任何一行",
     "unverifiable": "有數字或名稱，但引用全是這裡核不了的種類",
 }
@@ -311,6 +314,10 @@ def classify_ref(ref: str) -> str:
 class SourceLine:
     label: str          # 印出來的出處（檔名:行號、doc#引文 id、讀圖 id）
     text: str           # 原字
+    #: 我們自己寫的字（節錄檔的 NOTE 段與 Research excerpt 改寫、讀圖判讀、自家筆記）：照樣比對、列出來對照（標「自家文字」），
+    #: 但一句只對得上這種行時標 `own_text_only`（2026-11-13）。數字、引文、名稱、限定詞**不**改成只對一手：27 份的基準上
+    #: 那樣多標的句子邊際命中率低於亂猜（多數錯是改寫一手時寫錯，不是從自家筆記抄來的）
+    own: bool = False
 
 
 @dataclass(frozen=True)
@@ -865,6 +872,11 @@ def qualifier_problems(sentence: str, matched: Sequence[_LineFeat]) -> list[str]
     return out
 
 
+#: 保留或未來語氣（expected、may、plan、預計……原文有、句子沒有）**量過、不上線**（2026-11-13）：回頭核的 27 份裡改掉的敘事句 135 句、
+#: 核過沒改的 1,888 句當基準，三種寫法——對到的整個窗、只看對到最多字的那一句、再只查寫成已發生的句子——命中率都只比亂猜好
+#: 約 1.4 倍（原文一行常有好幾句，語氣字落在別句）。這一類錯要等句子綁逐字原文（ROADMAP「敘事事實句綁逐字錨點」）才查得準。
+
+
 def registry_name_problems(sentence: str, facts: SourceFacts, *,
                            names: Sequence[tuple[str, Sequence[tuple[str, str, bool]]]], self_company: str,
                            labels: str = "") -> list[str]:
@@ -896,6 +908,7 @@ class Match:
     text: str            # 印出來的那一段（長行取對到的那附近）
     coverage: float
     elsewhere: bool = False   # 對到的是別格的引用（引用指偏）
+    own: bool = False         # 對到的是我們自己寫的字（`SourceLine.own`）：對照用，不算原文
 
 
 @dataclass(frozen=True)
@@ -1007,6 +1020,8 @@ _DOC_WORDS = re.compile(r"财报|季报|年报|月报|法说|公告|新闻稿|�
 _DOC_BEFORE_CHARS = 10
 _DOC_AFTER_CHARS = 14
 META_ONLY_NOTE = "（只對到文件日期——是事件的月份還是文件的月份？）"
+#: 列出來對照的那一行是我們自己寫的
+OWN_LABEL = "（自家文字，不算原文）"
 
 
 def _names_document(claim: NumberClaim, sentence: str) -> bool:
@@ -1051,8 +1066,10 @@ def check_sentence(sentence: Sentence, ctx: CheckContext, *, self_company: str, 
     facts = ctx.facts(readable)
     ranked = rank_lines(sentence.text, facts.lines)
     best = ranked[0][0] if ranked else 0.0
-    matches = [Match(f.line.label, _window(f.line.text, needles), cov) for cov, f, needles in ranked[:TOP_LINES]
-               if cov >= SHOW_LINE_ABOVE]
+    # 對到的行是我們自己寫的（`SourceLine.own`）照列、標出來；一手原文最好的一行另算——「只對到自家文字」用
+    best_primary = next((cov for cov, f, _n in ranked if not f.line.own), 0.0)
+    matches = [Match(f.line.label, _window(f.line.text, needles), cov, own=f.line.own)
+               for cov, f, needles in ranked[:TOP_LINES] if cov >= SHOW_LINE_ABOVE]
     matched_feats = [f for cov, f, _n in ranked[:3] if cov >= SHOW_LINE_ABOVE]
     elsewhere_feats: list[_LineFeat] = []
     elsewhere_facts: SourceFacts | None = None
@@ -1062,7 +1079,7 @@ def check_sentence(sentence: Sentence, ctx: CheckContext, *, self_company: str, 
             elsewhere_facts = ctx.facts(other)
             more = rank_lines(sentence.text, elsewhere_facts.lines)
             if more and more[0][0] >= NO_MATCH_BELOW:
-                matches += [Match(f.line.label, _window(f.line.text, needles), cov, elsewhere=True)
+                matches += [Match(f.line.label, _window(f.line.text, needles), cov, elsewhere=True, own=f.line.own)
                             for cov, f, needles in more[:TOP_LINES] if cov >= NO_MATCH_BELOW]
                 elsewhere_feats = [f for cov, f, _n in more[:3] if cov >= NO_MATCH_BELOW]
                 matched_feats += elsewhere_feats
@@ -1125,6 +1142,9 @@ def check_sentence(sentence: Sentence, ctx: CheckContext, *, self_company: str, 
     anchored = bool(numbers or quotes_present or names or attribution) and not schedule_like
     if anchored and best < NO_MATCH_BELOW and not any(m.elsewhere for m in matches):
         flags.append(Flag("no_match", f"最好的一行只對到 {best:.0%}"))
+    elif anchored and best >= NO_MATCH_BELOW and best_primary < NO_MATCH_BELOW:
+        # 對得上的只有我們自己寫的字（2026-11-13）：以前這種句子不標——工具拿我們的改寫當原文，等於替自己背書（L18）
+        flags.append(Flag("own_text_only", f"一手原文最好的一行只對到 {best_primary:.0%}，我們自己寫的字對到 {best:.0%}"))
     return SentenceCheck(sentence, tuple(matches), tuple(flags), kinds, ctx.carried.get(sentence.digest))
 
 
@@ -1234,7 +1254,7 @@ def render_markdown(result: CheckResult, *, flags_only: bool = False) -> list[st
         if not any(k in READABLE_REF_KINDS for k in c.ref_kinds):
             lines.append("   （這一句的引用是 " + "、".join(sorted({REF_KINDS[k].split('（')[0] for k in c.ref_kinds})) + "，這裡不核）")
         for m in c.matches:
-            lines.append(f"   ↳ {m.label}{'（別格的引用）' if m.elsewhere else ''}｜{m.text}")
+            lines.append(f"   ↳ {m.label}{'（別格的引用）' if m.elsewhere else ''}{OWN_LABEL if m.own else ''}｜{m.text}")
     return lines
 
 
@@ -1245,7 +1265,7 @@ def as_dict(result: CheckResult) -> dict[str, Any]:
             "checks": [{"n": c.sentence.n, "where": c.sentence.where, "text": c.sentence.text, "digest": c.sentence.digest,
                         "carried": c.carried, "flags": [{"kind": f.kind, "detail": f.detail} for f in c.flags],
                         "matches": [{"label": m.label, "text": m.text, "coverage": round(m.coverage, 3),
-                                     "elsewhere": m.elsewhere} for m in c.matches]} for c in result.checks]}
+                                     "elsewhere": m.elsewhere, "own": m.own} for m in c.matches]} for c in result.checks]}
 
 
 __all__ = ["BriefText", "CheckContext", "CheckResult", "FLAG_KINDS", "Flag", "Match", "NumberClaim", "QUALIFIERS",

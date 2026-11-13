@@ -131,7 +131,7 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 | **1 path／side effect／capability** | daily ⑱⑲ 心跳（argv 不變）：⑤ 多一格，collector 在行程內讀三份本機 ledger（現行 v2 敘事、故事、`library/private/alpha/fact_checks.jsonl`），不連外、不跑 LLM、不寫；紀錄檔不存在＝0 筆（每份現行敘事都算還沒核），有壞行這一格印未讀到、不印 0（INV-3）。寫入面只有互動 session 手跑的 `python -m alpha brief-check <T> --record`（append-only、私有區；寫前過 `sensitive_payload_path`）；核對本身唯讀（讀 `library/raw`、`extractions`、讀圖 ledger，只讀文字檔、單檔 2 MB 以內）。APP 不讀 |
 | **2 canonical skill／prompt／本檔** | 本節；research-drain SKILL「逐句核對」段與段 6 量測抽樣；`docs/reports/phase7/registration.md` 2026-11-12；failure log #163；ROADMAP 已交付旁支一行。無人值守 prompt 不動 |
 | **3 最窄 rule** | daily argv 不變；不新增 step、allowlist、rule；`.codex/rules` 仍 0 條；新命令只在互動 session 跑 |
-| **4 contract test** | `tests/test_fact_check.py` 25 條（每條對一個撞過的形狀：6234「兩個部門」、LPK.DE「主要」、KSHINTL.NS「8 月簽了」、CECO 節錄標題、1802.TW 券商 PDF、002270.SZ「1.5 到 2.5 億」與韓文「주요」、300757.SZ 券商檔名裡的全形逗號、限定詞也查別格引用對到的行……）；`tests/test_todo_ledger.py` 涵蓋登記（`fact_check:brief`／`fact_check:story`）＋這一格的計數、分組、讀不到不印 0。變異 13／13 紅 |
+| **4 contract test** | `tests/test_fact_check.py` 27 條（每條對一個撞過的形狀：6234「兩個部門」、LPK.DE「主要」、KSHINTL.NS「8 月簽了」、CECO 節錄標題、1802.TW 券商 PDF、002270.SZ「1.5 到 2.5 億」與韓文「주요」、300757.SZ 券商檔名裡的全形逗號、限定詞也查別格引用對到的行、11-13 回頭核 27 份的自家文字——NOTE 段與改寫段照列標「不算原文」、段內引號字仍是原文、年報的「Note:」是原文……）；`tests/test_todo_ledger.py` 涵蓋登記（`fact_check:brief`／`fact_check:story`）＋這一格的計數、分組、讀不到不印 0。變異 13／13 紅；11-13 自家文字 14／14 紅 |
 | **5 端到端 smoke** | 11-12 真資料：`brief-check --gaps` 現行 99 版全未核；全量核對 99 份 7,897 句 80 秒、26% 帶旗標；心跳照 daily 的方式手跑（不寫快照）：完整版與短版 ⑤ 都印「敘事還沒逐句核對 99 檔（已持有 2、可開 37、缺 X 11、不要 49）」 |
 
 ### Sandbox impact review 結論（2026-11-10：負債燈只算借款、租賃另列——failure log #118 租賃那一半，使用者指示）

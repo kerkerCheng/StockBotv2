@@ -59,19 +59,58 @@ def _chunks(text: str) -> list[str]:
 #: 節錄檔裡**我們自己寫的**行（出處、日期、註記、標題摘要、段名）——不是原文，不拿來對（2026-11-12 校準：CECO 那句錯字
 #: 「10-Q 說增加主要來自大型燃氣發電專案」正是從節錄檔的 `[EXCERPT …]` 標題抄來的，工具拿它當原文就對上了；L18）。
 #: 鍵是 library/raw 實際用過的寫法（2026-11-12 全目錄盤點：RETRIEVED 913、Source URL 848、Excerpt 832、NOTE 776……）。
-META_LINE = re.compile(r"^\s*(?:\[(?:EXCERPT|CURATED EXCERPTS?)\b.*|(?:RETRIEVED|Retrieved|Source URL|Excerpt|EXCERPT|NOTE|Note|"
+#: ⚠ 只收大寫 `NOTE`（2026-11-13 全目錄：`NOTE:` 792 行 791 檔都是我們的；`Note:` 20 行有 19 行是年報與簡報的原文附註——
+#: 「Note: The identities of these suppliers are represented by code names…」原本被當標示行丟掉）。`來源：` 11 行都是我們的檔頭。
+META_LINE = re.compile(r"^\s*(?:\[(?:EXCERPT|CURATED EXCERPTS?)\b.*|(?:RETRIEVED|Retrieved|Source URL|Excerpt|EXCERPT|NOTE|"
                        r"DATE|PUBLISHED|Published|URL|SOURCE|Source|STORAGE|Storage|Title|TITLE|Publisher|PUBLISHER|"
-                       r"Research excerpt|Filed)\s*(?:[（(][^）)\n]{0,20}[）)])?\s*[:：].*|【[^】]*】\s*)$")
+                       r"Research excerpt|Filed|來源|来源)\s*(?:[（(][^）)\n]{0,20}[）)])?\s*[:：].*|【[^】]*】\s*)$")
+#: 我們自己寫的**段落**（2026-11-13，回頭核 27 份：錯從自家改寫抄進敘事，工具又拿改寫當原文對上）：
+#: `NOTE:` 之後到空行為止是我們的註記（`META_LINE` 只排掉第一行；全目錄 30 段 93 行續行抽 25 段都是我們的話）、
+#: `Research excerpt…:` 之後到空行為止是我們的改寫——兩種段落裡引號內的字照慣例是逐字原文（NVTS、ARBE 的 NOTE 段引了
+#: 8-K 原句），另收一行（`_QUOTED`），其餘是我們的話。
+_NOTE_HEAD = re.compile(r"^\s*NOTE\s*(?:[（(][^）)\n]{0,20}[）)])?\s*[:：]")
+_PARAPHRASE_HEAD = re.compile(r"^\s*Research excerpt\b[^:：\n]{0,40}[:：]")
+#: 一整行都是我們的話（2026-11-13 全目錄核過：`Boundary:` 15 行都是我們寫的；「說明：」33 行有 30 行是年報原文，不收）。
+_OWN_LINE = re.compile(r"^\s*Boundary\s*[:：]")
+#: 檔頭宣告整份是改寫（2026-11-13 只有 lumentum_q2fy26_cpo.txt 一份）：整份都算我們的話。
+_PARAPHRASED_FILE = re.compile(r"paraphrased,?\s+not\s+verbatim|非逐字", re.IGNORECASE)
+_QUOTED = re.compile(r"“([^“”]{3,})”|\"([^\"]{3,})\"|「([^「」]{3,})」|『([^『』]{3,})』")
 
 
-def file_lines(path: Path, label: str) -> tuple[SourceLine, ...]:
-    """一個檔的每一行（長行照句號再切，行號照原行）；空行與我們自己寫的行（`META_LINE`）略過。"""
+def file_lines(path: Path, label: str, *, own: bool = False) -> tuple[SourceLine, ...]:
+    """一個檔的每一行（長行照句號再切，行號照原行）；空行與我們自己寫的標示行（`META_LINE`）略過。
+
+    我們自己寫的段落與行（NOTE 段的續行、Research excerpt 的改寫、`Boundary:`）照收、標 `own`——列出來給人對照，
+    不算原文；改寫段裡引號內的字另收一行原文。`own=True`：整個檔都是我們寫的（自家筆記）。"""
     text = path.read_text(encoding="utf-8", errors="replace")
-    out = []
-    for number, line in enumerate(text.splitlines(), 1):
-        if not line.strip() or META_LINE.match(line):
+    lines = text.splitlines()
+    whole_own = own or any(_PARAPHRASED_FILE.search(line) for line in lines[:12])
+    out: list[SourceLine] = []
+    block = False                               # 現在在不在我們自己寫的段落（NOTE 段、Research excerpt 改寫）裡
+    para: list[tuple[int, str]] = []
+
+    def flush() -> None:
+        if para and not whole_own:
+            joined = " ".join(t.strip() for _n, t in para)
+            for m in _QUOTED.finditer(joined):
+                body = next(g for g in m.groups() if g)
+                out.append(SourceLine(f"{label}:{para[0][0]}（引號內）", body.strip()))
+        para.clear()
+
+    for number, line in enumerate(lines, 1):
+        if not line.strip():
+            flush()
+            block = False
             continue
-        out += [SourceLine(f"{label}:{number}", chunk.strip()) for chunk in _chunks(line.strip())]
+        if META_LINE.match(line):
+            flush()
+            block = bool(_NOTE_HEAD.match(line) or _PARAPHRASE_HEAD.match(line))
+            continue
+        if block:
+            para.append((number, line))
+        mine = whole_own or block or bool(_OWN_LINE.match(line))
+        out += [SourceLine(f"{label}:{number}", chunk.strip(), own=mine) for chunk in _chunks(line.strip())]
+    flush()
     return tuple(out)
 
 
@@ -155,7 +194,9 @@ class RefResolver:
         if path.suffix.lower() not in TEXT_SUFFIXES or path.stat().st_size > MAX_TEXT_BYTES:
             return ResolvedRef(ref, kind, problem=f"不是文字節錄（{path.suffix or '無副檔名'}，{path.stat().st_size // 1024} KB）"
                                                  "——這裡核不了，要核就把那幾頁存成節錄再引用")
-        return ResolvedRef(ref, kind, file_lines(path, path.name), units=file_units(path), meta=file_meta(path))
+        # 自家筆記（library/private、thesis）整份是我們寫的：列出來對照，不算原文
+        return ResolvedRef(ref, kind, file_lines(path, path.name, own=kind == "note"), units=file_units(path),
+                           meta=file_meta(path))
 
     def _resolve(self, ref: str) -> ResolvedRef:
         kind = classify_ref(ref)
@@ -172,7 +213,8 @@ class RefResolver:
             raw = self.readings().get(ref)
             if raw is None:
                 return ResolvedRef(ref, kind, problem="找不到這份讀圖")
-            lines = [SourceLine(f"{ref}（讀圖判讀）", chunk.strip()) for para in str(raw.get("reading") or "").splitlines()
+            # 判讀文字是我們寫的（列出來對照、不算原文）；它引用的逐字才是原文
+            lines = [SourceLine(f"{ref}（讀圖判讀）", chunk.strip(), own=True) for para in str(raw.get("reading") or "").splitlines()
                      if para.strip() for chunk in _chunks(para.strip())]
             # 文件的日子：讀圖自己寫的那天（台北日期；「11-11 重讀」）與它引用的每份文件檔名裡的日期
             meta = [_local_day(raw.get("created_at"))]

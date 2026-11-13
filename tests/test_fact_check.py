@@ -74,7 +74,8 @@ def test_number_claims_read_years_dates_amounts_percentages_and_counts_but_not_o
 def test_amounts_match_the_source_across_units_and_table_headers(tmp_path: Path) -> None:
     resolver = _resolver({
         "library/raw/a.txt": "合同预计总金额区间为57,008万元至85,512万元（含税）。\n",
-        "library/raw/b.txt": "NOTE: 金額單位新台幣仟元。\n鑽頭部門 來自外部客戶收入 $ 234,797\n",
+        # 真實節錄的寫法（mops_6234_…_excerpt.txt）：NOTE 行之後空一行才是原文；沒空行的續行是 NOTE 段（我們的話）
+        "library/raw/b.txt": "NOTE: 金額單位新台幣仟元。\n\n鑽頭部門 來自外部客戶收入 $ 234,797\n",
     }, tmp_path)
     ok = _check("合同下限約 5.7 億元。", ("library/raw/a.txt",), resolver)
     assert "number_missing" not in _kinds(ok)
@@ -273,6 +274,57 @@ def test_our_own_header_and_note_lines_are_not_source_text(tmp_path: Path) -> No
         "\"Orders increased 192% driven by large-scale natural gas power generation projects.\""]
     check = _check("10-Q 說營收增加主要來自大型燃氣發電專案。", ("library/raw/ceco.txt",), resolver)
     assert "qualifier_missing" in _kinds(check)
+
+
+def test_our_own_paragraphs_are_listed_but_marked_and_quotes_inside_them_are_source(tmp_path: Path) -> None:
+    """2026-11-13 回頭核 27 份：NOTE 段的續行、Research excerpt 的改寫、Boundary 行是我們的話（`own`）；段落裡引號內的字照慣例是
+    逐字原文（另收一行）。年報英文版的「Note: …」是原文附註，不是我們的標示行（全目錄 20 行有 19 行是原文）。"""
+    resolver = _resolver({
+        "library/raw/aaoi.txt": (
+            "Source URL: https://x\n\nResearch excerpt (executive quotes):\n"
+            "- CFO: \"We just can't make enough of them to be involved in their current\n"
+            "  first-generation deployments.\"\n"
+            "- Q2 2026 results: revenue $191.9M (record).\n\n"
+            "Boundary: the release does not name a customer.\n"
+            "NOTE: 給敘事用。\n①第二份合約 8 月開始送氣、第四季結束——法說說「could well extend」。\n\n"
+            "Note: The identities of these suppliers are represented by code names.\n"),
+        "library/raw/para.txt": "Note: Technical content below is paraphrased, not verbatim.\nRevenue grew 40%.\n",
+        "thesis/memo.md": "供不應求到 2027 年。\n",
+    }, tmp_path, readings={"sr_0123456789abcdef": {"reading_id": "sr_0123456789abcdef", "reading": "判讀：量。",
+                                                   "citations": [{"source_id": "doc_b", "quote": "供不應求的逐字"}]}})
+    lines = resolver("library/raw/aaoi.txt").lines
+    own = {line.text for line in lines if line.own}
+    source = {line.text for line in lines if not line.own}
+    assert "- Q2 2026 results: revenue $191.9M (record)." in own
+    assert "Boundary: the release does not name a customer." in own
+    assert any(text.startswith("①第二份合約") for text in own)
+    assert "We just can't make enough of them to be involved in their current first-generation deployments." in source
+    assert "could well extend" in source
+    assert "Note: The identities of these suppliers are represented by code names." in source
+    assert all(line.own for line in resolver("library/raw/para.txt").lines)
+    assert all(line.own for line in resolver("thesis/memo.md").lines)
+    assert [(line.text, line.own) for line in resolver("sr_0123456789abcdef").lines] == [
+        ("判讀：量。", True), ("供不應求的逐字", False)]
+
+
+def test_a_sentence_that_only_matches_our_own_words_is_flagged(tmp_path: Path) -> None:
+    """以前只對得上我們自己的改寫也算對到——工具拿我們的話替我們背書（L18）。"""
+    resolver = _resolver({"library/raw/r.txt": (
+        "Research excerpt:\n- AAOI shipped 400mW pump lasers to two hyperscale customers in Q3 2026.\n\n"
+        "\"Samples were available to select customers.\"\n")}, tmp_path)
+    own_only = _check("AAOI 第三季已把 400mW 泵浦雷射出貨給兩家雲端客戶。", ("library/raw/r.txt",), resolver)
+    assert "own_text_only" in _kinds(own_only)
+    assert own_only.matches and own_only.matches[0].own
+    primary = _check("AAOI 說樣品已給選定客戶（Samples were available to select customers）。", ("library/raw/r.txt",),
+                     resolver)
+    assert "own_text_only" not in _kinds(primary)
+    assert primary.matches and not primary.matches[0].own
+    # 給人讀的那份要看得出哪一行是我們自己寫的
+    brief = fcm.BriefText(ticker="T", company_id="co:self", brief_id="ib_x", as_of=date(2026, 11, 12),
+                          slots=(("position", "AAOI 第三季已把 400mW 泵浦雷射出貨給兩家雲端客戶。", ("library/raw/r.txt",)),))
+    result = fcm.check_brief(brief, fcm.CheckContext(resolve=resolver))
+    assert any(fcm.OWN_LABEL in line for line in fcm.render_markdown(result))
+    assert fcm.as_dict(result)["checks"][0]["matches"][0]["own"] is True
 
 
 def test_binary_and_missing_files_are_counted_as_unreadable_not_parsed(tmp_path: Path) -> None:
