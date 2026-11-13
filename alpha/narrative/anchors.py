@@ -260,9 +260,10 @@ def _folded_index(text: str) -> tuple[str, list[int]]:
 
 
 def term_problems(sentence: str, quotes: Sequence[str], *, skip: Iterable[str] = ()) -> list[str]:
-    """原文是中文時：句子裡連續 `TERM_MIN_CHARS` 個字以上、原文的兩字詞一個都蓋不到的詞（原字）。`skip`：這一檔自己的名字。"""
+    """原文是中文時：句子裡連續 `TERM_MIN_CHARS` 個字以上、原文的兩字詞一個都蓋不到的詞（原字）。`skip`：這一檔自己的名字。
+    錨點有中文也有英文時不比——句子哪一段是對英文那幾段翻過來的分不出來（2026-11-13 COHR：「連續波雷射」對的是 "CW laser"）。"""
     joined = "".join(quotes)
-    if not _CJK.search(joined) or _KANA_HANGUL.search(joined):
+    if not _CJK.search(joined) or _KANA_HANGUL.search(joined) or any(not _CJK.search(q) for q in quotes):
         return []
     q = squash(joined)
     pairs = {q[i:i + 2] for i in range(len(q) - 1)}

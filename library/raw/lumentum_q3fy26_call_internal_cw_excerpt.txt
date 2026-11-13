@@ -1,0 +1,13 @@
+SOURCE: Lumentum Holdings Inc. FY2026 第三季法說會逐字稿（第三方轉錄：Motley Fool）
+URL: https://www.fool.com/earnings/call-transcripts/2026/05/06/lumentum-lite-q3-2026-earnings-transcript/
+PUBLISHED: 2026-05-06（頁面 datePublished 2026-05-06T15:09:22Z）
+RETRIEVED: 2026-11-13（本機 curl 取 HTML、去標籤後逐字抄）
+STORAGE: repo_excerpt（逐字稿有限節錄：執行長開場白兩句、Q&A 一段，未刪句）
+NOTE: 第三方轉錄（非發行人申報）。同一頁 TAKEAWAYS 段的「about 20% of transceivers」是 Motley Fool 的摘要、不是講者原話；本機舊檔 lumentum_q3fy26_cpo.txt 只收到那一段摘要——這份只收講者原話。
+
+Michael E. Hurlston（執行長，開場白）:
+We continue to ship CW lasers to 800-gig transceiver manufacturers, and starting in fiscal Q3, we began supplying CW lasers for internal use in our cloud transceiver business.
+In addition, we are poised to ramp 1.6T-speed transceiver shipments in fiscal Q4 with a portion of this volume leveraging our own CW lasers.
+
+Michael E. Hurlston（執行長，Q&A 回答毛利與雷射內製）:
+We had initially forecasted sometime in calendar Q2, we'd be introducing the lasers, and we backed off just seeing so much tension on the EML line. But now we've seen a little bit of tension in our own supply line externally to get lasers from the external market, CW lasers. And as such, now we've allocated more of our fab capacity to CW lasers. I think in our mix, roughly, as we think about it in this -- in the guide, it would be about 20% of our modules would have our own CW lasers. It's still minority, but we'd expect to step that up through time and see some of the associated margin benefit as a result.

@@ -160,6 +160,12 @@ def test_the_term_check_only_compares_chinese_sources_and_skips_our_framing_word
     assert _compare("這代表公司 2025 年開始批量供應特種電子布給下游 CCL 客戶。", chinese) == {}
     # 印回句子原本的字（繁體），不是折疊後的簡體
     assert _compare("2025 年開始批量供應低熱膨脹布給下游 CCL 客戶。", chinese)["term_missing"] == "「低熱膨脹」"
+    # 中英混合的錨點不比（2026-11-13 COHR：「連續波雷射」對的是英文那一段 "CW laser"，中文那一段只講基板）
+    laser = anc.Anchor("fa_y", "library/raw/b.txt", "a CPO solution that includes our new high-power CW laser")
+    substrate = anc.Anchor("fa_z", "library/raw/c.txt", "先锐科技在 2027–2029 年期间提供 6 英寸磷化铟衬底")
+    mixed = anc.compare(_sentence("它做 CPO 用的連續波雷射，基板向先锐買 2027–2029 的六吋磷化銦。"), [laser, substrate],
+                        self_company="co:self")
+    assert "term_missing" not in _kinds(mixed)
 
 
 # ---------------------------------------------------------------------------
