@@ -1,0 +1,21 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1493594/000149359426000044/mtsi-20261002.htm
+
+Excerpt:
+Source URL: https://www.sec.gov/Archives/edgar/data/1493594/000149359426000044/mtsi-20261002.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] MACOM（MTSI）FY2026 10-K：資料中心光學產品組合（TIA、調變器驅動器、雷射、光偵測器）與資料中心營收年增 74.0% 的主因
+DATE: 2026-11-12
+RETRIEVED: 2026-11-13（EDGAR，repo 預設 UA；HTML 轉文字、空白攤平後逐字照抄）
+NOTE: 發行人自己的年報（自述）。10-K 沒寫光偵測器的材料（光通訊用 GaAs、InP、SiGe 三種技術），也沒有具名客戶；FY2026 會計年度截至 2026-10-02。
+
+【封面（registrant）】
+"MACOM Technology Solutions Holdings, Inc. (Exact name of registrant as specified in its charter)"
+【Item 1. Business — Data Center】
+"We provide a complete product portfolio of Transimpedance Amplifiers (“TIAs”), Modulator Drivers, Lasers and Photodetectors, to support single-mode, multi-mode and silicon photonics-based transceivers; in some cases, individual component designs are optimized for use together as a chipset."
+【Item 1. Business — optical communications】
+"We match our opto-electronic components to our laser and photodetector products enabling our customers to buy more complete solutions for their opto-electronic systems."
+【Item 1. Business — optical communications】
+"For optical communications applications, we utilize a proprietary combination of GaAs, InP and Silicon Germanium (“SiGe”) technologies to obtain advantages in performance and size."
+【Item 7. MD&A — Data Center】
+"In fiscal year 2026, our Data Center market revenue increased by $216.8 million, or 74.0%, compared to fiscal year 2025. The increase was primarily driven by higher sales of optical Data Center products, including photodetectors, supporting high speed data rates up to 1.6T related to data center infrastructure build-outs."

@@ -1,0 +1,128 @@
+{
+  "claims": [
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：MACOM 的 10-K／10-Q、法說或產品頁寫出 MARP-BP112 等 200G/lane 光偵測器停產或退出。核查頻率：每年（10-K）。觸發後 48 小時：改寫光偵測器層讀圖的供給側。",
+      "id": "macom_pr_20250325_1p6t_200g_pd_tia_cl1",
+      "source_ids": [
+        "macom_pr_20250325_1p6t_200g_pd_tia_s1",
+        "macom_pr_20250325_1p6t_200g_pd_tia_s2",
+        "macom_pr_20250325_1p6t_200g_pd_tia_s3"
+      ],
+      "statement": "Supply side (MACOM press release 2025-03-25): MACOM announced availability of four 200G-per-lane solutions for 1.6T data center optical connectivity, including the MARP-BP112 backside-illuminated photodiode with integrated lens that can be chip-stacked on MACOM's TIAs. Product availability announcement; no volume or customer named.",
+      "subject_id": "tech:photodiode"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "tech:photodiode",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "macom_pr_20250325_1p6t_200g_pd_tia_s1",
+        "macom_pr_20250325_1p6t_200g_pd_tia_s2",
+        "macom_pr_20250325_1p6t_200g_pd_tia_s3"
+      ],
+      "src_id": "co:macom"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "tech:tia_driver",
+      "id": "e2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "macom_pr_20250325_1p6t_200g_pd_tia_s1",
+        "macom_pr_20250325_1p6t_200g_pd_tia_s2"
+      ],
+      "src_id": "co:macom"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "MACOM",
+        "MTSI"
+      ],
+      "attributes": {
+        "ticker": "MTSI"
+      },
+      "confidence": 0.9,
+      "id": "co:macom",
+      "name": "MACOM Technology Solutions",
+      "role": "bottleneck_supplier",
+      "source_ids": [
+        "macom_pr_20250325_1p6t_200g_pd_tia_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "photodiodes",
+        "detectors"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:photodiode",
+      "name": "Photodiode (InP-based)",
+      "role": null,
+      "source_ids": [
+        "macom_pr_20250325_1p6t_200g_pd_tia_s2"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "TIA",
+        "trans-impedance amplifier",
+        "laser driver"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:tia_driver",
+      "name": "TIA and driver (optical transceiver)",
+      "role": "adjacent_silicon",
+      "source_ids": [
+        "macom_pr_20250325_1p6t_200g_pd_tia_s2"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "macom_pr_20250325_1p6t_200g_pd_tia",
+    "evidence_tier": 2,
+    "origin_entity": "MACOM Technology Solutions Holdings, Inc.",
+    "permission_basis": "發行人官網新聞稿（公開）；只保留研究必要的有限逐字節錄。published_at 取新聞稿日期 2025-03-25。",
+    "published_at": "2025-03-25",
+    "publisher": "MACOM（官網新聞稿）",
+    "retrieved_at": "2026-10-19",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "MACOM 新聞稿 2025-03-25〈MACOM Launches New High Performance Solutions for 1.6T Applications〉：200G/lane 的 CW 雷射與 MARP-BP112 光偵測器（可疊在 MACOM 的 TIA 上）",
+    "url": "https://www.macom.com/updates/news/2025/macom-launches-new-high-performance-solutions-for-1-6t-applicati"
+  },
+  "sources": [
+    {
+      "id": "macom_pr_20250325_1p6t_200g_pd_tia_s1",
+      "locator": "新聞稿首段",
+      "quote": "MACOM Technology Solutions Inc. (“MACOM”) , a leading supplier of semiconductor products, today announced the availability of four new 200G per lane solutions for 1.6T data center optical connectivity."
+    },
+    {
+      "id": "macom_pr_20250325_1p6t_200g_pd_tia_s2",
+      "locator": "Photodiode (PD) and TIA Chip Stack Solution",
+      "quote": "The MARP-BP112 backside illuminated PD with integrated lens enables chip stacking of photodiodes on MACOM’s transimpedance amplifiers (TIAs), which optimizes total system performance and helps to reduce assembly costs."
+    },
+    {
+      "id": "macom_pr_20250325_1p6t_200g_pd_tia_s3",
+      "locator": "Photodiode (PD) and TIA Chip Stack Solution",
+      "quote": "Designed utilizing MACOM’s proprietary optical semiconductor process, the MARP-BP112 PD features high responsivity and high bandwidth, which are critical for achieving the required bit error rate (BER) for link performance."
+    }
+  ]
+}

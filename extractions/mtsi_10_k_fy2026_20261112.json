@@ -1,0 +1,152 @@
+{
+  "claims": [
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：MACOM 的 10-K／10-Q 或法說寫出資料中心光學產品（含光偵測器）營收下滑、停產或退出這條產品線。核查頻率：每季（MACOM 10-Q 與法說）。觸發後 48 小時：改寫光偵測器層讀圖的供給側與環宇敘事的同業段。",
+      "id": "mtsi_10_k_fy2026_20261112_cl1",
+      "source_ids": [
+        "mtsi_10_k_fy2026_20261112_s2",
+        "mtsi_10_k_fy2026_20261112_s3",
+        "mtsi_10_k_fy2026_20261112_s5"
+      ],
+      "statement": "Supply side (MACOM FY2026 10-K, fiscal year ended 2026-10-02): MACOM sells photodetectors for single-mode, multi-mode and silicon photonics-based transceivers, matched with its lasers and TIAs; FY2026 Data Center revenue rose $216.8 million (74.0%), primarily driven by higher sales of optical Data Center products including photodetectors supporting data rates up to 1.6T. Self-reported; the 10-K does not state the photodetector material (it uses GaAs, InP and SiGe technologies for optical communications) and names no customer.",
+      "subject_id": "tech:photodiode"
+    },
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：MACOM 的 10-K／10-Q 或法說寫出 TIA／驅動器產品線停產、出售或資料中心光學營收下滑。核查頻率：每季（MACOM 10-Q 與法說）。觸發後 48 小時：改寫 TIA／驅動器層讀圖的供給側。",
+      "id": "mtsi_10_k_fy2026_20261112_cl2",
+      "source_ids": [
+        "mtsi_10_k_fy2026_20261112_s2",
+        "mtsi_10_k_fy2026_20261112_s3"
+      ],
+      "statement": "Supply side (MACOM FY2026 10-K): MACOM provides Transimpedance Amplifiers (TIAs) and Modulator Drivers for single-mode, multi-mode and silicon photonics-based transceivers; in some cases designs are optimized for use together with its lasers and photodetectors as a chipset. Self-reported; no customer or share named.",
+      "subject_id": "tech:tia_driver"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:photodiode",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "mtsi_10_k_fy2026_20261112_s1",
+        "mtsi_10_k_fy2026_20261112_s2",
+        "mtsi_10_k_fy2026_20261112_s3",
+        "mtsi_10_k_fy2026_20261112_s5"
+      ],
+      "src_id": "co:macom"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:tia_driver",
+      "id": "e2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "mtsi_10_k_fy2026_20261112_s1",
+        "mtsi_10_k_fy2026_20261112_s2",
+        "mtsi_10_k_fy2026_20261112_s3"
+      ],
+      "src_id": "co:macom"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "MACOM",
+        "MTSI"
+      ],
+      "attributes": {
+        "ticker": "MTSI"
+      },
+      "confidence": 0.9,
+      "id": "co:macom",
+      "name": "MACOM Technology Solutions",
+      "role": "bottleneck_supplier",
+      "source_ids": [
+        "mtsi_10_k_fy2026_20261112_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "photodiodes",
+        "detectors"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:photodiode",
+      "name": "Photodiode (InP-based)",
+      "role": null,
+      "source_ids": [
+        "mtsi_10_k_fy2026_20261112_s2"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "TIA",
+        "trans-impedance amplifier",
+        "laser driver"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:tia_driver",
+      "name": "TIA and driver (optical transceiver)",
+      "role": "adjacent_silicon",
+      "source_ids": [
+        "mtsi_10_k_fy2026_20261112_s2"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "mtsi_10_k_fy2026_20261112",
+    "evidence_tier": 1,
+    "origin_entity": "MACOM Technology Solutions Holdings, Inc.",
+    "permission_basis": "SEC EDGAR 公開申報（10-K）；只保留研究必要的有限逐字節錄。published_at 取 EDGAR 申報日 2026-11-12。",
+    "published_at": "2026-11-12",
+    "publisher": "SEC EDGAR",
+    "retrieved_at": "2026-11-13",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "MACOM（MTSI）FY2026 10-K（會計年度截至 2026-10-02）：資料中心光學產品組合含 TIA、調變器驅動器、雷射與光偵測器；資料中心營收年增 74.0%，主因含光偵測器在內的光學產品、支援到 1.6T",
+    "url": "https://www.sec.gov/Archives/edgar/data/1493594/000149359426000044/mtsi-20261002.htm"
+  },
+  "sources": [
+    {
+      "id": "mtsi_10_k_fy2026_20261112_s1",
+      "locator": "封面（registrant）",
+      "quote": "MACOM Technology Solutions Holdings, Inc. (Exact name of registrant as specified in its charter)"
+    },
+    {
+      "id": "mtsi_10_k_fy2026_20261112_s2",
+      "locator": "Item 1. Business — Data Center",
+      "quote": "We provide a complete product portfolio of Transimpedance Amplifiers (“TIAs”), Modulator Drivers, Lasers and Photodetectors, to support single-mode, multi-mode and silicon photonics-based transceivers; in some cases, individual component designs are optimized for use together as a chipset."
+    },
+    {
+      "id": "mtsi_10_k_fy2026_20261112_s3",
+      "locator": "Item 1. Business — optical communications",
+      "quote": "We match our opto-electronic components to our laser and photodetector products enabling our customers to buy more complete solutions for their opto-electronic systems."
+    },
+    {
+      "id": "mtsi_10_k_fy2026_20261112_s4",
+      "locator": "Item 1. Business — optical communications",
+      "quote": "For optical communications applications, we utilize a proprietary combination of GaAs, InP and Silicon Germanium (“SiGe”) technologies to obtain advantages in performance and size."
+    },
+    {
+      "id": "mtsi_10_k_fy2026_20261112_s5",
+      "locator": "Item 7. MD&A — Data Center",
+      "quote": "In fiscal year 2026, our Data Center market revenue increased by $216.8 million, or 74.0%, compared to fiscal year 2025. The increase was primarily driven by higher sales of optical Data Center products, including photodetectors, supporting high speed data rates up to 1.6T related to data center infrastructure build-outs."
+    }
+  ]
+}
