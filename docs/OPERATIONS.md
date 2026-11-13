@@ -93,8 +93,8 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 
 **Discord 送的是短版**（2026-10-07 使用者：「心跳太雜」；`crons/daily_brief.py`）：① lead 抓了什麼 ② 市場大事
 （這兩塊是 ⑪c 的 TL;DR，沒產生就退回程式組的來源計數與雷達收據原文）③ 待你決定（pq2 編號之前先列「可開 N 檔待你選」——起始門過了、
-這一版敘事還沒選過的可開，沒有編號、不進批次指令；2026-11-03 盲點修法第 18＋16 條，取代同日 §1 第 3 條的「只差已定價」）④ 狀態與健康度（**每天都印**：daily 步數、
-較昨變動、候選各格與最老滯留、逾期型反證 0 條的持有／可開敘事、watch 今日、反證與加碼條件、無到期的等待、新點名；同日使用者：「基本重要的 status 還是要印」）
+這一版敘事還沒選過的可開，沒有編號、不進批次指令；2026-11-03 盲點修法第 18＋16 條，取代同日 §1 第 3 條的「只差已定價」）④ 狀態與健康度（**每天都印**：daily 步數與最貼時限的那一步（≥ 75% 逐條列；2026-11-13）、
+較昨變動、候選各格與最老滯留（候選板比它讀的事件舊時先印一行）、逾期型反證 0 條的持有／可開敘事、watch 今日、反證與加碼條件、無到期的等待、新點名；同日使用者：「基本重要的 status 還是要印」）
 ⑤ 下一次研究——**歸零＝不漏球的唯一清單**（2026-10-22 起由 `engine_b/todo_ledger.py` 組：格數見 `LEDGER`、工作量與最老天數、0 的格列名字、
 讀不到另列；最後一行「下一步貼」由計數機械導出，全 0 時寫「今天沒有要貼的」）。每一種狀態落在哪一格（或為什麼不是研究待做）
 登記在同一檔的 `COVERAGE`，`tests/test_todo_ledger.py` 守著：新增狀態沒登記就紅。數字與心跳同一份快照、同一批函式；每一塊、④ 的每一行各自降級。
@@ -123,6 +123,16 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 ~~無人值守進入點 `crons/heartbeat_task.py`＋工作 `StockBotv2-Heartbeat`（07:00）~~——2026-09-24 Phase 1 Step 1.2a 起由
 `StockBotv2-Daily` 的 ⑱⑲ 取代（1.2a 停用、2026-09-25 1.2b 刪除）；它們的理由（LLM 失敗心跳照發、永遠 exit 0、Python 不用 `.cmd`、
 發送走 subprocess）搬進 `crons/daily_task.py` 的 docstring，守它們的測試改主詞搬進 `tests/test_daily_task.py`「無人值守入口」節。
+
+### Sandbox impact review 結論（2026-11-13：離時限多遠、候選板比它讀的事件舊——failure log #108 第 2 次，使用者「照你推薦做吧」）
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | daily 每一步的紀錄多一欄 `timeout_seconds`（這一步**實際用的**時限；接近 deadline 被夾短的照記夾短的值）——argv、步驟、時限都不變。daily ⑱⑲ 心跳（argv 不變）多算兩件事、都在行程內唯讀：①離時限多遠讀當天與上一份 daily 紀錄（`library/private/heartbeat/daily_run_*.json`，原本 model 漂移就在讀）；②候選板比它讀的事件舊讀 `event_watches.json` 與敘事 ledger 的時戳（兩份原本都在讀）。不連外、不跑 LLM、不開 subprocess、不寫；快照多一個鍵 `candidate.board_stale_events`（`--write-snapshot` 照舊只在 daily 寫）。比不了＝None（摘要行不加旗、短版 ④ 與完整心跳照說比不了），不印 0（INV-3） |
+| **2 canonical skill／prompt／本檔** | 本節；failure log #108 處置欄。無人值守 prompt、SKILL 不動 |
+| **3 最窄 rule** | daily argv 不變；不新增 step、allowlist、rule；`.codex/rules` 仍 0 條 |
+| **4 contract test** | 新 `tests/test_freshness_counters.py` 11 條（每步記實際時限＋被夾短的那一步、排序與只點名 ok 的、舊紀錄退回清單並註明、算不出照說、段 1 每天印、摘要行與短版同一步、只算板子讀的 watch 種類與敘事、壞時間不丟例外、舊／沒變／比不了三種說法、短版與快照同一個數、③ 標題）；`tests/test_heartbeat_phase1.py` 快照鍵清單；`tests/conftest.py` 自動隔離敘事 ledger（沒隔離時舊測試的 fixture 板子會拿去比真實敘事、行號跟著真資料移）。全套 5,013 過、0 失敗；變異 16 種（見 failure log #108） |
+| **5 端到端 smoke** | 11-13 真資料照 daily 的方式手跑心跳（不寫快照）：完整版段 1 印「離時限最近：APP materialize 2,700／2,700 秒＝100%，timeout，時限照清單（上一輪 2,700 秒）」、段 1 候選板那一行「11-13 10:18 產生；之後它讀的反證 watch 與敘事沒變（讀圖、Sheet 持股、三題稽核區沒比）」；短版 ④「daily 39/40 步｜最貼時限 100%（APP materialize）」；摘要行沒有過期旗（板子是新的）。回放 11-09～11-11 紀錄：三天都亮「APP materialize 用掉時限 80%」；11-13 00:21 的板子到 06:49 比出反證 watch 變動 94 筆、敘事寫入 4 份 |
 
 ### Sandbox impact review 結論（2026-11-12：⑤「敘事還沒逐句核對」與 `alpha brief-check`——failure log #163，使用者指示）
 

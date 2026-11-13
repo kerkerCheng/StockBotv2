@@ -710,7 +710,9 @@ class DailyRun:
         argv = [self.python, *self._expand(step.argv)]
         self.log(f"{step.key} 開始")
         status, completed, seconds, error = self._run(argv, timeout_minutes=timeout)
-        row = self._step_row(step, status=status, seconds=round(seconds, 1),
+        # timeout_seconds＝這一步**實際用的**時限（接近 deadline 時被夾短過的那個值，不是清單上的）——心跳的
+        # 「離時限多遠」拿它當分母（failure log #108 第 2 次：10-31～11-11 ⑬ 每天用掉 77–80%，沒有一行印出來）
+        row = self._step_row(step, status=status, seconds=round(seconds, 1), timeout_seconds=round(timeout * 60, 1),
                              exit=completed.returncode if completed else None)
         if error:
             row["error"] = error

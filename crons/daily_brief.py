@@ -535,15 +535,18 @@ def open_waiting_line(waiting: Sequence[tuple[Mapping[str, Any], Any]] | None, *
     return f"- {head}：{each}"
 
 
-def open_choice_block(lines: Sequence[str] | None, problem: str | None, waiting: str | None = None) -> list[str]:
+def open_choice_block(lines: Sequence[str] | None, problem: str | None, waiting: str | None = None,
+                      stale: bool = False) -> list[str]:
     """③ 的「可開待你選」（2026-11-03 第 18＋16 條；決定紀錄 §10.1 停止條件第一子句量的就是它）：起始門都過、這一版敘事
     你還沒選（或等到條件已到期）的檔。進／不要／等到條件是你的，所以住 ③；沒有 pq2 編號、不進批次指令；0 檔不印（④ 候選
-    那一行照印可開 0）——但還有等到條件在等時，那一句照印（`open_waiting_line`）。"""
+    那一行照印可開 0）——但還有等到條件在等時，那一句照印（`open_waiting_line`）。`stale`＝候選板比它讀的事件舊：
+    名單照印、標題註明可能過期（failure log #108 第 2 次：11-13 短版印 33、當天實際 14；細節與重跑命令在 ④）。"""
     if lines is None:
         return [f"**可開待你選：讀不到（{problem}）**"]
     if not lines:
         return [waiting] if waiting else []
-    return [f"**可開 {len(lines)} 檔待你選**（起始門都過、這一版敘事你還沒選；已定價是脈絡、不是門檻）", *lines,
+    note = "——⚠ 候選板比它讀的事件舊，這份名單可能過期（見 ④）" if stale else ""
+    return [f"**可開 {len(lines)} 檔待你選**（起始門都過、這一版敘事你還沒選；已定價是脈絡、不是門檻）{note}", *lines,
             *([waiting] if waiting else []),
             "- 回法：進＝下單後照成交記；不要／等到條件＝看了沒買 `python scripts/record_trade.py looked --symbol <代號> "
             "--choice 不要|等到條件 --why … [--until YYYY-MM-DD]`——不要＝這一版不再列；等到條件＝到期那天（不給＝30 天後）"
@@ -552,7 +555,8 @@ def open_choice_block(lines: Sequence[str] | None, problem: str | None, waiting:
 
 def decisions_block(*, actionable: Sequence[Mapping[str, Any]] | None, problem: str | None,
                     todo_mod: Any, open_choice: Sequence[str] | None = (),
-                    open_problem: str | None = None, open_waiting: str | None = None) -> tuple[list[str], str | None]:
+                    open_problem: str | None = None, open_waiting: str | None = None,
+                    open_stale: bool = False) -> tuple[list[str], str | None]:
     """③ 待你決定：一條一塊——**[編號] 主詞**、細節一行、go＝、不含、圖會變、建議（2026-10-28 使用者核可的排版）。
     清單與批次指令跟心跳段 3 同一份（`todo.actionable_items`、`heartbeat.recommended_batch`）；go／不含的白話取自
     `todo.GO_PLAIN`（與 `GO_AUTHORIZATION` 同鍵，L16）。回（這一塊的行, 建議的批次指令或 None）——批次指令由
@@ -560,7 +564,7 @@ def decisions_block(*, actionable: Sequence[Mapping[str, Any]] | None, problem: 
     `open_choice_lines` 組好的行；None＝讀不到；`open_waiting`＝等到條件在等的那一句）排在編號前面。"""
     from crons.heartbeat import PQ2_LIST_LIMIT, recommended_batch
 
-    choice = open_choice_block(open_choice, open_problem, open_waiting)
+    choice = open_choice_block(open_choice, open_problem, open_waiting, stale=open_stale)
     if actionable is None:
         return [f"### ③ 待你決定（讀不到：{problem}）", *choice], None
     extra = f"＋可開待你選 {len(open_choice)}" if open_choice else ""
@@ -669,11 +673,13 @@ def disproof_line(snapshot: Mapping[str, Any]) -> str:
 def health_block(*, record: Mapping[str, Any] | None, record_problem: str | None,
                  quota: Sequence[Mapping[str, Any]], snapshot: Mapping[str, Any],
                  model_drift: str | None = None, invariant_fails: Sequence[str] = (),
-                 red_sections: Sequence[str] = ()) -> list[str]:
+                 red_sections: Sequence[str] = (), headroom: Mapping[str, Any] | None = None) -> list[str]:
     """④ 第一行「daily 幾步」＋底下逐條出錯的事；沒問題就同一行寫「健康度正常」。
 
     同一個原因只印一次：被額度擋下的 LLM 步驟併成一行；invariant 那一步失敗與快照的「invariants FAIL N」是同一件事，
-    併成一行並寫出是哪幾條（2026-10-28：短版把同一個 SourceDocSync 誤報印成兩行「失敗」）。健康紅燈寫出是哪一節。"""
+    併成一行並寫出是哪幾條（2026-10-28：短版把同一個 SourceDocSync 誤報印成兩行「失敗」）。健康紅燈寫出是哪一節。
+    `headroom`（`heartbeat.timeout_headroom`）：第一行每天帶「最貼時限 X%」（常駐計數器，L14）；用掉 ≥ 門檻的步驟逐條
+    列成問題（failure log #108 第 2 次：⑬ 10-31～11-11 每天 77–80%，沒有一行印出來，11-12 起逾時）。"""
     problems: list[str] = []
     # 只有真的被擋（rejected）的步驟併進額度那一行。接近上限（allowed_warning）時步驟照跑，它們自己的失敗要照列——
     # 2026-10-08：T2 輪詢一次呼叫逾時，被併進「額度接近上限……這一輪沒跑」那行，使用者以為是額度出錯，而那些步驟其實都跑了。
@@ -696,6 +702,13 @@ def health_block(*, record: Mapping[str, Any] | None, record_problem: str | None
         done = sum(1 for r in steps if r.get("status") == "ok")
         skipped_n = sum(1 for r in steps if r.get("status") == "skipped")
         head_line = f"- daily {done}/{len(steps)} 步" + (f"（跳過 {skipped_n}）" if skipped_n else "")
+        if headroom and headroom.get("rows"):
+            top = headroom["rows"][0]
+            head_line += f"｜最貼時限 {round(top['ratio'] * 100)}%（{top['label']}）"
+        for near in (headroom or {}).get("near") or ():
+            previous = f"；上一輪 {near['previous']:,.0f} 秒" if near.get("previous") is not None else ""
+            problems.append(f"{near['label']} 用掉時限 {round(near['ratio'] * 100)}%"
+                            f"（{near['seconds']:,.0f}／{near['timeout']:,.0f} 秒{previous}）——再慢就逾時")
         for row in steps:
             if row.get("status") in ("ok", "skipped", "running", None) or row.get("key") in folded:
                 continue
@@ -774,6 +787,13 @@ def candidate_short_lines(state_dir: Path | None) -> list[str]:
     from alpha.candidates import deadline_line
 
     lines = [f"- 候選：{hb.candidate_states_text(c)}", cover, f"- {deadline_line(board)}"]
+    # 板子比它讀的事件舊（failure log #108 第 2 次）：只在舊的、或比不了的時候印，排在數字前面；完整心跳每天印比對結果
+    try:
+        stale = hb.board_staleness_text(hb.candidate_board_staleness(board), short=True)
+    except Exception as exc:  # noqa: BLE001 — 比不了就說比不了（不是「沒變」，INV-3）
+        stale = f"候選板依賴比對：讀不到（{type(exc).__name__}）"
+    if stale:
+        lines.insert(0, f"- {stale}")
     holdings = board.get("holdings") or {}
     if holdings.get("status") == "ok" and holdings.get("unresolved"):
         lines.append(f"- 持股解析不到 {len(holdings['unresolved'])}：{'、'.join(map(str, holdings['unresolved'][:5]))}")
@@ -957,8 +977,10 @@ def compose_brief(*, now: datetime, summary: str, snapshot: Mapping[str, Any], r
                 waiting = open_waiting_line(hb.open_choice_waiting(state_dir, today=today)[0], label=name)
         except Exception as exc:  # noqa: BLE001 — 候選板讀不到不帶走 pq2 那幾塊
             choice, open_problem = None, type(exc).__name__
+        # 板子比事件舊：與摘要行、④ 同一個快照計數（`heartbeat.candidate_board_staleness`）
         lines, batch[0] = decisions_block(actionable=actionable, problem=problem, todo_mod=todo_mod,
-                                          open_choice=choice, open_problem=open_problem, open_waiting=waiting)
+                                          open_choice=choice, open_problem=open_problem, open_waiting=waiting,
+                                          open_stale=bool(snapshot.get("candidate.board_stale_events")))
         return [*lines, "", *documents_block(asking=asking, problem=problem, todo_mod=todo_mod, today=today)]
 
     def line(build: Any, label: str) -> list[str]:
@@ -981,8 +1003,13 @@ def compose_brief(*, now: datetime, summary: str, snapshot: Mapping[str, Any], r
         except Exception:  # noqa: BLE001 — 比不了就不印這一條，不帶走健康度
             drift = None
         fails, reds = captured_problems(now=now, capture_dir=capture_dir)
+        try:
+            headroom = hb.timeout_headroom(record, record_dir=capture_dir)
+        except Exception:  # noqa: BLE001 — 算不出就不帶這一截，不帶走健康度（完整心跳段 1 照印算不出）
+            headroom = None
         health = health_block(record=record, record_problem=record_problem, quota=hb.quota_entries(rows, now=now),
-                              snapshot=snapshot, model_drift=drift, invariant_fails=fails, red_sections=reds)
+                              snapshot=snapshot, model_drift=drift, invariant_fails=fails, red_sections=reds,
+                              headroom=headroom)
         # ⚠ 2026-11-03（第 18＋16 條）：④ 的「等回落」小塊隨等回落併回可開退役——可開的已定價脈絡改在 ③ 可開待你選那幾行
         # LLM 額度每天一行（ROADMAP「週額度常駐計數器」②，2026-11-01）：兩個窗的用量與重置，週用量 ≥ 門檻粗體——只印不擋；
         # 沒有可讀的用量就說為什麼（沒有執行紀錄／這一輪沒有呼叫回報）

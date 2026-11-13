@@ -99,6 +99,20 @@ def _isolate_layer_note_ledger(tmp_path_factory, monkeypatch):
 
 
 @pytest.fixture(autouse=True)
+def _isolate_brief_ledger(tmp_path_factory, monkeypatch):
+    """把敘事 ledger 導向空的暫存目錄（2026-11-13 failure log #108 第 2 次）。
+
+    候選板「比它讀的事件舊」會讀敘事 ledger 每一列的寫入時間；沒隔離的測試就拿 fixture 板子的產生時間去比真實
+    敘事，短版多一行、行號跟著真資料移。要測的測試自己 monkeypatch `BRIEF_DIR`（照舊）。與上面同一個理由用 autouse。
+    """
+    from alpha.providers import briefs
+
+    target = tmp_path_factory.mktemp("briefs")
+    monkeypatch.setattr(briefs, "BRIEF_DIR", target)
+    return target
+
+
+@pytest.fixture(autouse=True)
 def _isolate_company_assertions(monkeypatch):
     """候選板 context 會讀圖上每家公司的 assertion 寫入紀錄（敘事 stale ③，2026-10-29）——測試一律換成空索引
     （查過了、沒有新邊），不連真的 Neo4j。要測 ③ 的測試往回傳的 dict 填列（鍵＝公司 id）。與上面同一個理由用 autouse：

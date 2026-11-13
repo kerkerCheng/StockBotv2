@@ -12,6 +12,7 @@ watch registry／讀圖／Engine C／Sheet 的那一半。舊名從這裡再匯�
 """
 from __future__ import annotations
 
+import json
 from datetime import date, datetime, timezone
 from functools import lru_cache
 from pathlib import Path
@@ -1025,8 +1026,78 @@ def held_on_board(ticker: str) -> bool | None:
                for r in (board.get("groups") or {}).get("held") or ())
 
 
-__all__ = ["ANSWER_WORDS", "CANDIDATES_THIS_IS_NOT", "GROUPS", "GROUP_LABELS", "SIDE_GROUPS", "SIDE_LABELS",
-           "UNANSWERED", "assemble_board", "assertions_for", "bet_index", "board_rewrite", "candidate_context",
+# ---------------------------------------------------------------------------
+# 候選板比它讀的事件舊嗎（failure log #108 第 2 次；使用者 2026-11-13「照你推薦做」）
+# ---------------------------------------------------------------------------
+
+#: 板子讀、但這裡**沒比**的輸入——照印，不得讓「沒比」看起來像「沒變」（INV-3）。
+BOARD_INPUTS_NOT_COMPARED: tuple[str, ...] = ("讀圖", "Sheet 持股", "三題稽核區")
+
+
+def _instant(raw: Any) -> datetime | None:
+    try:
+        moment = datetime.fromisoformat(str(raw).replace("Z", "+00:00"))
+    except (TypeError, ValueError):
+        return None
+    return moment if moment.tzinfo else moment.replace(tzinfo=timezone.utc)
+
+
+def board_input_events(*, watches: Sequence[Mapping[str, Any]] | None = None,
+                       brief_dir: Path | None = None) -> list[tuple[datetime, str]]:
+    """候選板依賴的**事件**與它的時戳：(時間, 種類)；種類 ∈ watch｜brief。依賴住在推導這一側（L16），心跳只拿來比。
+
+    - watch：會改「前提失效」的那幾類（`blocking_for_open` 看的：語意條件，或敘事來源）——新登記（`created_at`）、
+      醒來（`woken_by.at`）、判回（`reactivations[].at`）、判定（`judgments[].at`）、到期（`expired_at`）、收掉（`consumed_at`）。
+      追源 watch 不算（板子不讀它）。
+    - brief：敘事 ledger 每一列的 `created_at`（宣告的候選狀態從這裡來）。
+    事發（2026-11-13）：00:21 互動收尾物化的板子，05:52 NVIDIA 8-K 叫醒 45 條反證、⑬ 逾時沒重寫——心跳只比日期，
+    短版照印「可開待你選 33」，當天實際 14。"""
+    from engine_b import event_watch as ew
+    from engine_b.queue_segments import is_narrative_watch
+
+    from . import briefs as briefs_provider
+
+    events: list[tuple[datetime, str]] = []
+    rows = list(ew.load_watches().get("watches") or ()) if watches is None else list(watches)
+    for w in rows:
+        if not isinstance(w, Mapping) or not (w.get("kind") == ew.SEMANTIC_KIND or is_narrative_watch(w)):
+            continue
+        woken = w.get("woken_by")
+        stamps = [w.get("created_at"), woken.get("at") if isinstance(woken, Mapping) else None,
+                  w.get("expired_at"), w.get("consumed_at")]
+        stamps += [r.get("at") for r in w.get("reactivations") or () if isinstance(r, Mapping)]
+        stamps += [j.get("at") for j in w.get("judgments") or () if isinstance(j, Mapping)]
+        events += [(moment, "watch") for moment in map(_instant, stamps) if moment is not None]
+    directory = briefs_provider.BRIEF_DIR if brief_dir is None else Path(brief_dir)
+    for path in sorted(directory.glob("*.jsonl")) if directory.is_dir() else ():
+        for line in path.read_text(encoding="utf-8").splitlines():
+            if not line.strip():
+                continue
+            try:
+                record = json.loads(line)
+            except ValueError:
+                continue
+            moment = _instant(record.get("created_at")) if isinstance(record, Mapping) else None
+            if moment is not None:
+                events.append((moment, "brief"))
+    return events
+
+
+def board_inputs_since(generated_at: datetime, *, until: datetime | None = None,
+                       events: Sequence[tuple[datetime, str]] | None = None) -> dict[str, Any]:
+    """板子產生之後（到 `until` 為止，沒給＝現在）依賴的事件變了幾筆：`{watch, brief, latest, not_compared}`。
+    `latest`＝最晚那一筆的時間（沒有＝None）。0＝**比過的輸入**沒變；`not_compared` 的那幾種沒比。"""
+    rows = board_input_events() if events is None else events
+    start = generated_at if generated_at.tzinfo else generated_at.replace(tzinfo=timezone.utc)
+    hits = [(moment, kind) for moment, kind in rows if moment > start and (until is None or moment <= until)]
+    return {"watch": sum(1 for _m, k in hits if k == "watch"), "brief": sum(1 for _m, k in hits if k == "brief"),
+            "latest": max((m for m, _k in hits), default=None), "not_compared": list(BOARD_INPUTS_NOT_COMPARED)}
+
+
+__all__ = ["ANSWER_WORDS", "BOARD_INPUTS_NOT_COMPARED", "CANDIDATES_THIS_IS_NOT", "GROUPS", "GROUP_LABELS",
+           "SIDE_GROUPS", "SIDE_LABELS",
+           "UNANSWERED", "assemble_board", "assertions_for", "bet_index", "board_input_events", "board_inputs_since",
+           "board_rewrite", "candidate_context",
            "deadline_reminder", "derive_row", "held_index", "held_on_board", "raw_text",
            "knowable_bar_day", "lights_for", "load_board", "open_preconditions", "page_input", "rollup", "shared_bet",
            "stall_since", "three_words"]

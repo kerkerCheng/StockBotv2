@@ -372,6 +372,11 @@ def build_freshness(*, now: datetime, state_dir: Path | None, leads_path: Path,
     except Exception as exc:  # noqa: BLE001
         absence = Absence("upstream_unavailable", f"APP artifact 盤點失敗：{type(exc).__name__}")
         section.lines.append(f"APP materialize：{absence.reason}（{absence.kind}）")
+    # 候選板看依賴、不只看日期（failure log #108 第 2 次）：每天印，舊了就說舊在哪
+    try:
+        section.lines.append(_board_staleness_line(state_dir=state_dir))
+    except Exception as exc:  # noqa: BLE001
+        section.lines.append(f"候選板依賴比對：讀不到（{type(exc).__name__}）")
 
     # (e)(f)(g) 備份、健康審查、invariants（Phase 1 Step 1.8）——daily ⑯⑭⑮ 的結果；心跳只讀，不重跑。
     for label, fn in (("備份", lambda: _backup_line(now=now)),
@@ -531,6 +536,91 @@ def llm_model_drift(record: Mapping[str, Any] | None, *, now: datetime, record_d
     return None
 
 
+#: 用掉時限的這個比例以上，短版 ④ 與摘要行亮 ⚠（failure log #108 第 2 次：⑬ 10-31～11-11 每天用掉 77–80%，
+#: 沒有一行印出來，11-12 起逾時）。完整心跳每天印最貼的那一步，不看這個門檻。
+NEAR_TIMEOUT_RATIO = 0.75
+
+
+def _listed_timeouts() -> dict[str, float]:
+    """清單上的時限（秒；LLM 步驟不算）——舊紀錄沒存 `timeout_seconds` 時的退路。讀不到清單＝空（那幾步就不算）。"""
+    try:
+        from crons.daily_task import DAILY_STEPS
+    except Exception:  # noqa: BLE001
+        return {}
+    return {s.key: float(s.timeout_minutes) * 60 for s in DAILY_STEPS if s.kind != "llm"}
+
+
+def _previous_run_seconds(record: Mapping[str, Any], record_dir: Path | None) -> dict[str, float]:
+    """日期比這份紀錄早的最近一份 daily 紀錄裡，各步的秒數（沒有更早的＝空）。"""
+    day = str(record.get("date") or "")
+    for path in sorted((record_dir or RUN_RECORD_DIR).glob("daily_run_*.json"), reverse=True):
+        if not day or path.stem.removeprefix("daily_run_") >= day:
+            continue
+        try:
+            previous = _read_json(path)
+        except (OSError, ValueError):
+            continue
+        if isinstance(previous, Mapping):
+            return {str(r.get("key")): float(r["seconds"]) for r in previous.get("steps") or ()
+                    if isinstance(r, Mapping) and isinstance(r.get("seconds"), (int, float))}
+    return {}
+
+
+def timeout_headroom(record: Mapping[str, Any] | None, *, record_dir: Path | None = None) -> dict[str, Any] | None:
+    """daily 每一步用掉時限的比例——完整心跳、短版 ④、摘要行共用這一份（一個 owner，L16）。紀錄讀不到、或沒有一步
+    算得出 → None（呼叫端照說算不出）。
+
+    時限取紀錄的 `timeout_seconds`（2026-11-13 起每步實際用的那個）；舊紀錄沒有這一欄就退回清單上的時限（`source`＝清單：
+    接近 deadline 時實際被夾短過的那幾步，這樣算會高估餘裕）；LLM 步驟的秒數不記在步驟上，不算。
+    回 `{"rows": [由高到低], "near": [狀態 ok 且 ≥ NEAR_TIMEOUT_RATIO 的]}`——逾時的那一步已經在失敗清單裡，不重複進 near。
+    每列 `{key, label, status, seconds, timeout, ratio, source, previous}`；previous＝上一輪同一步的秒數，沒有＝None。"""
+    if not isinstance(record, Mapping):
+        return None
+    listed: dict[str, float] | None = None
+    previous = _previous_run_seconds(record, record_dir)
+    rows: list[dict[str, Any]] = []
+    for row in record.get("steps") or ():
+        if not isinstance(row, Mapping) or not isinstance(row.get("seconds"), (int, float)):
+            continue
+        key = str(row.get("key"))
+        timeout, source = row.get("timeout_seconds"), "紀錄"
+        if not isinstance(timeout, (int, float)):
+            listed = _listed_timeouts() if listed is None else listed
+            timeout, source = listed.get(key), "清單"
+        if not timeout:
+            continue
+        rows.append({"key": key, "label": str(row.get("label") or key).split("（", 1)[0], "status": row.get("status"),
+                     "seconds": float(row["seconds"]), "timeout": float(timeout),
+                     "ratio": float(row["seconds"]) / float(timeout), "source": source, "previous": previous.get(key)})
+    if not rows:
+        return None
+    rows.sort(key=lambda r: r["ratio"], reverse=True)
+    return {"rows": rows, "near": [r for r in rows if r["status"] == "ok" and r["ratio"] >= NEAR_TIMEOUT_RATIO]}
+
+
+def headroom_text(row: Mapping[str, Any]) -> str:
+    """一步的「用掉幾成時限」：`APP materialize 966／2,700 秒＝36%（上一輪 2,700 秒）`。"""
+    text = f"{row['label']} {row['seconds']:,.0f}／{row['timeout']:,.0f} 秒＝{round(row['ratio'] * 100)}%"
+    if row.get("status") not in ("ok", None):
+        text += f"，{row['status']}"
+    if row.get("source") == "清單":
+        text += "，時限照清單"
+    if row.get("previous") is not None:
+        text += f"（上一輪 {row['previous']:,.0f} 秒）"
+    return text
+
+
+def headroom_line(headroom: Mapping[str, Any] | None) -> str:
+    """完整心跳段 1 的一行——**每天都印**（常駐計數器，L14）：最貼時限的那一步；有 ≥ 門檻的就全部點名。"""
+    if not headroom:
+        return "離時限：這一輪沒有一步算得出（紀錄沒有秒數或時限）"
+    near = headroom.get("near") or []
+    if near:
+        return (f"⚠ **貼近時限 {len(near)} 步**（用掉 ≥ {NEAR_TIMEOUT_RATIO:.0%}，再慢就逾時）："
+                + "；".join(headroom_text(r) for r in near))
+    return "離時限最近：" + headroom_text(headroom["rows"][0])
+
+
 def _daily_run_lines(*, now: datetime, record_path: Path | None) -> list[str]:
     record, problem = _load_run_record(record_path, now=now)
     if record is None:
@@ -555,7 +645,7 @@ def _daily_run_lines(*, now: datetime, record_path: Path | None) -> list[str]:
             key = str(r.get("reason") or "?").split("：", 1)[0]
             reasons[key] = reasons.get(key, 0) + 1
         head += f"｜跳過 {len(skipped)}（" + "、".join(f"{k} {n}" for k, n in reasons.items()) + "）"
-    lines = [head]
+    lines = [head, headroom_line(timeout_headroom(record, record_dir=record_path.parent if record_path else None))]
     served = _served_models(record)
     if served or record.get("llm_effort"):
         lines.append(f"LLM：設定 {record.get('llm_model') or '沒記'}｜effort {record.get('llm_effort') or '沒記'}"
@@ -888,6 +978,48 @@ def _jp_kr_filings_line(*, now: datetime) -> str:
     finally:
         conn.close()
     return ("日韓財報｜" + "｜".join(parts)) if parts else "日韓財報：registry 裡沒有日韓（capability_absent）"
+
+
+def candidate_board_staleness(board: Mapping[str, Any] | None, *, until: datetime | None = None,
+                              events: Sequence[tuple[datetime, str]] | None = None) -> dict[str, Any] | None:
+    """候選板產生之後，它依賴的事件變了幾筆（依賴由推導那一側宣告：`alpha.providers.candidates.board_input_events`）——
+    完整心跳段 1、短版 ③④、摘要行共用（一個 owner，L16）。板子讀不到、或 generated_at 不合法 → None（呼叫端照讀不到說）。
+
+    「今天已 materialize」只比日期：2026-11-13 00:21 物化的板子，05:52 NVIDIA 8-K 叫醒 45 條反證、⑬ 逾時沒重寫，
+    心跳照日期判它是今天的，短版印「可開待你選 33」、當天實際 14（failure log #108 第 2 次）。"""
+    if not isinstance(board, Mapping):
+        return None
+    try:
+        generated = datetime.fromisoformat(str(board.get("generated_at") or "").replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    generated = generated if generated.tzinfo else generated.replace(tzinfo=timezone.utc)
+    from alpha.providers.candidates import board_inputs_since
+
+    info = dict(board_inputs_since(generated, until=until, events=events))
+    info.update(generated_at=generated, stale=bool(info["watch"] or info["brief"]))
+    return info
+
+
+def board_staleness_text(info: Mapping[str, Any] | None, *, short: bool = False) -> str | None:
+    """候選板新不新的一句。`short`＝沒變時不回（短版用）；完整心跳每天都印（常駐計數器）。比不了兩邊都照回——
+    比不了不是沒變（INV-3）。"""
+    if not info:
+        return "候選板依賴比對：讀不到板子或產生時間"
+    when = info["generated_at"].astimezone().strftime("%m-%d %H:%M")
+    if not info["stale"]:
+        return None if short else (f"候選板 {when} 產生；之後它讀的反證 watch 與敘事沒變"
+                                   f"（{'、'.join(info.get('not_compared') or ())}沒比）")
+    latest = info["latest"].astimezone().strftime("%m-%d %H:%M") if info.get("latest") else "?"
+    return (f"⚠ **候選板比它讀的事件舊**：{when} 產生，之後反證 watch 變動 {info['watch']} 筆、敘事寫入 {info['brief']} 份"
+            f"（最晚 {latest}）——可開與前提失效的數是舊的；重跑 `python -m webapp materialize --candidates`")
+
+
+def _board_staleness_line(*, state_dir: Path | None) -> str:
+    board, absence = _load_state(state_dir, "candidates")
+    if absence is not None:
+        return f"候選板依賴比對：{absence.reason}（{absence.kind}）"
+    return str(board_staleness_text(candidate_board_staleness(board)))
 
 
 def _app_freshness_line(*, now: datetime, state_dir: Path | None) -> str:
@@ -2785,6 +2917,8 @@ SNAPSHOT_KEYS: dict[str, str] = {
     # 可開待你選（2026-11-03 第 18＋16 條；取代同日的「只差已定價」）：摘要行「球在你」旁邊印它——③ 列了它，
     # 球在你的數不能只數 pq2。換鍵、首日起比對（語意不同，L12）
     "candidate.open_undecided": "候選 可開待你選",
+    # 候選板產生之後它依賴的事件（反證 watch 變動＋敘事寫入）筆數——0＝比過的輸入沒變；None＝比不了（failure log #108 第 2 次）
+    "candidate.board_stale_events": "候選 板子比事件舊（筆）",
     # 追蹤表三條 lane（Phase 5 Step 5.2）：列數與曾達 2 倍——較昨 diff 看得到第一筆回填、第一份新敘事、第一個 2 倍。
     "positions.lane.paper.n": "追蹤表 paper 列數", "positions.lane.live.n": "追蹤表 live 列數",
     **{f"positions.lane.{lane}.reached_2x_ever": f"{lane} 曾達 2 倍" for lane in ("history", "paper", "live")},
@@ -2937,12 +3071,17 @@ def collect_snapshot(*, now: datetime, state_dir: Path | None, leads_path: Path,
         from portfolio.looked_log import today_local
 
         undecided, _problem = open_choice_rows(state_dir, today=today_local(now))
+        try:
+            stale = candidate_board_staleness(board)
+        except Exception:  # noqa: BLE001 — 比不了＝None（不是 0）
+            stale = None
         return {**{f"candidate.{k}": counts.get(k) for k in (*CANDIDATE_GROUPS, *CANDIDATE_SIDE_GROUPS, "no_narrative")},
                 "candidate.edge_unmeasurable": c["edge_unmeasurable"],
                 "candidate.open_unmeasurable": c["open_unmeasurable"],
                 "candidate.not_edge_pending": c.get("not_edge_pending"),
                 "candidate.on_threshold": c.get("on_threshold"),
-                "candidate.open_undecided": None if undecided is None else len(undecided)}
+                "candidate.open_undecided": None if undecided is None else len(undecided),
+                "candidate.board_stale_events": None if stale is None else stale["watch"] + stale["brief"]}
 
     def positions() -> dict[str, Any]:
         payload, absence = _load_state(state_dir, "positions")
@@ -3254,8 +3393,15 @@ def summary_line(*, now: datetime, snapshot: Mapping[str, Any], run_record_path:
         quota = quota_flag(quota_usage({str(r.get("key")): r for r in steps}))
         if quota:
             flags.append(quota)
+        # 離時限多遠（failure log #108 第 2 次）：用掉 ≥ 門檻的步驟點名——數字與短版 ④ 同一個函式
+        headroom = timeout_headroom(record, record_dir=run_record_path.parent if run_record_path else None)
+        for row in (headroom or {}).get("near") or ():
+            flags.append(f"{row['label']} 用掉時限 {round(row['ratio'] * 100)}%")
         if (record.get("schedule_check") or {}).get("status") == "mismatch":
             flags.append("排程不一致")
+    stale = snapshot.get("candidate.board_stale_events")
+    if stale:
+        flags.append(f"候選板比 {stale} 筆事件舊（可開數是舊的）")
     touched = snapshot.get("disproof.touched_pending")
     if touched:
         flags.append(f"反證觸及待處置 {touched}")
