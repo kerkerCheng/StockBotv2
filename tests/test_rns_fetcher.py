@@ -85,6 +85,21 @@ def test_body_keeps_the_rns_text_and_drops_the_ai_summary_and_side_widgets() -> 
     assert "This information is provided by RNS" in page["text"]
 
 
+def test_body_inside_a_shadow_dom_template_is_still_extracted() -> None:
+    """2026-11 起正文包在 <template shadowrootmode>；bs4 從外層取字會跳過 TemplateString，抽出來只剩「-」且不 raise。"""
+    html = PAGE.replace(
+        '<div class="art-board py-3 news-window">\n',
+        '<div class="art-board py-3 news-window">\n<div class="announcement-shadow-wrapper">'
+        '<template shadowrootmode="open"><style>:host { display: block; }</style>\n',
+    ).replace("</body></html>\n</div>\n<div class=\"art-board\">",
+              "</body></html></template></div>\n</div>\n<div class=\"art-board\">")
+    assert "<template shadowrootmode" in html and "</template>" in html
+    page = rns.parse_announcement(html)
+    assert page["published_at"] == "2026-05-28"
+    assert "cash flow projections for a period of at least 12 months" in page["text"]
+    assert ":host" not in page["text"]
+
+
 def test_page_without_a_dateline_is_refused_not_dated_today() -> None:
     """沒有 dateline 就拒寫——ingest 日期冒充 published_at 是 AGENTS 的反向禁令。"""
     html = PAGE.replace("<div>28 May 2026</div>", "<div>&#160;</div>")

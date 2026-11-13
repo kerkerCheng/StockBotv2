@@ -9,7 +9,7 @@ RNS 是 LSE 的法定訊息揭露服務；investegate.co.uk 逐字鏡像每則�
     library/raw/{doc_id}.txt       — 公告全文（news-window 內的 RNS 本體，HTML 轉純文字）
     library/raw/{doc_id}.meta.json — doc metadata（含 published_at 與其依據）
 
-四個實測事實（2026-09-16～17），每一個都曾讓人誤判：
+五個實測事實（2026-09-16～17；第 5 條 2026-11-13），每一個都曾讓人誤判：
 
 1. **公司頁的公告清單是 AJAX 載入的。** `/company/IQE` 的 HTML 裡零筆公告連結；清單在
    `/company/IQE/announcements`（頁面用 jQuery `$.ajax` 打它），回一張四欄表（日期／時間／來源／標題）。
@@ -21,6 +21,9 @@ RNS 是 LSE 的法定訊息揭露服務；investegate.co.uk 逐字鏡像每則�
    404 才是「這則不存在」——兩者的下一步不同（等 vs 換 id），錯誤訊息必須分開講（L12）。
    ⚠ IQE 年報 PDF 的查核報告雙欄交錯、pdfplumber 也讀不出來；going concern 附註要抓
    **年度業績 RNS 全文**（HTML 的「2.2 Going concern」段完整可讀）——這才是該待辦卡住的真正原因。
+5. **2026-11 起正文包在 `<template shadowrootmode="open">` 裡**（IQE 11-02／11-04／11-11 總投票權公告）。
+   BeautifulSoup 把 template 內的字當 TemplateString，從外層 get_text 會整段跳過——抽出來只剩幾個「-」，
+   而且不 raise。所以先剝掉 template 標籤再轉文字。
 
 用法:
     python -m fetchers.rns --company IQE --list
@@ -74,6 +77,7 @@ _LONG_DATE = re.compile(r"\b(\d{1,2})\s+([A-Za-z]+)\.?\s+(20\d{2})\b")
 _MAIN_TITLE = re.compile(r'<h1 id="main-title">(.*?)</h1>', re.S)
 _NEWS_WINDOW_START = re.compile(r'<div class="art-board[^"]*news-window">', re.S)
 _DATELINE = re.compile(r"<body[^>]*>.*?<div>(.*?)</div>\s*<div>(.*?)</div>", re.S)
+_TEMPLATE_TAG = re.compile(r"</?template\b[^>]*>", re.I)
 _RNS_NUMBER = re.compile(r"RNS\s+Number\s*:?\s*([A-Z0-9]{4,6})")
 _ROW = re.compile(r"<tr>(.*?)</tr>", re.S)
 _TD = re.compile(r"<td[^>]*>(.*?)</td>", re.S)
@@ -210,7 +214,7 @@ def parse_announcement(html: str) -> dict[str, object]:
     """
     title_match = _MAIN_TITLE.search(html)
     title = html_to_text(title_match.group(1)).strip() if title_match else ""
-    window = _news_window(html)
+    window = _TEMPLATE_TAG.sub("", _news_window(html))
     dateline = _DATELINE.search(window)
     published_at = parse_long_date(dateline.group(2)) if dateline else None
     if not published_at:
