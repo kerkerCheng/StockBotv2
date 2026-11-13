@@ -44,3 +44,6 @@ Total：2023 4,238,989｜2024 5,086,600｜2025 8,354,680｜H1 2025 4,215,825｜H
 "Ligent Technologies’ self‑developed lasers feature high output power, high efficiency and superior stability."
 "They lay a solid light‑source foundation for ELSFP, NPO/CPO silicon photonics applications, completing the full technical chain spanning CW lasers, ELSFP external light sources down to NPO/CPO deployments."
 （招股書的「400mW CW-DFB laser chips which will be used in the CPO-based ELSFP modules」是更高功率的下一代；100 mW 那一代的 ELSFP 已經用它自研的雷射——兩份文件不矛盾。）
+
+【Business — 生產設施（PDF 第 163 頁；2026-11-13 補進節錄：同一份招股書重新下載、pypdf 抽字、逐字、空白正規化）】
+"Considering our multi-regional production capacity planning for optical chips, during the Track Record Period and up to the Latest Practicable Date, our U.S. production facility manufactured laser chip wafers, which were mainly shipped to our Qingdao production facility to produce laser chips."
