@@ -1,0 +1,15 @@
+SOURCE: Modine Manufacturing（MOD）8-K 2026-11-03，Exhibit 99.1 第二季（FY2027，季度截至 2026-09-30）財報新聞稿
+URL: https://www.sec.gov/Archives/edgar/data/67347/000110465926122032/mod-ex99d1.htm
+PUBLISHED: 2026-11-03（EDGAR 申報日）
+RETRIEVED: 2026-11-13（EDGAR，repo 預設 UA；HTML 轉文字、空白攤平後逐字照抄）
+STORAGE: repo_excerpt（法定申報有限節錄）
+NOTE: 發行人自述。長約的供應商、零件種類、年限、金額都沒寫；「record orders and backlog」沒給數字。同季 10-Q 見 library/raw/modine_10_q_20261104_data_centers_margin_excerpt.txt。
+
+【執行長】
+"Demand for our products remains very robust, highlighted by record orders and backlog in our Data Centers segment and expanding opportunities to serve the data center cooling market within Commercial HVAC. We have bolstered our supply chain by entering into long-term agreements with multiple strategic suppliers to secure critical components to meet our existing backlog and future business needs."
+
+【部門】
+"Data Centers segment sales were $439.7 million, compared with $225.0 million one year ago, an increase of 95 percent. This increase was primarily driven by higher sales to hyperscale customers in North America. The segment reported gross margin of 19.7 percent, which was 470 basis points lower than the prior year. This decrease was primarily due to higher material, component and tariff costs."
+
+【現金流】
+"Free cash flow for the six months ended September 30, 2026, was a use of $145.6 million, a decrease of $115.3 million from the prior year. This decrease was primarily due to higher capital expenditures to increase production capacity in the Data Centers segment, and higher net working capital including increased inventory levels to support growing customer demand for data center cooling products."

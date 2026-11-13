@@ -1,0 +1,38 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/2110029/000119312526456998/eroc-20261112.htm
+10-Q URL: https://www.sec.gov/Archives/edgar/data/2110029/000119312526458698/eroc-20260930.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] ERock, Inc. 8-K（2026-11-12，EX-99.1「ERock Reports Third Quarter 2026 Results」）＋ Form 10-Q（2026-09-30 季報，2026-11-12 申報）
+DATE: 2026-11-12
+RETRIEVED: 2026-11-13（SEC EDGAR 原文 HTML 攤平、空白正規化，逐字）
+NOTE: 發行人自己的新聞稿與季報（L8：需求與產能的說法是發行人自述；交易對手沒具名）。
+
+【8-K｜Business Highlights】
+"Increased revenue nearly 4x quarter-over-quarter driving positive net income of $8.9MM and Adjusted EBITDA* of $12.6MM, due to increased generator production and installation activity."
+"Began construction on schedule for the 366 megawatt (MW) El Paso Electric generation facility, supporting Meta's data center campus."
+"Expanding manufacturing capacity by 900 MW/year with the new Atlas facility, bringing run-rate capacity to 2.1 gigawatts (GW) per year in 2028."
+"Added power system sales bookings of over $300 million after quarter close, pushing backlog to a new record."
+"Ended the quarter with strong liquidity, including $549 million of unrestricted cash, no outstanding debt and an undrawn $250 million credit facility as of September 30, 2026."
+
+【8-K｜經營層】
+"Since the end of the quarter, we added new bookings of more than $300 million, setting a new backlog record and providing revenue and margin visibility into 2028."（執行長 John Carrington）
+"We expect continued revenue and profitability growth in the fourth quarter and are reaffirming our 2026 guidance."（財務長 Ian Blakely）
+"• Revenue: $435 million to $465 million"
+
+【8-K｜表（千美元：Q3 2026／Q2 2026／Q3 2025）】
+Total revenues 152,767／39,878／37,152
+Gross Margin 22.9%／18.6%／—
+Adjusted Gross Margin* 24.1%／22.2%／10.2%
+Adjusted EBITDA* 12,579／(13,982)／(9,528)
+Contracted Power System Sales Backlog ~$1.6bn／~$1.7bn／~$0.1bn
+
+【10-Q｜在手】
+"Contracted Power System Sales Backlog as of September 30, 2026 was approximately $1.6 billion, an increase of $1.5 billion, as compared to September 30, 2025. This increase was driven by new contracts with data center customers, partially offset by net reductions in backlog from utility and commercial and industrial ("C&I") customers as revenue recognized during the period exceeded new bookings in those customer groups."
+"Substantially all backlog growth year-over-year was attributable to contracts with data center customers, reflecting strong demand for speed-to-power solutions to support accelerated data center development timelines and increasing power requirements associated with artificial intelligence ("AI") and digital infrastructure. Geographically, the backlog growth year-over-year was driven predominantly by projects located in Texas…"
+
+【10-Q｜客戶集中】
+"For the three months ended September 30, 2026, sales to two counterparties accounted for approximately 68 % and 12 % of the Company's total revenue."
+"For the nine months ended September 30, 2026, sales to two counterparties accounted for approximately 49 % and 18 % of the Company's total revenue."
+
+【10-Q｜Atlas】
+"On September 11, 2026, the Company obtained possession and commenced phase 1 of a new 88-month operating lease for an approximately 162,180 square foot facility in Houston, Texas, to be used for warehousing related to the Company's new Atlas manufacturing facility."

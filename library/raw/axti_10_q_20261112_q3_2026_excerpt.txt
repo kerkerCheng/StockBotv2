@@ -1,0 +1,55 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1051627/000143774926036542/axti20261101_10q.htm
+Exhibit 10.1 URL: https://www.sec.gov/Archives/edgar/data/1051627/000143774926036542/ex_1017241.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] AXT, Inc. Form 10-Q（2026-09-30 季報，2026-11-12 申報）＋ Exhibit 10.1（與 Lumentum 的 Capacity Reservation Agreement，2026-07-26）
+DATE: 2026-11-12
+RETRIEVED: 2026-11-13（SEC EDGAR 原文 HTML 攤平、空白正規化，逐字；附件數量欄在原文就是 [***] 遮蔽）
+NOTE: 發行人自己的季報（L8：需求與產能的說法是發行人自述）。附件 10.1 是合約原文，數量與單價欄遮蔽。
+
+【MD&A｜營收】
+"Revenue increased $45.5 million, or 162.6%, to $73.4 million for the three months ended September 30, 2026 from $28.0 million for the three months ended September 30, 2025. The substrate revenue increase for the three months ended September 30, 2026 as compared to the same period in 2025 was primarily the result of higher demand for InP wafer substrates used for data center applications and in passive optical networks and GaAs wafer substrates, as a result of additional export approvals granted by the China government."
+九個月："…partially offset by lower demand for our Ge wafer substrates."
+
+【MD&A｜地區別（第三季，千美元：2026／2025）】
+China 40,284／13,145（+206.5%，占 55%）；Taiwan 7,367／9,045（−18.6%）；Japan 535／1,854（−71.1%）；Asia Pacific (excluding China, Taiwan and Japan) 9,722／347；Europe 14,823／3,424（+332.9%）；North America 679／140；Total 73,410／27,955。
+"Revenue in Taiwan decreased $1.7 million, primarily due to the impact of China export restrictions on our InP wafer substrates and lower demand for our GaAs wafer substrates. Revenue in Japan decreased $1.3 million, primarily due to the impact of China export restrictions on our InP wafer substrates and lower demand for our GaAs wafer substrates."
+"Revenue in Europe increased $11.4 million, primarily due to additional export approvals granted by the China government for our InP and GaAs wafer substrates. Revenue in North America increased $0.5 million, primarily due to additional export approvals granted by the China government for our InP wafer substrates."
+
+【MD&A｜毛利】
+"Gross Profit % 56.0 % 22.3 %"（第三季 2026／2025）
+"The increase in gross profit is attributed to higher revenue resulting in fixed costs being spread over more units and a favorable change in product mix, a migration to larger diameters—particularly 3-inch substrate moving to 4-inch substrate and a general price increase in the InP product line resulting from industrywide shortages of InP wafer substrates."
+
+【MD&A｜研發】
+"The increase in research and development expenses for the three months ended September 30, 2026 was primarily due to an increase in use of certain materials for new product development, in particular for 6-inch InP substrates, and compensation related costs."
+
+【附註｜合約負債與剩餘履約義務】
+"As of September 30, 2026, the aggregate transaction value allocated to the remaining performance obligations was approximately $293.5 million, excluding applicable taxes. Of this total, we expect to recognize approximately $15.5 million as revenue during the remainder of 2026, approximately $196.4 million during 2027, and approximately $81.6 million thereafter, as the related products are delivered and control transfers to customers. The agreements require aggregate contractual advance payments of approximately $179.5 million, of which approximately $92.4 million had been received as of September 30, 2026. These advances are applied against future shipments, and unused advances may be refundable under conditions specified in the respective agreements."
+合約負債（千美元，2026-09-30／2025-12-31）：流動 82,512／103；非流動 25,707／—；合計 108,219／103。
+
+【風險因子｜長約】
+"…the commitments may limit our ability to allocate capacity to other customers at more favorable prices."
+
+【出口許可】
+"While we continue to receive permits, we have a backlog of orders for which we have not yet received permits and as of the date of this report we still cannot predict when a permit application will be reviewed and approved."
+"We are unable to estimate when we will receive the necessary export permits to resume shipping our indium phosphide substrates to the U.S."
+
+【通美｜PE 贖回】
+"Although each Investor had the right to require the redemption of its shares at the original value, no Investor elected to be redeemed. To show good faith to the Investors, Tongmei allowed each Investor to retain its shares in exchange for surrendering any future right of redemption. Twelve of the thirteen Investors agreed. One Investor's internal rules required an exit, resulting in the transfer of some of its shares to a third party with the balance repurchased by Tongmei, subsequent to September 30, 2026."
+
+【通美｜10 月私募】
+"Tongmei intends to use the proceeds for further expansion of its manufacturing capacity for its InP substrates, expansion of its principal business operations, capital expenditures and general working capital. Assuming the Maximum Amount is invested, we believe that we will own approximately 73.40% of Tongmei following the transaction, down from approximately 85.5% before this transaction."
+"No closing has occurred as of the date of this report, and there can be no assurance that any closing will occur."
+
+【期後｜土地】
+"In November 2026, Tongmei entered into a Property Rights Transfer Agreement with Beijing Tongzhou Development Group Co., Ltd., through the Beijing Equity Exchange, to acquire 100% of the equity interests of Beijing Pujia Technology Industry Development Co., Ltd., which holds state-owned industrial land-use rights totaling approximately 69,452 square meters in Tongzhou District, Beijing, for RMB 115,132,900 (approximately $17.2 million). The acquisition is intended to support the Company's future manufacturing capacity expansion in China."
+
+【Exhibit 10.1｜Lumentum 產能保留協議】
+"…the figures shown in Table A represent one hundred percent (100%) of Supplier's reserved capacity for Lumentum. Lumentum's Annual Purchase Commitment will be based on one hundred percent (100%) of the listed figures in Table A."
+"…Lumentum shall remain liable for the shortfall between the Annual Purchase Commitment and the quantity actually purchased (the "Shortfall"), except as otherwise provided herein. Reconciliation of such Shortfall shall be conducted by Supplier on a quarterly basis…"
+"Most Favored Pricing. Supplier shall, during the Term, offer to Lumentum under this Agreement pricing that is no less favorable than the pricing offered by Supplier to any other customer purchasing similar [***]Products, as shown in Table B, in similar volumes and under similar terms."
+"Price Adjustments. In the event Supplier seeks a price increase, Supplier shall provide Lumentum with prior written notice, together with reasonable supporting documentation substantiating the basis for such requested increase. … Any increase in pricing shall require the Parties' mutual written agreement…"
+"4. Additional Capacity. If Supplier has or plans to make available to other customers any additional capacity for the Products beyond the capacity reservation quantity specified herein, Supplier may offer such additional capacity to Lumentum on the same or similar terms and conditions (including price, lead time, and volume) as those proposed to any third party (the "Offer")."
+"…Lumentum shall pay Supplier an initial deposit in the amount of Forty-Three Million Five Hundred Thousand U.S. Dollars (US$43,500,000) (the "Initial Deposit"). The Initial Deposit shall be due within thirty (30) business days following the Effective Date. The Parties acknowledge that the Initial Deposit is intended to support Supplier's capacity expansion and reservation activities contemplated during the first half of the Term under this Agreement."
+"…Supplier shall promptly refund to Lumentum the portion of the Initial Deposit (or Second Deposit, as applicable) that has not previously been applied as shipment credits as of the effective date of termination."
+"…deliveries of Products will be made FCA Supplier's Facility, China (Incoterms 2020)."

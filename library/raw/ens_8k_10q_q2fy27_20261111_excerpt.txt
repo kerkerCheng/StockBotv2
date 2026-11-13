@@ -1,0 +1,19 @@
+SOURCE: EnerSys（ENS）①8-K 2026-11-12（Item 2.02，Exhibit 99.1「Second Quarter Fiscal Year 2027 Results」新聞稿）②10-Q（季度截至 2026-10-04，2026-11-12 申報）
+URL: https://www.sec.gov/Archives/edgar/data/1289308/000162828026073041/ex991_earningsx2qfy27.htm
+URL: https://www.sec.gov/Archives/edgar/data/1289308/000162828026073034/ens-20261004.htm
+PUBLISHED: 2026-11-11（8-K 報告日 ens-20261111；EDGAR 申報 2026-11-12）；10-Q 2026-11-12
+RETRIEVED: 2026-11-13（EDGAR，repo 預設 UA；HTML 轉文字、空白攤平後逐字照抄）
+STORAGE: repo_excerpt（法定申報有限節錄）
+NOTE: 發行人自述。資料中心的營收金額兩份都沒有拆出來；「double-digit growth in data centers」是執行長在新聞稿裡的話。DataSafe Noir 的客戶、金額、用途（UPS 或機櫃備援）新聞稿沒寫。
+
+【① 新聞稿：執行長】
+"Network and Infrastructure Solutions delivered 3% growth against an unusually high second quarter prior year comparison, driven by double-digit growth in data centers."
+"During the quarter, we secured our first order for our DataSafe Noir™ lithium solution, began generating sales from our second-generation lithium offering for material handling, and advanced our strategic acquisition plans."
+"Our third quarter outlook reflects continued strength across Aerospace and Defense, Data Centers, and Transportation, with Communications picking up and Material Handling demonstrating early recovery"
+"Net sales for the second quarter of fiscal 2027 were $949.9 million, a decrease of 0.1% from the prior year second quarter net sales of $951.3 million and below the range of the second quarter of fiscal 2027 guidance of $955 million to $995 million."
+
+【② 10-Q：MD&A 部門營收（第二季，百萬美元）】
+"Network & Infrastructure Solutions $ 449.0 47.2 % $ 434.7 45.7 % $ 14.3 3.3 % Industrial Mobility Solutions 397.1 41.8 430.8 45.3 (33.7) (7.8) Precision Power Solutions 103.8 10.9 85.8 9.0 18.0 21.0 Total net sales $ 949.9 100.0 % $ 951.3 100.0 % $ (1.4) (0.1) %"
+"Net sales of our Network & Infrastructure segment in the second quarter of fiscal 2027 increased $14.3 million or 3.3% compared to the second quarter of fiscal 2026. This increase was due to a 3% increase in organic volume."
+"This increase in sales for the quarter is primarily a result of continuing robust demand from data center customers and for the six months increased demand from data centers and industrial customers and recovering demand with a stronger product mix in communications."
+"Network & Infrastructure Solutions (NIS) — providing power solutions and services to broadband, telecommunications, data center, and industrial utility customers."
