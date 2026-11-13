@@ -18,6 +18,10 @@ failure log #163）——**純規則，不讀不寫任何檔**：錨點紀錄的
      原文第二季約 79%、第三季約 87%）照數字旗標；
    - 同語言的詞不在原文：原文是中文時，句子裡連續三個字以上、原文裡沒有的詞（3110.T 半年報寫「特种电子布」，敘事收窄成
      「低熱膨脹布」）。原文不是中文時不比——翻譯過來的句子沒有字可比。
+3. **兩種依據**（使用者 11-13「自家句 A」）：一手原文，或自家紀錄——讀圖（判讀文字與它引用的逐字，照樣逐字比）、
+   authority（三題稽核區、Engine C、候選板的邊緣量測：quote 寫這句哪幾個數靠它，那幾個數不核、其餘不比）。
+   我們自己的判斷、圖上幾家、估值脈絡、「量不到」講的是自家紀錄，一手原文撐不了；只收一手的話它們永遠綁不上、⑤ 恆亮（L14）。
+   同一句綁到一手就算一手，只綁自家的算自家——兩種分開數。
 
 ## 它不做什麼
 
@@ -33,7 +37,7 @@ from datetime import date
 from typing import Any, Iterable, Mapping, Sequence
 
 from .fact_check import (_CJK, _EN_NUMBER_WORDS, CheckContext, CheckResult, Flag, Sentence, SentenceClaims, SourceLine,
-                         _latin_in, _line_feat, fold, fraction_claims, number_claims, number_found, qualifier_problems, quote_problems,
+                         _latin_in, _line_feat, classify_ref, fold, fraction_claims, number_claims, number_found, qualifier_problems, quote_problems,
                          registry_name_problems, sentence_claims, source_facts, squash, strip_placeholders, where_label)
 
 #: 錨點比對的旗標（封閉字彙；輸出、紀錄、測試都從這裡列舉——L16）。前四種與逐句核對同名同義，原文換成錨點那幾段。
@@ -46,8 +50,13 @@ ANCHOR_FLAG_KINDS: Mapping[str, str] = {
     "hedge_dropped": "錨點原文有保留語氣，句子寫成已發生",
     "derived_mismatch": "衍生數字與錨點的數算出來的不符",
 }
-#: 錨點只收一手原文：`library/raw` 節錄、圖的來源文件（逐字引文與同名節錄）。讀圖判讀、自家筆記、Engine C、外部網址不收。
-ANCHOR_REF_KINDS: tuple[str, ...] = ("raw", "graph_source")
+#: 一手原文：`library/raw` 節錄、圖的來源文件（逐字引文與同名節錄）。
+FIRST_HAND_REF_KINDS: tuple[str, ...] = ("raw", "graph_source")
+#: 自家紀錄（使用者 11-13「自家句 A」）：讀圖（`sr_…`）、authority（`alpha://…`、`engine_c://…`）。自家筆記、外部網址不收。
+OWN_REF_KINDS: tuple[str, ...] = ("reading", "authority")
+ANCHOR_REF_KINDS: tuple[str, ...] = (*FIRST_HAND_REF_KINDS, *OWN_REF_KINDS)
+#: 一句的依據（封閉字彙；計數與輸出從這裡列舉）。
+ANCHOR_BASIS: Mapping[str, str] = {"first_hand": "一手", "own": "自家"}
 #: 衍生數字的算法（封閉字彙）；`of` 照順序、寫原文的寫法（單位要一致）。
 DERIVE_OPS: Mapping[str, str] = {
     "ratio": "a ÷ b（倍）",
@@ -70,8 +79,16 @@ def fingerprint(company_id: str, text: str) -> str:
 class Anchor:
     anchor_id: str
     ref: str
-    quote: str
+    quote: str              # 一手與讀圖：逐字原文；authority：寫的人寫這句哪幾個數靠它（不是原文）
     derive: Mapping[str, Any] | None = None
+
+    @property
+    def kind(self) -> str:
+        return classify_ref(self.ref)
+
+    @property
+    def own(self) -> bool:
+        return self.kind in OWN_REF_KINDS
 
 
 # ---------------------------------------------------------------------------
@@ -238,7 +255,7 @@ _FRAMING: tuple[str, ...] = (
     "也就是说", "换句话说", "这代表", "意味着", "也就是", "代表", "所以", "因此", "因为", "但是", "不过", "而且", "并且", "同时",
     "另外", "此外", "例如", "比如", "包括", "以及", "其中", "目前", "已经", "这一", "那一", "这家", "该公司", "公司", "它们", "他们",
     "我们", "表示", "指出", "提到", "写道", "写着", "根据", "依据", "显示", "看来", "这是", "就是", "还是", "只是", "半年报",
-    "年报", "季报", "财报", "法说会", "法说", "新闻稿", "公告", "简报", "说明会", "原文", "节录",
+    "年报", "季报", "财报", "法说会", "法说", "新闻稿", "公告", "简报", "说明会", "原文", "节录", "读图", "判读",
     "说", "写", "的", "了", "在", "是", "有", "和", "与", "及", "或", "也", "都", "就", "还", "又", "再", "被", "把", "对", "向",
     "从", "到", "给", "让", "使", "由", "为", "因", "而", "但", "则", "即", "且", "并", "之", "其", "此", "该", "这", "那", "它",
     "个", "家", "种", "年", "月", "日", "季", "约", "近", "逾", "超过", "左右", "多", "已", "将", "会", "能", "可", "要", "不",
@@ -316,19 +333,22 @@ def singular_in(quotes: Sequence[str]) -> bool:
 def compare(sentence: Sentence, anchors: Sequence[Anchor], *, self_company: str, self_names: Sequence[str] = (),
             names: Sequence[tuple[str, Sequence[tuple[str, str, bool]]]] = (), as_of: date | None = None,
             claims: SentenceClaims | None = None) -> tuple[Flag, ...]:
-    """一句比它綁的錨點原文（沒有錨點＝沒有旗標，「還沒錨點」另算）。`names`：`CheckContext.folded_names()`。"""
+    """一句比它綁的錨點原文（沒有錨點＝沒有旗標，「還沒錨點」另算）。`names`：`CheckContext.folded_names()`。
+    一手與讀圖照逐字比；authority 錨點的 quote 只宣告哪幾個數靠它（那幾個數不核）——只綁 authority 的句子沒有原文可比名稱、
+    限定詞、詞與語氣，只核它宣告以外的數。"""
     if not anchors:
         return ()
     claims = claims or sentence_claims(sentence, self_names=self_names, as_of=as_of)
-    lines = [SourceLine(a.ref, a.quote) for a in anchors]
+    texted = [a for a in anchors if a.kind != "authority"]
+    lines = [SourceLine(a.ref, a.quote) for a in texted]
     facts = source_facts(lines)
-    quotes = [a.quote for a in anchors]
+    quotes = [a.quote for a in texted]
     flags: list[Flag] = []
-    missing_q = quote_problems(sentence.text, facts)
+    missing_q = quote_problems(sentence.text, facts) if texted else []
     if missing_q:
         flags.append(Flag("quote_missing", "、".join(f"「{q}」" for q in missing_q)))
-    shown, derived_bad = _derived(anchors)
-    shown_sq = [squash(s) for s in shown if s]
+    shown, derived_bad = _derived(texted)
+    shown_sq = [squash(s) for s in (*shown, *(a.quote for a in anchors if a.kind == "authority")) if s]
 
     def declared(raw: str) -> bool:
         r = squash(raw)
@@ -345,7 +365,9 @@ def compare(sentence: Sentence, anchors: Sequence[Anchor], *, self_company: str,
             missing_n.append(raw)
     if missing_n:
         flags.append(Flag("number_missing", "、".join(missing_n)))
-    labels = " ".join(fold(a.ref) for a in anchors)
+    if not texted:
+        return tuple(flags)
+    labels = " ".join(fold(a.ref) for a in texted)
     missing_names = [n for n in claims.names if not (_latin_in(n, facts.spaced) or _latin_in(n, labels))]
     if not claims.schedule_like:
         missing_names += registry_name_problems(sentence.text, facts, names=names, self_company=self_company, labels=labels)
@@ -355,7 +377,11 @@ def compare(sentence: Sentence, anchors: Sequence[Anchor], *, self_company: str,
         missing_qual = qualifier_problems(sentence.text, [_line_feat(line) for line in lines])
         if missing_qual:
             flags.append(Flag("qualifier_missing", "、".join(f"「{q}」" for q in missing_qual)))
-        terms = term_problems(sentence.text, quotes, skip=self_names)
+        # 名冊公司的中日文名稱歸名稱檢查管——公司自己的公告寫「公司」不寫自己的名字（2026-11-13 COHR「仕佳光子」），
+        # 不再算成原文裡沒有的詞
+        sq = squash(sentence.text)
+        named = [raw for _company, aliases in names for raw, folded, cjk in aliases if cjk and len(folded) >= 2 and folded in sq]
+        terms = term_problems(sentence.text, quotes, skip=(*self_names, *named))
         if terms:
             flags.append(Flag("term_missing", "、".join(f"「{t}」" for t in terms)))
         hedges = source_hedges(" ".join(quotes))
@@ -372,6 +398,13 @@ class AnchorCheck:
     fact: bool                         # 事實句（要綁錨點；`SentenceClaims.is_fact`）
     anchors: tuple[Anchor, ...]        # 對到這一句指紋的錨點（空＝還沒綁）
     flags: tuple[Flag, ...]
+
+    @property
+    def basis(self) -> str | None:
+        """`ANCHOR_BASIS`：綁到一手就是一手，只綁自家的是自家；還沒綁＝None。"""
+        if not self.anchors:
+            return None
+        return "own" if all(a.own for a in self.anchors) else "first_hand"
 
 
 def check_anchors(result: CheckResult, index: Mapping[str, Sequence[Anchor]], *, ctx: CheckContext,
@@ -402,9 +435,11 @@ def _short(text: str, limit: int) -> str:
 def anchor_summary(checks: Sequence[AnchorCheck]) -> str:
     facts = [c for c in checks if c.fact]
     anchored = [c for c in facts if c.anchors]
+    own = sum(1 for c in anchored if c.basis == "own")
     extra = [c for c in checks if c.anchors and not c.fact]
-    return (f"錨點：事實句 {len(facts)}｜有錨點 {len(anchored)}｜還沒錨點 {len(facts) - len(anchored)}"
-            f"｜錨點旗標 {sum(1 for c in checks if c.flags)}" + (f"｜非事實句也綁了 {len(extra)}" if extra else ""))
+    return (f"錨點：事實句 {len(facts)}｜有錨點 {len(anchored)}（一手 {len(anchored) - own}、自家 {own}）"
+            f"｜還沒錨點 {len(facts) - len(anchored)}｜錨點旗標 {sum(1 for c in checks if c.flags)}"
+            + (f"｜非事實句也綁了 {len(extra)}" if extra else ""))
 
 
 def render_markdown(checks: Sequence[AnchorCheck], *, ticker: str) -> list[str]:
@@ -415,7 +450,7 @@ def render_markdown(checks: Sequence[AnchorCheck], *, ticker: str) -> list[str]:
             continue
         lines.append(f"{c.sentence.n}.（{where_label(c.sentence.where)}）{c.sentence.text}")
         for a in c.anchors:
-            lines.append(f"   ⚓ {a.anchor_id}｜{a.ref}｜「{_short(a.quote, 160)}」"
+            lines.append(f"   ⚓ {a.anchor_id}｜{'自家｜' if a.own else ''}{a.ref}｜「{_short(a.quote, 160)}」"
                          + (f"｜衍生 {a.derive.get('op')}：{'、'.join(map(str, a.derive.get('of') or ()))} → "
                             f"{a.derive.get('shown')}" if a.derive else ""))
         for f in c.flags:
@@ -431,14 +466,17 @@ def as_dict(checks: Sequence[AnchorCheck]) -> dict[str, Any]:
     return {"summary": anchor_summary(checks),
             "fact_sentences": sum(1 for c in checks if c.fact),
             "anchored": sum(1 for c in checks if c.fact and c.anchors),
+            "anchored_own": sum(1 for c in checks if c.fact and c.basis == "own"),
             "checks": [{"n": c.sentence.n, "where": c.sentence.where, "fingerprint": c.fingerprint, "fact": c.fact,
-                        "anchors": [{"anchor_id": a.anchor_id, "ref": a.ref, "quote": a.quote, "derive": a.derive}
-                                    for a in c.anchors],
+                        "basis": c.basis,
+                        "anchors": [{"anchor_id": a.anchor_id, "ref": a.ref, "quote": a.quote, "derive": a.derive,
+                                     "basis": "own" if a.own else "first_hand"} for a in c.anchors],
                         "flags": [{"kind": f.kind, "detail": f.detail} for f in c.flags]}
                        for c in checks if c.fact or c.anchors]}
 
 
-__all__ = ["ANCHOR_FLAG_KINDS", "ANCHOR_REF_KINDS", "Anchor", "AnchorCheck", "DERIVE_OPS", "SENTENCE_HEDGES",
+__all__ = ["ANCHOR_BASIS", "ANCHOR_FLAG_KINDS", "ANCHOR_REF_KINDS", "Anchor", "AnchorCheck", "DERIVE_OPS",
+           "FIRST_HAND_REF_KINDS", "OWN_REF_KINDS", "SENTENCE_HEDGES",
            "TERM_MIN_CHARS", "anchor_summary", "as_dict", "check_anchors", "compare", "derive_problems", "derive_value",
            "fingerprint", "render_markdown", "sentence_hedged", "source_fraction_pcts",
            "source_hedges", "term_problems", "value_of"]

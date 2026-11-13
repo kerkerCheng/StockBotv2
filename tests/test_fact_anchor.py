@@ -160,6 +160,11 @@ def test_the_term_check_only_compares_chinese_sources_and_skips_our_framing_word
     assert _compare("這代表公司 2025 年開始批量供應特種電子布給下游 CCL 客戶。", chinese) == {}
     # 印回句子原本的字（繁體），不是折疊後的簡體
     assert _compare("2025 年開始批量供應低熱膨脹布給下游 CCL 客戶。", chinese)["term_missing"] == "「低熱膨脹」"
+    # 別家公司的名字歸名稱檢查管：它自己的公告寫「公司」（2026-11-13 COHR「仕佳光子」）
+    shijia = anc.Anchor("fa_s", "graph://source/shijia_688313_inquiry_reply", "2026 年 6 月以来，在多家国际头部光模块公司批量出货")
+    names = [("co:shijia", [("仕佳光子", fcm.squash("仕佳光子"), True), ("Shijia", "shijia", False)])]
+    assert "term_missing" not in _compare("新進的仕佳光子 2026-06 起已批量出貨。", shijia, names=names)
+    assert "仕佳光子" in _compare("新進的仕佳光子 2026-06 起已批量出貨。", shijia).get("term_missing", "")
     # 中英混合的錨點不比（2026-11-13 COHR：「連續波雷射」對的是英文那一段 "CW laser"，中文那一段只講基板）
     laser = anc.Anchor("fa_y", "library/raw/b.txt", "a CPO solution that includes our new high-power CW laser")
     substrate = anc.Anchor("fa_z", "library/raw/c.txt", "先锐科技在 2027–2029 年期间提供 6 英寸磷化铟衬底")
@@ -239,14 +244,65 @@ def test_a_brief_check_prints_the_anchor_section_apart_from_the_guessed_lines(tm
         "fa_1", "library/raw/axti.txt", "approximately 79% of revenue in the second quarter and approximately 87%")]}
     checks = anc.check_anchors(result, index, ctx=ctx)
     assert [c.fact for c in checks] == [True, True, False]              # 判斷句不是事實句
-    assert anc.anchor_summary(checks) == "錨點：事實句 2｜有錨點 1｜還沒錨點 1｜錨點旗標 1"
+    assert anc.anchor_summary(checks) == "錨點：事實句 2｜有錨點 1（一手 1、自家 0）｜還沒錨點 1｜錨點旗標 1"
     text = "\n".join(anc.render_markdown(checks, ticker="AXTI"))
     assert "## 錨點比對" in text and "⚑數字對不回錨點原文：三分之二" in text and "還沒錨點的事實句：2" in text
     payload = anc.as_dict(checks)
-    assert (payload["fact_sentences"], payload["anchored"]) == (2, 1)
+    assert (payload["fact_sentences"], payload["anchored"], payload["anchored_own"]) == (2, 1, 0)
     record = fc.build_record(result, company_id="co:axt", changed=0, note="逐句對過", anchor_counts=(2, 1))
-    assert (record["fact_sentences"], record["anchored"]) == (2, 1)
+    assert (record["fact_sentences"], record["anchored"]) == (2, 1) and "anchored_own" not in record
+    assert fc.build_record(result, company_id="co:axt", changed=0, note="逐句對過", anchor_counts=(2, 1, 1))["anchored_own"] == 1
     assert "anchored" not in fc.build_record(result, company_id="co:axt", changed=0, note="逐句對過")
+
+
+SR = "sr_0123456789abcdef"
+READING = {"reading_id": SR, "created_at": "2026-11-07T00:00:00Z",
+           "reading": "維持 volume（層）。供給側圖上 14 家，窗口在關。",
+           "citations": [{"source_id": "doc_a", "quote": "We ship 100mW CW lasers."}]}
+OWN_JUDGMENT = "讀圖判這一層窗口在關：供給側圖上 14 家。"
+OWN_VALUATION = "自家三年 P/S 第 76.1 百分位，分析師 3 位。"
+
+
+def test_own_anchors_need_a_verbatim_reading_or_this_tickers_authority(tmp_path: Path) -> None:
+    # 使用者 11-13「自家句 A」：我們自己的判斷、圖上幾家、估值脈絡綁自家紀錄——一手原文撐不了它們
+    resolve = fc.RefResolver(root=tmp_path, readings={SR: READING})
+    sentences = [_sentence(OWN_JUDGMENT), _sentence(OWN_VALUATION)]
+    by_reading = {"sentences": [OWN_JUDGMENT], "ref": SR, "quote": "供給側圖上 14 家，窗口在關"}
+    by_authority = {"sentences": [OWN_VALUATION], "ref": "alpha://three_questions/v1/AXTI#own_history_pctile",
+                    "quote": "第 76.1 百分位、分析師 3 位（三題稽核區，寫入那天的值）"}
+    cleaned, errors = fa.validate_items([by_reading, by_authority], company_id="co:axt", sentences=sentences,
+                                        resolve=resolve, ticker="AXTI")
+    assert errors == [] and len(cleaned) == 2
+    wrong = dict(by_reading, quote="供給側圖上 15 家")
+    other = dict(by_authority, ref="alpha://three_questions/v1/COHR#own_history_pctile")
+    derived = dict(by_authority, derive={"op": "ratio", "of": ["76.1", "3"], "shown": "25"})
+    note = dict(by_reading, ref="library/private/notes.md")
+    errors = fa.validate_items([wrong, other, derived, note], company_id="co:axt", sentences=sentences, resolve=resolve,
+                               ticker="AXTI")[1]
+    assert "找不到" in errors[0] and "AXTI 自己的" in errors[1] and "不收衍生數字" in errors[2] and "自家紀錄" in errors[3]
+
+
+def test_a_reading_is_compared_verbatim_and_authority_only_declares_its_numbers() -> None:
+    read = anc.Anchor("fa_r", SR, "供給側圖上 14 家，窗口在關")
+    assert _compare(OWN_JUDGMENT, read) == {}
+    assert "15" in _compare("供給側圖上 15 家。", read)["number_missing"]
+    auth = anc.Anchor("fa_a", "alpha://three_questions/v1/AXTI#own_history_pctile", "第 76.1 百分位、分析師 3 位")
+    assert _compare(OWN_VALUATION, auth) == {}                          # 宣告的數不核，名稱（P/S）與語氣沒有原文可比
+    snapshot = anc.Anchor("fa_s", "engine_c://financial_snapshot/AXTI", "近四季本益比約 45 倍（Engine C 11-10 快照）")
+    assert _compare("在同題材裡算貴：近四季本益比約 45 倍。", snapshot) == {}   # quote 不是原文，詞不拿它比
+    assert "5" in _compare("自家三年 P/S 第 76.1 百分位，分析師 5 位。", auth)["number_missing"]   # 沒宣告的照標
+    # 一手＋authority 混著：authority 宣告的數不再被一手那段標成對不回；一手那段照比
+    first = anc.Anchor("fa_f", "library/raw/a.txt", "NVIDIA announced the agreement on March 2, 2026.")
+    mixed = "NVIDIA 2026 年 3 月公布協議，寫這句那天在第 76.1 百分位。"
+    assert "number_missing" not in _kinds(anc.compare(_sentence(mixed), [first, auth], self_company="co:self"))
+    assert "number_missing" in _kinds(anc.compare(_sentence(mixed), [first], self_company="co:self"))
+    # 計數：綁到一手就是一手，只綁自家的是自家
+    checks = [anc.AnchorCheck(_sentence("a。"), "f1", True, (first, auth), ()),
+              anc.AnchorCheck(_sentence("b。"), "f2", True, (read,), ()),
+              anc.AnchorCheck(_sentence("c。"), "f3", True, (), ())]
+    assert [c.basis for c in checks] == ["first_hand", "own", None]
+    assert anc.anchor_summary(checks) == "錨點：事實句 3｜有錨點 2（一手 1、自家 1）｜還沒錨點 1｜錨點旗標 0"
+    assert "自家｜sr_0123456789abcdef" in "\n".join(anc.render_markdown(checks, ticker="AXTI"))
 
 
 # ---------------------------------------------------------------------------

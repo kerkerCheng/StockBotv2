@@ -4,9 +4,11 @@ Step A；failure log #163）：`library/private/alpha/fact_anchors.jsonl`（appe
 **一列＝一個事實**：它撐的句子指紋（可以多句——七格與故事裡講同一件事的句子都指向它，同一個事實只寫一處）、一手引用、逐字原文、
 選填的衍生數字。規則（指紋、比對）住 `alpha.narrative.anchors`；這裡做三件事：
 
-1. **寫入前驗證**（`validate_items`）：句子在現行那一版（敘事＋現行故事）、引用是一手（`ANCHOR_REF_KINDS`）、原文逐字找得到
-   （只正規化全半形、大小寫、繁簡、空白與換行，不跳字）、不是我們自己寫的字（節錄檔的 NOTE、改寫、Boundary——`SourceLine.own`）、
-   衍生數字的數照原字在原文裡——任一條不過整批拒收。
+1. **寫入前驗證**（`validate_items`）：句子在現行那一版（敘事＋現行故事）、引用是一手或自家紀錄（`ANCHOR_REF_KINDS`）、
+   原文逐字找得到（只正規化全半形、大小寫、繁簡、空白與換行，不跳字）、一手引用不是我們自己寫的字（節錄檔的 NOTE、改寫、
+   Boundary——`SourceLine.own`）、衍生數字的數照原字在原文裡——任一條不過整批拒收。自家紀錄（使用者 11-13「自家句 A」）：
+   讀圖的 quote 逐字在那份讀圖裡（判讀文字也算——自家句靠的就是它）；authority 的 quote 寫這句哪幾個數靠它（不驗逐字、
+   不收衍生數字），引用要是這一檔自己的。
 2. **讀**（`read_records`、`anchor_index`）：壞行回在第二個 list（INV-3）；被 `supersedes` 取代的錨點不算。
 3. **還沒錨點的**（`anchor_gaps`）：⑤「事實句還沒錨點」與 `python -m alpha brief-anchor --gaps` 的唯一判定（L16）——宣告可開
    （含前提失效）與已持有的現行敘事裡，事實句沒全部綁錨點的那幾版（使用者 11-13 ②：其餘狀態換版時才補）。
@@ -120,15 +122,16 @@ def _blocks(resolved: ResolvedRef) -> tuple[list[str], list[str]]:
     return primary, own
 
 
-def quote_problem(quote: str, resolved: ResolvedRef) -> str | None:
-    """這段字是不是逐字在這條一手引用裡；是＝None。"""
+def quote_problem(quote: str, resolved: ResolvedRef, *, own_ok: bool = False) -> str | None:
+    """這段字是不是逐字在這條引用裡；是＝None。`own_ok`：讀圖錨點——判讀文字（我們寫的）也算，整份接起來比（長段落切成好幾塊，
+    quote 可以跨塊）。"""
     q = squash(quote)
     if len(q) < QUOTE_MIN_CHARS:
         return f"quote 太短（去掉空白後至少 {QUOTE_MIN_CHARS} 個字）"
     if resolved.problem:
         return f"引用讀不到：{resolved.problem}"
     primary, own = _blocks(resolved)
-    if any(q in block for block in primary):
+    if any(q in block for block in primary) or (own_ok and q in "".join(own)):
         return None
     # 我們自己寫的：段落續行（`own`）與標示行（NOTE、出處、標題——`file_lines` 不收、`meta` 照留）
     if any(q in line for line in own) or any(q in squash(m) for m in resolved.meta):
@@ -136,10 +139,20 @@ def quote_problem(quote: str, resolved: ResolvedRef) -> str | None:
     return "原文裡找不到這段字（只正規化全半形、大小寫、繁簡、空白與換行；不跳字、不改字）"
 
 
+def authority_problem(ref: str, quote: str, *, ticker: str) -> str | None:
+    """authority 錨點：引用是這一檔自己的（路徑裡有代號）、quote 寫了靠它的是哪幾個數；是＝None。"""
+    if ticker and not re.search(rf"(?<![A-Za-z0-9.]){re.escape(ticker.upper())}(?![A-Za-z0-9])", ref.upper()):
+        return f"authority 引用要是 {ticker} 自己的（收到 {ref}）"
+    if len(squash(quote)) < QUOTE_MIN_CHARS:
+        return f"authority 錨點的 quote 寫這句哪幾個數靠它（去掉空白後至少 {QUOTE_MIN_CHARS} 個字）"
+    return None
+
+
 def validate_items(items: Any, *, company_id: str, sentences: Sequence[Sentence], resolve: Callable[[str], ResolvedRef],
-                   known_ids: Iterable[str] = ()) -> tuple[list[dict[str, Any]], list[str]]:
+                   known_ids: Iterable[str] = (), ticker: str = "") -> tuple[list[dict[str, Any]], list[str]]:
     """spec（`[{sentences, ref, quote, derive?, supersedes?}]`）→ (整理好的項目, 錯誤)。有任何錯誤＝整批不收（回空 list）。
-    `sentences`：現行那一版的句子（`fact_check.build_sentences`，含現行故事）；`known_ids`：這一家已有的錨點 id（supersedes 用）。"""
+    `sentences`：現行那一版的句子（`fact_check.build_sentences`，含現行故事）；`known_ids`：這一家已有的錨點 id（supersedes 用）；
+    `ticker`：authority 引用要是這一檔自己的。"""
     if not isinstance(items, list) or not items:
         return [], ["spec 要是非空的 list：[{\"sentences\": [句子原文…], \"ref\": …, \"quote\": …}]"]
     current = {fingerprint(company_id, s.text) for s in sentences}
@@ -166,13 +179,17 @@ def validate_items(items: Any, *, company_id: str, sentences: Sequence[Sentence]
         quote = str(item.get("quote") or "").strip()
         kind = classify_ref(ref)
         if kind not in ANCHOR_REF_KINDS:
-            errors.append(f"{where}：引用要是一手原文（library/raw/… 或 graph://source/…；收到的是 {kind}）")
+            errors.append(f"{where}：引用要是一手原文（library/raw/…、graph://source/…）或自家紀錄（讀圖 sr_…、alpha://…、"
+                          f"engine_c://…）；收到的是 {kind}")
         else:
-            problem = quote_problem(quote, resolve(ref))
+            problem = (authority_problem(ref, quote, ticker=ticker) if kind == "authority"
+                       else quote_problem(quote, resolve(ref), own_ok=kind == "reading"))
             if problem:
                 errors.append(f"{where}：{problem}")
         derive = item.get("derive")
-        if derive is not None:
+        if derive is not None and kind == "authority":
+            errors.append(f"{where}：authority 錨點不收衍生數字（quote 不是原文，沒有數可算）")
+        elif derive is not None:
             errors += [f"{where}：{p}" for p in derive_problems(derive, quote=quote, sentences=texts)]
         supersedes = item.get("supersedes") or []
         supersedes = [supersedes] if isinstance(supersedes, str) else supersedes

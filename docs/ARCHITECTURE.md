@@ -1023,8 +1023,10 @@ AnalystView.brief（optional）→ APP 首屏 briefCard；六張卡收進「為�
   核對紀錄 `library/private/alpha/fact_checks.jsonl`（`alpha/providers/fact_checks.py`；規則 `alpha/narrative/fact_check.py`）一筆對
   一版敘事＋它的故事——工具在那一格的整份引用裡**猜**對得上的行（命中率約 13%）。錨點紀錄 `library/private/alpha/fact_anchors.jsonl`
   （`alpha/providers/fact_anchors.py`；規則 `alpha/narrative/anchors.py`）**一列一個事實**：句子指紋（公司＋正規化的句子，**不含引用**，
-  同一句換版照對得到）、一手引用與逐字原文（寫入端驗逐字、拒收我們自己寫的字）、選填衍生數字；`brief-check` 對綁了錨點的句子
-  另比它自己那一段（多比保留語氣、分數與衍生數字、同語言的詞），與猜行分開印。事實句的定義只有一份
+  同一句換版照對得到）、引用與原文、選填衍生數字。引用兩種依據：一手（`library/raw`、圖的來源文件；寫入端驗逐字、拒收我們自己寫的字）
+  或自家紀錄（使用者 11-13「自家句 A」——讀圖逐字、判讀文字也收；authority 的 quote 宣告這句哪幾個數靠它，不驗逐字），
+  計數分開印「一手 X、自家 Y」，⑤ 兩種都算綁了。`brief-check` 對綁了錨點的句子另比它自己那一段（多比保留語氣、分數與衍生數字、
+  同語言的詞；只綁 authority 的只核它宣告以外的數），與猜行分開印。事實句的定義只有一份
   （`fact_check.sentence_claims(...).is_fact`）。⑤「敘事還沒逐句核對」與「事實句還沒錨點」（只管已持有與宣告可開）各是同名 `--gaps`
   的同一個判定。敘事格式不因錨點升版（使用者 11-13 ①）。查證：`python -m alpha brief-anchor --gaps`。
 

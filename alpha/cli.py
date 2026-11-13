@@ -1169,7 +1169,8 @@ def cmd_brief_check(args: argparse.Namespace) -> int:
         print(f"⚠ 錨點紀錄有 {len(fa_errors)} 行讀不懂（錨點比對不完整）：{fa_errors[0]}", file=sys.stderr)
     anchor_checks = anc.check_anchors(result, fa.anchor_index(company, fa_records), ctx=ctx,
                                       self_names=fc.self_names(company, ticker, names))
-    anchor_counts = (sum(1 for c in anchor_checks if c.fact), sum(1 for c in anchor_checks if c.fact and c.anchors))
+    anchor_counts = (sum(1 for c in anchor_checks if c.fact), sum(1 for c in anchor_checks if c.fact and c.anchors),
+                     sum(1 for c in anchor_checks if c.fact and c.basis == "own"))
     if args.record:
         if args.spec or args.story_spec:
             print("✗ --record 只記寫進去的那一版（現行敘事＋它現行的故事），不記草稿", file=sys.stderr)
@@ -1264,8 +1265,9 @@ def cmd_brief_anchor(args: argparse.Namespace) -> int:
             return 0
         facts = sum(1 for s in sentences if sentence_claims(s, self_names=mine, as_of=text.as_of).is_fact)
         print(f"# {ticker} 還沒錨點的事實句（{brief.brief_id}；事實句 {facts}、還沒錨點 {len(items)}）")
-        print("每一句讀原文、選撐它的那一段逐字抄進 quote（一手：library/raw 或 graph://source）；候選行是逐句核對猜的，"
-              "只是起點。`--format json` 印成可以直接填的 spec，填好用 `--spec` 寫入。")
+        print("每一句讀原文、選撐它的那一段逐字抄進 quote（一手：library/raw 或 graph://source）；我們自己的判斷、圖上幾家、"
+              "估值脈絡、「量不到」綁自家（讀圖 sr_… 逐字抄讀圖文字；alpha://、engine_c:// 的 quote 寫這句哪幾個數靠它）。"
+              "候選行是逐句核對猜的，只是起點。`--format json` 印成可以直接填的 spec，填好用 `--spec` 寫入。")
         for item in items:
             print(f"\n{item['n']}.（{item['where']}）{item['sentences'][0]}")
             for cand in item["candidates"]:
@@ -1276,7 +1278,7 @@ def cmd_brief_anchor(args: argparse.Namespace) -> int:
     items = spec.get("anchors") if isinstance(spec, dict) else spec
     known = [str(r["anchor_id"]) for r in anchors_all if r.get("company_id") == company]
     cleaned, problems = fa.validate_items(items, company_id=company, sentences=sentences, resolve=resolver,
-                                          known_ids=known)
+                                          known_ids=known, ticker=ticker)
     if problems:
         print("✗ 錨點整批不收：\n- " + "\n- ".join(problems), file=sys.stderr)
         return 2

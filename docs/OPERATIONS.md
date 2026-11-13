@@ -124,6 +124,16 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 `StockBotv2-Daily` 的 ⑱⑲ 取代（1.2a 停用、2026-09-25 1.2b 刪除）；它們的理由（LLM 失敗心跳照發、永遠 exit 0、Python 不用 `.cmd`、
 發送走 subprocess）搬進 `crons/daily_task.py` 的 docstring，守它們的測試改主詞搬進 `tests/test_daily_task.py`「無人值守入口」節。
 
+### Sandbox impact review 結論（2026-11-13：錨點收自家紀錄——plan 2026-11-13-001；failure log #163，使用者「自家句 A」）
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | 不新增命令、不改 daily：`brief-anchor --spec` 多收兩種引用——讀圖（`sr_…`，quote 要逐字在那份讀圖裡，判讀文字也收）與 authority（`alpha://…`、`engine_c://…`，要是這一檔自己的；quote 寫這句哪幾個數靠它；不收衍生數字）。寫入面照舊只有互動 session 手跑、append-only 私有區。`brief-check` 摘要多印「一手 X、自家 Y」，`--record` 多記 `anchored_own`。⑤「事實句還沒錨點」的 collector 不動（綁了就算，兩種依據都算）。比對：只綁 authority 的句子只核它宣告以外的數；名冊公司的中日文名不再算成原文沒有的詞（歸名稱檢查管） |
+| **2 canonical skill／prompt／本檔** | 本節；research-drain SKILL「講我們自己的句子綁自家」；ARCHITECTURE「逐句核對與事實句錨點」；plan §0、§6；failure log #163。無人值守 prompt 不動 |
+| **3 最窄 rule** | daily argv 不變；不新增 step、allowlist、rule；`.codex/rules` 仍 0 條 |
+| **4 contract test** | `tests/test_fact_anchor.py` 新 2 條（寫入：讀圖逐字、authority 要是這一檔的、不收衍生數字、自家筆記仍拒收；比對：讀圖照逐字比、authority 宣告的數不核、沒宣告的照標、一手＋authority 混著時一手照比、計數分開）＋別家公司名一條斷言，共 21 條。全套 6 組 5,046 過、1 skip、1 紅——退役機制掃描（B 組）抓到新夾具句裡的「籃子」，照它的規則改字、不列 keep-list，改字後該檔與 `test_fact_anchor.py` 重跑 23 過；變異 31 種（原 22＋自家 8＋別家公司名 1）各自變紅。另修兩條變異的樣式——「衍生數字也報數字旗標」「核對紀錄不記錨點數」在英文單數與第三個計數改了程式碼之後對不到、一直印 SKIP 沒在驗，對齊後兩條都變紅 |
+| **5 端到端 smoke** | 11-13 COHR（已持有）綁完：`brief-check COHR`「事實句 32｜有錨點 32（一手 26、自家 6）｜還沒錨點 0｜錨點旗標 6」；⑤ 39 → 38 版（`brief-anchor --gaps`）。旗標 6 個：兩個真缺口（Broadcom「三倍以上」本機沒有一手原文、只在讀圖轉述；源杰行業表的「2025 年」不在節錄）、DFB（圖上那一層的名字）、古河電工（讀圖寫簡稱）與頁碼 108、兩個改寫斷詞（「賭注賭」「成定性」） |
+
 ### Sandbox impact review 結論（2026-11-13：事實句錨點——plan 2026-11-13-001 Step A；failure log #163，使用者「照你推薦做吧」）
 
 | 步 | 結論 |
