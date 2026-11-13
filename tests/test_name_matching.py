@@ -117,3 +117,34 @@ def test_form_shared_by_two_companies_names_neither():
 
 def test_name_aliases_resolve_origin():
     assert company_id_for_origin("穩懋半導體股份有限公司", _Reg(WIN, AXT)) == "co:win_semiconductor"
+
+
+def test_origin_lookup_table_keeps_the_no_guess_rule():
+    """查表（failure log #108 第 2 次）只換查法：整串寫法屬於兩家、核心名稱屬於兩家都照舊回 None。"""
+    a, b = _Co("co:foo_a", "Foo Inc."), _Co("co:foo_b", "Foo Ltd.")
+    reg = _Reg(a, b, WIN)
+    assert company_id_for_origin("Foo Inc.", reg) == "co:foo_a"      # 完整登記名稱只屬於一家
+    assert company_id_for_origin("foo ltd.", reg) == "co:foo_b"      # 大小寫不計
+    assert company_id_for_origin("Foo", reg) is None                 # 整串寫法屬於兩家
+    assert company_id_for_origin("FOO LIMITED", reg) is None         # 核心名稱屬於兩家
+    assert company_id_for_origin("穩懋", reg) == "co:win_semiconductor"
+
+
+def test_origin_lookup_table_rebuilds_when_the_registry_changes():
+    """表掛在 registry 物件上；同一個物件的公司換了就要重建——不得讀到上一份名冊的表。"""
+    reg = _Reg(WIN, AXT)
+    assert company_id_for_origin("穩懋", reg) == "co:win_semiconductor"
+    reg.companies = (AXT,)
+    assert company_id_for_origin("穩懋", reg) is None
+    reg.companies = (AXT, WIN, _Co("co:win_other", "Other Corp.", name_aliases=("穩懋",)))
+    assert company_id_for_origin("穩懋", reg) is None                # 兩家都叫這個名字：不猜
+
+
+def test_origin_lookup_works_for_registry_that_cannot_be_a_cache_key():
+    """不能當弱參照鍵的 registry（SimpleNamespace 不可雜湊）照樣解析，只是不快取。"""
+    from types import SimpleNamespace
+
+    reg = SimpleNamespace(companies=(WIN, AXT), company_id_for_ticker=lambda ticker: None,
+                          has_company=lambda company_id: False)
+    assert company_id_for_origin("穩懋半導體股份有限公司", reg) == "co:win_semiconductor"
+    assert company_id_for_origin("AXT Inc", reg) == "co:axt"

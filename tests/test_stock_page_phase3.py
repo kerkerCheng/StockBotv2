@@ -16,6 +16,7 @@ import json
 from dataclasses import replace
 from datetime import date, datetime, timezone
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -772,12 +773,19 @@ def test_materialize_many_loads_each_context_once_and_wires_them_into_every_page
         calls["candidates"] += 1
         return {"absence": {"kind": "upstream_unavailable", "reason": "測試"}}
 
+    providers_seen = []
+
     def fake_fetch(ticker, **kwargs):
         calls["fetch"].append(kwargs.get("seat_readings"))
+        providers_seen.append((kwargs.get("graph_provider"), kwargs.get("fundamentals_provider")))
         return _full_view()
 
     import briefing.alpha_view.sources as sources
 
+    closed = []
+    graph = SimpleNamespace(driver=SimpleNamespace(close=lambda: closed.append("graph")))
+    fundamentals = object()
+    monkeypatch.setattr(mat, "_shared_providers", lambda: (graph, fundamentals))
     monkeypatch.setattr(mat, "readings_context", fake_readings)
     monkeypatch.setattr(mat, "candidate_context", fake_candidates)
     monkeypatch.setattr(sources, "fetch_alpha_investment_view", fake_fetch)
@@ -789,6 +797,9 @@ def test_materialize_many_loads_each_context_once_and_wires_them_into_every_page
     assert all(path is not None for _t, path, _r in results), results
     assert calls["readings"] == 1 and calls["candidates"] == 1
     assert calls["fetch"] == [readings_ctx, readings_ctx], "每檔 fetch 都收到同一份讀圖 context"
+    # failure log #108 第 2 次：圖與 Engine C 的 provider 整批共用一份、跑完關一次（不是每檔各開、各重建結構表）
+    assert providers_seen == [(graph, fundamentals), (graph, fundamentals)]
+    assert closed == ["graph"]
     assert len(seen) == 2 and seen[0] is seen[1]
     shared = {"absence": {"kind": "point_in_time_unavailable", "reason": "共用"}}
     calls["candidates"] = 0

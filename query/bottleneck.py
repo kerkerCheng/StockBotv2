@@ -39,6 +39,7 @@ import calendar
 import json
 import os
 import re
+import weakref
 from collections import Counter, defaultdict
 from dataclasses import dataclass, field
 from datetime import date, datetime
@@ -382,6 +383,44 @@ def _name_variants(company) -> set[str]:
     return {v for v in variants if v}
 
 
+#: registry 物件 → (建表時的公司序列, 整串寫法表, 核心名稱表)；registry 被回收時這一格跟著消失。
+_ORIGIN_NAME_INDEX: "weakref.WeakKeyDictionary[Any, tuple]" = weakref.WeakKeyDictionary()
+
+
+def _origin_name_index(registry) -> tuple[Mapping[str, frozenset[str]], Mapping[str, frozenset[str]]]:
+    """`company_id_for_origin` 的兩張查表：整串寫法（casefold）→ 公司、核心名稱（`_core_name`）→ 公司。
+
+    比對規則與逐家掃描相同（同一個 `_name_variants`、同一個 `_core_name`），只是先建表再查。
+    快取（2026-11-13，failure log #108 第 2 次）：原本每解析一個 origin 就把名冊每家的寫法重算兩輪——
+    daily ⑬ 每檔重算整張結構表、一檔約兩千五百次解析，名冊 225 家時 11-12、11-13 連兩天 2,700 秒逾時。
+    表掛在同一個 registry 物件上；公司序列換了（不是同一批物件）就重建——測試的假名冊改了內容也不會讀到舊表。
+    registry 不能當弱參照的鍵（例如 SimpleNamespace）就每次現建、不快取。
+    """
+    companies = tuple(registry.companies)
+    try:
+        cached = _ORIGIN_NAME_INDEX.get(registry)
+    except TypeError:
+        cached = None
+    if cached is not None and cached[0] == companies:
+        return cached[1], cached[2]
+    exact: dict[str, set[str]] = defaultdict(set)
+    core: dict[str, set[str]] = defaultdict(set)
+    for company in companies:
+        for variant in _name_variants(company):
+            exact[str(variant).casefold()].add(company.company_id)
+            key = _core_name(variant)
+            if key:
+                core[key].add(company.company_id)
+    built = (companies,
+             MappingProxyType({k: frozenset(v) for k, v in exact.items()}),
+             MappingProxyType({k: frozenset(v) for k, v in core.items()}))
+    try:
+        _ORIGIN_NAME_INDEX[registry] = built
+    except TypeError:
+        pass
+    return built[1], built[2]
+
+
 def company_id_for_origin(origin: str | None, registry) -> str | None:
     """把 SourceDoc 的 `origin_entity`（人類公司名）解析成 `co:*`。
 
@@ -403,9 +442,9 @@ def company_id_for_origin(origin: str | None, registry) -> str | None:
         return slug
     # 整串就是某家的一個名字寫法（大小寫不計）——中文名走這條：`_core_name` 只認 ASCII，
     # 會把「穩懋半導體股份有限公司」整個當標點丟掉（2026-10-01 Phase 4 Step 4.1b）。只增不減：
-    # 比不到才往下走核心名稱；兩家以上都比到就不猜。
-    exact = {c.company_id for c in registry.companies
-             if any(text.casefold() == str(v).casefold() for v in _name_variants(c))}
+    # 比不到才往下走核心名稱；兩家以上都比到就不猜。查表見 `_origin_name_index`（規則不變，只是不再逐家重算）。
+    exact_index, core_index = _origin_name_index(registry)
+    exact = set(exact_index.get(text.casefold(), ()))
     if len(exact) == 1:
         return exact.pop()
     if len(exact) > 1:
@@ -413,11 +452,7 @@ def company_id_for_origin(origin: str | None, registry) -> str | None:
     needle = _core_name(text)
     if not needle:
         return None
-    hits = {
-        c.company_id
-        for c in registry.companies
-        if any(needle == _core_name(v) for v in _name_variants(c))
-    }
+    hits = set(core_index.get(needle, ()))
     return hits.pop() if len(hits) == 1 else None
 
 

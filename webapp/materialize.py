@@ -631,7 +631,9 @@ def materialize(ticker: str, *, as_of: date | None = None, scenario: str | None 
                 layer_reps: Mapping[str, Any] | None = None,
                 events: Mapping[str, Any] | None = None,
                 taglines: Mapping[str, Any] | None = None,
-                labels_zh: Mapping[str, str] | None = None) -> tuple[Path, dict[str, Any]]:
+                labels_zh: Mapping[str, str] | None = None,
+                graph_provider: Any = None,
+                fundamentals_provider: Any = None) -> tuple[Path, dict[str, Any]]:
     """跑一次完整鏈並寫下 artifact。**只有這裡會連 Neo4j／Engine C／private ledger。**
 
     `readings`：`readings_context()` 的結果（多檔時由 `materialize_many` 載入一次傳進來）；沒給就自己載一次。
@@ -643,13 +645,16 @@ def materialize(ticker: str, *, as_of: date | None = None, scenario: str | None 
     `layer_reps`：層代表公司宣告（`_layer_reps_loaded`；多檔時載一次）——押的那一塊用；沒給就為這一檔載一次。
     `events`：事件之後跟組比的一輪輸入（`_event_context`；多檔時載一次）；沒給就為這一檔載一次。
     `taglines`／`labels_zh`：首頁卡片的介紹 ledger（`company_id` → 現行那一筆）與層中文名（多檔時載一次）；沒給就載一次。
+    `graph_provider`／`fundamentals_provider`：圖與 Engine C 的 provider（多檔時開一份共用，由 `materialize_many` 負責關）；
+    沒給就由 `fetch_alpha_investment_view` 為這一檔開一份、用完自己關。
     """
     from briefing.alpha_view.sources import fetch_alpha_investment_view
     from briefing.analyst_view import build_analyst_view
 
     context = readings if readings is not None else readings_context(as_of=as_of)
     view = fetch_alpha_investment_view(ticker, as_of=as_of, include_causal=False, scenario=scenario,
-                                       seat_readings=context)
+                                       seat_readings=context, graph_provider=graph_provider,
+                                       fundamentals_provider=fundamentals_provider)
     candidate_ctx = candidates if candidates is not None else candidate_context([ticker], as_of=as_of)
     analyst = build_analyst_view(view, readings=readings_input_for(context, view.identity.company_id,
                                                                         str(view.identity.ticker)),
@@ -946,16 +951,43 @@ def materialize_many(tickers: Sequence[str], *, as_of: date | None = None,
     events = _event_context() if tickers else None
     tags = _taglines_loaded() if tickers else None
     labels = node_labels_zh() if tickers else None
-    for ticker in tickers:
-        try:
-            path, _ = materialize(ticker, as_of=as_of, store=target, readings=readings, candidates=candidates,
-                                  layer_notes=notes_state, diagrams=loaded, node_names=names, anchors=anchors,
-                                  paths=paths, layer_reps=reps, events=events, taglines=tags, labels_zh=labels)
-        except Exception as exc:  # noqa: BLE001 — 逐檔隔離；理由原樣回報
-            results.append((ticker, None, f"{type(exc).__name__}: {str(exc)[:200]}"))
-        else:
-            results.append((ticker, path, None))
+    # 圖與 Engine C 的 provider 也整批共用一份（failure log #108 第 2 次）：每檔各開一份＝每檔重新連圖、重抓整張圖、
+    # 重建結構表兩次（daily 卡片 `fetch_alpha_cards` 早就整批共用，個股頁這條路漏了）。開不了就退回逐檔各開——
+    # 每檔照舊自己失敗、理由照樣現形（INV-3），不因共用的那一份開不了而整批丟掉。
+    graph_provider, fundamentals_provider = _shared_providers() if tickers else (None, None)
+    try:
+        for ticker in tickers:
+            try:
+                path, _ = materialize(ticker, as_of=as_of, store=target, readings=readings, candidates=candidates,
+                                      layer_notes=notes_state, diagrams=loaded, node_names=names, anchors=anchors,
+                                      paths=paths, layer_reps=reps, events=events, taglines=tags, labels_zh=labels,
+                                      graph_provider=graph_provider, fundamentals_provider=fundamentals_provider)
+            except Exception as exc:  # noqa: BLE001 — 逐檔隔離；理由原樣回報
+                results.append((ticker, None, f"{type(exc).__name__}: {str(exc)[:200]}"))
+            else:
+                results.append((ticker, path, None))
+    finally:
+        close = getattr(getattr(graph_provider, "driver", None), "close", None)
+        if callable(close):
+            close()
     return results
+
+
+def _shared_providers() -> tuple[Any, Any]:
+    """`materialize_many` 整批共用的 (圖 provider, Engine C provider)；哪一個開不了就回 None（那一個退回逐檔各開）。"""
+    try:
+        from alpha.providers.graph_neo4j import open_default_provider
+
+        graph_provider = open_default_provider()
+    except Exception:  # noqa: BLE001 — 退回逐檔開：每檔自己的失敗理由照樣寫進結果
+        graph_provider = None
+    try:
+        from alpha.providers.fundamentals import EngineCFundamentalsProvider
+
+        fundamentals_provider = EngineCFundamentalsProvider()
+    except Exception:  # noqa: BLE001 — 同上
+        fundamentals_provider = None
+    return graph_provider, fundamentals_provider
 
 
 # ---------------------------------------------------------------------------
