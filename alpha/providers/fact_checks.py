@@ -320,8 +320,9 @@ def carried_digests(company_id: str, records: Iterable[Mapping[str, Any]]) -> di
 
 
 def build_record(result: Any, *, company_id: str, changed: int, note: str, now: datetime | None = None,
-                 author: str = "session") -> dict[str, Any]:
-    """一筆核對紀錄（不寫檔）。`result`：`alpha.narrative.fact_check.CheckResult`（寫入後的那一版）。"""
+                 author: str = "session", anchor_counts: tuple[int, int] | None = None) -> dict[str, Any]:
+    """一筆核對紀錄（不寫檔）。`result`：`alpha.narrative.fact_check.CheckResult`（寫入後的那一版）。
+    `anchor_counts`＝(事實句數, 有錨點的事實句數)（2026-11-13 起；plan 2026-11-13-001——重放與「有錨點的比例」從這裡數）。"""
     from alpha.narrative.fact_check import FLAG_KINDS
 
     if result.brief.brief_id is None:
@@ -336,7 +337,8 @@ def build_record(result: Any, *, company_id: str, changed: int, note: str, now: 
         assert all(k in FLAG_KINDS for k in row["kinds"])
     body = {"story_id": result.story_id, "sentences": len(result.checks), "carried": len(result.carried),
             "flags_left": left, "changed": changed, "note": str(note).strip(),
-            "sentence_digests": result.digests}
+            "sentence_digests": result.digests,
+            **({"fact_sentences": anchor_counts[0], "anchored": anchor_counts[1]} if anchor_counts is not None else {})}
     stamp = (now or datetime.now(timezone.utc)).astimezone(timezone.utc).isoformat()
     return {"check_id": check_id(str(result.brief.brief_id), stamp, body), "brief_id": str(result.brief.brief_id),
             "company_id": company_id, "ticker": result.brief.ticker, "created_at": stamp, "author": author, **body}

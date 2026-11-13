@@ -1059,6 +1059,60 @@ def _is_target(claim: NumberClaim, sentence: str) -> bool:
     return bool(re.match(r"\s*[–\-~～至到]\s*\d", plain[end:end + 4]) or re.search(r"\d\s*[–\-~～至到]\s*$", plain[max(0, start - 4):start]))
 
 
+#: 分數（「三分之二」）→ 百分比。`number_claims` 不抽：在整份原文裡比不準（「約三分之二」對不到哪一個百分比），逐句核對不核它；
+#: 但它是數字主張——算進事實句，錨點比對另核（`alpha.narrative.anchors`；AXTI 11-13：原文第二季約 79%、第三季約 87%）。
+_FRACTION = re.compile(r"(\d+|[一二两兩三四五六七八九十]{1,3})\s*分之\s*(\d+|[一二两兩三四五六七八九十]{1,3})")
+
+
+def fraction_claims(text: Any) -> list[tuple[str, float]]:
+    """句子裡的分數 → (原字, 百分比)。"""
+    out = []
+    for m in _FRACTION.finditer(strip_placeholders(text)):
+        den, num = _num_value(fold(m.group(1))), _num_value(fold(m.group(2)))
+        if den and num is not None and 0 < num <= den:
+            out.append((m.group(0), num / den * 100))
+    return out
+
+
+@dataclass(frozen=True)
+class SentenceClaims:
+    """一句要核的主張——逐句核對（`check_sentence`）與錨點比對（`alpha.narrative.anchors`）共用：事實句的定義只有這一份（L16）。"""
+
+    numbers: tuple[NumberClaim, ...]
+    quotes: bool                  # 有引號裡的字
+    names: tuple[str, ...]        # 要核的英文名稱
+    attribution: str | None       # 「某份文件寫了什麼」的那個字（說、寫、年報……）
+    schedule_like: bool           # 何時格或條件句：只核引號
+    fractions: tuple[tuple[str, float], ...] = ()   # 分數（`fraction_claims`）：逐句核對不核，錨點比對核
+
+    @property
+    def is_fact(self) -> bool:
+        """事實句：有數字（含分數）、引號、英文名稱，或說某份文件寫了什麼；何時格與條件句（反證、錯的訊號）不算。"""
+        return (bool(self.numbers or self.fractions or self.quotes or self.names or self.attribution)
+                and not self.schedule_like)
+
+
+def sentence_claims(sentence: Sentence, *, self_names: Sequence[str], as_of: date | None = None) -> SentenceClaims:
+    # 寫的那天之後的日子（自己設的到期、未來的排程）原文裡本來就沒有，不核
+    commands = _command_spans(sentence.text)
+    numbers = [c for c in number_claims(sentence.text) if (as_of is None or not c.is_future(as_of))
+               and not any(a <= c.pos < b for a, b in commands)]
+    condition = sentence.condition or bool(_CONDITION_SENTENCE.search(sentence.text))
+    if sentence.where in TARGET_WHERES:
+        numbers = [c for c in numbers if not _is_target(c, sentence.text)]
+    quotes_present = bool(_QUOTE.search(strip_placeholders(sentence.text)))
+    names = latin_names(sentence.text, skip=self_names)
+    attribution = _ATTRIBUTION.search(squash(strip_placeholders(sentence.text)))
+    schedule_like = sentence.where in SCHEDULE_WHERES or condition
+    if schedule_like:
+        # 何時格講的是之後會發生什麼（下一份財報、法說、到期）；反證與錯的訊號是我們設的條件——都只核引號裡的字。
+        # 何時格的日期由裁決點那一套核（候選板「裁決點過了」）
+        numbers, names, attribution = [], [], None
+    return SentenceClaims(numbers=tuple(numbers), quotes=quotes_present, names=tuple(names),
+                          attribution=attribution.group(0) if attribution else None, schedule_like=schedule_like,
+                          fractions=() if schedule_like else tuple(fraction_claims(sentence.text)))
+
+
 def check_sentence(sentence: Sentence, ctx: CheckContext, *, self_company: str, self_names: Sequence[str],
                    as_of: date | None = None) -> SentenceCheck:
     kinds = tuple(ctx.resolve(r).kind for r in sentence.refs)
@@ -1084,26 +1138,14 @@ def check_sentence(sentence: Sentence, ctx: CheckContext, *, self_company: str, 
                 elsewhere_feats = [f for cov, f, _n in more[:3] if cov >= NO_MATCH_BELOW]
                 matched_feats += elsewhere_feats
     flags: list[Flag] = []
-    # 寫的那天之後的日子（自己設的到期、未來的排程）原文裡本來就沒有，不核
-    commands = _command_spans(sentence.text)
-    numbers = [c for c in number_claims(sentence.text) if (as_of is None or not c.is_future(as_of))
-               and not any(a <= c.pos < b for a, b in commands)]
-    condition = sentence.condition or bool(_CONDITION_SENTENCE.search(sentence.text))
-    if sentence.where in TARGET_WHERES:
-        numbers = [c for c in numbers if not _is_target(c, sentence.text)]
-    quotes_present = bool(_QUOTE.search(strip_placeholders(sentence.text)))
-    names = latin_names(sentence.text, skip=self_names)
-    attribution = _ATTRIBUTION.search(squash(strip_placeholders(sentence.text)))
-    if sentence.where in SCHEDULE_WHERES or condition:
-        # 何時格講的是之後會發生什麼（下一份財報、法說、到期）；反證與錯的訊號是我們設的條件——都只核引號裡的字。
-        # 何時格的日期由裁決點那一套核（候選板「裁決點過了」）
-        numbers, names, attribution = [], [], None
-    schedule_like = sentence.where in SCHEDULE_WHERES or condition
+    claims = sentence_claims(sentence, self_names=self_names, as_of=as_of)
+    numbers, quotes_present, names, attribution = list(claims.numbers), claims.quotes, list(claims.names), claims.attribution
+    schedule_like = claims.schedule_like
     if not readable:
         if numbers or quotes_present or names or attribution:
             what = [*(c.raw.strip() for c in numbers), *names][:6]
             flags.append(Flag("unverifiable", "、".join(what) if what else (
-                "引號裡的字" if quotes_present else f"「{attribution.group(0)}」說的內容")))
+                "引號裡的字" if quotes_present else f"「{attribution}」說的內容")))
         return SentenceCheck(sentence, tuple(matches), tuple(flags), kinds, ctx.carried.get(sentence.digest))
     union = facts if elsewhere_facts is None else _merge(facts, elsewhere_facts)
     missing_q = quote_problems(sentence.text, union)
@@ -1137,12 +1179,12 @@ def check_sentence(sentence: Sentence, ctx: CheckContext, *, self_company: str, 
     missing_qual = qualifier_problems(sentence.text, qual_lines) if not schedule_like else []
     if missing_qual:
         flags.append(Flag("qualifier_missing", "、".join(f"「{q}」" for q in missing_qual)))
-    # 「沒對到」只對事實句標：有數字、引號、名稱，或說某份文件寫了什麼的句子。判斷句（「還不賭，缺一件事」）本來就
-    # 不在原文裡——標了是恆亮的燈（L14-4），照樣要讀，但不是這一種問題
-    anchored = bool(numbers or quotes_present or names or attribution) and not schedule_like
-    if anchored and best < NO_MATCH_BELOW and not any(m.elsewhere for m in matches):
+    # 「沒對到」只對事實句標（`SentenceClaims.is_fact`）。判斷句（「還不賭，缺一件事」）本來就不在原文裡——
+    # 標了是恆亮的燈（L14-4），照樣要讀，但不是這一種問題
+    fact = claims.is_fact
+    if fact and best < NO_MATCH_BELOW and not any(m.elsewhere for m in matches):
         flags.append(Flag("no_match", f"最好的一行只對到 {best:.0%}"))
-    elif anchored and best >= NO_MATCH_BELOW and best_primary < NO_MATCH_BELOW:
+    elif fact and best >= NO_MATCH_BELOW and best_primary < NO_MATCH_BELOW:
         # 對得上的只有我們自己寫的字（2026-11-13）：以前這種句子不標——工具拿我們的改寫當原文，等於替自己背書（L18）
         flags.append(Flag("own_text_only", f"一手原文最好的一行只對到 {best_primary:.0%}，我們自己寫的字對到 {best:.0%}"))
     return SentenceCheck(sentence, tuple(matches), tuple(flags), kinds, ctx.carried.get(sentence.digest))
@@ -1269,7 +1311,8 @@ def as_dict(result: CheckResult) -> dict[str, Any]:
 
 
 __all__ = ["BriefText", "CheckContext", "CheckResult", "FLAG_KINDS", "Flag", "Match", "NumberClaim", "QUALIFIERS",
-           "READABLE_REF_KINDS", "REF_KINDS", "ResolvedRef", "Sentence", "SentenceCheck", "SourceFacts", "SourceLine",
+           "READABLE_REF_KINDS", "REF_KINDS", "ResolvedRef", "Sentence", "SentenceCheck", "SentenceClaims", "SourceFacts",
+           "SourceLine", "fraction_claims", "sentence_claims",
            "as_dict", "brief_text_from_record", "brief_text_from_spec", "build_sentences", "check_brief", "check_sentence",
            "classify_ref", "cn_to_int", "fold", "latin_names", "number_claims", "number_found", "qualifier_problems",
            "quote_problems", "rank_lines", "registry_name_problems", "render_markdown", "source_facts", "split_sentences",

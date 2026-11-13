@@ -350,6 +350,17 @@ Lumentum、住友並列，協議也是非獨家。它和別家不同在六吋磷
    `python -m alpha brief-check <T> --record --changed <K> --note "<一句>"`（K＝這次核對改了幾句，含寫入前在草稿裡改的）；
    一字沒改的句子下一版沿用、只核換過的。⑤「敘事還沒逐句核對」由研究 session 歸零：`python -m alpha brief-check --gaps` 列檔，
    順序已持有 → 可開 → 缺 X → 不要；有錯就重述改字（`restates`，判斷不變）＋故事改字，再 `--record`——判斷要變就照常換版。
+   **事實句錨點**（2026-11-13 使用者「照你推薦做吧」；plan 2026-11-13-001；failure log #163——猜行的命中率約 13%）：寫入（敘事＋故事）
+   之後、`--record` 之前，每一句**事實句**（有數字、引號、英文名稱，或說某份文件寫了什麼；何時格與條件句除外）綁一段逐字原文：
+   `python -m alpha brief-anchor <T> --draft --format json > a.json` 列還沒錨點的句子與候選行（候選行是猜的、只是起點）→ 讀原文，
+   每項填 `ref`（一手：`library/raw/…` 或 `graph://source/…`；NOTE、改寫、讀圖判讀、筆記不收）與 `quote`（撐這一句的那一段，逐字照抄、
+   原文是簡體就照簡體）→ 同一個事實撐好幾句就把那幾句都放進同一項的 `sentences`（只寫一處）→ 比例、成長率這種自己算的數寫
+   `derive`（`{"op": "share", "of": ["79%", "87%"], "shown": "…"}`，`of` 照原文寫法、`shown` 照句子寫法）→
+   `python -m alpha brief-anchor <T> --spec a.json --dry-run` 過了再去掉 `--dry-run` → `brief-check <T>` 的「錨點比對」一段每個旗標
+   都讀：主詞收窄、保留語氣被拿掉、分數與比例算不回原文，照「逐句核對」的規則改字或換版（改過的句子指紋變了，要重綁）。
+   找不到撐它的一手原文＝這句沒有一手依據：改成推論口氣或刪掉，不綁自家文字。數字來自 Engine C／三題的（分部營收占比、年增）
+   改用 placeholder 由 authority 填，或把那份申報的表節錄進 `library/raw` 再綁（比例用 `derive` 算）——不手寫成「約四分之三」。
+   ⑤「事實句還沒錨點」只管已持有與宣告可開（含前提失效），其餘狀態換版時才補；只印、不擋寫入。
    **缺 X 三分法**（2026-10-30 使用者「好 可以」；failure log #117；ROADMAP「缺 X 三分法與文件請求上限」）：每一檔缺 X 寫敘事時
    `candidate_state.missing_kind` 必答三選一——`filing`（X 會在下一份公開文件出現：等事件，watch 的 until 寫那一天）、
    `layer`（X 是層的問題：層深讀的入口，上一行）、`user_document`（X 可能寫在使用者拿得到的券商報告／法說 memo 裡）。

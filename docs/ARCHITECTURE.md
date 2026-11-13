@@ -1019,6 +1019,14 @@ AnalystView.brief（optional）→ APP 首屏 briefCard；六張卡收進「為�
   與 `python -m alpha stories --gaps` 同一個判定 `story_gaps`；涵蓋登記表從 `STORY_GAP_KINDS` 列舉）——過期是會自己出現的計數，
   不是要人記得的事（L14）。它不 gate 任何東西、不寫 watch、不改候選狀態。寫法守則（擋不到的那四條＋前後對照）住
   `skills/research-drain/SKILL.md`「段『故事』」。查證：`python -m alpha stories --gaps`。
+- **逐句核對與事實句錨點（2026-11-12、11-13；failure log #163）**：兩本 append-only 收據，都不 gate、不改候選狀態、不寫 watch。
+  核對紀錄 `library/private/alpha/fact_checks.jsonl`（`alpha/providers/fact_checks.py`；規則 `alpha/narrative/fact_check.py`）一筆對
+  一版敘事＋它的故事——工具在那一格的整份引用裡**猜**對得上的行（命中率約 13%）。錨點紀錄 `library/private/alpha/fact_anchors.jsonl`
+  （`alpha/providers/fact_anchors.py`；規則 `alpha/narrative/anchors.py`）**一列一個事實**：句子指紋（公司＋正規化的句子，**不含引用**，
+  同一句換版照對得到）、一手引用與逐字原文（寫入端驗逐字、拒收我們自己寫的字）、選填衍生數字；`brief-check` 對綁了錨點的句子
+  另比它自己那一段（多比保留語氣、分數與衍生數字、同語言的詞），與猜行分開印。事實句的定義只有一份
+  （`fact_check.sentence_claims(...).is_fact`）。⑤「敘事還沒逐句核對」與「事實句還沒錨點」（只管已持有與宣告可開）各是同名 `--gaps`
+  的同一個判定。敘事格式不因錨點升版（使用者 11-13 ①）。查證：`python -m alpha brief-anchor --gaps`。
 
 **為什麼數字用 placeholder：** session 打的數字會過期、會錯、會與 authority 不一致；placeholder 讓句子永遠
 讀到 materialize 當下的值，而且填不到時那一格自己現形（`partial`＋理由），不是留白。

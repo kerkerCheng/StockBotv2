@@ -1160,6 +1160,16 @@ def cmd_brief_check(args: argparse.Namespace) -> int:
         print(f"⚠ 核對紀錄有 {len(fc_errors)} 行讀不懂（上一版核過的句子這次不沿用）：{fc_errors[0]}", file=sys.stderr)
     ctx = CheckContext(resolve=fc.RefResolver(), names=names, carried=fc.carried_digests(company, fc_records))
     result = check_brief(text, ctx, story=story, self_names=fc.self_names(company, ticker, names))
+    # 錨點比對（2026-11-13 plan 2026-11-13-001 Step A）：綁了錨點的句子另比它自己那段原文，與上面的猜行分開印；只印、不擋
+    from .narrative import anchors as anc
+    from .providers import fact_anchors as fa
+
+    fa_records, fa_errors = fa.read_records()
+    if fa_errors:
+        print(f"⚠ 錨點紀錄有 {len(fa_errors)} 行讀不懂（錨點比對不完整）：{fa_errors[0]}", file=sys.stderr)
+    anchor_checks = anc.check_anchors(result, fa.anchor_index(company, fa_records), ctx=ctx,
+                                      self_names=fc.self_names(company, ticker, names))
+    anchor_counts = (sum(1 for c in anchor_checks if c.fact), sum(1 for c in anchor_checks if c.fact and c.anchors))
     if args.record:
         if args.spec or args.story_spec:
             print("✗ --record 只記寫進去的那一版（現行敘事＋它現行的故事），不記草稿", file=sys.stderr)
@@ -1167,18 +1177,117 @@ def cmd_brief_check(args: argparse.Namespace) -> int:
         if args.changed is None or not str(args.note or "").strip():
             print("✗ --record 要給 --changed（這次核對改了幾句，含寫入前在草稿裡改的）與 --note（一句話）", file=sys.stderr)
             return 2
-        record = fc.build_record(result, company_id=company, changed=args.changed, note=str(args.note))
+        record = fc.build_record(result, company_id=company, changed=args.changed, note=str(args.note),
+                                 anchor_counts=anchor_counts)
         fc.append_record(record)
         print(summary_line(result))
+        print(anc.anchor_summary(anchor_checks))
         for c in result.flagged:
             print(f"- 留著的旗標 {c.sentence.n}（{where_label(c.sentence.where)}）：" + "｜".join(f.kind for f in c.flags))
         print(f"✓ 記下 {record['check_id']}（{text.brief_id}" + (f"＋故事 {result.story_id}" if result.story_id else "＋沒有故事")
               + f"；改了 {args.changed} 句）")
         return 0
     if args.format == "json":
-        print(json.dumps(as_dict(result), ensure_ascii=False, indent=2))
+        print(json.dumps({**as_dict(result), "anchors": anc.as_dict(anchor_checks)}, ensure_ascii=False, indent=2))
         return 0
-    print("\n".join(render_markdown(result, flags_only=args.flags_only)))
+    print("\n".join([*render_markdown(result, flags_only=args.flags_only),
+                     *anc.render_markdown(anchor_checks, ticker=ticker)]))
+    return 0
+
+
+def cmd_brief_anchor(args: argparse.Namespace) -> int:
+    """敘事事實句綁逐字錨點（2026-11-13 使用者「照你推薦做吧」；plan 2026-11-13-001 Step A；failure log #163）。
+    `--draft` 列現行版還沒錨點的事實句、附逐句核對對到的候選原文行（`quote` 留空——預填會變成蓋章）；`--spec` 驗證後 append
+    （任一項不過整批不收）；`--gaps` 列 ⑤「事實句還沒錨點」那一格的名單。不擋寫入、不改候選狀態。"""
+    from identity.registry import get_registry
+
+    from .narrative.anchors import fingerprint
+    from .narrative.contracts import RECORD_VERSION_V2, select_brief
+    from .narrative.fact_check import (CheckContext, brief_text_from_record, build_sentences, check_brief, sentence_claims,
+                                       where_label)
+    from .providers import fact_anchors as fa
+    from .providers import fact_checks as fc
+    from .providers.briefs import read_brief_records
+    from .providers.stories import current_stories
+
+    if args.gaps:
+        held = fa.held_now()
+        if held is None:
+            print("⚠ 候選板或持股沒讀到——已持有那一半數不到，下面只列宣告可開的", file=sys.stderr)
+        gaps = fa.gaps_now(held=held or ())
+        if args.format == "json":
+            print(json.dumps(gaps, ensure_ascii=False, indent=2))
+            return 0
+        labels = {"held": "已持有", "open": "宣告可開（含前提失效）"}
+        print(f"事實句還沒錨點 {len(gaps)} 版（事實句 {sum(g['facts'] for g in gaps)} 句、沒錨點 {sum(g['missing'] for g in gaps)} 句）。"
+              "其餘狀態換版時才補。")
+        for scope in fa.ANCHOR_SCOPE:
+            rows = [g for g in gaps if g["scope"] == scope]
+            if rows:
+                print(f"- {labels[scope]} {len(rows)}：" + "、".join(f"{g['ticker']}（{g['missing']}/{g['facts']}）" for g in rows))
+        return 0
+    if not args.ticker or not (args.draft or args.spec):
+        print("✗ 要給代號＋--draft 或 --spec（或只給 --gaps）", file=sys.stderr)
+        return 2
+    ticker = args.ticker.strip()
+    registry = get_registry()
+    company = registry.company_id_for_ticker(ticker)
+    if company is None:
+        print(f"✗ {ticker} 不在名冊——先補名冊，不從公司名猜（INV-1）", file=sys.stderr)
+        return 2
+    records, _errors = read_brief_records(ticker)
+    brief = select_brief(list(records), as_of=None, today=date.today())
+    if brief is None or brief.record_version != RECORD_VERSION_V2:
+        print(f"✗ {ticker} 沒有現行的 v2 敘事（錨點綁在寫進去的那一版）", file=sys.stderr)
+        return 2
+    text = brief_text_from_record(brief)
+    story = current_stories()[0].get(brief.brief_id)
+    sentences = build_sentences(text, story=story)
+    anchors_all, anchor_errors = fa.read_records()
+    if anchor_errors:
+        print(f"✗ 錨點紀錄有 {len(anchor_errors)} 行讀不懂（先修好再寫）：{anchor_errors[0]}", file=sys.stderr)
+        return 2
+    names = fc.company_names(registry)
+    mine = fc.self_names(company, ticker, names)
+    index = fa.anchor_index(company, anchors_all)
+    resolver = fc.RefResolver()
+    if args.draft:
+        result = check_brief(text, CheckContext(resolve=resolver, names=names), story=story, self_names=mine)
+        items = [{"n": c.sentence.n, "where": where_label(c.sentence.where), "sentences": [c.sentence.text], "ref": "",
+                  "quote": "", "refs": list(c.sentence.refs),
+                  "candidates": [{"label": m.label, "line": m.text, "own": m.own} for m in c.matches]}
+                 for c in result.checks
+                 if sentence_claims(c.sentence, self_names=mine, as_of=text.as_of).is_fact
+                 and fingerprint(company, c.sentence.text) not in index]
+        if args.format == "json":
+            print(json.dumps(items, ensure_ascii=False, indent=2))
+            return 0
+        facts = sum(1 for s in sentences if sentence_claims(s, self_names=mine, as_of=text.as_of).is_fact)
+        print(f"# {ticker} 還沒錨點的事實句（{brief.brief_id}；事實句 {facts}、還沒錨點 {len(items)}）")
+        print("每一句讀原文、選撐它的那一段逐字抄進 quote（一手：library/raw 或 graph://source）；候選行是逐句核對猜的，"
+              "只是起點。`--format json` 印成可以直接填的 spec，填好用 `--spec` 寫入。")
+        for item in items:
+            print(f"\n{item['n']}.（{item['where']}）{item['sentences'][0]}")
+            for cand in item["candidates"]:
+                print(f"   ↳ {cand['label']}{'（自家文字，不能當錨點）' if cand['own'] else ''}｜{cand['line']}")
+            print("   引用：" + ("、".join(item["refs"]) or "（這一格沒有引用）"))
+        return 0
+    spec = json.loads(Path(args.spec).read_text(encoding="utf-8"))
+    items = spec.get("anchors") if isinstance(spec, dict) else spec
+    known = [str(r["anchor_id"]) for r in anchors_all if r.get("company_id") == company]
+    cleaned, problems = fa.validate_items(items, company_id=company, sentences=sentences, resolve=resolver,
+                                          known_ids=known)
+    if problems:
+        print("✗ 錨點整批不收：\n- " + "\n- ".join(problems), file=sys.stderr)
+        return 2
+    built = [fa.build_record(item, company_id=company, ticker=ticker) for item in cleaned]
+    covered = len({fp for b in built for fp in b["fingerprints"]})
+    if args.dry_run:
+        print(f"✓ 乾跑：{len(built)} 個錨點都過了驗證（撐 {covered} 句）；沒有寫入")
+        return 0
+    fa.append_records(built)
+    print(f"✓ 記下 {len(built)} 個錨點（撐 {covered} 句）：" + "、".join(b["anchor_id"] for b in built)
+          + f"——接著 `python -m alpha brief-check {ticker}` 看錨點比對")
     return 0
 
 
@@ -1299,6 +1408,16 @@ def build_parser() -> argparse.ArgumentParser:
     check.add_argument("--gaps", action="store_true", help="現行敘事裡還沒逐句核對的（與 ⑤ 同一份判定）")
     check.add_argument("--format", choices=("markdown", "json"), default="markdown")
     check.set_defaults(func=cmd_brief_check)
+
+    anchor = sub.add_parser(
+        "brief-anchor", help="敘事事實句綁逐字錨點：--draft 列還沒錨點的事實句；--spec 寫入（驗證不過整批不收）；--gaps ⑤ 那一格")
+    anchor.add_argument("ticker", nargs="?", help="代號（--gaps 不用給）")
+    anchor.add_argument("--draft", action="store_true", help="現行版還沒錨點的事實句＋候選原文行（quote 留空）")
+    anchor.add_argument("--spec", help="錨點 spec：[{sentences: [句子原文…], ref, quote, derive?, supersedes?}]")
+    anchor.add_argument("--dry-run", action="store_true", help="--spec：只驗證、不寫")
+    anchor.add_argument("--gaps", action="store_true", help="已持有與宣告可開的現行敘事裡，事實句沒全部綁錨點的（與 ⑤ 同一份判定）")
+    anchor.add_argument("--format", choices=("markdown", "json"), default="markdown")
+    anchor.set_defaults(func=cmd_brief_anchor)
 
     # ⚠ 2026-09-23（Phase 0 Step 0b.1b）：`valuation` 與 `horizon` 子命令隨 C／H 組退役。
     assumptions = sub.add_parser(

@@ -76,6 +76,12 @@ LEDGER: tuple[LedgerRow, ...] = (
               "`python -m alpha brief-check --gaps` → 逐檔 `python -m alpha brief-check <T>` 一句一句對原文行（research-drain"
               "「逐句核對」段）→ 有錯就重述改字（`restates`）＋故事改字 → `python -m alpha brief-check <T> --record --changed K "
               "--note …`"),
+    # 2026-11-13 使用者「照你推薦做吧」（plan 2026-11-13-001；failure log #163）：逐句核對在整份引用裡猜行、命中率約 13%——
+    # 事實句寫的時候各綁一段逐字原文。已持有與宣告可開（含前提失效）先補，其餘換版時才補
+    LedgerRow("todo.fact_anchor", "事實句還沒錨點", "檔",
+              "`python -m alpha brief-anchor --gaps` → 逐檔 `python -m alpha brief-anchor <T> --draft --format json > a.json`、"
+              "讀原文填 ref 與 quote（research-drain「事實句錨點」段）→ `python -m alpha brief-anchor <T> --spec a.json` → "
+              "`python -m alpha brief-check <T>` 看錨點比對"),
 )
 LEDGER_KEYS: tuple[str, ...] = tuple(r.key for r in LEDGER)
 LEDGER_BY_KEY: Mapping[str, LedgerRow] = {r.key: r for r in LEDGER}
@@ -175,6 +181,9 @@ COVERAGE: Mapping[str, str] = {
     # --- 敘事逐句核對（alpha.providers.fact_checks.FACT_CHECK_GAP_KINDS；2026-11-12）
     "fact_check:brief": "todo.fact_check",       # 這一版敘事還沒有核對紀錄
     "fact_check:story": "todo.fact_check",       # 核過之後故事換了
+    # --- 事實句錨點（alpha.providers.fact_anchors.ANCHOR_SCOPE；2026-11-13）：其餘狀態換版時才補，不進 ⑤
+    "fact_anchor:held": "todo.fact_anchor",
+    "fact_anchor:open": "todo.fact_anchor",       # 宣告可開（含前提失效、邊緣無法量）
     # --- 其他來源
     "impact:undisposed": "todo.undisposed",
     "lead:classification_gap": "todo.unclassified",
@@ -654,6 +663,24 @@ def collect(*, today: date, leads_store: Mapping[str, Any], watches: Sequence[Ma
             note=None if candidates is not None else "候選板沒讀到——已持有併在敘事宣告的狀態裡")
 
     guarded("todo.fact_check", fact_check)
+
+    def fact_anchor() -> None:
+        # `alpha.providers.fact_anchors.gaps_now`——`python -m alpha brief-anchor --gaps` 同一份判定（L16）。已持有要讀候選板的
+        # 持股：板或持股沒讀到＝未讀到（INV-3）——不退回只數宣告可開，那會把已持有那一半當成 0
+        from alpha.providers.fact_anchors import ANCHOR_SCOPE, gaps_now as anchor_gaps_now, held_from_board
+
+        held = held_from_board(candidates)
+        if held is None:
+            rows["todo.fact_anchor"].reason = "候選板或持股沒讀到——已持有那一半數不到"
+            return
+        gaps = (loaders.get("fact_anchor_gaps") or (lambda: anchor_gaps_now(held=held, today=today)))()
+        labels = {"held": "已持有", "open": "可開"}
+        bits = [f"{labels[s]} {n}" for s in ANCHOR_SCOPE if (n := sum(1 for g in gaps if g["scope"] == s))]
+        missing = sum(int(g["missing"]) for g in gaps)
+        put("todo.fact_anchor", len(gaps), work="、".join(bits) + f"；沒錨點的事實句 {missing}" if gaps else None,
+            oldest_days=_oldest((g.get("since") for g in gaps), today))
+
+    guarded("todo.fact_anchor", fact_anchor)
     return [rows[r.key] for r in LEDGER]
 
 
