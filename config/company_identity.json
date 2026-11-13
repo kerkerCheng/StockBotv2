@@ -3587,6 +3587,18 @@
         "China Tungsten High-Tech",
         "Shenzhen Jinzhou Precision Technology"
       ]
+    },
+    {
+      "company_id": "co:kunshan_jingming_machinery",
+      "research_ticker": null,
+      "display_name": "崑山競名機械有限公司",
+      "_display_name_source": "金像電 114 年度年報「七、重要契約」逐字「崑山競名機械有限公司」（p.99；2026-11-13 讀）；英文名沒有一手",
+      "_note": "隨電鍍設備層補買方一手入圖包 staged（2026-11-13，drop 即回退）：私人公司（中國江蘇崑山；研究 ticker 明確 null，INV-1），PCB 電鍍設備商——金像電 2025 年報重要契約向它買一次銅脈衝自動電鍍線（114/6/21～117/12/31）。只見於買方文件；別名收簡體寫法與四字簡稱",
+      "name_aliases": [
+        "崑山競名",
+        "昆山竞名机械有限公司",
+        "昆山竞名"
+      ]
     }
   ]
 }
