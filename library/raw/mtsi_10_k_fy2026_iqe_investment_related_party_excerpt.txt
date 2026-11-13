@@ -1,0 +1,20 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1493594/000149359426000044/mtsi-20261002.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] MACOM（MTSI）FY2026 10-K：投資 IQE 的用意（風險因子）、Long-Term Investments 附註、關係人交易（投資後向 IQE 買的存貨）
+DATE: 2026-11-12
+RETRIEVED: 2026-11-13（EDGAR，repo 預設 UA；HTML 轉文字、空白攤平後逐字照抄）
+NOTE: 買方（MACOM）自己的年報。向 IQE 買的是「inventory」，沒分材料（GaAs、InP 或其他）；長期供應協議的量、金額、年限都沒寫。第三季 10-Q（2026-08-06，library/raw/mtsi_10_q_20260806.txt）同一段寫的是 290 萬美元（2026-05-28 到 2026-07-03）。FY2026 會計年度截至 2026-10-02。
+
+【風險因子｜供應商】
+"We generally purchase raw materials on a purchase order basis, and we do not have significant long-term supply commitments from our vendors. The long-term supply commitments we have may result in an obligation to purchase excess material, which may materially and negatively impact our operating results. To secure access to wafer capacity and critical materials, we have made, and may in the future make, strategic investments in suppliers, such as our investment in Investee (IQE plc), and suppliers may require prepayments, capacity reservation fees or take-or-pay commitments."
+
+【附註｜Long-Term Investments】
+"On May 28, 2026, we completed an investment in IQE plc (“Investee”), which included entering into a Subscription Agreement to purchase newly-issued ordinary shares of Investee (representing approximately 12 % of Investee’s issued and outstanding ordinary shares on the date of issuance), for £ 30.0 million ($ 40.4 million) (“Equity Investment”), a five-year Convertible Loan Note Agreement with a principal balance of £ 15.0 million ($ 20.2 million) (“Debt Investment”, collectively, “Long-Term Investments”) and long-term supply agreements."
+
+【附註｜關係人交易】
+"Following the closing of our investment in Investee on May 28, 2026, as described in Note 5 - Investments , we purchased $ 10.3 million of inventory from Investee during the remainder of the fiscal year ended October 2, 2026. As of October 2, 2026, $ 0.2 million was due to Investee."
+
+【對照｜第三季 10-Q（2026-08-06，https://www.sec.gov/Archives/edgar/data/1493594/000149359426000038/mtsi-20260703.htm；本庫 library/raw/mtsi_10_q_20260806.txt，HTML 字元 &#160; 轉成空白）】
+"Following the closing of our investment in Investee on May 28, 2026, as described in Note 4 - Investments , we purchased $ 2.9 million of inventory from Investee during the remainder of the nine months ended July 3, 2026. As of July 3, 2026, $ 1.6 million was due to Investee."
+（即 5 月底到 7 月初 290 萬美元；全年 1,030 萬減去它，7 月初到 10 月初約 740 萬——推算，不是原文）
