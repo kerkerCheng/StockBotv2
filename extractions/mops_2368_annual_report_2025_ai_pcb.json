@@ -36,6 +36,20 @@
       ],
       "statement": "Gold Circuit Electronics lists its main raw materials as substrates (laminates), prepreg, copper foil, dry film and plating chemicals, bought from major domestic suppliers with long-term stable supply relationships; drill bits are not listed among its main raw materials.",
       "subject_id": "tech:ai_high_layer_pcb"
+    },
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：金像電下一份年報的重要契約或重訊寫出這兩份電鍍線契約解約、縮減，或寫明電鍍線只向單一設備商採購。核查頻率：每年（年報重要契約，約 5 月）＋每月（MOPS 重訊）。觸發後 48 小時：更正這條 claim，重讀電鍍設備層讀圖的 neither 出口。",
+      "id": "mops_2368_annual_report_2025_ai_pcb_cl4",
+      "source_ids": [
+        "mops_2368_annual_report_2025_ai_pcb_s1",
+        "mops_2368_annual_report_2025_ai_pcb_s10",
+        "mops_2368_annual_report_2025_ai_pcb_s11",
+        "mops_2368_annual_report_2025_ai_pcb_s12"
+      ],
+      "statement": "Customer-side fact (Gold Circuit Electronics FY2025 annual report, important contracts, p.99): Gold Circuit holds purchase contracts for a first-copper pulse automatic plating line from Kunshan Jingming Machinery (114/6/21-117/12/31 ROC, i.e. 2025-06-21 to 2028-12-31) and a gantry-type pulse plating line from Tongtai Machine & Tool (114/12/10-117/12/31 ROC, i.e. 2025-12-10 to 2028-12-31); both list no restrictive terms. One PCB maker buys plating lines from at least two vendors. The two lines are different types (first-copper vs gantry), so this shows more than one vendor at the layer, not that the same line type was switched.",
+      "subject_id": "tech:pcb_plating_line"
     }
   ],
   "edges": [
@@ -51,6 +65,57 @@
         "mops_2368_annual_report_2025_ai_pcb_s5"
       ],
       "src_id": "co:gold_circuit"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:pcb_plating_line",
+      "id": "e2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "mops_2368_annual_report_2025_ai_pcb_s10",
+        "mops_2368_annual_report_2025_ai_pcb_s11"
+      ],
+      "src_id": "co:kunshan_jingming_machinery"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:pcb_plating_line",
+      "id": "e3",
+      "relation": "supplies_to",
+      "source_ids": [
+        "mops_2368_annual_report_2025_ai_pcb_s10",
+        "mops_2368_annual_report_2025_ai_pcb_s12"
+      ],
+      "src_id": "co:tongtai_machine_tool"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "co:gold_circuit",
+      "id": "e4",
+      "relation": "supplies_to",
+      "source_ids": [
+        "mops_2368_annual_report_2025_ai_pcb_s1",
+        "mops_2368_annual_report_2025_ai_pcb_s10",
+        "mops_2368_annual_report_2025_ai_pcb_s11"
+      ],
+      "src_id": "co:kunshan_jingming_machinery"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "co:gold_circuit",
+      "id": "e5",
+      "relation": "supplies_to",
+      "source_ids": [
+        "mops_2368_annual_report_2025_ai_pcb_s1",
+        "mops_2368_annual_report_2025_ai_pcb_s8",
+        "mops_2368_annual_report_2025_ai_pcb_s10",
+        "mops_2368_annual_report_2025_ai_pcb_s12"
+      ],
+      "src_id": "co:tongtai_machine_tool"
     }
   ],
   "nodes": [
@@ -97,6 +162,71 @@
         "mops_2368_annual_report_2025_ai_pcb_s5"
       ],
       "type": "TechNode"
+    },
+    {
+      "abstraction_level": "equipment_epitaxy",
+      "aliases": [
+        "PCB 電鍍線",
+        "電鍍線",
+        "電鍍設備",
+        "垂直連續電鍍",
+        "垂直連續電鍍設備",
+        "脈衝電鍍線",
+        "龍門式電鍍線",
+        "垂直连续电镀设备",
+        "垂直连续镀铜线",
+        "电镀设备",
+        "VCP",
+        "PCB plating line",
+        "plating equipment"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:pcb_plating_line",
+      "name": "PCB electroplating lines (vertical continuous plating VCP, gantry / pulse plating, horizontal plating)",
+      "role": null,
+      "source_ids": [
+        "mops_2368_annual_report_2025_ai_pcb_s11",
+        "mops_2368_annual_report_2025_ai_pcb_s12"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "equipment_epitaxy",
+      "aliases": [
+        "東台精機",
+        "東台精機股份有限公司",
+        "Tongtai"
+      ],
+      "attributes": {
+        "ticker": "4526.TW"
+      },
+      "confidence": 0.9,
+      "id": "co:tongtai_machine_tool",
+      "name": "Tongtai Machine & Tool Co., Ltd.",
+      "role": null,
+      "source_ids": [
+        "mops_2368_annual_report_2025_ai_pcb_s8",
+        "mops_2368_annual_report_2025_ai_pcb_s12"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "equipment_epitaxy",
+      "aliases": [
+        "崑山競名",
+        "昆山竞名机械有限公司",
+        "昆山竞名"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "co:kunshan_jingming_machinery",
+      "name": "崑山競名機械有限公司",
+      "role": null,
+      "source_ids": [
+        "mops_2368_annual_report_2025_ai_pcb_s11"
+      ],
+      "type": "Company"
     }
   ],
   "schema_version": "0.1",
@@ -107,10 +237,11 @@
     "permission_basis": "公開資訊觀測站公開年報；只保留研究必要的有限逐字節錄。published_at 取 MOPS 上傳時間（115/05/07 15:02:44）。",
     "published_at": "2026-05-07",
     "publisher": "公開資訊觀測站（股東會年報）",
-    "retrieved_at": "2026-11-11",
+    "retrieved_at": "2026-11-13",
     "source_type": "filing",
     "storage_permission": "repo_excerpt",
-    "title": "金像電子（2368）中華民國 114 年度年報：印刷電路板用於伺服器、AI 伺服器、網路設備；52 層板量產；背鑽研發；主要原料國內各大廠穩定供應；重要契約——向東台精機買五軸鑽孔機 21 台、六軸 CCD 鑽孔 6 台；Prismark：2025 年 18 層以上高階多層板產值增 72.8%",
+    "supersedes_extraction_sha256": "5661541a1070acf2e8471706717ed80128a31abea7749182eadfb59f359889c8",
+    "title": "金像電子（2368）中華民國 114 年度年報：印刷電路板用於伺服器、AI 伺服器、網路設備；52 層板量產；背鑽研發；主要原料國內各大廠穩定供應；重要契約——向東台精機買五軸鑽孔機 21 台、六軸 CCD 鑽孔 6 台；Prismark：2025 年 18 層以上高階多層板產值增 72.8%；重要契約另兩列電鍍線——一次銅脈衝自動電鍍線向崑山競名機械買、龍門式脈衝電鍍線向東台精機買",
     "url": "https://doc.twse.com.tw/server-java/t57sb01?step=9&kind=F&co_id=2368&filename=2025_2368_20260529F04.pdf"
   },
   "sources": [
@@ -158,6 +289,21 @@
       "id": "mops_2368_annual_report_2025_ai_pcb_s9",
       "locator": "伍、營運概況 (二) 產業概況 3、產品之各種發展趨勢（p.83）",
       "quote": "根據研究機構 Prismark 預估"
+    },
+    {
+      "id": "mops_2368_annual_report_2025_ai_pcb_s10",
+      "locator": "七、重要契約（p.99）表頭",
+      "quote": "七、 重要契約： 契約性質 當事人 契約起迄日期 主要內容 限制 條款"
+    },
+    {
+      "id": "mops_2368_annual_report_2025_ai_pcb_s11",
+      "locator": "七、重要契約（p.99）",
+      "quote": "買賣契約 崑山競名機械有限公司 114/6/21~117/12/31 一次銅脈衝自動電 鍍線 無"
+    },
+    {
+      "id": "mops_2368_annual_report_2025_ai_pcb_s12",
+      "locator": "七、重要契約（p.99）",
+      "quote": "買賣契約 東台精機股份有限公司 114/12/10~117/12/31 龍門式脈衝電鍍線 無"
     }
   ]
 }
