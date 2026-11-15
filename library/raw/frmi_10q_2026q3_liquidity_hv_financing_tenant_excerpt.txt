@@ -1,0 +1,39 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/2071778/000207177826000058/frmi-20260930.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Fermi Inc.（FRMI）Form 10-Q，截至 2026-09-30 的季度（2026-11-12 申報）——流動性與持續經營、高壓設備融資、長交期設備採購承諾、期後事項；另附同日 8-K Exhibit 99.1（第三季新聞稿）一句
+RETRIEVED: 2026-11-13（10-Q：daily 語意預篩存的全文）；2026-11-15（8-K Exhibit 99.1：https://www.sec.gov/Archives/edgar/data/0002071778/000121390026118351/ea031197701ex99-1.htm）
+NOTE: 10-Q 財報附註的金額單位是千美元（$94,691＝9,469.1 萬美元）；MD&A 段落另以百萬美元寫同一筆數。買方（需求側）自己的申報；「demand currently exceeds available supply」那一句是為了說明持有的設備賣得掉而寫，句中把發電、變電站與變壓器、資料中心設備放在一起，沒有單講大型電力變壓器。
+
+【Note 1 流動性與持續經營：結論前的條件】
+"Considered in the aggregate and before consideration of management’s plans, these conditions raise substantial doubt about the Company’s ability to continue as a going concern within that period."
+
+【Note 1 流動性：緩解手段（持有的設備與市場供需）】
+"The Company also holds significant equity in its power generation, substation and transformer, data center, and other ancillary equipment, and, in the event the Company elects to monetize all or any portion of these assets in markets where demand currently exceeds available supply, such monetization would further mitigate the Company’s near-term liquidity needs."
+
+【Note 1 流動性：管理層結論】
+"Accordingly, management has concluded that its plans alleviate the substantial doubt, and these unaudited condensed consolidated financial statements have been prepared on a going concern basis."
+
+【Note 5 高壓設備融資：額度】
+"High Voltage Equipment Financing On February 19, 2026, Fermi High Voltage Warehouse LLC (“HVW”) entered into a master loan agreement (the “Keystone Master Loan Agreement”) with Keystone National Group, LLC, as agent, and Keystone Private Income Fund, as initial lender, providing for equipment-backed advances of up to $120,000 in aggregate principal, with the potential to increase by an additional $100,000 subject to lender approval (the “High Voltage Equipment Financing”)."
+
+【Note 5 高壓設備融資：撥款與餘額】
+"As of September 30, 2026, HVW had received advances totaling $94,691 under two promissory notes, each of which bears interest at a fixed rate of 12.90% per annum and matures on August 19, 2031. During the three months ended September 30, 2026, HVW made the first two scheduled principal installments totaling $3,156. As of September 30, 2026, $91,535 was outstanding under the High Voltage Equipment Financing."
+
+【Note 5 高壓設備融資：不能再撥】
+"As of September 30, 2026, no further advances were available to HVW under the High Voltage Equipment Financing."
+
+【Note 5 高壓設備融資：條款】
+"The Keystone Master Loan Agreement includes a minimum liquidity covenant of $20,000, a mandatory prepayment requirement if an approved customer agreement has not been received by December 31, 2026, and a collateral coverage requirement under which outstanding principal may not exceed 110% of the fair market value of the financed equipment."
+
+【Note 8 長交期設備的無條件採購承諾】
+"As of September 30, 2026, the Company’s unconditional purchase obligations of $126,179 related to long-lead-time equipment purchases, of which approximately $111,630 is expected to be funded through draws on the Company’s existing equipment financing facilities. Future payments under unconditional purchase obligations as of September 30, 2026, were as follows: Years Ending December 31, Payments by Year Remainder of 2026 $ 21,960 2027 71,279 2028 32,940 2029 — 2030 — Thereafter — Total unconditional purchase obligations $ 126,179"
+
+【Note 9 期後事項：TensorWave 租約終止】
+"The closing date passed without extension, and on 27 Table of Contents November 10, 2026, the TensorWave Lease was terminated in accordance with its terms."
+
+【Note 9 期後事項：超大規模業者意向書】
+"On November 10, 2026, the Company entered into a non-binding letter of intent with an investment-grade hyperscaler for the delivery of approximately 600 MW of powered land at Project Matador. In connection with the letter of intent, the Company and the hyperscaler have entered into a $200,000 prepayment agreement and a $15,000 early construction and site development agreement."
+
+【8-K 新聞稿（2026-11-12）：客戶在租約之前先付錢】
+"The customer is making financial and development commitments ahead of finalizing a lease, reflecting the importance of securing access to power within its targeted delivery timeline."
