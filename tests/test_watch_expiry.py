@@ -853,6 +853,21 @@ def test_scheduled_review_carries_conditions_that_would_expire_within_a_cycle(en
     assert _watch(later["watch_id"])["expires"] == (date.today() + timedelta(days=400)).isoformat(), "只延不縮"
 
 
+def test_retired_thesis_with_a_stale_next_check_mints_no_review(env) -> None:
+    """retired 是終局：殘留的 next_check 已過也不鑄複查號（2026-11-17 axt_inp retired 後仍鑄 [939]）。"""
+    from crons import thesis_freshness_check as tfc
+
+    env["life"]["x"]["next_check"] = (date.today() - timedelta(days=2)).isoformat()
+    env["save_life"]()
+    assert [tid for tid, _why, _ids in tfc.lifecycle_due_detail()] == ["x"], "對照：active 時照常到期"
+    env["life"]["x"]["status"] = "retired"
+    env["save_life"]()
+    assert tfc.lifecycle_due_detail() == []
+    pool = _pool()
+    _sync_lifecycle(pool)
+    assert _open(pool, "thesis_lifecycle") == []
+
+
 def test_new_reading_retires_every_older_reading_of_the_node(env, monkeypatch) -> None:
     """NB3-4：重讀忘了帶 supersedes_id，也要以節點收掉舊讀圖的條件——不留新舊兩筆。"""
     from alpha.providers import structure_readings as sr

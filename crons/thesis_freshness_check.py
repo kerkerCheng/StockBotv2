@@ -210,7 +210,9 @@ def lifecycle_due_detail(*, watch_data: dict | None = None, strict: bool = False
     reasons: dict[str, list[str]] = {}
     watch_ids: dict[str, list[str]] = {}
     for tid, entry in (data.items() if isinstance(data, dict) else []):
-        if not isinstance(entry, dict):
+        # retired 是終局（pending_lifecycle 不准轉出）：沒有下一個核查點，殘留的 next_check 不得再鑄複查號
+        # （2026-11-17 axt_inp 11-13 retired 後仍鑄 [939]；同檔其他三處早就排除 retired，這裡是漏掉的對稱面）。
+        if not isinstance(entry, dict) or entry.get("status") == "retired":
             continue
         due_now, reason = is_due(entry, today=today)
         if due_now:

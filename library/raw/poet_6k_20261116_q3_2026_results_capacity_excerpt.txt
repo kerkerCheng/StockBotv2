@@ -1,0 +1,33 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1437424/000117184326007469/exh_991.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] POET Technologies Inc.（POET）Form 6-K Exhibit 99.1（2026-11-16 新聞稿：第三季財報）——營收、現金、產能、客戶與出貨時程
+RETRIEVED: 2026-11-17（SEC Archives 原檔，UA 用 repo 預設）
+NOTE: 同日另一份 6-K（000149315226051994）附九個月財報與 MD&A（Exhibit 99.1／99.2），本節錄只取新聞稿。金額單位美元。發行人自述（L8 弱主張）：客戶全部沒有具名，「Tier 1 laser company」沒寫是哪一家。
+
+【標題與營收】
+"POET Technologies Reports Record Q3 2026 Revenue of $1.03M, Up 244%"
+
+【產能】
+"Wafer capacity: approximately tenfold increase secured at the Company's foundry partner for 2027"
+
+【客戶】
+"Active customers: 9, across 16 projects; 7 expected to enter production with POET engines in 2027"
+
+【出貨時程（原定 2026 年的 3 萬顆光引擎）】
+"We expect to ship our current backlog of optical engines, including the 30,000 engines we had targeted for 2026, by the second quarter of 2027, as the capacity we have already funded comes online,"
+
+【供應鏈】
+"Like much of the industry, we have faced supply chain tightening, wafer and component shortages, and are working through a yield ramp of a new production technology this year."
+
+【新產線投資與時程】
+"Total investment in the new line is expected to exceed $45 million."
+"Equipment is being delivered and installed through approximately April 2027, with the line targeted to be manufacturing-ready by mid-2027."
+
+【第三季重點與期後】
+"Signed a development agreement with a Tier 1 laser company for an external light source engine."
+"Received a $2.4 million purchase order from an existing customer."
+"Received a first purchase order from another leading Tier 1 laser manufacturer."
+
+【現金】
+"Cash and short-term investments: $774.3 million at September 30, 2026, compared with $796.3 million at June 30, 2026"
