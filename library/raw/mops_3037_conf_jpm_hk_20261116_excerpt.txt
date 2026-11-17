@@ -1,0 +1,14 @@
+Source URL: https://mopsov.twse.com.tw/mops/web/ajax_t100sb07_1（POST co_id=3037、year=115；法人說明會一覽）
+
+Excerpt:
+[EXCERPT — 有限逐字引文] 欣興電子（3037）公開資訊觀測站法人說明會一覽——2026-11-16 至 11-17 場次（摩根大通 APAC 科技論壇，香港）
+RETRIEVED: 2026-11-17（MOPS 法說一覽查詢回應，去 HTML 標籤，一個欄位一行照原樣）
+NOTE: 這一場用的簡報檔名與 2026-11-11 上傳的那一份相同（303720261111M001.pdf／E001.pdf）。影音連結欄空白。發行人申報。
+
+【法人說明會一覽】
+"115/11/16"
+"115/11/17"
+"香港君悅酒店"
+"本公司受邀參加J.P. Morgan舉辦之APAC Technology, Innovation and Growth Conference，會中就本公司"
+"已公開發布之財務數字、經營績效等相關資訊作說明。"
+"303720261111M001.pdf"
