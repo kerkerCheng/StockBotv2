@@ -1,0 +1,117 @@
+{
+  "claims": [
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：聯茂、台光電、台燿或其他銅箔基板廠的重訊／年報寫出取消或延後已下單的設備、或同一批設備改向別家採購。核查頻率：每月（MOPS 重訊）＋每年（年報重要契約）。觸發後 48 小時：更正這條 claim，重讀含浸機層讀圖的客戶資本承諾段。",
+      "id": "mops_6213_ann_2026_08_09_equipment_acquisitions_excerpt_cl1",
+      "source_ids": [
+        "mops_6213_ann_2026_08_09_equipment_acquisitions_excerpt_q1",
+        "mops_6213_ann_2026_08_09_equipment_acquisitions_excerpt_q2",
+        "mops_6213_ann_2026_08_09_equipment_acquisitions_excerpt_q3",
+        "mops_6213_ann_2026_08_09_equipment_acquisitions_excerpt_q4",
+        "mops_6213_ann_2026_08_09_equipment_acquisitions_excerpt_q5"
+      ],
+      "statement": "Customer-side capital commitment (ITEQ material announcement, 2026-08-28): its subsidiary Inspire Investments Ltd acquired one batch of operating machinery from Asia Metal Industries for about NT$2,101,075 thousand, board-approved on 2026-08-07, decided by price comparison and negotiation. The equipment type is not disclosed.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "co:iteq",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "mops_6213_ann_2026_08_09_equipment_acquisitions_excerpt_q1",
+        "mops_6213_ann_2026_08_09_equipment_acquisitions_excerpt_q4",
+        "mops_6213_ann_2026_08_09_equipment_acquisitions_excerpt_q5"
+      ],
+      "src_id": "co:asia_metal_industries"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "聯茂",
+        "聯茂電子",
+        "ITEQ",
+        "ITEQ Corporation"
+      ],
+      "attributes": {
+        "ticker": "6213.TW"
+      },
+      "confidence": 0.9,
+      "id": "co:iteq",
+      "name": "聯茂電子股份有限公司",
+      "role": null,
+      "source_ids": [
+        "mops_6213_ann_2026_08_09_equipment_acquisitions_excerpt_q1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "equipment_epitaxy",
+      "aliases": [
+        "亞泰金屬",
+        "亞泰金屬工業",
+        "亞泰金屬工業股份有限公司",
+        "Asia Metal Industries"
+      ],
+      "attributes": {
+        "ticker": "6727.TWO"
+      },
+      "confidence": 0.85,
+      "id": "co:asia_metal_industries",
+      "name": "Asia Metal Industries, Inc.",
+      "role": null,
+      "source_ids": [
+        "mops_6213_ann_2026_08_09_equipment_acquisitions_excerpt_q5"
+      ],
+      "type": "Company"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "mops_6213_ann_2026_08_09_equipment_acquisitions_excerpt",
+    "evidence_tier": 1,
+    "origin_entity": "聯茂電子股份有限公司",
+    "permission_basis": "台灣上市公司重大訊息（證交所開放資料 t187ap04_L，發言時間 2026-08-28 17:00:01）；全文短、只保留研究必要的逐字。published_at 取重訊發言日期 115/08/28。同一節錄另含 08-31、09-02、09-18 三則（交易相對人不是亞泰，不入圖）。",
+    "published_at": "2026-08-28",
+    "publisher": "公開資訊觀測站（MOPS 重大訊息）",
+    "retrieved_at": "2026-11-17",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "聯茂（6213）重大訊息 2026-08-28：代子公司 Inspire Investments 公告對單一廠商取得機器設備——交易相對人亞泰金屬工業、一批、新台幣 21.01 億元；董事會 115/8/7 通過（同節錄另含 08-31 連結機械 18.67 億、09-02 河南環宇昌 6.34 億、09-18 四川托璞勒 6.15 億元三則）",
+    "url": "https://openapi.twse.com.tw/v1/opendata/t187ap04_L?co_id=6213&spoke=2026-08-28T17%3A00%3A01&ref=c3d08088b68c"
+  },
+  "sources": [
+    {
+      "id": "mops_6213_ann_2026_08_09_equipment_acquisitions_excerpt_q1",
+      "locator": "A 主旨（2026-08-28）",
+      "quote": "代子公司Inspire Investments Ltd公告對單一廠商取得機器設備達新台幣5億元"
+    },
+    {
+      "id": "mops_6213_ann_2026_08_09_equipment_acquisitions_excerpt_q2",
+      "locator": "A 1. 標的物之名稱及性質",
+      "quote": "供營業之機器設備"
+    },
+    {
+      "id": "mops_6213_ann_2026_08_09_equipment_acquisitions_excerpt_q3",
+      "locator": "A 2. 事實發生日／3. 董事會通過日期",
+      "quote": "2.事實發生日:115/8/28~115/8/28"
+    },
+    {
+      "id": "mops_6213_ann_2026_08_09_equipment_acquisitions_excerpt_q4",
+      "locator": "A 5. 交易總金額",
+      "quote": "交易總金額:約新台幣2,101,075仟元"
+    },
+    {
+      "id": "mops_6213_ann_2026_08_09_equipment_acquisitions_excerpt_q5",
+      "locator": "A 6. 交易相對人及其與公司之關係",
+      "quote": "亞泰金屬工業股份有限公司;與公司關係:無。"
+    }
+  ]
+}
