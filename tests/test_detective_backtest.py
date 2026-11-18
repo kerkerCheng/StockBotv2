@@ -234,6 +234,16 @@ def test_names_match_across_extra_spaces() -> None:
     assert bt.residual_forms(bt.mask_text(text, [entry]), [entry]) == {}
 
 
+def test_cjk_names_match_with_spaces_between_characters() -> None:
+    # 財報表頭 PDF 轉文字：「臻 鼎 科 技 控 股」（2026-11-18 遮名組偵探點出來）
+    entry = bt.MaskEntry("co:zd", "B", ("臻鼎科技控股股份有限公司", "臻鼎"))
+    text = "公司B\n臻 鼎 科 技 控 股 股 份 有 限 公 司 及 子 公 司"
+    assert bt.residual_forms(text, [entry]), "掃描要抓得到字間空格"
+    out = bt.mask_text(text, [entry])
+    assert bt.residual_forms(out, [entry]) == {}
+    assert "臻" not in out
+
+
 def test_mask_letters() -> None:
     assert [bt.mask_letter(i) for i in (0, 1, 25, 26, 27)] == ["A", "B", "Z", "AA", "AB"]
 

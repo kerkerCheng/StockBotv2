@@ -296,7 +296,10 @@ def _ascii(text: str) -> bool:
 
 
 def _body(form: str) -> str:
-    """寫法 → 正則本體；字與字之間的空白容許任意多個（PDF 轉文字常是「Zhen  Ding」兩格，2026-11-18 實測漏網）。"""
+    """寫法 → 正則本體；字與字之間的空白容許任意多個（PDF 轉文字常是「Zhen  Ding」兩格，2026-11-18 實測漏網）。
+    中文名每個字之間都容許空白：財報表頭轉出來是「臻 鼎 科 技 控 股」（同日遮名組偵探點出來的漏網）。"""
+    if _CJK.search(form):
+        return r"\s*".join(re.escape(ch) for ch in form if not ch.isspace())
     return r"\s+".join(re.escape(part) for part in form.split())
 
 

@@ -190,6 +190,13 @@ def test_verify_report_flags_files_outside_the_pack(tmp_path) -> None:
     assert verify_report(report, lambda n: files.get(n))[0].in_manifest is None     # 沒給清單不判
 
 
+def test_verify_report_does_not_borrow_a_quote_from_an_earlier_line() -> None:
+    # 2026-11-18 回溯 B1：偵探自己加引號的話在前一行，這一行的引用沒有引號——不核，不是「原文沒有」
+    files = {"a.txt": ["the price was raised"]}
+    report = "- 計畫外的什麼：「價格或產品組合正在往上」的可能\n- 臻鼎下單的對象（a.txt:1，見線索 1）"
+    assert verify_report(report, lambda n: files.get(n)) == []
+
+
 def test_verify_report_ellipsis_parts_and_whitespace() -> None:
     files = {"c.txt": ["We are currently in", "discussions with other customers", "to form similar agreements"]}
     report = "「We are currently in discussions…to form similar agreements」（c.txt:2）"

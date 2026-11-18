@@ -298,8 +298,10 @@ def verify_report(report: str, read_lines: Callable[[str], Sequence[str] | None]
     prev_end = 0
     for m in _REF.finditer(report):
         name, line = m.group(1), int(m.group(2))
-        # 往前找引文不越過上一個「檔名:行號」：否則沒引號的引用會抓到上一條的引文、誤報原文沒有
-        quotes = list(_QUOTE.finditer(report[max(prev_end, m.start() - 600):m.start()]))
+        # 往前找引文不越過上一個「檔名:行號」：否則沒引號的引用會抓到上一條的引文、誤報原文沒有。
+        # 也不越過這一行的行首：偵探自己加引號的話（「共識寫進去了沒」）在前幾行時會被當成引文（2026-11-18 回溯 B1 誤報 6 條）
+        line_start = report.rfind("\n", 0, m.start()) + 1
+        quotes = list(_QUOTE.finditer(report[max(prev_end, line_start, m.start() - 600):m.start()]))
         prev_end = m.end()
         if not quotes:
             continue
