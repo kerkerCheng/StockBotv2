@@ -1599,9 +1599,11 @@
       "market_currency": "USD",
       "display_name": "Modine Manufacturing Company",
       "_display_name_source": "yfinance longName（2026-10-08）",
-      "_note": "名冊批次（2026-10-08）：散熱鏈（資料中心冰水機）；系統口徑邊緣（約 97.6 億美元、8 家，`python -m alpha edge`）；lead_1f5a72a9（X，「$MOD - Chillers / Cooling」）",
+      "_note": "名冊批次（2026-10-08）：散熱鏈（資料中心冰水機）；系統口徑邊緣（約 97.6 億美元、8 家，`python -m alpha edge`）；lead_1f5a72a9（X，「$MOD - Chillers / Cooling」）。2026-11-16 更名 Modexus Solutions, Inc.、代號仍 MOD（8-K 0001104659-26-128553 Item 5.03）——新名補成別名",
       "name_aliases": [
-        "Modine"
+        "Modine",
+        "Modexus Solutions",
+        "Modexus"
       ]
     },
     {
