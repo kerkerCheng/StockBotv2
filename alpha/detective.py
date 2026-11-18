@@ -192,7 +192,7 @@ def build_questions(company: str, neighbors: Sequence[Neighbor], docs_by_company
     """問句清單。每個鄰居照角色問一題（庫裡沒有它的文件也問——沒有本身是洞，INV-3）；另有固定的五題。"""
     qs: list[str] = []
     if consensus_lines:
-        target = "敘事『必須為真』的量級②與計畫路徑" if with_narrative else "公司文件寫的擴產計畫"
+        target = "敘事『量級』那一格的②（量的天花板）與計畫路徑" if with_narrative else "公司文件寫的擴產計畫"
         qs.append("共識：" + "；".join(consensus_lines) + f"。{target}和共識差多少？差出來的那一段是量、價還是時間？"
                   "哪些計畫外的東西還沒被寫進去，哪些會讓共識往下修？")
     else:

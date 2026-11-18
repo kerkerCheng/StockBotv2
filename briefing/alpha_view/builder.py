@@ -43,6 +43,7 @@ from thesis.lifecycle_schedule import CATALYST, effective_next_check
 
 from alpha.gap_closure import consensus_progress
 from alpha.narrative import ABSENT, SLOT_LABELS_V2, fill_brief, format_value, select_brief, slot_labels
+from alpha.narrative.contracts import OPTIONAL_SLOT_KEYS_V2
 from alpha.narrative.contracts import RECORD_VERSION_V2
 from alpha.structure_reading import READING_UNITS
 from alpha.narrative.argument import chain_paragraph, closure_phrase, timeline_paragraph
@@ -425,8 +426,9 @@ def _investor_brief_section(
                            reason=why, as_of=reference_day, absence_kind="not_yet_recorded")
         # 沒有短評時列的是 **v2 的七題**（Phase 3 Step 3.4）：v1 的題目含已退役的估值題（市場怎麼看、對了值多少），
         # 每次載入的題目會被當成目標（L19）。
+        # 選填格（量級）不列——它不是「沒寫短評」缺的那幾題（2026-11-18）
         slots = tuple(missing(f"brief:{key}", label, why, authority=A_BRIEF, absence_kind="not_yet_recorded")
-                      for key, label in SLOT_LABELS_V2.items())
+                      for key, label in SLOT_LABELS_V2.items() if key not in OPTIONAL_SLOT_KEYS_V2)
         return InvestorBriefSection(meta=meta, slots=slots, status_light=light,
                                     brief_id=None, is_not=BRIEF_IS_NOT,
                                     rides=_rides_datum(None, names or {}, reason=why))

@@ -67,10 +67,15 @@ BRIEF_SLOTS_V2: tuple[tuple[str, str], ...] = (
     ("priced_in", "已定價嗎"),
     ("our_bet", "我們賭什麼"),
     ("what_must_be_true", "什麼必須為真、錯的訊號是什麼"),
+    ("magnitude", "量級：會長到幾倍、靠量還是靠價、窗口多長"),
     ("when", "什麼時候知道"),
 )
 SLOT_KEYS_V2: tuple[str, ...] = tuple(k for k, _ in BRIEF_SLOTS_V2)
 SLOT_LABELS_V2: Mapping[str, str] = dict(BRIEF_SLOTS_V2)
+#: v2 的選填格（不在「七格缺一不可」裡）。`magnitude`（量級，2026-11-18 使用者「量獨立一個」）：11-17 試點把量級四段寫在
+#: 必須為真（①②③）與已定價（④）兩格，使用者說「分兩的地方比較難看」——四段收進同一格，首屏放「量 → 錢 → 價」那一塊。
+#: 選填：沒寫的舊版照讀（append-only、不回寫），首屏那一塊照印「還沒寫」；寫了才檢查。
+OPTIONAL_SLOT_KEYS_V2: frozenset[str] = frozenset({"magnitude"})
 
 
 def slot_keys(version: str) -> tuple[str, ...]:
@@ -178,6 +183,17 @@ BRIEF_FRAME_V2: Mapping[str, Mapping[str, str]] = {
                   "「讀圖第 N 條」；編號指不到拒收、沒標的印出來（2026-11-10，failure log #140）。"
                   "判「不要」的寫出**為什麼翻不了倍**就算數（2026-10-21 使用者照推薦；ROADMAP Phase 7 驗收②）。",
     },
+    "magnitude": {
+        # 2026-11-18 使用者「量獨立一個」：11-17 試點的量級四段（研究日誌三十九）收成一格。選填。
+        "question": "（選填）量級四段：①成長拆解——營收成長裡量、價、組合各占多少；②量的天花板——基期 × 產能倍數 × 單價變化 × 稼動率，"
+                    "算出天花板是近四季營收的幾倍、是哪一季的跑速；③供給時鐘——別家的新產能何時開出、買方的長約鎖到哪一年，"
+                    "天花板跑到的時候窗口還開著嗎；④兩因子並排——營收天花板倍數｜現行倍數在自家三年區間的位置（{own_history_pctile}），**並排不相乘**",
+        "look_at": "法說與季報的產能、產量、單價說法；同層別家的擴產與長約（偵探的線索包）；共識營收軌跡；"
+                   "{revenue_ttm}（近四季營收）、{market_cap}、{own_history_pctile}（{own_history_basis}）",
+        "do_not": "⚠ **兩因子不相乘、不換算價格**：不寫目標價、價格區間、報酬率、「倍數回到中位數時值多少」（G3 不復活）。"
+                  "{price} 不得出現在這一格。⚠ 缺輸入就寫「無法量：缺哪個輸入」，不補假設；推一步要標。"
+                  "⚠ 位置詞（高檔、偏貴…）要寫明日期，規則同已定價那一格。⚠ 算得出天花板的，登一條加碼條件（confirm[]）、下一次財報後到期。",
+    },
     "when": {
         "question": "什麼時候知道？（最近的裁決點）",
         "look_at": "催化劑、檢核點、下一次財報",
@@ -228,6 +244,8 @@ PLACEHOLDERS_V2: Mapping[str, str] = {
 #: `what_must_be_true` 不得出現的 placeholder：價格與已定價的數字（「對了值多少」已退役，那一格只談條件）。
 WHAT_MUST_BE_TRUE_FORBIDDEN: frozenset[str] = frozenset({
     "price", "own_history_pctile", "cohort_median"})
+#: `magnitude`（量級）不得出現的 placeholder：現價——兩因子並排只引用自家歷史的位置，不換算價格（G3）。
+MAGNITUDE_FORBIDDEN: frozenset[str] = frozenset({"price"})
 
 
 def placeholder_vocab(version: str) -> Mapping[str, str]:
@@ -752,7 +770,7 @@ class InvestorBrief:
         if len(set(keys)) != len(keys):
             raise ContractViolation(f"brief 有重複的 slot：{keys}")
         if not self.retracted:
-            missing = [k for k in slot_keys(self.record_version) if k not in keys]
+            missing = [k for k in slot_keys(self.record_version) if k not in keys and k not in OPTIONAL_SLOT_KEYS_V2]
             if missing:
                 raise ContractViolation(f"brief 七格缺一不可；缺 {missing}——少一格就不是前因後果，是片段")
         if self.record_version == RECORD_VERSION_V2:
@@ -788,6 +806,11 @@ class InvestorBrief:
             bad = sorted(t for t in wmbt.placeholders if t[1:-1] in WHAT_MUST_BE_TRUE_FORBIDDEN)
             if bad:
                 raise ContractViolation(f"what_must_be_true 不得有價格或報酬：{bad}")
+        magnitude = slots.get("magnitude")
+        if magnitude is not None:
+            bad = sorted(t for t in magnitude.placeholders if t[1:-1] in MAGNITUDE_FORBIDDEN)
+            if bad:
+                raise ContractViolation(f"magnitude（量級）不得有現價——兩因子並排、不換算價格：{bad}")
         if self.candidate_state.state == "open" and not self.rides:
             raise ContractViolation("candidate_state=open 至少要押一格讀圖（rides[] 不得為空）")
         seen: set[str] = set()
@@ -1049,7 +1072,8 @@ __all__ = [
     "LAMP_COLOUR_CLAIM", "PRICE_QUOTE_CLAIM", "lamp_colour_claims", "price_quote_claims",
     "WRONG_SIGNAL_MARK", "explains_no_disproof", "wrong_signal_items",
     "RIDE_UNITS",
-    "Ride", "SLOT_KEYS_V2", "SLOT_LABELS_V2", "WHAT_MUST_BE_TRUE_FORBIDDEN", "placeholder_vocab", "slot_keys",
+    "Ride", "SLOT_KEYS_V2", "SLOT_LABELS_V2", "WHAT_MUST_BE_TRUE_FORBIDDEN", "MAGNITUDE_FORBIDDEN", "OPTIONAL_SLOT_KEYS_V2",
+    "placeholder_vocab", "slot_keys",
     "slot_labels",
     "BRIEF_FRAME", "BRIEF_SLOTS", "FORBIDDEN_TERMS", "PARAM_PLACEHOLDER", "PLACEHOLDERS", "RECORD_VERSION",
     "SLOT_KEYS", "SLOT_LABELS", "BriefSlot", "InvestorBrief", "brief_record", "new_brief_id",

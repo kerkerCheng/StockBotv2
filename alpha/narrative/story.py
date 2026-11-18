@@ -107,8 +107,8 @@ def story_problems(key: str, text: object, *, limit: int = STORY_MAX) -> list[st
         out.append(f"{where} 寫死了燈色——燈每天重算、首屏另有一行；講燈背後的事實：{sentence[:24]}")
     # 已定價的位置詞（failure log #94 的對稱面，#137）：敘事那一格可以寫明日期，故事不准寫日期——位置詞在故事裡只會凍住
     # （MOD「第 5 百分位，在中間」）。已定價那一格每句都查；候選理由只查講到價格的句子（同敘事端）。
-    if key in ("priced_in", "candidate"):
-        for words, sentence in undated_position_claims(text, require_price_word=key == "candidate"):
+    if key in ("priced_in", "candidate", "magnitude"):
+        for words, sentence in undated_position_claims(text, require_price_word=key in ("candidate", "magnitude")):
             out.append(f"{where} 用了位置詞「{'、'.join(words)}」——百分位每天重填、這句不會；故事讓數字自己說，"
                        f"位置的判斷留在依據（敘事那一格寫明日期）：{sentence[:24]}")
     if PARAM_PLACEHOLDER.search(text):

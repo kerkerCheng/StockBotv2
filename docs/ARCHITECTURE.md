@@ -876,6 +876,11 @@ AnalystView.brief（optional）→ APP 首屏 briefCard；六張卡收進「為�
   回答五題的「押對了夠大嗎」而不用目標價），字彙加翻倍的起點兩個：`market_cap`（read model 的 `market_cap_settlement`：快照的 price × shares
   × 名冊報價單位的換算係數——係數由 sources 從 `identity/currency.py` 查好注入，builder 不碰 identity；不做匯率）與 `revenue_ttm`（快照 TTM，日期是取數日）；`{price}` 與已定價的數字仍不得出現在這一格（型別層）。
   不改 `record_version`、不改 id 欄位集合——既有紀錄逐位相同。
+  **2026-11-18（使用者「量獨立一個」）**：選填第八格 `magnitude`（量級：成長拆解／量的天花板／供給時鐘／兩因子並排，排在 `what_must_be_true`
+  與 `when` 之間；`OPTIONAL_SLOT_KEYS_V2`）——11-17 試點把四段分寫在必須為真與已定價兩格，使用者說難讀。不在「七格缺一不可」裡，
+  沒寫的舊版照讀；`{price}` 不得出現（兩因子並排不換算價格，G3），位置詞規則同已定價格（只看講到價格或倍數的句子，寫入端與故事都查）。
+  首屏放在 B12「量 → 錢 → 價」（`page_schema` 1.6；`first_screen.optional_slots` 讓 app.js 不把沒寫量級的短評當舊格式整份照印）。
+  不改 `record_version`、不改 id 欄位集合。
 - 結構化欄位（全部進 v2 的 id 欄位集合；v1 的集合一個字不動）：`rides[]`（騎的讀圖）、`disproof[]`（寫入即登記成 `brief:<id>#n` 語意 watch；
   已在盯的只以來源鍵 `link_source_ref` 連結；`deadline`＝逾期型宣告，條件寫成「X 未在 expires 前發生」，只收 true／false、只在 true 時進 payload，
   舊紀錄 id 不變——2026-11-03 第 10 條②，到期照舊是重問）、`answers`（已定價嗎／出現在數字裡了嗎：yes／no／unmeasurable）、`candidate_state`

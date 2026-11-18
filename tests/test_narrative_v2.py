@@ -528,3 +528,49 @@ def test_a_raw_excerpt_ref_must_point_to_a_file(tmp_path: Path) -> None:
     slots["position"]["evidence_refs"] = ["graph://x", "library/raw/__no_such_short_check_excerpt__.txt"]
     with pytest.raises(ContractViolation, match="library/raw 找不到"):
         _write(tmp_path, _record(slots=slots), _ctx())
+
+
+# ---------------------------------------------------------------------------
+# 量級（選填格；2026-11-18 使用者「量獨立一個」）
+# ---------------------------------------------------------------------------
+
+_MAGNITUDE = ("①成長拆解：量、價、組合各占多少——無法量：沒揭露片數。②量的天花板：基期 × 產能倍數 × 單價 × 稼動率，"
+              "約是近四季營收 {revenue_ttm} 的 4 倍。③供給時鐘：別家新產能 2027 下半年開出。"
+              "④兩因子並排：天花板 4 倍｜自家三年 {own_history_basis} 的第 {own_history_pctile} 百分位，不相乘。")
+
+
+def _with_magnitude(text: str = _MAGNITUDE) -> dict:
+    slots = _slots()
+    slots["magnitude"] = {"text": text, "evidence_refs": ["graph://x"]}
+    return slots
+
+
+def test_magnitude_is_optional_and_old_versions_without_it_still_parse() -> None:
+    assert parse_brief_record(_record()).slot("magnitude") is None          # 沒寫照收（選填）
+    with_it = parse_brief_record(_record(slots=_with_magnitude()))
+    assert with_it.slot("magnitude").text == _MAGNITUDE
+    keys = [s.key for s in with_it.slots]
+    assert keys.index("what_must_be_true") < keys.index("magnitude") < keys.index("when")    # 前因後果的順序
+
+
+def test_seven_required_slots_are_still_required() -> None:
+    slots = _with_magnitude()
+    del slots["what_must_be_true"]
+    with pytest.raises(ContractViolation, match="七格缺一不可"):
+        _record(slots=slots)
+
+
+def test_magnitude_refuses_the_current_price() -> None:
+    with pytest.raises(ContractViolation, match="不得有現價"):
+        _record(slots=_with_magnitude("天花板 4 倍，現價 {price}。"))
+
+
+def test_magnitude_writes_and_refuses_an_undated_position_word(tmp_path: Path) -> None:
+    out = _write(tmp_path, _record(slots=_with_magnitude()), _ctx())
+    assert out["brief_id"]
+    bad = _with_magnitude("④兩因子並排：天花板 4 倍｜倍數已在自家三年高檔，第 {own_history_pctile} 百分位。")
+    with pytest.raises(ContractViolation, match="位置結論"):
+        _write(tmp_path / "again", _record(slots=bad), _ctx())
+    # 沒講價格或倍數的句子不查（「產能利用率在高檔」講的是工廠，不是估值）
+    ok = _with_magnitude("②量的天花板：產能利用率已在高檔，天花板約是近四季營收 {revenue_ttm} 的 4 倍。")
+    _write(tmp_path / "third", _record(slots=ok), _ctx())

@@ -24,14 +24,15 @@ from typing import Any, Mapping, Sequence
 
 from alpha.absence import ABSENCE_KINDS, default_absence_kind
 
-PAGE_SCHEMA_VERSION = "stock-page-schema/1.5"   # 1.1（S3c）拿掉 B2 同層各家、路徑上各層接上；1.2（S3d）B3 營收結構與 backlog 接上；
+PAGE_SCHEMA_VERSION = "stock-page-schema/1.6"   # 1.1（S3c）拿掉 B2 同層各家、路徑上各層接上；1.2（S3d）B3 營收結構與 backlog 接上；
 #                                                  1.3（S3d 第二段）台股年報地區別、押的那一塊接上；1.4（S3e）事件之後跟組比接上；
-#                                                  1.5（2026-10-29 故事層）B3、B5 的一句故事接上
+#                                                  1.5（2026-10-29 故事層）B3、B5 的一句故事接上；
+#                                                  1.6（2026-11-18）B12 量 → 錢 → 價接上敘事的量級（選填格）
 #: 頁面合約出現過的版本（舊 → 新；最後一個＝現行，測試核對）。回饋紀錄（`briefing/analyst_view/feedback_log.py`，個股頁 S6b）
 #: 的版本只收這裡與 `CANVAS_VERSIONS`——**升版時在這裡加一個**，否則新版本的回饋登記不進去。
 PAGE_SCHEMA_HISTORY: tuple[str, ...] = (
     "stock-page-schema/1.0", "stock-page-schema/1.1", "stock-page-schema/1.2", "stock-page-schema/1.3",
-    "stock-page-schema/1.4", "stock-page-schema/1.5",
+    "stock-page-schema/1.4", "stock-page-schema/1.5", "stock-page-schema/1.6",
 )
 #: 凍結前（S1 磨合輪，2026-10-05 → 10-06）畫布的 schema 版本；v1.0 凍結（2026-10-07）之後不再增加。
 CANVAS_VERSIONS: tuple[str, ...] = (
@@ -258,7 +259,8 @@ BLOCK_READINGS: tuple[BlockReading, ...] = (
     BlockReading("B9", parts=("will_it_die", "wipeout")),
     BlockReading("B10", parts=("shared_bet",)),
     BlockReading("B11", slots=("when",)),
-    BlockReading("B12", pending="還沒做：量 → 錢 → 價要個股頁 S3 的機械資料（營收階梯）"),
+    # 2026-11-18 使用者「量獨立一個」：敘事的量級（選填格）住這一塊；沒寫的檔照「還沒寫」收進頁尾（app.js）
+    BlockReading("B12", slots=("magnitude",)),
 )
 
 
@@ -425,6 +427,12 @@ def fill_summary(rows: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
                            or (row.get("state") == "absent" and not row.get("absence_kind")))}
 
 
+def _optional_slots() -> frozenset[str]:
+    from alpha.narrative.contracts import OPTIONAL_SLOT_KEYS_V2
+
+    return OPTIONAL_SLOT_KEYS_V2
+
+
 def schema_payload() -> dict[str, Any]:
     """`.meta.json` 的 `page_schema`（APP 照抄；app.js 不留第二份）。"""
     return {
@@ -444,6 +452,8 @@ def schema_payload() -> dict[str, Any]:
             "readings": {r.block: {"slots": list(r.slots), "parts": list(r.parts), "pending": r.pending,
                                    "story_slots": list(r.story_slots)}
                          for r in BLOCK_READINGS},
+            # 選填格：短評沒寫它不算「舊格式」（app.js 不因它把整份短評照印在最前面）
+            "optional_slots": sorted(_optional_slots()),
         },
     }
 

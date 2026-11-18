@@ -774,7 +774,9 @@ function schemaFirstScreen(payload, view, panel) {
   const blocks = {};
   (schema.blocks || []).forEach((block) => { blocks[block.key] = block; });
   const box = el('div', 'schema-screen');
-  if (panel && !slots.every((slot) => lines['brief:' + slot])) {
+  // 選填格（2026-11-18 量級）沒寫不算舊格式——否則每一份沒寫量級的短評都會被整份照印在最前面
+  const optional = screen.optional_slots || [];
+  if (panel && !slots.every((slot) => lines['brief:' + slot] || optional.indexOf(slot) >= 0)) {
     const story = el('div', 'story');
     (panel.lines || []).filter((row) => row.key.indexOf('brief:') === 0).forEach((row) => story.appendChild(storyRow(row)));
     box.appendChild(story);

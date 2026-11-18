@@ -109,7 +109,7 @@ def scan_raw(companies: Mapping[str, Any], *, raw_dir: Path = RAW_DIR) -> ScanRe
 
 def consensus_lines(ticker: str, *, as_of: date | None = None) -> list[str]:
     """會計年度別營收共識：最新一次抓取的每一期＋那一期的修正軌跡（數字變了的點）。共識是預估，不是價格。"""
-    from .fundamentals import EngineCFundamentalsProvider
+    from alpha.providers.fundamentals import EngineCFundamentalsProvider
 
     prov = EngineCFundamentalsProvider()
     rows, _why = prov.fiscal_consensus(ticker, as_of=as_of)
@@ -251,7 +251,7 @@ def build_pack(ticker: str, out_dir: Path, *, as_of: date | None = None,
         narrative_note, *reading_lines,
         f"- 檔案清單：{(out_dir / 'MANIFEST.md').as_posix()}（{len(docs)} 份；鄰居與它們的角色也在裡面）。大檔用 Grep 找段落，不要整份讀。",
         "- 分析師共識（營收；Engine C）：" + ("；".join(cons) if cons else "沒有資料"),
-        "- 公司自己說的計畫與我們算的路徑：" + ("見敘事的必須為真（量級四段）。" if narrative_note else "從文件自己讀。"),
+        "- 公司自己說的計畫與我們算的路徑：" + ("見敘事的量級那一格（四段）。" if narrative_note else "從文件自己讀。"),
     ]))
     prompt = render_prompt(company=name, ticker=ticker, read_scope=read_scope, materials=materials,
                            questions=questions, as_of=as_of)

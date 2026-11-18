@@ -67,7 +67,8 @@ def test_the_first_screen_places_every_v2_slot_and_part_exactly_once() -> None:
     assert by_block["B9"].parts == ("will_it_die", "wipeout") and by_block["B10"].parts == ("shared_bet",)
     # 沒有句子來源的塊照合約印 pending（規則 7）；S3 的塊寫「還沒做」
     assert all(r.pending for r in BLOCK_READINGS if not (r.slots or r.parts))
-    assert "還沒做" in by_block["B12"].pending
+    # 2026-11-18 使用者「量獨立一個」：B12 量 → 錢 → 價接上敘事的量級（選填格）；沒寫的照「還沒寫」收進頁尾（app.js）
+    assert by_block["B12"].slots == ("magnitude",) and by_block["B12"].pending is None
 
 
 def test_the_meta_carries_the_one_copy_and_app_js_keeps_none(tmp_path: Path) -> None:

@@ -138,7 +138,7 @@ def test_questions_per_role_holes_and_fixed_three() -> None:
     ]
     docs = {"co:lumentum": [_doc("lite.txt", date(2026, 8, 11), "co:lumentum")]}
     qs = build_questions("AXT", nbs, docs, ["會計期末 2027-12-31 營收共識 5.10 億"], with_narrative=True)
-    assert qs[0].startswith("共識：會計期末 2027-12-31") and "量級②" in qs[0]
+    assert qs[0].startswith("共識：會計期末 2027-12-31") and "『量級』那一格的②" in qs[0]
     assert len(qs) == 1 + 5 + 3
     joined = "\n".join(qs)
     assert "庫裡 1 份點名它的文件，最新 2026-08-11" in joined

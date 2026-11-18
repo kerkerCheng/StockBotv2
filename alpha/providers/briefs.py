@@ -394,7 +394,9 @@ def v2_write_problems(parsed: InvestorBrief, *, ctx: WriteContext, existing: Seq
 
     # ⑧ 已定價的位置詞要帶日期（ROADMAP 已定價變動計數器；failure log #94）：「高檔」「偏貴」這種依賴百分位大小的結論，
     #   數字每天重填、這句不會——換騎照抄舊句就會把舊判斷包裝成新日期。只擋寫入；舊紀錄照讀（不放 parse 路徑）。
+    #   量級（2026-11-18 選填格）的兩因子並排引用同一個百分位——對稱面，只看講到價格或倍數的句子（L17）。
     for label, text, need_price in (("priced_in", slots.get("priced_in", ""), False),
+                                    ("magnitude", slots.get("magnitude", ""), True),
                                     ("candidate_state.reason", (cs.reason or "") if cs is not None else "", True)):
         for words, sentence in undated_position_claims(text, require_price_word=need_price):
             problems.append(f"{label}：「{'、'.join(words)}」是依賴百分位大小的位置結論，數字每天重填、這句不會——"
@@ -538,9 +540,12 @@ def v2_write_notices(parsed: InvestorBrief) -> list[str]:
     """只印、不擋的提示（2026-10-31，failure log #120）：已定價那一格與候選理由寫了收盤價——9-30 使用者定案首屏不放價格報酬
     （相對組漲幅只在稽核區）。先看它印出什麼（L16：比對文字的檢查會誤報），要擋另議。"""
     priced = parsed.slot("priced_in")
+    magnitude = parsed.slot("magnitude")
     reason = parsed.candidate_state.reason if parsed.candidate_state is not None else None
     notices: list[str] = []
-    for label, text in (("priced_in", priced.text if priced is not None else ""), ("candidate_state.reason", reason or "")):
+    for label, text in (("priced_in", priced.text if priced is not None else ""),
+                        ("magnitude", magnitude.text if magnitude is not None else ""),
+                        ("candidate_state.reason", reason or "")):
         for sentence in price_quote_claims(text):
             notices.append(f"{label}：寫了收盤價——首屏不放價格報酬（9-30 使用者定案），改用文字描述方向：{sentence[:40]}")
     # 錯的訊號沒標對應的反證（2026-11-10，failure log #140）：只印——沒有反證就沒有 watch，到期那天不會有東西叫你回來看

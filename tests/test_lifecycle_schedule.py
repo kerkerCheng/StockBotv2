@@ -11,6 +11,8 @@ import json
 from datetime import date
 from pathlib import Path
 
+import pytest
+
 from thesis.lifecycle_schedule import (
     CADENCE,
     CATALYST,
@@ -114,6 +116,9 @@ def test_real_lifecycle_axt_moves_from_cadence_to_catalyst() -> None:
     """實檔驗收：AXT 的生效複查日必須早於機械算出的 next_check。"""
     data = json.loads((ROOT / "thesis" / "lifecycle.json").read_text(encoding="utf-8"))
     axt = data["axt_inp"]
+    if axt.get("status") != "active":
+        # 2026-11-13 axt_inp retired、兩個催化劑日都過了：實檔的那一刻已經不存在；機制由上面的單元測試守（不是放寬）
+        pytest.skip(f"axt_inp 已是 {axt.get('status')}——實檔驗收只在 thesis active 時成立")
     when, source, checkpoint = effective_next_check(axt, today=TODAY)
     assert source == CATALYST
     assert when < date.fromisoformat(axt["next_check"])
