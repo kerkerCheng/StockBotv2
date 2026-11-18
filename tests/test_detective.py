@@ -203,6 +203,13 @@ def test_verify_report_ellipsis_parts_and_whitespace() -> None:
     assert [c.status for c in verify_report(report, lambda n: files.get(n))] == ["ok"]
 
 
+def test_verify_report_checks_short_quotes_instead_of_flagging_them() -> None:
+    # 2026-11-18 回溯 B2：「月 結 30 天」去空白後不到 6 字，以前一律報「原文沒有」
+    files = {"d.txt": ["其 他 關 係 人 銷 貨 $334,110 8% 月  結  30  天"]}
+    assert [c.status for c in verify_report("「月 結 30 天」（d.txt:1）", lambda n: files.get(n))] == ["ok"]
+    assert [c.status for c in verify_report("「月 結 90 天」（d.txt:1）", lambda n: files.get(n))] == ["missing"]
+
+
 # ---- CLI 接上了 ---------------------------------------------------------------------------------
 def test_cli_has_detective_pack_and_verify() -> None:
     parser = build_parser()

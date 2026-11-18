@@ -1622,7 +1622,7 @@ def _cmd_detective_backtest(args: argparse.Namespace) -> int:
         if not t["section_found"]:
             print("✗ 找不到「### 線索」段", file=sys.stderr)
             return 1
-        print(f"線索 {t['clues']} 條（抽不到抽屜 {t['unparsed']}）｜偏多強度：高 {t['lean_high']:+d}、中 {t['lean_mid']:+d}")
+        print(f"線索 {t['clues']} 條（抽不到抽屜或信心 {t['unparsed']}）｜偏多強度：高 {t['lean_high']:+d}、中 {t['lean_mid']:+d}")
         for drawer, levels in t["by"].items():
             print(f"  {drawer}：" + "、".join(f"{k} {levels.get(k, 0)}" for k in ("高", "中", "低")))
         return 0

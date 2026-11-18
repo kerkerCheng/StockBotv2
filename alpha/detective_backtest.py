@@ -372,15 +372,20 @@ def residual_forms(text: str, entries: Sequence[MaskEntry]) -> dict[str, int]:
 
 
 # ---- 偏多強度（§3.8，機械；開封之前就能算，但只在評分時印）-------------------------------------------
-_CONF = re.compile(r"信心\**\s*[:：]\s*\**\s*(高|中|低)")
+# 信心欄到第一個句號／破折號／逗號為止；取欄內第一個「高中低」（「需求年限中；傳到 X 低」→ 中）。
+# 欄內一個都沒有也算一條、記 unparsed——以前要求冒號後緊接高中低，對不上的整條被默默併進下一條（INV-3）。
+_CONF = re.compile(r"信心\**\s*[:：]\s*\**([^\n。—，,]*)")
+_LEVEL = re.compile(r"高|中|低")
 _DRAWER_FIELD = re.compile(r"抽屜\**\s*[:：]\s*\**\s*(" + "|".join(DRAWERS) + ")")
 _DRAWER_ANY = re.compile("(" + "|".join(DRAWERS) + ")")
+# 標題行（「### 線索 6｜窗口提早關：…」或「**1. 撐更久——…**」）：內文提到別的抽屜（「會翻成線索 2 的量超前」）不算
+_TITLE = re.compile(r"^\s*(?:#+|\*\*)[^\n]*?(" + "|".join(DRAWERS) + ")", re.M)
 _SECTION = re.compile(r"^(#{2,4})\s*線索", re.M)
 
 
 def lean_tally(report: str) -> dict[str, object]:
     """回報的「線索」段 → 每條的抽屜與信心。一條線索以它的「信心：」欄結束；抽屜取這一條裡的「抽屜：」欄，
-    沒有欄位才退回這一條裡最後一個抽屜字樣（標題寫「線索 1｜漲價」型）。抽不到抽屜的數成 unparsed（INV-3）。
+    沒有欄位取這一條的標題行（「### 線索 1｜漲價」「**1. 漲價——**」），都沒有才退回最後一個抽屜字樣。抽不到抽屜或信心的數成 unparsed（INV-3）。
     偏多強度＝信心「高」的線索中，量超前／漲價／撐更久的條數 − 窗口提早關的條數；「中」另算、不併。"""
     m = _SECTION.search(report)
     if not m:
@@ -397,11 +402,13 @@ def lean_tally(report: str) -> dict[str, object]:
         chunk_start = c.end()
         clues += 1
         fields = _DRAWER_FIELD.findall(chunk)
-        drawer = fields[-1] if fields else (_DRAWER_ANY.findall(chunk) or [None])[-1]
-        if drawer is None:
+        title = _TITLE.search(chunk)
+        drawer = fields[-1] if fields else title.group(1) if title else (_DRAWER_ANY.findall(chunk) or [None])[-1]
+        level = _LEVEL.search(c.group(1))
+        if drawer is None or level is None:
             unparsed += 1
             continue
-        by[drawer][c.group(1)] += 1
+        by[drawer][level.group(0)] += 1
 
     def lean(level: str) -> int:
         return (sum(by[d][level] for d in BULL_DRAWERS) - sum(by[d][level] for d in BEAR_DRAWERS))

@@ -311,7 +311,8 @@ def verify_report(report: str, read_lines: Callable[[str], Sequence[str] | None]
         if lines is None:
             out.append(QuoteCheck("no_file", name, line, quote, listed))
             continue
-        parts = [_norm(p) for p in re.split(r"…|\.\.\.", quote) if len(_norm(p)) >= 6]
+        # 「…」切出的短段（< 6 字）不核；整句就很短（「月 結 30 天」）時核整句，不再一律報原文沒有（2026-11-18 回溯 B2 誤報）
+        parts = [_norm(p) for p in re.split(r"…|\.\.\.", quote) if len(_norm(p)) >= 6] or [q for q in [_norm(quote)] if q]
         whole = _norm("\n".join(lines))
         if not parts or not all(p in whole for p in parts):
             out.append(QuoteCheck("missing", name, line, quote, listed))

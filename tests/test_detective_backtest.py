@@ -299,6 +299,24 @@ def test_lean_tally_reports_unparsed_and_missing_section() -> None:
     assert t["clues"] == 1 and t["unparsed"] == 1
 
 
+def test_lean_tally_confidence_with_prefix_is_not_merged_into_next_clue() -> None:
+    """3653.TW 回報（2026-11-18）：「信心：需求年限中；傳到 X 低」以前對不上，整條被默默併進下一條。"""
+    report = ("## 線索\n### 線索 1｜撐更久：買方拉長\n- 信心：需求年限中；傳到 X 低。\n"
+              "### 線索 2｜漲價：含量\n- 信心：低到中。\n### 線索 3｜窗口提早關：分食\n- 信心：判不出\n## 逐題回答\n")
+    t = bt.lean_tally(report)
+    assert t["clues"] == 3 and t["unparsed"] == 1, "沒有高中低的那一條要數出來，不是消失"
+    assert t["by"]["撐更久"] == {"中": 1} and t["by"]["漲價"] == {"低": 1}
+    assert t["lean_mid"] == 1
+
+
+def test_lean_tally_drawer_comes_from_the_title_not_a_later_mention() -> None:
+    """6805.TW 回報（2026-11-18）：標題「窗口提早關」，內文「會翻成線索 2 的量超前」→ 以前算成量超前。"""
+    report = ("## 線索\n### 線索 6｜窗口提早關：買方持平\n- 最可能錯的解釋：會翻成線索 2 的量超前。\n- 信心：中。\n"
+              "**7. 撐更久——買方鎖到 2030**\n- 解釋：也可能是窗口提早關\n- 信心：中\n## 逐題\n")
+    t = bt.lean_tally(report)
+    assert t["by"]["窗口提早關"] == {"中": 1} and t["by"]["撐更久"] == {"中": 1} and t["by"]["量超前"] == {}
+
+
 def test_pair_wins_and_verdict_lines() -> None:
     wins, total = bt.pair_wins([3, 2, 1], [0, 1])
     assert (wins, total) == (5.5, 6)
