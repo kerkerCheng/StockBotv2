@@ -1,0 +1,20 @@
+Source URL: https://openapi.twse.com.tw/v1/opendata/t187ap04_L?co_id=4958&spoke=2026-11-17T20:46:10&ref=8d566973facc
+
+Excerpt:
+[EXCERPT — 有限逐字引文] 臻鼎-KY（4958）重大訊息 2026-11-17：代子公司禮鼎半導體科技（深圳）公告取得機器設備——交易相對人 GIGAVIS CO.,LTD、一批、115/8/11～115/11/17 累計新台幣 18.65 億元
+DATE: 2026-11-17
+RETRIEVED: 2026-11-18（daily 存的重訊全文 library/private/semantic_text/lead_6074e081c394074656768878f15cc6c7.txt，逐字照抄）
+NOTE: 客戶端（載板廠）申報。重訊只寫「機器設備」一批，沒寫設備種類；GIGAVIS 自己的季報寫它只做半導體載板 AOI 檢測與 AOR 修補設備（library/raw/dart_420770_q3_2026_quarterly_report_excerpt.txt）。
+GIGAVIS 同期給「중국 반도체 기판 제조회사」的三份新合約（08-11、10-28、11-16）合計 864.4 億韓元（library/raw/dart_420770_supply_contracts_2026h2_excerpt.txt），匯率沒查（假設 45～47 韓元兌 1 新台幣）換算約 18.4～19.2 億元，與本則累計金額同一個量級——GIGAVIS 的公示沒具名，對應是推論。
+禮鼎是臻鼎的 IC 載板子公司；同一集團的 PCB 子公司慶鼎（淮安）2026-10-08 向牧德累計取得 10.13 億元（library/raw/mops_4958_ann_20261008_machvision_equipment.txt）——兩筆是不同子公司、不同產品（PCB 對 IC 載板）。
+
+【主旨】
+"代子公司禮鼎半導體科技(深圳)股份有限公司公告取得機器設備"
+【說明 2. 事實發生日】
+"事實發生日:115/8/11~115/11/17"
+【說明 5. 交易數量與交易總金額】
+"交易數量:一批 交易總金額:新台幣1,864,507,932元"
+【說明 6. 交易相對人及其與公司之關係】
+"交易相對人:GIGAVIS CO.,LTD 與公司之關係:無"
+【說明 11. 決定方式】
+"交易決定方式:比價及議價"
