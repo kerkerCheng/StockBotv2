@@ -1456,6 +1456,18 @@ def build_parser() -> argparse.ArgumentParser:
     lights.add_argument("--format", choices=("markdown", "json"), default="markdown")
     lights.set_defaults(func=cmd_lights)
 
+    detective = sub.add_parser(
+        "detective", help="偵探（計畫外線索組裝；唯讀）：pack 照圖上鄰居組線索包與派工提示、verify 核回報的引文")
+    det_sub = detective.add_subparsers(dest="action", required=True)
+    det_pack = det_sub.add_parser("pack", help="組線索包：MANIFEST.md、PROMPT.md（現況另有 narrative.json；回溯另有 docs/）")
+    det_pack.add_argument("ticker")
+    det_pack.add_argument("--out", help="輸出資料夾（預設 library/private/research_notes/detective/<代號>_<日期>[_asof_<日>]）")
+    det_pack.add_argument("--as-of", help="回溯日（YYYY-MM-DD）：只收那天以前發布的文件、清掉我們後來寫的字、不給敘事")
+    det_verify = det_sub.add_parser("verify", help="核回報的引文：每個「檔名:行號」前面那段引號文字是不是逐字在原文")
+    det_verify.add_argument("report", help="回報文字檔（主 session 存的 REPORT.md）")
+    det_verify.add_argument("--pack", help="線索包資料夾（回溯包要給，引文的檔在它的 docs/）")
+    detective.set_defaults(func=cmd_detective)
+
     audit = sub.add_parser(
         "audit",
         help="（已搬走）runtime invariant audit → 改用 `python -m audit invariants`",
@@ -1463,6 +1475,43 @@ def build_parser() -> argparse.ArgumentParser:
     audit.add_argument("what", choices=("invariants",))
     audit.set_defaults(func=cmd_audit_moved)
     return parser
+
+
+def cmd_detective(args: argparse.Namespace) -> int:
+    """偵探第一版（`skills/detective/SKILL.md`）。唯讀：不寫任何 authority、不跑 LLM、不碰價格。"""
+    from .detective import verify_report
+
+    if args.action == "pack":
+        from .providers.detective import ROOT, build_pack
+
+        as_of = date.fromisoformat(args.as_of) if args.as_of else None
+        stem = f"{args.ticker}_{date.today().isoformat()}" + (f"_asof_{as_of.isoformat()}" if as_of else "")
+        out = Path(args.out) if args.out else ROOT / "library" / "private" / "research_notes" / "detective" / stem
+        s = build_pack(args.ticker, out, as_of=as_of)
+        c = s["counts"]
+        print(f"✓ 線索包 → {s['out_dir']}")
+        print(f"  鄰居 {s['neighbors']} 家（名冊比不到名字 {len(s['missing_registry'])}）｜文件 {s['docs']} 份"
+              f"（自家庫掃 {s['scanned']}、非文字沒核 {s['unchecked']}、點名的 {c['named']}；回溯排除日期不明 {c['undated']}、"
+              f"晚於回溯日 {c['after_as_of']}；對手的客戶超過每家上限 {c['second_hop_capped']}；截斷 {c['truncated']}）"
+              f"｜問句 {s['questions']} 題")
+        print("  下一步：派一位強模型唯讀子代理，提示＝PROMPT.md 全文；回報存成同資料夾的 REPORT.md 再跑 verify")
+        return 0
+    from .providers.detective import listed_files, make_reader
+
+    report = Path(args.report).read_text(encoding="utf-8")
+    pack = Path(args.pack) if args.pack else None
+    checks = verify_report(report, make_reader(pack), listed_files(pack) if pack else None)
+    label = {"line_off": "～行號偏", "missing": "✗原文沒有", "no_file": "✗檔不存在"}
+    for c in checks:
+        if c.status != "ok":
+            print(f"{label[c.status]}｜{c.file}:{c.line}｜{c.quote[:80]}")
+        if c.in_manifest is False:
+            print(f"⚠清單外｜{c.file}:{c.line}｜子代理讀了包外的檔（引文對才可用；記進案例庫的越界欄）")
+    n = {k: sum(1 for c in checks if c.status == k) for k in ("ok", "line_off", "missing", "no_file")}
+    off = sum(1 for c in checks if c.in_manifest is False)
+    print(f"引文 {len(checks)}：逐字且行號對 {n['ok']}｜逐字但行號偏 {n['line_off']}｜原文沒有 {n['missing']}｜檔不存在 {n['no_file']}"
+          f"｜清單外 {off if pack else '沒給 --pack、不判'}（沒有引號包著的引文不核，只能人讀）")
+    return 1 if n["missing"] or n["no_file"] else 0
 
 
 def cmd_audit_moved(_args: argparse.Namespace) -> int:
