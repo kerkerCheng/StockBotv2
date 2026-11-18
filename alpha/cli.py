@@ -1463,9 +1463,29 @@ def build_parser() -> argparse.ArgumentParser:
     det_pack.add_argument("ticker")
     det_pack.add_argument("--out", help="輸出資料夾（預設 library/private/research_notes/detective/<代號>_<日期>[_asof_<日>]）")
     det_pack.add_argument("--as-of", help="回溯日（YYYY-MM-DD）：只收那天以前發布的文件、清掉我們後來寫的字、不給敘事")
+    det_pack.add_argument("--case", help="回溯案例編號（`detective next` 給的）：包寫到 backtest/<編號>/name|mask/、帶上補抓的文件")
+    det_pack.add_argument("--mask", action="store_true", help="遮名：目標與鄰居換成代碼、文件改名；殘留不是 0 就不寫 PROMPT（要 --case）")
     det_verify = det_sub.add_parser("verify", help="核回報的引文：每個「檔名:行號」前面那段引號文字是不是逐字在原文")
     det_verify.add_argument("report", help="回報文字檔（主 session 存的 REPORT.md）")
     det_verify.add_argument("--pack", help="線索包資料夾（回溯包要給，引文的檔在它的 docs/）")
+    det_rallies = det_sub.add_parser(
+        "rallies", help="回溯：找起漲點與同題材對照、封存（只印計數，不印價格、不說誰是贏家；plan 2026-11-18-001）")
+    det_rallies.add_argument("--rebuild", action="store_true", help="重找並覆蓋封存檔（會丟掉已組包的狀態）")
+    det_next = det_sub.add_parser("next", help="回溯：照封存順序給下一個要組包的案例（不說是贏家還是對照）")
+    det_next.add_argument("--group", choices=("clean", "masked"), required=True)
+    det_mark = det_sub.add_parser("mark", help="回溯：記下一個案例過不過門檻（鄰居 ≥ 1、回溯日以前的文件 ≥ 10）")
+    det_mark.add_argument("case_id")
+    det_mark_how = det_mark.add_mutually_exclusive_group(required=True)
+    det_mark_how.add_argument("--pass", dest="passed", action="store_true")
+    det_mark_how.add_argument("--fail", dest="failed", action="store_true")
+    det_mark.add_argument("--reason", default="")
+    det_backfill = det_sub.add_parser("backfill", help="回溯：補抓目標與當時直接鄰居在回溯日前 12 個月的申報（EDGAR、MOPS）")
+    det_backfill.add_argument("case_id")
+    det_tally = det_sub.add_parser("tally", help="回報的抽屜×信心計數與偏多強度（機械；不看價格）")
+    det_tally.add_argument("report")
+    det_score = det_sub.add_parser("score", help="回溯：開封一組——標籤、偏多強度、超額、配對分辨（印了就是看過價格，要揭露）")
+    det_score.add_argument("--group", choices=("clean", "masked"), required=True)
+    det_score.add_argument("--format", choices=("text", "json"), default="text")
     detective.set_defaults(func=cmd_detective)
 
     audit = sub.add_parser(
@@ -1481,19 +1501,47 @@ def cmd_detective(args: argparse.Namespace) -> int:
     """偵探第一版（`skills/detective/SKILL.md`）。唯讀：不寫任何 authority、不跑 LLM、不碰價格。"""
     from .detective import verify_report
 
+    if args.action in ("rallies", "next", "mark", "backfill", "tally", "score"):
+        return _cmd_detective_backtest(args)
     if args.action == "pack":
         from .providers.detective import ROOT, build_pack
+        from .providers.detective_backtest import BACKFILL_DIR, case_dir
 
         as_of = date.fromisoformat(args.as_of) if args.as_of else None
+        if args.mask and not args.case:
+            print("✗ --mask 要配 --case（遮名包的路徑不能含代號）", file=sys.stderr)
+            return 2
+        if args.case and as_of is None:
+            print("✗ --case 是回溯案例，要給 --as-of", file=sys.stderr)
+            return 2
         stem = f"{args.ticker}_{date.today().isoformat()}" + (f"_asof_{as_of.isoformat()}" if as_of else "")
-        out = Path(args.out) if args.out else ROOT / "library" / "private" / "research_notes" / "detective" / stem
-        s = build_pack(args.ticker, out, as_of=as_of)
+        extra: list[Path] = []
+        if args.case:
+            out = case_dir(args.case) / ("mask" if args.mask else "name")
+            if (BACKFILL_DIR / args.case).is_dir():
+                extra.append(BACKFILL_DIR / args.case)
+        else:
+            out = Path(args.out) if args.out else ROOT / "library" / "private" / "research_notes" / "detective" / stem
+        s = build_pack(args.ticker, out, as_of=as_of, mask=args.mask, extra_roots=extra)
         c = s["counts"]
-        print(f"✓ 線索包 → {s['out_dir']}")
-        print(f"  鄰居 {s['neighbors']} 家（名冊比不到名字 {len(s['missing_registry'])}）｜文件 {s['docs']} 份"
-              f"（自家庫掃 {s['scanned']}、非文字沒核 {s['unchecked']}、點名的 {c['named']}；回溯排除日期不明 {c['undated']}、"
+        print(f"✓ 線索包 → {s['out_dir']}" + ("（遮名）" if s["masked"] else ""))
+        print(f"  鄰居 {s['neighbors']} 家（名冊比不到名字 {len(s['missing_registry'])}"
+              + (f"；回溯日之後才有來源、拿掉 {s['pit_dropped']} 家" if as_of else "") + f"）｜文件 {s['docs']} 份"
+              f"（自家庫掃 {s['scanned']}" + (f"＋補抓 {len(extra)} 個資料夾" if extra else "")
+              + f"、非文字沒核 {s['unchecked']}、點名的 {c['named']}；回溯排除日期不明 {c['undated']}、"
               f"晚於回溯日 {c['after_as_of']}；對手的客戶超過每家上限 {c['second_hop_capped']}；截斷 {c['truncated']}）"
               f"｜問句 {s['questions']} 題")
+        if s["masked"]:
+            print(f"  遮名殘留：{sum(sum(v.values()) for v in s['leaks'].values())} 處（應為 0）")
+            for fname, hits in sorted(s["leaks"].items())[:20]:
+                print(f"  ✗ {fname}：" + "、".join(f"{k}×{v}" for k, v in sorted(hits.items())))
+            if s["leaks"]:
+                print("  ✗ 殘留不是 0：沒有寫 PROMPT.md（plan §3.5）——修名冊別名或遮名規則再組一次")
+                return 1
+        if args.case:
+            ok = s["neighbors"] >= 1 and s["docs"] >= 10
+            print(f"  門檻（鄰居 ≥ 1、文件 ≥ 10）：{'過' if ok else '不過'}——"
+                  f"`python -m alpha detective mark {args.case} {'--pass' if ok else '--fail'} --reason \"…\"`")
         print("  下一步：派一位強模型唯讀子代理，提示＝PROMPT.md 全文；回報存成同資料夾的 REPORT.md 再跑 verify")
         return 0
     from .providers.detective import listed_files, make_reader
@@ -1512,6 +1560,91 @@ def cmd_detective(args: argparse.Namespace) -> int:
     print(f"引文 {len(checks)}：逐字且行號對 {n['ok']}｜逐字但行號偏 {n['line_off']}｜原文沒有 {n['missing']}｜檔不存在 {n['no_file']}"
           f"｜清單外 {off if pack else '沒給 --pack、不判'}（沒有引號包著的引文不核，只能人讀）")
     return 1 if n["missing"] or n["no_file"] else 0
+
+
+def _fmt_pct(value: float | None) -> str:
+    return "—" if value is None else f"{value * 100:+.0f}%"
+
+
+def _cmd_detective_backtest(args: argparse.Namespace) -> int:
+    """偵探回溯（plan 2026-11-18-001）。`rallies`／`next`／`mark`／`backfill`／`tally` 不印任何價格、不說誰是贏家；
+    `score` 開封一組、印超額——印了就是看過價格，研究日誌要揭露（§3.9）。"""
+    from .detective_backtest import GROUP_LABELS, QUOTA, lean_tally
+    from .providers import detective_backtest as bt
+
+    if args.action == "rallies":
+        s = bt.build_sealed(rebuild=args.rebuild)
+        c = s["counts"]
+        print(("（沿用既有封存檔，" + str(s["generated_at"]) + "；要重找加 --rebuild）") if s["reused"] else f"✓ 封存 → {bt.SEALED.as_posix()}")
+        print(f"  宇宙（主題等權組成員、有還原收盤、Q3W 名單外）{c.get('universe', 0)} 檔｜Q3W 名單 {c.get('q3w_list', '?')} 檔、"
+              f"排除 {c.get('excluded', 0)}｜沒有還原收盤 {c.get('no_bars', 0)}｜起漲點早於價格資料 {c.get('winner_before_data', 0)}")
+        for g in ("clean", "masked"):
+            print(f"  {GROUP_LABELS[g]}：贏家候選 {c.get(g + '_winners', 0)}、對照候選 {c.get(g + '_controls', 0)}"
+                  f"（每組要 {QUOTA['winner']} 贏 {QUOTA['control']} 對照）")
+        print("  下一步：`python -m alpha detective next --group clean`")
+        return 0
+    if args.action == "next":
+        case, need = bt.next_for(args.group)
+        if case is None:
+            print(f"{GROUP_LABELS[args.group]}：" + ("湊齊了" if need == 0 else f"名單用完、還缺 {need} 個（plan §3.2：照實寫）"))
+            return 0
+        cid, t, a = case["case_id"], case["ticker"], case["as_of"]
+        print(f"{GROUP_LABELS[args.group]} 下一個：{cid}｜{t}｜回溯日 {a}（這一組還要 {need} 個）")
+        print(f"  1. python -m alpha detective backfill {cid}")
+        mask = " --mask" if args.group == "masked" else ""
+        print(f"  2. python -m alpha detective pack {t} --as-of {a} --case {cid}{mask}")
+        print(f"  3. 照組包印的門檻：python -m alpha detective mark {cid} --pass|--fail --reason \"…\"")
+        return 0
+    if args.action == "mark":
+        case = bt.mark(args.case_id, passed=bool(args.passed), reason=args.reason)
+        _c, need = bt.next_for(str(case["group"]))
+        print(f"✓ {case['case_id']}｜{case['ticker']} → {'收' if args.passed else '跳過'}"
+              f"｜{GROUP_LABELS[str(case['group'])]}還要 {need} 個")
+        return 0
+    if args.action == "backfill":
+        data = bt.read_sealed()
+        case = next((c for c in (data or {}).get("cases", []) if c["case_id"] == args.case_id), None)
+        if case is None:
+            print(f"✗ 封存檔沒有 {args.case_id}", file=sys.stderr)
+            return 1
+        r = bt.backfill(case["ticker"], date.fromisoformat(case["as_of"]), bt.BACKFILL_DIR / args.case_id)
+        print(f"✓ 補抓 → {r['out_dir']}｜窗口 {r['window'][0]}～{r['window'][1]}｜公司 {r['companies']} 家｜寫入 {r['written']} 份、失敗 {r['failed']}")
+        for market, rows in r["by_market"].items():
+            print(f"  {market}：" + "；".join(f"{x['ticker']} 列 {x.get('listed', 0)}／寫 {x.get('written', 0)}"
+                                             + ("／沒有 CIK" if x.get("no_cik") else "") for x in rows))
+        if r["no_route"]:
+            print(f"  沒有日期區間路線、不補（INV-3）：{'、'.join(r['no_route'])}")
+        if r["no_ticker"]:
+            print(f"  沒有上市代號（私有或未登記）：{len(r['no_ticker'])} 家")
+        return 0
+    if args.action == "tally":
+        t = lean_tally(Path(args.report).read_text(encoding="utf-8"))
+        if not t["section_found"]:
+            print("✗ 找不到「### 線索」段", file=sys.stderr)
+            return 1
+        print(f"線索 {t['clues']} 條（抽不到抽屜 {t['unparsed']}）｜偏多強度：高 {t['lean_high']:+d}、中 {t['lean_mid']:+d}")
+        for drawer, levels in t["by"].items():
+            print(f"  {drawer}：" + "、".join(f"{k} {levels.get(k, 0)}" for k in ("高", "中", "低")))
+        return 0
+    r = bt.score_group(args.group)
+    if args.format == "json":
+        print(json.dumps(r, ensure_ascii=False, indent=1, default=str))
+        return 0
+    print(f"⚠ 開封 {GROUP_LABELS[args.group]}（價格到 {r['price_through']}）：印出來就是看過價格——研究日誌列出這些代號（plan §3.9）")
+    for row in r["rows"]:
+        lean = row["lean"]
+        lean_s = (f"高 {lean['lean_high']:+d}／中 {lean['lean_mid']:+d}（{lean['clues']} 條）" if lean else "沒有回報")
+        print(f"- {row['case_id']}｜{row['ticker']}｜{row['as_of']}｜{'贏家' if row['label'] == 'winner' else '對照'}｜偏多強度 {lean_s}")
+        for w in row["windows"]:
+            if w.get("status"):
+                print(f"    {w['window']}：{w['status']}")
+                continue
+            market = "、".join(f"{k} {_fmt_pct(v)}" for k, v in w["vs_market"].items())
+            print(f"    {w['window']}：自己 {_fmt_pct(w['own'])}｜對主題等權組 {_fmt_pct(w['vs_cohort'])}｜對大盤 {market}")
+    print(f"配對分辨：{r['pair_wins']:g}／{r['pairs']} 對 → {r['verdict']}")
+    if r["bench_missing"]:
+        print(f"大盤抓不到：{'、'.join(r['bench_missing'])}")
+    return 0
 
 
 def cmd_audit_moved(_args: argparse.Namespace) -> int:

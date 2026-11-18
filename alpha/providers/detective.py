@@ -29,25 +29,30 @@ MAX_DOCS = 250
 SECOND_HOP_PER_COMPANY = 12
 
 #: 一跳：與目標公司直接相連的公司（供貨、競爭、投資、合作…）。
+#: 每條查詢多帶 `edge_docs`＝路徑上每條邊的 `source_doc_ids`：回溯只留「回溯日當時就有來源」的鄰居（plan 2026-11-18-001 §3.6）。
 ONE_HOP_CYPHER = """
 MATCH (c:Company {id: $cid})-[r]-(n:Company)
-RETURN type(r) AS rel, startNode(r) = c AS out, n.id AS nid, coalesce(n.name, n.id) AS name, null AS via
+RETURN type(r) AS rel, startNode(r) = c AS out, n.id AS nid, coalesce(n.name, n.id) AS name, null AS via,
+       [r.source_doc_ids] AS edge_docs
 """
 #: 經一層：目標供應的層節點上，其他供應商（同層）與吃這一層的公司（同層買方）。
 LAYER_CYPHER = """
-MATCH (c:Company {id: $cid})-[:SUPPLIES_TO]->(m)<-[r]-(n:Company)
+MATCH (c:Company {id: $cid})-[r0:SUPPLIES_TO]->(m)<-[r]-(n:Company)
 WHERE NOT m:Company AND NOT m:Claim AND NOT m:Source AND n.id <> $cid
-RETURN type(r) AS rel, true AS out, n.id AS nid, coalesce(n.name, n.id) AS name, m.id AS via
+RETURN type(r) AS rel, true AS out, n.id AS nid, coalesce(n.name, n.id) AS name, m.id AS via,
+       [r0.source_doc_ids, r.source_doc_ids] AS edge_docs
 """
 #: 第二跳：同層供應商與直接對手的客戶（買賣兩方各寫一半的合約，要兩邊的文件才對得起來——M0 的 AOI×雲南鍺業）。
 RIVAL_CUSTOMER_CYPHER = """
-MATCH (c:Company {id: $cid})-[:SUPPLIES_TO]->(m)<-[:SUPPLIES_TO]-(p:Company)-[:SUPPLIES_TO]->(n:Company)
+MATCH (c:Company {id: $cid})-[r1:SUPPLIES_TO]->(m)<-[r2:SUPPLIES_TO]-(p:Company)-[r3:SUPPLIES_TO]->(n:Company)
 WHERE NOT m:Company AND NOT m:Claim AND NOT m:Source AND p.id <> $cid AND n.id <> $cid
-RETURN DISTINCT 'SUPPLIES_TO' AS rel, true AS out, n.id AS nid, coalesce(n.name, n.id) AS name, p.id AS via, 2 AS hop
+RETURN DISTINCT 'SUPPLIES_TO' AS rel, true AS out, n.id AS nid, coalesce(n.name, n.id) AS name, p.id AS via, 2 AS hop,
+       [r1.source_doc_ids, r2.source_doc_ids, r3.source_doc_ids] AS edge_docs
 UNION
-MATCH (c:Company {id: $cid})-[:COMPETES_WITH]-(p:Company)-[:SUPPLIES_TO]->(n:Company)
+MATCH (c:Company {id: $cid})-[r1:COMPETES_WITH]-(p:Company)-[r2:SUPPLIES_TO]->(n:Company)
 WHERE n.id <> $cid
-RETURN DISTINCT 'SUPPLIES_TO' AS rel, true AS out, n.id AS nid, coalesce(n.name, n.id) AS name, p.id AS via, 2 AS hop
+RETURN DISTINCT 'SUPPLIES_TO' AS rel, true AS out, n.id AS nid, coalesce(n.name, n.id) AS name, p.id AS via, 2 AS hop,
+       [r1.source_doc_ids, r2.source_doc_ids] AS edge_docs
 """
 
 
@@ -76,7 +81,9 @@ class ScanResult:
 
 
 def scan_raw(companies: Mapping[str, Any], *, raw_dir: Path = RAW_DIR) -> ScanResult:
-    """掃自家庫一次：每份文字檔點名了哪些公司（目標＋鄰居）。`companies`＝company_id → 名冊物件。"""
+    """掃自家庫一次：每份文字檔點名了哪些公司（目標＋鄰居）。`companies`＝company_id → 名冊物件。
+    `raw_dir` 不是自家庫（回溯的補抓資料夾）時，DocInfo 帶 `root`，組包從那裡複製。"""
+    root = None if raw_dir == RAW_DIR else raw_dir.as_posix()
     from identity.registry import get_registry
     from query.bottleneck import quote_names_company, shared_name_forms
 
@@ -103,7 +110,8 @@ def scan_raw(companies: Mapping[str, Any], *, raw_dir: Path = RAW_DIR) -> ScanRe
                     meta = json.loads(sidecar.read_text(encoding="utf-8"))
                 except (OSError, ValueError):
                     meta = None         # 壞的 sidecar：退回檔頭與檔名，不中斷
-            out.docs.append(DocInfo(name=path.name, published=doc_date(path.name, text[:3000], meta), named=named))
+            out.docs.append(DocInfo(name=path.name, published=doc_date(path.name, text[:3000], meta), named=named,
+                                    root=root))
     return out
 
 
@@ -166,22 +174,38 @@ def _select(docs: Sequence[DocInfo], target_id: str, as_of: date | None,
 
 
 def build_pack(ticker: str, out_dir: Path, *, as_of: date | None = None,
-               rows: list[dict[str, Any]] | None = None) -> dict[str, Any]:
+               rows: list[dict[str, Any]] | None = None, mask: bool = False, extra_roots: Sequence[Path] = (),
+               doc_dates: Mapping[str, date | None] | None = None) -> dict[str, Any]:
     """組一份線索包：MANIFEST.md、PROMPT.md、（現況）narrative.json；回溯另把文件複製進 docs/ 並清掉我們後來寫的字。
-    回傳摘要（鄰居數、文件數、截斷與排除的計數）。"""
+    回溯（plan 2026-11-18-001）：鄰居只留回溯日當時就有來源的（§3.6）；`extra_roots`＝補抓資料夾（§3.7）；
+    `mask`＝目標與鄰居換成代碼、文件改名 doc-NNN、殘留掃描不是 0 就不寫 PROMPT（§3.5）。
+    回傳摘要（鄰居數、文件數、截斷與排除的計數、遮名殘留）。"""
     from identity.registry import get_registry
 
+    from ..detective_backtest import known_rows
     from ..price_mask import mask_brief_record
     from .briefs import raw_record
     from .structure_readings import ledger_path
 
+    if (mask or extra_roots) and as_of is None:
+        raise SystemExit("✗ --mask／補抓資料夾只用在回溯（要給 --as-of）")
     registry = get_registry()
     company_id = registry.company_id_for_ticker(ticker)
     if not company_id:
         raise SystemExit(f"✗ 名冊沒有 {ticker}（INV-1：不猜）")
     target = registry.company(company_id)
     name = str(getattr(target, "display_name", None) or ticker)
-    neighbors: list[Neighbor] = neighbors_from_rows(company_id, rows if rows is not None else fetch_neighbor_rows(company_id))
+    rows = rows if rows is not None else fetch_neighbor_rows(company_id)
+    pit_dropped = 0
+    if as_of is not None:
+        from .detective_backtest import fetch_doc_dates
+
+        dates = doc_dates if doc_dates is not None else fetch_doc_dates(
+            i for r in rows for ids in (r.get("edge_docs") or []) for i in (ids or []))
+        before = {str(r.get("nid")) for r in rows} - {company_id}
+        rows, _ = known_rows(rows, dates, as_of)
+        pit_dropped = len(before - {str(r.get("nid")) for r in rows})     # 回溯日之後才知道的鄰居（家數）
+    neighbors: list[Neighbor] = neighbors_from_rows(company_id, rows)
     companies = {company_id: target}
     missing_registry = []
     for nb in neighbors:
@@ -191,6 +215,11 @@ def build_pack(ticker: str, out_dir: Path, *, as_of: date | None = None,
             continue
         companies[nb.company_id] = obj
     scan = scan_raw(companies)
+    for extra in extra_roots:
+        more = scan_raw(companies, raw_dir=Path(extra))
+        scan.docs += more.docs
+        scan.scanned += more.scanned
+        scan.unchecked += more.unchecked
     second_hop = frozenset(nb.company_id for nb in neighbors if nb.roles == {"rival_customer"})
     docs, counts = _select(scan.docs, company_id, as_of, second_hop)
     by_company: dict[str, list[DocInfo]] = {}
@@ -211,16 +240,30 @@ def build_pack(ticker: str, out_dir: Path, *, as_of: date | None = None,
                 reading_lines.append(f"- 讀圖：{ledger_path(str(ride.get('node'))).relative_to(ROOT).as_posix()} 裡 "
                                      f"reading_id = {ride.get('reading_id')} 那一列（只讀這一列）。")
     docs_dir = out_dir / "docs"
+    entries = []
+    shown: dict[str, str] = {d.name: d.name for d in docs}       # 原檔名 → 包裡的檔名（遮名時改成 doc-NNN）
+    if mask:
+        from ..detective_backtest import mask_text
+        from .detective_backtest import mask_entries
+
+        from ..detective_backtest import residual_forms
+
+        entries = mask_entries(company_id, neighbors)
+        if residual_forms(out_dir.as_posix(), entries):
+            raise SystemExit("✗ 遮名包的路徑含目標或鄰居的名字／代號（路徑會出現在提示裡）：用 `--case`（backtest/<案例編號>/）")
+        shown = {d.name: f"doc-{i:03d}{Path(d.name).suffix or '.txt'}" for i, d in enumerate(docs, 1)}
     if as_of is not None:
         if docs_dir.exists():
             shutil.rmtree(docs_dir)
         docs_dir.mkdir()
         for d in docs:
-            src = RAW_DIR / d.name
+            src = (Path(d.root) if d.root else RAW_DIR) / d.name
             text = src.read_text(encoding="utf-8", errors="replace")
             if has_our_header(text[:3000]):
                 text, _dropped = sanitize_excerpt(text, as_of)
-            (docs_dir / d.name).write_text(text, encoding="utf-8")
+            if mask:
+                text = mask_text(text, entries)
+            (docs_dir / shown[d.name]).write_text(text, encoding="utf-8")
         read_scope = f"{docs_dir.as_posix()}/ 裡的檔（MANIFEST.md 列的那些）"
         file_prefix = docs_dir.as_posix() + "/"
     else:
@@ -228,7 +271,8 @@ def build_pack(ticker: str, out_dir: Path, *, as_of: date | None = None,
         file_prefix = "library/raw/"
 
     manifest = [f"# 線索包：{name}（{ticker}，{company_id}）", "",
-                f"- 產生日：{date.today().isoformat()}｜回溯：{as_of.isoformat() if as_of else '否（現況）'}",
+                f"- 產生日：{date.today().isoformat()}｜回溯：{as_of.isoformat() if as_of else '否（現況）'}"
+                + (f"｜回溯日之後才有來源、拿掉的鄰居 {pit_dropped} 家" if as_of else ""),
                 f"- 鄰居 {len(neighbors)} 家；名冊沒有、比不到名字的 {len(missing_registry)} 家：{'、'.join(missing_registry) or '無'}",
                 f"- 自家庫掃了 {scan.scanned} 份文字檔（非文字檔沒核 {scan.unchecked} 份）；點名目標或鄰居的 {counts['named']} 份；"
                 f"回溯排除：日期不明 {counts['undated']}、晚於回溯日 {counts['after_as_of']}；"
@@ -241,8 +285,8 @@ def build_pack(ticker: str, out_dir: Path, *, as_of: date | None = None,
     label = {cid: (registry.company(cid).display_name if registry.company(cid) else cid) for cid in companies}
     for d in docs:
         who = "、".join(label.get(c, c) for c in d.named)
-        manifest.append(f"- {file_prefix}{d.name}（{d.published.isoformat() if d.published else '日期不明'}｜{who}）")
-    (out_dir / "MANIFEST.md").write_text("\n".join(manifest) + "\n", encoding="utf-8")
+        manifest.append(f"- {file_prefix}{shown[d.name]}（{d.published.isoformat() if d.published else '日期不明'}｜{who}）")
+    manifest_text = "\n".join(manifest) + "\n"
 
     cons = consensus_lines(ticker, as_of=as_of)
     questions = build_questions(name, neighbors, by_company, cons, with_narrative=bool(narrative_note))
@@ -252,13 +296,35 @@ def build_pack(ticker: str, out_dir: Path, *, as_of: date | None = None,
         f"- 檔案清單：{(out_dir / 'MANIFEST.md').as_posix()}（{len(docs)} 份；鄰居與它們的角色也在裡面）。大檔用 Grep 找段落，不要整份讀。",
         "- 分析師共識（營收；Engine C）：" + ("；".join(cons) if cons else "沒有資料"),
         "- 公司自己說的計畫與我們算的路徑：" + ("見敘事的量級那一格（四段）。" if narrative_note else "從文件自己讀。"),
+        ("- 遮名：公司A 是這家公司、公司B 以後是鄰居，代號A 是它的交易代號；〔A〕是名字的一部分被遮掉（也可能誤遮到同字的普通詞）。"
+         "不要猜真名；猜到了也不要用你對它的記憶。") if mask else "",
     ]))
     prompt = render_prompt(company=name, ticker=ticker, read_scope=read_scope, materials=materials,
                            questions=questions, as_of=as_of)
-    (out_dir / "PROMPT.md").write_text(prompt, encoding="utf-8")
+    leaks: dict[str, dict[str, int]] = {}
+    prompt_path = out_dir / "PROMPT.md"
+    if mask:
+        from .detective_backtest import leak_check
+
+        manifest_text = mask_text(manifest_text, entries, normalize=False)
+        prompt = mask_text(prompt, entries, normalize=False)
+        texts = {"MANIFEST.md": manifest_text, "PROMPT.md": prompt}
+        texts.update({p.name: p.read_text(encoding="utf-8") for p in sorted(docs_dir.iterdir()) if p.is_file()})
+        leaks = leak_check(texts, entries)
+        (out_dir.parent / f"{out_dir.name}.mask_map.json").write_text(json.dumps({
+            "entries": [{"code": e.code, "company_id": e.company_id, "names": list(e.names), "tickers": list(e.tickers),
+                         "stems": list(e.stems)}
+                        for e in entries],
+            "files": shown}, ensure_ascii=False, indent=1), encoding="utf-8")     # 包外：子代理讀不到
+    (out_dir / "MANIFEST.md").write_text(manifest_text, encoding="utf-8")
+    if leaks:
+        prompt_path.unlink(missing_ok=True)       # 殘留不是 0：不給派工提示（§3.5）
+    else:
+        prompt_path.write_text(prompt, encoding="utf-8")
     return {"company_id": company_id, "neighbors": len(neighbors), "docs": len(docs), "counts": counts,
             "missing_registry": missing_registry, "scanned": scan.scanned, "unchecked": scan.unchecked,
-            "questions": len(questions), "out_dir": out_dir.as_posix()}
+            "questions": len(questions), "out_dir": out_dir.as_posix(), "pit_dropped": pit_dropped,
+            "masked": mask, "leaks": leaks}
 
 
 _LISTED_FILE = re.compile(r"([A-Za-z0-9_\-.]+\.(?:txt|md|jsonl|json))")

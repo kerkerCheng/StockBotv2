@@ -177,6 +177,7 @@ class DocInfo:
     name: str
     published: date | None
     named: tuple[str, ...]      # 這份文件點名了哪些公司（company_id）
+    root: str | None = None     # 不在自家庫時的資料夾（回溯補抓）；None＝library/raw
 
 
 def _docs_line(docs: Sequence[DocInfo]) -> str:
