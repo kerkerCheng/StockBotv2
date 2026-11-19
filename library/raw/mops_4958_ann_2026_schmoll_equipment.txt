@@ -1,0 +1,27 @@
+Source URL: https://mopsov.twse.com.tw/mops/web/t05st01?co_id=4958&spoke_date=20260514&seq_no=1
+Source URL: https://mopsov.twse.com.tw/mops/web/t05st01?co_id=4958&spoke_date=20260603&seq_no=2
+
+Excerpt:
+[EXCERPT — 有限逐字引文] 臻鼎-KY（4958）重大訊息兩則：①2026-05-14 代子公司 PENG SHEN TECHNOLOGY (THAILAND) 向 schmoll maschinen GmbH 取得機器設備一批 新台幣 11.06 億元；②2026-06-03 代子公司慶鼎精密電子（淮安）向 schmoll maschinen GmbH 取得機器設備一批 新台幣 15.21 億元（兩則都是比價及議價）
+DATE: 2026-05-14；2026-06-03
+RETRIEVED: 2026-11-19（MOPS 歷史重訊查詢 ajax_t05st01：①POST step=2&seq_no=1&spoke_time=224454&spoke_date=20260514&co_id=4958&TYPEK=sii ②seq_no=2&spoke_time=180511&spoke_date=20260603；換行與連續空白正規化成一個空格，再逐字照抄）
+NOTE: 客戶端（板廠）申報。重訊只寫「機器設備」一批，沒寫設備種類；schmoll maschinen 是德國的 PCB 鑽孔與成型設備商（它與大量科技、東台精機、大族數控賣同一類機種——這是我們的歸類，不是重訊原文）。對大量科技的意義：同一家子公司慶鼎（淮安）同一年既向大量的南京子公司買（mops_4958_ann_20260609／20260805／20261118_ta_liang_equipment.txt）、也向 schmoll 買——買方至少有兩家來源，不是只認大量；但重訊沒寫兩家各買什麼機種，分不出背鑽是不是同一種。
+
+【①2026-05-14 主旨】
+"代子公司PENG SHEN TECHNOLOGY (THAILAND) CO., LTD.公告取得機器設備"
+【①說明 2. 事實發生日】
+"2.事實發生日:114/5/15~115/5/14"
+【①說明 5. 交易總金額】
+"交易數量:一批 交易總金額:新台幣1,105,554,790元"
+【①說明 6. 交易相對人】
+"交易相對人: schmoll maschinen GmbH 與公司之關係:無"
+【②2026-06-03 主旨】
+"代子公司慶鼎精密電子(淮安)有限公司公告取得機器設備"
+【②說明 2. 事實發生日】
+"2.事實發生日:114/6/4~115/6/3"
+【②說明 5. 交易總金額】
+"交易數量:一批 交易總金額:新台幣1,521,144,972元"
+【②說明 6. 交易相對人】
+"交易相對人:schmoll maschinen GmbH 與公司之關係:無"
+【兩則說明 11. 決定方式】
+"交易決定方式:比價及議價 價格決定之參考依據:依市場行情"

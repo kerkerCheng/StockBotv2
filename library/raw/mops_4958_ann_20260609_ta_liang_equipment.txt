@@ -12,3 +12,5 @@ NOTE: 客戶端（板廠）申報。交易相對人是大量科技的南京子�
 "交易數量:一批 交易總金額:新台幣1,049,896,840元"
 【說明 6. 交易相對人及其與公司之關係】
 "交易相對人:NANJING TA LIANG TECHNOLOGY CO.,LTD. 與公司之關係:無"
+【說明 11. 決定方式（2026-11-19 補：MOPS 歷史重訊查詢 ajax_t05st01 POST step=2&seq_no=1&spoke_time=174747&spoke_date=20260609&co_id=4958&TYPEK=sii）】
+"交易決定方式:比價及議價"
