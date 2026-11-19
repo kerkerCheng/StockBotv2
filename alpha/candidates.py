@@ -40,12 +40,14 @@ SIDE_LABELS: Mapping[str, str] = {"not_multiple": "非倍率候選", "edge_unmea
 #: **順序是閱讀順序，不是名次**：研究時間花最多的在上（已持有、可開、缺 X——Phase 7 A4「深度」壓在這裡），
 #: 敘事要重寫的其次，判斷過「不要」的在最後；組內一律 ticker 字母序（AGENTS：不得輸出跨檔全序）。
 #: 沒有敘事分兩組（2026-10-28 使用者：「還沒寫敘事」讓 104 檔非邊緣看起來像待做）：`no_narrative`＝邊緣或量不到、
-#: 該寫還沒寫（研究待做）；`not_edge_no_narrative`＝非邊緣、規定不寫（不是待做，放在「不要」之後）。
+#: 該寫還沒寫（研究待做）；`not_edge_no_narrative`＝非邊緣、規定不寫（不是待做，放在「不要」之後）；
+#: `not_buyable_no_narrative`＝邊緣但買不到（`config/execution_access.json` 的例外，11-03 起不寫個股敘事；2026-11-19）。
 LIST_GROUPS: tuple[str, ...] = ("held", "open", "missing", "precondition_failed", "legacy",
                                 "edge_unmeasurable", "no_narrative", "not_multiple", "pass", "not_edge_no_narrative",
-                                "unavailable")
+                                "not_buyable_no_narrative", "unavailable")
 LIST_GROUP_LABELS: Mapping[str, str] = {**GROUP_LABELS, **SIDE_LABELS, "no_narrative": "還沒寫敘事（邊緣，該寫）",
                                         "not_edge_no_narrative": "不寫敘事（非邊緣）",
+                                        "not_buyable_no_narrative": "不寫敘事（買不到）",
                                         "unavailable": "候選狀態這次沒讀到"}
 #: 成績單 paper 線「現在」的狀態除了 GROUPS，還有兩個出口（`scripts/outcome_if_settled_today.py` 寫這兩個鍵）。
 #: 標籤住這裡、經 `.meta.json` 跟著資料走到畫面（L16）——2026-10-28 之前追蹤表直接印英文鍵（`pass → retracted`）。

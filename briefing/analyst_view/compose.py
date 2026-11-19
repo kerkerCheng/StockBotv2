@@ -496,6 +496,9 @@ def _candidate_panel(candidate: Mapping[str, Any] | None) -> AnalystPanel:
                                  "sheet": dict(candidate.get("sheet") or {}),
                                  # 沒有敘事時的邊緣判定（產生端宣告；首頁分「不寫（非邊緣）」與「還沒寫」兩組用）
                                  "edge_state": (candidate.get("row_absence") or {}).get("edge_state") if row is None
+                                 else None,
+                                 # 買得到嗎（2026-11-19）：邊緣但買不到＝規定不寫，首頁另一組「不寫敘事（買不到）」；None＝不知道
+                                 "buyable": (candidate.get("row_absence") or {}).get("buyable") if row is None
                                  else None},
                         reason=state.reason)
 

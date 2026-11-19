@@ -144,9 +144,12 @@ def _candidate_overview(panel: Mapping[str, Any]) -> dict[str, Any]:
     kind = datum.get("absence_kind") or panel.get("absence_kind")
     group = "unavailable"
     if kind == "not_yet_recorded":
-        # 非邊緣＝規定不寫，不是待做（產生端在面板 context 宣告 edge_state；不 parse 理由句，L16）
-        not_edge = (panel.get("context") or {}).get("edge_state") == "not_edge"
-        group = "not_edge_no_narrative" if not_edge else "no_narrative"
+        # 非邊緣＝規定不寫，不是待做（產生端在面板 context 宣告 edge_state；不 parse 理由句，L16）。
+        # 邊緣但買不到（2026-11-19）同樣是規定不寫；buyable 是 None（不知道）照「該寫」那一組
+        ctx = panel.get("context") or {}
+        not_edge = ctx.get("edge_state") == "not_edge"
+        group = ("not_edge_no_narrative" if not_edge
+                 else "not_buyable_no_narrative" if ctx.get("buyable") is False else "no_narrative")
     return {"list_group": group, "label": None,
             "absence_kind": kind or "upstream_unavailable", "reason": datum.get("reason") or panel.get("reason")}
 

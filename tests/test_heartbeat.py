@@ -773,3 +773,17 @@ def test_llm_model_drift_compares_with_the_last_run_that_called_the_llm(tmp_path
     _run_with_models(tmp_path / "daily_run_2026-10-23.json", ["claude-sonnet-5-5"])
     assert hb.llm_model_drift(record, now=now, record_dir=tmp_path) is None     # 一樣就不印
     assert "model 變了" not in "\n".join(hb._daily_run_lines(now=now, record_path=today))
+
+
+def test_candidate_counts_do_not_count_a_company_it_cannot_buy_as_a_narrative_gap() -> None:
+    """2026-11-19（688818.SS）：邊緣但名冊例外寫買不到——規定不寫，不算「邊緣卻沒敘事」；另印「買不到不寫」。
+    非邊緣照舊算非倍率（理由更根本）；access 讀不到（None）照舊數成待做（INV-3）。"""
+    no = {"buyable": False, "why": "滬股通名單外", "recheck_by": "2026-12-21"}
+    board = {"counts": {}, "no_narrative": [
+        {"ticker": "TINY", "edge": {"state": "edge"}, "access": {"buyable": True}},
+        {"ticker": "688818.SS", "edge": {"state": "edge"}, "access": no},
+        {"ticker": "U1", "edge": {"state": "unmeasurable"}, "access": no},
+        {"ticker": "U2", "edge": {"state": "unmeasurable"}, "access": None},
+        {"ticker": "688836.SS", "edge": {"state": "not_edge"}, "access": no}]}
+    c = hb.candidate_counts(board)
+    assert (c["edge_gap"], c["unmeasured"], c["not_buyable"], c["non_edge"]) == (1, 1, 2, 1)

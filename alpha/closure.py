@@ -112,7 +112,7 @@ class BacklogRow:
         """
         if self.awaiting_cohort is not None:
             return False
-        if self.population == "non_multiple":
+        if self.population in ("non_multiple", "not_buyable"):
             return False
         if self.population == "edge_no_seat":
             return bool(self.short_check_due) and self.awaiting_admission is None
@@ -286,8 +286,10 @@ def rank_backlog(rows: Sequence[BacklogRow]) -> list[BacklogRow]:
 #: 閉環母體的封閉字彙（2026-10-07，Phase 7 Step 7.0g-2；plan A4、failure log #22 選項②）。
 #: in＝已持有 ∪ 有 thesis（使用者明示）∪（邊緣或量不到 ∩ 供給側有座位）∪ 現行候選（缺 X／可開；舊的等回落讀成可開）；
 #: non_multiple＝非邊緣、沒持有、沒有 thesis、不是現行候選——不寫敘事，它的文件進層說明當在位者或客戶的證據；
-#: edge_no_seat＝邊緣或量不到但圖上沒有供貨座位——做一次「坐哪一層」短檢查，90 天後重問。
-POPULATIONS: tuple[str, ...] = ("in", "non_multiple", "edge_no_seat")
+#: edge_no_seat＝邊緣或量不到但圖上沒有供貨座位——做一次「坐哪一層」短檢查，90 天後重問；
+#: not_buyable＝邊緣或量不到但買不到（`config/execution_access.json` 的例外；2026-11-19 使用者「可以做」，688818.SS）——
+#: 11-03 起不寫個股敘事、只當層證據；例外過了重查日就照市場規則算、自己回母體（INV-2）。
+POPULATIONS: tuple[str, ...] = ("in", "non_multiple", "edge_no_seat", "not_buyable")
 #: 現行候選（這幾個狀態本身就是「還在研究」，不論邊緣與座位都留在母體）。候選板的列照讀法給狀態
 #: （`CandidateState.effective`，2026-11-03 起等回落併回可開），這裡不必認得退役的字。
 _CANDIDATE_STATES_IN: frozenset[str] = frozenset({"missing", "open"})
@@ -296,13 +298,16 @@ SHORT_CHECK_DAYS = 90
 
 
 def population_for(*, held: bool | None, has_thesis: bool | None, candidate_state: str | None,
-                   edge_state: str | None, has_seat: bool | None, edge_pending: bool | None = None) -> tuple[str, str]:
+                   edge_state: str | None, has_seat: bool | None, edge_pending: bool | None = None,
+                   buyable: bool | None = None) -> tuple[str, str]:
     """→ (母體, 理由代碼)。**每一檔各自判的是非題，不跨檔比較**（G2）。純函式。
 
     讀不到（None）的那一格一律往「留在母體」那一邊倒：邊緣判定讀不到 → in；座位讀不到 → in——
     不因為讀不到就退出（INV-3）。非邊緣只看邊緣判定（市值 AND 覆蓋，`config/alpha_screen.json`）。
     `edge_pending`（2026-11-01 遲滯）：今天才翻成非邊緣、候選板還沒列撤回建議 → 留在母體（`not_edge_pending`）——
     母體與候選板不得一邊撤、一邊留。
+    `buyable`（2026-11-19）：只有明確 False（例外寫買不到、還沒過重查日）才退出；None（不知道）留在母體。
+    已持有、有 thesis、現行候選照舊在母體——已經寫了的敘事不因為這一格消失；非邊緣照舊是非倍率（理由更根本）。
     """
     if held:
         return "in", "held"
@@ -314,6 +319,8 @@ def population_for(*, held: bool | None, has_thesis: bool | None, candidate_stat
         if edge_pending:
             return "in", "not_edge_pending"
         return "non_multiple", "not_edge"
+    if buyable is False:
+        return "not_buyable", "not_buyable"
     if edge_state in ("edge", "unmeasurable"):
         if has_seat is False:
             return "edge_no_seat", "no_supply_seat"
@@ -366,6 +373,9 @@ def summarize(rows: Sequence[BacklogRow]) -> dict[str, Any]:
                                                 for r in sorted(rows, key=lambda x: x.ticker)
                                                 if r.population == "edge_no_seat" and r.short_check_due
                                                 and r.awaiting_admission is not None],
+            # 2026-11-19：買不到（例外寫明、還沒過重查日）——不寫敘事；理由附重查日，過了自己回母體
+            "not_buyable": [[r.ticker, r.population_reason] for r in sorted(rows, key=lambda x: x.ticker)
+                            if r.population == "not_buyable"],
         },
         # 等主題組（failure log #26）：不排、也不算可推進數；逐檔列名附 pq2 編號（出口在那個編號上）
         "awaiting_cohort": [[r.ticker, r.awaiting_cohort] for r in sorted(rows, key=lambda x: x.ticker)
@@ -435,6 +445,7 @@ def render_outside(summary: Mapping[str, Any]) -> list[str]:
     non = list(outside.get("non_multiple") or ())
     checked = list(outside.get("edge_no_seat_checked") or ())
     admission = list(outside.get("edge_no_seat_awaiting_admission") or ())
+    not_buyable = list(outside.get("not_buyable") or ())
     cohort = list(summary.get("awaiting_cohort") or ())
     return [
         (f"母體外·非倍率 {len(non)} 檔（不寫敘事；它的文件進層說明當在位者或客戶證據；每次 materialize 重算，翻回邊緣就回母體）"
@@ -447,6 +458,9 @@ def render_outside(summary: Mapping[str, Any]) -> list[str]:
         # failure log #26：組落地前不寫第一份敘事；出口在那個 pq2 編號上
         (f"等主題組 {len(cohort)} 檔（還沒寫過敘事、主題組提案還在 pq2——組落地前不排，go＋complete 之後自動回佇列）"
          + ("：" + "、".join(f"{t}（[{n}]）" for t, n in cohort) if cohort else "")),
+        # 2026-11-19：買不到不寫個股敘事（11-03）——它的文件只當層證據；例外過了重查日自己回母體
+        (f"母體外·買不到 {len(not_buyable)} 檔（不寫敘事；文件只當層證據；名冊例外過了重查日就回母體）"
+         + ("：" + "、".join(f"{t}（{why}）" for t, why in not_buyable) if not_buyable else "")),
     ]
 
 
@@ -497,10 +511,12 @@ def render_summary(summary: Mapping[str, Any], *, notes: Sequence[str] = ()) -> 
     outside = summary.get("outside") or {}
     n_non, n_checked = len(outside.get("non_multiple") or ()), len(outside.get("edge_no_seat_checked") or ())
     n_adm = len(outside.get("edge_no_seat_awaiting_admission") or ())
+    n_buy = len(outside.get("not_buyable") or ())
     line = (
         f"段5 每檔閉環：到終局 {summary['terminal_count']}（{parts}）"
         f"／未到終局 {summary['open_count']}"
-        f"／母體外 {n_non + n_checked + n_adm}（非倍率 {n_non}、邊緣沒座位已查 {n_checked}、等入圖 {n_adm}）"
+        f"／母體外 {n_non + n_checked + n_adm + n_buy}（非倍率 {n_non}、邊緣沒座位已查 {n_checked}、等入圖 {n_adm}、"
+        f"買不到 {n_buy}）"
         f"｜有 ready 檔的產業 {len(summary['sectors_with_ready'])}／{len(summary['sectors_seen'])}"
     )
     if nxt:

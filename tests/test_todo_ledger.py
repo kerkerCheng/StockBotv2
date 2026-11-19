@@ -335,6 +335,16 @@ def test_edge_without_narrative_ignores_non_edge_companies() -> None:
     assert rows["todo.edge_no_narrative"].count == 1 and rows["todo.edge_no_narrative"].work == "TINY"
 
 
+def test_edge_without_narrative_names_but_does_not_count_a_company_it_cannot_buy() -> None:
+    # 2026-11-19（688818.SS）：邊緣但名冊例外寫買不到——11-03 起不寫個股敘事，閉環母體判 not_buyable，⑤ 不得照舊叫人寫
+    board = {"counts": {}, "no_narrative": [
+        {"ticker": "TINY", "edge": {"state": "edge"}, "access": {"buyable": True}},
+        {"ticker": "688818.SS", "edge": {"state": "edge"}, "access": {"buyable": False, "recheck_by": "2026-12-21"}},
+        {"ticker": "UNKNOWN", "edge": {"state": "unmeasurable"}, "access": None}]}     # 不知道＝照數（INV-3）
+    row = _collect(candidates=board)["todo.edge_no_narrative"]
+    assert (row.count, row.work) == (2, "TINY、UNKNOWN") and "買不到不寫：688818.SS" in row.note
+
+
 def test_edge_without_narrative_names_but_does_not_count_a_company_awaiting_admission() -> None:
     # failure log #51 的對稱面（2026-11-04 300757.SZ）：短檢查結論①的入圖包還在 pq2，閉環佇列判「不排」，⑤ 不得照舊叫人寫敘事
     board = {"counts": {}, "no_narrative": [{"ticker": "TINY", "edge": {"state": "edge"}},

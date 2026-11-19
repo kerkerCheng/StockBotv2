@@ -633,6 +633,13 @@ def test_no_narrative_page_says_why_there_is_no_narrative(monkeypatch) -> None:
         return _candidate_overview(build_analyst_view(_bare_view(), candidate=p).to_dict()["candidate"])["list_group"]
 
     assert group(page) == "not_edge_no_narrative" and group(edge_page) == "no_narrative"
+    # 2026-11-19（688818.SS）：邊緣但名冊例外寫買不到＝「不寫敘事（買不到）」；config 讀不到（None）照舊「還沒寫」
+    data = {"markets": {"US": {"channel": "IB", "basis": "測試"}},
+            "exceptions": {T.upper(): {"buyable": False, "why": "測試：買不到", "source": "測試", "checked": "2026-11-01",
+                                       "recheck_by": "2026-12-21"}}}
+    blocked = cand.page_input(_context(execution_access=data), T, CO, three_questions=_tq())
+    assert blocked["row_absence"]["buyable"] is False and group(blocked) == "not_buyable_no_narrative"
+    assert edge_page["row_absence"]["buyable"] is None
 
     class _Retracted:
         retracted, created_at, note = True, "2026-10-22T00:46:14+00:00", "非邊緣後撤回"

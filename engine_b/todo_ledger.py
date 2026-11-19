@@ -59,7 +59,7 @@ LEDGER: tuple[LedgerRow, ...] = (
     LedgerRow("todo.admission_audit", "入圖包抽中待核", "包",
               "`python -m engine_b.admission_audit status` → 抽中的包交乾淨 context 唯讀 reviewer 從頭核"
               "（research-drain「入圖包抽查」）→ `python -m engine_b.admission_audit record <n> --found-by 抽查 …`"),
-    LedgerRow("todo.edge_no_narrative", "邊緣卻沒敘事", "檔", "研究那一檔、寫第一份敘事（非邊緣的不寫）"),
+    LedgerRow("todo.edge_no_narrative", "邊緣卻沒敘事", "檔", "研究那一檔、寫第一份敘事（非邊緣、買不到的不寫）"),
     # 盲點修法第 18＋16 條（2026-11-03；使用者同日問「那系統會叫我去深挖嗎？還是得靠我自主？」——研究 session 去深挖）：
     # 加碼條件的 watch 只會被**新**文件叫醒，答案若在已經存在的年報、法說裡不會自己醒——要有一格叫人去查
     LedgerRow("todo.addon_unchecked", "加碼條件還沒查", "檔",
@@ -576,6 +576,10 @@ def collect(*, today: date, leads_store: Mapping[str, Any], watches: Sequence[Ma
         if candidates is None:
             return
         rows_ = [r for r in candidates.get("no_narrative") or () if (r.get("edge") or {}).get("state") != "not_edge"]
+        # 買不到（2026-11-19，688818.SS）：11-03 起不寫個股敘事——閉環母體退出（not_buyable），這格同一份（列上的 access，L16）
+        not_buyable = [str(r.get("ticker")) for r in rows_ if (r.get("access") or {}).get("buyable") is False]
+        rows_ = [r for r in rows_ if (r.get("access") or {}).get("buyable") is not False]
+        buy_note = f"買不到不寫：{'、'.join(not_buyable)}" if not_buyable else None
         # 等入圖（failure log #51 的對稱面）：短檢查結論①的入圖包還在 pq2，閉環佇列判「不排」——這格扣掉、點名在註記
         try:
             from alpha.providers.closure import pending_admission_tickers
@@ -599,7 +603,7 @@ def collect(*, today: date, leads_store: Mapping[str, Any], watches: Sequence[Ma
             rows_ = [r for r in rows_ if str(r.get("ticker")).upper() not in cohort]
         except Exception as exc:  # noqa: BLE001 — 讀不到等主題組同樣照舊全數計
             named = f"等主題組讀不到（{type(exc).__name__}），照舊全數計"
-        note = "；".join(x for x in (note, named) if x) or None
+        note = "；".join(x for x in (note, named, buy_note) if x) or None
         put("todo.edge_no_narrative", len(rows_), work="、".join(str(r.get("ticker")) for r in rows_[:5]) or None,
             note=note)
 

@@ -124,7 +124,8 @@ def collect_backlog(*, artifact_dir: Path | None = None, state_dir: Path | None 
             candidate_state=info.get("candidate_state"),
             edge_state=info.get("edge_state"),
             has_seat=(None if seats is None else r.ticker.upper() in seats),
-            edge_pending=info.get("edge_pending"))
+            edge_pending=info.get("edge_pending"),
+            buyable=(info.get("access") or {}).get("buyable"))
         reason, due = population_detail(population, code, info, board_day=board_day,
                                         last_brief=_last_brief_day(r.ticker) if population == "edge_no_seat" else None,
                                         today=today)
@@ -263,6 +264,9 @@ def board_inputs(candidates_payload: Any) -> tuple[dict[str, dict[str, Any]], st
             entry["candidate_state"] = state
         if edge is not None:
             entry["edge"], entry["edge_state"] = edge, edge.get("state")
+        # 買得到嗎（2026-11-19）：候選板沒有敘事的列附的那一格照抄（L16）；舊 artifact 沒有＝None＝留在母體
+        if isinstance(row.get("access"), dict):
+            entry["access"] = row["access"]
         # 遲滯（2026-11-01）：候選板說「今天才翻成非邊緣、待確認」就照抄——母體不自己重判
         if row.get("edge_pending"):
             entry["edge_pending"] = True
@@ -310,6 +314,10 @@ def population_detail(population: str, code: str, info: Any, *, board_day: str |
         nxt = date.fromordinal(last_brief.toordinal() + SHORT_CHECK_DAYS).isoformat()
         return (f"上次短檢查 {last_brief.isoformat()}（已過 {age} 天，到期重問）" if due
                 else f"上次短檢查 {last_brief.isoformat()}，{nxt} 重問"), due
+    if population == "not_buyable":
+        access = (info or {}).get("access") or {}
+        why = access.get("why") or "名冊例外寫買不到"
+        return f"{why}；{access.get('recheck_by') or '重查日未知'} 重查", None
     return None, None
 
 

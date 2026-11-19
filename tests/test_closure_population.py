@@ -93,9 +93,54 @@ def test_gate_and_summary_list_the_outside_by_name() -> None:
 def test_outside_lines_print_even_at_zero() -> None:
     """0 也印——「沒有人退出」與「沒算」不得同形（L13）。"""
     lines = closure.render_outside(closure.summarize([_row("A")]))
-    assert len(lines) == 4 and "非倍率 0 檔" in lines[0] and "已做過短檢查 0 檔" in lines[1]
+    assert len(lines) == 5 and "非倍率 0 檔" in lines[0] and "已做過短檢查 0 檔" in lines[1]
     assert "等入圖 0 檔" in lines[2]                      # 2026-10-08（failure log #51）
     assert "等主題組 0 檔" in lines[3]                    # 2026-10-08（failure log #26）
+    assert "買不到 0 檔" in lines[4]                      # 2026-11-19（688818.SS）
+
+
+# ---- 買不到（2026-11-19 使用者「可以做」；688818.SS：邊緣、滬股通名單外，閉環門一直叫人寫敘事）----
+
+def test_not_buyable_leaves_the_population_only_when_explicitly_false() -> None:
+    f = closure.population_for
+    assert f(held=False, has_thesis=False, candidate_state=None, edge_state="edge", has_seat=True,
+             buyable=False) == ("not_buyable", "not_buyable")
+    assert f(held=False, has_thesis=False, candidate_state=None, edge_state="unmeasurable", has_seat=False,
+             buyable=False)[0] == "not_buyable"
+    # 不知道（config 讀不到、市場不在表上）≠ 買不到：留在母體（INV-3）
+    assert f(held=False, has_thesis=False, candidate_state=None, edge_state="edge", has_seat=True,
+             buyable=None) == ("in", "seat")
+    # 已持有、有 thesis、現行候選照舊在母體；非邊緣照舊是非倍率（理由更根本）
+    assert f(held=True, has_thesis=False, candidate_state=None, edge_state="edge", has_seat=True, buyable=False)[0] == "in"
+    assert f(held=False, has_thesis=True, candidate_state=None, edge_state="edge", has_seat=True, buyable=False)[0] == "in"
+    assert f(held=False, has_thesis=False, candidate_state="missing", edge_state="edge", has_seat=True,
+             buyable=False)[0] == "in"
+    assert f(held=False, has_thesis=False, candidate_state=None, edge_state="not_edge", has_seat=True,
+             buyable=False) == ("non_multiple", "not_edge")
+    assert "not_buyable" in closure.POPULATIONS
+
+
+def test_not_buyable_never_queues_and_is_listed_by_name_with_its_recheck_date() -> None:
+    reason = "不在 HKEX 滬股通合資格名單上；2026-12-21 重查"
+    rows = [_row("688818.SS", population="not_buyable", population_reason=reason), _row("SILEX.ST")]
+    assert rows[0].queued is False and list(closure.closure_gate(rows).actionable) == ["SILEX.ST"]
+    s = closure.summarize(rows)
+    assert s["outside"]["not_buyable"] == [["688818.SS", reason]]
+    line = next(x for x in closure.render_outside(s) if "買不到" in x)
+    assert "買不到 1 檔" in line and "688818.SS（" in line and "2026-12-21 重查" in line
+    assert "母體外 1" in closure.render_summary(s) and "買不到 1" in closure.render_summary(s)
+
+
+def test_provider_reads_access_off_the_board_row_and_writes_the_reason() -> None:
+    board = {"no_narrative": [{"ticker": "688818.SS", "edge": {"state": "edge"},
+                               "access": {"buyable": False, "why": "滬股通名單外", "recheck_by": "2026-12-21",
+                                          "exception_expired": False}},
+                              {"ticker": "OLD", "edge": {"state": "edge"}}]}       # 舊 artifact：沒有 access 這一格
+    inputs, _day = provider.board_inputs(board)
+    assert inputs["688818.SS"]["access"]["buyable"] is False and "access" not in inputs["OLD"]
+    reason, due = provider.population_detail("not_buyable", "not_buyable", inputs["688818.SS"], board_day="2026-11-19",
+                                             last_brief=None, today=date(2026, 11, 19))
+    assert reason == "滬股通名單外；2026-12-21 重查" and due is None
 
 
 # ---- 等主題組（2026-10-08，failure log #26）：組要在這條鏈第一份敘事之前定義 ----

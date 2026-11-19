@@ -727,7 +727,13 @@ def candidate_context(tickers: Sequence[str], *, today: date | None = None,
 
     filings, filings_note = sec_filings_by_company()
     calendar, calendar_note = calendar_checkpoints_by_ticker()
+    # 買得到嗎（2026-11-19 使用者「可以做」；688818.SS：邊緣但滬股通名單外，閉環門與 ⑤ 一直叫人寫它的敘事）：
+    # 附到沒有敘事的列上，閉環母體、⑤、心跳、首頁分組讀同一份（L16）。讀不到＝None，各處當「不知道」留在母體（INV-3）。
+    from identity import execution_access
+
+    access_data, access_note = execution_access.load_or_none()
     return {"today": today, "registry": registry, "universe": universe, "extra": extra, "watches": watches,
+            "execution_access": access_data, "execution_access_note": access_note,
             "lifecycle": lifecycle, "reading_rows": reading_rows, "reading_errors": list(reading_errors),
             "retracted_cells": retracted_cells,
             # 今天的判定＋今天判非邊緣的檔的前一次判定（遲滯，2026-11-01）；兩趟共用一個 FX 快取
@@ -738,6 +744,13 @@ def candidate_context(tickers: Sequence[str], *, today: date | None = None,
             "readings_by_id": readings_by_id, "readings_by_id_note": readings_note,
             "sec_filings": filings, "sec_filings_note": filings_note,
             "calendar_checkpoints": calendar, "calendar_checkpoints_note": calendar_note}
+
+
+def access_payload(context: Mapping[str, Any], ticker: str, today: Any) -> dict[str, Any] | None:
+    """沒有敘事的列上那一格「買得到嗎」（`identity.execution_access.payload`）；context 沒帶或讀不到＝None。"""
+    from identity import execution_access
+
+    return execution_access.payload(ticker, today=today, data=context.get("execution_access"))
 
 
 def checkpoint_inputs(context: Mapping[str, Any], ticker: str, company_id: str | None) -> dict[str, Any]:
@@ -845,8 +858,11 @@ def page_input(context: Mapping[str, Any], ticker: str, company_id: str | None, 
     elif sheet.get("status") == "ok":
         edge = (context.get("edges") or {}).get(str(ticker).upper())
         # `edge_state` 跟著缺席走到首頁分組：非邊緣＝規定不寫（不是待做），與「邊緣、還沒寫」分兩組（L12）。
+        access = access_payload(context, ticker, today)
         row_absence = {"kind": "not_yet_recorded", "reason": no_narrative_reason(edge, records, today=today),
-                       "edge_state": (edge or {}).get("state")}
+                       "edge_state": (edge or {}).get("state"),
+                       # 買不到＝規定不寫（2026-11-19），與非邊緣同一種出口；None＝不知道（照「該寫」那一組）
+                       "buyable": (access or {}).get("buyable")}
     else:
         # Sheet 讀不到時「也沒有持有」是沒驗過的否定（3.7 R1；L12）——產生端宣告暫停，不是「還沒做」。
         row_absence = {"kind": "upstream_unavailable",
@@ -951,7 +967,9 @@ def load_board(tickers: Sequence[str], *, today: date | None = None,
                                                                                  else "未讀到")),
                                  # 7.0g-2：閉環母體要分「非倍率」與「邊緣」——邊緣判定本來就對整個宇宙算好了，
                                  # 這裡只是寫出來（不進 freshness_identity：市值每天在動，那不是認知變了）。
-                                 "edge": edges.get(ticker)})
+                                 "edge": edges.get(ticker),
+                                 # 買得到嗎（2026-11-19）：買不到的不寫個股敘事（11-03）——None＝config 讀不到
+                                 "access": access_payload(ctx, ticker, today)})
     for cid, info in (held.get("by_company") or {}).items():                   # registry 沒有 research ticker 的持有
         if cid not in {r["company_id"] for r in rows if r} and cid not in extra.values():
             rows.append(derive_row(str(info.get("sheet_ticker")), cid, records=[], today=today,
@@ -964,6 +982,8 @@ def load_board(tickers: Sequence[str], *, today: date | None = None,
                                                            watches=watches, company_ticker=company_ticker,
                                                            brief_company=brief_company))
     board["no_narrative"] = no_narrative
+    # 「買得到嗎」這一輪讀不到（列上的 access 全是 None、全部留在母體）——寫出來，不讓「不知道」與「都買得到」同形（INV-3）
+    board["execution_access_note"] = ctx.get("execution_access_note")
     # 在門檻上（ROADMAP「邊緣門檻的遲滯與在門檻上計數器」，2026-11-01）：整個宇宙逐檔、ticker 字母序——只計數、不排序、不改門檻。
     # 帶寬的人話由產生端給（心跳、closure-gate 照抄，L16）；宇宙空就是空 list（不是沒算）、帶寬 None。
     from alpha.edge import band_label

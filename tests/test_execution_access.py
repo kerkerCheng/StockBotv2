@@ -84,3 +84,14 @@ def test_validate_rejects_shapes_that_would_silently_misread(mutate, message) ->
     mutate(broken)
     with pytest.raises(ExecutionAccessError, match=message):
         validate(broken)
+
+
+def test_payload_carries_the_recheck_date_and_unknown_stays_unknown() -> None:
+    """2026-11-19：附到候選板沒有敘事的列上那一格（閉環母體、⑤、心跳、首頁分組讀同一份，L16）。"""
+    from identity.execution_access import payload
+
+    data = load()
+    row = payload("688818.SS", today=DAY, data=data)
+    assert row["buyable"] is False and row["recheck_by"] == data["exceptions"]["688818.SS"]["recheck_by"]
+    assert payload("AXTI", today=DAY, data=data)["buyable"] is True
+    assert payload("AXTI", today=DAY, data=None) is None          # config 讀不到＝不知道，不是買得到

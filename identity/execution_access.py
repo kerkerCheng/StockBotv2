@@ -40,6 +40,8 @@ class Access:
     why: str | None
     #: 有例外、但過了重查日——照市場規則算了，要有人重查。
     exception_expired: bool
+    #: 例外的重查日（YYYY-MM-DD）；照市場規則判的是 None。買不到的檔退出閉環母體時印它（等待要有到期，INV-2）。
+    recheck_by: str | None = None
 
 
 def market_of(ticker: str) -> str:
@@ -95,5 +97,22 @@ def access(ticker: str, *, today: date, data: Mapping[str, Any]) -> Access:
     entry = (data.get("exceptions") or {}).get(key)
     expired = bool(entry) and date.fromisoformat(str(entry["recheck_by"])) < today
     if entry and not expired:
-        return Access(key, market, bool(entry["buyable"]), channel, str(entry["why"]), False)
+        return Access(key, market, bool(entry["buyable"]), channel, str(entry["why"]), False, str(entry["recheck_by"]))
     return Access(key, market, True if rule else None, channel, None, expired)
+
+
+def payload(ticker: str, *, today: date, data: Mapping[str, Any] | None) -> dict[str, Any] | None:
+    """附到列上的那一份（L16：分類跟著資料走到閉環母體、⑤、心跳、首頁分組）。`data` 是 None（config 讀不到）→ None——
+    呼叫端當「不知道」，留在母體（INV-3），不當成買得到也不當成買不到。"""
+    if data is None:
+        return None
+    a = access(ticker, today=today, data=data)
+    return {"buyable": a.buyable, "why": a.why, "recheck_by": a.recheck_by, "exception_expired": a.exception_expired}
+
+
+def load_or_none(path: Path | None = None) -> tuple[dict[str, Any] | None, str | None]:
+    """→ (data, 讀不到的理由)。讀不到或形狀不對不 raise——呼叫端記成「沒算」。"""
+    try:
+        return load(path), None
+    except Exception as exc:  # noqa: BLE001
+        return None, f"買得到嗎讀不到：{type(exc).__name__}"

@@ -1450,8 +1450,11 @@ function candidateLine(view, inQuestions) {
     if (row.sheet_verified === false) head.appendChild(el('span', 'dim', '　持股未驗'));
   } else {
     // 非邊緣＝規定不寫敘事，不是「還沒做」（2026-10-28 使用者）：產生端在 context 宣告 edge_state，字取首頁分組字彙那一份。
-    const notEdge = (panel.context || {}).edge_state === 'not_edge' && listGroupLabel('not_edge_no_narrative');
-    const badge = notEdge ? el('span', 'badge', notEdge) : absenceBadge(panel.absence_kind);
+    // 邊緣但買不到（2026-11-19）同樣規定不寫；buyable 是 null（不知道）照舊印缺席。
+    const ctx = panel.context || {};
+    const notWritten = (ctx.edge_state === 'not_edge' && listGroupLabel('not_edge_no_narrative'))
+      || (ctx.buyable === false && listGroupLabel('not_buyable_no_narrative'));
+    const badge = notWritten ? el('span', 'badge', notWritten) : absenceBadge(panel.absence_kind);
     if (badge) head.appendChild(badge);
     if (panel.reason) head.appendChild(el('span', 'dim', '　' + panel.reason));
   }

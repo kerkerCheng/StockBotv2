@@ -1078,7 +1078,14 @@ def candidate_counts(board: Mapping[str, Any]) -> dict[str, Any]:
     # 真正的待做「邊緣（或量不到）卻沒敘事」單獨一格（⑤ 也有）。
     no_narr = [r for r in board.get("no_narrative") or () if isinstance(r, Mapping)]
     non_edge = sum(1 for r in no_narr if (r.get("edge") or {}).get("state") == "not_edge")
-    unmeasured = sum(1 for r in no_narr if (r.get("edge") or {}).get("state") not in ("not_edge", "edge"))
+    # 買不到（2026-11-19，688818.SS）：邊緣或量不到、但名冊例外寫買不到——規定不寫，不算「卻沒敘事」（閉環母體 not_buyable、
+    # ⑤ 同一份列上的 access，L16）。非邊緣的照舊算非倍率（理由更根本）。
+    def _not_buyable(r: Mapping[str, Any]) -> bool:
+        return (r.get("access") or {}).get("buyable") is False
+
+    not_buyable = sum(1 for r in no_narr if (r.get("edge") or {}).get("state") != "not_edge" and _not_buyable(r))
+    unmeasured = sum(1 for r in no_narr if (r.get("edge") or {}).get("state") not in ("not_edge", "edge")
+                     and not _not_buyable(r))
     out: dict[str, Any] = {key: counts.get(key, 0) for key in ("open", "missing", "pass")}
     # 邊緣無法量（2026-10-30 起是列上的標記、不是分組）：上板、非持有的 v2 敘事裡邊緣判定少一個輸入的檔數——
     # 照敘事分組的那幾檔（缺 X／不要）加上附組裡宣告可開、不放行的那幾檔。舊 artifact（附組裝全部）數出來一樣。
@@ -1092,7 +1099,8 @@ def candidate_counts(board: Mapping[str, Any]) -> dict[str, Any]:
                open_unmeasurable=sum(1 for r in side_unmeasured if r.get("declared") == "open"),
                legacy=counts.get("legacy", 0), precondition_failed=counts.get("precondition_failed", 0),
                with_old=int(counts.get("not_multiple") or 0), non_edge=non_edge, unmeasured=unmeasured,
-               edge_gap=len(no_narr) - non_edge - unmeasured, oldest=dict(board.get("oldest_stall_days") or {}),
+               edge_gap=len(no_narr) - non_edge - unmeasured - not_buyable, not_buyable=not_buyable,
+               oldest=dict(board.get("oldest_stall_days") or {}),
                # 邊緣門檻的遲滯與在門檻上（2026-11-01）：舊 artifact 沒有這兩格 → None（印「未算」），不壓成 0
                not_edge_pending=counts.get("not_edge_pending"), on_threshold=counts.get("on_threshold"))
     # 缺 X 三分法（2026-10-30）：讀列重算（算法在 `alpha.candidates`，與 assemble_board 同一份）——
@@ -1144,7 +1152,7 @@ def _candidate_lines(state_dir: Path | None) -> list[str]:
              f"｜非倍率 {c['with_old'] + c['non_edge']}（有舊敘事 {c['with_old']}｜不寫敘事 {c['non_edge']}）"
              # 遲滯（2026-11-01）：「有舊敘事」只數連續兩次判非邊緣的；今天才翻的另印，不是待做
              f"｜非邊緣待確認 {pending}"
-             f"｜邊緣卻沒敘事 {c['edge_gap']}｜量不到卻沒敘事 {c['unmeasured']}"]
+             f"｜邊緣卻沒敘事 {c['edge_gap']}｜量不到卻沒敘事 {c['unmeasured']}｜買不到不寫 {c['not_buyable']}"]
     # 在門檻上（ROADMAP「邊緣門檻的遲滯與在門檻上計數器」，2026-11-01）：每天印檔數與名單；只計數、不排序、不改門檻。
     # 板上沒有這一格（舊 artifact）印「未算」，不印 0（INV-3）。名單與帶寬的字都由候選板給（L16）。
     from alpha.candidates import on_threshold_line
