@@ -135,6 +135,31 @@ def test_a_position_word_next_to_the_daily_percentile_is_refused_in_the_story() 
     assert story_problems("bottleneck", "卡在中段製程，價格不是重點。") == []
 
 
+def test_a_price_move_without_an_as_of_is_refused_in_every_story_slot() -> None:
+    """ROADMAP 旁支「故事已定價段的股價脈絡帶截至日」（使用者 2026-11-19）：故事不准寫日期，已定價段寫「之後回落約一成五」
+    就沒有截至——EFXT 10-29 寫的那句 11-09 換版照抄，當時已回落約三成。走勢句同一句要有月份粒度的截至（括號或「截至」）；
+    事件格寫「股價跌掉約一半」同一件事（ATS.VI）。日子照舊不准寫——截至只到月份。"""
+    efxt_old = "脈絡：股價從 2026 年初漲到 5 月高點約七成八，之後回落約一成五。"
+    assert any("沒寫截至" in p for p in story_problems("priced_in", efxt_old))
+    assert story_problems("priced_in", "脈絡（11 月中）：股價從 2026 年初漲到 5 月高點約七成八，之後回落約三分之一。") == []
+    assert story_problems("priced_in", "股價截至 2026 年 11 月中比高點低約三成。") == []
+    assert story_problems("priced_in", "脈絡（2026 年 10 月底）：股價 6 月見高點後回落一半。") == []
+    ats_events = "10 月 NVIDIA 公布的載板協議是別家，之後科技股整體回檔，股價跌掉約一半。"
+    assert any("沒寫截至" in p for p in story_problems("events", ats_events))
+    # 同句已寫到哪個月看的，算有截至（002837.SZ、FORM 的寫法）
+    assert story_problems("priced_in", "脈絡：股價從 2025 年 4 月低點到 2026 年 4 月高點約 5 倍，10 月底比高點低約 55%。") == []
+    # 起點與回到的月份不是截至：講的是走勢從哪裡開始、回到哪，不是這句看到哪一天
+    assert any("沒寫截至" in p for p in story_problems("priced_in", "股價從 1 月底到 6 月高點漲了七成，之後回落一半。"))
+    assert any("沒寫截至" in p for p in story_problems("priced_in", "股價從 2026 年 1 月底漲了七成，之後回落一半。"))
+    assert any("沒寫截至" in p for p in story_problems("priced_in", "股價 2026 年 6 月見高點後跌回 1 月初的水準。"))
+    # 不是股價走勢的不查：布價停漲、價格已先付、營收翻倍
+    assert story_problems("priced_in", "之後股價跟著營收走，布價停漲時兩者會一起往下。") == []
+    assert story_problems("candidate", "價格已先付了轉盈的錢，翻倍條件寫得更嚴。", limit=CANDIDATE_STORY_MAX) == []
+    assert story_problems("demand", "在手訂單一年翻倍，指引上調。") == []
+    # 截至照舊不准寫到哪一天
+    assert any("含日期" in p for p in story_problems("priced_in", "脈絡（11 月 18 日）：股價 5 月見高點後回落三成。"))
+
+
 def test_length_counts_placeholders_as_their_filled_width() -> None:
     assert story_length("年增 {in_numbers_latest}") == len("年增") + 8
     assert story_problems("demand", "字" * STORY_MAX) == []

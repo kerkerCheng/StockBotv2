@@ -664,6 +664,29 @@ LAMP_COLOUR_CLAIM = re.compile(r"(?:現金跑道|跑道|負債|稀釋|繼續經�
 PRICE_QUOTE_CLAIM = re.compile(r"收盤[^。；]{0,30}?\d+(?:\.\d+)?\s*(?:美元|元|加元|盧比|港元|日圓|歐元|英鎊|克朗)")
 
 
+#: 股價走勢沒寫截至（2026-11-19 使用者「改錯 然後我點頭」；ROADMAP 旁支「故事已定價段的股價脈絡帶截至日」）：故事不准寫日期，
+#: 已定價段寫「之後回落約一成五」就沒有截至——EFXT 10-29 寫的那句 11-09 換版照抄，當時已回落約三成；同日掃現行 117 份故事，
+#: 21 份已定價段、1 份事件格（ATS.VI「股價跌掉約一半」）的走勢句沒有截至（其中 5 份同句已寫「10 月底比高點低約 55%」這種
+#: 月份，算有）。股價會繼續動、這句不會，所以同一句要帶月份粒度的截至：「N 月初／中／底／上旬／中旬／下旬」（「脈絡（11 月中）：」
+#: 「10 月底比高點低約 55%」）或「截至 N 月」。起點與回到的月份不算（「從 2026 年 1 月底」「跌回 1 月初的水準」——講的是走勢從哪
+#: 開始、回到哪，不是這句看到哪一天）。觸發只看「股價」那一個子句（不跨逗號）：「股價跟著營收走，布價停漲」講的是布價。
+#: 只在故事寫入端擋（`story_problems`）；敘事那一格本來就准寫日期（2026-11-19 現行 115 份敘事的已定價格走勢句 20 句，
+#: 5 句同句沒日期、多半鄰句有，不在本項）。
+PRICE_MOVE_CLAIM = re.compile(r"股價[^。；，,]{0,40}?(?:漲|跌|回落|回升|反彈|回檔|高點|低點|新高|新低|見高|見低|翻倍|腰斬|往下|往上)")
+PRICE_AS_OF_MONTH = re.compile(r"(?<!\d)\d{1,2}\s*月\s*(?:初|中|底|上旬|中旬|下旬)|截至\s*(?:\d{4}\s*年\s*)?\d{1,2}\s*月")
+_PRICE_FROM_MONTH = re.compile(r"(?:從|自|由|回)\s*(?:\d{4}\s*年\s*)?$")
+
+
+def _has_price_as_of(sentence: str) -> bool:
+    return any(not _PRICE_FROM_MONTH.search(sentence[:m.start()]) for m in PRICE_AS_OF_MONTH.finditer(sentence))
+
+
+def undated_price_move_claims(text: str) -> list[str]:
+    """講股價走勢、同一句卻沒寫截至的句子（故事寫入端拒收用）。"""
+    return [s.strip() for s in _SENTENCE_SPLIT.split(text or "")
+            if PRICE_MOVE_CLAIM.search(s) and not _has_price_as_of(s)]
+
+
 def lamp_colour_claims(text: str) -> list[str]:
     """寫死燈色的句子（寫入端拒收用）。"""
     return [s.strip() for s in _SENTENCE_SPLIT.split(text or "") if LAMP_COLOUR_CLAIM.search(s)]
@@ -1070,6 +1093,7 @@ __all__ = [
     "NarrativeConfirm", "NarrativeDisproof", "PLACEHOLDERS_V2", "PRICED_DATE_MARK", "PRICED_POSITION_WORDS",
     "PricedSnapshot", "RECORD_VERSION_V1", "RECORD_VERSION_V2", "RECORD_VERSIONS", "undated_position_claims",
     "LAMP_COLOUR_CLAIM", "PRICE_QUOTE_CLAIM", "lamp_colour_claims", "price_quote_claims",
+    "PRICE_AS_OF_MONTH", "PRICE_MOVE_CLAIM", "undated_price_move_claims",
     "WRONG_SIGNAL_MARK", "explains_no_disproof", "wrong_signal_items",
     "RIDE_UNITS",
     "Ride", "SLOT_KEYS_V2", "SLOT_LABELS_V2", "WHAT_MUST_BE_TRUE_FORBIDDEN", "MAGNITUDE_FORBIDDEN", "OPTIONAL_SLOT_KEYS_V2",
