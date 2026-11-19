@@ -1,0 +1,13 @@
+SOURCE: CECO Environmental Corp.（TXSE: CECO）Form 10-K（FY2025）有限節錄——客戶集中度
+URL: https://www.sec.gov/Archives/edgar/data/3197/000119312526085815/ceco-20251231.htm
+PUBLISHED: 2026-03-02（EDGAR 申報日）
+RETRIEVED: 2026-11-19
+STORAGE: repo_excerpt（SEC 申報有限節錄；repo 預設 UA 抓、HTML 轉文字、空白攤平後以錨句逐字節錄）
+NOTE: Phase 7 CECO 深挖清單（2026-11-19）用：2023–2025 三年沒有單一客戶占合併營收或應收帳款 10% 以上。這是合併 Thermon 之前的年報；第三季 10-Q 沒有客戶集中度的揭露。
+節錄：逐字（空白已正規化）；每段以錨句為準，前後各取一段。
+
+[10-K FY2025｜anchor] We are not dependent upon any single customer
+Standard project management and production management tools are used to help ensure that all work is done to specification and that project schedules are met. Equipment is tested at the site to ensure it is functioning properly. Customers We are not dependent upon any single customer, and no customer contributed 10% or more of our consolidated revenues for the years ended December 31, 2025, 2024, or 2023. 7 Suppliers and Subcontractors We purchase our raw materials and supplies from a variety of global sources.
+
+[10-K FY2025｜anchor] No single customer represented greater than 10 % of consolidated net sales
+Other segment information is as follows for the year ended December 31, 2023: (in thousands) Engineered Systems Industrial Process Solutions Property and equipment additions $ 2,070 $ 2,827 Depreciation and amortization (3) 5,820 4,352 (3) The amounts of depreciation and amortization disclosed by reportable segment are included within the other segment expense captions, such as shop burden or general and administrative expense. No single customer represented greater than 10 % of consolidated net sales or accounts receivable for 2025, 2024, or 2023. Geographic Information Net sales by geographic area are as follows: Year ended December 31, (in thousands) 2025 2024 2023 United States $ 513,463 $ 376,281 $ 364,483 Netherlands 62,995 52,629 51,149 United Kingdom 56,267 62,961 51,066 China 48,835 30,622 24,660 Other 92,821 35,440 53,487 Total net sales $ 774,381 $ 557,933 $ 544,845 The geographical area data for net sales is based upon the country location of the Company's business unit generating such sales.

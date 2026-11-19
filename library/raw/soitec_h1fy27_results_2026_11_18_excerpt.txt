@@ -1,0 +1,18 @@
+Source URL: https://www.soitec.com/home/group/corporate/newsroom/press-releases/content/2026/11/18/soitec-reports-second-quarter-revenue-and-half-year-results-of-fiscal-year-2027
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Soitec（SOI.PA）2026-11-18 新聞稿〈Soitec Reports Second Quarter Revenue And Half-Year Results Of Fiscal Year 2027〉：Photonics-SOI 上半年約 1.25 億美元、全年指引上調到 3 億美元以上；產能保留協議附現金保證金、客戶承諾約 12 億美元
+DATE: 2026-11-18
+RETRIEVED: 2026-11-19（公司官網新聞稿頁 HTML 轉文字，逐字照抄；同日另有〈Availability of 2026-2027 Half-Year Financial Report〉）
+NOTE: 供應商自述（L8 弱主張）：「customer commitments」是 Soitec 自己說的，客戶沒具名、合約沒公開。光子 SOI 層的客戶端一手仍缺；FY27 毛利率下半年受「pivot of our manufacturing setup to increase Photonics-SOI capacity」的製程成本拖累（自述）。
+
+"● In line with updated guidance, Soitec Q2’27 revenue grew 50% at constant currency and scope compared with Q2’26, to €204m (+46% year-on-year on a reported basis), driven by strong Photonics-SOI and POI performance. Photonics-SOI Q2’27 revenue reached approximately $75m."
+"● H1’27 revenue amounted to €317m, up +39% at constant currency and scope, compared with H1’26 (+37% reported). Photonics-SOI H1’27 revenue reached approximately $125m (vs around $50m in H1’26)."
+"● Soitec continues to capitalize on AI-driven demand for Photonics-SOI through Capacity Reservation Agreements backed by cash deposits. These contracts amount to customer commitments of approximately $1.2bn for the coming years."
+"● Successful execution of cash enhancement plan with H1’27 Free Cash Flow [1] at €236m (including an initial €86m of Photonics-SOI cash deposits)."
+"● Q3’27 revenue is expected to be up around 40% y/y at constant currency and scope, compared with Q3’26. Photonics-SOI revenue is expected at around $90m, compared with around $25m in Q3’26."
+"● FY27 revenue is expected to be up around 40% y/y at constant currency and scope. Photonics-SOI revenue is now expected above $300m, more than 3 times its FY26 level."
+"● FY27 Gross Margin is expected slightly above 30%, with H2’27 impacted mainly by temporary higher process costs related to the pivot of our manufacturing setup to increase Photonics-SOI capacity."
+"● FY27 CAPEX cash-out is now expected around €130m, up from the previous indicative guidance of around €100m, to increase Photonics-SOI production capacity."
+"Edge & Cloud AI revenue stood at €107 million in Q2’27, up 109% year-on-year at constant currency and scope (+105% reported) compared with Q2’26. Growth was primarily driven by Photonics-SOI, leveraging sustained demand for high-speed, high-bandwidth optical interconnects in AI data center infrastructure."
+"Photonics-SOI revenue reached approximately $75 million in Q2’27. Growth was essentially driven by higher volumes, supported by sustained demand for high-speed optical connectivity in AI data centers. Photonics-SOI is increasingly establishing itself as a key technology for optical transceivers, supporting all major form factors, including pluggable transceivers, Near-Package Optics (NPO) and Co-Packaged Optics (CPO)."
