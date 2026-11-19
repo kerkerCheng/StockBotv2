@@ -45,6 +45,15 @@ def test_the_prompt_points_at_a_checklist_that_exists() -> None:
     assert "**完整重讀＝清單之外的五項回掃**" in skill
 
 
+def test_the_prompt_offers_the_detective_as_the_deeper_entry() -> None:
+    # 2026-11-19 使用者：按鈕是第一層、偵探是第二層的固定入口；提示點名的 skill 與觸發詞不存在，那一行就指向空處（L13）
+    prompt = _function("askClaudePrompt")
+    assert "偵探 ${payload.ticker}" in prompt and "skills/detective/SKILL.md" in prompt
+    skill = (ROOT / "skills" / "detective" / "SKILL.md").read_text(encoding="utf-8")
+    assert "觸發詞：偵探" in skill
+    assert "不改候選狀態" in skill                               # 提示說「不改候選狀態」，skill 得真的這樣寫
+
+
 def test_a_blocked_clipboard_shows_the_text_instead_of_pretending() -> None:
     button = _function("askClaudeButton")
     assert "navigator.clipboard.writeText" in button
