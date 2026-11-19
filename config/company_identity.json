@@ -3506,6 +3506,22 @@
       ]
     },
     {
+      "company_id": "co:gigavis",
+      "research_ticker": "420770.KQ",
+      "market_currency": "KRW",
+      "execution_currency": "KRW",
+      "execution_venue": "KOSDAQ",
+      "display_name": "GIGAVIS Co., Ltd.",
+      "_display_name_source": "臻鼎 2026-11-17 重訊交易相對人逐字「GIGAVIS CO.,LTD」；DART 季報（2026-11-16）自稱「기가비스 주식회사」",
+      "_note": "隨載板檢測設備入圖包 staged（2026-11-19，drop 即回退；入圖包見 gigavis_substrate_aoi_aor_2026_11_19_action.json）：韓國 KOSDAQ 420770，半導體載板（FC-BGA 為主，另有 FC-CSP／HDI／FPCB）的 AOI 檢測與 AOR 修補設備。使用者 2026-11-19 確認 IB 買得到 KOSDAQ（config/execution_access.json KQ）。別名收韓文與大小寫兩種",
+      "name_aliases": [
+        "GIGAVIS",
+        "Gigavis",
+        "기가비스",
+        "기가비스 주식회사"
+      ]
+    },
+    {
       "company_id": "co:utechzone",
       "research_ticker": "3455.TWO",
       "market_currency": "TWD",

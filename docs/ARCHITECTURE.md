@@ -708,6 +708,9 @@ L16）。兩份 state artifact 與 `/api/v1/candidates`、`/api/v1/watches` 照�
 組＝`.meta.json` 的 `claim_groups`（`CANDIDATE_STATES_DECLARABLE` 三種，0 也印；11-03 起退役的等回落照寫下那天的原字分在
 `retired_states` 那一組，INV-6；已持有來自 Sheet，不是我們說的話），字彙外或沒記下的
 狀態另列在後面（不消失）；組內照 artifact 的列序（代號），**不照報酬排、路由不算組平均**（量測才幾週，平均是雜訊；brainstorm F4）。
+例外只有一行、住短版不住畫面：Discord 短版 ④ **每週一**印「紙上籃子」——寫下時說可開那組的等權報酬、對 QQQ 與對主題等權組超額、
+曾達 2 倍、量測起始（使用者 2026-11-19「a OK」，明知牴觸 F4；數字是 outcome 腳本 `_by_state` 算好的 `by_anchor_state.open`，
+`heartbeat.paper_basket_line` 照抄、只印不判）。
 每組一張點圖（一點一檔、橫軸是寫下後到現在、同格往上疊，「2 倍」那條線一定畫得到），逐檔表點開才畫；「現在」的狀態印中文——
 兩個出口（撤回、舊版）的標籤住 `alpha.candidates.PAPER_STATE_EXITS`，經 `.meta.json` 的 `paper_state_exits` 走到畫面（L16；之前印 `pass → retracted`）。
 帳號計分表在最下面一段一帳號一列：點名數、tier（佇列加分）、各持有期「每檔只算最早一次」的超額——**三個基準並排**（QQQ／SOXX／組）；

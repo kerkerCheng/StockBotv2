@@ -938,9 +938,17 @@ def _by_state(rows: Sequence[Mapping[str, Any]], *, key: str, missing: str, lane
     out: dict[str, dict] = {}
     for state, group in sorted(groups.items()):
         power = power_law_aggregate(list(group), lane=lane)
+        measured = [r for r in group if r.get("absolute_return") is not None]
+        excess = [r["excess_theme_cohort"] for r in measured if r.get("excess_theme_cohort") is not None]
+        anchors = [r["anchor_date"] for r in measured if r.get("anchor_date")]
         out[state] = {"n": len(group), "aggregate": equal_weight_aggregate(list(group)),
                       "reached_2x_ever": power.get("reached_2x_ever"), "peak_measured": power.get("peak_measured"),
-                      "small_sample": len(group) < SMALL_SAMPLE_N}
+                      "small_sample": len(group) < SMALL_SAMPLE_N,
+                      # 短版每週那一行「紙上籃子」要的兩格（使用者 2026-11-19「a OK」）：對主題等權組超額與量測起始——
+                      # 跟 lane_summary 同一套算法（各列已算好的 excess_theme_cohort 取平均；起始＝量得到的列最早錨點）
+                      "theme_cohort_excess": {"n": len(excess), "of": len(measured),
+                                              "mean": (sum(excess) / len(excess)) if excess else None},
+                      "measurement_start": min(anchors).isoformat() if anchors else None}
     return out
 
 

@@ -99,6 +99,8 @@ KEEP: dict[tuple[str,str],str] = {
     ("tests/test_opinion_stance.py","B"): "kept_file: outcome 腳本 power-law 量測的測試（basket_total_return 是量測鍵）",
     ("tests/test_webapp_positions.py","B"): "kept_file: positions artifact 的 power_law 夾具（basket_total_return 量測鍵）",
     ("tests/test_wipeout_flags.py","B"): "guard_assertion: 斷言心跳段 4 仍印「power-law：籃子總報酬」；其餘是籃子退役註記",
+    ("crons/daily_brief.py","B"): "kept_file: 短版 ④ 每週一行「紙上籃子」＝追蹤表 paper 線寫下時說可開那組的等權報酬（AGENTS 量測「籃子總報酬」的一組；使用者 2026-11-19「a OK」），只印不判，不是籃子 filter",
+    ("tests/test_paper_basket_line.py","B"): "kept_file: 「紙上籃子」那一行的測試（量測用語，不是籃子 filter）",
     ("tests/test_heartbeat.py","B"): "retirement_note: 0a.2 籃子退役後換主詞的註記",
     ("tests/test_heartbeat.py","D"): "guard_assertion: 斷言心跳段 4「賭注帳／量的候選／要幾倍」那一行已隨三個退役機制刪除（Phase 3 Step 3.6）",
     ('tests/test_daily_task.py','G'): 'guard_assertion: 斷言 daily 的封閉步驟清單不含 reassess-stale 等使用者動詞（原守在 Codex prompt／rules，2026-09-24 改主詞）',

@@ -14,7 +14,8 @@ Websearch 大事件 TL;DR、幾件事待我決定、健康度等等」。
 ③b 等你提供的文件：向你要文件的每一條，**獨立一區、批次 go 不收**——提供文件才算 go（同日使用者：「隔離一區讓我知道
    也不要讓我直接 go 提供文件才算 go」；名單只有 `todo.document_requests()` 一份）。
 ④ 狀態與健康度：**每天都印**的基本狀態（daily 步數與出錯的步驟、候選四格檔數與最老滯留、你的決定、watch 今日醒／
-   到期／標旗、反證在盯與未盯、無到期的等待——2026-10-07 使用者：「daily 心跳基本重要的 status 還是要印」）。
+   到期／標旗、反證在盯與未盯、無到期的等待——2026-10-07 使用者：「daily 心跳基本重要的 status 還是要印」）；
+   每週一多一行「紙上籃子」（寫下時說可開那組的等權報酬；2026-11-19 使用者「a OK」）。
 ⑤ 下一次研究要做的：常駐計數器（`engine_b.todo_ledger`）——非 0 的逐格，0 的格名字印在小字裡（L14：每格都出現）。
 最後一則：③ 的建議批次指令，**單獨一則、inline code**——手機上一點就複製（2026-10-28 使用者：「最後給我一次複製的
 指令可以用回以前的格式 那樣我一次點就可以複製」）。
@@ -1028,7 +1029,10 @@ def compose_brief(*, now: datetime, summary: str, snapshot: Mapping[str, Any], r
                 *line(lambda: "- " + disproof_line(snapshot), "反證"),
                 *line(waits_line, "無到期的等待"),
                 *line(lambda: "- " + admission_line(today=today), "入圖包抽查"),
-                *line(lambda: [f"- {text}" for text in q3w_lines(today)], "Q3W 裁決")]
+                *line(lambda: [f"- {text}" for text in q3w_lines(today)], "Q3W 裁決"),
+                # 紙上籃子（使用者 2026-11-19「a OK」）：每週一一行，寫下時說可開那組的等權報酬——只印不判
+                *(line(lambda: "- " + hb.paper_basket_line(state_dir), "紙上籃子")
+                  if today.weekday() == hb.PAPER_BASKET_WEEKDAY else [])]
 
     def todo_part() -> list[str]:
         try:

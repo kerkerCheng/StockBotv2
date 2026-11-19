@@ -154,7 +154,9 @@ def test_prompt_carries_the_iron_rules() -> None:
                            questions=["q1", "q2"], as_of=date(2026, 9, 7))
     for must in ("只能讀這個線索包列出的檔案", "不得帶 email", "不看價格與市場資料", "library/private/engine_c",
                  "檔名:行號", "推一步", "不給目標價", "2026-09-07", "不要用你自己對 2026-09-07 之後的任何記憶",
-                 "Q1 q1", "Q2 q2", "窗口提早關至少 1 條"):
+                 "Q1 q1", "Q2 q2", "窗口提早關至少 1 條",
+                 # 出處格式（使用者 2026-11-19 關遮名組後改；回溯 B2 核引文三種工具面誤報的源頭）
+                 "出處緊接在引文後面", "不自創縮寫", "出處不要寫在引文前面", "各附行號"):
         assert must in prompt, must
     assert all(d in prompt for d in DRAWERS)
     now = render_prompt(company="AXT", ticker="AXTI", read_scope="x", materials="", questions=[], as_of=None)

@@ -1,4 +1,4 @@
-Source URL: https://openapi.twse.com.tw/v1/opendata/t187ap04_L?co_id=4958&spoke=2026-11-17T20:46:10&ref=8d566973facc
+Source URL: https://openapi.twse.com.tw/v1/opendata/t187ap04_L?co_id=4958&spoke=2026-11-17T20%3A46%3A10&ref=8d566973facc
 
 Excerpt:
 [EXCERPT — 有限逐字引文] 臻鼎-KY（4958）重大訊息 2026-11-17：代子公司禮鼎半導體科技（深圳）公告取得機器設備——交易相對人 GIGAVIS CO.,LTD、一批、115/8/11～115/11/17 累計新台幣 18.65 億元

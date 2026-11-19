@@ -77,6 +77,7 @@ INV-6、INV-3），我們寫的節錄檔拿掉 NOTE／取得日／自己的評�
 **起漲點前看**（plan [`2026-11-18-001`](../../docs/plans/2026-11-18-001-dev-detective-backtest-plan.md)；設計、先登記的評分、amendment 都在那裡）：
 1. `python -m alpha detective rallies`——主題等權組成員（Q3W 名單外）裡找「半年內 2 倍的起點」與同期沒漲的對照，**封存**；
    只印計數。封存檔（`backtest/cases_sealed.json`）主 session 不讀——裡面寫著誰是贏家。
+   ⚠ **遮名組 2026-11-19 使用者「關吧」關閉**（清淨組看不出分辨，記憶份量不進結論）；`--group masked`／`--mask` 的機制留著，不再接續。
 2. `python -m alpha detective next --group clean|masked`——照封存順序給下一個案例（不說是贏家還是對照）＋接下來三條命令：
    `backfill <編號>`（目標與當時直接鄰居回溯日前 12 個月的 EDGAR／MOPS 申報）→ `pack <代號> --as-of <日> --case <編號> [--mask]`
    （遮名組加 `--mask`：目標與鄰居換成公司A／B、中文名本體換成〔A〕，殘留不是 0 就不寫 PROMPT）→ 照組包印的門檻 `mark <編號> --pass|--fail`。

@@ -20,7 +20,8 @@
     "SS": {"channel": "IB（滬股通）", "basis": "使用者 2026-11-03「IB這些都可以下」（問的是 688498.SS）；個別代號要在 HKEX 滬股通合資格名單上"},
     "SZ": {"channel": "IB（深股通）", "basis": "使用者 2026-11-03「IB這些都可以下」（問的是 300394.SZ、002463.SZ）；個別代號要在 HKEX 深股通合資格名單上"},
     "VI": {"channel": "IB", "basis": "使用者 2026-11-03「IB這些都可以下」（問的是 ATS.VI）"},
-    "V": {"channel": "IB", "basis": "使用者 2026-11-03「IB這些都可以下」（問的是 ENA.V）"}
+    "V": {"channel": "IB", "basis": "使用者 2026-11-03「IB這些都可以下」（問的是 ENA.V）"},
+    "KQ": {"channel": "IB", "basis": "使用者 2026-11-19「買的到」（問的是 KOSDAQ 的 GIGAVIS 420770.KQ）"}
   },
   "exceptions": {
     "688836.SS": {

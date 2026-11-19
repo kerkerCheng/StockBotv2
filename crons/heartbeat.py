@@ -2735,6 +2735,54 @@ def _lane_power_line(lane: str, entry: Mapping[str, Any] | None) -> str:
             f"｜對 §5.2 觀察名單超額 {_watchlist_excess_text(entry)}")
 
 
+#: 紙上籃子印在短版的星期（0＝週一）。使用者 2026-11-19「a OK」：短版每週一行——每天印是雜訊，量測才幾週。
+PAPER_BASKET_WEEKDAY = 0
+
+
+def _signed_pct(value: Any) -> str:
+    return f"{value * 100:+.1f}%" if isinstance(value, (int, float)) else "—"
+
+
+def paper_basket_line(state_dir: Path | None) -> str:
+    """短版 ④ 每週一行「紙上籃子」：追蹤表 paper 線裡**寫下判斷那天說可開**的那一組（`by_anchor_state.open`；
+    當時寫的字，INV-6）等權報酬、對 QQQ 與對主題等權組的超額、曾達 2 倍、量測起始。數字全部由 outcome 腳本算好，這裡照抄。
+
+    使用者 2026-11-19「a OK」決定印——牴觸 10-28「不算組平均」（APP 成績單路由仍不算；這一行住短版、一週一次）。
+    只印不判：不排序、不給動作、不跟任何門檻比；n 不到 6 照 artifact 的小樣本旗說。缺席各自說，不印 0（INV-3）。"""
+    positions, absence = _load_state(state_dir, "positions")
+    if absence is not None:
+        return f"紙上籃子：{absence.reason}（{absence.kind}）"
+    paper = (positions.get("lanes") or {}).get("paper")
+    if not paper:
+        return "紙上籃子：positions artifact 沒有 paper lane（upstream_unavailable）——不是 0"
+    if paper.get("absence"):
+        return f"紙上籃子：{paper['absence'].get('reason')}（{paper['absence'].get('kind')}）——不是 0"
+    groups = paper.get("by_anchor_state")
+    if groups is None:
+        return "紙上籃子：artifact 早於「寫下那天的狀態」分組（下一次 materialize --positions 補上；不是 0）"
+    retired = (groups.get("priced_wait") or {}).get("n")
+    tail = f"｜11-03 前寫「等回落」的 {retired} 檔不在內（成績單另列）" if retired else ""
+    group = groups.get("open")
+    if not group or not group.get("n"):
+        return f"紙上籃子：寫下時說可開 0 檔{tail}"
+    agg = group.get("aggregate") or {}
+    if not agg.get("measured"):
+        return f"紙上籃子：寫下時說可開 {group['n']} 檔、量得到報酬的 0 檔——不是 0%{tail}"
+    excess = group.get("theme_cohort_excess")
+    if excess is None:
+        cohort = "對主題組：artifact 還沒有這一格"
+    elif excess.get("n"):
+        cohort = f"對主題組 {_signed_pct(excess.get('mean'))}（{excess['n']}/{excess.get('of')} 檔）"
+    else:
+        cohort = f"對主題組：還沒有值（{excess.get('of', 0)} 檔量得到報酬）"
+    small = "｜小樣本（n < 6）" if group.get("small_sample") else ""
+    start = group.get("measurement_start") or "artifact 還沒有這一格"
+    return (f"紙上籃子（每週一；寫下時說可開的 {group['n']} 檔、等權、各從寫下那天起）："
+            f"{_signed_pct(agg.get('absolute'))}｜對 {agg.get('benchmark') or '大盤'} {_signed_pct(agg.get('excess'))}"
+            f"｜{cohort}｜曾達 2 倍 {group.get('reached_2x_ever', '?')}｜量得到 {agg['measured']}/{group['n']}"
+            f"｜起始 {start}{small}{tail}——只印不判")
+
+
 _WRONG_OUTCOMES = ("reversed", "disproof_touched", "retracted")
 
 
