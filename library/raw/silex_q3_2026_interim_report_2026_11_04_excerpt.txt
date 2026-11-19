@@ -32,3 +32,9 @@ NOTE: 發行人自己的季報（自述，L8 弱）。給 SILEX.ST 第三季後�
 
 [財務行事曆]
 "Year-end report 2026 18 February 2027"
+
+[第三季摘要補抄（第 2 頁；2026-11-19 同一份 PDF 重新下載、pypdf 本機抽字、逐字——11-04 節錄漏抄年增率這一行）]
+"Net sales amounted to SEKm 413 (339), a growth of 21.7% (33.9%)"
+
+[分部（第 8 頁；2026-11-19 同一份 PDF 本機抽字、逐字——另一個分部 Other 是不動產出租，沒有對外營收）]
+"Net sales for the MEMS segment amounted to SEKm 413 (339) for the quarter, corresponding to the Group’s total net sales, as described in the previous section."
