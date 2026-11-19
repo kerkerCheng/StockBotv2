@@ -1,0 +1,117 @@
+{
+  "claims": [
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：臻鼎的重訊／年報寫出取消或延後這批向 GIGAVIS 下單的設備，或同一批設備改向別家採購。核查頻率：每月（MOPS 重訊）＋每年（年報）。觸發後 48 小時：更正這條 claim。",
+      "id": "mops_4958_ann_20261117_gigavis_equipment_cl1",
+      "source_ids": [
+        "mops_4958_ann_20261117_gigavis_equipment_z1",
+        "mops_4958_ann_20261117_gigavis_equipment_z2",
+        "mops_4958_ann_20261117_gigavis_equipment_z3",
+        "mops_4958_ann_20261117_gigavis_equipment_z4",
+        "mops_4958_ann_20261117_gigavis_equipment_z5"
+      ],
+      "statement": "Customer-side capital commitment (Zhen Ding Technology material announcement, 2026-11-17): its IC-substrate subsidiary Leading Interconnect Semiconductor Technology (Shenzhen) acquired one batch of machinery worth NT$1,864,507,932 from GIGAVIS CO.,LTD over 2026-08-11 to 2026-11-17 (cumulative), an unrelated party, decided by price comparison and negotiation. The equipment type is not disclosed.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "co:zhen_ding_tech",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "mops_4958_ann_20261117_gigavis_equipment_z1",
+        "mops_4958_ann_20261117_gigavis_equipment_z3",
+        "mops_4958_ann_20261117_gigavis_equipment_z4"
+      ],
+      "src_id": "co:gigavis"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "臻鼎",
+        "臻鼎-KY",
+        "臻鼎科技",
+        "Zhen Ding Technology"
+      ],
+      "attributes": {
+        "ticker": "4958.TW"
+      },
+      "confidence": 0.9,
+      "id": "co:zhen_ding_tech",
+      "name": "Zhen Ding Technology Holding Limited",
+      "role": null,
+      "source_ids": [
+        "mops_4958_ann_20261117_gigavis_equipment_z1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "equipment_epitaxy",
+      "aliases": [
+        "GIGAVIS",
+        "Gigavis",
+        "기가비스",
+        "기가비스 주식회사"
+      ],
+      "attributes": {
+        "ticker": "420770.KQ"
+      },
+      "confidence": 0.9,
+      "id": "co:gigavis",
+      "name": "GIGAVIS Co., Ltd.",
+      "role": null,
+      "source_ids": [
+        "mops_4958_ann_20261117_gigavis_equipment_z4"
+      ],
+      "type": "Company"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "mops_4958_ann_20261117_gigavis_equipment",
+    "evidence_tier": 1,
+    "origin_entity": "Zhen Ding Technology Holding Limited",
+    "permission_basis": "台灣上市公司重大訊息（TWSE 開放資料 t187ap04_L，發言 2026-11-17 20:46:10）；全文短、只保留研究必要的逐字。published_at 取 MOPS 發言日期 115/11/17；url 欄是去重鍵。",
+    "published_at": "2026-11-17",
+    "publisher": "公開資訊觀測站（MOPS 重大訊息）",
+    "retrieved_at": "2026-11-18",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "臻鼎-KY（4958）重大訊息 2026-11-17：代子公司禮鼎半導體科技（深圳）公告取得機器設備——交易相對人 GIGAVIS CO.,LTD、一批、115/8/11～115/11/17 累計新台幣 18.65 億元（比價及議價）",
+    "url": "https://openapi.twse.com.tw/v1/opendata/t187ap04_L?co_id=4958&spoke=2026-11-17T20%3A46%3A10&ref=8d566973facc"
+  },
+  "sources": [
+    {
+      "id": "mops_4958_ann_20261117_gigavis_equipment_z1",
+      "locator": "主旨",
+      "quote": "代子公司禮鼎半導體科技(深圳)股份有限公司公告取得機器設備"
+    },
+    {
+      "id": "mops_4958_ann_20261117_gigavis_equipment_z2",
+      "locator": "說明 2. 事實發生日",
+      "quote": "事實發生日:115/8/11~115/11/17"
+    },
+    {
+      "id": "mops_4958_ann_20261117_gigavis_equipment_z3",
+      "locator": "說明 5. 交易數量與交易總金額",
+      "quote": "交易數量:一批 交易總金額:新台幣1,864,507,932元"
+    },
+    {
+      "id": "mops_4958_ann_20261117_gigavis_equipment_z4",
+      "locator": "說明 6. 交易相對人及其與公司之關係",
+      "quote": "交易相對人:GIGAVIS CO.,LTD 與公司之關係:無"
+    },
+    {
+      "id": "mops_4958_ann_20261117_gigavis_equipment_z5",
+      "locator": "說明 11. 決定方式",
+      "quote": "交易決定方式:比價及議價"
+    }
+  ]
+}

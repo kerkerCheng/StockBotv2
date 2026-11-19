@@ -1,0 +1,122 @@
+{
+  "claims": [
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：GIGAVIS 公示這五份合約任一份的解除、取消或減額更正（減額一成以上）。核查頻率：每月（DART 公示）。觸發後 48 小時：更正這條 claim 與合約金額。",
+      "id": "dart_420770_supply_contracts_2026h2_excerpt_cl1",
+      "source_ids": [
+        "dart_420770_supply_contracts_2026h2_excerpt_c1",
+        "dart_420770_supply_contracts_2026h2_excerpt_c2",
+        "dart_420770_supply_contracts_2026h2_excerpt_c3",
+        "dart_420770_supply_contracts_2026h2_excerpt_c4",
+        "dart_420770_supply_contracts_2026h2_excerpt_c5"
+      ],
+      "statement": "Seller-side mandatory disclosures (GIGAVIS single sales/supply contract filings on DART, 2026-08-11 to 2026-11-16): five new contracts for semiconductor substrate inspection (and repair) equipment worth KRW 11.13bn, 12.95bn, 46.94bn, 30.59bn and 44.72bn (the last one equal to 85.29% of 2025 revenue); counterparties are described only as substrate manufacturers in China (three), Korea (one) and Japan (one), not named.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:pcb_electrical_test_aoi",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "dart_420770_supply_contracts_2026h2_excerpt_c3",
+        "dart_420770_supply_contracts_2026h2_excerpt_c5"
+      ],
+      "src_id": "co:gigavis"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "equipment_epitaxy",
+      "aliases": [
+        "GIGAVIS",
+        "Gigavis",
+        "기가비스",
+        "기가비스 주식회사"
+      ],
+      "attributes": {
+        "ticker": "420770.KQ"
+      },
+      "confidence": 0.9,
+      "id": "co:gigavis",
+      "name": "GIGAVIS Co., Ltd.",
+      "role": null,
+      "source_ids": [
+        "dart_420770_supply_contracts_2026h2_excerpt_c5"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "equipment_epitaxy",
+      "aliases": [
+        "AOI",
+        "AVI",
+        "自動光學檢測",
+        "外觀檢測",
+        "線路檢測",
+        "電測機",
+        "四線電測",
+        "飛針測試",
+        "线路检测",
+        "PCB inspection",
+        "electrical test"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:pcb_electrical_test_aoi",
+      "name": "PCB automated optical inspection (AOI / AVI) and electrical test equipment",
+      "role": null,
+      "source_ids": [
+        "dart_420770_supply_contracts_2026h2_excerpt_c3",
+        "dart_420770_supply_contracts_2026h2_excerpt_c5"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "dart_420770_supply_contracts_2026h2_excerpt",
+    "evidence_tier": 1,
+    "origin_entity": "GIGAVIS Co., Ltd.",
+    "permission_basis": "韓國金融監督院 DART 公開的單一供貨合約公示；只保留研究必要的有限逐字節錄。published_at 取最後一份的 DART 接收日（2026-11-16）；五份的 rcpNo 在節錄 NOTE。",
+    "published_at": "2026-11-16",
+    "publisher": "DART（韓國金融監督院電子公示）",
+    "retrieved_at": "2026-11-18",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "GIGAVIS（KOSDAQ 420770）單一銷售／供貨合約公示五份（DART，2026-08-11～11-16）：半導體載板檢測（及修補）設備，買方寫中國三份、韓國一份、日本一份的「반도체 기판 제조회사」、沒具名；合計約 1,463 億韓元",
+    "url": "https://dart.fss.or.kr/dsaf001/main.do?rcpNo=20261116900538"
+  },
+  "sources": [
+    {
+      "id": "dart_420770_supply_contracts_2026h2_excerpt_c1",
+      "locator": "20260811900329 契約內容",
+      "quote": "\"계약금액 총액(원) 11,133,584,000\"；\"매출액 대비(%) 21.23\"；\"3. 계약상대방 중국 반도체 기판 제조회사\""
+    },
+    {
+      "id": "dart_420770_supply_contracts_2026h2_excerpt_c2",
+      "locator": "20260915900285 契約內容",
+      "quote": "\"계약금액 총액(원) 12,952,727,500\"；\"계약상대방 일본 반도체 기판 제조회사\""
+    },
+    {
+      "id": "dart_420770_supply_contracts_2026h2_excerpt_c3",
+      "locator": "20261023900460 契約內容",
+      "quote": "\"반도체 기판 검사장비\"；\"계약금액 총액(원) 46,937,000,000\"；\"계약상대방 한국 반도체 기판 제조회사\""
+    },
+    {
+      "id": "dart_420770_supply_contracts_2026h2_excerpt_c4",
+      "locator": "20261028900110 契約內容",
+      "quote": "\"계약금액 총액(원) 30,589,092,800\"；\"계약상대방 중국 반도체 기판 제조회사\""
+    },
+    {
+      "id": "dart_420770_supply_contracts_2026h2_excerpt_c5",
+      "locator": "20261116900538 契約內容",
+      "quote": "\"1. 판매ㆍ공급계약 내용 반도체 기판 검사 및 수리장비\"；\"계약금액 총액(원) 44,720,673,600\"；\"매출액 대비(%) 85.29\"；\"3. 계약상대방 중국 반도체 기판 제조회사\""
+    }
+  ]
+}

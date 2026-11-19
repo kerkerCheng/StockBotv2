@@ -1,0 +1,128 @@
+{
+  "claims": [
+    {
+      "confidence": 0.5,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：GIGAVIS 的季報、年報或單一供貨合約公示寫出合約取消、解除或大幅減額，或分期報告的在手訂單比上一期少一半以上；或載板廠（臻鼎、Ibiden、三星電機、欣興、景碩、AT&S）的一手寫出載板檢測修補改向別家或改用自製。核查頻率：每季（DART 分期報告與單一供貨合約公示）。觸發後 48 小時：更正這條 claim，並重讀檢測設備層讀圖。",
+      "id": "dart_420770_q3_2026_quarterly_report_excerpt_cl1",
+      "source_ids": [
+        "dart_420770_q3_2026_quarterly_report_excerpt_g1",
+        "dart_420770_q3_2026_quarterly_report_excerpt_g2",
+        "dart_420770_q3_2026_quarterly_report_excerpt_g4",
+        "dart_420770_q3_2026_quarterly_report_excerpt_g5",
+        "dart_420770_q3_2026_quarterly_report_excerpt_g6"
+      ],
+      "statement": "Supplier-side statement (GIGAVIS Q3 2026 quarterly report filed on DART, 2026-11-16): GIGAVIS makes automated optical inspection (AOI) and automated optical repair (AOR) equipment for semiconductor substrates, mainly FC-BGA (AOI also for FC-CSP, HDI and FPCB); it claims a very high market share at global top-tier substrate makers without a number or third-party source; its order table for Jan–Sep 2026 shows new orders of KRW 202.5bn, deliveries of KRW 35.6bn and a backlog of KRW 167.0bn; citing Prismark, it says AI FC-BGA demand has risen sharply since 2025 and shortages are appearing in 2026 while large substrate makers announce capex.",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:pcb_electrical_test_aoi",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "dart_420770_q3_2026_quarterly_report_excerpt_g1",
+        "dart_420770_q3_2026_quarterly_report_excerpt_g3",
+        "dart_420770_q3_2026_quarterly_report_excerpt_g4"
+      ],
+      "src_id": "co:gigavis"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "equipment_epitaxy",
+      "aliases": [
+        "GIGAVIS",
+        "Gigavis",
+        "기가비스",
+        "기가비스 주식회사"
+      ],
+      "attributes": {
+        "ticker": "420770.KQ"
+      },
+      "confidence": 0.9,
+      "id": "co:gigavis",
+      "name": "GIGAVIS Co., Ltd.",
+      "role": null,
+      "source_ids": [
+        "dart_420770_q3_2026_quarterly_report_excerpt_g1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "equipment_epitaxy",
+      "aliases": [
+        "AOI",
+        "AVI",
+        "自動光學檢測",
+        "外觀檢測",
+        "線路檢測",
+        "電測機",
+        "四線電測",
+        "飛針測試",
+        "线路检测",
+        "PCB inspection",
+        "electrical test"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:pcb_electrical_test_aoi",
+      "name": "PCB automated optical inspection (AOI / AVI) and electrical test equipment",
+      "role": null,
+      "source_ids": [
+        "dart_420770_q3_2026_quarterly_report_excerpt_g1",
+        "dart_420770_q3_2026_quarterly_report_excerpt_g3"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "dart_420770_q3_2026_quarterly_report_excerpt",
+    "evidence_tier": 1,
+    "origin_entity": "GIGAVIS Co., Ltd.",
+    "permission_basis": "韓國金融監督院 DART 公開的法定分期報告；只保留研究必要的有限逐字節錄。published_at 取 DART 接收日（rcpNo 20261116…）。",
+    "published_at": "2026-11-16",
+    "publisher": "DART（韓國金融監督院電子公示）",
+    "retrieved_at": "2026-11-18",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "GIGAVIS（기가비스，KOSDAQ 420770）2026 年第 3 季分期報告（DART，2026-11-16）：半導體載板 AOI 檢測與 AOR 修補設備商；AOI 主要對象 FC-BGA／FC-CSP／HDI／FPCB；2026 年 1–9 月新訂單 2,025 億韓元、在手 1,670 億韓元；轉引 Prismark 2026 年 FC-BGA 供給短缺",
+    "url": "https://dart.fss.or.kr/dsaf001/main.do?rcpNo=20261116000783"
+  },
+  "sources": [
+    {
+      "id": "dart_420770_q3_2026_quarterly_report_excerpt_g1",
+      "locator": "II. 사업의 내용 1. 사업의 개요",
+      "quote": "기가비스 주식회사는 2004년 설립된 반도체 기판 자동광학검사기(AOI: Automatic Optical Inspection) 및 자동광학수리기(AOR: Automatic Optical Repair)를 제작/판매하는 글로벌 반도체 장비 업체입니다."
+    },
+    {
+      "id": "dart_420770_q3_2026_quarterly_report_excerpt_g2",
+      "locator": "II. 사업의 내용 1. 사업의 개요",
+      "quote": "당사는 글로벌 Top-tier 반도체 기판 제조사에 고해상도 검사 및 수리 플랫폼을 제공하여 매우 높은 시장 점유율을 보유하고 있습니다."
+    },
+    {
+      "id": "dart_420770_q3_2026_quarterly_report_excerpt_g3",
+      "locator": "II. 사업의 내용 2. 주요 제품 및 서비스（AOI 規格表 Main Product）",
+      "quote": "FC-BGA / FC-CSP / HDI / FPCB"
+    },
+    {
+      "id": "dart_420770_q3_2026_quarterly_report_excerpt_g4",
+      "locator": "II. 사업의 내용 2. 주요 제품 및 서비스（AOR）",
+      "quote": "AOR 설비는 반도체 기판의 불량(쇼트, 돌기 등)을 자동으로 수리하여 양품화함으로써 기판 생산 수율을 향상시킵니다."
+    },
+    {
+      "id": "dart_420770_q3_2026_quarterly_report_excerpt_g5",
+      "locator": "II. 사업의 내용 4. 다. 수주 현황（당기수주｜납품액｜수주잔고，백만원）",
+      "quote": "반도체 기판 검사 및 수리장비 202,548 35,597 166,951"
+    },
+    {
+      "id": "dart_420770_q3_2026_quarterly_report_excerpt_g6",
+      "locator": "II. 사업의 내용 7. 기타 참고사항 — 시장여건（轉引 Prismark）",
+      "quote": "반면, 2025년 이후 AI 반도체용 FC-BGA 수요가 급격히 증가하면서 2026년에는 공급 부족 현상이 나타나고 있으며, 국내외 대형 기판 제조사들은 생산능력 확대를 위해 설비투자(CAPEX) 계획을 발표하고 있습니다."
+    }
+  ]
+}
