@@ -16,3 +16,14 @@ Backlog for Specialty Semiconductors represented 365 days of annualized revenue 
 [...]
 
 While the estimated number of days based on annualized revenue cannot exceed 365 days per the Company’s definition of backlog , the effective backlog under Specialty Semiconductors for the terrestrial renewable energy and space solar power sectors surpassed the next twelve months on September 30, 2026. 1 These measures are not recognized measures under IFRS and do not have standardized meanings prescribed by IFRS and
+
+[...]
+
+【Performance Materials 分部描述（PDF p.3）與第三季營收（p.4）——2026-11-19 同一份 PDF 重新下載、pypdf 本機抽字、逐字補抄】
+The Performance Materials segment operates in North America, Europe and Asia and manufactures and sells products that are used in several applications in pharmaceutical and healthcare, and industrial. Main products are sold as active pharmaceutical ingredients, specialized chemicals, commercial grade metals, alloys and engineered powders.
+Performance Materials revenue reached $35. 7 million in Q3 2026, up 20% compared with the same period in 2025, primarily driven by higher volumes of bismuth-based products.
+
+[...]
+
+【Financial Highlights：淨利（PDF p.5）——2026-11-19 同一份 PDF 本機抽字、逐字補抄】
+Net earnings were $12.3 million in Q3 2026, compared to $18.2 million in Q3 2025.

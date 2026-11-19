@@ -141,6 +141,19 @@ def test_a_derived_number_is_computed_from_the_anchor_and_not_flagged_as_missing
     assert anc.derive_value("growth", [120, 100]) == pytest.approx(20.0) and anc.derive_value("ratio", [1, 0]) is None
 
 
+def test_derive_of_takes_the_source_side_scale_for_english_amounts() -> None:
+    # 原文寫英文金額、句子寫「億」：of 要照原文的 million／billion 乘上去（EFXT 2026-11-19：40 加 85 被算成 125、對不回 1.2 億）
+    capex = anc.Anchor("fa_x", "library/raw/a.txt", "$30 million to $40 million in 2026 and approximately $85 million during 2027",
+                       {"op": "sum", "of": ["$40 million", "$85 million"], "shown": "約 1.2 億美元"})
+    assert "derived_mismatch" not in _compare("擴廠約 1.2 億美元。", capex)
+    backlog = anc.Anchor("fa_x", "library/raw/a.txt", "Backlog of $2.1 billion increased from $1.1 billion",
+                         {"op": "diff", "of": ["$2.1 billion", "$1.1 billion"], "shown": "10 億"})
+    assert "derived_mismatch" not in _compare("在手比年初多出 10 億。", backlog)
+    wrong = anc.Anchor("fa_x", "library/raw/a.txt", "Backlog of $2.1 billion increased from $1.1 billion",
+                       {"op": "diff", "of": ["$2.1 billion", "$1.1 billion"], "shown": "20 億"})
+    assert "derived_mismatch" in _compare("在手比年初多出 20 億。", wrong)
+
+
 def test_derive_is_validated_at_write_time() -> None:
     quote = "Revenue was $120 million, of which $90 million came from data centers."
     ok = {"op": "share", "of": ["$90 million", "$120 million"], "shown": "75%"}

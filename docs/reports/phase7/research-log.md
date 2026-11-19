@@ -1234,3 +1234,39 @@
 **本段候選狀態移動 1（GIGAVIS 無敘事 → 可開）／入圖 1（[941]）／讀圖換版 2／開發 1（81c97afd）。**
 
 ---
+
+## 四十八、2026-11-19 中午（同日第四段）：/research-drain——⑤ 兩格維護積壓回填四份（中途壓縮）
+
+使用者 11-19：「/research-drain」（`/clear` 之後）。開工時閉包已成立（closure-gate exit 0、佇列段全 0），⑤ 只剩兩格維護積壓
+（敘事還沒逐句核對、事實句還沒錨點）——照 plan `2026-11-13-001` 一段排 3–5 份，做四份。
+
+- **SIVE.ST**：錨點 75／75（一手 47、自家 28），核對 `fc_c1e9f1ecc486b6c2`（改 0 句）。
+- **SILEX.ST**：錨點 83／83（一手 74、自家 9），核對 `fc_1afd362dc5255431`；第三季報節錄補抄兩行（年增 21.7%、MEMS 分部＝集團營收；commit 06e6f966）。
+- **VNP.TO**：錨點 79／79（一手 63、自家 16），核對 `fc_71fb3be80fb6dafa`；MD&A 節錄補抄性能材料分部描述與鉍、第三季淨利 1,230 萬美元
+  （同一份 PDF 本機抽字），新聞稿「We continue to operate at high capacity」那句 newswire 擋本機抓取，經 WebFetch 轉錄、已在節錄標明沒核到原文。
+- **EFXT**：錨點 51／51（一手 46、自家 5），核對 `fc_a8e9edd139c70be3`；6-K 新聞稿與法說逐字稿節錄補抄六句（EI 與 AMS 占毛利 68%、
+  CEO「record bookings and backlog」、「originally a little over 7 gigawatts」「bringing those home in the 1.8」、2018 年約 15 億紀錄、
+  「record bookings of approximately $1 billion」——兩份原檔重新抓取、逐字核過）。兩句股價脈絡綁 Engine C `price_history`。
+- **開發（L17 當下修）**：`derive.of` 照原文的 million／billion 乘數算——原本用句子端的讀數，「$40 million」加「$85 million」算成 125、
+  對不回「約 1.2 億美元」。測試先紅後綠；現有 25 筆 derive 錨點新舊各算一次，只有 EFXT 這兩筆結論變（由錯到對）。
+- 量測抽樣①：688020.SS（`ib_51f5eb078ad5624c`，未核）n＝38、m＝0（`cases.md` ①）。
+
+**發現**（連到哪個目標｜落在哪）：
+- **故事的股價脈絡沒帶截至日、換版沿用過期數**：EFXT 故事已定價段「5 月高點後回落約一成五」是 10-29 的數（−14%），11-09 換版沿用，
+  那天已 −29%（今天 −32%）；敘事版同一句帶「寫這句的 2026-10-28」，故事版沒帶。現行故事 23 份寫了股價走勢、約 19 份沒有截至日｜
+  首屏是故事（故事不比依據多主張）｜ROADMAP 旁支「故事已定價段的股價脈絡帶截至日」（未排程）；EFXT 那句下一版改。案例：過期 1、沒截至日約 19。
+- **保留語氣被拿掉**：SIVE 深挖清單「Lumentum 約兩成收發器改用自家 CW 雷射」原文是 *expected…in the coming quarter*——寫成已發生｜
+  錨點「保留語氣」旗標抓到的｜下一版（11-26 第三季報告後換版）改。案例 1 次。
+- **節錄漏抄，敘事的數其實有一手**：SILEX 2 行、VNP 3 處、EFXT 6 句——敘事句的數字對得上原文，但不在我們的節錄裡；EFXT 的 68%
+  原本只在 Motley Fool 編輯摘要框（二手），補到 6-K 新聞稿一手｜L11 ③（多個二手≠一手）、⑤（找不到≠不存在）｜錨點回填本身就是這類漏洞的偵測器，
+  不另排程。
+- **措辭（下一版改，不算事實錯）**：SILEX #2「最可行」→「最被看好」（原文 demonstrated the most promise）；VNP #49 法說「太空實際積壓」
+  原文是部門（for this segment）→ 主詞收窄，改「部門（地面光伏與太空）」、#8「2027 下半年完工」加「預計」；EFXT #79「第四季才入帳」
+  原文是 reflected in ES backlog → 改「第四季才進在手」。
+- 自己寫 spec 的錯：SIVE #66 的 growth 把新舊值順序寫反（算出 −10.7%）——derive 檢查抓到、`supersedes` 重綁。工具在做它該做的事。
+- 揭露：EFXT 與 VNP 兩句股價脈絡句，主 session 用 Engine C `price_history` 與 yfinance 算過年初、高點、回落（沒有寫進敘事、只綁錨點）；
+  `alpha lights` 都沒開 `--prices`。
+
+**本段候選狀態移動 0／鑄 ra_admission 0／入圖 0／開發 1（derive 單位）／ROADMAP 新列 1（未排程）。**
+
+---

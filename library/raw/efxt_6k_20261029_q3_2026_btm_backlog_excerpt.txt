@@ -35,3 +35,7 @@ NOTE: 發行人自述。Enerflex 敘事（現場燃氣發電層）用：①450 M
 
 【期中財報：客戶集中】
 "For the nine months ended September 30, 2026, the Company had no individual customer which accounted for more than 10% of its revenue (September 30, 2025 – nil)."
+
+【新聞稿（附件 99.1）：毛利結構與 CEO 引言——2026-11-19 同一份 EDGAR 附件重新抓取（repo 預設 UA）、HTML 抽字、空白攤平後逐字補抄】
+"Energy Infrastructure (“EI”) and After Market Services (“AMS”) product lines generated 68% of consolidated gross margin before depreciation and amortization during Q3/26"
+"Enerflex delivered a solid third quarter, highlighted by healthy cash generation, record bookings and backlog, notable commercial wins for behind-the-meter natural gas-fired power generation"

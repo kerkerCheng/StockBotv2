@@ -36,3 +36,9 @@ NOTE: **第三方轉錄、公司自述（L8）**。講者：Paul E. Mahoney（Pr
 
 【結尾】
 "We appreciate your time and look forward to sharing our fourth quarter and year end results with you in February."
+
+【CEO 開場與問答補抄——2026-11-19 同一頁重新取頁（HTTP 200）、HTML 抽字、空白攤平後逐字照抄；講者原話段落，不是摘要框】
+"The quarter was highlighted by record bookings of approximately $1 billion"
+"This compares to our prior annual high watermark of approximately $1.5 billion in 2018."
+"As we have talked over several quarters, that we have had originally a little over 7 gigawatts of commercial activity and opportunity"
+"And so we did walk into a 7 gigawatt set of opportunities. We narrowed it to our best view. We focused on bringing those home in the 1.8."

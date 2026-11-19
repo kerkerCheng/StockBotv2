@@ -11,3 +11,6 @@ Highlights：
 
 CEO 引言：
 "This includes advancing recently announced gallium arsenide (GaAs) production and facility expansion plans at St. George, Utah, to support growing demand across defence, space solar, medical imaging and industrial sensing applications."
+
+CEO 引言補抄（2026-11-19；newswire.ca 擋本機抓取〔Cloudflare 驗證頁〕，經 WebFetch 抓取工具轉錄、本機沒核到原文）：
+"We continue to operate at high capacity and to ramp additional production to support customer demand,"

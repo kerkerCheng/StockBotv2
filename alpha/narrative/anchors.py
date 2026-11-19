@@ -177,6 +177,20 @@ def value_of(text: str) -> tuple[float, float] | None:
     return (claims[0].value, claims[0].tol) if claims else None
 
 
+#: `derive.of` 是原文的寫法：英文的 million／billion 照原文端的乘數算（句子端的 `number_claims` 不認英文單位——
+#: EFXT 11-19「$40 million」加「$85 million」被算成 125，對不回句子的「約 1.2 億美元」）。比例類兩邊同乘、結果不變。
+_OF_EN_SCALE = re.compile(r"\d\s*(trillion|billion|million|thousand|bn|mn)(?![a-z])", re.I)
+_OF_SCALE = {"trillion": 1e12, "billion": 1e9, "bn": 1e9, "million": 1e6, "mn": 1e6, "thousand": 1e3}
+
+
+def _of_value(text: str) -> tuple[float, float] | None:
+    got, scale = value_of(text), _OF_EN_SCALE.search(text)
+    if got is None or scale is None:
+        return got
+    mult = _OF_SCALE[scale.group(1).lower()]
+    return got[0] * mult, got[1] * mult
+
+
 def derive_value(op: str, values: Sequence[float]) -> float | None:
     try:
         if op == "ratio":
@@ -233,7 +247,7 @@ def _derived(anchors: Sequence[Anchor]) -> tuple[list[str], list[Flag]]:
             continue
         shown = str(d.get("shown") or "")
         shown_all.append(shown)
-        values = [value_of(str(v)) for v in d.get("of") or ()]
+        values = [_of_value(str(v)) for v in d.get("of") or ()]
         target = value_of(shown)
         op = str(d.get("op"))
         computed = derive_value(op, [v[0] for v in values]) if values and all(values) else None
