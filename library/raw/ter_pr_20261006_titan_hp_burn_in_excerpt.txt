@@ -1,0 +1,23 @@
+Source URL: https://www.businesswire.com/news/home/20251002549708/en/Teradyne-Unveils-Titan-HP
+Retrieved via: https://finviz.com/news/399372/teradyne-introduces-titan-hp-platform-with-burn-in-capabilities-for-advanced-ai-data-center-devices（Business Wire 原稿轉載頁）
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Teradyne 新聞稿「Teradyne Introduces Titan HP Platform with Burn-In Capabilities for Advanced AI Data Center Devices」（Business Wire，2026-10-06）
+DATE: 2026-10-06
+RETRIEVED: 2026-11-20（轉載頁 HTML 以 fetchers.utils.html_to_text 去標籤後逐字切出）
+NOTE: 發行人新聞稿（供應商自述，L8 弱證據）；沒有具名客戶、沒有台數或金額。上面第一個網址是 2025-10 Titan HP 首發稿（同產品線），2026-10-06 這一則以轉載頁為準。Teradyne 是 Aehr 執行長在 2026-11-02 法說點名的封裝級替代者之一（系統級測試機）。
+
+【首段】
+"Teradyne, Inc. (NASDAQ: TER), a leading provider of automated test equipment and advanced robotics, today announced a production-ready system that delivers enhanced burn-in capabilities on its Titan™ HP platform. Traditional burn-in holds devices in banks of dedicated ovens at a controlled air temperature for hours before they move on to functional test. Teradyne Titan HP instead holds each device at its target junction temperature while running a realistic device workload, so reliability stress functions are optimized and thermal controls are enabled at the per-device level. Titan HP can be used for system level test or reliability testing, optimizing capital cost investments."
+
+【主管說法】
+"Moving reliability stress testing onto a system level test platform means optimized reliability, which can lower cost of test, improve time to market and deliver better data on every device shipped."
+
+【逐顆控溫】
+"Per-site thermal control, tuned to each device's thermal and force zones, and paired with high per-device kilowatt power delivery, lets Titan HP sustain reliability-stress conditions on parts whose power draw and heat dissipation strain a conventional oven flow."
+
+【需求說法】
+"Burn-in has long been standard for automotive and other high-reliability silicon. AI accelerators and cloud infrastructure devices are now entering the same category, driven by the high cost of a single failed accelerator in a deployed rack. That demand is arriving as capital, floor space, and handling capacity for dedicated oven banks come under pressure in high-volume manufacturing and OSAT facilities."
+
+【供貨狀態】
+"Teradyne Titan HP with enhanced burn-in is available today and deployed in production."

@@ -1,0 +1,30 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1040470/000165495426009601/aehr_10q.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Aehr Test Systems Form 10-Q（quarterly period ended September 25, 2026；2026-11-06 申報）營收按產品別、遞延收入與合約負債、存貨組成、營業現金流說明
+DATE: 2026-11-06
+RETRIEVED: 2026-11-20（EDGAR 原文 HTML 以 fetchers.edgar 去標籤後逐字切出；表格一格一行，這裡以空格接起）
+NOTE: 發行人申報。產品別表三欄依序為 Three Months Ended September 25, 2026／August 29, 2025／One Month Ended June 26, 2026（會計年度改制的過渡月），千美元；「$ -」＝零。遞延收入與存貨表三欄依序為 September 25, 2026／June 26, 2026／May 29, 2026。同一份申報的客戶集中度與地區營收在 aehr_10q_fq1fy27_2026_11_06_excerpt.txt。
+
+【營收按產品別（Disaggregation of revenue；千美元）】
+"Systems $ 17,316 $ 6,764 $ - Contactors 13,489 2,613 240 Services 2,202 1,592 398 $ 33,007 $ 10,969 $ 638"
+
+【MD&A：營收變動】
+"For the three months ended September 25, 2026 revenue increased by $22.0 million, compared to the three months ended August 29, 2025, primarily driven by significantly higher shipments of systems and contactors due to strong demand in the AI market. Revenue from package level burn-in systems increased by $10.9 million, while revenue from wafer-level burn-in contactors and package level burn-in boards and modules increased by a combined $10.9 million."
+
+【遞延收入（短期；千美元）】
+"Customer deposits $ 7,529 $ 6,028 $ 4,554 Deferred revenue 415 670 638 $ 7,944 $ 6,698 $ 5,192"
+
+【合約負債與剩餘履約義務】
+"Contract liabilities as of September 25, 2026, June 26, 2026, and May 29, 2026 were $8.0 million, $6.8 million, and $5.2 million, respectively, and were included in deferred revenue, short-term and deferred revenue, long-term on the accompanying Condensed Consolidated Balance Sheets."
+"As of September 25, 2026, the remaining performance obligations, exclusive of customer deposits, which consisted of deferred service contracts and extended warranty contracts not yet delivered, are not material. The foregoing excludes the value of other remaining performance obligations as they have original durations of one year or less and excludes information about variable consideration allocated entirely to a wholly unsatisfied performance obligation."
+
+【採購承諾】
+"The Company has purchase obligations to certain suppliers. In some cases, the products the Company purchases are unique and have provisions against cancellation of the order."
+
+【存貨組成（千美元）】
+"Raw materials and sub-assemblies $ 37,534 $ 30,040 $ 29,247 Work in process 14,617 13,628 11,441 Finished goods 969 742 666 $ 53,120 $ 44,410 $ 41,354"
+
+【MD&A：營業現金流】
+"Net cash used in operating activities increased by $2.8 million for the three months ended September 25, 2026, compared to the three months ended August 29, 2025. This increase in cash usage was primarily driven by an increase in accounts receivable associated with significantly higher revenue and increased cash used for prepaid expenses. The Company also increased inventory purchases in anticipation of higher customer demand; however, the cash impact was largely offset by a corresponding increase in accounts payable due to the timing of vendor payments. These uses of cash were partially offset by improved net income and an increase in cash provided by deferred revenue due to the timing of customer deposits and revenue recognition."
+"Net cash used in operating activities during the one month ended June 26, 2026, was driven primarily by a net loss and cash used for inventory purchases in anticipation of higher customer demand, partially offset by cash provided by deferred revenue and collection of accounts receivable."

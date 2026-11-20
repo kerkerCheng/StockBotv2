@@ -1,0 +1,21 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1040470/000165495426006919/aehr_10k.htm
+
+Excerpt:
+[EXCERPT — 有限逐字引文] Aehr Test Systems Form 10-K（fiscal year ended May 29, 2026；2026-07-27 申報）backlog 定義、訂單取消條款（風險因子）、ATM 發行
+DATE: 2026-07-27
+RETRIEVED: 2026-11-20（EDGAR 原文 HTML 以 fetchers.edgar 去標籤後逐字切出）
+NOTE: 發行人申報。ATM 那一段原文另寫了平均發行價，這裡刻意不收（Q3W 名單內的檔，敘事不寫價格）；只收股數、募得金額與「已用完」。同一份申報的客戶集中度在 aehr_10_k_20260727_sipho.txt。
+
+【Item 1：Backlog】
+"At May 29, 2026, the Company’s backlog was $80.6 million compared with $15.2 million at May 30, 2025. The Company’s backlog consists of product orders for which confirmed purchase orders have been received and which are scheduled for shipment within 12 months. Due to the possibility of customer changes in delivery schedules or cancellations and potential delays in product shipments or development projects, the Company’s backlog as of a particular date may not be indicative of net revenues for any succeeding period."
+
+【風險因子：訂單可取消或改期】
+"Most customer purchase orders are subject to cancellation or rescheduling by the customer with limited penalties, and, therefore, backlog at any particular date is not necessarily indicative of actual sales for any succeeding period."
+
+【ATM（2026 年 4 月那一輪）】
+"On April 7, 2026, the Board of Directors authorized the filing of an additional Prospectus Supplement for the sale of $60 million of its common stock pursuant to a new ATM offering program under the Company’s existing $100 million shelf registration statement."
+"In April 2026, the Company sold 812,185 shares of common stock"
+"The gross proceeds to the Company were approximately $60.0 million, before professional fees of $1.2 million. The ATM offering program has been fully utilized."
+
+【MD&A：融資現金流】
+"Net cash provided by financing activities was $97.2 million in fiscal year 2026, compared to $0.6 million in fiscal year 2025, and $0.1 million in fiscal years 2024, primarily driven by net proceeds of $97.4 million from the issuance of common stock under the Company’s ATM offering program."

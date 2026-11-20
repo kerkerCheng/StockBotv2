@@ -1,0 +1,15 @@
+SOURCE: Aehr Test Systems 官網新聞稿〈Aehr Receives Follow-On Sonoma™ Production Orders for Lead Hyperscale Customer’s Next-Generation AI Processor〉——供應商自述（L8 弱主張）；客戶沒具名
+URL: https://www.aehr.com/2026/10/aehr-receives-follow-on-sonoma-production-orders-for-lead-hyperscale-customer-s-next-generation-ai-processor/
+PUBLISHED: 2026-10-07
+RETRIEVED: 2026-11-20
+STORAGE: repo_excerpt（官網新聞稿有限引文；有沒有同步交 8-K 沒查）
+NOTE: AEHR 敘事 2026-11-19「完整重讀」第 (2) 項（非 EDGAR 一手）補讀：庫裡原本沒有這一則。新的是三件——①訂單約 600 萬美元、交在台灣的 OSAT、半年內交貨；②「為什麼選 Sonoma」的供應商說法：第二顆處理器要同一顆封裝內分區獨立控溫；③它自己寫客戶可選晶圓級或封裝級、或兩者都用（兩條路互為替代）。第二顆處理器 2027 放量、量會超過第一顆，與 11-02 法說同一句話。
+
+"Orders supports customer’s second AI processor program on Sonoma, with production expected to ramp in calendar 2027"
+"today announced approximately $6 million in follow-on production orders from its lead hyperscale customer for package-level burn-in (PLBI) of its next-generation AI processor for data center training and inference applications."
+"The systems and consumables will be deployed at one of the customer’s outsourced semiconductor assembly and test (OSAT) partners in Taiwan. Deliveries under the order are scheduled over the next six months."
+"This next-generation AI processor is the second from this customer to use Aehr’s Sonoma platform for production burn-in. Following the previously announced initial production win, these orders expand the customer’s capacity ahead of an expected production ramp of this second AI device in calendar 2027."
+"The customer has indicated that this second AI processor is expected to ultimately reach production volumes exceeding those of the customer’s first processor brought into production burn-in on the Sonoma platform."
+"The next-generation processor requires independently controlled thermal zones within each package to achieve the operating conditions needed for effective production burn-in and early-life failure screening. Sonoma’s multi-zone thermal control capabilities enable independent temperature management across different areas of a device while delivering the high current required to electrically stress the processor."
+"Aehr is also engaged in detailed discussions with this customer regarding reliability qualification and production burn-in requirements for future generations of higher-power, larger AI devices. These discussions include both Aehr’s Sonoma package-level and FOX-XP™ wafer -level burn-in (WLBI) platforms."
+"WLBI can screen die before assembly, while PLBI can stress and screen the completed device. Customers may choose either approach or use both at different stages of qualification and production, depending on their requirements."
