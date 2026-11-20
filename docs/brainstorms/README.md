@@ -20,6 +20,7 @@
 | [`2026-10-04-phase7-research-edge-proposal.md`](2026-10-04-phase7-research-edge-proposal.md) | Phase 7（研究使用與量測）的能力盤點、failure analysis、十個 edge 假說、回放與前瞻評估設計、campaign 驗證集、§13 決策流程（APP 的組織原則）；使用者 2026-10-04 定案，Phase 7 plan 從它導出 |
 | [`2026-10-28-app-attention-ia.md`](2026-10-28-app-attention-ia.md) | APP 照使用者問題重組：11 頁收成 5 頁、首頁 compact、圖頁骨架＝層、成績單不排序、「問 Claude」橋；「圖的哪裡有機會」的 zoom-out；發現紀錄 F1–F4（**活的**）。使用者 2026-10-28 照推薦定案 |
 | [`2026-10-05-stock-page-schema.md`](2026-10-05-stock-page-schema.md) | 個股頁 schema：十三塊、單位（題材錨／路徑／層／插槽／公司／事件）、十一條規則、七檔測試集與填得滿表、三檔錨點與時光機、「量 → 錢 → 價」、發現紀錄與回饋紀錄（**活的**，每輪往下加）；S1 凍結判準達成（2026-10-06）、v1.0 等 §14.1 ②③④ 與負錨點驗收；2026-10-06 amendment：S4 層說明升主產品並提前、四段規格、S5 等三份層說明；PLAN_PROPOSAL `plans/2026-10-05-003` |
+| [`2026-11-20-historical-playbook-replay-design.md`](2026-11-20-historical-playbook-replay-design.md) | **DRAFT（2026-11-20；待使用者看一眼 → R2 兩位審查 → 使用者簽；簽核前不是任何機制的依據）**——歷史劇本回放：照圖的 schema 與 as-of 規則重建過去「集中需求灌進薄層」的案例，只回放逐字事實、不回放判讀；回放語料長期維護但不是 authority、對正式圖單向晉升；試點 ABF 載板 2020–2022＋一段雜湊挑的失敗段；六個判斷點 J1–J6、給審查者的十二題、ROADMAP 五欄 amendment（Phase 8，簽核後才改） |
 
 ## 歷史證據（只在引用實測數字時讀）
 
