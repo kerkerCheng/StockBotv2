@@ -20,7 +20,7 @@
 | [`2026-10-04-phase7-research-edge-proposal.md`](2026-10-04-phase7-research-edge-proposal.md) | Phase 7（研究使用與量測）的能力盤點、failure analysis、十個 edge 假說、回放與前瞻評估設計、campaign 驗證集、§13 決策流程（APP 的組織原則）；使用者 2026-10-04 定案，Phase 7 plan 從它導出 |
 | [`2026-10-28-app-attention-ia.md`](2026-10-28-app-attention-ia.md) | APP 照使用者問題重組：11 頁收成 5 頁、首頁 compact、圖頁骨架＝層、成績單不排序、「問 Claude」橋；「圖的哪裡有機會」的 zoom-out；發現紀錄 F1–F4（**活的**）。使用者 2026-10-28 照推薦定案 |
 | [`2026-10-05-stock-page-schema.md`](2026-10-05-stock-page-schema.md) | 個股頁 schema：十三塊、單位（題材錨／路徑／層／插槽／公司／事件）、十一條規則、七檔測試集與填得滿表、三檔錨點與時光機、「量 → 錢 → 價」、發現紀錄與回饋紀錄（**活的**，每輪往下加）；S1 凍結判準達成（2026-10-06）、v1.0 等 §14.1 ②③④ 與負錨點驗收；2026-10-06 amendment：S4 層說明升主產品並提前、四段規格、S5 等三份層說明；PLAN_PROPOSAL `plans/2026-10-05-003` |
-| [`2026-11-21-playbook-replay-design-v2.md`](2026-11-21-playbook-replay-design-v2.md) | **DRAFT v2（2026-11-21；待 R2 第二輪 → 使用者簽；簽核前不是任何機制的依據）**——歷史劇本回放：AI 這一波當主體（傳導時差表、每層對照表）、舊劇本專攻「怎麼結束」（結尾標記表）；確認型只剩一條機械回放 H16（大跌當時分不分得出中段與結束），其餘全部描述型；回放語料長期維護但不是 authority、對正式圖單向；試點 ABF 一層兩個循環；ROADMAP Phase 8 那一列的逐字草稿（簽核後才改）。第一版與它的第一輪審查紀錄見已封存 |
+| [`2026-11-21-playbook-replay-design-v3.md`](2026-11-21-playbook-replay-design-v3.md) | **DRAFT v3（2026-11-21；R2 第二輪三位的條件已落字；待使用者定 §1 的 U1–U7 → 窄範圍複核 → 簽；簽核前不是任何機制的依據）**——歷史劇本回放：先交今天能用的（A0 賭注句與對帳日曆、A1 機械回放 H16 與「今天的一頁」），回放語料（Phase 8）排在後面而且變窄（試點 0 買家口徑時間線 → 機制 → ABF → 擴段；每層對照表延後）；確認型只有 H16（先零結果乾跑、季內排列檢定），其餘全部描述型；ROADMAP 兩列與 phase-run 步驟 1 的逐字草稿（簽核後才改）。第一、二版與兩輪審查紀錄見已封存 |
 
 ## 歷史證據（只在引用實測數字時讀）
 
@@ -32,6 +32,7 @@
 
 | 檔 | 為什麼不用再讀 |
 |---|---|
+| [`2026-11-21-playbook-replay-design-v2.md`](2026-11-21-playbook-replay-design-v2.md) | 歷史劇本回放第二版；R2 第二輪三位都回 CONDITIONAL_GO，條件落在第三版。只有檔尾的第二輪審查紀錄（逐條處置）仍被第三版引用 |
 | [`2026-11-20-historical-playbook-replay-design.md`](2026-11-20-historical-playbook-replay-design.md) | 歷史劇本回放第一版；選案規則被乾跑否定（`docs/reports/2026-11-20-replay-episode-detection-dryrun.md`），已由 2026-11-21 第二版取代。只有檔尾的 R2 第一輪審查紀錄仍被第二版引用 |
 | [`2026-09-21-graph-consumption-vs-ranking.md`](2026-09-21-graph-consumption-vs-ranking.md) | 待否證素材；採納的部分已整併進決定紀錄，未採納的不再追 |
 | [`2026-09-16-alpha-edge-new-session-prompt.md`](2026-09-16-alpha-edge-new-session-prompt.md) | 舊路線的啟動 prompt；新啟動 prompt 由重建後的 ROADMAP 導出 |
