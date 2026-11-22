@@ -273,6 +273,10 @@ def build_sentences(brief: BriefText, *, story: Mapping[str, Any] | None = None)
             rows += [(f"story:{key}", s, refs or every) for s in split_sentences(slots[key])]
         cand = (story.get("candidate") or {}).get("story")
         rows += [("story:candidate", s, every) for s in split_sentences(cand)]
+        # 賭注句（2026-11-22）：它是故事——「押什麼」對「我們賭什麼」那一格的引用、「翻倍要」對「必須為真」那一格的引用核
+        bet = story.get("bet") if isinstance(story.get("bet"), Mapping) else {}
+        for key, basis in (("stake", "our_bet"), ("doubling", "what_must_be_true")):
+            rows += [(f"story:bet.{key}", s, tuple(by_slot.get(basis) or ()) or every) for s in split_sentences(bet.get(key))]
     out = []
     listing: str | None = None            # 正在「錯的訊號」清單裡的那一格
     for n, (where, text, refs) in enumerate(rows, 1):
@@ -785,7 +789,7 @@ _CONDITION_SENTENCE = re.compile(r"第\s*\d+(?:\s*[、,，及和与與]\s*第?\s
 _TARGET_BEFORE = re.compile(r"(低於|低于|高於|高于|跌回|跌破|守在|至少|最多|站上|跌到|走到|超過|超过|達到|达到|不掉回|回到)\s*約?\s*$")
 _TARGET_AFTER = re.compile(r"^\s*[^\d，。；,;]{0,4}?(以下|以上|以內|以内|之下|之上)")
 #: 「必須為真」那幾格（敘事與故事）：數字可能是門檻，不是事實。
-TARGET_WHERES: tuple[str, ...] = ("what_must_be_true", "story:what_must_be_true")
+TARGET_WHERES: tuple[str, ...] = ("what_must_be_true", "story:what_must_be_true", "story:bet.doubling")
 #: 系統自己的字（候選狀態、讀圖判讀）被加引號不是引文。
 _SYSTEM_QUOTES = frozenset(squash(w) for w in ("可開", "缺 X", "不要", "已持有", "量", "價", "neither", "moat", "量的賭注",
                                                "價的賭注", "反證", "加碼條件", "讀到邊", "已定價", "前提失效", "會死嗎",
@@ -1260,6 +1264,10 @@ def where_label(where: str) -> str:
         return "故事：候選理由"
     if where.startswith("depth:"):
         return "深挖清單：" + dict(DEPTH_CHECK_ITEMS).get(where[6:], where[6:])
+    if where.startswith("story:bet."):
+        from .story import BET_LABELS
+
+        return "故事：" + BET_LABELS.get(where[6:], where[6:])
     if where.startswith("story:"):
         return "故事：" + STORY_SLOT_LABELS.get(where[6:], where[6:])
     return SLOT_LABELS_V2.get(where, where)

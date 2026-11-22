@@ -139,6 +139,11 @@ def story_spec_problems(spec: Mapping[str, Any], brief: Any) -> list[str]:
             problems += missing_label_problems(candidate.get("missing_label"))
         elif candidate.get("missing_label") is not None:
             problems.append(f"這版敘事宣告的是 {state}，不是缺 X——不寫 missing_label（一個欄位不承載兩種意思，L12）")
+    # 賭注句（選填；2026-11-22）：寫了才檢查。`disproof` 是這一版敘事 `disproof[]` 的序號——指得回那一條（L18）
+    if spec.get("bet") is not None:
+        from alpha.narrative.story import bet_problems
+
+        problems += bet_problems(spec["bet"], disproof_count=len(getattr(brief, "disproof", ()) or ()))
     return problems
 
 
@@ -189,9 +194,16 @@ def prepare_story(ticker: str, spec: Mapping[str, Any], *, path: Path | None = N
     body = {"slots": {k: str(v).strip() for k, v in (spec.get("slots") or {}).items()},
             "evidence": {k: [str(r).strip() for r in v] for k, v in (spec.get("evidence") or {}).items()},
             "candidate": {k: str(v).strip() for k, v in (spec.get("candidate") or {}).items() if v is not None}}
+    # 賭注句是選填鍵：**寫了才進 body**——沒寫的故事 id 照舊算（加一個恆在的鍵會讓「同一份內容」算出不同的 id）
+    bet = spec.get("bet")
+    if isinstance(bet, Mapping):
+        body["bet"] = {"stake": str(bet.get("stake") or "").strip(), "doubling": str(bet.get("doubling") or "").strip(),
+                       "disproof": bet.get("disproof")}
     head = current.get(brief.brief_id)
-    if head is not None and all(head.get(k) == body[k] for k in body):
+    if head is not None and all(head.get(k) == body[k] for k in body) and head.get("bet") == body.get("bet"):
         problems.append(f"跟現行那一筆（{head['story_id']}）一樣——不必再寫")
+    elif head is not None and head.get("bet") and "bet" not in body:
+        problems.append(f"現行那一筆（{head['story_id']}）有賭注句、這一筆沒有——改故事的字要把 bet 一起帶上（不帶就等於把那一句拿掉）")
     stamp = (now or datetime.now(timezone.utc)).astimezone(timezone.utc).isoformat()
     record = {"story_id": story_id(brief.brief_id, stamp, body), "brief_id": brief.brief_id, "company_id": company,
               "ticker": str(brief.ticker), "created_at": stamp, "author": author, **body}
@@ -200,6 +212,26 @@ def prepare_story(ticker: str, spec: Mapping[str, Any], *, path: Path | None = N
     if sensitive_payload_path(dict(record), "stories") is not None:
         problems.append("內容像密鑰，拒收")
     return record, problems
+
+
+def bet_only_spec(ticker: str, bet: Any, *, path: Path | None = None, today: date | None = None,
+                  brief_loader: Callable[[str], tuple[Sequence[Any], Sequence[str]]] | None = None) -> dict[str, Any]:
+    """只加（或換）賭注句的 spec：故事其他格**沿用**這一檔現行敘事的現行故事，一個字不動（`stories --bet-only`）。
+    沒有現行的 v2 敘事、或那一版還沒有故事：raise——賭注句是故事的一部分，先寫故事。"""
+    from alpha.narrative.contracts import RECORD_VERSION_V2, select_brief
+
+    from .briefs import read_brief_records
+
+    records, _errors = (brief_loader or read_brief_records)(str(ticker))
+    brief = select_brief(list(records), as_of=None, today=today or date.today())
+    if brief is None or brief.record_version != RECORD_VERSION_V2:
+        raise ContractViolation(f"{ticker} 沒有現行的 v2 敘事——賭注句寫給一版敘事的故事")
+    head = current_stories(path=path)[0].get(brief.brief_id)
+    if head is None:
+        raise ContractViolation(f"{ticker} 現行那一版敘事（{brief.brief_id}）還沒有故事——先寫故事（python -m alpha stories --gaps）")
+    return {"ticker": str(ticker), "brief_id": brief.brief_id, "slots": dict(head.get("slots") or {}),
+            "evidence": {k: list(v) for k, v in (head.get("evidence") or {}).items()},
+            "candidate": dict(head.get("candidate") or {}), "bet": bet}
 
 
 def story_gaps(briefs: Iterable[Any], *, stories: Mapping[str, Mapping[str, Any]],
@@ -242,5 +274,6 @@ def gaps_now(*, today: date | None = None, path: Path | None = None) -> tuple[li
     return story_gaps(current_v2_briefs(today=today), stories=current, all_story_briefs=written), errors
 
 
-__all__ = ["STORIES_PATH", "STORY_GAP_KINDS", "current_stories", "current_v2_briefs", "gaps_now", "prepare_story", "read_records",
+__all__ = ["STORIES_PATH", "STORY_GAP_KINDS", "bet_only_spec", "current_stories", "current_v2_briefs", "gaps_now", "prepare_story",
+           "read_records",
            "story_at", "story_gaps", "story_id", "story_spec_problems", "write_story"]

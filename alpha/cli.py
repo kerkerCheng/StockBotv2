@@ -1015,13 +1015,16 @@ def cmd_stories(args: argparse.Namespace) -> int:
     - `--list`（預設）：現行的故事（給 TICKER 就只列那一檔，印每一格）。
     - `--check spec.json`：乾跑——跟 `--add` 同一份核對，不寫檔。
     - `--add spec.json`：一筆或一批（`[…]` 或 `{"items": […]}`）；每筆 `{ticker, brief_id, slots, evidence, candidate}`。
-      **先全部核對、全過才寫**（任一筆不過整批不寫，逐筆說原因）。
+      **先全部核對、全過才寫**（任一筆不過整批不寫，逐筆說原因）。選填 `bet`＝賭注句
+      `{stake: 押哪個量, doubling: 翻倍要哪個營業數字到多少、最晚哪一份文件看得到, disproof: 第幾條反證}`（2026-11-22）。
+    - `--bet-only`（搭配 `--check`／`--add`）：每筆只給 `{ticker, bet}`——故事其他格沿用現行那一筆，只加或換賭注句。
     - `--gaps`：現行敘事裡還沒有故事的（從沒寫／敘事換版、故事過期）——與待做清單 ⑤ 同一份判定。
 
     ⚠ 故事只是那一格的人話：依據照舊在敘事那一格；不 gate 任何東西、不改候選狀態。寫完重跑
     `python -m webapp materialize <TICKER>`（候選短標要再跑 `--candidates`）首屏才看得到。
     """
-    from .providers.stories import current_stories, gaps_now, prepare_story, write_story
+    from .narrative.story import DOUBLING_KIND_LABELS, doubling_kind
+    from .providers.stories import bet_only_spec, current_stories, gaps_now, prepare_story, write_story
 
     def _items(raw: Any) -> list[Any]:
         items = raw.get("items") if isinstance(raw, dict) and "items" in raw else raw
@@ -1034,14 +1037,21 @@ def cmd_stories(args: argparse.Namespace) -> int:
             print(f"✗ spec 讀不到：{exc}", file=sys.stderr)
             return 2
         failed = 0
+        specs: list[Any] = []
         for spec in items:
             ticker = str((spec or {}).get("ticker") or "") if isinstance(spec, dict) else ""
             try:
                 if not ticker:
                     raise ValueError("每一筆都要寫 ticker")
+                if args.bet_only:
+                    # 只加（或換）賭注句：故事其他格沿用現行那一筆，一個字不動
+                    if set(spec) - {"ticker", "bet"}:
+                        raise ValueError("--bet-only 的每一筆只給 {ticker, bet}——故事其他格沿用現行那一筆")
+                    spec = bet_only_spec(ticker, spec.get("bet"))
                 _record, problems = prepare_story(ticker, spec)
             except (AlphaError, ValueError) as exc:
                 problems = [str(exc)]
+            specs.append(spec)
             if problems:
                 failed += 1
                 print(f"✗ {ticker or '（沒寫 ticker）'}：\n  - " + "\n  - ".join(problems), file=sys.stderr)
@@ -1053,10 +1063,12 @@ def cmd_stories(args: argparse.Namespace) -> int:
         if args.check:
             print(f"✓ {len(items)} 筆全過（乾跑，沒寫）")
             return 0
-        for spec in items:
+        for spec in specs:
             record = write_story(str(spec["ticker"]), spec)
             print(f"  寫入 {record['ticker']} {record['story_id']}（對 {record['brief_id']}）"
-                  + ("（換版）" if record.get("supersedes_id") else ""))
+                  + ("（換版）" if record.get("supersedes_id") else "")
+                  + (f"｜賭注句：翻倍要＝{DOUBLING_KIND_LABELS[doubling_kind(record['bet'].get('doubling'))]}"
+                     if record.get("bet") else ""))
         print(f"✓ 寫入 {len(items)} 筆；下一步：python -m webapp materialize <TICKER>（候選短標再跑 --candidates）")
         return 0
     if args.gaps:
@@ -1085,6 +1097,12 @@ def cmd_stories(args: argparse.Namespace) -> int:
         if args.ticker:
             for key, text in (r.get("slots") or {}).items():
                 print(f"    {key}：{text}")
+            bet = r.get("bet")
+            if bet:
+                print(f"    賭注句｜押：{bet.get('stake')}｜翻倍要：{bet.get('doubling')}"
+                      f"（{DOUBLING_KIND_LABELS[doubling_kind(bet.get('doubling'))]}）｜認錯看：第 {bet.get('disproof')} 條反證")
+            else:
+                print("    賭注句：還沒寫（python -m alpha stories --add spec.json --bet-only；spec 每筆 {ticker, bet}）")
     if errors:
         print(f"⚠ 解析失敗 {len(errors)} 行：" + "；".join(errors[:3]))
     return 0
@@ -1355,6 +1373,8 @@ def build_parser() -> argparse.ArgumentParser:
     told.add_argument("--check", help="乾跑：核對一筆或一批 spec，不寫檔")
     told.add_argument("--add", help="寫入一筆或一批（先全部核對、全過才寫）")
     told.add_argument("--gaps", action="store_true", help="現行敘事裡還沒有故事的（從沒寫／過期）")
+    told.add_argument("--bet-only", action="store_true",
+                      help="搭配 --check／--add：spec 每筆只給 {ticker, bet}，故事其他格沿用現行那一筆（只加或換賭注句）")
     told.add_argument("--format", choices=("markdown", "json"), default="markdown")
     told.set_defaults(func=cmd_stories)
 

@@ -87,7 +87,7 @@ def story_length(text: str) -> int:
 
 def story_problems(key: str, text: object, *, limit: int = STORY_MAX) -> list[str]:
     """一句故事的問題清單（空＝可以寫）。`key` 是格名（`demand`…）或 `candidate`；只用來寫錯誤訊息。"""
-    label = STORY_SLOT_LABELS.get(key, "候選理由" if key == "candidate" else key)
+    label = STORY_SLOT_LABELS.get(key) or BET_LABELS.get(key) or ("候選理由" if key == "candidate" else key)
     where = f"故事〔{label}〕"
     if not isinstance(text, str) or not text.strip():
         return [f"{where} 必須是非空字串"]
@@ -201,7 +201,80 @@ def missing_label_problems(label: object) -> list[str]:
     return out
 
 
+# ---------------------------------------------------------------------------
+# 賭注句（2026-11-22 使用者「A0 1b 2B 3b，S1–S3 做」；提案 docs/brainstorms/2026-11-22-a0-bet-line-proposal.md）
+# ---------------------------------------------------------------------------
+# 使用者 2026-11-20：「難把敘事組成一個我們在賭的東西」。一檔一句四格：押什麼｜翻倍要什麼｜下一個對帳日｜認錯看哪一條。
+# 寫的人只寫前兩格的字與「第幾條反證」；押哪一層照抄敘事的 rides、對帳日與反證的條件／到期由程式帶（`alpha.narrative.bet_line`）。
+# 它是故事（不比依據多主張）：住故事紀錄的選填鍵 `bet`，敘事換版就跟著故事一起過期。不 gate、不改候選狀態、不排序。
+
+BET_KEYS: tuple[str, ...] = ("stake", "doubling", "disproof")
+BET_LABELS: Mapping[str, str] = {"bet.stake": "賭注句：押什麼", "bet.doubling": "賭注句：翻倍要"}
+BET_STAKE_MAX = 60
+BET_DOUBLING_MAX = 80
+#: 賭注句兩格都不准的 placeholder：價格與已定價的數字（與「必須為真」那一格同一份禁用清單——那一格只談條件，G3）。
+BET_FORBIDDEN_PLACEHOLDERS: frozenset[str] = frozenset({"price", "own_history_pctile", "cohort_median"})
+#: 賭注句兩格都不准的字：它講的是營業數字，不是價格。
+BET_PRICE_WORDS: tuple[str, ...] = ("股價", "目標價", "報酬率", "本益比", "市值要")
+#: 「翻倍要」寫不出數字時的合法寫法：以這三個字開頭、寫明缺什麼（例：「無法量：缺產能與單價」）。
+BET_UNMEASURABLE_PREFIX = "無法量"
+#: 「翻倍要」機械分三種——**只標不擋**（L18：偵測器生出問句，不自動修）：有數字有時點｜宣告無法量｜其餘。
+DOUBLING_KINDS: tuple[str, ...] = ("number", "unmeasurable", "vague")
+DOUBLING_KIND_LABELS: Mapping[str, str] = {"number": "有數字", "unmeasurable": "無法量", "vague": "翻倍條件還沒寫成數字"}
+#: 時點的字（年、季、半年、哪一份定期報告）；判「有數字」前先拿掉，免得「2027 年要大幅成長」的 2027 被當成數字。
+_BET_TIME = re.compile(r"20\d{2}\s*年(?:度)?(?:\s*第?\s*[一二三四1-4]\s*季)?|第\s*[一二三四1-4]\s*季|[上下]半年|Q[1-4]|\d{1,2}\s*月")
+_BET_QUANTITY = re.compile(r"\d|[一二兩三四五六七八九十百千]\s*(?:倍|成|億|萬)|翻倍|倍增")
+
+
+def doubling_kind(text: object) -> str:
+    """「翻倍要」那一句屬於哪一種（`DOUBLING_KINDS`）。純函式；placeholder（起點的市值、近四季營收）不算條件的數字。"""
+    if not isinstance(text, str) or not text.strip():
+        return "vague"
+    body = text.strip()
+    if body.startswith(BET_UNMEASURABLE_PREFIX):
+        return "unmeasurable"
+    bare = SIMPLE_PLACEHOLDER.sub("", PARAM_PLACEHOLDER.sub("", body))
+    has_time = bool(_BET_TIME.search(bare))
+    has_quantity = bool(_BET_QUANTITY.search(_BET_TIME.sub("", bare)))
+    return "number" if has_time and has_quantity else "vague"
+
+
+def bet_problems(bet: object, *, disproof_count: int) -> list[str]:
+    """賭注句的問題清單（空＝可以寫）。`disproof_count`：這一版敘事有幾條反證（`disproof` 是從 1 起的序號）。"""
+    if not isinstance(bet, Mapping):
+        return ["bet 必須是 {stake: 押哪個量, doubling: 翻倍要哪個營業數字到多少、最晚哪一份文件看得到, disproof: 第幾條反證}"]
+    out: list[str] = []
+    unknown = sorted(set(bet) - set(BET_KEYS))
+    if unknown:
+        out.append(f"bet 有不認得的鍵 {unknown}；認得的是 {list(BET_KEYS)}（押哪一層不用寫——照抄敘事的 rides；對帳日由程式帶）")
+    for key, limit in (("stake", BET_STAKE_MAX), ("doubling", BET_DOUBLING_MAX)):
+        text = bet.get(key)
+        where = f"故事〔{BET_LABELS['bet.' + key]}〕"
+        out += story_problems("bet." + key, text, limit=limit)
+        if not isinstance(text, str):
+            continue
+        for name in SIMPLE_PLACEHOLDER.findall(PARAM_PLACEHOLDER.sub("", text)):
+            if name in BET_FORBIDDEN_PLACEHOLDERS:
+                out.append(f"{where} 用了 {{{name}}}——賭注句只講營業數字，價格與已定價的數字不得出現（G3）")
+        for word in BET_PRICE_WORDS:
+            if word in text:
+                out.append(f"{where} 含「{word}」——賭注句只講營業數字（營收、出貨、產能、毛利），不講價格")
+    doubling = bet.get("doubling")
+    if isinstance(doubling, str) and doubling.strip().startswith(BET_UNMEASURABLE_PREFIX):
+        rest = doubling.strip()[len(BET_UNMEASURABLE_PREFIX):].lstrip("：:，, ")
+        if "缺" not in rest or len(rest) < 3:
+            out.append(f"故事〔{BET_LABELS['bet.doubling']}〕寫「無法量」要寫明缺什麼（例：無法量：缺產能與單價）")
+    n = bet.get("disproof")
+    if isinstance(n, bool) or not isinstance(n, int):
+        out.append("bet.disproof 必須是整數——這一版敘事的第幾條反證（從 1 起）")
+    elif not 1 <= n <= disproof_count:
+        out.append(f"bet.disproof＝{n} 超出範圍——這一版敘事有 {disproof_count} 條反證（從 1 起）")
+    return out
+
+
 __all__ = [
+    "BET_DOUBLING_MAX", "BET_FORBIDDEN_PLACEHOLDERS", "BET_KEYS", "BET_LABELS", "BET_PRICE_WORDS", "BET_STAKE_MAX",
+    "BET_UNMEASURABLE_PREFIX", "DOUBLING_KINDS", "DOUBLING_KIND_LABELS", "bet_problems", "doubling_kind",
     "CANDIDATE_STORY_MAX", "MISSING_LABEL_MAX", "PLACEHOLDER_WIDTH", "STORY_DATE_PLACEHOLDERS", "STORY_MAX",
     "STORY_ONLY_KEYS", "STORY_ONLY_SLOTS", "STORY_RELATIVE_YEARS", "STORY_SLOT_KEYS", "STORY_SLOT_LABELS",
     "STORY_SYSTEM_WORDS",
