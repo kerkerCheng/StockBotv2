@@ -124,6 +124,16 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 `StockBotv2-Daily` 的 ⑱⑲ 取代（1.2a 停用、2026-09-25 1.2b 刪除）；它們的理由（LLM 失敗心跳照發、永遠 exit 0、Python 不用 `.cmd`、
 發送走 subprocess）搬進 `crons/daily_task.py` 的 docstring，守它們的測試改主詞搬進 `tests/test_daily_task.py`「無人值守入口」節。
 
+### Sandbox impact review 結論（2026-11-22：A0 賭注句與對帳日曆 S1–S3——使用者「A0 1b 2B 3b，S1–S3 做」）
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | 不新增命令、不改 daily 的 argv。daily ⑬ materialize：候選列多兩個加法欄 `bet_line`、`check_calendar`（讀它本來就讀的敘事、故事紀錄、watch、名冊檢核點；不多讀一個檔、不連外、不跑 LLM、不寫 ledger），個股頁候選面板多一行、卡片多兩格、`.meta.json` 的頁面合約升 1.7。daily ⑱ 心跳：⑤ 多三格（賭注句還沒寫／翻倍條件還沒寫成數字／沒有對帳日），讀它本來就讀的候選板；板或持股沒讀到＝這三格未讀到，不是 0。APP 的 `/api/v1/stocks` 日曆從 14 天改回到 90 天、每天標 `near`，仍是純選取、沒有寫入端點。寫入面只有互動 session 手跑的 `python -m alpha stories --add spec.json --bet-only`（S1；append-only 私有區） |
+| **2 canonical skill／prompt／本檔** | 本節；research-drain SKILL「段『賭注句』」；ARCHITECTURE §6.11「賭注句與對帳日曆」；提案 `docs/brainstorms/2026-11-22-a0-bet-line-proposal.md` §5.1。無人值守 prompt 不動 |
+| **3 最窄 rule** | daily argv 不變；不新增 step、allowlist、rule；`.codex/rules` 仍 0 條 |
+| **4 contract test** | `tests/test_bet_line.py`（寫入規則、對帳日只認帶年份或 90 天內的確切月日、序號解析到 watch、四種狀態、三個計數、未讀到不是 0、候選面板那一行的三種缺席、B13、前端只照印不組字）；`tests/test_todo_ledger.py` 涵蓋登記表多兩個字彙；`tests/test_webapp_home_cards.py` 日曆（近的／90 天內／過了的對帳日不列／不欠的檔不帶）；`tests/test_page_schema.py` 十四塊 |
+| **5 端到端 smoke** | 11-22 真資料：物化候選板＋欠賭注句的 19 檔；手跑心跳短版 ⑤ 印「賭注句還沒寫 19 檔（從沒寫 19）」，另兩格在 0 的格；無頭 Edge 四頁——已持有沒寫的個股頁印「還沒寫賭注句」＋下一個對帳日、缺 X 的個股頁整塊不印、依層頁 21 處（19 檔，一檔押三層）、首頁日曆 17 列（對帳日 13＋重看日 4）。「寫了之後印四句」在故事紀錄的暫存副本上驗（S4 還沒放行，沒寫真的紀錄）。APP 12:40 重啟、`code.stale=false` |
+
 ### Sandbox impact review 結論（2026-11-13：錨點收自家紀錄——plan 2026-11-13-001；failure log #163，使用者「自家句 A」）
 
 | 步 | 結論 |

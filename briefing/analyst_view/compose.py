@@ -452,6 +452,20 @@ A_DOWNSIDE = "engine_b://event_watch/downside"
 _THREE_WORD_LABELS = (("will_it_die", "會死嗎"), ("priced_in", "已定價嗎"), ("in_numbers", "出現在數字裡了嗎"))
 
 
+def _bet_line_datum(bet: Mapping[str, Any]) -> Datum:
+    """賭注句那一行（A0，2026-11-22）：寫了＝那四句（`alpha.bet_line` 組好的，照抄）；可開／已持有沒寫＝還沒寫；缺 X／不要的檔
+    不欠——不適用是已定的缺席，不是待做。頁面合約 B13 的填得滿表讀這一行自己宣告的缺席（L16）；畫面印的句子在候選狀態
+    那一格的 `bet_line.lines`（沒寫而且欠的那一句「還沒寫賭注句」也在那裡）。"""
+    base = dict(key="candidate:bet_line", label="賭注句", authority=A_CANDIDATES,
+                method="alpha.bet_line.bet_line（候選列同一個推導；寫的人的字住故事紀錄的 bet）")
+    if bet.get("state") == "written":
+        return Datum(**base, value=list(bet.get("lines") or ()), status="available", basis="session_judgment")
+    if bet.get("owed"):
+        return Datum(**base, status="missing", absence_kind="not_yet_recorded", reason=bet.get("state_label"))
+    return Datum(**base, status="not_applicable", absence_kind="method_not_applicable",
+                 reason="這一檔不欠賭注句——可開與已持有才寫")
+
+
 def _candidate_panel(candidate: Mapping[str, Any] | None) -> AnalystPanel:
     """首屏末行（optional，Phase 3 Step 3.7）：候選狀態＋財務三題三個字。
 
@@ -484,6 +498,10 @@ def _candidate_panel(candidate: Mapping[str, Any] | None) -> AnalystPanel:
         state = Datum(key="candidate:state", label="候選狀態", status="missing", authority=A_CANDIDATES,
                       absence_kind=declared.get("kind") or "not_yet_recorded", reason=declared.get("reason"))
     lines = [_line(state.key, state.label, state, "candidate")]
+    bet = row.get("bet_line") if row is not None else None
+    if isinstance(bet, Mapping):
+        datum = _bet_line_datum(bet)
+        lines.append(_line(datum.key, datum.label, datum, "candidate"))
     for key, label in _THREE_WORD_LABELS:
         word = words.get(key) or "未讀到"
         datum = Datum(key=f"candidate:{key}", label=label, value=word, status="available", basis="deterministic",

@@ -17,7 +17,7 @@ ROOT = Path(__file__).resolve().parent.parent
 
 def test_the_contract_is_closed_and_complete() -> None:
     assert ps.check_schema() == []
-    assert [b.key for b in ps.BLOCKS] == [f"B{i}" for i in range(13)]          # 十三塊（§5.3）
+    assert [b.key for b in ps.BLOCKS] == [f"B{i}" for i in range(14)]          # 十三塊（§5.3）＋ B13 賭注句（2026-11-22 A0）
     assert {e.block for e in ps.ELEMENTS} == {b.key for b in ps.BLOCKS}
 
 

@@ -47,7 +47,7 @@ def test_the_first_39_rows_are_the_brainstorm_table_verbatim() -> None:
 
 
 @pytest.mark.parametrize("over, message", [
-    ({"elements": ["B13"]}, "未登記的鍵"),
+    ({"elements": ["B99"]}, "未登記的鍵"),         # B13 自 2026-11-22（A0 賭注句）起是登記過的塊
     ({"elements": []}, "至少一個"),
     ({"elements": ["B2", "B2"]}, "重複"),
     ({"schema_version": "stock-page-schema/9.9"}, "不是出現過的版本"),

@@ -181,6 +181,7 @@ def _card_overview(view: Mapping[str, Any], inputs: Mapping[str, Any] | None) ->
     row = (_line_map(view.get("candidate") or {}).get("candidate:state") or {}).get("value")
     row = row if isinstance(row, Mapping) else {}
     watch = row.get("watch") if isinstance(row.get("watch"), Mapping) else None
+    bet = row.get("bet_line") if isinstance(row.get("bet_line"), Mapping) else None
     if rec is not None:
         tagline = {"text": rec.get("text"), "source": "ledger", "written_at": str(rec.get("created_at") or "")[:10] or None}
     elif rides:
@@ -214,6 +215,13 @@ def _card_overview(view: Mapping[str, Any], inputs: Mapping[str, Any] | None) ->
         # ⚠ 2026-11-03（盲點修法第 18＋16 條）：「只差已定價」那一格隨等回落併回可開退役
         "spark": [{"session_date": r["session_date"], "close": r["close"]} for r in series[-CARD_SPARK_SESSIONS:]],
         "move": move,
+        # 賭注句與對帳日曆（A0，2026-11-22）：候選列那兩格照抄——「依層」頁每檔印那幾句、首頁日曆讀對帳日。日曆只帶欠賭注句
+        # 的檔（可開、已持有；`bet_line.owed` 由產生端給）：缺 X 的檔在日曆上是它的重看日（上面的 watch），不要的檔不上日曆。
+        # 沒有候選列＝None（不是空：那一檔沒有敘事）
+        "bet_line": ({"state": bet.get("state"), "state_label": bet.get("state_label"), "owed": bool(bet.get("owed")),
+                      "lines": list(bet.get("lines") or ())} if bet is not None else None),
+        "check_calendar": ([dict(item) for item in row.get("check_calendar") or () if isinstance(item, Mapping)]
+                           if bet is not None and bet.get("owed") else []),
     }
 
 

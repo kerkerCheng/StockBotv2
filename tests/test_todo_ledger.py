@@ -25,7 +25,9 @@ CHECKPOINT_OK = {"status": "ok", "filings": "ok", "calendar": "ok", "reason": No
 # ---------------------------------------------------------------------------
 
 def _vocabularies() -> dict[str, set[str]]:
+    from alpha.bet_line import BET_LINE_STATES
     from alpha.candidates import GROUPS, SIDE_GROUPS
+    from alpha.narrative.story import DOUBLING_KINDS
     from alpha.providers.fact_anchors import ANCHOR_SCOPE
     from alpha.providers.fact_checks import FACT_CHECK_GAP_KINDS
     from alpha.providers.stories import STORY_GAP_KINDS
@@ -50,11 +52,14 @@ def _vocabularies() -> dict[str, set[str]]:
         "fact_check": set(FACT_CHECK_GAP_KINDS),
         "fact_anchor": set(ANCHOR_SCOPE),
         "admission_audit": set(admission_audit.AUDIT_STATES),
+        "bet_line": set(BET_LINE_STATES),
+        "doubling": set(DOUBLING_KINDS),
     }
 
 
 @pytest.mark.parametrize("prefix", ["lead", "segment", "watch", "expiry", "dispatch", "hypothesis", "thesis",
-                                    "candidate", "reading", "story", "fact_check", "fact_anchor", "admission_audit"])
+                                    "candidate", "reading", "story", "fact_check", "fact_anchor", "admission_audit",
+                                    "bet_line", "doubling"])
 def test_every_state_in_every_vocabulary_has_a_registered_destination(prefix: str) -> None:
     missing = sorted(v for v in _vocabularies()[prefix] if f"{prefix}:{v}" not in tl.COVERAGE)
     assert not missing, (f"{prefix} 有狀態沒登記去處：{missing}——新增狀態時先在 engine_b/todo_ledger.py 的 COVERAGE "

@@ -69,6 +69,9 @@ def test_the_first_screen_places_every_v2_slot_and_part_exactly_once() -> None:
     assert all(r.pending for r in BLOCK_READINGS if not (r.slots or r.parts))
     # 2026-11-18 使用者「量獨立一個」：B12 量 → 錢 → 價接上敘事的量級（選填格）；沒寫的照「還沒寫」收進頁尾（app.js）
     assert by_block["B12"].slots == ("magnitude",) and by_block["B12"].pending is None
+    # 2026-11-22 A0：賭注句（一句四格）排在論點段最前——候選列自己導出的那幾句，不占故事的七格
+    assert by_block["B13"].parts == ("bet_line",) and by_block["B13"].slots == ()
+    assert FIRST_SCREEN_SECTIONS[0]["blocks"] == ("B13", "B1")
 
 
 def test_the_meta_carries_the_one_copy_and_app_js_keeps_none(tmp_path: Path) -> None:

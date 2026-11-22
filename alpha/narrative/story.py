@@ -212,8 +212,9 @@ BET_KEYS: tuple[str, ...] = ("stake", "doubling", "disproof")
 BET_LABELS: Mapping[str, str] = {"bet.stake": "賭注句：押什麼", "bet.doubling": "賭注句：翻倍要"}
 BET_STAKE_MAX = 60
 BET_DOUBLING_MAX = 80
-#: 賭注句兩格都不准的 placeholder：價格與已定價的數字（與「必須為真」那一格同一份禁用清單——那一格只談條件，G3）。
-BET_FORBIDDEN_PLACEHOLDERS: frozenset[str] = frozenset({"price", "own_history_pctile", "cohort_median"})
+# 賭注句兩格**不收任何 placeholder**（S2，2026-11-22；比提案寫的「價格與已定價的佔位字不得出現」嚴）：這一句不只印在個股頁，
+# 也印在沒有值表的地方（依層頁、日曆、待做清單）——同一句不能有填了值與沒填值兩種樣子（L12）。只寫門檻（到多少），
+# 現在是多少留在依據。價格與已定價的數字因此本來就進不來（G3）。檢查在 `bet_problems`。
 #: 賭注句兩格都不准的字：它講的是營業數字，不是價格。
 BET_PRICE_WORDS: tuple[str, ...] = ("股價", "目標價", "報酬率", "本益比", "市值要")
 #: 「翻倍要」寫不出數字時的合法寫法：以這三個字開頭、寫明缺什麼（例：「無法量：缺產能與單價」）。
@@ -227,15 +228,14 @@ _BET_QUANTITY = re.compile(r"\d|[一二兩三四五六七八九十百千]\s*(?:�
 
 
 def doubling_kind(text: object) -> str:
-    """「翻倍要」那一句屬於哪一種（`DOUBLING_KINDS`）。純函式；placeholder（起點的市值、近四季營收）不算條件的數字。"""
+    """「翻倍要」那一句屬於哪一種（`DOUBLING_KINDS`）。純函式。"""
     if not isinstance(text, str) or not text.strip():
         return "vague"
     body = text.strip()
     if body.startswith(BET_UNMEASURABLE_PREFIX):
         return "unmeasurable"
-    bare = SIMPLE_PLACEHOLDER.sub("", PARAM_PLACEHOLDER.sub("", body))
-    has_time = bool(_BET_TIME.search(bare))
-    has_quantity = bool(_BET_QUANTITY.search(_BET_TIME.sub("", bare)))
+    has_time = bool(_BET_TIME.search(body))
+    has_quantity = bool(_BET_QUANTITY.search(_BET_TIME.sub("", body)))
     return "number" if has_time and has_quantity else "vague"
 
 
@@ -254,8 +254,8 @@ def bet_problems(bet: object, *, disproof_count: int) -> list[str]:
         if not isinstance(text, str):
             continue
         for name in SIMPLE_PLACEHOLDER.findall(PARAM_PLACEHOLDER.sub("", text)):
-            if name in BET_FORBIDDEN_PLACEHOLDERS:
-                out.append(f"{where} 用了 {{{name}}}——賭注句只講營業數字，價格與已定價的數字不得出現（G3）")
+            out.append(f"{where} 用了 {{{name}}}——賭注句不用佔位字（這一句也印在依層頁與日曆，那裡沒有值可填）："
+                       "只寫門檻（到多少），現在是多少留在依據；價格與已定價的數字本來就不得出現（G3）")
         for word in BET_PRICE_WORDS:
             if word in text:
                 out.append(f"{where} 含「{word}」——賭注句只講營業數字（營收、出貨、產能、毛利），不講價格")
@@ -273,7 +273,7 @@ def bet_problems(bet: object, *, disproof_count: int) -> list[str]:
 
 
 __all__ = [
-    "BET_DOUBLING_MAX", "BET_FORBIDDEN_PLACEHOLDERS", "BET_KEYS", "BET_LABELS", "BET_PRICE_WORDS", "BET_STAKE_MAX",
+    "BET_DOUBLING_MAX", "BET_KEYS", "BET_LABELS", "BET_PRICE_WORDS", "BET_STAKE_MAX",
     "BET_UNMEASURABLE_PREFIX", "DOUBLING_KINDS", "DOUBLING_KIND_LABELS", "bet_problems", "doubling_kind",
     "CANDIDATE_STORY_MAX", "MISSING_LABEL_MAX", "PLACEHOLDER_WIDTH", "STORY_DATE_PLACEHOLDERS", "STORY_MAX",
     "STORY_ONLY_KEYS", "STORY_ONLY_SLOTS", "STORY_RELATIVE_YEARS", "STORY_SLOT_KEYS", "STORY_SLOT_LABELS",

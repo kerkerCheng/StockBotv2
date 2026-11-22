@@ -301,8 +301,9 @@ PLAIN_WIPEOUT = (
 
 #: 個股頁首屏的既有元件（封閉字彙；Phase 7 Step 7.0e）。五題只**重排**它們，不新增判斷、不改任何 Datum：
 #: 三個字（候選面板）、歸零燈（wipeout 面板）、反證列（downside 面板）、加碼條件與「是不是新賭注」（候選狀態那一份）。
+#: 2026-11-22（A0）加 `bet_line`：賭注句一句四格（候選狀態那一份的 `bet_line`，句子由 `alpha.bet_line` 組好）。
 FIRST_SCREEN_PARTS: tuple[str, ...] = (
-    "priced_in", "in_numbers", "will_it_die", "wipeout", "disproof", "confirm", "shared_bet",
+    "priced_in", "in_numbers", "will_it_die", "wipeout", "disproof", "confirm", "shared_bet", "bet_line",
 )
 
 #: ⚠ 2026-10-08（個股頁 S5）：首屏五題（Phase 7 Step 7.0e 的 `FIRST_SCREEN_QUESTIONS`）退役——「哪一格放哪一塊」改由

@@ -120,6 +120,68 @@ def when_dates(text: str, *, written_on: date) -> list[date]:
     return sorted({end for _, end in when_spans(text, written_on=written_on)})
 
 
+#: 對帳日認沒寫年份的月日，只認到寫下那天之後幾天（2026-11-22 A0 S2 驗收：可開＋已持有 19 檔逐檔看過，沒寫年份的月日 7 筆裡
+#: 3 筆讀錯——「只有 03-06 第一次呈交」「照 Q1 8-10 的節奏」「9 月 15 日寫 1b 在試車」，都是回頭講的日子被推成明年，落在
+#: 寫下那天之後 116～304 天；讀對的 3 筆都在 50 天內）。推出來落在 d 天後，另一種讀法就是 365−d 天前：一季以內的另一種讀法
+#: 是九個月前，何時格不太會不寫年份地講那麼久以前的事。
+YEARLESS_AHEAD_DAYS = 90
+
+#: 一句的結尾——對帳日帶的是日子所在的那一句原文。
+_SENTENCE_BREAKS = "。；\n"
+
+
+def _sentence_around(text: str, start: int, end: int) -> str:
+    left = max(text.rfind(ch, 0, start) for ch in _SENTENCE_BREAKS) + 1
+    rights = [i for ch in _SENTENCE_BREAKS if (i := text.find(ch, end)) >= 0]
+    return text[left:min(rights) if rights else len(text)].strip()
+
+
+def reckoning_days(text: str, *, written_on: date) -> list[dict[str, Any]]:
+    """對帳日（A0，2026-11-22）：何時格裡**寫得出是哪一天**的日子，連它所在的那一句原文——`{date, sentence, yearless}`，
+    照日期排；同一天同一句只留一筆。
+
+    比 `when_spans` 窄，因為它印給人看、還排進日曆：只認**有年份的**（ISO、年月日、年月與旬——只寫到旬或月的取那一段的
+    最後一天）與**寫得出確切月日、而且落在寫下那天之後 `YEARLESS_AHEAD_DAYS` 天內的**（年份照 `_year_for` 推，
+    `yearless=True`，畫面標出來）。沒寫年份的另外兩種不認，因為何時格常回頭講剛讀過的事、年份會被推成明年：
+    只寫到旬的（「9 月底合約負債…」→ 明年 9 月）、與推出來落在一季以後的月日（「只有 03-06 第一次呈交」→ 明年 3 月）。
+    `checkpoint_passed` 照舊認它們（那邊多認一個，只多一次重寫提醒）。開始那天要晚於寫下那天（與 `checkpoint_passed`
+    同一條：寫下當天的日子多半是「查到哪一天」）。
+    ⚠ 它只知道「這一句有一個日子」，不知道那是不是文件出來的日子——所以原句永遠跟著印（L18）。只寫「2027 年初」
+    「2027 年 2–3 月」的讀不出日子（已知漏的那一半）。"""
+    text = text or ""
+    found: dict[tuple[date, str], dict[str, Any]] = {}
+    spans: list[tuple[int, int]] = []
+
+    def put(start: date, end: date, m: re.Match, yearless: bool) -> None:
+        if start <= written_on:
+            return
+        sentence = _sentence_around(text, m.start(), m.end())
+        found.setdefault((end, sentence), {"date": end, "sentence": sentence, "yearless": yearless})
+
+    for pattern in (_ISO, _YMD):
+        for m in pattern.finditer(text):
+            spans.append(m.span())
+            d = _safe(int(m.group(1)), int(m.group(2)), int(m.group(3)))
+            if d is not None:
+                put(d, d, m, False)
+    for m in _YM.finditer(text):
+        year, month = int(m.group(1)), int(m.group(2))
+        spans.append(m.span())
+        if 1 <= month <= 12:
+            start, end = _part_span(year, month, m.group(3))
+            put(start, end, m, False)
+    for pattern in (_MD, _M_D):
+        for m in pattern.finditer(text):
+            if any(a <= m.start() < b for a, b in spans):
+                continue
+            month, day = int(m.group(1)), int(m.group(2))
+            if 1 <= month <= 12 and 1 <= day <= 31:
+                d = _year_for(month, day, written_on)
+                if d is not None and d <= written_on + timedelta(days=YEARLESS_AHEAD_DAYS):
+                    put(d, d, m, True)
+    return sorted(found.values(), key=lambda r: (r["date"], r["sentence"]))
+
+
 def _part_span(year: int, month: int, part: str | None) -> tuple[date, date]:
     """上旬／初＝1～10 日、中旬／中＝11～20 日、下旬／底＝21 日～月底、沒寫＝整個月。"""
     last = calendar.monthrange(year, month)[1]
@@ -225,6 +287,7 @@ def when_text_since(records: Sequence[Any], brief: Any) -> datetime:
     return origin.created_at
 
 
-__all__ = ["CHECKPOINT_KINDS", "CHECKPOINT_PASSED_PREFIX", "PLACEHOLDER", "WHEN_FORMS", "YEARLESS_BACK_DAYS",
-           "checkpoint_passed", "checkpoint_reason", "placeholder_as_event", "when_dates", "when_forms",
+__all__ = ["CHECKPOINT_KINDS", "CHECKPOINT_PASSED_PREFIX", "PLACEHOLDER", "WHEN_FORMS", "YEARLESS_AHEAD_DAYS",
+           "YEARLESS_BACK_DAYS",
+           "checkpoint_passed", "checkpoint_reason", "placeholder_as_event", "reckoning_days", "when_dates", "when_forms",
            "when_spans", "when_text_since"]

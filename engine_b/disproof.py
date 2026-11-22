@@ -443,6 +443,37 @@ def confirm_summary(rows: Sequence[Mapping[str, Any]]) -> str | None:
             else f"其餘加碼條件 {waiting} 條在等")
 
 
+def disproof_pointers(current_brief: Any, watches: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
+    """現行敘事 `disproof[]` 每一條（序號從 1 起）與盯它的 watch：條件、watch 編號、到期日、狀態——賭注句「認錯看第幾條」
+    與對帳日曆「反證到期」讀它（A0，2026-11-22）。
+
+    對的是**來源鍵**：自己登記的＝`brief:<brief_id>#<n>`（`register_brief_watches` 寫的那一個），連結的＝`link_source_ref`。
+    沒有處理中的 watch 印「未盯」，到期日退回敘事那一條自己寫的（INV-3）。
+    ⚠ `downside_rows` 對自己登記的那幾條是對「來源＋條件文字」（位置不算身分，RB-2）——那邊在數條件；這邊在解寫的人
+    指的那個序號，所以對位置。"""
+    if current_brief is None:
+        return []
+    live = [(cat, w) for w in watches if (cat := watch_category(w)) is not None and cat != CONFIRM]
+    rows: list[dict[str, Any]] = []
+    for index, entry in enumerate(getattr(current_brief, "disproof", ()) or (), 1):
+        ref = str(entry.link_source_ref) if entry.link_source_ref else f"brief:{current_brief.brief_id}#{index}"
+        hits = [(cat, w) for cat, w in live if str(w.get("source_ref") or "") == ref]
+        cat, watch = (max(hits, key=lambda h: (_PRIORITY[h[0]], 1 if h[1].get("status") == "fired" else 0))
+                      if hits else (None, None))
+        if watch is None:
+            state = "unwatched"
+        elif cat == "watching":
+            state = "fired" if watch.get("status") == "fired" else "active"
+        else:
+            state = str(cat)
+        expires = (watch or {}).get("expires") or getattr(entry, "expires", None)
+        rows.append({"n": index, "source_ref": ref, "linked": bool(entry.link_source_ref), "condition": entry.condition,
+                     "watch_id": (watch or {}).get("watch_id"),
+                     "expires": (expires.isoformat() if hasattr(expires, "isoformat") else str(expires)[:10]) if expires else None,
+                     "state": state, "state_label": DOWNSIDE_STATES[state]})
+    return rows
+
+
 def condition_key(watch: Mapping[str, Any]) -> tuple[str, str]:
     """（來源, 正規化文字）——條件的身分（計數與 downside 同一個鍵；位置不算身分，RB-2）。"""
     return (str(watch.get("source_ref") or "").split("#", 1)[0], normalize(watch.get("condition")))
@@ -757,6 +788,6 @@ def frozen_history_count() -> int | None:
 
 __all__ = ["CONFIRM", "CONFIRM_STATES", "DOWNSIDE_SOURCES", "DOWNSIDE_STATES", "after_thesis_review", "condition_key",
            "confirm_counts", "confirm_line", "confirm_rows", "confirm_state", "current_layer_notes", "current_readings",
-           "disproof_counts", "downside_rows", "frozen_history_count", "load_lifecycle",
+           "disproof_counts", "disproof_pointers", "downside_rows", "frozen_history_count", "load_lifecycle",
            "memo_ref", "normalize", "reconcile_thesis_disproof", "review_horizon", "source_is_current",
            "watch_category"]

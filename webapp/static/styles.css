@@ -122,6 +122,22 @@ main { padding: 16px; max-width: 940px; margin: 0 auto; }
 .cal-names { font-size: 13px; line-height: 1.45; }
 .cal-names a { color: var(--text); text-decoration: none; }
 .cal-names a:hover { color: var(--accent); }
+/* 對帳日曆（2026-11-22 A0）：每一檔後面的小字是哪一種（重看日、何時格寫的日子…）；展開裡逐列印原句。 */
+.cal-kinds { font-size: 11px; color: var(--dim); }
+.cal-more { margin-top: 2px; font-size: 13px; }
+.cal-more > summary { cursor: pointer; color: var(--muted); padding: 3px 0; }
+.cal-row { display: grid; grid-template-columns: 6.2em 1fr; gap: 2px 8px; padding: 5px 0; border-top: 1px solid var(--border);
+           line-height: 1.5; overflow-wrap: anywhere; }
+.cal-row.past .cal-date { color: var(--flags); }
+.cal-row-body a { color: var(--text); text-decoration: none; font-weight: 600; }
+.cal-row-body a:hover { color: var(--accent); }
+.cal-text { color: var(--muted); }
+/* 賭注句（一句四格）：個股頁首屏那一塊與「依層」頁每一層底下各檔。 */
+.bet-row { color: var(--text); font-size: 13px; line-height: 1.55; }
+.bet-list { display: grid; gap: 8px; margin: 8px 0 16px; }
+.bet-item { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 7px 10px; }
+.bet-name { display: block; font-size: 13px; font-weight: 650; color: var(--text); text-decoration: none; margin-bottom: 2px; }
+.bet-name:hover { color: var(--accent); }
 
 .view-toggle { display: inline-flex; border: 1px solid var(--border); border-radius: 999px; overflow: hidden; margin: 6px 0 2px; }
 .toggle-btn { padding: 3px 14px; font-size: 13px; color: var(--muted); text-decoration: none; }

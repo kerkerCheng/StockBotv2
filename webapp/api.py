@@ -146,8 +146,11 @@ _STALE_GROUP = {"key": "stale_artifact", "label": "判讀早於這次分組（�
 #: 首頁預設展開的組（2026-10-28 使用者：「單檔判讀頁面太多檔了」）：持有、可開、缺 X——要你看的（2026-11-03 等回落
 #: 併回可開）；其餘（不要、無法量、還沒寫、非邊緣…）收合但照數。組序與中文仍只有 `.meta.json` 那一份，這裡只說哪幾組攤開。
 MAIN_GROUPS: tuple[str, ...] = ("held", "open", "missing")
-#: 「接下來兩週會揭曉」看多遠（天）。
+#: 「接下來會揭曉」預設攤開多遠（天）；`CALENDAR_MAX_DAYS`＝可以展開到多遠（2026-11-22 A0：可開那一批的對帳日多半在一季以後）。
 CALENDAR_DAYS = 14
+CALENDAR_MAX_DAYS = 90
+#: 重看日那一列的種類字（對帳日的四種由候選列自己帶 `kind_label`；這一種是候選狀態在等的那筆 watch 的 `until`）。
+REVIEW_KIND = {"kind": "review", "kind_label": "重看日"}
 
 
 def _card_name(row: Mapping[str, Any]) -> str:
@@ -155,26 +158,44 @@ def _card_name(row: Mapping[str, Any]) -> str:
 
 
 def _calendar(items: Sequence[Mapping[str, Any]], *, today: Any, order: Mapping[str, int]) -> dict[str, Any]:
-    """「接下來兩週會揭曉」：重看日落在今天＋`CALENDAR_DAYS` 天以內的檔。**時間序不是名次**——照日期，同一天照組序、ticker。
-    重看日已過還在等的也列、標「已過」（等待不得消失，INV-2）。重看日來自候選列的 watch（materialize 端照抄進 card）。"""
-    horizon = (today + timedelta(days=CALENDAR_DAYS)).isoformat()
-    days: dict[str, list[Mapping[str, Any]]] = {}
-    for row in items:
-        until = str((((row.get("card") or {}).get("watch")) or {}).get("until") or "")[:10]
+    """「接下來會揭曉」：今天＋`CALENDAR_MAX_DAYS` 天以內的日子，每一天列哪幾檔、各是哪一種。**時間序不是名次**——照日期，
+    同一天照組序、ticker；`near`＝落在預設攤開的 `CALENDAR_DAYS` 天內。**純選取**：日子與種類都是 materialize 端照抄進 card 的。
+
+    兩個來源：①重看日（候選狀態在等的那筆 watch 的 `until`）——已過還在等的也列、標「已過」（等待不得消失，INV-2）；
+    ②對帳日曆（2026-11-22 A0；`card.check_calendar`，只有可開與已持有帶）：何時格寫的日子、名冊檢核點、反證與加碼條件的到期，
+    每列帶那一句原文或條件。對帳日過了就不列——那一檔下次物化會自己跳到下一個，過了的由「敘事該重寫」講。"""
+    now = today.isoformat()
+    near = (today + timedelta(days=CALENDAR_DAYS)).isoformat()
+    far = (today + timedelta(days=CALENDAR_MAX_DAYS)).isoformat()
+    days: dict[str, dict[str, dict[str, Any]]] = {}
+
+    def put(day: str, row: Mapping[str, Any], item: Mapping[str, Any]) -> None:
         try:
-            date.fromisoformat(until)
+            date.fromisoformat(day)
         except ValueError:
-            continue
-        if until <= horizon:
-            days.setdefault(until, []).append(row)
+            return
+        if day <= far:
+            entry = days.setdefault(day, {}).setdefault(str(row.get("ticker")), {"row": row, "items": []})
+            entry["items"].append({"kind": item.get("kind"), "kind_label": item.get("kind_label"), "text": item.get("text")})
+
+    for row in items:
+        card = row.get("card") or {}
+        put(str(((card.get("watch")) or {}).get("until") or "")[:10], row, REVIEW_KIND)
+        for item in card.get("check_calendar") or ():
+            day = str(item.get("date") or "")[:10]
+            if day >= now:
+                put(day, row, item)
     dates = []
     for day in sorted(days):
-        rows = sorted(days[day], key=lambda r: (order.get(str(r.get("group")), len(order)), str(r.get("ticker") or "")))
-        dates.append({"date": day, "past": day < today.isoformat(),
-                      "stocks": [{"ticker": r.get("ticker"), "name": _card_name(r),
-                                  "state": (r.get("candidate") or {}).get("label")} for r in rows]})
-    return {"days": CALENDAR_DAYS, "today": today.isoformat(), "dates": dates,
-            "note": "重看日是研究寫下的「哪天再看」（財報期限、法說、檢核點）；照日期列，不是名次。"}
+        entries = sorted(days[day].values(), key=lambda e: (order.get(str(e["row"].get("group")), len(order)),
+                                                             str(e["row"].get("ticker") or "")))
+        dates.append({"date": day, "past": day < now, "near": day <= near,
+                      "stocks": [{"ticker": e["row"].get("ticker"), "name": _card_name(e["row"]),
+                                  "state": (e["row"].get("candidate") or {}).get("label"), "items": e["items"]}
+                                 for e in entries]})
+    return {"days": CALENDAR_DAYS, "max_days": CALENDAR_MAX_DAYS, "today": now, "dates": dates,
+            "note": "照日期列，不是名次。重看日是研究寫下的「哪天再看」；對帳日是可開與已持有的檔在「什麼時候知道」那一格寫出的"
+                    "日子、名冊的檢核點、反證與加碼條件的到期——到期是到時候重問，不是哪一份文件出來。"}
 
 
 def _by_layer(items: Sequence[Mapping[str, Any]], *, order: Mapping[str, int],

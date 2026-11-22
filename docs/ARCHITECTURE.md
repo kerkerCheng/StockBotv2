@@ -911,7 +911,7 @@ AnalystView.brief（optional）→ APP 首屏 briefCard；六張卡收進「為�
   這類字只住封閉字彙旁邊）。為什麼不另開 `confirm_ref` 欄位：用 `disproof_ref` 的地方有八處，另開欄位漏改任何一處，加碼條件就會叫不醒、
   沒人消費（INV-4）；標錯字的代價比等待消失小。
 - **首屏（2026-10-08 個股頁 S5a，使用者選 B；取代 2026-10-04 Phase 7 Step 7.0e 的首屏五題）**：v2 短評的首屏照個股頁 schema
-  的十三塊排成四段——論點（B1 押什麼）／營收從哪來 → 事件 → 怎麼被定價（B3、B5、B6）／深入（B2 需求傳導、B4 技術鏈、B12 量 → 錢 → 價）／
+  的塊排成四段——論點（B13 賭注句〔2026-11-22 A0 加，合約 1.7〕、B1 押什麼）／營收從哪來 → 事件 → 怎麼被定價（B3、B5、B6）／深入（B2 需求傳導、B4 技術鏈、B12 量 → 錢 → 價）／
   清單（B7 夠大嗎、B8 錯了怎麼知道、B9 會不會死、B10 是不是新賭注、B11 接下來看什麼）；B0 頁首是候選狀態那一行。
   **段與「哪一格放哪一塊」只有一份**（`briefing/analyst_view/page_schema.py::FIRST_SCREEN_SECTIONS`／`BLOCK_READINGS`：v2 七格與
   `FIRST_SCREEN_PARTS` 的元件各放一次；沒有句子來源的塊宣告 `pending`——研究的塊印「還沒寫」、要 S3 機械資料的塊印「還沒做」），
@@ -1037,6 +1037,21 @@ AnalystView.brief（optional）→ APP 首屏 briefCard；六張卡收進「為�
   同語言的詞；只綁 authority 的只核它宣告以外的數），與猜行分開印。事實句的定義只有一份
   （`fact_check.sentence_claims(...).is_fact`）。⑤「敘事還沒逐句核對」與「事實句還沒錨點」（只管已持有與宣告可開）各是同名 `--gaps`
   的同一個判定。敘事格式不因錨點升版（使用者 11-13 ①）。查證：`python -m alpha brief-anchor --gaps`。
+- **賭注句與對帳日曆（A0，2026-11-22；使用者定 1b／2B／3b，提案 `docs/brainstorms/2026-11-22-a0-bet-line-proposal.md`）**：
+  一檔一句四格——押什麼｜翻倍要哪個營業數字｜下一個對帳日｜認錯看哪一條。**寫的人只寫三個鍵**：故事紀錄的選填鍵
+  `bet = {stake, doubling, disproof}`（`disproof`＝這一版敘事 `disproof[]` 的序號，從 1 起）。規則住 `alpha/narrative/story.py`：
+  `bet_problems`（不收任何佔位字——這一句也印在沒有值表的地方；不收價格與報酬的字；序號要落在這一版敘事裡）與 `doubling_kind`
+  （數字／無法量／還沒寫成數字，機械分，只是標籤）。沒有 `bet` 的故事 `story_id` 不變；寫入口
+  `python -m alpha stories --add spec.json --bet-only`（故事其他格一個字不動）。**其餘的每次物化重算**（`alpha/bet_line.py`，純函式）：
+  押哪一層照抄敘事 `rides[]`；下一個對帳日讀「什麼時候知道」那一格自己寫到的日子（`alpha/narrative/checkpoints.py::reckoning_days`
+  ——只認帶年份的，或寫得出確切月日且落在寫下那天之後 `YEARLESS_AHEAD_DAYS` 天內的；**那一句原文永遠跟著印**，讀的人看得出它在講
+  什麼）與名冊的檢核點；認錯那一條由序號解析到反證的 watch（`engine_b/disproof.py::disproof_pointers`）。候選列多兩個加法欄
+  `bet_line`、`check_calendar`（`alpha/providers/candidates.py::derive_row` 的外包層；候選板與個股頁同一個推導）。**欠賭注句的只有
+  可開與已持有**（`BET_GROUPS`＝加碼條件那一組）；敘事換版＝過期。畫面三處：個股頁 B13（論點段最前）、依層頁每檔印那幾句、首頁
+  「接下來會揭曉」（預設攤開 `CALENDAR_DAYS` 天、可展開到 `CALENDAR_MAX_DAYS` 天，每列標種類；重看日照舊列、對帳日過了就不列）。
+  ⑤ 多三格 `todo.bet_line`／`todo.bet_vague`／`todo.no_check_day`——**不在進展格**（整批寫要使用者放行，不推 drain；「無法量」
+  印成現況、不算待做）。它不 gate、不改候選狀態、不排序、不寫 watch、不寫目標價。已知漏：只寫「年初」「2–3 月」的日子讀不出來。
+  寫法守則住 `skills/research-drain/SKILL.md`「段『賭注句』」。查證：`python -m pytest tests/test_bet_line.py`；現況讀短版 ⑤ 那三格。
 
 **為什麼數字用 placeholder：** session 打的數字會過期、會錯、會與 authority 不一致；placeholder 讓句子永遠
 讀到 materialize 當下的值，而且填不到時那一格自己現形（`partial`＋理由），不是留白。

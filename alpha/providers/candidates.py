@@ -18,6 +18,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, Callable, Mapping, Sequence
 
+from ..bet_line import BET_GROUPS, bet_line, check_calendar
 from ..candidates import (
     ANSWER_WORDS, CANDIDATES_THIS_IS_NOT, GROUP_LABELS, GROUPS, IN_NUMBERS_LINES, RETIRED_STATE_LABELS,
     PRICED_IN_LINES, REWRITE_STATE_WORDS, SIDE_GROUPS, SIDE_LABELS, UNANSWERED, assemble_board, body_version, cap_label,
@@ -27,7 +28,7 @@ from ..candidates import (
     BODY_BEHIND_KINDS, body_behind_readings, body_behind_reasons,
 )
 from ..edge import not_edge_confirmed
-from ..narrative.checkpoints import checkpoint_passed, checkpoint_reason, when_text_since
+from ..narrative.checkpoints import PLACEHOLDER, checkpoint_passed, checkpoint_reason, reckoning_days, when_text_since
 from ..narrative.contracts import CANDIDATE_STATES_RETIRED, RECORD_VERSION_V2, InvestorBrief, select_brief
 from ..narrative.depth_check import unchecked_items
 from ..structure_reading.contracts import READING_KINDS, READING_UNITS
@@ -227,20 +228,80 @@ def _reason_story(brief: InvestorBrief | None, stories: Mapping[str, Mapping[str
 
 
 def derive_row(ticker: str, company_id: str | None, *, records: Sequence[InvestorBrief], today: date,
-               reading_rows: Mapping[tuple[str, str], Mapping[str, Any]], watches: Sequence[Mapping[str, Any]],
-               lifecycle: Mapping[str, Any] | None, edge: Mapping[str, Any] | None,
-               three_questions: Mapping[str, Any] | None, held: Mapping[str, Any],
-               three_questions_note: str | None = None, bets: Mapping[str, Any] | None = None,
-               registry: Any = None, own_history_at: Callable[..., Mapping[str, Any]] | None = None,
-               bars_at: Callable[[str, date], Sequence[tuple[date, float | None]]] | None = None,
-               stories: Mapping[str, Mapping[str, Any]] | None = None,
-               company_assertions: Sequence[Mapping[str, Any]] | None = None,
-               raw_text: Callable[[str], str] | None = None,
-               open_document_requests: Sequence[int] | None = None,
-               readings_by_id: Mapping[str, Any] | None = None,
-               company_filings: Sequence[Mapping[str, Any]] | None = None,
+               watches: Sequence[Mapping[str, Any]], stories: Mapping[str, Mapping[str, Any]] | None = None,
                calendar_checkpoints: Sequence[Mapping[str, Any]] | None = None,
-               ) -> dict[str, Any] | None:
+               node_labels: Mapping[str, str] | None = None, **inputs: Any) -> dict[str, Any] | None:
+    """一檔的候選列＝狀態推導（`_derive_row`；其餘輸入與每一格的規則寫在那裡）＋賭注句與對帳日曆（A0，2026-11-22）。
+
+    後一半只呈現：`bet_line`（一句四格）與 `check_calendar`（今天以後的對帳日）每次重算，**不進任何狀態判斷**。它接在
+    狀態推導之後，是因為「欠不欠賭注句」要看這一列最後落在哪一組（可開、已持有；`alpha.bet_line.BET_GROUPS`）。
+    `node_labels`：節點 id → 中文名（賭注句「押」那一句用）；沒給就讀 `config/node_labels_zh.json`。"""
+    row = _derive_row(ticker, company_id, records=records, today=today, watches=watches, stories=stories,
+                      calendar_checkpoints=calendar_checkpoints, **inputs)
+    if row is not None:
+        row.update(_bet_fields(row, records=records, today=today, watches=watches, stories=stories,
+                               calendar_checkpoints=calendar_checkpoints, node_labels=node_labels,
+                               graph_names=(inputs.get("bets") or {}).get("names")))
+    return row
+
+
+def _bet_fields(row: Mapping[str, Any], *, records: Sequence[InvestorBrief], today: date,
+                watches: Sequence[Mapping[str, Any]], stories: Mapping[str, Mapping[str, Any]] | None,
+                calendar_checkpoints: Sequence[Mapping[str, Any]] | None,
+                node_labels: Mapping[str, str] | None,
+                graph_names: Mapping[str, str] | None = None) -> dict[str, Any]:
+    """候選列的 `bet_line` 與 `check_calendar`（`alpha.bet_line`）。寫的人寫的只有現行故事的 `bet`；其餘照抄與重算：
+    押哪一層＝這一列的 `rides[]`、對帳日＝何時格裡寫得出是哪一天的日子＋名冊檢核點、認錯那一條＝反證對 watch。
+    層名：有中文名用中文；沒有就用圖上的名字（`graph_names`＝`bet_index` 的 `names`，「是不是新賭注」同一份）；都沒有才印節點 id
+    ——不臨時翻譯（首頁卡片同一個退法）。"""
+    from alpha.node_labels import node_labels_zh
+    from engine_b import event_watch as ew
+    from engine_b.disproof import disproof_pointers
+
+    owed = row.get("group") in BET_GROUPS
+    brief = select_brief(records, as_of=None, today=today)
+    if brief is None or brief.record_version != RECORD_VERSION_V2:
+        return {"bet_line": bet_line(bet=None, has_narrative=False, earlier_bet=False, owed=owed, rides=(),
+                                     pointers=(), calendar=()),
+                "check_calendar": []}
+    when = brief.slot("when")
+    days = reckoning_days(when.text if when is not None else "",
+                          written_on=when_text_since(records, brief).astimezone(ew._local_timezone()).date())
+    # 那一句若帶名冊佔位字：個股頁填的日子另含催化劑（`briefing.alpha_view.builder._brief_values`），這裡不另填一個
+    # 可能不同的日子——寫成字（同一句不能有兩個日子，L12）
+    days = [{**d, "sentence": d["sentence"].replace(PLACEHOLDER, "名冊上的下一個檢核點")} for d in days]
+    pointers = disproof_pointers(brief, watches)
+    calendar = check_calendar(today=today, when_days=days, registry_days=calendar_checkpoints or (),
+                              disproof=pointers, confirm=row.get("confirm") or ())
+    known = stories or {}
+    bet = (known.get(brief.brief_id) or {}).get("bet")
+    earlier = any(isinstance((known.get(r.brief_id) or {}).get("bet"), Mapping)
+                  for r in records if r.brief_id != brief.brief_id)
+    labels = node_labels_zh() if node_labels is None else node_labels
+    names = graph_names or {}
+    rides = [{"node": r.get("node"),
+              "label": labels.get(str(r.get("node"))) or names.get(str(r.get("node"))) or r.get("node"),
+              "unit_label": r.get("unit_label")} for r in row.get("rides") or ()]
+    return {"bet_line": bet_line(bet=bet if isinstance(bet, Mapping) else None, has_narrative=True, earlier_bet=earlier,
+                                 owed=owed, rides=rides, pointers=pointers, calendar=calendar),
+            "check_calendar": calendar}
+
+
+def _derive_row(ticker: str, company_id: str | None, *, records: Sequence[InvestorBrief], today: date,
+                reading_rows: Mapping[tuple[str, str], Mapping[str, Any]], watches: Sequence[Mapping[str, Any]],
+                lifecycle: Mapping[str, Any] | None, edge: Mapping[str, Any] | None,
+                three_questions: Mapping[str, Any] | None, held: Mapping[str, Any],
+                three_questions_note: str | None = None, bets: Mapping[str, Any] | None = None,
+                registry: Any = None, own_history_at: Callable[..., Mapping[str, Any]] | None = None,
+                bars_at: Callable[[str, date], Sequence[tuple[date, float | None]]] | None = None,
+                stories: Mapping[str, Mapping[str, Any]] | None = None,
+                company_assertions: Sequence[Mapping[str, Any]] | None = None,
+                raw_text: Callable[[str], str] | None = None,
+                open_document_requests: Sequence[int] | None = None,
+                readings_by_id: Mapping[str, Any] | None = None,
+                company_filings: Sequence[Mapping[str, Any]] | None = None,
+                calendar_checkpoints: Sequence[Mapping[str, Any]] | None = None,
+                ) -> dict[str, Any] | None:
     """一檔的候選狀態。沒有敘事、也沒有持有 → None（不上板，計數另印「無敘事」）。
 
     邊緣：非邊緣進「非倍率候選」；邊緣判定少一個輸入時**只擋宣告可開**（附組「可開但邊緣無法量」），

@@ -173,9 +173,12 @@ def test_bad_lines_are_reported_not_dropped(tmp_path) -> None:
 # 3. API：日曆、依層、攤開哪幾組
 # ---------------------------------------------------------------------------
 
-def _payload(ticker, group, *, until=None, rides=(), short=None, stall=5):
+def _payload(ticker, group, *, until=None, rides=(), short=None, stall=5, bet=None, checks=()):
     row = {"derived": group, "declared": group, "derived_label": group, "since": "2026-10-01T00:00:00+00:00",
            "stall_days": stall, "watch": {"until": until, "status": "active"} if until else None}
+    if bet is not None:
+        row["bet_line"] = bet
+        row["check_calendar"] = [dict(c) for c in checks]
     view = _with_card_panels(fake_view(ticker), rides=rides, row=row)
     payload = materialize_view(view, tagline={"short_name": short, "text": "做什麼", "created_at": "2026-10-28T00:00:00+00:00"}
                                if short else None)
@@ -196,11 +199,18 @@ def client(tmp_path):
     later = (today + timedelta(days=40)).isoformat()
     past = (today - timedelta(days=2)).isoformat()
     other = {**RIDE, "node": "mat:inp_substrate", "node_name": "InP substrate"}
+    # 對帳日曆（A0）：EEE 欠賭注句（已持有）——一筆過了的、一筆 20 天後的、一筆 200 天後的
+    checks = [{"date": past, "kind": "when_slot", "kind_label": "何時格寫的日子", "text": "過了的那一句"},
+              {"date": (today + timedelta(days=20)).isoformat(), "kind": "when_slot", "kind_label": "何時格寫的日子",
+               "text": "第三季財報那一句"},
+              {"date": (today + timedelta(days=200)).isoformat(), "kind": "disproof_expiry", "kind_label": "反證到期",
+               "text": "太遠的那一條"}]
+    owed = {"state": "not_written", "state_label": "還沒寫賭注句", "owed": True, "lines": ["還沒寫賭注句", "下一個對帳日：…"]}
     for payload in (_payload("AAA", "missing", until=soon, rides=[RIDE], short="甲"),
                     _payload("BBB", "open", until=past, rides=[RIDE, other]),
                     _payload("CCC", "missing", until=later, rides=[other], stall=12),
                     _payload("DDD", "pass", until=soon, rides=[RIDE]),
-                    _payload("EEE", "held")):
+                    _payload("EEE", "held", bet=owed, checks=checks)):
         store.write(payload)
     write_vocabularies(store)
     return TestClient(create_app(tmp_path)), today
@@ -213,7 +223,16 @@ def test_calendar_is_by_date_within_two_weeks_and_keeps_past_ones(client) -> Non
     dates = [d["date"] for d in cal["dates"]]
     assert dates == sorted(dates)                                   # 時間序
     tickers = [s["ticker"] for d in cal["dates"] for s in d["stocks"]]
-    assert "CCC" not in tickers                                     # 40 天後不在兩週內
+    # 40 天後：列得出來（展開到 90 天看得到）、但不在預設攤開的兩週內（2026-11-22 A0；原本是整筆不列）
+    far = next(d for d in cal["dates"] if d["date"] == (today + timedelta(days=40)).isoformat())
+    assert [s["ticker"] for s in far["stocks"]] == ["CCC"] and far["near"] is False and far["past"] is False
+    assert (cal["days"], cal["max_days"]) == (14, 90)
+    assert all(d["near"] for d in cal["dates"] if d["date"] <= (today + timedelta(days=14)).isoformat())
+    assert far["stocks"][0]["items"] == [{"kind": "review", "kind_label": "重看日", "text": None}]
+    # 對帳日：只列今天以後、90 天以內的，原句跟著走；過了的對帳日不列（那一檔下次物化自己跳下一個）
+    eee = [(d["date"], s["items"]) for d in cal["dates"] for s in d["stocks"] if s["ticker"] == "EEE"]
+    assert eee == [((today + timedelta(days=20)).isoformat(),
+                    [{"kind": "when_slot", "kind_label": "何時格寫的日子", "text": "第三季財報那一句"}])]
     assert "BBB" in tickers and next(d for d in cal["dates"] if d["stocks"][0]["ticker"] == "BBB")["past"] is True
     soon = next(d for d in cal["dates"] if d["date"] == (today + timedelta(days=3)).isoformat())
     assert [s["ticker"] for s in soon["stocks"]] == ["AAA", "DDD"]  # 同一天照組序（缺 X 在不要之前）
@@ -225,6 +244,22 @@ def test_calendar_is_by_date_within_two_weeks_and_keeps_past_ones(client) -> Non
     assert by["AAA"]["card"]["watch"]["label"] == (soon_day[5:] if soon_day[:4] == today.isoformat()[:4] else soon_day)
     later_day = (today + timedelta(days=40)).isoformat()
     assert by["CCC"]["card"]["watch"]["label"] == (later_day[5:] if later_day[:4] == today.isoformat()[:4] else later_day)
+
+
+def test_the_card_copies_the_bet_line_and_only_owed_ones_carry_check_days() -> None:
+    """A0（2026-11-22）：卡片照抄候選列的賭注句那幾句；對帳日曆只有欠賭注句的檔（可開、已持有）帶——缺 X 的檔在日曆上是它的
+    重看日，產生端就算帶了對帳日也不上日曆。沒有候選列或舊候選列（沒有這一欄）＝None，不是「還沒寫」。"""
+    checks = [{"date": "2027-01-15", "kind": "when_slot", "kind_label": "何時格寫的日子", "text": "一句"}]
+    owed = {"state": "not_written", "state_label": "還沒寫賭注句", "owed": True, "lines": ["還沒寫賭注句"], "stake": None}
+    card = build_overview(_with_card_panels(fake_view(), row={**ROW, "bet_line": owed, "check_calendar": checks}),
+                          card={})["card"]
+    assert card["bet_line"] == {"state": "not_written", "state_label": "還沒寫賭注句", "owed": True, "lines": ["還沒寫賭注句"]}
+    assert card["check_calendar"] == checks
+    free = build_overview(_with_card_panels(fake_view(), row={**ROW, "bet_line": {**owed, "owed": False, "lines": []},
+                                                              "check_calendar": checks}), card={})["card"]
+    assert free["bet_line"]["owed"] is False and free["check_calendar"] == []
+    old = build_overview(_with_card_panels(fake_view(), row=ROW), card={})["card"]
+    assert old["bet_line"] is None and old["check_calendar"] == []
 
 
 def test_a_watch_in_another_year_prints_the_year(tmp_path) -> None:

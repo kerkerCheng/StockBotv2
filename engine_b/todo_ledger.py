@@ -82,6 +82,19 @@ LEDGER: tuple[LedgerRow, ...] = (
               "`python -m alpha brief-anchor --gaps` → 逐檔 `python -m alpha brief-anchor <T> --draft --format json > a.json`、"
               "讀原文填 ref 與 quote（research-drain「事實句錨點」段）→ `python -m alpha brief-anchor <T> --spec a.json` → "
               "`python -m alpha brief-check <T>` 看錨點比對"),
+    # A0 賭注句與對帳日曆（2026-11-22 使用者「A0 1b 2B 3b，S1–S3 做」；2026-11-20「難把敘事組成一個我們在賭的東西」「沒有 timing」）：
+    # 可開與已持有每檔一句四格（`alpha.bet_line`；候選列每次物化重算）。三格都不在進展格裡——不推 drain。
+    # ⚠ 整批寫使用者還沒放行（先寫 3 檔給他看）：前兩格現在怎麼處理寫在 research-drain「賭注句」段
+    LedgerRow("todo.bet_line", "賭注句還沒寫", "檔",
+              "research-drain「賭注句」段（⚠ 使用者放行之前只寫 3 檔交他看，其餘照數回報）：`python -m alpha stories <T>` → "
+              "寫 `[{ticker, bet: {stake, doubling, disproof}}]` → `python -m alpha stories --bet-only --check spec.json` → "
+              "`--bet-only --add spec.json`"),
+    LedgerRow("todo.bet_vague", "翻倍條件還沒寫成數字", "檔",
+              "依據（必須為真、量級那兩格）有數字：把賭注句的「翻倍要」改成數字＋哪一年哪一季看得到；依據沒有數字就先補依據，"
+              "補不出來寫「無法量：缺 X」（合法的寫法，不留在這一格）→ `python -m alpha stories --bet-only --add spec.json`"),
+    LedgerRow("todo.no_check_day", "沒有對帳日", "檔",
+              "何時格沒有寫得出是哪一天的日子、名冊也沒有今天以後的檢核點：重述這一版敘事的何時格——寫出帶年份的日期與"
+              "那一份文件（`python -m alpha brief <T> --add spec.json`）"),
 )
 LEDGER_KEYS: tuple[str, ...] = tuple(r.key for r in LEDGER)
 LEDGER_BY_KEY: Mapping[str, LedgerRow] = {r.key: r for r in LEDGER}
@@ -184,6 +197,15 @@ COVERAGE: Mapping[str, str] = {
     # --- 事實句錨點（alpha.providers.fact_anchors.ANCHOR_SCOPE；2026-11-13）：其餘狀態換版時才補，不進 ⑤
     "fact_anchor:held": "todo.fact_anchor",
     "fact_anchor:open": "todo.fact_anchor",       # 宣告可開（含前提失效、邊緣無法量）
+    # --- 賭注句（alpha.bet_line.BET_LINE_STATES；可開與已持有才算欠，2026-11-22）
+    "bet_line:written": "terminal",
+    "bet_line:not_written": "todo.bet_line",
+    "bet_line:stale": "todo.bet_line",            # 敘事換版：照新的一版重寫
+    "bet_line:no_narrative": "todo.bet_line",     # 已持有、沒有 v2 敘事
+    # --- 賭注句的翻倍條件（alpha.narrative.story.DOUBLING_KINDS）：只標不擋
+    "doubling:number": "terminal",
+    "doubling:unmeasurable": "terminal",          # 「無法量：缺 X」是合法的寫法——另印成現況，不逼人補（否則會硬掰數字）
+    "doubling:vague": "todo.bet_vague",
     # --- 其他來源
     "impact:undisposed": "todo.undisposed",
     "lead:classification_gap": "todo.unclassified",
@@ -199,6 +221,8 @@ COVERAGE: Mapping[str, str] = {
     "brief:link_break": "todo.narrative",
     # 可開／已持有的深挖清單還有沒查的項目（`alpha.candidates.addon_unchecked_rows`；2026-11-03 第 18＋16 條）
     "depth_check:unchecked": "todo.addon_unchecked",
+    # 可開／已持有、有敘事卻帶不出下一個對帳日（`alpha.bet_line.no_check_day_rows`；2026-11-22）
+    "check_day:none": "todo.no_check_day",
     "registry:stale_lead_entities": "todo.registry_rescan",
     "thesis:due_not_minted": "todo.thesis_due",
     "disproof:touched": "todo.disproof_touched",
@@ -685,6 +709,59 @@ def collect(*, today: date, leads_store: Mapping[str, Any], watches: Sequence[Ma
             oldest_days=_oldest((g.get("since") for g in gaps), today))
 
     guarded("todo.fact_anchor", fact_anchor)
+
+    def bet_groups(key: str) -> Mapping[str, Sequence[Mapping[str, Any]]] | None:
+        # 賭注句三格共用的輸入：候選板的列（`bet_line` 是候選列每次物化重算的加法欄）。板沒讀到、持股沒讀到（已持有那一半
+        # 數不到）、舊板（列上沒有這一格）都是未讀到，不是 0（INV-3）——與「加碼條件還沒查」同一套
+        from alpha.bet_line import BET_GROUPS
+
+        groups = (candidates or {}).get("groups") or {}
+        if candidates is None:
+            rows[key].reason = "候選板未讀到"
+        elif ((candidates.get("holdings") or {}).get("status") or "ok") != "ok":
+            rows[key].reason = "持股沒讀到——已持有那一半數不到"
+        elif any("bet_line" not in r for g in BET_GROUPS for r in groups.get(g) or ()):
+            rows[key].reason = "候選板是舊版（列上沒有賭注句那一格）"
+        else:
+            return groups
+        return None
+
+    def tickers(found: Sequence[Mapping[str, Any]]) -> str | None:
+        return "、".join(str(r.get("ticker")) for r in found) or None
+
+    def bet_line() -> None:
+        from alpha.bet_line import bet_gap_rows
+
+        if (groups := bet_groups("todo.bet_line")) is None:
+            return
+        found = bet_gap_rows(groups)
+        words = {"not_written": "從沒寫", "stale": "敘事換版", "no_narrative": "沒有敘事"}
+        bits = [f"{label} {n}" for state, label in words.items()
+                if (n := sum(1 for r in found if r["bet_line"].get("state") == state))]
+        put("todo.bet_line", len(found), work="；".join(bits) or None)
+
+    guarded("todo.bet_line", bet_line)
+
+    def bet_vague() -> None:
+        from alpha.bet_line import doubling_rows
+
+        if (groups := bet_groups("todo.bet_vague")) is None:
+            return
+        found, unmeasurable = doubling_rows(groups, "vague"), doubling_rows(groups, "unmeasurable")
+        put("todo.bet_vague", len(found), work=tickers(found),
+            note=f"另有「無法量」{len(unmeasurable)} 檔（{tickers(unmeasurable)}）——現況，不是待做" if unmeasurable else None)
+
+    guarded("todo.bet_vague", bet_vague)
+
+    def no_check_day() -> None:
+        from alpha.bet_line import no_check_day_rows
+
+        if (groups := bet_groups("todo.no_check_day")) is None:
+            return
+        found = no_check_day_rows(groups)
+        put("todo.no_check_day", len(found), work=tickers(found))
+
+    guarded("todo.no_check_day", no_check_day)
     return [rows[r.key] for r in LEDGER]
 
 

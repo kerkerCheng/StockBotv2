@@ -307,29 +307,69 @@ function renderBenchmarks(b) {
   return box;
 }
 
-/* 「接下來兩週會揭曉」：日期序由後端排好（時間序不是名次），前端照印。 */
+/* 「接下來會揭曉」（2026-11-22 A0 起併進對帳日曆）：重看日＋可開與已持有的對帳日。日期序、同一天的列序、每一列是哪一種
+   （種類的字）都由後端給（時間序不是名次），前端照印。預設攤開近的那幾天（`near`）；到 `max_days` 的每一列收在一個展開裡，
+   連那一句原文或條件一起印——日子是程式讀出來的，原句讓人看得出它在講什麼。舊 API（沒有 near／items）照舊全部攤開。 */
 function renderCalendar(cal) {
   if (!cal || !(cal.dates || []).length) return null;
   const box = el('section', 'calendar');
   box.appendChild(el('h2', 'group-head', `接下來 ${cal.days} 天會揭曉`));
-  const strip = el('div', 'cal-strip');
-  cal.dates.forEach((d) => {
-    const day = el('div', 'cal-day' + (d.past ? ' past' : ''));
-    day.appendChild(el('div', 'cal-date', d.past ? `${d.date.slice(5)} 已過` : d.date.slice(5)));
-    const names = el('div', 'cal-names');
-    (d.stocks || []).forEach((s, i) => {
-      if (i) names.appendChild(document.createTextNode('、'));
-      const a = el('a', null, s.name || s.ticker);
-      a.href = '#/' + encodeURIComponent(s.ticker);
-      a.title = `${s.ticker}${s.state ? '｜' + s.state : ''}`;
-      names.appendChild(a);
+  const near = cal.dates.filter((d) => d.near !== false);
+  if (near.length) {
+    const strip = el('div', 'cal-strip');
+    near.forEach((d) => {
+      const day = el('div', 'cal-day' + (d.past ? ' past' : ''));
+      day.appendChild(el('div', 'cal-date', d.past ? `${d.date.slice(5)} 已過` : d.date.slice(5)));
+      const names = el('div', 'cal-names');
+      (d.stocks || []).forEach((s, i) => {
+        if (i) names.appendChild(document.createTextNode('、'));
+        const a = el('a', null, s.name || s.ticker);
+        a.href = '#/' + encodeURIComponent(s.ticker);
+        a.title = `${s.ticker}${s.state ? '｜' + s.state : ''}`;
+        names.appendChild(a);
+        const kinds = calendarKinds(s);
+        if (kinds) names.appendChild(el('span', 'cal-kinds', `（${kinds}）`));
+      });
+      day.appendChild(names);
+      strip.appendChild(day);
     });
-    day.appendChild(names);
-    strip.appendChild(day);
-  });
-  box.appendChild(strip);
+    box.appendChild(strip);
+  } else {
+    box.appendChild(el('p', 'note', `這 ${cal.days} 天沒有。`));
+  }
+  const rows = [];
+  cal.dates.forEach((d) => (d.stocks || []).forEach((s) => (s.items || []).forEach((item) => rows.push([d, s, item]))));
+  if (cal.max_days && rows.length) {
+    const more = el('details', 'cal-more');
+    more.appendChild(el('summary', null, `逐列看到 ${cal.max_days} 天（${rows.length} 列，含原句）`));
+    rows.forEach((entry) => more.appendChild(calendarRow(entry[0], entry[1], entry[2])));
+    box.appendChild(more);
+  }
   if (cal.note) box.appendChild(el('p', 'note', cal.note));
   return box;
+}
+
+/** 這一檔在這一天是哪幾種（種類的字由後端給；同一種只印一次，照後端的列序）。 */
+function calendarKinds(stock) {
+  const seen = [];
+  (stock.items || []).forEach((item) => {
+    if (item.kind_label && seen.indexOf(item.kind_label) < 0) seen.push(item.kind_label);
+  });
+  return seen.join('、');
+}
+
+/** 展開裡的一列：哪天｜哪一檔｜哪一種｜那一句原文或條件（重看日沒有句子）。 */
+function calendarRow(d, stock, item) {
+  const row = el('div', 'cal-row' + (d.past ? ' past' : ''));
+  row.appendChild(el('span', 'cal-date', d.past ? `${dayLabel(d.date)} 已過` : dayLabel(d.date)));
+  const body = el('span', 'cal-row-body');
+  const a = el('a', null, stock.name || stock.ticker);
+  a.href = '#/' + encodeURIComponent(stock.ticker);
+  body.appendChild(a);
+  body.appendChild(el('span', 'cal-kinds', `｜${item.kind_label || item.kind || ''}`));
+  if (item.text) body.appendChild(el('span', 'cal-text', `｜${item.text}`));
+  row.appendChild(body);
+  return row;
 }
 
 function viewToggle(mode) {
@@ -380,6 +420,8 @@ async function renderList(mode) {
       if (layer.unit_label) head.appendChild(el('span', 'group-sub', layer.unit_label));
       app.appendChild(head);
       app.appendChild(cardGrid(layer.tickers.map((t) => byTicker[t])));
+      const bets = betList(layer.tickers.map((t) => byTicker[t]));
+      if (bets) app.appendChild(bets);
       if ((layer.others || []).length) {
         app.appendChild(el('p', 'note', '同一層另有：' + layer.others.map((o) => `${o.label} ${o.count}`).join('、')));
       }
@@ -387,6 +429,8 @@ async function renderList(mode) {
     if ((byLayer.unridden || []).length) {
       app.appendChild(el('h2', 'group-head', `還沒宣告押哪一層（${byLayer.unridden.length}）`));
       app.appendChild(cardGrid(byLayer.unridden.map((t) => byTicker[t])));
+      const bets = betList(byLayer.unridden.map((t) => byTicker[t]));
+      if (bets) app.appendChild(bets);
     }
     if (byLayer.note) app.appendChild(el('p', 'note', byLayer.note));
   }
@@ -1236,6 +1280,7 @@ function questionPart(view, part) {
   if (part === 'disproof') return disproofBrief(view);
   if (part === 'confirm') return confirmBrief(row);
   if (part === 'shared_bet') return sharedBetLines(row);
+  if (part === 'bet_line') return betLines(row);
   return [el('div', 'row-reason', `（這一題的元件 ${part} 這版畫面還不認得）`)];
 }
 
@@ -1420,6 +1465,30 @@ function sharedBetLines(row, tag) {
   const bet = row && row.shared_bet;
   if (!bet) return [];
   return (bet.lines || []).map((text) => el(tag || 'div', 'row-reason', text));
+}
+
+/** 一句四格（A0，2026-11-22）：押什麼、翻倍要哪個營業數字、下一個對帳日、認錯看哪一條。**每一句都由 materialize 端組好**
+ * （`alpha/bet_line.py`：寫的人只寫故事紀錄的 bet，押哪一層、對帳日、那一條的 watch 照抄與重算），這裡照印、不組字。
+ * 沒寫而且不欠的檔沒有句子——整塊不印。`holder`＝帶著 `bet_line` 的那一份：個股頁是候選列、首頁「依層」是卡片。 */
+function betLines(holder) {
+  const bet = holder && holder.bet_line;
+  return ((bet && bet.lines) || []).map((text) => el('div', 'row-reason bet-row', text));
+}
+
+/** 「依層」頁每一層底下各檔的那幾句（A0）：照抄卡片；順序照這一層既有的列序（後端排好，不是名次）。沒有句子的檔不列。 */
+function betList(rows) {
+  const box = el('div', 'bet-list');
+  rows.forEach((row) => {
+    const lines = betLines(row && row.card);
+    if (!lines.length) return;
+    const item = el('div', 'bet-item');
+    const name = el('a', 'bet-name', row.card.short_name || row.company_label || row.ticker);
+    name.href = '#/' + encodeURIComponent(row.ticker);
+    item.appendChild(name);
+    lines.forEach((line) => item.appendChild(line));
+    box.appendChild(item);
+  });
+  return box.childNodes.length ? box : null;
 }
 
 /** 首頁分組的中文（`alpha.candidates.LIST_GROUP_LABELS` 經 `.meta.json` 的那一份；讀不到回 null，不另寫一份）。 */

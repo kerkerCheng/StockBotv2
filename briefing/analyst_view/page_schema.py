@@ -4,7 +4,7 @@
 **封閉字彙**，經 `.meta.json` 給 APP（`webapp.materialize.write_vocabularies`），app.js 不留第二份（L16）。
 
 三件事：
-1. **十三塊 × 元素**：每個元素宣告掛在哪個單位（§5.1）、資料源類別（機械／圖／研究／共識／市場／等待 registry）、
+1. **塊 × 元素**（v1.0 十三塊；2026-11-22 加 B13 賭注句）：每個元素宣告掛在哪個單位（§5.1）、資料源類別（機械／圖／研究／共識／市場／等待 registry）、
    由 analyst view 的哪幾條 line 承載，以及**沒有的時候印什麼、在哪裡找過**（規則 2、L11-5）。
 2. **填得滿表**（`fill_table`）：每次 materialize 逐檔算——元素有值（承載它的 line 有值），或具名缺席：缺席的 kind
    **照抄產生那條 line 的程式自己宣告的**（`datum.absence_kind`；L16），沒有任何 line 承載的元素用合約宣告的預設缺席。
@@ -24,15 +24,16 @@ from typing import Any, Mapping, Sequence
 
 from alpha.absence import ABSENCE_KINDS, default_absence_kind
 
-PAGE_SCHEMA_VERSION = "stock-page-schema/1.6"   # 1.1（S3c）拿掉 B2 同層各家、路徑上各層接上；1.2（S3d）B3 營收結構與 backlog 接上；
+PAGE_SCHEMA_VERSION = "stock-page-schema/1.7"   # 1.1（S3c）拿掉 B2 同層各家、路徑上各層接上；1.2（S3d）B3 營收結構與 backlog 接上；
 #                                                  1.3（S3d 第二段）台股年報地區別、押的那一塊接上；1.4（S3e）事件之後跟組比接上；
 #                                                  1.5（2026-10-29 故事層）B3、B5 的一句故事接上；
-#                                                  1.6（2026-11-18）B12 量 → 錢 → 價接上敘事的量級（選填格）
+#                                                  1.6（2026-11-18）B12 量 → 錢 → 價接上敘事的量級（選填格）；
+#                                                  1.7（2026-11-22 A0）多一塊 B13 賭注句，放在論點那一段最前面
 #: 頁面合約出現過的版本（舊 → 新；最後一個＝現行，測試核對）。回饋紀錄（`briefing/analyst_view/feedback_log.py`，個股頁 S6b）
 #: 的版本只收這裡與 `CANVAS_VERSIONS`——**升版時在這裡加一個**，否則新版本的回饋登記不進去。
 PAGE_SCHEMA_HISTORY: tuple[str, ...] = (
     "stock-page-schema/1.0", "stock-page-schema/1.1", "stock-page-schema/1.2", "stock-page-schema/1.3",
-    "stock-page-schema/1.4", "stock-page-schema/1.5", "stock-page-schema/1.6",
+    "stock-page-schema/1.4", "stock-page-schema/1.5", "stock-page-schema/1.6", "stock-page-schema/1.7",
 )
 #: 凍結前（S1 磨合輪，2026-10-05 → 10-06）畫布的 schema 版本；v1.0 凍結（2026-10-07）之後不再增加。
 CANVAS_VERSIONS: tuple[str, ...] = (
@@ -91,6 +92,9 @@ BLOCKS: tuple[PageBlock, ...] = (
     PageBlock("B10", "是不是新賭注", "五題⑤：和持股共用的需求錨與層", "company", "機械"),
     PageBlock("B11", "接下來看什麼", "哪天要回來看", "company", "機械＋registry"),
     PageBlock("B12", "量 → 錢 → 價", "會長到幾倍、價格要的是什麼（不乘倍數算價格，規則 11）", "company", "機械＋研究"),
+    # 2026-11-22（A0；使用者 11-20「難把敘事組成一個我們在賭的東西」「沒有 timing」）：整頁壓成一句四格。寫的人只寫押什麼、
+    # 翻倍要、認錯看第幾條（故事紀錄的 bet）；押哪一層、下一個對帳日、那一條的 watch 由候選列每次物化重算
+    PageBlock("B13", "賭注句（一句四格）", "押什麼、翻倍要哪個營業數字、下一個對帳日、認錯看哪一條", "company", "研究＋機械"),
 )
 
 _S3 = "個股頁 S3（機械資料）尚未做"
@@ -213,6 +217,10 @@ ELEMENTS: tuple[PageElement, ...] = (
     PageElement("B12.price", "B12", "價：本益比買的是哪一年、參考尺", "company", "market",
                 ("three_questions/tq:priced_in:*:own_history_pctile", "three_questions/tq:priced_in:*:cohort_median"),
                 "upstream_unavailable", "三題②"),
+    # B13 賭注句（2026-11-22 A0）：有值＝寫了；可開與已持有沒寫＝還沒寫；缺 X／不要的檔不欠，那條 line 自己宣告不適用
+    PageElement("B13.bet_line", "B13", "一句四格：押什麼｜翻倍要哪個營業數字｜下一個對帳日｜認錯看哪一條", "company", "research",
+                ("candidate/candidate:bet_line",), "not_yet_recorded",
+                "故事紀錄的 bet（寫的人寫：押什麼、翻倍要、認錯看第幾條）＋候選列每次物化重算的押哪一層、對帳日與那一條反證的 watch"),
 )
 
 
@@ -238,7 +246,7 @@ class BlockReading:
 #: B0 是頁首（候選狀態那一行），不在段裡。**「哪一格放哪一塊」只有這一份**——取代 Phase 7 Step 7.0e 的首屏五題
 #: （①→論點、②③④⑤→清單；②裡的 demand 與 priced_in 移到深入的需求傳導與短文的怎麼被定價）。
 FIRST_SCREEN_SECTIONS: tuple[Mapping[str, Any], ...] = (
-    {"key": "thesis", "title": "論點", "blocks": ("B1",)},
+    {"key": "thesis", "title": "論點", "blocks": ("B13", "B1")},
     {"key": "essay", "title": "營收從哪來 → 事件 → 怎麼被定價", "blocks": ("B3", "B5", "B6")},
     {"key": "deep", "title": "深入", "blocks": ("B2", "B4", "B12")},
     {"key": "checklist", "title": "清單", "blocks": ("B7", "B8", "B9", "B10", "B11")},
@@ -261,6 +269,8 @@ BLOCK_READINGS: tuple[BlockReading, ...] = (
     BlockReading("B11", slots=("when",)),
     # 2026-11-18 使用者「量獨立一個」：敘事的量級（選填格）住這一塊；沒寫的檔照「還沒寫」收進頁尾（app.js）
     BlockReading("B12", slots=("magnitude",)),
+    # 2026-11-22（A0）：賭注句是元件不是敘事的格——句子在候選列那一份（`alpha.bet_line`）；沒寫而且不欠的檔沒有句子、整塊不印
+    BlockReading("B13", parts=("bet_line",)),
 )
 
 
@@ -289,7 +299,7 @@ EVIDENCE_LEVEL_MAP: Mapping[str, Mapping[str, Any]] = {
 # ---------------------------------------------------------------------------
 
 def _first_screen_problems(block_keys: Sequence[str]) -> list[str]:
-    """首屏的不變式（S5）：B1–B12 各在一段、各有一份讀法來源；v2 敘事七格與首屏元件各放一次，不漏不重；
+    """首屏的不變式（S5）：B0 以外的每一塊各在一段、各有一份讀法來源；v2 敘事七格與首屏元件各放一次，不漏不重；
     沒有任何句子來源的塊必須宣告 `pending`（沒寫印「還沒寫」，規則 7），有來源的塊不得再宣告。"""
     from alpha.narrative.contracts import SLOT_KEYS_V2
     from briefing.analyst_view.contracts import FIRST_SCREEN_PARTS
@@ -298,10 +308,10 @@ def _first_screen_problems(block_keys: Sequence[str]) -> list[str]:
     placed = [key for section in FIRST_SCREEN_SECTIONS for key in section["blocks"]]
     expected = [key for key in block_keys if key != "B0"]
     if sorted(placed) != sorted(expected) or len(placed) != len(set(placed)):
-        problems.append(f"首屏的段沒有把 B1–B12 各放一次：{placed}")
+        problems.append(f"首屏的段沒有把 B0 以外的每一塊各放一次：{placed}")
     readings = {r.block: r for r in BLOCK_READINGS}
     if len(readings) != len(BLOCK_READINGS) or sorted(readings) != sorted(expected):
-        problems.append(f"首屏讀法要 B1–B12 各一份：{sorted(readings)}")
+        problems.append(f"首屏讀法要 B0 以外的每一塊各一份：{sorted(readings)}")
     slots = [s for r in BLOCK_READINGS for s in r.slots]
     if sorted(slots) != sorted(SLOT_KEYS_V2) or len(slots) != len(set(slots)):
         problems.append(f"v2 敘事七格要各放一次：{slots}")
