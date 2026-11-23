@@ -38,7 +38,9 @@ def registry_us_tickers() -> dict[str, str]:
         ticker = c.get("research_ticker")
         if not ticker:
             continue
-        if any(str(ticker).endswith(sfx) for sfx in _FOREIGN_SUFFIXES):
+        # 與每日的 engine_b.routine_config 同一條規則：帶「.」的就是交易所後綴（yfinance 慣例；美股類別股寫「-」）。
+        # 原本只列 11 個後綴，名冊裡 .KS／.KQ／.NS／.TO／.L／.V／.VI／.SW／.HE 的 23 家會被當美股、走 browse-edgar 寬鬆搜尋。
+        if "." in str(ticker) or any(str(ticker).endswith(sfx) for sfx in _FOREIGN_SUFFIXES):
             continue
         out[str(c["company_id"])] = str(ticker)
     return out
