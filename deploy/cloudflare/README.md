@@ -146,7 +146,7 @@ Cloudflare One 主控台 → **存取控制（Access controls）→ 應用程式
 |---|---|
 | 原則名稱（Policy name） | `owner-only` |
 | 動作（Action） | **允許（Allow）** |
-| 包含（Include）→ 電子郵件（Emails） | `c3035281@gmail.com` |
+| 包含（Include）→ 電子郵件（Emails） | `<你登入用的 email>` |
 | **工作階段持續時間（Session Duration）** | **同樣設 `1 個月`** |
 
 ⚠ **原則層的工作階段持續時間會覆寫應用程式層。** 兩邊都設，否則你會發現

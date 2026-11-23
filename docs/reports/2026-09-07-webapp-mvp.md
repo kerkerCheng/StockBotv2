@@ -345,7 +345,7 @@ registry 新增 `display_name`（**只是名字，不是新的知識主張**—�
 **⚠ 還沒做的三步（需要使用者本人操作，本報告不偽造完成）：**
 
 1. **Cloudflare Zero Trust → Access → 建立 self-hosted application**
-   （`stockbot.minatoyukina.uk`，policy allow `c3035281@gmail.com`，登入方式最省事是內建的
+   （`stockbot.minatoyukina.uk`，policy allow `<使用者的 email>`，登入方式最省事是內建的
    One-time PIN，**不需要任何 OAuth 設定**）。
 2. **`cloudflared tunnel route dns d3074ec2-… stockbot.minatoyukina.uk`**（建立 CNAME）。
 3. **編輯 `C:\Users\Cheng\.cloudflared\config.yml` 加一條 ingress 並重啟 cloudflared**
@@ -521,7 +521,7 @@ Portfolio 排序、FY2028 model 擴充、Valuation v2、Post-MVP Graph Alpha Edg
 | 項目 | 狀態 | 證據 |
 |---|---|---|
 | 對外網址 | ✅ `https://stockbot.minatoyukina.uk` | 未登入 → **302** 導向 `bold-…cloudflareaccess.com/cdn-cgi/access/login/…` |
-| 認證 | ✅ **Google OAuth** | Access event analytics：`Identity provider = google`、`Users = c3035281@gmail.com`、`Granted 1`、`App types = Self-hosted`。⚠ **不是我們手動設的**——新版 Cloudflare One 在建立 Access 應用程式的流程中已把 Google 加成 identity provider，所以文件裡的「步驟 0」實際上被跳過了 |
+| 認證 | ✅ **Google OAuth** | Access event analytics：`Identity provider = google`、`Users = <使用者的 email>`、`Granted 1`、`App types = Self-hosted`。⚠ **不是我們手動設的**——新版 Cloudflare One 在建立 Access 應用程式的流程中已把 Google 加成 identity provider，所以文件裡的「步驟 0」實際上被跳過了 |
 | 手機 | ✅ iPhone Safari 可開 | 使用者實測 |
 | 既有 MCP | ✅ 未受影響 | `mcp.minatoyukina.uk` → `404`（**正常**：path token 未帶）；`neo4j.` → `200` |
 | tunnel 設定 | ✅ 只多一條 ingress | `config.yml` 內 `stockbot` 一條；`neo4j`／`mcp`（含 `httpHostHeader`）一字未動；catch-all 仍在最後；備份 `config.yml.bak` 在 |

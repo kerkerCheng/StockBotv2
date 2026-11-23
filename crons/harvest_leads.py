@@ -47,7 +47,7 @@ MOPS_HISTORY_LIMITS: dict[str, tuple[int, int]] = {
 #: 連續幾檔的列表抓不到就停打這台主機（其餘照記失敗）——被擋時繼續逐檔打只會延長被擋。
 MOPS_HISTORY_CONSECUTIVE_FAILURES = 3
 MOPS_CALENDAR = ZoneInfo("Asia/Taipei")
-_UA = "StockBotv2 daily-harvest (research; contact c3035281@gmail.com)"
+_UA = "StockBotv2 daily-harvest (research)"   # 只抓 RSS，不需要聯絡信箱；個人信箱不寫進 repo（2026-11-23）
 _X_STATUS_URL = re.compile(r"^https://x\.com/([^/]+)/status/(\d+)$")
 
 

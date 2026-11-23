@@ -22,7 +22,7 @@ import requests
 
 from fetchers.utils import write_raw
 
-_UA = "StockBotv2 research fetcher (contact: c3035281@gmail.com)"
+_UA = "StockBotv2 research fetcher"   # arXiv API 不需要聯絡信箱；個人信箱不寫進 repo（2026-11-23）
 _ATOM = "{http://www.w3.org/2005/Atom}"
 
 
