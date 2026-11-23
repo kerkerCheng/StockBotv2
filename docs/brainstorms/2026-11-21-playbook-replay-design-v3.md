@@ -657,3 +657,12 @@ Case: 使用者指示（Phase 8）
 5. 每日與 APP 排最後，照第四則。
 
 **第一批的三個層**：高功率連續波雷射（`tech:cw_dfb_laser`；Coherent、Sivers 騎）、CPO 全堆疊測試（`tech:cpo_full_stack_test`；Aehr、RoboTechnik 騎）、銅箔基板的含浸機與精密塗佈線（`tech:ccl_impregnation_treater`；亞泰金屬騎）——就是已經寫了賭注句的那三檔所在的層。
+
+### 2026-11-23（第六則）｜**SIGNED**：第二個修正案「劇本時間線」（第四則的內容、第五則的順序）
+
+**使用者原話**：「Ok 簽 我們能一次做到哪 我想把token一次花光」。先前同日已答：偵探的包可以放舊劇本的高點位置（「1. Ok」）。
+
+- 簽的範圍：第四則的五欄修正案，順序照第五則——回測甲先做（先登記判讀線）、字彙與事件表同時、回測乙先乾跑；帳與偵探試做等回測甲的結果給使用者看過；每日與 APP 排最後、開工前寫 plan。
+- 第一批的三個層照第五則（`tech:cw_dfb_laser`、`tech:cpo_full_stack_test`、`tech:ccl_impregnation_treater`）；使用者問了是哪三個、沒有改。
+- 不含：其餘 16 檔賭注句、改任何敘事或候選狀態（偵探試做那一檔除外，而且排在回測結果之後）、掛進每日排程、入圖、thesis、live。
+- ROADMAP 的 Phase 8 那一列同一個 commit 改。回測甲的判讀線另在 Phase 7 的帳登記，要使用者選的題目在登記之前問。
