@@ -1,0 +1,189 @@
+# 六張劇本卡 A3、B1–B5 每一列對到事件字彙 v1（人工標；2026-11-23）。欄：卡 格 列 種類 日期（覆寫，空＝用列上的發布日） 發布者（覆寫） 附註
+# 種類＝十種之一，或 x_摘要／x_沒找到／x_機械／x_背景／x_重複／x_落不進去
+01	A3	1	x_重複			同一份文件在 B1 表第 1 列
+01	A3	2	hard_signal
+01	A3	3	x_摘要
+01	B1	T1	capacity_add		供應商自述
+01	B1	T2	capacity_add		供應商自述
+01	B1	T3	capacity_add		供應商自述
+01	B1	T4	capacity_add		供應商自述	同日另有馬來西亞貿工部新聞稿（第三方）
+01	B1	T5	capacity_add		供應商自述
+01	B1	1	x_摘要
+01	B1	2	x_機械
+01	B1	3	x_沒找到
+01	B2	1	new_entrant	2022-03-15	供應商自述
+01	B2	2	x_沒找到
+01	B3	1	buyer_tone_down
+01	B3	2	buyer_tone_down
+01	B3	3	buyer_tone_down			供應商轉述的買家預估
+01	B3	4	buyer_tone_down	2022-10-28	供應商自述	同一張圖第一次往下改；2023-05-02 再改一次
+01	B4	1	buyer_commit
+01	B4	2	buyer_commit
+01	B4	3	x_機械
+01	B4	4	x_機械
+01	B4	5	x_沒找到
+01	B5	1	terms_turn
+01	B5	2	x_背景			風險因素的例行寫法
+01	B5	3	supplier_cut	2022-04-28	供應商自述	新廠量產由 2023 年改到 2024 年；2023-10-27 再寫配合需求調整
+01	B5	4	x_沒找到
+02	A3	1	x_重複			同一份文件在 B1 表第 1 列
+02	A3	2	hard_signal
+02	A3	3	hard_signal
+02	A3	4	x_摘要
+02	B1	T1	capacity_add		第三方
+02	B1	T2	capacity_add		供應商自述
+02	B1	T3	capacity_add		供應商自述
+02	B1	T4	capacity_add		供應商自述
+02	B1	T5	capacity_add		供應商自述
+02	B1	T6	capacity_add		供應商自述
+02	B1	T7	capacity_add		供應商自述
+02	B1	T8	capacity_add		供應商自述
+02	B1	1	x_摘要
+02	B1	2	x_背景
+02	B1	3	x_沒找到
+02	B2	1	x_沒找到
+02	B3	1	hard_signal			買家寫正在缺
+02	B3	2	x_背景			同一句還在，沒有變化
+02	B3	3	buyer_tone_down
+02	B3	4	hard_signal
+02	B3	5	x_背景
+02	B3	6	x_背景
+02	B4	1	buyer_commit			買家提早備料
+02	B4	2	buyer_commit	2019-05-30	供應商自述	預付發生在 2018-09、2018-11、2019-02；公開在這份年報
+02	B4	3	buyer_commit	2019-05-30	供應商自述
+02	B4	4	x_沒找到
+02	B4	5	x_沒找到
+02	B5	1	hard_signal	2018-06-13	供應商自述	漲價
+02	B5	2	terms_turn
+02	B5	3	terms_turn
+02	B5	4	x_沒找到
+03	A3	1	hard_signal
+03	A3	2	hard_signal
+03	A3	3	hard_signal
+03	A3	4	x_摘要
+03	B1	T1	capacity_add		供應商自述
+03	B1	T2	capacity_add		供應商自述
+03	B1	T3	capacity_add		供應商自述
+03	B1	T4	capacity_add	2019-06-06	供應商自述
+03	B1	1	x_摘要
+03	B1	2	x_沒找到
+03	B2	1	x_沒找到
+03	B3	1	buyer_commit		供應商自述	客戶主動要求談合約
+03	B3	2	buyer_tone_down		供應商自述
+03	B3	3	buyer_commit		供應商自述
+03	B3	4	buyer_tone_down		供應商自述
+03	B3	5	buyer_tone_down		供應商自述
+03	B3	6	buyer_tone_down		供應商自述
+03	B3	7	x_摘要
+03	B4	1	buyer_commit	2018-03-01	供應商自述	客戶預付
+03	B4	2	x_機械
+03	B4	3	x_沒找到
+03	B4	4	x_沒找到
+03	B5	1	hard_signal		供應商自述	漲了多少
+03	B5	2	buyer_commit		供應商自述	長約占比
+03	B5	3	x_背景			合約價照走，條件沒有變
+03	B5	4	terms_turn		供應商自述
+03	B5	5	x_沒找到
+04	A3	1	x_背景			只是一句新興應用
+04	A3	2	hard_signal
+04	A3	3	x_重複			同一份文件在 B4 第 1 列
+04	A3	4	x_摘要
+04	B1	T1	capacity_add		供應商自述
+04	B1	T2	x_重複			同一份文件在 B4 第 1 列
+04	B1	T3	capacity_add		供應商自述
+04	B1	T4	capacity_add		供應商自述
+04	B1	1	x_摘要
+04	B1	2	x_沒找到
+04	B2	1	x_背景
+04	B2	2	new_entrant
+04	B2	3	new_entrant
+04	B2	4	supplier_cut			新進者的新廠比預告晚
+04	B2	5	new_entrant
+04	B3	1	buyer_tone_down
+04	B3	2	supplier_cut		供應商自述
+04	B3	3	buyer_tone_down
+04	B4	1	buyer_commit
+04	B4	2	x_沒找到
+04	B4	3	x_沒找到
+04	B4	4	x_沒找到
+04	B5	1	x_背景
+04	B5	2	x_背景
+04	B5	3	x_摘要
+04	B5	4	x_沒找到
+05	A3	1	hard_signal		供應商自述
+05	A3	2	x_沒找到
+05	B1	T1	capacity_add	2000-02	供應商自述
+05	B1	T2	capacity_add	2000-09	供應商自述
+05	B1	T3	capacity_add		供應商自述
+05	B1	T4	capacity_add	2000-12	供應商自述
+05	B1	T5	capacity_add	2000-12	供應商自述
+05	B1	1	x_重複			年度合計，逐筆在表上
+05	B1	2	x_摘要
+05	B1	3	x_沒找到
+05	B2	1	x_沒找到
+05	B3	1	buyer_tone_down
+05	B3	2	buyer_tone_down		供應商自述
+05	B3	3	buyer_tone_down
+05	B4	1	buyer_funding		客戶端
+05	B4	2	buyer_funding
+05	B4	3	buyer_funding			融資變成呆帳
+05	B4	4	buyer_funding			買家借不到錢
+05	B4	5	x_沒找到
+05	B5	1	x_背景
+05	B5	2	hard_signal		供應商自述
+05	B5	3	supplier_cut
+05	B5	4	x_沒找到
+06	A3	1	buyer_tone_up		客戶端	錨的財測
+06	A3	2	buyer_commit
+06	A3	3	hard_signal
+06	A3	4	hard_signal
+06	A3	5	x_摘要
+06	B1	T1	capacity_add		供應商自述
+06	B1	T2	capacity_add		供應商自述
+06	B1	T3	capacity_add		供應商自述
+06	B1	T4	capacity_add		供應商自述
+06	B1	T5	capacity_add		供應商自述
+06	B1	T6	capacity_add		供應商自述
+06	B1	T7	capacity_add		供應商自述
+06	B1	T8	supplier_cut		供應商自述	年底產能目標往下改（同一句把 2027 年底的目標往上寫）
+06	B1	T9	capacity_add		供應商自述
+06	B1	1	supplier_raise	2026-11-05	供應商自述	賣股票在 2026-03～09；這一列引的是季報
+06	B1	2	x_重複			同一筆的分輪
+06	B1	3	x_重複			同一筆的分輪
+06	B1	4	x_機械
+06	B1	5	x_機械
+06	B1	6	supplier_raise
+06	B1	7	supplier_raise
+06	B1	8	x_沒找到
+06	B2	1	new_entrant
+06	B2	2	x_摘要
+06	B2	3	new_entrant
+06	B2	4	x_落不進去			技術路線轉向（插拔式模組到整合式光學）
+06	B2	5	x_落不進去			技術路線轉向
+06	B2	6	x_摘要
+06	B3	1	buyer_tone_up
+06	B3	2	buyer_tone_up
+06	B3	3	buyer_tone_up
+06	B3	4	buyer_tone_up
+06	B3	5	x_摘要
+06	B4	1	buyer_funding
+06	B4	2	buyer_funding
+06	B4	3	buyer_commit			買家對上游的採購承諾（錨的帳）
+06	B4	4	buyer_funding
+06	B4	5	buyer_funding
+06	B4	6	buyer_funding
+06	B4	7	buyer_funding
+06	B4	8	buyer_funding
+06	B4	9	x_機械
+06	B4	10	buyer_commit			錨往上游綁的量
+06	B4	11	buyer_commit
+06	B4	12	buyer_commit
+06	B4	13	x_重複
+06	B5	1	x_背景
+06	B5	2	x_背景
+06	B5	3	x_重複			同一份文件在 B4 第 11 列
+06	B5	4	buyer_commit
+06	B5	5	terms_turn			長約裡的價格上限
+06	B5	6	x_重複
+06	B5	7	x_重複
+06	B5	8	x_沒找到
