@@ -191,3 +191,11 @@ Readiness 規則同步換：核心面板改為 headline、短評、argument、re
 `test_implied_return`、`test_valuation_model`、`test_reverse_bridge*`、`test_multi_year_*`、`test_entry_logic`、`test_probe_sizing`、`test_webapp_basket`、
 `test_basket_screen_thresholds`、`test_bet_endgame`、`test_variant_scenario`、`test_decision_lab_e2e`、`test_action_card`、`test_alpha_expectation_gap`、
 `test_full_chain_acceptance`（重寫為新管線的 full chain）。**每刪一個測試檔，STEP_RESULT 列出它守的是哪個退役機制。**
+
+## Phase **8 歷史劇本回放** ▶（2026-11-24 目標重定前的原列；原行 58，1,717 字元）
+
+2026-11-24 使用者簽目標重定（`docs/brainstorms/2026-11-24-playbook-replay-regoal.md`）：成品改成帶分母的對照表，設計稿第三版的回放部分作廢。下面是改寫前的原始表格列逐字：
+
+```text
+| **8 歷史劇本回放** ▶（使用者 2026-11-22 簽核設計稿 [`brainstorms/2026-11-21-playbook-replay-design-v3.md`](brainstorms/2026-11-21-playbook-replay-design-v3.md)；**同日簽修正案（該檔檔尾最後一則）：先廣後深、拿掉 14 天條件、加對照讀法、劇本庫開放追加**——第一輪劇本卡 ✅ 六張（2026-11-22；其餘段不照清單做，改由回測的事件表照規則挑、含沒漲的）；**2026-11-23 簽第二個修正案「劇本時間線」（該檔檔尾 2026-11-23 第四、五則）：反例先回測、每日記帳、偵探讀帳**——回測甲「個股大漲之後」✅（2026-11-23 H17：加速與漲幅大小的崩支持、其餘四格不確定，獨立覆核 GO_WITH_NOTES；[報告](reports/phase7/replay-h17-results.md)）、事件字彙與兩把尺＋六張卡轉事件表 ✅（[events-v1](reports/phase8/playbook-cards/events-v1.md)；文件尺定義待使用者選）、回測乙「硬訊號之後」✅（2026-11-24 H18：澄清公告寫了漲價、缺貨、訂單的 865 次，判讀的兩條都不確定（+2.2、+1.8 個百分點，線是 3），八成兩年內沒翻倍；事後看前一年漲最多那一格多出少數大贏家，只印；獨立覆核 GO_WITH_NOTES；[報告](reports/phase7/replay-h18-results.md)、[乾跑](reports/phase7/replay-b-hard-signal-dryrun.md)）、考卷 ✅ 不及格（線一 58.4%；不掛每日；[考卷](reports/phase8/flagger-exam-v1.md)）＋第一批帳 ◐（四本已開、252 則全判完、層的帳只回溯到 2026；[帳](reports/phase8/ledgers-v0.md)）＋偵探讀帳試一檔 ○（等使用者看過回測甲的結果）、每日記帳與 APP 時間線 ○（要先過考卷 v2；開工前寫 plan；排程變更做 sandbox impact review）） | 一份長期維護、開放追加、不是 authority 的劇本庫：每段舊劇本一張**劇本卡**（欄位定死、每格帶日期的一手原句；[`reports/phase8/playbook-cards/`](reports/phase8/playbook-cards/README.md)）；讀卡後每檔可開寫一份**對照讀法**（像哪一段、像在哪、不像在哪、接下來該看到什麼、沒看到就認錯）進敘事與賭注句——由偵探讀帳產生、主 session 核過引文才寫入；**事件帳**（封閉的事件字彙、文件尺與數字尺兩把尺；錨一本、層各一本；每日只記帳不判定，判定在互動 session；不入圖、不過 gate）取代原訂的第二輪逐月回放；**反例由回測給**（甲：個股大漲之後；乙：硬訊號之後），不靠多做幾張有漲起來的卡 | 財務條件 H11–H13 量到底分不出、判讀回放 2／6 看不出分辨、H16 三個標記都不確定；使用者 2026-11-22「我們要有劇本樣本多，我們才好說現在是走哪一個劇本」「我現在看到的東西都沒有讓我真的有信心去下任何賭注，才會有這項開發項」；2026-11-23「我們還沒看反例」「我們明明討論的是時序」「系統怎麼自己發現」「我以為反例的洞是要先做回測的」（重大開發；案例 1 次，使用者指示） | 劇本卡張數、回放的表、帳的列數、考卷分數、回測的事件數都是機制，不算進展（照印）；進展只數：**敘事**——可開裡寫了對照讀法的檔數；**等待 registry**——由對照讀法與層級反證登記的 watch 條數；**追蹤表**——對照讀法記帳的條數與由它登記的前向假說條數 | 回測甲、字彙與事件表：無。帳與偵探試做：回測甲的結果使用者看過。每日與 APP：偵探試做使用者看過、plan |
+```
