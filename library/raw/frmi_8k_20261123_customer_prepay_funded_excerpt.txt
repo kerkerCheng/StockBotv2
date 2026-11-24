@@ -1,0 +1,9 @@
+SOURCE: Fermi Inc.（FRMI）— Form 8-K（Date of Report 2026-11-23）Item 8.01 Other Events
+URL: https://www.sec.gov/Archives/edgar/data/2071778/000121390026122877/ea0313210-8k_fermi.htm
+PUBLISHED: 2026-11-23
+RETRIEVED: 2026-11-23（daily 語意預篩存的全文，lead_dffa0b18a5c0078cece91cc09fe71a18）；2026-11-25 節錄
+STORAGE: repo_excerpt（美國法定公開申報有限節錄；逐字照抄）
+NOTE: 發行人自述。8-K 沒寫金額與客戶名；「customer prepay agreement discussed on its previous earnings call」對照第三季 10-Q 期後事項是隨非約束性意向書簽的 $200,000 千美元預付款協議（見 frmi_10q_2026q3_liquidity_hv_financing_tenant_excerpt.txt）——這個對應是我們的推論，8-K 本身沒寫數字。
+
+【Item 8.01 Other Events】
+"Fermi Inc. (the “Company”) announced today that the obligations under the customer prepay agreement discussed on its previous earnings call have been fulfilled, and the amounts due thereunder have been funded to the Company."

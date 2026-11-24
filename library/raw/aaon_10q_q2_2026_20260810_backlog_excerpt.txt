@@ -1,0 +1,11 @@
+SOURCE: AAON, Inc. — Form 10-Q（quarter ended 2026-06-30）
+URL: https://www.sec.gov/Archives/edgar/data/824142/000082414226000055/aaon-20260630.htm
+PUBLISHED: 2026-08-10
+RETRIEVED: 2026-08-10（daily 語意預篩存的全文，lead_317dd48a5f0d264130dfa66df468b933）；2026-11-25 節錄（空白攤平成單一空格，其餘逐字）
+STORAGE: repo_excerpt（美國法定公開申報有限節錄）
+NOTE: 發行人自述。AAON 敘事（不要）核對第二季數字用：BASX 在手訂單第二季對去年同期 +185.4%（10-K 的 141.3% 是 2025 年底對 2024 年底）。
+
+【Item 2 MD&A — Net sales（第二季）】
+"Net sales for the three months ended June 30, 2026 grew 101.2% to $627 million driven by the strong demand and growth of our BASX-branded products. BASX-branded products increased 216.2%, or $235.7 million when compared to the three months ended June 30, 2025."
+【Item 2 MD&A — Backlog（第二季）】
+"Backlog is up from a year ago for both AAON-branded products and BASX-branded products with BASX-branded products increasing 185.4%, or $929.3 million, when compared to June 30, 2025. Most of these orders were associated with the BASX-branded data center liquid cooling solutions."

@@ -14,3 +14,12 @@ NOTE: 發行人新聞稿（自述）。全文沒有具名的資料中心或共�
 "New wide bandgap opportunities include solid-state circuit breakers (SSCBs) as an emerging application for both SiC and GaN power semiconductors, driven by the need for fast and efficient power protection in next-generation data centers and energy infrastructure. X-FAB has secured two SSCB-related development agreements during the third quarter, with several additional opportunities under negotiation."
 "Cash and cash equivalents totaled USD 196.0 million at the end of the quarter, an increase of USD 32.5 million from the previous quarter. Net debt amounted to USD 315.5 million, up USD 3.2 million from the previous quarter."
 （* excluding impact from revenue recognized over time according to IFRS 15）
+
+【Highlights Q3 2026（2026-11-25 補；以下三段取自公司官網新聞稿 PDF，pypdf 抽字、空白攤平）】
+"Revenue was USD 194.4 million, down 15% year-on-year (YoY) and down 3% quarter-on-quarter (QoQ) › Excluding the impact from revenue recognized over time (IFRS 15), revenue was USD 200.7 million, down 12% YoY and up 2% QoQ"
+
+【Revenue by end market 表（Q4 2024 至 Q3 2026 八季、Q3 年增率、核心占比；百萬美元，*不含 IFRS 15 隨時間認列）】
+"Automotive 128.6 135.4 143.4 146.9 132.6 121.6 116.0 119.1 -19% Industrial 36.1 39.3 47.2 47.6 50.5 52.0 45.2 49.6 4% Medical 16.5 13.8 15.1 21.2 21.2 19.2 21.0 19.1 -10% Subtotal core business 181.2 188.6 205.7 215.7 204.3 192.9 182.1 187.8 -13% 92.1% 93.2% 94.2% 94.2% 93.7% 93.6% 92.9% 93.6%"
+
+【Revenue by technology 表（同上八季）】
+"Smart CMOS & SOI 170.8 173.4 185.1 191.8 182.9 156.9 156.7 158.6 -17% Microsystems & Photonics1 20.2 22.9 25.3 27.5 25.0 33.7 28.7 25.9 -6% Wide-bandgap technologies2 5.8 6.0 7.9 9.6 10.2 15.1 10.6 16.2 68%"

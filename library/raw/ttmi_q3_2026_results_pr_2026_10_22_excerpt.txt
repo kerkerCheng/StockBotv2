@@ -37,3 +37,12 @@ NOTE: 發行人自己的新聞稿（自述）。全文 grep「capacity」只在 
 
 【2026-10-19 8-K EX-99.1 — 交割時程】
 "This transaction is expected to close in the second quarter of 2027."
+
+【2026-10-19 8-K EX-99.1——Ophir Optics 收購價與業務（2026-11-25 補）】
+"today announced that it has entered into a definitive agreement to acquire the Ophir Optics business (“Ophir Optics”) from MKS Inc. (NASDAQ: MKSI) for approximately $650 million in an all-cash transaction, subject to customary closing adjustments. The Ophir Optics business is an Israel and Romania-based manufacturer of high-precision infrared thermal imaging and laser optics solutions, serving defense, security and industrial applications."
+【Q3 2026 結果新聞稿——英國、德國板廠與已完成的收購（2026-11-25 補）】
+"to a definitive agreement with plans to acquire Merlin Circuit Technology Ltd. and Merlin Flex Ltd., two small printed circuit board fabrication factories in the United Kingdom for an undisclosed amount, with transaction funding expected to come from cash on hand."
+"TTM previously announced the planned acquisition of ILFA GmbH, a German printed circuit manufacturer. The acquisition is expected to close during the fourth quarter of 2026 and is excluded from current guidance."
+"In recent weeks and up through the date of this press release, TTM has completed the previously announced acquisitions of Swiss Technology Group (“STG”) and Epiq Solutions (“Epiq”"
+【Q3 2026 結果新聞稿——2027 初步預測的口徑（2026-11-25 補）】
+"Our initial 2027 full year forecast includes contributions from recently closed acquisitions and associated financing costs while excluding the impacts of planned or potential acquisitions that have not been closed."

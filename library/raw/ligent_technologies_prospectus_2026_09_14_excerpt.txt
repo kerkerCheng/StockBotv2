@@ -47,3 +47,6 @@ Total：2023 4,238,989｜2024 5,086,600｜2025 8,354,680｜H1 2025 4,215,825｜H
 
 【Business — 生產設施（PDF 第 163 頁；2026-11-13 補進節錄：同一份招股書重新下載、pypdf 抽字、逐字、空白正規化）】
 "Considering our multi-regional production capacity planning for optical chips, during the Track Record Period and up to the Latest Practicable Date, our U.S. production facility manufactured laser chip wafers, which were mainly shipped to our Qingdao production facility to produce laser chips."
+
+【招股書 FINANCIAL INFORMATION（PDF p.235、頁碼 226）——2026 中期報告豁免（2026-11-25 補；pypdf 抽字、空白攤平後逐字）】
+"Pursuant to the Note to Rule 13.48(1) of the Listing Rules, we have fulfilled the three requirements to waive the publication of a separate interim report, and we do not intend to publish a separate interim report in respect of the six months ended June 30, 2026 under the aforementioned Rule."

@@ -28,3 +28,6 @@ NOTE: 發行人自述。SPB.TO 敘事（不要）何時格寫的觀測點「第�
 【p.4 2026 Outlook】
 "Anticipated 2026 CNG Adjusted EBITDA growth has improved to ~5% driven by stronger-than-expected growth in the data center and industrial segments coupled with continued strength in the wellsite business. This growth is not expected to offset a decline in propane, driven by capacity investments to improve winter readiness as well as temporarily elevated customer attrition following last winter."
 "CNG Adjusted EBITDA(1) Growth (4%) to (9%) ~5%"
+
+【p.4 2026 Outlook 表（2026-11-25 補：整家 Adjusted EBITDA 指引 ~2% → (~2%)；表格抽字壓成一行，Previous／Current 兩欄依序）】
+"Previous 2026 Outlook Current 2026 Outlook Adjusted EBITDA(1) Growth ~2% (~2%) Key Assumptions: North American Propane Adjusted EBITDA(1) Growth (incl ~$30M Superior Delivers, previously ~$50M) 3% to 8% (~5%) CNG Adjusted EBITDA(1) Growth (4%) to (9%) ~5%"

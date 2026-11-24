@@ -29,3 +29,7 @@ NOTE: 發行人自己的年報與季報（自述）。Phase 7 Step 7.1 段 5「�
 
 【Item 2 MD&A — Recent Developments（增資）】
 "On July 1, 2026, we completed an underwritten public offering of 17.25 million shares of our common stock at a price to the public of $50.00 per share for proceeds of $830.25 million, net of underwriting discounts and issuance costs."
+
+【10-Q（quarter ended 2026-07-04）MD&A——營收成長的歸因（2026-11-25 補）】
+"We continued to see improving market conditions in the second fiscal quarter of 2026, resulting in revenue growth driven primarily by higher sales volume and improved pricing conditions."
+"Average selling prices increased versus the prior fiscal quarter."

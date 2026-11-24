@@ -28,3 +28,9 @@ NOTE: 發行人自述。金額單位百萬美元。10-Q 營收表四欄依序是
 "neither Element Solutions nor Solstice will be responsible for any payments to the other party as a result of the termination of the Merger Agreement."
 【④ Rule 425（2026-07-28）】
 "in connection with its proposed acquisition by Solstice Advanced Materials Inc. (“Solstice”)."
+
+【① 10-Q Item 2 營收表（Semiconductor Solutions；2026-11-25 補）】
+"Semiconductor Solutions 111.0 89.6 323.9 257.2"
+
+【① 10-Q 合併協議日期與終止（2026-11-25 補）】
+"The proposed acquisition of Element Solutions by Solstice pursuant to the Agreement and Plan of Merger, dated as of July 6, 2026, by and among Element Solutions, Solstice, Solar Merger Sub One Inc. and Solar Merger Sub Two LLC. On August 27, 2026 the parties mutually agreed to terminate"

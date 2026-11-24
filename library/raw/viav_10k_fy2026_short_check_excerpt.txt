@@ -24,3 +24,12 @@ NOTE: 發行人自己的年報（自述）。全文沒有 co-packaged／CPO 字�
 
 【Notes — Segment information】
 "One customer of the Company in the OSP segment generated $174.7 million, $166.7 million and $154.1 million of net revenue, which represented more than 10% of total net revenue, during fiscal 2026, 2025 and 2024, respectively."
+
+【Item 7 MD&A — Net revenue 接續（2026-11-25 補：併購貢獻數字）】
+"Our acquisition of Spirent’s HSE and CE business contributed $145.0 million of net revenue in fiscal 2026 and Inertial Labs contributed $86.1 million of net revenue in fiscal 2026."
+
+【Item 1 Business — 成長方向（2026-11-25 補：資料中心生態的客戶類型）】
+"Data Center Ecosystem: High performance communication and computing test solutions for advanced semis, optical modules, network equipment manufacturers (NEMs), hyperscalers, and enterprises;"
+
+【Item 1 Business — 產業概況（2026-11-25 補）】
+"The data center ecosystem, consisting of semiconductor vendors, transceiver and module developers, NEMs, and end users including hyperscalers and data center operators amongst others, is driving rapid change and strong demand in the industry."

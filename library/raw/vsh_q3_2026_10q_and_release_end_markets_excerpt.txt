@@ -13,3 +13,6 @@ NOTE: 發行人自己的申報（自述）。research-drain 段 0「無內文」
 
 === 10-Q（MD&A） ===
 "The order level remained at a high level and backlog continued to increase."
+
+=== 第三季財報新聞稿（經營者的話；2026-11-25 補，8-K exhibit99-1.htm） ===
+"Q3 revenue of $979 million marked the highest quarterly revenue ever in Vishay’s history and exceeded the top end of our guidance."

@@ -1,0 +1,9 @@
+SOURCE: Schaeffler AG corporate news「Schaeffler with solid nine-months results」（EQS News 發布；Key word(s): Quarter Results/9 Month figures）
+URL: https://menafn.com/1111906615/Schaeffler-With-Solid-Nine-Months-Results（MENAFN 轉載的 EQS Group 原文；schaeffler.com 新聞稿列表是 JS 載入，這次沒抓到原頁）
+PUBLISHED: 2026-11-03
+RETRIEVED: 2026-11-25（HTML 抽字、空白攤平後逐字照抄）
+STORAGE: repo_excerpt（發行人公司新聞有限節錄）
+NOTE: 發行人自述。10-13 是初步數字（schaeffler_9m_2026_preliminary_humanoid_orders_2026_10_13.txt），這份是完整九個月結果。全文 grep「humanoid」只有下面一句：沒有人形營收、預付或最低採購量，新客戶沒具名。
+
+【CEO 的話（Klaus Rosenfeld）】
+"As a broadly positioned Motion Technology Company, our diversified portfolio enabled us to at least partly compensate for the situation in the automotive original equipment business, which has become more difficult, by growth in other areas. At the same time, we are further expanding our future growth areas. Especially in humanoid robotics, we won new customers and continued to expand our order book during the reporting period. On that basis, we confirm our full-year guidance for 2026 and the mid-term targets for 2028,” says Klaus Rosenfeld, CEO of Schaeffler AG."
