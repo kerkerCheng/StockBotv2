@@ -1672,3 +1672,130 @@ T0 執行結果（母體 EDGAR 237／X 67／公司與新聞 feed 36／decompose 
   ②階段一那一筆寫「不在宇宙內 406（四碼以外、興櫃、DR、事件月底沒有收盤）」——四碼以外的代號在算 2,087 之前就濾掉了，406 只是興櫃、DR、事件月底沒有收盤。
 - **報告用語已照覆核改**（說太滿的三處：「沒掉回來」改用第 12／24 個月月收盤仍 ≥ 2 倍；「同月全市場偏正」補真實幅度約 +0.5；窄的差「全在 2017–2020」改成主要在前段、拿掉 2017 降到 +2.7）。主 session 用 `review_check.py`（sha 前 16 碼 `3ac7086020b80f50`，逐字附在報告檔尾）重算過；這些都是事後、不進判讀。
 - **給以後的登記（不追溯）**：「拿掉事件最多那一年」對影響最大的那一年不敏感（這次拿掉 2021，影響最大的是 2017）；以後改成拿掉影響最大的那一年，或逐年都拿掉看一次。「以 LF 換行算」的 digest 一律寫明＝把 CRLF 換成 LF（欄位內可能有單獨的 CR）。
+
+### 2026-11-24｜讀圖考試 v1（Phase 8 步驟 1a）：寫死的詞表從文件裡抄出來的記號，分不分得出讀圖判「繞不過」與「繞得過」的層；預先登記，先於任何逐節點的計算（使用者 2026-11-24「好 照建議 繼續」：及格線兩個比例都 ≥ 70% 加 p < 0.05；主規則三個買家端記號任一、供應商自己說缺只印；階段 B 及格才做）
+
+- **為什麼加**：使用者 2026-11-24「由買家點名真的缺或啥的 好像不多嗎？ 瓶頸感覺都是要讀圖或是偵探挖個一兩層比較容易拿到？ 純讀文件可以嗎」。Phase 8 目標重定（[決定紀錄](../../brainstorms/2026-11-24-playbook-replay-regoal.md) D7）把回放限制成「模型只准逐字抽取、不准判讀」；所以先考一次——不經任何判斷、只用寫死的詞表抄出來的記號，像不像我們自己的讀圖——及格才寫回放規則（步驟 1b）。規格：[reading-exam-v1-spec.md](../phase8/reading-exam-v1-spec.md)（草稿 commit `9c8d6228`）。
+- **它不是什麼**：不是 H 編號的假說——不碰股價、不量任何結果；不是讀圖對不對的測驗（記號與讀圖可能一起錯）；不是兩手走法的測驗（讀的是我們已經挑進庫的文件，不是照規則全收的）。及格只是必要條件：階段 A 讀的是抽取時模型挑過的引文，是上界。
+- **登記前看過什麼（照實寫）**：
+  - 讀圖 ledger：只看過判讀種類的計數（規格 §2 那條查證命令：87 個節點——判不出 50、量 23、都不是 12、換不掉 2）。**沒有讀過任何一份讀圖的內文、引用、快照列。**
+  - 圖：只看過形狀的彙總（EdgeAssertion 1,320 筆、每筆引 1 份 SourceDoc；518 份 SourceDoc 裡 28 份沒有發布日；EdgeAssertion 有哪些欄位）。**沒有按節點看過任何引文，沒有拿詞表比對過任何一段真的引文。**
+  - 程式碼與設定：`alpha/structure_reading/contracts.py`、`alpha/providers/structure_readings.py`、`query/structure.py`、`query/origin_resolution.py`、`query/sub_language.py`、`query/bottleneck.py` 的定義；`config/substitutability_language.json` 的開頭（比對方式的先例；它的字表與這裡的「少數來源」「多源」兩張有重疊）。
+  - 同一天、與考卷無關但會影響詞表用語的：六家買方 10-K 的錨帳計數（71 則裡硬訊號 1、買方綁產能 14）、CW 雷射帳的計數、NVIDIA 兩個年度 10-K 的供應商段落、EDGAR 全文搜尋的命中數、劇本卡的事件字彙 v1（十種）。詞表的英文用語受這些影響（例如 10-K 的 purchase obligations、prepaid）。寫詞表的是模型，它對這個產業的一般知識擋不掉。
+  - 這個 session 從乾淨的 context 開始；專案記憶的索引裡有幾檔個股的名字與一句話狀態（其中一句提到一檔對照組的可替代性分數），沒有任何節點的讀圖判讀。
+  - 程式只用**假資料**跑過（`examlib.py` 的自查）；`stage1.py`、`stage2.py` 只編譯與 import 過，**沒有執行**。
+
+**以下 §2–§6 逐字照規格（只把標題降一級、標成「規格 §N」，內容一字不改；詞表區塊 sha256 `6330de39f0432865bbc0e3e8454a8b21baf24557e1c15fe607dcae1ba7e8ab2c`，追加時由腳本核過與程式讀到的相同）：**
+
+#### 規格 §2 考卷
+
+- 讀圖 ledger 裡每個節點取**最新一份、沒撤回的**讀圖；計分前把名單（節點、讀圖 id、判讀、寫下的日子）凍結、記 digest。
+- 2026-11-24 的快照（凍結時以當下為準）：87 個節點——量 23、換不掉 2（合稱**繞不過** 25）；都不是 12（**繞得過**）；判不出 50（不計分、只印）。
+  查證：`python -c "from alpha.providers.structure_readings import known_nodes, read_reading_records as r; from collections import Counter; print(Counter(x[-1].kind for x in (r(n)[0] for n in known_nodes()) if x))"`
+
+#### 規格 §3 給它讀什麼
+
+- **階段 A（本規格）**：那個節點在圖上五個角度（需求側、供給側、下一層、對手路徑、開發者）每條邊的逐字引文，只收**來源文件發布日不晚於那份讀圖寫下的日子**的；沒有發布日的排除並計數。
+- **誰說的**（每段引文各判一次，沿用既有的發布者解析）：來源文件的發布者坐在這個節點的供給側＝**供應商**；在需求側＝**買方**；其餘解析得到的＝**第三方**；解析不到的另計，不算進任何「買方或第三方才算」的記號。
+- **階段 B（及格才做，另登記）**：同一批文件的原始全文，用固定的取句規則，不靠抽取當時挑的引文。
+
+#### 規格 §4 記號
+
+| 記號 | 定義 | 誰說的才算 | 進主規則 |
+|---|---|---|---|
+| 買家說缺 | 引文命中「缺」詞表 | 買方、第三方 | 是 |
+| 供應商自己說缺 | 同一張詞表 | 供應商 | 否，只印（供應商自述是弱證據） |
+| 買家拿錢綁產能 | 引文命中「綁」詞表 | 不限（合約兩邊都會揭露）；按誰說的分開印 | 是 |
+| 只有幾家做 | 引文命中「少數來源」詞表 | 買方、第三方 | 是 |
+| 只有幾家做（用數的） | 快照供給側的公司數 ≤ 3 | — | 否，只印（家數跟我們讀多深有關） |
+| 反向：買方寫明不只一家 | 引文命中「多源」詞表 | 買方、第三方 | 否，只印 |
+
+#### 規格 §5 詞表（寫死；登記後不改）
+
+比對方式沿用 `query/sub_language.py`：ASCII 詞整詞、不分大小寫；中日韓字整串出現即算。
+
+```text
+缺：
+shortage, shortages, short supply, supply constraint, supply constraints, supply constrained, supply-constrained,
+capacity constraint, capacity constraints, capacity constrained, capacity-constrained, constrained supply, tight supply,
+supply tightness, sold out, on allocation, allocation basis, extended lead times, longer lead times, lead time extension,
+price increase, price increases, price hike, price hikes, raised prices, backlog
+缺貨, 缺货, 供不應求, 供不应求, 吃緊, 吃紧, 緊缺, 紧缺, 短缺, 滿載, 满载, 產能不足, 产能不足, 交期拉長, 交期拉长,
+交期延長, 交期延长, 漲價, 涨价, 調漲, 调涨, 積壓訂單, 积压订单
+逼迫, 品薄, 供給不足, 値上げ, 受注残
+공급 부족, 쇼티지, 가격 인상, 수주잔고
+
+綁：
+prepayment, prepayments, prepaid, prepay, advance payment, advance payments, customer deposit, customer deposits,
+long-term supply agreement, long-term supply agreements, long-term agreement, long-term agreements,
+long-term purchase agreement, multi-year supply agreement, multi-year agreement, capacity reservation,
+capacity reservations, reserved capacity, capacity commitment, capacity commitments, take-or-pay,
+purchase commitment, purchase commitments, purchase obligation, purchase obligations, non-cancellable, non-cancelable,
+noncancelable, warrant, warrants, equity investment, strategic investment, co-investment
+預付, 预付, 預收, 预收, 長約, 长约, 長期供貨, 长期供货, 長期合約, 长期合同, 長期供應, 长期供应, 包產能, 包产能,
+產能保證, 产能保证, 保障產能, 保障产能, 鎖定產能, 锁定产能, 入股, 認股權, 认股权, 策略投資, 战略投资,
+採購承諾, 采购承诺, 合約負債, 合同负债
+長期供給契約, 前受金, 資本参加, 出資
+장기공급계약, 선수금, 선급금, 지분 투자
+
+少數來源：
+sole source, sole-source, sole sourced, sole supplier, single source, single-source, single sourced, single supplier,
+only supplier, only source, only qualified, limited number of suppliers, limited number of sources, limited sources,
+limited source, few suppliers, exclusive supplier, exclusively from, no alternative, no alternatives, no other supplier,
+no other suppliers, no second source, qualification period, requalification, re-qualification, lengthy qualification
+獨家, 独家, 唯一供應, 唯一供应, 單一供應, 单一供应, 單一來源, 单一来源, 少數供應商, 少数供应商, 少數幾家, 少数几家,
+寡占, 寡头, 無替代, 无替代, 難以替代, 难以替代, 認證期, 認證時間, 认证周期, 验证周期
+独占, 唯一, 寡占
+독점, 단독 공급, 유일
+
+多源（只印）：
+second source, second-source, second sourcing, dual source, dual-source, dual sourcing, multi-source, multi-sourcing,
+multiple sources, multiple suppliers, alternative supplier, alternative suppliers, alternative source,
+alternative sources, qualified a second, additional supplier, additional suppliers, switch suppliers,
+diversify suppliers, supplier diversification
+第二供應, 第二供应, 第二來源, 第二来源, 雙供應, 双供应, 多家供應, 多家供应, 替代供應, 替代供应, 分散供應, 分散供应,
+導入第二, 导入第二
+```
+
+這四張表不得出現在 `prompts/`、`skills/`（抽取端讀得到就會挑含這些字的引文，記號恆亮；與 `config/substitutability_language.json` 同一條規矩）。
+
+#### 規格 §6 判讀
+
+- **主規則**：一個節點只要有「買家說缺」「買家拿錢綁產能」「只有幾家做（買方或第三方寫的）」任一個，就判**繞不過**；三個都沒有，判**繞得過**。
+- **計分**只在有判讀的節點上：
+  - 抓到率＝讀圖判繞不過的節點裡，主規則也判繞不過的比例。
+  - 放掉率＝讀圖判繞得過的節點裡，主規則也判繞得過的比例。
+- **及格線**（三個都過才及格，不設中間地帶）：抓到率 ≥ 70%；放掉率 ≥ 70%；Fisher 精確檢定單尾 p < 0.05。
+  以 2026-11-24 的快照算＝25 個裡至少 18 個、12 個裡至少 9 個。
+- **一次計分**。看過結果想改詞表或規則＝另登記一版，而且要用新的考卷（之後才寫的讀圖），不得改了重跑同一份。
+- **只印、不進判讀**：每個記號各自的 2×2；層與插槽分開；判不出的那些被主規則判成什麼；全部節點被判繞不過的比例（恆亮檢查）；
+  每個節點命中的詞與那一句原文（標籤要指得回原文）；被時點排除、沒有發布日、解析不到發布者、日韓文的引文各幾段。
+
+**套用說明**（規格沒寫到的實作細節；全部在看任何結果之前定）：
+
+1. **考卷一個節點一題。** 現行讀圖的選法沿用既有的 `select_readings`（每個單位取最新一筆；最新一筆是撤回＝這個單位沒有現行讀圖）；一個節點兩個單位（層、插槽）都有現行讀圖時，取寫下時間最新的那一份，並計數。所以題數可能跟規格 §2 引的 87 不同（那條查證命令取的是每個節點的最後一筆紀錄，不分單位、不看撤回）；**及格線照比例算（各七成），不照「18 個、9 個」**。凍結日 2026-11-24。考卷的欄位：節點、單位、讀圖 id、判讀、寫下的日子（UTC 日）、那份讀圖自己存的快照裡供給側的公司數。
+2. **引文的範圍**：今天的圖上，那個節點五個角度（`query.structure.build_structure`）每條邊的逐字；查詢與 `query.structure._Q_QUOTES` 同形（有效逐字以 `source_ids` 為準），多帶來源文件的發布日；同一條邊、同一份文件、同一段（空白正規化後）只算一次。時點＝`latest_possible_date(published_at)` 不晚於讀圖寫下的日子（只有年月的取當月最後一天）；讀不出日子的排除並計數。**以文件的發布日篩，不以入圖日篩**——讀圖的人當時不一定看過這一段。
+3. **誰說的**：`query.origin_resolution.resolve_origin`。層讀圖——供應商＝坐在這個節點上的公司（`is_seat_edge`：`co:*` 對它的 `supplies_to`／`develops`）；買方＝需求側那一角的 `co:*` 端點；兩邊都是的算供應商。插槽讀圖——供應商＝對這個產品 `supplies_to` 的 `co:*`；買方＝`develops`／`deploys` 這個產品的 `co:*` 加需求側的 `co:*` 端點；兩邊都是的算買方。登記的發布者（媒體、研究機構）＝第三方；解析得到、但不在兩側的公司也算第三方——**包括鄰層、變體層的供應商與同業，沒有逐段確認它獨不獨立**。解析不到的另計。兩側用今天的圖判，不是讀圖當時的快照。
+4. **比對前的正規化**：詞與引文都把連字號、破折號換成空白、連續空白收成一個；其餘照 `query.sub_language._term_pattern`（含中日韓字的詞整串出現即算；其餘前後不得緊接英數字，不分大小寫）。
+5. 「買家拿錢綁產能」不限誰說的（規格 §4），解析不到發布者的也算；按誰說的分開印。
+6. 第三方的引文不濾轉述（媒體轉述供應商的話照樣算第三方）——這會讓「買家說缺」偏鬆，列為限制。
+7. 「只有幾家做（用數的）」用考卷上那份讀圖自己存的快照（供給側那一角的 `co:*` 來源端去重），不用今天的圖。
+8. 詞表由程式直接讀規格 §5 那一塊（不另抄一份到程式裡）；階段二執行時核對上面那個 sha256 與考卷的 sha256，任一不符就不算。
+9. 公開的檔只放計數與 digest；考卷與每題命中的原句留在本機私有區（`library/private/measurement/exam_reading_v1/`）。
+10. **形狀檢查（不是判讀）**：考卷上的邊對得到引文的不到一半、或留下的引文是零 → 階段二中止，不印、不寫任何計分；修了再跑要在結果那一筆寫明改了什麼。
+
+**加印（不進判讀；登記時補的，在看任何結果之前）**：
+
+- **研究量檢查。** 主規則是「任一段命中就算」，引文越多越容易亮——正是 `AGENTS.md` 說的「會隨我們多讀一份文件而單調上升」的指標；而我們對判了繞不過的層多半研究得比較深。所以另印三組（繞不過、繞得過、判不出）每題留下的引文數（最小、中位數、最大），與每組「命中主規則三個記號任一的引文段數 ÷ 留下的引文段數」。
+  **讀法先寫定**：R＝繞不過組每題引文數的中位數 ÷ 繞得過組的（分母是 0 當成無限大）；H＝繞不過組按引文計的命中率 ÷ 繞得過組的（分母是 0 而分子 > 0 當成無限大；兩邊都是 0 當成 1）。**及格、而且 R ≥ 2、而且 H < 1.5** → 結論寫成「及格，但分不出是記號有鑑別力還是研究量」。這不改及格與否，但 1b 的規格必須先處理它。
+- **沒有引文的題。** 一題若沒有任何一段留下的引文，主規則會自動判它「繞得過」。所以另印：各組沒有引文、沒有任何邊的題數；只含有引文的題的那張 2×2。**讀法先寫定**：主表及格、而只含有引文的題那張不及格 → 結論寫成「及格靠的是沒有引文的題被自動判成繞得過」。
+- 各記號每個詞在幾題上亮過（分三組）；「買家拿錢綁產能」按誰說的分；判不出的題被主規則判成什麼；全部題目被判繞不過的比例（恆亮檢查）。
+
+**假結果自查（登記前，只用假的 2×2）**：抓到 18／漏 7／誤判 3／放掉 9 → 抓到率 72%、放掉率 75%、p 0.0092，及格；17／8／3／9 → 68%，不及格；18／7／4／8 → 放掉率 67%，不及格；全部判繞不過（25／0／12／0）→ 放掉率 0%，不及格（恆亮不得及格）。比對、誰說的、主規則另用假句子核過（例：`warranty` 不得命中 `warrant`；只有供應商自己說缺時主規則不亮；解析不到發布者的「缺」不算、「綁」算）。
+
+- **後果（先寫定；照規格 §8）**：**及格** → 寫步驟 1b（回放規則規格），階段 B（原始文件版）併進 1b 的乾跑；**不及格** → 回放停，交使用者選：Phase 8 改成只做前向，或另登記一版記號、用新的考卷（之後才寫的讀圖）再考。不論哪一種，都不改任何讀圖、敘事、候選狀態、排序、門檻（G10）。
+- **偏差標註**：①引文是抽取時模型挑的，讀圖的引用也出自同一批引文——階段 A 是上界 ②研究量（上面加印的第一條）③詞表是寫規格的同一個模型寫的；它沒讀過讀圖的內文，但知道這個產業 ④讀圖與記號可能一起錯——這場只回答「像不像」 ⑤小樣本，同一條鏈上的層彼此相關，檢定把它們當成獨立的（p 偏樂觀）⑥兩側（誰是供應商、誰是買方）用今天的圖判；第三方不濾轉述、不確認獨立 ⑦以發布日篩、不以入圖日篩 ⑧詞表以英文與中文為主，日韓文只有少數幾個詞 ⑨「綁」詞表裡的 purchase commitments、warrant、equity investment 等詞，在供應商自己的年報裡常指它自己對上游的承諾或它自己的融資，不一定是買家綁它。
+- **程式**（本筆時的 sha256 前 16 碼，把 CRLF 換成 LF 後算）：`examlib.py` `a4f0c90d71b34479`、`stage1.py` `8c7ff7c5cc1c84cf`、`stage2.py` `f16e015e71d8016c`。之後若有改動（例如修錯），在結果那一筆逐條寫出改了什麼、是在看任何結果之前還是之後。
+- **不改的**：這一筆之後上面每一項都不再動；要更正只能在這一筆之後追加，並寫明是在看任何結果之前還是之後。**一次計分**，不改詞表或規則重跑同一份考卷。
+  順序：本筆 commit → 階段一（凍結考卷、記 digest；commit）→ 階段二（計分，一次）→ 結果另起一筆。獨立覆核這次沒有開（使用者沒有選）。
+- **量在哪一層**：讀圖（記號與讀圖判讀像不像）；不是追蹤表，不碰結果。
