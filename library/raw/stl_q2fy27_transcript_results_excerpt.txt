@@ -55,3 +55,6 @@ Optical networking business 851 401 136 1,252 273 606
 
 【結果表：合併營收】
 Revenue from operations 2,529 1,910 1,034 4,439 2,054 4,745
+
+【結果表：合併分部營收與分部 EBITDA（2026-11-24 補；同一份 Result Sheet Q2 FY 27 第 1 頁，pypdf 抽字、空白攤平、逐字）】
+"1. Segment revenue Optical networking business 2,461 1,842 980 4,302 1,941 4,486 Digital and technology solutions 86 72 65 159 129 284 Inter segment elimination (18) (4) (11) (22) (16) (25) Revenue from operations 2,529 1,910 1,034 4,439 2,054 4,745 2. Segment Results (EBITDA) Optical networking business 851 401 136 1,252 273 606 Digital and technology solutions 2 2 1 4 2 3 Total segment results 853 403 137 1,256 275 609 Net unallocated income / (expense) (7) (6) 4 (13) 6 19 Total EBITDA 846 397 141 1,243 281 628 Finance cost 63 55 55 118 105 224 Depreciation and amortisation expense 109 85 80 194 157 313 Profit/(loss) before exceptional item and tax 674 257 6 931 19 91 Exceptional items (Refer note 8) - - - - - 16"

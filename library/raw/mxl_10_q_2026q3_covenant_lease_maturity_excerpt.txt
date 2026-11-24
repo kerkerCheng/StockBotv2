@@ -21,3 +21,6 @@ NOTE: 補 library/raw/mxl_10_q_2026q3_infrastructure_wafer_prepay_debt.txt 沒�
 
 [Condensed Consolidated Balance Sheets — 股數（千股）]
 "91,000 shares issued and outstanding at September 30, 2026 and 86,451 shares issued and outstanding at December 31, 2025"
+
+【Subsequent event — Third Amendment：流動性門檻（2026-11-25 補：敘事「10-16 修約後門檻 6,000 萬」引的是這句；「35」是抽字混進的頁碼）】
+"The Third Amendment also amends the Company’s 35 liquidity covenant by reducing the threshold thereunder from $80 million to $60 million."
