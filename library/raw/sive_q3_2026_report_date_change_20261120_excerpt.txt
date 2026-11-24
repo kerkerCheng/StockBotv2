@@ -1,0 +1,10 @@
+SOURCE: Sivers Semiconductors AB — 受規管新聞稿「Change of Date for Sivers Semiconductors’ Q3 2026 Report and Invitation to Presentation」（Regulatory，2026-11-20）
+URL: https://www.sivers-semiconductors.com/（公司官網 News；發布日 2026-11-20 17:02 UTC，瑞典文版同日）
+PUBLISHED: 2026-11-20
+RETRIEVED: 2026-11-24
+STORAGE: repo_excerpt（公司公開新聞稿有限節錄；HTML 轉文字、空白攤平後逐字照抄）
+NOTE: 發行人自述的財報日期變更；沒有寫延後的理由。
+節錄：逐字（空白已正規化）；每段以錨句為準，前後各取一段。
+
+[新聞稿 2026-11-20｜anchor] today announced that the Board of Directors has decided to move the publication of the interim report for the third quarter of 2026 from Thursday, November 26, 2026 to Monday, November 30, 2026
+Change of Date for Sivers Semiconductors' Q3 2026 Report and Invitation to Presentation - Sivers Semiconductors Skip to content Sivers Semiconductors - Products Products - Wireless - Photonics - Applications Applications Wireless - Satellite Communications - Fixed Wireless Access/5G - Defense Photonics - Data Communications, AI and Machine Learning - Sensing - FMCW LiDar for 3D Imaging - Company Company - About us - Our Offices - Management - Careers - Events - Blogs - News - Investors Investors Corporate Governance - General Meetings - Committees - Board of Directors & Executive Management - Auditor - Articles of Association - Information Policy - Insider Policy - Code of Conduct Investor information - Shares - Shareholders - IR Contact - Annual Reports - Interim Reports - Presentations & Interviews - Financial Calendar - Prospectus - Contact Us Contact - - SIVERS PRESSRELEASE Change of Date for Sivers Semiconductors’ Q3 2026 Report and Invitation to Presentation November 20, 2026 | Category: Regulatory Kista, Sweden – November 20, 2026 – Sivers Semiconductors AB (STO:SIVE) today announced that the Board of Directors has decided to move the publication of the interim report for the third quarter of 2026 from Thursday, November 26, 2026 to Monday, November 30, 2026. The report will be published at approximately 6:00 PM CET (12:00 PM ET), followed by a webcast presentation at 6:30 PM CET (12:30 PM ET).
