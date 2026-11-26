@@ -327,6 +327,36 @@ def test_company_names_come_from_the_registry() -> None:
     assert spp.company_names(REGISTRY) == {"co:zzzz_example": ["範例精密"], "co:pkg_a": ["封裝廠甲"],
                                               "co:pkg_b": ["封裝廠乙", "甲乙封裝"]}
 
+# ---------------------------------------------------------------- 冷讀包（Step 8.4a）
+
+def test_cold_pack_writes_only_the_visible_words_and_the_one_prompt(tmp_path) -> None:
+    folder = _layout(tmp_path)
+    page, prompt = spp.cold_pack(folder)
+    assert page == folder / "coldread" / "PAGE.txt" and prompt == folder / "coldread" / "PROMPT.md"
+    text = page.read_text(encoding="utf-8")
+    from alpha.narrative.story_page import cold_read_prompt, parse_fragment, visible_text
+
+    assert text == visible_text(parse_fragment((folder / spp.PAGE_FILE).read_text(encoding="utf-8"))[0])
+    assert "出處" in text                                   # 摺疊的那一行 summary 看得到
+    assert "範例精密年報（虛構）" not in text                  # 摺疊裡的出處與原話不給讀者
+    assert prompt.read_text(encoding="utf-8") == cold_read_prompt(str(page.resolve()))
+    assert spp.cold_pack(folder) == (page, prompt)           # 再跑一次照蓋、不疊
+
+
+def test_cold_pack_needs_the_fragment(tmp_path) -> None:
+    with pytest.raises(ContractViolation, match="page.html"):
+        spp.cold_pack(tmp_path)
+
+
+def test_cold_pack_command(tmp_path, capsys) -> None:
+    from alpha import cli
+
+    folder = _layout(tmp_path)
+    assert cli.main(["story-page", "cold-pack", str(folder)]) == 0
+    out = capsys.readouterr().out
+    assert "PAGE.txt" in out and "PROMPT.md" in out and "REPORT.md" in out and "唯讀" in out
+    assert cli.main(["story-page", "cold-pack", str(tmp_path / "nope")]) == 1
+
 # ---------------------------------------------------------------- 對帳（Step 8.3）
 
 def _loader(*briefs):

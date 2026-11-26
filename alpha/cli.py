@@ -1132,6 +1132,7 @@ def cmd_story_page(args: argparse.Namespace) -> int:
     - `text <資料夾｜代號>`：印看得到的字（冷讀與量字數用的同一份）。
     - `list`：每家的現行頁與它對不對著現行敘事；`show <代號>`：一家的版本史。
     - `gaps`：故事和系統對不上的三種（敘事換版、等待沒登記、押的單位對不上）與怎麼清——⑤「故事頁該對版」同一份判定。
+    - `cold-pack <資料夾>`：冷讀包——`coldread/PAGE.txt`（看得到的字）＋`coldread/PROMPT.md`（派工提示，唯一一份在程式裡）。
 
     ⚠ 故事頁不是 authority：不改候選狀態、不擋任何別的寫入、不入圖。寫完重跑 `python -m webapp materialize <代號>`。
     """
@@ -1181,6 +1182,16 @@ def cmd_story_page(args: argparse.Namespace) -> int:
             html = sp.read_html(head)
         root, _problems = parse_fragment(html)
         print(visible_text(root), end="")
+        return 0
+    if args.action == "cold-pack":
+        try:
+            page, prompt = sp.cold_pack(Path(args.folder))
+        except AlphaError as exc:
+            print(f"✗ {exc}", file=sys.stderr)
+            return 1
+        print(f"✓ 冷讀包：{page}（{len(page.read_text(encoding='utf-8')):,} 字）＋ {prompt}")
+        print("  下一步：Agent 工具派一位乾淨 context 的唯讀便宜模型，提示用 PROMPT.md 全文、只給 PAGE.txt；"
+              f"回報全文存成 {page.parent / 'REPORT.md'}（skills/stock-story「冷讀」）")
         return 0
     if args.action == "gaps":
         try:
@@ -1505,7 +1516,8 @@ def build_parser() -> argparse.ArgumentParser:
 
     page = sub.add_parser(
         "story-page",
-        help="個股故事頁的帳（一版對一版敘事；APP 個股頁印它）：check／add 資料夾、rebind 對版、text、list、show、gaps")
+        help="個股故事頁的帳（一版對一版敘事；APP 個股頁印它）：check／add 資料夾、rebind 對版、text、list、show、gaps、"
+             "cold-pack")
     page_sub = page.add_subparsers(dest="action", required=True)
     page_check = page_sub.add_parser("check", help="乾跑：page.html＋page.json 的全部檢查（ERROR 有就 exit 1），不寫檔")
     page_check.add_argument("folder")
@@ -1523,6 +1535,8 @@ def build_parser() -> argparse.ArgumentParser:
     page_show.add_argument("ticker")
     page_gaps = page_sub.add_parser("gaps", help="故事和系統對不上的三種與怎麼清（⑤「故事頁該對版」同一份判定）")
     page_gaps.add_argument("--format", choices=("markdown", "json"), default="markdown")
+    page_cold = page_sub.add_parser("cold-pack", help="冷讀包：coldread/PAGE.txt（看得到的字）＋coldread/PROMPT.md（派工提示）")
+    page_cold.add_argument("folder")
     page.set_defaults(func=cmd_story_page)
 
     edge = sub.add_parser(

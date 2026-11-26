@@ -72,6 +72,18 @@ def test_visible_text_counts_summary_but_not_the_folded_sources_or_svg_title() -
     assert "（買方）" in text                              # 來源等級在文字版寫成括號
 
 
+def test_cold_read_prompt_is_read_only_offline_and_asks_for_six_things() -> None:
+    """冷讀的派工提示唯一一份在程式裡（plan §2.8）：讀者只拿到看得到的字；不對外、不寫任何檔、不給投資建議；回六樣。"""
+    prompt = sp.cold_read_prompt("C:/x/coldread/PAGE.txt")
+    assert prompt.splitlines()[0] == "對外請求不帶 email、不帶個人資訊；本任務不需要對外。"   # AGENTS 的派工第一行
+    assert "C:/x/coldread/PAGE.txt" in prompt
+    for rule in ("不對外", "不寫任何檔", "不給投資建議", "只讀這一個檔"):
+        assert rule in prompt, rule
+    headings = [line for line in prompt.splitlines() if line.startswith("### ")]
+    assert headings == [f"### {i}. {title}" for i, title in enumerate(sp.COLD_READ_SECTIONS, 1)]
+    assert len(sp.COLD_READ_SECTIONS) == 6 and "{" not in prompt          # 沒有沒填到的佔位字
+
+
 def test_svg_attribute_case_is_accepted() -> None:
     root, _problems = sp.parse_fragment(HTML)
     svg = next(n for n in root.iter() if n.tag == "svg")

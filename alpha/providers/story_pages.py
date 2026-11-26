@@ -20,7 +20,8 @@ from pathlib import Path
 from typing import Any, Callable, Iterable, Mapping, Sequence
 
 from alpha.errors import ContractViolation
-from alpha.narrative.story_page import Finding, PageCheck, check_page, normalize_for_match
+from alpha.narrative.story_page import (COLD_READ_DIR, Finding, PageCheck, check_page, cold_read_prompt, normalize_for_match,
+                                        parse_fragment, visible_text)
 
 _ROOT = Path(__file__).resolve().parents[2]
 STORY_PAGES_PATH = _ROOT / "library" / "private" / "alpha" / "story_pages.jsonl"
@@ -397,6 +398,28 @@ def current_brief(ticker: str, *, brief_loader: BriefLoader | None = None, today
     """這一檔現行的 v2 敘事（沒有＝None）。寫入核對、物化、對帳三處共用這一個定義。"""
     return _current_brief(ticker, brief_loader=brief_loader, today=today)[0]
 
+# ---------------------------------------------------------------- 冷讀包（plan §2.8；派工、對照、記帳住 skills/stock-story「冷讀」）
+
+COLD_READ_PAGE = "PAGE.txt"
+COLD_READ_PROMPT_FILE = "PROMPT.md"
+
+
+def cold_pack(folder: Path) -> tuple[Path, Path]:
+    """在寫作資料夾裡寫 `coldread/PAGE.txt`（看得到的字——量字數與 W 類檢查用的同一個函式；摺疊裡的出處與原話不在）
+    與 `coldread/PROMPT.md`（`cold_read_prompt`，提示唯一一份）。讀者的回報由主 session 存成 `coldread/REPORT.md`
+    （宣告的 `cold_read.report`）。不讀別的帳、不改片段；片段不見了就 raise。"""
+    source = Path(folder) / PAGE_FILE
+    if not source.is_file():
+        raise ContractViolation(f"資料夾裡沒有 {PAGE_FILE}：{folder}")
+    root, _problems = parse_fragment(source.read_text(encoding="utf-8"))
+    out = Path(folder) / COLD_READ_DIR
+    out.mkdir(parents=True, exist_ok=True)
+    page = out / COLD_READ_PAGE
+    page.write_text(visible_text(root), encoding="utf-8", newline="\n")
+    prompt = out / COLD_READ_PROMPT_FILE
+    prompt.write_text(cold_read_prompt(str(page.resolve())), encoding="utf-8", newline="\n")
+    return page, prompt
+
 # ---------------------------------------------------------------- 故事和系統對不上的三種（plan §2.6）
 
 #: 封閉字彙（順序＝印的順序）。三種都是互動 session 自己清得掉的：圖上缺的那一層只要求登記成線索，不要求入圖（L14④）。
@@ -518,7 +541,8 @@ def current_brief_ids(tickers: Iterable[str], *, brief_loader: BriefLoader | Non
 
 
 __all__ = [
-    "DECLARATION_FILE", "FolderReport", "PAGE_FILE", "RECORD_KINDS", "STORY_PAGES_PATH", "STORY_PAGE_DIR",
+    "COLD_READ_PAGE", "COLD_READ_PROMPT_FILE", "DECLARATION_FILE", "FolderReport", "PAGE_FILE", "RECORD_KINDS",
+    "STORY_PAGES_PATH", "STORY_PAGE_DIR", "cold_pack",
     "STORY_PAGE_GAP_KINDS", "STORY_PAGE_GAP_LABELS", "STORY_PAGE_GAP_REMEDY", "WAIT_STATUS_LABELS", "add_page", "check_folder",
     "company_names", "current_brief", "current_brief_ids", "current_pages", "gaps_now", "graph_nodes_exist", "history",
     "html_file", "load_folder", "page_gaps",

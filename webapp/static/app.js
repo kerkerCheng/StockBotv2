@@ -1669,6 +1669,7 @@ async function renderDetail(ticker, legacy) {
   if (what) head.appendChild(what);
   const sub = headerLine(payload, view);
   if (sub) head.appendChild(sub);
+  head.appendChild(deepDiveButton(payload, view));    // 2026-11-26 Phase 8 Step 8.4a：蒐證到寫故事頁的整段
   head.appendChild(askClaudeButton(payload, view));   // 2026-10-28 定案 8：把這一頁帶進對話
   app.appendChild(head);
 
@@ -1843,12 +1844,15 @@ function storyPageHead(sp) {
     sp.checklist_version ? `照問題清單 ${sp.checklist_version}` : null,
     seen.length ? `看過股價：${seen.join('、')}${sp.price_as_of ? `（看到 ${sp.price_as_of}）` : ''}` : '寫的時候沒看股價'];
   box.appendChild(el('div', 'story-version', bits.filter(Boolean).join('｜')));
-  if (sp.stale) {
-    box.appendChild(el('div', 'warn story-stale', sp.current_brief_on
-      ? `敘事在 ${sp.current_brief_on} 換版了，這一頁還沒對版` : '現在沒有現行的敘事，這一頁綁的那一版已經不是現行'));
-  }
+  if (sp.stale) box.appendChild(el('div', 'warn story-stale', storyStaleText(sp)));
   if (sp.brief_note) box.appendChild(el('div', 'note', `對版沒核：${sp.brief_note}`));
   return box;
+}
+
+/** 故事頁過期那一句（頁首橫幅與「做深」「問 Claude」兩段提示共用）。 */
+function storyStaleText(sp) {
+  return sp.current_brief_on ? `敘事在 ${sp.current_brief_on} 換版了，這一頁還沒對版`
+    : '現在沒有現行的敘事，這一頁綁的那一版已經不是現行';
 }
 
 /** 頁上一條等待的徽章：等待 registry 的狀態（字取 `.meta.json`，前端不另寫）＋哪天醒來重看；watch id 放 title。 */
@@ -2044,19 +2048,20 @@ function headerLine(payload, view) {
   return bits.length ? el('div', 'detail-sub', bits.join('｜')) : null;
 }
 
-/* ---------- 個股頁「問 Claude」（2026-10-28 定案 8：APP 怎麼協助理解一間公司、跟 agent 對話展開） ----------
-   一顆按鈕把這一頁的現況組成一段提示、複製到剪貼簿，貼進 Claude Code（這個 repo）的對話裡展開。APP 本身不跑 LLM、不連外
-   （request path 規則不動）；提示裡的每一個字都是這一頁已經印出來的（做什麼、候選狀態、理由、在等什麼），不另算、不另抓。
-   剪貼簿不給用時攤開那一段讓你自己複製——不假裝複製成功。`?ask=1` 把提示印進隱藏的 `#ask-preview`（headless 驗證用，同 selfcheck）。 */
+/* ---------- 個股頁「做深這一檔」「問 Claude」（問 Claude：2026-10-28 定案 8；做深：2026-11-26 Phase 8 Step 8.4a） ----------
+   兩顆按鈕各把這一頁的現況組成一段提示、複製到剪貼簿，貼進 Claude Code（這個 repo）的對話裡展開。APP 本身不跑 LLM、不連外
+   （request path 規則不動）；提示裡的每一個字都是這一頁已經印出來的（做什麼、候選狀態、理由、在等什麼、故事頁），不另算、不另抓。
+   剪貼簿不給用時攤開那一段讓你自己複製——不假裝複製成功。`?ask=1` 把兩段提示印進隱藏的 `#deep-preview`、`#ask-preview`
+   （headless 驗證用，同 selfcheck）。「問 Claude」只讀、先理解；「做深」是蒐證到寫故事頁的整段研究（偵探的「做深」→ 故事頁），
+   會寫線索、節錄、敘事換版、等待與故事頁——四個人工 gate 照舊，提示最後一行寫邊界。 */
 
-function askClaudePrompt(payload, view) {
+/** 這一頁的現況（兩段提示共用同一份字，L16）。 */
+function pageStatusLines(payload, view) {
   const lines = view && view.candidate ? lineMap(view.candidate) : {};
   const state = lines['candidate:state'] && lines['candidate:state'].datum;
   const row = (state && state.value) || null;
   const what = payload.what_it_does || {};
-  const name = payload.company_label ? `${payload.company_label}（${payload.ticker}）` : payload.ticker;
-  const day = String((payload.freshness || {}).generated_at || '—').slice(0, 10);
-  const out = [`我想在 StockBotv2 這個 repo 裡深入了解 ${name}。APP 個股頁的現況（判讀產生於 ${day}）：`];
+  const out = [];
   if (what.line) out.push(`- 做什麼：${what.line}`);
   if (row) {
     out.push(`- 候選狀態：${row.derived_label || row.derived || '—'}`
@@ -2074,6 +2079,27 @@ function askClaudePrompt(payload, view) {
   } else {
     out.push('- 候選狀態：這一頁沒有候選狀態（還沒寫敘事，或不在候選範圍）');
   }
+  out.push(`- 故事頁：${storyPageStatus(payload.story_page)}`);
+  return out;
+}
+
+/** 故事頁有沒有、是不是過期（一句；`story_page` 是物化時放進來的那一格）。 */
+function storyPageStatus(sp) {
+  if (!sp) return '還沒有（這一檔還沒做深）';
+  if (sp.absence) return `有，但這一輪讀不到（${sp.absence.reason || absenceLabel(sp.absence.kind) || '沒說為什麼'}）`;
+  const bits = [`有${sp.written_on ? `，寫於 ${sp.written_on}` : ''}`];
+  if (sp.stale) bits.push(storyStaleText(sp));
+  return bits.join('；');
+}
+
+function pageName(payload) {
+  return payload.company_label ? `${payload.company_label}（${payload.ticker}）` : payload.ticker;
+}
+
+function askClaudePrompt(payload, view) {
+  const day = String((payload.freshness || {}).generated_at || '—').slice(0, 10);
+  const out = [`我想在 StockBotv2 這個 repo 裡深入了解 ${pageName(payload)}。APP 個股頁的現況（判讀產生於 ${day}）：`,
+    ...pageStatusLines(payload, view)];
   out.push('', '請先只讀（不寫任何 authority）它的敘事、它押的那一層的讀圖與層說明，然後告訴我：',
     '① 這一檔在賭什麼、憑什麼、什麼會推翻它——每一句指得回原文；',
     '② 讀到邊了嗎：客戶為什麼選這家的變體、什麼會讓它被換掉；答不出就寫「缺 X」；',
@@ -2085,15 +2111,30 @@ function askClaudePrompt(payload, view) {
   return out.join('\n');
 }
 
-function askClaudeButton(payload, view) {
+/** 「做深這一檔」的提示（plan Step 8.4a）：第一行就是 skill 認得的那一句；蒐證、拼線索、落帳在偵探，寫故事頁在 stock-story。 */
+function deepDivePrompt(payload, view) {
+  const name = payload.company_label ? `（${payload.company_label}）` : '';
+  const day = String((payload.freshness || {}).generated_at || '—').slice(0, 10);
+  return [`做深 ${payload.ticker}${name}`,
+    '照 skills/detective/SKILL.md 的「做深」：對外蒐證、拼線索、落帳（節錄照存、圖的洞登記成線索、敘事換版、等待登記；全程不看股價），出蒐證包；',
+    '再照 skills/stock-story/SKILL.md 寫這一檔的故事頁：照問題清單寫、檢查、冷讀、收進帳，讓 APP 個股頁印出來。',
+    '',
+    `APP 個股頁的現況（判讀產生於 ${day}）：`,
+    ...pageStatusLines(payload, view),
+    '',
+    '邊界：圖的洞登記成線索、入圖等我 go；不改候選狀態；不給目標價與排序；付費來源先問我金額。'].join('\n');
+}
+
+/** 「做深這一檔」「問 Claude」共用的那一段：複製、複製不了就攤開、`?ask=1` 印進隱藏的預覽（不抄兩份）。 */
+function copyPromptButton(label, makeText, previewId) {
   const box = el('div', 'ask-claude');
-  const button = el('button', 'ask-btn', '問 Claude（複製提示）');
+  const button = el('button', 'ask-btn', label);
   button.type = 'button';
   const status = el('span', 'dim ask-status', '');
   box.appendChild(button);
   box.appendChild(status);
   button.addEventListener('click', async () => {
-    const text = askClaudePrompt(payload, view);
+    const text = makeText();
     try {
       await navigator.clipboard.writeText(text);
       status.textContent = '　已複製——貼到 Claude Code（這個 repo）的對話裡。';
@@ -2110,12 +2151,20 @@ function askClaudeButton(payload, view) {
     }
   });
   if (/[?&]ask=1\b/.test(window.location.search)) {
-    const preview = el('pre', null, askClaudePrompt(payload, view));
-    preview.id = 'ask-preview';
+    const preview = el('pre', null, makeText());
+    preview.id = previewId;
     preview.hidden = true;
     box.appendChild(preview);
   }
   return box;
+}
+
+function askClaudeButton(payload, view) {
+  return copyPromptButton('問 Claude（複製提示）', () => askClaudePrompt(payload, view), 'ask-preview');
+}
+
+function deepDiveButton(payload, view) {
+  return copyPromptButton('做深這一檔（複製提示）', () => deepDivePrompt(payload, view), 'deep-preview');
 }
 
 /* ---------- 共用：導覽、行內強調、表格 ----------

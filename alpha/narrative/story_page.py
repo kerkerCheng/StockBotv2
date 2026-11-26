@@ -806,12 +806,50 @@ def whitelist_payload() -> dict[str, Any]:
             "patterns": {"id": _ID.pattern, "href": _SAFE_HREF.pattern, "url_ref": _LOCAL_URL_REF.pattern,
                          "bad_scheme": _BAD_SCHEME.pattern}}
 
+# ---------------------------------------------------------------- 冷讀（plan §2.8；派工、對照、記帳住 skills/stock-story「冷讀」）
+
+#: 冷讀包住寫作資料夾的這個子資料夾；回報存成這裡的 REPORT.md（宣告的 `cold_read.report` 指它）。
+COLD_READ_DIR = "coldread"
+#: 讀者回報的六樣（順序＝標題順序；skill 與測試照這一份）。
+COLD_READ_SECTIONS: tuple[str, ...] = (
+    "五句話重述：這家公司在賭什麼",
+    "第一次出現時沒解釋的詞（逐條：詞＋它第一次出現的那一句）",
+    "要回頭重讀才懂的句子（逐條：那一句＋卡在哪）",
+    "讀完還想問的（最多五個）",
+    "覺得重複的（逐條：哪幾處在講同一件事）",
+    "最容易被讀錯的三處（逐條：那一句＋可能被讀成什麼）",
+)
+#: 冷讀的派工提示（唯一一份，照 `alpha.detective.PROMPT_TEMPLATE` 的做法；skill 只說用它、不另抄——L16）。
+#: 讀者只拿到這一頁看得到的字：不給問題清單、不給對話、不給蒐證包——寫的人已經知道答案，讀不出哪裡讀不懂。
+COLD_READ_PROMPT = """對外請求不帶 email、不帶個人資訊；本任務不需要對外。
+
+你是第一次讀到這一頁的讀者。你手上只有一個純文字檔：{page}
+那是一家公司的「故事頁」看得到的字（摺疊起來的出處與原話不在裡面）。沒有問題清單、沒有前面的對話、沒有蒐證包，也不需要。
+
+## 鐵則
+- 只讀這一個檔；不開別的檔、不查資料、不上網、不呼叫任何外部服務（不對外）。
+- 不寫任何檔、不跑會改東西的命令；你的最終訊息就是交付物。
+- 不給投資建議、目標價、買賣時點，也不評這家公司值不值得買——你評的是這一頁讀不讀得懂。
+- 用繁體中文寫；引用頁上的句子逐字照抄、用「」包起來。
+
+## 回報六樣（照這個順序、用這六個標題）
+{sections}
+"""
+
+
+def cold_read_prompt(page_path: str) -> str:
+    """冷讀派工提示的全文（`page_path`＝PAGE.txt 的路徑）。"""
+    sections = "\n".join(f"### {i}. {title}" for i, title in enumerate(COLD_READ_SECTIONS, 1))
+    return COLD_READ_PROMPT.format(page=page_path, sections=sections)
+
 
 __all__ = [
-    "DECLARATION_KEYS", "Finding", "GLOBAL_ATTRS", "HTML_TAGS", "Node", "PageCheck", "QUESTION_IDS", "SECTION_IDS",
+    "COLD_READ_DIR", "COLD_READ_PROMPT", "COLD_READ_SECTIONS", "DECLARATION_KEYS", "Finding", "GLOBAL_ATTRS", "HTML_TAGS",
+    "Node", "PageCheck", "QUESTION_IDS", "SECTION_IDS",
     "SELF_EVAL_VALUES", "SOURCE_LEVELS", "SVG_ATTRS", "SVG_TAGS", "SVG_TEXT_ONLY", "TAG_ATTRS", "VISIBLE_CHARS_RANGE",
     "WAIT_KINDS",
-    "all_text", "check_page", "cold_read_problems", "declaration_problems", "fragment_problems", "normalize_for_match",
+    "all_text", "check_page", "cold_read_problems", "cold_read_prompt", "declaration_problems", "fragment_problems",
+    "normalize_for_match",
     "page_wait_keys", "parse_fragment", "private_string_problems", "quote_found", "quotes_in", "structure_problems",
     "system_slot_problems", "visible_chars", "visible_text", "whitelist_payload", "whitelist_problems",
     "writing_warnings",

@@ -44,8 +44,8 @@ spawn 前先讀週額度（`python -m crons.llm_quota`）。本 plan 已知會�
 | 8.0 | 文件：本 plan、兩份 skill 照定案的分工改寫、`AGENTS.md` 四處、ROADMAP 與 CONCEPTS 整理 | 強模型 | Z2／R1 | ✅ 2026-11-26 | `6a70068` |
 | 8.1 | 故事頁的帳、片段與宣告的檢查、`python -m alpha story-page` 命令、合成範例頁 | 便宜模型 | Z2／R1 | ✅ 2026-11-26 | `5c2c9f2`＋`02ad42b` |
 | 8.2 | 物化把現行故事頁放進個股物化檔；APP 個股頁換新框架（故事 → 系統裡的它；沒做深的印短故事）；樣式表 | 便宜模型 | Z3／**R2** | ✅ 2026-11-26（R2 GO） | `523952c`＋`a868f9e` |
-| 8.3 | 故事和系統對不上的三種：`story-page gaps`、待做清單新一格、心跳照印 | 便宜模型 | Z2／R1 | ✅ 2026-11-26 | （本 commit） |
-| 8.4a | 「做深這一檔」按鈕；冷讀包（頁面文字＋提示，提示唯一一份在程式裡） | 便宜模型 | Z1／R1 | ○ | |
+| 8.3 | 故事和系統對不上的三種：`story-page gaps`、待做清單新一格、心跳照印 | 便宜模型 | Z2／R1 | ✅ 2026-11-26 | `c8a6580` |
+| 8.4a | 「做深這一檔」按鈕；冷讀包（頁面文字＋提示，提示唯一一份在程式裡） | 便宜模型 | Z1／R1 | ✅ 2026-11-26 | （本 commit） |
 | 8.4b | 畫圖工具（地圖、時間長條、對數股價圖），輸出過得了片段檢查 | 便宜模型 | Z1／R1 | ○ | |
 | 8.4c | 兩份 skill、OPERATIONS、ARCHITECTURE 接上真的命令（§3 Step 8.4c 列了要改的句子） | 便宜模型 | Z0／R0 | ○ | |
 | 8.5 | 三頁搬進 APP：讀回、轉成片段與宣告、對照已發布的頁、各跑一次冷讀；Sivers 頁刪到字數上限內 | **強模型** | 研究＋Z1 | ○（要能讀回私有頁面，或使用者下載 HTML） | |
@@ -337,6 +337,15 @@ spawn 前先讀週額度（`python -m crons.llm_quota`）。本 plan 已知會�
 - **怎麼驗**：`tests/test_webapp_ask_claude.py` 加：新提示只用 payload 組、不抓任何東西、含兩份 skill 的路徑與那一行邊界；`?ask=1` 的隱藏預覽同時印得出兩段。
   `cold-pack` 的測試：`PAGE.txt` 不含 `<details>` 裡的字、`PROMPT.md` 含「不對外」「不寫任何檔」與六樣回報。
 - **第④問**：最先壞的是既有的「問 Claude」按鈕（共用程式抽壞了）——headless 用 `?ask=1` 讀一次預覽。
+- **執行紀錄（2026-11-26）**：
+  - 共用的不只複製與攤開（`copyPromptButton`；全檔 `navigator.clipboard.writeText` 只剩一處）：「這一頁的現況」也抽成一份
+    （`pageStatusLines`），兩段提示照用，多一行「故事頁：還沒有／有，寫於哪天；過期一句」——過期那一句和頁首橫幅同一個函式（`storyStaleText`）。
+    `test_webapp_ask_claude.py` 原有判準照留、主詞改成共用的函式。
+  - `COLD_READ_PROMPT`（與六樣 `COLD_READ_SECTIONS`）照計畫放在規則模組；`cold_pack` 要寫檔，放帳模組 `alpha/providers/story_pages.py`
+    （規則模組維持純函式）。提示第一行就是派工規定的那一句「對外請求不帶 email……」；冷讀包寫 `coldread/PAGE.txt`、`coldread/PROMPT.md`，
+    回報存 `coldread/REPORT.md`（宣告 `cold_read.report` 指它，E6 核得到）。`PAGE.txt` 就是量字數與 W 類檢查用的那一份看得到的字。
+  - 驗收：正式 APP 重啟（`code.stale=false`）→ headless `?ask=1`：COHR、000660.KS 兩段隱藏預覽都印得出來，「做深」第一行
+    「做深 COHR（Coherent Corp.）」、最後一行是邊界；頁首兩顆按鈕；390 寬零溢出、零疊字。
 
 ### Step 8.4b 畫圖工具（Z1／R1）
 
