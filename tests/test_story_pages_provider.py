@@ -185,7 +185,8 @@ def test_add_copies_the_fragment_and_appends_one_row(tmp_path) -> None:
     assert record["created_at"] == NOW.isoformat()
     assert record["warnings"] and record["warnings"][0].startswith("W1 ")
     assert record["declaration"]["brief_id"] == BRIEF.brief_id
-    assert spp.read_html(record, root=tmp_path) == (folder / spp.PAGE_FILE).read_text(encoding="utf-8")
+    # 位元組比位元組：這台機器簽出時換行是 CRLF，read_text 會把它轉成 LF（2026-11-26 簽出後實測紅過）
+    assert spp.read_html(record, root=tmp_path).encode("utf-8") == (folder / spp.PAGE_FILE).read_bytes()
     lines = _ledger(tmp_path).read_text(encoding="utf-8").splitlines()
     assert len(lines) == 1 and json.loads(lines[0]) == record
 
