@@ -1058,9 +1058,57 @@ AnalystView.brief（optional）→ APP 首屏 briefCard；六張卡收進「為�
 **為什麼禁字表在型別層：** 首屏是投資人的；「白話別名」那次是把欄位翻成中文，欄位還在——這次是欄位不上首屏。
 **套件叫 `narrative` 不叫 `brief`：** `alpha/brief.py` 已是 daily brief 的渲染模組。
 
-### 6.12 個股頁三層：短評／論證／稽核（2026-09-15）
+### 6.12 個股頁：故事 → 系統裡的它（2026-11-26 Phase 8；取代 2026-09-15 的三層）
 
-**判準一句話：消費層的單位是句與段；格只住稽核層。**
+**判準一句話：個股的消費單位是一頁故事（AGENTS「消費契約」）；系統自己知道的由程式填，不手抄。**
+plan：[`docs/plans/2026-11-26-001-feat-phase8-story-page-app-plan.md`](plans/2026-11-26-001-feat-phase8-story-page-app-plan.md)；
+寫法住 `skills/stock-story`（呈現）與 `skills/detective`（蒐證、落帳），命令順序住 OPERATIONS「做深一檔與故事頁」。
+
+| 這一檔 | 個股頁（`renderDetail` → `stockPage`） |
+|---|---|
+| 有現行故事頁 | 頁首 → 版本一行（寫於哪天、清單版本、看過誰的股價、股價圖畫到哪天；過期一條橫幅）→ 故事片段：片段裡 `#system` 的空位換成「系統裡的它」，每個 `data-wait` 後面加等待徽章（照等待 registry：已登記・哪天醒來重看／還沒登記） |
+| 沒有 | 頁首 → 「這一檔還沒做深」→ 短故事（§6.11「故事層與依據層」）→ 示意圖 → 系統裡的它 |
+| 有、但這一輪讀不到 | 只有故事那一塊印「故事頁讀不到：原因」（不說還沒做深），其餘同上一列——整份物化檔照寫 |
+
+- **頁首**：代號、公司名、做什麼一行、現價一行；兩顆複製提示的按鈕「做深這一檔」（偵探的「做深」→ 故事頁的整段）與「問 Claude」（只讀）。
+  兩段提示共用同一份「這一頁的現況」（`pageStatusLines`：做什麼、候選狀態與理由、在等、前提失效、故事頁有沒有、過期一句）；
+  複製只有一個出口（`copyPromptButton`），剪貼簿不給用就說。按鈕不抓任何東西、不寫任何東西。
+- **系統裡的它**（`systemBlock` 一個函式、固定順序，全部沿用現有元件、不新算任何數）：敘事狀態燈 → 候選狀態與賭注句 → 押在哪一層、
+  路徑、這條鏈怎麼走（走圖的敘事與 claim 引文）、示意圖（有故事頁時放這裡）→ 層與插槽 → 會不會先死（四盞燈）→ 已定價嗎、
+  出現在數字裡了嗎與數字 → 反證與加碼條件 → 事件與影響多大 → 下檔、時間表 → 現在的股價 → 對不上的（只在有故事頁時）。
+- **頁尾**：一個小連結到舊版個股頁（過渡期，`#/old/<代號>`：§6.11 的「頁首＋十三塊」，`briefCard`）。舊函式不刪，刪不刪由 Phase 8 結案時使用者決定。
+
+**故事頁的帳**（帳 `alpha/providers/story_pages.py`；純規則 `alpha/narrative/story_page.py`；命令 `python -m alpha story-page`）：
+
+| 件 | 住哪／長什麼樣 |
+|---|---|
+| 片段 | 一個 `page.html`，根元素 `<article class="story-page">`，節序與 `id` 是契約：`hero` → `q1`…`q12` → `bet-kind` → `system`（**必須是空的**，APP 填）→ `system-gap`（選填，對不上的地方由人寫）→ `self-eval` → `details#sources`。等待 `data-wait="<key>"`、來源等級 `<span class="src" data-src>`（封閉字彙：自述／買方／第三方／推一步／網路）、圖一律行內 SVG |
+| 宣告 | 同資料夾的 `page.json`：`ticker`、`brief_id`（寫的當下這一檔的現行敘事）、`checklist_version`、`written_on`、`evidence_pack`、`quote_sources`、`prices_seen`、`price_as_of`、`self_eval`（十二題 `full`／`half`／`none`）、`key_question`、`rides`、`graph_gaps[{text, lead_ids}]`、`waits[{key, kind ∈ disproof／confirm／date, watch_id 或 null}]`、`cold_read`（`{report, restated_ok, asked, asked_outside}` 或 `{skipped}`） |
+| 帳 | `library/private/alpha/story_pages.jsonl`，一列一版、只追加；**現行頁＝這家公司的最後一列**。`page_id`＝`sp_`＋（`company_id`、`brief_id`、片段 sha256）的 sha256 前 16 碼；`kind` 是 `page` 或 `rebind`（同一份片段綁到新一版敘事，必附一句差在哪、為什麼還站得住）；另有 `html_sha256`、`html_path`、`visible_chars`、`warnings`、`declaration`、`supersedes_id`。壞行報出來、不靜默跳過（INV-3） |
+| 片段原文 | `library/private/story_pages/<代號>/<page_id>.html`，寫入後不改 |
+| 白名單 | 只有 `alpha/narrative/story_page.py` 那一份（標籤、屬性、網址規則、svg 的 `title`／`desc` 只放字）；物化經 `write_vocabularies` 寫進 `.meta.json` 的 `story_page`，前端照它重建（L16） |
+| 圖 | `alpha/story_kit.py`：`ladder_map`（誰賣給誰）、`time_bars`（時間長條）、`price_log`（對數股價，`as_of` 之後不畫）——純函式、只用白名單、顏色只用 class、viewBox 寬 360、同樣輸入一字不差；樣式住 `webapp/static/story.css` |
+| 冷讀包 | `cold-pack` 寫 `coldread/PAGE.txt`（看得到的字；量字數、W 類檢查同一個函式）與 `coldread/PROMPT.md`（提示唯一一份 `COLD_READ_PROMPT`） |
+
+**三道清洗，同一份白名單**：寫入時 `check`（E1–E6 拒收：白名單外的標籤屬性網址、節序、`#system` 有內容、私有網址與本機路徑、宣告與跨帳核對、
+冷讀紀錄；W 類照印、記在那一列）→ 物化再檢查一次（E1–E4；不過＝`story_page.absence`）→ 前端 `DOMParser` 照 `.meta.json` 重建節點
+（HTML 用 `createElement`、SVG 用 `createElementNS`，白名單外的丟掉並在主控台記一筆；不用 `innerHTML`）。安全標頭（CSP）不放寬。
+物化讀現行頁 → 個股物化檔多一格 `story_page`（`page_id`、`brief_id`、`current_brief_id`、`stale`、`html`、`waits[]` 帶 registry 狀態、`gaps[]`…）；
+沒有故事頁＝`null`。
+
+**對帳三種**（封閉字彙 `STORY_PAGE_GAP_KINDS`；判定只有 `gaps_now` 一份，`story-page gaps`、待做清單 ⑤「故事頁該對版」（`todo.story_page`）、
+物化的 `story_page.gaps` 照用）：`stale`（現行頁的 `brief_id` ≠ 現行敘事 → 頁上講的沒變就 `rebind`，變了小修再 `add`）／
+`unregistered_wait`（`waits` 有 `watch_id` 是 null → 登記等待再 `add`）／`ride_mismatch`（`rides` 不在現行敘事押的單位，或 `graph_gaps`
+沒有 `lead_ids` → 敘事換版改押，或登記成線索）。三種都是互動 session 自己清得掉的——圖上缺的那一層只要求登記成線索、不要求入圖，
+否則這一格會恆亮（L14④，未量測的機制不得享有默認信任——恆亮的計數器沒有鑑別力）。帳讀不到＝「未讀到」，不是 0。
+
+**它不是 authority**：故事頁的帳不決定候選狀態、不擋任何別的寫入、不入圖、不鑄 pq2、不寫 watch、不動 thesis；四個人工 gate 不動。
+寫故事頁由使用者點名（「做深」），不進 research-drain、不進無人值守；drain 只做對版。
+
+#### 舊版的三層與論證段（2026-09-15；畫面已兩度被取代）
+
+① 短評／② 論證／③ 稽核三層的畫面先被 2026-10-08 的「頁首＋十三塊」取代（§6.11，展開裡讀論證段的 `argument:chain`／`risks`／`timeline`），
+再被上面的新框架取代；十三塊在過渡期住 `#/old/<代號>`。留到今天的是論證段的資料流與三條規則：
 
 | 層 | 讀法 | 內容 | 誰產生文字 |
 |---|---|---|---|
@@ -1076,7 +1124,8 @@ builder._argument_section：只選取既有 Datum（chain／risks／disproofs／
         ▼
 ArgumentSection（6 個 Datum：value＝段落；dependencies.long_form／citations）→ AnalystView.argument（optional）
         ▼
-APP：briefCard → argumentCard → priceCard → drill「稽核」→ drill「完整細節」
+APP：「系統裡的它」的三個展開讀 argument:chain／risks／timeline（chainDetail、downsideDetail、timelineDetail；舊版十三塊同一組函式）
+（2026-09-15 的 briefCard → argumentCard → priceCard → drill「稽核」→ drill「完整細節」已於 2026-10-08 拿掉）
 ```
 
 **三條規則：** ①句型輸出掃同一張禁字表（`FORBIDDEN_TERMS`），「跳／邊／sub=5／tier」不出現，只講「誰說的、有沒有別人印證」；

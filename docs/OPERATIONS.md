@@ -1350,6 +1350,43 @@ materialize 用**，不動 `discover_tracked_tickers`——那會連帶擴大 ED
 ⚠ 供給側多一家／反向路徑變動**同時是既有 disproof 的觸發**（量的賭注賭的正是「產能一時補不上」）。
 系統只標記；**thesis 要不要改由人決定**（thesis mutation 是四個人工 gate 之一）。
 
+### 做深一檔與故事頁（2026-11-27，Phase 8）
+
+一句「做深 <代號>」（APP 個股頁的「做深這一檔」按鈕複製的就是這一句＋這一頁的現況）在互動 session 跑兩段：
+偵探（`skills/detective`：蒐證、拼線索、落帳、蒐證包）→ 故事頁（`skills/stock-story`：寫、檢查、冷讀、收進帳）。
+**只由使用者點名**；不進 daily、不進 research-drain（drain 只做對版）。故事頁的帳不是 authority：不決定候選狀態、不擋任何別的寫入、
+不入圖；入圖照舊等人工 `go`。片段格式、帳的欄位、白名單在 `docs/ARCHITECTURE.md` §6.12；範例頁 `tests/fixtures/story_page/ZZZZ/`。
+
+```powershell
+# 工作資料夾 library/private/story_pages/<代號>/：page.html（片段）＋page.json（宣告）。圖用 alpha/story_kit.py 產生、貼進片段
+& '.venv\Scripts\python.exe' -m alpha story-page check <資料夾>       # 乾跑全部檢查（不寫檔）：ERROR 有就 exit 1；WARN 逐條看過
+& '.venv\Scripts\python.exe' -m alpha story-page cold-pack <資料夾>   # 冷讀包：coldread/PAGE.txt（看得到的字）＋coldread/PROMPT.md（派工提示）
+#   派一位乾淨 context 的唯讀便宜模型（Agent 工具、model: sonnet、每頁一位），提示＝PROMPT.md 全文、只給 PAGE.txt；回報存 coldread/REPORT.md
+& '.venv\Scripts\python.exe' scripts\writer_guard.py acquire --minutes 30 --purpose "故事頁 <代號>"
+& '.venv\Scripts\python.exe' -m alpha story-page add <資料夾>         # 先 check、沒有 ERROR 才收：片段複製成 <page_id>.html（寫入後不改）、帳追加一列
+& '.venv\Scripts\python.exe' -m webapp materialize <代號>             # 個股物化檔多一格 story_page（片段再檢查一次；讀不到時只有故事那一塊印原因）
+#   然後重啟 serve（/api/v1/health 的 code.stale 要是 false），手機寬打開 #/<代號> 看一次；
+#   機械量：headless 瀏覽器開 http://127.0.0.1:8790/?selfcheck=1&w=390#/<代號>，讀 DOM 裡 #selfcheck 的溢出與疊字（0 才算過）
+& '.venv\Scripts\python.exe' -m alpha story-page text <資料夾｜代號>  # 印看得到的字（量字數、冷讀、W 類檢查同一個函式）
+& '.venv\Scripts\python.exe' -m alpha story-page list                 # 每家的現行頁、對不對著現行敘事
+& '.venv\Scripts\python.exe' -m alpha story-page show <代號>          # 一家的版本史
+```
+
+**對版**（敘事換版之後；research-drain 的 ⑤「故事頁該對版」那一格數的是同一份判定）：
+
+```powershell
+& '.venv\Scripts\python.exe' -m alpha story-page gaps                 # 逐檔列三種：敘事換版／等待沒登記／押的單位對不上（帳有壞行＝exit 1「未讀到（不是 0）」）
+& '.venv\Scripts\python.exe' -m alpha story-page rebind <代號> --note "新舊敘事差在哪、這一頁為什麼還站得住"   # 頁上講的沒變：綁到現行敘事
+#   變了：改片段、page.json 的 brief_id 換成現行敘事，再 add 一版
+#   等待沒登記：登記成反證或加碼條件，把 watch_id 補進 page.json 的 waits，再 add 一版；不該等的從頁上拿掉
+#   押的單位對不上：敘事換版改押，或把圖上沒有的那一層登記成線索（graph_gaps 的 lead_ids）；入圖照人工 go
+#   每一種清完都接 python -m webapp materialize <代號>
+```
+
+**過渡期的舊版個股頁：** 新個股頁頁尾有一個小連結「舊版個股頁（過渡期）→」，網址 `#/old/<代號>`
+（例：`http://127.0.0.1:8790/#/old/COHR`），走原本的三層（短評、論證、稽核）；舊頁頂端有「回新版 →」。
+舊的函式不刪，刪不刪由 Phase 8 結案時使用者決定。
+
 ### Engine C
 ```powershell
 & '.venv\Scripts\python.exe' engine_c\etl_yfinance.py <TICKER>
