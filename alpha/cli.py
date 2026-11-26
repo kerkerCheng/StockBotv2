@@ -1108,6 +1108,111 @@ def cmd_stories(args: argparse.Namespace) -> int:
     return 0
 
 
+_STORY_PAGE_STATUS = {"current": "對著現行敘事", "stale": "敘事換版了、還沒對版", "no_brief": "現在沒有現行的 v2 敘事"}
+
+
+def _print_story_page_report(report: Any) -> None:
+    head = f"{report.ticker or '（宣告沒寫 ticker）'}｜{report.folder}"
+    print(f"{'✗' if report.errors else '✓'} {head}：ERROR {len(report.errors)}、WARN {len(report.warnings)}；"
+          f"看得到的字 {report.check.visible_chars:,}")
+    for finding in [*report.errors, *report.warnings]:
+        print(f"  {finding.code} {finding.message}")
+        for sample in finding.samples:
+            print(f"      · {sample}")
+    if report.quote_files:
+        print(f"  （引號對了 {len(report.quote_files)} 個檔）")
+
+
+def cmd_story_page(args: argparse.Namespace) -> int:
+    """個股故事頁的帳（Phase 8 plan 2026-11-26-001 §2.5）：一版對一版敘事；APP 個股頁印它（`webapp materialize`）。
+
+    - `check <資料夾>`：乾跑——`page.html`（片段）＋`page.json`（宣告）的全部檢查，ERROR 有就 exit 1。不寫檔。
+    - `add <資料夾>`：先 check；沒有 ERROR 才把片段複製進私有區、帳追加一列。WARN 記在那一列上。
+    - `rebind <代號> --note "…"`：對版——敘事換版了、頁上講的沒變，就把現行頁綁到新的一版敘事。
+    - `text <資料夾｜代號>`：印看得到的字（冷讀與量字數用的同一份）。
+    - `list`：每家的現行頁與它對不對著現行敘事；`show <代號>`：一家的版本史。
+
+    ⚠ 故事頁不是 authority：不改候選狀態、不擋任何別的寫入、不入圖。寫完重跑 `python -m webapp materialize <代號>`。
+    """
+    from .narrative.story_page import parse_fragment, visible_text
+    from .providers import story_pages as sp
+
+    if args.action == "check":
+        report = sp.check_folder(Path(args.folder))
+        if args.format == "json":
+            print(json.dumps(report.as_dict(), ensure_ascii=False, indent=2))
+        else:
+            _print_story_page_report(report)
+        return 1 if report.errors else 0
+    if args.action == "add":
+        try:
+            record, report = sp.add_page(Path(args.folder))
+        except AlphaError as exc:
+            print(f"✗ {exc}", file=sys.stderr)
+            return 1
+        _print_story_page_report(report)
+        print(f"✓ 寫入 {record['ticker']} {record['page_id']}（對 {record['brief_id']}）"
+              + (f"，取代 {record['supersedes_id']}" if record.get("supersedes_id") else "")
+              + f"；WARN {len(record['warnings'])} 條記在帳上")
+        print(f"  下一步：python -m webapp materialize {record['ticker']}（改了 webapp 或物化過要重啟 serve）")
+        return 0
+    if args.action == "rebind":
+        try:
+            record = sp.rebind_page(args.ticker, args.note)
+        except AlphaError as exc:
+            print(f"✗ {exc}", file=sys.stderr)
+            return 1
+        print(f"✓ 對版 {record['ticker']}：{record['supersedes_id']} → {record['page_id']}（敘事 {record['brief_id']}）")
+        print(f"  下一步：python -m webapp materialize {record['ticker']}")
+        return 0
+    if args.action == "text":
+        target = Path(args.target)
+        if target.is_dir():
+            html = (target / sp.PAGE_FILE).read_text(encoding="utf-8")
+        else:
+            from identity.registry import get_registry
+
+            company = get_registry().company_id_for_ticker(args.target)
+            head = sp.current_pages()[0].get(str(company)) if company else None
+            if head is None:
+                print(f"✗ {args.target} 不是資料夾、也沒有現行的故事頁", file=sys.stderr)
+                return 1
+            html = sp.read_html(head)
+        root, _problems = parse_fragment(html)
+        print(visible_text(root), end="")
+        return 0
+    current, errors = sp.current_pages()
+    if args.action == "list":
+        rows = sorted(current.values(), key=lambda r: r["ticker"])
+        briefs = sp.current_brief_ids([r["ticker"] for r in rows])
+        if args.format == "json":
+            print(json.dumps({"current": [{**r, "status": sp.page_status(r, briefs.get(r["ticker"]))} for r in rows],
+                              "parse_errors": errors}, ensure_ascii=False, indent=2))
+            return 0
+        print(f"# 故事頁（現行 {len(rows)} 家）")
+        for r in rows:
+            status = sp.page_status(r, briefs.get(r["ticker"]))
+            decl = r.get("declaration") or {}
+            print(f"- {r['ticker']}｜{r['page_id']}｜寫於 {decl.get('written_on') or r['created_at'][:10]}｜"
+                  f"字 {r.get('visible_chars') or 0:,}｜{_STORY_PAGE_STATUS[status]}")
+    else:
+        from identity.registry import get_registry
+
+        company = get_registry().company_id_for_ticker(args.ticker)
+        rows = sp.history(str(company)) if company else []
+        if not rows:
+            print(f"✗ {args.ticker} 沒有故事頁", file=sys.stderr)
+            return 1
+        print(f"# {args.ticker} 故事頁的版本史（舊到新，{len(rows)} 列）")
+        for r in rows:
+            print(f"- {r['created_at'][:16]}｜{r['kind']}｜{r['page_id']}｜敘事 {r['brief_id']}"
+                  + (f"｜對版：{r['rebind_note']}" if r.get("rebind_note") else "")
+                  + (f"｜WARN {len(r.get('warnings') or [])}" if r["kind"] == "page" else ""))
+    if errors:
+        print(f"⚠ 故事頁的帳解析失敗 {len(errors)} 行：" + "；".join(errors[:3]))
+    return 0
+
+
 def cmd_brief_check(args: argparse.Namespace) -> int:
     """敘事逐句核對（2026-11-12 使用者「先修吧」；事實抽樣① 11 份 8 份有錯）：每一句列出它引用的原文裡對得上的行與
     機械疑點（`alpha.narrative.fact_check`）。唯讀；`--record` 記一筆核對紀錄（`alpha.providers.fact_checks`）。
@@ -1377,6 +1482,25 @@ def build_parser() -> argparse.ArgumentParser:
                       help="搭配 --check／--add：spec 每筆只給 {ticker, bet}，故事其他格沿用現行那一筆（只加或換賭注句）")
     told.add_argument("--format", choices=("markdown", "json"), default="markdown")
     told.set_defaults(func=cmd_stories)
+
+    page = sub.add_parser(
+        "story-page", help="個股故事頁的帳（一版對一版敘事；APP 個股頁印它）：check／add 資料夾、rebind 對版、text、list、show")
+    page_sub = page.add_subparsers(dest="action", required=True)
+    page_check = page_sub.add_parser("check", help="乾跑：page.html＋page.json 的全部檢查（ERROR 有就 exit 1），不寫檔")
+    page_check.add_argument("folder")
+    page_check.add_argument("--format", choices=("markdown", "json"), default="markdown")
+    page_add = page_sub.add_parser("add", help="先 check；沒有 ERROR 才收進帳（片段複製進私有區）")
+    page_add.add_argument("folder")
+    page_rebind = page_sub.add_parser("rebind", help="對版：現行頁綁到現行那一版敘事（頁上講的沒變時）")
+    page_rebind.add_argument("ticker")
+    page_rebind.add_argument("--note", required=True, help="一句：新舊兩版敘事差在哪、這一頁為什麼還站得住")
+    page_text = page_sub.add_parser("text", help="印看得到的字（資料夾或代號）")
+    page_text.add_argument("target")
+    page_list = page_sub.add_parser("list", help="每家的現行頁與它對不對著現行敘事")
+    page_list.add_argument("--format", choices=("markdown", "json"), default="markdown")
+    page_show = page_sub.add_parser("show", help="一家的版本史")
+    page_show.add_argument("ticker")
+    page.set_defaults(func=cmd_story_page)
 
     edge = sub.add_parser(
         "edge", help="研究時判邊緣（唯讀）：名冊外的代號也能判——同一個判定函式與門檻，缺的輸入用 yfinance 補、逐欄標來源")

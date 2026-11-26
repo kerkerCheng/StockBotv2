@@ -41,8 +41,8 @@ spawn 前先讀週額度（`python -m crons.llm_quota`）。本 plan 已知會�
 
 | Step | 內容 | 執行者 | Zoom／Review | 狀態 | commit |
 |---|---|---|---|---|---|
-| 8.0 | 文件：本 plan、兩份 skill 照定案的分工改寫、`AGENTS.md` 四處、ROADMAP 與 CONCEPTS 整理 | 強模型 | Z2／R1 | ✅ 2026-11-26 | （本 commit） |
-| 8.1 | 故事頁的帳、片段與宣告的檢查、`python -m alpha story-page` 命令、合成範例頁 | 便宜模型 | Z2／R1 | ○ | |
+| 8.0 | 文件：本 plan、兩份 skill 照定案的分工改寫、`AGENTS.md` 四處、ROADMAP 與 CONCEPTS 整理 | 強模型 | Z2／R1 | ✅ 2026-11-26 | `6a70068` |
+| 8.1 | 故事頁的帳、片段與宣告的檢查、`python -m alpha story-page` 命令、合成範例頁 | 便宜模型 | Z2／R1 | ✅ 2026-11-26 | （本 commit） |
 | 8.2 | 物化把現行故事頁放進個股物化檔；APP 個股頁換新框架（故事 → 系統裡的它；沒做深的印短故事）；樣式表 | 便宜模型 | Z3／**R2** | ○ | |
 | 8.3 | 故事和系統對不上的三種：`story-page gaps`、待做清單新一格、心跳照印 | 便宜模型 | Z2／R1 | ○ | |
 | 8.4a | 「做深這一檔」按鈕；冷讀包（頁面文字＋提示，提示唯一一份在程式裡） | 便宜模型 | Z1／R1 | ○ | |
@@ -248,6 +248,14 @@ spawn 前先讀週額度（`python -m crons.llm_quota`）。本 plan 已知會�
   - 把檢查拿掉一條，對應的 fixture 要變綠（確認測試真的靠那一條）。
   - 範例頁原樣：0 ERROR；`text` 的字數穩定。
 - **第④問**：這一步只加新檔，沒有現有資料會壞；最先壞的是 `python -m alpha --help`（子命令註冊錯會讓整個 CLI 起不來）——跑一次。
+- **執行紀錄（2026-11-26，和上面契約不同或契約沒寫的）**：
+  - SVG 屬性多收 `markerWidth markerHeight refX refY orient markerUnits dx dy stroke-opacity`（畫箭頭與字距要用；都是幾何與呈現，不帶網址）。
+  - 註解、`<!DOCTYPE>`、CDATA 一律 E1（註解會把私有字串藏在看不到的地方）；非空元素自閉合（`<p/>`）算 E2（瀏覽器與 `html.parser` 讀法不同）。
+  - 圖連不上記成 **W10**（契約說算進 WARN、沒給編號）。看得到的字含 `<summary>`（摺疊時看得到那一行），SVG 的 `title`／`desc` 不算。
+  - 對版那一句最少 12 字。W4 的公司名用名冊的顯示名＋別名，不用 `fact_checks.company_names`（那份含代號，掃散文會被短代號誤報）。
+  - `gaps`、`cold-pack` 照 Step 排在 8.3、8.4a。
+  - **留給 8.2**：片段的 `id` 進 APP 會變成頁面上真的 id——前端重建節點時一律加前綴（`#…` 連結與 `url(#…)` 一起改），
+    不在 Python 另抄一份 APP 的 id 清單（app.js 現在用 `app`、`selfcheck`、`page-question`、`footer-warning`、`code-banner`）。
 
 ### Step 8.2 物化與 APP 新框架（Z3／R2）
 

@@ -1,0 +1,18 @@
+{
+  "ticker": "ZZZZ",
+  "brief_id": "ib_0000000000000000",
+  "checklist_version": "v3",
+  "written_on": "2026-11-26",
+  "evidence_pack": "",
+  "quote_sources": ["tests/fixtures/story_page/ZZZZ/source_*.txt"],
+  "prices_seen": [],
+  "price_as_of": null,
+  "self_eval": {"1": "full", "2": "full", "3": "full", "4": "full", "5": "half", "6": "full",
+                "7": "full", "8": "full", "9": "none", "10": "full", "11": "full", "12": "full"},
+  "key_question": 6,
+  "rides": ["tech:zzzz_inspection"],
+  "graph_gaps": [{"text": "封裝後檢測那一層，圖上還沒有", "lead_ids": []}],
+  "waits": [{"key": "w1", "kind": "confirm", "watch_id": "ew_9001_2026-11-26"},
+            {"key": "w2", "kind": "disproof", "watch_id": null}],
+  "cold_read": {"report": "coldread/REPORT.md", "restated_ok": true, "asked": 3, "asked_outside": 0}
+}
