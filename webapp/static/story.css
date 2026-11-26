@@ -44,6 +44,7 @@
 .story-page svg .tier { fill: var(--surface-2); stroke: var(--border); }
 .story-page svg .focus { fill: color-mix(in srgb, var(--viz-s1) 22%, transparent); stroke: var(--viz-s1); }
 .story-page svg .muted { fill: var(--muted); stroke: var(--muted); }
+.story-page svg text.muted { stroke: none; }   /* 字不描邊（描了看起來是粗體、小字糊掉；2026-11-27 畫圖工具試跑） */
 .story-page svg .line { stroke: currentColor; fill: none; }
 .story-page svg .series-1 { stroke: var(--viz-s1); fill: none; }
 .story-page svg .series-2 { stroke: var(--viz-s2); fill: none; }
