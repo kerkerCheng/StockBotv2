@@ -43,6 +43,10 @@ HTML_TAGS: frozenset[str] = frozenset((
     "details summary blockquote strong em b i sup sub br hr span div a small code").split())
 SVG_TAGS: frozenset[str] = frozenset("svg g path line polyline polygon rect circle ellipse text tspan title desc defs marker"
                                      .split())
+#: SVG 裡只准放字的標籤。瀏覽器把 svg 的 title／desc 當 HTML 整合點：裡面的標記照 HTML 讀（`<script>`、`<a href>` 都會變成
+#: 真的元素）。2026-11-26 R2 找到：Python 3.14 的 html.parser 把 title 當 RCDATA、裡面的標記只當字，寫入與物化兩道都放行
+#: `<svg><title><script>…`——第三道（前端重建）擋住了。修法：檢查器照瀏覽器讀（`_Builder`），再加這一條明文規則，前端照同一份。
+SVG_TEXT_ONLY: frozenset[str] = frozenset({"title", "desc"})
 VOID_TAGS: frozenset[str] = frozenset({"br", "hr"})
 GLOBAL_ATTRS: frozenset[str] = frozenset({"id", "class", "title", "lang", "data-slot", "data-wait", "data-src", "data-label"})
 TAG_ATTRS: Mapping[str, frozenset[str]] = {
@@ -80,6 +84,8 @@ _WAIT_KEY = re.compile(r"^[A-Za-z0-9_\-]{1,32}$")
 _SAFE_HREF = re.compile(r"^(?:https://[^\s\"'<>\\]+|#[A-Za-z][A-Za-z0-9_\-:.]*)$")
 _LOCAL_URL_REF = re.compile(r"^url\(\s*#[A-Za-z][A-Za-z0-9_\-:.]*\s*\)$")
 _BAD_SCHEME = re.compile(r"(?:javascript|vbscript|data|file|blob):|http://")
+#: svg 的 title／desc 的字裡像標記的寫法（`<` 後面接字母、`/`、`!`、`?`）——只在 Python 這一側用（前端照 DOM 的節點擋）。
+_MARKUP_IN_TEXT = re.compile(r"<[A-Za-z/!?]")
 #: E4：頁上不得出現的私有字串（私有網頁網址、本機路徑）。
 PRIVATE_PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = (
     ("私有網頁網址", re.compile(r"claude\.ai/artifact", re.I)),
@@ -196,6 +202,10 @@ class Node:
 
 class _Builder(HTMLParser):
     """容錯的樹：不認得的照樣建進樹裡（交給白名單擋），結構錯記成 E2，註解與宣告記成 E1。"""
+
+    #: 不把 title／textarea 當 RCDATA（Python 3.14 起的預設）：svg 的 title 在瀏覽器裡是 HTML 整合點，裡面的標記會變成元素——
+    #: 檢查器要看到瀏覽器看到的那棵樹（見 `SVG_TEXT_ONLY`）。HTML 層的 title、textarea 本來就不在白名單：照標記讀只會多報錯、不會少報。
+    RCDATA_CONTENT_ELEMENTS: tuple[str, ...] = ()
 
     def __init__(self) -> None:
         super().__init__(convert_charrefs=True)
@@ -328,6 +338,10 @@ def whitelist_problems(root: Node) -> list[Finding]:
             if node.tag not in SVG_TAGS:
                 out.append(Finding("E1", f"第 {node.line} 行 svg 裡有 <{node.tag}>——svg 裡只准 SVG 的白名單標籤"))
                 continue
+            if node.tag in SVG_TEXT_ONLY and (node.elements or any(
+                    _MARKUP_IN_TEXT.search(c.text) for c in node.children if c.tag == TEXT)):
+                # 字裡像標記的也擋：解析器哪天又把它當 RCDATA，標記就躲進字裡（2026-11-26 R2 那一型）
+                out.append(Finding("E1", f"第 {node.line} 行 svg 的 <{node.tag}> 裡只放字——瀏覽器把它裡面的標記當 HTML 讀"))
             allowed = GLOBAL_ATTRS | SVG_ATTRS
         else:
             if node.tag not in HTML_TAGS:
@@ -787,7 +801,7 @@ def whitelist_payload() -> dict[str, Any]:
     return {"html_tags": sorted(HTML_TAGS), "svg_tags": sorted(SVG_TAGS), "void_tags": sorted(VOID_TAGS),
             "global_attrs": sorted(GLOBAL_ATTRS), "tag_attrs": {k: sorted(v) for k, v in TAG_ATTRS.items()},
             "svg_attrs": sorted(SVG_ATTRS), "svg_namespace": SVG_NAMESPACE, "source_levels": list(SOURCE_LEVELS),
-            "wait_kinds": list(WAIT_KINDS), "text_attrs": sorted(_TEXT_ATTRS),
+            "wait_kinds": list(WAIT_KINDS), "text_attrs": sorted(_TEXT_ATTRS), "svg_text_only": sorted(SVG_TEXT_ONLY),
             # 網址與 id 的規則（前端 `new RegExp` 照用；比對前先拿掉空白與控制字元再小寫，同 `_squash`）
             "patterns": {"id": _ID.pattern, "href": _SAFE_HREF.pattern, "url_ref": _LOCAL_URL_REF.pattern,
                          "bad_scheme": _BAD_SCHEME.pattern}}
@@ -795,7 +809,8 @@ def whitelist_payload() -> dict[str, Any]:
 
 __all__ = [
     "DECLARATION_KEYS", "Finding", "GLOBAL_ATTRS", "HTML_TAGS", "Node", "PageCheck", "QUESTION_IDS", "SECTION_IDS",
-    "SELF_EVAL_VALUES", "SOURCE_LEVELS", "SVG_ATTRS", "SVG_TAGS", "TAG_ATTRS", "VISIBLE_CHARS_RANGE", "WAIT_KINDS",
+    "SELF_EVAL_VALUES", "SOURCE_LEVELS", "SVG_ATTRS", "SVG_TAGS", "SVG_TEXT_ONLY", "TAG_ATTRS", "VISIBLE_CHARS_RANGE",
+    "WAIT_KINDS",
     "all_text", "check_page", "cold_read_problems", "declaration_problems", "fragment_problems", "normalize_for_match",
     "page_wait_keys", "parse_fragment", "private_string_problems", "quote_found", "quotes_in", "structure_problems",
     "system_slot_problems", "visible_chars", "visible_text", "whitelist_payload", "whitelist_problems",

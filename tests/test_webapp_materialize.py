@@ -415,6 +415,7 @@ def test_vocabularies_carry_the_one_story_page_whitelist(tmp_path) -> None:
 
     meta = json.loads(write_vocabularies(ArtifactStore(tmp_path)).read_text(encoding="utf-8"))["story_page"]
     assert meta["html_tags"] == sorted(rules.HTML_TAGS) and "viewbox" in meta["svg_attrs"]
+    assert meta["svg_text_only"] == ["desc", "title"]           # 前端缺這一條就不印片段（storyRules）
     assert meta["gap_kinds"] == list(STORY_PAGE_GAP_KINDS)
     assert set(WATCH_STATUSES) <= set(meta["wait_status_labels"]) == set(WAIT_STATUS_LABELS)
     for name, pattern in meta["patterns"].items():

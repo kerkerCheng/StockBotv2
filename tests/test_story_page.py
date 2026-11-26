@@ -13,6 +13,7 @@ from __future__ import annotations
 import copy
 import json
 import re
+from html.parser import HTMLParser
 from pathlib import Path
 
 import pytest
@@ -96,6 +97,12 @@ INJECTIONS = {
     "svg_tag_outside_svg": "<path d=\"M0 0\"></path>",
     "unknown_source_level": "<p>一句<span class=\"src\" data-src=\"券商\">券商</span></p>",
     "data_slot_elsewhere": "<p data-slot=\"system\">字</p>",
+    # svg 的 title／desc 是瀏覽器的 HTML 整合點（2026-11-26 R2：Python 3.14 把 title 當 RCDATA，前三筆兩道檢查都放行過）
+    "svg_title_javascript_link": f"<svg xmlns=\"{sp.SVG_NAMESPACE}\" viewBox=\"0 0 10 10\"><title>"
+                                 "<a href=\"javascript:alert(1)\">x</a></title></svg>",
+    "svg_title_script": "<svg viewBox=\"0 0 10 10\"><title><script>alert(1)</script></title></svg>",
+    "svg_title_nested_svg": "<svg viewBox=\"0 0 10 10\"><title><svg><rect x=\"1\"></rect></svg></title></svg>",
+    "svg_desc_whitelisted_tag": "<svg viewBox=\"0 0 10 10\"><desc><g></g></desc></svg>",
 }
 
 
@@ -156,6 +163,39 @@ def test_mutation_url_reference_rule_is_what_rejects_remote_fill(monkeypatch) ->
     monkeypatch.setattr(sp, "_LOCAL_URL_REF", re.compile(r".*", re.S))
     monkeypatch.setattr(sp, "_BAD_SCHEME", re.compile(r"(?!x)x"))
     assert "E1" not in _codes(_check(_inject(INJECTIONS["svg_fill_remote_url"])))
+
+
+def test_svg_title_content_is_parsed_the_way_the_browser_parses_it() -> None:
+    """瀏覽器把 svg 的 title 當 HTML 整合點：裡面的 `<script>` 是元素。檢查器要看到同一棵樹。"""
+    root, _problems = sp.parse_fragment(INJECTIONS["svg_title_script"])
+    title = next(n for n in root.iter() if n.tag == "title")
+    assert [e.tag for e in title.elements] == ["script"]
+
+
+def test_svg_title_with_plain_words_and_an_escaped_less_than_sign_passes() -> None:
+    ok = _inject("<svg viewBox=\"0 0 10 10\"><title>營收 &lt; 成本</title><rect x=\"1\"></rect></svg>")
+    assert "E1" not in _codes(_check(ok))
+
+
+def test_mutation_svg_title_markup_is_caught_by_two_layers(monkeypatch) -> None:
+    """svg title 裡的標記有兩道：檢查器照瀏覽器讀（標記變成元素、白名單與只放字擋）、字裡像標記的也擋。
+    拿掉任一道都還擋，兩道都拿掉才收——那就是 R2 找到時的樣子。"""
+    if not hasattr(HTMLParser, "RCDATA_CONTENT_ELEMENTS"):
+        pytest.skip("這一版 html.parser 不把 title 當 RCDATA：洞本來就不在")
+    snippet = _inject(INJECTIONS["svg_title_script"])
+    monkeypatch.setattr(sp._Builder, "RCDATA_CONTENT_ELEMENTS", ("textarea", "title"))   # 回到 3.14 的預設
+    assert "E1" in _codes(_check(snippet))                               # 字裡像標記那一道還擋著
+    monkeypatch.setattr(sp, "_MARKUP_IN_TEXT", re.compile(r"(?!x)x"))
+    assert "E1" not in _codes(_check(snippet))                           # 兩道都拿掉：R2 找到的洞
+    monkeypatch.undo()
+    monkeypatch.setattr(sp, "_MARKUP_IN_TEXT", re.compile(r"(?!x)x"))
+    assert "E1" in _codes(_check(snippet))                               # 只拿掉字那一道：照瀏覽器讀還擋著
+
+
+def test_mutation_text_only_rule_is_what_rejects_whitelisted_tags_inside_desc(monkeypatch) -> None:
+    monkeypatch.setattr(sp, "SVG_TEXT_ONLY", frozenset())
+    assert "E1" not in _codes(_check(_inject(INJECTIONS["svg_desc_whitelisted_tag"])))
+    assert "svg_text_only" in sp.whitelist_payload()                     # 前端照同一份
 
 # ---------------------------------------------------------------- E2：結構
 

@@ -1711,8 +1711,10 @@ function stockPage(payload, view) {
       box.appendChild(el('div', 'warn', `故事頁讀不到：${sp.absence.reason || absenceLabel(sp.absence.kind) || '沒說為什麼'}`));
     } else if (sp && sp.html) {
       box.appendChild(el('div', 'warn', '故事頁的白名單讀不到（.meta.json 是舊的：重跑 python -m webapp materialize）——不印片段'));
+    } else {
+      // 有故事頁只是印不出來時不說「還沒做深」（做了、只是這一輪讀不到——上面那一行講原因）
+      box.appendChild(el('p', 'note not-deep', '這一檔還沒做深：下面是短故事與系統裡的它。'));
     }
-    box.appendChild(el('p', 'note not-deep', '這一檔還沒做深：下面是短故事與系統裡的它。'));
     box.appendChild(shortStory(view));
     pageDiagrams(payload, view).forEach((n) => box.appendChild(n));
     box.appendChild(systemBlock(payload, view, null));
@@ -1731,12 +1733,13 @@ function storyRules() {
   const v = VOCAB && VOCAB.story_page;
   const p = (v && v.patterns) || {};
   const patterns = [p.id, p.href, p.url_ref, p.bad_scheme];
-  if (!v || !Array.isArray(v.html_tags) || !patterns.every((s) => typeof s === 'string' && s)) return null;
+  if (!v || !Array.isArray(v.html_tags) || !Array.isArray(v.svg_text_only)
+      || !patterns.every((s) => typeof s === 'string' && s)) return null;
   try {
     return {
       html: new Set(v.html_tags), svg: new Set(v.svg_tags || []), global: new Set(v.global_attrs || []),
       svgAttrs: new Set(v.svg_attrs || []), tagAttrs: v.tag_attrs || {}, text: new Set(v.text_attrs || []),
-      levels: new Set(v.source_levels || []),
+      levels: new Set(v.source_levels || []), textOnly: new Set(v.svg_text_only),
       id: new RegExp(p.id), href: new RegExp(p.href), urlRef: new RegExp(p.url_ref), bad: new RegExp(p.bad_scheme),
     };
   } catch (err) {
@@ -1783,7 +1786,13 @@ function storyNode(node, rules, inSvg, dropped) {
     out.setAttribute(svg ? attr.name : lower, value);           // SVG 屬性分大小寫（viewBox）：用 DOM 給的原名
   });
   if (!svg && name === 'a') storyLink(out);
+  // svg 的 title／desc 只放字：瀏覽器把它們裡面的標記當 HTML 讀（`SVG_TEXT_ONLY`；寫入與物化同一條）
+  const textOnly = svg && rules.textOnly.has(name);
   Array.from(node.childNodes).forEach((child) => {
+    if (textOnly && child.nodeType !== Node.TEXT_NODE) {
+      dropped.push(`<${local}> 裡的標記`);
+      return;
+    }
     const rebuilt = storyNode(child, rules, svg, dropped);
     if (rebuilt) out.appendChild(rebuilt);
   });

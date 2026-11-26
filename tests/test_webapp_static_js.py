@@ -193,6 +193,22 @@ def test_app_js_never_parses_strings_into_the_page() -> None:
     assert "DOMParser" in stripped and "storyFragment" in stripped
 
 
+def test_story_rules_read_only_keys_the_server_sends() -> None:
+    """`storyRules` 讀的每個規則鍵都要在 `.meta.json` 的那一份（`whitelist_payload`）裡——拼錯一個字，規則讀不到、
+    整頁故事不印，而且不報錯（成功與失敗同形，L13）。反過來，必要的幾條前端都要讀（2026-11-26 R2 補的 svg_text_only）。"""
+    from alpha.narrative.story_page import whitelist_payload
+
+    source = APP_JS.read_text(encoding="utf-8")
+    body = source.split("function storyRules()", 1)[1].split("\n}\n", 1)[0]
+    payload = whitelist_payload()
+    keys = set(re.findall(r"\bv\.([a-z_]+)", body))
+    pattern_keys = set(re.findall(r"\bp\.([a-z_]+)", body))
+    assert keys and pattern_keys, "抓不到 storyRules 讀的鍵，這條守衛等於沒作用"
+    assert keys <= set(payload), keys - set(payload)
+    assert pattern_keys == set(payload["patterns"]), pattern_keys ^ set(payload["patterns"])
+    assert {"html_tags", "svg_tags", "svg_text_only", "text_attrs", "patterns"} <= keys
+
+
 @pytest.mark.parametrize("broken", ["function f() { return 1;", "const a = [1, 2;"])
 def test_the_bracket_checker_actually_catches_things(broken: str) -> None:
     """守衛自己也要被驗（INV-5：未量測的機制不得享有默認信任）。"""
