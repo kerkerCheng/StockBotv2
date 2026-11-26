@@ -31,6 +31,7 @@ def _vocabularies() -> dict[str, set[str]]:
     from alpha.providers.fact_anchors import ANCHOR_SCOPE
     from alpha.providers.fact_checks import FACT_CHECK_GAP_KINDS
     from alpha.providers.stories import STORY_GAP_KINDS
+    from alpha.providers.story_pages import STORY_PAGE_GAP_KINDS
     from alpha.structure_reading.staleness import READING_STATUSES
     from crons.heartbeat import THESIS_STATUSES
     from engine_b import admission_audit
@@ -49,6 +50,7 @@ def _vocabularies() -> dict[str, set[str]]:
         "candidate": set(GROUPS) | set(SIDE_GROUPS) | {"no_narrative"},
         "reading": set(READING_STATUSES),
         "story": set(STORY_GAP_KINDS),
+        "story_page": set(STORY_PAGE_GAP_KINDS),
         "fact_check": set(FACT_CHECK_GAP_KINDS),
         "fact_anchor": set(ANCHOR_SCOPE),
         "admission_audit": set(admission_audit.AUDIT_STATES),
@@ -58,8 +60,8 @@ def _vocabularies() -> dict[str, set[str]]:
 
 
 @pytest.mark.parametrize("prefix", ["lead", "segment", "watch", "expiry", "dispatch", "hypothesis", "thesis",
-                                    "candidate", "reading", "story", "fact_check", "fact_anchor", "admission_audit",
-                                    "bet_line", "doubling"])
+                                    "candidate", "reading", "story", "story_page", "fact_check", "fact_anchor",
+                                    "admission_audit", "bet_line", "doubling"])
 def test_every_state_in_every_vocabulary_has_a_registered_destination(prefix: str) -> None:
     missing = sorted(v for v in _vocabularies()[prefix] if f"{prefix}:{v}" not in tl.COVERAGE)
     assert not missing, (f"{prefix} 有狀態沒登記去處：{missing}——新增狀態時先在 engine_b/todo_ledger.py 的 COVERAGE "
@@ -113,7 +115,8 @@ def _collect(**over):
                               "checkpoint_check": CHECKPOINT_OK}, thesis_due=[])
     loaders = {"classification_gaps": lambda: [], "undisposed": lambda: [], "parked_without_expiry": lambda: [],
                "stale_lead_entities": lambda: 0, "story_gaps": lambda: [], "pending_admission": lambda: {},
-               "pending_cohort": lambda: {}, "fact_check_gaps": lambda: [], "fact_anchor_gaps": lambda: []}
+               "pending_cohort": lambda: {}, "fact_check_gaps": lambda: [], "fact_anchor_gaps": lambda: [],
+               "story_page_gaps": lambda: []}
     loaders.update(over.pop("loaders", {}))       # 只換掉測試點名的那幾個；其餘不讀真的 ledger
     params.update(over, loaders=loaders)
     return {row.key: row for row in tl.collect(**params)}
@@ -293,6 +296,49 @@ def test_story_gaps_count_per_company_and_split_never_from_a_new_brief_version()
 
     unread = _collect(loaders={"story_gaps": boom})["todo.story"]
     assert unread.count is None and "OSError" in unread.reason
+
+
+def _page_gap_rows(ticker: str, decl: dict, brief) -> list[dict]:
+    """照 `story_pages.gaps_now` 的形狀，用真的 `page_gaps` 做一檔的對不上（不讀帳）。"""
+    from alpha.providers.story_pages import page_gaps
+
+    record = {"brief_id": "ib_old", "page_id": f"sp_{ticker.lower()}", "created_at": "2026-10-15T00:00:00+00:00",
+              "declaration": decl}
+    return [{"ticker": ticker, "company_id": f"co:{ticker.lower()}", "page_id": record["page_id"], **g,
+             "since": "2026-10-15"} for g in page_gaps(record, brief)]
+
+
+def test_story_page_gaps_count_tickers_one_fixture_per_kind() -> None:
+    """⑤「故事頁該對版」＝`python -m alpha story-page gaps` 同一個判定（L16）：三種各一檔；一檔兩種算一檔、兩種都點名。"""
+    from alpha.providers.story_pages import STORY_PAGE_GAP_KINDS
+
+    current = SimpleNamespace(brief_id="ib_old", created_on=date(2026, 10, 1), rides=(SimpleNamespace(node="tech:a"),))
+    newer = SimpleNamespace(brief_id="ib_new", created_on=date(2026, 10, 20), rides=(SimpleNamespace(node="tech:a"),))
+    gaps = [*_page_gap_rows("A", {"rides": ["tech:a"]}, newer),                                   # 敘事換版
+            *_page_gap_rows("B", {"rides": ["tech:a"], "waits": [{"key": "w1", "watch_id": None}]}, current),
+            *_page_gap_rows("C", {"rides": ["tech:x"], "graph_gaps": [{"text": "缺一層", "lead_ids": []}],
+                                  "waits": [{"key": "w2", "watch_id": None}]}, current)]
+    assert [(g["ticker"], g["kind"]) for g in gaps] == [("A", "stale"), ("B", "unregistered_wait"),
+                                                        ("C", "unregistered_wait"), ("C", "ride_mismatch")]
+    assert {g["kind"] for g in gaps} == set(STORY_PAGE_GAP_KINDS)
+    row = _collect(loaders={"story_page_gaps": lambda: gaps})["todo.story_page"]
+    assert row.count == 3                                                   # 算檔，不算件（C 有兩種）
+    assert row.work =="A（敘事換版）、B（等待沒登記）、C（等待沒登記／押的單位對不上）"
+    assert row.oldest_days == (TODAY - date(2026, 10, 15)).days
+    assert "故事頁該對版 3" in tl.next_prompt({"todo.story_page": 3, "todo.progress": 0, "todo.oldest_days": 0})
+
+
+def test_story_page_ledger_unreadable_is_not_zero_and_other_cells_still_print() -> None:
+    """帳讀不到＝未讀到（INV-3）；這一格的 loader 丟例外不拖垮整張表（plan 8.3 第④問）。"""
+    def boom():
+        raise ValueError("故事頁的帳有 1 行讀不懂")
+
+    rows = _collect(loaders={"story_page_gaps": boom, "story_gaps": lambda: [{"kind": "never", "ticker": "Z"}]})
+    assert rows["todo.story_page"].count is None and "ValueError" in rows["todo.story_page"].reason
+    assert rows["todo.story"].count == 1                                  # 隔壁那一格照算
+    lines = tl.render_cells(list(rows.values()))
+    assert any(line.startswith("- ⚠ 未讀到") and "故事頁該對版" in line for line in lines)   # 未讀到另列，不是 0
+    assert not any(line.startswith("- 0 的格") and "故事頁該對版" in line for line in lines)
 
 
 def test_fact_check_gaps_count_per_version_grouped_by_the_board_and_unreadable_is_not_zero() -> None:

@@ -326,3 +326,54 @@ def test_page_status_against_the_current_brief(tmp_path) -> None:
 def test_company_names_come_from_the_registry() -> None:
     assert spp.company_names(REGISTRY) == {"co:zzzz_example": ["範例精密"], "co:pkg_a": ["封裝廠甲"],
                                               "co:pkg_b": ["封裝廠乙", "甲乙封裝"]}
+
+# ---------------------------------------------------------------- 對帳（Step 8.3）
+
+def _loader(*briefs):
+    return lambda t: (list(briefs), []) if t == "ZZZZ" else ([], [])
+
+
+def test_gaps_now_runs_page_gaps_on_every_current_page(tmp_path) -> None:
+    """⑤「故事頁該對版」與 `story-page gaps` 同一份判定：每一檔現行頁對現行敘事跑 `page_gaps`；since 照種類取日子。"""
+    record, _ = _add(tmp_path, _layout(tmp_path))
+    gaps = spp.gaps_now(path=_ledger(tmp_path), brief_loader=_loader(BRIEF), today=TODAY)
+    assert [(g["ticker"], g["kind"]) for g in gaps] == [("ZZZZ", "unregistered_wait"), ("ZZZZ", "ride_mismatch")]
+    assert gaps[0]["items"] == ["w2"] and gaps[1]["items"] == ["封裝後檢測那一層，圖上還沒有"]
+    assert {g["page_id"] for g in gaps} == {record["page_id"]}
+    assert {g["since"] for g in gaps} == {NOW.date().isoformat()}       # 頁寫進帳那天（晚於敘事那一版）
+    newer = spp.gaps_now(path=_ledger(tmp_path), brief_loader=_loader(BRIEF, NEWER), today=TODAY)
+    assert newer[0]["kind"] == "stale" and newer[0]["since"] == NEWER.created_on.isoformat()
+    none = spp.gaps_now(path=_ledger(tmp_path), brief_loader=_loader(), today=TODAY)
+    assert none[0]["kind"] == "stale" and "沒有現行的 v2 敘事" in none[0]["text"]
+
+
+def test_gaps_now_without_a_ledger_is_a_real_zero_and_bad_lines_raise(tmp_path) -> None:
+    assert spp.gaps_now(path=_ledger(tmp_path), brief_loader=_loader(BRIEF), today=TODAY) == []   # 還沒有任何一頁
+    _add(tmp_path, _layout(tmp_path))
+    with _ledger(tmp_path).open("a", encoding="utf-8") as handle:
+        handle.write("不是 JSON\n")
+    with pytest.raises(ContractViolation, match="讀不懂"):                # 讀不懂哪一版是現行頁：未讀到，不是 0
+        spp.gaps_now(path=_ledger(tmp_path), brief_loader=_loader(BRIEF), today=TODAY)
+
+
+def test_gap_labels_and_remedies_cover_every_kind() -> None:
+    assert set(spp.STORY_PAGE_GAP_LABELS) == set(spp.STORY_PAGE_GAP_KINDS) == set(spp.STORY_PAGE_GAP_REMEDY)
+
+
+def test_story_page_gaps_command_prints_each_gap_and_how_to_clear(monkeypatch, capsys) -> None:
+    from alpha import cli
+
+    rows = [{"ticker": "ZZZZ", "company_id": "co:zzzz_example", "page_id": "sp_x", "kind": "unregistered_wait",
+             "text": "頁上寫了 1 件要等的事，系統還沒登記", "items": ["w2"], "since": "2026-11-26"}]
+    monkeypatch.setattr(spp, "gaps_now", lambda **_kw: rows)
+    assert cli.main(["story-page", "gaps"]) == 0
+    out = capsys.readouterr().out
+    assert "故事頁該對版（1 檔、1 件）" in out and "ZZZZ｜等待沒登記（2026-11-26 起）" in out and "：w2" in out
+    assert spp.STORY_PAGE_GAP_REMEDY["unregistered_wait"] in out
+
+    def boom(**_kw):
+        raise ContractViolation("故事頁的帳有 1 行讀不懂")
+
+    monkeypatch.setattr(spp, "gaps_now", boom)
+    assert cli.main(["story-page", "gaps"]) == 1
+    assert "未讀到（不是 0）" in capsys.readouterr().err

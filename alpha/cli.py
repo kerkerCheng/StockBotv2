@@ -1131,6 +1131,7 @@ def cmd_story_page(args: argparse.Namespace) -> int:
     - `rebind <代號> --note "…"`：對版——敘事換版了、頁上講的沒變，就把現行頁綁到新的一版敘事。
     - `text <資料夾｜代號>`：印看得到的字（冷讀與量字數用的同一份）。
     - `list`：每家的現行頁與它對不對著現行敘事；`show <代號>`：一家的版本史。
+    - `gaps`：故事和系統對不上的三種（敘事換版、等待沒登記、押的單位對不上）與怎麼清——⑤「故事頁該對版」同一份判定。
 
     ⚠ 故事頁不是 authority：不改候選狀態、不擋任何別的寫入、不入圖。寫完重跑 `python -m webapp materialize <代號>`。
     """
@@ -1180,6 +1181,25 @@ def cmd_story_page(args: argparse.Namespace) -> int:
             html = sp.read_html(head)
         root, _problems = parse_fragment(html)
         print(visible_text(root), end="")
+        return 0
+    if args.action == "gaps":
+        try:
+            gaps = sp.gaps_now()
+        except AlphaError as exc:
+            print(f"✗ 未讀到（不是 0）：{exc}", file=sys.stderr)
+            return 1
+        if args.format == "json":
+            print(json.dumps({"gaps": gaps}, ensure_ascii=False, indent=2))
+            return 0
+        tickers = sorted({g["ticker"] for g in gaps})
+        print(f"# 故事頁該對版（{len(tickers)} 檔、{len(gaps)} 件）")
+        for g in gaps:
+            shown = g["items"] if g["kind"] != "stale" else []        # 換版那一種的 items 是兩個敘事 id，句子裡已經講了
+            print(f"- {g['ticker']}｜{sp.STORY_PAGE_GAP_LABELS[g['kind']]}（{g['since']} 起）｜{g['text']}"
+                  + (f"：{'、'.join(shown)}" if shown else ""))
+        for kind in sp.STORY_PAGE_GAP_KINDS:
+            if any(g["kind"] == kind for g in gaps):
+                print(f"  怎麼清「{sp.STORY_PAGE_GAP_LABELS[kind]}」：{sp.STORY_PAGE_GAP_REMEDY[kind]}")
         return 0
     current, errors = sp.current_pages()
     if args.action == "list":
@@ -1484,7 +1504,8 @@ def build_parser() -> argparse.ArgumentParser:
     told.set_defaults(func=cmd_stories)
 
     page = sub.add_parser(
-        "story-page", help="個股故事頁的帳（一版對一版敘事；APP 個股頁印它）：check／add 資料夾、rebind 對版、text、list、show")
+        "story-page",
+        help="個股故事頁的帳（一版對一版敘事；APP 個股頁印它）：check／add 資料夾、rebind 對版、text、list、show、gaps")
     page_sub = page.add_subparsers(dest="action", required=True)
     page_check = page_sub.add_parser("check", help="乾跑：page.html＋page.json 的全部檢查（ERROR 有就 exit 1），不寫檔")
     page_check.add_argument("folder")
@@ -1500,6 +1521,8 @@ def build_parser() -> argparse.ArgumentParser:
     page_list.add_argument("--format", choices=("markdown", "json"), default="markdown")
     page_show = page_sub.add_parser("show", help="一家的版本史")
     page_show.add_argument("ticker")
+    page_gaps = page_sub.add_parser("gaps", help="故事和系統對不上的三種與怎麼清（⑤「故事頁該對版」同一份判定）")
+    page_gaps.add_argument("--format", choices=("markdown", "json"), default="markdown")
     page.set_defaults(func=cmd_story_page)
 
     edge = sub.add_parser(

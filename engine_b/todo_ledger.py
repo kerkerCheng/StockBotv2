@@ -70,6 +70,11 @@ LEDGER: tuple[LedgerRow, ...] = (
     LedgerRow("todo.story", "故事還沒寫", "檔",
               "`python -m alpha stories --gaps` → 照 research-drain「故事」段寫 → `python -m alpha stories --check "
               "spec.json` → `--add spec.json`"),
+    # Phase 8 Step 8.3（plan 2026-11-26-001 §2.6；使用者 2026-11-26「先開發完一版」）：故事頁（敘事的長版）和系統對不上的三種——
+    # 敘事換版了、頁上寫的等待沒登記、押的單位對不上。三種都是互動 session 自己清得掉的：圖上缺的那一層只要求登記成線索、
+    # 不要求入圖（否則這一格恆亮，L14④）
+    LedgerRow("todo.story_page", "故事頁該對版", "檔",
+              "`python -m alpha story-page gaps` → 對版 `rebind`、小修 `add`、登記等待或線索"),
     # 2026-11-12 使用者「先修吧」（事實抽樣① 11 份 8 份有錯，過了 registration 2026-11-03 的判讀線）：寫敘事沒有一步逐句對過原文。
     # 現行每一版敘事（＋它現行的故事）都要有一筆核對紀錄；換版或故事換了就再核（上一版核過、一字不差的句子自動沿用）
     LedgerRow("todo.fact_check", "敘事還沒逐句核對", "檔",
@@ -191,6 +196,10 @@ COVERAGE: Mapping[str, str] = {
     # --- 個股頁故事（alpha.providers.stories.STORY_GAP_KINDS）
     "story:never": "todo.story",
     "story:stale": "todo.story",                 # 敘事換版：舊故事不算數，首屏退回印依據
+    # --- 故事頁和系統對不上（alpha.providers.story_pages.STORY_PAGE_GAP_KINDS；Phase 8 Step 8.3）
+    "story_page:stale": "todo.story_page",              # 敘事換版：對過新舊兩版，沒變就 rebind、變了才小修 add
+    "story_page:unregistered_wait": "todo.story_page",  # 頁上寫了要等的事、等待 registry 還沒登記
+    "story_page:ride_mismatch": "todo.story_page",      # 押的節點不在現行敘事裡，或圖上缺的那一層還沒登記成線索
     # --- 敘事逐句核對（alpha.providers.fact_checks.FACT_CHECK_GAP_KINDS；2026-11-12）
     "fact_check:brief": "todo.fact_check",       # 這一版敘事還沒有核對紀錄
     "fact_check:story": "todo.fact_check",       # 核過之後故事換了
@@ -367,8 +376,8 @@ def collect(*, today: date, leads_store: Mapping[str, Any], watches: Sequence[Ma
             candidates: Mapping[str, Any] | None, thesis_due: Sequence[str] | None,
             loaders: Mapping[str, Callable[[], Any]] | None = None) -> list[LedgerCount]:
     """⑤ 每一格的計數。注入的值是呼叫端讀過的 authority（心跳讀 artifact 與 ledger）；None＝那個 authority 沒讀到。
-    `loaders`：要另外讀檔才算得出的格（停放未處置對照、名冊重算、缺分類、故事還沒寫、入圖包抽查帳、敘事還沒逐句核對）——
-    測試可換掉。"""
+    `loaders`：要另外讀檔才算得出的格（停放未處置對照、名冊重算、缺分類、故事還沒寫、故事頁該對版、入圖包抽查帳、
+    敘事還沒逐句核對）——測試可換掉。"""
     from engine_b import event_watch as ew
     from engine_b import queue_segments as qs
 
@@ -666,6 +675,22 @@ def collect(*, today: date, leads_store: Mapping[str, Any], watches: Sequence[Ma
         put("todo.story", len(gaps), work="；".join(bits) or None)
 
     guarded("todo.story", story)
+
+    def story_page() -> None:
+        # `alpha.providers.story_pages.gaps_now`——`python -m alpha story-page gaps` 同一份判定（L16）。一檔可以同時有幾種，
+        # 計數算檔；帳有壞行時 gaps_now raise、guarded 接住＝未讀到，不是 0（INV-3）
+        from alpha.providers.story_pages import STORY_PAGE_GAP_LABELS, gaps_now as page_gaps_now
+
+        gaps = (loaders.get("story_page_gaps") or (lambda: page_gaps_now(today=today)))()
+        by_ticker: dict[str, list[str]] = {}
+        for g in gaps:
+            by_ticker.setdefault(str(g["ticker"]), []).append(STORY_PAGE_GAP_LABELS.get(str(g["kind"]), str(g["kind"])))
+        work = "、".join(f"{t}（{'／'.join(labels)}）" for t, labels in list(by_ticker.items())[:5])
+        if len(by_ticker) > 5:
+            work += f" 等 {len(by_ticker)} 檔"
+        put("todo.story_page", len(by_ticker), work=work or None, oldest_days=_oldest((g.get("since") for g in gaps), today))
+
+    guarded("todo.story_page", story_page)
 
     def fact_check() -> None:
         # `alpha.providers.fact_checks.gaps_now`——`python -m alpha brief-check --gaps` 同一份判定（L16）。工作量照候選板的組分

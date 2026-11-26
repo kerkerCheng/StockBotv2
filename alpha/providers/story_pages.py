@@ -401,6 +401,12 @@ def current_brief(ticker: str, *, brief_loader: BriefLoader | None = None, today
 
 #: 封閉字彙（順序＝印的順序）。三種都是互動 session 自己清得掉的：圖上缺的那一層只要求登記成線索，不要求入圖（L14④）。
 STORY_PAGE_GAP_KINDS: tuple[str, ...] = ("stale", "unregistered_wait", "ride_mismatch")
+#: 每一種的短標（⑤「故事頁該對版」的工作量與 `story-page gaps` 照印；字只有這一份）。
+STORY_PAGE_GAP_LABELS: dict[str, str] = {
+    "stale": "敘事換版",
+    "unregistered_wait": "等待沒登記",
+    "ride_mismatch": "押的單位對不上",
+}
 #: 每一種怎麼清（`story-page gaps` 與待做清單照印；字只有這一份）。
 STORY_PAGE_GAP_REMEDY: dict[str, str] = {
     "stale": "對過新舊兩版敘事：頁上講的沒變就 rebind，變了就小修後 add",
@@ -478,6 +484,29 @@ def wait_states(record: Mapping[str, Any], watches: Mapping[str, Mapping[str, An
     return out
 
 
+def gaps_now(*, today: date | None = None, path: Path | None = None,
+             brief_loader: BriefLoader | None = None) -> list[dict[str, Any]]:
+    """現在故事頁和系統對不上的（⑤「故事頁該對版」與 `python -m alpha story-page gaps` 共用，L16；APP 個股頁的那幾條
+    是物化時同一個 `page_gaps`）。每一檔現行頁對現行敘事（`current_brief`，寫入核對與物化同一個定義）跑一次；
+    每項 `{ticker, company_id, page_id, kind, text, items, since}`——`since`＝這一種從哪天起對不上：敘事換版＝新一版的日子，
+    等待沒登記＝這一頁寫進帳的日子，押的單位對不上＝兩者取晚的。
+    帳有壞行就 raise——讀不懂哪一版是現行頁，計數就是未讀到，不是 0（INV-3）。帳還不存在＝還沒有任何一頁，是真的 0。"""
+    pages, errors = current_pages(path=path)
+    if errors:
+        raise ContractViolation(f"故事頁的帳有 {len(errors)} 行讀不懂：{errors[0]}")
+    out: list[dict[str, Any]] = []
+    for company in sorted(pages, key=lambda c: str(pages[c].get("ticker"))):
+        record = pages[company]
+        brief = current_brief(str(record["ticker"]), brief_loader=brief_loader, today=today)
+        page_on = str(record.get("created_at") or "")[:10]
+        brief_on = brief.created_on.isoformat() if brief is not None else ""
+        since = {"stale": brief_on or page_on, "unregistered_wait": page_on, "ride_mismatch": max(page_on, brief_on)}
+        for gap in page_gaps(record, brief):
+            out.append({"ticker": str(record["ticker"]), "company_id": company, "page_id": record["page_id"], **gap,
+                        "since": since[gap["kind"]]})
+    return out
+
+
 def current_brief_ids(tickers: Iterable[str], *, brief_loader: BriefLoader | None = None,
                       today: date | None = None) -> dict[str, str | None]:
     """代號 → 現行 v2 敘事的 id（沒有＝None）。"""
@@ -490,7 +519,8 @@ def current_brief_ids(tickers: Iterable[str], *, brief_loader: BriefLoader | Non
 
 __all__ = [
     "DECLARATION_FILE", "FolderReport", "PAGE_FILE", "RECORD_KINDS", "STORY_PAGES_PATH", "STORY_PAGE_DIR",
-    "STORY_PAGE_GAP_KINDS", "STORY_PAGE_GAP_REMEDY", "WAIT_STATUS_LABELS", "add_page", "check_folder", "company_names", "current_brief",
-    "current_brief_ids", "current_pages", "graph_nodes_exist", "history", "html_file", "load_folder", "page_gaps",
+    "STORY_PAGE_GAP_KINDS", "STORY_PAGE_GAP_LABELS", "STORY_PAGE_GAP_REMEDY", "WAIT_STATUS_LABELS", "add_page", "check_folder",
+    "company_names", "current_brief", "current_brief_ids", "current_pages", "gaps_now", "graph_nodes_exist", "history",
+    "html_file", "load_folder", "page_gaps",
     "page_id", "page_status", "read_html", "read_records", "rebind_page", "wait_states",
 ]

@@ -216,6 +216,20 @@ spec：`{ticker, brief_id, slots: {敘事七格 ＋ revenue（營收從哪來）
 季報「非獨家」、Lumentum 內製兩成；故事是「卡的是這一層的量，不是它：做這種雷射的有十來家，補產能的速度量不到；NVIDIA 把它和
 Lumentum、住友並列，協議也是非獨家。它和別家不同在六吋磷化銦產線；會讓它被換掉的是買家自己做。」
 
+**段「故事頁對版」（Phase 8；⑤「故事頁該對版」有數時，和「故事還沒寫」同一個時點清）**：故事頁是做深過的那幾檔的長版
+（`skills/stock-story`），它對著一版敘事寫；這一格點名三種對不上——敘事換版、頁上寫的等待沒登記、押的單位對不上。
+**敘事換版**：先讀新舊兩版的差（`python -m alpha brief <T> --show <舊 id>` 對 `--show`），頁上講的沒變就 `rebind` 附一句差在哪，
+變了才照 stock-story 小修那幾節、`check` 過再 `add`——**不重寫整頁**。**等待沒登記**：在敘事換版時把它登記成反證或加碼條件，
+再 `add` 一版補上 `watch_id`；不該等的就從頁上拿掉。**押的單位對不上**：敘事換版改押；圖上缺的那一層只登記成線索（入圖照人工 `go`）。
+
+```powershell
+& '.venv\Scripts\python.exe' -m alpha story-page gaps                        # 哪幾檔、哪一種、怎麼清（與 ⑤ 同一份判定）
+& '.venv\Scripts\python.exe' -m alpha story-page rebind <T> --note "差在哪、為什麼還站得住"   # 頁上講的沒變：對版
+& '.venv\Scripts\python.exe' -m alpha story-page check <資料夾>               # 變了：小修後乾跑
+& '.venv\Scripts\python.exe' -m alpha story-page add <資料夾>                 # 過了才收進帳
+& '.venv\Scripts\python.exe' -m webapp materialize <T>                        # APP 個股頁才看得到
+```
+
 **段「賭注句」（一檔一句四格：押什麼｜翻倍要哪個營業數字｜下一個對帳日｜認錯看哪一條；2026-11-20 使用者：「難把敘事組成一個
 我們在賭的東西」「沒有 timing」）**：可開與已持有每檔一句，住故事紀錄的選填鍵 `bet`——**不換敘事版本**。寫的人只寫三樣；
 押哪一層（照抄敘事的 `rides[]`）、下一個對帳日（何時格裡寫得出是哪一天的日子與名冊檢核點，取較早的）、那一條反證的 watch 與
