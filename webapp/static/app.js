@@ -1291,11 +1291,13 @@ function questionPart(view, part) {
 const CANDIDATE_WORDS = [['candidate:will_it_die', '會死嗎', 'will_it_die'], ['candidate:priced_in', '已定價嗎', 'priced_in'],
   ['candidate:in_numbers', '出現在數字裡了嗎', 'in_numbers']];
 
-/** 打開同一頁那一題的「數字與出處」、捲過去（`numbersDrill` 掛了 id `tq-<題>`）。不在就不動。 */
+/** 打開同一頁那一題的「數字與出處」、捲過去（舊版：`numbersDrill` 把 id `tq-<題>` 掛在展開上；新版：`systemNumbers`
+ *  掛在展開裡那一題的段上——打開包住它的那個展開）。不在就不動。 */
 function jumpToNumbers(question) {
   const box = document.getElementById('tq-' + question);
   if (!box) return;
-  box.open = true;
+  const folded = box.closest('details');
+  if (folded) folded.open = true;
   box.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
@@ -1627,7 +1629,7 @@ function argumentSection(line) {
   return sec;
 }
 
-async function renderDetail(ticker) {
+async function renderDetail(ticker, legacy) {
   markNav('stocks', '這一家我們押什麼、憑什麼、什麼會推翻它？');
   let payload;
   try {
@@ -1670,13 +1672,336 @@ async function renderDetail(ticker) {
   head.appendChild(askClaudeButton(payload, view));   // 2026-10-28 定案 8：把這一頁帶進對話
   app.appendChild(head);
 
-  // 2026-10-08 使用者：「舊有的資訊非必要的就拿掉，除非是給我看的；給機器看的不用顯示出來」。
-  // 一頁只剩頁首＋十三塊（個股頁 schema v1.0）：①每塊一句讀法 ②塊底下一個展開放這一塊給人讀的論證（這條鏈怎麼走、
-  // 坐的層讀成什麼、每條反證、時間表）③要核對的數字與出處也在那一塊的展開裡（財務三題）。原本的「基本數字／憑什麼這樣想／
-  // 讀圖／錯了怎麼知道」四張卡的內容搬進對應的塊；「稽核」與「完整細節」兩個大展開、每塊的「這一塊的格」（填得滿表）拿掉——
-  // 給查核用的欄位（authority、digest、readiness、填得滿表、原始 JSON）留在 artifact 與 `/api/v1/stocks/<T>`，不必有畫面。
-  app.appendChild(briefCard(payload, view));
+  if (legacy) {
+    // 舊版個股頁（過渡期；Phase 8 plan 不可越線 11：舊的函式不刪，刪除是結案後使用者決定的事）。
+    // 2026-10-08 使用者：「舊有的資訊非必要的就拿掉，除非是給我看的；給機器看的不用顯示出來」——頁首＋十三塊（個股頁 schema v1.0）。
+    const note = el('p', 'note', '這是舊版個股頁（過渡期）。');
+    const now = el('a', null, '回新版 →');
+    now.href = '#/' + encodeURIComponent(payload.ticker);
+    note.appendChild(now);
+    app.appendChild(note);
+    app.appendChild(briefCard(payload, view));
+  } else {
+    app.appendChild(stockPage(payload, view));
+  }
   window.scrollTo(0, 0);
+}
+
+/* ---------- 個股頁新框架（Phase 8 Step 8.2；plan `docs/plans/2026-11-26-001-feat-phase8-story-page-app-plan.md` §2.7） ----------
+   2026-11-26 使用者：「樣板取代APP個股頁」「2 全部換」。一頁＝頁首 → 有故事頁：版本一行（過期一條橫幅）→ 故事片段，片段裡
+   `#system` 的空位換成「系統裡的它」、每條等待後面加徽章；沒有故事頁：一行「還沒做深」→ 短故事 → 示意圖 → 系統裡的它。
+   頁尾一個小連結到舊版個股頁（過渡期，`#/old/<代號>`）。
+   片段是研究 session 寫的 HTML：寫入時檢查一次、物化時再檢查一次、這裡第三次——照 `.meta.json` 的白名單**重建節點**
+   （白名單與網址規則只有 `alpha.narrative.story_page` 那一份，L16）；白名單外的丟掉並在主控台記一筆。不用 innerHTML。
+   SVG 的命名空間用畫圖那一段的 `SVG_NS`（同一個值，不另宣告——2026-10-08 撞名整頁空白、測試全綠）。 */
+
+function stockPage(payload, view) {
+  const box = el('div', 'stock-page');
+  const sp = payload.story_page;
+  const article = sp && sp.html ? storyFragment(sp.html) : null;
+  if (article) {
+    box.appendChild(storyPageHead(sp));
+    const slot = article.querySelector('[data-slot="system"]');
+    const system = systemBlock(payload, view, sp);
+    if (slot) slot.appendChild(system); else article.appendChild(system);
+    article.querySelectorAll('[data-wait]').forEach((node) => node.appendChild(waitBadge(sp, node.getAttribute('data-wait'))));
+    box.appendChild(article);
+  } else {
+    if (sp && sp.absence) {
+      box.appendChild(el('div', 'warn', `故事頁讀不到：${sp.absence.reason || absenceLabel(sp.absence.kind) || '沒說為什麼'}`));
+    } else if (sp && sp.html) {
+      box.appendChild(el('div', 'warn', '故事頁的白名單讀不到（.meta.json 是舊的：重跑 python -m webapp materialize）——不印片段'));
+    }
+    box.appendChild(el('p', 'note not-deep', '這一檔還沒做深：下面是短故事與系統裡的它。'));
+    box.appendChild(shortStory(view));
+    pageDiagrams(payload, view).forEach((n) => box.appendChild(n));
+    box.appendChild(systemBlock(payload, view, null));
+  }
+  const old = el('p', 'old-page');
+  const link = el('a', 'dim', '舊版個股頁（過渡期）→');
+  link.href = '#/old/' + encodeURIComponent(payload.ticker);
+  old.appendChild(link);
+  box.appendChild(old);
+  return box;
+}
+
+/** 故事頁的白名單與網址規則（`.meta.json` 的 `story_page`）。讀不到、或缺任何一條規則就回 null——寧可不印片段，也不放寬
+ *  （缺的規則若拿空字串建 RegExp，會變成什麼都收）。 */
+function storyRules() {
+  const v = VOCAB && VOCAB.story_page;
+  const p = (v && v.patterns) || {};
+  const patterns = [p.id, p.href, p.url_ref, p.bad_scheme];
+  if (!v || !Array.isArray(v.html_tags) || !patterns.every((s) => typeof s === 'string' && s)) return null;
+  try {
+    return {
+      html: new Set(v.html_tags), svg: new Set(v.svg_tags || []), global: new Set(v.global_attrs || []),
+      svgAttrs: new Set(v.svg_attrs || []), tagAttrs: v.tag_attrs || {}, text: new Set(v.text_attrs || []),
+      levels: new Set(v.source_levels || []),
+      id: new RegExp(p.id), href: new RegExp(p.href), urlRef: new RegExp(p.url_ref), bad: new RegExp(p.bad_scheme),
+    };
+  } catch (err) {
+    return null;
+  }
+}
+
+/** 故事片段 → 重建好的 `<article class="story-page">`；白名單讀不到或根元素不對＝null。
+ *  DOMParser 的文件不執行程式、不載資源；它會把片段包進 `<html><body>`，所以從 body 的子節點走。 */
+function storyFragment(html) {
+  const rules = storyRules();
+  if (!rules) return null;
+  const doc = new DOMParser().parseFromString(String(html || ''), 'text/html');
+  const dropped = [];
+  const nodes = Array.from(doc.body.childNodes).map((child) => storyNode(child, rules, false, dropped)).filter(Boolean);
+  if (dropped.length) console.warn('故事頁片段：白名單外的丟掉了', dropped);
+  return nodes.find((n) => n.nodeType === Node.ELEMENT_NODE && n.localName === 'article'
+    && n.classList.contains('story-page')) || null;
+}
+
+/** 重建一個節點（遞迴）：白名單內的標籤照建（SVG 一律 createElementNS，否則畫不出來而且不報錯），白名單內的屬性照規則
+ *  過一次（`storyAttrValue`）；其餘丟掉、記進 `dropped`。文字一律 createTextNode。 */
+function storyNode(node, rules, inSvg, dropped) {
+  if (node.nodeType === Node.TEXT_NODE) return document.createTextNode(node.nodeValue);
+  if (node.nodeType !== Node.ELEMENT_NODE) return null;      // 註解、處理指令：寫入時就拒收了，這裡照丟
+  const local = String(node.localName || '');
+  const name = local.toLowerCase();
+  const svg = inSvg || name === 'svg';
+  if (!(svg ? rules.svg.has(name) : rules.html.has(name))) {
+    dropped.push(`<${local}>`);
+    return null;
+  }
+  const out = svg ? document.createElementNS(SVG_NS, local) : document.createElement(name);
+  const own = svg ? rules.svgAttrs : new Set(rules.tagAttrs[name] || []);
+  Array.from(node.attributes).forEach((attr) => {
+    const lower = attr.name.toLowerCase();
+    if (lower === 'xmlns') return;                              // createElementNS 已經給了命名空間
+    const allowed = (rules.global.has(lower) || own.has(lower)) && lower.indexOf('on') !== 0 && lower !== 'style';
+    const value = allowed ? storyAttrValue(rules, lower, attr.value) : null;
+    if (value === null) {
+      dropped.push(`${local}[${lower}]`);
+      return;
+    }
+    out.setAttribute(svg ? attr.name : lower, value);           // SVG 屬性分大小寫（viewBox）：用 DOM 給的原名
+  });
+  if (!svg && name === 'a') storyLink(out);
+  Array.from(node.childNodes).forEach((child) => {
+    const rebuilt = storyNode(child, rules, svg, dropped);
+    if (rebuilt) out.appendChild(rebuilt);
+  });
+  return out;
+}
+
+/** 屬性值照規則過一次（同 `alpha.narrative.story_page._attr_problems` 的那幾條；規則原文來自 `.meta.json`）。null＝丟掉。
+ *  id 一律加前綴 `sp-`：片段的 id 進到 APP 就是頁面上真的 id，不能撞到 APP 自己的（`app`、`selfcheck`…）；
+ *  頁內連結與 `url(#…)` 跟著改。 */
+function storyAttrValue(rules, name, raw) {
+  const value = String(raw);
+  if (name === 'id') return rules.id.test(value) ? 'sp-' + value : null;
+  if (name === 'data-src') return rules.levels.has(value) ? value : null;
+  if (rules.text.has(name)) return value;
+  const squashed = value.replace(/[\s\p{Cc}\p{Cf}]+/gu, '').toLowerCase();   // 「java&#9;script:」照樣是 javascript:
+  if (rules.bad.test(squashed)) return null;
+  const trimmed = value.trim();
+  if (name === 'href') {
+    if (!rules.href.test(trimmed)) return null;
+    return trimmed.charAt(0) === '#' ? '#sp-' + trimmed.slice(1) : trimmed;
+  }
+  if (squashed.indexOf('url(') >= 0 || squashed.indexOf('expression(') >= 0) {
+    return rules.urlRef.test(trimmed) ? trimmed.replace('#', '#sp-') : null;
+  }
+  return value;
+}
+
+/** 片段裡的連結：外部的開新分頁、不帶來源；頁內錨點不能真的改網址（這個 APP 用 hash 換頁，改了就跳到別頁）——攔下來、捲到那一節。 */
+function storyLink(a) {
+  const href = a.getAttribute('href') || '';
+  if (href.charAt(0) === '#') {
+    a.addEventListener('click', (event) => {
+      event.preventDefault();
+      const target = document.getElementById(href.slice(1));
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  } else if (href) {
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+  }
+}
+
+/** 故事頁的版本一行（寫於哪天、照哪一版問題清單、看過誰的股價、看到哪天）；敘事換版了還沒對版＝一條橫幅。 */
+function storyPageHead(sp) {
+  const box = el('div', 'story-head');
+  const seen = sp.prices_seen || [];
+  const bits = [sp.written_on ? `寫於 ${sp.written_on}` : null,
+    sp.checklist_version ? `照問題清單 ${sp.checklist_version}` : null,
+    seen.length ? `看過股價：${seen.join('、')}${sp.price_as_of ? `（看到 ${sp.price_as_of}）` : ''}` : '寫的時候沒看股價'];
+  box.appendChild(el('div', 'story-version', bits.filter(Boolean).join('｜')));
+  if (sp.stale) {
+    box.appendChild(el('div', 'warn story-stale', sp.current_brief_on
+      ? `敘事在 ${sp.current_brief_on} 換版了，這一頁還沒對版` : '現在沒有現行的敘事，這一頁綁的那一版已經不是現行'));
+  }
+  if (sp.brief_note) box.appendChild(el('div', 'note', `對版沒核：${sp.brief_note}`));
+  return box;
+}
+
+/** 頁上一條等待的徽章：等待 registry 的狀態（字取 `.meta.json`，前端不另寫）＋哪天醒來重看；watch id 放 title。 */
+function waitBadge(sp, key) {
+  const wait = (sp.waits || []).find((w) => w.key === key);
+  const labels = ((VOCAB && VOCAB.story_page) || {}).wait_status_labels || {};
+  if (!wait) return el('span', 'wait-badge wait-warn', '宣告裡沒有這一條');
+  const bits = [labels[wait.status] || wait.status || '—'];
+  if (wait.wake_on) bits.push(`${dayLabel(wait.wake_on)} 醒來重看`);
+  else if (wait.expires) bits.push(`最晚 ${dayLabel(wait.expires)} 到期`);
+  const tone = wait.status === 'active' ? 'wait-on' : (wait.status === 'consumed' ? 'wait-done' : 'wait-warn');
+  const badge = el('span', 'wait-badge ' + tone, bits.join('・'));
+  if (wait.watch_id) badge.title = `watch ${wait.watch_id}${wait.expires ? `；最晚 ${wait.expires} 到期重問` : ''}`;
+  return badge;
+}
+
+/** 「系統裡的它」（plan §2.7；一個函式、固定順序、全部沿用現有元件、不新算任何數）：①候選狀態與賭注句（＋和持有的檔押
+ *  同一個需求——AGENTS「必須點明相關性」）②押在哪一層、路徑（有故事頁時示意圖也放這裡；名詞一個展開）③讀圖的判讀
+ *  （＋研究寫的這條鏈怎麼走與引文，一個展開）④會不會先死 ⑤已定價嗎、出現在數字裡了嗎（數字收一個展開：參考尺、
+ *  營收從哪來——客戶集中度、backlog 也在這裡）⑥已登記的等待（反證、確認條件、事件與影響多大、時間表）⑦現在的股價
+ *  ⑧這一頁和系統對不上的（只在有故事頁時）。
+ *  2026-11-26 落地時逐行對照舊版：需求錨的四張圖、吃到多少、各格的依據（短故事那一格的原文）、各塊標題只在舊版
+ *  （頁尾連結；刪舊版之前要先決定它們的去處——plan 8.6 待決）。 */
+function systemBlock(payload, view, sp) {
+  const box = el('div', 'system-block');
+  box.appendChild(el('h2', 'system-title', '系統裡的它'));
+  const light = view.brief && lineMap(view.brief).brief_status_light;       // 敘事的狀態燈（「有假設改過，判斷還沒重看」）
+  const lit = light && light.datum && light.datum.value;
+  if (lit && lit.label) box.appendChild(el('span', 'badge badge-light light-' + (lit.state || 'unknown'), lit.label));
+  const row = candidateStateRow(view);
+  const line = candidateLine(view, true);
+  if (line) box.appendChild(line);
+  betLines(row).forEach((n) => box.appendChild(n));
+  sharedBetLines(row).forEach((n) => box.appendChild(n));
+  box.appendChild(seatsSentence(payload, view));
+  pathSentences(payload).forEach((n) => box.appendChild(n));
+  const chain = chainDetail(payload, view);      // 走圖的敘事：研究寫的這條鏈怎麼走＋圖裡 claim 的引文（11-26「走圖啥的敘事」）
+  if (chain) box.appendChild(chain);
+  if (sp) pageDiagrams(payload, view).forEach((n) => box.appendChild(n));
+  const rides = view.bet && lineMap(view.bet).rides;
+  const glossary = rides && Array.isArray(rides.datum.value) && rides.datum.value.length ? unitGlossary() : null;
+  if (glossary) box.appendChild(drill('名詞：層、插槽、押在哪一格', () => glossary));
+  const seats = seatsDetail(payload, view);
+  if (seats) box.appendChild(seats);
+  const lamps = lampsBlock(view, true);
+  if (lamps) box.appendChild(lamps);
+  wordsBlock(view, ['priced_in', 'in_numbers']).forEach((n) => box.appendChild(n));
+  const numbers = systemNumbers(payload, view);
+  if (numbers) box.appendChild(numbers);
+  disproofBrief(view).forEach((n) => box.appendChild(n));
+  confirmBrief(row).forEach((n) => box.appendChild(n));
+  const events = eventBlock(payload);
+  if (events) box.appendChild(events);
+  const downside = downsideDetail(view);
+  if (downside) box.appendChild(downside);
+  const timeline = timelineDetail(view);
+  if (timeline) box.appendChild(timeline);
+  box.appendChild(priceFigure(payload));
+  const gaps = sp ? storyGapLines(sp) : null;
+  if (gaps) box.appendChild(gaps);
+  return box;
+}
+
+/** 事件與影響多大（舊版 B5；2026-10-29 使用者：「事件與影響多大 我想知道」）：醒過的等待與已過的檢核點，一件一句、之後
+ *  比同組多漲或少漲多少。只有「不算事件的」缺席句時不印（API 照舊有）——同舊版首屏的規則（缺席句不上首屏）。 */
+function eventBlock(payload) {
+  const lines = eventReactionLines(payload);
+  if (!lines.some((n) => !n.classList.contains('ss-pending'))) return null;
+  const box = el('div', 'event-lines');
+  box.appendChild(el('div', 'group-title', '事件與影響多大'));
+  lines.forEach((n) => box.appendChild(n));
+  return box;
+}
+
+/** 候選列（candidate 面板 `candidate:state` 那一格的值；沒有＝null）。 */
+function candidateStateRow(view) {
+  const lines = view.candidate ? lineMap(view.candidate) : {};
+  const state = lines['candidate:state'] && lines['candidate:state'].datum;
+  return (state && state.value) || null;
+}
+
+/** 財務三題的數字與出處收成一個展開（§2.7 ⑤）。每題一段、掛 id `tq-<題>`——上面那幾個字點了打開這個展開、捲到那一段。
+ *  「已定價嗎」帶參考尺（自家三年的倍數，脈絡不是訊號）；「出現在數字裡了嗎」帶營收從哪來（每季營收、押的那一塊、
+ *  分部占比、客戶集中度、backlog——出投資建議前必看的那幾項，舊版的「營收從哪來」那一塊）。
+ *  三題的數字面板缺席時只印一次缺席，不印三次；營收從哪來照樣印。 */
+function systemNumbers(payload, view) {
+  const panel = view.three_questions;
+  const any = Boolean(panel) && (panel.lines || []).some((line) => line.role === 'three_question');
+  const revenue = () => [revenueBars(view), ...betShareLines(payload), ...mixFigures(payload), ...mixDetail(payload)];
+  const parts = any ? [
+    ['will_it_die', '會不會死：算出四盞燈的數字', () => [wipeoutUnlitRule(view)]],
+    ['priced_in', '已定價嗎', () => [pricedInPlain(), marketMultiples(view), rulerChart(view)]],
+    ['in_numbers', '出現在數字裡了嗎（營收從哪來）', revenue],
+  ] : [['will_it_die', '', () => []], ['in_numbers', '營收從哪來', revenue]];
+  const sections = parts.map(([question, title, extras], i) => {
+    const rows = panel && (any || i === 0) ? tqNumbers(view, question) : null;
+    const extra = [].concat(extras() || []).filter(Boolean);
+    if (!rows && !extra.length) return null;
+    const sec = el('div', 'system-numbers-part');
+    sec.id = 'tq-' + question;
+    if (title) sec.appendChild(el('div', 'group-title', title));
+    extra.forEach((n) => sec.appendChild(n));
+    if (rows) sec.appendChild(rows);
+    return sec;
+  }).filter(Boolean);
+  if (!sections.length) return null;
+  return drill('數字與出處', () => {
+    const body = el('div', 'block-detail');
+    sections.forEach((sec) => body.appendChild(sec));
+    return body;
+  });
+}
+
+/** 這一頁和系統對不上的（§2.6 三種，物化時算好；每種一句白話，怎麼清放 title）。 */
+function storyGapLines(sp) {
+  const gaps = sp.gaps || [];
+  if (!gaps.length) return null;
+  const remedy = ((VOCAB && VOCAB.story_page) || {}).gap_remedy || {};
+  const box = el('div', 'story-gaps');
+  box.appendChild(el('div', 'group-title', '這一頁和系統對不上的'));
+  gaps.forEach((gap) => {
+    const line = el('div', 'warn', gap.text || gap.kind);
+    if (remedy[gap.kind]) line.title = '怎麼清：' + remedy[gap.kind];
+    box.appendChild(line);
+  });
+  return box;
+}
+
+/** 沒做深的檔的故事（§2.7 第 3 條）：敘事逐格——那一格有短故事（`story:`）印短故事、沒有印敘事原文（`brief:`；舊版十三塊
+ *  同一個規則，2026-11-26 落地對照時抓到「有一格寫了短故事就整份只印短故事」會讓其餘格消失）；只有短故事的格（營收從哪來、
+ *  最近發生什麼）接在後面。都沒有印一句——非邊緣（或邊緣但買不到）是規定不寫敘事、不是還沒寫，字取首頁分組字彙那一份。 */
+function shortStory(view) {
+  const lines = ((view.brief && view.brief.lines) || []).filter((row) => {
+    const d = row.datum || {};
+    return typeof d.value === 'string' && d.value;
+  });
+  const told = {};
+  lines.filter((row) => row.key.indexOf('story:') === 0).forEach((row) => { told[row.key.slice('story:'.length)] = row; });
+  const rows = [];
+  lines.filter((row) => row.key.indexOf('brief:') === 0).forEach((row) => {
+    const slot = row.key.slice('brief:'.length);
+    rows.push(told[slot] || row);
+    delete told[slot];
+  });
+  Object.keys(told).forEach((slot) => rows.push(told[slot]));
+  if (rows.length) {
+    const box = el('div', 'story short-story');
+    rows.forEach((row) => box.appendChild(storyRow(row)));
+    return box;
+  }
+  const ctx = (view.candidate || {}).context || {};
+  const rule = (ctx.edge_state === 'not_edge' && listGroupLabel('not_edge_no_narrative'))
+    || (ctx.buyable === false && listGroupLabel('not_buyable_no_narrative'));
+  return el('p', 'note', rule || '還沒寫敘事');
+}
+
+/** 這一頁坐的層的技術示意圖，標出它在哪一格（新舊兩版個股頁共用）。 */
+function pageDiagrams(payload, view) {
+  const seats = ((view.readings || {}).context || {}).seats || Object.keys(payload.node_names || {});
+  const what = payload.what_it_does || {};
+  const word = what.source === 'rides' ? '押在' : '在';
+  return (payload.diagrams || []).map((d) => diagramFigure(d, seats, payload.ticker, what.focus, word));
 }
 
 /** 頁首「做什麼」（schema B0；2026-10-08 使用者：「像 COHR 就寫個 CW DFB 雷射，一目了然」）：materialize 組好的句子照印
@@ -2001,10 +2326,7 @@ function blockVisuals(payload, view, key) {
   if (key === 'B5') eventReactionLines(payload).forEach((m) => out.push(m));
   if (key === 'B4') {
     // 標出它坐的層：讀圖面板的「坐的節點」（與讀圖、是不是新賭注同一份 seats）；頁首「做什麼」講的那幾格（押的格）粗框加標籤
-    const seats = ((view.readings || {}).context || {}).seats || Object.keys(payload.node_names || {});
-    const what = payload.what_it_does || {};
-    const word = what.source === 'rides' ? '押在' : '在';
-    (payload.diagrams || []).forEach((d) => out.push(diagramFigure(d, seats, payload.ticker, what.focus, word)));
+    pageDiagrams(payload, view).forEach((n) => out.push(n));
   }
   if (key === 'B6') { const n = rulerChart(view); if (n) out.push(n); out.push(priceFigure(payload)); }
   return out;
@@ -3816,6 +4138,8 @@ async function route() {
     else if (target.startsWith('layer/')) await renderLayerNote(target.slice('layer/'.length));
     // 2026-10-28：首頁「依層」。小寫帶連字號，不會撞到 ticker（ticker 一律大寫）。
     else if (target === 'by-layer') await renderList('layer');
+    // 2026-11-26（Phase 8 Step 8.2）：舊版個股頁（過渡期）。`old/` 小寫帶斜線，不會撞到 ticker。
+    else if (target.startsWith('old/')) await renderDetail(target.slice('old/'.length), true);
     else if (target) await renderDetail(target);
     else await renderList();
     if (/[?&]selfcheck=1\b/.test(window.location.search)) setTimeout(selfCheck, 0);

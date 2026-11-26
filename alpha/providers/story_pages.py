@@ -393,6 +393,91 @@ def page_status(record: Mapping[str, Any], current_brief_id: str | None) -> str:
     return "current" if record.get("brief_id") == current_brief_id else "stale"
 
 
+def current_brief(ticker: str, *, brief_loader: BriefLoader | None = None, today: date | None = None) -> Any:
+    """這一檔現行的 v2 敘事（沒有＝None）。寫入核對、物化、對帳三處共用這一個定義。"""
+    return _current_brief(ticker, brief_loader=brief_loader, today=today)[0]
+
+# ---------------------------------------------------------------- 故事和系統對不上的三種（plan §2.6）
+
+#: 封閉字彙（順序＝印的順序）。三種都是互動 session 自己清得掉的：圖上缺的那一層只要求登記成線索，不要求入圖（L14④）。
+STORY_PAGE_GAP_KINDS: tuple[str, ...] = ("stale", "unregistered_wait", "ride_mismatch")
+#: 每一種怎麼清（`story-page gaps` 與待做清單照印；字只有這一份）。
+STORY_PAGE_GAP_REMEDY: dict[str, str] = {
+    "stale": "對過新舊兩版敘事：頁上講的沒變就 rebind，變了就小修後 add",
+    "unregistered_wait": "敘事換版把它登記成反證或加碼條件，再 add 一版補上 watch_id；不該等的就從頁上拿掉",
+    "ride_mismatch": "敘事換版改押；圖上沒有的那一層登記成線索（入圖照人工 go）",
+}
+
+
+def page_gaps(record: Mapping[str, Any], brief: Any) -> list[dict[str, Any]]:
+    """一頁對現行敘事的對不上（§2.6）。`brief`＝這一檔現行的 v2 敘事（None＝現在沒有）。每項 `{kind, text, items}`，
+    `text` 是給人讀的一句。純函式：不讀任何帳。"""
+    decl = record.get("declaration") if isinstance(record.get("declaration"), Mapping) else {}
+    out: list[dict[str, Any]] = []
+    if brief is None:
+        out.append({"kind": "stale", "text": "現在沒有現行的 v2 敘事——這一頁綁的那一版已經不是現行", "items": []})
+    elif record.get("brief_id") != brief.brief_id:
+        out.append({"kind": "stale", "text": f"敘事在 {brief.created_on.isoformat()} 換版了，這一頁還沒對版",
+                    "items": [str(record.get("brief_id")), str(brief.brief_id)]})
+    waits = [w for w in (decl.get("waits") or []) if isinstance(w, Mapping)]
+    loose = [str(w.get("key")) for w in waits if w.get("watch_id") is None]
+    if loose:
+        out.append({"kind": "unregistered_wait", "text": f"頁上寫了 {len(loose)} 件要等的事，系統還沒登記", "items": loose})
+    rides = [str(r) for r in (decl.get("rides") or []) if isinstance(r, str)]
+    off = []
+    if brief is not None:
+        brief_nodes = {str(getattr(r, "node", "")) for r in (getattr(brief, "rides", None) or ())}
+        off = [r for r in rides if r not in brief_nodes]
+    unled = [str(g.get("text")) for g in (decl.get("graph_gaps") or [])
+             if isinstance(g, Mapping) and not g.get("lead_ids")]
+    if off or unled:
+        bits = []
+        if off:
+            bits.append(f"故事押的 {len(off)} 個節點不在現行敘事押的單位裡")
+        if unled:
+            bits.append(f"圖上缺的 {len(unled)} 處還沒登記成線索")
+        out.append({"kind": "ride_mismatch", "text": "；".join(bits), "items": [*off, *unled]})
+    return out
+
+
+#: 頁上等待的徽章字（APP 經 `.meta.json` 照印；前四個是等待 registry 的狀態 `engine_b.event_watch.WATCH_STATUSES`，
+#: 後三個是這裡對不到 registry 的三種——測試核對 registry 每一種狀態都有字，新增狀態不會以原文上畫面）。
+WAIT_STATUS_LABELS: dict[str, str] = {
+    "active": "已登記・在等",
+    "fired": "已登記・醒了，該重看",
+    "consumed": "已登記・已處理",
+    "expired": "已登記・到期了，該重問",
+    "unregistered": "還沒登記",
+    "missing": "登記的 id 在等待 registry 找不到",
+    "unread": "等待 registry 這一輪沒讀到",
+}
+
+
+def wait_states(record: Mapping[str, Any], watches: Mapping[str, Mapping[str, Any]] | None) -> list[dict[str, Any]]:
+    """頁上每一條等待對到等待 registry 的狀態。`watches`＝watch_id → watch（None＝這一輪沒讀到 registry）。
+    `status`：registry 的狀態；`unregistered`＝頁上寫了、還沒登記；`missing`＝寫了 id、registry 找不到（讀取問題，
+    不算進對不上的三種）；`unread`＝registry 沒讀到。"""
+    decl = record.get("declaration") if isinstance(record.get("declaration"), Mapping) else {}
+    out = []
+    for wait in decl.get("waits") or []:
+        if not isinstance(wait, Mapping):
+            continue
+        watch_id = wait.get("watch_id")
+        row = {"key": wait.get("key"), "kind": wait.get("kind"), "watch_id": watch_id,
+               "status": None, "wake_on": None, "expires": None}
+        if watch_id is None:
+            row["status"] = "unregistered"
+        elif watches is None:
+            row["status"] = "unread"
+        elif str(watch_id) not in watches:
+            row["status"] = "missing"
+        else:
+            watch = watches[str(watch_id)]
+            row.update({"status": watch.get("status"), "wake_on": watch.get("until"), "expires": watch.get("expires")})
+        out.append(row)
+    return out
+
+
 def current_brief_ids(tickers: Iterable[str], *, brief_loader: BriefLoader | None = None,
                       today: date | None = None) -> dict[str, str | None]:
     """代號 → 現行 v2 敘事的 id（沒有＝None）。"""
@@ -404,7 +489,8 @@ def current_brief_ids(tickers: Iterable[str], *, brief_loader: BriefLoader | Non
 
 
 __all__ = [
-    "DECLARATION_FILE", "FolderReport", "PAGE_FILE", "RECORD_KINDS", "STORY_PAGES_PATH", "STORY_PAGE_DIR", "add_page",
-    "check_folder", "company_names", "current_brief_ids", "current_pages", "graph_nodes_exist", "history", "html_file",
-    "load_folder", "page_id", "page_status", "read_html", "read_records", "rebind_page",
+    "DECLARATION_FILE", "FolderReport", "PAGE_FILE", "RECORD_KINDS", "STORY_PAGES_PATH", "STORY_PAGE_DIR",
+    "STORY_PAGE_GAP_KINDS", "STORY_PAGE_GAP_REMEDY", "WAIT_STATUS_LABELS", "add_page", "check_folder", "company_names", "current_brief",
+    "current_brief_ids", "current_pages", "graph_nodes_exist", "history", "html_file", "load_folder", "page_gaps",
+    "page_id", "page_status", "read_html", "read_records", "rebind_page", "wait_states",
 ]

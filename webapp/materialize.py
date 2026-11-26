@@ -329,8 +329,12 @@ def materialize_view(analyst_view_dict: Mapping[str, Any], *,
                      bet_share: Mapping[str, Any] | None = None,
                      event_reaction: Mapping[str, Any] | None = None,
                      tagline: Mapping[str, Any] | None = None,
-                     labels_zh: Mapping[str, str] | None = None) -> dict[str, Any]:
+                     labels_zh: Mapping[str, str] | None = None,
+                     story_page: Mapping[str, Any] | None = None) -> dict[str, Any]:
     """`AnalystView.to_dict()` → artifact payload（含遮蔽、overview、兩個 digest）。純函式。
+
+    `story_page`：這一檔的故事頁格（`_page_story`；Phase 8 Step 8.2）——None＝沒有故事頁，`{absence}`＝有但讀不到。
+    呈現用，不進新鮮度身分（`content_digest` 照常涵蓋）。
 
     `tagline`／`labels_zh`：首頁卡片的短名與一句做什麼（研究 ledger 現行那一筆）、押的層的中文名——呈現用，不進新鮮度身分。
 
@@ -390,6 +394,8 @@ def materialize_view(analyst_view_dict: Mapping[str, Any], *,
         # 事件之後跟組比（個股頁 S3e，2026-10-14）：這一檔名下醒過的等待與已過的確定檢核點，每件 1／5／20 日相對主題等權組——
         # 照抄 `alpha.event_reaction`。
         "event_reaction": dict(event_reaction) if event_reaction is not None else None,
+        # 故事頁（Phase 8 Step 8.2）：研究 session 寫的片段（寫入與物化各檢查一次，前端再照白名單重建）＋版本、對版、等待狀態。
+        "story_page": dict(story_page) if story_page is not None else None,
         "materializer": {
             "version": MATERIALIZER_VERSION,
             "python": f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}",
@@ -643,6 +649,7 @@ def materialize(ticker: str, *, as_of: date | None = None, scenario: str | None 
                 events: Mapping[str, Any] | None = None,
                 taglines: Mapping[str, Any] | None = None,
                 labels_zh: Mapping[str, str] | None = None,
+                story_pages: Mapping[str, Any] | None = None,
                 graph_provider: Any = None,
                 fundamentals_provider: Any = None) -> tuple[Path, dict[str, Any]]:
     """跑一次完整鏈並寫下 artifact。**只有這裡會連 Neo4j／Engine C／private ledger。**
@@ -656,6 +663,7 @@ def materialize(ticker: str, *, as_of: date | None = None, scenario: str | None 
     `layer_reps`：層代表公司宣告（`_layer_reps_loaded`；多檔時載一次）——押的那一塊用；沒給就為這一檔載一次。
     `events`：事件之後跟組比的一輪輸入（`_event_context`；多檔時載一次）；沒給就為這一檔載一次。
     `taglines`／`labels_zh`：首頁卡片的介紹 ledger（`company_id` → 現行那一筆）與層中文名（多檔時載一次）；沒給就載一次。
+    `story_pages`：故事頁的帳（`_story_pages_loaded`；多檔時載一次）；沒給就載一次。
     `graph_provider`／`fundamentals_provider`：圖與 Engine C 的 provider（多檔時開一份共用，由 `materialize_many` 負責關）；
     沒給就由 `fetch_alpha_investment_view` 為這一檔開一份、用完自己關。
     """
@@ -691,6 +699,8 @@ def materialize(ticker: str, *, as_of: date | None = None, scenario: str | None 
     reaction = _page_event_reaction(str(view.identity.ticker or ticker), view.identity.company_id, analyst_dict,
                                     event_ctx, as_of)
     tags = taglines if taglines is not None else _taglines_loaded()
+    story = _page_story(str(view.identity.ticker or ticker), view.identity.company_id,
+                        story_pages if story_pages is not None else _story_pages_loaded(), event_ctx, as_of)
     payload = materialize_view(analyst_dict, generated_at=generated_at,
                                price_series=_close_series(ticker),
                                page_extra=page_extra_for(ticker, notes_state, page_diagrams, demand, capture, what,
@@ -700,7 +710,7 @@ def materialize(ticker: str, *, as_of: date | None = None, scenario: str | None 
                                demand_anchor=demand, capture=capture, what_it_does=what, path_layers=path_layers,
                                revenue_mix=mix, bet_share=bet, event_reaction=reaction,
                                tagline=tags.get(str(view.identity.company_id)) if view.identity.company_id else None,
-                               labels_zh=zh)
+                               labels_zh=zh, story_page=story)
     target = store or ArtifactStore()
     return target.write(payload), payload
 
@@ -747,6 +757,71 @@ def _event_context() -> dict[str, Any] | None:
                 "lifecycle": load_lifecycle()}
     except Exception:  # noqa: BLE001 — 讀不到只讓 B5 那一格說讀不到
         return None
+
+
+def _story_pages_loaded() -> dict[str, Any]:
+    """故事頁的帳（Phase 8 Step 8.2；多檔載一次）：`company_id` → 現行那一列。讀不到＝`absence`（每一檔的故事那一塊說讀不到，
+    其餘照寫）；壞行由 `python -m alpha story-page list` 印（帳自己的事），這裡只數。"""
+    try:
+        from alpha.providers.story_pages import current_pages
+
+        pages, errors = current_pages()
+        return {"pages": pages, "bad_lines": len(errors)}
+    except Exception as exc:  # noqa: BLE001 — 讀不到只讓故事那一塊說讀不到
+        return {"absence": {"kind": "upstream_unavailable",
+                            "reason": f"故事頁的帳沒讀到（{type(exc).__name__}: {str(exc)[:120]}）"}}
+
+
+def _page_story(ticker: str, company_id: str | None, loaded: Mapping[str, Any],
+                event_ctx: Mapping[str, Any] | None, as_of: date | None, *,
+                root: Path | None = None, brief_loader: Any = None) -> dict[str, Any] | None:
+    """一檔的故事頁格（plan §2.7）：沒有故事頁＝None；有但讀不到或沒過第二次檢查（E1–E4）＝`{absence}`——只有故事那一塊
+    說讀不到，整份物化檔照寫。等待的狀態用這一輪已載入的等待 registry（`_event_context` 那一份）。
+    `root`／`brief_loader`：片段路徑的根與現行敘事的讀法（測試注入；預設是 repo 與敘事帳）。"""
+    if loaded.get("absence"):
+        return {"absence": dict(loaded["absence"])}
+    record = (loaded.get("pages") or {}).get(str(company_id)) if company_id else None
+    if record is None:
+        return None
+    if as_of is not None:
+        return {"absence": {"kind": "point_in_time_unavailable",
+                            "reason": "as-of 視角不推故事頁——它的等待狀態與現行敘事只有現在（INV-6）"}}
+    from alpha.errors import ContractViolation
+    from alpha.narrative.story_page import fragment_problems
+    from alpha.providers import story_pages as sp
+
+    try:
+        html = sp.read_html(record, root=root)
+    except ContractViolation as exc:
+        return {"absence": {"kind": "invalidated", "reason": str(exc)[:200]}}
+    problems = fragment_problems(html)
+    if problems:
+        return {"absence": {"kind": "invalidated",
+                            "reason": "片段沒過物化時的第二次檢查：" + "；".join(f.line() for f in problems[:3])}}
+    try:
+        brief = sp.current_brief(ticker, brief_loader=brief_loader)
+    except Exception as exc:  # noqa: BLE001 — 敘事讀不到：故事照印，對版那一格說沒核
+        brief, brief_note = None, f"現行敘事沒讀到（{type(exc).__name__}）"
+    else:
+        brief_note = None
+    watches = None
+    if event_ctx is not None:
+        watches = {str(w.get("watch_id")): w for w in event_ctx.get("watches") or () if isinstance(w, Mapping)}
+    decl = record.get("declaration") or {}
+    current_id = str(brief.brief_id) if brief is not None else None
+    return {
+        "page_id": record["page_id"], "kind": record["kind"], "created_at": record["created_at"],
+        "brief_id": record["brief_id"], "current_brief_id": current_id,
+        "current_brief_on": brief.created_on.isoformat() if brief is not None else None,
+        "brief_note": brief_note,
+        "stale": brief_note is None and sp.page_status(record, current_id) != "current",
+        "written_on": decl.get("written_on"), "checklist_version": decl.get("checklist_version"),
+        "prices_seen": list(decl.get("prices_seen") or ()), "price_as_of": decl.get("price_as_of"),
+        "visible_chars": record.get("visible_chars"), "html": html,
+        "waits": sp.wait_states(record, watches),
+        "gaps": [] if brief_note else sp.page_gaps(record, brief),
+        "self_eval": dict(decl.get("self_eval") or {}), "key_question": decl.get("key_question"),
+    }
 
 
 def _page_event_reaction(ticker: str, company_id: str | None, analyst_dict: Mapping[str, Any],
@@ -962,6 +1037,7 @@ def materialize_many(tickers: Sequence[str], *, as_of: date | None = None,
     events = _event_context() if tickers else None
     tags = _taglines_loaded() if tickers else None
     labels = node_labels_zh() if tickers else None
+    stories = _story_pages_loaded() if tickers else None
     # 圖與 Engine C 的 provider 也整批共用一份（failure log #108 第 2 次）：每檔各開一份＝每檔重新連圖、重抓整張圖、
     # 重建結構表兩次（daily 卡片 `fetch_alpha_cards` 早就整批共用，個股頁這條路漏了）。開不了就退回逐檔各開——
     # 每檔照舊自己失敗、理由照樣現形（INV-3），不因共用的那一份開不了而整批丟掉。
@@ -972,6 +1048,7 @@ def materialize_many(tickers: Sequence[str], *, as_of: date | None = None,
                 path, _ = materialize(ticker, as_of=as_of, store=target, readings=readings, candidates=candidates,
                                       layer_notes=notes_state, diagrams=loaded, node_names=names, anchors=anchors,
                                       paths=paths, layer_reps=reps, events=events, taglines=tags, labels_zh=labels,
+                                      story_pages=stories,
                                       graph_provider=graph_provider, fundamentals_provider=fundamentals_provider)
             except Exception as exc:  # noqa: BLE001 — 逐檔隔離；理由原樣回報
                 results.append((ticker, None, f"{type(exc).__name__}: {str(exc)[:200]}"))
@@ -2560,6 +2637,8 @@ def write_vocabularies(store: ArtifactStore | None = None) -> Path:
         GROUP_LABELS, LIST_GROUP_LABELS, LIST_GROUPS, PAPER_STATE_EXITS, RETIRED_STATE_LABELS,
     )
     from alpha.narrative.contracts import CANDIDATE_STATES_DECLARABLE, CANDIDATE_STATES_RETIRED
+    from alpha.narrative.story_page import whitelist_payload as story_whitelist
+    from alpha.providers.story_pages import STORY_PAGE_GAP_KINDS, STORY_PAGE_GAP_REMEDY, WAIT_STATUS_LABELS
     from alpha.structure_reading.contracts import READING_KIND_SHORT, READING_KINDS, READING_UNITS
     from alpha.structure_reading.predictions import OUTCOMES, UNJUDGED_OUTCOMES
     from briefing.analyst_view.contracts import (
@@ -2620,6 +2699,10 @@ def write_vocabularies(store: ArtifactStore | None = None) -> Path:
         "reading_kinds": {kind: {"short": READING_KIND_SHORT[kind], "plain": READING_KINDS[kind]} for kind in READING_KINDS},
         "reading_units": {unit: text.split("讀圖")[0] for unit, text in READING_UNITS.items()},   # 層／插槽（同候選列的推法）
         "node_labels_zh": node_labels_zh(),
+        # 故事頁（Phase 8 Step 8.2）：前端重建片段用的白名單只有 `alpha.narrative.story_page` 那一份（app.js 不另抄，L16）；
+        # 對不上的三種、怎麼清、等待徽章的字也跟著走
+        "story_page": {**story_whitelist(), "gap_kinds": list(STORY_PAGE_GAP_KINDS),
+                       "gap_remedy": dict(STORY_PAGE_GAP_REMEDY), "wait_status_labels": dict(WAIT_STATUS_LABELS)},
     }
     path = target.directory / ".meta.json"
     tmp = path.with_suffix(".json.tmp")

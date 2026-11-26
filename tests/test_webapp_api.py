@@ -214,7 +214,7 @@ def test_an_unexpected_exception_returns_a_fixed_shape_not_its_message(client, m
 
 
 def test_static_assets_are_an_allowlist(client) -> None:
-    for name in ("index.html", "app.js", "styles.css"):
+    for name in ("index.html", "app.js", "styles.css", "story.css"):
         assert client.get(f"/static/{name}").status_code == 200
     for name in ("api.py", "..%2fapi.py", "secrets.json", ".meta.json"):
         assert client.get(f"/static/{name}").status_code == 404
@@ -550,9 +550,13 @@ def test_priced_in_is_explained_from_one_string_in_one_place(client) -> None:
     assert "Phase" not in text and "R1" not in text and "稽核區" not in text, "給人看的白話不帶內部編號與已拿掉的區塊名"
     source = (ROOT / "webapp" / "static" / "app.js").read_text(encoding="utf-8")
     assert "VOCAB.plain_priced_in" in source and "太貴" not in source
-    assert source.count("pricedInPlain()") == 2           # 函式定義一次、「怎麼被定價」的數字與出處一次
+    # 函式定義一次＋每一版個股頁各印一次（2026-11-26 Phase 8 Step 8.2 起舊版與新版是兩頁：舊版在「怎麼被定價」的數字與出處，
+    # 新版在「系統裡的它」的數字與出處——一頁裡都只印一次，判準不變）
+    assert source.count("pricedInPlain()") == 3
     detail = source.split("function blockDetail", 1)[1].split("\nfunction ", 1)[0]
     assert "numbersDrill(view, 'priced_in', () => [pricedInPlain()" in detail
+    numbers = source.split("function systemNumbers", 1)[1].split("\nfunction ", 1)[0]
+    assert numbers.count("pricedInPlain()") == 1
 
 
 def test_stock_page_three_words_jump_to_their_numbers_on_the_same_page() -> None:

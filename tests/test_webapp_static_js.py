@@ -170,6 +170,29 @@ def test_no_top_level_function_is_declared_twice() -> None:
     assert not dupes, f"這些頂層函式宣告了兩次（後面那一份會蓋掉前面的）：{dupes}"
 
 
+def test_no_top_level_name_is_declared_twice_across_const_let_and_function() -> None:
+    """頂層 `const`／`let` 重複宣告（或和函式同名）不是蓋掉，是整支程式語法錯誤、整頁空白。
+
+    事發 2026-11-26（Phase 8 Step 8.2）：個股頁新框架又宣告了一次畫圖那一段早有的 `const SVG_NS`——上面那條只看 `function`，
+    抓不到；是 `node --check` 抓到的。"""
+    source = APP_JS.read_text(encoding="utf-8")
+    names = re.findall(r"^(?:(?:async )?function (\w+)\(|(?:const|let) (\w+)\s*=)", source, flags=re.M)
+    flat = [a or b for a, b in names]
+    assert len([n for n in flat if n]) > 60, "抓不到頂層宣告，這條守衛等於沒作用"
+    dupes = sorted({name for name in flat if flat.count(name) > 1})
+    assert not dupes, f"這些頂層名字宣告了兩次（const／let 重複＝語法錯誤整頁空白）：{dupes}"
+
+
+def test_app_js_never_parses_strings_into_the_page() -> None:
+    """研究 session 寫的故事頁片段會進到這一頁：字串一律走 DOMParser＋白名單重建（`storyFragment`），
+    不准用任何把字串當 HTML 直接塞進頁面的寫法（Phase 8 plan 不可越線 4）。註解與字串裡提到不算。"""
+    stripped = _strip_literals(APP_JS.read_text(encoding="utf-8"))
+    for token in ("innerHTML", "outerHTML", "insertAdjacentHTML", "document.write", "createContextualFragment",
+                  "srcdoc"):
+        assert token not in stripped, token
+    assert "DOMParser" in stripped and "storyFragment" in stripped
+
+
 @pytest.mark.parametrize("broken", ["function f() { return 1;", "const a = [1, 2;"])
 def test_the_bracket_checker_actually_catches_things(broken: str) -> None:
     """守衛自己也要被驗（INV-5：未量測的機制不得享有默認信任）。"""

@@ -782,11 +782,12 @@ async def static_asset(request: Request) -> Response:
     return _static_file(request.path_params["asset"])
 
 
-_ALLOWED_ASSETS = {"index.html", "app.js", "styles.css"}
+#: `story.css`：故事頁片段的樣式（Phase 8 Step 8.2；片段不准帶行內樣式，長相全住這裡）。
+_ALLOWED_ASSETS = {"index.html", "app.js", "styles.css", "story.css"}
 
 
 def _static_file(name: str) -> Response:
-    """**allowlist**，不是路徑過濾——只有這三個檔名可以被讀到，沒有 arbitrary file access。"""
+    """**allowlist**，不是路徑過濾——只有這幾個檔名可以被讀到，沒有 arbitrary file access。"""
     if name not in _ALLOWED_ASSETS:
         raise HTTPException(status_code=404, detail="not found")
     path = STATIC_DIR / name

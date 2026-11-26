@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import json
 from datetime import datetime, timezone
+from pathlib import Path
 
 import pytest
 
@@ -277,3 +278,147 @@ def test_stale_is_a_state_not_an_error() -> None:
     assert fresh.state == "fresh" and stale.state == "stale"
     assert stale.age_seconds > 0
     assert "不會觸發重建" in stale.to_dict()["rule"]
+
+# ---------------------------------------------------------------- 故事頁（Phase 8 Step 8.2）
+# 全部用合成的範例頁（tests/fixtures/story_page/ZZZZ）與 tmp 目錄；不讀真的故事頁帳、敘事帳、等待 registry。
+
+_STORY_FIXTURE = Path(__file__).resolve().parent / "fixtures" / "story_page" / "ZZZZ"
+
+
+def _story_brief(created: datetime):
+    from alpha.narrative import RECORD_VERSION_V2, brief_record, parse_brief_record
+
+    ev = ["graph://x"]
+    slots = {"demand": {"text": "買方擴產。", "evidence_refs": ev},
+             "position": {"text": "坐在檢測層，年增 {in_numbers_latest}（{in_numbers_as_of}）。", "evidence_refs": ev},
+             "bottleneck": {"text": "卡的是高階機台的量。", "evidence_refs": ev},
+             "priced_in": {"text": "自家三年 {own_history_basis} 第 {own_history_pctile} 百分位。", "evidence_refs": ev},
+             "our_bet": {"text": "賭高階機台。", "evidence_refs": ev},
+             "what_must_be_true": {"text": "買方照計畫擴產。", "evidence_refs": ev},
+             "when": {"text": "{next_checkpoint_date} 檢核點。", "evidence_refs": ev}}
+    return parse_brief_record(brief_record(
+        company_id="co:zzzz_example", ticker="ZZZZ", slots=slots, record_version=RECORD_VERSION_V2,
+        rides=[{"node": "tech:zzzz_inspection", "unit": "layer", "reading_id": "sr_" + "a" * 16}],
+        answers={"priced_in": "yes", "in_numbers": "yes"},
+        candidate_state={"state": "pass", "watch_id": None, "reason": "理由的依據"}, created_at=created))
+
+
+_BRIEF = _story_brief(datetime(2026, 11, 25, tzinfo=timezone.utc))
+_NEWER = _story_brief(datetime(2026, 11, 26, 1, 0, tzinfo=timezone.utc))
+_WATCHES = {"watches": [{"watch_id": "ew_9001_2026-11-26", "status": "active", "until": "2027-02-01",
+                         "expires": "2027-03-01"}]}
+
+
+def _story_record(tmp_path, html: bytes | None = None, *, brief_id: str | None = None) -> dict:
+    """帳上一列（與 `story_pages.add_page` 寫的同形）＋片段檔，放在 tmp 根目錄下。"""
+    import hashlib
+
+    data = (_STORY_FIXTURE / "page.html").read_bytes() if html is None else html
+    decl = json.loads((_STORY_FIXTURE / "page.json").read_text(encoding="utf-8"))
+    decl["brief_id"] = brief_id or _BRIEF.brief_id
+    target = tmp_path / "library" / "private" / "story_pages" / "ZZZZ" / "sp_0123456789abcdef.html"
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_bytes(data)
+    return {"page_id": "sp_0123456789abcdef", "company_id": "co:zzzz_example", "ticker": "ZZZZ",
+            "brief_id": decl["brief_id"], "created_at": "2026-11-26T14:00:00+00:00", "author": "session", "kind": "page",
+            "html_sha256": hashlib.sha256(data).hexdigest(),
+            "html_path": "library/private/story_pages/ZZZZ/sp_0123456789abcdef.html", "visible_chars": 1259,
+            "warnings": [], "declaration": decl, "rebind_note": None, "supersedes_id": None}
+
+
+def _story(tmp_path, record, *, briefs=(_BRIEF,), event_ctx=_WATCHES, as_of=None, loaded=None):
+    from webapp.materialize import _page_story
+
+    return _page_story("ZZZZ", "co:zzzz_example", loaded or {"pages": {"co:zzzz_example": record}}, event_ctx,
+                       as_of, root=tmp_path, brief_loader=lambda t: (list(briefs), []))
+
+
+def test_story_page_carries_the_fragment_and_the_registry_state(tmp_path) -> None:
+    record = _story_record(tmp_path)
+    story = _story(tmp_path, record)
+    assert story["html"].encode("utf-8") == (_STORY_FIXTURE / "page.html").read_bytes()
+    assert story["stale"] is False and story["current_brief_id"] == _BRIEF.brief_id
+    waits = {w["key"]: w for w in story["waits"]}
+    assert waits["w1"]["status"] == "active" and waits["w1"]["wake_on"] == "2027-02-01"
+    assert waits["w1"]["expires"] == "2027-03-01"
+    assert waits["w2"]["status"] == "unregistered" and waits["w2"]["watch_id"] is None
+    # 範例頁：w2 還沒登記、圖上缺的那一層沒有線索——對不上的兩種；押的節點和敘事一樣，不算
+    assert [g["kind"] for g in story["gaps"]] == ["unregistered_wait", "ride_mismatch"]
+    assert story["written_on"] == "2026-11-26" and story["checklist_version"] == "v3"
+    artifact = materialize_view(fake_view(), story_page=story)
+    validate_artifact("TEST", artifact)
+    assert artifact["story_page"]["html"] == story["html"]
+
+
+def test_story_page_is_stale_when_the_brief_moved_on(tmp_path) -> None:
+    story = _story(tmp_path, _story_record(tmp_path), briefs=(_BRIEF, _NEWER))
+    assert story["stale"] is True and story["current_brief_on"] == "2026-11-26"
+    assert story["gaps"][0]["kind"] == "stale" and "2026-11-26 換版" in story["gaps"][0]["text"]
+
+
+def test_watch_missing_from_the_registry_is_a_reading_problem_not_a_pass(tmp_path) -> None:
+    story = _story(tmp_path, _story_record(tmp_path), event_ctx={"watches": []})
+    assert {w["key"]: w["status"] for w in story["waits"]} == {"w1": "missing", "w2": "unregistered"}
+    unread = _story(tmp_path, _story_record(tmp_path), event_ctx=None)
+    assert {w["key"]: w["status"] for w in unread["waits"]} == {"w1": "unread", "w2": "unregistered"}
+
+
+def test_no_story_page_is_null(tmp_path) -> None:
+    from webapp.materialize import _page_story
+
+    assert _page_story("ZZZZ", "co:zzzz_example", {"pages": {}}, _WATCHES, None, root=tmp_path) is None
+    assert materialize_view(fake_view())["story_page"] is None
+
+
+@pytest.mark.parametrize("snippet, needle", [
+    ("<script>alert(1)</script>", "E1"),
+    ("<p onclick=\"alert(1)\">字</p>", "E1"),
+    ("<p style=\"color:red\">字</p>", "E1"),
+    ("<p><a href=\"javascript:alert(1)\">連結</a></p>", "E1"),
+    ("<p>https://claude.ai/artifact/abc</p>", "E4"),
+])
+def test_a_broken_fragment_is_an_absence_and_the_artifact_is_still_written(tmp_path, snippet, needle) -> None:
+    html = (_STORY_FIXTURE / "page.html").read_text(encoding="utf-8").replace("</header>", snippet + "\n</header>", 1)
+    story = _story(tmp_path, _story_record(tmp_path, html.encode("utf-8")))
+    assert story["absence"]["kind"] == "invalidated" and needle in story["absence"]["reason"]
+    assert "html" not in story
+    store = ArtifactStore(tmp_path / "views")
+    store.write(materialize_view(fake_view(), story_page=story))        # 整份物化檔照寫
+    payload, _fresh = store.read("TEST")
+    assert payload["story_page"]["absence"]["kind"] == "invalidated"
+
+
+def test_a_tampered_fragment_file_is_an_absence(tmp_path) -> None:
+    record = _story_record(tmp_path)
+    (tmp_path / record["html_path"]).write_bytes(b"<article class=\"story-page\"></article>")
+    story = _story(tmp_path, record)
+    assert story["absence"]["kind"] == "invalidated" and "被改過" in story["absence"]["reason"]
+
+
+def test_story_page_refuses_as_of_and_passes_ledger_absence_through(tmp_path) -> None:
+    from datetime import date
+
+    record = _story_record(tmp_path)
+    assert _story(tmp_path, record, as_of=date(2026, 11, 1))["absence"]["kind"] == "point_in_time_unavailable"
+    down = {"absence": {"kind": "upstream_unavailable", "reason": "故事頁的帳沒讀到"}}
+    assert _story(tmp_path, record, loaded=down)["absence"] == down["absence"]
+
+
+def test_vocabularies_carry_the_one_story_page_whitelist(tmp_path) -> None:
+    """前端重建片段用的白名單、網址規則、對不上的三種與等待徽章的字只有一份（`.meta.json`；app.js 不另抄）。"""
+    import re
+
+    from alpha.narrative import story_page as rules
+    from alpha.providers.story_pages import STORY_PAGE_GAP_KINDS, WAIT_STATUS_LABELS
+    from engine_b.event_watch import WATCH_STATUSES
+    from webapp.materialize import write_vocabularies
+
+    meta = json.loads(write_vocabularies(ArtifactStore(tmp_path)).read_text(encoding="utf-8"))["story_page"]
+    assert meta["html_tags"] == sorted(rules.HTML_TAGS) and "viewbox" in meta["svg_attrs"]
+    assert meta["gap_kinds"] == list(STORY_PAGE_GAP_KINDS)
+    assert set(WATCH_STATUSES) <= set(meta["wait_status_labels"]) == set(WAIT_STATUS_LABELS)
+    for name, pattern in meta["patterns"].items():
+        assert pattern and "\\w" not in pattern, name          # Python 與 JavaScript 對 \w 的意思不一樣
+        re.compile(pattern)
+    assert re.fullmatch(meta["patterns"]["href"], "https://example.com/a")
+    assert not re.fullmatch(meta["patterns"]["href"], "javascript:alert(1)")

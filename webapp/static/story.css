@@ -1,0 +1,84 @@
+/* 故事頁（Phase 8 Step 8.2；plan docs/plans/2026-11-26-001-feat-phase8-story-page-app-plan.md §2.7）。
+   研究 session 寫的片段不帶任何樣式——行內樣式被安全標頭擋、寫入檢查也拒收——長相全住這裡。
+   只用 styles.css 的變數（--text、--muted、--border、--viz-* …），不寫死顏色；先照手機寬（390）排。
+   片段的 id 進 APP 時加了前綴 `sp-`（#hero → #sp-hero），這裡用元素與 class 選，不綁 id。 */
+
+.story-head { margin: 10px 0 4px; }
+.story-version { color: var(--dim); font-size: 12px; }
+.story-stale { font-weight: 600; }
+
+.story-page { margin: 8px 0 0; line-height: 1.75; font-size: 15.5px; }
+.story-page > header { margin: 0 0 8px; }
+.story-page h1 { font-size: 21px; line-height: 1.4; margin: 6px 0 10px; }
+.story-page > header p { margin: 8px 0; }
+.story-page h2 { font-size: 17px; line-height: 1.45; margin: 26px 0 8px; padding-top: 14px;
+  border-top: 1px solid var(--border); }
+.story-page h3 { font-size: 15px; margin: 16px 0 6px; }
+.story-page h4 { font-size: 14px; margin: 12px 0 4px; color: var(--muted); }
+.story-page p { margin: 8px 0; }
+.story-page ul, .story-page ol { margin: 6px 0; padding-left: 22px; }
+.story-page li { margin: 4px 0; }
+.story-page blockquote { margin: 10px 0; padding: 2px 0 2px 12px; border-left: 3px solid var(--border); color: var(--muted); }
+.story-page code { font-size: 13px; }
+.story-page small { color: var(--muted); }
+.story-page hr { border: 0; border-top: 1px solid var(--border); margin: 18px 0; }
+
+/* 每句的來源等級：<span class="src" data-src="買方">買方</span> → （買方），小字、不斷行 */
+.story-page .src { color: var(--dim); font-size: 11.5px; white-space: nowrap; }
+.story-page .src::before { content: "（"; }
+.story-page .src::after { content: "）"; }
+
+/* 表：手機上可以橫向捲（表本身捲，不撐寬整頁） */
+.story-page table { display: block; max-width: 100%; overflow-x: auto; border-collapse: collapse;
+  font-size: 13px; line-height: 1.5; margin: 10px 0; }
+.story-page caption { text-align: left; color: var(--muted); font-size: 12px; padding: 0 0 4px; }
+.story-page th, .story-page td { border-bottom: 1px solid var(--border); padding: 5px 8px; text-align: left;
+  vertical-align: top; }
+.story-page th { color: var(--muted); font-weight: 600; white-space: nowrap; }
+
+/* 圖：一律行內 SVG。字與線用 currentColor（跟著深淺色走），有意義的那一格用 --viz-* */
+.story-page figure { margin: 12px 0; }
+.story-page figcaption { color: var(--muted); font-size: 12px; line-height: 1.5; margin-top: 4px; }
+.story-page svg { display: block; max-width: 100%; height: auto; color: var(--text); }
+.story-page svg text { fill: currentColor; font-size: 12px; }
+.story-page svg .tier { fill: var(--surface-2); stroke: var(--border); }
+.story-page svg .focus { fill: color-mix(in srgb, var(--viz-s1) 22%, transparent); stroke: var(--viz-s1); }
+.story-page svg .muted { fill: var(--muted); stroke: var(--muted); }
+.story-page svg .line { stroke: currentColor; fill: none; }
+.story-page svg .series-1 { stroke: var(--viz-s1); fill: none; }
+.story-page svg .series-2 { stroke: var(--viz-s2); fill: none; }
+.story-page svg .bar { fill: var(--viz-s1); }
+.story-page svg .bar-alt { fill: var(--viz-s2); }
+.story-page svg .grid { stroke: var(--viz-grid); }
+.story-page svg .axis { stroke: var(--viz-axis); }
+
+/* 出處：一處、摺起來 */
+.story-page details { margin: 22px 0 8px; }
+.story-page details > summary { cursor: pointer; color: var(--muted); font-size: 13px; }
+.story-page details li { font-size: 13px; }
+
+/* 等待的徽章（APP 照等待 registry 印；頁上不手寫「已登記」） */
+.wait-badge { display: inline-block; margin-left: 6px; padding: 0 7px; border: 1px solid var(--border);
+  border-radius: 999px; font-size: 11px; line-height: 1.7; color: var(--muted); white-space: nowrap; vertical-align: 1px; }
+.wait-on { color: var(--ready); border-color: var(--ready); }
+.wait-warn { color: var(--flags); border-color: var(--flags); }
+.wait-done { color: var(--dim); }
+
+/* 系統裡的它：填進故事的空位（#system），沒有故事頁時接在短故事後面 */
+.system-block { margin: 10px 0; padding: 12px 14px; border: 1px solid var(--border); border-radius: var(--radius);
+  background: var(--surface); line-height: 1.6; font-size: 14px; }
+.story-page .system-block h2.system-title, .system-block .system-title { font-size: 15px; margin: 0 0 8px; padding: 0;
+  border: 0; }
+.system-numbers-part { margin: 0 0 12px; }
+.story-gaps { margin-top: 10px; }
+
+.not-deep { margin-top: 10px; }
+.short-story { margin: 8px 0; }
+.old-page { margin: 28px 0 0; }
+
+@media (max-width: 640px) {
+  .story-page { font-size: 15px; }
+  .story-page h1 { font-size: 19px; }
+  .story-page h2 { font-size: 16px; }
+  .system-block { padding: 10px 11px; }
+}

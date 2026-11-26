@@ -72,11 +72,13 @@ VISIBLE_CHARS_RANGE: tuple[int, int] = (8_000, 15_000)
 #: 片段大小上限（一頁 1.5 萬字加幾張圖約 0.2 MB；超過十倍多半是貼錯檔）。
 MAX_HTML_BYTES = 2_000_000
 
-_ID = re.compile(r"^[A-Za-z][\w\-:.]{0,63}$")
+# ⚠ 下面四條的原文經 `whitelist_payload()` 交給前端（app.js 用 `new RegExp` 照用，不另寫一份）：只用 Python 與 JavaScript
+# 語意相同的寫法——不用 `\w`（Python 認 Unicode 字母、JavaScript 只認 ASCII，兩邊會判得不一樣）。
+_ID = re.compile(r"^[A-Za-z][A-Za-z0-9_\-:.]{0,63}$")
 _CLASS = re.compile(r"^[A-Za-z0-9_\- ]{1,120}$")
 _WAIT_KEY = re.compile(r"^[A-Za-z0-9_\-]{1,32}$")
-_SAFE_HREF = re.compile(r"^(?:https://[^\s\"'<>\\]+|#[A-Za-z][\w\-:.]*)$")
-_LOCAL_URL_REF = re.compile(r"^url\(\s*#[A-Za-z][\w\-:.]*\s*\)$")
+_SAFE_HREF = re.compile(r"^(?:https://[^\s\"'<>\\]+|#[A-Za-z][A-Za-z0-9_\-:.]*)$")
+_LOCAL_URL_REF = re.compile(r"^url\(\s*#[A-Za-z][A-Za-z0-9_\-:.]*\s*\)$")
 _BAD_SCHEME = re.compile(r"(?:javascript|vbscript|data|file|blob):|http://")
 #: E4：頁上不得出現的私有字串（私有網頁網址、本機路徑）。
 PRIVATE_PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = (
@@ -785,7 +787,10 @@ def whitelist_payload() -> dict[str, Any]:
     return {"html_tags": sorted(HTML_TAGS), "svg_tags": sorted(SVG_TAGS), "void_tags": sorted(VOID_TAGS),
             "global_attrs": sorted(GLOBAL_ATTRS), "tag_attrs": {k: sorted(v) for k, v in TAG_ATTRS.items()},
             "svg_attrs": sorted(SVG_ATTRS), "svg_namespace": SVG_NAMESPACE, "source_levels": list(SOURCE_LEVELS),
-            "wait_kinds": list(WAIT_KINDS)}
+            "wait_kinds": list(WAIT_KINDS), "text_attrs": sorted(_TEXT_ATTRS),
+            # 網址與 id 的規則（前端 `new RegExp` 照用；比對前先拿掉空白與控制字元再小寫，同 `_squash`）
+            "patterns": {"id": _ID.pattern, "href": _SAFE_HREF.pattern, "url_ref": _LOCAL_URL_REF.pattern,
+                         "bad_scheme": _BAD_SCHEME.pattern}}
 
 
 __all__ = [
