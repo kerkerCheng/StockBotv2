@@ -86,7 +86,7 @@
     ],
     "check_interval_days": 90,
     "last_checked": "2026-11-06",
-    "memo": "thesis/coherent_cpo_v3_lane_memo.md",
+    "memo": "thesis/coherent_cpo_v4_lane_memo.md",
     "mutations": [
       {
         "at": "2026-09-19T05:44:40.354150+00:00",
