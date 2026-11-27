@@ -1,7 +1,7 @@
 ---
 date: 2026-11-26
 topic: phase8-story-page-app
-status: active
+status: completed
 derived_from: docs/ROADMAP.md（Phase 8）、docs/brainstorms/2026-11-25-story-question-list-goal.md（§8 S4 修正案、§9 收斂）
 ---
 
@@ -49,7 +49,7 @@ spawn 前先讀週額度（`python -m crons.llm_quota`）。本 plan 已知會�
 | 8.4b | 畫圖工具（地圖、時間長條、對數股價圖），輸出過得了片段檢查 | 便宜模型 | Z1／R1 | ✅ 2026-11-27 | `63be1f2` |
 | 8.4c | 兩份 skill、OPERATIONS、ARCHITECTURE 接上真的命令（§3 Step 8.4c 列了要改的句子） | 便宜模型 | Z0／R0 | ✅ 2026-11-27 | `d69ead6` |
 | 8.5 | 三頁搬進 APP：讀回、轉成片段與宣告、對照已發布的頁、各跑一次冷讀；Sivers 頁刪到字數上限內 | ~~強模型~~ → Opus（使用者 2026-11-27：「給opus做吧 我fable沒額度了」） | 研究＋Z1 | ✅ 2026-11-27 | `8b33a60` |
-| 8.6 | 結案：completion gate、R2、README 與 ROADMAP 登記、closeout 報告 | 做完 8.5 的那一位 | **R2** | ○ | |
+| 8.6 | 結案：completion gate、R2、README 與 ROADMAP 登記、closeout 報告 | 做完 8.5 的那一位 | **R2** | ✅ 2026-11-27（R2 CONDITIONAL_GO → 兩條當下修、一條列待決 → 窄範圍覆核 GO） | `58ba10e`＋`0067938`＋結案登記 |
 
 8.1–8.4c 不依賴 8.5：用合成範例頁開發與驗收。便宜模型做完 8.4c 就停（`AWAITING_HUMAN`：「切強模型做 8.5」）。
 
@@ -488,7 +488,7 @@ Boundaries: 不改 code、不 commit、不核准 pq2、不入圖、不動 thesis
     - C2 報告初稿說「對帳會點名沒對上的」是錯的：`rebind` 照抄宣告，舊編號跟著過去，收掉的條件在頁上印「已處理」、對帳是 0 →
       `rebind` 遇到等待掛在另一版敘事自己登記的條件上就拒收，`add` 同一條規則給 E5；三頁模擬換版後實呼叫，三頁都拒收。
     - C3 敘事撤回、又不再寫新版時「該對版」清不掉 → 要改契約，列進結案報告 §5 #5（推薦先不改，今天 0 頁）。
-    - 條件修正後的窄範圍覆核：審查中。
+    - 條件修正後（`0067938`）全套重跑 5,315 passed、2 skipped、0 failed；窄範圍覆核 **GO**（阻擋 0、條件 0、不阻擋 3，照帶不排程；結案報告 §7）。
 
 ---
 
