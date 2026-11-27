@@ -196,3 +196,5 @@ description: >
 並把頁綁到新版；變了才小修那一節。不為了對版把整頁重生成；整頁重寫只由使用者點名。
 命令：`python -m alpha story-page gaps` 列出要對版的；頁上講的沒變 → `python -m alpha story-page rebind <代號> --note "差在哪、為什麼還站得住"`；
 變了 → 改片段、`page.json` 的 `brief_id` 換成現行敘事，再 `add` 一版。都接 `python -m webapp materialize <代號>`。待做清單 ⑤「故事頁該對版」數的是同一份。
+⚠ 自己寫的反證與加碼條件每次換版（重述也一樣）都換新 watch 編號：等待掛在它們上面時 `rebind` 會拒收，`add` 也擋——照 watch 來源的
+`brief:<id>#<第幾條>` 把 `page.json` 的編號換成新版的再 `add`（連讀圖、連 thesis 的與日期等待不換號）。

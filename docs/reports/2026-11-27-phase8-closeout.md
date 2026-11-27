@@ -20,7 +20,7 @@
 | 8.4b | 63be1f21 | 畫圖工具 `alpha/story_kit.py`（誰賣給誰、時間長條、對數股價），輸出過得了片段檢查 |
 | 8.4c | d69ead6a | stock-story skill、OPERATIONS、ARCHITECTURE §6.12、CONCEPTS 接上真的命令 |
 | 8.5 | 8b33a604 | 三頁（Aehr、Sivers、亞泰）搬進 APP：先落帳（三檔敘事換版、等待登記）→ 轉成片段與宣告 → 檢查 → 冷讀 → 物化；APP 加句尾標記的圖例、表格那一列的徽章放進最後一格 |
-| 8.6 | （本 commit） | 本報告；全套抓到 8.2 帶進來的兩條失敗，當下修（§4 第 1 條）；AEHR、亞泰的賭注句綁到新版敘事（§4 第 2 條） |
+| 8.6 | 58ba10ea；R2 修正另一個 commit | 本報告；全套抓到 8.2 帶進來的兩條失敗，當下修（§4 第 1 條）；AEHR、亞泰的賭注句綁到新版敘事（§4 第 2 條）；R2 的兩個條件當下修（§4 第 3、13 條；§7） |
 
 範圍：`git diff --stat 28b40385^..8b33a604`＝49 個檔、+5,290／−159。新程式檔：`alpha/narrative/story_page.py`（規則）、`alpha/providers/story_pages.py`（帳）、
 `alpha/story_kit.py`（畫圖）、`webapp/static/story.css`。
@@ -32,13 +32,13 @@
 | # | gate | 結果 | 查證 |
 |---|---|---|---|
 | 1 | 8.0–8.5 進度表全 ✅ | ✅ 九個 Step commit 都在 plan §0.5 進度表 | plan §0.5 |
-| 2 | 全套綠；invariants 沒有新的違反 | ✅ 修後重跑全套 **5,307 passed、2 skipped、0 failed**（33 分 40 秒）；第一次跑 2 failed，都是 8.2 帶進來的，當下修（§4 第 1 條）。`audit invariants` **15 PASS／0 FAIL（共檢查 25,828 筆）**；兩條既有註記照舊（PointInTime 28 份 SourceDoc 未定日；GateDiscrimination 40／64 個 gate 樣本不足，audit 自己標「不當作通過也不當作失敗」） | `python -m pytest -q -p no:cacheprovider`；`python -m audit invariants` |
+| 2 | 全套綠；invariants 沒有新的違反 | ✅ 修後重跑全套 **5,307 passed、2 skipped、0 failed**（33 分 40 秒）；第一次跑 2 failed，都是 8.2 帶進來的，當下修（§4 第 1 條）；R2 修正之後再跑一次的結果在 §7 末。`audit invariants` **15 PASS／0 FAIL（共檢查 25,828 筆）**；兩條既有註記照舊（PointInTime 28 份 SourceDoc 未定日；GateDiscrimination 40／64 個 gate 樣本不足，audit 自己標「不當作通過也不當作失敗」） | `python -m pytest -q -p no:cacheprovider`；`python -m audit invariants` |
 | 3 | 三檔印出故事頁；一檔沒有故事頁的印新框架 | ✅ headless Edge（390 寬、展開全開）：**AEHR、SIVE.ST、6727.TWO** 各印一份 `article.story-page`、句尾標記圖例、`data-wait` 14／13／13 列各帶一個徽章（Sivers 3 個「醒了待判」）、「系統裡的它」一塊；**AXTI、COHR**（沒有故事頁）印「這一檔還沒做深」＋新框架；`#/old/COHR` 舊版照印、頁首有「回新版」。六頁溢出 0、頁面程式錯誤 0。疊字 10／29／14 對都在照搬的手繪圖上（§4 第 8 條）；APP 自己畫的頁（AXTI、COHR、舊版）0 | `http://127.0.0.1:8790/?selfcheck=1&w=390&open=1#/<代號>`（selfcheck 寫進 `#selfcheck`；OPERATIONS「做深一檔與故事頁」） |
-| 4 | 四種注入在寫入與物化都被拒 | ✅ **寫入**（E1）：`tests/test_story_page.py::test_each_injection_is_rejected_by_the_whitelist[script\|event\|style\|javascript_href]`；拿掉任一道仍擋得住的變異：`test_mutation_tag_whitelist_is_what_rejects_script`、`test_mutation_event_and_style_attributes_are_caught_by_two_layers[event-onclick\|style-style]`、`test_mutation_javascript_href_is_caught_by_two_layers`。**物化**：`tests/test_webapp_materialize.py::test_a_broken_fragment_is_an_absence_and_the_artifact_is_still_written`（4 個參數；壞片段＝故事那一塊印讀不到的理由，整份物化檔照寫）。第三道（前端照白名單重建）由 8.2 的 R2 以四十多筆注入＋headless Edge 驗過（plan 8.2 執行紀錄） | 上列測試 |
-| 5 | `library/private` 不進版控；新增行沒有私有網址 | ✅ `git ls-files library/private`＝0 行；`git diff 28b40385^..HEAD \| grep "^+.*claude.ai/artifact"`＝6 行，全是規則文字（E4 的說明、本 gate 的原文）與測試裡的假網址 `…/artifact/abc` | 兩條命令 |
-| 6 | ⑤「故事頁該對版」與 `story-page gaps` 一致、逐檔列得出原因 | ✅ 兩邊都是 **0**：手跑心跳 ⑤「0 的格」列出這一格；`story-page gaps`＝0 檔 0 件（重綁賭注句、重物化之後再跑一次，仍是 0）。**逐檔原因今天是空的成立**——非零時逐檔印種類與怎麼清，由 8.3 的測試證明：`tests/test_todo_ledger.py::test_story_page_gaps_count_tickers_one_fixture_per_kind`（三種各一檔）、`tests/test_story_pages_provider.py::test_story_page_gaps_command_prints_each_gap_and_how_to_clear`；帳讀不到印「未讀到」不是 0：`tests/test_todo_ledger.py::test_story_page_ledger_unreadable_is_not_zero_and_other_cells_still_print` | `python -m alpha story-page gaps`；`python -m crons.heartbeat --out <檔> --brief-out <檔>`（不帶 `--write-snapshot`） |
+| 4 | 四種注入在寫入與物化都被拒 | ✅ **寫入**（E1）：`tests/test_story_page.py::test_each_injection_is_rejected_by_the_whitelist[script\|event\|style\|javascript_href]`；拿掉任一道仍擋得住的變異：`test_mutation_tag_whitelist_is_what_rejects_script`、`test_mutation_event_and_style_attributes_are_caught_by_two_layers[event-onclick\|style-style]`、`test_mutation_javascript_href_is_caught_by_two_layers`。**物化**：`tests/test_webapp_materialize.py::test_a_broken_fragment_is_an_absence_and_the_artifact_is_still_written`（5 個參數：四種注入＋一筆私有網址 E4；壞片段＝故事那一塊印讀不到的理由，整份物化檔照寫）；`test_each_injection_is_rejected_by_the_whitelist` 對每一筆注入同時核寫入的 E1 與物化的 `fragment_problems`。第三道（前端照白名單重建）由 8.2 的 R2 以四十多筆注入＋headless Edge 驗過（plan 8.2 執行紀錄）。**結案 R2 另找到第五類**（CSS 跳脫拼出網址），三道都補上（§4 第 13 條） | 上列測試 |
+| 5 | `library/private` 不進版控；新增行沒有私有網址 | ✅ `git ls-files library/private`＝0 行；`git diff 28b40385^..HEAD \| grep "^+.*claude.ai/artifact"`＝7 行：規則文字 3 行（E4 的說明、plan 本 gate 的原文兩行）、本報告這一列、測試裡的假網址 `…/artifact/abc` 3 行 | 兩條命令 |
+| 6 | ⑤「故事頁該對版」與 `story-page gaps` 一致、逐檔列得出原因 | ✅ 兩邊都是 **0**：手跑心跳 ⑤「0 的格」列出這一格；`story-page gaps`＝0 檔 0 件（重綁賭注句、重物化之後再跑一次，仍是 0）。**例外**：三種裡的「敘事換版」在敘事撤回、又不再寫新版時清不掉（R2 C3；今天 0 頁）→ §5 #5。**逐檔原因今天是空的成立**——非零時逐檔印種類與怎麼清，由 8.3 的測試證明：`tests/test_todo_ledger.py::test_story_page_gaps_count_tickers_one_fixture_per_kind`（三種各一檔）、`tests/test_story_pages_provider.py::test_story_page_gaps_command_prints_each_gap_and_how_to_clear`；帳讀不到印「未讀到」不是 0：`tests/test_todo_ledger.py::test_story_page_ledger_unreadable_is_not_zero_and_other_cells_still_print` | `python -m alpha story-page gaps`；`python -m crons.heartbeat --out <檔> --brief-out <檔>`（不帶 `--write-snapshot`） |
 | 7 | 等待 registry 與敘事（進展） | 見 §2 | §2 |
-| 8 | OPERATIONS、ARCHITECTURE、兩份 skill 講的命令都跑得起來 | ✅ 8.5 實跑：`story-page check／add／list／show／text／gaps／cold-pack`、`webapp materialize <代號>`、selfcheck 網址、舊版路由 `#/old/<代號>`（8.6 再開一次 `#/old/COHR`）；`rebind` 只跑 `--help`（8.5 的對版是換宣告重 `add`，沒用到它；8.1 的測試跑過真的 rebind）；detective skill 的 `alpha detective`、`briefing alpha-card`、`engine_b.cli register` 參數解析得過 | 各命令 `--help` 與 8.5 執行紀錄 |
+| 8 | OPERATIONS、ARCHITECTURE、兩份 skill 講的命令都跑得起來 | ✅ 8.5 實跑：`story-page check／add／list／show／text／gaps／cold-pack`、`webapp materialize <代號>`、selfcheck 網址、舊版路由 `#/old/<代號>`（8.6 再開一次 `#/old/COHR`）；`rebind` 只跑 `--help`（8.5 的對版是換宣告重 `add`，沒用到它；8.1 的測試跑過真的 rebind；R2 修正後對三頁各模擬一次換版、實呼叫一次，三頁都拒收，帳寫暫存複本，§4 第 3 條）；detective skill 的 `alpha detective`、`briefing alpha-card`、`engine_b.cli register` 參數解析得過 | 各命令 `--help` 與 8.5 執行紀錄 |
 | 9 | closeout 報告 | ✅ 本檔；要你決定的在 §5 | — |
 
 ## 2. 驗收數的層（plan §4）
@@ -51,9 +51,9 @@
 | 敘事 | 三檔裡因為做深而換版的檔數 | **3／3**：Sivers 換版一次（加反證第 8 條、缺 X 的日期改掛 11-30）；亞泰重述一次（改正一處事實：昆山睿平是亞泰的子公司，不是台光電的第二家設備商；判斷不變），同版補反證 4、加碼條件 2；Aehr 換版兩次（「卡在哪」補三件與反證、加碼條件；之後為錨點核出的兩處字重述一次） |
 
 **機制（存在與否，照印、不算進展）：**
-- 測試檔 316 → **319**（＋`test_story_page`、`test_story_pages_provider`、`test_story_kit`；退役 0）；測試函式 4164 → **4259**，新增 95、**拿掉 0**
-  （`test_story_page` 38、`test_story_pages_provider` 30、`test_story_kit` 12、`test_webapp_materialize` 8、`test_webapp_static_js` 4、`test_todo_ledger` 2、`test_webapp_ask_claude` 1）。
-  8.6 改了一條既有測試的斷言主詞（§4 第 1 條），沒拿掉任何斷言。查證：`git grep -n -E "^\s*(async )?def test_" <rev> -- 'tests/*.py'` 兩版相減。
+- 測試檔 316 → **319**（＋`test_story_page`、`test_story_pages_provider`、`test_story_kit`；退役 0）；測試函式 4164 → **4263**，新增 99、**拿掉 0**
+  （`test_story_page` 40、`test_story_pages_provider` 32、`test_story_kit` 12、`test_webapp_materialize` 8、`test_webapp_static_js` 4、`test_todo_ledger` 2、`test_webapp_ask_claude` 1；
+  其中 4 條是 R2 修正加的）。8.6 改了一條既有測試的斷言主詞（§4 第 1 條），沒拿掉任何斷言。查證：`git grep -n -E "^\s*(async )?def test_" <rev> -- 'tests/*.py'` 兩版相減。
 - 三頁看得到的字：Sivers 14,931、AEHR 14,925、亞泰 11,815（Sivers 由超過 1.5 萬刪進來）。
 - 冷讀：三頁現行版各一次（前向）、三份舊版各一次（回測）；回測時你讀後說的 10 句，冷讀先抓到 3 句（寫法 3 句抓到 2；清單外與題內 7 句抓到 1）——
   冷讀擋得了寫法、擋不了清單外。逐句在漏題帳。
@@ -70,22 +70,29 @@
    結案的全套才抓到（gate 2 存在的理由）：
    - `tests/test_five_questions_shared_bet.py::test_the_meta_carries_the_one_copy_and_app_js_keeps_none`：新框架的「系統裡的它」把三個塊名寫死在前端
      （B3「營收從哪來」、B5「事件與影響多大」、B9「會不會死」）——塊名的唯一一份在 `page_schema`、經 `.meta.json` 給前端（L16）。
-     修法：`app.js` 加 `blockTitle(key)` 照合約取名（同 `lampNames` 的做法；讀不到合約就不印標題，不在前端留第二份），三處改用它。
+     修法（L16：分類已有唯一一份，就讓它跟著資料走到需要它的地方）：`app.js` 加 `blockTitle(key)` 照合約取名（同 `lampNames` 的做法；讀不到合約就不印標題，不在前端留第二份），三處改用它。
      測試一字未改；修前紅、修後綠。畫面上三個標題照樣印出（gate 3 的 dump-dom 逐字數到）。
    - `tests/test_stock_page_s5b_charts.py::test_diagrams_show_as_images_in_b4_and_on_the_layer_page_labelled_as_illustration`：8.2 把 B4 的示意圖抽成
      新舊兩版共用的 `pageDiagrams`，行為沒變，測試還在 `blockVisuals` 裡找字。修法：斷言照留、主詞改成共用的函式（同 8.4a 的先例）。
 2. **（8.6）換版讓下游的帳過期，這次撞到四本**：敘事一換版，短故事、賭注句、故事頁、事實錨點都跟著過期，各有 ⑤ 一格點名（沒有靜默）。
    8.5 對了短故事、故事頁、錨點，**漏了賭注句**：結案時讀 ⑤ 才發現「賭注句還沒寫」的「敘事換版」是 AEHR 與亞泰（兩檔的賭注句綁在 11-23 那一版）。
    兩檔賭注句引用的反證（AEHR 第 1 條、亞泰第 2 條）在新版逐字相同，照原文綁到新版（`stories --bet-only`），沒改字；重物化後候選板上兩檔不再是「敘事換版」。
-3. **（8.5）自己寫的反證與加碼條件每次換版都換新 watch 編號**，重述也一樣；連到讀圖的反證與日期等待才保留編號。故事頁的 `waits` 因此要重對號：
+3. **（8.5 發現；8.6 R2 補洞）自己寫的反證與加碼條件每次換版都換新 watch 編號**，重述也一樣；連到讀圖的反證與日期等待才保留編號。故事頁的 `waits` 因此要重對號：
    8.5 裡亞泰對了一次、AEHR 兩次。現在三頁掛在「這一版敘事自己登記」的列：**AEHR 14／14、亞泰 12／13、Sivers 3／13**（Sivers 的反證多半連讀圖）——
-   下一次換版，這 29 列都要重對。對號照 watch 來源上的 `brief:<id>#<第幾條>` 走、不手抄；`story-page gaps` 會點名沒對上的。→ §5 #4。
+   下一次換版，這 29 列都要重對。
+   - **初稿寫「`story-page gaps` 會點名沒對上的」是錯的**（R2 C2）：照對帳給的清法走 `rebind`，宣告原樣照抄、舊編號跟著過去；對帳只比敘事版本，
+     對上了就是 0；換版時被收掉的舊條件在頁上印「已登記・已處理」——還在等的條件靜默變成已處理。
+   - **當下修（不動契約）**：`rebind` 遇到等待掛在同一檔另一版敘事自己登記的條件上（watch 來源 `brief:<另一版>#…`）就拒收，說明要重對號再 `add`；
+     `add` 的檢查同一條規則給 E5（L17 的對稱面：只認得當初那個案例的機制當下修，三問之一「對稱面做了嗎」）。連讀圖、連 thesis 的與日期等待不受影響。
+   - **查證**：三頁各模擬一次換版後實呼叫 `rebind_page`（帳寫暫存複本、真帳前後一樣），三頁都拒收（AEHR 14、亞泰 12、Sivers 3 條）；
+     `tests/test_story_pages_provider.py` 兩條新測試（rebind 拒收、add 給 E5；連讀圖的與別檔的不誤擋），規則換成永遠不中時兩條都紅；
+     三頁真頁 `check` 仍是 ERROR 0。對號照 watch 來源上的 `brief:<id>#<第幾條>` 走、不手抄（stock-story、research-drain 兩份 skill 已寫）。→ §5 #4。
 4. **（8.5）判完醒來的等待，候選板跟著變**：亞泰換版被 26 條醒來的等待擋住（台光電 11-26 受邀法說的重訊叫醒的），逐條判無關、放回去續等。
    這 26 條掛在玻纖布、石英布、高速基板、銅箔、含浸機、壓合機等讀圖與六份敘事上；重物化候選板後「可開」15 → 19——多出亞泰、台玻 1802、富喬 1815、
    菲利华 300395.SZ，早上 daily 時它們是「前提失效」（31 → 27）。這是判讀的結果，不是規則變了。
 5. **（8.5）SIVE.ST 的「裁決點過了」是對的**：何時格的文字還寫 11-26（報告延到 11-30），8.5 只把日期等待改到 11-30、沒改文字，
    所以 ⑤「敘事該重寫」點名它。結案時不重述：11-30 報告出來還要再換一次版，兩次換版會讓這一頁的等待重對號兩次（第 3 條）——等報告出來一起換。
-6. **（8.5）L11-5 更正**：11-26 寫「三頁的暫存夾已經不在」是錯的——一直在本機暫存區（以 session 編號為名），11-27 搬進私有區；
+6. **（8.5）L11-5 更正**（「我找不到」與「它不存在」是兩個主張）：11-26 寫「三頁的暫存夾已經不在」是錯的——一直在本機暫存區（以 session 編號為名），11-27 搬進私有區；
    決定紀錄 §9.4、漏題帳、stock-story skill 各接一條更正。
 7. **（8.5）綁錨點核出兩處字**：Aehr 新聞稿寫的是「預計出貨與安裝」，敘事寫成已裝好；「有兩個反例要看」改成「要看下面的反例」——重述一次。
 8. **（8.5）疊字量到 53 對，全在照搬的手繪圖上**：都是上下兩行的字框擦到（50 對 0.5 px、3 對 1.2–2.4 px），截圖看墨跡沒碰到。
@@ -96,7 +103,11 @@
 11. **（8.4b）兩條測試拿掉機制照綠**（避讓與換行的案例沒撞到）——改到拿掉機制會紅才算數。
 12. **（8.6）長駐 APP 的重啟方式**：8.5 重啟的 serve 是掛在 session 背景任務底下的行程（背景任務有時限）。8.6 改成照開機腳本的方式
     （repo 根目錄、隱藏視窗、不等待）另起一個獨立行程；`/api/v1/health` 的 `code.stale=false`。
-13. 其餘小偏差（白名單多收畫箭頭用的 SVG 屬性、註解與 CDATA 一律拒收、`#/old/<代號>` 路由、片段 id 加 `sp-` 前綴、對帳每項帶 `since`、
+13. **（8.6 R2 C1）片段的非文字屬性可以用 CSS 跳脫拼出 `url(…)`**（`fill="\75 rl(…)"` 讀起來就是 `url(…)`）：寫入、物化、前端三道都只比對字面的 `url(`，
+    三道都放行，只剩 CSP 擋。當下修：三道都不收反斜線（非文字屬性——幾何、顏色、id 參照——本來就用不到），順手補擋 `src(`；規則仍只有一份，
+    經 `.meta.json` 給前端（測試核對前端拿到的就是同一段）。查證：新注入四筆在寫入與物化都 E1；變異（退回沒有反斜線的舊規則，三筆跳脫注入兩道都放行）；
+    審查者的注入腳本在新規則下兩道都 E1，前端重建後的畫面沒有任何帶 `url(` 或反斜線的屬性值；三頁真頁 `check` 仍是 ERROR 0。
+14. 其餘小偏差（白名單多收畫箭頭用的 SVG 屬性、註解與 CDATA 一律拒收、`#/old/<代號>` 路由、片段 id 加 `sp-` 前綴、對帳每項帶 `since`、
     共用的複製按鈕與頁面現況）都在 plan 各 Step 的執行紀錄。
 
 ## 5. 要你決定的事
@@ -109,8 +120,15 @@
 3. **下一檔做哪一檔**——由你點名（AGENTS：哪一檔要做深由使用者點名，系統不排序）。現況：已持有 2 檔裡 COHR 還沒有故事頁；可開 19 檔裡 17 檔還沒有。
    點名之後照「做深 <代號>」走偵探 → 故事頁，一次寫到交稿。
 4. **（開發候選，未排程）換版時自己寫的反證與加碼條件，條件逐字相同就沿用原本的 watch 編號**（現在是收舊開新）。真實案例：8.5 一天內重對號三次
-   （亞泰一次、AEHR 兩次）；三頁 40 列裡 29 列會在下一次換版時再對一次（§4 第 3 條）。不改也不會漏（`story-page gaps` 會點名），
-   只是每次換版多一步、多一次手誤的機會。要排就進 ROADMAP；不自己排。
+   （亞泰一次、AEHR 兩次）；三頁 40 列裡 29 列會在下一次換版時再對一次（§4 第 3 條）。R2 修正之後不會靜默漏掉（`rebind` 拒收、`add` 擋），
+   但每次換版仍要手動重對、多一次手誤的機會——改了就省這一步。要排就進 ROADMAP；不自己排。
+5. **（R2 C3；要改契約，不當下修）敘事撤回、又不再寫新版時，故事頁卡在「該對版」清不掉**。對帳的「敘事換版」一種承載兩個情形
+   （L12：一個表示承載兩種語意，下游兩邊都錯）：「敘事換新版了」與「現在沒有現行敘事」。後者 `rebind` 拒收、`add` 要先寫敘事，
+   帳也沒有「收掉這一頁」的紀錄。敘事帳裡有規則性的撤回（「連續兩次判非邊緣」「非倍率」；164 檔敘事帳 48 檔最後一筆是撤回）——
+   撞上了 ⑤ 那一格會恆亮（L14④：恆亮的機制不得享有默認信任）。三頁今天都不在這個狀態，不擋結案。
+   ①**先不改，第一次真的撞到再選**（推薦——系統自己提的開發項要指得出真實案例，現在是 0 頁；撞到時 ⑤ 印的是「現在沒有現行的 v2 敘事」，
+   不會靜默）；②帳加一種「收掉這一頁」的紀錄（附一句理由；APP 該檔回到沒做深的短故事；⑤ 歸 0）；
+   ③「敘事換版」拆成兩種，「沒有現行敘事」在 ⑤ 改成提醒、不算待做。②③都動契約，要排進 ROADMAP 才做。
 
 **照帶（研究，下一次 drain 或做深時處理，不需要你決定）：**
 - Sivers 3 條醒了待判（11-23 LITE、META 的 8-K）；11-30 第三季報告出來後換版並改何時格（§4 第 5 條）。SIVE.ST（已持有）的賭注句從沒寫過。
@@ -123,4 +141,22 @@
 
 ## 7. 結案 R2（已常規 opt-in）
 
-（審查中——乾淨 context、唯讀；WORK_REQUEST 照 plan §3 Step 8.6。結果與處置寫在這一節。）
+乾淨 context、唯讀的審查者照 plan §3 Step 8.6 審 `28b40385^..58ba10ea`：自己跑全套與 invariants、重跑 gate 3 的畫面、寫注入打三道檢查、
+在記憶體裡模擬換版與撤回。**Verdict：CONDITIONAL_GO**（阻擋 0、條件 3、不阻擋 4）。
+
+**條件與處置：**
+- **C1 CSS 跳脫拼得出網址** → 當下修（§4 第 13 條）。
+- **C2 對版照抄舊編號、對帳不叫** → 報告改正＋當下修（§4 第 3 條、§5 #4）。
+- **C3 敘事撤回時「該對版」清不掉** → 要改契約，列 §5 #5。
+
+**不阻擋（照帶，不排程——今天都是 0 個真實案例）：**
+- N1 片段可以借用 APP 自己的 class：假徽章、假的「系統裡的它」卡片看起來和真的一樣（三頁今天撞名 0）。
+- N2 `data-wait` 標在 svg 或空元素上，徽章畫不出來（三頁今天只標在表格列與清單項）。
+- N3 報告兩處數字（gate 5 行數、gate 4 參數數）→ 已改。
+- N4 兩份新節錄沒記下載網址（招股書、研討會投影片；節錄裡寫明以封面文字識別）。
+
+**審查者的副作用（照實記）**：audit 結束時兩個 SQLite 的 -shm／-wal 旁檔時間被更新（主資料庫檔沒動、不在版控）；
+暫存目錄含私有資料副本，用完由主 session 刪掉。
+
+**條件修正後**：相關測試 449 passed（故事頁、物化、前端、待做清單等 10 檔＋只改文件時的 10 檔）；全套重跑中（跑完填在這裡）。
+覆核：審查中——另開乾淨 context、唯讀的窄範圍審查者，只看 C1、C2 的修法與本報告的改正。

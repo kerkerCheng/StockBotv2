@@ -134,6 +134,33 @@ def _default_watches() -> Mapping[str, Any]:
     return load_watches()
 
 
+def _version_ids(ticker: str, *, brief_loader: BriefLoader | None) -> set[str]:
+    """這一檔敘事帳上出現過的每一版 id（判「另一版敘事自己登記的條件」用；別檔的敘事不在裡面）。"""
+    from .briefs import read_brief_records
+
+    records, _errors = (brief_loader or read_brief_records)(str(ticker))
+    return {str(r.brief_id) for r in records if getattr(r, "brief_id", None)}
+
+
+def waits_on_other_versions(decl: Any, bound_brief_id: Any, version_ids: Iterable[str],
+                            watches: Mapping[str, Any] | None) -> list[str]:
+    """宣告裡掛在「同一檔另一版敘事自己登記」的條件上的等待（watch 來源 `brief:<那一版>#…`）的 key。
+    敘事一換版（重述也一樣），舊版自己登記的反證與加碼條件收掉、新版另開編號；連讀圖、連 thesis 的與日期等待不受影響。
+    照抄舊編號，APP 會把還在等的條件印成「已處理」、對帳也不叫（2026-11-27 結案 R2 C2）——rebind 與 add 同一條規則擋。"""
+    versions = {str(v) for v in version_ids} - {str(bound_brief_id)}
+    if not versions or not isinstance(decl, Mapping):
+        return []
+    by_id = {str(w.get("watch_id")): w for w in (watches or {}).get("watches") or [] if isinstance(w, Mapping)}
+    out: list[str] = []
+    for wait in decl.get("waits") or []:
+        if not isinstance(wait, Mapping) or not isinstance(wait.get("watch_id"), str):
+            continue
+        source = str((by_id.get(wait["watch_id"]) or {}).get("source_ref") or "")
+        if source.startswith("brief:") and source[len("brief:"):].split("#", 1)[0] in versions:
+            out.append(str(wait.get("key")))
+    return out
+
+
 def _current_brief(ticker: str, *, brief_loader: BriefLoader | None, today: date | None) -> tuple[Any, list[str]]:
     from alpha.narrative.contracts import RECORD_VERSION_V2, select_brief
 
@@ -279,6 +306,11 @@ def check_folder(folder: Path, *, registry: Any = None, brief_loader: BriefLoade
             missing = [w for w in wanted if w not in known]
             if missing:
                 extra.append(Finding("E5", "waits 的 watch_id 在等待 registry 找不到：" + "、".join(missing)))
+            if ticker:
+                old = waits_on_other_versions(decl, decl.get("brief_id"), _version_ids(ticker, brief_loader=brief_loader), data)
+                if old:
+                    extra.append(Finding("E5", "waits 掛在這一檔另一版敘事自己登記的條件上（換版時已收掉、新版另開了編號）："
+                                         + "、".join(old) + "——照 watch 來源的 brief:<id>#<第幾條> 換成這一版的編號"))
         rides = [r for r in (decl.get("rides") or []) if isinstance(r, str) and r.strip()]
         if rides:
             found = (graph_checker or graph_nodes_exist)(rides)
@@ -353,9 +385,10 @@ def add_page(folder: Path, *, path: Path | None = None, page_dir: Path | None = 
 
 
 def rebind_page(ticker: str, note: str, *, path: Path | None = None, root: Path | None = None, registry: Any = None,
-                brief_loader: BriefLoader | None = None, now: datetime | None = None, today: date | None = None,
-                author: str = "session") -> dict[str, Any]:
-    """對版：現行頁（同一份片段）綁到現行那一版敘事。必附一句「新舊敘事差在哪、這一頁為什麼還站得住」。"""
+                brief_loader: BriefLoader | None = None, watch_loader: WatchLoader | None = None,
+                now: datetime | None = None, today: date | None = None, author: str = "session") -> dict[str, Any]:
+    """對版：現行頁（同一份片段）綁到現行那一版敘事。必附一句「新舊敘事差在哪、這一頁為什麼還站得住」。
+    頁上的等待掛在舊版自己登記的條件上就拒收（`waits_on_other_versions`）——那些編號換版時已收掉，要重對號後 `add`。"""
     root = root or _ROOT
     if registry is None:
         from identity.registry import get_registry
@@ -376,6 +409,13 @@ def rebind_page(ticker: str, note: str, *, path: Path | None = None, root: Path 
     text = " ".join(str(note or "").split())
     if len(text) < REBIND_NOTE_MIN:
         raise ContractViolation(f"對版要寫一句（{REBIND_NOTE_MIN} 字以上）：新舊兩版敘事差在哪、這一頁為什麼還站得住")
+    old = waits_on_other_versions(head.get("declaration"), brief.brief_id,
+                                  _version_ids(str(ticker), brief_loader=brief_loader), (watch_loader or _default_watches)())
+    if old:
+        raise ContractViolation(
+            f"{ticker} 頁上有 {len(old)} 條等待掛在舊版敘事自己登記的條件上（{'、'.join(old[:5])}{'…' if len(old) > 5 else ''}）"
+            "——換版時它們收掉、新版另開了編號，照抄會把還在等的條件印成「已處理」。照 watch 來源的 brief:<id>#<第幾條> "
+            "把宣告換成新版的編號，再 python -m alpha story-page add <資料夾>")
     read_html(head, root=root)            # 片段還在、沒被改過才對版
     stamp = (now or datetime.now(timezone.utc)).astimezone(timezone.utc).isoformat()
     record = {**{k: head.get(k) for k in ("company_id", "ticker", "html_sha256", "html_path", "visible_chars",
@@ -432,7 +472,8 @@ STORY_PAGE_GAP_LABELS: dict[str, str] = {
 }
 #: 每一種怎麼清（`story-page gaps` 與待做清單照印；字只有這一份）。
 STORY_PAGE_GAP_REMEDY: dict[str, str] = {
-    "stale": "對過新舊兩版敘事：頁上講的沒變就 rebind，變了就小修後 add",
+    "stale": "對過新舊兩版敘事：頁上講的沒變就 rebind（等待掛在舊版自己登記的條件上時 rebind 會拒收——"
+             "照 watch 來源的 brief:<id>#<第幾條> 換成新版的編號再 add），變了就小修後 add",
     "unregistered_wait": "敘事換版把它登記成反證或加碼條件，再 add 一版補上 watch_id；不該等的就從頁上拿掉",
     "ride_mismatch": "敘事換版改押；圖上沒有的那一層登記成線索（入圖照人工 go）",
 }
@@ -546,5 +587,5 @@ __all__ = [
     "STORY_PAGE_GAP_KINDS", "STORY_PAGE_GAP_LABELS", "STORY_PAGE_GAP_REMEDY", "WAIT_STATUS_LABELS", "add_page", "check_folder",
     "company_names", "current_brief", "current_brief_ids", "current_pages", "gaps_now", "graph_nodes_exist", "history",
     "html_file", "load_folder", "page_gaps",
-    "page_id", "page_status", "read_html", "read_records", "rebind_page", "wait_states",
+    "page_id", "page_status", "read_html", "read_records", "rebind_page", "wait_states", "waits_on_other_versions",
 ]

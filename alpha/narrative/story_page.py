@@ -88,7 +88,9 @@ _CLASS = re.compile(r"^[A-Za-z0-9_\- ]{1,120}$")
 _WAIT_KEY = re.compile(r"^[A-Za-z0-9_\-]{1,32}$")
 _SAFE_HREF = re.compile(r"^(?:https://[^\s\"'<>\\]+|#[A-Za-z][A-Za-z0-9_\-:.]*)$")
 _LOCAL_URL_REF = re.compile(r"^url\(\s*#[A-Za-z][A-Za-z0-9_\-:.]*\s*\)$")
-_BAD_SCHEME = re.compile(r"(?:javascript|vbscript|data|file|blob):|http://")
+#: 反斜線也擋（2026-11-27 結案 R2 C1）：CSS 跳脫（`\75 rl(…)`＝url(…)）能在字面比對之外拼出 url(…)，三道都放行、只剩 CSP 擋；
+#: 非文字屬性（幾何、顏色、id 參照）本來就用不到反斜線。
+_BAD_SCHEME = re.compile(r"(?:javascript|vbscript|data|file|blob):|http://|\\")
 #: svg 的 title／desc 的字裡像標記的寫法（`<` 後面接字母、`/`、`!`、`?`）——只在 Python 這一側用（前端照 DOM 的節點擋）。
 _MARKUP_IN_TEXT = re.compile(r"<[A-Za-z/!?]")
 #: E4：頁上不得出現的私有字串（私有網頁網址、本機路徑）。
@@ -315,8 +317,8 @@ def _attr_problems(node: Node, name: str, value: str | None, allowed: frozenset[
     if name not in _TEXT_ATTRS:
         squashed = _squash(raw)
         if _BAD_SCHEME.search(squashed):
-            return [Finding("E1", f"{where}：不收 javascript:、data:、http://、file: 這類網址")]
-        if ("url(" in squashed or "expression(" in squashed) and not _LOCAL_URL_REF.fullmatch(raw.strip()):
+            return [Finding("E1", f"{where}：不收 javascript:、data:、http://、file: 這類網址，也不收反斜線（CSS 跳脫拼得出 url(…)）")]
+        if ("url(" in squashed or "src(" in squashed or "expression(" in squashed) and not _LOCAL_URL_REF.fullmatch(raw.strip()):
             return [Finding("E1", f"{where}：url(…) 只准指向頁內的 #id")]
     if name == "href" and not _SAFE_HREF.fullmatch(raw.strip()):
         return [Finding("E1", f"{where}：連結只准 https:// 或頁內 #錨點")]

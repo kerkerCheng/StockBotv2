@@ -115,6 +115,11 @@ INJECTIONS = {
     "svg_title_script": "<svg viewBox=\"0 0 10 10\"><title><script>alert(1)</script></title></svg>",
     "svg_title_nested_svg": "<svg viewBox=\"0 0 10 10\"><title><svg><rect x=\"1\"></rect></svg></title></svg>",
     "svg_desc_whitelisted_tag": "<svg viewBox=\"0 0 10 10\"><desc><g></g></desc></svg>",
+    # CSS 跳脫拼出 url(…)（2026-11-27 結案 R2 C1：三道都放行過、只剩 CSP 擋；Edge 把三種寫法都解成 url(…) 並發出請求）
+    "svg_fill_css_escaped_url": "<svg viewBox=\"0 0 10 10\"><rect fill=\"\\75 rl(https://example.com/p.svg#g)\"></rect></svg>",
+    "svg_stroke_css_escaped_url": "<svg viewBox=\"0 0 10 10\"><line stroke=\"u\\72 l(/p.svg#g)\"></line></svg>",
+    "svg_marker_css_escaped_url": "<svg viewBox=\"0 0 10 10\"><line marker-end=\"\\000075rl(/p.svg#m)\"></line></svg>",
+    "svg_fill_src_function": "<svg viewBox=\"0 0 10 10\"><rect fill=\"src(https://example.com/p.svg#g)\"></rect></svg>",
 }
 
 
@@ -169,6 +174,23 @@ def test_mutation_javascript_href_is_caught_by_two_layers(monkeypatch) -> None:
     assert "E1" in _codes(_check(_inject(INJECTIONS["javascript_href"])))   # href 只准 https:// 或 # 還擋著
     monkeypatch.setattr(sp, "_SAFE_HREF", re.compile(r".*", re.S))
     assert "E1" not in _codes(_check(_inject(INJECTIONS["javascript_href"])))
+
+
+def test_mutation_backslash_rule_is_what_rejects_css_escaped_urls(monkeypatch) -> None:
+    """跳脫寫法躲得過「url(」的字面比對——擋它的是反斜線那一條；退回沒有反斜線的舊規則，三筆都被收（R2 C1 的原狀）。"""
+    escaped = ("svg_fill_css_escaped_url", "svg_stroke_css_escaped_url", "svg_marker_css_escaped_url")
+    for name in escaped:
+        assert "E1" in _codes(_check(_inject(INJECTIONS[name]))), name
+    monkeypatch.setattr(sp, "_BAD_SCHEME", re.compile(r"(?:javascript|vbscript|data|file|blob):|http://"))
+    for name in escaped:
+        assert "E1" not in _codes(_check(_inject(INJECTIONS[name]))), name
+        assert not sp.fragment_problems(_inject(INJECTIONS[name])), name
+
+
+def test_the_backslash_rule_reaches_the_front_end_unchanged() -> None:
+    """前端照 `.meta.json` 的 patterns.bad_scheme 建規則（不另寫一份）；JavaScript 的 RegExp 讀同一段原文要同樣抓到反斜線。"""
+    pattern = sp.whitelist_payload()["patterns"]["bad_scheme"]
+    assert pattern == sp._BAD_SCHEME.pattern and pattern.endswith("|\\\\")
 
 
 def test_mutation_url_reference_rule_is_what_rejects_remote_fill(monkeypatch) -> None:

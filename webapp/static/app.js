@@ -1827,7 +1827,7 @@ function storyAttrValue(rules, name, raw) {
     if (!rules.href.test(trimmed)) return null;
     return trimmed.charAt(0) === '#' ? '#sp-' + trimmed.slice(1) : trimmed;
   }
-  if (squashed.indexOf('url(') >= 0 || squashed.indexOf('expression(') >= 0) {
+  if (squashed.indexOf('url(') >= 0 || squashed.indexOf('src(') >= 0 || squashed.indexOf('expression(') >= 0) {
     return rules.urlRef.test(trimmed) ? trimmed.replace('#', '#sp-') : null;
   }
   return value;

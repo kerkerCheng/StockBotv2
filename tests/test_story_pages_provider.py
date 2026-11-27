@@ -271,10 +271,16 @@ NOTE = "新版只把檢核日從十二月改到一月，夢與反證都沒變，
 
 
 def _rebind(tmp_path: Path, note: str = NOTE, **over):
-    kw = _kw(tmp_path, **{k: over.pop(k) for k in ("briefs", "registry") if k in over})
-    for key in ("watch_loader", "graph_checker"):
-        kw.pop(key)
+    kw = _kw(tmp_path, **{k: over.pop(k) for k in ("briefs", "watches", "registry") if k in over})
+    kw.pop("graph_checker")
+    if "watch_loader" in over:
+        kw["watch_loader"] = over.pop("watch_loader")
     return spp.rebind_page("ZZZZ", note, path=_ledger(tmp_path), now=NOW, **kw, **over)
+
+
+def _sourced(source: str):
+    """等待 registry 的假讀法：範例頁那一條 watch 帶上來源（`brief:<版>#n` 換版會換號；`reading:…` 不會）。"""
+    return lambda: {"watches": [{"watch_id": WATCH, "status": "consumed", "source_ref": source}]}
 
 
 def test_rebind_needs_a_page_first(tmp_path) -> None:
@@ -311,6 +317,31 @@ def test_rebind_refuses_unknown_tickers_missing_briefs_and_tampered_fragments(tm
     with pytest.raises(ContractViolation, match="被改過"):
         _rebind(tmp_path, briefs=(BRIEF, NEWER))
     assert len(_ledger(tmp_path).read_text(encoding="utf-8").splitlines()) == 1
+
+
+def test_rebind_refuses_waits_still_on_the_old_versions_own_conditions(tmp_path) -> None:
+    """2026-11-27 結案 R2 C2：換版時舊版自己登記的反證與加碼條件收掉、新版另開編號（重述也一樣）——rebind 照抄舊編號，
+    APP 會把還在等的條件印成「已處理」、gaps 也歸零（靜默）。拒收、什麼都不寫；連讀圖的（換版不換號）照樣對版。"""
+    _add(tmp_path, _layout(tmp_path))
+    with pytest.raises(ContractViolation, match="舊版敘事自己登記"):
+        _rebind(tmp_path, briefs=(BRIEF, NEWER), watch_loader=_sourced(f"brief:{BRIEF.brief_id}#1"))
+    assert len(_ledger(tmp_path).read_text(encoding="utf-8").splitlines()) == 1
+    record = _rebind(tmp_path, briefs=(BRIEF, NEWER), watch_loader=_sourced("reading:sr_" + "b" * 16 + "#1"))
+    assert record["brief_id"] == NEWER.brief_id
+
+
+def test_add_refuses_waits_on_another_versions_own_conditions(tmp_path) -> None:
+    """對稱面：換版後只改 brief_id、等待編號沒換成新版的就 add，一樣會把還在等的條件印成「已處理」——E5 擋。
+    本版自己登記的、連讀圖的、別檔敘事登記的都不擋（判「同一檔」看這一檔自己的敘事帳）。"""
+    folder = _layout(tmp_path, brief_id=NEWER.brief_id)
+    kw = _kw(tmp_path, briefs=(BRIEF, NEWER))
+    kw["watch_loader"] = _sourced(f"brief:{BRIEF.brief_id}#1")
+    assert "另一版敘事" in _text(spp.check_folder(folder, **kw).findings, "E5")
+    with pytest.raises(ContractViolation, match="另一版敘事"):
+        spp.add_page(folder, path=_ledger(tmp_path), page_dir=_page_dir(tmp_path), now=NOW, **kw)
+    for fine in (f"brief:{NEWER.brief_id}#1", "reading:sr_" + "b" * 16 + "#1", "brief:ib_" + "c" * 16 + "#1"):
+        kw["watch_loader"] = _sourced(fine)
+        assert "另一版敘事" not in _text(spp.check_folder(folder, **kw).findings, "E5"), fine
 
 
 def test_page_status_against_the_current_brief(tmp_path) -> None:
