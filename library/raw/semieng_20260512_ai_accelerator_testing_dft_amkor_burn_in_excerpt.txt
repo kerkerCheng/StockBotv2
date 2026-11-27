@@ -1,0 +1,13 @@
+SOURCE: Semiconductor Engineering — 「AI Accelerator Testing Depends On DFT Innovations」（Laura Peters，2026-05-12）
+URL: https://semiengineering.com/ai-accelerator-testing-depends-on-dft-innovations/
+PUBLISHED: 2026-05-12
+RETRIEVED: 2026-11-27（HTML 轉文字後逐字照抄）
+STORAGE: repo_excerpt（產業媒體有限節錄）
+NOTE: 第三方產業媒體轉述受訪者原話。封測廠 Amkor 的製造測試資深總監說晶圓級燒機很難做到、仍在封裝後做——比 2025-07 那篇（library/raw/semieng_20250710_package_level_burn_in_amkor_nxp_excerpt.txt）晚十個月、換一位 Amkor 主管，說法一致。對 AEHR（晶圓級燒機）是反方向的第三方現況。
+來源：AEHR 故事頁蒐證（directed lead lead_e9d643d596daa6392dd5c6c542564ae1）。
+
+[SemiEngineering 2026-05-12｜Amkor，燒機]
+By stressing parts with higher voltage and temperatures than they would normally encounter during actual use, burn-in mimics the aging process caused by defects and variability in the fab process. “Burn-in remains a crucial test insertion, especially for every new wafer fabrication process,” said Amkor’s Pancholi. “Weeding out infant mortality defects with early production volumes is indispensable. Burn-in at the wafer level is tough to accomplish and is still being done post-packaging.”
+
+[SemiEngineering 2026-05-12｜Amkor，電流與熱]
+“The complexities within an advanced package have grown by a couple of orders of magnitude. These complexities are expected to grow even more as the number of package designs for each customer is unique,” said Vineet Pancholi, senior director of manufacturing test at Amkor . “With AI ASICs drawing 1,200 amps (soon 2,400 A levels), and because test systems must be capable of stressing devices to 2X the levels they would see in regular use, thermal management during testing is critical for these systems.”

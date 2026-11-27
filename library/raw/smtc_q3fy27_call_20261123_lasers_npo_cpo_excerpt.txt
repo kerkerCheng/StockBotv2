@@ -1,0 +1,29 @@
+SOURCE: Semtech Corporation（SMTC）— 2027 會計年度第三季法說（2026-11-23 美東盤後；Motley Fool 逐字稿 2026-11-24 刊出）
+URL: https://www.fool.com/earnings/call-transcripts/2026/11/24/semtech-smtc-q3-2027-earnings-call-transcript/
+PUBLISHED: 2026-11-24
+RETRIEVED: 2026-11-27（HTML 轉文字後逐字照抄）
+STORAGE: repo_excerpt（第三方轉錄逐字稿有限節錄；不是公司官方稿，引用時標明 Motley Fool 轉錄）
+NOTE: 供應商自述（L8 弱證據）。Semtech 會計年度 2028 = 2027-02 到 2028-01，所以「second half of fiscal 2028」約為 2027-08 到 2028-01。
+雷射這一段來自 2026 年收購的 HieFo（InP 雷射）。三件事：①VHP 雷射（250 mW）放進 1.6T 收發器與 NPO 光引擎；②UHP 雷射（400 mW）配 SOA 瞄準 CPO scale-up 光源，營收在 2027 之後；③光子產能「gated by the capacity」，年底擴 3–4 倍、明年底再 3–4 倍，擴 3 倍時可支撐每季約 2,500 萬美元營收。
+
+[法說 2026-11-23｜準備稿，雷射]
+A single VHP laser can drive an 8-lane silicon photonics modulator, making it very well suited for 1.6T transceivers and NPO optical engines. We're also actively developing our ultra-high-power, or UHP, lasers with a 400-milliwatt of optical output. Paired with our semiconductor optical amplifier, this can address customer requirements for a CPO scale-up light source where the laser and amplification functions are central to system power and performance. Our photonics capacity expansion program is on track to support substantial demand for a differentiated product.
+
+[法說 2026-11-23｜問答，CPO 與 NPO 時程（Hong Q. Hou，執行長）]
+For CPO, we are developing CPO scale-up lasers, but that's a contribution of potential revenue beyond 2027. On the other hand, NPO, we do believe by the second half of 2027, we have a meaningful revenue contribution.
+So NPO, we are very well positioned. CPO is a story for 2028 and beyond, and we'll see the meaningful revenue in the second half of FY '28.
+
+[法說 2026-11-23｜問答，光子產能（Hong Q. Hou）]
+Right now, we are gated by the capacity. So that's why we're increasing capacity, and we're on track, as I said, to expand the capacity by 3 to 4x by the end of this year and another 3 to 4x by the end of next year. By 3x increase, for example, end of this year, we will be having the capacity to support a run rate of $25 million a quarter. And of course, you can just scale that by the future capacity increase.
+
+[法說 2026-11-23｜問答，供給與晶圓產能（UBS 分析師 Timothy Arcuri 問、Hong Q. Hou 答）]
+Timothy Arcuri: Hong, you mentioned in the prepared remarks that supply, you said that it's kind of a driver for your optical business. Can you talk about sort of where you stand versus your peers and your lead times? Is that driving a lot of the share gain? And I guess I ask because can that be sustained as the supply sort of normalizes out?
+Hong Q. Hou: Yes. Tim, that's a good question. So our supply is -- we have been working on the supply issue. About 2 years ago, we actually -- our operations team, especially our Chief Operating Officer, saw that, and we went out and qualified additional fabs and secure more capacity. At this point of time, the foundry capacity is not a limitation. And on the back end, we are building the diversification and also the resiliency as well. For example, some of the testers will have a longer lead time and -- but it's going to be supporting our FY '28 plan.
+So we view that as a differentiation because in the past, there are probably more competition and -- but now there are a few of us will have the capacity. And -- but this compounded with the growth -- with the performance and the qualification cycle since our product is already in the qualification with all module manufacturers, we know even for someone new to come in with a product, and they will have to go through the same process to get their customer and their customers qualified and even they have the security. So I'd say the combination of the performance, the road map alignment and secured capacity give us the confidence for the future growth trajectory.
+
+[法說 2026-11-23｜問答，NPO 的客戶面（Hong Q. Hou）]
+on the hyperscaler side, probably about 4 in the U.S. and 3 in China. Those are the major hyperscalers. They are having very active NPO programs. And -- but of course, they usually are having multiple module suppliers engaged in supporting their pursuit.
+
+[法說 2026-11-23｜問答，CPO 可能延後（分析師 Tristan Gerra 問、Hong Q. Hou 答）]
+Tristan Gerra: Okay. And then as a follow-up, it looks like the CPO market could be delayed a bit. It looks like some hyperscalers are demanding a detachable connector for reliability purposes. Does that increase or extend the life of NPOs? And any commentary on the time line for CPO?
+Hong Q. Hou: In my view, the NPO is better and easier and faster in adoption because it leverage the ecosystem and improve the serviceability. So I think the NPO, we will have more opportunities in there because we can insert our TIAs and drivers and even lasers in that. As for the CPO, the only play and the contribution from the open ecosystem is the CPO lasers. And so we are developing that for the future years, but NPO represents a great near-term opportunity.

@@ -1,0 +1,20 @@
+SOURCE: Applied Optoelectronics, Inc.（AOI）— 新聞稿「AOI Announces Multi-Year Long-Term Agreement with Tier-1 Hyperscale Datacenter Customer」（PRNewswire，2026-11-24）
+URL: https://www.prnewswire.com/news-releases/aoi-announces-multi-year-long-term-agreement-with-tier-1-hyperscale-datacenter-customer-302949068.html
+RETRIEVED_VIA: https://www.stocktitan.net/news/AAOI/aoi-announces-multi-year-long-term-agreement-with-tier-1-hyperscale-igsxh6zd4638.html（PRNewswire 原稿全文轉載；HTML 轉文字後逐字照抄）
+PUBLISHED: 2026-11-24
+RETRIEVED: 2026-11-27
+STORAGE: repo_excerpt（公司公開新聞稿有限節錄）
+NOTE: 供應商自述（L8 弱證據）；客戶沒具名（「existing Tier-1 hyperscale datacenter customer」，AOI 稱是第二家簽 LTA 的雲端業者）。截至 2026-11-27 EDGAR 還沒有對應的 8-K（最近一份 8-K 是 11-17 的 ATM）。
+三件事要分開讀：①客戶的最低採購承諾（800G 收發器 2027 約 15 億美元、雷射二極體 2028–2029 約 7 億美元）；②客戶沒有出資（「no commitment of capital」），反而是 AOI 自付 200 萬美元加速認證；③超過 100 億美元是 AOI 依長期討論估的需求、明寫不保證。雷射用於 CPO 是 AOI 執行長的預期（「some of which we expect」），不是客戶的話。
+
+[PR 2026-11-24｜第一段]
+SUGAR LAND, Texas , Nov. 24, 2026 /PRNewswire/ -- AOI (NASDAQ: AAOI ), a leading provider of advanced optical and HFC networking products that power AI, today announced it has signed a multiyear long-term agreement (LTA) with an existing Tier-1 hyperscale datacenter customer.
+
+[PR 2026-11-24｜條款]
+Under the agreement, AOI will supply the customer with 800G transceiver products as well as laser diodes over the four-year time period from December 2026 through December 2030. Other products may be added depending on future needs. The customer has agreed to purchase a minimum commitment of approximately $1.5 billion of 800G transceivers in 2027 and approximately $0.7 billion in laser diodes between 2028 and 2029. As part of the agreement, AOI will contribute a $2 million one-time expense to accelerate qualification efforts with this customer. The customer made no commitment of capital as part of this LTA.
+
+[PR 2026-11-24｜執行長，雷射與 CPO]
+Lin continued, "We have a long history of manufacturing lasers and have strategically curated our portfolio to provide the high-performance optical sources driving the industry's shift toward silicon photonics, near-packaged optics (NPO), and co-packaged optics (CPO). As part of this agreement, we will be supplying our laser diodes, some of which we expect will be used to power CPO architectures, starting in 2028. We believe that in the future, CPO and related technologies will continue to drive increased demand for high-power lasers and we plan to further expand our laser manufacturing capacity in Texas to support this anticipated growth."
+
+[PR 2026-11-24｜財務長，承諾以外的需求與美國製造]
+"The customer's forecast indicates significant demand beyond the purchase commitments specified in the agreement over its four-year term," said Dr. Stefan Murry, AOI's Chief Financial Officer and Chief Strategy Officer. "While not guaranteed, the current level of demand based on long-term discussions with the customer exceeds $10 billion over the four years of the LTA. Expanding our production capacity would position us to serve that demand, but additional sales beyond the $2.2 billion of purchase commitments specified in the agreement will depend on our ability to bring that capacity online and secure additional purchase commitments. Under the LTA, we have committed to supplying volumes needed, including a commitment to ship an agreed-upon quantity of products made in the USA , starting in the first quarter of 2027 and ramping throughout 2027. We believe this agreement supports our ability to further increase our capacity, allocate capital, and invest in advanced technologies with greater confidence. To support this accelerating customer demand, we are continuing to expand our capacity and remain focused on executing on our expansion plans."

@@ -1,0 +1,22 @@
+SOURCE: Johnson Matthey plc — 2026/27 上半年業績公告（截至 2026-09-30 的六個月；公告 2026-11-19）
+URL: https://matthey.com/documents/d/guest/announcement-1h-2026-27
+PUBLISHED: 2026-11-19
+RETRIEVED: 2026-11-27（PDF 文字層抽字，逐字照抄；斷字已接回）
+STORAGE: repo_excerpt（公司公開業績公告有限節錄）
+NOTE: 發行人自述。Cormetech 2026-07 併入（企業價值 3.6 億美元）；這份半年報還沒把發電觸媒拆成獨立部門——公司說從 2026/27 全年起把 Clean Air Solutions 與 Cormetech 合成新部門「Clean Power」單獨報，2025/26 備考數字會在全年業績前提供。規模對照：Clean Power 年化營收預期逾 2.5 億英鎊；Clean Air（含 Clean Air Solutions）2027/28 營收預期逾 20 億英鎊——約一成二，不是三成。
+來源：lead_13ce5a799a63da7b8bba9640acb4d0ec（JMAT.L 敘事反證第 2 條 ew_1743 的叫醒）。
+
+[1H 2026/27｜Cormetech 與 Clean Air Solutions（Clean Power）]
+On an annualised basis, the combined business is now expected to achieve sales in excess of £250 million (previously in excess of £200 million) and an operating margin of at least mid -teens in 2026/27.
+In the two months since completion, we have already secured our first joint business win with a leading manufacturer of heat recovery steam generators. Together, Cormetech’s SCR catalysts and JM’s oxidation catalysts will be supplied into the emissions control system for gas turbines used in data centres . This demonstrates the potential for our combined offering and strong commercial proposition , reflected in a c.$350 million orderbook which underpins sales to 31st March 2028.
+（註 3）Represents Cormetech’s orders due for delivery to 31st March 2028. Previously $300m orderbook representing orders due for delivery in calendar years 2026 and 2027 (May 2026 guidance).
+
+[1H 2026/27｜半年貢獻]
+Cormetech contributed £33 million sales in the half.
+Cormetech contributed £6 million to underlying operating profit
+
+[1H 2026/27｜報告結構]
+we are changing our reporting structure for full year 2026/27. To align with how the businesses will be managed, we will report Clean Air Solutions and Cormetech (both currently reported as part of Clean Air heavy duty) in a single separate segment – “Clean Power”. 2025/26 pro forma financials for Clean Power will be provided in advance of our full year 2026/27 results.
+
+[1H 2026/27｜Clean Air 規模]
+For 2027/28, Clean Air (including Clean Air Solutions) is expected to deliver sales of more than £2 billion (of which over 95% is already won) and an improved operating margin of 16 to 18%.

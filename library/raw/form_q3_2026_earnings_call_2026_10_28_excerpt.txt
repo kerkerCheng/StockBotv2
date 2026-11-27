@@ -17,3 +17,9 @@ Aric McKinnis (CFO): "Q3 revenues of $280.5 million came in $10.5 million above 
 "Exiting 2027, we expect Farmers Branch will have the capability to produce about $400 million in annual probe card revenue"
 "We expect revenue of approximately $285 million, plus or minus $10 million" (Q4 outlook)
 Takeaways (Motley Fool summary): "Non-GAAP Gross Margin -- 56.5%"; "Total Cash and Investments -- $399 million, an increase of $50 million during the third quarter before the $300 million Teradyne investment."; "HBM Outlook -- Management expects continued growth in HBM4E and HBM5 designs despite a temporary sequential decline in revenue during the third quarter."
+補記（2026-11-27，FORM 敘事逐句核對；同一份 Motley Fool 逐字稿重抓，逐字照抄）：
+Mike Slessor (CEO, prepared remarks): "We recently qualified the assembly and test portion of this new facility and, only a few days ago, shipped the first production unit to a leading customer."
+Mike Slessor (CEO, Q&A): "Photonics is such a compelling solution for the power and energy challenges that the industry face. It's really a question of when and not if, and we're seeing the early innings of that when really take place here in '26 into '27."
+Aric McKinnis (CFO, Q&A): "I agree that we're starting to see more and more tightness in our ability to produce. We're operating kind of at the limits of what our current footprint can do."
+Aric McKinnis (CFO): "Approximately $10.5 million or about 380 basis points, of benefit resulted primarily from tariff refunds and favorable subcomponent costs in our Quantum business that are not expected to recur. Excluding these items, non-GAAP gross margins would have been between 52.5% and 53%"
+Takeaways (Motley Fool summary): "McKinnis indicated that 2027 gross margins are expected to remain at the current baseline level of 53% as volume efficiencies offset temporary startup costs from the new factory."

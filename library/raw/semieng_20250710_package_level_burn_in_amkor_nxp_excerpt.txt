@@ -1,0 +1,17 @@
+SOURCE: Semiconductor Engineering — 「Easing The Stress For Package-Level Burn-In」（Laura Peters，2025-07-10）
+URL: https://semiengineering.com/easing-the-stress-for-package-level-burn-in/
+PUBLISHED: 2025-07-10
+RETRIEVED: 2026-11-27（HTML 轉文字後逐字照抄）
+STORAGE: repo_excerpt（產業媒體有限節錄）
+NOTE: 第三方產業媒體轉述受訪者原話。對 AEHR（晶圓級燒機）是兩個方向：①封測廠 Amkor 說晶圓級做得到、但客戶沒往那邊走，封裝測試仍是主流（反方向，第三方 OSAT）；②NXP 用晶圓級加壓（高電壓應力＋高溫烘烤）加離群值篩選取代大部分封裝級燒機（晶圓級方向，但用的是晶圓測試加壓，不一定是燒機設備）；Aehr 自己的業務副總說封裝後才發現失效要多付 10 到 100 倍成本（自述）。
+來源：AEHR 故事頁蒐證（directed lead lead_128809a674427856f748662d4135715f）。
+
+[SemiEngineering 2025-07-10｜Amkor]
+Interestingly, the industry has the tools to perform most stress tests at the wafer level. But because the complete assembly must pass reliability testing with all the solder bump connections, many chipmakers prefer to keep burn-in in production. “We’ve had the technology for years,” said Claude Castiglione, director of global test services at Amkor Technology . “It can be done, but we just don’t see customers moving in that direction. A couple of customers have inquired about it, and we do it to some level, but package test remains the dominant approach.”
+
+[SemiEngineering 2025-07-10｜NXP]
+“There is a perception from automotive customers that package-level burn-in is required to ensure automotive quality,” said Chen He, senior director of product enablement and fellow at NXP Semiconductors. “We showed that an advanced wafer-level stress methodology, using enhanced high voltage stress tests and advanced outlier screening, can achieve superior acceleration and detection of latent defects with less reliability risk like thermal runaway compared to package level burn-in.”
+“It is non-trivial to switch from package-level burn-in to wafer-level stress across a production line,” said He. “The wafer-level stress and testing need to be designed to have sufficient coverage for latent defects, and a large-volume validation needs to be executed to prove that DLBI can be removed without affecting quality. It took NXP several years to explain the theory and collect large volumes of silicon data to convince our automotive customers to accept the approach.
+
+[SemiEngineering 2025-07-10｜Aehr（自述）]
+“If you look at that AI chip from a very large brand company, you have their logic, their GPU, and then you have memory around it. And the reality is, all of those have to get some level of burn-in or stress,” said Vernon Rogers, executive vice president of sales and marketing at Aehr Test Systems. “So if I do burn-in at the package level and I have a failure, versus burning it in at the wafer, it’s our understanding that you could suffer a 10X to 100X cost penalty for finding the fault later rather than sooner.”

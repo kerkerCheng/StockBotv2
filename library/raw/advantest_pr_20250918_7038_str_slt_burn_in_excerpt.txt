@@ -1,0 +1,21 @@
+SOURCE: Advantest Corporation — 新聞稿「Advantest Expands 7038 System-Level Test Platform with Right-Sized Single Test Rack Solution for High-Volume Manufacturing」（2025-09-18）
+URL: https://www.advantest.com/en/news/2025/20250918.html
+PUBLISHED: 2025-09-18
+RETRIEVED: 2026-11-27（HTML 轉文字後逐字照抄）
+STORAGE: repo_excerpt（公司公開新聞稿有限節錄）
+NOTE: 供應商自述（L8 弱證據）；沒有具名客戶、沒有台數。這是封裝後的系統級測試（SLT）加燒機（BI）平台的小台版本，瞄準中低量產；不是晶圓級燒機。Aehr 執行長在法說把 Advantest 列為晶圓級那一邊的替代者（測試機一次測一顆），這份則是 Advantest 在封裝級 SLT＋燒機這一邊的產品——兩邊都有它。
+來源：AEHR 故事頁蒐證（directed lead lead_980daa7c142bd0556c0363c937ca6b7d）。
+
+[PR 2025-09-18｜副標與首段]
+New liquid-cooling enabled system delivers affordable, high-density SLT and burn-in test for high-demand, lower-volume HPC, AI, and automotive devices
+TOKYO, Japan —Sept. 18, 2025— Leading semiconductor test equipment supplier Advantest Corporation (TSE: 6857) today announced its 7038 Single Test Rack (STR) system-level test (SLT) and burn-in test (BI) solution. The 7038 STR extends the company’s proven 7038 SLT platform with a lower-cost architecture optimized for slot-based automated test solutions, enabling right-sized SLT deployment in the production of artificial intelligence (AI), high-performance compute (HPC), automotive, and other low- to mid-volume devices.
+
+[PR 2025-09-18｜散熱]
+The new 7038 STR delivers liquid-cooled thermal management of up to 1.4 kW per test site, enabling robust testing of today’s most complex and power-hungry devices. Thermal capabilities beyond 1.4 kW are available in Advantest's suite of offerings.
+
+[PR 2025-09-18｜主管說法]
+“The 7038 STR represents the next evolution of our system-level and burn-in test portfolio. Extending our proven 7038 platform into a right-sized configuration creates new opportunities to address the needs of customers who require robust test coverage for increasingly complex, high-power devices but don’t need the scale of a dual-rack system,” said Jonathan Sinskie, president and CEO, Advantest Test Solutions. “This addition strengthens our ability to support demanding applications while reinforcing our commitment to being a single-source partner for total SLT and BI solutions.
+
+[PR 2025-09-18｜供貨]
+The 7038 STR is especially suited for mid- to low-volume production environments where customers require advanced SLT/BI capabilities without the higher investment and larger footprint of dual-rack systems.
+The 7038 Single Test Rack solution is available immediately, with pricing dependent on slot configuration, sites per slot, and thermal requirements.
