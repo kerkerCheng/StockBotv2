@@ -358,7 +358,8 @@ def cmd_brief(args: argparse.Namespace) -> int:
       祖先、候選狀態與 answers 都沒變）。
       寫入當下檢查讀圖現行、供給側、watch、answers、可開的起始門，不過就整筆拒收並逐條說明；
       通過後 `disproof[]` 自動登記成語意 watch（已在盯的只連結）、`confirm[]`（加碼條件，Phase 7 Step 7.0d）各登記一筆
-      `condition_role=confirm` 的語意 watch、舊版還 active 的 `brief:` watch 收掉。
+      `condition_role=confirm` 的語意 watch；舊版還 active 的 `brief:` watch，條件逐字沒變的沿用（改掛到新版、id 不變，
+      輸出的 `relinked`），其餘收掉。
     - `--retract <id>`：append 一筆撤回紀錄（沿用被撤那筆的版本；撤回 v2 只收它登記、還 active 的 watch）。
     """
     from datetime import datetime, timezone
@@ -432,8 +433,8 @@ def cmd_brief(args: argparse.Namespace) -> int:
             return 2
         print(f"✓ {record['brief_id']} → {result['path']}")
         print(f"  watch：新登 {len(result['registered'])}｜連結既有 {len(result['linked'])}"
-              f"｜收掉舊版 {len(result['consumed'])}｜處置 {len(result['acknowledged'])}"
-              f"｜加碼條件新登 {len(result.get('confirm_registered') or ())}")
+              f"｜沿用舊版 {len(result.get('relinked') or ())}｜收掉舊版 {len(result['consumed'])}"
+              f"｜處置 {len(result['acknowledged'])}｜加碼條件新登 {len(result.get('confirm_registered') or ())}")
         for notice in result.get("notices") or ():
             print(f"  ⚠ {notice}")
         # 深挖清單（2026-10-31 failure log #119；2026-11-03 起是加碼條件、存進敘事）：宣告可開或有寫清單就印還缺哪幾項——

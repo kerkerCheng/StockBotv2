@@ -145,8 +145,9 @@ def _version_ids(ticker: str, *, brief_loader: BriefLoader | None) -> set[str]:
 def waits_on_other_versions(decl: Any, bound_brief_id: Any, version_ids: Iterable[str],
                             watches: Mapping[str, Any] | None) -> list[str]:
     """宣告裡掛在「同一檔另一版敘事自己登記」的條件上的等待（watch 來源 `brief:<那一版>#…`）的 key。
-    敘事一換版（重述也一樣），舊版自己登記的反證與加碼條件收掉、新版另開編號；連讀圖、連 thesis 的與日期等待不受影響。
-    照抄舊編號，APP 會把還在等的條件印成「已處理」、對帳也不叫（2026-11-27 結案 R2 C2）——rebind 與 add 同一條規則擋。"""
+    敘事換版時，條件逐字沒變、還在等的沿用原編號（改掛到新版，`engine_b.narrative_watches`，2026-11-27），不會被點名；
+    改了字的（或舊的已醒來要處置的）舊版收掉、新版另開編號——照抄舊編號，APP 會把還在等的條件印成「已處理」、對帳也不叫
+    （2026-11-27 結案 R2 C2）——rebind 與 add 同一條規則擋。連讀圖、連 thesis 的與日期等待不受影響。"""
     versions = {str(v) for v in version_ids} - {str(bound_brief_id)}
     if not versions or not isinstance(decl, Mapping):
         return []
@@ -309,7 +310,7 @@ def check_folder(folder: Path, *, registry: Any = None, brief_loader: BriefLoade
             if ticker:
                 old = waits_on_other_versions(decl, decl.get("brief_id"), _version_ids(ticker, brief_loader=brief_loader), data)
                 if old:
-                    extra.append(Finding("E5", "waits 掛在這一檔另一版敘事自己登記的條件上（換版時已收掉、新版另開了編號）："
+                    extra.append(Finding("E5", "waits 掛在這一檔另一版敘事自己登記的條件上（換版時改了字或已醒來，舊的收掉、新版另開了編號）："
                                          + "、".join(old) + "——照 watch 來源的 brief:<id>#<第幾條> 換成這一版的編號"))
         rides = [r for r in (decl.get("rides") or []) if isinstance(r, str) and r.strip()]
         if rides:
@@ -388,7 +389,8 @@ def rebind_page(ticker: str, note: str, *, path: Path | None = None, root: Path 
                 brief_loader: BriefLoader | None = None, watch_loader: WatchLoader | None = None,
                 now: datetime | None = None, today: date | None = None, author: str = "session") -> dict[str, Any]:
     """對版：現行頁（同一份片段）綁到現行那一版敘事。必附一句「新舊敘事差在哪、這一頁為什麼還站得住」。
-    頁上的等待掛在舊版自己登記的條件上就拒收（`waits_on_other_versions`）——那些編號換版時已收掉，要重對號後 `add`。"""
+    頁上的等待掛在舊版自己登記的條件上就拒收（`waits_on_other_versions`）——條件逐字沒變的換版時已沿用到新版、不會擋；
+    擋下的是改了字或已醒來的那幾條，舊編號已收掉，要重對號後 `add`。"""
     root = root or _ROOT
     if registry is None:
         from identity.registry import get_registry
@@ -414,7 +416,7 @@ def rebind_page(ticker: str, note: str, *, path: Path | None = None, root: Path 
     if old:
         raise ContractViolation(
             f"{ticker} 頁上有 {len(old)} 條等待掛在舊版敘事自己登記的條件上（{'、'.join(old[:5])}{'…' if len(old) > 5 else ''}）"
-            "——換版時它們收掉、新版另開了編號，照抄會把還在等的條件印成「已處理」。照 watch 來源的 brief:<id>#<第幾條> "
+            "——它們換版時改了字或已醒來，舊的收掉、新版另開了編號，照抄會把還在等的條件印成「已處理」。照 watch 來源的 brief:<id>#<第幾條> "
             "把宣告換成新版的編號，再 python -m alpha story-page add <資料夾>")
     read_html(head, root=root)            # 片段還在、沒被改過才對版
     stamp = (now or datetime.now(timezone.utc)).astimezone(timezone.utc).isoformat()

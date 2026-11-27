@@ -356,21 +356,98 @@ def test_open_is_refused_while_an_attributed_watch_waits_for_judgment(tmp_path: 
 # 換版、撤回、處置
 # ---------------------------------------------------------------------------
 
+#: 換版時改了字的反證（日期往後）——條件文字不同，舊的照舊收、新的另登（沿用只認逐字相同，2026-11-27）
+_CHANGED = "若 JX 在 2027-03-31 前宣布新產能投產則供給缺口消失，本敘事的量的賭注不成立"
+_SUMITOMO = "若住友在 2026-12-31 前宣布六吋 InP 量產則量的論點削弱"
+
+
 def test_supersede_closes_only_active_watches_and_the_next_write_must_acknowledge(tmp_path: Path) -> None:
     ctx = _ctx()
-    first = _write(tmp_path, _record(disproof=[_disproof(), _disproof(condition="若住友在 2026-12-31 前宣布六吋 InP 量產則量的論點削弱")]), ctx)
+    first = _write(tmp_path, _record(disproof=[_disproof(), _disproof(condition=_SUMITOMO)]), ctx)
     w1, w2 = ctx.watches["watches"]
     w2["status"] = "fired"                                   # 第二條醒了
     assert classify_watch(w2) == "narrative_rewrite"
     with pytest.raises(ContractViolation, match="acknowledged_touched 沒處置"):
-        _write(tmp_path, _record(supersedes=first["brief_id"]), ctx)
-    second = _write(tmp_path, _record(supersedes=first["brief_id"], acks=[
+        _write(tmp_path, _record(supersedes=first["brief_id"], disproof=[_disproof(condition=_CHANGED)]), ctx)
+    second = _write(tmp_path, _record(supersedes=first["brief_id"], disproof=[_disproof(condition=_CHANGED)], acks=[
         {"watch_id": w2["watch_id"], "disposition": "thesis_changed", "note": "住友 9/30 公告量產，已改寫量的賭注"}]), ctx)
     assert w1["status"] == "consumed" and w1["closed"]["note"].startswith("superseded")
     assert w2["status"] == "consumed" and w2["judgment"]["handled"]["verb"] == "thesis_changed"
     assert "quote" not in w2["judgment"]                      # R2-a C5：作者 note 不是文件逐字，不得進 quote（L12／L18）
     assert w2["judgment"]["note"].startswith("住友")
-    assert second["registered"]
+    assert second["registered"] and second["relinked"] == []
+
+
+def test_a_rewrite_keeps_the_watch_of_a_condition_that_did_not_change(tmp_path: Path) -> None:
+    """2026-11-27 使用者「沿用編號直接做完吧」：條件逐字相同的反證改掛到新版——id 不變、不收舊開新；位置變了照文字對
+    （舊第 2 條成了新第 1 條）；條件改了字的照舊收舊開新。"""
+    ctx = _ctx()
+    first = _write(tmp_path, _record(disproof=[_disproof(), _disproof(condition=_SUMITOMO)]), ctx)
+    w1, w2 = ctx.watches["watches"]
+    second = _write(tmp_path, _record(supersedes=first["brief_id"],
+                                      disproof=[_disproof(condition=_SUMITOMO), _disproof(condition=_CHANGED)]), ctx)
+    new = second["brief_id"]
+    assert second["relinked"] == [w2["watch_id"]] and len(second["registered"]) == 1
+    assert w2["status"] == "active" and w2["source_ref"] == w2["disproof_ref"] == f"brief:{new}#1"
+    assert w2["relinks"][-1]["from"] == f"brief:{first['brief_id']}#2" and w2["relinks"][-1]["to"] == f"brief:{new}#1"
+    assert w2["note"].startswith(f"敘事 {new}") and w2["quote_locator"].startswith("narrative disproof[1]")
+    assert w1["status"] == "consumed" and second["consumed"] == [w1["watch_id"]]
+    assert len(ctx.watches["watches"]) == 3                 # 只多了改字的那一條
+
+
+def test_a_kept_condition_takes_the_new_versions_dates_and_remembers_the_old_ones(tmp_path: Path) -> None:
+    """沿用的條件照新版的到期日與頻率走（先照登記同一套規則驗），舊值記在 `relinks[].previous`。"""
+    ctx = _ctx()
+    first = _write(tmp_path, _record(), ctx)
+    (watch,) = ctx.watches["watches"]
+    later = (TODAY + timedelta(days=300)).isoformat()
+    second = _write(tmp_path, _record(supersedes=first["brief_id"],
+                                      disproof=[_disproof(expires=later, check_frequency="每月")]), ctx)
+    assert second["relinked"] == [watch["watch_id"]] and second["registered"] == [] and second["consumed"] == []
+    assert watch["expires"] == later and watch["check_frequency"] == "每月"
+    previous = watch["relinks"][-1]["previous"]
+    assert previous["expires"] == FAR and previous["check_frequency"] == "每季" and "condition" not in previous
+
+
+def test_a_woken_watch_is_not_kept_it_still_has_to_be_acknowledged(tmp_path: Path) -> None:
+    """醒來（fired）的舊 watch 是上一段的處置工作，不沿用：照舊要在 `acknowledged_touched` 處置，新版另登一條。"""
+    ctx = _ctx()
+    first = _write(tmp_path, _record(), ctx)
+    (watch,) = ctx.watches["watches"]
+    watch["status"] = "fired"
+    second = _write(tmp_path, _record(supersedes=first["brief_id"], acks=[
+        {"watch_id": watch["watch_id"], "disposition": "still_holds", "note": "叫醒它的文件與這條無關，條件照舊"}]), ctx)
+    assert second["relinked"] == [] and len(second["registered"]) == 1 and watch["status"] == "consumed"
+
+
+def test_a_kept_condition_still_passes_the_registration_rules(tmp_path: Path) -> None:
+    """沿用不能比新登記寬：新版的值過不了登記規則（例：牽涉誰寫成代號、沒有 co:*），一樣在 append 之前拒收。"""
+    ctx = _ctx()
+    first = _write(tmp_path, _record(), ctx)
+    (watch,) = ctx.watches["watches"]
+    from engine_b.narrative_watches import _relink_same_condition
+
+    item = SimpleNamespace(condition=watch["condition"], check_frequency="每季", action_48h="重寫敘事",
+                           entities=["AXTI"], expires=TODAY + timedelta(days=100))
+    with pytest.raises(ew.EventWatchError, match="co:"):
+        _relink_same_condition(ctx.watches, older=[first["brief_id"]], ref="brief:ib_next#1", item=item,
+                               confirm=False, quote_locator="q", note="n", brief_id="ib_next", claimed=set())
+    assert watch["source_ref"] == f"brief:{first['brief_id']}#1" and "relinks" not in watch
+
+
+def test_retraction_never_keeps_a_watch(tmp_path: Path) -> None:
+    """撤回不沿用：舊版還在等的全收（沿用只發生在換新版）。"""
+    ctx = _ctx()
+    first = _write(tmp_path, _record(), ctx)
+    (watch,) = ctx.watches["watches"]
+    target = read_brief_records(T, directory=tmp_path / "briefs")[0][0]
+    retract = brief_record(company_id=CO, ticker=T, created_at=datetime.now(timezone.utc) + timedelta(seconds=1),
+                           slots=[{"key": s.key, "text": s.text, "evidence_refs": list(s.evidence_refs)} for s in target.slots],
+                           supersedes_id=first["brief_id"], retracted=True, record_version=target.record_version,
+                           rides=[r.as_dict() for r in target.rides], disproof=[d.as_dict() for d in target.disproof],
+                           answers=target.answers.as_dict(), candidate_state=target.candidate_state.as_dict())
+    out = _write(tmp_path, retract, ctx)
+    assert out["relinked"] == [] and watch["status"] == "consumed" and "relinks" not in watch
 
 
 def test_a_past_expiry_brief_watch_not_yet_marked_by_daily_is_not_swallowed_by_supersede(tmp_path: Path) -> None:

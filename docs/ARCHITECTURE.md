@@ -898,7 +898,8 @@ AnalystView.brief（optional）→ APP 首屏 briefCard；六張卡收進「為�
   **重押讀圖時格層 `evidence_refs` 不得指向同一節點同一單位已被取代的讀圖**（Phase 7 Step 7.0c；只拒收並列出該換成哪個 id，不自動改寫）。
   放在 parse 路徑，舊紀錄日後會解析失敗、從候選板安靜消失。
 - **敘事來源的等待**：`wake_brief=<co:*>`（缺 X 在等的事；11-03 前等回落舊紀錄的照算）與 `brief:` 語意 watch 醒來、觸及、到期都進佇列段 `narrative_rewrite`
-  （`expiry_class=rewrite`，不鑄 pq2、不進假設對照）；換版與撤回只收 active 的。**watch 歸屬的唯一 SSOT** 是
+  （`expiry_class=rewrite`，不鑄 pq2、不進假設對照）；換版與撤回只收 active 的。**換版時條件逐字沒變、還在等的反證與加碼條件沿用原 watch**
+  （改掛到新版的來源鍵、`relinks` 留歷史，同 thesis 那一邊；撤回不沿用；2026-11-27 使用者「沿用編號直接做完吧」）。**watch 歸屬的唯一 SSOT** 是
   `engine_b/narrative_watches.py::attributed_watches`（以來源判，不以 entities；`candidate_state.watch_id` 不構成歸屬）。
 - **加碼條件 `confirm[]`（2026-10-04 Phase 7 Step 7.0d，使用者 A2）**：「這件事發生＝結構被確認了」。v2 的**選填**欄——只在非空時
   進 payload 與 id 欄位集合（既有紀錄 id 逐位不變）；L7 三件套＋實體＋到期＋出處，寫入即登記成語意 watch（`brief:<id>#c<n>`）。

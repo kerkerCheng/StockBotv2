@@ -113,6 +113,26 @@ def test_writing_registers_each_confirm_as_its_own_semantic_watch(tmp_path: Path
     assert target["kind"] == "confirm" and "不是買進訊號" in target["label"]
 
 
+def test_a_rewrite_keeps_an_unchanged_confirm_and_never_crosses_roles(tmp_path: Path) -> None:
+    """2026-11-27「沿用編號」：加碼條件逐字沒變就沿用（改掛到新版的 `#c<n>`）；同一句從反證改成加碼條件不沿用——
+    種類不同，醒來之後的工作不同（反證擋可開、加碼條件只提醒）。"""
+    from tests.test_narrative_v2 import _CHANGED, _disproof
+
+    ctx = _ctx()
+    first = _write(tmp_path, _record(confirm=[_confirm()], stamp=STAMP), ctx)
+    old_disproof, old_confirm = ctx.watches["watches"]
+    moved = old_disproof["condition"]
+    second = _write(tmp_path, _record(supersedes=first["brief_id"], stamp=STAMP + timedelta(hours=1),
+                                      disproof=[_disproof(condition=_CHANGED)],
+                                      confirm=[_confirm(), _confirm(condition=moved)]), ctx)
+    assert second["relinked"] == [old_confirm["watch_id"]]
+    assert old_confirm["status"] == "active" and old_confirm["source_ref"] == f"brief:{second['brief_id']}#c1"
+    assert ew.is_confirm(old_confirm) and old_disproof["status"] == "consumed"
+    assert len(second["registered"]) == 1 and len(second["confirm_registered"]) == 1
+    fresh = next(w for w in ctx.watches["watches"] if w["watch_id"] == second["confirm_registered"][0])
+    assert fresh["condition"] == moved and ew.is_confirm(fresh)
+
+
 def test_condition_role_is_closed_and_only_for_narrative_sources() -> None:
     data = {"schema_version": 1, "watches": []}
     ref = "thesis:thesis/x.md#1"

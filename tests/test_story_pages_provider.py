@@ -320,7 +320,7 @@ def test_rebind_refuses_unknown_tickers_missing_briefs_and_tampered_fragments(tm
 
 
 def test_rebind_refuses_waits_still_on_the_old_versions_own_conditions(tmp_path) -> None:
-    """2026-11-27 結案 R2 C2：換版時舊版自己登記的反證與加碼條件收掉、新版另開編號（重述也一樣）——rebind 照抄舊編號，
+    """2026-11-27 結案 R2 C2：換版時舊版自己登記、改了字（或已醒來）的反證與加碼條件收掉、新版另開編號——rebind 照抄舊編號，
     APP 會把還在等的條件印成「已處理」、gaps 也歸零（靜默）。拒收、什麼都不寫；連讀圖的（換版不換號）照樣對版。"""
     _add(tmp_path, _layout(tmp_path))
     with pytest.raises(ContractViolation, match="舊版敘事自己登記"):

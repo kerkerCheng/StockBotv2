@@ -18,6 +18,14 @@
 
 醒來（fired）、被判觸及、到期未判的敘事來源 watch 是**下一次重寫要處置的工作**（佇列段 `narrative_rewrite`）。
 換版與撤回只收 active 的；其餘留著，下一次寫入必須在 `acknowledged_touched[]` 逐條處置（不列就拒收）。
+
+## 換版沿用同一條條件的 watch（2026-11-27 使用者「沿用編號直接做完吧」；Phase 8 結案報告 §5 #4）
+
+新版的反證或加碼條件，在舊版有一筆**還在等（active）、條件文字逐字相同、同一種**（反證配反證、加碼條件配加碼條件）的 watch，
+就把它改掛到新版的來源鍵（`source_ref`／`disproof_ref` 一起改，`relinks` 留歷史——與 thesis 那一邊 `engine_b.disproof._relink`
+同一個欄位），不收舊開新：id 不變，醒來與判讀的歷史跟著走，故事頁的等待與賭注句不必重對號。頻率、48 小時動作、到期日、
+牽涉誰照新版的值（先照新登記同一套規則驗，`ew._validate_semantic`），改了的舊值記在那一筆 `relinks` 的 `previous`。
+撤回不沿用；醒來、觸及、到期的舊 watch 不沿用（它們是上一段的處置工作）；條件文字有任何不同就照舊收舊開新。
 """
 from __future__ import annotations
 
@@ -218,6 +226,39 @@ def _close_active(data: dict[str, Any], prefixes: tuple[str, ...], note: str, su
         summary.append(str(watch["watch_id"]))
 
 
+def _item_fields(item: Any) -> dict[str, Any]:
+    """一條反證／加碼條件寫進 watch 的欄位（與 `add_watch` 存的形狀一致：entities 去空白、排序、去重）。"""
+    return {"condition": item.condition, "check_frequency": item.check_frequency, "action_48h": item.action_48h,
+            "expires": item.expires.isoformat(),
+            "entities": sorted({str(e).strip() for e in item.entities if str(e).strip()})}
+
+
+def _relink_same_condition(data: dict[str, Any], *, older: Sequence[str], ref: str, item: Any, confirm: bool,
+                           quote_locator: str, note: str, brief_id: str, claimed: set[str]) -> str | None:
+    """新版這一條在舊版有沒有還在等、條件文字逐字相同、同一種的 watch：有就改掛到 `ref`、回傳 id（見模組 docstring）。
+    一筆舊 watch 只配一次（`claimed`）。新版的值先照登記的同一套規則驗——不能比新登記寬。"""
+    prefixes = tuple(f"brief:{b}#" for b in older)
+    text = str(getattr(item, "condition", "") or "").strip()
+    if not prefixes or not text:
+        return None
+    for watch in data["watches"]:
+        wid = str(watch.get("watch_id"))
+        if (wid in claimed or watch.get("status") != "active" or not _src(watch).startswith(prefixes)
+                or ew.is_confirm(watch) != confirm or str(watch.get("condition") or "").strip() != text):
+            continue
+        fields = {**_item_fields(item), "quote_locator": quote_locator, "note": note}
+        ew._validate_semantic(condition=fields["condition"], entities=fields["entities"], source_ref=ref,
+                              disproof_ref=ref, check_frequency=fields["check_frequency"],
+                              action_48h=fields["action_48h"], expires=fields["expires"], today=ew._today())
+        previous = {k: watch.get(k) for k, v in fields.items() if watch.get(k) != v}
+        watch["relinks"] = [*(watch.get("relinks") or []),
+                            {"at": _now(), "from": _src(watch), "to": ref, "brief_id": brief_id, "previous": previous}]
+        watch.update({**fields, "source_ref": ref, "disproof_ref": ref})
+        claimed.add(wid)
+        return wid
+    return None
+
+
 def _apply_ack(data: dict[str, Any], watch_id: str, disposition: str, note: str, brief_id: str) -> str:
     """把一條處置寫成那筆 watch 既有的收據：fired → consumed＋closed；觸及 → `judgment.handled`；到期 → `expiry_resolution`。"""
     watch = next((w for w in data["watches"] if w.get("watch_id") == watch_id), None)
@@ -245,12 +286,13 @@ def _apply_ack(data: dict[str, Any], watch_id: str, disposition: str, note: str,
 
 
 def register_brief_watches(record: Any, *, data: dict[str, Any], company_brief_ids: Iterable[str]) -> dict[str, list[str]]:
-    """一筆敘事紀錄 append 成功之後：①換版／撤回收掉舊版還 active 的 `brief:` watch（只收 active；加碼條件同一條）；
+    """一筆敘事紀錄 append 成功之後：⓪換版時舊版還在等、條件逐字相同的 watch 改掛到這一版（`relinked`，見模組 docstring）；
+    ①換版／撤回收掉舊版其餘還 active 的 `brief:` watch（只收 active；加碼條件同一條）；
     ②`acknowledged_touched` 逐條寫處置收據；③這一版 `disproof[]` 沒有 `link_source_ref` 的每條登記一筆語意 watch
-    （`brief:<brief_id>#<n>`；同鍵已存在就不重登）；④這一版 `confirm[]` 每條登記一筆加碼條件的語意 watch
-    （`brief:<brief_id>#c<n>`、`condition_role=confirm`；Phase 7 Step 7.0d）。`record` 是已解析的 `InvestorBrief`。"""
+    （`brief:<brief_id>#<n>`；同鍵已存在就不重登——改掛過來的就是已存在）；④這一版 `confirm[]` 每條登記一筆加碼條件的
+    語意 watch（`brief:<brief_id>#c<n>`、`condition_role=confirm`；Phase 7 Step 7.0d）。`record` 是已解析的 `InvestorBrief`。"""
     summary: dict[str, list[str]] = {"registered": [], "consumed": [], "acknowledged": [], "linked": [],
-                                     "confirm_registered": []}
+                                     "confirm_registered": [], "relinked": []}
     brief_id = str(record.brief_id)
     older = [b for b in company_brief_ids if b != brief_id]
     if record.retracted:
@@ -258,7 +300,21 @@ def register_brief_watches(record: Any, *, data: dict[str, Any], company_brief_i
             _close_active(data, (f"brief:{record.supersedes_id}#",), f"retracted by {brief_id}", summary["consumed"])
         _close_wake_brief(data, str(record.company_id), f"retracted by {brief_id}", summary["consumed"])
         return summary
+    own = [(f"brief:{brief_id}#{index}", item, False, f"narrative disproof[{index}]（source {item.source}）",
+            f"敘事 {brief_id}（{record.ticker}）的第 {index} 條反證")
+           for index, item in enumerate(record.disproof, 1) if not item.link_source_ref]
+    own += [(f"brief:{brief_id}#c{index}", item, True, f"narrative confirm[{index}]（source {item.source}）",
+             f"敘事 {brief_id}（{record.ticker}）的第 {index} 條加碼條件——觸及只提醒，不是買進訊號")
+            for index, item in enumerate(getattr(record, "confirm", ()) or (), 1)]
     if older:
+        claimed: set[str] = set()
+        for ref, item, confirm, locator, note in own:
+            if any(_src(w) == ref for w in data["watches"]):
+                continue
+            wid = _relink_same_condition(data, older=older, ref=ref, item=item, confirm=confirm, quote_locator=locator,
+                                         note=note, brief_id=brief_id, claimed=claimed)
+            if wid:
+                summary["relinked"].append(wid)
         _close_active(data, tuple(f"brief:{b}#" for b in older), f"superseded by {brief_id}", summary["consumed"])
     state = getattr(getattr(record, "candidate_state", None), "state", None)
     if state not in WAITING_STATES:
@@ -268,30 +324,16 @@ def register_brief_watches(record: Any, *, data: dict[str, Any], company_brief_i
     for ack in record.acknowledged_touched:
         _apply_ack(data, ack.watch_id, ack.disposition, ack.note, brief_id)
         summary["acknowledged"].append(ack.watch_id)
-    for index, item in enumerate(record.disproof, 1):
-        if item.link_source_ref:
-            summary["linked"].append(str(item.link_source_ref))
-            continue
-        ref = f"brief:{brief_id}#{index}"
+    summary["linked"].extend(str(item.link_source_ref) for item in record.disproof if item.link_source_ref)
+    for ref, item, confirm, locator, note in own:
         if any(_src(w) == ref for w in data["watches"]):
             continue
         watch = ew.add_watch(
             data, kind=ew.SEMANTIC_KIND, disproof_ref=ref, source_ref=ref, expires=item.expires.isoformat(),
             entities=list(item.entities), condition=item.condition, check_frequency=item.check_frequency,
-            action_48h=item.action_48h, quote_locator=f"narrative disproof[{index}]（source {item.source}）",
-            note=f"敘事 {brief_id}（{record.ticker}）的第 {index} 條反證")
-        summary["registered"].append(str(watch["watch_id"]))
-    for index, item in enumerate(getattr(record, "confirm", ()) or (), 1):
-        ref = f"brief:{brief_id}#c{index}"
-        if any(_src(w) == ref for w in data["watches"]):
-            continue
-        watch = ew.add_watch(
-            data, kind=ew.SEMANTIC_KIND, disproof_ref=ref, source_ref=ref, expires=item.expires.isoformat(),
-            entities=list(item.entities), condition=item.condition, check_frequency=item.check_frequency,
-            action_48h=item.action_48h, quote_locator=f"narrative confirm[{index}]（source {item.source}）",
-            note=f"敘事 {brief_id}（{record.ticker}）的第 {index} 條加碼條件——觸及只提醒，不是買進訊號",
-            condition_role=ew.CONFIRM_ROLE)
-        summary["confirm_registered"].append(str(watch["watch_id"]))
+            action_48h=item.action_48h, quote_locator=locator, note=note,
+            condition_role=ew.CONFIRM_ROLE if confirm else "")
+        summary["confirm_registered" if confirm else "registered"].append(str(watch["watch_id"]))
     return summary
 
 
