@@ -95,9 +95,12 @@ def test_diagrams_show_as_images_in_b4_and_on_the_layer_page_labelled_as_illustr
     """示意圖由 materialize 檢查過、編成 data URI；前端只用 <img> 顯示，不把 SVG 原碼塞進頁面（SVG 在 img 裡不執行任何東西）。
     2026-10-08 使用者：「我想知道它出現在示意圖的哪一個地方」——坐的那幾格疊一個框（位置換算，不改圖），上方一句列出是哪幾格；
     頁首「做什麼」講的那幾格（押的格）粗框加「押在這裡」，其餘坐的格細虛線。手畫的圖沒有位置表：照實說標不出，不是不印。"""
+    # Phase 8 Step 8.2 把 B4 的示意圖抽成新舊兩版個股頁共用的 `pageDiagrams`（新版放在「系統裡的它」）——判準照留、主詞改成共用的函式
     visuals = _body("blockVisuals")
-    assert "key === 'B4'" in visuals and "payload.diagrams" in visuals
-    assert "payload.what_it_does" in visuals and "what.focus" in visuals          # 粗框跟頁首講的是同一份（L16）
+    assert "key === 'B4'" in visuals and "pageDiagrams(payload, view)" in visuals
+    shared = _body("pageDiagrams")
+    assert "payload.diagrams" in shared
+    assert "payload.what_it_does" in shared and "what.focus" in shared            # 粗框跟頁首講的是同一份（L16）
     figure = _body("diagramFigure")
     assert "document.createElement('img')" in figure and "img.src = d.src" in figure
     assert "innerHTML" not in figure and "示意｜" in figure and "出處" in figure

@@ -48,7 +48,7 @@ spawn 前先讀週額度（`python -m crons.llm_quota`）。本 plan 已知會�
 | 8.4a | 「做深這一檔」按鈕；冷讀包（頁面文字＋提示，提示唯一一份在程式裡） | 便宜模型 | Z1／R1 | ✅ 2026-11-26 | `928dd3f` |
 | 8.4b | 畫圖工具（地圖、時間長條、對數股價圖），輸出過得了片段檢查 | 便宜模型 | Z1／R1 | ✅ 2026-11-27 | `63be1f2` |
 | 8.4c | 兩份 skill、OPERATIONS、ARCHITECTURE 接上真的命令（§3 Step 8.4c 列了要改的句子） | 便宜模型 | Z0／R0 | ✅ 2026-11-27 | `d69ead6` |
-| 8.5 | 三頁搬進 APP：讀回、轉成片段與宣告、對照已發布的頁、各跑一次冷讀；Sivers 頁刪到字數上限內 | ~~強模型~~ → Opus（使用者 2026-11-27：「給opus做吧 我fable沒額度了」） | 研究＋Z1 | ✅ 2026-11-27 | （本 commit） |
+| 8.5 | 三頁搬進 APP：讀回、轉成片段與宣告、對照已發布的頁、各跑一次冷讀；Sivers 頁刪到字數上限內 | ~~強模型~~ → Opus（使用者 2026-11-27：「給opus做吧 我fable沒額度了」） | 研究＋Z1 | ✅ 2026-11-27 | `8b33a60` |
 | 8.6 | 結案：completion gate、R2、README 與 ROADMAP 登記、closeout 報告 | 做完 8.5 的那一位 | **R2** | ○ | |
 
 8.1–8.4c 不依賴 8.5：用合成範例頁開發與驗收。便宜模型做完 8.4c 就停（`AWAITING_HUMAN`：「切強模型做 8.5」）。
@@ -475,6 +475,15 @@ Boundaries: 不改 code、不 commit、不核准 pq2、不入圖、不動 thesis
 ```
 
 **結案之後：停。** 進度表標 ✅、README 那一列改 completed、ROADMAP Phase 8 列更新，印 closeout 的待決清單，`AWAITING_HUMAN`。不自己開下一個 Phase。
+
+- **執行紀錄（2026-11-27）**：結案報告 [`docs/reports/2026-11-27-phase8-closeout.md`](../reports/2026-11-27-phase8-closeout.md)（九項 gate 逐項附查證命令；
+  要使用者決定的四題在 §5）。
+  - **全套第一次跑 2 failed，兩條都是 8.2 帶進來的**（8.1–8.5 每一步只跑相關測試）：新框架把三個塊名寫死在前端（B3、B5、B9）——`app.js` 加
+    `blockTitle(key)` 照 `.meta.json` 的 `page_schema` 取名，測試一字未改；B4 示意圖抽成共用的 `pageDiagrams` 之後，舊測試還在 `blockVisuals` 裡找字——
+    斷言照留、主詞改成共用的函式。修後重跑全套 5,307 passed、2 skipped、0 failed。
+  - **讀 ⑤ 發現 8.5 漏對賭注句**：AEHR、亞泰的賭注句還綁在 11-23 那一版；兩檔引用的反證在新版逐字相同，照原文綁到新版、重物化。
+  - 改了 `app.js`：照開機腳本的方式另起長駐 serve（不掛在 session 的背景任務底下），`code.stale=false`；headless 六頁（三檔故事頁、兩檔新框架、舊版路由）零溢出。
+  - R2：審查中（結果寫進結案報告 §7）。
 
 ---
 

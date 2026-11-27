@@ -1406,6 +1406,14 @@ function lampLine(view) {
   return box;
 }
 
+/** 塊名：page_schema 的 `blocks[].title`（合約只有一份，前端不另寫，L16；同 `lampNames`）。讀不到合約（舊 server）回空字串，
+ *  呼叫的一方就不印那個標題——不在前端留第二份。 */
+function blockTitle(key) {
+  const blocks = (VOCAB && VOCAB.page_schema && VOCAB.page_schema.blocks) || [];
+  const block = blocks.find((b) => b.key === key);
+  return (block && block.title) || '';
+}
+
 /** 燈名：page_schema 的 B9 元素名（`wipeout/<key>` 那一條 line 對到的元素；合約只有一份，前端不另寫）。 */
 function lampNames() {
   const out = {};
@@ -1948,7 +1956,8 @@ function eventBlock(payload) {
   const lines = eventReactionLines(payload);
   if (!lines.some((n) => !n.classList.contains('ss-pending'))) return null;
   const box = el('div', 'event-lines');
-  box.appendChild(el('div', 'group-title', '事件與影響多大'));
+  const title = blockTitle('B5');
+  if (title) box.appendChild(el('div', 'group-title', title));
   lines.forEach((n) => box.appendChild(n));
   return box;
 }
@@ -1968,11 +1977,13 @@ function systemNumbers(payload, view) {
   const panel = view.three_questions;
   const any = Boolean(panel) && (panel.lines || []).some((line) => line.role === 'three_question');
   const revenue = () => [revenueBars(view), ...betShareLines(payload), ...mixFigures(payload), ...mixDetail(payload)];
+  const dies = blockTitle('B9');       // 塊名照 page_schema（L16）
+  const source = blockTitle('B3');
   const parts = any ? [
-    ['will_it_die', '會不會死：算出四盞燈的數字', () => [wipeoutUnlitRule(view)]],
+    ['will_it_die', (dies ? dies + '：' : '') + '算出四盞燈的數字', () => [wipeoutUnlitRule(view)]],
     ['priced_in', '已定價嗎', () => [pricedInPlain(), marketMultiples(view), rulerChart(view)]],
-    ['in_numbers', '出現在數字裡了嗎（營收從哪來）', revenue],
-  ] : [['will_it_die', '', () => []], ['in_numbers', '營收從哪來', revenue]];
+    ['in_numbers', '出現在數字裡了嗎' + (source ? '（' + source + '）' : ''), revenue],
+  ] : [['will_it_die', '', () => []], ['in_numbers', source, revenue]];
   const sections = parts.map(([question, title, extras], i) => {
     const rows = panel && (any || i === 0) ? tqNumbers(view, question) : null;
     const extra = [].concat(extras() || []).filter(Boolean);
