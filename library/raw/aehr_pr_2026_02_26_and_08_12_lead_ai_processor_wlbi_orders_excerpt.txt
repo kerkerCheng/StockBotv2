@@ -1,0 +1,17 @@
+Aehr Test Systems 官網新聞稿兩則：領頭 AI 處理器客戶的晶圓級燒機（FOX-XP）訂單（2026-02-26 1,400 萬美元；2026-08-12 2,200 萬美元追加）節錄
+Source URL: https://www.aehr.com/2026/02/aehr-receives-14-million-order-from-lead-ai-processor-customer-for-multiple-new-fully-automated-fox-xp-wafer-level-burn-in-systems/
+Source URL: https://www.aehr.com/2026/08/aehr-receives-22-million-follow-on-order-for-ai-processor-wafer-level-burn-in-systems/
+RETRIEVED: 2026-11-25（官網 HTML 去標籤）；節錄 2026-11-27（空白正規化、逐字切出）
+NOTE: 發行人新聞稿（供應商自述，L8 弱證據）；客戶沒有具名。
+
+== 2026-02-26 新聞稿
+"Fremont, CA (February 26, 2026) – Aehr Test Systems (NASDAQ: AEHR), a leading provider of test and burn-in solutions for semiconductor devices used in artificial intelligence (AI), data center, automotive, and industrial applications, today announced it has received a $14 million order from its lead AI processor customer for FOX™ systems, WaferPak™ contactors, and Automated WaferPak Auto Aligners for wafer-level burn-in (WLBI) of AI processors used in data center training and inference applications. The order includes multiple new fully automated FOX-XP wafer-level test and burn-in systems, each configured to test nine 300mm wafers in parallel, along with a set of Aehr’s proprietary FOX WaferPak full-wafer Contactors and a fully integrated FOX WaferPak Auto Aligner with each system to enable hands-free operation in high-volume production. The products included in this order are scheduled to ship within the next six months."
+
+== 2026-02-26 新聞稿（執行長）
+"“Our FOX-XP systems configured for very-high-power, high-current AI processors began shipping last year and provides the highest power-per-wafer capability available in the market, delivering up to thousands of amperes of current per wafer,”"
+
+== 2026-08-12 新聞稿
+"FREMONT, CA (August 12, 2026) – Aehr Test Systems (NASDAQ: AEHR), a leading provider of test and burn-in solutions for semiconductor devices used in artificial intelligence (AI), silicon photonics, data center, automotive, and industrial applications, today announced a $22 million follow-on production order from its lead wafer-level AI processor customer. The customer is a leading provider of advanced AI training and inference processors. The order supports the customer’s continued expansion of production capacity utilizing Aehr’s wafer-level burn-in (WLBI) systems and includes multiple fully automated FOX-XP™ WLBI systems, together with Aehr’s proprietary FOX WaferPak™ full-wafer Contactors and integrated FOX WaferPak Auto Aligners™. Each FOX-XP system is configured to test and burn in nine 300 mm wafers simultaneously. Aehr expects to ship the systems over the next six months for installation at the customer’s high-volume manufacturing partner in Taiwan."
+
+== 2026-08-12 新聞稿（執行長）
+"“This $22 million follow-on order represents another significant expansion of WLBI capacity by our lead AI processor customer and further validates the use of our FOX-XP platform in high-volume production,” said Gayn Erickson, President and Chief Executive Officer of Aehr Test Systems. “We are encouraged that the customer’s current production plans contemplate capacity beyond this order"

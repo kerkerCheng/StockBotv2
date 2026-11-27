@@ -209,6 +209,18 @@ def test_story_rules_read_only_keys_the_server_sends() -> None:
     assert {"html_tags", "svg_tags", "svg_text_only", "text_attrs", "patterns"} <= keys
 
 
+def test_story_legend_reads_only_keys_the_server_sends() -> None:
+    """頁首的來源圖例讀 `.meta.json` 的兩個鍵；拼錯一個字，圖例整排不印而且不報錯（L13）。"""
+    from alpha.narrative.story_page import whitelist_payload
+
+    source = APP_JS.read_text(encoding="utf-8")
+    body = source.split("function storyLegend()", 1)[1].split("\n}\n", 1)[0]
+    keys = set(re.findall(r"\bv\.([a-z_]+)", body))
+    assert keys == {"source_levels", "source_level_notes"}, keys
+    assert keys <= set(whitelist_payload())
+    assert "storyLegend()" in source.split("function storyPageHead(sp)", 1)[1].split("\n}\n", 1)[0]
+
+
 @pytest.mark.parametrize("broken", ["function f() { return 1;", "const a = [1, 2;"])
 def test_the_bracket_checker_actually_catches_things(broken: str) -> None:
     """守衛自己也要被驗（INV-5：未量測的機制不得享有默認信任）。"""

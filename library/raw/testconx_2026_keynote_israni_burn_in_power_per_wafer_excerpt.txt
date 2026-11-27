@@ -1,0 +1,16 @@
+TestConX 2026（2026 年 3 月 1–4 日，Mesa, Arizona）主題演講「Burn-In at an Inflection Point: Supporting HPC, Chiplets, and CPO in Production Test」，講者 Vijay Israni，投影片節錄
+來源：TestConX 2026 Archive 的主題演講投影片 PDF；2026-11-25 研究 session 下載（下載網址當時沒記下；文件以首頁「TWENTY-SEVENTH ANNUAL … TestConX … March 1-4, 2026」與第 2 頁標題識別）
+RETRIEVED: 2026-11-25；節錄 2026-11-27（PDF 抽字、空白正規化、逐字切出；「== 投影片第 N 頁」是 PDF 頁序）
+NOTE: 第三方技術簡報（研討會主題演講）。講者的所屬單位投影片上沒寫；2026-11-25 讀到的議程把他列在 ISE Labs（日月光旗下的測試實驗室，也是 Aehr 的合作夥伴）——那一份議程沒存，這一點只當線索。每顆 350 瓦是講者舉的燒機功率例子，不是哪一顆真實晶片。
+
+== 投影片第 2 頁（標題）
+"2026.03.01 Keynote TestConX 2026 r6 Vijay Israni Burn-In at an Inflection Point Supporting HPC, Chiplets, and CPO in Production Test"
+
+== 投影片第 22 頁（晶圓級燒機 WLBI-HTOL）
+"Wafer Level Burn-in (WLBI - HTOL) “the transition” 1. Important for chiplets that don’t go into packages anyway 2. High cost of package qual: Building boards, buying sockets, ATE read point testing 3. Ability to run three lots one on wafer, ATE read points a matter of running one wafer. (assuming <15W / die) Current solutions provide ~3500 Watts per wafer For 240 units 15watts / die For 160 units 22watts / die For 80 units 45watts / die"
+
+== 投影片第 25 頁（晶圓級量產燒機 WLBI-PBI）
+"Wafer Level Production (WLBI-PBI) “the other transition” 1. KGD is -critical for chiplet-based compute dies in HPC and CPO packages 2. Multiple components require production-grade burn-in (BI) Compute DIE (GPU/CPU/cache) Chiplets (compute I/O / OE - PICs) HBM (before stacking and placing into package) Integrated lasers High speed SerDes chiplet What if the total wafer thermal power exceeds 3500Watts?"
+
+== 投影片第 26 頁（高功率元件的量產燒機）
+"Production BI : high power devices Example : compute die a. 350W production BI max power b. 80 die per wafer c. 2-hour Production BI time d. Test made up of MBIST, LBIST, Serdes loop back, etc In this case, 350W x 80 devices = 28KW (3500W limit!) Options 1. Test 10 die at a time, requiring 16 hours total production BI time vs 2hrs 2. Test 40 die at a time, work with DFT to test to reduce vectors to exercise only 25% of the cores/memory at a time, requiring a two pass test but 25% of the power per die"

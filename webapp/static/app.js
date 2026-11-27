@@ -1705,7 +1705,11 @@ function stockPage(payload, view) {
     const slot = article.querySelector('[data-slot="system"]');
     const system = systemBlock(payload, view, sp);
     if (slot) slot.appendChild(system); else article.appendChild(system);
-    article.querySelectorAll('[data-wait]').forEach((node) => node.appendChild(waitBadge(sp, node.getAttribute('data-wait'))));
+    article.querySelectorAll('[data-wait]').forEach((node) => {
+      // 表格的一列：徽章放進最後一格（直接掛在 tr 底下，瀏覽器會把它擠到表格外）
+      const host = node.localName === 'tr' ? (node.lastElementChild || node) : node;
+      host.appendChild(waitBadge(sp, node.getAttribute('data-wait')));
+    });
     box.appendChild(article);
   } else {
     if (sp && sp.absence) {
@@ -1844,8 +1848,30 @@ function storyPageHead(sp) {
     sp.checklist_version ? `照問題清單 ${sp.checklist_version}` : null,
     seen.length ? `看過股價：${seen.join('、')}${sp.price_as_of ? `（看到 ${sp.price_as_of}）` : ''}` : '寫的時候沒看股價'];
   box.appendChild(el('div', 'story-version', bits.filter(Boolean).join('｜')));
+  const legend = storyLegend();
+  if (legend) box.appendChild(legend);
   if (sp.stale) box.appendChild(el('div', 'warn story-stale', storyStaleText(sp)));
   if (sp.brief_note) box.appendChild(el('div', 'note', `對版沒核：${sp.brief_note}`));
+  return box;
+}
+
+/** 句尾來源標記的圖例（三份冷讀都說標籤沒有說明；發布版頁首有這一排）。等級與白話都來自 `.meta.json`
+ *  （`source_levels`、`source_level_notes`，字只住 `alpha.narrative.story_page`）；讀不到就不印，不另寫一份。 */
+function storyLegend() {
+  const v = (VOCAB && VOCAB.story_page) || {};
+  const notes = v.source_level_notes || {};
+  const levels = (Array.isArray(v.source_levels) ? v.source_levels : []).filter((level) => notes[level]);
+  if (!levels.length) return null;
+  const box = el('div', 'story-legend');
+  box.appendChild(el('span', '', '句尾的標記：'));
+  levels.forEach((level) => {
+    const item = el('span', 'story-legend-item');
+    const chip = el('span', 'src', level);
+    chip.setAttribute('data-src', level);
+    item.appendChild(chip);
+    item.appendChild(document.createTextNode(notes[level]));
+    box.appendChild(item);
+  });
   return box;
 }
 

@@ -209,6 +209,14 @@ def test_mutation_text_only_rule_is_what_rejects_whitelisted_tags_inside_desc(mo
     assert "E1" not in _codes(_check(_inject(INJECTIONS["svg_desc_whitelisted_tag"])))
     assert "svg_text_only" in sp.whitelist_payload()                     # 前端照同一份
 
+
+def test_every_source_level_has_a_plain_note_for_the_legend() -> None:
+    """頁首圖例（app.js storyLegend）照 `source_levels` 的順序印 `source_level_notes`：少一個等級的白話，那個標記在 APP
+    就沒有說明而且不報錯（Step 8.5 三份冷讀都抓到「標籤沒有說明」）。"""
+    payload = sp.whitelist_payload()
+    assert set(payload["source_level_notes"]) == set(payload["source_levels"]) == set(sp.SOURCE_LEVELS)
+    assert all(note.strip() for note in payload["source_level_notes"].values())
+
 # ---------------------------------------------------------------- E2：結構
 
 def _swap(a: str, b: str) -> str:

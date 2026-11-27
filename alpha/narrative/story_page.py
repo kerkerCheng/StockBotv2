@@ -67,6 +67,11 @@ _TEXT_ATTRS: frozenset[str] = frozenset({"title", "aria-label", "data-label", "c
 
 #: 每句的來源等級（`<span class="src" data-src="…">`）：封閉字彙。
 SOURCE_LEVELS: tuple[str, ...] = ("自述", "買方", "第三方", "推一步", "網路")
+#: 每個等級的白話（APP 故事頁頁首的圖例照印；2026-11-25 三頁發布版頁首的那一排）。Step 8.5 三份冷讀都指出標籤沒有說明——
+#: 發布版有圖例、搬進 APP 時頁首只准 h1＋段落，圖例改由 APP 印，字只住這裡（L16）。
+SOURCE_LEVEL_NOTES: Mapping[str, str] = {
+    "自述": "賣的人自己說", "買方": "買的人說", "第三方": "別人說", "推一步": "從文件推的", "網路": "這次上網查的",
+}
 #: 頁上等待的種類（宣告 `waits[].kind`）。
 WAIT_KINDS: tuple[str, ...] = ("disproof", "confirm", "date")
 #: 自評的三個值（十二題各一個）。
@@ -801,6 +806,7 @@ def whitelist_payload() -> dict[str, Any]:
     return {"html_tags": sorted(HTML_TAGS), "svg_tags": sorted(SVG_TAGS), "void_tags": sorted(VOID_TAGS),
             "global_attrs": sorted(GLOBAL_ATTRS), "tag_attrs": {k: sorted(v) for k, v in TAG_ATTRS.items()},
             "svg_attrs": sorted(SVG_ATTRS), "svg_namespace": SVG_NAMESPACE, "source_levels": list(SOURCE_LEVELS),
+            "source_level_notes": dict(SOURCE_LEVEL_NOTES),
             "wait_kinds": list(WAIT_KINDS), "text_attrs": sorted(_TEXT_ATTRS), "svg_text_only": sorted(SVG_TEXT_ONLY),
             # 網址與 id 的規則（前端 `new RegExp` 照用；比對前先拿掉空白與控制字元再小寫，同 `_squash`）
             "patterns": {"id": _ID.pattern, "href": _SAFE_HREF.pattern, "url_ref": _LOCAL_URL_REF.pattern,
@@ -846,7 +852,7 @@ def cold_read_prompt(page_path: str) -> str:
 __all__ = [
     "COLD_READ_DIR", "COLD_READ_PROMPT", "COLD_READ_SECTIONS", "DECLARATION_KEYS", "Finding", "GLOBAL_ATTRS", "HTML_TAGS",
     "Node", "PageCheck", "QUESTION_IDS", "SECTION_IDS",
-    "SELF_EVAL_VALUES", "SOURCE_LEVELS", "SVG_ATTRS", "SVG_TAGS", "SVG_TEXT_ONLY", "TAG_ATTRS", "VISIBLE_CHARS_RANGE",
+    "SELF_EVAL_VALUES", "SOURCE_LEVEL_NOTES", "SOURCE_LEVELS", "SVG_ATTRS", "SVG_TAGS", "SVG_TEXT_ONLY", "TAG_ATTRS", "VISIBLE_CHARS_RANGE",
     "WAIT_KINDS",
     "all_text", "check_page", "cold_read_problems", "cold_read_prompt", "declaration_problems", "fragment_problems",
     "normalize_for_match",
