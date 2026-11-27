@@ -277,6 +277,12 @@ def build_sentences(brief: BriefText, *, story: Mapping[str, Any] | None = None)
         bet = story.get("bet") if isinstance(story.get("bet"), Mapping) else {}
         for key, basis in (("stake", "our_bet"), ("doubling", "what_must_be_true")):
             rows += [(f"story:bet.{key}", s, tuple(by_slot.get(basis) or ()) or every) for s in split_sentences(bet.get(key))]
+        # 淺寫頁首（2026-11-27）：它總結整份敘事，所以對整份的引用核；來源標記〔自述〕不是事實，切句前拿掉
+        from .story import hero_plain
+
+        hero = story.get("hero") if isinstance(story.get("hero"), Mapping) else {}
+        for text in [hero.get("title"), *(hero.get("paragraphs") or ())]:
+            rows += [("story:hero", s, every) for s in split_sentences(hero_plain(text))]
     out = []
     listing: str | None = None            # 正在「錯的訊號」清單裡的那一格
     for n, (where, text, refs) in enumerate(rows, 1):
@@ -1262,6 +1268,8 @@ def where_label(where: str) -> str:
         return "候選理由"
     if where == "story:candidate":
         return "故事：候選理由"
+    if where == "story:hero":
+        return "故事：淺寫頁首"
     if where.startswith("depth:"):
         return "深挖清單：" + dict(DEPTH_CHECK_ITEMS).get(where[6:], where[6:])
     if where.startswith("story:bet."):

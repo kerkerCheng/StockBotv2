@@ -257,6 +257,21 @@ Lumentum、住友並列，協議也是非獨家。它和別家不同在六吋磷
   只寫「2027 年初」「約 2–3 月」讀不出日子。畫面把那一句原文跟日子一起印，讀錯看得出來。
 - 寫了之後它跟故事其他句一起進逐句核對；敘事換版，賭注句跟著過期（⑤ 那一格會自己出現）。
 
+**段「淺寫頁首」（⑤「頁首還沒寫」；2026-11-27 使用者：沒做深的檔「我看不懂」、不知道要不要做深 →「走2」）**：可開與已持有、
+還沒有故事頁的每一檔，故事帶一段頁首——標題一句＋三到四段（它是誰、已經知道的、夢在哪、什麼會讓夢醒），住故事紀錄的選填鍵
+`hero`，**不換敘事版本**。寫法照 [`skills/stock-story/SKILL.md`](../stock-story/SKILL.md)「淺寫頁首」段：只用帳上已有的敘事、
+故事與它們的引用，**不對外蒐證**（要蒐證就是做深，由使用者點名）；每句句尾帶來源標記。
+
+```powershell
+& '.venv\Scripts\python.exe' -m alpha stories --hero-gaps                         # 該寫的那幾檔（與 ⑤ 同一份判定）
+& '.venv\Scripts\python.exe' -m alpha stories <T>                                # 現行故事、賭注句、頁首
+& '.venv\Scripts\python.exe' -m alpha brief <T> --show                           # 依據原文（價格欄預設遮住）
+& '.venv\Scripts\python.exe' -m alpha stories --hero-only --check spec.json      # spec：[{ticker, hero: {title, paragraphs}}]
+& '.venv\Scripts\python.exe' -m alpha stories --hero-only --add spec.json        # 故事其他格與賭注句沿用現行那一筆
+& '.venv\Scripts\python.exe' -m alpha brief-check <T> --record --changed 0 --note "加淺寫頁首"   # 故事換了要再核（頁首的句子也核）
+& '.venv\Scripts\python.exe' -m webapp materialize <T>                           # 個股頁才看得到
+```
+
 以下是**三段固定**：
 
 1. **所有「使用者已授權、還沒做完」的項目** — 放著不動是本 skill 要修的那個 bug。

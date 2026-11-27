@@ -494,6 +494,18 @@ def _story_slots(story: Mapping[str, Any] | None, brief: Any, values: Mapping[st
             dependencies={"raw_text": text, "missing": gaps, "story_id": story.get("story_id"),
                           "brief_id": brief.brief_id,
                           "basis_line": None if key in STORY_ONLY_KEYS else f"brief:{key}"}))
+    # 淺寫頁首（2026-11-27「走2」）：沒做深的檔的個股頁印在最前面。值是 {title, paragraphs}（不是字串——短故事那一段
+    # 只收字串的格，不會把它當成一格印第二次）；句尾的來源標記照抄，前端畫成標籤。不收佔位字，所以不填值
+    hero = story.get("hero")
+    if isinstance(hero, Mapping) and str(hero.get("title") or "").strip():
+        out.append(Datum(
+            key="story:hero", label="淺寫頁首",
+            value={"title": str(hero.get("title")).strip(),
+                   "paragraphs": [str(p).strip() for p in hero.get("paragraphs") or () if str(p).strip()]},
+            status="available", basis="session_judgment", authority=A_STORY, as_of=written,
+            evidence_refs=tuple(dict.fromkeys(r for refs in basis_refs.values() for r in refs)),
+            reason="只用帳上已有的敘事與證據寫，沒有對外蒐證；要讀完整的故事就點名做深",
+            dependencies={"story_id": story.get("story_id"), "brief_id": brief.brief_id}))
     return tuple(out)
 
 

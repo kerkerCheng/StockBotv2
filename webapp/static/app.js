@@ -1720,14 +1720,17 @@ function stockPage(payload, view) {
     });
     box.appendChild(article);
   } else {
+    const hero = heroBlock(view);
     if (sp && sp.absence) {
       box.appendChild(el('div', 'warn', `故事頁讀不到：${sp.absence.reason || absenceLabel(sp.absence.kind) || '沒說為什麼'}`));
     } else if (sp && sp.html) {
       box.appendChild(el('div', 'warn', '故事頁的白名單讀不到（.meta.json 是舊的：重跑 python -m webapp materialize）——不印片段'));
     } else {
       // 有故事頁只是印不出來時不說「還沒做深」（做了、只是這一輪讀不到——上面那一行講原因）
-      box.appendChild(el('p', 'note not-deep', '這一檔還沒做深：下面是短故事與系統裡的它。'));
+      box.appendChild(el('p', 'note not-deep', hero ? '這一檔還沒做深：下面是淺寫的頁首、短故事與系統裡的它。'
+        : '這一檔還沒做深：下面是短故事與系統裡的它。'));
     }
+    if (hero) box.appendChild(hero);
     box.appendChild(shortStory(view));
     pageDiagrams(payload, view).forEach((n) => box.appendChild(n));
     box.appendChild(systemBlock(payload, view, null));
@@ -1738,6 +1741,38 @@ function stockPage(payload, view) {
   old.appendChild(link);
   box.appendChild(old);
   return box;
+}
+
+/** 淺寫頁首（2026-11-27 使用者「走2」：沒做深的檔「我看不懂」、不知道要不要做深）：標題一句＋三四段，句尾〔來源〕畫成
+ *  故事頁同一種標籤與圖例。只用帳上已有的敘事與證據寫（沒有對外蒐證），頁上寫明「淺寫」。沒寫＝null，下面照舊印短故事。 */
+function heroBlock(view) {
+  const row = ((view.brief && view.brief.lines) || []).find((r) => r.key === 'story:hero');
+  const value = row && row.datum && row.datum.value;
+  if (!value || typeof value !== 'object' || !value.title) return null;
+  const box = el('div', 'story-hero');
+  box.appendChild(el('div', 'story-hero-note', '淺寫：只用已有的敘事與證據寫，還沒對外蒐證'));
+  box.appendChild(el('h3', 'story-hero-title', value.title));
+  (Array.isArray(value.paragraphs) ? value.paragraphs : []).forEach((text) => box.appendChild(heroParagraph(text)));
+  const legend = storyLegend();
+  if (legend) box.appendChild(legend);
+  return box;
+}
+
+/** 一段頁首：句尾〔等級〕換成標籤（等級只認 `.meta.json` 的 `source_levels`；認不得的照字印，不吞）。 */
+function heroParagraph(text) {
+  const p = el('p', 'story-hero-p');
+  const levels = new Set((((VOCAB && VOCAB.story_page) || {}).source_levels) || []);
+  String(text || '').split(/(〔[^〔〕]{1,8}〕)/).forEach((part) => {
+    const mark = /^〔([^〔〕]{1,8})〕$/.exec(part);
+    if (mark && levels.has(mark[1])) {
+      const chip = el('span', 'src', mark[1]);
+      chip.setAttribute('data-src', mark[1]);
+      p.appendChild(chip);
+    } else if (part) {
+      p.appendChild(document.createTextNode(part));
+    }
+  });
+  return p;
 }
 
 /** 故事頁的白名單與網址規則（`.meta.json` 的 `story_page`）。讀不到、或缺任何一條規則就回 null——寧可不印片段，也不放寬
@@ -1909,7 +1944,7 @@ function waitBadge(sp, key) {
  *  營收從哪來——客戶集中度、backlog 也在這裡）⑥已登記的等待（反證、確認條件、事件與影響多大、時間表）⑦現在的股價
  *  ⑧這一頁和系統對不上的（只在有故事頁時）。
  *  2026-11-26 落地時逐行對照舊版：需求錨的四張圖、吃到多少、各格的依據（短故事那一格的原文）、各塊標題只在舊版
- *  （頁尾連結；刪舊版之前要先決定它們的去處——plan 8.6 待決）。 */
+ *  （頁尾連結）。「會不會死」那一行總結 2026-11-27 使用者「加回去就夠了」：放在四盞燈上面，點了跳到算出燈的數字。 */
 function systemBlock(payload, view, sp) {
   const box = el('div', 'system-block');
   box.appendChild(el('h2', 'system-title', '系統裡的它'));
@@ -1931,6 +1966,8 @@ function systemBlock(payload, view, sp) {
   if (glossary) box.appendChild(drill('名詞：層、插槽、押在哪一格', () => glossary));
   const seats = seatsDetail(payload, view);
   if (seats) box.appendChild(seats);
+  const dies = lampLine(view);           // 會不會死一行（最差那盞的詞＋不是綠的那幾盞的短句）
+  if (dies) box.appendChild(dies);
   const lamps = lampsBlock(view, true);
   if (lamps) box.appendChild(lamps);
   wordsBlock(view, ['priced_in', 'in_numbers']).forEach((n) => box.appendChild(n));

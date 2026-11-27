@@ -144,6 +144,11 @@ def story_spec_problems(spec: Mapping[str, Any], brief: Any) -> list[str]:
         from alpha.narrative.story import bet_problems
 
         problems += bet_problems(spec["bet"], disproof_count=len(getattr(brief, "disproof", ()) or ()))
+    # 淺寫頁首（選填；2026-11-27「走2」）：寫了才檢查
+    if spec.get("hero") is not None:
+        from alpha.narrative.story import hero_problems
+
+        problems += hero_problems(spec["hero"])
     return problems
 
 
@@ -199,11 +204,21 @@ def prepare_story(ticker: str, spec: Mapping[str, Any], *, path: Path | None = N
     if isinstance(bet, Mapping):
         body["bet"] = {"stake": str(bet.get("stake") or "").strip(), "doubling": str(bet.get("doubling") or "").strip(),
                        "disproof": bet.get("disproof")}
+    # 淺寫頁首同賭注句：選填鍵，寫了才進 body
+    hero = spec.get("hero")
+    if isinstance(hero, Mapping):
+        paragraphs = hero.get("paragraphs")
+        body["hero"] = {"title": str(hero.get("title") or "").strip(),
+                        "paragraphs": [str(p).strip() for p in paragraphs] if isinstance(paragraphs, list) else []}
     head = current.get(brief.brief_id)
-    if head is not None and all(head.get(k) == body[k] for k in body) and head.get("bet") == body.get("bet"):
+    if head is not None and all(head.get(k) == body[k] for k in body) and all(
+            head.get(k) == body.get(k) for k in OPTIONAL_STORY_KEYS):
         problems.append(f"跟現行那一筆（{head['story_id']}）一樣——不必再寫")
-    elif head is not None and head.get("bet") and "bet" not in body:
-        problems.append(f"現行那一筆（{head['story_id']}）有賭注句、這一筆沒有——改故事的字要把 bet 一起帶上（不帶就等於把那一句拿掉）")
+    elif head is not None:
+        for key, what in (("bet", "賭注句"), ("hero", "淺寫頁首")):
+            if head.get(key) and key not in body:
+                problems.append(f"現行那一筆（{head['story_id']}）有{what}、這一筆沒有——改故事的字要把 {key} 一起帶上"
+                                f"（不帶就等於把它拿掉）")
     stamp = (now or datetime.now(timezone.utc)).astimezone(timezone.utc).isoformat()
     record = {"story_id": story_id(brief.brief_id, stamp, body), "brief_id": brief.brief_id, "company_id": company,
               "ticker": str(brief.ticker), "created_at": stamp, "author": author, **body}
@@ -214,10 +229,15 @@ def prepare_story(ticker: str, spec: Mapping[str, Any], *, path: Path | None = N
     return record, problems
 
 
-def bet_only_spec(ticker: str, bet: Any, *, path: Path | None = None, today: date | None = None,
-                  brief_loader: Callable[[str], tuple[Sequence[Any], Sequence[str]]] | None = None) -> dict[str, Any]:
-    """只加（或換）賭注句的 spec：故事其他格**沿用**這一檔現行敘事的現行故事，一個字不動（`stories --bet-only`）。
-    沒有現行的 v2 敘事、或那一版還沒有故事：raise——賭注句是故事的一部分，先寫故事。"""
+#: 故事紀錄的選填鍵（寫了才進紀錄；沒寫的舊紀錄 id 照舊算）：賭注句（2026-11-22）、淺寫頁首（2026-11-27）。
+#: 只換其中一個時，其餘照現行那一筆帶上（`_keep_spec`）——不帶就等於拿掉，`prepare_story` 會擋。
+OPTIONAL_STORY_KEYS: tuple[str, ...] = ("bet", "hero")
+
+
+def _keep_spec(ticker: str, what: str, *, path: Path | None = None, today: date | None = None,
+               brief_loader: Callable[[str], tuple[Sequence[Any], Sequence[str]]] | None = None) -> dict[str, Any]:
+    """這一檔現行敘事的現行故事，原樣做成 spec（一個字不動）。沒有現行的 v2 敘事、或那一版還沒有故事：raise——
+    `what`（賭注句／淺寫頁首）是故事的一部分，先寫故事。"""
     from alpha.narrative.contracts import RECORD_VERSION_V2, select_brief
 
     from .briefs import read_brief_records
@@ -225,13 +245,58 @@ def bet_only_spec(ticker: str, bet: Any, *, path: Path | None = None, today: dat
     records, _errors = (brief_loader or read_brief_records)(str(ticker))
     brief = select_brief(list(records), as_of=None, today=today or date.today())
     if brief is None or brief.record_version != RECORD_VERSION_V2:
-        raise ContractViolation(f"{ticker} 沒有現行的 v2 敘事——賭注句寫給一版敘事的故事")
+        raise ContractViolation(f"{ticker} 沒有現行的 v2 敘事——{what}寫給一版敘事的故事")
     head = current_stories(path=path)[0].get(brief.brief_id)
     if head is None:
         raise ContractViolation(f"{ticker} 現行那一版敘事（{brief.brief_id}）還沒有故事——先寫故事（python -m alpha stories --gaps）")
-    return {"ticker": str(ticker), "brief_id": brief.brief_id, "slots": dict(head.get("slots") or {}),
-            "evidence": {k: list(v) for k, v in (head.get("evidence") or {}).items()},
-            "candidate": dict(head.get("candidate") or {}), "bet": bet}
+    spec: dict[str, Any] = {"ticker": str(ticker), "brief_id": brief.brief_id, "slots": dict(head.get("slots") or {}),
+                            "evidence": {k: list(v) for k, v in (head.get("evidence") or {}).items()},
+                            "candidate": dict(head.get("candidate") or {})}
+    for key in OPTIONAL_STORY_KEYS:
+        if head.get(key) is not None:
+            spec[key] = head[key]
+    return spec
+
+
+def bet_only_spec(ticker: str, bet: Any, *, path: Path | None = None, today: date | None = None,
+                  brief_loader: Callable[[str], tuple[Sequence[Any], Sequence[str]]] | None = None) -> dict[str, Any]:
+    """只加（或換）賭注句的 spec：故事其他格與頁首**沿用**這一檔現行敘事的現行故事，一個字不動（`stories --bet-only`）。"""
+    return {**_keep_spec(ticker, "賭注句", path=path, today=today, brief_loader=brief_loader), "bet": bet}
+
+
+def hero_only_spec(ticker: str, hero: Any, *, path: Path | None = None, today: date | None = None,
+                   brief_loader: Callable[[str], tuple[Sequence[Any], Sequence[str]]] | None = None) -> dict[str, Any]:
+    """只加（或換）淺寫頁首的 spec：故事其他格與賭注句沿用現行那一筆（`stories --hero-only`）。"""
+    return {**_keep_spec(ticker, "淺寫頁首", path=path, today=today, brief_loader=brief_loader), "hero": hero}
+
+
+# 淺寫頁首該不該寫（⑤「頁首還沒寫」與 `alpha stories --hero-gaps` 的唯一判定，L16）。只看可開與已持有（賭注句同一組
+# `BET_GROUPS`——這兩組才有「要不要做深」的問題）；已經有故事頁的不用（故事頁自己有頁首）；這一版敘事還沒有故事的
+# 不在這裡數（它在「故事還沒寫」，頁首是故事的一部分，先寫故事——不重複數）。
+HERO_STATES: tuple[str, ...] = ("written", "not_written", "has_page", "no_story")
+
+
+def hero_state(row: Mapping[str, Any], *, stories: Mapping[str, Mapping[str, Any]],
+               page_companies: Iterable[str]) -> str:
+    """候選板的一列 → `HERO_STATES` 之一。`row` 要有 `brief_id`、`company_id`（候選列本來就有）。"""
+    if str(row.get("company_id") or "") in set(page_companies):
+        return "has_page"
+    story = stories.get(str(row.get("brief_id") or ""))
+    if story is None:
+        return "no_story"
+    return "written" if isinstance(story.get("hero"), Mapping) else "not_written"
+
+
+def hero_gaps(groups: Mapping[str, Sequence[Mapping[str, Any]]], *, stories: Mapping[str, Mapping[str, Any]],
+              page_companies: Iterable[str]) -> list[dict[str, Any]]:
+    """可開與已持有裡、有故事、沒有故事頁、還沒寫頁首的列（依 ticker 列；索引，不是名次）。"""
+    from alpha.bet_line import BET_GROUPS
+
+    pages = set(page_companies)
+    out = [{"ticker": str(r.get("ticker")), "company_id": r.get("company_id"), "brief_id": r.get("brief_id"),
+            "group": g} for g in BET_GROUPS for r in groups.get(g) or ()
+           if hero_state(r, stories=stories, page_companies=pages) == "not_written"]
+    return sorted(out, key=lambda r: r["ticker"])
 
 
 def story_gaps(briefs: Iterable[Any], *, stories: Mapping[str, Mapping[str, Any]],
@@ -274,6 +339,7 @@ def gaps_now(*, today: date | None = None, path: Path | None = None) -> tuple[li
     return story_gaps(current_v2_briefs(today=today), stories=current, all_story_briefs=written), errors
 
 
-__all__ = ["STORIES_PATH", "STORY_GAP_KINDS", "bet_only_spec", "current_stories", "current_v2_briefs", "gaps_now", "prepare_story",
+__all__ = ["HERO_STATES", "OPTIONAL_STORY_KEYS", "STORIES_PATH", "STORY_GAP_KINDS", "bet_only_spec", "current_stories",
+           "current_v2_briefs", "gaps_now", "hero_gaps", "hero_only_spec", "hero_state", "prepare_story",
            "read_records",
            "story_at", "story_gaps", "story_id", "story_spec_problems", "write_story"]

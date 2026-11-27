@@ -75,6 +75,12 @@ LEDGER: tuple[LedgerRow, ...] = (
     # 不要求入圖（否則這一格恆亮，L14④）
     LedgerRow("todo.story_page", "故事頁該對版", "檔",
               "`python -m alpha story-page gaps` → 對版 `rebind`、小修 `add`、登記等待或線索"),
+    # 2026-11-27 使用者「走2」（沒做深的檔「我看不懂」，不知道要不要做深）：可開與已持有、沒有故事頁的，故事先帶一段淺寫頁首
+    # （只用帳上已有的敘事與證據；讀完再點名做深）。頁首是故事的一部分，敘事換版就跟著故事過期——這一格會自己再亮（L14）
+    LedgerRow("todo.hero", "頁首還沒寫", "檔",
+              "`python -m alpha stories --hero-gaps` → 逐檔 `python -m alpha stories <T>` 讀現行故事、敘事與引用 → 照 stock-story"
+              "「淺寫頁首」段寫 `[{ticker, hero: {title, paragraphs}}]` → `python -m alpha stories --hero-only --check spec.json` → "
+              "`--add` → `python -m alpha brief-check <T> --record --changed K --note …`（故事換了要再核）"),
     # 2026-11-12 使用者「先修吧」（事實抽樣① 11 份 8 份有錯，過了 registration 2026-11-03 的判讀線）：寫敘事沒有一步逐句對過原文。
     # 現行每一版敘事（＋它現行的故事）都要有一筆核對紀錄；換版或故事換了就再核（上一版核過、一字不差的句子自動沿用）
     LedgerRow("todo.fact_check", "敘事還沒逐句核對", "檔",
@@ -200,6 +206,11 @@ COVERAGE: Mapping[str, str] = {
     "story_page:stale": "todo.story_page",              # 敘事換版：對過新舊兩版，沒變就 rebind、變了才小修 add
     "story_page:unregistered_wait": "todo.story_page",  # 頁上寫了要等的事、等待 registry 還沒登記
     "story_page:ride_mismatch": "todo.story_page",      # 押的節點不在現行敘事裡，或圖上缺的那一層還沒登記成線索
+    # --- 淺寫頁首（alpha.providers.stories.HERO_STATES；可開與已持有才算欠，2026-11-27）
+    "hero:written": "terminal",
+    "hero:not_written": "todo.hero",
+    "hero:has_page": "terminal",                 # 有故事頁：頁首在故事頁裡
+    "hero:no_story": "todo.story",               # 這一版敘事還沒有故事：先寫故事（不重複數）
     # --- 敘事逐句核對（alpha.providers.fact_checks.FACT_CHECK_GAP_KINDS；2026-11-12）
     "fact_check:brief": "todo.fact_check",       # 這一版敘事還沒有核對紀錄
     "fact_check:story": "todo.fact_check",       # 核過之後故事換了
@@ -376,8 +387,8 @@ def collect(*, today: date, leads_store: Mapping[str, Any], watches: Sequence[Ma
             candidates: Mapping[str, Any] | None, thesis_due: Sequence[str] | None,
             loaders: Mapping[str, Callable[[], Any]] | None = None) -> list[LedgerCount]:
     """⑤ 每一格的計數。注入的值是呼叫端讀過的 authority（心跳讀 artifact 與 ledger）；None＝那個 authority 沒讀到。
-    `loaders`：要另外讀檔才算得出的格（停放未處置對照、名冊重算、缺分類、故事還沒寫、故事頁該對版、入圖包抽查帳、
-    敘事還沒逐句核對）——測試可換掉。"""
+    `loaders`：要另外讀檔才算得出的格（停放未處置對照、名冊重算、缺分類、故事還沒寫、故事頁該對版、頁首還沒寫
+    〔`current_stories`、`story_page_companies`〕、入圖包抽查帳、敘事還沒逐句核對）——測試可換掉。"""
     from engine_b import event_watch as ew
     from engine_b import queue_segments as qs
 
@@ -691,6 +702,31 @@ def collect(*, today: date, leads_store: Mapping[str, Any], watches: Sequence[Ma
         put("todo.story_page", len(by_ticker), work=work or None, oldest_days=_oldest((g.get("since") for g in gaps), today))
 
     guarded("todo.story_page", story_page)
+
+    def hero() -> None:
+        # `alpha.providers.stories.hero_gaps`——`python -m alpha stories --hero-gaps` 同一份判定（L16）。板沒讀到、持股沒讀到、
+        # 舊板（列上沒有 brief_id）都是未讀到，不是 0（INV-3）；故事帳或故事頁帳讀不到由 guarded 接住
+        from alpha.bet_line import BET_GROUPS
+        from alpha.providers.stories import current_stories, hero_gaps
+        from alpha.providers.story_pages import current_pages
+
+        cell = rows["todo.hero"]
+        groups = (candidates or {}).get("groups") or {}
+        if candidates is None:
+            cell.reason = "候選板未讀到"
+            return
+        if ((candidates.get("holdings") or {}).get("status") or "ok") != "ok":
+            cell.reason = "持股沒讀到——已持有那一半數不到"
+            return
+        if any("brief_id" not in r for g in BET_GROUPS for r in groups.get(g) or ()):
+            cell.reason = "候選板是舊版（列上沒有 brief_id）"
+            return
+        stories = (loaders.get("current_stories") or (lambda: current_stories()[0]))()
+        pages = (loaders.get("story_page_companies") or (lambda: set(current_pages()[0])))()
+        found = hero_gaps(groups, stories=stories, page_companies=pages)
+        put("todo.hero", len(found), work="、".join(r["ticker"] for r in found) or None)
+
+    guarded("todo.hero", hero)
 
     def fact_check() -> None:
         # `alpha.providers.fact_checks.gaps_now`——`python -m alpha brief-check --gaps` 同一份判定（L16）。工作量照候選板的組分

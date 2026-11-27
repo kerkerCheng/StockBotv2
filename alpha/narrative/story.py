@@ -87,7 +87,8 @@ def story_length(text: str) -> int:
 
 def story_problems(key: str, text: object, *, limit: int = STORY_MAX) -> list[str]:
     """一句故事的問題清單（空＝可以寫）。`key` 是格名（`demand`…）或 `candidate`；只用來寫錯誤訊息。"""
-    label = STORY_SLOT_LABELS.get(key) or BET_LABELS.get(key) or ("候選理由" if key == "candidate" else key)
+    label = (STORY_SLOT_LABELS.get(key) or BET_LABELS.get(key) or HERO_LABELS.get(key)
+             or ("候選理由" if key == "candidate" else key))
     where = f"故事〔{label}〕"
     if not isinstance(text, str) or not text.strip():
         return [f"{where} 必須是非空字串"]
@@ -272,7 +273,81 @@ def bet_problems(bet: object, *, disproof_count: int) -> list[str]:
     return out
 
 
+# ---------------------------------------------------------------------------
+# 淺寫頁首（2026-11-27 使用者：「預設每一檔都寫一小部分的內容？再來做深？」→ 選 ②「走2」）
+# ---------------------------------------------------------------------------
+# 沒做深的檔，個股頁只有九格短故事——使用者讀了「不知道要不要做深，因為我看不懂」。故事頁的頁首（標題一句＋三四段：
+# 它是誰、已經知道的、夢在哪、什麼會讓夢醒）才是寫給從頭讀的人；淺寫＝只用帳上已有的敘事與證據寫這一段、不對外蒐證，
+# 讓人讀完挑要做深的。它是故事（不比依據多主張）：住故事紀錄的選填鍵 `hero`，敘事換版就跟著故事一起過期——同賭注句。
+# 每句句尾帶來源等級〔自述〕〔買方〕〔第三方〕〔推一步〕〔網路〕（字彙只住 `story_page.SOURCE_LEVELS`；AGENTS「故事不比依據
+# 多主張」：每句帶來源等級）。不收佔位字：這一段也印在沒有值表的地方（`alpha stories`），同一句不能有兩種樣子（L12）。
+
+HERO_KEYS: tuple[str, ...] = ("title", "paragraphs")
+HERO_LABELS: Mapping[str, str] = {"hero.title": "頁首：標題", "hero.paragraph": "頁首：段落"}
+HERO_TITLE_MAX = 40
+#: 段落數：它是誰、已經知道的、夢在哪、什麼會讓夢醒——三到四段（故事頁頁首同一個寫法，`skills/stock-story`「寫法規則」）。
+HERO_PARAGRAPHS: tuple[int, int] = (3, 4)
+HERO_PARAGRAPH_MAX = STORY_MAX
+#: 句尾的來源標記：〔等級〕緊接在句號（。！？）前；最後一句可以沒有句號、標記在段尾。
+HERO_MARK = re.compile(r"〔([^〔〕]{0,8})〕")
+_HERO_SENTENCE = re.compile(r"[^。！？]+(?:[。！？]+|$)")
+_HERO_TAIL = re.compile(r"〔[^〔〕]{1,8}〕$")
+
+
+def hero_plain(text: object) -> str:
+    """頁首的一段拿掉來源標記（給字數、寫法檢查與逐句核對用——標記不是事實）。"""
+    return HERO_MARK.sub("", text) if isinstance(text, str) else ""
+
+
+def hero_sentences(text: object) -> list[str]:
+    """一段頁首切句（標記留著）。"""
+    if not isinstance(text, str):
+        return []
+    return [m.group(0).strip() for m in _HERO_SENTENCE.finditer(text.strip()) if m.group(0).strip(" 　。！？")]
+
+
+def hero_problems(hero: object) -> list[str]:
+    """淺寫頁首的問題清單（空＝可以寫）。純函式。"""
+    from .story_page import SOURCE_LEVELS
+
+    shape = "hero 必須是 {title: 標題一句, paragraphs: [三到四段：它是誰、已經知道的、夢在哪、什麼會讓夢醒]}"
+    if not isinstance(hero, Mapping):
+        return [shape]
+    out: list[str] = []
+    unknown = sorted(set(hero) - set(HERO_KEYS))
+    if unknown:
+        out.append(f"hero 有不認得的鍵 {unknown}；認得的是 {list(HERO_KEYS)}")
+    title = hero.get("title")
+    out += story_problems("hero.title", title, limit=HERO_TITLE_MAX)
+    if isinstance(title, str) and HERO_MARK.search(title):
+        out.append("故事〔頁首：標題〕不帶來源標記——標題是下面幾段的總結，標記放在段落的句尾")
+    paragraphs = hero.get("paragraphs")
+    low, high = HERO_PARAGRAPHS
+    if not isinstance(paragraphs, list) or not low <= len(paragraphs) <= high:
+        out.append(f"hero.paragraphs 必須是 {low} 到 {high} 段的清單（它是誰、已經知道的、夢在哪、什麼會讓夢醒）")
+        return out
+    for n, text in enumerate(paragraphs, 1):
+        where = f"故事〔頁首：第 {n} 段〕"
+        if not isinstance(text, str) or not text.strip():
+            out.append(f"{where} 必須是非空字串")
+            continue
+        out += [p.replace("故事〔頁首：段落〕", where) for p in story_problems("hero.paragraph", hero_plain(text),
+                                                                           limit=HERO_PARAGRAPH_MAX)]
+        if SIMPLE_PLACEHOLDER.search(text) or PARAM_PLACEHOLDER.search(text):
+            out.append(f"{where} 用了佔位字——頁首不用（這一段也印在沒有值可填的地方）：寫到哪一季的事實，現價與百分位留在系統那一塊")
+        for word in HERO_MARK.findall(text):
+            if word not in SOURCE_LEVELS:
+                out.append(f"{where} 的來源標記〔{word}〕不在字彙裡；認得的是 {'、'.join(SOURCE_LEVELS)}")
+        for sentence in hero_sentences(text):
+            if not _HERO_TAIL.search(sentence.rstrip("。！？ 　")):
+                out.append(f"{where} 這一句句尾沒有來源標記（〔自述〕〔買方〕〔第三方〕〔推一步〕〔網路〕放在句號前）："
+                           f"{hero_plain(sentence)[:24]}")
+    return out
+
+
 __all__ = [
+    "HERO_KEYS", "HERO_LABELS", "HERO_MARK", "HERO_PARAGRAPHS", "HERO_PARAGRAPH_MAX", "HERO_TITLE_MAX",
+    "hero_plain", "hero_problems", "hero_sentences",
     "BET_DOUBLING_MAX", "BET_KEYS", "BET_LABELS", "BET_PRICE_WORDS", "BET_STAKE_MAX",
     "BET_UNMEASURABLE_PREFIX", "DOUBLING_KINDS", "DOUBLING_KIND_LABELS", "bet_problems", "doubling_kind",
     "CANDIDATE_STORY_MAX", "MISSING_LABEL_MAX", "PLACEHOLDER_WIDTH", "STORY_DATE_PLACEHOLDERS", "STORY_MAX",

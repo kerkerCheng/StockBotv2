@@ -1019,13 +1019,17 @@ def cmd_stories(args: argparse.Namespace) -> int:
       **先全部核對、全過才寫**（任一筆不過整批不寫，逐筆說原因）。選填 `bet`＝賭注句
       `{stake: 押哪個量, doubling: 翻倍要哪個營業數字到多少、最晚哪一份文件看得到, disproof: 第幾條反證}`（2026-11-22）。
     - `--bet-only`（搭配 `--check`／`--add`）：每筆只給 `{ticker, bet}`——故事其他格沿用現行那一筆，只加或換賭注句。
+    - `--hero-only`（搭配 `--check`／`--add`）：每筆只給 `{ticker, hero}`——`hero`＝淺寫頁首 `{title, paragraphs: [三到四段]}`，
+      每句句尾帶來源標記〔自述〕〔買方〕〔第三方〕〔推一步〕〔網路〕（2026-11-27「走2」）。
     - `--gaps`：現行敘事裡還沒有故事的（從沒寫／敘事換版、故事過期）——與待做清單 ⑤ 同一份判定。
+    - `--hero-gaps`：可開與已持有裡還沒寫淺寫頁首的——與 ⑤「頁首還沒寫」同一份判定（讀候選板）。
 
     ⚠ 故事只是那一格的人話：依據照舊在敘事那一格；不 gate 任何東西、不改候選狀態。寫完重跑
     `python -m webapp materialize <TICKER>`（候選短標要再跑 `--candidates`）首屏才看得到。
     """
     from .narrative.story import DOUBLING_KIND_LABELS, doubling_kind
-    from .providers.stories import bet_only_spec, current_stories, gaps_now, prepare_story, write_story
+    from .providers.stories import (bet_only_spec, current_stories, gaps_now, hero_gaps, hero_only_spec, prepare_story,
+                                    write_story)
 
     def _items(raw: Any) -> list[Any]:
         items = raw.get("items") if isinstance(raw, dict) and "items" in raw else raw
@@ -1044,11 +1048,17 @@ def cmd_stories(args: argparse.Namespace) -> int:
             try:
                 if not ticker:
                     raise ValueError("每一筆都要寫 ticker")
+                if args.bet_only and args.hero_only:
+                    raise ValueError("--bet-only 與 --hero-only 一次只用一個")
                 if args.bet_only:
                     # 只加（或換）賭注句：故事其他格沿用現行那一筆，一個字不動
                     if set(spec) - {"ticker", "bet"}:
                         raise ValueError("--bet-only 的每一筆只給 {ticker, bet}——故事其他格沿用現行那一筆")
                     spec = bet_only_spec(ticker, spec.get("bet"))
+                if args.hero_only:
+                    if set(spec) - {"ticker", "hero"}:
+                        raise ValueError("--hero-only 的每一筆只給 {ticker, hero}——故事其他格與賭注句沿用現行那一筆")
+                    spec = hero_only_spec(ticker, spec.get("hero"))
                 _record, problems = prepare_story(ticker, spec)
             except (AlphaError, ValueError) as exc:
                 problems = [str(exc)]
@@ -1069,8 +1079,32 @@ def cmd_stories(args: argparse.Namespace) -> int:
             print(f"  寫入 {record['ticker']} {record['story_id']}（對 {record['brief_id']}）"
                   + ("（換版）" if record.get("supersedes_id") else "")
                   + (f"｜賭注句：翻倍要＝{DOUBLING_KIND_LABELS[doubling_kind(record['bet'].get('doubling'))]}"
-                     if record.get("bet") else ""))
-        print(f"✓ 寫入 {len(items)} 筆；下一步：python -m webapp materialize <TICKER>（候選短標再跑 --candidates）")
+                     if record.get("bet") else "")
+                  + ("｜淺寫頁首" if record.get("hero") else ""))
+        print(f"✓ 寫入 {len(items)} 筆；下一步：python -m webapp materialize <TICKER>（候選短標再跑 --candidates）"
+              "；故事換了要再核一次：python -m alpha brief-check <TICKER> --record --changed K --note …")
+        return 0
+    if args.hero_gaps:
+        from alpha.providers.story_pages import current_pages
+        from webapp.store import ArtifactUnavailable, StateArtifactStore
+
+        try:
+            board, _freshness = StateArtifactStore().read("candidates")
+        except ArtifactUnavailable as exc:
+            print(f"✗ 候選板讀不到（{exc.reason}）——未讀到，不是 0；先跑 python -m webapp materialize --candidates",
+                  file=sys.stderr)
+            return 2
+        stories, errors = current_stories()
+        pages, _page_errors = current_pages()
+        found = hero_gaps(board.get("groups") or {}, stories=stories, page_companies=pages)
+        if args.format == "json":
+            print(json.dumps({"gaps": found, "parse_errors": errors}, ensure_ascii=False, indent=2))
+            return 0
+        print(f"# 頁首還沒寫 {len(found)} 檔（可開與已持有、有故事、沒有故事頁；候選板 {board.get('generated_at', '?')[:16]}）")
+        for g in found:
+            print(f"- {g['ticker']}｜{g['group']}｜{g['brief_id']}")
+        if errors:
+            print(f"⚠ 故事 ledger 解析失敗 {len(errors)} 行：" + "；".join(errors[:3]))
         return 0
     if args.gaps:
         gaps, errors = gaps_now()
@@ -1104,6 +1138,13 @@ def cmd_stories(args: argparse.Namespace) -> int:
                       f"（{DOUBLING_KIND_LABELS[doubling_kind(bet.get('doubling'))]}）｜認錯看：第 {bet.get('disproof')} 條反證")
             else:
                 print("    賭注句：還沒寫（python -m alpha stories --add spec.json --bet-only；spec 每筆 {ticker, bet}）")
+            hero = r.get("hero")
+            if hero:
+                print(f"    淺寫頁首｜{hero.get('title')}")
+                for n, text in enumerate(hero.get("paragraphs") or (), 1):
+                    print(f"      {n}. {text}")
+            else:
+                print("    淺寫頁首：還沒寫（python -m alpha stories --add spec.json --hero-only；spec 每筆 {ticker, hero}）")
     if errors:
         print(f"⚠ 解析失敗 {len(errors)} 行：" + "；".join(errors[:3]))
     return 0
@@ -1512,6 +1553,10 @@ def build_parser() -> argparse.ArgumentParser:
     told.add_argument("--gaps", action="store_true", help="現行敘事裡還沒有故事的（從沒寫／過期）")
     told.add_argument("--bet-only", action="store_true",
                       help="搭配 --check／--add：spec 每筆只給 {ticker, bet}，故事其他格沿用現行那一筆（只加或換賭注句）")
+    told.add_argument("--hero-only", action="store_true",
+                      help="搭配 --check／--add：spec 每筆只給 {ticker, hero}，故事其他格與賭注句沿用現行那一筆（只加或換淺寫頁首）")
+    told.add_argument("--hero-gaps", action="store_true",
+                      help="可開與已持有裡還沒寫淺寫頁首的（與待做清單 ⑤「頁首還沒寫」同一份判定；讀候選板）")
     told.add_argument("--format", choices=("markdown", "json"), default="markdown")
     told.set_defaults(func=cmd_stories)
 

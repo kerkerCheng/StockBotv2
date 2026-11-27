@@ -124,6 +124,16 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 `StockBotv2-Daily` 的 ⑱⑲ 取代（1.2a 停用、2026-09-25 1.2b 刪除）；它們的理由（LLM 失敗心跳照發、永遠 exit 0、Python 不用 `.cmd`、
 發送走 subprocess）搬進 `crons/daily_task.py` 的 docstring，守它們的測試改主詞搬進 `tests/test_daily_task.py`「無人值守入口」節。
 
+### Sandbox impact review 結論（2026-11-27：淺寫頁首＋新個股頁加回會不會死一行——使用者「走2」「會不會死的總結加回去就夠了」）
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | 不新增命令、不改 daily 的 argv。daily ⑬ materialize：個股物化檔多一個 `story:hero` Datum（讀它本來就讀的故事帳；只在那一筆寫了 `hero` 時出），不連外、不跑 LLM、不寫 ledger。daily ⑱ 心跳：⑤ 多一格「頁首還沒寫」，讀的候選板、持股狀態、故事帳、故事頁帳都是它本來就讀的（「故事還沒寫」「故事頁該對版」兩格已在讀）；板、持股沒讀到或舊板＝這一格未讀到，不是 0。APP：前端多印一段頁首與一行會不會死（照抄物化檔，不組字、不新算數）；沒有寫入端點。寫入面只有互動 session 手跑的 `python -m alpha stories --add spec.json --hero-only`（append-only 私有區；`--hero-gaps` 唯讀） |
+| **2 canonical skill／prompt／本檔** | 本節；stock-story SKILL「淺寫頁首」；research-drain SKILL「淺寫頁首」段；ARCHITECTURE §6.11「淺寫頁首」、§6.12。無人值守 prompt 不動 |
+| **3 最窄 rule** | daily argv 不變；不新增 step、allowlist、rule；`.codex/rules` 仍 0 條 |
+| **4 contract test** | `tests/test_story_hero.py`（寫入規則：每句句尾標記、標記在字彙裡、標題不帶、段數、佔位字、字數不算標記；故事帶著頁首、拿掉就擋；沒寫頁首的故事 id 照舊；只換頁首與只換賭注句互不動；欠頁首只算可開與已持有、有故事、沒故事頁；⑤ 那一格與 `--hero-gaps` 同一份判定、讀不到不是 0；涵蓋表；讀模型一個 Datum 不是一格；逐句核對核頁首、不含標記；前端順序；CLI）；`tests/test_todo_ledger.py` 涵蓋登記 |
+| **5 端到端 smoke** | 11-27 真資料：`stories --hero-gaps` 18 檔（可開 17、已持有 COHR）；17 檔照 stock-story「淺寫頁首」寫入（COHR 當天做深、不寫），`--hero-gaps` 剩 1；頁首 153 個數字逐一對回同一版故事格或反證原文，17 筆 `brief-check --record`。物化 19 檔、APP 15:51 重啟、`code.stale=false`；無頭 Edge 五頁——1519.TW、NVTS、SLNG 印淺寫頁首（來源標籤 14–15 個），AEHR（有故事頁）與 3167.TW（不在可開／已持有）不印；五頁的「會不會死」一行都在四盞燈之前。手跑心跳短版 ⑤ 印「頁首還沒寫 1 檔（COHR）」。變異 20 種各自變紅（第一輪 3 種沒抓到：拿掉頁首被說成「一樣」、缺 X 那組也算欠、兩個旗標碰巧被別的關擋——補測試後全紅）；相關 7 檔 232 過 |
+
 ### Sandbox impact review 結論（2026-11-22：A0 賭注句與對帳日曆 S1–S3——使用者「A0 1b 2B 3b，S1–S3 做」）
 
 | 步 | 結論 |

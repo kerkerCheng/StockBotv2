@@ -81,6 +81,7 @@
 
 > 日期＝交付日。這裡只留落點，讓程式註解裡的 `ROADMAP「標題」` 找得到；要看做了什麼、數字怎麼變，讀封存列。
 
+- 2026-11-27 **淺寫頁首：還沒做深的檔先有一段頁首**（使用者指示「走2」，沒有 ROADMAP 列、這一行就是紀錄）——故事紀錄選填鍵 `hero`（`alpha/narrative/story.py::hero_problems`）、⑤「頁首還沒寫」（`todo.hero`，交付當天 18 檔）；新個股頁「系統裡的它」加回會不會死一行（`lampLine`）；機制見 ARCHITECTURE §6.11、§6.12；`tests/test_story_hero.py`
 - 2026-11-19 **故事已定價段的股價脈絡帶截至日**——寫入端拒收沒有截至日的股價走勢句（`alpha.narrative.contracts.undated_price_move_claims`）；`tests/test_stories.py -k price_move`
 - 2026-11-19 **偵探回溯：起漲點前看**——結論：停在校準用途（清淨組配對分辨 2／6，看不出）、遮名組 11-19 關閉；偵探提示出處格式鎖字（`tests/test_detective.py`）；plan `2026-11-18-001`；2027-05-31 重算見〈已交付列留下的遺留小項〉
 - 2026-11-19 **閉環母體讀「買得到嗎」**——閉環母體封閉字彙加 `not_buyable`（`alpha/closure.py::POPULATIONS`）、候選板沒有敘事的列附 `access`；`tests/test_closure_population.py`
