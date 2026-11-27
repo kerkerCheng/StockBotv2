@@ -196,7 +196,7 @@ The content-addressed, immutable bundle of normalized values, source references,
 Later changes in Engine A/B/C do not rewrite an existing decision context; a new assessment freezes a new bundle. This preserves what the system knew at decision time without creating parallel current-state authorities.
 
 ### Portfolio Risk Snapshot（投組風險快照）
-`risk/snapshot.py`（原文寫 Engine D；研究側已退役）由當下 Google Sheet holdings、Capital Authority、versioned beta／investment policy 衍生的 point-in-time telemetry。它分開保存 daily-reset ETF 的 nominal／effective 槓桿、已提款貸款槓桿、兩者合計、alpha 總量與已知 issuer 曝險；`library/private/decision_lab/portfolio_risk_snapshots.jsonl` 只作 append-only 變化偵測與 weekly 趨勢，不取代 Sheet、Capital Authority 或 frozen decision context。Daily 只顯示門檻跨越／狀態翻轉；Weekly 可顯示完整快照。
+`risk/snapshot.py`（原文寫 Engine D；研究側已退役）由當下 Google Sheet holdings、Capital Authority、versioned beta／investment policy 衍生的 point-in-time telemetry。它分開保存 daily-reset ETF 的 nominal／effective 槓桿、已提款貸款槓桿、兩者合計、alpha 總量與已知 issuer 曝險；`library/private/decision_lab/portfolio_risk_snapshots.jsonl` 只作 append-only 變化偵測與趨勢，不取代 Sheet、Capital Authority 或 frozen decision context。Daily 只顯示門檻跨越／狀態翻轉；完整快照住 APP「資產配置」頁（Weekly 2026-09-24 退役）。
 *Avoid:* portfolio authority, holdings ledger, daily report archive
 
 ### Issuer Look-through（發行人穿透）
