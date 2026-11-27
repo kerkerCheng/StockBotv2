@@ -1,0 +1,12 @@
+SOURCE: Coherent Corp.（COHR）Form 8-K（Item 5.02、7.01；Date of Report June 2, 2024；accession 0001193125-24-152389）
+URL: https://www.sec.gov/Archives/edgar/data/820318/000119312524152389/d845190d8k.htm
+PUBLISHED: 2024-06-03（EDGAR 申報日；受理 2024-06-03T12:04:01Z＝美東 08:04，開盤前）
+RETRIEVED: 2026-11-28（本機抓 EDGAR 原文、去 HTML 後逐字截取；通用 UA）
+STORAGE: repo_excerpt（只截 Item 5.02 任命新執行長的兩段）
+NOTE: 發行人一手。2024-06-03 開盤前公告新執行長（Lattice Semiconductor 前執行長 James Anderson）。同一天開盤前 Coherent 只有這一份申報
+（另兩份 Form 144 在收盤後）。當天收盤 +22.9%、Lumentum +1.6%、SOXX +0.2%（yfinance；故事頁 COHR 的 px.json）——2023-12 到 2026-11
+之間 Coherent 單日比 SOXX 多漲最多的一天。股價反應與這份公告的關係是推一步。
+
+【Item 5.02】
+"On June 3, 2024, the Company announced the appointment of James R. Anderson as CEO of the Company, effective June 3, 2024 (the “Start Date”), to replace Dr. Mattera as CEO."
+"Mr. Anderson, age 51, served as a director and as President and Chief Executive Officer of Lattice Semiconductor Corporation (“Lattice”) since September 2018. Prior to joining Lattice, Mr. Anderson served as the Senior Vice President and General Manager of the Computing and Graphics Business Group at Advanced Micro Devices, Inc. (“AMD”)."

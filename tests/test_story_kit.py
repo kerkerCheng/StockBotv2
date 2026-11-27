@@ -52,6 +52,17 @@ def _classes(chart: str) -> set[str]:
     return {c for value in re.findall(r'class="([^"]+)"', chart) for c in value.split()}
 
 
+def _split_svg(chart: str) -> tuple[str, str]:
+    """(svg 裡的, svg 外的)：圖下的編號清單是 HTML，樣式寫法和 svg 裡的不同。"""
+    start, end = chart.index("<svg"), chart.index("</svg>") + len("</svg>")
+    return chart[start:end], chart[:start] + chart[end:]
+
+
+def _event_items(chart: str) -> list[tuple[str, str, str]]:
+    """圖下清單的每一列：(編號, 日期與收盤, 那一句)。"""
+    return re.findall(r'<li><span class="n">(\d+)</span><span><span class="p">([^<]*)</span>([^<]*)</span></li>', chart)
+
+
 def _texts(chart: str) -> list[tuple[float, float, str, str, int]]:
     """單行的 <text>：(x, y, anchor, 字, 字級)。"""
     out = []
@@ -84,9 +95,12 @@ def test_each_chart_passes_the_fragment_check(name: str, chart: str) -> None:
 
 def test_every_class_the_charts_use_has_a_style() -> None:
     css = (ROOT / "webapp" / "static" / "story.css").read_text(encoding="utf-8")
-    used = set().union(*(_classes(c) for c in (LADDER, BARS, PRICE, *EMPTY.values())))
-    assert used, "抓不到 class，這條守衛等於沒作用"
-    missing = sorted(c for c in used if f".story-page svg .{c} " not in css)
+    charts = (LADDER, BARS, PRICE, *EMPTY.values())
+    in_svg = set().union(*(_classes(_split_svg(c)[0]) for c in charts))
+    outside = set().union(*(_classes(_split_svg(c)[1]) for c in charts))
+    assert in_svg and outside, "抓不到 class，這條守衛等於沒作用"
+    missing = sorted(c for c in in_svg if f".story-page svg .{c} " not in css)
+    missing += sorted(c for c in outside if not re.search(r"\.story-page[^{]*\." + re.escape(c) + r"\b", css))
     assert not missing, f"story.css 沒有這幾個 class 的樣式：{missing}"
 
 
@@ -141,7 +155,24 @@ def test_events_on_the_same_day_are_stacked_not_overlapped() -> None:
     assert len(centres) == 3
     for (xa, ya), (xb, yb) in itertools.combinations(centres, 2):
         assert abs(xa - xb) >= 16 - 1e-6 or abs(ya - yb) >= 16 - 1e-6       # 直徑 14＋留 2
-    assert "① 2025-06-01 甲" in chart and "③ 2025-06-01 丙" in chart
+    assert [(n, words) for n, _p, words in _event_items(chart)] == [("1", "甲"), ("2", "乙"), ("3", "丙")]
+
+
+def test_events_are_listed_under_the_chart_with_the_close_of_that_day() -> None:
+    """2026-11-28 使用者讀 COHR：「走過的路那邊沒有數字，我不知道誰對誰」——那幾句原本接在圖說後面一長串、沒有價位。
+    圖下一張清單：編號和圖上的圈一樣、每列有日期與那天的收盤；事件落在休市日就寫取哪一天的收盤。"""
+    chart = kit.price_log([("2026-01-02", 10.0), ("2026-02-02", 20.5), ("2026-03-02", 1234.567), ("2026-03-06", 40.0)],
+                          [("2026-02-02", "甲"), ("2026-03-01", "乙"), ("2026-03-06", "丙")], "2026-03-31", currency="美元")
+    marks = sorted(re.findall(r'<circle class="focus mark"[^>]*></circle>\s*<text [^>]*>(\d+)</text>', chart))
+    items = _event_items(chart)
+    assert [n for n, _p, _w in items] == marks == ["1", "2", "3"]
+    assert items[0] == ("1", "2026-02-02　20.5 美元。", "甲")
+    assert items[1] == ("2", "2026-03-01（收盤取 2026-03-02）　1,234.57 美元。", "乙")
+    assert items[2] == ("3", "2026-03-06　40 美元。", "丙")
+    svg_end, ol, caption = chart.index("</svg>"), chart.index('<ol class="events">'), chart.index("<figcaption>")
+    assert svg_end < ol < caption                                  # 清單緊接在圖下、圖說之前
+    assert "甲" not in chart[caption:]                              # 圖說不再接那一串
+    assert '<ol class="events">' not in kit.price_log([("2026-01-02", 10.0)], [], "2026-03-31")   # 沒有事件就沒有清單
 
 
 def test_events_stacked_near_the_top_do_not_climb_into_the_as_of_line() -> None:

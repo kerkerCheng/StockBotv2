@@ -2,9 +2,10 @@
 
 - `ladder_map`：誰賣給誰——由下往上幾排，主角標色。
 - `time_bars`：量或錢的時間長條（可以有負的、可以缺）。
-- `price_log`：對數股價折線＋編號事件，圖上寫明畫到哪一天。
+- `price_log`：對數股價折線＋編號事件，圖上寫明畫到哪一天；圖下一張編號清單（編號、日期、那天的收盤、一句）。
 
-純函式：呼叫的人把數列傳進來，回傳一段 `<figure><svg>…</svg><figcaption>…</figcaption></figure>`——只用片段白名單裡的標籤與屬性
+純函式：呼叫的人把數列傳進來，回傳一段 `<figure><svg>…</svg><figcaption>…</figcaption></figure>`（股價圖在 svg 與圖說之間
+多一張 `<ol class="events">`）——只用片段白名單裡的標籤與屬性
 （`alpha.narrative.story_page`；寫入與物化兩道照樣檢查），顏色只用 class（`webapp/static/story.css`：tier、focus、muted、line、
 series-1、bar、bar-alt、grid、axis），寬度照手機（`viewBox` 寬 360）。不抓資料、不讀帳、不看今天的日期；同樣的輸入兩次輸出一字不差。
 空數列回一張寫明「沒有資料」的圖，不丟例外。字寬是估的（全形一字＝字級、其餘約 0.6 字級）：放不下就換兩行、再縮字、最後才截斷；
@@ -85,7 +86,7 @@ def _text(lines: Sequence[str], *, x: float, y: float, size: int, anchor: str = 
     return f"<text {attrs}>{''.join(spans)}</text>"
 
 
-def _figure(height: float, label: str, body: Sequence[str], caption: str) -> str:
+def _figure(height: float, label: str, body: Sequence[str], caption: str, after: Sequence[str] = ()) -> str:
     # svg 的 title 只放字、字裡像標記的也擋（`story_page.SVG_TEXT_ONLY`）：名字裡的角括號在 title 裡換成全形
     words = label.replace("<", "＜").replace(">", "＞")
     return "\n".join([
@@ -94,6 +95,7 @@ def _figure(height: float, label: str, body: Sequence[str], caption: str) -> str
         f"<title>{_esc(words)}</title>",
         *body,
         "</svg>",
+        *after,
         f"<figcaption>{_esc(caption)}</figcaption>",
         "</figure>",
     ])
@@ -111,6 +113,11 @@ def _num(value: float) -> str:
     if abs(value - round(value)) < 1e-9:
         return f"{int(round(value)):,}"
     return f"{value:,.1f}"
+
+
+def _price(value: float) -> str:
+    """收盤的寫法（圖下的編號清單）：千分位、最多兩位小數、去尾零——298.91、660、0.32。"""
+    return f"{value:,.2f}".rstrip("0").rstrip(".")
 
 
 def _short(value: float) -> str:
@@ -256,7 +263,6 @@ _PRICE_TOP = 34          # 最高點上的事件圓圈不壓到「畫到哪一�
 _PRICE_BOTTOM = 26
 _MARK_R = 7
 _MAX_POINTS = 360
-_CIRCLED = "①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳"
 
 
 def _day(value: object) -> date:
@@ -275,7 +281,9 @@ def _log_ticks(lo: float, hi: float, fallback: tuple[float, float]) -> list[floa
 def price_log(closes: Sequence[tuple[object, float | None]], events: Sequence[tuple[object, str]], as_of: object, *,
               currency: str | None = None, label: str = "股價（對數刻度）", caption: str | None = None) -> str:
     """對數股價折線（同樣的高度＝同樣的倍數）。`closes`＝(日期, 收盤)；`as_of` 之後的收盤與事件一律不畫（畫到哪一天寫在圖上）。
-    `events`＝(日期, 一句) 在線上標 1、2…，那幾句照 ①②… 寫進圖說；離得太近的往上疊、不疊字。"""
+    `events`＝(日期, 一句) 在線上標 1、2…，離得太近的往上疊、不疊字；圖下列一張同樣編號的清單：日期、那天的收盤（程式填，
+    事件落在休市日就寫取哪一天的收盤）、那一句。2026-11-28 使用者讀 COHR：「走過的路那邊沒有數字，我不知道誰對誰」——
+    原本那幾句接在圖說後面一長串、沒有價位，圈和事件對不起來。"""
     cutoff = _day(as_of)
     note = f"畫到 {cutoff.isoformat()}"
     points = sorted((_day(d), float(c)) for d, c in closes
@@ -314,7 +322,9 @@ def price_log(closes: Sequence[tuple[object, float | None]], events: Sequence[tu
     body.append(_text([first.strftime("%Y-%m")], x=plot_left, y=_PRICE_H - 8, size=10, anchor="start", cls="muted"))
     body.append(_text([last.strftime("%Y-%m")], x=plot_right, y=_PRICE_H - 8, size=10, anchor="end", cls="muted"))
     placed: list[tuple[float, float]] = []
-    legend = []
+    items: list[str] = []
+    unit = f" {currency}" if currency else ""
+
     def taken(x: float, y: float) -> bool:
         return any(abs(x - px) < _MARK_R * 2 + 2 and abs(y - py) < _MARK_R * 2 + 2 for px, py in placed)
 
@@ -329,14 +339,15 @@ def price_log(closes: Sequence[tuple[object, float | None]], events: Sequence[tu
             while taken(x, y):
                 y += _MARK_R * 2 + 2
         placed.append((x, y))
-        body.append(f'<circle class="focus" cx="{_f(x)}" cy="{_f(y)}" r="{_MARK_R}"></circle>')
+        body.append(f'<circle class="focus mark" cx="{_f(x)}" cy="{_f(y)}" r="{_MARK_R}"></circle>')
         body.append(_text([str(n)], x=x, y=y + 3.5, size=10))
-        legend.append(f"{_CIRCLED[n - 1] if n <= len(_CIRCLED) else n} {day.isoformat()} {words}")
+        traded, close = points[index]
+        when = day.isoformat() if traded == day else f"{day.isoformat()}（收盤取 {traded.isoformat()}）"
+        items.append(f'<li><span class="n">{n}</span><span><span class="p">{when}　{_price(close)}{_esc(unit)}。</span>'
+                     f"{_esc(words)}</span></li>")
     text = caption or f"{title}：同樣的高度代表同樣的倍數，{note}。"
-    if legend:
-        text += "　" + "；".join(legend)
     aria = f"{title}，{first.isoformat()} 到 {last.isoformat()}，{_num(points[0][1])} 到 {_num(points[-1][1])}；{note}"
-    return _figure(_PRICE_H, aria, body, text)
+    return _figure(_PRICE_H, aria, body, text, after=['<ol class="events">', *items, "</ol>"] if items else ())
 
 
 __all__ = ["WIDTH", "ladder_map", "price_log", "text_width", "time_bars"]

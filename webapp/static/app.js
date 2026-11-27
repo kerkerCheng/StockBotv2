@@ -4296,7 +4296,8 @@ async function route() {
 
 /** 個股頁 S5c 的機械量測（只在網址帶 `?selfcheck=1` 時跑；唯讀、不連網、不寫任何東西）：
  *  ①頁面橫向溢出（文件寬度超過視窗幾 px；逐一列出右緣超出視窗、又不在自己可捲動的容器裡的元素）
- *  ②圖上的字互相重疊的對數（schema v1.0 規則 9：0 才算過）。結果寫進 `#selfcheck`，headless 瀏覽器的 DOM 傾印讀得到。 */
+ *  ②圖上的字互相重疊的對數（schema v1.0 規則 9：0 才算過）③故事頁裡要左右捲才讀得完的表（`side_scroll`；故事頁 0 才算過）。
+ *  結果寫進 `#selfcheck`，headless 瀏覽器的 DOM 傾印讀得到。 */
 function selfCheckWidth() {
   const m = /[?&]selfcheck=1\b.*?[?&]w=(\d{3,4})\b/.exec(window.location.search);
   return m ? Number(m[1]) : null;
@@ -4352,10 +4353,20 @@ function selfCheck() {
     const r = node.getBoundingClientRect();
     if (r.width > 0 && !scrollsX(node)) maxRight = Math.max(maxRight, r.right);
   });
+  // ③故事頁裡要左右捲才讀得完的表：①把可捲容器裡的東西當成沒溢出，所以這種表①量不到、要另外數（2026-11-28 使用者在手機
+  // 讀 COHR：表的右邊幾欄被切掉，「沒有數字，我不知道誰對誰」）。
+  const sideScroll = [];
+  app.querySelectorAll('.story-page .tw, .story-page table').forEach((node) => {
+    const ox = getComputedStyle(node).overflowX;
+    if ((ox === 'auto' || ox === 'scroll') && node.scrollWidth > node.clientWidth + 1) {
+      sideScroll.push({ hidden_px: node.scrollWidth - node.clientWidth, text: (node.textContent || '').trim().slice(0, 40) });
+    }
+  });
   const result = { viewport: vw, doc_width: Math.round(Math.max(maxRight, doc.clientWidth > vw ? 0 : doc.scrollWidth)),
     page_overflow_px: Math.max(0, Math.round(maxRight - vw)),
     offenders: offenders.slice(0, 20), offenders_total: offenders.length,
-    charts: app.querySelectorAll('svg').length, text_overlaps: overlaps, overlap_pairs: details.slice(0, 20) };
+    charts: app.querySelectorAll('svg').length, text_overlaps: overlaps, overlap_pairs: details.slice(0, 20),
+    side_scroll: sideScroll.length, side_scroll_items: sideScroll.slice(0, 20) };
   let out = document.getElementById('selfcheck');
   if (!out) { out = document.createElement('pre'); out.id = 'selfcheck'; out.hidden = true; document.body.appendChild(out); }
   out.textContent = JSON.stringify(result);
