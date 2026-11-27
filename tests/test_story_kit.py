@@ -144,6 +144,21 @@ def test_events_on_the_same_day_are_stacked_not_overlapped() -> None:
     assert "① 2025-06-01 甲" in chart and "③ 2025-06-01 丙" in chart
 
 
+def test_events_stacked_near_the_top_do_not_climb_into_the_as_of_line() -> None:
+    """2026-11-27 COHR：高點附近幾件事往上疊，圈疊進「畫到哪一天」那一行（手機寬自檢抓到）——疊不下就改放線下。"""
+    chart = kit.price_log([("2026-01-01", 10.0), ("2026-06-01", 40.0), ("2026-06-10", 39.0), ("2026-12-01", 20.0)],
+                          [("2026-06-01", "甲"), ("2026-06-02", "乙"), ("2026-06-10", "丙")], "2026-12-01")
+    texts = _texts(chart)
+    note = next(t for t in texts if t[3].startswith("畫到"))
+    marks = [t for t in texts if t[3] in {"1", "2", "3"}]
+    assert len(marks) == 3
+    assert not any(_overlap(_box(*note), _box(*m)) for m in marks)
+    centres = [(float(x), float(y)) for x, y in re.findall(r'<circle [^>]*cx="([^"]+)" cy="([^"]+)"', chart)]
+    assert len(centres) == 3 and all(y - 7 >= note[1] for _x, y in centres)       # 圈的上緣不高過那一行的基線
+    for (xa, ya), (xb, yb) in itertools.combinations(centres, 2):
+        assert abs(xa - xb) >= 16 - 1e-6 or abs(ya - yb) >= 16 - 1e-6
+
+
 def test_large_prices_fit_the_axis_and_narrow_ranges_still_have_ticks() -> None:
     def ticks(chart: str) -> list:
         return [t for t in _texts(chart) if t[2] == "end" and t[0] == 36.0]     # 左邊那一欄（plot_left − 4）

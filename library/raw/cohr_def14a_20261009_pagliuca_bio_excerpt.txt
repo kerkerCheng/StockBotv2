@@ -1,0 +1,13 @@
+SOURCE: Coherent Corp.（COHR）DEF 14A 股東會委託書（2026 年股東會；accession 0001104659-26-114847）——董事 Stephen Pagliuca 簡歷
+URL: https://www.sec.gov/Archives/edgar/data/820318/000110465926114847/tm264288-6_def14a.htm
+PUBLISHED: 2026-10-09（EDGAR 申報日）
+RETRIEVED: 2026-11-27（本機抓 EDGAR 原文、去 HTML 後逐字截取；通用 UA）
+STORAGE: repo_excerpt（委託書有限節錄：一位董事的簡歷段，未刪句）
+NOTE: 發行人一手。給 Form 4 那筆最大的內部人買進對主詞用：2026-11-20 到 11-24 經 LLC 在公開市場買進 251,910 股（約 4,987 萬美元，推一步）的 Pagliuca
+是獨立董事、前 Bain Capital 共同主席（library/raw/cohr_form4_20260603_20261124_insider_trades_excerpt.txt）。委託書這一段沒寫他哪一年加入 Coherent 董事會。
+
+【Director nominee／continuing director — STEPHEN PAGLIUCA, INDEPENDENT DIRECTOR】
+"Senior Advisor, Bain Capital Private Equity, LP"
+"Mr. Pagliuca is an experienced global executive, with a strong background in private equity, successful strategic investments, and corporate governance. His expertise in scaling businesses and driving long-term value provides invaluable insights to Board discussions on capital management and growth."
+"Mr. Pagliuca is the Founder and CEO of PagsGroup, a growth capital investment firm with expertise in biotech, technology, media and sports. Mr. Pagliuca is the former Co-Chair of Bain Capital, a global investment firm managing approximately $180 billion in assets. He currently serves as a Senior Advisor to the firm."
+"Mr. Pagliuca has served on the board of Gartner, Inc., a research and advisory company, since 2010. He joined the boards of Symbotic, Inc. and Norwegian Cruise Lines in 2026."

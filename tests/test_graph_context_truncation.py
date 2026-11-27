@@ -101,6 +101,17 @@ def test_bottleneck_query_survives_format_because_it_has_bare_braces() -> None:
     assert "{}" in session.queries[0], "裸大括號必須原樣送到 Neo4j"
 
 
+def test_company_supply_prints_edges_in_their_true_direction() -> None:
+    """公司模式的比對是無向的，但印出來的 src→dst 必須是邊的真方向。
+
+    事發 2026-11-27（做深 COHR）：`RETURN c.name AS src … n.name AS dst` 把 4 條入邊印反——
+    「Coherent SUPPLIES_TO AXT」「Coherent INVESTS_IN NVIDIA」，圖裡其實是 AXT→Coherent、NVIDIA→Coherent。
+    """
+    assert "startNode(r).name AS src" in _Q_COMPANY_SUPPLY
+    assert "endNode(r).name AS dst" in _Q_COMPANY_SUPPLY
+    assert "c.name AS src" not in _Q_COMPANY_SUPPLY
+
+
 @pytest.mark.parametrize("builder", [_build_supply_section, _build_claims_section])
 def test_sections_report_the_total_not_just_what_they_show(builder) -> None:
     text = builder([], 0)

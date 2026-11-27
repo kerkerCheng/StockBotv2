@@ -86,14 +86,16 @@ _NOT_FOUND_TEMPLATE = (
 )
 
 # 以公司為中心的 2 跳子圖查詢（company_id 過濾模式）
+# 比對是無向的（入邊出邊都要），但 src／dst 必須照邊的真方向印：2026-11-27 COHR 的 40 條邊裡
+# 4 條入邊（AXT 供貨給 Coherent、NVIDIA 投資 Coherent…）原本被印成「Coherent SUPPLIES_TO AXT」。
 _Q_COMPANY_SUPPLY = """\
 MATCH (c:Entity {{id: $company_id}})-[r]-(n:Entity)
 WHERE NOT (c:Claim) AND NOT (n:Claim)
   AND r.confidence >= 0.5
-RETURN c.name AS src, type(r) AS rel, n.name AS dst,
+RETURN startNode(r).name AS src, type(r) AS rel, endNode(r).name AS dst,
        r.attributes AS attrs, r.confidence AS confidence,
        r.source_ids AS source_ids,
-       c.id AS src_id, n.id AS dst_id
+       startNode(r).id AS src_id, endNode(r).id AS dst_id
 ORDER BY r.confidence DESC LIMIT {limit}
 """
 

@@ -1,0 +1,41 @@
+SOURCE: Coherent Corp.（COHR）Form 8-K（Items 2.02、7.01、9.01）——EX-99.1 新聞稿〈COHERENT CORP. REPORTS FIRST QUARTER FISCAL 2027 RESULTS〉與 EX-99.2 法說投影片〈COHERENT FIRST QUARTER 2027 EARNINGS〉（accession 0001193125-26-447200）
+URL: https://www.sec.gov/Archives/edgar/data/820318/000119312526447200/d176836dex991.htm ； https://www.sec.gov/Archives/edgar/data/820318/000119312526447200/d176836dex992.htm
+PUBLISHED: 2026-11-04（美東盤後）
+RETRIEVED: 2026-11-27（本機抓 EDGAR 原文、去 HTML 後逐字截取；通用 UA）
+STORAGE: repo_excerpt（新聞稿與投影片有限節錄：標題、執行長與財務長引言、展望、投影片重點頁，未刪句）
+NOTE: 發行人一手（自述，已申報的附件）。PhotonLink 那份約 200 億美元、五年、2028 年初開始放量的長約，法說逐字稿之外**也寫在申報的投影片裡**（EX-99.2）；
+客戶只寫「a major AI company」（逐字稿）、投影片沒寫是誰。FY2027＝2026-07 到 2027-06；FY2028＝2027-07 到 2028-06。
+
+【EX-99.1 標題】
+"Q1 REVENUE OF $2.37B, INCREASED 50% Y/Y AND 56% Y/Y ON A PRO FORMA BASIS"
+"Q1 GAAP GROSS MARGIN OF 39.1%, INCREASED 254 bps Y/Y; Q1 NON-GAAP GROSS MARGIN OF 40.6%, INCREASED 184 bps Y/Y"
+
+【EX-99.1 引言】
+"“Q1 marked a strong start to fiscal 2027, with pro forma revenue up 56% year over year and non-GAAP EPS up 80%,” said Jim Anderson, CEO. “Our established businesses delivered strong growth, while new growth areas are beginning to ramp. As AI datacenters transition from copper to optical connectivity, Coherent’s broad photonics platform and manufacturing scale position us to help customers meet rising needs for bandwidth and energy efficiency. We expect fiscal 2027 pro forma revenue growth to exceed 60%.”"
+"Sherri Luther, CFO, said, “Our Q1 results delivered substantial operating leverage and durable gross margin expansion, driven by pricing optimization and cost improvements. This margin strength gives us the confidence to raise our longer-term target. We expect to achieve our first quarter with non-GAAP gross margin above 45% before the end of calendar 2028.”"
+
+【EX-99.1 Business Outlook – Second Quarter Fiscal 2027】
+"Revenue for the second quarter of fiscal 2027 is expected to be between $2.55 billion and $2.75 billion."
+"Gross margin percentage for the second quarter of fiscal 2027 is expected to be between 40% and 42% on a non-GAAP basis."
+"EPS for the second quarter of fiscal 2027 is expected to be between $2.28 and $2.48 on a non-GAAP basis."
+Additional Revenue and Gross Margin Guidance：
+"Expect to achieve our first $3 billion revenue quarter by the end of fiscal 2027."
+"Expect fiscal 2027 pro forma revenue growth to exceed 60%, more than double our fiscal 2026 pro forma growth rate."
+"Expect first $4 billion revenue quarter in fiscal 2028."
+"New Gross Margin Target; Expect to achieve our first quarter with non-GAAP gross margin above 45% before the end of calendar 2028."
+
+【EX-99.2 EXECUTIVE SUMMARY】
+"STRONG DEMAND AND MANUFACTURING EXECUTION Datacenter and Communications revenue grew 79% YoY, representing 82% of total revenue New LTAs strengthen multiyear visibility, including a PhotonLink™ agreement valued at ~$20B over five years; with revenue beginning to ramp in early CY2028 Internal InP output capacity doubled YoY one quarter early; on track to more than double again by CY27-end"
+"SCALE-ACROSS AND PHOTONLINK EXPAND GROWTH Scale-across / DCI: Q1 revenue exceeded $200M, roughly quadrupling YoY and reaching a nearly $1B annualized revenue run rate; quarterly revenue expected to roughly double from Q1 by CY2027-end PhotonLink: Revenue expected to exceed $100M in the March 2027 quarter and $250M per quarter before CY27-end"
+
+【EX-99.2 DATACENTER AND COMMUNICATIONS KEY HIGHLIGHTS】
+"Datacenter: Revenue increased 17% QoQ; 85% YoY Communications: Revenue increased 34% QoQ; 84% YoY"
+"Multi-Rail – Revenue ramp expected in the March 2027 quarter Manufacturing and visibility: Internal InP output capacity doubled YoY in Q1, one quarter ahead of plan Customer orders increasingly extend into CY28; LTAs typically extend through the end of the decade"
+
+【EX-99.2 INDUSTRIAL KEY HIGHLIGHTS】
+"Return to growth: Strong semiconductor capital equipment bookings support an expected return to growth in Q2 FY27"
+"“Our vertical integration—from materials and crystal growth through optics and lasers—helps us manage quality, cost, and supply in a capacity-constrained market.” — Jim Anderson, CEO"
+
+【EX-99.2 Recent announcements】
+"SEPTEMBER 21, 2026 DELIVERING COMPLETE OPTICAL SOLUTIONS FOR AI WITH PHOTONLINKTM Launched PhotonLink™, an integrated optics platform supporting CPO, NPO and emerging chip‑to‑chip connectivity. Anchor customers and long‑term agreements are secured for both CPO and NPO, with revenue expected to begin ramping in Q4 CY26."
+"AUGUST 17, 2026 ADVANCING AI THERMAL MANAGEMENT WITH 300MM SILICON CARBIDE Began sampling 300mm high thermal conductivity silicon carbide (SiC) substrates to leading AI semiconductor partners, engineered to improve heat spreading by up to 25% versus current solutions for AI and high‑performance computing."

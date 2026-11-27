@@ -1,0 +1,95 @@
+SOURCE: Coherent Corp.（COHR）內部人 Form 4（含一份 4/A）申報——EDGAR 2026-05-27 至 2026-11-25 申報的 38 份原始 XML（ownership document）
+URL: https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0000820318&type=4 （每列最後一欄是 accession；原檔在 https://www.sec.gov/Archives/edgar/data/820318/<accession 去掉連字號>/form4.xml）
+PUBLISHED: 2026-06-05 至 2026-11-25（各份申報日不同；交易日見每列第一欄）
+RETRIEVED: 2026-11-27（本機抓 EDGAR 原始 XML；通用 UA）
+STORAGE: repo_excerpt（表格由 XML 欄位機械抽出、欄位值照原值；只收非衍生證券交易表）
+NOTE: 發行人內部人一手申報。代碼：P＝公開市場買進、S＝公開市場賣出、A＝授予、F＝扣稅交回、M＝行使、G＝贈與；D＝本人名下、I＝間接（By LLC 等）；
+aff10b5One＝申報表勾選「依 10b5-1 預定計畫」。持股要把同一人的 D 與 I 相加。少數列的交易日早於 2026-06（例：2025-11-28、2026-02、2026-03）是這段期間才申報或更正（4/A）的舊交易。
+最後的金額加總是我們的算術（股數×每股價格，未扣費用），不是申報上的數字。
+
+transactionDate | rptOwnerName | relationship | code | A/D | shares | pricePerShare | sharesOwnedFollowingTransaction | D/I | natureOfOwnership | aff10b5One | accession
+2025-11-28 | Mocciaro Ilaria | Chief Accounting Officer | F | D | 1130 | 154 | 24280 | D |  | false | 0000899140-26-001100
+2026-02-11 | PAGLIUCA STEPHEN G | Director | A | A | 279 | 0 | 18747 | D |  | false | 0001193125-26-417073
+2026-02-28 | Mocciaro Ilaria | Chief Accounting Officer | F | D | 636 | 258.93 | 22267 | D |  | false | 0000899140-26-001100
+2026-03-06 | Digirolomo Enrico | Director | G | D | 1847 | 0 | 19510 | D |  | false | 0000899140-26-001046
+2026-03-06 | Digirolomo Enrico | Director | M | A | 1005 | 49.9 | 22362 | D |  | false | 0000899140-26-001046
+2026-03-06 | Digirolomo Enrico | Director | M | A | 2906 | 36.56 | 25268 | D |  | false | 0000899140-26-001046
+2026-03-06 | Digirolomo Enrico | Director | S | D | 3911 | 241.5 | 21357 | D |  | false | 0000899140-26-001046
+2026-06-03 | ANDERSON JAMES ROBERT | Director、CEO | F | D | 25836 | 426.89 | 166438 | D |  | false | 0000899140-26-000627
+2026-07-01 | Place Jeffrey B. | Chief Supply Chain Officer | F | D | 2181 | 394.47 | 17658 | D |  | false | 0000899140-26-000699
+2026-07-22 | Luther Sherri R | Chief Financial Officer | S | D | 1000 | 306.68 | 67475 | D |  | true | 0000899140-26-000726
+2026-08-18 | Luther Sherri R | Chief Financial Officer | S | D | 3000 | 324.00 | 64475 | D |  | true | 0000899140-26-000912
+2026-08-28 | ANDERSON JAMES ROBERT | Director、CEO | A | A | 30564 | 0 | 197245 | D |  | false | 0000899140-26-001035
+2026-08-28 | ANDERSON JAMES ROBERT | Director、CEO | F | D | 11958 | 295.39 | 185287 | D |  | false | 0000899140-26-001035
+2026-08-28 | Beard Robert P | Chief Strategy & Legal Officer | A | A | 5373 | 0 | 53824 | D |  | false | 0000899140-26-001036
+2026-08-28 | Beard Robert P | Chief Strategy & Legal Officer | F | D | 1896 | 295.39 | 51928 | D |  | false | 0000899140-26-001036
+2026-08-28 | Eng Julie Sheridan | Chief Technology Officer | A | A | 11960 | 0 | 66966 | D |  | true | 0000899140-26-001037
+2026-08-28 | Eng Julie Sheridan | Chief Technology Officer | A | A | 5373 | 0 | 55006 | D |  | true | 0000899140-26-001037
+2026-08-28 | Eng Julie Sheridan | Chief Technology Officer | F | D | 12862 | 295.39 | 54104 | D |  | true | 0000899140-26-001037
+2026-08-28 | Luther Sherri R | CFO and Treasurer | A | A | 8731 | 0 | 73449 | D |  | false | 0000899140-26-001038
+2026-08-28 | Luther Sherri R | CFO and Treasurer | F | D | 2594 | 295.39 | 70855 | D |  | false | 0000899140-26-001038
+2026-08-28 | Mocciaro Ilaria | Chief Accounting Officer | A | A | 1612 | 0 | 23879 | D |  | false | 0000899140-26-001039
+2026-08-28 | Mocciaro Ilaria | Chief Accounting Officer | A | A | 2449 | 0 | 26328 | D |  | false | 0000899140-26-001039
+2026-08-28 | Mocciaro Ilaria | Chief Accounting Officer | F | D | 2174 | 295.39 | 24154 | D |  | false | 0000899140-26-001039
+2026-08-28 | Place Jeffrey B. | Chief Supply Chain Officer | A | A | 3358 | 0 | 21099 | D |  | false | 0000899140-26-001040
+2026-08-31 | Digirolomo Enrico | Director | S | D | 2272 | 276.8479 | 17238 | D |  | true | 0000899140-26-001048
+2026-08-31 | Eng Julie Sheridan | Chief Technology Officer | S | D | 7047 | 276.8319 | 47057 | D |  | true | 0000899140-26-001037
+2026-08-31 | SKAGGS STEPHEN A | Director | S | D | 2272 | 276.8758 | 14592 | D |  | true | 0000899140-26-001047
+2026-09-01 | Eng Julie Sheridan | Chief Technology Officer | S | D | 6030 | 270.6876 | 41027 | D |  | true | 0000899140-26-001037
+2026-09-02 | Neal-Graves Lisa | Director | S | D | 2200 | 268.42 | 13033 | D |  | false | 0000899140-26-001054
+2026-09-09 | Beard Robert P | Chief Strategy & Legal Officer | S | D | 500 | 309.3206 | 51428 | D |  | false | 0000899140-26-001056
+2026-09-11 | Digirolomo Enrico | Director | G | D | 1279 | 0 | 10644 | D |  | false | 0000899140-26-001064
+2026-09-11 | Digirolomo Enrico | Director | S | D | 5315 | 305.985 | 11923 | D |  | false | 0000899140-26-001064
+2026-10-01 | Place Jeffrey B. | Chief Supply Chain Officer | F | D | 641 | 287.81 | 20458 | D |  | false | 0000899140-26-001089
+2026-10-12 | Luther Sherri R | Chief Financial Officer | F | D | 18284 | 312.62 | 52571 | D |  | false | 0000899140-26-001104
+2026-10-21 | Beard Robert P | Chief Strategy & Legal Officer | F | D | 5127 | 231.80 | 46301 | D |  | false | 0000899140-26-001124
+2026-11-09 | ANDERSON JAMES ROBERT | Director、CEO | P | A | 5000 | 199.48 | 190287 | D |  | false | 0000899140-26-001276
+2026-11-10 | Digirolomo Enrico | Director | P | A | 1000 | 222.885 | 11644 | D |  | false | 0000899140-26-001275
+2026-11-19 | CORASANTI JOSEPH J | Director | A | A | 919 | 0 | 81112 | D |  | false | 0000899140-26-001401
+2026-11-19 | Digirolomo Enrico | Director | A | A | 919 | 0 | 12563 | D |  | false | 0000899140-26-001398
+2026-11-19 | Dreyer Michael L | Director | A | A | 919 | 0 | 13283 | D |  | false | 0000899140-26-001403
+2026-11-19 | Hatter Patricia | Director | A | A | 919 | 0 | 24778 | D |  | false | 0000899140-26-001405
+2026-11-19 | MOTLEY DAVID L | Director | A | A | 919 | 0 | 27116 | D |  | false | 0000899140-26-001399
+2026-11-19 | Neal-Graves Lisa | Director | A | A | 919 | 0 | 13952 | D |  | false | 0000899140-26-001402
+2026-11-19 | PAGLIUCA STEPHEN G | Director | A | A | 919 | 0 | 19666 | D |  | false | 0000899140-26-001397
+2026-11-19 | Patrick Elizabeth | Director | A | A | 919 | 0 | 6301 | D |  | false | 0000899140-26-001408
+2026-11-19 | SADASIVAM SHAKER | Director | A | A | 919 | 0 | 42092 | D |  | false | 0000899140-26-001407
+2026-11-19 | SKAGGS STEPHEN A | Director | A | A | 919 | 0 | 15511 | D |  | false | 0000899140-26-001406
+2026-11-19 | STERLING MICHELLE M | Director | A | A | 919 | 0 | 9843 | D |  | false | 0000899140-26-001404
+2026-11-19 | VIJ SANDEEP | Director | A | A | 919 | 0 | 16873 | D |  | false | 0000899140-26-001409
+2026-11-19 | Xia Howard H. | Director | A | A | 919 | 0 | 51217 | D |  | false | 0000899140-26-001400
+2026-11-20 | PAGLIUCA STEPHEN G | Director | P | A | 10403 | 186.4701 | 66029 | I | By LLC | false | 0000899140-26-001411
+2026-11-20 | PAGLIUCA STEPHEN G | Director | P | A | 1150 | 190.05 | 82000 | I | By LLC | false | 0000899140-26-001411
+2026-11-20 | PAGLIUCA STEPHEN G | Director | P | A | 12138 | 183.6973 | 12138 | I | By LLC | false | 0000899140-26-001411
+2026-11-20 | PAGLIUCA STEPHEN G | Director | P | A | 12387 | 187.2186 | 78416 | I | By LLC | false | 0000899140-26-001411
+2026-11-20 | PAGLIUCA STEPHEN G | Director | P | A | 14705 | 184.4751 | 26843 | I | By LLC | false | 0000899140-26-001411
+2026-11-20 | PAGLIUCA STEPHEN G | Director | P | A | 2114 | 188.5922 | 80530 | I | By LLC | false | 0000899140-26-001411
+2026-11-20 | PAGLIUCA STEPHEN G | Director | P | A | 28783 | 185.5055 | 55626 | I | By LLC | false | 0000899140-26-001411
+2026-11-20 | PAGLIUCA STEPHEN G | Director | P | A | 320 | 189.65 | 80850 | I | By LLC | false | 0000899140-26-001411
+2026-11-23 | PAGLIUCA STEPHEN G | Director | P | A | 11956 | 218.4010 | 140216 | I | By LLC | false | 0000899140-26-001413
+2026-11-23 | PAGLIUCA STEPHEN G | Director | P | A | 13597 | 216.5009 | 121612 | I | By LLC | false | 0000899140-26-001413
+2026-11-23 | PAGLIUCA STEPHEN G | Director | P | A | 13647 | 215.5179 | 108015 | I | By LLC | false | 0000899140-26-001413
+2026-11-23 | PAGLIUCA STEPHEN G | Director | P | A | 1368 | 221.5153 | 149870 | I | By LLC | false | 0000899140-26-001413
+2026-11-23 | PAGLIUCA STEPHEN G | Director | P | A | 2962 | 220.2396 | 148502 | I | By LLC | false | 0000899140-26-001413
+2026-11-23 | PAGLIUCA STEPHEN G | Director | P | A | 3908 | 213.5499 | 85908 | I | By LLC | false | 0000899140-26-001413
+2026-11-23 | PAGLIUCA STEPHEN G | Director | P | A | 5324 | 219.3490 | 145540 | I | By LLC | false | 0000899140-26-001413
+2026-11-23 | PAGLIUCA STEPHEN G | Director | P | A | 6648 | 217.5614 | 128260 | I | By LLC | false | 0000899140-26-001413
+2026-11-23 | PAGLIUCA STEPHEN G | Director | P | A | 8460 | 214.4491 | 94368 | I | By LLC | false | 0000899140-26-001413
+2026-11-24 | PAGLIUCA STEPHEN G | Director | P | A | 1320 | 191.3524 | 151190 | I | By LLC | false | 0000899140-26-001413
+2026-11-24 | PAGLIUCA STEPHEN G | Director | P | A | 13751 | 194.5536 | 188252 | I | By LLC | false | 0000899140-26-001413
+2026-11-24 | PAGLIUCA STEPHEN G | Director | P | A | 16734 | 193.5215 | 174501 | I | By LLC | false | 0000899140-26-001413
+2026-11-24 | PAGLIUCA STEPHEN G | Director | P | A | 17752 | 197.4077 | 248568 | I | By LLC | false | 0000899140-26-001413
+2026-11-24 | PAGLIUCA STEPHEN G | Director | P | A | 19642 | 196.4560 | 230816 | I | By LLC | false | 0000899140-26-001413
+2026-11-24 | PAGLIUCA STEPHEN G | Director | P | A | 22922 | 195.5027 | 211174 | I | By LLC | false | 0000899140-26-001413
+2026-11-24 | PAGLIUCA STEPHEN G | Director | P | A | 3342 | 198.2467 | 251910 | I | By LLC | false | 0000899140-26-001413
+2026-11-24 | PAGLIUCA STEPHEN G | Director | P | A | 6577 | 192.3538 | 157767 | I | By LLC | false | 0000899140-26-001413
+
+推一步（股數×每股價格加總，未扣費用）：
+- Luther Sherri R：賣出 4,000 股、約 1.28 百萬美元
+- Eng Julie Sheridan：賣出 13,077 股、約 3.58 百萬美元
+- Digirolomo Enrico：公開市場買進 1,000 股、約 0.22 百萬美元；賣出 11,498 股、約 3.20 百萬美元
+- SKAGGS STEPHEN A：賣出 2,272 股、約 0.63 百萬美元
+- Neal-Graves Lisa：賣出 2,200 股、約 0.59 百萬美元
+- Beard Robert P：賣出 500 股、約 0.15 百萬美元
+- ANDERSON JAMES ROBERT：公開市場買進 5,000 股、約 1.00 百萬美元
+- PAGLIUCA STEPHEN G：公開市場買進 251,910 股、約 49.87 百萬美元

@@ -315,11 +315,19 @@ def price_log(closes: Sequence[tuple[object, float | None]], events: Sequence[tu
     body.append(_text([last.strftime("%Y-%m")], x=plot_right, y=_PRICE_H - 8, size=10, anchor="end", cls="muted"))
     placed: list[tuple[float, float]] = []
     legend = []
+    def taken(x: float, y: float) -> bool:
+        return any(abs(x - px) < _MARK_R * 2 + 2 and abs(y - py) < _MARK_R * 2 + 2 for px, py in placed)
+
     for n, (day, words) in enumerate(marks, 1):
         index = nearest(day)
-        x, y = x_of(points[index][0]), y_of(points[index][1]) - _MARK_R - 4
-        while any(abs(x - px) < _MARK_R * 2 + 2 and abs(y - py) < _MARK_R * 2 + 2 for px, py in placed):
+        x, line_y = x_of(points[index][0]), y_of(points[index][1])
+        y = line_y - _MARK_R - 4
+        while taken(x, y):
             y -= _MARK_R * 2 + 2
+        if y < _PRICE_TOP - _MARK_R - 4:        # 往上疊會壓到「畫到哪一天」那一行（2026-11-27 COHR）：改放線下、往下疊
+            y = line_y + _MARK_R + 4
+            while taken(x, y):
+                y += _MARK_R * 2 + 2
         placed.append((x, y))
         body.append(f'<circle class="focus" cx="{_f(x)}" cy="{_f(y)}" r="{_MARK_R}"></circle>')
         body.append(_text([str(n)], x=x, y=y + 3.5, size=10))

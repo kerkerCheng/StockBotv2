@@ -1,0 +1,26 @@
+SOURCE: Coherent Corp.（COHR）Form 10-K，fiscal year ended June 30, 2026（accession 0000820318-26-000020）
+URL: https://www.sec.gov/Archives/edgar/data/820318/000082031826000020/iivi-20260630.htm
+PUBLISHED: 2026-08-14
+RETRIEVED: 2026-11-27（本機抓 EDGAR 原文、去 HTML 後逐字截取；通用 UA）
+STORAGE: repo_excerpt（年報有限節錄：業務概述一段、客戶集中度兩段、NVIDIA 協議兩段，未刪句）
+NOTE: 發行人一手（自述）。給 COHR 做深（2026-11-27）用：①最大客戶占營收由 FY2025 的 10% 升到 FY2026 的 20%，第二大 12%——年報沒寫是誰；
+②NVIDIA 協議是非獨家、含數十億美元的採購承諾與先進雷射與光網路產品的產能權利；③產能協議「may require incremental investments … through 2030」，
+可能帶來重大的未來現金需求，並影響營收集中度、毛利率與資本支出。
+
+【Item 1. Business（Datacenter & Communications 段）】
+"During fiscal 2026, we announced the expansion of our Sherman, Texas, manufacturing facility, entered into a strategic multi-year supply agreement with NVIDIA for advanced lasers and optical networking products supporting next-generation AI infrastructure, and received a $50 million preliminary memorandum of terms under the CHIPS and Science Act to support the Sherman expansion."
+
+【Item 1. Business — Sales and Marketing】
+"We had two customers who each contributed more than 10% of revenue during fiscal 2026."
+
+【Item 1A. Risk Factors — Risks Related to Our Business, Operations and Industry】
+"A small number of customers have consistently accounted for a significant portion of our revenues, with two customers each contributing more than 10% of total revenues in fiscal 2026. Our success will depend on our continued ability to develop and manage relationships with our large customers and their continued need for our products. Although we are attempting to expand our customer base, we expect that significant customer concentration will continue for the foreseeable future. We may not be able to offset any decline in revenues from our existing large customers with revenues from new customers, and our quarterly results may be volatile because we are dependent on large orders from these customers that may be reduced, delayed, or cancelled."
+
+【Item 7. MD&A — Overview／Trends and Other Matters Affecting Our Business — Agreements with NVIDIA】
+"On March 2, 2026, the Company entered into a multi-year strategic agreement with NVIDIA to advance the development of advanced optics technologies, including manufacturing capacity and research and development, to enable next-generation AI infrastructure. The non-exclusive agreement includes a multi-billion-dollar purchase commitment with NVIDIA, as well as future access and capacity rights for advanced laser and optical networking products. Separately, on March 2, 2026, NVIDIA made a $2 billion investment in the Company, through the purchase of shares of the Company’s Common Stock in a private placement."
+
+【Item 7. MD&A — Liquidity（Other Liquidity）】
+"We also entered into a multi-year capacity agreement that may require incremental investments in equipment, labor, and working capital to support future production volumes through 2030. While no material liability was recorded at quarter-end solely as a result of entering into the agreement, the arrangement may result in material future cash requirements and could affect revenue concentration, gross margin, and capital expenditures as volumes ramp."
+
+【Notes to Consolidated Financial Statements — Major Customers（FY2026 營收合計 $7,118,181 千元）】
+"One major customer accounted for 20 %, 10 %, and 10 % of consolidated revenue during fiscal 2026, 2025 and 2024, respectively. A second major customer accounted for 12 % of consolidated revenue during fiscal 2026. A third major customer accounted for 12 % of consolidated revenue during fiscal 2025. Revenue from these customers was primarily attributable to our Datacenter & Communications segment."

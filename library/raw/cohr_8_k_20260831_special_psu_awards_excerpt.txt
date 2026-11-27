@@ -1,0 +1,19 @@
+SOURCE: Coherent Corp.（COHR）Form 8-K（Items 5.02、8.01；Date of Report August 27, 2026；accession 0001193125-26-375462）——高管特別績效股（PSU）獎酬
+URL: https://www.sec.gov/Archives/edgar/data/820318/000119312526375462/d110649d8k.htm
+PUBLISHED: 2026-08-31（EDGAR 申報日）
+RETRIEVED: 2026-11-27（本機抓 EDGAR 原文、去 HTML 後逐字截取；通用 UA）
+STORAGE: repo_excerpt（有限節錄：獎酬對象與目標值、績效設計、離職與控制權變更條款，未刪句；**每一級的股價門檻（美元）原文有列，這份節錄刻意不收價格**，只收年化成長率與可得比例）
+NOTE: 發行人一手。管理層被付錢去達成的是「四年內股價年化成長 10%–25%、而且相對同業總報酬高於中位數」，綁到 2030 年在職；
+不是營收或毛利率目標。給「誰在賭、賭什麼」與「管理層的誘因」用；同年 11 月執行長另以自己的錢在公開市場買進（library/raw/cohr_form4_20260603_20261124_insider_trades_excerpt.txt）。
+
+【Item 8.01 — Performance Stock Units】
+"On August 27, 2026 (the “Grant Date”), the Compensation and Human Capital Committee (the “Committee”) of the Board of Directors of Coherent Corp. approved special incentive awards for key members of its leadership team, including James R. Anderson, the Company’s Chief Executive Officer, with a target value of $50 million, Sherri Luther, the Company’s Chief Financial Officer, with a target value of $15 million, Julie Eng, Chief Technology Officer and Executive Vice President, Optical Components, with a target value of $15 million, Rob Beard, Chief Strategy and Legal Affairs Officer, with a target value of $15 million, and Jeffrey Place, Chief Supply Chain Officer, with a target value of $5 million (collectively the “Awards”). The Awards consist entirely of performance stock units (“PSUs”), with vesting tied to the achievement of significant share price growth milestones, satisfaction of a relative total shareholder return hurdle and a continued service requirement through 2030."
+"The Committee believes retaining Mr. Anderson and the current executive leadership team through this stage of technology investment, capacity expansion, customer engagement and operational execution is paramount to sustaining Coherent’s strategic momentum and capitalizing on opportunities presented by the next generation of AI and computing infrastructure."
+
+【Shareholder-Aligned Award Design】
+"Consistent with the Committee’s objective of aligning pay outcomes with long-term value creation and sustained shareholder returns, the Awards are 100% performance-based and may be earned based on the achievement of pre-set Company stock price hurdles during the four-year period beginning on the Grant Date (the “Performance Period”), measured over 60 consecutive calendar days, provided that, for each tranche earned, the Company’s total shareholder return (“TSR”) is above the 50 th percentile relative to the S&P Composite 1500 – Electronic Equipment, Instruments & Components Index. No portion of the Awards can be earned if these absolute and relative stock price performance hurdles are not met simultaneously, i.e., a tranche will only vest if rTSR is above median when a price hurdle is met."
+表（只收年化成長率與可得比例；股價門檻欄略）：CAGR 10% → 50% of Target PSUs；15% → 100%；20% → 150%；25% → 200%。
+"However, no portion of the award will vest until the conclusion of the four-year Performance Period. Further, any PSUs that vest are subject to an additional one-year holding period following the Performance Period, and therefore will not be tradable by the recipients until five years following the date of grant."
+
+【Shareholder-Aligned Termination Provisions】
+"Upon a change-in-control, the Performance Period ends and milestone achievement is measured using the per share consideration payable in the transaction, with linear interpolation applied."

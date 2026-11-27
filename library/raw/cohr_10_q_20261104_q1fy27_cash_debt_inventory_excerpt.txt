@@ -1,0 +1,53 @@
+SOURCE: Coherent Corp.（COHR）Form 10-Q，quarter ended September 30, 2026（FY2027 第一季；accession 0000820318-26-000023）
+URL: https://www.sec.gov/Archives/edgar/data/820318/000082031826000023/iivi-20260930.htm
+PUBLISHED: 2026-11-04
+RETRIEVED: 2026-11-27（本機抓 EDGAR 原文、去 HTML 後逐字截取；表格由去 HTML 的連續文字還原；通用 UA）
+STORAGE: repo_excerpt（季報有限節錄：營收與毛利率說明、流動性與現金流、借款、NVIDIA 協議兩段，未刪句）
+NOTE: 發行人一手（自述）。給 COHR 做深（2026-11-27）與「會不會先死」那一節用：①這一季營業現金流是負的 9,300 萬美元——
+原因是存貨大增（存貨由 25.81 億增到 33.41 億美元；現金流量表存貨變動 −7.37 億）；資本支出 7.76 億（另有 5.28 億掛在應付帳款）；
+②總借款由 32.22 億增到 40.01 億，新增的是兩筆境外子公司的在地信用額度（2026 Credit Lines 已動用 2.05 億、August 2026 Facility 已動用 5.98 億）；
+③NVIDIA 產能協議「may result in material future cash requirements」；④NVIDIA 私募的價格保護條款 2026 年 9 月到期、沒有觸發；
+⑤合約負債（客戶先付、還沒出貨的錢）由 6 月底的 6,300 萬（48＋15）增到 9 月底的 3.33 億，其中 1.61 億列在非流動負債（一年以後才交貨）；
+現金流量表這一行是 +2.69 億——對得上法說執行長說「幾乎每一份長約都有客戶的預付款或 NRE、用來幫忙出產能資本支出」（library/raw/cohr_q1fy27_earnings_call_lta_competition_cash_excerpt.txt）；
+季報**沒寫是哪幾個客戶付的**。（2026-11-27 補收這一段。）
+這一季的 10-Q 沒有客戶集中度的百分比（只在年報）。
+
+【MD&A — Results of Operations（three months ended September 30, 2026）】
+"Revenues. Revenues for the three months ended September 30, 2026 increased 50% to $2,370 million, compared to $1,581 million for the same period last fiscal year. Revenues in the Datacenter & Communications segment increased $862 million, or 79%, driven by continued strong AI datacenter demand. The Communications business also benefited from increased demand for data center interconnect, scale across and traditional telecom applications. Revenue in the Industrial segment decreased $73 million, or 15%, primarily due to the divestitures of our aerospace and defense business on September 2, 2025 and our Munich, Germany business on January 30, 2026."
+"Gross margin. Gross margin for the three months ended September 30, 2026 was $928 million, or 39% of revenues, compared to $579 million, or 37% of revenues, for the same period last fiscal year, an increase of 254 basis points. The increase was primarily driven by lower product input costs, manufacturing efficiencies and yield improvements within the Datacenter & Communications segment. In addition, gross margin benefited from pricing optimization initiatives and lower amortization expense across both the Datacenter & Communications and Industrial segments."
+
+【Condensed Consolidated Balance Sheets（千美元；September 30, 2026 ／ June 30, 2026）】
+Inventories | 3,341,373 | 2,581,043
+Current portion of long-term debt | 19,887 | 7,916
+Long-term debt | 3,980,711 | 3,214,308
+
+【Condensed Consolidated Statements of Cash Flows（千美元；three months ended September 30, 2026 ／ 2025）】
+Accounts receivable | ( 255,278 ) | ( 66,628 )
+Inventories | ( 737,082 ) | ( 219,120 )
+Accounts payable | 429,824 | 105,357
+Contract liabilities | 269,276 | ( 8,022 )
+Net cash provided by (used in) operating activities | ( 92,681 ) | 45,955
+Additions to property, plant & equipment | ( 775,547 ) | ( 103,946 )
+Additions to property, plant & equipment included in accounts payable | 527,734 | 71,647
+
+【MD&A — Liquidity and Capital Resources】
+Operating activities:
+"Net cash used in operating activities was $93 million for the three months ended September 30, 2026 compared to net cash provided by operating activities of $46 million for the same period in the prior fiscal year. The increase in cash used in operating activities was primarily driven by a significant increase in inventory levels to support higher revenue growth, resulting in increased use of working capital. This was partially offset by higher accounts payable and higher net earnings."
+Investing activities:
+"Net cash used in investing activities was $201 million for the three months ended September 30, 2026, compared to net cash provided by investing activities of $297 million for the same period in the prior fiscal year. The increase in cash used was primarily due to $672 million higher cash used to fund capital expenditures partially offset by $625 million net purchases of short-term investments."
+"In June, July, and August 2026, certain wholly-owned foreign subsidiaries of the Company entered into unsecured credit facility agreements with local lenders providing for aggregate lines of credit of up to $475 million, which is denominated in local currency (the “2026 Credit Lines”). The 2026 Credit Lines mature in June, July, and August of 2029 and had $205 million outstanding as of September 30, 2026."
+"On August 12, 2026, a wholly-owned foreign subsidiary of the Company entered into an unsecured credit facility with local lenders providing for aggregate commitments of approximately $950 million. The facility consists of a local currency tranche with a sublimit equivalent to 475 million U.S. Dollars and a U.S. Dollar tranche with sublimit of $475 million (the “August 2026 Facility”). The August 2026 Facility matures 36 months from the date of first utilization, August 17, 2026, and had $598 million outstanding as of September 30, 2026."
+"The weighted average interest rate of total borrowings was 5% and 6% for the three months ended September 30, 2026 and 2025, respectively."
+Our cash position, borrowing capacity and debt obligations（百萬美元；September 30, 2026 ／ June 30, 2026）：Cash and cash equivalents | 1,553 | 1,162；Restricted cash, current | 45 | 35；Restricted cash, non-current | 539 | 571；Short-term investments | 200 | 825；Available borrowing capacity under Revolving Credit Facility | 669 | 664；Total debt obligations | 4,001 | 3,222
+【Other Liquidity】
+"On March 2, 2026, NVIDIA made a $2 billion investment in the Company through the purchase of shares of the Company’s Common Stock. The proceeds from the investment will be used to support research and development, future capacity and operations as we build out our manufacturing capabilities. We also entered into a multi-year capacity agreement that may require incremental investments in equipment, labor, and working capital to support future production volumes through 2030. While no material liability was recorded at quarter-end solely as a result of entering into the agreement, the arrangement may result in material future cash requirements and could affect revenue concentration, gross margin, and capital expenditures as volumes ramp."
+"The Company believes existing cash, cash flow from operations, and available borrowing capacity from its credit facilities will be sufficient to fund its needs for working capital, capital expenditures, repayment of scheduled long-term borrowings and lease obligations, investments in R&D, and internal and external growth objectives at least through the next twelve months."
+"At September 30, 2026, we had $583 million of restricted cash, which includes $581 million at Silicon Carbide LLC that is restricted for use by only that subsidiary."
+
+【Notes — Contract Liabilities】
+"Payments received from customers are based on invoices or billing schedules as established in contracts with customers. Contract liabilities generally relate to payments received in advance of performance under the contract. Contract liabilities are recognized as revenue when the performance obligations have been satisfied. During the three months ended September 30, 2026, we recognized revenue of $ 15 million related to customer payments that were included as contract liabilities in the Consolidated Balance Sheet as of June 30, 2026. We had $ 333 million of contract liabilities recorded in the Condensed Consolidated Balance Sheet as of September 30, 2026. As of September 30, 2026, $ 172 million of contract liabilities is included within Other accrued liabilities, and $ 161 million is included within Other liabilities on the Condensed Consolidated Balance Sheet. As of June 30, 2026, $ 48 million of contract liabilities is included in Other accrued liabilities, and $ 15 million is included within Other liabilities on the Condensed Consolidated Balance Sheet."
+
+【Notes — Equity（NVIDIA 私募）】
+"On March 2, 2026, the Company entered into a Securities Purchase Agreement (the “Purchase Agreement”) with NVIDIA Corporation (“NVIDIA”), pursuant to which the Company issued and sold 7,788,161 shares of Common Stock at a price of $ 256.80 per share, for aggregate gross proceeds of $ 2 billion."
+"The shares issued to NVIDIA were subject to a contractual lock-up for a period of six months following the closing date, during which NVIDIA could not, without the Company’s prior written consent, directly or indirectly transfer or otherwise dispose of the shares or enter into transactions that transfer the economic risks or benefits of ownership."
+"The price protection provision expired in September 2026 without being triggered. Accordingly, no additional shares were issued and no cash settlement was required."

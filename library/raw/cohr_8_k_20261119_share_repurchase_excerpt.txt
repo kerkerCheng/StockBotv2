@@ -1,0 +1,11 @@
+SOURCE: Coherent Corp.（COHR）Form 8-K（Item 7.01 Regulation FD Disclosure；Date of Report November 18, 2026；accession 0001193125-26-467737）
+URL: https://www.sec.gov/Archives/edgar/data/820318/000119312526467737/d867801d8k.htm
+PUBLISHED: 2026-11-19（EDGAR 申報日）
+RETRIEVED: 2026-11-27（本機抓 EDGAR 原文、去 HTML 後逐字截取；通用 UA）
+STORAGE: repo_excerpt（全文只有這一段實質內容，未刪句）
+NOTE: 發行人一手。授權 20 億美元庫藏股、沒有到期日、不承諾買多少。同一個月董事與執行長在公開市場買進（見 library/raw/cohr_form4_20260603_20261124_insider_trades_excerpt.txt）；
+同期 10-Q 寫總借款 40 億美元、營業現金流為負（library/raw/cohr_10_q_20261104_q1fy27_cash_debt_inventory_excerpt.txt）——授權不等於已經在買，買了多少要看下一份 10-Q。
+
+【Item 7.01 — Share Repurchase Program】
+"On November 18, 2026, the Board of Directors of Coherent Corp. (the “Company”) authorized a share repurchase program under which the Company may repurchase up to $2.0 billion of its common stock, exclusive of any fees, commissions or other expenses related to such repurchases. The repurchase program authorizes the Company to purchase its common stock from time to time in the open market, through negotiated purchases including accelerated buyback programs, in block transactions with an institutional broker, pursuant to Rule 10b5-1 plans, through the sale of put options or other derivative transactions that may result in the Company’s acquisition of its capital stock, or otherwise, all in compliance with applicable laws, rules, regulations and other restrictions."
+"The program has no expiration date, does not obligate the Company to repurchase any specific number of shares and may be suspended or discontinued at any time."

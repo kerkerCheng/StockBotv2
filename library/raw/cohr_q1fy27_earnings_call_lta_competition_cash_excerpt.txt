@@ -1,0 +1,64 @@
+SOURCE: Coherent Corp. FY2027 第一季法說會逐字稿（第三方轉錄：gloom.sh；機器轉錄）——長約客戶與預付款、400mW CW 雷射的對手、Marvell 併 Lumentum、每顆晶片內容值、毛利率驅動、財務長的現金與資本支出
+URL: https://gloom.sh/stocks/cohr/transcripts/q1-2027
+CROSS-CHECK: https://www.fool.com/earnings/call-transcripts/2026/11/05/coherent-cohr-q1-2027-earnings-call-transcript/（Motley Fool 全文逐字稿；2026-11-27 本機以通用 UA 抓 HTML、去標籤後與下面每一段逐句比對：語意一致、字面有 ASR 差異——例如 Fool 版把「five years」轉成「a year period」、把「before the end of calendar 27」轉成「calendar 2025」；講者欄 Fool 版有錯置，以 gloom.sh 的時間戳＋講者為準）
+PUBLISHED: 2026-11-04（法說會日期；與 8-K 財報同日、美東盤後；同一份轉錄稿另見 library/raw/cohr_q1fy27_earnings_call_substrates_excerpt.txt、cohr_q1fy27_earnings_call_photonlink_fiber_excerpt.txt、cohr_q1fy27_earnings_call_inp_mix_oversupply_excerpt.txt）
+RETRIEVED: 2026-11-27（本機 curl 取 HTML、去標籤後逐字截取；通用 UA）
+STORAGE: repo_excerpt（逐字稿有限節錄：Q&A 七段＋財務長開場白兩段，未刪句；前三份節錄已收的段落不重收）
+NOTE: 第三方機器轉錄（非發行人申報）；ASR 把「indium phosphide」轉成「Indian phosphide」、VCSEL 轉成「Vixel／Vixal」、把提問裡的 LTA 轉成「LCA」、把 Citi 分析師的名字轉成「Papa」——以下照轉錄稿逐字保留，不改字。
+買方兼 IDM 自述（L8）：①約 200 億美元那份長約的客戶**沒點名**，只說「a leading AI data center customer name you would definitely recognize」、以 400mW CW 雷射為錨、賣的不只雷射；
+②「幾乎每一份」長約都有客戶的預付款或 NRE，用來幫忙出這個客戶的產能資本支出——**法說沒寫金額**；同季 10-Q 的合約負債由 6 月底 6,300 萬增到 9 月底 3.33 億（現金流量表 +2.69 億，其中 1.61 億列非流動），對得上這句話，但**沒寫是哪幾個客戶付的**（library/raw/cohr_10_q_20261104_q1fy27_cash_debt_inventory_excerpt.txt）；
+③400mW 等級的 CW 雷射「only have one competitor there as far as we can see」——**沒點名是誰**；
+④財務長說的「cash balance of $2.34 billion」——推一步（不是原文）：同季 10-Q 的現金 1,553＋受限現金 45＋539＋短期投資 200＝2,337 百萬美元，對得上 2.34B；上一季 1,162＋35＋571＋825＝2,593，對得上 2.59B。
+**所以這個 2.34B 含了約 5.8 億受限現金（10-Q 原文「$583 million of restricted cash, which includes $581 million at Silicon Carbide LLC」，只有那家子公司能用）**（library/raw/cohr_10_q_20261104_q1fy27_cash_debt_inventory_excerpt.txt）。
+⑤Marvell 併 Lumentum（2026-11-02 宣布；library/raw/mrvl_lite_425_merger_call_2026_11_02_ocs_excerpt.txt）——執行長的回答是「客戶需要一家獨立的光學供應商」。
+
+[51:17 Tom O'Malley, Analyst, Barclays — 問長約客戶]
+"Super helpful. And then just as my follow-up for that LCA, obviously $20 billion , a pretty robust number over that five years. Could you just give us any color just around that customer perhaps? And then if you can't talk about the customer around some of the solutions, obviously it's PhotonLink, So it spans a large number of your products, but any more specificity would be really helpful, just given the size of that customer."
+
+[51:39 James Anderson, Chief Executive Officer]
+"Yeah, sure. So definitely a leading AI data center customer name you would definitely recognize. And so we're really proud of that partnership, excited about it. That's all that LTA for 20 billion is all around PhotonLink technology. I would call it, I would say it's anchored by our laser, our 400 milliwatt CW laser. That's kind of the anchor of that LTA."
+"But there's, it's more than, we're selling more than just that laser. So we're selling more, you know, call it a higher level solution than that. So more than just that laser. So we're really, really pleased by that. As I mentioned, the revenue, we expect the revenue to start to flow from that in early 2028 and to ramp over the course of the quarters of years after that. And so really pleased with that. And I think given the engagement that we have on PhotonLink across many different customers, many different solutions, we certainly expect to sign more long-term agreements and partnerships with PhotonLink over the coming quarters as well."
+
+[1:09:31 Unidentified Analyst, BNP Paribas — 問產能規劃與客戶預付]
+"Thank you. Jim, you spoke about how customers are beginning to book out to calendar 2028 that gives you confidence in your growth forecast. At the same time, there is investor concern about the financing and permitting of data centers here in the United States. In light of this, how does the team align its laser production capacity plans with your major customers, and has the team considered customer prepayments for additional laser production capacity?"（轉錄稿此句在頁面上截斷於「custo」，問句尾依 Motley Fool 版補：「And has the team considered customer prepayments for additional laser production capacity? Thank you.」）
+
+[1:09:58 James Anderson, Chief Executive Officer]
+"Yeah, thanks, Carl. The answer to the last part of the question is yes, definitely. Maybe I'll start with the end of the question. So we've signed a number of LTAs over the past quarters. The one public LTA is the one with NVIDIA that we signed back in March, but we've signed a number of other LTAs. The LTAs all follow a general pattern, and one part of the LTA is typically some sort of upfront payment from the customer."
+"It could be either prepayment or NRE. There's different forms of payment, but there's some sort of upfront payment from the customer. And what we do that for is for two reasons. Number one is it makes sure that the customers have skin in the game. But number two is we use that upfront payment to help fund the CapEx to build the capacity for that customer, right? We think it's important that if we're going to go build the capacity that the customers either fund that or help co-fund that. And so far we've had customers be very, very willing to do that. And I think that's worked really well for us. And so I would say almost every LTA that we've signed has that general pattern."
+"And so that certainly gives us better confidence and helps offset the risk in terms of our own capital deployment. But I guess on the first part of your question, we certainly work very, very closely with our customers on planning out the demand. I think one thing to keep in mind with Indian phosphide capacity is remember that it's not just being driven by data center demand. There's two things driving optics, in general, optics demand, right? Number one is data center growth, but number two is, in the case of integrated optics, it's the conversion of the copper links to optical over time. And that is a technology trend that, in my view, is independent of the market demand."
+
+[59:16 Gianmarco Conti, Analyst, Deutsche Bank — 問中國雷射供應商]
+"If I could just ask a follow-up. It's going to be a tough question. Sorry to put you on the spot. But I've been receiving a lot of questions from investors around Chinese laser suppliers. I was wondering if you could provide any kind of thoughts on basically more supply coming in online and whether you see them competing for ultra-high-powered lasers for CWs."
+
+[59:38 James Anderson, Chief Executive Officer]
+"Yeah, so I don't see that those competitors in terms of ultra high power, if you're talking about like the 400 milliwatt CW laser, we're not seeing competition from really, we really only have one competitor there as far as we can see, right? So we're really not seeing any other competitors out there with high power CW laser capability."
+
+[45:49 Simon Leopold, Analyst, Raymond James — 問 Marvell 併 Lumentum]
+"And as a follow-up, I have a hard question, one that I imagine you anticipate getting, is what does the proposed consolidation of Lumentum and Marvell mean to you? Thank you."
+
+[46:02 James Anderson, Chief Executive Officer]
+"Yeah, thanks, Simon. No, I don't think that's a hard question at all. I think happy to answer that. I'd give a few thoughts on this. I think number one is it definitely demonstrates that optics and photonics is becoming an absolutely critical part of data center architecture. You know, as we look forward, as we convert the entire scale-up network and then even the scale-in chip-to-chip communication links, over time, all of that getting converted from copper to optical, photonic technology is absolutely critical to making that happen, to driving the innovation in data center architecture. So I think it's a proof point around just the criticality of optics and photonics. And then I think for Coherent, I think it just highlights the tremendous strategic value of the portfolio that is within Coherent."
+"There's no other company, I believe, on the planet that has a broader and deeper set of photonic and optical technology. if you look at the entire optical signal chain from the generation of the light to the transmission through our fiber optic cable that we make to detection on the other side, I don't think there's any other company that's got a better portfolio of technology. So I think it definitely highlights the strategic importance of our technology platform. And then, look, I think from a customer perspective, I think that for a lot of our customers, I think it's really important that they have an independent photonic optical supplier and partner. And so I think it positions us really well to be that independent optical supplier that's going to support, without any competitive conflict, can support multiple different customers and support both hyperscaler customers, can support semiconductor customers."
+
+[17:21 James Anderson, Chief Executive Officer — prepared remarks，每顆晶片內容值]
+"For an XPU or switch chip with 100 terabits per second of bandwidth, we estimate our content opportunity can reach approximately $15,000 per chip."
+
+[1:05:19 James Anderson, Chief Executive Officer — 回答內容值能拿到幾成]
+"Yeah, thanks, Papa. Yeah, the 15,000 basically represents, if you take an example of a chip that needed 100 terabit of I. O. , and if you were using our full photon link portfolio, which would include not just the lasers, but all the other components, isolators, thermoelectric coolers, laser modules, our full fiber assembly kit, all the connectors, et cetera. So everything that we do, if you use all the content per chip would be, we estimated, about $15,000 per chip. Now, it will depend on the customer in their particular application how much of that content they utilize, whether they utilize a portion of that, all of it."
+
+[57:25 James Anderson, Chief Executive Officer — scale-in 的時點]
+"I think you also asked about scale-in chip-to-chip. I think that's a little further out in time. I think PhotonLink in scale-in applications is more in the 2029 to 2030, but we'll definitely see, I think, Vixels deployed in NPO applications well before that."
+
+[1:08:11 Sherri Luther, Chief Financial Officer — 毛利率到 45% 以上的驅動排序]
+"Yeah, okay. So if I were to rank order, I think that the largest contributors are going to be our new product ramps and that full operational leverage of our six-inch Indian phosphide capacity and then pricing optimization, followed by cost reduction. That's kind of how I would rank order it. And the timing of some of those things kicking in, right, will vary."
+
+[29:42 Sherri Luther, Chief Financial Officer — prepared remarks，資產負債表與資本支出]
+"Turning to the balance sheet, we closed the quarter with a healthy cash balance of $2.34 billion compared to $2.59 billion at the end of the prior quarter and $1.55 billion at the end of the year-ago quarter. Our debt leverage ratio at the end of Q1 was 1.1 times as we continued to maintain a highly resilient and flexible balance sheet."
+"Consistent with our capital allocation priorities, we strategically invested in opportunities that will drive long-term growth and profitability. Capital expenditures for the first quarter increased sequentially to $776 million , up from $556 million in the prior quarter, and $104 million in the year-ago quarter. These investments directly support the future growth of our data center and communications businesses with excellent financial returns."
+"Our conviction to deploy this capital at an accelerated rate is backed by exceptional customer visibility, a robust pipeline of committed purchase orders, and additional multi-year supply agreements. Furthermore, this capacity offers significant fungibility as our infrastructure can be efficiently repurposed to support multiple product lines. Given the strong visibility and record backlog, we expect capital expenditures to increase sequentially again in the second quarter."
+
+[1:14:39 James Anderson, Chief Executive Officer — InP 與 GaAs 產線能不能互換]
+"Sure. I would say there's some fungibility, but it's not like you can easily switch a line from india phosphide to gallium arsenide or vice versa. But I will note that we have a tremendous amount of gallium arsenide capacity. One of the stats that we shared at the PhotonLink launch is that today we have capacity to produce over a billion VIXL arrays annually. So we have a tremendous amount of capacity that we could deploy."
+
+[17:21 James Anderson, Chief Executive Officer — prepared remarks，兩個錨定客戶以外的接洽數（2026-11-27 補收；放檔尾，前面行號不動）]
+"This is in addition to our previously announced LTA with NVIDIA. Beyond these two anchor customers, we have more than 10 additional CPO engagements, more than 10 NPO engagements, and more than five chip-to-chip engagements."

@@ -1,0 +1,36 @@
+SOURCE: Lumentum Holdings Inc. Form 10-Q（fiscal quarter ended September 26, 2026）——產能保留協議（客戶承諾分兩期、第一期 1 億美元）、合約負債、元件營收成長來源、毛利率、與 Marvell 合併協議的簽約日與時限
+URL: https://www.sec.gov/Archives/edgar/data/1633978/000162828026069615/lite-20260926.htm
+PUBLISHED: 2026-11-03（EDGAR filingDate；同一份 10-Q 另見 library/raw/lite_10q_20260926_ocs_excerpt.txt）
+RETRIEVED: 2026-11-27（本機以通用 UA 抓 EDGAR 原文、去 HTML 後逐字截取）
+STORAGE: repo_excerpt（美國 SEC 法定申報有限節錄；表格以「|」分欄、空白攤平，數字照抄）
+NOTE: 發行人申報（自述）。做深 COHR（2026-11-27）時偵探子代理要「Lumentum 拿到逾 50 億美元 NPO／CPO 大單之後的客戶訂金」——這一份回答它：
+①2026-09 和「a certain customer」簽製造產能保留協議，客戶的財務承諾分兩期，第一期 1 億美元在簽約時到期——**記成應收（accrued accounts receivable）與非流動合約負債，季底還沒收到現金**；第二期金額沒寫；客戶沒點名；
+②合約負債（Deferred revenue and customer deposits）由 2026-06-27 的 15.4＋1.4＝16.8 百萬美元，變成 2026-09-26 的 12.2＋109.5＝121.7 百萬美元，其中 100.0 是上面那一筆；
+③所以「客戶預付，Coherent 拿得到、同業拿不到」只對一半：Lumentum 也拿到了（一筆、1 億、還沒收現），AOI 兩張長約寫明零客戶資金（library/raw/aaoi_pr_20261124_lta_tier1_hyperscaler_800g_lasers_excerpt.txt）。
+同一季 Coherent 的合約負債 6,300 萬→3.33 億（library/raw/cohr_10_q_20261104_q1fy27_cash_debt_inventory_excerpt.txt）。
+
+Note 7（Balance Sheet Details — Accrued Accounts Receivable）：
+"In September 2026, we entered into a manufacturing capacity reservation agreement with a certain customer. Under the agreement, the customer made a financial commitment, payable in two installments. The first installment of $ 100.0 million became due to us upon the execution of the agreement. Accordingly, we recorded $ 100.0 million in accrued accounts receivable within current assets and an offsetting contract liability within other non-current liabilities in our condensed consolidated balance sheets."
+
+Note 16（Revenue Recognition — Contract Balances；百萬美元；September 26, 2026 ／ June 27, 2026）：
+Accrued accounts receivable (1) | Accrued accounts receivable | $ | 100.0 | $ | — | $ | 100.0 | n/a |
+Deferred revenue and customer deposits – current (2) | Other current liabilities | $ | 12.2 | $ | 15.4 | $ | ( 3.2 ) | ( 20.8 ) | % |
+Deferred revenue and customer deposits – non-current (1) | Other non-current liabilities | $ | 109.5 | $ | 1.4 | $ | 108.1 | 7,721.4 | % |
+"(1) The outstanding amounts as of September 26, 2026 includes $ 100.0 million of contract liability to certain customer. Refer to “Accrued Accounts Receivable” section in “Note 7. Balance Sheet Details” for further details."
+"(2) We recorded the total $ 9.9 million of below-market contract liability related to our acquisition of a business in March 2026 in our condensed consolidated balance sheets, which will be amortized and recorded as revenue over the term of the supply agreement."
+
+Revenue（百萬美元；三個月）：
+Net revenue | $ | 1,262.6 | $ | 533.8 |
+Components | $ | 754.2 | $ | 379.2 | $ | 375.0 | 98.9 | % |
+
+MD&A（Components）：
+"The Components products net revenue growth was primarily driven by the ramp of laser chip and laser assembly product shipment, which represent 66% of the total growth to support strong, broad-based demand across intra-data center, data center interconnect, and long-haul applications."
+
+MD&A（Gross margin）：
+"Gross margin for the three months ended September 26, 2026 increased to 51.0% from 34.0% for the three months ended September 27, 2025, primarily driven by higher revenue from our laser chip, laser assembly, and data transport products as well as our cloud transceiver product lines and optical circuit switch products. Approximately 42% of the gross margin dollar increase was driven by lower manufacturing costs as a percentage of revenue, primarily due to higher internal factory utilization. Additionally, 45% of the gross margin increase was driven by a mix shift to higher margin products."
+
+Subsequent Event（與 Marvell 的合併協議；2026-11-27 寫 COHR 故事頁時補收）：
+"On November 1, 2026, we entered into a Merger Agreement with Marvell and two of its wholly owned subsidiaries, pursuant to which, upon the terms and subject to the conditions of the Merger Agreement, we will become a wholly owned subsidiary of Marvell."
+
+Risk Factors（合併的時限）：
+"In addition, either party may terminate the Merger Agreement if the Merger has not been completed by November 1, 2027, which date may be extended in certain circumstances to February 1, 2028, May 1, 2028 and August 1, 2028 if required regulatory approvals have not been obtained, and in certain other specified circumstances."
