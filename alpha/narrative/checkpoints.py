@@ -13,6 +13,8 @@ PSIX 的何時格 10-28 寫「最近的裁決點是第三季 10-Q（約 2026 年
   名冊上沒有更晚的日子時畫面印「最近的裁決點是（尚無）的第三季財報」）。單獨寫的佔位字（「…。{next_checkpoint_date}。」）
   會自己更新，不核。
 「寫下這段文字那天」＝何時格這段文字最早出現的那一版（只換騎、只改別格的版本沿用，`when_text_since`）。
+改期前的舊日子不是裁決點（2026-11-27，failure log #174）：「原定／原訂 X」而同一句寫了改期的字、又有另一個寫下那天之後的日子，
+X 不收（`_superseded_starts`）；只寫「原定 X 延後」沒寫改到哪天的照舊收——等的那一天不知道，就照舊日子叫重寫。
 
 只叫重寫、不判斷：進候選列 `rewrite[]`，⑤「敘事該重寫」照名字去改；文字是不是真的舊了，由寫的人讀過再改。
 ⚠ 抓不到的：沒寫日期、點名的又不是 SEC 定期報告（「等第三季財報」「等法說」「等第三季 6-K」）——那一半要等台股財報上架
@@ -75,12 +77,54 @@ def _year_for(month: int, day: int, written_on: date) -> date | None:
     return None
 
 
+#: 改期前的舊日子（failure log #174：SIVE.ST 何時格 11-24 寫「11-30 的第三季報告（公司 11-20 公告由原定 11-26 延後）」，
+#: 11-26 是寫下之後最早的日子，11-27 叫重寫、對帳日也排上 11-26）。標記緊貼在日子前面；同一句要有改期的字。
+_SUPERSEDED_MARK = re.compile(r"(?:原定|原訂|原本|原排|原先|原預計)\s*(?:於|在)?\s*$")
+_RESCHEDULED = re.compile(r"延後|延到|延至|順延|改到|改至|改期|提前")
+
+
+def _date_hits(text: str, written_on: date) -> list[tuple[int, int, date]]:
+    """每一個寫到的日子 `(起, 迄, 那一段的開始日)`；被別的命中包住的（年月日裡的月日）不算第二個。"""
+    hits: list[tuple[int, int, date]] = []
+    for pattern in (_ISO, _YMD):
+        for m in pattern.finditer(text):
+            if (d := _safe(int(m.group(1)), int(m.group(2)), int(m.group(3)))) is not None:
+                hits.append((m.start(), m.end(), d))
+    for m in _YM.finditer(text):
+        if 1 <= (month := int(m.group(2))) <= 12:
+            hits.append((m.start(), m.end(), _part_span(int(m.group(1)), month, m.group(3))[0]))
+    for pattern in (_MD, _M_D):
+        for m in pattern.finditer(text):
+            month, day = int(m.group(1)), int(m.group(2))
+            if 1 <= month <= 12 and 1 <= day <= 31 and (d := _year_for(month, day, written_on)) is not None:
+                hits.append((m.start(), m.end(), d))
+    for m in _MPART.finditer(text):
+        if 1 <= (month := int(m.group(1))) <= 12 and (anchor := _year_for(month, 15, written_on)) is not None:
+            hits.append((m.start(), m.end(), _part_span(anchor.year, month, m.group(2))[0]))
+    return [h for h in hits if not any(o[0] <= h[0] and h[1] <= o[1] and o[:2] != h[:2] for o in hits)]
+
+
+def _superseded_starts(text: str, *, written_on: date) -> set[int]:
+    """被改期取代的舊日子（命中的起點）：前面緊貼「原定／原訂…」、同一句有改期的字，而且同一句還有另一個沒被標成舊的、
+    寫下那天之後的日子（延後或提前到的那一天）。少了替代的日子就不算取代——照舊收（收緊面：略過要有新的那一天）。"""
+    hits = _date_hits(text, written_on)
+    marked = {h for h in hits if _SUPERSEDED_MARK.search(text[max(0, h[0] - 8):h[0]])}
+    out: set[int] = set()
+    for h in marked:
+        lo, hi = _sentence_bounds(text, h[0], h[1])
+        if _RESCHEDULED.search(text[lo:hi]) and any(
+                lo <= o[0] < hi and o not in marked and o[2] > written_on for o in hits):
+            out.add(h[0])
+    return out
+
+
 def when_spans(text: str, *, written_on: date) -> list[tuple[date, date]]:
     """何時格寫到的日子，一個一段 `(開始, 結束)`（排序、去重）：寫到日的開始＝結束；只寫到旬或月的是一段（「11 月初」＝11-01～11-10）。
-    年月日、ISO、月日、月-日、年月（旬）、月＋旬都收；沒寫年份的照 `written_on` 推。"""
+    年月日、ISO、月日、月-日、年月（旬）、月＋旬都收；沒寫年份的照 `written_on` 推；改期前的舊日子不收（`_superseded_starts`）。"""
     text = text or ""
     found: set[tuple[date, date]] = set()
     spans: list[tuple[int, int]] = []
+    old = _superseded_starts(text, written_on=written_on)
 
     def taken(m: re.Match) -> bool:
         return any(a <= m.start() < b for a, b in spans)
@@ -89,11 +133,12 @@ def when_spans(text: str, *, written_on: date) -> list[tuple[date, date]]:
         for m in pattern.finditer(text):
             d = _safe(int(m.group(1)), int(m.group(2)), int(m.group(3)))
             if d is not None:
-                found.add((d, d))
+                if m.start() not in old:
+                    found.add((d, d))
                 spans.append(m.span())
     for pattern in (_MD, _M_D):
         for m in pattern.finditer(text):
-            if taken(m):
+            if taken(m) or m.start() in old:
                 continue
             month, day = int(m.group(1)), int(m.group(2))
             if 1 <= month <= 12 and 1 <= day <= 31:
@@ -103,11 +148,12 @@ def when_spans(text: str, *, written_on: date) -> list[tuple[date, date]]:
     for m in _YM.finditer(text):
         year, month = int(m.group(1)), int(m.group(2))
         if 1 <= month <= 12:
-            found.add(_part_span(year, month, m.group(3)))
+            if m.start() not in old:
+                found.add(_part_span(year, month, m.group(3)))
             spans.append(m.span())
     for m in _MPART.finditer(text):
         month = int(m.group(1))
-        if taken(m) or not 1 <= month <= 12:
+        if taken(m) or m.start() in old or not 1 <= month <= 12:
             continue
         anchor = _year_for(month, 15, written_on)            # 用月中定年（窗只看月份），再換成那一旬
         if anchor is not None:
@@ -130,10 +176,15 @@ YEARLESS_AHEAD_DAYS = 90
 _SENTENCE_BREAKS = "。；\n"
 
 
-def _sentence_around(text: str, start: int, end: int) -> str:
+def _sentence_bounds(text: str, start: int, end: int) -> tuple[int, int]:
     left = max(text.rfind(ch, 0, start) for ch in _SENTENCE_BREAKS) + 1
     rights = [i for ch in _SENTENCE_BREAKS if (i := text.find(ch, end)) >= 0]
-    return text[left:min(rights) if rights else len(text)].strip()
+    return left, min(rights) if rights else len(text)
+
+
+def _sentence_around(text: str, start: int, end: int) -> str:
+    left, right = _sentence_bounds(text, start, end)
+    return text[left:right].strip()
 
 
 def reckoning_days(text: str, *, written_on: date) -> list[dict[str, Any]]:
@@ -151,9 +202,10 @@ def reckoning_days(text: str, *, written_on: date) -> list[dict[str, Any]]:
     text = text or ""
     found: dict[tuple[date, str], dict[str, Any]] = {}
     spans: list[tuple[int, int]] = []
+    old = _superseded_starts(text, written_on=written_on)      # 改期前的舊日子不是對帳日（failure log #174）
 
     def put(start: date, end: date, m: re.Match, yearless: bool) -> None:
-        if start <= written_on:
+        if start <= written_on or m.start() in old:
             return
         sentence = _sentence_around(text, m.start(), m.end())
         found.setdefault((end, sentence), {"date": end, "sentence": sentence, "yearless": yearless})

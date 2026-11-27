@@ -21,8 +21,8 @@ import pytest
 
 from alpha.candidates import CHECKPOINT_PASSED_PREFIX, assemble_board, rewrite_words
 from alpha.narrative import parse_brief_record
-from alpha.narrative.checkpoints import (checkpoint_passed, checkpoint_reason, placeholder_as_event, when_dates,
-                                         when_forms, when_spans, when_text_since)
+from alpha.narrative.checkpoints import (checkpoint_passed, checkpoint_reason, placeholder_as_event, reckoning_days,
+                                         when_dates, when_forms, when_spans, when_text_since)
 from alpha.providers.briefs import write_brief
 from alpha.providers.candidates import board_rewrite, checkpoint_check, checkpoint_inputs, derive_row
 
@@ -86,6 +86,38 @@ def test_the_earliest_date_still_ahead_when_written_flags_once_it_has_passed() -
     assert checkpoint_passed(text, written_on=written, today=D(2026, 11, 10)) is None
     assert checkpoint_passed(text, written_on=written, today=D(2026, 11, 11)) == {
         "kind": "date", "since": "2026-11-09", "checkpoint": "2026-11-10"}
+
+
+SIVE_WHEN = ("11-30 的第三季報告（公司 11-20 公告由原定 11-26 延後）：看資料中心光子產品營收有沒有出貨；"
+             "持續經營那一項要等 2026 年度年報的查核報告。")
+
+
+def test_sive_replay_a_day_replaced_by_a_reschedule_is_not_the_checkpoint() -> None:
+    """failure log #174：11-24 寫的何時格把延後前的 11-26 也寫進去，11-27 被叫重寫、對帳日排上 11-26；等的是 11-30。"""
+    written = D(2026, 11, 24)
+    assert D(2026, 11, 26) not in when_dates(SIVE_WHEN, written_on=written)
+    assert checkpoint_passed(SIVE_WHEN, written_on=written, today=D(2026, 11, 27)) is None
+    assert checkpoint_passed(SIVE_WHEN, written_on=written, today=D(2026, 12, 1))["checkpoint"] == "2026-11-30"
+    assert [r["date"] for r in reckoning_days(SIVE_WHEN, written_on=written)] == [D(2026, 11, 30)]
+
+
+@pytest.mark.parametrize("text, gone, kept", [
+    ("原定 12 月 10 日的法說提前到 12 月 3 日。", D(2026, 12, 10), D(2026, 12, 3)),                      # 提前：舊的是後面那天
+    ("股東會原訂於 2026 年 12 月 5 日，延至 2026 年 12 月 19 日。", D(2026, 12, 5), D(2026, 12, 19)),     # 年月日、標記接「於」
+])
+def test_a_rescheduled_day_drops_the_old_one_and_keeps_the_new_one(text: str, gone: date, kept: date) -> None:
+    dates = when_dates(text, written_on=D(2026, 11, 24))
+    assert gone not in dates and kept in dates
+
+
+@pytest.mark.parametrize("text, today, old_day", [
+    ("公司 11-20 公告原定 11-26 的法說延後，新日子未定。", D(2026, 11, 27), "2026-11-26"),   # 11-20 是寫下前的公告日，不是新的那天
+    ("11-30 前再看原定 11-26 那一份。", D(2026, 11, 27), "2026-11-26"),                       # 同一句沒有改期的字
+    ("股東會原訂於 2026 年 12 月 5 日，延後、新日子未定。", D(2026, 12, 6), "2026-12-05"),     # 年月日裡包著的月日不是新的那天
+])
+def test_an_old_day_without_a_new_one_still_counts(text: str, today: date, old_day: str) -> None:
+    """收緊面：略過要有替代的那一天——等的日子不知道，就照舊日子叫重寫。"""
+    assert checkpoint_passed(text, written_on=D(2026, 11, 24), today=today)["checkpoint"] == old_day
 
 
 # ---------------------------------------------------------------------------
