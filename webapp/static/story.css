@@ -244,6 +244,17 @@
   border: 0; }
 .system-numbers-part { margin: 0 0 12px; }
 .story-gaps { margin-top: 10px; }
+/* 有故事頁時是故事的一節，不是一張卡（2026-11-28 使用者：「融合進去現在新的敘事頁面」）：標題用故事的 h2、字級跟故事、
+   不加框；標題下一行說明是程式照帳上填的（app.js storySystemBlock） */
+.story-page .system-in-story { margin: 0; padding: 0; border: 0; border-radius: 0; background: none; font-size: inherit;
+  line-height: inherit; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.story-page .system-in-story .system-note { margin: 0; font-size: 13px; line-height: 1.6; color: var(--sp-ink2); }
+.story-page .system-in-story .candidate-line { display: flex; flex-direction: column; gap: 4px; }
+.story-page .system-in-story .candidate-state { font-size: 16px; }
+.story-page .system-in-story .row-reason { font-size: 14.5px; line-height: 1.65; color: var(--sp-ink2); }
+.story-page .system-in-story .warn { font-size: 14.5px; line-height: 1.65; }
+.story-page .system-in-story .candidate-words { display: flex; flex-wrap: wrap; gap: 6px 14px; }
+.story-page .system-in-story .story-gaps { margin-top: 4px; }
 
 .not-deep { margin-top: 10px; }
 .short-story { margin: 8px 0; }

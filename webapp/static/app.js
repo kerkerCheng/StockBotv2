@@ -1507,7 +1507,7 @@ function listGroupLabel(key) {
   return hit ? hit.label : null;
 }
 
-function candidateLine(view, inQuestions) {
+function candidateLine(view, inQuestions, noLink) {
   const panel = view.candidate;
   if (!panel) return null;      // 3.7 之前 materialize 的 artifact 沒有這個面板
   const lines = lineMap(panel);
@@ -1570,9 +1570,12 @@ function candidateLine(view, inQuestions) {
     if (row.note) node.appendChild(el('div', 'row-reason', row.note));
   }
   // 「和其他檔並排看」在首頁（2026-10-28 候選板併進首頁），不是這一檔的細節（細節在上面三個字點下去的稽核區）。
-  const link = el('a', 'dim', '和其他檔一起看（公司）→');
-  link.href = '#/';
-  node.appendChild(link);
+  // 故事頁裡不印（noLink；2026-11-28 瘦身）：頁首已有「← 回清單」。
+  if (!noLink) {
+    const link = el('a', 'dim', '和其他檔一起看（公司）→');
+    link.href = '#/';
+    node.appendChild(link);
+  }
   return node;
 }
 
@@ -1938,14 +1941,15 @@ function waitBadge(sp, key) {
   return badge;
 }
 
-/** 「系統裡的它」（plan §2.7；一個函式、固定順序、全部沿用現有元件、不新算任何數）：①候選狀態與賭注句（＋和持有的檔押
- *  同一個需求——AGENTS「必須點明相關性」）②押在哪一層、路徑（有故事頁時示意圖也放這裡；名詞一個展開）③讀圖的判讀
- *  （＋研究寫的這條鏈怎麼走與引文，一個展開）④會不會先死 ⑤已定價嗎、出現在數字裡了嗎（數字收一個展開：參考尺、
- *  營收從哪來——客戶集中度、backlog 也在這裡）⑥已登記的等待（反證、確認條件、事件與影響多大、時間表）⑦現在的股價
- *  ⑧這一頁和系統對不上的（只在有故事頁時）。
+/** 「系統裡的它」——沒有故事頁的檔（2026-11-28 起；有故事頁的走 `storySystemBlock`）。這一頁沒有故事，這一塊就是主內容，所以
+ *  照 plan §2.7 全留（一個函式、固定順序、全部沿用現有元件、不新算任何數）：①候選狀態與賭注句（＋和持有的檔押同一個需求——
+ *  AGENTS「必須點明相關性」）②押在哪一層、路徑（名詞一個展開）③讀圖的判讀（＋研究寫的這條鏈怎麼走與引文，一個展開）
+ *  ④會不會先死 ⑤已定價嗎、出現在數字裡了嗎（數字收一個展開：參考尺、營收從哪來——客戶集中度、backlog 也在這裡）
+ *  ⑥已登記的等待（反證、確認條件、事件與影響多大、時間表）⑦現在的股價。示意圖在這一塊上面（`stockPage`）。
  *  2026-11-26 落地時逐行對照舊版：需求錨的四張圖、吃到多少、各格的依據（短故事那一格的原文）、各塊標題只在舊版
  *  （頁尾連結）。「會不會死」那一行總結 2026-11-27 使用者「加回去就夠了」：放在四盞燈上面，點了跳到算出燈的數字。 */
 function systemBlock(payload, view, sp) {
+  if (sp) return storySystemBlock(payload, view, sp);
   const box = el('div', 'system-block');
   box.appendChild(el('h2', 'system-title', '系統裡的它'));
   const light = view.brief && lineMap(view.brief).brief_status_light;       // 敘事的狀態燈（「有假設改過，判斷還沒重看」）
@@ -1960,7 +1964,6 @@ function systemBlock(payload, view, sp) {
   pathSentences(payload).forEach((n) => box.appendChild(n));
   const chain = chainDetail(payload, view);      // 走圖的敘事：研究寫的這條鏈怎麼走＋圖裡 claim 的引文（11-26「走圖啥的敘事」）
   if (chain) box.appendChild(chain);
-  if (sp) pageDiagrams(payload, view).forEach((n) => box.appendChild(n));
   const rides = view.bet && lineMap(view.bet).rides;
   const glossary = rides && Array.isArray(rides.datum.value) && rides.datum.value.length ? unitGlossary() : null;
   if (glossary) box.appendChild(drill('名詞：層、插槽、押在哪一格', () => glossary));
@@ -1982,8 +1985,76 @@ function systemBlock(payload, view, sp) {
   const timeline = timelineDetail(view);
   if (timeline) box.appendChild(timeline);
   box.appendChild(priceFigure(payload));
-  const gaps = sp ? storyGapLines(sp) : null;
+  return box;
+}
+
+/** 有故事頁的檔的「系統裡的它」（2026-11-28 使用者：「瘦身」「我是想要原本 old 還存在的那一段，就融合進去現在新的敘事頁面」）。
+ *  故事已經講過、或頁首已經印的不再印一次：押什麼／翻倍要／認錯看那一句（第 11、12 題）、它坐的二十幾層與錢怎麼走到它、
+ *  這條鏈怎麼走、每條反證的細節與時間表（第 11、12 題的等待徽章）、四盞燈逐盞（會不會死一行＋數字的展開就夠）、股價圖（頁首有
+ *  現價、第 9 題有圖）。留下系統帳上會自己變、故事不能手抄的（AGENTS「系統自己知道的由程式填」）：候選狀態與理由、和持有的檔
+ *  押同一個需求、押的那一層讀成什麼（示意圖收進展開——頁首那一句「往下有圖」指的就是它）、會不會死一行、已定價嗎／出現在
+ *  數字裡了嗎、反證與確認條件有沒有醒、事件與影響多大、這一頁和系統對不上的。排成故事的一節（標題用故事的 h2、不是一張卡），
+ *  標題下一行寫明是程式照帳上填的。拿掉的在舊版個股頁還看得到；刪舊版前再對一次。 */
+function storySystemBlock(payload, view, sp) {
+  const box = el('div', 'system-block system-in-story');
+  box.appendChild(el('h2', null, '系統裡的它'));
+  box.appendChild(el('p', 'system-note', '這一節是程式照系統帳上的現值填的，每天更新；上面的故事是研究時寫的。'));
+  const light = view.brief && lineMap(view.brief).brief_status_light;       // 敘事的狀態燈（「有假設改過，判斷還沒重看」）
+  const lit = light && light.datum && light.datum.value;
+  if (lit && lit.label) box.appendChild(el('span', 'badge badge-light light-' + (lit.state || 'unknown'), lit.label));
+  const row = candidateStateRow(view);
+  const line = candidateLine(view, true, true);
+  if (line) box.appendChild(line);
+  sharedBetLines(row).forEach((n) => box.appendChild(n));
+  const reading = rideReadingLine(payload, view);
+  if (reading) box.appendChild(reading);
+  const diagrams = pageDiagrams(payload, view);
+  if (diagrams.length) {
+    box.appendChild(drill('技術鏈示意圖：它在哪一格', () => {
+      const wrap = el('div', 'block-detail');
+      diagrams.forEach((n) => wrap.appendChild(n));
+      return wrap;
+    }));
+  }
+  const dies = lampLine(view);
+  if (dies) box.appendChild(dies);
+  wordsBlock(view, ['priced_in', 'in_numbers']).forEach((n) => box.appendChild(n));
+  const numbers = systemNumbers(payload, view);
+  if (numbers) box.appendChild(numbers);
+  disproofBrief(view).forEach((n) => box.appendChild(n));
+  confirmBrief(row).forEach((n) => box.appendChild(n));
+  const events = eventBlock(payload);
+  if (events) box.appendChild(events);
+  const gaps = storyGapLines(sp);
   if (gaps) box.appendChild(gaps);
+  return box;
+}
+
+/** 押的那一層（或插槽）讀成什麼：敘事的 rides 每一個一句——名字連到圖頁那一層、讀圖照抄第一段（同 `seatsSentence` 的讀法），
+ *  沒讀過圖照說。只給有故事頁的「系統裡的它」：坐的其他層與每一層的讀圖在圖頁。 */
+function rideReadingLine(payload, view) {
+  const rides = view.bet && lineMap(view.bet).rides;
+  const list = rides && rides.datum && Array.isArray(rides.datum.value) ? rides.datum.value : [];
+  if (!list.length) return null;
+  const read = {};
+  ((view.readings && view.readings.lines) || []).filter((line) => line.role === 'reading').forEach((line) => {
+    const m = /^reading:(.+):(layer|socket)$/.exec(line.key) || [];
+    const d = line.datum || {};
+    if (m[1] && typeof d.value === 'string' && d.value) read[m[1]] = d.value.split('｜')[0];
+  });
+  const names = payload.node_names || {};
+  const box = el('div', 'row-reason ride-reading');
+  box.appendChild(document.createTextNode('讀圖：'));
+  list.forEach((ride, i) => {
+    if (i) box.appendChild(document.createTextNode('；'));
+    box.appendChild(document.createTextNode('押的'));
+    const link = el('a', null, nodeLabel(ride.node, names[ride.node] || ride.node_name));
+    link.href = '#/graph/' + encodeURIComponent(ride.node);
+    link.title = ride.node;
+    box.appendChild(link);
+    const unit = ride.unit_label || ride.unit || '';
+    box.appendChild(document.createTextNode(`${unit ? `（${unit}）` : ''}${read[ride.node] ? `讀成「${read[ride.node]}」` : '還沒有讀圖'}`));
+  });
   return box;
 }
 

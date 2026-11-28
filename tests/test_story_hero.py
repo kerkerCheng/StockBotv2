@@ -206,6 +206,36 @@ def test_the_stock_page_prints_the_hero_before_the_short_story_and_the_die_line_
     assert ".story-hero span.src" in css
 
 
+def test_a_story_page_gets_the_slim_system_section_and_a_page_without_one_keeps_the_full_block() -> None:
+    """2026-11-28 使用者：「瘦身」「原本 old 還存在的那一段，就融合進去現在新的敘事頁面」。有故事頁的檔走
+    `storySystemBlock`：故事講過或頁首已印的不再印（押什麼那一句、坐的層與路徑、這條鏈怎麼走、四盞燈逐盞、反證的展開與
+    時間表、股價圖）；系統帳上會自己變的照程式填。沒有故事頁的檔照舊整塊——它沒有故事，這一塊就是主內容。"""
+    app = (ROOT / "webapp" / "static" / "app.js").read_text(encoding="utf-8")
+
+    def body(name: str) -> str:
+        start = app.index(f"function {name}(")
+        return app[start:app.index("\n}\n", start)]
+
+    full, slim = body("systemBlock"), body("storySystemBlock")
+    assert "if (sp) return storySystemBlock(payload, view, sp);" in full
+    kept = ("candidateLine(view, true, true)", "sharedBetLines(row)", "rideReadingLine(payload, view)",
+            "pageDiagrams(payload, view)", "lampLine(view)", "wordsBlock(view, ['priced_in', 'in_numbers'])",
+            "systemNumbers(payload, view)", "disproofBrief(view)", "confirmBrief(row)", "eventBlock(payload)",
+            "storyGapLines(sp)")
+    for call in kept:
+        assert call in slim, call
+    dropped = ("betLines(", "seatsSentence(", "pathSentences(", "chainDetail(", "unitGlossary(", "seatsDetail(",
+               "lampsBlock(", "downsideDetail(", "timelineDetail(", "priceFigure(")
+    for call in dropped:
+        assert call not in slim, call
+        assert call in full, call            # 沒有故事頁的檔一樣都不少
+    # 沒有故事頁：示意圖在 stockPage（短故事後面）、「這一頁和系統對不上的」只有故事頁有
+    assert "pageDiagrams(" not in full and "storyGapLines(" not in full
+    assert "candidateLine(view, true)" in full and "'和其他檔一起看（公司）→'" in body("candidateLine")
+    css = (ROOT / "webapp" / "static" / "story.css").read_text(encoding="utf-8")
+    assert ".story-page .system-in-story {" in css
+
+
 def test_the_cli_hero_only_takes_ticker_and_hero_and_nothing_else(tmp_path, monkeypatch, capsys) -> None:
     import alpha.providers.stories as stories_mod
     from alpha.cli import build_parser
