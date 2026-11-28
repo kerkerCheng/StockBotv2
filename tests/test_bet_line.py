@@ -481,8 +481,11 @@ def test_the_front_end_prints_the_sentences_as_given_and_builds_none() -> None:
     source = (Path(__file__).resolve().parent.parent / "webapp" / "static" / "app.js").read_text(encoding="utf-8")
     code = re.sub(r"(?m)//.*$", "", re.sub(r"/\*.*?\*/", "", source, flags=re.S))
     assert "function betLines(" in code and "function betList(" in code and "function calendarRow(" in code
-    part = source.split("function questionPart(", 1)[1].split("\n}\n", 1)[0]
-    assert "'bet_line'" in part and "betLines(" in part
+    # 2026-11-28 舊版個股頁（十三塊的 `questionPart`）刪除：賭注句印在沒做深的檔的「系統裡的它」；做過故事頁的檔不印
+    # （故事的第 11、12 題就是長版）
+    system = source.split("function systemBlock(", 1)[1].split("\n}\n", 1)[0]
+    slim = source.split("function storySystemBlock(", 1)[1].split("\n}\n", 1)[0]
+    assert "betLines(row)" in system and "betLines(" not in slim
     for built in ("押：", "翻倍要：", "下一個對帳日：", "認錯看：", "還沒寫賭注句"):
         assert built not in code, built                                        # 這幾個字只住 alpha.bet_line（L16）
     assert ".sort(" not in code

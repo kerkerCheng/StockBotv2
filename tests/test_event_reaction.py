@@ -111,7 +111,7 @@ def test_the_b5_lines_only_copy_the_materialized_reactions() -> None:
         nxt = re.search(r"\n(?:async )?function |\nconst [A-Z_]+ =", app[start + 10:])
         return app[start: start + 10 + (nxt.start() if nxt else len(app))]
 
-    assert "eventReactionLines(payload)" in body("blockVisuals")
+    assert "eventReactionLines(payload)" in body("eventBlock")      # 2026-11-28 起只有新版個股頁（舊版 blockVisuals 刪除）
     lines = body("eventReactionLines")
     for copied in ("payload.event_reaction", "e.kind_label", "w.relative", "w.pending", "r.absence", "e.reaction_absence",
                    "counts.estimated_checkpoints", "e.price_before"):

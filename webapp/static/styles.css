@@ -430,37 +430,11 @@ table.rank.compare td:first-child { color: var(--muted); }
 .reverse { margin-top: 18px; padding-top: 14px; border-top: 1px dashed var(--border); }
 .reverse h3 { font-size: 14px; margin: 0 0 8px; }
 
-/* ---------- 投資人短評（2026-09-15） ---------- */
-.brief-card .story { margin-top: .6rem; }
-.brief-card .story-row { display: grid; grid-template-columns: 9.5rem 1fr; gap: .2rem .9rem; padding: .45rem 0; border-top: 1px solid var(--border); }
-.brief-card .story-row:first-child { border-top: 0; }
-.brief-card .story-label { font-weight: 600; opacity: .8; line-height: 1.5; }
-.brief-card .story-text { line-height: 1.6; }
-@media (max-width: 640px) { .brief-card .story-row { grid-template-columns: 1fr; gap: .15rem; } }
-/* 首屏五題（Phase 7 Step 7.0e）：每題一段，題目在上、既有句子與燈在下；不加任何分數或名次樣式。 */
-.brief-card .five-questions { margin-top: .4rem; }
-.brief-card .fq { padding: .55rem 0 .35rem; border-top: 1px solid var(--border); }
-.brief-card .fq:first-child { border-top: 0; }
-.brief-card .fq-title { font-size: 15px; margin: 0 0 .15rem; }
-.brief-card .fq .story { margin-top: .15rem; }
-.brief-card .fq .candidate-words { margin: .25rem 0; }
-/* 個股頁 S5（2026-10-08）：首屏照 page_schema 的段排（論點／短文／深入／清單）；段名小字在上、塊沿用五題的樣式。
-   沒有分數、名次或顏色排序——段與塊的順序只是閱讀順序。 */
-.brief-card .schema-screen { margin-top: .4rem; }
-.brief-card .ss-section { margin-top: .7rem; }
-.brief-card .ss-section:first-child { margin-top: .2rem; }
-.brief-card .ss-section-title { font-size: 12px; letter-spacing: .08em; opacity: .65; padding-bottom: .15rem;
-  border-bottom: 1px solid var(--border); }
-.brief-card .ss-section .fq:first-of-type { border-top: 0; }
-.brief-card .ss-pending { font-style: italic; opacity: .75; }
-.brief-card .ss-block details { margin-top: .25rem; }
-/* 故事層（2026-10-29）：依據＝那一格的原文，收在展開最前面；小一號字、不搶故事。 */
-.basis-row { padding: .35rem 0; border-bottom: 1px solid var(--border); font-size: 13px; }
-.basis-row .story-label { font-weight: 600; opacity: .75; }
+/* ---------- 投資人短評（2026-09-15） ----------
+   ⚠ 2026-11-28：舊版個股頁（短評卡 `.brief-card`：頁首＋十三塊）刪除，只掛在它底下的樣式一起拿掉。 */
+/* 依據的原文（候選理由的「依據」展開）：小一號字、不搶故事。 */
 .basis-text { line-height: 1.55; opacity: .9; overflow-wrap: anywhere; }
-.brief-card .ss-cells .attention-body { overflow-wrap: anywhere; }
 .numbers-strip .headline-numbers .num-value { font-size: 19px; }
-.brief-card .badge-light { margin-left: .5rem; }
 .card-brief { margin: .4rem 0 .2rem; font-size: .92rem; line-height: 1.45; opacity: .9; }
 .scale { margin-top: 1rem; }
 .scale-svg { width: 100%; height: auto; display: block; }
@@ -504,24 +478,6 @@ table.rank.compare td:first-child { color: var(--muted); }
 .arg-cites { margin: .3rem 0 0 1rem; padding: 0; font-size: .9rem; line-height: 1.5; }
 .arg-cites .cite-who { font-weight: 600; opacity: .8; }
 
-/* 走勢圖住在短評卡裡：去掉內層 panel 的外框，只留標題與圖 */
-.brief-card > .panel { border: 0; padding: .6rem 0 0; margin: .6rem 0 0; box-shadow: none; background: transparent; }
-
-/* 首屏末行（Phase 3 Step 3.7）：候選狀態＋財務三題三個字。字全由 materialize 端給，這裡只排版。 */
-.brief-card .candidate-line { margin-top: .7rem; padding-top: .6rem; border-top: 1px solid var(--border); }
-.brief-card .candidate-state { font-size: 15px; }
-.brief-card .candidate-words { display: flex; flex-wrap: wrap; gap: .3rem 1.2rem; margin: .35rem 0; }
-.brief-card .candidate-words .word { white-space: nowrap; }
-/* 2026-09-30：三個字可以點（跳到同頁稽核區那一題）。 */
-.brief-card .candidate-words .word-link {
-  font: inherit; color: var(--accent); background: transparent; cursor: pointer;
-  border: 1px solid var(--border); border-radius: 999px; padding: .15rem .6rem;
-}
-.brief-card .candidate-words .word-link:hover { background: var(--surface-2); }
-/* 2026-10-29：會不會死一行（`lampLine`）可能比一個字長——可以換行、靠左 */
-.brief-card .candidate-words .lamp-line { white-space: normal; text-align: left; }
-.brief-card .seats-line a { margin: 0 .1rem; }
-.brief-card .lamp-notes { margin: .1rem 0 .3rem; }
 .lamp-plain { margin-bottom: 6px; }
 .lamp-row { font-size: 14px; line-height: 1.6; margin: 2px 0; }
 

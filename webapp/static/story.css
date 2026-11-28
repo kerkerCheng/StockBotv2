@@ -258,7 +258,6 @@
 
 .not-deep { margin-top: 10px; }
 .short-story { margin: 8px 0; }
-.old-page { margin: 28px 0 0; }
 
 @media (max-width: 480px) {
   .story-page { font-size: 15.5px; gap: 40px; }

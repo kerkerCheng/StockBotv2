@@ -81,6 +81,7 @@
 
 > 日期＝交付日。這裡只留落點，讓程式註解裡的 `ROADMAP「標題」` 找得到；要看做了什麼、數字怎麼變，讀封存列。
 
+- 2026-11-28 **刪舊版個股頁（`#/old/`，頁首＋十三塊）**（使用者「2 go」，沒有 ROADMAP 列、這一行就是紀錄）——`briefCard` 與只有它用的八個函式拿掉；需求錨與「吃到多少」兩張圖搬進「系統裡的它」的數字與出處（`systemNumbers`）；存著的舊連結轉到新版；機制見 ARCHITECTURE §6.12；`tests/test_webapp_api.py -k story_page_only`
 - 2026-11-28 **故事頁的「系統裡的它」瘦身、排成故事的一節**（使用者指示「瘦身」「原本 old 還存在的那一段，就融合進去現在新的敘事頁面」，沒有 ROADMAP 列、這一行就是紀錄）——有故事頁的檔走 `storySystemBlock`（只留帳上會自己變的；故事講過的不重印）、沒有故事頁的照舊 `systemBlock`；機制見 ARCHITECTURE §6.12；`tests/test_story_hero.py -k slim`
 - 2026-11-27 **淺寫頁首：還沒做深的檔先有一段頁首**（使用者指示「走2」，沒有 ROADMAP 列、這一行就是紀錄）——故事紀錄選填鍵 `hero`（`alpha/narrative/story.py::hero_problems`）、⑤「頁首還沒寫」（`todo.hero`，交付當天 18 檔）；新個股頁「系統裡的它」加回會不會死一行（`lampLine`）；機制見 ARCHITECTURE §6.11、§6.12；`tests/test_story_hero.py`
 - 2026-11-19 **故事已定價段的股價脈絡帶截至日**——寫入端拒收沒有截至日的股價走勢句（`alpha.narrative.contracts.undated_price_move_claims`）；`tests/test_stories.py -k price_move`

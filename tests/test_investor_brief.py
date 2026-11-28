@@ -158,13 +158,16 @@ def test_packet_carries_the_brief_frame_for_the_session() -> None:
     assert "alpha brief" in frame["_how_to_use"]
 
 
-def test_the_page_is_the_brief_and_each_block_keeps_its_own_detail() -> None:
-    """2026-10-08（使用者：「舊有的資訊非必要的就拿掉」）：單檔頁只剩頁首與短評卡（十三塊）；細節住各自那一塊的展開。"""
+def test_the_page_is_the_story_and_the_system_block_and_neither_computes_returns() -> None:
+    """2026-10-08（使用者：「舊有的資訊非必要的就拿掉」）頁首＋短評卡（十三塊）；2026-11-26 起換成故事頁框架，2026-11-28
+    使用者「刪」舊版（`briefCard`）。單檔頁＝頁首＋`stockPage`（故事頁，或短故事＋「系統裡的它」）；頁面層沒有大展開。"""
     source = (ROOT / "webapp" / "static" / "app.js").read_text(encoding="utf-8")
     block = source.split("async function renderDetail", 1)[1]
     block = re.split(r"\n(?:async )?function ", block, maxsplit=1)[0]
-    assert "briefCard(" in block and "argumentCard(" not in block and "drill(" not in block
-    # 首屏卡片不得自己算報酬；尺的三個數與兩個報酬都來自 materialize 端
-    card = source.split("function briefCard", 1)[1].split("\nasync function renderDetail", 1)[0]
-    for token in ("fair_value /", "/ price", "value - ", "value / ", "Math.pow"):
-        assert token not in card, token
+    assert "stockPage(payload, view)" in block and "briefCard(" not in source
+    assert "argumentCard(" not in block and "drill(" not in block
+    # 個股頁不得自己算報酬：數字都來自 materialize 端
+    for name in ("stockPage", "systemBlock", "storySystemBlock"):
+        body = source.split(f"function {name}(", 1)[1].split("\n}\n", 1)[0]
+        for token in ("fair_value /", "/ price", "value - ", "value / ", "Math.pow"):
+            assert token not in body, (name, token)

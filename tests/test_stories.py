@@ -303,15 +303,19 @@ def test_the_first_screen_contract_places_each_story_only_slot_once() -> None:
     assert readings["B3"]["pending"] and readings["B5"]["pending"]
 
 
-def test_the_front_end_prints_the_story_first_and_keeps_the_basis_one_click_away() -> None:
-    """app.js：每塊先找 `story:<格>`、沒有才印依據；依據併進那一塊的展開；只有故事的格照合約的 story_slots；
-    首頁卡片印缺 X 的短標；候選理由先印故事。"""
+def test_the_front_end_prints_the_story_first() -> None:
+    """app.js：沒做深的檔的短故事每一格先找 `story:<格>`、沒有才印敘事原文；只有故事的格接在後面；首頁卡片印缺 X 的短標；
+    候選理由先印故事、原理由收進「依據」。2026-11-28 舊版個股頁（十三塊，各格的依據併進那一塊的展開）刪除——各格依據的
+    原文使用者 11-27 說不看，跟著拿掉。"""
     from pathlib import Path
 
     js = (Path(__file__).resolve().parents[1] / "webapp" / "static" / "app.js").read_text(encoding="utf-8")
-    for token in ("lines['story:' + slot]", "reading.story_slots", "function basisRow", "basis.push(basisRow(said))",
-                  "cand.missing_label", "row.reason_story"):
+    story = js.split("function shortStory(", 1)[1].split("\n}\n", 1)[0]
+    for token in ("row.key.indexOf('story:') === 0", "told[slot] || row", "Object.keys(told)"):
+        assert token in story, token
+    for token in ("cand.missing_label", "row.reason_story", "drill('依據'"):
         assert token in js, token
+    assert "function basisRow" not in js
 
 
 def test_the_cli_writes_a_batch_only_when_every_story_passes(tmp_path, monkeypatch) -> None:

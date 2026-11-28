@@ -320,30 +320,31 @@ def test_plain_labels_never_claim_more_than_the_vocabulary_does() -> None:
     assert joined.count("可以買") == joined.count("不是「可以買」")
 
 
-def test_single_stock_page_is_the_header_and_the_thirteen_blocks_only(client) -> None:
-    """2026-10-08 使用者：「舊有的資訊非必要的就拿掉，除非是給我看的；給機器看的不用顯示出來」。單檔頁＝頁首（現價、
-    哪天產生）＋十三塊；頁尾四張卡（基本數字／憑什麼這樣想／讀圖／錯了怎麼知道）與「稽核」「完整細節」兩個大展開拿掉——
-    不是收起來，是拿掉；人讀的內容搬進對應的塊，給查核用的留在 artifact 與 API。"""
+def test_single_stock_page_is_the_header_and_the_story_page_only(client) -> None:
+    """2026-10-08 使用者：「舊有的資訊非必要的就拿掉，除非是給我看的；給機器看的不用顯示出來」——頁尾四張卡與「稽核」
+    「完整細節」兩個大展開拿掉（不是收起來，是拿掉）。2026-11-26 起單檔頁＝頁首＋故事頁框架（`stockPage`）；2026-11-28 使用者
+    「刪」舊版（頁首＋十三塊，`#/old/`）。人讀的內容在「系統裡的它」，給查核用的留在 artifact 與 API。"""
     source = (ROOT / "webapp" / "static" / "app.js").read_text(encoding="utf-8")
     block = source.split("async function renderDetail", 1)[1]
     block = re.split(r"\n(?:async )?function ", block, maxsplit=1)[0]
-    assert "briefCard(payload, view)" in block and "headerLine(payload, view)" in block
+    assert "stockPage(payload, view)" in block and "headerLine(payload, view)" in block
     assert "drill(" not in block, "頁面層不再有大展開（稽核／完整細節）"
     for gone in ("numbersStrip", "argumentCard", "readingsCard", "downsideCard", "conclusionCard", "blockerCard",
                  "threeQuestionsCard", "versusMarketCard", "pageFillCard", "blockCells", "renderHeadline", "renderBet",
-                 "renderFundamental", "renderResearch", "renderReadiness", "renderFreshness", "priceCard"):
+                 "renderFundamental", "renderResearch", "renderReadiness", "renderFreshness", "priceCard",
+                 "briefCard", "schemaFirstScreen", "schemaBlock", "blockVisuals", "blockDetail", "numbersDrill",
+                 "questionPart", "basisRow", "plainPanel"):
         assert f"function {gone}(" not in source, f"{gone} 應已拿掉"
-    # 人讀的內容搬進對應的塊（論證、坐的層、反證、時間表、三題的數字與出處）
-    detail = source.split("function blockDetail", 1)[1].split("\nfunction ", 1)[0]
-    for owner in ("chainDetail(payload, view)", "seatsDetail(payload, view)", "'priced_in'", "'in_numbers'", "downsideDetail(view)",
-                  "'will_it_die'", "timelineDetail(view)"):
-        assert owner in detail, f"塊的展開少了 {owner}"
-    # 走勢圖住在「怎麼被定價」那一塊（脈絡不是訊號）；首屏卡片不再自己掛走勢
-    visuals = source.split("function blockVisuals", 1)[1].split("\nfunction ", 1)[0]
-    assert "priceFigure(payload)" in visuals
-    # 沒有短評的頁也照十三塊排（不再有第二套舊版面）
-    brief_fn = source.split("function briefCard", 1)[1].split("\nfunction ", 1)[0]
-    assert "schemaFirstScreen(payload, view, available ? panel : null)" in brief_fn
+    assert "'#/old/'" not in source and "old-page" not in source, "舊版個股頁的連結應已拿掉"
+    # 人讀的內容在沒做深的檔的「系統裡的它」（論證、坐的層、反證、時間表、三題的數字與出處、走勢圖——脈絡不是訊號）
+    system = source.split("function systemBlock(", 1)[1].split("\n}\n", 1)[0]
+    for owner in ("chainDetail(payload, view)", "seatsDetail(payload, view)", "'priced_in'", "'in_numbers'",
+                  "downsideDetail(view)", "lampLine(view)", "timelineDetail(view)", "systemNumbers(payload, view)",
+                  "priceFigure(payload)"):
+        assert owner in system, f"系統裡的它少了 {owner}"
+    # 存著的舊連結轉到新版，不印「讀不到」
+    route = source.split("async function route(", 1)[1].split("\n}\n", 1)[0]
+    assert "target.startsWith('old/')) window.location.replace(" in route
 
 
 def test_price_series_is_context_not_a_signal(client) -> None:
@@ -406,7 +407,7 @@ def test_each_block_has_at_most_one_expansion_and_none_is_nested() -> None:
         part = source.split(f"function {name}(", 1)[1]
         return re.split(r"\n(?:async )?function ", part, maxsplit=1)[0]
 
-    for fn in ("chainDetail", "seatsDetail", "numbersDrill", "downsideDetail", "timelineDetail"):
+    for fn in ("chainDetail", "seatsDetail", "systemNumbers", "downsideDetail", "timelineDetail"):
         assert body(fn).count("drill(") == 1, f"{fn} 只准有一個展開"
     for helper in ("argumentSection", "tqNumbers", "detailList", "tqPoint", "layerNoteLinks", "marketMultiples"):
         assert "drill(" not in body(helper), f"{helper} 在展開裡，不得再開展開"
@@ -550,11 +551,8 @@ def test_priced_in_is_explained_from_one_string_in_one_place(client) -> None:
     assert "Phase" not in text and "R1" not in text and "稽核區" not in text, "給人看的白話不帶內部編號與已拿掉的區塊名"
     source = (ROOT / "webapp" / "static" / "app.js").read_text(encoding="utf-8")
     assert "VOCAB.plain_priced_in" in source and "太貴" not in source
-    # 函式定義一次＋每一版個股頁各印一次（2026-11-26 Phase 8 Step 8.2 起舊版與新版是兩頁：舊版在「怎麼被定價」的數字與出處，
-    # 新版在「系統裡的它」的數字與出處——一頁裡都只印一次，判準不變）
-    assert source.count("pricedInPlain()") == 3
-    detail = source.split("function blockDetail", 1)[1].split("\nfunction ", 1)[0]
-    assert "numbersDrill(view, 'priced_in', () => [pricedInPlain()" in detail
+    # 函式定義一次＋個股頁印一次（「系統裡的它」的數字與出處；2026-11-28 舊版個股頁刪除前舊版另印一次）
+    assert source.count("pricedInPlain()") == 2
     numbers = source.split("function systemNumbers", 1)[1].split("\nfunction ", 1)[0]
     assert numbers.count("pricedInPlain()") == 1
 
@@ -564,7 +562,7 @@ def test_stock_page_three_words_jump_to_their_numbers_on_the_same_page() -> None
     2026-10-08 起每一題的數字住在那一題那一塊的「數字與出處」（錨點 `tq-<題>`），點了打開它。連到候選板的那一句不再暗示細節在那裡。
     2026-10-28：候選板頁併進首頁，那一句改連首頁（公司）。"""
     source = (ROOT / "webapp" / "static" / "app.js").read_text(encoding="utf-8")
-    assert "jumpToNumbers(question)" in source and "node.id = 'tq-' + question" in source
+    assert "jumpToNumbers(question)" in source and "sec.id = 'tq-' + question" in source
     assert "audit-drill" not in source
     assert "看候選板 →" not in source and "和其他檔一起看（公司）→" in source and "'#/candidates'" not in source
     assert "candidateWatchLine(row.watch)" in source and "'理由：' + row.reason" in source

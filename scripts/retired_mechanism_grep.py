@@ -171,7 +171,6 @@ KEEP: dict[tuple[str,str],str] = {
     ('tests/test_webapp_structure_table.py','D'): 'guard_assertion: kind 數 9 → 7 的封閉字彙相等斷言',
     ('webapp/contracts.py','D'): 'retirement_note: multi_year kind 從封閉字彙 de-register 的註記',
     ('webapp/materialize.py','D'): 'retirement_note: materialize_multi_year 移除註記',
-    ('webapp/static/app.js','D'): 'retirement_note: 首屏「要翻倍需要什麼為真」計算框退役註記',
     ('alpha/abstention/contracts.py','E'): 'legacy_key: ABSTENTION_SUBJECTS 的 bet/variant.overlay、downside.overlay 是 append-only abstention ledger 的 subject 字彙（資料留，L10）',
     ('alpha/evidence_quality.py','E'): 'retirement_note: docstring 對照舊五軸（valuation_payoff）與新五 score 的說明',
     ('alpha/fundamental/contracts.py','E'): 'legacy_key: ASSUMPTION_SCENARIOS（variant／downside）是 overlay 假設紀錄的型別驗證字彙（plan §0.6 #22）',

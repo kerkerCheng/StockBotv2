@@ -86,20 +86,22 @@ def test_the_meta_carries_the_one_copy_and_app_js_keeps_none(tmp_path: Path) -> 
     import re
 
     source = APP_JS.read_text(encoding="utf-8")
-    assert "schema.first_screen" in source and "first_screen_questions" not in source
+    assert "first_screen_questions" not in source
     code = re.sub(r"(?m)//.*$", "", re.sub(r"/\*.*?\*/", "", source, flags=re.S))   # 註解裡提到塊名不算第二份
     for block in BLOCKS:
         assert block.title not in code, block.title                            # 塊名不在前端（不留第二份，L16）
     for section in FIRST_SCREEN_SECTIONS:
         if len(section["title"]) > 4:
             assert section["title"] not in code, section["title"]
-    body = source.split("function questionPart(", 1)[1].split("\n}\n", 1)[0]
+    # 2026-11-28 舊版個股頁（照 first_screen 排十三塊的 `questionPart`／`schemaFirstScreen`）刪除：合約的每個元件改在
+    # 沒做深的檔的「系統裡的它」各有一個呼叫（`systemBlock`）——元件沒有一個悄悄消失（INV-3）
+    system = source.split("function systemBlock(", 1)[1].split("\n}\n", 1)[0]
+    shown = {"priced_in": "'priced_in'", "in_numbers": "'in_numbers'", "will_it_die": "lampLine(view)",
+             "wipeout": "lampsBlock(view, true)", "disproof": "disproofBrief(view)", "confirm": "confirmBrief(row)",
+             "shared_bet": "sharedBetLines(row)", "bet_line": "betLines(row)"}
+    assert set(FIRST_SCREEN_PARTS) <= set(shown), set(FIRST_SCREEN_PARTS) - set(shown)
     for part in FIRST_SCREEN_PARTS:
-        assert f"'{part}'" in body, part                                       # 每個元件前端都認得
-    assert "還不認得" in body                                                   # 認不得的照印，不靜默略過（INV-3）
-    # v1 短評（格不同）照舊版面：帶齊合約放的每一格才用新首屏
-    gate = source.split("function schemaFirstScreen(", 1)[1].split("\n}\n", 1)[0]
-    assert ".every(" in gate and "'brief:' + slot" in gate
+        assert shown[part] in system, part
 
 
 # ---------------------------------------------------------------------------
