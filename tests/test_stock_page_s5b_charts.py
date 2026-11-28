@@ -20,10 +20,13 @@ def _body(name: str) -> str:
 
 def test_the_ruler_sits_with_priced_in_and_the_revenue_bars_with_in_numbers() -> None:
     """2026-10-08 使用者：「對我來說都是營收，一起看最好」——營收柱與「出現在數字裡了嗎」放在一起。2026-11-28 舊版個股頁
-    （十三塊的 B6／B3）刪除：兩張圖住「系統裡的它」的數字與出處，參考尺在已定價嗎那一段、營收柱在出現在數字裡了嗎那一段。"""
-    numbers = _body("systemNumbers")
-    priced = numbers[numbers.index("['priced_in'"):numbers.index("['in_numbers'")]
-    assert "rulerChart(view)" in priced and "revenueBars(view)" in numbers[:numbers.index("const dies")]
+    （十三塊的 B6／B3）刪除、同日系統現值拆進各節：參考尺在已定價嗎那一題的展開（故事頁第 9 題）、營收柱在出現在數字裡了嗎
+    那一題的展開（故事頁第 2 題）。"""
+    pieces = _body("systemPieces")
+    priced = pieces.split("priced: [", 1)[1].split("price:", 1)[0]
+    revenue = pieces.split("revenue: [", 1)[1].split("reading:", 1)[0]
+    assert "questionNumbers(view, 'priced_in'" in priced and "rulerChart(view)" in priced and "revenueBars(view)" not in priced
+    assert "questionNumbers(view, 'in_numbers'" in revenue and "revenueBars(view)" in revenue and "rulerChart(" not in revenue
 
 
 def test_the_charts_only_copy_audit_values() -> None:
@@ -59,9 +62,9 @@ def test_bar_charts_have_a_y_axis_named_for_the_series_and_no_legend_underneath(
 
 def test_the_demand_anchor_lives_in_the_numbers_and_only_copies_the_materialized_series() -> None:
     """個股頁 S3a（2026-10-08）：「錨的變化」照抄 materialize 的 `demand_anchor`——前端不加總、不換算、不算年增；
-    圖下不放字；沒有就照印缺席的原因。2026-11-28 舊版個股頁（B2）刪除時搬進「系統裡的它」的數字與出處（使用者 11-27
-    以為新版已經有——不讓它跟著舊版消失）。"""
-    assert "anchorFigures(payload)" in _body("systemNumbers")
+    圖下不放字；沒有就照印缺席的原因。2026-11-28 舊版個股頁（B2）刪除時搬進新版（使用者 11-27 以為新版已經有——不讓它跟著
+    舊版消失）；同日放在講市場多大的那一節（故事頁第 6 題、短故事「什麼在放量」那一格）的一個展開。"""
+    assert "anchorFigures(payload)" in _body("systemPieces").split("demand: [", 1)[1].split("revenue:", 1)[0]
     figures = _body("anchorFigures")
     assert "payload.demand_anchor" in figures and "demand.absence.reason" in figures
     bars = _body("anchorBars")
@@ -80,7 +83,7 @@ def test_the_demand_anchor_lives_in_the_numbers_and_only_copies_the_materialized
 def test_the_capture_chart_lives_in_the_numbers_and_only_copies_the_materialized_ratio() -> None:
     """個股頁 S3b（2026-10-08）：「吃到多少」照抄 materialize 的 `capture`（比值、季均價、可知日都在 `alpha.capture` 算好）；
     前端不換匯、不相除——只有柱高的座標換算；沒有就照印原因。2026-11-28 舊版個股頁（B2）刪除時搬進數字與出處（同上）。"""
-    assert "captureFigure(payload)" in _body("systemNumbers")
+    assert "captureFigure(payload)" in _body("systemPieces").split("demand: [", 1)[1].split("revenue:", 1)[0]
     figure = _body("captureFigure")
     for copied in ("payload.capture", "p.per_billion", "cap.absence.reason"):
         assert copied in figure, f"吃到多少少照抄了 {copied}"
@@ -96,9 +99,11 @@ def test_diagrams_show_as_images_in_b4_and_on_the_layer_page_labelled_as_illustr
     """示意圖由 materialize 檢查過、編成 data URI；前端只用 <img> 顯示，不把 SVG 原碼塞進頁面（SVG 在 img 裡不執行任何東西）。
     2026-10-08 使用者：「我想知道它出現在示意圖的哪一個地方」——坐的那幾格疊一個框（位置換算，不改圖），上方一句列出是哪幾格；
     頁首「做什麼」講的那幾格（押的格）粗框加「押在這裡」，其餘坐的格細虛線。手畫的圖沒有位置表：照實說標不出，不是不印。"""
-    # Phase 8 Step 8.2 把 B4 的示意圖抽成 `pageDiagrams`；2026-11-28 舊版個股頁刪除後兩處呼叫：沒做深的檔在短故事後面
-    # （`stockPage`）、做過故事頁的收在「系統裡的它」的一個展開（`storySystemBlock`）——判準照留、主詞改成這兩處
-    assert "pageDiagrams(payload, view)" in _body("stockPage") and "pageDiagrams(payload, view)" in _body("storySystemBlock")
+    # Phase 8 Step 8.2 把 B4 的示意圖抽成 `pageDiagrams`；2026-11-28 起一處呼叫（`systemPieces` 的 diagram）：沒做深的檔直接印在
+    # 短故事「坐在哪幾層」那一格、做過故事頁的收在第 1 題（它在哪一格）的一個展開——判準照留、主詞改成這一處
+    pieces = _body("systemPieces")
+    assert "pageDiagrams(payload, view)" in pieces and "['diagram', 'q1', ['position']]" in SOURCE
+    assert "pageDiagrams(" not in _body("stockPage")
     shared = _body("pageDiagrams")
     assert "payload.diagrams" in shared
     assert "payload.what_it_does" in shared and "what.focus" in shared            # 粗框跟頁首講的是同一份（L16）
@@ -136,8 +141,8 @@ def test_the_path_ladder_lives_in_b2_and_only_copies_the_materialized_lines() ->
     """個股頁 S3c（2026-10-09）：B2「路徑上各層」照抄 materialize 的 `path_layers`——年增在 `alpha.path_layers` 算好；
     前端不算年增、不排序。2026-10-29 使用者（「這三個折疊起來的可不可以消化過再給我」）：消化成句——押的格那幾條路每條
     一句（「錢怎麼走到它：A → B → C」，層名用中文名），其餘只寫起點、不再收在展開裡；缺席原因、代表公司的理由不上畫面。"""
-    # 2026-11-28 舊版個股頁（B2）刪除：路徑只在沒做深的檔的「系統裡的它」（做過故事頁的，錢怎麼走到它是故事在講）
-    assert "pathSentences(payload)" in _body("systemBlock") and "function pathFigure(" not in SOURCE
+    # 2026-11-28 舊版個股頁（B2）刪除：路徑只在沒做深的檔（短故事「什麼在放量」那一格；做過故事頁的，錢怎麼走到它是故事在講）
+    assert "path: story ? [] : [...pathSentences(payload)," in _body("systemPieces") and "function pathFigure(" not in SOURCE
     fig = _body("pathSentences")
     for copied in ("payload.path_layers", "h.latest.yoy", "p.focus", "nodeLabel(node, h.name)", "錢怎麼走到它"):
         assert copied in fig, f"路徑上各層少照抄了 {copied}"

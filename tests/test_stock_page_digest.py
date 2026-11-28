@@ -22,15 +22,16 @@ def _body(name: str) -> str:
 
 def test_will_it_die_is_one_line_that_copies_the_lamps_and_never_judges_a_colour() -> None:
     """「會不會死我不知道灰字這麼多要幹嘛 燈號跟訊息也不直覺」：一行＝最差那盞的詞＋不是綠的那幾盞的短句（`alpha.wipeout`
-    給的 `short`）；沒量到的寫名字（灰不是綠）。前端不從輸入重判顏色。2026-11-28 舊版個股頁刪除：一行在兩版「系統裡的它」
-    都印；四盞的全句只在沒做深的檔那一版（做過故事頁的，不是綠的燈寫進故事——stock-story skill）。"""
-    assert "lampLine(view)" in _body("systemBlock") and "lampLine(view)" in _body("storySystemBlock")
+    給的 `short`）；沒量到的寫名字（灰不是綠）。前端不從輸入重判顏色。2026-11-28 舊版個股頁刪除、同日系統現值拆進各節：
+    一行在兩種頁都印（故事頁第 12 題、短故事「什麼必須為真」那一格）；四盞的全句收在它點下去打開的展開裡（做過故事頁的，
+    不是綠的燈另外寫進故事——stock-story skill）。"""
+    dies = _body("systemPieces").split("dies: [", 1)[1].split("timeline:", 1)[0]
+    assert "lampLine(view)" in dies and "lampsBlock(view, true)" in dies and "questionNumbers(view, 'will_it_die'" in dies
     line = _body("lampLine")
     for copied in ("value.colour", "value.short", "沒查到", "jumpToNumbers('will_it_die')", "LAMP_WORDS[worst]"):
         assert copied in line, f"會不會死那一行少了 {copied}"
     for judged in ("inputs", "runway", "free_cash_flow", "months"):
         assert judged not in line, f"前端不得自己判燈：{judged}"
-    assert "lampsBlock(view, true)" in _body("systemBlock") and "lampsBlock(" not in _body("storySystemBlock")
 
 
 def test_disproof_and_confirm_print_only_what_needs_you_and_count_the_rest() -> None:
@@ -58,21 +59,24 @@ def test_rewrite_reasons_are_words_on_the_card_and_the_page_with_the_sentence_in
 
 def test_absence_sentences_stay_off_the_first_screen() -> None:
     """「營收哪裡來 事件與影響多大…只看到一堆斜體字」：缺席句（`ss-pending`）不上首屏。2026-11-28 舊版個股頁（十三塊）刪除後：
-    事件那一塊只有缺席句時整塊不印（`eventBlock`）；需求錨與「吃到多少」的缺席句只在「數字與出處」那個展開裡（`systemNumbers`）。"""
+    事件那一塊只有缺席句時整塊不印（`eventBlock`）；需求錨與「吃到多少」的缺席句只在一個展開裡（`systemPieces` 的 demand
+    交給 `questionNumbers`，它只開一個 `drill`）。"""
     events = _body("eventBlock")
     assert "ss-pending" in events and "return null" in events
-    numbers = _body("systemNumbers")
-    assert "anchorFigures(payload)" in numbers and "captureFigure(payload)" in numbers and "drill('數字與出處'" in numbers
-    for name in ("systemBlock", "storySystemBlock", "stockPage"):
+    demand = _body("systemPieces").split("demand: [", 1)[1].split("revenue:", 1)[0]
+    assert demand.startswith("questionNumbers(view, null, ") and "anchorFigures(payload)" in demand and "captureFigure(payload)" in demand
+    assert "drill(title" in _body("questionNumbers")
+    for name in ("stockPage", "placeInStory", "shortStory"):
         assert "anchorFigures(" not in _body(name) and "captureFigure(" not in _body(name), name
 
 
 def test_a_not_edge_page_says_no_narrative_is_by_rule_and_names_its_seats() -> None:
     """非邊緣＝規定不寫敘事（2026-10-28），不是還沒寫：短故事那一格印首頁分組字彙那一句；它坐在哪幾層照印（層名中文、可點）。
-    2026-11-28 舊版個股頁（`briefCard` 的非邊緣分支）刪除——這兩件改由新版個股頁的短故事與「系統裡的它」負責。"""
+    2026-11-28 舊版個股頁（`briefCard` 的非邊緣分支）刪除——這兩件改由新版個股頁的短故事與系統現值負責（沒有敘事的格，
+    系統現值收在短故事最後一個灰框）。"""
     story = _body("shortStory")
     assert "edge_state === 'not_edge'" in story and "listGroupLabel('not_edge_no_narrative')" in story
-    assert "seatsSentence(payload, view)" in _body("systemBlock")
+    assert "seats: story ? [] : [seatsSentence(payload, view)," in _body("systemPieces")
     seats = _body("seatsSentence")
     assert "nodeLabel(node, names[node])" in seats and "'#/graph/'" in seats and "split('｜')[0]" in seats
 

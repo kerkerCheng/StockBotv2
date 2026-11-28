@@ -239,14 +239,16 @@ Lumentum、住友並列，協議也是非獨家。它和別家不同在六吋磷
 我們在賭的東西」「沒有 timing」）**：可開與已持有每檔一句，住故事紀錄的選填鍵 `bet`——**不換敘事版本**。寫的人只寫三樣；
 押哪一層（照抄敘事的 `rides[]`）、下一個對帳日（何時格裡寫得出是哪一天的日子與名冊檢核點，取較早的）、那一條反證的 watch 與
 到期日，都由候選列每次物化重算。
-⚠ **整批寫使用者還沒放行（2026-11-22：先寫 3 檔——台股、海外、已持有各一——給他看，再寫其餘）**：放行之前 ⑤「賭注句還沒寫」
-「翻倍條件還沒寫成數字」兩格不清，收尾照數回報；「沒有對帳日」照常清（那是何時格沒寫出日子，重述何時格）。
+整批寫 2026-11-28 使用者放行（「1 go」：照現行敘事寫，不換敘事版本、不改候選狀態、不對外蒐證；當天 24 檔寫完、三格歸零）。
+之後新進可開或已持有、或敘事換版而過期的檔，三格照常清：照這一段寫，「沒有對帳日」是何時格沒寫出日子——重述何時格。
 
 ```powershell
 & '.venv\Scripts\python.exe' -m alpha stories <T>                                # 現行故事與賭注句（沒寫印「還沒寫」）
 & '.venv\Scripts\python.exe' -m alpha brief <T>                                  # 依據：反證的序號、必須為真與量級那兩格的數字
 & '.venv\Scripts\python.exe' -m alpha stories --bet-only --check spec.json       # spec：[{ticker, bet: {stake, doubling, disproof}}]
 & '.venv\Scripts\python.exe' -m alpha stories --bet-only --add spec.json         # 故事其他格沿用現行那一筆，只加或換賭注句
+& '.venv\Scripts\python.exe' -m alpha brief-check <T> --flags-only               # 賭注句跟故事一起逐句核：被標的句子回原文核過，要改字就再 --add
+& '.venv\Scripts\python.exe' -m alpha brief-check <T> --record --changed K --note "加賭注句：…"   # 故事換了：記核對紀錄（K＝核對後改了幾句）
 & '.venv\Scripts\python.exe' -m webapp materialize <T…> --candidates             # 個股頁、依層頁、首頁日曆才看得到
 ```
 

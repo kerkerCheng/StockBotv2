@@ -85,8 +85,10 @@ def test_the_page_contract_reads_revenue_mix_and_backlog_from_the_page_input() -
 
 
 def test_the_b3_figures_only_copy_the_materialized_mix() -> None:
-    # 2026-11-28 舊版個股頁刪除：營收從哪來只住「系統裡的它」的數字與出處（`systemNumbers`）
-    assert "mixFigures(payload)" in _body("systemNumbers") and "mixDetail(payload)" in _body("systemNumbers")
+    # 2026-11-28 舊版個股頁刪除：營收從哪來只住「出現在數字裡了嗎」那一題的展開（`systemPieces` 的 revenue；故事頁第 2 題、
+    # 短故事「營收從哪來」那一格）
+    revenue = _body("systemPieces").split("revenue: [", 1)[1].split("reading:", 1)[0]
+    assert "mixFigures(payload)" in revenue and "mixDetail(payload)" in revenue
     fig = _body("mixFigures")
     for copied in ("payload.revenue_mix", "p.share", "p.prev_share", "item.headline", "mix.absences", "mix.conflicts"):
         assert copied in fig, copied
@@ -170,7 +172,7 @@ def test_the_page_contract_reads_bet_share_and_unread_is_not_absence() -> None:
 
 
 def test_the_b3_bet_share_line_only_copies_the_materialized_items() -> None:
-    assert "betShareLines(payload)" in _body("systemNumbers")
+    assert "betShareLines(payload)" in _body("systemPieces").split("revenue: [", 1)[1].split("reading:", 1)[0]
     lines = _body("betShareLines")
     for copied in ("payload.bet_share", "item.share", "item.segment", "item.period", "item.reason", "bet.absence"):
         assert copied in lines, copied

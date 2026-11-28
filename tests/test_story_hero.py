@@ -197,43 +197,70 @@ def test_the_fact_check_reads_the_hero_sentences_without_the_source_marks() -> N
 def test_the_stock_page_prints_the_hero_before_the_short_story_and_the_die_line_above_the_lamps() -> None:
     app = (ROOT / "webapp" / "static" / "app.js").read_text(encoding="utf-8")
     page = app[app.index("function stockPage("):app.index("function storyRules(")]
-    assert page.index("heroBlock(view)") < page.index("shortStory(view)")
+    assert page.index("heroBlock(view)") < page.index("shortStory(view, ")
     hero = app[app.index("function heroBlock("):app.index("function storyRules(")]
     assert "story:hero" in hero and "storyLegend()" in hero and "淺寫" in hero
-    system = app[app.index("function systemBlock("):app.index("function eventBlock(")]
-    assert system.index("lampLine(view)") < system.index("lampsBlock(view, true)")
+    # 會不會死一行在上、四盞燈的全句收在它點下去打開的那個展開裡（`questionNumbers` 的 will_it_die）
+    pieces = app[app.index("function systemPieces("):app.index("function placeOrder(")]
+    dies = pieces[pieces.index("dies: ["):pieces.index("timeline:")]
+    assert dies.index("lampLine(view)") < dies.index("questionNumbers(view, 'will_it_die'") < dies.index("lampsBlock(view, true)")
     css = (ROOT / "webapp" / "static" / "story.css").read_text(encoding="utf-8")
     assert ".story-hero span.src" in css
 
 
-def test_a_story_page_gets_the_slim_system_section_and_a_page_without_one_keeps_the_full_block() -> None:
-    """2026-11-28 使用者：「瘦身」「原本 old 還存在的那一段，就融合進去現在新的敘事頁面」。有故事頁的檔走
-    `storySystemBlock`：故事講過或頁首已印的不再印（押什麼那一句、坐的層與路徑、這條鏈怎麼走、四盞燈逐盞、反證的展開與
-    時間表、股價圖）；系統帳上會自己變的照程式填。沒有故事頁的檔照舊整塊——它沒有故事，這一塊就是主內容。"""
+def test_the_system_values_are_spread_into_the_sections_that_talk_about_the_same_thing() -> None:
+    """2026-11-28 使用者：「系統裡的它就融合進整個報告裡面啊…系統裡的它就是報告內容啊 你為何一直要把他們綁在一起 變成一段
+    不知道為什麼突然出現的一坨文字？根本無法消化」。沒有「系統裡的它」那一節：每一項拆開（`systemPieces`），照一張表
+    （`SYSTEM_PLACES`）放進講同一件事的那一節——故事頁照片段的節 id（`placeInStory`）、沒做深的檔照短故事的格（`shortStory`）——
+    接在那一節的字後面、一節一個灰框（`liveBox`）。表上那一節不存在就放進「回頭看」／最後一個灰框，不丟（INV-3）。
+    故事頁不印故事自己講過的（11-28「瘦身」那一刀照留）；沒做深的檔一樣都不少。"""
+    import re
+
     app = (ROOT / "webapp" / "static" / "app.js").read_text(encoding="utf-8")
 
     def body(name: str) -> str:
         start = app.index(f"function {name}(")
         return app[start:app.index("\n}\n", start)]
 
-    full, slim = body("systemBlock"), body("storySystemBlock")
-    assert "if (sp) return storySystemBlock(payload, view, sp);" in full
-    kept = ("candidateLine(view, true, true)", "sharedBetLines(row)", "rideReadingLine(payload, view)",
-            "pageDiagrams(payload, view)", "lampLine(view)", "wordsBlock(view, ['priced_in', 'in_numbers'])",
-            "systemNumbers(payload, view)", "disproofBrief(view)", "confirmBrief(row)", "eventBlock(payload)",
-            "storyGapLines(sp)")
-    for call in kept:
-        assert call in slim, call
-    dropped = ("betLines(", "seatsSentence(", "pathSentences(", "chainDetail(", "unitGlossary(", "seatsDetail(",
-               "lampsBlock(", "downsideDetail(", "timelineDetail(", "priceFigure(")
-    for call in dropped:
-        assert call not in slim, call
-        assert call in full, call            # 沒有故事頁的檔一樣都不少
-    # 沒有故事頁：示意圖在 stockPage（短故事後面）、「這一頁和系統對不上的」只有故事頁有
-    assert "pageDiagrams(" not in full and "storyGapLines(" not in full
-    assert "candidateLine(view, true)" in full and "'和其他檔一起看（公司）→'" in body("candidateLine")
+    for gone in ("systemBlock", "storySystemBlock", "systemNumbers"):
+        assert f"function {gone}(" not in app, gone
+    code = re.sub(r"(?m)//.*$", "", re.sub(r"/\*.*?\*/", "", app, flags=re.S))
+    assert "'系統裡的它'" not in code and "系統裡的它" not in code          # 畫面上沒有這個標題（註解裡留著歷史）
+    # 一張表：每一項 → 故事頁的哪一節、短故事的哪幾格；節 id 都是合約上的節（alpha.narrative.story_page.SECTION_IDS）
+    from alpha.narrative.story_page import SECTION_IDS
+
+    table = app[app.index("const SYSTEM_PLACES = ["):]
+    table = table[:table.index("];")]
+    rows = re.findall(r"\['(\w+)', (null|'[\w-]+'), (null|\[[^\]]*\])\]", table)
+    places = {key: (section.strip("'") if section != "null" else None) for key, section, _ in rows}
+    assert set(places.values()) - {None} <= set(SECTION_IDS)
+    assert places == {"verdict": "bet-kind", "bet": None, "shared": "q3", "seats": None, "diagram": "q1", "path": None,
+                      "demand": "q6", "revenue": "q2", "reading": "q7", "priced": "q9", "price": None, "events": "q9",
+                      "confirm": "q11", "disproof": "q12", "dies": "q12", "timeline": None, "gaps": "system-gap"}
+    pieces = body("systemPieces")
+    assert set(re.findall(r"^    (\w+): ", pieces, flags=re.M)) == set(places), "每一項都在表上、表上每一項都有元件"
+    # 故事頁不印故事自己講過的；沒做深的檔一樣都不少
+    for key, call in (("bet", "betLines(row)"), ("seats", "seatsSentence(payload, view)"), ("path", "pathSentences(payload)"),
+                      ("price", "priceFigure(payload)"), ("timeline", "timelineDetail(view)")):
+        assert f"{key}: story ? [] : " in pieces and call in pieces, key
+    assert "story ? null : downsideDetail(view)" in pieces and "reading: story ? [rideReadingLine(payload, view)] : []" in pieces
+    assert "gaps: story ? [storyGapLines(sp)] : []" in pieces and "candidateLine(view, true, story)" in pieces
+    assert "'和其他檔一起看（公司）→'" in body("candidateLine")
+    # 放的方式：故事頁照節 id、找不到放「回頭看」→ 空位 → 片段最後；短故事照格、找不到放最後一個灰框；表外的項目不丟
+    place = body("placeInStory")
+    assert "'#sp-' + place[1]" in place and "'#sp-bet-kind'" in place and "liveBox(nodes)" in place
+    assert "slot.remove()" in place                                       # 合約規定留空的空位用不到就拿掉
+    short = body("shortStory")
+    assert "(place[2] || []).find((s) => at[s])" in short and "slot ? at[slot] : box" in short and "liveBox(nodes)" in short
+    order = body("placeOrder")
+    assert "!known.has(key)" in order                                     # 表外的項目接在最後，不丟
+    assert "'系統現值・每天更新'" in body("liveBox")
+    page = body("stockPage")
+    assert "placeInStory(article, systemPieces(payload, view, sp))" in page
+    assert "shortStory(view, systemPieces(payload, view, null))" in page
     css = (ROOT / "webapp" / "static" / "story.css").read_text(encoding="utf-8")
-    assert ".story-page .system-in-story {" in css
+    assert ".sys-live {" in css and ".sys-live-tag {" in css and ".story-page .sys-live figure" in css
+    assert ".system-block" not in css and ".system-in-story" not in css
 
 
 def test_the_cli_hero_only_takes_ticker_and_hero_and_nothing_else(tmp_path, monkeypatch, capsys) -> None:

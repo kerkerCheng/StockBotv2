@@ -94,10 +94,11 @@ LEDGER: tuple[LedgerRow, ...] = (
               "讀原文填 ref 與 quote（research-drain「事實句錨點」段）→ `python -m alpha brief-anchor <T> --spec a.json` → "
               "`python -m alpha brief-check <T>` 看錨點比對"),
     # A0 賭注句與對帳日曆（2026-11-22 使用者「A0 1b 2B 3b，S1–S3 做」；2026-11-20「難把敘事組成一個我們在賭的東西」「沒有 timing」）：
-    # 可開與已持有每檔一句四格（`alpha.bet_line`；候選列每次物化重算）。三格都不在進展格裡——不推 drain。
-    # ⚠ 整批寫使用者還沒放行（先寫 3 檔給他看）：前兩格現在怎麼處理寫在 research-drain「賭注句」段
+    # 可開與已持有每檔一句四格（`alpha.bet_line`；候選列每次物化重算）。三格都不在進展格裡——清掉它不讓任何一檔離決定更近，
+    # 不推 drain。整批寫 2026-11-28 使用者放行（「1 go」：照現行敘事寫，不換版、不改候選狀態），當天 24 檔寫完、三格歸零；
+    # 之後新進可開或敘事換版的檔照 research-drain「賭注句」段寫
     LedgerRow("todo.bet_line", "賭注句還沒寫", "檔",
-              "research-drain「賭注句」段（⚠ 使用者放行之前只寫 3 檔交他看，其餘照數回報）：`python -m alpha stories <T>` → "
+              "research-drain「賭注句」段（照現行敘事寫，不換版）：`python -m alpha stories <T>` → "
               "寫 `[{ticker, bet: {stake, doubling, disproof}}]` → `python -m alpha stories --bet-only --check spec.json` → "
               "`--bet-only --add spec.json`"),
     LedgerRow("todo.bet_vague", "翻倍條件還沒寫成數字", "檔",

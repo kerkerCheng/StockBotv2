@@ -323,7 +323,8 @@ def test_plain_labels_never_claim_more_than_the_vocabulary_does() -> None:
 def test_single_stock_page_is_the_header_and_the_story_page_only(client) -> None:
     """2026-10-08 使用者：「舊有的資訊非必要的就拿掉，除非是給我看的；給機器看的不用顯示出來」——頁尾四張卡與「稽核」
     「完整細節」兩個大展開拿掉（不是收起來，是拿掉）。2026-11-26 起單檔頁＝頁首＋故事頁框架（`stockPage`）；2026-11-28 使用者
-    「刪」舊版（頁首＋十三塊，`#/old/`）。人讀的內容在「系統裡的它」，給查核用的留在 artifact 與 API。"""
+    「刪」舊版（頁首＋十三塊，`#/old/`）。人讀的內容拆進故事各節（`systemPieces`；同日「系統裡的它」那一節拿掉），給查核用的
+    留在 artifact 與 API。"""
     source = (ROOT / "webapp" / "static" / "app.js").read_text(encoding="utf-8")
     block = source.split("async function renderDetail", 1)[1]
     block = re.split(r"\n(?:async )?function ", block, maxsplit=1)[0]
@@ -336,12 +337,12 @@ def test_single_stock_page_is_the_header_and_the_story_page_only(client) -> None
                  "questionPart", "basisRow", "plainPanel"):
         assert f"function {gone}(" not in source, f"{gone} 應已拿掉"
     assert "'#/old/'" not in source and "old-page" not in source, "舊版個股頁的連結應已拿掉"
-    # 人讀的內容在沒做深的檔的「系統裡的它」（論證、坐的層、反證、時間表、三題的數字與出處、走勢圖——脈絡不是訊號）
-    system = source.split("function systemBlock(", 1)[1].split("\n}\n", 1)[0]
+    # 人讀的內容在系統的每一項（論證、坐的層、反證、時間表、三題的數字與出處、走勢圖——脈絡不是訊號），拆進各節
+    system = source.split("function systemPieces(", 1)[1].split("\n}\n", 1)[0]
     for owner in ("chainDetail(payload, view)", "seatsDetail(payload, view)", "'priced_in'", "'in_numbers'",
-                  "downsideDetail(view)", "lampLine(view)", "timelineDetail(view)", "systemNumbers(payload, view)",
+                  "downsideDetail(view)", "lampLine(view)", "timelineDetail(view)", "questionNumbers(view, 'will_it_die'",
                   "priceFigure(payload)"):
-        assert owner in system, f"系統裡的它少了 {owner}"
+        assert owner in system, f"系統的每一項少了 {owner}"
     # 存著的舊連結轉到新版，不印「讀不到」
     route = source.split("async function route(", 1)[1].split("\n}\n", 1)[0]
     assert "target.startsWith('old/')) window.location.replace(" in route
@@ -407,7 +408,7 @@ def test_each_block_has_at_most_one_expansion_and_none_is_nested() -> None:
         part = source.split(f"function {name}(", 1)[1]
         return re.split(r"\n(?:async )?function ", part, maxsplit=1)[0]
 
-    for fn in ("chainDetail", "seatsDetail", "systemNumbers", "downsideDetail", "timelineDetail"):
+    for fn in ("chainDetail", "seatsDetail", "questionNumbers", "downsideDetail", "timelineDetail"):
         assert body(fn).count("drill(") == 1, f"{fn} 只准有一個展開"
     for helper in ("argumentSection", "tqNumbers", "detailList", "tqPoint", "layerNoteLinks", "marketMultiples"):
         assert "drill(" not in body(helper), f"{helper} 在展開裡，不得再開展開"
@@ -551,9 +552,9 @@ def test_priced_in_is_explained_from_one_string_in_one_place(client) -> None:
     assert "Phase" not in text and "R1" not in text and "稽核區" not in text, "給人看的白話不帶內部編號與已拿掉的區塊名"
     source = (ROOT / "webapp" / "static" / "app.js").read_text(encoding="utf-8")
     assert "VOCAB.plain_priced_in" in source and "太貴" not in source
-    # 函式定義一次＋個股頁印一次（「系統裡的它」的數字與出處；2026-11-28 舊版個股頁刪除前舊版另印一次）
+    # 函式定義一次＋個股頁印一次（已定價嗎那一題的展開，故事頁第 9 題；2026-11-28 舊版個股頁刪除前舊版另印一次）
     assert source.count("pricedInPlain()") == 2
-    numbers = source.split("function systemNumbers", 1)[1].split("\nfunction ", 1)[0]
+    numbers = source.split("function systemPieces", 1)[1].split("\nfunction ", 1)[0]
     assert numbers.count("pricedInPlain()") == 1
 
 
@@ -562,7 +563,7 @@ def test_stock_page_three_words_jump_to_their_numbers_on_the_same_page() -> None
     2026-10-08 起每一題的數字住在那一題那一塊的「數字與出處」（錨點 `tq-<題>`），點了打開它。連到候選板的那一句不再暗示細節在那裡。
     2026-10-28：候選板頁併進首頁，那一句改連首頁（公司）。"""
     source = (ROOT / "webapp" / "static" / "app.js").read_text(encoding="utf-8")
-    assert "jumpToNumbers(question)" in source and "sec.id = 'tq-' + question" in source
+    assert "jumpToNumbers(question)" in source and "body.id = 'tq-' + question" in source
     assert "audit-drill" not in source
     assert "看候選板 →" not in source and "和其他檔一起看（公司）→" in source and "'#/candidates'" not in source
     assert "candidateWatchLine(row.watch)" in source and "'理由：' + row.reason" in source

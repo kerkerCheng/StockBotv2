@@ -160,14 +160,15 @@ def test_packet_carries_the_brief_frame_for_the_session() -> None:
 
 def test_the_page_is_the_story_and_the_system_block_and_neither_computes_returns() -> None:
     """2026-10-08（使用者：「舊有的資訊非必要的就拿掉」）頁首＋短評卡（十三塊）；2026-11-26 起換成故事頁框架，2026-11-28
-    使用者「刪」舊版（`briefCard`）。單檔頁＝頁首＋`stockPage`（故事頁，或短故事＋「系統裡的它」）；頁面層沒有大展開。"""
+    使用者「刪」舊版（`briefCard`）。單檔頁＝頁首＋`stockPage`（故事頁，或短故事；同日起系統現值拆進各節，沒有「系統裡的它」
+    那一節）；頁面層沒有大展開。"""
     source = (ROOT / "webapp" / "static" / "app.js").read_text(encoding="utf-8")
     block = source.split("async function renderDetail", 1)[1]
     block = re.split(r"\n(?:async )?function ", block, maxsplit=1)[0]
     assert "stockPage(payload, view)" in block and "briefCard(" not in source
     assert "argumentCard(" not in block and "drill(" not in block
     # 個股頁不得自己算報酬：數字都來自 materialize 端
-    for name in ("stockPage", "systemBlock", "storySystemBlock"):
+    for name in ("stockPage", "systemPieces", "placeInStory", "shortStory", "questionNumbers"):
         body = source.split(f"function {name}(", 1)[1].split("\n}\n", 1)[0]
         for token in ("fair_value /", "/ price", "value - ", "value / ", "Math.pow"):
             assert token not in body, (name, token)

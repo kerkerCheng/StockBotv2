@@ -543,7 +543,8 @@ function nodeLabel(node, fallback) {
    2026-09-08 使用者回饋：「太多展開、太多字、全部是內部術語，基本上看不懂」；2026-10-08：「舊有的資訊非必要的就拿掉，
    除非是給我看的；給機器看的不用顯示出來」。2026-10-08 起一頁＝頁首＋十三塊（`briefCard`）；2026-11-26 起換成故事頁框架
    （`stockPage`），十三塊留在 `#/old/` 過渡，2026-11-28 使用者「刪」——十三塊的函式拿掉，需求錨與「吃到多少」兩張圖搬進
-   「系統裡的它」的「數字與出處」（`systemNumbers`），其餘舊頁才有的（各格依據的原文、塊標題當目錄）使用者 11-27 說不看。
+   新版（同日起放在講市場多大的那一節：`systemPieces` 的 demand），其餘舊頁才有的（各格依據的原文、塊標題當目錄）使用者
+   11-27 說不看。
    ⚠ 刪的是版面不是內容：給查核用的每一格都還在 artifact 與 `/api/v1/stocks/<T>`。
    ⚠ 2026-10-08 拿掉的：「稽核」（結論卡、卡在哪、市場預測原始數字、填得滿表）與「完整細節」（現價每一格、賭注、
    市場預測、研究現況與五軸、判讀狀態、新鮮度、不是什麼）兩個大展開，以及頁尾「基本數字／憑什麼這樣想／讀圖／錯了怎麼知道」
@@ -736,7 +737,9 @@ function tqNumbers(view, question) {
 
 /* ⚠ 2026-11-28：舊版個股頁（`briefCard`：頁首＋十三塊，`#/old/<代號>`）使用者「刪」——連同只有它用的十三塊排版
    （`schemaFirstScreen`、`schemaBlock`、`blockVisuals`、`blockDetail`、`numbersDrill`、`questionPart`、`basisRow`、`plainPanel`）
-   一起拿掉。個股頁只剩 `stockPage`（故事頁或短故事＋「系統裡的它」）；十三塊的合約（page_schema）照舊——塊名、燈名從那裡讀。 */
+   一起拿掉。個股頁只剩 `stockPage`（故事頁或短故事，系統現值拆進各節）；十三塊的合約（page_schema）照舊——塊名、燈名從那裡讀。
+   ⚠ 同日「系統裡的它」那一節（`systemBlock`／`storySystemBlock`／`systemNumbers`）也拿掉：使用者「系統裡的它就是報告內容啊…
+   變成一段不知道為什麼突然出現的一坨文字」——拆進各節（`SYSTEM_PLACES`），不得再長回一整塊。 */
 
 /** 短評的一格（標籤＋句子；partial 的理由放 title）。沒做深的檔的短故事（`shortStory`）用。 */
 function storyRow(line) {
@@ -1099,8 +1102,8 @@ function timelineDetail(view) {
 const CANDIDATE_WORDS = [['candidate:will_it_die', '會死嗎', 'will_it_die'], ['candidate:priced_in', '已定價嗎', 'priced_in'],
   ['candidate:in_numbers', '出現在數字裡了嗎', 'in_numbers']];
 
-/** 打開同一頁那一題的「數字與出處」、捲過去（舊版：`numbersDrill` 把 id `tq-<題>` 掛在展開上；新版：`systemNumbers`
- *  掛在展開裡那一題的段上——打開包住它的那個展開）。不在就不動。 */
+/** 打開同一頁那一題的數字、捲過去（`questionNumbers` 把 id `tq-<題>` 掛在那一題展開的內容上——打開包住它的那個展開；
+ *  2026-11-28 起每一題的展開就在講那一題的那一節，三個字緊接在展開上面）。不在就不動。 */
 function jumpToNumbers(question) {
   const box = document.getElementById('tq-' + question);
   if (!box) return;
@@ -1497,8 +1500,12 @@ async function renderDetail(ticker) {
 }
 
 /* ---------- 個股頁新框架（Phase 8 Step 8.2；plan `docs/plans/2026-11-26-001-feat-phase8-story-page-app-plan.md` §2.7） ----------
-   2026-11-26 使用者：「樣板取代APP個股頁」「2 全部換」。一頁＝頁首 → 有故事頁：版本一行（過期一條橫幅）→ 故事片段，片段裡
-   `#system` 的空位換成「系統裡的它」、每條等待後面加徽章；沒有故事頁：一行「還沒做深」→ 短故事 → 示意圖 → 系統裡的它。
+   2026-11-26 使用者：「樣板取代APP個股頁」「2 全部換」。一頁＝頁首 → 有故事頁：版本一行（過期一條橫幅）→ 故事片段、每條等待
+   後面加徽章；沒有故事頁：一行「還沒做深」→ 淺寫頁首 → 短故事。
+   2026-11-28 使用者：「系統裡的它就融合進整個報告裡面啊…系統裡的它就是報告內容啊 你為何一直要把他們綁在一起 變成一段不知道
+   為什麼突然出現的一坨文字？根本無法消化」——**沒有「系統裡的它」那一節**：系統的每一項拆開（`systemPieces`），各自放進講同一件事
+   的那一節、接在那一節的字後面（一節一個灰框「系統現值・每天更新」，`liveBox`）；放哪一節只有一張表（`SYSTEM_PLACES`）。
+   故事頁照節（`placeInStory`），沒做深的檔照短故事的格（`shortStory`）；表裡那一節不存在就放進「回頭看」那一節／最後一個灰框，不丟。
    舊版個股頁（`#/old/<代號>`，過渡期）2026-11-28 使用者「刪」：頁尾的連結拿掉，存著的舊連結轉到這一頁（`route`）。
    片段是研究 session 寫的 HTML：寫入時檢查一次、物化時再檢查一次、這裡第三次——照 `.meta.json` 的白名單**重建節點**
    （白名單與網址規則只有 `alpha.narrative.story_page` 那一份，L16）；白名單外的丟掉並在主控台記一筆。不用 innerHTML。
@@ -1510,9 +1517,7 @@ function stockPage(payload, view) {
   const article = sp && sp.html ? storyFragment(sp.html) : null;
   if (article) {
     box.appendChild(storyPageHead(sp));
-    const slot = article.querySelector('[data-slot="system"]');
-    const system = systemBlock(payload, view, sp);
-    if (slot) slot.appendChild(system); else article.appendChild(system);
+    placeInStory(article, systemPieces(payload, view, sp));
     article.querySelectorAll('[data-wait]').forEach((node) => {
       // 表格的一列：徽章放進最後一格（直接掛在 tr 底下，瀏覽器會把它擠到表格外）
       const host = node.localName === 'tr' ? (node.lastElementChild || node) : node;
@@ -1527,13 +1532,11 @@ function stockPage(payload, view) {
       box.appendChild(el('div', 'warn', '故事頁的白名單讀不到（.meta.json 是舊的：重跑 python -m webapp materialize）——不印片段'));
     } else {
       // 有故事頁只是印不出來時不說「還沒做深」（做了、只是這一輪讀不到——上面那一行講原因）
-      box.appendChild(el('p', 'note not-deep', hero ? '這一檔還沒做深：下面是淺寫的頁首、短故事與系統裡的它。'
-        : '這一檔還沒做深：下面是短故事與系統裡的它。'));
+      box.appendChild(el('p', 'note not-deep', (hero ? '這一檔還沒做深：下面是淺寫的頁首與短故事；'
+        : '這一檔還沒做深：下面是短故事；') + '每一格後面的灰框是系統現值。'));
     }
     if (hero) box.appendChild(hero);
-    box.appendChild(shortStory(view));
-    pageDiagrams(payload, view).forEach((n) => box.appendChild(n));
-    box.appendChild(systemBlock(payload, view, null));
+    box.appendChild(shortStory(view, systemPieces(payload, view, null)));
   }
   return box;
 }
@@ -1733,99 +1736,113 @@ function waitBadge(sp, key) {
   return badge;
 }
 
-/** 「系統裡的它」——沒有故事頁的檔（2026-11-28 起；有故事頁的走 `storySystemBlock`）。這一頁沒有故事，這一塊就是主內容，所以
- *  照 plan §2.7 全留（一個函式、固定順序、全部沿用現有元件、不新算任何數）：①候選狀態與賭注句（＋和持有的檔押同一個需求——
- *  AGENTS「必須點明相關性」）②押在哪一層、路徑（名詞一個展開）③讀圖的判讀（＋研究寫的這條鏈怎麼走與引文，一個展開）
- *  ④會不會先死 ⑤已定價嗎、出現在數字裡了嗎（數字收一個展開：參考尺、營收從哪來——客戶集中度、backlog 也在這裡）
- *  ⑥已登記的等待（反證、確認條件、事件與影響多大、時間表）⑦現在的股價。示意圖在這一塊上面（`stockPage`）。
- *  2026-11-26 落地時逐行對照舊版：需求錨的四張圖、吃到多少、各格的依據（短故事那一格的原文）、各塊標題只在舊版。
- *  「會不會死」那一行總結 2026-11-27 使用者「加回去就夠了」：放在四盞燈上面，點了跳到算出燈的數字。2026-11-28 刪舊版時
- *  需求錨與吃到多少兩張圖搬進數字與出處（`systemNumbers`）；依據原文、塊標題使用者 11-27 說不看，跟著舊版拿掉。 */
-function systemBlock(payload, view, sp) {
-  if (sp) return storySystemBlock(payload, view, sp);
-  const box = el('div', 'system-block');
-  box.appendChild(el('h2', 'system-title', '系統裡的它'));
+/** 系統的每一項放在報告的哪裡——只有這一張表（2026-11-28 使用者：「系統裡的它就是報告內容啊」）。
+ *  每列＝[項目, 故事頁的哪一節（片段的 id）, 沒做深的檔的短故事哪幾格（照順序找第一個有寫的）]；null＝那一種頁不印這一項
+ *  （`systemPieces` 給空的）。故事頁：示意圖在第 1 題（它在哪一格）、營收的數字在第 2 題（量與錢各在哪一種）、和持有的檔押同一個
+ *  需求在第 3 題（它在賭哪一種）、需求錨與吃到多少在第 6 題（市場多大）、押的那一層讀成什麼在第 7 題（缺不缺）、已定價嗎與事件
+ *  在第 9 題（股價走過的路）、確認條件在第 11 題（再一次要發生什麼）、反證與會不會死在第 12 題（什麼會讓夢醒）、候選狀態在
+ *  「回頭看，這是哪一種賭」、程式數到的對不上在 `#system-gap`。表的順序＝同一節裡的先後，也是對不到任何一格時（還沒寫敘事）的先後。 */
+const SYSTEM_PLACES = [
+  ['verdict', 'bet-kind', ['our_bet']],
+  ['bet', null, ['our_bet']],
+  ['shared', 'q3', ['our_bet']],
+  ['seats', null, ['position']],
+  ['diagram', 'q1', ['position']],
+  ['path', null, ['demand']],
+  ['demand', 'q6', ['demand']],
+  ['revenue', 'q2', ['revenue', 'position']],
+  ['reading', 'q7', null],
+  ['priced', 'q9', ['priced_in']],
+  ['price', null, ['priced_in']],
+  ['events', 'q9', ['events', 'when']],
+  ['confirm', 'q11', ['what_must_be_true']],
+  ['disproof', 'q12', ['what_must_be_true']],
+  ['dies', 'q12', ['what_must_be_true']],
+  ['timeline', null, ['when']],
+  ['gaps', 'system-gap', null],
+];
+
+/** 系統的每一項（`sp`＝有故事頁）：項目 → 節點清單。全部沿用現有元件、不新算任何數。故事頁不印故事自己講過的
+ *  （2026-11-28「瘦身」：押什麼／翻倍要／認錯看那一句、坐的層與錢怎麼走到它、這條鏈怎麼走、每條反證的細節與時間表、股價圖——
+ *  stock-story skill 要求故事自己講到）；沒做深的檔全印（它只有短故事，這些就是主內容）。
+ *  三題的三個字點了打開同一頁那一題的數字（`questionNumbers` 掛 id `tq-<題>`）；會不會死一行點了打開四盞燈的全句與數字。 */
+function systemPieces(payload, view, sp) {
+  const story = Boolean(sp);
+  const row = candidateStateRow(view);
   const light = view.brief && lineMap(view.brief).brief_status_light;       // 敘事的狀態燈（「有假設改過，判斷還沒重看」）
   const lit = light && light.datum && light.datum.value;
-  if (lit && lit.label) box.appendChild(el('span', 'badge badge-light light-' + (lit.state || 'unknown'), lit.label));
-  const row = candidateStateRow(view);
-  const line = candidateLine(view, true);
-  if (line) box.appendChild(line);
-  betLines(row).forEach((n) => box.appendChild(n));
-  sharedBetLines(row).forEach((n) => box.appendChild(n));
-  box.appendChild(seatsSentence(payload, view));
-  pathSentences(payload).forEach((n) => box.appendChild(n));
-  const chain = chainDetail(payload, view);      // 走圖的敘事：研究寫的這條鏈怎麼走＋圖裡 claim 的引文（11-26「走圖啥的敘事」）
-  if (chain) box.appendChild(chain);
   const rides = view.bet && lineMap(view.bet).rides;
   const glossary = rides && Array.isArray(rides.datum.value) && rides.datum.value.length ? unitGlossary() : null;
-  if (glossary) box.appendChild(drill('名詞：層、插槽、押在哪一格', () => glossary));
-  const seats = seatsDetail(payload, view);
-  if (seats) box.appendChild(seats);
-  const dies = lampLine(view);           // 會不會死一行（最差那盞的詞＋不是綠的那幾盞的短句）
-  if (dies) box.appendChild(dies);
-  const lamps = lampsBlock(view, true);
-  if (lamps) box.appendChild(lamps);
-  wordsBlock(view, ['priced_in', 'in_numbers']).forEach((n) => box.appendChild(n));
-  const numbers = systemNumbers(payload, view);
-  if (numbers) box.appendChild(numbers);
-  disproofBrief(view).forEach((n) => box.appendChild(n));
-  confirmBrief(row).forEach((n) => box.appendChild(n));
-  const events = eventBlock(payload);
-  if (events) box.appendChild(events);
-  const downside = downsideDetail(view);
-  if (downside) box.appendChild(downside);
-  const timeline = timelineDetail(view);
-  if (timeline) box.appendChild(timeline);
-  box.appendChild(priceFigure(payload));
-  return box;
-}
-
-/** 有故事頁的檔的「系統裡的它」（2026-11-28 使用者：「瘦身」「我是想要原本 old 還存在的那一段，就融合進去現在新的敘事頁面」）。
- *  故事已經講過、或頁首已經印的不再印一次：押什麼／翻倍要／認錯看那一句（第 11、12 題）、它坐的二十幾層與錢怎麼走到它、
- *  這條鏈怎麼走、每條反證的細節與時間表（第 11、12 題的等待徽章）、四盞燈逐盞（會不會死一行＋數字的展開就夠）、股價圖（頁首有
- *  現價、第 9 題有圖）。留下系統帳上會自己變、故事不能手抄的（AGENTS「系統自己知道的由程式填」）：候選狀態與理由、和持有的檔
- *  押同一個需求、押的那一層讀成什麼（示意圖收進展開——頁首那一句「往下有圖」指的就是它）、會不會死一行、已定價嗎／出現在
- *  數字裡了嗎、反證與確認條件有沒有醒、事件與影響多大、這一頁和系統對不上的。排成故事的一節（標題用故事的 h2、不是一張卡），
- *  標題下一行寫明是程式照帳上填的。舊版個股頁 2026-11-28 刪除：拿掉的那幾樣故事頁自己要講到（stock-story skill）。 */
-function storySystemBlock(payload, view, sp) {
-  const box = el('div', 'system-block system-in-story');
-  box.appendChild(el('h2', null, '系統裡的它'));
-  box.appendChild(el('p', 'system-note', '這一節是程式照系統帳上的現值填的，每天更新；上面的故事是研究時寫的。'));
-  const light = view.brief && lineMap(view.brief).brief_status_light;       // 敘事的狀態燈（「有假設改過，判斷還沒重看」）
-  const lit = light && light.datum && light.datum.value;
-  if (lit && lit.label) box.appendChild(el('span', 'badge badge-light light-' + (lit.state || 'unknown'), lit.label));
-  const row = candidateStateRow(view);
-  const line = candidateLine(view, true, true);
-  if (line) box.appendChild(line);
-  sharedBetLines(row).forEach((n) => box.appendChild(n));
-  const reading = rideReadingLine(payload, view);
-  if (reading) box.appendChild(reading);
   const diagrams = pageDiagrams(payload, view);
-  if (diagrams.length) {
-    // 標題的塊名照 page_schema（B4；頁首「往下『…』有圖」指的就是它）——前端不留第二份（L16）；讀不到合約只寫「示意圖」
-    box.appendChild(drill(`${blockTitle('B4') || '示意圖'}：它在哪一格`, () => {
+  const dies = blockTitle('B9');       // 塊名照 page_schema（L16）；讀不到合約不印塊名
+  const source = blockTitle('B3');
+  const pieces = {
+    verdict: [lit && lit.label ? el('span', 'badge badge-light light-' + (lit.state || 'unknown'), lit.label) : null,
+      candidateLine(view, true, story)],
+    bet: story ? [] : betLines(row),
+    shared: sharedBetLines(row),
+    seats: story ? [] : [seatsSentence(payload, view),
+      glossary ? drill('名詞：層、插槽、押在哪一格', () => glossary) : null, seatsDetail(payload, view)],
+    // 故事頁收進一個展開（標題的塊名照 page_schema 的 B4——前端不留第二份，L16）；沒做深的檔直接印
+    diagram: !diagrams.length ? [] : story ? [drill(`${blockTitle('B4') || '示意圖'}：它在哪一格`, () => {
       const wrap = el('div', 'block-detail');
       diagrams.forEach((n) => wrap.appendChild(n));
       return wrap;
-    }));
-  }
-  const dies = lampLine(view);
-  if (dies) box.appendChild(dies);
-  wordsBlock(view, ['priced_in', 'in_numbers']).forEach((n) => box.appendChild(n));
-  const numbers = systemNumbers(payload, view);
-  if (numbers) box.appendChild(numbers);
-  disproofBrief(view).forEach((n) => box.appendChild(n));
-  confirmBrief(row).forEach((n) => box.appendChild(n));
-  const events = eventBlock(payload);
-  if (events) box.appendChild(events);
-  const gaps = storyGapLines(sp);
-  if (gaps) box.appendChild(gaps);
+    })] : diagrams,
+    path: story ? [] : [...pathSentences(payload), chainDetail(payload, view)],
+    demand: [questionNumbers(view, null, '需求那一頭：錨的走勢、它吃到多少', [...anchorFigures(payload), captureFigure(payload)])],
+    revenue: [...wordsBlock(view, ['in_numbers']), questionNumbers(view, 'in_numbers',
+      '出現在數字裡了嗎：' + (source || '營收的數字'),
+      [revenueBars(view), ...betShareLines(payload), ...mixFigures(payload), ...mixDetail(payload)])],
+    reading: story ? [rideReadingLine(payload, view)] : [],
+    priced: [...wordsBlock(view, ['priced_in']), questionNumbers(view, 'priced_in', '已定價嗎：參考尺與數字',
+      [pricedInPlain(), marketMultiples(view), rulerChart(view)])],
+    price: story ? [] : [priceFigure(payload)],
+    events: [eventBlock(payload)],
+    confirm: confirmBrief(row),
+    disproof: [...disproofBrief(view), story ? null : downsideDetail(view)],
+    dies: [lampLine(view), questionNumbers(view, 'will_it_die', (dies ? dies + '：' : '') + '四盞燈的全句與數字',
+      [lampsBlock(view, true), wipeoutUnlitRule(view)])],
+    timeline: story ? [] : [timelineDetail(view)],
+    gaps: story ? [storyGapLines(sp)] : [],
+  };
+  Object.keys(pieces).forEach((key) => { pieces[key] = pieces[key].filter(Boolean); });
+  return pieces;
+}
+
+/** 照表的順序走一遍：[項目, 節點, 那一列]；表外的項目（不該有）接在最後——不丟（INV-3）。 */
+function placeOrder(pieces) {
+  const known = new Set(SYSTEM_PLACES.map((place) => place[0]));
+  return SYSTEM_PLACES.map((place) => [place[0], pieces[place[0]] || [], place])
+    .concat(Object.keys(pieces).filter((key) => !known.has(key)).map((key) => [key, pieces[key], [key, null, null]]))
+    .filter((entry) => entry[1].length);
+}
+
+/** 一節後面的灰框：系統現值（每天物化時更新）；上面那一節的字是研究時寫的。 */
+function liveBox(nodes) {
+  const box = el('div', 'sys-live');
+  box.appendChild(el('div', 'sys-live-tag', '系統現值・每天更新'));
+  nodes.forEach((n) => box.appendChild(n));
   return box;
 }
 
+/** 故事頁：每一項放進表上那一節、接在那一節的字後面（一節一個灰框）。那一節不存在（選填的 `#system-gap`、舊片段）就放進
+ *  「回頭看，這是哪一種賭」，再沒有放進片段的空位、片段最後——不丟。片段的空位（`#system`，合約規定留空）用不到就拿掉。 */
+function placeInStory(article, pieces) {
+  const slot = article.querySelector('[data-slot="system"]');
+  const fallback = article.querySelector('#sp-bet-kind') || slot || article;
+  const hosts = new Map();
+  placeOrder(pieces).forEach(([, nodes, place]) => {
+    const host = (place[1] && article.querySelector('#sp-' + place[1])) || fallback;
+    if (!hosts.has(host)) hosts.set(host, []);
+    hosts.get(host).push(...nodes);
+  });
+  hosts.forEach((nodes, host) => host.appendChild(liveBox(nodes)));
+  if (slot && !slot.children.length && !slot.textContent.trim()) slot.remove();
+}
+
 /** 押的那一層（或插槽）讀成什麼：敘事的 rides 每一個一句——名字連到圖頁那一層、讀圖照抄第一段（同 `seatsSentence` 的讀法），
- *  沒讀過圖照說。只給有故事頁的「系統裡的它」：坐的其他層與每一層的讀圖在圖頁。 */
+ *  沒讀過圖照說。只給故事頁（放在第 7 題「缺不缺」那一節）：坐的其他層與每一層的讀圖在圖頁。 */
 function rideReadingLine(payload, view) {
   const rides = view.bet && lineMap(view.bet).rides;
   const list = rides && rides.datum && Array.isArray(rides.datum.value) ? rides.datum.value : [];
@@ -1871,38 +1888,24 @@ function candidateStateRow(view) {
   return (state && state.value) || null;
 }
 
-/** 財務三題的數字與出處收成一個展開（§2.7 ⑤）。每題一段、掛 id `tq-<題>`——上面那幾個字點了打開這個展開、捲到那一段。
- *  「已定價嗎」帶參考尺（自家三年的倍數，脈絡不是訊號）；「出現在數字裡了嗎」帶營收從哪來（每季營收、押的那一塊、
- *  分部占比、客戶集中度、backlog——出投資建議前必看的那幾項，舊版的「營收從哪來」那一塊），再接需求那一頭：需求錨的季度
- *  走勢與「吃到多少」（每 10 億美元的錨對應它多少營收；2026-11-28 刪舊版時從舊版「需求傳導」那一塊搬來——使用者 11-27
- *  以為新版已經有）。三題的數字面板缺席時只印一次缺席，不印三次；營收從哪來照樣印。 */
-function systemNumbers(payload, view) {
+/** 一題的數字與出處（一個展開，接在講那一題的那一節）：三題的數字面板照抄（`tqNumbers`）＋這一題的圖與細節（`extras`）。
+ *  展開裡那一段掛 id `tq-<題>`——三個字與會不會死那一行點了打開這個展開、捲過去（`jumpToNumbers`）。
+ *  「已定價嗎」帶參考尺（自家三年的倍數，脈絡不是訊號）；「出現在數字裡了嗎」帶營收從哪來（每季營收、押的那一塊、分部占比、
+ *  客戶集中度、backlog——出投資建議前必看的那幾項）；`question` 是 null＝只有圖、沒有三題的數字（需求錨的季度走勢與「吃到
+ *  多少」：每 10 億美元的錨對應它多少營收；2026-11-28 刪舊版時搬來——使用者 11-27 以為新版已經有）。
+ *  三題的數字面板缺席時，缺席只印一次（會不會死那一題），不印三次；「已定價嗎」那一題沒有數字就整個不印。 */
+function questionNumbers(view, question, title, extras) {
   const panel = view.three_questions;
   const any = Boolean(panel) && (panel.lines || []).some((line) => line.role === 'three_question');
-  const revenue = () => [revenueBars(view), ...betShareLines(payload), ...mixFigures(payload), ...mixDetail(payload),
-    ...anchorFigures(payload), captureFigure(payload)];
-  const dies = blockTitle('B9');       // 塊名照 page_schema（L16）
-  const source = blockTitle('B3');
-  const parts = any ? [
-    ['will_it_die', (dies ? dies + '：' : '') + '算出四盞燈的數字', () => [wipeoutUnlitRule(view)]],
-    ['priced_in', '已定價嗎', () => [pricedInPlain(), marketMultiples(view), rulerChart(view)]],
-    ['in_numbers', '出現在數字裡了嗎' + (source ? '（' + source + '）' : ''), revenue],
-  ] : [['will_it_die', '', () => []], ['in_numbers', source, revenue]];
-  const sections = parts.map(([question, title, extras], i) => {
-    const rows = panel && (any || i === 0) ? tqNumbers(view, question) : null;
-    const extra = [].concat(extras() || []).filter(Boolean);
-    if (!rows && !extra.length) return null;
-    const sec = el('div', 'system-numbers-part');
-    sec.id = 'tq-' + question;
-    if (title) sec.appendChild(el('div', 'group-title', title));
-    extra.forEach((n) => sec.appendChild(n));
-    if (rows) sec.appendChild(rows);
-    return sec;
-  }).filter(Boolean);
-  if (!sections.length) return null;
-  return drill('數字與出處', () => {
+  if (question === 'priced_in' && !any) return null;
+  const rows = question && panel && (any || question === 'will_it_die') ? tqNumbers(view, question) : null;
+  const parts = [].concat(extras || []).filter(Boolean);
+  if (!rows && !parts.length) return null;
+  return drill(title, () => {
     const body = el('div', 'block-detail');
-    sections.forEach((sec) => body.appendChild(sec));
+    if (question) body.id = 'tq-' + question;
+    parts.forEach((n) => body.appendChild(n));
+    if (rows) body.appendChild(rows);
     return body;
   });
 }
@@ -1913,7 +1916,7 @@ function storyGapLines(sp) {
   if (!gaps.length) return null;
   const remedy = ((VOCAB && VOCAB.story_page) || {}).gap_remedy || {};
   const box = el('div', 'story-gaps');
-  box.appendChild(el('div', 'group-title', '這一頁和系統對不上的'));
+  box.appendChild(el('div', 'group-title', '這一頁和系統對不上的（程式數到的）'));
   gaps.forEach((gap) => {
     const line = el('div', 'warn', gap.text || gap.kind);
     if (remedy[gap.kind]) line.title = '怎麼清：' + remedy[gap.kind];
@@ -1924,8 +1927,10 @@ function storyGapLines(sp) {
 
 /** 沒做深的檔的故事（§2.7 第 3 條）：敘事逐格——那一格有短故事（`story:`）印短故事、沒有印敘事原文（`brief:`；舊版十三塊
  *  同一個規則，2026-11-26 落地對照時抓到「有一格寫了短故事就整份只印短故事」會讓其餘格消失）；只有短故事的格（營收從哪來、
- *  最近發生什麼）接在後面。都沒有印一句——非邊緣（或邊緣但買不到）是規定不寫敘事、不是還沒寫，字取首頁分組字彙那一份。 */
-function shortStory(view) {
+ *  最近發生什麼）接在後面。都沒有印一句——非邊緣（或邊緣但買不到）是規定不寫敘事、不是還沒寫，字取首頁分組字彙那一份。
+ *  系統的每一項（`pieces`）放進講同一件事的那一格、接在那一格的字後面（`SYSTEM_PLACES` 第三欄，照順序找第一個有的格；一格一個
+ *  灰框）；對不到任何一格的（例：還沒寫敘事）收在最後一個灰框——不丟（INV-3）。 */
+function shortStory(view, pieces) {
   const lines = ((view.brief && view.brief.lines) || []).filter((row) => {
     const d = row.datum || {};
     return typeof d.value === 'string' && d.value;
@@ -1935,19 +1940,31 @@ function shortStory(view) {
   const rows = [];
   lines.filter((row) => row.key.indexOf('brief:') === 0).forEach((row) => {
     const slot = row.key.slice('brief:'.length);
-    rows.push(told[slot] || row);
+    rows.push([slot, told[slot] || row]);
     delete told[slot];
   });
-  Object.keys(told).forEach((slot) => rows.push(told[slot]));
-  if (rows.length) {
-    const box = el('div', 'story short-story');
-    rows.forEach((row) => box.appendChild(storyRow(row)));
-    return box;
+  Object.keys(told).forEach((slot) => rows.push([slot, told[slot]]));
+  const box = el('div', 'story short-story');
+  const at = {};
+  rows.forEach(([slot, row]) => {
+    at[slot] = storyRow(row);
+    box.appendChild(at[slot]);
+  });
+  if (!rows.length) {
+    const ctx = (view.candidate || {}).context || {};
+    const rule = (ctx.edge_state === 'not_edge' && listGroupLabel('not_edge_no_narrative'))
+      || (ctx.buyable === false && listGroupLabel('not_buyable_no_narrative'));
+    box.appendChild(el('p', 'note', rule || '還沒寫敘事'));
   }
-  const ctx = (view.candidate || {}).context || {};
-  const rule = (ctx.edge_state === 'not_edge' && listGroupLabel('not_edge_no_narrative'))
-    || (ctx.buyable === false && listGroupLabel('not_buyable_no_narrative'));
-  return el('p', 'note', rule || '還沒寫敘事');
+  const hosts = new Map();
+  placeOrder(pieces || {}).forEach(([, nodes, place]) => {
+    const slot = (place[2] || []).find((s) => at[s]);
+    const host = slot ? at[slot] : box;
+    if (!hosts.has(host)) hosts.set(host, []);
+    hosts.get(host).push(...nodes);
+  });
+  hosts.forEach((nodes, host) => host.appendChild(liveBox(nodes)));
+  return box;
 }
 
 /** 這一頁坐的層的技術示意圖，標出它在哪一格（新舊兩版個股頁共用）。 */
@@ -2399,7 +2416,7 @@ function revenueBars(view) {
     latest: last.yoy == null ? null : `年增 ${fmtPercent(last.yoy)}` });
 }
 
-/** 需求錨（B2「錨的變化」，個股頁 S3a；2026-11-28 起住「系統裡的它」的數字與出處）：這家公司在結構表走到的錨對到的
+/** 需求錨（B2「錨的變化」，個股頁 S3a；2026-11-28 起住講市場多大的那一節的展開，`systemPieces` 的 demand）：這家公司在結構表走到的錨對到的
  *  A2 序列——每條一張柱狀圖（Y 軸寫它是什麼、最新一期頭上寫量與年增）。可知日、哪幾家推算、代理說明不上畫面（2026-10-29），
  *  圖下不放字。全部照抄 materialize 的 `demand_anchor`（不加總、不換算）；沒有就照寫原因（走不到錨／題材沒宣告序列／這一輪沒讀到）。 */
 function anchorFigures(payload) {
@@ -2429,7 +2446,7 @@ function anchorBars(s) {
     unit: CURRENCY_WORD[s.currency] || s.currency || '', latest });
 }
 
-/** 吃到多少（B2，個股頁 S3b；2026-11-28 起住「系統裡的它」的數字與出處）：每 10 億美元的錨對應它多少美元營收——往上＝
+/** 吃到多少（B2，個股頁 S3b；2026-11-28 起和需求錨同一個展開）：每 10 億美元的錨對應它多少美元營收——往上＝
  *  吃到的比例變大。全部照抄 materialize 的 `capture`（季營收、換匯的季均價、比值都在 `alpha.capture` 算好）；換匯與可知日
  *  不上畫面。沒有就照寫原因。 */
 function captureFigure(payload) {

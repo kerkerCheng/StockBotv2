@@ -411,7 +411,7 @@ def test_the_todo_ledger_carries_three_cells_and_unread_is_not_zero() -> None:
     assert (cells["todo.bet_vague"].count, cells["todo.bet_vague"].work) == (1, "B")
     assert "無法量」1 檔（D）" in cells["todo.bet_vague"].note and "不是待做" in cells["todo.bet_vague"].note
     assert (cells["todo.no_check_day"].count, cells["todo.no_check_day"].work) == (1, "C")
-    # 三格都不推 drain：整批寫使用者還沒放行，它們只是會自己出現的計數
+    # 三格都不推 drain：清掉它們不讓任何一檔離決定更近（整批寫 2026-11-28 已放行），它們只是會自己出現的計數
     from engine_b import todo_ledger as tl
 
     assert not {"todo.bet_line", "todo.bet_vague", "todo.no_check_day"} & set(tl.PROGRESS_LABELS)
@@ -481,11 +481,10 @@ def test_the_front_end_prints_the_sentences_as_given_and_builds_none() -> None:
     source = (Path(__file__).resolve().parent.parent / "webapp" / "static" / "app.js").read_text(encoding="utf-8")
     code = re.sub(r"(?m)//.*$", "", re.sub(r"/\*.*?\*/", "", source, flags=re.S))
     assert "function betLines(" in code and "function betList(" in code and "function calendarRow(" in code
-    # 2026-11-28 舊版個股頁（十三塊的 `questionPart`）刪除：賭注句印在沒做深的檔的「系統裡的它」；做過故事頁的檔不印
-    # （故事的第 11、12 題就是長版）
-    system = source.split("function systemBlock(", 1)[1].split("\n}\n", 1)[0]
-    slim = source.split("function storySystemBlock(", 1)[1].split("\n}\n", 1)[0]
-    assert "betLines(row)" in system and "betLines(" not in slim
+    # 2026-11-28 舊版個股頁（十三塊的 `questionPart`）刪除：賭注句印在沒做深的檔短故事「我們賭什麼」那一格的灰框
+    # （`systemPieces` 的 bet、`SYSTEM_PLACES`）；做過故事頁的檔不印（故事的第 11、12 題就是長版）
+    pieces = source.split("function systemPieces(", 1)[1].split("\n}\n", 1)[0]
+    assert "bet: story ? [] : betLines(row)," in pieces and "['bet', null, ['our_bet']]" in source
     for built in ("押：", "翻倍要：", "下一個對帳日：", "認錯看：", "還沒寫賭注句"):
         assert built not in code, built                                        # 這幾個字只住 alpha.bet_line（L16）
     assert ".sort(" not in code

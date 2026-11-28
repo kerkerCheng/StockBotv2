@@ -94,8 +94,8 @@ def test_the_meta_carries_the_one_copy_and_app_js_keeps_none(tmp_path: Path) -> 
         if len(section["title"]) > 4:
             assert section["title"] not in code, section["title"]
     # 2026-11-28 舊版個股頁（照 first_screen 排十三塊的 `questionPart`／`schemaFirstScreen`）刪除：合約的每個元件改在
-    # 沒做深的檔的「系統裡的它」各有一個呼叫（`systemBlock`）——元件沒有一個悄悄消失（INV-3）
-    system = source.split("function systemBlock(", 1)[1].split("\n}\n", 1)[0]
+    # 系統的每一項（`systemPieces`，同日拆進各節）各有一個呼叫——元件沒有一個悄悄消失（INV-3）
+    system = source.split("function systemPieces(", 1)[1].split("\n}\n", 1)[0]
     shown = {"priced_in": "'priced_in'", "in_numbers": "'in_numbers'", "will_it_die": "lampLine(view)",
              "wipeout": "lampsBlock(view, true)", "disproof": "disproofBrief(view)", "confirm": "confirmBrief(row)",
              "shared_bet": "sharedBetLines(row)", "bet_line": "betLines(row)"}
